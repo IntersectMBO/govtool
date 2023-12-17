@@ -1,0 +1,8 @@
+# other
+.vite
+.vscode
+/node_modules
+/dist
+/.lighthouseci
+/yarn-error.log
+.env

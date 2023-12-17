@@ -1,0 +1,379 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: Slack VVA
+    receivers:
+      - uid: d3b7ee9d-ca06-452b-8e73-687b6cefc611
+        name: Slack VVA
+        type: slack
+        settings:
+          recipient: GRAFANA_SLACK_RECIPIENT
+          token: GRAFANA_SLACK_OAUTH_TOKEN
+        disableResolveMessage: false
+
+policies:
+  - orgId: 1
+    receiver: "Slack VVA"
+    group_by:
+      - grafana_folder
+      - alertname
+
+groups:
+  - orgId: 1
+    name: status
+    folder: VVA
+    interval: 1m
+    rules:
+      - uid: ee72520a-2e0b-4789-a6c3-f29e68240511
+        title: Cardano Node slotInEpoch change rate over 5 min
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 1800
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              datasource:
+                type: prometheus
+                uid: PBFA97CFB590B2093
+              editorMode: builder
+              expr: rate(cardano_node_metrics_slotInEpoch_int{instance="cardano-node:12798"}[5m])
+              instant: false
+              interval: ""
+              intervalMs: 15000
+              maxDataPoints: 43200
+              range: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 1800
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              hide: false
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              settings:
+                mode: replaceNN
+                replaceWithValue: 0
+              type: reduce
+          - refId: C
+            relativeTimeRange:
+              from: 1800
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0.4
+                    type: lt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              hide: false
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        dashboardUid: e3697f62-6a01-4596-b626-d46141441b32
+        panelId: 5
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        annotations:
+          __dashboardUid__: e3697f62-6a01-4596-b626-d46141441b32
+          __panelId__: "5"
+        isPaused: false
+        labels:
+          app_component: cardano-node
+  #- orgId: 1
+  #  name: node_dbsync_block_diff
+  #  folder: VVA
+  #  interval: 1m
+  #  rules:
+      - uid: c341df64-edda-4d43-b9bd-ef8989cfb638
+        title: DB Sync node-db block height difference
+        condition: F
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 1800
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              datasource:
+                type: prometheus
+                uid: PBFA97CFB590B2093
+              editorMode: builder
+              expr: cardano_db_sync_node_block_height{instance="cardano-db-sync:8080"}
+              instant: false
+              interval: ""
+              intervalMs: 15000
+              maxDataPoints: 43200
+              range: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 1800
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              datasource:
+                type: prometheus
+                uid: PBFA97CFB590B2093
+              editorMode: builder
+              expr: cardano_db_sync_db_block_height{instance="cardano-db-sync:8080"}
+              hide: false
+              instant: false
+              interval: ""
+              intervalMs: 15000
+              maxDataPoints: 43200
+              range: true
+              refId: B
+          - refId: C
+            relativeTimeRange:
+              from: 1800
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: []
+                  reducer:
+                    params: []
+                    type: avg
+                  type: query
+              datasource:
+                  name: Expression
+                  type: __expr__
+                  uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: C
+              settings:
+                mode: ""
+              type: reduce
+          - refId: D
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: []
+                  reducer:
+                    params: []
+                    type: avg
+                  type: query
+              datasource:
+                name: Expression
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: D
+              type: reduce
+          - refId: E
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: []
+                  reducer:
+                    params: []
+                    type: avg
+                  type: query
+              datasource:
+                name: Expression
+                type: __expr__
+                uid: __expr__
+              expression: abs($C-$D)
+              hide: false
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: E
+              type: math
+          - refId: F
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: []
+                  reducer:
+                    params: []
+                    type: avg
+                  type: query
+              datasource:
+                name: Expression
+                type: __expr__
+                uid: __expr__
+              expression: E
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: F
+              type: threshold
+        dashboardUid: e3697f62-6a01-4596-b626-d46141441b32
+        panelId: 6
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        annotations:
+          __dashboardUid__: e3697f62-6a01-4596-b626-d46141441b32
+          __panelId__: "6"
+        isPaused: false
+        labels:
+          app_component: cardano-db-sync
+      - uid: f68d71fb-561d-4a39-b6d9-043bb3053a58
+        title: Backend HTTP 502s
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 1800
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              datasource:
+                type: prometheus
+                uid: PBFA97CFB590B2093
+              editorMode: builder
+              expr: sum by(code) (rate(traefik_service_requests_total{service="vva-be@docker", code="502"}[$__rate_interval]))
+              hide: false
+              instant: false
+              interval: ""
+              intervalMs: 15000
+              legendFormat: '{{code}}'
+              maxDataPoints: 43200
+              range: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 1800
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              hide: false
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            relativeTimeRange:
+              from: 1800
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0.1
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - D
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              hide: false
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        dashboardUid: e3697f62-6a01-4596-b626-d46141441b32
+        panelId: 4
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          __dashboardUid__: e3697f62-6a01-4596-b626-d46141441b32
+          __panelId__: "4"
+        isPaused: false
+        labels:
+          app_component: backend

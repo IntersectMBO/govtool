@@ -1,0 +1,37 @@
+# .gitignore
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Environment files
+.env
+
+# Virtual environment
+venv/
+
+# IDEs and editors
+*.pycharm/
+*.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# pytest artifacts
+.pytest_cache/
+
+# Logs and databases
+*.log
+*.sqlite
+
+# Other
+*.bak

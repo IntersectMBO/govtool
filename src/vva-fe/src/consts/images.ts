@@ -1,0 +1,15 @@
+export const IMAGES = {
+  appLogo: "/images/SanchoLogo.png",
+  appLogoWithoutText: "/images/AppLogoWithoutText.png",
+  errorPageImage: "/images/ErrorPageImage.png",
+  heroImage: "/images/HeroImage.png",
+  govActionDelegateImage: "/images/GovActionDelegate.png",
+  govActionRegisterImage: "/images/GovActionRegister.png",
+  govActionListImage: "/images/GovActionList.png",
+  govActionDefaultImage: "/images/GovActionDefault.png",
+  successImage: "/images/Success.png",
+  warningImage: "/images/Warning.png",
+  warningYellowImage: "/images/WarningYellow.png",
+  bgOrange: "/images/BGOrange.png",
+  bgBlue: "/images/BGBlue.png",
+};

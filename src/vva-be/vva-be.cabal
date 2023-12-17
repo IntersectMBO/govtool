@@ -1,0 +1,113 @@
+cabal-version:      3.6
+name:               vva-be
+version:            0.1.0.0
+
+-- A short (one-line) description of the package.
+-- synopsis:
+
+-- A longer description of the package.
+-- description:
+
+-- A URL where users can report bugs.
+-- bug-reports:q
+
+-- The license under which the package is released.
+-- license:
+author:             Michał Jankun
+maintainer:         michaljankun@gmail.com
+
+-- A copyright notice.
+-- copyright:
+-- category:
+extra-source-files:
+  CHANGELOG.md
+  sql/get-voting-power.sql
+  sql/list-dreps.sql
+  sql/get-delegates.sql
+  sql/get-current-delegation.sql
+  sql/list-proposals.sql
+  sql/get-votes.sql
+  sql/get-drep-info.sql
+  sql/get-all-proposal-stake-keys.sql
+  sql/get-current-epoch-params.sql
+  sql/get-transaction-status.sql
+  sql/get-stake-key-voting-power.sql
+  sql/get-network-metrics.sql
+executable vva-be
+    main-is:          Main.hs
+
+    -- Modules included in this executable, other than Main.
+    -- other-modules:
+
+    -- LANGUAGE extensions used by modules in this package.
+    -- other-extensions:
+    build-depends:    base >=4.16 && <4.18
+                    , vva-be
+                    , optparse-applicative
+                    , text
+                    , servant-swagger-ui
+                    , servant-server
+                    , servant-openapi3
+                    , servant
+                    , wai
+                    , wai-cors
+                    , warp
+                    , transformers
+                    , time
+                    , aeson
+                    , string-conversions
+                    , openapi3
+                    , lens
+                    , cache
+                    , clock
+                    , resource-pool >= 0.4.0.0
+                    , postgresql-simple
+                    , data-has
+                    , raven-haskell >= 0.1.4.1
+                    , bytestring
+
+    hs-source-dirs:   app
+    default-language: Haskell2010
+
+library
+  hs-source-dirs: src
+  build-depends: base  >=4.16 && <4.18
+               , servant-server
+               , conferer
+               , mtl
+               , aeson
+               , aeson-pretty
+               , conferer-aeson
+               , text
+               , bytestring
+               , optparse-applicative
+               , servant
+               , openapi3
+               , lens
+               , postgresql-simple
+               , file-embed
+               , base16-bytestring
+               , scientific
+               , cryptonite
+               , time
+               , containers
+               , cache
+               , hashable
+               , data-has
+               , resource-pool
+               , swagger2
+
+  exposed-modules: VVA.Config
+                 , VVA.CommandLine
+                 , VVA.API
+                 , VVA.API.Types
+                 , VVA.API.Utils
+                 , VVA.DRep
+                 , VVA.AdaHolder
+                 , VVA.Proposal
+                 , VVA.Epoch
+                 , VVA.Transaction
+                 , VVA.Cache
+                 , VVA.Pool
+                 , VVA.Types
+                 , VVA.Network

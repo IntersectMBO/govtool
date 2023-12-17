@@ -1,0 +1,5 @@
+/target
+/.mvn/wrapper/*.jar
+/gatling
+.idea
+.gitlab-ci.yml

@@ -1,0 +1,11 @@
+title Is User DRep
+
+participant dApp Frontend
+participant Wallet
+participant dApp Backend
+
+dApp Frontend->Wallet: ""API.getDRepKey()""
+Wallet->dApp Frontend: ""pubDRepKey""
+
+dApp Frontend->dApp Backend: ""GET drep/{pubDRepKey}
+dApp Backend->dApp Frontend: ""bool""

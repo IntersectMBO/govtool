@@ -1,0 +1,14 @@
+title DRep Retirement
+
+participant User (dRep)
+participant dApp Frontend
+participant Wallet
+participant Cardano Node
+
+User (dRep)->dApp Frontend: 'Retire' button pressed
+dApp Frontend->dApp Frontend: Construct ""DRepRetirementCertificate""
+dApp Frontend->Wallet: Pass certificate to wallet:\n""API.submitDRepRetirementCertificate(DRepRetirementCertificate)""
+Wallet->User (dRep): Ask permission popup (Wallet UI)
+User (dRep)->Wallet: Access granted (Wallet UI)
+Wallet->Cardano Node: Submit transaction: \n""POST /retirement/{retirement-cert}
+Wallet->dApp Frontend: ""SignedDRepRetirementCertificate""

@@ -1,0 +1,5 @@
+ci:
+  collect:
+    staticDistDir: "./dist"
+    url:
+      - "http://localhost"

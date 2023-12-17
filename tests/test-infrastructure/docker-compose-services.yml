@@ -1,0 +1,88 @@
+version: "3.9"
+secrets:
+  postgres_user:
+    external: true
+    name:  ${STACK_NAME}_postgres_user
+  postgres_password:
+    external: true
+    name:  ${STACK_NAME}_postgres_password
+configs:
+  postgres_db_setup.sql:
+    external: true
+    name: ${STACK_NAME}_postgres_db_setup.sql
+
+### secrets and configs in docker compose
+# secrets:
+#   postgres_user:
+#     file:  "./secrets/${STACK_NAME}_postgres_user"
+#   postgres_password:
+#     file: "./secrets/${STACK_NAME}_postgres_password"
+# configs:
+#   postgres_db_setup.sql:
+#     file: "./configs/${STACK_NAME}_postgres_db_setup.sql"
+volumes:
+  postgres:
+  nginx_dhparam:
+  nginx_ssl:
+
+networks:
+  postgres:
+    attachable: true
+    name: postgres
+  frontend:
+    attachable: true
+    name: frontend
+
+services:
+  gateway:
+    image: mesudip/nginx-proxy
+    networks:
+      - frontend
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nginx_dhparam:/etc/nginx/dhparam
+      - nginx_ssl:/etc/ssl
+    ports:
+     - target: 80
+       published: 80
+       protocol: tcp
+       mode: host
+     - target: 443
+       published: 443
+       protocol: tcp
+       mode: host
+    deploy:
+      placement:
+        constraints:
+          - node.labels.vva-test-stack == true
+      restart_policy:
+        delay: "10s"
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_LOGGING=true
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+      - POSTGRES_USER_FILE=/run/secrets/postgres_user
+    secrets:
+      - postgres_password
+      - postgres_user
+    configs:
+      - source: postgres_db_setup.sql
+        target: /docker-entrypoint-initdb.d/postgres_db_setup.sql
+    networks:
+      - postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: ${POSTGRES_ARGS:--c maintenance_work_mem=1GB -c max_parallel_maintenance_workers=4}
+    deploy:
+      placement:
+        constraints:
+          - node.labels.vva-test-stack == true
+      restart_policy:
+        delay: "30s"

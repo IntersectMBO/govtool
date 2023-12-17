@@ -1,0 +1,11 @@
+title Is User Delegator
+
+participant dApp Frontend
+participant Wallet
+participant dApp Backend
+
+dApp Frontend->Wallet: ""API.getActiveStakeKeys()""
+Wallet->dApp Frontend: ""[pubStakeKey]""
+
+dApp Frontend->dApp Backend: ""GET delegation/{pubStakeKey}
+dApp Backend->dApp Frontend: ""delegationCert""

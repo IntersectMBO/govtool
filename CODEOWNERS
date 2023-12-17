@@ -1,0 +1,24 @@
+# GovTool Project Codeowners
+
+# These owners will be the default owners for everything in the repository.
+* @Ryun1 @kickloop
+
+# Frontend assets templates
+src/vva-fe/*                                                                @Sworzen1 @JanJaroszczak @kickloop
+*.tsx                                                                       @Sworzen1 @JanJaroszczak @kickloop
+*.ts                                                                        @Sworzen1 @JanJaroszczak @kickloop
+*.css                                                                       @Sworzen1 @JanJaroszczak @kickloop
+
+# Backend
+src/vva-be/*                                                                @jankun4 @kickloop
+
+# DevOps
+.github/workflows/*                                                         @adgud @placek @kickloop
+src/config/*                                                                @adgud @placek @kickloop
+src/scripts/*                                                               @adgud @placek @kickloop
+src/terraform/*                                                             @adgud @placek @kickloop
+
+# Testing
+src/load-testing/*                                                          @mesudip @kickloop
+src/governance-action-loader/*                                              @mesudip @kickloop
+tests/*                                                                     @mesudip @kickloop

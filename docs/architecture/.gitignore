@@ -1,0 +1,10 @@
+# arch structurizr
+arch-structurizr/.structurizr
+arch-structurizr/workspace.json
+
+#other
+.vscode
+
+#oura install
+oura/
+./oura/

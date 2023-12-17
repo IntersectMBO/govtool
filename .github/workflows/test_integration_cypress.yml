@@ -1,0 +1,73 @@
+name: Integration Test [Cypress]
+run-name: Integration Test on ${{ inputs.network ||'sanchonet' }} [${{ inputs.deployment || 'staging.govtool.byron.network' }}]
+
+on:
+  push:
+    branches: [feat/integration-test]
+  schedule:
+    - cron: '0 0 * * *'
+
+  workflow_dispatch:
+    inputs:
+      network:
+        required: true
+        type: choice
+        default: "sanchonet"
+        options:
+          - "preprod"
+          - "sanchonet"
+      deployment:
+        required: true
+        type: choice
+        default: "staging.govtool.byron.network"
+        options:
+          - "sanchogov.tools"
+          - "staging.govtool.byron.network"
+          - "vva-sanchonet.cardanoapi.io"
+
+jobs:
+  cypress-tests:
+    defaults:
+      run:
+        working-directory: ./tests/vva-fe
+    runs-on: ubuntu-latest
+    env: 
+      NODE_OPTIONS: --max_old_space_size=4096
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key:
+            ${{ runner.os }}-yarn-${{hashFiles('tests/vva-fe/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          record: true
+          working-directory: ./tests/vva-fe
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          # pass GitHub token to allow accurately detecting a build vs a re-run build
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CYPRESS_baseUrl: https://${{inputs.deployment ||  'staging.govtool.byron.network' }}
+          CYPRESS_apiUrl: https://${{ inputs.deployment || 'staging.govtool.byron.network' }}/api
+          CYPRESS_kuberApiUrl: https://${{ inputs.network || 'sanchonet' }}.kuber.cardanoapi.io
+          CYPRESS_kuberApiKey: ${{secrets.KUBER_API_KEY}}
+          CYPRESS_faucetApiUrl: https://faucet.${{inputs.network || 'sanchonet'}}.world.dev.cardano.org
+          CYPRESS_faucetApiKey: ${{ secrets.FAUCET_API_KEY }}
+        

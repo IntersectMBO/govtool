@@ -1,0 +1,36 @@
+title User Login
+
+participant User
+participant dApp Frontend
+participant Wallet
+participant dApp Backend
+
+note over dApp Frontend: Connect Wallet
+
+User->dApp Frontend: 'Connect Wallet' Button pressed
+dApp Frontend->User: Wallet Selection prompt
+User->dApp Frontend: Wallet Selected ""walletName
+dApp Frontend->Wallet: ""cardano.{walletName}.enable({"cip": ?})
+Wallet->User: Ask permission popup (Wallet UI)
+User->Wallet: Access granted (Wallet UI)
+Wallet->dApp Frontend: ""API"" object
+
+note over dApp Frontend: Identify the user's stake key delegator status
+dApp Frontend->Wallet: ""API.getActiveStakeKeys()""
+Wallet->dApp Frontend: ""[pubStakeKey]""
+
+dApp Frontend->User: Select ""pubStakeKey"" to use
+User->dApp Frontend: Choose which stake key to engage with
+
+dApp Frontend->dApp Backend: ""GET delegation/{pubStakeKey}
+dApp Backend->dApp Frontend: ""delegationCert""
+
+note over dApp Frontend: Identify the user's DRep status
+
+dApp Frontend->Wallet: ""API.getDRepKey()""
+Wallet->dApp Frontend: ""pubDRepKey""
+
+dApp Frontend->dApp Backend: ""GET drep/{pubDRepKey}
+dApp Backend->dApp Frontend: ""DRepCert""
+
+dApp Frontend->User: Serve correct UI

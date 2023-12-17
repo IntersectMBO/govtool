@@ -1,0 +1,247 @@
+version: "3.9"
+secrets:
+  postgres_user:
+    external: true
+    name:  ${STACK_NAME}_postgres_user
+  postgres_password:
+    external: true
+    name:  ${STACK_NAME}_postgres_password
+  lighthouserc.json:
+    external: true
+    name:  ${STACK_NAME}_lighthouserc.json
+  metrics_api_secret_token:
+    external: true
+    name: ${STACK_NAME}_metrics_api_secret
+
+## secrets syntax for docker compose stack
+# secrets:
+#   postgres_user:
+#     file:  "./secrets/${STACK_NAME}_postgres_user"
+#   postgres_password:
+#     file: "./secrets/${STACK_NAME}_postgres_password"
+#   postgres_db:
+#     file: "./secrets/${STACK_NAME}_postgres_user"
+#   lighthouserc.json:
+#     file: "./secrets/${STACK_NAME}_lighthouserc.json"
+#   metrics_api_secret_token:
+#     file: "./secrets/${STACK_NAME}_metrics_api_secret"
+volumes:
+  lhci_data:
+  sonar_data:
+  sonar_logs:
+  node_data:
+  node_ipc:
+
+networks:
+  postgres:
+    external: true
+  frontend:
+    external: true
+
+services:
+  metabase:
+    image: metabase/metabase:v0.46.6.2
+    hostname: metabase
+    volumes:
+    - /dev/urandom:/dev/random:ro
+    environment:
+      VIRTUAL_HOST: https://metabase.${BASE_DOMAIN}
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: ${STACK_NAME}_metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER_FILE: /run/secrets/postgres_user
+      MB_DB_PASS_FILE: /run/secrets/postgres_password
+      MB_DB_HOST: postgres
+    networks:
+      - postgres
+      - frontend
+    secrets:
+      - postgres_password
+      - postgres_user
+    deploy:
+      placement:
+        constraints:
+          - node.labels.vva-test-stack == true
+      restart_policy:
+        delay: "30s"
+      resources:
+        limits:
+          memory: 3G
+        reservations:
+          memory: 1.8G
+
+    healthcheck:
+      test: curl --fail -I http://localhost:3000/api/health || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  metrics_api:
+    image: voltaire-era/vva-metrics-api
+    build:
+      context: ../test-metrics-api
+
+    environment:
+      VIRTUAL_HOST: https://metrics.${BASE_DOMAIN}/ -> :3000/
+      PGHOST: postgres
+      PGDATABASE: ${STACK_NAME}_metrics
+    secrets:
+      - source: postgres_password
+        target: /run/secrets/pgpassword
+      - source: postgres_user
+        target: /run/secrets/pguser
+      - source: metrics_api_secret_token
+        target: /run/secrets/api_secret_token
+    networks:
+      - postgres
+      - frontend
+    deploy:
+      placement:
+        constraints:
+          - node.labels.vva-test-stack == true
+      restart_policy:
+        delay: "30s"
+      resources:
+        limits:
+          memory: 600M
+        reservations:
+          memory: 100M
+
+  lhci-server:
+    image: patrickhulce/lhci-server:0.12.0
+    environment:
+      VIRTUAL_HOST: https://lighthouse.${BASE_DOMAIN} -> :9001
+    volumes:
+      - lhci_data:/data
+    secrets:
+      - source: lighthouserc.json
+        target: /usr/src/lhci/lighthouserc.json
+    networks:
+      - postgres
+      - frontend
+    deploy:
+      placement:
+        constraints:
+          - node.labels.vva-test-stack == true
+      restart_policy:
+        delay: "30s"
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 300M
+
+  governance-action-loader-ui:
+    image: voltaire-era/vva-governance-action-loader
+    build:
+      context: ../../src/gov-action-loader-fe
+      dockerfile: Dockerfile
+    environment:
+      VIRTUAL_HOST: https://vva-governance.${BASE_DOMAIN}
+    networks:
+      - frontend
+    deploy:
+      placement:
+        constraints:
+          - node.labels.vva-test-stack == true
+      restart_policy:
+        delay: "30s"
+      resources:
+        limits:
+          memory: 500M
+        reservations:
+          memory: 100M
+
+  governance-action-loader-api:
+    image: voltaire-era/vva-kuber-proposal-loader-proxy
+    build:
+      context: ../../src/gov-action-loader-be
+      dockerfile: Dockerfile
+    environment:
+      KUBER_API_URL: "http://kuber:8081"
+      KUBER_API_KEY: ""
+      BLOCKFROST_API_URL: "${BLOCKFROST_API_URL}"
+      BLOCKFROST_PROJECT_ID: "${BLOCKFROST_PROJECT_ID}"
+      VIRTUAL_HOST: https://vva-governance.${BASE_DOMAIN}/api/ -> /api/
+    networks:
+      - default
+      - frontend
+    deploy:
+      placement:
+        constraints:
+          - node.labels.vva-test-stack == true
+      restart_policy:
+        delay: "30s"
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 500M
+
+  sonarqube_server:
+    image: mc1arke/sonarqube-with-community-branch-plugin:9.9-community
+    networks:
+      - frontend
+      - postgres
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/${STACK_NAME}_sonarqube
+      VIRTUAL_HOST:	https+wss://sonarqube.${BASE_DOMAIN} -> :9000
+      SONAR_JDBC_USERNAME: postgres
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_logs:/opt/sonarqube/logs
+    entrypoint: "sh -c 'SONAR_JDBC_PASSWORD=\"$$( cat /run/secrets/postgres_password )\" /opt/sonarqube/docker/entrypoint.sh'"
+    secrets:
+      - postgres_password
+    deploy:
+      placement:
+        constraints:
+          - node.labels.vva-test-stack == true
+      restart_policy:
+        delay: 15s
+      resources:
+        limits:
+          memory: 3.5G
+        reservations:
+          memory: 2.2G
+  cardano-node:
+    image: ghcr.io/input-output-hk/cardano-node:8.7.1-pre
+    environment:
+      NETWORK: sanchonet
+    volumes:
+      - node_data:/data
+      - node_ipc:/ipc
+    stop_grace_period: 1m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    ports:
+     - target: 3001
+       published: 30004
+       protocol: tcp
+       mode: host
+    deploy:
+      placement:
+        constraints:
+          - node.labels.vva-test-stack == true
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+  kuber: 
+    image: dquadrant/kuber
+    environment:
+      CARDANO_NODE_SOCKET_PATH: /ipc/node.socket
+      VIRTUAL_HOST: https://kuber.${BASE_DOMAIN}
+      NETWORK: 4
+      START_ERA: CONWAY
+    volumes:
+      - node_ipc:/ipc/
+    deploy:
+      placement:
+        constraints:
+          - node.labels.vva-test-stack == true
+      restart_policy:
+        delay: "30s"
+

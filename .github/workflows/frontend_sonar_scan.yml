@@ -1,0 +1,29 @@
+name: SonarQube Static Analysis
+
+on:
+  push:
+    paths:
+      - src/vva-fe/**
+      - .github/workflows/frontend_sonar_scan.yml
+
+jobs:
+  execute_sonar_scanner:
+    name: Execute sonar-scanner on vva-fe
+    runs-on: ubuntu-latest
+    permissions: read-all
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+    - uses: sonarsource/sonarqube-scan-action@master
+      with:
+        projectBaseDir: src/vva-fe
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      # Fail the build if it doesn't meet quality gate
+      # - uses: sonarsource/sonarqube-quality-gate-action@master
+      #   timeout-minutes: 5
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

@@ -1,0 +1,10 @@
+{
+    "ci": {
+      "server": {
+        "storage": {
+          "sqlDialect": "postgres",
+          "sqlConnectionUrl": "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${STACK_NAME}_lighthouse?application_name=lighthouse-ci-server"
+        }
+      }
+    }
+}

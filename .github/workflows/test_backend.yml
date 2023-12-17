@@ -1,0 +1,49 @@
+name: Backend Test
+
+on:
+  push:
+    paths:
+    - .github/workflows/test_backend.yml
+  #     - src/vva-be
+  #     - tests/vva-be
+
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      deployment:
+        required: true
+        type: choice
+        default: "staging.govtool.byron.network/api"
+        options:
+          - "sanchogov.tools/api"
+          - "staging.govtool.byron.network/api"
+          - "vva-sanchonet.cardanoapi.io/api"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+  
+        - name: Set up Python
+          uses: actions/setup-python@v4
+          with:
+            python-version: 3.11.4
+            cache: 'pip'
+
+        - name: Run Backend Test
+          working-directory: tests/vva-be
+          run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+            pytest -v --github-report 
+          env:
+            BASE_URL:   https://${{inputs.deployment ||  'staging.govtool.byron.network/api' }}
+            METRICS_URL: https://metrics.cardanoapi.io
+            METRICS_API_SECRET: "${{ secrets.METRICS_SERVER_SECRET_TOKEN }}"
+
+        # - uses: schemathesis/action@v1
+        #   with:
+        #     schema: "http://localhost:8080/swagger.json"

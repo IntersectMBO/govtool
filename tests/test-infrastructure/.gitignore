@@ -1,0 +1,5 @@
+secrets/
+configs/
+docker-compose-rendered.yml
+docker-compose-swarm-rendered.yml
+docker-compose-services-rendered.yml

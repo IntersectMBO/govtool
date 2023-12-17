@@ -1,0 +1,32 @@
+.rangeSlider {
+  background-color: rgba(214, 226, 255, 0.2);
+  height: 10px;
+  position: relative;
+  width: 100%;
+  border-radius: 20px;
+
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  &:hover {
+    cursor: pointer;
+  }
+  &::-webkit-slider-thumb {
+    background-color: rgba(102, 133, 206, 1);
+    height: 10px;
+    width: 10%;
+    border-radius: 20px;
+
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: grab;
+  }
+  &::-moz-range-thumb {
+    background-color: rgba(102, 133, 206, 1);
+    height: 10px;
+    width: 10%;
+    border-radius: 20px;
+
+    cursor: grab;
+  }
+}

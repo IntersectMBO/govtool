@@ -1,0 +1,59 @@
+name: Lighthouse
+
+on:
+  push:
+    paths:
+      - src/vva-fe/**
+      - .github/workflows/lighthouse.yml
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    env: 
+      NODE_OPTIONS: --max_old_space_size=4096
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+    
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./src/vva-fe
+
+      - name: Cache npm dependencies
+        id: npm-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('src/vva-fe/package-lock.json', 'tests/vva-fe/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - run: npm install -g @lhci/cli@0.12.x
+
+      - name: Run build  and lighthouse task
+        working-directory: ./src/vva-fe
+        run: |
+            npm install
+            VITE_BASE_URL=https://staging.govtool.byron.network/api npm run build
+            lhci collect
+
+      - name: Evaluate reports
+        if: github.repository_owner != 'input-output-hk'
+        run: |
+            lhci assert  --preset "lighthouse:recommended"
+
+            
+      - name: Publish reports
+        working-directory: ./src/vva-fe
+        if: github.repository_owner == 'input-output-hk'
+        run: |
+            lhci assert  --preset lighthouse:recommended || echo "LightHouse Assertion error ignored ..."
+            lhci upload --githubAppToken="${{ secrets.LHCI_GITHUB_APP_TOKEN }}" --token="${{ secrets.LHCI_SERVER_TOKEN }}" --serverBaseUrl=https://lighthouse.cardanoapi.io --ignoreDuplicateBuildFailure
+            curl -X POST https://ligththouse.cardanoapi.io/api/metrics/build-reports \
+              -d "@./lighthouseci/$(ls ./.lighthouseci |grep 'lhr.*\.json' | head -n 1)" \
+              -H "commit-hash: $(git rev-parse HEAD)" \
+              -H "secret-token: ${{ secrets.METRICS_SERVER_SECRET_TOKEN }}" \
+              -H 'Content-Type: application/json' || echo "Metric Upload error ignored ..."

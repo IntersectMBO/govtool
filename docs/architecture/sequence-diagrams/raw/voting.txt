@@ -1,0 +1,16 @@
+title DRep Voting
+
+participant User (dRep)
+participant dApp Frontend
+participant Wallet
+participant Cardano Node
+
+User (dRep)->dApp Frontend: Select Governance Action + choice
+User (dRep)->dApp Frontend: Supply metadata anchor
+
+dApp Frontend->dApp Frontend: Construct ""Vote""
+dApp Frontend->Wallet: Pass object to wallet:\n""API.submitVote(Vote)""
+Wallet->User (dRep): Ask permission popup (Wallet UI)
+User (dRep)->Wallet: Access granted (Wallet UI)
+Wallet->Cardano Node: Submit transaction: \n""POST /vote/{vote}
+Wallet->dApp Frontend: ""SignedVote""

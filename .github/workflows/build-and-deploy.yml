@@ -7,9 +7,8 @@ on:
       cardano_network:
         required: true
         type: choice
-        default: "preprod"
+        default: "sanchonet"
         options:
-          - "preprod"
           - "sanchonet"
       environment:
         required: true
@@ -27,7 +26,7 @@ on:
 
 env:
   ENVIRONMENT: ${{ inputs.environment || 'dev' }}
-  CARDANO_NETWORK: ${{ inputs.cardano_network || 'preprod' }}
+  CARDANO_NETWORK: ${{ inputs.cardano_network || 'sanchonet' }}
 
 jobs:
   check_environment_exists:

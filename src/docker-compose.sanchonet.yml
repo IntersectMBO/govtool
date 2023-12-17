@@ -129,7 +129,7 @@ services:
       - "--disable-delayed-os-memory-return"
       - "-RTS"
     environment:
-      - NETWORK=${CARDANO_NETWORK:-preprod}
+      - NETWORK=${CARDANO_NETWORK:-sanchonet}
     volumes:
       - node-db:/data/db
       - node-ipc:/ipc
@@ -145,7 +145,7 @@ services:
   cardano-db-sync:
     image: ghcr.io/input-output-hk/cardano-db-sync:sancho-2-3-0-docker
     environment:
-      - NETWORK=${CARDANO_NETWORK:-preprod}
+      - NETWORK=${CARDANO_NETWORK:-sanchonet}
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - RESTORE_SNAPSHOT=${RESTORE_SNAPSHOT:-}
@@ -167,7 +167,7 @@ services:
     logging: *logging
 
   vva-be:
-    image: ${VVA_BE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/backend}:${TAG:-main-dev-preprod}
+    image: ${VVA_BE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/backend}:${TAG:-main-dev-sanchonet}
     command: /usr/local/bin/vva-be -c /run/secrets/vva-be-config.json start-app
     depends_on:
       cardano-node:
@@ -191,7 +191,7 @@ services:
       - "traefik.http.services.vva-be.loadbalancer.server.port=9876"
 
   vva-fe:
-    image: ${VVA_FE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/frontend}:${TAG:-main-dev-preprod}
+    image: ${VVA_FE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/frontend}:${TAG:-main-dev-sanchonet}
     depends_on:
       cardano-node:
         condition: service_healthy

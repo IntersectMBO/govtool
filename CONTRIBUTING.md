@@ -186,24 +186,29 @@ TODO
 - Create [well named](#branch-naming) branch from `develop` add changes, then make a pull request back to the `develop` branch.
 - If the changes are not ready for review then feel free to create a draft PR, and link this to the ticket/issue.
 - Developers should review each other's pull requests, and should be requested via [CODEOWNERS](./CODEOWNERS).
-- XXXX tests are run on each pull request. 
+- Unit tests are run on each pull request to `develop`.
 - Once tests pass and peer review is done the branch can be merged into `develop` by author and then deployed to the dev environment (manually for now).
 - The ticket status can then be moved ticket to `in QA` making sure that the PR/branch has been added to the ticket/issue as a comment.
 
 ### QA Workflow
 
 - Choose ticket from `in QA`.
-- 
-
-create PR from develop to test then merge and QA can deploy to test environment (manually for now).
-If QA agrees that the code is good, they can make a PR from test to staging if tests pass, then they can merge and deploy to staging (manually for now).
-Moving ticket to Staging
-
+- Merge in the ticket's changes from `develop` branch into `test` branch.
+- Deploy to test environment (manually for now).
+- The QA tests the deployed test environment against the ticket.
+- If QA agrees that the code is good, they can make a PR from `test` branch to `staging` branch where end-to-end and performance tests are run.
+- If tests pass, then QA or tech lead can merge and deploy to staging environment (manually for now).
+- Moving ticket to `staging` status this ready for PO check.
+  
 ### PO Workflow
-Sees new ticket in staging
-Reviews if the ticket has been satisfied via the staging environment, moves ticket to done if good
-what happens if ticket is not done?
-How does PO decide or note what should go in next release?
 
+- Choose ticket from `staging` status.
+- Compare the deployment on staging environment to the contents of the ticket.
+- If the deployment has been satisfied via the staging environment, PO comments on the ticket to be included in next release.
 
+### Tech Lead Workflow
 
+- Bundle the staging status tickets together into a new tag.
+- Merge `staging` branch into the `main` branch.
+- Deploy tagged build to `beta` environment.
+- Move tickets from staging status to done status.

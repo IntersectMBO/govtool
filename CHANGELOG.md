@@ -18,6 +18,7 @@ changes.
 
 ### Changed
 - Changed Node version from 8.7.1-pre to 8.7.2 and Db-sync version from sancho-2-3-0 to sancho-3-0-0.
+- (`docs/update-working-conventions`) Addressing [Issue 25](https://github.com/IntersectMBO/govtool/issues/25) changed working conventions documentation to improve intended flows.
 
 ### Removed
 - 

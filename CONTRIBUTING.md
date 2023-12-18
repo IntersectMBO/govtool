@@ -17,23 +17,25 @@ This document contains guidelines to help you get started and how to make sure y
   - [Your First Code Contribution](#your-first-code-contribution)
 - [Working Conventions](#working-conventions)
   - [Pull Requests](#pull-requests)
+  - [Branch Naming](#branch-naming)
   - [Commit Messages](#commit-messages)
   - [Merge Commit PRs and Rebase Branches on top of Main](#merge-commit-prs-and-rebase-branches-on-top-of-main)
   - [Versioning and Changelog](#versioning-and-changelog)
   - [Style Guides](#style-guides)
+- [evelopment Processes](#development-processes)
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [Code of Conduct](https://github.com/IntersectMBO/govtool/blob/main/CODE_OF_CONDUCT.md).
+This project and everyone participating in it is governed by the [Code of Conduct](./CODE-OF-CONDUCT.md).
 By participating, you are expected to uphold this code.
 
 ## Ask for Help
 
-See [`SUPPORT.md`](SUPPORT.md) should you have any questions or need some help in getting set up.
+See [`SUPPORT.md`](./SUPPORT.md) should you have any questions or need some help in getting set up.
 
 ## Roles and Responsibilities
 
-We maintain a [CODEOWNERS file](https://github.com/IntersectMBO/govtool/CODEOWNERS) which provides information who should review a contributing PR.
+We maintain a [CODEOWNERS file](./CODEOWNERS) which provides information who should review a contributing PR.
 Note that you might need to get approvals from all code owners (even though GitHub doesn't give a way to enforce it).
 
 ## I Want To Contribute
@@ -47,7 +49,7 @@ Please complete the following steps in advance to help us fix any potential bug 
 - Make sure that you are using the latest version.
 - Determine if your bug is really a bug and not an error on your side.
   e.g. using incompatible environment components/versions.
-  If you are looking for support, you might want to check [this section](#i-have-a-question)).
+  If you are looking for support, you might want to check [this section](#i-have-a-question).
 - To see if other users have experienced (and potentially already solved) the same issue you are having.
 - Also make sure to search the internet (including Stack Overflow)
   to see if users outside of the GitHub community have discussed the issue.
@@ -99,17 +101,24 @@ To get something merged we usually require:
 - Change is related to an issue, feature (idea) or bug report - ideally discussed beforehand
 - Well-scoped - we prefer multiple PRs, rather than a big one
 
+### Branch Naming
+
+- When creating your branches please create informative names.
+- using prefixes such as `feat/`, `fix/`, `chore/`, `docs/` for branch names are a good start.
+
 ### Commit Messages
 
-Please make informative commit messages! It makes it much easier to work out why things are the way they are when you’re debugging things later.
+Please make informative commit messages! 
+It makes it much easier to work out why things are the way they are when you’re debugging things later.
 
-A commit message is communication, so as usual, put yourself in the position of the reader: what does a reviewer, or someone reading the commit message later need to do their job? Write it down! It is even better to include this information in the code itself, but sometimes it doesn’t belong there (e.g. ticket info).
+A commit message is communication, so as usual, put yourself in the position of the reader: what does a reviewer, or someone reading the commit message later need to do their job?
+Write it down!
+It is even better to include this information in the code itself, but sometimes it doesn’t belong there (e.g. ticket info).
 
-Also, include any relevant meta-information, such as ticket numbers.
-If a commit completely addresses a ticket, you can put that in the headline if you want, but it’s fine to just put it in the body.
+Also, include any relevant meta-information, such as issue numbers.
+If a commit completely addresses a issue, you can put that in the headline if you want, but it’s fine to just put it in the body.
 
 Here are seven rules for great git commit messages:
-
 1. Separate subject from body with a blank line
 2. Limit the subject line to 50 characters (soft limit)
 3. Capitalize the subject line
@@ -147,7 +156,7 @@ Releases that aren't stable will be released as pre-releases and will append a -
 
 ### Changelog
 
-During development
+During development, on every PR;
 - Make sure `CHANGELOG.md` is kept up-to-date with high-level, technical, but user-focused list of changes according to [keepachangelog](https://keepachangelog.com/en/1.0.0/).
 - Bump `UNRELEASED` version in `CHANGELOG.md` according to [semver](https://semver.org/).
 
@@ -168,3 +177,33 @@ Please see [CSS / SASS Style Guide](./docs/style-guides/css-sass/).
 #### Haskell
 
 TODO
+
+## Development Processes
+
+### Developer workflow
+
+- Choose ticket/issue to work on from the project, move ticket from `todo` to `in progress`.
+- Create [well named](#branch-naming) branch from `develop` add changes, then make a pull request back to the `develop` branch.
+- If the changes are not ready for review then feel free to create a draft PR, and link this to the ticket/issue.
+- Developers should review each other's pull requests, and should be requested via [CODEOWNERS](./CODEOWNERS).
+- XXXX tests are run on each pull request. 
+- Once tests pass and peer review is done the branch can be merged into `develop` by author and then deployed to the dev environment (manually for now).
+- The ticket status can then be moved ticket to `in QA` making sure that the PR/branch has been added to the ticket/issue as a comment.
+
+### QA Workflow
+
+- Choose ticket from `in QA`.
+- 
+
+create PR from develop to test then merge and QA can deploy to test environment (manually for now).
+If QA agrees that the code is good, they can make a PR from test to staging if tests pass, then they can merge and deploy to staging (manually for now).
+Moving ticket to Staging
+
+### PO Workflow
+Sees new ticket in staging
+Reviews if the ticket has been satisfied via the staging environment, moves ticket to done if good
+what happens if ticket is not done?
+How does PO decide or note what should go in next release?
+
+
+

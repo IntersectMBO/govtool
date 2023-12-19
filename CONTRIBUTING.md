@@ -22,7 +22,11 @@ This document contains guidelines to help you get started and how to make sure y
   - [Merge Commit PRs and Rebase Branches on top of Main](#merge-commit-prs-and-rebase-branches-on-top-of-main)
   - [Versioning and Changelog](#versioning-and-changelog)
   - [Style Guides](#style-guides)
-- [evelopment Processes](#development-processes)
+- [Development Processes](#development-processes)
+  - [Developer Workflow](#developer-workflow)
+  - [QA Workflow](#qa-workflow)
+  - [PO Workflow](#po-workflow)
+  - [Tech Lead Workflow](#tech-lead-workflow)
 
 ## Code of Conduct
 

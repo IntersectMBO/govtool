@@ -54,13 +54,6 @@ resource "aws_iam_group_policy_attachment" "cicd" {
 
 # duplicate the following block in order to prepare a new environment
 # make sure that app_env/cardano_network variable pair is unique
-module "vva-dev-preprod" {
-  source          = "./modules/vva-ec2"
-  app_env         = "dev"
-  cardano_network = "preprod"
-  instance_type   = "t3.large"
-  dns_zone_id     = aws_route53_zone.govtool.id
-}
 
 module "vva-dev-sanchonet" {
   source          = "./modules/vva-ec2"
@@ -100,10 +93,6 @@ output "vva-ecr-be-url" {
 
 output "vva-ecr-fe-url" {
   value = module.vva-ecr-fe.repo_url
-}
-
-output "vva-dev-preprod-frontend-domain" {
-  value = module.vva-dev-preprod.frontend_domain
 }
 
 output "vva-dev-sanchonet-frontend-domain" {

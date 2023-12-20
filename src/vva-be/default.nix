@@ -16,6 +16,7 @@ let
     root = ./.;
     modifier = additionalTools;
     overrides = self: super: { openapi3 = pkgs.haskell.lib.dontCheck super.openapi3; };
+    source-overrides = { resource-pool = "0.4.0.0"; };
   };
 in
 project

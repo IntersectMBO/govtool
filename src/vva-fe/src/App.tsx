@@ -27,7 +27,6 @@ import {
   WALLET_LS_KEY,
   removeItemFromLocalStorage,
 } from "@utils";
-
 import { SetupInterceptors } from "./services";
 import { useGetDRepInfo, useWalletConnectionListener } from "./hooks";
 

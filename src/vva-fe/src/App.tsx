@@ -29,12 +29,14 @@ import {
 } from "@utils";
 
 import { SetupInterceptors } from "./services";
-import { useGetDRepInfo } from "./hooks";
+import { useGetDRepInfo, useWalletConnectionListener } from "./hooks";
 
 export default function App() {
   const { enable, setDRep, setIsDrepLoading } = useCardano();
   const navigate = useNavigate();
   const { data } = useGetDRepInfo();
+
+  useWalletConnectionListener();
 
   useEffect(() => {
     SetupInterceptors(navigate);

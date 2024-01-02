@@ -17,7 +17,6 @@ export const DelegateTodRep = () => {
   const [step, setStep] = useState(1);
   const { isMobile } = useScreenDimension();
   const navigate = useNavigate();
-  console.log("test");
 
   useEffect(() => {
     if (

@@ -104,7 +104,7 @@ services:
     logging: *logging
 
   cardano-node:
-    image: ghcr.io/input-output-hk/cardano-node:8.7.1-pre
+    image: ghcr.io/intersectmbo/cardano-node:8.7.1-pre
     entrypoint:
       - "cardano-node"
       - "run"
@@ -143,7 +143,7 @@ services:
     logging: *logging
 
   cardano-db-sync:
-    image: ghcr.io/input-output-hk/cardano-db-sync:sancho-2-3-0-docker
+    image: ghcr.io/intersectmbo/cardano-db-sync:sancho-2-3-0-docker
     environment:
       - NETWORK=${CARDANO_NETWORK:-sanchonet}
       - POSTGRES_HOST=postgres

@@ -41,14 +41,14 @@ jobs:
             lhci collect
 
       - name: Evaluate reports
-        if: github.repository_owner != 'input-output-hk'
+        if: github.repository_owner != 'IntersectMBO'
         run: |
             lhci assert  --preset "lighthouse:recommended"
 
             
       - name: Publish reports
         working-directory: ./src/vva-fe
-        if: github.repository_owner == 'input-output-hk'
+        if: github.repository_owner == 'IntersectMBO'
         run: |
             lhci assert  --preset lighthouse:recommended || echo "LightHouse Assertion error ignored ..."
             lhci upload --githubAppToken="${{ secrets.LHCI_GITHUB_APP_TOKEN }}" --token="${{ secrets.LHCI_SERVER_TOKEN }}" --serverBaseUrl=https://lighthouse.cardanoapi.io --ignoreDuplicateBuildFailure

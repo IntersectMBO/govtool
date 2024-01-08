@@ -205,7 +205,7 @@ services:
         reservations:
           memory: 2.2G
   cardano-node:
-    image: ghcr.io/input-output-hk/cardano-node:8.7.1-pre
+    image: ghcr.io/intersectmbo/cardano-node:8.7.1-pre
     environment:
       NETWORK: sanchonet
     volumes:

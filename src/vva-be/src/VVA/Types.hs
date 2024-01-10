@@ -114,5 +114,7 @@ data NetworkMetrics = NetworkMetrics
   , networkMetricsTotalGovernanceActions :: Integer
   , networkMetricsTotalDRepVotes :: Integer
   , networkMetricsTotalRegisteredDReps :: Integer
+  , networkMetricsAlwaysAbstainVotingPower :: Integer
+  , networkMetricsAlwaysNoConfidenceVotingPower :: Integer
   }
 

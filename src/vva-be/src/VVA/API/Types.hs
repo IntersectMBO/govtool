@@ -536,6 +536,8 @@ data GetNetworkMetricsResponse = GetNetworkMetricsResponse
   , getNetworkMetricsResponseTotalGovernanceActions :: Integer
   , getNetworkMetricsResponseTotalDRepVotes :: Integer
   , getNetworkMetricsResponseTotalRegisteredDReps :: Integer
+  , getNetworkMetricsResponseAlwaysAbstainVotingPower :: Integer
+  , getNetworkMetricsResponseAlwaysNoConfidenceVotingPower :: Integer
   }
 
 deriveJSON (jsonOptions "getNetworkMetricsResponse") ''GetNetworkMetricsResponse
@@ -549,7 +551,9 @@ exampleGetNetworkMetricsResponse =
  <> "\"totalDelegations\": 0,"
  <> "\"totalGovernanceActions\": 0,"
  <> "\"totalDRepVotes\": 0,"
- <> "\"totalRegisteredDReps\": 0}"
+ <> "\"totalRegisteredDReps\": 0,"
+ <> "\"alwaysAbstainVotingPower\": 0,"
+ <> "\"alwaysNoConfidenceVotingPower\": 0}"
 
 instance ToSchema GetNetworkMetricsResponse where
     declareNamedSchema _ = pure $ NamedSchema (Just "GetNetworkMetricsResponse") $ mempty

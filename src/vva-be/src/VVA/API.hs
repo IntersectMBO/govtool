@@ -244,4 +244,6 @@ getNetworkMetrics = do
     , getNetworkMetricsResponseTotalGovernanceActions = networkMetricsTotalGovernanceActions
     , getNetworkMetricsResponseTotalDRepVotes = networkMetricsTotalDRepVotes
     , getNetworkMetricsResponseTotalRegisteredDReps = networkMetricsTotalRegisteredDReps
+    , getNetworkMetricsResponseAlwaysAbstainVotingPower = networkMetricsAlwaysAbstainVotingPower
+    , getNetworkMetricsResponseAlwaysNoConfidenceVotingPower = networkMetricsAlwaysNoConfidenceVotingPower
     }

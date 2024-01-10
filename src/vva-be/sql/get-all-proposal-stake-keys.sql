@@ -1,12 +1,12 @@
-select encode(stake_address.hash_raw, 'hex'), voting_procedure.vote::text, governance_action.id
-from governance_action
+select encode(stake_address.hash_raw, 'hex'), voting_procedure.vote::text, gov_action_proposal.id
+from gov_action_proposal
 join voting_procedure
-on voting_procedure.governance_action_id = governance_action.id
+on voting_procedure.gov_action_proposal_id = gov_action_proposal.id
 join delegation_vote
 on delegation_vote.drep_hash_id = voting_procedure.drep_voter
 join stake_address
 on stake_address.id = delegation_vote.addr_id
-where governance_action.id in ?
+where gov_action_proposal.id in ?
 
 union all
 

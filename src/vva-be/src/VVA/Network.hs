@@ -37,16 +37,20 @@ networkMetrics = withPool $ \conn -> do
      , block_no
      , unique_delegators
      , total_delegations
-     , total_governance_actions
+     , total_gov_action_proposals
      , total_drep_votes
      , total_registered_dreps
+     , always_abstain_voting_power
+     , always_no_confidence_voting_power
      )] -> return $ NetworkMetrics
             current_time
             epoch_no
             block_no
             unique_delegators
             total_delegations
-            total_governance_actions
+            total_gov_action_proposals
             total_drep_votes
             total_registered_dreps
+            always_abstain_voting_power
+            always_no_confidence_voting_power
     _ -> throwError $ CriticalError "Could not query the network metrics. This should never happen."

@@ -23,6 +23,10 @@ on:
         required: true
         type: boolean
         default: false
+      resync_cardano_node_and_db:
+        required: true
+        type: boolean
+        default: false
 
 env:
   ENVIRONMENT: ${{ inputs.environment || 'dev' }}
@@ -144,6 +148,12 @@ jobs:
           if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
           if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
           make upload-config
+      - name: Destroy Cardano Node, DB sync and Postgres if required
+        if: ${{ inputs.resync_cardano_node_and_db }}
+        run: |
+          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
+          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
+          make destroy-cardano-node-and-dbsync;
       - name: Deploy app
         run: |
           make docker-login
@@ -210,6 +220,12 @@ jobs:
           if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
           if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
           make upload-config
+      - name: Destroy Cardano Node, DB sync and Postgres if required
+        if: ${{ inputs.resync_cardano_node_and_db }}
+        run: |
+          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
+          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
+          make destroy-cardano-node-and-dbsync;
       - name: Deploy app
         run: |
           make docker-login

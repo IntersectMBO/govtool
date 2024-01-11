@@ -106,6 +106,21 @@ deploy-stack:
 	docker compose -f docker-compose.$(cardano_network).yml -p vva-$(env)-$(cardano_network) pull; \
 	docker compose -f docker-compose.$(cardano_network).yml -p vva-$(env)-$(cardano_network) up -d
 
+.PHONY: destroy-cardano-node-and-dbsync
+destroy-cardano-node-and-dbsync:
+	@:$(call check_defined, cardano_network)
+	@:$(call check_defined, env)
+	export CARDANO_NETWORK=$(cardano_network); \
+	export DOCKER_HOST=ssh://$(ssh_url); \
+	export ENVIRONMENT=$(env); \
+	export TAG=$(tag); \
+	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
+	containers="$$(docker container ls --no-trunc --format '{{.Names}}' -f name=cardano-node -f name=cardano-db-sync -f name=postgres)"; \
+	volumes="$$(docker volume ls --format '{{.Name}}' -f name=db-sync-data -f name=node-db -f name=node-ipc -f name=postgres)"; \
+	docker container stop $${containers}; \
+	docker container rm $${containers}; \
+	docker volume rm $${volumes}
+
 .PHONY: toggle-maintenance
 toggle-maintenance:
 	@:$(call check_defined, cardano_network)

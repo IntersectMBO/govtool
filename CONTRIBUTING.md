@@ -8,25 +8,36 @@ This document contains guidelines to help you get started and how to make sure y
 
 ## Table of Contents
 
-- [Code of Conduct](#code-of-conduct)
-- [Ask for Help](#ask-for-help)
-- [Roles and Responsibilities](#roles-and-responsibilities)
-- [I Want To Contribute](#i-want-to-contribute)
-  - [Reporting Bugs](#reporting-bugs)
-  - [Suggesting Enhancements](#suggesting-enhancements)
-  - [Your First Code Contribution](#your-first-code-contribution)
-- [Working Conventions](#working-conventions)
-  - [Pull Requests](#pull-requests)
-  - [Branch Naming](#branch-naming)
-  - [Commit Messages](#commit-messages)
-  - [Merge Commit PRs and Rebase Branches on top of Main](#merge-commit-prs-and-rebase-branches-on-top-of-main)
-  - [Versioning and Changelog](#versioning-and-changelog)
-  - [Style Guides](#style-guides)
-- [Development Processes](#development-processes)
-  - [Developer Workflow](#developer-workflow)
-  - [QA Workflow](#qa-workflow)
-  - [PO Workflow](#po-workflow)
-  - [Tech Lead Workflow](#tech-lead-workflow)
+- [Contributing to the `GovTool` project](#contributing-to-the-govtool-project)
+  - [Table of Contents](#table-of-contents)
+  - [Code of Conduct](#code-of-conduct)
+  - [Ask for Help](#ask-for-help)
+  - [Roles and Responsibilities](#roles-and-responsibilities)
+  - [I Want To Contribute](#i-want-to-contribute)
+      - [Before Submitting a Bug Report](#before-submitting-a-bug-report)
+      - [How Do I Submit a Good Bug Report?](#how-do-i-submit-a-good-bug-report)
+      - [Your First Code Contribution](#your-first-code-contribution)
+  - [Working Conventions](#working-conventions)
+    - [Pull Requests](#pull-requests)
+    - [Branch Naming](#branch-naming)
+    - [Commit Messages](#commit-messages)
+      - [Rationale](#rationale)
+    - [Merge Commit PRs and Rebase Branches on top of Main](#merge-commit-prs-and-rebase-branches-on-top-of-main)
+      - [Rationale](#rationale-1)
+    - [Versioning](#versioning)
+    - [Changelog](#changelog)
+    - [Style Guides](#style-guides)
+      - [React](#react)
+      - [CSS in Javascript](#css-in-javascript)
+      - [CSS / SASS](#css--sass)
+      - [Haskell](#haskell)
+  - [Bumping Node, DB-Sync, SanchoNet Versions](#bumping-node-db-sync-sanchonet-versions)
+    - [Steps to upgrade](#steps-to-upgrade)
+  - [Development Processes](#development-processes)
+    - [Developer workflow](#developer-workflow)
+    - [QA Workflow](#qa-workflow)
+    - [PO Workflow](#po-workflow)
+    - [Tech Lead Workflow](#tech-lead-workflow)
 
 ## Code of Conduct
 
@@ -181,6 +192,25 @@ Please see [CSS / SASS Style Guide](./docs/style-guides/css-sass/).
 #### Haskell
 
 TODO
+
+## Bumping Node, DB-Sync, SanchoNet Versions
+
+- SanchoNet periodically has to be respun, where all data is erased.
+- This is normally to allow for the nodes to be upgraded to a new version, where the old chain may not be compatible with newer node implementation.
+- So to go along with each respin GovTool's Node needs to upgraded to a newer version and it's local database must be dropped.
+- New versions of DB-Sync are usually released alongside new Node versions, to ensure compatibility.
+- Some new versions of DB-Sync will include revisions to the DB schema, if this is the case then we also need to upgrade the BE interface to work.
+
+### Steps to upgrade
+
+1. Coordinate and align with DB-Sync/Node teams to anticipate SanchoNet respins and version releases. Once network has been respun upgrade.
+- Often a new node version is released a few days ahead of a Sanchonet respin, DB-Sync is normally a couple of days post node release.
+2. Change the versions in the [docker-compose file](./src/docker-compose.sanchonet.yml), here the DB-Sync and Node docker versions can be incremented. Merge this change, following standard working conventions.
+- IF the DB-Sync schema changed, then BE changes will have to be merged also.
+3. Then the upgrade can be deployed using normal workflows, ensure to tick `resync_cardano_node_and_db` option of the workflow. This will wipe the existing Node and Db-Sync's data, to let the upgraded versions fully resync.
+4. Wait for resync, depending on the size SanchoNet resycing will likely take over an hour.
+5. Check successful resync, using the BE you are able to check transaction status. You can use the SanchoNet faucet to send transactions, then check faucet Tx id via GovTool BE. If GovTool sees the Tx then GovTool BE is on the same network as the faucet which is ideal.
+
 
 ## Development Processes
 

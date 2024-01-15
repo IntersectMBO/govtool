@@ -8,32 +8,49 @@ This document contains guidelines to help you get started and how to make sure y
 
 ## Table of Contents
 
-- [Code of Conduct](#code-of-conduct)
-- [Ask for Help](#ask-for-help)
-- [Roles and Responsibilities](#roles-and-responsibilities)
-- [I Want To Contribute](#i-want-to-contribute)
-  - [Reporting Bugs](#reporting-bugs)
-  - [Suggesting Enhancements](#suggesting-enhancements)
-  - [Your First Code Contribution](#your-first-code-contribution)
-- [Working Conventions](#working-conventions)
-  - [Pull Requests](#pull-requests)
-  - [Commit Messages](#commit-messages)
-  - [Merge Commit PRs and Rebase Branches on top of Main](#merge-commit-prs-and-rebase-branches-on-top-of-main)
-  - [Versioning and Changelog](#versioning-and-changelog)
-  - [Style Guides](#style-guides)
+- [Contributing to the `GovTool` project](#contributing-to-the-govtool-project)
+  - [Table of Contents](#table-of-contents)
+  - [Code of Conduct](#code-of-conduct)
+  - [Ask for Help](#ask-for-help)
+  - [Roles and Responsibilities](#roles-and-responsibilities)
+  - [I Want To Contribute](#i-want-to-contribute)
+      - [Before Submitting a Bug Report](#before-submitting-a-bug-report)
+      - [How Do I Submit a Good Bug Report?](#how-do-i-submit-a-good-bug-report)
+      - [Your First Code Contribution](#your-first-code-contribution)
+  - [Working Conventions](#working-conventions)
+    - [Pull Requests](#pull-requests)
+    - [Branch Naming](#branch-naming)
+    - [Commit Messages](#commit-messages)
+      - [Rationale](#rationale)
+    - [Merge Commit PRs and Rebase Branches on top of Main](#merge-commit-prs-and-rebase-branches-on-top-of-main)
+      - [Rationale](#rationale-1)
+    - [Versioning](#versioning)
+    - [Changelog](#changelog)
+    - [Style Guides](#style-guides)
+      - [React](#react)
+      - [CSS in Javascript](#css-in-javascript)
+      - [CSS / SASS](#css--sass)
+      - [Haskell](#haskell)
+  - [Bumping Node, DB-Sync, SanchoNet Versions](#bumping-node-db-sync-sanchonet-versions)
+    - [Steps to upgrade](#steps-to-upgrade)
+  - [Development Processes](#development-processes)
+    - [Developer workflow](#developer-workflow)
+    - [QA Workflow](#qa-workflow)
+    - [PO Workflow](#po-workflow)
+    - [Tech Lead Workflow](#tech-lead-workflow)
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [Code of Conduct](https://github.com/IntersectMBO/govtool/blob/main/CODE_OF_CONDUCT.md).
+This project and everyone participating in it is governed by the [Code of Conduct](./CODE-OF-CONDUCT.md).
 By participating, you are expected to uphold this code.
 
 ## Ask for Help
 
-See [`SUPPORT.md`](SUPPORT.md) should you have any questions or need some help in getting set up.
+See [`SUPPORT.md`](./SUPPORT.md) should you have any questions or need some help in getting set up.
 
 ## Roles and Responsibilities
 
-We maintain a [CODEOWNERS file](https://github.com/IntersectMBO/govtool/CODEOWNERS) which provides information who should review a contributing PR.
+We maintain a [CODEOWNERS file](./CODEOWNERS) which provides information who should review a contributing PR.
 Note that you might need to get approvals from all code owners (even though GitHub doesn't give a way to enforce it).
 
 ## I Want To Contribute
@@ -47,7 +64,7 @@ Please complete the following steps in advance to help us fix any potential bug 
 - Make sure that you are using the latest version.
 - Determine if your bug is really a bug and not an error on your side.
   e.g. using incompatible environment components/versions.
-  If you are looking for support, you might want to check [this section](#i-have-a-question)).
+  If you are looking for support, you might want to check [this section](#i-have-a-question).
 - To see if other users have experienced (and potentially already solved) the same issue you are having.
 - Also make sure to search the internet (including Stack Overflow)
   to see if users outside of the GitHub community have discussed the issue.
@@ -99,17 +116,24 @@ To get something merged we usually require:
 - Change is related to an issue, feature (idea) or bug report - ideally discussed beforehand
 - Well-scoped - we prefer multiple PRs, rather than a big one
 
+### Branch Naming
+
+- When creating your branches please create informative names.
+- using prefixes such as `feat/`, `fix/`, `chore/`, `docs/` for branch names are a good start.
+
 ### Commit Messages
 
-Please make informative commit messages! It makes it much easier to work out why things are the way they are when you’re debugging things later.
+Please make informative commit messages! 
+It makes it much easier to work out why things are the way they are when you’re debugging things later.
 
-A commit message is communication, so as usual, put yourself in the position of the reader: what does a reviewer, or someone reading the commit message later need to do their job? Write it down! It is even better to include this information in the code itself, but sometimes it doesn’t belong there (e.g. ticket info).
+A commit message is communication, so as usual, put yourself in the position of the reader: what does a reviewer, or someone reading the commit message later need to do their job?
+Write it down!
+It is even better to include this information in the code itself, but sometimes it doesn’t belong there (e.g. ticket info).
 
-Also, include any relevant meta-information, such as ticket numbers.
-If a commit completely addresses a ticket, you can put that in the headline if you want, but it’s fine to just put it in the body.
+Also, include any relevant meta-information, such as issue numbers.
+If a commit completely addresses a issue, you can put that in the headline if you want, but it’s fine to just put it in the body.
 
 Here are seven rules for great git commit messages:
-
 1. Separate subject from body with a blank line
 2. Limit the subject line to 50 characters (soft limit)
 3. Capitalize the subject line
@@ -147,7 +171,7 @@ Releases that aren't stable will be released as pre-releases and will append a -
 
 ### Changelog
 
-During development
+During development, on every PR;
 - Make sure `CHANGELOG.md` is kept up-to-date with high-level, technical, but user-focused list of changes according to [keepachangelog](https://keepachangelog.com/en/1.0.0/).
 - Bump `UNRELEASED` version in `CHANGELOG.md` according to [semver](https://semver.org/).
 
@@ -168,3 +192,57 @@ Please see [CSS / SASS Style Guide](./docs/style-guides/css-sass/).
 #### Haskell
 
 TODO
+
+## Bumping Node, DB-Sync, SanchoNet Versions
+
+- SanchoNet periodically has to be respun, where all data is erased.
+- This is normally to allow for the nodes to be upgraded to a new version, where the old chain may not be compatible with newer node implementation.
+- So to go along with each respin GovTool's Node needs to upgraded to a newer version and it's local database must be dropped.
+- New versions of DB-Sync are usually released alongside new Node versions, to ensure compatibility.
+- Some new versions of DB-Sync will include revisions to the DB schema, if this is the case then we also need to upgrade the BE interface to work.
+
+### Steps to upgrade
+
+1. Coordinate and align with DB-Sync/Node teams to anticipate SanchoNet respins and version releases. Once network has been respun upgrade.
+- Often a new node version is released a few days ahead of a Sanchonet respin, DB-Sync is normally a couple of days post node release.
+2. Change the versions in the [docker-compose file](./src/docker-compose.sanchonet.yml), here the DB-Sync and Node docker versions can be incremented. Merge this change, following standard working conventions.
+- IF the DB-Sync schema changed, then BE changes will have to be merged also.
+3. Then the upgrade can be deployed using normal workflows, ensure to tick `resync_cardano_node_and_db` option of the workflow. This will wipe the existing Node and Db-Sync's data, to let the upgraded versions fully resync.
+4. Wait for resync, depending on the size SanchoNet resycing will likely take over an hour.
+5. Check successful resync, using the BE you are able to check transaction status. You can use the SanchoNet faucet to send transactions, then check faucet Tx id via GovTool BE. If GovTool sees the Tx then GovTool BE is on the same network as the faucet which is ideal.
+
+
+## Development Processes
+
+### Developer workflow
+
+- Choose ticket/issue to work on from the project, move ticket from `todo` to `in progress`.
+- Create [well named](#branch-naming) branch from `develop` add changes, then make a pull request back to the `develop` branch.
+- If the changes are not ready for review then feel free to create a draft PR, and link this to the ticket/issue.
+- Developers should review each other's pull requests, and should be requested via [CODEOWNERS](./CODEOWNERS).
+- Unit tests are run on each pull request to `develop`.
+- Once tests pass and peer review is done the branch can be merged into `develop` by author and then deployed to the dev environment (manually for now).
+- The ticket status can then be moved ticket to `in QA` making sure that the PR/branch has been added to the ticket/issue as a comment.
+
+### QA Workflow
+
+- Choose ticket from `in QA`.
+- Merge in the ticket's changes from `develop` branch into `test` branch.
+- Deploy to test environment (manually for now).
+- The QA tests the deployed test environment against the ticket.
+- If QA agrees that the code is good, they can make a PR from `test` branch to `staging` branch where end-to-end and performance tests are run.
+- If tests pass, then QA or tech lead can merge and deploy to staging environment (manually for now).
+- Moving ticket to `staging` status this ready for PO check.
+  
+### PO Workflow
+
+- Choose ticket from `staging` status.
+- Compare the deployment on staging environment to the contents of the ticket.
+- If the deployment has been satisfied via the staging environment, PO comments on the ticket to be included in next release.
+
+### Tech Lead Workflow
+
+- Bundle the staging status tickets together into a new tag.
+- Merge `staging` branch into the `main` branch.
+- Deploy tagged build to `beta` environment.
+- Move tickets from staging status to done status.

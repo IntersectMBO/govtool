@@ -192,6 +192,9 @@ services:
 
   vva-fe:
     image: ${VVA_FE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/frontend}:${TAG:-main-dev-sanchonet}
+    volumes:
+      - /home/ubuntu/config/nginx/auth.conf:/etc/nginx/conf.d/auth.conf
+      - /home/ubuntu/config/nginx/govtool.htpasswd:/etc/nginx/conf.d/govtool.htpasswd
     depends_on:
       cardano-node:
         condition: service_healthy

@@ -75,3 +75,20 @@ cp -a "$repo_root_dir/src/config/grafana-provisioning/"* "$grafana_provisioning_
 sed -e "s/GRAFANA_SLACK_RECIPIENT/$GRAFANA_SLACK_RECIPIENT/" \
     -e "s|GRAFANA_SLACK_OAUTH_TOKEN|$GRAFANA_SLACK_OAUTH_TOKEN|" \
     -i "$grafana_provisioning_dir/alerting/alerting.yml"
+
+# nginx config for frontend optional basic auth
+nginx_config_dir="$target_config_dir/nginx"
+mkdir -p "$nginx_config_dir"
+if [[ "$DOMAIN" == *"govtool.byron.network"* ]]; then
+  cat >"$nginx_config_dir/auth.conf" <<_EOF_
+auth_basic "Restricted";
+auth_basic_user_file /etc/nginx/conf.d/govtool.htpasswd;
+_EOF_
+  cat >"$nginx_config_dir/govtool.htpasswd" <<_EOF_
+$NGINX_BASIC_AUTH
+_EOF_
+else
+  # create empty files if no basic auth is needed
+  touch "$nginx_config_dir/auth.conf"
+  touch "$nginx_config_dir/govtool.htpasswd"
+fi

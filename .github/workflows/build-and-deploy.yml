@@ -148,8 +148,6 @@ jobs:
           if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
           DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}
           make prepare-config
-          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
-          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
           make upload-config
       - name: Destroy Cardano Node, DB sync and Postgres if required
         if: ${{ inputs.resync_cardano_node_and_db }}
@@ -219,9 +217,10 @@ jobs:
           ssh-private-key: ${{ secrets.GHA_SSH_PRIVATE_KEY }}
       - name: Prepare and upload app config
         run: |
-          make prepare-config
           if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
           if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
+          DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}
+          make prepare-config
           make upload-config
       - name: Destroy Cardano Node, DB sync and Postgres if required
         if: ${{ inputs.resync_cardano_node_and_db }}

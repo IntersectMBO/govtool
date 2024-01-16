@@ -123,6 +123,7 @@ jobs:
       GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
       GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
       GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
+      NGINX_BASIC_AUTH: ${{ secrets.NGINX_BASIC_AUTH }}
       SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
       TRAEFIK_LE_EMAIL: "admin+vva@binarapps.com"
     steps:
@@ -196,6 +197,7 @@ jobs:
       GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
       GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
       GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
+      NGINX_BASIC_AUTH: ${{ secrets.NGINX_BASIC_AUTH }}
       SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
       TRAEFIK_LE_EMAIL: "admin+vva@binarapps.com"
     steps:

@@ -45,4 +45,4 @@ Frontend is able to connect to Cardano wallets over the [CIP-30](https://github.
 
 ## 🤝 Contributing
 Thanks for considering contributing and helping us on creating GovTool! 😎
-Please checkout our [Contributing Documentation](./CONTRIBUTING.md).
+Please checkout our [Contributing Documentation](./CONTRIBUTING.md). 

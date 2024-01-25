@@ -8,11 +8,11 @@
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self';
-      img-src 'self' data:;
-      script-src 'self' 'unsafe-inline' https://www.googletagmanager.com;
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-      connect-src 'self' https://dev-sanchonet.govtool.byron.network/api https://o4506155985141760.ingest.sentry.io/api/4506156032196608/envelope/;
-      font-src 'self' 'unsafe-inline' https://fonts.gstatic.com;
+      img-src *.usersnap.com 'self' data:;
+      script-src *.usersnap.com 'self' 'unsafe-inline' https://www.googletagmanager.com;
+      style-src *.usersnap.com *.googleapis.com 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      connect-src *.usersnap.com https://s3.eu-central-1.amazonaws.com/upload.usersnap.com 'self' https://dev-sanchonet.govtool.byron.network/api/ https://o4506155985141760.ingest.sentry.io/api/4506156032196608/envelope/;
+      font-src *.usersnap.com *.gstatic.com 'self' 'unsafe-inline' https://fonts.gstatic.com;
       "
     />
     <link

@@ -33,7 +33,8 @@
       "@organisms": ["./src/components/organisms/index.ts"],
       "@context": ["./src/context/index.ts"],
       "@models": ["./src/models/index.ts"],
-      "@utils": ["./src/utils/index.ts"]
+      "@utils": ["./src/utils/index.ts"],
+      "@translations": ["./src/translations/index.ts"]
     }
   },
   "include": ["src"],

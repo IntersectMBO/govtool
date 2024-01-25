@@ -15,8 +15,8 @@ import {
   getShortenedGovActionId,
   openInNewTab,
 } from "@utils";
+import { usei18n } from "@translations";
 import { Tooltip } from "@atoms";
-import { tooltips } from "@/consts/texts";
 
 interface Props {
   votedProposal: VotedProposal;
@@ -31,6 +31,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
     palette: { lightBlue },
   } = theme;
   const { isMobile } = useScreenDimension();
+  const { t } = usei18n();
 
   const proposalTypeNoEmptySpaces = getProposalTypeLabel(proposal.type).replace(
     / /g,
@@ -77,11 +78,11 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           variant="body2"
         >
           {inProgress ? (
-            "In progress"
+            t("inProgress")
           ) : (
             <>
               <CheckIcon fontSize="small" sx={{ marginRight: 0.5 }} />
-              Vote submitted
+              {t("govActions.voteSubmitted")}
             </>
           )}
         </Typography>
@@ -98,7 +99,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
       >
         <Box data-testid="governance-action-type">
           <Typography color={"#8E908E"} variant="caption">
-            Governance Action Type:
+            {t("govActions.type")}
           </Typography>
           <Box display={"flex"}>
             <Box
@@ -119,7 +120,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         </Box>
         <Box mt={5}>
           <Typography color={"#8E908E"} variant="caption">
-            Governance Action ID:
+            {t("govActions.id")}
           </Typography>
           <Box display={"flex"} mt={0.5}>
             <Box
@@ -143,7 +144,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         </Box>
         <Box data-testid="my-vote" mt={5}>
           <Typography color={"#8E908E"} variant="caption">
-            My Vote:
+            {t("govActions.myVote")}
           </Typography>
           <Box
             mt={1}
@@ -172,7 +173,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
                 whiteSpace: "nowrap",
               }}
             >
-              Vote transaction
+              {t("govActions.voteTransaction")}
             </Button>
           </Box>
         </Box>
@@ -187,14 +188,14 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           py={0.75}
         >
           <Typography fontWeight={300} sx={{ mr: 1 }} variant="caption">
-            Submission date:
+            {t("govActions.submissionDate")}
           </Typography>
           <Typography fontWeight={600} variant="caption">
             {formatDisplayDate(proposal.createdDate)}
           </Typography>
           <Tooltip
-            heading={tooltips.submissionDate.heading}
-            paragraphOne={tooltips.submissionDate.paragraphOne}
+            heading={t("tooltips.submissionDate.heading")}
+            paragraphOne={t("tooltips.submissionDate.paragraphOne")}
             placement={"bottom-end"}
             arrow
           >
@@ -219,15 +220,15 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           py={0.75}
         >
           <Typography fontWeight={300} sx={{ mr: 1 }} variant="caption">
-            Expiry date:
+            {t("govActions.expiryDate")}
           </Typography>
           <Typography variant="caption" fontWeight={600}>
             {formatDisplayDate(proposal.expiryDate)}
           </Typography>
           <Tooltip
-            heading={tooltips.expiryDate.heading}
-            paragraphOne={tooltips.expiryDate.paragraphOne}
-            paragraphTwo={tooltips.expiryDate.paragraphTwo}
+            heading={t("tooltips.expiryDate.heading")}
+            paragraphOne={t("tooltips.expiryDate.paragraphOne")}
+            paragraphTwo={t("tooltips.expiryDate.paragraphTwo")}
             placement={"bottom-end"}
             arrow
           >
@@ -273,7 +274,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           }}
           variant="outlined"
         >
-          Change your vote
+          {t("govActions.changeYourVote")}
         </Button>
       </Box>
     </Box>

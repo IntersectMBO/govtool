@@ -3,9 +3,11 @@ import { Box, Link } from "@mui/material";
 import { Typography } from "@atoms";
 import { useScreenDimension } from "@hooks";
 import { openInNewTab } from "@utils";
+import { usei18n } from "@translations";
 
 export const Footer = () => {
   const { isMobile, pagePadding } = useScreenDimension();
+  const { t } = usei18n();
 
   return (
     <Box
@@ -17,7 +19,7 @@ export const Footer = () => {
     >
       <Box flex={1}>
         <Typography fontWeight={500} variant="caption">
-          © 2023 Voltaire Gov Tool
+          {t("footer.copyright")}
         </Typography>
       </Box>
       <Box display="flex" flexDirection="row" mt={isMobile ? 1.5 : 0}>
@@ -34,7 +36,7 @@ export const Footer = () => {
             sx={{ "&:hover": { color: "primaryBlue", cursor: "pointer" } }}
             variant="caption"
           >
-            Privacy policy
+            {t("footer.privacyPolicy")}
           </Typography>
         </Link>
       </Box>

@@ -8,6 +8,7 @@ import { PATHS } from "@consts";
 import { setItemToLocalStorage, WALLET_LS_KEY } from "@utils";
 import { theme } from "@/theme";
 import { useScreenDimension } from "@hooks";
+import { usei18n } from "@translations";
 
 export const ChooseStakeKeyPanel = () => {
   const { disconnectWallet, stakeKeys, setStakeKey } = useCardano();
@@ -15,6 +16,7 @@ export const ChooseStakeKeyPanel = () => {
   const { addSuccessAlert } = useSnackbar();
   const [chosenKey, setChosenKey] = useState<string>("");
   const { isMobile } = useScreenDimension();
+  const { t } = usei18n();
   const {
     palette: { boxShadow2 },
   } = theme;
@@ -36,7 +38,7 @@ export const ChooseStakeKeyPanel = () => {
           px: isMobile ? 0 : 6,
         }}
       >
-        Cancel
+        {t("cancel")}
       </Button>
     );
   }, [isMobile]);
@@ -61,7 +63,7 @@ export const ChooseStakeKeyPanel = () => {
         }}
         variant="contained"
       >
-        Select
+        {t("select")}
       </Button>
     );
   }, [isMobile, chosenKey, setStakeKey]);
@@ -83,10 +85,10 @@ export const ChooseStakeKeyPanel = () => {
       >
         <Box>
           <Typography fontSize={32} fontWeight={600} textAlign={"center"}>
-            Pick Stake Key
+            {t("wallet.pickStakeKey")}
           </Typography>
           <Typography fontSize={14} textAlign={"center"} mt={1} mb={4}>
-            Select the stake key you want to use:
+            {t("wallet.pickStakeKey")}
           </Typography>
           <Grid
             container

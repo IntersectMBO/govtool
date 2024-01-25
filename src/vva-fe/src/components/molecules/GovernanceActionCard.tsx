@@ -3,7 +3,6 @@ import { Box } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 import { Button, Typography, Tooltip } from "@atoms";
-import { tooltips } from "@consts";
 import { useScreenDimension } from "@hooks";
 import { theme } from "@/theme";
 import {
@@ -12,6 +11,7 @@ import {
   getProposalTypeLabel,
   getShortenedGovActionId,
 } from "@utils";
+import { usei18n } from "@translations";
 
 interface ActionTypeProps
   extends Omit<
@@ -43,6 +43,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
     index,
   } = props;
   const { isMobile, screenWidth } = useScreenDimension();
+  const { t } = usei18n();
 
   const {
     palette: { lightBlue },
@@ -85,7 +86,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           }}
         >
           <Typography color="#DEA029" variant="body2">
-            In progress
+            {t("inProgress")}
           </Typography>
         </Box>
       )}
@@ -101,7 +102,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
       >
         <Box data-testid="governance-action-type">
           <Typography color="neutralGray" variant="caption">
-            Governance Action Type:
+            {t("govActions.type")}
           </Typography>
           <Box display={"flex"}>
             <Box
@@ -122,7 +123,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
         </Box>
         <Box mt={5}>
           <Typography color="neutralGray" variant="caption">
-            Governance Action ID:
+            {t("govActions.id")}
           </Typography>
           <Box display={"flex"} mt={0.25}>
             <Box
@@ -156,7 +157,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
             sx={{ flexWrap: "nowrap", mr: 1 }}
             variant="caption"
           >
-            Submission date:
+            {t("govActions.submissionDate")}
           </Typography>
           <Typography
             fontWeight={600}
@@ -166,8 +167,8 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
             {formatDisplayDate(createdDate)}
           </Typography>
           <Tooltip
-            heading={tooltips.submissionDate.heading}
-            paragraphOne={tooltips.submissionDate.paragraphOne}
+            heading={t("tooltips.submissionDate.heading")}
+            paragraphOne={t("tooltips.submissionDate.paragraphOne")}
             placement={"bottom-end"}
             arrow
           >
@@ -196,7 +197,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
             sx={{ flexWrap: "nowrap", mr: 1 }}
             variant="caption"
           >
-            Expiry date:
+            {t("govActions.expiryDate")}
           </Typography>
           <Typography
             fontWeight={600}
@@ -206,9 +207,9 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
             {formatDisplayDate(expiryDate)}
           </Typography>
           <Tooltip
-            heading={tooltips.expiryDate.heading}
-            paragraphOne={tooltips.expiryDate.paragraphOne}
-            paragraphTwo={tooltips.expiryDate.paragraphTwo}
+            heading={t("tooltips.expiryDate.heading")}
+            paragraphOne={t("tooltips.expiryDate.paragraphOne")}
+            paragraphTwo={t("tooltips.expiryDate.paragraphTwo")}
             placement={"bottom-end"}
             arrow
           >
@@ -237,7 +238,9 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           }}
           data-testid={`govaction-${govActionId}-view-detail`}
         >
-          {inProgress ? "See transaction" : "View proposal details"}
+          {inProgress
+            ? t("seeTransaction")
+            : t("govActions.viewProposalDetails")}
         </Button>
       </Box>
     </Box>

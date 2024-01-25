@@ -6,6 +6,7 @@ import { PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { useGetDRepListQuery } from "@hooks";
 import { formHexToBech32 } from "@utils";
+import { usei18n } from "@translations";
 
 export interface DelegateTodrepFormValues {
   dRepId: string;
@@ -21,6 +22,7 @@ export const useDelegateTodRepForm = () => {
   const { openModal, closeModal, modal } = useModal();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+  const { t } = usei18n();
 
   const { control, handleSubmit } = useForm<DelegateTodrepFormValues>();
 
@@ -43,7 +45,7 @@ export const useDelegateTodRepForm = () => {
           });
         }
         if (!drepList?.length || !isValidDrep) {
-          throw new Error("DrepId not found");
+          throw new Error(t("errors.dRepIdNotFound"));
         }
         const certBuilder = await buildVoteDelegationCert(dRepId);
         const result = await buildSignSubmitConwayCertTx({
@@ -55,11 +57,10 @@ export const useDelegateTodRepForm = () => {
             type: "statusModal",
             state: {
               status: "success",
-              title: "Delegation Transaction Submitted!",
-              message:
-                "The confirmation of your actual delegation might take a bit of time but you can track it using.",
+              title: t("modals.delegation.title"),
+              message: t("modals.delegation.message"),
               link: "https://adanordic.com/latest_transactions",
-              buttonText: "Go to dashboard",
+              buttonText: t("modals.common.goToDashboard"),
               onSubmit: () => {
                 navigate(PATHS.dashboard);
                 closeModal();
@@ -76,7 +77,7 @@ export const useDelegateTodRepForm = () => {
             onSubmit: () => {
               closeModal();
             },
-            title: "Oops!",
+            title: t("modals.common.oops"),
             dataTestId: "delegation-transaction-error-modal",
           },
         });

@@ -14,6 +14,7 @@ import { GovernanceActionCard } from "@molecules";
 import { GOVERNANCE_ACTIONS_FILTERS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { getProposalTypeLabel, getFullGovActionId, openInNewTab } from "@utils";
+import { usei18n } from "@translations";
 
 type GovernanceActionsToVoteProps = {
   filters: string[];
@@ -36,6 +37,7 @@ export const GovernanceActionsToVote = ({
   const { data: dRepVotes, dRepVotesAreLoading } = useGetDRepVotesQuery([], "");
   const navigate = useNavigate();
   const { isMobile } = useScreenDimension();
+  const { t } = usei18n();
 
   const queryFilters = filters.length > 0 ? filters : defaultCategories;
 
@@ -94,7 +96,7 @@ export const GovernanceActionsToVote = ({
     <>
       {!mappedData.length ? (
         <Typography fontWeight={300} sx={{ py: 4 }}>
-          No results for the search
+          {t("govActions.noResults")}
         </Typography>
       ) : (
         <>

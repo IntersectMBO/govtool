@@ -9,6 +9,7 @@ import {
   GovernanceActionsToVote,
   DashboardGovernanceActionsVotedOn,
 } from "@organisms";
+import { usei18n } from "@translations";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -67,6 +68,7 @@ export const DashboardGovernanceActions = () => {
 
   const { dRep } = useCardano();
   const { isMobile } = useScreenDimension();
+  const { t } = usei18n();
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setContent(newValue);
@@ -123,7 +125,7 @@ export const DashboardGovernanceActions = () => {
         >
           <StyledTab
             data-testid="to-vote-tab"
-            label="To vote"
+            label={t("govActions.toVote")}
             sx={{
               textTransform: "none",
               width: !isMobile ? "auto" : "50%",
@@ -131,7 +133,7 @@ export const DashboardGovernanceActions = () => {
           />
           <StyledTab
             data-testid="voted-tab"
-            label="Voted"
+            label={t("govActions.voted")}
             sx={{
               textTransform: "none",
               width: !isMobile ? "auto" : "50%",

@@ -20,12 +20,14 @@ import {
   getItemFromLocalStorage,
   getShortenedGovActionId,
 } from "@utils";
+import { usei18n } from "@translations";
 
 export const GovernanceActionDetails = () => {
   const { state, hash } = useLocation();
   const navigate = useNavigate();
   const { pagePadding, screenWidth } = useScreenDimension();
   const { isEnabled } = useCardano();
+  const { t } = usei18n();
   const { proposalId } = useParams();
   const fullProposalId = proposalId + hash;
 
@@ -50,11 +52,11 @@ export const GovernanceActionDetails = () => {
       style={{ textDecorationColor: "#0033AD" }}
     >
       <Typography color="primary" fontWeight={300} variant="caption">
-        Governance Actions
+        {t("govActions.title")}
       </Typography>
     </NavLink>,
     <Typography fontWeight={500} key="2" variant="caption">
-      Vote on Governance Action
+      {t("govActions.voteOnGovActions")}
     </Typography>,
   ];
 
@@ -77,7 +79,7 @@ export const GovernanceActionDetails = () => {
           <Box display="flex" flex={1} flexDirection="column" width="100%">
             {screenWidth >= 1024 ? (
               <Typography fontSize={36} fontWeight={400}>
-                Governance Actions
+                {t("govActions.title")}
               </Typography>
             ) : null}
             <Breadcrumbs
@@ -112,7 +114,7 @@ export const GovernanceActionDetails = () => {
                 style={{ marginRight: "12px", transform: "rotate(180deg)" }}
               />
               <Typography color="primary" fontWeight={400} variant="body2">
-                Back to the list
+                {t("backToList")}
               </Typography>
             </Link>
             {isLoading ? (
@@ -159,12 +161,14 @@ export const GovernanceActionDetails = () => {
             ) : (
               <Box display="flex" flexWrap="wrap" mt={4}>
                 <Typography fontWeight={300}>
-                  Governnance action with id&nbsp;
+                  {t("govActions.withIdNotExist.partOne")}&nbsp;
                 </Typography>
                 <Typography
                   fontWeight={500}
                 >{` ${shortenedGovActionId} `}</Typography>
-                <Typography fontWeight={300}>&nbsp;does not exist.</Typography>
+                <Typography fontWeight={300}>
+                  &nbsp;{t("govActions.withIdNotExist.partTwo")}
+                </Typography>
               </Box>
             )}
           </Box>

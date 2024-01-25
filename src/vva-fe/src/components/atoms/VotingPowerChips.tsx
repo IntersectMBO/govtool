@@ -10,7 +10,7 @@ import {
 } from "@hooks";
 import { correctAdaFormat } from "@utils";
 import { Tooltip } from "@atoms";
-import { tooltips } from "@/consts/texts";
+import { usei18n } from "@translations";
 
 export const VotingPowerChips = () => {
   const { dRep, stakeKey, isDrepLoading } = useCardano();
@@ -19,6 +19,7 @@ export const VotingPowerChips = () => {
   const { votingPower, powerIsLoading } =
     useGetAdaHolderVotingPowerQuery(stakeKey);
   const { isMobile, screenWidth } = useScreenDimension();
+  const { t } = usei18n();
 
   return (
     <Box
@@ -34,9 +35,9 @@ export const VotingPowerChips = () => {
     >
       {dRep?.isRegistered && (
         <Tooltip
-          heading={tooltips.votingPower.heading}
-          paragraphOne={tooltips.votingPower.paragraphOne}
-          paragraphTwo={tooltips.votingPower.paragraphTwo}
+          heading={t("tooltips.votingPower.heading")}
+          paragraphOne={t("tooltips.votingPower.paragraphOne")}
+          paragraphTwo={t("tooltips.votingPower.paragraphTwo")}
           placement={"bottom-end"}
           arrow
         >
@@ -51,7 +52,7 @@ export const VotingPowerChips = () => {
       )}
       {screenWidth >= 1024 && (
         <Typography color="#A5A6A5" sx={{ mr: 1.5 }} variant="body2">
-          Voting power:
+          {t("votingPower")}
         </Typography>
       )}
       {(dRep?.isRegistered && drepPowerIsLoading) ||

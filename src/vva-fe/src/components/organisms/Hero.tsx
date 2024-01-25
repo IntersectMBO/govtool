@@ -5,12 +5,14 @@ import { Button, Typography } from "@atoms";
 import { IMAGES, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { useScreenDimension } from "@hooks";
+import { usei18n } from "@translations";
 
 export const Hero = () => {
   const { isEnabled } = useCardano();
   const { openModal } = useModal();
   const navigate = useNavigate();
   const { isMobile, screenWidth, pagePadding } = useScreenDimension();
+  const { t } = usei18n();
   const IMAGE_SIZE =
     screenWidth < 768
       ? 140
@@ -36,24 +38,17 @@ export const Hero = () => {
       <Box alignItems="center" flex={1} height="min-content">
         <Typography
           variant={screenWidth < 1024 ? "headline2" : "headline1"}
+          sx={{ whiteSpace: "pre-line" }}
           {...(screenWidth < 375 && { fontSize: 45 })}
         >
-          SanchoNet
-          <br />
-          Governance Tool
+          {t("hero.headline")}
         </Typography>
         <Typography
           fontWeight={400}
-          sx={{ my: 4 }}
+          sx={{ my: 4, ...(isMobile ? {} : { whiteSpace: "pre-line" }) }}
           variant={isMobile ? "body2" : "title2"}
         >
-          Interact with SanchoNet using GovTool - a friendly user{" "}
-          {!isMobile && <br />}
-          interface connected to SanchoNet. You can delegate{" "}
-          {!isMobile && <br />}
-          your voting power (tAda) or become a SanchoNet DRep{" "}
-          {!isMobile && <br />}
-          to allow people to delegate voting power to you.
+          {t("hero.description")}
         </Typography>
         <Button
           data-testid="hero-connect-wallet-button"
@@ -66,7 +61,7 @@ export const Hero = () => {
           }}
           size={isMobile ? "medium" : "extraLarge"}
         >
-          Connect your wallet
+          {t("hero.connectWallet")}
         </Button>
       </Box>
       <Box

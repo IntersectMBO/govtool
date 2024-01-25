@@ -6,7 +6,7 @@ import { GovActionDetails, VoteActionForm, VotesSubmitted } from "../molecules";
 import { useModal } from "@context";
 import { ICONS } from "@consts";
 import { Tooltip } from "@atoms";
-import { tooltips } from "@/consts/texts";
+import { usei18n } from "@translations";
 
 type GovernanceActionDetailsCardProps = {
   abstainVotes: number;
@@ -37,6 +37,7 @@ export const GovernanceActionDetailsCard = ({
 }: GovernanceActionDetailsCardProps) => {
   const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
+  const { t } = usei18n();
 
   return (
     <Box
@@ -80,14 +81,14 @@ export const GovernanceActionDetailsCard = ({
             width="100%"
           >
             <Typography fontWeight={300} sx={{ mr: 1 }} variant="caption">
-              Submission date:
+              {t("govActions.submissionDate")}
             </Typography>
             <Typography fontWeight={600} variant="caption">
               {createdDate}
             </Typography>
             <Tooltip
-              heading={tooltips.submissionDate.heading}
-              paragraphOne={tooltips.submissionDate.paragraphOne}
+              heading={t("tooltips.submissionDate.heading")}
+              paragraphOne={t("tooltips.submissionDate.paragraphOne")}
               placement={"bottom-end"}
               arrow
             >
@@ -109,15 +110,15 @@ export const GovernanceActionDetailsCard = ({
             width={"100%"}
           >
             <Typography fontWeight={300} sx={{ mr: 1 }} variant="caption">
-              Expiry date:
+              {t("govActions.expiryDate")}
             </Typography>
             <Typography fontWeight={600} variant="caption">
               {expiryDate}
             </Typography>
             <Tooltip
-              heading={tooltips.expiryDate.heading}
-              paragraphOne={tooltips.expiryDate.paragraphOne}
-              paragraphTwo={tooltips.expiryDate.paragraphTwo}
+              heading={t("tooltips.expiryDate.heading")}
+              paragraphOne={t("tooltips.expiryDate.paragraphOne")}
+              paragraphTwo={t("tooltips.expiryDate.paragraphTwo")}
               placement={"bottom-end"}
               arrow
             >
@@ -134,7 +135,7 @@ export const GovernanceActionDetailsCard = ({
         <Box flex={1} mt={3}>
           <Box>
             <Typography color="neutralGray" variant="caption">
-              Governance Action Type:
+              {t("govActions.type")}
             </Typography>
             <Box display={"flex"}>
               <Box mt={1} px={2} py={1} bgcolor="lightBlue" borderRadius={100}>
@@ -144,7 +145,7 @@ export const GovernanceActionDetailsCard = ({
           </Box>
           <Box mt={4}>
             <Typography color="neutralGray" variant="caption">
-              Governance Action ID:
+              {t("govActions.id")}
             </Typography>
             <Box display="flex">
               <Box
@@ -162,7 +163,7 @@ export const GovernanceActionDetailsCard = ({
           </Box>
           <Box mt={4}>
             <Typography color="neutralGray" variant="caption">
-              Governance Details:
+              {t("govActions.details")}
             </Typography>
             {typeof details === "object" && details !== null ? (
               Object.entries(details).map(([key, value]) => {
@@ -200,7 +201,7 @@ export const GovernanceActionDetailsCard = ({
           data-testid="view-other-details-button"
         >
           <Typography variant="body2" fontWeight={500} color="primary">
-            View other details
+            {t("govActions.viewOtherDetails")}
           </Typography>
           <img
             alt="external link"

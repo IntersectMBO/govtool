@@ -6,9 +6,11 @@ import { CONNECTED_NAV_ITEMS, ICONS, IMAGES, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { WalletInfoCard, DRepInfoCard } from "@molecules";
 import { openInNewTab } from "@/utils";
+import { usei18n } from "@translations";
 
 export const Drawer = () => {
   const { dRep } = useCardano();
+  const { t } = usei18n();
 
   return (
     <Box height="100vh" width="268px" zIndex={101}>
@@ -65,7 +67,7 @@ export const Drawer = () => {
           <Box my={1}>
             <DrawerLink
               dataTestId="helps-link"
-              label="Help"
+              label={t("menu.help")}
               activeIcon={ICONS.helpIcon}
               icon={ICONS.helpIcon}
               navTo=""
@@ -77,7 +79,7 @@ export const Drawer = () => {
             />
           </Box>
           <Typography sx={{ mb: 2 }} variant="caption">
-            © 2023 Voltaire Gov Tool
+            {t("footer.copyright")}
           </Typography>
         </Box>
       </Box>

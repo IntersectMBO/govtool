@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 
 import { GOVERNANCE_ACTIONS_FILTERS } from "@consts";
+import { usei18n } from "@translations";
 
 interface Props {
   chosenFilters: string[];
@@ -32,6 +33,8 @@ export const GovernanceActionsFilters = ({
     [chosenFilters, setChosenFilters]
   );
 
+  const { t } = usei18n();
+
   return (
     <Box
       display={"flex"}
@@ -54,7 +57,7 @@ export const GovernanceActionsFilters = ({
           paddingX: "20px",
         }}
       >
-        Governance Action Type
+        {t("govActions.filterTitle")}
       </FormLabel>
       {GOVERNANCE_ACTIONS_FILTERS.map((item) => {
         return (

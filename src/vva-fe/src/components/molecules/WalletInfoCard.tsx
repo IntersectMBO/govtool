@@ -4,10 +4,12 @@ import { Box, Button, Typography } from "@mui/material";
 import { PATHS } from "@consts";
 import { useCardano } from "@context";
 import { theme } from "@/theme";
+import { usei18n } from "@translations";
 
 export const WalletInfoCard = () => {
   const { address, disconnectWallet, isMainnet } = useCardano();
   const navigate = useNavigate();
+  const { t } = usei18n();
   const {
     palette: { lightBlue },
   } = theme;
@@ -38,7 +40,7 @@ export const WalletInfoCard = () => {
           </Typography>
         </Box>
         <Typography color="gray" fontSize={12} fontWeight={500}>
-          Connected Wallet:
+          {t("wallet.connectedWallet")}
         </Typography>
         <Box
           display="flex"
@@ -67,7 +69,7 @@ export const WalletInfoCard = () => {
               }}
               sx={{ textTransform: "none", fontWeight: 500 }}
             >
-              Disconnect
+              {t("wallet.disconnect")}
             </Button>
           </Box>
         </Box>

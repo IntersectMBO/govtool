@@ -27,6 +27,7 @@ import {
   getProposalTypeLabel,
   removeDuplicatedProposals,
 } from "@utils";
+import { usei18n } from "@translations";
 
 export const GovernanceActionsCategory = ({}) => {
   const { category } = useParams();
@@ -37,6 +38,7 @@ export const GovernanceActionsCategory = ({}) => {
   const { isEnabled } = useCardano();
   const navigate = useNavigate();
   const { dRep } = useCardano();
+  const { t } = usei18n();
 
   const {
     data: dRepVotes,
@@ -72,7 +74,7 @@ export const GovernanceActionsCategory = ({}) => {
       style={{ textDecorationColor: "#0033AD" }}
     >
       <Typography color="primary" fontWeight={300} variant="caption">
-        Governance Actions
+        {t("govActions.title")}
       </Typography>
     </NavLink>,
     <Typography fontWeight={500} key="2" variant="caption">
@@ -121,7 +123,7 @@ export const GovernanceActionsCategory = ({}) => {
             sx={{ mb: isMobile ? 3.75 : 6, px: pagePadding }}
             variant={isMobile ? "title1" : "headline3"}
           >
-            Governance Actions
+            {t("govActions.title")}
           </Typography>
           {isMobile && (
             <Divider
@@ -159,7 +161,7 @@ export const GovernanceActionsCategory = ({}) => {
                 style={{ marginRight: "12px", transform: "rotate(180deg)" }}
               />
               <Typography color="primary" fontWeight={400} variant="body2">
-                Back to the list
+                {t("backToList")}
               </Typography>
             </Link>
             <DataActionsBar
@@ -179,18 +181,20 @@ export const GovernanceActionsCategory = ({}) => {
                 <Typography fontWeight={300} sx={{ py: 4 }}>
                   <Box mt={4} display="flex" flexWrap="wrap">
                     <Typography fontWeight={300}>
-                      Governnance actions with category&nbsp;
+                      {t("govActions.withCategoryNotExist.partOne")}&nbsp;
                     </Typography>
                     <Typography fontWeight={700}>{category}&nbsp;</Typography>
                     {searchText && (
                       <>
                         <Typography fontWeight={300}>
-                          and search phrase&nbsp;
+                          {t("govActions.withCategoryNotExist.optional")}&nbsp;
                         </Typography>
                         <Typography fontWeight={700}>{searchText}</Typography>
                       </>
                     )}
-                    <Typography fontWeight={300}>&nbsp;don't exist.</Typography>
+                    <Typography fontWeight={300}>
+                      &nbsp;{t("govActions.withCategoryNotExist.partTwo")}
+                    </Typography>
                   </Box>
                 </Typography>
               ) : (

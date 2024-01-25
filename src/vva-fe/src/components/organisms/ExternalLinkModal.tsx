@@ -6,6 +6,7 @@ import { useModal } from "@context";
 import { useScreenDimension } from "@hooks";
 import { theme } from "@/theme";
 import { openInNewTab } from "@utils";
+import { usei18n } from "@translations";
 
 export interface ExternalLinkModalState {
   externalLink: string;
@@ -14,6 +15,7 @@ export interface ExternalLinkModalState {
 export function ExternalLinkModal() {
   const { state, closeModal } = useModal<ExternalLinkModalState>();
   const { isMobile } = useScreenDimension();
+  const { t } = usei18n();
   const {
     palette: { primaryBlue, fadedPurple },
   } = theme;
@@ -26,13 +28,15 @@ export function ExternalLinkModal() {
         style={{ height: "84px", margin: "0 auto", width: "84px" }}
       />
       <ModalHeader sx={{ marginTop: "34px" }}>
-        {isMobile ? "External Link Safety" : "Be Careful!"}
+        {isMobile
+          ? t("modals.externalLink.safety")
+          : t("modals.externalLink.beCareful")}
       </ModalHeader>
       <ModalContents>
         <Typography textAlign="center" sx={{ fontSize: "16px" }}>
           {isMobile
-            ? "This is an external link:"
-            : "You are about to open an external link to:"}
+            ? t("modals.externalLink.thisIs")
+            : t("modals.externalLink.youAreAboutToOpen")}
         </Typography>
         <Typography
           textAlign="center"
@@ -53,9 +57,7 @@ export function ExternalLinkModal() {
             color: fadedPurple,
           }}
         >
-          Exercise caution and verify the website's authenticity before sharing
-          personal information. To proceed, click 'Continue'. To stay on
-          Voltaire, click 'Cancel'.
+          {t("modals.externalLink.description")}
         </Typography>
       </ModalContents>
       <Box
@@ -79,7 +81,7 @@ export function ExternalLinkModal() {
           }}
           variant="contained"
         >
-          {isMobile ? "Continue" : "Continue to external link"}
+          {isMobile ? t("continue") : t("modals.externalLink.continueTo")}
         </Button>
         <Button
           data-testid={"cancel-modal-button"}
@@ -95,7 +97,7 @@ export function ExternalLinkModal() {
           }}
           variant="outlined"
         >
-          Cancel
+          {t("cancel")}
         </Button>
       </Box>
     </ModalWrapper>

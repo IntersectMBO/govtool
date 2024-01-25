@@ -11,8 +11,8 @@ import {
   useScreenDimension,
 } from "@hooks";
 import { theme } from "@/theme";
-import { tooltips } from "@/consts/texts";
 import { correctAdaFormat } from "@utils";
+import { usei18n } from "@translations";
 
 interface DelegateProps {
   setStep: (newStep: number) => void;
@@ -35,6 +35,7 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
     palette: { boxShadow2 },
   } = theme;
   const { isMobile } = useScreenDimension();
+  const { t } = usei18n();
 
   const { votingPower } = useGetAdaHolderVotingPowerQuery(stakeKey);
   const correctAdaRepresentation = correctAdaFormat(votingPower);
@@ -44,9 +45,8 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
       type: "statusModal",
       state: {
         status: "success",
-        title: "Delegation Transaction Submitted!",
-        message:
-          "The confirmation of your actual delegation might take a bit of time but you can track it using.",
+        title: t("modals.delegation.title"),
+        message: t("modals.delegation.message"),
         link: "https://adanordic.com/latest_transactions",
         buttonText: "Go to dashboard",
         onSubmit: () => {
@@ -63,10 +63,10 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
       type: "statusModal",
       state: {
         status: "warning",
-        title: "Oops!",
+        title: t("modals.delegation.title"),
         message: errorMessage,
         isWarning: true,
-        buttonText: "Go to dashboard",
+        buttonText: t("modals.common.goToDashboard"),
         onSubmit: () => {
           navigate(PATHS.dashboard);
           closeModal();
@@ -121,7 +121,7 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
         }}
         variant="contained"
       >
-        {chosenOption !== dRepID ? "Next step" : "Delegate"}
+        {chosenOption !== dRepID ? t("nextStep") : t("delegate")}
       </Button>
     );
   }, [chosenOption, dRep?.isRegistered, isMobile, delegate, dRepID]);
@@ -138,7 +138,7 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
         }}
         variant="outlined"
       >
-        Cancel
+        {t("cancel")}
       </Button>
     );
   }, [isMobile]);
@@ -171,7 +171,7 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Typography color="textBlack" variant="body2">
-                  Voting power to delegate:
+                  {t("delegation.votingPowerToDelegate")}
                 </Typography>
                 <Typography
                   color="specialCyan"
@@ -186,15 +186,14 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
           </Box>
         )}
         <Typography sx={{ textAlign: "center" }} variant="headline4">
-          Use your Voting Power
+          {t("delegation.heading")}
         </Typography>
         <Typography
           fontWeight={400}
           sx={{ mb: 4, mt: 1, textAlign: "center" }}
           variant="body1"
         >
-          You can delegate your voting power to a DRep or to a pre-defined
-          voting option.
+          {t("delegation.description")}
         </Typography>
         <Grid
           container
@@ -207,11 +206,11 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
             <Grid item>
               <ActionRadio
                 onChange={setChosenOption}
-                tooltipTitle={tooltips.delegateTodRep.toMyself.heading}
-                tooltipText={tooltips.delegateTodRep.toMyself.paragraphOne}
+                tooltipTitle={t("tooltips.delegateTodRep.toMyself.heading")}
+                tooltipText={t("tooltips.delegateTodRep.toMyself.paragraphOne")}
                 isChecked={chosenOption === dRepID}
-                subtitle="Select this to delegate your own voting power to yourself."
-                title="Delegate to myself"
+                subtitle={t("delegation.toMyself.subtitle")}
+                title={t("delegation.toMyself.title")}
                 value={dRepID}
                 dataTestId="delegate-to-myself-card"
               />
@@ -220,11 +219,11 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
           <Grid item>
             <ActionRadio
               onChange={setChosenOption}
-              tooltipTitle={tooltips.delegateTodRep.todRep.heading}
-              tooltipText={tooltips.delegateTodRep.todRep.paragraphOne}
+              tooltipTitle={t("tooltips.delegateTodRep.todRep.heading")}
+              tooltipText={t("tooltips.delegateTodRep.todRep.paragraphOne")}
               isChecked={chosenOption === "Delegate to DRep"}
-              subtitle="Select this to delegate to a DRep using their related DRep ID."
-              title="Delegate to DRep"
+              subtitle={t("delegation.toDRep.subtitle")}
+              title={t("delegation.toDRep.title")}
               value="Delegate to DRep"
               dataTestId="delegate-to-drep-card"
             />
@@ -242,7 +241,9 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
               },
             ]}
           >
-            <Typography variant="caption">Other options</Typography>
+            <Typography variant="caption">
+              {t("delegation.otherOptions")}
+            </Typography>
             <img
               alt="arrow"
               src={ICONS.arrowDownIcon}
@@ -256,14 +257,16 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
             <>
               <Grid item>
                 <ActionRadio
-                  tooltipTitle={tooltips.delegateTodRep.noConfidence.heading}
-                  tooltipText={
-                    tooltips.delegateTodRep.noConfidence.paragraphOne
-                  }
+                  tooltipTitle={t(
+                    "tooltips.delegateTodRep.noConfidence.heading"
+                  )}
+                  tooltipText={t(
+                    "tooltips.delegateTodRep.noConfidence.paragraphOne"
+                  )}
                   onChange={setChosenOption}
                   isChecked={chosenOption === "no confidence"}
-                  subtitle="Select this to signal no confidence in the current constitutional committee by voting NO on every proposal and voting YES to no-confidence proposals."
-                  title="Signal no confidence"
+                  subtitle={t("delegation.noConfidence.subtitle")}
+                  title={t("delegation.noConfidence.title")}
                   value="no confidence"
                   dataTestId="signal-no-confidence-card"
                 />
@@ -271,11 +274,13 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
               <Grid item>
                 <ActionRadio
                   onChange={setChosenOption}
-                  tooltipTitle={tooltips.delegateTodRep.abstain.heading}
-                  tooltipText={tooltips.delegateTodRep.abstain.paragraphOne}
+                  tooltipTitle={t("tooltips.delegateTodRep.abstain.heading")}
+                  tooltipText={t(
+                    "tooltips.delegateTodRep.abstain.paragraphOne"
+                  )}
                   isChecked={chosenOption === "abstain"}
-                  subtitle="Select this to vote ABSTAIN to every vote."
-                  title="Vote ABSTAIN as default"
+                  subtitle={t("delegation.abstain.subtitle")}
+                  title={t("delegation.abstain.title")}
                   value="abstain"
                   dataTestId="vote-abstain-card"
                 />

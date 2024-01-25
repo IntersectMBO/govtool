@@ -9,34 +9,45 @@ import { UrlAndHashFormValues } from "./useUrlAndHashFormController";
 import { PATHS } from "@consts";
 import { useCardano, useSnackbar } from "@context";
 import { HASH_REGEX, URL_REGEX } from "@utils";
+import { usei18n } from "@translations";
 
 export interface VoteActionFormValues extends UrlAndHashFormValues {
   vote: string;
 }
 
 export const useVoteActionFormController = () => {
+  const { t } = usei18n();
+
   const validationSchema = useMemo(
     () =>
       Yup.object().shape({
         vote: Yup.string().oneOf(["yes", "no", "abstain"]).required(),
         url: Yup.string()
           .trim()
-          .max(64, "Url must be less than 65 characters")
-          .test("url-validation", "Invalid URL format", (value) => {
-            return !value || URL_REGEX.test(value);
-          }),
+          .max(64, t("forms.errors.urlTooLong"))
+          .test(
+            "url-validation",
+            t("forms.errors.urlInvalidFormat"),
+            (value) => {
+              return !value || URL_REGEX.test(value);
+            }
+          ),
         hash: Yup.string()
           .trim()
           .test(
             "hash-length-validation",
-            "Hash must be exactly 64 characters long",
+            t("forms.errors.hashInvalidLength"),
             (value) => {
               return !value || value.length === 64;
             }
           )
-          .test("hash-format-validation", "Invalid hash format", (value) => {
-            return !value || HASH_REGEX.test(value);
-          }),
+          .test(
+            "hash-format-validation",
+            t("forms.errors.hashInvalidFormat"),
+            (value) => {
+              return !value || HASH_REGEX.test(value);
+            }
+          ),
       }),
     []
   );

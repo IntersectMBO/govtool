@@ -5,6 +5,7 @@ import { Button, Input, Typography } from "../atoms";
 import { useScreenDimension, useDelegateTodRepForm } from "@hooks";
 import { theme } from "@/theme";
 import { openInNewTab } from "@utils";
+import { usei18n } from "@translations";
 
 interface DelegateProps {
   setStep: (newStep: number) => void;
@@ -12,6 +13,7 @@ interface DelegateProps {
 
 export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
   const { isMobile } = useScreenDimension();
+  const { t } = usei18n();
 
   const {
     palette: { boxShadow2 },
@@ -33,7 +35,7 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
         }}
         variant="contained"
       >
-        Delegate
+        {t("delegate")}
       </Button>
     );
   }, [isDelegateButtonDisabled, delegate, isMobile]);
@@ -50,7 +52,7 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
         }}
         variant="outlined"
       >
-        Back
+        {t("back")}
       </Button>
     );
   }, [isMobile]);
@@ -69,20 +71,20 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
     >
       <Box display="flex" flexDirection="column" flex={1} px={isMobile ? 0 : 6}>
         <Typography sx={{ textAlign: "center" }} variant="headline4">
-          Paste DRep ID
+          {t("delegation.pasteDRepId")}
         </Typography>
         <Typography
           fontWeight={400}
           sx={{ mb: 6, mt: 1, textAlign: "center" }}
           variant="body1"
         >
-          The DRep ID is the identifier of a DRep.
+          {t("delegation.dRepIdDescription")}
         </Typography>
         <Box display="flex" justifyContent="center">
           <Input
             control={control}
             formFieldName="dRepId"
-            placeholder="Paste DRep ID"
+            placeholder={t("delegation.pasteDRepId")}
             dataTestId="dRep-id-input"
             width={"100%"}
           />
@@ -99,7 +101,7 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
           sx={[{ "&:hover": { cursor: "pointer" } }]}
         >
           <Typography color="primary" fontWeight={500} variant="body2">
-            Where can I find a DRep ID?
+            {t("delegation.whereFindDRepId")}
           </Typography>
         </Link>
       </Box>

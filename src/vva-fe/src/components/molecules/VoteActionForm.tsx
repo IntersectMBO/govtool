@@ -7,6 +7,7 @@ import { ICONS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { useScreenDimension, useVoteActionForm } from "@hooks";
 import { openInNewTab } from "@utils";
+import { usei18n } from "@translations";
 
 export const VoteActionForm = ({
   voteFromEP,
@@ -24,6 +25,7 @@ export const VoteActionForm = ({
   const { isMobile, screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { dRep } = useCardano();
+  const { t } = usei18n();
 
   const {
     setValue,
@@ -65,7 +67,7 @@ export const VoteActionForm = ({
           width: "100%",
         }}
       >
-        Cancel
+        {t("cancel")}
       </Button>
     );
   }, [state]);
@@ -89,7 +91,7 @@ export const VoteActionForm = ({
           height: 48,
         }}
       >
-        Change vote
+        {t("govActions.changeVote")}
       </LoadingButton>
     );
   }, [confirmVote, areFormErrors, vote]);
@@ -102,7 +104,9 @@ export const VoteActionForm = ({
         flexDirection="column"
         px={screenWidth < 1024 ? 0 : 5}
       >
-        <Typography variant="body1">Choose how you want to vote:</Typography>
+        <Typography variant="body1">
+          {t("govActions.chooseHowToVote")}
+        </Typography>
         <Box mt={3}>
           <Box display="flex" flexDirection="row">
             <Radio
@@ -111,7 +115,7 @@ export const VoteActionForm = ({
               name="vote"
               register={registerInput}
               setValue={setValue}
-              title="Yes"
+              title={t("yes")}
               value="yes"
             />
             <Box px={1} />
@@ -121,7 +125,7 @@ export const VoteActionForm = ({
               name="vote"
               register={registerInput}
               setValue={setValue}
-              title="No"
+              title={t("no")}
               value="no"
             />
           </Box>
@@ -132,7 +136,7 @@ export const VoteActionForm = ({
               name="vote"
               register={registerInput}
               setValue={setValue}
-              title="Abstain"
+              title={t("abstain")}
               value="abstain"
             />
           </Box>
@@ -155,7 +159,7 @@ export const VoteActionForm = ({
               });
             }}
           >
-            Show votes
+            {t("govActions.showVotes")}
           </Button>
         )}
         <Box
@@ -179,9 +183,9 @@ export const VoteActionForm = ({
               margin: 0,
             }}
           >
-            Provide context about your vote{" "}
+            {t("govActions.provideContext")}{" "}
             <span style={{ fontSize: 12, fontWeight: 300 }}>
-              (optional)
+              {t("govActions.optional")}
               <img
                 alt="arrow"
                 src={ICONS.arrowDownIcon}
@@ -201,7 +205,7 @@ export const VoteActionForm = ({
               dataTestId="url-input"
               errorMessage={errors.url?.message}
               formFieldName="url"
-              placeholder="Your URL with with your context"
+              placeholder={t("forms.urlWithContextPlaceholder")}
               width={"100%"}
             />
             <Input
@@ -209,7 +213,7 @@ export const VoteActionForm = ({
               dataTestId="hash-input"
               errorMessage={errors.hash?.message}
               formFieldName="hash"
-              placeholder="The hash of your URL"
+              placeholder={t("forms.hashPlaceholder")}
               width={"100%"}
             />
             <Link
@@ -225,7 +229,7 @@ export const VoteActionForm = ({
               visibility={!isContext ? "hidden" : "visible"}
             >
               <Typography color="primary" fontWeight={400} variant="body2">
-                How to create URL and hash?
+                {t("forms.howCreateUrlAndHash")}
               </Typography>
             </Link>
           </Box>
@@ -239,7 +243,7 @@ export const VoteActionForm = ({
         }}
         variant="caption"
       >
-        Select a different option to change your vote
+        {t("govActions.selectDifferentOption")}
       </Typography>
       {(state?.vote && state?.vote !== vote) ||
       (voteFromEP && voteFromEP !== vote) ? (
@@ -268,7 +272,7 @@ export const VoteActionForm = ({
             width: "100%",
           }}
         >
-          Vote
+          {t("govActions.vote")}
         </Button>
       )}
     </Box>

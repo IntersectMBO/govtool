@@ -22,12 +22,14 @@ import {
   getShortenedGovActionId,
   getProposalTypeLabel,
 } from "@utils";
+import { usei18n } from "@translations";
 
 export const DashboardGovernanceActionDetails = () => {
   const { dRep } = useCardano();
   const { state, hash } = useLocation();
   const navigate = useNavigate();
   const { isMobile, screenWidth } = useScreenDimension();
+  const { t } = usei18n();
   const { proposalId } = useParams();
   const fullProposalId = proposalId + hash;
 
@@ -45,11 +47,11 @@ export const DashboardGovernanceActionDetails = () => {
       style={{ textDecorationColor: "#0033AD" }}
     >
       <Typography color="primary" fontWeight={300} fontSize={12}>
-        Governance Actions
+        {t("govActions.title")}
       </Typography>
     </NavLink>,
     <Typography fontSize={12} fontWeight={500} key="2">
-      Vote on Governance Action
+      {t("govActions.voteOnGovActions")}
     </Typography>,
   ];
 
@@ -100,7 +102,7 @@ export const DashboardGovernanceActionDetails = () => {
           style={{ marginRight: "12px", transform: "rotate(180deg)" }}
         />
         <Typography variant="body2" color="primary">
-          Back to the list
+          {t("backToList")}
         </Typography>
       </Link>
       <Box display="flex" justifyContent="center">
@@ -144,12 +146,14 @@ export const DashboardGovernanceActionDetails = () => {
         ) : (
           <Box mt={4} display="flex" flexWrap="wrap">
             <Typography fontWeight={300}>
-              Governnance action with id&nbsp;
+              {t("govActions.withIdNotExist.partOne")}&nbsp;
             </Typography>
             <Typography
               fontWeight={"bold"}
             >{` ${shortenedGovActionId} `}</Typography>
-            <Typography fontWeight={300}>&nbsp;does not exist.</Typography>
+            <Typography fontWeight={300}>
+              &nbsp;{t("govActions.withIdNotExist.partTwo")}
+            </Typography>
           </Box>
         )}
       </Box>

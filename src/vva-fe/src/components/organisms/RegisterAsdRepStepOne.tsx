@@ -7,6 +7,7 @@ import { PATHS } from "@consts";
 import { useScreenDimension, useRegisterAsdRepFormContext } from "@hooks";
 import { theme } from "@/theme";
 import { openInNewTab } from "@utils";
+import { usei18n } from "@translations";
 
 interface Props {
   setStep: Dispatch<SetStateAction<number>>;
@@ -14,6 +15,7 @@ interface Props {
 
 export const RegisterAsdRepStepOne = ({ setStep }: Props) => {
   const navigate = useNavigate();
+  const { t } = usei18n();
   const {
     palette: { boxShadow2 },
   } = theme;
@@ -33,7 +35,7 @@ export const RegisterAsdRepStepOne = ({ setStep }: Props) => {
         }}
         variant="outlined"
       >
-        Cancel
+        {t("cancel")}
       </Button>
     );
   }, [isMobile]);
@@ -53,7 +55,7 @@ export const RegisterAsdRepStepOne = ({ setStep }: Props) => {
         }}
         variant="contained"
       >
-        {showSubmitButton ? "Confirm" : "Skip"}
+        {showSubmitButton ? t("confirm") : t("skip")}
       </Button>
     );
   }, [isMobile, isValid, showSubmitButton]);
@@ -74,23 +76,22 @@ export const RegisterAsdRepStepOne = ({ setStep }: Props) => {
           sx={{ letterSpacing: 1.5, textAlign: "center" }}
           variant="body1"
         >
-          OPTIONAL
+          {t("registration.optional")}
         </Typography>
         <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
-          Add Information
+          {t("registration.headingStepOne")}
         </Typography>
         <Typography
           fontWeight={400}
           sx={{ mb: 7, mt: 3, textAlign: "center" }}
           variant="body1"
         >
-          You can include extra information about yourself by adding a URL and
-          its hash.
+          {t("registration.descriptionStepOne")}
         </Typography>
         <Input
           control={control}
           formFieldName="url"
-          placeholder="Your URL with extra info about you"
+          placeholder={t("forms.urlWithInfoPlaceholder")}
           dataTestId="url-input"
           errorMessage={errors.url?.message}
           width={isMobile ? "100%" : "70%"}
@@ -98,7 +99,7 @@ export const RegisterAsdRepStepOne = ({ setStep }: Props) => {
         <Input
           control={control}
           formFieldName="hash"
-          placeholder="The hash of your URL"
+          placeholder={t("forms.hashPlaceholder")}
           dataTestId="hash-input"
           errorMessage={errors.hash?.message}
           width={isMobile ? "100%" : "70%"}
@@ -116,7 +117,7 @@ export const RegisterAsdRepStepOne = ({ setStep }: Props) => {
           sx={{ cursor: "pointer" }}
         >
           <Typography fontWeight={500} color="primary" variant="body1">
-            How to create URL and hash?
+            {t("forms.howCreateUrlAndHash")}
           </Typography>
         </Link>
       </Box>

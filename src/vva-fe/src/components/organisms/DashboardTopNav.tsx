@@ -8,6 +8,7 @@ import { ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { DRepInfoCard, WalletInfoCard } from "@molecules";
 import { openInNewTab } from "@utils";
+import { usei18n } from "@translations";
 
 type DashboardTopNavProps = {
   imageSRC?: string;
@@ -30,6 +31,7 @@ export const DashboardTopNav = ({
   const { dRep } = useCardano();
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const { t } = usei18n();
 
   return (
     <Box
@@ -114,7 +116,7 @@ export const DashboardTopNav = ({
                     <Link
                       dataTestId="home-link"
                       navTo={PATHS.dashboard}
-                      label="My Dashboard"
+                      label={t("menu.myDashboard")}
                       size="big"
                       onClick={() => {
                         setIsDrawerOpen(false);
@@ -126,7 +128,7 @@ export const DashboardTopNav = ({
                     <Link
                       dataTestId="governance-actions-link"
                       navTo={PATHS.dashboard_governance_actions}
-                      label="View Governance Actions"
+                      label={t("menu.viewGovActions")}
                       size="big"
                       onClick={() => {
                         setIsDrawerOpen(false);
@@ -138,7 +140,7 @@ export const DashboardTopNav = ({
                     <Link
                       dataTestId="guides-link"
                       navTo={""}
-                      label="Guides"
+                      label={t("menu.guides")}
                       size="big"
                       onClick={() => {
                         openInNewTab(
@@ -153,7 +155,7 @@ export const DashboardTopNav = ({
                     <Link
                       dataTestId="faqs-link"
                       navTo={""}
-                      label="FAQs"
+                      label={t("menu.faqs")}
                       size="big"
                       onClick={() => {
                         openInNewTab("https://docs.sanchogov.tools/faqs");

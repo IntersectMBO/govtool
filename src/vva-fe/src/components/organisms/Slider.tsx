@@ -9,6 +9,7 @@ import { ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { useScreenDimension, useSlider } from "@hooks";
 import { generatePath, useNavigate } from "react-router-dom";
+import { usei18n } from "@translations";
 
 const SLIDER_MAX_LENGTH = 1000;
 
@@ -40,6 +41,7 @@ export const Slider = ({
   const { isMobile, screenWidth, pagePadding } = useScreenDimension();
   const navigate = useNavigate();
   const { voteTransaction } = useCardano();
+  const { t } = usei18n();
 
   const DEFAULT_SLIDER_CONFIG = {
     mode: "free",
@@ -122,7 +124,7 @@ export const Slider = ({
               lineHeight={"20px"}
               noWrap
             >
-              Show all
+              {t("slider.showAll")}
             </Typography>
           </Link>
         )}
@@ -171,7 +173,7 @@ export const Slider = ({
               }
             >
               <Typography noWrap color="primary" fontSize={16} fontWeight={500}>
-                View all
+                {t("slider.viewAll")}
               </Typography>
               <img
                 src={ICONS.arrowRightIcon}

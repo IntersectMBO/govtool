@@ -6,6 +6,7 @@ import { ICONS, IMAGES, NAV_ITEMS } from "@consts";
 import { useScreenDimension } from "@hooks";
 import { useModal } from "@context";
 import { openInNewTab } from "@utils";
+import { usei18n } from "@translations";
 
 type DrawerMobileProps = {
   isConnectButton: boolean;
@@ -23,6 +24,7 @@ export const DrawerMobile = ({
 }: DrawerMobileProps) => {
   const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
+  const { t } = usei18n();
 
   return (
     <SwipeableDrawer
@@ -61,7 +63,7 @@ export const DrawerMobile = ({
               }}
               variant="contained"
             >
-              Connect your wallet
+              {t("wallet.connectYourWalletButton")}
             </Button>
           ) : null}
           <Grid container direction="column" mt={6} rowGap={4}>

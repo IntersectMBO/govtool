@@ -5,6 +5,7 @@ import { useModal } from "@context";
 import { correctAdaFormat } from "@utils";
 import { Vote } from "@/models";
 import { useScreenDimension } from "@/hooks";
+import { usei18n } from "@/translations";
 
 export interface VotingPowerModalState {
   yesVotes: number;
@@ -15,12 +16,14 @@ export interface VotingPowerModalState {
 
 export function VotingPowerModal() {
   const { state } = useModal<VotingPowerModalState>();
+  const { isMobile } = useScreenDimension();
+  const { t } = usei18n();
+
   const VOTES = [
     { title: "yes", vote: state?.yesVotes },
     { title: "abstain", vote: state?.abstainVotes },
     { title: "no", vote: state?.noVotes },
   ];
-  const { isMobile } = useScreenDimension();
 
   return (
     <ModalWrapper
@@ -30,14 +33,14 @@ export function VotingPowerModal() {
       <ModalContents>
         <Box alignItems="center">
           <Typography sx={{ textAlign: "center" }} variant="title2">
-            Governance Action votes
+            {t("modals.votingPower.govActionsVotes")}
           </Typography>
           <Typography
             fontWeight={400}
             sx={{ mt: 1, mb: 3, textAlign: "center" }}
             variant="body2"
           >
-            Votes submitted by DReps
+            {t("modals.votingPower.votesSubmittedByDReps")}
           </Typography>
           {VOTES.map((vote, index) => (
             <Box
@@ -71,7 +74,7 @@ export function VotingPowerModal() {
                   }}
                   variant="caption"
                 >
-                  Your vote
+                  {t("modals.votingPower.yourVote")}
                 </Typography>
               ) : null}
               <VotePill

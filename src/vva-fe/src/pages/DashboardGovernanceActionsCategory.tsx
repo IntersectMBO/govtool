@@ -30,6 +30,7 @@ import {
   getProposalTypeLabel,
   removeDuplicatedProposals,
 } from "@utils";
+import { usei18n } from "@translations";
 
 export const DashboardGovernanceActionsCategory = ({}) => {
   const { category } = useParams();
@@ -39,6 +40,7 @@ export const DashboardGovernanceActionsCategory = ({}) => {
   const { isMobile, screenWidth } = useScreenDimension();
   const navigate = useNavigate();
   const { dRep, voteTransaction } = useCardano();
+  const { t } = usei18n();
 
   const { data: dRepVotes } = useGetDRepVotesQuery([], "");
 
@@ -70,7 +72,7 @@ export const DashboardGovernanceActionsCategory = ({}) => {
       style={{ textDecorationColor: "#0033AD" }}
     >
       <Typography color="primary" fontWeight={300} fontSize={12}>
-        Governance Actions
+        {t("govActions.title")}
       </Typography>
     </NavLink>,
     <Typography fontSize={12} fontWeight={500} key="2">
@@ -149,7 +151,7 @@ export const DashboardGovernanceActionsCategory = ({}) => {
                 style={{ marginRight: "12px", transform: "rotate(180deg)" }}
               />
               <Typography variant="body2" color="primary">
-                Back to the list
+                {t("backToList")}
               </Typography>
             </Link>
             <DataActionsBar
@@ -169,10 +171,12 @@ export const DashboardGovernanceActionsCategory = ({}) => {
                 <Typography py={4} fontWeight="300">
                   <Box mt={4} display="flex" flexWrap="wrap">
                     <Typography fontWeight={300}>
-                      Governnance actions with category&nbsp;
+                      {t("govActions.withCategoryNotExist.partOne")}&nbsp;
                     </Typography>
                     <Typography fontWeight="bold">{` ${category} `}</Typography>
-                    <Typography fontWeight={300}>&nbsp;don't exist.</Typography>
+                    <Typography fontWeight={300}>
+                      &nbsp;{t("govActions.withCategoryNotExist.partTwo")}
+                    </Typography>
                   </Box>
                 </Typography>
               ) : (

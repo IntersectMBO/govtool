@@ -9,6 +9,7 @@ import { useScreenDimension, useUpdatedRepMetadataForm } from "@hooks";
 import { DashboardTopNav, Footer } from "@organisms";
 import { theme } from "@/theme";
 import { WALLET_LS_KEY, getItemFromLocalStorage, openInNewTab } from "@utils";
+import { usei18n } from "@translations";
 
 export const UpdatedRepMetadata = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export const UpdatedRepMetadata = () => {
   } = theme;
   const { isMobile, pagePadding, screenWidth } = useScreenDimension();
   const { isPendingTransaction } = useCardano();
+  const { t } = usei18n();
 
   const { submitForm, control, errors, isValid, isLoading } =
     useUpdatedRepMetadataForm();
@@ -45,7 +47,7 @@ export const UpdatedRepMetadata = () => {
         }}
         variant="outlined"
       >
-        Cancel
+        {t("cancel")}
       </Button>
     );
   }, [isMobile]);
@@ -66,7 +68,7 @@ export const UpdatedRepMetadata = () => {
         }}
         variant="contained"
       >
-        Confirm
+        {t("confirm")}
       </LoadingButton>
     );
   }, [isLoading, isMobile, isValid, submitForm]);
@@ -78,7 +80,7 @@ export const UpdatedRepMetadata = () => {
           imageSRC={ICONS.appLogoIcon}
           imageWidth={isMobile ? undefined : 42}
           imageHeight={isMobile ? 24 : 35}
-          title={"Update DRep Metadata"}
+          title={t("metadataUpdate.title")}
         />
         <Box
           display={"flex"}
@@ -103,20 +105,19 @@ export const UpdatedRepMetadata = () => {
                 sx={{ mt: 1, textAlign: "center" }}
                 variant="headline4"
               >
-                Update Information
+                {t("metadataUpdate.info")}
               </Typography>
               <Typography
                 fontWeight={400}
                 sx={{ mb: 7, mt: 3, textAlign: "cenetr" }}
                 variant="body1"
               >
-                You can include extra information about yourself by adding a URL
-                and its hash.
+                {t("metadataUpdate.description")}
               </Typography>
               <Input
                 control={control}
                 formFieldName="url"
-                placeholder="Your URL with extra info about you"
+                placeholder={t("forms.urlWithInfoPlaceholder")}
                 dataTestId="url-input"
                 errorMessage={errors.url?.message}
                 width={isMobile ? "100%" : "70%"}
@@ -124,7 +125,7 @@ export const UpdatedRepMetadata = () => {
               <Input
                 control={control}
                 formFieldName="hash"
-                placeholder="The hash of your URL"
+                placeholder={t("forms.hashPlaceholder")}
                 dataTestId="hash-input"
                 errorMessage={errors.hash?.message}
                 width={isMobile ? "100%" : "70%"}
@@ -141,7 +142,7 @@ export const UpdatedRepMetadata = () => {
                 sx={{ cursor: "pointer" }}
               >
                 <Typography fontWeight={500} color="primary" variant="body1">
-                  How to create URL and hash?
+                  {t("forms.howCreateUrlAndHash")}
                 </Typography>
               </Link>
             </Box>

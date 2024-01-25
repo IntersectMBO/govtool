@@ -7,6 +7,7 @@ import { useGetDRepVotesQuery, useScreenDimension } from "@hooks";
 import { getProposalTypeLabel } from "@/utils/getProposalTypeLabel";
 import { getFullGovActionId } from "@/utils";
 import { useCardano } from "@/context";
+import { usei18n } from "@translations";
 
 interface DashboardGovernanceActionsVotedOnProps {
   filters: string[];
@@ -22,6 +23,7 @@ export const DashboardGovernanceActionsVotedOn = ({
   const { data, dRepVotesAreLoading } = useGetDRepVotesQuery(filters, sorting);
   const { isMobile } = useScreenDimension();
   const { voteTransaction } = useCardano();
+  const { t } = usei18n();
 
   const filteredData = useMemo(() => {
     if (data.length && searchPhrase) {
@@ -53,12 +55,11 @@ export const DashboardGovernanceActionsVotedOn = ({
     <>
       {!data.length ? (
         <Typography py={4} fontWeight="300">
-          You haven't voted on any Governance Actions yet. Check the &apos;To
-          vote on&apos; section to vote on Governance Actions.
+          {t("govActions.youHaventVotedYet")}
         </Typography>
       ) : !filteredData?.length ? (
         <Typography py={4} fontWeight="300">
-          No results for the search.
+          {t("govActions.noResults")}
         </Typography>
       ) : (
         <>

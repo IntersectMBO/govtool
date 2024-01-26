@@ -124,6 +124,6 @@ export const useVoteActionForm = () => {
     isDirty,
     clearErrors,
     areFormErrors,
-    isLoading,
+    isVoteLoading: isLoading,
   };
 };

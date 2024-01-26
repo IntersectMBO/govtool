@@ -92,6 +92,6 @@ export const useDelegateTodRepForm = () => {
     isDelegateButtonDisabled,
     delegate: handleSubmit(delegate),
     modal,
-    isLoading,
+    isDelegationLoading: isLoading,
   };
 };

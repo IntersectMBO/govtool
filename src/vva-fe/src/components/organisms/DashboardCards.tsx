@@ -28,13 +28,14 @@ export const DashboardCards = () => {
     useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const { screenWidth, isMobile } = useScreenDimension();
   const { openModal } = useModal();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isRetirementLoading, setIsRetirementLoading] =
+    useState<boolean>(false);
   const { votingPower, powerIsLoading } =
     useGetAdaHolderVotingPowerQuery(stakeKey);
 
   const retireAsDrep = useCallback(async () => {
     try {
-      setIsLoading(true);
+      setIsRetirementLoading(true);
       const isPendingTx = isPendingTransaction();
       if (isPendingTx) return;
       const certBuilder = await buildDRepRetirementCert();
@@ -59,7 +60,6 @@ export const DashboardCards = () => {
     } catch (error: any) {
       const errorMessage = error.info ? error.info : error;
 
-      setIsLoading(false);
       openModal({
         type: "statusModal",
         state: {
@@ -71,7 +71,7 @@ export const DashboardCards = () => {
         },
       });
     } finally {
-      setIsLoading(false);
+      setIsRetirementLoading(false);
     }
   }, [buildDRepRetirementCert, buildSignSubmitConwayCertTx]);
 
@@ -328,7 +328,6 @@ export const DashboardCards = () => {
           }
           dataTestidDrepIdBox="my-drep-id"
           firstButtonVariant={dRep?.isRegistered ? "outlined" : "contained"}
-          firstButtonDisabled={isLoading}
           secondButtonVariant={
             registerTransaction?.transactionHash
               ? "outlined"
@@ -359,6 +358,7 @@ export const DashboardCards = () => {
               ? retireAsDrep
               : () => navigateTo(PATHS.registerAsdRep)
           }
+          firstButtonIsLoading={isRetirementLoading}
           firstButtonLabel={
             registerTransaction?.transactionHash
               ? ""

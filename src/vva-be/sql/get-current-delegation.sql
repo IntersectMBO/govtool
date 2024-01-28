@@ -1,6 +1,6 @@
 select
   case
-    when drep_hash.raw = '\x00000000000000000000000000000000000000000000000000000000' then drep_hash.view
+    when drep_hash.raw is NULL then drep_hash.view
     else encode(drep_hash.raw,'hex')
   end
 from delegation_vote

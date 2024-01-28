@@ -12,6 +12,7 @@ changes.
 
 ### Fixed
 - Fixed vote calculation problems related to NoConfidence DRep [Issue 59](https://github.com/IntersectMBO/govtool/issues/59)
+- Fixed ada-holder/get-current-delegation error when delegated to NoConfidence or AlwaysAbstain dreps. [Issue 82](https://github.com/IntersectMBO/govtool/issues/82)
 
 ## [sancho-v1.0.1](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.1) 2023-12-XX
 

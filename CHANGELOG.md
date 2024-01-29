@@ -10,8 +10,17 @@ changes.
 
 ## [Unreleased]
 
+### Added
+-
+
 ### Fixed
 - Fixed vote calculation problems related to NoConfidence DRep [Issue 59](https://github.com/IntersectMBO/govtool/issues/59)
+
+### Changed
+- Changed and improved working conventions docs, PR template and codeowners file, addressing [Issue 88](https://github.com/IntersectMBO/govtool/issues/88).
+
+### Removed
+-
 
 ## [sancho-v1.0.1](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.1) 2023-12-XX
 

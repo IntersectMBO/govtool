@@ -13,12 +13,12 @@ src/vva-fe/*                                                                @Swo
 src/vva-be/*                                                                @jankun4 @kickloop
 
 # DevOps
-.github/workflows/*                                                         @adgud @placek @kickloop
-src/config/*                                                                @adgud @placek @kickloop
-src/scripts/*                                                               @adgud @placek @kickloop
-src/terraform/*                                                             @adgud @placek @kickloop
+.github/workflows/*                                                         @adgud @kickloop
+src/config/*                                                                @adgud @kickloop
+src/scripts/*                                                               @adgud @kickloop
+src/terraform/*                                                             @adgud @kickloop
 
 # Testing
-src/load-testing/*                                                          @mesudip @kickloop
-src/governance-action-loader/*                                              @mesudip @kickloop
-tests/*                                                                     @mesudip @kickloop
+src/load-testing/*                                                          @govtool-test @kickloop
+src/governance-action-loader/*                                              @govtool-test @kickloop
+tests/*                                                                     @govtool-test @kickloop

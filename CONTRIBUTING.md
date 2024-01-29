@@ -115,11 +115,21 @@ To get something merged we usually require:
 - Quality of changes is ensured - through new or updated automated tests
 - Change is related to an issue, feature (idea) or bug report - ideally discussed beforehand
 - Well-scoped - we prefer multiple PRs, rather than a big one
+- Add changes to changelog, see [Changelog](#changelog).
+
+Please reuse the branch naming for the pull request naming.
 
 ### Branch Naming
 
 - When creating your branches please create informative names.
-- using prefixes such as `feat/`, `fix/`, `chore/`, `docs/` for branch names are a good start.
+- Using prefixes such as `feat/`, `fix/`, `chore/`, `docs/` for branch names are a good start.
+- Using the related issue number after the prefix is required.
+
+Examples:
+- `feat/123-added-ability-for-dreps-to-change-drep-id`
+- `fix/312-fixed-drep-ids-being-reversed`
+- `chore/567-bumped-cardano-node-version-to-9`
+- `docs/88-tweak-contributing-pr-template-codeowners`
 
 ### Commit Messages
 

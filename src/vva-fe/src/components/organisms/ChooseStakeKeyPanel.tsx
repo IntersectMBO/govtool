@@ -7,8 +7,7 @@ import { useCardano, useSnackbar } from "@context";
 import { PATHS } from "@consts";
 import { setItemToLocalStorage, WALLET_LS_KEY } from "@utils";
 import { theme } from "@/theme";
-import { useScreenDimension } from "@hooks";
-import { usei18n } from "@translations";
+import { useScreenDimension, useTranslation } from "@hooks";
 
 export const ChooseStakeKeyPanel = () => {
   const { disconnectWallet, stakeKeys, setStakeKey } = useCardano();
@@ -16,7 +15,7 @@ export const ChooseStakeKeyPanel = () => {
   const { addSuccessAlert } = useSnackbar();
   const [chosenKey, setChosenKey] = useState<string>("");
   const { isMobile } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
   const {
     palette: { boxShadow2 },
   } = theme;

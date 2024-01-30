@@ -4,9 +4,8 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
-import { useGetDRepListQuery } from "@hooks";
+import { useGetDRepListQuery, useTranslation } from "@hooks";
 import { formHexToBech32 } from "@utils";
-import { usei18n } from "@translations";
 
 export interface DelegateTodrepFormValues {
   dRepId: string;
@@ -22,7 +21,7 @@ export const useDelegateTodRepForm = () => {
   const { openModal, closeModal, modal } = useModal();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const { control, handleSubmit } = useForm<DelegateTodrepFormValues>();
 

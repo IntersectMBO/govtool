@@ -1,12 +1,11 @@
-import { useScreenDimension } from "@hooks";
 import { Box } from "@mui/material";
 import { Button, Typography } from "../atoms";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { GovActionDetails, VoteActionForm, VotesSubmitted } from "../molecules";
 import { useModal } from "@context";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { ICONS } from "@consts";
 import { Tooltip } from "@atoms";
-import { usei18n } from "@translations";
 
 type GovernanceActionDetailsCardProps = {
   abstainVotes: number;
@@ -37,7 +36,7 @@ export const GovernanceActionDetailsCard = ({
 }: GovernanceActionDetailsCardProps) => {
   const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   return (
     <Box

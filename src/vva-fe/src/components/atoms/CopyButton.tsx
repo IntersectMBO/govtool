@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { ICONS } from "@consts";
 import { useSnackbar } from "@context";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@hooks";
 
 interface Props {
   isChecked?: boolean;

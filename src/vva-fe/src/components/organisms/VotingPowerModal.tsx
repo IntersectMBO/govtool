@@ -4,8 +4,7 @@ import { ModalContents, ModalWrapper, Typography, VotePill } from "@atoms";
 import { useModal } from "@context";
 import { correctAdaFormat } from "@utils";
 import { Vote } from "@/models";
-import { useScreenDimension } from "@/hooks";
-import { usei18n } from "@/translations";
+import { useScreenDimension, useTranslation } from "@hooks";
 
 export interface VotingPowerModalState {
   yesVotes: number;
@@ -17,7 +16,7 @@ export interface VotingPowerModalState {
 export function VotingPowerModal() {
   const { state } = useModal<VotingPowerModalState>();
   const { isMobile } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const VOTES = [
     { title: "yes", vote: state?.yesVotes },

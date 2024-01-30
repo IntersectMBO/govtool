@@ -5,9 +5,8 @@ import { Box, Link } from "@mui/material";
 import { Button, Input, LoadingButton, Radio, Typography } from "@atoms";
 import { ICONS } from "@consts";
 import { useCardano, useModal } from "@context";
-import { useScreenDimension, useVoteActionForm } from "@hooks";
+import { useScreenDimension, useVoteActionForm, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
-import { usei18n } from "@translations";
 
 export const VoteActionForm = ({
   voteFromEP,
@@ -25,7 +24,7 @@ export const VoteActionForm = ({
   const { isMobile, screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { dRep } = useCardano();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const {
     setValue,

@@ -9,10 +9,10 @@ import {
   useGetAdaHolderCurrentDelegationQuery,
   useGetAdaHolderVotingPowerQuery,
   useScreenDimension,
+  useTranslation,
 } from "@hooks";
 import { theme } from "@/theme";
 import { correctAdaFormat } from "@utils";
-import { usei18n } from "@translations";
 
 interface DelegateProps {
   setStep: (newStep: number) => void;
@@ -35,7 +35,7 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
     palette: { boxShadow2 },
   } = theme;
   const { isMobile } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const { votingPower } = useGetAdaHolderVotingPowerQuery(stakeKey);
   const correctAdaRepresentation = correctAdaFormat(votingPower);

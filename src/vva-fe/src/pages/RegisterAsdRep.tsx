@@ -13,16 +13,16 @@ import {
 import {
   useScreenDimension,
   useUrlAndHashFormController as useRegisterAsdRepFormController,
+  useTranslation,
 } from "@hooks";
 import { useNavigate } from "react-router-dom";
 import { WALLET_LS_KEY, getItemFromLocalStorage } from "@/utils/localStorage";
-import { usei18n } from "@translations";
 
 export const RegisterAsdRep = () => {
   const [step, setStep] = useState<number>(1);
   const { isMobile } = useScreenDimension();
   const navigate = useNavigate();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const registerAsdRepFormMethods = useRegisterAsdRepFormController();
 

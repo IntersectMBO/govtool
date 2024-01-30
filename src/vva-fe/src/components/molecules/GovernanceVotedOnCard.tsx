@@ -5,7 +5,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 import { Button, VotePill, Typography } from "@atoms";
 import { PATHS } from "@consts";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { VotedProposal } from "@models";
 import { theme } from "@/theme";
 import {
@@ -15,7 +15,6 @@ import {
   getShortenedGovActionId,
   openInNewTab,
 } from "@utils";
-import { usei18n } from "@translations";
 import { Tooltip } from "@atoms";
 
 interface Props {
@@ -31,7 +30,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
     palette: { lightBlue },
   } = theme;
   const { isMobile } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const proposalTypeNoEmptySpaces = getProposalTypeLabel(proposal.type).replace(
     / /g,

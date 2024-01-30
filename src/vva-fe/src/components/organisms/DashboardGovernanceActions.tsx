@@ -3,13 +3,12 @@ import { Box, Tab, Tabs, styled } from "@mui/material";
 import { useLocation } from "react-router-dom";
 
 import { useCardano } from "@context";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { DataActionsBar } from "@molecules";
 import {
   GovernanceActionsToVote,
   DashboardGovernanceActionsVotedOn,
 } from "@organisms";
-import { usei18n } from "@translations";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -68,7 +67,7 @@ export const DashboardGovernanceActions = () => {
 
   const { dRep } = useCardano();
   const { isMobile } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setContent(newValue);

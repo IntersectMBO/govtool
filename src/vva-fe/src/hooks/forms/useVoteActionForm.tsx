@@ -9,14 +9,14 @@ import { UrlAndHashFormValues } from "./useUrlAndHashFormController";
 import { PATHS } from "@consts";
 import { useCardano, useSnackbar } from "@context";
 import { HASH_REGEX, URL_REGEX } from "@utils";
-import { usei18n } from "@translations";
+import { useTranslation } from "@hooks";
 
 export interface VoteActionFormValues extends UrlAndHashFormValues {
   vote: string;
 }
 
 export const useVoteActionFormController = () => {
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const validationSchema = useMemo(
     () =>

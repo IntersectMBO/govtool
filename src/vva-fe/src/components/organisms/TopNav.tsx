@@ -8,7 +8,7 @@ import { useCardano, useModal } from "@context";
 import { useScreenDimension } from "@hooks";
 import { DrawerMobile } from "./DrawerMobile";
 import { openInNewTab } from "@utils";
-import { usei18n } from "@translations";
+import { useTranslation } from "@hooks";
 
 const POSITION_TO_BLUR = 50;
 
@@ -19,7 +19,7 @@ export const TopNav = ({ isConnectButton = true }) => {
   const { screenWidth, isMobile } = useScreenDimension();
   const { isEnabled, disconnectWallet, stakeKey } = useCardano();
   const navigate = useNavigate();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const onScroll = () => {

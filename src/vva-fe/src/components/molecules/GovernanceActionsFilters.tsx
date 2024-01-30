@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 
 import { GOVERNANCE_ACTIONS_FILTERS } from "@consts";
-import { usei18n } from "@translations";
+import { useTranslation } from "@hooks";
 
 interface Props {
   chosenFilters: string[];
@@ -33,7 +33,7 @@ export const GovernanceActionsFilters = ({
     [chosenFilters, setChosenFilters]
   );
 
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   return (
     <Box

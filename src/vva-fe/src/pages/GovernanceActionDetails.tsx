@@ -11,7 +11,11 @@ import { Box, Breadcrumbs, CircularProgress, Link } from "@mui/material";
 import { Background, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
-import { useGetProposalQuery, useScreenDimension } from "@hooks";
+import {
+  useGetProposalQuery,
+  useScreenDimension,
+  useTranslation,
+} from "@hooks";
 import { Footer, TopNav, GovernanceActionDetailsCard } from "@organisms";
 import {
   formatDisplayDate,
@@ -20,14 +24,13 @@ import {
   getItemFromLocalStorage,
   getShortenedGovActionId,
 } from "@utils";
-import { usei18n } from "@translations";
 
 export const GovernanceActionDetails = () => {
   const { state, hash } = useLocation();
   const navigate = useNavigate();
   const { pagePadding, screenWidth } = useScreenDimension();
   const { isEnabled } = useCardano();
-  const { t } = usei18n();
+  const { t } = useTranslation();
   const { proposalId } = useParams();
   const fullProposalId = proposalId + hash;
 

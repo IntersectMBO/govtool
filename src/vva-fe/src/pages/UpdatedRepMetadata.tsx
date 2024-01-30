@@ -5,11 +5,14 @@ import { useNavigate } from "react-router-dom";
 import { Background, Input, LoadingButton, Button, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
-import { useScreenDimension, useUpdatedRepMetadataForm } from "@hooks";
+import {
+  useScreenDimension,
+  useUpdatedRepMetadataForm,
+  useTranslation,
+} from "@hooks";
 import { DashboardTopNav, Footer } from "@organisms";
 import { theme } from "@/theme";
 import { WALLET_LS_KEY, getItemFromLocalStorage, openInNewTab } from "@utils";
-import { usei18n } from "@translations";
 
 export const UpdatedRepMetadata = () => {
   const navigate = useNavigate();
@@ -18,7 +21,7 @@ export const UpdatedRepMetadata = () => {
   } = theme;
   const { isMobile, pagePadding, screenWidth } = useScreenDimension();
   const { isPendingTransaction } = useCardano();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const { submitForm, control, errors, isValid, isLoading } =
     useUpdatedRepMetadataForm();

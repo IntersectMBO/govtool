@@ -3,8 +3,7 @@ import { Box, Typography } from "@mui/material";
 
 import { theme } from "@/theme";
 import { VotePill } from "@atoms";
-import { useScreenDimension } from "@hooks";
-import { usei18n } from "@translations";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { correctAdaFormat } from "@/utils/adaFormat";
 
 interface Props {
@@ -18,7 +17,7 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
     palette: { lightBlue },
   } = theme;
   const { isMobile } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   return (
     <Box

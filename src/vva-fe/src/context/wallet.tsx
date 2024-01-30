@@ -45,6 +45,7 @@ import { Buffer } from "buffer";
 import { useNavigate } from "react-router-dom";
 import { Link } from "@mui/material";
 import * as Sentry from "@sentry/react";
+import { Trans } from "react-i18next";
 
 import { useModal, useSnackbar } from ".";
 
@@ -71,7 +72,7 @@ import {
   setLimitedDelegationInterval,
   setLimitedRegistrationInterval,
 } from "./walletUtils";
-import { TypedTrans, usei18n } from "@translations";
+import { useTranslation } from "@hooks";
 
 interface Props {
   children: React.ReactNode;
@@ -204,7 +205,7 @@ function CardanoProvider(props: Props) {
   const [isDrepLoading, setIsDrepLoading] = useState<boolean>(true);
 
   const { addSuccessAlert, addWarningAlert, addErrorAlert } = useSnackbar();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const isPendingTransaction = useCallback(() => {
     if (
@@ -1176,7 +1177,7 @@ function useCardano() {
   const { openModal, closeModal } = useModal<StatusModalState>();
   const { addSuccessAlert } = useSnackbar();
   const navigate = useNavigate();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   if (context === undefined) {
     throw new Error(t("errors.useCardano"));
@@ -1212,7 +1213,7 @@ function useCardano() {
                     .
                     <br />
                     <br />
-                    <TypedTrans
+                    <Trans
                       i18nKey="system.testAdaNote"
                       components={[
                         <span style={{ fontWeight: 700 }} key="0" />,

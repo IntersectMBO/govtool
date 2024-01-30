@@ -15,21 +15,24 @@ import {
 
 import { ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
-import { useGetProposalQuery, useScreenDimension } from "@hooks";
+import {
+  useGetProposalQuery,
+  useScreenDimension,
+  useTranslation,
+} from "@hooks";
 import { GovernanceActionDetailsCard } from "@organisms";
 import {
   formatDisplayDate,
   getShortenedGovActionId,
   getProposalTypeLabel,
 } from "@utils";
-import { usei18n } from "@translations";
 
 export const DashboardGovernanceActionDetails = () => {
   const { dRep } = useCardano();
   const { state, hash } = useLocation();
   const navigate = useNavigate();
   const { isMobile, screenWidth } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
   const { proposalId } = useParams();
   const fullProposalId = proposalId + hash;
 

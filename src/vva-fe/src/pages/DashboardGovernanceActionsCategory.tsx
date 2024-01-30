@@ -23,6 +23,7 @@ import {
   useFetchNextPageDetector,
   useSaveScrollPosition,
   useScreenDimension,
+  useTranslation,
 } from "@hooks";
 import {
   getFullGovActionId,
@@ -30,7 +31,6 @@ import {
   getProposalTypeLabel,
   removeDuplicatedProposals,
 } from "@utils";
-import { usei18n } from "@translations";
 
 export const DashboardGovernanceActionsCategory = ({}) => {
   const { category } = useParams();
@@ -40,7 +40,7 @@ export const DashboardGovernanceActionsCategory = ({}) => {
   const { isMobile, screenWidth } = useScreenDimension();
   const navigate = useNavigate();
   const { dRep, voteTransaction } = useCardano();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const { data: dRepVotes } = useGetDRepVotesQuery([], "");
 

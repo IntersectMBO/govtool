@@ -3,7 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { HASH_REGEX, URL_REGEX } from "@utils";
-import { usei18n } from "@translations";
+import { useTranslation } from "@hooks";
 
 export interface UrlAndHashFormValues {
   url?: string;
@@ -11,7 +11,7 @@ export interface UrlAndHashFormValues {
 }
 
 export const useUrlAndHashFormController = () => {
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const validationSchema = useMemo(
     () =>

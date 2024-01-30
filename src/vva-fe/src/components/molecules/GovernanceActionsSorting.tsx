@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 
 import { GOVERNANCE_ACTIONS_SORTING } from "@consts";
-import { usei18n } from "@translations";
+import { useTranslation } from "@hooks";
 
 interface Props {
   chosenSorting: string;
@@ -20,7 +20,7 @@ export const GovernanceActionsSorting = ({
   chosenSorting,
   setChosenSorting,
 }: Props) => {
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   return (
     <Box

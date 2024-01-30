@@ -4,10 +4,13 @@ import { Box, Link } from "@mui/material";
 
 import { Button, Input, Typography } from "@atoms";
 import { PATHS } from "@consts";
-import { useScreenDimension, useRegisterAsdRepFormContext } from "@hooks";
+import {
+  useScreenDimension,
+  useRegisterAsdRepFormContext,
+  useTranslation,
+} from "@hooks";
 import { theme } from "@/theme";
 import { openInNewTab } from "@utils";
-import { usei18n } from "@translations";
 
 interface Props {
   setStep: Dispatch<SetStateAction<number>>;
@@ -15,7 +18,7 @@ interface Props {
 
 export const RegisterAsdRepStepOne = ({ setStep }: Props) => {
   const navigate = useNavigate();
-  const { t } = usei18n();
+  const { t } = useTranslation();
   const {
     palette: { boxShadow2 },
   } = theme;

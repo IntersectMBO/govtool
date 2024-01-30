@@ -19,6 +19,7 @@ import {
   useFetchNextPageDetector,
   useSaveScrollPosition,
   useScreenDimension,
+  useTranslation,
 } from "@hooks";
 import {
   WALLET_LS_KEY,
@@ -27,7 +28,6 @@ import {
   getProposalTypeLabel,
   removeDuplicatedProposals,
 } from "@utils";
-import { usei18n } from "@translations";
 
 export const GovernanceActionsCategory = ({}) => {
   const { category } = useParams();
@@ -38,7 +38,7 @@ export const GovernanceActionsCategory = ({}) => {
   const { isEnabled } = useCardano();
   const navigate = useNavigate();
   const { dRep } = useCardano();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const {
     data: dRepVotes,

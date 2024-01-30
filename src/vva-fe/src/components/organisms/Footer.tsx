@@ -1,13 +1,12 @@
 import { Box, Link } from "@mui/material";
 
 import { Typography } from "@atoms";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
-import { usei18n } from "@translations";
 
 export const Footer = () => {
   const { isMobile, pagePadding } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   return (
     <Box

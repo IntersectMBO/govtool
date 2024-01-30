@@ -4,15 +4,14 @@ import { useFormContext, useWatch } from "react-hook-form";
 
 import { PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
-import { UrlAndHashFormValues } from "@hooks";
-import { usei18n } from "@translations";
+import { UrlAndHashFormValues, useTranslation } from "@hooks";
 
 export const useRegisterAsdRepFormContext = () => {
   const { buildSignSubmitConwayCertTx, buildDRepRegCert } = useCardano();
   const { openModal, closeModal } = useModal();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const {
     control,

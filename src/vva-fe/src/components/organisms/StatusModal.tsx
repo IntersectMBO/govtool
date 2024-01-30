@@ -4,8 +4,7 @@ import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import { ICONS, IMAGES } from "@consts";
 import { useModal } from "@context";
 import { openInNewTab } from "@/utils";
-import { useScreenDimension } from "@/hooks";
-import { usei18n } from "@/translations";
+import { useScreenDimension, useTranslation } from "@/hooks";
 
 export interface StatusModalState {
   buttonText?: string;
@@ -21,7 +20,7 @@ export interface StatusModalState {
 export function StatusModal() {
   const { state, closeModal } = useModal<StatusModalState>();
   const { isMobile } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   return (
     <ModalWrapper dataTestId={state ? state.dataTestId : "status-modal"}>

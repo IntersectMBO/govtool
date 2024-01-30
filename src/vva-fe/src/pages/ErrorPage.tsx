@@ -4,8 +4,7 @@ import { Box } from "@mui/material";
 import { Background, Button, Typography } from "@atoms";
 import { IMAGES, PATHS } from "@consts";
 import { useCardano } from "@context";
-import { useScreenDimension } from "@hooks";
-import { usei18n } from "@translations";
+import { useScreenDimension, useTranslation } from "@hooks";
 
 const IMAGE_SIZE = 748;
 
@@ -22,7 +21,7 @@ export const ErrorPage = ({
   const { isEnabled } = useCardano();
   const { screenWidth } = useScreenDimension();
   const { state } = useLocation();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   return (
     <Background>

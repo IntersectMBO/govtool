@@ -3,8 +3,11 @@ import { Box } from "@mui/material";
 
 import { LoadingButton, Button, Typography } from "@atoms";
 import { theme } from "@/theme";
-import { useRegisterAsdRepFormContext, useScreenDimension } from "@hooks";
-import { usei18n } from "@translations";
+import {
+  useRegisterAsdRepFormContext,
+  useScreenDimension,
+  useTranslation,
+} from "@hooks";
 
 interface Props {
   setStep: Dispatch<SetStateAction<number>>;
@@ -16,7 +19,7 @@ export const RegisterAsdRepStepTwo = ({ setStep }: Props) => {
   } = theme;
   const { isLoading, submitForm } = useRegisterAsdRepFormContext();
   const { isMobile, pagePadding, screenWidth } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const renderBackButton = useMemo(() => {
     return (

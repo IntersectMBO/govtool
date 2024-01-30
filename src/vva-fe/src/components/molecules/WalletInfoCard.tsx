@@ -4,12 +4,12 @@ import { Box, Button, Typography } from "@mui/material";
 import { PATHS } from "@consts";
 import { useCardano } from "@context";
 import { theme } from "@/theme";
-import { usei18n } from "@translations";
+import { useTranslation } from "@hooks";
 
 export const WalletInfoCard = () => {
   const { address, disconnectWallet, isMainnet } = useCardano();
   const navigate = useNavigate();
-  const { t } = usei18n();
+  const { t } = useTranslation();
   const {
     palette: { lightBlue },
   } = theme;

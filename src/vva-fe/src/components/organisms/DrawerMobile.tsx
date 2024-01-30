@@ -3,10 +3,9 @@ import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 
 import { Background, Button, Link } from "../atoms";
 import { ICONS, IMAGES, NAV_ITEMS } from "@consts";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { useModal } from "@context";
 import { openInNewTab } from "@utils";
-import { usei18n } from "@translations";
 
 type DrawerMobileProps = {
   isConnectButton: boolean;
@@ -24,7 +23,7 @@ export const DrawerMobile = ({
 }: DrawerMobileProps) => {
   const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   return (
     <SwipeableDrawer

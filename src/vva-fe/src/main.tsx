@@ -14,6 +14,7 @@ import {
 import { QueryClient, QueryClientProvider } from "react-query";
 import * as Sentry from "@sentry/react";
 import TagManager from "react-gtm-module";
+import "./translations/i18n";
 
 const queryClient = new QueryClient();
 

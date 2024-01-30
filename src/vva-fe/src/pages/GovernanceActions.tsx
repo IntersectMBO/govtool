@@ -5,11 +5,10 @@ import { Box, Divider } from "@mui/material";
 import { Background, ScrollToManage, Typography } from "@atoms";
 import { PATHS } from "@consts";
 import { useCardano } from "@context";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { DataActionsBar } from "@molecules";
 import { Footer, TopNav, GovernanceActionsToVote } from "@organisms";
 import { WALLET_LS_KEY, getItemFromLocalStorage } from "@utils";
-import { usei18n } from "@translations";
 
 export const GovernanceActions = () => {
   const [searchText, setSearchText] = useState<string>("");
@@ -20,7 +19,7 @@ export const GovernanceActions = () => {
   const { isMobile, pagePadding } = useScreenDimension();
   const { isEnabled } = useCardano();
   const navigate = useNavigate();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {

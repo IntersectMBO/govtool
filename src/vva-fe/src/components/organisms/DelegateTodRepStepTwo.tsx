@@ -2,10 +2,13 @@ import { useMemo } from "react";
 import { Box, Link } from "@mui/material";
 
 import { Button, Input, Typography } from "../atoms";
-import { useScreenDimension, useDelegateTodRepForm } from "@hooks";
+import {
+  useScreenDimension,
+  useDelegateTodRepForm,
+  useTranslation,
+} from "@hooks";
 import { theme } from "@/theme";
 import { openInNewTab } from "@utils";
-import { usei18n } from "@translations";
 
 interface DelegateProps {
   setStep: (newStep: number) => void;
@@ -13,7 +16,7 @@ interface DelegateProps {
 
 export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
   const { isMobile } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const {
     palette: { boxShadow2 },

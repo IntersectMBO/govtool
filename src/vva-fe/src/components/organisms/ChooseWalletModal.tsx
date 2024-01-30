@@ -5,10 +5,10 @@ import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import type { WalletOption } from "@molecules";
 import { WalletOptionButton } from "@molecules";
 import { openInNewTab } from "@utils";
-import { usei18n } from "@translations";
+import { useTranslation } from "@hooks";
 
 export function ChooseWalletModal() {
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const walletOptions: WalletOption[] = useMemo(() => {
     if (!window.cardano) return [];

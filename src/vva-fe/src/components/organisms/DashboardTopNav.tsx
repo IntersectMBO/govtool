@@ -3,12 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 
 import { Background, Link, VotingPowerChips, Typography } from "@atoms";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { DRepInfoCard, WalletInfoCard } from "@molecules";
 import { openInNewTab } from "@utils";
-import { usei18n } from "@translations";
 
 type DashboardTopNavProps = {
   imageSRC?: string;
@@ -31,7 +30,7 @@ export const DashboardTopNav = ({
   const { dRep } = useCardano();
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   return (
     <Box

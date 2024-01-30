@@ -4,15 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { Button, Typography } from "@atoms";
 import { IMAGES, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
-import { useScreenDimension } from "@hooks";
-import { usei18n } from "@translations";
+import { useScreenDimension, useTranslation } from "@hooks";
 
 export const Hero = () => {
   const { isEnabled } = useCardano();
   const { openModal } = useModal();
   const navigate = useNavigate();
   const { isMobile, screenWidth, pagePadding } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
   const IMAGE_SIZE =
     screenWidth < 768
       ? 140

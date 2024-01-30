@@ -6,11 +6,11 @@ import { CONNECTED_NAV_ITEMS, ICONS, IMAGES, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { WalletInfoCard, DRepInfoCard } from "@molecules";
 import { openInNewTab } from "@/utils";
-import { usei18n } from "@translations";
+import { useTranslation } from "@hooks";
 
 export const Drawer = () => {
   const { dRep } = useCardano();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   return (
     <Box height="100vh" width="268px" zIndex={101}>

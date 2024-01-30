@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 import { Button, Typography, Tooltip } from "@atoms";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { theme } from "@/theme";
 import {
   formatDisplayDate,
@@ -11,7 +11,6 @@ import {
   getProposalTypeLabel,
   getShortenedGovActionId,
 } from "@utils";
-import { usei18n } from "@translations";
 
 interface ActionTypeProps
   extends Omit<
@@ -43,7 +42,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
     index,
   } = props;
   const { isMobile, screenWidth } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const {
     palette: { lightBlue },

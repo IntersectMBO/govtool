@@ -3,10 +3,9 @@ import { Box, Button, Typography } from "@mui/material";
 import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import { IMAGES } from "@consts";
 import { useModal } from "@context";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { theme } from "@/theme";
 import { openInNewTab } from "@utils";
-import { usei18n } from "@translations";
 
 export interface ExternalLinkModalState {
   externalLink: string;
@@ -15,7 +14,7 @@ export interface ExternalLinkModalState {
 export function ExternalLinkModal() {
   const { state, closeModal } = useModal<ExternalLinkModalState>();
   const { isMobile } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
   const {
     palette: { primaryBlue, fadedPurple },
   } = theme;

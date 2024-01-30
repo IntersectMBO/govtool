@@ -4,15 +4,14 @@ import { Box } from "@mui/material";
 import { IMAGES, PATHS } from "@consts";
 import { useModal } from "@context";
 import { ActionCard } from "@molecules";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
-import { usei18n } from "@/translations";
 
 export const HomeCards = () => {
   const navigate = useNavigate();
   const { openModal } = useModal();
   const { isMobile, screenWidth } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   return (
     <Box

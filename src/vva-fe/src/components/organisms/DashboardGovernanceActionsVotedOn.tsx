@@ -3,11 +3,14 @@ import { Box, Typography, CircularProgress } from "@mui/material";
 
 import { GovernanceVotedOnCard } from "@molecules";
 import { Slider } from ".";
-import { useGetDRepVotesQuery, useScreenDimension } from "@hooks";
+import {
+  useGetDRepVotesQuery,
+  useScreenDimension,
+  useTranslation,
+} from "@hooks";
 import { getProposalTypeLabel } from "@/utils/getProposalTypeLabel";
 import { getFullGovActionId } from "@/utils";
 import { useCardano } from "@/context";
-import { usei18n } from "@translations";
 
 interface DashboardGovernanceActionsVotedOnProps {
   filters: string[];
@@ -23,7 +26,7 @@ export const DashboardGovernanceActionsVotedOn = ({
   const { data, dRepVotesAreLoading } = useGetDRepVotesQuery(filters, sorting);
   const { isMobile } = useScreenDimension();
   const { voteTransaction } = useCardano();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const filteredData = useMemo(() => {
     if (data.length && searchPhrase) {

@@ -7,10 +7,10 @@ import {
   useGetAdaHolderVotingPowerQuery,
   useGetDRepVotingPowerQuery,
   useScreenDimension,
+  useTranslation,
 } from "@hooks";
 import { correctAdaFormat } from "@utils";
 import { Tooltip } from "@atoms";
-import { usei18n } from "@translations";
 
 export const VotingPowerChips = () => {
   const { dRep, stakeKey, isDrepLoading } = useCardano();
@@ -19,7 +19,7 @@ export const VotingPowerChips = () => {
   const { votingPower, powerIsLoading } =
     useGetAdaHolderVotingPowerQuery(stakeKey);
   const { isMobile, screenWidth } = useScreenDimension();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   return (
     <Box

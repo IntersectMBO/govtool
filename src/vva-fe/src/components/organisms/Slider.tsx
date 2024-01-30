@@ -7,9 +7,8 @@ import styles from "./slider.module.css";
 
 import { ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
-import { useScreenDimension, useSlider } from "@hooks";
+import { useScreenDimension, useSlider, useTranslation } from "@hooks";
 import { generatePath, useNavigate } from "react-router-dom";
-import { usei18n } from "@translations";
 
 const SLIDER_MAX_LENGTH = 1000;
 
@@ -41,7 +40,7 @@ export const Slider = ({
   const { isMobile, screenWidth, pagePadding } = useScreenDimension();
   const navigate = useNavigate();
   const { voteTransaction } = useCardano();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const DEFAULT_SLIDER_CONFIG = {
     mode: "free",

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Box, CircularProgress, Typography } from "@mui/material";
+import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
@@ -7,11 +8,11 @@ import {
   useGetAdaHolderVotingPowerQuery,
   useScreenDimension,
   useGetAdaHolderCurrentDelegationQuery,
+  useTranslation,
 } from "@hooks";
 import { DashboardActionCard } from "@molecules";
 import { useCallback, useMemo, useState } from "react";
 import { correctAdaFormat, formHexToBech32, openInNewTab } from "@utils";
-import { TypedTrans, usei18n } from "@translations";
 
 export const DashboardCards = () => {
   const {
@@ -35,7 +36,7 @@ export const DashboardCards = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { votingPower, powerIsLoading } =
     useGetAdaHolderVotingPowerQuery(stakeKey);
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   const retireAsDrep = useCallback(async () => {
     try {
@@ -83,35 +84,35 @@ export const DashboardCards = () => {
     const correctAdaRepresentation = correctAdaFormat(votingPower);
     if (currentDelegation === dRepID) {
       return (
-        <TypedTrans
+        <Trans
           i18nKey="dashboard.delegation.toYourself"
           values={{ ada: correctAdaRepresentation }}
         />
       );
     } else if (currentDelegation === "drep_always_no_confidence") {
       return (
-        <TypedTrans
+        <Trans
           i18nKey="dashboard.delegation.voteNo"
           values={{ ada: correctAdaRepresentation }}
         />
       );
     } else if (currentDelegation === "drep_always_abstain") {
       return (
-        <TypedTrans
+        <Trans
           i18nKey="dashboard.delegation.voteAbstain"
           values={{ ada: correctAdaRepresentation }}
         />
       );
     } else if (currentDelegation) {
       return (
-        <TypedTrans
+        <Trans
           i18nKey="dashboard.delegation.toDRep"
           values={{ ada: correctAdaRepresentation }}
         />
       );
     } else {
       return (
-        <TypedTrans
+        <Trans
           i18nKey="dashboard.delegation.delegateOwnPower"
           values={{ ada: correctAdaRepresentation }}
         />
@@ -137,7 +138,7 @@ export const DashboardCards = () => {
     const correctAdaRepresentation = correctAdaFormat(votingPower);
     if (delegateTo === dRepID) {
       return (
-        <TypedTrans
+        <Trans
           i18nKey="dashboard.delegation.inProgress.toYourself"
           values={{ ada: correctAdaRepresentation }}
         />
@@ -145,7 +146,7 @@ export const DashboardCards = () => {
     }
     if (delegateTo === "no confidence") {
       return (
-        <TypedTrans
+        <Trans
           i18nKey="dashboard.delegation.inProgress.voteNo"
           values={{ ada: correctAdaRepresentation }}
         />
@@ -153,7 +154,7 @@ export const DashboardCards = () => {
     }
     if (delegateTo === "abstain") {
       return (
-        <TypedTrans
+        <Trans
           i18nKey="dashboard.delegation.inProgress.voteAbstain"
           values={{ ada: correctAdaRepresentation }}
         />
@@ -161,7 +162,7 @@ export const DashboardCards = () => {
     }
     if (delegateTo) {
       return (
-        <TypedTrans
+        <Trans
           i18nKey="dashboard.delegation.inProgress.toDRep"
           values={{ ada: correctAdaRepresentation }}
         />
@@ -313,7 +314,7 @@ export const DashboardCards = () => {
             delegateTransaction?.transactionHash ? (
               t("dashboard.delegation.votingPowerDelegation")
             ) : currentDelegation ? (
-              <TypedTrans i18nKey="dashboard.delegation.yourVotingPowerIsDelegated" />
+              <Trans i18nKey="dashboard.delegation.yourVotingPowerIsDelegated" />
             ) : (
               t("dashboard.delegation.useYourVotingPower")
             )

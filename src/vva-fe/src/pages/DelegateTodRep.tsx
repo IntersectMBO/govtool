@@ -9,16 +9,15 @@ import {
   DelegateTodRepStepTwo,
   Footer,
 } from "@organisms";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { WALLET_LS_KEY, getItemFromLocalStorage } from "@/utils/localStorage";
 import { useNavigate } from "react-router-dom";
-import { usei18n } from "@translations";
 
 export const DelegateTodRep = () => {
   const [step, setStep] = useState(1);
   const { isMobile } = useScreenDimension();
   const navigate = useNavigate();
-  const { t } = usei18n();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (

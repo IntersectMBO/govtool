@@ -4,7 +4,7 @@ import { en } from "./locales/en";
 
 i18n.use(initReactI18next).init({
   resources: {
-    en: en,
+    en,
   },
   fallbackLng: "en",
   interpolation: {

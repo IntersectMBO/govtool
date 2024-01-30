@@ -207,6 +207,8 @@ services:
       - "traefik.http.routers.vva-fe.rule=Host(`${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}`)"
       - "traefik.http.routers.vva-fe.entrypoints=websecure"
       - "traefik.http.routers.vva-fe.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.vva-fe-csp.headers.contentSecurityPolicy=default-src 'self'; img-src *.usersnap.com 'self' data:; script-src *.usersnap.com 'self' 'unsafe-inline' https://www.googletagmanager.com https://browser.sentry-cdn.com; style-src *.usersnap.com *.googleapis.com 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src *.usersnap.com https://s3.eu-central-1.amazonaws.com/upload.usersnap.com 'self' https://o4506155985141760.ingest.sentry.io/api/4506156032196608/envelope/ *.google-analytics.com; font-src *.usersnap.com *.gstatic.com 'self' 'unsafe-inline' https://fonts.gstatic.com; worker-src blob:"
+      - "traefik.http.routers.vva-fe.middlewares=vva-fe-csp@docker"
       - "traefik.http.services.vva-fe.loadbalancer.server.port=80"
 
 secrets:

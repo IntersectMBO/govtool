@@ -9,30 +9,24 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
-
 - i18next library added to FE [Issue 80](https://github.com/IntersectMBO/govtool/issues/80)
 
 ### Fixed
-
 - Fixed vote calculation problems related to NoConfidence DRep [Issue 59](https://github.com/IntersectMBO/govtool/issues/59)
 
 ## [sancho-v1.0.1](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.1) 2023-12-XX
 
 ### Added
-
 -
 
 ### Fixed
-
 -
 
 ### Changed
-
 - Changed Node version from 8.7.1-pre to 8.7.2 and Db-sync version from sancho-2-3-0 to sancho-3-0-0.
 - (`docs/update-working-conventions`) Addressing [Issue 25](https://github.com/IntersectMBO/govtool/issues/25) changed working conventions documentation to improve intended flows.
 
 ### Removed
-
 -
 
 ## [sancho-v1.0.0](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.0) 2023-12-17

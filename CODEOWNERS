@@ -19,6 +19,6 @@ src/scripts/*                                                               @adg
 src/terraform/*                                                             @adgud @kickloop
 
 # Testing
-src/load-testing/*                                                          @govtool-test @kickloop
-src/governance-action-loader/*                                              @govtool-test @kickloop
-tests/*                                                                     @govtool-test @kickloop
+src/load-testing/*                                                          @IntersectMBO/govtool-test @kickloop
+src/governance-action-loader/*                                              @IntersectMBO/govtool-test @kickloop
+tests/*                                                                     @IntersectMBO/govtool-test @kickloop

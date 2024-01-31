@@ -359,11 +359,15 @@ function CardanoProvider(props: Props) {
           resetRegisterTransaction();
           if (isEnabled)
             addErrorAlert(
-              registerTransaction.type === "retirement"
-                ? t("alerts.retirement.failed")
-                : registerTransaction.type === "registration"
-                ? t("alerts.registration.failed")
-                : t("alerts.metadataUpdate.failed")
+              t(
+                `alerts.${
+                  registerTransaction.type === "retirement"
+                    ? "retirement.failed"
+                    : registerTransaction.type === "registration"
+                    ? "registration.failed"
+                    : "metadataUpdate.failed"
+                }`
+              )
             );
         }
       };
@@ -587,7 +591,7 @@ function CardanoProvider(props: Props) {
                   .to_hex();
             });
           } else {
-            console.log(t("warnings.usingUnregisteredStakeKeys"));
+            console.warn(t("warnings.usingUnregisteredStakeKeys"));
             stakeKeysList = unregisteredStakeKeysList.map((stakeKey) => {
               const stakeKeyHash = PublicKey.from_hex(stakeKey).hash();
               const stakeCredential = Credential.from_keyhash(stakeKeyHash);

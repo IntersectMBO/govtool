@@ -101,7 +101,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
       >
         <Box data-testid="governance-action-type">
           <Typography color="neutralGray" variant="caption">
-            {t("govActions.type")}
+            {t("govActions.governanceActionType")}
           </Typography>
           <Box display={"flex"}>
             <Box
@@ -122,7 +122,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
         </Box>
         <Box mt={5}>
           <Typography color="neutralGray" variant="caption">
-            {t("govActions.id")}
+            {t("govActions.governanceActionId")}
           </Typography>
           <Box display={"flex"} mt={0.25}>
             <Box
@@ -237,9 +237,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           }}
           data-testid={`govaction-${govActionId}-view-detail`}
         >
-          {inProgress
-            ? t("seeTransaction")
-            : t("govActions.viewProposalDetails")}
+          {t(inProgress ? "seeTransaction" : "govActions.viewProposalDetails")}
         </Button>
       </Box>
     </Box>

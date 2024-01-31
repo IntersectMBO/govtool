@@ -208,6 +208,42 @@ export const DashboardCards = () => {
     formHexToBech32,
   ]);
 
+  const getRegistrationCardDescription = () => {
+    if (registerTransaction.transactionHash) {
+      switch (registerTransaction.type) {
+        case "retirement":
+          return t("dashboard.registration.retirementInProgress");
+        case "registration":
+          return t("dashboard.registration.registrationInProgress");
+        default:
+          return t("dashboard.registration.metadataUpdateInProgress");
+      }
+    } else if (dRep?.isRegistered || dRep?.wasRegistered) {
+      return t("dashboard.registration.holdersCanDelegate");
+    } else {
+      return t("dashboard.registration.ifYouWant");
+    }
+  };
+
+  const getRegistrationCardTitle = () => {
+    if (registerTransaction?.transactionHash) {
+      switch (registerTransaction.type) {
+        case "retirement":
+          return t("dashboard.registration.dRepRetirement");
+        case "registration":
+          return t("dashboard.registration.dRepRegistration");
+        default:
+          return t("dashboard.registration.dRepUpdate");
+      }
+    } else if (dRep?.isRegistered) {
+      return t("dashboard.registration.youAreRegistered");
+    } else if (dRep?.wasRegistered) {
+      return t("dashboard.registration.registerAgain");
+    } else {
+      return t("dashboard.registration.registerAsDRep");
+    }
+  };
+
   const renderGovActionSection = useCallback(() => {
     return (
       <>
@@ -340,21 +376,7 @@ export const DashboardCards = () => {
               ? "change-metadata-button"
               : "register-learn-more-button"
           }
-          description={t(
-            `dashboard.registration.${
-              registerTransaction.transactionHash
-                ? registerTransaction?.type === "retirement"
-                  ? "retirementInProgress"
-                  : registerTransaction?.type === "registration"
-                  ? "registrationInProgress"
-                  : "metadataUpdateInProgress"
-                : dRep?.isRegistered
-                ? "holdersCanDelegate"
-                : dRep?.wasRegistered
-                ? "holdersCanDelegate"
-                : "ifYouWant"
-            }`
-          )}
+          description={getRegistrationCardDescription()}
           firstButtonAction={
             dRep?.isRegistered
               ? retireAsDrep
@@ -394,21 +416,7 @@ export const DashboardCards = () => {
           cardTitle={
             dRep?.isRegistered || dRep?.wasRegistered ? t("myDRepId") : ""
           }
-          title={t(
-            `dashboard.registration.${
-              registerTransaction?.transactionHash
-                ? registerTransaction?.type === "retirement"
-                  ? "dRepRetirement"
-                  : registerTransaction?.type === "registration"
-                  ? "dRepRegistration"
-                  : "dRepUpdate"
-                : dRep?.isRegistered
-                ? "youAreRegistered"
-                : dRep?.wasRegistered
-                ? "registerAgain"
-                : "registerAsDRep"
-            }`
-          )}
+          title={getRegistrationCardTitle()}
         />
       </Box>
       {!dRep?.isRegistered && renderGovActionSection()}

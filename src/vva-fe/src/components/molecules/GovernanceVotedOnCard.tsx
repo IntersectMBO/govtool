@@ -98,7 +98,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
       >
         <Box data-testid="governance-action-type">
           <Typography color={"#8E908E"} variant="caption">
-            {t("govActions.type")}
+            {t("govActions.governanceActionType")}
           </Typography>
           <Box display={"flex"}>
             <Box
@@ -119,7 +119,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         </Box>
         <Box mt={5}>
           <Typography color={"#8E908E"} variant="caption">
-            {t("govActions.id")}
+            {t("govActions.governanceActionId")}
           </Typography>
           <Box display={"flex"} mt={0.5}>
             <Box

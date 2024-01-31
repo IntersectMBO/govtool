@@ -27,15 +27,13 @@ export function ExternalLinkModal() {
         style={{ height: "84px", margin: "0 auto", width: "84px" }}
       />
       <ModalHeader sx={{ marginTop: "34px" }}>
-        {isMobile
-          ? t("modals.externalLink.safety")
-          : t("modals.externalLink.beCareful")}
+        {t(`modals.externalLink.${isMobile ? "safety" : "beCareful"}`)}
       </ModalHeader>
       <ModalContents>
         <Typography textAlign="center" sx={{ fontSize: "16px" }}>
-          {isMobile
-            ? t("modals.externalLink.thisIs")
-            : t("modals.externalLink.youAreAboutToOpen")}
+          {t(
+            `modals.externalLink.${isMobile ? "thisIs" : "youAreAboutToOpen"}`
+          )}
         </Typography>
         <Typography
           textAlign="center"
@@ -80,7 +78,7 @@ export function ExternalLinkModal() {
           }}
           variant="contained"
         >
-          {isMobile ? t("continue") : t("modals.externalLink.continueTo")}
+          {t(`${isMobile ? "continue" : "modals.externalLink.continueTo"}`)}
         </Button>
         <Button
           data-testid={"cancel-modal-button"}

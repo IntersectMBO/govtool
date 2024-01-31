@@ -96,7 +96,7 @@ export const GovernanceActionsToVote = ({
     <>
       {!mappedData.length ? (
         <Typography fontWeight={300} sx={{ py: 4 }}>
-          {t("govActions.noResults")}
+          {t("govActions.noResultsForTheSearch")}
         </Typography>
       ) : (
         <>

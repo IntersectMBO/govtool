@@ -62,7 +62,7 @@ export const DashboardGovernanceActionsVotedOn = ({
         </Typography>
       ) : !filteredData?.length ? (
         <Typography py={4} fontWeight="300">
-          {t("govActions.noResults")}
+          {t("govActions.noResultsForTheSearch")}
         </Typography>
       ) : (
         <>

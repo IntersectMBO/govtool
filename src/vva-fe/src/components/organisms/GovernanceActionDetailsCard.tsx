@@ -134,7 +134,7 @@ export const GovernanceActionDetailsCard = ({
         <Box flex={1} mt={3}>
           <Box>
             <Typography color="neutralGray" variant="caption">
-              {t("govActions.type")}
+              {t("govActions.governanceActionType")}
             </Typography>
             <Box display={"flex"}>
               <Box mt={1} px={2} py={1} bgcolor="lightBlue" borderRadius={100}>
@@ -144,7 +144,7 @@ export const GovernanceActionDetailsCard = ({
           </Box>
           <Box mt={4}>
             <Typography color="neutralGray" variant="caption">
-              {t("govActions.id")}
+              {t("govActions.governanceActionId")}
             </Typography>
             <Box display="flex">
               <Box

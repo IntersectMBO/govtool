@@ -58,7 +58,7 @@ export const VoteActionForm = ({
   const renderCancelButton = useMemo(() => {
     return (
       <Button
-        data-testid={"cancel-button"}
+        data-testid="cancel-button"
         onClick={() => setValue("vote", state.vote)}
         variant="outlined"
         size="extraLarge"
@@ -74,7 +74,7 @@ export const VoteActionForm = ({
   const renderChangeVoteButton = useMemo(() => {
     return (
       <LoadingButton
-        data-testid={"change-vote"}
+        data-testid="change-vote"
         onClick={confirmVote}
         disabled={
           (!areFormErrors && voteFromEP === vote) ||
@@ -96,7 +96,7 @@ export const VoteActionForm = ({
   }, [confirmVote, areFormErrors, vote]);
 
   return (
-    <Box flex={1} display="flex" flexDirection="column" width={"full"}>
+    <Box flex={1} display="flex" flexDirection="column" width="full">
       <Box
         flex={1}
         display="flex"
@@ -142,7 +142,7 @@ export const VoteActionForm = ({
         </Box>
         {dRep?.isRegistered && (
           <Button
-            data-testid={"show-votes-button"}
+            data-testid="show-votes-button"
             variant="text"
             size="large"
             sx={{ mt: 3 }}
@@ -198,14 +198,14 @@ export const VoteActionForm = ({
           </p>
         </Box>
         {isContext && (
-          <Box display={"flex"} flexDirection={"column"} flex={1}>
+          <Box display="flex" flexDirection="column" flex={1}>
             <Input
               control={control}
               dataTestId="url-input"
               errorMessage={errors.url?.message}
               formFieldName="url"
               placeholder={t("forms.urlWithContextPlaceholder")}
-              width={"100%"}
+              width="100%"
             />
             <Input
               control={control}
@@ -213,10 +213,10 @@ export const VoteActionForm = ({
               errorMessage={errors.hash?.message}
               formFieldName="hash"
               placeholder={t("forms.hashPlaceholder")}
-              width={"100%"}
+              width="100%"
             />
             <Link
-              data-testid={"how-to-create-link"}
+              data-testid="how-to-create-link"
               onClick={() =>
                 openInNewTab(
                   "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor"
@@ -224,7 +224,7 @@ export const VoteActionForm = ({
               }
               mb={isMobile ? 2 : 8}
               sx={{ cursor: "pointer" }}
-              textAlign={"center"}
+              textAlign="center"
               visibility={!isContext ? "hidden" : "visible"}
             >
               <Typography color="primary" fontWeight={400} variant="body2">
@@ -247,9 +247,9 @@ export const VoteActionForm = ({
       {(state?.vote && state?.vote !== vote) ||
       (voteFromEP && voteFromEP !== vote) ? (
         <Box
-          display={"flex"}
+          display="flex"
           flexDirection={isMobile ? "column" : "row"}
-          justifyContent={"space-between"}
+          justifyContent="space-between"
         >
           {isMobile ? renderChangeVoteButton : renderCancelButton}
           <Box px={1} py={isMobile ? 1.5 : 0} />
@@ -257,7 +257,7 @@ export const VoteActionForm = ({
         </Box>
       ) : (
         <Button
-          data-testid={"vote-button"}
+          data-testid="vote-button"
           variant="contained"
           disabled={
             !vote ||

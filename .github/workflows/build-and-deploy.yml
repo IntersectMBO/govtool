@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./src
+        working-directory: ./scripts/govtool
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./src
+        working-directory: ./scripts/govtool
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./src
+        working-directory: ./scripts/govtool
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -112,7 +112,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./src
+        working-directory: ./scripts/govtool
     env:
       DBSYNC_POSTGRES_DB: "cexplorer"
       DBSYNC_POSTGRES_USER: "postgres"
@@ -186,7 +186,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./src
+        working-directory: ./scripts/govtool
     env:
       DBSYNC_POSTGRES_DB: "cexplorer"
       DBSYNC_POSTGRES_USER: "postgres"

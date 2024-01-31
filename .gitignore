@@ -120,13 +120,13 @@ treefmt.toml
 local/
 
 # used by haskell
-src/vva-be/dist-newstyle/
+govtool/backend/dist-newstyle/
 
 # target environment config dir
-src/config/target
+scripts/govtool/config/target
 
 # terraform
-src/terraform/.terraform*
+infra/terraform/.terraform*
 
 # local env files
 .env

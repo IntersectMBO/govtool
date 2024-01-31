@@ -35,7 +35,7 @@ all: docker-login prepare-config upload-config build-backend push-backend build-
 check-env-defined:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	@grep -q "module \"vva-$(env)-$(cardano_network)\"" terraform/main.tf && \
+	@grep -q "module \"vva-$(env)-$(cardano_network)\"" ../../infra/terraform/main.tf && \
 	echo "Environment $(env) for network $(cardano_network) is defined in Terraform" || \
 	{ echo "Environment $(env) for network $(cardano_network) is NOT defined in Terraform, cannot deploy there"; exit 1; }
 
@@ -52,7 +52,7 @@ prepare-config:
 	export CARDANO_NETWORK=$(cardano_network); \
 	export GRAFANA_SLACK_RECIPIENT=$(grafana_slack_recipient); \
 	export GRAFANA_SLACK_OAUTH_TOKEN=$(grafana_slack_oauth_token); \
-	./scripts/prepare-config.sh
+	./prepare-config.sh
 
 .PHONY: upload-config
 upload-config: prepare-config
@@ -64,7 +64,7 @@ upload-config: prepare-config
 build-backend:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	$(docker) build --tag $(repo_url)/backend:$(tag) vva-be
+	$(docker) build --tag $(repo_url)/backend:$(tag) ../../govtool/backend
 
 .PHONY: push-backend
 push-backend:
@@ -84,7 +84,7 @@ build-frontend:
 		--build-arg VITE_GTM_ID="$(gtm_id)" \
 		--build-arg VITE_NETWORK_FLAG="$$NETWORK_FLAG" \
 		--build-arg VITE_SENTRY_DSN="$(sentry_dsn)" \
-		vva-fe
+		../../govtool/frontend
 
 .PHONY: push-frontend
 push-frontend:

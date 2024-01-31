@@ -68,7 +68,7 @@ services:
 
   status-service:
     build:
-      context: ./status-service
+      context: ../../govtool/status-service
     environment:
       - GRAFANA_USERNAME=admin
       - GRAFANA_PASSWORD=${GRAFANA_ADMIN_PASSWORD}

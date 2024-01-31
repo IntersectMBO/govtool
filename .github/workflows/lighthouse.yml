@@ -3,7 +3,7 @@ name: Lighthouse
 on:
   push:
     paths:
-      - src/vva-fe/**
+      - govtool/frontend/**
       - .github/workflows/lighthouse.yml
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
     
       - name: Install dependencies
         run: npm install
-        working-directory: ./src/vva-fe
+        working-directory: ./govtool/frontend
 
       - name: Cache npm dependencies
         id: npm-cache
@@ -27,14 +27,14 @@ jobs:
         with:
           path: |
             ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('src/vva-fe/package-lock.json', 'tests/vva-fe/package-lock.json') }}
+          key: ${{ runner.os }}-npm-${{ hashFiles('govtool/frontend/package-lock.json', 'tests/vva-fe/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
 
       - run: npm install -g @lhci/cli@0.12.x
 
       - name: Run build  and lighthouse task
-        working-directory: ./src/vva-fe
+        working-directory: ./govtool/frontend
         run: |
             npm install
             VITE_BASE_URL=https://staging.govtool.byron.network/api npm run build
@@ -47,7 +47,7 @@ jobs:
 
             
       - name: Publish reports
-        working-directory: ./src/vva-fe
+        working-directory: ./govtool/frontend
         if: github.repository_owner == 'IntersectMBO'
         run: |
             lhci assert  --preset lighthouse:recommended || echo "LightHouse Assertion error ignored ..."

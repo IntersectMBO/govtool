@@ -3,12 +3,12 @@ name: Storybook Test
 on:
   push:
     paths:
-      - src/vva-fe/**
+      - govtool/frontend/**
       - .github/workflows/test_storybook.yml
 
 defaults:
   run:
-    working-directory: ./src/vva-fe
+    working-directory: ./govtool/frontend
 
 jobs:
   storybook:

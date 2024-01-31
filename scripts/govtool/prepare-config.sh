@@ -3,7 +3,8 @@
 set -eu pipefail
 
 repo_root_dir="$(git rev-parse --show-toplevel)"
-target_config_dir="$repo_root_dir/src/config/target"
+config_dir="$repo_root_dir/scripts/govtool/config"
+target_config_dir="$repo_root_dir/scripts/govtool/config/target"
 mkdir -p "$target_config_dir"
 
 # cardano node config
@@ -25,10 +26,10 @@ echo "$DBSYNC_POSTGRES_DB" > "$dbsync_secrets_dir/postgres_db"
 # postgres schema for fake db sync
 fakedbsync_init_dir="$target_config_dir/fakedbsync_init.d"
 mkdir -p "$fakedbsync_init_dir"
-cp "$repo_root_dir/src/vva-be/misc/fakedbsync_users.sql" "$fakedbsync_init_dir/00_fakedbsync_users.sql"
+cp "$repo_root_dir/govtool/backend/misc/fakedbsync_users.sql" "$fakedbsync_init_dir/00_fakedbsync_users.sql"
 sed -i -e "s/CREATE USER.*$/CREATE USER $FAKEDBSYNC_POSTGRES_USER WITH PASSWORD '$FAKEDBSYNC_POSTGRES_PASSWORD';/g" \
     "$fakedbsync_init_dir/00_fakedbsync_users.sql"
-cp "$repo_root_dir/src/vva-be/misc/schema6.sql" "$fakedbsync_init_dir/10_schema.sql"
+cp "$repo_root_dir/govtool/backend/misc/schema6.sql" "$fakedbsync_init_dir/10_schema.sql"
 
 # backend config file
 sed -e "s/FAKEDBSYNC_POSTGRES_DB/$FAKEDBSYNC_POSTGRES_DB/" \
@@ -38,7 +39,7 @@ sed -e "s/FAKEDBSYNC_POSTGRES_DB/$FAKEDBSYNC_POSTGRES_DB/" \
     -e "s/DBSYNC_POSTGRES_USER/$DBSYNC_POSTGRES_USER/" \
     -e "s/DBSYNC_POSTGRES_PASSWORD/$DBSYNC_POSTGRES_PASSWORD/" \
     -e "s|SENTRY_DSN|$SENTRY_DSN_BACKEND|" \
-    "$repo_root_dir/src/config/secrets/vva-be-config.json.tpl" \
+    "$config_dir/secrets/vva-be-config.json.tpl" \
     > "$target_config_dir/vva-be-config.json"
 
 # prometheus config file
@@ -71,7 +72,7 @@ _EOF_
 # grafana provisioning dir
 grafana_provisioning_dir="$target_config_dir/grafana-provisioning"
 mkdir -p "$grafana_provisioning_dir"
-cp -a "$repo_root_dir/src/config/grafana-provisioning/"* "$grafana_provisioning_dir"
+cp -a "$config_dir/grafana-provisioning/"* "$grafana_provisioning_dir"
 sed -e "s/GRAFANA_SLACK_RECIPIENT/$GRAFANA_SLACK_RECIPIENT/" \
     -e "s|GRAFANA_SLACK_OAUTH_TOKEN|$GRAFANA_SLACK_OAUTH_TOKEN|" \
     -i "$grafana_provisioning_dir/alerting/alerting.yml"

@@ -103,8 +103,8 @@ deploy-stack:
 	export GRAFANA_ADMIN_PASSWORD=$(grafana_admin_password); \
 	export TAG=$(tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
-	docker compose -f docker-compose.$(cardano_network).yml -p vva-$(env)-$(cardano_network) pull; \
-	docker compose -f docker-compose.$(cardano_network).yml -p vva-$(env)-$(cardano_network) up -d
+	docker compose -f docker-compose.$(cardano_network).yml -p govtool-$(env)-$(cardano_network) pull; \
+	docker compose -f docker-compose.$(cardano_network).yml -p govtool-$(env)-$(cardano_network) up -d
 
 .PHONY: destroy-cardano-node-and-dbsync
 destroy-cardano-node-and-dbsync:
@@ -131,8 +131,8 @@ toggle-maintenance:
 	export DOCKER_HOST=ssh://$(ssh_url); \
 	export TAG=$(tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
-	if [[ "$(maintenance)" = "enable" ]]; then docker compose -f docker-compose.$(cardano_network).yml -p vva-$(env)-$(cardano_network) exec frontend touch /var/run/maintenance_enabled; \
-	else docker compose -f docker-compose.$(cardano_network).yml -p vva-$(env)-$(cardano_network) exec frontend rm /var/run/maintenance_enabled; fi
+	if [[ "$(maintenance)" = "enable" ]]; then docker compose -f docker-compose.$(cardano_network).yml -p govtool-$(env)-$(cardano_network) exec frontend touch /var/run/maintenance_enabled; \
+	else docker compose -f docker-compose.$(cardano_network).yml -p govtool-$(env)-$(cardano_network) exec frontend rm /var/run/maintenance_enabled; fi
 
 .DEFAULT_GOAL := info
 .PHONY: info

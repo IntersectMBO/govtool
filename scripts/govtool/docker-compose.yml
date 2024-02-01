@@ -96,7 +96,7 @@ services:
     image: postgres:15-alpine
     environment:
       - POSTGRES_LOGGING=true
-      - POSTGRES_DB=vva
+      - POSTGRES_DB=govtool
       - POSTGRES_PASSWORD=test
       - POSTGRES_USER=postgres
     volumes:

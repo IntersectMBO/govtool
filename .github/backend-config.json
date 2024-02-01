@@ -8,7 +8,7 @@
   },
   "fakedbsyncconfig" : {
       "host"     : "localhost",
-      "dbname"   : "vva",
+      "dbname"   : "govtool",
       "user"     : "postgres",
       "password" : "MTnk8lsuMM41RgAh1y2WTAUdObsb",
       "port"     : 5432

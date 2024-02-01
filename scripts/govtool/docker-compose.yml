@@ -116,7 +116,7 @@ services:
 
   vva-be:
     build:
-      context: vva-be
+      context: ../../govtool/backend
     command: /usr/local/bin/vva-be -c /run/secrets/vva-be-config.json start-app
     depends_on:
       # Depend on both services to be healthy before starting.
@@ -141,7 +141,7 @@ services:
 
   vva-fe:
     build:
-      context: vva-fe
+      context: ../../govtool/frontend
       args:
         - VITE_BASE_URL="https://${VA_BE_DOMAIN:-vva-be.localhost}"
     depends_on:

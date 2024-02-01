@@ -117,7 +117,7 @@ services:
   vva-be:
     build:
       context: ../../govtool/backend
-    command: /usr/local/bin/vva-be -c /run/secrets/vva-be-config.json start-app
+    command: /usr/local/bin/vva-be -c /run/secrets/backend-config.json start-app
     depends_on:
       # Depend on both services to be healthy before starting.
       cardano-node:
@@ -130,7 +130,7 @@ services:
     # ports:
     #   - ${VVA_BE_PORT:-9876}:9876
     secrets:
-      - vva-be-config.json
+      - backend-config.json
     restart: on-failure
     logging: *logging
     labels:
@@ -168,8 +168,8 @@ secrets:
     file: ./config/secrets/postgres_password
   postgres_user:
     file: ./config/secrets/postgres_user
-  vva-be-config.json:
-    file: ./config/secrets/vva-be-config.json
+  backend-config.json:
+    file: ./config/secrets/backend-config.json
 
 volumes:
   # letsencrypt:

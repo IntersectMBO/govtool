@@ -131,8 +131,8 @@ toggle-maintenance:
 	export DOCKER_HOST=ssh://$(ssh_url); \
 	export TAG=$(tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
-	if [[ "$(maintenance)" = "enable" ]]; then docker compose -f docker-compose.$(cardano_network).yml -p vva-$(env)-$(cardano_network) exec vva-fe touch /var/run/maintenance_enabled; \
-	else docker compose -f docker-compose.$(cardano_network).yml -p vva-$(env)-$(cardano_network) exec vva-fe rm /var/run/maintenance_enabled; fi
+	if [[ "$(maintenance)" = "enable" ]]; then docker compose -f docker-compose.$(cardano_network).yml -p vva-$(env)-$(cardano_network) exec frontend touch /var/run/maintenance_enabled; \
+	else docker compose -f docker-compose.$(cardano_network).yml -p vva-$(env)-$(cardano_network) exec frontend rm /var/run/maintenance_enabled; fi
 
 .DEFAULT_GOAL := info
 .PHONY: info

@@ -39,8 +39,8 @@ sed -e "s/FAKEDBSYNC_POSTGRES_DB/$FAKEDBSYNC_POSTGRES_DB/" \
     -e "s/DBSYNC_POSTGRES_USER/$DBSYNC_POSTGRES_USER/" \
     -e "s/DBSYNC_POSTGRES_PASSWORD/$DBSYNC_POSTGRES_PASSWORD/" \
     -e "s|SENTRY_DSN|$SENTRY_DSN_BACKEND|" \
-    "$config_dir/secrets/vva-be-config.json.tpl" \
-    > "$target_config_dir/vva-be-config.json"
+    "$config_dir/secrets/backend-config.json.tpl" \
+    > "$target_config_dir/backend-config.json"
 
 # prometheus config file
 cat >"$target_config_dir/prometheus.yml" <<_EOF_

@@ -135,7 +135,7 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`${VVA_BE_DOMAIN:-vva-be.localhost}`)"
+      - "traefik.http.routers.backend.rule=Host(`${GOVTOOL_BE_DOMAIN:-backend-govtool.localhost}`)"
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.services.backend.loadbalancer.server.port=9876"
 
@@ -143,7 +143,7 @@ services:
     build:
       context: ../../govtool/frontend
       args:
-        - VITE_BASE_URL="https://${VA_BE_DOMAIN:-vva-be.localhost}"
+        - VITE_BASE_URL="https://${GOVTOOL_BE_DOMAIN:-backend-govtool.localhost}"
     depends_on:
       # Depend on both services to be healthy before starting.
       cardano-node:
@@ -157,7 +157,7 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`${VVA_FE_DOMAIN:-vva-fe.localhost}`)"
+      - "traefik.http.routers.frontend.rule=Host(`${GOVTOOL_FE_DOMAIN:-frontend-govtool.localhost}`)"
       - "traefik.http.routers.frontend.entrypoints=web"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
 

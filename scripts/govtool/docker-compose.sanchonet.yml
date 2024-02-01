@@ -166,7 +166,7 @@ services:
     restart: always
     logging: *logging
 
-  vva-be:
+  backend:
     image: ${VVA_BE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/backend}:${TAG:-main-dev-sanchonet}
     command: /usr/local/bin/vva-be -c /run/secrets/backend-config.json start-app
     depends_on:
@@ -190,7 +190,7 @@ services:
       - "traefik.http.routers.vva-be.tls.certresolver=myresolver"
       - "traefik.http.services.vva-be.loadbalancer.server.port=9876"
 
-  vva-fe:
+  frontend:
     image: ${VVA_FE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/frontend}:${TAG:-main-dev-sanchonet}
     volumes:
       - /home/ubuntu/config/nginx/auth.conf:/etc/nginx/conf.d/auth.conf

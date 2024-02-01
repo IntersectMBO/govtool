@@ -114,7 +114,7 @@ services:
     command: ${POSTGRES_ARGS:--c maintenance_work_mem=1GB -c max_parallel_maintenance_workers=4}
     logging: *logging
 
-  vva-be:
+  backend:
     build:
       context: ../../govtool/backend
     command: /usr/local/bin/vva-be -c /run/secrets/backend-config.json start-app
@@ -139,7 +139,7 @@ services:
       - "traefik.http.routers.vva-be.entrypoints=web"
       - "traefik.http.services.vva-be.loadbalancer.server.port=9876"
 
-  vva-fe:
+  frontend:
     build:
       context: ../../govtool/frontend
       args:

@@ -168,14 +168,14 @@ services:
 
   vva-be:
     image: ${VVA_BE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/backend}:${TAG:-main-dev-sanchonet}
-    command: /usr/local/bin/vva-be -c /run/secrets/vva-be-config.json start-app
+    command: /usr/local/bin/vva-be -c /run/secrets/backend-config.json start-app
     depends_on:
       cardano-node:
         condition: service_healthy
       postgres:
         condition: service_healthy
     secrets:
-      - vva-be-config.json
+      - backend-config.json
     restart: always
     logging: *logging
     labels:
@@ -216,8 +216,8 @@ secrets:
     file: /home/ubuntu/config/dbsync-secrets/postgres_password
   postgres_user:
     file: /home/ubuntu/config/dbsync-secrets/postgres_user
-  vva-be-config.json:
-    file: /home/ubuntu/config/vva-be-config.json
+  backend-config.json:
+    file: /home/ubuntu/config/backend-config.json
 
 volumes:
   letsencrypt:

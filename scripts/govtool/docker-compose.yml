@@ -101,8 +101,8 @@ services:
       - POSTGRES_USER=postgres
     volumes:
       - postgres-fakedbsync:/var/lib/postgresql/data
-      - ./vva-be/misc/fakedbsync_users.sql:/docker-entrypoint-initdb.d/00_fakedbsync_users.sql
-      - ./vva-be/misc/schema6.sql:/docker-entrypoint-initdb.d/10_schema6.sql
+      - ../../govtool/backend/misc/fakedbsync_users.sql:/docker-entrypoint-initdb.d/00_fakedbsync_users.sql
+      - ../../govtool/backend/misc/schema6.sql:/docker-entrypoint-initdb.d/10_schema6.sql
     restart: on-failure
     healthcheck:
       # Use pg_isready to check postgres is running. Substitute different

@@ -35,7 +35,7 @@ export const VoteActionForm = ({
     isDirty,
     clearErrors,
     areFormErrors,
-    isLoading,
+    isVoteLoading,
   } = useVoteActionForm();
 
   useEffect(() => {
@@ -80,7 +80,7 @@ export const VoteActionForm = ({
           areFormErrors ||
           (!isContext && voteFromEP === vote)
         }
-        isLoading={isLoading}
+        isLoading={isVoteLoading}
         variant="contained"
         sx={{
           borderRadius: 50,
@@ -92,7 +92,7 @@ export const VoteActionForm = ({
         Change vote
       </LoadingButton>
     );
-  }, [confirmVote, areFormErrors, vote]);
+  }, [confirmVote, areFormErrors, vote, isVoteLoading]);
 
   return (
     <Box flex={1} display="flex" flexDirection="column" width={"full"}>
@@ -253,7 +253,7 @@ export const VoteActionForm = ({
           {isMobile ? renderCancelButton : renderChangeVoteButton}
         </Box>
       ) : (
-        <Button
+        <LoadingButton
           data-testid={"vote-button"}
           variant="contained"
           disabled={
@@ -262,14 +262,12 @@ export const VoteActionForm = ({
             (isContext && areFormErrors && isDirty) ||
             voteFromEP === vote
           }
+          isLoading={isVoteLoading}
           onClick={confirmVote}
           size="extraLarge"
-          sx={{
-            width: "100%",
-          }}
         >
           Vote
-        </Button>
+        </LoadingButton>
       )}
     </Box>
   );

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Box, Link } from "@mui/material";
 
-import { Button, Input, Typography } from "../atoms";
+import { Button, Input, LoadingButton, Typography } from "../atoms";
 import { useScreenDimension, useDelegateTodRepForm } from "@hooks";
 import { theme } from "@/theme";
 import { openInNewTab } from "@utils";
@@ -17,14 +17,15 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
     palette: { boxShadow2 },
   } = theme;
 
-  const { control, isDelegateButtonDisabled, delegate } =
+  const { control, delegate, isDelegateButtonDisabled, isDelegationLoading } =
     useDelegateTodRepForm();
 
   const renderDelegateButton = useMemo(() => {
     return (
-      <Button
+      <LoadingButton
         data-testid={"delegate-button"}
         disabled={isDelegateButtonDisabled}
+        isLoading={isDelegationLoading}
         onClick={delegate}
         size="extraLarge"
         sx={{
@@ -34,9 +35,9 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
         variant="contained"
       >
         Delegate
-      </Button>
+      </LoadingButton>
     );
-  }, [isDelegateButtonDisabled, delegate, isMobile]);
+  }, [isDelegateButtonDisabled, delegate, isMobile, isDelegationLoading]);
 
   const renderBackButton = useMemo(() => {
     return (

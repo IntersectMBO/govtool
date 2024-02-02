@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Grid } from "@mui/material";
 
-import { ActionRadio, Button, Typography } from "@atoms";
+import { ActionRadio, Button, LoadingButton, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import {
@@ -31,6 +31,8 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
   const { openModal, closeModal } = useModal();
   const [areOptions, setAreOptions] = useState<boolean>(false);
   const [chosenOption, setChosenOption] = useState<string>("");
+  const [isDelegationLoading, setIsDelegationLoading] =
+    useState<boolean>(false);
   const {
     palette: { boxShadow2 },
   } = theme;
@@ -86,6 +88,7 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
   }, [chosenOption, areOptions]);
 
   const delegate = useCallback(async () => {
+    setIsDelegationLoading(true);
     try {
       const certBuilder = await buildVoteDelegationCert(chosenOption);
       const result = await buildSignSubmitConwayCertTx({
@@ -97,16 +100,19 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
       const errorMessage = error.info ? error.info : error;
 
       openErrorDelegationModal(errorMessage);
+    } finally {
+      setIsDelegationLoading(false);
     }
   }, [chosenOption, buildSignSubmitConwayCertTx, buildVoteDelegationCert]);
 
   const renderDelegateButton = useMemo(() => {
     return (
-      <Button
+      <LoadingButton
         data-testid={
           chosenOption !== dRepID ? "next-step-button" : "delegate-button"
         }
         disabled={!chosenOption}
+        isLoading={isDelegationLoading}
         onClick={() => {
           if (chosenOption === "Delegate to DRep") {
             setStep(2);
@@ -122,9 +128,16 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
         variant="contained"
       >
         {chosenOption !== dRepID ? "Next step" : "Delegate"}
-      </Button>
+      </LoadingButton>
     );
-  }, [chosenOption, dRep?.isRegistered, isMobile, delegate, dRepID]);
+  }, [
+    chosenOption,
+    delegate,
+    dRep?.isRegistered,
+    dRepID,
+    isDelegationLoading,
+    isMobile,
+  ]);
 
   const renderCancelButton = useMemo(() => {
     return (

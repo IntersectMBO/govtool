@@ -1,54 +1,58 @@
 import { Box, ButtonProps, Skeleton } from "@mui/material";
 import { FC, ReactNode } from "react";
 
-import { Button, CopyButton, Typography } from "@atoms";
+import { CopyButton, LoadingButton, Typography } from "@atoms";
 import { useScreenDimension } from "@hooks";
 import { theme } from "@/theme";
 
 type DashboardActionCardProps = {
+  cardId?: string;
+  cardTitle?: string;
+  dataTestidDelegationStatus?: string;
+  dataTestidDrepIdBox?: string;
+  dataTestidFirstButton?: string;
+  dataTestidSecondButton?: string;
   description?: ReactNode;
   firstButtonAction?: () => void;
   firstButtonDisabled?: boolean;
+  firstButtonIsLoading?: boolean;
   firstButtonLabel?: string;
   firstButtonVariant?: ButtonProps["variant"];
   imageHeight?: number;
   imageURL?: string;
   imageWidth?: number;
+  inProgress?: boolean;
+  isLoading?: boolean;
   secondButtonAction?: () => void;
+  secondButtonIsLoading?: boolean;
   secondButtonLabel?: string;
   secondButtonVariant?: ButtonProps["variant"];
   title?: ReactNode;
-  cardTitle?: string;
-  cardId?: string;
-  inProgress?: boolean;
-  isLoading?: boolean;
-  dataTestidFirstButton?: string;
-  dataTestidSecondButton?: string;
-  dataTestidDrepIdBox?: string;
-  dataTestidDelegationStatus?: string;
 };
 
 export const DashboardActionCard: FC<DashboardActionCardProps> = ({
   ...props
 }) => {
   const {
+    cardId,
+    cardTitle,
+    dataTestidDrepIdBox,
     dataTestidFirstButton,
     dataTestidSecondButton,
-    dataTestidDrepIdBox,
     description,
     firstButtonAction,
     firstButtonDisabled = false,
+    firstButtonIsLoading = false,
     firstButtonLabel,
     firstButtonVariant = "contained",
     imageURL,
+    inProgress,
+    isLoading = false,
     secondButtonAction,
+    secondButtonIsLoading = false,
     secondButtonLabel,
     secondButtonVariant = "outlined",
     title,
-    cardId,
-    cardTitle,
-    inProgress,
-    isLoading = false,
   } = props;
 
   const {
@@ -202,12 +206,13 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
           }
         >
           {firstButtonLabel ? (
-            <Button
+            <LoadingButton
               data-testid={dataTestidFirstButton}
-              onClick={firstButtonAction}
-              variant={firstButtonVariant}
               disabled={firstButtonDisabled}
+              isLoading={firstButtonIsLoading}
+              onClick={firstButtonAction}
               size="large"
+              variant={firstButtonVariant}
               sx={{
                 mr:
                   screenWidth < 768
@@ -221,14 +226,15 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
               }}
             >
               {firstButtonLabel}
-            </Button>
+            </LoadingButton>
           ) : null}
           {secondButtonLabel ? (
-            <Button
+            <LoadingButton
               data-testid={dataTestidSecondButton}
+              isLoading={secondButtonIsLoading}
               onClick={secondButtonAction}
-              variant={secondButtonVariant}
               size="large"
+              variant={secondButtonVariant}
               sx={{
                 width: isMobile ? "100%" : "auto",
                 marginTop:
@@ -242,7 +248,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
               }}
             >
               {secondButtonLabel}
-            </Button>
+            </LoadingButton>
           ) : null}
         </Box>
       )}

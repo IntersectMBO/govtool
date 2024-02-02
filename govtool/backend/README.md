@@ -54,3 +54,5 @@ Due to problems with openapi3 package it's hard to build this project with plain
     ```sh
     cabal run vva-be -- --config <YOUR CONFIG FILE> start-app
     ```
+> [!WARNING]
+> In the context of our ongoing project enhancements, it is assumed that the executable previously known as 'vva-be' should be now officially renamed to 'govtool-backend'. This change is necessary for aligning with the updated branding and functional scope of the application and it has to be implemented in the near future as a chore and refactoring ticket. Make sure that the documentation matches the actual name of the executable.

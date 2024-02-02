@@ -3,7 +3,7 @@ name: SonarQube Static Analysis
 on:
   push:
     paths:
-      - src/vva-fe/**
+      - govtool/frontend/**
       - .github/workflows/frontend_sonar_scan.yml
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
         fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
     - uses: sonarsource/sonarqube-scan-action@master
       with:
-        projectBaseDir: src/vva-fe
+        projectBaseDir: govtool/frontend
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

@@ -4,21 +4,19 @@
 * @Ryun1 @kickloop
 
 # Frontend assets templates
-src/vva-fe/*                                                                @Sworzen1 @JanJaroszczak @kickloop
+govtool/frontend/*                                                          @Sworzen1 @JanJaroszczak @kickloop
 *.tsx                                                                       @Sworzen1 @JanJaroszczak @kickloop
 *.ts                                                                        @Sworzen1 @JanJaroszczak @kickloop
 *.css                                                                       @Sworzen1 @JanJaroszczak @kickloop
 
 # Backend
-src/vva-be/*                                                                @jankun4 @kickloop
+govtool/backend/*                                                           @jankun4 @kickloop
 
 # DevOps
-.github/workflows/*                                                         @adgud @placek @kickloop
-src/config/*                                                                @adgud @placek @kickloop
-src/scripts/*                                                               @adgud @placek @kickloop
-src/terraform/*                                                             @adgud @placek @kickloop
+.github/workflows/*                                                         @adgud @kickloop
+config/govtool/*                                                            @adgud @kickloop
+infra/terraform/*                                                           @adgud @kickloop
 
 # Testing
-src/load-testing/*                                                          @mesudip @kickloop
-src/governance-action-loader/*                                              @mesudip @kickloop
-tests/*                                                                     @mesudip @kickloop
+gov-action-loader/*                                                         @IntersectMBO/govtool-test @kickloop
+tests/*                                                                     @IntersectMBO/govtool-test @kickloop

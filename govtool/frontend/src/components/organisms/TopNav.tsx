@@ -2,18 +2,19 @@ import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { AppBar, Box, Grid, IconButton } from "@mui/material";
 
-import { Button, Link, Modal } from "@atoms";
+import { Button, Link } from "@atoms";
 import { ICONS, IMAGES, PATHS, NAV_ITEMS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { useScreenDimension } from "@hooks";
-import { DrawerMobile } from "./DrawerMobile";
 import { openInNewTab } from "@utils";
+
+import { DrawerMobile } from "./DrawerMobile";
 
 const POSITION_TO_BLUR = 50;
 
 export const TopNav = ({ isConnectButton = true }) => {
   const [windowScroll, setWindowScroll] = useState<number>(0);
-  const { openModal, closeModal, modal } = useModal();
+  const { openModal } = useModal();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const { screenWidth, isMobile } = useScreenDimension();
   const { isEnabled, disconnectWallet, stakeKey } = useCardano();
@@ -144,14 +145,6 @@ export const TopNav = ({ isConnectButton = true }) => {
           </>
         )}
       </AppBar>
-      {modal?.component && (
-        <Modal
-          open={Boolean(modal.component)}
-          handleClose={!modal.preventDismiss ? closeModal : undefined}
-        >
-          {modal.component}
-        </Modal>
-      )}
     </Box>
   );
 };

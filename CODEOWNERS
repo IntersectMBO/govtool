@@ -4,18 +4,18 @@
 * @Ryun1 @kickloop
 
 # Frontend assets templates
-govtool/frontend/*                                                          @Sworzen1 @JanJaroszczak @kickloop
-*.tsx                                                                       @Sworzen1 @JanJaroszczak @kickloop
-*.ts                                                                        @Sworzen1 @JanJaroszczak @kickloop
-*.css                                                                       @Sworzen1 @JanJaroszczak @kickloop
+govtool/frontend/*                                                          @MSzalowski @Sworzen1 @JanJaroszczak @kickloop
+*.tsx                                                                       @MSzalowski @Sworzen1 @JanJaroszczak @kickloop
+*.ts                                                                        @MSzalowski @Sworzen1 @JanJaroszczak @kickloop
+*.css                                                                       @MSzalowski @Sworzen1 @JanJaroszczak @kickloop
 
 # Backend
-govtool/backend/*                                                           @jankun4 @kickloop
+govtool/backend/*                                                           @MSzalowski @jankun4 @kickloop
 
 # DevOps
-.github/workflows/*                                                         @adgud @kickloop
-config/govtool/*                                                            @adgud @kickloop
-infra/terraform/*                                                           @adgud @kickloop
+.github/workflows/*                                                         @placek @adgud @kickloop
+config/govtool/*                                                            @placek @adgud @kickloop
+infra/terraform/*                                                           @placek @adgud @kickloop
 
 # Testing
 gov-action-loader/*                                                         @IntersectMBO/govtool-test @kickloop

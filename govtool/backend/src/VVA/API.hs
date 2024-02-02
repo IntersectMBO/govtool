@@ -46,6 +46,7 @@ type VVAApi =
                     :> QueryParam "sort" GovernanceActionSortMode
                     :> QueryParam "page" Natural
                     :> QueryParam "pageSize" Natural
+                    :> QueryParam "drepId" HexText
                     :> Get '[JSON] ListProposalsResponse
     :<|> "proposal" :> "get" :> Capture "proposalId" GovActionId :> QueryParam "drepId" HexText :> Get '[JSON] GetProposalResponse
     :<|> "epoch" :> "params" :> Get '[JSON] GetCurrentEpochParamsResponse
@@ -175,13 +176,26 @@ listProposals
   -> Maybe GovernanceActionSortMode
   -> Maybe Natural
   -> Maybe Natural
+  -> Maybe HexText
   -> m ListProposalsResponse
-listProposals selectedTypes sortMode mPage mPageSize = do
+listProposals selectedTypes sortMode mPage mPageSize mDrepRaw = do
   let page = (fromIntegral $ fromMaybe 0 mPage) :: Int
       pageSize = (fromIntegral $ fromMaybe 10 mPageSize) :: Int
 
+  -- proposals that the provided Drep has already voted on should be filtered out
+  proposalsToRemove <- case mDrepRaw of
+    Nothing -> return []
+    Just drepId ->
+      map (voteParamsProposalId . voteResponseVote)
+        <$> getVotes drepId [] Nothing
+
   CacheEnv {proposalListCache} <- asks vvaCache
   mappedAndSortedProposals <-
+    filter
+      ( \ProposalResponse {proposalResponseId} ->
+          proposalResponseId `notElem` proposalsToRemove
+      )
+      <$>
     mapSortAndFilterProposals selectedTypes sortMode
     <$> cacheRequest proposalListCache () Proposal.listProposals
 

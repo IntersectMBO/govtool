@@ -155,3 +155,10 @@ notify:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	curl -X POST -H 'Content-type: application/json' --data '{"host":"$(docker_host)","branch":"$(branch)","env":"$(env)","commit":"$(shell git rev-parse HEAD)"}' $$SLACK_WEBHOOK_URL
+
+.PHONY: ssh
+ssh:
+	@:$(call check_defined, cardano_network)
+	@:$(call check_defined, env)
+	export TERM=xterm-256color; \
+	ssh $(ssh_url)

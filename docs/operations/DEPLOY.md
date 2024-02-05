@@ -29,7 +29,7 @@ This has to be done only once per AWS account.
 1. Run `terraform plan` to view changes that would be performed to infrastructure.
 1. Take note of the outputs - they contain ECR repo URLs and app domains.
 
-Note: the Terraform code configures the EC2 instance using `infra/terraform/modules/vva-ec2/user_data.sh`. This script is only executed on instance creation.
+Note: the Terraform code configures the EC2 instance using `infra/terraform/modules/govtool-ec2/user_data.sh`. This script is only executed on instance creation.
 
 ## Application deployment
 

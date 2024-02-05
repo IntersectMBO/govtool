@@ -1,8 +1,8 @@
-const LOVELANCE = 1000000;
+const LOVELACE = 1000000;
 const DECIMALS = 6;
 
-export const correctAdaFormat = (lovelance: number | undefined) => {
-  return lovelance
-    ? Number.parseFloat((lovelance / LOVELANCE).toFixed(DECIMALS))
+export const correctAdaFormat = (lovelace: number | undefined) => {
+  return lovelace
+    ? Number.parseFloat((lovelace / LOVELACE).toFixed(DECIMALS))
     : 0;
 };

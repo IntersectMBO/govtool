@@ -66,7 +66,7 @@ import {
   VOTE_TRANSACTION_KEY,
   checkIsMaintenanceOn,
 } from "@utils";
-import { getDRepInfo, getEpochParams, getTransactionStatus } from "@services";
+import { getEpochParams, getTransactionStatus } from "@services";
 import {
   setLimitedDelegationInterval,
   setLimitedRegistrationInterval,
@@ -228,8 +228,10 @@ function CardanoProvider(props: Props) {
     }
     return false;
   }, [
-    registerTransaction?.transactionHash,
+    closeModal,
     delegateTransaction?.transactionHash,
+    openModal,
+    registerTransaction?.transactionHash,
     voteTransaction?.transactionHash,
   ]);
 

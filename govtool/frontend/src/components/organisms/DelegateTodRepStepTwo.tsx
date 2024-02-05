@@ -82,7 +82,7 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
         <Box display="flex" justifyContent="center">
           <Input
             control={control}
-            formFieldName="dRepId"
+            formFieldName="dRepID"
             placeholder="Paste DRep ID"
             dataTestId="dRep-id-input"
             width={"100%"}

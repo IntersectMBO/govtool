@@ -2,40 +2,38 @@ import { useQuery } from "react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
-import { getProposals } from "@services";
+import { getProposals, getProposalsArguments } from "@services";
 
-export const useGetProposalsQuery = (
-  filters: string[],
-  sorting: string
-): {
-  proposals: ActionType[];
-  isLoading: boolean;
-} => {
-  const { voteTransaction, isEnabled } = useCardano();
+export const useGetProposalsQuery = ({
+  filters = [],
+  sorting,
+}: getProposalsArguments) => {
+  const { dRepID, isEnabled, voteTransaction } = useCardano();
 
-  const fetchProposals = async () => {
+  const fetchProposals = async (): Promise<ActionType[]> => {
     const allProposals = await Promise.all(
-      filters.map((filter) => getProposals([filter], sorting))
+      filters.map((filter) =>
+        getProposals({ dRepID, filters: [filter], sorting })
+      )
     );
 
-    return allProposals.flatMap((proposal) => proposal.elements || []);
+    return allProposals.flatMap((proposal) => proposal.elements);
   };
 
-  const request = useQuery(
+  const { data, isLoading } = useQuery(
     [
       QUERY_KEYS.useGetProposalsKey,
       filters,
       sorting,
       voteTransaction.proposalId,
       isEnabled,
+      dRepID,
     ],
     fetchProposals
   );
 
-  const proposals = request.data as ActionType[];
-
   return {
-    proposals,
-    isLoading: request.isLoading,
+    isProposalsLoading: isLoading,
+    proposals: data,
   };
 };

@@ -11,7 +11,7 @@ export const formHexToBech32 = (dRepID?: string) => {
   return dRepIDBech32;
 };
 
-export const getPubDRepId = async (walletApi: CardanoApiWallet) => {
+export const getPubDRepID = async (walletApi: CardanoApiWallet) => {
   try {
     // From wallet get pub DRep key
     const raw = await walletApi.cip95.getPubDRepKey();

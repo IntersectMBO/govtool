@@ -8,12 +8,12 @@ import { useGetDRepListQuery } from "@hooks";
 import { formHexToBech32 } from "@utils";
 
 export interface DelegateTodrepFormValues {
-  dRepId: string;
+  dRepID: string;
 }
 
 export const useDelegateTodRepForm = () => {
   const {
-    setDelegatedDRepId,
+    setDelegatedDRepID,
     buildSignSubmitConwayCertTx,
     buildVoteDelegationCert,
   } = useCardano();
@@ -26,26 +26,26 @@ export const useDelegateTodRepForm = () => {
 
   const watch = useWatch({
     control,
-    name: "dRepId",
+    name: "dRepID",
   });
 
   const isDelegateButtonDisabled = !watch;
 
   const delegate = useCallback(
-    async ({ dRepId }: DelegateTodrepFormValues) => {
+    async ({ dRepID }: DelegateTodrepFormValues) => {
       setIsLoading(true);
       try {
-        setDelegatedDRepId(dRepId);
+        setDelegatedDRepID(dRepID);
         let isValidDrep = false;
         if (drepList?.length) {
           isValidDrep = drepList.some((i) => {
-            return i.drepId === dRepId || formHexToBech32(i.drepId) === dRepId;
+            return i.drepId === dRepID || formHexToBech32(i.drepId) === dRepID;
           });
         }
         if (!drepList?.length || !isValidDrep) {
           throw new Error("DrepId not found");
         }
-        const certBuilder = await buildVoteDelegationCert(dRepId);
+        const certBuilder = await buildVoteDelegationCert(dRepID);
         const result = await buildSignSubmitConwayCertTx({
           certBuilder,
           type: "delegation",

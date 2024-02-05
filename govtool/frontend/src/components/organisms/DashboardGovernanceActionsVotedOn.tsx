@@ -19,7 +19,7 @@ export const DashboardGovernanceActionsVotedOn = ({
   searchPhrase,
   sorting,
 }: DashboardGovernanceActionsVotedOnProps) => {
-  const { data, dRepVotesAreLoading } = useGetDRepVotesQuery(filters, sorting);
+  const { data, areDRepVotesLoading } = useGetDRepVotesQuery(filters, sorting);
   const { isMobile } = useScreenDimension();
   const { voteTransaction } = useCardano();
 
@@ -45,7 +45,7 @@ export const DashboardGovernanceActionsVotedOn = ({
     }
   }, [data, searchPhrase, voteTransaction.transactionHash]);
 
-  return dRepVotesAreLoading ? (
+  return areDRepVotesLoading ? (
     <Box py={4} display="flex" justifyContent="center">
       <CircularProgress />
     </Box>

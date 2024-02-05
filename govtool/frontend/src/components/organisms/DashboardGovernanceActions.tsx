@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Box, Tab, Tabs, styled } from "@mui/material";
+import { Box, CircularProgress, Tab, Tabs, styled } from "@mui/material";
 import { useLocation } from "react-router-dom";
 
 import { useCardano } from "@context";
@@ -65,7 +65,7 @@ export const DashboardGovernanceActions = () => {
     state && state.isVotedListOnLoad ? 1 : 0
   );
 
-  const { dRep } = useCardano();
+  const { dRep, isDrepLoading } = useCardano();
   const { isMobile } = useScreenDimension();
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -92,69 +92,83 @@ export const DashboardGovernanceActions = () => {
       display="flex"
       flexDirection="column"
     >
-      <DataActionsBar
-        chosenFilters={chosenFilters}
-        chosenFiltersLength={chosenFilters.length}
-        chosenSorting={chosenSorting}
-        closeFilters={closeFilters}
-        closeSorts={closeSorts}
-        filtersOpen={filtersOpen}
-        searchText={searchText}
-        setChosenFilters={setChosenFilters}
-        setChosenSorting={setChosenSorting}
-        setFiltersOpen={setFiltersOpen}
-        setSearchText={setSearchText}
-        setSortOpen={setSortOpen}
-        sortingActive={Boolean(chosenSorting)}
-        sortOpen={sortOpen}
-      />
-      {dRep?.isRegistered && (
-        <Tabs
-          sx={{
-            marginTop: 3,
-            display: "flex",
-            fontSize: 16,
-            fontWeight: 500,
-          }}
-          value={content}
-          indicatorColor="secondary"
-          onChange={handleChange}
-          aria-label="basic tabs example"
+      {isDrepLoading ? (
+        <Box
+          alignItems="center"
+          display="flex"
+          flex={1}
+          height="100%"
+          justifyContent="center"
         >
-          <StyledTab
-            data-testid="to-vote-tab"
-            label="To vote"
-            sx={{
-              textTransform: "none",
-              width: !isMobile ? "auto" : "50%",
-            }}
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          <DataActionsBar
+            chosenFilters={chosenFilters}
+            chosenFiltersLength={chosenFilters.length}
+            chosenSorting={chosenSorting}
+            closeFilters={closeFilters}
+            closeSorts={closeSorts}
+            filtersOpen={filtersOpen}
+            searchText={searchText}
+            setChosenFilters={setChosenFilters}
+            setChosenSorting={setChosenSorting}
+            setFiltersOpen={setFiltersOpen}
+            setSearchText={setSearchText}
+            setSortOpen={setSortOpen}
+            sortingActive={Boolean(chosenSorting)}
+            sortOpen={sortOpen}
           />
-          <StyledTab
-            data-testid="voted-tab"
-            label="Voted"
-            sx={{
-              textTransform: "none",
-              width: !isMobile ? "auto" : "50%",
-            }}
-          />
-        </Tabs>
+          {dRep?.isRegistered && (
+            <Tabs
+              sx={{
+                marginTop: 3,
+                display: "flex",
+                fontSize: 16,
+                fontWeight: 500,
+              }}
+              value={content}
+              indicatorColor="secondary"
+              onChange={handleChange}
+              aria-label="basic tabs example"
+            >
+              <StyledTab
+                data-testid="to-vote-tab"
+                label="To vote"
+                sx={{
+                  textTransform: "none",
+                  width: !isMobile ? "auto" : "50%",
+                }}
+              />
+              <StyledTab
+                data-testid="voted-tab"
+                label="Voted"
+                sx={{
+                  textTransform: "none",
+                  width: !isMobile ? "auto" : "50%",
+                }}
+              />
+            </Tabs>
+          )}
+          <Box height={isMobile ? 24 : 60} />
+          <CustomTabPanel value={content} index={0}>
+            <GovernanceActionsToVote
+              filters={chosenFilters}
+              onDashboard
+              searchPhrase={searchText}
+              sorting={chosenSorting}
+            />
+          </CustomTabPanel>
+          <CustomTabPanel value={content} index={1}>
+            <DashboardGovernanceActionsVotedOn
+              filters={chosenFilters}
+              searchPhrase={searchText}
+              sorting={chosenSorting}
+            />
+          </CustomTabPanel>
+        </>
       )}
-      <Box height={isMobile ? 24 : 60} />
-      <CustomTabPanel value={content} index={0}>
-        <GovernanceActionsToVote
-          filters={chosenFilters}
-          onDashboard
-          searchPhrase={searchText}
-          sorting={chosenSorting}
-        />
-      </CustomTabPanel>
-      <CustomTabPanel value={content} index={1}>
-        <DashboardGovernanceActionsVotedOn
-          filters={chosenFilters}
-          searchPhrase={searchText}
-          sorting={chosenSorting}
-        />
-      </CustomTabPanel>
     </Box>
   );
 };

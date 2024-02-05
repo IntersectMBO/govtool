@@ -2,17 +2,23 @@ import { useInfiniteQuery } from "react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
-import { getProposals } from "@services";
+import { getProposals, getProposalsArguments } from "@services";
 
-export const useGetProposalsInfiniteQuery = (
-  filters: string[],
-  sorting: string,
-  pageSize: number = 10
-) => {
-  const { voteTransaction, isEnabled } = useCardano();
+export const useGetProposalsInfiniteQuery = ({
+  filters = [],
+  pageSize = 10,
+  sorting = "",
+}: getProposalsArguments) => {
+  const { dRepID, isEnabled, voteTransaction } = useCardano();
 
   const fetchProposals = async ({ pageParam = 0 }) => {
-    return await getProposals(filters, sorting, pageParam, pageSize);
+    return await getProposals({
+      dRepID,
+      filters,
+      page: pageParam,
+      pageSize,
+      sorting,
+    });
   };
 
   const {
@@ -29,6 +35,7 @@ export const useGetProposalsInfiniteQuery = (
       sorting,
       voteTransaction.proposalId,
       isEnabled,
+      dRepID,
     ],
     fetchProposals,
     {
@@ -47,11 +54,11 @@ export const useGetProposalsInfiniteQuery = (
   ) as ActionType[];
 
   return {
+    proposalsfetchNextPage: fetchNextPage,
+    proposalsHaveNextPage: hasNextPage,
+    isProposalsFetching: isFetching,
+    isProposalsFetchingNextPage: isFetchingNextPage,
+    isProposalsLoading: isLoading,
     proposals,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
   };
 };

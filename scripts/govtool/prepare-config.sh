@@ -48,7 +48,7 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
   external_labels:
-    monitor: 'vva'
+    monitor: 'govtool'
 scrape_configs:
   - job_name: 'traefik'
     scrape_interval: 5s

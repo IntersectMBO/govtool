@@ -8,11 +8,11 @@ interface Props {
 
 const ContextProviders = ({ children }: Props) => {
   return (
-    <SnackbarProvider>
-      <CardanoProvider>
-        <ModalProvider>{children}</ModalProvider>
-      </CardanoProvider>
-    </SnackbarProvider>
+    <ModalProvider>
+      <SnackbarProvider>
+        <CardanoProvider>{children}</CardanoProvider>
+      </SnackbarProvider>
+    </ModalProvider>
   );
 };
 

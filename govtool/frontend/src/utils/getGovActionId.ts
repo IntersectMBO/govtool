@@ -1,4 +1,8 @@
 export const getShortenedGovActionId = (txHash: string, index: number) => {
+  if (txHash.length <= 6) {
+    return `${txHash}#${index}`;
+  }
+
   const firstPart = txHash.slice(0, 4);
   const lastPart = txHash.slice(-4);
 

@@ -1,9 +1,10 @@
-import { defineConfig } from "vite";
+import { defineConfig as defineViteConfig, mergeConfig } from "vite";
+import { defineConfig as defineVitestConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import path from "path";
 
 // https://vitejs.dev/config/
-export default defineConfig({
+const viteConfig = defineViteConfig({
   plugins: [react()],
   cacheDir: ".vite",
   resolve: {
@@ -44,3 +45,14 @@ export default defineConfig({
     ],
   },
 });
+
+const vitestConfig = defineVitestConfig({
+  test: {
+    setupFiles: "./src/setupTests.ts",
+    globals: true,
+    environment: "jsdom",
+    reporters: "verbose",
+  },
+});
+
+export default mergeConfig(viteConfig, vitestConfig);

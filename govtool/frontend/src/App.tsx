@@ -1,9 +1,9 @@
 import { useCallback, useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 
-import { ScrollToTop } from "@atoms";
+import { Modal, ScrollToTop } from "@atoms";
 import { PATHS } from "@consts";
-import { useCardano } from "@context";
+import { useCardano, useModal } from "@context";
 import {
   DashboardCards,
   DashboardGovernanceActions,
@@ -23,6 +23,7 @@ import {
   DashboardGovernanceActionsCategory,
 } from "@pages";
 import {
+  callAll,
   getItemFromLocalStorage,
   WALLET_LS_KEY,
   removeItemFromLocalStorage,
@@ -34,6 +35,7 @@ export default function App() {
   const { enable, setDRep, setIsDrepLoading } = useCardano();
   const navigate = useNavigate();
   const { data } = useGetDRepInfo();
+  const { modal, openModal, modals } = useModal();
 
   useWalletConnectionListener();
 
@@ -118,6 +120,20 @@ export default function App() {
         <Route path="*" element={<ErrorPage />} />
         <Route path={PATHS.error} element={<ErrorPage />} />
       </Routes>
+      {modals[modal.type]?.component && (
+        <Modal
+          open={Boolean(modals[modal.type].component)}
+          handleClose={
+            !modals[modal.type].preventDismiss
+              ? callAll(modals[modal.type]?.onClose, () =>
+                  openModal({ type: "none", state: null })
+                )
+              : undefined
+          }
+        >
+          {modals[modal.type]?.component ?? <></>}
+        </Modal>
+      )}
     </>
   );
 }

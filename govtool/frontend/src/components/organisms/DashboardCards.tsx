@@ -73,7 +73,12 @@ export const DashboardCards = () => {
     } finally {
       setIsRetirementLoading(false);
     }
-  }, [buildDRepRetirementCert, buildSignSubmitConwayCertTx]);
+  }, [
+    buildDRepRetirementCert,
+    buildSignSubmitConwayCertTx,
+    isPendingTransaction,
+    openModal,
+  ]);
 
   const delegationDescription = useMemo(() => {
     const correctAdaRepresentation = (

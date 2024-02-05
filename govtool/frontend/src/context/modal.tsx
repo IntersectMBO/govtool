@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useReducer } from "react";
 
-import { Modal, type MuiModalChildren } from "@atoms";
+import { type MuiModalChildren } from "@atoms";
 import {
   ChooseWalletModal,
   ExternalLinkModal,
@@ -53,7 +53,8 @@ interface ModalState<T> {
 }
 
 interface ModalContext<T> {
-  modal: ContextModal;
+  modal: ModalState<T>;
+  modals: Record<ModalType, ContextModal>;
   state: T | null;
   openModal: (modal: Optional<ModalState<T>, "state">) => void;
   closeModal: () => void;
@@ -74,7 +75,8 @@ function ModalProvider<T>(props: ProviderProps) {
 
   const value = useMemo(
     () => ({
-      modal: modals[modal.type],
+      modals,
+      modal,
       state: modal.state,
       openModal,
       closeModal: callAll(modals[modal.type]?.onClose, () =>
@@ -86,20 +88,6 @@ function ModalProvider<T>(props: ProviderProps) {
 
   return (
     <ModalContext.Provider value={value} {...props}>
-      {modals[modal.type]?.component && (
-        <Modal
-          open={Boolean(modals[modal.type].component)}
-          handleClose={
-            !modals[modal.type].preventDismiss
-              ? callAll(modals[modal.type]?.onClose, () =>
-                  openModal({ type: "none", state: null })
-                )
-              : undefined
-          }
-        >
-          {modals[modal.type]?.component ?? <></>}
-        </Modal>
-      )}
       {props.children}
     </ModalContext.Provider>
   );

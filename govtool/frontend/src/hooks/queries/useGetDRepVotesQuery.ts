@@ -6,7 +6,7 @@ import { getDRepVotes } from "@services";
 import { VotedProposal } from "@/models/api";
 
 export const useGetDRepVotesQuery = (filters: string[], sorting: string) => {
-  const { dRepID: dRepId, voteTransaction } = useCardano();
+  const { dRepID, voteTransaction } = useCardano();
 
   const { data, isLoading, refetch, isRefetching } = useQuery({
     queryKey: [
@@ -16,9 +16,9 @@ export const useGetDRepVotesQuery = (filters: string[], sorting: string) => {
       sorting,
     ],
     queryFn: async () => {
-      return await getDRepVotes({ dRepId, filters, sorting });
+      return await getDRepVotes({ dRepID, filters, sorting });
     },
-    enabled: !!dRepId,
+    enabled: !!dRepID,
   });
 
   const groupedByType = data?.reduce((groups, item) => {
@@ -41,7 +41,7 @@ export const useGetDRepVotesQuery = (filters: string[], sorting: string) => {
       title: string;
       actions: VotedProposal[];
     }[],
-    dRepVotesAreLoading: isLoading,
+    areDRepVotesLoading: isLoading,
     refetch,
     isRefetching,
   };

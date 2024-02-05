@@ -5,7 +5,7 @@ import { useCardano } from "@context";
 import { getDRepInfo } from "@services";
 
 export const useGetDRepInfo = () => {
-  const { registerTransaction, dRepID } = useCardano();
+  const { dRepID, registerTransaction } = useCardano();
 
   const { data, isLoading } = useQuery({
     queryKey: [

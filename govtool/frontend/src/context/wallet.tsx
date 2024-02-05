@@ -52,7 +52,7 @@ import { PATHS } from "@consts";
 import { CardanoApiWallet, DRepInfo, Protocol } from "@models";
 import type { StatusModalState } from "@organisms";
 import {
-  getPubDRepId,
+  getPubDRepID,
   WALLET_LS_KEY,
   DELEGATE_TRANSACTION_KEY,
   REGISTER_TRANSACTION_KEY,
@@ -107,8 +107,8 @@ interface CardanoContext {
   setStakeKey: (key: string) => void;
   stakeKeys: string[];
   walletApi?: CardanoApiWallet;
-  delegatedDRepId?: string;
-  setDelegatedDRepId: (key: string) => void;
+  delegatedDRepID?: string;
+  setDelegatedDRepID: (key: string) => void;
   buildSignSubmitConwayCertTx: ({
     certBuilder,
     votingBuilder,
@@ -178,7 +178,7 @@ function CardanoProvider(props: Props) {
   const [registeredStakeKeysListState, setRegisteredPubStakeKeysState] =
     useState<string[]>([]);
   const [error, setError] = useState<string | undefined>(undefined);
-  const [delegatedDRepId, setDelegatedDRepId] = useState<string | undefined>(
+  const [delegatedDRepID, setDelegatedDRepID] = useState<string | undefined>(
     undefined
   );
   const [delegateTo, setDelegateTo] = useState<string>("");
@@ -640,10 +640,10 @@ function CardanoProvider(props: Props) {
             );
             stakeKeySet = true;
           }
-          const dRepIds = await getPubDRepId(enabledApi);
-          setPubDRepKey(dRepIds?.dRepKey || "");
-          setDRepID(dRepIds?.dRepID || "");
-          setDRepIDBech32(dRepIds?.dRepIDBech32 || "");
+          const dRepIDs = await getPubDRepID(enabledApi);
+          setPubDRepKey(dRepIDs?.dRepKey || "");
+          setDRepID(dRepIDs?.dRepID || "");
+          setDRepIDBech32(dRepIDs?.dRepIDBech32 || "");
           setItemToLocalStorage(`${WALLET_LS_KEY}_name`, walletName);
 
           const protocol = await getEpochParams();
@@ -1139,8 +1139,8 @@ function CardanoProvider(props: Props) {
       stakeKeys,
       walletApi,
       error,
-      delegatedDRepId,
-      setDelegatedDRepId,
+      delegatedDRepID,
+      setDelegatedDRepID,
       buildSignSubmitConwayCertTx,
       buildDRepRegCert,
       buildDRepUpdateCert,
@@ -1171,8 +1171,8 @@ function CardanoProvider(props: Props) {
       stakeKeys,
       walletApi,
       error,
-      delegatedDRepId,
-      setDelegatedDRepId,
+      delegatedDRepID,
+      setDelegatedDRepID,
       buildSignSubmitConwayCertTx,
       buildDRepRegCert,
       buildDRepUpdateCert,

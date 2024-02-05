@@ -1,7 +1,7 @@
-import { useState, useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
-  NavLink,
   generatePath,
+  NavLink,
   useNavigate,
   useParams,
 } from "react-router-dom";
@@ -18,58 +18,58 @@ import { ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { DataActionsBar, GovernanceActionCard } from "@molecules";
 import {
-  useGetDRepVotesQuery,
-  useGetProposalsInfiniteQuery,
   useFetchNextPageDetector,
+  useGetProposalsInfiniteQuery,
   useSaveScrollPosition,
   useScreenDimension,
 } from "@hooks";
 import {
   getFullGovActionId,
-  openInNewTab,
   getProposalTypeLabel,
+  openInNewTab,
   removeDuplicatedProposals,
 } from "@utils";
 
-export const DashboardGovernanceActionsCategory = ({}) => {
+export const DashboardGovernanceActionsCategory = () => {
   const { category } = useParams();
   const [searchText, setSearchText] = useState<string>("");
   const [sortOpen, setSortOpen] = useState(false);
   const [chosenSorting, setChosenSorting] = useState<string>("");
   const { isMobile, screenWidth } = useScreenDimension();
   const navigate = useNavigate();
-  const { dRep, voteTransaction } = useCardano();
-
-  const { data: dRepVotes } = useGetDRepVotesQuery([], "");
+  const { dRep, isDrepLoading, voteTransaction } = useCardano();
 
   const {
+    isProposalsFetching,
+    isProposalsFetchingNextPage,
+    isProposalsLoading,
     proposals,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    isLoading,
-  } = useGetProposalsInfiniteQuery(
-    [category?.replace(/ /g, "") ?? ""],
-    chosenSorting
-  );
+    proposalsfetchNextPage,
+    proposalsHaveNextPage,
+  } = useGetProposalsInfiniteQuery({
+    filters: [category?.replace(/ /g, "") ?? ""],
+    sorting: chosenSorting,
+  });
   const loadNextPageRef = useRef(null);
 
   useFetchNextPageDetector(
-    fetchNextPage,
-    isLoading || isFetchingNextPage,
-    hasNextPage
+    proposalsfetchNextPage,
+    isProposalsLoading || isProposalsFetchingNextPage,
+    proposalsHaveNextPage
   );
 
-  const saveScrollPosition = useSaveScrollPosition(isLoading, isFetching);
+  const saveScrollPosition = useSaveScrollPosition(
+    isProposalsLoading,
+    isProposalsFetching
+  );
 
   const breadcrumbs = [
     <NavLink
       key="1"
-      to={PATHS.dashboard_governance_actions}
       style={{ textDecorationColor: "#0033AD" }}
+      to={PATHS.dashboard_governance_actions}
     >
-      <Typography color="primary" fontWeight={300} fontSize={12}>
+      <Typography color="primary" fontSize={12} fontWeight={300}>
         Governance Actions
       </Typography>
     </NavLink>,
@@ -81,33 +81,12 @@ export const DashboardGovernanceActionsCategory = ({}) => {
   const mappedData = useMemo(() => {
     const uniqueProposals = removeDuplicatedProposals(proposals);
 
-    if (dRep?.isRegistered && dRepVotes) {
-      const filteredBySearchPhrase = uniqueProposals?.filter((i) =>
-        getFullGovActionId(i.txHash, i.index)
-          .toLowerCase()
-          .includes(searchText.toLowerCase())
-      );
-
-      const filteredData = filteredBySearchPhrase?.filter((i) => {
-        return !dRepVotes
-          .flatMap((item) => item.actions.map((item) => item.proposal.id))
-          .includes(i.id);
-      });
-
-      return filteredData;
-    }
     return uniqueProposals?.filter((i) =>
       getFullGovActionId(i.txHash, i.index)
         .toLowerCase()
         .includes(searchText.toLowerCase())
     );
-  }, [
-    proposals,
-    dRep?.isRegistered,
-    dRepVotes,
-    searchText,
-    isFetchingNextPage,
-  ]);
+  }, [proposals, dRep?.isRegistered, searchText, isProposalsFetchingNextPage]);
 
   const closeSorts = useCallback(() => {
     setSortOpen(false);
@@ -116,16 +95,16 @@ export const DashboardGovernanceActionsCategory = ({}) => {
   return (
     <Background>
       <Box
-        minHeight={"100vh"}
         display="flex"
-        flexDirection={"column"}
+        flexDirection="column"
         justifyContent="flex-start"
+        minHeight="100vh"
       >
         <Box flex={1}>
           <Box px={isMobile ? 2 : 3.75} flex={1}>
             <Breadcrumbs
-              separator="|"
               aria-label="breadcrumb"
+              separator="|"
               sx={{
                 marginBottom: isMobile ? 3 : 5,
                 marginTop: isMobile ? 2.5 : 1.25,
@@ -148,99 +127,95 @@ export const DashboardGovernanceActionsCategory = ({}) => {
                 alt="arrow"
                 style={{ marginRight: "12px", transform: "rotate(180deg)" }}
               />
-              <Typography variant="body2" color="primary">
+              <Typography color="primary" variant="body2">
                 Back to the list
               </Typography>
             </Link>
             <DataActionsBar
+              chosenSorting={chosenSorting}
+              closeSorts={closeSorts}
               isFiltering={false}
               searchText={searchText}
+              setChosenSorting={setChosenSorting}
               setSearchText={setSearchText}
-              sortOpen={sortOpen}
               setSortOpen={setSortOpen}
               sortingActive={Boolean(chosenSorting)}
-              chosenSorting={chosenSorting}
-              setChosenSorting={setChosenSorting}
-              closeSorts={closeSorts}
+              sortOpen={sortOpen}
             />
             <Box height={24} />
-            {!isLoading ? (
-              !mappedData?.length ? (
-                <Typography py={4} fontWeight="300">
-                  <Box mt={4} display="flex" flexWrap="wrap">
-                    <Typography fontWeight={300}>
-                      Governnance actions with category&nbsp;
-                    </Typography>
-                    <Typography fontWeight="bold">{` ${category} `}</Typography>
-                    <Typography fontWeight={300}>&nbsp;don't exist.</Typography>
-                  </Box>
-                </Typography>
-              ) : (
-                <Box
-                  columnGap={4}
-                  display="grid"
-                  gridTemplateColumns={`repeat(auto-fit, minmax(${
-                    screenWidth < 375
-                      ? "255px"
-                      : screenWidth < 768
-                      ? "294px"
-                      : "402px"
-                  }, 1fr))`}
-                >
-                  {mappedData.map((item) => (
-                    <Box pb={4.25} key={item.txHash + item.index}>
-                      <GovernanceActionCard
-                        {...item}
-                        txHash={item.txHash}
-                        index={item.index}
-                        inProgress={
-                          voteTransaction.proposalId ===
-                          item.txHash + item.index
-                        }
-                        onClick={() => {
-                          saveScrollPosition();
-
-                          voteTransaction.proposalId ===
-                          item.txHash + item.index
-                            ? openInNewTab(
-                                "https://adanordic.com/latest_transactions"
-                              )
-                            : navigate(
-                                generatePath(
-                                  PATHS.dashboard_governance_actions_action,
-                                  {
-                                    proposalId: getFullGovActionId(
-                                      item.txHash,
-                                      item.index
-                                    ),
-                                  }
-                                ),
-                                {
-                                  state: {
-                                    ...item,
-                                    openedFromCategoryPage: true,
-                                  },
-                                }
-                              );
-                        }}
-                      />
-                    </Box>
-                  ))}
-                  {hasNextPage && isFetchingNextPage && (
-                    <Box
-                      py={4}
-                      display="flex"
-                      justifyContent="center"
-                      ref={loadNextPageRef}
-                    >
-                      <CircularProgress />
-                    </Box>
-                  )}
-                </Box>
-              )
-            ) : (
-              <Box py={4} display="flex" justifyContent="center">
+            {isProposalsLoading || isDrepLoading ? (
+              <Box display="flex" justifyContent="center" py={4}>
                 <CircularProgress />
+              </Box>
+            ) : !mappedData?.length ? (
+              <Typography fontWeight="300" py={4}>
+                <Box display="flex" flexWrap="wrap" mt={4}>
+                  <Typography fontWeight={300}>
+                    Governnance actions with category&nbsp;
+                  </Typography>
+                  <Typography fontWeight="bold">{` ${category} `}</Typography>
+                  <Typography fontWeight={300}>&nbsp;don't exist.</Typography>
+                </Box>
+              </Typography>
+            ) : (
+              <Box
+                columnGap={4}
+                display="grid"
+                gridTemplateColumns={`repeat(auto-fit, minmax(${
+                  screenWidth < 375
+                    ? "255px"
+                    : screenWidth < 768
+                    ? "294px"
+                    : "402px"
+                }, 1fr))`}
+              >
+                {mappedData.map((item) => (
+                  <Box pb={4.25} key={item.txHash + item.index}>
+                    <GovernanceActionCard
+                      {...item}
+                      index={item.index}
+                      inProgress={
+                        voteTransaction.proposalId === item.txHash + item.index
+                      }
+                      onClick={() => {
+                        saveScrollPosition();
+
+                        voteTransaction.proposalId === item.txHash + item.index
+                          ? openInNewTab(
+                              "https://adanordic.com/latest_transactions"
+                            )
+                          : navigate(
+                              generatePath(
+                                PATHS.dashboard_governance_actions_action,
+                                {
+                                  proposalId: getFullGovActionId(
+                                    item.txHash,
+                                    item.index
+                                  ),
+                                }
+                              ),
+                              {
+                                state: {
+                                  ...item,
+                                  openedFromCategoryPage: true,
+                                },
+                              }
+                            );
+                      }}
+                      txHash={item.txHash}
+                    />
+                  </Box>
+                ))}
+                {proposalsHaveNextPage && isProposalsFetchingNextPage && (
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    py={4}
+                    ref={loadNextPageRef}
+                  >
+                    <CircularProgress />
+                  </Box>
+                )}
               </Box>
             )}
           </Box>

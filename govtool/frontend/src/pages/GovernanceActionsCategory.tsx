@@ -14,7 +14,6 @@ import { useCardano } from "@context";
 import { DataActionsBar, GovernanceActionCard } from "@molecules";
 import { Footer, TopNav } from "@organisms";
 import {
-  useGetDRepVotesQuery,
   useGetProposalsInfiniteQuery,
   useFetchNextPageDetector,
   useSaveScrollPosition,
@@ -28,7 +27,7 @@ import {
   removeDuplicatedProposals,
 } from "@utils";
 
-export const GovernanceActionsCategory = ({}) => {
+export const GovernanceActionsCategory = () => {
   const { category } = useParams();
   const [searchText, setSearchText] = useState<string>("");
   const [sortOpen, setSortOpen] = useState(false);
@@ -39,31 +38,28 @@ export const GovernanceActionsCategory = ({}) => {
   const { dRep } = useCardano();
 
   const {
-    data: dRepVotes,
-    dRepVotesAreLoading,
-    isRefetching: votesRefetching,
-  } = useGetDRepVotesQuery([], "");
-
-  const {
+    isProposalsFetching,
+    isProposalsFetchingNextPage,
+    isProposalsLoading,
     proposals,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    isLoading,
-  } = useGetProposalsInfiniteQuery(
-    [category?.replace(/ /g, "") ?? ""],
-    chosenSorting
-  );
+    proposalsfetchNextPage,
+    proposalsHaveNextPage,
+  } = useGetProposalsInfiniteQuery({
+    filters: [category?.replace(/ /g, "") ?? ""],
+    sorting: chosenSorting,
+  });
   const loadNextPageRef = useRef(null);
 
   useFetchNextPageDetector(
-    fetchNextPage,
-    isLoading || isFetchingNextPage,
-    hasNextPage
+    proposalsfetchNextPage,
+    isProposalsLoading || isProposalsFetchingNextPage,
+    proposalsHaveNextPage
   );
 
-  const saveScrollPosition = useSaveScrollPosition(isLoading, isFetching);
+  const saveScrollPosition = useSaveScrollPosition(
+    isProposalsLoading,
+    isProposalsFetching
+  );
 
   const breadcrumbs = [
     <NavLink
@@ -88,13 +84,7 @@ export const GovernanceActionsCategory = ({}) => {
         .toLowerCase()
         .includes(searchText.toLowerCase())
     );
-  }, [
-    proposals,
-    dRep?.isRegistered,
-    dRepVotes,
-    searchText,
-    isFetchingNextPage,
-  ]);
+  }, [dRep?.isRegistered, isProposalsFetchingNextPage, proposals, searchText]);
 
   useEffect(() => {
     if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
@@ -174,7 +164,7 @@ export const GovernanceActionsCategory = ({}) => {
               setChosenSorting={setChosenSorting}
             />
             <Box height={isMobile ? 60 : 80} />
-            {!isLoading && !dRepVotesAreLoading && !votesRefetching ? (
+            {!isProposalsLoading ? (
               !mappedData?.length ? (
                 <Typography fontWeight={300} sx={{ py: 4 }}>
                   <Box mt={4} display="flex" flexWrap="wrap">
@@ -230,7 +220,7 @@ export const GovernanceActionsCategory = ({}) => {
                       />
                     </Box>
                   ))}
-                  {hasNextPage && isFetchingNextPage && (
+                  {proposalsHaveNextPage && isProposalsFetchingNextPage && (
                     <Box
                       py={4}
                       display="flex"

@@ -11,17 +11,17 @@ import { correctAdaFormat, formHexToBech32, openInNewTab } from "@utils";
 
 export const DashboardCards = () => {
   const {
-    dRepIDBech32: drepId,
-    dRepID,
-    dRep,
-    stakeKey,
-    buildSignSubmitConwayCertTx,
-    delegateTransaction,
     buildDRepRetirementCert,
-    registerTransaction,
+    buildSignSubmitConwayCertTx,
     delegateTo,
-    isPendingTransaction,
+    delegateTransaction,
+    dRep,
+    dRepID,
+    dRepIDBech32,
     isDrepLoading,
+    isPendingTransaction,
+    registerTransaction,
+    stakeKey,
   } = useCardano();
   const navigate = useNavigate();
   const { currentDelegation, isCurrentDelegationLoading } =
@@ -120,7 +120,7 @@ export const DashboardCards = () => {
         </>
       );
     }
-  }, [currentDelegation, drepId, votingPower]);
+  }, [currentDelegation, dRepID, votingPower]);
 
   const delegationStatusTestForId = useMemo(() => {
     if (currentDelegation === dRepID) {
@@ -134,7 +134,7 @@ export const DashboardCards = () => {
     } else {
       return "not_delegated";
     }
-  }, [currentDelegation, drepId, votingPower]);
+  }, [currentDelegation, dRepID, votingPower]);
 
   const progressDescription = useMemo(() => {
     const correctAdaRepresentation = (
@@ -174,7 +174,7 @@ export const DashboardCards = () => {
         </>
       );
     }
-  }, [delegateTo, votingPower]);
+  }, [delegateTo, dRepID, votingPower]);
 
   const navigateTo = useCallback(
     (path: string) => {
@@ -341,7 +341,7 @@ export const DashboardCards = () => {
               : "outlined"
           }
           dataTestidSecondButton={
-            dRep?.isRegistered && drepId
+            dRep?.isRegistered
               ? "change-metadata-button"
               : "register-learn-more-button"
           }
@@ -376,7 +376,7 @@ export const DashboardCards = () => {
           secondButtonAction={
             registerTransaction?.transactionHash
               ? () => openInNewTab("https://adanordic.com/latest_transactions")
-              : dRep?.isRegistered && drepId
+              : dRep?.isRegistered
               ? () => {
                   navigateTo(PATHS.updateMetadata);
                 }
@@ -392,7 +392,7 @@ export const DashboardCards = () => {
               ? "Change metadata"
               : "Learn more"
           }
-          cardId={dRep?.isRegistered || dRep?.wasRegistered ? drepId : ""}
+          cardId={dRep?.isRegistered || dRep?.wasRegistered ? dRepIDBech32 : ""}
           cardTitle={
             dRep?.isRegistered || dRep?.wasRegistered ? "My DRep ID" : ""
           }

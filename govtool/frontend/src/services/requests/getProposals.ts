@@ -1,11 +1,20 @@
 import { API } from "../API";
 
-export const getProposals = async (
-  filters: string[],
-  sorting: string,
-  page: number = 0,
-  pageSize: number = 7
-) => {
+export type getProposalsArguments = {
+  dRepID?: string;
+  filters?: string[];
+  page?: number;
+  pageSize?: number;
+  sorting?: string;
+};
+
+export const getProposals = async ({
+  dRepID = "",
+  filters = [],
+  page = 0,
+  pageSize = 7,
+  sorting = "",
+}: getProposalsArguments) => {
   let urlBase = "/proposal/list";
   let urlParameters = `?page=${page}&pageSize=${pageSize}`;
 
@@ -16,6 +25,9 @@ export const getProposals = async (
   }
   if (sorting.length) {
     urlParameters += `&sort=${sorting}`;
+  }
+  if (dRepID) {
+    urlParameters += `&drepId=${dRepID}`;
   }
 
   const response = await API.get(`${urlBase}${urlParameters}`);

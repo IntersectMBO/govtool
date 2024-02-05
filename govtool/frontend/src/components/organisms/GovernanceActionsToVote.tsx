@@ -5,11 +5,7 @@ import { Box, CircularProgress } from "@mui/material";
 import { Slider } from "./Slider";
 
 import { Typography } from "@atoms";
-import {
-  useGetDRepVotesQuery,
-  useGetProposalsQuery,
-  useScreenDimension,
-} from "@hooks";
+import { useGetProposalsQuery, useScreenDimension } from "@hooks";
 import { GovernanceActionCard } from "@molecules";
 import { GOVERNANCE_ACTIONS_FILTERS, PATHS } from "@consts";
 import { useCardano } from "@context";
@@ -32,14 +28,16 @@ export const GovernanceActionsToVote = ({
   searchPhrase = "",
   sorting,
 }: GovernanceActionsToVoteProps) => {
-  const { dRep, voteTransaction } = useCardano();
-  const { data: dRepVotes, dRepVotesAreLoading } = useGetDRepVotesQuery([], "");
+  const { voteTransaction } = useCardano();
   const navigate = useNavigate();
   const { isMobile } = useScreenDimension();
 
   const queryFilters = filters.length > 0 ? filters : defaultCategories;
 
-  const { proposals, isLoading } = useGetProposalsQuery(queryFilters, sorting);
+  const { proposals, isProposalsLoading } = useGetProposalsQuery({
+    filters: queryFilters,
+    sorting,
+  });
 
   const groupedByType = (data?: ActionType[]) => {
     return data?.reduce((groups, item) => {
@@ -59,20 +57,6 @@ export const GovernanceActionsToVote = ({
   };
 
   const mappedData = useMemo(() => {
-    if (onDashboard && dRep?.isRegistered && dRepVotes) {
-      const filteredBySearchPhrase = proposals?.filter((i) =>
-        getFullGovActionId(i.txHash, i.index)
-          .toLowerCase()
-          .includes(searchPhrase.toLowerCase())
-      );
-      const filteredData = filteredBySearchPhrase?.filter((i) => {
-        return !dRepVotes
-          .flatMap((item) => item.actions.map((item) => item.proposal.id))
-          .includes(i.id);
-      });
-      const groupedData = groupedByType(filteredData);
-      return Object.values(groupedData ?? []) as ToVoteDataType;
-    }
     const groupedData = groupedByType(
       proposals?.filter((i) =>
         getFullGovActionId(i.txHash, i.index)
@@ -81,16 +65,9 @@ export const GovernanceActionsToVote = ({
       )
     );
     return Object.values(groupedData ?? []) as ToVoteDataType;
-  }, [
-    proposals,
-    onDashboard,
-    dRep?.isRegistered,
-    dRepVotes,
-    searchPhrase,
-    voteTransaction.proposalId,
-  ]);
+  }, [proposals, searchPhrase]);
 
-  return !isLoading && !dRepVotesAreLoading ? (
+  return !isProposalsLoading ? (
     <>
       {!mappedData.length ? (
         <Typography fontWeight={300} sx={{ py: 4 }}>
@@ -156,13 +133,13 @@ export const GovernanceActionsToVote = ({
                     );
                   })}
                   dataLength={item.actions.slice(0, 6).length}
-                  notSlicedDataLength={item.actions.length}
                   filters={filters}
+                  navigateKey={item.title}
+                  notSlicedDataLength={item.actions.length}
                   onDashboard={onDashboard}
                   searchPhrase={searchPhrase}
                   sorting={sorting}
                   title={getProposalTypeLabel(item.title)}
-                  navigateKey={item.title}
                 />
                 {index < mappedData.length - 1 && (
                   <Box height={isMobile ? 40 : 52} />
@@ -180,7 +157,6 @@ export const GovernanceActionsToVote = ({
       flex={1}
       height="100%"
       justifyContent="center"
-      py={4}
     >
       <CircularProgress />
     </Box>

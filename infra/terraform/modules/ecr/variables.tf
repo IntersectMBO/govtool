@@ -1,4 +1,4 @@
 variable "app_name" {
-  default = "vva"
+  default = "govtool"
 }
 variable "repo_name" {}

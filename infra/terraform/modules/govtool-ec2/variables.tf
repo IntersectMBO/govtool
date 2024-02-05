@@ -3,7 +3,7 @@ variable "ami" {
 }
 variable "app_env" {}
 variable "app_name" {
-  default = "vva"
+  default = "govtool"
 }
 variable "cardano_network" {}
 variable "custom_subdomain" {

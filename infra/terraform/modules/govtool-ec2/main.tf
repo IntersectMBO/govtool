@@ -143,7 +143,7 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
-resource "aws_instance" "vva" {
+resource "aws_instance" "govtool" {
   ami           = var.ami
   instance_type = var.instance_type
 
@@ -174,8 +174,8 @@ resource "aws_instance" "vva" {
   }
 }
 
-resource "aws_eip" "vva" {
-  instance = aws_instance.vva.id
+resource "aws_eip" "govtool" {
+  instance = aws_instance.govtool.id
 
   tags = {
     Name            = "${var.app_name}_${var.app_env}_${var.cardano_network}"
@@ -191,5 +191,5 @@ resource "aws_route53_record" "frontend" {
   name    = "${var.custom_subdomain != "" ? "${var.custom_subdomain}" : "${var.app_env}-${var.cardano_network}"}"
   type    = "A"
   ttl     = 180
-  records = [aws_eip.vva.public_ip]
+  records = [aws_eip.govtool.public_ip]
 }

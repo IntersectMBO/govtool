@@ -11,12 +11,12 @@ resource "aws_route53_zone" "govtool" {
   name = "govtool.byron.network."
 }
 
-module "vva-ecr-be" {
+module "govtool-ecr-backend" {
   source    = "./modules/ecr"
   repo_name = "backend"
 }
 
-module "vva-ecr-fe" {
+module "govtool-ecr-frontend" {
   source    = "./modules/ecr"
   repo_name = "frontend"
 }
@@ -32,8 +32,8 @@ resource "aws_iam_policy" "cicd_ecr" {
         ]
         Effect = "Allow"
         Resource = [
-          module.vva-ecr-be.repo_arn,
-          module.vva-ecr-fe.repo_arn
+          module.govtool-ecr-backend.repo_arn,
+          module.govtool-ecr-forntend.repo_arn
         ]
       },
       {
@@ -55,24 +55,24 @@ resource "aws_iam_group_policy_attachment" "cicd" {
 # duplicate the following block in order to prepare a new environment
 # make sure that app_env/cardano_network variable pair is unique
 
-module "vva-dev-sanchonet" {
-  source          = "./modules/vva-ec2"
+module "govtool-dev-sanchonet" {
+  source          = "./modules/govtool-ec2"
   app_env         = "dev"
   cardano_network = "sanchonet"
   instance_type   = "t3.large"
   dns_zone_id     = aws_route53_zone.govtool.id
 }
 
-module "vva-test-sanchonet" {
-  source          = "./modules/vva-ec2"
+module "govtool-test-sanchonet" {
+  source          = "./modules/govtool-ec2"
   app_env         = "test"
   cardano_network = "sanchonet"
   instance_type   = "t3.large"
   dns_zone_id     = aws_route53_zone.govtool.id
 }
 
-module "vva-staging-sanchonet" {
-  source           = "./modules/vva-ec2"
+module "govtool-staging-sanchonet" {
+  source           = "./modules/govtool-ec2"
   app_env          = "staging"
   cardano_network  = "sanchonet"
   instance_type    = "t3.large"
@@ -80,33 +80,33 @@ module "vva-staging-sanchonet" {
   custom_subdomain = "staging"
 }
 
-module "vva-beta-sanchonet" {
-  source           = "./modules/vva-ec2"
+module "govtool-beta-sanchonet" {
+  source           = "./modules/govtool-ec2"
   app_env          = "beta"
   cardano_network  = "sanchonet"
   instance_type    = "t3.large"
 }
 
-output "vva-ecr-be-url" {
-  value = module.vva-ecr-be.repo_url
+output "govtool-ecr-backend-url" {
+  value = module.govtool-ecr-backend.repo_url
 }
 
-output "vva-ecr-fe-url" {
-  value = module.vva-ecr-fe.repo_url
+output "govtool-ecr-frontend-url" {
+  value = module.govtool-ecr-frontend.repo_url
 }
 
-output "vva-dev-sanchonet-frontend-domain" {
-  value = module.vva-dev-sanchonet.frontend_domain
+output "govtool-dev-sanchonet-frontend-domain" {
+  value = module.govtool-dev-sanchonet.frontend_domain
 }
 
-output "vva-test-sanchonet-frontend-domain" {
-  value = module.vva-test-sanchonet.frontend_domain
+output "govtool-test-sanchonet-frontend-domain" {
+  value = module.govtool-test-sanchonet.frontend_domain
 }
 
-output "vva-staging-sanchonet-frontend-domain" {
-  value = module.vva-staging-sanchonet.frontend_domain
+output "govtool-staging-sanchonet-frontend-domain" {
+  value = module.govtool-staging-sanchonet.frontend_domain
 }
 
-output "vva-beta-sanchonet-frontend-domain" {
-  value = module.vva-beta-sanchonet.frontend_domain
+output "govtool-beta-sanchonet-frontend-domain" {
+  value = module.govtool-beta-sanchonet.frontend_domain
 }

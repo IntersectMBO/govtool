@@ -36,6 +36,11 @@
       "@utils": ["./src/utils/index.ts"]
     }
   },
-  "include": ["src"],
+  "include": [
+    "src",
+    "vitest.config.ts",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

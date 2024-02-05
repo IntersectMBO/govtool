@@ -35,7 +35,7 @@ all: docker-login prepare-config upload-config build-backend push-backend build-
 check-env-defined:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	@grep -q "module \"vva-$(env)-$(cardano_network)\"" ../../infra/terraform/main.tf && \
+	@grep -q "module \"govtool-$(env)-$(cardano_network)\"" ../../infra/terraform/main.tf && \
 	echo "Environment $(env) for network $(cardano_network) is defined in Terraform" || \
 	{ echo "Environment $(env) for network $(cardano_network) is NOT defined in Terraform, cannot deploy there"; exit 1; }
 

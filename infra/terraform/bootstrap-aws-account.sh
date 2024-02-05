@@ -1,6 +1,6 @@
 #!/bin/bash
 
-state_bucket="vva-terraform-state"
+state_bucket="govtool-terraform-state"
 lock_table="vva-terraform-locks"
 region="eu-west-1"
 

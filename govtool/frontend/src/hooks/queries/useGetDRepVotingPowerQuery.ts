@@ -5,15 +5,15 @@ import { useCardano } from "@context";
 import { getDRepVotingPower } from "@services";
 
 export const useGetDRepVotingPowerQuery = () => {
-  const { dRepID: dRepId } = useCardano();
+  const { dRepID } = useCardano();
 
   const { data, isLoading } = useQuery({
     queryKey: QUERY_KEYS.useGetDRepVotingPowerKey,
     queryFn: async () => {
-      return await getDRepVotingPower({ dRepId });
+      return await getDRepVotingPower({ dRepID });
     },
-    enabled: !!dRepId,
+    enabled: !!dRepID,
   });
 
-  return { data, isLoading };
+  return { dRepVotingPower: data, isDRepVotingPowerLoading: isLoading };
 };

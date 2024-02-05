@@ -14,7 +14,7 @@ import { tooltips } from "@/consts/texts";
 
 export const VotingPowerChips = () => {
   const { dRep, stakeKey, isDrepLoading } = useCardano();
-  const { data: drepVotingPower, isLoading: drepPowerIsLoading } =
+  const { dRepVotingPower, isDRepVotingPowerLoading } =
     useGetDRepVotingPowerQuery();
   const { votingPower, powerIsLoading } =
     useGetAdaHolderVotingPowerQuery(stakeKey);
@@ -54,7 +54,7 @@ export const VotingPowerChips = () => {
           Voting power:
         </Typography>
       )}
-      {(dRep?.isRegistered && drepPowerIsLoading) ||
+      {(dRep?.isRegistered && isDRepVotingPowerLoading) ||
       (!dRep?.isRegistered && powerIsLoading) ||
       isDrepLoading ? (
         <CircularProgress size={20} color="primary" />
@@ -67,7 +67,7 @@ export const VotingPowerChips = () => {
         >
           ₳{" "}
           {dRep?.isRegistered
-            ? correctAdaFormat(drepVotingPower) ?? 0
+            ? correctAdaFormat(dRepVotingPower) ?? 0
             : correctAdaFormat(votingPower) ?? 0}
         </Typography>
       )}

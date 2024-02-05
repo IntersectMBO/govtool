@@ -125,7 +125,7 @@ jobs:
       GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
       NGINX_BASIC_AUTH: ${{ secrets.NGINX_BASIC_AUTH }}
       SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
-      TRAEFIK_LE_EMAIL: "admin+vva@binarapps.com"
+      TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -199,7 +199,7 @@ jobs:
       GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
       NGINX_BASIC_AUTH: ${{ secrets.NGINX_BASIC_AUTH }}
       SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
-      TRAEFIK_LE_EMAIL: "admin+vva@binarapps.com"
+      TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

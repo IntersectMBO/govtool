@@ -13,7 +13,7 @@ def validate_proposal_list(proposal_list: [Proposal]) -> bool:
     return True
 
 
-def test_list_proposal(vva_api):
-    response = vva_api.proposal_list()
+def test_list_proposal(govtool_api):
+    response = govtool_api.proposal_list()
     proposal_list = response.json()
     assert validate_proposal_list(proposal_list)

@@ -1,6 +1,6 @@
-package org.cardano.vva.simulations;
+package org.cardano.govtool.simulations;
 
-import org.cardano.vva.Scenario;
+import org.cardano.govtool.Scenario;
 import io.gatling.javaapi.core.Simulation;
 import io.gatling.javaapi.http.HttpProtocolBuilder;
 

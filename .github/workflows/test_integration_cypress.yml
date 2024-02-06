@@ -22,13 +22,13 @@ on:
         options:
           - "sanchogov.tools"
           - "staging.govtool.byron.network"
-          - "vva-sanchonet.cardanoapi.io"
+          - "govtool-sanchonet.cardanoapi.io"
 
 jobs:
   cypress-tests:
     defaults:
       run:
-        working-directory: ./tests/vva-fe
+        working-directory: ./tests/govtool-frontend
     runs-on: ubuntu-latest
     env: 
       NODE_OPTIONS: --max_old_space_size=4096
@@ -50,7 +50,7 @@ jobs:
           path: |
             ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key:
-            ${{ runner.os }}-yarn-${{hashFiles('tests/vva-fe/yarn.lock') }}
+            ${{ runner.os }}-yarn-${{hashFiles('tests/govtool-frontend/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
 
@@ -58,7 +58,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           record: true
-          working-directory: ./tests/vva-fe
+          working-directory: ./tests/govtool-frontend
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           # pass GitHub token to allow accurately detecting a build vs a re-run build
@@ -69,4 +69,3 @@ jobs:
           CYPRESS_kuberApiKey: ${{secrets.KUBER_API_KEY}}
           CYPRESS_faucetApiUrl: https://faucet.${{inputs.network || 'sanchonet'}}.world.dev.cardano.org
           CYPRESS_faucetApiKey: ${{ secrets.FAUCET_API_KEY }}
-        

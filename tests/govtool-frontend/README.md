@@ -1,4 +1,4 @@
-VVA Frontend Integration Test
+GovTool frontend Integration Test
 =============================
 
 ## Run tests
@@ -14,5 +14,5 @@ yarn cypress run
 ## Run tests in dev environment
 
 ```
-yarn cypress run --env baseUrl=http://localhost:5173,apiUrl=https://vva.dev.byron.network
+yarn cypress run --env baseUrl=http://localhost:5173,apiUrl=https://govtool.dev.byron.network
 ```

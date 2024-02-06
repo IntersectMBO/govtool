@@ -5,8 +5,8 @@ module.exports = {
   chromeWebSecurity: false,
   // experimentalModifyObstructiveThirdPartyCode: true,
   env: {
-    baseUrl: "https://vva-sanchonet.cardanoapi.io",
-    apiUrl: "http://vva-sanchonet.cardanoapi.io/api",
+    baseUrl: "https://govtool-sanchonet.cardanoapi.io",
+    apiUrl: "http://govtool-sanchonet.cardanoapi.io/api",
     disableSecurityTest: false, // set to true for github-ci
     networkId: "testnet",
     mobileViewportWidthBreakpoint: 414,

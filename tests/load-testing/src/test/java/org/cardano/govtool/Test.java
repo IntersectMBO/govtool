@@ -1,4 +1,4 @@
-package org.cardano.vva;
+package org.cardano.govtool;
 
 public class Test {
     public static void main(String[] args) {

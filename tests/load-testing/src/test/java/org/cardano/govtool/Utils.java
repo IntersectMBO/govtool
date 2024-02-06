@@ -1,4 +1,4 @@
-package org.cardano.vva;
+package org.cardano.govtool;
 
 import org.bouncycastle.crypto.digests.Blake2bDigest;
 import org.bouncycastle.util.encoders.Hex;

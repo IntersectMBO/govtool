@@ -2,8 +2,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.gatling.vva</groupId>
-    <artifactId>vva-be</artifactId>
+    <groupId>io.gatling.govtool</groupId>
+    <artifactId>govtool-backend</artifactId>
     <version>0.0.1</version>
     <properties>
         <!-- use the following if you're compiling with JDK 8-->
@@ -86,7 +86,7 @@
 <!--                <configuration>-->
 <!--                <archive>-->
 <!--                    <manifest>-->
-<!--                        <mainClass>org.cardano.vva.Engine</mainClass>-->
+<!--                        <mainClass>org.cardano.govtool.Engine</mainClass>-->
 <!--                    </manifest>-->
 <!--                </archive>-->
 <!--                </configuration>-->

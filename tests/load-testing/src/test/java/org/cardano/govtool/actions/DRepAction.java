@@ -1,7 +1,7 @@
-package org.cardano.vva.actions;
+package org.cardano.govtool.actions;
 
-import org.cardano.vva.ApiService;
-import org.cardano.vva.feeders.RandomDataFeeder;
+import org.cardano.govtool.ApiService;
+import org.cardano.govtool.feeders.RandomDataFeeder;
 import io.gatling.javaapi.core.ChainBuilder;
 
 import static io.gatling.javaapi.core.CoreDsl.*;

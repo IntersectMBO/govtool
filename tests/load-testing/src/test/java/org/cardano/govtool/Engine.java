@@ -1,4 +1,4 @@
-package org.cardano.vva;
+package org.cardano.govtool;
 
 import io.gatling.app.Gatling;
 import io.gatling.core.config.GatlingPropertiesBuilder;

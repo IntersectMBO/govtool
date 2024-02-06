@@ -1,4 +1,4 @@
-package org.cardano.vva;
+package org.cardano.govtool;
 
 import io.gatling.recorder.GatlingRecorder;
 import io.gatling.recorder.config.RecorderPropertiesBuilder;

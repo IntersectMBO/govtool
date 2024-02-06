@@ -1,10 +1,10 @@
-package org.cardano.vva;
+package org.cardano.govtool;
 
 import io.gatling.javaapi.core.ScenarioBuilder;
-import org.cardano.vva.actions.Action;
-import org.cardano.vva.actions.AdaHolderAction;
-import org.cardano.vva.actions.AuthenticationAction;
-import org.cardano.vva.actions.DRepAction;
+import org.cardano.govtool.actions.Action;
+import org.cardano.govtool.actions.AdaHolderAction;
+import org.cardano.govtool.actions.AuthenticationAction;
+import org.cardano.govtool.actions.DRepAction;
 
 import static io.gatling.javaapi.core.CoreDsl.scenario;
 

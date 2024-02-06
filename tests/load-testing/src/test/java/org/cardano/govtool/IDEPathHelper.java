@@ -1,4 +1,4 @@
-package org.cardano.vva;
+package org.cardano.govtool;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -19,7 +19,7 @@ public class IDEPathHelper {
       Path mavenTargetDirectory = projectRootDir.resolve("target");
       Path mavenSrcTestDirectory = projectRootDir.resolve("src").resolve("test");
 
-      mavenSourcesDirectory = mavenSrcTestDirectory.resolve("java/org/cardano/vva");
+      mavenSourcesDirectory = mavenSrcTestDirectory.resolve("java/org/cardano/govtool");
       mavenResourcesDirectory = mavenSrcTestDirectory.resolve("resources");
       mavenBinariesDirectory = mavenTargetDirectory.resolve("test-classes");
       resultsDirectory = mavenTargetDirectory.resolve("gatling");

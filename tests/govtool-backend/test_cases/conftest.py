@@ -8,7 +8,7 @@ import requests
 
 from models.TestResult import Metrics
 
-from test_cases.vva_api import VVAApi
+from test_cases.govtool_api import GovToolApi
 
 from config import CURRENT_GIT_HASH
 from config import BUILD_ID
@@ -18,7 +18,7 @@ from test_cases.fixtures.ada_holder import ada_holder_delegate_to_drep
 
 
 @pytest.fixture(scope="session")
-def vva_api():
+def govtool_api():
     base_url: str = os.environ.get('BASE_URL')
     metrics_url: str = os.environ.get('METRICS_URL')
 
@@ -36,7 +36,7 @@ def vva_api():
         print("METRICS_URL environment variable is not set.", file=sys.stderr)
         print("Proceeding without METRICS_URL: Metrics will not be posted")
 
-    api = VVAApi(base_url)
+    api = GovToolApi(base_url)
     yield api
 
     if metrics_url:
@@ -64,13 +64,13 @@ def vva_api():
 @pytest.hookimpl(wrapper=True, tryfirst=True)
 def pytest_runtest_makereport(item):
     rep = yield
-    vva_api_object = item.funcargs.get("vva_api")
+    govtool_api_object = item.funcargs.get("govtool_api")
 
     if rep.when == "call":
 
         test_func_name = re.search(r'(?<=::)(.*?)*(?=\[|$)', rep.nodeid).group()
 
-        vva_api_object.add_test_metrics(
+        govtool_api_object.add_test_metrics(
             Metrics(
                 outcome=rep.outcome,
                 test_name=test_func_name,

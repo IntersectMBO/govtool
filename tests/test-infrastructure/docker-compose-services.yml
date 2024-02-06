@@ -54,7 +54,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.vva-test-stack == true
+          - node.labels.govtool-test-stack == true
       restart_policy:
         delay: "10s"
   postgres:
@@ -83,6 +83,6 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.vva-test-stack == true
+          - node.labels.govtool-test-stack == true
       restart_policy:
         delay: "30s"

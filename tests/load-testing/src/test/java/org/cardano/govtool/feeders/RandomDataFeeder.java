@@ -1,6 +1,6 @@
-package org.cardano.vva.feeders;
+package org.cardano.govtool.feeders;
 
-import org.cardano.vva.Utils;
+import org.cardano.govtool.Utils;
 
 import java.util.Collections;
 import java.util.Iterator;

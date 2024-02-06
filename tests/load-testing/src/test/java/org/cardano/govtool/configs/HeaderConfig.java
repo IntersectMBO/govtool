@@ -1,4 +1,4 @@
-package org.cardano.vva.configs;
+package org.cardano.govtool.configs;
 
 import java.util.Map;
 

@@ -12,6 +12,7 @@ export const getProposals = async ({
   dRepID = "",
   filters = [],
   page = 0,
+  // It allows fetch proposals and if we have 7 items, display 6 cards and "view all" button
   pageSize = 7,
   sorting = "",
 }: getProposalsArguments) => {

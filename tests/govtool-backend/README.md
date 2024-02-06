@@ -1,8 +1,8 @@
-VVA-BE PyTest
+GovTool backend PyTest
 =================
 This test is responsible for following
 
-- Perform basic tests on VVA backend endpoints.
+- Perform basic tests on GovTool backend endpoints.
 - Publish the reports to metrics server for visualization.
 
 ## Installation
@@ -31,7 +31,7 @@ This will generate test_data.json that will be used to run tests.
 
 
 ## Run tests
-In the root directory of tests/vva-be run the following command
+In the root directory of tests/govtool-backend run the following command
 ```shell
 export BASE_URL="url" # server's url e.g. https://staging.govtool.byron.network/api"
 export METRICS_URL="url" # metrics server Url

@@ -4,7 +4,7 @@ from models.TestData import Delegation, Drep, AdaHolder
 
 
 @pytest.fixture(scope="module", params=ada_holders)
-def ada_holder_delegate_to_drep(request, vva_api):
+def ada_holder_delegate_to_drep(request, govtool_api):
     ada_holder: AdaHolder = request.param
 
     delegation_data = Delegation(

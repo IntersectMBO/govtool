@@ -9,7 +9,7 @@ from models.TestResult import Metrics
 from config import BUILD_ID
 
 
-class VVAApi():
+class GovToolApi():
 
     def __init__(self, base_url: str):
         self._base_url = base_url

@@ -34,14 +34,14 @@ def validate_voteonproposal_list(voteonproposal_list: [VoteonProposal]) -> bool:
     return True
 
 
-def test_list_drep(vva_api):
-    response = vva_api.drep_list()
+def test_list_drep(govtool_api):
+    response = govtool_api.drep_list()
     drep_list = response.json()
     validate_drep_list(drep_list)
 
 
-def test_initialized_getVotes( vva_api, registered_drep):
-    response = vva_api.drep_getVotes(registered_drep["drepId"])
+def test_initialized_getVotes( govtool_api, registered_drep):
+    response = govtool_api.drep_getVotes(registered_drep["drepId"])
     validate_voteonproposal_list(response.json())
     votes = response.json()
     proposals = map(lambda x: x["vote"]["proposalId"], votes)
@@ -49,6 +49,6 @@ def test_initialized_getVotes( vva_api, registered_drep):
     assert len(proposals)==0
 
 
-def test_initialized_getVotingPower(vva_api, registered_drep):
-    response = vva_api.drep_get_voting_power(registered_drep["drepId"])
+def test_initialized_getVotingPower(govtool_api, registered_drep):
+    response = govtool_api.drep_get_voting_power(registered_drep["drepId"])
     assert isinstance(response.json(), int)

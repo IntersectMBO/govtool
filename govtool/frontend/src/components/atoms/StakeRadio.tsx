@@ -3,7 +3,11 @@ import { Box, IconButton, Typography } from "@mui/material";
 
 import { ICONS } from "@consts";
 import { theme } from "@/theme";
-import { useGetAdaHolderVotingPowerQuery, useScreenDimension } from "@/hooks";
+import {
+  useGetAdaHolderVotingPowerQuery,
+  useScreenDimension,
+  useTranslation,
+} from "@hooks";
 import { correctAdaFormat } from "@/utils/adaFormat";
 
 type StakeRadioProps = {
@@ -21,6 +25,7 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
   const { isMobile } = useScreenDimension();
   const { powerIsLoading, votingPower } =
     useGetAdaHolderVotingPowerQuery(stakeKey);
+  const { t } = useTranslation();
 
   return (
     <Box
@@ -65,12 +70,11 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
         </Box>
         <Box alignItems="center" display="flex">
           <Typography color={isChecked ? "white" : "#8E908E"} variant="body2">
-            Voting power:
+            {t("votingPower")}
           </Typography>
           {powerIsLoading ? (
             <Typography color={isChecked ? "white" : "#8E908E"} variant="body2">
-              {" "}
-              Loading...
+              {t("loading")}
             </Typography>
           ) : (
             <Typography

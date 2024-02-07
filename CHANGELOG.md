@@ -10,16 +10,14 @@ changes.
 
 ## [Unreleased]
 - Vitest unit tests added for utils functions [Issue 81](https://github.com/IntersectMBO/govtool/issues/81)
-
-## [sancho-v1.0.1](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.1) 2023-12-XX
-
-### Added
--
+- i18next library added to FE [Issue 80](https://github.com/IntersectMBO/govtool/issues/80)
 
 ### Fixed
--
+- Fixed vote calculation problems related to NoConfidence DRep [Issue 59](https://github.com/IntersectMBO/govtool/issues/59)
+- Fixed ada-holder/get-current-delegation error when delegated to NoConfidence or AlwaysAbstain dreps. [Issue 82](https://github.com/IntersectMBO/govtool/issues/82)
 
 ### Changed
+- Changed and improved working conventions docs, PR template and codeowners file, addressing [Issue 88](https://github.com/IntersectMBO/govtool/issues/88).
 - Changed Node version from 8.7.1-pre to 8.7.2 and Db-sync version from sancho-2-3-0 to sancho-3-0-0.
 - (`docs/update-working-conventions`) Addressing [Issue 25](https://github.com/IntersectMBO/govtool/issues/25) changed working conventions documentation to improve intended flows.
 

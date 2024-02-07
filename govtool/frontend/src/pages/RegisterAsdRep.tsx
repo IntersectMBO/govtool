@@ -13,6 +13,7 @@ import {
 import {
   useScreenDimension,
   useUrlAndHashFormController as useRegisterAsdRepFormController,
+  useTranslation,
 } from "@hooks";
 import { useNavigate } from "react-router-dom";
 import { WALLET_LS_KEY, getItemFromLocalStorage } from "@/utils/localStorage";
@@ -21,6 +22,7 @@ export const RegisterAsdRep = () => {
   const [step, setStep] = useState<number>(1);
   const { isMobile } = useScreenDimension();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const registerAsdRepFormMethods = useRegisterAsdRepFormController();
 
@@ -40,7 +42,7 @@ export const RegisterAsdRep = () => {
           imageSRC={ICONS.appLogoIcon}
           imageWidth={isMobile ? undefined : 42}
           imageHeight={isMobile ? 24 : 35}
-          title={"Register as a DRep"}
+          title={t("registration.registerAsDRep")}
         />
         <Box
           display={"flex"}

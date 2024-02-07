@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material";
 
 import { theme } from "@/theme";
 import { VotePill } from "@atoms";
-import { useScreenDimension } from "@/hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { correctAdaFormat } from "@/utils/adaFormat";
 
 interface Props {
@@ -17,6 +17,7 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
     palette: { lightBlue },
   } = theme;
   const { isMobile } = useScreenDimension();
+  const { t } = useTranslation();
 
   return (
     <Box
@@ -33,18 +34,17 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
         style={{ marginBottom: "10px" }}
       />
       <Typography fontSize={"22px"} fontWeight={"600"}>
-        Votes Submitted
+        {t("govActions.voteSubmitted")}
       </Typography>
       <Typography fontSize={"22px"} fontWeight={"500"}>
-        for this Governance Action
+        {t("govActions.forGovAction")}
       </Typography>
       <Typography
         color={"textGray"}
         fontSize={"14px"}
         sx={{ marginTop: "8px" }}
       >
-        Votes submitted on-chain by DReps, SPOs and Constitutional Committee
-        members.
+        {t("govActions.votesSubmittedOnChain")}
       </Typography>
       <Typography
         color="neutralGray"
@@ -53,7 +53,7 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
           marginTop: "40px",
         }}
       >
-        Votes:
+        {t("govActions.votes")}
       </Typography>
       <Box
         sx={{

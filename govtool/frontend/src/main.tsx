@@ -1,9 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.tsx";
-import { ThemeProvider } from "@emotion/react";
-import { ContextProviders } from "@context";
-import { theme } from "./theme.ts";
 import {
   BrowserRouter,
   createRoutesFromChildren,
@@ -12,8 +8,15 @@ import {
   useNavigationType,
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
-import * as Sentry from "@sentry/react";
 import TagManager from "react-gtm-module";
+import { ThemeProvider } from "@emotion/react";
+import * as Sentry from "@sentry/react";
+
+import { ContextProviders } from "@context";
+
+import App from "./App.tsx";
+import { theme } from "./theme.ts";
+import "./i18n";
 
 const queryClient = new QueryClient();
 

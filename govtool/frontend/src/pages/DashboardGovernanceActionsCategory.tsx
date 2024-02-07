@@ -22,6 +22,7 @@ import {
   useGetProposalsInfiniteQuery,
   useSaveScrollPosition,
   useScreenDimension,
+  useTranslation,
 } from "@hooks";
 import {
   getFullGovActionId,
@@ -38,6 +39,7 @@ export const DashboardGovernanceActionsCategory = () => {
   const { isMobile, screenWidth } = useScreenDimension();
   const navigate = useNavigate();
   const { dRep, isDrepLoading, voteTransaction } = useCardano();
+  const { t } = useTranslation();
 
   const {
     isProposalsFetching,
@@ -69,8 +71,8 @@ export const DashboardGovernanceActionsCategory = () => {
       style={{ textDecorationColor: "#0033AD" }}
       to={PATHS.dashboard_governance_actions}
     >
-      <Typography color="primary" fontSize={12} fontWeight={300}>
-        Governance Actions
+      <Typography color="primary" fontWeight={300} fontSize={12}>
+        {t("govActions.title")}
       </Typography>
     </NavLink>,
     <Typography fontSize={12} fontWeight={500} key="2">
@@ -127,8 +129,8 @@ export const DashboardGovernanceActionsCategory = () => {
                 alt="arrow"
                 style={{ marginRight: "12px", transform: "rotate(180deg)" }}
               />
-              <Typography color="primary" variant="body2">
-                Back to the list
+              <Typography variant="body2" color="primary">
+                {t("backToList")}
               </Typography>
             </Link>
             <DataActionsBar
@@ -151,10 +153,12 @@ export const DashboardGovernanceActionsCategory = () => {
               <Typography fontWeight="300" py={4}>
                 <Box display="flex" flexWrap="wrap" mt={4}>
                   <Typography fontWeight={300}>
-                    Governnance actions with category&nbsp;
+                    {t("govActions.withCategoryNotExist.partOne")}&nbsp;
                   </Typography>
                   <Typography fontWeight="bold">{` ${category} `}</Typography>
-                  <Typography fontWeight={300}>&nbsp;don't exist.</Typography>
+                  <Typography fontWeight={300}>
+                    &nbsp;{t("govActions.withCategoryNotExist.partTwo")}
+                  </Typography>
                 </Box>
               </Typography>
             ) : (

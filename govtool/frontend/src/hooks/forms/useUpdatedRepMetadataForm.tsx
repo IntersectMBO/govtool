@@ -7,12 +7,14 @@ import { useNavigate } from "react-router-dom";
 
 import { PATHS } from "@consts";
 import { useCardano, useSnackbar } from "@context";
+import { useTranslation } from "@hooks";
 
 export const useUpdatedRepMetadataForm = () => {
   const { buildSignSubmitConwayCertTx, buildDRepUpdateCert } = useCardano();
   const { addSuccessAlert, addErrorAlert } = useSnackbar();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const {
     handleSubmit,
@@ -37,10 +39,10 @@ export const useUpdatedRepMetadataForm = () => {
           type: "registration",
           registrationType: "update",
         });
-        if (result) addSuccessAlert("Metadata update submitted");
+        if (result) addSuccessAlert(t("alerts.metadataUpdate.success"));
         navigate(PATHS.dashboard);
       } catch (e) {
-        addErrorAlert("Something went wrong while updating metadata");
+        addErrorAlert(t("alerts.metadataUpdate.failed"));
       } finally {
         setIsLoading(false);
       }

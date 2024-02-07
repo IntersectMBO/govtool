@@ -11,7 +11,7 @@ import { Snackbar, Alert } from "@mui/material";
 
 import { SnackbarMessage } from "@atoms";
 import { SnackbarSeverity } from "@models";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 
 interface ProviderProps {
   children: React.ReactNode;
@@ -53,6 +53,7 @@ function SnackbarProvider({ children }: ProviderProps) {
   const [snackPack, setSnackPack] = useState<readonly SnackbarMessage[]>([]);
   const [{ messageInfo, open }, setState] = useState(defaultState);
   const { isMobile } = useScreenDimension();
+  const { t } = useTranslation();
 
   const addWarningAlert = useCallback(
     (message: string, autoHideDuration = DEFAULT_AUTO_HIDE_DURATION) =>
@@ -97,7 +98,7 @@ function SnackbarProvider({ children }: ProviderProps) {
   );
 
   const addChangesSavedAlert = useCallback(
-    () => addSuccessAlert("Your changes have been saved"),
+    () => addSuccessAlert(t("alerts.changesSaved")),
     [addSuccessAlert]
   );
 

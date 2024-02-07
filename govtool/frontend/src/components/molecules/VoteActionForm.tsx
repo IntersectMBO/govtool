@@ -5,7 +5,7 @@ import { Box, Link } from "@mui/material";
 import { Button, Input, LoadingButton, Radio, Typography } from "@atoms";
 import { ICONS } from "@consts";
 import { useCardano, useModal } from "@context";
-import { useScreenDimension, useVoteActionForm } from "@hooks";
+import { useScreenDimension, useVoteActionForm, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
 export const VoteActionForm = ({
@@ -24,6 +24,7 @@ export const VoteActionForm = ({
   const { isMobile, screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { dRep } = useCardano();
+  const { t } = useTranslation();
 
   const {
     setValue,
@@ -57,7 +58,7 @@ export const VoteActionForm = ({
   const renderCancelButton = useMemo(() => {
     return (
       <Button
-        data-testid={"cancel-button"}
+        data-testid="cancel-button"
         onClick={() => setValue("vote", state.vote)}
         variant="outlined"
         size="extraLarge"
@@ -65,7 +66,7 @@ export const VoteActionForm = ({
           width: "100%",
         }}
       >
-        Cancel
+        {t("cancel")}
       </Button>
     );
   }, [state]);
@@ -73,7 +74,7 @@ export const VoteActionForm = ({
   const renderChangeVoteButton = useMemo(() => {
     return (
       <LoadingButton
-        data-testid={"change-vote"}
+        data-testid="change-vote"
         onClick={confirmVote}
         disabled={
           (!areFormErrors && voteFromEP === vote) ||
@@ -89,20 +90,22 @@ export const VoteActionForm = ({
           height: 48,
         }}
       >
-        Change vote
+        {t("govActions.changeVote")}
       </LoadingButton>
     );
   }, [confirmVote, areFormErrors, vote, isVoteLoading]);
 
   return (
-    <Box flex={1} display="flex" flexDirection="column" width={"full"}>
+    <Box flex={1} display="flex" flexDirection="column" width="full">
       <Box
         flex={1}
         display="flex"
         flexDirection="column"
         px={screenWidth < 1024 ? 0 : 5}
       >
-        <Typography variant="body1">Choose how you want to vote:</Typography>
+        <Typography variant="body1">
+          {t("govActions.chooseHowToVote")}
+        </Typography>
         <Box mt={3}>
           <Box display="flex" flexDirection="row">
             <Radio
@@ -111,7 +114,7 @@ export const VoteActionForm = ({
               name="vote"
               register={registerInput}
               setValue={setValue}
-              title="Yes"
+              title={t("yes")}
               value="yes"
             />
             <Box px={1} />
@@ -121,7 +124,7 @@ export const VoteActionForm = ({
               name="vote"
               register={registerInput}
               setValue={setValue}
-              title="No"
+              title={t("no")}
               value="no"
             />
           </Box>
@@ -132,14 +135,14 @@ export const VoteActionForm = ({
               name="vote"
               register={registerInput}
               setValue={setValue}
-              title="Abstain"
+              title={t("abstain")}
               value="abstain"
             />
           </Box>
         </Box>
         {dRep?.isRegistered && (
           <Button
-            data-testid={"show-votes-button"}
+            data-testid="show-votes-button"
             variant="text"
             size="large"
             sx={{ mt: 3 }}
@@ -155,7 +158,7 @@ export const VoteActionForm = ({
               });
             }}
           >
-            Show votes
+            {t("govActions.showVotes")}
           </Button>
         )}
         <Box
@@ -179,9 +182,9 @@ export const VoteActionForm = ({
               margin: 0,
             }}
           >
-            Provide context about your vote{" "}
+            {t("govActions.provideContext")}{" "}
             <span style={{ fontSize: 12, fontWeight: 300 }}>
-              (optional)
+              {t("govActions.optional")}
               <img
                 alt="arrow"
                 src={ICONS.arrowDownIcon}
@@ -195,25 +198,25 @@ export const VoteActionForm = ({
           </p>
         </Box>
         {isContext && (
-          <Box display={"flex"} flexDirection={"column"} flex={1}>
+          <Box display="flex" flexDirection="column" flex={1}>
             <Input
               control={control}
               dataTestId="url-input"
               errorMessage={errors.url?.message}
               formFieldName="url"
-              placeholder="Your URL with with your context"
-              width={"100%"}
+              placeholder={t("forms.urlWithContextPlaceholder")}
+              width="100%"
             />
             <Input
               control={control}
               dataTestId="hash-input"
               errorMessage={errors.hash?.message}
               formFieldName="hash"
-              placeholder="The hash of your URL"
-              width={"100%"}
+              placeholder={t("forms.hashPlaceholder")}
+              width="100%"
             />
             <Link
-              data-testid={"how-to-create-link"}
+              data-testid="how-to-create-link"
               onClick={() =>
                 openInNewTab(
                   "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor"
@@ -221,11 +224,11 @@ export const VoteActionForm = ({
               }
               mb={isMobile ? 2 : 8}
               sx={{ cursor: "pointer" }}
-              textAlign={"center"}
+              textAlign="center"
               visibility={!isContext ? "hidden" : "visible"}
             >
               <Typography color="primary" fontWeight={400} variant="body2">
-                How to create URL and hash?
+                {t("forms.howCreateUrlAndHash")}
               </Typography>
             </Link>
           </Box>
@@ -239,14 +242,14 @@ export const VoteActionForm = ({
         }}
         variant="caption"
       >
-        Select a different option to change your vote
+        {t("govActions.selectDifferentOption")}
       </Typography>
       {(state?.vote && state?.vote !== vote) ||
       (voteFromEP && voteFromEP !== vote) ? (
         <Box
-          display={"flex"}
+          display="flex"
           flexDirection={isMobile ? "column" : "row"}
-          justifyContent={"space-between"}
+          justifyContent="space-between"
         >
           {isMobile ? renderChangeVoteButton : renderCancelButton}
           <Box px={1} py={isMobile ? 1.5 : 0} />
@@ -254,7 +257,7 @@ export const VoteActionForm = ({
         </Box>
       ) : (
         <LoadingButton
-          data-testid={"vote-button"}
+          data-testid="vote-button"
           variant="contained"
           disabled={
             !vote ||
@@ -266,7 +269,7 @@ export const VoteActionForm = ({
           onClick={confirmVote}
           size="extraLarge"
         >
-          Vote
+          {t("govActions.vote")}
         </LoadingButton>
       )}
     </Box>

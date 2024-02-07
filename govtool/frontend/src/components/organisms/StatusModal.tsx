@@ -4,7 +4,7 @@ import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import { ICONS, IMAGES } from "@consts";
 import { useModal } from "@context";
 import { openInNewTab } from "@/utils";
-import { useScreenDimension } from "@/hooks";
+import { useScreenDimension, useTranslation } from "@/hooks";
 
 export interface StatusModalState {
   buttonText?: string;
@@ -20,6 +20,7 @@ export interface StatusModalState {
 export function StatusModal() {
   const { state, closeModal } = useModal<StatusModalState>();
   const { isMobile } = useScreenDimension();
+  const { t } = useTranslation();
 
   return (
     <ModalWrapper dataTestId={state ? state.dataTestId : "status-modal"}>
@@ -49,7 +50,7 @@ export function StatusModal() {
               target="_blank"
               sx={[{ "&:hover": { cursor: "pointer" } }]}
             >
-              this link
+              {t("thisLink")}
             </Link>
           )}
         </Typography>
@@ -66,7 +67,7 @@ export function StatusModal() {
         }}
         variant="contained"
       >
-        {state?.buttonText || "Confirm"}
+        {state?.buttonText || t("confirm")}
       </Button>
     </ModalWrapper>
   );

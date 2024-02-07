@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 
 import { Background, Link, VotingPowerChips, Typography } from "@atoms";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { DRepInfoCard, WalletInfoCard } from "@molecules";
@@ -30,6 +30,7 @@ export const DashboardTopNav = ({
   const { dRep } = useCardano();
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const { t } = useTranslation();
 
   return (
     <Box
@@ -114,7 +115,7 @@ export const DashboardTopNav = ({
                     <Link
                       dataTestId="home-link"
                       navTo={PATHS.dashboard}
-                      label="My Dashboard"
+                      label={t("menu.myDashboard")}
                       size="big"
                       onClick={() => {
                         setIsDrawerOpen(false);
@@ -126,7 +127,7 @@ export const DashboardTopNav = ({
                     <Link
                       dataTestId="governance-actions-link"
                       navTo={PATHS.dashboard_governance_actions}
-                      label="View Governance Actions"
+                      label={t("menu.viewGovActions")}
                       size="big"
                       onClick={() => {
                         setIsDrawerOpen(false);
@@ -138,7 +139,7 @@ export const DashboardTopNav = ({
                     <Link
                       dataTestId="guides-link"
                       navTo={""}
-                      label="Guides"
+                      label={t("menu.guides")}
                       size="big"
                       onClick={() => {
                         openInNewTab(
@@ -153,7 +154,7 @@ export const DashboardTopNav = ({
                     <Link
                       dataTestId="faqs-link"
                       navTo={""}
-                      label="FAQs"
+                      label={t("menu.faqs")}
                       size="big"
                       onClick={() => {
                         openInNewTab("https://docs.sanchogov.tools/faqs");

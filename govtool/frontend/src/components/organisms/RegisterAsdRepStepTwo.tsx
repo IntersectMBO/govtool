@@ -3,7 +3,11 @@ import { Box } from "@mui/material";
 
 import { LoadingButton, Button, Typography } from "@atoms";
 import { theme } from "@/theme";
-import { useRegisterAsdRepFormContext, useScreenDimension } from "@hooks";
+import {
+  useRegisterAsdRepFormContext,
+  useScreenDimension,
+  useTranslation,
+} from "@hooks";
 
 interface Props {
   setStep: Dispatch<SetStateAction<number>>;
@@ -15,6 +19,7 @@ export const RegisterAsdRepStepTwo = ({ setStep }: Props) => {
   } = theme;
   const { isLoading, submitForm } = useRegisterAsdRepFormContext();
   const { isMobile, pagePadding, screenWidth } = useScreenDimension();
+  const { t } = useTranslation();
 
   const renderBackButton = useMemo(() => {
     return (
@@ -28,7 +33,7 @@ export const RegisterAsdRepStepTwo = ({ setStep }: Props) => {
         }}
         variant="outlined"
       >
-        Back
+        {t("back")}
       </Button>
     );
   }, [isMobile]);
@@ -48,7 +53,7 @@ export const RegisterAsdRepStepTwo = ({ setStep }: Props) => {
         }}
         variant="contained"
       >
-        Register
+        {t("registration.register")}
       </LoadingButton>
     );
   }, [isLoading, isMobile, submitForm]);
@@ -65,19 +70,19 @@ export const RegisterAsdRepStepTwo = ({ setStep }: Props) => {
     >
       <Box display="flex" flexDirection="column">
         <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
-          Confirm DRep registration
+          {t("registration.headingStepTwo")}
         </Typography>
         <Typography
           fontWeight={400}
-          sx={{ mb: 7, mt: isMobile ? 4 : 10, textAlign: "center" }}
+          sx={{
+            mb: 7,
+            mt: isMobile ? 4 : 10,
+            textAlign: "center",
+            whiteSpace: "pre-line",
+          }}
           variant="body1"
         >
-          By clicking register you create your DRep ID within your wallet and
-          become a DRep. <br />
-          <br />
-          Once the registration has completed your DRep ID will be shown on your
-          dashboard. You will be able to share your DRep ID so that other ada
-          holders can delegate their voting power to you.
+          {t("registration.descriptionStepTwo")}
         </Typography>
       </Box>
       <Box

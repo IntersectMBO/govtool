@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 import { Background, Button, Typography } from "@atoms";
 import { IMAGES, PATHS } from "@consts";
 import { useCardano } from "@context";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 
 const IMAGE_SIZE = 748;
 
@@ -21,6 +21,7 @@ export const ErrorPage = ({
   const { isEnabled } = useCardano();
   const { screenWidth } = useScreenDimension();
   const { state } = useLocation();
+  const { t } = useTranslation();
 
   return (
     <Background>
@@ -40,19 +41,22 @@ export const ErrorPage = ({
             lineHeight={"64px"}
             sx={{ whiteSpace: "nowrap" }}
           >
-            Whoops!
+            {t("errorPage.whoops")}
           </Typography>
           <Typography sx={{ marginTop: 1 }} variant="headline3">
             {state && state.errorCode === 500
-              ? "We have an internal server error."
+              ? t("errorPage.serverError")
               : errorDescription}
           </Typography>
           <Typography fontWeight={400} sx={{ marginY: 4.25 }} variant="title2">
-            Error {state ? state.errorCode : errorCode}
+            {t("errorPage.error")}
+            {state ? state.errorCode : errorCode}
           </Typography>
           {isButton && (
             <Button size="extraLarge" onClick={() => navigate(PATHS.home)}>
-              {isEnabled ? "Back to dashboard" : "Back to homepage"}
+              {isEnabled
+                ? t("errorPage.backToDashboard")
+                : t("errorPage.backToHomepage")}
             </Button>
           )}
         </Box>

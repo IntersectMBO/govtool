@@ -4,13 +4,14 @@ import { useFormContext, useWatch } from "react-hook-form";
 
 import { PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
-import { UrlAndHashFormValues } from "@hooks";
+import { UrlAndHashFormValues, useTranslation } from "@hooks";
 
 export const useRegisterAsdRepFormContext = () => {
   const { buildSignSubmitConwayCertTx, buildDRepRegCert } = useCardano();
   const { openModal, closeModal } = useModal();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const {
     control,
@@ -49,11 +50,10 @@ export const useRegisterAsdRepFormContext = () => {
             type: "statusModal",
             state: {
               status: "success",
-              title: "Registration Transaction Submitted!",
-              message:
-                "The confirmation of your registration might take a bit of time but you can track it using.",
+              title: t("modals.registration.title"),
+              message: t("modals.registration.message"),
               link: "https://adanordic.com/latest_transactions",
-              buttonText: "Go to dashboard",
+              buttonText: t("modals.common.goToDashboard"),
               onSubmit: () => {
                 navigate(PATHS.dashboard);
                 closeModal();
@@ -68,9 +68,9 @@ export const useRegisterAsdRepFormContext = () => {
           type: "statusModal",
           state: {
             status: "warning",
-            title: "Oops!",
+            title: t("modals.common.oops"),
             message: errorMessage,
-            buttonText: "Go to dashboard",
+            buttonText: t("modals.common.goToDashboard"),
             onSubmit: () => {
               navigate(PATHS.dashboard);
               closeModal();

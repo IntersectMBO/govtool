@@ -5,7 +5,12 @@ import { Box, CircularProgress } from "@mui/material";
 import { Slider } from "./Slider";
 
 import { Typography } from "@atoms";
-import { useGetProposalsQuery, useScreenDimension } from "@hooks";
+import {
+  useGetDRepVotesQuery,
+  useGetProposalsQuery,
+  useScreenDimension,
+  useTranslation,
+} from "@hooks";
 import { GovernanceActionCard } from "@molecules";
 import { GOVERNANCE_ACTIONS_FILTERS, PATHS } from "@consts";
 import { useCardano } from "@context";
@@ -31,6 +36,7 @@ export const GovernanceActionsToVote = ({
   const { voteTransaction } = useCardano();
   const navigate = useNavigate();
   const { isMobile } = useScreenDimension();
+  const { t } = useTranslation();
 
   const queryFilters = filters.length > 0 ? filters : defaultCategories;
 
@@ -71,7 +77,7 @@ export const GovernanceActionsToVote = ({
     <>
       {!mappedData.length ? (
         <Typography fontWeight={300} sx={{ py: 4 }}>
-          No results for the search
+          {t("govActions.noResultsForTheSearch")}
         </Typography>
       ) : (
         <>

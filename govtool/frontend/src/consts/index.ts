@@ -5,4 +5,3 @@ export * from "./images";
 export * from "./navItems";
 export * from "./paths";
 export * from "./queryKeys";
-export * from "./texts";

@@ -1,3 +1,4 @@
+export { useTranslation } from "react-i18next";
 export * from "./useScreenDimension";
 export * from "./useSlider";
 export * from "./useSaveScrollPosition";

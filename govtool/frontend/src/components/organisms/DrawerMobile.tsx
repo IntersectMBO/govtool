@@ -3,7 +3,7 @@ import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 
 import { Background, Button, Link } from "../atoms";
 import { ICONS, IMAGES, NAV_ITEMS } from "@consts";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { useModal } from "@context";
 import { openInNewTab } from "@utils";
 
@@ -23,6 +23,7 @@ export const DrawerMobile = ({
 }: DrawerMobileProps) => {
   const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
+  const { t } = useTranslation();
 
   return (
     <SwipeableDrawer
@@ -61,7 +62,7 @@ export const DrawerMobile = ({
               }}
               variant="contained"
             >
-              Connect your wallet
+              {t("wallet.connectYourWalletButton")}
             </Button>
           ) : null}
           <Grid container direction="column" mt={6} rowGap={4}>

@@ -45,6 +45,7 @@ import { Buffer } from "buffer";
 import { useNavigate } from "react-router-dom";
 import { Link } from "@mui/material";
 import * as Sentry from "@sentry/react";
+import { Trans } from "react-i18next";
 
 import { useModal, useSnackbar } from ".";
 
@@ -71,6 +72,7 @@ import {
   setLimitedDelegationInterval,
   setLimitedRegistrationInterval,
 } from "./walletUtils";
+import { useTranslation } from "@hooks";
 
 interface Props {
   children: React.ReactNode;
@@ -203,6 +205,7 @@ function CardanoProvider(props: Props) {
   const [isDrepLoading, setIsDrepLoading] = useState<boolean>(true);
 
   const { addSuccessAlert, addWarningAlert, addErrorAlert } = useSnackbar();
+  const { t } = useTranslation();
 
   const isPendingTransaction = useCallback(() => {
     if (
@@ -214,10 +217,9 @@ function CardanoProvider(props: Props) {
         type: "statusModal",
         state: {
           status: "info",
-          title: "Please wait for your previous transaction to be completed.",
-          message:
-            "Before performing a new action please wait for the previous action transaction to be completed.",
-          buttonText: "Ok",
+          title: t("modals.waitForTransaction.title"),
+          message: t("modals.waitForTransaction.message"),
+          buttonText: t("ok"),
           onSubmit: () => {
             closeModal();
           },
@@ -286,13 +288,9 @@ function CardanoProvider(props: Props) {
               stakeKey
             ).then((isDelegated) => {
               if (isDelegated) {
-                addSuccessAlert(
-                  "Your voting power has been successfully delegated!"
-                );
+                addSuccessAlert(t("alerts.delegation.success"));
               } else {
-                addWarningAlert(
-                  "Your voting power has been successfully delegated! Please refresh the page."
-                );
+                addWarningAlert(t("alerts.delegation.refreshPage"));
               }
             });
           }
@@ -303,7 +301,7 @@ function CardanoProvider(props: Props) {
           TIME_TO_EXPIRE_TRANSACTION
         ) {
           resetDelegateTransaction();
-          if (isEnabled) addErrorAlert("Delegation transaction failed");
+          if (isEnabled) addErrorAlert(t("alerts.delegation.failed"));
         }
       };
       let interval = setInterval(checkDelegateTransaction, REFRESH_TIME);
@@ -338,28 +336,20 @@ function CardanoProvider(props: Props) {
               ).then((isRegistered) => {
                 if (registerTransaction.type === "registration") {
                   if (isRegistered) {
-                    addSuccessAlert(
-                      "You have successfully registered as a DRep!"
-                    );
+                    addSuccessAlert(t("alerts.registration.success"));
                   } else {
-                    addWarningAlert(
-                      "You have successfully registered as a DRep! Please refresh the page."
-                    );
+                    addWarningAlert(t("alerts.registration.refreshPage"));
                   }
                 } else if (registerTransaction.type === "retirement") {
                   if (!isRegistered) {
-                    addSuccessAlert(
-                      "You have successfully retired from being a DRep!"
-                    );
+                    addSuccessAlert(t("alerts.retirement.success"));
                   } else {
-                    addWarningAlert(
-                      "You have successfully retired from being a DRep! Please refresh the page."
-                    );
+                    addWarningAlert(t("alerts.retirement.refreshPage"));
                   }
                 }
               });
             } else {
-              addSuccessAlert("You have successfully updated DRep metadata!");
+              addSuccessAlert(t("alerts.metadataUpdate.success"));
             }
           }
           resetRegisterTransaction();
@@ -371,11 +361,15 @@ function CardanoProvider(props: Props) {
           resetRegisterTransaction();
           if (isEnabled)
             addErrorAlert(
-              registerTransaction.type === "retirement"
-                ? "Retirement transaction failed"
-                : registerTransaction.type === "registration"
-                ? "Registration transaction failed"
-                : "Update DRep metadata transaction failed"
+              t(
+                `alerts.${
+                  registerTransaction.type === "retirement"
+                    ? "retirement.failed"
+                    : registerTransaction.type === "registration"
+                    ? "registration.failed"
+                    : "metadataUpdate.failed"
+                }`
+              )
             );
         }
       };
@@ -398,14 +392,14 @@ function CardanoProvider(props: Props) {
         );
         if (status.transactionConfirmed) {
           resetVoteTransaction();
-          if (isEnabled) addSuccessAlert("You have successfully voted!");
+          if (isEnabled) addSuccessAlert(t("alerts.voting.success"));
         }
         if (
           new Date().getTime() - new Date(voteTransaction?.time).getTime() >
           TIME_TO_EXPIRE_TRANSACTION
         ) {
           resetVoteTransaction();
-          if (isEnabled) addErrorAlert("Vote transaction failed");
+          if (isEnabled) addErrorAlert(t("alerts.voting.failed"));
         }
       };
       let interval = setInterval(checkVoteTransaction, REFRESH_TIME);
@@ -417,7 +411,7 @@ function CardanoProvider(props: Props) {
         registerTransaction?.transactionHash ||
         delegateTransaction?.transactionHash)
     ) {
-      addWarningAlert("Transaction in progress. Please wait.", 10000);
+      addWarningAlert(t("alerts.transactionInProgress"), 10000);
     }
   }, [delegateTransaction, registerTransaction, voteTransaction]);
 
@@ -530,15 +524,13 @@ function CardanoProvider(props: Props) {
         try {
           // Check that this wallet supports CIP-95 connection
           if (!window.cardano[walletName].supportedExtensions) {
-            throw new Error("Your wallet does not support CIP-30 extensions.");
+            throw new Error(t("errors.walletNoCIP30Support"));
           } else if (
             !window.cardano[walletName].supportedExtensions.some(
               (item) => item.cip === 95
             )
           ) {
-            throw new Error(
-              "Your wallet does not support the required CIP-30 extension, CIP-95."
-            );
+            throw new Error(t("errors.walletNoCIP30Nor90Support"));
           }
           // Enable wallet connection
           const enabledApi = await window.cardano[walletName]
@@ -556,18 +548,15 @@ function CardanoProvider(props: Props) {
           // Check if wallet has enabled the CIP-95 extension
           const enabledExtensions = await enabledApi.getExtensions();
           if (!enabledExtensions.some((item) => item.cip === 95)) {
-            throw new Error(
-              "Your wallet did not enable the needed CIP-95 functions during connection."
-            );
+            throw new Error(t("errors.walletNoCIP90FunctionsEnabled"));
           }
           const network = await enabledApi.getNetworkId();
           if (network != NETWORK) {
             throw new Error(
-              `You are trying to connect with a wallet connected to ${
-                network == 1 ? "mainnet" : "testnet"
-              }. Please adjust your wallet settings to connect to ${
-                network != 1 ? "mainnet" : "testnet"
-              } or select a different wallet`
+              t("errors.tryingConnectTo", {
+                networkFrom: network == 1 ? "mainnet" : "testnet",
+                networkTo: network != 1 ? "mainnet" : "testnet",
+              })
             );
           }
           setIsMainnet(network == 1);
@@ -575,7 +564,7 @@ function CardanoProvider(props: Props) {
           const usedAddresses = await enabledApi.getUsedAddresses();
           const unusedAddresses = await enabledApi.getUnusedAddresses();
           if (!usedAddresses.length && !unusedAddresses.length) {
-            throw new Error("No addresses found.");
+            throw new Error(t("errors.noAddressesFound"));
           }
           if (!usedAddresses.length) {
             setAddress(unusedAddresses[0]);
@@ -605,9 +594,7 @@ function CardanoProvider(props: Props) {
                   .to_hex();
             });
           } else {
-            console.log(
-              "Warning, no registered stake keys, using unregistered stake keys"
-            );
+            console.warn(t("warnings.usingUnregisteredStakeKeys"));
             stakeKeysList = unregisteredStakeKeysList.map((stakeKey) => {
               const stakeKeyHash = PublicKey.from_hex(stakeKey).hash();
               const stakeCredential = Credential.from_keyhash(stakeKeyHash);
@@ -649,7 +636,7 @@ function CardanoProvider(props: Props) {
           const protocol = await getEpochParams();
           setItemToLocalStorage(PROTOCOL_PARAMS_KEY, protocol);
 
-          return { status: "OK", stakeKey: stakeKeySet };
+          return { status: t("ok"), stakeKey: stakeKeySet };
         } catch (e) {
           Sentry.captureException(e);
           console.error(e);
@@ -661,11 +648,11 @@ function CardanoProvider(props: Props) {
           setIsEnabled(false);
           throw {
             status: "ERROR",
-            error: `${e == undefined ? "Something went wrong" : e}`,
+            error: `${e == undefined ? t("errors.somethingWentWrong") : e}`,
           };
         }
       }
-      throw { status: "ERROR", error: `Something went wrong` };
+      throw { status: "ERROR", error: t("errors.somethingWentWrong") };
     },
     [isEnabled, stakeKeys]
   );
@@ -741,7 +728,7 @@ function CardanoProvider(props: Props) {
         const txBuilder = await initTransactionBuilder();
 
         if (!txBuilder) {
-          throw new Error("Application can not create transaction");
+          throw new Error(t("errors.appCannotCreateTransaction"));
         }
 
         if (certBuilder) {
@@ -757,7 +744,7 @@ function CardanoProvider(props: Props) {
           !walletState.usedAddress ||
           !walletApi
         )
-          throw new Error("Check the wallet is connected.");
+          throw new Error(t("errors.checkIsWalletConnected"));
         const shelleyOutputAddress = Address.from_bech32(
           walletState.usedAddress
         );
@@ -781,7 +768,7 @@ function CardanoProvider(props: Props) {
         const utxos = await getUtxos(walletApi);
 
         if (!utxos) {
-          throw new Error("Application can not get utxos");
+          throw new Error(t("errors.appCannotGetUtxos"));
         }
         // Find the available UTXOs in the wallet and use them as Inputs for the transaction
         const txUnspentOutputs = await getTxUnspentOutputs(utxos);
@@ -915,7 +902,7 @@ function CardanoProvider(props: Props) {
         const certBuilder = CertificatesBuilder.new();
         let stakeCred;
         if (!stakeKey) {
-          throw new Error("No stake key selected");
+          throw new Error(t("errors.noStakeKeySelected"));
         }
         // Remove network tag from stake key hash
         const stakeKeyHash = Ed25519KeyHash.from_hex(stakeKey.substring(2));
@@ -923,7 +910,7 @@ function CardanoProvider(props: Props) {
         if (registeredStakeKeysListState.length > 0) {
           stakeCred = Credential.from_keyhash(stakeKeyHash);
         } else {
-          console.log("Registering stake key");
+          console.log(t("errors.registeringStakeKey"));
           stakeCred = Credential.from_keyhash(stakeKeyHash);
           const stakeKeyRegCert = StakeRegistration.new(stakeCred);
           certBuilder.add(Certificate.new_stake_registration(stakeKeyRegCert));
@@ -986,7 +973,7 @@ function CardanoProvider(props: Props) {
             anchor
           );
         } else {
-          console.log("DRep Registration - not using anchor");
+          console.log(t("errors.notUsingAnchor"));
           dRepRegCert = DrepRegistration.new(
             dRepCred,
             BigNum.from_str(`${epochParams.drep_deposit}`)
@@ -1197,9 +1184,10 @@ function useCardano() {
   const { openModal, closeModal } = useModal<StatusModalState>();
   const { addSuccessAlert } = useSnackbar();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   if (context === undefined) {
-    throw new Error("useCardano must be used within a CardanoProvider");
+    throw new Error(t("errors.useCardano"));
   }
 
   const enable = useCallback(
@@ -1212,7 +1200,7 @@ function useCardano() {
         if (!result.error) {
           closeModal();
           if (result.stakeKey) {
-            addSuccessAlert(`Wallet connected`, 3000);
+            addSuccessAlert(t("alerts.walletConnected"), 3000);
           }
           if (!isSanchoInfoShown) {
             openModal({
@@ -1222,23 +1210,26 @@ function useCardano() {
                 dataTestId: "info-about-sancho-net-modal",
                 message: (
                   <p style={{ margin: 0 }}>
-                    The SanchoNet GovTool is currently in beta and it connects
-                    to{" "}
+                    {t("system.sanchoNetIsBeta")}
                     <Link
                       onClick={() => openInNewTab("https://sancho.network/")}
                       sx={{ cursor: "pointer" }}
                     >
-                      SanchoNet
+                      {t("system.sanchoNet")}
                     </Link>
                     .
                     <br />
-                    <br /> Please note, this tool uses ‘Test ada’
-                    <span style={{ fontWeight: 700 }}> NOT real ada</span>. All
-                    governance actions and related terms pertain to SanchoNet."
+                    <br />
+                    <Trans
+                      i18nKey="system.testAdaNote"
+                      components={[
+                        <span style={{ fontWeight: 700 }} key="0" />,
+                      ]}
+                    />
                   </p>
                 ),
-                title: "This tool is connected to SanchoNet",
-                buttonText: "Ok",
+                title: t("system.toolConnectedToSanchonet"),
+                buttonText: t("ok"),
               },
             });
             setItemToLocalStorage(SANCHO_INFO_KEY + `_${walletName}`, true);
@@ -1257,7 +1248,7 @@ function useCardano() {
             onSubmit: () => {
               closeModal();
             },
-            title: "Oops!",
+            title: t("modals.common.oops"),
             dataTestId: "wallet-connection-error-modal",
           },
         });

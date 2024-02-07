@@ -1,12 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { Box, CircularProgress, Typography } from "@mui/material";
+import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
-import { useGetAdaHolderVotingPowerQuery, useScreenDimension } from "@hooks";
+import {
+  useGetAdaHolderVotingPowerQuery,
+  useScreenDimension,
+  useGetAdaHolderCurrentDelegationQuery,
+  useTranslation,
+} from "@hooks";
 import { DashboardActionCard } from "@molecules";
 import { useCallback, useMemo, useState } from "react";
-import { useGetAdaHolderCurrentDelegationQuery } from "@hooks";
 import { correctAdaFormat, formHexToBech32, openInNewTab } from "@utils";
 
 export const DashboardCards = () => {
@@ -32,6 +37,7 @@ export const DashboardCards = () => {
     useState<boolean>(false);
   const { votingPower, powerIsLoading } =
     useGetAdaHolderVotingPowerQuery(stakeKey);
+  const { t } = useTranslation();
 
   const retireAsDrep = useCallback(async () => {
     try {
@@ -49,11 +55,10 @@ export const DashboardCards = () => {
           type: "statusModal",
           state: {
             status: "success",
-            title: "Retirement Transaction Submitted!",
-            message:
-              "The confirmation of your retirement might take a bit of time but you can track it using.",
+            title: t("modals.retirement.title"),
+            message: t("modals.retirement.message"),
             link: `https://adanordic.com/latest_transactions`,
-            buttonText: "Go to dashboard",
+            buttonText: t("modals.common.goToDashboard"),
             dataTestId: "retirement-transaction-submitted-modal",
           },
         });
@@ -65,8 +70,8 @@ export const DashboardCards = () => {
         state: {
           status: "warning",
           message: errorMessage,
-          buttonText: "Go to dashboard",
-          title: "Oops!",
+          buttonText: t("modals.common.goToDashboard"),
+          title: t("modals.common.oops"),
           dataTestId: "retirement-transaction-error-modal",
         },
       });
@@ -81,43 +86,41 @@ export const DashboardCards = () => {
   ]);
 
   const delegationDescription = useMemo(() => {
-    const correctAdaRepresentation = (
-      <strong>{correctAdaFormat(votingPower)}</strong>
-    );
+    const correctAdaRepresentation = correctAdaFormat(votingPower);
     if (currentDelegation === dRepID) {
       return (
-        <>
-          You have delegated your voting power of ₳{correctAdaRepresentation} to
-          yourself.
-        </>
+        <Trans
+          i18nKey="dashboard.delegation.toYourself"
+          values={{ ada: correctAdaRepresentation }}
+        />
       );
     } else if (currentDelegation === "drep_always_no_confidence") {
       return (
-        <>
-          You have delegated your voting power of ₳{correctAdaRepresentation}.
-          You are going to vote 'NO' as default.
-        </>
+        <Trans
+          i18nKey="dashboard.delegation.voteNo"
+          values={{ ada: correctAdaRepresentation }}
+        />
       );
     } else if (currentDelegation === "drep_always_abstain") {
       return (
-        <>
-          You have delegated your voting power of ₳{correctAdaRepresentation}.
-          You are going to vote 'ABSTAIN' as default.
-        </>
+        <Trans
+          i18nKey="dashboard.delegation.voteAbstain"
+          values={{ ada: correctAdaRepresentation }}
+        />
       );
     } else if (currentDelegation) {
       return (
-        <>
-          You have delegated your voting power of ₳{correctAdaRepresentation} to
-          a selected DRep.
-        </>
+        <Trans
+          i18nKey="dashboard.delegation.toDRep"
+          values={{ ada: correctAdaRepresentation }}
+        />
       );
     } else {
       return (
-        <>
-          If you want to delegate your own voting power of ₳
-          {correctAdaRepresentation}.
-        </>
+        <Trans
+          i18nKey="dashboard.delegation.delegateOwnPower"
+          values={{ ada: correctAdaRepresentation }}
+        />
       );
     }
   }, [currentDelegation, dRepID, votingPower]);
@@ -137,41 +140,37 @@ export const DashboardCards = () => {
   }, [currentDelegation, dRepID, votingPower]);
 
   const progressDescription = useMemo(() => {
-    const correctAdaRepresentation = (
-      <strong>{correctAdaFormat(votingPower)}</strong>
-    );
+    const correctAdaRepresentation = correctAdaFormat(votingPower);
     if (delegateTo === dRepID) {
       return (
-        <>
-          Your own voting power of ₳{correctAdaRepresentation} is in progress of
-          being delegated. You are going to delegate your voting power to
-          yourself.
-        </>
+        <Trans
+          i18nKey="dashboard.delegation.inProgress.toYourself"
+          values={{ ada: correctAdaRepresentation }}
+        />
       );
     }
     if (delegateTo === "no confidence") {
       return (
-        <>
-          Your own voting power of ₳{correctAdaRepresentation} is in progress of
-          being delegated. You are going to vote ‘NO’ as default.
-        </>
+        <Trans
+          i18nKey="dashboard.delegation.inProgress.voteNo"
+          values={{ ada: correctAdaRepresentation }}
+        />
       );
     }
     if (delegateTo === "abstain") {
       return (
-        <>
-          Your own voting power of ₳{correctAdaRepresentation} is in progress of
-          being delegated. You are going to vote ‘ABSTAIN’ as default.
-        </>
+        <Trans
+          i18nKey="dashboard.delegation.inProgress.voteAbstain"
+          values={{ ada: correctAdaRepresentation }}
+        />
       );
     }
     if (delegateTo) {
       return (
-        <>
-          Your own voting power of ₳{correctAdaRepresentation} is progress of
-          being delegated. You are going to delegate your voting power to a
-          selected DRep.
-        </>
+        <Trans
+          i18nKey="dashboard.delegation.inProgress.toDRep"
+          values={{ ada: correctAdaRepresentation }}
+        />
       );
     }
   }, [delegateTo, dRepID, votingPower]);
@@ -214,24 +213,72 @@ export const DashboardCards = () => {
     formHexToBech32,
   ]);
 
+  const registrationCardDescription = useMemo(() => {
+    if (registerTransaction.transactionHash) {
+      switch (registerTransaction.type) {
+        case "retirement":
+          return t("dashboard.registration.retirementInProgress");
+        case "registration":
+          return t("dashboard.registration.registrationInProgress");
+        default:
+          return t("dashboard.registration.metadataUpdateInProgress");
+      }
+    } else if (dRep?.isRegistered || dRep?.wasRegistered) {
+      return t("dashboard.registration.holdersCanDelegate");
+    } else {
+      return t("dashboard.registration.ifYouWant");
+    }
+  }, [
+    registerTransaction.transactionHash,
+    registerTransaction.type,
+    dRep?.isRegistered,
+    dRep?.wasRegistered,
+  ]);
+
+  const registrationCardTitle = useMemo(() => {
+    if (registerTransaction?.transactionHash) {
+      switch (registerTransaction.type) {
+        case "retirement":
+          return t("dashboard.registration.dRepRetirement");
+        case "registration":
+          return t("dashboard.registration.dRepRegistration");
+        default:
+          return t("dashboard.registration.dRepUpdate");
+      }
+    } else if (dRep?.isRegistered) {
+      return t("dashboard.registration.youAreRegistered");
+    } else if (dRep?.wasRegistered) {
+      return t("dashboard.registration.registerAgain");
+    } else {
+      return t("dashboard.registration.registerAsDRep");
+    }
+  }, [
+    registerTransaction?.transactionHash,
+    registerTransaction.type,
+    dRep?.isRegistered,
+    dRep?.wasRegistered,
+  ]);
+
   const renderGovActionSection = useCallback(() => {
     return (
       <>
         <Typography fontSize={16} fontWeight={600} lineHeight={"24px"} my={3}>
-          See Active Governance Actions
+          {t("dashboard.headingTwo")}
         </Typography>
         <Box display={"flex"}>
           <DashboardActionCard
             dataTestidFirstButton="view-governance-actions-button"
-            description="Review governance actions submitted on-chain."
+            description={t("dashboard.govActions.description")}
             firstButtonAction={() =>
               navigate(PATHS.dashboard_governance_actions)
             }
-            firstButtonLabel={
-              dRep?.isRegistered ? "Review and vote" : "View governance actions"
-            }
+            firstButtonLabel={t(
+              `dashboard.govActions.${
+                dRep?.isRegistered ? "reviewAndVote" : "view"
+              }`
+            )}
             imageURL={IMAGES.govActionListImage}
-            title="View Governance Actions"
+            title={t("dashboard.govActions.title")}
           />
           {screenWidth < 1024 ? null : (
             <>
@@ -261,7 +308,7 @@ export const DashboardCards = () => {
     >
       {dRep?.isRegistered && renderGovActionSection()}
       <Typography fontSize={16} fontWeight={600} lineHeight={"24px"} my={3}>
-        Your Participation
+        {t("dashboard.headingOne")}
       </Typography>
       <Box
         display={"flex"}
@@ -289,8 +336,8 @@ export const DashboardCards = () => {
             delegateTransaction?.transactionHash
               ? ""
               : currentDelegation
-              ? "Change delegation"
-              : "Delegate"
+              ? t("dashboard.delegation.changeDelegation")
+              : t("delegate")
           }
           imageHeight={55}
           imageWidth={65}
@@ -298,7 +345,7 @@ export const DashboardCards = () => {
           imageURL={IMAGES.govActionDelegateImage}
           cardId={displayedDelegationId}
           inProgress={!!delegateTransaction?.transactionHash}
-          cardTitle="DRep you delegated to"
+          cardTitle={t("dashboard.delegation.dRepDelegatedTo")}
           secondButtonAction={
             delegateTransaction?.transactionHash
               ? () => openInNewTab("https://adanordic.com/latest_transactions")
@@ -309,20 +356,18 @@ export const DashboardCards = () => {
           }
           secondButtonLabel={
             delegateTransaction?.transactionHash
-              ? "See transaction"
+              ? t("seeTransaction")
               : currentDelegation
               ? ""
-              : "Learn more"
+              : t("learnMore")
           }
           title={
             delegateTransaction?.transactionHash ? (
-              "Voting Power Delegation"
+              t("dashboard.delegation.votingPowerDelegation")
             ) : currentDelegation ? (
-              <>
-                Your Voting Power <strong>is Delegated</strong>
-              </>
+              <Trans i18nKey="dashboard.delegation.yourVotingPowerIsDelegated" />
             ) : (
-              "Use your Voting Power"
+              t("dashboard.delegation.useYourVotingPower")
             )
           }
         />
@@ -345,19 +390,7 @@ export const DashboardCards = () => {
               ? "change-metadata-button"
               : "register-learn-more-button"
           }
-          description={
-            registerTransaction.transactionHash
-              ? registerTransaction?.type === "retirement"
-                ? "The retirement process is ongoing. This may take several minutes."
-                : registerTransaction?.type === "registration"
-                ? "The registration process is ongoing. This may take several minutes."
-                : "The update DRep metadata is ongoing. This may take several minutes."
-              : dRep?.isRegistered
-              ? "Ada holders can delegate their voting power to you."
-              : dRep?.wasRegistered
-              ? "Ada holders can delegate their voting power to you."
-              : "If you want to directly participate in voting and have other ada holders delegate their voting power to you."
-          }
+          description={registrationCardDescription}
           firstButtonAction={
             dRep?.isRegistered
               ? retireAsDrep
@@ -367,9 +400,11 @@ export const DashboardCards = () => {
           firstButtonLabel={
             registerTransaction?.transactionHash
               ? ""
-              : dRep?.isRegistered
-              ? "Retire as a DRep"
-              : "Register"
+              : t(
+                  `dashboard.registration.${
+                    dRep?.isRegistered ? "retire" : "register"
+                  }`
+                )
           }
           inProgress={!!registerTransaction?.transactionHash}
           imageURL={IMAGES.govActionRegisterImage}
@@ -387,28 +422,16 @@ export const DashboardCards = () => {
           }
           secondButtonLabel={
             registerTransaction?.transactionHash
-              ? "See transaction"
+              ? t("seeTransaction")
               : dRep?.isRegistered
-              ? "Change metadata"
-              : "Learn more"
+              ? t("dashboard.registration.changeMetadata")
+              : t("learnMore")
           }
           cardId={dRep?.isRegistered || dRep?.wasRegistered ? dRepIDBech32 : ""}
           cardTitle={
-            dRep?.isRegistered || dRep?.wasRegistered ? "My DRep ID" : ""
+            dRep?.isRegistered || dRep?.wasRegistered ? t("myDRepId") : ""
           }
-          title={
-            registerTransaction?.transactionHash
-              ? registerTransaction?.type === "retirement"
-                ? "DRep Retirement"
-                : registerTransaction?.type === "registration"
-                ? "DRep Registration"
-                : "DRep Update"
-              : dRep?.isRegistered
-              ? "You are Registered as a DRep"
-              : dRep?.wasRegistered
-              ? "Register Again as a dRep"
-              : "Register as a DRep"
-          }
+          title={registrationCardTitle}
         />
       </Box>
       {!dRep?.isRegistered && renderGovActionSection()}

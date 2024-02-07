@@ -4,13 +4,14 @@ import { Box } from "@mui/material";
 import { IMAGES, PATHS } from "@consts";
 import { useModal } from "@context";
 import { ActionCard } from "@molecules";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
 export const HomeCards = () => {
   const navigate = useNavigate();
   const { openModal } = useModal();
   const { isMobile, screenWidth } = useScreenDimension();
+  const { t } = useTranslation();
 
   return (
     <Box
@@ -37,9 +38,9 @@ export const HomeCards = () => {
         <ActionCard
           dataTestIdFirstButton="delegate-connect-wallet-button"
           dataTestIdSecondButton="delegate-learn-more-button"
-          description="If you want to delegate to a DRep or select a default option."
+          description={t("dashboard.delegation.description")}
           firstButtonAction={() => openModal({ type: "chooseWallet" })}
-          firstButtonLabel="Connect to delegate"
+          firstButtonLabel={t("dashboard.delegation.connectToDelegate")}
           imageHeight={80}
           imageURL={IMAGES.govActionDelegateImage}
           imageWidth={115}
@@ -48,8 +49,8 @@ export const HomeCards = () => {
               "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power"
             )
           }
-          secondButtonLabel="Learn more"
-          title="Use your Voting Power"
+          secondButtonLabel={t("learnMore")}
+          title={t("dashboard.delegation.useYourVotingPower")}
         />
       </Box>
       <Box
@@ -59,9 +60,9 @@ export const HomeCards = () => {
         <ActionCard
           dataTestIdFirstButton="register-connect-wallet-button"
           dataTestIdSecondButton="register-learn-more-button"
-          description="If you want to directly participate in voting and have other ada holders delegate their voting power to you."
+          description={t("dashboard.registration.description")}
           firstButtonAction={() => openModal({ type: "chooseWallet" })}
-          firstButtonLabel="Connect to register"
+          firstButtonLabel={t("dashboard.registration.connectToRegister")}
           imageHeight={80}
           imageURL={IMAGES.govActionRegisterImage}
           imageWidth={70}
@@ -70,8 +71,8 @@ export const HomeCards = () => {
               "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep"
             )
           }
-          secondButtonLabel="Learn more"
-          title="Register as a DRep"
+          secondButtonLabel={t("learnMore")}
+          title={t("dashboard.registration.registerAsDRep")}
         />
       </Box>
       <Box
@@ -80,13 +81,13 @@ export const HomeCards = () => {
       >
         <ActionCard
           dataTestIdFirstButton="move-to-governance-actions-button"
-          description="Review governance actions submitted on-chain."
+          description={t("dashboard.govActions.description")}
           firstButtonAction={() => navigate(PATHS.governance_actions)}
-          firstButtonLabel="View governance actions"
+          firstButtonLabel={t("dashboard.govActions.view")}
           imageHeight={80}
           imageURL={IMAGES.govActionListImage}
           imageWidth={80}
-          title="Governance Actions"
+          title={t("dashboard.govActions.title")}
         />
       </Box>
     </Box>

@@ -7,6 +7,7 @@ import { ICONS, IMAGES, PATHS, NAV_ITEMS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { useScreenDimension } from "@hooks";
 import { openInNewTab } from "@utils";
+import { useTranslation } from "@hooks";
 
 import { DrawerMobile } from "./DrawerMobile";
 
@@ -19,6 +20,7 @@ export const TopNav = ({ isConnectButton = true }) => {
   const { screenWidth, isMobile } = useScreenDimension();
   const { isEnabled, disconnectWallet, stakeKey } = useCardano();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const onScroll = () => {
@@ -104,7 +106,7 @@ export const TopNav = ({ isConnectButton = true }) => {
                     size="extraLarge"
                     variant="contained"
                   >
-                    Connect wallet
+                    {t("wallet.connectWallet")}
                   </Button>
                 </Grid>
               ) : null}
@@ -126,7 +128,7 @@ export const TopNav = ({ isConnectButton = true }) => {
                   }}
                   variant="contained"
                 >
-                  Connect
+                  {t("wallet.connect")}
                 </Button>
               ) : null}
               <IconButton

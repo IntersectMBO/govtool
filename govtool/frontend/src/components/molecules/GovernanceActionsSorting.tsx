@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 
 import { GOVERNANCE_ACTIONS_SORTING } from "@consts";
+import { useTranslation } from "@hooks";
 
 interface Props {
   chosenSorting: string;
@@ -19,6 +20,8 @@ export const GovernanceActionsSorting = ({
   chosenSorting,
   setChosenSorting,
 }: Props) => {
+  const { t } = useTranslation();
+
   return (
     <Box
       display={"flex"}
@@ -36,11 +39,11 @@ export const GovernanceActionsSorting = ({
       <FormControl>
         <Box display="flex" justifyContent="space-between" px={"20px"}>
           <Typography sx={{ fontSize: 14, fontWeight: 500, color: "#9792B5" }}>
-            Sort by
+            {t("sortBy")}
           </Typography>
           <Box sx={{ cursor: "pointer" }} onClick={() => setChosenSorting("")}>
             <Typography fontSize={14} fontWeight={500} color="primary">
-              Clear
+              {t("clear")}
             </Typography>
           </Box>
         </Box>

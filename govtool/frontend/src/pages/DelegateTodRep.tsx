@@ -9,7 +9,7 @@ import {
   DelegateTodRepStepTwo,
   Footer,
 } from "@organisms";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { WALLET_LS_KEY, getItemFromLocalStorage } from "@/utils/localStorage";
 import { useNavigate } from "react-router-dom";
 
@@ -17,6 +17,7 @@ export const DelegateTodRep = () => {
   const [step, setStep] = useState(1);
   const { isMobile } = useScreenDimension();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (
@@ -34,7 +35,7 @@ export const DelegateTodRep = () => {
           imageSRC={ICONS.appLogoIcon}
           imageWidth={isMobile ? undefined : 42}
           imageHeight={isMobile ? 24 : 35}
-          title={"Delegate to DRep"}
+          title={t("delegation.toDRep.title")}
         />
         <Box
           display={"flex"}

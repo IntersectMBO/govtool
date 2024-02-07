@@ -5,8 +5,11 @@ import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import type { WalletOption } from "@molecules";
 import { WalletOptionButton } from "@molecules";
 import { openInNewTab } from "@utils";
+import { useTranslation } from "@hooks";
 
 export function ChooseWalletModal() {
+  const { t } = useTranslation();
+
   const walletOptions: WalletOption[] = useMemo(() => {
     if (!window.cardano) return [];
     const keys = Object.keys(window.cardano);
@@ -15,7 +18,9 @@ export function ChooseWalletModal() {
       const { icon, name, supportedExtensions } = window.cardano[k];
       if (icon && name && supportedExtensions) {
         // Check if the name already exists in resultWallets
-        const isNameDuplicate = resultWallets.some(wallet => wallet.label === name);
+        const isNameDuplicate = resultWallets.some(
+          (wallet) => wallet.label === name
+        );
         // Check if the supportedExtensions array contains an entry with cip === 95
         const isCip95Available = Boolean(
           supportedExtensions?.find((i) => i.cip === 95)
@@ -36,7 +41,7 @@ export function ChooseWalletModal() {
 
   return (
     <ModalWrapper dataTestId="connect-your-wallet-modal">
-      <ModalHeader>Connect your Wallet</ModalHeader>
+      <ModalHeader>{t("wallet.connectYourWallet")}</ModalHeader>
       <ModalContents>
         <Typography
           sx={{
@@ -46,7 +51,7 @@ export function ChooseWalletModal() {
             textAlign: "center",
           }}
         >
-          Choose the wallet you want to connect with:
+          {t("wallet.chooseWallet")}
         </Typography>
         <Box
           sx={{
@@ -65,8 +70,7 @@ export function ChooseWalletModal() {
               fontWeight={600}
               sx={{ textAlign: "center" }}
             >
-              You don't have wallets to connect, install a wallet and refresh
-              the page and try again
+              {t("wallet.noWalletsToConnect")}
             </Typography>
           ) : (
             walletOptions.map(({ icon, label, name, cip95Available }) => {
@@ -91,8 +95,7 @@ export function ChooseWalletModal() {
             textAlign: "center",
           }}
         >
-          Can’t see your wallet? Check what wallets are currently compatible
-          with GovTool{" "}
+          {t("wallet.cantSeeWalletQuestion")}
           <Link
             fontSize={11}
             fontWeight={500}
@@ -103,7 +106,7 @@ export function ChooseWalletModal() {
             }
             sx={{ cursor: "pointer" }}
           >
-            here
+            {t("here")}
           </Link>
           .
         </Typography>

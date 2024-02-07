@@ -3,7 +3,7 @@ import { Box, CircularProgress, Tab, Tabs, styled } from "@mui/material";
 import { useLocation } from "react-router-dom";
 
 import { useCardano } from "@context";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { DataActionsBar } from "@molecules";
 import {
   GovernanceActionsToVote,
@@ -67,6 +67,7 @@ export const DashboardGovernanceActions = () => {
 
   const { dRep, isDrepLoading } = useCardano();
   const { isMobile } = useScreenDimension();
+  const { t } = useTranslation();
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setContent(newValue);
@@ -135,7 +136,7 @@ export const DashboardGovernanceActions = () => {
             >
               <StyledTab
                 data-testid="to-vote-tab"
-                label="To vote"
+                label={t("govActions.toVote")}
                 sx={{
                   textTransform: "none",
                   width: !isMobile ? "auto" : "50%",
@@ -143,7 +144,7 @@ export const DashboardGovernanceActions = () => {
               />
               <StyledTab
                 data-testid="voted-tab"
-                label="Voted"
+                label={t("govActions.voted")}
                 sx={{
                   textTransform: "none",
                   width: !isMobile ? "auto" : "50%",

@@ -10,11 +10,12 @@ grafana_slack_oauth_token := $(shell echo $${GRAFANA_SLACK_OAUTH_TOKEN})
 gtm_id := $(shell echo $${GTM_ID})
 sentry_dsn := $(shell echo $${SENTRY_DSN})
 
+commit := $(shell git rev-parse HEAD)
 branch := $(shell git rev-parse --abbrev-ref HEAD)
 docker ?= docker
 domain := $(shell echo $${DOMAIN:-$(env)-$(cardano_network).govtool.byron.network})
 repo_url ?= 733019650473.dkr.ecr.eu-west-1.amazonaws.com
-tag := $(branch)-$(env)-$(cardano_network)
+tag := $(commit)-$(env)-$(cardano_network)
 
 docker_host := $(domain)
 docker_user := ubuntu
@@ -64,7 +65,7 @@ upload-config: prepare-config
 build-backend:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	$(docker) build --tag $(repo_url)/backend:$(tag) ../../govtool/backend
+	$(docker) build --tag "$(repo_url)/backend:$(tag)" ../../govtool/backend
 
 .PHONY: push-backend
 push-backend:
@@ -79,7 +80,7 @@ build-frontend:
 	@:$(call check_defined, gtm_id)
 	@:$(call check_defined, sentry_dsn)
 	if [[ "$(cardano_network)" = "mainnet" ]]; then NETWORK_FLAG=1; else NETWORK_FLAG=0; fi; \
-	$(docker) build --tag $(repo_url)/frontend:$(tag) \
+	$(docker) build --tag "$(repo_url)/frontend:$(tag)" \
 		--build-arg VITE_BASE_URL="https://$(domain)/api" \
 		--build-arg VITE_GTM_ID="$(gtm_id)" \
 		--build-arg VITE_NETWORK_FLAG="$$NETWORK_FLAG" \

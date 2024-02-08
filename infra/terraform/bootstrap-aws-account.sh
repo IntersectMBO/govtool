@@ -1,7 +1,7 @@
 #!/bin/bash
 
-state_bucket="govtool-terraform-state"
-lock_table="govtool-terraform-locks"
+state_bucket="vva-terraform-state"
+lock_table="vva-terraform-locks"
 region="eu-west-1"
 
 # aws s3api create-bucket --bucket "$state_bucket" --region "$region"

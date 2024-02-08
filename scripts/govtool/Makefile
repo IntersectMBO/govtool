@@ -163,3 +163,17 @@ ssh:
 	@:$(call check_defined, env)
 	export TERM=xterm-256color; \
 	ssh $(ssh_url)
+
+.PHONY: docker
+docker:
+	@:$(call check_defined, cardano_network)
+	@:$(call check_defined, env)
+	@:$(call check_defined, grafana_admin_password)
+	@:$(call check_defined, cmd)
+	export CARDANO_NETWORK=$(cardano_network); \
+	export DOCKER_HOST=ssh://$(ssh_url); \
+	export ENVIRONMENT=$(env); \
+	export GRAFANA_ADMIN_PASSWORD=$(grafana_admin_password); \
+	export TAG=$(tag); \
+	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
+	docker compose -f docker-compose.$(cardano_network).yml -p govtool-$(env)-$(cardano_network) $(cmd)

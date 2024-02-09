@@ -21,4 +21,7 @@ export * from "./Typography";
 export * from "./VotePill";
 export * from "./VotingPowerChips";
 export * from "./Input";
+export * from "./Spacer";
 export * from "./HighlightedText";
+
+export * from "./types";

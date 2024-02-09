@@ -1,27 +1,5 @@
-import {
-  Typography as MUITypography,
-  SxProps,
-  TypographyProps as MUITypographyProps,
-} from "@mui/material";
-
-interface TypographyProps
-  extends Pick<MUITypographyProps, "color" | "lineHeight"> {
-  children?: React.ReactNode;
-  fontSize?: number;
-  fontWeight?: 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
-  variant?:
-    | "headline1"
-    | "headline2"
-    | "headline3"
-    | "headline4"
-    | "headline5"
-    | "title1"
-    | "title2"
-    | "body1"
-    | "body2"
-    | "caption";
-  sx?: SxProps;
-}
+import { Typography as MUITypography } from "@mui/material";
+import { TypographyProps } from "./types";
 
 export const Typography = ({
   color,

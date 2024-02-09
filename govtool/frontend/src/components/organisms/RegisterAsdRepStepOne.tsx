@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Link } from "@mui/material";
 
-import { Button, Input, Typography } from "@atoms";
+import { Button, Spacer, Typography } from "@atoms";
 import { PATHS } from "@consts";
 import {
   useScreenDimension,
@@ -11,6 +11,8 @@ import {
 } from "@hooks";
 import { theme } from "@/theme";
 import { openInNewTab } from "@utils";
+
+import { ControlledField } from ".";
 
 interface Props {
   setStep: Dispatch<SetStateAction<number>>;
@@ -91,22 +93,20 @@ export const RegisterAsdRepStepOne = ({ setStep }: Props) => {
         >
           {t("registration.descriptionStepOne")}
         </Typography>
-        <Input
-          control={control}
-          formFieldName="url"
-          placeholder={t("forms.urlWithInfoPlaceholder")}
+        <ControlledField.Input
+          {...{ control, errors }}
           dataTestId="url-input"
-          errorMessage={errors.url?.message}
-          width={isMobile ? "100%" : "70%"}
+          layoutStyle={{ width: isMobile ? "100%" : "70%" }}
+          name="url"
+          placeholder={t("forms.urlWithInfoPlaceholder")}
         />
-        <Input
-          control={control}
-          formFieldName="hash"
-          placeholder={t("forms.hashPlaceholder")}
+        <Spacer y={6} />
+        <ControlledField.Input
+          {...{ control, errors }}
           dataTestId="hash-input"
-          errorMessage={errors.hash?.message}
-          width={isMobile ? "100%" : "70%"}
-          marginTop="48px"
+          layoutStyle={{ width: isMobile ? "100%" : "70%" }}
+          name="hash"
+          placeholder={t("forms.hashPlaceholder")}
         />
         <Link
           data-testid={"how-to-create-link"}

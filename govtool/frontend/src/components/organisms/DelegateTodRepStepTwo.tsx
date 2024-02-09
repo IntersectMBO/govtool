@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Box, Link } from "@mui/material";
 
-import { Button, Input, LoadingButton, Typography } from "../atoms";
+import { Button, LoadingButton, Typography } from "../atoms";
 import {
   useScreenDimension,
   useDelegateTodRepForm,
@@ -9,6 +9,7 @@ import {
 } from "@hooks";
 import { theme } from "@/theme";
 import { openInNewTab } from "@utils";
+import { ControlledField } from ".";
 
 interface DelegateProps {
   setStep: (newStep: number) => void;
@@ -22,8 +23,13 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
     palette: { boxShadow2 },
   } = theme;
 
-  const { control, delegate, isDelegateButtonDisabled, isDelegationLoading } =
-    useDelegateTodRepForm();
+  const {
+    control,
+    delegate,
+    errors,
+    isDelegateButtonDisabled,
+    isDelegationLoading,
+  } = useDelegateTodRepForm();
 
   const renderDelegateButton = useMemo(() => {
     return (
@@ -85,12 +91,11 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
           {t("delegation.dRepIdDescription")}
         </Typography>
         <Box display="flex" justifyContent="center">
-          <Input
-            control={control}
-            formFieldName="dRepID"
-            placeholder={t("delegation.pasteDRepId")}
+          <ControlledField.Input
+            {...{ control, errors }}
             dataTestId="dRep-id-input"
-            width={"100%"}
+            name="dRepID"
+            placeholder={t("delegation.pasteDRepId")}
           />
         </Box>
         <Link

@@ -2,11 +2,13 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { Box, Link } from "@mui/material";
 
-import { Button, Input, LoadingButton, Radio, Typography } from "@atoms";
+import { Button, LoadingButton, Radio, Spacer, Typography } from "@atoms";
 import { ICONS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { useScreenDimension, useVoteActionForm, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
+
+import { ControlledField } from "../organisms";
 
 export const VoteActionForm = ({
   voteFromEP,
@@ -27,16 +29,16 @@ export const VoteActionForm = ({
   const { t } = useTranslation();
 
   const {
-    setValue,
-    control,
+    areFormErrors,
+    clearErrors,
     confirmVote,
-    vote,
-    registerInput,
+    control,
     errors,
     isDirty,
-    clearErrors,
-    areFormErrors,
     isVoteLoading,
+    registerInput,
+    setValue,
+    vote,
   } = useVoteActionForm();
 
   useEffect(() => {
@@ -199,22 +201,20 @@ export const VoteActionForm = ({
         </Box>
         {isContext && (
           <Box display="flex" flexDirection="column" flex={1}>
-            <Input
-              control={control}
+            <ControlledField.Input
+              {...{ control, errors }}
               dataTestId="url-input"
-              errorMessage={errors.url?.message}
-              formFieldName="url"
+              name="url"
               placeholder={t("forms.urlWithContextPlaceholder")}
-              width="100%"
             />
-            <Input
-              control={control}
+            <Spacer y={1.5} />
+            <ControlledField.Input
+              {...{ control, errors }}
               dataTestId="hash-input"
-              errorMessage={errors.hash?.message}
-              formFieldName="hash"
+              name="hash"
               placeholder={t("forms.hashPlaceholder")}
-              width="100%"
             />
+            <Spacer y={3} />
             <Link
               data-testid="how-to-create-link"
               onClick={() =>

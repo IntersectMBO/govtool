@@ -1,11 +1,6 @@
 import { Button, CircularProgress } from "@mui/material";
-import type { ButtonProps, SxProps } from "@mui/material";
 
-interface Props extends Omit<ButtonProps, "size" | "sx"> {
-  isLoading?: boolean;
-  size?: "small" | "medium" | "large" | "extraLarge";
-  sx?: SxProps;
-}
+import { LoadingButtonProps } from "./types";
 
 export const LoadingButton = ({
   isLoading,
@@ -14,7 +9,7 @@ export const LoadingButton = ({
   size = "large",
   sx,
   ...rest
-}: Props) => {
+}: LoadingButtonProps) => {
   const buttonHeight = {
     extraLarge: 48,
     large: 40,

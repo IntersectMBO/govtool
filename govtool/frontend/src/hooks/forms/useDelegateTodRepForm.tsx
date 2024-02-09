@@ -23,7 +23,11 @@ export const useDelegateTodRepForm = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const { control, handleSubmit } = useForm<DelegateTodrepFormValues>();
+  const {
+    control,
+    formState: { errors },
+    handleSubmit,
+  } = useForm<DelegateTodrepFormValues>();
 
   const watch = useWatch({
     control,
@@ -89,9 +93,10 @@ export const useDelegateTodRepForm = () => {
 
   return {
     control,
-    isDelegateButtonDisabled,
     delegate: handleSubmit(delegate),
-    modal,
+    errors,
+    isDelegateButtonDisabled,
     isDelegationLoading: isLoading,
+    modal,
   };
 };

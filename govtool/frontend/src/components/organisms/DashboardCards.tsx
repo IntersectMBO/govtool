@@ -226,7 +226,7 @@ export const DashboardCards = () => {
     } else if (dRep?.isRegistered || dRep?.wasRegistered) {
       return t("dashboard.registration.holdersCanDelegate");
     } else {
-      return t("dashboard.registration.ifYouWant");
+      return t("dashboard.cards.registerAsDRepDescription");
     }
   }, [
     registerTransaction.transactionHash,
@@ -250,7 +250,7 @@ export const DashboardCards = () => {
     } else if (dRep?.wasRegistered) {
       return t("dashboard.registration.registerAgain");
     } else {
-      return t("dashboard.registration.registerAsDRep");
+      return t("dashboard.cards.registerAsDRepTitle");
     }
   }, [
     registerTransaction?.transactionHash,
@@ -373,18 +373,14 @@ export const DashboardCards = () => {
         />
         <Box width={24} />
         <DashboardActionCard
+          cardId={dRep?.isRegistered || dRep?.wasRegistered ? dRepIDBech32 : ""}
+          cardTitle={
+            dRep?.isRegistered || dRep?.wasRegistered ? t("myDRepId") : ""
+          }
           dataTestidFirstButton={
             dRep?.isRegistered ? "retire-button" : "register-button"
           }
           dataTestidDrepIdBox="my-drep-id"
-          firstButtonVariant={dRep?.isRegistered ? "outlined" : "contained"}
-          secondButtonVariant={
-            registerTransaction?.transactionHash
-              ? "outlined"
-              : dRep?.isRegistered
-              ? "text"
-              : "outlined"
-          }
           dataTestidSecondButton={
             dRep?.isRegistered
               ? "change-metadata-button"
@@ -401,13 +397,16 @@ export const DashboardCards = () => {
             registerTransaction?.transactionHash
               ? ""
               : t(
-                  `dashboard.registration.${
-                    dRep?.isRegistered ? "retire" : "register"
+                  `dashboard.cards.${
+                    dRep?.isRegistered
+                      ? "retireAsDRepFirstButtonLabel"
+                      : "registerAsDRepFirstButtonLabel"
                   }`
                 )
           }
-          inProgress={!!registerTransaction?.transactionHash}
+          firstButtonVariant={dRep?.isRegistered ? "outlined" : "contained"}
           imageURL={IMAGES.govActionRegisterImage}
+          inProgress={!!registerTransaction?.transactionHash}
           secondButtonAction={
             registerTransaction?.transactionHash
               ? () => openInNewTab("https://adanordic.com/latest_transactions")
@@ -427,9 +426,12 @@ export const DashboardCards = () => {
               ? t("dashboard.registration.changeMetadata")
               : t("learnMore")
           }
-          cardId={dRep?.isRegistered || dRep?.wasRegistered ? dRepIDBech32 : ""}
-          cardTitle={
-            dRep?.isRegistered || dRep?.wasRegistered ? t("myDRepId") : ""
+          secondButtonVariant={
+            registerTransaction?.transactionHash
+              ? "outlined"
+              : dRep?.isRegistered
+              ? "text"
+              : "outlined"
           }
           title={registrationCardTitle}
         />

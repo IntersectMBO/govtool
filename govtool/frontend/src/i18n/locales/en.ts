@@ -72,23 +72,27 @@ export const en = {
         title: "Governance Actions",
         view: "View governance actions",
       },
+      cards: {
+        registerAsDRepDescription:
+          "If you want to actively participate in voting and have other Community Members delegate their voting power to you.",
+        registerAsDRepFirstButtonLabel: "Register",
+        registerAsDRepTitle: "Become a DRep",
+        retireAsDRepFirstButtonLabel: "Retire as a DRep",
+      },
       registration: {
         changeMetadata: "Change metadata",
-        connectToRegister: "Connect to register",
         dRepRegistration: "DRep Registration",
         dRepRetirement: "DRep Retirement",
         dRepUpdate: "DRep Update",
-        description:
-          "If you want to directly participate in voting and have other ada holders delegate their voting power to you.",
         holdersCanDelegate:
           "Ada holders can delegate their voting power to you.",
-        ifYouWant:
-          "If you want to directly participate in voting and have other ada holders delegate their voting power to you.",
+        registerAsDRepCardDescription:
+          "If you want to actively participate in voting and have other Community Members delegate their voting power to you.",
         metadataUpdateInProgress:
           "The update DRep metadata is ongoing. This may take several minutes.",
         register: "Register",
         registerAgain: "Register Again as a dRep",
-        registerAsDRep: "Register as a DRep",
+        registerAsDRepCardTitle: "Become a DRep",
         registrationInProgress:
           "The registration process is ongoing. This may take several minutes.",
         retire: "Retire as a DRep",
@@ -214,6 +218,12 @@ export const en = {
       description:
         "Interact with SanchoNet using GovTool - a friendly user\ninterface connected to SanchoNet. You can delegate\nyour voting power (tAda) or become a SanchoNet DRep\nto allow people to delegate voting power to you.",
       headline: "SanchoNet \n Governance Tool",
+    },
+    home: {
+      connectToRegister: "Connect to Register",
+      registerAsDRepCardDescription:
+        "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
+      registerAsDRepCardTitle: "Become a DRep",
     },
     menu: {
       faqs: "FAQs",

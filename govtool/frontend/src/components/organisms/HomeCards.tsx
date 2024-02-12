@@ -60,9 +60,9 @@ export const HomeCards = () => {
         <ActionCard
           dataTestIdFirstButton="register-connect-wallet-button"
           dataTestIdSecondButton="register-learn-more-button"
-          description={t("dashboard.registration.description")}
+          description={t("home.registerAsDRepCardDescription")}
           firstButtonAction={() => openModal({ type: "chooseWallet" })}
-          firstButtonLabel={t("dashboard.registration.connectToRegister")}
+          firstButtonLabel={t("home.connectToRegister")}
           imageHeight={80}
           imageURL={IMAGES.govActionRegisterImage}
           imageWidth={70}
@@ -72,7 +72,7 @@ export const HomeCards = () => {
             )
           }
           secondButtonLabel={t("learnMore")}
-          title={t("dashboard.registration.registerAsDRep")}
+          title={t("home.registerAsDRepCardTitle")}
         />
       </Box>
       <Box

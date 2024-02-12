@@ -1,38 +1,30 @@
 import type { Meta, StoryFn } from "@storybook/react";
 
-import { Input } from "@atoms";
+import { Field } from "@molecules";
 import { ComponentProps } from "react";
 import { userEvent, within } from "@storybook/testing-library";
 import { expect } from "@storybook/jest";
-import { useUrlAndHashFormController } from "@hooks";
 
 const meta = {
   title: "Example/Input",
-  component: Input,
+  component: Field.Input,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof Input>;
+} satisfies Meta<typeof Field.Input>;
 
 export default meta;
 
-const Template: StoryFn<ComponentProps<typeof Input>> = (args) => {
-  const { control } = useUrlAndHashFormController();
-
-  return <Input {...args} control={control} />;
+const Template: StoryFn<ComponentProps<typeof Field.Input>> = (args) => {
+  return <Field.Input placeholder="Placeholder-auto" {...args} />;
 };
 
 export const Default = Template.bind({});
-Default.args = {
-  placeholder: "Enter URL",
-  width: "400px",
-  formFieldName: "url",
-};
 
 Default.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
-  const inputElement = canvas.getByPlaceholderText("Enter URL");
+  const inputElement = canvas.getByPlaceholderText("Placeholder");
   await userEvent.type(inputElement, "test");
   expect(inputElement).toHaveValue("test");
 };
@@ -40,9 +32,6 @@ Default.play = async ({ canvasElement }) => {
 export const WithLabel = Template.bind({});
 WithLabel.args = {
   label: "Label",
-  placeholder: "Enter URL",
-  width: "400px",
-  formFieldName: "url",
 };
 
 WithLabel.play = async ({ canvasElement }) => {
@@ -52,13 +41,22 @@ WithLabel.play = async ({ canvasElement }) => {
 
 export const Error = Template.bind({});
 Error.args = {
-  placeholder: "Enter URL",
-  errorMessage: "Invalid URL format",
-  width: "400px",
-  formFieldName: "url",
+  errorMessage: "Error message",
 };
 
 Error.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
-  expect(canvas.getByTestId("invalid-url-format-error")).toBeInTheDocument();
+  expect(canvas.getByTestId("error-message-error")).toBeInTheDocument();
+};
+
+export const ErrorAndLabel = Template.bind({});
+ErrorAndLabel.args = {
+  errorMessage: "Error message",
+  label: "Label",
+};
+
+ErrorAndLabel.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+  expect(canvas.getByText("Label")).toBeInTheDocument();
+  expect(canvas.getByTestId("error-message-error")).toBeInTheDocument();
 };

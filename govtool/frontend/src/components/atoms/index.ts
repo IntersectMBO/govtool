@@ -13,8 +13,6 @@ export * from "./modal/ModalWrapper";
 export * from "./Radio";
 export * from "./ScrollToManage";
 export * from "./ScrollToTop";
-export * from "./snackbar/Snackbar";
-export * from "./snackbar/SnackbarMessage";
 export * from "./StakeRadio";
 export * from "./Tooltip";
 export * from "./Typography";

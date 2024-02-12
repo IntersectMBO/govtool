@@ -9,7 +9,6 @@ import {
 } from "react";
 import { Snackbar, Alert } from "@mui/material";
 
-import { SnackbarMessage } from "@atoms";
 import { SnackbarSeverity } from "@models";
 import { useScreenDimension, useTranslation } from "@hooks";
 

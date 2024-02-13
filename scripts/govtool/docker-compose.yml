@@ -96,13 +96,13 @@ services:
     image: postgres:15-alpine
     environment:
       - POSTGRES_LOGGING=true
-      - POSTGRES_DB=vva
+      - POSTGRES_DB=govtool
       - POSTGRES_PASSWORD=test
       - POSTGRES_USER=postgres
     volumes:
       - postgres-fakedbsync:/var/lib/postgresql/data
-      - ./vva-be/misc/fakedbsync_users.sql:/docker-entrypoint-initdb.d/00_fakedbsync_users.sql
-      - ./vva-be/misc/schema6.sql:/docker-entrypoint-initdb.d/10_schema6.sql
+      - ../../govtool/backend/misc/fakedbsync_users.sql:/docker-entrypoint-initdb.d/00_fakedbsync_users.sql
+      - ../../govtool/backend/misc/schema6.sql:/docker-entrypoint-initdb.d/10_schema6.sql
     restart: on-failure
     healthcheck:
       # Use pg_isready to check postgres is running. Substitute different
@@ -114,10 +114,10 @@ services:
     command: ${POSTGRES_ARGS:--c maintenance_work_mem=1GB -c max_parallel_maintenance_workers=4}
     logging: *logging
 
-  vva-be:
+  backend:
     build:
-      context: vva-be
-    command: /usr/local/bin/vva-be -c /run/secrets/vva-be-config.json start-app
+      context: ../../govtool/backend
+    command: /usr/local/bin/vva-be -c /run/secrets/backend-config.json start-app
     depends_on:
       # Depend on both services to be healthy before starting.
       cardano-node:
@@ -130,20 +130,20 @@ services:
     # ports:
     #   - ${VVA_BE_PORT:-9876}:9876
     secrets:
-      - vva-be-config.json
+      - backend-config.json
     restart: on-failure
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.vva-be.rule=Host(`${VVA_BE_DOMAIN:-vva-be.localhost}`)"
-      - "traefik.http.routers.vva-be.entrypoints=web"
-      - "traefik.http.services.vva-be.loadbalancer.server.port=9876"
+      - "traefik.http.routers.backend.rule=Host(`${GOVTOOL_BE_DOMAIN:-backend-govtool.localhost}`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.services.backend.loadbalancer.server.port=9876"
 
-  vva-fe:
+  frontend:
     build:
-      context: vva-fe
+      context: ../../govtool/frontend
       args:
-        - VITE_BASE_URL="https://${VA_BE_DOMAIN:-vva-be.localhost}"
+        - VITE_BASE_URL="https://${GOVTOOL_BE_DOMAIN:-backend-govtool.localhost}"
     depends_on:
       # Depend on both services to be healthy before starting.
       cardano-node:
@@ -157,9 +157,9 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.vva-fe.rule=Host(`${VVA_FE_DOMAIN:-vva-fe.localhost}`)"
-      - "traefik.http.routers.vva-fe.entrypoints=web"
-      - "traefik.http.services.vva-fe.loadbalancer.server.port=80"
+      - "traefik.http.routers.frontend.rule=Host(`${GOVTOOL_FE_DOMAIN:-frontend-govtool.localhost}`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
 
 secrets:
   postgres_db:
@@ -168,8 +168,8 @@ secrets:
     file: ./config/secrets/postgres_password
   postgres_user:
     file: ./config/secrets/postgres_user
-  vva-be-config.json:
-    file: ./config/secrets/vva-be-config.json
+  backend-config.json:
+    file: ./config/secrets/backend-config.json
 
 volumes:
   # letsencrypt:

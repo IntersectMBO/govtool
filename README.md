@@ -21,8 +21,8 @@ The SanchoNet GovTool is currently open for beta testing and can be accessed at 
 Learn more; [docs.sanchogov.tools](https://docs.sanchogov.tools/).
 
 ## 📍 Navigation
-- [GovTool Backend](./src/vva-be/README.md)
-- [GovTool Frontend](./src/vva-fe/README.md)
+- [GovTool Backend](./govtool/backend/README.md)
+- [GovTool Frontend](./govtool/frontend/README.md)
 - [Documentation](./docs/)
 - [Tests](./tests/)
 

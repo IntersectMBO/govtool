@@ -1,4 +1,4 @@
-# Voltaire GovTool Frontend
+# GovTool Frontend
 
 Installed on your machine:
 
@@ -16,7 +16,7 @@ Fill .env based on env.example file
 Go to the project directory
 
 ```bash
-  cd voltaire-era/src/vva-fe
+  cd voltaire-era/govtool/frontend
 ```
 
 Install dependencies
@@ -47,10 +47,10 @@ yarn dev
 
 1. Get [Nix](https://nixos.org/download).
 
-2. Enter `src/vva-fe` directory:
+2. Enter `govtool/frontend` directory:
 
 ```sh
-cd src/vva-fe
+cd govtool/frontend
 ```
 
 3. Run `nix-shell`
@@ -75,13 +75,13 @@ Install [`direnv`](https://direnv.net/):
 nix-env -i direnv
 ```
 
-Allow direnv configuration in `src/vva-fe`:
+Allow direnv configuration in `govtool/frontend`:
 
 ```sh
-direnv allow src/vva-fe
+direnv allow govtool/frontend
 ```
 
-From now on, once you enter the `src/vva-fe` the `nix-shell` with proper
+From now on, once you enter the `govtool/frontend` the `nix-shell` with proper
 configuration will be propagated.
 
 ## Developing
@@ -128,9 +128,9 @@ npm run dev
 
 1. Get [Nix](https://nixos.org/download).
 
-2. Enter `src/vva-fe` directory:
+2. Enter `govtool/frontend` directory:
 ```sh
-cd src/vva-fe
+cd govtool/frontend
 ```
 
 3. Run `nix-shell`
@@ -152,12 +152,12 @@ Install [`direnv`](https://direnv.net/):
 nix-env -i direnv
 ```
 
-Allow direnv configuration in `src/vva-fe`:
+Allow direnv configuration in `govtool/frontend`:
 ```sh
-direnv allow src/vva-fe
+direnv allow govtool/frontend
 ```
 
-From now on, once you enter the `src/vva-fe` the `nix-shell` with proper
+From now on, once you enter the `govtool/frontend` the `nix-shell` with proper
 configuration will be propagated.
 
 ### Users

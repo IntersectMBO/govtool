@@ -44,9 +44,9 @@ if [ "$1" == "clean" ]; then
 fi
 
 ## Check if one fo the secrets already exists
-if [[ -f ./secrets/vva_postgres_user ]]
+if [[ -f ./secrets/govtool_postgres_user ]]
 then
-    echo "File  ./secrets/vva_postgres_user already exists."
+    echo "File  ./secrets/govtool_postgres_user already exists."
     echo "Assuming that the secrets were already generated"
     echo "   Use:"
     echo "      > ./gen-configs.sh clean"
@@ -60,9 +60,9 @@ mkdir -p ./secrets;
 
 
 ## save secrets to secrets folder
-echo -n $POSTGRES_USER > ./secrets/vva_postgres_user
-echo -n $POSTGRES_PASSWORD > ./secrets/vva_postgres_password
-echo -n $metrics_api_secret > ./secrets/vva_metrics_api_secret
+echo -n $POSTGRES_USER > ./secrets/govtool_postgres_user
+echo -n $POSTGRES_PASSWORD > ./secrets/govtool_postgres_password
+echo -n $metrics_api_secret > ./secrets/govtool_metrics_api_secret
 
 
 ## loop over templates and updaete them.

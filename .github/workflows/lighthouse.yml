@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-    
+
       - name: Install dependencies
         run: npm install
         working-directory: ./govtool/frontend
@@ -27,7 +27,7 @@ jobs:
         with:
           path: |
             ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('govtool/frontend/package-lock.json', 'tests/vva-fe/package-lock.json') }}
+          key: ${{ runner.os }}-npm-${{ hashFiles('govtool/frontend/package-lock.json', 'tests/govtool-frontend/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
 
@@ -45,7 +45,6 @@ jobs:
         run: |
             lhci assert  --preset "lighthouse:recommended"
 
-            
       - name: Publish reports
         working-directory: ./govtool/frontend
         if: github.repository_owner == 'IntersectMBO'

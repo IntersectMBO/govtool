@@ -217,46 +217,56 @@ export const DashboardCards = () => {
     if (registerTransaction.transactionHash) {
       switch (registerTransaction.type) {
         case "retirement":
-          return t("dashboard.registration.retirementInProgress");
+          return (
+            <Trans
+              i18nKey="dashboard.cards.retirementInProgressDescription"
+              value={{ deposit: correctAdaFormat(dRep?.deposit) }}
+            />
+          );
         case "registration":
-          return t("dashboard.registration.registrationInProgress");
+          return t("dashboard.cards.registrationInProgressDescription");
         default:
-          return t("dashboard.registration.metadataUpdateInProgress");
+          return t("dashboard.cards.changeMetadataInProgressDescription");
       }
-    } else if (dRep?.isRegistered || dRep?.wasRegistered) {
-      return t("dashboard.registration.holdersCanDelegate");
+    } else if (dRep?.isRegistered) {
+      return (
+        <Trans i18nKey="dashboard.cards.youAreRegisteredAsDRepDescription" />
+      );
+    } else if (dRep?.wasRegistered) {
+      return <Trans i18nKey="dashboard.cards.registerAsDRepAgainDescription" />;
     } else {
       return t("dashboard.cards.registerAsDRepDescription");
     }
   }, [
-    registerTransaction.transactionHash,
-    registerTransaction.type,
+    dRep?.deposit,
     dRep?.isRegistered,
     dRep?.wasRegistered,
+    registerTransaction.transactionHash,
+    registerTransaction.type,
   ]);
 
   const registrationCardTitle = useMemo(() => {
     if (registerTransaction?.transactionHash) {
       switch (registerTransaction.type) {
         case "retirement":
-          return t("dashboard.registration.dRepRetirement");
+          return <Trans i18nKey="dashboard.cards.retirementInProgressTitle" />;
         case "registration":
-          return t("dashboard.registration.dRepRegistration");
+          return t("dashboard.cards.registrationInProgressTitle");
         default:
-          return t("dashboard.registration.dRepUpdate");
+          return t("dashboard.cards.changeMetadataInProgressTitle");
       }
     } else if (dRep?.isRegistered) {
-      return t("dashboard.registration.youAreRegistered");
+      return t("dashboard.cards.youAreRegisteredAsDRepTitle");
     } else if (dRep?.wasRegistered) {
-      return t("dashboard.registration.registerAgain");
+      return t("dashboard.cards.registerAsDRepAgainTitle");
     } else {
       return t("dashboard.cards.registerAsDRepTitle");
     }
   }, [
-    registerTransaction?.transactionHash,
-    registerTransaction.type,
     dRep?.isRegistered,
     dRep?.wasRegistered,
+    registerTransaction?.transactionHash,
+    registerTransaction.type,
   ]);
 
   const renderGovActionSection = useCallback(() => {
@@ -373,9 +383,19 @@ export const DashboardCards = () => {
         />
         <Box width={24} />
         <DashboardActionCard
-          cardId={dRep?.isRegistered || dRep?.wasRegistered ? dRepIDBech32 : ""}
+          cardId={
+            dRep?.isRegistered ||
+            (registerTransaction?.transactionHash &&
+              registerTransaction?.type === "retirement")
+              ? dRepIDBech32
+              : ""
+          }
           cardTitle={
-            dRep?.isRegistered || dRep?.wasRegistered ? t("myDRepId") : ""
+            dRep?.isRegistered ||
+            (registerTransaction?.transactionHash &&
+              registerTransaction?.type === "retirement")
+              ? t("dashboard.cards.mrDRep")
+              : ""
           }
           dataTestidFirstButton={
             dRep?.isRegistered ? "retire-button" : "register-button"
@@ -400,6 +420,8 @@ export const DashboardCards = () => {
                   `dashboard.cards.${
                     dRep?.isRegistered
                       ? "retireAsDRepFirstButtonLabel"
+                      : dRep?.wasRegistered
+                      ? "reregisterAsDRepButtonLabel"
                       : "registerAsDRepFirstButtonLabel"
                   }`
                 )
@@ -421,9 +443,11 @@ export const DashboardCards = () => {
           }
           secondButtonLabel={
             registerTransaction?.transactionHash
-              ? t("seeTransaction")
+              ? registerTransaction?.type === "registration"
+                ? t("seeTransaction")
+                : ""
               : dRep?.isRegistered
-              ? t("dashboard.registration.changeMetadata")
+              ? t("dashboard.cards.changeMetadataSecondButtonLabel")
               : t("learnMore")
           }
           secondButtonVariant={

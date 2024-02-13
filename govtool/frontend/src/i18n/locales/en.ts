@@ -73,32 +73,29 @@ export const en = {
         view: "View governance actions",
       },
       cards: {
+        changeMetadataSecondButtonLabel: "Change your DRep details",
+        changeMetadataInProgressDescription:
+          "The update DRep metadata is ongoing. This may take several minutes.",
+        changeMetadataInProgressTitle: "DRep Update",
+        mrDRep: "MrDRep",
+        registerAsDRepAgainDescription:
+          "You are now retired and your listing in the DRep directory as <strong>MrDrep</strong> has been marked as <strong>retired</strong>. You cannot vote on Governance Actions as <strong>MrDrep</strong>.<br><br>You can always re-register as a DRep, in which case you will have the same DRep ID as you had initially.",
+        registerAsDRepAgainTitle: "You have retired as a DRep.",
         registerAsDRepDescription:
           "If you want to actively participate in voting and have other Community Members delegate their voting power to you.",
         registerAsDRepFirstButtonLabel: "Register",
         registerAsDRepTitle: "Become a DRep",
-        retireAsDRepFirstButtonLabel: "Retire as a DRep",
-      },
-      registration: {
-        changeMetadata: "Change metadata",
-        dRepRegistration: "DRep Registration",
-        dRepRetirement: "DRep Retirement",
-        dRepUpdate: "DRep Update",
-        holdersCanDelegate:
-          "Ada holders can delegate their voting power to you.",
-        registerAsDRepCardDescription:
-          "If you want to actively participate in voting and have other Community Members delegate their voting power to you.",
-        metadataUpdateInProgress:
-          "The update DRep metadata is ongoing. This may take several minutes.",
-        register: "Register",
-        registerAgain: "Register Again as a dRep",
-        registerAsDRepCardTitle: "Become a DRep",
-        registrationInProgress:
+        registrationInProgressDescription:
           "The registration process is ongoing. This may take several minutes.",
-        retire: "Retire as a DRep",
-        retirementInProgress:
-          "The retirement process is ongoing. This may take several minutes.",
-        youAreRegistered: "You are Registered as a DRep",
+        registrationInProgressTitle: "DRep registration",
+        reregisterAsDRepButtonLabel: "Re-register as a DRep",
+        retireAsDRepFirstButtonLabel: "Retire as a DRep",
+        retirementInProgressDescription:
+          "You are being retired as <strong>MrDrep</strong>. You will receive a refund of {{deposit}} ADA when the transaction  completes.",
+        retirementInProgressTitle: "DRep retirement",
+        youAreRegisteredAsDRepDescription:
+          "You are now listed in the DRep directory as <strong>MrDrep</strong>. You can vote on Governance Actions with the combined power of your wallet and the delegated power of others. ",
+        youAreRegisteredAsDRepTitle: "You are Registered as a DRep",
       },
     },
     delegation: {

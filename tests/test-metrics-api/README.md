@@ -1,6 +1,6 @@
 # Test Metrics API
 
-This api is intended to be called by Github Action whenever a new commit to vva app has been made and new metrics are obtained. The api expects a POST request with a JSON file of the metrics which will then update the database with the new metrics.
+This api is intended to be called by Github Action whenever a new commit to GovTool app has been made and new metrics are obtained. The api expects a POST request with a JSON file of the metrics which will then update the database with the new metrics.
 
 ## Prerequisite
 

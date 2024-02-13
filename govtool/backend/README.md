@@ -3,7 +3,7 @@
 This is a backend application of GovTool project.
 
 ## Prerequisites
-In order to run `vva-be` your host machine will need access to the `cardano-db-sync` postgres database. To have this database running locally you'll need:
+In order to run `backend` your host machine will need access to the `cardano-db-sync` postgres database. To have this database running locally you'll need:
 * `cardano-node`
 * `cardano-db-sync`
 * PostgreSQL database
@@ -24,10 +24,10 @@ Due to problems with openapi3 package it's hard to build this project with plain
 
 1. Get [Nix](https://nixos.org/download).
 
-2. Enter `src/vva-be` directory:
+2. Enter `govtool/backend` directory:
 
     ```sh
-    cd src/vva-be
+    cd govtool/backend
     ```
 
 3. Allow broken nix packages
@@ -54,3 +54,5 @@ Due to problems with openapi3 package it's hard to build this project with plain
     ```sh
     cabal run vva-be -- --config <YOUR CONFIG FILE> start-app
     ```
+> [!WARNING]
+> In the context of our ongoing project enhancements, it is assumed that the executable previously known as 'vva-be' should be now officially renamed to 'govtool-backend'. This change is necessary for aligning with the updated branding and functional scope of the application and it has to be implemented in the near future as a chore and refactoring ticket. Make sure that the documentation matches the actual name of the executable.

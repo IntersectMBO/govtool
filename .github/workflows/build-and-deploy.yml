@@ -117,7 +117,7 @@ jobs:
       DBSYNC_POSTGRES_DB: "cexplorer"
       DBSYNC_POSTGRES_USER: "postgres"
       DBSYNC_POSTGRES_PASSWORD: "pSa8JCpQOACMUdGb"
-      FAKEDBSYNC_POSTGRES_DB: "vva"
+      FAKEDBSYNC_POSTGRES_DB: "govtool"
       FAKEDBSYNC_POSTGRES_USER: "test"
       FAKEDBSYNC_POSTGRES_PASSWORD: "test"
       GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
@@ -125,7 +125,7 @@ jobs:
       GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
       NGINX_BASIC_AUTH: ${{ secrets.NGINX_BASIC_AUTH }}
       SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
-      TRAEFIK_LE_EMAIL: "admin+vva@binarapps.com"
+      TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -191,7 +191,7 @@ jobs:
       DBSYNC_POSTGRES_DB: "cexplorer"
       DBSYNC_POSTGRES_USER: "postgres"
       DBSYNC_POSTGRES_PASSWORD: "pSa8JCpQOACMUdGb"
-      FAKEDBSYNC_POSTGRES_DB: "vva"
+      FAKEDBSYNC_POSTGRES_DB: "govtool"
       FAKEDBSYNC_POSTGRES_USER: "test"
       FAKEDBSYNC_POSTGRES_PASSWORD: "test"
       GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
@@ -199,7 +199,7 @@ jobs:
       GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
       NGINX_BASIC_AUTH: ${{ secrets.NGINX_BASIC_AUTH }}
       SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
-      TRAEFIK_LE_EMAIL: "admin+vva@binarapps.com"
+      TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

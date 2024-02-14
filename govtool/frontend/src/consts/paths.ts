@@ -16,6 +16,7 @@ export const PATHS = {
   faqs: "/faqs",
   delegateTodRep: "/delegate",
   registerAsdRep: "/register",
+  registerAsSoleVoter: "/register_sole_voter",
   stakeKeys: "/stake_keys",
   updateMetadata: "/update_metadata",
 };

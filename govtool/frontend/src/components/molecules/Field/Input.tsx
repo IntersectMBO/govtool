@@ -1,38 +1,26 @@
 import { Box } from "@mui/material";
 
-import { Input as InputBase, Typography } from "@atoms";
+import { FormErrorMessage, Input as InputBase, Typography } from "@atoms";
 
 import { InputFieldProps } from "./types";
 
 export const Input = ({
   errorMessage,
-  errorStyle,
+  errorStyles,
   label,
-  labelStyle,
-  layoutStyle,
+  labelStyles,
+  layoutStyles,
   ...rest
 }: InputFieldProps) => {
   return (
-    <Box sx={{ width: "100%", ...layoutStyle }}>
+    <Box sx={{ width: "100%", ...layoutStyles }}>
       {label && (
-        <Typography fontWeight={400} variant="body2" {...labelStyle}>
+        <Typography fontWeight={400} variant="body2" {...labelStyles}>
           {label}
         </Typography>
       )}
       <InputBase errorMessage={errorMessage} {...rest} />
-      {errorMessage && (
-        <Typography
-          variant="caption"
-          color="red"
-          data-testid={`${errorMessage
-            .replace(/\s+/g, "-")
-            .toLowerCase()}-error`}
-          sx={{ mt: 0.25 }}
-          {...errorStyle}
-        >
-          {errorMessage}
-        </Typography>
-      )}
+      <FormErrorMessage errorMessage={errorMessage} errorStyles={errorStyles} />
     </Box>
   );
 };

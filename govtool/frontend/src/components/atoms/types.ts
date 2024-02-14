@@ -43,9 +43,11 @@ export type SpacerProps = {
   y?: number;
 };
 
-export type CheckboxProps = MUICheckboxProps & {
+export type CheckboxProps = Omit<MUICheckboxProps, "onChange" | "value"> & {
   dataTestId?: string;
   errorMessage?: string;
+  onChange: (newValue: boolean) => void;
+  value: boolean;
 };
 
 export type FormErrorMessageProps = {

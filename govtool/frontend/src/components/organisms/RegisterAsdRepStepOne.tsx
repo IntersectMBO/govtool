@@ -96,7 +96,7 @@ export const RegisterAsdRepStepOne = ({ setStep }: Props) => {
         <ControlledField.Input
           {...{ control, errors }}
           dataTestId="url-input"
-          layoutStyle={{ width: isMobile ? "100%" : "70%" }}
+          layoutStyles={{ width: isMobile ? "100%" : "70%" }}
           name="url"
           placeholder={t("forms.urlWithInfoPlaceholder")}
         />
@@ -104,7 +104,7 @@ export const RegisterAsdRepStepOne = ({ setStep }: Props) => {
         <ControlledField.Input
           {...{ control, errors }}
           dataTestId="hash-input"
-          layoutStyle={{ width: isMobile ? "100%" : "70%" }}
+          layoutStyles={{ width: isMobile ? "100%" : "70%" }}
           name="hash"
           placeholder={t("forms.hashPlaceholder")}
         />

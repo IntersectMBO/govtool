@@ -13,6 +13,7 @@ import {
 } from "@hooks";
 import { theme } from "@/theme";
 import { correctAdaFormat } from "@utils";
+import { Field } from "../molecules";
 
 interface DelegateProps {
   setStep: (newStep: number) => void;
@@ -166,6 +167,7 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
       mb={isMobile ? 0 : 6}
       height={"100%"}
     >
+      <Field.Checkbox label="Some stuff about what it means to vote on your own behalf. In other words, all of your ADA equates to an equivalent amount of Voting Power." />
       <Box>
         {!isMobile && (
           <Box

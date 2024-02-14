@@ -1,4 +1,4 @@
-import { InputFieldProps } from "@molecules";
+import { CheckboxFieldProps, InputFieldProps } from "@molecules";
 import {
   Control,
   ControllerRenderProps,
@@ -9,9 +9,16 @@ import {
 } from "react-hook-form";
 
 export type ControlledInputProps = InputFieldProps & {
-  name: Path<any>;
   control: Control<any>;
   errors: FieldErrors<any>;
+  name: Path<any>;
+  rules?: Omit<RegisterOptions, "valueAsNumber" | "valueAsDate" | "setValueAs">;
+};
+
+export type ControlledCheckboxProps = CheckboxFieldProps & {
+  control: Control<any>;
+  errors: FieldErrors<any>;
+  name: Path<any>;
   rules?: Omit<RegisterOptions, "valueAsNumber" | "valueAsDate" | "setValueAs">;
 };
 

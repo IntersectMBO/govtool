@@ -1,11 +1,19 @@
-import { BoxProps } from "@mui/material";
+import { BoxProps, TypographyProps as MUITypographyProps } from "@mui/material";
 
-import { InputProps, TypographyProps } from "@atoms";
+import { CheckboxProps, InputProps, TypographyProps } from "@atoms";
 
 export type InputFieldProps = InputProps & {
   errorMessage?: string;
-  errorStyle?: TypographyProps;
+  errorStyles?: MUITypographyProps;
   label?: string;
-  labelStyle?: TypographyProps;
-  layoutStyle?: BoxProps;
+  labelStyles?: TypographyProps;
+  layoutStyles?: BoxProps;
+};
+
+export type CheckboxFieldProps = CheckboxProps & {
+  errorMessage?: string;
+  errorStyles?: MUITypographyProps;
+  label?: string;
+  labelStyles?: TypographyProps;
+  layoutStyles?: BoxProps;
 };

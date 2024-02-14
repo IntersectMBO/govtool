@@ -156,7 +156,7 @@ export const en = {
       privacyPolicy: "Privacy policy",
     },
     forms: {
-      hashPlaceholder: "The hash of your URL",
+      hashPlaceholder: "The hash of metadata at URL",
       howCreateUrlAndHash: "How to create URL and hash?",
       urlWithContextPlaceholder: "Your URL with with your context",
       urlWithInfoPlaceholder: "Your URL with extra info about you",

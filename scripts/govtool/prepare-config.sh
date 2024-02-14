@@ -79,6 +79,7 @@ sed -e "s/GRAFANA_SLACK_RECIPIENT/$GRAFANA_SLACK_RECIPIENT/" \
 
 # nginx config for frontend optional basic auth
 nginx_config_dir="$target_config_dir/nginx"
+rm -rf "$nginx_config_dir"
 mkdir -p "$nginx_config_dir"
 if [[ "$DOMAIN" == *"sanchonet.govtool.byron.network"* ]]; then
   cat >"$nginx_config_dir/auth.conf" <<_EOF_

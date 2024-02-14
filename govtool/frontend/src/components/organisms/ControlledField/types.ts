@@ -15,7 +15,10 @@ export type ControlledInputProps = InputFieldProps & {
   rules?: Omit<RegisterOptions, "valueAsNumber" | "valueAsDate" | "setValueAs">;
 };
 
-export type ControlledCheckboxProps = CheckboxFieldProps & {
+export type ControlledCheckboxProps = Omit<
+  CheckboxFieldProps,
+  "onChange" | "value"
+> & {
   control: Control<any>;
   errors: FieldErrors<any>;
   name: Path<any>;

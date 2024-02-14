@@ -286,6 +286,13 @@ export const en = {
       showAll: "Show all",
       viewAll: "View all",
     },
+    soleVoter: {
+      becomeSoleVoter: "Become a Sole Voter",
+      continueToRegister: "Continue to register",
+      description:
+        "A Sole Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of ADA in their connected wallet. <0>Learn More</0> about Sole Voter.\n\nBecoming a Sole Voter will require a refundable deposit of <strong>₳2</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
+      heading: "What this Means",
+    },
     system: {
       sanchoNet: "SanchoNet",
       sanchoNetIsBeta:
@@ -360,6 +367,7 @@ export const en = {
     back: "Back",
     backToDashboard: "Back to dashboard",
     backToList: "Back to the list",
+    backToDashboard: "Back to dashboard",
     cancel: "Cancel",
     clear: "Clear",
     confirm: "Confirm",

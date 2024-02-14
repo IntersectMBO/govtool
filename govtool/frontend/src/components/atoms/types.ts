@@ -1,5 +1,6 @@
 import {
   ButtonProps as MUIButtonProps,
+  CheckboxProps as MUICheckboxProps,
   InputBaseProps,
   TypographyProps as MUITypographyProps,
 } from "@mui/material";
@@ -40,4 +41,14 @@ export type InputProps = InputBaseProps & {
 export type SpacerProps = {
   x?: number;
   y?: number;
+};
+
+export type CheckboxProps = MUICheckboxProps & {
+  dataTestId?: string;
+  errorMessage?: string;
+};
+
+export type FormErrorMessageProps = {
+  errorMessage?: string;
+  errorStyles?: MUITypographyProps;
 };

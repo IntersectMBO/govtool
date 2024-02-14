@@ -1,9 +1,9 @@
 import { Box } from "@mui/material";
 
-import { Checkbox as CheckboxBase, Typography } from "@atoms";
+import { Checkbox as CheckboxBase, FormErrorMessage, Typography } from "@atoms";
 
 import { CheckboxFieldProps } from "./types";
-import { FormErrorMessage } from "@/components/atoms/FormErrorMessage";
+import { useCallback } from "react";
 
 export const Checkbox = ({
   errorMessage,
@@ -12,18 +12,30 @@ export const Checkbox = ({
   labelStyles,
   layoutStyles,
   onChange,
+  value,
   ...rest
 }: CheckboxFieldProps) => {
+  const handleValue = useCallback(() => {
+    onChange(!value);
+  }, [value]);
+
   return (
     <Box sx={{ width: "100%", ...layoutStyles }}>
       <Box
+        onClick={handleValue}
         sx={{
           alignItems: "center",
+          cursor: "pointer",
           display: "flex",
           flexDirection: "row",
+          width: "fit-content",
         }}
       >
-        <CheckboxBase errorMessage={errorMessage} {...rest} />
+        <CheckboxBase
+          {...{ onChange, value }}
+          errorMessage={errorMessage}
+          {...rest}
+        />
         {label && (
           <Typography variant="caption" {...labelStyles}>
             {label}

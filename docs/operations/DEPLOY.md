@@ -52,3 +52,19 @@ Alternatively you can type `make all instance=$INSTANCE cardano_network=$CARDANO
 
 View the app at `https://${ENVIRONMENT}-${INSTANCE}.govtool.byron.network`.
 Keep in mind that after initial deployment on a new environment, it will take some time for the Cardano node to get in sync.
+
+## Aftermatch
+
+After performing a deploy from a local machine, it is crucial to carefully track
+the application's accessibility and functionality to ensure no unintended
+changes, such as the accidental activation of BasicAuth[^1], have occurred.
+
+Additionally, verifying that all configuration files and environment variables,
+particularly those related to environment-specific settings like database
+connections or external service endpoints, are correctly generated and applied
+is essential for maintaining the intended behavior of the application across
+different environments. This includes a thorough check of environment variables
+to confirm they are correctly set and aligned with the specific needs of the
+deployed environment.
+
+[^1]: https://github.com/IntersectMBO/govtool/discussions/174

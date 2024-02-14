@@ -30,6 +30,7 @@ import {
 } from "@utils";
 import { SetupInterceptors } from "./services";
 import { useGetDRepInfo, useWalletConnectionListener } from "./hooks";
+import { RegisterAsSoleVoter } from "./pages/RegisterAsSoleVoter";
 
 export default function App() {
   const { enable, setDRep, setIsDrepLoading } = useCardano();
@@ -115,6 +116,10 @@ export default function App() {
         </Route>
         <Route path={PATHS.delegateTodRep} element={<DelegateTodRep />} />
         <Route path={PATHS.registerAsdRep} element={<RegisterAsdRep />} />
+        <Route
+          path={PATHS.registerAsSoleVoter}
+          element={<RegisterAsSoleVoter />}
+        />
         <Route path={PATHS.stakeKeys} element={<ChooseStakeKey />} />
         <Route path={PATHS.updateMetadata} element={<UpdatedRepMetadata />} />
         <Route path="*" element={<ErrorPage />} />

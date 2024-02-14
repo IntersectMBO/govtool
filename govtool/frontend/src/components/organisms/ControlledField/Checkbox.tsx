@@ -20,7 +20,7 @@ export const Checkbox = ({
         checked={!!field.value}
         errorMessage={errorMessage}
         name={field.name}
-        onChange={(newValue) => field.onChange(newValue)}
+        onChange={field.onChange}
         value={field.value}
         {...props}
       />

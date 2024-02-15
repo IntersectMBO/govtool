@@ -1,10 +1,11 @@
-export * from "./FormErrorMessage";
 export * from "./ActionRadio";
 export * from "./Background";
 export * from "./Button";
+export * from "./Checkbox";
 export * from "./ClickOutside";
 export * from "./CopyButton";
 export * from "./DrawerLink";
+export * from "./FormErrorMessage";
 export * from "./HighlightedText";
 export * from "./Input";
 export * from "./Link";
@@ -22,7 +23,5 @@ export * from "./Tooltip";
 export * from "./Typography";
 export * from "./VotePill";
 export * from "./VotingPowerChips";
-
-export * from "./checkbox/index";
 
 export * from "./types";

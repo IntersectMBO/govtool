@@ -1,3 +1,4 @@
+import { ChangeEvent } from "react";
 import {
   ButtonProps as MUIButtonProps,
   CheckboxProps as MUICheckboxProps,
@@ -46,7 +47,7 @@ export type SpacerProps = {
 export type CheckboxProps = Omit<MUICheckboxProps, "onChange" | "value"> & {
   dataTestId?: string;
   errorMessage?: string;
-  onChange: (newValue: boolean) => void;
+  onChange: (newValue: ChangeEvent<Element> | boolean) => void;
   value: boolean;
 };
 

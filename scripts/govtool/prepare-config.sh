@@ -7,6 +7,13 @@ config_dir="$repo_root_dir/scripts/govtool/config"
 target_config_dir="$repo_root_dir/scripts/govtool/config/target"
 mkdir -p "$target_config_dir"
 
+# prepare a scripts directory for the DBSync entrypoint
+dbsync_scripts_dir="$target_config_dir/dbsync-scripts"
+mkdir -p "$dbsync_scripts_dir"
+cp "$repo_root_dir/scripts/govtool/dbsync/govtool-entrypoint" "$dbsync_scripts_dir/govtool-entrypoint"
+cp "$repo_root_dir/scripts/govtool/dbsync/govtool-sanchonet" "$dbsync_scripts_dir/govtool-sanchonet"
+cp "$repo_root_dir/scripts/govtool/dbsync/govtool-dbsync" "$dbsync_scripts_dir/govtool-dbsync"
+
 # cardano node config
 cardano_node_config_dir="$target_config_dir/cardano-node"
 mkdir -p "$cardano_node_config_dir"

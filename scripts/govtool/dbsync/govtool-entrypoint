@@ -1,0 +1,81 @@
+#!/nix/store/vqvj60h076bhqj6977caz0pfxs6543nb-bash-5.2-p15/bin/bash
+mkdir -p /configuration
+if [ ! -f /configuration/pgpass ]; then
+  /nix/store/vwp2kcwif9afpcqpm31bxlk9gh3h2r5r-gen-pgpass /run/secrets
+fi
+export PGPASSFILE=/configuration/pgpass
+
+# set up /tmp (override with TMPDIR variable)
+mkdir -p -m 1777 /tmp
+if [[ -z "$NETWORK" ]]; then
+  echo "Connecting to network specified in configuration.yaml"
+  DBSYNC=/nix/store/hjlmcj93mxvl1wqfsmac1pj9rfk106hw-cardano-db-sync-exe-cardano-db-sync-13.2.0.0/bin/cardano-db-sync
+
+  set -euo pipefail
+  if [ ! -z "${RESTORE_SNAPSHOT:-}" ]; then
+SNAPSHOT_BASENAME="$(basename "$RESTORE_SNAPSHOT")"
+RESTORED_MARKER="$SNAPSHOT_BASENAME.restored"
+if [ ! -f "$RESTORED_MARKER" ]; then
+  if [[ "$RESTORE_SNAPSHOT" =~ ^https://.* ]]; then
+    echo "Downloading snapshot $RESTORE_SNAPSHOT ..."
+    /nix/store/6g6s5cqbvk1nw2y2c8lpbn95sk0w24f9-curl-8.2.1-bin/bin/curl -LOC - "$RESTORE_SNAPSHOT"
+
+    /nix/store/6g6s5cqbvk1nw2y2c8lpbn95sk0w24f9-curl-8.2.1-bin/bin/curl -LO "$RESTORE_SNAPSHOT.sha256sum"
+    /nix/store/apn3p2b40xvirn7w740wv2gy330ppib5-coreutils-9.3/bin/sha256sum -c "$SNAPSHOT_BASENAME.sha256sum"
+
+    
+
+    SNAPSHOT="$SNAPSHOT_BASENAME"
+  else
+    SNAPSHOT="$RESTORE_SNAPSHOT"
+  fi
+  rm -f /var/lib/cexplorer/*.lstate
+  /nix/store/1bys3yjgm97yxy91sfy8f5law41fyif9-postgresql-setup.sh --restore-snapshot "$SNAPSHOT" /var/lib/cexplorer
+  touch $RESTORED_MARKER
+  rm -f $SNAPSHOT{,.sha256sum,.asc}
+fi
+fi
+
+
+  if [[ "${DISABLE_LEDGER:-N}" == "Y" ]]; then
+    LEDGER_OPTS="--disable-ledger"
+  else
+    LEDGER_OPTS="--state-dir /var/lib/cexplorer"
+  fi
+
+  exec $DBSYNC --schema-dir /nix/store/4xzm921ryfrvp73j86alrq8rkk14h7s6-schema ${LEDGER_OPTS} $@
+
+elif [[ "$NETWORK" == "mainnet" ]]; then
+  echo "Connecting to network: mainnet"
+  exec /nix/store/85v1wxvwsf487ng3pc0cfw999jzgyf00-cardano-db-sync-mainnet/bin/cardano-db-sync-mainnet
+  echo "Cleaning up"
+
+elif [[ "$NETWORK" == "preprod" ]]; then
+  echo "Connecting to network: preprod"
+  exec /nix/store/3qmpvpl9p1azinz2aqp4rgmhfymn7m2y-cardano-db-sync-preprod/bin/cardano-db-sync-preprod
+  echo "Cleaning up"
+
+elif [[ "$NETWORK" == "preview" ]]; then
+  echo "Connecting to network: preview"
+  exec /nix/store/km8zmilk90kb51q1qg4vf8d72dwb3w7l-cardano-db-sync-preview/bin/cardano-db-sync-preview
+  echo "Cleaning up"
+
+elif [[ "$NETWORK" == "private" ]]; then
+  echo "Connecting to network: private"
+  exec /nix/store/674zfi0nxjxbzmi9lbjm6pfdgdxhnvv2-cardano-db-sync-private/bin/cardano-db-sync-private
+  echo "Cleaning up"
+
+elif [[ "$NETWORK" == "sanchonet" ]]; then
+  echo "Connecting to network: sanchonet"
+  exec /scripts/govtool-sanchonet
+  echo "Cleaning up"
+
+elif [[ "$NETWORK" == "shelley_qa" ]]; then
+  echo "Connecting to network: shelley_qa"
+  exec /nix/store/2dv0dff02yx5cixxiacp2ha70z53hhc3-cardano-db-sync-shelley_qa/bin/cardano-db-sync-shelley_qa
+  echo "Cleaning up"
+
+
+else
+  echo "Managed configuration for network "$NETWORK" does not exist"
+fi

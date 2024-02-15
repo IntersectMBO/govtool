@@ -1,7 +1,7 @@
 import { useId } from "react";
 import { Checkbox as MUICheckbox } from "@mui/material";
 
-import { CheckboxProps } from "../types";
+import { CheckboxProps } from "./types";
 
 export const Checkbox = ({
   dataTestId,

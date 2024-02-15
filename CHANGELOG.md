@@ -9,6 +9,7 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
+- Create Checkbox component. Improve Field and ControlledField [Issue 177](https://github.com/IntersectMBO/govtool/pull/177)
 - Vitest unit tests added for utils functions [Issue 81](https://github.com/IntersectMBO/govtool/issues/81)
 - i18next library added to FE [Issue 80](https://github.com/IntersectMBO/govtool/issues/80)
 

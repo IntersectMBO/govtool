@@ -18,9 +18,7 @@ type DashboardActionCardProps = {
   firstButtonIsLoading?: boolean;
   firstButtonLabel?: string;
   firstButtonVariant?: ButtonProps["variant"];
-  imageHeight?: number;
   imageURL?: string;
-  imageWidth?: number;
   inProgress?: boolean;
   isLoading?: boolean;
   secondButtonAction?: () => void;
@@ -62,17 +60,15 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
 
   return (
     <Box
-      mb={3}
-      p={3}
-      sx={{ boxShadow: `5px 5px 15px 5px ${boxShadow2}` }}
-      borderRadius={3}
-      flex={1}
-      display="flex"
-      flexDirection="column"
       border={inProgress && !isLoading ? 1 : 0}
       borderColor="accentOrange"
+      borderRadius={3}
+      display="flex"
+      flex={1}
+      flexDirection="column"
+      p={3}
       position="relative"
-      maxWidth={440}
+      sx={{ boxShadow: `5px 5px 15px 5px ${boxShadow2}` }}
     >
       {inProgress && !isLoading && (
         <Box

@@ -160,13 +160,9 @@ services:
       - postgres_password
       - postgres_user
       - postgres_db
-    entrypoint:
-      - /scripts/govtool-entrypoint
     volumes:
       - db-sync-data:/var/lib/cexplorer
       - node-ipc:/node-ipc
-      - /home/ubuntu/config/cardano-node:/configuration
-      - /home/ubuntu/config/dbsync-scripts:/scripts
     restart: always
     logging: *logging
 

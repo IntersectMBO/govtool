@@ -20,7 +20,7 @@ AWS is configured with Terraform, but the account needs to be bootstrapped befor
 This has to be done only once per AWS account.
 
 1. Configure AWS CLI with `aws configure` (if you are using a configuration profile, use `aws --profile MYPROFILE configure` and then `export AWS_PROFILE=MYPROFILE`).
-1. Execute `./src/terraform/bootstrap-aws-account.sh` script.
+1. Execute `./infra/terraform/bootstrap-aws-account.sh` script.
 
 ### Infrastructure setup
 
@@ -29,7 +29,7 @@ This has to be done only once per AWS account.
 1. Run `terraform plan` to view changes that would be performed to infrastructure.
 1. Take note of the outputs - they contain ECR repo URLs and app domains.
 
-Note: the Terraform code configures the EC2 instance using `src/terraform/modules/vva-ec2/user_data.sh`. This script is only executed on instance creation.
+Note: the Terraform code configures the EC2 instance using `infra/terraform/modules/govtool-ec2/user_data.sh`. This script is only executed on instance creation.
 
 ## Application deployment
 
@@ -52,3 +52,19 @@ Alternatively you can type `make all instance=$INSTANCE cardano_network=$CARDANO
 
 View the app at `https://${ENVIRONMENT}-${INSTANCE}.govtool.byron.network`.
 Keep in mind that after initial deployment on a new environment, it will take some time for the Cardano node to get in sync.
+
+## Aftermatch
+
+After performing a deploy from a local machine, it is crucial to carefully track
+the application's accessibility and functionality to ensure no unintended
+changes, such as the accidental activation of BasicAuth[^1], have occurred.
+
+Additionally, verifying that all configuration files and environment variables,
+particularly those related to environment-specific settings like database
+connections or external service endpoints, are correctly generated and applied
+is essential for maintaining the intended behavior of the application across
+different environments. This includes a thorough check of environment variables
+to confirm they are correctly set and aligned with the specific needs of the
+deployed environment.
+
+[^1]: https://github.com/IntersectMBO/govtool/discussions/174

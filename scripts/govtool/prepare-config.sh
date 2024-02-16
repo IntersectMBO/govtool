@@ -39,8 +39,8 @@ sed -e "s/FAKEDBSYNC_POSTGRES_DB/$FAKEDBSYNC_POSTGRES_DB/" \
     -e "s/DBSYNC_POSTGRES_USER/$DBSYNC_POSTGRES_USER/" \
     -e "s/DBSYNC_POSTGRES_PASSWORD/$DBSYNC_POSTGRES_PASSWORD/" \
     -e "s|SENTRY_DSN|$SENTRY_DSN_BACKEND|" \
-    "$config_dir/secrets/vva-be-config.json.tpl" \
-    > "$target_config_dir/vva-be-config.json"
+    "$config_dir/secrets/backend-config.json.tpl" \
+    > "$target_config_dir/backend-config.json"
 
 # prometheus config file
 cat >"$target_config_dir/prometheus.yml" <<_EOF_
@@ -48,7 +48,7 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
   external_labels:
-    monitor: 'vva'
+    monitor: 'govtool'
 scrape_configs:
   - job_name: 'traefik'
     scrape_interval: 5s
@@ -79,6 +79,7 @@ sed -e "s/GRAFANA_SLACK_RECIPIENT/$GRAFANA_SLACK_RECIPIENT/" \
 
 # nginx config for frontend optional basic auth
 nginx_config_dir="$target_config_dir/nginx"
+rm -rf "$nginx_config_dir"
 mkdir -p "$nginx_config_dir"
 if [[ "$DOMAIN" == *"sanchonet.govtool.byron.network"* ]]; then
   cat >"$nginx_config_dir/auth.conf" <<_EOF_

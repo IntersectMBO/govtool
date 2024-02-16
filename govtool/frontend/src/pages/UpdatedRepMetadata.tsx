@@ -2,7 +2,7 @@ import { useMemo, useEffect } from "react";
 import { Box, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-import { Background, Input, LoadingButton, Button, Typography } from "@atoms";
+import { Background, Button, LoadingButton, Spacer, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
@@ -10,7 +10,7 @@ import {
   useUpdatedRepMetadataForm,
   useTranslation,
 } from "@hooks";
-import { DashboardTopNav, Footer } from "@organisms";
+import { ControlledField, DashboardTopNav, Footer } from "@organisms";
 import { theme } from "@/theme";
 import { WALLET_LS_KEY, getItemFromLocalStorage, openInNewTab } from "@utils";
 
@@ -117,22 +117,21 @@ export const UpdatedRepMetadata = () => {
               >
                 {t("metadataUpdate.description")}
               </Typography>
-              <Input
-                control={control}
-                formFieldName="url"
-                placeholder={t("forms.urlWithInfoPlaceholder")}
+              <ControlledField.Input
+                {...{ control, errors }}
                 dataTestId="url-input"
-                errorMessage={errors.url?.message}
-                width={isMobile ? "100%" : "70%"}
+                layoutStyles={{ width: isMobile ? "100%" : "70%" }}
+                name="url"
+                placeholder={t("forms.urlWithInfoPlaceholder")}
               />
-              <Input
-                control={control}
-                formFieldName="hash"
-                placeholder={t("forms.hashPlaceholder")}
+              <Spacer y={6} />
+              <ControlledField.Input
+                {...{ control, errors }}
                 dataTestId="hash-input"
                 errorMessage={errors.hash?.message}
-                width={isMobile ? "100%" : "70%"}
-                marginTop="48px"
+                layoutStyles={{ width: isMobile ? "100%" : "70%" }}
+                name="hash"
+                placeholder={t("forms.hashPlaceholder")}
               />
               <Link
                 onClick={() =>

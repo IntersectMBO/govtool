@@ -61,7 +61,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.vva-test-stack == true
+          - node.labels.govtool-test-stack == true
       restart_policy:
         delay: "30s"
       resources:
@@ -77,7 +77,7 @@ services:
       retries: 5
 
   metrics_api:
-    image: voltaire-era/vva-metrics-api
+    image: voltaire-era/govtool-metrics-api
     build:
       context: ../test-metrics-api
 
@@ -98,7 +98,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.vva-test-stack == true
+          - node.labels.govtool-test-stack == true
       restart_policy:
         delay: "30s"
       resources:
@@ -122,7 +122,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.vva-test-stack == true
+          - node.labels.govtool-test-stack == true
       restart_policy:
         delay: "30s"
       resources:
@@ -132,18 +132,18 @@ services:
           memory: 300M
 
   governance-action-loader-ui:
-    image: voltaire-era/vva-governance-action-loader
+    image: voltaire-era/govtool-governance-action-loader
     build:
       context: ../../src/gov-action-loader-fe
       dockerfile: Dockerfile
     environment:
-      VIRTUAL_HOST: https://vva-governance.${BASE_DOMAIN}
+      VIRTUAL_HOST: https://govtool-governance.${BASE_DOMAIN}
     networks:
       - frontend
     deploy:
       placement:
         constraints:
-          - node.labels.vva-test-stack == true
+          - node.labels.govtool-test-stack == true
       restart_policy:
         delay: "30s"
       resources:
@@ -153,7 +153,7 @@ services:
           memory: 100M
 
   governance-action-loader-api:
-    image: voltaire-era/vva-kuber-proposal-loader-proxy
+    image: voltaire-era/govtool-kuber-proposal-loader-proxy
     build:
       context: ../../src/gov-action-loader-be
       dockerfile: Dockerfile
@@ -162,14 +162,14 @@ services:
       KUBER_API_KEY: ""
       BLOCKFROST_API_URL: "${BLOCKFROST_API_URL}"
       BLOCKFROST_PROJECT_ID: "${BLOCKFROST_PROJECT_ID}"
-      VIRTUAL_HOST: https://vva-governance.${BASE_DOMAIN}/api/ -> /api/
+      VIRTUAL_HOST: https://govtool-governance.${BASE_DOMAIN}/api/ -> /api/
     networks:
       - default
       - frontend
     deploy:
       placement:
         constraints:
-          - node.labels.vva-test-stack == true
+          - node.labels.govtool-test-stack == true
       restart_policy:
         delay: "30s"
       resources:
@@ -196,7 +196,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.vva-test-stack == true
+          - node.labels.govtool-test-stack == true
       restart_policy:
         delay: 15s
       resources:
@@ -225,7 +225,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.vva-test-stack == true
+          - node.labels.govtool-test-stack == true
       restart_policy:
         condition: on-failure
         delay: 15s
@@ -241,7 +241,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.vva-test-stack == true
+          - node.labels.govtool-test-stack == true
       restart_policy:
         delay: "30s"
 

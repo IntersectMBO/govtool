@@ -22,3 +22,5 @@ export * from "./Slider";
 export * from "./StatusModal";
 export * from "./TopNav";
 export * from "./VotingPowerModal";
+
+export * from "./ControlledField";

@@ -39,7 +39,7 @@ then
 elif [ "$1" == "finalize" ]
 then
     ## apply the environment to compose file
-    ## deploy the vva test infrastructure stack
+    ## deploy the govtool test infrastructure stack
     envsubst < ./docker-compose.yml  > ./docker-compose-rendered.yml
     docker stack deploy -c './docker-compose-rendered.yml' ${STACK_NAME}
 else

@@ -8,7 +8,7 @@ on:
 
 jobs:
   execute_sonar_scanner:
-    name: Execute sonar-scanner on vva-fe
+    name: Execute sonar-scanner on govtool frontend
     runs-on: ubuntu-latest
     permissions: read-all
     steps:

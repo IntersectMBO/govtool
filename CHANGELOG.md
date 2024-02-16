@@ -9,6 +9,7 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
+- Add Sole Voter card [Issue 141](https://github.com/IntersectMBO/govtool/issues/141)
 - Vitest unit tests added for utils functions [Issue 81](https://github.com/IntersectMBO/govtool/issues/81)
 - i18next library added to FE [Issue 80](https://github.com/IntersectMBO/govtool/issues/80)
 

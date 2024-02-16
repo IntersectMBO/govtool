@@ -4,6 +4,8 @@ export const IMAGES = {
   bgBlue: "/images/BGBlue.png",
   bgOrange: "/images/BGOrange.png",
   errorPageImage: "/images/ErrorPageImage.png",
+  heroImage: "/images/HeroImage.png",
+  soleVoterImage: "/images/GovActionsSoleVoter.png",
   govActionDefaultImage: "/images/GovActionDefault.png",
   govActionDelegateImage: "/images/GovActionDelegate.png",
   govActionListImage: "/images/GovActionList.png",

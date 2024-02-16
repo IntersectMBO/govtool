@@ -3,6 +3,7 @@ export const IMAGES = {
   appLogoWithoutText: "/images/AppLogoWithoutText.png",
   errorPageImage: "/images/ErrorPageImage.png",
   heroImage: "/images/HeroImage.png",
+  soleVoterImage: "/images/GovActionsSoleVoter.png",
   govActionDelegateImage: "/images/GovActionDelegate.png",
   govActionRegisterImage: "/images/GovActionRegister.png",
   govActionListImage: "/images/GovActionList.png",

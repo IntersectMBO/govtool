@@ -72,6 +72,11 @@ export const en = {
         title: "Governance Actions",
         view: "View governance actions",
       },
+      cards: {
+        registerAsSoleVoterTitle: "Become a Sole Voter",
+        registerAsSoleVoterDescription:
+          "Vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>",
+      },
       registration: {
         changeMetadata: "Change metadata",
         connectToRegister: "Connect to register",

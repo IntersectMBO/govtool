@@ -1,3 +1,0 @@
-#!/nix/store/vqvj60h076bhqj6977caz0pfxs6543nb-bash-5.2-p15/bin/bash
-set -euo pipefail
-/scripts/govtool-dbsync $@

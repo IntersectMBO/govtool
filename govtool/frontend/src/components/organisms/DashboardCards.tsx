@@ -31,7 +31,7 @@ export const DashboardCards = () => {
   const navigate = useNavigate();
   const { currentDelegation, isCurrentDelegationLoading } =
     useGetAdaHolderCurrentDelegationQuery(stakeKey);
-  const { screenWidth, isMobile } = useScreenDimension();
+  const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const [isRetirementLoading, setIsRetirementLoading] =
     useState<boolean>(false);

@@ -246,8 +246,6 @@ jobs:
           curl -X POST -u "admin:$GRAFANA_ADMIN_PASSWORD" https://$DOMAIN/grafana/api/admin/provisioning/dashboards/reload
           curl -X POST -u "admin:$GRAFANA_ADMIN_PASSWORD" https://$DOMAIN/grafana/api/admin/provisioning/notifications/reload
       - name: Notify on Slack
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_SLACK_WEBHOOK_URL }}
         run: |
           if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
           if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;

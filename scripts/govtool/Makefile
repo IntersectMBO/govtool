@@ -155,7 +155,7 @@ info:
 notify:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	curl -X POST -H 'Content-type: application/json' --data '{"host":"$(docker_host)","branch":"$(branch)","env":"$(env)","commit":"$(shell git rev-parse HEAD)"}' $$SLACK_WEBHOOK_URL
+	curl -X POST -H "Authorization: Bearer $$GRAFANA_SLACK_OAUTH_TOKEN" -d "channel=$$GRAFANA_SLACK_RECIPIENT" -d "text=The deploy to $(env) has been made from branch $(branch) ($(shell git-rev-parse HEAD))" https://slack.com/api/chat.postMessage
 
 .PHONY: ssh
 ssh:

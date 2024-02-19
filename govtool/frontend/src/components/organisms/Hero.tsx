@@ -1,10 +1,13 @@
-import { Box } from "@mui/material";
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { Trans } from "react-i18next";
+import { Box, Link } from "@mui/material";
 
 import { Button, Typography } from "@atoms";
 import { IMAGES, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
+import { openInNewTab } from "@utils";
 
 export const Hero = () => {
   const { isEnabled } = useCardano();
@@ -22,6 +25,12 @@ export const Hero = () => {
       : screenWidth < 1920
       ? 600
       : 720;
+
+  const onClickVotingPower = useCallback(
+    () =>
+      openInNewTab("https://docs.sanchogov.tools/faqs/what-is-voting-power"),
+    []
+  );
 
   return (
     <Box
@@ -44,10 +53,29 @@ export const Hero = () => {
         </Typography>
         <Typography
           fontWeight={400}
-          sx={{ my: 4, ...(isMobile ? {} : { whiteSpace: "pre-line" }) }}
+          sx={{
+            maxWidth: 630,
+            my: 4,
+            ...(isMobile ? {} : { whiteSpace: "pre-line" }),
+          }}
           variant={isMobile ? "body2" : "title2"}
         >
-          {t("hero.description")}
+          <Trans
+            i18nKey={
+              screenWidth < 1024
+                ? "hero.description.mobile"
+                : "hero.description.wide"
+            }
+            components={[
+              <Link
+                data-testid="voting-power-link"
+                onClick={onClickVotingPower}
+                sx={{
+                  cursor: "pointer",
+                }}
+              ></Link>,
+            ]}
+          ></Trans>
         </Typography>
         <Button
           data-testid="hero-connect-wallet-button"

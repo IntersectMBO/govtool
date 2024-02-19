@@ -73,9 +73,13 @@ export const en = {
         view: "View governance actions",
       },
       cards: {
+        retire: "Retire",
+        youAreSoleVoterTitle: "You are a Sole Voter",
+        youAreSoleVoterDescription:
+          "Your Voting Power of ₳<strong>{{votingPower}}</strong> can be used to vote.",
         registerAsSoleVoterTitle: "Become a Sole Voter",
         registerAsSoleVoterDescription:
-          "Vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>",
+          "Vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>.",
       },
       registration: {
         changeMetadata: "Change metadata",
@@ -311,11 +315,15 @@ export const en = {
       viewAll: "View all",
     },
     soleVoter: {
+      retireSoleVoter: "Retire as a Sole Voter",
       becomeSoleVoter: "Become a Sole Voter",
       continueToRegister: "Continue to register",
       description:
         "A Sole Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of ADA in their connected wallet. <0>Learn More</0> about Sole Voter.\n\nBecoming a Sole Voter will require a refundable deposit of <strong>₳2</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
       heading: "What this Means",
+      retirementHeading: "What Retirement Means",
+      retirementDescription:
+        "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of <strong>{{deposit}} ADA</strong> will be refunded.\n\nYou can at any time in the future re-register to become a Sole Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\n<0>These options are listed in our Guides here:</0> <1>Voting options and Roles</1>",
     },
     system: {
       sanchoNet: "SanchoNet",

@@ -27,6 +27,7 @@ export const DashboardCards = () => {
     isPendingTransaction,
     registerTransaction,
     stakeKey,
+    soleVoter,
   } = useCardano();
   const navigate = useNavigate();
   const { currentDelegation, isCurrentDelegationLoading } =
@@ -271,12 +272,12 @@ export const DashboardCards = () => {
     </Box>
   ) : (
     <Box
+      columnGap={3}
       display="grid"
-      rowGap={3}
-      columnGap={4}
       gridTemplateColumns={screenWidth < 1024 ? "1fr" : "1fr 1fr"}
       px={screenWidth < 1024 ? 2 : screenWidth < 1440 ? 5 : 4}
       py={3}
+      rowGap={4}
     >
       {/* DELEGATION CARD */}
       <DashboardActionCard
@@ -400,18 +401,35 @@ export const DashboardCards = () => {
       {/* DREP CARD END*/}
       {/* SOLE VOTER CARD */}
       <DashboardActionCard
-        dataTestidFirstButton="register-as-sole-voter-button"
-        firstButtonVariant="contained"
-        secondButtonVariant="outlined"
+        dataTestidFirstButton={
+          soleVoter?.isRegistered
+            ? "retire-as-sole-voter-button"
+            : "register-as-sole-voter-button"
+        }
         dataTestidSecondButton="learn-more-button"
         description={
           <Trans
-            i18nKey="dashboard.cards.registerAsSoleVoterDescription"
-            values={{ votingPower }}
+            i18nKey={
+              soleVoter?.isRegistered
+                ? "dashboard.cards.youAreSoleVoterDescription"
+                : "dashboard.cards.registerAsSoleVoterDescription"
+            }
+            values={{ votingPower: correctAdaFormat(votingPower) }}
           />
         }
-        firstButtonAction={() => navigateTo(PATHS.registerAsSoleVoter)}
-        firstButtonLabel={t("dashboard.registration.register")}
+        firstButtonAction={() =>
+          navigateTo(
+            soleVoter?.isRegistered
+              ? PATHS.retireAsSoleVoter
+              : PATHS.registerAsSoleVoter
+          )
+        }
+        firstButtonLabel={t(
+          soleVoter?.isRegistered
+            ? "dashboard.cards.retire"
+            : "dashboard.registration.register"
+        )}
+        firstButtonVariant={soleVoter?.isRegistered ? "outlined" : "contained"}
         imageURL={IMAGES.soleVoterImage}
         secondButtonAction={() =>
           openInNewTab(
@@ -419,7 +437,12 @@ export const DashboardCards = () => {
           )
         }
         secondButtonLabel={t("learnMore")}
-        title={t("dashboard.cards.registerAsSoleVoterTitle")}
+        secondButtonVariant="outlined"
+        title={t(
+          soleVoter?.isRegistered
+            ? "dashboard.cards.youAreSoleVoterTitle"
+            : "dashboard.cards.registerAsSoleVoterTitle"
+        )}
       />
       {/* REGISTARTION AS SOLE VOTER CARD END*/}
       {/* GOV ACTIONS LIST CARD */}

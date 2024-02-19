@@ -1,90 +1,56 @@
-import { useId } from "react";
-import { Control, Controller } from "react-hook-form";
-import { Box, InputBase, InputBaseProps } from "@mui/material";
+import {
+  forwardRef,
+  useCallback,
+  useId,
+  useImperativeHandle,
+  useRef,
+} from "react";
+import { InputBase } from "@mui/material";
 
-import { Typography } from ".";
+import { InputProps } from "./types";
 
-interface Props extends InputBaseProps {
-  control: Control<any>;
-  formFieldName: string;
-  label?: string;
-  errorMessage?: string;
-  dataTestId?: string;
-  placeholder?: string;
-  width?: string;
-  marginTop?: string;
-  marginBottom?: string;
-}
+export const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ errorMessage, dataTestId, onBlur, onFocus, sx, ...rest }, ref) => {
+    const id = useId();
+    const inputRef = useRef<HTMLInputElement>(null);
 
-export const Input = ({
-  control,
-  formFieldName,
-  errorMessage,
-  label,
-  placeholder,
-  disabled,
-  type = "text",
-  width,
-  marginTop,
-  marginBottom,
-  dataTestId,
-  ...rest
-}: Props) => {
-  const id = useId();
+    const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+      onFocus?.(e);
+      inputRef.current?.focus();
+    }, []);
 
-  return (
-    <Controller
-      control={control}
-      name={formFieldName}
-      render={({ field: { onChange } }) => (
-        <Box
-          width={width}
-          display="flex"
-          flexDirection="column"
-          sx={{ marginTop, marginBottom }}
-        >
-          {label && (
-            <Typography
-              variant="caption"
-              sx={{ height: "20px", marginBottom: "5px", fontSize: "16px" }}
-            >
-              {label}
-            </Typography>
-          )}
-          <InputBase
-            inputProps={{ "data-testid": dataTestId }}
-            onChange={onChange}
-            disabled={disabled}
-            id={id}
-            placeholder={placeholder}
-            type={type}
-            sx={{
-              border: 1,
-              bgcolor: "white",
-              padding: "8px 16px",
-              backgroundColor: errorMessage ? "inputRed" : "transparent",
-              borderColor: errorMessage ? "red" : "secondaryBlue",
-              borderRadius: 50,
-              width: "100%",
-            }}
-            {...rest}
-          />
-          <Box sx={{ height: "20px" }}>
-            {errorMessage && (
-              <Typography
-                variant="caption"
-                color="red"
-                sx={{ height: "20px", marginTop: "2px" }}
-                data-testid={`${errorMessage
-                  .replace(/\s+/g, "-")
-                  .toLowerCase()}-error`}
-              >
-                {errorMessage}
-              </Typography>
-            )}
-          </Box>
-        </Box>
-      )}
-    />
-  );
-};
+    const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+      onBlur?.(e);
+      inputRef.current?.blur();
+    }, []);
+
+    useImperativeHandle(
+      ref,
+      () =>
+        ({
+          focus: handleFocus,
+          blur: handleBlur,
+          ...inputRef.current,
+        } as unknown as HTMLInputElement),
+      [handleBlur, handleFocus]
+    );
+
+    return (
+      <InputBase
+        id={id}
+        inputProps={{ "data-testid": dataTestId }}
+        inputRef={inputRef}
+        sx={{
+          backgroundColor: errorMessage ? "inputRed" : "transparent",
+          border: 1,
+          borderColor: errorMessage ? "red" : "secondaryBlue",
+          borderRadius: 50,
+          padding: "8px 16px",
+          width: "100%",
+          ...sx,
+        }}
+        {...rest}
+      />
+    );
+  }
+);

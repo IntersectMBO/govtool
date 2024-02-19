@@ -683,7 +683,7 @@ function CardanoProvider(props: Props) {
           )
           .pool_deposit(BigNum.from_str(String(protocolParams.pool_deposit)))
           .key_deposit(BigNum.from_str(String(protocolParams.key_deposit)))
-          .coins_per_utxo_word(
+          .coins_per_utxo_byte(
             BigNum.from_str(String(protocolParams.coins_per_utxo_size))
           )
           .max_value_size(protocolParams.max_val_size)

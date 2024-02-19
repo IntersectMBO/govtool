@@ -1,14 +1,5 @@
-import {
-  Button as MUIButton,
-  ButtonProps as MUIButtonProps,
-  SxProps,
-} from "@mui/material";
-
-interface ButtonProps extends Omit<MUIButtonProps, "size" | "sx" | "variant"> {
-  size?: "small" | "medium" | "large" | "extraLarge";
-  variant?: "contained" | "outlined" | "text";
-  sx?: SxProps;
-}
+import { Button as MUIButton } from "@mui/material";
+import { ButtonProps } from ".";
 
 export const Button = ({
   size = "large",

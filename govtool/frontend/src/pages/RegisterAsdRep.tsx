@@ -37,25 +37,17 @@ export const RegisterAsdRep = () => {
 
   return (
     <Background isReverted>
-      <Box display={"flex"} minHeight={"100vh"} flexDirection="column">
+      <Box display="flex" flexDirection="column" minHeight="100vh">
         <DashboardTopNav
           imageSRC={ICONS.appLogoIcon}
           imageWidth={isMobile ? undefined : 42}
           imageHeight={isMobile ? 24 : 35}
-          title={t("registration.registerAsDRep")}
+          title={t("registration.becomeADRep")}
         />
-        <Box
-          display={"flex"}
-          justifyContent={"center"}
-          mt={isMobile ? 0 : 7}
-          height={isMobile ? "100%" : "auto"}
-          sx={{ marginTop: isMobile ? "97px" : "153px" }}
-        >
-          <FormProvider {...registerAsdRepFormMethods}>
-            {step === 1 && <RegisterAsdRepStepOne setStep={setStep} />}
-            {step === 2 && <RegisterAsdRepStepTwo setStep={setStep} />}
-          </FormProvider>
-        </Box>
+        <FormProvider {...registerAsdRepFormMethods}>
+          {step === 1 && <RegisterAsdRepStepOne setStep={setStep} />}
+          {step === 2 && <RegisterAsdRepStepTwo setStep={setStep} />}
+        </FormProvider>
         {isMobile && <Footer />}
       </Box>
     </Background>

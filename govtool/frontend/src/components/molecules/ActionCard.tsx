@@ -94,7 +94,6 @@ export const ActionCard: FC<ActionCardProps> = ({ ...props }) => {
           <Button
             data-testid={dataTestIdFirstButton}
             onClick={firstButtonAction}
-            size="large"
             sx={{
               width: MOBILE_AND_WIDE_CONDITION ? "100%" : "auto",
             }}

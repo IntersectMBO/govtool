@@ -1,8 +1,9 @@
-{ pkgs ? (import ./sources.nix).pkgs
-, ghcVersion ? "ghc927"
-}:
+{ pkgs ? (import ./sources.nix).pkgs }:
 let
-  additionalTools = drv: pkgs.haskell.lib.addBuildTools drv (with pkgs.haskell.packages."${ghcVersion}";
+  # This is the version of the Haskell compiler we reccommend using.
+  ghcPackages = pkgs.haskell.packages.ghc927;
+
+  additionalTools = drv: pkgs.haskell.lib.addBuildTools drv (with ghcPackages;
     [
       cabal-install
       haskell-language-server
@@ -12,7 +13,7 @@ let
       zlib
     ]);
 
-  project = pkgs.haskell.packages."${ghcVersion}".developPackage {
+  project = ghcPackages.developPackage {
     root = ./.;
     modifier = additionalTools;
     overrides = self: super: { openapi3 = pkgs.haskell.lib.dontCheck super.openapi3; };

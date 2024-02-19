@@ -1,3 +1,4 @@
+export * from "./BgCard";
 export * from "./ChooseStakeKeyPanel";
 export * from "./ChooseWalletModal";
 export * from "./DashboardCards";

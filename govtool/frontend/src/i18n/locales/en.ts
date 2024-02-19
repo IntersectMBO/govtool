@@ -269,15 +269,15 @@ export const en = {
       },
     },
     registration: {
-      descriptionStepOne:
-        "You can include extra information about yourself by adding a URL and its hash.",
+      rolesAndResponsibilitiesTitle: "Roles & Responsibilities",
+      rolesAndResponsibilitiesDescription:
+        "DReps are fundamental users that govern the Cardano network. This is an important role which requires work and dedication to fulfil.\n\nA DRep is expected to actively participate in governance and act as a representative of other Cardano members in  governance matters. Therefore, DReps will be expected to keep abreast of Governance Actions so they can make informed and wise decisions.\n<0>Learn More</0> about DRep.\n\nPlease register as a DRep if you have time to dedicate to making Cardano a better and more well-governed place.\n\nBecoming a DRep will require a refundable deposit of ₳<strong>{{deposit}}</strong>.\n\nYou will be refunded your deposit when you retire.",
       descriptionStepTwo:
         "By clicking register you create your DRep ID within your wallet and become a DRep.\n\nOnce the registration has completed your DRep ID will be shown on your dashboard. You will be able to share your DRep ID so that other ada holders can delegate their voting power to you.",
-      headingStepOne: "Add Information",
       headingStepTwo: "Confirm DRep registration",
       optional: "OPTIONAL",
       register: "Register",
-      registerAsDRep: "Register as a DRep",
+      becomeADRep: "Become a DRep",
     },
     slider: {
       showAll: "Show all",
@@ -355,6 +355,7 @@ export const en = {
     },
     abstain: "Abstain",
     back: "Back",
+    backToDashboard: "Back to dashboard",
     backToList: "Back to the list",
     cancel: "Cancel",
     clear: "Clear",

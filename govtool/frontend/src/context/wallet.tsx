@@ -100,6 +100,8 @@ interface CardanoContext {
   isEnableLoading: string | null;
   error?: string;
   dRep: DRepInfo | undefined;
+  soleVoter: DRepInfo | undefined;
+  setSoleVoter: (key: undefined | DRepInfo) => void;
   isEnabled: boolean;
   pubDRepKey: string;
   dRepID: string;
@@ -168,6 +170,11 @@ function CardanoProvider(props: Props) {
   const [isEnabled, setIsEnabled] = useState(false);
   const [isEnableLoading, setIsEnableLoading] = useState<string | null>(null);
   const [dRep, setDRep] = useState<DRepInfo | undefined>(undefined);
+  const [soleVoter, setSoleVoter] = useState<DRepInfo | undefined>({
+    deposit: 4000000,
+    isRegistered: false,
+    wasRegistered: false,
+  });
   const [walletApi, setWalletApi] = useState<CardanoApiWallet | undefined>(
     undefined
   );
@@ -1147,6 +1154,8 @@ function CardanoProvider(props: Props) {
       isDrepLoading,
       setIsDrepLoading,
       isEnableLoading,
+      soleVoter,
+      setSoleVoter,
     }),
     [
       address,
@@ -1180,6 +1189,8 @@ function CardanoProvider(props: Props) {
       isDrepLoading,
       setIsDrepLoading,
       isEnableLoading,
+      soleVoter,
+      setSoleVoter,
     ]
   );
 

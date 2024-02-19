@@ -21,6 +21,7 @@ import {
   UpdatedRepMetadata,
   GovernanceActionsCategory,
   DashboardGovernanceActionsCategory,
+  RetireAsSoleVoter,
 } from "@pages";
 import {
   callAll,
@@ -120,6 +121,7 @@ export default function App() {
           path={PATHS.registerAsSoleVoter}
           element={<RegisterAsSoleVoter />}
         />
+        <Route path={PATHS.retireAsSoleVoter} element={<RetireAsSoleVoter />} />
         <Route path={PATHS.stakeKeys} element={<ChooseStakeKey />} />
         <Route path={PATHS.updateMetadata} element={<UpdatedRepMetadata />} />
         <Route path="*" element={<ErrorPage />} />

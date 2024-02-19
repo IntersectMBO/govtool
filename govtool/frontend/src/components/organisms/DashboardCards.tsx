@@ -400,10 +400,10 @@ export const DashboardCards = () => {
       {/* DREP CARD END*/}
       {/* SOLE VOTER CARD */}
       <DashboardActionCard
-        dataTestidFirstButton={"register-as-sole-voter-button"}
-        firstButtonVariant={"contained"}
-        secondButtonVariant={"outlined"}
-        dataTestidSecondButton={"learn-more-button"}
+        dataTestidFirstButton="register-as-sole-voter-button"
+        firstButtonVariant="contained"
+        secondButtonVariant="outlined"
+        dataTestidSecondButton="learn-more-button"
         description={
           <Trans
             i18nKey="dashboard.cards.registerAsSoleVoterDescription"

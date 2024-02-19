@@ -102,6 +102,25 @@ export const en = {
         youAreRegistered: "You are Registered as a DRep",
       },
     },
+    home: {
+      cards: {
+        delegateDescription: "Find a DRep to vote on your behalf.",
+        delegateFirstButtonLabel: "View DRep Direcotry",
+        delegateTitle: "Delegate your Voting Power",
+        governaneActionsDescription:
+          "See all the Governance Actions submitted on chain. ",
+        governanceActionsFirstButtonLabel: "View Governance Actions",
+        governaneActionsTitle: "View Governance Actions",
+        registerAsDRepDescription:
+          "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
+        registerAsDRepFirstButtonLabel: "Connect to Register",
+        registerAsDRepTitle: "Become a DRep",
+        registerAsSoleVoterDescription:
+          "Vote on Governance Actions using your own voting power",
+        registerAsSoleVoterFirstButtonLabel: "Connect to Register",
+        registerAsSoleVoterTitle: "Become a Sole Voter",
+      },
+    },
     delegation: {
       description:
         "You can delegate your voting power to a DRep or to a pre-defined voting option.",
@@ -216,8 +235,11 @@ export const en = {
     },
     hero: {
       connectWallet: "Connect your wallet",
-      description:
-        "Interact with SanchoNet using GovTool - a friendly user\ninterface connected to SanchoNet. You can delegate\nyour voting power (tAda) or become a SanchoNet DRep\nto allow people to delegate voting power to you.",
+      description: {
+        mobile:
+          "You can either delegate your voting power or become a DRep to allow people to delegate voting power to you.",
+        wide: "Anyone with a wallet containing ADA can participate in governance on Sanchonet.\n\nYour ADA balance entitles you to an equal amount of Voting Power.\n\nFor more info see the guide entry for <0>Voting Power</0>.",
+      },
       headline: "SanchoNet \n Governance Tool",
     },
     menu: {
@@ -351,7 +373,7 @@ export const en = {
         "Can’t see your wallet? Check what wallets are currently compatible with GovTool ",
       chooseWallet: "Choose the wallet you want to connect with:",
       connect: "Connect",
-      connectWallet: "Connect wallet",
+      connectWallet: "Connect Wallet",
       connectYourWallet: "Connect your Wallet",
       connectYourWalletButton: "Connect your wallet",
       connectedWallet: "Connected Wallet:",

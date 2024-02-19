@@ -406,7 +406,7 @@ export const DashboardCards = () => {
             ? "retire-as-sole-voter-button"
             : "register-as-sole-voter-button"
         }
-        dataTestidSecondButton={"learn-more-button"}
+        dataTestidSecondButton="learn-more-button"
         description={
           <Trans
             i18nKey={
@@ -437,7 +437,7 @@ export const DashboardCards = () => {
           )
         }
         secondButtonLabel={t("learnMore")}
-        secondButtonVariant={"outlined"}
+        secondButtonVariant="outlined"
         title={t(
           soleVoter?.isRegistered
             ? "dashboard.cards.youAreSoleVoterTitle"

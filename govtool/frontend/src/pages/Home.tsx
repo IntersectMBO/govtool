@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Box } from "@mui/material";
 
 import { Background } from "@atoms";
-import { Box } from "@mui/material";
-import { TopNav, Hero, Footer, HomeCards } from "@organisms";
+import { PATHS } from "@consts";
 import { useCardano } from "@context";
-import { PATHS } from "@/consts";
-import { WALLET_LS_KEY, getItemFromLocalStorage } from "@/utils/localStorage";
+import { TopNav, Hero, Footer, HomeCards } from "@organisms";
+import { WALLET_LS_KEY, getItemFromLocalStorage } from "@utils";
 
 export const Home = () => {
   const { isEnabled } = useCardano();

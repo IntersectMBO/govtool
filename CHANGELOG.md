@@ -9,6 +9,7 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
+- Add retire as Sole Voter screen [Issue 198](https://github.com/IntersectMBO/govtool/issues/198)
 - Add Sole Voter card [Issue 141](https://github.com/IntersectMBO/govtool/issues/141)
 - Create DRep registration page about roles [Issue 205](https://github.com/IntersectMBO/govtool/issues/205)
 - Create Checkbox component. Improve Field and ControlledField [Issue 177](https://github.com/IntersectMBO/govtool/pull/177)

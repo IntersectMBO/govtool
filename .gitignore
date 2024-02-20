@@ -131,3 +131,8 @@ infra/terraform/.terraform*
 # local env files
 .env
 .envrc
+
+# local docker-compose files
+scripts/govtool/dev-postgres_db
+scripts/govtool/dev-postgres_user
+scripts/govtool/dev-postgres_password

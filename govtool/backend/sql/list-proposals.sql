@@ -10,17 +10,17 @@ WITH LatestDrepDistr AS (
         Max(end_time) as last_epoch_end_time
     FROM epoch
 ), always_no_confidence_voting_power as (
-    select amount
-    from drep_distr
-    join drep_hash
+    select coalesce(amount, 0) as amount
+    from drep_hash
+    left join drep_distr
     on drep_hash.id = drep_distr.hash_id
     where drep_hash.view = 'drep_always_no_confidence'
     order by epoch_no desc
     limit 1
 ), always_abstain_voting_power as (
-    select amount
-    from drep_distr
-    join drep_hash
+    select coalesce(amount, 0) as amount
+    from drep_hash
+    left join drep_distr
     on drep_hash.id = drep_distr.hash_id
     where drep_hash.view = 'drep_always_abstain'
     order by epoch_no desc

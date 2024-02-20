@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Box } from "@mui/material";
-import { FormProvider } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 
 import { Background } from "@atoms";
 import { ICONS, PATHS } from "@consts";
@@ -11,20 +11,23 @@ import {
   RegisterAsdRepStepTwo,
 } from "@organisms";
 import {
+  defaulDRepRegistrationtValues,
   useScreenDimension,
-  useUrlAndHashFormController as useRegisterAsdRepFormController,
   useTranslation,
 } from "@hooks";
 import { useNavigate } from "react-router-dom";
 import { WALLET_LS_KEY, getItemFromLocalStorage } from "@/utils/localStorage";
 
 export const RegisterAsdRep = () => {
-  const [step, setStep] = useState<number>(1);
+  const [step, setStep] = useState<number>(2);
   const { isMobile } = useScreenDimension();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const registerAsdRepFormMethods = useRegisterAsdRepFormController();
+  const methods = useForm({
+    mode: "onBlur",
+    defaultValues: defaulDRepRegistrationtValues,
+  });
 
   useEffect(() => {
     if (
@@ -44,7 +47,7 @@ export const RegisterAsdRep = () => {
           imageHeight={isMobile ? 24 : 35}
           title={t("registration.becomeADRep")}
         />
-        <FormProvider {...registerAsdRepFormMethods}>
+        <FormProvider {...methods}>
           {step === 1 && <RegisterAsdRepStepOne setStep={setStep} />}
           {step === 2 && <RegisterAsdRepStepTwo setStep={setStep} />}
         </FormProvider>

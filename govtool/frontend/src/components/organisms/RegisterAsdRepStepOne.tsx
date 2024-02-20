@@ -21,13 +21,14 @@ export const RegisterAsdRepStepOne = ({
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
 
-  const deposit = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
+  const params = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
   const onClickContinue = useCallback(() => setStep(2), [setStep]);
 
   return (
     <BgCard
       actionButtonLabel={t("continue")}
+      backButtonLabel={t("cancel")}
       onClickActionButton={onClickContinue}
       title={t("registration.becomeADRep")}
     >
@@ -53,7 +54,7 @@ export const RegisterAsdRepStepOne = ({
             />,
           ]}
           i18nKey={"registration.rolesAndResponsibilitiesDescription"}
-          values={{ deposit: correctAdaFormat(deposit) }}
+          values={{ deposit: correctAdaFormat(params.drep_deposit) }}
         />
       </Typography>
     </BgCard>

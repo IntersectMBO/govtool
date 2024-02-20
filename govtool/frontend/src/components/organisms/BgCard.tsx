@@ -12,6 +12,7 @@ import { BgCardProps } from "./types";
 
 export const BgCard = ({
   actionButtonLabel,
+  backButtonLabel,
   children,
   onClickBackButton,
   onClickActionButton,
@@ -42,7 +43,7 @@ export const BgCard = ({
         }}
         variant="outlined"
       >
-        {t("cancel")}
+        {backButtonLabel ?? t("back")}
       </Button>
     );
   }, [isMobile]);
@@ -69,12 +70,10 @@ export const BgCard = ({
       height={isMobile ? "100%" : "auto"}
       sx={{
         alignItems: screenWidth >= 768 ? "center" : "inherit",
-        marginTop: screenWidth < 1440 ? "97px" : "137px",
-        display: screenWidth < 1440 ? "flex" : "grid",
-        ...(screenWidth < 1440 && {
-          flexDirection: "column",
-        }),
-        ...(screenWidth >= 1440 && { gridTemplateColumns: "1fr auto 1fr" }),
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        marginTop: "97px",
       }}
     >
       {isMobile && (
@@ -94,12 +93,14 @@ export const BgCard = ({
         data-testid="back-to-list-link"
         sx={{
           alignItems: "center",
+          justifySelf: "self-start",
           alignSelf: "flex-start",
           cursor: "pointer",
           display: "flex",
           justifyContent: "flex-start",
+          mb: isMobile ? 6 : 3,
           ml: screenWidth < 1440 ? 2 : 5,
-          mt: screenWidth < 1440 ? 3 : "none",
+          mt: 3,
           textDecoration: "none",
         }}
         onClick={navigateToDashboard}
@@ -114,9 +115,10 @@ export const BgCard = ({
         boxShadow={isMobile ? "" : `2px 2px 20px 0px ${boxShadow2}`}
         height="auto"
         maxWidth={screenWidth > 768 ? 600 : undefined}
+        mb={isMobile ? undefined : 3}
+        pb={isMobile ? undefined : 3}
+        pt={isMobile ? undefined : 10}
         px={isMobile ? 2 : 18.75}
-        pt={isMobile ? 6 : 10}
-        pb={3}
         sx={sx}
       >
         <Box display="flex" flexDirection="column">

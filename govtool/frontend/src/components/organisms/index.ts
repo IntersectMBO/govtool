@@ -1,6 +1,7 @@
 export * from "./BgCard";
 export * from "./ChooseStakeKeyPanel";
 export * from "./ChooseWalletModal";
+export * from "./ControlledField";
 export * from "./DashboardCards";
 export * from "./DashboardCards";
 export * from "./DashboardGovernanceActionDetails";
@@ -21,8 +22,10 @@ export * from "./RegisterAsdRepStepOne";
 export * from "./RegisterAsdRepStepThree";
 export * from "./RegisterAsdRepStepTwo";
 export * from "./Slider";
+export * from "./RegisterAsSoleVoterBoxContent";
+export * from "./RegisterAsSoleVoterBox";
+export * from "./RetireAsSoleVoterBoxContent";
+export * from "./RetireAsSoleVoterBox";
 export * from "./StatusModal";
 export * from "./TopNav";
 export * from "./VotingPowerModal";
-
-export * from "./ControlledField";

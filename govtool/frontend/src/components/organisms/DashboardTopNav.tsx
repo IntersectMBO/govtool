@@ -15,6 +15,7 @@ type DashboardTopNavProps = {
   imageHeight?: number;
   title: string;
   isDrawer?: boolean;
+  isVotingPowerHidden?: boolean;
 };
 
 const DRAWER_PADDING = 2;
@@ -25,6 +26,7 @@ export const DashboardTopNav = ({
   imageSRC,
   imageWidth,
   imageHeight,
+  isVotingPowerHidden,
 }: DashboardTopNavProps) => {
   const { isMobile, screenWidth } = useScreenDimension();
   const { dRep } = useCardano();
@@ -47,6 +49,7 @@ export const DashboardTopNav = ({
       zIndex={100}
       flex={1}
       width={"fill-available"}
+      height={"48px"}
     >
       <Box display={"flex"}>
         {imageSRC ? (
@@ -66,7 +69,7 @@ export const DashboardTopNav = ({
         ) : null}
       </Box>
       <Box display="flex">
-        <VotingPowerChips />
+        {!isVotingPowerHidden && <VotingPowerChips />}
         {isMobile && (
           <IconButton
             data-testid={"open-drawer-button"}

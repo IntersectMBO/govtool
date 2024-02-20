@@ -23,6 +23,16 @@ export const en = {
           "You have successfully retired from being a DRep! Please refresh the page.",
         success: "You have successfully retired from being a DRep!",
       },
+      soleVoterRegistration: {
+        refreshPage:
+          "You have successfully registered as a Sole Voter! Please refresh the page.",
+        success: "You have successfully registered as a Sole Voter!",
+      },
+      soleVoterRetirement: {
+        refreshPage:
+          "You have successfully retired from being a Sole Voter! Please refresh the page.",
+        success: "You have successfully retired from being a SoleVoter!",
+      },
       voting: {
         failed: "Vote transaction failed",
         success: "You have successfully voted!",
@@ -37,11 +47,8 @@ export const en = {
       headingTwo: "See Active Governance Actions",
       delegation: {
         changeDelegation: "Change delegation",
-        connectToDelegate: "Connect to delegate",
         delegateOwnPower:
           "If you want to delegate your own voting power of ₳<strong>{{ada}}</strong>.",
-        description:
-          "If you want to delegate to a DRep or select a default option.",
         dRepDelegatedTo: "DRep you delegated to",
         toDRep:
           "You have delegated your voting power of ₳<strong>{{ada}}</strong> to a selected DRep.",
@@ -72,23 +79,11 @@ export const en = {
         title: "Governance Actions",
         view: "View governance actions",
       },
-      cards: {
-        retire: "Retire",
-        youAreSoleVoterTitle: "You are a Sole Voter",
-        youAreSoleVoterDescription:
-          "Your Voting Power of ₳<strong>{{votingPower}}</strong> can be used to vote.",
-        registerAsSoleVoterTitle: "Become a Sole Voter",
-        registerAsSoleVoterDescription:
-          "Vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>.",
-      },
       registration: {
         changeMetadata: "Change metadata",
-        connectToRegister: "Connect to register",
         dRepRegistration: "DRep Registration",
         dRepRetirement: "DRep Retirement",
         dRepUpdate: "DRep Update",
-        description:
-          "If you want to directly participate in voting and have other ada holders delegate their voting power to you.",
         holdersCanDelegate:
           "Ada holders can delegate their voting power to you.",
         ifYouWant:
@@ -105,24 +100,15 @@ export const en = {
           "The retirement process is ongoing. This may take several minutes.",
         youAreRegistered: "You are Registered as a DRep",
       },
-    },
-    home: {
-      cards: {
-        delegateDescription: "Find a DRep to vote on your behalf.",
-        delegateFirstButtonLabel: "View DRep Direcotry",
-        delegateTitle: "Delegate your Voting Power",
-        governaneActionsDescription:
-          "See all the Governance Actions submitted on chain. ",
-        governanceActionsFirstButtonLabel: "View Governance Actions",
-        governaneActionsTitle: "View Governance Actions",
-        registerAsDRepDescription:
-          "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
-        registerAsDRepFirstButtonLabel: "Connect to Register",
-        registerAsDRepTitle: "Become a DRep",
+      soleVoter: {
+        register: "Register",
         registerAsSoleVoterDescription:
-          "Vote on Governance Actions using your own voting power",
-        registerAsSoleVoterFirstButtonLabel: "Connect to Register",
+          "Vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>.",
         registerAsSoleVoterTitle: "Become a Sole Voter",
+        retire: "Retire",
+        youAreSoleVoterDescription:
+          "Your Voting Power of ₳<strong>{{votingPower}}</strong> can be used to vote.",
+        youAreSoleVoterTitle: "You are a Sole Voter",
       },
     },
     delegation: {
@@ -246,6 +232,25 @@ export const en = {
       },
       headline: "SanchoNet \n Governance Tool",
     },
+    home: {
+      cards: {
+        delegateDescription: "Find a DRep to vote on your behalf.",
+        delegateFirstButtonLabel: "View DRep Direcotry",
+        delegateTitle: "Delegate your Voting Power",
+        governaneActionsDescription:
+          "See all the Governance Actions submitted on chain. ",
+        governanceActionsFirstButtonLabel: "View Governance Actions",
+        governaneActionsTitle: "View Governance Actions",
+        registerAsDRepDescription:
+          "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
+        registerAsDRepFirstButtonLabel: "Connect to Register",
+        registerAsDRepTitle: "Become a DRep",
+        registerAsSoleVoterDescription:
+          "Vote on Governance Actions using your own voting power",
+        registerAsSoleVoterFirstButtonLabel: "Connect to Register",
+        registerAsSoleVoterTitle: "Become a Sole Voter",
+      },
+    },
     menu: {
       faqs: "FAQs",
       guides: "Guides",
@@ -320,13 +325,12 @@ export const en = {
     soleVoter: {
       retireSoleVoter: "Retire as a Sole Voter",
       becomeSoleVoter: "Become a Sole Voter",
-      continueToRegister: "Continue to register",
-      description:
-        "A Sole Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of ADA in their connected wallet. <0>Learn More</0> about Sole Voter.\n\nBecoming a Sole Voter will require a refundable deposit of <strong>₳2</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
-      heading: "What this Means",
+      registerDescription:
+        "A Sole Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of ADA in their connected wallet. <0>Learn More</0> about Sole Voter.\n\nBecoming a Sole Voter will require a refundable deposit of <strong>₳{{deposit}}</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
+      registerHeading: "What this Means",
       retirementHeading: "What Retirement Means",
       retirementDescription:
-        "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of <strong>{{deposit}} ADA</strong> will be refunded.\n\nYou can at any time in the future re-register to become a Sole Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\n<0>These options are listed in our Guides here:</0> <1>Voting options and Roles</1>",
+        "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of {{deposit}} ADA will be refunded.\n\nYou can at any time in the future re-register to become a Sole Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\nThese options are listed in our Guides here: <0>Voting options and Roles</0>",
     },
     system: {
       sanchoNet: "SanchoNet",

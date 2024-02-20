@@ -66,6 +66,7 @@ import {
   SANCHO_INFO_KEY,
   VOTE_TRANSACTION_KEY,
   checkIsMaintenanceOn,
+  REGISTER_SOLE_VOTER_TRANSACTION_KEY,
 } from "@utils";
 import { getEpochParams, getTransactionStatus } from "@services";
 import {
@@ -122,7 +123,7 @@ interface CardanoContext {
   }: {
     certBuilder?: CertificatesBuilder;
     votingBuilder?: VotingBuilder;
-    type?: "delegation" | "registration" | "vote";
+    type?: "delegation" | "registration" | "soleVoterRegistration" | "vote";
     proposalId?: string;
     registrationType?: DRepActionType;
   }) => Promise<string>;
@@ -145,6 +146,9 @@ interface CardanoContext {
   ) => Promise<VotingBuilder>;
   delegateTransaction: TransactionHistoryItem;
   registerTransaction: TransactionHistoryItem & { type: DRepActionType };
+  soleVoterTransaction: TransactionHistoryItem & {
+    type: Omit<DRepActionType, "update">;
+  };
   delegateTo: string;
   voteTransaction: TransactionHistoryItem & { proposalId: string };
   isPendingTransaction: () => boolean;
@@ -208,6 +212,9 @@ function CardanoProvider(props: Props) {
   const [registerTransaction, setRegisterTransaction] = useState<
     TransactionHistoryItem & { type: DRepActionType }
   >({ time: undefined, transactionHash: "", type: "" });
+  const [soleVoterTransaction, setSoleVoterTransaction] = useState<
+    TransactionHistoryItem & { type: Omit<DRepActionType, "update"> }
+  >({ time: undefined, transactionHash: "", type: "" });
   const [voteTransaction, setVoteTransaction] = useState<
     { proposalId: string } & TransactionHistoryItem
   >({ time: undefined, transactionHash: "", proposalId: "" });
@@ -219,6 +226,7 @@ function CardanoProvider(props: Props) {
   const isPendingTransaction = useCallback(() => {
     if (
       registerTransaction?.transactionHash ||
+      soleVoterTransaction?.transactionHash ||
       delegateTransaction?.transactionHash ||
       voteTransaction?.transactionHash
     ) {
@@ -243,6 +251,7 @@ function CardanoProvider(props: Props) {
     delegateTransaction?.transactionHash,
     openModal,
     registerTransaction?.transactionHash,
+    soleVoterTransaction?.transactionHash,
     voteTransaction?.transactionHash,
   ]);
 
@@ -252,6 +261,11 @@ function CardanoProvider(props: Props) {
     );
     const registerTransaction = JSON.parse(
       getItemFromLocalStorage(REGISTER_TRANSACTION_KEY + `_${stakeKey}`)
+    );
+    const soleVoterTransaction = JSON.parse(
+      getItemFromLocalStorage(
+        REGISTER_SOLE_VOTER_TRANSACTION_KEY + `_${stakeKey}`
+      )
     );
     const voteTransaction = JSON.parse(
       getItemFromLocalStorage(VOTE_TRANSACTION_KEY + `_${stakeKey}`)
@@ -264,6 +278,9 @@ function CardanoProvider(props: Props) {
     }
     if (registerTransaction?.transactionHash) {
       setRegisterTransaction(registerTransaction);
+    }
+    if (soleVoterTransaction?.transactionHash) {
+      setSoleVoterTransaction(soleVoterTransaction);
     }
     if (voteTransaction?.transactionHash) {
       setVoteTransaction(voteTransaction);
@@ -385,6 +402,71 @@ function CardanoProvider(props: Props) {
       let interval = setInterval(checkRegisterTransaction, REFRESH_TIME);
       checkRegisterTransaction();
     }
+    if (soleVoterTransaction?.transactionHash) {
+      const checkRegisterTransaction = async () => {
+        const resetRegisterTransaction = () => {
+          clearInterval(interval);
+          removeItemFromLocalStorage(
+            REGISTER_SOLE_VOTER_TRANSACTION_KEY + `_${stakeKey}`
+          );
+          setSoleVoterTransaction({
+            time: undefined,
+            transactionHash: "",
+            type: "",
+          });
+        };
+        const status = await getTransactionStatus(
+          soleVoterTransaction.transactionHash
+        );
+        if (status.transactionConfirmed) {
+          if (isEnabled) {
+            await setLimitedRegistrationInterval(
+              3000,
+              10,
+              dRepID,
+              soleVoterTransaction.type,
+              setDRep
+            ).then((isRegistered) => {
+              if (soleVoterTransaction.type === "registration") {
+                if (isRegistered) {
+                  addSuccessAlert(t("alerts.soleVoterRegistration.success"));
+                } else {
+                  addWarningAlert(
+                    t("alerts.soleVoterRegistration.refreshPage")
+                  );
+                }
+              } else if (soleVoterTransaction.type === "retirement") {
+                if (!isRegistered) {
+                  addSuccessAlert(t("alerts.soleVoterRetirement.success"));
+                } else {
+                  addWarningAlert(t("alerts.soleVoterRetirement.refreshPage"));
+                }
+              }
+            });
+          }
+          resetRegisterTransaction();
+        }
+        if (
+          new Date().getTime() -
+            new Date(soleVoterTransaction?.time).getTime() >
+          TIME_TO_EXPIRE_TRANSACTION
+        ) {
+          resetRegisterTransaction();
+          if (isEnabled)
+            addErrorAlert(
+              t(
+                `alerts.${
+                  soleVoterTransaction.type === "retirement"
+                    ? "retirement.failed"
+                    : "registration.failed"
+                }`
+              )
+            );
+        }
+      };
+      let interval = setInterval(checkRegisterTransaction, REFRESH_TIME);
+      checkRegisterTransaction();
+    }
     if (voteTransaction?.transactionHash) {
       const checkVoteTransaction = async () => {
         const resetVoteTransaction = () => {
@@ -418,11 +500,17 @@ function CardanoProvider(props: Props) {
       isEnabled &&
       (voteTransaction?.transactionHash ||
         registerTransaction?.transactionHash ||
+        soleVoterTransaction?.transactionHash ||
         delegateTransaction?.transactionHash)
     ) {
       addWarningAlert(t("alerts.transactionInProgress"), 10000);
     }
-  }, [delegateTransaction, registerTransaction, voteTransaction]);
+  }, [
+    delegateTransaction,
+    registerTransaction,
+    soleVoterTransaction,
+    voteTransaction,
+  ]);
 
   const getChangeAddress = async (enabledApi: CardanoApiWallet) => {
     try {
@@ -726,7 +814,7 @@ function CardanoProvider(props: Props) {
     }: {
       certBuilder?: CertificatesBuilder;
       votingBuilder?: VotingBuilder;
-      type?: "delegation" | "registration" | "vote";
+      type?: "delegation" | "registration" | "soleVoterRegistration" | "vote";
       proposalId?: string;
       registrationType?: DRepActionType;
     }) => {
@@ -849,6 +937,21 @@ function CardanoProvider(props: Props) {
             })
           );
         }
+        if (type === "soleVoterRegistration" && registrationType !== "update") {
+          setSoleVoterTransaction({
+            time: new Date(),
+            transactionHash: resultHash,
+            type: registrationType ?? "",
+          });
+          setItemToLocalStorage(
+            REGISTER_SOLE_VOTER_TRANSACTION_KEY + `_${stakeKey}`,
+            JSON.stringify({
+              time: new Date(),
+              transactionHash: resultHash,
+              type: registrationType,
+            })
+          );
+        }
         if (type === "delegation") {
           setDelegateTransaction({
             time: new Date(),
@@ -899,6 +1002,7 @@ function CardanoProvider(props: Props) {
       walletApi,
       getUtxos,
       registerTransaction.transactionHash,
+      soleVoterTransaction.transactionHash,
       delegateTransaction.transactionHash,
       voteTransaction.transactionHash,
       stakeKey,
@@ -1148,6 +1252,7 @@ function CardanoProvider(props: Props) {
       buildVoteDelegationCert,
       delegateTransaction,
       registerTransaction,
+      soleVoterTransaction,
       delegateTo,
       voteTransaction,
       isPendingTransaction,
@@ -1183,6 +1288,7 @@ function CardanoProvider(props: Props) {
       buildVoteDelegationCert,
       delegateTransaction,
       registerTransaction,
+      soleVoterTransaction,
       delegateTo,
       voteTransaction,
       isPendingTransaction,

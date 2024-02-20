@@ -1,0 +1,95 @@
+# NOTE: This onfiguration file is designed to facilitate the development process
+# for developers working with the Cardano blockchain by provisioning a Cardano
+# Node on SanchoNet, Cardano DB Sync, and a PostgreSQL database as supporting
+# infrastructure.
+#
+# By automatically setting up these essential services, it allows developers to
+# easily interact with the Cardano blockchain and perform data queries through
+# the exposed PostgreSQL database on port 5432 on the DBSync database.
+#
+# Before start there are three text files that has to be set up in a current
+# directory in order to provide sufficient database configuration for both
+# PostgreSQL and Cardano DBSync services:
+# * ./dev-postgres_db
+# * ./dev-postgres_password
+# * ./dev-postgres_user
+#
+# USAGE:
+#   docker compose --file docker-compose.dev.yml up --detach
+#   docker compose --file docker-compose.dev.yml down --remove-orphans
+#   docker compose --file docker-compose.dev.yml logs --follow --timestamps cardano-node
+#   docker compose --file docker-compose.dev.yml logs --follow --timestamps cardano-db-sync
+#   docker-compose run postgres psql
+
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB_FILE=/run/secrets/postgres_db
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+      - POSTGRES_USER_FILE=/run/secrets/postgres_user
+    secrets:
+      - postgres_password
+      - postgres_user
+      - postgres_db
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+    command: ${POSTGRES_ARGS:--c maintenance_work_mem=1GB -c max_parallel_maintenance_workers=4}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cardano-node:
+    image: ghcr.io/intersectmbo/cardano-node:8.8.0-pre
+    environment:
+      - NETWORK=sanchonet
+    volumes:
+      - node-db:/data/db
+      - node-ipc:/ipc
+    restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f 127.0.0.1:12788 || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+
+  cardano-db-sync:
+    image: ghcr.io/intersectmbo/cardano-db-sync:sancho-4-0-0-fix-config
+    environment:
+      - NETWORK=sanchonet
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+    depends_on:
+      cardano-node:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    secrets:
+      - postgres_password
+      - postgres_user
+      - postgres_db
+    volumes:
+      - db-sync-data:/var/lib/cexplorer
+      - node-ipc:/node-ipc
+    restart: on-failure
+
+secrets:
+  postgres_db:
+    file: ./dev-postgres_db
+  postgres_password:
+    file: ./dev-postgres_password
+  postgres_user:
+    file: ./dev-postgres_user
+
+volumes:
+  db-sync-data:
+  postgres:
+  node-db:
+  node-ipc:

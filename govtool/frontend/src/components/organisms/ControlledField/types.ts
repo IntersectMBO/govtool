@@ -1,4 +1,8 @@
-import { CheckboxFieldProps, InputFieldProps } from "@molecules";
+import {
+  CheckboxFieldProps,
+  InputFieldProps,
+  TextAreaFieldProps,
+} from "@molecules";
 import {
   Control,
   ControllerRenderProps,
@@ -27,4 +31,11 @@ export type ControlledCheckboxProps = Omit<
 
 export type RenderInputProps = {
   field: ControllerRenderProps<FieldValues, string>;
+};
+
+export type ControlledTextAreaProps = TextAreaFieldProps & {
+  control: Control<any>;
+  errors: FieldErrors<any>;
+  name: Path<any>;
+  rules?: Omit<RegisterOptions, "valueAsNumber" | "valueAsDate" | "setValueAs">;
 };

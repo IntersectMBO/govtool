@@ -41,7 +41,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         inputProps={{ "data-testid": dataTestId }}
         inputRef={inputRef}
         sx={{
-          backgroundColor: errorMessage ? "inputRed" : "transparent",
+          backgroundColor: errorMessage ? "inputRed" : "white",
           border: 1,
           borderColor: errorMessage ? "red" : "secondaryBlue",
           borderRadius: 50,

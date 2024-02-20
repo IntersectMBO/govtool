@@ -6,7 +6,9 @@ export * from "./ClickOutside";
 export * from "./CopyButton";
 export * from "./DrawerLink";
 export * from "./FormErrorMessage";
+export * from "./FormHelpfulText";
 export * from "./HighlightedText";
+export * from "./InfoText";
 export * from "./Input";
 export * from "./Link";
 export * from "./LoadingButton";
@@ -21,6 +23,7 @@ export * from "./Spacer";
 export * from "./StakeRadio";
 export * from "./Tooltip";
 export * from "./Typography";
+export * from "./TextArea";
 export * from "./VotePill";
 export * from "./VotingPowerChips";
 

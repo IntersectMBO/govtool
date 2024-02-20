@@ -29,6 +29,7 @@ changes.
 - Reorganized repository to fit new conventions [Issue 85](https://github.com/IntersectMBO/govtool/issues/85).
 - Renamed project from VVA to GovTool [Issue 97](https://github.com/IntersectMBO/govtool/issues/97).
 - (`docs/update-working-conventions`) Addressing [Issue 25](https://github.com/IntersectMBO/govtool/issues/25) changed working conventions documentation to improve intended flows.
+- Adjusted Nix configuration to meet projects needs [Issue 187](https://github.com/IntersectMBO/govtool/issues/187).
 
 ### Removed
 -

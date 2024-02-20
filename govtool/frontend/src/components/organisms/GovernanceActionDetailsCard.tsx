@@ -164,7 +164,7 @@ export const GovernanceActionDetailsCard = ({
             <Typography color="neutralGray" variant="caption">
               {t("govActions.details")}
             </Typography>
-            {/* {typeof details === "object" && details !== null ? (
+            {typeof details === "object" && details !== null ? (
               Object.entries(details).map(([key, value]) => {
                 return (
                   <div key={key}>
@@ -179,7 +179,7 @@ export const GovernanceActionDetailsCard = ({
               >
                 {details}
               </Typography>
-            )} */}
+            )}
           </Box>
         </Box>
         <Button

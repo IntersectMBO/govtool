@@ -1,4 +1,6 @@
 export * from "./ActionCard";
+export * from "./BottomBoxButtons";
+export * from "./CenteredBoxPageWrapper";
 export * from "./DashboardActionCard";
 export * from "./DataActionsBar";
 export * from "./DRepInfoCard";

@@ -1,6 +1,8 @@
 export const WALLET_LS_KEY = "wallet_data";
 export const DELEGATE_TRANSACTION_KEY = "delegate_transaction";
 export const REGISTER_TRANSACTION_KEY = "register_transaction";
+export const REGISTER_SOLE_VOTER_TRANSACTION_KEY =
+  "register_sole_voter_transaction";
 export const DELEGATE_TO_KEY = "delegate_to_transaction";
 export const PROTOCOL_PARAMS_KEY = "protocol_params";
 export const SANCHO_INFO_KEY = "sancho_info";

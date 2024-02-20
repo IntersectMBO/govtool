@@ -6,7 +6,7 @@ export const setLimitedRegistrationInterval = (
   intervalTime: number,
   attemptsNumber: number,
   dRepID: string,
-  transactionType: DRepActionType,
+  transactionType: DRepActionType | Omit<DRepActionType, "update">,
   setDRep: (key: undefined | DRepInfo) => void
 ): Promise<boolean> => {
   return new Promise(async (resolve) => {

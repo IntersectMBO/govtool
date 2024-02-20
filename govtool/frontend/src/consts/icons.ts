@@ -2,6 +2,7 @@ export const ICONS = {
   appLogoIcon: "/icons/AppLogo.svg",
   arrowDownIcon: "/icons/ArrowDown.svg",
   arrowRightIcon: "/icons/ArrowRight.svg",
+  arrowLeftThinIcon: "/icons/ArrowLeftThin.svg",
   checkCircleIcon: "/icons/CheckCircle.svg",
   closeDrawerIcon: "/icons/CloseIcon.svg",
   closeIcon: "/icons/Close.svg",

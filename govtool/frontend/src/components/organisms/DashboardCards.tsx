@@ -1,3 +1,4 @@
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
 import { Trans } from "react-i18next";
@@ -11,7 +12,6 @@ import {
   useTranslation,
 } from "@hooks";
 import { DashboardActionCard } from "@molecules";
-import { useCallback, useMemo, useState } from "react";
 import { correctAdaFormat, formHexToBech32, openInNewTab } from "@utils";
 
 export const DashboardCards = () => {
@@ -26,6 +26,7 @@ export const DashboardCards = () => {
     isDrepLoading,
     isPendingTransaction,
     registerTransaction,
+    soleVoterTransaction,
     stakeKey,
     soleVoter,
   } = useCardano();
@@ -413,8 +414,8 @@ export const DashboardCards = () => {
           <Trans
             i18nKey={
               soleVoter?.isRegistered
-                ? "dashboard.cards.youAreSoleVoterDescription"
-                : "dashboard.cards.registerAsSoleVoterDescription"
+                ? "dashboard.soleVoter.youAreSoleVoterDescription"
+                : "dashboard.soleVoter.registerAsSoleVoterDescription"
             }
             values={{ votingPower: correctAdaFormat(votingPower) }}
           />
@@ -428,10 +429,18 @@ export const DashboardCards = () => {
         }
         firstButtonLabel={t(
           soleVoter?.isRegistered
-            ? "dashboard.cards.retire"
-            : "dashboard.registration.register"
+            ? "dashboard.soleVoter.retire"
+            : "dashboard.soleVoter.register"
         )}
         firstButtonVariant={soleVoter?.isRegistered ? "outlined" : "contained"}
+        secondButtonVariant={
+          soleVoterTransaction?.transactionHash
+            ? "outlined"
+            : soleVoter?.isRegistered
+            ? "text"
+            : "outlined"
+        }
+        inProgress={!!soleVoterTransaction?.transactionHash}
         imageURL={IMAGES.soleVoterImage}
         secondButtonAction={() =>
           openInNewTab(
@@ -442,8 +451,8 @@ export const DashboardCards = () => {
         secondButtonVariant={"outlined"}
         title={t(
           soleVoter?.isRegistered
-            ? "dashboard.cards.youAreSoleVoterTitle"
-            : "dashboard.cards.registerAsSoleVoterTitle"
+            ? "dashboard.soleVoter.youAreSoleVoterTitle"
+            : "dashboard.soleVoter.registerAsSoleVoterTitle"
         )}
       />
       {/* REGISTARTION AS SOLE VOTER CARD END*/}

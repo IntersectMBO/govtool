@@ -9,6 +9,8 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
+- Create DRep registration page about DRep information [Issue 206](https://github.com/IntersectMBO/govtool/issues/206)
+- Create DRep registration page about roles [Issue 205](https://github.com/IntersectMBO/govtool/issues/205)
 - Create Checkbox component. Improve Field and ControlledField [Issue 177](https://github.com/IntersectMBO/govtool/pull/177)
 - Vitest unit tests added for utils functions [Issue 81](https://github.com/IntersectMBO/govtool/issues/81)
 - i18next library added to FE [Issue 80](https://github.com/IntersectMBO/govtool/issues/80)

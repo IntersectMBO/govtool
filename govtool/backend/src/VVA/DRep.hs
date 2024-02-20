@@ -47,11 +47,9 @@ getVotingPower ::
   Text ->
   m Integer
 getVotingPower drepId = withPool $ \conn -> do
-  votingPower <-
-    sum . map (\(SQL.Only x) -> x) <$>
-        liftIO
-          (SQL.query @_ @(SQL.Only Scientific) conn getVotingPowerSql $
-            SQL.Only drepId)
+  [SQL.Only votingPower] <-
+    liftIO
+      (SQL.query @_ @(SQL.Only Scientific) conn getVotingPowerSql $ SQL.Only drepId)
   return $ floor votingPower
 
 listDRepsSql :: SQL.Query

@@ -1,0 +1,10 @@
+# NOTE: This Dockerfile sets up an environment with precompiled dependencies for
+# the GovTool Haskell backend project, streamlining the project's compilation
+# process by ensuring it only needs to compile against these dependencies. This
+# is a common practice in Haskell projects, as it can significantly reduce the
+# time it takes to build the project.
+
+FROM haskell:9.2-buster
+WORKDIR /src
+COPY . .
+RUN cabal update && cabal configure && cabal install --only-dependencies && rm -rf /src/*

@@ -16,6 +16,11 @@ module "govtool-ecr-backend" {
   repo_name = "backend"
 }
 
+module "govtool-ecr-backend-base" {
+  source    = "./modules/ecr"
+  repo_name = "backend-base"
+}
+
 module "govtool-ecr-frontend" {
   source    = "./modules/ecr"
   repo_name = "frontend"
@@ -33,6 +38,7 @@ resource "aws_iam_policy" "cicd_ecr" {
         Effect = "Allow"
         Resource = [
           module.govtool-ecr-backend.repo_arn,
+          module.govtool-ecr-backend-base.repo_arn,
           module.govtool-ecr-frontend.repo_arn
         ]
       },
@@ -89,6 +95,10 @@ module "govtool-beta-sanchonet" {
 
 output "govtool-ecr-backend-url" {
   value = module.govtool-ecr-backend.repo_url
+}
+
+output "govtool-ecr-backend-base-url" {
+  value = module.govtool-ecr-backend-base.repo_url
 }
 
 output "govtool-ecr-frontend-url" {

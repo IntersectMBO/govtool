@@ -15,10 +15,10 @@
 # * ./dev-postgres_user
 #
 # USAGE:
-#   docker compose --file docker-compose.dev.yml up --detach
-#   docker compose --file docker-compose.dev.yml down --remove-orphans
-#   docker compose --file docker-compose.dev.yml logs --follow --timestamps cardano-node
-#   docker compose --file docker-compose.dev.yml logs --follow --timestamps cardano-db-sync
+#   docker compose --file docker-compose.node+dbsync.yml up --detach
+#   docker compose --file docker-compose.node+dbsync.yml down --remove-orphans
+#   docker compose --file docker-compose.node+dbsync.yml logs --follow --timestamps cardano-node
+#   docker compose --file docker-compose.node+dbsync.yml logs --follow --timestamps cardano-db-sync
 #   docker-compose run postgres psql
 
 version: "3.9"
@@ -56,9 +56,9 @@ services:
     restart: on-failure
     healthcheck:
       test: ["CMD-SHELL", "curl -f 127.0.0.1:12788 || exit 1"]
-      interval: 60s
+      interval: 10s
       timeout: 10s
-      retries: 5
+      retries: 10
 
   cardano-db-sync:
     image: ghcr.io/intersectmbo/cardano-db-sync:sancho-4-0-0-fix-config

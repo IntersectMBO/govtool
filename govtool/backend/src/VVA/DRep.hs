@@ -99,10 +99,12 @@ getDRepInfo
 getDRepInfo drepId = withPool $ \conn -> do
   result <- liftIO $ SQL.query conn getDRepInfoSql (SQL.Only drepId)
   case result of
-    [(isRegistered, wasRegistered, deposit)] ->
+    [(isRegisteredAsDRep, wasRegisteredAsDRep, isRegisteredAsSoleVoter, wasRegisteredAsSoleVoter, deposit)] ->
       return $ DRepInfo
-        { dRepInfoIsRegistered = fromMaybe False isRegistered
-        , dRepInfoWasRegistered = fromMaybe False wasRegistered
+        { dRepInfoIsRegisteredAsDRep = fromMaybe False isRegisteredAsDRep
+        , dRepInfoWasRegisteredAsDRep = fromMaybe False wasRegisteredAsDRep
+        , dRepInfoIsRegisteredAsSoleVoter = fromMaybe False isRegisteredAsSoleVoter
+        , dRepInfoWasRegisteredAsSoleVoter = fromMaybe False wasRegisteredAsSoleVoter
         , dRepInfoDeposit = deposit
         }
-    [] -> return $ DRepInfo False False Nothing
+    [] -> return $ DRepInfo False False False False Nothing

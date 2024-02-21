@@ -153,8 +153,10 @@ drepInfo (unHexText -> dRepId) = do
   CacheEnv {dRepInfoCache} <- asks vvaCache
   Types.DRepInfo {..} <- cacheRequest dRepInfoCache dRepId $ DRep.getDRepInfo dRepId
   return $ DRepInfoResponse
-    { dRepInfoResponseIsRegistered = dRepInfoIsRegistered
-    , dRepInfoResponseWasRegistered = dRepInfoWasRegistered
+    { dRepInfoResponseIsRegisteredAsDRep = dRepInfoIsRegisteredAsDRep
+    , dRepInfoResponseWasRegisteredAsDRep = dRepInfoWasRegisteredAsDRep
+    , dRepInfoResponseIsRegisteredAsSoleVoter = dRepInfoIsRegisteredAsSoleVoter
+    , dRepInfoResponseWasRegisteredAsSoleVoter = dRepInfoWasRegisteredAsSoleVoter
     , dRepInfoResponseDeposit = dRepInfoDeposit
     }
 

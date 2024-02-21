@@ -23,6 +23,7 @@ export const RetireAsSoleVoterBoxContent = () => {
           mt: isMobile ? 4 : 10,
           textAlign: "center",
           whiteSpace: "pre-line",
+          textDecoration: "underline",
         }}
         variant="body1"
       >

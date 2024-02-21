@@ -1,5 +1,5 @@
 export * from "./ActionCard";
-export * from "./BottomBoxButtons";
+export * from "./CenteredBoxBottomButtons";
 export * from "./CenteredBoxPageWrapper";
 export * from "./DashboardActionCard";
 export * from "./DataActionsBar";

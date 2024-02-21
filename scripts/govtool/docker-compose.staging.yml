@@ -55,13 +55,13 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_INSTALL_PLUGINS=grafana-piechart-panel
-      - GF_SERVER_ROOT_URL=https://${SUBDOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK}.govtool.byron.network/grafana
+      - GF_SERVER_ROOT_URL=https://staging.govtool.byron.network/grafana
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     restart: always
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}`) && PathPrefix(`/grafana`)"
+      - "traefik.http.routers.grafana.rule=Host(`staging.govtool.byron.network`) && PathPrefix(`/grafana`)"
       - "traefik.http.routers.grafana.entrypoints=websecure"
       - "traefik.http.routers.grafana.tls.certresolver=myresolver"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
@@ -76,7 +76,7 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.status-service.rule=Host(`${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}`) && PathPrefix(`/status`)"
+      - "traefik.http.routers.status-service.rule=Host(`staging.govtool.byron.network`) && PathPrefix(`/status`)"
       - "traefik.http.routers.status-service.entrypoints=websecure"
       - "traefik.http.routers.status-service.tls.certresolver=myresolver"
       - "traefik.http.services.status-service.loadbalancer.server.port=8000"
@@ -180,11 +180,11 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.rule=Host(`staging.govtool.byron.network`) && PathPrefix(`/api`)"
       - "traefik.http.middlewares.backend-stripprefix.stripprefix.prefixes=/api"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=GET,HEAD,OPTIONS"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=*"
-      - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlist=https://${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network},http://localhost"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlist=https://staging.govtool.byron.network"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.backend-cors.headers.addvaryheader=true"
       - "traefik.http.routers.backend.middlewares=backend-stripprefix@docker,backend-cors@docker"
@@ -206,7 +206,7 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}`)"
+      - "traefik.http.routers.frontend.rule=Host(`staging.govtool.byron.network`)"
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.middlewares.frontend-csp.headers.contentSecurityPolicy=default-src 'self'; img-src *.usersnap.com 'self' data:; script-src *.usersnap.com 'self' 'unsafe-inline' https://www.googletagmanager.com https://browser.sentry-cdn.com; style-src *.usersnap.com *.googleapis.com 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src *.usersnap.com https://s3.eu-central-1.amazonaws.com/upload.usersnap.com 'self' https://o4506155985141760.ingest.sentry.io/api/4506156032196608/envelope/ *.google-analytics.com; font-src *.usersnap.com *.gstatic.com 'self' 'unsafe-inline' https://fonts.gstatic.com; worker-src blob:"

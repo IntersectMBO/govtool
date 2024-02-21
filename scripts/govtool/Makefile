@@ -20,7 +20,7 @@ tag := $(commit)-$(env)-$(cardano_network)
 docker_host := $(domain)
 docker_user := ubuntu
 ssh_url := $(docker_user)@$(docker_host)
-docker_compose_file := docker-compose.$(cardano_network).yml
+docker_compose_file := docker-compose.$(env).yml
 
 # helper function for checking undefined variables
 check_defined = \

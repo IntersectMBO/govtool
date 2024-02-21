@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { PATHS } from "@consts";
-import { BottomBoxButtons } from "@molecules";
+import { CenteredBoxBottomButtons } from "@molecules";
 import { useCardano, useModal } from "@context";
 import { RetireAsSoleVoterBoxContent } from "@organisms";
 
@@ -76,10 +76,10 @@ export const RetireAsSoleVoterBox = () => {
   return (
     <>
       <RetireAsSoleVoterBoxContent />
-      <BottomBoxButtons
-        leftButtonAction={() => navigate(PATHS.dashboard)}
-        rightButtonAction={onRetire}
-        rightButtonIsLoading={isLoading}
+      <CenteredBoxBottomButtons
+        onBackButton={() => navigate(PATHS.dashboard)}
+        onActionButton={onRetire}
+        isLoading={isLoading}
       />
     </>
   );

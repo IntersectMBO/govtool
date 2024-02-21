@@ -5,19 +5,19 @@ import { Button, LoadingButton } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 
 interface Props {
-  leftButtonAction: () => void;
-  rightButtonAction: () => void;
-  rightButtonIsLoading?: boolean;
-  leftButtonText?: string;
-  rightButtonText?: string;
+  onBackButton: () => void;
+  onActionButton: () => void;
+  isLoading?: boolean;
+  backButtonText?: string;
+  actionButtonText?: string;
 }
 
-export const BottomBoxButtons = ({
-  leftButtonAction,
-  rightButtonAction,
-  rightButtonIsLoading,
-  leftButtonText,
-  rightButtonText,
+export const CenteredBoxBottomButtons = ({
+  onBackButton,
+  onActionButton,
+  isLoading,
+  backButtonText,
+  actionButtonText,
 }: Props) => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -26,7 +26,7 @@ export const BottomBoxButtons = ({
     return (
       <Button
         data-testid={"back-button"}
-        onClick={leftButtonAction}
+        onClick={onBackButton}
         size="extraLarge"
         sx={{
           px: 6,
@@ -34,17 +34,17 @@ export const BottomBoxButtons = ({
         }}
         variant="outlined"
       >
-        {leftButtonText ?? t("cancel")}
+        {backButtonText ?? t("cancel")}
       </Button>
     );
   }, [isMobile]);
 
-  const renderRegisterButton = useMemo(() => {
+  const renderActionButton = useMemo(() => {
     return (
       <LoadingButton
         data-testid={"register-button"}
-        isLoading={rightButtonIsLoading}
-        onClick={rightButtonAction}
+        isLoading={isLoading}
+        onClick={onActionButton}
         sx={{
           borderRadius: 50,
           textTransform: "none",
@@ -55,10 +55,10 @@ export const BottomBoxButtons = ({
         }}
         variant="contained"
       >
-        {rightButtonText ?? t("continue")}
+        {actionButtonText ?? t("continue")}
       </LoadingButton>
     );
-  }, [rightButtonIsLoading, isMobile]);
+  }, [isLoading, isMobile]);
 
   return (
     <Box
@@ -67,9 +67,9 @@ export const BottomBoxButtons = ({
       justifyContent="space-around"
       mt={6}
     >
-      {isMobile ? renderRegisterButton : renderBackButton}
+      {isMobile ? renderActionButton : renderBackButton}
       <Box px={2} py={isMobile ? 1.5 : 0} />
-      {isMobile ? renderBackButton : renderRegisterButton}
+      {isMobile ? renderBackButton : renderActionButton}
     </Box>
   );
 };

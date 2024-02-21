@@ -15,6 +15,9 @@ changes.
 - Vitest unit tests added for utils functions [Issue 81](https://github.com/IntersectMBO/govtool/issues/81)
 - i18next library added to FE [Issue 80](https://github.com/IntersectMBO/govtool/issues/80)
 
+### Added
+- Added `isRegisteredAsSoleVoter` and `wasRegisteredAsSoleVoter` fields to the drep/info response [Issue 212](https://github.com/IntersectMBO/govtool/issues/212)
+
 ### Fixed
 - Fix make button disble when wallet tries connect [Issue 265](https://github.com/IntersectMBO/govtool/issues/265)
 - Fix drep voting power calculation [Issue 231](https://github.com/IntersectMBO/govtool/issues/231)
@@ -28,6 +31,7 @@ changes.
 - Fixed get drep voting power incorrectly executed endpoint [Issue 280](https://github.com/IntersectMBO/govtool/issues/280)
 
 ### Changed
+- `isRegistered` and `wasRegistered` fields in the drep/info endpoint changed to `isRegisteredAsDRep` and `wasRegisteredAsDRep` respectively [Issue 212](https://github.com/IntersectMBO/govtool/issues/212)
 - Update Cardano-Serialization-Lib to 12.0.0-alpha.16 [Issue 156](https://github.com/IntersectMBO/govtool/issues/156)
 - Changed and improved working conventions docs, PR template and codeowners file, addressing [Issue 88](https://github.com/IntersectMBO/govtool/issues/88).
 - Changed Node version from 8.7.1-pre to 8.8.0-pre and DbSync version from sancho-2-3-0 to sancho-4-0-0-fix-config, addressing also [Issue 181](https://github.com/IntersectMBO/govtool/issues/181).

@@ -6,6 +6,7 @@ type RegistrationAsDRepValues = {
   dRepName: string;
   email: string;
   link1: string;
+  storeData: boolean;
 };
 
 export const defaulDRepRegistrationtValues: RegistrationAsDRepValues = {
@@ -13,6 +14,7 @@ export const defaulDRepRegistrationtValues: RegistrationAsDRepValues = {
   dRepName: "",
   email: "",
   link1: "",
+  storeData: false,
 };
 
 export const useRegisterAsdRepForm = () => {
@@ -21,6 +23,7 @@ export const useRegisterAsdRepForm = () => {
   const {
     control,
     handleSubmit,
+    watch,
     formState: { errors, isValid },
   } = useFormContext<RegistrationAsDRepValues>();
 
@@ -35,9 +38,10 @@ export const useRegisterAsdRepForm = () => {
   }, []);
 
   return {
-    isLoading,
     control,
     errors,
+    watch,
+    isLoading,
     isValid,
     submitForm: handleSubmit(onSubmit),
   };

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Box } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
+import { Box } from "@mui/material";
 
 import { Background } from "@atoms";
 import { ICONS, PATHS } from "@consts";
@@ -8,6 +8,7 @@ import {
   DashboardTopNav,
   Footer,
   RegisterAsdRepStepOne,
+  RegisterAsdRepStepThree,
   RegisterAsdRepStepTwo,
 } from "@organisms";
 import {
@@ -19,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { WALLET_LS_KEY, getItemFromLocalStorage } from "@/utils/localStorage";
 
 export const RegisterAsdRep = () => {
-  const [step, setStep] = useState<number>(2);
+  const [step, setStep] = useState<number>(1);
   const { isMobile } = useScreenDimension();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -50,6 +51,7 @@ export const RegisterAsdRep = () => {
         <FormProvider {...methods}>
           {step === 1 && <RegisterAsdRepStepOne setStep={setStep} />}
           {step === 2 && <RegisterAsdRepStepTwo setStep={setStep} />}
+          {step === 3 && <RegisterAsdRepStepThree setStep={setStep} />}
         </FormProvider>
         {isMobile && <Footer />}
       </Box>

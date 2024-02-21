@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { PATHS } from "@consts";
 import { RegisterAsSoleVoterBoxContent } from "@organisms";
-import { BottomBoxButtons } from "@molecules";
+import { CenteredBoxBottomButtons } from "@molecules";
 import { useCardano, useModal } from "@context";
 
 export const RegisterAsSoleVoterBox = () => {
@@ -66,10 +66,10 @@ export const RegisterAsSoleVoterBox = () => {
   return (
     <>
       <RegisterAsSoleVoterBoxContent />
-      <BottomBoxButtons
-        leftButtonAction={() => navigate(PATHS.dashboard)}
-        rightButtonAction={onRegister}
-        rightButtonIsLoading={isLoading}
+      <CenteredBoxBottomButtons
+        onBackButton={() => navigate(PATHS.dashboard)}
+        onActionButton={onRegister}
+        isLoading={isLoading}
       />
     </>
   );

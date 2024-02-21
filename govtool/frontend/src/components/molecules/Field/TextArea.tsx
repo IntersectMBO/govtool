@@ -1,3 +1,5 @@
+import { Box } from "@mui/material";
+
 import {
   FormErrorMessage,
   FormHelpfulText,
@@ -6,7 +8,6 @@ import {
 } from "@atoms";
 
 import { TextAreaFieldProps } from "./types";
-import { Box } from "@mui/material";
 
 export const TextArea = ({
   errorMessage,
@@ -16,10 +17,19 @@ export const TextArea = ({
   label,
   labelStyles,
   layoutStyles,
+  maxLength = 500,
   ...props
 }: TextAreaFieldProps) => {
   return (
-    <Box sx={{ width: "100%", ...layoutStyles }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        position: "relative",
+        ...layoutStyles,
+      }}
+    >
       {label && (
         <Typography
           fontWeight={400}
@@ -30,12 +40,19 @@ export const TextArea = ({
           {label}
         </Typography>
       )}
-      <TextAreaBase {...props} />
+      <TextAreaBase maxLength={maxLength} {...props} />
       <FormHelpfulText
         helpfulText={helpfulText}
         helpfulTextStyle={helpfulTextStyle}
       />
       <FormErrorMessage errorMessage={errorMessage} errorStyles={errorStyles} />
+      <Typography
+        color="#8E908E"
+        sx={{ bottom: 35, position: "absolute", right: 15 }}
+        variant="caption"
+      >
+        {props?.value?.toString().length}/{maxLength}
+      </Typography>
     </Box>
   );
 };

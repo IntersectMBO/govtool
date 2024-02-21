@@ -31,6 +31,7 @@ export const RegisterAsdRepStepOne = ({
       backButtonLabel={t("cancel")}
       onClickActionButton={onClickContinue}
       title={t("registration.becomeADRep")}
+      sx={{ paddingBottom: isMobile ? undefined : 3 }}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("registration.rolesAndResponsibilitiesTitle")}

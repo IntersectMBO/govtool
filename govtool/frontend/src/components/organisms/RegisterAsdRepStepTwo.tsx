@@ -67,7 +67,6 @@ export const RegisterAsdRepStepTwo = ({
       onClickActionButton={onClickContinue}
       onClickBackButton={onClickBackButton}
       title={t("registration.becomeADRep")}
-      sx={{ paddingBottom: isMobile ? 0.5 : 10 }}
     >
       <Box textAlign="center">
         <InfoText>{t("registration.required")}</InfoText>

@@ -14,6 +14,7 @@ export const BgCard = ({
   actionButtonLabel,
   backButtonLabel,
   children,
+  isActionButtonDisabled,
   onClickBackButton,
   onClickActionButton,
   sx,
@@ -52,6 +53,7 @@ export const BgCard = ({
     return (
       <Button
         data-testid="retire-button"
+        disabled={isActionButtonDisabled}
         onClick={onClickActionButton}
         size="extraLarge"
         sx={{
@@ -63,7 +65,7 @@ export const BgCard = ({
         {actionButtonLabel}
       </Button>
     );
-  }, [isMobile]);
+  }, [isActionButtonDisabled, isMobile]);
 
   return (
     <Box
@@ -71,8 +73,8 @@ export const BgCard = ({
       sx={{
         alignItems: screenWidth >= 768 ? "center" : "inherit",
         display: "flex",
+        flex: 1,
         flexDirection: "column",
-        justifyContent: "center",
         marginTop: "97px",
       }}
     >
@@ -111,17 +113,20 @@ export const BgCard = ({
         </Typography>
       </Link>
       <Box
+        display="flex"
+        flexDirection="column"
+        flex={isMobile ? 1 : undefined}
         borderRadius="20px"
         boxShadow={isMobile ? "" : `2px 2px 20px 0px ${boxShadow2}`}
         height="auto"
         maxWidth={screenWidth > 768 ? 600 : undefined}
         mb={isMobile ? undefined : 3}
-        pb={isMobile ? undefined : 3}
+        pb={isMobile ? undefined : 10}
         pt={isMobile ? undefined : 10}
         px={isMobile ? 2 : 18.75}
         sx={sx}
       >
-        <Box display="flex" flexDirection="column">
+        <Box display="flex" flex={1} flexDirection="column">
           {children}
         </Box>
         <Box

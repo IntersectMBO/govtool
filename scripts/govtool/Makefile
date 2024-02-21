@@ -21,6 +21,7 @@ docker_host := $(domain)
 docker_user := ubuntu
 ssh_url := $(docker_user)@$(docker_host)
 docker_compose_file := docker-compose.$(env).yml
+compose_stack_name := govtool-$(env)-$(cardano_network)
 
 # helper function for checking undefined variables
 check_defined = \
@@ -37,7 +38,7 @@ all: docker-login prepare-config upload-config build-backend push-backend build-
 check-env-defined:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	@grep -q "module \"govtool-$(env)-$(cardano_network)\"" ../../infra/terraform/main.tf && \
+	@grep -q "module \"$(compose_stack_name)\"" ../../infra/terraform/main.tf && \
 	echo "Environment $(env) for network $(cardano_network) is defined in Terraform" || \
 	{ echo "Environment $(env) for network $(cardano_network) is NOT defined in Terraform, cannot deploy there"; exit 1; }
 
@@ -105,8 +106,8 @@ deploy-stack:
 	export GRAFANA_ADMIN_PASSWORD=$(grafana_admin_password); \
 	export TAG=$(tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
-	docker compose -f $(docker_compose_file) -p govtool-$(env)-$(cardano_network) pull; \
-	docker compose -f $(docker_compose_file) -p govtool-$(env)-$(cardano_network) up -d
+	docker compose -f $(docker_compose_file) -p $(compose_stack_name) pull; \
+	docker compose -f $(docker_compose_file) -p $(compose_stack_name) up -d
 
 .PHONY: destroy-cardano-node-and-dbsync
 destroy-cardano-node-and-dbsync:
@@ -133,8 +134,8 @@ toggle-maintenance:
 	export DOCKER_HOST=ssh://$(ssh_url); \
 	export TAG=$(tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
-	if [[ "$(maintenance)" = "enable" ]]; then docker compose -f $(docker_compose_file) -p govtool-$(env)-$(cardano_network) exec frontend touch /var/run/maintenance_enabled; \
-	else docker compose -f $(docker_compose_file) -p govtool-$(env)-$(cardano_network) exec frontend rm /var/run/maintenance_enabled; fi
+	if [[ "$(maintenance)" = "enable" ]]; then docker compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend touch /var/run/maintenance_enabled; \
+	else docker compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend rm /var/run/maintenance_enabled; fi
 
 .DEFAULT_GOAL := info
 .PHONY: info
@@ -177,4 +178,4 @@ docker:
 	export GRAFANA_ADMIN_PASSWORD=$(grafana_admin_password); \
 	export TAG=$(tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
-	docker compose -f $(docker_compose_file) -p govtool-$(env)-$(cardano_network) $(cmd)
+	docker compose -f $(docker_compose_file) -p $(compose_stack_name) $(cmd)

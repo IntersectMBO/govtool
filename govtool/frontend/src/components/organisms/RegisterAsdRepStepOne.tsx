@@ -33,6 +33,7 @@ export const RegisterAsdRepStepOne = ({
   return (
     <BgCard
       actionButtonLabel={t("continue")}
+      backButtonLabel={t("cancel")}
       onClickActionButton={onClickContinue}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">

@@ -323,14 +323,15 @@ export const en = {
       viewAll: "View all",
     },
     soleVoter: {
-      retireSoleVoter: "Retire as a Sole Voter",
       becomeSoleVoter: "Become a Sole Voter",
       registerDescription:
-        "A Sole Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of ADA in their connected wallet. <0>Learn More</0> about Sole Voter.\n\nBecoming a Sole Voter will require a refundable deposit of <strong>₳{{deposit}}</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
+      "A Sole Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of ADA in their connected wallet. <0>Learn More</0> about Sole Voter.\n\nBecoming a Sole Voter will require a refundable deposit of <strong>₳{{deposit}}</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
       registerHeading: "What this Means",
-      retirementHeading: "What Retirement Means",
+      reRegister:"Re-register",
       retirementDescription:
-        "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of {{deposit}} ADA will be refunded.\n\nYou can at any time in the future re-register to become a Sole Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\nThese options are listed in our Guides here: <0>Voting options and Roles</0>",
+      "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of {{deposit}} ADA will be refunded.\n\nYou can at any time in the future re-register to become a Sole Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\nThese options are listed in our Guides here: <0>Voting options and Roles</0>",
+      retirementHeading: "What Retirement Means",
+      retireSoleVoter: "Retire as a Sole Voter",
     },
     system: {
       sanchoNet: "SanchoNet",

@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import { Button, Typography } from "../atoms";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { GovActionDetails, VoteActionForm, VotesSubmitted } from "../molecules";
+import { VoteActionForm, VotesSubmitted } from "../molecules";
 import { useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { ICONS } from "@consts";
@@ -164,22 +164,18 @@ export const GovernanceActionDetailsCard = ({
             <Typography color="neutralGray" variant="caption">
               {t("govActions.details")}
             </Typography>
-            {typeof details === "object" && details !== null ? (
-              Object.entries(details).map(([key, value]) => {
-                return (
-                  <div key={key}>
-                    {<GovActionDetails title={key} value={value} />}
-                  </div>
-                );
-              })
-            ) : (
+            <Box>
               <Typography
-                sx={{ textOverflow: "ellipsis", overflow: "hidden" }}
                 variant="caption"
+                sx={{
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "pre-line",
+                }}
               >
-                {details}
+                {JSON.stringify(details, null, 1)}
               </Typography>
-            )}
+            </Box>
           </Box>
         </Box>
         <Button

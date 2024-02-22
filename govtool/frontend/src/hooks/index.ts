@@ -6,5 +6,4 @@ export * from "./useFetchNextPageDetector";
 export * from "./useWalletConnectionListener";
 
 export * from "./forms";
-export * from "./mutations";
 export * from "./queries";

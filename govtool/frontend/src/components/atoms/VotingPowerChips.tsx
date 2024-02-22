@@ -13,7 +13,7 @@ import { correctAdaFormat } from "@utils";
 import { Tooltip } from "@atoms";
 
 export const VotingPowerChips = () => {
-  const { dRep, stakeKey, isDrepLoading } = useCardano();
+  const { user, stakeKey, isDrepLoading } = useCardano();
   const { dRepVotingPower, isDRepVotingPowerLoading } =
     useGetDRepVotingPowerQuery();
   const { votingPower, powerIsLoading } =
@@ -33,7 +33,7 @@ export const VotingPowerChips = () => {
       alignItems="center"
       maxHeight={isMobile ? undefined : 48}
     >
-      {dRep?.isRegistered && (
+      {user?.isRegisteredAsDRep && (
         <Tooltip
           heading={t("tooltips.votingPower.heading")}
           paragraphOne={t("tooltips.votingPower.paragraphOne")}
@@ -55,8 +55,8 @@ export const VotingPowerChips = () => {
           {t("votingPower")}
         </Typography>
       )}
-      {(dRep?.isRegistered && isDRepVotingPowerLoading) ||
-      (!dRep?.isRegistered && powerIsLoading) ||
+      {(user?.isRegisteredAsDRep && isDRepVotingPowerLoading) ||
+      (!user?.isRegisteredAsDRep && powerIsLoading) ||
       isDrepLoading ? (
         <CircularProgress size={20} color="primary" />
       ) : (
@@ -67,7 +67,7 @@ export const VotingPowerChips = () => {
           sx={{ whiteSpace: "nowrap" }}
         >
           ₳{" "}
-          {dRep?.isRegistered
+          {user?.isRegisteredAsDRep
             ? correctAdaFormat(dRepVotingPower) ?? 0
             : correctAdaFormat(votingPower) ?? 0}
         </Typography>

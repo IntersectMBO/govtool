@@ -38,7 +38,7 @@ export const DashboardGovernanceActionsCategory = () => {
   const [chosenSorting, setChosenSorting] = useState<string>("");
   const { isMobile, screenWidth } = useScreenDimension();
   const navigate = useNavigate();
-  const { dRep, isDrepLoading, voteTransaction } = useCardano();
+  const { user, isDrepLoading, voteTransaction } = useCardano();
   const { t } = useTranslation();
 
   const {
@@ -88,7 +88,7 @@ export const DashboardGovernanceActionsCategory = () => {
         .toLowerCase()
         .includes(searchText.toLowerCase())
     );
-  }, [proposals, dRep?.isRegistered, searchText, isProposalsFetchingNextPage]);
+  }, [proposals, user?.isRegisteredAsDRep, searchText, isProposalsFetchingNextPage]);
 
   const closeSorts = useCallback(() => {
     setSortOpen(false);

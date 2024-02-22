@@ -23,13 +23,17 @@ export const RegisterAsdRepStepOne = ({
 
   const deposit = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
-  const onClickContinue = useCallback(() => setStep(2), [setStep]);
+  const onClickContinue = useCallback(() => setStep(2), []);
+
+  const openLearMoreAboutDrep = useCallback(
+    () => openInNewTab("https://sancho.network/roles/drep"),
+    []
+  );
 
   return (
     <BgCard
       actionButtonLabel={t("continue")}
       onClickActionButton={onClickContinue}
-      title={t("registration.becomeADRep")}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("registration.rolesAndResponsibilitiesTitle")}
@@ -48,12 +52,12 @@ export const RegisterAsdRepStepOne = ({
           components={[
             <Link
               key="1"
-              onClick={() => openInNewTab("https://sancho.network/")}
+              onClick={openLearMoreAboutDrep}
               sx={{ cursor: "pointer" }}
             />,
           ]}
           i18nKey={"registration.rolesAndResponsibilitiesDescription"}
-          values={{ deposit: correctAdaFormat(deposit) }}
+          values={{ deposit: correctAdaFormat(deposit.drep_deposit) }}
         />
       </Typography>
     </BgCard>

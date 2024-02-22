@@ -8,6 +8,7 @@ import {
   DashboardTopNav,
   Footer,
   RegisterAsdRepStepOne,
+  RegisterAsdRepStepThree,
   RegisterAsdRepStepTwo,
 } from "@organisms";
 import {
@@ -47,6 +48,7 @@ export const RegisterAsdRep = () => {
         <FormProvider {...registerAsdRepFormMethods}>
           {step === 1 && <RegisterAsdRepStepOne setStep={setStep} />}
           {step === 2 && <RegisterAsdRepStepTwo setStep={setStep} />}
+          {step === 3 && <RegisterAsdRepStepThree setStep={setStep} />}
         </FormProvider>
         {isMobile && <Footer />}
       </Box>

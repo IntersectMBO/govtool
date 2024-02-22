@@ -1,13 +1,13 @@
 import { getAdaHolderCurrentDelegation, getDRepInfo } from "@services";
 import { DRepActionType } from "./wallet";
-import { DRepInfo } from "@models";
+import { userInfo } from "@models";
 
 export const setLimitedRegistrationInterval = (
   intervalTime: number,
   attemptsNumber: number,
   dRepID: string,
   transactionType: DRepActionType | Omit<DRepActionType, "update">,
-  setDRep: (key: undefined | DRepInfo) => void
+  setUser: (key: undefined | userInfo) => void
 ): Promise<boolean> => {
   return new Promise(async (resolve) => {
     const desiredResult = transactionType === "registration" ? true : false;
@@ -20,8 +20,8 @@ export const setLimitedRegistrationInterval = (
         try {
           const data = await getDRepInfo(dRepID);
 
-          if (data.isRegistered === desiredResult) {
-            setDRep(data);
+          if (data.isRegisteredAsDRep === desiredResult) {
+            setUser(data);
             clearInterval(interval);
             resolve(desiredResult);
           }

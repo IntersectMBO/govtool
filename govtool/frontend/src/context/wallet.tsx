@@ -50,7 +50,7 @@ import { Trans } from "react-i18next";
 import { useModal, useSnackbar } from ".";
 
 import { PATHS } from "@consts";
-import { CardanoApiWallet, DRepInfo, Protocol } from "@models";
+import { CardanoApiWallet, userInfo, Protocol } from "@models";
 import type { StatusModalState } from "@organisms";
 import {
   getPubDRepID,
@@ -99,16 +99,14 @@ interface CardanoContext {
   disconnectWallet: () => Promise<void>;
   enable: (walletName: string) => Promise<EnableResponse>;
   error?: string;
-  dRep: DRepInfo | undefined;
-  soleVoter: DRepInfo | undefined;
-  setSoleVoter: (key: undefined | DRepInfo) => void;
+  user: userInfo | undefined;
   isEnabled: boolean;
   pubDRepKey: string;
   dRepID: string;
   dRepIDBech32: string;
   isMainnet: boolean;
   stakeKey?: string;
-  setDRep: (key: undefined | DRepInfo) => void;
+  setUser: (key: undefined | userInfo) => void;
   setStakeKey: (key: string) => void;
   stakeKeys: string[];
   walletApi?: CardanoApiWallet;
@@ -171,12 +169,7 @@ CardanoContext.displayName = "CardanoContext";
 
 function CardanoProvider(props: Props) {
   const [isEnabled, setIsEnabled] = useState(false);
-  const [dRep, setDRep] = useState<DRepInfo | undefined>(undefined);
-  const [soleVoter, setSoleVoter] = useState<DRepInfo | undefined>({
-    deposit: 4000000,
-    isRegistered: false,
-    wasRegistered: false,
-  });
+  const [user, setUser] = useState<userInfo | undefined>(undefined);
   const [walletApi, setWalletApi] = useState<CardanoApiWallet | undefined>(
     undefined
   );
@@ -356,7 +349,7 @@ function CardanoProvider(props: Props) {
                 10,
                 dRepID,
                 registerTransaction.type,
-                setDRep
+                setUser
               ).then((isRegistered) => {
                 if (registerTransaction.type === "registration") {
                   if (isRegistered) {
@@ -423,7 +416,7 @@ function CardanoProvider(props: Props) {
               10,
               dRepID,
               soleVoterTransaction.type,
-              setDRep
+              setUser
             ).then((isRegistered) => {
               if (soleVoterTransaction.type === "registration") {
                 if (isRegistered) {
@@ -850,9 +843,9 @@ function CardanoProvider(props: Props) {
         // Add output of 1 ADA to the address of our wallet
         let outputValue = BigNum.from_str("1000000");
 
-        if (registrationType === "retirement" && dRep?.deposit) {
+        if (registrationType === "retirement" && user?.deposit) {
           outputValue = outputValue.checked_add(
-            BigNum.from_str(`${dRep?.deposit}`)
+            BigNum.from_str(`${user?.deposit}`)
           );
         }
 
@@ -1002,7 +995,7 @@ function CardanoProvider(props: Props) {
       voteTransaction.transactionHash,
       stakeKey,
       isPendingTransaction,
-      dRep,
+      user,
     ]
   );
 
@@ -1151,7 +1144,7 @@ function CardanoProvider(props: Props) {
 
         const dRepRetirementCert = DrepDeregistration.new(
           dRepCred,
-          BigNum.from_str(`${dRep?.deposit}`)
+          BigNum.from_str(`${user?.deposit}`)
         );
         // add cert to tbuilder
         certBuilder.add(
@@ -1163,7 +1156,7 @@ function CardanoProvider(props: Props) {
         console.log(e);
         throw e;
       }
-    }, [dRepID, dRep]);
+    }, [dRepID, user]);
 
   const buildVote = useCallback(
     async (
@@ -1224,7 +1217,7 @@ function CardanoProvider(props: Props) {
     () => ({
       address,
       enable,
-      dRep,
+      user,
       isEnabled,
       isMainnet,
       disconnectWallet,
@@ -1232,7 +1225,7 @@ function CardanoProvider(props: Props) {
       dRepIDBech32,
       pubDRepKey,
       stakeKey,
-      setDRep,
+      setUser,
       setStakeKey,
       stakeKeys,
       walletApi,
@@ -1253,13 +1246,11 @@ function CardanoProvider(props: Props) {
       isPendingTransaction,
       isDrepLoading,
       setIsDrepLoading,
-      soleVoter,
-      setSoleVoter,
     }),
     [
       address,
       enable,
-      dRep,
+      user,
       isEnabled,
       isMainnet,
       disconnectWallet,
@@ -1267,7 +1258,7 @@ function CardanoProvider(props: Props) {
       dRepIDBech32,
       pubDRepKey,
       stakeKey,
-      setDRep,
+      setUser,
       setStakeKey,
       stakeKeys,
       walletApi,
@@ -1288,8 +1279,6 @@ function CardanoProvider(props: Props) {
       isPendingTransaction,
       isDrepLoading,
       setIsDrepLoading,
-      soleVoter,
-      setSoleVoter,
     ]
   );
 

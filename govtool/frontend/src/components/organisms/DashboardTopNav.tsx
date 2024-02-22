@@ -29,7 +29,7 @@ export const DashboardTopNav = ({
   isVotingPowerHidden,
 }: DashboardTopNavProps) => {
   const { isMobile, screenWidth } = useScreenDimension();
-  const { dRep } = useCardano();
+  const { user } = useCardano();
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const { t } = useTranslation();
@@ -168,7 +168,7 @@ export const DashboardTopNav = ({
                   </Grid>
                 </Grid>
               </Box>
-              {dRep?.isRegistered && <DRepInfoCard />}
+              {user?.isRegisteredAsDRep && <DRepInfoCard />}
               <Box py={2} />
               <WalletInfoCard />
             </Box>

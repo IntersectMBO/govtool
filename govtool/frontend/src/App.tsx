@@ -34,7 +34,7 @@ import { useGetDRepInfo, useWalletConnectionListener } from "./hooks";
 import { RegisterAsSoleVoter } from "./pages/RegisterAsSoleVoter";
 
 export default function App() {
-  const { enable, setDRep, setIsDrepLoading } = useCardano();
+  const { enable, setUser, setIsDrepLoading } = useCardano();
   const navigate = useNavigate();
   const { data } = useGetDRepInfo();
   const { modal, openModal, modals } = useModal();
@@ -47,11 +47,11 @@ export default function App() {
 
   useEffect(() => {
     setIsDrepLoading(true);
-    setDRep(data);
+    setUser(data);
     const timer = setTimeout(() => setIsDrepLoading(false), 1000);
 
     return () => clearTimeout(timer);
-  }, [data?.isRegistered]);
+  }, [data?.isRegisteredAsDRep]);
 
   const checkTheWalletIsActive = useCallback(() => {
     const hrefCondition =

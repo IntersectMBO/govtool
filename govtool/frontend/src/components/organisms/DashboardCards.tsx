@@ -20,7 +20,7 @@ export const DashboardCards = () => {
     buildSignSubmitConwayCertTx,
     delegateTo,
     delegateTransaction,
-    dRep,
+    user,
     dRepID,
     dRepIDBech32,
     isDrepLoading,
@@ -28,7 +28,6 @@ export const DashboardCards = () => {
     registerTransaction,
     soleVoterTransaction,
     stakeKey,
-    soleVoter,
   } = useCardano();
   const navigate = useNavigate();
   const { currentDelegation, isCurrentDelegationLoading } =
@@ -225,7 +224,7 @@ export const DashboardCards = () => {
         default:
           return t("dashboard.registration.metadataUpdateInProgress");
       }
-    } else if (dRep?.isRegistered || dRep?.wasRegistered) {
+    } else if (user?.isRegisteredAsDRep || user?.wasRegisteredAsDRep) {
       return t("dashboard.registration.holdersCanDelegate");
     } else {
       return t("dashboard.registration.ifYouWant");
@@ -233,8 +232,8 @@ export const DashboardCards = () => {
   }, [
     registerTransaction.transactionHash,
     registerTransaction.type,
-    dRep?.isRegistered,
-    dRep?.wasRegistered,
+    user?.isRegisteredAsDRep,
+    user?.wasRegisteredAsDRep,
   ]);
 
   const registrationCardTitle = useMemo(() => {
@@ -247,9 +246,9 @@ export const DashboardCards = () => {
         default:
           return t("dashboard.registration.dRepUpdate");
       }
-    } else if (dRep?.isRegistered) {
+    } else if (user?.isRegisteredAsDRep) {
       return t("dashboard.registration.youAreRegistered");
-    } else if (dRep?.wasRegistered) {
+    } else if (user?.wasRegisteredAsDRep) {
       return t("dashboard.registration.registerAgain");
     } else {
       return t("dashboard.registration.registerAsDRep");
@@ -257,8 +256,8 @@ export const DashboardCards = () => {
   }, [
     registerTransaction?.transactionHash,
     registerTransaction.type,
-    dRep?.isRegistered,
-    dRep?.wasRegistered,
+    user?.isRegisteredAsDRep,
+    user?.wasRegisteredAsDRep,
   ]);
 
   return isDrepLoading ? (
@@ -340,25 +339,25 @@ export const DashboardCards = () => {
       {/* REGISTARTION AS DREP CARD */}
       <DashboardActionCard
         dataTestidFirstButton={
-          dRep?.isRegistered ? "retire-button" : "register-button"
+          user?.isRegisteredAsDRep ? "retire-button" : "register-button"
         }
         dataTestidDrepIdBox="my-drep-id"
-        firstButtonVariant={dRep?.isRegistered ? "outlined" : "contained"}
+        firstButtonVariant={user?.isRegisteredAsDRep ? "outlined" : "contained"}
         secondButtonVariant={
           registerTransaction?.transactionHash
             ? "outlined"
-            : dRep?.isRegistered
+            : user?.isRegisteredAsDRep
             ? "text"
             : "outlined"
         }
         dataTestidSecondButton={
-          dRep?.isRegistered
+          user?.isRegisteredAsDRep
             ? "change-metadata-button"
             : "register-learn-more-button"
         }
         description={registrationCardDescription}
         firstButtonAction={
-          dRep?.isRegistered
+          user?.isRegisteredAsDRep
             ? retireAsDrep
             : () => navigateTo(PATHS.registerAsdRep)
         }
@@ -368,7 +367,7 @@ export const DashboardCards = () => {
             ? ""
             : t(
                 `dashboard.registration.${
-                  dRep?.isRegistered ? "retire" : "register"
+                  user?.isRegisteredAsDRep ? "retire" : "register"
                 }`
               )
         }
@@ -377,7 +376,7 @@ export const DashboardCards = () => {
         secondButtonAction={
           registerTransaction?.transactionHash
             ? () => openInNewTab("https://adanordic.com/latest_transactions")
-            : dRep?.isRegistered
+            : user?.isRegisteredAsDRep
             ? () => {
                 navigateTo(PATHS.updateMetadata);
               }
@@ -389,13 +388,13 @@ export const DashboardCards = () => {
         secondButtonLabel={
           registerTransaction?.transactionHash
             ? t("seeTransaction")
-            : dRep?.isRegistered
+            : user?.isRegisteredAsDRep
             ? t("dashboard.registration.changeMetadata")
             : t("learnMore")
         }
-        cardId={dRep?.isRegistered || dRep?.wasRegistered ? dRepIDBech32 : ""}
+        cardId={user?.isRegisteredAsDRep || user?.wasRegisteredAsDRep ? dRepIDBech32 : ""}
         cardTitle={
-          dRep?.isRegistered || dRep?.wasRegistered ? t("myDRepId") : ""
+          user?.isRegisteredAsDRep || user?.wasRegisteredAsDRep ? t("myDRepId") : ""
         }
         title={registrationCardTitle}
       />
@@ -403,7 +402,7 @@ export const DashboardCards = () => {
       {/* SOLE VOTER CARD */}
       <DashboardActionCard
         dataTestidFirstButton={
-          soleVoter?.isRegistered
+          user?.isRegisteredAsSoleVoter
             ? "retire-as-sole-voter-button"
             : "register-as-sole-voter-button"
         }
@@ -411,7 +410,7 @@ export const DashboardCards = () => {
         description={
           <Trans
             i18nKey={
-              soleVoter?.isRegistered
+              user?.isRegisteredAsSoleVoter
                 ? "dashboard.soleVoter.youAreSoleVoterDescription"
                 : "dashboard.soleVoter.registerAsSoleVoterDescription"
             }
@@ -420,21 +419,21 @@ export const DashboardCards = () => {
         }
         firstButtonAction={() =>
           navigateTo(
-            soleVoter?.isRegistered
+            user?.isRegisteredAsSoleVoter
               ? PATHS.retireAsSoleVoter
               : PATHS.registerAsSoleVoter
           )
         }
         firstButtonLabel={t(
-          soleVoter?.isRegistered
+          user?.isRegisteredAsSoleVoter
             ? "dashboard.soleVoter.retire"
             : "dashboard.soleVoter.register"
         )}
-        firstButtonVariant={soleVoter?.isRegistered ? "outlined" : "contained"}
+        firstButtonVariant={user?.isRegisteredAsSoleVoter ? "outlined" : "contained"}
         secondButtonVariant={
           soleVoterTransaction?.transactionHash
             ? "outlined"
-            : soleVoter?.isRegistered
+            : user?.isRegisteredAsSoleVoter
             ? "text"
             : "outlined"
         }
@@ -447,7 +446,7 @@ export const DashboardCards = () => {
         }
         secondButtonLabel={t("learnMore")}
         title={t(
-          soleVoter?.isRegistered
+          user?.isRegisteredAsSoleVoter
             ? "dashboard.soleVoter.youAreSoleVoterTitle"
             : "dashboard.soleVoter.registerAsSoleVoterTitle"
         )}
@@ -460,7 +459,7 @@ export const DashboardCards = () => {
         firstButtonAction={() => navigate(PATHS.dashboard_governance_actions)}
         firstButtonLabel={t(
           `dashboard.govActions.${
-            dRep?.isRegistered ? "reviewAndVote" : "view"
+            user?.isRegisteredAsDRep ? "reviewAndVote" : "view"
           }`
         )}
         imageURL={IMAGES.govActionListImage}

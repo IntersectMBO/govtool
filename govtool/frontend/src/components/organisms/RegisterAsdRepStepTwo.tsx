@@ -1,100 +1,84 @@
-import { Dispatch, SetStateAction, useMemo } from "react";
-import { Box } from "@mui/material";
+import { Dispatch, SetStateAction, useCallback } from "react";
+import { Box, Link } from "@mui/material";
 
-import { LoadingButton, Button, Typography } from "@atoms";
-import { theme } from "@/theme";
+import { Spacer, Typography } from "@atoms";
 import {
-  useRegisterAsdRepFormContext,
   useScreenDimension,
+  useRegisterAsdRepFormContext,
   useTranslation,
 } from "@hooks";
+import { openInNewTab } from "@utils";
+
+import { BgCard, ControlledField } from ".";
 
 interface Props {
   setStep: Dispatch<SetStateAction<number>>;
 }
 
 export const RegisterAsdRepStepTwo = ({ setStep }: Props) => {
-  const {
-    palette: { boxShadow2 },
-  } = theme;
-  const { isLoading, submitForm } = useRegisterAsdRepFormContext();
-  const { isMobile, pagePadding, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
+  const { isMobile } = useScreenDimension();
+  const { control, errors } = useRegisterAsdRepFormContext();
 
-  const renderBackButton = useMemo(() => {
-    return (
-      <Button
-        data-testid={"back-button"}
-        onClick={() => setStep(1)}
-        size="extraLarge"
-        sx={{
-          px: 6,
-          width: isMobile ? "100%" : "auto",
-        }}
-        variant="outlined"
-      >
-        {t("back")}
-      </Button>
-    );
-  }, [isMobile]);
+  const onClickContinue = useCallback(() => setStep(3), []);
 
-  const renderRegisterButton = useMemo(() => {
-    return (
-      <LoadingButton
-        data-testid={"register-button"}
-        isLoading={isLoading}
-        onClick={submitForm}
-        sx={{
-          borderRadius: 50,
-          textTransform: "none",
-          px: 6,
-          width: isMobile ? "100%" : "auto",
-          height: 48,
-        }}
-        variant="contained"
-      >
-        {t("registration.register")}
-      </LoadingButton>
-    );
-  }, [isLoading, isMobile, submitForm]);
+  const onClickBackButton = useCallback(() => setStep(1), []);
 
   return (
-    <Box
-      width={screenWidth < 768 ? "auto" : screenWidth < 1024 ? "60vw" : "45vw"}
-      boxShadow={isMobile ? "" : `2px 2px 20px 0px ${boxShadow2}`}
-      px={pagePadding}
-      py={isMobile ? 4 : 8}
-      borderRadius={"20px"}
-      mb={isMobile ? 0 : 6}
-      height="100%"
+    <BgCard
+      actionButtonLabel={t("skip")}
+      onClickActionButton={onClickContinue}
+      onClickBackButton={onClickBackButton}
     >
-      <Box display="flex" flexDirection="column">
-        <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
-          {t("registration.headingStepTwo")}
-        </Typography>
-        <Typography
-          fontWeight={400}
-          sx={{
-            mb: 7,
-            mt: isMobile ? 4 : 10,
-            textAlign: "center",
-            whiteSpace: "pre-line",
-          }}
-          variant="body1"
-        >
-          {t("registration.descriptionStepTwo")}
-        </Typography>
-      </Box>
-      <Box
-        display="flex"
-        flexDirection={isMobile ? "column" : "row"}
-        justifyContent="space-between"
-        mt={6}
+      <Typography
+        color="accentOrange"
+        sx={{ letterSpacing: 1.5, textAlign: "center" }}
+        variant="body1"
       >
-        {isMobile ? renderRegisterButton : renderBackButton}
-        <Box px={2} py={isMobile ? 1.5 : 0} />
-        {isMobile ? renderBackButton : renderRegisterButton}
+        {t("registration.optional")}
+      </Typography>
+      <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
+        {t("registration.addInformationTitle")}
+      </Typography>
+      <Typography
+        fontWeight={400}
+        sx={{ mb: 7, mt: 3, textAlign: "center" }}
+        variant="body1"
+      >
+        {t("registration.addInformationDescription")}
+      </Typography>
+      <Box display="flex" flexDirection="column" alignItems="center">
+        <ControlledField.Input
+          {...{ control, errors }}
+          dataTestId="url-input"
+          layoutStyles={{ width: isMobile ? "100%" : "70%" }}
+          name="url"
+          placeholder={t("forms.urlWithInfoPlaceholder")}
+        />
+        <Spacer y={6} />
+        <ControlledField.Input
+          {...{ control, errors }}
+          dataTestId="hash-input"
+          layoutStyles={{ width: isMobile ? "100%" : "70%" }}
+          name="hash"
+          placeholder={t("forms.hashPlaceholder")}
+        />
+        <Link
+          data-testid={"how-to-create-link"}
+          onClick={() =>
+            openInNewTab(
+              "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor"
+            )
+          }
+          alignSelf={"center"}
+          my={5}
+          sx={{ cursor: "pointer" }}
+        >
+          <Typography fontWeight={500} color="primary" variant="body1">
+            {t("forms.howCreateUrlAndHash")}
+          </Typography>
+        </Link>
       </Box>
-    </Box>
+    </BgCard>
   );
 };

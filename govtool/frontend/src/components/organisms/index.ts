@@ -18,6 +18,7 @@ export * from "./GovernanceActionsToVote";
 export * from "./Hero";
 export * from "./HomeCards";
 export * from "./RegisterAsdRepStepOne";
+export * from "./RegisterAsdRepStepThree";
 export * from "./RegisterAsdRepStepTwo";
 export * from "./Slider";
 export * from "./StatusModal";

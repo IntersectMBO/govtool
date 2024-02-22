@@ -66,6 +66,9 @@
     "typescript": "^5.0.2",
     "vite": "^4.3.9"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-arm64-musl": "4.12.0"
+  },
   "eslintConfig": {
     "extends": [
       "plugin:storybook/recommended"

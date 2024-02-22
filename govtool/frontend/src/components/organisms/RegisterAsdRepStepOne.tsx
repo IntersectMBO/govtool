@@ -35,6 +35,7 @@ export const RegisterAsdRepStepOne = ({
       actionButtonLabel={t("continue")}
       backButtonLabel={t("cancel")}
       onClickActionButton={onClickContinue}
+      sx={{ paddingBottom: isMobile ? undefined : 3 }}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("registration.rolesAndResponsibilitiesTitle")}

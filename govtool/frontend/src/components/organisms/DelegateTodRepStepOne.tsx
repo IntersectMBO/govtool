@@ -21,7 +21,7 @@ interface DelegateProps {
 export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
   const navigate = useNavigate();
   const {
-    dRep,
+    user,
     dRepID,
     buildSignSubmitConwayCertTx,
     buildVoteDelegationCert,
@@ -133,7 +133,7 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
   }, [
     chosenOption,
     delegate,
-    dRep?.isRegistered,
+    user?.isRegisteredAsDRep,
     dRepID,
     isDelegationLoading,
     isMobile,
@@ -215,7 +215,7 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
           flexDirection={"column"}
           rowGap={3}
         >
-          {dRep?.isRegistered && currentDelegation !== dRepID && (
+          {user?.isRegisteredAsDRep && currentDelegation !== dRepID && (
             <Grid item>
               <ActionRadio
                 onChange={setChosenOption}

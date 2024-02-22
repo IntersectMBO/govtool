@@ -28,7 +28,7 @@ import {
 } from "@utils";
 
 export const DashboardGovernanceActionDetails = () => {
-  const { dRep } = useCardano();
+  const { user } = useCardano();
   const { state, hash } = useLocation();
   const navigate = useNavigate();
   const { isMobile, screenWidth } = useScreenDimension();
@@ -134,7 +134,7 @@ export const DashboardGovernanceActionDetails = () => {
                 ? formatDisplayDate(state.expiryDate)
                 : formatDisplayDate(data.proposal.expiryDate)
             }
-            isDRep={dRep?.isRegistered}
+            isDRep={user?.isRegisteredAsDRep}
             noVotes={state ? state.noVotes : data.proposal.noVotes}
             type={
               state

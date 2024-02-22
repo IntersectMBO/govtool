@@ -1,9 +1,9 @@
 import { API } from "../API";
 
-import type { DRepInfo } from "@models";
+import type { userInfo } from "@models";
 
 export const getDRepInfo = async (dRepID: string) => {
-  const response = await API.get<DRepInfo>(`/drep/info/${dRepID}`);
+  const response = await API.get<userInfo>(`/drep/info/${dRepID}`);
 
   return response.data;
 };

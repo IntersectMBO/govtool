@@ -23,6 +23,7 @@ changes.
 - Fixed vote calculation problems related to NoConfidence DRep [Issue 59](https://github.com/IntersectMBO/govtool/issues/59)
 - Fixed ada-holder/get-current-delegation error when delegated to NoConfidence or AlwaysAbstain dreps. [Issue 82](https://github.com/IntersectMBO/govtool/issues/82)
 - Fixed deployment scripts to address [Issue 171](https://github.com/IntersectMBO/govtool/issues/171).
+- Fixed get drep voting power incorrectly executed endpoint [Issue 280](https://github.com/IntersectMBO/govtool/issues/280)
 
 ### Changed
 - Update Cardano-Serialization-Lib to 12.0.0-alpha.16 [Issue 156](https://github.com/IntersectMBO/govtool/issues/156)

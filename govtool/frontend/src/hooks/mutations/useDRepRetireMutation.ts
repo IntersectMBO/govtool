@@ -8,7 +8,11 @@ export const useDRepRetireMutation = () => {
 
   const { mutateAsync } = useMutation(postDRepRetire, {
     onSuccess: () => {
-      setDRep({ deposit: 100, wasRegistered: true, isRegistered: false });
+      setDRep({
+        deposit: 100,
+        wasRegistered: true,
+        isRegistered: false,
+      });
       addSuccessAlert("DRep retired.");
     },
   });

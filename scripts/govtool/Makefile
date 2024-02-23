@@ -70,7 +70,7 @@ build-backend:
 	$(docker) build --tag "$(repo_url)/backend:$(tag)" ../../govtool/backend
 
 .PHONY: push-backend
-push-backend:
+push-backend: docker-login
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	$(docker) push $(repo_url)/backend:$(tag)
@@ -90,13 +90,13 @@ build-frontend:
 		../../govtool/frontend
 
 .PHONY: push-frontend
-push-frontend:
+push-frontend: docker-login
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	$(docker) push $(repo_url)/frontend:$(tag)
 
 .PHONY: deploy-stack
-deploy-stack:
+deploy-stack: docker-login
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	@:$(call check_defined, grafana_admin_password)

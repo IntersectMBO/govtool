@@ -65,7 +65,7 @@ upload-config: prepare-config
 	rsync -av -e 'ssh -o StrictHostKeyChecking=no' config/target/. $(ssh_url):config
 
 .PHONY: build-backend
-build-backend:
+build-backend: build-backend-base
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	$(docker) build --build-arg BASE_IMAGE_TAG=$(base_backend_image_tag) --tag "$(repo_url)/backend:$(tag)" ../../govtool/backend
@@ -74,11 +74,12 @@ build-backend:
 build-backend-base:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
+	docker manifest inspect "$(repo_url)/backend-base:$(base_backend_image_tag)" || \
 	$(docker) build --file ../../govtool/backend/Dockerfile.base --tag "$(repo_url)/backend-base:$(base_backend_image_tag)" ../../govtool/backend
-	@echo "New backend-base image: $(repo_url)/backend-base:$(base_backend_image_tag)"
+	@echo "Using backend-base image: $(repo_url)/backend-base:$(base_backend_image_tag)"
 
 .PHONY: push-backend
-push-backend: docker-login
+push-backend: docker-login push-backend-base
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	$(docker) push $(repo_url)/backend:$(tag)
@@ -87,6 +88,7 @@ push-backend: docker-login
 push-backend-base: docker-login
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
+	docker manifest inspect "$(repo_url)/backend-base:$(base_backend_image_tag)" || \
 	$(docker) push $(repo_url)/backend-base:$(base_backend_image_tag)
 
 .PHONY: build-frontend

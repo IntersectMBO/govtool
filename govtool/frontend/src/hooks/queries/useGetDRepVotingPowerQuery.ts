@@ -8,7 +8,7 @@ export const useGetDRepVotingPowerQuery = () => {
   const { dRepID, dRep } = useCardano();
 
   const { data, isLoading } = useQuery({
-    queryKey: QUERY_KEYS.useGetDRepVotingPowerKey,
+    queryKey: [QUERY_KEYS.useGetDRepVotingPowerKey, dRepID, dRep?.isRegistered],
     queryFn: async () => {
       return await getDRepVotingPower({ dRepID });
     },

@@ -12,7 +12,7 @@ export const useGetDRepVotingPowerQuery = () => {
     queryFn: async () => {
       return await getDRepVotingPower({ dRepID });
     },
-    enabled: !!dRepID && dRep?.isRegistered,
+    enabled: !!dRepID && !!dRep?.isRegistered,
   });
 
   return { dRepVotingPower: data, isDRepVotingPowerLoading: isLoading };

@@ -7,7 +7,11 @@ export const useDRepRegisterMutation = () => {
 
   const { mutateAsync, isLoading } = useMutation(postDRepRegister, {
     onSuccess: () => {
-      setDRep({ deposit: 100, isRegistered: true, wasRegistered: false });
+      setDRep({
+        deposit: 100,
+        isRegistered: true,
+        wasRegistered: false,
+      });
     },
   });
 

@@ -1,7 +1,7 @@
 export interface DRepInfo {
   isRegistered: boolean;
   wasRegistered: boolean;
-  deposit: number;
+  deposit: number | null;
 }
 
 export interface DRepData {

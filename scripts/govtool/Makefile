@@ -22,6 +22,7 @@ docker_user := ubuntu
 ssh_url := $(docker_user)@$(docker_host)
 docker_compose_file := docker-compose.$(env).yml
 compose_stack_name := govtool-$(env)-$(cardano_network)
+base_backend_image_tag := $(shell git hash-object ../../govtool/backend/vva-be.cabal)
 
 # helper function for checking undefined variables
 check_defined = \
@@ -67,14 +68,14 @@ upload-config: prepare-config
 build-backend:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	$(docker) build --tag "$(repo_url)/backend:$(tag)" ../../govtool/backend
+	$(docker) build --build-arg BASE_IMAGE_TAG=$(base_backend_image_tag) --tag "$(repo_url)/backend:$(tag)" ../../govtool/backend
 
 .PHONY: build-backend-base
 build-backend-base:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	$(docker) build --file ../../govtool/backend/Dockerfile.base --tag "$(repo_url)/backend-base:$(commit)" ../../govtool/backend
-	@echo "New backend-base image: $(repo_url)/backend-base:$(commit)"
+	$(docker) build --file ../../govtool/backend/Dockerfile.base --tag "$(repo_url)/backend-base:$(base_backend_image_tag)" ../../govtool/backend
+	@echo "New backend-base image: $(repo_url)/backend-base:$(base_backend_image_tag)"
 
 .PHONY: push-backend
 push-backend: docker-login
@@ -86,7 +87,7 @@ push-backend: docker-login
 push-backend-base: docker-login
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	$(docker) push $(repo_url)/backend-base:$(commit)
+	$(docker) push $(repo_url)/backend-base:$(base_backend_image_tag)
 
 .PHONY: build-frontend
 build-frontend:

@@ -106,8 +106,8 @@ deploy-stack: docker-login
 	export GRAFANA_ADMIN_PASSWORD=$(grafana_admin_password); \
 	export TAG=$(tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
-	docker compose -f $(docker_compose_file) -p $(compose_stack_name) pull; \
-	docker compose -f $(docker_compose_file) -p $(compose_stack_name) up -d
+	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) pull; \
+	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) up -d
 
 .PHONY: destroy-cardano-node-and-dbsync
 destroy-cardano-node-and-dbsync:
@@ -120,9 +120,9 @@ destroy-cardano-node-and-dbsync:
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
 	containers="$$(docker container ls --no-trunc --format '{{.Names}}' -f name=cardano-node -f name=cardano-db-sync -f name=postgres)"; \
 	volumes="$$(docker volume ls --format '{{.Name}}' -f name=db-sync-data -f name=node-db -f name=node-ipc -f name=postgres)"; \
-	docker container stop $${containers}; \
-	docker container rm $${containers}; \
-	docker volume rm $${volumes}
+	$(docker) container stop $${containers}; \
+	$(docker) container rm $${containers}; \
+	$(docker) volume rm $${volumes}
 
 .PHONY: toggle-maintenance
 toggle-maintenance:
@@ -134,8 +134,8 @@ toggle-maintenance:
 	export DOCKER_HOST=ssh://$(ssh_url); \
 	export TAG=$(tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
-	if [[ "$(maintenance)" = "enable" ]]; then docker compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend touch /var/run/maintenance_enabled; \
-	else docker compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend rm /var/run/maintenance_enabled; fi
+	if [[ "$(maintenance)" = "enable" ]]; then $(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend touch /var/run/maintenance_enabled; \
+	else $(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend rm /var/run/maintenance_enabled; fi
 
 .DEFAULT_GOAL := info
 .PHONY: info
@@ -178,4 +178,4 @@ docker:
 	export GRAFANA_ADMIN_PASSWORD=$(grafana_admin_password); \
 	export TAG=$(tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
-	docker compose -f $(docker_compose_file) -p $(compose_stack_name) $(cmd)
+	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) $(cmd)

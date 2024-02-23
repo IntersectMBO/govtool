@@ -69,11 +69,24 @@ build-backend:
 	@:$(call check_defined, env)
 	$(docker) build --tag "$(repo_url)/backend:$(tag)" ../../govtool/backend
 
+.PHONY: build-backend-base
+build-backend-base:
+	@:$(call check_defined, cardano_network)
+	@:$(call check_defined, env)
+	$(docker) build --file ../../govtool/backend/Dockerfile.base --tag "$(repo_url)/backend-base:$(commit)" ../../govtool/backend
+	@echo "New backend-base image: $(repo_url)/backend-base:$(commit)"
+
 .PHONY: push-backend
 push-backend: docker-login
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	$(docker) push $(repo_url)/backend:$(tag)
+
+.PHONY: push-backend-base
+push-backend-base: docker-login
+	@:$(call check_defined, cardano_network)
+	@:$(call check_defined, env)
+	$(docker) push $(repo_url)/backend-base:$(commit)
 
 .PHONY: build-frontend
 build-frontend:

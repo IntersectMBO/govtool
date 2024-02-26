@@ -50,7 +50,7 @@ import { Trans } from "react-i18next";
 import { useModal, useSnackbar } from ".";
 
 import { PATHS } from "@consts";
-import { CardanoApiWallet, userInfo, Protocol } from "@models";
+import { CardanoApiWallet, VoterInfo, Protocol } from "@models";
 import type { StatusModalState } from "@organisms";
 import {
   getPubDRepID,
@@ -99,14 +99,14 @@ interface CardanoContext {
   disconnectWallet: () => Promise<void>;
   enable: (walletName: string) => Promise<EnableResponse>;
   error?: string;
-  voter: userInfo | undefined;
+  voter: VoterInfo | undefined;
   isEnabled: boolean;
   pubDRepKey: string;
   dRepID: string;
   dRepIDBech32: string;
   isMainnet: boolean;
   stakeKey?: string;
-  setVoter: (key: undefined | userInfo) => void;
+  setVoter: (key: undefined | VoterInfo) => void;
   setStakeKey: (key: string) => void;
   stakeKeys: string[];
   walletApi?: CardanoApiWallet;
@@ -169,7 +169,7 @@ CardanoContext.displayName = "CardanoContext";
 
 function CardanoProvider(props: Props) {
   const [isEnabled, setIsEnabled] = useState(false);
-  const [voter, setVoter] = useState<userInfo | undefined>(undefined);
+  const [voter, setVoter] = useState<VoterInfo | undefined>(undefined);
   const [walletApi, setWalletApi] = useState<CardanoApiWallet | undefined>(
     undefined
   );

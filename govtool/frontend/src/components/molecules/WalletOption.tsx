@@ -1,10 +1,10 @@
-import { Box, Typography } from "@mui/material";
-import { FC } from "react";
+import { FC, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { Box, CircularProgress, Typography } from "@mui/material";
 
+import { PATHS } from "@consts";
 import { useCardano } from "@context";
 import { theme } from "@/theme";
-import { useNavigate } from "react-router-dom";
-import { PATHS } from "@/consts";
 
 export interface WalletOption {
   icon: string;
@@ -15,7 +15,7 @@ export interface WalletOption {
 }
 
 export const WalletOptionButton: FC<WalletOption> = ({ ...props }) => {
-  const { enable } = useCardano();
+  const { enable, isEnableLoading } = useCardano();
   const {
     palette: { lightBlue },
   } = theme;
@@ -23,52 +23,77 @@ export const WalletOptionButton: FC<WalletOption> = ({ ...props }) => {
 
   const { dataTestId, icon, label, name, cip95Available } = props;
 
+  const enableByWalletName = useCallback(async() => {
+    if(isEnableLoading) return;
+    const result = await enable(name);
+    if (result?.stakeKey) {
+      navigate(PATHS.dashboard);
+      return;
+    }
+    navigate(PATHS.stakeKeys);
+  }, [enable, isEnableLoading])
+
   return (
     <Box
       data-testid={dataTestId}
       sx={{
         alignItems: "center",
-        border: `1px solid ${lightBlue}`,
+        border: isEnableLoading ? "none" : `1px solid ${lightBlue}`,
+        bgcolor: isEnableLoading ? "#EAE9F0" : "white",
         borderRadius: "100px",
-        boxShadow: "0px 0px 11px 0px #24223230",
+        boxShadow: isEnableLoading ? undefined : "0px 0px 11px 0px #24223230",
         boxSizing: "border-box",
-        cursor: cip95Available ? "pointer" : "unset",
+        cursor: cip95Available
+          ? isEnableLoading
+            ? "default"
+            : "pointer"
+          : "unset",
         display: "flex",
         justifyContent: "space-between",
         marginBottom: "16px",
-        padding: "12px 28px 12px 13px",
+        padding: "12px 13px 12px 13px",
         transition: "background .2s",
+        position: "relative",
         width: "100%",
-        "&:hover": {
-          background: lightBlue,
-        },
+        "&:hover": isEnableLoading
+          ? undefined
+          : {
+              background: lightBlue,
+            },
       }}
       key={name}
-      onClick={async () => {
-        const result = await enable(name);
-        if (result?.stakeKey) {
-          navigate(PATHS.dashboard);
-          return;
-        }
-        navigate(PATHS.stakeKeys);
-      }}
+      onClick={enableByWalletName}
     >
       <img
         alt={`${name} icon`}
         src={icon}
-        style={{ height: "24px", width: "24px" }}
+        style={{
+          height: "24px",
+          width: "24px",
+          filter: isEnableLoading ? "grayscale(100%)" : "none",
+        }}
       />
       <Typography
-        color="primaryBlue"
-        sx={{ fontSize: "16px", fontWeight: "500" }}
+        color={isEnableLoading ? "#C1BED3" : "primaryBlue"}
+        sx={{
+          fontSize: "16px",
+          fontWeight: "500",
+        }}
       >
         {name ?? label}
       </Typography>
-      <img
-        alt={`${name} icon`}
-        src={icon}
-        style={{ height: "24px", width: "24px", visibility: "hidden" }}
-      />
+      <div style={{ height: "24px", width: "24px" }} />
+      {isEnableLoading === name && (
+        <Box
+          position="absolute"
+          left={0}
+          right={0}
+          display="flex"
+          justifyContent="center"
+        >
+          <CircularProgress size={26} />
+        </Box>
+      )}
     </Box>
   );
 };

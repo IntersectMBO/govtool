@@ -20,7 +20,10 @@ export const setLimitedRegistrationInterval = (
         try {
           const data = await getDRepInfo(dRepID);
 
-          if (data.isRegisteredAsDRep === desiredResult) {
+          if (
+            data.isRegisteredAsDRep === desiredResult ||
+            data.isRegisteredAsSoleVoter === desiredResult
+          ) {
             setUser(data);
             clearInterval(interval);
             resolve(desiredResult);

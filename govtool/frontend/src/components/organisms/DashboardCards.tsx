@@ -236,6 +236,28 @@ export const DashboardCards = () => {
     user?.wasRegisteredAsDRep,
   ]);
 
+  const soleVoterCardDescription = useMemo(() => {
+    if (soleVoterTransaction.transactionHash) {
+      switch (soleVoterTransaction.type) {
+        case "retirement":
+          return "dashboard.soleVoter.retirementInProgress";
+        default:
+          return "dashboard.soleVoter.registrationInProgress";
+      }
+    } else if (user?.isRegisteredAsSoleVoter) {
+      return "dashboard.soleVoter.isRegisteredDescription";
+    } else if (user?.wasRegisteredAsSoleVoter && !user?.isRegisteredAsDRep) {
+      return "dashboard.soleVoter.wasRegisteredDescription";
+    } else {
+      return "dashboard.soleVoter.registerDescription";
+    }
+  }, [
+    soleVoterTransaction.transactionHash,
+    soleVoterTransaction.type,
+    user?.isRegisteredAsSoleVoter,
+    user?.wasRegisteredAsSoleVoter,
+  ]);
+
   const registrationCardTitle = useMemo(() => {
     if (registerTransaction?.transactionHash) {
       switch (registerTransaction.type) {
@@ -258,6 +280,28 @@ export const DashboardCards = () => {
     registerTransaction.type,
     user?.isRegisteredAsDRep,
     user?.wasRegisteredAsDRep,
+  ]);
+
+  const soleVoterCardTitle = useMemo(() => {
+    if (soleVoterTransaction?.transactionHash) {
+      switch (soleVoterTransaction.type) {
+        case "retirement":
+          return t("dashboard.soleVoter.retirement");
+        default:
+          return t("dashboard.soleVoter.registration");
+      }
+    } else if (user?.isRegisteredAsSoleVoter) {
+      return t("dashboard.soleVoter.youAreSoleVoterTitle");
+    } else if (user?.wasRegisteredAsSoleVoter && !user?.isRegisteredAsDRep) {
+      return t("dashboard.soleVoter.retireTitle");
+    } else {
+      return t("dashboard.soleVoter.registerTitle");
+    }
+  }, [
+    soleVoterTransaction?.transactionHash,
+    soleVoterTransaction.type,
+    user?.isRegisteredAsSoleVoter,
+    user?.isRegisteredAsSoleVoter,
   ]);
 
   return isDrepLoading ? (
@@ -392,32 +436,45 @@ export const DashboardCards = () => {
             ? t("dashboard.registration.changeMetadata")
             : t("learnMore")
         }
-        cardId={user?.isRegisteredAsDRep || user?.wasRegisteredAsDRep ? dRepIDBech32 : ""}
+        cardId={
+          user?.isRegisteredAsDRep || user?.wasRegisteredAsDRep
+            ? dRepIDBech32
+            : ""
+        }
         cardTitle={
-          user?.isRegisteredAsDRep || user?.wasRegisteredAsDRep ? t("myDRepId") : ""
+          user?.isRegisteredAsDRep || user?.wasRegisteredAsDRep
+            ? t("myDRepId")
+            : ""
         }
         title={registrationCardTitle}
       />
       {/* DREP CARD END*/}
       {/* SOLE VOTER CARD */}
       <DashboardActionCard
+        title={soleVoterCardTitle}
+        inProgress={!!soleVoterTransaction?.transactionHash}
         dataTestidFirstButton={
           user?.isRegisteredAsSoleVoter
             ? "retire-as-sole-voter-button"
             : "register-as-sole-voter-button"
         }
-        firstButtonVariant="contained"
-        secondButtonVariant="outlined"
         dataTestidSecondButton="learn-more-button"
         description={
           <Trans
-            i18nKey={
-              user?.isRegisteredAsSoleVoter
-                ? "dashboard.soleVoter.youAreSoleVoterDescription"
-                : "dashboard.soleVoter.registerAsSoleVoterDescription"
-            }
+            i18nKey={soleVoterCardDescription}
             values={{ votingPower: correctAdaFormat(votingPower) }}
           />
+        }
+        firstButtonLabel={
+          soleVoterTransaction?.transactionHash
+            ? ""
+            : t(
+                user?.isRegisteredAsSoleVoter
+                  ? "dashboard.soleVoter.retire"
+                  : user?.wasRegisteredAsSoleVoter && !user?.isRegisteredAsDRep
+                  ? "dashboard.soleVoter.reRegister"
+                  : "dashboard.soleVoter.register"
+              )
         }
         firstButtonAction={() =>
           navigateTo(
@@ -426,21 +483,10 @@ export const DashboardCards = () => {
               : PATHS.registerAsSoleVoter
           )
         }
-        firstButtonLabel={t(
-          user?.isRegisteredAsSoleVoter
-            ? "dashboard.soleVoter.retire"
-            : "dashboard.soleVoter.register"
-        )}
-        firstButtonVariant={user?.isRegisteredAsSoleVoter ? "outlined" : "contained"}
-        secondButtonVariant={
-          soleVoterTransaction?.transactionHash
-            ? "outlined"
-            : user?.isRegisteredAsSoleVoter
-            ? "text"
-            : "outlined"
+        firstButtonVariant={
+          user?.isRegisteredAsSoleVoter ? "outlined" : "contained"
         }
-        inProgress={!!soleVoterTransaction?.transactionHash}
-        imageURL={IMAGES.soleVoterImage}
+        secondButtonLabel={t("learnMore")}
         secondButtonAction={() =>
           openInNewTab(
             "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep"
@@ -448,11 +494,8 @@ export const DashboardCards = () => {
         }
         secondButtonLabel={t("learnMore")}
         secondButtonVariant={"outlined"}
-        title={t(
-          user?.isRegisteredAsSoleVoter
-            ? "dashboard.soleVoter.youAreSoleVoterTitle"
-            : "dashboard.soleVoter.registerAsSoleVoterTitle"
-        )}
+        dataTestidSecondButton="learn-more-button"
+        imageURL={IMAGES.soleVoterImage}
       />
       {/* REGISTARTION AS SOLE VOTER CARD END*/}
       {/* GOV ACTIONS LIST CARD */}

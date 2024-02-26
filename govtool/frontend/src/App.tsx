@@ -51,7 +51,7 @@ export default function App() {
     const timer = setTimeout(() => setIsDrepLoading(false), 1000);
 
     return () => clearTimeout(timer);
-  }, [data?.isRegisteredAsDRep]);
+  }, [data?.isRegisteredAsDRep, data?.isRegisteredAsSoleVoter]);
 
   const checkTheWalletIsActive = useCallback(() => {
     const hrefCondition =

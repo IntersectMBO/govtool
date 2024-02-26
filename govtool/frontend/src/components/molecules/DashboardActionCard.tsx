@@ -112,7 +112,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
         ) : null}
         {inProgress && !isLoading ? (
           <Typography variant="title2" fontWeight={700}>
-            in progress
+            In Progress
           </Typography>
         ) : null}
         {description ? (

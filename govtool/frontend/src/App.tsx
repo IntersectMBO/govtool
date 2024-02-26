@@ -34,7 +34,7 @@ import { useGetDRepInfo, useWalletConnectionListener } from "./hooks";
 import { RegisterAsSoleVoter } from "./pages/RegisterAsSoleVoter";
 
 export default function App() {
-  const { enable, setUser, setIsDrepLoading } = useCardano();
+  const { enable, setVoter, setIsDrepLoading } = useCardano();
   const navigate = useNavigate();
   const { data } = useGetDRepInfo();
   const { modal, openModal, modals } = useModal();
@@ -47,7 +47,7 @@ export default function App() {
 
   useEffect(() => {
     setIsDrepLoading(true);
-    setUser(data);
+    setVoter(data);
     const timer = setTimeout(() => setIsDrepLoading(false), 1000);
 
     return () => clearTimeout(timer);

@@ -9,7 +9,7 @@ import { useCardano } from "@/context";
 export const RetireAsSoleVoterBoxContent = () => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
-  const { user } = useCardano();
+  const { voter } = useCardano();
 
   return (
     <>
@@ -29,7 +29,7 @@ export const RetireAsSoleVoterBoxContent = () => {
       >
         <Trans
           i18nKey="soleVoter.retirementDescription"
-          values={{ deposit: correctAdaFormat(user?.deposit) }}
+          values={{ deposit: correctAdaFormat(voter?.deposit) }}
           components={[
             <Link
               onClick={() => openInNewTab("https://sancho.network/")}

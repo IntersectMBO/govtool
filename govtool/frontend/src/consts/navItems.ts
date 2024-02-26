@@ -9,6 +9,11 @@ export const NAV_ITEMS = [
     newTabLink: null,
   },
   {
+    dataTestId: "drep-directory-link",
+    navTo: PATHS.drep_directory,
+    label: "DRep Directory",
+  },
+  {
     dataTestId: "governance-actions-link",
     navTo: PATHS.governance_actions,
     label: "Governance Actions",
@@ -36,6 +41,13 @@ export const CONNECTED_NAV_ITEMS = [
     activeIcon: ICONS.dashboardActiveIcon,
     icon: ICONS.dashboardIcon,
     newTabLink: null,
+  },
+  {
+    dataTestId: "drep-directory-link",
+    label: "DRep Directory",
+    navTo: PATHS.dashboard_drep_directory,
+    activeIcon: ICONS.dRepDirectoryActiveIcon,
+    icon: ICONS.dRepDirectoryIcon,
   },
   {
     dataTestId: "governance-actions-link",

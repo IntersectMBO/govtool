@@ -22,6 +22,8 @@ import {
   GovernanceActionsCategory,
   DashboardGovernanceActionsCategory,
   RetireAsSoleVoter,
+  DRepDirectory,
+  DRepDirectoryContent,
 } from "@pages";
 import {
   callAll,
@@ -114,7 +116,12 @@ export default function App() {
             path={PATHS.dashboard_governance_actions_category}
             element={<DashboardGovernanceActionsCategory />}
           />
+          <Route
+            path={PATHS.dashboard_drep_directory}
+            element={<DRepDirectoryContent isConnected />}
+          />
         </Route>
+        <Route path={PATHS.drep_directory} element={<DRepDirectory />} />
         <Route path={PATHS.delegateTodRep} element={<DelegateTodRep />} />
         <Route path={PATHS.registerAsdRep} element={<RegisterAsdRep />} />
         <Route
@@ -133,8 +140,8 @@ export default function App() {
           handleClose={
             !modals[modal.type].preventDismiss
               ? callAll(modals[modal.type]?.onClose, () =>
-                  openModal({ type: "none", state: null })
-                )
+                openModal({ type: "none", state: null })
+              )
               : undefined
           }
         >

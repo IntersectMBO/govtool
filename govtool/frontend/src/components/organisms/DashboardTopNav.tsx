@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
+import { Box, BoxProps, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 
 import { Background, Link, VotingPowerChips, Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
@@ -9,13 +9,14 @@ import { useCardano } from "@context";
 import { DRepInfoCard, WalletInfoCard } from "@molecules";
 import { openInNewTab } from "@utils";
 
-type DashboardTopNavProps = {
+export type DashboardTopNavProps = {
   imageSRC?: string;
   imageWidth?: number;
   imageHeight?: number;
   title: string;
   isDrawer?: boolean;
   isVotingPowerHidden?: boolean;
+  sx?: BoxProps["sx"];
 };
 
 const DRAWER_PADDING = 2;
@@ -27,6 +28,7 @@ export const DashboardTopNav = ({
   imageWidth,
   imageHeight,
   isVotingPowerHidden,
+  sx
 }: DashboardTopNavProps) => {
   const { isMobile, screenWidth } = useScreenDimension();
   const { voter } = useCardano();
@@ -40,7 +42,10 @@ export const DashboardTopNav = ({
       py={3}
       display={"flex"}
       bgcolor={isMobile ? "#FBFBFF" : undefined}
-      sx={{ backdropFilter: "blur(10px)" }}
+      sx={{
+        backdropFilter: "blur(10px)",
+        ...sx
+      }}
       alignItems={"center"}
       justifyContent={"space-between"}
       borderBottom={1}
@@ -80,93 +85,98 @@ export const DashboardTopNav = ({
           </IconButton>
         )}
       </Box>
-      {isMobile && (
-        <SwipeableDrawer
-          anchor="right"
-          open={isDrawerOpen}
-          onClose={() => setIsDrawerOpen(false)}
-          onOpen={() => setIsDrawerOpen(true)}
-        >
-          <Background>
-            <Box
-              flex={1}
-              px={DRAWER_PADDING}
-              pb={3}
-              display="flex"
-              flexDirection="column"
-              height={"100%"}
-            >
-              <Box flex={1}>
-                <Box
-                  width={screenWidth - CALCULATED_DRAWER_PADDING}
-                  display="flex"
-                  flex={1}
-                  py={3}
-                  justifyContent="space-between"
-                >
-                  <img src={ICONS.appLogoIcon} height={25} />
-                  <IconButton
-                    data-testid={"close-drawer-button"}
-                    sx={{ padding: 0 }}
-                    onClick={() => setIsDrawerOpen(false)}
+      {
+        isMobile && (
+          <SwipeableDrawer
+            anchor="right"
+            open={isDrawerOpen}
+            onClose={() => setIsDrawerOpen(false)}
+            onOpen={() => setIsDrawerOpen(true)}
+          >
+            <Background>
+              <Box
+                flex={1}
+                px={DRAWER_PADDING}
+                pb={3}
+                display="flex"
+                flexDirection="column"
+                height={"100%"}
+              >
+                <Box flex={1}>
+                  <Box
+                    width={screenWidth - CALCULATED_DRAWER_PADDING}
+                    display="flex"
+                    flex={1}
+                    py={3}
+                    justifyContent="space-between"
                   >
-                    <img src={ICONS.closeDrawerIcon} />
-                  </IconButton>
+                    <img src={ICONS.appLogoIcon} height={25} />
+                    <IconButton
+                      data-testid={"close-drawer-button"}
+                      sx={{ padding: 0 }}
+                      onClick={() => setIsDrawerOpen(false)}
+                    >
+                      <img src={ICONS.closeDrawerIcon} />
+                    </IconButton>
+                  </Box>
+                  <Grid container direction={"column"} rowGap={4} mt={6}>
+                    <Grid item>
+                      <Link
+                        dataTestId="home-link"
+                        navTo={PATHS.dashboard}
+                        label={t("menu.myDashboard")}
+                        size="big"
+                        onClick={() => {
+                          setIsDrawerOpen(false);
+                        }}
+                        isConnectWallet
+                      />
+                    </Grid>
+                    <Grid item>
+                      <Link
+                        dataTestId="governance-actions-link"
+                        navTo={PATHS.dashboard_governance_actions}
+                        label={t("menu.viewGovActions")}
+                        size="big"
+                        onClick={() => {
+                          setIsDrawerOpen(false);
+                        }}
+                        isConnectWallet
+                      />
+                    </Grid>
+                    <Grid item>
+                      <Link
+                        dataTestId="guides-link"
+                        navTo={""}
+                        label={t("menu.guides")}
+                        size="big"
+                        onClick={() => {
+                          openInNewTab(
+                            "https://docs.sanchogov.tools/about/what-is-sanchonet-govtool"
+                          );
+                          setIsDrawerOpen(false);
+                        }}
+                        isConnectWallet
+                      />
+                    </Grid>
+                    <Grid item>
+                      <Link
+                        dataTestId="faqs-link"
+                        navTo={""}
+                        label={t("menu.faqs")}
+                        size="big"
+                        onClick={() => {
+                          openInNewTab("https://docs.sanchogov.tools/faqs");
+                          setIsDrawerOpen(false);
+                        }}
+                        isConnectWallet
+                      />
+                    </Grid>
+                  </Grid>
                 </Box>
-                <Grid container direction={"column"} rowGap={4} mt={6}>
-                  <Grid item>
-                    <Link
-                      dataTestId="home-link"
-                      navTo={PATHS.dashboard}
-                      label={t("menu.myDashboard")}
-                      size="big"
-                      onClick={() => {
-                        setIsDrawerOpen(false);
-                      }}
-                      isConnectWallet
-                    />
-                  </Grid>
-                  <Grid item>
-                    <Link
-                      dataTestId="governance-actions-link"
-                      navTo={PATHS.dashboard_governance_actions}
-                      label={t("menu.viewGovActions")}
-                      size="big"
-                      onClick={() => {
-                        setIsDrawerOpen(false);
-                      }}
-                      isConnectWallet
-                    />
-                  </Grid>
-                  <Grid item>
-                    <Link
-                      dataTestId="guides-link"
-                      navTo={""}
-                      label={t("menu.guides")}
-                      size="big"
-                      onClick={() => {
-                        openInNewTab(
-                          "https://docs.sanchogov.tools/about/what-is-sanchonet-govtool"
-                        );
-                        setIsDrawerOpen(false);
-                      }}
-                      isConnectWallet
-                    />
-                  </Grid>
-                  <Grid item>
-                    <Link
-                      dataTestId="faqs-link"
-                      navTo={""}
-                      label={t("menu.faqs")}
-                      size="big"
-                      onClick={() => {
-                        openInNewTab("https://docs.sanchogov.tools/faqs");
-                        setIsDrawerOpen(false);
-                      }}
-                      isConnectWallet
-                    />
-                  </Grid>
-                </Grid>
+                {dRep?.isRegistered && <DRepInfoCard />}
+                <Box py={2} />
+                <WalletInfoCard />
               </Box>
               {(voter?.isRegisteredAsDRep ||
                 voter?.isRegisteredAsSoleVoter) && <DRepInfoCard />}

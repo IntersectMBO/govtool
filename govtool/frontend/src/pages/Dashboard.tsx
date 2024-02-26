@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { useEffect, useRef } from "react";
 import { useLocation, Outlet, useNavigate } from "react-router-dom";
 
-import { ICONS, PATHS } from "@consts";
+import { CONNECTED_NAV_ITEMS, ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { Background, ScrollToManage } from "@atoms";
 import { useScreenDimension } from "@hooks";
@@ -12,10 +12,8 @@ import { checkIsWalletConnected } from "@/utils";
 const getPageTitle = (pathname: string) => {
   if (pathname === PATHS.dashboard) {
     return "My Dashboard";
-  } else if (pathname.includes(PATHS.dashboard_governance_actions)) {
-    return "Governance Actions";
   }
-  return "";
+  return Object.values(CONNECTED_NAV_ITEMS).find(({ navTo }) => navTo === pathname)?.label ?? "";
 };
 
 export const Dashboard = () => {

@@ -150,6 +150,7 @@ export const en = {
       },
     },
     dRepDirectory: {
+      title: "DRep Directory",
       abstainCardDescription: "Select this to vote ABSTAIN to every vote.",
       abstainCardTitle: "Abstain from Every Vote",
       automatedVotingOptions: "Automated Voting Options",

@@ -3,6 +3,8 @@ export * from "./Dashboard";
 export * from "./DashboardGovernanceActionsCategory";
 export * from "./DelegateTodRep";
 export * from "./ErrorPage";
+export * from "./DRepDirectory";
+export * from "./DRepDirectoryContent";
 export * from "./GovernanceActionDetails";
 export * from "./GovernanceActions";
 export * from "./GovernanceActionsCategory";

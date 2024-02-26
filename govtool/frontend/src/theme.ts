@@ -1,6 +1,16 @@
 import { createTheme } from "@mui/material/styles";
 
 declare module "@mui/material/styles" {
+
+  interface BreakpointOverrides {
+    xxs: true;
+    xs: true;
+    sm: true;
+    md: true;
+    lg: true;
+    xl: true;
+  }
+
   interface Palette {
     accentOrange: string;
     accentYellow: string;
@@ -16,6 +26,7 @@ declare module "@mui/material/styles" {
     primaryBlue: string;
     secondaryBlue: string;
     specialCyan: string;
+    specialCyanLight: string;
     specialCyanBorder: string;
     lightBlue: string;
     textBlack: string;
@@ -38,6 +49,7 @@ declare module "@mui/material/styles" {
     primaryBlue: string;
     secondaryBlue: string;
     specialCyan: string;
+    specialCyanLight: string;
     specialCyanBorder: string;
     lightBlue: string;
     textBlack: string;
@@ -50,6 +62,16 @@ declare module "@mui/material/styles" {
 export type Theme = typeof theme;
 
 export const theme = createTheme({
+  breakpoints: {
+    values: {
+      xxs: 0,
+      xs: 375,
+      sm: 425,
+      md: 768,
+      lg: 1024,
+      xl: 1440,
+    },
+  },
   components: {
     MuiInputBase: {
       styleOverrides: {
@@ -103,6 +125,7 @@ export const theme = createTheme({
     secondary: { main: "rgb(255, 100, 10)" },
     secondaryBlue: "#6F99FF",
     specialCyan: "#1C94B2",
+    specialCyanLight: "#D2EAF0",
     specialCyanBorder: "#77BFD1",
     textBlack: "#242232",
     textGray: "#525252",

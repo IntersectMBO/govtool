@@ -99,14 +99,14 @@ interface CardanoContext {
   disconnectWallet: () => Promise<void>;
   enable: (walletName: string) => Promise<EnableResponse>;
   error?: string;
-  user: userInfo | undefined;
+  voter: userInfo | undefined;
   isEnabled: boolean;
   pubDRepKey: string;
   dRepID: string;
   dRepIDBech32: string;
   isMainnet: boolean;
   stakeKey?: string;
-  setUser: (key: undefined | userInfo) => void;
+  setVoter: (key: undefined | userInfo) => void;
   setStakeKey: (key: string) => void;
   stakeKeys: string[];
   walletApi?: CardanoApiWallet;
@@ -169,7 +169,7 @@ CardanoContext.displayName = "CardanoContext";
 
 function CardanoProvider(props: Props) {
   const [isEnabled, setIsEnabled] = useState(false);
-  const [user, setUser] = useState<userInfo | undefined>(undefined);
+  const [voter, setVoter] = useState<userInfo | undefined>(undefined);
   const [walletApi, setWalletApi] = useState<CardanoApiWallet | undefined>(
     undefined
   );
@@ -349,7 +349,7 @@ function CardanoProvider(props: Props) {
                 10,
                 dRepID,
                 registerTransaction.type,
-                setUser
+                setVoter
               ).then((isRegistered) => {
                 if (registerTransaction.type === "registration") {
                   if (isRegistered) {
@@ -416,7 +416,7 @@ function CardanoProvider(props: Props) {
               10,
               dRepID,
               soleVoterTransaction.type,
-              setUser
+              setVoter
             ).then((isRegistered) => {
               if (soleVoterTransaction.type === "registration") {
                 if (isRegistered) {
@@ -843,9 +843,9 @@ function CardanoProvider(props: Props) {
         // Add output of 1 ADA to the address of our wallet
         let outputValue = BigNum.from_str("1000000");
 
-        if (registrationType === "retirement" && user?.deposit) {
+        if (registrationType === "retirement" && voter?.deposit) {
           outputValue = outputValue.checked_add(
-            BigNum.from_str(`${user?.deposit}`)
+            BigNum.from_str(`${voter?.deposit}`)
           );
         }
 
@@ -995,7 +995,7 @@ function CardanoProvider(props: Props) {
       voteTransaction.transactionHash,
       stakeKey,
       isPendingTransaction,
-      user,
+      voter,
     ]
   );
 
@@ -1144,7 +1144,7 @@ function CardanoProvider(props: Props) {
 
         const dRepRetirementCert = DrepDeregistration.new(
           dRepCred,
-          BigNum.from_str(`${user?.deposit}`)
+          BigNum.from_str(`${voter?.deposit}`)
         );
         // add cert to tbuilder
         certBuilder.add(
@@ -1156,7 +1156,7 @@ function CardanoProvider(props: Props) {
         console.log(e);
         throw e;
       }
-    }, [dRepID, user]);
+    }, [dRepID, voter]);
 
   const buildVote = useCallback(
     async (
@@ -1217,7 +1217,7 @@ function CardanoProvider(props: Props) {
     () => ({
       address,
       enable,
-      user,
+      voter,
       isEnabled,
       isMainnet,
       disconnectWallet,
@@ -1225,7 +1225,7 @@ function CardanoProvider(props: Props) {
       dRepIDBech32,
       pubDRepKey,
       stakeKey,
-      setUser,
+      setVoter,
       setStakeKey,
       stakeKeys,
       walletApi,
@@ -1250,7 +1250,7 @@ function CardanoProvider(props: Props) {
     [
       address,
       enable,
-      user,
+      voter,
       isEnabled,
       isMainnet,
       disconnectWallet,
@@ -1258,7 +1258,7 @@ function CardanoProvider(props: Props) {
       dRepIDBech32,
       pubDRepKey,
       stakeKey,
-      setUser,
+      setVoter,
       setStakeKey,
       stakeKeys,
       walletApi,

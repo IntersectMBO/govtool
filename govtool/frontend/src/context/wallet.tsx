@@ -97,6 +97,7 @@ interface CardanoContext {
   address?: string;
   disconnectWallet: () => Promise<void>;
   enable: (walletName: string) => Promise<EnableResponse>;
+  isEnableLoading: string | null;
   error?: string;
   dRep: DRepInfo | undefined;
   isEnabled: boolean;
@@ -165,6 +166,7 @@ CardanoContext.displayName = "CardanoContext";
 
 function CardanoProvider(props: Props) {
   const [isEnabled, setIsEnabled] = useState(false);
+  const [isEnableLoading, setIsEnableLoading] = useState<string | null>(null);
   const [dRep, setDRep] = useState<DRepInfo | undefined>(undefined);
   const [walletApi, setWalletApi] = useState<CardanoApiWallet | undefined>(
     undefined
@@ -517,6 +519,7 @@ function CardanoProvider(props: Props) {
 
   const enable = useCallback(
     async (walletName: string) => {
+      setIsEnableLoading(walletName);
       await checkIsMaintenanceOn();
 
       // todo: use .getSupportedExtensions() to check if wallet supports CIP-95
@@ -650,6 +653,8 @@ function CardanoProvider(props: Props) {
             status: "ERROR",
             error: `${e == undefined ? t("errors.somethingWentWrong") : e}`,
           };
+        } finally {
+          setIsEnableLoading(null);
         }
       }
       throw { status: "ERROR", error: t("errors.somethingWentWrong") };
@@ -1141,6 +1146,7 @@ function CardanoProvider(props: Props) {
       isPendingTransaction,
       isDrepLoading,
       setIsDrepLoading,
+      isEnableLoading,
     }),
     [
       address,
@@ -1173,6 +1179,7 @@ function CardanoProvider(props: Props) {
       isPendingTransaction,
       isDrepLoading,
       setIsDrepLoading,
+      isEnableLoading,
     ]
   );
 

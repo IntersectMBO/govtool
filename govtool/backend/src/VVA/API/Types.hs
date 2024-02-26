@@ -388,7 +388,7 @@ exampleDRepInfoResponse :: Text
 exampleDRepInfoResponse =
     "{\"isRegisteredAsDRep\": false,"
   <> "\"wasRegisteredAsDRep\": true,"
-  <> "\"wasRegisteredAsSoleVoter\": true,"
+  <> "\"isRegisteredAsSoleVoter\": true,"
   <> "\"wasRegisteredAsSoleVoter\": true,"
   <> "\"deposit\": 2000000}"
 

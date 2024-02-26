@@ -15,6 +15,7 @@ changes.
 - i18next library added to FE [Issue 80](https://github.com/IntersectMBO/govtool/issues/80)
 
 ### Fixed
+- Fix make button disble when wallet tries connect [Issue 265](https://github.com/IntersectMBO/govtool/issues/265)
 - Fix drep voting power calculation [Issue 231](https://github.com/IntersectMBO/govtool/issues/231)
 - Fix proposal/list and network/metrics bug that appeared when noone has delegated their funds either to drep_always_abstain or drep_always_no_confidence [Issue 231](https://github.com/IntersectMBO/govtool/issues/231)
 - Fix GA details [Issue 272](https://github.com/IntersectMBO/govtool/issues/272)

@@ -7,7 +7,7 @@ export const setLimitedRegistrationInterval = (
   attemptsNumber: number,
   dRepID: string,
   transactionType: DRepActionType | Omit<DRepActionType, "update">,
-  setUser: (key: undefined | userInfo) => void
+  setVoter: (key: undefined | userInfo) => void
 ): Promise<boolean> => {
   return new Promise(async (resolve) => {
     const desiredResult = transactionType === "registration" ? true : false;
@@ -24,7 +24,7 @@ export const setLimitedRegistrationInterval = (
             data.isRegisteredAsDRep === desiredResult ||
             data.isRegisteredAsSoleVoter === desiredResult
           ) {
-            setUser(data);
+            setVoter(data);
             clearInterval(interval);
             resolve(desiredResult);
           }

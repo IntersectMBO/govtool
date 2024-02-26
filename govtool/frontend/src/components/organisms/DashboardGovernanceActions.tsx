@@ -65,7 +65,7 @@ export const DashboardGovernanceActions = () => {
     state && state.isVotedListOnLoad ? 1 : 0
   );
 
-  const { user, isDrepLoading } = useCardano();
+  const { voter, isDrepLoading } = useCardano();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
 
@@ -121,7 +121,7 @@ export const DashboardGovernanceActions = () => {
             sortingActive={Boolean(chosenSorting)}
             sortOpen={sortOpen}
           />
-          {user?.isRegisteredAsDRep && (
+          {voter?.isRegisteredAsDRep && (
             <Tabs
               sx={{
                 marginTop: 3,

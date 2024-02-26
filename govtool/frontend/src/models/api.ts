@@ -1,4 +1,4 @@
-export interface userInfo {
+export interface VoterInfo {
   isRegisteredAsDRep: boolean;
   wasRegisteredAsDRep: boolean;
   isRegisteredAsSoleVoter: boolean;

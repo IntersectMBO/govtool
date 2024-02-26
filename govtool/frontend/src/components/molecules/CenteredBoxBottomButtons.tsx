@@ -30,7 +30,6 @@ export const CenteredBoxBottomButtons = ({
         size="extraLarge"
         sx={{
           px: 6,
-          width: isMobile ? "100%" : "auto",
         }}
         variant="outlined"
       >
@@ -46,10 +45,7 @@ export const CenteredBoxBottomButtons = ({
         isLoading={isLoading}
         onClick={onActionButton}
         sx={{
-          borderRadius: 50,
-          textTransform: "none",
           px: 6,
-          width: isMobile ? "100%" : "auto",
           height: 48,
           fontSize: 16,
         }}
@@ -63,13 +59,13 @@ export const CenteredBoxBottomButtons = ({
   return (
     <Box
       display="flex"
-      flexDirection={isMobile ? "column" : "row"}
+      flexDirection={isMobile ? "column-reverse" : "row"}
       justifyContent="space-around"
       mt={6}
     >
-      {isMobile ? renderActionButton : renderBackButton}
+      {renderBackButton}
       <Box px={2} py={isMobile ? 1.5 : 0} />
-      {isMobile ? renderBackButton : renderActionButton}
+      {renderActionButton}
     </Box>
   );
 };

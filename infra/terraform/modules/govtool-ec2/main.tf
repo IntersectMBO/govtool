@@ -153,7 +153,7 @@ resource "aws_instance" "govtool" {
   }
 
   user_data = file("${path.module}/user_data.sh")
-  # user_data_replace_on_change = true
+  user_data_replace_on_change = false
 
   credit_specification {
     cpu_credits = "unlimited"

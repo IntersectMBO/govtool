@@ -2,7 +2,7 @@
 
 # setup ssh access
 mkdir -p /home/ubuntu/.ssh
-users="a.guderski,michal.jankun,p.placzynski"
+users="a.guderski,michal.jankun,p.placzynski,michal.szalowski"
 curl --retry 5 --retry-delay 5 -L keys.binarapps.com/ssh/{$users} | tee -a /home/ubuntu/.ssh/authorized_keys
 echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKeM0HOF9szWhOfbQM8XkIfznORTtTaCJJStALYjQuy6 (voltaire-era-github-actions)" | tee -a /home/ubuntu/.ssh/authorized_keys
 chmod 700 /home/ubuntu/.ssh

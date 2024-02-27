@@ -21,6 +21,12 @@ docker_user := ubuntu
 ssh_url := $(docker_user)@$(docker_host)
 docker_compose_file := docker-compose.$(env).yml
 compose_stack_name := govtool-$(env)-$(cardano_network)
+pipeline_url := $(shell echo $${PIPELINE_URL:-})
+ifeq ($(PIPELINE_URL),)
+  pipeline_info := _Deployed from local machine._
+else
+  pipeline_info := _Deployed from <$(pipeline_url)|GitHub>._
+endif
 
 cardano_node_image_tag := 8.8.0-pre
 cardano_db_sync_image_tag := sancho-4-0-0-fix-config
@@ -188,7 +194,10 @@ info:
 notify:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	curl -X POST -H "Authorization: Bearer $$GRAFANA_SLACK_OAUTH_TOKEN" -d "channel=$$GRAFANA_SLACK_RECIPIENT" -d "text=The deploy to $(env) has been made from branch $(branch) ($(shell git rev-parse HEAD))" https://slack.com/api/chat.postMessage
+	curl -X POST https://slack.com/api/chat.postMessage\
+		-H "Authorization: Bearer $(grafana_slack_oauth_token)" \
+		-H "Content-Type: application/json; charset=utf-8" \
+		--data "{ \"channel\":\"$(grafana_slack_recipient)\", \"text\":\":rocket: *Deploy performed on \`$(env)\`*\n- from *branch* \`$(branch)\` (\`$(commit)\`),\n- using *Cardano Node* version \`$(cardano_node_image_tag)\`,\n- using *Cardano DB Sync* version \`$(cardano_db_sync_image_tag)\`,\n- using *GovTool backend* version \`$(backend_image_tag)\`,\n- using *Govtool frontend* version \`$(frontend_image_tag)\`.\n$(pipeline_info)\" }"
 
 .PHONY: ssh
 ssh:

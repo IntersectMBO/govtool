@@ -42,6 +42,10 @@ __check_defined = \
     $(if $(value $1),, \
       $(error Undefined $1$(if $2, ($2))))
 
+# helper function for checking if image exists on ECR
+check_image_on_ecr = \
+	$(docker) manifest inspect "$(repo_url)/$1:$2" > /dev/null 2>&1
+
 .PHONY: all
 all: docker-login prepare-config upload-config build-backend push-backend build-frontend push-frontend deploy-stack info notify
 
@@ -75,39 +79,42 @@ upload-config: prepare-config
 	rsync -av -e 'ssh -o StrictHostKeyChecking=no' config/target/. $(ssh_url):config
 
 .PHONY: build-backend
-build-backend: build-backend-base
+build-backend: docker-login build-backend-base
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
+	$(call check_image_on_ecr,backend,$(backend_image_tag)) || \
 	$(docker) build --build-arg BASE_IMAGE_TAG=$(base_backend_image_tag) --tag "$(repo_url)/backend:$(backend_image_tag)" ../../govtool/backend
 
 .PHONY: build-backend-base
-build-backend-base:
+build-backend-base: docker-login
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	docker manifest inspect "$(repo_url)/backend-base:$(base_backend_image_tag)" > /dev/null 2>&1 || \
+	$(call check_image_on_ecr,backend-base,$(base_backend_image_tag)) || \
 	$(docker) build --file ../../govtool/backend/Dockerfile.base --tag "$(repo_url)/backend-base:$(base_backend_image_tag)" ../../govtool/backend
 	@echo "Using backend-base image: $(repo_url)/backend-base:$(base_backend_image_tag)"
 
 .PHONY: push-backend
-push-backend: docker-login push-backend-base
+push-backend: docker-login push-backend-base build-backend
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
+	$(call check_image_on_ecr,backend,$(backend_image_tag)) || \
 	$(docker) push $(repo_url)/backend:$(backend_image_tag)
 
 .PHONY: push-backend-base
-push-backend-base: docker-login
+push-backend-base: docker-login build-backend-base
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	docker manifest inspect "$(repo_url)/backend-base:$(base_backend_image_tag)" > /dev/null 2>&1 || \
+	$(call check_image_on_ecr,backend-base,$(base_backend_image_tag)) || \
 	$(docker) push $(repo_url)/backend-base:$(base_backend_image_tag)
 
 .PHONY: build-frontend
-build-frontend:
+build-frontend: docker-login
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	@:$(call check_defined, gtm_id)
 	@:$(call check_defined, sentry_dsn)
 	if [[ "$(cardano_network)" = "mainnet" ]]; then NETWORK_FLAG=1; else NETWORK_FLAG=0; fi; \
+	$(call check_image_on_ecr,frontend,$(frontend_image_tag)) || \
 	$(docker) build --tag "$(repo_url)/frontend:$(frontend_image_tag)" \
 		--build-arg VITE_BASE_URL="https://$(domain)/api" \
 		--build-arg VITE_GTM_ID="$(gtm_id)" \
@@ -116,9 +123,10 @@ build-frontend:
 		../../govtool/frontend
 
 .PHONY: push-frontend
-push-frontend: docker-login
+push-frontend: docker-login build-frontend
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
+	$(call check_image_on_ecr,frontend,$(frontend_image_tag)) || \
 	$(docker) push $(repo_url)/frontend:$(frontend_image_tag)
 
 .PHONY: deploy-stack

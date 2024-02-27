@@ -15,14 +15,16 @@ branch := $(shell git rev-parse --abbrev-ref HEAD)
 docker ?= docker
 domain := $(shell echo $${DOMAIN:-$(env)-$(cardano_network).govtool.byron.network})
 repo_url ?= 733019650473.dkr.ecr.eu-west-1.amazonaws.com
-tag := $(commit)-$(env)-$(cardano_network)
 
 docker_host := $(domain)
 docker_user := ubuntu
 ssh_url := $(docker_user)@$(docker_host)
 docker_compose_file := docker-compose.$(env).yml
 compose_stack_name := govtool-$(env)-$(cardano_network)
-base_backend_image_tag := $(shell git hash-object ../../govtool/backend/vva-be.cabal)
+
+base_backend_image_tag := $(shell ./utils/backend-base-version)
+backend_image_tag := $(shell ./utils/backend-version)
+frontend_image_tag := $(shell ./utils/frontend-version)
 
 # helper function for checking undefined variables
 check_defined = \
@@ -68,7 +70,7 @@ upload-config: prepare-config
 build-backend: build-backend-base
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	$(docker) build --build-arg BASE_IMAGE_TAG=$(base_backend_image_tag) --tag "$(repo_url)/backend:$(tag)" ../../govtool/backend
+	$(docker) build --build-arg BASE_IMAGE_TAG=$(base_backend_image_tag) --tag "$(repo_url)/backend:$(backend_image_tag)" ../../govtool/backend
 
 .PHONY: build-backend-base
 build-backend-base:
@@ -82,7 +84,7 @@ build-backend-base:
 push-backend: docker-login push-backend-base
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	$(docker) push $(repo_url)/backend:$(tag)
+	$(docker) push $(repo_url)/backend:$(backend_image_tag)
 
 .PHONY: push-backend-base
 push-backend-base: docker-login
@@ -98,7 +100,7 @@ build-frontend:
 	@:$(call check_defined, gtm_id)
 	@:$(call check_defined, sentry_dsn)
 	if [[ "$(cardano_network)" = "mainnet" ]]; then NETWORK_FLAG=1; else NETWORK_FLAG=0; fi; \
-	$(docker) build --tag "$(repo_url)/frontend:$(tag)" \
+	$(docker) build --tag "$(repo_url)/frontend:$(frontend_image_tag)" \
 		--build-arg VITE_BASE_URL="https://$(domain)/api" \
 		--build-arg VITE_GTM_ID="$(gtm_id)" \
 		--build-arg VITE_NETWORK_FLAG="$$NETWORK_FLAG" \
@@ -109,7 +111,7 @@ build-frontend:
 push-frontend: docker-login
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	$(docker) push $(repo_url)/frontend:$(tag)
+	$(docker) push $(repo_url)/frontend:$(frontend_image_tag)
 
 .PHONY: deploy-stack
 deploy-stack: docker-login
@@ -120,7 +122,8 @@ deploy-stack: docker-login
 	export DOCKER_HOST=ssh://$(ssh_url); \
 	export ENVIRONMENT=$(env); \
 	export GRAFANA_ADMIN_PASSWORD=$(grafana_admin_password); \
-	export TAG=$(tag); \
+	export BACKEND_TAG=$(backend_image_tag); \
+	export FRONTEND_TAG=$(frontend_image_tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
 	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) pull; \
 	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) up -d
@@ -132,7 +135,8 @@ destroy-cardano-node-and-dbsync:
 	export CARDANO_NETWORK=$(cardano_network); \
 	export DOCKER_HOST=ssh://$(ssh_url); \
 	export ENVIRONMENT=$(env); \
-	export TAG=$(tag); \
+	export BACKEND_TAG=$(backend_image_tag); \
+	export FRONTEND_TAG=$(frontend_image_tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
 	containers="$$(docker container ls --no-trunc --format '{{.Names}}' -f name=cardano-node -f name=cardano-db-sync -f name=postgres)"; \
 	volumes="$$(docker volume ls --format '{{.Name}}' -f name=db-sync-data -f name=node-db -f name=node-ipc -f name=postgres)"; \
@@ -148,7 +152,8 @@ toggle-maintenance:
 	export ENVIRONMENT=$(env); \
 	export CARDANO_NETWORK=$(cardano_network); \
 	export DOCKER_HOST=ssh://$(ssh_url); \
-	export TAG=$(tag); \
+	export BACKEND_TAG=$(backend_image_tag); \
+	export FRONTEND_TAG=$(frontend_image_tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
 	if [[ "$(maintenance)" = "enable" ]]; then $(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend touch /var/run/maintenance_enabled; \
 	else $(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend rm /var/run/maintenance_enabled; fi
@@ -160,12 +165,12 @@ info:
 	@:$(call check_defined, env)
 	@echo "+-----------"
 	@echo "|  TIME      $(shell date +'%Y-%m-%d %H:%M:%S%z')"
-	@echo "D  COMMIT    $(shell git rev-parse HEAD)"
-	@echo "E  BRANCH    $(branch)"
-	@echo "P  ENV       $(env)"
-	@echo "L  NETWORK   $(cardano_network)"
-	@echo "O  IMAGE_TAG $(tag)"
-	@echo "Y  SSH       $(ssh_url)"
+	@echo "|  BRANCH    $(branch) [$(shell git rev-parse HEAD)]"
+	@echo "I  ENV       $(env)"
+	@echo "N  NETWORK   $(cardano_network)"
+	@echo "F  BACKEND   $(repo_url)/backend:$(backend_image_tag)"
+	@echo "O  FRONTEND  $(repo_url)/frontend:$(frontend_image_tag)"
+	@echo "|  SSH       $(ssh_url)"
 	@echo "|  URL       https://$(docker_host)"
 	@echo "+-----------"
 
@@ -192,6 +197,7 @@ docker:
 	export DOCKER_HOST=ssh://$(ssh_url); \
 	export ENVIRONMENT=$(env); \
 	export GRAFANA_ADMIN_PASSWORD=$(grafana_admin_password); \
-	export TAG=$(tag); \
+	export BACKEND_TAG=$(backend_image_tag); \
+	export FRONTEND_TAG=$(frontend_image_tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
 	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) $(cmd)

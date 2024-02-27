@@ -167,7 +167,7 @@ services:
     logging: *logging
 
   backend:
-    image: ${VVA_BE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/backend}:${TAG:-main-dev-sanchonet}
+    image: ${VVA_BE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/backend}:${BACKEND_TAG}
     command: /usr/local/bin/vva-be -c /run/secrets/backend-config.json start-app
     depends_on:
       cardano-node:
@@ -193,7 +193,7 @@ services:
       - "traefik.http.services.backend.loadbalancer.server.port=9876"
 
   frontend:
-    image: ${VVA_FE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/frontend}:${TAG:-main-dev-sanchonet}
+    image: ${VVA_FE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/frontend}:${FRONTEND_TAG}
     volumes:
       - /home/ubuntu/config/nginx/auth.conf:/etc/nginx/conf.d/auth.conf
       - /home/ubuntu/config/nginx/govtool.htpasswd:/etc/nginx/conf.d/govtool.htpasswd

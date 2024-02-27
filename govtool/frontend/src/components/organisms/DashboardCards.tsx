@@ -456,7 +456,7 @@ export const DashboardCards = () => {
         title={soleVoterCardTitle}
         inProgress={!!soleVoterTransaction?.transactionHash}
         dataTestidFirstButton={
-          user?.isRegisteredAsSoleVoter
+          voter?.isRegisteredAsSoleVoter
             ? "retire-as-sole-voter-button"
             : "register-as-sole-voter-button"
         }
@@ -495,9 +495,7 @@ export const DashboardCards = () => {
             "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep"
           )
         }
-        secondButtonLabel={t("learnMore")}
         secondButtonVariant={"outlined"}
-        dataTestidSecondButton="learn-more-button"
         imageURL={IMAGES.soleVoterImage}
       />
       {/* REGISTARTION AS SOLE VOTER CARD END*/}

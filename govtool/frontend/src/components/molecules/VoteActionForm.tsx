@@ -142,7 +142,7 @@ export const VoteActionForm = ({
             />
           </Box>
         </Box>
-        {voter?.isRegisteredAsDRep && (
+        {(voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter) && (
           <Button
             data-testid="show-votes-button"
             variant="text"

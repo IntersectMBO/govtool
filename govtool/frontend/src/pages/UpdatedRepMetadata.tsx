@@ -12,7 +12,7 @@ import {
 } from "@hooks";
 import { ControlledField, DashboardTopNav, Footer } from "@organisms";
 import { theme } from "@/theme";
-import { WALLET_LS_KEY, getItemFromLocalStorage, openInNewTab } from "@utils";
+import { checkIsWalletConnected, openInNewTab } from "@utils";
 
 export const UpdatedRepMetadata = () => {
   const navigate = useNavigate();
@@ -27,10 +27,7 @@ export const UpdatedRepMetadata = () => {
     useUpdatedRepMetadataForm();
 
   useEffect(() => {
-    if (
-      !getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`) ||
-      !getItemFromLocalStorage(`${WALLET_LS_KEY}_name`)
-    ) {
+    if (checkIsWalletConnected()) {
       navigate(PATHS.home);
     } else {
       const isPendingTx = isPendingTransaction();

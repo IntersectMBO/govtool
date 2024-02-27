@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# This script returns a version string for the backend code. The version string
+# is the SHA1 hash of the most recent commit in the backend directory. This is
+# used to tag the backend Docker image with the version of the backend code that
+# it was built from. It means that any changes made in the backend code should
+# result in building a new backend docker image.
+
+git log -n 1 --format="%H" -- $(git rev-parse --show-toplevel)/govtool/backend

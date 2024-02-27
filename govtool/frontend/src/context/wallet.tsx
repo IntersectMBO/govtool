@@ -170,6 +170,7 @@ CardanoContext.displayName = "CardanoContext";
 
 function CardanoProvider(props: Props) {
   const [isEnabled, setIsEnabled] = useState(false);
+  const [isEnableLoading, setIsEnableLoading] = useState<string | null>(null);
   const [voter, setVoter] = useState<VoterInfo | undefined>(undefined);
   const [walletApi, setWalletApi] = useState<CardanoApiWallet | undefined>(
     undefined
@@ -1251,8 +1252,6 @@ function CardanoProvider(props: Props) {
       isDrepLoading,
       setIsDrepLoading,
       isEnableLoading,
-      soleVoter,
-      setSoleVoter,
     }),
     [
       address,
@@ -1287,8 +1286,6 @@ function CardanoProvider(props: Props) {
       isDrepLoading,
       setIsDrepLoading,
       isEnableLoading,
-      soleVoter,
-      setSoleVoter,
     ]
   );
 

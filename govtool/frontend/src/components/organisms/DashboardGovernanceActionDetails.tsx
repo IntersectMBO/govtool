@@ -134,7 +134,7 @@ export const DashboardGovernanceActionDetails = () => {
                 ? formatDisplayDate(state.expiryDate)
                 : formatDisplayDate(data.proposal.expiryDate)
             }
-            isDRep={voter?.isRegisteredAsDRep}
+            isDRep={voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter}
             noVotes={state ? state.noVotes : data.proposal.noVotes}
             type={
               state

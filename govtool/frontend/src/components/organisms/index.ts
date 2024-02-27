@@ -1,3 +1,4 @@
+export * from "./AutomatedVotingOptions";
 export * from "./BgCard";
 export * from "./ChooseGovernanceActionType";
 export * from "./ChooseStakeKeyPanel";

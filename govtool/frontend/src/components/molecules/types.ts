@@ -13,3 +13,11 @@ export type StepProps = {
   layoutStyles?: SxProps;
   stepNumber: number | string;
 };
+
+export type AutomatedVotingCardProps = {
+  description: string;
+  onClickDelegate: () => void;
+  onClickInfo: () => void;
+  title: string;
+  votingPower: string | number;
+};

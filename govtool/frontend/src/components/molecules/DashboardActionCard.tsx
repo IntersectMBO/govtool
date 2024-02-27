@@ -2,7 +2,7 @@ import { Box, ButtonProps, Skeleton } from "@mui/material";
 import { FC, ReactNode } from "react";
 
 import { CopyButton, LoadingButton, Typography } from "@atoms";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { theme } from "@/theme";
 
 type DashboardActionCardProps = {
@@ -31,6 +31,7 @@ type DashboardActionCardProps = {
 export const DashboardActionCard: FC<DashboardActionCardProps> = ({
   ...props
 }) => {
+  const { t } = useTranslation();
   const {
     cardId,
     cardTitle,
@@ -83,7 +84,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
           }}
         >
           <Typography color={"orangeDark"} variant="body2">
-            In progress
+            {t("inProgress").toLocaleUpperCase()}
           </Typography>
         </Box>
       )}

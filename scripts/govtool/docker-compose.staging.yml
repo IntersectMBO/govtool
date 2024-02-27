@@ -104,7 +104,7 @@ services:
     logging: *logging
 
   cardano-node:
-    image: ghcr.io/intersectmbo/cardano-node:8.8.0-pre
+    image: ghcr.io/intersectmbo/cardano-node:${CARDANO_NODE_TAG}
     entrypoint:
       - "cardano-node"
       - "run"
@@ -143,7 +143,7 @@ services:
     logging: *logging
 
   cardano-db-sync:
-    image: ghcr.io/intersectmbo/cardano-db-sync:sancho-4-0-0-fix-config
+    image: ghcr.io/intersectmbo/cardano-db-sync:${CARDANO_DB_SYNC_TAG}
     environment:
       - NETWORK=${CARDANO_NETWORK:-sanchonet}
       - POSTGRES_HOST=postgres

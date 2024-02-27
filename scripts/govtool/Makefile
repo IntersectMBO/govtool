@@ -22,6 +22,8 @@ ssh_url := $(docker_user)@$(docker_host)
 docker_compose_file := docker-compose.$(env).yml
 compose_stack_name := govtool-$(env)-$(cardano_network)
 
+cardano_node_image_tag := 8.8.0-pre
+cardano_db_sync_image_tag := sancho-4-0-0-fix-config
 base_backend_image_tag := $(shell ./utils/backend-base-version)
 backend_image_tag := $(shell ./utils/backend-version)
 frontend_image_tag := $(shell ./utils/frontend-version)
@@ -124,6 +126,8 @@ deploy-stack: docker-login
 	export GRAFANA_ADMIN_PASSWORD=$(grafana_admin_password); \
 	export BACKEND_TAG=$(backend_image_tag); \
 	export FRONTEND_TAG=$(frontend_image_tag); \
+	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \
+	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
 	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) pull; \
 	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) up -d
@@ -137,6 +141,8 @@ destroy-cardano-node-and-dbsync:
 	export ENVIRONMENT=$(env); \
 	export BACKEND_TAG=$(backend_image_tag); \
 	export FRONTEND_TAG=$(frontend_image_tag); \
+	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \
+	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
 	containers="$$(docker container ls --no-trunc --format '{{.Names}}' -f name=cardano-node -f name=cardano-db-sync -f name=postgres)"; \
 	volumes="$$(docker volume ls --format '{{.Name}}' -f name=db-sync-data -f name=node-db -f name=node-ipc -f name=postgres)"; \
@@ -154,6 +160,8 @@ toggle-maintenance:
 	export DOCKER_HOST=ssh://$(ssh_url); \
 	export BACKEND_TAG=$(backend_image_tag); \
 	export FRONTEND_TAG=$(frontend_image_tag); \
+	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \
+	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
 	if [[ "$(maintenance)" = "enable" ]]; then $(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend touch /var/run/maintenance_enabled; \
 	else $(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend rm /var/run/maintenance_enabled; fi
@@ -166,10 +174,12 @@ info:
 	@echo "+-----------"
 	@echo "|  TIME      $(shell date +'%Y-%m-%d %H:%M:%S%z')"
 	@echo "|  BRANCH    $(branch) [$(shell git rev-parse HEAD)]"
-	@echo "I  ENV       $(env)"
-	@echo "N  NETWORK   $(cardano_network)"
-	@echo "F  BACKEND   $(repo_url)/backend:$(backend_image_tag)"
-	@echo "O  FRONTEND  $(repo_url)/frontend:$(frontend_image_tag)"
+	@echo "|  ENV       $(env)"
+	@echo "I  NETWORK   $(cardano_network)"
+	@echo "N  BACKEND   $(repo_url)/backend:$(backend_image_tag)"
+	@echo "F  FRONTEND  $(repo_url)/frontend:$(frontend_image_tag)"
+	@echo "O  NODE      ghcr.io/intersectmbo/cardano-node:$(cardano_node_image_tag)"
+	@echo "|  DBSYNC    ghcr.io/intersectmbo/cardano-db-sync:$(cardano_db_sync_image_tag)"
 	@echo "|  SSH       $(ssh_url)"
 	@echo "|  URL       https://$(docker_host)"
 	@echo "+-----------"
@@ -199,5 +209,7 @@ docker:
 	export GRAFANA_ADMIN_PASSWORD=$(grafana_admin_password); \
 	export BACKEND_TAG=$(backend_image_tag); \
 	export FRONTEND_TAG=$(frontend_image_tag); \
+	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \
+	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
 	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) $(cmd)

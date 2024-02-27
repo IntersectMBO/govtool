@@ -7,7 +7,7 @@ import { useCardano } from "@context";
 import { Background, ScrollToManage } from "@atoms";
 import { useScreenDimension } from "@hooks";
 import { DashboardTopNav, Drawer, Footer } from "@organisms";
-import { WALLET_LS_KEY, getItemFromLocalStorage } from "@/utils/localStorage";
+import { checkIsWalletConnected } from "@/utils";
 
 const getPageTitle = (pathname: string) => {
   if (pathname === PATHS.dashboard) {
@@ -33,10 +33,7 @@ export const Dashboard = () => {
   }, [pathname, divRef]);
 
   useEffect(() => {
-    if (
-      !getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`) ||
-      !getItemFromLocalStorage(`${WALLET_LS_KEY}_name`)
-    ) {
+    if (checkIsWalletConnected()) {
       if (window.location.pathname === PATHS.dashboard) {
         navigate(PATHS.home);
       } else {

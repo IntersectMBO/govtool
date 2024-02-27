@@ -1,7 +1,7 @@
 WITH DRepId AS (
     SELECT decode(?, 'hex') as raw
 ), IsRegisteredAsDRep AS (
-    SELECT (deposit>0) as value,
+    SELECT (drep_registration.voting_anchor_id is not null and deposit>0) as value,
            deposit as deposit
     FROM drep_registration
     JOIN drep_hash
@@ -9,7 +9,6 @@ WITH DRepId AS (
     CROSS JOIN DRepId
     WHERE drep_hash.raw = DRepId.raw
     and deposit is not null
-    and drep_registration.voting_anchor_id is not null
     ORDER BY drep_registration.tx_id DESC
     LIMIT 1
 ), WasRegisteredAsDRep AS (
@@ -24,7 +23,7 @@ WITH DRepId AS (
         and drep_registration.voting_anchor_id is not null
     )) as value
 ), IsRegisteredAsSoleVoter AS (
-    SELECT (deposit>0) as value,
+    SELECT (drep_registration.voting_anchor_id is null and deposit>0) as value,
            deposit as deposit
     FROM drep_registration
     JOIN drep_hash
@@ -32,7 +31,6 @@ WITH DRepId AS (
     CROSS JOIN DRepId
     WHERE drep_hash.raw = DRepId.raw
     and deposit is not null
-    and drep_registration.voting_anchor_id is null
     ORDER BY drep_registration.tx_id DESC
     LIMIT 1
 ), WasRegisteredAsSoleVoter AS (

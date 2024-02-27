@@ -416,7 +416,6 @@ export const en = {
     back: "Back",
     backToDashboard: "Back to dashboard",
     backToList: "Back to the list",
-    backToDashboard: "Back to dashboard",
     cancel: "Cancel",
     clear: "Clear",
     confirm: "Confirm",

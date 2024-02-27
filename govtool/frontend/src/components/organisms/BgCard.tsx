@@ -61,7 +61,7 @@ export const BgCard = ({
         {actionButtonLabel}
       </LoadingButton>
     );
-  }, [isLoadingActionButton, isMobile]);
+  }, [isLoadingActionButton, isMobile, actionButtonLabel]);
 
   return (
     <Box

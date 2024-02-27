@@ -431,6 +431,7 @@ export const en = {
     ok: "Ok",
     select: "Select",
     seeTransaction: "See transaction",
+    submit: "Submit",
     skip: "Skip",
     sortBy: "Sort by",
     thisLink: "this link",

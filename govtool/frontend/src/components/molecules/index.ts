@@ -1,4 +1,5 @@
 export * from "./ActionCard";
+export * from "./AutomatedVotingCard";
 export * from "./BackToButton";
 export * from "./CenteredBoxBottomButtons";
 export * from "./CenteredBoxPageWrapper";

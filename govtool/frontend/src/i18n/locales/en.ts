@@ -166,6 +166,15 @@ export const en = {
         title: "Delegate to myself",
       },
     },
+    dRepDirectory: {
+      abstainCardDescription: "Select this to vote ABSTAIN to every vote.",
+      abstainCardTitle: "Abstain from Every Vote",
+      automatedVotingOptions: "Automated Voting Options",
+      noConfidenceDescription:
+        "Select this to signal no confidence in the current constitutional committee by voting NO on every proposal and voting YES to no confidence proposals",
+      noConfidenceTitle: "Signal No Confidence on Every Vote",
+      votingPower: "Voting Power",
+    },
     errorPage: {
       backToDashboard: "Back to dashboard",
       backToHomepage: "Back to homepage",
@@ -466,7 +475,8 @@ export const en = {
     continue: "Continue",
     delegate: "Delegate",
     here: "here",
-    inProgress: "In Progress",
+    info: "Info",
+    inProgress: "In progress",
     learnMore: "Learn more",
     loading: "Loading...",
     myDRepId: "My DRep ID:",

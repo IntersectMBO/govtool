@@ -17,7 +17,7 @@ import {
   useTranslation,
 } from "@hooks";
 import { useNavigate } from "react-router-dom";
-import { WALLET_LS_KEY, getItemFromLocalStorage } from "@/utils/localStorage";
+import { checkIsWalletConnected } from "@/utils";
 
 export const RegisterAsdRep = () => {
   const [step, setStep] = useState<number>(1);
@@ -28,10 +28,7 @@ export const RegisterAsdRep = () => {
   const registerAsdRepFormMethods = useRegisterAsdRepFormController();
 
   useEffect(() => {
-    if (
-      !getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`) ||
-      !getItemFromLocalStorage(`${WALLET_LS_KEY}_name`)
-    ) {
+    if (checkIsWalletConnected()) {
       navigate(PATHS.home);
     }
   }, []);

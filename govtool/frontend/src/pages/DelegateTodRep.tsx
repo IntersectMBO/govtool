@@ -10,8 +10,8 @@ import {
   Footer,
 } from "@organisms";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { WALLET_LS_KEY, getItemFromLocalStorage } from "@/utils/localStorage";
 import { useNavigate } from "react-router-dom";
+import { checkIsWalletConnected } from "@/utils";
 
 export const DelegateTodRep = () => {
   const [step, setStep] = useState(1);
@@ -20,10 +20,7 @@ export const DelegateTodRep = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (
-      !getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`) ||
-      !getItemFromLocalStorage(`${WALLET_LS_KEY}_name`)
-    ) {
+    if (checkIsWalletConnected()) {
       navigate(PATHS.home);
     }
   }, []);

@@ -121,7 +121,7 @@ export const DashboardGovernanceActions = () => {
             sortingActive={Boolean(chosenSorting)}
             sortOpen={sortOpen}
           />
-          {voter?.isRegisteredAsDRep && (
+          {(voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter) && (
             <Tabs
               sx={{
                 marginTop: 3,

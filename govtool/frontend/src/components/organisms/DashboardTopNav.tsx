@@ -44,7 +44,7 @@ export const DashboardTopNav = ({
       alignItems={"center"}
       justifyContent={"space-between"}
       borderBottom={1}
-      borderColor={"#D6E2FF"}
+      borderColor="#D6E2FF"
       position="fixed"
       zIndex={100}
       flex={1}
@@ -168,7 +168,8 @@ export const DashboardTopNav = ({
                   </Grid>
                 </Grid>
               </Box>
-              {voter?.isRegisteredAsDRep && <DRepInfoCard />}
+              {(voter?.isRegisteredAsDRep ||
+                voter?.isRegisteredAsSoleVoter) && <DRepInfoCard />}
               <Box py={2} />
               <WalletInfoCard />
             </Box>

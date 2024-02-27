@@ -134,6 +134,7 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
     chosenOption,
     delegate,
     voter?.isRegisteredAsDRep,
+    voter?.isRegisteredAsSoleVoter,
     dRepID,
     isDelegationLoading,
     isMobile,
@@ -177,9 +178,9 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
             <Box
               border={1}
               borderColor="#D6E2FF"
-              py={"12px"}
-              px={"24px"}
-              mb={"32px"}
+              py="12px"
+              px="24px"
+              mb="32px"
               borderRadius={3}
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -211,24 +212,27 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
         <Grid
           container
           columns={1}
-          display={"flex"}
-          flexDirection={"column"}
+          display="flex"
+          flexDirection="column"
           rowGap={3}
         >
-          {voter?.isRegisteredAsDRep && currentDelegation !== dRepID && (
-            <Grid item>
-              <ActionRadio
-                onChange={setChosenOption}
-                tooltipTitle={t("tooltips.delegateTodRep.toMyself.heading")}
-                tooltipText={t("tooltips.delegateTodRep.toMyself.paragraphOne")}
-                isChecked={chosenOption === dRepID}
-                subtitle={t("delegation.toMyself.subtitle")}
-                title={t("delegation.toMyself.title")}
-                value={dRepID}
-                dataTestId="delegate-to-myself-card"
-              />
-            </Grid>
-          )}
+          {(voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter) &&
+            currentDelegation !== dRepID && (
+              <Grid item>
+                <ActionRadio
+                  onChange={setChosenOption}
+                  tooltipTitle={t("tooltips.delegateTodRep.toMyself.heading")}
+                  tooltipText={t(
+                    "tooltips.delegateTodRep.toMyself.paragraphOne"
+                  )}
+                  isChecked={chosenOption === dRepID}
+                  subtitle={t("delegation.toMyself.subtitle")}
+                  title={t("delegation.toMyself.title")}
+                  value={dRepID}
+                  dataTestId="delegate-to-myself-card"
+                />
+              </Grid>
+            )}
           <Grid item>
             <ActionRadio
               onChange={setChosenOption}

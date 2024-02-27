@@ -74,7 +74,7 @@ build-backend: build-backend-base
 build-backend-base:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	docker manifest inspect "$(repo_url)/backend-base:$(base_backend_image_tag)" || \
+	docker manifest inspect "$(repo_url)/backend-base:$(base_backend_image_tag)" > /dev/null 2>&1 || \
 	$(docker) build --file ../../govtool/backend/Dockerfile.base --tag "$(repo_url)/backend-base:$(base_backend_image_tag)" ../../govtool/backend
 	@echo "Using backend-base image: $(repo_url)/backend-base:$(base_backend_image_tag)"
 
@@ -88,7 +88,7 @@ push-backend: docker-login push-backend-base
 push-backend-base: docker-login
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	docker manifest inspect "$(repo_url)/backend-base:$(base_backend_image_tag)" || \
+	docker manifest inspect "$(repo_url)/backend-base:$(base_backend_image_tag)" > /dev/null 2>&1 || \
 	$(docker) push $(repo_url)/backend-base:$(base_backend_image_tag)
 
 .PHONY: build-frontend

@@ -9,6 +9,7 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
+- Create Automated Voting Options component [Issue 216](https://github.com/IntersectMBO/govtool/issues/216)
 - Change step 3 components [Issue 152](https://github.com/intersectMBO/govtool/issues/152)
 - Add possibility to vote on behalf of myself - Sole Voter [Issue 119](https://github.com/IntersectMBO/govtool/issues/119)
 - Create DRep registration page about roles [Issue 205](https://github.com/IntersectMBO/govtool/issues/205)

@@ -6,8 +6,9 @@ import { HASH_REGEX, URL_REGEX } from "@utils";
 import { useTranslation } from "@hooks";
 
 export interface UrlAndHashFormValues {
-  url?: string;
   hash?: string;
+  storeData?: boolean;
+  url?: string;
 }
 
 export const useUrlAndHashFormController = () => {
@@ -42,12 +43,13 @@ export const useUrlAndHashFormController = () => {
               return !value || HASH_REGEX.test(value);
             }
           ),
+        storeData: Yup.boolean(),
       }),
     []
   );
 
   return useForm<UrlAndHashFormValues>({
-    defaultValues: { url: "", hash: "" },
+    defaultValues: { url: "", hash: "", storeData: false },
     mode: "onChange",
     resolver: yupResolver<UrlAndHashFormValues>(validationSchema),
   });

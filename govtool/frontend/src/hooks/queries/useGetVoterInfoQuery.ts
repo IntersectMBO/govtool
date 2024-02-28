@@ -2,9 +2,9 @@ import { useQuery } from "react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
-import { getDRepInfo } from "@services";
+import { getVoterInfo } from "@services";
 
-export const useGetDRepInfo = () => {
+export const useGetVoterInfo = () => {
   const { dRepID, registerTransaction, soleVoterTransaction } = useCardano();
 
   const { data, isLoading } = useQuery({
@@ -14,7 +14,7 @@ export const useGetDRepInfo = () => {
       soleVoterTransaction?.transactionHash,
     ],
     enabled: !!dRepID,
-    queryFn: async () => await getDRepInfo(dRepID),
+    queryFn: async () => await getVoterInfo(dRepID),
   });
 
   return { data, isLoading };

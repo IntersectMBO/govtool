@@ -9,6 +9,7 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
+- Change step 3 components [Issue 152](https://github.com/intersectMBO/govtool/issues/152)
 - Add possibility to vote on behalf of myself - Sole Voter [Issue 119](https://github.com/IntersectMBO/govtool/issues/119)
 - Create DRep registration page about roles [Issue 205](https://github.com/IntersectMBO/govtool/issues/205)
 - Create Checkbox component. Improve Field and ControlledField [Issue 177](https://github.com/IntersectMBO/govtool/pull/177)

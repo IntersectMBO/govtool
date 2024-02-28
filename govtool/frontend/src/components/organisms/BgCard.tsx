@@ -14,6 +14,7 @@ export const BgCard = ({
   backButtonLabel,
   children,
   isLoadingActionButton,
+  isActionButtonDisabled,
   onClickBackButton,
   onClickActionButton,
   sx,
@@ -50,9 +51,10 @@ export const BgCard = ({
     return (
       <LoadingButton
         data-testid="retire-button"
+        disabled={isActionButtonDisabled}
+        isLoading={isLoadingActionButton}
         onClick={onClickActionButton}
         size="extraLarge"
-        isLoading={isLoadingActionButton}
         sx={{
           px: 6,
         }}
@@ -61,7 +63,12 @@ export const BgCard = ({
         {actionButtonLabel}
       </LoadingButton>
     );
-  }, [isLoadingActionButton, isMobile, actionButtonLabel]);
+  }, [
+    actionButtonLabel,
+    isActionButtonDisabled,
+    isLoadingActionButton,
+    isMobile,
+  ]);
 
   return (
     <Box

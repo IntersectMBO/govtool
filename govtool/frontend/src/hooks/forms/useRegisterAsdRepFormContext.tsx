@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useFormContext, useWatch } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
 import { PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
@@ -22,15 +22,8 @@ export const useRegisterAsdRepFormContext = () => {
     control,
     handleSubmit,
     formState: { errors, isValid },
+    watch,
   } = useFormContext<UrlAndHashFormValues>();
-
-  const watch = useWatch({
-    control,
-  });
-
-  const isUrlNullOrFilledIn = watch.url !== "" && watch.url !== null;
-  const isHashNullOrFilledIn = watch.hash !== "" && watch.hash !== null;
-  const showSubmitButton = isUrlNullOrFilledIn || isHashNullOrFilledIn;
 
   const onSubmit = useCallback(
     async (values: UrlAndHashFormValues) => {
@@ -95,11 +88,11 @@ export const useRegisterAsdRepFormContext = () => {
   );
 
   return {
-    isLoading,
+    isRegistrationAsDRepLoading: isLoading,
     control,
     errors,
     isValid,
-    showSubmitButton,
+    watch,
     submitForm: handleSubmit(onSubmit),
   };
 };

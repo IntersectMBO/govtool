@@ -18,7 +18,7 @@ interface Props {
 export const RegisterAsdRepStepTwo = ({ setStep }: Props) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
-  const { showSubmitButton, control, errors } = useRegisterAsdRepFormContext();
+  const { control, errors } = useRegisterAsdRepFormContext();
 
   const onClickContinue = useCallback(() => setStep(3), []);
 
@@ -26,7 +26,7 @@ export const RegisterAsdRepStepTwo = ({ setStep }: Props) => {
 
   return (
     <BgCard
-      actionButtonLabel={showSubmitButton ? t("continue") : t("skip")}
+      actionButtonLabel={t("continue")}
       onClickActionButton={onClickContinue}
       onClickBackButton={onClickBackButton}
     >

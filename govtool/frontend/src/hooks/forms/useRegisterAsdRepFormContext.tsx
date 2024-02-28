@@ -25,6 +25,10 @@ export const useRegisterAsdRepFormContext = () => {
     watch,
   } = useFormContext<UrlAndHashFormValues>();
 
+  const isSkipButton = !watch('hash')?.trim() && !watch("url")?.trim()
+
+  const isContinueButtonDisabled = !!Object.keys(errors).length
+
   const onSubmit = useCallback(
     async (values: UrlAndHashFormValues) => {
       const { url, hash } = values;
@@ -92,6 +96,8 @@ export const useRegisterAsdRepFormContext = () => {
     control,
     errors,
     isValid,
+    isContinueButtonDisabled,
+    isSkipButton,
     watch,
     submitForm: handleSubmit(onSubmit),
   };

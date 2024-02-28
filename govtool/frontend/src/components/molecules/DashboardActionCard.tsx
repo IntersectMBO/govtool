@@ -84,7 +84,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
           }}
         >
           <Typography color={"orangeDark"} variant="body2">
-            {t("inProgress").toLocaleUpperCase()}
+            {t("inProgress")}
           </Typography>
         </Box>
       )}
@@ -113,7 +113,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
         ) : null}
         {inProgress && !isLoading ? (
           <Typography variant="title2" fontWeight={700}>
-            In Progress
+            {t("inProgress")}
           </Typography>
         ) : null}
         {description ? (

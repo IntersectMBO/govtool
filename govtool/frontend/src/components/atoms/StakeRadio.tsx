@@ -71,6 +71,7 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
         <Box alignItems="center" display="flex">
           <Typography color={isChecked ? "white" : "#8E908E"} variant="body2">
             {t("votingPower")}
+            :
           </Typography>
           {powerIsLoading ? (
             <Typography color={isChecked ? "white" : "#8E908E"} variant="body2">

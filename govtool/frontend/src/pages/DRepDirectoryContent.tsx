@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { AutomatedVotingOptions } from ".";
+import { AutomatedVotingOptions } from "@organisms";
 
 interface DRepDirectoryContentProps {
   isConnected?: boolean;

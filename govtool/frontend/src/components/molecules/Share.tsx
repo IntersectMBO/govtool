@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Box, Popover } from "@mui/material";
+import { MouseEvent, useState } from "react";
+import { Box, ButtonBase, Popover } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { ICONS } from "@consts";
@@ -9,20 +9,22 @@ import { useTranslation } from "@hooks";
 export const Share = ({ link }: { link: string }) => {
   const { addSuccessAlert } = useSnackbar();
   const { t } = useTranslation();
-  const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [isActive, setIsActive] = useState<boolean>(true);
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    setAnchorEl(e.currentTarget);
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  const onCopy = (e: React.MouseEvent<HTMLDivElement>) => {
+  const onCopy = (event: MouseEvent<HTMLButtonElement>) => {
     navigator.clipboard.writeText(link);
     addSuccessAlert(t("alerts.copiedToClipboard"));
-    e.stopPropagation();
+    setIsActive(false);
+    event.stopPropagation();
   };
 
   const open = Boolean(anchorEl);
@@ -30,29 +32,33 @@ export const Share = ({ link }: { link: string }) => {
 
   return (
     <>
-      <Box
+      <ButtonBase
         aria-describedby={id}
         onClick={handleClick}
-        sx={{
+        sx={(theme) => ({
           alignItems: "center",
-          bgcolor: "#F7F9FB",
+          bgcolor: open ? "#F7F9FB" : "transparent",
           borderRadius: 50,
-          boxShadow: "2px 2px 15px 0px #2F62DC47",
+          boxShadow: open ? theme.shadows[1] : "none",
           cursor: "pointer",
           display: "flex",
           justifyContent: "center",
           padding: 1.5,
-        }}
+          transition: 'all 0.3s',
+          '&:hover': {
+            boxShadow: theme.shadows[1],
+            bgcolor: "#F7F9FB",
+          }
+        })}
       >
-        <img height={24} width={24} src={ICONS.share} alt="share icon" />
-      </Box>
+        <img alt="" height={24} width={24} src={ICONS.share} />
+      </ButtonBase>
       <Popover
         id={id}
         open={open}
         onClose={handleClose}
         anchorEl={anchorEl}
         marginThreshold={12}
-        sx={{ botderRadius: 12 }}
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "right",
@@ -65,19 +71,23 @@ export const Share = ({ link }: { link: string }) => {
         <Box
           sx={{
             alignItems: "center",
+            boxSizing: "border-box",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             padding: "12px 24px",
+            px: 3,
+            width: 148,
           }}
         >
           <Typography sx={{ alignSelf: "flex-start" }}>{t("share")}</Typography>
-          <Box
+          <ButtonBase
             onClick={onCopy}
             sx={{
               alignItems: "center",
-              bgcolor: "lightBlue",
+              bgcolor: isActive ? "lightBlue" : "neutralWhite",
               borderRadius: 50,
+              boxShadow: (theme) => theme.shadows[1],
               cursor: "pointer",
               display: "flex",
               height: 48,
@@ -88,8 +98,8 @@ export const Share = ({ link }: { link: string }) => {
             }}
           >
             <img alt="link" height={24} src={ICONS.link} width={24} />
-          </Box>
-          <Typography variant="caption">{t("clickToCopyLink")}</Typography>
+          </ButtonBase>
+          <Typography variant="caption">{isActive ? t("clickToCopyLink") : t("linkCopied")}</Typography>
         </Box>
       </Popover>
     </>

@@ -33,6 +33,7 @@ export * from "./SliderArrows";
 export * from "./SoleVoterAction";
 export * from "./Step";
 export * from "./PageTitle";
+export * from "./Share";
 export * from "./VoteActionForm";
 export * from "./VotesSubmitted";
 export * from "./WalletInfoCard";

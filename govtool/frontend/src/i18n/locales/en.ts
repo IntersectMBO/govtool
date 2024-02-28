@@ -112,12 +112,12 @@ export const en = {
         registrationInProgress:
           "The registration process is ongoing. This may take several minutes.",
         retire: "Retire",
-        retireTitle: "You Have Retired as a Sole Voter",
+        wasSoleVoterTitle: "You Have Retired as a Sole Voter",
         retirement: "Sole Voter Retirement",
-        wasRegisteredDescription:
-          "You cannot vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>. until you re-register.",
         retirementInProgress:
           "The retirement process is ongoing. This may take several minutes.",
+        wasRegisteredDescription:
+          "You cannot vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>. until you re-register.",
         youAreSoleVoterTitle: "You are a Sole Voter",
       },
     },

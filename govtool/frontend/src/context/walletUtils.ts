@@ -1,4 +1,4 @@
-import { getAdaHolderCurrentDelegation, getDRepInfo } from "@services";
+import { getAdaHolderCurrentDelegation, getVoterInfo } from "@services";
 import { DRepActionType } from "./wallet";
 import { VoterInfo } from "@models";
 
@@ -18,7 +18,7 @@ export const setLimitedRegistrationInterval = (
         count++;
 
         try {
-          const data = await getDRepInfo(dRepID);
+          const data = await getVoterInfo(dRepID);
 
           if (
             data.isRegisteredAsDRep === desiredResult ||

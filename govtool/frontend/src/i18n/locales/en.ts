@@ -426,7 +426,7 @@ export const en = {
     continue: "Continue",
     delegate: "Delegate",
     here: "here",
-    inProgress: "In progress",
+    inProgress: "In Progress",
     learnMore: "Learn more",
     loading: "Loading...",
     myDRepId: "My DRep ID:",

@@ -1,50 +1,65 @@
-import { Dispatch, SetStateAction, useCallback } from "react";
-import { Box } from "@mui/material";
+import { Dispatch, SetStateAction } from "react";
+import { Box, Link } from "@mui/material";
 
-import { Typography } from "@atoms";
+import { Spacer, Typography } from "@atoms";
 import {
   useRegisterAsdRepFormContext,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
+import { openInNewTab } from "@utils";
 
-import { BgCard } from ".";
+import { BgCard, ControlledField } from ".";
 
-interface Props {
+export const RegisterAsdRepStepThree = ({
+  setStep,
+}: {
   setStep: Dispatch<SetStateAction<number>>;
-}
-
-export const RegisterAsdRepStepThree = ({ setStep }: Props) => {
-  const { isLoading, submitForm } = useRegisterAsdRepFormContext();
-  const { isMobile } = useScreenDimension();
+}) => {
   const { t } = useTranslation();
+  const { isMobile } = useScreenDimension();
+  const { control, errors, submitForm, isRegistrationAsDRepLoading, watch } =
+    useRegisterAsdRepFormContext();
 
-  const onClickBackButton = useCallback(() => setStep(2), []);
+  const onClickBackButton = () => setStep(2);
+
+  const isContinueDisabled = !watch("storeData");
+
+  // TODO: Add link about store data when available
+  const openLink = () => openInNewTab("https://sancho.network/get-started");
 
   return (
     <BgCard
-      actionButtonLabel={t("registration.register")}
-      isLoadingActionButton={isLoading}
+      actionButtonLabel={t("continue")}
+      isActionButtonDisabled={isContinueDisabled}
+      isLoadingActionButton={isRegistrationAsDRepLoading}
       onClickActionButton={submitForm}
       onClickBackButton={onClickBackButton}
     >
-      <Box display="flex" flexDirection="column">
-        <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
-          {t("registration.headingStepTwo")}
-        </Typography>
-        <Typography
-          fontWeight={400}
-          sx={{
-            mb: 7,
-            mt: isMobile ? 4 : 10,
-            textAlign: "center",
-            whiteSpace: "pre-line",
-          }}
-          variant="body1"
-        >
-          {t("registration.descriptionStepTwo")}
-        </Typography>
-      </Box>
+      <Typography sx={{ textAlign: "center" }} variant="headline4">
+        {t("registration.storeDataTitle")}
+      </Typography>
+      <Link
+        onClick={openLink}
+        sx={{
+          cursor: "pointer",
+          fontSize: 16,
+          fontWeight: 500,
+          fontFamily: "Poppins",
+          my: 4,
+          textAlign: "center",
+          textDecoration: "none",
+        }}
+      >
+        {t("registration.storeDataLink")}
+      </Link>
+      <ControlledField.Checkbox
+        {...{ control, errors }}
+        name="storeData"
+        label={t("registration.storeDataCheckboxLabel")}
+      />
+      <Spacer y={isMobile ? 4 : 12.5} />
+      <Box display="flex" flex={1} />
     </BgCard>
   );
 };

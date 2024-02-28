@@ -30,13 +30,13 @@ import {
   removeItemFromLocalStorage,
 } from "@utils";
 import { SetupInterceptors } from "./services";
-import { useGetDRepInfo, useWalletConnectionListener } from "./hooks";
+import { useGetVoterInfo, useWalletConnectionListener } from "./hooks";
 import { RegisterAsSoleVoter } from "./pages/RegisterAsSoleVoter";
 
 export default function App() {
   const { enable, setVoter, setIsDrepLoading } = useCardano();
   const navigate = useNavigate();
-  const { data } = useGetDRepInfo();
+  const { data } = useGetVoterInfo();
   const { modal, openModal, modals } = useModal();
 
   useWalletConnectionListener();

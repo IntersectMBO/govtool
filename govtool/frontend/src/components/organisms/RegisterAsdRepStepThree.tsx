@@ -18,10 +18,19 @@ export const RegisterAsdRepStepThree = ({
 }) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
-  const { control, errors, submitForm, isRegistrationAsDRepLoading, watch } =
-    useRegisterAsdRepFormContext();
+  const {
+    control,
+    errors,
+    isRegistrationAsDRepLoading,
+    resetField,
+    submitForm,
+    watch,
+  } = useRegisterAsdRepFormContext();
 
-  const onClickBackButton = () => setStep(2);
+  const onClickBackButton = () => {
+    setStep(2);
+    resetField("storeData");
+  };
 
   const isContinueDisabled = !watch("storeData");
 
@@ -30,7 +39,7 @@ export const RegisterAsdRepStepThree = ({
 
   return (
     <BgCard
-      actionButtonLabel={t("continue")}
+      actionButtonLabel={t("register")}
       isActionButtonDisabled={isContinueDisabled}
       isLoadingActionButton={isRegistrationAsDRepLoading}
       onClickActionButton={submitForm}

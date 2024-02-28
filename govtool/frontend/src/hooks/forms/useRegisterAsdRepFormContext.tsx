@@ -22,12 +22,13 @@ export const useRegisterAsdRepFormContext = () => {
     control,
     handleSubmit,
     formState: { errors, isValid },
+    resetField,
     watch,
   } = useFormContext<UrlAndHashFormValues>();
 
-  const isSkipButton = !watch('hash')?.trim() && !watch("url")?.trim()
+  const isSkipButton = !watch("hash")?.trim() && !watch("url")?.trim();
 
-  const isContinueButtonDisabled = !!Object.keys(errors).length
+  const isContinueButtonDisabled = !!Object.keys(errors).length;
 
   const onSubmit = useCallback(
     async (values: UrlAndHashFormValues) => {
@@ -92,13 +93,14 @@ export const useRegisterAsdRepFormContext = () => {
   );
 
   return {
-    isRegistrationAsDRepLoading: isLoading,
     control,
     errors,
-    isValid,
     isContinueButtonDisabled,
+    isRegistrationAsDRepLoading: isLoading,
     isSkipButton,
-    watch,
+    isValid,
+    resetField,
     submitForm: handleSubmit(onSubmit),
+    watch,
   };
 };

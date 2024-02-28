@@ -18,7 +18,8 @@ interface Props {
 export const RegisterAsdRepStepTwo = ({ setStep }: Props) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
-  const { control, errors,isContinueButtonDisabled, isSkipButton  } = useRegisterAsdRepFormContext();
+  const { control, errors, isContinueButtonDisabled, isSkipButton } =
+    useRegisterAsdRepFormContext();
 
   const onClickContinue = useCallback(() => setStep(3), []);
 

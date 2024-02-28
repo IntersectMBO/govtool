@@ -5,12 +5,13 @@ import { useCardano } from "@context";
 import { getDRepInfo } from "@services";
 
 export const useGetDRepInfo = () => {
-  const { dRepID, registerTransaction } = useCardano();
+  const { dRepID, registerTransaction, soleVoterTransaction } = useCardano();
 
   const { data, isLoading } = useQuery({
     queryKey: [
       QUERY_KEYS.useGetDRepInfoKey,
       registerTransaction?.transactionHash,
+      soleVoterTransaction?.transactionHash,
     ],
     enabled: !!dRepID,
     queryFn: async () => await getDRepInfo(dRepID),

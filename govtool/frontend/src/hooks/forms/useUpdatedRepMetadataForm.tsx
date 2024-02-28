@@ -26,8 +26,15 @@ export const useUpdatedRepMetadataForm = () => {
     async (values: UrlAndHashFormValues) => {
       const { url, hash } = values;
 
-      const urlSubmitValue = url ?? "";
-      const hashSubmitValue = hash ?? "";
+      // Temporary solution. To modify later.
+      const urlSubmitValue =
+        !url || url === ""
+          ? "https://raw.githubusercontent.com/Thomas-Upfield/test-metadata/main/placeholder.json"
+          : url;
+      const hashSubmitValue =
+        !hash || hash === ""
+          ? "654e483feefc4d208ea02637a981a2046e17c73c09583e9dd0c84c25dab42749"
+          : hash;
       setIsLoading(true);
       try {
         const certBuilder = await buildDRepUpdateCert(

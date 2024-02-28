@@ -37,14 +37,12 @@ export const useRegisterAsdRepFormContext = () => {
       const { url, hash } = values;
 
       // Temporary solution. To modify later.
-      const urlSubmitValue =
-        !url || url === ""
-          ? "https://raw.githubusercontent.com/Thomas-Upfield/test-metadata/main/placeholder.json"
-          : url;
-      const hashSubmitValue =
-        !hash || hash === ""
-          ? "654e483feefc4d208ea02637a981a2046e17c73c09583e9dd0c84c25dab42749"
-          : hash;
+      const urlSubmitValue = !url
+        ? "https://raw.githubusercontent.com/Thomas-Upfield/test-metadata/main/placeholder.json"
+        : url;
+      const hashSubmitValue = !hash
+        ? "654e483feefc4d208ea02637a981a2046e17c73c09583e9dd0c84c25dab42749"
+        : hash;
       setIsLoading(true);
 
       try {

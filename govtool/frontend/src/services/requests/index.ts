@@ -1,6 +1,6 @@
 export * from "./getAdaHolderCurrentDelegation";
 export * from "./getAdaHolderVotingPower";
-export * from "./getDRepInfo";
+export * from "./getVoterInfo";
 export * from "./getDRepList";
 export * from "./getDRepVotes";
 export * from "./getDRepVotingPower";

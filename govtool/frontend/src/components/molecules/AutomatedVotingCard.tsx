@@ -60,7 +60,7 @@ export const AutomatedVotingCard = ({
           {t("dRepDirectory.votingPower")}
         </Typography>
         <Typography sx={{ display: "flex", flexDirection: "row", mt: 0.5 }}>
-          <Typography fontWeight={400}>₳</Typography>
+          {'₳ '}
           {votingPower}
         </Typography>
       </Box>

@@ -23,6 +23,8 @@ import {
   DashboardGovernanceActionsCategory,
   RetireAsSoleVoter,
   DRepDirectory,
+  DRepDetails,
+  DRepDirectoryContent,
 } from "@pages";
 import {
   callAll,
@@ -104,12 +106,27 @@ export default () => {
             path={PATHS.dashboardGovernanceActionsCategory}
             element={<DashboardGovernanceActionsCategory />}
           />
+          <Route element={<DRepDirectory />}>
+            <Route
+              path={PATHS.dashboardDRepDirectory}
+              element={<DRepDirectoryContent isConnected />}
+            />
+            <Route
+              path={PATHS.dashboardDrepDirectoryDrep}
+              element={<DRepDetails isConnected />}
+            />
+          </Route>
+        </Route>
+        <Route element={<DRepDirectory />}>
           <Route
-            path={PATHS.dashboardDRepDirectory}
-            element={<DRepDirectory />}
+            path={PATHS.dRepDirectory}
+            element={<DRepDirectoryContent />}
+          />
+          <Route
+            path={PATHS.drepDirectoryDrep}
+            element={<DRepDetails />}
           />
         </Route>
-        <Route path={PATHS.dRepDirectory} element={<DRepDirectory />} />
         <Route
           path={PATHS.createGovernanceAction}
           element={<CreateGovernanceAction />}

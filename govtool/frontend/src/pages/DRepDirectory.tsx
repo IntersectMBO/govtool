@@ -1,7 +1,8 @@
 import { useTranslation } from "@hooks";
+import { Outlet } from "react-router-dom";
 import { checkIsWalletConnected } from "@/utils";
 import { Background, PagePaddingBox, ContentBox } from "@/components/atoms";
-import { DRepDirectoryContent, TopNav } from "@/components/organisms";
+import { TopNav } from "@/components/organisms";
 import { PageTitle } from "@/components/molecules";
 
 export const DRepDirectory = () => {
@@ -12,7 +13,7 @@ export const DRepDirectory = () => {
   if (isConnected) {
     return (
       <PagePaddingBox py={2}>
-        <DRepDirectoryContent isConnected />
+        <Outlet />
       </PagePaddingBox>
     );
   }
@@ -25,7 +26,7 @@ export const DRepDirectory = () => {
 
       <PagePaddingBox py={2}>
         <ContentBox>
-          <DRepDirectoryContent />
+          <Outlet />
         </ContentBox>
       </PagePaddingBox>
     </Background>

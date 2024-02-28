@@ -113,6 +113,11 @@ export const theme = createTheme({
         },
       },
     },
+    MuiPopover: {
+      defaultProps: {
+        elevation: 2,
+      }
+    },
   },
   typography: {
     fontFamily: "Poppins, Arial",

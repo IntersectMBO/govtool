@@ -10,7 +10,12 @@ import { useCardano, useModal } from "@context";
 export const RegisterAsSoleVoterBox = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { buildSignSubmitConwayCertTx, buildDRepRegCert } = useCardano();
+  const {
+    buildSignSubmitConwayCertTx,
+    buildDRepRegCert,
+    buildDRepUpdateCert,
+    voter,
+  } = useCardano();
   const navigate = useNavigate();
   const { openModal, closeModal } = useModal();
   const { t } = useTranslation();
@@ -19,7 +24,9 @@ export const RegisterAsSoleVoterBox = () => {
     setIsLoading(true);
 
     try {
-      const certBuilder = await buildDRepRegCert();
+      const certBuilder = voter?.isRegisteredAsDRep
+        ? await buildDRepUpdateCert()
+        : await buildDRepRegCert();
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
         type: "soleVoterRegistration",

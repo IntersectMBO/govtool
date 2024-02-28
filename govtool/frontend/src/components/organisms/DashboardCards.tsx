@@ -246,7 +246,7 @@ export const DashboardCards = () => {
       }
     } else if (voter?.isRegisteredAsSoleVoter) {
       return "dashboard.soleVoter.isRegisteredDescription";
-    } else if (voter?.wasRegisteredAsSoleVoter && !voter?.isRegisteredAsDRep) {
+    } else if (voter?.wasRegisteredAsSoleVoter) {
       return "dashboard.soleVoter.wasRegisteredDescription";
     } else {
       return "dashboard.soleVoter.registerDescription";
@@ -292,8 +292,8 @@ export const DashboardCards = () => {
       }
     } else if (voter?.isRegisteredAsSoleVoter) {
       return t("dashboard.soleVoter.youAreSoleVoterTitle");
-    } else if (voter?.wasRegisteredAsSoleVoter && !voter?.isRegisteredAsDRep) {
-      return t("dashboard.soleVoter.retireTitle");
+    } else if (voter?.wasRegisteredAsSoleVoter) {
+      return t("dashboard.soleVoter.wasSoleVoterTitle");
     } else {
       return t("dashboard.soleVoter.registerTitle");
     }
@@ -473,8 +473,7 @@ export const DashboardCards = () => {
             : t(
                 voter?.isRegisteredAsSoleVoter
                   ? "dashboard.soleVoter.retire"
-                  : voter?.wasRegisteredAsSoleVoter &&
-                    !voter?.isRegisteredAsDRep
+                  : voter?.wasRegisteredAsSoleVoter
                   ? "dashboard.soleVoter.reRegister"
                   : "dashboard.soleVoter.register"
               )

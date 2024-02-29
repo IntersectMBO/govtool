@@ -187,7 +187,7 @@ info:
 	@:$(call check_defined, env)
 	@echo "+-----------"
 	@echo "|  TIME      $(shell date +'%Y-%m-%d %H:%M:%S%z')"
-	@echo "|  BRANCH    $(branch) [$(shell git rev-parse HEAD)]"
+	@echo "|  BRANCH    $(branch) [$(commit)]"
 	@echo "|  ENV       $(env)"
 	@echo "I  NETWORK   $(cardano_network)"
 	@echo "N  BACKEND   $(repo_url)/backend:$(backend_image_tag)"

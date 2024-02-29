@@ -27,6 +27,7 @@ LEFT JOIN (
   FROM drep_registration dr
 ) as dr_voting_anchor
 on dr_voting_anchor.drep_hash_id = dh.id and dr_voting_anchor.rn = 1
-left JOIN voting_anchor va ON va.id = dr_voting_anchor.voting_anchor_id
 LEFT JOIN DRepDistr
 on DRepDistr.hash_id = dh.id and DRepDistr.rn = 1
+JOIN voting_anchor va ON va.id = dr_voting_anchor.voting_anchor_id
+

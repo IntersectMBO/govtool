@@ -23,19 +23,8 @@ echo "$DBSYNC_POSTGRES_USER" > "$dbsync_secrets_dir/postgres_user"
 echo "$DBSYNC_POSTGRES_PASSWORD" > "$dbsync_secrets_dir/postgres_password"
 echo "$DBSYNC_POSTGRES_DB" > "$dbsync_secrets_dir/postgres_db"
 
-# postgres schema for fake db sync
-fakedbsync_init_dir="$target_config_dir/fakedbsync_init.d"
-mkdir -p "$fakedbsync_init_dir"
-cp "$repo_root_dir/govtool/backend/misc/fakedbsync_users.sql" "$fakedbsync_init_dir/00_fakedbsync_users.sql"
-sed -i -e "s/CREATE USER.*$/CREATE USER $FAKEDBSYNC_POSTGRES_USER WITH PASSWORD '$FAKEDBSYNC_POSTGRES_PASSWORD';/g" \
-    "$fakedbsync_init_dir/00_fakedbsync_users.sql"
-cp "$repo_root_dir/govtool/backend/misc/schema6.sql" "$fakedbsync_init_dir/10_schema.sql"
-
 # backend config file
-sed -e "s/FAKEDBSYNC_POSTGRES_DB/$FAKEDBSYNC_POSTGRES_DB/" \
-    -e "s/FAKEDBSYNC_POSTGRES_USER/$FAKEDBSYNC_POSTGRES_USER/" \
-    -e "s/FAKEDBSYNC_POSTGRES_PASSWORD/$FAKEDBSYNC_POSTGRES_PASSWORD/" \
-    -e "s/DBSYNC_POSTGRES_DB/$DBSYNC_POSTGRES_DB/" \
+sed -e "s/DBSYNC_POSTGRES_DB/$DBSYNC_POSTGRES_DB/" \
     -e "s/DBSYNC_POSTGRES_USER/$DBSYNC_POSTGRES_USER/" \
     -e "s/DBSYNC_POSTGRES_PASSWORD/$DBSYNC_POSTGRES_PASSWORD/" \
     -e "s|SENTRY_DSN|$SENTRY_DSN_BACKEND|" \

@@ -35,6 +35,7 @@ changes.
 
 ### Changed
 - `drep/list` and `drep/info` endpoints now return additional data such as metadata url and hash, and voting power [Issue 223](https://github.com/IntersectMBO/govtool/issues/223)
+- `drep/info` now does not return sole voters (dreps without metadata) [Issue 317](https://github.com/IntersectMBO/govtool/issues/317)
 - `isRegistered` and `wasRegistered` fields in the drep/info endpoint changed to `isRegisteredAsDRep` and `wasRegisteredAsDRep` respectively [Issue 212](https://github.com/IntersectMBO/govtool/issues/212)
 - Update Cardano-Serialization-Lib to 12.0.0-alpha.16 [Issue 156](https://github.com/IntersectMBO/govtool/issues/156)
 - Changed and improved working conventions docs, PR template and codeowners file, addressing [Issue 88](https://github.com/IntersectMBO/govtool/issues/88).

@@ -380,6 +380,9 @@ data DRepInfoResponse = DRepInfoResponse
   , dRepInfoResponseIsRegisteredAsSoleVoter :: Bool
   , dRepInfoResponseWasRegisteredAsSoleVoter :: Bool
   , dRepInfoResponseDeposit :: Maybe Integer
+  , dRepInfoResponseUrl :: Maybe Text
+  , dRepInfoResponseDataHash :: Maybe HexText
+  , dRepInfoResponseVotingPower :: Maybe Integer
   } deriving (Generic, Show)
 
 deriveJSON (jsonOptions "dRepInfoResponse") ''DRepInfoResponse
@@ -390,7 +393,10 @@ exampleDRepInfoResponse =
   <> "\"wasRegisteredAsDRep\": true,"
   <> "\"isRegisteredAsSoleVoter\": true,"
   <> "\"wasRegisteredAsSoleVoter\": true,"
-  <> "\"deposit\": 2000000}"
+  <> "\"deposit\": 2000000,"
+  <> "\"url\": \"https://drep.metadata.xyz\","
+  <> "\"dataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
+  <> "\"votingPower\": 1000000}"
 
 instance ToSchema DRepInfoResponse where
   declareNamedSchema proxy = do
@@ -512,6 +518,7 @@ data DRep = DRep
   , dRepUrl :: Maybe Text
   , dRepMetadataHash :: Maybe Text
   , dRepDeposit :: Integer
+  , dRepVotingPower :: Maybe Integer
   } deriving (Generic, Show)
 
 
@@ -522,7 +529,8 @@ exampleDrep =
    "{\"drepId\": \"d3a62ffe9c214e1a6a9809f7ab2a104c117f85e1f171f8f839d94be5\","
  <> "\"url\": \"https://proposal.metadata.xyz\","
  <> "\"metadataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
- <> "\"deposit\": 0}"
+ <> "\"deposit\": 0,"
+ <> "\"votingPower\": 0}"
 
 instance ToSchema DRep where
     declareNamedSchema _ = pure $ NamedSchema (Just "DRep") $ mempty

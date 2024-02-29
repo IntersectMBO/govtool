@@ -64,6 +64,9 @@ data DRepInfo = DRepInfo
   , dRepInfoIsRegisteredAsSoleVoter :: Bool
   , dRepInfoWasRegisteredAsSoleVoter :: Bool
   , dRepInfoDeposit :: Maybe Integer
+  , dRepInfoUrl :: Maybe Text
+  , dRepInfoDataHash :: Maybe Text
+  , dRepInfoVotingPower :: Maybe Integer
   }
 
 data DRepRegistration = DRepRegistration
@@ -71,6 +74,7 @@ data DRepRegistration = DRepRegistration
  , dRepRegistrationUrl :: Maybe Text
  , dRepRegistrationDataHash :: Maybe Text
  , dRepRegistrationDeposit :: Integer
+ , dRepRegistrationVotingPower :: Maybe Integer
  }
 
 data Proposal = Proposal

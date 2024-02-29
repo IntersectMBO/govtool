@@ -2,10 +2,10 @@ apiVersion: 1
 
 contactPoints:
   - orgId: 1
-    name: Slack VVA
+    name: Slack GovTool
     receivers:
       - uid: d3b7ee9d-ca06-452b-8e73-687b6cefc611
-        name: Slack VVA
+        name: Slack GovTool
         type: slack
         settings:
           recipient: GRAFANA_SLACK_RECIPIENT
@@ -14,7 +14,7 @@ contactPoints:
 
 policies:
   - orgId: 1
-    receiver: "Slack VVA"
+    receiver: "Slack GovTool"
     group_by:
       - grafana_folder
       - alertname
@@ -22,7 +22,7 @@ policies:
 groups:
   - orgId: 1
     name: status
-    folder: VVA
+    folder: GovTool
     interval: 1m
     rules:
       - uid: ee72520a-2e0b-4789-a6c3-f29e68240511
@@ -120,7 +120,7 @@ groups:
           app_component: cardano-node
   #- orgId: 1
   #  name: node_dbsync_block_diff
-  #  folder: VVA
+  #  folder: GovTool
   #  interval: 1m
   #  rules:
       - uid: c341df64-edda-4d43-b9bd-ef8989cfb638

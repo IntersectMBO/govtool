@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { AppBar, Box, Grid, IconButton } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 
 import { Button, Link } from "@atoms";
 import { ICONS, IMAGES, PATHS, NAV_ITEMS } from "@consts";
@@ -34,6 +35,10 @@ export const TopNav = ({ isConnectButton = true }) => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const openDrawer = () => {
+    setIsDrawerOpen(true);
+  };
+
   return (
     <Box position="relative" py={isMobile ? 5 : 6}>
       <AppBar
@@ -51,101 +56,118 @@ export const TopNav = ({ isConnectButton = true }) => {
           borderBottom: isMobile ? 1 : 0,
           borderColor: "lightblue",
           boxShadow: 0,
+          justifyContent: "center",
           flex: 1,
           flexDirection: "row",
-          justifyContent: "space-between",
           position: "fixed",
-          px: screenWidth >= 1920 ? 37 : isMobile ? 2 : 5,
+          px: isMobile ? 2 : 5,
           py: 3,
         }}
       >
-        <NavLink
-          data-testid="logo-button"
-          onClick={() => (isConnectButton ? {} : disconnectWallet())}
-          to={PATHS.home}
+        <Box
+          sx={{
+            alignItems: "center",
+            display: "flex",
+            flex: 1,
+            justifyContent: "space-between",
+            maxWidth: 1290,
+          }}
         >
-          <img height={isMobile ? 25 : 35} src={IMAGES.appLogo} />
-        </NavLink>
-        {!isMobile ? (
-          <nav
-            style={{
-              alignItems: "center",
-              display: "flex",
-              justifyContent: "end",
-            }}
+          <NavLink
+            data-testid="logo-button"
+            onClick={() => (isConnectButton ? {} : disconnectWallet())}
+            to={PATHS.home}
           >
-            <Grid
-              alignItems="center"
-              columns={5}
-              columnSpacing={screenWidth < 1024 ? 2 : 4}
-              container
+            <img height={isMobile ? 25 : 35} src={IMAGES.appLogo} />
+          </NavLink>
+          {screenWidth >= 1024 ? (
+            <nav
+              style={{
+                alignItems: "center",
+                display: "flex",
+                justifyContent: "end",
+              }}
             >
-              {NAV_ITEMS.map((navItem) => (
-                <Grid item key={navItem.label}>
-                  <Link
-                    {...navItem}
-                    isConnectWallet={isConnectButton}
-                    onClick={() => {
-                      if (navItem.newTabLink) openInNewTab(navItem.newTabLink);
-                      setIsDrawerOpen(false);
-                    }}
-                  />
-                </Grid>
-              ))}
-              {isConnectButton ? (
-                <Grid item>
+              <Grid
+                alignItems="center"
+                columns={5}
+                columnSpacing={screenWidth < 1024 ? 2 : 4}
+                container
+              >
+                {NAV_ITEMS.map((navItem) => (
+                  <Grid item key={navItem.label}>
+                    <Link
+                      {...navItem}
+                      isConnectWallet={isConnectButton}
+                      onClick={() => {
+                        if (navItem.newTabLink)
+                          openInNewTab(navItem.newTabLink);
+                        setIsDrawerOpen(false);
+                      }}
+                    />
+                  </Grid>
+                ))}
+                {isConnectButton ? (
+                  <Grid item>
+                    <Button
+                      data-testid="connect-wallet-button"
+                      onClick={() => {
+                        if (isEnabled && stakeKey) {
+                          navigate(PATHS.dashboard);
+                        } else {
+                          openModal({ type: "chooseWallet" });
+                        }
+                      }}
+                      size="extraLarge"
+                      variant="contained"
+                    >
+                      {t("wallet.connectWallet")}
+                    </Button>
+                  </Grid>
+                ) : null}
+              </Grid>
+            </nav>
+          ) : (
+            <>
+              <Box sx={{ alignItems: "center", display: "flex" }}>
+                {isConnectButton ? (
                   <Button
                     data-testid="connect-wallet-button"
                     onClick={() => {
-                      if (isEnabled && stakeKey) {
-                        navigate(PATHS.dashboard);
-                      } else {
-                        openModal({ type: "chooseWallet" });
-                      }
+                      openModal({ type: "chooseWallet" });
                     }}
-                    size="extraLarge"
+                    size="small"
+                    sx={{
+                      marginRight: screenWidth >= 768 ? 3 : 1,
+                      flex: 1,
+                    }}
                     variant="contained"
                   >
-                    {t("wallet.connectWallet")}
+                    {t("wallet.connect")}
                   </Button>
-                </Grid>
-              ) : null}
-            </Grid>
-          </nav>
-        ) : (
-          <>
-            <Box display="flex">
-              {isConnectButton ? (
-                <Button
-                  data-testid="connect-wallet-button"
-                  onClick={() => {
-                    openModal({ type: "chooseWallet" });
-                  }}
-                  size="small"
-                  sx={{
-                    marginRight: 1,
-                    flex: 1,
-                  }}
-                  variant="contained"
-                >
-                  {t("wallet.connect")}
-                </Button>
-              ) : null}
-              <IconButton
-                data-testid="open-drawer-button"
-                onClick={() => setIsDrawerOpen(true)}
-                sx={{ padding: 0 }}
-              >
-                <img src={ICONS.drawerIcon} />
-              </IconButton>
-            </Box>
-            <DrawerMobile
-              isConnectButton={isConnectButton}
-              isDrawerOpen={isDrawerOpen}
-              setIsDrawerOpen={setIsDrawerOpen}
-            />
-          </>
-        )}
+                ) : null}
+                {screenWidth >= 768 ? (
+                  <IconButton
+                    data-testid="open-drawer-button"
+                    onClick={openDrawer}
+                    sx={{
+                      bgcolor: "#FBFBFF",
+                    }}
+                  >
+                    <MenuIcon color="primary" />
+                  </IconButton>
+                ) : (
+                  <img src={ICONS.drawerIcon} onClick={openDrawer} />
+                )}
+              </Box>
+              <DrawerMobile
+                isConnectButton={isConnectButton}
+                isDrawerOpen={isDrawerOpen}
+                setIsDrawerOpen={setIsDrawerOpen}
+              />
+            </>
+          )}
+        </Box>
       </AppBar>
     </Box>
   );

@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 
-import { Background, Button, Link } from "../atoms";
+import { Background, Button, Link, Typography } from "@atoms";
 import { ICONS, IMAGES, NAV_ITEMS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { useModal } from "@context";
@@ -25,6 +25,9 @@ export const DrawerMobile = ({
   const { openModal } = useModal();
   const { t } = useTranslation();
 
+  const onClickHelp = () =>
+    openInNewTab("https://docs.sanchogov.tools/support/get-help-in-discord");
+
   return (
     <SwipeableDrawer
       anchor="right"
@@ -33,13 +36,21 @@ export const DrawerMobile = ({
       open={isDrawerOpen}
     >
       <Background>
-        <Box px={DRAWER_PADDING}>
+        <Box
+          sx={{
+            display: "flex",
+            flex: 1,
+            flexDirection: "column",
+            px: DRAWER_PADDING,
+          }}
+        >
           <Box
-            display="flex"
-            flex={1}
-            justifyContent="space-between"
-            py={3}
-            width={screenWidth - CALCULATED_DRAWER_PADDING}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              py: 3,
+              width: screenWidth - CALCULATED_DRAWER_PADDING,
+            }}
           >
             <img height={25} src={IMAGES.appLogo} />
             <IconButton
@@ -65,21 +76,32 @@ export const DrawerMobile = ({
               {t("wallet.connectYourWalletButton")}
             </Button>
           ) : null}
-          <Grid container direction="column" mt={6} rowGap={4}>
-            {NAV_ITEMS.map((navItem) => (
-              <Grid item key={navItem.label}>
-                <Link
-                  {...navItem}
-                  isConnectWallet={isConnectButton}
-                  onClick={() => {
-                    if (navItem.newTabLink) openInNewTab(navItem.newTabLink);
-                    setIsDrawerOpen(false);
-                  }}
-                  size="big"
-                />
-              </Grid>
-            ))}
-          </Grid>
+          <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
+            <Grid container direction="column" mt={6} rowGap={4}>
+              {NAV_ITEMS.map((navItem) => (
+                <Grid item key={navItem.label}>
+                  <Link
+                    {...navItem}
+                    isConnectWallet={isConnectButton}
+                    onClick={() => {
+                      if (navItem.newTabLink) openInNewTab(navItem.newTabLink);
+                      setIsDrawerOpen(false);
+                    }}
+                    size="big"
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </Box>
+        <Box
+          onClick={onClickHelp}
+          sx={{ alignItems: "center", display: "flex", p: DRAWER_PADDING }}
+        >
+          <img height={20} src={ICONS.helpIcon} width={20} />
+          <Typography fontWeight={500} sx={{ ml: 1.5 }}>
+            {t("menu.help")}
+          </Typography>
         </Box>
       </Background>
     </SwipeableDrawer>

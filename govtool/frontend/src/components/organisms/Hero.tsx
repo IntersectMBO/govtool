@@ -49,7 +49,7 @@ export const Hero = () => {
             my: 4,
             whiteSpace: "pre-line",
           }}
-          variant={"title2"}
+          variant="title2"
         >
           <Trans
             i18nKey="hero.description"

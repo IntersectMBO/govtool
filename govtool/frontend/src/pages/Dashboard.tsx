@@ -13,7 +13,10 @@ const getPageTitle = (pathname: string) => {
   if (pathname === PATHS.dashboard) {
     return "My Dashboard";
   }
-  return Object.values(CONNECTED_NAV_ITEMS).find(({ navTo }) => navTo === pathname)?.label ?? "";
+  return (
+    Object.values(CONNECTED_NAV_ITEMS).find(({ navTo }) => navTo === pathname)
+      ?.label ?? ""
+  );
 };
 
 export const Dashboard = () => {

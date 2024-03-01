@@ -13,18 +13,9 @@ export const Hero = () => {
   const { isEnabled } = useCardano();
   const { openModal } = useModal();
   const navigate = useNavigate();
-  const { isMobile, screenWidth, pagePadding } = useScreenDimension();
+  const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
-  const IMAGE_SIZE =
-    screenWidth < 768
-      ? 140
-      : screenWidth < 1024
-      ? 400
-      : screenWidth < 1440
-      ? 500
-      : screenWidth < 1920
-      ? 600
-      : 720;
+  const IMAGE_SIZE = screenWidth < 640 ? 300 : screenWidth < 860 ? 400 : 600;
 
   const onClickVotingPower = useCallback(
     () =>
@@ -37,15 +28,15 @@ export const Hero = () => {
       alignItems="center"
       display="flex"
       flex={1}
+      marginTop={16}
       flexDirection="row"
-      height={screenWidth < 1024 ? "70vh" : "75vh"}
       overflow="visible"
       position="relative"
-      px={pagePadding}
+      px={screenWidth < 640 ? 3 : screenWidth < 1512 ? 10 : 14}
     >
       <Box alignItems="center" flex={1} height="min-content">
         <Typography
-          variant={screenWidth < 1024 ? "headline2" : "headline1"}
+          variant={screenWidth < 860 ? "headline2" : "headline1"}
           sx={{ whiteSpace: "pre-line" }}
           {...(screenWidth < 375 && { fontSize: 45 })}
         >
@@ -56,16 +47,12 @@ export const Hero = () => {
           sx={{
             maxWidth: 630,
             my: 4,
-            ...(isMobile ? {} : { whiteSpace: "pre-line" }),
+            whiteSpace: "pre-line",
           }}
-          variant={isMobile ? "body2" : "title2"}
+          variant={"title2"}
         >
           <Trans
-            i18nKey={
-              screenWidth < 1024
-                ? "hero.description.mobile"
-                : "hero.description.wide"
-            }
+            i18nKey="hero.description"
             components={[
               <Link
                 data-testid="voting-power-link"
@@ -94,8 +81,16 @@ export const Hero = () => {
       <Box
         flex={1}
         position="absolute"
-        right={isMobile ? -30 : screenWidth < 1920 ? -50 : 50}
-        top={screenWidth < 1024 ? 0 : undefined}
+        right={
+          screenWidth >= 1728
+            ? IMAGE_SIZE / 8
+            : screenWidth >= 1512
+            ? -(IMAGE_SIZE / 12)
+            : screenWidth >= 860
+            ? -(IMAGE_SIZE / 8)
+            : -(IMAGE_SIZE / 4)
+        }
+        top={-80}
         zIndex={-1}
       >
         <img src={IMAGES.heroImage} width={IMAGE_SIZE} height={IMAGE_SIZE} />

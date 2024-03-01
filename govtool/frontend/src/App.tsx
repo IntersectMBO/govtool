@@ -21,6 +21,7 @@ import {
   UpdatedRepMetadata,
   GovernanceActionsCategory,
   DashboardGovernanceActionsCategory,
+  RetireAsSoleVoter,
 } from "@pages";
 import {
   callAll,
@@ -29,12 +30,13 @@ import {
   removeItemFromLocalStorage,
 } from "@utils";
 import { SetupInterceptors } from "./services";
-import { useGetDRepInfo, useWalletConnectionListener } from "./hooks";
+import { useGetVoterInfo, useWalletConnectionListener } from "./hooks";
+import { RegisterAsSoleVoter } from "./pages/RegisterAsSoleVoter";
 
 export default function App() {
-  const { enable, setDRep, setIsDrepLoading } = useCardano();
+  const { enable, setVoter, setIsDrepLoading } = useCardano();
   const navigate = useNavigate();
-  const { data } = useGetDRepInfo();
+  const { data } = useGetVoterInfo();
   const { modal, openModal, modals } = useModal();
 
   useWalletConnectionListener();
@@ -45,11 +47,11 @@ export default function App() {
 
   useEffect(() => {
     setIsDrepLoading(true);
-    setDRep(data);
+    setVoter(data);
     const timer = setTimeout(() => setIsDrepLoading(false), 1000);
 
     return () => clearTimeout(timer);
-  }, [data?.isRegistered]);
+  }, [data?.isRegisteredAsDRep, data?.isRegisteredAsSoleVoter]);
 
   const checkTheWalletIsActive = useCallback(() => {
     const hrefCondition =
@@ -115,6 +117,11 @@ export default function App() {
         </Route>
         <Route path={PATHS.delegateTodRep} element={<DelegateTodRep />} />
         <Route path={PATHS.registerAsdRep} element={<RegisterAsdRep />} />
+        <Route
+          path={PATHS.registerAsSoleVoter}
+          element={<RegisterAsSoleVoter />}
+        />
+        <Route path={PATHS.retireAsSoleVoter} element={<RetireAsSoleVoter />} />
         <Route path={PATHS.stakeKeys} element={<ChooseStakeKey />} />
         <Route path={PATHS.updateMetadata} element={<UpdatedRepMetadata />} />
         <Route path="*" element={<ErrorPage />} />

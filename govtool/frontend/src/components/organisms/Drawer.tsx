@@ -9,7 +9,7 @@ import { openInNewTab } from "@/utils";
 import { useTranslation } from "@hooks";
 
 export const Drawer = () => {
-  const { dRep } = useCardano();
+  const { voter } = useCardano();
   const { t } = useTranslation();
 
   return (
@@ -61,7 +61,7 @@ export const Drawer = () => {
           ))}
         </Grid>
         <Box px={2}>
-          {dRep?.isRegistered && <DRepInfoCard />}
+          {voter?.isRegisteredAsDRep && <DRepInfoCard />}
           <Box py={2} />
           <WalletInfoCard />
           <Box my={1}>

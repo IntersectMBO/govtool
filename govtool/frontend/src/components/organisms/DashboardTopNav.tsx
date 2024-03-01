@@ -15,6 +15,7 @@ type DashboardTopNavProps = {
   imageHeight?: number;
   title: string;
   isDrawer?: boolean;
+  isVotingPowerHidden?: boolean;
 };
 
 const DRAWER_PADDING = 2;
@@ -25,9 +26,10 @@ export const DashboardTopNav = ({
   imageSRC,
   imageWidth,
   imageHeight,
+  isVotingPowerHidden,
 }: DashboardTopNavProps) => {
   const { isMobile, screenWidth } = useScreenDimension();
-  const { dRep } = useCardano();
+  const { voter } = useCardano();
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const { t } = useTranslation();
@@ -42,11 +44,12 @@ export const DashboardTopNav = ({
       alignItems={"center"}
       justifyContent={"space-between"}
       borderBottom={1}
-      borderColor={"#D6E2FF"}
+      borderColor="#D6E2FF"
       position="fixed"
       zIndex={100}
       flex={1}
       width={"fill-available"}
+      height={"48px"}
     >
       <Box display={"flex"}>
         {imageSRC ? (
@@ -66,7 +69,7 @@ export const DashboardTopNav = ({
         ) : null}
       </Box>
       <Box display="flex">
-        <VotingPowerChips />
+        {!isVotingPowerHidden && <VotingPowerChips />}
         {isMobile && (
           <IconButton
             data-testid={"open-drawer-button"}
@@ -165,7 +168,8 @@ export const DashboardTopNav = ({
                   </Grid>
                 </Grid>
               </Box>
-              {dRep?.isRegistered && <DRepInfoCard />}
+              {(voter?.isRegisteredAsDRep ||
+                voter?.isRegisteredAsSoleVoter) && <DRepInfoCard />}
               <Box py={2} />
               <WalletInfoCard />
             </Box>

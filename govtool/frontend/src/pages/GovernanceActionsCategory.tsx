@@ -36,7 +36,7 @@ export const GovernanceActionsCategory = () => {
   const { isMobile, pagePadding, screenWidth } = useScreenDimension();
   const { isEnabled } = useCardano();
   const navigate = useNavigate();
-  const { dRep } = useCardano();
+  const { voter } = useCardano();
   const { t } = useTranslation();
 
   const {
@@ -86,7 +86,12 @@ export const GovernanceActionsCategory = () => {
         .toLowerCase()
         .includes(searchText.toLowerCase())
     );
-  }, [dRep?.isRegistered, isProposalsFetchingNextPage, proposals, searchText]);
+  }, [
+    voter?.isRegisteredAsDRep,
+    isProposalsFetchingNextPage,
+    proposals,
+    searchText,
+  ]);
 
   useEffect(() => {
     if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {

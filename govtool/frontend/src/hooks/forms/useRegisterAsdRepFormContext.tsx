@@ -1,13 +1,18 @@
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useFormContext, useWatch } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
 import { PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { UrlAndHashFormValues, useTranslation } from "@hooks";
 
 export const useRegisterAsdRepFormContext = () => {
-  const { buildSignSubmitConwayCertTx, buildDRepRegCert } = useCardano();
+  const {
+    buildSignSubmitConwayCertTx,
+    buildDRepRegCert,
+    buildDRepUpdateCert,
+    voter,
+  } = useCardano();
   const { openModal, closeModal } = useModal();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -17,29 +22,31 @@ export const useRegisterAsdRepFormContext = () => {
     control,
     handleSubmit,
     formState: { errors, isValid },
+    resetField,
+    watch,
   } = useFormContext<UrlAndHashFormValues>();
 
-  const watch = useWatch({
-    control,
-  });
+  const isSkipButton = !watch("hash")?.trim() && !watch("url")?.trim();
 
-  const isUrlNullOrFilledIn = watch.url !== "" && watch.url !== null;
-  const isHashNullOrFilledIn = watch.hash !== "" && watch.hash !== null;
-  const showSubmitButton = isUrlNullOrFilledIn || isHashNullOrFilledIn;
+  const isContinueButtonDisabled = !!Object.keys(errors).length;
 
   const onSubmit = useCallback(
     async (values: UrlAndHashFormValues) => {
       const { url, hash } = values;
 
-      const urlSubmitValue = url ?? "";
-      const hashSubmitValue = hash ?? "";
+      // Temporary solution. To modify later.
+      const urlSubmitValue = !url
+        ? "https://raw.githubusercontent.com/Thomas-Upfield/test-metadata/main/placeholder.json"
+        : url;
+      const hashSubmitValue = !hash
+        ? "654e483feefc4d208ea02637a981a2046e17c73c09583e9dd0c84c25dab42749"
+        : hash;
       setIsLoading(true);
 
       try {
-        const certBuilder = await buildDRepRegCert(
-          urlSubmitValue,
-          hashSubmitValue
-        );
+        const certBuilder = voter?.isRegisteredAsSoleVoter
+          ? await buildDRepUpdateCert(urlSubmitValue, hashSubmitValue)
+          : await buildDRepRegCert(urlSubmitValue, hashSubmitValue);
         const result = await buildSignSubmitConwayCertTx({
           certBuilder,
           type: "registration",
@@ -86,11 +93,14 @@ export const useRegisterAsdRepFormContext = () => {
   );
 
   return {
-    isLoading,
     control,
     errors,
+    isContinueButtonDisabled,
+    isRegistrationAsDRepLoading: isLoading,
+    isSkipButton,
     isValid,
-    showSubmitButton,
+    resetField,
     submitForm: handleSubmit(onSubmit),
+    watch,
   };
 };

@@ -375,8 +375,10 @@ instance ToSchema VoteResponse where
             ?~ toJSON exampleVoteResponse
 
 data DRepInfoResponse = DRepInfoResponse
-  { dRepInfoResponseIsRegistered :: Bool
-  , dRepInfoResponseWasRegistered :: Bool
+  { dRepInfoResponseIsRegisteredAsDRep :: Bool
+  , dRepInfoResponseWasRegisteredAsDRep :: Bool
+  , dRepInfoResponseIsRegisteredAsSoleVoter :: Bool
+  , dRepInfoResponseWasRegisteredAsSoleVoter :: Bool
   , dRepInfoResponseDeposit :: Maybe Integer
   } deriving (Generic, Show)
 
@@ -384,8 +386,10 @@ deriveJSON (jsonOptions "dRepInfoResponse") ''DRepInfoResponse
 
 exampleDRepInfoResponse :: Text
 exampleDRepInfoResponse =
-    "{\"isRegistered\": false,"
-  <> "\"wasRegistered\": true,"
+    "{\"isRegisteredAsDRep\": false,"
+  <> "\"wasRegisteredAsDRep\": true,"
+  <> "\"isRegisteredAsSoleVoter\": true,"
+  <> "\"wasRegisteredAsSoleVoter\": true,"
   <> "\"deposit\": 2000000}"
 
 instance ToSchema DRepInfoResponse where

@@ -23,6 +23,16 @@ export const en = {
           "You have successfully retired from being a DRep! Please refresh the page.",
         success: "You have successfully retired from being a DRep!",
       },
+      soleVoterRegistration: {
+        refreshPage:
+          "You have successfully registered as a Sole Voter! Please refresh the page.",
+        success: "You have successfully registered as a Sole Voter!",
+      },
+      soleVoterRetirement: {
+        refreshPage:
+          "You have successfully retired from being a Sole Voter! Please refresh the page.",
+        success: "You have successfully retired from being a SoleVoter!",
+      },
       voting: {
         failed: "Vote transaction failed",
         success: "You have successfully voted!",
@@ -37,11 +47,8 @@ export const en = {
       headingTwo: "See Active Governance Actions",
       delegation: {
         changeDelegation: "Change delegation",
-        connectToDelegate: "Connect to delegate",
         delegateOwnPower:
           "If you want to delegate your own voting power of ₳<strong>{{ada}}</strong>.",
-        description:
-          "If you want to delegate to a DRep or select a default option.",
         dRepDelegatedTo: "DRep you delegated to",
         toDRep:
           "You have delegated your voting power of ₳<strong>{{ada}}</strong> to a selected DRep.",
@@ -74,12 +81,9 @@ export const en = {
       },
       registration: {
         changeMetadata: "Change metadata",
-        connectToRegister: "Connect to register",
         dRepRegistration: "DRep Registration",
         dRepRetirement: "DRep Retirement",
         dRepUpdate: "DRep Update",
-        description:
-          "If you want to directly participate in voting and have other ada holders delegate their voting power to you.",
         holdersCanDelegate:
           "Ada holders can delegate their voting power to you.",
         ifYouWant:
@@ -95,6 +99,26 @@ export const en = {
         retirementInProgress:
           "The retirement process is ongoing. This may take several minutes.",
         youAreRegistered: "You are Registered as a DRep",
+      },
+      soleVoter: {
+        isRegisteredDescription:
+          "Your Voting Power of ₳<strong>{{votingPower}}</strong> can be used to vote.",
+        register: "Register",
+        registerDescription:
+          "Vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>.",
+        registerTitle: "Become a Sole Voter",
+        reRegister: "Re-register",
+        registration: "Sole Voter Registration",
+        registrationInProgress:
+          "The registration process is ongoing. This may take several minutes.",
+        retire: "Retire",
+        wasSoleVoterTitle: "You Have Retired as a Sole Voter",
+        retirement: "Sole Voter Retirement",
+        retirementInProgress:
+          "The retirement process is ongoing. This may take several minutes.",
+        wasRegisteredDescription:
+          "You cannot vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>. until you re-register.",
+        youAreSoleVoterTitle: "You are a Sole Voter",
       },
     },
     delegation: {
@@ -211,9 +235,31 @@ export const en = {
     },
     hero: {
       connectWallet: "Connect your wallet",
-      description:
-        "Interact with SanchoNet using GovTool - a friendly user\ninterface connected to SanchoNet. You can delegate\nyour voting power (tAda) or become a SanchoNet DRep\nto allow people to delegate voting power to you.",
+      description: {
+        mobile:
+          "You can either delegate your voting power or become a DRep to allow people to delegate voting power to you.",
+        wide: "Anyone with a wallet containing ADA can participate in governance on Sanchonet.\n\nYour ADA balance entitles you to an equal amount of Voting Power.\n\nFor more info see the guide entry for <0>Voting Power</0>.",
+      },
       headline: "SanchoNet \n Governance Tool",
+    },
+    home: {
+      cards: {
+        delegateDescription: "Find a DRep to vote on your behalf.",
+        delegateFirstButtonLabel: "View DRep Direcotry",
+        delegateTitle: "Delegate your Voting Power",
+        governaneActionsDescription:
+          "See all the Governance Actions submitted on chain. ",
+        governanceActionsFirstButtonLabel: "View Governance Actions",
+        governaneActionsTitle: "View Governance Actions",
+        registerAsDRepDescription:
+          "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
+        registerAsDRepFirstButtonLabel: "Connect to Register",
+        registerAsDRepTitle: "Become a DRep",
+        registerAsSoleVoterDescription:
+          "Vote on Governance Actions using your own voting power",
+        registerAsSoleVoterFirstButtonLabel: "Connect to Register",
+        registerAsSoleVoterTitle: "Become a Sole Voter",
+      },
     },
     menu: {
       faqs: "FAQs",
@@ -281,10 +327,24 @@ export const en = {
       rolesAndResponsibilitiesDescription:
         "DReps are fundamental users that govern the Cardano network. This is an important role which requires work and dedication to fulfil.\n\nA DRep is expected to actively participate in governance and act as a representative of other Cardano members in  governance matters. Therefore, DReps will be expected to keep abreast of Governance Actions so they can make informed and wise decisions.\n<0>Learn More</0> about DRep.\n\nPlease register as a DRep if you have time to dedicate to making Cardano a better and more well-governed place.\n\nBecoming a DRep will require a refundable deposit of ₳<strong>{{deposit}}</strong>.\n\nYou will be refunded your deposit when you retire.",
       rolesAndResponsibilitiesTitle: "Roles & Responsibilities",
+      storeDataCheckboxLabel:
+        "I agree to store correctly this information and to maintain them over the years",
+      storeDataLink: "Learn more about storing information",
+      storeDataTitle: "Store and maintain the data yourself",
     },
     slider: {
       showAll: "Show all",
       viewAll: "View all",
+    },
+    soleVoter: {
+      becomeSoleVoter: "Become a Sole Voter",
+      registerDescription:
+        "A Sole Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of ADA in their connected wallet. <0>Learn More</0> about Sole Voter.\n\nBecoming a Sole Voter will require a refundable deposit of <strong>₳{{deposit}}</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
+      registerHeading: "What this Means",
+      retirementDescription:
+        "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of {{deposit}} ADA will be refunded.\n\nYou can at any time in the future re-register to become a Sole Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\nThese options are listed in our Guides here: <0>Voting options and Roles</0>",
+      retirementHeading: "What Retirement Means",
+      retireSoleVoter: "Retire as a Sole Voter",
     },
     system: {
       sanchoNet: "SanchoNet",
@@ -342,7 +402,7 @@ export const en = {
         "Can’t see your wallet? Check what wallets are currently compatible with GovTool ",
       chooseWallet: "Choose the wallet you want to connect with:",
       connect: "Connect",
-      connectWallet: "Connect wallet",
+      connectWallet: "Connect Wallet",
       connectYourWallet: "Connect your Wallet",
       connectYourWalletButton: "Connect your wallet",
       connectedWallet: "Connected Wallet:",
@@ -366,17 +426,19 @@ export const en = {
     continue: "Continue",
     delegate: "Delegate",
     here: "here",
-    inProgress: "In progress",
+    inProgress: "In Progress",
     learnMore: "Learn more",
     loading: "Loading...",
     myDRepId: "My DRep ID:",
     nextStep: "Next step",
     no: "No",
     ok: "Ok",
-    select: "Select",
+    register:"Register",
     seeTransaction: "See transaction",
+    select: "Select",
     skip: "Skip",
     sortBy: "Sort by",
+    submit: "Submit",
     thisLink: "this link",
     votingPower: "Voting power:",
     yes: "Yes",

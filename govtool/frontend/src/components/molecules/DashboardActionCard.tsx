@@ -2,7 +2,7 @@ import { Box, ButtonProps, Skeleton } from "@mui/material";
 import { FC, ReactNode } from "react";
 
 import { CopyButton, LoadingButton, Typography } from "@atoms";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { theme } from "@/theme";
 
 type DashboardActionCardProps = {
@@ -18,9 +18,7 @@ type DashboardActionCardProps = {
   firstButtonIsLoading?: boolean;
   firstButtonLabel?: string;
   firstButtonVariant?: ButtonProps["variant"];
-  imageHeight?: number;
   imageURL?: string;
-  imageWidth?: number;
   inProgress?: boolean;
   isLoading?: boolean;
   secondButtonAction?: () => void;
@@ -33,6 +31,7 @@ type DashboardActionCardProps = {
 export const DashboardActionCard: FC<DashboardActionCardProps> = ({
   ...props
 }) => {
+  const { t } = useTranslation();
   const {
     cardId,
     cardTitle,
@@ -62,17 +61,15 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
 
   return (
     <Box
-      mb={3}
-      p={3}
-      sx={{ boxShadow: `5px 5px 15px 5px ${boxShadow2}` }}
-      borderRadius={3}
-      flex={1}
-      display="flex"
-      flexDirection="column"
       border={inProgress && !isLoading ? 1 : 0}
       borderColor="accentOrange"
+      borderRadius={3}
+      display="flex"
+      flex={1}
+      flexDirection="column"
+      p={3}
       position="relative"
-      maxWidth={440}
+      sx={{ boxShadow: `5px 5px 15px 5px ${boxShadow2}` }}
     >
       {inProgress && !isLoading && (
         <Box
@@ -87,7 +84,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
           }}
         >
           <Typography color={"orangeDark"} variant="body2">
-            In progress
+            {t("inProgress")}
           </Typography>
         </Box>
       )}
@@ -116,7 +113,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
         ) : null}
         {inProgress && !isLoading ? (
           <Typography variant="title2" fontWeight={700}>
-            in progress
+            {t("inProgress")}
           </Typography>
         ) : null}
         {description ? (

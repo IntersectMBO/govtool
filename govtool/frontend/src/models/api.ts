@@ -1,7 +1,9 @@
-export interface DRepInfo {
-  isRegistered: boolean;
-  wasRegistered: boolean;
-  deposit: number | null;
+export interface VoterInfo {
+  isRegisteredAsDRep: boolean;
+  wasRegisteredAsDRep: boolean;
+  isRegisteredAsSoleVoter: boolean;
+  wasRegisteredAsSoleVoter: boolean;
+  deposit: number;
 }
 
 export interface DRepData {

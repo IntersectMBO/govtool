@@ -25,7 +25,7 @@ export const VoteActionForm = ({
   const [isContext, setIsContext] = useState<boolean>(false);
   const { isMobile, screenWidth } = useScreenDimension();
   const { openModal } = useModal();
-  const { dRep } = useCardano();
+  const { voter } = useCardano();
   const { t } = useTranslation();
 
   const {
@@ -142,7 +142,7 @@ export const VoteActionForm = ({
             />
           </Box>
         </Box>
-        {dRep?.isRegistered && (
+        {(voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter) && (
           <Button
             data-testid="show-votes-button"
             variant="text"

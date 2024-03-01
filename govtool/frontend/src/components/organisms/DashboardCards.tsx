@@ -1,5 +1,6 @@
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
@@ -11,7 +12,6 @@ import {
   useTranslation,
 } from "@hooks";
 import { DashboardActionCard } from "@molecules";
-import { useCallback, useMemo, useState } from "react";
 import { correctAdaFormat, formHexToBech32, openInNewTab } from "@utils";
 
 export const DashboardCards = () => {
@@ -20,18 +20,19 @@ export const DashboardCards = () => {
     buildSignSubmitConwayCertTx,
     delegateTo,
     delegateTransaction,
-    dRep,
+    voter,
     dRepID,
     dRepIDBech32,
     isDrepLoading,
     isPendingTransaction,
     registerTransaction,
+    soleVoterTransaction,
     stakeKey,
   } = useCardano();
   const navigate = useNavigate();
   const { currentDelegation, isCurrentDelegationLoading } =
     useGetAdaHolderCurrentDelegationQuery(stakeKey);
-  const { screenWidth, isMobile } = useScreenDimension();
+  const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const [isRetirementLoading, setIsRetirementLoading] =
     useState<boolean>(false);
@@ -223,7 +224,7 @@ export const DashboardCards = () => {
         default:
           return t("dashboard.registration.metadataUpdateInProgress");
       }
-    } else if (dRep?.isRegistered || dRep?.wasRegistered) {
+    } else if (voter?.isRegisteredAsDRep || voter?.wasRegisteredAsDRep) {
       return t("dashboard.registration.holdersCanDelegate");
     } else {
       return t("dashboard.registration.ifYouWant");
@@ -231,8 +232,30 @@ export const DashboardCards = () => {
   }, [
     registerTransaction.transactionHash,
     registerTransaction.type,
-    dRep?.isRegistered,
-    dRep?.wasRegistered,
+    voter?.isRegisteredAsDRep,
+    voter?.wasRegisteredAsDRep,
+  ]);
+
+  const soleVoterCardDescription = useMemo(() => {
+    if (soleVoterTransaction.transactionHash) {
+      switch (soleVoterTransaction.type) {
+        case "retirement":
+          return "dashboard.soleVoter.retirementInProgress";
+        default:
+          return "dashboard.soleVoter.registrationInProgress";
+      }
+    } else if (voter?.isRegisteredAsSoleVoter) {
+      return "dashboard.soleVoter.isRegisteredDescription";
+    } else if (voter?.wasRegisteredAsSoleVoter) {
+      return "dashboard.soleVoter.wasRegisteredDescription";
+    } else {
+      return "dashboard.soleVoter.registerDescription";
+    }
+  }, [
+    soleVoterTransaction.transactionHash,
+    soleVoterTransaction.type,
+    voter?.isRegisteredAsSoleVoter,
+    voter?.wasRegisteredAsSoleVoter,
   ]);
 
   const registrationCardTitle = useMemo(() => {
@@ -245,9 +268,9 @@ export const DashboardCards = () => {
         default:
           return t("dashboard.registration.dRepUpdate");
       }
-    } else if (dRep?.isRegistered) {
+    } else if (voter?.isRegisteredAsDRep) {
       return t("dashboard.registration.youAreRegistered");
-    } else if (dRep?.wasRegistered) {
+    } else if (voter?.wasRegisteredAsDRep) {
       return t("dashboard.registration.registerAgain");
     } else {
       return t("dashboard.registration.registerAsDRep");
@@ -255,41 +278,31 @@ export const DashboardCards = () => {
   }, [
     registerTransaction?.transactionHash,
     registerTransaction.type,
-    dRep?.isRegistered,
-    dRep?.wasRegistered,
+    voter?.isRegisteredAsDRep,
+    voter?.wasRegisteredAsDRep,
   ]);
 
-  const renderGovActionSection = useCallback(() => {
-    return (
-      <>
-        <Typography fontSize={16} fontWeight={600} lineHeight={"24px"} my={3}>
-          {t("dashboard.headingTwo")}
-        </Typography>
-        <Box display={"flex"}>
-          <DashboardActionCard
-            dataTestidFirstButton="view-governance-actions-button"
-            description={t("dashboard.govActions.description")}
-            firstButtonAction={() =>
-              navigate(PATHS.dashboard_governance_actions)
-            }
-            firstButtonLabel={t(
-              `dashboard.govActions.${
-                dRep?.isRegistered ? "reviewAndVote" : "view"
-              }`
-            )}
-            imageURL={IMAGES.govActionListImage}
-            title={t("dashboard.govActions.title")}
-          />
-          {screenWidth < 1024 ? null : (
-            <>
-              <Box p={2} />
-              <Box flex={1} px={4} />
-            </>
-          )}
-        </Box>
-      </>
-    );
-  }, [screenWidth, isMobile, dRep?.isRegistered]);
+  const soleVoterCardTitle = useMemo(() => {
+    if (soleVoterTransaction?.transactionHash) {
+      switch (soleVoterTransaction.type) {
+        case "retirement":
+          return t("dashboard.soleVoter.retirement");
+        default:
+          return t("dashboard.soleVoter.registration");
+      }
+    } else if (voter?.isRegisteredAsSoleVoter) {
+      return t("dashboard.soleVoter.youAreSoleVoterTitle");
+    } else if (voter?.wasRegisteredAsSoleVoter) {
+      return t("dashboard.soleVoter.wasSoleVoterTitle");
+    } else {
+      return t("dashboard.soleVoter.registerTitle");
+    }
+  }, [
+    soleVoterTransaction?.transactionHash,
+    soleVoterTransaction.type,
+    voter?.isRegisteredAsSoleVoter,
+    voter?.isRegisteredAsSoleVoter,
+  ]);
 
   return isDrepLoading ? (
     <Box
@@ -303,138 +316,202 @@ export const DashboardCards = () => {
     </Box>
   ) : (
     <Box
-      pl={screenWidth < 1024 ? 2 : screenWidth < 1440 ? 4 : 4}
-      pr={screenWidth < 1024 ? 2 : screenWidth < 1440 ? 8 : 29.5}
+      columnGap={3}
+      display="grid"
+      gridTemplateColumns={screenWidth < 1024 ? "1fr" : "1fr 1fr"}
+      px={screenWidth < 1024 ? 2 : screenWidth < 1440 ? 5 : 4}
+      py={3}
+      rowGap={4}
     >
-      {dRep?.isRegistered && renderGovActionSection()}
-      <Typography fontSize={16} fontWeight={600} lineHeight={"24px"} my={3}>
-        {t("dashboard.headingOne")}
-      </Typography>
-      <Box
-        display={"flex"}
-        flexDirection={screenWidth < 1024 ? "column" : "row"}
-      >
-        <DashboardActionCard
-          dataTestidFirstButton={
-            currentDelegation ? "change-dRep-button" : "delegate-button"
-          }
-          dataTestidSecondButton="delegate-learn-more-button"
-          dataTestidDrepIdBox="delegated-to-drep-id"
-          isLoading={isCurrentDelegationLoading || powerIsLoading}
-          description={
-            delegateTransaction?.transactionHash
-              ? progressDescription
-              : delegationDescription
-          }
-          dataTestidDelegationStatus={
-            delegateTransaction?.transactionHash
-              ? "voting-power-delegation-status-in-progress"
-              : `voting-power-delegation-status-${delegationStatusTestForId}`
-          }
-          firstButtonAction={() => navigateTo(PATHS.delegateTodRep)}
-          firstButtonLabel={
-            delegateTransaction?.transactionHash
-              ? ""
-              : currentDelegation
-              ? t("dashboard.delegation.changeDelegation")
-              : t("delegate")
-          }
-          imageHeight={55}
-          imageWidth={65}
-          firstButtonVariant={currentDelegation ? "outlined" : "contained"}
-          imageURL={IMAGES.govActionDelegateImage}
-          cardId={displayedDelegationId}
-          inProgress={!!delegateTransaction?.transactionHash}
-          cardTitle={t("dashboard.delegation.dRepDelegatedTo")}
-          secondButtonAction={
-            delegateTransaction?.transactionHash
-              ? () => openInNewTab("https://adanordic.com/latest_transactions")
-              : () =>
-                  openInNewTab(
-                    "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power"
-                  )
-          }
-          secondButtonLabel={
-            delegateTransaction?.transactionHash
-              ? t("seeTransaction")
-              : currentDelegation
-              ? ""
-              : t("learnMore")
-          }
-          title={
-            delegateTransaction?.transactionHash ? (
-              t("dashboard.delegation.votingPowerDelegation")
-            ) : currentDelegation ? (
-              <Trans i18nKey="dashboard.delegation.yourVotingPowerIsDelegated" />
-            ) : (
-              t("dashboard.delegation.useYourVotingPower")
-            )
-          }
-        />
-        <Box width={24} />
-        <DashboardActionCard
-          dataTestidFirstButton={
-            dRep?.isRegistered ? "retire-button" : "register-button"
-          }
-          dataTestidDrepIdBox="my-drep-id"
-          firstButtonVariant={dRep?.isRegistered ? "outlined" : "contained"}
-          secondButtonVariant={
-            registerTransaction?.transactionHash
-              ? "outlined"
-              : dRep?.isRegistered
-              ? "text"
-              : "outlined"
-          }
-          dataTestidSecondButton={
-            dRep?.isRegistered
-              ? "change-metadata-button"
-              : "register-learn-more-button"
-          }
-          description={registrationCardDescription}
-          firstButtonAction={
-            dRep?.isRegistered
-              ? retireAsDrep
-              : () => navigateTo(PATHS.registerAsdRep)
-          }
-          firstButtonIsLoading={isRetirementLoading}
-          firstButtonLabel={
-            registerTransaction?.transactionHash
-              ? ""
-              : t(
-                  `dashboard.registration.${
-                    dRep?.isRegistered ? "retire" : "register"
-                  }`
+      {/* DELEGATION CARD */}
+      <DashboardActionCard
+        dataTestidFirstButton={
+          currentDelegation ? "change-dRep-button" : "delegate-button"
+        }
+        dataTestidSecondButton="delegate-learn-more-button"
+        dataTestidDrepIdBox="delegated-to-drep-id"
+        isLoading={isCurrentDelegationLoading || powerIsLoading}
+        description={
+          delegateTransaction?.transactionHash
+            ? progressDescription
+            : delegationDescription
+        }
+        dataTestidDelegationStatus={
+          delegateTransaction?.transactionHash
+            ? "voting-power-delegation-status-in-progress"
+            : `voting-power-delegation-status-${delegationStatusTestForId}`
+        }
+        firstButtonAction={() => navigateTo(PATHS.delegateTodRep)}
+        firstButtonLabel={
+          delegateTransaction?.transactionHash
+            ? ""
+            : currentDelegation
+            ? t("dashboard.delegation.changeDelegation")
+            : t("delegate")
+        }
+        firstButtonVariant={currentDelegation ? "outlined" : "contained"}
+        imageURL={IMAGES.govActionDelegateImage}
+        cardId={displayedDelegationId}
+        inProgress={!!delegateTransaction?.transactionHash}
+        cardTitle={t("dashboard.delegation.dRepDelegatedTo")}
+        secondButtonAction={
+          delegateTransaction?.transactionHash
+            ? () => openInNewTab("https://adanordic.com/latest_transactions")
+            : () =>
+                openInNewTab(
+                  "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power"
                 )
-          }
-          inProgress={!!registerTransaction?.transactionHash}
-          imageURL={IMAGES.govActionRegisterImage}
-          secondButtonAction={
-            registerTransaction?.transactionHash
-              ? () => openInNewTab("https://adanordic.com/latest_transactions")
-              : dRep?.isRegistered
-              ? () => {
-                  navigateTo(PATHS.updateMetadata);
-                }
-              : () =>
-                  openInNewTab(
-                    "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep"
-                  )
-          }
-          secondButtonLabel={
-            registerTransaction?.transactionHash
-              ? t("seeTransaction")
-              : dRep?.isRegistered
-              ? t("dashboard.registration.changeMetadata")
-              : t("learnMore")
-          }
-          cardId={dRep?.isRegistered || dRep?.wasRegistered ? dRepIDBech32 : ""}
-          cardTitle={
-            dRep?.isRegistered || dRep?.wasRegistered ? t("myDRepId") : ""
-          }
-          title={registrationCardTitle}
-        />
-      </Box>
-      {!dRep?.isRegistered && renderGovActionSection()}
+        }
+        secondButtonLabel={
+          delegateTransaction?.transactionHash
+            ? t("seeTransaction")
+            : currentDelegation
+            ? ""
+            : t("learnMore")
+        }
+        title={
+          delegateTransaction?.transactionHash ? (
+            t("dashboard.delegation.votingPowerDelegation")
+          ) : currentDelegation ? (
+            <Trans i18nKey="dashboard.delegation.yourVotingPowerIsDelegated" />
+          ) : (
+            t("dashboard.delegation.useYourVotingPower")
+          )
+        }
+      />
+      {/* DELEGATION CARD END*/}
+      {/* REGISTARTION AS DREP CARD */}
+      <DashboardActionCard
+        dataTestidFirstButton={
+          voter?.isRegisteredAsDRep ? "retire-button" : "register-button"
+        }
+        dataTestidDrepIdBox="my-drep-id"
+        firstButtonVariant={
+          voter?.isRegisteredAsDRep ? "outlined" : "contained"
+        }
+        secondButtonVariant={
+          registerTransaction?.transactionHash
+            ? "outlined"
+            : voter?.isRegisteredAsDRep
+            ? "text"
+            : "outlined"
+        }
+        dataTestidSecondButton={
+          voter?.isRegisteredAsDRep
+            ? "change-metadata-button"
+            : "register-learn-more-button"
+        }
+        description={registrationCardDescription}
+        firstButtonAction={
+          voter?.isRegisteredAsDRep
+            ? retireAsDrep
+            : () => navigateTo(PATHS.registerAsdRep)
+        }
+        firstButtonIsLoading={isRetirementLoading}
+        firstButtonLabel={
+          registerTransaction?.transactionHash
+            ? ""
+            : t(
+                `dashboard.registration.${
+                  voter?.isRegisteredAsDRep ? "retire" : "register"
+                }`
+              )
+        }
+        inProgress={!!registerTransaction?.transactionHash}
+        imageURL={IMAGES.govActionRegisterImage}
+        secondButtonAction={
+          registerTransaction?.transactionHash
+            ? () => openInNewTab("https://adanordic.com/latest_transactions")
+            : voter?.isRegisteredAsDRep
+            ? () => {
+                navigateTo(PATHS.updateMetadata);
+              }
+            : () =>
+                openInNewTab(
+                  "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep"
+                )
+        }
+        secondButtonLabel={
+          registerTransaction?.transactionHash
+            ? t("seeTransaction")
+            : voter?.isRegisteredAsDRep
+            ? t("dashboard.registration.changeMetadata")
+            : t("learnMore")
+        }
+        cardId={
+          voter?.isRegisteredAsDRep || voter?.wasRegisteredAsDRep
+            ? dRepIDBech32
+            : ""
+        }
+        cardTitle={
+          voter?.isRegisteredAsDRep || voter?.wasRegisteredAsDRep
+            ? t("myDRepId")
+            : ""
+        }
+        title={registrationCardTitle}
+      />
+      {/* DREP CARD END*/}
+      {/* SOLE VOTER CARD */}
+      <DashboardActionCard
+        title={soleVoterCardTitle}
+        inProgress={!!soleVoterTransaction?.transactionHash}
+        dataTestidFirstButton={
+          voter?.isRegisteredAsSoleVoter
+            ? "retire-as-sole-voter-button"
+            : "register-as-sole-voter-button"
+        }
+        dataTestidSecondButton="learn-more-button"
+        description={
+          <Trans
+            i18nKey={soleVoterCardDescription}
+            values={{ votingPower: correctAdaFormat(votingPower) }}
+          />
+        }
+        firstButtonLabel={
+          soleVoterTransaction?.transactionHash
+            ? ""
+            : t(
+                voter?.isRegisteredAsSoleVoter
+                  ? "dashboard.soleVoter.retire"
+                  : voter?.wasRegisteredAsSoleVoter
+                  ? "dashboard.soleVoter.reRegister"
+                  : "dashboard.soleVoter.register"
+              )
+        }
+        firstButtonAction={() =>
+          navigateTo(
+            voter?.isRegisteredAsSoleVoter
+              ? PATHS.retireAsSoleVoter
+              : PATHS.registerAsSoleVoter
+          )
+        }
+        firstButtonVariant={
+          voter?.isRegisteredAsSoleVoter ? "outlined" : "contained"
+        }
+        secondButtonLabel={t("learnMore")}
+        secondButtonAction={() =>
+          openInNewTab(
+            "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep"
+          )
+        }
+        secondButtonVariant={"outlined"}
+        imageURL={IMAGES.soleVoterImage}
+      />
+      {/* REGISTARTION AS SOLE VOTER CARD END*/}
+      {/* GOV ACTIONS LIST CARD */}
+      <DashboardActionCard
+        dataTestidFirstButton="view-governance-actions-button"
+        description={t("dashboard.govActions.description")}
+        firstButtonAction={() => navigate(PATHS.dashboard_governance_actions)}
+        firstButtonLabel={t(
+          `dashboard.govActions.${
+            voter?.isRegisteredAsDRep ? "reviewAndVote" : "view"
+          }`
+        )}
+        imageURL={IMAGES.govActionListImage}
+        title={t("dashboard.govActions.title")}
+      />
+      {/* GOV ACTIONS LIST CARD END*/}
     </Box>
   );
 };

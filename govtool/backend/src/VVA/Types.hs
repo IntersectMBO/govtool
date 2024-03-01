@@ -59,8 +59,10 @@ data Vote = Vote
   }
 
 data DRepInfo = DRepInfo
-  { dRepInfoIsRegistered :: Bool
-  , dRepInfoWasRegistered :: Bool
+  { dRepInfoIsRegisteredAsDRep :: Bool
+  , dRepInfoWasRegisteredAsDRep :: Bool
+  , dRepInfoIsRegisteredAsSoleVoter :: Bool
+  , dRepInfoWasRegisteredAsSoleVoter :: Bool
   , dRepInfoDeposit :: Maybe Integer
   }
 

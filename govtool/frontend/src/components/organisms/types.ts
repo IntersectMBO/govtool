@@ -5,6 +5,7 @@ export type BgCardProps = {
   backButtonLabel?: string;
   children: React.ReactNode;
   isLoadingActionButton?: boolean;
+  isActionButtonDisabled?:boolean;
   onClickBackButton?: () => void;
   onClickActionButton: () => void;
   sx?: SxProps;

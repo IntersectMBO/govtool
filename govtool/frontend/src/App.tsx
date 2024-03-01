@@ -93,7 +93,7 @@ export default function App() {
         <Route
           path={PATHS.governance_actions}
           element={<GovernanceActions />}
-        ></Route>
+        />
         <Route
           path={PATHS.governance_actions_category}
           element={<GovernanceActionsCategory />}
@@ -140,8 +140,8 @@ export default function App() {
           handleClose={
             !modals[modal.type].preventDismiss
               ? callAll(modals[modal.type]?.onClose, () =>
-                openModal({ type: "none", state: null })
-              )
+                  openModal({ type: "none", state: null })
+                )
               : undefined
           }
         >

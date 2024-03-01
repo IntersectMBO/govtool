@@ -47,7 +47,7 @@ export const Dashboard = () => {
 
   return (
     <Background opacity={0.7}>
-      <Box display={"flex"} flexDirection={"row"} position={"relative"}>
+      <Box display="flex" flexDirection="row" position="relative">
         {isMobile ? null : <Drawer />}
         <Box
           display="flex"

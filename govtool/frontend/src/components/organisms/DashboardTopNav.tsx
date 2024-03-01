@@ -46,23 +46,23 @@ export const DashboardTopNav = ({
     <Box
       px={isMobile ? 2 : 5}
       py={3}
-      display={"flex"}
+      display="flex"
       bgcolor={isMobile ? "#FBFBFF" : undefined}
       sx={{
         backdropFilter: "blur(10px)",
         ...sx,
       }}
-      alignItems={"center"}
-      justifyContent={"space-between"}
+      alignItems="center"
+      justifyContent="space-between"
       borderBottom={1}
       borderColor="#D6E2FF"
       position="fixed"
       zIndex={100}
       flex={1}
-      width={"fill-available"}
-      height={"48px"}
+      width="fill-available"
+      height="48px"
     >
-      <Box display={"flex"}>
+      <Box display="flex">
         {imageSRC ? (
           <Box
             display="flex"
@@ -83,7 +83,7 @@ export const DashboardTopNav = ({
         {!isVotingPowerHidden && <VotingPowerChips />}
         {isMobile && (
           <IconButton
-            data-testid={"open-drawer-button"}
+            data-testid="open-drawer-button"
             sx={{ padding: 0, marginLeft: 1 }}
             onClick={() => setIsDrawerOpen(true)}
           >
@@ -105,7 +105,7 @@ export const DashboardTopNav = ({
               pb={3}
               display="flex"
               flexDirection="column"
-              height={"100%"}
+              height="100%"
             >
               <Box flex={1}>
                 <Box
@@ -117,14 +117,14 @@ export const DashboardTopNav = ({
                 >
                   <img src={ICONS.appLogoIcon} height={25} />
                   <IconButton
-                    data-testid={"close-drawer-button"}
+                    data-testid="close-drawer-button"
                     sx={{ padding: 0 }}
                     onClick={() => setIsDrawerOpen(false)}
                   >
                     <img src={ICONS.closeDrawerIcon} />
                   </IconButton>
                 </Box>
-                <Grid container direction={"column"} rowGap={4} mt={6}>
+                <Grid container direction="column" rowGap={4} mt={6}>
                   <Grid item>
                     <Link
                       dataTestId="home-link"
@@ -152,7 +152,7 @@ export const DashboardTopNav = ({
                   <Grid item>
                     <Link
                       dataTestId="guides-link"
-                      navTo={""}
+                      navTo=""
                       label={t("menu.guides")}
                       size="big"
                       onClick={() => {
@@ -167,7 +167,7 @@ export const DashboardTopNav = ({
                   <Grid item>
                     <Link
                       dataTestId="faqs-link"
-                      navTo={""}
+                      navTo=""
                       label={t("menu.faqs")}
                       size="big"
                       onClick={() => {

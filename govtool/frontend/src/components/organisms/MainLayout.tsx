@@ -4,13 +4,18 @@ import { ComponentProps, FC, PropsWithChildren } from "react";
 import { ICONS } from "@consts";
 import { Background, Typography } from "@atoms";
 import { useScreenDimension } from "@hooks";
-import { DashboardTopNav, DashboardTopNavProps, Drawer, Footer } from "@organisms";
+import {
+  DashboardTopNav,
+  DashboardTopNavProps,
+  Drawer,
+  Footer,
+} from "@organisms";
 import { NewTopNav } from "./NewTopNav";
 import { theme } from "@/theme";
 
-export type DashboardLayoutProps = PropsWithChildren
-  & Pick<DashboardTopNavProps, 'title'>
-  & ComponentProps<typeof Box> & {
+export type DashboardLayoutProps = PropsWithChildren &
+  Pick<DashboardTopNavProps, "title"> &
+  ComponentProps<typeof Box> & {
     isConnected: boolean;
     hideDrawer?: boolean;
   };
@@ -29,7 +34,7 @@ export const MainLayout: FC<DashboardLayoutProps> = ({
 
   return (
     <Background opacity={0.7}>
-      <Box display={"flex"} flexDirection={"row"} position={"relative"}>
+      <Box display="flex" flexDirection="row" position="relative">
         {showDrawer && <Drawer />}
 
         <Box

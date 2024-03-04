@@ -32,7 +32,7 @@ export const DashboardCards = () => {
   const navigate = useNavigate();
   const { currentDelegation, isCurrentDelegationLoading } =
     useGetAdaHolderCurrentDelegationQuery(stakeKey);
-  const { screenWidth } = useScreenDimension();
+  const { isMobile, screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const [isRetirementLoading, setIsRetirementLoading] =
     useState<boolean>(false);
@@ -306,22 +306,31 @@ export const DashboardCards = () => {
 
   return isDrepLoading ? (
     <Box
-      alignItems="center"
-      display="flex"
-      flex={1}
-      height="100vh"
-      justifyContent="center"
+      sx={{
+        alignItems: "center",
+        display: "flex",
+        flex: 1,
+        height: "100vh",
+        justifyContent: "center",
+      }}
     >
       <CircularProgress />
     </Box>
   ) : (
     <Box
-      columnGap={3}
-      display="grid"
-      gridTemplateColumns={screenWidth < 1024 ? "1fr" : "1fr 1fr"}
-      px={screenWidth < 1024 ? 2 : screenWidth < 1440 ? 5 : 4}
-      py={3}
-      rowGap={4}
+      sx={{
+        columnGap: 3,
+        display: "grid",
+        gridTemplateColumns:
+          screenWidth < 1280
+            ? "1fr"
+            : screenWidth > 1728
+            ? "repeat(3, minmax(300px, 572px))"
+            : "repeat(2, minmax(300px, 572px))",
+        px: isMobile ? 2 : 5,
+        py: 3,
+        rowGap: 3,
+      }}
     >
       {/* DELEGATION CARD */}
       <DashboardActionCard

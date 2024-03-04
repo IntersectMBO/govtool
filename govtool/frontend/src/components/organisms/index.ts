@@ -4,6 +4,7 @@ export * from "./ChooseWalletModal";
 export * from "./ControlledField";
 export * from "./DashboardCards";
 export * from "./DashboardCards";
+export * from "./DashboardDrawerMobile";
 export * from "./DashboardGovernanceActionDetails";
 export * from "./DashboardGovernanceActions";
 export * from "./DashboardGovernanceActionsVotedOn";

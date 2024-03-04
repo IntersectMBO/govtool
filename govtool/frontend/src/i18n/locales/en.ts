@@ -45,6 +45,7 @@ export const en = {
     dashboard: {
       headingOne: "Your Participation",
       headingTwo: "See Active Governance Actions",
+      title: "Dashboard",
       delegation: {
         changeDelegation: "Change delegation",
         delegateOwnPower:
@@ -262,7 +263,7 @@ export const en = {
       faqs: "FAQs",
       guides: "Guides",
       help: "Help",
-      myDashboard: "My Dashboard",
+      dashboard: "Dashboard",
       viewGovActions: "View Governance Actions",
     },
     metadataUpdate: {

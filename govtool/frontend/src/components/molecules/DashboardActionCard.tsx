@@ -68,6 +68,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
       flex={1}
       flexDirection="column"
       p={3}
+      maxWidth={524}
       position="relative"
       sx={{ boxShadow: `5px 5px 15px 5px ${boxShadow2}` }}
     >
@@ -192,15 +193,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
       ) : (
         <Box
           display="flex"
-          flexDirection={
-            screenWidth < 768
-              ? "column"
-              : screenWidth < 1024
-              ? "row"
-              : screenWidth < 1440
-              ? "column"
-              : "row"
-          }
+          flexDirection={screenWidth < 640 ? "column" : "row"}
         >
           {firstButtonLabel ? (
             <LoadingButton
@@ -211,14 +204,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
               size="large"
               variant={firstButtonVariant}
               sx={{
-                mr:
-                  screenWidth < 768
-                    ? 0
-                    : screenWidth < 1024 && secondButtonLabel
-                    ? 2
-                    : screenWidth >= 1440 && secondButtonLabel
-                    ? 2
-                    : 0,
+                mr: screenWidth < 640 ? 0 : 2,
                 width: isMobile ? "100%" : "auto",
               }}
             >
@@ -234,14 +220,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
               variant={secondButtonVariant}
               sx={{
                 width: isMobile ? "100%" : "auto",
-                marginTop:
-                  screenWidth < 768
-                    ? 1
-                    : screenWidth < 1024
-                    ? 0
-                    : screenWidth < 1440
-                    ? 1
-                    : 0,
+                marginTop: screenWidth < 640 ? 1 : 0,
               }}
             >
               {secondButtonLabel}

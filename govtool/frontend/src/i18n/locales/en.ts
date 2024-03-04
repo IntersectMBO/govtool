@@ -45,6 +45,7 @@ export const en = {
     dashboard: {
       headingOne: "Your Participation",
       headingTwo: "See Active Governance Actions",
+      title: "Dashboard",
       delegation: {
         changeDelegation: "Change delegation",
         delegateOwnPower:
@@ -265,7 +266,7 @@ export const en = {
       faqs: "FAQs",
       guides: "Guides",
       help: "Help",
-      myDashboard: "My Dashboard",
+      dashboard: "Dashboard",
       viewGovActions: "View Governance Actions",
     },
     metadataUpdate: {
@@ -433,7 +434,7 @@ export const en = {
     nextStep: "Next step",
     no: "No",
     ok: "Ok",
-    register:"Register",
+    register: "Register",
     seeTransaction: "See transaction",
     select: "Select",
     skip: "Skip",

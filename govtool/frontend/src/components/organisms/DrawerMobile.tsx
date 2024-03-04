@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
 import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 
 import { Background, Button, Link } from "../atoms";
@@ -7,11 +6,7 @@ import { useScreenDimension, useTranslation } from "@hooks";
 import { useModal } from "@context";
 import { openInNewTab } from "@utils";
 
-type DrawerMobileProps = {
-  isConnectButton: boolean;
-  isDrawerOpen: boolean;
-  setIsDrawerOpen: Dispatch<SetStateAction<boolean>>;
-};
+import { DrawerMobileProps } from "./types";
 
 const DRAWER_PADDING = 2;
 const CALCULATED_DRAWER_PADDING = DRAWER_PADDING * 8 * 2;

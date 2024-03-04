@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
-import { Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { FormProvider } from "react-hook-form";
+import { Box } from "@mui/material";
 
 import { Background } from "@atoms";
-import { ICONS, PATHS } from "@consts";
+import { PATHS } from "@consts";
+import {
+  useScreenDimension,
+  useUrlAndHashFormController as useRegisterAsdRepFormController,
+  useTranslation,
+} from "@hooks";
 import {
   DashboardTopNav,
   Footer,
@@ -11,13 +17,7 @@ import {
   RegisterAsdRepStepThree,
   RegisterAsdRepStepTwo,
 } from "@organisms";
-import {
-  useScreenDimension,
-  useUrlAndHashFormController as useRegisterAsdRepFormController,
-  useTranslation,
-} from "@hooks";
-import { useNavigate } from "react-router-dom";
-import { checkIsWalletConnected } from "@/utils";
+import { checkIsWalletConnected } from "@utils";
 
 export const RegisterAsdRep = () => {
   const [step, setStep] = useState<number>(1);
@@ -35,13 +35,10 @@ export const RegisterAsdRep = () => {
 
   return (
     <Background isReverted>
-      <Box display="flex" flexDirection="column" minHeight="100vh">
-        <DashboardTopNav
-          imageSRC={ICONS.appLogoIcon}
-          imageWidth={isMobile ? undefined : 42}
-          imageHeight={isMobile ? 24 : 35}
-          title={t("registration.becomeADRep")}
-        />
+      <Box
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      >
+        <DashboardTopNav title={t("registration.becomeADRep")} />
         <FormProvider {...registerAsdRepFormMethods}>
           {step === 1 && <RegisterAsdRepStepOne setStep={setStep} />}
           {step === 2 && <RegisterAsdRepStepTwo setStep={setStep} />}

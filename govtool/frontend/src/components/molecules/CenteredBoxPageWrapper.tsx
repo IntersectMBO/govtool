@@ -31,9 +31,6 @@ export const CenteredBoxPageWrapper: FC<PropsWithChildren<Props>> = ({
     <Background isReverted>
       <Box display={"flex"} minHeight={"100vh"} flexDirection="column">
         <DashboardTopNav
-          imageSRC={ICONS.appLogoIcon}
-          imageWidth={isMobile ? undefined : 42}
-          imageHeight={isMobile ? 24 : 35}
           title={pageTitle}
           isVotingPowerHidden={isVotingPowerHidden}
         />
@@ -41,25 +38,8 @@ export const CenteredBoxPageWrapper: FC<PropsWithChildren<Props>> = ({
           display={"flex"}
           justifyContent={"center"}
           flexDirection={"column"}
-          mt={isMobile ? 0 : 7}
           height={isMobile ? "100%" : "auto"}
-          sx={{ marginTop: "97px" }}
         >
-          {isMobile && (
-            <Box borderBottom={1} borderColor={"#fff"}>
-              <Typography
-                variant="body2"
-                sx={{
-                  ml: 2,
-                  my: "26px",
-                  fontSize: "24px",
-                  fontWeight: 400,
-                }}
-              >
-                {pageTitle}
-              </Typography>
-            </Box>
-          )}
           <Link
             data-testid={"back-button"}
             sx={{

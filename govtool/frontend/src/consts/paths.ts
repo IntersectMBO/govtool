@@ -1,4 +1,5 @@
 export const PATHS = {
+  create_governance_action: "/create_governance_action",
   dashboard_governance_actions_action:
     "/connected/governance_actions/:proposalId",
   dashboard_governance_actions_category:

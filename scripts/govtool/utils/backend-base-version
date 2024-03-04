@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-# This script returns a version string for the base image used to build the
-# backend Docker image. The version string is the SHA1 hash of the vva-be.cabal
-# file in the backend directory. This is used to tag the base image with the
-# version of the backend code that it was built from. It means that any changes
-# made in cabal file should result in building a new base docker image for
-# backend.
-
-git hash-object $(git rev-parse --show-toplevel)/govtool/backend/vva-be.cabal

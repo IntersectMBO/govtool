@@ -51,15 +51,16 @@ files. For an example configuration, refer to the `.env.example` file.
 
 ## Deployment process
 
-The deployment process is automated using a Makefile, which includes several
-targets to streamline the deployment steps:
+The deployment process is automated using a system of Makefiles, which include
+several targets to streamline the deployment steps:
 
-### `docker-login`
+### [Deployment `Makefile`](./Makefile)
 
-Ensures that the user is logged into the correct Docker account, providing
-access to necessary Docker resources.
+This is the main Makefile that provides full support for the deployment and
+maintenance of the stack. It includes backend and frontend modules and uses
+particular Makefiles for additional purposes.
 
-### `prepare-config`
+#### `prepare-config`
 
 Prepares the configuration files required for the application. This involves
 generating or fetching files, then placing them in the appropriate directory
@@ -72,36 +73,79 @@ structure. Key components include:
 - `prometheus.yml` and `grafana-provisioning` for monitoring setup.
 - `nginx` configuration for basic authentication where necessary.
 
-### `upload-config`
+#### `upload-config`
 
 Uploads the generated configuration to the target server.
 
-### `build-backend`
-
-Builds the backend image locally and a base image for the backend when changes
-are detected in the Cabal file.
-
-### `push-backend`
-
-Pushes the backend and backend-base images to the Docker repository.
-
-### `build-frontend`
-
-Handles the construction of the frontend image.
-
-### `push-frontend`
-
-Pushes the frontend image to the Docker repository.
-
-### `deploy-stack`
+#### `deploy-stack`
 
 Updates the target server with the latest images and (re)launches the Docker
 Compose stack.
 
-### `info`
+#### `destroy-cardano-node-and-dbsync`
+
+Removes the Cardano Node and Cardano DB Sync services, purges their volumes, and
+removes PostgreSQL database files. This step ensures that the Cardano network's
+state has been fully removed so the blockchain will be synchronized from the
+beginning.
+
+#### `toggle-maintenance`
+
+This step turns on the "maintenance page" that blocks users from usage of the
+application and provides an explanation of that in form of the simple page with
+error message.
+
+### Helpers, variables and targets in [`common.mk`](./common.mk) file
+
+This Makefile defines some common variables and helpers, as well as highly
+reused targets, such as:
+
+#### `check-env-defined`
+
+Verifies the given environment value. When there is no definition for such
+environment in Terraform configuration it stops the execution.
+
+#### `docker-login`
+
+Ensures that the user is logged into the correct Docker account, providing
+access to necessary Docker resources.
+
+### Notifications in [`info.mk`](./info.mk) file
+
+This file is responsible for giving the proper notifications and feedback about
+the current execution:
+
+#### `info`
 
 Displays deployment parameters for review and verification.
 
-### `notify`
+#### `notify`
 
 Sends a notification to stakeholders about the deployment status via Slack.
+
+### Building backend images steps in [backend `Makefile`](../../govtool/backend/Makefile)
+
+This file is responsible for generating images for backend and for pushing them
+to the ECR repository.
+
+#### `build-backend`
+
+Builds the backend image locally and a base image for the backend when changes
+are detected in the Cabal file.
+
+#### `push-backend`
+
+Pushes the backend and backend-base images to the Docker repository.
+
+### Building frontend images steps in [frontend `Makefile`](../../govtool/frontend/Makefile)
+
+This file is responsible for generating images for frontend and for pushing them
+to the ECR repository.
+
+#### `build-frontend`
+
+Handles the construction of the frontend image.
+
+#### `push-frontend`
+
+Pushes the frontend image to the Docker repository.

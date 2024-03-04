@@ -191,6 +191,8 @@ export const DashboardGovernanceActionsCategory = () => {
                         pendingTransaction.vote?.resourceId ===
                         item.txHash + item.index
                       }
+                      // TODO: Add data validation
+                      isDataMissing={false}
                       onClick={() => {
                         saveScrollPosition();
 

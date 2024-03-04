@@ -1,11 +1,11 @@
 import { Box } from "@mui/material";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { useModal } from "@context";
-import { useScreenDimension, useTranslation } from "@hooks";
-import { ICONS } from "@consts";
-import { Tooltip } from "@atoms";
-import { VoteActionForm, VotesSubmitted } from "../molecules";
-import { Button, Typography } from "../atoms";
+import {
+  GovernanceActionCardStatePill,
+  GovernanceActionDetailsCardVotes,
+} from "@molecules";
+import { useScreenDimension } from "@hooks";
+import { GovernanceActionDetailsCardData } from "@organisms";
+import { useState } from "react";
 
 type GovernanceActionDetailsCardProps = {
   abstainVotes: number;
@@ -16,9 +16,11 @@ type GovernanceActionDetailsCardProps = {
   type: string;
   url: string;
   yesVotes: number;
-  shortenedGovActionId: string;
-  isDRep?: boolean;
+  govActionId: string;
+  isDashboard?: boolean;
+  isVoter?: boolean;
   voteFromEP?: string;
+  isInProgress?: boolean;
 };
 
 export const GovernanceActionDetailsCard = ({
@@ -30,210 +32,62 @@ export const GovernanceActionDetailsCard = ({
   type,
   url,
   yesVotes,
-  isDRep,
+  isDashboard,
+  isVoter,
   voteFromEP,
-  shortenedGovActionId,
+  govActionId,
+  isInProgress,
 }: GovernanceActionDetailsCardProps) => {
-  const { screenWidth } = useScreenDimension();
-  const { openModal } = useModal();
-  const { t } = useTranslation();
+  const [isVoteSubmitted, setIsVoteSubmitted] = useState<boolean>(false);
+  const { screenWidth, isMobile } = useScreenDimension();
+
+  // TODO: Add as a prop when BE is ready
+  const isDataMissing = false;
+
+  const isOneColumn = (isDashboard && screenWidth < 1036) ?? isMobile;
 
   return (
     <Box
-      borderRadius={4.5}
-      boxShadow="0px 2px 10px 2px rgba(0, 51, 173, 0.15)"
-      display="flex"
-      flexDirection={screenWidth < 1024 ? "column" : "row"}
-      mt={3}
-      maxWidth={890}
-      overflow="visible"
-      width="100%"
+      sx={{
+        borderRadius: "20px",
+        display: "grid",
+        gridTemplateColumns: isOneColumn ? undefined : "0.6fr 0.4fr",
+        mt: "12px",
+        width: "100%",
+        position: "relative",
+        boxShadow: isInProgress
+          ? "2px 2px 20px 0px rgba(245, 90, 0, 0.20)"
+          : isVoteSubmitted
+          ? "2px 2px 20px 0px rgba(98, 188, 82, 0.20)"
+          : "2px 2px 20px 0px rgba(47, 98, 220, 0.20)",
+      }}
       data-testid="governance-action-details-card"
     >
-      <Box
-        bgcolor="rgba(255, 255, 255, 0.6)"
-        display="flex"
-        flexDirection="column"
-        px={screenWidth < 1024 ? 3 : 5}
-        py={screenWidth < 1024 ? 3 : 4}
-        sx={{
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: screenWidth < 1024 ? 20 : 0,
-          borderBottomLeftRadius: screenWidth < 1024 ? 0 : 20,
-        }}
-        width={screenWidth < 1024 ? "auto" : "40%"}
-      >
-        <Box
-          border={1}
-          borderColor="lightBlue"
-          borderRadius={3}
-          display="flex"
-          flexDirection="column"
-        >
-          <Box
-            alignItems="center"
-            bgcolor="#D6E2FF80"
-            display="flex"
-            flex={1}
-            justifyContent="center"
-            py={0.75}
-            width="100%"
-          >
-            <Typography fontWeight={300} sx={{ mr: 1 }} variant="caption">
-              {t("govActions.submissionDate")}
-            </Typography>
-            <Typography fontWeight={600} variant="caption">
-              {createdDate}
-            </Typography>
-            <Tooltip
-              heading={t("tooltips.submissionDate.heading")}
-              paragraphOne={t("tooltips.submissionDate.paragraphOne")}
-              placement="bottom-end"
-              arrow
-            >
-              <InfoOutlinedIcon
-                style={{
-                  color: "#ADAEAD",
-                }}
-                sx={{ ml: 1.25 }}
-                fontSize="small"
-              />
-            </Tooltip>
-          </Box>
-          <Box
-            justifyContent="center"
-            alignItems="center"
-            display="flex"
-            flex={1}
-            py={0.75}
-            width="100%"
-          >
-            <Typography fontWeight={300} sx={{ mr: 1 }} variant="caption">
-              {t("govActions.expiryDate")}
-            </Typography>
-            <Typography fontWeight={600} variant="caption">
-              {expiryDate}
-            </Typography>
-            <Tooltip
-              heading={t("tooltips.expiryDate.heading")}
-              paragraphOne={t("tooltips.expiryDate.paragraphOne")}
-              paragraphTwo={t("tooltips.expiryDate.paragraphTwo")}
-              placement="bottom-end"
-              arrow
-            >
-              <InfoOutlinedIcon
-                style={{
-                  color: "#ADAEAD",
-                }}
-                sx={{ ml: 1.25 }}
-                fontSize="small"
-              />
-            </Tooltip>
-          </Box>
-        </Box>
-        <Box flex={1} mt={3}>
-          <Box>
-            <Typography color="neutralGray" variant="caption">
-              {t("govActions.governanceActionType")}
-            </Typography>
-            <Box display="flex">
-              <Box mt={1} px={2} py={1} bgcolor="lightBlue" borderRadius={100}>
-                <Typography variant="caption">{type}</Typography>
-              </Box>
-            </Box>
-          </Box>
-          <Box mt={4}>
-            <Typography color="neutralGray" variant="caption">
-              {t("govActions.governanceActionId")}
-            </Typography>
-            <Box display="flex">
-              <Box
-                px={2}
-                py={1}
-                border={1}
-                borderColor="lightBlue"
-                borderRadius={100}
-              >
-                <Typography variant="caption">
-                  {shortenedGovActionId}
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-          <Box mt={4}>
-            <Typography color="neutralGray" variant="caption">
-              {t("govActions.details")}
-            </Typography>
-            <Box>
-              <Typography
-                variant="caption"
-                sx={{
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "pre-line",
-                }}
-              >
-                {JSON.stringify(details, null, 1)}
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
-        <Button
-          onClick={() => {
-            openModal({
-              type: "externalLink",
-              state: {
-                externalLink: url,
-              },
-            });
-          }}
-          sx={{
-            mt: 8,
-            width: screenWidth < 1024 ? "100%" : "fit-content",
-            alignSelf: screenWidth < 1024 ? "center" : "auto",
-          }}
-          variant="text"
-          data-testid="view-other-details-button"
-        >
-          <Typography variant="body2" fontWeight={500} color="primary">
-            {t("govActions.viewOtherDetails")}
-          </Typography>
-          <img
-            alt="external link"
-            src={ICONS.externalLinkIcon}
-            height="20"
-            width="20"
-            style={{ marginLeft: "8px" }}
-          />
-        </Button>
-      </Box>
-      <Box
-        bgcolor="rgba(255, 255, 255, 0.2)"
-        display="flex"
-        flex={1}
-        px={screenWidth < 1024 ? 3 : 5}
-        py={4}
-        sx={{
-          borderBottomLeftRadius: screenWidth < 1024 ? 20 : 0,
-          borderBottomRightRadius: 20,
-          borderTopRightRadius: screenWidth < 1024 ? 0 : 20,
-        }}
-      >
-        {isDRep ? (
-          <VoteActionForm
-            voteFromEP={voteFromEP ? voteFromEP.toLowerCase() : undefined}
-            yesVotes={yesVotes}
-            noVotes={noVotes}
-            abstainVotes={abstainVotes}
-          />
-        ) : (
-          <VotesSubmitted
-            yesVotes={yesVotes}
-            noVotes={noVotes}
-            abstainVotes={abstainVotes}
-          />
-        )}
-      </Box>
+      {(isVoteSubmitted || isInProgress) && (
+        <GovernanceActionCardStatePill
+          variant={isVoteSubmitted ? "voteSubmitted" : "inProgress"}
+        />
+      )}
+      <GovernanceActionDetailsCardData
+        type={type}
+        govActionId={govActionId}
+        createdDate={createdDate}
+        expiryDate={expiryDate}
+        isDataMissing={isDataMissing}
+        isDashboard={isDashboard}
+        isOneColumn={isOneColumn}
+      />
+      <GovernanceActionDetailsCardVotes
+        setIsVoteSubmitted={setIsVoteSubmitted}
+        abstainVotes={abstainVotes}
+        noVotes={noVotes}
+        yesVotes={yesVotes}
+        isVoter={isVoter}
+        voteFromEP={voteFromEP}
+        isDashboard={isDashboard}
+        isOneColumn={isOneColumn}
+        isInProgress={isInProgress}
+      />
     </Box>
   );
 };

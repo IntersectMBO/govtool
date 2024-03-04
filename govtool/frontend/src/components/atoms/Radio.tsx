@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
+
+import { Typography } from "@atoms";
 import { UseFormRegister, UseFormSetValue } from "react-hook-form";
 
 type RadioProps = {
@@ -10,11 +12,20 @@ type RadioProps = {
   setValue: UseFormSetValue<any>;
   register: UseFormRegister<any>;
   dataTestId?: string;
+  disabled?: boolean;
 };
 
 export const Radio = ({ ...props }: RadioProps) => {
-  const { isChecked, name, setValue, title, value, dataTestId, register } =
-    props;
+  const {
+    isChecked,
+    name,
+    setValue,
+    title,
+    value,
+    dataTestId,
+    register,
+    disabled,
+  } = props;
 
   const handleClick = () => {
     setValue(name, value);
@@ -23,13 +34,17 @@ export const Radio = ({ ...props }: RadioProps) => {
   return (
     <Box
       data-testid={dataTestId}
-      onClick={handleClick}
-      borderRadius={2}
-      p={0.2}
-      border={isChecked ? 1 : 0}
-      borderColor={isChecked ? "specialCyanBorder" : "white"}
+      onClick={() => {
+        if (!disabled) handleClick();
+      }}
+      borderRadius={isChecked ? "15px" : "12px"}
+      p={isChecked ? "2px" : 0}
+      border={isChecked ? 2 : 0}
+      borderColor={isChecked ? "specialCyanBorder" : undefined}
       sx={[{ "&:hover": { color: "blue", cursor: "pointer" } }]}
-      flex={1}
+      boxShadow={
+        "0px 1px 2px 0px rgba(0, 51, 173, 0.08), 0px 1px 6px 1px rgba(0, 51, 173, 0.15)"
+      }
     >
       <input
         type="radio"
@@ -39,15 +54,16 @@ export const Radio = ({ ...props }: RadioProps) => {
         checked={isChecked}
       />
       <Box
-        borderRadius={1.5}
+        borderRadius={"12px"}
         bgcolor={isChecked ? "specialCyan" : "white"}
         py={1.5}
-        border={isChecked ? 0 : 1}
-        borderColor="lightBlue"
       >
         <Typography
-          textAlign="center"
-          color={isChecked ? "white" : "textBlack"}
+          variant="body1"
+          sx={{
+            textAlign: "center",
+            color: isChecked ? "white" : "textBlack",
+          }}
         >
           {title}
         </Typography>

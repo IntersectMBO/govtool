@@ -218,6 +218,8 @@ export const GovernanceActionsCategory = () => {
                         {...item}
                         txHash={item.txHash}
                         index={item.index}
+                        // TODO: Add data validation
+                        isDataMissing={false}
                         onClick={() => {
                           saveScrollPosition();
 

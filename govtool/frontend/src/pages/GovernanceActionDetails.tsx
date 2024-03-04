@@ -130,11 +130,7 @@ export const GovernanceActionDetails = () => {
                 <CircularProgress />
               </Box>
             ) : data || state ? (
-              <Box
-                px={screenWidth < 1024 ? 0 : screenWidth < 1440 ? 10 : 24}
-                py={3}
-                data-testid="governance-action-details"
-              >
+              <Box data-testid={"governance-action-details"}>
                 <GovernanceActionDetailsCard
                   abstainVotes={
                     state ? state.abstainVotes : data.proposal.abstainVotes
@@ -158,7 +154,7 @@ export const GovernanceActionDetails = () => {
                   }
                   url={state ? state.url : data.proposal.url}
                   yesVotes={state ? state.yesVotes : data.proposal.yesVotes}
-                  shortenedGovActionId={shortenedGovActionId}
+                  govActionId={fullProposalId}
                 />
               </Box>
             ) : (

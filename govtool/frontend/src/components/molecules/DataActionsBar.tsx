@@ -50,7 +50,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
 
   return (
     <>
-      <Box alignItems="center" display="flex" justifyContent="flex-start">
+      <Box alignItems="center" display="flex" justifyContent="space-between">
         <InputBase
           inputProps={{ "data-testid": "search-input" }}
           onChange={(e) => setSearchText(e.target.value)}
@@ -76,7 +76,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
             fontWeight: 500,
             height: 48,
             padding: "16px 24px",
-            width: 231,
+            width: 500,
           }}
         />
         <OrderActionsChip

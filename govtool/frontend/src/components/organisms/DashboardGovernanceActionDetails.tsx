@@ -20,15 +20,17 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import { GovernanceActionDetailsCard } from "@organisms";
 import {
   formatDisplayDate,
   getShortenedGovActionId,
   getProposalTypeLabel,
 } from "@utils";
+import { GovernanceActionDetailsCard } from "@organisms";
+import { useCardano } from "@/context";
 
 export const DashboardGovernanceActionDetails = () => {
   const { voter } = useGetVoterInfo();
+  const { pendingTransaction } = useCardano();
   const { state, hash } = useLocation();
   const navigate = useNavigate();
   const { isMobile, screenWidth } = useScreenDimension();
@@ -72,7 +74,7 @@ export const DashboardGovernanceActionDetails = () => {
         aria-label="breadcrumb"
         sx={{
           marginTop: screenWidth < 1024 ? 2.5 : 0,
-          marginBottom: 5,
+          marginBottom: "24px",
         }}
       >
         {breadcrumbs}
@@ -134,7 +136,9 @@ export const DashboardGovernanceActionDetails = () => {
                 ? formatDisplayDate(state.expiryDate)
                 : formatDisplayDate(data.proposal.expiryDate)
             }
-            isDRep={voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter}
+            isVoter={
+              voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
+            }
             noVotes={state ? state.noVotes : data.proposal.noVotes}
             type={
               state
@@ -144,7 +148,12 @@ export const DashboardGovernanceActionDetails = () => {
             url={state ? state.url : data.proposal.url}
             yesVotes={state ? state.yesVotes : data.proposal.yesVotes}
             voteFromEP={data?.vote?.vote}
-            shortenedGovActionId={shortenedGovActionId}
+            govActionId={fullProposalId}
+            isInProgress={
+              pendingTransaction.vote?.resourceId ===
+              fullProposalId.replace("#", "")
+            }
+            isDashboard
           />
         ) : (
           <Box mt={4} display="flex" flexWrap="wrap">

@@ -9,6 +9,59 @@ import {
   successGreen,
 } from "./consts";
 
+declare module "@mui/material/styles" {
+  interface Palette {
+    accentOrange: string;
+    accentYellow: string;
+    arcticWhite: string;
+    boxShadow1: string;
+    boxShadow2: string;
+    errorRed: string;
+    highlightBlue: string;
+    inputRed: string;
+    negativeRed: string;
+    neutralGray: string;
+    orangeDark: string;
+    neutralWhite: string;
+    positiveGreen: string;
+    primaryBlue: string;
+    secondaryBlue: string;
+    specialCyan: string;
+    specialCyanBorder: string;
+    lightBlue: string;
+    textBlack: string;
+    textGray: string;
+    lightOrange: string;
+    fadedPurple: string;
+  }
+  interface PaletteOptions {
+    accentOrange: string;
+    accentYellow: string;
+    arcticWhite: string;
+    boxShadow1: string;
+    boxShadow2: string;
+    errorRed: string;
+    highlightBlue: string;
+    orangeDark: string;
+    inputRed: string;
+    negativeRed: string;
+    neutralGray: string;
+    neutralWhite: string;
+    positiveGreen: string;
+    primaryBlue: string;
+    secondaryBlue: string;
+    specialCyan: string;
+    specialCyanBorder: string;
+    lightBlue: string;
+    textBlack: string;
+    textGray: string;
+    lightOrange: string;
+    fadedPurple: string;
+  }
+}
+
+export type Theme = typeof theme;
+
 export const theme = createTheme({
   breakpoints: {
     values: {
@@ -114,8 +167,10 @@ export const theme = createTheme({
   palette: {
     accentOrange: "#F29339",
     accentYellow: "#F2D9A9",
+    arcticWhite: "#FBFBFF",
     boxShadow1: "rgba(0, 18, 61, 0.37)",
     boxShadow2: "rgba(47, 98, 220, 0.2)",
+    errorRed: "#9E2323",
     fadedPurple: "#716E88",
     highlightBlue: "#C2EFF299",
     inputRed: "#FAEAEB",

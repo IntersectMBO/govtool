@@ -2,7 +2,7 @@ import { styled } from "@mui/material";
 import * as TooltipMUI from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 
-type TooltipProps = Omit<TooltipMUI.TooltipProps, "title"> & {
+export type TooltipProps = Omit<TooltipMUI.TooltipProps, "title"> & {
   heading?: string;
   paragraphOne?: string;
   paragraphTwo?: string;

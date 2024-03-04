@@ -7,7 +7,7 @@ import { useTranslation } from "@hooks";
 interface Props {
   isChecked?: boolean;
   text: string;
-  variant?: string;
+  variant?: "blueThin" | "blue";
 }
 
 export const CopyButton = ({ isChecked, text, variant }: Props) => {
@@ -17,6 +17,10 @@ export const CopyButton = ({ isChecked, text, variant }: Props) => {
   const iconSrc = useMemo(() => {
     if (variant === "blue") {
       return ICONS.copyBlueIcon;
+    }
+
+    if (variant === "blueThin") {
+      return ICONS.copyBlueThinIcon;
     }
 
     if (isChecked) {

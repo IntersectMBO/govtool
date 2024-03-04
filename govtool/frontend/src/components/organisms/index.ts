@@ -17,6 +17,7 @@ export * from "./DrawerMobile";
 export * from "./ExternalLinkModal";
 export * from "./Footer";
 export * from "./GovernanceActionDetailsCard";
+export * from "./GovernanceActionDetailsCardData";
 export * from "./GovernanceActionsToVote";
 export * from "./Hero";
 export * from "./HomeCards";

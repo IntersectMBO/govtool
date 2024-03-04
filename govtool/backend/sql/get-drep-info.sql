@@ -71,16 +71,36 @@ WasRegisteredAsSoleVoter AS (
                 WHERE
                     drep_hash.raw = DRepId.raw
                     AND drep_registration.voting_anchor_id IS NULL)) AS value
+), CurrentMetadata AS (
+    SELECT voting_anchor.url as url, encode(voting_anchor.data_hash, 'hex') as data_hash
+    FROM LatestRegistrationEntry
+    LEFT JOIN voting_anchor
+    ON voting_anchor.id = LatestRegistrationEntry.voting_anchor_id
+    LIMIT 1
+), CurrentVotingPower AS (
+    SELECT amount as amount
+    FROM drep_hash
+    JOIN DRepId
+    ON drep_hash.raw = DRepId.raw
+    LEFT JOIN drep_distr
+    ON drep_distr.hash_id = drep_hash.id
+    ORDER BY drep_distr.epoch_no DESC
+    LIMIT 1
 )
 SELECT
     IsRegisteredAsDRep.value,
     WasRegisteredAsDRep.value,
     IsRegisteredAsSoleVoter.value,
     WasRegisteredAsSoleVoter.value,
-    CurrentDeposit.value
+    CurrentDeposit.value,
+    CurrentMetadata.url,
+    CurrentMetadata.data_hash,
+    CurrentVotingPower.amount
 FROM
     IsRegisteredAsDRep
     CROSS JOIN IsRegisteredAsSoleVoter
     CROSS JOIN WasRegisteredAsDRep
     CROSS JOIN WasRegisteredAsSoleVoter
     CROSS JOIN CurrentDeposit
+    CROSS JOIN CurrentMetadata
+    CROSS JOIN CurrentVotingPower

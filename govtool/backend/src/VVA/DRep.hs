@@ -60,7 +60,7 @@ listDReps ::
   m [DRepRegistration]
 listDReps = withPool $ \conn -> do
   results <- liftIO $ SQL.query_ conn listDRepsSql
-  return [DRepRegistration drepHash url dataHash (floor @Scientific deposit) | (drepHash, url, dataHash, deposit) <- results]
+  return [DRepRegistration drepHash url dataHash (floor @Scientific deposit) votingPower | (drepHash, url, dataHash, deposit, votingPower) <- results]
 
 getVotesSql :: SQL.Query
 getVotesSql = sqlFrom $(embedFile "sql/get-votes.sql")
@@ -99,12 +99,23 @@ getDRepInfo
 getDRepInfo drepId = withPool $ \conn -> do
   result <- liftIO $ SQL.query conn getDRepInfoSql (SQL.Only drepId)
   case result of
-    [(isRegisteredAsDRep, wasRegisteredAsDRep, isRegisteredAsSoleVoter, wasRegisteredAsSoleVoter, deposit)] ->
+    [ ( isRegisteredAsDRep
+      , wasRegisteredAsDRep
+      , isRegisteredAsSoleVoter
+      , wasRegisteredAsSoleVoter
+      , deposit
+      , url
+      , dataHash
+      , votingPower
+      )] ->
       return $ DRepInfo
         { dRepInfoIsRegisteredAsDRep = fromMaybe False isRegisteredAsDRep
         , dRepInfoWasRegisteredAsDRep = fromMaybe False wasRegisteredAsDRep
         , dRepInfoIsRegisteredAsSoleVoter = fromMaybe False isRegisteredAsSoleVoter
         , dRepInfoWasRegisteredAsSoleVoter = fromMaybe False wasRegisteredAsSoleVoter
         , dRepInfoDeposit = deposit
+        , dRepInfoUrl = url
+        , dRepInfoDataHash = dataHash
+        , dRepInfoVotingPower = votingPower
         }
-    [] -> return $ DRepInfo False False False False Nothing
+    [] -> return $ DRepInfo False False False False Nothing Nothing Nothing Nothing

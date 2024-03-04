@@ -1,22 +1,13 @@
-import { Box } from "@mui/material";
 import { useEffect, useRef } from "react";
 import { useLocation, Outlet, useNavigate } from "react-router-dom";
+import { Box } from "@mui/material";
 
-import { ICONS, PATHS } from "@consts";
-import { useCardano } from "@context";
 import { Background, ScrollToManage } from "@atoms";
-import { useScreenDimension } from "@hooks";
+import { PATHS } from "@consts";
+import { useCardano } from "@context";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { DashboardTopNav, Drawer, Footer } from "@organisms";
-import { checkIsWalletConnected } from "@/utils";
-
-const getPageTitle = (pathname: string) => {
-  if (pathname === PATHS.dashboard) {
-    return "My Dashboard";
-  } else if (pathname.includes(PATHS.dashboard_governance_actions)) {
-    return "Governance Actions";
-  }
-  return "";
-};
+import { checkIsWalletConnected } from "@utils";
 
 export const Dashboard = () => {
   const { isEnabled, stakeKey } = useCardano();
@@ -24,6 +15,16 @@ export const Dashboard = () => {
   const { pathname, hash } = useLocation();
   const divRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const getPageTitle = (pathname: string) => {
+    if (pathname === PATHS.dashboard) {
+      return t("dashboard.title");
+    } else if (pathname.includes(PATHS.dashboard_governance_actions)) {
+      return t("dashboard.govActions.title");
+    }
+    return "";
+  };
 
   useEffect(() => {
     if (divRef.current) {
@@ -46,35 +47,21 @@ export const Dashboard = () => {
 
   return (
     <Background opacity={0.7}>
-      <Box display={"flex"} flexDirection={"row"} position={"relative"}>
+      <Box sx={{ display: "flex", position: "relative" }}>
         {isMobile ? null : <Drawer />}
         <Box
-          display="flex"
-          flexDirection="column"
-          flex={1}
-          minHeight="100vh"
-          overflow="hidden"
+          sx={{
+            display: "flex",
+            flex: 1,
+            flexDirection: "column",
+            minHeight: "100vh",
+            overflow: "clip",
+            position: "relative",
+          }}
         >
-          <DashboardTopNav
-            title={getPageTitle(location.pathname)}
-            imageSRC={isMobile ? ICONS.appLogoIcon : undefined}
-            imageHeight={24}
-          />
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              flex: "1",
-              overflowX: "hidden",
-              overflowY: "auto",
-              position: "relative",
-              marginTop: "97px",
-            }}
-            ref={divRef}
-          >
-            <ScrollToManage />
-            <Outlet />
-          </Box>
+          <DashboardTopNav title={getPageTitle(location.pathname)} />
+          <ScrollToManage />
+          <Outlet />
           {isMobile ? <Footer /> : null}
         </Box>
       </Box>

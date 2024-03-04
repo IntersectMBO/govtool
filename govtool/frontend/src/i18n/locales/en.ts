@@ -45,6 +45,7 @@ export const en = {
     dashboard: {
       headingOne: "Your Participation",
       headingTwo: "See Active Governance Actions",
+      title: "Dashboard",
       delegation: {
         changeDelegation: "Change delegation",
         delegateOwnPower:
@@ -235,11 +236,8 @@ export const en = {
     },
     hero: {
       connectWallet: "Connect your wallet",
-      description: {
-        mobile:
-          "You can either delegate your voting power or become a DRep to allow people to delegate voting power to you.",
-        wide: "Anyone with a wallet containing ADA can participate in governance on Sanchonet.\n\nYour ADA balance entitles you to an equal amount of Voting Power.\n\nFor more info see the guide entry for <0>Voting Power</0>.",
-      },
+      description:
+        "Anyone with a wallet containing ADA can participate in governance on Sanchonet.\n\nYour ADA balance entitles you to an equal amount of Voting Power.\n\nFor more info see the guide entry for <0>Voting Power</0>.",
       headline: "SanchoNet \n Governance Tool",
     },
     home: {
@@ -265,7 +263,7 @@ export const en = {
       faqs: "FAQs",
       guides: "Guides",
       help: "Help",
-      myDashboard: "My Dashboard",
+      dashboard: "Dashboard",
       viewGovActions: "View Governance Actions",
     },
     metadataUpdate: {
@@ -433,7 +431,7 @@ export const en = {
     nextStep: "Next step",
     no: "No",
     ok: "Ok",
-    register:"Register",
+    register: "Register",
     seeTransaction: "See transaction",
     select: "Select",
     skip: "Skip",

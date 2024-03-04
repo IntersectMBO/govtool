@@ -104,7 +104,7 @@ services:
     logging: *logging
 
   cardano-node:
-    image: ghcr.io/intersectmbo/cardano-node:8.8.0-pre
+    image: ghcr.io/intersectmbo/cardano-node:${CARDANO_NODE_TAG}
     entrypoint:
       - "cardano-node"
       - "run"
@@ -143,7 +143,7 @@ services:
     logging: *logging
 
   cardano-db-sync:
-    image: ghcr.io/intersectmbo/cardano-db-sync:sancho-4-0-0-fix-config
+    image: ghcr.io/intersectmbo/cardano-db-sync:${CARDANO_DB_SYNC_TAG}
     environment:
       - NETWORK=${CARDANO_NETWORK:-sanchonet}
       - POSTGRES_HOST=postgres
@@ -167,7 +167,7 @@ services:
     logging: *logging
 
   backend:
-    image: ${VVA_BE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/backend}:${TAG:-main-dev-sanchonet}
+    image: ${VVA_BE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/backend}:${BACKEND_TAG}
     command: /usr/local/bin/vva-be -c /run/secrets/backend-config.json start-app
     depends_on:
       cardano-node:
@@ -193,7 +193,7 @@ services:
       - "traefik.http.services.backend.loadbalancer.server.port=9876"
 
   frontend:
-    image: ${VVA_FE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/frontend}:${TAG:-main-dev-sanchonet}
+    image: ${VVA_FE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/frontend}:${FRONTEND_TAG}
     volumes:
       - /home/ubuntu/config/nginx/auth.conf:/etc/nginx/conf.d/auth.conf
       - /home/ubuntu/config/nginx/govtool.htpasswd:/etc/nginx/conf.d/govtool.htpasswd

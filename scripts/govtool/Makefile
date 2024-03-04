@@ -2,27 +2,48 @@ SHELL := bash
 ONESHELL:
 .SHELLFLAGS := -eu -o pipefail -c
 
-cardano_network := $(shell echo $${CARDANO_NETWORK})
+# tools
+docker ?= docker
+curl ?= curl
+
+# environment variables
 env := $(shell echo $${ENVIRONMENT})
+cardano_network := $(shell echo $${CARDANO_NETWORK})
 grafana_admin_password := $(shell echo $${GRAFANA_ADMIN_PASSWORD})
 grafana_slack_recipient := $(shell echo $${GRAFANA_SLACK_RECIPIENT})
 grafana_slack_oauth_token := $(shell echo $${GRAFANA_SLACK_OAUTH_TOKEN})
 gtm_id := $(shell echo $${GTM_ID})
 sentry_dsn := $(shell echo $${SENTRY_DSN})
 
+# git state
 commit := $(shell git rev-parse HEAD)
 branch := $(shell git rev-parse --abbrev-ref HEAD)
-docker ?= docker
+
+# target addresses
 domain := $(shell echo $${DOMAIN:-$(env)-$(cardano_network).govtool.byron.network})
 repo_url ?= 733019650473.dkr.ecr.eu-west-1.amazonaws.com
-tag := $(commit)-$(env)-$(cardano_network)
-
 docker_host := $(domain)
 docker_user := ubuntu
 ssh_url := $(docker_user)@$(docker_host)
+
+# stack configuration
 docker_compose_file := docker-compose.$(env).yml
 compose_stack_name := govtool-$(env)-$(cardano_network)
-base_backend_image_tag := $(shell git hash-object ../../govtool/backend/vva-be.cabal)
+
+# pipeline information
+pipeline_url := $(shell echo $${PIPELINE_URL:-})
+ifeq ($(PIPELINE_URL),)
+  pipeline_info := _Deployed from local machine._
+else
+  pipeline_info := _Deployed from <$(pipeline_url)|GitHub>._
+endif
+
+# image tags
+cardano_node_image_tag := 8.8.0-pre
+cardano_db_sync_image_tag := sancho-4-0-0-fix-config
+base_backend_image_tag := $(shell ./utils/backend-base-version)
+backend_image_tag := $(shell ./utils/backend-version)
+frontend_image_tag := $(shell ./utils/frontend-version)
 
 # helper function for checking undefined variables
 check_defined = \
@@ -31,6 +52,10 @@ check_defined = \
 __check_defined = \
     $(if $(value $1),, \
       $(error Undefined $1$(if $2, ($2))))
+
+# helper function for checking if image exists on ECR
+check_image_on_ecr = \
+	$(docker) manifest inspect "$(repo_url)/$1:$2" > /dev/null 2>&1
 
 .PHONY: all
 all: docker-login prepare-config upload-config build-backend push-backend build-frontend push-frontend deploy-stack info notify
@@ -65,40 +90,43 @@ upload-config: prepare-config
 	rsync -av -e 'ssh -o StrictHostKeyChecking=no' config/target/. $(ssh_url):config
 
 .PHONY: build-backend
-build-backend: build-backend-base
+build-backend: docker-login build-backend-base
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	$(docker) build --build-arg BASE_IMAGE_TAG=$(base_backend_image_tag) --tag "$(repo_url)/backend:$(tag)" ../../govtool/backend
+	$(call check_image_on_ecr,backend,$(backend_image_tag)) || \
+	$(docker) build --build-arg BASE_IMAGE_TAG=$(base_backend_image_tag) --tag "$(repo_url)/backend:$(backend_image_tag)" ../../govtool/backend
 
 .PHONY: build-backend-base
-build-backend-base:
+build-backend-base: docker-login
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	docker manifest inspect "$(repo_url)/backend-base:$(base_backend_image_tag)" || \
+	$(call check_image_on_ecr,backend-base,$(base_backend_image_tag)) || \
 	$(docker) build --file ../../govtool/backend/Dockerfile.base --tag "$(repo_url)/backend-base:$(base_backend_image_tag)" ../../govtool/backend
 	@echo "Using backend-base image: $(repo_url)/backend-base:$(base_backend_image_tag)"
 
 .PHONY: push-backend
-push-backend: docker-login push-backend-base
+push-backend: docker-login push-backend-base build-backend
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	$(docker) push $(repo_url)/backend:$(tag)
+	$(call check_image_on_ecr,backend,$(backend_image_tag)) || \
+	$(docker) push $(repo_url)/backend:$(backend_image_tag)
 
 .PHONY: push-backend-base
-push-backend-base: docker-login
+push-backend-base: docker-login build-backend-base
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	docker manifest inspect "$(repo_url)/backend-base:$(base_backend_image_tag)" || \
+	$(call check_image_on_ecr,backend-base,$(base_backend_image_tag)) || \
 	$(docker) push $(repo_url)/backend-base:$(base_backend_image_tag)
 
 .PHONY: build-frontend
-build-frontend:
+build-frontend: docker-login
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	@:$(call check_defined, gtm_id)
 	@:$(call check_defined, sentry_dsn)
 	if [[ "$(cardano_network)" = "mainnet" ]]; then NETWORK_FLAG=1; else NETWORK_FLAG=0; fi; \
-	$(docker) build --tag "$(repo_url)/frontend:$(tag)" \
+	$(call check_image_on_ecr,frontend,$(frontend_image_tag)) || \
+	$(docker) build --tag "$(repo_url)/frontend:$(frontend_image_tag)" \
 		--build-arg VITE_BASE_URL="https://$(domain)/api" \
 		--build-arg VITE_GTM_ID="$(gtm_id)" \
 		--build-arg VITE_NETWORK_FLAG="$$NETWORK_FLAG" \
@@ -106,10 +134,11 @@ build-frontend:
 		../../govtool/frontend
 
 .PHONY: push-frontend
-push-frontend: docker-login
+push-frontend: docker-login build-frontend
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	$(docker) push $(repo_url)/frontend:$(tag)
+	$(call check_image_on_ecr,frontend,$(frontend_image_tag)) || \
+	$(docker) push $(repo_url)/frontend:$(frontend_image_tag)
 
 .PHONY: deploy-stack
 deploy-stack: docker-login
@@ -120,7 +149,10 @@ deploy-stack: docker-login
 	export DOCKER_HOST=ssh://$(ssh_url); \
 	export ENVIRONMENT=$(env); \
 	export GRAFANA_ADMIN_PASSWORD=$(grafana_admin_password); \
-	export TAG=$(tag); \
+	export BACKEND_TAG=$(backend_image_tag); \
+	export FRONTEND_TAG=$(frontend_image_tag); \
+	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \
+	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
 	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) pull; \
 	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) up -d
@@ -132,7 +164,10 @@ destroy-cardano-node-and-dbsync:
 	export CARDANO_NETWORK=$(cardano_network); \
 	export DOCKER_HOST=ssh://$(ssh_url); \
 	export ENVIRONMENT=$(env); \
-	export TAG=$(tag); \
+	export BACKEND_TAG=$(backend_image_tag); \
+	export FRONTEND_TAG=$(frontend_image_tag); \
+	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \
+	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
 	containers="$$(docker container ls --no-trunc --format '{{.Names}}' -f name=cardano-node -f name=cardano-db-sync -f name=postgres)"; \
 	volumes="$$(docker volume ls --format '{{.Name}}' -f name=db-sync-data -f name=node-db -f name=node-ipc -f name=postgres)"; \
@@ -148,7 +183,10 @@ toggle-maintenance:
 	export ENVIRONMENT=$(env); \
 	export CARDANO_NETWORK=$(cardano_network); \
 	export DOCKER_HOST=ssh://$(ssh_url); \
-	export TAG=$(tag); \
+	export BACKEND_TAG=$(backend_image_tag); \
+	export FRONTEND_TAG=$(frontend_image_tag); \
+	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \
+	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
 	if [[ "$(maintenance)" = "enable" ]]; then $(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend touch /var/run/maintenance_enabled; \
 	else $(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend rm /var/run/maintenance_enabled; fi
@@ -160,12 +198,14 @@ info:
 	@:$(call check_defined, env)
 	@echo "+-----------"
 	@echo "|  TIME      $(shell date +'%Y-%m-%d %H:%M:%S%z')"
-	@echo "D  COMMIT    $(shell git rev-parse HEAD)"
-	@echo "E  BRANCH    $(branch)"
-	@echo "P  ENV       $(env)"
-	@echo "L  NETWORK   $(cardano_network)"
-	@echo "O  IMAGE_TAG $(tag)"
-	@echo "Y  SSH       $(ssh_url)"
+	@echo "|  BRANCH    $(branch) [$(commit)]"
+	@echo "|  ENV       $(env)"
+	@echo "I  NETWORK   $(cardano_network)"
+	@echo "N  BACKEND   $(repo_url)/backend:$(backend_image_tag)"
+	@echo "F  FRONTEND  $(repo_url)/frontend:$(frontend_image_tag)"
+	@echo "O  NODE      ghcr.io/intersectmbo/cardano-node:$(cardano_node_image_tag)"
+	@echo "|  DBSYNC    ghcr.io/intersectmbo/cardano-db-sync:$(cardano_db_sync_image_tag)"
+	@echo "|  SSH       $(ssh_url)"
 	@echo "|  URL       https://$(docker_host)"
 	@echo "+-----------"
 
@@ -173,7 +213,10 @@ info:
 notify:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	curl -X POST -H "Authorization: Bearer $$GRAFANA_SLACK_OAUTH_TOKEN" -d "channel=$$GRAFANA_SLACK_RECIPIENT" -d "text=The deploy to $(env) has been made from branch $(branch) ($(shell git rev-parse HEAD))" https://slack.com/api/chat.postMessage
+	$(curl) -X POST https://slack.com/api/chat.postMessage\
+		-H "Authorization: Bearer $(grafana_slack_oauth_token)" \
+		-H "Content-Type: application/json; charset=utf-8" \
+		--data "{ \"channel\":\"$(grafana_slack_recipient)\", \"text\":\":rocket: *Deploy performed on \`$(env)\`*\n- from *branch* \`$(branch)\` (\`$(commit)\`),\n- using *Cardano Node* version \`$(cardano_node_image_tag)\`,\n- using *Cardano DB Sync* version \`$(cardano_db_sync_image_tag)\`,\n- using *GovTool backend* version \`$(backend_image_tag)\`,\n- using *Govtool frontend* version \`$(frontend_image_tag)\`.\n$(pipeline_info)\" }"
 
 .PHONY: ssh
 ssh:
@@ -192,6 +235,9 @@ docker:
 	export DOCKER_HOST=ssh://$(ssh_url); \
 	export ENVIRONMENT=$(env); \
 	export GRAFANA_ADMIN_PASSWORD=$(grafana_admin_password); \
-	export TAG=$(tag); \
+	export BACKEND_TAG=$(backend_image_tag); \
+	export FRONTEND_TAG=$(frontend_image_tag); \
+	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \
+	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	ssh-keyscan $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
 	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) $(cmd)

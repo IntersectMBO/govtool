@@ -1,9 +1,9 @@
 import { useMemo, useEffect } from "react";
-import { Box, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Box, Link } from "@mui/material";
 
 import { Background, Button, LoadingButton, Spacer, Typography } from "@atoms";
-import { ICONS, PATHS } from "@consts";
+import { PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
   useScreenDimension,
@@ -76,18 +76,12 @@ export const UpdatedRepMetadata = () => {
   return (
     <Background isReverted>
       <Box display={"flex"} minHeight={"100vh"} flexDirection="column">
-        <DashboardTopNav
-          imageSRC={ICONS.appLogoIcon}
-          imageWidth={isMobile ? undefined : 42}
-          imageHeight={isMobile ? 24 : 35}
-          title={t("metadataUpdate.title")}
-        />
+        <DashboardTopNav title={t("metadataUpdate.title")} />
         <Box
           display={"flex"}
           justifyContent={"center"}
-          mt={isMobile ? 0 : 7}
+          mt={3}
           height={isMobile ? "100%" : "auto"}
-          sx={{ marginTop: isMobile ? "97px" : "153px" }}
         >
           <Box
             width={

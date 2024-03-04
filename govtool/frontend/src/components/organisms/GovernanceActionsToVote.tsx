@@ -6,7 +6,6 @@ import { Slider } from "./Slider";
 
 import { Typography } from "@atoms";
 import {
-  useGetDRepVotesQuery,
   useGetProposalsQuery,
   useScreenDimension,
   useTranslation,

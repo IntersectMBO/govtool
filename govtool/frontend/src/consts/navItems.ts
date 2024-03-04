@@ -3,9 +3,9 @@ import { PATHS } from "./paths";
 
 export const NAV_ITEMS = [
   {
-    dataTestId: "home-link",
+    dataTestId: "dashboard-link",
     navTo: PATHS.home,
-    label: "Home",
+    label: "Dashboard",
     newTabLink: null,
   },
   {

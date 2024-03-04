@@ -71,7 +71,7 @@ server = drepList
 drepList :: App m => m [DRep]
 drepList = do
   CacheEnv {dRepListCache} <- asks vvaCache
-  map (\(Types.DRepRegistration drep_hash url data_hash deposit) -> DRep (DRepHash drep_hash) url data_hash deposit)
+  map (\(Types.DRepRegistration drep_hash url data_hash deposit votingPower) -> DRep (DRepHash drep_hash) url data_hash deposit votingPower)
     <$> cacheRequest dRepListCache () DRep.listDReps
 
 getVotingPower :: App m => HexText -> m Integer
@@ -158,6 +158,9 @@ drepInfo (unHexText -> dRepId) = do
     , dRepInfoResponseIsRegisteredAsSoleVoter = dRepInfoIsRegisteredAsSoleVoter
     , dRepInfoResponseWasRegisteredAsSoleVoter = dRepInfoWasRegisteredAsSoleVoter
     , dRepInfoResponseDeposit = dRepInfoDeposit
+    , dRepInfoResponseUrl = dRepInfoUrl
+    , dRepInfoResponseDataHash = HexText <$> dRepInfoDataHash
+    , dRepInfoResponseVotingPower = dRepInfoVotingPower
     }
 
 getCurrentDelegation :: App m => HexText -> m (Maybe HexText)

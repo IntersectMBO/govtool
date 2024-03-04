@@ -9,6 +9,9 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
+- Abandoning registration as DRep [Issue 151](https://github.com/IntersectMBO/govtool/issues/151)
+- Abandoning GA creation [Issue 359](https://github.com/IntersectMBO/govtool/issues/359)
+- Choose GA type - GA Submiter [Issue 358](https://github.com/IntersectMBO/govtool/issues/358)
 - Change step 3 components [Issue 152](https://github.com/intersectMBO/govtool/issues/152)
 - Add possibility to vote on behalf of myself - Sole Voter [Issue 119](https://github.com/IntersectMBO/govtool/issues/119)
 - Create DRep registration page about roles [Issue 205](https://github.com/IntersectMBO/govtool/issues/205)

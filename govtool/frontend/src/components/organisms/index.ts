@@ -1,4 +1,5 @@
 export * from "./BgCard";
+export * from "./ChooseGovernanceActionType";
 export * from "./ChooseStakeKeyPanel";
 export * from "./ChooseWalletModal";
 export * from "./ControlledField";

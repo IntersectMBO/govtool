@@ -32,6 +32,7 @@ import {
 import { SetupInterceptors } from "./services";
 import { useGetVoterInfo, useWalletConnectionListener } from "./hooks";
 import { RegisterAsSoleVoter } from "./pages/RegisterAsSoleVoter";
+import { CreateGovernanceAction } from "./pages/CreateGovernanceAction";
 
 export default function App() {
   const { enable, setVoter, setIsDrepLoading } = useCardano();
@@ -115,6 +116,10 @@ export default function App() {
             element={<DashboardGovernanceActionsCategory />}
           />
         </Route>
+        <Route
+          path={PATHS.create_governance_action}
+          element={<CreateGovernanceAction />}
+        />
         <Route path={PATHS.delegateTodRep} element={<DelegateTodRep />} />
         <Route path={PATHS.registerAsdRep} element={<RegisterAsdRep />} />
         <Route

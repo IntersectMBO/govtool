@@ -14,8 +14,10 @@ import {
 import { BgCard } from ".";
 
 export const RegisterAsdRepStepOne = ({
+  onClickCancel,
   setStep,
 }: {
+  onClickCancel: () => void;
   setStep: Dispatch<SetStateAction<number>>;
 }) => {
   const { t } = useTranslation();
@@ -35,6 +37,7 @@ export const RegisterAsdRepStepOne = ({
       actionButtonLabel={t("continue")}
       backButtonLabel={t("cancel")}
       onClickActionButton={onClickContinue}
+      onClickBackButton={onClickCancel}
       sx={{ paddingBottom: isMobile ? undefined : 3 }}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">

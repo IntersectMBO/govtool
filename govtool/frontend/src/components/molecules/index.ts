@@ -1,4 +1,5 @@
 export * from "./ActionCard";
+export * from "./BackToButton";
 export * from "./CenteredBoxBottomButtons";
 export * from "./CenteredBoxPageWrapper";
 export * from "./DashboardActionCard";

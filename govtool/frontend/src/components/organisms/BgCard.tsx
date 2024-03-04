@@ -89,7 +89,7 @@ export const BgCard = ({
           flexDirection: "column",
           height: "auto",
           maxWidth: screenWidth > 768 ? 600 : undefined,
-          my: isMobile ? undefined : 3,
+          mb: isMobile ? undefined : 3,
           pb: isMobile ? undefined : 10,
           pt: isMobile ? 6 : 10,
           px: isMobile ? 2 : 18.75,

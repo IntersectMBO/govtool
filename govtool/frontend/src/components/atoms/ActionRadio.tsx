@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction } from "react";
+import { FC } from "react";
 import { Box, Typography } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
@@ -9,8 +9,8 @@ import { theme } from "@/theme";
 type ActionRadioProps = {
   dataTestId?: string;
   isChecked?: boolean;
-  onChange: Dispatch<SetStateAction<string>>;
-  subtitle: string;
+  onChange: (newValue: string) => void;
+  subtitle?: string;
   title: string;
   tooltipText?: string;
   tooltipTitle?: string;
@@ -76,13 +76,15 @@ export const ActionRadio: FC<ActionRadioProps> = ({ ...props }) => {
             </Tooltip>
           )}
         </Box>
-        <Typography
-          variant="body2"
-          mt={1}
-          color={isChecked ? "white" : "textBlack"}
-        >
-          {subtitle}
-        </Typography>
+        {subtitle ? (
+          <Typography
+            variant="body2"
+            mt={1}
+            color={isChecked ? "white" : "textBlack"}
+          >
+            {subtitle}
+          </Typography>
+        ) : null}
       </Box>
     </Box>
   );

@@ -1,34 +1,35 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FormProvider } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { Box } from "@mui/material";
 
 import { Background } from "@atoms";
 import { PATHS } from "@consts";
 import { useModal } from "@context";
 import {
+  defaulCreateGovernanceActionValues,
   useScreenDimension,
-  useUrlAndHashFormController as useRegisterAsdRepFormController,
   useTranslation,
 } from "@hooks";
 import { BackToButton } from "@molecules";
 import {
+  ChooseGovernanceActionType,
   DashboardTopNav,
   Footer,
-  RegisterAsdRepStepOne,
-  RegisterAsdRepStepThree,
-  RegisterAsdRepStepTwo,
 } from "@organisms";
 import { checkIsWalletConnected } from "@utils";
 
-export const RegisterAsdRep = () => {
-  const [step, setStep] = useState<number>(1);
-  const { isMobile } = useScreenDimension();
+export const CreateGovernanceAction = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { isMobile } = useScreenDimension();
   const { closeModal, openModal } = useModal();
+  const [step, setStep] = useState(1);
 
-  const registerAsdRepFormMethods = useRegisterAsdRepFormController();
+  const methods = useForm({
+    mode: "onBlur",
+    defaultValues: defaulCreateGovernanceActionValues,
+  });
 
   useEffect(() => {
     if (checkIsWalletConnected()) {
@@ -41,10 +42,10 @@ export const RegisterAsdRep = () => {
       type: "statusModal",
       state: {
         status: "warning",
-        message: t("modals.registration.cancelDescription"),
+        message: t("modals.createGovernanceAction.cancelModalDescription"),
         buttonText: t("modals.common.goToDashboard"),
-        title: t("modals.registration.cancelTitle"),
-        dataTestId: "cancel-registration-modal",
+        title: t("modals.createGovernanceAction.cancelModalTitle"),
+        dataTestId: "cancel-governance-action-creation-modal",
         onSubmit: backToDashboard,
       },
     });
@@ -59,7 +60,7 @@ export const RegisterAsdRep = () => {
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
-        <DashboardTopNav title={t("registration.becomeADRep")} />
+        <DashboardTopNav title={t("createGovernanceAction.title")} />
         <BackToButton
           label={t("backToDashboard")}
           onClick={onClickBackToDashboard}
@@ -69,15 +70,13 @@ export const RegisterAsdRep = () => {
             mt: isMobile ? 3 : 1.5,
           }}
         />
-        <FormProvider {...registerAsdRepFormMethods}>
+        <FormProvider {...methods}>
           {step === 1 && (
-            <RegisterAsdRepStepOne
+            <ChooseGovernanceActionType
               onClickCancel={onClickBackToDashboard}
               setStep={setStep}
             />
           )}
-          {step === 2 && <RegisterAsdRepStepTwo setStep={setStep} />}
-          {step === 3 && <RegisterAsdRepStepThree setStep={setStep} />}
         </FormProvider>
         {isMobile && <Footer />}
       </Box>

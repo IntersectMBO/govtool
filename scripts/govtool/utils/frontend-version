@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-# This script returns a version string for the base image used to build the frontend Docker image. The version string is the SHA1 hash of the most recent commit in the frontend directory. This is used to tag the image with the version of the frontend code that it was built from. It means that any changes made in the frontend code should result in building a new docker image for frontend.
-
-git log -n 1 --format="%H" -- $(git rev-parse --show-toplevel)/govtool/frontend

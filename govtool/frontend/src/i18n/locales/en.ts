@@ -122,6 +122,10 @@ export const en = {
         youAreSoleVoterTitle: "You are a Sole Voter",
       },
     },
+    createGovernanceAction: {
+      chooseGATypeTitle: "Choose a Governance Action type",
+      title: "Create a Governance Action",
+    },
     delegation: {
       description:
         "You can delegate your voting power to a DRep or to a pre-defined voting option.",
@@ -277,6 +281,11 @@ export const en = {
         goToDashboard: "Go to Dashboard",
         oops: "Oops!",
       },
+      createGovernanceAction: {
+        cancelModalDescription:
+          "If you return to the Dashboard, your information will not be saved.",
+        cancelModalTitle: "Do You Want to Cancel Registration ?",
+      },
       delegation: {
         message:
           "The confirmation of your actual delegation might take a bit of time but you can track it using",
@@ -292,6 +301,9 @@ export const en = {
         youAreAboutToOpen: "You are about to open an external link to:",
       },
       registration: {
+        cancelTitle: "Do You Want to Abandon Registration ?",
+        cancelDescription:
+          "If you return to the Dashboard, your information will not be saved.",
         message:
           "The confirmation of your registration might take a bit of time but you can track it using",
         title: "Registration Transaction Submitted!",

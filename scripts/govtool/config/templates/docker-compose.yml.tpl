@@ -40,7 +40,7 @@ services:
     image: prom/prometheus:v2.47.1
     volumes:
       - prometheus-data:/prometheus
-      - /home/ubuntu/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - /home/<DOCKER_USER>/config/prometheus.yml:/etc/prometheus/prometheus.yml
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: always
@@ -50,18 +50,18 @@ services:
     image: grafana/grafana:10.0.8
     volumes:
       - grafana-data:/var/lib/grafana
-      - /home/ubuntu/config/grafana-provisioning:/etc/grafana/provisioning
+      - /home/<DOCKER_USER>/config/grafana-provisioning:/etc/grafana/provisioning
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_INSTALL_PLUGINS=grafana-piechart-panel
-      - GF_SERVER_ROOT_URL=https://staging.govtool.byron.network/grafana
+      - GF_SERVER_ROOT_URL=https://<DOMAIN>/grafana
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     restart: always
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`staging.govtool.byron.network`) && PathPrefix(`/grafana`)"
+      - "traefik.http.routers.grafana.rule=Host(`<DOMAIN>`) && PathPrefix(`/grafana`)"
       - "traefik.http.routers.grafana.entrypoints=websecure"
       - "traefik.http.routers.grafana.tls.certresolver=myresolver"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
@@ -76,7 +76,7 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.status-service.rule=Host(`staging.govtool.byron.network`) && PathPrefix(`/status`)"
+      - "traefik.http.routers.status-service.rule=Host(`<DOMAIN>`) && PathPrefix(`/status`)"
       - "traefik.http.routers.status-service.entrypoints=websecure"
       - "traefik.http.routers.status-service.tls.certresolver=myresolver"
       - "traefik.http.services.status-service.loadbalancer.server.port=8000"
@@ -129,11 +129,11 @@ services:
       - "--disable-delayed-os-memory-return"
       - "-RTS"
     environment:
-      - NETWORK=${CARDANO_NETWORK:-sanchonet}
+      - NETWORK=${CARDANO_NETWORK}
     volumes:
       - node-db:/data/db
       - node-ipc:/ipc
-      - /home/ubuntu/config/cardano-node:/configuration
+      - /home/<DOCKER_USER>/config/cardano-node:/configuration
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "curl -f 127.0.0.1:12788 || exit 1"]
@@ -145,12 +145,10 @@ services:
   cardano-db-sync:
     image: ghcr.io/intersectmbo/cardano-db-sync:${CARDANO_DB_SYNC_TAG}
     environment:
-      - NETWORK=${CARDANO_NETWORK:-sanchonet}
+      - NETWORK=${CARDANO_NETWORK}
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
-      - RESTORE_SNAPSHOT=${RESTORE_SNAPSHOT:-}
       - RESTORE_RECREATE_DB=N
-      - EXTRA_DB_SYNC_ARGS=${EXTRA_DB_SYNC_ARGS:-}
     depends_on:
       cardano-node:
         condition: service_healthy
@@ -167,7 +165,7 @@ services:
     logging: *logging
 
   backend:
-    image: ${VVA_BE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/backend}:${BACKEND_TAG}
+    image: <REPO_URL>/backend:${BACKEND_TAG}
     command: /usr/local/bin/vva-be -c /run/secrets/backend-config.json start-app
     depends_on:
       cardano-node:
@@ -180,11 +178,11 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`staging.govtool.byron.network`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.rule=Host(`<DOMAIN>`) && PathPrefix(`/api`)"
       - "traefik.http.middlewares.backend-stripprefix.stripprefix.prefixes=/api"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=GET,HEAD,OPTIONS"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=*"
-      - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlist=https://staging.govtool.byron.network"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlist=https://<DOMAIN><CSP_ALLOWED_HOSTS>"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.backend-cors.headers.addvaryheader=true"
       - "traefik.http.routers.backend.middlewares=backend-stripprefix@docker,backend-cors@docker"
@@ -193,10 +191,10 @@ services:
       - "traefik.http.services.backend.loadbalancer.server.port=9876"
 
   frontend:
-    image: ${VVA_FE_REPO:-733019650473.dkr.ecr.eu-west-1.amazonaws.com/frontend}:${FRONTEND_TAG}
+    image: <REPO_URL>/frontend:${FRONTEND_TAG}
     volumes:
-      - /home/ubuntu/config/nginx/auth.conf:/etc/nginx/conf.d/auth.conf
-      - /home/ubuntu/config/nginx/govtool.htpasswd:/etc/nginx/conf.d/govtool.htpasswd
+      - /home/<DOCKER_USER>/config/nginx/auth.conf:/etc/nginx/conf.d/auth.conf
+      - /home/<DOCKER_USER>/config/nginx/govtool.htpasswd:/etc/nginx/conf.d/govtool.htpasswd
     depends_on:
       cardano-node:
         condition: service_healthy
@@ -206,7 +204,7 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`staging.govtool.byron.network`)"
+      - "traefik.http.routers.frontend.rule=Host(`<DOMAIN>`)"
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.middlewares.frontend-csp.headers.contentSecurityPolicy=default-src 'self'; img-src *.usersnap.com 'self' data:; script-src *.usersnap.com 'self' 'unsafe-inline' https://www.googletagmanager.com https://browser.sentry-cdn.com; style-src *.usersnap.com *.googleapis.com 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src *.usersnap.com https://s3.eu-central-1.amazonaws.com/upload.usersnap.com 'self' o4506155985141760.ingest.sentry.io *.google-analytics.com; font-src *.usersnap.com *.gstatic.com 'self' 'unsafe-inline' https://fonts.gstatic.com; worker-src blob:"
@@ -215,13 +213,13 @@ services:
 
 secrets:
   postgres_db:
-    file: /home/ubuntu/config/dbsync-secrets/postgres_db
+    file: /home/<DOCKER_USER>/config/dbsync-secrets/postgres_db
   postgres_password:
-    file: /home/ubuntu/config/dbsync-secrets/postgres_password
+    file: /home/<DOCKER_USER>/config/dbsync-secrets/postgres_password
   postgres_user:
-    file: /home/ubuntu/config/dbsync-secrets/postgres_user
+    file: /home/<DOCKER_USER>/config/dbsync-secrets/postgres_user
   backend-config.json:
-    file: /home/ubuntu/config/backend-config.json
+    file: /home/<DOCKER_USER>/config/backend-config.json
 
 volumes:
   letsencrypt:

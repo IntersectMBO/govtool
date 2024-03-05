@@ -11,12 +11,10 @@ import {
 import { BgCard } from "./BgCard";
 
 type ChooseGovernanceActionTypeProps = {
-  onClickCancel: () => void;
   setStep: Dispatch<SetStateAction<number>>;
 };
 
 export const ChooseGovernanceActionType = ({
-  onClickCancel,
   setStep,
 }: ChooseGovernanceActionTypeProps) => {
   const { t } = useTranslation();
@@ -27,6 +25,10 @@ export const ChooseGovernanceActionType = ({
 
   const onClickContinue = () => {
     setStep(3);
+  };
+
+  const onClickCancel = () => {
+    setStep(1);
   };
 
   // TODO: Add tooltips when they will be available
@@ -54,7 +56,6 @@ export const ChooseGovernanceActionType = ({
   return (
     <BgCard
       actionButtonLabel={t("continue")}
-      backButtonLabel={t("cancel")}
       isActionButtonDisabled={isContinueButtonDisabled}
       onClickActionButton={onClickContinue}
       onClickBackButton={onClickCancel}

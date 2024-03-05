@@ -79,12 +79,7 @@ export const CreateGovernanceAction = () => {
               setStep={setStep}
             />
           )}
-          {step === 2 && (
-            <ChooseGovernanceActionType
-              onClickCancel={onClickBackToDashboard}
-              setStep={setStep}
-            />
-          )}
+          {step === 2 && <ChooseGovernanceActionType setStep={setStep} />}
           {step === 3 && <CreateGovernanceActionForm setStep={setStep} />}
         </FormProvider>
         {isMobile && <Footer />}

@@ -78,6 +78,7 @@ export const BgCard = ({
         flex: 1,
         flexDirection: "column",
         height: isMobile ? "100%" : "auto",
+        px: isMobile ? 0 : 5,
       }}
     >
       <Box
@@ -93,6 +94,7 @@ export const BgCard = ({
           pb: isMobile ? undefined : 10,
           pt: isMobile ? 6 : 10,
           px: isMobile ? 2 : 18.75,
+          width: "-webkit-fill-available",
           ...sx,
         }}
       >

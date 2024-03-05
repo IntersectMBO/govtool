@@ -22,9 +22,8 @@ export const useCreateGovernanceActionForm = () => {
     watch,
   } = useFormContext<createGovernanceActionValues>();
 
-  const onSubmit = useCallback(async (values: createGovernanceActionValues) => {
+  const onSubmit = useCallback(async () => {
     setIsLoading(true);
-    console.log(values);
     try {
     } catch (e: any) {
     } finally {

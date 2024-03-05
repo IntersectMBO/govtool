@@ -51,7 +51,7 @@ export const GovernanceActionDetails = () => {
   const breadcrumbs = [
     <NavLink
       key="1"
-      to={PATHS.governance_actions}
+      to={PATHS.governanceActions}
       style={{ textDecorationColor: "#0033AD" }}
     >
       <Typography color="primary" fontWeight={300} variant="caption">
@@ -104,10 +104,10 @@ export const GovernanceActionDetails = () => {
               onClick={() =>
                 navigate(
                   state && state.openedFromCategoryPage
-                    ? generatePath(PATHS.governance_actions_category, {
+                    ? generatePath(PATHS.governanceActionsCategory, {
                         category: state.type,
                       })
-                    : PATHS.governance_actions
+                    : PATHS.governanceActions
                 )
               }
             >

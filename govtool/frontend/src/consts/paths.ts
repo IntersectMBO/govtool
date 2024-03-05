@@ -1,19 +1,18 @@
 export const PATHS = {
-  create_governance_action: "/create_governance_action",
-  dashboard_governance_actions_action:
-    "/connected/governance_actions/:proposalId",
-  dashboard_governance_actions_category:
+  createGovernanceAction: "/create_governance_action",
+  dashboardGovernanceActionsAction: "/connected/governance_actions/:proposalId",
+  dashboardGovernanceActionsCategory:
     "/connected/governance_actions/category/:category",
-  dashboard_governance_actions: "/connected/governance_actions",
+  dashboardGovernanceActions: "/connected/governance_actions",
   dashboard: "/dashboard",
   delegateTodRep: "/delegate",
   error: "/error",
   faqs: "/faqs",
-  governance_actions_action: "/governance_actions/:proposalId",
-  governance_actions_category_action:
+  governanceActions: "/governance_actions",
+  governanceActionsAction: "/governance_actions/:proposalId",
+  governanceActionsCategoryAction:
     "/governance_actions/category/:category/:proposalId",
-  governance_actions_category: "/governance_actions/category/:category",
-  governance_actions: "/governance_actions",
+  governanceActionsCategory: "/governance_actions/category/:category",
   guides: "/guides",
   home: "/",
   registerAsdRep: "/register",

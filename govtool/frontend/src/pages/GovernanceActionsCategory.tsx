@@ -66,7 +66,7 @@ export const GovernanceActionsCategory = () => {
   const breadcrumbs = [
     <NavLink
       key="1"
-      to={PATHS.dashboard_governance_actions}
+      to={PATHS.dashboardGovernanceActions}
       style={{ textDecorationColor: "#0033AD" }}
     >
       <Typography color="primary" fontWeight={300} variant="caption">
@@ -148,7 +148,7 @@ export const GovernanceActionsCategory = () => {
                 textDecoration: "none",
                 marginBottom: 4.25,
               }}
-              onClick={() => navigate(PATHS.dashboard_governance_actions)}
+              onClick={() => navigate(PATHS.dashboardGovernanceActions)}
             >
               <img
                 src={ICONS.arrowRightIcon}
@@ -214,7 +214,7 @@ export const GovernanceActionsCategory = () => {
                           saveScrollPosition();
 
                           navigate(
-                            PATHS.governance_actions_action.replace(
+                            PATHS.governanceActionsAction.replace(
                               ":proposalId",
                               getFullGovActionId(item.txHash, item.index)
                             ),

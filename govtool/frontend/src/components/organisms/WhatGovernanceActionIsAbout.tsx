@@ -33,7 +33,6 @@ export const WhatGovernanceActionIsAbout = ({
       backButtonLabel={t("cancel")}
       onClickActionButton={onClickContinue}
       onClickBackButton={onClickCancel}
-      sx={{ paddingBottom: isMobile ? undefined : 3 }}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("createGovernanceAction.creatingAGovernanceAction")}

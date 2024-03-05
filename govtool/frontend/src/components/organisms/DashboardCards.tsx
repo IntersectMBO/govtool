@@ -503,7 +503,7 @@ export const DashboardCards = () => {
             "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep"
           )
         }
-        secondButtonVariant={"outlined"}
+        secondButtonVariant="outlined"
         imageURL={IMAGES.soleVoterImage}
       />
       {/* REGISTARTION AS SOLE VOTER CARD END*/}
@@ -511,7 +511,7 @@ export const DashboardCards = () => {
       <DashboardActionCard
         dataTestidFirstButton="view-governance-actions-button"
         description={t("dashboard.govActions.description")}
-        firstButtonAction={() => navigate(PATHS.dashboard_governance_actions)}
+        firstButtonAction={() => navigate(PATHS.dashboardGovernanceActions)}
         firstButtonLabel={t(
           `dashboard.govActions.${
             voter?.isRegisteredAsDRep ? "reviewAndVote" : "view"
@@ -519,6 +519,31 @@ export const DashboardCards = () => {
         )}
         imageURL={IMAGES.govActionListImage}
         title={t("dashboard.govActions.title")}
+      />
+      {/* GOV ACTIONS LIST CARD END*/}
+      {/* GOV ACTIONS LIST CARD */}
+      <DashboardActionCard
+        dataTestidFirstButton="propose-governance-actions-button"
+        description={t("dashboard.proposeGovernanceAction.description")}
+        // TODO: add isPendingGovernanceAction to the context
+        // inProgress={isPendingGovernanceAction}
+        firstButtonAction={() => navigate(PATHS.createGovernanceAction)}
+        firstButtonLabel={t(
+          `dashboard.proposeGovernanceAction.${
+            // TODO: add isPendingGovernanceAction to the context
+            // isPendingGovernanceAction ? "propose" : "viewGovernanceActions"
+            `propose`
+          }`
+        )}
+        secondButtonLabel={t("learnMore")}
+        secondButtonAction={() =>
+          openInNewTab(
+            "https://docs.sanchogov.tools/faqs/what-is-a-governance-action"
+          )
+        }
+        secondButtonVariant="outlined"
+        imageURL={IMAGES.proposeGovActionImage}
+        title={t("dashboard.proposeGovernanceAction.title")}
       />
       {/* GOV ACTIONS LIST CARD END*/}
     </Box>

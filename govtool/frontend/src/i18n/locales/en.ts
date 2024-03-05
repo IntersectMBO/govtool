@@ -80,6 +80,12 @@ export const en = {
         title: "Governance Actions",
         view: "View governance actions",
       },
+      proposeGovernanceAction: {
+        title: "Propose a Governance Action",
+        description: "Submit your proposal for a Governance Action.",
+        propose: "Propose",
+        view: "View governance actions",
+      },
       registration: {
         changeMetadata: "Change metadata",
         dRepRegistration: "DRep Registration",
@@ -254,21 +260,32 @@ export const en = {
     },
     home: {
       cards: {
-        delegateDescription: "Find a DRep to vote on your behalf.",
-        delegateFirstButtonLabel: "View DRep Direcotry",
-        delegateTitle: "Delegate your Voting Power",
-        governaneActionsDescription:
-          "See all the Governance Actions submitted on chain. ",
-        governanceActionsFirstButtonLabel: "View Governance Actions",
-        governaneActionsTitle: "View Governance Actions",
-        registerAsDRepDescription:
-          "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
-        registerAsDRepFirstButtonLabel: "Connect to Register",
-        registerAsDRepTitle: "Become a DRep",
-        registerAsSoleVoterDescription:
-          "Vote on Governance Actions using your own voting power",
-        registerAsSoleVoterFirstButtonLabel: "Connect to Register",
-        registerAsSoleVoterTitle: "Become a Sole Voter",
+        delegate: {
+          description: "Find a DRep to vote on your behalf.",
+          firstButtonLabel: "View DRep Directory",
+          title: "Delegate your Voting Power",
+        },
+        governanceActions: {
+          description: "See all the Governance Actions submitted on chain. ",
+          firstButtonLabel: "View Governance Actions",
+          title: "View Governance Actions",
+        },
+        proposeAGovernanceAction: {
+          description: "Submit your proposal for a Governance Action.",
+          firstButtonLabel: "Connect to Submit",
+          title: "Propose a Governance Action",
+        },
+        registerAsDRep: {
+          description:
+            "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
+          firstButtonLabel: "Connect to Register",
+          title: "Become a DRep",
+        },
+        registerAsSoleVoter: {
+          description: "Vote on Governance Actions using your own voting power",
+          firstButtonLabel: "Connect to Register",
+          title: "Become a Sole Voter",
+        },
       },
     },
     menu: {

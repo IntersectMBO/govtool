@@ -35,12 +35,19 @@ export const HomeCards = () => {
   );
 
   const onClickLearnMoreAboutSoleVoterRegistration = useCallback(
-    () => openInNewTab("https://www.google.com"),
+    // TODO: Update the link
+    () => openInNewTab("https://docs.sanchogov.tools/"),
+    []
+  );
+
+  const onClickLearnMoreAboutProposingGovAction = useCallback(
+    // TODO: Update the link
+    () => openInNewTab("https://docs.sanchogov.tools/"),
     []
   );
 
   const navigateToGovActions = useCallback(
-    () => navigate(PATHS.governance_actions),
+    () => navigate(PATHS.governanceActions),
     [navigate]
   );
 
@@ -67,59 +74,75 @@ export const HomeCards = () => {
       <ActionCard
         dataTestIdFirstButton="delegate-connect-wallet-button"
         dataTestIdSecondButton="delegate-learn-more-button"
-        description={t("home.cards.delegateDescription")}
+        description={t("home.cards.delegate.description")}
         firstButtonAction={openWalletModal}
-        firstButtonLabel={t("home.cards.delegateFirstButtonLabel")}
+        firstButtonLabel={t("home.cards.delegate.firstButtonLabel")}
         imageHeight={80}
         imageURL={IMAGES.govActionDelegateImage}
         imageWidth={115}
         secondButtonAction={onClickLearnMoreAboutDelegation}
         secondButtonLabel={t("learnMore")}
-        title={t("home.cards.delegateTitle")}
+        title={t("home.cards.delegate.title")}
       />
       {/* DELEGATE CARD END*/}
       {/* REGISTER AS DREP CARD */}
       <ActionCard
         dataTestIdFirstButton="register-connect-wallet-button"
         dataTestIdSecondButton="register-learn-more-button"
-        description={t("home.cards.registerAsDRepDescription")}
+        description={t("home.cards.registerAsDRep.description")}
         firstButtonAction={openWalletModal}
-        firstButtonLabel={t("home.cards.registerAsDRepFirstButtonLabel")}
+        firstButtonLabel={t("home.cards.registerAsDRep.firstButtonLabel")}
         imageHeight={80}
         imageURL={IMAGES.govActionRegisterImage}
         imageWidth={70}
         secondButtonAction={onClickLearnMoreAboutDRepRegistration}
         secondButtonLabel={t("learnMore")}
-        title={t("home.cards.registerAsDRepTitle")}
+        title={t("home.cards.registerAsDRep.title")}
       />
       {/* REGISTER AS DREP CARD END */}
       {/* REGISTER AS SOLE VOTER CARD */}
       <ActionCard
         dataTestIdFirstButton="register-as-sole-voter-button"
         dataTestIdSecondButton="lear-more-about-sole-voter-button"
-        description={t("home.cards.registerAsSoleVoterDescription")}
+        description={t("home.cards.registerAsSoleVoter.description")}
         firstButtonAction={openWalletModal}
-        firstButtonLabel={t("home.cards.registerAsSoleVoterFirstButtonLabel")}
+        firstButtonLabel={t("home.cards.registerAsSoleVoter.firstButtonLabel")}
         imageHeight={84}
         imageURL={IMAGES.soleVoterImage}
         imageWidth={84}
         secondButtonAction={onClickLearnMoreAboutSoleVoterRegistration}
         secondButtonLabel={t("learnMore")}
-        title={t("home.cards.registerAsSoleVoterTitle")}
+        title={t("home.cards.registerAsSoleVoter.title")}
       />
       {/* REGISTER AS SOLE VOTER CARD END */}
       {/* GOV ACTIONS CARD */}
       <ActionCard
         dataTestIdFirstButton="move-to-governance-actions-button"
-        description={t("home.cards.governaneActionsDescription")}
+        description={t("home.cards.governanceActions.description")}
         firstButtonAction={navigateToGovActions}
-        firstButtonLabel={t("home.cards.governanceActionsFirstButtonLabel")}
-        imageHeight={80}
+        firstButtonLabel={t("home.cards.governanceActions.firstButtonLabel")}
+        imageHeight={84}
         imageURL={IMAGES.govActionListImage}
-        imageWidth={80}
-        title={t("home.cards.governaneActionsTitle")}
+        imageWidth={84}
+        title={t("home.cards.governanceActions.title")}
       />
-      {/* GOV ACTIONS CARD */}
+      {/* GOV ACTIONS CARD  END*/}
+      {/* PROPOSE GOV ACTION CARD  */}
+      <ActionCard
+        dataTestIdFirstButton="propose-a-governance-action-button"
+        description={t("home.cards.proposeAGovernanceAction.description")}
+        firstButtonAction={openWalletModal}
+        firstButtonLabel={t(
+          "home.cards.proposeAGovernanceAction.firstButtonLabel"
+        )}
+        imageHeight={84}
+        imageURL={IMAGES.proposeGovActionImage}
+        imageWidth={84}
+        secondButtonAction={onClickLearnMoreAboutProposingGovAction}
+        secondButtonLabel={t("learnMore")}
+        title={t("home.cards.proposeAGovernanceAction.title")}
+      />
+      {/* PROPOSE GOV ACTION CARD  END*/}
     </Box>
   );
 };

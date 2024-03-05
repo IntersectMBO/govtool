@@ -19,10 +19,6 @@ on:
           - "test"
           - "staging"
           - "beta"
-      skip_build:
-        required: true
-        type: boolean
-        default: false
       resync_cardano_node_and_db:
         required: true
         type: boolean
@@ -33,81 +29,8 @@ env:
   CARDANO_NETWORK: ${{ inputs.cardano_network || 'sanchonet' }}
 
 jobs:
-  check_environment_exists:
-    name: Check if target environment exists before proceeding
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./scripts/govtool
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Check environment exists
-        run: |
-          make check-env-defined
-
-  build_backend:
-    name: Build and push backend Docker image
-    if: ${{ ! inputs.skip_build }}
-    needs:
-      - check_environment_exists
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./scripts/govtool
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.GHA_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.GHA_AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-1
-      - name: Login to AWS ECR
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-region: eu-west-1
-      - name: Build and push images
-        run: |
-          make push-backend
-
-  build_frontend:
-    name: Build and push frontend Docker image
-    if: ${{ ! inputs.skip_build }}
-    needs:
-      - check_environment_exists
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./scripts/govtool
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.GHA_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.GHA_AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-1
-      - name: Login to AWS ECR
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-region: eu-west-1
-      - name: Build and push images
-        env:
-          GTM_ID: ${{ secrets.GTM_ID }}
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
-        run: |
-          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
-          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
-          make push-frontend
-
   deploy:
     name: Deploy app
-    needs:
-      - build_backend
-      - build_frontend
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -125,106 +48,37 @@ jobs:
       NGINX_BASIC_AUTH: ${{ secrets.NGINX_BASIC_AUTH }}
       SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
       TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
+      GTM_ID: ${{ secrets.GTM_ID }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
+      PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.GHA_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.GHA_AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-1
-      - name: Login to AWS ECR
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-region: eu-west-1
-      - name: Setup SSH agent
-        uses: webfactory/ssh-agent@v0.8.0
-        with:
-          ssh-private-key: ${{ secrets.GHA_SSH_PRIVATE_KEY }}
-      - name: Deploy app
-        run: |
-          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
-          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
-          export DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}
-          make deploy-stack
-      - name: Reprovision Grafana
-        run: |
-          sleep 30 # give grafana time to start up
-          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
-          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
-          DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}
-          curl -X POST -u "admin:$GRAFANA_ADMIN_PASSWORD" https://$DOMAIN/grafana/api/admin/provisioning/alerting/reload
-          curl -X POST -u "admin:$GRAFANA_ADMIN_PASSWORD" https://$DOMAIN/grafana/api/admin/provisioning/dashboards/reload
-          curl -X POST -u "admin:$GRAFANA_ADMIN_PASSWORD" https://$DOMAIN/grafana/api/admin/provisioning/notifications/reload
-      - name: Notify on Slack
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_NOTIFY_SLACK_WEBHOOK_URL }}
-          PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
-          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
-          export DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}
-          make notify
 
-  deploy_without_build:
-    name: Deploy app without building
-    if: ${{ inputs.skip_build }}
-    needs:
-      - check_environment_exists
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./scripts/govtool
-    env:
-      DBSYNC_POSTGRES_DB: "cexplorer"
-      DBSYNC_POSTGRES_USER: "postgres"
-      DBSYNC_POSTGRES_PASSWORD: "pSa8JCpQOACMUdGb"
-      FAKEDBSYNC_POSTGRES_DB: "govtool"
-      FAKEDBSYNC_POSTGRES_USER: "test"
-      FAKEDBSYNC_POSTGRES_PASSWORD: "test"
-      GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
-      GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
-      GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
-      NGINX_BASIC_AUTH: ${{ secrets.NGINX_BASIC_AUTH }}
-      SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
-      TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.GHA_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.GHA_AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
+
       - name: Login to AWS ECR
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: eu-west-1
+
       - name: Setup SSH agent
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.GHA_SSH_PRIVATE_KEY }}
-      - name: Prepare and upload app config
+
+      - name: Deploy app
         run: |
           if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
           if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
           export DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}
-          make prepare-config
-          make upload-config
-      - name: Destroy Cardano Node, DB sync and Postgres if required
-        if: ${{ inputs.resync_cardano_node_and_db }}
-        run: |
-          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
-          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
-          make destroy-cardano-node-and-dbsync;
-      - name: Deploy app
-        run: |
-          make docker-login
-          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
-          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
-          make deploy-stack
+          make all
+
       - name: Reprovision Grafana
         run: |
           sleep 30 # give grafana time to start up
@@ -234,8 +88,3 @@ jobs:
           curl -X POST -u "admin:$GRAFANA_ADMIN_PASSWORD" https://$DOMAIN/grafana/api/admin/provisioning/alerting/reload
           curl -X POST -u "admin:$GRAFANA_ADMIN_PASSWORD" https://$DOMAIN/grafana/api/admin/provisioning/dashboards/reload
           curl -X POST -u "admin:$GRAFANA_ADMIN_PASSWORD" https://$DOMAIN/grafana/api/admin/provisioning/notifications/reload
-      - name: Notify on Slack
-        run: |
-          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
-          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
-          make notify

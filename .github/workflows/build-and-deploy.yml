@@ -45,6 +45,7 @@ jobs:
       - name: Check environment exists
         run: |
           make check-env-defined
+
   build_backend:
     name: Build and push backend Docker image
     if: ${{ ! inputs.skip_build }}
@@ -69,9 +70,8 @@ jobs:
           aws-region: eu-west-1
       - name: Build and push images
         run: |
-          make docker-login
-          make build-backend
           make push-backend
+
   build_frontend:
     name: Build and push frontend Docker image
     if: ${{ ! inputs.skip_build }}
@@ -99,11 +99,10 @@ jobs:
           GTM_ID: ${{ secrets.GTM_ID }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
         run: |
-          make docker-login
           if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
           if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
-          make build-frontend
           make push-frontend
+
   deploy:
     name: Deploy app
     needs:
@@ -143,24 +142,11 @@ jobs:
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.GHA_SSH_PRIVATE_KEY }}
-      - name: Prepare and upload app config
+      - name: Deploy app
         run: |
           if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
           if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
           export DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}
-          make prepare-config
-          make upload-config
-      - name: Destroy Cardano Node, DB sync and Postgres if required
-        if: ${{ inputs.resync_cardano_node_and_db }}
-        run: |
-          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
-          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
-          make destroy-cardano-node-and-dbsync;
-      - name: Deploy app
-        run: |
-          make docker-login
-          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
-          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
           make deploy-stack
       - name: Reprovision Grafana
         run: |
@@ -178,7 +164,9 @@ jobs:
         run: |
           if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
           if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
+          export DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}
           make notify
+
   deploy_without_build:
     name: Deploy app without building
     if: ${{ inputs.skip_build }}

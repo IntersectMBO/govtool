@@ -4,6 +4,9 @@ ONESHELL:
 
 # tools
 docker ?= docker
+curl ?= curl
+rsync ?= rsync
+ssh-keyscan ?= ssh-keyscan
 
 # environment variables
 env := $(shell echo $${ENVIRONMENT})
@@ -17,6 +20,9 @@ root_dir := $(shell git rev-parse --show-toplevel)
 # target addresses
 domain := $(shell echo $${DOMAIN})
 repo_url ?= 733019650473.dkr.ecr.eu-west-1.amazonaws.com
+docker_host := $(domain)
+docker_user := ubuntu
+ssh_url := $(docker_user)@$(docker_host)
 
 # stack configuration
 compose_stack_name := govtool-$(env)-$(cardano_network)

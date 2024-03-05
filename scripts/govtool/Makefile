@@ -2,23 +2,9 @@ include ../../govtool/backend/Makefile
 include ../../govtool/frontend/Makefile
 include utils.mk
 include info.mk
+include config.mk
 
 .DEFAULT_GOAL := info
-
-# tools
-curl ?= curl
-rsync ?= rsync
-ssh-keyscan ?= ssh-keyscan
-
-# environment variables
-grafana_admin_password := $(shell echo $${GRAFANA_ADMIN_PASSWORD})
-grafana_slack_recipient := $(shell echo $${GRAFANA_SLACK_RECIPIENT})
-grafana_slack_oauth_token := $(shell echo $${GRAFANA_SLACK_OAUTH_TOKEN})
-
-# target addresses
-docker_host := $(domain)
-docker_user := ubuntu
-ssh_url := $(docker_user)@$(docker_host)
 
 # stack configuration
 docker_compose_file := docker-compose.$(env).yml
@@ -28,33 +14,16 @@ cardano_node_image_tag := 8.8.0-pre
 cardano_db_sync_image_tag := sancho-4-0-0-fix-config
 
 .PHONY: all
-all: deploy-stack info #notify
-
-.PHONY: prepare-config
-prepare-config:
-	@:$(call check_defined, cardano_network)
-	@:$(call check_defined, grafana_slack_recipient)
-	@:$(call check_defined, grafana_slack_oauth_token)
-	export CARDANO_NETWORK=$(cardano_network); \
-	export GRAFANA_SLACK_RECIPIENT=$(grafana_slack_recipient); \
-	export GRAFANA_SLACK_OAUTH_TOKEN=$(grafana_slack_oauth_token); \
-	./prepare-config.sh
-
-.PHONY: upload-config
-upload-config: check-env-defined prepare-config
-	@:$(call check_defined, cardano_network)
-	@:$(call check_defined, env)
-	$(rsync) -av -e 'ssh -o StrictHostKeyChecking=no' config/target/. $(ssh_url):config
+all: deploy-stack info notify
 
 .PHONY: deploy-stack
 deploy-stack: upload-config push-backend push-frontend
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	@:$(call check_defined, grafana_admin_password)
 	export CARDANO_NETWORK=$(cardano_network); \
 	export DOCKER_HOST=ssh://$(ssh_url); \
 	export ENVIRONMENT=$(env); \
-	export GRAFANA_ADMIN_PASSWORD=$(grafana_admin_password); \
+	export GRAFANA_ADMIN_PASSWORD=$${GRAFANA_ADMIN_PASSWORD}; \
 	export BACKEND_TAG=$(backend_image_tag); \
 	export FRONTEND_TAG=$(frontend_image_tag); \
 	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \

@@ -1,7 +1,5 @@
 .PHONY: ssh
 ssh:
-	@:$(call check_defined, cardano_network)
-	@:$(call check_defined, env)
 	export TERM=xterm-256color; \
 	ssh $(ssh_url)
 
@@ -9,12 +7,11 @@ ssh:
 docker:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
-	@:$(call check_defined, grafana_admin_password)
 	@:$(call check_defined, cmd)
 	export CARDANO_NETWORK=$(cardano_network); \
 	export DOCKER_HOST=ssh://$(ssh_url); \
 	export ENVIRONMENT=$(env); \
-	export GRAFANA_ADMIN_PASSWORD=$(grafana_admin_password); \
+	export GRAFANA_ADMIN_PASSWORD=$${GRAFANA_ADMIN_PASSWORD}; \
 	export BACKEND_TAG=$(backend_image_tag); \
 	export FRONTEND_TAG=$(frontend_image_tag); \
 	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \

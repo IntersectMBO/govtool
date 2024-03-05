@@ -6,9 +6,6 @@ include config.mk
 
 .DEFAULT_GOAL := info
 
-# stack configuration
-docker_compose_file := docker-compose.$(env).yml
-
 # image tags
 cardano_node_image_tag := 8.8.0-pre
 cardano_db_sync_image_tag := sancho-4-0-0-fix-config
@@ -33,7 +30,7 @@ deploy-stack: upload-config push-backend push-frontend
 	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) up -d
 
 .PHONY: destroy-cardano-node-and-dbsync
-destroy-cardano-node-and-dbsync: check-env-defined
+destroy-cardano-node-and-dbsync: prepare-config
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	export CARDANO_NETWORK=$(cardano_network); \
@@ -51,7 +48,7 @@ destroy-cardano-node-and-dbsync: check-env-defined
 	$(docker) volume rm $${volumes}
 
 .PHONY: toggle-maintenance
-toggle-maintenance: check-env-defined
+toggle-maintenance: prepare-config
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	@:$(call check_defined, maintenance)

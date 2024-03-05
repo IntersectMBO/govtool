@@ -34,8 +34,8 @@ effectively. This includes configurations for:
 - Monitoring solutions with Prometheus and Grafana to ensure optimal performance
   and availability.
 
-Each environment has its own Docker Compose file, enabling tailored setups that
-meet specific requirements.
+Each environment has its own Docker Compose file, generated from the template,
+enabling tailored setups that meet specific requirements.
 
 ## Nix shell
 

@@ -46,6 +46,8 @@ changes.
 - Adjusted Nix configuration to meet projects needs [Issue 187](https://github.com/IntersectMBO/govtool/issues/187).
 - Integrated OAuth to securely notify about deployment status in Slack [Issue 194](https://github.com/IntersectMBO/govtool/issues/194).
 - Streamlined the application build and deployment process, thereby accelerating continuous delivery (CD) and reducing the resource burden [Issue 246](https://github.com/IntersectMBO/govtool/issues/246).
+- Applied unified policy on Docker images tagging [Issue 320](https://github.com/IntersectMBO/govtool/issues/320).
+- Reorganised deployment Makefiles in order to better document the process and easier management [Issue 385](https://github.com/IntersectMBO/govtool/issues/385).
 
 ### Removed
 -

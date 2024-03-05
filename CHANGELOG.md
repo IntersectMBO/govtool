@@ -9,6 +9,8 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
+- Create GA creation form [Issue 360](https://github.com/IntersectMBO/govtool/issues/360)
+- Create TextArea [Issue 110](https://github.com/IntersectMBO/govtool/issues/110)
 - Abandoning registration as DRep [Issue 151](https://github.com/IntersectMBO/govtool/issues/151)
 - Abandoning GA creation [Issue 359](https://github.com/IntersectMBO/govtool/issues/359)
 - Choose GA type - GA Submiter [Issue 358](https://github.com/IntersectMBO/govtool/issues/358)

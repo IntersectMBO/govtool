@@ -26,7 +26,7 @@ export const ChooseGovernanceActionType = ({
   const isContinueButtonDisabled = !watch("type");
 
   const onClickContinue = () => {
-    setStep(2);
+    setStep(3);
   };
 
   // TODO: Add tooltips when they will be available

@@ -17,6 +17,7 @@ import {
   CreateGovernanceActionForm,
   DashboardTopNav,
   Footer,
+  WhatGovernanceActionIsAbout,
 } from "@organisms";
 import { checkIsWalletConnected } from "@utils";
 
@@ -73,12 +74,18 @@ export const CreateGovernanceAction = () => {
         />
         <FormProvider {...methods}>
           {step === 1 && (
+            <WhatGovernanceActionIsAbout
+              onClickCancel={onClickBackToDashboard}
+              setStep={setStep}
+            />
+          )}
+          {step === 2 && (
             <ChooseGovernanceActionType
               onClickCancel={onClickBackToDashboard}
               setStep={setStep}
             />
           )}
-          {step === 2 && <CreateGovernanceActionForm setStep={setStep} />}
+          {step === 3 && <CreateGovernanceActionForm setStep={setStep} />}
         </FormProvider>
         {isMobile && <Footer />}
       </Box>

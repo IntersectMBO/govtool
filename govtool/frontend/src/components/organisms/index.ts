@@ -2,6 +2,7 @@ export * from "./BgCard";
 export * from "./ChooseGovernanceActionType";
 export * from "./ChooseStakeKeyPanel";
 export * from "./ChooseWalletModal";
+export * from "./CreateGovernanceActionForm";
 export * from "./ControlledField";
 export * from "./DashboardCards";
 export * from "./DashboardCards";

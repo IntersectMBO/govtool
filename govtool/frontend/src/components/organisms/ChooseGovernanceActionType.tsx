@@ -34,7 +34,7 @@ export const ChooseGovernanceActionType = ({
     return GOVERNANCE_ACTION_TYPES.map((type, index) => {
       const isChecked = getValues("type") === type;
       return (
-        <>
+        <div key={type}>
           <ActionRadio
             isChecked={isChecked}
             onChange={onChangeType}
@@ -42,7 +42,7 @@ export const ChooseGovernanceActionType = ({
             value={type}
           />
           {index + 1 < GOVERNANCE_ACTION_TYPES.length ? <Spacer y={2} /> : null}
-        </>
+        </div>
       );
     });
   };

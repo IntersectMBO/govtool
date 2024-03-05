@@ -4,6 +4,8 @@ import {
   CheckboxProps as MUICheckboxProps,
   InputBaseProps,
   TypographyProps as MUITypographyProps,
+  TextareaAutosizeProps,
+  SxProps,
 } from "@mui/material";
 
 export type ButtonProps = Omit<MUIButtonProps, "size"> & {
@@ -54,4 +56,18 @@ export type CheckboxProps = Omit<MUICheckboxProps, "onChange" | "value"> & {
 export type FormErrorMessageProps = {
   errorMessage?: string;
   errorStyles?: MUITypographyProps;
+};
+
+export type FormHelpfulTextProps = {
+  helpfulText?: string;
+  helpfulTextStyle?: MUITypographyProps;
+};
+
+export type TextAreaProps = TextareaAutosizeProps & {
+  errorMessage?: string;
+};
+
+export type InfoTextProps = {
+  label: string;
+  sx?: SxProps;
 };

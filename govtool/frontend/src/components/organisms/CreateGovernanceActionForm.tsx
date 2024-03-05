@@ -44,11 +44,11 @@ export const CreateGovernanceActionForm = ({
   );
 
   const onClickContinue = () => {
-    setStep(3);
+    setStep(4);
   };
 
   const onClickBack = () => {
-    setStep(1);
+    setStep(2);
   };
 
   const renderGovernanceActionField = () => {

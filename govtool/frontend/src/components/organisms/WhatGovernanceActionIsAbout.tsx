@@ -1,36 +1,31 @@
 import { Dispatch, SetStateAction, useCallback } from "react";
 import { Trans } from "react-i18next";
-import { Link } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
   correctAdaFormat,
   getItemFromLocalStorage,
-  openInNewTab,
   PROTOCOL_PARAMS_KEY,
 } from "@utils";
 
 import { BgCard } from ".";
 
-export const RegisterAsdRepStepOne = ({
-  onClickCancel,
-  setStep,
-}: {
+type WhatGovernanceActionIsAboutProps = {
   onClickCancel: () => void;
   setStep: Dispatch<SetStateAction<number>>;
-}) => {
+};
+
+export const WhatGovernanceActionIsAbout = ({
+  setStep,
+  onClickCancel,
+}: WhatGovernanceActionIsAboutProps) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
 
   const deposit = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
   const onClickContinue = useCallback(() => setStep(2), []);
-
-  const openLearnMoreAboutDrep = useCallback(
-    () => openInNewTab("https://sancho.network/roles/drep"),
-    []
-  );
 
   return (
     <BgCard
@@ -41,7 +36,7 @@ export const RegisterAsdRepStepOne = ({
       sx={{ paddingBottom: isMobile ? undefined : 3 }}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
-        {t("registration.rolesAndResponsibilitiesTitle")}
+        {t("createGovernanceAction.creatingAGovernanceAction")}
       </Typography>
       <Typography
         fontWeight={400}
@@ -54,15 +49,10 @@ export const RegisterAsdRepStepOne = ({
         variant="body1"
       >
         <Trans
-          components={[
-            <Link
-              key="1"
-              onClick={openLearnMoreAboutDrep}
-              sx={{ cursor: "pointer" }}
-            />,
-          ]}
-          i18nKey={"registration.rolesAndResponsibilitiesDescription"}
-          values={{ deposit: correctAdaFormat(deposit.drep_deposit) }}
+          i18nKey="createGovernanceAction.creatingAGovernanceActionDescription"
+          values={{
+            deposit: correctAdaFormat(deposit.gov_action_deposit),
+          }}
         />
       </Typography>
     </BgCard>

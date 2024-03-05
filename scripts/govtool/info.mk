@@ -28,7 +28,7 @@ notify:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	$(curl) -X POST https://slack.com/api/chat.postMessage\
-		-H "Authorization: Bearer $(grafana_slack_oauth_token)" \
+		-H "Authorization: Bearer $${GRAFANA_SLACK_OAUTH_TOKEN}" \
 		-H "Content-Type: application/json; charset=utf-8" \
 		--data "{ \"channel\":\"$(grafana_slack_recipient)\", \"text\":\":rocket: *Deploy performed on \`$(env)\`*\n- from *branch* \`$(branch)\` (\`$(commit)\`),\n- using *Cardano Node* version \`$(cardano_node_image_tag)\`,\n- using *Cardano DB Sync* version \`$(cardano_db_sync_image_tag)\`,\n- using *GovTool backend* version \`$(backend_image_tag)\`,\n- using *Govtool frontend* version \`$(frontend_image_tag)\`.\n$(pipeline_info)\" }"
 

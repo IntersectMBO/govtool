@@ -8,8 +8,8 @@ contactPoints:
         name: Slack GovTool
         type: slack
         settings:
-          recipient: GRAFANA_SLACK_RECIPIENT
-          token: GRAFANA_SLACK_OAUTH_TOKEN
+          recipient: <GRAFANA_SLACK_RECIPIENT>
+          token: <GRAFANA_SLACK_OAUTH_TOKEN>
         disableResolveMessage: false
 
 policies:

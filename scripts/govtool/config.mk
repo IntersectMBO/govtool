@@ -57,10 +57,10 @@ prepare-dbsync-secrets:
 
 .PHONY: prepare-backend-config
 prepare-backend-config:
-	sed -e "s/DBSYNC_POSTGRES_DB/$${DBSYNC_POSTGRES_DB}/" \
-		-e "s/DBSYNC_POSTGRES_USER/$${DBSYNC_POSTGRES_USER}/" \
-		-e "s/DBSYNC_POSTGRES_PASSWORD/$${DBSYNC_POSTGRES_PASSWORD}/" \
-		-e "s|SENTRY_DSN|$${SENTRY_DSN_BACKEND}|" \
+	sed -e "s|<DBSYNC_POSTGRES_DB>|$${DBSYNC_POSTGRES_DB}|" \
+		-e "s|<DBSYNC_POSTGRES_USER>|$${DBSYNC_POSTGRES_USER}|" \
+		-e "s|<DBSYNC_POSTGRES_PASSWORD>|$${DBSYNC_POSTGRES_PASSWORD}|" \
+		-e "s|<SENTRY_DSN>|$${SENTRY_DSN_BACKEND}|" \
 		"$(config_dir)/templates/backend-config.json.tpl" \
 		> "$(target_config_dir)/backend-config.json"
 
@@ -72,8 +72,8 @@ prepare-prometheus-config:
 prepare-grafana-provisioning:
 	mkdir -p $(grafana_provisioning_dir)
 	cp -a $(template_config_dir)/grafana-provisioning/* $(grafana_provisioning_dir)
-	sed -e "s/GRAFANA_SLACK_RECIPIENT/$${GRAFANA_SLACK_RECIPIENT}/" \
-		-e "s|GRAFANA_SLACK_OAUTH_TOKEN|$${GRAFANA_SLACK_OAUTH_TOKEN}|" \
+	sed -e "s|<GRAFANA_SLACK_RECIPIENT>|$${GRAFANA_SLACK_RECIPIENT}|" \
+		-e "s|<GRAFANA_SLACK_OAUTH_TOKEN>|$${GRAFANA_SLACK_OAUTH_TOKEN}|" \
 		-i $(grafana_provisioning_dir)/alerting/alerting.yml
 
 .PHONY: prepare-nginx-config

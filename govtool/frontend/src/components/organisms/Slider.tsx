@@ -105,12 +105,12 @@ export const Slider = ({
             onClick={() =>
               onDashboard
                 ? navigate(
-                    generatePath(PATHS.dashboard_governance_actions_category, {
+                    generatePath(PATHS.dashboardGovernanceActionsCategory, {
                       category: navigateKey,
                     })
                   )
                 : navigate(
-                    generatePath(PATHS.governance_actions_category, {
+                    generatePath(PATHS.governanceActionsCategory, {
                       category: navigateKey,
                     })
                   )
@@ -157,15 +157,12 @@ export const Slider = ({
               onClick={() =>
                 onDashboard
                   ? navigate(
-                      generatePath(
-                        PATHS.dashboard_governance_actions_category,
-                        {
-                          category: navigateKey,
-                        }
-                      )
+                      generatePath(PATHS.dashboardGovernanceActionsCategory, {
+                        category: navigateKey,
+                      })
                     )
                   : navigate(
-                      generatePath(PATHS.governance_actions_category, {
+                      generatePath(PATHS.governanceActionsCategory, {
                         category: navigateKey,
                       })
                     )

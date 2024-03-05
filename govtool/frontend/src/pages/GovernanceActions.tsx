@@ -23,7 +23,7 @@ export const GovernanceActions = () => {
 
   useEffect(() => {
     if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
-      navigate(PATHS.dashboard_governance_actions);
+      navigate(PATHS.dashboardGovernanceActions);
     }
   }, [isEnabled]);
 

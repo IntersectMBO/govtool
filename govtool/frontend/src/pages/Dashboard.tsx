@@ -20,7 +20,7 @@ export const Dashboard = () => {
   const getPageTitle = (pathname: string) => {
     if (pathname === PATHS.dashboard) {
       return t("dashboard.title");
-    } else if (pathname.includes(PATHS.dashboard_governance_actions)) {
+    } else if (pathname.includes(PATHS.dashboardGovernanceActions)) {
       return t("dashboard.govActions.title");
     }
     return "";
@@ -28,7 +28,7 @@ export const Dashboard = () => {
 
   useEffect(() => {
     if (divRef.current) {
-      pathname !== PATHS.dashboard_governance_actions &&
+      pathname !== PATHS.dashboardGovernanceActions &&
         divRef.current.scrollTo({ top: 0 });
     }
   }, [pathname, divRef]);

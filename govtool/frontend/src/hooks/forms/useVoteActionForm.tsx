@@ -110,7 +110,7 @@ export const useVoteActionForm = () => {
         });
         if (result) {
           addSuccessAlert("Vote submitted");
-          navigate(PATHS.dashboard_governance_actions, {
+          navigate(PATHS.dashboardGovernanceActions, {
             state: {
               isVotedListOnLoad: state && state.vote ? true : false,
             },

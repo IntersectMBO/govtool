@@ -255,7 +255,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           )}-change-your-vote`}
           onClick={() =>
             navigate(
-              PATHS.dashboard_governance_actions_action.replace(
+              PATHS.dashboardGovernanceActionsAction.replace(
                 ":proposalId",
                 getFullGovActionId(proposal.txHash, proposal.index)
               ),

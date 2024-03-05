@@ -124,6 +124,8 @@ export const en = {
     },
     createGovernanceAction: {
       chooseGATypeTitle: "Choose a Governance Action type",
+      formTitle: "Governance Action details",
+      references: "References and Supporting Information",
       title: "Create a Governance Action",
     },
     delegation: {
@@ -187,8 +189,14 @@ export const en = {
     forms: {
       hashPlaceholder: "The hash of metadata at URL",
       howCreateUrlAndHash: "How to create URL and hash?",
+      link: "Link",
       urlWithContextPlaceholder: "Your URL with with your context",
       urlWithInfoPlaceholder: "Your URL with extra info about you",
+      createGovernanceAction: {
+        typeLabel: "Governance Action Type",
+        typeTip:
+          "To change the Governance Action Type go back to the previous page.",
+      },
       errors: {
         hashInvalidFormat: "Invalid hash format",
         hashInvalidLength: "Hash must be exactly 64 characters long",
@@ -427,6 +435,7 @@ export const en = {
         "Warning, no registered stake keys, using unregistered stake keys",
     },
     abstain: "Abstain",
+    addLink: "+ Add link",
     back: "Back",
     backToDashboard: "Back to dashboard",
     backToList: "Back to the list",
@@ -443,7 +452,9 @@ export const en = {
     nextStep: "Next step",
     no: "No",
     ok: "Ok",
+    optional: "Optional",
     register: "Register",
+    required: "required",
     seeTransaction: "See transaction",
     select: "Select",
     skip: "Skip",

@@ -14,6 +14,7 @@ import {
 import { BackToButton } from "@molecules";
 import {
   ChooseGovernanceActionType,
+  CreateGovernanceActionForm,
   DashboardTopNav,
   Footer,
 } from "@organisms";
@@ -77,6 +78,7 @@ export const CreateGovernanceAction = () => {
               setStep={setStep}
             />
           )}
+          {step === 2 && <CreateGovernanceActionForm setStep={setStep} />}
         </FormProvider>
         {isMobile && <Footer />}
       </Box>

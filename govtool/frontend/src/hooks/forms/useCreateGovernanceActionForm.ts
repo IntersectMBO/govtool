@@ -3,11 +3,13 @@ import { useFormContext } from "react-hook-form";
 
 type createGovernanceActionValues = {
   type: string;
+  links?: { link: string }[];
 };
 
 export const defaulCreateGovernanceActionValues: createGovernanceActionValues =
   {
     type: "",
+    links: [{ link: "" }],
   };
 
 export const useCreateGovernanceActionForm = () => {
@@ -20,6 +22,7 @@ export const useCreateGovernanceActionForm = () => {
     handleSubmit,
     setValue,
     watch,
+    register,
   } = useFormContext<createGovernanceActionValues>();
 
   const onSubmit = useCallback(async () => {
@@ -40,5 +43,6 @@ export const useCreateGovernanceActionForm = () => {
     setValue,
     submitForm: handleSubmit(onSubmit),
     watch,
+    register,
   };
 };

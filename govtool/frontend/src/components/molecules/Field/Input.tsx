@@ -1,7 +1,12 @@
 import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 import { Box } from "@mui/material";
 
-import { FormErrorMessage, Input as InputBase, Typography } from "@atoms";
+import {
+  FormErrorMessage,
+  FormHelpfulText,
+  Input as InputBase,
+  Typography,
+} from "@atoms";
 
 import { InputFieldProps } from "./types";
 
@@ -10,6 +15,8 @@ export const Input = forwardRef<HTMLInputElement, InputFieldProps>(
     {
       errorMessage,
       errorStyles,
+      helpfulText,
+      helpfulTextStyle,
       label,
       labelStyles,
       layoutStyles,
@@ -45,11 +52,20 @@ export const Input = forwardRef<HTMLInputElement, InputFieldProps>(
     return (
       <Box sx={{ width: "100%", ...layoutStyles }}>
         {label && (
-          <Typography fontWeight={400} variant="body2" {...labelStyles}>
+          <Typography
+            fontWeight={400}
+            sx={{ mb: 0.5 }}
+            variant="body2"
+            {...labelStyles}
+          >
             {label}
           </Typography>
         )}
         <InputBase errorMessage={errorMessage} {...rest} ref={inputRef} />
+        <FormHelpfulText
+          helpfulText={helpfulText}
+          helpfulTextStyle={helpfulTextStyle}
+        />
         <FormErrorMessage
           errorMessage={errorMessage}
           errorStyles={errorStyles}

@@ -12,16 +12,28 @@ cardano_node_config_dir := $(target_config_dir)/cardano-node
 dbsync_secrets_dir := $(target_config_dir)/dbsync-secrets
 grafana_provisioning_dir := $(target_config_dir)/grafana-provisioning
 nginx_config_dir := $(target_config_dir)/nginx
+docker_compose_file := $(target_config_dir)/docker-compose.yml
 
 # metadata
 cardano_config_provider := https://book.world.dev.cardano.org
 
 .PHONY: prepare-config
-prepare-config: clear enable-prometheus prepare-dbsync-secrets prepare-backend-config prepare-prometheus-config prepare-grafana-provisioning prepare-nginx-config
+prepare-config: clear generate-docker-compose-file enable-prometheus prepare-dbsync-secrets prepare-backend-config prepare-prometheus-config prepare-grafana-provisioning prepare-nginx-config
 
 .PHONY: clear
 clear:
 	rm -rf $(target_config_dir)
+	mkdir -p $(target_config_dir)
+
+.PHONY: generate-docker-compose-file
+generate-docker-compose-file: check-env-defined
+	if [[ "$(env)" == "dev" ]]; then CSP_ALLOWED_HOSTS=",http://localhost"; else CSP_ALLOWED_HOSTS=; fi; \
+	sed -e "s|<DOMAIN>|$(domain)|g" \
+		-e "s|<DOCKER_USER>|$(docker_user)|g" \
+		-e "s|<REPO_URL>|$(repo_url)|g" \
+		-e "s|<CSP_ALLOWED_HOSTS>|$${CSP_ALLOWED_HOSTS}|g" \
+		"$(template_config_dir)/docker-compose.yml.tpl" \
+		> "$(target_config_dir)/docker-compose.yml"
 
 .PHONY: fetch-cardano-node-config
 fetch-cardano-node-config:
@@ -56,7 +68,7 @@ prepare-backend-config:
 prepare-prometheus-config:
 	cp -a "$(template_config_dir)/prometheus.yml" "$(target_config_dir)/prometheus.yml"
 
- PHONY: prepare-grafana-provisioning
+.PHONY: prepare-grafana-provisioning
 prepare-grafana-provisioning:
 	mkdir -p $(grafana_provisioning_dir)
 	cp -a $(template_config_dir)/grafana-provisioning/* $(grafana_provisioning_dir)

@@ -14,6 +14,7 @@ export * from "./GovernanceVotedOnCard";
 export * from "./LinkWithIcon";
 export * from "./OrderActionsChip";
 export * from "./Step";
+export * from "./PageTitle";
 export * from "./VoteActionForm";
 export * from "./VotesSubmitted";
 export * from "./WalletInfoCard";

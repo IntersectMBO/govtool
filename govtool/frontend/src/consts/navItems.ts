@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { ICONS } from "./icons";
 import { PATHS } from "./paths";
 
@@ -7,6 +8,11 @@ export const NAV_ITEMS = [
     navTo: PATHS.home,
     label: "Dashboard",
     newTabLink: null,
+  },
+  {
+    dataTestId: "drep-directory-link",
+    navTo: PATHS.dRepDirectory,
+    label: i18n.t("dRepDirectory.title"),
   },
   {
     dataTestId: "governance-actions-link",
@@ -36,6 +42,13 @@ export const CONNECTED_NAV_ITEMS = [
     activeIcon: ICONS.dashboardActiveIcon,
     icon: ICONS.dashboardIcon,
     newTabLink: null,
+  },
+  {
+    dataTestId: "drep-directory-link",
+    label: i18n.t("dRepDirectory.title"),
+    navTo: PATHS.dashboardDRepDirectory,
+    activeIcon: ICONS.dRepDirectoryActiveIcon,
+    icon: ICONS.dRepDirectoryIcon,
   },
   {
     dataTestId: "governance-actions-link",

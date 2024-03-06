@@ -4,8 +4,10 @@ export const PATHS = {
   dashboardGovernanceActionsCategory:
     "/connected/governance_actions/category/:category",
   dashboardGovernanceActions: "/connected/governance_actions",
+  dashboardDRepDirectory: "/connected/drep_directory",
   dashboard: "/dashboard",
   delegateTodRep: "/delegate",
+  dRepDirectory: "/drep_directory",
   error: "/error",
   faqs: "/faqs",
   governanceActions: "/governance_actions",

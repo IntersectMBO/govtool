@@ -13,6 +13,8 @@ export const ICONS = {
   dashboardActiveIcon: "/icons/DashboardActive.svg",
   dashboardIcon: "/icons/Dashboard.svg",
   drawerIcon: "/icons/DrawerIcon.svg",
+  dRepDirectoryActiveIcon: "/icons/DRepDirectoryActive.svg",
+  dRepDirectoryIcon: "/icons/DRepDirectory.svg",
   externalLinkIcon: "/icons/ExternalLink.svg",
   faqsActiveIcon: "/icons/FaqsActive.svg",
   faqsIcon: "/icons/Faqs.svg",

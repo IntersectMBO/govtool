@@ -5,7 +5,9 @@ export const PATHS = {
   dashboardGovernanceActionsAction: "/connected/governance_actions/:proposalId",
   dashboardGovernanceActionsCategory:
     "/connected/governance_actions/category/:category",
+  dashboardDRepDirectory: "/connected/drep_directory",
   delegateTodRep: "/delegate",
+  dRepDirectory: "/drep_directory",
   error: "/error",
   faqs: "/faqs",
   governanceActions: "/governance_actions",

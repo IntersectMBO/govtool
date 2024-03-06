@@ -22,6 +22,7 @@ import {
   GovernanceActionsCategory,
   DashboardGovernanceActionsCategory,
   RetireAsSoleVoter,
+  DRepDirectory,
 } from "@pages";
 import {
   callAll,
@@ -103,7 +104,12 @@ export default () => {
             path={PATHS.dashboardGovernanceActionsCategory}
             element={<DashboardGovernanceActionsCategory />}
           />
+          <Route
+            path={PATHS.dashboardDRepDirectory}
+            element={<DRepDirectory />}
+          />
         </Route>
+        <Route path={PATHS.dRepDirectory} element={<DRepDirectory />} />
         <Route
           path={PATHS.createGovernanceAction}
           element={<CreateGovernanceAction />}

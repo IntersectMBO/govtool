@@ -9,6 +9,7 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
+- Add DRep directory page [Issue 217](https://github.com/IntersectMBO/govtool/issues/217)
 - Create GA creation form [Issue 360](https://github.com/IntersectMBO/govtool/issues/360)
 - Create TextArea [Issue 110](https://github.com/IntersectMBO/govtool/issues/110)
 - Abandoning registration as DRep [Issue 151](https://github.com/IntersectMBO/govtool/issues/151)

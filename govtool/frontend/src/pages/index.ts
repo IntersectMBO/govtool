@@ -1,4 +1,6 @@
 export * from "./ChooseStakeKey";
+export * from "./CreateGovernanceAction";
+export * from "./DRepDirectory";
 export * from "./Dashboard";
 export * from "./DashboardGovernanceActionsCategory";
 export * from "./DelegateTodRep";
@@ -7,6 +9,7 @@ export * from "./GovernanceActionDetails";
 export * from "./GovernanceActions";
 export * from "./GovernanceActionsCategory";
 export * from "./Home";
+export * from "./RegisterAsSoleVoter";
 export * from "./RegisterAsdRep";
 export * from "./RetireAsSoleVoter";
 export * from "./UpdatedRepMetadata";

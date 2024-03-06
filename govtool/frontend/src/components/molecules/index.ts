@@ -13,6 +13,7 @@ export * from "./GovernanceActionsFilters";
 export * from "./GovernanceActionsSorting";
 export * from "./GovernanceVotedOnCard";
 export * from "./OrderActionsChip";
+export * from "./PageTitle";
 export * from "./VoteActionForm";
 export * from "./VotesSubmitted";
 export * from "./WalletInfoCard";

@@ -1,6 +1,14 @@
 import { createTheme } from "@mui/material/styles";
 
 declare module "@mui/material/styles" {
+  interface BreakpointOverrides {
+    xxs: true;
+    xs: true;
+    sm: true;
+    md: true;
+    lg: true;
+    xl: true;
+  }
   interface Palette {
     accentOrange: string;
     accentYellow: string;
@@ -50,6 +58,16 @@ declare module "@mui/material/styles" {
 export type Theme = typeof theme;
 
 export const theme = createTheme({
+  breakpoints: {
+    values: {
+      xxs: 0,
+      xs: 375,
+      sm: 425,
+      md: 768,
+      lg: 1024,
+      xl: 1440,
+    },
+  },
   components: {
     MuiInputBase: {
       styleOverrides: {

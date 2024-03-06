@@ -22,3 +22,7 @@ echo \
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin prometheus-node-exporter
 sudo usermod -aG docker ubuntu
+
+# initialize deployment log
+sudo touch /var/log/deployment.log
+sudo chown ubuntu:ubuntu /var/log/deployment.log

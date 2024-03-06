@@ -21,7 +21,7 @@ export const CreateGovernanceActionForm = ({
   setStep,
 }: ChooseGovernanceActionTypeProps) => {
   const { t } = useTranslation();
-  const { control, errors, getValues, register, watch } =
+  const { control, errors, getValues, register, reset, watch } =
     useCreateGovernanceActionForm();
   const {
     append,
@@ -48,6 +48,7 @@ export const CreateGovernanceActionForm = ({
   };
 
   const onClickBack = () => {
+    reset();
     setStep(2);
   };
 

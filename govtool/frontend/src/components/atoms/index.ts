@@ -22,6 +22,7 @@ export * from "./Radio";
 export * from "./ScrollToManage";
 export * from "./ScrollToTop";
 export * from "./Spacer";
+export * from "./StatusPill";
 export * from "./StakeRadio";
 export * from "./TextArea";
 export * from "./Tooltip";

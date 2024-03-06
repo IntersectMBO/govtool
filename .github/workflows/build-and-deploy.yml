@@ -82,6 +82,4 @@ jobs:
           if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
           if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
           DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}
-          curl -X POST -u "admin:$GRAFANA_ADMIN_PASSWORD" https://$DOMAIN/grafana/api/admin/provisioning/alerting/reload
-          curl -X POST -u "admin:$GRAFANA_ADMIN_PASSWORD" https://$DOMAIN/grafana/api/admin/provisioning/dashboards/reload
-          curl -X POST -u "admin:$GRAFANA_ADMIN_PASSWORD" https://$DOMAIN/grafana/api/admin/provisioning/notifications/reload
+          make reload-grafana

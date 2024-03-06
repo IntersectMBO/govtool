@@ -258,6 +258,7 @@ export const en = {
       noConfidenceDescription:
         "Select this to signal no confidence in the current constitutional committee by voting NO on every proposal and voting YES to no confidence proposals",
       noConfidenceTitle: "Signal No Confidence on Every Vote",
+      title: "DRep Directory",
       votingPower: "Voting Power",
     },
     errorPage: {

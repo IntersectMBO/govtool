@@ -1,8 +1,8 @@
 import { Box, Divider } from "@mui/material";
 
-import { AutomatedVotingCardProps } from "./types";
 import { Button, Spacer, Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
+import { AutomatedVotingCardProps } from "./types";
 
 export const AutomatedVotingCard = ({
   description,

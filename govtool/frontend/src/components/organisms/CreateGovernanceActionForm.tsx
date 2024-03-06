@@ -11,7 +11,7 @@ import { BgCard } from "./BgCard";
 import { ControlledField } from "./ControlledField";
 
 const LINK_PLACEHOLDER = "https://website.com/";
-const MAX_NUMBER_OF_LINKS = 7;
+const MAX_NUMBER_OF_LINKS = 8;
 
 type ChooseGovernanceActionTypeProps = {
   setStep: Dispatch<SetStateAction<number>>;

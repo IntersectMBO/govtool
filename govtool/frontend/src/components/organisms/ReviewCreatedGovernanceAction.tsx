@@ -59,17 +59,30 @@ export const ReviewCreatedGovernanceAction = ({
 
   const renderLinks = () => {
     const links = values["links"]?.map((item) => item.link) ?? [];
+    const areLinks = links.some((item) => item);
 
-    return links.map((link: string) => {
-      return (
-        <LinkWithIcon
-          icon={<img src={ICONS.link} />}
-          label={link}
-          onClick={() => onClickLink(link)}
-          sx={{ mb: 1.75 }}
-        />
-      );
-    });
+    return areLinks ? (
+      <>
+        <Typography
+          color="neutralGray"
+          fontWeight={400}
+          sx={{ mb: 0.5 }}
+          variant="body2"
+        >
+          {t("createGovernanceAction.supportingLinks")}
+        </Typography>
+        {links.map((link: string) => {
+          return link ? (
+            <LinkWithIcon
+              icon={<img src={ICONS.link} />}
+              label={link}
+              onClick={() => onClickLink(link)}
+              sx={{ mb: 1.75 }}
+            />
+          ) : null;
+        })}
+      </>
+    ) : null;
   };
 
   return (
@@ -97,14 +110,6 @@ export const ReviewCreatedGovernanceAction = ({
       </Button>
       <Spacer y={6} />
       {renderReviewFields()}
-      <Typography
-        color="neutralGray"
-        fontWeight={400}
-        sx={{ mb: 0.5 }}
-        variant="body2"
-      >
-        {t("createGovernanceAction.supportingLinks")}
-      </Typography>
       {renderLinks()}
       <Spacer y={6} />
     </BgCard>

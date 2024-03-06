@@ -48,3 +48,36 @@ datasources:
   version: 1
   # <bool> allow users to edit datasources from the UI.
   editable: true
+
+  # <string, required> name of the datasource. Required
+- name: Loki
+  # <string, required> datasource type. Required
+  type: loki
+  # <string, required> access mode. direct or proxy. Required
+  access: browser
+  # <int> org id. will default to orgId 1 if not specified
+  orgId: 1
+  # <string> url
+  url: http://loki:3100
+  # <string> database password, if used
+  password:
+  # <string> database user, if used
+  user:
+  # <string> database name, if used
+  database:
+  # <bool> enable/disable basic auth
+  basicAuth: false
+  # <string> basic auth username
+  basicAuthUser: admin
+  # <string> basic auth password
+  basicAuthPassword: foobar
+  # <bool> enable/disable with credentials headers
+  withCredentials:
+  # <bool> mark as default datasource. Max one per org
+  # <bool> enable/disable basic auth
+  basicAuth: false
+  # <bool> mark as default datasource. Max one per org
+  isDefault: false
+  version: 1
+  # <bool> allow users to edit datasources from the UI.
+  editable: true

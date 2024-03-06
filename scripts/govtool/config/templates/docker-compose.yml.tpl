@@ -36,6 +36,24 @@ services:
       - "traefik.http.routers.http-catchall.entrypoints=web"
       - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
 
+  loki:
+    image: grafana/loki:2.9.4
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/loki.yml
+    volumes:
+      - loki-data:/loki
+      - /home/<DOCKER_USER>/config/loki.yml:/etc/loki/loki.yml
+
+  promtail:
+    image: grafana/promtail:2.9.4
+    volumes:
+      - /var/log/deployment.log:/var/log/deployment.log
+      - /home/<DOCKER_USER>/config/promtail.yml:/etc/promtail/promtail.yml
+    command: -config.file=/etc/promtail/promtail.yml
+    depends_on:
+      - loki
+
   prometheus:
     image: prom/prometheus:v2.47.1
     volumes:
@@ -229,3 +247,4 @@ volumes:
   prometheus-data:
   node-db:
   node-ipc:
+  loki-data:

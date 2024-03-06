@@ -130,13 +130,16 @@ export const en = {
     },
     createGovernanceAction: {
       chooseGATypeTitle: "Choose a Governance Action type",
-      formTitle: "Governance Action details",
-      references: "References and Supporting Information",
-      title: "Create a Governance Action",
       creatingAGovernanceAction:
         "Creating a Governance Action: What you need to know",
       creatingAGovernanceActionDescription:
         "To create a Governance Action, you will need to:\n\n• Fill out a form with the relevant data\n• Pay a refundable deposit of <strong>₳{{deposit}}</strong>\n• Store the metadata of your Governance Action at your own expense.\n\nYour deposit will be refunded to your wallet when the Governance Action is either enacted or expired.\n\nThe deposit will not affect your Voting Power.",
+      editSubmission: "Edit submission",
+      formTitle: "Governance Action details",
+      references: "References and Supporting Information",
+      reviewSubmission: "Review your submission",
+      supportingLinks: "Supporting links",
+      title: "Create a Governance Action",
     },
     delegation: {
       description:

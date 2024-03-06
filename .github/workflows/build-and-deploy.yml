@@ -79,6 +79,11 @@ jobs:
             echo "DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}" >> $GITHUB_ENV
           fi
 
+      - name: Destroy Cardano Node, DB sync and Postgres if required
+        if: ${{ inputs.resync_cardano_node_and_db }}
+        run: |
+          make destroy-cardano-node-and-dbsync
+
       - name: Deploy app
         run: |
           make all

@@ -27,7 +27,7 @@ export const ChooseGovernanceActionType = ({
     setStep(3);
   };
 
-  const onClickCancel = () => {
+  const onClickBack = () => {
     setStep(1);
   };
 
@@ -58,7 +58,7 @@ export const ChooseGovernanceActionType = ({
       actionButtonLabel={t("continue")}
       isActionButtonDisabled={isContinueButtonDisabled}
       onClickActionButton={onClickContinue}
-      onClickBackButton={onClickCancel}
+      onClickBackButton={onClickBack}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("createGovernanceAction.chooseGATypeTitle")}

@@ -23,6 +23,7 @@ export const useCreateGovernanceActionForm = () => {
     setValue,
     watch,
     register,
+    reset,
   } = useFormContext<createGovernanceActionValues>();
 
   const onSubmit = useCallback(async () => {
@@ -44,5 +45,6 @@ export const useCreateGovernanceActionForm = () => {
     submitForm: handleSubmit(onSubmit),
     watch,
     register,
+    reset,
   };
 };

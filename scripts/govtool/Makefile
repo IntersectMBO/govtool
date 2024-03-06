@@ -11,7 +11,7 @@ cardano_node_image_tag := 8.8.0-pre
 cardano_db_sync_image_tag := sancho-4-0-0-fix-config
 
 .PHONY: all
-all: deploy-stack info notify
+all: deploy-stack notify
 
 .PHONY: deploy-stack
 deploy-stack: upload-config push-backend push-frontend

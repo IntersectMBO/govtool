@@ -32,7 +32,7 @@ export const CreateGovernanceActionForm = ({
     name: "links",
   });
 
-  const governanceActionType = getValues("type");
+  const governanceActionType = getValues("governance_action_type");
   const fields =
     GOVERNANCE_ACTIONS_FIELDS.find(
       (field) => field.name === governanceActionType

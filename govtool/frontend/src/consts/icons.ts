@@ -1,8 +1,8 @@
 export const ICONS = {
   appLogoIcon: "/icons/AppLogo.svg",
   arrowDownIcon: "/icons/ArrowDown.svg",
-  arrowRightIcon: "/icons/ArrowRight.svg",
   arrowLeftThinIcon: "/icons/ArrowLeftThin.svg",
+  arrowRightIcon: "/icons/ArrowRight.svg",
   checkCircleIcon: "/icons/CheckCircle.svg",
   closeDrawerIcon: "/icons/CloseIcon.svg",
   closeIcon: "/icons/Close.svg",
@@ -23,6 +23,7 @@ export const ICONS = {
   guidesActiveIcon: "/icons/GuidesActive.svg",
   guidesIcon: "/icons/Guides.svg",
   helpIcon: "/icons/Help.svg",
+  link: "/icons/Link.svg",
   sortActiveIcon: "/icons/SortActive.svg",
   sortIcon: "/icons/Sort.svg",
   sortWhiteIcon: "/icons/SortWhite.svg",

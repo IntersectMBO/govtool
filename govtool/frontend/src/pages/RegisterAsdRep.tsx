@@ -11,7 +11,7 @@ import {
   useUrlAndHashFormController as useRegisterAsdRepFormController,
   useTranslation,
 } from "@hooks";
-import { BackToButton } from "@molecules";
+import { LinkWithIcon } from "@molecules";
 import {
   DashboardTopNav,
   Footer,
@@ -60,7 +60,7 @@ export const RegisterAsdRep = () => {
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
         <DashboardTopNav title={t("registration.becomeADRep")} />
-        <BackToButton
+        <LinkWithIcon
           label={t("backToDashboard")}
           onClick={onClickBackToDashboard}
           sx={{

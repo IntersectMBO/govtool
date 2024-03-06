@@ -23,7 +23,7 @@ export const ChooseGovernanceActionType = ({
   const { isMobile } = useScreenDimension();
   const { getValues, setValue, watch } = useCreateGovernanceActionForm();
 
-  const isContinueButtonDisabled = !watch("type");
+  const isContinueButtonDisabled = !watch("governance_action_type");
 
   const onClickContinue = () => {
     setStep(3);
@@ -32,7 +32,7 @@ export const ChooseGovernanceActionType = ({
   // TODO: Add tooltips when they will be available
   const renderGovernanceActionTypes = () => {
     return GOVERNANCE_ACTION_TYPES.map((type, index) => {
-      const isChecked = getValues("type") === type;
+      const isChecked = getValues("governance_action_type") === type;
       return (
         <div key={type}>
           <ActionRadio
@@ -48,7 +48,7 @@ export const ChooseGovernanceActionType = ({
   };
 
   const onChangeType = (value: string) => {
-    setValue("type", value);
+    setValue("governance_action_type", value);
   };
 
   return (

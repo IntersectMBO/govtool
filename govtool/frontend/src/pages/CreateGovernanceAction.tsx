@@ -11,12 +11,13 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import { BackToButton } from "@molecules";
+import { LinkWithIcon } from "@molecules";
 import {
   ChooseGovernanceActionType,
   CreateGovernanceActionForm,
   DashboardTopNav,
   Footer,
+  ReviewCreatedGovernanceAction,
   WhatGovernanceActionIsAbout,
 } from "@organisms";
 import { checkIsWalletConnected } from "@utils";
@@ -63,7 +64,7 @@ export const CreateGovernanceAction = () => {
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
         <DashboardTopNav title={t("createGovernanceAction.title")} />
-        <BackToButton
+        <LinkWithIcon
           label={t("backToDashboard")}
           onClick={onClickBackToDashboard}
           sx={{
@@ -86,6 +87,7 @@ export const CreateGovernanceAction = () => {
             />
           )}
           {step === 3 && <CreateGovernanceActionForm setStep={setStep} />}
+          {step === 4 && <ReviewCreatedGovernanceAction setStep={setStep} />}
         </FormProvider>
         {isMobile && <Footer />}
       </Box>

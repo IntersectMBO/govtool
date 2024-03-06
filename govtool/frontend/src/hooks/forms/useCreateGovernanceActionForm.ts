@@ -2,13 +2,13 @@ import { useCallback, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 type createGovernanceActionValues = {
-  type: string;
+  governance_action_type: string;
   links?: { link: string }[];
 };
 
 export const defaulCreateGovernanceActionValues: createGovernanceActionValues =
   {
-    type: "",
+    governance_action_type: "",
     links: [{ link: "" }],
   };
 

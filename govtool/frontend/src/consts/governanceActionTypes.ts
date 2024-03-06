@@ -44,7 +44,7 @@ export const GOVERNANCE_ACTIONS_FIELDS = [
         placeholder: "Problem this GA will solve",
         tip: "How will this solve a problem",
       },
-      Rationale: {
+      rationale: {
         component: "textarea",
         placeholder: "Content of Governance Action",
         tip: "Put all the content of the GA here",

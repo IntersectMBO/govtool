@@ -53,7 +53,7 @@ export const AutomatedVotingOptions = () => {
             onClickDelegate={() => {}}
             onClickInfo={() => {}}
             title={t("dRepDirectory.abstainCardTitle")}
-            votingPower={"99,111,111"}
+            votingPower="99,111,111"
           />
           <Spacer y={2} />
           <AutomatedVotingCard
@@ -61,7 +61,7 @@ export const AutomatedVotingOptions = () => {
             onClickDelegate={() => {}}
             onClickInfo={() => {}}
             title={t("dRepDirectory.noConfidenceTitle")}
-            votingPower={"99,111,111"}
+            votingPower="99,111,111"
           />
         </>
       ) : null}

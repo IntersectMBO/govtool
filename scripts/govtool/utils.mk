@@ -18,3 +18,10 @@ docker:
 	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	$(ssh-keyscan) $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
 	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) $(cmd)
+
+.PHONY: reload-grafana
+reload-grafana:
+	@:$(call check_defined, domain)
+	curl -X POST -u "admin:$${GRAFANA_ADMIN_PASSWORD}" https://$(domain)/grafana/api/admin/provisioning/alerting/reload
+	curl -X POST -u "admin:$${GRAFANA_ADMIN_PASSWORD}" https://$(domain)/grafana/api/admin/provisioning/dashboards/reload
+	curl -X POST -u "admin:$${GRAFANA_ADMIN_PASSWORD}" https://$(domain)/grafana/api/admin/provisioning/notifications/reload

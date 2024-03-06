@@ -69,17 +69,21 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.GHA_SSH_PRIVATE_KEY }}
 
+      - name: Set domain
+        run: |
+          if [[ "${{ inputs.environment }}" == "staging" ]]; then
+            echo "DOMAIN=staging.govtool.byron.network" >> $GITHUB_ENV
+          elif [[ "${{ inputs.environment }}" == "beta" ]]; then
+            echo "DOMAIN=sanchogov.tools" >> $GITHUB_ENV
+          else
+            echo "DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}" >> $GITHUB_ENV
+          fi
+
       - name: Deploy app
         run: |
-          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
-          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
-          export DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}
           make all
 
       - name: Reprovision Grafana
         run: |
           sleep 30 # give grafana time to start up
-          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
-          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
-          DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}
           make reload-grafana

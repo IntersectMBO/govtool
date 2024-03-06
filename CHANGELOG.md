@@ -54,6 +54,7 @@ changes.
 - Streamlined the application build and deployment process, thereby accelerating continuous delivery (CD) and reducing the resource burden [Issue 246](https://github.com/IntersectMBO/govtool/issues/246).
 - Applied unified policy on Docker images tagging [Issue 320](https://github.com/IntersectMBO/govtool/issues/320).
 - Reorganised deployment Makefiles in order to better document the process and easier management [Issue 385](https://github.com/IntersectMBO/govtool/issues/385).
+- Added a grafana panel to track all the deploys on the target machines [Issue 361](https://github.com/IntersectMBO/govtool/issues/361).
 
 ### Removed
 -

@@ -38,7 +38,7 @@ export const useCreateGovernanceActionForm = () => {
       ?.filter((link) => link.link)
       .map((link) => {
         // TODO: Label isnt available and harcoded Other for type
-        return { type: "Other", label: "Testlabel", uri: link.link };
+        return { "@type": "Other", label: "Testlabel", uri: link.link };
       });
     const body = { ...Object.fromEntries(filteredData), references };
 

@@ -84,13 +84,13 @@ jobs:
       - name: Destroy Cardano Node, DB sync and Postgres if required
         if: ${{ inputs.resync_cardano_node_and_db }}
         run: |
-          make destroy-cardano-node-and-dbsync
+          make --debug=w destroy-cardano-node-and-dbsync
 
       - name: Deploy app
         run: |
-          make all
+          make --debug=w all
 
       - name: Reprovision Grafana
         run: |
           sleep 30 # give grafana time to start up
-          make reload-grafana
+          make --debug=w reload-grafana

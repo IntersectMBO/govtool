@@ -4,7 +4,11 @@ import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRen
 
 import { Button, Spacer, Typography } from "@atoms";
 import { ICONS } from "@consts";
-import { useCreateGovernanceActionForm, useTranslation } from "@hooks";
+import {
+  defaulCreateGovernanceActionValues,
+  useCreateGovernanceActionForm,
+  useTranslation,
+} from "@hooks";
 import { LinkWithIcon } from "@molecules";
 import { openInNewTab } from "@utils";
 
@@ -39,7 +43,11 @@ export const ReviewCreatedGovernanceAction = ({
 
   const renderReviewFields = () => {
     return Object.entries(values)
-      .filter(([key]) => key !== "links")
+      .filter(
+        ([key]) =>
+          !Object.keys(defaulCreateGovernanceActionValues).includes(key) ||
+          key === "governance_action_type"
+      )
       .map(([key, value]) => {
         const label =
           key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " ");

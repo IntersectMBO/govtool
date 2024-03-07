@@ -18,6 +18,7 @@ export const LinkWithIcon = ({
         alignItems: "center",
         cursor: "pointer",
         display: "flex",
+        width: "fit-content",
         ...sx,
       }}
       onClick={onClick}

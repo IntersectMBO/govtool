@@ -4,6 +4,7 @@ export * from "./ChooseStakeKeyPanel";
 export * from "./ChooseWalletModal";
 export * from "./ControlledField";
 export * from "./CreateGovernanceActionForm";
+export * from "./CreateGovernanceActionSteps";
 export * from "./DashboardCards";
 export * from "./DashboardCards";
 export * from "./DashboardDrawerMobile";

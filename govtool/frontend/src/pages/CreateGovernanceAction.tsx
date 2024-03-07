@@ -18,6 +18,8 @@ import {
   DashboardTopNav,
   Footer,
   ReviewCreatedGovernanceAction,
+  StorageInformation,
+  StoreDataInfo,
   WhatGovernanceActionIsAbout,
 } from "@organisms";
 import { checkIsWalletConnected } from "@utils";
@@ -83,6 +85,8 @@ export const CreateGovernanceAction = () => {
           {step === 2 && <ChooseGovernanceActionType setStep={setStep} />}
           {step === 3 && <CreateGovernanceActionForm setStep={setStep} />}
           {step === 4 && <ReviewCreatedGovernanceAction setStep={setStep} />}
+          {step === 5 && <StoreDataInfo setStep={setStep} />}
+          {step === 6 && <StorageInformation setStep={setStep} />}
         </FormProvider>
         {isMobile && <Footer />}
       </Box>

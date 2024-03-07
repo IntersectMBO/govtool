@@ -6,3 +6,10 @@ export type LinkWithIconProps = {
   icon?: JSX.Element;
   sx?: SxProps;
 };
+
+export type StepProps = {
+  component: JSX.Element;
+  label: string;
+  layoutStyles?: SxProps;
+  stepNumber: number | string;
+};

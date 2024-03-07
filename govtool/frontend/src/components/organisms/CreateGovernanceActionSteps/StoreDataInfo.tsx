@@ -21,7 +21,7 @@ export const StoreDataInfo = ({
 
   // TODO: change link when available
   const openLink = () => {
-    openInNewTab("https://www.google.com");
+    openInNewTab("https://docs.sanchogov.tools");
   };
 
   const isContinueDisabled = !watch("storeData");

@@ -6,7 +6,7 @@ export const NAV_ITEMS = [
   {
     dataTestId: "dashboard-link",
     navTo: PATHS.home,
-    label: "Dashboard",
+    label: i18n.t("dashboard.title"),
     newTabLink: null,
   },
   {
@@ -17,19 +17,19 @@ export const NAV_ITEMS = [
   {
     dataTestId: "governance-actions-link",
     navTo: PATHS.governanceActions,
-    label: "Governance Actions",
+    label: i18n.t("govActions.title"),
     newTabLink: null,
   },
   {
     dataTestId: "guides-link",
     navTo: "",
-    label: "Guides",
+    label: i18n.t("menu.guides"),
     newTabLink: "https://docs.sanchogov.tools/about/what-is-sanchonet-govtool",
   },
   {
     dataTestId: "faqs-link",
     navTo: "",
-    label: "FAQs",
+    label: i18n.t("menu.faqs"),
     newTabLink: "https://docs.sanchogov.tools/faqs",
   },
 ];
@@ -37,7 +37,7 @@ export const NAV_ITEMS = [
 export const CONNECTED_NAV_ITEMS = [
   {
     dataTestId: "dashboard-link",
-    label: "Dashboard",
+    label: i18n.t("dashboard.title"),
     navTo: PATHS.dashboard,
     activeIcon: ICONS.dashboardActiveIcon,
     icon: ICONS.dashboardIcon,
@@ -52,7 +52,7 @@ export const CONNECTED_NAV_ITEMS = [
   },
   {
     dataTestId: "governance-actions-link",
-    label: "Governance Actions",
+    label: i18n.t("govActions.title"),
     navTo: PATHS.dashboardGovernanceActions,
     activeIcon: ICONS.governanceActionsActiveIcon,
     icon: ICONS.governanceActionsIcon,
@@ -60,7 +60,7 @@ export const CONNECTED_NAV_ITEMS = [
   },
   {
     dataTestId: "guides-link",
-    label: "Guides",
+    label: i18n.t("menu.guides"),
     navTo: "",
     activeIcon: ICONS.guidesActiveIcon,
     icon: ICONS.guidesIcon,
@@ -68,7 +68,7 @@ export const CONNECTED_NAV_ITEMS = [
   },
   {
     dataTestId: "faqs-link",
-    label: "FAQs",
+    label: i18n.t("menu.faqs"),
     navTo: "",
     activeIcon: ICONS.faqsActiveIcon,
     icon: ICONS.faqsIcon,

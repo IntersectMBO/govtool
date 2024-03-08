@@ -322,8 +322,6 @@ export const en = {
       faqs: "FAQs",
       guides: "Guides",
       help: "Help",
-      dashboard: "Dashboard",
-      viewGovActions: "View Governance Actions",
     },
     metadataUpdate: {
       description:

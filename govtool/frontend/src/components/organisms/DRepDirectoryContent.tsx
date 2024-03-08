@@ -1,4 +1,5 @@
 import { FC } from "react";
+import { AutomatedVotingOptions } from ".";
 
 interface DRepDirectoryContentProps {
   isConnected?: boolean;
@@ -6,12 +7,4 @@ interface DRepDirectoryContentProps {
 
 export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   isConnected,
-}) => (
-  <>
-    <p>DRepDirectory</p>
-    <p>
-      connected:
-      {String(!!isConnected)}
-    </p>
-  </>
-);
+}) => <>{isConnected && <AutomatedVotingOptions />}</>;

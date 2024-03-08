@@ -4,6 +4,7 @@ export * from "./callAll";
 export * from "./checkIsMaintenanceOn";
 export * from "./checkIsWalletConnected";
 export * from "./formatDate";
+export * from "./generateAnchor";
 export * from "./getDRepID";
 export * from "./getGovActionId";
 export * from "./getLengthInBytes";

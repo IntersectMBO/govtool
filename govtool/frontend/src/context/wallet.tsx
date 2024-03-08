@@ -40,6 +40,12 @@ import {
   VotingBuilder,
   VotingProcedure,
   StakeRegistration,
+  VotingProposalBuilder,
+  InfoAction,
+  VotingProposal,
+  GovernanceAction,
+  TreasuryWithdrawals,
+  TreasuryWithdrawalsAction,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 import { Buffer } from "buffer";
 import { useNavigate } from "react-router-dom";
@@ -93,6 +99,18 @@ type TransactionHistoryItem = {
 };
 
 export type DRepActionType = "retirement" | "registration" | "update" | "";
+
+type InfoProps = {
+  hash: string;
+  url: string;
+};
+
+type TreasuryProps = {
+  amount: string;
+  hash: string;
+  receivingAddress: string;
+  url: string;
+};
 
 interface CardanoContext {
   address?: string;
@@ -152,6 +170,12 @@ interface CardanoContext {
   isPendingTransaction: () => boolean;
   isDrepLoading: boolean;
   setIsDrepLoading: Dispatch<SetStateAction<boolean>>;
+  buildNewInfoGovernanceAction: (
+    infoProps: InfoProps
+  ) => Promise<VotingProposalBuilder | undefined>;
+  buildTreasuryGovernanceAction: (
+    treasuryProps: TreasuryProps
+  ) => Promise<VotingProposalBuilder | undefined>;
 }
 
 type Utxos = {
@@ -1218,74 +1242,178 @@ function CardanoProvider(props: Props) {
     [dRepID]
   );
 
+  // info action
+  const buildNewInfoGovernanceAction = useCallback(
+    async ({ hash, url }: InfoProps) => {
+      let govActionBuilder = VotingProposalBuilder.new();
+      const govActionDeposit =
+        getItemFromLocalStorage(PROTOCOL_PARAMS_KEY).govActDeposit;
+      try {
+        const rewardAddress = await walletApi?.getRewardAddress();
+
+        if (!rewardAddress) {
+          throw new Error("Can not get reward address");
+        }
+
+        // Create new info action
+        const infoAction = InfoAction.new();
+        const infoGovAct = GovernanceAction.new_info_action(infoAction);
+        // Create an anchor
+        const anchorURL = URL.new(url);
+        const anchorHash = AnchorDataHash.from_hex(hash);
+        const anchor = Anchor.new(anchorURL, anchorHash);
+
+        const rewardAddr = RewardAddress.from_address(
+          Address.from_bech32(rewardAddress)
+        );
+
+        if (!rewardAddr) {
+          throw new Error("Can not convert address to reward address");
+        }
+
+        // Create voting proposal
+        const votingProposal = VotingProposal.new(
+          infoGovAct,
+          anchor,
+          rewardAddr,
+          BigNum.from_str(govActionDeposit)
+        );
+        govActionBuilder.add(votingProposal);
+
+        return govActionBuilder;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    []
+  );
+
+  // treasury action
+  const buildTreasuryGovernanceAction = useCallback(
+    async ({ amount, hash, receivingAddress, url }: TreasuryProps) => {
+      const govActionBuilder = VotingProposalBuilder.new();
+      const govActionDeposit =
+        getItemFromLocalStorage(PROTOCOL_PARAMS_KEY).govActDeposit;
+      try {
+        const rewardAddress = await walletApi?.getRewardAddress();
+
+        if (!rewardAddress) {
+          throw new Error("Can not get reward address");
+        }
+
+        const treasuryTarget = RewardAddress.from_address(
+          Address.from_bech32(receivingAddress)
+        );
+
+        if (!treasuryTarget) throw new Error("Can not get tresasury target");
+
+        const myWithdrawal = BigNum.from_str(amount);
+        const withdrawals = TreasuryWithdrawals.new();
+        withdrawals.insert(treasuryTarget, myWithdrawal);
+        // Create new treasury withdrawal gov act
+        const treasuryAction = TreasuryWithdrawalsAction.new(withdrawals);
+        const treasuryGovAct =
+          GovernanceAction.new_treasury_withdrawals_action(treasuryAction);
+        // Create an anchor
+        const anchorURL = URL.new(url);
+        const anchorHash = AnchorDataHash.from_hex(hash);
+        const anchor = Anchor.new(anchorURL, anchorHash);
+
+        const rewardAddr = RewardAddress.from_address(
+          Address.from_bech32(rewardAddress)
+        );
+
+        if (!rewardAddr)
+          throw new Error("Can not convert address to reward address");
+        // Create voting proposal
+        const votingProposal = VotingProposal.new(
+          treasuryGovAct,
+          anchor,
+          rewardAddr,
+          BigNum.from_str(govActionDeposit)
+        );
+        govActionBuilder.add(votingProposal);
+
+        return govActionBuilder;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    []
+  );
+
   const value = useMemo(
     () => ({
       address,
-      enable,
-      voter,
-      isEnabled,
-      isMainnet,
+      buildDRepRegCert,
+      buildDRepRetirementCert,
+      buildDRepUpdateCert,
+      buildNewInfoGovernanceAction,
+      buildSignSubmitConwayCertTx,
+      buildTreasuryGovernanceAction,
+      buildVote,
+      buildVoteDelegationCert,
+      delegatedDRepID,
+      delegateTo,
+      delegateTransaction,
       disconnectWallet,
       dRepID,
       dRepIDBech32,
-      pubDRepKey,
-      stakeKey,
-      setVoter,
-      setStakeKey,
-      stakeKeys,
-      walletApi,
+      enable,
       error,
-      delegatedDRepID,
-      setDelegatedDRepID,
-      buildSignSubmitConwayCertTx,
-      buildDRepRegCert,
-      buildDRepUpdateCert,
-      buildDRepRetirementCert,
-      buildVote,
-      buildVoteDelegationCert,
-      delegateTransaction,
-      registerTransaction,
-      soleVoterTransaction,
-      delegateTo,
-      voteTransaction,
-      isPendingTransaction,
       isDrepLoading,
-      setIsDrepLoading,
+      isEnabled,
       isEnableLoading,
+      isMainnet,
+      isPendingTransaction,
+      pubDRepKey,
+      registerTransaction,
+      setDelegatedDRepID,
+      setIsDrepLoading,
+      setStakeKey,
+      setVoter,
+      soleVoterTransaction,
+      stakeKey,
+      stakeKeys,
+      voter,
+      voteTransaction,
+      walletApi,
     }),
     [
       address,
-      enable,
-      voter,
-      isEnabled,
-      isMainnet,
+      buildDRepRegCert,
+      buildDRepRetirementCert,
+      buildDRepUpdateCert,
+      buildNewInfoGovernanceAction,
+      buildSignSubmitConwayCertTx,
+      buildTreasuryGovernanceAction,
+      buildVote,
+      buildVoteDelegationCert,
+      delegatedDRepID,
+      delegateTo,
+      delegateTransaction,
       disconnectWallet,
       dRepID,
       dRepIDBech32,
-      pubDRepKey,
-      stakeKey,
-      setVoter,
-      setStakeKey,
-      stakeKeys,
-      walletApi,
+      enable,
       error,
-      delegatedDRepID,
-      setDelegatedDRepID,
-      buildSignSubmitConwayCertTx,
-      buildDRepRegCert,
-      buildDRepUpdateCert,
-      buildDRepRetirementCert,
-      buildVote,
-      buildVoteDelegationCert,
-      delegateTransaction,
-      registerTransaction,
-      soleVoterTransaction,
-      delegateTo,
-      voteTransaction,
-      isPendingTransaction,
       isDrepLoading,
-      setIsDrepLoading,
+      isEnabled,
       isEnableLoading,
+      isMainnet,
+      isPendingTransaction,
+      pubDRepKey,
+      registerTransaction,
+      setDelegatedDRepID,
+      setIsDrepLoading,
+      setStakeKey,
+      setVoter,
+      soleVoterTransaction,
+      stakeKey,
+      stakeKeys,
+      voter,
+      voteTransaction,
+      walletApi,
     ]
   );
 

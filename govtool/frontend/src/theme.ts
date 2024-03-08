@@ -69,6 +69,13 @@ export const theme = createTheme({
     },
   },
   components: {
+    MuiAccordion: {
+      styleOverrides: {
+        root: {
+          borderRadius: `12px !important`,
+        }
+      }
+    },
     MuiInputBase: {
       styleOverrides: {
         root: {
@@ -126,3 +133,9 @@ export const theme = createTheme({
     textGray: "#525252",
   },
 });
+
+theme.shadows[1] = "0px 1px 2px 0px rgba(0, 51, 173, 0.08), 0px 1px 6px 1px rgba(0, 51, 173, 0.15)";
+theme.shadows[2] = "0px 1px 2px 0px rgba(0, 51, 173, 0.08), 0px 2px 10px 2px rgba(0, 51, 173, 0.15)";
+theme.shadows[3] = "0px 1px 3px 0px rgba(0, 51, 173, 0.08), 0px 4px 12px 3px rgba(0, 51, 173, 0.15)";
+theme.shadows[4] = "0px 2px 3px 0px rgba(0, 51, 173, 0.08), 0px 6px 14px 4px rgba(0, 51, 173, 0.15)";
+theme.shadows[5] = "0px 4px 4px 0px rgba(0, 51, 173, 0.08), 0px 8px 20px 6px rgba(0, 51, 173, 0.15)";

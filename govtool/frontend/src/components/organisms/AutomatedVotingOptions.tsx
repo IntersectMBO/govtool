@@ -1,53 +1,40 @@
-import { useState } from "react";
-import { Box } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+} from "@mui/material";
 
-import { Spacer, Typography } from "@atoms";
+import { Typography } from "@atoms";
 import { ICONS } from "@consts";
 import { useTranslation } from "@hooks";
 import { AutomatedVotingCard } from "@molecules";
 
 export const AutomatedVotingOptions = () => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const { t } = useTranslation();
 
-  const handleOpen = () => {
-    setIsOpen((prev) => !prev);
-  };
-
   return (
-    <Box
-      sx={{
-        bgcolor: "#D6E2FF80",
-        border: "1px solid #F7F9FB",
-        borderRadius: 3,
-        boxShadow: `2px 2px 15px 0px #2F62DC47`,
-        display: "flex",
-        flexDirection: "column",
-        padding: "12px 24px",
-      }}
+    <Accordion
+      elevation={3}
+      sx={(theme) => ({
+        bgcolor: `${theme.palette.lightBlue}80`,
+        border: `1px solid ${theme.palette.neutralWhite}`,
+      })}
     >
-      <Box
-        onClick={handleOpen}
-        sx={{
-          alignItems: "center",
-          cursor: "pointer",
-          display: "flex",
-          flex: 1,
-          justifyContent: "space-between",
-        }}
+      <AccordionSummary
+        expandIcon={<img alt="arrow" src={ICONS.arrowDownIcon} />}
+        sx={{ borderRadius: 3, px: { xxs: 2, md: 3 } }}
       >
         <Typography>{t("dRepDirectory.automatedVotingOptions")}</Typography>
-        <img
-          alt="arrow"
-          src={ICONS.arrowDownIcon}
-          style={{
-            transform: `rotate(${isOpen ? "180deg" : "0"})`,
+      </AccordionSummary>
+      <AccordionDetails sx={{ p: { xxs: 2, md: 3 }, pt: { xxs: 0, md: 0 } }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
           }}
-        />
-      </Box>
-      {isOpen ? (
-        <>
-          <Spacer y={2} />
+        >
           <AutomatedVotingCard
             description={t("dRepDirectory.abstainCardDescription")}
             onClickDelegate={() => {}}
@@ -55,7 +42,6 @@ export const AutomatedVotingOptions = () => {
             title={t("dRepDirectory.abstainCardTitle")}
             votingPower={"99,111,111"}
           />
-          <Spacer y={2} />
           <AutomatedVotingCard
             description={t("dRepDirectory.noConfidenceDescription")}
             onClickDelegate={() => {}}
@@ -63,8 +49,8 @@ export const AutomatedVotingOptions = () => {
             title={t("dRepDirectory.noConfidenceTitle")}
             votingPower={"99,111,111"}
           />
-        </>
-      ) : null}
-    </Box>
+        </Box>
+      </AccordionDetails>
+    </Accordion>
   );
 };

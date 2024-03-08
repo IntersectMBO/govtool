@@ -10,8 +10,6 @@ import {
 } from "react";
 import {
   Address,
-  Anchor,
-  AnchorDataHash,
   BigNum,
   Certificate,
   CertificatesBuilder,
@@ -33,7 +31,6 @@ import {
   TransactionUnspentOutput,
   TransactionUnspentOutputs,
   TransactionWitnessSet,
-  URL,
   Value,
   VoteDelegation,
   Voter,
@@ -59,20 +56,21 @@ import { PATHS } from "@consts";
 import { CardanoApiWallet, VoterInfo, Protocol } from "@models";
 import type { StatusModalState } from "@organisms";
 import {
-  getPubDRepID,
-  WALLET_LS_KEY,
-  DELEGATE_TRANSACTION_KEY,
-  REGISTER_TRANSACTION_KEY,
-  DELEGATE_TO_KEY,
-  PROTOCOL_PARAMS_KEY,
-  getItemFromLocalStorage,
-  setItemToLocalStorage,
-  removeItemFromLocalStorage,
-  openInNewTab,
-  SANCHO_INFO_KEY,
-  VOTE_TRANSACTION_KEY,
   checkIsMaintenanceOn,
+  DELEGATE_TO_KEY,
+  DELEGATE_TRANSACTION_KEY,
+  generateAnchor,
+  getItemFromLocalStorage,
+  getPubDRepID,
+  openInNewTab,
+  PROTOCOL_PARAMS_KEY,
   REGISTER_SOLE_VOTER_TRANSACTION_KEY,
+  REGISTER_TRANSACTION_KEY,
+  removeItemFromLocalStorage,
+  SANCHO_INFO_KEY,
+  setItemToLocalStorage,
+  VOTE_TRANSACTION_KEY,
+  WALLET_LS_KEY,
 } from "@utils";
 import { getEpochParams, getTransactionStatus } from "@services";
 import {
@@ -1096,9 +1094,7 @@ function CardanoProvider(props: Props) {
         let dRepRegCert;
         // If there is an anchor
         if (cip95MetadataURL && cip95MetadataHash) {
-          const url = URL.new(cip95MetadataURL);
-          const hash = AnchorDataHash.from_hex(cip95MetadataHash);
-          const anchor = Anchor.new(url, hash);
+          const anchor = generateAnchor(cip95MetadataURL, cip95MetadataHash);
           // Create cert object using one Ada as the deposit
           dRepRegCert = DrepRegistration.new_with_anchor(
             dRepCred,
@@ -1141,9 +1137,7 @@ function CardanoProvider(props: Props) {
         let dRepUpdateCert;
         // If there is an anchor
         if (cip95MetadataURL && cip95MetadataHash) {
-          const url = URL.new(cip95MetadataURL);
-          const hash = AnchorDataHash.from_hex(cip95MetadataHash);
-          const anchor = Anchor.new(url, hash);
+          const anchor = generateAnchor(cip95MetadataURL, cip95MetadataHash);
           // Create cert object using one Ada as the deposit
           dRepUpdateCert = DrepUpdate.new_with_anchor(dRepCred, anchor);
         } else {
@@ -1217,9 +1211,7 @@ function CardanoProvider(props: Props) {
 
         let votingProcedure;
         if (cip95MetadataURL && cip95MetadataHash) {
-          const url = URL.new(cip95MetadataURL);
-          const hash = AnchorDataHash.from_hex(cip95MetadataHash);
-          const anchor = Anchor.new(url, hash);
+          const anchor = generateAnchor(cip95MetadataURL, cip95MetadataHash);
           // Create cert object using one Ada as the deposit
           votingProcedure = VotingProcedure.new_with_anchor(
             votingChoice,
@@ -1259,9 +1251,7 @@ function CardanoProvider(props: Props) {
         const infoAction = InfoAction.new();
         const infoGovAct = GovernanceAction.new_info_action(infoAction);
         // Create an anchor
-        const anchorURL = URL.new(url);
-        const anchorHash = AnchorDataHash.from_hex(hash);
-        const anchor = Anchor.new(anchorURL, anchorHash);
+        const anchor = generateAnchor(url, hash);
 
         const rewardAddr = RewardAddress.from_address(
           Address.from_bech32(rewardAddress)
@@ -1315,9 +1305,7 @@ function CardanoProvider(props: Props) {
         const treasuryGovAct =
           GovernanceAction.new_treasury_withdrawals_action(treasuryAction);
         // Create an anchor
-        const anchorURL = URL.new(url);
-        const anchorHash = AnchorDataHash.from_hex(hash);
-        const anchor = Anchor.new(anchorURL, anchorHash);
+        const anchor = generateAnchor(url, hash);
 
         const rewardAddr = RewardAddress.from_address(
           Address.from_bech32(rewardAddress)

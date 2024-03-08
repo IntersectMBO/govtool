@@ -51,6 +51,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
@@ -82,13 +84,13 @@ jobs:
       - name: Destroy Cardano Node, DB sync and Postgres if required
         if: ${{ inputs.resync_cardano_node_and_db }}
         run: |
-          make destroy-cardano-node-and-dbsync
+          make --debug=b destroy-cardano-node-and-dbsync
 
       - name: Deploy app
         run: |
-          make all
+          make --debug=b all
 
       - name: Reprovision Grafana
         run: |
           sleep 30 # give grafana time to start up
-          make reload-grafana
+          make --debug=b reload-grafana

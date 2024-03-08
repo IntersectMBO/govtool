@@ -23,6 +23,13 @@ export const theme = createTheme({
     },
   },
   components: {
+    MuiAccordion: {
+      styleOverrides: {
+        root: {
+          borderRadius: `12px !important`,
+        }
+      }
+    },
     MuiInputBase: {
       styleOverrides: {
         root: {

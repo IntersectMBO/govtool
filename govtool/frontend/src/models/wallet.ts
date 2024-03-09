@@ -94,7 +94,7 @@ export interface CardanoApiWallet {
   getUsedAddresses(): Promise<string[]>;
   getUnusedAddresses(): Promise<string[]>;
   getChangeAddress(): Promise<string>;
-  getRewardAddress(): Promise<string>;
+  getRewardAddresses(): Promise<string[]>;
   getNetworkId(): Promise<number>;
   signData(arg0: any, arg1?: any): Promise<any>;
   signTx(arg0: any, arg1?: any): Promise<any>;

@@ -234,9 +234,9 @@ function CardanoProvider(props: Props) {
     { proposalId: string } & TransactionHistoryItem
   >({ time: undefined, transactionHash: "", proposalId: "" });
   const [isDrepLoading, setIsDrepLoading] = useState<boolean>(true);
-
   const { addSuccessAlert, addWarningAlert, addErrorAlert } = useSnackbar();
   const { t } = useTranslation();
+  const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
   const isPendingTransaction = useCallback(() => {
     if (
@@ -1083,7 +1083,6 @@ function CardanoProvider(props: Props) {
       cip95MetadataHash?: string
     ): Promise<CertificatesBuilder> => {
       try {
-        const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
         // Build DRep Registration Certificate
         const certBuilder = CertificatesBuilder.new();
 
@@ -1117,7 +1116,7 @@ function CardanoProvider(props: Props) {
         throw e;
       }
     },
-    [dRepID]
+    [epochParams, dRepID]
   );
 
   // conway alpha
@@ -1234,39 +1233,39 @@ function CardanoProvider(props: Props) {
     [dRepID]
   );
 
+  const getRewardAddress = useCallback(async () => {
+    const addresses = await walletApi?.getRewardAddresses();
+    if (!addresses) {
+      throw new Error("Can not get reward addresses from wallet.");
+    }
+    const firstAddress = addresses[0];
+    const bech32Address = Address.from_bytes(
+      Buffer.from(firstAddress, "hex")
+    ).to_bech32();
+
+    return RewardAddress.from_address(Address.from_bech32(bech32Address));
+  }, [walletApi]);
+
   // info action
   const buildNewInfoGovernanceAction = useCallback(
     async ({ hash, url }: InfoProps) => {
       let govActionBuilder = VotingProposalBuilder.new();
-      const govActionDeposit =
-        getItemFromLocalStorage(PROTOCOL_PARAMS_KEY).govActDeposit;
       try {
-        const rewardAddress = await walletApi?.getRewardAddress();
-
-        if (!rewardAddress) {
-          throw new Error("Can not get reward address");
-        }
-
         // Create new info action
         const infoAction = InfoAction.new();
         const infoGovAct = GovernanceAction.new_info_action(infoAction);
         // Create an anchor
         const anchor = generateAnchor(url, hash);
 
-        const rewardAddr = RewardAddress.from_address(
-          Address.from_bech32(rewardAddress)
-        );
-
-        if (!rewardAddr) {
-          throw new Error("Can not convert address to reward address");
-        }
+        const rewardAddr = await getRewardAddress();
+        if (!rewardAddr) throw new Error("Can not get reward address");
 
         // Create voting proposal
         const votingProposal = VotingProposal.new(
           infoGovAct,
           anchor,
           rewardAddr,
-          BigNum.from_str(govActionDeposit)
+          BigNum.from_str(epochParams.gov_action_deposit.toString())
         );
         govActionBuilder.add(votingProposal);
 
@@ -1275,22 +1274,14 @@ function CardanoProvider(props: Props) {
         console.error(err);
       }
     },
-    []
+    [epochParams]
   );
 
   // treasury action
   const buildTreasuryGovernanceAction = useCallback(
     async ({ amount, hash, receivingAddress, url }: TreasuryProps) => {
       const govActionBuilder = VotingProposalBuilder.new();
-      const govActionDeposit =
-        getItemFromLocalStorage(PROTOCOL_PARAMS_KEY).govActDeposit;
       try {
-        const rewardAddress = await walletApi?.getRewardAddress();
-
-        if (!rewardAddress) {
-          throw new Error("Can not get reward address");
-        }
-
         const treasuryTarget = RewardAddress.from_address(
           Address.from_bech32(receivingAddress)
         );
@@ -1307,18 +1298,15 @@ function CardanoProvider(props: Props) {
         // Create an anchor
         const anchor = generateAnchor(url, hash);
 
-        const rewardAddr = RewardAddress.from_address(
-          Address.from_bech32(rewardAddress)
-        );
+        const rewardAddr = await getRewardAddress();
 
-        if (!rewardAddr)
-          throw new Error("Can not convert address to reward address");
+        if (!rewardAddr) throw new Error("Can not get reward address");
         // Create voting proposal
         const votingProposal = VotingProposal.new(
           treasuryGovAct,
           anchor,
           rewardAddr,
-          BigNum.from_str(govActionDeposit)
+          BigNum.from_str(epochParams.gov_action_deposit.toString())
         );
         govActionBuilder.add(votingProposal);
 
@@ -1327,7 +1315,7 @@ function CardanoProvider(props: Props) {
         console.error(err);
       }
     },
-    []
+    [epochParams]
   );
 
   const value = useMemo(

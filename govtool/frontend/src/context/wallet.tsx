@@ -1274,7 +1274,7 @@ function CardanoProvider(props: Props) {
         console.error(err);
       }
     },
-    [epochParams]
+    [epochParams, getRewardAddress]
   );
 
   // treasury action
@@ -1315,7 +1315,7 @@ function CardanoProvider(props: Props) {
         console.error(err);
       }
     },
-    [epochParams]
+    [epochParams, getRewardAddress]
   );
 
   const value = useMemo(

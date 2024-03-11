@@ -21,9 +21,7 @@ export const DashboardCardComponent: Story = {
   args: {
     description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
     firstButtonLabel: "first button",
-    imageHeight: 80,
     imageURL: IMAGES.govActionDelegateImage,
-    imageWidth: 115,
     secondButtonLabel: "second button",
     title: "Action card",
   },
@@ -38,13 +36,22 @@ export const DashboardCardComponent: Story = {
   },
 };
 
+export const WithDRepIdDashboardCardComponent: Story = {
+  args: {
+    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
+    firstButtonLabel: "first button",
+    imageURL: IMAGES.govActionDelegateImage,
+    secondButtonLabel: "second button",
+    title: "Action card",
+    cardId: "drep1gwsw9ckkhuwscj9savt5f7u9xsrudw209hne7pggcktzuw5sv32",
+  },
+};
+
 export const isLoadingDashboardCard: Story = {
   args: {
     description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
     firstButtonLabel: "first button",
-    imageHeight: 80,
     imageURL: IMAGES.govActionDelegateImage,
-    imageWidth: 115,
     secondButtonLabel: "second button",
     title: "Action card",
     isLoading: true,
@@ -62,9 +69,7 @@ export const isProgressDashboardCard: Story = {
   args: {
     description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
     firstButtonLabel: "first button",
-    imageHeight: 80,
     imageURL: IMAGES.govActionDelegateImage,
-    imageWidth: 115,
     secondButtonLabel: "second button",
     title: "Action card",
     inProgress: true,

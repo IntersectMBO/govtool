@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { DashboardTopNav } from "@organisms";
-import { IMAGES } from "@/consts";
 import { within, userEvent, waitFor, screen } from "@storybook/testing-library";
 import { expect } from "@storybook/jest";
 
@@ -15,7 +14,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const DashboardTopNavComponent: Story = {
-  args: { title: "Example title", isDrawer: true },
+  args: { title: "Example title" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     expect(canvas.getByText("Example title")).toBeInTheDocument();
@@ -29,18 +28,5 @@ export const DashboardTopNavComponent: Story = {
         /DRep Voting Power/i
       );
     });
-  },
-};
-
-export const DashboardTopNavWithIcon: Story = {
-  args: {
-    title: "Example title",
-    isDrawer: true,
-    imageSRC: IMAGES.appLogoWithoutText,
-    imageHeight: 24,
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    expect(canvas.getByRole("img")).toBeInTheDocument();
   },
 };

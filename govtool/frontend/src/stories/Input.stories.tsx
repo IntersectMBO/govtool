@@ -60,3 +60,8 @@ ErrorAndLabel.play = async ({ canvasElement }) => {
   expect(canvas.getByText("Label")).toBeInTheDocument();
   expect(canvas.getByTestId("error-message-error")).toBeInTheDocument();
 };
+
+export const WithHelpfulText = Template.bind({});
+WithHelpfulText.args = {
+  helpfulText: "Helpful text",
+};

@@ -1,22 +1,16 @@
 import { useEffect } from "react";
-import { Story, Meta, StoryFn } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react";
+import { expect } from "@storybook/jest";
+import { within, waitFor, screen, userEvent } from "@storybook/testing-library";
 
 import { Modal } from "@atoms";
 import { StatusModal, StatusModalState } from "@organisms";
-import { ModalProvider, useModal } from "../../context/modal";
-import { within, waitFor, screen, userEvent } from "@storybook/testing-library";
-import { expect } from "@storybook/jest";
+import { useModal } from "../../context/modal";
+import { callAll } from "@utils";
 
 const meta = {
   title: "Example/Modals/StatusModal",
   component: StatusModal,
-  decorators: [
-    (Story) => (
-      <ModalProvider>
-        <Story />
-      </ModalProvider>
-    ),
-  ],
 } satisfies Meta<typeof StatusModal>;
 
 export default meta;
@@ -40,7 +34,7 @@ const performCommonAction = async (canvas: any, args: any) => {
   });
 };
 const Template: StoryFn<StatusModalState> = (args) => {
-  const { openModal, modal, closeModal } = useModal();
+  const { openModal, modal, modals, closeModal } = useModal();
 
   const open = () => {
     openModal({
@@ -67,12 +61,18 @@ const Template: StoryFn<StatusModalState> = (args) => {
       <button onClick={open} style={{ cursor: "pointer" }}>
         Open Modal
       </button>
-      {modal?.component && (
+      {modals[modal.type]?.component && (
         <Modal
-          open={Boolean(modal.component)}
-          handleClose={!modal.preventDismiss ? closeModal : undefined}
+          open={Boolean(modals[modal.type].component)}
+          handleClose={
+            !modals[modal.type].preventDismiss
+              ? callAll(modals[modal.type]?.onClose, () =>
+                  openModal({ type: "none", state: null })
+                )
+              : undefined
+          }
         >
-          {modal.component}
+          {modals[modal.type]?.component ?? <></>}
         </Modal>
       )}
     </>

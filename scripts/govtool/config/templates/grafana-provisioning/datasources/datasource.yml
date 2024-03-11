@@ -78,9 +78,6 @@ datasources:
   # <bool> enable/disable with credentials headers
   withCredentials:
   # <bool> mark as default datasource. Max one per org
-  # <bool> enable/disable basic auth
-  basicAuth: false
-  # <bool> mark as default datasource. Max one per org
   isDefault: false
   version: 1
   # <bool> allow users to edit datasources from the UI.

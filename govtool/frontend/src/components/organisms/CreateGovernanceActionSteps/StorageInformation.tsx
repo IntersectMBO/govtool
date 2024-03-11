@@ -6,13 +6,13 @@ import { Button, Spacer, Typography } from "@atoms";
 import { useCreateGovernanceActionForm, useTranslation } from "@hooks";
 import { Step } from "@molecules";
 import { BgCard, ControlledField } from "@organisms";
-import { downloadJson, openInNewTab } from "@utils";
+import { URL_REGEX, downloadJson, openInNewTab } from "@utils";
 
-export const StorageInformation = ({
-  setStep,
-}: {
+type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
-}) => {
+};
+
+export const StorageInformation = ({ setStep }: StorageInformationProps) => {
   const { t } = useTranslation();
   const {
     control,
@@ -23,6 +23,7 @@ export const StorageInformation = ({
     watch,
   } = useCreateGovernanceActionForm();
   const [isJsonDownloaded, setIsJsonDownloaded] = useState<boolean>(false);
+
   // TODO: change on correct file name
   const fileName = getValues("governance_action_type");
 
@@ -36,7 +37,7 @@ export const StorageInformation = ({
 
   const onClickBack = useCallback(() => setStep(5), []);
 
-  const onClickDowloadJson = () => {
+  const onClickDownloadJson = () => {
     const data = getValues();
     const jsonBody = generateJsonBody(data);
     downloadJson(jsonBody, fileName);
@@ -66,7 +67,7 @@ export const StorageInformation = ({
           // TODO: add onClick action when available
           component={
             <Button
-              onClick={onClickDowloadJson}
+              onClick={onClickDownloadJson}
               size="extraLarge"
               sx={{ width: "fit-content" }}
             >
@@ -109,6 +110,18 @@ export const StorageInformation = ({
               placeholder={t(
                 "createGovernanceAction.storingInformationURLPlaceholder"
               )}
+              rules={{
+                required: {
+                  value: true,
+                  message: t(
+                    "createGovernanceAction.fields.validations.required"
+                  ),
+                },
+                pattern: {
+                  value: URL_REGEX,
+                  message: t("createGovernanceAction.fields.validations.url"),
+                },
+              }}
             />
           }
           label={t("createGovernanceAction.storingInformationStep3Label")}

@@ -1,16 +1,19 @@
+import {
+  GovernanceActionFieldSchemas,
+  GovernanceActionType,
+} from "@/types/governanceAction";
 import { useCallback, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
-type createGovernanceActionValues = {
-  governance_action_type: string;
+export type CreateGovernanceActionValues = {
   links?: { link: string }[];
   storeData?: boolean;
   storingURL: string;
-};
+  governance_action_type?: GovernanceActionType;
+} & Partial<Record<keyof GovernanceActionFieldSchemas, string>>;
 
-export const defaulCreateGovernanceActionValues: createGovernanceActionValues =
+export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues =
   {
-    governance_action_type: "",
     links: [{ link: "" }],
     storeData: false,
     storingURL: "",
@@ -28,16 +31,17 @@ export const useCreateGovernanceActionForm = () => {
     watch,
     register,
     reset,
-  } = useFormContext<createGovernanceActionValues>();
+  } = useFormContext<CreateGovernanceActionValues>();
 
-  const generateJsonBody = (data: createGovernanceActionValues) => {
+  // TODO: To be moved to utils
+  const generateJsonBody = (data: CreateGovernanceActionValues) => {
     const filteredData = Object.entries(data).filter(
       ([key]) => !Object.keys(defaulCreateGovernanceActionValues).includes(key)
     );
-    const references = data.links
+    const references = (data as CreateGovernanceActionValues).links
       ?.filter((link) => link.link)
       .map((link) => {
-        // TODO: Label isnt available and harcoded Other for type
+        // TODO: Label isnt available and hardcoded Other for type
         return { "@type": "Other", label: "Testlabel", uri: link.link };
       });
     const body = { ...Object.fromEntries(filteredData), references };
@@ -46,7 +50,7 @@ export const useCreateGovernanceActionForm = () => {
     return jsonStr;
   };
 
-  const onSubmit = useCallback(async (data: createGovernanceActionValues) => {
+  const onSubmit = useCallback(async (data: CreateGovernanceActionValues) => {
     try {
       setIsLoading(true);
       const jsonBody = generateJsonBody(data);

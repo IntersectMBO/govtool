@@ -11,6 +11,8 @@ deleteDatasources:
 datasources:
   # <string, required> name of the datasource. Required
 - name: Prometheus
+  # <string> datasource UID.
+  uid: PBFA97CFB590B2093
   # <string, required> datasource type. Required
   type: prometheus
   # <string, required> access mode. direct or proxy. Required
@@ -51,6 +53,8 @@ datasources:
 
   # <string, required> name of the datasource. Required
 - name: Loki
+  # <string> datasource UID.
+  uid: a698987a-0cba-42a9-86aa-3ba65104ef72
   # <string, required> datasource type. Required
   type: loki
   # <string, required> access mode. direct or proxy. Required

@@ -864,7 +864,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "b0d64f25-3bca-4cc1-b8f3-6b391d88b442"
+        "uid": "a698987a-0cba-42a9-86aa-3ba65104ef72"
       },
       "description": "Trace of every deploy made on this machine. This is a good place to start when something goes wrong.",
       "gridPos": {
@@ -888,7 +888,7 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "b0d64f25-3bca-4cc1-b8f3-6b391d88b442"
+            "uid": "a698987a-0cba-42a9-86aa-3ba65104ef72"
           },
           "editorMode": "builder",
           "expr": "{filename=\"/var/log/deployment.log\"}",
@@ -916,6 +916,6 @@
   "timezone": "",
   "title": "GovTool basic stats",
   "uid": "e3697f62-6a01-4596-b626-d46141441b32",
-  "version": 44,
+  "version": 50,
   "weekStart": ""
 }

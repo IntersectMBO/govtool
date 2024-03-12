@@ -191,6 +191,25 @@ export const en = {
           url: "Invalid URL",
         },
       },
+      modals: {
+        externalDataDoesntMatch: {
+          title: "Your External Data Does Not Match the Original File.",
+          message:
+            "GovTool checks the URL you entered to see if the JSON file that you self-host matches the one that was generated in GovTool. To complete registration, this match must be exact.\n\nIn this case, there is a mismatch. You can go back to the data edit screen and try the process again.",
+          buttonText: "Go to Data Edit Screen",
+          cancelRegistrationText: "Cancel Registration",
+          feedbackText: "Feedback",
+        },
+        urlCannotBeFound: {
+          title: "The URL You Entered Cannot Be Found",
+          message:
+            "GovTool cannot find the URL that you entered. Please check it and re-enter.",
+          linkText: "Learn More about self-hosting",
+          buttonText: "Go to Data Edit Screen",
+          cancelRegistrationText: "Cancel Registration",
+          feedbackText: "Feedback",
+        },
+      },
     },
     delegation: {
       description:

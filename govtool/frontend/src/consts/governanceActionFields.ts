@@ -95,10 +95,15 @@ export const GOVERNANCE_ACTION_FIELDS: GovernanceActionFields = {
       placeholderI18nKey:
         "createGovernanceAction.fields.declarations.receivingAddress.placeholder",
       rules: {
-        validate: (value) => {
-          if (bech32.decode(value).words.length) {
-            return true;
-          } else {
+        validate: async (value) => {
+          try {
+            const decoded = await bech32.decode(value);
+            if (decoded.words.length) {
+              return true;
+            } else {
+              throw new Error();
+            }
+          } catch (error) {
             return I18n.t("createGovernanceAction.fields.validations.bech32");
           }
         },
@@ -114,13 +119,9 @@ export const GOVERNANCE_ACTION_FIELDS: GovernanceActionFields = {
           value: true,
           message: I18n.t("createGovernanceAction.fields.validations.required"),
         },
-        validate: (value) => {
-          if (Number.isInteger(Number(value))) {
-            return true;
-          } else {
-            return I18n.t("createGovernanceAction.fields.validations.number");
-          }
-        },
+        validate: (value) =>
+          Number.isInteger(Number(value)) ||
+          I18n.t("createGovernanceAction.fields.validations.number"),
       },
     },
   },

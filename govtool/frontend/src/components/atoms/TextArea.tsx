@@ -55,6 +55,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       <TextAreaBase
         style={{
           border: `1px solid ${errorMessage ? "red" : "#6F99FF"}`,
+          backgroundColor: errorMessage ? "#FAEAEB" : "white",
           borderRadius: "24px",
           height: isMobile ? "104px" : "128px",
           outline: "none",

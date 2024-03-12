@@ -40,4 +40,12 @@ declare global {
     title: string;
     actions: ActionType[];
   }[];
+
+  type NestedKeys<T> = T extends Record<string, any>
+    ? {
+        [K in keyof T]: T[K] extends Record<string, any>
+          ? `${string & K}.${NestedKeys<T[K]>}`
+          : string & K;
+      }[keyof T]
+    : never;
 }

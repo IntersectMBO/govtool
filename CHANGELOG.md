@@ -9,23 +9,27 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
+
 - Create GA review subbmision page [Issue 362](https://github.com/IntersectMBO/govtool/issues/362)
 - Create GA creation form [Issue 360](https://github.com/IntersectMBO/govtool/issues/360)
 - Create TextArea [Issue 110](https://github.com/IntersectMBO/govtool/issues/110)
+- Choose GA type - GA Submiter [Issue 358](https://github.com/IntersectMBO/govtool/issues/358)
+
+- Add on-chain inputs validation [Issue 377](https://github.com/IntersectMBO/govtool/issues/377)
+
+### Added
+
+- Added `isRegisteredAsSoleVoter` and `wasRegisteredAsSoleVoter` fields to the drep/info response [Issue 212](https://github.com/IntersectMBO/govtool/issues/212)
 - Abandoning registration as DRep [Issue 151](https://github.com/IntersectMBO/govtool/issues/151)
 - Abandoning GA creation [Issue 359](https://github.com/IntersectMBO/govtool/issues/359)
-- Choose GA type - GA Submiter [Issue 358](https://github.com/IntersectMBO/govtool/issues/358)
-- Change step 3 components [Issue 152](https://github.com/intersectMBO/govtool/issues/152)
-- Add possibility to vote on behalf of myself - Sole Voter [Issue 119](https://github.com/IntersectMBO/govtool/issues/119)
 - Create DRep registration page about roles [Issue 205](https://github.com/IntersectMBO/govtool/issues/205)
 - Create Checkbox component. Improve Field and ControlledField [Issue 177](https://github.com/IntersectMBO/govtool/pull/177)
 - Vitest unit tests added for utils functions [Issue 81](https://github.com/IntersectMBO/govtool/issues/81)
 - i18next library added to FE [Issue 80](https://github.com/IntersectMBO/govtool/issues/80)
-
-### Added
-- Added `isRegisteredAsSoleVoter` and `wasRegisteredAsSoleVoter` fields to the drep/info response [Issue 212](https://github.com/IntersectMBO/govtool/issues/212)
+- Add possibility to vote on behalf of myself - Sole Voter [Issue 119](https://github.com/IntersectMBO/govtool/issues/119)
 
 ### Fixed
+
 - Fix drep type detection when changing metadata [Issue 333](https://github.com/IntersectMBO/govtool/issues/333)
 - Fix make button disble when wallet tries connect [Issue 265](https://github.com/IntersectMBO/govtool/issues/265)
 - Fix drep voting power calculation [Issue 231](https://github.com/IntersectMBO/govtool/issues/231)
@@ -58,6 +62,7 @@ changes.
 - Added a grafana panel to track all the deploys on the target machines [Issue 361](https://github.com/IntersectMBO/govtool/issues/361).
 
 ### Removed
+
 -
 
 ## [sancho-v1.0.0](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.0) 2023-12-17

@@ -1,4 +1,4 @@
-export * from "./governanceActionTypes";
+export * from "./governanceActionFields";
 export * from "./governanceActionsFilters";
 export * from "./governanceActionsSorting";
 export * from "./icons";

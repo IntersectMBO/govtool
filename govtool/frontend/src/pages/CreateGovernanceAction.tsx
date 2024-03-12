@@ -25,14 +25,14 @@ import {
 import { checkIsWalletConnected } from "@utils";
 
 export const CreateGovernanceAction = () => {
+  const [step, setStep] = useState(1);
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
   const { closeModal, openModal } = useModal();
-  const [step, setStep] = useState(1);
 
   const methods = useForm({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: defaulCreateGovernanceActionValues,
   });
 

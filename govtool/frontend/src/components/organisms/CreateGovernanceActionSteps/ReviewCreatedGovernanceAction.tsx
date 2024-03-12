@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
 import { Box } from "@mui/material";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
 
@@ -12,7 +11,8 @@ import {
 import { LinkWithIcon } from "@molecules";
 import { openInNewTab } from "@utils";
 
-import { BgCard } from "./BgCard";
+import { BgCard } from "../BgCard";
+import { Dispatch, SetStateAction } from "react";
 
 type ReviewCreatedGovernanceActionProps = {
   setStep: Dispatch<SetStateAction<number>>;

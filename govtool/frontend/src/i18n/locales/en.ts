@@ -328,8 +328,9 @@ export const en = {
       },
       createGovernanceAction: {
         cancelModalDescription:
-          "If you return to the Dashboard, your information will not be saved.",
-        cancelModalTitle: "Do You Want to Cancel Registration ?",
+          "Returning to the Dashboard will cancel your submission and your proposed Governance Action will not be submitted.",
+        cancelModalTitle:
+          "Do you want to Cancel your Governance Action submission?",
       },
       delegation: {
         message:

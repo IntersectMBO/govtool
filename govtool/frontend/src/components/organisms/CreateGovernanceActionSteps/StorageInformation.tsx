@@ -3,6 +3,7 @@ import { Box } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import { Button, Spacer, Typography } from "@atoms";
+import { ICONS } from "@consts";
 import { useCreateGovernanceActionForm, useTranslation } from "@hooks";
 import { Step } from "@molecules";
 import { BgCard, ControlledField } from "@organisms";
@@ -64,11 +65,11 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
       </Typography>
       <Box sx={{ my: 4 }}>
         <Step
-          // TODO: add onClick action when available
           component={
             <Button
               onClick={onClickDownloadJson}
               size="extraLarge"
+              startIcon={<img src={ICONS.download} />}
               sx={{ width: "fit-content" }}
             >
               {`${fileName}.jsonld`}

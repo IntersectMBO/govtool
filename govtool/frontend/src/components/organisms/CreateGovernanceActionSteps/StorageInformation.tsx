@@ -38,9 +38,9 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
 
   const onClickBack = useCallback(() => setStep(5), []);
 
-  const onClickDownloadJson = () => {
+  const onClickDownloadJson = async () => {
     const data = getValues();
-    const jsonBody = generateJsonBody(data);
+    const jsonBody = await generateJsonBody(data);
     downloadJson(jsonBody, fileName);
     setIsJsonDownloaded(true);
   };

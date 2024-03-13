@@ -110,17 +110,17 @@ export const GOVERNANCE_ACTION_FIELDS: GovernanceActionFields = {
       placeholderI18nKey:
         "createGovernanceAction.fields.declarations.amount.placeholder",
       rules: {
-        // required: {
-        // value: true,
-        // message: I18n.t("createGovernanceAction.fields.validations.required"),
-        // },
-        // validate: (value) => {
-        // if (Number.isInteger(Number(value))) {
-        // return true;
-        // } else {
-        // return I18n.t("createGovernanceAction.fields.validations.number");
-        // }
-        // },
+        required: {
+          value: true,
+          message: I18n.t("createGovernanceAction.fields.validations.required"),
+        },
+        validate: (value) => {
+          if (Number.isInteger(Number(value))) {
+            return true;
+          } else {
+            return I18n.t("createGovernanceAction.fields.validations.number");
+          }
+        },
       },
     },
   },

@@ -7,6 +7,10 @@ export const en = {
           "Your voting power has been successfully delegated! Please refresh the page.",
         success: "Your voting power has been successfully delegated!",
       },
+      govAction: {
+        failed: "Creating Governance Action transaction failed",
+        success: "Your Governance Action has been submitted",
+      },
       metadataUpdate: {
         failed: "Update DRep metadata transaction failed",
         success: "You have successfully updated DRep metadata!",

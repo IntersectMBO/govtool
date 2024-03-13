@@ -17,7 +17,7 @@ docker_compose_file := $(target_config_dir)/docker-compose.yml
 cardano_config_provider := https://book.world.dev.cardano.org
 
 .PHONY: prepare-config
-prepare-config: clear generate-docker-compose-file enable-prometheus prepare-dbsync-secrets prepare-backend-config prepare-grafana-provisioning $(target_config_dir)/nginx/auth.conf
+prepare-config: clear generate-docker-compose-file enable-prometheus prepare-dbsync-secrets prepare-backend-config prepare-grafana-provisioning $(target_config_dir)/loki.yml $(target_config_dir)/nginx/auth.conf
 
 .PHONY: clear
 clear:
@@ -72,12 +72,11 @@ prepare-prometheus-config: $(target_config_dir)
 prepare-promtail-config: $(target_config_dir)
 	cp -a "$(template_config_dir)/promtail.yml" "$(target_config_dir)/promtail.yml"
 
-.PHONY: prepare-loki-config
-prepare-loki-config: $(target_config_dir)
-	cp -a "$(template_config_dir)/loki.yml" "$(target_config_dir)/loki.yml"
+$(target_config_dir)/loki.yml: $(target_config_dir)
+	cp -a "$(template_config_dir)/loki.yml" $@
 
 .PHONY: prepare-grafana-provisioning
-prepare-grafana-provisioning: prepare-prometheus-config prepare-loki-config prepare-promtail-config $(target_config_dir)/grafana-provisioning
+prepare-grafana-provisioning: prepare-prometheus-config prepare-promtail-config $(target_config_dir)/grafana-provisioning
 	cp -a $(template_config_dir)/grafana-provisioning/* $(target_config_dir)/grafana-provisioning
 	sed -e "s|<GRAFANA_SLACK_RECIPIENT>|$${GRAFANA_SLACK_RECIPIENT}|" \
 		-e "s|<GRAFANA_SLACK_OAUTH_TOKEN>|$${GRAFANA_SLACK_OAUTH_TOKEN}|" \

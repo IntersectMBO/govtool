@@ -77,7 +77,7 @@ export const useCreateGovernanceActionForm = () => {
       GOVERNANCE_ACTION_CONTEXTS[govActionType as GovernanceActionType]
     );
 
-    return JSON.stringify(json);
+    return json;
   };
 
   const onSubmit = useCallback(async (data: CreateGovernanceActionValues) => {

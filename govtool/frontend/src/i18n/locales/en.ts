@@ -209,6 +209,11 @@ export const en = {
           cancelRegistrationText: "Cancel Registration",
           feedbackText: "Feedback",
         },
+        submitTransactionSuccess: {
+          title: "Governance Action submitted!",
+          message:
+            "Your Governance Action may take a little time to submit to the chain.",
+        },
       },
     },
     delegation: {

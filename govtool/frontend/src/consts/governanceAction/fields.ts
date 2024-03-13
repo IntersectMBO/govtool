@@ -127,7 +127,7 @@ export const GOVERNANCE_ACTION_FIELDS: GovernanceActionFields = {
   },
 } as const;
 
-const commonContext = {
+export const GOVERNANCE_ACTION_CONTEXT = {
   "@language": "en-us",
   CIP100:
     "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#",
@@ -172,21 +172,6 @@ const commonContext = {
           publicKey: "CIP100:publicKey",
           signature: "CIP100:signature",
         },
-      },
-    },
-  },
-};
-
-export const GOVERNANCE_ACTION_CONTEXTS = {
-  [GovernanceActionType.Info]: commonContext,
-  [GovernanceActionType.Treasury]: {
-    ...commonContext,
-    body: {
-      ...commonContext.body,
-      "@context": {
-        ...commonContext.body["@context"],
-        amount: "CIP108:amount",
-        receivingAddress: "CIP108:receivingAddress",
       },
     },
   },

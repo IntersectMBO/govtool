@@ -132,11 +132,13 @@ interface CardanoContext {
   buildSignSubmitConwayCertTx: ({
     certBuilder,
     votingBuilder,
+    govActionBuilder,
     type,
     registrationType,
   }: {
     certBuilder?: CertificatesBuilder;
     votingBuilder?: VotingBuilder;
+    govActionBuilder?: VotingProposalBuilder;
     type?: "delegation" | "registration" | "soleVoterRegistration" | "vote";
     proposalId?: string;
     registrationType?: DRepActionType;
@@ -823,12 +825,14 @@ function CardanoProvider(props: Props) {
     async ({
       certBuilder,
       votingBuilder,
+      govActionBuilder,
       type,
       proposalId,
       registrationType,
     }: {
       certBuilder?: CertificatesBuilder;
       votingBuilder?: VotingBuilder;
+      govActionBuilder?: VotingProposalBuilder;
       type?: "delegation" | "registration" | "soleVoterRegistration" | "vote";
       proposalId?: string;
       registrationType?: DRepActionType;
@@ -852,6 +856,10 @@ function CardanoProvider(props: Props) {
 
         if (votingBuilder) {
           txBuilder.set_voting_builder(votingBuilder);
+        }
+
+        if (govActionBuilder) {
+          txBuilder.set_voting_proposal_builder(govActionBuilder);
         }
 
         if (

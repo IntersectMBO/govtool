@@ -5,13 +5,7 @@ import { API } from "@/services";
 
 import { canonizeJSON } from "./canonizeJSON";
 import { URL_REGEX } from ".";
-
-export enum MetadataHashValidationErrors {
-  INVALID_URL = "Invalid URL",
-  INVALID_JSON = "Invalid JSON",
-  INVALID_HASH = "Invalid hash",
-  FETCH_ERROR = "Error fetching data",
-}
+import { MetadataHashValidationErrors } from "@/consts";
 
 /**
  * Validates the metadata hash by fetching the metadata from the given URL,

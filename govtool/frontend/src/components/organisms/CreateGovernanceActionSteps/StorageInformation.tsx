@@ -1,95 +1,29 @@
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Dispatch, SetStateAction, useCallback } from "react";
 import { Box } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import { Button, Spacer, Typography } from "@atoms";
-import { ICONS, PATHS } from "@consts";
+import { ICONS } from "@consts";
 import { useCreateGovernanceActionForm, useTranslation } from "@hooks";
 import { Step } from "@molecules";
-import { BgCard, ControlledField, StatusModalState } from "@organisms";
-import {
-  URL_REGEX,
-  downloadJson,
-  openInNewTab,
-  validateMetadataHash,
-  MetadataHashValidationErrors,
-} from "@utils";
-import { ModalState, useModal } from "@/context";
-import I18n from "@/i18n";
+import { BgCard, ControlledField } from "@organisms";
+import { URL_REGEX, openInNewTab } from "@utils";
 
 type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
 };
 
-const externalDataDoesntMatchModal = {
-  type: "statusModal",
-  state: {
-    status: "warning",
-    title: I18n.t(
-      "createGovernanceAction.modals.externalDataDoesntMatch.title"
-    ),
-    message: I18n.t(
-      "createGovernanceAction.modals.externalDataDoesntMatch.message"
-    ),
-    buttonText: I18n.t(
-      "createGovernanceAction.modals.externalDataDoesntMatch.buttonText"
-    ),
-    cancelText: I18n.t(
-      "createGovernanceAction.modals.externalDataDoesntMatch.cancelRegistrationText"
-    ),
-    feedbackText: I18n.t(
-      "createGovernanceAction.modals.externalDataDoesntMatch.feedbackText"
-    ),
-  },
-} as const;
-
-const urlCannotBeFound = {
-  type: "statusModal",
-  state: {
-    status: "warning",
-    title: I18n.t("createGovernanceAction.modals.urlCannotBeFound.title"),
-    message: I18n.t("createGovernanceAction.modals.urlCannotBeFound.message"),
-    link: "https://docs.sanchogov.tools",
-    linkText: I18n.t("createGovernanceAction.modals.urlCannotBeFound.linkText"),
-    buttonText: I18n.t(
-      "createGovernanceAction.modals.urlCannotBeFound.buttonText"
-    ),
-    cancelText: I18n.t(
-      "createGovernanceAction.modals.urlCannotBeFound.cancelRegistrationText"
-    ),
-    feedbackText: I18n.t(
-      "createGovernanceAction.modals.urlCannotBeFound.feedbackText"
-    ),
-  },
-} as const;
-
-const storageInformationErrorModals: Record<
-  MetadataHashValidationErrors,
-  ModalState<
-    | (typeof externalDataDoesntMatchModal)["state"]
-    | (typeof urlCannotBeFound)["state"]
-  >
-> = {
-  [MetadataHashValidationErrors.INVALID_URL]: urlCannotBeFound,
-  [MetadataHashValidationErrors.FETCH_ERROR]: urlCannotBeFound,
-  [MetadataHashValidationErrors.INVALID_JSON]: externalDataDoesntMatchModal,
-  [MetadataHashValidationErrors.INVALID_HASH]: externalDataDoesntMatchModal,
-};
-
 export const StorageInformation = ({ setStep }: StorageInformationProps) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const {
     control,
     errors,
     createGovernanceAction,
-    generateJsonBody,
     getValues,
     watch,
-  } = useCreateGovernanceActionForm();
-  const { openModal, closeModal } = useModal();
-  const [isJsonDownloaded, setIsJsonDownloaded] = useState<boolean>(false);
+    onClickDownloadJson,
+    isLoading,
+  } = useCreateGovernanceActionForm(setStep);
 
   // TODO: change on correct file name
   const fileName = getValues("governance_action_type");
@@ -100,53 +34,18 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
     []
   );
 
-  const isActionButtonDisabled = !watch("storingURL") || !isJsonDownloaded;
+  const isActionButtonDisabled = !watch("storingURL");
 
   const onClickBack = useCallback(() => setStep(5), []);
-
-  const onClickDownloadJson = async () => {
-    const data = getValues();
-    const jsonBody = await generateJsonBody(data);
-    downloadJson(jsonBody, fileName);
-    setIsJsonDownloaded(true);
-  };
-
-  const backToDashboard = () => {
-    navigate(PATHS.dashboard);
-    closeModal();
-  };
-
-  const handleStoringURLJSONValidation = useCallback(async () => {
-    const storingURL = getValues("storingURL");
-    try {
-      await createGovernanceAction();
-
-      // TODO: To be replaced wtih the correct hash
-      await validateMetadataHash(storingURL, "hash");
-    } catch (error: any) {
-      if (Object.values(MetadataHashValidationErrors).includes(error.message)) {
-        openModal({
-          ...storageInformationErrorModals[
-            error.message as MetadataHashValidationErrors
-          ],
-          onSubmit: () => {
-            setStep(3);
-          },
-          onCancel: backToDashboard,
-          // TODO: Open usersnap feedback
-          onFeedback: backToDashboard,
-        } as ModalState<StatusModalState>);
-      }
-    }
-  }, [getValues, generateJsonBody]);
 
   return (
     <BgCard
       actionButtonLabel={t("continue")}
       backButtonLabel={t("back")}
       isActionButtonDisabled={isActionButtonDisabled}
-      onClickActionButton={handleStoringURLJSONValidation}
+      onClickActionButton={createGovernanceAction}
       onClickBackButton={onClickBack}
+      isLoadingActionButton={isLoading}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("createGovernanceAction.storingInformationTitle")}

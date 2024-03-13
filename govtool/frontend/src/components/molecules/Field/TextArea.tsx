@@ -75,7 +75,12 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
             {label}
           </Typography>
         )}
-        <TextAreaBase maxLength={maxLength} {...props} ref={textAreaRef} />
+        <TextAreaBase
+          errorMessage={errorMessage}
+          maxLength={maxLength}
+          {...props}
+          ref={textAreaRef}
+        />
         <FormHelpfulText
           helpfulText={helpfulText}
           helpfulTextStyle={helpfulTextStyle}
@@ -86,7 +91,11 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
         />
         <Typography
           color="#8E908E"
-          sx={{ bottom: 35, position: "absolute", right: 15 }}
+          sx={{
+            bottom: errorMessage ? 52.5 : 35,
+            position: "absolute",
+            right: 15,
+          }}
           variant="caption"
         >
           {props?.value?.toString()?.length ?? 0}/{maxLength}

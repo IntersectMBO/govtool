@@ -10,8 +10,6 @@ import {
 } from "react";
 import {
   Address,
-  Anchor,
-  AnchorDataHash,
   BigNum,
   Certificate,
   CertificatesBuilder,
@@ -33,13 +31,18 @@ import {
   TransactionUnspentOutput,
   TransactionUnspentOutputs,
   TransactionWitnessSet,
-  URL,
   Value,
   VoteDelegation,
   Voter,
   VotingBuilder,
   VotingProcedure,
   StakeRegistration,
+  VotingProposalBuilder,
+  InfoAction,
+  VotingProposal,
+  GovernanceAction,
+  TreasuryWithdrawals,
+  TreasuryWithdrawalsAction,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 import { Buffer } from "buffer";
 import { useNavigate } from "react-router-dom";
@@ -53,20 +56,21 @@ import { PATHS } from "@consts";
 import { CardanoApiWallet, VoterInfo, Protocol } from "@models";
 import type { StatusModalState } from "@organisms";
 import {
-  getPubDRepID,
-  WALLET_LS_KEY,
-  DELEGATE_TRANSACTION_KEY,
-  REGISTER_TRANSACTION_KEY,
-  DELEGATE_TO_KEY,
-  PROTOCOL_PARAMS_KEY,
-  getItemFromLocalStorage,
-  setItemToLocalStorage,
-  removeItemFromLocalStorage,
-  openInNewTab,
-  SANCHO_INFO_KEY,
-  VOTE_TRANSACTION_KEY,
   checkIsMaintenanceOn,
+  DELEGATE_TO_KEY,
+  DELEGATE_TRANSACTION_KEY,
+  generateAnchor,
+  getItemFromLocalStorage,
+  getPubDRepID,
+  openInNewTab,
+  PROTOCOL_PARAMS_KEY,
   REGISTER_SOLE_VOTER_TRANSACTION_KEY,
+  REGISTER_TRANSACTION_KEY,
+  removeItemFromLocalStorage,
+  SANCHO_INFO_KEY,
+  setItemToLocalStorage,
+  VOTE_TRANSACTION_KEY,
+  WALLET_LS_KEY,
 } from "@utils";
 import { getEpochParams, getTransactionStatus } from "@services";
 import {
@@ -93,6 +97,18 @@ type TransactionHistoryItem = {
 };
 
 export type DRepActionType = "retirement" | "registration" | "update" | "";
+
+type InfoProps = {
+  hash: string;
+  url: string;
+};
+
+type TreasuryProps = {
+  amount: string;
+  hash: string;
+  receivingAddress: string;
+  url: string;
+};
 
 interface CardanoContext {
   address?: string;
@@ -152,6 +168,12 @@ interface CardanoContext {
   isPendingTransaction: () => boolean;
   isDrepLoading: boolean;
   setIsDrepLoading: Dispatch<SetStateAction<boolean>>;
+  buildNewInfoGovernanceAction: (
+    infoProps: InfoProps
+  ) => Promise<VotingProposalBuilder | undefined>;
+  buildTreasuryGovernanceAction: (
+    treasuryProps: TreasuryProps
+  ) => Promise<VotingProposalBuilder | undefined>;
 }
 
 type Utxos = {
@@ -212,9 +234,9 @@ function CardanoProvider(props: Props) {
     { proposalId: string } & TransactionHistoryItem
   >({ time: undefined, transactionHash: "", proposalId: "" });
   const [isDrepLoading, setIsDrepLoading] = useState<boolean>(true);
-
   const { addSuccessAlert, addWarningAlert, addErrorAlert } = useSnackbar();
   const { t } = useTranslation();
+  const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
   const isPendingTransaction = useCallback(() => {
     if (
@@ -1061,7 +1083,6 @@ function CardanoProvider(props: Props) {
       cip95MetadataHash?: string
     ): Promise<CertificatesBuilder> => {
       try {
-        const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
         // Build DRep Registration Certificate
         const certBuilder = CertificatesBuilder.new();
 
@@ -1072,9 +1093,7 @@ function CardanoProvider(props: Props) {
         let dRepRegCert;
         // If there is an anchor
         if (cip95MetadataURL && cip95MetadataHash) {
-          const url = URL.new(cip95MetadataURL);
-          const hash = AnchorDataHash.from_hex(cip95MetadataHash);
-          const anchor = Anchor.new(url, hash);
+          const anchor = generateAnchor(cip95MetadataURL, cip95MetadataHash);
           // Create cert object using one Ada as the deposit
           dRepRegCert = DrepRegistration.new_with_anchor(
             dRepCred,
@@ -1097,7 +1116,7 @@ function CardanoProvider(props: Props) {
         throw e;
       }
     },
-    [dRepID]
+    [epochParams, dRepID]
   );
 
   // conway alpha
@@ -1117,9 +1136,7 @@ function CardanoProvider(props: Props) {
         let dRepUpdateCert;
         // If there is an anchor
         if (cip95MetadataURL && cip95MetadataHash) {
-          const url = URL.new(cip95MetadataURL);
-          const hash = AnchorDataHash.from_hex(cip95MetadataHash);
-          const anchor = Anchor.new(url, hash);
+          const anchor = generateAnchor(cip95MetadataURL, cip95MetadataHash);
           // Create cert object using one Ada as the deposit
           dRepUpdateCert = DrepUpdate.new_with_anchor(dRepCred, anchor);
         } else {
@@ -1193,9 +1210,7 @@ function CardanoProvider(props: Props) {
 
         let votingProcedure;
         if (cip95MetadataURL && cip95MetadataHash) {
-          const url = URL.new(cip95MetadataURL);
-          const hash = AnchorDataHash.from_hex(cip95MetadataHash);
-          const anchor = Anchor.new(url, hash);
+          const anchor = generateAnchor(cip95MetadataURL, cip95MetadataHash);
           // Create cert object using one Ada as the deposit
           votingProcedure = VotingProcedure.new_with_anchor(
             votingChoice,
@@ -1218,74 +1233,163 @@ function CardanoProvider(props: Props) {
     [dRepID]
   );
 
+  const getRewardAddress = useCallback(async () => {
+    const addresses = await walletApi?.getRewardAddresses();
+    if (!addresses) {
+      throw new Error("Can not get reward addresses from wallet.");
+    }
+    const firstAddress = addresses[0];
+    const bech32Address = Address.from_bytes(
+      Buffer.from(firstAddress, "hex")
+    ).to_bech32();
+
+    return RewardAddress.from_address(Address.from_bech32(bech32Address));
+  }, [walletApi]);
+
+  // info action
+  const buildNewInfoGovernanceAction = useCallback(
+    async ({ hash, url }: InfoProps) => {
+      let govActionBuilder = VotingProposalBuilder.new();
+      try {
+        // Create new info action
+        const infoAction = InfoAction.new();
+        const infoGovAct = GovernanceAction.new_info_action(infoAction);
+        // Create an anchor
+        const anchor = generateAnchor(url, hash);
+
+        const rewardAddr = await getRewardAddress();
+        if (!rewardAddr) throw new Error("Can not get reward address");
+
+        // Create voting proposal
+        const votingProposal = VotingProposal.new(
+          infoGovAct,
+          anchor,
+          rewardAddr,
+          BigNum.from_str(epochParams.gov_action_deposit.toString())
+        );
+        govActionBuilder.add(votingProposal);
+
+        return govActionBuilder;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [epochParams, getRewardAddress]
+  );
+
+  // treasury action
+  const buildTreasuryGovernanceAction = useCallback(
+    async ({ amount, hash, receivingAddress, url }: TreasuryProps) => {
+      const govActionBuilder = VotingProposalBuilder.new();
+      try {
+        const treasuryTarget = RewardAddress.from_address(
+          Address.from_bech32(receivingAddress)
+        );
+
+        if (!treasuryTarget) throw new Error("Can not get tresasury target");
+
+        const myWithdrawal = BigNum.from_str(amount);
+        const withdrawals = TreasuryWithdrawals.new();
+        withdrawals.insert(treasuryTarget, myWithdrawal);
+        // Create new treasury withdrawal gov act
+        const treasuryAction = TreasuryWithdrawalsAction.new(withdrawals);
+        const treasuryGovAct =
+          GovernanceAction.new_treasury_withdrawals_action(treasuryAction);
+        // Create an anchor
+        const anchor = generateAnchor(url, hash);
+
+        const rewardAddr = await getRewardAddress();
+
+        if (!rewardAddr) throw new Error("Can not get reward address");
+        // Create voting proposal
+        const votingProposal = VotingProposal.new(
+          treasuryGovAct,
+          anchor,
+          rewardAddr,
+          BigNum.from_str(epochParams.gov_action_deposit.toString())
+        );
+        govActionBuilder.add(votingProposal);
+
+        return govActionBuilder;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [epochParams, getRewardAddress]
+  );
+
   const value = useMemo(
     () => ({
       address,
-      enable,
-      voter,
-      isEnabled,
-      isMainnet,
+      buildDRepRegCert,
+      buildDRepRetirementCert,
+      buildDRepUpdateCert,
+      buildNewInfoGovernanceAction,
+      buildSignSubmitConwayCertTx,
+      buildTreasuryGovernanceAction,
+      buildVote,
+      buildVoteDelegationCert,
+      delegatedDRepID,
+      delegateTo,
+      delegateTransaction,
       disconnectWallet,
       dRepID,
       dRepIDBech32,
-      pubDRepKey,
-      stakeKey,
-      setVoter,
-      setStakeKey,
-      stakeKeys,
-      walletApi,
+      enable,
       error,
-      delegatedDRepID,
-      setDelegatedDRepID,
-      buildSignSubmitConwayCertTx,
-      buildDRepRegCert,
-      buildDRepUpdateCert,
-      buildDRepRetirementCert,
-      buildVote,
-      buildVoteDelegationCert,
-      delegateTransaction,
-      registerTransaction,
-      soleVoterTransaction,
-      delegateTo,
-      voteTransaction,
-      isPendingTransaction,
       isDrepLoading,
-      setIsDrepLoading,
+      isEnabled,
       isEnableLoading,
+      isMainnet,
+      isPendingTransaction,
+      pubDRepKey,
+      registerTransaction,
+      setDelegatedDRepID,
+      setIsDrepLoading,
+      setStakeKey,
+      setVoter,
+      soleVoterTransaction,
+      stakeKey,
+      stakeKeys,
+      voter,
+      voteTransaction,
+      walletApi,
     }),
     [
       address,
-      enable,
-      voter,
-      isEnabled,
-      isMainnet,
+      buildDRepRegCert,
+      buildDRepRetirementCert,
+      buildDRepUpdateCert,
+      buildNewInfoGovernanceAction,
+      buildSignSubmitConwayCertTx,
+      buildTreasuryGovernanceAction,
+      buildVote,
+      buildVoteDelegationCert,
+      delegatedDRepID,
+      delegateTo,
+      delegateTransaction,
       disconnectWallet,
       dRepID,
       dRepIDBech32,
-      pubDRepKey,
-      stakeKey,
-      setVoter,
-      setStakeKey,
-      stakeKeys,
-      walletApi,
+      enable,
       error,
-      delegatedDRepID,
-      setDelegatedDRepID,
-      buildSignSubmitConwayCertTx,
-      buildDRepRegCert,
-      buildDRepUpdateCert,
-      buildDRepRetirementCert,
-      buildVote,
-      buildVoteDelegationCert,
-      delegateTransaction,
-      registerTransaction,
-      soleVoterTransaction,
-      delegateTo,
-      voteTransaction,
-      isPendingTransaction,
       isDrepLoading,
-      setIsDrepLoading,
+      isEnabled,
       isEnableLoading,
+      isMainnet,
+      isPendingTransaction,
+      pubDRepKey,
+      registerTransaction,
+      setDelegatedDRepID,
+      setIsDrepLoading,
+      setStakeKey,
+      setVoter,
+      soleVoterTransaction,
+      stakeKey,
+      stakeKeys,
+      voter,
+      voteTransaction,
+      walletApi,
     ]
   );
 

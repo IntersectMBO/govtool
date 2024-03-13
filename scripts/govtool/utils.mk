@@ -3,8 +3,8 @@ ssh:
 	export TERM=xterm-256color; \
 	ssh $(ssh_url)
 
-.PHONY: docker
-docker:
+.PHONY: docker-compose
+docker-compose:
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	@:$(call check_defined, cmd)

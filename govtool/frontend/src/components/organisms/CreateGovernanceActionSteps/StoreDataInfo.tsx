@@ -10,11 +10,11 @@ import {
 import { BgCard, ControlledField } from "@organisms";
 import { openInNewTab } from "@utils";
 
-export const StoreDataInfo = ({
-  setStep,
-}: {
+type StoreDataInfoProps = {
   setStep: Dispatch<SetStateAction<number>>;
-}) => {
+};
+
+export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
   const { t } = useTranslation();
   const { control, errors, watch } = useCreateGovernanceActionForm();
   const { isMobile } = useScreenDimension();

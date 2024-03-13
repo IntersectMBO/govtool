@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback } from "react";
+import { useCallback, Dispatch, SetStateAction } from "react";
 import { Trans } from "react-i18next";
 
 import { Typography } from "@atoms";
@@ -9,7 +9,7 @@ import {
   PROTOCOL_PARAMS_KEY,
 } from "@utils";
 
-import { BgCard } from ".";
+import { BgCard } from "..";
 
 type WhatGovernanceActionIsAboutProps = {
   onClickCancel: () => void;
@@ -17,8 +17,8 @@ type WhatGovernanceActionIsAboutProps = {
 };
 
 export const WhatGovernanceActionIsAbout = ({
-  setStep,
   onClickCancel,
+  setStep,
 }: WhatGovernanceActionIsAboutProps) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();

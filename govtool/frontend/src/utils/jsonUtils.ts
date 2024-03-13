@@ -1,8 +1,12 @@
-export const downloadJson = (json: string, fileName?: string) => {
-  const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(json)}`;
+import { NodeObject } from "jsonld";
+
+export const downloadJson = (json: NodeObject, fileName?: string) => {
+  const jsonString = `data:text/jsonld;chatset=utf-8,${encodeURIComponent(
+    JSON.stringify(json, null, 2)
+  )}`;
   const link = document.createElement("a");
   link.href = jsonString;
-  link.download = `${fileName ? fileName : "data"}.json`;
+  link.download = `${fileName ? fileName : "data"}.jsonld`;
 
   link.click();
 };

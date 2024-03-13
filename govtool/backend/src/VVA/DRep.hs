@@ -31,6 +31,8 @@ import VVA.Types
   , Proposal(..)
   , Vote(..)
   , DRepInfo(..)
+  , DRepType(..)
+  , DRepStatus(..)
   )
 
 
@@ -60,7 +62,17 @@ listDReps ::
   m [DRepRegistration]
 listDReps = withPool $ \conn -> do
   results <- liftIO $ SQL.query_ conn listDRepsSql
-  return [DRepRegistration drepHash url dataHash (floor @Scientific deposit) votingPower | (drepHash, url, dataHash, deposit, votingPower) <- results]
+  return
+    [ DRepRegistration drepHash drepView url dataHash (floor @Scientific deposit) votingPower status drepType
+    | (drepHash, drepView, url, dataHash, deposit, votingPower, isActive, wasDRep) <- results
+    , let status = case (isActive, deposit) of
+                      (_, d)        | d < 0 -> Retired
+                      (isActive, d) | d >= 0 && isActive -> Active
+                                    | d >= 0 && not isActive -> Inactive
+    , let drepType | url == Nothing && wasDRep = DRep
+                   | url == Nothing && not wasDRep = SoleVoter
+                   | url /= Nothing = DRep
+    ]
 
 getVotesSql :: SQL.Query
 getVotesSql = sqlFrom $(embedFile "sql/get-votes.sql")

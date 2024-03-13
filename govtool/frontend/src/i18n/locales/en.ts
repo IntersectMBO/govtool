@@ -153,6 +153,44 @@ export const en = {
       storingInformationURLPlaceholder: "URL",
       supportingLinks: "Supporting links",
       title: "Create a Governance Action",
+      fields: {
+        declarations: {
+          title: {
+            label: "Title",
+            placeholder: "A name for this Action",
+          },
+          abstract: {
+            label: "Abstract",
+            placeholder: "Summary",
+            tip: "General summary of the Action",
+          },
+          motivation: {
+            label: "Motivation",
+            placeholder: "Problem this GA will solve",
+            tip: "How will this solve a problem",
+          },
+          rationale: {
+            label: "Rationale",
+            placeholder: "Content of Governance Action",
+            tip: "Put all the content of the GA here",
+          },
+          receivingAddress: {
+            label: "Receiving Address",
+            placeholder: "The address to receive funds",
+          },
+          amount: {
+            label: "Amount",
+            placeholder: "e.g. 20000",
+          },
+        },
+        validations: {
+          maxLength: "Max {{maxLength}} characters",
+          required: "This field is required",
+          bech32: "Invalid bech32 address",
+          number: "Only number is allowed",
+          url: "Invalid URL",
+        },
+      },
     },
     delegation: {
       description:
@@ -328,8 +366,9 @@ export const en = {
       },
       createGovernanceAction: {
         cancelModalDescription:
-          "If you return to the Dashboard, your information will not be saved.",
-        cancelModalTitle: "Do You Want to Cancel Registration ?",
+          "Returning to the Dashboard will cancel your submission and your proposed Governance Action will not be submitted.",
+        cancelModalTitle:
+          "Do you want to Cancel your Governance Action submission?",
       },
       delegation: {
         message:

@@ -17,7 +17,7 @@ docker_compose_file := $(target_config_dir)/docker-compose.yml
 cardano_config_provider := https://book.world.dev.cardano.org
 
 .PHONY: prepare-config
-prepare-config: clear generate-docker-compose-file enable-prometheus prepare-dbsync-secrets prepare-backend-config prepare-grafana-provisioning prepare-nginx-config
+prepare-config: clear generate-docker-compose-file enable-prometheus prepare-dbsync-secrets prepare-backend-config prepare-grafana-provisioning $(target_config_dir)/nginx/auth.conf
 
 .PHONY: clear
 clear:
@@ -83,15 +83,21 @@ prepare-grafana-provisioning: prepare-prometheus-config prepare-loki-config prep
 		-e "s|<GRAFANA_SLACK_OAUTH_TOKEN>|$${GRAFANA_SLACK_OAUTH_TOKEN}|" \
 		-i $(target_config_dir)/grafana-provisioning/alerting/alerting.yml
 
-.PHONY: prepare-nginx-config
-prepare-nginx-config: $(target_config_dir)/nginx
+$(target_config_dir)/nginx/auth.conf: $(target_config_dir)/nginx $(target_config_dir)/nginx/govtool.htpasswd
 	@:$(call check_defined, domain)
-	touch "$(target_config_dir)/nginx/auth.conf"
-	touch "$(target_config_dir)/nginx/govtool.htpasswd"
 	if [[ "$(domain)" == *"sanchonet.govtool.byron.network"* ]]; then \
-	echo "$${NGINX_BASIC_AUTH}" > "$(target_config_dir)/nginx/govtool.htpasswd"; \
-	echo "auth_basic \"Restricted\";" > "$(target_config_dir)/nginx/auth.conf"; \
-	echo "auth_basic_user_file /etc/nginx/conf.d/govtool.htpasswd;" >> "$(target_config_dir)/nginx/auth.conf"; \
+	  echo "auth_basic \"Restricted\";" > $@; \
+	  echo "auth_basic_user_file /etc/nginx/conf.d/govtool.htpasswd;" >> $@; \
+	else \
+	  touch "$(target_config_dir)/nginx/auth.conf"; \
+	fi
+
+$(target_config_dir)/nginx/govtool.htpasswd: $(target_config_dir)/nginx
+	@:$(call check_defined, domain)
+	if [[ "$(domain)" == *"sanchonet.govtool.byron.network"* ]]; then \
+	  echo "$${NGINX_BASIC_AUTH}" > $@; \
+	else \
+	  touch $@; \
 	fi
 
 .PHONY: upload-config

@@ -166,7 +166,7 @@ export const useCreateGovernanceActionForm = (
               data.amount === undefined ||
               data.receivingAddress === undefined
             ) {
-              throw new Error("Invalid treasury governance action data");
+              throw new Error(t("errors.invalidTreasuryGovernanceActionType"));
             }
 
             const treasuryActionDetails = {
@@ -177,7 +177,7 @@ export const useCreateGovernanceActionForm = (
 
             return await buildTreasuryGovernanceAction(treasuryActionDetails);
           default:
-            throw new Error("Invalid governance action type");
+            throw new Error(t("errors.invalidGovernanceActionType"));
         }
       } catch (error: any) {
         console.error(error);

@@ -139,34 +139,16 @@ export const en = {
       creatingAGovernanceActionDescription:
         "To create a Governance Action, you will need to:\n\n• Fill out a form with the relevant data\n• Pay a refundable deposit of <strong>₳{{deposit}}</strong>\n• Store the metadata of your Governance Action at your own expense.\n\nYour deposit will be refunded to your wallet when the Governance Action is either enacted or expired.\n\nThe deposit will not affect your Voting Power.",
       editSubmission: "Edit submission",
-      formTitle: "Governance Action details",
-      references: "References and Supporting Information",
-      reviewSubmission: "Review your submission",
-      storeDataCheckboxLabel:
-        "I agree to store correctly this information and to maintain them over the years",
-      storeDataLink: "Learn more about storing information",
-      storeDataTitle: "Store and Maintain the Data Yourself",
-      storingInformationDescription:
-        "Download your file, save it to your chosen location, and enter the URL of that location in step 3",
-      storingInformationStep1Label: "Download this file",
-      storingInformationStep2Label:
-        "Save this file in a location that provides a public URL (ex. github)",
-      storingInformationStep2Link: "Read full guide",
-      storingInformationStep3Label: "Paste the URL here",
-      storingInformationTitle: "Information Storage Steps",
-      storingInformationURLPlaceholder: "URL",
-      supportingLinks: "Supporting links",
-      title: "Create a Governance Action",
       fields: {
         declarations: {
-          title: {
-            label: "Title",
-            placeholder: "A name for this Action",
-          },
           abstract: {
             label: "Abstract",
             placeholder: "Summary",
             tip: "General summary of the Action",
+          },
+          amount: {
+            label: "Amount",
+            placeholder: "e.g. 20000",
           },
           motivation: {
             label: "Motivation",
@@ -182,41 +164,59 @@ export const en = {
             label: "Receiving Address",
             placeholder: "The address to receive funds",
           },
-          amount: {
-            label: "Amount",
-            placeholder: "e.g. 20000",
+          title: {
+            label: "Title",
+            placeholder: "A name for this Action",
           },
         },
+        formTitle: "Governance Action details",
+        references: "References and Supporting Information",
+        reviewSubmission: "Review your submission",
+        storeDataCheckboxLabel:
+          "I agree to store correctly this information and to maintain them over the years",
+        storeDataLink: "Learn more about storing information",
+        storeDataTitle: "Store and Maintain the Data Yourself",
+        storingInformationDescription:
+          "Download your file, save it to your chosen location, and enter the URL of that location in step 3",
+        storingInformationStep1Label: "Download this file",
+        storingInformationStep2Label:
+          "Save this file in a location that provides a public URL (ex. github)",
+        storingInformationStep2Link: "Read full guide",
+        storingInformationStep3Label: "Paste the URL here",
+        storingInformationTitle: "Information Storage Steps",
+        storingInformationURLPlaceholder: "URL",
+        supportingLinks: "Supporting links",
+        title: "Create a Governance Action",
         validations: {
-          maxLength: "Max {{maxLength}} characters",
-          required: "This field is required",
           bech32: "Invalid bech32 address",
+          maxLength: "Max {{maxLength}} characters",
           number: "Only number is allowed",
+          required: "This field is required",
           url: "Invalid URL",
         },
       },
       modals: {
         externalDataDoesntMatch: {
-          title: "Your External Data Does Not Match the Original File.",
+          buttonText: "Go to Data Edit Screen",
+          cancelRegistrationText: "Cancel Registration",
+          feedbackText: "Feedback",
           message:
             "GovTool checks the URL you entered to see if the JSON file that you self-host matches the one that was generated in GovTool. To complete registration, this match must be exact.\n\nIn this case, there is a mismatch. You can go back to the data edit screen and try the process again.",
-          buttonText: "Go to Data Edit Screen",
-          cancelRegistrationText: "Cancel Registration",
-          feedbackText: "Feedback",
-        },
-        urlCannotBeFound: {
-          title: "The URL You Entered Cannot Be Found",
-          message:
-            "GovTool cannot find the URL that you entered. Please check it and re-enter.",
-          linkText: "Learn More about self-hosting",
-          buttonText: "Go to Data Edit Screen",
-          cancelRegistrationText: "Cancel Registration",
-          feedbackText: "Feedback",
+          title: "Your External Data Does Not Match the Original File.",
         },
         submitTransactionSuccess: {
-          title: "Governance Action submitted!",
           message:
             "Your Governance Action may take a little time to submit to the chain.",
+          title: "Governance Action submitted!",
+        },
+        urlCannotBeFound: {
+          buttonText: "Go to Data Edit Screen",
+          cancelRegistrationText: "Cancel Registration",
+          feedbackText: "Feedback",
+          linkText: "Learn More about self-hosting",
+          message:
+            "GovTool cannot find the URL that you entered. Please check it and re-enter.",
+          title: "The URL You Entered Cannot Be Found",
         },
       },
     },
@@ -260,14 +260,15 @@ export const en = {
       appCannotGetUtxos: "Application can not get utxos",
       checkIsWalletConnected: "Check if the wallet is connected.",
       dRepIdNotFound: "DrepId not found",
-      notUsingAnchor: "DRep Registration - not using anchor",
+      invalidGovernanceActionType: "Invalid Governance Action Type",
       noAddressesFound: "No addresses found",
       noStakeKeySelected: "No stake key selected",
+      notUsingAnchor: "DRep Registration - not using anchor",
       registeringStakeKey: "Registering stake key",
       somethingWentWrong: "Something went wrong",
-      useCardano: "useCardano must be used within a CardanoProvider",
       tryingConnectTo:
         "You are trying to connect with a wallet connected to {{networkFrom}}. Please adjust your wallet settings to connect to {{networkTo}} or select a different wallet.",
+      useCardano: "useCardano must be used within a CardanoProvider",
       walletNoCIP30Nor90Support:
         "Your wallet does not support the required CIP-30 extension, CIP-95.",
       walletNoCIP30Support: "Your wallet does not support CIP-30 extensions.",

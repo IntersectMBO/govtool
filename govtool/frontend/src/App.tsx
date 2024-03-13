@@ -32,6 +32,7 @@ import {
 import { SetupInterceptors } from "./services";
 import { useGetVoterInfo, useWalletConnectionListener } from "./hooks";
 import { RegisterAsSoleVoter } from "./pages/RegisterAsSoleVoter";
+import { CreateGovernanceAction } from "./pages/CreateGovernanceAction";
 
 export default function App() {
   const { enable, setVoter, setIsDrepLoading } = useCardano();
@@ -56,8 +57,8 @@ export default function App() {
   const checkTheWalletIsActive = useCallback(() => {
     const hrefCondition =
       window.location.pathname === PATHS.home ||
-      window.location.pathname === PATHS.governance_actions ||
-      window.location.pathname === PATHS.governance_actions_action;
+      window.location.pathname === PATHS.governanceActions ||
+      window.location.pathname === PATHS.governanceActionsAction;
 
     const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
     if (window.cardano) {
@@ -89,32 +90,36 @@ export default function App() {
       <Routes>
         <Route path={PATHS.home} element={<Home />} />
         <Route
-          path={PATHS.governance_actions}
+          path={PATHS.governanceActions}
           element={<GovernanceActions />}
         ></Route>
         <Route
-          path={PATHS.governance_actions_category}
+          path={PATHS.governanceActionsCategory}
           element={<GovernanceActionsCategory />}
         />
         <Route
-          path={PATHS.governance_actions_action}
+          path={PATHS.governanceActionsAction}
           element={<GovernanceActionDetails />}
         />
         <Route element={<Dashboard />}>
           <Route path={PATHS.dashboard} element={<DashboardCards />} />
           <Route
-            path={PATHS.dashboard_governance_actions}
+            path={PATHS.dashboardGovernanceActions}
             element={<DashboardGovernanceActions />}
           />
           <Route
-            path={PATHS.dashboard_governance_actions_action}
+            path={PATHS.dashboardGovernanceActionsAction}
             element={<DashboardGovernanceActionDetails />}
           />
           <Route
-            path={PATHS.dashboard_governance_actions_category}
+            path={PATHS.dashboardGovernanceActionsCategory}
             element={<DashboardGovernanceActionsCategory />}
           />
         </Route>
+        <Route
+          path={PATHS.createGovernanceAction}
+          element={<CreateGovernanceAction />}
+        />
         <Route path={PATHS.delegateTodRep} element={<DelegateTodRep />} />
         <Route path={PATHS.registerAsdRep} element={<RegisterAsdRep />} />
         <Route

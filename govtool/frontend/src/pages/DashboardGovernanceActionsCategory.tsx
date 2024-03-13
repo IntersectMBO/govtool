@@ -69,7 +69,7 @@ export const DashboardGovernanceActionsCategory = () => {
     <NavLink
       key="1"
       style={{ textDecorationColor: "#0033AD" }}
-      to={PATHS.dashboard_governance_actions}
+      to={PATHS.dashboardGovernanceActions}
     >
       <Typography color="primary" fontWeight={300} fontSize={12}>
         {t("govActions.title")}
@@ -127,7 +127,7 @@ export const DashboardGovernanceActionsCategory = () => {
                 textDecoration: "none",
                 marginBottom: 3,
               }}
-              onClick={() => navigate(PATHS.dashboard_governance_actions)}
+              onClick={() => navigate(PATHS.dashboardGovernanceActions)}
             >
               <img
                 src={ICONS.arrowRightIcon}
@@ -195,7 +195,7 @@ export const DashboardGovernanceActionsCategory = () => {
                             )
                           : navigate(
                               generatePath(
-                                PATHS.dashboard_governance_actions_action,
+                                PATHS.dashboardGovernanceActionsAction,
                                 {
                                   proposalId: getFullGovActionId(
                                     item.txHash,

@@ -64,13 +64,29 @@ data DRepInfo = DRepInfo
   , dRepInfoIsRegisteredAsSoleVoter :: Bool
   , dRepInfoWasRegisteredAsSoleVoter :: Bool
   , dRepInfoDeposit :: Maybe Integer
+  , dRepInfoUrl :: Maybe Text
+  , dRepInfoDataHash :: Maybe Text
+  , dRepInfoVotingPower :: Maybe Integer
   }
 
+data DRepStatus
+  = Retired
+  | Active
+  | Inactive
+
+data DRepType
+  = DRep
+  | SoleVoter
+
 data DRepRegistration = DRepRegistration
- { dRepRegistrationDrepHash :: Text
+ { dRepRegistrationDRepHash :: Text
+ , dRepRegistrationView :: Text
  , dRepRegistrationUrl :: Maybe Text
  , dRepRegistrationDataHash :: Maybe Text
  , dRepRegistrationDeposit :: Integer
+ , dRepRegistrationVotingPower :: Maybe Integer
+ , dRepRegistrationStatus :: DRepStatus
+ , dRepRegistrationType :: DRepType
  }
 
 data Proposal = Proposal

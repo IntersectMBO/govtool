@@ -6,7 +6,6 @@ import { Slider } from "./Slider";
 
 import { Typography } from "@atoms";
 import {
-  useGetDRepVotesQuery,
   useGetProposalsQuery,
   useScreenDimension,
   useTranslation,
@@ -114,7 +113,7 @@ export const GovernanceActionsToVote = ({
                               : navigate(
                                   onDashboard
                                     ? generatePath(
-                                        PATHS.dashboard_governance_actions_action,
+                                        PATHS.dashboardGovernanceActionsAction,
                                         {
                                           proposalId: getFullGovActionId(
                                             item.txHash,
@@ -122,7 +121,7 @@ export const GovernanceActionsToVote = ({
                                           ),
                                         }
                                       )
-                                    : PATHS.governance_actions_action.replace(
+                                    : PATHS.governanceActionsAction.replace(
                                         ":proposalId",
                                         getFullGovActionId(
                                           item.txHash,

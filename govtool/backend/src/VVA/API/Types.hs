@@ -380,6 +380,9 @@ data DRepInfoResponse = DRepInfoResponse
   , dRepInfoResponseIsRegisteredAsSoleVoter :: Bool
   , dRepInfoResponseWasRegisteredAsSoleVoter :: Bool
   , dRepInfoResponseDeposit :: Maybe Integer
+  , dRepInfoResponseUrl :: Maybe Text
+  , dRepInfoResponseDataHash :: Maybe HexText
+  , dRepInfoResponseVotingPower :: Maybe Integer
   } deriving (Generic, Show)
 
 deriveJSON (jsonOptions "dRepInfoResponse") ''DRepInfoResponse
@@ -390,7 +393,10 @@ exampleDRepInfoResponse =
   <> "\"wasRegisteredAsDRep\": true,"
   <> "\"isRegisteredAsSoleVoter\": true,"
   <> "\"wasRegisteredAsSoleVoter\": true,"
-  <> "\"deposit\": 2000000}"
+  <> "\"deposit\": 2000000,"
+  <> "\"url\": \"https://drep.metadata.xyz\","
+  <> "\"dataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
+  <> "\"votingPower\": 1000000}"
 
 instance ToSchema DRepInfoResponse where
   declareNamedSchema proxy = do
@@ -505,13 +511,66 @@ instance ToSchema DRepHash where
           ?~ toJSON exampleDrepHash
 
 
+data DRepStatus = Retired | Active | Inactive
+  deriving (Generic, Show)
 
+-- ToJSON instance for DRepStatus
+instance ToJSON DRepStatus where
+  toJSON Retired = "Retired"
+  toJSON Active = "Active"
+  toJSON Inactive = "Inactive"
+
+-- FromJSON instance for DRepStatus
+instance FromJSON DRepStatus where
+  parseJSON = withText "DRepStatus" $ \case
+    "Retired" -> pure Retired
+    "Active" -> pure Active
+    "Inactive" -> pure Inactive
+    _ -> fail "Invalid DRepStatus"
+
+-- ToSchema instance for DRepStatus
+instance ToSchema DRepStatus where
+    declareNamedSchema _ = pure $ NamedSchema (Just "DRepStatus") $ mempty
+        & type_ ?~ OpenApiString
+        & description ?~ "DRep Status"
+        & enum_ ?~ map toJSON [Retired, Active, Inactive]
+
+
+
+data DRepType = NormalDRep | SoleVoter
+
+instance Show DRepType where
+  show NormalDRep = "DRep"
+  show SoleVoter = "SoleVoter"
+
+-- ToJSON instance for DRepType
+instance ToJSON DRepType where
+  toJSON NormalDRep = "DRep"
+  toJSON SoleVoter = "SoleVoter"
+
+-- FromJSON instance for DRepType
+instance FromJSON DRepType where
+  parseJSON = withText "DRepType" $ \case
+    "DRep" -> pure NormalDRep
+    "SoleVoter" -> pure SoleVoter
+    _ -> fail "Invalid DRepType"
+
+-- ToSchema instance for DRepType
+instance ToSchema DRepType where
+    declareNamedSchema _ = pure $ NamedSchema (Just "DRepType") $ mempty
+        & type_ ?~ OpenApiString
+        & description ?~ "DRep Type"
+        & enum_ ?~ map toJSON [NormalDRep, SoleVoter]
 
 data DRep = DRep
   { dRepDrepId :: DRepHash
+  , dRepView :: Text
   , dRepUrl :: Maybe Text
   , dRepMetadataHash :: Maybe Text
   , dRepDeposit :: Integer
+  , dRepVotingPower :: Maybe Integer
+  , dRepStatus :: DRepStatus
+  , dRepType :: DRepType
   } deriving (Generic, Show)
 
 
@@ -520,16 +579,30 @@ deriveJSON (jsonOptions "dRep") ''DRep
 exampleDrep :: Text
 exampleDrep =
    "{\"drepId\": \"d3a62ffe9c214e1a6a9809f7ab2a104c117f85e1f171f8f839d94be5\","
+ <> "\"view\": \"drep1l8uyy66sm8u82h82gc8hkcy2xu24dl8ffsh58aa0v7d37yp48u8\","
  <> "\"url\": \"https://proposal.metadata.xyz\","
  <> "\"metadataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
- <> "\"deposit\": 0}"
+ <> "\"deposit\": 0,"
+ <> "\"votingPower\": 0,"
+ <> "\"status\": \"Active\","
+  <> "\"type\": \"DRep\"}"
 
+-- ToSchema instance for DRep
 instance ToSchema DRep where
-    declareNamedSchema _ = pure $ NamedSchema (Just "DRep") $ mempty
-        & type_ ?~ OpenApiObject
-        & description ?~ "DRep"
-        & example
-          ?~ toJSON exampleDrep
+    declareNamedSchema proxy = do
+      NamedSchema name_ schema_ <-
+        genericDeclareNamedSchema
+        ( fromAesonOptions $ jsonOptions "dRep" )
+        proxy
+      return $
+        NamedSchema name_ $
+          schema_
+            & description ?~ "DRep"
+            & example
+              ?~ toJSON exampleDrep
+
+
+
 
 data GetNetworkMetricsResponse = GetNetworkMetricsResponse
   { getNetworkMetricsResponseCurrentTime :: UTCTime

@@ -35,7 +35,7 @@ import VVA.Network as Network
 import Numeric.Natural (Natural)
 
 type VVAApi =
-         "drep" :> "list" :> Get '[JSON] [DRep]
+         "drep" :> "list" :> QueryParam "drepView" Text :> Get '[JSON] [DRep]
     :<|> "drep" :> "get-voting-power" :> Capture "drepId" HexText :> Get '[JSON] Integer
     :<|> "drep" :> "getVotes" :> Capture "drepId" HexText :> QueryParams "type" GovernanceActionType :> QueryParam "sort" GovernanceActionSortMode :> Get '[JSON] [VoteResponse]
     :<|> "drep" :> "info" :> Capture "drepId" HexText :> Get '[JSON] DRepInfoResponse
@@ -68,11 +68,40 @@ server = drepList
     :<|> throw500
     :<|> getNetworkMetrics
 
-drepList :: App m => m [DRep]
-drepList = do
+
+mapDRepType :: Types.DRepType -> DRepType
+mapDRepType Types.DRep = NormalDRep
+mapDRepType Types.SoleVoter = SoleVoter
+
+mapDRepStatus :: Types.DRepStatus -> DRepStatus
+mapDRepStatus Types.Retired = Retired
+mapDRepStatus Types.Active = Active
+mapDRepStatus Types.Inactive = Inactive
+
+drepRegistrationToDrep :: Types.DRepRegistration -> DRep
+drepRegistrationToDrep Types.DRepRegistration {..} =
+  DRep
+    { dRepDrepId = DRepHash dRepRegistrationDRepHash,
+      dRepView = dRepRegistrationView,
+      dRepUrl = dRepRegistrationUrl,
+      dRepMetadataHash = dRepRegistrationDataHash,
+      dRepDeposit = dRepRegistrationDeposit,
+      dRepVotingPower = dRepRegistrationVotingPower,
+      dRepStatus = mapDRepStatus dRepRegistrationStatus,
+      dRepType = mapDRepType dRepRegistrationType
+    }
+
+drepList :: App m => Maybe Text -> m [DRep]
+drepList mDRepView = do
   CacheEnv {dRepListCache} <- asks vvaCache
-  map (\(Types.DRepRegistration drep_hash url data_hash deposit) -> DRep (DRepHash drep_hash) url data_hash deposit)
-    <$> cacheRequest dRepListCache () DRep.listDReps
+  dreps <- cacheRequest dRepListCache () DRep.listDReps
+  let filtered = flip filter dreps $ \Types.DRepRegistration {..} ->
+        case (dRepRegistrationType, mDRepView) of
+          (Types.SoleVoter, Just x) -> x == dRepRegistrationView
+          (Types.DRep, Just x) -> isInfixOf x dRepRegistrationView
+          (Types.DRep, Nothing) -> True
+          _ -> False
+  return $ map drepRegistrationToDrep filtered
 
 getVotingPower :: App m => HexText -> m Integer
 getVotingPower (unHexText -> dRepId) = do
@@ -158,6 +187,9 @@ drepInfo (unHexText -> dRepId) = do
     , dRepInfoResponseIsRegisteredAsSoleVoter = dRepInfoIsRegisteredAsSoleVoter
     , dRepInfoResponseWasRegisteredAsSoleVoter = dRepInfoWasRegisteredAsSoleVoter
     , dRepInfoResponseDeposit = dRepInfoDeposit
+    , dRepInfoResponseUrl = dRepInfoUrl
+    , dRepInfoResponseDataHash = HexText <$> dRepInfoDataHash
+    , dRepInfoResponseVotingPower = dRepInfoVotingPower
     }
 
 getCurrentDelegation :: App m => HexText -> m (Maybe HexText)

@@ -1,3 +1,5 @@
+export * from "./colors";
+export * from "./governanceActionFields";
 export * from "./governanceActionsFilters";
 export * from "./governanceActionsSorting";
 export * from "./icons";

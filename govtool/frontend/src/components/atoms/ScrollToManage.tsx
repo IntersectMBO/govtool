@@ -25,8 +25,8 @@ export const ScrollToManage = () => {
       window.scrollTo(0, pathMap.get(pathname)!);
     } else {
       if (
-        pathname === PATHS.dashboard_governance_actions ||
-        pathname === PATHS.governance_actions
+        pathname === PATHS.dashboardGovernanceActions ||
+        pathname === PATHS.governanceActions
       ) {
         pathMap.set(pathname, 0);
       }
@@ -37,8 +37,8 @@ export const ScrollToManage = () => {
   useEffect(() => {
     const fn = debounce(() => {
       if (
-        pathname === PATHS.dashboard_governance_actions ||
-        pathname === PATHS.governance_actions
+        pathname === PATHS.dashboardGovernanceActions ||
+        pathname === PATHS.governanceActions
       ) {
         pathMap.set(pathname, window.scrollY);
       }

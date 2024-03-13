@@ -41,12 +41,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         inputProps={{ "data-testid": dataTestId }}
         inputRef={inputRef}
         sx={{
-          backgroundColor: errorMessage ? "inputRed" : "transparent",
+          backgroundColor: errorMessage ? "inputRed" : "white",
           border: 1,
           borderColor: errorMessage ? "red" : "secondaryBlue",
           borderRadius: 50,
           padding: "8px 16px",
           width: "100%",
+          "& input.Mui-disabled": {
+            WebkitTextFillColor: "#4C495B",
+          },
+          "&.Mui-disabled": {
+            backgroundColor: "#F5F5F8",
+            borderColor: "#9792B5",
+          },
           ...sx,
         }}
         {...rest}

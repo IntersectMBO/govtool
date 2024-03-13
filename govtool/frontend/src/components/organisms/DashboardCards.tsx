@@ -32,7 +32,7 @@ export const DashboardCards = () => {
   const navigate = useNavigate();
   const { currentDelegation, isCurrentDelegationLoading } =
     useGetAdaHolderCurrentDelegationQuery(stakeKey);
-  const { screenWidth } = useScreenDimension();
+  const { isMobile, screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const [isRetirementLoading, setIsRetirementLoading] =
     useState<boolean>(false);
@@ -306,22 +306,31 @@ export const DashboardCards = () => {
 
   return isDrepLoading ? (
     <Box
-      alignItems="center"
-      display="flex"
-      flex={1}
-      height="100vh"
-      justifyContent="center"
+      sx={{
+        alignItems: "center",
+        display: "flex",
+        flex: 1,
+        height: "100vh",
+        justifyContent: "center",
+      }}
     >
       <CircularProgress />
     </Box>
   ) : (
     <Box
-      columnGap={3}
-      display="grid"
-      gridTemplateColumns={screenWidth < 1024 ? "1fr" : "1fr 1fr"}
-      px={screenWidth < 1024 ? 2 : screenWidth < 1440 ? 5 : 4}
-      py={3}
-      rowGap={4}
+      sx={{
+        columnGap: 3,
+        display: "grid",
+        gridTemplateColumns:
+          screenWidth < 1280
+            ? "1fr"
+            : screenWidth > 1728
+            ? "repeat(3, minmax(300px, 572px))"
+            : "repeat(2, minmax(300px, 572px))",
+        px: isMobile ? 2 : 5,
+        py: 3,
+        rowGap: 3,
+      }}
     >
       {/* DELEGATION CARD */}
       <DashboardActionCard
@@ -494,7 +503,7 @@ export const DashboardCards = () => {
             "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep"
           )
         }
-        secondButtonVariant={"outlined"}
+        secondButtonVariant="outlined"
         imageURL={IMAGES.soleVoterImage}
       />
       {/* REGISTARTION AS SOLE VOTER CARD END*/}
@@ -502,7 +511,7 @@ export const DashboardCards = () => {
       <DashboardActionCard
         dataTestidFirstButton="view-governance-actions-button"
         description={t("dashboard.govActions.description")}
-        firstButtonAction={() => navigate(PATHS.dashboard_governance_actions)}
+        firstButtonAction={() => navigate(PATHS.dashboardGovernanceActions)}
         firstButtonLabel={t(
           `dashboard.govActions.${
             voter?.isRegisteredAsDRep ? "reviewAndVote" : "view"
@@ -510,6 +519,31 @@ export const DashboardCards = () => {
         )}
         imageURL={IMAGES.govActionListImage}
         title={t("dashboard.govActions.title")}
+      />
+      {/* GOV ACTIONS LIST CARD END*/}
+      {/* GOV ACTIONS LIST CARD */}
+      <DashboardActionCard
+        dataTestidFirstButton="propose-governance-actions-button"
+        description={t("dashboard.proposeGovernanceAction.description")}
+        // TODO: add isPendingGovernanceAction to the context
+        // inProgress={isPendingGovernanceAction}
+        firstButtonAction={() => navigate(PATHS.createGovernanceAction)}
+        firstButtonLabel={t(
+          `dashboard.proposeGovernanceAction.${
+            // TODO: add isPendingGovernanceAction to the context
+            // isPendingGovernanceAction ? "propose" : "viewGovernanceActions"
+            `propose`
+          }`
+        )}
+        secondButtonLabel={t("learnMore")}
+        secondButtonAction={() =>
+          openInNewTab(
+            "https://docs.sanchogov.tools/faqs/what-is-a-governance-action"
+          )
+        }
+        secondButtonVariant="outlined"
+        imageURL={IMAGES.proposeGovActionImage}
+        title={t("dashboard.proposeGovernanceAction.title")}
       />
       {/* GOV ACTIONS LIST CARD END*/}
     </Box>

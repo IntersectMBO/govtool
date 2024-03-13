@@ -45,6 +45,7 @@ export const en = {
     dashboard: {
       headingOne: "Your Participation",
       headingTwo: "See Active Governance Actions",
+      title: "Dashboard",
       delegation: {
         changeDelegation: "Change delegation",
         delegateOwnPower:
@@ -77,6 +78,12 @@ export const en = {
         description: "Review governance actions submitted on-chain.",
         reviewAndVote: "Review and vote",
         title: "Governance Actions",
+        view: "View governance actions",
+      },
+      proposeGovernanceAction: {
+        title: "Propose a Governance Action",
+        description: "Submit your proposal for a Governance Action.",
+        propose: "Propose",
         view: "View governance actions",
       },
       registration: {
@@ -119,6 +126,70 @@ export const en = {
         wasRegisteredDescription:
           "You cannot vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>. until you re-register.",
         youAreSoleVoterTitle: "You are a Sole Voter",
+      },
+    },
+    createGovernanceAction: {
+      chooseGATypeTitle: "Choose a Governance Action type",
+      creatingAGovernanceAction:
+        "Creating a Governance Action: What you need to know",
+      creatingAGovernanceActionDescription:
+        "To create a Governance Action, you will need to:\n\n• Fill out a form with the relevant data\n• Pay a refundable deposit of <strong>₳{{deposit}}</strong>\n• Store the metadata of your Governance Action at your own expense.\n\nYour deposit will be refunded to your wallet when the Governance Action is either enacted or expired.\n\nThe deposit will not affect your Voting Power.",
+      editSubmission: "Edit submission",
+      formTitle: "Governance Action details",
+      references: "References and Supporting Information",
+      reviewSubmission: "Review your submission",
+      storeDataCheckboxLabel:
+        "I agree to store correctly this information and to maintain them over the years",
+      storeDataLink: "Learn more about storing information",
+      storeDataTitle: "Store and Maintain the Data Yourself",
+      storingInformationDescription:
+        "Download your file, save it to your chosen location, and enter the URL of that location in step 3",
+      storingInformationStep1Label: "Download this file",
+      storingInformationStep2Label:
+        "Save this file in a location that provides a public URL (ex. github)",
+      storingInformationStep2Link: "Read full guide",
+      storingInformationStep3Label: "Paste the URL here",
+      storingInformationTitle: "Information Storage Steps",
+      storingInformationURLPlaceholder: "URL",
+      supportingLinks: "Supporting links",
+      title: "Create a Governance Action",
+      fields: {
+        declarations: {
+          title: {
+            label: "Title",
+            placeholder: "A name for this Action",
+          },
+          abstract: {
+            label: "Abstract",
+            placeholder: "Summary",
+            tip: "General summary of the Action",
+          },
+          motivation: {
+            label: "Motivation",
+            placeholder: "Problem this GA will solve",
+            tip: "How will this solve a problem",
+          },
+          rationale: {
+            label: "Rationale",
+            placeholder: "Content of Governance Action",
+            tip: "Put all the content of the GA here",
+          },
+          receivingAddress: {
+            label: "Receiving Address",
+            placeholder: "The address to receive funds",
+          },
+          amount: {
+            label: "Amount",
+            placeholder: "e.g. 20000",
+          },
+        },
+        validations: {
+          maxLength: "Max {{maxLength}} characters",
+          required: "This field is required",
+          bech32: "Invalid bech32 address",
+          number: "Only number is allowed",
+          url: "Invalid URL",
+        },
       },
     },
     delegation: {
@@ -182,8 +253,14 @@ export const en = {
     forms: {
       hashPlaceholder: "The hash of metadata at URL",
       howCreateUrlAndHash: "How to create URL and hash?",
+      link: "Link",
       urlWithContextPlaceholder: "Your URL with with your context",
       urlWithInfoPlaceholder: "Your URL with extra info about you",
+      createGovernanceAction: {
+        typeLabel: "Governance Action Type",
+        typeTip:
+          "To change the Governance Action Type go back to the previous page.",
+      },
       errors: {
         hashInvalidFormat: "Invalid hash format",
         hashInvalidLength: "Hash must be exactly 64 characters long",
@@ -235,37 +312,45 @@ export const en = {
     },
     hero: {
       connectWallet: "Connect your wallet",
-      description: {
-        mobile:
-          "You can either delegate your voting power or become a DRep to allow people to delegate voting power to you.",
-        wide: "Anyone with a wallet containing ADA can participate in governance on Sanchonet.\n\nYour ADA balance entitles you to an equal amount of Voting Power.\n\nFor more info see the guide entry for <0>Voting Power</0>.",
-      },
+      description:
+        "Anyone with a wallet containing ADA can participate in governance on Sanchonet.\n\nYour ADA balance entitles you to an equal amount of Voting Power.\n\nFor more info see the guide entry for <0>Voting Power</0>.",
       headline: "SanchoNet \n Governance Tool",
     },
     home: {
       cards: {
-        delegateDescription: "Find a DRep to vote on your behalf.",
-        delegateFirstButtonLabel: "View DRep Direcotry",
-        delegateTitle: "Delegate your Voting Power",
-        governaneActionsDescription:
-          "See all the Governance Actions submitted on chain. ",
-        governanceActionsFirstButtonLabel: "View Governance Actions",
-        governaneActionsTitle: "View Governance Actions",
-        registerAsDRepDescription:
-          "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
-        registerAsDRepFirstButtonLabel: "Connect to Register",
-        registerAsDRepTitle: "Become a DRep",
-        registerAsSoleVoterDescription:
-          "Vote on Governance Actions using your own voting power",
-        registerAsSoleVoterFirstButtonLabel: "Connect to Register",
-        registerAsSoleVoterTitle: "Become a Sole Voter",
+        delegate: {
+          description: "Find a DRep to vote on your behalf.",
+          firstButtonLabel: "View DRep Directory",
+          title: "Delegate your Voting Power",
+        },
+        governanceActions: {
+          description: "See all the Governance Actions submitted on chain. ",
+          firstButtonLabel: "View Governance Actions",
+          title: "View Governance Actions",
+        },
+        proposeAGovernanceAction: {
+          description: "Submit your proposal for a Governance Action.",
+          firstButtonLabel: "Connect to Submit",
+          title: "Propose a Governance Action",
+        },
+        registerAsDRep: {
+          description:
+            "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
+          firstButtonLabel: "Connect to Register",
+          title: "Become a DRep",
+        },
+        registerAsSoleVoter: {
+          description: "Vote on Governance Actions using your own voting power",
+          firstButtonLabel: "Connect to Register",
+          title: "Become a Sole Voter",
+        },
       },
     },
     menu: {
       faqs: "FAQs",
       guides: "Guides",
       help: "Help",
-      myDashboard: "My Dashboard",
+      dashboard: "Dashboard",
       viewGovActions: "View Governance Actions",
     },
     metadataUpdate: {
@@ -278,6 +363,12 @@ export const en = {
       common: {
         goToDashboard: "Go to Dashboard",
         oops: "Oops!",
+      },
+      createGovernanceAction: {
+        cancelModalDescription:
+          "Returning to the Dashboard will cancel your submission and your proposed Governance Action will not be submitted.",
+        cancelModalTitle:
+          "Do you want to Cancel your Governance Action submission?",
       },
       delegation: {
         message:
@@ -294,6 +385,9 @@ export const en = {
         youAreAboutToOpen: "You are about to open an external link to:",
       },
       registration: {
+        cancelTitle: "Do You Want to Abandon Registration ?",
+        cancelDescription:
+          "If you return to the Dashboard, your information will not be saved.",
         message:
           "The confirmation of your registration might take a bit of time but you can track it using",
         title: "Registration Transaction Submitted!",
@@ -417,6 +511,7 @@ export const en = {
         "Warning, no registered stake keys, using unregistered stake keys",
     },
     abstain: "Abstain",
+    addLink: "+ Add link",
     back: "Back",
     backToDashboard: "Back to dashboard",
     backToList: "Back to the list",
@@ -433,7 +528,9 @@ export const en = {
     nextStep: "Next step",
     no: "No",
     ok: "Ok",
-    register:"Register",
+    optional: "Optional",
+    register: "Register",
+    required: "required",
     seeTransaction: "See transaction",
     select: "Select",
     skip: "Skip",

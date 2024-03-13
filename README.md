@@ -23,6 +23,7 @@ Learn more; [docs.sanchogov.tools](https://docs.sanchogov.tools/).
 ## 📍 Navigation
 - [GovTool Backend](./govtool/backend/README.md)
 - [GovTool Frontend](./govtool/frontend/README.md)
+- [GovTool deployment setup](./scripts/govtool/README.md)
 - [Documentation](./docs/)
 - [Tests](./tests/)
 

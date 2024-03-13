@@ -14,8 +14,10 @@ import {
 import { BgCard } from ".";
 
 export const RegisterAsdRepStepOne = ({
+  onClickCancel,
   setStep,
 }: {
+  onClickCancel: () => void;
   setStep: Dispatch<SetStateAction<number>>;
 }) => {
   const { t } = useTranslation();
@@ -25,7 +27,7 @@ export const RegisterAsdRepStepOne = ({
 
   const onClickContinue = useCallback(() => setStep(2), []);
 
-  const openLearMoreAboutDrep = useCallback(
+  const openLearnMoreAboutDrep = useCallback(
     () => openInNewTab("https://sancho.network/roles/drep"),
     []
   );
@@ -35,6 +37,7 @@ export const RegisterAsdRepStepOne = ({
       actionButtonLabel={t("continue")}
       backButtonLabel={t("cancel")}
       onClickActionButton={onClickContinue}
+      onClickBackButton={onClickCancel}
       sx={{ paddingBottom: isMobile ? undefined : 3 }}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
@@ -54,7 +57,7 @@ export const RegisterAsdRepStepOne = ({
           components={[
             <Link
               key="1"
-              onClick={openLearMoreAboutDrep}
+              onClick={openLearnMoreAboutDrep}
               sx={{ cursor: "pointer" }}
             />,
           ]}

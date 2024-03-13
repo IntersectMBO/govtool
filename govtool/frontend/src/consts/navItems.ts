@@ -3,14 +3,14 @@ import { PATHS } from "./paths";
 
 export const NAV_ITEMS = [
   {
-    dataTestId: "home-link",
+    dataTestId: "dashboard-link",
     navTo: PATHS.home,
-    label: "Home",
+    label: "Dashboard",
     newTabLink: null,
   },
   {
     dataTestId: "governance-actions-link",
-    navTo: PATHS.governance_actions,
+    navTo: PATHS.governanceActions,
     label: "Governance Actions",
     newTabLink: null,
   },
@@ -40,7 +40,7 @@ export const CONNECTED_NAV_ITEMS = [
   {
     dataTestId: "governance-actions-link",
     label: "Governance Actions",
-    navTo: PATHS.dashboard_governance_actions,
+    navTo: PATHS.dashboardGovernanceActions,
     activeIcon: ICONS.governanceActionsActiveIcon,
     icon: ICONS.governanceActionsIcon,
     newTabLink: null,

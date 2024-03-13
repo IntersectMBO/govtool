@@ -1,4 +1,5 @@
 export * from "./ActionCard";
+export * from "./Card";
 export * from "./CenteredBoxBottomButtons";
 export * from "./CenteredBoxPageWrapper";
 export * from "./DashboardActionCard";
@@ -10,7 +11,9 @@ export * from "./GovernanceActionCard";
 export * from "./GovernanceActionsFilters";
 export * from "./GovernanceActionsSorting";
 export * from "./GovernanceVotedOnCard";
+export * from "./LinkWithIcon";
 export * from "./OrderActionsChip";
+export * from "./Step";
 export * from "./VoteActionForm";
 export * from "./VotesSubmitted";
 export * from "./WalletInfoCard";

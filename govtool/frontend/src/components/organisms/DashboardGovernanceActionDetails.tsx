@@ -46,7 +46,7 @@ export const DashboardGovernanceActionDetails = () => {
   const breadcrumbs = [
     <NavLink
       key="1"
-      to={PATHS.dashboard_governance_actions}
+      to={PATHS.dashboardGovernanceActions}
       style={{ textDecorationColor: "#0033AD" }}
     >
       <Typography color="primary" fontWeight={300} fontSize={12}>
@@ -87,10 +87,10 @@ export const DashboardGovernanceActionDetails = () => {
         onClick={() =>
           navigate(
             state && state.openedFromCategoryPage
-              ? generatePath(PATHS.dashboard_governance_actions_category, {
+              ? generatePath(PATHS.dashboardGovernanceActionsCategory, {
                   category: state.type,
                 })
-              : PATHS.dashboard_governance_actions,
+              : PATHS.dashboardGovernanceActions,
             {
               state: {
                 isVotedListOnLoad: state && state.vote ? true : false,

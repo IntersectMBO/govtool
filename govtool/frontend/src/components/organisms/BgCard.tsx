@@ -72,37 +72,42 @@ export const BgCard = ({
 
   return (
     <Box
-      height={isMobile ? "100%" : "auto"}
       sx={{
         alignItems: screenWidth >= 768 ? "center" : "inherit",
         display: "flex",
         flex: 1,
         flexDirection: "column",
-        marginTop: isMobile ? "97px" : "137px",
+        height: isMobile ? "100%" : "auto",
+        px: isMobile ? 0 : 5,
       }}
     >
       <Box
-        display="flex"
-        flexDirection="column"
-        flex={isMobile ? 1 : undefined}
-        borderRadius="20px"
-        boxShadow={isMobile ? "" : `2px 2px 20px 0px ${boxShadow2}`}
-        height="auto"
-        maxWidth={screenWidth > 768 ? 600 : undefined}
-        mb={isMobile ? undefined : 3}
-        pb={isMobile ? undefined : 10}
-        pt={isMobile ? 6 : 10}
-        px={isMobile ? 2 : 18.75}
-        sx={sx}
+        sx={{
+          borderRadius: "20px",
+          boxShadow: isMobile ? "" : `2px 2px 20px 0px ${boxShadow2}`,
+          display: "flex",
+          flex: isMobile ? 1 : undefined,
+          flexDirection: "column",
+          height: "auto",
+          maxWidth: screenWidth > 768 ? 600 : undefined,
+          mb: isMobile ? undefined : 3,
+          pb: isMobile ? undefined : 10,
+          pt: isMobile ? 6 : 10,
+          px: isMobile ? 2 : 18.75,
+          width: "-webkit-fill-available",
+          ...sx,
+        }}
       >
-        <Box display="flex" flex={1} flexDirection="column">
+        <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
           {children}
         </Box>
         <Box
-          display="flex"
-          flexDirection={isMobile ? "column-reverse" : "row"}
-          gap={isMobile ? 3 : 0}
-          justifyContent="space-between"
+          sx={{
+            display: "flex",
+            flexDirection: isMobile ? "column-reverse" : "row",
+            gap: isMobile ? 3 : 0,
+            justifyContent: "space-between",
+          }}
         >
           {renderBackButton}
           {renderContinueButton}

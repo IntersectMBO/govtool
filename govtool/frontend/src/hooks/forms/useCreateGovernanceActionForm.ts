@@ -123,7 +123,6 @@ export const useCreateGovernanceActionForm = (
   const validateHash = useCallback(
     async (storingUrl: string, hash: string | null) => {
       try {
-        console.log({ hash });
         if (!hash) throw new Error(MetadataHashValidationErrors.INVALID_HASH);
 
         await validateMetadataHash(storingUrl, hash);

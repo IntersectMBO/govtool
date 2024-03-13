@@ -40,3 +40,10 @@ ErrorAndLabel.args = {
   errorMessage: "Error message",
   label: "Label",
 };
+
+export const WithAllProps = Template.bind({});
+WithAllProps.args = {
+  label: "Label",
+  helpfulText: "Helpful text",
+  errorMessage: "Error message",
+};

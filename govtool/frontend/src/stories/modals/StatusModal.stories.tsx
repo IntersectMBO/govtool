@@ -64,13 +64,9 @@ const Template: StoryFn<StatusModalState> = (args) => {
       {modals[modal.type]?.component && (
         <Modal
           open={Boolean(modals[modal.type].component)}
-          handleClose={
-            !modals[modal.type].preventDismiss
-              ? callAll(modals[modal.type]?.onClose, () =>
-                  openModal({ type: "none", state: null })
-                )
-              : undefined
-          }
+          handleClose={callAll(modals[modal.type]?.onClose, () =>
+            openModal({ type: "none", state: null })
+          )}
         >
           {modals[modal.type]?.component ?? <></>}
         </Modal>

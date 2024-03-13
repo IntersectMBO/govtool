@@ -68,3 +68,19 @@ export const ActionRadioActive: Story = {
     );
   },
 };
+
+export const ActionRadioOnlyTitle: Story = {
+  args: {
+    title: "Title",
+    value: "",
+    isChecked: false,
+  },
+};
+
+export const ActionRadioOnlyTitleChecked: Story = {
+  args: {
+    title: "Title",
+    value: "",
+    isChecked: true,
+  },
+};

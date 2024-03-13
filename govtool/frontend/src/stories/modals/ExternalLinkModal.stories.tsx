@@ -1,28 +1,22 @@
-import { ComponentProps, useEffect } from "react";
-import { Story, Meta, StoryFn } from "@storybook/react";
+import { useEffect } from "react";
+import { Meta, StoryFn } from "@storybook/react";
 
 import { Modal } from "@atoms";
 import { ExternalLinkModal, ExternalLinkModalState } from "@organisms";
-import { ModalProvider, useModal } from "../../context/modal";
+import { useModal } from "../../context/modal";
 import { userEvent, within, screen, waitFor } from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
+import { callAll } from "@/utils";
 
 const meta = {
   title: "Example/Modals/ExternalLinkModal",
   component: ExternalLinkModal,
-  decorators: [
-    (Story) => (
-      <ModalProvider>
-        <Story />
-      </ModalProvider>
-    ),
-  ],
 } satisfies Meta<typeof ExternalLinkModal>;
 
 export default meta;
 
 const Template: StoryFn<ExternalLinkModalState> = (args) => {
-  const { openModal, modal, closeModal } = useModal();
+  const { openModal, modal, modals } = useModal();
 
   const open = () => {
     openModal({
@@ -40,12 +34,14 @@ const Template: StoryFn<ExternalLinkModalState> = (args) => {
       <button onClick={open} style={{ cursor: "pointer" }}>
         Open Modal
       </button>
-      {modal?.component && (
+      {modals[modal.type]?.component && (
         <Modal
-          open={Boolean(modal.component)}
-          handleClose={!modal.preventDismiss ? closeModal : undefined}
+          open={Boolean(modals[modal.type].component)}
+          handleClose={callAll(modals[modal.type]?.onClose, () =>
+            openModal({ type: "none", state: null })
+          )}
         >
-          {modal.component}
+          {modals[modal.type]?.component ?? <></>}
         </Modal>
       )}
     </>

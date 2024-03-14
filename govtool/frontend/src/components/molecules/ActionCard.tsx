@@ -33,7 +33,7 @@ export const ActionCard: FC<ActionCardProps> = ({ ...props }) => {
     secondButtonLabel,
     title,
   } = props;
-  const { isMobile, screenWidth } = useScreenDimension();
+  const { screenWidth } = useScreenDimension();
 
   const {
     palette: { boxShadow2 },
@@ -52,23 +52,14 @@ export const ActionCard: FC<ActionCardProps> = ({ ...props }) => {
     >
       <Box display="flex" flexDirection="column" flex={1}>
         {imageURL ? (
-          <img
-            src={imageURL}
-            width={imageWidth}
-            height={imageHeight}
-            style={{
-              alignSelf: screenWidth < 640 ? "center" : "start",
-            }}
-          />
+          <img height={imageHeight} src={imageURL} width={imageWidth} />
         ) : null}
         {title ? (
           <Typography
-            fontWeight={isMobile ? 600 : 500}
             sx={{
-              mt: screenWidth < 640 ? 4 : 2.5,
-              textAlign: screenWidth < 640 ? "center" : "left",
+              mt: 2.5,
             }}
-            variant={isMobile ? "title2" : "headline5"}
+            variant={"headline5"}
           >
             {title}
           </Typography>
@@ -79,9 +70,8 @@ export const ActionCard: FC<ActionCardProps> = ({ ...props }) => {
             sx={{
               mb: 4.25,
               mt: 1.75,
-              textAlign: screenWidth < 640 ? "center" : "left",
             }}
-            variant={isMobile ? "body2" : "body1"}
+            variant={"body1"}
           >
             {description}
           </Typography>
@@ -103,11 +93,11 @@ export const ActionCard: FC<ActionCardProps> = ({ ...props }) => {
           data-testid={dataTestIdSecondButton}
           onClick={secondButtonAction}
           sx={{
-            visibility: secondButtonLabel ? "visible" : "hidden",
+            display: !secondButtonLabel && screenWidth < 768 ? "none" : "block",
             ml: screenWidth < 640 ? 0 : 2,
             mt: screenWidth < 640 ? 2 : 0,
+            visibility: secondButtonLabel ? "visible" : "hidden",
             width: screenWidth < 640 ? "100%" : "auto",
-            display: !secondButtonLabel && screenWidth < 768 ? "none" : "block",
           }}
           variant="outlined"
         >

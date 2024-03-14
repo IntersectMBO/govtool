@@ -100,7 +100,12 @@ $(target_config_dir)/grafana-provisioning/alerting/alerting.yml: $(template_conf
 $(target_config_dir)/nginx/auth.conf: $(target_config_dir)/nginx/
 	@:$(call check_defined, domain)
 	if [[ "$(domain)" == *"sanchonet.govtool.byron.network"* ]]; then \
-	  echo "auth_basic \"Restricted\";" > $@; \
+	  echo 'map $$http_x_forwarded_for $$auth {' > $@; \
+	  echo "  default \"Restricted\";" >> $@; \
+	  echo "  $${IP_ADDRESS_BYPASSING_BASIC_AUTH1} \"off\";" >> $@; \
+	  echo "  $${IP_ADDRESS_BYPASSING_BASIC_AUTH2} \"off\";" >> $@; \
+	  echo "}" >> $@; \
+	  echo 'auth_basic $$auth;' >> $@; \
 	  echo "auth_basic_user_file /etc/nginx/conf.d/govtool.htpasswd;" >> $@; \
 	else \
 	  echo > $@; \

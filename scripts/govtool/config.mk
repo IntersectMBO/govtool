@@ -11,15 +11,18 @@ target_config_dir := $(config_dir)/target
 config_subdirs := cardano-node dbsync-secrets grafana-provisioning nginx
 target_config_subdirs := $(target_config_dir) $(addprefix $(target_config_dir)/,$(config_subdirs))
 
-docker_compose_file := $(target_config_dir)/docker-compose.yml
-
 # metadata
 cardano_config_provider := https://book.world.dev.cardano.org
+
+# files
+docker_compose_file := $(target_config_dir)/docker-compose.yml
 cardano_configs := alonzo-genesis byron-genesis conway-genesis db-sync-config shelley-genesis submit-api-config topology
 cardano_config_files := $(addprefix $(target_config_dir)/cardano-node/,$(addsuffix .json,$(cardano_configs)))
+outputs := cardano-node/config.json dbsync-secrets/postgres_user dbsync-secrets/postgres_db dbsync-secrets/postgres_password backend-config.json prometheus.yml promtail.yml loki.yml nginx/auth.conf nginx/govtool.htpasswd
+output_files := $(addprefix $(target_config_dir)/,$(outputs)) $(cardano_config_files) $(docker_compose_file)
 
 .PHONY: prepare-config
-prepare-config: clear $(target_config_dir)/docker-compose.yml $(cardano_config_files) $(target_config_dir)/cardano-node/config.json $(target_config_dir)/dbsync-secrets/postgres_user $(target_config_dir)/dbsync-secrets/postgres_db $(target_config_dir)/dbsync-secrets/postgres_password $(target_config_dir)/backend-config.json prepare-grafana-provisioning $(target_config_dir)/prometheus.yml $(target_config_dir)/promtail.yml $(target_config_dir)/loki.yml $(target_config_dir)/nginx/auth.conf $(target_config_dir)/nginx/govtool.htpasswd
+prepare-config: clear $(output_files) prepare-grafana-provisioning
 
 .PHONY: clear
 clear:

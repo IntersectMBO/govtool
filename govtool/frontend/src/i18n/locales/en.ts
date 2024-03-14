@@ -169,24 +169,6 @@ export const en = {
             placeholder: "A name for this Action",
           },
         },
-        formTitle: "Governance Action details",
-        references: "References and Supporting Information",
-        reviewSubmission: "Review your submission",
-        storeDataCheckboxLabel:
-          "I agree to store correctly this information and to maintain them over the years",
-        storeDataLink: "Learn more about storing information",
-        storeDataTitle: "Store and Maintain the Data Yourself",
-        storingInformationDescription:
-          "Download your file, save it to your chosen location, and enter the URL of that location in step 3",
-        storingInformationStep1Label: "Download this file",
-        storingInformationStep2Label:
-          "Save this file in a location that provides a public URL (ex. github)",
-        storingInformationStep2Link: "Read full guide",
-        storingInformationStep3Label: "Paste the URL here",
-        storingInformationTitle: "Information Storage Steps",
-        storingInformationURLPlaceholder: "URL",
-        supportingLinks: "Supporting links",
-        title: "Create a Governance Action",
         validations: {
           bech32: "Invalid bech32 address",
           maxLength: "Max {{maxLength}} characters",
@@ -195,6 +177,24 @@ export const en = {
           url: "Invalid URL",
         },
       },
+      formTitle: "Governance Action details",
+      references: "References and Supporting Information",
+      reviewSubmission: "Review your submission",
+      storeDataCheckboxLabel:
+        "I agree to store correctly this information and to maintain them over the years",
+      storeDataLink: "Learn more about storing information",
+      storeDataTitle: "Store and Maintain the Data Yourself",
+      storingInformationDescription:
+        "Download your file, save it to your chosen location, and enter the URL of that location in step 3",
+      storingInformationStep1Label: "Download this file",
+      storingInformationStep2Label:
+        "Save this file in a location that provides a public URL (ex. github)",
+      storingInformationStep2Link: "Read full guide",
+      storingInformationStep3Label: "Paste the URL here",
+      storingInformationTitle: "Information Storage Steps",
+      storingInformationURLPlaceholder: "URL",
+      supportingLinks: "Supporting links",
+      title: "Create a Governance Action",
       modals: {
         externalDataDoesntMatch: {
           buttonText: "Go to Data Edit Screen",
@@ -261,6 +261,7 @@ export const en = {
       checkIsWalletConnected: "Check if the wallet is connected.",
       dRepIdNotFound: "DrepId not found",
       invalidGovernanceActionType: "Invalid Governance Action Type",
+      invalidTreasuryGovernanceActionType: "Invalid Treasury Governance Action",
       noAddressesFound: "No addresses found",
       noStakeKeySelected: "No stake key selected",
       notUsingAnchor: "DRep Registration - not using anchor",

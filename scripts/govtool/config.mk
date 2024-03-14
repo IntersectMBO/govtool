@@ -37,6 +37,11 @@ output_dirs := $(sort $(foreach file,$(output_files),$(dir $(file))))
 .PHONY: prepare-config
 prepare-config: clear $(output_files)
 
+.PHONY: upload-config
+upload-config: check-env-defined prepare-config
+	@:$(call check_defined, ssh_url)
+	$(rsync) -av -e 'ssh -o StrictHostKeyChecking=no' config/target/. $(ssh_url):config
+
 .PHONY: clear
 clear:
 	rm -rf $(target_config_dir)
@@ -108,8 +113,3 @@ $(target_config_dir)/nginx/govtool.htpasswd: $(target_config_dir)/nginx/
 	else \
 	  echo > $@; \
 	fi
-
-.PHONY: upload-config
-upload-config: check-env-defined prepare-config
-	@:$(call check_defined, ssh_url)
-	$(rsync) -av -e 'ssh -o StrictHostKeyChecking=no' config/target/. $(ssh_url):config

@@ -56,13 +56,12 @@ $(target_config_dir)/dbsync-secrets/postgres_password: $(target_config_dir)/dbsy
 $(target_config_dir)/dbsync-secrets/postgres_db: $(target_config_dir)/dbsync-secrets
 	echo "$${DBSYNC_POSTGRES_DB}" > $@
 
-$(target_config_dir)/backend-config.json: $(target_config_dir)
+$(target_config_dir)/backend-config.json: $(config_dir)/templates/backend-config.json.tpl $(target_config_dir)
 	sed -e "s|<DBSYNC_POSTGRES_DB>|$${DBSYNC_POSTGRES_DB}|" \
 		-e "s|<DBSYNC_POSTGRES_USER>|$${DBSYNC_POSTGRES_USER}|" \
 		-e "s|<DBSYNC_POSTGRES_PASSWORD>|$${DBSYNC_POSTGRES_PASSWORD}|" \
 		-e "s|<SENTRY_DSN>|$${SENTRY_DSN_BACKEND}|" \
-		"$(config_dir)/templates/backend-config.json.tpl" \
-		> $@
+		$< > $@
 
 $(target_config_dir)/prometheus.yml: $(target_config_dir)
 	cp -a "$(template_config_dir)/prometheus.yml" $@

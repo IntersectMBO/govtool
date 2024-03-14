@@ -17,7 +17,7 @@ docker_compose_file := $(target_config_dir)/docker-compose.yml
 cardano_config_provider := https://book.world.dev.cardano.org
 
 .PHONY: prepare-config
-prepare-config: clear generate-docker-compose-file enable-prometheus $(target_config_dir)/dbsync-secrets/postgres_user $(target_config_dir)/dbsync-secrets/postgres_db $(target_config_dir)/dbsync-secrets/postgres_password $(target_config_dir)/backend-config.json prepare-grafana-provisioning $(target_config_dir)/prometheus.yml $(target_config_dir)/promtail.yml $(target_config_dir)/loki.yml $(target_config_dir)/nginx/auth.conf $(target_config_dir)/nginx/govtool.htpasswd
+prepare-config: clear $(target_config_dir)/docker-compose.yml enable-prometheus $(target_config_dir)/dbsync-secrets/postgres_user $(target_config_dir)/dbsync-secrets/postgres_db $(target_config_dir)/dbsync-secrets/postgres_password $(target_config_dir)/backend-config.json prepare-grafana-provisioning $(target_config_dir)/prometheus.yml $(target_config_dir)/promtail.yml $(target_config_dir)/loki.yml $(target_config_dir)/nginx/auth.conf $(target_config_dir)/nginx/govtool.htpasswd
 
 .PHONY: clear
 clear:
@@ -27,15 +27,13 @@ clear:
 $(target_config_subdirs):
 	mkdir -p $@
 
-.PHONY: generate-docker-compose-file
-generate-docker-compose-file: check-env-defined $(target_config_dir)
+$(target_config_dir)/docker-compose.yml: $(template_config_dir)/docker-compose.yml.tpl $(target_config_dir)
 	if [[ "$(env)" == "dev" ]]; then CSP_ALLOWED_HOSTS=",http://localhost"; else CSP_ALLOWED_HOSTS=; fi; \
 	sed -e "s|<DOMAIN>|$(domain)|g" \
 		-e "s|<DOCKER_USER>|$(docker_user)|g" \
 		-e "s|<REPO_URL>|$(repo_url)|g" \
 		-e "s|<CSP_ALLOWED_HOSTS>|$${CSP_ALLOWED_HOSTS}|g" \
-		"$(template_config_dir)/docker-compose.yml.tpl" \
-		> "$(target_config_dir)/docker-compose.yml"
+		$< > $@
 
 .PHONY: fetch-cardano-node-config
 fetch-cardano-node-config: $(target_config_dir)/cardano-node

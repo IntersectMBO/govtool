@@ -17,7 +17,7 @@ docker_compose_file := $(target_config_dir)/docker-compose.yml
 cardano_config_provider := https://book.world.dev.cardano.org
 
 .PHONY: prepare-config
-prepare-config: clear generate-docker-compose-file enable-prometheus prepare-dbsync-secrets $(target_config_dir)/backend-config.json prepare-grafana-provisioning $(target_config_dir)/prometheus.yml $(target_config_dir)/promtail.yml $(target_config_dir)/loki.yml $(target_config_dir)/nginx/auth.conf $(target_config_dir)/nginx/govtool.htpasswd
+prepare-config: clear generate-docker-compose-file enable-prometheus $(target_config_dir)/dbsync-secrets/postgres_user $(target_config_dir)/dbsync-secrets/postgres_db $(target_config_dir)/dbsync-secrets/postgres_password $(target_config_dir)/backend-config.json prepare-grafana-provisioning $(target_config_dir)/prometheus.yml $(target_config_dir)/promtail.yml $(target_config_dir)/loki.yml $(target_config_dir)/nginx/auth.conf $(target_config_dir)/nginx/govtool.htpasswd
 
 .PHONY: clear
 clear:
@@ -49,11 +49,14 @@ fetch-cardano-node-config: $(target_config_dir)/cardano-node
 enable-prometheus: fetch-cardano-node-config $(target_config_dir)/cardano-node
 	sed -i '/"hasPrometheus"/ { N; s/"127\.0\.0\.1"/"0.0.0.0"/ }' "$(target_config_dir)/cardano-node/config.json"
 
-.PHONY: prepare-dbsync-secrets
-prepare-dbsync-secrets: $(target_config_dir)/dbsync-secrets
-	echo "$${DBSYNC_POSTGRES_USER}" > "$(target_config_dir)/dbsync-secrets/postgres_user"; \
-	echo "$${DBSYNC_POSTGRES_PASSWORD}" > "$(target_config_dir)/dbsync-secrets/postgres_password"; \
-	echo "$${DBSYNC_POSTGRES_DB}" > "$(target_config_dir)/dbsync-secrets/postgres_db"
+$(target_config_dir)/dbsync-secrets/postgres_user: $(target_config_dir)/dbsync-secrets
+	echo "$${DBSYNC_POSTGRES_USER}" > $@
+
+$(target_config_dir)/dbsync-secrets/postgres_password: $(target_config_dir)/dbsync-secrets
+	echo "$${DBSYNC_POSTGRES_PASSWORD}" > $@
+
+$(target_config_dir)/dbsync-secrets/postgres_db: $(target_config_dir)/dbsync-secrets
+	echo "$${DBSYNC_POSTGRES_DB}" > $@
 
 $(target_config_dir)/backend-config.json: $(target_config_dir)
 	sed -e "s|<DBSYNC_POSTGRES_DB>|$${DBSYNC_POSTGRES_DB}|" \

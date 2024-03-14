@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import { Dispatch, SetStateAction, useCallback } from "react";
 import { Box } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
@@ -7,7 +7,7 @@ import { ICONS } from "@consts";
 import { useCreateGovernanceActionForm, useTranslation } from "@hooks";
 import { Step } from "@molecules";
 import { BgCard, ControlledField } from "@organisms";
-import { URL_REGEX, downloadJson, openInNewTab } from "@utils";
+import { URL_REGEX, openInNewTab } from "@utils";
 
 type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -19,11 +19,11 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
     control,
     errors,
     createGovernanceAction,
-    generateJsonBody,
     getValues,
     watch,
-  } = useCreateGovernanceActionForm();
-  const [isJsonDownloaded, setIsJsonDownloaded] = useState<boolean>(false);
+    onClickDownloadJson,
+    isLoading,
+  } = useCreateGovernanceActionForm(setStep);
 
   // TODO: change on correct file name
   const fileName = getValues("governance_action_type");
@@ -34,16 +34,9 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
     []
   );
 
-  const isActionButtonDisabled = !watch("storingURL") || !isJsonDownloaded;
+  const isActionButtonDisabled = !watch("storingURL");
 
   const onClickBack = useCallback(() => setStep(5), []);
-
-  const onClickDownloadJson = async () => {
-    const data = getValues();
-    const jsonBody = await generateJsonBody(data);
-    downloadJson(jsonBody, fileName);
-    setIsJsonDownloaded(true);
-  };
 
   return (
     <BgCard
@@ -52,6 +45,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
       isActionButtonDisabled={isActionButtonDisabled}
       onClickActionButton={createGovernanceAction}
       onClickBackButton={onClickBack}
+      isLoadingActionButton={isLoading}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("createGovernanceAction.storingInformationTitle")}

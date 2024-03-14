@@ -20,14 +20,15 @@ export const DashboardCards = () => {
     buildSignSubmitConwayCertTx,
     delegateTo,
     delegateTransaction,
-    voter,
     dRepID,
     dRepIDBech32,
+    govActionTransaction,
     isDrepLoading,
     isPendingTransaction,
     registerTransaction,
     soleVoterTransaction,
     stakeKey,
+    voter,
   } = useCardano();
   const navigate = useNavigate();
   const { currentDelegation, isCurrentDelegationLoading } =
@@ -184,6 +185,15 @@ export const DashboardCards = () => {
     },
     [isPendingTransaction, navigate]
   );
+
+  const onClickGovernanceActionCardActionButton = useCallback(() => {
+    if(govActionTransaction.transactionHash) {
+      navigate(PATHS.dashboardGovernanceActions)
+      return
+    }
+    navigate(PATHS.createGovernanceAction)
+
+  }, [govActionTransaction.transactionHash, navigate])
 
   const displayedDelegationId = useMemo(() => {
     const restrictedNames = [
@@ -525,16 +535,13 @@ export const DashboardCards = () => {
       <DashboardActionCard
         dataTestidFirstButton="propose-governance-actions-button"
         description={t("dashboard.proposeGovernanceAction.description")}
-        // TODO: add isPendingGovernanceAction to the context
-        // inProgress={isPendingGovernanceAction}
-        firstButtonAction={() => navigate(PATHS.createGovernanceAction)}
+        firstButtonAction={onClickGovernanceActionCardActionButton}
         firstButtonLabel={t(
           `dashboard.proposeGovernanceAction.${
-            // TODO: add isPendingGovernanceAction to the context
-            // isPendingGovernanceAction ? "propose" : "viewGovernanceActions"
-            `propose`
+             govActionTransaction.transactionHash ? "view" : "propose" 
           }`
-        )}
+          )}
+        inProgress={!!govActionTransaction.transactionHash}
         secondButtonLabel={t("learnMore")}
         secondButtonAction={() =>
           openInNewTab(

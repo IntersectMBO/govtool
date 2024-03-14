@@ -65,14 +65,8 @@ $(target_config_dir)/backend-config.json: $(config_dir)/templates/backend-config
 		-e "s|<SENTRY_DSN>|$${SENTRY_DSN_BACKEND}|" \
 		$< > $@
 
-$(target_config_dir)/prometheus.yml: $(target_config_dir)
-	cp -a "$(template_config_dir)/prometheus.yml" $@
-
-$(target_config_dir)/promtail.yml: $(target_config_dir)
-	cp -a "$(template_config_dir)/promtail.yml" $@
-
-$(target_config_dir)/loki.yml: $(target_config_dir)
-	cp -a "$(template_config_dir)/loki.yml" $@
+$(target_config_dir)/%.yml: $(template_config_dir)/%.yml $(target_config_dir)
+	cp -a $< $@
 
 .PHONY: prepare-grafana-provisioning
 prepare-grafana-provisioning: $(target_config_dir)/grafana-provisioning

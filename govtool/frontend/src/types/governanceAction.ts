@@ -37,8 +37,7 @@ export type TreasuryGovernanceActionFieldSchema =
   };
 
 export type GovernanceActionFieldSchemas =
-  | InfoGovernanceActionFieldSchema
-  | TreasuryGovernanceActionFieldSchema;
+  | InfoGovernanceActionFieldSchema & TreasuryGovernanceActionFieldSchema;
 
 export type GovernanceActionFields = Record<
   GovernanceActionType,

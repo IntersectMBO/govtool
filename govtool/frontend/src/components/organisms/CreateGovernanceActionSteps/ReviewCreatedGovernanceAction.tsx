@@ -53,11 +53,14 @@ export const ReviewCreatedGovernanceAction = ({
           key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " ");
 
         return (
-          <Box sx={{ mb: 5 }}>
+          <Box sx={{ mb: 5, width: "100%" }}>
             <Typography color="neutralGray" fontWeight={400} variant="body2">
               {label}
             </Typography>
-            <Typography sx={{ mt: 0.5 }} variant="body2">
+            <Typography
+              sx={{ mt: 0.5, overflow: "hidden", textOverflow: "ellipsis" }}
+              variant="body2"
+            >
               {value as string}
             </Typography>
           </Box>

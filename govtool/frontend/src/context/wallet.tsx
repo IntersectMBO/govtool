@@ -62,6 +62,7 @@ import {
   generateAnchor,
   getItemFromLocalStorage,
   getPubDRepID,
+  GOVERNANCE_ACTION_KEY,
   openInNewTab,
   PROTOCOL_PARAMS_KEY,
   REGISTER_SOLE_VOTER_TRANSACTION_KEY,
@@ -132,11 +133,13 @@ interface CardanoContext {
   buildSignSubmitConwayCertTx: ({
     certBuilder,
     votingBuilder,
+    govActionBuilder,
     type,
     registrationType,
   }: {
     certBuilder?: CertificatesBuilder;
     votingBuilder?: VotingBuilder;
+    govActionBuilder?: VotingProposalBuilder;
     type?: "delegation" | "registration" | "soleVoterRegistration" | "vote";
     proposalId?: string;
     registrationType?: DRepActionType;
@@ -158,6 +161,7 @@ interface CardanoContext {
     cip95MetadataURL?: string,
     cip95MetadataHash?: string
   ) => Promise<VotingBuilder>;
+  govActionTransaction: TransactionHistoryItem;
   delegateTransaction: TransactionHistoryItem;
   registerTransaction: TransactionHistoryItem & { type: DRepActionType };
   soleVoterTransaction: TransactionHistoryItem & {
@@ -227,6 +231,8 @@ function CardanoProvider(props: Props) {
   const [registerTransaction, setRegisterTransaction] = useState<
     TransactionHistoryItem & { type: DRepActionType }
   >({ time: undefined, transactionHash: "", type: "" });
+  const [govActionTransaction, setGovActionTransaction] =
+    useState<TransactionHistoryItem>({ time: undefined, transactionHash: "" });
   const [soleVoterTransaction, setSoleVoterTransaction] = useState<
     TransactionHistoryItem & { type: Omit<DRepActionType, "update"> }
   >({ time: undefined, transactionHash: "", type: "" });
@@ -511,12 +517,42 @@ function CardanoProvider(props: Props) {
       let interval = setInterval(checkVoteTransaction, REFRESH_TIME);
       checkVoteTransaction();
     }
+    if (govActionTransaction?.transactionHash) {
+      const checkGovActionTransaction = async () => {
+        const resetGovActionTransaction = () => {
+          clearInterval(interval);
+          removeItemFromLocalStorage(GOVERNANCE_ACTION_KEY + `_${stakeKey}`);
+          setGovActionTransaction({
+            time: undefined,
+            transactionHash: "",
+          });
+        };
+        const status = await getTransactionStatus(
+          govActionTransaction.transactionHash
+        );
+        if (status.transactionConfirmed) {
+          resetGovActionTransaction();
+          if (isEnabled) addSuccessAlert(t("alerts.govAction.success"));
+        }
+        if (
+          new Date().getTime() -
+            new Date(govActionTransaction?.time).getTime() >
+          TIME_TO_EXPIRE_TRANSACTION
+        ) {
+          resetGovActionTransaction();
+          if (isEnabled) addErrorAlert(t("alerts.govAction.failed"));
+        }
+      };
+      let interval = setInterval(checkGovActionTransaction, REFRESH_TIME);
+      checkGovActionTransaction();
+    }
     if (
       isEnabled &&
       (voteTransaction?.transactionHash ||
         registerTransaction?.transactionHash ||
         soleVoterTransaction?.transactionHash ||
-        delegateTransaction?.transactionHash)
+        delegateTransaction?.transactionHash ||
+        govActionTransaction.transactionHash)
     ) {
       addWarningAlert(t("alerts.transactionInProgress"), 10000);
     }
@@ -525,6 +561,7 @@ function CardanoProvider(props: Props) {
     registerTransaction,
     soleVoterTransaction,
     voteTransaction,
+    govActionTransaction,
   ]);
 
   const getChangeAddress = async (enabledApi: CardanoApiWallet) => {
@@ -823,12 +860,14 @@ function CardanoProvider(props: Props) {
     async ({
       certBuilder,
       votingBuilder,
+      govActionBuilder,
       type,
       proposalId,
       registrationType,
     }: {
       certBuilder?: CertificatesBuilder;
       votingBuilder?: VotingBuilder;
+      govActionBuilder?: VotingProposalBuilder;
       type?: "delegation" | "registration" | "soleVoterRegistration" | "vote";
       proposalId?: string;
       registrationType?: DRepActionType;
@@ -852,6 +891,10 @@ function CardanoProvider(props: Props) {
 
         if (votingBuilder) {
           txBuilder.set_voting_builder(votingBuilder);
+        }
+
+        if (govActionBuilder) {
+          txBuilder.set_voting_proposal_builder(govActionBuilder);
         }
 
         if (
@@ -937,6 +980,19 @@ function CardanoProvider(props: Props) {
           "utf8"
         ).toString("hex");
 
+        if (govActionBuilder) {
+          setGovActionTransaction({
+            time: new Date(),
+            transactionHash: resultHash,
+          });
+          setItemToLocalStorage(
+            GOVERNANCE_ACTION_KEY + `_${stakeKey}`,
+            JSON.stringify({
+              time: new Date(),
+              transactionHash: resultHash,
+            })
+          );
+        }
         if (type === "registration") {
           setRegisterTransaction({
             time: new Date(),
@@ -1354,6 +1410,7 @@ function CardanoProvider(props: Props) {
       voter,
       voteTransaction,
       walletApi,
+      govActionTransaction,
     }),
     [
       address,
@@ -1390,6 +1447,7 @@ function CardanoProvider(props: Props) {
       voter,
       voteTransaction,
       walletApi,
+      govActionTransaction,
     ]
   );
 

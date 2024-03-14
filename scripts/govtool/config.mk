@@ -85,7 +85,7 @@ $(target_config_dir)/nginx/auth.conf: $(target_config_dir)/nginx
 	  echo "auth_basic \"Restricted\";" > $@; \
 	  echo "auth_basic_user_file /etc/nginx/conf.d/govtool.htpasswd;" >> $@; \
 	else \
-	  touch "$(target_config_dir)/nginx/auth.conf"; \
+	  echo > $@; \
 	fi
 
 $(target_config_dir)/nginx/govtool.htpasswd: $(target_config_dir)/nginx
@@ -93,7 +93,7 @@ $(target_config_dir)/nginx/govtool.htpasswd: $(target_config_dir)/nginx
 	if [[ "$(domain)" == *"sanchonet.govtool.byron.network"* ]]; then \
 	  echo "$${NGINX_BASIC_AUTH}" > $@; \
 	else \
-	  touch $@; \
+	  echo > $@; \
 	fi
 
 .PHONY: upload-config

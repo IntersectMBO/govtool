@@ -15,9 +15,11 @@ docker_compose_file := $(target_config_dir)/docker-compose.yml
 
 # metadata
 cardano_config_provider := https://book.world.dev.cardano.org
+cardano_configs := alonzo-genesis byron-genesis conway-genesis db-sync-config shelley-genesis submit-api-config topology
+cardano_config_files := $(addprefix $(target_config_dir)/cardano-node/,$(addsuffix .json,$(cardano_configs)))
 
 .PHONY: prepare-config
-prepare-config: clear $(target_config_dir)/docker-compose.yml enable-prometheus $(target_config_dir)/dbsync-secrets/postgres_user $(target_config_dir)/dbsync-secrets/postgres_db $(target_config_dir)/dbsync-secrets/postgres_password $(target_config_dir)/backend-config.json prepare-grafana-provisioning $(target_config_dir)/prometheus.yml $(target_config_dir)/promtail.yml $(target_config_dir)/loki.yml $(target_config_dir)/nginx/auth.conf $(target_config_dir)/nginx/govtool.htpasswd
+prepare-config: clear $(target_config_dir)/docker-compose.yml $(cardano_config_files) $(target_config_dir)/cardano-node/config.json $(target_config_dir)/dbsync-secrets/postgres_user $(target_config_dir)/dbsync-secrets/postgres_db $(target_config_dir)/dbsync-secrets/postgres_password $(target_config_dir)/backend-config.json prepare-grafana-provisioning $(target_config_dir)/prometheus.yml $(target_config_dir)/promtail.yml $(target_config_dir)/loki.yml $(target_config_dir)/nginx/auth.conf $(target_config_dir)/nginx/govtool.htpasswd
 
 .PHONY: clear
 clear:
@@ -35,16 +37,13 @@ $(target_config_dir)/docker-compose.yml: $(template_config_dir)/docker-compose.y
 		-e "s|<CSP_ALLOWED_HOSTS>|$${CSP_ALLOWED_HOSTS}|g" \
 		$< > $@
 
-.PHONY: fetch-cardano-node-config
-fetch-cardano-node-config: $(target_config_dir)/cardano-node
+$(cardano_config_files): $(target_config_dir)/cardano-node
 	@:$(call check_defined, cardano_network)
-	$(curl) -s "$(cardano_config_provider)/env-$(cardano_network).html" | \
-		grep -E -o '[a-z-]+\.json' | \
-		sort -u | \
-		xargs -I"{}" $(curl) -s "$(cardano_config_provider)/environments/$(cardano_network)/{}" -o "$(target_config_dir)/cardano-node/{}"
+	$(curl) -s "$(cardano_config_provider)/environments/$(cardano_network)/$(notdir $@)" -o $@
 
-.PHONY: enable-prometheus
-enable-prometheus: fetch-cardano-node-config $(target_config_dir)/cardano-node
+.PHONY: $(target_config_dir)/cardano-node/config.json
+$(target_config_dir)/cardano-node/config.json: $(target_config_dir)/cardano-node
+	$(curl) -s "$(cardano_config_provider)/environments/$(cardano_network)/$(notdir $@)" -o $@
 	sed -i '/"hasPrometheus"/ { N; s/"127\.0\.0\.1"/"0.0.0.0"/ }' "$(target_config_dir)/cardano-node/config.json"
 
 $(target_config_dir)/dbsync-secrets/postgres_user: $(target_config_dir)/dbsync-secrets

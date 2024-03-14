@@ -16,7 +16,20 @@ target_config_dir := $(config_dir)/target
 docker_compose_file := $(target_config_dir)/docker-compose.yml
 cardano_configs := alonzo-genesis byron-genesis conway-genesis db-sync-config shelley-genesis submit-api-config topology
 cardano_config_files := $(addprefix $(target_config_dir)/cardano-node/,$(addsuffix .json,$(cardano_configs)))
-outputs := cardano-node/config.json dbsync-secrets/postgres_user dbsync-secrets/postgres_db dbsync-secrets/postgres_password backend-config.json prometheus.yml promtail.yml loki.yml nginx/auth.conf nginx/govtool.htpasswd grafana-provisioning/alerting/alerting.yml grafana-provisioning/datasources/datasource.yml grafana-provisioning/dashboards/dashboard.yml grafana-provisioning/dashboards/govtool.json  grafana-provisioning/dashboards/traefik_rev4.json
+outputs := cardano-node/config.json \
+  dbsync-secrets/postgres_user \
+  dbsync-secrets/postgres_db \
+  dbsync-secrets/postgres_password \
+  backend-config.json prometheus.yml \
+  promtail.yml \
+  loki.yml \
+  nginx/auth.conf \
+  nginx/govtool.htpasswd \
+  grafana-provisioning/alerting/alerting.yml \
+  grafana-provisioning/datasources/datasource.yml \
+  grafana-provisioning/dashboards/dashboard.yml \
+  grafana-provisioning/dashboards/govtool.json \
+  grafana-provisioning/dashboards/traefik_rev4.json
 
 output_files := $(addprefix $(target_config_dir)/,$(outputs)) $(cardano_config_files) $(docker_compose_file)
 output_dirs := $(sort $(foreach file,$(output_files),$(dir $(file))))

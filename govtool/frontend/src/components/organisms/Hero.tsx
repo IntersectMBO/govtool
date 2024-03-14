@@ -38,7 +38,7 @@ export const Hero = () => {
         <Typography
           variant={screenWidth < 860 ? "headline2" : "headline1"}
           sx={{ whiteSpace: "pre-line" }}
-          {...(screenWidth < 375 && { fontSize: 45 })}
+          {...(screenWidth < 430 && { fontSize: 50 })}
         >
           {t("hero.headline")}
         </Typography>

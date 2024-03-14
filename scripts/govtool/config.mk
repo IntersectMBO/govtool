@@ -57,7 +57,6 @@ $(cardano_config_files): $(target_config_dir)/cardano-node/
 	@:$(call check_defined, cardano_network)
 	$(curl) -s "$(cardano_config_provider)/environments/$(cardano_network)/$(notdir $@)" -o $@
 
-.PHONY: $(target_config_dir)/cardano-node/config.json
 $(target_config_dir)/cardano-node/config.json: $(target_config_dir)/cardano-node/
 	$(curl) -s "$(cardano_config_provider)/environments/$(cardano_network)/$(notdir $@)" -o $@
 	sed -i '/"hasPrometheus"/ { N; s/"127\.0\.0\.1"/"0.0.0.0"/ }' "$(target_config_dir)/cardano-node/config.json"

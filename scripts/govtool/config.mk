@@ -17,7 +17,7 @@ docker_compose_file := $(target_config_dir)/docker-compose.yml
 cardano_config_provider := https://book.world.dev.cardano.org
 
 .PHONY: prepare-config
-prepare-config: clear generate-docker-compose-file enable-prometheus prepare-dbsync-secrets prepare-backend-config prepare-grafana-provisioning $(target_config_dir)/prometheus.yml $(target_config_dir)/promtail.yml $(target_config_dir)/loki.yml $(target_config_dir)/nginx/auth.conf
+prepare-config: clear generate-docker-compose-file enable-prometheus prepare-dbsync-secrets $(target_config_dir)/backend-config.json prepare-grafana-provisioning $(target_config_dir)/prometheus.yml $(target_config_dir)/promtail.yml $(target_config_dir)/loki.yml $(target_config_dir)/nginx/auth.conf
 
 .PHONY: clear
 clear:
@@ -55,14 +55,13 @@ prepare-dbsync-secrets: $(target_config_dir)/dbsync-secrets
 	echo "$${DBSYNC_POSTGRES_PASSWORD}" > "$(target_config_dir)/dbsync-secrets/postgres_password"; \
 	echo "$${DBSYNC_POSTGRES_DB}" > "$(target_config_dir)/dbsync-secrets/postgres_db"
 
-.PHONY: prepare-backend-config
-prepare-backend-config: $(target_config_dir)
+$(target_config_dir)/backend-config.json: $(target_config_dir)
 	sed -e "s|<DBSYNC_POSTGRES_DB>|$${DBSYNC_POSTGRES_DB}|" \
 		-e "s|<DBSYNC_POSTGRES_USER>|$${DBSYNC_POSTGRES_USER}|" \
 		-e "s|<DBSYNC_POSTGRES_PASSWORD>|$${DBSYNC_POSTGRES_PASSWORD}|" \
 		-e "s|<SENTRY_DSN>|$${SENTRY_DSN_BACKEND}|" \
 		"$(config_dir)/templates/backend-config.json.tpl" \
-		> "$(target_config_dir)/backend-config.json"
+		> $@
 
 $(target_config_dir)/prometheus.yml: $(target_config_dir)
 	cp -a "$(template_config_dir)/prometheus.yml" $@

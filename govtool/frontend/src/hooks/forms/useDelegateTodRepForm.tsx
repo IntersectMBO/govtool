@@ -54,7 +54,8 @@ export const useDelegateTodRepForm = () => {
         const certBuilder = await buildVoteDelegationCert(dRepID);
         const result = await buildSignSubmitConwayCertTx({
           certBuilder,
-          type: "delegation",
+          type: "delegate",
+          resourceId: dRepID,
         });
         if (result) {
           openModal({

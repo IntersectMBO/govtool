@@ -3,17 +3,17 @@ import { useMemo } from "react";
 import { useNavigate, generatePath } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
 
-import { Typography } from "@atoms";
+import { Typography } from '@atoms';
 import {
   useGetProposalsQuery,
   useScreenDimension,
   useTranslation,
-} from "@hooks";
-import { GovernanceActionCard } from "@molecules";
-import { GOVERNANCE_ACTIONS_FILTERS, PATHS } from "@consts";
-import { useCardano } from "@context";
-import { getProposalTypeLabel, getFullGovActionId, openInNewTab } from "@utils";
-import { Slider } from "./Slider";
+} from '@hooks';
+import { GovernanceActionCard } from '@molecules';
+import { GOVERNANCE_ACTIONS_FILTERS, PATHS } from '@consts';
+import { useCardano } from '@context';
+import { getProposalTypeLabel, getFullGovActionId, openInNewTab } from '@utils';
+import { Slider } from './Slider';
 
 type GovernanceActionsToVoteProps = {
   filters: string[];
@@ -29,10 +29,10 @@ const defaultCategories = GOVERNANCE_ACTIONS_FILTERS.map(
 export const GovernanceActionsToVote = ({
   filters,
   onDashboard = true,
-  searchPhrase = "",
+  searchPhrase = '',
   sorting,
 }: GovernanceActionsToVoteProps) => {
-  const { voteTransaction } = useCardano();
+  const { pendingTransaction } = useCardano();
   const navigate = useNavigate();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -81,7 +81,7 @@ export const GovernanceActionsToVote = ({
     <>
       {!mappedData.length ? (
         <Typography fontWeight={300} sx={{ py: 4 }}>
-          {t("govActions.noResultsForTheSearch")}
+          {t('govActions.noResultsForTheSearch')}
         </Typography>
       ) : (
         <>
@@ -93,8 +93,8 @@ export const GovernanceActionsToVote = ({
                     className="keen-slider__slide"
                     key={action.id}
                     style={{
-                      overflow: "visible",
-                      width: "auto",
+                      overflow: 'visible',
+                      width: 'auto',
                     }}
                   >
                     <GovernanceActionCard
@@ -103,39 +103,39 @@ export const GovernanceActionsToVote = ({
                       index={action.index}
                       inProgress={
                         onDashboard &&
-                        voteTransaction?.proposalId ===
-                          action?.txHash + action?.index
+                        pendingTransaction.vote?.resourceId ===
+                        action?.txHash + action?.index
                       }
                       // eslint-disable-next-line no-confusing-arrow
                       onClick={() =>
                         onDashboard &&
-                        voteTransaction?.proposalId ===
+                          pendingTransaction.vote?.resourceId ===
                           action?.txHash + action?.index
                           ? openInNewTab(
-                              "https://adanordic.com/latest_transactions",
-                            )
+                            "https://adanordic.com/latest_transactions",
+                          )
                           : navigate(
-                              onDashboard
-                                ? generatePath(
-                                    PATHS.dashboardGovernanceActionsAction,
-                                    {
-                                      proposalId: getFullGovActionId(
-                                        action.txHash,
-                                        action.index,
-                                      ),
-                                    },
-                                  )
-                                : PATHS.governanceActionsAction.replace(
-                                    ":proposalId",
-                                    getFullGovActionId(
-                                      action.txHash,
-                                      action.index,
-                                    ),
+                            onDashboard
+                              ? generatePath(
+                                PATHS.dashboardGovernanceActionsAction,
+                                {
+                                  proposalId: getFullGovActionId(
+                                    action.txHash,
+                                    action.index,
                                   ),
-                              {
-                                state: { ...action },
-                              },
-                            )
+                                },
+                              )
+                              : PATHS.governanceActionsAction.replace(
+                                ":proposalId",
+                                getFullGovActionId(
+                                  action.txHash,
+                                  action.index,
+                                ),
+                              ),
+                            {
+                              state: { ...action },
+                            },
+                          )
                       }
                     />
                   </div>

@@ -13,17 +13,17 @@ import {
   PATHS,
   storageInformationErrorModals,
 } from "@consts";
-import {
-  GovernanceActionFieldSchemas,
-  GovernanceActionType,
-} from "@/types/governanceAction";
+import { useCardano, useModal } from "@context";
 import {
   canonizeJSON,
   downloadJson,
   generateJsonld,
   validateMetadataHash,
-} from "@/utils";
-import { useCardano, useModal } from "@/context";
+} from "@utils";
+import {
+  GovernanceActionFieldSchemas,
+  GovernanceActionType,
+} from "@/types/governanceAction";
 
 export type CreateGovernanceActionValues = {
   links?: { link: string }[];
@@ -214,7 +214,7 @@ export const useCreateGovernanceActionForm = (
         const govActionBuilder = await buildTransaction(data);
         await buildSignSubmitConwayCertTx({
           govActionBuilder,
-          type: "govAction",
+          type: "createGovAction",
         });
 
         showSuccessModal();

@@ -1,16 +1,16 @@
-import { useMemo } from "react";
-import { Box, Typography, CircularProgress } from "@mui/material";
+import { useMemo } from 'react';
+import { Box, Typography, CircularProgress } from '@mui/material';
 
-import { GovernanceVotedOnCard } from "@molecules";
+import { GovernanceVotedOnCard } from '@molecules';
 import {
   useGetDRepVotesQuery,
   useScreenDimension,
   useTranslation,
-} from "@hooks";
-import { Slider } from ".";
-import { getProposalTypeLabel } from "@/utils/getProposalTypeLabel";
-import { getFullGovActionId } from "@/utils";
-import { useCardano } from "@/context";
+} from '@hooks';
+import { Slider } from '.';
+import { getProposalTypeLabel } from '@/utils/getProposalTypeLabel';
+import { getFullGovActionId } from '@/utils';
+import { useCardano } from '@/context';
 
 interface DashboardGovernanceActionsVotedOnProps {
   filters: string[];
@@ -25,7 +25,7 @@ export const DashboardGovernanceActionsVotedOn = ({
 }: DashboardGovernanceActionsVotedOnProps) => {
   const { data, areDRepVotesLoading } = useGetDRepVotesQuery(filters, sorting);
   const { isMobile } = useScreenDimension();
-  const { voteTransaction } = useCardano();
+  const { pendingTransaction } = useCardano();
   const { t } = useTranslation();
 
   const filteredData = useMemo(() => {
@@ -42,7 +42,7 @@ export const DashboardGovernanceActionsVotedOn = ({
         .filter((entry) => entry.actions.length > 0);
     }
     return data;
-  }, [data, searchPhrase, voteTransaction.transactionHash]);
+  }, [data, searchPhrase, pendingTransaction.vote]);
 
   return areDRepVotesLoading ? (
     <Box py={4} display="flex" justifyContent="center">
@@ -52,11 +52,11 @@ export const DashboardGovernanceActionsVotedOn = ({
     <>
       {!data.length ? (
         <Typography py={4} fontWeight="300">
-          {t("govActions.youHaventVotedYet")}
+          {t('govActions.youHaventVotedYet')}
         </Typography>
       ) : !filteredData?.length ? (
         <Typography py={4} fontWeight="300">
-          {t("govActions.noResultsForTheSearch")}
+          {t('govActions.noResultsForTheSearch')}
         </Typography>
       ) : (
         <>
@@ -77,7 +77,7 @@ export const DashboardGovernanceActionsVotedOn = ({
                     <GovernanceVotedOnCard
                       votedProposal={action}
                       inProgress={
-                        voteTransaction.proposalId ===
+                        pendingTransaction.vote?.resourceId ===
                         action.proposal.txHash + action.proposal.index
                       }
                     />

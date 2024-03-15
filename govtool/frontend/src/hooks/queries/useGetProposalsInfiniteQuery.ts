@@ -9,7 +9,7 @@ export const useGetProposalsInfiniteQuery = ({
   pageSize = 10,
   sorting = "",
 }: getProposalsArguments) => {
-  const { dRepID, isEnabled, voteTransaction } = useCardano();
+  const { dRepID, isEnabled, pendingTransaction } = useCardano();
 
   const fetchProposals = ({ pageParam = 0 }) =>
     getProposals({
@@ -30,11 +30,11 @@ export const useGetProposalsInfiniteQuery = ({
   } = useInfiniteQuery(
     [
       QUERY_KEYS.useGetProposalsInfiniteKey,
-      filters,
-      sorting,
-      voteTransaction.proposalId,
-      isEnabled,
       dRepID,
+      filters,
+      isEnabled,
+      pendingTransaction.vote,
+      sorting,
     ],
     fetchProposals,
     {

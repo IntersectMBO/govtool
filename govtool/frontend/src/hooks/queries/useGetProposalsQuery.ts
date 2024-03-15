@@ -8,7 +8,7 @@ export const useGetProposalsQuery = ({
   filters = [],
   sorting,
 }: getProposalsArguments) => {
-  const { dRepID, isEnabled, voteTransaction } = useCardano();
+  const { dRepID, isEnabled, pendingTransaction } = useCardano();
 
   const fetchProposals = async (): Promise<ActionType[]> => {
     const allProposals = await Promise.all(
@@ -25,9 +25,9 @@ export const useGetProposalsQuery = ({
       QUERY_KEYS.useGetProposalsKey,
       filters,
       sorting,
-      voteTransaction.proposalId,
       isEnabled,
       dRepID,
+      pendingTransaction.vote,
     ],
     fetchProposals,
   );

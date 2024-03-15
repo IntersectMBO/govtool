@@ -93,7 +93,8 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
       const certBuilder = await buildVoteDelegationCert(chosenOption);
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
-        type: "delegation",
+        type: "delegate",
+        resourceId: chosenOption,
       });
       if (result) openSuccessDelegationModal();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

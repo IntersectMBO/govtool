@@ -29,8 +29,7 @@ export const RegisterAsSoleVoterBox = () => {
         : await buildDRepRegCert();
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
-        type: "soleVoterRegistration",
-        registrationType: "registration",
+        type: "registerAsSoleVoter",
       });
       if (result) {
         openModal({

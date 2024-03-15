@@ -5,13 +5,15 @@ import { useCardano } from "@context";
 import { getVoterInfo } from "@services";
 
 export const useGetVoterInfo = () => {
-  const { dRepID, registerTransaction, soleVoterTransaction } = useCardano();
+  const { dRepID, pendingTransaction } = useCardano();
 
   const { data, isLoading } = useQuery({
     queryKey: [
       QUERY_KEYS.useGetDRepInfoKey,
-      registerTransaction?.transactionHash,
-      soleVoterTransaction?.transactionHash,
+      pendingTransaction.registerAsDrep ||
+        pendingTransaction.registerAsSoleVoter ||
+        pendingTransaction.retireAsDrep ||
+        pendingTransaction.retireAsSoleVoter,
     ],
     enabled: !!dRepID,
     queryFn: () => getVoterInfo(dRepID),

@@ -7,7 +7,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -58,7 +57,6 @@ import { CardanoApiWallet, VoterInfo, Protocol } from '@models';
 import type { StatusModalState } from '@organisms';
 import {
   checkIsMaintenanceOn,
-  DELEGATE_TO_KEY,
   generateAnchor,
   getItemFromLocalStorage,
   getPubDRepID,
@@ -73,7 +71,11 @@ import { getEpochParams } from '@services';
 import { useTranslation } from '@hooks';
 import { getUtxos } from './walletUtils';
 import { useModal, useSnackbar } from '.';
-import { useTransactions } from './useTransactions';
+import {
+  PendingTransaction,
+  TransactionType,
+  useTransactions,
+} from './useTransactions';
 
 interface Props {
   children: React.ReactNode;
@@ -84,13 +86,6 @@ interface EnableResponse {
   stakeKey?: boolean;
   error?: string;
 }
-
-type TransactionHistoryItem = {
-  transactionHash: string;
-  time?: Date;
-};
-
-export type DRepActionType = 'retirement' | 'registration' | 'update' | '';
 
 type InfoProps = {
   hash: string;
@@ -125,22 +120,16 @@ interface CardanoContext {
   setDelegatedDRepID: (key: string) => void;
   buildSignSubmitConwayCertTx: ({
     certBuilder,
-    votingBuilder,
     govActionBuilder,
+    resourceId,
     type,
-    registrationType,
+    votingBuilder,
   }: {
     certBuilder?: CertificatesBuilder;
-    votingBuilder?: VotingBuilder;
     govActionBuilder?: VotingProposalBuilder;
-    type:
-    | 'delegation'
-    | 'govAction'
-    | 'registration'
-    | 'soleVoterRegistration'
-    | 'vote';
-    proposalId?: string;
-    registrationType?: DRepActionType;
+    resourceId?: string;
+    type: TransactionType;
+    votingBuilder?: VotingBuilder;
   }) => Promise<string>;
   buildDRepRegCert: (
     url?: string,
@@ -162,14 +151,7 @@ interface CardanoContext {
     cip95MetadataHash?: string,
     cip95MetadataHash?: string,
   ) => Promise<VotingBuilder>;
-  govActionTransaction: TransactionHistoryItem;
-  delegateTransaction: TransactionHistoryItem;
-  registerTransaction: TransactionHistoryItem & { type: DRepActionType };
-  soleVoterTransaction: TransactionHistoryItem & {
-    type: Omit<DRepActionType, 'update'>;
-  };
-  delegateTo: string;
-  voteTransaction: TransactionHistoryItem & { proposalId: string };
+  pendingTransaction: PendingTransaction;
   isPendingTransaction: () => boolean;
   isDrepLoading: boolean;
   setIsDrepLoading: Dispatch<SetStateAction<boolean>>;
@@ -216,7 +198,6 @@ const CardanoProvider = (props: Props) => {
   const [delegatedDRepID, setDelegatedDRepID] = useState<string | undefined>(
     undefined,
   );
-  const [delegateTo, setDelegateTo] = useState<string>('');
   const [walletState, setWalletState] = useState<{
     changeAddress: undefined | string;
     usedAddress: undefined | string;
@@ -228,26 +209,10 @@ const CardanoProvider = (props: Props) => {
   const { t } = useTranslation();
   const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
-  const {
-    delegateTransaction,
-    registerTransaction,
-    soleVoterTransaction,
-    voteTransaction,
-    govActionTransaction,
-    isPendingTransaction,
-    updateTransaction,
-  } = useTransactions({
-    delegateTo, dRepID, setVoter, isEnabled, stakeKey
-  });
-
-  useEffect(() => {
-    const delegateTo = getItemFromLocalStorage(
-      `${DELEGATE_TO_KEY}_${stakeKey}`,
-    );
-    if (delegateTo) {
-      setDelegateTo(delegateTo);
-    }
-  }, [isEnabled, stakeKey]);
+  const { isPendingTransaction, updateTransaction, pendingTransaction } =
+    useTransactions({
+      dRepID, setVoter, isEnabled, stakeKey
+    });
 
   const getChangeAddress = async (enabledApi: CardanoApiWallet) => {
     try {
@@ -459,42 +424,33 @@ const CardanoProvider = (props: Props) => {
     }
   }, []);
 
-  const getTxUnspentOutputs = useCallback(async (utxos: Utxos) => {
+  const getTxUnspentOutputs = async (utxos: Utxos) => {
     const txOutputs = TransactionUnspentOutputs.new();
     for (const utxo of utxos) {
       txOutputs.add(utxo.TransactionUnspentOutput);
     }
     return txOutputs;
-  }, []);
+  };
 
   // Build, sign and submit transaction
   const buildSignSubmitConwayCertTx = useCallback(
     async ({
       certBuilder,
-      votingBuilder,
       govActionBuilder,
+      resourceId,
       type,
-      proposalId,
-      registrationType,
+      votingBuilder,
     }: {
       certBuilder?: CertificatesBuilder;
-      votingBuilder?: VotingBuilder;
       govActionBuilder?: VotingProposalBuilder;
-      type:
-      | 'delegation'
-      | 'govAction'
-      | 'registration'
-      | 'soleVoterRegistration'
-      | 'vote';
-      proposalId?: string;
-      registrationType?: DRepActionType;
+      resourceId?: string;
+      type: TransactionType;
+      votingBuilder?: VotingBuilder;
     }) => {
       await checkIsMaintenanceOn();
       const isPendingTx = isPendingTransaction();
       if (isPendingTx) return;
 
-      console.log(walletState, 'walletState');
-      console.log(certBuilder, 'certBuilder');
       try {
         const txBuilder = await initTransactionBuilder();
 
@@ -530,7 +486,10 @@ const CardanoProvider = (props: Props) => {
         // Add output of 1 ADA to the address of our wallet
         let outputValue = BigNum.from_str('1000000');
 
-        if (registrationType === 'retirement' && voter?.deposit) {
+        if (
+          (type === 'retireAsDrep' || type === 'retireAsSoleVoter') &&
+          voter?.deposit
+        ) {
           outputValue = outputValue.checked_add(
             BigNum.from_str(`${voter?.deposit}`),
           );
@@ -566,49 +525,35 @@ const CardanoProvider = (props: Props) => {
         // Ask wallet to to provide signature (witnesses) for the transaction
         let txVkeyWitnesses;
 
-        txVkeyWitnesses = await walletApi.signTx(
-          Buffer.from(tx.to_bytes(), 'utf8').toString('hex'),
-          true,
-        );
+        txVkeyWitnesses = await walletApi.signTx(tx.to_hex(), true);
 
         // Create witness set object using the witnesses provided by the wallet
         txVkeyWitnesses = TransactionWitnessSet.from_bytes(
           Buffer.from(txVkeyWitnesses, 'hex'),
         );
-        transactionWitnessSet.set_vkeys(txVkeyWitnesses.vkeys());
+        const vkeys = txVkeyWitnesses.vkeys();
+
+        if (!vkeys) throw new Error(t('errors.appCannotGetVkeys'));
+
+        transactionWitnessSet.set_vkeys(vkeys);
         // Build transaction with witnesses
         const signedTx = Transaction.new(tx.body(), transactionWitnessSet);
-        console.log(
-          Buffer.from(signedTx.to_bytes(), 'utf8').toString('hex'),
-          'signed tx cbor',
-        );
 
         // Submit built signed transaction to chain, via wallet's submit transaction endpoint
-        const result = await walletApi.submitTx(
-          Buffer.from(signedTx.to_bytes(), 'utf8').toString('hex'),
-        );
+        const result = await walletApi.submitTx(signedTx.to_hex());
         // Set results so they can be rendered
-        const cip95ResultTx = Buffer.from(signedTx.to_bytes(), 'utf8').toString(
-          'hex',
-        );
         const resultHash = result;
-        const cip95ResultWitness = Buffer.from(
-          txVkeyWitnesses.to_bytes(),
-          'utf8',
-        ).toString('hex');
 
         updateTransaction({
           transactionHash: resultHash,
           type,
-          proposalId,
-          registrationType,
+          resourceId,
         });
 
-        console.log(cip95ResultTx, 'cip95ResultTx');
-        console.log(resultHash, 'cip95ResultHash');
-        console.log(cip95ResultWitness, 'cip95ResultWitness');
+        console.log(signedTx.to_hex(), 'signed tx cbor');
         return resultHash;
-      } catch (error) {
+        // TODO: type error
+      } catch (error: any) {
         const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
         const isWalletConnected = await window.cardano[walletName].isEnabled();
 
@@ -617,21 +562,17 @@ const CardanoProvider = (props: Props) => {
         }
 
         Sentry.captureException(error);
-        console.log(error, 'error');
+        console.error(error, 'error');
         throw error?.info ?? error;
       }
     },
     [
-      walletState,
-      walletApi,
-      getUtxos,
-      registerTransaction.transactionHash,
-      soleVoterTransaction.transactionHash,
-      delegateTransaction.transactionHash,
-      voteTransaction.transactionHash,
-      stakeKey,
       isPendingTransaction,
-      voter,
+      stakeKey,
+      updateTransaction,
+      voter?.deposit,
+      walletApi,
+      walletState,
     ],
   );
 
@@ -650,11 +591,11 @@ const CardanoProvider = (props: Props) => {
         if (registeredStakeKeysListState.length > 0) {
           stakeCred = Credential.from_keyhash(stakeKeyHash);
         } else {
-          console.log(t('errors.registeringStakeKey'));
           stakeCred = Credential.from_keyhash(stakeKeyHash);
           const stakeKeyRegCert = StakeRegistration.new(stakeCred);
           certBuilder.add(Certificate.new_stake_registration(stakeKeyRegCert));
         }
+
         // Create correct DRep
         let targetDRep;
         if (target === 'abstain') {
@@ -669,10 +610,8 @@ const CardanoProvider = (props: Props) => {
         // Create cert object
         const voteDelegationCert = VoteDelegation.new(stakeCred, targetDRep);
         // add cert to tbuilder
-
         certBuilder.add(Certificate.new_vote_delegation(voteDelegationCert));
-        setDelegateTo(target);
-        setItemToLocalStorage(`${DELEGATE_TO_KEY}_${stakeKey}`, target);
+
         return certBuilder;
       } catch (e) {
         Sentry.captureException(e);
@@ -719,7 +658,7 @@ const CardanoProvider = (props: Props) => {
         return certBuilder;
       } catch (e) {
         Sentry.captureException(e);
-        console.log(e);
+        console.error(e);
         throw e;
       }
     },
@@ -937,8 +876,6 @@ const CardanoProvider = (props: Props) => {
       buildVote,
       buildVoteDelegationCert,
       delegatedDRepID,
-      delegateTo,
-      delegateTransaction,
       disconnectWallet,
       dRepID,
       dRepIDBech32,
@@ -949,19 +886,16 @@ const CardanoProvider = (props: Props) => {
       isEnableLoading,
       isMainnet,
       isPendingTransaction,
+      pendingTransaction,
       pubDRepKey,
-      registerTransaction,
       setDelegatedDRepID,
       setIsDrepLoading,
       setStakeKey,
       setVoter,
-      soleVoterTransaction,
       stakeKey,
       stakeKeys,
       voter,
-      voteTransaction,
       walletApi,
-      govActionTransaction,
     }),
     [
       address,
@@ -974,8 +908,6 @@ const CardanoProvider = (props: Props) => {
       buildVote,
       buildVoteDelegationCert,
       delegatedDRepID,
-      delegateTo,
-      delegateTransaction,
       disconnectWallet,
       dRepID,
       dRepIDBech32,
@@ -986,19 +918,16 @@ const CardanoProvider = (props: Props) => {
       isEnableLoading,
       isMainnet,
       isPendingTransaction,
+      pendingTransaction,
       pubDRepKey,
-      registerTransaction,
       setDelegatedDRepID,
       setIsDrepLoading,
       setStakeKey,
       setVoter,
-      soleVoterTransaction,
       stakeKey,
       stakeKeys,
       voter,
-      voteTransaction,
       walletApi,
-      govActionTransaction,
     ],
   );
 

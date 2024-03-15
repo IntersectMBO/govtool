@@ -5,12 +5,12 @@ import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 
 export const useGetAdaHolderCurrentDelegationQuery = (stakeKey?: string) => {
-  const { delegateTransaction } = useCardano();
+  const { pendingTransaction } = useCardano();
 
   const { data, isLoading } = useQuery({
     queryKey: [
       QUERY_KEYS.getAdaHolderCurrentDelegationKey,
-      delegateTransaction.transactionHash,
+      pendingTransaction.delegate,
     ],
     queryFn: () => getAdaHolderCurrentDelegation({ stakeKey }),
     enabled: !!stakeKey,

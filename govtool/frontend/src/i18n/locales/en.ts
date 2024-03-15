@@ -1,43 +1,45 @@
 export const en = {
   translation: {
     alerts: {
-      delegation: {
+      delegate: {
         failed: "Delegation transaction failed",
-        refreshPage:
+        warning:
           "Your voting power has been successfully delegated! Please refresh the page.",
         success: "Your voting power has been successfully delegated!",
       },
-      govAction: {
+      createGovAction: {
         failed: "Creating Governance Action transaction failed",
         success: "Your Governance Action has been submitted",
       },
-      metadataUpdate: {
-        failed: "Update DRep metadata transaction failed",
-        success: "You have successfully updated DRep metadata!",
-      },
-      registration: {
+      registerAsDrep: {
         failed: "Registration transaction failed",
-        refreshPage:
+        warning:
           "You have successfully registered as a DRep! Please refresh the page.",
         success: "You have successfully registered as a DRep!",
       },
-      retirement: {
-        failed: "Retirement transaction failed",
-        refreshPage:
-          "You have successfully retired from being a DRep! Please refresh the page.",
-        success: "You have successfully retired from being a DRep!",
-      },
-      soleVoterRegistration: {
-        refreshPage:
+      registerAsSoleVoter: {
+        failed: "Registration transaction failed",
+        warning:
           "You have successfully registered as a Sole Voter! Please refresh the page.",
         success: "You have successfully registered as a Sole Voter!",
       },
-      soleVoterRetirement: {
-        refreshPage:
+      retireAsDrep: {
+        failed: "Retirement transaction failed",
+        warning:
+          "You have successfully retired from being a DRep! Please refresh the page.",
+        success: "You have successfully retired from being a DRep!",
+      },
+      retireAsSoleVoter: {
+        failed: "Retirement transaction failed",
+        warning:
           "You have successfully retired from being a Sole Voter! Please refresh the page.",
         success: "You have successfully retired from being a SoleVoter!",
       },
-      voting: {
+      updateMetaData: {
+        failed: "Update DRep metadata transaction failed",
+        success: "You have successfully updated DRep metadata!",
+      },
+      vote: {
         failed: "Vote transaction failed",
         success: "You have successfully voted!",
       },
@@ -259,6 +261,7 @@ export const en = {
     errors: {
       appCannotCreateTransaction: "Application can not create transaction.",
       appCannotGetUtxos: "Application can not get utxos",
+      appCannotGetVkeys: "Application can not get vkey",
       checkIsWalletConnected: "Check if the wallet is connected.",
       dRepIdNotFound: "DrepId not found",
       invalidGovernanceActionType: "Invalid Governance Action Type",

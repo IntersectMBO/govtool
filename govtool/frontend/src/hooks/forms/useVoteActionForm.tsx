@@ -98,7 +98,7 @@ export const useVoteActionForm = () => {
         const result = await buildSignSubmitConwayCertTx({
           votingBuilder,
           type: "vote",
-          proposalId: state.txHash + state.index,
+          resourceId: state.txHash + state.index,
         });
         if (result) {
           addSuccessAlert("Vote submitted");

@@ -3,10 +3,13 @@ import { CardanoApiWallet, VoterInfo } from "@models";
 import * as Sentry from "@sentry/react";
 import { TransactionUnspentOutput } from "@emurgo/cardano-serialization-lib-asmjs";
 import { Buffer } from "buffer";
-import { DRepActionType } from "./wallet";
+import { TransactionType } from "./useTransactions";
+
+const INTERVAL_TIME = 3 * 1000; // 3 SECONDS
+const ATTEMPTS_NUMBER = 10;
 
 type Utxos = {
-  txid: any;
+  txid: unknown;
   txindx: number;
   amount: string;
   str: string;
@@ -14,56 +17,53 @@ type Utxos = {
   TransactionUnspentOutput: TransactionUnspentOutput;
 }[];
 
-export const setLimitedRegistrationInterval = (
-  intervalTime: number,
-  attemptsNumber: number,
+export const setLimitedDRepActionInterval = (
   dRepID: string,
-  transactionType: DRepActionType | Omit<DRepActionType, "update">,
-  setVoter: (key: undefined | VoterInfo) => void,
-): Promise<boolean> =>
-  new Promise((resolve) => {
-    const desiredResult = transactionType === "registration";
-    let count = 0;
+  transactionType: TransactionType,
+  setVoter: (key: undefined | VoterInfo) => void
+): Promise<boolean> => new Promise((resolve) => {
+  const desiredResult =
+    transactionType === "registerAsDrep" ||
+    transactionType === "registerAsSoleVoter";
+  let count = 0;
 
-    const interval = setInterval(async () => {
-      if (count < attemptsNumber) {
-        // TODO: Refactor this to not iterate over the same data
-        count++;
+  const interval = setInterval(async () => {
+    if (count < ATTEMPTS_NUMBER) {
+      // TODO: Refactor this to not iterate over the same data
+      count++;
 
-        try {
-          const data = await getVoterInfo(dRepID);
+      try {
+        const data = await getVoterInfo(dRepID);
 
-          if (
-            data.isRegisteredAsDRep === desiredResult ||
-            data.isRegisteredAsSoleVoter === desiredResult
-          ) {
-            setVoter(data);
-            clearInterval(interval);
-            resolve(desiredResult);
-          }
-        } catch (error) {
+        if (
+          data.isRegisteredAsDRep === desiredResult ||
+          data.isRegisteredAsSoleVoter === desiredResult
+        ) {
+          setVoter(data);
           clearInterval(interval);
-          resolve(!desiredResult);
+          resolve(desiredResult);
         }
-      } else {
+      } catch (error) {
         clearInterval(interval);
         resolve(!desiredResult);
       }
-    }, intervalTime);
-  });
+    } else {
+      clearInterval(interval);
+      resolve(!desiredResult);
+    }
+  }, INTERVAL_TIME);
+});
 
 export const setLimitedDelegationInterval = (
-  intervalTime: number,
-  attemptsNumber: number,
   dRepID: string,
-  delegateTo: string,
+  delegateTo: string | undefined,
   stakeKey?: string,
 ): Promise<boolean> =>
   new Promise((resolve) => {
     let count = 0;
 
     const interval = setInterval(async () => {
-      if (count < attemptsNumber) {
+      if (count < ATTEMPTS_NUMBER) {
         count++;
 
         try {
@@ -90,7 +90,7 @@ export const setLimitedDelegationInterval = (
         clearInterval(interval);
         resolve(false);
       }
-    }, intervalTime);
+    }, INTERVAL_TIME);
   });
 
 export const getUtxos = async (
@@ -121,9 +121,7 @@ export const getUtxos = async (
 
         for (let i = 0; i < N; i++) {
           const policyId = keys.get(i);
-          const policyIdHex = Buffer.from(policyId.to_bytes(), "utf8").toString(
-            "hex"
-          );
+          const policyIdHex = policyId.to_hex();
           const assets = multiasset.get(policyId);
           if (assets) {
             const assetNames = assets.keys();
@@ -131,10 +129,7 @@ export const getUtxos = async (
 
             for (let j = 0; j < K; j++) {
               const assetName = assetNames.get(j);
-              const assetNameString = Buffer.from(
-                assetName.name(),
-                "utf8"
-              ).toString();
+              const assetNameString = assetName.name().toString();
               const assetNameHex = Buffer.from(
                 assetName.name(),
                 "utf8"
@@ -147,12 +142,12 @@ export const getUtxos = async (
       }
 
       const obj = {
+        amount,
+        multiAssetStr,
+        str: `${txid} #${txindx} = ${amount}`,
+        TransactionUnspentOutput: utxo,
         txid,
         txindx,
-        amount,
-        str: `${txid} #${txindx} = ${amount}`,
-        multiAssetStr,
-        TransactionUnspentOutput: utxo,
       };
       utxos.push(obj);
     }
@@ -160,6 +155,6 @@ export const getUtxos = async (
     return utxos;
   } catch (err) {
     Sentry.captureException(err);
-    console.log(err);
+    console.error(err);
   }
 };

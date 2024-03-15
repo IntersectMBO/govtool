@@ -1,6 +1,6 @@
 export * from "./useCreateGovernanceActionForm";
 export * from "./useDelegateTodRepForm";
-export * from "./useRegisterAsdRepFormContext";
+export * from "./useRegisterAsdRepForm";
 export * from "./useUpdatedRepMetadataForm";
 export * from "./useUrlAndHashFormController";
 export * from "./useVoteActionForm";

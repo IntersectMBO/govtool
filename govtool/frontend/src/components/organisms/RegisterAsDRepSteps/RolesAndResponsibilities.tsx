@@ -1,19 +1,19 @@
-import { Dispatch, SetStateAction, useCallback } from "react";
-import { Trans } from "react-i18next";
-import { Link } from "@mui/material";
+import { Dispatch, SetStateAction } from 'react';
+import { Trans } from 'react-i18next';
+import { Link } from '@mui/material';
 
-import { Typography } from "@atoms";
-import { useScreenDimension, useTranslation } from "@hooks";
+import { Typography } from '@atoms';
+import { useScreenDimension, useTranslation } from '@hooks';
 import {
   correctAdaFormat,
   getItemFromLocalStorage,
   openInNewTab,
   PROTOCOL_PARAMS_KEY,
-} from "@utils";
+} from '@utils';
 
-import { BgCard } from ".";
+import { BgCard } from '..';
 
-export const RegisterAsdRepStepOne = ({
+export const RolesAndResponsibilities = ({
   onClickCancel,
   setStep,
 }: {
@@ -25,31 +25,29 @@ export const RegisterAsdRepStepOne = ({
 
   const deposit = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
-  const onClickContinue = useCallback(() => setStep(2), []);
+  const onClickContinue = () => setStep(2);
 
-  const openLearnMoreAboutDrep = useCallback(
-    () => openInNewTab("https://sancho.network/roles/drep"),
-    [],
-  );
+  const openLearnMoreAboutDrep = () =>
+    openInNewTab('https://sancho.network/roles/drep');
 
   return (
     <BgCard
-      actionButtonLabel={t("continue")}
-      backButtonLabel={t("cancel")}
+      actionButtonLabel={t('continue')}
+      backButtonLabel={t('cancel')}
       onClickActionButton={onClickContinue}
       onClickBackButton={onClickCancel}
-      sx={{ paddingBottom: isMobile ? undefined : 3 }}
+      sx={{ pb: isMobile ? undefined : 5, pt: isMobile ? 4 : 8 }}
     >
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
-        {t("registration.rolesAndResponsibilitiesTitle")}
+      <Typography sx={{ textAlign: 'center' }} variant="headline4">
+        {t('registration.rolesAndResponsibilitiesTitle')}
       </Typography>
       <Typography
         fontWeight={400}
         sx={{
-          pb: isMobile ? 6 : 4,
+          pb: isMobile ? 4 : 6,
           pt: 4,
-          textAlign: "center",
-          whiteSpace: "pre-line",
+          textAlign: 'center',
+          whiteSpace: 'pre-line',
         }}
         variant="body1"
       >
@@ -58,7 +56,7 @@ export const RegisterAsdRepStepOne = ({
             <Link
               key="1"
               onClick={openLearnMoreAboutDrep}
-              sx={{ cursor: "pointer" }}
+              sx={{ cursor: 'pointer' }}
             />,
           ]}
           i18nKey="registration.rolesAndResponsibilitiesDescription"

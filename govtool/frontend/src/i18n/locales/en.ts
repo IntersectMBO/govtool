@@ -285,6 +285,7 @@ export const en = {
       hashPlaceholder: "The hash of metadata at URL",
       howCreateUrlAndHash: "How to create URL and hash?",
       link: "Link",
+      linkPlaceholder: "https://website.com/",
       urlWithContextPlaceholder: "Your URL with with your context",
       urlWithInfoPlaceholder: "Your URL with extra info about you",
       createGovernanceAction: {
@@ -297,6 +298,17 @@ export const en = {
         hashInvalidLength: "Hash must be exactly 64 characters long",
         urlTooLong: "Url must be less than 65 characters",
         urlInvalidFormat: "Invalid URL format",
+      },
+      registerAsDRep: {
+        bio: "Bio",
+        bioHelpfulText: "Some sentence about yourself",
+        bioPlaceholder: "Enter your Bio ...",
+        dRepName: "DRep Name",
+        dRepNameHelpfulText:
+          "This is name that will be shown on your DRep profile",
+        dRepNamePlaceholder: "ex. JohnDRep",
+        email: "Email",
+        emailPlaceholder: "john.smith@email.com",
       },
     },
     govActions: {
@@ -440,15 +452,24 @@ export const en = {
       },
     },
     registration: {
+      aboutYou: "About You",
+      aboutYouDescription:
+        "Some extra info about you to provide context to delegators.",
       addInformationDescription:
         "You can include extra information about yourself by adding a URL and its hash.",
       addInformationTitle: "Add Information",
       becomeADRep: "Become a DRep",
       descriptionStepTwo:
         "By clicking register you create your DRep ID within your wallet and become a DRep.\n\nOnce the registration has completed your DRep ID will be shown on your dashboard. You will be able to share your DRep ID so that other ada holders can delegate their voting power to you.",
+      dRepName: "DRep Name",
+      dRepNameDescription:
+        "This is the name that will be displayed in the DRep Directory and it will be used also by delegators to find your profile.",
       headingStepTwo: "Confirm DRep registration",
-      optional: "OPTIONAL",
+      linksDescription: "Links to extra content or social media contacts ",
+      maximumLinks: "(maximum of 7 entries)",
+      optional: "optional",
       register: "Register",
+      required: "required",
       rolesAndResponsibilitiesDescription:
         "DReps are fundamental users that govern the Cardano network. This is an important role which requires work and dedication to fulfil.\n\nA DRep is expected to actively participate in governance and act as a representative of other Cardano members in  governance matters. Therefore, DReps will be expected to keep abreast of Governance Actions so they can make informed and wise decisions.\n<0>Learn More</0> about DRep.\n\nPlease register as a DRep if you have time to dedicate to making Cardano a better and more well-governed place.\n\nBecoming a DRep will require a refundable deposit of ₳<strong>{{deposit}}</strong>.\n\nYou will be refunded your deposit when you retire.",
       rolesAndResponsibilitiesTitle: "Roles & Responsibilities",

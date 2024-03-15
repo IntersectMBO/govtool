@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FormProvider } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { Box } from "@mui/material";
 
 import { Background } from "@atoms";
@@ -8,16 +8,16 @@ import { PATHS } from "@consts";
 import { useModal } from "@context";
 import {
   useScreenDimension,
-  useUrlAndHashFormController as useRegisterAsdRepFormController,
   useTranslation,
+  defaultRegisterAsDRepValues,
 } from "@hooks";
 import { LinkWithIcon } from "@molecules";
 import {
   DashboardTopNav,
   Footer,
-  RegisterAsdRepStepOne,
+  RolesAndResponsibilities,
   RegisterAsdRepStepThree,
-  RegisterAsdRepStepTwo,
+  RegisterAsDRepForm,
 } from "@organisms";
 import { checkIsWalletConnected } from "@utils";
 
@@ -28,7 +28,10 @@ export const RegisterAsdRep = () => {
   const { t } = useTranslation();
   const { closeModal, openModal } = useModal();
 
-  const registerAsdRepFormMethods = useRegisterAsdRepFormController();
+  const methods = useForm({
+    mode: "onChange",
+    defaultValues: defaultRegisterAsDRepValues,
+  });
 
   useEffect(() => {
     if (checkIsWalletConnected()) {
@@ -68,14 +71,14 @@ export const RegisterAsdRep = () => {
             mt: isMobile ? 3 : 1.5,
           }}
         />
-        <FormProvider {...registerAsdRepFormMethods}>
-          {step === 1 && (
-            <RegisterAsdRepStepOne
-              onClickCancel={onClickBackToDashboard}
-              setStep={setStep}
-            />
-          )}
-          {step === 2 && <RegisterAsdRepStepTwo setStep={setStep} />}
+        {step === 1 && (
+          <RolesAndResponsibilities
+            onClickCancel={onClickBackToDashboard}
+            setStep={setStep}
+          />
+        )}
+        <FormProvider {...methods}>
+          {step === 2 && <RegisterAsDRepForm setStep={setStep} />}
           {step === 3 && <RegisterAsdRepStepThree setStep={setStep} />}
         </FormProvider>
         {isMobile && <Footer />}

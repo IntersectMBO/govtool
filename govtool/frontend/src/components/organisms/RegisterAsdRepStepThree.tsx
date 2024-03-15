@@ -3,9 +3,9 @@ import { Box, Link } from "@mui/material";
 
 import { Spacer, Typography } from "@atoms";
 import {
-  useRegisterAsdRepFormContext,
   useScreenDimension,
   useTranslation,
+  useRegisterAsdRepForm,
 } from "@hooks";
 import { openInNewTab } from "@utils";
 
@@ -18,14 +18,8 @@ export const RegisterAsdRepStepThree = ({
 }) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
-  const {
-    control,
-    errors,
-    isRegistrationAsDRepLoading,
-    resetField,
-    submitForm,
-    watch,
-  } = useRegisterAsdRepFormContext();
+  const { control, errors, isRegistrationAsDRepLoading, resetField, watch } =
+    useRegisterAsdRepForm();
 
   const onClickBackButton = () => {
     setStep(2);
@@ -42,7 +36,7 @@ export const RegisterAsdRepStepThree = ({
       actionButtonLabel={t("register")}
       isActionButtonDisabled={isContinueDisabled}
       isLoadingActionButton={isRegistrationAsDRepLoading}
-      onClickActionButton={submitForm}
+      onClickActionButton={() => {}}
       onClickBackButton={onClickBackButton}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">

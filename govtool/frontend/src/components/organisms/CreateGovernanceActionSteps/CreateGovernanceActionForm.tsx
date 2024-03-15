@@ -2,9 +2,7 @@ import { Dispatch, SetStateAction, useCallback } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
-import {
-  Button, InfoText, Spacer, Typography
-} from '@atoms';
+import { Button, InfoText, Spacer, Typography } from '@atoms';
 import { GOVERNANCE_ACTION_FIELDS } from '@consts';
 import { useCreateGovernanceActionForm, useTranslation } from '@hooks';
 import { Field } from '@molecules';
@@ -14,7 +12,6 @@ import { GovernanceActionField } from '@/types/governanceAction';
 import { BgCard } from '../BgCard';
 import { ControlledField } from '../ControlledField';
 
-const LINK_PLACEHOLDER = 'https://website.com/';
 const MAX_NUMBER_OF_LINKS = 8;
 
 type CreateGovernanceActionFormProps = {
@@ -25,9 +22,7 @@ export const CreateGovernanceActionForm = ({
   setStep,
 }: CreateGovernanceActionFormProps) => {
   const { t } = useTranslation();
-  const {
-    control, errors, getValues, register, reset, watch
-  } =
+  const { control, errors, getValues, register, reset, watch } =
     useCreateGovernanceActionForm();
 
   const isError = Object.keys(errors).length > 0;
@@ -112,7 +107,7 @@ export const CreateGovernanceActionForm = ({
           key={field.id}
           label={`${t('forms.link')} ${index + 1}`}
           layoutStyles={{ mb: 3 }}
-          placeholder={LINK_PLACEHOLDER}
+          placeholder={t('forms.linkPlaceholder')}
           name={`links.${index}.link`}
           rules={{
             pattern: {

@@ -53,9 +53,13 @@ export const HomeCards = () => {
 
   return (
     <Box
-      columnGap={5}
+      columnGap={4.625}
       display="grid"
-      gridTemplateColumns={screenWidth >= 1920 ? "1fr 1fr" : "1fr"}
+      gridTemplateColumns={
+        screenWidth < 2560
+          ? "repeat(1, minmax(300px, 866px))"
+          : "repeat(2, minmax(300px, 866px))"
+      }
       justifyItems="center"
       mb={screenWidth < 640 ? 10 : 17}
       mt={screenWidth < 640 ? 10 : 14.5}
@@ -68,7 +72,7 @@ export const HomeCards = () => {
           ? 10
           : 34
       }
-      rowGap={5}
+      rowGap={4.625}
     >
       {/* DELEGATE CARD */}
       <ActionCard

@@ -58,7 +58,7 @@ export const ReviewCreatedGovernanceAction = ({
               {label}
             </Typography>
             <Typography
-              sx={{ mt: 0.5, overflow: "hidden", textOverflow: "ellipsis" }}
+              sx={{ mt: 0.5, wordBreak: "break-word" }}
               variant="body2"
             >
               {value as string}

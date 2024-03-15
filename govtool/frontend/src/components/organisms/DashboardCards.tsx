@@ -33,7 +33,7 @@ export const DashboardCards = () => {
   const navigate = useNavigate();
   const { currentDelegation, isCurrentDelegationLoading } =
     useGetAdaHolderCurrentDelegationQuery(stakeKey);
-  const { isMobile, screenWidth } = useScreenDimension();
+  const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const [isRetirementLoading, setIsRetirementLoading] =
     useState<boolean>(false);
@@ -187,13 +187,12 @@ export const DashboardCards = () => {
   );
 
   const onClickGovernanceActionCardActionButton = useCallback(() => {
-    if(govActionTransaction.transactionHash) {
-      navigate(PATHS.dashboardGovernanceActions)
-      return
+    if (govActionTransaction.transactionHash) {
+      navigate(PATHS.dashboardGovernanceActions);
+      return;
     }
-    navigate(PATHS.createGovernanceAction)
-
-  }, [govActionTransaction.transactionHash, navigate])
+    navigate(PATHS.createGovernanceAction);
+  }, [govActionTransaction.transactionHash, navigate]);
 
   const displayedDelegationId = useMemo(() => {
     const restrictedNames = [
@@ -333,11 +332,12 @@ export const DashboardCards = () => {
         display: "grid",
         gridTemplateColumns:
           screenWidth < 1280
-            ? "1fr"
-            : screenWidth > 1728
-            ? "repeat(3, minmax(300px, 572px))"
-            : "repeat(2, minmax(300px, 572px))",
-        px: isMobile ? 2 : 5,
+            ? "repeat(1, minmax(300px, 530px))"
+            : screenWidth >= 1728
+            ? "repeat(3, minmax(300px, 570px))"
+            : "repeat(2, minmax(300px, 530px))",
+        justifyContent: screenWidth < 1024 ? "center" : "flex-start",
+        px: screenWidth < 640 ? 2 : 5,
         py: 3,
         rowGap: 3,
       }}
@@ -538,9 +538,9 @@ export const DashboardCards = () => {
         firstButtonAction={onClickGovernanceActionCardActionButton}
         firstButtonLabel={t(
           `dashboard.proposeGovernanceAction.${
-             govActionTransaction.transactionHash ? "view" : "propose" 
+            govActionTransaction.transactionHash ? "view" : "propose"
           }`
-          )}
+        )}
         inProgress={!!govActionTransaction.transactionHash}
         secondButtonLabel={t("learnMore")}
         secondButtonAction={() =>

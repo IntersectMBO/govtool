@@ -8,7 +8,7 @@ export const Typography = ({
 }: TypographyProps) => {
   const fontSize = {
     headline1: 100,
-    headline2: 50,
+    headline2: 57,
     headline3: 36,
     headline4: 32,
     headline5: 28,
@@ -21,7 +21,7 @@ export const Typography = ({
 
   const fontWeight = {
     headline1: 600,
-    headline2: 600,
+    headline2: 700,
     headline3: 400,
     headline4: 600,
     headline5: 500,

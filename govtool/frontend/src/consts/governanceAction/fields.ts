@@ -119,9 +119,21 @@ export const GOVERNANCE_ACTION_FIELDS: GovernanceActionFields = {
           value: true,
           message: I18n.t("createGovernanceAction.fields.validations.required"),
         },
-        validate: (value) =>
-          Number.isInteger(Number(value)) ||
-          I18n.t("createGovernanceAction.fields.validations.number"),
+        validate: (value) => {
+          const parsedValue = Number(
+            value.includes(",") ? value.replace(",", ".") : value
+          );
+
+          if (isNaN(parsedValue)) {
+            return I18n.t("createGovernanceAction.fields.validations.number");
+          }
+
+          if (parsedValue < 0) {
+            return I18n.t("createGovernanceAction.fields.validations.positive");
+          }
+
+          return true;
+        },
       },
     },
   },

@@ -175,6 +175,7 @@ export const en = {
           number: "Only number is allowed",
           required: "This field is required",
           url: "Invalid URL",
+          positive: "Only positive number is allowed",
         },
       },
       formTitle: "Governance Action details",

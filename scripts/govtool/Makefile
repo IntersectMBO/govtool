@@ -47,7 +47,7 @@ destroy-cardano-node-and-dbsync: prepare-config
 	$(docker) volume rm $${volumes}
 
 .PHONY: toggle-maintenance
-toggle-maintenance: prepare-config
+toggle-maintenance: docker-login prepare-config
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	@:$(call check_defined, maintenance)
@@ -59,5 +59,5 @@ toggle-maintenance: prepare-config
 	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \
 	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	$(ssh-keyscan) $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
-	if [[ "$(maintenance)" = "enable" ]]; then $(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend touch /var/run/maintenance_enabled; \
+	if [[ "$(maintenance)" = "enabled" ]]; then $(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend touch /var/run/maintenance_enabled; \
 	else $(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) exec frontend rm /var/run/maintenance_enabled; fi

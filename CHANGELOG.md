@@ -9,6 +9,7 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
+
 - Add generate jsonld function [Issue 451](https://github.com/IntersectMBO/govtool/issues/451)
 - Create GA review subbmision page [Issue 362](https://github.com/IntersectMBO/govtool/issues/362)
 - Create GA creation form [Issue 360](https://github.com/IntersectMBO/govtool/issues/360)
@@ -16,6 +17,7 @@ changes.
 - Choose GA type - GA Submiter [Issue 358](https://github.com/IntersectMBO/govtool/issues/358)
 - Add on-chain inputs validation [Issue 377](https://github.com/IntersectMBO/govtool/issues/377)
 - Add hash and validation of the metadata [Issue 378](https://github.com/IntersectMBO/govtool/issues/378)
+- Add githubusercontent.com and ipfs.io to content security policy header [Issue 451](https://github.com/IntersectMBO/govtool/issues/451)
 
 ### Added
 

@@ -42,6 +42,7 @@ export function ExternalLinkModal() {
             marginBottom: "38px",
             color: primaryBlue,
             textDecoration: "underline",
+            wordBreak: "break-word",
           }}
         >
           {state?.externalLink}

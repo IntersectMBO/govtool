@@ -6,11 +6,11 @@ import { Button, InfoText, Spacer, Typography } from "@atoms";
 import { GOVERNANCE_ACTION_FIELDS } from "@consts";
 import { useCreateGovernanceActionForm, useTranslation } from "@hooks";
 import { Field } from "@molecules";
+import { URL_REGEX } from "@/utils";
+import { GovernanceActionField } from "@/types/governanceAction";
 
 import { BgCard } from "../BgCard";
 import { ControlledField } from "../ControlledField";
-import { GovernanceActionField } from "@/types/governanceAction";
-import { URL_REGEX } from "@/utils";
 
 const LINK_PLACEHOLDER = "https://website.com/";
 const MAX_NUMBER_OF_LINKS = 8;
@@ -117,10 +117,6 @@ export const CreateGovernanceActionForm = ({
           placeholder={LINK_PLACEHOLDER}
           name={`links.${index}.link`}
           rules={{
-            required: {
-              value: true,
-              message: t("createGovernanceAction.fields.validations.required"),
-            },
             pattern: {
               value: URL_REGEX,
               message: t("createGovernanceAction.fields.validations.url"),

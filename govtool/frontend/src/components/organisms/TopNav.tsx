@@ -6,9 +6,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Button, Link } from "@atoms";
 import { ICONS, IMAGES, PATHS, NAV_ITEMS } from "@consts";
 import { useCardano, useModal } from "@context";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
-import { useTranslation } from "@hooks";
 
 import { DrawerMobile } from "./DrawerMobile";
 
@@ -55,6 +54,7 @@ export const TopNav = ({ isConnectButton = true }) => {
               : "transparent",
           borderBottom: isMobile ? 1 : 0,
           borderColor: "lightblue",
+          borderRadius: 0,
           boxShadow: 0,
           justifyContent: "center",
           flex: 1,

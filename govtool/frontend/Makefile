@@ -7,7 +7,7 @@ endif
 .DEFAULT_GOAL := push-frontend
 
 # image tags
-frontend_image_tag := $(shell git log -n 1 --format="%H" -- $(root_dir)/govtool/frontend)
+frontend_image_tag := $(shell git log -n 1 --format="%H" -- $(root_dir)/govtool/frontend)-$(env)
 
 .PHONY: build-frontend
 build-frontend: docker-login

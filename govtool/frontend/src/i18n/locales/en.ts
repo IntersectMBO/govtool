@@ -7,6 +7,10 @@ export const en = {
           "Your voting power has been successfully delegated! Please refresh the page.",
         success: "Your voting power has been successfully delegated!",
       },
+      govAction: {
+        failed: "Creating Governance Action transaction failed",
+        success: "Your Governance Action has been submitted",
+      },
       metadataUpdate: {
         failed: "Update DRep metadata transaction failed",
         success: "You have successfully updated DRep metadata!",
@@ -135,6 +139,45 @@ export const en = {
       creatingAGovernanceActionDescription:
         "To create a Governance Action, you will need to:\n\n• Fill out a form with the relevant data\n• Pay a refundable deposit of <strong>₳{{deposit}}</strong>\n• Store the metadata of your Governance Action at your own expense.\n\nYour deposit will be refunded to your wallet when the Governance Action is either enacted or expired.\n\nThe deposit will not affect your Voting Power.",
       editSubmission: "Edit submission",
+      fields: {
+        declarations: {
+          abstract: {
+            label: "Abstract",
+            placeholder: "Summary",
+            tip: "General summary of the Action",
+          },
+          amount: {
+            label: "Amount",
+            placeholder: "e.g. 20000",
+          },
+          motivation: {
+            label: "Motivation",
+            placeholder: "Problem this GA will solve",
+            tip: "How will this solve a problem",
+          },
+          rationale: {
+            label: "Rationale",
+            placeholder: "Content of Governance Action",
+            tip: "Put all the content of the GA here",
+          },
+          receivingAddress: {
+            label: "Receiving Address",
+            placeholder: "The address to receive funds",
+          },
+          title: {
+            label: "Title",
+            placeholder: "A name for this Action",
+          },
+        },
+        validations: {
+          bech32: "Invalid bech32 address",
+          maxLength: "Max {{maxLength}} characters",
+          number: "Only number is allowed",
+          required: "This field is required",
+          url: "Invalid URL",
+          positive: "Only positive number is allowed",
+        },
+      },
       formTitle: "Governance Action details",
       references: "References and Supporting Information",
       reviewSubmission: "Review your submission",
@@ -153,42 +196,28 @@ export const en = {
       storingInformationURLPlaceholder: "URL",
       supportingLinks: "Supporting links",
       title: "Create a Governance Action",
-      fields: {
-        declarations: {
-          title: {
-            label: "Title",
-            placeholder: "A name for this Action",
-          },
-          abstract: {
-            label: "Abstract",
-            placeholder: "Summary",
-            tip: "General summary of the Action",
-          },
-          motivation: {
-            label: "Motivation",
-            placeholder: "Problem this GA will solve",
-            tip: "How will this solve a problem",
-          },
-          rationale: {
-            label: "Rationale",
-            placeholder: "Content of Governance Action",
-            tip: "Put all the content of the GA here",
-          },
-          receivingAddress: {
-            label: "Receiving Address",
-            placeholder: "The address to receive funds",
-          },
-          amount: {
-            label: "Amount",
-            placeholder: "e.g. 20000",
-          },
+      modals: {
+        externalDataDoesntMatch: {
+          buttonText: "Go to Data Edit Screen",
+          cancelRegistrationText: "Cancel Registration",
+          feedbackText: "Feedback",
+          message:
+            "GovTool checks the URL you entered to see if the JSON file that you self-host matches the one that was generated in GovTool. To complete registration, this match must be exact.\n\nIn this case, there is a mismatch. You can go back to the data edit screen and try the process again.",
+          title: "Your External Data Does Not Match the Original File.",
         },
-        validations: {
-          maxLength: "Max {{maxLength}} characters",
-          required: "This field is required",
-          bech32: "Invalid bech32 address",
-          number: "Only number is allowed",
-          url: "Invalid URL",
+        submitTransactionSuccess: {
+          message:
+            "Your Governance Action may take a little time to submit to the chain.",
+          title: "Governance Action submitted!",
+        },
+        urlCannotBeFound: {
+          buttonText: "Go to Data Edit Screen",
+          cancelRegistrationText: "Cancel Registration",
+          feedbackText: "Feedback",
+          linkText: "Learn More about self-hosting",
+          message:
+            "GovTool cannot find the URL that you entered. Please check it and re-enter.",
+          title: "The URL You Entered Cannot Be Found",
         },
       },
     },
@@ -232,14 +261,16 @@ export const en = {
       appCannotGetUtxos: "Application can not get utxos",
       checkIsWalletConnected: "Check if the wallet is connected.",
       dRepIdNotFound: "DrepId not found",
-      notUsingAnchor: "DRep Registration - not using anchor",
+      invalidGovernanceActionType: "Invalid Governance Action Type",
+      invalidTreasuryGovernanceActionType: "Invalid Treasury Governance Action",
       noAddressesFound: "No addresses found",
       noStakeKeySelected: "No stake key selected",
+      notUsingAnchor: "DRep Registration - not using anchor",
       registeringStakeKey: "Registering stake key",
       somethingWentWrong: "Something went wrong",
-      useCardano: "useCardano must be used within a CardanoProvider",
       tryingConnectTo:
         "You are trying to connect with a wallet connected to {{networkFrom}}. Please adjust your wallet settings to connect to {{networkTo}} or select a different wallet.",
+      useCardano: "useCardano must be used within a CardanoProvider",
       walletNoCIP30Nor90Support:
         "Your wallet does not support the required CIP-30 extension, CIP-95.",
       walletNoCIP30Support: "Your wallet does not support CIP-30 extensions.",

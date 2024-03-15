@@ -9,13 +9,15 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
+
 - Add generate jsonld function [Issue 451](https://github.com/IntersectMBO/govtool/issues/451)
 - Create GA review subbmision page [Issue 362](https://github.com/IntersectMBO/govtool/issues/362)
 - Create GA creation form [Issue 360](https://github.com/IntersectMBO/govtool/issues/360)
 - Create TextArea [Issue 110](https://github.com/IntersectMBO/govtool/issues/110)
 - Choose GA type - GA Submiter [Issue 358](https://github.com/IntersectMBO/govtool/issues/358)
-
 - Add on-chain inputs validation [Issue 377](https://github.com/IntersectMBO/govtool/issues/377)
+- Add hash and validation of the metadata [Issue 378](https://github.com/IntersectMBO/govtool/issues/378)
+- Add githubusercontent.com and ipfs.io to content security policy header [Issue 451](https://github.com/IntersectMBO/govtool/issues/451)
 
 ### Added
 
@@ -44,6 +46,7 @@ changes.
 - Fixed CSP settings to allow error reports with Sentry [Issue 291](https://github.com/IntersectMBO/govtool/issues/291).
 
 ### Changed
+
 - `drep/list` now return also `status` and `type` fields. Also it now returns the retired dreps, and you can search for given drep by name using optional query parameter. If the drep name is passed exactly, then you can even find a drep that's sole voter. [Issue 446](https://github.com/IntersectMBO/govtool/issues/446)
 - `drep/list` and `drep/info` endpoints now return additional data such as metadata url and hash, and voting power [Issue 223](https://github.com/IntersectMBO/govtool/issues/223)
 - `drep/info` now does not return sole voters (dreps without metadata) [Issue 317](https://github.com/IntersectMBO/govtool/issues/317)

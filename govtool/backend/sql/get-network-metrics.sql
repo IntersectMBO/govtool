@@ -21,21 +21,21 @@ with current_epoch as (
     select count(*) as count
     from drep_hash
 ), always_abstain_voting_power as (
-    select coalesce(amount, 0) as amount
+    select coalesce((select amount
     from drep_hash
     left join drep_distr
     on drep_hash.id = drep_distr.hash_id
     where drep_hash.view = 'drep_always_abstain'
     order by epoch_no desc
-    limit 1
+    limit 1), 0) as amount
 ), always_no_confidence_voting_power as (
-    select coalesce(amount, 0) as amount
+    select coalesce((select amount
     from drep_hash
     left join drep_distr
     on drep_hash.id = drep_distr.hash_id
     where drep_hash.view = 'drep_always_no_confidence'
     order by epoch_no desc
-    limit 1
+    limit 1), 0) as amount
 )
 
 select

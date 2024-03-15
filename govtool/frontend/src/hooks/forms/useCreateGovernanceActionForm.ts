@@ -131,7 +131,7 @@ export const useCreateGovernanceActionForm = (
             type: "statusModal",
             state: {
               ...storageInformationErrorModals[
-                error.message as MetadataHashValidationErrors
+              error.message as MetadataHashValidationErrors
               ],
               onSubmit: backToForm,
               onCancel: backToDashboard,
@@ -212,7 +212,10 @@ export const useCreateGovernanceActionForm = (
 
         await validateHash(data.storingURL, hash);
         const govActionBuilder = await buildTransaction(data);
-        await buildSignSubmitConwayCertTx({ govActionBuilder });
+        await buildSignSubmitConwayCertTx({
+          govActionBuilder,
+          type: "govAction",
+        });
 
         showSuccessModal();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

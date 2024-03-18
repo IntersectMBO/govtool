@@ -31,10 +31,11 @@ export type SharedGovernanceActionFieldSchema = {
 
 export type InfoGovernanceActionFieldSchema = SharedGovernanceActionFieldSchema;
 export type TreasuryGovernanceActionFieldSchema =
-  SharedGovernanceActionFieldSchema & {
-    receivingAddress: FieldSchema;
-    amount: FieldSchema;
-  };
+  SharedGovernanceActionFieldSchema &
+    Partial<{
+      receivingAddress: FieldSchema;
+      amount: FieldSchema;
+    }>;
 
 export type GovernanceActionFieldSchemas =
   | InfoGovernanceActionFieldSchema & TreasuryGovernanceActionFieldSchema;

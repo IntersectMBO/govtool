@@ -75,7 +75,6 @@ export const useCreateGovernanceActionForm = (
     closeModal();
   }, []);
 
-  // TODO: To be moved to utils
   const generateMetadata = async (data: CreateGovernanceActionValues) => {
     if (!govActionType) throw new Error("Governance action type is not defined");
 
@@ -207,10 +206,8 @@ export const useCreateGovernanceActionForm = (
         setIsLoading(true);
 
         await validateHash(data.storingURL, hash);
-        const votingProposalBuilder = await buildTransaction(data);
-        await buildSignSubmitConwayCertTx({
-          govActionBuilder: votingProposalBuilder,
-        });
+        const govActionBuilder = await buildTransaction(data);
+        await buildSignSubmitConwayCertTx({ govActionBuilder });
 
         showSuccessModal();
       } catch (error: any) {

@@ -48,4 +48,12 @@ declare global {
           : string & K;
       }[keyof T]
     : never;
+
+  type JSONValue =
+    | string
+    | number
+    | boolean
+    | null
+    | { [property: string]: JSONValue }
+    | JSONValue[];
 }

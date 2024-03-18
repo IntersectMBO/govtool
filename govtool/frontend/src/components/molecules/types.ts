@@ -8,8 +8,9 @@ export type LinkWithIconProps = {
 };
 
 export type StepProps = {
-  component: JSX.Element;
   label: string;
-  layoutStyles?: SxProps;
   stepNumber: number | string;
+  component?: JSX.Element;
+  componentsLayoutStyles?: SxProps;
+  layoutStyles?: SxProps;
 };

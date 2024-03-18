@@ -7,6 +7,7 @@ import { StepProps } from './types';
 
 export const Step = ({
   component,
+  componentsLayoutStyles,
   label,
   layoutStyles,
   stepNumber,
@@ -46,9 +47,10 @@ export const Step = ({
           flex: 1,
           flexDirection: 'column',
           ml: 3,
+          ...componentsLayoutStyles,
         }}
       >
-        <Typography fontWeight={500} sx={{ mb: 1.5 }} variant="body1">
+        <Typography fontWeight={500} variant="body1">
           {label}
         </Typography>
         {component}

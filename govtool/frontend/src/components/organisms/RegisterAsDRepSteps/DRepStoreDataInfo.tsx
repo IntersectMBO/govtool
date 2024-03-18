@@ -9,9 +9,9 @@ import {
 } from "@hooks";
 import { openInNewTab } from "@utils";
 
-import { BgCard, ControlledField } from ".";
+import { BgCard, ControlledField } from "..";
 
-export const RegisterAsdRepStepThree = ({
+export const DRepStoreDataInfo = ({
   setStep,
 }: {
   setStep: Dispatch<SetStateAction<number>>;
@@ -28,6 +28,8 @@ export const RegisterAsdRepStepThree = ({
 
   const isContinueDisabled = !watch("storeData");
 
+  const onClickContinue = () => setStep(4);
+
   // TODO: Add link about store data when available
   const openLink = () => openInNewTab("https://sancho.network/get-started");
 
@@ -36,7 +38,7 @@ export const RegisterAsdRepStepThree = ({
       actionButtonLabel={t("register")}
       isActionButtonDisabled={isContinueDisabled}
       isLoadingActionButton={isRegistrationAsDRepLoading}
-      onClickActionButton={() => {}}
+      onClickActionButton={onClickContinue}
       onClickBackButton={onClickBackButton}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">

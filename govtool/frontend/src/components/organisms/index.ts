@@ -21,7 +21,6 @@ export * from "./GovernanceActionsToVote";
 export * from "./Hero";
 export * from "./HomeCards";
 export * from "./RegisterAsDRepSteps";
-export * from "./RegisterAsdRepStepThree";
 export * from "./RegisterAsSoleVoterBox";
 export * from "./RegisterAsSoleVoterBoxContent";
 export * from "./RetireAsSoleVoterBox";

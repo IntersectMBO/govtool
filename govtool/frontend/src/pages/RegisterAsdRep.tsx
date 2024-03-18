@@ -14,10 +14,11 @@ import {
 import { LinkWithIcon } from "@molecules";
 import {
   DashboardTopNav,
+  DRepStorageInformation,
+  DRepStoreDataInfo,
   Footer,
-  RolesAndResponsibilities,
-  RegisterAsdRepStepThree,
   RegisterAsDRepForm,
+  RolesAndResponsibilities,
 } from "@organisms";
 import { checkIsWalletConnected } from "@utils";
 
@@ -79,7 +80,8 @@ export const RegisterAsdRep = () => {
         )}
         <FormProvider {...methods}>
           {step === 2 && <RegisterAsDRepForm setStep={setStep} />}
-          {step === 3 && <RegisterAsdRepStepThree setStep={setStep} />}
+          {step === 3 && <DRepStoreDataInfo setStep={setStep} />}
+          {step === 4 && <DRepStorageInformation setStep={setStep} />}
         </FormProvider>
         {isMobile && <Footer />}
       </Box>

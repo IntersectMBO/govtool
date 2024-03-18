@@ -32,6 +32,7 @@ changes.
 
 ### Fixed
 
+- Fix possible sql error when there would be no predefined drep voting pwoer [Issue 501](https://github.com/IntersectMBO/govtool/issues/501)
 - Fix drep type detection when changing metadata [Issue 333](https://github.com/IntersectMBO/govtool/issues/333)
 - Fix make button disble when wallet tries connect [Issue 265](https://github.com/IntersectMBO/govtool/issues/265)
 - Fix drep voting power calculation [Issue 231](https://github.com/IntersectMBO/govtool/issues/231)

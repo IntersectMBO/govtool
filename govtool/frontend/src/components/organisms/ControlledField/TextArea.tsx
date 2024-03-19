@@ -5,20 +5,20 @@ import { Field } from "@molecules";
 
 import { ControlledTextAreaProps, RenderInputProps } from "./types";
 
-export const TextArea = ({
+export function TextArea({
   control,
   name,
   errors,
   rules,
   ...props
-}: ControlledTextAreaProps) => {
+}: ControlledTextAreaProps) {
   const errorMessage = get(errors, name)?.message as string;
 
   const renderInput = useCallback(
     ({ field }: RenderInputProps) => (
       <Field.TextArea {...props} {...field} errorMessage={errorMessage} />
     ),
-    [errorMessage, props]
+    [errorMessage, props],
   );
 
   return (
@@ -29,4 +29,4 @@ export const TextArea = ({
       render={renderInput}
     />
   );
-};
+}

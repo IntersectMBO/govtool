@@ -13,13 +13,13 @@ import {
 
 import { BgCard } from ".";
 
-export const RegisterAsdRepStepOne = ({
+export function RegisterAsdRepStepOne({
   onClickCancel,
   setStep,
 }: {
   onClickCancel: () => void;
   setStep: Dispatch<SetStateAction<number>>;
-}) => {
+}) {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
 
@@ -29,7 +29,7 @@ export const RegisterAsdRepStepOne = ({
 
   const openLearnMoreAboutDrep = useCallback(
     () => openInNewTab("https://sancho.network/roles/drep"),
-    []
+    [],
   );
 
   return (
@@ -61,10 +61,10 @@ export const RegisterAsdRepStepOne = ({
               sx={{ cursor: "pointer" }}
             />,
           ]}
-          i18nKey={"registration.rolesAndResponsibilitiesDescription"}
+          i18nKey="registration.rolesAndResponsibilitiesDescription"
           values={{ deposit: correctAdaFormat(deposit.drep_deposit) }}
         />
       </Typography>
     </BgCard>
   );
-};
+}

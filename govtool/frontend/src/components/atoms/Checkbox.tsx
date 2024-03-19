@@ -3,12 +3,12 @@ import { Checkbox as MUICheckbox } from "@mui/material";
 
 import { CheckboxProps } from "./types";
 
-export const Checkbox = ({
+export function Checkbox({
   dataTestId,
   errorMessage,
   sx,
   ...props
-}: CheckboxProps) => {
+}: CheckboxProps) {
   const id = useId();
 
   return (
@@ -27,4 +27,4 @@ export const Checkbox = ({
       {...props}
     />
   );
-};
+}

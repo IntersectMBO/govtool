@@ -15,7 +15,7 @@ const WheelControls = (slider: any) => {
           x: position.x,
           y: position.y,
         },
-      })
+      }),
     );
   }
 
@@ -65,23 +65,22 @@ export const useSlider = ({
         setCurrentSlide(slider.track.details.rel);
       },
     },
-    [WheelControls]
+    [WheelControls],
   );
 
   const DATA_LENGTH = instanceRef?.current?.slides?.length ?? 10;
-  const ITEMS_PER_VIEW =
-    DATA_LENGTH - (instanceRef?.current?.track?.details?.maxIdx ?? 2);
+  const ITEMS_PER_VIEW = DATA_LENGTH - (instanceRef?.current?.track?.details?.maxIdx ?? 2);
 
   const setPercentageValue = (e: ChangeEvent<HTMLInputElement>) => {
     const target = e?.target;
     const currentIndexOfSlide = Math.floor(
-      +target?.value /
-        (sliderMaxLength / (DATA_LENGTH - Math.floor(ITEMS_PER_VIEW)))
+      +target?.value
+        / (sliderMaxLength / (DATA_LENGTH - Math.floor(ITEMS_PER_VIEW))),
     );
 
     instanceRef.current?.track.add(
-      (+target.value - currentRange) *
-        (instanceRef.current.track.details.length / sliderMaxLength)
+      (+target.value - currentRange)
+        * (instanceRef.current.track.details.length / sliderMaxLength),
     );
     setCurrentRange(+target.value);
     setCurrentSlide(currentIndexOfSlide);

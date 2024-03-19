@@ -13,10 +13,10 @@ type DashboardTopNavProps = {
 
 const POSITION_TO_BLUR = 50;
 
-export const DashboardTopNav = ({
+export function DashboardTopNav({
   title,
   isVotingPowerHidden,
-}: DashboardTopNavProps) => {
+}: DashboardTopNavProps) {
   const [windowScroll, setWindowScroll] = useState<number>(0);
   const { isMobile } = useScreenDimension();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
@@ -47,8 +47,8 @@ export const DashboardTopNav = ({
             windowScroll > POSITION_TO_BLUR
               ? "rgba(256, 256, 256, 0.7)"
               : isMobile
-              ? "#FBFBFF59"
-              : "transparent",
+                ? "#FBFBFF59"
+                : "transparent",
           borderBottom: "1px solid #D6E2FF",
           display: "flex",
           justifyContent: "space-between",
@@ -94,4 +94,4 @@ export const DashboardTopNav = ({
       ) : null}
     </>
   );
-};
+}

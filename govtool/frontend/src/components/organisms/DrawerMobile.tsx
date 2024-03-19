@@ -1,6 +1,10 @@
-import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
+import {
+  Box, Grid, IconButton, SwipeableDrawer,
+} from "@mui/material";
 
-import { Background, Button, Link, Typography } from "@atoms";
+import {
+  Background, Button, Link, Typography,
+} from "@atoms";
 import { ICONS, IMAGES, NAV_ITEMS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { useModal } from "@context";
@@ -11,17 +15,16 @@ import { DrawerMobileProps } from "./types";
 const DRAWER_PADDING = 2;
 const CALCULATED_DRAWER_PADDING = DRAWER_PADDING * 8 * 2;
 
-export const DrawerMobile = ({
+export function DrawerMobile({
   isConnectButton,
   isDrawerOpen,
   setIsDrawerOpen,
-}: DrawerMobileProps) => {
+}: DrawerMobileProps) {
   const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { t } = useTranslation();
 
-  const onClickHelp = () =>
-    openInNewTab("https://docs.sanchogov.tools/support/get-help-in-discord");
+  const onClickHelp = () => openInNewTab("https://docs.sanchogov.tools/support/get-help-in-discord");
 
   return (
     <SwipeableDrawer
@@ -101,4 +104,4 @@ export const DrawerMobile = ({
       </Background>
     </SwipeableDrawer>
   );
-};
+}

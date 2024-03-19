@@ -21,7 +21,7 @@ import {
 } from "@organisms";
 import { checkIsWalletConnected } from "@utils";
 
-export const RegisterAsdRep = () => {
+export function RegisterAsdRep() {
   const [step, setStep] = useState<number>(1);
   const { isMobile } = useScreenDimension();
   const navigate = useNavigate();
@@ -36,18 +36,17 @@ export const RegisterAsdRep = () => {
     }
   }, []);
 
-  const onClickBackToDashboard = () =>
-    openModal({
-      type: "statusModal",
-      state: {
-        status: "warning",
-        message: t("modals.registration.cancelDescription"),
-        buttonText: t("modals.common.goToDashboard"),
-        title: t("modals.registration.cancelTitle"),
-        dataTestId: "cancel-registration-modal",
-        onSubmit: backToDashboard,
-      },
-    });
+  const onClickBackToDashboard = () => openModal({
+    type: "statusModal",
+    state: {
+      status: "warning",
+      message: t("modals.registration.cancelDescription"),
+      buttonText: t("modals.common.goToDashboard"),
+      title: t("modals.registration.cancelTitle"),
+      dataTestId: "cancel-registration-modal",
+      onSubmit: backToDashboard,
+    },
+  });
 
   const backToDashboard = () => {
     navigate(PATHS.dashboard);
@@ -83,4 +82,4 @@ export const RegisterAsdRep = () => {
       </Box>
     </Background>
   );
-};
+}

@@ -10,7 +10,7 @@ import {
   openInNewTab,
 } from "@utils";
 
-export const RegisterAsSoleVoterBoxContent = () => {
+export function RegisterAsSoleVoterBoxContent() {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
 
@@ -45,4 +45,4 @@ export const RegisterAsSoleVoterBoxContent = () => {
       </Typography>
     </>
   );
-};
+}

@@ -21,17 +21,19 @@ export const WalletOptionButton: FC<WalletOption> = ({ ...props }) => {
   } = theme;
   const navigate = useNavigate();
 
-  const { dataTestId, icon, label, name, cip95Available } = props;
+  const {
+    dataTestId, icon, label, name, cip95Available,
+  } = props;
 
-  const enableByWalletName = useCallback(async() => {
-    if(isEnableLoading) return;
+  const enableByWalletName = useCallback(async () => {
+    if (isEnableLoading) return;
     const result = await enable(name);
     if (result?.stakeKey) {
       navigate(PATHS.dashboard);
       return;
     }
     navigate(PATHS.stakeKeys);
-  }, [enable, isEnableLoading])
+  }, [enable, isEnableLoading]);
 
   return (
     <Box
@@ -58,8 +60,8 @@ export const WalletOptionButton: FC<WalletOption> = ({ ...props }) => {
         "&:hover": isEnableLoading
           ? undefined
           : {
-              background: lightBlue,
-            },
+            background: lightBlue,
+          },
       }}
       key={name}
       onClick={enableByWalletName}

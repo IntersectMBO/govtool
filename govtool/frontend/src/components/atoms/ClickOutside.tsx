@@ -23,8 +23,8 @@ interface Props {
   onClick: () => void;
 }
 
-export const ClickOutside = ({ children, onClick }: Props) => {
+export function ClickOutside({ children, onClick }: Props) {
   const wrapperRef = useRef(null);
   useOutsideClick(wrapperRef, onClick);
   return <div ref={wrapperRef}>{children}</div>;
-};
+}

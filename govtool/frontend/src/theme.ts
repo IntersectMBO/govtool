@@ -1,5 +1,7 @@
 import { createTheme } from "@mui/material/styles";
-import { cyan, errorRed, fadedPurple, orange, primaryBlue, progressYellow, successGreen } from "./consts";
+import {
+  cyan, errorRed, fadedPurple, orange, primaryBlue, progressYellow, successGreen,
+} from "./consts";
 
 declare module "@mui/material/styles" {
   interface BreakpointOverrides {
@@ -88,11 +90,9 @@ export const theme = createTheme({
           borderRadius: 50,
           textTransform: "none",
         },
-        outlined: ({ theme }) => {
-          return {
-            borderColor: theme.palette.lightBlue,
-          };
-        },
+        outlined: ({ theme }) => ({
+          borderColor: theme.palette.lightBlue,
+        }),
       },
     },
     MuiChip: {
@@ -104,28 +104,28 @@ export const theme = createTheme({
           },
         },
         {
-          props: {color: 'success', variant: "filled"},
+          props: { color: "success", variant: "filled" },
           style: {
             backgroundColor: successGreen.c200,
             color: successGreen.c700,
           },
         },
         {
-          props: {color: 'error', variant: "filled"},
+          props: { color: "error", variant: "filled" },
           style: {
             backgroundColor: errorRed.c100,
             color: errorRed.c500,
           },
         },
         {
-          props: {color: 'warning', variant: "filled"},
+          props: { color: "warning", variant: "filled" },
           style: {
             backgroundColor: progressYellow.c200,
             color: orange.c700,
           },
         },
         {
-          props: {color: 'info', variant: "filled"},
+          props: { color: "info", variant: "filled" },
           style: {
             backgroundColor: cyan.c100,
             color: cyan.c500,
@@ -187,7 +187,6 @@ export const theme = createTheme({
     textGray: "#525252",
   },
 });
-
 
 theme.shadows[1] = "0px 1px 2px 0px rgba(0, 51, 173, 0.08), 0px 1px 6px 1px rgba(0, 51, 173, 0.15)";
 theme.shadows[2] = "0px 1px 2px 0px rgba(0, 51, 173, 0.08), 0px 2px 10px 2px rgba(0, 51, 173, 0.15)";

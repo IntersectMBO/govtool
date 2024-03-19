@@ -10,9 +10,7 @@ type FieldComposition = React.FC<PropsWithChildren> & {
   TextArea: typeof TextArea;
 };
 
-const Field: FieldComposition = ({ children }) => {
-  return <React.Fragment>{children}</React.Fragment>;
-};
+const Field: FieldComposition = ({ children }) => <>{children}</>;
 
 Field.Checkbox = Checkbox;
 Field.Input = Input;

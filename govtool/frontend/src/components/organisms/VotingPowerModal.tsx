@@ -1,10 +1,12 @@
 import { Box } from "@mui/material";
 
-import { ModalContents, ModalWrapper, Typography, VotePill } from "@atoms";
+import {
+  ModalContents, ModalWrapper, Typography, VotePill,
+} from "@atoms";
 import { useModal } from "@context";
 import { correctAdaFormat } from "@utils";
-import { Vote } from "@/models";
 import { useScreenDimension, useTranslation } from "@hooks";
+import { Vote } from "@/models";
 
 export interface VotingPowerModalState {
   yesVotes: number;
@@ -52,7 +54,7 @@ export function VotingPowerModal() {
                     : 3
                   : 0
               }
-              borderColor={"lightBlue"}
+              borderColor="lightBlue"
               sx={{
                 alignItems: "center",
                 display: "flex",
@@ -86,7 +88,9 @@ export function VotingPowerModal() {
                 sx={{ marginLeft: "12px", whiteSpace: "nowrap" }}
                 variant="body1"
               >
-                ₳ {correctAdaFormat(vote.vote)}
+                ₳
+                {" "}
+                {correctAdaFormat(vote.vote)}
               </Typography>
             </Box>
           ))}

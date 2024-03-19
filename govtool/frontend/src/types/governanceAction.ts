@@ -1,5 +1,5 @@
-import { en } from "@/i18n/locales/en";
 import { RegisterOptions } from "react-hook-form";
+import { en } from "@/i18n/locales/en";
 
 export enum GovernanceActionType {
   Info = "Info",

@@ -1,4 +1,6 @@
-import { createContext, useContext, useMemo, useReducer } from "react";
+import {
+  createContext, useContext, useMemo, useReducer,
+} from "react";
 
 import { type MuiModalChildren } from "@atoms";
 import {
@@ -70,7 +72,7 @@ function ModalProvider<T>(props: ProviderProps) {
     {
       state: null,
       type: "none",
-    }
+    },
   );
 
   const value = useMemo(
@@ -79,11 +81,9 @@ function ModalProvider<T>(props: ProviderProps) {
       modal,
       state: modal.state,
       openModal,
-      closeModal: callAll(modals[modal.type]?.onClose, () =>
-        openModal({ type: "none", state: null })
-      ),
+      closeModal: callAll(modals[modal.type]?.onClose, () => openModal({ type: "none", state: null })),
     }),
-    [modal, openModal]
+    [modal, openModal],
   );
 
   return (

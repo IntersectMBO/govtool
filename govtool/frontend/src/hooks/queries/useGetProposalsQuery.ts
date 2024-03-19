@@ -12,9 +12,7 @@ export const useGetProposalsQuery = ({
 
   const fetchProposals = async (): Promise<ActionType[]> => {
     const allProposals = await Promise.all(
-      filters.map((filter) =>
-        getProposals({ dRepID, filters: [filter], sorting })
-      )
+      filters.map((filter) => getProposals({ dRepID, filters: [filter], sorting })),
     );
 
     return allProposals.flatMap((proposal) => proposal.elements);
@@ -29,7 +27,7 @@ export const useGetProposalsQuery = ({
       isEnabled,
       dRepID,
     ],
-    fetchProposals
+    fetchProposals,
   );
 
   return {

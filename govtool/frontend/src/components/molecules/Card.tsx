@@ -2,7 +2,9 @@ import { Chip, Paper, SxProps } from "@mui/material";
 import { PropsWithChildren } from "react";
 
 import { Theme } from "@/theme";
-import { errorRed, orange, primaryBlue, successGreen } from "@/consts";
+import {
+  errorRed, orange, primaryBlue, successGreen,
+} from "@/consts";
 
 type CardProps = PropsWithChildren & {
   border?: boolean;
@@ -26,8 +28,7 @@ export function Card({
     <Paper
       elevation={elevation}
       sx={{
-        backgroundColor: (theme) =>
-          colors.backgroundColor ?? `${theme.palette.neutralWhite}4D`,
+        backgroundColor: (theme) => colors.backgroundColor ?? `${theme.palette.neutralWhite}4D`,
         border: border ? 1 : 0,
         borderColor: colors?.borderColor,
         padding: 3,

@@ -1,11 +1,11 @@
 import { Typography as MUITypography } from "@mui/material";
 import { TypographyProps } from "./types";
 
-export const Typography = ({
+export function Typography({
   color,
   variant = "body1",
   ...props
-}: TypographyProps) => {
+}: TypographyProps) {
   const fontSize = {
     headline1: 100,
     headline2: 57,
@@ -56,4 +56,4 @@ export const Typography = ({
       {props.children}
     </MUITypography>
   );
-};
+}

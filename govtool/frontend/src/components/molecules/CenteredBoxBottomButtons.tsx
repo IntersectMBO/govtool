@@ -12,49 +12,45 @@ interface Props {
   actionButtonText?: string;
 }
 
-export const CenteredBoxBottomButtons = ({
+export function CenteredBoxBottomButtons({
   onBackButton,
   onActionButton,
   isLoading,
   backButtonText,
   actionButtonText,
-}: Props) => {
+}: Props) {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
 
-  const renderBackButton = useMemo(() => {
-    return (
-      <Button
-        data-testid={"back-button"}
-        onClick={onBackButton}
-        size="extraLarge"
-        sx={{
-          px: 6,
-        }}
-        variant="outlined"
-      >
-        {backButtonText ?? t("cancel")}
-      </Button>
-    );
-  }, [isMobile]);
+  const renderBackButton = useMemo(() => (
+    <Button
+      data-testid="back-button"
+      onClick={onBackButton}
+      size="extraLarge"
+      sx={{
+        px: 6,
+      }}
+      variant="outlined"
+    >
+      {backButtonText ?? t("cancel")}
+    </Button>
+  ), [isMobile]);
 
-  const renderActionButton = useMemo(() => {
-    return (
-      <LoadingButton
-        data-testid={"register-button"}
-        isLoading={isLoading}
-        onClick={onActionButton}
-        sx={{
-          px: 6,
-          height: 48,
-          fontSize: 16,
-        }}
-        variant="contained"
-      >
-        {actionButtonText ?? t("continue")}
-      </LoadingButton>
-    );
-  }, [isLoading, isMobile]);
+  const renderActionButton = useMemo(() => (
+    <LoadingButton
+      data-testid="register-button"
+      isLoading={isLoading}
+      onClick={onActionButton}
+      sx={{
+        px: 6,
+        height: 48,
+        fontSize: 16,
+      }}
+      variant="contained"
+    >
+      {actionButtonText ?? t("continue")}
+    </LoadingButton>
+  ), [isLoading, isMobile]);
 
   return (
     <Box
@@ -68,4 +64,4 @@ export const CenteredBoxBottomButtons = ({
       {renderActionButton}
     </Box>
   );
-};
+}

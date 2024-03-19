@@ -7,7 +7,7 @@ import { useTranslation } from "@hooks";
 import { CenteredBoxPageWrapper } from "@molecules";
 import { checkIsWalletConnected } from "@/utils";
 
-export const RegisterAsSoleVoter = () => {
+export function RegisterAsSoleVoter() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -27,4 +27,4 @@ export const RegisterAsSoleVoter = () => {
       <RegisterAsSoleVoterBox />
     </CenteredBoxPageWrapper>
   );
-};
+}

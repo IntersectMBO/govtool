@@ -3,12 +3,11 @@ import { Box, Link, Typography } from "@mui/material";
 import { KeenSliderOptions } from "keen-slider";
 import "keen-slider/keen-slider.min.css";
 
-import styles from "./slider.module.css";
-
 import { ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { useScreenDimension, useSlider, useTranslation } from "@hooks";
 import { generatePath, useNavigate } from "react-router-dom";
+import styles from "./slider.module.css";
 
 const SLIDER_MAX_LENGTH = 1000;
 
@@ -25,7 +24,7 @@ type SliderProps = {
   filters?: string[];
 };
 
-export const Slider = ({
+export function Slider({
   data,
   title,
   navigateKey,
@@ -36,7 +35,7 @@ export const Slider = ({
   filters,
   searchPhrase,
   sorting,
-}: SliderProps) => {
+}: SliderProps) {
   const { isMobile, screenWidth, pagePadding } = useScreenDimension();
   const navigate = useNavigate();
   const { voteTransaction } = useCardano();
@@ -78,18 +77,17 @@ export const Slider = ({
     refresh();
   }, [filters, sorting, searchPhrase, voteTransaction?.proposalId, data]);
 
-  const rangeSliderCalculationElement =
-    dataLength < notSlicedDataLength
-      ? (screenWidth +
-          (onDashboard ? -290 - paddingOffset : -paddingOffset + 250)) /
-        437
-      : (screenWidth + (onDashboard ? -280 - paddingOffset : -paddingOffset)) /
-        402;
+  const rangeSliderCalculationElement = dataLength < notSlicedDataLength
+    ? (screenWidth
+          + (onDashboard ? -290 - paddingOffset : -paddingOffset + 250))
+        / 437
+    : (screenWidth + (onDashboard ? -280 - paddingOffset : -paddingOffset))
+        / 402;
 
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" mb={3.5}>
-        <Typography fontSize={16} lineHeight={"24px"} fontWeight={600}>
+        <Typography fontSize={16} lineHeight="24px" fontWeight={600}>
           {title}
         </Typography>
         {isMobile && isShowAll && (
@@ -102,25 +100,23 @@ export const Slider = ({
                 display: "flex",
               },
             ]}
-            onClick={() =>
-              onDashboard
-                ? navigate(
-                    generatePath(PATHS.dashboardGovernanceActionsCategory, {
-                      category: navigateKey,
-                    })
-                  )
-                : navigate(
-                    generatePath(PATHS.governanceActionsCategory, {
-                      category: navigateKey,
-                    })
-                  )
-            }
+            onClick={() => (onDashboard
+              ? navigate(
+                generatePath(PATHS.dashboardGovernanceActionsCategory, {
+                  category: navigateKey,
+                }),
+              )
+              : navigate(
+                generatePath(PATHS.governanceActionsCategory, {
+                  category: navigateKey,
+                }),
+              ))}
           >
             <Typography
               color="primary"
               fontSize={14}
               fontWeight={500}
-              lineHeight={"20px"}
+              lineHeight="20px"
               noWrap
             >
               {t("slider.showAll")}
@@ -154,19 +150,17 @@ export const Slider = ({
                   display: "flex",
                 },
               ]}
-              onClick={() =>
-                onDashboard
-                  ? navigate(
-                      generatePath(PATHS.dashboardGovernanceActionsCategory, {
-                        category: navigateKey,
-                      })
-                    )
-                  : navigate(
-                      generatePath(PATHS.governanceActionsCategory, {
-                        category: navigateKey,
-                      })
-                    )
-              }
+              onClick={() => (onDashboard
+                ? navigate(
+                  generatePath(PATHS.dashboardGovernanceActionsCategory, {
+                    category: navigateKey,
+                  }),
+                )
+                : navigate(
+                  generatePath(PATHS.governanceActionsCategory, {
+                    category: navigateKey,
+                  }),
+                ))}
             >
               <Typography noWrap color="primary" fontSize={16} fontWeight={500}>
                 {t("slider.viewAll")}
@@ -193,4 +187,4 @@ export const Slider = ({
       )}
     </Box>
   );
-};
+}

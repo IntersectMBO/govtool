@@ -1,7 +1,7 @@
 import { Vote } from "@models";
 import { Box, Typography } from "@mui/material";
 
-export const VotePill = ({
+export function VotePill({
   vote,
   width,
   maxWidth,
@@ -9,7 +9,7 @@ export const VotePill = ({
   vote: Vote;
   width?: number;
   maxWidth?: number;
-}) => {
+}) {
   const VOTE = vote.toLowerCase();
   return (
     <Box
@@ -30,13 +30,13 @@ export const VotePill = ({
       maxHeight="14px"
     >
       <Typography
-        textTransform={"uppercase"}
+        textTransform="uppercase"
         fontSize={12}
         fontWeight={400}
-        lineHeight={"16px"}
+        lineHeight="16px"
       >
         {vote}
       </Typography>
     </Box>
   );
-};
+}

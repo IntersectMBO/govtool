@@ -27,7 +27,7 @@ import {
   getProposalTypeLabel,
 } from "@utils";
 
-export const DashboardGovernanceActionDetails = () => {
+export function DashboardGovernanceActionDetails() {
   const { voter } = useCardano();
   const { state, hash } = useLocation();
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ export const DashboardGovernanceActionDetails = () => {
 
   const shortenedGovActionId = getShortenedGovActionId(
     state ? state.txHash : data?.proposal.txHash ?? "",
-    state ? state.index : data?.proposal.index ?? ""
+    state ? state.index : data?.proposal.index ?? "",
   );
 
   const breadcrumbs = [
@@ -78,26 +78,24 @@ export const DashboardGovernanceActionDetails = () => {
         {breadcrumbs}
       </Breadcrumbs>
       <Link
-        data-testid={"back-to-list-link"}
+        data-testid="back-to-list-link"
         sx={{
           cursor: "pointer",
           display: "flex",
           textDecoration: "none",
         }}
-        onClick={() =>
-          navigate(
-            state && state.openedFromCategoryPage
-              ? generatePath(PATHS.dashboardGovernanceActionsCategory, {
-                  category: state.type,
-                })
-              : PATHS.dashboardGovernanceActions,
-            {
-              state: {
-                isVotedListOnLoad: state && state.vote ? true : false,
-              },
-            }
-          )
-        }
+        onClick={() => navigate(
+          state && state.openedFromCategoryPage
+            ? generatePath(PATHS.dashboardGovernanceActionsCategory, {
+              category: state.type,
+            })
+            : PATHS.dashboardGovernanceActions,
+          {
+            state: {
+              isVotedListOnLoad: !!(state && state.vote),
+            },
+          },
+        )}
       >
         <img
           src={ICONS.arrowRightIcon}
@@ -149,17 +147,21 @@ export const DashboardGovernanceActionDetails = () => {
         ) : (
           <Box mt={4} display="flex" flexWrap="wrap">
             <Typography fontWeight={300}>
-              {t("govActions.withIdNotExist.partOne")}&nbsp;
+              {t("govActions.withIdNotExist.partOne")}
+&nbsp;
             </Typography>
             <Typography
-              fontWeight={"bold"}
-            >{` ${shortenedGovActionId} `}</Typography>
+              fontWeight="bold"
+            >
+              {` ${shortenedGovActionId} `}
+            </Typography>
             <Typography fontWeight={300}>
-              &nbsp;{t("govActions.withIdNotExist.partTwo")}
+              &nbsp;
+              {t("govActions.withIdNotExist.partTwo")}
             </Typography>
           </Box>
         )}
       </Box>
     </Box>
   );
-};
+}

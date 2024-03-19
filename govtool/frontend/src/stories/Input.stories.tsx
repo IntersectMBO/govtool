@@ -16,9 +16,7 @@ const meta = {
 
 export default meta;
 
-const Template: StoryFn<ComponentProps<typeof Field.Input>> = (args) => {
-  return <Field.Input placeholder="Placeholder-auto" {...args} />;
-};
+const Template: StoryFn<ComponentProps<typeof Field.Input>> = (args) => <Field.Input placeholder="Placeholder-auto" {...args} />;
 
 export const Default = Template.bind({});
 
@@ -26,7 +24,7 @@ Default.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   const inputElement = canvas.getByPlaceholderText("Placeholder");
   await userEvent.type(inputElement, "test");
-  expect(inputElement).toHaveValue("test");
+  await expect(inputElement).toHaveValue("test");
 };
 
 export const WithLabel = Template.bind({});
@@ -36,7 +34,7 @@ WithLabel.args = {
 
 WithLabel.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
-  expect(canvas.getByText("Label")).toBeInTheDocument();
+  await expect(canvas.getByText("Label")).toBeInTheDocument();
 };
 
 export const Error = Template.bind({});
@@ -46,7 +44,7 @@ Error.args = {
 
 Error.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
-  expect(canvas.getByTestId("error-message-error")).toBeInTheDocument();
+  await expect(canvas.getByTestId("error-message-error")).toBeInTheDocument();
 };
 
 export const ErrorAndLabel = Template.bind({});
@@ -57,8 +55,8 @@ ErrorAndLabel.args = {
 
 ErrorAndLabel.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
-  expect(canvas.getByText("Label")).toBeInTheDocument();
-  expect(canvas.getByTestId("error-message-error")).toBeInTheDocument();
+  await expect(canvas.getByText("Label")).toBeInTheDocument();
+  await expect(canvas.getByTestId("error-message-error")).toBeInTheDocument();
 };
 
 export const WithHelpfulText = Template.bind({});

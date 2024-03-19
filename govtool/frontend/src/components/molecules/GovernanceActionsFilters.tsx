@@ -15,10 +15,10 @@ interface Props {
   setChosenFilters: Dispatch<SetStateAction<string[]>>;
 }
 
-export const GovernanceActionsFilters = ({
+export function GovernanceActionsFilters({
   chosenFilters,
   setChosenFilters,
-}: Props) => {
+}: Props) {
   const handleFilterChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       e.target.name, e.target.checked;
@@ -30,16 +30,16 @@ export const GovernanceActionsFilters = ({
       }
       setChosenFilters(filters);
     },
-    [chosenFilters, setChosenFilters]
+    [chosenFilters, setChosenFilters],
   );
 
   const { t } = useTranslation();
 
   return (
     <Box
-      display={"flex"}
-      flexDirection={"column"}
-      position={"absolute"}
+      display="flex"
+      flexDirection="column"
+      position="absolute"
       sx={{
         background: "#FBFBFF",
         boxShadow: "1px 2px 11px 0px #00123D5E",
@@ -59,36 +59,34 @@ export const GovernanceActionsFilters = ({
       >
         {t("govActions.filterTitle")}
       </FormLabel>
-      {GOVERNANCE_ACTIONS_FILTERS.map((item) => {
-        return (
-          <Box
-            key={item.key}
-            paddingX={"20px"}
-            sx={[{ "&:hover": { bgcolor: "#E6EBF7" } }]}
-            bgcolor={
+      {GOVERNANCE_ACTIONS_FILTERS.map((item) => (
+        <Box
+          key={item.key}
+          paddingX="20px"
+          sx={[{ "&:hover": { bgcolor: "#E6EBF7" } }]}
+          bgcolor={
               chosenFilters?.includes(item.key) ? "#FFF0E7" : "transparent"
             }
-          >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  inputProps={{
-                    "data-testid": item.label.replace(/ /g, "") + "-checkbox",
-                  }}
-                  onChange={handleFilterChange}
-                  name={item.key}
-                  checked={chosenFilters?.includes(item.key)}
-                />
-              }
-              label={
-                <Typography fontSize={14} fontWeight={500}>
-                  {item.label}
-                </Typography>
-              }
-            />
-          </Box>
-        );
-      })}
+        >
+          <FormControlLabel
+            control={(
+              <Checkbox
+                inputProps={{
+                  "data-testid": `${item.label.replace(/ /g, "")}-checkbox`,
+                }}
+                onChange={handleFilterChange}
+                name={item.key}
+                checked={chosenFilters?.includes(item.key)}
+              />
+              )}
+            label={(
+              <Typography fontSize={14} fontWeight={500}>
+                {item.label}
+              </Typography>
+              )}
+          />
+        </Box>
+      ))}
     </Box>
   );
-};
+}

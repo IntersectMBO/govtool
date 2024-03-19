@@ -112,7 +112,6 @@ result*
 .std
 
 # nixago: ignore-linked-files
-.prettierrc
 lefthook.yml
 treefmt.toml
 

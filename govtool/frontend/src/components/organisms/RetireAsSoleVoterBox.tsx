@@ -7,7 +7,7 @@ import { CenteredBoxBottomButtons } from "@molecules";
 import { useCardano, useModal } from "@context";
 import { RetireAsSoleVoterBoxContent } from "@organisms";
 
-export const RetireAsSoleVoterBox = () => {
+export function RetireAsSoleVoterBox() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -30,14 +30,14 @@ export const RetireAsSoleVoterBox = () => {
         type: "soleVoterRegistration",
         registrationType: "retirement",
       });
-      if (result)
+      if (result) {
         openModal({
           type: "statusModal",
           state: {
             status: "success",
             title: t("modals.retirement.title"),
             message: t("modals.retirement.message"),
-            link: `https://adanordic.com/latest_transactions`,
+            link: "https://adanordic.com/latest_transactions",
             buttonText: t("modals.common.goToDashboard"),
             dataTestId: "retirement-transaction-submitted-modal",
             onSubmit: () => {
@@ -46,6 +46,7 @@ export const RetireAsSoleVoterBox = () => {
             },
           },
         });
+      }
     } catch (error: any) {
       const errorMessage = error.info ? error.info : error;
 
@@ -83,4 +84,4 @@ export const RetireAsSoleVoterBox = () => {
       />
     </>
   );
-};
+}

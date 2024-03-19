@@ -5,7 +5,7 @@ import { PATHS } from "@consts";
 import { useCardano } from "@context";
 import { useTranslation } from "@hooks";
 
-export const WalletInfoCard = () => {
+export function WalletInfoCard() {
   const { address, disconnectWallet } = useCardano();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -45,7 +45,7 @@ export const WalletInfoCard = () => {
             {address}
           </Typography>
           <Button
-            data-testid={"disconnect-button"}
+            data-testid="disconnect-button"
             variant="text"
             onClick={onClickDisconnect}
           >
@@ -55,4 +55,4 @@ export const WalletInfoCard = () => {
       </Box>
     )
   );
-};
+}

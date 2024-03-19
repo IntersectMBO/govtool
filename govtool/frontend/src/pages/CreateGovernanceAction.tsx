@@ -24,7 +24,7 @@ import {
 } from "@organisms";
 import { checkIsWalletConnected } from "@utils";
 
-export const CreateGovernanceAction = () => {
+export function CreateGovernanceAction() {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -42,18 +42,17 @@ export const CreateGovernanceAction = () => {
     }
   }, []);
 
-  const onClickBackToDashboard = () =>
-    openModal({
-      type: "statusModal",
-      state: {
-        status: "warning",
-        message: t("modals.createGovernanceAction.cancelModalDescription"),
-        buttonText: t("modals.common.goToDashboard"),
-        title: t("modals.createGovernanceAction.cancelModalTitle"),
-        dataTestId: "cancel-governance-action-creation-modal",
-        onSubmit: backToDashboard,
-      },
-    });
+  const onClickBackToDashboard = () => openModal({
+    type: "statusModal",
+    state: {
+      status: "warning",
+      message: t("modals.createGovernanceAction.cancelModalDescription"),
+      buttonText: t("modals.common.goToDashboard"),
+      title: t("modals.createGovernanceAction.cancelModalTitle"),
+      dataTestId: "cancel-governance-action-creation-modal",
+      onSubmit: backToDashboard,
+    },
+  });
 
   const backToDashboard = () => {
     navigate(PATHS.dashboard);
@@ -92,4 +91,4 @@ export const CreateGovernanceAction = () => {
       </Box>
     </Background>
   );
-};
+}

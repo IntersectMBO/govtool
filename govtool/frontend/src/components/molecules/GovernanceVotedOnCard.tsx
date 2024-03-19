@@ -3,11 +3,12 @@ import { Box } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
-import { Button, VotePill, Typography } from "@atoms";
+import {
+  Button, VotePill, Typography, Tooltip,
+} from "@atoms";
 import { PATHS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { VotedProposal } from "@models";
-import { theme } from "@/theme";
 import {
   formatDisplayDate,
   getFullGovActionId,
@@ -15,7 +16,7 @@ import {
   getShortenedGovActionId,
   openInNewTab,
 } from "@utils";
-import { Tooltip } from "@atoms";
+import { theme } from "@/theme";
 
 interface Props {
   votedProposal: VotedProposal;
@@ -23,7 +24,7 @@ interface Props {
   inProgress?: boolean;
 }
 
-export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
+export function GovernanceVotedOnCard({ votedProposal, inProgress }: Props) {
   const navigate = useNavigate();
   const { proposal, vote } = votedProposal;
   const {
@@ -34,7 +35,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
 
   const proposalTypeNoEmptySpaces = getProposalTypeLabel(proposal.type).replace(
     / /g,
-    ""
+    "",
   );
 
   return (
@@ -97,10 +98,10 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         }}
       >
         <Box data-testid="governance-action-type">
-          <Typography color={"#8E908E"} variant="caption">
+          <Typography color="#8E908E" variant="caption">
             {t("govActions.governanceActionType")}
           </Typography>
-          <Box display={"flex"}>
+          <Box display="flex">
             <Box
               mt={1.5}
               px={2.25}
@@ -118,10 +119,10 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           </Box>
         </Box>
         <Box mt={5}>
-          <Typography color={"#8E908E"} variant="caption">
+          <Typography color="#8E908E" variant="caption">
             {t("govActions.governanceActionId")}
           </Typography>
-          <Box display={"flex"} mt={0.5}>
+          <Box display="flex" mt={0.5}>
             <Box
               px={2.25}
               py={0.75}
@@ -132,7 +133,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
               <Typography
                 data-testid={`${getFullGovActionId(
                   proposal.txHash,
-                  proposal.index
+                  proposal.index,
                 )}-id`}
                 variant="caption"
               >
@@ -142,7 +143,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           </Box>
         </Box>
         <Box data-testid="my-vote" mt={5}>
-          <Typography color={"#8E908E"} variant="caption">
+          <Typography color="#8E908E" variant="caption">
             {t("govActions.myVote")}
           </Typography>
           <Box
@@ -152,18 +153,16 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
             display="flex"
             flexDirection="row"
             border={1}
-            borderColor={"rgba(214, 226, 255, 1)"}
+            borderColor="rgba(214, 226, 255, 1)"
             borderRadius={100}
             flex={1}
-            alignItems={"center"}
+            alignItems="center"
           >
             <Box flex={1}>
               <VotePill vote={vote.vote} />
             </Box>
             <Button
-              onClick={() =>
-                openInNewTab("https://adanordic.com/latest_transactions")
-              }
+              onClick={() => openInNewTab("https://adanordic.com/latest_transactions")}
               variant="text"
               size="small"
               sx={{
@@ -195,7 +194,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           <Tooltip
             heading={t("tooltips.submissionDate.heading")}
             paragraphOne={t("tooltips.submissionDate.paragraphOne")}
-            placement={"bottom-end"}
+            placement="bottom-end"
             arrow
           >
             <InfoOutlinedIcon
@@ -228,7 +227,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
             heading={t("tooltips.expiryDate.heading")}
             paragraphOne={t("tooltips.expiryDate.paragraphOne")}
             paragraphTwo={t("tooltips.expiryDate.paragraphTwo")}
-            placement={"bottom-end"}
+            placement="bottom-end"
             arrow
           >
             <InfoOutlinedIcon
@@ -242,7 +241,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         </Box>
       ) : null}
       <Box
-        bgcolor={"white"}
+        bgcolor="white"
         px={isMobile ? 2 : 5}
         py={2}
         sx={{ borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}
@@ -251,22 +250,20 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           disabled={inProgress}
           data-testid={`govaction-${getFullGovActionId(
             proposal.txHash,
-            proposal.index
+            proposal.index,
           )}-change-your-vote`}
-          onClick={() =>
-            navigate(
-              PATHS.dashboardGovernanceActionsAction.replace(
-                ":proposalId",
-                getFullGovActionId(proposal.txHash, proposal.index)
-              ),
-              {
-                state: {
-                  ...proposal,
-                  vote: vote.vote.toLowerCase(),
-                },
-              }
-            )
-          }
+          onClick={() => navigate(
+            PATHS.dashboardGovernanceActionsAction.replace(
+              ":proposalId",
+              getFullGovActionId(proposal.txHash, proposal.index),
+            ),
+            {
+              state: {
+                ...proposal,
+                vote: vote.vote.toLowerCase(),
+              },
+            },
+          )}
           sx={{
             backgroundColor: "#FBFBFF",
             width: "100%",
@@ -278,4 +275,4 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
       </Box>
     </Box>
   );
-};
+}

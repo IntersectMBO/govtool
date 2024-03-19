@@ -1,7 +1,6 @@
 import MuiModal from "@mui/material/Modal";
 import type { JSXElementConstructor, ReactElement } from "react";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MuiModalChildren = ReactElement<
   any,
   string | JSXElementConstructor<any>

@@ -4,7 +4,7 @@ import { useCardano } from "@context";
 import { CopyButton } from "@atoms";
 import { useTranslation } from "@hooks";
 
-export const DRepInfoCard = () => {
+export function DRepInfoCard() {
   const { dRepIDBech32 } = useCardano();
   const { t } = useTranslation();
 
@@ -18,10 +18,10 @@ export const DRepInfoCard = () => {
       </Box>
       <Box display="flex" flexDirection="row" mt={0.5} alignItems="center">
         <Typography
-          data-testid={"dRep-id-display"}
-          textOverflow={"ellipsis"}
-          overflow={"hidden"}
-          width={"70vw"}
+          data-testid="dRep-id-display"
+          textOverflow="ellipsis"
+          overflow="hidden"
+          width="70vw"
           fontSize={14}
           fontWeight={500}
         >
@@ -30,4 +30,4 @@ export const DRepInfoCard = () => {
       </Box>
     </Box>
   );
-};
+}

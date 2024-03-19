@@ -15,11 +15,12 @@ interface Props {
   setStep: Dispatch<SetStateAction<number>>;
 }
 
-export const RegisterAsdRepStepTwo = ({ setStep }: Props) => {
+export function RegisterAsdRepStepTwo({ setStep }: Props) {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
-  const { control, errors, isContinueButtonDisabled, isSkipButton } =
-    useRegisterAsdRepFormContext();
+  const {
+    control, errors, isContinueButtonDisabled, isSkipButton,
+  } = useRegisterAsdRepFormContext();
 
   const onClickContinue = useCallback(() => setStep(3), []);
 
@@ -66,13 +67,11 @@ export const RegisterAsdRepStepTwo = ({ setStep }: Props) => {
           placeholder={t("forms.hashPlaceholder")}
         />
         <Link
-          data-testid={"how-to-create-link"}
-          onClick={() =>
-            openInNewTab(
-              "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor"
-            )
-          }
-          alignSelf={"center"}
+          data-testid="how-to-create-link"
+          onClick={() => openInNewTab(
+            "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor",
+          )}
+          alignSelf="center"
           my={5}
           sx={{ cursor: "pointer" }}
         >
@@ -83,4 +82,4 @@ export const RegisterAsdRepStepTwo = ({ setStep }: Props) => {
       </Box>
     </BgCard>
   );
-};
+}

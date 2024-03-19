@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Tooltip } from "@/components/atoms";
 import { Box, Typography } from "@mui/material";
-import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
+import {
+  screen, userEvent, waitFor, within,
+} from "@storybook/testing-library";
 import { expect } from "@storybook/jest";
+import { Tooltip } from "@/components/atoms";
 
 const defaultChildren = (
   <Box>
@@ -45,10 +47,10 @@ export const BasicTooltip: Story = {
       expect(screen.getByRole("tooltip")).toBeInTheDocument();
       expect(screen.getByRole("tooltip")).toHaveTextContent("Tooltip Heading");
       expect(screen.getByRole("tooltip")).toHaveTextContent(
-        "This is the first paragraph."
+        "This is the first paragraph.",
       );
       expect(screen.getByRole("tooltip")).toHaveTextContent(
-        "This is the second paragraph."
+        "This is the second paragraph.",
       );
     });
   },
@@ -78,7 +80,7 @@ export const OneParagraphOnly: Story = {
     await waitFor(() => {
       expect(screen.getByRole("tooltip")).toBeInTheDocument();
       expect(screen.getByRole("tooltip")).toHaveTextContent(
-        "Only one paragraph without a heading."
+        "Only one paragraph without a heading.",
       );
     });
   },
@@ -96,7 +98,7 @@ export const TwoParagraphs: Story = {
       expect(screen.getByRole("tooltip")).toBeInTheDocument();
       expect(screen.getByRole("tooltip")).toHaveTextContent("First paragraph.");
       expect(screen.getByRole("tooltip")).toHaveTextContent(
-        "Second paragraph."
+        "Second paragraph.",
       );
     });
   },
@@ -114,7 +116,7 @@ export const RightPlacement: Story = {
       expect(screen.getByRole("tooltip")).toBeInTheDocument();
       expect(screen.getByRole("tooltip")).toHaveAttribute(
         "data-popper-placement",
-        "right"
+        "right",
       );
     });
   },
@@ -132,7 +134,7 @@ export const BottomPlacement: Story = {
       expect(screen.getByRole("tooltip")).toBeInTheDocument();
       expect(screen.getByRole("tooltip")).toHaveAttribute(
         "data-popper-placement",
-        "bottom"
+        "bottom",
       );
     });
   },
@@ -150,7 +152,7 @@ export const LeftPlacement: Story = {
       expect(screen.getByRole("tooltip")).toBeInTheDocument();
       expect(screen.getByRole("tooltip")).toHaveAttribute(
         "data-popper-placement",
-        "left"
+        "left",
       );
     });
   },

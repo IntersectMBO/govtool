@@ -10,7 +10,7 @@ interface Props {
   variant?: string;
 }
 
-export const CopyButton = ({ isChecked, text, variant }: Props) => {
+export function CopyButton({ isChecked, text, variant }: Props) {
   const { addSuccessAlert } = useSnackbar();
   const { t } = useTranslation();
 
@@ -28,7 +28,7 @@ export const CopyButton = ({ isChecked, text, variant }: Props) => {
 
   return (
     <img
-      data-testid={"copy-button"}
+      data-testid="copy-button"
       alt="copy"
       onClick={(e) => {
         navigator.clipboard.writeText(text);
@@ -39,4 +39,4 @@ export const CopyButton = ({ isChecked, text, variant }: Props) => {
       style={{ cursor: "pointer" }}
     />
   );
-};
+}

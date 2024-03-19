@@ -2,14 +2,14 @@ import { Button, CircularProgress } from "@mui/material";
 
 import { LoadingButtonProps } from "./types";
 
-export const LoadingButton = ({
+export function LoadingButton({
   isLoading,
   disabled,
   children,
   size = "large",
   sx,
   ...rest
-}: LoadingButtonProps) => {
+}: LoadingButtonProps) {
   const buttonHeight = {
     extraLarge: 48,
     large: 40,
@@ -29,4 +29,4 @@ export const LoadingButton = ({
       {children}
     </Button>
   );
-};
+}

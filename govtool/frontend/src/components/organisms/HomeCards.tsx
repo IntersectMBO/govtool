@@ -8,7 +8,7 @@ import { ActionCard } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
-export const HomeCards = () => {
+export function HomeCards() {
   const navigate = useNavigate();
   const { openModal } = useModal();
   const { screenWidth } = useScreenDimension();
@@ -19,36 +19,34 @@ export const HomeCards = () => {
   }, [openModal]);
 
   const onClickLearnMoreAboutDelegation = useCallback(
-    () =>
-      openInNewTab(
-        "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power"
-      ),
-    []
+    () => openInNewTab(
+      "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power",
+    ),
+    [],
   );
 
   const onClickLearnMoreAboutDRepRegistration = useCallback(
-    () =>
-      openInNewTab(
-        "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep"
-      ),
-    []
+    () => openInNewTab(
+      "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
+    ),
+    [],
   );
 
   const onClickLearnMoreAboutSoleVoterRegistration = useCallback(
     // TODO: Update the link
     () => openInNewTab("https://docs.sanchogov.tools/"),
-    []
+    [],
   );
 
   const onClickLearnMoreAboutProposingGovAction = useCallback(
     // TODO: Update the link
     () => openInNewTab("https://docs.sanchogov.tools/"),
-    []
+    [],
   );
 
   const navigateToGovActions = useCallback(
     () => navigate(PATHS.governanceActions),
-    [navigate]
+    [navigate],
   );
 
   return (
@@ -67,10 +65,10 @@ export const HomeCards = () => {
         screenWidth < 640
           ? 2
           : screenWidth < 1024
-          ? 5
-          : screenWidth < 1440
-          ? 10
-          : 34
+            ? 5
+            : screenWidth < 1440
+              ? 10
+              : 34
       }
       rowGap={4.625}
     >
@@ -88,7 +86,7 @@ export const HomeCards = () => {
         secondButtonLabel={t("learnMore")}
         title={t("home.cards.delegate.title")}
       />
-      {/* DELEGATE CARD END*/}
+      {/* DELEGATE CARD END */}
       {/* REGISTER AS DREP CARD */}
       <ActionCard
         dataTestIdFirstButton="register-connect-wallet-button"
@@ -130,14 +128,14 @@ export const HomeCards = () => {
         imageWidth={84}
         title={t("home.cards.governanceActions.title")}
       />
-      {/* GOV ACTIONS CARD  END*/}
+      {/* GOV ACTIONS CARD  END */}
       {/* PROPOSE GOV ACTION CARD  */}
       <ActionCard
         dataTestIdFirstButton="propose-a-governance-action-button"
         description={t("home.cards.proposeAGovernanceAction.description")}
         firstButtonAction={openWalletModal}
         firstButtonLabel={t(
-          "home.cards.proposeAGovernanceAction.firstButtonLabel"
+          "home.cards.proposeAGovernanceAction.firstButtonLabel",
         )}
         imageHeight={84}
         imageURL={IMAGES.proposeGovActionImage}
@@ -146,7 +144,7 @@ export const HomeCards = () => {
         secondButtonLabel={t("learnMore")}
         title={t("home.cards.proposeAGovernanceAction.title")}
       />
-      {/* PROPOSE GOV ACTION CARD  END*/}
+      {/* PROPOSE GOV ACTION CARD  END */}
     </Box>
   );
-};
+}

@@ -2,10 +2,10 @@ import { Typography } from "@mui/material";
 
 import { FormHelpfulTextProps } from "./types";
 
-export const FormHelpfulText = ({
+export function FormHelpfulText({
   helpfulText,
   helpfulTextStyle,
-}: FormHelpfulTextProps) => {
+}: FormHelpfulTextProps) {
   return (
     helpfulText && (
       <Typography
@@ -20,4 +20,4 @@ export const FormHelpfulText = ({
       </Typography>
     )
   );
-};
+}

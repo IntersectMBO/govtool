@@ -50,8 +50,6 @@ import { Link } from "@mui/material";
 import * as Sentry from "@sentry/react";
 import { Trans } from "react-i18next";
 
-import { useModal, useSnackbar } from ".";
-
 import { PATHS } from "@consts";
 import { CardanoApiWallet, VoterInfo, Protocol } from "@models";
 import type { StatusModalState } from "@organisms";
@@ -74,11 +72,12 @@ import {
   WALLET_LS_KEY,
 } from "@utils";
 import { getEpochParams, getTransactionStatus } from "@services";
+import { useTranslation } from "@hooks";
 import {
   setLimitedDelegationInterval,
   setLimitedRegistrationInterval,
 } from "./walletUtils";
-import { useTranslation } from "@hooks";
+import { useModal, useSnackbar } from ".";
 
 interface Props {
   children: React.ReactNode;
@@ -199,7 +198,7 @@ function CardanoProvider(props: Props) {
   const [isEnableLoading, setIsEnableLoading] = useState<string | null>(null);
   const [voter, setVoter] = useState<VoterInfo | undefined>(undefined);
   const [walletApi, setWalletApi] = useState<CardanoApiWallet | undefined>(
-    undefined
+    undefined,
   );
   const [address, setAddress] = useState<string | undefined>(undefined);
   const [pubDRepKey, setPubDRepKey] = useState<string>("");
@@ -209,11 +208,10 @@ function CardanoProvider(props: Props) {
   const [stakeKeys, setStakeKeys] = useState<string[]>([]);
   const [isMainnet, setIsMainnet] = useState<boolean>(false);
   const { openModal, closeModal } = useModal<StatusModalState>();
-  const [registeredStakeKeysListState, setRegisteredPubStakeKeysState] =
-    useState<string[]>([]);
+  const [registeredStakeKeysListState, setRegisteredPubStakeKeysState] = useState<string[]>([]);
   const [error, setError] = useState<string | undefined>(undefined);
   const [delegatedDRepID, setDelegatedDRepID] = useState<string | undefined>(
-    undefined
+    undefined,
   );
   const [delegateTo, setDelegateTo] = useState<string>("");
   const [walletState, setWalletState] = useState<{
@@ -223,16 +221,14 @@ function CardanoProvider(props: Props) {
     changeAddress: undefined,
     usedAddress: undefined,
   });
-  const [delegateTransaction, setDelegateTransaction] =
-    useState<TransactionHistoryItem>({
-      time: undefined,
-      transactionHash: "",
-    });
+  const [delegateTransaction, setDelegateTransaction] = useState<TransactionHistoryItem>({
+    time: undefined,
+    transactionHash: "",
+  });
   const [registerTransaction, setRegisterTransaction] = useState<
     TransactionHistoryItem & { type: DRepActionType }
   >({ time: undefined, transactionHash: "", type: "" });
-  const [govActionTransaction, setGovActionTransaction] =
-    useState<TransactionHistoryItem>({ time: undefined, transactionHash: "" });
+  const [govActionTransaction, setGovActionTransaction] = useState<TransactionHistoryItem>({ time: undefined, transactionHash: "" });
   const [soleVoterTransaction, setSoleVoterTransaction] = useState<
     TransactionHistoryItem & { type: Omit<DRepActionType, "update"> }
   >({ time: undefined, transactionHash: "", type: "" });
@@ -246,10 +242,10 @@ function CardanoProvider(props: Props) {
 
   const isPendingTransaction = useCallback(() => {
     if (
-      registerTransaction?.transactionHash ||
-      soleVoterTransaction?.transactionHash ||
-      delegateTransaction?.transactionHash ||
-      voteTransaction?.transactionHash
+      registerTransaction?.transactionHash
+      || soleVoterTransaction?.transactionHash
+      || delegateTransaction?.transactionHash
+      || voteTransaction?.transactionHash
     ) {
       openModal({
         type: "statusModal",
@@ -278,21 +274,21 @@ function CardanoProvider(props: Props) {
 
   useEffect(() => {
     const delegateTransaction = JSON.parse(
-      getItemFromLocalStorage(DELEGATE_TRANSACTION_KEY + `_${stakeKey}`)
+      getItemFromLocalStorage(`${DELEGATE_TRANSACTION_KEY}_${stakeKey}`),
     );
     const registerTransaction = JSON.parse(
-      getItemFromLocalStorage(REGISTER_TRANSACTION_KEY + `_${stakeKey}`)
+      getItemFromLocalStorage(`${REGISTER_TRANSACTION_KEY}_${stakeKey}`),
     );
     const soleVoterTransaction = JSON.parse(
       getItemFromLocalStorage(
-        REGISTER_SOLE_VOTER_TRANSACTION_KEY + `_${stakeKey}`
-      )
+        `${REGISTER_SOLE_VOTER_TRANSACTION_KEY}_${stakeKey}`,
+      ),
     );
     const voteTransaction = JSON.parse(
-      getItemFromLocalStorage(VOTE_TRANSACTION_KEY + `_${stakeKey}`)
+      getItemFromLocalStorage(`${VOTE_TRANSACTION_KEY}_${stakeKey}`),
     );
     const delegateTo = getItemFromLocalStorage(
-      DELEGATE_TO_KEY + `_${stakeKey}`
+      `${DELEGATE_TO_KEY}_${stakeKey}`,
     );
     if (delegateTransaction?.transactionHash) {
       setDelegateTransaction(delegateTransaction);
@@ -316,14 +312,14 @@ function CardanoProvider(props: Props) {
       const checkDelegateTransaction = async () => {
         const resetDelegateTransaction = () => {
           clearInterval(interval);
-          removeItemFromLocalStorage(DELEGATE_TRANSACTION_KEY + `_${stakeKey}`);
+          removeItemFromLocalStorage(`${DELEGATE_TRANSACTION_KEY}_${stakeKey}`);
           setDelegateTransaction({
             time: undefined,
             transactionHash: "",
           });
         };
         const status = await getTransactionStatus(
-          delegateTransaction.transactionHash
+          delegateTransaction.transactionHash,
         );
         if (status.transactionConfirmed) {
           if (isEnabled) {
@@ -332,7 +328,7 @@ function CardanoProvider(props: Props) {
               10,
               dRepID,
               delegateTo,
-              stakeKey
+              stakeKey,
             ).then((isDelegated) => {
               if (isDelegated) {
                 addSuccessAlert(t("alerts.delegation.success"));
@@ -344,8 +340,8 @@ function CardanoProvider(props: Props) {
           resetDelegateTransaction();
         }
         if (
-          new Date().getTime() - new Date(delegateTransaction?.time).getTime() >
-          TIME_TO_EXPIRE_TRANSACTION
+          new Date().getTime() - new Date(delegateTransaction?.time).getTime()
+          > TIME_TO_EXPIRE_TRANSACTION
         ) {
           resetDelegateTransaction();
           if (isEnabled) addErrorAlert(t("alerts.delegation.failed"));
@@ -358,7 +354,7 @@ function CardanoProvider(props: Props) {
       const checkRegisterTransaction = async () => {
         const resetRegisterTransaction = () => {
           clearInterval(interval);
-          removeItemFromLocalStorage(REGISTER_TRANSACTION_KEY + `_${stakeKey}`);
+          removeItemFromLocalStorage(`${REGISTER_TRANSACTION_KEY}_${stakeKey}`);
           setRegisterTransaction({
             time: undefined,
             transactionHash: "",
@@ -366,20 +362,20 @@ function CardanoProvider(props: Props) {
           });
         };
         const status = await getTransactionStatus(
-          registerTransaction.transactionHash
+          registerTransaction.transactionHash,
         );
         if (status.transactionConfirmed) {
           if (isEnabled) {
             if (
-              registerTransaction.type === "registration" ||
-              registerTransaction.type === "retirement"
+              registerTransaction.type === "registration"
+              || registerTransaction.type === "retirement"
             ) {
               await setLimitedRegistrationInterval(
                 3000,
                 10,
                 dRepID,
                 registerTransaction.type,
-                setVoter
+                setVoter,
               ).then((isRegistered) => {
                 if (registerTransaction.type === "registration") {
                   if (isRegistered) {
@@ -402,22 +398,23 @@ function CardanoProvider(props: Props) {
           resetRegisterTransaction();
         }
         if (
-          new Date().getTime() - new Date(registerTransaction?.time).getTime() >
-          TIME_TO_EXPIRE_TRANSACTION
+          new Date().getTime() - new Date(registerTransaction?.time).getTime()
+          > TIME_TO_EXPIRE_TRANSACTION
         ) {
           resetRegisterTransaction();
-          if (isEnabled)
+          if (isEnabled) {
             addErrorAlert(
               t(
                 `alerts.${
                   registerTransaction.type === "retirement"
                     ? "retirement.failed"
                     : registerTransaction.type === "registration"
-                    ? "registration.failed"
-                    : "metadataUpdate.failed"
-                }`
-              )
+                      ? "registration.failed"
+                      : "metadataUpdate.failed"
+                }`,
+              ),
             );
+          }
         }
       };
       let interval = setInterval(checkRegisterTransaction, REFRESH_TIME);
@@ -428,7 +425,7 @@ function CardanoProvider(props: Props) {
         const resetRegisterTransaction = () => {
           clearInterval(interval);
           removeItemFromLocalStorage(
-            REGISTER_SOLE_VOTER_TRANSACTION_KEY + `_${stakeKey}`
+            `${REGISTER_SOLE_VOTER_TRANSACTION_KEY}_${stakeKey}`,
           );
           setSoleVoterTransaction({
             time: undefined,
@@ -437,7 +434,7 @@ function CardanoProvider(props: Props) {
           });
         };
         const status = await getTransactionStatus(
-          soleVoterTransaction.transactionHash
+          soleVoterTransaction.transactionHash,
         );
         if (status.transactionConfirmed) {
           if (isEnabled) {
@@ -446,14 +443,14 @@ function CardanoProvider(props: Props) {
               10,
               dRepID,
               soleVoterTransaction.type,
-              setVoter
+              setVoter,
             ).then((isRegistered) => {
               if (soleVoterTransaction.type === "registration") {
                 if (isRegistered) {
                   addSuccessAlert(t("alerts.soleVoterRegistration.success"));
                 } else {
                   addWarningAlert(
-                    t("alerts.soleVoterRegistration.refreshPage")
+                    t("alerts.soleVoterRegistration.refreshPage"),
                   );
                 }
               } else if (soleVoterTransaction.type === "retirement") {
@@ -468,21 +465,22 @@ function CardanoProvider(props: Props) {
           resetRegisterTransaction();
         }
         if (
-          new Date().getTime() -
-            new Date(soleVoterTransaction?.time).getTime() >
-          TIME_TO_EXPIRE_TRANSACTION
+          new Date().getTime()
+            - new Date(soleVoterTransaction?.time).getTime()
+          > TIME_TO_EXPIRE_TRANSACTION
         ) {
           resetRegisterTransaction();
-          if (isEnabled)
+          if (isEnabled) {
             addErrorAlert(
               t(
                 `alerts.${
                   soleVoterTransaction.type === "retirement"
                     ? "retirement.failed"
                     : "registration.failed"
-                }`
-              )
+                }`,
+              ),
             );
+          }
         }
       };
       let interval = setInterval(checkRegisterTransaction, REFRESH_TIME);
@@ -492,7 +490,7 @@ function CardanoProvider(props: Props) {
       const checkVoteTransaction = async () => {
         const resetVoteTransaction = () => {
           clearInterval(interval);
-          removeItemFromLocalStorage(VOTE_TRANSACTION_KEY + `_${stakeKey}`);
+          removeItemFromLocalStorage(`${VOTE_TRANSACTION_KEY}_${stakeKey}`);
           setVoteTransaction({
             time: undefined,
             transactionHash: "",
@@ -500,15 +498,15 @@ function CardanoProvider(props: Props) {
           });
         };
         const status = await getTransactionStatus(
-          voteTransaction.transactionHash
+          voteTransaction.transactionHash,
         );
         if (status.transactionConfirmed) {
           resetVoteTransaction();
           if (isEnabled) addSuccessAlert(t("alerts.voting.success"));
         }
         if (
-          new Date().getTime() - new Date(voteTransaction?.time).getTime() >
-          TIME_TO_EXPIRE_TRANSACTION
+          new Date().getTime() - new Date(voteTransaction?.time).getTime()
+          > TIME_TO_EXPIRE_TRANSACTION
         ) {
           resetVoteTransaction();
           if (isEnabled) addErrorAlert(t("alerts.voting.failed"));
@@ -521,23 +519,23 @@ function CardanoProvider(props: Props) {
       const checkGovActionTransaction = async () => {
         const resetGovActionTransaction = () => {
           clearInterval(interval);
-          removeItemFromLocalStorage(GOVERNANCE_ACTION_KEY + `_${stakeKey}`);
+          removeItemFromLocalStorage(`${GOVERNANCE_ACTION_KEY}_${stakeKey}`);
           setGovActionTransaction({
             time: undefined,
             transactionHash: "",
           });
         };
         const status = await getTransactionStatus(
-          govActionTransaction.transactionHash
+          govActionTransaction.transactionHash,
         );
         if (status.transactionConfirmed) {
           resetGovActionTransaction();
           if (isEnabled) addSuccessAlert(t("alerts.govAction.success"));
         }
         if (
-          new Date().getTime() -
-            new Date(govActionTransaction?.time).getTime() >
-          TIME_TO_EXPIRE_TRANSACTION
+          new Date().getTime()
+            - new Date(govActionTransaction?.time).getTime()
+          > TIME_TO_EXPIRE_TRANSACTION
         ) {
           resetGovActionTransaction();
           if (isEnabled) addErrorAlert(t("alerts.govAction.failed"));
@@ -547,12 +545,12 @@ function CardanoProvider(props: Props) {
       checkGovActionTransaction();
     }
     if (
-      isEnabled &&
-      (voteTransaction?.transactionHash ||
-        registerTransaction?.transactionHash ||
-        soleVoterTransaction?.transactionHash ||
-        delegateTransaction?.transactionHash ||
-        govActionTransaction.transactionHash)
+      isEnabled
+      && (voteTransaction?.transactionHash
+        || registerTransaction?.transactionHash
+        || soleVoterTransaction?.transactionHash
+        || delegateTransaction?.transactionHash
+        || govActionTransaction.transactionHash)
     ) {
       addWarningAlert(t("alerts.transactionInProgress"), 10000);
     }
@@ -568,7 +566,7 @@ function CardanoProvider(props: Props) {
     try {
       const raw = await enabledApi.getChangeAddress();
       const changeAddress = Address.from_bytes(
-        Buffer.from(raw, "hex")
+        Buffer.from(raw, "hex"),
       ).to_bech32();
       setWalletState((prev) => ({ ...prev, changeAddress }));
     } catch (err) {
@@ -582,7 +580,7 @@ function CardanoProvider(props: Props) {
       const raw = await enabledApi.getUsedAddresses();
       const rawFirst = raw[0];
       const usedAddress = Address.from_bytes(
-        Buffer.from(rawFirst, "hex")
+        Buffer.from(rawFirst, "hex"),
       ).to_bech32();
       setWalletState((prev) => ({ ...prev, usedAddress }));
     } catch (err) {
@@ -592,21 +590,21 @@ function CardanoProvider(props: Props) {
   };
 
   const getUtxos = async (
-    enabledApi: CardanoApiWallet
+    enabledApi: CardanoApiWallet,
   ): Promise<Utxos | undefined> => {
-    let Utxos = [];
+    const Utxos = [];
 
     try {
       const rawUtxos = await enabledApi.getUtxos();
 
       for (const rawUtxo of rawUtxos) {
         const utxo = TransactionUnspentOutput.from_bytes(
-          Buffer.from(rawUtxo, "hex")
+          Buffer.from(rawUtxo, "hex"),
         );
         const input = utxo.input();
         const txid = Buffer.from(
           input.transaction_id().to_bytes(),
-          "utf8"
+          "utf8",
         ).toString("hex");
         const txindx = input.index();
         const output = utxo.output();
@@ -622,7 +620,7 @@ function CardanoProvider(props: Props) {
             const policyId = keys.get(i);
             const policyIdHex = Buffer.from(
               policyId.to_bytes(),
-              "utf8"
+              "utf8",
             ).toString("hex");
             const assets = multiasset.get(policyId);
             if (assets) {
@@ -633,11 +631,11 @@ function CardanoProvider(props: Props) {
                 const assetName = assetNames.get(j);
                 const assetNameString = Buffer.from(
                   assetName.name(),
-                  "utf8"
+                  "utf8",
                 ).toString();
                 const assetNameHex = Buffer.from(
                   assetName.name(),
-                  "utf8"
+                  "utf8",
                 ).toString("hex");
                 const multiassetAmt = multiasset.get_asset(policyId, assetName);
                 multiAssetStr += `+ ${multiassetAmt.to_str()} + ${policyIdHex}.${assetNameHex} (${assetNameString})`;
@@ -647,11 +645,11 @@ function CardanoProvider(props: Props) {
         }
 
         const obj = {
-          txid: txid,
-          txindx: txindx,
-          amount: amount,
+          txid,
+          txindx,
+          amount,
           str: `${txid} #${txindx} = ${amount}`,
-          multiAssetStr: multiAssetStr,
+          multiAssetStr,
           TransactionUnspentOutput: utxo,
         };
         Utxos.push(obj);
@@ -677,7 +675,7 @@ function CardanoProvider(props: Props) {
             throw new Error(t("errors.walletNoCIP30Support"));
           } else if (
             !window.cardano[walletName].supportedExtensions.some(
-              (item) => item.cip === 95
+              (item) => item.cip === 95,
             )
           ) {
             throw new Error(t("errors.walletNoCIP30Nor90Support"));
@@ -706,7 +704,7 @@ function CardanoProvider(props: Props) {
               t("errors.tryingConnectTo", {
                 networkFrom: network == 1 ? "mainnet" : "testnet",
                 networkTo: network != 1 ? "mainnet" : "testnet",
-              })
+              }),
             );
           }
           setIsMainnet(network == 1);
@@ -722,40 +720,38 @@ function CardanoProvider(props: Props) {
             setAddress(usedAddresses[0]);
           }
 
-          const registeredStakeKeysList =
-            await enabledApi.cip95.getRegisteredPubStakeKeys();
+          const registeredStakeKeysList = await enabledApi.cip95.getRegisteredPubStakeKeys();
           setRegisteredPubStakeKeysState(registeredStakeKeysList);
 
-          const unregisteredStakeKeysList =
-            await enabledApi.cip95.getUnregisteredPubStakeKeys();
+          const unregisteredStakeKeysList = await enabledApi.cip95.getUnregisteredPubStakeKeys();
 
           let stakeKeysList;
           if (registeredStakeKeysList.length > 0) {
             stakeKeysList = registeredStakeKeysList.map((stakeKey) => {
               const stakeKeyHash = PublicKey.from_hex(stakeKey).hash();
               const stakeCredential = Credential.from_keyhash(stakeKeyHash);
-              if (network === 1)
+              if (network === 1) {
                 return RewardAddress.new(1, stakeCredential)
                   .to_address()
                   .to_hex();
-              else
-                return RewardAddress.new(0, stakeCredential)
-                  .to_address()
-                  .to_hex();
+              }
+              return RewardAddress.new(0, stakeCredential)
+                .to_address()
+                .to_hex();
             });
           } else {
             console.warn(t("warnings.usingUnregisteredStakeKeys"));
             stakeKeysList = unregisteredStakeKeysList.map((stakeKey) => {
               const stakeKeyHash = PublicKey.from_hex(stakeKey).hash();
               const stakeCredential = Credential.from_keyhash(stakeKeyHash);
-              if (network === 1)
+              if (network === 1) {
                 return RewardAddress.new(1, stakeCredential)
                   .to_address()
                   .to_hex();
-              else
-                return RewardAddress.new(0, stakeCredential)
-                  .to_address()
-                  .to_hex();
+              }
+              return RewardAddress.new(0, stakeCredential)
+                .to_address()
+                .to_hex();
             });
           }
 
@@ -763,7 +759,7 @@ function CardanoProvider(props: Props) {
 
           let stakeKeySet = false;
           const savedStakeKey = getItemFromLocalStorage(
-            `${WALLET_LS_KEY}_stake_key`
+            `${WALLET_LS_KEY}_stake_key`,
           );
           if (savedStakeKey && stakeKeysList.includes(savedStakeKey)) {
             setStakeKey(savedStakeKey);
@@ -773,7 +769,7 @@ function CardanoProvider(props: Props) {
 
             setItemToLocalStorage(
               `${WALLET_LS_KEY}_stake_key`,
-              stakeKeysList[0]
+              stakeKeysList[0],
             );
             stakeKeySet = true;
           }
@@ -806,7 +802,7 @@ function CardanoProvider(props: Props) {
       }
       throw { status: "ERROR", error: t("errors.somethingWentWrong") };
     },
-    [isEnabled, stakeKeys]
+    [isEnabled, stakeKeys],
   );
 
   const disconnectWallet = useCallback(async () => {
@@ -821,7 +817,7 @@ function CardanoProvider(props: Props) {
   // Create transaction builder
   const initTransactionBuilder = useCallback(async () => {
     const protocolParams = getItemFromLocalStorage(
-      PROTOCOL_PARAMS_KEY
+      PROTOCOL_PARAMS_KEY,
     ) as Protocol;
 
     if (protocolParams) {
@@ -830,25 +826,25 @@ function CardanoProvider(props: Props) {
           .fee_algo(
             LinearFee.new(
               BigNum.from_str(String(protocolParams.min_fee_a)),
-              BigNum.from_str(String(protocolParams.min_fee_b))
-            )
+              BigNum.from_str(String(protocolParams.min_fee_b)),
+            ),
           )
           .pool_deposit(BigNum.from_str(String(protocolParams.pool_deposit)))
           .key_deposit(BigNum.from_str(String(protocolParams.key_deposit)))
           .coins_per_utxo_byte(
-            BigNum.from_str(String(protocolParams.coins_per_utxo_size))
+            BigNum.from_str(String(protocolParams.coins_per_utxo_size)),
           )
           .max_value_size(protocolParams.max_val_size)
           .max_tx_size(protocolParams.max_tx_size)
           .prefer_pure_change(true)
-          .build()
+          .build(),
       );
       return txBuilder;
     }
   }, []);
 
   const getTxUnspentOutputs = useCallback(async (utxos: Utxos) => {
-    let txOutputs = TransactionUnspentOutputs.new();
+    const txOutputs = TransactionUnspentOutputs.new();
     for (const utxo of utxos) {
       txOutputs.add(utxo.TransactionUnspentOutput);
     }
@@ -898,16 +894,15 @@ function CardanoProvider(props: Props) {
         }
 
         if (
-          !walletState.changeAddress ||
-          !walletState.usedAddress ||
-          !walletApi
-        )
-          throw new Error(t("errors.checkIsWalletConnected"));
+          !walletState.changeAddress
+          || !walletState.usedAddress
+          || !walletApi
+        ) throw new Error(t("errors.checkIsWalletConnected"));
         const shelleyOutputAddress = Address.from_bech32(
-          walletState.usedAddress
+          walletState.usedAddress,
         );
         const shelleyChangeAddress = Address.from_bech32(
-          walletState.changeAddress
+          walletState.changeAddress,
         );
 
         // Add output of 1 ADA to the address of our wallet
@@ -915,12 +910,12 @@ function CardanoProvider(props: Props) {
 
         if (registrationType === "retirement" && voter?.deposit) {
           outputValue = outputValue.checked_add(
-            BigNum.from_str(`${voter?.deposit}`)
+            BigNum.from_str(`${voter?.deposit}`),
           );
         }
 
         txBuilder.add_output(
-          TransactionOutput.new(shelleyOutputAddress, Value.new(outputValue))
+          TransactionOutput.new(shelleyOutputAddress, Value.new(outputValue)),
         );
 
         const utxos = await getUtxos(walletApi);
@@ -944,40 +939,40 @@ function CardanoProvider(props: Props) {
         const transactionWitnessSet = TransactionWitnessSet.new();
         const tx = Transaction.new(
           txBody,
-          TransactionWitnessSet.from_bytes(transactionWitnessSet.to_bytes())
+          TransactionWitnessSet.from_bytes(transactionWitnessSet.to_bytes()),
         );
         // Ask wallet to to provide signature (witnesses) for the transaction
         let txVkeyWitnesses;
 
         txVkeyWitnesses = await walletApi.signTx(
           Buffer.from(tx.to_bytes(), "utf8").toString("hex"),
-          true
+          true,
         );
 
         // Create witness set object using the witnesses provided by the wallet
         txVkeyWitnesses = TransactionWitnessSet.from_bytes(
-          Buffer.from(txVkeyWitnesses, "hex")
+          Buffer.from(txVkeyWitnesses, "hex"),
         );
         transactionWitnessSet.set_vkeys(txVkeyWitnesses.vkeys());
         // Build transaction with witnesses
         const signedTx = Transaction.new(tx.body(), transactionWitnessSet);
         console.log(
           Buffer.from(signedTx.to_bytes(), "utf8").toString("hex"),
-          "signed tx cbor"
+          "signed tx cbor",
         );
 
         // Submit built signed transaction to chain, via wallet's submit transaction endpoint
         const result = await walletApi.submitTx(
-          Buffer.from(signedTx.to_bytes(), "utf8").toString("hex")
+          Buffer.from(signedTx.to_bytes(), "utf8").toString("hex"),
         );
         // Set results so they can be rendered
         const cip95ResultTx = Buffer.from(signedTx.to_bytes(), "utf8").toString(
-          "hex"
+          "hex",
         );
         const resultHash = result;
         const cip95ResultWitness = Buffer.from(
           txVkeyWitnesses.to_bytes(),
-          "utf8"
+          "utf8",
         ).toString("hex");
 
         if (govActionBuilder) {
@@ -986,11 +981,11 @@ function CardanoProvider(props: Props) {
             transactionHash: resultHash,
           });
           setItemToLocalStorage(
-            GOVERNANCE_ACTION_KEY + `_${stakeKey}`,
+            `${GOVERNANCE_ACTION_KEY}_${stakeKey}`,
             JSON.stringify({
               time: new Date(),
               transactionHash: resultHash,
-            })
+            }),
           );
         }
         if (type === "registration") {
@@ -1000,12 +995,12 @@ function CardanoProvider(props: Props) {
             type: registrationType ?? "",
           });
           setItemToLocalStorage(
-            REGISTER_TRANSACTION_KEY + `_${stakeKey}`,
+            `${REGISTER_TRANSACTION_KEY}_${stakeKey}`,
             JSON.stringify({
               time: new Date(),
               transactionHash: resultHash,
               type: registrationType,
-            })
+            }),
           );
         }
         if (type === "soleVoterRegistration" && registrationType !== "update") {
@@ -1015,12 +1010,12 @@ function CardanoProvider(props: Props) {
             type: registrationType ?? "",
           });
           setItemToLocalStorage(
-            REGISTER_SOLE_VOTER_TRANSACTION_KEY + `_${stakeKey}`,
+            `${REGISTER_SOLE_VOTER_TRANSACTION_KEY}_${stakeKey}`,
             JSON.stringify({
               time: new Date(),
               transactionHash: resultHash,
               type: registrationType,
-            })
+            }),
           );
         }
         if (type === "delegation") {
@@ -1029,11 +1024,11 @@ function CardanoProvider(props: Props) {
             transactionHash: resultHash,
           });
           setItemToLocalStorage(
-            DELEGATE_TRANSACTION_KEY + `_${stakeKey}`,
+            `${DELEGATE_TRANSACTION_KEY}_${stakeKey}`,
             JSON.stringify({
               time: new Date(),
               transactionHash: resultHash,
-            })
+            }),
           );
         }
         if (type === "vote") {
@@ -1043,12 +1038,12 @@ function CardanoProvider(props: Props) {
             proposalId: proposalId ?? "",
           });
           setItemToLocalStorage(
-            VOTE_TRANSACTION_KEY + `_${stakeKey}`,
+            `${VOTE_TRANSACTION_KEY}_${stakeKey}`,
             JSON.stringify({
               time: new Date(),
               transactionHash: resultHash,
               proposalId: proposalId ?? "",
-            })
+            }),
           );
         }
         console.log(cip95ResultTx, "cip95ResultTx");
@@ -1079,7 +1074,7 @@ function CardanoProvider(props: Props) {
       stakeKey,
       isPendingTransaction,
       voter,
-    ]
+    ],
   );
 
   const buildVoteDelegationCert = useCallback(
@@ -1108,12 +1103,10 @@ function CardanoProvider(props: Props) {
           targetDRep = DRep.new_always_abstain();
         } else if (target === "no confidence") {
           targetDRep = DRep.new_always_no_confidence();
+        } else if (target.includes("drep")) {
+          targetDRep = DRep.new_key_hash(Ed25519KeyHash.from_bech32(target));
         } else {
-          if (target.includes("drep")) {
-            targetDRep = DRep.new_key_hash(Ed25519KeyHash.from_bech32(target));
-          } else {
-            targetDRep = DRep.new_key_hash(Ed25519KeyHash.from_hex(target));
-          }
+          targetDRep = DRep.new_key_hash(Ed25519KeyHash.from_hex(target));
         }
         // Create cert object
         const voteDelegationCert = VoteDelegation.new(stakeCred, targetDRep);
@@ -1121,7 +1114,7 @@ function CardanoProvider(props: Props) {
 
         certBuilder.add(Certificate.new_vote_delegation(voteDelegationCert));
         setDelegateTo(target);
-        setItemToLocalStorage(DELEGATE_TO_KEY + `_${stakeKey}`, target);
+        setItemToLocalStorage(`${DELEGATE_TO_KEY}_${stakeKey}`, target);
         return certBuilder;
       } catch (e) {
         Sentry.captureException(e);
@@ -1129,14 +1122,14 @@ function CardanoProvider(props: Props) {
         throw e;
       }
     },
-    [stakeKey, registeredStakeKeysListState]
+    [stakeKey, registeredStakeKeysListState],
   );
 
   // conway alpha
   const buildDRepRegCert = useCallback(
     async (
       cip95MetadataURL?: string,
-      cip95MetadataHash?: string
+      cip95MetadataHash?: string,
     ): Promise<CertificatesBuilder> => {
       try {
         // Build DRep Registration Certificate
@@ -1154,13 +1147,13 @@ function CardanoProvider(props: Props) {
           dRepRegCert = DrepRegistration.new_with_anchor(
             dRepCred,
             BigNum.from_str(`${epochParams.drep_deposit}`),
-            anchor
+            anchor,
           );
         } else {
           console.log(t("errors.notUsingAnchor"));
           dRepRegCert = DrepRegistration.new(
             dRepCred,
-            BigNum.from_str(`${epochParams.drep_deposit}`)
+            BigNum.from_str(`${epochParams.drep_deposit}`),
           );
         }
         // add cert to tbuilder
@@ -1172,14 +1165,14 @@ function CardanoProvider(props: Props) {
         throw e;
       }
     },
-    [epochParams, dRepID]
+    [epochParams, dRepID],
   );
 
   // conway alpha
   const buildDRepUpdateCert = useCallback(
     async (
       cip95MetadataURL?: string,
-      cip95MetadataHash?: string
+      cip95MetadataHash?: string,
     ): Promise<CertificatesBuilder> => {
       try {
         // Build DRep Registration Certificate
@@ -1207,34 +1200,33 @@ function CardanoProvider(props: Props) {
         throw e;
       }
     },
-    [dRepID]
+    [dRepID],
   );
 
   // conway alpha
-  const buildDRepRetirementCert =
-    useCallback(async (): Promise<CertificatesBuilder> => {
-      try {
-        // Build DRep Registration Certificate
-        const certBuilder = CertificatesBuilder.new();
-        // Get wallet's DRep key
-        const dRepKeyHash = Ed25519KeyHash.from_hex(dRepID);
-        const dRepCred = Credential.from_keyhash(dRepKeyHash);
+  const buildDRepRetirementCert = useCallback(async (): Promise<CertificatesBuilder> => {
+    try {
+      // Build DRep Registration Certificate
+      const certBuilder = CertificatesBuilder.new();
+      // Get wallet's DRep key
+      const dRepKeyHash = Ed25519KeyHash.from_hex(dRepID);
+      const dRepCred = Credential.from_keyhash(dRepKeyHash);
 
-        const dRepRetirementCert = DrepDeregistration.new(
-          dRepCred,
-          BigNum.from_str(`${voter?.deposit}`)
-        );
+      const dRepRetirementCert = DrepDeregistration.new(
+        dRepCred,
+        BigNum.from_str(`${voter?.deposit}`),
+      );
         // add cert to tbuilder
-        certBuilder.add(
-          Certificate.new_drep_deregistration(dRepRetirementCert)
-        );
-        return certBuilder;
-      } catch (e) {
-        Sentry.captureException(e);
-        console.log(e);
-        throw e;
-      }
-    }, [dRepID, voter]);
+      certBuilder.add(
+        Certificate.new_drep_deregistration(dRepRetirementCert),
+      );
+      return certBuilder;
+    } catch (e) {
+      Sentry.captureException(e);
+      console.log(e);
+      throw e;
+    }
+  }, [dRepID, voter]);
 
   const buildVote = useCallback(
     async (
@@ -1242,7 +1234,7 @@ function CardanoProvider(props: Props) {
       txHash: string,
       index: number,
       cip95MetadataURL?: string,
-      cip95MetadataHash?: string
+      cip95MetadataHash?: string,
     ): Promise<VotingBuilder> => {
       try {
         // Get wallet's DRep key
@@ -1252,7 +1244,7 @@ function CardanoProvider(props: Props) {
         const govActionId = GovernanceActionId.new(
           // placeholder
           TransactionHash.from_hex(txHash),
-          index
+          index,
         );
 
         let votingChoice;
@@ -1270,7 +1262,7 @@ function CardanoProvider(props: Props) {
           // Create cert object using one Ada as the deposit
           votingProcedure = VotingProcedure.new_with_anchor(
             votingChoice,
-            anchor
+            anchor,
           );
         } else {
           votingProcedure = VotingProcedure.new(votingChoice);
@@ -1286,7 +1278,7 @@ function CardanoProvider(props: Props) {
         throw e;
       }
     },
-    [dRepID]
+    [dRepID],
   );
 
   const getRewardAddress = useCallback(async () => {
@@ -1296,7 +1288,7 @@ function CardanoProvider(props: Props) {
     }
     const firstAddress = addresses[0];
     const bech32Address = Address.from_bytes(
-      Buffer.from(firstAddress, "hex")
+      Buffer.from(firstAddress, "hex"),
     ).to_bech32();
 
     return RewardAddress.from_address(Address.from_bech32(bech32Address));
@@ -1305,7 +1297,7 @@ function CardanoProvider(props: Props) {
   // info action
   const buildNewInfoGovernanceAction = useCallback(
     async ({ hash, url }: InfoProps) => {
-      let govActionBuilder = VotingProposalBuilder.new();
+      const govActionBuilder = VotingProposalBuilder.new();
       try {
         // Create new info action
         const infoAction = InfoAction.new();
@@ -1321,7 +1313,7 @@ function CardanoProvider(props: Props) {
           infoGovAct,
           anchor,
           rewardAddr,
-          BigNum.from_str(epochParams.gov_action_deposit.toString())
+          BigNum.from_str(epochParams.gov_action_deposit.toString()),
         );
         govActionBuilder.add(votingProposal);
 
@@ -1330,16 +1322,18 @@ function CardanoProvider(props: Props) {
         console.error(err);
       }
     },
-    [epochParams, getRewardAddress]
+    [epochParams, getRewardAddress],
   );
 
   // treasury action
   const buildTreasuryGovernanceAction = useCallback(
-    async ({ amount, hash, receivingAddress, url }: TreasuryProps) => {
+    async ({
+      amount, hash, receivingAddress, url,
+    }: TreasuryProps) => {
       const govActionBuilder = VotingProposalBuilder.new();
       try {
         const treasuryTarget = RewardAddress.from_address(
-          Address.from_bech32(receivingAddress)
+          Address.from_bech32(receivingAddress),
         );
 
         if (!treasuryTarget) throw new Error("Can not get tresasury target");
@@ -1349,8 +1343,7 @@ function CardanoProvider(props: Props) {
         withdrawals.insert(treasuryTarget, myWithdrawal);
         // Create new treasury withdrawal gov act
         const treasuryAction = TreasuryWithdrawalsAction.new(withdrawals);
-        const treasuryGovAct =
-          GovernanceAction.new_treasury_withdrawals_action(treasuryAction);
+        const treasuryGovAct = GovernanceAction.new_treasury_withdrawals_action(treasuryAction);
         // Create an anchor
         const anchor = generateAnchor(url, hash);
 
@@ -1362,7 +1355,7 @@ function CardanoProvider(props: Props) {
           treasuryGovAct,
           anchor,
           rewardAddr,
-          BigNum.from_str(epochParams.gov_action_deposit.toString())
+          BigNum.from_str(epochParams.gov_action_deposit.toString()),
         );
         govActionBuilder.add(votingProposal);
 
@@ -1371,7 +1364,7 @@ function CardanoProvider(props: Props) {
         console.error(err);
       }
     },
-    [epochParams, getRewardAddress]
+    [epochParams, getRewardAddress],
   );
 
   const value = useMemo(
@@ -1448,7 +1441,7 @@ function CardanoProvider(props: Props) {
       voteTransaction,
       walletApi,
       govActionTransaction,
-    ]
+    ],
   );
 
   return <CardanoContext.Provider value={value} {...props} />;
@@ -1469,7 +1462,7 @@ function useCardano() {
     async (walletName: string) => {
       try {
         const isSanchoInfoShown = getItemFromLocalStorage(
-          SANCHO_INFO_KEY + `_${walletName}`
+          `${SANCHO_INFO_KEY}_${walletName}`,
         );
         const result = await context.enable(walletName);
         if (!result.error) {
@@ -1507,7 +1500,7 @@ function useCardano() {
                 buttonText: t("ok"),
               },
             });
-            setItemToLocalStorage(SANCHO_INFO_KEY + `_${walletName}`, true);
+            setItemToLocalStorage(`${SANCHO_INFO_KEY}_${walletName}`, true);
           }
           return result;
         }
@@ -1530,7 +1523,7 @@ function useCardano() {
         throw e;
       }
     },
-    [context, openModal, context.isEnabled]
+    [context, openModal, context.isEnabled],
   );
 
   const disconnectWallet = useCallback(async () => {

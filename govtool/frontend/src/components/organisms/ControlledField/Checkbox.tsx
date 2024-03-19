@@ -5,13 +5,13 @@ import { Field } from "@molecules";
 
 import { ControlledCheckboxProps, RenderInputProps } from "./types";
 
-export const Checkbox = ({
+export function Checkbox({
   control,
   name,
   errors,
   rules,
   ...props
-}: ControlledCheckboxProps) => {
+}: ControlledCheckboxProps) {
   const errorMessage = get(errors, name)?.message as string;
 
   const renderInput = useCallback(
@@ -25,7 +25,7 @@ export const Checkbox = ({
         {...props}
       />
     ),
-    [errorMessage, props]
+    [errorMessage, props],
   );
 
   return (
@@ -36,4 +36,4 @@ export const Checkbox = ({
       render={renderInput}
     />
   );
-};
+}

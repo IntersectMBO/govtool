@@ -2,10 +2,10 @@ import { Box } from "@mui/material";
 
 import { Checkbox as CheckboxBase, FormErrorMessage, Typography } from "@atoms";
 
-import { CheckboxFieldProps } from "./types";
 import { useCallback } from "react";
+import { CheckboxFieldProps } from "./types";
 
-export const Checkbox = ({
+export function Checkbox({
   errorMessage,
   errorStyles,
   label,
@@ -14,7 +14,7 @@ export const Checkbox = ({
   onChange,
   value,
   ...rest
-}: CheckboxFieldProps) => {
+}: CheckboxFieldProps) {
   const handleValue = useCallback(() => {
     onChange(!value);
   }, [value]);
@@ -45,4 +45,4 @@ export const Checkbox = ({
       <FormErrorMessage errorMessage={errorMessage} errorStyles={errorStyles} />
     </Box>
   );
-};
+}

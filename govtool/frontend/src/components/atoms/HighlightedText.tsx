@@ -8,13 +8,13 @@ interface Props {
   color?: string;
 }
 
-export const HighlightedText = ({
+export function HighlightedText({
   text,
   searchPhrase = "",
   fontSize = 12,
   fontWeight = 400,
   color = "inherit",
-}: Props) => {
+}: Props) {
   const regex = new RegExp(`(${searchPhrase})`, "gi");
   const parts = text.split(regex);
 
@@ -26,7 +26,7 @@ export const HighlightedText = ({
           component="span"
           fontSize={fontSize}
           fontWeight={fontWeight}
-          lineHeight={"16px"}
+          lineHeight="16px"
           style={{
             backgroundColor:
               part.toLowerCase() === searchPhrase.toLowerCase()
@@ -43,4 +43,4 @@ export const HighlightedText = ({
       ))}
     </>
   );
-};
+}

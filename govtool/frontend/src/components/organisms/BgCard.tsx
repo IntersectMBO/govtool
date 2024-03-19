@@ -9,7 +9,7 @@ import { theme } from "@/theme";
 
 import { BgCardProps } from "./types";
 
-export const BgCard = ({
+export function BgCard({
   actionButtonLabel,
   backButtonLabel,
   children,
@@ -18,7 +18,7 @@ export const BgCard = ({
   onClickBackButton,
   onClickActionButton,
   sx,
-}: BgCardProps) => {
+}: BgCardProps) {
   const {
     palette: { boxShadow2 },
   } = theme;
@@ -28,42 +28,38 @@ export const BgCard = ({
 
   const navigateToDashboard = useCallback(
     () => navigate(PATHS.dashboard),
-    [navigate]
+    [navigate],
   );
 
-  const renderBackButton = useMemo(() => {
-    return (
-      <Button
-        data-testid="back-button"
-        onClick={onClickBackButton ?? navigateToDashboard}
-        size="extraLarge"
-        sx={{
-          px: 6,
-        }}
-        variant="outlined"
-      >
-        {backButtonLabel ?? t("back")}
-      </Button>
-    );
-  }, [isMobile]);
+  const renderBackButton = useMemo(() => (
+    <Button
+      data-testid="back-button"
+      onClick={onClickBackButton ?? navigateToDashboard}
+      size="extraLarge"
+      sx={{
+        px: 6,
+      }}
+      variant="outlined"
+    >
+      {backButtonLabel ?? t("back")}
+    </Button>
+  ), [isMobile]);
 
-  const renderContinueButton = useMemo(() => {
-    return (
-      <LoadingButton
-        data-testid="retire-button"
-        disabled={isActionButtonDisabled}
-        isLoading={isLoadingActionButton}
-        onClick={onClickActionButton}
-        size="extraLarge"
-        sx={{
-          px: 6,
-        }}
-        variant="contained"
-      >
-        {actionButtonLabel}
-      </LoadingButton>
-    );
-  }, [
+  const renderContinueButton = useMemo(() => (
+    <LoadingButton
+      data-testid="retire-button"
+      disabled={isActionButtonDisabled}
+      isLoading={isLoadingActionButton}
+      onClick={onClickActionButton}
+      size="extraLarge"
+      sx={{
+        px: 6,
+      }}
+      variant="contained"
+    >
+      {actionButtonLabel}
+    </LoadingButton>
+  ), [
     actionButtonLabel,
     isActionButtonDisabled,
     isLoadingActionButton,
@@ -115,4 +111,4 @@ export const BgCard = ({
       </Box>
     </Box>
   );
-};
+}

@@ -14,12 +14,10 @@ export const useGetDRepVotingPowerQuery = () => {
       voter?.isRegisteredAsDRep,
       voter?.isRegisteredAsSoleVoter,
     ],
-    queryFn: async () => {
-      return await getDRepVotingPower({ dRepID });
-    },
+    queryFn: async () => await getDRepVotingPower({ dRepID }),
     enabled:
-      !!dRepID &&
-      (!!voter?.isRegisteredAsDRep || !!voter?.isRegisteredAsSoleVoter),
+      !!dRepID
+      && (!!voter?.isRegisteredAsDRep || !!voter?.isRegisteredAsSoleVoter),
   });
 
   return { dRepVotingPower: data, isDRepVotingPowerLoading: isLoading };

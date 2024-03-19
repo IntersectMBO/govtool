@@ -2,7 +2,9 @@ import { Dispatch, SetStateAction, useCallback } from "react";
 import { useFieldArray } from "react-hook-form";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
-import { Button, InfoText, Spacer, Typography } from "@atoms";
+import {
+  Button, InfoText, Spacer, Typography,
+} from "@atoms";
 import { GOVERNANCE_ACTION_FIELDS } from "@consts";
 import { useCreateGovernanceActionForm, useTranslation } from "@hooks";
 import { Field } from "@molecules";
@@ -19,12 +21,13 @@ type CreateGovernanceActionFormProps = {
   setStep: Dispatch<SetStateAction<number>>;
 };
 
-export const CreateGovernanceActionForm = ({
+export function CreateGovernanceActionForm({
   setStep,
-}: CreateGovernanceActionFormProps) => {
+}: CreateGovernanceActionFormProps) {
   const { t } = useTranslation();
-  const { control, errors, getValues, register, reset, watch } =
-    useCreateGovernanceActionForm();
+  const {
+    control, errors, getValues, register, reset, watch,
+  } = useCreateGovernanceActionForm();
 
   const isError = Object.keys(errors).length > 0;
 
@@ -39,10 +42,9 @@ export const CreateGovernanceActionForm = ({
   });
 
   // TODO: Replace any
-  const isContinueButtonDisabled =
-    Object.keys(GOVERNANCE_ACTION_FIELDS[type!]).some(
-      (field: any) => !watch(field)
-    ) || isError;
+  const isContinueButtonDisabled = Object.keys(GOVERNANCE_ACTION_FIELDS[type!]).some(
+    (field: any) => !watch(field),
+  ) || isError;
 
   const onClickContinue = () => {
     setStep(4);
@@ -53,37 +55,35 @@ export const CreateGovernanceActionForm = ({
     setStep(2);
   };
 
-  const renderGovernanceActionField = () => {
-    return Object.entries(GOVERNANCE_ACTION_FIELDS[type!]).map(
-      ([key, field]) => {
-        const fieldProps = {
-          helpfulText: field.tipI18nKey ? t(field.tipI18nKey) : undefined,
-          key,
-          label: t(field.labelI18nKey),
-          layoutStyles: { mb: 3 },
-          name: key,
-          placeholder: field.placeholderI18nKey
-            ? t(field.placeholderI18nKey)
-            : undefined,
-          rules: field.rules,
-        };
+  const renderGovernanceActionField = () => Object.entries(GOVERNANCE_ACTION_FIELDS[type!]).map(
+    ([key, field]) => {
+      const fieldProps = {
+        helpfulText: field.tipI18nKey ? t(field.tipI18nKey) : undefined,
+        key,
+        label: t(field.labelI18nKey),
+        layoutStyles: { mb: 3 },
+        name: key,
+        placeholder: field.placeholderI18nKey
+          ? t(field.placeholderI18nKey)
+          : undefined,
+        rules: field.rules,
+      };
 
-        if (field.component === GovernanceActionField.Input) {
-          return (
-            <ControlledField.Input {...{ control, errors }} {...fieldProps} />
-          );
-        }
-        if (field.component === GovernanceActionField.TextArea) {
-          return (
-            <ControlledField.TextArea
-              {...{ control, errors }}
-              {...fieldProps}
-            />
-          );
-        }
+      if (field.component === GovernanceActionField.Input) {
+        return (
+          <ControlledField.Input {...{ control, errors }} {...fieldProps} />
+        );
       }
-    );
-  };
+      if (field.component === GovernanceActionField.TextArea) {
+        return (
+          <ControlledField.TextArea
+            {...{ control, errors }}
+            {...fieldProps}
+          />
+        );
+      }
+    },
+  );
 
   const addLink = useCallback(() => {
     append({ link: "" });
@@ -93,16 +93,14 @@ export const CreateGovernanceActionForm = ({
     (index: number) => {
       remove(index);
     },
-    [remove]
+    [remove],
   );
 
-  const renderLinks = useCallback(() => {
-    return links.map((field, index) => {
-      return (
-        <ControlledField.Input
-          {...register(`links.${index}.link`)}
-          errors={errors}
-          endAdornment={
+  const renderLinks = useCallback(() => links.map((field, index) => (
+    <ControlledField.Input
+      {...register(`links.${index}.link`)}
+      errors={errors}
+      endAdornment={
             links.length > 1 ? (
               <DeleteOutlineIcon
                 color="primary"
@@ -111,21 +109,19 @@ export const CreateGovernanceActionForm = ({
               />
             ) : null
           }
-          key={field.id}
-          label={t("forms.link") + ` ${index + 1}`}
-          layoutStyles={{ mb: 3 }}
-          placeholder={LINK_PLACEHOLDER}
-          name={`links.${index}.link`}
-          rules={{
-            pattern: {
-              value: URL_REGEX,
-              message: t("createGovernanceAction.fields.validations.url"),
-            },
-          }}
-        />
-      );
-    });
-  }, [links]);
+      key={field.id}
+      label={`${t("forms.link")} ${index + 1}`}
+      layoutStyles={{ mb: 3 }}
+      placeholder={LINK_PLACEHOLDER}
+      name={`links.${index}.link`}
+      rules={{
+        pattern: {
+          value: URL_REGEX,
+          message: t("createGovernanceAction.fields.validations.url"),
+        },
+      }}
+    />
+  )), [links]);
 
   return (
     <BgCard
@@ -140,7 +136,7 @@ export const CreateGovernanceActionForm = ({
       </Typography>
       <Spacer y={4.25} />
       <Field.Input
-        disabled={true}
+        disabled
         helpfulText={t("forms.createGovernanceAction.typeTip")}
         label={t("forms.createGovernanceAction.typeLabel")}
         value={type}
@@ -161,4 +157,4 @@ export const CreateGovernanceActionForm = ({
       <Spacer y={3} />
     </BgCard>
   );
-};
+}

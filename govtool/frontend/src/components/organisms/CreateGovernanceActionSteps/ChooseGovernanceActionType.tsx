@@ -13,9 +13,9 @@ type ChooseGovernanceActionTypeProps = {
   setStep: Dispatch<SetStateAction<number>>;
 };
 
-export const ChooseGovernanceActionType = ({
+export function ChooseGovernanceActionType({
   setStep,
-}: ChooseGovernanceActionTypeProps) => {
+}: ChooseGovernanceActionTypeProps) {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
   const { getValues, setValue, watch } = useCreateGovernanceActionForm();
@@ -31,23 +31,22 @@ export const ChooseGovernanceActionType = ({
   };
 
   // TODO: Add tooltips when they will be available
-  const renderGovernanceActionTypes = () =>
-    Object.keys(GovernanceActionType).map(
-      (type, index, governanceActionTypes) => {
-        const isChecked = getValues("governance_action_type") === type;
-        return (
-          <div key={type}>
-            <ActionRadio
-              isChecked={isChecked}
-              onChange={onChangeType}
-              title={type}
-              value={type}
-            />
-            {index + 1 < governanceActionTypes.length ? <Spacer y={2} /> : null}
-          </div>
-        );
-      }
-    );
+  const renderGovernanceActionTypes = () => Object.keys(GovernanceActionType).map(
+    (type, index, governanceActionTypes) => {
+      const isChecked = getValues("governance_action_type") === type;
+      return (
+        <div key={type}>
+          <ActionRadio
+            isChecked={isChecked}
+            onChange={onChangeType}
+            title={type}
+            value={type}
+          />
+          {index + 1 < governanceActionTypes.length ? <Spacer y={2} /> : null}
+        </div>
+      );
+    },
+  );
 
   const onChangeType = (value: string) => {
     setValue("governance_action_type", value as GovernanceActionType);
@@ -68,4 +67,4 @@ export const ChooseGovernanceActionType = ({
       <Spacer y={isMobile ? 6 : 7.5} />
     </BgCard>
   );
-};
+}

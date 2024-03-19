@@ -33,7 +33,7 @@ export const WithIconButton: StoryObj<typeof Step> = {
     stepNumber: 2,
     component: (
       <Button
-        endIcon={
+        endIcon={(
           <OpenInNewIcon
             sx={{
               color: "primary",
@@ -41,7 +41,7 @@ export const WithIconButton: StoryObj<typeof Step> = {
               width: 17,
             }}
           />
-        }
+        )}
         size="extraLarge"
         sx={{ width: "fit-content" }}
         variant="text"
@@ -57,6 +57,6 @@ export const WithInput: StoryObj<typeof Step> = {
     label:
       "Save this file in a location that provides a public URL (ex. github)",
     stepNumber: 2,
-    component: <Field.Input name="storingURL" placeholder={"URL"} />,
+    component: <Field.Input name="storingURL" placeholder="URL" />,
   },
 };

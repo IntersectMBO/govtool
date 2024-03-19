@@ -1,21 +1,21 @@
 import { useMemo } from "react";
 import { Box, Link } from "@mui/material";
 
-import { Button, LoadingButton, Typography } from "../atoms";
 import {
   useScreenDimension,
   useDelegateTodRepForm,
   useTranslation,
 } from "@hooks";
-import { theme } from "@/theme";
 import { openInNewTab } from "@utils";
+import { Button, LoadingButton, Typography } from "../atoms";
+import { theme } from "@/theme";
 import { ControlledField } from ".";
 
 interface DelegateProps {
   setStep: (newStep: number) => void;
 }
 
-export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
+export function DelegateTodRepStepTwo({ setStep }: DelegateProps) {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
 
@@ -31,48 +31,44 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
     isDelegationLoading,
   } = useDelegateTodRepForm();
 
-  const renderDelegateButton = useMemo(() => {
-    return (
-      <LoadingButton
-        data-testid={"delegate-button"}
-        disabled={isDelegateButtonDisabled}
-        isLoading={isDelegationLoading}
-        onClick={delegate}
-        size="extraLarge"
-        sx={{
-          px: 6,
-          width: isMobile ? "100%" : "auto",
-        }}
-        variant="contained"
-      >
-        {t("delegate")}
-      </LoadingButton>
-    );
-  }, [isDelegateButtonDisabled, delegate, isMobile, isDelegationLoading]);
+  const renderDelegateButton = useMemo(() => (
+    <LoadingButton
+      data-testid="delegate-button"
+      disabled={isDelegateButtonDisabled}
+      isLoading={isDelegationLoading}
+      onClick={delegate}
+      size="extraLarge"
+      sx={{
+        px: 6,
+        width: isMobile ? "100%" : "auto",
+      }}
+      variant="contained"
+    >
+      {t("delegate")}
+    </LoadingButton>
+  ), [isDelegateButtonDisabled, delegate, isMobile, isDelegationLoading]);
 
-  const renderBackButton = useMemo(() => {
-    return (
-      <Button
-        data-testid={"cancel-button"}
-        onClick={() => setStep(1)}
-        size="extraLarge"
-        sx={{
-          px: 6,
-          width: isMobile ? "100%" : "auto",
-        }}
-        variant="outlined"
-      >
-        {t("back")}
-      </Button>
-    );
-  }, [isMobile]);
+  const renderBackButton = useMemo(() => (
+    <Button
+      data-testid="cancel-button"
+      onClick={() => setStep(1)}
+      size="extraLarge"
+      sx={{
+        px: 6,
+        width: isMobile ? "100%" : "auto",
+      }}
+      variant="outlined"
+    >
+      {t("back")}
+    </Button>
+  ), [isMobile]);
 
   return (
     <Box
       boxShadow={isMobile ? "" : `2px 2px 20px 0px ${boxShadow2}`}
       px={isMobile ? 2 : 17.5}
       py={isMobile ? 4 : 14}
-      borderRadius={"20px"}
+      borderRadius="20px"
       mb={isMobile ? 0 : 6}
       flex={1}
       maxWidth={646}
@@ -99,13 +95,11 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
           />
         </Box>
         <Link
-          data-testid={"find-dRep-link"}
-          onClick={() =>
-            openInNewTab(
-              "https://docs.sanchogov.tools/faqs/where-can-i-find-a-drep-id"
-            )
-          }
-          alignSelf={"center"}
+          data-testid="find-dRep-link"
+          onClick={() => openInNewTab(
+            "https://docs.sanchogov.tools/faqs/where-can-i-find-a-drep-id",
+          )}
+          alignSelf="center"
           mt={4}
           sx={[{ "&:hover": { cursor: "pointer" } }]}
         >
@@ -115,9 +109,9 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
         </Link>
       </Box>
       <Box
-        display={"flex"}
+        display="flex"
         flexDirection={isMobile ? "column" : "row"}
-        justifyContent={"space-between"}
+        justifyContent="space-between"
         mt={6}
         px={isMobile ? 0 : 6}
       >
@@ -127,4 +121,4 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
       </Box>
     </Box>
   );
-};
+}

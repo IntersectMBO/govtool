@@ -19,11 +19,11 @@ export function ChooseWalletModal() {
       if (icon && name && supportedExtensions) {
         // Check if the name already exists in resultWallets
         const isNameDuplicate = resultWallets.some(
-          (wallet) => wallet.label === name
+          (wallet) => wallet.label === name,
         );
         // Check if the supportedExtensions array contains an entry with cip === 95
         const isCip95Available = Boolean(
-          supportedExtensions?.find((i) => i.cip === 95)
+          supportedExtensions?.find((i) => i.cip === 95),
         );
         // If the name is not a duplicate and cip === 95 is available, add it to resultWallets
         if (!isNameDuplicate && isCip95Available) {
@@ -73,18 +73,18 @@ export function ChooseWalletModal() {
               {t("wallet.noWalletsToConnect")}
             </Typography>
           ) : (
-            walletOptions.map(({ icon, label, name, cip95Available }) => {
-              return (
-                <WalletOptionButton
-                  dataTestId={name + "-wallet-button"}
-                  key={name}
-                  icon={icon}
-                  label={label}
-                  name={name}
-                  cip95Available={cip95Available}
-                />
-              );
-            })
+            walletOptions.map(({
+              icon, label, name, cip95Available,
+            }) => (
+              <WalletOptionButton
+                dataTestId={`${name}-wallet-button`}
+                key={name}
+                icon={icon}
+                label={label}
+                name={name}
+                cip95Available={cip95Available}
+              />
+            ))
           )}
         </Box>
         <Typography
@@ -99,11 +99,9 @@ export function ChooseWalletModal() {
           <Link
             fontSize={11}
             fontWeight={500}
-            onClick={() =>
-              openInNewTab(
-                "https://docs.sanchogov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet"
-              )
-            }
+            onClick={() => openInNewTab(
+              "https://docs.sanchogov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet",
+            )}
             sx={{ cursor: "pointer" }}
           >
             {t("here")}

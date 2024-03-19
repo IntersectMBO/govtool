@@ -38,9 +38,9 @@ export const SliderComponent: Story = {
     )),
     dataLength: DATA.length,
   },
-  play: ({ canvasElement }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    expect(canvas.getByText("Slider title")).toBeInTheDocument();
-    expect(canvas.getAllByTestId("slider")).toHaveLength(DATA.length);
+    await expect(canvas.getByText("Slider title")).toBeInTheDocument();
+    await expect(canvas.getAllByTestId("slider")).toHaveLength(DATA.length);
   },
 };

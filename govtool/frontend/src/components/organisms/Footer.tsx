@@ -4,7 +4,7 @@ import { Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
-export const Footer = () => {
+export function Footer() {
   const { isMobile, pagePadding } = useScreenDimension();
   const { t } = useTranslation();
 
@@ -24,9 +24,7 @@ export const Footer = () => {
       <Box display="flex" flexDirection="row" mt={isMobile ? 1.5 : 0}>
         <Link
           data-testid="privacy-policy-link"
-          onClick={() =>
-            openInNewTab("https://docs.sanchogov.tools/legal/privacy-policy")
-          }
+          onClick={() => openInNewTab("https://docs.sanchogov.tools/legal/privacy-policy")}
           sx={[{ textDecoration: "none" }]}
           mr={6}
         >
@@ -41,4 +39,4 @@ export const Footer = () => {
       </Box>
     </Box>
   );
-};
+}

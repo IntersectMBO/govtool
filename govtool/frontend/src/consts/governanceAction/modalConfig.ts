@@ -7,16 +7,16 @@ const externalDataDoesntMatchModal = {
   status: "warning",
   title: I18n.t("createGovernanceAction.modals.externalDataDoesntMatch.title"),
   message: I18n.t(
-    "createGovernanceAction.modals.externalDataDoesntMatch.message"
+    "createGovernanceAction.modals.externalDataDoesntMatch.message",
   ),
   buttonText: I18n.t(
-    "createGovernanceAction.modals.externalDataDoesntMatch.buttonText"
+    "createGovernanceAction.modals.externalDataDoesntMatch.buttonText",
   ),
   cancelText: I18n.t(
-    "createGovernanceAction.modals.externalDataDoesntMatch.cancelRegistrationText"
+    "createGovernanceAction.modals.externalDataDoesntMatch.cancelRegistrationText",
   ),
   feedbackText: I18n.t(
-    "createGovernanceAction.modals.externalDataDoesntMatch.feedbackText"
+    "createGovernanceAction.modals.externalDataDoesntMatch.feedbackText",
   ),
 } as const;
 
@@ -27,13 +27,13 @@ const urlCannotBeFound = {
   link: "https://docs.sanchogov.tools",
   linkText: I18n.t("createGovernanceAction.modals.urlCannotBeFound.linkText"),
   buttonText: I18n.t(
-    "createGovernanceAction.modals.urlCannotBeFound.buttonText"
+    "createGovernanceAction.modals.urlCannotBeFound.buttonText",
   ),
   cancelText: I18n.t(
-    "createGovernanceAction.modals.urlCannotBeFound.cancelRegistrationText"
+    "createGovernanceAction.modals.urlCannotBeFound.cancelRegistrationText",
   ),
   feedbackText: I18n.t(
-    "createGovernanceAction.modals.urlCannotBeFound.feedbackText"
+    "createGovernanceAction.modals.urlCannotBeFound.feedbackText",
   ),
 };
 

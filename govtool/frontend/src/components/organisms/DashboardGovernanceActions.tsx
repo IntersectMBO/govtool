@@ -1,5 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
-import { Box, CircularProgress, Tab, Tabs, styled } from "@mui/material";
+import {
+  Box, CircularProgress, Tab, Tabs, styled,
+} from "@mui/material";
 import { useLocation } from "react-router-dom";
 
 import { useCardano } from "@context";
@@ -53,7 +55,7 @@ const StyledTab = styled((props: StyledTabProps) => (
   },
 }));
 
-export const DashboardGovernanceActions = () => {
+export function DashboardGovernanceActions() {
   const [searchText, setSearchText] = useState<string>("");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [chosenFilters, setChosenFilters] = useState<string[]>([]);
@@ -62,7 +64,7 @@ export const DashboardGovernanceActions = () => {
 
   const { state } = useLocation();
   const [content, setContent] = useState<number>(
-    state && state.isVotedListOnLoad ? 1 : 0
+    state && state.isVotedListOnLoad ? 1 : 0,
   );
 
   const { voter, isDrepLoading } = useCardano();
@@ -172,4 +174,4 @@ export const DashboardGovernanceActions = () => {
       )}
     </Box>
   );
-};
+}

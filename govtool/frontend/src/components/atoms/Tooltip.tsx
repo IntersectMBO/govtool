@@ -8,18 +8,18 @@ type TooltipProps = Omit<TooltipMUI.TooltipProps, "title"> & {
   paragraphTwo?: string;
 };
 
-export const Tooltip = ({
+export function Tooltip({
   heading,
   paragraphOne,
   paragraphTwo,
   ...tooltipProps
-}: TooltipProps) => {
+}: TooltipProps) {
   return (
     <StyledTooltip
       {...tooltipProps}
       enterTouchDelay={0}
       leaveTouchDelay={1000}
-      title={
+      title={(
         <>
           {heading && (
             <Typography fontSize={16} fontWeight={400} color="#FBFBFF">
@@ -35,21 +35,23 @@ export const Tooltip = ({
             {paragraphOne && paragraphOne}
             {paragraphTwo && (
               <>
-                <br /> <br />
+                <br />
+                {" "}
+                <br />
                 {paragraphTwo}
               </>
             )}
           </Typography>
         </>
-      }
+      )}
     />
   );
-};
+}
 
 const StyledTooltip = styled(
   ({ className, ...props }: TooltipMUI.TooltipProps) => (
     <TooltipMUI.default {...props} arrow classes={{ popper: className }} />
-  )
+  ),
 )(() => ({
   [`& .${TooltipMUI.tooltipClasses.arrow}`]: {
     color: "rgb(36, 34, 50)",

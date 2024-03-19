@@ -27,7 +27,7 @@ export function ModalWrapper({
     <BaseWrapper variant={variant} data-testid={dataTestId} sx={sx}>
       {variant !== "popup" && !hideCloseButton && (
         <CloseButton
-          data-testid={"close-modal-button"}
+          data-testid="close-modal-button"
           alt="close"
           onClick={callAll(closeModal, onClose)}
           src={ICONS.closeIcon}

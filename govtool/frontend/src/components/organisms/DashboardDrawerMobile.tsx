@@ -1,4 +1,6 @@
-import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
+import {
+  Box, Grid, IconButton, SwipeableDrawer,
+} from "@mui/material";
 
 import { Background, Link } from "@atoms";
 import { CONNECTED_NAV_ITEMS, ICONS } from "@consts";
@@ -13,10 +15,10 @@ const DRAWER_PADDING = 2;
 // 8 is number of multiple in Material UI 2 is left and right side
 const CALCULATED_DRAWER_PADDING = DRAWER_PADDING * 8 * 2;
 
-export const DashboardDrawerMobile = ({
+export function DashboardDrawerMobile({
   isDrawerOpen,
   setIsDrawerOpen,
-}: DashboardDrawerMobileProps) => {
+}: DashboardDrawerMobileProps) {
   const { screenWidth } = useScreenDimension();
   const { voter } = useCardano();
 
@@ -90,4 +92,4 @@ export const DashboardDrawerMobile = ({
       </Background>
     </SwipeableDrawer>
   );
-};
+}

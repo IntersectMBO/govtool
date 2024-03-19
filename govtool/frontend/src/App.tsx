@@ -55,10 +55,9 @@ export default function App() {
   }, [data?.isRegisteredAsDRep, data?.isRegisteredAsSoleVoter]);
 
   const checkTheWalletIsActive = useCallback(() => {
-    const hrefCondition =
-      window.location.pathname === PATHS.home ||
-      window.location.pathname === PATHS.governanceActions ||
-      window.location.pathname === PATHS.governanceActionsAction;
+    const hrefCondition = window.location.pathname === PATHS.home
+      || window.location.pathname === PATHS.governanceActions
+      || window.location.pathname === PATHS.governanceActionsAction;
 
     const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
     if (window.cardano) {
@@ -69,8 +68,8 @@ export default function App() {
       }
     }
     if (
-      (!window.cardano && walletName) ||
-      (walletName && !Object.keys(window.cardano).includes(walletName))
+      (!window.cardano && walletName)
+      || (walletName && !Object.keys(window.cardano).includes(walletName))
     ) {
       if (!hrefCondition) {
         navigate(PATHS.home);
@@ -92,7 +91,7 @@ export default function App() {
         <Route
           path={PATHS.governanceActions}
           element={<GovernanceActions />}
-        ></Route>
+        />
         <Route
           path={PATHS.governanceActionsCategory}
           element={<GovernanceActionsCategory />}
@@ -137,9 +136,7 @@ export default function App() {
           open={Boolean(modals[modal.type].component)}
           handleClose={
             !modals[modal.type].preventDismiss
-              ? callAll(modals[modal.type]?.onClose, () =>
-                  openModal({ type: "none", state: null })
-                )
+              ? callAll(modals[modal.type]?.onClose, () => openModal({ type: "none", state: null }))
               : undefined
           }
         >

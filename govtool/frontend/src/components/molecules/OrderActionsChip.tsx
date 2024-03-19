@@ -14,7 +14,7 @@ interface Props {
   isFiltering?: boolean;
 }
 
-export const OrderActionsChip = (props: Props) => {
+export function OrderActionsChip(props: Props) {
   const {
     palette: { secondary },
   } = theme;
@@ -29,11 +29,11 @@ export const OrderActionsChip = (props: Props) => {
   } = props;
 
   return (
-    <Box display={"flex"} width={"min-content"} alignItems={"center"} ml="8px">
+    <Box display="flex" width="min-content" alignItems="center" ml="8px">
       {isFiltering && (
-        <Box position={"relative"}>
+        <Box position="relative">
           <img
-            data-testid={"filters-button"}
+            data-testid="filters-button"
             alt="filter"
             onClick={() => {
               setSortOpen(false);
@@ -77,10 +77,10 @@ export const OrderActionsChip = (props: Props) => {
           )}
         </Box>
       )}
-      <Box position={"relative"}>
+      <Box position="relative">
         <img
           alt="sort"
-          data-testid={"sort-button"}
+          data-testid="sort-button"
           onClick={() => {
             if (isFiltering) {
               setFiltersOpen(false);
@@ -121,4 +121,4 @@ export const OrderActionsChip = (props: Props) => {
       </Box>
     </Box>
   );
-};
+}

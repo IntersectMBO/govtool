@@ -1,13 +1,13 @@
 import { useCallback, useState } from "react";
-import {
-  UrlAndHashFormValues,
-  useUrlAndHashFormController,
-} from "./useUrlAndHashFormController";
 import { useNavigate } from "react-router-dom";
 
 import { PATHS } from "@consts";
 import { useCardano, useSnackbar } from "@context";
 import { useTranslation } from "@hooks";
+import {
+  UrlAndHashFormValues,
+  useUrlAndHashFormController,
+} from "./useUrlAndHashFormController";
 
 export const useUpdatedRepMetadataForm = () => {
   const { buildSignSubmitConwayCertTx, buildDRepUpdateCert } = useCardano();
@@ -37,7 +37,7 @@ export const useUpdatedRepMetadataForm = () => {
       try {
         const certBuilder = await buildDRepUpdateCert(
           urlSubmitValue,
-          hashSubmitValue
+          hashSubmitValue,
         );
         const result = await buildSignSubmitConwayCertTx({
           certBuilder,
@@ -52,7 +52,7 @@ export const useUpdatedRepMetadataForm = () => {
         setIsLoading(false);
       }
     },
-    [buildDRepUpdateCert, buildSignSubmitConwayCertTx]
+    [buildDRepUpdateCert, buildSignSubmitConwayCertTx],
   );
 
   return {

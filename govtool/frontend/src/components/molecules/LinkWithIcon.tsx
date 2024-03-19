@@ -5,12 +5,12 @@ import { Typography } from "@atoms";
 
 import { LinkWithIconProps } from "./types";
 
-export const LinkWithIcon = ({
+export function LinkWithIcon({
   label,
   onClick,
   icon,
   sx,
-}: LinkWithIconProps) => {
+}: LinkWithIconProps) {
   return (
     <Box
       data-testid={`${label.split(" ").join("-")}-link`}
@@ -23,7 +23,7 @@ export const LinkWithIcon = ({
       }}
       onClick={onClick}
     >
-      {icon ? icon : <ArrowBackIosIcon color="primary" sx={{ fontSize: 14 }} />}
+      {icon || <ArrowBackIosIcon color="primary" sx={{ fontSize: 14 }} />}
       <Typography
         color="primary"
         fontWeight={400}
@@ -34,4 +34,4 @@ export const LinkWithIcon = ({
       </Typography>
     </Box>
   );
-};
+}

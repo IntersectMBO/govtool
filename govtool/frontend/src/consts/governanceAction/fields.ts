@@ -1,3 +1,4 @@
+import { bech32 } from "bech32";
 import I18n from "@/i18n";
 import {
   GovernanceActionType,
@@ -5,12 +6,9 @@ import {
   GovernanceActionField,
   SharedGovernanceActionFieldSchema,
 } from "@/types/governanceAction";
-import { bech32 } from "bech32";
 
-export const CIP_100 =
-  "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#";
-export const CIP_108 =
-  "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#";
+export const CIP_100 = "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#";
+export const CIP_108 = "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#";
 
 const sharedGovernanceActionFields: SharedGovernanceActionFieldSchema = {
   title: {
@@ -100,9 +98,8 @@ export const GOVERNANCE_ACTION_FIELDS: GovernanceActionFields = {
             const decoded = await bech32.decode(value);
             if (decoded.words.length) {
               return true;
-            } else {
-              throw new Error();
             }
+            throw new Error();
           } catch (error) {
             return I18n.t("createGovernanceAction.fields.validations.bech32");
           }
@@ -121,7 +118,7 @@ export const GOVERNANCE_ACTION_FIELDS: GovernanceActionFields = {
         },
         validate: (value) => {
           const parsedValue = Number(
-            value.includes(",") ? value.replace(",", ".") : value
+            value.includes(",") ? value.replace(",", ".") : value,
           );
 
           if (isNaN(parsedValue)) {
@@ -151,7 +148,7 @@ export const GOVERNANCE_ACTION_CONTEXT = {
     "@context": {
       references: {
         "@id": "CIP108:references",
-        "@container": "@set" as "@set",
+        "@container": "@set" as const,
         "@context": {
           GovernanceMetadata: "CIP100:GovernanceMetadataReference",
           Other: "CIP100:OtherReference",
@@ -174,7 +171,7 @@ export const GOVERNANCE_ACTION_CONTEXT = {
   },
   authors: {
     "@id": "CIP100:authors",
-    "@container": "@set" as "@set",
+    "@container": "@set" as const,
     "@context": {
       name: "http://xmlns.com/foaf/0.1/name",
       witness: {

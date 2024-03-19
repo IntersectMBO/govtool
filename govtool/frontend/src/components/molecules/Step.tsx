@@ -5,12 +5,12 @@ import { theme } from "@/theme";
 
 import { StepProps } from "./types";
 
-export const Step = ({
+export function Step({
   component,
   label,
   layoutStyles,
   stepNumber,
-}: StepProps) => {
+}: StepProps) {
   const {
     palette: { boxShadow2 },
   } = theme;
@@ -55,4 +55,4 @@ export const Step = ({
       </Box>
     </Box>
   );
-};
+}

@@ -47,7 +47,7 @@ Sentry.init({
         useLocation,
         useNavigationType,
         createRoutesFromChildren,
-        matchRoutes
+        matchRoutes,
       ),
     }),
     new Sentry.Replay(),
@@ -62,12 +62,11 @@ Sentry.init({
 Sentry.addGlobalEventProcessor((event) => {
   window.dataLayer = window.dataLayer || [];
 
-  const errorMessage =
-    (event.exception &&
-      event.exception.values &&
-      event.exception.values[0] &&
-      event.exception.values[0].value) ||
-    "Unknown Error";
+  const errorMessage = (event.exception
+      && event.exception.values
+      && event.exception.values[0]
+      && event.exception.values[0].value)
+    || "Unknown Error";
 
   window.dataLayer.push({
     event: "sentryEvent",
@@ -89,5 +88,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

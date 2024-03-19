@@ -11,9 +11,10 @@ type RadioProps = {
   dataTestId?: string;
 };
 
-export const Radio = ({ ...props }: RadioProps) => {
-  const { isChecked, name, setValue, title, value, dataTestId, register } =
-    props;
+export function Radio({ ...props }: RadioProps) {
+  const {
+    isChecked, name, setValue, title, value, dataTestId, register,
+  } = props;
 
   const handleClick = () => {
     setValue(name, value);
@@ -42,7 +43,7 @@ export const Radio = ({ ...props }: RadioProps) => {
         bgcolor={isChecked ? "specialCyan" : "white"}
         py={1.5}
         border={isChecked ? 0 : 1}
-        borderColor={"lightBlue"}
+        borderColor="lightBlue"
       >
         <Typography
           textAlign="center"
@@ -53,4 +54,4 @@ export const Radio = ({ ...props }: RadioProps) => {
       </Box>
     </Box>
   );
-};
+}

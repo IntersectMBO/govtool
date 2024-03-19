@@ -8,7 +8,7 @@ import { useScreenDimension, useTranslation } from "@hooks";
 
 const IMAGE_SIZE = 748;
 
-export const ErrorPage = ({
+export function ErrorPage({
   errorCode = 404,
   errorDescription = "This page is not available",
   isButton = true,
@@ -16,7 +16,7 @@ export const ErrorPage = ({
   errorCode?: string | number;
   errorDescription?: string;
   isButton?: boolean;
-}) => {
+}) {
   const navigate = useNavigate();
   const { isEnabled } = useCardano();
   const { screenWidth } = useScreenDimension();
@@ -38,7 +38,7 @@ export const ErrorPage = ({
           <Typography
             fontSize={57}
             fontWeight={700}
-            lineHeight={"64px"}
+            lineHeight="64px"
             sx={{ whiteSpace: "nowrap" }}
           >
             {t("errorPage.whoops")}
@@ -76,4 +76,4 @@ export const ErrorPage = ({
       </Box>
     </Background>
   );
-};
+}

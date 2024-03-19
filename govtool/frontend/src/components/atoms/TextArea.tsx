@@ -1,4 +1,6 @@
-import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
+import {
+  forwardRef, useCallback, useImperativeHandle, useRef,
+} from "react";
 import { TextareaAutosize, styled } from "@mui/material";
 
 import { useScreenDimension } from "@hooks";
@@ -16,11 +18,13 @@ const TextAreaBase = styled(TextareaAutosize)(
       font-weight: 400;
       color: #a6a6a6;
     }
-    `
+    `,
 );
 
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  ({ errorMessage, maxLength = 500, onBlur, onFocus, ...props }, ref) => {
+  ({
+    errorMessage, maxLength = 500, onBlur, onFocus, ...props
+  }, ref) => {
     const { isMobile } = useScreenDimension();
     const textAraeRef = useRef<HTMLTextAreaElement>(null);
 
@@ -29,7 +33,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
         onFocus?.(e);
         textAraeRef.current?.focus();
       },
-      []
+      [],
     );
 
     const handleBlur = useCallback(
@@ -37,18 +41,17 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
         onBlur?.(e);
         textAraeRef.current?.blur();
       },
-      []
+      [],
     );
 
     useImperativeHandle(
       ref,
-      () =>
-        ({
-          focus: handleFocus,
-          blur: handleBlur,
-          ...textAraeRef.current,
-        } as unknown as HTMLTextAreaElement),
-      [handleBlur, handleFocus]
+      () => ({
+        focus: handleFocus,
+        blur: handleBlur,
+        ...textAraeRef.current,
+      } as unknown as HTMLTextAreaElement),
+      [handleBlur, handleFocus],
     );
 
     return (
@@ -67,5 +70,5 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
         {...props}
       />
     );
-  }
+  },
 );

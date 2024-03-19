@@ -1,8 +1,12 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import {
+  useState, useEffect, useMemo, useCallback,
+} from "react";
 import { useLocation } from "react-router-dom";
 import { Box, Link } from "@mui/material";
 
-import { Button, LoadingButton, Radio, Spacer, Typography } from "@atoms";
+import {
+  Button, LoadingButton, Radio, Spacer, Typography,
+} from "@atoms";
 import { ICONS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { useScreenDimension, useVoteActionForm, useTranslation } from "@hooks";
@@ -10,7 +14,7 @@ import { openInNewTab } from "@utils";
 
 import { ControlledField } from "../organisms";
 
-export const VoteActionForm = ({
+export function VoteActionForm({
   voteFromEP,
   yesVotes,
   noVotes,
@@ -20,7 +24,7 @@ export const VoteActionForm = ({
   yesVotes: number;
   noVotes: number;
   abstainVotes: number;
-}) => {
+}) {
   const { state } = useLocation();
   const [isContext, setIsContext] = useState<boolean>(false);
   const { isMobile, screenWidth } = useScreenDimension();
@@ -57,45 +61,41 @@ export const VoteActionForm = ({
     setIsContext((prev) => !prev);
   }, []);
 
-  const renderCancelButton = useMemo(() => {
-    return (
-      <Button
-        data-testid="cancel-button"
-        onClick={() => setValue("vote", state.vote)}
-        variant="outlined"
-        size="extraLarge"
-        sx={{
-          width: "100%",
-        }}
-      >
-        {t("cancel")}
-      </Button>
-    );
-  }, [state]);
+  const renderCancelButton = useMemo(() => (
+    <Button
+      data-testid="cancel-button"
+      onClick={() => setValue("vote", state.vote)}
+      variant="outlined"
+      size="extraLarge"
+      sx={{
+        width: "100%",
+      }}
+    >
+      {t("cancel")}
+    </Button>
+  ), [state]);
 
-  const renderChangeVoteButton = useMemo(() => {
-    return (
-      <LoadingButton
-        data-testid="change-vote"
-        onClick={confirmVote}
-        disabled={
-          (!areFormErrors && voteFromEP === vote) ||
-          areFormErrors ||
-          (!isContext && voteFromEP === vote)
+  const renderChangeVoteButton = useMemo(() => (
+    <LoadingButton
+      data-testid="change-vote"
+      onClick={confirmVote}
+      disabled={
+          (!areFormErrors && voteFromEP === vote)
+          || areFormErrors
+          || (!isContext && voteFromEP === vote)
         }
-        isLoading={isVoteLoading}
-        variant="contained"
-        sx={{
-          borderRadius: 50,
-          textTransform: "none",
-          width: "100%",
-          height: 48,
-        }}
-      >
-        {t("govActions.changeVote")}
-      </LoadingButton>
-    );
-  }, [confirmVote, areFormErrors, vote, isVoteLoading]);
+      isLoading={isVoteLoading}
+      variant="contained"
+      sx={{
+        borderRadius: 50,
+        textTransform: "none",
+        width: "100%",
+        height: 48,
+      }}
+    >
+      {t("govActions.changeVote")}
+    </LoadingButton>
+  ), [confirmVote, areFormErrors, vote, isVoteLoading]);
 
   return (
     <Box flex={1} display="flex" flexDirection="column" width="full">
@@ -184,7 +184,8 @@ export const VoteActionForm = ({
               margin: 0,
             }}
           >
-            {t("govActions.provideContext")}{" "}
+            {t("govActions.provideContext")}
+            {" "}
             <span style={{ fontSize: 12, fontWeight: 300 }}>
               {t("govActions.optional")}
               <img
@@ -217,11 +218,9 @@ export const VoteActionForm = ({
             <Spacer y={3} />
             <Link
               data-testid="how-to-create-link"
-              onClick={() =>
-                openInNewTab(
-                  "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor"
-                )
-              }
+              onClick={() => openInNewTab(
+                "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor",
+              )}
               mb={isMobile ? 2 : 8}
               sx={{ cursor: "pointer" }}
               textAlign="center"
@@ -244,8 +243,8 @@ export const VoteActionForm = ({
       >
         {t("govActions.selectDifferentOption")}
       </Typography>
-      {(state?.vote && state?.vote !== vote) ||
-      (voteFromEP && voteFromEP !== vote) ? (
+      {(state?.vote && state?.vote !== vote)
+      || (voteFromEP && voteFromEP !== vote) ? (
         <Box
           display="flex"
           flexDirection={isMobile ? "column" : "row"}
@@ -255,23 +254,23 @@ export const VoteActionForm = ({
           <Box px={1} py={isMobile ? 1.5 : 0} />
           {isMobile ? renderCancelButton : renderChangeVoteButton}
         </Box>
-      ) : (
-        <LoadingButton
-          data-testid="vote-button"
-          variant="contained"
-          disabled={
-            !vote ||
-            state?.vote === vote ||
-            (isContext && areFormErrors && isDirty) ||
-            voteFromEP === vote
+        ) : (
+          <LoadingButton
+            data-testid="vote-button"
+            variant="contained"
+            disabled={
+            !vote
+            || state?.vote === vote
+            || (isContext && areFormErrors && isDirty)
+            || voteFromEP === vote
           }
-          isLoading={isVoteLoading}
-          onClick={confirmVote}
-          size="extraLarge"
-        >
-          {t("govActions.vote")}
-        </LoadingButton>
-      )}
+            isLoading={isVoteLoading}
+            onClick={confirmVote}
+            size="extraLarge"
+          >
+            {t("govActions.vote")}
+          </LoadingButton>
+        )}
     </Box>
   );
-};
+}

@@ -13,7 +13,7 @@ type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
 };
 
-export const StorageInformation = ({ setStep }: StorageInformationProps) => {
+export function StorageInformation({ setStep }: StorageInformationProps) {
   const { t } = useTranslation();
   const {
     control,
@@ -31,7 +31,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
   // TODO: Change link to correct
   const openGuideAboutStoringInformation = useCallback(
     () => openInNewTab("https://sancho.network/"),
-    []
+    [],
   );
 
   const isActionButtonDisabled = !watch("storingURL");
@@ -59,7 +59,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
       </Typography>
       <Box sx={{ my: 4 }}>
         <Step
-          component={
+          component={(
             <Button
               onClick={onClickDownloadJson}
               size="extraLarge"
@@ -68,15 +68,15 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
             >
               {`${fileName}.jsonld`}
             </Button>
-          }
+          )}
           label={t("createGovernanceAction.storingInformationStep1Label")}
           stepNumber={1}
         />
         <Spacer y={6} />
         <Step
-          component={
+          component={(
             <Button
-              endIcon={
+              endIcon={(
                 <OpenInNewIcon
                   sx={{
                     color: "primary",
@@ -84,7 +84,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
                     width: 17,
                   }}
                 />
-              }
+              )}
               onClick={openGuideAboutStoringInformation}
               size="extraLarge"
               sx={{ width: "fit-content" }}
@@ -92,24 +92,24 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
             >
               {t("createGovernanceAction.storingInformationStep2Link")}
             </Button>
-          }
+          )}
           label={t("createGovernanceAction.storingInformationStep2Label")}
           stepNumber={2}
         />
         <Spacer y={6} />
         <Step
-          component={
+          component={(
             <ControlledField.Input
               {...{ control, errors }}
               name="storingURL"
               placeholder={t(
-                "createGovernanceAction.storingInformationURLPlaceholder"
+                "createGovernanceAction.storingInformationURLPlaceholder",
               )}
               rules={{
                 required: {
                   value: true,
                   message: t(
-                    "createGovernanceAction.fields.validations.required"
+                    "createGovernanceAction.fields.validations.required",
                   ),
                 },
                 pattern: {
@@ -118,11 +118,11 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
                 },
               }}
             />
-          }
+          )}
           label={t("createGovernanceAction.storingInformationStep3Label")}
           stepNumber={3}
         />
       </Box>
     </BgCard>
   );
-};
+}

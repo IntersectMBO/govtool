@@ -2,10 +2,10 @@ import { Typography } from "@mui/material";
 
 import { FormErrorMessageProps } from "./types";
 
-export const FormErrorMessage = ({
+export function FormErrorMessage({
   errorMessage,
   errorStyles,
-}: FormErrorMessageProps) => {
+}: FormErrorMessageProps) {
   return (
     errorMessage && (
       <Typography
@@ -20,4 +20,4 @@ export const FormErrorMessage = ({
       </Typography>
     )
   );
-};
+}

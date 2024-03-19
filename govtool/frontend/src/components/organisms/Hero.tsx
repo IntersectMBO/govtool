@@ -9,7 +9,7 @@ import { useCardano, useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
-export const Hero = () => {
+export function Hero() {
   const { isEnabled } = useCardano();
   const { openModal } = useModal();
   const navigate = useNavigate();
@@ -18,9 +18,8 @@ export const Hero = () => {
   const IMAGE_SIZE = screenWidth < 640 ? 300 : screenWidth < 860 ? 400 : 600;
 
   const onClickVotingPower = useCallback(
-    () =>
-      openInNewTab("https://docs.sanchogov.tools/faqs/what-is-voting-power"),
-    []
+    () => openInNewTab("https://docs.sanchogov.tools/faqs/what-is-voting-power"),
+    [],
   );
 
   return (
@@ -60,9 +59,9 @@ export const Hero = () => {
                 sx={{
                   cursor: "pointer",
                 }}
-              ></Link>,
+              />,
             ]}
-          ></Trans>
+          />
         </Typography>
         <Button
           data-testid="hero-connect-wallet-button"
@@ -85,10 +84,10 @@ export const Hero = () => {
           screenWidth >= 1728
             ? IMAGE_SIZE / 8
             : screenWidth >= 1512
-            ? -(IMAGE_SIZE / 12)
-            : screenWidth >= 860
-            ? -(IMAGE_SIZE / 8)
-            : -(IMAGE_SIZE / 4)
+              ? -(IMAGE_SIZE / 12)
+              : screenWidth >= 860
+                ? -(IMAGE_SIZE / 8)
+                : -(IMAGE_SIZE / 4)
         }
         top={-80}
         zIndex={-1}
@@ -97,4 +96,4 @@ export const Hero = () => {
       </Box>
     </Box>
   );
-};
+}

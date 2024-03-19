@@ -16,7 +16,7 @@ export const getProposals = async ({
   pageSize = 7,
   sorting = "",
 }: getProposalsArguments) => {
-  let urlBase = "/proposal/list";
+  const urlBase = "/proposal/list";
   let urlParameters = `?page=${page}&pageSize=${pageSize}`;
 
   if (filters.length > 0) {

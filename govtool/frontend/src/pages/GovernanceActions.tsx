@@ -10,7 +10,7 @@ import { DataActionsBar } from "@molecules";
 import { Footer, TopNav, GovernanceActionsToVote } from "@organisms";
 import { WALLET_LS_KEY, getItemFromLocalStorage } from "@utils";
 
-export const GovernanceActions = () => {
+export function GovernanceActions() {
   const [searchText, setSearchText] = useState<string>("");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [chosenFilters, setChosenFilters] = useState<string[]>([]);
@@ -91,4 +91,4 @@ export const GovernanceActions = () => {
       </Box>
     </Background>
   );
-};
+}

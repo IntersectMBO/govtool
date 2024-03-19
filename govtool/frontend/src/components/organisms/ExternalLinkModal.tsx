@@ -4,8 +4,8 @@ import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import { IMAGES } from "@consts";
 import { useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { theme } from "@/theme";
 import { openInNewTab } from "@utils";
+import { theme } from "@/theme";
 
 export interface ExternalLinkModalState {
   externalLink: string;
@@ -32,7 +32,7 @@ export function ExternalLinkModal() {
       <ModalContents>
         <Typography textAlign="center" sx={{ fontSize: "16px" }}>
           {t(
-            `modals.externalLink.${isMobile ? "thisIs" : "youAreAboutToOpen"}`
+            `modals.externalLink.${isMobile ? "thisIs" : "youAreAboutToOpen"}`,
           )}
         </Typography>
         <Typography
@@ -67,7 +67,7 @@ export function ExternalLinkModal() {
         }}
       >
         <Button
-          data-testid={"continue-modal-button"}
+          data-testid="continue-modal-button"
           onClick={() => {
             openInNewTab(state?.externalLink || "#");
             closeModal();
@@ -82,7 +82,7 @@ export function ExternalLinkModal() {
           {t(`${isMobile ? "continue" : "modals.externalLink.continueTo"}`)}
         </Button>
         <Button
-          data-testid={"cancel-modal-button"}
+          data-testid="cancel-modal-button"
           onClick={() => {
             closeModal();
           }}

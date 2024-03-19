@@ -1,9 +1,9 @@
-import { IMAGES } from "@/consts";
 import { Box, Typography } from "@mui/material";
 
-import { theme } from "@/theme";
 import { VotePill } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
+import { theme } from "@/theme";
+import { IMAGES } from "@/consts";
 import { correctAdaFormat } from "@/utils/adaFormat";
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
   abstainVotes: number;
 }
 
-export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
+export function VotesSubmitted({ yesVotes, noVotes, abstainVotes }: Props) {
   const {
     palette: { lightBlue },
   } = theme;
@@ -33,15 +33,15 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
         height="64px"
         style={{ marginBottom: "10px" }}
       />
-      <Typography fontSize={"22px"} fontWeight={"600"}>
+      <Typography fontSize="22px" fontWeight="600">
         {t("govActions.voteSubmitted")}
       </Typography>
-      <Typography fontSize={"22px"} fontWeight={"500"}>
+      <Typography fontSize="22px" fontWeight="500">
         {t("govActions.forGovAction")}
       </Typography>
       <Typography
-        color={"textGray"}
-        fontSize={"14px"}
+        color="textGray"
+        fontSize="14px"
         sx={{ marginTop: "8px" }}
       >
         {t("govActions.votesSubmittedOnChain")}
@@ -69,13 +69,15 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
         >
           <VotePill vote="yes" maxWidth={82} />
           <Typography
-            fontSize={"16px"}
+            fontSize="16px"
             sx={{
               marginLeft: "12px",
               whiteSpace: "nowrap",
             }}
           >
-            ₳ {correctAdaFormat(yesVotes)}
+            ₳
+            {" "}
+            {correctAdaFormat(yesVotes)}
           </Typography>
         </Box>
         <Box
@@ -88,7 +90,9 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
               whiteSpace: "nowrap",
             }}
           >
-            ₳ {correctAdaFormat(abstainVotes)}
+            ₳
+            {" "}
+            {correctAdaFormat(abstainVotes)}
           </Typography>
         </Box>
         <Box sx={{ alignItems: "center", display: "flex" }}>
@@ -99,10 +103,12 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
               whiteSpace: "nowrap",
             }}
           >
-            ₳ {correctAdaFormat(noVotes)}
+            ₳
+            {" "}
+            {correctAdaFormat(noVotes)}
           </Typography>
         </Box>
       </Box>
     </Box>
   );
-};
+}

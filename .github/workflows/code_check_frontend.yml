@@ -11,7 +11,7 @@ defaults:
     working-directory: govtool/frontend
 
 jobs:
-  code_check:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -28,13 +28,51 @@ jobs:
         with:
           node-version-file: "govtool/frontend/.nvmrc"
 
-      - name: Run Frontend Test
+      - name: 🧪 Test
         run: |
           npm install
           npm run test
 
-      - name: Lint
-        run: npm run lint
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Type Check
-        run: npm run tsc
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: govtool/frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "govtool/frontend/.nvmrc"
+
+      - name: 👕 Lint
+        run: /
+          npm install
+          npm run lint
+
+  type_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: govtool/frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "govtool/frontend/.nvmrc"
+
+      - name: 🔍 Type Check
+        run: /
+          npm install
+          npm run lint

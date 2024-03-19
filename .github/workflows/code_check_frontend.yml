@@ -1,4 +1,4 @@
-name: Frontend Test
+name: Frontend Test, Lint & Type Check
 
 on:
   push:
@@ -6,8 +6,12 @@ on:
       - govtool/frontend/**
       - .github/workflows/test_frontend.yml
 
+defaults:
+  run:
+    working-directory: govtool/frontend
+
 jobs:
-  test:
+  code_check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,7 +29,12 @@ jobs:
           node-version: "18.x"
 
       - name: Run Frontend Test
-        working-directory: govtool/frontend
         run: |
           npm install
           npm run test
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type Check
+        run: npm run tsc

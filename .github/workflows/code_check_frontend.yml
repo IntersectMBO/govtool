@@ -75,4 +75,4 @@ jobs:
       - name: 🔍 Type Check
         run: /
           npm install
-          npm run lint
+          npm run tsc

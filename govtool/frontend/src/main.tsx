@@ -8,6 +8,7 @@ import {
   useNavigationType,
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 import TagManager from "react-gtm-module";
 import { ThemeProvider } from "@emotion/react";
 import * as Sentry from "@sentry/react";
@@ -89,6 +90,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           </ContextProviders>
         </BrowserRouter>
       </ThemeProvider>
+      {import.meta.env.VITE_IS_DEV && (
+        <ReactQueryDevtools initialIsOpen={false} />
+      )}
     </QueryClientProvider>
   </React.StrictMode>,
 );

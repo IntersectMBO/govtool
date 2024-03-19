@@ -69,13 +69,13 @@ import {
 } from '@utils';
 import { getEpochParams } from '@services';
 import { useTranslation } from '@hooks';
-import { getUtxos } from './walletUtils';
+import { getUtxos } from './getUtxos';
 import { useModal, useSnackbar } from '.';
 import {
   PendingTransaction,
   TransactionType,
-  useTransactions,
-} from './useTransactions';
+  usePendingTransaction,
+} from './pendingTransaction';
 
 interface Props {
   children: React.ReactNode;
@@ -210,9 +210,7 @@ const CardanoProvider = (props: Props) => {
   const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
   const { isPendingTransaction, updateTransaction, pendingTransaction } =
-    useTransactions({
-      dRepID, setVoter, isEnabled, stakeKey
-    });
+    usePendingTransaction({ dRepID, isEnabled, stakeKey });
 
   const getChangeAddress = async (enabledApi: CardanoApiWallet) => {
     try {

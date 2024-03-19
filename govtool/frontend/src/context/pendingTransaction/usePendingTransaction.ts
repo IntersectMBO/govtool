@@ -4,74 +4,36 @@ import {
   removeItemFromLocalStorage,
   getItemFromLocalStorage,
   PENDING_TRANSACTION_KEY,
+  wait,
 } from "@utils";
 import { getTransactionStatus } from "@services";
 import { useTranslation } from "@hooks";
 import { StatusModalState } from "@organisms";
-import {
-  setLimitedDelegationInterval,
-  setLimitedDRepActionInterval,
-} from "./walletUtils";
-import { useModal, useSnackbar } from ".";
-import { VoterInfo } from "@/models";
+import { useQueryClient } from "react-query";
+import { useModal, useSnackbar } from "..";
+import { TransactionState } from "./types";
+import { getDesiredResult, getQueryKey, refetchData } from "./utils";
 
 const TIME_TO_EXPIRE_TRANSACTION = 3 * 60 * 1000; // 3 MINUTES
-const REFRESH_TIME = 15 * 1000; // 15 SECONDS
+const TRANSACTION_REFRESH_TIME = 15 * 1000; // 15 SECONDS
+const DB_SYNC_REFRESH_TIME = 3 * 1000; // 3 SECONDS
+const DB_SYNC_MAX_ATTEMPTS = 10;
 
-type UseTransactionsProps = {
+type UsePendingTransactionProps = {
   dRepID: string;
   isEnabled: boolean;
-  setVoter: (key: VoterInfo | undefined) => void;
   stakeKey: string | undefined;
 };
 
-export type PendingTransaction =
-  | Record<
-    Exclude<TransactionType, "delegate" | "vote">,
-    TransactionStateWithoutResource | null
-  > &
-  Record<
-    Extract<TransactionType, "delegate" | "vote">,
-    TransactionStateWithResource | null
-  >;
-
-export type TransactionStateWithoutResource = {
-  type: Exclude<TransactionType, "delegate" | "vote">;
-  transactionHash: string;
-  time: Date;
-  resourceId?: never;
-};
-
-export type TransactionStateWithResource = {
-  type: Extract<TransactionType, "delegate" | "vote">;
-  transactionHash: string;
-  time: Date;
-  resourceId: string;
-};
-
-export type TransactionState =
-  | TransactionStateWithResource
-  | TransactionStateWithoutResource;
-
-export type TransactionType =
-  | "delegate"
-  | "createGovAction"
-  | "registerAsDrep"
-  | "registerAsSoleVoter"
-  | "retireAsDrep"
-  | "retireAsSoleVoter"
-  | "updateMetaData"
-  | "vote";
-
-export const useTransactions = ({
+export const usePendingTransaction = ({
   dRepID,
   isEnabled,
-  setVoter,
   stakeKey,
-}: UseTransactionsProps) => {
+}: UsePendingTransactionProps) => {
   const { t } = useTranslation();
   const { openModal, closeModal } = useModal<StatusModalState>();
   const { addSuccessAlert, addWarningAlert, addErrorAlert } = useSnackbar();
+  const queryClient = useQueryClient();
 
   const [transaction, setTransaction] = useState<TransactionState | null>(null);
 
@@ -95,7 +57,11 @@ export const useTransactions = ({
       const fromLocalStorage = getItemFromLocalStorage(
         `${PENDING_TRANSACTION_KEY}_${stakeKey}`
       );
-      setTransaction(fromLocalStorage);
+      setTransaction(
+        fromLocalStorage
+          ? { ...fromLocalStorage, time: new Date(fromLocalStorage.time) }
+          : null
+      );
     }
   }, [isEnabled, stakeKey]);
 
@@ -109,36 +75,36 @@ export const useTransactions = ({
       const status = await getTransactionStatus(transactionHash);
 
       const resetTransaction = () => {
-        clearInterval(interval);
         removeItemFromLocalStorage(`${PENDING_TRANSACTION_KEY}_${stakeKey}`);
         setTransaction(null);
       };
 
       if (status.transactionConfirmed) {
-        const isDRepAction =
-          type === "registerAsDrep" ||
-          type === "registerAsSoleVoter" ||
-          type === "retireAsDrep" ||
-          type === "retireAsSoleVoter";
-
-        const isActionSuccesful =
-          type === "delegate"
-            ? await setLimitedDelegationInterval(dRepID, resourceId, stakeKey)
-            : isDRepAction
-              ? await setLimitedDRepActionInterval(dRepID, type, setVoter)
-              : undefined;
-
+        clearInterval(interval);
         if (isEnabled) {
-          if (isActionSuccesful) {
-            if (isDRepAction || type === "delegate") {
-              addWarningAlert(t(`alerts.${type}.warning`));
+          const desiredResult = getDesiredResult(
+            type,
+            dRepID,
+            resourceId,
+            stakeKey
+          );
+          const queryKey = getQueryKey(type, transaction);
+
+          let count = 0;
+          let isDBSyncUpdated = false;
+          while (!isDBSyncUpdated && count < DB_SYNC_MAX_ATTEMPTS) {
+            count++;
+            // eslint-disable-next-line no-await-in-loop
+            const data = await refetchData(type, queryClient, queryKey);
+            if (desiredResult === data) {
+              addSuccessAlert(t(`alerts.${type}.success`));
               resetTransaction();
-              return;
+              isDBSyncUpdated = true;
+            } else {
+              // eslint-disable-next-line no-await-in-loop
+              await wait(DB_SYNC_REFRESH_TIME);
             }
           }
-
-          addSuccessAlert(t(`alerts.${type}.success`));
-          resetTransaction();
 
           if (isTransactionExpired(transaction.time)) {
             addErrorAlert(t(`alerts.${type}.failed`));
@@ -148,7 +114,7 @@ export const useTransactions = ({
       }
     };
 
-    let interval = setInterval(checkTransaction, REFRESH_TIME);
+    let interval = setInterval(checkTransaction, TRANSACTION_REFRESH_TIME);
     checkTransaction();
 
     if (isEnabled && transaction) {
@@ -185,7 +151,7 @@ export const useTransactions = ({
     setTransaction(newTransaction);
     setItemToLocalStorage(
       `${PENDING_TRANSACTION_KEY}_${stakeKey}`,
-      newTransaction
+      JSON.stringify(newTransaction)
     );
   };
 

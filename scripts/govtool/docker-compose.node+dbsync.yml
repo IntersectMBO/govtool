@@ -7,12 +7,16 @@
 # easily interact with the Cardano blockchain and perform data queries through
 # the exposed PostgreSQL database on port 5432 on the DBSync database.
 #
-# Before start there are three text files that has to be set up in a current
-# directory in order to provide sufficient database configuration for both
-# PostgreSQL and Cardano DBSync services:
-# * ./dev-postgres_db
-# * ./dev-postgres_password
-# * ./dev-postgres_user
+# Before start there are three text files that has to be set up in a GovTool
+# configuration directory in order to provide sufficient database configuration
+# for both PostgreSQL and Cardano DB Sync services:
+# * ${TARGET_HOST_CONFIG_DIR}/dev-postgres_db
+# * ${TARGET_HOST_CONFIG_DIR}/dev-postgres_password
+# * ${TARGET_HOST_CONFIG_DIR}/dev-postgres_user
+#
+# The GovTool configuration directory under ${TARGET_HOST_CONFIG_DIR} has to be
+# created, the sufficient privileges has to be applied to it to read it's
+# context and the ENV has to be provided with proper value.
 #
 # USAGE:
 #   docker compose --file docker-compose.node+dbsync.yml up --detach
@@ -82,11 +86,11 @@ services:
 
 secrets:
   postgres_db:
-    file: ./dev-postgres_db
+    file: ${TARGET_HOST_CONFIG_DIR}/dev-postgres_db
   postgres_password:
-    file: ./dev-postgres_password
+    file: ${TARGET_HOST_CONFIG_DIR}/dev-postgres_password
   postgres_user:
-    file: ./dev-postgres_user
+    file: ${TARGET_HOST_CONFIG_DIR}/dev-postgres_user
 
 volumes:
   db-sync-data:

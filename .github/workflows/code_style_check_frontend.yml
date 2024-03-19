@@ -1,0 +1,37 @@
+name: Frontend Lint & Type Check
+
+on:
+  push:
+    paths:
+      - govtool/frontend/**
+      - .github/workflows/code_check_frontend.yml
+
+jobs:
+  code_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: govtool/frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
+
+      - name: Install dependencies
+        working-directory: govtool/frontend
+        run: npm install
+
+      - name: Lint
+        working-directory: govtool/frontend
+        run: npm run lint
+
+      - name: Type Check
+        working-directory: govtool/frontend
+        run: npm run tsc

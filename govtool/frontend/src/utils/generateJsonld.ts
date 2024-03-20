@@ -12,7 +12,7 @@ import { CIP_100, CIP_108 } from "@/consts";
  * @returns {Promise<any>} - A promise that resolves to the compacted JSON-LD document.
  */
 export const generateJsonld = async <
-  T extends string,
+  T extends Record<string, JSONValue>,
   C extends jsonld.ContextDefinition
 >(
   body: T,

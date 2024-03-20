@@ -1,15 +1,9 @@
-name: Toggle (enable/disable) maintenance page
-run-name: Maintenance mode set to ${{ inputs.maintenance }} on ${{ inputs.environment }}/${{ inputs.cardano_network }} by @${{ github.actor }}
+name: Toggle maintenance page
+run-name: Maintenance mode set to ${{ inputs.maintenance }} on ${{ inputs.environment }} by @${{ github.actor }}
 
 on:
   workflow_dispatch:
     inputs:
-      cardano_network:
-        required: true
-        type: choice
-        default: "sanchonet"
-        options:
-          - "sanchonet"
       environment:
         required: true
         type: choice
@@ -22,33 +16,18 @@ on:
       maintenance:
         required: true
         type: choice
-        default: "enable"
+        default: "enabled"
         options:
-          - "enable"
-          - "disable"
+          - "enabled"
+          - "disabled"
 
 env:
   ENVIRONMENT: ${{ inputs.environment || 'dev' }}
-  CARDANO_NETWORK: ${{ inputs.cardano_network || 'sanchonet' }}
+  CARDANO_NETWORK: "sanchonet"
 
 jobs:
-  check_environment_exists:
-    name: Check if target environment exists before proceeding
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./scripts/govtool
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Check environment exists
-        run: |
-          make check-env-defined cardano_network=$CARDANO_NETWORK env=$ENVIRONMENT
-
   toggle_maintenance:
     name: Toggl maintenance state
-    needs:
-      - check_environment_exists
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -56,23 +35,34 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.GHA_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.GHA_AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
+
       - name: Login to AWS ECR
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: eu-west-1
+
       - name: Setup SSH agent
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.GHA_SSH_PRIVATE_KEY }}
+
+      - name: Set domain
+        run: |
+          if [[ "${{ inputs.environment }}" == "staging" ]]; then
+            echo "DOMAIN=staging.govtool.byron.network" >> $GITHUB_ENV
+          elif [[ "${{ inputs.environment }}" == "beta" ]]; then
+            echo "DOMAIN=sanchogov.tools" >> $GITHUB_ENV
+          else
+            echo "DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}" >> $GITHUB_ENV
+          fi
+
       - name: Toggle maintenance
         run: |
-          make docker-login
-          if [[ "${{ inputs.environment }}" == "staging" ]]; then export DOMAIN=staging.govtool.byron.network; fi;
-          if [[ "${{ inputs.environment }}" == "beta" ]]; then export DOMAIN=sanchogov.tools; fi;
-          make toggle-maintenance cardano_network=$CARDANO_NETWORK env=$ENVIRONMENT maintenance=${{ inputs.maintenance || 'disable' }}
+          make toggle-maintenance maintenance=${{ inputs.maintenance || 'disabled' }}

@@ -1,0 +1,64 @@
+name: Build and deploy GovTool to TEST server
+run-name: Deploy by @${{ github.actor }}
+
+on:
+  push:
+    branches:
+      - test
+
+env:
+  ENVIRONMENT: "test"
+  CARDANO_NETWORK: "sanchonet"
+  DOMAIN: "test-sanchonet.govtool.byron.network"
+
+jobs:
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./scripts/govtool
+    env:
+      DBSYNC_POSTGRES_DB: "cexplorer"
+      DBSYNC_POSTGRES_USER: "postgres"
+      DBSYNC_POSTGRES_PASSWORD: "pSa8JCpQOACMUdGb"
+      GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+      GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
+      GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
+      NGINX_BASIC_AUTH: ${{ secrets.NGINX_BASIC_AUTH }}
+      SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
+      TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
+      GTM_ID: ${{ secrets.GTM_ID }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
+      PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.GHA_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.GHA_AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Login to AWS ECR
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: eu-west-1
+
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.GHA_SSH_PRIVATE_KEY }}
+
+      - name: Deploy app
+        run: |
+          make --debug=b all
+
+      - name: Reprovision Grafana
+        run: |
+          sleep 30 # give grafana time to start up
+          make --debug=b reload-grafana

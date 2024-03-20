@@ -3,9 +3,11 @@ import { Meta, StoryFn } from "@storybook/react";
 
 import { Modal } from "@atoms";
 import { ExternalLinkModal, ExternalLinkModalState } from "@organisms";
-import { useModal } from "../../context/modal";
-import { userEvent, within, screen, waitFor } from "@storybook/testing-library";
+import {
+  userEvent, within, screen, waitFor,
+} from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
+import { useModal } from "../../context/modal";
 import { callAll } from "@/utils";
 
 const meta = {
@@ -37,9 +39,7 @@ const Template: StoryFn<ExternalLinkModalState> = (args) => {
       {modals[modal.type]?.component && (
         <Modal
           open={Boolean(modals[modal.type].component)}
-          handleClose={callAll(modals[modal.type]?.onClose, () =>
-            openModal({ type: "none", state: null })
-          )}
+          handleClose={callAll(modals[modal.type]?.onClose, () => openModal({ type: "none", state: null }))}
         >
           {modals[modal.type]?.component ?? <></>}
         </Modal>
@@ -63,7 +63,7 @@ Default.play = async ({ canvasElement }) => {
 
     expect(modalCanvas.getByText(/Be Careful!/i)).toBeInTheDocument();
     expect(
-      modalCanvas.getByText("https://www.google.com/")
+      modalCanvas.getByText("https://www.google.com/"),
     ).toBeInTheDocument();
 
     await userEvent.click(modalCanvas.getByTestId("continue-modal-button"));

@@ -1,18 +1,18 @@
-import { Box } from "@mui/material";
-import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
+import { Box } from '@mui/material';
+import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
 
-import { Button, Spacer, Typography } from "@atoms";
-import { ICONS } from "@consts";
+import { Button, Spacer, Typography } from '@atoms';
+import { ICONS } from '@consts';
 import {
   defaulCreateGovernanceActionValues,
   useCreateGovernanceActionForm,
   useTranslation,
-} from "@hooks";
-import { LinkWithIcon } from "@molecules";
-import { openInNewTab } from "@utils";
+} from '@hooks';
+import { LinkWithIcon } from '@molecules';
+import { openInNewTab } from '@utils';
 
-import { BgCard } from "../BgCard";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction } from 'react';
+import { BgCard } from '../BgCard';
 
 type ReviewCreatedGovernanceActionProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -41,24 +41,24 @@ export const ReviewCreatedGovernanceAction = ({
     openInNewTab(link);
   };
 
-  const renderReviewFields = () => {
-    return Object.entries(values)
+  const renderReviewFields = () =>
+    Object.entries(values)
       .filter(
         ([key]) =>
           !Object.keys(defaulCreateGovernanceActionValues).includes(key) ||
-          key === "governance_action_type"
+          key === 'governance_action_type',
       )
       .map(([key, value]) => {
         const label =
-          key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " ");
+          key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
 
         return (
-          <Box sx={{ mb: 5, width: "100%" }}>
+          <Box sx={{ mb: 5, width: '100%' }}>
             <Typography color="neutralGray" fontWeight={400} variant="body2">
               {label}
             </Typography>
             <Typography
-              sx={{ mt: 0.5, wordBreak: "break-word" }}
+              sx={{ mt: 0.5, wordBreak: 'break-word' }}
               variant="body2"
             >
               {value as string}
@@ -66,10 +66,9 @@ export const ReviewCreatedGovernanceAction = ({
           </Box>
         );
       });
-  };
 
   const renderLinks = () => {
-    const links = values["links"]?.map((item) => item.link) ?? [];
+    const links = values.links?.map((item) => item.link) ?? [];
     const areLinks = links.some((item) => item);
 
     return areLinks ? (
@@ -80,44 +79,43 @@ export const ReviewCreatedGovernanceAction = ({
           sx={{ mb: 0.5 }}
           variant="body2"
         >
-          {t("createGovernanceAction.supportingLinks")}
+          {t('createGovernanceAction.supportingLinks')}
         </Typography>
-        {links.map((link: string) => {
-          return link ? (
+        {links.map((link: string) =>
+          (link ? (
             <LinkWithIcon
               icon={<img src={ICONS.link} />}
               label={link}
               onClick={() => onClickLink(link)}
               sx={{ mb: 1.75 }}
             />
-          ) : null;
-        })}
+          ) : null),)}
       </>
     ) : null;
   };
 
   return (
     <BgCard
-      actionButtonLabel={t("continue")}
+      actionButtonLabel={t('continue')}
       onClickActionButton={onClickContinue}
       onClickBackButton={onClickBackButton}
     >
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
-        {t("createGovernanceAction.reviewSubmission")}
+      <Typography sx={{ textAlign: 'center' }} variant="headline4">
+        {t('createGovernanceAction.reviewSubmission')}
       </Typography>
       <Spacer y={4.25} />
       <Button
-        startIcon={
+        startIcon={(
           <DriveFileRenameOutlineOutlinedIcon
             color="primary"
             fontSize="large"
           />
-        }
+        )}
         onClick={onClickEditSubmission}
-        sx={{ alignSelf: "center", width: "180px" }}
+        sx={{ alignSelf: 'center', width: '180px' }}
         variant="outlined"
       >
-        {t("createGovernanceAction.editSubmission")}
+        {t('createGovernanceAction.editSubmission')}
       </Button>
       <Spacer y={6} />
       {renderReviewFields()}

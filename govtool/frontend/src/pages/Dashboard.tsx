@@ -20,7 +20,7 @@ export const Dashboard = () => {
   const getPageTitle = (pathname: string) => {
     if (pathname === PATHS.dashboard) {
       return t("dashboard.title");
-    } else if (pathname.includes(PATHS.dashboardGovernanceActions)) {
+    } if (pathname.includes(PATHS.dashboardGovernanceActions)) {
       return t("dashboard.govActions.title");
     }
     return "";
@@ -28,8 +28,8 @@ export const Dashboard = () => {
 
   useEffect(() => {
     if (divRef.current) {
-      pathname !== PATHS.dashboardGovernanceActions &&
-        divRef.current.scrollTo({ top: 0 });
+      pathname !== PATHS.dashboardGovernanceActions
+        && divRef.current.scrollTo({ top: 0 });
     }
   }, [pathname, divRef]);
 
@@ -39,7 +39,7 @@ export const Dashboard = () => {
         navigate(PATHS.home);
       } else {
         navigate(
-          window.location.pathname.replace("connected/", "") + hash ?? ""
+          window.location.pathname.replace("connected/", "") + hash ?? "",
         );
       }
     }

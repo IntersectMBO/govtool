@@ -1,5 +1,5 @@
-import { API } from "../API";
 import { VotedProposal } from "@models";
+import { API } from "../API";
 
 export const getDRepVotes = async ({
   dRepID,
@@ -10,7 +10,7 @@ export const getDRepVotes = async ({
   filters: string[];
   sorting: string;
 }) => {
-  let urlBase = `/drep/getVotes/${dRepID}`;
+  const urlBase = `/drep/getVotes/${dRepID}`;
   let urlParameters = "";
   if (filters.length > 0) {
     filters.forEach((item) => {

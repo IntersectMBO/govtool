@@ -47,8 +47,8 @@ export const DashboardTopNav = ({
             windowScroll > POSITION_TO_BLUR
               ? "rgba(256, 256, 256, 0.7)"
               : isMobile
-              ? "#FBFBFF59"
-              : "transparent",
+                ? "#FBFBFF59"
+                : "transparent",
           borderBottom: "1px solid #D6E2FF",
           display: "flex",
           justifyContent: "space-between",

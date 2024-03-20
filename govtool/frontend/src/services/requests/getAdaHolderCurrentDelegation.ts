@@ -6,7 +6,7 @@ export const getAdaHolderCurrentDelegation = async ({
   stakeKey?: string;
 }) => {
   const response = await API.get(
-    `/ada-holder/get-current-delegation/${stakeKey}`
+    `/ada-holder/get-current-delegation/${stakeKey}`,
   );
 
   return response.data;

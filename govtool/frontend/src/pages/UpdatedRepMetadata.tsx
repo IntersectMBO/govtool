@@ -2,7 +2,9 @@ import { useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Link } from "@mui/material";
 
-import { Background, Button, LoadingButton, Spacer, Typography } from "@atoms";
+import {
+  Background, Button, LoadingButton, Spacer, Typography,
+} from "@atoms";
 import { PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
@@ -11,8 +13,8 @@ import {
   useTranslation,
 } from "@hooks";
 import { ControlledField, DashboardTopNav, Footer } from "@organisms";
-import { theme } from "@/theme";
 import { checkIsWalletConnected, openInNewTab } from "@utils";
+import { theme } from "@/theme";
 
 export const UpdatedRepMetadata = () => {
   const navigate = useNavigate();
@@ -23,8 +25,9 @@ export const UpdatedRepMetadata = () => {
   const { isPendingTransaction } = useCardano();
   const { t } = useTranslation();
 
-  const { submitForm, control, errors, isValid, isLoading } =
-    useUpdatedRepMetadataForm();
+  const {
+    submitForm, control, errors, isValid, isLoading,
+  } = useUpdatedRepMetadataForm();
 
   useEffect(() => {
     if (checkIsWalletConnected()) {
@@ -35,51 +38,47 @@ export const UpdatedRepMetadata = () => {
     }
   }, []);
 
-  const renderCancelButton = useMemo(() => {
-    return (
-      <Button
-        data-testid={"cancel-button"}
-        onClick={() => navigate(PATHS.dashboard)}
-        size="extraLarge"
-        sx={{
-          px: 6,
-          width: isMobile ? "100%" : "auto",
-        }}
-        variant="outlined"
-      >
-        {t("cancel")}
-      </Button>
-    );
-  }, [isMobile]);
+  const renderCancelButton = useMemo(() => (
+    <Button
+      data-testid="cancel-button"
+      onClick={() => navigate(PATHS.dashboard)}
+      size="extraLarge"
+      sx={{
+        px: 6,
+        width: isMobile ? "100%" : "auto",
+      }}
+      variant="outlined"
+    >
+      {t("cancel")}
+    </Button>
+  ), [isMobile]);
 
-  const renderUpdateButton = useMemo(() => {
-    return (
-      <LoadingButton
-        data-testid={"confirm-button"}
-        disabled={!isValid}
-        isLoading={isLoading}
-        onClick={submitForm}
-        sx={{
-          borderRadius: 50,
-          textTransform: "none",
-          px: 6,
-          width: isMobile ? "100%" : "auto",
-          height: 48,
-        }}
-        variant="contained"
-      >
-        {t("confirm")}
-      </LoadingButton>
-    );
-  }, [isLoading, isMobile, isValid, submitForm]);
+  const renderUpdateButton = useMemo(() => (
+    <LoadingButton
+      data-testid="confirm-button"
+      disabled={!isValid}
+      isLoading={isLoading}
+      onClick={submitForm}
+      sx={{
+        borderRadius: 50,
+        textTransform: "none",
+        px: 6,
+        width: isMobile ? "100%" : "auto",
+        height: 48,
+      }}
+      variant="contained"
+    >
+      {t("confirm")}
+    </LoadingButton>
+  ), [isLoading, isMobile, isValid, submitForm]);
 
   return (
     <Background isReverted>
-      <Box display={"flex"} minHeight={"100vh"} flexDirection="column">
+      <Box display="flex" minHeight="100vh" flexDirection="column">
         <DashboardTopNav title={t("metadataUpdate.title")} />
         <Box
-          display={"flex"}
-          justifyContent={"center"}
+          display="flex"
+          justifyContent="center"
           mt={3}
           height={isMobile ? "100%" : "auto"}
         >
@@ -92,7 +91,7 @@ export const UpdatedRepMetadata = () => {
             py={isMobile ? 4 : 8}
             borderRadius={3}
             mb={isMobile ? 0 : 6}
-            height={"100%"}
+            height="100%"
           >
             <Box display="flex" flexDirection="column" alignItems="center">
               <Typography
@@ -125,12 +124,10 @@ export const UpdatedRepMetadata = () => {
                 placeholder={t("forms.hashPlaceholder")}
               />
               <Link
-                onClick={() =>
-                  openInNewTab(
-                    "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor"
-                  )
-                }
-                alignSelf={"center"}
+                onClick={() => openInNewTab(
+                  "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor",
+                )}
+                alignSelf="center"
                 mt={5}
                 sx={{ cursor: "pointer" }}
               >
@@ -140,9 +137,9 @@ export const UpdatedRepMetadata = () => {
               </Link>
             </Box>
             <Box
-              display={"flex"}
+              display="flex"
               flexDirection={isMobile ? "column" : "row"}
-              justifyContent={"space-between"}
+              justifyContent="space-between"
               mt={6}
             >
               {isMobile ? renderUpdateButton : renderCancelButton}

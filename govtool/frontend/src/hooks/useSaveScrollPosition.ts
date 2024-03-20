@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 export const useSaveScrollPosition = (
   isLoading: boolean,
-  isFetching: boolean
+  isFetching: boolean,
 ) => {
   const saveScrollPosition = () => {
     sessionStorage.setItem("scrollPosition", window.scrollY.toString());

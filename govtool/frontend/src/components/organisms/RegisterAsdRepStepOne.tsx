@@ -29,7 +29,7 @@ export const RegisterAsdRepStepOne = ({
 
   const openLearnMoreAboutDrep = useCallback(
     () => openInNewTab("https://sancho.network/roles/drep"),
-    []
+    [],
   );
 
   return (
@@ -61,7 +61,7 @@ export const RegisterAsdRepStepOne = ({
               sx={{ cursor: "pointer" }}
             />,
           ]}
-          i18nKey={"registration.rolesAndResponsibilitiesDescription"}
+          i18nKey="registration.rolesAndResponsibilitiesDescription"
           values={{ deposit: correctAdaFormat(deposit.drep_deposit) }}
         />
       </Typography>

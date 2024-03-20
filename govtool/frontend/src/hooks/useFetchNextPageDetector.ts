@@ -5,18 +5,18 @@ const windowHeightFetchThreshold = 0.85;
 export const useFetchNextPageDetector = (
   fetchNextPage: () => void,
   isLoading: boolean,
-  hasNextPage?: boolean
+  hasNextPage?: boolean,
 ) => {
   useEffect(() => {
     const onScroll = () => {
-      const scrollTop = document.documentElement.scrollTop;
+      const { scrollTop } = document.documentElement;
       const windowHeight = window.innerHeight;
       const fullHeight = document.documentElement.offsetHeight;
 
       if (
-        scrollTop + windowHeight > fullHeight * windowHeightFetchThreshold &&
-        hasNextPage &&
-        !isLoading
+        scrollTop + windowHeight > fullHeight * windowHeightFetchThreshold
+        && hasNextPage
+        && !isLoading
       ) {
         fetchNextPage();
       }

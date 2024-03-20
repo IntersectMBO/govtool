@@ -2,12 +2,12 @@ import { useMemo } from "react";
 import { Box, Typography, CircularProgress } from "@mui/material";
 
 import { GovernanceVotedOnCard } from "@molecules";
-import { Slider } from ".";
 import {
   useGetDRepVotesQuery,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
+import { Slider } from ".";
 import { getProposalTypeLabel } from "@/utils/getProposalTypeLabel";
 import { getFullGovActionId } from "@/utils";
 import { useCardano } from "@/context";
@@ -31,23 +31,18 @@ export const DashboardGovernanceActionsVotedOn = ({
   const filteredData = useMemo(() => {
     if (data.length && searchPhrase) {
       return data
-        .map((entry) => {
-          return {
-            ...entry,
-            actions: entry.actions.filter((action) => {
-              return getFullGovActionId(
-                action.proposal.txHash,
-                action.proposal.index
-              )
-                .toLowerCase()
-                .includes(searchPhrase.toLowerCase());
-            }),
-          };
-        })
+        .map((entry) => ({
+          ...entry,
+          actions: entry.actions.filter((action) => getFullGovActionId(
+            action.proposal.txHash,
+            action.proposal.index,
+          )
+            .toLowerCase()
+            .includes(searchPhrase.toLowerCase())),
+        }))
         .filter((entry) => entry.actions.length > 0);
-    } else {
-      return data;
     }
+    return data;
   }, [data, searchPhrase, voteTransaction.transactionHash]);
 
   return areDRepVotesLoading ? (
@@ -74,24 +69,22 @@ export const DashboardGovernanceActionsVotedOn = ({
                 title={getProposalTypeLabel(item.title)}
                 navigateKey={item.title}
                 searchPhrase={searchPhrase}
-                data={item.actions.map((item) => {
-                  return (
-                    <div
-                      className="keen-slider__slide"
-                      key={`${item?.proposal.id}${item.vote.vote}`}
-                      style={{ overflow: "visible", width: "auto" }}
-                    >
-                      <GovernanceVotedOnCard
-                        votedProposal={item}
-                        searchPhrase={searchPhrase}
-                        inProgress={
-                          voteTransaction.proposalId ===
-                          item.proposal.txHash + item.proposal.index
+                data={item.actions.map((item) => (
+                  <div
+                    className="keen-slider__slide"
+                    key={`${item?.proposal.id}${item.vote.vote}`}
+                    style={{ overflow: "visible", width: "auto" }}
+                  >
+                    <GovernanceVotedOnCard
+                      votedProposal={item}
+                      searchPhrase={searchPhrase}
+                      inProgress={
+                          voteTransaction.proposalId
+                          === item.proposal.txHash + item.proposal.index
                         }
-                      />
-                    </div>
-                  );
-                })}
+                    />
+                  </div>
+                ))}
               />
               <Box height={isMobile ? 50 : 72} />
             </div>

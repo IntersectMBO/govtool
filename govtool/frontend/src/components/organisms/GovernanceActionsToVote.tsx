@@ -2,8 +2,6 @@ import { useMemo } from "react";
 import { useNavigate, generatePath } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
 
-import { Slider } from "./Slider";
-
 import { Typography } from "@atoms";
 import {
   useGetProposalsQuery,
@@ -14,6 +12,7 @@ import { GovernanceActionCard } from "@molecules";
 import { GOVERNANCE_ACTIONS_FILTERS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { getProposalTypeLabel, getFullGovActionId, openInNewTab } from "@utils";
+import { Slider } from "./Slider";
 
 type GovernanceActionsToVoteProps = {
   filters: string[];
@@ -23,7 +22,7 @@ type GovernanceActionsToVoteProps = {
 };
 
 const defaultCategories = GOVERNANCE_ACTIONS_FILTERS.map(
-  (category) => category.key
+  (category) => category.key,
 );
 
 export const GovernanceActionsToVote = ({
@@ -44,30 +43,26 @@ export const GovernanceActionsToVote = ({
     sorting,
   });
 
-  const groupedByType = (data?: ActionType[]) => {
-    return data?.reduce((groups, item) => {
-      const itemType = item.type;
+  const groupedByType = (data?: ActionType[]) => data?.reduce((groups, item) => {
+    const itemType = item.type;
 
-      if (!groups[itemType]) {
-        groups[itemType] = {
-          title: itemType,
-          actions: [],
-        };
-      }
+    if (!groups[itemType]) {
+      groups[itemType] = {
+        title: itemType,
+        actions: [],
+      };
+    }
 
-      groups[itemType].actions.push(item);
+    groups[itemType].actions.push(item);
 
-      return groups;
-    }, {});
-  };
+    return groups;
+  }, {});
 
   const mappedData = useMemo(() => {
     const groupedData = groupedByType(
-      proposals?.filter((i) =>
-        getFullGovActionId(i.txHash, i.index)
-          .toLowerCase()
-          .includes(searchPhrase.toLowerCase())
-      )
+      proposals?.filter((i) => getFullGovActionId(i.txHash, i.index)
+        .toLowerCase()
+        .includes(searchPhrase.toLowerCase())),
     );
     return Object.values(groupedData ?? []) as ToVoteDataType;
   }, [proposals, searchPhrase]);
@@ -80,78 +75,72 @@ export const GovernanceActionsToVote = ({
         </Typography>
       ) : (
         <>
-          {mappedData?.map((item, index) => {
-            return (
-              <Box key={item.title} pb={2.5}>
-                <Slider
-                  data={item.actions.slice(0, 6).map((item) => {
-                    return (
-                      <div
-                        className="keen-slider__slide"
-                        key={item.id}
-                        style={{
-                          overflow: "visible",
-                          width: "auto",
-                        }}
-                      >
-                        <GovernanceActionCard
-                          {...item}
-                          txHash={item.txHash}
-                          index={item.index}
-                          inProgress={
-                            onDashboard &&
-                            voteTransaction?.proposalId ===
-                              item?.txHash + item?.index
+          {mappedData?.map((item, index) => (
+            <Box key={item.title} pb={2.5}>
+              <Slider
+                data={item.actions.slice(0, 6).map((item) => (
+                  <div
+                    className="keen-slider__slide"
+                    key={item.id}
+                    style={{
+                      overflow: "visible",
+                      width: "auto",
+                    }}
+                  >
+                    <GovernanceActionCard
+                      {...item}
+                      txHash={item.txHash}
+                      index={item.index}
+                      inProgress={
+                            onDashboard
+                            && voteTransaction?.proposalId
+                              === item?.txHash + item?.index
                           }
-                          onClick={() =>
-                            onDashboard &&
-                            voteTransaction?.proposalId ===
-                              item?.txHash + item?.index
-                              ? openInNewTab(
-                                  "https://adanordic.com/latest_transactions"
-                                )
-                              : navigate(
-                                  onDashboard
-                                    ? generatePath(
-                                        PATHS.dashboardGovernanceActionsAction,
-                                        {
-                                          proposalId: getFullGovActionId(
-                                            item.txHash,
-                                            item.index
-                                          ),
-                                        }
-                                      )
-                                    : PATHS.governanceActionsAction.replace(
-                                        ":proposalId",
-                                        getFullGovActionId(
-                                          item.txHash,
-                                          item.index
-                                        )
-                                      ),
-                                  {
-                                    state: { ...item },
-                                  }
-                                )
-                          }
-                        />
-                      </div>
-                    );
-                  })}
-                  dataLength={item.actions.slice(0, 6).length}
-                  filters={filters}
-                  navigateKey={item.title}
-                  notSlicedDataLength={item.actions.length}
-                  onDashboard={onDashboard}
-                  searchPhrase={searchPhrase}
-                  sorting={sorting}
-                  title={getProposalTypeLabel(item.title)}
-                />
-                {index < mappedData.length - 1 && (
-                  <Box height={isMobile ? 40 : 52} />
-                )}
-              </Box>
-            );
-          })}
+                      onClick={() => (onDashboard
+                            && voteTransaction?.proposalId
+                              === item?.txHash + item?.index
+                        ? openInNewTab(
+                          "https://adanordic.com/latest_transactions",
+                        )
+                        : navigate(
+                          onDashboard
+                            ? generatePath(
+                              PATHS.dashboardGovernanceActionsAction,
+                              {
+                                proposalId: getFullGovActionId(
+                                  item.txHash,
+                                  item.index,
+                                ),
+                              },
+                            )
+                            : PATHS.governanceActionsAction.replace(
+                              ":proposalId",
+                              getFullGovActionId(
+                                item.txHash,
+                                item.index,
+                              ),
+                            ),
+                          {
+                            state: { ...item },
+                          },
+                        ))}
+                    />
+                  </div>
+                ))}
+                dataLength={item.actions.slice(0, 6).length}
+                filters={filters}
+                navigateKey={item.title}
+                notSlicedDataLength={item.actions.length}
+                onDashboard={onDashboard}
+                searchPhrase={searchPhrase}
+                sorting={sorting}
+                title={getProposalTypeLabel(item.title)}
+              />
+              {index < mappedData.length - 1 && (
+              <Box height={isMobile ? 40 : 52} />
+              )}
+            </Box>
+          ))}
         </>
       )}
     </>

@@ -1,4 +1,4 @@
-import { Typography } from "../atoms";
+import { Typography } from '../atoms';
 
 export const GovActionDetails = ({
   title,
@@ -10,12 +10,15 @@ export const GovActionDetails = ({
   if (Array.isArray(value)) {
     return (
       <div>
-        <Typography variant="caption">{title}:</Typography>
+        <Typography variant="caption">
+          {title}
+          :
+        </Typography>
         <ul>
           {value.map((item, index) => (
             <li key={index}>
               <Typography
-                sx={{ textOverflow: "ellipsis", overflow: "hidden" }}
+                sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}
                 variant="caption"
               >
                 {item}
@@ -25,23 +28,27 @@ export const GovActionDetails = ({
         </ul>
       </div>
     );
-  } else if (typeof value === "boolean") {
+  }
+  if (typeof value === 'boolean') {
     return (
       <Typography
-        sx={{ textOverflow: "ellipsis", overflow: "hidden" }}
+        sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}
         variant="caption"
       >
-        {title}: {value ? "True" : "False"}
-      </Typography>
-    );
-  } else {
-    return (
-      <Typography
-        sx={{ textOverflow: "ellipsis", overflow: "hidden" }}
-        variant="caption"
-      >
-        {title}: {value}
+        {title}
+        :
+        {value ? 'True' : 'False'}
       </Typography>
     );
   }
+  return (
+    <Typography
+      sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}
+      variant="caption"
+    >
+      {title}
+      :
+      {value}
+    </Typography>
+  );
 };

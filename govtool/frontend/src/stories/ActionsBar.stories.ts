@@ -1,4 +1,3 @@
-import { DataActionsBar } from "@/components/molecules";
 import { userEvent, within } from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
 import type { Meta, StoryObj } from "@storybook/react";
@@ -6,6 +5,7 @@ import {
   GOVERNANCE_ACTIONS_FILTERS,
   GOVERNANCE_ACTIONS_SORTING,
 } from "@consts";
+import { DataActionsBar } from "@/components/molecules";
 
 const meta = {
   title: "Example/DataActionsBar",
@@ -71,7 +71,7 @@ export const ActionsBarFiltersOpen: Story = {
     const canvas = within(canvasElement);
     for (const { key, label } of GOVERNANCE_ACTIONS_FILTERS) {
       await userEvent.click(
-        canvas.getByTestId(`${label.replace(/ /g, "")}-checkbox`)
+        canvas.getByTestId(`${label.replace(/ /g, "")}-checkbox`),
       );
       await expect(args.setChosenFilters).toHaveBeenCalledWith([key]);
     }
@@ -106,7 +106,7 @@ export const ActionsBarWithoutFilters: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
-      canvas.queryByTestId("filters-button")
+      canvas.queryByTestId("filters-button"),
     ).not.toBeInTheDocument();
   },
 };

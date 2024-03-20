@@ -6,7 +6,9 @@ import {
   NavLink,
   generatePath,
 } from "react-router-dom";
-import { Box, Breadcrumbs, CircularProgress, Link } from "@mui/material";
+import {
+  Box, Breadcrumbs, CircularProgress, Link,
+} from "@mui/material";
 
 import { Background, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
@@ -38,13 +40,13 @@ export const GovernanceActionDetails = () => {
 
   const shortenedGovActionId = getShortenedGovActionId(
     state ? state.txHash : data?.proposal.txHash ?? "",
-    state ? state.index : data?.proposal.index ?? ""
+    state ? state.index : data?.proposal.index ?? "",
   );
 
   useEffect(() => {
     if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
-      const pathname = window.location.pathname;
-      navigate("/connected" + pathname);
+      const { pathname } = window.location;
+      navigate(`/connected${pathname}`);
     }
   }, [isEnabled]);
 
@@ -101,15 +103,13 @@ export const GovernanceActionDetails = () => {
                 display: "flex",
                 textDecoration: "none",
               }}
-              onClick={() =>
-                navigate(
-                  state && state.openedFromCategoryPage
-                    ? generatePath(PATHS.governanceActionsCategory, {
-                        category: state.type,
-                      })
-                    : PATHS.governanceActions
-                )
-              }
+              onClick={() => navigate(
+                state && state.openedFromCategoryPage
+                  ? generatePath(PATHS.governanceActionsCategory, {
+                    category: state.type,
+                  })
+                  : PATHS.governanceActions,
+              )}
             >
               <img
                 alt="arrow"
@@ -133,7 +133,7 @@ export const GovernanceActionDetails = () => {
               <Box
                 px={screenWidth < 1024 ? 0 : screenWidth < 1440 ? 10 : 24}
                 py={3}
-                data-testid={"governance-action-details"}
+                data-testid="governance-action-details"
               >
                 <GovernanceActionDetailsCard
                   abstainVotes={
@@ -164,13 +164,17 @@ export const GovernanceActionDetails = () => {
             ) : (
               <Box display="flex" flexWrap="wrap" mt={4}>
                 <Typography fontWeight={300}>
-                  {t("govActions.withIdNotExist.partOne")}&nbsp;
+                  {t("govActions.withIdNotExist.partOne")}
+&nbsp;
                 </Typography>
                 <Typography
                   fontWeight={500}
-                >{` ${shortenedGovActionId} `}</Typography>
+                >
+                  {` ${shortenedGovActionId} `}
+                </Typography>
                 <Typography fontWeight={300}>
-                  &nbsp;{t("govActions.withIdNotExist.partTwo")}
+                  &nbsp;
+                  {t("govActions.withIdNotExist.partTwo")}
                 </Typography>
               </Box>
             )}

@@ -1,9 +1,9 @@
-import { Button as MUIButton } from "@mui/material";
-import { ButtonProps } from ".";
+import { Button as MUIButton } from '@mui/material';
+import { ButtonProps } from '.';
 
 export const Button = ({
-  size = "large",
-  variant = "contained",
+  size = 'large',
+  variant = 'contained',
   sx,
   ...props
 }: ButtonProps) => {
@@ -17,7 +17,7 @@ export const Button = ({
   return (
     <MUIButton
       sx={{
-        fontSize: size === "extraLarge" ? 16 : 14,
+        fontSize: size === 'extraLarge' ? 16 : 14,
         height: buttonHeight,
         ...sx,
       }}

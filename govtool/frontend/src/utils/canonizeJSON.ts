@@ -1,4 +1,4 @@
-import jsonld from "jsonld";
+import jsonld from 'jsonld';
 
 /**
  * Canonizes a JSON object using jsonld.canonize.

@@ -1,6 +1,4 @@
-import { Box } from "@mui/material";
-import { SpacerProps } from ".";
+import { Box } from '@mui/material';
+import { SpacerProps } from '.';
 
-export const Spacer = ({ x, y }: SpacerProps) => {
-  return <Box pt={y} pr={x} />;
-};
+export const Spacer = ({ x, y }: SpacerProps) => <Box pt={y} pr={x} />;

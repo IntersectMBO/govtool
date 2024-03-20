@@ -24,7 +24,7 @@ describe("correctAdaFormat", () => {
   it("handles small lovelace values with correct rounding", () => {
     const lovelace = 123;
     const expectedAda = Number.parseFloat(
-      (lovelace / LOVELACE).toFixed(DECIMALS)
+      (lovelace / LOVELACE).toFixed(DECIMALS),
     );
     expect(correctAdaFormat(lovelace)).toBe(expectedAda);
   });

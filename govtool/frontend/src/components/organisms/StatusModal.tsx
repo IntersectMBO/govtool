@@ -22,7 +22,7 @@ export interface StatusModalState {
   dataTestId: string;
 }
 
-export function StatusModal() {
+export const StatusModal = () => {
   const { state, closeModal } = useModal<StatusModalState>();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -35,8 +35,8 @@ export function StatusModal() {
           state?.status === "warning"
             ? IMAGES.warningImage
             : state?.status === "success"
-            ? IMAGES.successImage
-            : ICONS.timerIcon
+              ? IMAGES.successImage
+              : ICONS.timerIcon
         }
         style={{ height: "84px", margin: "0 auto", width: "84px" }}
       />
@@ -111,4 +111,4 @@ export function StatusModal() {
       )}
     </ModalWrapper>
   );
-}
+};

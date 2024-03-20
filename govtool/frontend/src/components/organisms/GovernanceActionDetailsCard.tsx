@@ -1,11 +1,11 @@
 import { Box } from "@mui/material";
-import { Button, Typography } from "../atoms";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { VoteActionForm, VotesSubmitted } from "../molecules";
 import { useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { ICONS } from "@consts";
 import { Tooltip } from "@atoms";
+import { VoteActionForm, VotesSubmitted } from "../molecules";
+import { Button, Typography } from "../atoms";
 
 type GovernanceActionDetailsCardProps = {
   abstainVotes: number;
@@ -88,7 +88,7 @@ export const GovernanceActionDetailsCard = ({
             <Tooltip
               heading={t("tooltips.submissionDate.heading")}
               paragraphOne={t("tooltips.submissionDate.paragraphOne")}
-              placement={"bottom-end"}
+              placement="bottom-end"
               arrow
             >
               <InfoOutlinedIcon
@@ -103,10 +103,10 @@ export const GovernanceActionDetailsCard = ({
           <Box
             justifyContent="center"
             alignItems="center"
-            display={"flex"}
+            display="flex"
             flex={1}
             py={0.75}
-            width={"100%"}
+            width="100%"
           >
             <Typography fontWeight={300} sx={{ mr: 1 }} variant="caption">
               {t("govActions.expiryDate")}
@@ -118,7 +118,7 @@ export const GovernanceActionDetailsCard = ({
               heading={t("tooltips.expiryDate.heading")}
               paragraphOne={t("tooltips.expiryDate.paragraphOne")}
               paragraphTwo={t("tooltips.expiryDate.paragraphTwo")}
-              placement={"bottom-end"}
+              placement="bottom-end"
               arrow
             >
               <InfoOutlinedIcon
@@ -136,7 +136,7 @@ export const GovernanceActionDetailsCard = ({
             <Typography color="neutralGray" variant="caption">
               {t("govActions.governanceActionType")}
             </Typography>
-            <Box display={"flex"}>
+            <Box display="flex">
               <Box mt={1} px={2} py={1} bgcolor="lightBlue" borderRadius={100}>
                 <Typography variant="caption">{type}</Typography>
               </Box>

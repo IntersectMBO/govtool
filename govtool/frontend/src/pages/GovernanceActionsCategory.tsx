@@ -1,4 +1,6 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  useState, useCallback, useEffect, useMemo, useRef,
+} from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import {
   Box,
@@ -55,12 +57,12 @@ export const GovernanceActionsCategory = () => {
   useFetchNextPageDetector(
     proposalsfetchNextPage,
     isProposalsLoading || isProposalsFetchingNextPage,
-    proposalsHaveNextPage
+    proposalsHaveNextPage,
   );
 
   const saveScrollPosition = useSaveScrollPosition(
     isProposalsLoading,
-    isProposalsFetching
+    isProposalsFetching,
   );
 
   const breadcrumbs = [
@@ -81,11 +83,9 @@ export const GovernanceActionsCategory = () => {
   const mappedData = useMemo(() => {
     const uniqueProposals = removeDuplicatedProposals(proposals);
 
-    return uniqueProposals?.filter((i) =>
-      getFullGovActionId(i.txHash, i.index)
-        .toLowerCase()
-        .includes(searchText.toLowerCase())
-    );
+    return uniqueProposals?.filter((i) => getFullGovActionId(i.txHash, i.index)
+      .toLowerCase()
+      .includes(searchText.toLowerCase()));
   }, [
     voter?.isRegisteredAsDRep,
     isProposalsFetchingNextPage,
@@ -95,8 +95,8 @@ export const GovernanceActionsCategory = () => {
 
   useEffect(() => {
     if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
-      const pathname = window.location.pathname;
-      navigate("/connected" + pathname);
+      const { pathname } = window.location;
+      navigate(`/connected${pathname}`);
     }
   }, [isEnabled]);
 
@@ -113,7 +113,7 @@ export const GovernanceActionsCategory = () => {
         minHeight="100vh"
       >
         <TopNav />
-        <Box flex={1} mt={isMobile ? 3.25 : 6.25} overflow={"hidden"}>
+        <Box flex={1} mt={isMobile ? 3.25 : 6.25} overflow="hidden">
           <Typography
             sx={{ mb: isMobile ? 3.75 : 6, px: pagePadding }}
             variant={isMobile ? "title1" : "headline3"}
@@ -141,7 +141,7 @@ export const GovernanceActionsCategory = () => {
               {breadcrumbs}
             </Breadcrumbs>
             <Link
-              data-testid={"back-to-list-link"}
+              data-testid="back-to-list-link"
               sx={{
                 cursor: "pointer",
                 display: "flex",
@@ -176,19 +176,25 @@ export const GovernanceActionsCategory = () => {
                 <Typography fontWeight={300} sx={{ py: 4 }}>
                   <Box mt={4} display="flex" flexWrap="wrap">
                     <Typography fontWeight={300}>
-                      {t("govActions.withCategoryNotExist.partOne")}&nbsp;
+                      {t("govActions.withCategoryNotExist.partOne")}
+&nbsp;
                     </Typography>
-                    <Typography fontWeight={700}>{category}&nbsp;</Typography>
+                    <Typography fontWeight={700}>
+                      {category}
+&nbsp;
+                    </Typography>
                     {searchText && (
                       <>
                         <Typography fontWeight={300}>
-                          {t("govActions.withCategoryNotExist.optional")}&nbsp;
+                          {t("govActions.withCategoryNotExist.optional")}
+&nbsp;
                         </Typography>
                         <Typography fontWeight={700}>{searchText}</Typography>
                       </>
                     )}
                     <Typography fontWeight={300}>
-                      &nbsp;{t("govActions.withCategoryNotExist.partTwo")}
+                      &nbsp;
+                      {t("govActions.withCategoryNotExist.partTwo")}
                     </Typography>
                   </Box>
                 </Typography>
@@ -200,8 +206,8 @@ export const GovernanceActionsCategory = () => {
                     screenWidth < 375
                       ? "255px"
                       : screenWidth < 768
-                      ? "294px"
-                      : "402px"
+                        ? "294px"
+                        : "402px"
                   }, 1fr))`}
                 >
                   {mappedData.map((item) => (
@@ -216,14 +222,14 @@ export const GovernanceActionsCategory = () => {
                           navigate(
                             PATHS.governanceActionsAction.replace(
                               ":proposalId",
-                              getFullGovActionId(item.txHash, item.index)
+                              getFullGovActionId(item.txHash, item.index),
                             ),
                             {
                               state: {
                                 ...item,
                                 openedFromCategoryPage: true,
                               },
-                            }
+                            },
                           );
                         }}
                       />

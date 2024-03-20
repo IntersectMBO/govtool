@@ -1,5 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
-import { Box, CircularProgress, Tab, Tabs, styled } from "@mui/material";
+import {
+  Box, CircularProgress, Tab, Tabs, styled,
+} from "@mui/material";
 import { useLocation } from "react-router-dom";
 
 import { useCardano } from "@context";
@@ -16,7 +18,7 @@ interface TabPanelProps {
   value: number;
 }
 
-function CustomTabPanel(props: TabPanelProps) {
+const CustomTabPanel = (props: TabPanelProps) => {
   const { children, value, index } = props;
 
   return (
@@ -34,7 +36,7 @@ function CustomTabPanel(props: TabPanelProps) {
       {value === index && <Box pb={3}>{children}</Box>}
     </div>
   );
-}
+};
 
 type StyledTabProps = {
   label: string;
@@ -62,7 +64,7 @@ export const DashboardGovernanceActions = () => {
 
   const { state } = useLocation();
   const [content, setContent] = useState<number>(
-    state && state.isVotedListOnLoad ? 1 : 0
+    state && state.isVotedListOnLoad ? 1 : 0,
   );
 
   const { voter, isDrepLoading } = useCardano();

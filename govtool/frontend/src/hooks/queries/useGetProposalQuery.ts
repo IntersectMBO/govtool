@@ -9,13 +9,11 @@ export const useGetProposalQuery = (proposalId: string, enabled?: boolean) => {
 
   const request = useQuery(
     [QUERY_KEYS.useGetProposalKey, dRepID],
-    async () => {
-      return await getProposal(proposalId, dRepID);
-    },
+    async () => await getProposal(proposalId, dRepID),
     {
       staleTime: Infinity,
       enabled,
-    }
+    },
   );
 
   const data = request.data as {

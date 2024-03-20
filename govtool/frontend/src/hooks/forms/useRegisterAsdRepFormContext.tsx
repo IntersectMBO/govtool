@@ -52,7 +52,7 @@ export const useRegisterAsdRepFormContext = () => {
           type: "registration",
           registrationType: "registration",
         });
-        if (result)
+        if (result) {
           openModal({
             type: "statusModal",
             state: {
@@ -68,6 +68,7 @@ export const useRegisterAsdRepFormContext = () => {
               dataTestId: "registration-transaction-submitted-modal",
             },
           });
+        }
       } catch (e: any) {
         const errorMessage = e.info ? e.info : e;
 
@@ -89,7 +90,7 @@ export const useRegisterAsdRepFormContext = () => {
         setIsLoading(false);
       }
     },
-    [buildSignSubmitConwayCertTx, buildDRepRegCert, openModal]
+    [buildSignSubmitConwayCertTx, buildDRepRegCert, openModal],
   );
 
   return {

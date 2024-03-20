@@ -39,19 +39,17 @@ export const Link: FC<LinkProps> = ({ ...props }) => {
         if (!isConnectWallet) disconnectWallet();
         if (onClick) onClick();
       }}
-      children={({ isActive }) => {
-        return (
-          <Typography
-            sx={{
-              fontSize: fontSize,
-              fontWeight: isActive && navTo !== "" ? 600 : 500,
-              color: isActive && navTo !== "" ? "#FF640A" : "textBlack",
-            }}
-          >
-            {label}
-          </Typography>
-        );
-      }}
-    ></NavLink>
+      children={({ isActive }) => (
+        <Typography
+          sx={{
+            fontSize,
+            fontWeight: isActive && navTo !== "" ? 600 : 500,
+            color: isActive && navTo !== "" ? "#FF640A" : "textBlack",
+          }}
+        >
+          {label}
+        </Typography>
+      )}
+    />
   );
 };

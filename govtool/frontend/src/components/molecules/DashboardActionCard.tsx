@@ -74,7 +74,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
     >
       {inProgress && !isLoading && (
         <Box
-          bgcolor={"rgb(242, 217, 169)"}
+          bgcolor="rgb(242, 217, 169)"
           px={2.25}
           py={0.5}
           borderRadius={100}
@@ -84,12 +84,12 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
             right: 30,
           }}
         >
-          <Typography color={"orangeDark"} variant="body2">
+          <Typography color="orangeDark" variant="body2">
             {t("inProgress")}
           </Typography>
         </Box>
       )}
-      <Box display={"flex"} flexDirection="column" flex={1}>
+      <Box display="flex" flexDirection="column" flex={1}>
         {imageURL ? (
           isLoading ? (
             <Skeleton
@@ -138,14 +138,14 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
             px={1.5}
             py={1}
             border={1}
-            borderColor={"rgba(236, 234, 234, 1)"}
+            borderColor="rgba(236, 234, 234, 1)"
             borderRadius={1.5}
-            bgcolor={"white"}
+            bgcolor="white"
             mb={3}
             sx={{ display: "flex", justifyContent: "flex-start" }}
           >
             <Box mr="24px">
-              <Typography color={"#8E908E"} variant="caption">
+              <Typography color="#8E908E" variant="caption">
                 {cardTitle}
               </Typography>
               <Typography
@@ -157,14 +157,14 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
                     screenWidth < 375
                       ? "150px"
                       : screenWidth < 425
-                      ? "200px"
-                      : screenWidth < 768
-                      ? "240px"
-                      : screenWidth < 1024
-                      ? "300px"
-                      : screenWidth < 1440
-                      ? "150px"
-                      : "300px",
+                        ? "200px"
+                        : screenWidth < 768
+                          ? "240px"
+                          : screenWidth < 1024
+                            ? "300px"
+                            : screenWidth < 1440
+                              ? "150px"
+                              : "300px",
                 }}
               >
                 {cardId}

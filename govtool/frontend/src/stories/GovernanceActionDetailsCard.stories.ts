@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
+import {
+  screen, userEvent, waitFor, within,
+} from "@storybook/testing-library";
 import { GovernanceActionDetailsCard } from "@organisms";
 import { expect } from "@storybook/jest";
 
@@ -39,14 +41,14 @@ export const GovernanceActionDetailsCardComponent: Story = {
     const tooltips = canvas.getAllByTestId("InfoOutlinedIcon");
     await userEvent.hover(tooltips[0]);
     await waitFor(async () => {
-      expect(screen.getByRole("tooltip")).toBeInTheDocument();
-      expect(screen.getByRole("tooltip")).toHaveTextContent(/Submission Date/i);
+      await expect(screen.getByRole("tooltip")).toBeInTheDocument();
+      await expect(screen.getByRole("tooltip")).toHaveTextContent(/Submission Date/i);
       await userEvent.unhover(tooltips[0]);
     });
     await userEvent.hover(tooltips[1]);
 
-    expect(canvas.getByText("Gov Type")).toBeInTheDocument();
-    expect(canvas.getByText("Example id")).toBeInTheDocument();
+    await expect(canvas.getByText("Gov Type")).toBeInTheDocument();
+    await expect(canvas.getByText("Example id")).toBeInTheDocument();
 
     await expect(canvas.getByText("key: value")).toBeInTheDocument();
     await expect(canvas.getAllByText("key-list")).toHaveLength(3);

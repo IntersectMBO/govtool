@@ -1,4 +1,6 @@
-import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
+import {
+  Box, Grid, IconButton, SwipeableDrawer,
+} from "@mui/material";
 
 import { Background, Link } from "@atoms";
 import { CONNECTED_NAV_ITEMS, ICONS } from "@consts";

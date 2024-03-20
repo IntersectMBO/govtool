@@ -2,8 +2,8 @@ import { FC } from "react";
 import { Box, Typography } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
-import { Tooltip } from ".";
 import { useScreenDimension } from "@hooks";
+import { Tooltip } from ".";
 import { theme } from "@/theme";
 
 type ActionRadioProps = {
@@ -38,10 +38,10 @@ export const ActionRadio: FC<ActionRadioProps> = ({ ...props }) => {
       data-testid={dataTestId}
       aria-checked={isChecked}
       p="2px"
-      maxWidth={"623px"}
+      maxWidth="623px"
       border="2px solid"
       borderColor={isChecked ? "specialCyanBorder" : "white"}
-      bgcolor={"white"}
+      bgcolor="white"
       borderRadius="15px"
       boxShadow={`1px 2px 11px 0px ${boxShadow1}`}
       onClick={() => onChange(value)}
@@ -50,7 +50,7 @@ export const ActionRadio: FC<ActionRadioProps> = ({ ...props }) => {
       <Box
         p={2}
         bgcolor={isChecked ? "specialCyan" : "white"}
-        borderRadius={"12px"}
+        borderRadius="12px"
       >
         <Box display="flex" flexDirection="row" alignItems="center">
           <Typography

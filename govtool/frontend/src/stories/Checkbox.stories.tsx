@@ -14,9 +14,7 @@ const meta = {
 
 export default meta;
 
-const Template: StoryFn<ComponentProps<typeof Field.Checkbox>> = (args) => {
-  return <Field.Checkbox {...args} />;
-};
+const Template: StoryFn<ComponentProps<typeof Field.Checkbox>> = (args) => <Field.Checkbox {...args} />;
 
 export const Default = Template.bind({});
 

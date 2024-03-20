@@ -3,13 +3,13 @@ import { removeDuplicatedProposals } from "..";
 describe("remove duplicated proposals", () => {
   it("returns all proposals when all are unique", () => {
     expect(removeDuplicatedProposals(uniqueProposals).length).toBe(
-      uniqueProposals.length
+      uniqueProposals.length,
     );
   });
 
   it("removes duplicate proposals based on txHash and index", () => {
     expect(removeDuplicatedProposals(duplicatedProposals).length).toBe(
-      uniqueProposals.length
+      uniqueProposals.length,
     );
   });
 

@@ -1,9 +1,9 @@
-import { Box } from "@mui/material";
+import { Box } from '@mui/material';
 
-import { Typography } from "@atoms";
-import { theme } from "@/theme";
+import { Typography } from '@atoms';
+import { theme } from '@/theme';
 
-import { StepProps } from "./types";
+import { StepProps } from './types';
 
 export const Step = ({
   component,
@@ -18,20 +18,20 @@ export const Step = ({
   return (
     <Box
       sx={{
-        flexDirection: "row",
-        display: "flex",
-        width: "100%",
+        flexDirection: 'row',
+        display: 'flex',
+        width: '100%',
         ...layoutStyles,
       }}
     >
       <Box
         sx={{
-          alignItems: "center",
-          borderRadius: "100%",
+          alignItems: 'center',
+          borderRadius: '100%',
           boxShadow: `2px 2px 20px 0px ${boxShadow2}`,
-          display: "flex",
+          display: 'flex',
           height: 54,
-          justifyContent: "center",
+          justifyContent: 'center',
           width: 54,
         }}
       >
@@ -42,9 +42,9 @@ export const Step = ({
 
       <Box
         sx={{
-          display: "flex",
+          display: 'flex',
           flex: 1,
-          flexDirection: "column",
+          flexDirection: 'column',
           ml: 3,
         }}
       >

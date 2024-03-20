@@ -24,9 +24,7 @@ export const Footer = () => {
       <Box display="flex" flexDirection="row" mt={isMobile ? 1.5 : 0}>
         <Link
           data-testid="privacy-policy-link"
-          onClick={() =>
-            openInNewTab("https://docs.sanchogov.tools/legal/privacy-policy")
-          }
+          onClick={() => openInNewTab("https://docs.sanchogov.tools/legal/privacy-policy")}
           sx={[{ textDecoration: "none" }]}
           mr={6}
         >

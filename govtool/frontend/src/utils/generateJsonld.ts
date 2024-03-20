@@ -16,7 +16,7 @@ export const generateJsonld = async <
   C extends jsonld.ContextDefinition
 >(
   body: T,
-  context: C
+  context: C,
 ) => {
   const doc = {
     [`${CIP_108}body`]: body,

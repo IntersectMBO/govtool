@@ -33,7 +33,7 @@ export const TopNavComponent: Story = {
     const canvas = within(canvasElement);
     await performCommonActions(canvas);
     await expect(
-      canvas.getByTestId("connect-wallet-button")
+      canvas.getByTestId("connect-wallet-button"),
     ).toBeInTheDocument();
   },
 };
@@ -44,7 +44,7 @@ export const TopNavWithoutButton: Story = {
     const canvas = within(canvasElement);
     await performCommonActions(canvas);
     await expect(
-      canvas.queryByTestId("connect-wallet-button")
+      canvas.queryByTestId("connect-wallet-button"),
     ).not.toBeInTheDocument();
   },
 };

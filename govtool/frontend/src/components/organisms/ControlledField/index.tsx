@@ -10,9 +10,7 @@ type ControlledFieldComposition = React.FC<PropsWithChildren> & {
   TextArea: typeof TextArea;
 };
 
-const ControlledField: ControlledFieldComposition = ({ children }) => {
-  return <>{children}</>;
-};
+const ControlledField: ControlledFieldComposition = ({ children }) => <>{children}</>;
 
 ControlledField.Checkbox = Checkbox;
 ControlledField.Input = Input;

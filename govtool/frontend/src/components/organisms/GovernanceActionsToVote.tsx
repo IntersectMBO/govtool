@@ -25,12 +25,12 @@ const defaultCategories = GOVERNANCE_ACTIONS_FILTERS.map(
   (category) => category.key,
 );
 
-export function GovernanceActionsToVote({
+export const GovernanceActionsToVote = ({
   filters,
   onDashboard = true,
   searchPhrase = "",
   sorting,
-}: GovernanceActionsToVoteProps) {
+}: GovernanceActionsToVoteProps) => {
   const { voteTransaction } = useCardano();
   const navigate = useNavigate();
   const { isMobile } = useScreenDimension();
@@ -155,4 +155,4 @@ export function GovernanceActionsToVote({
       <CircularProgress />
     </Box>
   );
-}
+};

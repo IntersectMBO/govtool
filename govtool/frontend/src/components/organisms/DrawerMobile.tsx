@@ -15,11 +15,11 @@ import { DrawerMobileProps } from "./types";
 const DRAWER_PADDING = 2;
 const CALCULATED_DRAWER_PADDING = DRAWER_PADDING * 8 * 2;
 
-export function DrawerMobile({
+export const DrawerMobile = ({
   isConnectButton,
   isDrawerOpen,
   setIsDrawerOpen,
-}: DrawerMobileProps) {
+}: DrawerMobileProps) => {
   const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { t } = useTranslation();
@@ -104,4 +104,4 @@ export function DrawerMobile({
       </Background>
     </SwipeableDrawer>
   );
-}
+};

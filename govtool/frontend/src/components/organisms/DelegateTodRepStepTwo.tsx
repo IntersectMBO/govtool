@@ -15,7 +15,7 @@ interface DelegateProps {
   setStep: (newStep: number) => void;
 }
 
-export function DelegateTodRepStepTwo({ setStep }: DelegateProps) {
+export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
 
@@ -121,4 +121,4 @@ export function DelegateTodRepStepTwo({ setStep }: DelegateProps) {
       </Box>
     </Box>
   );
-}
+};

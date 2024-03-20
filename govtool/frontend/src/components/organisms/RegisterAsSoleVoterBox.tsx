@@ -7,7 +7,7 @@ import { RegisterAsSoleVoterBoxContent } from "@organisms";
 import { CenteredBoxBottomButtons } from "@molecules";
 import { useCardano, useModal } from "@context";
 
-export function RegisterAsSoleVoterBox() {
+export const RegisterAsSoleVoterBox = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const {
@@ -81,4 +81,4 @@ export function RegisterAsSoleVoterBox() {
       />
     </>
   );
-}
+};

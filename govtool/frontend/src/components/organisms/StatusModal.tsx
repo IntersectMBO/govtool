@@ -22,7 +22,7 @@ export interface StatusModalState {
   dataTestId: string;
 }
 
-export function StatusModal() {
+export const StatusModal = () => {
   const { state, closeModal } = useModal<StatusModalState>();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -111,4 +111,4 @@ export function StatusModal() {
       )}
     </ModalWrapper>
   );
-}
+};

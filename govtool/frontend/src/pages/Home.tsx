@@ -10,7 +10,7 @@ import {
 } from "@organisms";
 import { WALLET_LS_KEY, getItemFromLocalStorage } from "@utils";
 
-export function Home() {
+export const Home = () => {
   const { isEnabled } = useCardano();
   const navigate = useNavigate();
 
@@ -30,4 +30,4 @@ export function Home() {
       </Box>
     </Background>
   );
-}
+};

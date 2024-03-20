@@ -1,8 +1,8 @@
-import { Dispatch, SetStateAction } from "react";
-import { Box, Typography } from "@mui/material";
+import { Dispatch, SetStateAction } from 'react';
+import { Box, Typography } from '@mui/material';
 
-import { ICONS } from "@consts";
-import { theme } from "@/theme";
+import { ICONS } from '@consts';
+import { theme } from '@/theme';
 
 interface Props {
   filtersOpen?: boolean;
@@ -14,7 +14,7 @@ interface Props {
   isFiltering?: boolean;
 }
 
-export function OrderActionsChip(props: Props) {
+export const OrderActionsChip = (props: Props) => {
   const {
     palette: { secondary },
   } = theme;
@@ -43,31 +43,31 @@ export function OrderActionsChip(props: Props) {
             }}
             src={filtersOpen ? ICONS.filterWhiteIcon : ICONS.filterIcon}
             style={{
-              background: filtersOpen ? secondary.main : "transparent",
-              borderRadius: "100%",
-              cursor: "pointer",
-              padding: "14px",
-              overflow: "visible",
+              background: filtersOpen ? secondary.main : 'transparent',
+              borderRadius: '100%',
+              cursor: 'pointer',
+              padding: '14px',
+              overflow: 'visible',
               height: 20,
               width: 20,
-              objectFit: "contain",
+              objectFit: 'contain',
             }}
           />
           {!filtersOpen && chosenFiltersLength > 0 && (
             <Box
               sx={{
-                alignItems: "center",
+                alignItems: 'center',
                 background: secondary.main,
-                borderRadius: "100%",
-                color: "white",
-                display: "flex",
-                fontSize: "12px",
-                height: "16px",
-                justifyContent: "center",
-                position: "absolute",
-                right: "0",
-                top: "0",
-                width: "16px",
+                borderRadius: '100%',
+                color: 'white',
+                display: 'flex',
+                fontSize: '12px',
+                height: '16px',
+                justifyContent: 'center',
+                position: 'absolute',
+                right: '0',
+                top: '0',
+                width: '16px',
               }}
             >
               <Typography variant="caption" color="#FFFFFF">
@@ -89,30 +89,30 @@ export function OrderActionsChip(props: Props) {
           }}
           src={sortOpen ? ICONS.sortWhiteIcon : ICONS.sortIcon}
           style={{
-            background: sortOpen ? secondary.main : "transparent",
-            borderRadius: "100%",
-            cursor: "pointer",
-            padding: "14px",
+            background: sortOpen ? secondary.main : 'transparent',
+            borderRadius: '100%',
+            cursor: 'pointer',
+            padding: '14px',
             height: 24,
             width: 24,
-            objectFit: "contain",
+            objectFit: 'contain',
           }}
         />
         {!sortOpen && sortingActive && (
           <Box
             sx={{
-              alignItems: "center",
+              alignItems: 'center',
               background: secondary.main,
-              borderRadius: "100%",
-              color: "white",
-              display: "flex",
-              fontSize: "12px",
-              height: "16px",
-              justifyContent: "center",
-              position: "absolute",
-              right: "0",
-              top: "0",
-              width: "16px",
+              borderRadius: '100%',
+              color: 'white',
+              display: 'flex',
+              fontSize: '12px',
+              height: '16px',
+              justifyContent: 'center',
+              position: 'absolute',
+              right: '0',
+              top: '0',
+              width: '16px',
             }}
           >
             <img alt="sorting active" src={ICONS.sortActiveIcon} />
@@ -121,4 +121,4 @@ export function OrderActionsChip(props: Props) {
       </Box>
     </Box>
   );
-}
+};

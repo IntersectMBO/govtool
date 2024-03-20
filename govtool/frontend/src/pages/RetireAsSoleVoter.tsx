@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { CenteredBoxPageWrapper } from "@molecules";
 import { checkIsWalletConnected } from "@/utils";
 
-export function RetireAsSoleVoter() {
+export const RetireAsSoleVoter = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -26,4 +26,4 @@ export function RetireAsSoleVoter() {
       <RetireAsSoleVoterBox />
     </CenteredBoxPageWrapper>
   );
-}
+};

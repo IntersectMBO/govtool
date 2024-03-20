@@ -33,7 +33,7 @@ import {
   removeDuplicatedProposals,
 } from "@utils";
 
-export function DashboardGovernanceActionsCategory() {
+export const DashboardGovernanceActionsCategory = () => {
   const { category } = useParams();
   const [searchText, setSearchText] = useState<string>("");
   const [sortOpen, setSortOpen] = useState(false);
@@ -234,4 +234,4 @@ export function DashboardGovernanceActionsCategory() {
       </Box>
     </Background>
   );
-}
+};

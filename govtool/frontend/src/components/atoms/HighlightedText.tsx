@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { Typography } from '@mui/material';
 
 interface Props {
   text: string;
@@ -8,14 +8,14 @@ interface Props {
   color?: string;
 }
 
-export function HighlightedText({
+export const HighlightedText = ({
   text,
-  searchPhrase = "",
+  searchPhrase = '',
   fontSize = 12,
   fontWeight = 400,
-  color = "inherit",
-}: Props) {
-  const regex = new RegExp(`(${searchPhrase})`, "gi");
+  color = 'inherit',
+}: Props) => {
+  const regex = new RegExp(`(${searchPhrase})`, 'gi');
   const parts = text.split(regex);
 
   return (
@@ -30,11 +30,11 @@ export function HighlightedText({
           style={{
             backgroundColor:
               part.toLowerCase() === searchPhrase.toLowerCase()
-                ? "#FF640A"
-                : "transparent",
+                ? '#FF640A'
+                : 'transparent',
             color:
               part.toLowerCase() === searchPhrase.toLowerCase()
-                ? "white"
+                ? 'white'
                 : `${color}`,
           }}
         >
@@ -43,4 +43,4 @@ export function HighlightedText({
       ))}
     </>
   );
-}
+};

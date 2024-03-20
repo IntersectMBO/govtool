@@ -24,7 +24,7 @@ type SliderProps = {
   filters?: string[];
 };
 
-export function Slider({
+export const Slider = ({
   data,
   title,
   navigateKey,
@@ -35,7 +35,7 @@ export function Slider({
   filters,
   searchPhrase,
   sorting,
-}: SliderProps) {
+}: SliderProps) => {
   const { isMobile, screenWidth, pagePadding } = useScreenDimension();
   const navigate = useNavigate();
   const { voteTransaction } = useCardano();
@@ -187,4 +187,4 @@ export function Slider({
       )}
     </Box>
   );
-}
+};

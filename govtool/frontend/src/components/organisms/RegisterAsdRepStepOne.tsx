@@ -13,13 +13,13 @@ import {
 
 import { BgCard } from ".";
 
-export function RegisterAsdRepStepOne({
+export const RegisterAsdRepStepOne = ({
   onClickCancel,
   setStep,
 }: {
   onClickCancel: () => void;
   setStep: Dispatch<SetStateAction<number>>;
-}) {
+}) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
 
@@ -67,4 +67,4 @@ export function RegisterAsdRepStepOne({
       </Typography>
     </BgCard>
   );
-}
+};

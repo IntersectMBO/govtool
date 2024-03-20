@@ -48,7 +48,7 @@ const defaultPosition = {
   horizontal: "center",
 } as SnackbarOrigin;
 
-function SnackbarProvider({ children }: ProviderProps) {
+const SnackbarProvider = ({ children }: ProviderProps) => {
   const [snackPack, setSnackPack] = useState<readonly SnackbarMessage[]>([]);
   const [{ messageInfo, open }, setState] = useState(defaultState);
   const { isMobile } = useScreenDimension();
@@ -167,7 +167,7 @@ function SnackbarProvider({ children }: ProviderProps) {
       )}
     </SnackbarContext.Provider>
   );
-}
+};
 
 function useSnackbar() {
   const context = useContext(SnackbarContext);

@@ -5,7 +5,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-export function ModalContents({ children }: Props) {
+export const ModalContents = ({ children }: Props) => {
   const { isMobile } = useScreenDimension();
 
   return (
@@ -18,4 +18,4 @@ export function ModalContents({ children }: Props) {
       {children}
     </Box>
   );
-}
+};

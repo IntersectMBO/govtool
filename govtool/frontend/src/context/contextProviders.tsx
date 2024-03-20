@@ -6,15 +6,13 @@ interface Props {
   children: React.ReactNode;
 }
 
-function ContextProviders({ children }: Props) {
-  return (
-    <ModalProvider>
-      <SnackbarProvider>
-        <CardanoProvider>{children}</CardanoProvider>
-      </SnackbarProvider>
-    </ModalProvider>
-  );
-}
+const ContextProviders = ({ children }: Props) => (
+  <ModalProvider>
+    <SnackbarProvider>
+      <CardanoProvider>{children}</CardanoProvider>
+    </SnackbarProvider>
+  </ModalProvider>
+);
 
 export {
   ContextProviders, useCardano, useModal, useSnackbar,

@@ -11,7 +11,7 @@ export interface ExternalLinkModalState {
   externalLink: string;
 }
 
-export function ExternalLinkModal() {
+export const ExternalLinkModal = () => {
   const { state, closeModal } = useModal<ExternalLinkModalState>();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -100,4 +100,4 @@ export function ExternalLinkModal() {
       </Box>
     </ModalWrapper>
   );
-}
+};

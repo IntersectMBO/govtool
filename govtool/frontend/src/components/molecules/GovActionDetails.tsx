@@ -1,12 +1,12 @@
-import { Typography } from "../atoms";
+import { Typography } from '../atoms';
 
-export function GovActionDetails({
+export const GovActionDetails = ({
   title,
   value,
 }: {
   title: string;
   value: any;
-}) {
+}) => {
   if (Array.isArray(value)) {
     return (
       <div>
@@ -18,7 +18,7 @@ export function GovActionDetails({
           {value.map((item, index) => (
             <li key={index}>
               <Typography
-                sx={{ textOverflow: "ellipsis", overflow: "hidden" }}
+                sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}
                 variant="caption"
               >
                 {item}
@@ -28,21 +28,22 @@ export function GovActionDetails({
         </ul>
       </div>
     );
-  } if (typeof value === "boolean") {
+  }
+  if (typeof value === 'boolean') {
     return (
       <Typography
-        sx={{ textOverflow: "ellipsis", overflow: "hidden" }}
+        sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}
         variant="caption"
       >
         {title}
         :
-        {value ? "True" : "False"}
+        {value ? 'True' : 'False'}
       </Typography>
     );
   }
   return (
     <Typography
-      sx={{ textOverflow: "ellipsis", overflow: "hidden" }}
+      sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}
       variant="caption"
     >
       {title}
@@ -50,4 +51,4 @@ export function GovActionDetails({
       {value}
     </Typography>
   );
-}
+};

@@ -4,7 +4,7 @@ import { Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
-export function Footer() {
+export const Footer = () => {
   const { isMobile, pagePadding } = useScreenDimension();
   const { t } = useTranslation();
 
@@ -39,4 +39,4 @@ export function Footer() {
       </Box>
     </Box>
   );
-}
+};

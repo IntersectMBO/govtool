@@ -7,7 +7,7 @@ import { WalletOptionButton } from "@molecules";
 import { openInNewTab } from "@utils";
 import { useTranslation } from "@hooks";
 
-export function ChooseWalletModal() {
+export const ChooseWalletModal = () => {
   const { t } = useTranslation();
 
   const walletOptions: WalletOption[] = useMemo(() => {
@@ -111,4 +111,4 @@ export function ChooseWalletModal() {
       </ModalContents>
     </ModalWrapper>
   );
-}
+};

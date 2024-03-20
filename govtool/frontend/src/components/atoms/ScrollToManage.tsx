@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { PATHS } from "@/consts";
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { PATHS } from '@/consts';
 
 export function debounce(
   fn: (...params: any) => void,
@@ -17,7 +17,7 @@ export function debounce(
 
 export const pathMap = new Map<string, number>();
 
-export function ScrollToManage() {
+export const ScrollToManage = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -25,8 +25,8 @@ export function ScrollToManage() {
       window.scrollTo(0, pathMap.get(pathname)!);
     } else {
       if (
-        pathname === PATHS.dashboardGovernanceActions
-        || pathname === PATHS.governanceActions
+        pathname === PATHS.dashboardGovernanceActions ||
+        pathname === PATHS.governanceActions
       ) {
         pathMap.set(pathname, 0);
       }
@@ -37,16 +37,16 @@ export function ScrollToManage() {
   useEffect(() => {
     const fn = debounce(() => {
       if (
-        pathname === PATHS.dashboardGovernanceActions
-        || pathname === PATHS.governanceActions
+        pathname === PATHS.dashboardGovernanceActions ||
+        pathname === PATHS.governanceActions
       ) {
         pathMap.set(pathname, window.scrollY);
       }
     }, 200);
 
-    window.addEventListener("scroll", fn);
-    return () => window.removeEventListener("scroll", fn);
+    window.addEventListener('scroll', fn);
+    return () => window.removeEventListener('scroll', fn);
   }, [pathname]);
 
   return <></>;
-}
+};

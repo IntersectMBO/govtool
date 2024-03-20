@@ -18,11 +18,11 @@ interface DashboardGovernanceActionsVotedOnProps {
   sorting: string;
 }
 
-export function DashboardGovernanceActionsVotedOn({
+export const DashboardGovernanceActionsVotedOn = ({
   filters,
   searchPhrase,
   sorting,
-}: DashboardGovernanceActionsVotedOnProps) {
+}: DashboardGovernanceActionsVotedOnProps) => {
   const { data, areDRepVotesLoading } = useGetDRepVotesQuery(filters, sorting);
   const { isMobile } = useScreenDimension();
   const { voteTransaction } = useCardano();
@@ -93,4 +93,4 @@ export function DashboardGovernanceActionsVotedOn({
       )}
     </>
   );
-}
+};

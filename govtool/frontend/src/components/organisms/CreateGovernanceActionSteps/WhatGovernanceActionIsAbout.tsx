@@ -16,10 +16,10 @@ type WhatGovernanceActionIsAboutProps = {
   setStep: Dispatch<SetStateAction<number>>;
 };
 
-export function WhatGovernanceActionIsAbout({
+export const WhatGovernanceActionIsAbout = ({
   onClickCancel,
   setStep,
-}: WhatGovernanceActionIsAboutProps) {
+}: WhatGovernanceActionIsAboutProps) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
 
@@ -56,4 +56,4 @@ export function WhatGovernanceActionIsAbout({
       </Typography>
     </BgCard>
   );
-}
+};

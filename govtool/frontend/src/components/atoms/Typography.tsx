@@ -1,11 +1,11 @@
-import { Typography as MUITypography } from "@mui/material";
-import { TypographyProps } from "./types";
+import { Typography as MUITypography } from '@mui/material';
+import { TypographyProps } from './types';
 
-export function Typography({
+export const Typography = ({
   color,
-  variant = "body1",
+  variant = 'body1',
   ...props
-}: TypographyProps) {
+}: TypographyProps) => {
   const fontSize = {
     headline1: 100,
     headline2: 57,
@@ -33,16 +33,16 @@ export function Typography({
   }[variant];
 
   const lineHeight = {
-    headline1: "110px",
-    headline2: "57px",
-    headline3: "44px",
-    headline4: "40px",
-    headline5: "36px",
-    title1: "32px",
-    title2: "28px",
-    body1: "24px",
-    body2: "20px",
-    caption: "16px",
+    headline1: '110px',
+    headline2: '57px',
+    headline3: '44px',
+    headline4: '40px',
+    headline5: '36px',
+    title1: '32px',
+    title2: '28px',
+    body1: '24px',
+    body2: '20px',
+    caption: '16px',
   }[variant];
 
   return (
@@ -56,4 +56,4 @@ export function Typography({
       {props.children}
     </MUITypography>
   );
-}
+};

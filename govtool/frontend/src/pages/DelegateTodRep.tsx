@@ -13,7 +13,7 @@ import {
 } from "@organisms";
 import { checkIsWalletConnected } from "@utils";
 
-export function DelegateTodRep() {
+export const DelegateTodRep = () => {
   const [step, setStep] = useState(1);
   const { isMobile } = useScreenDimension();
   const navigate = useNavigate();
@@ -45,4 +45,4 @@ export function DelegateTodRep() {
       </Box>
     </Background>
   );
-}
+};

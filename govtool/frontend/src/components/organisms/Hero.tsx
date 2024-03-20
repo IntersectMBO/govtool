@@ -9,7 +9,7 @@ import { useCardano, useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
-export function Hero() {
+export const Hero = () => {
   const { isEnabled } = useCardano();
   const { openModal } = useModal();
   const navigate = useNavigate();
@@ -96,4 +96,4 @@ export function Hero() {
       </Box>
     </Box>
   );
-}
+};

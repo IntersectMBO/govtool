@@ -21,7 +21,7 @@ import {
 } from "@organisms";
 import { checkIsWalletConnected } from "@utils";
 
-export function RegisterAsdRep() {
+export const RegisterAsdRep = () => {
   const [step, setStep] = useState<number>(1);
   const { isMobile } = useScreenDimension();
   const navigate = useNavigate();
@@ -82,4 +82,4 @@ export function RegisterAsdRep() {
       </Box>
     </Background>
   );
-}
+};

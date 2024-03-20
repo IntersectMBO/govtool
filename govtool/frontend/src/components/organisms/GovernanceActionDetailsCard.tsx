@@ -21,7 +21,7 @@ type GovernanceActionDetailsCardProps = {
   voteFromEP?: string;
 };
 
-export function GovernanceActionDetailsCard({
+export const GovernanceActionDetailsCard = ({
   abstainVotes,
   createdDate,
   details,
@@ -33,7 +33,7 @@ export function GovernanceActionDetailsCard({
   isDRep,
   voteFromEP,
   shortenedGovActionId,
-}: GovernanceActionDetailsCardProps) {
+}: GovernanceActionDetailsCardProps) => {
   const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { t } = useTranslation();
@@ -236,4 +236,4 @@ export function GovernanceActionDetailsCard({
       </Box>
     </Box>
   );
-}
+};

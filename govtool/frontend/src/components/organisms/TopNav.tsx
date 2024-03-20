@@ -17,7 +17,7 @@ import { DrawerMobile } from "./DrawerMobile";
 
 const POSITION_TO_BLUR = 50;
 
-export function TopNav({ isConnectButton = true }) {
+export const TopNav = ({ isConnectButton = true }) => {
   const [windowScroll, setWindowScroll] = useState<number>(0);
   const { openModal } = useModal();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
@@ -174,4 +174,4 @@ export function TopNav({ isConnectButton = true }) {
       </AppBar>
     </Box>
   );
-}
+};

@@ -1,15 +1,15 @@
-import { Button, CircularProgress } from "@mui/material";
+import { Button, CircularProgress } from '@mui/material';
 
-import { LoadingButtonProps } from "./types";
+import { LoadingButtonProps } from './types';
 
-export function LoadingButton({
+export const LoadingButton = ({
   isLoading,
   disabled,
   children,
-  size = "large",
+  size = 'large',
   sx,
   ...rest
-}: LoadingButtonProps) {
+}: LoadingButtonProps) => {
   const buttonHeight = {
     extraLarge: 48,
     large: 40,
@@ -24,9 +24,9 @@ export function LoadingButton({
       {...rest}
     >
       {isLoading && (
-        <CircularProgress size={26} sx={{ position: "absolute" }} />
+        <CircularProgress size={26} sx={{ position: 'absolute' }} />
       )}
       {children}
     </Button>
   );
-}
+};

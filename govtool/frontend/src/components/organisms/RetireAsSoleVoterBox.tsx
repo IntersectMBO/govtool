@@ -7,7 +7,7 @@ import { CenteredBoxBottomButtons } from "@molecules";
 import { useCardano, useModal } from "@context";
 import { RetireAsSoleVoterBoxContent } from "@organisms";
 
-export function RetireAsSoleVoterBox() {
+export const RetireAsSoleVoterBox = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -84,4 +84,4 @@ export function RetireAsSoleVoterBox() {
       />
     </>
   );
-}
+};

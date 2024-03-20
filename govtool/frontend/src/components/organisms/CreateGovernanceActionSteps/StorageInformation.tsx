@@ -13,7 +13,7 @@ type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
 };
 
-export function StorageInformation({ setStep }: StorageInformationProps) {
+export const StorageInformation = ({ setStep }: StorageInformationProps) => {
   const { t } = useTranslation();
   const {
     control,
@@ -125,4 +125,4 @@ export function StorageInformation({ setStep }: StorageInformationProps) {
       </Box>
     </BgCard>
   );
-}
+};

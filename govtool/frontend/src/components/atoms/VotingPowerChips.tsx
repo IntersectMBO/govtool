@@ -1,20 +1,22 @@
-import { Box, CircularProgress } from "@mui/material";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import { Box, CircularProgress } from '@mui/material';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
-import { Typography, Tooltip } from "@atoms";
-import { useCardano } from "@context";
+import { Typography, Tooltip } from '@atoms';
+import { useCardano } from '@context';
 import {
   useGetAdaHolderVotingPowerQuery,
   useGetDRepVotingPowerQuery,
   useScreenDimension,
   useTranslation,
-} from "@hooks";
-import { correctAdaFormat } from "@utils";
+} from '@hooks';
+import { correctAdaFormat } from '@utils';
 
-export function VotingPowerChips() {
+export const VotingPowerChips = () => {
   const { voter, stakeKey, isDrepLoading } = useCardano();
-  const { dRepVotingPower, isDRepVotingPowerLoading } = useGetDRepVotingPowerQuery();
-  const { votingPower, powerIsLoading } = useGetAdaHolderVotingPowerQuery(stakeKey);
+  const { dRepVotingPower, isDRepVotingPowerLoading } =
+    useGetDRepVotingPowerQuery();
+  const { votingPower, powerIsLoading } =
+    useGetAdaHolderVotingPowerQuery(stakeKey);
   const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
 
@@ -32,16 +34,16 @@ export function VotingPowerChips() {
     >
       {voter?.isRegisteredAsDRep && (
         <Tooltip
-          heading={t("tooltips.votingPower.heading")}
-          paragraphOne={t("tooltips.votingPower.paragraphOne")}
-          paragraphTwo={t("tooltips.votingPower.paragraphTwo")}
+          heading={t('tooltips.votingPower.heading')}
+          paragraphOne={t('tooltips.votingPower.paragraphOne')}
+          paragraphTwo={t('tooltips.votingPower.paragraphTwo')}
           placement="bottom-end"
           arrow
         >
           <InfoOutlinedIcon
             style={{
-              color: "#ADAEAD",
-              marginRight: "12px",
+              color: '#ADAEAD',
+              marginRight: '12px',
             }}
             fontSize="small"
           />
@@ -49,22 +51,22 @@ export function VotingPowerChips() {
       )}
       {screenWidth >= 1024 && (
         <Typography color="#A5A6A5" sx={{ mr: 1.5 }} variant="body2">
-          {t("votingPower")}
+          {t('votingPower')}
         </Typography>
       )}
-      {(voter?.isRegisteredAsDRep && isDRepVotingPowerLoading)
-      || (!voter?.isRegisteredAsDRep && powerIsLoading)
-      || isDrepLoading ? (
+      {(voter?.isRegisteredAsDRep && isDRepVotingPowerLoading) ||
+      (!voter?.isRegisteredAsDRep && powerIsLoading) ||
+      isDrepLoading ? (
         <CircularProgress size={20} color="primary" />
         ) : (
           <Typography
             color="white"
             fontSize={18}
             fontWeight={600}
-            sx={{ whiteSpace: "nowrap" }}
+            sx={{ whiteSpace: 'nowrap' }}
           >
             ₳
-            {" "}
+            {' '}
             {voter?.isRegisteredAsDRep
               ? correctAdaFormat(dRepVotingPower) ?? 0
               : correctAdaFormat(votingPower) ?? 0}
@@ -72,4 +74,4 @@ export function VotingPowerChips() {
         )}
     </Box>
   );
-}
+};

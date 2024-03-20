@@ -10,7 +10,7 @@ import { useTranslation } from "@hooks";
 import { WalletInfoCard, DRepInfoCard } from "@molecules";
 import { openInNewTab } from "@utils";
 
-export function Drawer() {
+export const Drawer = () => {
   const { voter } = useCardano();
   const { t } = useTranslation();
 
@@ -82,4 +82,4 @@ export function Drawer() {
       </Box>
     </Box>
   );
-}
+};

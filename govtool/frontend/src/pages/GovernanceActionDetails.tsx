@@ -27,7 +27,7 @@ import {
   getShortenedGovActionId,
 } from "@utils";
 
-export function GovernanceActionDetails() {
+export const GovernanceActionDetails = () => {
   const { state, hash } = useLocation();
   const navigate = useNavigate();
   const { pagePadding, screenWidth } = useScreenDimension();
@@ -184,4 +184,4 @@ export function GovernanceActionDetails() {
       </Box>
     </Background>
   );
-}
+};

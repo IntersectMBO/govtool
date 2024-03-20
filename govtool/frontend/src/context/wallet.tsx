@@ -193,7 +193,7 @@ const NETWORK = import.meta.env.VITE_NETWORK_FLAG;
 const CardanoContext = createContext<CardanoContext>({} as CardanoContext);
 CardanoContext.displayName = "CardanoContext";
 
-function CardanoProvider(props: Props) {
+const CardanoProvider = (props: Props) => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [isEnableLoading, setIsEnableLoading] = useState<string | null>(null);
   const [voter, setVoter] = useState<VoterInfo | undefined>(undefined);
@@ -1445,7 +1445,7 @@ function CardanoProvider(props: Props) {
   );
 
   return <CardanoContext.Provider value={value} {...props} />;
-}
+};
 
 function useCardano() {
   const context = useContext(CardanoContext);

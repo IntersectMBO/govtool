@@ -16,7 +16,7 @@ import { ControlledField, DashboardTopNav, Footer } from "@organisms";
 import { checkIsWalletConnected, openInNewTab } from "@utils";
 import { theme } from "@/theme";
 
-export function UpdatedRepMetadata() {
+export const UpdatedRepMetadata = () => {
   const navigate = useNavigate();
   const {
     palette: { boxShadow2 },
@@ -152,4 +152,4 @@ export function UpdatedRepMetadata() {
       </Box>
     </Background>
   );
-}
+};

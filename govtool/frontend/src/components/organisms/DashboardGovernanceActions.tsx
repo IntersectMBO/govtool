@@ -18,7 +18,7 @@ interface TabPanelProps {
   value: number;
 }
 
-function CustomTabPanel(props: TabPanelProps) {
+const CustomTabPanel = (props: TabPanelProps) => {
   const { children, value, index } = props;
 
   return (
@@ -36,7 +36,7 @@ function CustomTabPanel(props: TabPanelProps) {
       {value === index && <Box pb={3}>{children}</Box>}
     </div>
   );
-}
+};
 
 type StyledTabProps = {
   label: string;
@@ -55,7 +55,7 @@ const StyledTab = styled((props: StyledTabProps) => (
   },
 }));
 
-export function DashboardGovernanceActions() {
+export const DashboardGovernanceActions = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [chosenFilters, setChosenFilters] = useState<string[]>([]);
@@ -174,4 +174,4 @@ export function DashboardGovernanceActions() {
       )}
     </Box>
   );
-}
+};

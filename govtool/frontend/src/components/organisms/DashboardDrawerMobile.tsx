@@ -15,10 +15,10 @@ const DRAWER_PADDING = 2;
 // 8 is number of multiple in Material UI 2 is left and right side
 const CALCULATED_DRAWER_PADDING = DRAWER_PADDING * 8 * 2;
 
-export function DashboardDrawerMobile({
+export const DashboardDrawerMobile = ({
   isDrawerOpen,
   setIsDrawerOpen,
-}: DashboardDrawerMobileProps) {
+}: DashboardDrawerMobileProps) => {
   const { screenWidth } = useScreenDimension();
   const { voter } = useCardano();
 
@@ -92,4 +92,4 @@ export function DashboardDrawerMobile({
       </Background>
     </SwipeableDrawer>
   );
-}
+};

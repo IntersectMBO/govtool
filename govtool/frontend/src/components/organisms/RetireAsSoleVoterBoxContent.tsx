@@ -6,7 +6,7 @@ import { useScreenDimension, useTranslation } from "@hooks";
 import { correctAdaFormat, openInNewTab } from "@/utils";
 import { useCardano } from "@/context";
 
-export function RetireAsSoleVoterBoxContent() {
+export const RetireAsSoleVoterBoxContent = () => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
   const { voter } = useCardano();
@@ -41,4 +41,4 @@ export function RetireAsSoleVoterBoxContent() {
       </Typography>
     </>
   );
-}
+};

@@ -11,7 +11,7 @@ import { setItemToLocalStorage, WALLET_LS_KEY } from "@utils";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { theme } from "@/theme";
 
-export function ChooseStakeKeyPanel() {
+export const ChooseStakeKeyPanel = () => {
   const { disconnectWallet, stakeKeys, setStakeKey } = useCardano();
   const navigate = useNavigate();
   const { addSuccessAlert } = useSnackbar();
@@ -120,4 +120,4 @@ export function ChooseStakeKeyPanel() {
       </Box>
     </Box>
   );
-}
+};

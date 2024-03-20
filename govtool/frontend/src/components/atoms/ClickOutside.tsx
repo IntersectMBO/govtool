@@ -1,15 +1,15 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect } from 'react';
 
 const useOutsideClick = (ref: any, onClick: () => void) => {
   useEffect(() => {
-    document.addEventListener("mousedown", (e) => {
+    document.addEventListener('mousedown', (e) => {
       if (ref.current && !ref.current.contains(e.target)) {
         onClick();
       }
     });
 
     return () => {
-      document.removeEventListener("mousedown", (e) => {
+      document.removeEventListener('mousedown', (e) => {
         if (ref.current && !ref.current.contains(e.target)) {
           onClick();
         }
@@ -23,8 +23,8 @@ interface Props {
   onClick: () => void;
 }
 
-export function ClickOutside({ children, onClick }: Props) {
+export const ClickOutside = ({ children, onClick }: Props) => {
   const wrapperRef = useRef(null);
   useOutsideClick(wrapperRef, onClick);
   return <div ref={wrapperRef}>{children}</div>;
-}
+};

@@ -12,10 +12,8 @@ interface Props {
   handleClose?: () => void;
 }
 
-export function Modal({ open, children, handleClose }: Props) {
-  return (
-    <MuiModal open={open} onClose={handleClose} disableAutoFocus>
-      <>{children}</>
-    </MuiModal>
-  );
-}
+export const Modal = ({ open, children, handleClose }: Props) => (
+  <MuiModal open={open} onClose={handleClose} disableAutoFocus>
+    <>{children}</>
+  </MuiModal>
+);

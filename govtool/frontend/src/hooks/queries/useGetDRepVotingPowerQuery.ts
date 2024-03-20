@@ -1,8 +1,8 @@
-import { useQuery } from "react-query";
+import { useQuery } from 'react-query';
 
-import { QUERY_KEYS } from "@consts";
-import { useCardano } from "@context";
-import { getDRepVotingPower } from "@services";
+import { QUERY_KEYS } from '@consts';
+import { useCardano } from '@context';
+import { getDRepVotingPower } from '@services';
 
 export const useGetDRepVotingPowerQuery = () => {
   const { dRepID, voter } = useCardano();
@@ -16,8 +16,8 @@ export const useGetDRepVotingPowerQuery = () => {
     ],
     queryFn: async () => await getDRepVotingPower({ dRepID }),
     enabled:
-      !!dRepID
-      && (!!voter?.isRegisteredAsDRep || !!voter?.isRegisteredAsSoleVoter),
+      !!dRepID &&
+      (!!voter?.isRegisteredAsDRep || !!voter?.isRegisteredAsSoleVoter),
   });
 
   return { dRepVotingPower: data, isDRepVotingPowerLoading: isLoading };

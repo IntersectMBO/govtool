@@ -1,17 +1,17 @@
-import { useCallback } from "react";
-import { Controller, get } from "react-hook-form";
+import { useCallback } from 'react';
+import { Controller, get } from 'react-hook-form';
 
-import { Field } from "@molecules";
+import { Field } from '@molecules';
 
-import { ControlledCheckboxProps, RenderInputProps } from "./types";
+import { ControlledCheckboxProps, RenderInputProps } from './types';
 
-export function Checkbox({
+export const Checkbox = ({
   control,
   name,
   errors,
   rules,
   ...props
-}: ControlledCheckboxProps) {
+}: ControlledCheckboxProps) => {
   const errorMessage = get(errors, name)?.message as string;
 
   const renderInput = useCallback(
@@ -36,4 +36,4 @@ export function Checkbox({
       render={renderInput}
     />
   );
-}
+};

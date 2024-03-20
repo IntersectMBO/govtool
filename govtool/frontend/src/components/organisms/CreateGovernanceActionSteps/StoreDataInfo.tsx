@@ -14,7 +14,7 @@ type StoreDataInfoProps = {
   setStep: Dispatch<SetStateAction<number>>;
 };
 
-export function StoreDataInfo({ setStep }: StoreDataInfoProps) {
+export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
   const { t } = useTranslation();
   const { control, errors, watch } = useCreateGovernanceActionForm();
   const { isMobile } = useScreenDimension();
@@ -67,4 +67,4 @@ export function StoreDataInfo({ setStep }: StoreDataInfoProps) {
       <Box display="flex" flex={1} />
     </BgCard>
   );
-}
+};

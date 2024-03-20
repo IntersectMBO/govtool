@@ -22,7 +22,7 @@ interface DelegateProps {
   setStep: (newStep: number) => void;
 }
 
-export function DelegateTodRepStepOne({ setStep }: DelegateProps) {
+export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
   const navigate = useNavigate();
   const {
     voter,
@@ -317,4 +317,4 @@ export function DelegateTodRepStepOne({ setStep }: DelegateProps) {
       </Box>
     </Box>
   );
-}
+};

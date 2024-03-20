@@ -11,11 +11,11 @@ import { openInNewTab } from "@utils";
 
 import { BgCard, ControlledField } from ".";
 
-export function RegisterAsdRepStepThree({
+export const RegisterAsdRepStepThree = ({
   setStep,
 }: {
   setStep: Dispatch<SetStateAction<number>>;
-}) {
+}) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
   const {
@@ -71,4 +71,4 @@ export function RegisterAsdRepStepThree({
       <Box display="flex" flex={1} />
     </BgCard>
   );
-}
+};

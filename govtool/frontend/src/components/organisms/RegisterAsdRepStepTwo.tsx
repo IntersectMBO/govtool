@@ -15,7 +15,7 @@ interface Props {
   setStep: Dispatch<SetStateAction<number>>;
 }
 
-export function RegisterAsdRepStepTwo({ setStep }: Props) {
+export const RegisterAsdRepStepTwo = ({ setStep }: Props) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
   const {
@@ -82,4 +82,4 @@ export function RegisterAsdRepStepTwo({ setStep }: Props) {
       </Box>
     </BgCard>
   );
-}
+};

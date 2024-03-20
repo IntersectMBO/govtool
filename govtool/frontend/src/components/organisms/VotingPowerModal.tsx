@@ -15,7 +15,7 @@ export interface VotingPowerModalState {
   vote?: string;
 }
 
-export function VotingPowerModal() {
+export const VotingPowerModal = () => {
   const { state } = useModal<VotingPowerModalState>();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -98,4 +98,4 @@ export function VotingPowerModal() {
       </ModalContents>
     </ModalWrapper>
   );
-}
+};

@@ -14,7 +14,7 @@ import {
 import { DashboardActionCard } from "@molecules";
 import { correctAdaFormat, formHexToBech32, openInNewTab } from "@utils";
 
-export function DashboardCards() {
+export const DashboardCards = () => {
   const {
     buildDRepRetirementCert,
     buildSignSubmitConwayCertTx,
@@ -542,4 +542,4 @@ export function DashboardCards() {
       {/* GOV ACTIONS LIST CARD END */}
     </Box>
   );
-}
+};

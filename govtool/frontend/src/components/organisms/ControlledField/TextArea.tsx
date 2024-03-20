@@ -1,17 +1,17 @@
-import { useCallback } from "react";
-import { Controller, get } from "react-hook-form";
+import { useCallback } from 'react';
+import { Controller, get } from 'react-hook-form';
 
-import { Field } from "@molecules";
+import { Field } from '@molecules';
 
-import { ControlledTextAreaProps, RenderInputProps } from "./types";
+import { ControlledTextAreaProps, RenderInputProps } from './types';
 
-export function TextArea({
+export const TextArea = ({
   control,
   name,
   errors,
   rules,
   ...props
-}: ControlledTextAreaProps) {
+}: ControlledTextAreaProps) => {
   const errorMessage = get(errors, name)?.message as string;
 
   const renderInput = useCallback(
@@ -29,4 +29,4 @@ export function TextArea({
       render={renderInput}
     />
   );
-}
+};

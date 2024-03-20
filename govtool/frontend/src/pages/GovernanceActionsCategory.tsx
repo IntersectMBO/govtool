@@ -30,7 +30,7 @@ import {
   removeDuplicatedProposals,
 } from "@utils";
 
-export function GovernanceActionsCategory() {
+export const GovernanceActionsCategory = () => {
   const { category } = useParams();
   const [searchText, setSearchText] = useState<string>("");
   const [sortOpen, setSortOpen] = useState(false);
@@ -258,4 +258,4 @@ export function GovernanceActionsCategory() {
       </Box>
     </Background>
   );
-}
+};

@@ -24,7 +24,7 @@ import {
 } from "@organisms";
 import { checkIsWalletConnected } from "@utils";
 
-export function CreateGovernanceAction() {
+export const CreateGovernanceAction = () => {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -91,4 +91,4 @@ export function CreateGovernanceAction() {
       </Box>
     </Background>
   );
-}
+};

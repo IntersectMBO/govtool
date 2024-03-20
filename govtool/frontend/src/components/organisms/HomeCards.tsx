@@ -8,7 +8,7 @@ import { ActionCard } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
-export function HomeCards() {
+export const HomeCards = () => {
   const navigate = useNavigate();
   const { openModal } = useModal();
   const { screenWidth } = useScreenDimension();
@@ -147,4 +147,4 @@ export function HomeCards() {
       {/* PROPOSE GOV ACTION CARD  END */}
     </Box>
   );
-}
+};

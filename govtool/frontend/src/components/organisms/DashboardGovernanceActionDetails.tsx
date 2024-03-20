@@ -27,7 +27,7 @@ import {
   getProposalTypeLabel,
 } from "@utils";
 
-export function DashboardGovernanceActionDetails() {
+export const DashboardGovernanceActionDetails = () => {
   const { voter } = useCardano();
   const { state, hash } = useLocation();
   const navigate = useNavigate();
@@ -164,4 +164,4 @@ export function DashboardGovernanceActionDetails() {
       </Box>
     </Box>
   );
-}
+};

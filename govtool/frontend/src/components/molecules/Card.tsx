@@ -14,14 +14,14 @@ type CardProps = PropsWithChildren & {
   variant?: "default" | "error" | "primary" | "success" | "warning";
 };
 
-export function Card({
+export const Card = ({
   variant = "default",
   border = variant !== "default",
   children,
   elevation = 4,
   label,
   sx,
-}: CardProps) {
+}: CardProps) => {
   const colors = COLORS[variant];
 
   return (
@@ -50,7 +50,7 @@ export function Card({
       {children}
     </Paper>
   );
-}
+};
 
 const COLORS = {
   default: {

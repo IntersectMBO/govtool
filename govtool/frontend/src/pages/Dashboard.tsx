@@ -9,7 +9,7 @@ import { useScreenDimension, useTranslation } from "@hooks";
 import { DashboardTopNav, Drawer, Footer } from "@organisms";
 import { checkIsWalletConnected } from "@utils";
 
-export function Dashboard() {
+export const Dashboard = () => {
   const { isEnabled, stakeKey } = useCardano();
   const { isMobile } = useScreenDimension();
   const { pathname, hash } = useLocation();
@@ -67,4 +67,4 @@ export function Dashboard() {
       </Box>
     </Background>
   );
-}
+};

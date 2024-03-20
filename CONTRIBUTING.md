@@ -167,6 +167,7 @@ Try to keep branches up-to-date with main (not strict requirement though).
 Once merged to main, please delete the branch.
 
 **Tip:** Use Github's merge button in PRs to merge with commit.
+This strategy helps us operate on the commits you've delivered: it's easier to [cherry-pick a merge commit](https://git-scm.com/docs/git-cherry-pick#Documentation/git-cherry-pick.txt--mltparent-numbergt) than a series of commits, and it's also easier to [revert changes using a merge commit](https://git-scm.com/docs/git-revert#Documentation/git-revert.txt--mparent-number) instead of a series of reverts.
 If a branch is outdated, use the rebase button in PRs to rebase feature branches (NOT update via merge).
 
 #### Rationale
@@ -229,19 +230,21 @@ TODO
 - Choose ticket/issue to work on from the project, move ticket from `todo` to `in progress`.
 - Create [well named](#branch-naming) branch from `develop` add changes, then make a pull request back to the `develop` branch.
 - If the changes are not ready for review then feel free to create a draft PR, and link this to the ticket/issue.
+- When the PR is ready for review move the ticket from `in progress` to `in review`. Remember to change the state of the PR from draft to actual PR.
 - Developers should review each other's pull requests, and should be requested via [CODEOWNERS](./CODEOWNERS).
 - Unit tests are run on each pull request to `develop`.
-- Once tests pass and peer review is done the branch can be merged into `develop` by author and then deployed to the dev environment (manually for now).
-- The ticket status can then be moved ticket to `in QA` making sure that the PR/branch has been added to the ticket/issue as a comment.
+- After a review remember to address all the requests of changes since they are blocking PR from being merged.
+- Once tests pass and peer review is done the branch can be merged into `develop` by author and then deployed to the dev environment (manually).
+- The ticket status can then be moved to `in QA` making sure that the PR/branch has been added to the ticket/issue as a comment.
 
 ### QA Workflow
 
 - Choose ticket from `in QA`.
 - Merge in the ticket's changes from `develop` branch into `test` branch.
-- Deploy to test environment (manually for now).
+- Deploy to test environment is performed automatically once the ticket is merged to the `test` branch.
 - The QA tests the deployed test environment against the ticket.
 - If QA agrees that the code is good, they can make a PR from `test` branch to `staging` branch where end-to-end and performance tests are run.
-- If tests pass, then QA or tech lead can merge and deploy to staging environment (manually for now).
+- If tests pass, then QA or tech lead can merge and deploy to staging environment (automatically).
 - Moving ticket to `staging` status this ready for PO check.
   
 ### PO Workflow

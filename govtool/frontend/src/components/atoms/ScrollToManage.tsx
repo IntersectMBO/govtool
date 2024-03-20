@@ -1,10 +1,10 @@
-import { PATHS } from "@/consts";
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { PATHS } from '@/consts';
 
 export function debounce(
   fn: (...params: any) => void,
-  wait: number
+  wait: number,
 ): (...params: any) => void {
   let timer: any = null;
   return function (...params: any) {
@@ -44,8 +44,8 @@ export const ScrollToManage = () => {
       }
     }, 200);
 
-    window.addEventListener("scroll", fn);
-    return () => window.removeEventListener("scroll", fn);
+    window.addEventListener('scroll', fn);
+    return () => window.removeEventListener('scroll', fn);
   }, [pathname]);
 
   return <></>;

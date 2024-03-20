@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
+import {
+  screen, userEvent, waitFor, within,
+} from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
 
 import { ActionRadio } from "@atoms";
@@ -36,14 +38,14 @@ export const ActionRadioComponent: Story = {
     expect(canvas.getByText("Example subtitle")).toBeInTheDocument();
     await expect(canvas.getByTestId("radio")).toHaveAttribute(
       "aria-checked",
-      "false"
+      "false",
     );
     await userEvent.hover(canvas.getByTestId("InfoOutlinedIcon"));
     await waitFor(() => {
       expect(screen.getByRole("tooltip")).toBeInTheDocument();
       expect(screen.getByRole("tooltip")).toHaveTextContent("Tooltip title");
       expect(screen.getByRole("tooltip")).toHaveTextContent(
-        "Example tooltip text"
+        "Example tooltip text",
       );
     });
     await userEvent.click(canvas.getByTestId("radio"));
@@ -64,7 +66,7 @@ export const ActionRadioActive: Story = {
     const canvas = within(canvasElement);
     await expect(canvas.getByTestId("radio")).toHaveAttribute(
       "aria-checked",
-      "true"
+      "true",
     );
   },
 };

@@ -32,7 +32,7 @@ export const RegisterAsSoleVoterBox = () => {
         type: "soleVoterRegistration",
         registrationType: "registration",
       });
-      if (result)
+      if (result) {
         openModal({
           type: "statusModal",
           state: {
@@ -48,6 +48,7 @@ export const RegisterAsSoleVoterBox = () => {
             dataTestId: "registration-transaction-submitted-modal",
           },
         });
+      }
     } catch (e: any) {
       const errorMessage = e.info ? e.info : e;
 

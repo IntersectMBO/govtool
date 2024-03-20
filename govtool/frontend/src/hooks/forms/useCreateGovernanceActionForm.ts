@@ -1,8 +1,6 @@
 import {
-  GovernanceActionFieldSchemas,
-  GovernanceActionType,
-} from "@/types/governanceAction";
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
+  Dispatch, SetStateAction, useCallback, useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormContext } from "react-hook-form";
 import * as blake from "blakejs";
@@ -18,6 +16,10 @@ import {
   storageInformationErrorModals,
 } from "@consts";
 import {
+  GovernanceActionFieldSchemas,
+  GovernanceActionType,
+} from "@/types/governanceAction";
+import {
   canonizeJSON,
   downloadJson,
   generateJsonld,
@@ -32,15 +34,14 @@ export type CreateGovernanceActionValues = {
   governance_action_type?: GovernanceActionType;
 } & Partial<Record<keyof GovernanceActionFieldSchemas, string>>;
 
-export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues =
-  {
-    links: [{ link: "" }],
-    storeData: false,
-    storingURL: "",
-  };
+export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues = {
+  links: [{ link: "" }],
+  storeData: false,
+  storingURL: "",
+};
 
 export const useCreateGovernanceActionForm = (
-  setStep?: Dispatch<SetStateAction<number>>
+  setStep?: Dispatch<SetStateAction<number>>,
 ) => {
   const {
     buildNewInfoGovernanceAction,
@@ -74,28 +75,22 @@ export const useCreateGovernanceActionForm = (
     closeModal();
   }, []);
 
-  // TODO: To be moved to utils
   const generateMetadata = async (data: CreateGovernanceActionValues) => {
-    if (!govActionType)
-      throw new Error("Governance action type is not defined");
+    if (!govActionType) throw new Error("Governance action type is not defined");
 
     const acceptedKeys = ["title", "motivation", "abstract", "rationale"];
 
     const filteredData = Object.entries(data)
       .filter(([key]) => acceptedKeys.includes(key))
-      .map(([key, value]) => {
-        return [CIP_108 + key, value];
-      });
+      .map(([key, value]) => [CIP_108 + key, value]);
 
     const references = (data as CreateGovernanceActionValues).links
       ?.filter((link) => link.link)
-      .map((link) => {
-        return {
-          [`@type`]: "Other",
-          [`${CIP_100}reference-label`]: "Label",
-          [`${CIP_100}reference-uri`]: link.link,
-        };
-      });
+      .map((link) => ({
+        "@type": "Other",
+        [`${CIP_100}reference-label`]: "Label",
+        [`${CIP_100}reference-uri`]: link.link,
+      }));
 
     const body = {
       ...Object.fromEntries(filteredData),
@@ -146,7 +141,7 @@ export const useCreateGovernanceActionForm = (
         throw error;
       }
     },
-    [hash, backToForm]
+    [hash, backToForm],
   );
 
   const buildTransaction = useCallback(
@@ -163,8 +158,8 @@ export const useCreateGovernanceActionForm = (
             return await buildNewInfoGovernanceAction(commonGovActionDetails);
           case GovernanceActionType.Treasury:
             if (
-              data.amount === undefined ||
-              data.receivingAddress === undefined
+              data.amount === undefined
+              || data.receivingAddress === undefined
             ) {
               throw new Error(t("errors.invalidTreasuryGovernanceActionType"));
             }
@@ -184,7 +179,7 @@ export const useCreateGovernanceActionForm = (
         throw error;
       }
     },
-    [hash]
+    [hash],
   );
 
   const showSuccessModal = useCallback(() => {
@@ -193,10 +188,10 @@ export const useCreateGovernanceActionForm = (
       state: {
         status: "success",
         title: t(
-          "createGovernanceAction.modals.submitTransactionSuccess.title"
+          "createGovernanceAction.modals.submitTransactionSuccess.title",
         ),
         message: t(
-          "createGovernanceAction.modals.submitTransactionSuccess.message"
+          "createGovernanceAction.modals.submitTransactionSuccess.message",
         ),
         buttonText: t("modals.common.goToDashboard"),
         dataTestId: "governance-action-submitted-modal",
@@ -211,10 +206,8 @@ export const useCreateGovernanceActionForm = (
         setIsLoading(true);
 
         await validateHash(data.storingURL, hash);
-        const votingProposalBuilder = await buildTransaction(data);
-        await buildSignSubmitConwayCertTx({
-          govActionBuilder: votingProposalBuilder,
-        });
+        const govActionBuilder = await buildTransaction(data);
+        await buildSignSubmitConwayCertTx({ govActionBuilder });
 
         showSuccessModal();
       } catch (error: any) {
@@ -224,7 +217,7 @@ export const useCreateGovernanceActionForm = (
         setIsLoading(false);
       }
     },
-    [hash]
+    [hash],
   );
 
   return {

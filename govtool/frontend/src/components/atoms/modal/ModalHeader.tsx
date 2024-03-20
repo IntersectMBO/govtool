@@ -6,16 +6,14 @@ interface Props {
   sx?: SxProps;
 }
 
-export function ModalHeader({ children, sx }: Props) {
-  return (
-    <Typography
-      marginBottom="8px"
-      fontSize="28px"
-      fontWeight="500"
-      textAlign="center"
-      sx={sx}
-    >
-      {children}
-    </Typography>
-  );
-}
+export const ModalHeader = ({ children, sx }: Props) => (
+  <Typography
+    marginBottom="8px"
+    fontSize="28px"
+    fontWeight="500"
+    textAlign="center"
+    sx={sx}
+  >
+    {children}
+  </Typography>
+);

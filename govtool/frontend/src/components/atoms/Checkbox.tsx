@@ -1,7 +1,7 @@
-import { useId } from "react";
-import { Checkbox as MUICheckbox } from "@mui/material";
+import { useId } from 'react';
+import { Checkbox as MUICheckbox } from '@mui/material';
 
-import { CheckboxProps } from "./types";
+import { CheckboxProps } from './types';
 
 export const Checkbox = ({
   dataTestId,
@@ -16,12 +16,12 @@ export const Checkbox = ({
       id={id}
       inputProps={
         {
-          "data-testid": dataTestId,
+          'data-testid': dataTestId,
         } as React.InputHTMLAttributes<HTMLInputElement>
       }
       sx={{
-        "& .MuiSvgIcon-root": { fontSize: 18 },
-        color: errorMessage ? "red" : "#0033AD",
+        '& .MuiSvgIcon-root': { fontSize: 18 },
+        color: errorMessage ? 'red' : '#0033AD',
         ...sx,
       }}
       {...props}

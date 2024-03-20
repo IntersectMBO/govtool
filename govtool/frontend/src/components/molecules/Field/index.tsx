@@ -1,8 +1,8 @@
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren } from 'react';
 
-import { Checkbox } from "./Checkbox";
-import { Input } from "./Input";
-import { TextArea } from "./TextArea";
+import { Checkbox } from './Checkbox';
+import { Input } from './Input';
+import { TextArea } from './TextArea';
 
 type FieldComposition = React.FC<PropsWithChildren> & {
   Input: typeof Input;
@@ -10,9 +10,7 @@ type FieldComposition = React.FC<PropsWithChildren> & {
   TextArea: typeof TextArea;
 };
 
-const Field: FieldComposition = ({ children }) => {
-  return <React.Fragment>{children}</React.Fragment>;
-};
+const Field: FieldComposition = ({ children }) => children;
 
 Field.Checkbox = Checkbox;
 Field.Input = Input;
@@ -20,4 +18,4 @@ Field.TextArea = TextArea;
 
 export { Field };
 
-export * from "./types";
+export * from './types';

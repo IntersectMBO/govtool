@@ -1,8 +1,8 @@
-export const GOVERNANCE_ACTION_KEY = "create_governance_action"
+export const GOVERNANCE_ACTION_KEY = "create_governance_action";
 export const DELEGATE_TO_KEY = "delegate_to_transaction";
 export const DELEGATE_TRANSACTION_KEY = "delegate_transaction";
 export const PROTOCOL_PARAMS_KEY = "protocol_params";
-export const REGISTER_SOLE_VOTER_TRANSACTION_KEY ="register_sole_voter_transaction";
+export const REGISTER_SOLE_VOTER_TRANSACTION_KEY = "register_sole_voter_transaction";
 export const REGISTER_TRANSACTION_KEY = "register_transaction";
 export const SANCHO_INFO_KEY = "sancho_info";
 export const VOTE_TRANSACTION_KEY = "vote_transaction";

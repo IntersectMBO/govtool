@@ -2,12 +2,12 @@ import { Dispatch, FC, SetStateAction } from "react";
 import { Box, IconButton, Typography } from "@mui/material";
 
 import { ICONS } from "@consts";
-import { theme } from "@/theme";
 import {
   useGetAdaHolderVotingPowerQuery,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
+import { theme } from "@/theme";
 import { correctAdaFormat } from "@/utils/adaFormat";
 
 type StakeRadioProps = {
@@ -18,32 +18,33 @@ type StakeRadioProps = {
 };
 
 export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
-  const { dataTestId, isChecked = false, stakeKey, onChange } = props;
+  const {
+    dataTestId, isChecked = false, stakeKey, onChange,
+  } = props;
   const {
     palette: { boxShadow1 },
   } = theme;
   const { isMobile } = useScreenDimension();
-  const { powerIsLoading, votingPower } =
-    useGetAdaHolderVotingPowerQuery(stakeKey);
+  const { powerIsLoading, votingPower } = useGetAdaHolderVotingPowerQuery(stakeKey);
   const { t } = useTranslation();
 
   return (
     <Box
       data-testid={dataTestId}
       border={isChecked ? 2 : 1}
-      p={"2px"}
-      bgcolor={"white"}
+      p="2px"
+      bgcolor="white"
       borderColor={isChecked ? "specialCyanBorder" : "#D6E2FF"}
-      borderRadius={"15px"}
+      borderRadius="15px"
       boxShadow={`1px 2px 11px 0px ${boxShadow1}`}
       onClick={() => onChange(stakeKey)}
       sx={[{ "&:hover": { cursor: "pointer" } }]}
     >
       <Box
-        px={"18px"}
-        py={"14px"}
+        px="18px"
+        py="14px"
         bgcolor={isChecked ? "specialCyan" : "white"}
-        borderRadius={"12px"}
+        borderRadius="12px"
       >
         <Box alignItems="center" display="flex" justifyContent="space-between">
           <Typography
@@ -82,7 +83,9 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
               fontWeight={600}
               marginLeft="4px"
             >
-              ₳ {correctAdaFormat(votingPower) ?? 0}
+              ₳
+              {" "}
+              {correctAdaFormat(votingPower) ?? 0}
             </Typography>
           )}
         </Box>

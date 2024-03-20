@@ -4,13 +4,13 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 import { Button, Typography, Tooltip } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { theme } from "@/theme";
 import {
   formatDisplayDate,
   getFullGovActionId,
   getProposalTypeLabel,
   getShortenedGovActionId,
 } from "@utils";
+import { theme } from "@/theme";
 
 interface ActionTypeProps
   extends Omit<
@@ -51,7 +51,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
   const govActionId = getFullGovActionId(txHash, index);
   const proposalTypeNoEmptySpaces = getProposalTypeLabel(type).replace(
     / /g,
-    ""
+    "",
   );
 
   return (
@@ -103,7 +103,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           <Typography color="neutralGray" variant="caption">
             {t("govActions.governanceActionType")}
           </Typography>
-          <Box display={"flex"}>
+          <Box display="flex">
             <Box
               mt={1.5}
               px={2.25}
@@ -124,7 +124,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           <Typography color="neutralGray" variant="caption">
             {t("govActions.governanceActionId")}
           </Typography>
-          <Box display={"flex"} mt={0.25}>
+          <Box display="flex" mt={0.25}>
             <Box
               px={2.25}
               py={0.75}
@@ -168,7 +168,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           <Tooltip
             heading={t("tooltips.submissionDate.heading")}
             paragraphOne={t("tooltips.submissionDate.paragraphOne")}
-            placement={"bottom-end"}
+            placement="bottom-end"
             arrow
           >
             <InfoOutlinedIcon
@@ -209,7 +209,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
             heading={t("tooltips.expiryDate.heading")}
             paragraphOne={t("tooltips.expiryDate.paragraphOne")}
             paragraphTwo={t("tooltips.expiryDate.paragraphTwo")}
-            placement={"bottom-end"}
+            placement="bottom-end"
             arrow
           >
             <InfoOutlinedIcon

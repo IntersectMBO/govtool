@@ -5,7 +5,9 @@ import { Box } from "@mui/material";
 import { Background } from "@atoms";
 import { PATHS } from "@consts";
 import { useCardano } from "@context";
-import { TopNav, Hero, Footer, HomeCards } from "@organisms";
+import {
+  TopNav, Hero, Footer, HomeCards,
+} from "@organisms";
 import { WALLET_LS_KEY, getItemFromLocalStorage } from "@utils";
 
 export const Home = () => {

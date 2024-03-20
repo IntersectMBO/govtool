@@ -1,5 +1,5 @@
-import { en } from "@/i18n/locales/en";
 import { RegisterOptions } from "react-hook-form";
+import { en } from "@/i18n/locales/en";
 
 export enum GovernanceActionType {
   Info = "Info",
@@ -31,10 +31,11 @@ export type SharedGovernanceActionFieldSchema = {
 
 export type InfoGovernanceActionFieldSchema = SharedGovernanceActionFieldSchema;
 export type TreasuryGovernanceActionFieldSchema =
-  SharedGovernanceActionFieldSchema & {
-    receivingAddress: FieldSchema;
-    amount: FieldSchema;
-  };
+  SharedGovernanceActionFieldSchema &
+    Partial<{
+      receivingAddress: FieldSchema;
+      amount: FieldSchema;
+    }>;
 
 export type GovernanceActionFieldSchemas =
   | InfoGovernanceActionFieldSchema & TreasuryGovernanceActionFieldSchema;

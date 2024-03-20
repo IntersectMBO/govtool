@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { GovernanceVotedOnCard } from "@molecules";
-import { userEvent, waitFor, within, screen } from "@storybook/testing-library";
+import {
+  userEvent, waitFor, within, screen,
+} from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
 import { formatDisplayDate } from "@/utils";
 
@@ -24,10 +26,10 @@ async function checkGovActionVisibility(canvas: any) {
   expect(canvas.getByText(/vote submitted/i)).toBeInTheDocument();
 
   expect(
-    canvas.getByText(formatDisplayDate("1970-01-01T00:00:00Z"))
+    canvas.getByText(formatDisplayDate("1970-01-01T00:00:00Z")),
   ).toBeInTheDocument();
   expect(
-    canvas.getByText(formatDisplayDate("1970-02-01T00:00:00Z"))
+    canvas.getByText(formatDisplayDate("1970-02-01T00:00:00Z")),
   ).toBeInTheDocument();
 
   const tooltips = canvas.getAllByTestId("InfoOutlinedIcon");
@@ -44,7 +46,7 @@ async function checkGovActionVisibility(canvas: any) {
   });
 
   await expect(
-    canvas.getByTestId("govaction-exampleHash#1-change-your-vote")
+    canvas.getByTestId("govaction-exampleHash#1-change-your-vote"),
   ).toBeInTheDocument();
 }
 

@@ -2,7 +2,9 @@ import { Chip, Paper, SxProps } from "@mui/material";
 import { PropsWithChildren } from "react";
 
 import { Theme } from "@/theme";
-import { errorRed, orange, primaryBlue, successGreen } from "@/consts";
+import {
+  errorRed, orange, primaryBlue, successGreen,
+} from "@/consts";
 
 type CardProps = PropsWithChildren & {
   border?: boolean;
@@ -12,22 +14,21 @@ type CardProps = PropsWithChildren & {
   variant?: "default" | "error" | "primary" | "success" | "warning";
 };
 
-export function Card({
+export const Card = ({
   variant = "default",
   border = variant !== "default",
   children,
   elevation = 4,
   label,
   sx,
-}: CardProps) {
+}: CardProps) => {
   const colors = COLORS[variant];
 
   return (
     <Paper
       elevation={elevation}
       sx={{
-        backgroundColor: (theme) =>
-          colors.backgroundColor ?? `${theme.palette.neutralWhite}4D`,
+        backgroundColor: (theme) => colors.backgroundColor ?? `${theme.palette.neutralWhite}4D`,
         border: border ? 1 : 0,
         borderColor: colors?.borderColor,
         padding: 3,
@@ -49,7 +50,7 @@ export function Card({
       {children}
     </Paper>
   );
-}
+};
 
 const COLORS = {
   default: {

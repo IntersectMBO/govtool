@@ -29,19 +29,19 @@ export const CenteredBoxPageWrapper: FC<PropsWithChildren<Props>> = ({
 
   return (
     <Background isReverted>
-      <Box display={"flex"} minHeight={"100vh"} flexDirection="column">
+      <Box display="flex" minHeight="100vh" flexDirection="column">
         <DashboardTopNav
           title={pageTitle}
           isVotingPowerHidden={isVotingPowerHidden}
         />
         <Box
-          display={"flex"}
-          justifyContent={"center"}
-          flexDirection={"column"}
+          display="flex"
+          justifyContent="center"
+          flexDirection="column"
           height={isMobile ? "100%" : "auto"}
         >
           <Link
-            data-testid={"back-button"}
+            data-testid="back-button"
             sx={{
               cursor: "pointer",
               display: "flex",
@@ -67,13 +67,13 @@ export const CenteredBoxPageWrapper: FC<PropsWithChildren<Props>> = ({
               {backButtonText}
             </Typography>
           </Link>
-          <Box display={"flex"} justifyContent={"center"}>
+          <Box display="flex" justifyContent="center">
             <Box
               width={screenWidth < 768 ? "auto" : "52vw"}
               boxShadow={isMobile ? "" : `2px 2px 20px 0px ${boxShadow2}`}
               px={pagePadding}
               py={isMobile ? 3 : 8}
-              borderRadius={"20px"}
+              borderRadius="20px"
               height="auto"
             >
               <Box display="flex" flexDirection="column">

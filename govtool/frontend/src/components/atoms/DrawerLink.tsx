@@ -14,7 +14,9 @@ type LinkProps = {
 };
 
 export const DrawerLink: FC<LinkProps> = ({ ...props }) => {
-  const { dataTestId, label, navTo, icon, activeIcon, onClick } = props;
+  const {
+    dataTestId, label, navTo, icon, activeIcon, onClick,
+  } = props;
   const {
     palette: { highlightBlue },
   } = theme;
@@ -26,37 +28,33 @@ export const DrawerLink: FC<LinkProps> = ({ ...props }) => {
       onClick={() => {
         if (onClick) onClick();
       }}
-      style={({ isActive }) => {
-        return {
-          textDecoration: "none",
-          backgroundColor: isActive ? highlightBlue : "transparent",
-          padding: "8px 16px",
-          display: "block",
-          borderRadius: 100,
-        };
-      }}
-      children={({ isActive }) => {
-        return (
-          <Box display={"flex"}>
-            {activeIcon && icon && (
-              <img
-                alt="icon"
-                src={isActive ? activeIcon : icon}
-                style={{ marginRight: "12px" }}
-              />
-            )}
-            <Typography
-              fontSize={14}
-              lineHeight={"20px"}
-              sx={{
-                fontWeight: isActive ? 500 : 400,
-              }}
-            >
-              {label}
-            </Typography>
-          </Box>
-        );
-      }}
-    ></NavLink>
+      style={({ isActive }) => ({
+        textDecoration: "none",
+        backgroundColor: isActive ? highlightBlue : "transparent",
+        padding: "8px 16px",
+        display: "block",
+        borderRadius: 100,
+      })}
+      children={({ isActive }) => (
+        <Box display="flex">
+          {activeIcon && icon && (
+          <img
+            alt="icon"
+            src={isActive ? activeIcon : icon}
+            style={{ marginRight: "12px" }}
+          />
+          )}
+          <Typography
+            fontSize={14}
+            lineHeight="20px"
+            sx={{
+              fontWeight: isActive ? 500 : 400,
+            }}
+          >
+            {label}
+          </Typography>
+        </Box>
+      )}
+    />
   );
 };

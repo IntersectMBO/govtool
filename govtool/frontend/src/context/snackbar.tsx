@@ -48,57 +48,54 @@ const defaultPosition = {
   horizontal: "center",
 } as SnackbarOrigin;
 
-function SnackbarProvider({ children }: ProviderProps) {
+const SnackbarProvider = ({ children }: ProviderProps) => {
   const [snackPack, setSnackPack] = useState<readonly SnackbarMessage[]>([]);
   const [{ messageInfo, open }, setState] = useState(defaultState);
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
 
   const addWarningAlert = useCallback(
-    (message: string, autoHideDuration = DEFAULT_AUTO_HIDE_DURATION) =>
-      setSnackPack((prev) => [
-        ...prev,
-        {
-          message,
-          autoHideDuration,
-          severity: "warning",
-          key: new Date().getTime(),
-        },
-      ]),
-    []
+    (message: string, autoHideDuration = DEFAULT_AUTO_HIDE_DURATION) => setSnackPack((prev) => [
+      ...prev,
+      {
+        message,
+        autoHideDuration,
+        severity: "warning",
+        key: new Date().getTime(),
+      },
+    ]),
+    [],
   );
 
   const addSuccessAlert = useCallback(
-    (message: string, autoHideDuration = DEFAULT_AUTO_HIDE_DURATION) =>
-      setSnackPack((prev) => [
-        ...prev,
-        {
-          message,
-          autoHideDuration,
-          severity: "success",
-          key: new Date().getTime(),
-        },
-      ]),
-    []
+    (message: string, autoHideDuration = DEFAULT_AUTO_HIDE_DURATION) => setSnackPack((prev) => [
+      ...prev,
+      {
+        message,
+        autoHideDuration,
+        severity: "success",
+        key: new Date().getTime(),
+      },
+    ]),
+    [],
   );
 
   const addErrorAlert = useCallback(
-    (message: string, autoHideDuration = DEFAULT_AUTO_HIDE_DURATION) =>
-      setSnackPack((prev) => [
-        ...prev,
-        {
-          message,
-          autoHideDuration,
-          severity: "error",
-          key: new Date().getTime(),
-        },
-      ]),
-    []
+    (message: string, autoHideDuration = DEFAULT_AUTO_HIDE_DURATION) => setSnackPack((prev) => [
+      ...prev,
+      {
+        message,
+        autoHideDuration,
+        severity: "error",
+        key: new Date().getTime(),
+      },
+    ]),
+    [],
   );
 
   const addChangesSavedAlert = useCallback(
     () => addSuccessAlert(t("alerts.changesSaved")),
-    [addSuccessAlert]
+    [addSuccessAlert],
   );
 
   const value = useMemo(
@@ -108,7 +105,7 @@ function SnackbarProvider({ children }: ProviderProps) {
       addChangesSavedAlert,
       addWarningAlert,
     }),
-    [addSuccessAlert, addErrorAlert, addChangesSavedAlert, addWarningAlert]
+    [addSuccessAlert, addErrorAlert, addChangesSavedAlert, addWarningAlert],
   );
 
   useEffect(() => {
@@ -124,7 +121,7 @@ function SnackbarProvider({ children }: ProviderProps) {
 
   const handleClose = (
     _event: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === "clickaway") {
       return;
@@ -160,8 +157,8 @@ function SnackbarProvider({ children }: ProviderProps) {
                 messageInfo.severity === "success"
                   ? "#62BC52"
                   : messageInfo.severity === "error"
-                  ? "#FF3333"
-                  : "#DEA029",
+                    ? "#FF3333"
+                    : "#DEA029",
             }}
           >
             {messageInfo.message}
@@ -170,7 +167,7 @@ function SnackbarProvider({ children }: ProviderProps) {
       )}
     </SnackbarContext.Provider>
   );
-}
+};
 
 function useSnackbar() {
   const context = useContext(SnackbarContext);

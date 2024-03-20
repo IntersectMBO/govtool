@@ -1,6 +1,10 @@
-import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
+import {
+  Box, Grid, IconButton, SwipeableDrawer,
+} from "@mui/material";
 
-import { Background, Button, Link, Typography } from "@atoms";
+import {
+  Background, Button, Link, Typography,
+} from "@atoms";
 import { ICONS, IMAGES, NAV_ITEMS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { useModal } from "@context";
@@ -20,8 +24,7 @@ export const DrawerMobile = ({
   const { openModal } = useModal();
   const { t } = useTranslation();
 
-  const onClickHelp = () =>
-    openInNewTab("https://docs.sanchogov.tools/support/get-help-in-discord");
+  const onClickHelp = () => openInNewTab("https://docs.sanchogov.tools/support/get-help-in-discord");
 
   return (
     <SwipeableDrawer

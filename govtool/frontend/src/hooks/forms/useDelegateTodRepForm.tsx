@@ -43,9 +43,7 @@ export const useDelegateTodRepForm = () => {
         setDelegatedDRepID(dRepID);
         let isValidDrep = false;
         if (drepList?.length) {
-          isValidDrep = drepList.some((i) => {
-            return i.drepId === dRepID || formHexToBech32(i.drepId) === dRepID;
-          });
+          isValidDrep = drepList.some((i) => i.drepId === dRepID || formHexToBech32(i.drepId) === dRepID);
         }
         if (!drepList?.length || !isValidDrep) {
           throw new Error(t("errors.dRepIdNotFound"));
@@ -55,7 +53,7 @@ export const useDelegateTodRepForm = () => {
           certBuilder,
           type: "delegation",
         });
-        if (result)
+        if (result) {
           openModal({
             type: "statusModal",
             state: {
@@ -71,6 +69,7 @@ export const useDelegateTodRepForm = () => {
               dataTestId: "delegation-transaction-submitted-modal",
             },
           });
+        }
       } catch (error) {
         openModal({
           type: "statusModal",
@@ -88,7 +87,7 @@ export const useDelegateTodRepForm = () => {
         setIsLoading(false);
       }
     },
-    [buildVoteDelegationCert, buildSignSubmitConwayCertTx, drepList]
+    [buildVoteDelegationCert, buildSignSubmitConwayCertTx, drepList],
   );
 
   return {

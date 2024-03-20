@@ -14,9 +14,7 @@ const meta: Meta<typeof Field.TextArea> = {
 
 export default meta;
 
-const Template: StoryFn<ComponentProps<typeof Field.TextArea>> = (args) => {
-  return <Field.TextArea {...args} />;
-};
+const Template: StoryFn<ComponentProps<typeof Field.TextArea>> = (args) => <Field.TextArea {...args} />;
 
 export const Default = Template.bind({});
 

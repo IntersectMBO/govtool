@@ -10,16 +10,13 @@ export const API = axios.create({
   timeout: TIMEOUT_IN_SECONDS,
 });
 
-export const SetupInterceptors = (navigate: any) =>
-  API.interceptors.response.use(
-    function (response) {
-      return response;
-    },
-    function (error) {
-      if (error?.response?.status === 500) {
-        navigate(PATHS.error, { state: { errorCode: 500 } });
-      }
-
-      return Promise.reject(error);
+export const SetupInterceptors = (navigate: any) => API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 500) {
+      navigate(PATHS.error, { state: { errorCode: 500 } });
     }
-  );
+
+    return Promise.reject(error);
+  },
+);

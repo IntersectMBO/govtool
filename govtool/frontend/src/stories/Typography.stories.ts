@@ -16,8 +16,8 @@ const meta = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    expect(
-      canvas.getByText("Lorem ipsum dolor sit amet. 123 !@#")
+    await expect(
+      canvas.getByText("Lorem ipsum dolor sit amet. 123 !@#"),
     ).toBeInTheDocument();
   },
 } satisfies Meta<typeof Typography>;

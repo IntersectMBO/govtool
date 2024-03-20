@@ -2,8 +2,8 @@ import { Box } from "@mui/material";
 import { FC } from "react";
 
 import { Button, Typography } from "@atoms";
-import { theme } from "@/theme";
 import { useScreenDimension } from "@hooks";
+import { theme } from "@/theme";
 
 type ActionCardProps = {
   description?: string;
@@ -59,7 +59,7 @@ export const ActionCard: FC<ActionCardProps> = ({ ...props }) => {
             sx={{
               mt: 2.5,
             }}
-            variant={"headline5"}
+            variant="headline5"
           >
             {title}
           </Typography>
@@ -71,7 +71,7 @@ export const ActionCard: FC<ActionCardProps> = ({ ...props }) => {
               mb: 4.25,
               mt: 1.75,
             }}
-            variant={"body1"}
+            variant="body1"
           >
             {description}
           </Typography>

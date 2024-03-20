@@ -38,7 +38,7 @@ export const ErrorPage = ({
           <Typography
             fontSize={57}
             fontWeight={700}
-            lineHeight={"64px"}
+            lineHeight="64px"
             sx={{ whiteSpace: "nowrap" }}
           >
             {t("errorPage.whoops")}

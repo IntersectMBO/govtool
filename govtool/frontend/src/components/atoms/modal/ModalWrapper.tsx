@@ -13,21 +13,21 @@ interface Props {
   sx?: SxProps;
 }
 
-export function ModalWrapper({
+export const ModalWrapper = ({
   children,
   onClose,
   variant = "modal",
   hideCloseButton = false,
   dataTestId = "modal",
   sx,
-}: Props) {
+}: Props) => {
   const { closeModal } = useModal();
 
   return (
     <BaseWrapper variant={variant} data-testid={dataTestId} sx={sx}>
       {variant !== "popup" && !hideCloseButton && (
         <CloseButton
-          data-testid={"close-modal-button"}
+          data-testid="close-modal-button"
           alt="close"
           onClick={callAll(closeModal, onClose)}
           src={ICONS.closeIcon}
@@ -36,7 +36,7 @@ export function ModalWrapper({
       {children}
     </BaseWrapper>
   );
-}
+};
 
 export const BaseWrapper = styled("div")<Pick<Props, "variant">>`
   box-shadow: 1px 2px 11px 0px #00123d5e;

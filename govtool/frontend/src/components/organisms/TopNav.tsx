@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { AppBar, Box, Grid, IconButton } from "@mui/material";
+import {
+  AppBar, Box, Grid, IconButton,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 
 import { Button, Link } from "@atoms";
-import { ICONS, IMAGES, PATHS, NAV_ITEMS } from "@consts";
+import {
+  ICONS, IMAGES, PATHS, NAV_ITEMS,
+} from "@consts";
 import { useCardano, useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
@@ -50,8 +54,8 @@ export const TopNav = ({ isConnectButton = true }) => {
             windowScroll > POSITION_TO_BLUR
               ? "rgba(256, 256, 256, 0.7)"
               : isMobile
-              ? "white"
-              : "transparent",
+                ? "white"
+                : "transparent",
           borderBottom: isMobile ? 1 : 0,
           borderColor: "lightblue",
           borderRadius: 0,
@@ -100,8 +104,7 @@ export const TopNav = ({ isConnectButton = true }) => {
                       {...navItem}
                       isConnectWallet={isConnectButton}
                       onClick={() => {
-                        if (navItem.newTabLink)
-                          openInNewTab(navItem.newTabLink);
+                        if (navItem.newTabLink) openInNewTab(navItem.newTabLink);
                         setIsDrawerOpen(false);
                       }}
                     />

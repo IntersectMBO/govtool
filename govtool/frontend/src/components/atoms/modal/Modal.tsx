@@ -1,7 +1,6 @@
 import MuiModal from "@mui/material/Modal";
 import type { JSXElementConstructor, ReactElement } from "react";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MuiModalChildren = ReactElement<
   any,
   string | JSXElementConstructor<any>
@@ -13,10 +12,8 @@ interface Props {
   handleClose?: () => void;
 }
 
-export function Modal({ open, children, handleClose }: Props) {
-  return (
-    <MuiModal open={open} onClose={handleClose} disableAutoFocus>
-      <>{children}</>
-    </MuiModal>
-  );
-}
+export const Modal = ({ open, children, handleClose }: Props) => (
+  <MuiModal open={open} onClose={handleClose} disableAutoFocus>
+    <>{children}</>
+  </MuiModal>
+);

@@ -7,8 +7,10 @@ import {
   Typography,
 } from "@atoms";
 
+import {
+  forwardRef, useCallback, useImperativeHandle, useRef,
+} from "react";
 import { TextAreaFieldProps } from "./types";
-import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
   (
@@ -25,7 +27,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
       onFocus,
       ...props
     },
-    ref
+    ref,
   ) => {
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -34,7 +36,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
         onFocus?.(e);
         textAreaRef.current?.focus();
       },
-      []
+      [],
     );
 
     const handleBlur = useCallback(
@@ -42,18 +44,17 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
         onBlur?.(e);
         textAreaRef.current?.blur();
       },
-      []
+      [],
     );
 
     useImperativeHandle(
       ref,
-      () =>
-        ({
-          focus: handleFocus,
-          blur: handleBlur,
-          ...textAreaRef.current,
-        } as unknown as HTMLTextAreaElement),
-      [handleBlur, handleFocus]
+      () => ({
+        focus: handleFocus,
+        blur: handleBlur,
+        ...textAreaRef.current,
+      } as unknown as HTMLTextAreaElement),
+      [handleBlur, handleFocus],
     );
     return (
       <Box
@@ -98,9 +99,11 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
           }}
           variant="caption"
         >
-          {props?.value?.toString()?.length ?? 0}/{maxLength}
+          {props?.value?.toString()?.length ?? 0}
+          /
+          {maxLength}
         </Typography>
       </Box>
     );
-  }
+  },
 );

@@ -11,15 +11,13 @@ export const useGetProposalsInfiniteQuery = ({
 }: getProposalsArguments) => {
   const { dRepID, isEnabled, voteTransaction } = useCardano();
 
-  const fetchProposals = async ({ pageParam = 0 }) => {
-    return await getProposals({
-      dRepID,
-      filters,
-      page: pageParam,
-      pageSize,
-      sorting,
-    });
-  };
+  const fetchProposals = async ({ pageParam = 0 }) => await getProposals({
+    dRepID,
+    filters,
+    page: pageParam,
+    pageSize,
+    sorting,
+  });
 
   const {
     data,
@@ -46,11 +44,11 @@ export const useGetProposalsInfiniteQuery = ({
         return lastPage.page + 1;
       },
       refetchInterval: 20000,
-    }
+    },
   );
 
   const proposals = data?.pages.flatMap(
-    (page) => page.elements
+    (page) => page.elements,
   ) as ActionType[];
 
   return {

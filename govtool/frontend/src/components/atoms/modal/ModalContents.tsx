@@ -1,11 +1,11 @@
-import { useScreenDimension } from "@/hooks";
 import { Box } from "@mui/material";
+import { useScreenDimension } from "@/hooks";
 
 interface Props {
   children: React.ReactNode;
 }
 
-export function ModalContents({ children }: Props) {
+export const ModalContents = ({ children }: Props) => {
   const { isMobile } = useScreenDimension();
 
   return (
@@ -18,4 +18,4 @@ export function ModalContents({ children }: Props) {
       {children}
     </Box>
   );
-}
+};

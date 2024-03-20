@@ -8,16 +8,16 @@ import { VotedProposal } from "@/models/api";
 export const useGetDRepVotesQuery = (filters: string[], sorting: string) => {
   const { dRepID, voteTransaction } = useCardano();
 
-  const { data, isLoading, refetch, isRefetching } = useQuery({
+  const {
+    data, isLoading, refetch, isRefetching,
+  } = useQuery({
     queryKey: [
       QUERY_KEYS.useGetDRepVotesKey,
       voteTransaction.transactionHash,
       filters,
       sorting,
     ],
-    queryFn: async () => {
-      return await getDRepVotes({ dRepID, filters, sorting });
-    },
+    queryFn: async () => await getDRepVotes({ dRepID, filters, sorting }),
     enabled: !!dRepID,
   });
 

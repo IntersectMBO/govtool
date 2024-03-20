@@ -1,9 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { within, userEvent, waitFor, screen } from "@storybook/testing-library";
+import {
+  within, userEvent, waitFor, screen,
+} from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
 
-import { GovernanceActionCard } from "@/components/molecules";
 import { formatDisplayDate } from "@utils";
+import { GovernanceActionCard } from "@/components/molecules";
 
 const meta = {
   title: "Example/GovernanceActionCard",
@@ -31,10 +33,10 @@ export const GovernanceActionCardComponent: Story = {
     expect(canvas.getByTestId("exampleType-type")).toBeInTheDocument();
     expect(canvas.getByTestId("sad78afdsf7jasd98d#2-id")).toBeInTheDocument();
     expect(
-      canvas.getByText(formatDisplayDate("1970-01-01T00:00:00Z"))
+      canvas.getByText(formatDisplayDate("1970-01-01T00:00:00Z")),
     ).toBeInTheDocument();
     expect(
-      canvas.getByText(formatDisplayDate("1970-02-01T00:00:00Z"))
+      canvas.getByText(formatDisplayDate("1970-02-01T00:00:00Z")),
     ).toBeInTheDocument();
 
     const tooltips = canvas.getAllByTestId("InfoOutlinedIcon");
@@ -51,7 +53,7 @@ export const GovernanceActionCardComponent: Story = {
     });
 
     await userEvent.click(
-      canvas.getByTestId("govaction-sad78afdsf7jasd98d#2-view-detail")
+      canvas.getByTestId("govaction-sad78afdsf7jasd98d#2-view-detail"),
     );
     await expect(args.onClick).toHaveBeenCalled();
   },

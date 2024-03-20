@@ -32,9 +32,7 @@ const Template: StoryFn<VotingPowerModalState> = (args) => {
       {modals[modal.type]?.component && (
         <Modal
           open={Boolean(modals[modal.type].component)}
-          handleClose={callAll(modals[modal.type]?.onClose, () =>
-            openModal({ type: "none", state: null })
-          )}
+          handleClose={callAll(modals[modal.type]?.onClose, () => openModal({ type: "none", state: null }))}
         >
           {modals[modal.type]?.component ?? <></>}
         </Modal>

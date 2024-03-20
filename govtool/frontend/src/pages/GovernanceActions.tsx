@@ -1,14 +1,22 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Divider } from "@mui/material";
+import { Box, CircularProgress, Divider } from "@mui/material";
 
 import { Background, ScrollToManage, Typography } from "@atoms";
-import { PATHS } from "@consts";
+import { GOVERNANCE_ACTIONS_FILTERS, PATHS } from "@consts";
 import { useCardano } from "@context";
-import { useScreenDimension, useTranslation } from "@hooks";
+import {
+  useGetProposalsQuery,
+  useScreenDimension,
+  useTranslation,
+} from "@hooks";
 import { DataActionsBar } from "@molecules";
 import { Footer, TopNav, GovernanceActionsToVote } from "@organisms";
 import { WALLET_LS_KEY, getItemFromLocalStorage } from "@utils";
+
+const defaultCategories = GOVERNANCE_ACTIONS_FILTERS.map(
+  (category) => category.key
+);
 
 export const GovernanceActions = () => {
   const [searchText, setSearchText] = useState<string>("");
@@ -20,6 +28,15 @@ export const GovernanceActions = () => {
   const { isEnabled } = useCardano();
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const queryFilters =
+    chosenFilters.length > 0 ? chosenFilters : defaultCategories;
+
+  const { proposals, isProposalsLoading } = useGetProposalsQuery({
+    filters: queryFilters,
+    sorting: chosenSorting,
+    searchPhrase: searchText,
+  });
 
   useEffect(() => {
     if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
@@ -79,12 +96,25 @@ export const GovernanceActions = () => {
               sortOpen={sortOpen}
             />
             <Box height={isMobile ? 60 : 80} />
-            <GovernanceActionsToVote
-              filters={chosenFilters}
-              onDashboard={false}
-              searchPhrase={searchText}
-              sorting={chosenSorting}
-            />
+            {!proposals || isProposalsLoading ? (
+              <Box
+                alignItems="center"
+                display="flex"
+                flex={1}
+                height="100%"
+                justifyContent="center"
+              >
+                <CircularProgress />
+              </Box>
+            ) : (
+              <GovernanceActionsToVote
+                filters={chosenFilters}
+                onDashboard={false}
+                searchPhrase={searchText}
+                sorting={chosenSorting}
+                proposals={proposals}
+              />
+            )}
           </Box>
         </Box>
         <Footer />

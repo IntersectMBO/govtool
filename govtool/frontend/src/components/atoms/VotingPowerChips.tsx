@@ -6,31 +6,33 @@ import { useCardano } from "@context";
 import {
   useGetAdaHolderVotingPowerQuery,
   useGetDRepVotingPowerQuery,
+  useGetVoterInfo,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
 import { correctAdaFormat } from "@utils";
 
 export const VotingPowerChips = () => {
-  const { voter, stakeKey, isDrepLoading } = useCardano();
-  const { dRepVotingPower, isDRepVotingPowerLoading } =
-    useGetDRepVotingPowerQuery();
-  const { votingPower, powerIsLoading } =
-    useGetAdaHolderVotingPowerQuery(stakeKey);
+  const { stakeKey, isEnableLoading } = useCardano();
+  const { dRepVotingPower } = useGetDRepVotingPowerQuery();
+  const { votingPower } = useGetAdaHolderVotingPowerQuery(stakeKey);
   const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
+  const { voter } = useGetVoterInfo();
 
   return (
     <Box
-      bgcolor="black"
-      px={2}
-      py={isMobile ? 1 : 1.5}
-      display="flex"
-      border={isMobile ? 2 : 0}
-      borderColor="#FBFBFF"
-      borderRadius={100}
-      alignItems="center"
-      maxHeight={isMobile ? undefined : 48}
+      sx={{
+        alignItems: 'center',
+        bgcolor: 'textBlack',
+        border: isMobile ? 2 : 0,
+        borderColor: '#FBFBFF',
+        borderRadius: 100,
+        display: 'flex',
+        height: isMobile ? 16 : 24,
+        px: 2,
+        py: isMobile ? 1 : 1.5,
+      }}
     >
       {voter?.isRegisteredAsDRep && (
         <Tooltip
@@ -54,10 +56,11 @@ export const VotingPowerChips = () => {
           {t("votingPower")}
         </Typography>
       )}
-      {(voter?.isRegisteredAsDRep && isDRepVotingPowerLoading) ||
-      (!voter?.isRegisteredAsDRep && powerIsLoading) ||
-      isDrepLoading ? (
-        <CircularProgress size={20} color="primary" />
+      {(voter?.isRegisteredAsDRep && dRepVotingPower === undefined) ||
+        (!voter?.isRegisteredAsDRep && votingPower === undefined) ||
+        isEnableLoading ||
+        !voter ? (
+          <CircularProgress size={20} color="primary" />
       ) : (
         <Typography
           color="white"

@@ -7,7 +7,7 @@ import { getVoterInfo } from "@services";
 export const useGetVoterInfo = () => {
   const { dRepID, pendingTransaction } = useCardano();
 
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: [
       QUERY_KEYS.useGetDRepInfoKey,
       pendingTransaction.registerAsDrep ||
@@ -19,5 +19,5 @@ export const useGetVoterInfo = () => {
     queryFn: () => getVoterInfo(dRepID),
   });
 
-  return { data, isLoading };
+  return { voter: data };
 };

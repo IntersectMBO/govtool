@@ -30,14 +30,13 @@ import {
   removeItemFromLocalStorage,
 } from "@utils";
 import { SetupInterceptors } from "./services";
-import { useGetVoterInfo, useWalletConnectionListener } from "./hooks";
+import { useWalletConnectionListener } from "./hooks";
 import { RegisterAsSoleVoter } from "./pages/RegisterAsSoleVoter";
 import { CreateGovernanceAction } from "./pages/CreateGovernanceAction";
 
 export default () => {
-  const { enable, setVoter, setIsDrepLoading } = useCardano();
+  const { enable } = useCardano();
   const navigate = useNavigate();
-  const { data } = useGetVoterInfo();
   const { modal, openModal, modals } = useModal();
 
   useWalletConnectionListener();
@@ -45,14 +44,6 @@ export default () => {
   useEffect(() => {
     SetupInterceptors(navigate);
   }, []);
-
-  useEffect(() => {
-    setIsDrepLoading(true);
-    setVoter(data);
-    const timer = setTimeout(() => setIsDrepLoading(false), 1000);
-
-    return () => clearTimeout(timer);
-  }, [data?.isRegisteredAsDRep, data?.isRegisteredAsSoleVoter]);
 
   const checkTheWalletIsActive = useCallback(() => {
     const hrefCondition =
@@ -135,8 +126,8 @@ export default () => {
           handleClose={
             !modals[modal.type].preventDismiss
               ? callAll(modals[modal.type]?.onClose, () =>
-                  openModal({ type: "none", state: null }),
-                )
+                openModal({ type: "none", state: null }),
+              )
               : undefined
           }
         >

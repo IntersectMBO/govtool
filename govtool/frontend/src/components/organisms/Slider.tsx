@@ -38,7 +38,7 @@ export const Slider = ({
 }: SliderProps) => {
   const { isMobile, screenWidth, pagePadding } = useScreenDimension();
   const navigate = useNavigate();
-  const { voteTransaction } = useCardano();
+  const { pendingTransaction } = useCardano();
   const { t } = useTranslation();
 
   const DEFAULT_SLIDER_CONFIG = {
@@ -75,7 +75,7 @@ export const Slider = ({
 
   useEffect(() => {
     refresh();
-  }, [filters, sorting, searchPhrase, voteTransaction?.proposalId, data]);
+  }, [filters, sorting, searchPhrase, pendingTransaction.vote?.resourceId, data]);
 
   const rangeSliderCalculationElement =
     dataLength < notSlicedDataLength

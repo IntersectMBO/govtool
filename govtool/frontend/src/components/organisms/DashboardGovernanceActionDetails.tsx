@@ -14,9 +14,9 @@ import {
 } from "@mui/material";
 
 import { ICONS, PATHS } from "@consts";
-import { useCardano } from "@context";
 import {
   useGetProposalQuery,
+  useGetVoterInfo,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
@@ -28,7 +28,7 @@ import {
 } from "@utils";
 
 export const DashboardGovernanceActionDetails = () => {
-  const { voter } = useCardano();
+  const { voter } = useGetVoterInfo();
   const { state, hash } = useLocation();
   const navigate = useNavigate();
   const { isMobile, screenWidth } = useScreenDimension();

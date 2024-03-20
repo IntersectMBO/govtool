@@ -50,6 +50,8 @@ export const getUtxos = async (
             for (let j = 0; j < K; j++) {
               const assetName = assetNames.get(j);
               const assetNameString = assetName.name().toString();
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
               const assetNameHex = Buffer.from(
                 assetName.name(),
                 "utf8"
@@ -75,6 +77,7 @@ export const getUtxos = async (
     return utxos;
   } catch (err) {
     Sentry.captureException(err);
+    // eslint-disable-next-line no-console
     console.error(err);
   }
 };

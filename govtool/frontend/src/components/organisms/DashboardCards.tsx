@@ -10,6 +10,7 @@ import {
   useScreenDimension,
   useGetAdaHolderCurrentDelegationQuery,
   useTranslation,
+  useGetVoterInfo,
 } from '@hooks';
 import { DashboardActionCard } from '@molecules';
 import { correctAdaFormat, formHexToBech32, openInNewTab } from '@utils';
@@ -19,12 +20,11 @@ export const DashboardCards = () => {
     buildDRepRetirementCert,
     buildSignSubmitConwayCertTx,
     dRepID,
+    isEnableLoading,
     dRepIDBech32,
-    isDrepLoading,
     isPendingTransaction,
     pendingTransaction,
     stakeKey,
-    voter,
   } = useCardano();
   const navigate = useNavigate();
   const { currentDelegation } =
@@ -36,16 +36,23 @@ export const DashboardCards = () => {
   const { votingPower } =
     useGetAdaHolderVotingPowerQuery(stakeKey);
   const { t } = useTranslation();
+  const { voter } = useGetVoterInfo();
 
   const retireAsDrep = useCallback(async () => {
     try {
       setIsRetirementLoading(true);
       const isPendingTx = isPendingTransaction();
+
       if (isPendingTx) return;
-      const certBuilder = await buildDRepRetirementCert();
+      if (!voter?.deposit) throw new Error('Can not get deposit');
+
+      const certBuilder = await buildDRepRetirementCert(
+        voter.deposit.toString(),
+      );
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
         type: 'retireAsDrep',
+        voterDeposit: voter.deposit.toString(),
       });
       if (result) {
         openModal({
@@ -82,6 +89,7 @@ export const DashboardCards = () => {
     buildSignSubmitConwayCertTx,
     isPendingTransaction,
     openModal,
+    voter?.deposit,
   ]);
 
   const delegationDescription = useMemo(() => {
@@ -146,6 +154,7 @@ export const DashboardCards = () => {
     const correctAdaRepresentation = correctAdaFormat(votingPower);
     if (!pendingTransaction.delegate) return;
     const { resourceId } = pendingTransaction.delegate;
+
     if (resourceId === dRepID) {
       return (
         <Trans
@@ -190,12 +199,12 @@ export const DashboardCards = () => {
   );
 
   const onClickGovernanceActionCardActionButton = useCallback(() => {
-    if (!pendingTransaction.createGovAction) {
+    if (pendingTransaction.createGovAction) {
       navigate(PATHS.dashboardGovernanceActions);
       return;
     }
     navigate(PATHS.createGovernanceAction);
-  }, [pendingTransaction, navigate]);
+  }, [pendingTransaction.createGovAction, navigate]);
 
   const displayedDelegationId = useMemo(() => {
     const restrictedNames = [
@@ -286,7 +295,7 @@ export const DashboardCards = () => {
     voter?.isRegisteredAsSoleVoter,
   ]);
 
-  return isDrepLoading ? (
+  return isEnableLoading || !currentDelegation || !voter || !votingPower ? (
     <Box
       sx={{
         alignItems: 'center',

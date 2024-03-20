@@ -2,8 +2,6 @@
 /* eslint-disable */
 // @ts-nocheck
 import {
-  Dispatch,
-  SetStateAction,
   createContext,
   useCallback,
   useContext,
@@ -53,7 +51,7 @@ import * as Sentry from '@sentry/react';
 import { Trans } from 'react-i18next';
 
 import { PATHS } from '@consts';
-import { CardanoApiWallet, VoterInfo, Protocol } from '@models';
+import { CardanoApiWallet, Protocol } from '@models';
 import type { StatusModalState } from '@organisms';
 import {
   checkIsMaintenanceOn,
@@ -105,31 +103,29 @@ interface CardanoContext {
   enable: (walletName: string) => Promise<EnableResponse>;
   isEnableLoading: string | null;
   error?: string;
-  voter: VoterInfo | undefined;
   isEnabled: boolean;
   pubDRepKey: string;
   dRepID: string;
   dRepIDBech32: string;
   isMainnet: boolean;
   stakeKey?: string;
-  setVoter: (key: undefined | VoterInfo) => void;
   setStakeKey: (key: string) => void;
   stakeKeys: string[];
   walletApi?: CardanoApiWallet;
-  delegatedDRepID?: string;
-  setDelegatedDRepID: (key: string) => void;
   buildSignSubmitConwayCertTx: ({
     certBuilder,
     govActionBuilder,
     resourceId,
     type,
     votingBuilder,
+    voterDeposit,
   }: {
     certBuilder?: CertificatesBuilder;
     govActionBuilder?: VotingProposalBuilder;
     resourceId?: string;
     type: TransactionType;
     votingBuilder?: VotingBuilder;
+    voterDeposit?: string;
   }) => Promise<string>;
   buildDRepRegCert: (
     url?: string,
@@ -142,7 +138,9 @@ interface CardanoContext {
     hash?: string,
     hash?: string,
   ) => Promise<CertificatesBuilder>;
-  buildDRepRetirementCert: () => Promise<CertificatesBuilder>;
+  buildDRepRetirementCert: (
+    voterDeposit: string,
+  ) => Promise<CertificatesBuilder>;
   buildVote: (
     voteChoice: string,
     txHash: string,
@@ -153,8 +151,6 @@ interface CardanoContext {
   ) => Promise<VotingBuilder>;
   pendingTransaction: PendingTransaction;
   isPendingTransaction: () => boolean;
-  isDrepLoading: boolean;
-  setIsDrepLoading: Dispatch<SetStateAction<boolean>>;
   buildNewInfoGovernanceAction: (
     infoProps: InfoProps,
   ) => Promise<VotingProposalBuilder | undefined>;
@@ -180,7 +176,6 @@ CardanoContext.displayName = 'CardanoContext';
 const CardanoProvider = (props: Props) => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [isEnableLoading, setIsEnableLoading] = useState<string | null>(null);
-  const [voter, setVoter] = useState<VoterInfo | undefined>(undefined);
   const [walletApi, setWalletApi] = useState<CardanoApiWallet | undefined>(
     undefined,
   );
@@ -195,9 +190,6 @@ const CardanoProvider = (props: Props) => {
   const [registeredStakeKeysListState, setRegisteredPubStakeKeysState] =
     useState<string[]>([]);
   const [error, setError] = useState<string | undefined>(undefined);
-  const [delegatedDRepID, setDelegatedDRepID] = useState<string | undefined>(
-    undefined,
-  );
   const [walletState, setWalletState] = useState<{
     changeAddress: undefined | string;
     usedAddress: undefined | string;
@@ -205,7 +197,6 @@ const CardanoProvider = (props: Props) => {
     changeAddress: undefined,
     usedAddress: undefined,
   });
-  const [isDrepLoading, setIsDrepLoading] = useState<boolean>(true);
   const { t } = useTranslation();
   const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
@@ -221,7 +212,7 @@ const CardanoProvider = (props: Props) => {
       setWalletState((prev) => ({ ...prev, changeAddress }));
     } catch (err) {
       Sentry.captureException(err);
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -235,7 +226,7 @@ const CardanoProvider = (props: Props) => {
       setWalletState((prev) => ({ ...prev, usedAddress }));
     } catch (err) {
       Sentry.captureException(err);
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -438,12 +429,14 @@ const CardanoProvider = (props: Props) => {
       resourceId,
       type,
       votingBuilder,
+      voterDeposit,
     }: {
       certBuilder?: CertificatesBuilder;
       govActionBuilder?: VotingProposalBuilder;
       resourceId?: string;
       type: TransactionType;
       votingBuilder?: VotingBuilder;
+      voterDeposit?: string;
     }) => {
       await checkIsMaintenanceOn();
       const isPendingTx = isPendingTransaction();
@@ -486,11 +479,9 @@ const CardanoProvider = (props: Props) => {
 
         if (
           (type === 'retireAsDrep' || type === 'retireAsSoleVoter') &&
-          voter?.deposit
+          voterDeposit
         ) {
-          outputValue = outputValue.checked_add(
-            BigNum.from_str(`${voter?.deposit}`),
-          );
+          outputValue = outputValue.checked_add(BigNum.from_str(voterDeposit));
         }
 
         txBuilder.add_output(
@@ -564,14 +555,7 @@ const CardanoProvider = (props: Props) => {
         throw error?.info ?? error;
       }
     },
-    [
-      isPendingTransaction,
-      stakeKey,
-      updateTransaction,
-      voter?.deposit,
-      walletApi,
-      walletState,
-    ],
+    [isPendingTransaction, stakeKey, updateTransaction, walletApi, walletState],
   );
 
   const buildVoteDelegationCert = useCallback(
@@ -699,8 +683,8 @@ const CardanoProvider = (props: Props) => {
   );
 
   // conway alpha
-  const buildDRepRetirementCert =
-    useCallback(async (): Promise<CertificatesBuilder> => {
+  const buildDRepRetirementCert = useCallback(
+    async (voterDeposit: string): Promise<CertificatesBuilder> => {
       try {
         // Build DRep Registration Certificate
         const certBuilder = CertificatesBuilder.new();
@@ -710,7 +694,7 @@ const CardanoProvider = (props: Props) => {
 
         const dRepRetirementCert = DrepDeregistration.new(
           dRepCred,
-          BigNum.from_str(`${voter?.deposit}`),
+          BigNum.from_str(voterDeposit),
         );
         // add cert to tbuilder
         certBuilder.add(
@@ -722,7 +706,9 @@ const CardanoProvider = (props: Props) => {
         console.log(e);
         throw e;
       }
-    }, [dRepID, voter]);
+    },
+    [dRepID],
+  );
 
   const buildVote = useCallback(
     async (
@@ -873,26 +859,20 @@ const CardanoProvider = (props: Props) => {
       buildTreasuryGovernanceAction,
       buildVote,
       buildVoteDelegationCert,
-      delegatedDRepID,
       disconnectWallet,
       dRepID,
       dRepIDBech32,
       enable,
       error,
-      isDrepLoading,
       isEnabled,
       isEnableLoading,
       isMainnet,
       isPendingTransaction,
       pendingTransaction,
       pubDRepKey,
-      setDelegatedDRepID,
-      setIsDrepLoading,
       setStakeKey,
-      setVoter,
       stakeKey,
       stakeKeys,
-      voter,
       walletApi,
     }),
     [
@@ -905,26 +885,20 @@ const CardanoProvider = (props: Props) => {
       buildTreasuryGovernanceAction,
       buildVote,
       buildVoteDelegationCert,
-      delegatedDRepID,
       disconnectWallet,
       dRepID,
       dRepIDBech32,
       enable,
       error,
-      isDrepLoading,
       isEnabled,
       isEnableLoading,
       isMainnet,
       isPendingTransaction,
       pendingTransaction,
       pubDRepKey,
-      setDelegatedDRepID,
-      setIsDrepLoading,
       setStakeKey,
-      setVoter,
       stakeKey,
       stakeKeys,
-      voter,
       walletApi,
     ],
   );

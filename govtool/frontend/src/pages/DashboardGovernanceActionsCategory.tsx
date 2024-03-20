@@ -20,6 +20,7 @@ import { DataActionsBar, GovernanceActionCard } from "@molecules";
 import {
   useFetchNextPageDetector,
   useGetProposalsInfiniteQuery,
+  useGetVoterInfo,
   useSaveScrollPosition,
   useScreenDimension,
   useTranslation,
@@ -38,7 +39,8 @@ export const DashboardGovernanceActionsCategory = () => {
   const [chosenSorting, setChosenSorting] = useState<string>("");
   const { isMobile, screenWidth } = useScreenDimension();
   const navigate = useNavigate();
-  const { voter, isDrepLoading, voteTransaction } = useCardano();
+  const { pendingTransaction, isEnableLoading } = useCardano();
+  const { voter } = useGetVoterInfo();
   const { t } = useTranslation();
 
   const {
@@ -51,6 +53,7 @@ export const DashboardGovernanceActionsCategory = () => {
   } = useGetProposalsInfiniteQuery({
     filters: [category?.replace(/ /g, "") ?? ""],
     sorting: chosenSorting,
+    searchPhrase: searchText,
   });
   const loadNextPageRef = useRef(null);
 
@@ -150,7 +153,7 @@ export const DashboardGovernanceActionsCategory = () => {
               sortOpen={sortOpen}
             />
             <Box height={24} />
-            {isProposalsLoading || isDrepLoading ? (
+            {!mappedData || isEnableLoading || isProposalsLoading ? (
               <Box display="flex" justifyContent="center" py={4}>
                 <CircularProgress />
               </Box>
@@ -172,13 +175,12 @@ export const DashboardGovernanceActionsCategory = () => {
               <Box
                 columnGap={4}
                 display="grid"
-                gridTemplateColumns={`repeat(auto-fit, minmax(${
-                  screenWidth < 375
+                gridTemplateColumns={`repeat(auto-fit, minmax(${screenWidth < 375
                     ? "255px"
                     : screenWidth < 768
-                    ? "294px"
-                    : "402px"
-                }, 1fr))`}
+                      ? "294px"
+                      : "402px"
+                  }, 1fr))`}
               >
                 {mappedData.map((item) => (
                   <Box pb={4.25} key={item.txHash + item.index}>
@@ -186,33 +188,34 @@ export const DashboardGovernanceActionsCategory = () => {
                       {...item}
                       index={item.index}
                       inProgress={
-                        voteTransaction.proposalId === item.txHash + item.index
+                        pendingTransaction.vote?.resourceId ===
+                        item.txHash + item.index
                       }
                       onClick={() => {
                         saveScrollPosition();
 
                         // eslint-disable-next-line no-unused-expressions
-                        voteTransaction.proposalId === item.txHash + item.index
+                        pendingTransaction.vote?.resourceId === item.txHash + item.index
                           ? openInNewTab(
-                              "https://adanordic.com/latest_transactions",
-                            )
+                            "https://adanordic.com/latest_transactions",
+                          )
                           : navigate(
-                              generatePath(
-                                PATHS.dashboardGovernanceActionsAction,
-                                {
-                                  proposalId: getFullGovActionId(
-                                    item.txHash,
-                                    item.index,
-                                  ),
-                                },
-                              ),
+                            generatePath(
+                              PATHS.dashboardGovernanceActionsAction,
                               {
-                                state: {
-                                  ...item,
-                                  openedFromCategoryPage: true,
-                                },
+                                proposalId: getFullGovActionId(
+                                  item.txHash,
+                                  item.index,
+                                ),
                               },
-                            );
+                            ),
+                            {
+                              state: {
+                                ...item,
+                                openedFromCategoryPage: true,
+                              },
+                            },
+                          );
                       }}
                       txHash={item.txHash}
                     />

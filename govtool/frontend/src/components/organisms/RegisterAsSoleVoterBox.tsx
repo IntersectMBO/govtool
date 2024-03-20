@@ -6,19 +6,17 @@ import { PATHS } from "@consts";
 import { RegisterAsSoleVoterBoxContent } from "@organisms";
 import { CenteredBoxBottomButtons } from "@molecules";
 import { useCardano, useModal } from "@context";
+import { useGetVoterInfo } from "@/hooks";
 
 export const RegisterAsSoleVoterBox = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const {
-    buildSignSubmitConwayCertTx,
-    buildDRepRegCert,
-    buildDRepUpdateCert,
-    voter,
-  } = useCardano();
+  const { buildSignSubmitConwayCertTx, buildDRepRegCert, buildDRepUpdateCert } =
+    useCardano();
   const navigate = useNavigate();
   const { openModal, closeModal } = useModal();
   const { t } = useTranslation();
+  const { voter } = useGetVoterInfo();
 
   const onRegister = useCallback(async () => {
     setIsLoading(true);

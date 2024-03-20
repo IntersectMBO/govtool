@@ -26,9 +26,9 @@ type UsePendingTransactionProps = {
 };
 
 export const usePendingTransaction = ({
-  dRepID,
   isEnabled,
   stakeKey,
+  dRepID,
 }: UsePendingTransactionProps) => {
   const { t } = useTranslation();
   const { openModal, closeModal } = useModal<StatusModalState>();
@@ -163,4 +163,4 @@ export const usePendingTransaction = ({
 };
 
 const isTransactionExpired = (time: Date): boolean =>
-  new Date().getTime() - time.getTime() > TIME_TO_EXPIRE_TRANSACTION;
+  Date.now() - time.getTime() > TIME_TO_EXPIRE_TRANSACTION;

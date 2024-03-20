@@ -6,6 +6,7 @@ import { PATHS } from "@consts";
 import { CenteredBoxBottomButtons } from "@molecules";
 import { useCardano, useModal } from "@context";
 import { RetireAsSoleVoterBoxContent } from "@organisms";
+import { useGetVoterInfo } from "@/hooks";
 
 export const RetireAsSoleVoterBox = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -18,16 +19,23 @@ export const RetireAsSoleVoterBox = () => {
   } = useCardano();
   const { openModal, closeModal } = useModal();
   const { t } = useTranslation();
+  const { voter } = useGetVoterInfo();
 
   const onRetire = useCallback(async () => {
     try {
       setIsLoading(true);
       const isPendingTx = isPendingTransaction();
       if (isPendingTx) return;
-      const certBuilder = await buildDRepRetirementCert();
+      if (!voter?.deposit) {
+        throw new Error("Can not fetch deposit");
+      }
+      const certBuilder = await buildDRepRetirementCert(
+        voter?.deposit?.toString()
+      );
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
         type: "retireAsSoleVoter",
+        voterDeposit: voter?.deposit?.toString(),
       });
       if (result) {
         openModal({
@@ -72,6 +80,7 @@ export const RetireAsSoleVoterBox = () => {
     buildSignSubmitConwayCertTx,
     isPendingTransaction,
     openModal,
+    voter?.deposit,
   ]);
 
   return (

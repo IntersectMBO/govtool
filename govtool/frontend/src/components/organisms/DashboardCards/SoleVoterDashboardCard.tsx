@@ -1,23 +1,21 @@
-import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
 import { useTranslation } from "@hooks";
-import { DashboardActionCard } from "@molecules";
+import { DashboardActionCard, DashboardActionCardProps } from "@molecules";
 import { correctAdaFormat, openInNewTab } from "@utils";
+import { LoadingButtonProps } from "@atoms";
 import { PendingTransaction } from "@/context/pendingTransaction";
 import { VoterInfo } from "@/models";
 
 type SoleVoterDashboardCardProps = {
-  isPendingTransaction: () => boolean;
   pendingTransaction: PendingTransaction;
   voter: VoterInfo;
   votingPower: number;
 };
 
 export const SoleVoterDashboardCard = ({
-  isPendingTransaction,
   pendingTransaction,
   voter,
   votingPower,
@@ -25,93 +23,95 @@ export const SoleVoterDashboardCard = ({
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const navigateTo = useCallback(
-    (path: string) => {
-      const isPendingTx = isPendingTransaction();
-      if (isPendingTx) return;
-      navigate(path);
-    },
-    [isPendingTransaction, navigate]
-  );
+  const ada = correctAdaFormat(votingPower);
 
-  const soleVoterCardDescription = useMemo(() => {
-    if (pendingTransaction.registerAsSoleVoter) return "dashboard.soleVoter.registrationInProgress";
+  const cardProps: Partial<DashboardActionCardProps> = (() => {
+    // transaction in progress
+    if (
+      !!pendingTransaction.registerAsSoleVoter ||
+      !!pendingTransaction.retireAsSoleVoter
+    ) {
+      return {
+        buttons: [
+          {
+            children: t("seeTransaction"),
+            dataTestId: "see-transaction-button",
+            onClick: () =>
+              openInNewTab("https://adanordic.com/latest_transactions"),
+          },
+        ],
+        state: "inProgress",
+        ...(pendingTransaction.registerAsSoleVoter && {
+          description: t("dashboard.soleVoter.registrationInProgress"),
+          title: t("dashboard.soleVoter.registration"),
+        }),
+        ...(pendingTransaction.retireAsSoleVoter && {
+          description: t("dashboard.soleVoter.retirementInProgress"),
+          title: t("dashboard.soleVoter.retirement"),
+        }),
+      };
+    }
 
-    if (pendingTransaction.retireAsSoleVoter) return "dashboard.soleVoter.retirementInProgress";
-
-    if (voter?.isRegisteredAsSoleVoter) return "dashboard.soleVoter.isRegisteredDescription";
-
-    if (voter?.wasRegisteredAsSoleVoter) return "dashboard.soleVoter.wasRegisteredDescription";
-
-    return "dashboard.soleVoter.registerDescription";
-  }, [
-    pendingTransaction,
-    voter?.isRegisteredAsSoleVoter,
-    voter?.wasRegisteredAsSoleVoter,
-  ]);
-
-  const soleVoterCardTitle = useMemo(() => {
-    if (pendingTransaction.retireAsSoleVoter) return t("dashboard.soleVoter.retirement");
-
-    if (pendingTransaction.registerAsSoleVoter) return t("dashboard.soleVoter.registration");
-
-    if (voter?.isRegisteredAsSoleVoter) return t("dashboard.soleVoter.youAreSoleVoterTitle");
-
-    if (voter?.wasRegisteredAsSoleVoter) return t("dashboard.soleVoter.wasSoleVoterTitle");
-
-    return t("dashboard.soleVoter.registerTitle");
-  }, [
-    pendingTransaction,
-    voter?.isRegisteredAsSoleVoter,
-    voter?.isRegisteredAsSoleVoter,
-  ]);
-
-  return (
-    <DashboardActionCard
-      title={soleVoterCardTitle}
-      inProgress={
-        !!pendingTransaction.registerAsSoleVoter ||
-        !!pendingTransaction.retireAsSoleVoter
-      }
-      dataTestidFirstButton={
-        voter?.isRegisteredAsSoleVoter
-          ? "retire-as-sole-voter-button"
-          : "register-as-sole-voter-button"
-      }
-      dataTestidSecondButton="learn-more-button"
-      description={(
-        <Trans
-          i18nKey={soleVoterCardDescription}
-          values={{ votingPower: correctAdaFormat(votingPower) }}
-        />
-      )}
-      firstButtonLabel={
-        pendingTransaction.registerAsSoleVoter
-          ? ""
-          : t(
-            voter?.isRegisteredAsSoleVoter
-              ? "dashboard.soleVoter.retire"
-              : voter?.wasRegisteredAsSoleVoter
-                ? "dashboard.soleVoter.reRegister"
-                : "dashboard.soleVoter.register"
-          )
-      }
-      firstButtonAction={() =>
-        navigateTo(
-          voter?.isRegisteredAsSoleVoter
-            ? PATHS.retireAsSoleVoter
-            : PATHS.registerAsSoleVoter
-        )}
-      firstButtonVariant={
-        voter?.isRegisteredAsSoleVoter ? "outlined" : "contained"
-      }
-      secondButtonLabel={t("learnMore")}
-      secondButtonAction={() =>
+    // learn more button
+    const learnMoreButton: LoadingButtonProps = {
+      children: t("learnMore"),
+      dataTestId: "learn-more-button",
+      onClick: () =>
         openInNewTab(
           "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep"
-        )}
-      secondButtonVariant="outlined"
-      imageURL={IMAGES.soleVoterImage}
-    />
+        ),
+    };
+
+    // currently registered
+    if (voter?.isRegisteredAsSoleVoter) {
+      return {
+        buttons: [
+          {
+            children: t("dashboard.soleVoter.retire"),
+            dataTestId: "retire-as-sole-voter-button",
+            onClick: () => navigate(PATHS.retireAsSoleVoter),
+          },
+          learnMoreButton,
+        ],
+        description: <Trans i18nKey="dashboard.soleVoter.isRegisteredDescription" values={{ votingPower: ada }} />,
+        state: "active",
+        title: t("dashboard.soleVoter.youAreSoleVoterTitle"),
+      };
+    }
+
+    // was registered
+    if (voter?.wasRegisteredAsSoleVoter) {
+      return {
+        buttons: [
+          {
+            children: t("dashboard.soleVoter.reRegister"),
+            dataTestId: "register-as-sole-voter-button",
+            onClick: () => navigate(PATHS.registerAsSoleVoter),
+          },
+          learnMoreButton,
+        ],
+        description: <Trans i18nKey="dashboard.soleVoter.wasRegisteredDescription" values={{ votingPower: ada }} />,
+        title: t("dashboard.soleVoter.wasSoleVoterTitle"),
+      };
+    }
+
+    // not registered
+    return {
+      buttons: [
+        {
+          children: t("dashboard.soleVoter.register"),
+          dataTestId: "register-as-sole-voter-button",
+          onClick: () => navigate(PATHS.registerAsSoleVoter),
+          variant: "contained",
+        },
+        learnMoreButton,
+      ],
+      description: <Trans i18nKey="dashboard.soleVoter.registerDescription" values={{ votingPower: ada }} />,
+      title: t("dashboard.soleVoter.registerTitle"),
+    };
+  })();
+
+  return (
+    <DashboardActionCard imageURL={IMAGES.soleVoterImage} {...cardProps} />
   );
 };

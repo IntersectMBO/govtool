@@ -15,14 +15,18 @@ export const ListGovActionsDashboardCards = ({ voter }: ListGovActionsDashboardC
 
   return (
     <DashboardActionCard
-      dataTestidFirstButton="view-governance-actions-button"
+      buttons={[
+        {
+          children: t(
+            `dashboard.govActions.${
+              voter?.isRegisteredAsDRep ? "reviewAndVote" : "view"
+            }`
+          ),
+          dataTestId: "view-governance-actions-button",
+          onClick: () => navigate(PATHS.dashboardGovernanceActions),
+        },
+      ]}
       description={t("dashboard.govActions.description")}
-      firstButtonAction={() => navigate(PATHS.dashboardGovernanceActions)}
-      firstButtonLabel={t(
-        `dashboard.govActions.${
-          voter?.isRegisteredAsDRep ? "reviewAndVote" : "view"
-        }`
-      )}
       imageURL={IMAGES.govActionListImage}
       title={t("dashboard.govActions.title")}
     />

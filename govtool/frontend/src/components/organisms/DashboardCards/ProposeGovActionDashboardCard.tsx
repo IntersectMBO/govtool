@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { IMAGES, PATHS } from "@consts";
@@ -8,41 +7,50 @@ import { openInNewTab } from "@utils";
 import { PendingTransaction } from "@/context/pendingTransaction";
 
 type ProposeGovActionDashboardCardProps = {
-  pendingTransaction: PendingTransaction;
+  createGovActionTx: PendingTransaction["createGovAction"];
 };
 
 export const ProposeGovActionDashboardCard = ({
-  pendingTransaction,
+  createGovActionTx,
 }: ProposeGovActionDashboardCardProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const onClickGovernanceActionCardActionButton = useCallback(() => {
-    if (!pendingTransaction.createGovAction) {
-      navigate(PATHS.dashboardGovernanceActions);
-      return;
-    }
-    navigate(PATHS.createGovernanceAction);
-  }, [pendingTransaction, navigate]);
-
   return (
     <DashboardActionCard
-      dataTestidFirstButton="propose-governance-actions-button"
+      buttons={[
+        ...(createGovActionTx
+          // transaction in progress
+          ? [
+              {
+                children: t("dashboard.proposeGovernanceAction.view"),
+                dataTestId: "propose-governance-actions-button",
+                onClick: () => navigate(PATHS.dashboardGovernanceActions),
+                variant: "contained",
+              } as const,
+          ]
+          // default
+          : [
+              {
+                children: t("dashboard.proposeGovernanceAction.propose"),
+                dataTestId: "propose-governance-actions-button",
+                onClick: () => navigate(PATHS.createGovernanceAction),
+                variant: "contained",
+              } as const,
+          ]),
+        // common
+        {
+          children: t("learnMore"),
+          dataTestId: "learn-more-button",
+          onClick: () =>
+            openInNewTab(
+              "https://docs.sanchogov.tools/faqs/what-is-a-governance-action"
+            ),
+        },
+      ]}
       description={t("dashboard.proposeGovernanceAction.description")}
-      firstButtonAction={onClickGovernanceActionCardActionButton}
-      firstButtonLabel={t(
-        `dashboard.proposeGovernanceAction.${
-          pendingTransaction.createGovAction ? "view" : "propose"
-        }`
-      )}
-      inProgress={!!pendingTransaction.createGovAction}
-      secondButtonLabel={t("learnMore")}
-      secondButtonAction={() =>
-        openInNewTab(
-          "https://docs.sanchogov.tools/faqs/what-is-a-governance-action"
-        )}
-      secondButtonVariant="outlined"
       imageURL={IMAGES.proposeGovActionImage}
+      state={createGovActionTx ? "inProgress" : "default"}
       title={t("dashboard.proposeGovernanceAction.title")}
     />
   );

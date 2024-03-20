@@ -1,4 +1,5 @@
 import { Box, CircularProgress } from "@mui/material";
+
 import { useCardano } from "@context";
 import {
   useGetAdaHolderVotingPowerQuery,
@@ -16,7 +17,6 @@ export const DashboardCards = () => {
   const {
     dRepID,
     dRepIDBech32,
-    isPendingTransaction,
     pendingTransaction,
     stakeKey,
   } = useCardano();
@@ -61,21 +61,18 @@ export const DashboardCards = () => {
     >
       <DelegateDashboardCard
         currentDelegation={currentDelegation}
+        delegateTx={pendingTransaction.delegate}
         dRepID={dRepID}
-        isPendingTransaction={isPendingTransaction}
-        pendingTransaction={pendingTransaction}
         votingPower={votingPower}
       />
 
       <DRepDashboardCard
         dRepIDBech32={dRepIDBech32}
-        isPendingTransaction={isPendingTransaction}
         pendingTransaction={pendingTransaction}
         voter={voter}
       />
 
       <SoleVoterDashboardCard
-        isPendingTransaction={isPendingTransaction}
         pendingTransaction={pendingTransaction}
         voter={voter}
         votingPower={votingPower}
@@ -83,7 +80,9 @@ export const DashboardCards = () => {
 
       <ListGovActionsDashboardCards voter={voter} />
 
-      <ProposeGovActionDashboardCard pendingTransaction={pendingTransaction} />
+      <ProposeGovActionDashboardCard
+        createGovActionTx={pendingTransaction.createGovAction}
+      />
     </Box>
   );
 };

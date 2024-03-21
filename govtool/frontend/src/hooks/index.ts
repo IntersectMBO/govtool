@@ -1,4 +1,6 @@
 export { useTranslation } from "react-i18next";
+
+export * from "./useDelegateToDrep";
 export * from "./useFetchNextPageDetector";
 export * from "./useOutsideClick";
 export * from "./useSaveScrollPosition";

@@ -16,18 +16,18 @@ type Story = StoryObj<typeof meta>;
 
 export const StatusPillActive: Story = {
   args: {
-    status: "active",
+    status: "Active",
   },
 };
 
 export const StatusPillInactive: Story = {
   args: {
-    status: "inactive",
+    status: "Inactive",
   },
 };
 
 export const StatusPillRetired: Story = {
   args: {
-    status: "retired",
+    status: "Retired",
   },
 };

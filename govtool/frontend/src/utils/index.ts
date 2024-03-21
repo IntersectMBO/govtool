@@ -5,6 +5,7 @@ export * from "./callAll";
 export * from "./canonizeJSON";
 export * from "./checkIsMaintenanceOn";
 export * from "./checkIsWalletConnected";
+export * from "./dRep";
 export * from "./formatDate";
 export * from "./generateAnchor";
 export * from "./generateJsonld";

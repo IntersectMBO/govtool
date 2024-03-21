@@ -2,9 +2,7 @@
 pkgs.mkShell {
   buildInputs = with pkgs; [ awscli curl docker git gnumake openssh rsync ];
   shellHook = ''
-    function warn() {
-      tput setaf $2; echo "$1"; tput sgr0
-    }
+    function warn() { tput setaf $2; echo "$1"; tput sgr0; }
 
     tput bold
     warn "Welcome to GovTool!" 4

@@ -34,7 +34,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
     buildVoteDelegationCert,
     dRepID: myDRepId,
     pendingTransaction,
-    stakeKey
+    stakeKey,
   } = useCardano();
   const { t } = useTranslation();
   const navigate = useNavigate();

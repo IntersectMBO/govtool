@@ -19,6 +19,7 @@
         name = system;
         value = {
           scripts = pkgs.callPackage ./scripts/govtool { inherit pkgs; };
+          infra = pkgs.callPackage ./infra/terraform { inherit pkgs; };
           backend = pkgs.callPackage ./govtool/backend { inherit pkgs; };
         };
       }) supportedSystems);

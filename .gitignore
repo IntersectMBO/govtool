@@ -100,7 +100,7 @@ book/src/08_event-db/db-diagrams/*.dot
 
 # Used by nix
 result*
-/.direnv/
+.direnv/
 /.pre-commit-config.yaml
 
 # Development Environments

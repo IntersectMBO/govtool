@@ -4,7 +4,7 @@ import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { getDRepList } from "@services";
 
-export const useGetDRepListQuery = () => {
+export const useGetDRepListQuery = (dRepView?: string) => {
   const { pendingTransaction } = useCardano();
 
   const { data, isLoading } = useQuery({
@@ -15,7 +15,7 @@ export const useGetDRepListQuery = () => {
         pendingTransaction.retireAsSoleVoter ||
         pendingTransaction.retireAsDrep)?.transactionHash,
     ],
-    queryFn: getDRepList,
+    queryFn: () => getDRepList(dRepView),
   });
 
   return { data, isLoading };

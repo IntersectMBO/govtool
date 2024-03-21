@@ -2,12 +2,12 @@ import { Dispatch, SetStateAction, useCallback } from "react";
 import { useFieldArray } from "react-hook-form";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
-import { Button, InfoText, Spacer, Typography } from '@atoms';
-import { GOVERNANCE_ACTION_FIELDS, Placeholders } from '@consts';
-import { useCreateGovernanceActionForm, useTranslation } from '@hooks';
-import { Field } from '@molecules';
-import { URL_REGEX } from '@/utils';
-import { GovernanceActionField } from '@/types/governanceAction';
+import { Button, InfoText, Spacer, Typography } from "@atoms";
+import { GOVERNANCE_ACTION_FIELDS, Placeholders } from "@consts";
+import { useCreateGovernanceActionForm, useTranslation } from "@hooks";
+import { Field } from "@molecules";
+import { URL_REGEX } from "@/utils";
+import { GovernanceActionField } from "@/types/governanceAction";
 
 import { BgCard } from "../BgCard";
 import { ControlledField } from "../ControlledField";
@@ -38,8 +38,10 @@ export const CreateGovernanceActionForm = ({
   });
 
   const isContinueButtonDisabled =
+    // TODO: Provide better typing for GOVERNANCE_ACTION_FIELDS
+    // to get rid of explicit type assertion
     Object.keys(GOVERNANCE_ACTION_FIELDS[type!]).some(
-      (field) => !watch(field as keyof CreateGovernanceActionValues),
+      (field) => !watch(field as unknown as Parameters<typeof watch>[0]),
     ) || isError;
 
   const onClickContinue = () => {
@@ -77,7 +79,7 @@ export const CreateGovernanceActionForm = ({
       }
     });
 
-  const addLink = useCallback(() => append({ link: '' }), [append]);
+  const addLink = useCallback(() => append({ link: "" }), [append]);
 
   const removeLink = useCallback((index: number) => remove(index), [remove]);
 

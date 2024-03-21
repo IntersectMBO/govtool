@@ -14,7 +14,7 @@ interface ProviderProps {
 }
 
 interface ContextModal {
-  component: null | MuiModalChildren;
+  component: MuiModalChildren | null;
   variant?: "modal" | "popup";
   preventDismiss?: boolean;
   onClose?: () => void;

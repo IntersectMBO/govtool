@@ -76,7 +76,6 @@ export const DashboardGovernanceActionsVotedOn = ({
                   >
                     <GovernanceVotedOnCard
                       votedProposal={action}
-                      searchPhrase={searchPhrase}
                       inProgress={
                         voteTransaction.proposalId ===
                         action.proposal.txHash + action.proposal.index

@@ -1,14 +1,14 @@
-import { useCallback, useEffect } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect } from "react";
+import { Route, Routes, useNavigate } from "react-router-dom";
 
-import { Modal, ScrollToTop } from '@atoms';
-import { PATHS } from '@consts';
-import { useCardano, useModal } from '@context';
+import { Modal, ScrollToTop } from "@atoms";
+import { PATHS } from "@consts";
+import { useCardano, useModal } from "@context";
 import {
   DashboardCards,
   DashboardGovernanceActions,
   DashboardGovernanceActionDetails,
-} from '@organisms';
+} from "@organisms";
 import {
   ChooseStakeKey,
   Dashboard,
@@ -22,17 +22,17 @@ import {
   GovernanceActionsCategory,
   DashboardGovernanceActionsCategory,
   RetireAsSoleVoter,
-} from '@pages';
+} from "@pages";
 import {
   callAll,
   getItemFromLocalStorage,
   WALLET_LS_KEY,
   removeItemFromLocalStorage,
-} from '@utils';
-import { SetupInterceptors } from './services';
-import { useGetVoterInfo, useWalletConnectionListener } from './hooks';
-import { RegisterAsSoleVoter } from './pages/RegisterAsSoleVoter';
-import { CreateGovernanceAction } from './pages/CreateGovernanceAction';
+} from "@utils";
+import { SetupInterceptors } from "./services";
+import { useGetVoterInfo, useWalletConnectionListener } from "./hooks";
+import { RegisterAsSoleVoter } from "./pages/RegisterAsSoleVoter";
+import { CreateGovernanceAction } from "./pages/CreateGovernanceAction";
 
 export default () => {
   const { enable, setVoter, setIsDrepLoading } = useCardano();
@@ -135,12 +135,12 @@ export default () => {
           handleClose={
             !modals[modal.type].preventDismiss
               ? callAll(modals[modal.type]?.onClose, () =>
-                  openModal({ type: 'none', state: null }),
+                  openModal({ type: "none", state: null }),
                 )
               : undefined
           }
         >
-          {modals[modal.type]?.component}
+          {modals[modal.type].component!}
         </Modal>
       )}
     </>

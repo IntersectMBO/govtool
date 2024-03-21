@@ -1,15 +1,15 @@
-import { useEffect } from 'react';
-import { Meta, StoryFn } from '@storybook/react';
-import { expect } from '@storybook/jest';
-import { within, waitFor, screen, userEvent } from '@storybook/testing-library';
+import { useEffect } from "react";
+import { Meta, StoryFn } from "@storybook/react";
+import { expect } from "@storybook/jest";
+import { within, waitFor, screen, userEvent } from "@storybook/testing-library";
 
-import { Modal } from '@atoms';
-import { StatusModal, StatusModalState } from '@organisms';
-import { callAll } from '@utils';
-import { useModal } from '../../context/modal';
+import { Modal } from "@atoms";
+import { StatusModal, StatusModalState } from "@organisms";
+import { callAll } from "@utils";
+import { useModal } from "../../context/modal";
 
 const meta = {
-  title: 'Example/Modals/StatusModal',
+  title: "Example/Modals/StatusModal",
   component: StatusModal,
 } satisfies Meta<typeof StatusModal>;
 
@@ -29,12 +29,12 @@ const performCommonAction = async (
     ).toBeInTheDocument();
 
     // Validating closing of modal
-    await userEvent.click(modalCanvas.getByTestId('confirm-modal-button'));
+    await userEvent.click(modalCanvas.getByTestId("confirm-modal-button"));
     expect(screen.queryAllByTestId(args.dataTestId)).toHaveLength(0); // checking id modal is closed
 
-    await userEvent.click(canvas.getByRole('button'));
+    await userEvent.click(canvas.getByRole("button"));
     modalCanvas = within(screen.getAllByTestId(args.dataTestId)[0]);
-    await userEvent.click(modalCanvas.getByTestId('close-modal-button'));
+    await userEvent.click(modalCanvas.getByTestId("close-modal-button"));
     expect(screen.queryAllByTestId(args.dataTestId)).toHaveLength(0); // checking id modal is closed
   });
 };
@@ -49,7 +49,7 @@ const Template: StoryFn<StatusModalState> = ({
 
   const open = () => {
     openModal({
-      type: 'statusModal',
+      type: "statusModal",
       state: {
         buttonText,
         status,
@@ -69,17 +69,17 @@ const Template: StoryFn<StatusModalState> = ({
 
   return (
     <>
-      <button type="button" onClick={open} style={{ cursor: 'pointer' }}>
+      <button type="button" onClick={open} style={{ cursor: "pointer" }}>
         Open Modal
       </button>
       {modals[modal.type]?.component && (
         <Modal
           open={Boolean(modals[modal.type].component)}
           handleClose={callAll(modals[modal.type]?.onClose, () =>
-            openModal({ type: 'none', state: null }),
+            openModal({ type: "none", state: null }),
           )}
         >
-          {modals[modal.type]?.component}
+          {modals[modal.type].component!}
         </Modal>
       )}
     </>
@@ -88,11 +88,11 @@ const Template: StoryFn<StatusModalState> = ({
 
 export const Warning = Template.bind({});
 Warning.args = {
-  status: 'warning',
+  status: "warning",
   message:
-    'We had trouble processing your request. Please try again or come back later.',
-  title: 'Oops!',
-  dataTestId: 'warning-modal',
+    "We had trouble processing your request. Please try again or come back later.",
+  title: "Oops!",
+  dataTestId: "warning-modal",
 };
 
 Warning.play = async ({ canvasElement, args }) => {
@@ -102,10 +102,10 @@ Warning.play = async ({ canvasElement, args }) => {
 
 export const Success = Template.bind({});
 Success.args = {
-  status: 'success',
-  message: 'Delegation transaction submitted!',
-  title: 'Success!',
-  dataTestId: 'status-modal',
+  status: "success",
+  message: "Delegation transaction submitted!",
+  title: "Success!",
+  dataTestId: "status-modal",
 };
 
 Success.play = async ({ canvasElement, args }) => {
@@ -115,12 +115,12 @@ Success.play = async ({ canvasElement, args }) => {
 
 export const Info = Template.bind({});
 Info.args = {
-  status: 'info',
+  status: "info",
   message:
-    'Before performing a new action please wait for the previous action transaction to be completed.',
-  title: 'Please wait for your previous transaction to be completed.',
-  dataTestId: 'info-modal',
-  buttonText: 'Ok',
+    "Before performing a new action please wait for the previous action transaction to be completed.",
+  title: "Please wait for your previous transaction to be completed.",
+  dataTestId: "info-modal",
+  buttonText: "Ok",
 };
 
 Info.play = async ({ canvasElement, args }) => {

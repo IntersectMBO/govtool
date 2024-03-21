@@ -41,6 +41,7 @@ export const useVoteActionFormController = () => {
             t("forms.errors.hashInvalidFormat"),
             (value) => !value || HASH_REGEX.test(value),
           ),
+        storeData: Yup.boolean(),
       }),
     [],
   );

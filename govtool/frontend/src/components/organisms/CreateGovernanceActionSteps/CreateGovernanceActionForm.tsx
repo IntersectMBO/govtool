@@ -2,10 +2,8 @@ import { Dispatch, SetStateAction, useCallback } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
-import {
-  Button, InfoText, Spacer, Typography
-} from '@atoms';
-import { GOVERNANCE_ACTION_FIELDS } from '@consts';
+import { Button, InfoText, Spacer, Typography } from '@atoms';
+import { GOVERNANCE_ACTION_FIELDS, Placeholders } from '@consts';
 import { useCreateGovernanceActionForm, useTranslation } from '@hooks';
 import { Field } from '@molecules';
 import { URL_REGEX } from '@/utils';
@@ -14,7 +12,6 @@ import { GovernanceActionField } from '@/types/governanceAction';
 import { BgCard } from '../BgCard';
 import { ControlledField } from '../ControlledField';
 
-const LINK_PLACEHOLDER = 'https://website.com/';
 const MAX_NUMBER_OF_LINKS = 8;
 
 type CreateGovernanceActionFormProps = {
@@ -25,9 +22,7 @@ export const CreateGovernanceActionForm = ({
   setStep,
 }: CreateGovernanceActionFormProps) => {
   const { t } = useTranslation();
-  const {
-    control, errors, getValues, register, reset, watch
-  } =
+  const { control, errors, getValues, register, reset, watch } =
     useCreateGovernanceActionForm();
 
   const isError = Object.keys(errors).length > 0;
@@ -83,16 +78,9 @@ export const CreateGovernanceActionForm = ({
       }
     });
 
-  const addLink = useCallback(() => {
-    append({ link: '' });
-  }, [append]);
+  const addLink = useCallback(() => append({ link: '' }), [append]);
 
-  const removeLink = useCallback(
-    (index: number) => {
-      remove(index);
-    },
-    [remove],
-  );
+  const removeLink = useCallback((index: number) => remove(index), [remove]);
 
   const renderLinks = useCallback(
     () =>
@@ -112,7 +100,7 @@ export const CreateGovernanceActionForm = ({
           key={field.id}
           label={`${t('forms.link')} ${index + 1}`}
           layoutStyles={{ mb: 3 }}
-          placeholder={LINK_PLACEHOLDER}
+          placeholder={Placeholders.LINK}
           name={`links.${index}.link`}
           rules={{
             pattern: {

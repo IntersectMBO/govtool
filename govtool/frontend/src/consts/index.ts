@@ -4,4 +4,5 @@ export * from "./icons";
 export * from "./images";
 export * from "./navItems";
 export * from "./paths";
+export * from "./placeholders";
 export * from "./queryKeys";

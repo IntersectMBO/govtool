@@ -1,12 +1,20 @@
-import { Box, ButtonBase } from "@mui/material";
+import { PropsWithChildren, useState } from "react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
+import {
+  Box, ButtonBase, Chip, CircularProgress
+} from "@mui/material";
 
-import { Button, Typography } from "@atoms";
+import { Button, LoadingButton, Typography } from "@atoms";
 import { Card, Share } from "@molecules";
-import { ICONS } from "@consts";
-import { useScreenDimension, useTranslation } from "@hooks";
-import { openInNewTab } from "@utils";
-import { PropsWithChildren } from "react";
-import { useModal } from "@/context";
+import { ICONS, PATHS } from "@consts";
+import {
+  useGetAdaHolderCurrentDelegationQuery,
+  useGetDRepListQuery,
+  useScreenDimension,
+  useTranslation
+} from "@hooks";
+import { correctAdaFormat, openInNewTab } from "@utils";
+import { useCardano, useModal, useSnackbar } from "@/context";
 
 const LINKS = [
   "darlenelonglink1.DRepwebsiteorwhatever.com",
@@ -21,48 +29,129 @@ type DRepDetailsProps = {
 };
 
 export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
+  const {
+    buildSignSubmitConwayCertTx,
+    buildVoteDelegationCert,
+    dRepID: myDRepId,
+    pendingTransaction,
+    stakeKey
+  } = useCardano();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { openModal } = useModal();
+  const { addSuccessAlert, addErrorAlert } = useSnackbar();
   const { screenWidth } = useScreenDimension();
+  const { dRepId: dRepParam } = useParams();
+
+  const [isDelegating, setIsDelegating] = useState(false);
+
+  const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
+  const { data, isLoading } = useGetDRepListQuery(dRepParam);
+  const dRep = data?.[0];
+
+  if (!dRep && isLoading) return <CircularProgress />;
+
+  if (!dRep) return <Navigate to={PATHS.error} />;
+
+  const {
+    drepId, view, status, votingPower, type
+  } = dRep;
+
+  const isMe = drepId === myDRepId || view === myDRepId;
+  const isMyDrep = drepId === currentDelegation || view === currentDelegation;
+  const inProgressDelegation = pendingTransaction.delegate?.resourceId;
+  const isMyDrepInProgress = drepId === inProgressDelegation || view === inProgressDelegation;
+
+  const delegate = async () => {
+    setIsDelegating(true);
+    try {
+      const certBuilder = await buildVoteDelegationCert(drepId);
+      const result = await buildSignSubmitConwayCertTx({
+        certBuilder,
+        type: "delegate",
+        resourceId: drepId,
+      });
+      if (result) {
+        addSuccessAlert(t("alerts.delegate.success"));
+      }
+    } catch (error) {
+      addErrorAlert(t("alerts.delegate.failed"));
+    } finally {
+      setIsDelegating(false);
+    }
+  };
 
   return (
-    <Card sx={{ borderRadius: 5, pb: 4, pt: 2.25 }}>
+    <Card
+      {...((isMe || isMyDrep) && {
+        border: true,
+        variant: "primary",
+      })}
+      {...(isMyDrepInProgress && {
+        variant: "warning",
+        label: t("inProgress"),
+      })}
+      sx={{
+        borderRadius: 5, mt: isMe || isMyDrep ? 1 : 0, pb: 4, pt: 2.25
+      }}
+    >
+      {(isMe || isMyDrep) && (
+        <Chip
+          color="primary"
+          label={isMe ? t("dRepDirectory.meAsDRep") : t("dRepDirectory.myDRep")}
+          sx={{
+            boxShadow: (theme) => theme.shadows[2],
+            color: (theme) => theme.palette.text.primary,
+            mb: 1.5,
+            px: 2,
+            py: 0.5,
+            width: '100%',
+          }}
+        />
+      )}
       <Box
         sx={{
           alignItems: "center",
           display: "flex",
           flexDirection: "row",
-          justifyContent: "space-between",
+          gap: 1,
           mb: 3
         }}
       >
         <Typography
           fontWeight={600}
-          sx={ellipsisStyles}
+          sx={{ ...ellipsisStyles, flex: 1 }}
           variant="title2"
         >
-          ExampleDRepName
+          {type}
         </Typography>
-        {/* TODO: connect link */}
-        <Share link="test" />
+        {isMe && (
+          <Button
+            onClick={() => navigate(PATHS.updateMetadata)}
+            variant="outlined"
+          >
+            {t("dRepDirectory.editBtn")}
+          </Button>
+        )}
+        <Share link={window.location.href} />
       </Box>
 
       <Box component="dl" gap={2} m={0}>
         <DRepDetailsInfoItem label={t("drepId")}>
-          <DRepId>
-            drep_1njkdnkjwenfk12321ndcnsjdcsndc
-          </DRepId>
+          <DRepId>{view}</DRepId>
         </DRepDetailsInfoItem>
         <DRepDetailsInfoItem label={t("status")}>
           {/* TODO: add status pill */}
           {/* <StatusPill /> */}
+          <Typography>{status}</Typography>
         </DRepDetailsInfoItem>
         <DRepDetailsInfoItem label={t("votingPower")}>
           <Typography sx={{ display: "flex", flexDirection: "row", mt: 0.5 }}>
             {'₳ '}
-            50,000,000
+            {correctAdaFormat(votingPower)}
           </Typography>
         </DRepDetailsInfoItem>
+        {/* TODO: fetch metadata, add views for metadata errors */}
         <DRepDetailsInfoItem label={t("email")}>
           <LinkWithIcon
             label="darlenelonglink.DRepwebsiteorwhatever.com"
@@ -85,14 +174,17 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
         }}
       >
         {isConnected ? (
-          <Button
-            // TODO: add delegate function
-            onClick={() => { }}
+          <LoadingButton
+            data-testid="delegate-button"
+            disabled={!!pendingTransaction.delegate}
+            isLoading={isDelegating}
+            onClick={delegate}
             size="extraLarge"
             sx={{ width: "100%" }}
+            variant="contained"
           >
             {t("delegate")}
-          </Button>
+          </LoadingButton>
         ) : (
           <Button
             onClick={() => openModal({ type: "chooseWallet" })}
@@ -111,6 +203,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
         sx={{ maxWidth: 608 }}
         variant="body1"
       >
+        {/* TODO replace with actual data */}
         I am the Cardano crusader carving his path in the blockchain
         battleground. With a mind sharper than a Ledger Nano X, this fearless
         crypto connoisseur fearlessly navigates the volatile seas of Cardano,

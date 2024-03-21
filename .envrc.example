@@ -33,11 +33,3 @@ export NGINX_BASIC_AUTH=<NGINX_BASIC_AUTH>
 # the IP addresses that bypass the basic auth
 export IP_ADDRESS_BYPASSING_BASIC_AUTH1=<IP_ADDRESS_BYPASSING_BASIC_AUTH1>
 export IP_ADDRESS_BYPASSING_BASIC_AUTH2=<IP_ADDRESS_BYPASSING_BASIC_AUTH2>
-
-# Tell direnv to use Nix Flakes configuration.
-# See https://direnv.net/docs/hook.html#nix.
-# Uncomment one of the following lines depending on the role you want to use the
-# project with:
-
-# use flake --extra-experimental-features nix-command --extra-experimental-features flakes .#scripts
-# use flake --extra-experimental-features nix-command --extra-experimental-features flakes .#backend

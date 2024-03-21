@@ -3,7 +3,7 @@ import { useFieldArray } from 'react-hook-form';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 import { Button, InfoText, Spacer, Typography } from '@atoms';
-import { GOVERNANCE_ACTION_FIELDS } from '@consts';
+import { GOVERNANCE_ACTION_FIELDS, Placeholders } from '@consts';
 import { useCreateGovernanceActionForm, useTranslation } from '@hooks';
 import { Field } from '@molecules';
 import { URL_REGEX } from '@/utils';
@@ -78,16 +78,9 @@ export const CreateGovernanceActionForm = ({
       }
     });
 
-  const addLink = useCallback(() => {
-    append({ link: '' });
-  }, [append]);
+  const addLink = useCallback(() => append({ link: '' }), [append]);
 
-  const removeLink = useCallback(
-    (index: number) => {
-      remove(index);
-    },
-    [remove],
-  );
+  const removeLink = useCallback((index: number) => remove(index), [remove]);
 
   const renderLinks = useCallback(
     () =>
@@ -107,7 +100,7 @@ export const CreateGovernanceActionForm = ({
           key={field.id}
           label={`${t('forms.link')} ${index + 1}`}
           layoutStyles={{ mb: 3 }}
-          placeholder={t('forms.linkPlaceholder')}
+          placeholder={Placeholders.LINK}
           name={`links.${index}.link`}
           rules={{
             pattern: {

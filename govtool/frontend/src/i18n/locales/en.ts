@@ -285,7 +285,6 @@ export const en = {
       hashPlaceholder: "The hash of metadata at URL",
       howCreateUrlAndHash: "How to create URL and hash?",
       link: "Link",
-      linkPlaceholder: "https://website.com/",
       urlWithContextPlaceholder: "Your URL with with your context",
       urlWithInfoPlaceholder: "Your URL with extra info about you",
       createGovernanceAction: {

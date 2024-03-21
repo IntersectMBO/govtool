@@ -1,4 +1,4 @@
-import { SxProps } from "@mui/material";
+import { SxProps } from '@mui/material';
 
 export type LinkWithIconProps = {
   label: string;
@@ -10,7 +10,7 @@ export type LinkWithIconProps = {
 export type StepProps = {
   label: string;
   stepNumber: number | string;
-  component?: JSX.Element;
+  component?: React.ReactNode;
   componentsLayoutStyles?: SxProps;
   layoutStyles?: SxProps;
 };

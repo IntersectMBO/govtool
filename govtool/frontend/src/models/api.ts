@@ -10,9 +10,13 @@ export interface VoterInfo {
 
 export interface DRepData {
   drepId: string;
+  view: string;
   url: string;
   metadataHash: string;
   deposit: number;
+  votingPower: number;
+  status: 'Active' | 'Inactive' | 'Retired';
+  type: 'DRep' | 'SoleVoter';
 }
 
 export type Vote = "yes" | "no" | "abstain";

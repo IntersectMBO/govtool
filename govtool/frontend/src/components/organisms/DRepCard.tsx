@@ -5,20 +5,44 @@ import { useTranslation } from "@hooks";
 import { Button, StatusPill, Typography } from "@atoms";
 import { Card } from "@molecules";
 import { correctAdaFormat } from "@/utils";
-import { ICONS } from "@/consts";
+import { ICONS, PATHS } from "@/consts";
+import { DRepData } from "@/models";
+
+type DRepCardProps = {
+  dRep: DRepData;
+  isConnected: boolean;
+  isInProgress?: boolean;
+  isMe?: boolean;
+  onDelegate?: () => void;
+}
 
 export const DRepCard = ({
+  dRep: {
+    status,
+    type,
+    view,
+    votingPower,
+  },
   isConnected,
-  name,
-  id,
-  votingPower,
-  status,
-}: any) => {
+  isInProgress,
+  isMe,
+  onDelegate,
+}: DRepCardProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   return (
-    <Card sx={{ container: "root / inline-size", py: 2.5 }}>
+    <Card
+      {...(isMe && {
+        variant: 'primary',
+        label: 'Yourself'
+      })}
+      {...(isInProgress && {
+        variant: 'warning',
+        label: 'In Progress'
+      })}
+      sx={{ container: "root / inline-size", py: 2.5 }}
+    >
       <Box
         display="flex"
         flexDirection="column"
@@ -45,7 +69,7 @@ export const DRepCard = ({
             }}
           >
             <Box flex={1} minWidth={0}>
-              <Typography sx={ellipsisStyles}>{name}</Typography>
+              <Typography sx={ellipsisStyles}>{type}</Typography>
               <ButtonBase
                 sx={{
                   gap: 1,
@@ -57,7 +81,7 @@ export const DRepCard = ({
                 }}
               >
                 <Typography color="primary" variant="body2" sx={ellipsisStyles}>
-                  {id}
+                  {view}
                 </Typography>
                 <img alt="" src={ICONS.copyBlueIcon} />
               </ButtonBase>
@@ -108,13 +132,19 @@ export const DRepCard = ({
             },
           }}
         >
-          <Button variant="outlined" onClick={() => navigate(`/drep/${id}`)}>
+          <Button
+            variant="outlined"
+            onClick={() => navigate((isConnected
+              ? PATHS.dashboardDRepDirectoryDRep
+              : PATHS.dRepDirectoryDRep
+            ).replace(':dRepId', view))}
+          >
             {t("viewDetails")}
           </Button>
-          {status === "active" && isConnected && (
-            <Button>{t("delegate")}</Button>
+          {status === "Active" && isConnected && onDelegate && (
+            <Button onClick={onDelegate}>{t("delegate")}</Button>
           )}
-          {status === "active" && !isConnected && (
+          {status === "Active" && !isConnected && (
             <Button>{t("connectToDelegate")}</Button>
           )}
         </Box>

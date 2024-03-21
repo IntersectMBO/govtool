@@ -1,7 +1,7 @@
 import { Chip, ChipProps, styled } from "@mui/material";
 import { cyan, errorRed, successGreen } from "@/consts";
 
-type Status = 'active' | 'retired' | 'inactive';
+type Status = 'Active' | 'Inactive' | 'Retired';
 
 interface StatusPillProps {
   status: Status;
@@ -26,25 +26,25 @@ export const StatusPill = ({
 
 const getBgColor = (status: Status): string => {
   switch (status) {
-    case 'active':
+    case 'Active':
       return successGreen.c200;
-    case 'retired':
-      return errorRed.c100;
-    case 'inactive':
+    case 'Inactive':
       return cyan.c100;
-    // no default
+    case 'Retired':
+      return errorRed.c100;
+      // no default
   }
 };
 
 const getTextColor = (status: Status): string => {
   switch (status) {
-    case 'active':
+    case 'Active':
       return successGreen.c700;
-    case 'retired':
-      return errorRed.c500;
-    case 'inactive':
+    case 'Inactive':
       return cyan.c500;
-    // no default
+    case 'Retired':
+      return errorRed.c500;
+      // no default
   }
 };
 

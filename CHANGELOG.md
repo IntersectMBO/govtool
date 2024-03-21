@@ -9,6 +9,7 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
+
 - Update Cardano Serialization Lib to 12.0.0-alpha.19 [Issue 521](https://github.com/IntersectMBO/govtool/issues/521)
 - Add generate jsonld function [Issue 451](https://github.com/IntersectMBO/govtool/issues/451)
 - Create GA review subbmision page [Issue 362](https://github.com/IntersectMBO/govtool/issues/362)
@@ -21,6 +22,9 @@ changes.
 - Add frontend test workflow on github actions [Issue 500](https://github.com/IntersectMBO/govtool/issues/500)
 - Add type check & lint to github actions [Issue 512](https://github.com/IntersectMBO/govtool/issues/512)
 - Add eslint & prettier to frontend package [Issue 166](https://github.com/IntersectMBO/govtool/issues/166)
+- Extend the eslint config to apply to the style guide of the project [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
+- Fix all the existing eslint errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
+- Fix all the existing typescript errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
 
 ### Added
 

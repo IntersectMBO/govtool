@@ -21,9 +21,7 @@ export const WalletOptionButton: FC<WalletOption> = ({ ...props }) => {
   } = theme;
   const navigate = useNavigate();
 
-  const {
-    dataTestId, icon, label, name, cip95Available,
-  } = props;
+  const { dataTestId, icon, label, name, cip95Available } = props;
 
   const enableByWalletName = useCallback(async () => {
     if (isEnableLoading) return;
@@ -60,8 +58,8 @@ export const WalletOptionButton: FC<WalletOption> = ({ ...props }) => {
         "&:hover": isEnableLoading
           ? undefined
           : {
-            background: lightBlue,
-          },
+              background: lightBlue,
+            },
       }}
       key={name}
       onClick={enableByWalletName}

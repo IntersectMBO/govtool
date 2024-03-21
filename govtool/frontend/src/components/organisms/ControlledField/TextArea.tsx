@@ -1,9 +1,9 @@
-import { useCallback } from 'react';
-import { Controller, get } from 'react-hook-form';
+import { useCallback } from "react";
+import { Controller, get } from "react-hook-form";
 
-import { Field } from '@molecules';
+import { Field } from "@molecules";
 
-import { ControlledTextAreaProps, RenderInputProps } from './types';
+import { ControlledTextAreaProps, RenderInputProps } from "./types";
 
 export const TextArea = ({
   control,

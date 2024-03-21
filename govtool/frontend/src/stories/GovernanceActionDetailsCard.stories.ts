@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import {
-  screen, userEvent, waitFor, within,
-} from "@storybook/testing-library";
+import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
 import { GovernanceActionDetailsCard } from "@organisms";
 import { expect } from "@storybook/jest";
 
@@ -42,7 +40,9 @@ export const GovernanceActionDetailsCardComponent: Story = {
     await userEvent.hover(tooltips[0]);
     await waitFor(async () => {
       await expect(screen.getByRole("tooltip")).toBeInTheDocument();
-      await expect(screen.getByRole("tooltip")).toHaveTextContent(/Submission Date/i);
+      await expect(screen.getByRole("tooltip")).toHaveTextContent(
+        /Submission Date/i,
+      );
       await userEvent.unhover(tooltips[0]);
     });
     await userEvent.hover(tooltips[1]);

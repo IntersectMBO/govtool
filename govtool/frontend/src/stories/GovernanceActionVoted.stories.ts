@@ -1,50 +1,50 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from "@storybook/react";
 
-import { GovernanceVotedOnCard } from '@molecules';
-import { userEvent, waitFor, within, screen } from '@storybook/testing-library';
-import { expect } from '@storybook/jest';
-import { formatDisplayDate } from '@/utils';
+import { GovernanceVotedOnCard } from "@molecules";
+import { userEvent, waitFor, within, screen } from "@storybook/testing-library";
+import { expect } from "@storybook/jest";
+import { formatDisplayDate } from "@/utils";
 
 const meta = {
-  title: 'Example/GovernanceVotedOnCard',
+  title: "Example/GovernanceVotedOnCard",
   component: GovernanceVotedOnCard,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 } satisfies Meta<typeof GovernanceVotedOnCard>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 async function checkGovActionVisibility(canvas: ReturnType<typeof within>) {
-  expect(canvas.getByTestId('exampleType-type')).toBeInTheDocument();
-  expect(canvas.getByTestId('exampleHash#1-id')).toBeInTheDocument();
+  expect(canvas.getByTestId("exampleType-type")).toBeInTheDocument();
+  expect(canvas.getByTestId("exampleHash#1-id")).toBeInTheDocument();
   expect(canvas.getByText(/vote submitted/i)).toBeInTheDocument();
 
   expect(
-    canvas.getByText(formatDisplayDate('1970-01-01T00:00:00Z')),
+    canvas.getByText(formatDisplayDate("1970-01-01T00:00:00Z")),
   ).toBeInTheDocument();
   expect(
-    canvas.getByText(formatDisplayDate('1970-02-01T00:00:00Z')),
+    canvas.getByText(formatDisplayDate("1970-02-01T00:00:00Z")),
   ).toBeInTheDocument();
 
-  const tooltips = canvas.getAllByTestId('InfoOutlinedIcon');
+  const tooltips = canvas.getAllByTestId("InfoOutlinedIcon");
   await userEvent.hover(tooltips[0]);
   await waitFor(async () => {
-    expect(screen.getByRole('tooltip')).toBeInTheDocument();
-    expect(screen.getByRole('tooltip')).toHaveTextContent(/Submission Date/i);
+    expect(screen.getByRole("tooltip")).toBeInTheDocument();
+    expect(screen.getByRole("tooltip")).toHaveTextContent(/Submission Date/i);
     await userEvent.unhover(tooltips[0]);
   });
   await userEvent.hover(tooltips[1]);
   await waitFor(() => {
-    expect(screen.getByRole('tooltip')).toBeInTheDocument();
-    expect(screen.getByRole('tooltip')).toHaveTextContent(/Expiry Date/i);
+    expect(screen.getByRole("tooltip")).toBeInTheDocument();
+    expect(screen.getByRole("tooltip")).toHaveTextContent(/Expiry Date/i);
   });
 
   await expect(
-    canvas.getByTestId('govaction-exampleHash#1-change-your-vote'),
+    canvas.getByTestId("govaction-exampleHash#1-change-your-vote"),
   ).toBeInTheDocument();
 }
 
@@ -52,25 +52,25 @@ export const GovernanceVotedOnCardComponent: Story = {
   args: {
     votedProposal: {
       proposal: {
-        createdDate: '1970-01-01T00:00:00Z',
-        expiryDate: '1970-02-01T00:00:00Z',
-        id: 'exampleId',
-        type: 'exampleType',
+        createdDate: "1970-01-01T00:00:00Z",
+        expiryDate: "1970-02-01T00:00:00Z",
+        id: "exampleId",
+        type: "exampleType",
         index: 1,
-        txHash: 'exampleHash',
-        details: 'some details',
-        url: 'https://example.com',
-        metadataHash: 'exampleHash',
+        txHash: "exampleHash",
+        details: "some details",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
         yesVotes: 1,
         noVotes: 0,
         abstainVotes: 2,
       },
       vote: {
-        vote: 'no',
-        proposalId: 'exampleId',
-        drepId: 'exampleId',
-        url: 'https://example.com',
-        metadataHash: 'exampleHash',
+        vote: "no",
+        proposalId: "exampleId",
+        drepId: "exampleId",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
       },
     },
   },
@@ -84,25 +84,25 @@ export const GovernanceVotedOnCardAbstain: Story = {
   args: {
     votedProposal: {
       proposal: {
-        createdDate: '1970-01-01T00:00:00Z',
-        expiryDate: '1970-02-01T00:00:00Z',
-        id: 'exampleId',
-        type: 'exampleType',
+        createdDate: "1970-01-01T00:00:00Z",
+        expiryDate: "1970-02-01T00:00:00Z",
+        id: "exampleId",
+        type: "exampleType",
         index: 1,
-        txHash: 'exampleHash',
-        details: 'some details',
-        url: 'https://example.com',
-        metadataHash: 'exampleHash',
+        txHash: "exampleHash",
+        details: "some details",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
         yesVotes: 1,
         noVotes: 0,
         abstainVotes: 2,
       },
       vote: {
-        vote: 'abstain',
-        proposalId: 'exampleId',
-        drepId: 'exampleId',
-        url: 'https://example.com',
-        metadataHash: 'exampleHash',
+        vote: "abstain",
+        proposalId: "exampleId",
+        drepId: "exampleId",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
       },
     },
   },
@@ -117,25 +117,25 @@ export const GovernanceVotedOnCardYes: Story = {
   args: {
     votedProposal: {
       proposal: {
-        createdDate: '1970-01-01T00:00:00Z',
-        expiryDate: '1970-02-01T00:00:00Z',
-        id: 'exampleId',
-        type: 'exampleType',
+        createdDate: "1970-01-01T00:00:00Z",
+        expiryDate: "1970-02-01T00:00:00Z",
+        id: "exampleId",
+        type: "exampleType",
         index: 1,
-        txHash: 'exampleHash',
-        details: 'some details',
-        url: 'https://example.com',
-        metadataHash: 'exampleHash',
+        txHash: "exampleHash",
+        details: "some details",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
         yesVotes: 1,
         noVotes: 0,
         abstainVotes: 2,
       },
       vote: {
-        vote: 'yes',
-        proposalId: 'exampleId',
-        drepId: 'exampleId',
-        url: 'https://example.com',
-        metadataHash: 'exampleHash',
+        vote: "yes",
+        proposalId: "exampleId",
+        drepId: "exampleId",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
       },
     },
   },
@@ -150,25 +150,25 @@ export const GovernanceVotedOnCardNo: Story = {
   args: {
     votedProposal: {
       proposal: {
-        createdDate: '1970-01-01T00:00:00Z',
-        expiryDate: '1970-02-01T00:00:00Z',
-        id: 'exampleId',
-        type: 'exampleType',
+        createdDate: "1970-01-01T00:00:00Z",
+        expiryDate: "1970-02-01T00:00:00Z",
+        id: "exampleId",
+        type: "exampleType",
         index: 1,
-        txHash: 'exampleHash',
-        details: 'some details',
-        url: 'https://example.com',
-        metadataHash: 'exampleHash',
+        txHash: "exampleHash",
+        details: "some details",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
         yesVotes: 1,
         noVotes: 0,
         abstainVotes: 2,
       },
       vote: {
-        vote: 'no',
-        proposalId: 'exampleId',
-        drepId: 'exampleId',
-        url: 'https://example.com',
-        metadataHash: 'exampleHash',
+        vote: "no",
+        proposalId: "exampleId",
+        drepId: "exampleId",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
       },
     },
   },

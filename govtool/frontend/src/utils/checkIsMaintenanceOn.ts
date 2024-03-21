@@ -5,10 +5,7 @@ export const checkIsMaintenanceOn = async () => {
 
   try {
     const response = await axios.get(
-      `${window.location.protocol
-      }//${
-        window.location.hostname
-      }/is-maintenance-mode-on`,
+      `${window.location.protocol}//${window.location.hostname}/is-maintenance-mode-on`,
     );
 
     if (response.data) {

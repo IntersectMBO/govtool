@@ -1,15 +1,15 @@
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from "@storybook/react";
 
-import { Field } from '@molecules';
-import { ComponentProps } from 'react';
+import { Field } from "@molecules";
+import { ComponentProps } from "react";
 
 const meta: Meta<typeof Field.TextArea> = {
-  title: 'Example/TextArea',
+  title: "Example/TextArea",
   component: Field.TextArea,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 };
 
 export default meta;
@@ -22,28 +22,28 @@ export const Default = Template.bind({});
 
 export const WithLabel = Template.bind({});
 WithLabel.args = {
-  label: 'Label',
+  label: "Label",
 };
 
 export const WithHelpfulText = Template.bind({});
 WithHelpfulText.args = {
-  helpfulText: 'Helpful text here',
+  helpfulText: "Helpful text here",
 };
 
 export const Error = Template.bind({});
 Error.args = {
-  errorMessage: 'Error message',
+  errorMessage: "Error message",
 };
 
 export const ErrorAndLabel = Template.bind({});
 ErrorAndLabel.args = {
-  errorMessage: 'Error message',
-  label: 'Label',
+  errorMessage: "Error message",
+  label: "Label",
 };
 
 export const WithAllProps = Template.bind({});
 WithAllProps.args = {
-  label: 'Label',
-  helpfulText: 'Helpful text',
-  errorMessage: 'Error message',
+  label: "Label",
+  helpfulText: "Helpful text",
+  errorMessage: "Error message",
 };

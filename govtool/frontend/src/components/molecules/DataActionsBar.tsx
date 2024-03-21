@@ -56,7 +56,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
           onChange={(e) => setSearchText(e.target.value)}
           placeholder="Search..."
           value={searchText}
-          startAdornment={(
+          startAdornment={
             <Search
               style={{
                 color: "#99ADDE",
@@ -65,7 +65,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
                 width: 16,
               }}
             />
-          )}
+          }
           sx={{
             bgcolor: "white",
             border: 1,

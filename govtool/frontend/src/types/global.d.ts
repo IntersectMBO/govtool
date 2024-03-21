@@ -1,7 +1,7 @@
 export {};
 
 declare global {
-  type VoteType = 'yes' | 'no' | 'abstain';
+  type VoteType = "yes" | "no" | "abstain";
 
   type ActionTypeFromAPI = {
     id: string;

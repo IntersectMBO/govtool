@@ -1,19 +1,19 @@
-import { userEvent, within } from '@storybook/testing-library';
-import { expect, jest } from '@storybook/jest';
-import type { Meta, StoryObj } from '@storybook/react';
+import { userEvent, within } from "@storybook/testing-library";
+import { expect, jest } from "@storybook/jest";
+import type { Meta, StoryObj } from "@storybook/react";
 import {
   GOVERNANCE_ACTIONS_FILTERS,
   GOVERNANCE_ACTIONS_SORTING,
-} from '@consts';
-import { DataActionsBar } from '@/components/molecules';
+} from "@consts";
+import { DataActionsBar } from "@/components/molecules";
 
 const meta = {
-  title: 'Example/DataActionsBar',
+  title: "Example/DataActionsBar",
   component: DataActionsBar,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 } satisfies Meta<typeof DataActionsBar>;
 
 export default meta;
@@ -21,8 +21,8 @@ type Story = StoryObj<typeof meta>;
 
 export const ActionsBarComponent: Story = {
   args: {
-    chosenSorting: '',
-    searchText: '',
+    chosenSorting: "",
+    searchText: "",
     sortingActive: false,
     sortOpen: false,
     isFiltering: true,
@@ -34,21 +34,21 @@ export const ActionsBarComponent: Story = {
     const { setFiltersOpen, setSortOpen, setSearchText } = args;
     const canvas = within(canvasElement);
 
-    await step('Check if searching is working', async () => {
-      const searchInput = canvas.getByTestId('search-input');
-      await userEvent.type(searchInput, 'info action');
+    await step("Check if searching is working", async () => {
+      const searchInput = canvas.getByTestId("search-input");
+      await userEvent.type(searchInput, "info action");
       await expect(setSearchText).toHaveBeenCalled();
     });
 
-    await step('Check if filter button is working', async () => {
-      await userEvent.click(canvas.getByTestId('filters-button'));
+    await step("Check if filter button is working", async () => {
+      await userEvent.click(canvas.getByTestId("filters-button"));
       // Make sure sort dropdown is closed
       await expect(setSortOpen).toHaveBeenCalledWith(false);
       await expect(setFiltersOpen).toHaveBeenCalled();
     });
 
-    await step('Check if sort button is working', async () => {
-      await userEvent.click(canvas.getByTestId('sort-button'));
+    await step("Check if sort button is working", async () => {
+      await userEvent.click(canvas.getByTestId("sort-button"));
       // Make sure filter dropdown is closed
       await expect(setFiltersOpen).toHaveBeenCalledWith(false);
       await expect(setSortOpen).toHaveBeenCalled();
@@ -58,8 +58,8 @@ export const ActionsBarComponent: Story = {
 
 export const ActionsBarFiltersOpen: Story = {
   args: {
-    chosenSorting: '',
-    searchText: '',
+    chosenSorting: "",
+    searchText: "",
     sortingActive: false,
     sortOpen: false,
     chosenFilters: [],
@@ -73,7 +73,7 @@ export const ActionsBarFiltersOpen: Story = {
     const canvas = within(canvasElement);
     GOVERNANCE_ACTIONS_FILTERS.forEach(async ({ key, label }) => {
       await userEvent.click(
-        canvas.getByTestId(`${label.replace(/ /g, '')}-checkbox`),
+        canvas.getByTestId(`${label.replace(/ /g, "")}-checkbox`),
       );
       expect(args.setChosenFilters).toHaveBeenCalledWith([key]);
     });
@@ -82,8 +82,8 @@ export const ActionsBarFiltersOpen: Story = {
 
 export const ActionsBarSortsOpen: Story = {
   args: {
-    chosenSorting: '',
-    searchText: '',
+    chosenSorting: "",
+    searchText: "",
     sortingActive: false,
     sortOpen: true,
     setChosenSorting: jest.fn(),
@@ -99,8 +99,8 @@ export const ActionsBarSortsOpen: Story = {
 
 export const ActionsBarWithoutFilters: Story = {
   args: {
-    chosenSorting: '',
-    searchText: '',
+    chosenSorting: "",
+    searchText: "",
     sortingActive: false,
     sortOpen: false,
     isFiltering: false,
@@ -108,7 +108,7 @@ export const ActionsBarWithoutFilters: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
-      canvas.queryByTestId('filters-button'),
+      canvas.queryByTestId("filters-button"),
     ).not.toBeInTheDocument();
   },
 };

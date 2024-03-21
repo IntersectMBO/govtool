@@ -1,9 +1,9 @@
-import { Typography as MUITypography } from '@mui/material';
-import { TypographyProps } from './types';
+import { Typography as MUITypography } from "@mui/material";
+import { TypographyProps } from "./types";
 
 export const Typography = ({
   color,
-  variant = 'body1',
+  variant = "body1",
   ...props
 }: TypographyProps) => {
   const fontSize = {
@@ -33,16 +33,16 @@ export const Typography = ({
   }[variant];
 
   const lineHeight = {
-    headline1: '110px',
-    headline2: '57px',
-    headline3: '44px',
-    headline4: '40px',
-    headline5: '36px',
-    title1: '32px',
-    title2: '28px',
-    body1: '24px',
-    body2: '20px',
-    caption: '16px',
+    headline1: "110px",
+    headline2: "57px",
+    headline3: "44px",
+    headline4: "40px",
+    headline5: "36px",
+    title1: "32px",
+    title2: "28px",
+    body1: "24px",
+    body2: "20px",
+    caption: "16px",
   }[variant];
 
   return (

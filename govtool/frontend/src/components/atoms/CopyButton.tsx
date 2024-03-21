@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-import { ICONS } from '@consts';
-import { useSnackbar } from '@context';
-import { useTranslation } from '@hooks';
+import { ICONS } from "@consts";
+import { useSnackbar } from "@context";
+import { useTranslation } from "@hooks";
 
 interface Props {
   isChecked?: boolean;
@@ -15,7 +15,7 @@ export const CopyButton = ({ isChecked, text, variant }: Props) => {
   const { t } = useTranslation();
 
   const iconSrc = useMemo(() => {
-    if (variant === 'blue') {
+    if (variant === "blue") {
       return ICONS.copyBlueIcon;
     }
 
@@ -32,11 +32,11 @@ export const CopyButton = ({ isChecked, text, variant }: Props) => {
       alt="copy"
       onClick={(e) => {
         navigator.clipboard.writeText(text);
-        addSuccessAlert(t('alerts.copiedToClipboard'));
+        addSuccessAlert(t("alerts.copiedToClipboard"));
         e.stopPropagation();
       }}
       src={iconSrc}
-      style={{ cursor: 'pointer' }}
+      style={{ cursor: "pointer" }}
     />
   );
 };

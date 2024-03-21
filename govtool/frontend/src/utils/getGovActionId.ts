@@ -9,4 +9,5 @@ export const getShortenedGovActionId = (txHash: string, index: number) => {
   return `${firstPart}...${lastPart}#${index}`;
 };
 
-export const getFullGovActionId = (txHash: string, index: number) => `${txHash}#${index}`;
+export const getFullGovActionId = (txHash: string, index: number) =>
+  `${txHash}#${index}`;

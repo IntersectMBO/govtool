@@ -1,6 +1,6 @@
-import { ChangeEvent, useState } from 'react';
-import { KeenSliderOptions, useKeenSlider } from 'keen-slider/react';
-import type { KeenSliderInstance } from 'keen-slider';
+import { ChangeEvent, useState } from "react";
+import { KeenSliderOptions, useKeenSlider } from "keen-slider/react";
+import type { KeenSliderInstance } from "keen-slider";
 
 const WheelControls = (slider: KeenSliderInstance) => {
   let touchTimeout: NodeJS.Timeout;
@@ -28,20 +28,20 @@ const WheelControls = (slider: KeenSliderInstance) => {
           x: e.pageX,
           y: e.pageY,
         };
-        dispatch(e, 'ksDragStart');
+        dispatch(e, "ksDragStart");
         wheelActive = true;
       }
-      dispatch(e, 'ksDrag');
+      dispatch(e, "ksDrag");
       clearTimeout(touchTimeout);
       touchTimeout = setTimeout(() => {
         wheelActive = false;
-        dispatch(e, 'ksDragEnd');
+        dispatch(e, "ksDragEnd");
       }, 50);
     }
   }
 
-  slider.on('created', () => {
-    slider.container.addEventListener('wheel', eventWheel, {
+  slider.on("created", () => {
+    slider.container.addEventListener("wheel", eventWheel, {
       passive: false,
     });
   });

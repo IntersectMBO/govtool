@@ -13,7 +13,7 @@ import { CIP_100, CIP_108 } from "@/consts";
  */
 export const generateJsonld = async <
   T extends Record<string, JSONValue>,
-  C extends jsonld.ContextDefinition
+  C extends jsonld.ContextDefinition,
 >(
   body: T,
   context: C,

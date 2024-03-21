@@ -1,4 +1,4 @@
-import I18n from '@/i18n';
+import I18n from "@/i18n";
 
 /**
  * Validates a string value as a number.
@@ -8,15 +8,15 @@ import I18n from '@/i18n';
  */
 export default (value: string) => {
   const parsedValue = Number(
-    value.includes(',') ? value.replace(',', '.') : value,
+    value.includes(",") ? value.replace(",", ".") : value,
   );
 
   if (Number.isNaN(parsedValue)) {
-    return I18n.t('createGovernanceAction.fields.validations.number');
+    return I18n.t("createGovernanceAction.fields.validations.number");
   }
 
   if (parsedValue < 0) {
-    return I18n.t('createGovernanceAction.fields.validations.positive');
+    return I18n.t("createGovernanceAction.fields.validations.positive");
   }
 
   return true;

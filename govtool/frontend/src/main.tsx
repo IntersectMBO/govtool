@@ -1,22 +1,22 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import React from "react";
+import ReactDOM from "react-dom/client";
 import {
   BrowserRouter,
   createRoutesFromChildren,
   matchRoutes,
   useLocation,
   useNavigationType,
-} from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import TagManager from 'react-gtm-module';
-import { ThemeProvider } from '@emotion/react';
-import * as Sentry from '@sentry/react';
+} from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "react-query";
+import TagManager from "react-gtm-module";
+import { ThemeProvider } from "@emotion/react";
+import * as Sentry from "@sentry/react";
 
-import { ContextProviders } from '@context';
+import { ContextProviders } from "@context";
 
-import App from './App.tsx';
-import { theme } from './theme.ts';
-import './i18n';
+import App from "./App.tsx";
+import { theme } from "./theme.ts";
+import "./i18n";
 
 const queryClient = new QueryClient();
 
@@ -68,18 +68,18 @@ Sentry.addGlobalEventProcessor((event) => {
       event.exception.values &&
       event.exception.values[0] &&
       event.exception.values[0].value) ||
-    'Unknown Error';
+    "Unknown Error";
 
   window.dataLayer.push({
-    event: 'sentryEvent',
-    sentryEventId: event.event_id || 'default_event_id',
+    event: "sentryEvent",
+    sentryEventId: event.event_id || "default_event_id",
     sentryErrorMessage: errorMessage,
   });
 
   return event;
 });
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>

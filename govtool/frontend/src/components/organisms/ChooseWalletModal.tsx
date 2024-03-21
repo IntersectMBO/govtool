@@ -73,9 +73,7 @@ export const ChooseWalletModal = () => {
               {t("wallet.noWalletsToConnect")}
             </Typography>
           ) : (
-            walletOptions.map(({
-              icon, label, name, cip95Available,
-            }) => (
+            walletOptions.map(({ icon, label, name, cip95Available }) => (
               <WalletOptionButton
                 dataTestId={`${name}-wallet-button`}
                 key={name}
@@ -99,9 +97,11 @@ export const ChooseWalletModal = () => {
           <Link
             fontSize={11}
             fontWeight={500}
-            onClick={() => openInNewTab(
-              "https://docs.sanchogov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet",
-            )}
+            onClick={() =>
+              openInNewTab(
+                "https://docs.sanchogov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet",
+              )
+            }
             sx={{ cursor: "pointer" }}
           >
             {t("here")}

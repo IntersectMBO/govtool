@@ -16,7 +16,9 @@ const meta = {
 
 export default meta;
 
-const Template: StoryFn<ComponentProps<typeof Field.Input>> = (args) => <Field.Input placeholder="Placeholder-auto" {...args} />;
+const Template: StoryFn<ComponentProps<typeof Field.Input>> = (args) => (
+  <Field.Input placeholder="Placeholder-auto" {...args} />
+);
 
 export const Default = Template.bind({});
 

@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import {
-  screen, userEvent, waitFor, within,
-} from "@storybook/testing-library";
+import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
 
 import { ActionRadio } from "@atoms";

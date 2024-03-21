@@ -7,9 +7,7 @@ import {
   Typography,
 } from "@atoms";
 
-import {
-  forwardRef, useCallback, useImperativeHandle, useRef,
-} from "react";
+import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 import { TextAreaFieldProps } from "./types";
 
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
@@ -49,11 +47,12 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
 
     useImperativeHandle(
       ref,
-      () => ({
-        focus: handleFocus,
-        blur: handleBlur,
-        ...textAreaRef.current,
-      } as unknown as HTMLTextAreaElement),
+      () =>
+        ({
+          focus: handleFocus,
+          blur: handleBlur,
+          ...textAreaRef.current,
+        } as unknown as HTMLTextAreaElement),
       [handleBlur, handleFocus],
     );
     return (
@@ -99,9 +98,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
           }}
           variant="caption"
         >
-          {props?.value?.toString()?.length ?? 0}
-          /
-          {maxLength}
+          {props?.value?.toString()?.length ?? 0}/{maxLength}
         </Typography>
       </Box>
     );

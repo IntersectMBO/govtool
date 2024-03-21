@@ -255,6 +255,9 @@ export const en = {
       abstainCardDescription: "Select this to vote ABSTAIN to every vote.",
       abstainCardTitle: "Abstain from Every Vote",
       automatedVotingOptions: "Automated Voting Options",
+      editBtn: "Edit DRep data",
+      meAsDRep: "This  DRep ID is connected  to your wallet",
+      myDRep: "This is your DRep",
       noConfidenceDescription:
         "Select this to signal no confidence in the current constitutional committee by voting NO on every proposal and voting YES to no confidence proposals",
       noConfidenceTitle: "Signal No Confidence on Every Vote",
@@ -596,6 +599,7 @@ export const en = {
     cancel: "Cancel",
     clear: "Clear",
     clickToCopy: "Click to copy link",
+    close: "Close",
     confirm: "Confirm",
     connectToDelegate: "Connect to delegate",
     continue: "Continue",

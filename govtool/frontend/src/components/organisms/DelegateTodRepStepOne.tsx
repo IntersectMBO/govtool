@@ -1,12 +1,8 @@
-import {
-  useEffect, useState, useCallback, useMemo,
-} from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Grid } from "@mui/material";
 
-import {
-  ActionRadio, Button, LoadingButton, Typography,
-} from "@atoms";
+import { ActionRadio, Button, LoadingButton, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import {
@@ -35,7 +31,8 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
   const { openModal, closeModal } = useModal();
   const [areOptions, setAreOptions] = useState<boolean>(false);
   const [chosenOption, setChosenOption] = useState<string>("");
-  const [isDelegationLoading, setIsDelegationLoading] = useState<boolean>(false);
+  const [isDelegationLoading, setIsDelegationLoading] =
+    useState<boolean>(false);
   const {
     palette: { boxShadow2 },
   } = theme;
@@ -83,8 +80,8 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
 
   useEffect(() => {
     if (
-      !areOptions
-      && (chosenOption === "no confidence" || chosenOption === "abstain")
+      !areOptions &&
+      (chosenOption === "no confidence" || chosenOption === "abstain")
     ) {
       setChosenOption("");
     }
@@ -99,6 +96,7 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
         type: "delegation",
       });
       if (result) openSuccessDelegationModal();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       const errorMessage = error.info ? error.info : error;
 
@@ -108,53 +106,59 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
     }
   }, [chosenOption, buildSignSubmitConwayCertTx, buildVoteDelegationCert]);
 
-  const renderDelegateButton = useMemo(() => (
-    <LoadingButton
-      data-testid={
+  const renderDelegateButton = useMemo(
+    () => (
+      <LoadingButton
+        data-testid={
           chosenOption !== dRepID ? "next-step-button" : "delegate-button"
         }
-      disabled={!chosenOption}
-      isLoading={isDelegationLoading}
-      onClick={() => {
-        if (chosenOption === "Delegate to DRep") {
-          setStep(2);
-        } else {
-          delegate();
-        }
-      }}
-      size="extraLarge"
-      sx={{
-        px: 6,
-        width: isMobile ? "100%" : "auto",
-      }}
-      variant="contained"
-    >
-      {chosenOption !== dRepID ? t("nextStep") : t("delegate")}
-    </LoadingButton>
-  ), [
-    chosenOption,
-    delegate,
-    voter?.isRegisteredAsDRep,
-    voter?.isRegisteredAsSoleVoter,
-    dRepID,
-    isDelegationLoading,
-    isMobile,
-  ]);
+        disabled={!chosenOption}
+        isLoading={isDelegationLoading}
+        onClick={() => {
+          if (chosenOption === "Delegate to DRep") {
+            setStep(2);
+          } else {
+            delegate();
+          }
+        }}
+        size="extraLarge"
+        sx={{
+          px: 6,
+          width: isMobile ? "100%" : "auto",
+        }}
+        variant="contained"
+      >
+        {chosenOption !== dRepID ? t("nextStep") : t("delegate")}
+      </LoadingButton>
+    ),
+    [
+      chosenOption,
+      delegate,
+      voter?.isRegisteredAsDRep,
+      voter?.isRegisteredAsSoleVoter,
+      dRepID,
+      isDelegationLoading,
+      isMobile,
+    ],
+  );
 
-  const renderCancelButton = useMemo(() => (
-    <Button
-      data-testid="cancel-button"
-      onClick={() => navigate(PATHS.dashboard)}
-      size="extraLarge"
-      sx={{
-        px: 6,
-        width: isMobile ? "100%" : "auto",
-      }}
-      variant="outlined"
-    >
-      {t("cancel")}
-    </Button>
-  ), [isMobile]);
+  const renderCancelButton = useMemo(
+    () => (
+      <Button
+        data-testid="cancel-button"
+        onClick={() => navigate(PATHS.dashboard)}
+        size="extraLarge"
+        sx={{
+          px: 6,
+          width: isMobile ? "100%" : "auto",
+        }}
+        variant="outlined"
+      >
+        {t("cancel")}
+      </Button>
+    ),
+    [isMobile],
+  );
 
   return (
     <Box
@@ -215,8 +219,8 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
           flexDirection="column"
           rowGap={3}
         >
-          {(voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter)
-            && currentDelegation !== dRepID && (
+          {(voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter) &&
+            currentDelegation !== dRepID && (
               <Grid item>
                 <ActionRadio
                   onChange={setChosenOption}
@@ -231,7 +235,7 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
                   dataTestId="delegate-to-myself-card"
                 />
               </Grid>
-          )}
+            )}
           <Grid item>
             <ActionRadio
               onChange={setChosenOption}

@@ -1,6 +1,4 @@
-import {
-  useState, useCallback, useEffect, useMemo, useRef,
-} from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import {
   Box,
@@ -83,9 +81,11 @@ export const GovernanceActionsCategory = () => {
   const mappedData = useMemo(() => {
     const uniqueProposals = removeDuplicatedProposals(proposals);
 
-    return uniqueProposals?.filter((i) => getFullGovActionId(i.txHash, i.index)
-      .toLowerCase()
-      .includes(searchText.toLowerCase()));
+    return uniqueProposals?.filter((i) =>
+      getFullGovActionId(i.txHash, i.index)
+        .toLowerCase()
+        .includes(searchText.toLowerCase()),
+    );
   }, [
     voter?.isRegisteredAsDRep,
     isProposalsFetchingNextPage,
@@ -177,17 +177,17 @@ export const GovernanceActionsCategory = () => {
                   <Box mt={4} display="flex" flexWrap="wrap">
                     <Typography fontWeight={300}>
                       {t("govActions.withCategoryNotExist.partOne")}
-&nbsp;
+                      &nbsp;
                     </Typography>
                     <Typography fontWeight={700}>
                       {category}
-&nbsp;
+                      &nbsp;
                     </Typography>
                     {searchText && (
                       <>
                         <Typography fontWeight={300}>
                           {t("govActions.withCategoryNotExist.optional")}
-&nbsp;
+                          &nbsp;
                         </Typography>
                         <Typography fontWeight={700}>{searchText}</Typography>
                       </>
@@ -206,8 +206,8 @@ export const GovernanceActionsCategory = () => {
                     screenWidth < 375
                       ? "255px"
                       : screenWidth < 768
-                        ? "294px"
-                        : "402px"
+                      ? "294px"
+                      : "402px"
                   }, 1fr))`}
                 >
                   {mappedData.map((item) => (

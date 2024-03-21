@@ -14,9 +14,7 @@ type LinkProps = {
 };
 
 export const DrawerLink: FC<LinkProps> = ({ ...props }) => {
-  const {
-    dataTestId, label, navTo, icon, activeIcon, onClick,
-  } = props;
+  const { dataTestId, label, navTo, icon, activeIcon, onClick } = props;
   const {
     palette: { highlightBlue },
   } = theme;
@@ -35,14 +33,15 @@ export const DrawerLink: FC<LinkProps> = ({ ...props }) => {
         display: "block",
         borderRadius: 100,
       })}
-      children={({ isActive }) => (
+    >
+      {({ isActive }) => (
         <Box display="flex">
           {activeIcon && icon && (
-          <img
-            alt="icon"
-            src={isActive ? activeIcon : icon}
-            style={{ marginRight: "12px" }}
-          />
+            <img
+              alt="icon"
+              src={isActive ? activeIcon : icon}
+              style={{ marginRight: "12px" }}
+            />
           )}
           <Typography
             fontSize={14}
@@ -55,6 +54,6 @@ export const DrawerLink: FC<LinkProps> = ({ ...props }) => {
           </Typography>
         </Box>
       )}
-    />
+    </NavLink>
   );
 };

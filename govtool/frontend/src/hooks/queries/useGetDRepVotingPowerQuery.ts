@@ -14,7 +14,7 @@ export const useGetDRepVotingPowerQuery = () => {
       voter?.isRegisteredAsDRep,
       voter?.isRegisteredAsSoleVoter,
     ],
-    queryFn: async () => await getDRepVotingPower({ dRepID }),
+    queryFn: () => getDRepVotingPower({ dRepID }),
     enabled:
       !!dRepID &&
       (!!voter?.isRegisteredAsDRep || !!voter?.isRegisteredAsSoleVoter),

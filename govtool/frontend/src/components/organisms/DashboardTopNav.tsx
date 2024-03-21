@@ -47,8 +47,8 @@ export const DashboardTopNav = ({
             windowScroll > POSITION_TO_BLUR
               ? "rgba(256, 256, 256, 0.7)"
               : isMobile
-                ? "#FBFBFF59"
-                : "transparent",
+              ? "#FBFBFF59"
+              : "transparent",
           borderBottom: "1px solid #D6E2FF",
           display: "flex",
           justifyContent: "space-between",
@@ -62,7 +62,12 @@ export const DashboardTopNav = ({
       >
         <Box display="flex">
           {isMobile ? (
-            <img height={24} src={ICONS.appLogoIcon} width={27} />
+            <img
+              alt="app-logo"
+              height={24}
+              src={ICONS.appLogoIcon}
+              width={27}
+            />
           ) : null}
           {!isMobile && title ? (
             <Typography variant="headline5">{title}</Typography>
@@ -76,7 +81,7 @@ export const DashboardTopNav = ({
               sx={{ padding: 0, marginLeft: 1 }}
               onClick={openDrawer}
             >
-              <img src={ICONS.drawerIcon} />
+              <img alt="drawer" src={ICONS.drawerIcon} />
             </IconButton>
           )}
         </Box>

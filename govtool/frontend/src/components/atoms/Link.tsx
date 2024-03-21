@@ -39,7 +39,8 @@ export const Link: FC<LinkProps> = ({ ...props }) => {
         if (!isConnectWallet) disconnectWallet();
         if (onClick) onClick();
       }}
-      children={({ isActive }) => (
+    >
+      {({ isActive }) => (
         <Typography
           sx={{
             fontSize,
@@ -50,6 +51,6 @@ export const Link: FC<LinkProps> = ({ ...props }) => {
           {label}
         </Typography>
       )}
-    />
+    </NavLink>
   );
 };

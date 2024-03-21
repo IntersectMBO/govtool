@@ -12,9 +12,8 @@ export default async (value: string) => {
     const decoded = await bech32.decode(value);
     if (decoded.words.length) {
       return true;
-    } else {
-      throw new Error();
     }
+    throw new Error();
   } catch (error) {
     return I18n.t("createGovernanceAction.fields.validations.bech32");
   }

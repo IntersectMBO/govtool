@@ -1,12 +1,27 @@
-import { styled } from '@mui/material';
-import * as TooltipMUI from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
+import { styled } from "@mui/material";
+import * as TooltipMUI from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
 
-type TooltipProps = Omit<TooltipMUI.TooltipProps, 'title'> & {
+type TooltipProps = Omit<TooltipMUI.TooltipProps, "title"> & {
   heading?: string;
   paragraphOne?: string;
   paragraphTwo?: string;
 };
+
+const StyledTooltip = styled(
+  ({ className, ...props }: TooltipMUI.TooltipProps) => (
+    // eslint-disable-next-line react/jsx-pascal-case
+    <TooltipMUI.default {...props} arrow classes={{ popper: className }} />
+  ),
+)(() => ({
+  [`& .${TooltipMUI.tooltipClasses.arrow}`]: {
+    color: "rgb(36, 34, 50)",
+  },
+  [`& .${TooltipMUI.tooltipClasses.tooltip}`]: {
+    backgroundColor: "rgb(36, 34, 50)",
+    padding: 12,
+  },
+}));
 
 export const Tooltip = ({
   heading,
@@ -18,12 +33,12 @@ export const Tooltip = ({
     {...tooltipProps}
     enterTouchDelay={0}
     leaveTouchDelay={1000}
-    title={(
+    title={
       <>
         {heading && (
-        <Typography fontSize={16} fontWeight={400} color="#FBFBFF">
-          {heading}
-        </Typography>
+          <Typography fontSize={16} fontWeight={400} color="#FBFBFF">
+            {heading}
+          </Typography>
         )}
         <Typography
           mt={0.5}
@@ -33,29 +48,13 @@ export const Tooltip = ({
         >
           {paragraphOne && paragraphOne}
           {paragraphTwo && (
-          <>
-            <br />
-            {' '}
-            <br />
-            {paragraphTwo}
-          </>
+            <>
+              <br /> <br />
+              {paragraphTwo}
+            </>
           )}
         </Typography>
       </>
-      )}
+    }
   />
 );
-
-const StyledTooltip = styled(
-  ({ className, ...props }: TooltipMUI.TooltipProps) => (
-    <TooltipMUI.default {...props} arrow classes={{ popper: className }} />
-  ),
-)(() => ({
-  [`& .${TooltipMUI.tooltipClasses.arrow}`]: {
-    color: 'rgb(36, 34, 50)',
-  },
-  [`& .${TooltipMUI.tooltipClasses.tooltip}`]: {
-    backgroundColor: 'rgb(36, 34, 50)',
-    padding: 12,
-  },
-}));

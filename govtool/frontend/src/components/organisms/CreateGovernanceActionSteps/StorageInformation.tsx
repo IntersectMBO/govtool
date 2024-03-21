@@ -81,7 +81,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
             <Button
               onClick={onClickDownloadJson}
               size="extraLarge"
-              startIcon={<img src={ICONS.download} />}
+              startIcon={<img alt="download" src={ICONS.download} />}
               sx={{
                 width: 'fit-content',
                 ml: screenWidth < 1024 ? 0 : 1.75,
@@ -101,6 +101,25 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
         />
         <Spacer y={6} />
         <Step
+          component={
+            <Button
+              endIcon={
+                <OpenInNewIcon
+                  sx={{
+                    color: "primary",
+                    height: 17,
+                    width: 17,
+                  }}
+                />
+              }
+              onClick={openGuideAboutStoringInformation}
+              size="extraLarge"
+              sx={{ width: "fit-content" }}
+              variant="text"
+            >
+              {t("createGovernanceAction.storingInformationStep2Link")}
+            </Button>
+          }
           label={t('createGovernanceAction.storingInformationStep2Label')}
           stepNumber={2}
         />

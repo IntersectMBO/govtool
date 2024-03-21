@@ -16,7 +16,7 @@ interface ProviderProps {
   children: React.ReactNode;
 }
 
-interface SnackbarContext {
+interface SnackbarContextType {
   addSuccessAlert: (message: string, autoHideDuration?: number) => void;
   addErrorAlert: (message: string, autoHideDuration?: number) => void;
   addWarningAlert: (message: string, autoHideDuration?: number) => void;
@@ -35,7 +35,9 @@ interface State {
   messageInfo?: SnackbarMessage;
 }
 
-const SnackbarContext = createContext<SnackbarContext>({} as SnackbarContext);
+const SnackbarContext = createContext<SnackbarContextType>(
+  {} as SnackbarContextType,
+);
 SnackbarContext.displayName = "SnackbarContext";
 
 const DEFAULT_AUTO_HIDE_DURATION = 2000;
@@ -55,41 +57,44 @@ const SnackbarProvider = ({ children }: ProviderProps) => {
   const { t } = useTranslation();
 
   const addWarningAlert = useCallback(
-    (message: string, autoHideDuration = DEFAULT_AUTO_HIDE_DURATION) => setSnackPack((prev) => [
-      ...prev,
-      {
-        message,
-        autoHideDuration,
-        severity: "warning",
-        key: new Date().getTime(),
-      },
-    ]),
+    (message: string, autoHideDuration = DEFAULT_AUTO_HIDE_DURATION) =>
+      setSnackPack((prev) => [
+        ...prev,
+        {
+          message,
+          autoHideDuration,
+          severity: "warning",
+          key: new Date().getTime(),
+        },
+      ]),
     [],
   );
 
   const addSuccessAlert = useCallback(
-    (message: string, autoHideDuration = DEFAULT_AUTO_HIDE_DURATION) => setSnackPack((prev) => [
-      ...prev,
-      {
-        message,
-        autoHideDuration,
-        severity: "success",
-        key: new Date().getTime(),
-      },
-    ]),
+    (message: string, autoHideDuration = DEFAULT_AUTO_HIDE_DURATION) =>
+      setSnackPack((prev) => [
+        ...prev,
+        {
+          message,
+          autoHideDuration,
+          severity: "success",
+          key: new Date().getTime(),
+        },
+      ]),
     [],
   );
 
   const addErrorAlert = useCallback(
-    (message: string, autoHideDuration = DEFAULT_AUTO_HIDE_DURATION) => setSnackPack((prev) => [
-      ...prev,
-      {
-        message,
-        autoHideDuration,
-        severity: "error",
-        key: new Date().getTime(),
-      },
-    ]),
+    (message: string, autoHideDuration = DEFAULT_AUTO_HIDE_DURATION) =>
+      setSnackPack((prev) => [
+        ...prev,
+        {
+          message,
+          autoHideDuration,
+          severity: "error",
+          key: new Date().getTime(),
+        },
+      ]),
     [],
   );
 
@@ -133,6 +138,16 @@ const SnackbarProvider = ({ children }: ProviderProps) => {
     setState((prev) => ({ ...prev, messageInfo: undefined }));
   };
 
+  const getBackgroundColor = (severity: SnackbarSeverity) => {
+    if (severity === "success") {
+      return "#62BC52";
+    }
+    if (severity === "error") {
+      return "#FF3333";
+    }
+    return "#DEA029";
+  };
+
   return (
     <SnackbarContext.Provider value={value}>
       {children}
@@ -153,12 +168,7 @@ const SnackbarProvider = ({ children }: ProviderProps) => {
             variant="filled"
             sx={{
               minWidth: isMobile ? "90%" : "30vw",
-              backgroundColor:
-                messageInfo.severity === "success"
-                  ? "#62BC52"
-                  : messageInfo.severity === "error"
-                    ? "#FF3333"
-                    : "#DEA029",
+              backgroundColor: getBackgroundColor(messageInfo.severity),
             }}
           >
             {messageInfo.message}

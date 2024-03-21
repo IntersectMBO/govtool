@@ -1,7 +1,8 @@
-import { ChangeEvent, useState } from "react";
-import { KeenSliderOptions, useKeenSlider } from "keen-slider/react";
+import { ChangeEvent, useState } from 'react';
+import { KeenSliderOptions, useKeenSlider } from 'keen-slider/react';
+import type { KeenSliderInstance } from 'keen-slider';
 
-const WheelControls = (slider: any) => {
+const WheelControls = (slider: KeenSliderInstance) => {
   let touchTimeout: NodeJS.Timeout;
   let position: { x: number; y: number };
   let wheelActive: boolean = false;
@@ -27,20 +28,20 @@ const WheelControls = (slider: any) => {
           x: e.pageX,
           y: e.pageY,
         };
-        dispatch(e, "ksDragStart");
+        dispatch(e, 'ksDragStart');
         wheelActive = true;
       }
-      dispatch(e, "ksDrag");
+      dispatch(e, 'ksDrag');
       clearTimeout(touchTimeout);
       touchTimeout = setTimeout(() => {
         wheelActive = false;
-        dispatch(e, "ksDragEnd");
+        dispatch(e, 'ksDragEnd');
       }, 50);
     }
   }
 
-  slider.on("created", () => {
-    slider.container.addEventListener("wheel", eventWheel, {
+  slider.on('created', () => {
+    slider.container.addEventListener('wheel', eventWheel, {
       passive: false,
     });
   });
@@ -69,20 +70,21 @@ export const useSlider = ({
   );
 
   const DATA_LENGTH = instanceRef?.current?.slides?.length ?? 10;
-  const ITEMS_PER_VIEW = DATA_LENGTH - (instanceRef?.current?.track?.details?.maxIdx ?? 2);
+  const ITEMS_PER_VIEW =
+    DATA_LENGTH - (instanceRef?.current?.track?.details?.maxIdx ?? 2);
 
   const setPercentageValue = (e: ChangeEvent<HTMLInputElement>) => {
     const target = e?.target;
     const currentIndexOfSlide = Math.floor(
-      +target?.value
-        / (sliderMaxLength / (DATA_LENGTH - Math.floor(ITEMS_PER_VIEW))),
+      +(target?.value ?? 0) /
+        (sliderMaxLength / (DATA_LENGTH - Math.floor(ITEMS_PER_VIEW))),
     );
 
     instanceRef.current?.track.add(
-      (+target.value - currentRange)
-        * (instanceRef.current.track.details.length / sliderMaxLength),
+      (+(target?.value ?? 0) - currentRange) *
+        (instanceRef.current.track.details.length / sliderMaxLength),
     );
-    setCurrentRange(+target.value);
+    setCurrentRange(+(target?.value ?? 0));
     setCurrentSlide(currentIndexOfSlide);
   };
 

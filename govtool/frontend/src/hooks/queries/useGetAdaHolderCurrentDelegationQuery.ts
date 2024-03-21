@@ -12,7 +12,7 @@ export const useGetAdaHolderCurrentDelegationQuery = (stakeKey?: string) => {
       QUERY_KEYS.getAdaHolderCurrentDelegationKey,
       delegateTransaction.transactionHash,
     ],
-    queryFn: async () => await getAdaHolderCurrentDelegation({ stakeKey }),
+    queryFn: () => getAdaHolderCurrentDelegation({ stakeKey }),
     enabled: !!stakeKey,
   });
 

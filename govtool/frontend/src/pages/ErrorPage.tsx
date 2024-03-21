@@ -1,16 +1,16 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { Box } from "@mui/material";
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Box } from '@mui/material';
 
-import { Background, Button, Typography } from "@atoms";
-import { IMAGES, PATHS } from "@consts";
-import { useCardano } from "@context";
-import { useScreenDimension, useTranslation } from "@hooks";
+import { Background, Button, Typography } from '@atoms';
+import { IMAGES, PATHS } from '@consts';
+import { useCardano } from '@context';
+import { useScreenDimension, useTranslation } from '@hooks';
 
 const IMAGE_SIZE = 748;
 
 export const ErrorPage = ({
   errorCode = 404,
-  errorDescription = "This page is not available",
+  errorDescription = 'This page is not available',
   isButton = true,
 }: {
   errorCode?: string | number;
@@ -39,24 +39,24 @@ export const ErrorPage = ({
             fontSize={57}
             fontWeight={700}
             lineHeight="64px"
-            sx={{ whiteSpace: "nowrap" }}
+            sx={{ whiteSpace: 'nowrap' }}
           >
-            {t("errorPage.whoops")}
+            {t('errorPage.whoops')}
           </Typography>
           <Typography sx={{ marginTop: 1 }} variant="headline3">
             {state && state.errorCode === 500
-              ? t("errorPage.serverError")
+              ? t('errorPage.serverError')
               : errorDescription}
           </Typography>
           <Typography fontWeight={400} sx={{ marginY: 4.25 }} variant="title2">
-            {t("errorPage.error")}
+            {t('errorPage.error')}
             {state ? state.errorCode : errorCode}
           </Typography>
           {isButton && (
             <Button size="extraLarge" onClick={() => navigate(PATHS.home)}>
               {isEnabled
-                ? t("errorPage.backToDashboard")
-                : t("errorPage.backToHomepage")}
+                ? t('errorPage.backToDashboard')
+                : t('errorPage.backToHomepage')}
             </Button>
           )}
         </Box>
@@ -68,6 +68,7 @@ export const ErrorPage = ({
           zIndex={-1}
         >
           <img
+            alt="error-page"
             height={IMAGE_SIZE}
             src={IMAGES.errorPageImage}
             width={IMAGE_SIZE}

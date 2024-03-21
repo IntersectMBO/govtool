@@ -18,29 +18,30 @@ export const useVoteActionFormController = () => {
   const { t } = useTranslation();
 
   const validationSchema = useMemo(
-    () => Yup.object().shape({
-      vote: Yup.string().oneOf(["yes", "no", "abstain"]).required(),
-      url: Yup.string()
-        .trim()
-        .max(64, t("forms.errors.urlTooLong"))
-        .test(
-          "url-validation",
-          t("forms.errors.urlInvalidFormat"),
-          (value) => !value || URL_REGEX.test(value),
-        ),
-      hash: Yup.string()
-        .trim()
-        .test(
-          "hash-length-validation",
-          t("forms.errors.hashInvalidLength"),
-          (value) => !value || value.length === 64,
-        )
-        .test(
-          "hash-format-validation",
-          t("forms.errors.hashInvalidFormat"),
-          (value) => !value || HASH_REGEX.test(value),
-        ),
-    }),
+    () =>
+      Yup.object().shape({
+        vote: Yup.string().oneOf(["yes", "no", "abstain"]).required(),
+        url: Yup.string()
+          .trim()
+          .max(64, t("forms.errors.urlTooLong"))
+          .test(
+            "url-validation",
+            t("forms.errors.urlInvalidFormat"),
+            (value) => !value || URL_REGEX.test(value),
+          ),
+        hash: Yup.string()
+          .trim()
+          .test(
+            "hash-length-validation",
+            t("forms.errors.hashInvalidLength"),
+            (value) => !value || value.length === 64,
+          )
+          .test(
+            "hash-format-validation",
+            t("forms.errors.hashInvalidFormat"),
+            (value) => !value || HASH_REGEX.test(value),
+          ),
+      }),
     [],
   );
 
@@ -53,7 +54,8 @@ export const useVoteActionFormController = () => {
 
 export const useVoteActionForm = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { buildSignSubmitConwayCertTx, buildVote, isPendingTransaction } = useCardano();
+  const { buildSignSubmitConwayCertTx, buildVote, isPendingTransaction } =
+    useCardano();
   const { addErrorAlert, addSuccessAlert } = useSnackbar();
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -72,8 +74,6 @@ export const useVoteActionForm = () => {
   });
 
   const areFormErrors = !!errors.vote || !!errors.url || !!errors.hash;
-
-  const { vote } = watch;
 
   const confirmVote = useCallback(
     async (values: VoteActionFormValues) => {
@@ -121,7 +121,7 @@ export const useVoteActionForm = () => {
     errors,
     confirmVote: handleSubmit(confirmVote),
     setValue,
-    vote,
+    vote: watch.vote,
     registerInput,
     isDirty,
     clearErrors,

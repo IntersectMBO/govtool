@@ -1,23 +1,24 @@
-import { useInfiniteQuery } from "react-query";
+import { useInfiniteQuery } from 'react-query';
 
-import { QUERY_KEYS } from "@consts";
-import { useCardano } from "@context";
-import { getProposals, getProposalsArguments } from "@services";
+import { QUERY_KEYS } from '@consts';
+import { useCardano } from '@context';
+import { getProposals, getProposalsArguments } from '@services';
 
 export const useGetProposalsInfiniteQuery = ({
   filters = [],
   pageSize = 10,
-  sorting = "",
+  sorting = '',
 }: getProposalsArguments) => {
   const { dRepID, isEnabled, voteTransaction } = useCardano();
 
-  const fetchProposals = async ({ pageParam = 0 }) => await getProposals({
-    dRepID,
-    filters,
-    page: pageParam,
-    pageSize,
-    sorting,
-  });
+  const fetchProposals = ({ pageParam = 0 }) =>
+    getProposals({
+      dRepID,
+      filters,
+      page: pageParam,
+      pageSize,
+      sorting,
+    });
 
   const {
     data,

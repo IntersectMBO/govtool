@@ -47,6 +47,7 @@ export const RetireAsSoleVoterBox = () => {
           },
         });
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       const errorMessage = error.info ? error.info : error;
 

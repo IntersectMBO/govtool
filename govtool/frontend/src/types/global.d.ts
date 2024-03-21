@@ -1,7 +1,7 @@
 export {};
 
 declare global {
-  type VoteType = "yes" | "no" | "abstain";
+  type VoteType = 'yes' | 'no' | 'abstain';
 
   type ActionTypeFromAPI = {
     id: string;
@@ -41,9 +41,9 @@ declare global {
     actions: ActionType[];
   }[];
 
-  type NestedKeys<T> = T extends Record<string, any>
+  type NestedKeys<T> = T extends Record<string, unknown>
     ? {
-        [K in keyof T]: T[K] extends Record<string, any>
+        [K in keyof T]: T[K] extends Record<string, unknown>
           ? `${string & K}.${NestedKeys<T[K]>}`
           : string & K;
       }[keyof T]

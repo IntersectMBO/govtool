@@ -1,13 +1,13 @@
-import { useEffect, useRef } from "react";
-import { useLocation, Outlet, useNavigate } from "react-router-dom";
-import { Box } from "@mui/material";
+import { useEffect, useRef } from 'react';
+import { useLocation, Outlet, useNavigate } from 'react-router-dom';
+import { Box } from '@mui/material';
 
-import { Background, ScrollToManage } from "@atoms";
-import { PATHS } from "@consts";
-import { useCardano } from "@context";
-import { useScreenDimension, useTranslation } from "@hooks";
-import { DashboardTopNav, Drawer, Footer } from "@organisms";
-import { checkIsWalletConnected } from "@utils";
+import { Background, ScrollToManage } from '@atoms';
+import { PATHS } from '@consts';
+import { useCardano } from '@context';
+import { useScreenDimension, useTranslation } from '@hooks';
+import { DashboardTopNav, Drawer, Footer } from '@organisms';
+import { checkIsWalletConnected } from '@utils';
 
 export const Dashboard = () => {
   const { isEnabled, stakeKey } = useCardano();
@@ -17,19 +17,19 @@ export const Dashboard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const getPageTitle = (pathname: string) => {
-    if (pathname === PATHS.dashboard) {
-      return t("dashboard.title");
-    } if (pathname.includes(PATHS.dashboardGovernanceActions)) {
-      return t("dashboard.govActions.title");
+  const getPageTitle = (path: string) => {
+    if (path === PATHS.dashboard) {
+      return t('dashboard.title');
     }
-    return "";
+    if (path.includes(PATHS.dashboardGovernanceActions)) {
+      return t('dashboard.govActions.title');
+    }
+    return '';
   };
 
   useEffect(() => {
-    if (divRef.current) {
-      pathname !== PATHS.dashboardGovernanceActions
-        && divRef.current.scrollTo({ top: 0 });
+    if (divRef.current && pathname !== PATHS.dashboardGovernanceActions) {
+      divRef.current.scrollTo({ top: 0 });
     }
   }, [pathname, divRef]);
 
@@ -39,7 +39,7 @@ export const Dashboard = () => {
         navigate(PATHS.home);
       } else {
         navigate(
-          window.location.pathname.replace("connected/", "") + hash ?? "",
+          window.location.pathname.replace('connected/', '') + hash ?? '',
         );
       }
     }
@@ -47,19 +47,19 @@ export const Dashboard = () => {
 
   return (
     <Background opacity={0.7}>
-      <Box sx={{ display: "flex", position: "relative" }}>
+      <Box sx={{ display: 'flex', position: 'relative' }}>
         {isMobile ? null : <Drawer />}
         <Box
           sx={{
-            display: "flex",
+            display: 'flex',
             flex: 1,
-            flexDirection: "column",
-            minHeight: "100vh",
-            overflow: "clip",
-            position: "relative",
+            flexDirection: 'column',
+            minHeight: '100vh',
+            overflow: 'clip',
+            position: 'relative',
           }}
         >
-          <DashboardTopNav title={getPageTitle(location.pathname)} />
+          <DashboardTopNav title={getPageTitle(window.location.pathname)} />
           <ScrollToManage />
           <Outlet />
           {isMobile ? <Footer /> : null}

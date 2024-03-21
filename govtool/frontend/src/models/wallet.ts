@@ -1,26 +1,11 @@
-declare global {
-  interface Window {
-    cardano: {
-      [key: string]: CardanoBrowserWallet;
-    };
-  }
-}
-
+// TODO: Replace any with proper types
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface Extension {
   cip: number;
 }
 
 export interface EnableExtensionPayload {
   extensions: Extension[];
-}
-
-export interface CardanoBrowserWallet {
-  apiVersion: string;
-  enable(extensions?: EnableExtensionPayload): Promise<CardanoApiWallet>;
-  icon: string;
-  isEnabled(): Promise<boolean>;
-  name: string;
-  supportedExtensions: Extension[];
 }
 
 export interface Protocol {
@@ -103,4 +88,21 @@ export interface CardanoApiWallet {
   onNetworkChange(arg0: (network: number) => void): Promise<void>;
   getActivePubStakeKeys(): Promise<string[]>;
   getExtensions(): Promise<Extension[]>;
+}
+
+export interface CardanoBrowserWallet {
+  apiVersion: string;
+  enable(extensions?: EnableExtensionPayload): Promise<CardanoApiWallet>;
+  icon: string;
+  isEnabled(): Promise<boolean>;
+  name: string;
+  supportedExtensions: Extension[];
+}
+
+declare global {
+  interface Window {
+    cardano: {
+      [key: string]: CardanoBrowserWallet;
+    };
+  }
 }

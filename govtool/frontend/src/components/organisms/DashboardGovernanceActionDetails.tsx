@@ -84,18 +84,20 @@ export const DashboardGovernanceActionDetails = () => {
           display: "flex",
           textDecoration: "none",
         }}
-        onClick={() => navigate(
-          state && state.openedFromCategoryPage
-            ? generatePath(PATHS.dashboardGovernanceActionsCategory, {
-              category: state.type,
-            })
-            : PATHS.dashboardGovernanceActions,
-          {
-            state: {
-              isVotedListOnLoad: !!(state && state.vote),
+        onClick={() =>
+          navigate(
+            state && state.openedFromCategoryPage
+              ? generatePath(PATHS.dashboardGovernanceActionsCategory, {
+                  category: state.type,
+                })
+              : PATHS.dashboardGovernanceActions,
+            {
+              state: {
+                isVotedListOnLoad: !!(state && state.vote),
+              },
             },
-          },
-        )}
+          )
+        }
       >
         <img
           src={ICONS.arrowRightIcon}
@@ -148,11 +150,9 @@ export const DashboardGovernanceActionDetails = () => {
           <Box mt={4} display="flex" flexWrap="wrap">
             <Typography fontWeight={300}>
               {t("govActions.withIdNotExist.partOne")}
-&nbsp;
+              &nbsp;
             </Typography>
-            <Typography
-              fontWeight="bold"
-            >
+            <Typography fontWeight="bold">
               {` ${shortenedGovActionId} `}
             </Typography>
             <Typography fontWeight={300}>

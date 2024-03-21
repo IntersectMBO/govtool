@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { FormProvider, useForm } from "react-hook-form";
 import { Box } from "@mui/material";
 
-import { Background } from "@atoms";
-import { PATHS } from "@consts";
-import { useModal } from "@context";
+import { Background } from '@atoms';
+import { PATHS } from '@consts';
+import { useModal } from '@context';
 import {
   useScreenDimension,
   useTranslation,
@@ -40,31 +40,32 @@ export const RegisterAsdRep = () => {
     }
   }, []);
 
-  const onClickBackToDashboard = () => openModal({
-    type: "statusModal",
-    state: {
-      status: "warning",
-      message: t("modals.registration.cancelDescription"),
-      buttonText: t("modals.common.goToDashboard"),
-      title: t("modals.registration.cancelTitle"),
-      dataTestId: "cancel-registration-modal",
-      onSubmit: backToDashboard,
-    },
-  });
-
   const backToDashboard = () => {
     navigate(PATHS.dashboard);
     closeModal();
   };
 
+  const onClickBackToDashboard = () =>
+    openModal({
+      type: 'statusModal',
+      state: {
+        status: 'warning',
+        message: t('modals.registration.cancelDescription'),
+        buttonText: t('modals.common.goToDashboard'),
+        title: t('modals.registration.cancelTitle'),
+        dataTestId: 'cancel-registration-modal',
+        onSubmit: backToDashboard,
+      },
+    });
+
   return (
     <Background isReverted>
       <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+        sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}
       >
-        <DashboardTopNav title={t("registration.becomeADRep")} />
+        <DashboardTopNav title={t('registration.becomeADRep')} />
         <LinkWithIcon
-          label={t("backToDashboard")}
+          label={t('backToDashboard')}
           onClick={onClickBackToDashboard}
           sx={{
             mb: isMobile ? 0 : 1.5,

@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
 import { expect, jest } from '@storybook/jest';
-import {
-  userEvent, waitFor, within, screen
-} from '@storybook/testing-library';
+import { userEvent, waitFor, within, screen } from '@storybook/testing-library';
 
 import { Modal } from '@atoms';
 import { StatusModal, StatusModalState } from '@organisms';
@@ -17,10 +15,13 @@ const meta = {
 
 export default meta;
 
-const Template: StoryFn<StatusModalState> = (args) => {
-  const {
-    openModal, modal, modals, closeModal
-  } = useModal();
+const Template: StoryFn<StatusModalState> = ({
+  title,
+  message,
+  link,
+  dataTestId,
+}) => {
+  const { openModal, modal, modals, closeModal } = useModal();
 
   const open = () => {
     openModal({
@@ -29,10 +30,10 @@ const Template: StoryFn<StatusModalState> = (args) => {
         buttonText: 'Close',
         status: 'success',
         onSubmit: () => closeModal(),
-        title: args.title,
-        message: args.message,
-        link: args.link,
-        dataTestId: args.dataTestId,
+        title,
+        message,
+        link,
+        dataTestId,
       },
     });
   };
@@ -43,16 +44,17 @@ const Template: StoryFn<StatusModalState> = (args) => {
 
   return (
     <>
-      <button onClick={open} style={{ cursor: 'pointer' }}>
+      <button type="button" onClick={open} style={{ cursor: 'pointer' }}>
         Open Modal
       </button>
       {modals[modal.type]?.component && (
         <Modal
           open={Boolean(modals[modal.type].component)}
           handleClose={callAll(modals[modal.type]?.onClose, () =>
-            openModal({ type: 'none', state: null }),)}
+            openModal({ type: 'none', state: null }),
+          )}
         >
-          {modals[modal.type]?.component ?? <></>}
+          {modals[modal.type]?.component}
         </Modal>
       )}
     </>

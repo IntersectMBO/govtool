@@ -18,9 +18,9 @@ changes.
 - Add on-chain inputs validation [Issue 377](https://github.com/IntersectMBO/govtool/issues/377)
 - Add hash and validation of the metadata [Issue 378](https://github.com/IntersectMBO/govtool/issues/378)
 - Add githubusercontent.com and ipfs.io to content security policy header [Issue 451](https://github.com/IntersectMBO/govtool/issues/451)
-- Add frontend test workflow on github actions [Issue 500](https://github.com/IntesectMBO/govtool/issues/500)
-- Add type check & lint to github actions [Issue 512](https://github.com/IntesectMBO/govtool/issues/512)
-- Add eslint & prettier to frontend package [Issue 166](https://github.com/IntesectMBO/govtool/issues/166)
+- Add frontend test workflow on github actions [Issue 500](https://github.com/IntersectMBO/govtool/issues/500)
+- Add type check & lint to github actions [Issue 512](https://github.com/IntersectMBO/govtool/issues/512)
+- Add eslint & prettier to frontend package [Issue 166](https://github.com/IntersectMBO/govtool/issues/166)
 
 ### Added
 

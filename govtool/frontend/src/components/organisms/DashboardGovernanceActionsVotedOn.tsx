@@ -33,12 +33,11 @@ export const DashboardGovernanceActionsVotedOn = ({
       return data
         .map((entry) => ({
           ...entry,
-          actions: entry.actions.filter((action) => getFullGovActionId(
-            action.proposal.txHash,
-            action.proposal.index,
-          )
-            .toLowerCase()
-            .includes(searchPhrase.toLowerCase())),
+          actions: entry.actions.filter((action) =>
+            getFullGovActionId(action.proposal.txHash, action.proposal.index)
+              .toLowerCase()
+              .includes(searchPhrase.toLowerCase()),
+          ),
         }))
         .filter((entry) => entry.actions.length > 0);
     }
@@ -69,19 +68,19 @@ export const DashboardGovernanceActionsVotedOn = ({
                 title={getProposalTypeLabel(item.title)}
                 navigateKey={item.title}
                 searchPhrase={searchPhrase}
-                data={item.actions.map((item) => (
+                data={item.actions.map((action) => (
                   <div
                     className="keen-slider__slide"
-                    key={`${item?.proposal.id}${item.vote.vote}`}
+                    key={`${action?.proposal.id}${action.vote.vote}`}
                     style={{ overflow: "visible", width: "auto" }}
                   >
                     <GovernanceVotedOnCard
-                      votedProposal={item}
+                      votedProposal={action}
                       searchPhrase={searchPhrase}
                       inProgress={
-                          voteTransaction.proposalId
-                          === item.proposal.txHash + item.proposal.index
-                        }
+                        voteTransaction.proposalId ===
+                        action.proposal.txHash + action.proposal.index
+                      }
                     />
                   </div>
                 ))}

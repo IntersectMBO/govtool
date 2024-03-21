@@ -1,8 +1,8 @@
-import { useQuery } from "react-query";
+import { useQuery } from 'react-query';
 
-import { QUERY_KEYS } from "@consts";
-import { useCardano } from "@context";
-import { getVoterInfo } from "@services";
+import { QUERY_KEYS } from '@consts';
+import { useCardano } from '@context';
+import { getVoterInfo } from '@services';
 
 export const useGetVoterInfo = () => {
   const { dRepID, registerTransaction, soleVoterTransaction } = useCardano();
@@ -14,7 +14,7 @@ export const useGetVoterInfo = () => {
       soleVoterTransaction?.transactionHash,
     ],
     enabled: !!dRepID,
-    queryFn: async () => await getVoterInfo(dRepID),
+    queryFn: () => getVoterInfo(dRepID),
   });
 
   return { data, isLoading };

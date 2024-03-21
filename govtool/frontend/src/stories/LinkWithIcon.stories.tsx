@@ -1,12 +1,12 @@
-import { Meta, StoryObj } from "@storybook/react";
-import { LinkWithIcon } from "@molecules";
-import { ICONS } from "@consts";
+import { Meta, StoryObj } from '@storybook/react';
+import { LinkWithIcon } from '@molecules';
+import { ICONS } from '@consts';
 
 const meta: Meta<typeof LinkWithIcon> = {
-  title: "Example/LinkWithIcon",
+  title: 'Example/LinkWithIcon',
   component: LinkWithIcon,
   parameters: {
-    layout: "centered",
+    layout: 'centered',
   },
 };
 
@@ -14,13 +14,13 @@ export default meta;
 
 export const Default: StoryObj<typeof LinkWithIcon> = {
   args: {
-    label: "Default Link",
+    label: 'Default Link',
   },
 };
 
 export const WithCustomIcon: StoryObj<typeof LinkWithIcon> = {
   args: {
-    label: "Custom Icon Link",
-    icon: <img src={ICONS.link} />,
+    label: 'Custom Icon Link',
+    icon: <img alt="custom icon" src={ICONS.link} />,
   },
 };

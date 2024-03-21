@@ -1,16 +1,16 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, RefObject } from "react";
 
-const useOutsideClick = (ref: any, onClick: () => void) => {
+const useOutsideClick = (ref: RefObject<HTMLElement>, onClick: () => void) => {
   useEffect(() => {
-    document.addEventListener('mousedown', (e) => {
-      if (ref.current && !ref.current.contains(e.target)) {
+    document.addEventListener("mousedown", (e) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
         onClick();
       }
     });
 
     return () => {
-      document.removeEventListener('mousedown', (e) => {
-        if (ref.current && !ref.current.contains(e.target)) {
+      document.removeEventListener("mousedown", (e) => {
+        if (ref.current && !ref.current.contains(e.target as Node)) {
           onClick();
         }
       });

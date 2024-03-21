@@ -1,3 +1,4 @@
+/* eslint-disable no-unsafe-optional-chaining */
 import { useMemo } from "react";
 import { useNavigate, generatePath } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
@@ -43,26 +44,35 @@ export const GovernanceActionsToVote = ({
     sorting,
   });
 
-  const groupedByType = (data?: ActionType[]) => data?.reduce((groups, item) => {
-    const itemType = item.type;
+  const groupedByType = (data?: ActionType[]) =>
+    data?.reduce((groups, item) => {
+      const itemType = item.type;
 
-    if (!groups[itemType]) {
-      groups[itemType] = {
-        title: itemType,
-        actions: [],
-      };
-    }
+      // TODO: Provide better typing for groups
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      if (!groups[itemType]) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        groups[itemType] = {
+          title: itemType,
+          actions: [],
+        };
+      }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      groups[itemType].actions.push(item);
 
-    groups[itemType].actions.push(item);
-
-    return groups;
-  }, {});
+      return groups;
+    }, {});
 
   const mappedData = useMemo(() => {
     const groupedData = groupedByType(
-      proposals?.filter((i) => getFullGovActionId(i.txHash, i.index)
-        .toLowerCase()
-        .includes(searchPhrase.toLowerCase())),
+      proposals?.filter((i) =>
+        getFullGovActionId(i.txHash, i.index)
+          .toLowerCase()
+          .includes(searchPhrase.toLowerCase()),
+      ),
     );
     return Object.values(groupedData ?? []) as ToVoteDataType;
   }, [proposals, searchPhrase]);
@@ -78,52 +88,55 @@ export const GovernanceActionsToVote = ({
           {mappedData?.map((item, index) => (
             <Box key={item.title} pb={2.5}>
               <Slider
-                data={item.actions.slice(0, 6).map((item) => (
+                data={item.actions.slice(0, 6).map((action) => (
                   <div
                     className="keen-slider__slide"
-                    key={item.id}
+                    key={action.id}
                     style={{
                       overflow: "visible",
                       width: "auto",
                     }}
                   >
                     <GovernanceActionCard
-                      {...item}
-                      txHash={item.txHash}
-                      index={item.index}
+                      {...action}
+                      txHash={action.txHash}
+                      index={action.index}
                       inProgress={
-                            onDashboard
-                            && voteTransaction?.proposalId
-                              === item?.txHash + item?.index
-                          }
-                      onClick={() => (onDashboard
-                            && voteTransaction?.proposalId
-                              === item?.txHash + item?.index
-                        ? openInNewTab(
-                          "https://adanordic.com/latest_transactions",
-                        )
-                        : navigate(
-                          onDashboard
-                            ? generatePath(
-                              PATHS.dashboardGovernanceActionsAction,
+                        onDashboard &&
+                        voteTransaction?.proposalId ===
+                          action?.txHash + action?.index
+                      }
+                      // eslint-disable-next-line no-confusing-arrow
+                      onClick={() =>
+                        onDashboard &&
+                        voteTransaction?.proposalId ===
+                          action?.txHash + action?.index
+                          ? openInNewTab(
+                              "https://adanordic.com/latest_transactions",
+                            )
+                          : navigate(
+                              onDashboard
+                                ? generatePath(
+                                    PATHS.dashboardGovernanceActionsAction,
+                                    {
+                                      proposalId: getFullGovActionId(
+                                        action.txHash,
+                                        action.index,
+                                      ),
+                                    },
+                                  )
+                                : PATHS.governanceActionsAction.replace(
+                                    ":proposalId",
+                                    getFullGovActionId(
+                                      action.txHash,
+                                      action.index,
+                                    ),
+                                  ),
                               {
-                                proposalId: getFullGovActionId(
-                                  item.txHash,
-                                  item.index,
-                                ),
+                                state: { ...action },
                               },
                             )
-                            : PATHS.governanceActionsAction.replace(
-                              ":proposalId",
-                              getFullGovActionId(
-                                item.txHash,
-                                item.index,
-                              ),
-                            ),
-                          {
-                            state: { ...item },
-                          },
-                        ))}
+                      }
                     />
                   </div>
                 ))}
@@ -137,7 +150,7 @@ export const GovernanceActionsToVote = ({
                 title={getProposalTypeLabel(item.title)}
               />
               {index < mappedData.length - 1 && (
-              <Box height={isMobile ? 40 : 52} />
+                <Box height={isMobile ? 40 : 52} />
               )}
             </Box>
           ))}

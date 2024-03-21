@@ -1,10 +1,7 @@
 import MuiModal from "@mui/material/Modal";
-import type { JSXElementConstructor, ReactElement } from "react";
+import type { ComponentProps } from "react";
 
-export type MuiModalChildren = ReactElement<
-  any,
-  string | JSXElementConstructor<any>
->;
+export type MuiModalChildren = ComponentProps<typeof MuiModal>["children"];
 
 interface Props {
   open: boolean;
@@ -14,6 +11,6 @@ interface Props {
 
 export const Modal = ({ open, children, handleClose }: Props) => (
   <MuiModal open={open} onClose={handleClose} disableAutoFocus>
-    <>{children}</>
+    {children}
   </MuiModal>
 );

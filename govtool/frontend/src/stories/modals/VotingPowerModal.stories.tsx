@@ -1,12 +1,12 @@
-import { Meta, StoryFn } from "@storybook/react";
+import { Meta, StoryFn } from '@storybook/react';
 
-import { Modal } from "@atoms";
-import { StatusModal, VotingPowerModalState } from "@organisms";
-import { useModal } from "@context";
-import { callAll } from "@utils";
+import { Modal } from '@atoms';
+import { StatusModal, VotingPowerModalState } from '@organisms';
+import { useModal } from '@context';
+import { callAll } from '@utils';
 
 const meta = {
-  title: "Example/Modals/VotingPowerModal",
+  title: 'Example/Modals/VotingPowerModal',
   component: StatusModal,
 } satisfies Meta<typeof StatusModal>;
 
@@ -17,7 +17,7 @@ const Template: StoryFn<VotingPowerModalState> = (args) => {
 
   const open = () => {
     openModal({
-      type: "votingPower",
+      type: 'votingPower',
       state: {
         ...args,
       },
@@ -26,15 +26,17 @@ const Template: StoryFn<VotingPowerModalState> = (args) => {
 
   return (
     <>
-      <button onClick={open} style={{ cursor: "pointer" }}>
+      <button type="button" onClick={open} style={{ cursor: 'pointer' }}>
         Open Modal
       </button>
       {modals[modal.type]?.component && (
         <Modal
           open={Boolean(modals[modal.type].component)}
-          handleClose={callAll(modals[modal.type]?.onClose, () => openModal({ type: "none", state: null }))}
+          handleClose={callAll(modals[modal.type]?.onClose, () =>
+            openModal({ type: 'none', state: null }),
+          )}
         >
-          {modals[modal.type]?.component ?? <></>}
+          {modals[modal.type]?.component}
         </Modal>
       )}
     </>
@@ -46,5 +48,5 @@ Default.args = {
   yesVotes: 1000000000000,
   noVotes: 10000000000,
   abstainVotes: 324000000,
-  vote: "yes",
+  vote: 'yes',
 };

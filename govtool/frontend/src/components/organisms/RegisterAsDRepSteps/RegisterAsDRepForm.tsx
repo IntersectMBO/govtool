@@ -1,18 +1,18 @@
-import { Dispatch, SetStateAction, useCallback } from 'react';
-import { useFieldArray } from 'react-hook-form';
-import { Box } from '@mui/material';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { Dispatch, SetStateAction, useCallback } from "react";
+import { useFieldArray } from "react-hook-form";
+import { Box } from "@mui/material";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
-import { Button, InfoText, Spacer, Typography } from '@atoms';
+import { Button, InfoText, Spacer, Typography } from "@atoms";
 import {
   useRegisterAsdRepForm,
   useScreenDimension,
   useTranslation,
-} from '@hooks';
-import { URL_REGEX } from '@utils';
+} from "@hooks";
+import { URL_REGEX } from "@utils";
 
-import { BgCard, ControlledField } from '..';
-import { Placeholders } from '@/consts';
+import { BgCard, ControlledField } from "..";
+import { Placeholders } from "@/consts";
 
 const MAX_NUMBER_OF_LINKS = 8;
 
@@ -30,18 +30,18 @@ export const RegisterAsDRepForm = ({
     remove,
   } = useFieldArray({
     control,
-    name: 'links',
+    name: "links",
   });
 
   const onClickContinue = () => setStep(3);
 
   const onClickBack = () => setStep(1);
 
-  const addLink = useCallback(() => append({ link: '' }), [append]);
+  const addLink = useCallback(() => append({ link: "" }), [append]);
 
   const removeLink = useCallback((index: number) => remove(index), [remove]);
 
-  const isContinueButtonDisabled = !watch('dRepName');
+  const isContinueButtonDisabled = !watch("dRepName");
 
   const renderLinks = useCallback(
     () =>
@@ -53,20 +53,22 @@ export const RegisterAsDRepForm = ({
             links.length > 1 ? (
               <DeleteOutlineIcon
                 color="primary"
-                sx={{ cursor: 'pointer', height: 24, with: 24 }}
+                sx={{ cursor: "pointer", height: 24, with: 24 }}
                 onClick={() => removeLink(index)}
               />
             ) : null
           }
           key={field.id}
-          label={t('forms.link') + ` ${index + 1}`}
+          // prefer-template rule for that label makes no sense
+          // eslint-disable-next-line prefer-template
+          label={t("forms.link") + ` ${index + 1}`}
           layoutStyles={{ mb: 3 }}
           placeholder={Placeholders.LINK}
           name={`links.${index}.link`}
           rules={{
             pattern: {
               value: URL_REGEX,
-              message: t('createGovernanceAction.fields.validations.url'),
+              message: t("createGovernanceAction.fields.validations.url"),
             },
           }}
         />
@@ -76,72 +78,72 @@ export const RegisterAsDRepForm = ({
 
   return (
     <BgCard
-      actionButtonLabel={t('continue')}
+      actionButtonLabel={t("continue")}
       onClickActionButton={onClickContinue}
       onClickBackButton={onClickBack}
       isActionButtonDisabled={isContinueButtonDisabled}
       sx={{ pb: isMobile ? undefined : 6, pt: isMobile ? 4 : 8 }}
     >
       <Box textAlign="center">
-        <InfoText label={t('registration.required')} />
+        <InfoText label={t("registration.required")} />
         <Typography sx={{ mt: 0.5, mb: isMobile ? 3 : 4 }} variant="headline4">
-          {t('registration.dRepName')}
+          {t("registration.dRepName")}
         </Typography>
         <Typography fontWeight={400} sx={{ mb: 4 }} variant="body1">
-          {t('registration.dRepNameDescription')}
+          {t("registration.dRepNameDescription")}
         </Typography>
       </Box>
       <ControlledField.Input
         {...{ control, errors }}
-        helpfulText={t('forms.registerAsDRep.dRepNameHelpfulText')}
-        label={t('forms.registerAsDRep.dRepName')}
+        helpfulText={t("forms.registerAsDRep.dRepNameHelpfulText")}
+        label={t("forms.registerAsDRep.dRepName")}
         name="dRepName"
-        placeholder={t('forms.registerAsDRep.dRepNamePlaceholder')}
+        placeholder={t("forms.registerAsDRep.dRepNamePlaceholder")}
       />
       <Spacer y={isMobile ? 5 : 6} />
       <Box textAlign="center">
-        <InfoText label={t('registration.optional')} />
+        <InfoText label={t("registration.optional")} />
         <Typography sx={{ mt: 0.5, mb: isMobile ? 3 : 4 }} variant="headline4">
-          {t('registration.aboutYou')}
+          {t("registration.aboutYou")}
         </Typography>
         <Typography fontWeight={400} sx={{ mb: 4 }} variant="body1">
-          {t('registration.aboutYouDescription')}
+          {t("registration.aboutYouDescription")}
         </Typography>
       </Box>
       <ControlledField.Input
         {...{ control, errors }}
-        label={t('forms.registerAsDRep.email')}
+        label={t("forms.registerAsDRep.email")}
         name="email"
-        placeholder={t('forms.registerAsDRep.emailPlaceholder')}
+        placeholder={t("forms.registerAsDRep.emailPlaceholder")}
       />
       <Spacer y={3} />
       <ControlledField.TextArea
         {...{ control, errors }}
-        label={t('forms.registerAsDRep.bio')}
+        label={t("forms.registerAsDRep.bio")}
         name="bio"
-        placeholder={t('forms.registerAsDRep.bioPlaceholder')}
-        helpfulText={t('forms.registerAsDRep.bioHelpfulText')}
+        placeholder={t("forms.registerAsDRep.bioPlaceholder")}
+        helpfulText={t("forms.registerAsDRep.bioHelpfulText")}
       />
       <Spacer y={4} />
       <p
         style={{
-          fontFamily: 'Poppins',
+          fontFamily: "Poppins",
           fontSize: 16,
           fontWeight: 600,
-          textAlign: 'center',
+          textAlign: "center",
           margin: 0,
         }}
       >
-        {t('registration.linksDescription')}
+        {t("registration.linksDescription")}
         <span style={{ fontSize: 16, fontWeight: 400 }}>
-          {t('registration.maximumLinks')}
+          {t("registration.maximumLinks")}
         </span>
       </p>
       <Spacer y={3} />
       {renderLinks()}
       {links?.length < MAX_NUMBER_OF_LINKS ? (
         <Button onClick={addLink} size="extraLarge" variant="text">
-          {t('addLink')}
+          {t("addLink")}
         </Button>
       ) : null}
       <Spacer y={isMobile ? 4 : 6} />

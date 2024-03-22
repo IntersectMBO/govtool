@@ -21,7 +21,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 }) => {
   const {
     dRepID: myDRepId,
-    isEnableLoading,
+    isEnabled,
     pendingTransaction,
     stakeKey,
   } = useCardano();
@@ -29,19 +29,20 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   const { delegate } = useDelegateTodRep();
 
+  const { votingPower } = useGetAdaHolderVotingPowerQuery();
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const inProgressDelegation = pendingTransaction.delegate?.resourceId;
 
-  const { data: myDRepList, isLoading: isMyDRepLoading } = useGetDRepListQuery(
+  const { data: myDRepList } = useGetDRepListQuery(
     currentDelegation?.startsWith('drep') ? currentDelegation : formHexToBech32(currentDelegation),
     { enabled: !!inProgressDelegation || !!currentDelegation }
   );
   const myDrep = myDRepList?.[0];
-  const { data: dRepList, isLoading: isDRepListLoading } = useGetDRepListQuery();
+  const { data: dRepList } = useGetDRepListQuery();
 
-  const { votingPower } = useGetAdaHolderVotingPowerQuery();
-
-  if (isEnableLoading || isMyDRepLoading || isDRepListLoading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
+  if (!isEnabled || votingPower === undefined || !dRepList) {
+    return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
+  }
 
   const ada = correctAdaFormat(votingPower);
 
@@ -62,18 +63,35 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
       {isConnected && (
         <div>
-          <Typography variant="title2" sx={{ mb: 2 }}>{t("dRepDirectory.delegationOptions")}</Typography>
-          <AutomatedVotingOptions />
+          <Typography variant="title2" sx={{ mb: 2 }}>
+            {t("dRepDirectory.delegationOptions")}
+          </Typography>
+          <AutomatedVotingOptions
+            currentDelegation={(!pendingTransaction.delegate
+              && ['drep_always_abstain', 'drep_always_no_confidence'].includes(currentDelegation))
+                ? currentDelegation
+                : undefined
+            }
+            delegate={delegate}
+            delegationInProgress={inProgressDelegation
+              && ['abstain', 'no confidence'].includes(inProgressDelegation)
+                ? inProgressDelegation
+                : undefined
+            }
+            isConnected={!!isConnected}
+            votingPower={ada.toString()}
+          />
         </div>
       )}
 
       <div>
-        <Typography fontSize={18} fontWeight={500}>{t("dRepDirectory.listTitle")}</Typography>
+        <Typography fontSize={18} fontWeight={500}>
+          {t('dRepDirectory.listTitle')}
+        </Typography>
         <Box component="ul" p={0} display="flex" flexDirection="column" gap={3}>
-          {dRepList?.map((dRep) => (isSameDRep(dRep, myDrep?.view)
-            ? null
-            : (
-              <Box key={dRep.drepId} component="li" sx={{ listStyle: "none" }}>
+          {dRepList?.map((dRep) =>
+            (isSameDRep(dRep, myDrep?.view) ? null : (
+              <Box key={dRep.drepId} component="li" sx={{ listStyle: 'none' }}>
                 <DRepCard
                   dRep={dRep}
                   isConnected={!!isConnected}
@@ -82,7 +100,8 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
                   onDelegate={() => delegate(dRep.drepId)}
                 />
               </Box>
-            )))}
+            )),
+          )}
         </Box>
       </div>
     </Box>

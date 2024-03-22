@@ -3,19 +3,39 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Chip,
 } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { ICONS } from "@consts";
 import { useTranslation } from "@hooks";
 import { AutomatedVotingCard } from "@molecules";
+import { useState } from "react";
 
-export const AutomatedVotingOptions = () => {
+type AutomatedVotingOptionsProps = {
+  currentDelegation: string | undefined;
+  delegate: (delegateTo: string) => void;
+  delegationInProgress?: string;
+  isConnected?: boolean;
+  votingPower: string;
+};
+
+export const AutomatedVotingOptions = ({
+  currentDelegation,
+  delegate,
+  delegationInProgress,
+  isConnected,
+  votingPower,
+}: AutomatedVotingOptionsProps) => {
   const { t } = useTranslation();
+
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
     <Accordion
       elevation={3}
+      expanded={isOpen}
+      onChange={(_, isExpanded) => setIsOpen(isExpanded)}
       sx={(theme) => ({
         bgcolor: `${theme.palette.lightBlue}80`,
         border: `1px solid ${theme.palette.neutralWhite}`,
@@ -26,6 +46,19 @@ export const AutomatedVotingOptions = () => {
         sx={{ borderRadius: 3, px: { xxs: 2, md: 3 } }}
       >
         <Typography>{t("dRepDirectory.automatedVotingOptions")}</Typography>
+        {currentDelegation && !isOpen && (
+          // TODO this Chip is temporary, since there were no design for this case
+          <Chip
+            color="primary"
+            label={currentDelegation === "drep_always_abstain" ? 'Abstain' : 'No confidence'}
+            sx={{
+              backgroundColor: (theme) => theme.palette.neutralWhite,
+              fontWeight: 400,
+              ml: 2,
+              textTransform: 'uppercase',
+            }}
+          />
+        )}
       </AccordionSummary>
       <AccordionDetails sx={{ p: { xxs: 2, md: 3 }, pt: { xxs: 0, md: 0 } }}>
         <Box
@@ -37,17 +70,23 @@ export const AutomatedVotingOptions = () => {
         >
           <AutomatedVotingCard
             description={t("dRepDirectory.abstainCardDescription")}
-            onClickDelegate={() => {}}
-            onClickInfo={() => {}}
+            inProgress={delegationInProgress === "abstain"}
+            isConnected={isConnected}
+            isSelected={currentDelegation === "drep_always_abstain"}
+            onClickDelegate={() => delegate("abstain")}
+            onClickInfo={() => { }}
             title={t("dRepDirectory.abstainCardTitle")}
-            votingPower="99,111,111"
+            votingPower={votingPower}
           />
           <AutomatedVotingCard
             description={t("dRepDirectory.noConfidenceDescription")}
-            onClickDelegate={() => {}}
-            onClickInfo={() => {}}
+            inProgress={delegationInProgress === "no confidence"}
+            isConnected={isConnected}
+            isSelected={currentDelegation === "drep_always_no_confidence"}
+            onClickDelegate={() => delegate("no confidence")}
+            onClickInfo={() => { }}
             title={t("dRepDirectory.noConfidenceTitle")}
-            votingPower="99,111,111"
+            votingPower={votingPower}
           />
         </Box>
       </AccordionDetails>

@@ -35,11 +35,11 @@ export const DRepCard = ({
     <Card
       {...(isMe && {
         variant: 'primary',
-        label: 'Yourself'
+        label: t('yourself')
       })}
       {...(isInProgress && {
         variant: 'warning',
-        label: 'In Progress'
+        label: t('inProgress')
       })}
       sx={{ container: "root / inline-size", py: 2.5 }}
     >

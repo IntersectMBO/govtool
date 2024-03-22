@@ -18,6 +18,9 @@ export type StepProps = {
 
 export type AutomatedVotingCardProps = {
   description: string;
+  inProgress?: boolean;
+  isConnected?: boolean;
+  isSelected?: boolean;
   onClickDelegate: () => void;
   onClickInfo: () => void;
   title: string;

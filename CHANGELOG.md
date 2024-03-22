@@ -36,6 +36,7 @@ changes.
 - Vitest unit tests added for utils functions [Issue 81](https://github.com/IntersectMBO/govtool/issues/81)
 - i18next library added to FE [Issue 80](https://github.com/IntersectMBO/govtool/issues/80)
 - Add possibility to vote on behalf of myself - Sole Voter [Issue 119](https://github.com/IntersectMBO/govtool/issues/119)
+- Added Nix Flakes configurtion to handle unified developers setup [Issue 526](https://github.com/IntersectMBO/govtool/issues/526)
 
 ### Fixed
 

@@ -79,8 +79,9 @@ export const useCreateGovernanceActionForm = (
   const generateMetadata = useCallback(async () => {
     const data = getValues();
 
-    if (!govActionType)
+    if (!govActionType) {
       throw new Error("Governance action type is not defined");
+    }
 
     const acceptedKeys = ["title", "motivation", "abstract", "rationale"];
 
@@ -104,10 +105,10 @@ export const useCreateGovernanceActionForm = (
     const jsonld = await generateJsonld(body, GOVERNANCE_ACTION_CONTEXT);
 
     const canonizedJson = await canonizeJSON(jsonld);
-    const hash = blake2bHex(canonizedJson, undefined, 32);
+    const canonizedJsonHash = blake2bHex(canonizedJson, undefined, 32);
 
     // That allows to validate metadata hash
-    setHash(hash);
+    setHash(canonizedJsonHash);
     setJson(jsonld);
 
     return jsonld;

@@ -33,3 +33,22 @@ export NGINX_BASIC_AUTH=<NGINX_BASIC_AUTH>
 # the IP addresses that bypass the basic auth
 export IP_ADDRESS_BYPASSING_BASIC_AUTH1=<IP_ADDRESS_BYPASSING_BASIC_AUTH1>
 export IP_ADDRESS_BYPASSING_BASIC_AUTH2=<IP_ADDRESS_BYPASSING_BASIC_AUTH2>
+
+# the domain name for the target environment
+case "$ENVIRONMENT" in
+  "dev")
+    export DOMAIN="dev-${CARDANO_NETWORK}.govtool.byron.network"
+    ;;
+  "test")
+    export DOMAIN="test-${CARDANO_NETWORK}.govtool.byron.network"
+    ;;
+  "staging")
+    export DOMAIN="staging.govtool.byron.network"
+    ;;
+  "beta")
+    export DOMAIN="sanchogov.tools"
+    ;;
+  *)
+    exit 1
+    ;;
+esac

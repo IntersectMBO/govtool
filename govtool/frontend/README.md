@@ -2,13 +2,13 @@
 
 Installed on your machine:
 
-1. Node.js >= 16 ([official website](https://nodejs.org/en))
+1. Node.js >= 18 ([official website](https://nodejs.org/en))
 2. npm or yarn - for package management
 
 Clone the project
 
 ```bash
-  git clone https://github.com/IntersectMBO/govtool
+git clone https://github.com/IntersectMBO/govtool
 ```
 
 Fill .env based on env.example file
@@ -16,19 +16,19 @@ Fill .env based on env.example file
 Go to the project directory
 
 ```bash
-  cd voltaire-era/govtool/frontend
+cd voltaire-era/govtool/frontend
 ```
 
 Install dependencies
 
 ```bash
-  npm install
+npm install
 ```
 
 or
 
 ```bash
-  yarn install
+yarn install
 ```
 
 Start the server
@@ -42,47 +42,6 @@ or
 ```bash
 yarn dev
 ```
-
-#### Using nix
-
-1. Get [Nix](https://nixos.org/download).
-
-2. Enter `govtool/frontend` directory:
-
-```sh
-cd govtool/frontend
-```
-
-3. Run `nix-shell`
-
-```sh
-nix-shell
-```
-
-4. Run project
-
-```sh
-npm run dev
-```
-
-##### Alternative
-
-You can skip point 3 by using an automatic direnv configuration:
-
-Install [`direnv`](https://direnv.net/):
-
-```sh
-nix-env -i direnv
-```
-
-Allow direnv configuration in `govtool/frontend`:
-
-```sh
-direnv allow govtool/frontend
-```
-
-From now on, once you enter the `govtool/frontend` the `nix-shell` with proper
-configuration will be propagated.
 
 ## Developing
 
@@ -107,7 +66,6 @@ configuration will be propagated.
 Install [`Git`](https://git-scm.com/) - version control
 Recommendetd [`React developer tools`](https://react.dev/learn/react-developer-tools)
 
-
 ## To Develop
 
 ### Standard way
@@ -124,41 +82,31 @@ npm install
 npm run dev
 ```
 
-### Using nix
+#### Using Nix and Direnv
 
 1. Get [Nix](https://nixos.org/download).
 
-2. Enter `govtool/frontend` directory:
+2. Get [direnv](https://direnv.net/).
+
+3. Fill .envrc based on envrc.example file in project root.
+
+4. Enter `govtool/frontend` directory:
+
 ```sh
 cd govtool/frontend
 ```
 
-3. Run `nix-shell`
+5. Allow direnv to setup your environment:
+
 ```sh
-nix-shell
+direnv allow
 ```
 
-4. Run project
+5. Run project
+
 ```sh
-npm run dev
+yarn dev
 ```
-
-##### Alternative
-
-You can skip point 3 by using an automatic direnv configuration: 
-
-Install [`direnv`](https://direnv.net/):
-```sh
-nix-env -i direnv
-```
-
-Allow direnv configuration in `govtool/frontend`:
-```sh
-direnv allow govtool/frontend
-```
-
-From now on, once you enter the `govtool/frontend` the `nix-shell` with proper
-configuration will be propagated.
 
 ### Users
 

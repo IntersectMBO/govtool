@@ -44,6 +44,7 @@ module.exports = {
     "no-nested-ternary": "off",
 
     "no-unused-vars": "off",
+    "no-use-before-define": "off",
     "comma-dangle": "off",
     "operator-linebreak": "off",
     "implicit-arrow-linebreak": "off",

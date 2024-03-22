@@ -14,17 +14,17 @@ import {
   PATHS,
   storageInformationErrorModals,
 } from "@consts";
-import {
-  GovernanceActionFieldSchemas,
-  GovernanceActionType,
-} from "@/types/governanceAction";
+import { useCardano, useModal } from "@context";
 import {
   canonizeJSON,
   downloadJson,
   generateJsonld,
   validateMetadataHash,
-} from "@/utils";
-import { useCardano, useModal } from "@/context";
+} from "@utils";
+import {
+  GovernanceActionFieldSchemas,
+  GovernanceActionType,
+} from "@/types/governanceAction";
 
 export type CreateGovernanceActionValues = {
   links?: { link: string }[];
@@ -135,7 +135,7 @@ export const useCreateGovernanceActionForm = (
             type: "statusModal",
             state: {
               ...storageInformationErrorModals[
-                error.message as MetadataHashValidationErrors
+              error.message as MetadataHashValidationErrors
               ],
               onSubmit: backToForm,
               onCancel: backToDashboard,
@@ -216,7 +216,10 @@ export const useCreateGovernanceActionForm = (
 
         await validateHash(data.storingURL, hash);
         const govActionBuilder = await buildTransaction(data);
-        await buildSignSubmitConwayCertTx({ govActionBuilder });
+        await buildSignSubmitConwayCertTx({
+          govActionBuilder,
+          type: "createGovAction",
+        });
 
         showSuccessModal();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

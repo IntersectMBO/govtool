@@ -8,6 +8,7 @@ import { useCardano, useModal } from "@context";
 import {
   useGetAdaHolderCurrentDelegationQuery,
   useGetAdaHolderVotingPowerQuery,
+  useGetVoterInfo,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
@@ -21,12 +22,12 @@ interface DelegateProps {
 export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
   const navigate = useNavigate();
   const {
-    voter,
     dRepID,
     buildSignSubmitConwayCertTx,
     buildVoteDelegationCert,
     stakeKey,
   } = useCardano();
+  const { voter } = useGetVoterInfo();
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const { openModal, closeModal } = useModal();
   const [areOptions, setAreOptions] = useState<boolean>(false);
@@ -93,7 +94,8 @@ export const DelegateTodRepStepOne = ({ setStep }: DelegateProps) => {
       const certBuilder = await buildVoteDelegationCert(chosenOption);
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
-        type: "delegation",
+        type: "delegate",
+        resourceId: chosenOption,
       });
       if (result) openSuccessDelegationModal();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

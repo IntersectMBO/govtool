@@ -4,8 +4,13 @@ import { Box, Link } from "@mui/material";
 
 import { Button, LoadingButton, Radio, Spacer, Typography } from "@atoms";
 import { ICONS } from "@consts";
-import { useCardano, useModal } from "@context";
-import { useScreenDimension, useVoteActionForm, useTranslation } from "@hooks";
+import { useModal } from "@context";
+import {
+  useScreenDimension,
+  useVoteActionForm,
+  useTranslation,
+  useGetVoterInfo,
+} from "@hooks";
 import { openInNewTab } from "@utils";
 
 import { ControlledField } from "../organisms";
@@ -25,8 +30,8 @@ export const VoteActionForm = ({
   const [isContext, setIsContext] = useState<boolean>(false);
   const { isMobile, screenWidth } = useScreenDimension();
   const { openModal } = useModal();
-  const { voter } = useCardano();
   const { t } = useTranslation();
+  const { voter } = useGetVoterInfo();
 
   const {
     areFormErrors,
@@ -74,28 +79,27 @@ export const VoteActionForm = ({
     [state],
   );
 
-  const renderChangeVoteButton = useMemo(
-    () => (
-      <LoadingButton
-        data-testid="change-vote"
-        onClick={confirmVote}
-        disabled={
-          (!areFormErrors && voteFromEP === vote) ||
-          areFormErrors ||
-          (!isContext && voteFromEP === vote)
-        }
-        isLoading={isVoteLoading}
-        variant="contained"
-        sx={{
-          borderRadius: 50,
-          textTransform: "none",
-          width: "100%",
-          height: 48,
-        }}
-      >
-        {t("govActions.changeVote")}
-      </LoadingButton>
-    ),
+  const renderChangeVoteButton = useMemo(() => (
+    <LoadingButton
+      data-testid="change-vote"
+      onClick={confirmVote}
+      disabled={
+        (!areFormErrors && voteFromEP === vote) ||
+        areFormErrors ||
+        (!isContext && voteFromEP === vote)
+      }
+      isLoading={isVoteLoading}
+      variant="contained"
+      sx={{
+        borderRadius: 50,
+        textTransform: 'none',
+        width: '100%',
+        height: 48,
+      }}
+    >
+      {t('govActions.changeVote')}
+    </LoadingButton>
+  ),
     [confirmVote, areFormErrors, vote, isVoteLoading],
   );
 
@@ -247,16 +251,16 @@ export const VoteActionForm = ({
         {t("govActions.selectDifferentOption")}
       </Typography>
       {(state?.vote && state?.vote !== vote) ||
-      (voteFromEP && voteFromEP !== vote) ? (
-        <Box
-          display="flex"
-          flexDirection={isMobile ? "column" : "row"}
-          justifyContent="space-between"
-        >
-          {isMobile ? renderChangeVoteButton : renderCancelButton}
-          <Box px={1} py={isMobile ? 1.5 : 0} />
-          {isMobile ? renderCancelButton : renderChangeVoteButton}
-        </Box>
+        (voteFromEP && voteFromEP !== vote) ? (
+          <Box
+            display="flex"
+            flexDirection={isMobile ? "column" : "row"}
+            justifyContent="space-between"
+          >
+            {isMobile ? renderChangeVoteButton : renderCancelButton}
+            <Box px={1} py={isMobile ? 1.5 : 0} />
+            {isMobile ? renderCancelButton : renderChangeVoteButton}
+          </Box>
       ) : (
         <LoadingButton
           data-testid="vote-button"

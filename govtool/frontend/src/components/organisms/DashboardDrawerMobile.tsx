@@ -2,9 +2,8 @@ import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 
 import { Background, Link } from "@atoms";
 import { CONNECTED_NAV_ITEMS, ICONS } from "@consts";
-import { useCardano } from "@context";
 import { DRepInfoCard, WalletInfoCard } from "@molecules";
-import { useScreenDimension } from "@hooks";
+import { useGetVoterInfo, useScreenDimension } from "@hooks";
 import { openInNewTab } from "@utils";
 
 import { DashboardDrawerMobileProps } from "./types";
@@ -18,7 +17,7 @@ export const DashboardDrawerMobile = ({
   setIsDrawerOpen,
 }: DashboardDrawerMobileProps) => {
   const { screenWidth } = useScreenDimension();
-  const { voter } = useCardano();
+  const { voter } = useGetVoterInfo();
 
   const openDrawer = () => {
     setIsDrawerOpen(true);

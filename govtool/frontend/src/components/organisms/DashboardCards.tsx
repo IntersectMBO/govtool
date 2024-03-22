@@ -1,67 +1,69 @@
-import { useCallback, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, CircularProgress } from "@mui/material";
-import { Trans } from "react-i18next";
+import { useCallback, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Box, CircularProgress } from '@mui/material';
+import { Trans } from 'react-i18next';
 
-import { IMAGES, PATHS } from "@consts";
-import { useCardano, useModal } from "@context";
+import { IMAGES, PATHS } from '@consts';
+import { useCardano, useModal } from '@context';
 import {
   useGetAdaHolderVotingPowerQuery,
   useScreenDimension,
   useGetAdaHolderCurrentDelegationQuery,
   useTranslation,
-} from "@hooks";
-import { DashboardActionCard } from "@molecules";
-import { correctAdaFormat, formHexToBech32, openInNewTab } from "@utils";
+  useGetVoterInfo,
+} from '@hooks';
+import { DashboardActionCard } from '@molecules';
+import { correctAdaFormat, formHexToBech32, openInNewTab } from '@utils';
 
 export const DashboardCards = () => {
   const {
     buildDRepRetirementCert,
     buildSignSubmitConwayCertTx,
-    delegateTo,
-    delegateTransaction,
     dRepID,
+    isEnableLoading,
     dRepIDBech32,
-    govActionTransaction,
-    isDrepLoading,
     isPendingTransaction,
-    registerTransaction,
-    soleVoterTransaction,
+    pendingTransaction,
     stakeKey,
-    voter,
   } = useCardano();
   const navigate = useNavigate();
-  const { currentDelegation, isCurrentDelegationLoading } =
+  const { currentDelegation } =
     useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const [isRetirementLoading, setIsRetirementLoading] =
     useState<boolean>(false);
-  const { votingPower, powerIsLoading } =
+  const { votingPower } =
     useGetAdaHolderVotingPowerQuery(stakeKey);
   const { t } = useTranslation();
+  const { voter } = useGetVoterInfo();
 
   const retireAsDrep = useCallback(async () => {
     try {
       setIsRetirementLoading(true);
       const isPendingTx = isPendingTransaction();
+
       if (isPendingTx) return;
-      const certBuilder = await buildDRepRetirementCert();
+      if (!voter?.deposit) throw new Error('Can not get deposit');
+
+      const certBuilder = await buildDRepRetirementCert(
+        voter.deposit.toString(),
+      );
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
-        type: "registration",
-        registrationType: "retirement",
+        type: 'retireAsDrep',
+        voterDeposit: voter.deposit.toString(),
       });
       if (result) {
         openModal({
-          type: "statusModal",
+          type: 'statusModal',
           state: {
-            status: "success",
-            title: t("modals.retirement.title"),
-            message: t("modals.retirement.message"),
-            link: "https://adanordic.com/latest_transactions",
-            buttonText: t("modals.common.goToDashboard"),
-            dataTestId: "retirement-transaction-submitted-modal",
+            status: 'success',
+            title: t('modals.retirement.title'),
+            message: t('modals.retirement.message'),
+            link: `https://adanordic.com/latest_transactions`,
+            buttonText: t('modals.common.goToDashboard'),
+            dataTestId: 'retirement-transaction-submitted-modal',
           },
         });
       }
@@ -70,13 +72,13 @@ export const DashboardCards = () => {
       const errorMessage = error.info ? error.info : error;
 
       openModal({
-        type: "statusModal",
+        type: 'statusModal',
         state: {
-          status: "warning",
+          status: 'warning',
           message: errorMessage,
-          buttonText: t("modals.common.goToDashboard"),
-          title: t("modals.common.oops"),
-          dataTestId: "retirement-transaction-error-modal",
+          buttonText: t('modals.common.goToDashboard'),
+          title: t('modals.common.oops'),
+          dataTestId: 'retirement-transaction-error-modal',
         },
       });
     } finally {
@@ -87,6 +89,7 @@ export const DashboardCards = () => {
     buildSignSubmitConwayCertTx,
     isPendingTransaction,
     openModal,
+    voter?.deposit,
   ]);
 
   const delegationDescription = useMemo(() => {
@@ -144,12 +147,15 @@ export const DashboardCards = () => {
     if (currentDelegation) {
       return "dRep";
     }
-    return "not_delegated";
+    return 'not_delegated';
   }, [currentDelegation, dRepID, votingPower]);
 
   const progressDescription = useMemo(() => {
     const correctAdaRepresentation = correctAdaFormat(votingPower);
-    if (delegateTo === dRepID) {
+    if (!pendingTransaction.delegate) return;
+    const { resourceId } = pendingTransaction.delegate;
+
+    if (resourceId === dRepID) {
       return (
         <Trans
           i18nKey="dashboard.delegation.inProgress.toYourself"
@@ -157,7 +163,7 @@ export const DashboardCards = () => {
         />
       );
     }
-    if (delegateTo === "no confidence") {
+    if (resourceId === 'no confidence') {
       return (
         <Trans
           i18nKey="dashboard.delegation.inProgress.voteNo"
@@ -165,7 +171,7 @@ export const DashboardCards = () => {
         />
       );
     }
-    if (delegateTo === "abstain") {
+    if (resourceId === 'abstain') {
       return (
         <Trans
           i18nKey="dashboard.delegation.inProgress.voteAbstain"
@@ -173,7 +179,7 @@ export const DashboardCards = () => {
         />
       );
     }
-    if (delegateTo) {
+    if (resourceId) {
       return (
         <Trans
           i18nKey="dashboard.delegation.inProgress.toDRep"
@@ -181,7 +187,7 @@ export const DashboardCards = () => {
         />
       );
     }
-  }, [delegateTo, dRepID, votingPower]);
+  }, [pendingTransaction, dRepID, votingPower]);
 
   const navigateTo = useCallback(
     (path: string) => {
@@ -193,24 +199,25 @@ export const DashboardCards = () => {
   );
 
   const onClickGovernanceActionCardActionButton = useCallback(() => {
-    if (govActionTransaction.transactionHash) {
+    if (pendingTransaction.createGovAction) {
       navigate(PATHS.dashboardGovernanceActions);
       return;
     }
     navigate(PATHS.createGovernanceAction);
-  }, [govActionTransaction.transactionHash, navigate]);
+  }, [pendingTransaction.createGovAction, navigate]);
 
   const displayedDelegationId = useMemo(() => {
     const restrictedNames = [
       dRepID,
-      "drep_always_abstain",
-      "drep_always_no_confidence",
-      "abstain",
-      "no confidence",
+      'drep_always_abstain',
+      'drep_always_no_confidence',
+      'abstain',
+      'no confidence',
     ];
-    if (delegateTransaction?.transactionHash) {
+    if (pendingTransaction.delegate) {
+      const delegateTo = pendingTransaction.delegate.resourceId;
       if (!restrictedNames.includes(delegateTo)) {
-        return delegateTo.includes("drep")
+        return delegateTo.includes('drep')
           ? delegateTo
           : formHexToBech32(delegateTo);
       }
@@ -220,112 +227,82 @@ export const DashboardCards = () => {
       return formHexToBech32(currentDelegation);
     }
     return undefined;
-  }, [
-    currentDelegation,
-    dRepID,
-    delegateTo,
-    delegateTransaction,
-    formHexToBech32,
-  ]);
+  }, [currentDelegation, dRepID, pendingTransaction, formHexToBech32]);
 
   const registrationCardDescription = useMemo(() => {
-    if (registerTransaction.transactionHash) {
-      switch (registerTransaction.type) {
-        case "retirement":
-          return t("dashboard.registration.retirementInProgress");
-        case "registration":
-          return t("dashboard.registration.registrationInProgress");
-        default:
-          return t("dashboard.registration.metadataUpdateInProgress");
-      }
-    } else if (voter?.isRegisteredAsDRep || voter?.wasRegisteredAsDRep) {
-      return t("dashboard.registration.holdersCanDelegate");
-    } else {
-      return t("dashboard.registration.ifYouWant");
-    }
+    if (pendingTransaction.registerAsDrep) return t('dashboard.registration.registrationInProgress');
+
+    if (pendingTransaction.retireAsDrep) return t('dashboard.registration.retirementInProgress');
+
+    if (pendingTransaction.updateMetaData) return t('dashboard.registration.metadataUpdateInProgress');
+
+    if (voter?.isRegisteredAsDRep || voter?.wasRegisteredAsDRep) return t('dashboard.registration.holdersCanDelegate');
+
+    return t('dashboard.registration.ifYouWant');
   }, [
-    registerTransaction.transactionHash,
-    registerTransaction.type,
+    pendingTransaction,
     voter?.isRegisteredAsDRep,
     voter?.wasRegisteredAsDRep,
   ]);
 
   const soleVoterCardDescription = useMemo(() => {
-    if (soleVoterTransaction.transactionHash) {
-      switch (soleVoterTransaction.type) {
-        case "retirement":
-          return "dashboard.soleVoter.retirementInProgress";
-        default:
-          return "dashboard.soleVoter.registrationInProgress";
-      }
-    } else if (voter?.isRegisteredAsSoleVoter) {
-      return "dashboard.soleVoter.isRegisteredDescription";
-    } else if (voter?.wasRegisteredAsSoleVoter) {
-      return "dashboard.soleVoter.wasRegisteredDescription";
-    } else {
-      return "dashboard.soleVoter.registerDescription";
-    }
+    if (pendingTransaction.registerAsSoleVoter) return 'dashboard.soleVoter.registrationInProgress';
+
+    if (pendingTransaction.retireAsSoleVoter) return 'dashboard.soleVoter.retirementInProgress';
+
+    if (voter?.isRegisteredAsSoleVoter) return 'dashboard.soleVoter.isRegisteredDescription';
+
+    if (voter?.wasRegisteredAsSoleVoter) return 'dashboard.soleVoter.wasRegisteredDescription';
+
+    return 'dashboard.soleVoter.registerDescription';
   }, [
-    soleVoterTransaction.transactionHash,
-    soleVoterTransaction.type,
+    pendingTransaction,
     voter?.isRegisteredAsSoleVoter,
     voter?.wasRegisteredAsSoleVoter,
   ]);
 
   const registrationCardTitle = useMemo(() => {
-    if (registerTransaction?.transactionHash) {
-      switch (registerTransaction.type) {
-        case "retirement":
-          return t("dashboard.registration.dRepRetirement");
-        case "registration":
-          return t("dashboard.registration.dRepRegistration");
-        default:
-          return t("dashboard.registration.dRepUpdate");
-      }
-    } else if (voter?.isRegisteredAsDRep) {
-      return t("dashboard.registration.youAreRegistered");
-    } else if (voter?.wasRegisteredAsDRep) {
-      return t("dashboard.registration.registerAgain");
-    } else {
-      return t("dashboard.registration.registerAsDRep");
-    }
+    if (pendingTransaction.retireAsDrep) return t('dashboard.registration.dRepRetirement');
+
+    if (pendingTransaction.registerAsDrep) return t('dashboard.registration.dRepRegistration');
+
+    if (pendingTransaction.updateMetaData) return t('dashboard.registration.dRepUpdate');
+
+    if (voter?.isRegisteredAsDRep) return t('dashboard.registration.youAreRegistered');
+
+    if (voter?.wasRegisteredAsDRep) return t('dashboard.registration.registerAgain');
+
+    return t('dashboard.registration.registerAsDRep');
   }, [
-    registerTransaction?.transactionHash,
-    registerTransaction.type,
+    pendingTransaction,
     voter?.isRegisteredAsDRep,
     voter?.wasRegisteredAsDRep,
   ]);
 
   const soleVoterCardTitle = useMemo(() => {
-    if (soleVoterTransaction?.transactionHash) {
-      switch (soleVoterTransaction.type) {
-        case "retirement":
-          return t("dashboard.soleVoter.retirement");
-        default:
-          return t("dashboard.soleVoter.registration");
-      }
-    } else if (voter?.isRegisteredAsSoleVoter) {
-      return t("dashboard.soleVoter.youAreSoleVoterTitle");
-    } else if (voter?.wasRegisteredAsSoleVoter) {
-      return t("dashboard.soleVoter.wasSoleVoterTitle");
-    } else {
-      return t("dashboard.soleVoter.registerTitle");
-    }
+    if (pendingTransaction.retireAsSoleVoter) return t('dashboard.soleVoter.retirement');
+
+    if (pendingTransaction.registerAsSoleVoter) return t('dashboard.soleVoter.registration');
+
+    if (voter?.isRegisteredAsSoleVoter) return t('dashboard.soleVoter.youAreSoleVoterTitle');
+
+    if (voter?.wasRegisteredAsSoleVoter) return t('dashboard.soleVoter.wasSoleVoterTitle');
+
+    return t('dashboard.soleVoter.registerTitle');
   }, [
-    soleVoterTransaction?.transactionHash,
-    soleVoterTransaction.type,
+    pendingTransaction,
     voter?.isRegisteredAsSoleVoter,
     voter?.isRegisteredAsSoleVoter,
   ]);
 
-  return isDrepLoading ? (
+  return isEnableLoading || !currentDelegation || !voter || !votingPower ? (
     <Box
       sx={{
-        alignItems: "center",
-        display: "flex",
+        alignItems: 'center',
+        display: 'flex',
         flex: 1,
-        height: "100vh",
-        justifyContent: "center",
+        height: '100vh',
+        justifyContent: 'center',
       }}
     >
       <CircularProgress />
@@ -334,13 +311,13 @@ export const DashboardCards = () => {
     <Box
       sx={{
         columnGap: 3,
-        display: "grid",
+        display: 'grid',
         gridTemplateColumns:
           screenWidth < 1280
-            ? "repeat(1, minmax(300px, 530px))"
+            ? 'repeat(1, minmax(300px, 530px))'
             : screenWidth >= 1728
-            ? "repeat(3, minmax(300px, 570px))"
-            : "repeat(2, minmax(300px, 530px))",
+              ? "repeat(3, minmax(300px, 570px))"
+              : "repeat(2, minmax(300px, 530px))",
         justifyContent: screenWidth < 1024 ? "center" : "flex-start",
         px: screenWidth < 640 ? 2 : 5,
         py: 3,
@@ -350,56 +327,55 @@ export const DashboardCards = () => {
       {/* DELEGATION CARD */}
       <DashboardActionCard
         dataTestidFirstButton={
-          currentDelegation ? "change-dRep-button" : "delegate-button"
+          currentDelegation ? 'change-dRep-button' : 'delegate-button'
         }
         dataTestidSecondButton="delegate-learn-more-button"
         dataTestidDrepIdBox="delegated-to-drep-id"
-        isLoading={isCurrentDelegationLoading || powerIsLoading}
         description={
-          delegateTransaction?.transactionHash
+          pendingTransaction.delegate
             ? progressDescription
             : delegationDescription
         }
         dataTestidDelegationStatus={
-          delegateTransaction?.transactionHash
-            ? "voting-power-delegation-status-in-progress"
+          pendingTransaction.delegate
+            ? 'voting-power-delegation-status-in-progress'
             : `voting-power-delegation-status-${delegationStatusTestForId}`
         }
         firstButtonAction={() => navigateTo(PATHS.delegateTodRep)}
         firstButtonLabel={
-          delegateTransaction?.transactionHash
-            ? ""
+          pendingTransaction.delegate
+            ? ''
             : currentDelegation
-            ? t("dashboard.delegation.changeDelegation")
-            : t("delegate")
+              ? t("dashboard.delegation.changeDelegation")
+              : t("delegate")
         }
-        firstButtonVariant={currentDelegation ? "outlined" : "contained"}
+        firstButtonVariant={currentDelegation ? 'outlined' : 'contained'}
         imageURL={IMAGES.govActionDelegateImage}
         cardId={displayedDelegationId}
-        inProgress={!!delegateTransaction?.transactionHash}
-        cardTitle={t("dashboard.delegation.dRepDelegatedTo")}
+        inProgress={!!pendingTransaction.delegate}
+        cardTitle={t('dashboard.delegation.dRepDelegatedTo')}
         secondButtonAction={
-          delegateTransaction?.transactionHash
+          pendingTransaction.delegate
             ? () => openInNewTab("https://adanordic.com/latest_transactions")
             : () =>
-                openInNewTab(
-                  "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power",
-                )
+              openInNewTab(
+                "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power",
+              )
         }
         secondButtonLabel={
-          delegateTransaction?.transactionHash
-            ? t("seeTransaction")
+          pendingTransaction.delegate
+            ? t('seeTransaction')
             : currentDelegation
-            ? ""
-            : t("learnMore")
+              ? ""
+              : t("learnMore")
         }
         title={
-          delegateTransaction?.transactionHash ? (
-            t("dashboard.delegation.votingPowerDelegation")
+          pendingTransaction.delegate ? (
+            t('dashboard.delegation.votingPowerDelegation')
           ) : currentDelegation ? (
             <Trans i18nKey="dashboard.delegation.yourVotingPowerIsDelegated" />
           ) : (
-            t("dashboard.delegation.useYourVotingPower")
+            t('dashboard.delegation.useYourVotingPower')
           )
         }
       />
@@ -407,23 +383,23 @@ export const DashboardCards = () => {
       {/* REGISTARTION AS DREP CARD */}
       <DashboardActionCard
         dataTestidFirstButton={
-          voter?.isRegisteredAsDRep ? "retire-button" : "register-button"
+          voter?.isRegisteredAsDRep ? 'retire-button' : 'register-button'
         }
         dataTestidDrepIdBox="my-drep-id"
         firstButtonVariant={
-          voter?.isRegisteredAsDRep ? "outlined" : "contained"
+          voter?.isRegisteredAsDRep ? 'outlined' : 'contained'
         }
         secondButtonVariant={
-          registerTransaction?.transactionHash
-            ? "outlined"
+          pendingTransaction.registerAsDrep || pendingTransaction.retireAsDrep
+            ? 'outlined'
             : voter?.isRegisteredAsDRep
-            ? "text"
-            : "outlined"
+              ? "text"
+              : "outlined"
         }
         dataTestidSecondButton={
           voter?.isRegisteredAsDRep
-            ? "change-metadata-button"
-            : "register-learn-more-button"
+            ? 'change-metadata-button'
+            : 'register-learn-more-button'
         }
         description={registrationCardDescription}
         firstButtonAction={
@@ -433,44 +409,49 @@ export const DashboardCards = () => {
         }
         firstButtonIsLoading={isRetirementLoading}
         firstButtonLabel={
-          registerTransaction?.transactionHash
-            ? ""
+          pendingTransaction.registerAsDrep || pendingTransaction.retireAsDrep
+            ? ''
             : t(
-                `dashboard.registration.${
-                  voter?.isRegisteredAsDRep ? "retire" : "register"
-                }`,
-              )
+              `dashboard.registration.${voter?.isRegisteredAsDRep ? "retire" : "register"
+              }`,
+            )
         }
-        inProgress={!!registerTransaction?.transactionHash}
+        inProgress={
+          !!(
+            pendingTransaction.registerAsDrep ||
+            pendingTransaction.retireAsDrep ||
+            pendingTransaction.updateMetaData
+          )
+        }
         imageURL={IMAGES.govActionRegisterImage}
         secondButtonAction={
-          registerTransaction?.transactionHash
-            ? () => openInNewTab("https://adanordic.com/latest_transactions")
+          pendingTransaction.registerAsDrep || pendingTransaction.retireAsDrep
+            ? () => openInNewTab('https://adanordic.com/latest_transactions')
             : voter?.isRegisteredAsDRep
-            ? () => {
+              ? () => {
                 navigateTo(PATHS.updateMetadata);
               }
-            : () =>
+              : () =>
                 openInNewTab(
                   "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
                 )
         }
         secondButtonLabel={
-          registerTransaction?.transactionHash
-            ? t("seeTransaction")
+          pendingTransaction.registerAsDrep || pendingTransaction.retireAsDrep
+            ? t('seeTransaction')
             : voter?.isRegisteredAsDRep
-            ? t("dashboard.registration.changeMetadata")
-            : t("learnMore")
+              ? t("dashboard.registration.changeMetadata")
+              : t("learnMore")
         }
         cardId={
           voter?.isRegisteredAsDRep || voter?.wasRegisteredAsDRep
             ? dRepIDBech32
-            : ""
+            : ''
         }
         cardTitle={
           voter?.isRegisteredAsDRep || voter?.wasRegisteredAsDRep
-            ? t("myDRepId")
-            : ""
+            ? t('myDRepId')
+            : ''
         }
         title={registrationCardTitle}
       />
@@ -478,11 +459,14 @@ export const DashboardCards = () => {
       {/* SOLE VOTER CARD */}
       <DashboardActionCard
         title={soleVoterCardTitle}
-        inProgress={!!soleVoterTransaction?.transactionHash}
+        inProgress={
+          !!pendingTransaction.registerAsSoleVoter ||
+          !!pendingTransaction.retireAsSoleVoter
+        }
         dataTestidFirstButton={
           voter?.isRegisteredAsSoleVoter
-            ? "retire-as-sole-voter-button"
-            : "register-as-sole-voter-button"
+            ? 'retire-as-sole-voter-button'
+            : 'register-as-sole-voter-button'
         }
         dataTestidSecondButton="learn-more-button"
         description={
@@ -492,15 +476,15 @@ export const DashboardCards = () => {
           />
         }
         firstButtonLabel={
-          soleVoterTransaction?.transactionHash
-            ? ""
+          pendingTransaction.registerAsSoleVoter
+            ? ''
             : t(
-                voter?.isRegisteredAsSoleVoter
-                  ? "dashboard.soleVoter.retire"
-                  : voter?.wasRegisteredAsSoleVoter
+              voter?.isRegisteredAsSoleVoter
+                ? "dashboard.soleVoter.retire"
+                : voter?.wasRegisteredAsSoleVoter
                   ? "dashboard.soleVoter.reRegister"
                   : "dashboard.soleVoter.register",
-              )
+            )
         }
         firstButtonAction={() =>
           navigateTo(
@@ -510,7 +494,7 @@ export const DashboardCards = () => {
           )
         }
         firstButtonVariant={
-          voter?.isRegisteredAsSoleVoter ? "outlined" : "contained"
+          voter?.isRegisteredAsSoleVoter ? 'outlined' : 'contained'
         }
         secondButtonLabel={t("learnMore")}
         secondButtonAction={() =>
@@ -525,37 +509,33 @@ export const DashboardCards = () => {
       {/* GOV ACTIONS LIST CARD */}
       <DashboardActionCard
         dataTestidFirstButton="view-governance-actions-button"
-        description={t("dashboard.govActions.description")}
+        description={t('dashboard.govActions.description')}
         firstButtonAction={() => navigate(PATHS.dashboardGovernanceActions)}
         firstButtonLabel={t(
-          `dashboard.govActions.${
-            voter?.isRegisteredAsDRep ? "reviewAndVote" : "view"
+          `dashboard.govActions.${voter?.isRegisteredAsDRep ? 'reviewAndVote' : 'view'
           }`,
         )}
         imageURL={IMAGES.govActionListImage}
-        title={t("dashboard.govActions.title")}
+        title={t('dashboard.govActions.title')}
       />
       {/* GOV ACTIONS LIST CARD END */}
       {/* GOV ACTIONS LIST CARD */}
       <DashboardActionCard
         dataTestidFirstButton="propose-governance-actions-button"
-        description={t("dashboard.proposeGovernanceAction.description")}
+        description={t('dashboard.proposeGovernanceAction.description')}
         firstButtonAction={onClickGovernanceActionCardActionButton}
         firstButtonLabel={t(
-          `dashboard.proposeGovernanceAction.${
-            govActionTransaction.transactionHash ? "view" : "propose"
+          `dashboard.proposeGovernanceAction.${pendingTransaction.createGovAction ? 'view' : 'propose'
           }`,
         )}
-        inProgress={!!govActionTransaction.transactionHash}
+        inProgress={!!pendingTransaction.createGovAction}
         secondButtonLabel={t("learnMore")}
-        secondButtonAction={() =>
-          openInNewTab(
-            "https://docs.sanchogov.tools/faqs/what-is-a-governance-action",
-          )
-        }
+        secondButtonAction={() => openInNewTab(
+          "https://docs.sanchogov.tools/faqs/what-is-a-governance-action",
+        )}
         secondButtonVariant="outlined"
         imageURL={IMAGES.proposeGovActionImage}
-        title={t("dashboard.proposeGovernanceAction.title")}
+        title={t('dashboard.proposeGovernanceAction.title')}
       />
       {/* GOV ACTIONS LIST CARD END */}
     </Box>

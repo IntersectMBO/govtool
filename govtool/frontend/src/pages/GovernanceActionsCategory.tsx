@@ -19,6 +19,7 @@ import {
   useSaveScrollPosition,
   useScreenDimension,
   useTranslation,
+  useGetVoterInfo,
 } from "@hooks";
 import {
   WALLET_LS_KEY,
@@ -36,7 +37,7 @@ export const GovernanceActionsCategory = () => {
   const { isMobile, pagePadding, screenWidth } = useScreenDimension();
   const { isEnabled } = useCardano();
   const navigate = useNavigate();
-  const { voter } = useCardano();
+  const { voter } = useGetVoterInfo();
   const { t } = useTranslation();
 
   const {
@@ -49,6 +50,7 @@ export const GovernanceActionsCategory = () => {
   } = useGetProposalsInfiniteQuery({
     filters: [category?.replace(/ /g, "") ?? ""],
     sorting: chosenSorting,
+    searchPhrase: searchText,
   });
   const loadNextPageRef = useRef(null);
 

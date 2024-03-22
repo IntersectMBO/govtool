@@ -31,11 +31,14 @@ export const DashboardCards = () => {
     voter,
   } = useCardano();
   const navigate = useNavigate();
-  const { currentDelegation, isCurrentDelegationLoading } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
+  const { currentDelegation, isCurrentDelegationLoading } =
+    useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
-  const [isRetirementLoading, setIsRetirementLoading] = useState<boolean>(false);
-  const { votingPower, powerIsLoading } = useGetAdaHolderVotingPowerQuery(stakeKey);
+  const [isRetirementLoading, setIsRetirementLoading] =
+    useState<boolean>(false);
+  const { votingPower, powerIsLoading } =
+    useGetAdaHolderVotingPowerQuery(stakeKey);
   const { t } = useTranslation();
 
   const retireAsDrep = useCallback(async () => {
@@ -62,6 +65,7 @@ export const DashboardCards = () => {
           },
         });
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       const errorMessage = error.info ? error.info : error;
 
@@ -94,21 +98,24 @@ export const DashboardCards = () => {
           values={{ ada: correctAdaRepresentation }}
         />
       );
-    } if (currentDelegation === "drep_always_no_confidence") {
+    }
+    if (currentDelegation === "drep_always_no_confidence") {
       return (
         <Trans
           i18nKey="dashboard.delegation.voteNo"
           values={{ ada: correctAdaRepresentation }}
         />
       );
-    } if (currentDelegation === "drep_always_abstain") {
+    }
+    if (currentDelegation === "drep_always_abstain") {
       return (
         <Trans
           i18nKey="dashboard.delegation.voteAbstain"
           values={{ ada: correctAdaRepresentation }}
         />
       );
-    } if (currentDelegation) {
+    }
+    if (currentDelegation) {
       return (
         <Trans
           i18nKey="dashboard.delegation.toDRep"
@@ -127,11 +134,14 @@ export const DashboardCards = () => {
   const delegationStatusTestForId = useMemo(() => {
     if (currentDelegation === dRepID) {
       return "myself";
-    } if (currentDelegation === "drep_always_no_confidence") {
+    }
+    if (currentDelegation === "drep_always_no_confidence") {
       return "no-confidence";
-    } if (currentDelegation === "drep_always_abstain") {
+    }
+    if (currentDelegation === "drep_always_abstain") {
       return "abstain";
-    } if (currentDelegation) {
+    }
+    if (currentDelegation) {
       return "dRep";
     }
     return "not_delegated";
@@ -329,8 +339,8 @@ export const DashboardCards = () => {
           screenWidth < 1280
             ? "repeat(1, minmax(300px, 530px))"
             : screenWidth >= 1728
-              ? "repeat(3, minmax(300px, 570px))"
-              : "repeat(2, minmax(300px, 530px))",
+            ? "repeat(3, minmax(300px, 570px))"
+            : "repeat(2, minmax(300px, 530px))",
         justifyContent: screenWidth < 1024 ? "center" : "flex-start",
         px: screenWidth < 640 ? 2 : 5,
         py: 3,
@@ -360,8 +370,8 @@ export const DashboardCards = () => {
           delegateTransaction?.transactionHash
             ? ""
             : currentDelegation
-              ? t("dashboard.delegation.changeDelegation")
-              : t("delegate")
+            ? t("dashboard.delegation.changeDelegation")
+            : t("delegate")
         }
         firstButtonVariant={currentDelegation ? "outlined" : "contained"}
         imageURL={IMAGES.govActionDelegateImage}
@@ -371,16 +381,17 @@ export const DashboardCards = () => {
         secondButtonAction={
           delegateTransaction?.transactionHash
             ? () => openInNewTab("https://adanordic.com/latest_transactions")
-            : () => openInNewTab(
-              "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power",
-            )
+            : () =>
+                openInNewTab(
+                  "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power",
+                )
         }
         secondButtonLabel={
           delegateTransaction?.transactionHash
             ? t("seeTransaction")
             : currentDelegation
-              ? ""
-              : t("learnMore")
+            ? ""
+            : t("learnMore")
         }
         title={
           delegateTransaction?.transactionHash ? (
@@ -406,8 +417,8 @@ export const DashboardCards = () => {
           registerTransaction?.transactionHash
             ? "outlined"
             : voter?.isRegisteredAsDRep
-              ? "text"
-              : "outlined"
+            ? "text"
+            : "outlined"
         }
         dataTestidSecondButton={
           voter?.isRegisteredAsDRep
@@ -425,10 +436,10 @@ export const DashboardCards = () => {
           registerTransaction?.transactionHash
             ? ""
             : t(
-              `dashboard.registration.${
-                voter?.isRegisteredAsDRep ? "retire" : "register"
-              }`,
-            )
+                `dashboard.registration.${
+                  voter?.isRegisteredAsDRep ? "retire" : "register"
+                }`,
+              )
         }
         inProgress={!!registerTransaction?.transactionHash}
         imageURL={IMAGES.govActionRegisterImage}
@@ -436,19 +447,20 @@ export const DashboardCards = () => {
           registerTransaction?.transactionHash
             ? () => openInNewTab("https://adanordic.com/latest_transactions")
             : voter?.isRegisteredAsDRep
-              ? () => {
+            ? () => {
                 navigateTo(PATHS.updateMetadata);
               }
-              : () => openInNewTab(
-                "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
-              )
+            : () =>
+                openInNewTab(
+                  "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
+                )
         }
         secondButtonLabel={
           registerTransaction?.transactionHash
             ? t("seeTransaction")
             : voter?.isRegisteredAsDRep
-              ? t("dashboard.registration.changeMetadata")
-              : t("learnMore")
+            ? t("dashboard.registration.changeMetadata")
+            : t("learnMore")
         }
         cardId={
           voter?.isRegisteredAsDRep || voter?.wasRegisteredAsDRep
@@ -473,35 +485,39 @@ export const DashboardCards = () => {
             : "register-as-sole-voter-button"
         }
         dataTestidSecondButton="learn-more-button"
-        description={(
+        description={
           <Trans
             i18nKey={soleVoterCardDescription}
             values={{ votingPower: correctAdaFormat(votingPower) }}
           />
-        )}
+        }
         firstButtonLabel={
           soleVoterTransaction?.transactionHash
             ? ""
             : t(
-              voter?.isRegisteredAsSoleVoter
-                ? "dashboard.soleVoter.retire"
-                : voter?.wasRegisteredAsSoleVoter
+                voter?.isRegisteredAsSoleVoter
+                  ? "dashboard.soleVoter.retire"
+                  : voter?.wasRegisteredAsSoleVoter
                   ? "dashboard.soleVoter.reRegister"
                   : "dashboard.soleVoter.register",
-            )
+              )
         }
-        firstButtonAction={() => navigateTo(
-          voter?.isRegisteredAsSoleVoter
-            ? PATHS.retireAsSoleVoter
-            : PATHS.registerAsSoleVoter,
-        )}
+        firstButtonAction={() =>
+          navigateTo(
+            voter?.isRegisteredAsSoleVoter
+              ? PATHS.retireAsSoleVoter
+              : PATHS.registerAsSoleVoter,
+          )
+        }
         firstButtonVariant={
           voter?.isRegisteredAsSoleVoter ? "outlined" : "contained"
         }
         secondButtonLabel={t("learnMore")}
-        secondButtonAction={() => openInNewTab(
-          "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
-        )}
+        secondButtonAction={() =>
+          openInNewTab(
+            "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
+          )
+        }
         secondButtonVariant="outlined"
         imageURL={IMAGES.soleVoterImage}
       />
@@ -532,9 +548,11 @@ export const DashboardCards = () => {
         )}
         inProgress={!!govActionTransaction.transactionHash}
         secondButtonLabel={t("learnMore")}
-        secondButtonAction={() => openInNewTab(
-          "https://docs.sanchogov.tools/faqs/what-is-a-governance-action",
-        )}
+        secondButtonAction={() =>
+          openInNewTab(
+            "https://docs.sanchogov.tools/faqs/what-is-a-governance-action",
+          )
+        }
         secondButtonVariant="outlined"
         imageURL={IMAGES.proposeGovActionImage}
         title={t("dashboard.proposeGovernanceAction.title")}

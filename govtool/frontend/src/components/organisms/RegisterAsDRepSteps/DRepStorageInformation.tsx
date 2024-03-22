@@ -36,7 +36,7 @@ export const DRepStorageInformation = ({
   // TODO: Change link to correct
   const openGuideAboutStoringInformation = useCallback(
     () => openInNewTab("https://sancho.network/"),
-    []
+    [],
   );
 
   const isActionButtonDisabled = !watch("storingURL");
@@ -82,7 +82,7 @@ export const DRepStorageInformation = ({
               // TODO: add function onClickDownloadJson
               // onClick={onClickDownloadJson}
               size="extraLarge"
-              startIcon={<img src={ICONS.download} />}
+              startIcon={<img alt="download" src={ICONS.download} />}
               sx={{
                 width: "fit-content",
                 ml: screenWidth < 1024 ? 0 : 1.75,

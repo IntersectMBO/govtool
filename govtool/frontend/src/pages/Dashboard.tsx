@@ -17,19 +17,19 @@ export const Dashboard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const getPageTitle = (pathname: string) => {
-    if (pathname === PATHS.dashboard) {
+  const getPageTitle = (path: string) => {
+    if (path === PATHS.dashboard) {
       return t("dashboard.title");
-    } if (pathname.includes(PATHS.dashboardGovernanceActions)) {
+    }
+    if (path.includes(PATHS.dashboardGovernanceActions)) {
       return t("dashboard.govActions.title");
     }
     return "";
   };
 
   useEffect(() => {
-    if (divRef.current) {
-      pathname !== PATHS.dashboardGovernanceActions
-        && divRef.current.scrollTo({ top: 0 });
+    if (divRef.current && pathname !== PATHS.dashboardGovernanceActions) {
+      divRef.current.scrollTo({ top: 0 });
     }
   }, [pathname, divRef]);
 
@@ -59,7 +59,7 @@ export const Dashboard = () => {
             position: "relative",
           }}
         >
-          <DashboardTopNav title={getPageTitle(location.pathname)} />
+          <DashboardTopNav title={getPageTitle(window.location.pathname)} />
           <ScrollToManage />
           <Outlet />
           {isMobile ? <Footer /> : null}

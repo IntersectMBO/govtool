@@ -18,14 +18,13 @@ type StakeRadioProps = {
 };
 
 export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
-  const {
-    dataTestId, isChecked = false, stakeKey, onChange,
-  } = props;
+  const { dataTestId, isChecked = false, stakeKey, onChange } = props;
   const {
     palette: { boxShadow1 },
   } = theme;
   const { isMobile } = useScreenDimension();
-  const { powerIsLoading, votingPower } = useGetAdaHolderVotingPowerQuery(stakeKey);
+  const { powerIsLoading, votingPower } =
+    useGetAdaHolderVotingPowerQuery(stakeKey);
   const { t } = useTranslation();
 
   return (
@@ -83,9 +82,7 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
               fontWeight={600}
               marginLeft="4px"
             >
-              ₳
-              {" "}
-              {correctAdaFormat(votingPower) ?? 0}
+              ₳ {correctAdaFormat(votingPower) ?? 0}
             </Typography>
           )}
         </Box>

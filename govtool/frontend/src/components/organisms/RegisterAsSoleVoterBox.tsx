@@ -49,6 +49,7 @@ export const RegisterAsSoleVoterBox = () => {
           },
         });
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       const errorMessage = e.info ? e.info : e;
 

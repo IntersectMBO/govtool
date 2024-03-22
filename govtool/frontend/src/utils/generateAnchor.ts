@@ -1,4 +1,8 @@
-import { Anchor, AnchorDataHash, URL } from "@emurgo/cardano-serialization-lib-asmjs";
+import {
+  Anchor,
+  AnchorDataHash,
+  URL,
+} from "@emurgo/cardano-serialization-lib-asmjs";
 
 export const generateAnchor = (url: string, hash: string) => {
   const metadataUrl = URL.new(url);

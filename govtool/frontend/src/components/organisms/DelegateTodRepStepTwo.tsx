@@ -31,37 +31,43 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
     isDelegationLoading,
   } = useDelegateTodRepForm();
 
-  const renderDelegateButton = useMemo(() => (
-    <LoadingButton
-      data-testid="delegate-button"
-      disabled={isDelegateButtonDisabled}
-      isLoading={isDelegationLoading}
-      onClick={delegate}
-      size="extraLarge"
-      sx={{
-        px: 6,
-        width: isMobile ? "100%" : "auto",
-      }}
-      variant="contained"
-    >
-      {t("delegate")}
-    </LoadingButton>
-  ), [isDelegateButtonDisabled, delegate, isMobile, isDelegationLoading]);
+  const renderDelegateButton = useMemo(
+    () => (
+      <LoadingButton
+        data-testid="delegate-button"
+        disabled={isDelegateButtonDisabled}
+        isLoading={isDelegationLoading}
+        onClick={delegate}
+        size="extraLarge"
+        sx={{
+          px: 6,
+          width: isMobile ? "100%" : "auto",
+        }}
+        variant="contained"
+      >
+        {t("delegate")}
+      </LoadingButton>
+    ),
+    [isDelegateButtonDisabled, delegate, isMobile, isDelegationLoading],
+  );
 
-  const renderBackButton = useMemo(() => (
-    <Button
-      data-testid="cancel-button"
-      onClick={() => setStep(1)}
-      size="extraLarge"
-      sx={{
-        px: 6,
-        width: isMobile ? "100%" : "auto",
-      }}
-      variant="outlined"
-    >
-      {t("back")}
-    </Button>
-  ), [isMobile]);
+  const renderBackButton = useMemo(
+    () => (
+      <Button
+        data-testid="cancel-button"
+        onClick={() => setStep(1)}
+        size="extraLarge"
+        sx={{
+          px: 6,
+          width: isMobile ? "100%" : "auto",
+        }}
+        variant="outlined"
+      >
+        {t("back")}
+      </Button>
+    ),
+    [isMobile],
+  );
 
   return (
     <Box
@@ -96,9 +102,11 @@ export const DelegateTodRepStepTwo = ({ setStep }: DelegateProps) => {
         </Box>
         <Link
           data-testid="find-dRep-link"
-          onClick={() => openInNewTab(
-            "https://docs.sanchogov.tools/faqs/where-can-i-find-a-drep-id",
-          )}
+          onClick={() =>
+            openInNewTab(
+              "https://docs.sanchogov.tools/faqs/where-can-i-find-a-drep-id",
+            )
+          }
           alignSelf="center"
           mt={4}
           sx={[{ "&:hover": { cursor: "pointer" } }]}

@@ -1,10 +1,6 @@
-import {
-  Box, Grid, IconButton, SwipeableDrawer,
-} from "@mui/material";
+import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 
-import {
-  Background, Button, Link, Typography,
-} from "@atoms";
+import { Background, Button, Link, Typography } from "@atoms";
 import { ICONS, IMAGES, NAV_ITEMS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { useModal } from "@context";
@@ -24,7 +20,8 @@ export const DrawerMobile = ({
   const { openModal } = useModal();
   const { t } = useTranslation();
 
-  const onClickHelp = () => openInNewTab("https://docs.sanchogov.tools/support/get-help-in-discord");
+  const onClickHelp = () =>
+    openInNewTab("https://docs.sanchogov.tools/support/get-help-in-discord");
 
   return (
     <SwipeableDrawer
@@ -50,12 +47,12 @@ export const DrawerMobile = ({
               width: screenWidth - CALCULATED_DRAWER_PADDING,
             }}
           >
-            <img height={25} src={IMAGES.appLogo} />
+            <img alt="app-logo" height={25} src={IMAGES.appLogo} />
             <IconButton
               sx={{ padding: 0 }}
               onClick={() => setIsDrawerOpen(false)}
             >
-              <img src={ICONS.closeDrawerIcon} />
+              <img alt="close-drawer" src={ICONS.closeDrawerIcon} />
             </IconButton>
           </Box>
           {isConnectButton ? (
@@ -96,7 +93,7 @@ export const DrawerMobile = ({
           onClick={onClickHelp}
           sx={{ alignItems: "center", display: "flex", p: DRAWER_PADDING }}
         >
-          <img height={20} src={ICONS.helpIcon} width={20} />
+          <img alt="help" height={20} src={ICONS.helpIcon} width={20} />
           <Typography fontWeight={500} sx={{ ml: 1.5 }}>
             {t("menu.help")}
           </Typography>

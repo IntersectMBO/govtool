@@ -33,8 +33,11 @@ export const useRegisterAsdRepForm = () => {
 
   const onSubmit = useCallback(async (values: RegisterAsDRepValues) => {
     try {
+      // eslint-disable-next-line no-console
       console.log(values);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
+      // eslint-disable-next-line no-console
       console.error(e);
     } finally {
       setIsLoading(false);

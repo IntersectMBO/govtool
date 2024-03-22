@@ -40,22 +40,23 @@ export const RegisterAsdRep = () => {
     }
   }, []);
 
-  const onClickBackToDashboard = () => openModal({
-    type: "statusModal",
-    state: {
-      status: "warning",
-      message: t("modals.registration.cancelDescription"),
-      buttonText: t("modals.common.goToDashboard"),
-      title: t("modals.registration.cancelTitle"),
-      dataTestId: "cancel-registration-modal",
-      onSubmit: backToDashboard,
-    },
-  });
-
   const backToDashboard = () => {
     navigate(PATHS.dashboard);
     closeModal();
   };
+
+  const onClickBackToDashboard = () =>
+    openModal({
+      type: "statusModal",
+      state: {
+        status: "warning",
+        message: t("modals.registration.cancelDescription"),
+        buttonText: t("modals.common.goToDashboard"),
+        title: t("modals.registration.cancelTitle"),
+        dataTestId: "cancel-registration-modal",
+        onSubmit: backToDashboard,
+      },
+    });
 
   return (
     <Background isReverted>

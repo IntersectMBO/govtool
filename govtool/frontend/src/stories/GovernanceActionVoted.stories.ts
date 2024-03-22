@@ -1,10 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { GovernanceVotedOnCard } from "@molecules";
-import {
-  userEvent, waitFor, within, screen,
-} from "@storybook/testing-library";
-import { expect, jest } from "@storybook/jest";
+import { userEvent, waitFor, within, screen } from "@storybook/testing-library";
+import { expect } from "@storybook/jest";
 import { formatDisplayDate } from "@/utils";
 
 const meta = {
@@ -20,7 +18,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-async function checkGovActionVisibility(canvas: any) {
+async function checkGovActionVisibility(canvas: ReturnType<typeof within>) {
   expect(canvas.getByTestId("exampleType-type")).toBeInTheDocument();
   expect(canvas.getByTestId("exampleHash#1-id")).toBeInTheDocument();
   expect(canvas.getByText(/vote submitted/i)).toBeInTheDocument();
@@ -60,11 +58,23 @@ export const GovernanceVotedOnCardComponent: Story = {
         type: "exampleType",
         index: 1,
         txHash: "exampleHash",
+        details: "some details",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
+        yesVotes: 1,
+        noVotes: 0,
+        abstainVotes: 2,
       },
-      vote: { vote: "no" },
+      vote: {
+        vote: "no",
+        proposalId: "exampleId",
+        drepId: "exampleId",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
+      },
     },
   },
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await checkGovActionVisibility(canvas);
   },
@@ -80,11 +90,23 @@ export const GovernanceVotedOnCardAbstain: Story = {
         type: "exampleType",
         index: 1,
         txHash: "exampleHash",
+        details: "some details",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
+        yesVotes: 1,
+        noVotes: 0,
+        abstainVotes: 2,
       },
-      vote: { vote: "abstain" },
+      vote: {
+        vote: "abstain",
+        proposalId: "exampleId",
+        drepId: "exampleId",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
+      },
     },
   },
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await checkGovActionVisibility(canvas);
     expect(canvas.getByText(/abstain/i)).toBeInTheDocument();
@@ -101,11 +123,23 @@ export const GovernanceVotedOnCardYes: Story = {
         type: "exampleType",
         index: 1,
         txHash: "exampleHash",
+        details: "some details",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
+        yesVotes: 1,
+        noVotes: 0,
+        abstainVotes: 2,
       },
-      vote: { vote: "yes" },
+      vote: {
+        vote: "yes",
+        proposalId: "exampleId",
+        drepId: "exampleId",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
+      },
     },
   },
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await checkGovActionVisibility(canvas);
     expect(canvas.getByText(/yes/i)).toBeInTheDocument();
@@ -122,11 +156,23 @@ export const GovernanceVotedOnCardNo: Story = {
         type: "exampleType",
         index: 1,
         txHash: "exampleHash",
+        details: "some details",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
+        yesVotes: 1,
+        noVotes: 0,
+        abstainVotes: 2,
       },
-      vote: { vote: "no" },
+      vote: {
+        vote: "no",
+        proposalId: "exampleId",
+        drepId: "exampleId",
+        url: "https://example.com",
+        metadataHash: "exampleHash",
+      },
     },
   },
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await checkGovActionVisibility(canvas);
     expect(canvas.getByText(/no/i)).toBeInTheDocument();

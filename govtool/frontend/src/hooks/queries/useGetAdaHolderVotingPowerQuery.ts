@@ -8,7 +8,7 @@ const REFRESH_TIME = 20 * 1000;
 export const useGetAdaHolderVotingPowerQuery = (stakeKey?: string) => {
   const { data, isLoading } = useQuery({
     queryKey: QUERY_KEYS.getAdaHolderVotingPowerKey,
-    queryFn: async () => await getAdaHolderVotingPower({ stakeKey }),
+    queryFn: () => getAdaHolderVotingPower({ stakeKey }),
     enabled: !!stakeKey,
     refetchInterval: REFRESH_TIME,
   });

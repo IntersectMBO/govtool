@@ -42,13 +42,15 @@ export const ActionsBarComponent: Story = {
 
     await step("Check if filter button is working", async () => {
       await userEvent.click(canvas.getByTestId("filters-button"));
-      await expect(setSortOpen).toHaveBeenCalledWith(false); // Make sure sort dropdown is closed
+      // Make sure sort dropdown is closed
+      await expect(setSortOpen).toHaveBeenCalledWith(false);
       await expect(setFiltersOpen).toHaveBeenCalled();
     });
 
     await step("Check if sort button is working", async () => {
       await userEvent.click(canvas.getByTestId("sort-button"));
-      await expect(setFiltersOpen).toHaveBeenCalledWith(false); // Make sure filter dropdown is closed
+      // Make sure filter dropdown is closed
+      await expect(setFiltersOpen).toHaveBeenCalledWith(false);
       await expect(setSortOpen).toHaveBeenCalled();
     });
   },
@@ -69,12 +71,12 @@ export const ActionsBarFiltersOpen: Story = {
 
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
-    for (const { key, label } of GOVERNANCE_ACTIONS_FILTERS) {
+    GOVERNANCE_ACTIONS_FILTERS.forEach(async ({ key, label }) => {
       await userEvent.click(
         canvas.getByTestId(`${label.replace(/ /g, "")}-checkbox`),
       );
-      await expect(args.setChosenFilters).toHaveBeenCalledWith([key]);
-    }
+      expect(args.setChosenFilters).toHaveBeenCalledWith([key]);
+    });
   },
 };
 
@@ -88,10 +90,10 @@ export const ActionsBarSortsOpen: Story = {
   },
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
-    for (const { key } of GOVERNANCE_ACTIONS_SORTING) {
+    GOVERNANCE_ACTIONS_SORTING.forEach(async ({ key }) => {
       await userEvent.click(canvas.getByTestId(`${key}-radio`));
-      await expect(args.setChosenSorting).toHaveBeenCalledWith(key);
-    }
+      expect(args.setChosenSorting).toHaveBeenCalledWith(key);
+    });
   },
 };
 

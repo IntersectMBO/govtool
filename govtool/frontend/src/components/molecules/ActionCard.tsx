@@ -52,7 +52,12 @@ export const ActionCard: FC<ActionCardProps> = ({ ...props }) => {
     >
       <Box display="flex" flexDirection="column" flex={1}>
         {imageURL ? (
-          <img height={imageHeight} src={imageURL} width={imageWidth} />
+          <img
+            alt="action-card"
+            height={imageHeight}
+            src={imageURL}
+            width={imageWidth}
+          />
         ) : null}
         {title ? (
           <Typography

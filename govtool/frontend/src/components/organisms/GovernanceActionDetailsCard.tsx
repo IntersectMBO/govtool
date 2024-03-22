@@ -10,7 +10,7 @@ import { Button, Typography } from "../atoms";
 type GovernanceActionDetailsCardProps = {
   abstainVotes: number;
   createdDate: string;
-  details: any;
+  details: unknown;
   expiryDate: string;
   noVotes: number;
   type: string;

@@ -1,6 +1,4 @@
-import {
-  useCallback, useMemo, useRef, useState,
-} from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   generatePath,
   NavLink,
@@ -85,9 +83,11 @@ export const DashboardGovernanceActionsCategory = () => {
   const mappedData = useMemo(() => {
     const uniqueProposals = removeDuplicatedProposals(proposals);
 
-    return uniqueProposals?.filter((i) => getFullGovActionId(i.txHash, i.index)
-      .toLowerCase()
-      .includes(searchText.toLowerCase()));
+    return uniqueProposals?.filter((i) =>
+      getFullGovActionId(i.txHash, i.index)
+        .toLowerCase()
+        .includes(searchText.toLowerCase()),
+    );
   }, [
     proposals,
     voter?.isRegisteredAsDRep,
@@ -159,7 +159,7 @@ export const DashboardGovernanceActionsCategory = () => {
                 <Box display="flex" flexWrap="wrap" mt={4}>
                   <Typography fontWeight={300}>
                     {t("govActions.withCategoryNotExist.partOne")}
-&nbsp;
+                    &nbsp;
                   </Typography>
                   <Typography fontWeight="bold">{` ${category} `}</Typography>
                   <Typography fontWeight={300}>
@@ -176,8 +176,8 @@ export const DashboardGovernanceActionsCategory = () => {
                   screenWidth < 375
                     ? "255px"
                     : screenWidth < 768
-                      ? "294px"
-                      : "402px"
+                    ? "294px"
+                    : "402px"
                 }, 1fr))`}
               >
                 {mappedData.map((item) => (
@@ -191,27 +191,28 @@ export const DashboardGovernanceActionsCategory = () => {
                       onClick={() => {
                         saveScrollPosition();
 
+                        // eslint-disable-next-line no-unused-expressions
                         voteTransaction.proposalId === item.txHash + item.index
                           ? openInNewTab(
-                            "https://adanordic.com/latest_transactions",
-                          )
+                              "https://adanordic.com/latest_transactions",
+                            )
                           : navigate(
-                            generatePath(
-                              PATHS.dashboardGovernanceActionsAction,
+                              generatePath(
+                                PATHS.dashboardGovernanceActionsAction,
+                                {
+                                  proposalId: getFullGovActionId(
+                                    item.txHash,
+                                    item.index,
+                                  ),
+                                },
+                              ),
                               {
-                                proposalId: getFullGovActionId(
-                                  item.txHash,
-                                  item.index,
-                                ),
+                                state: {
+                                  ...item,
+                                  openedFromCategoryPage: true,
+                                },
                               },
-                            ),
-                            {
-                              state: {
-                                ...item,
-                                openedFromCategoryPage: true,
-                              },
-                            },
-                          );
+                            );
                       }}
                       txHash={item.txHash}
                     />

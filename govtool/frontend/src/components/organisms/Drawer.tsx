@@ -2,9 +2,7 @@ import { Box, Grid } from "@mui/material";
 import { NavLink } from "react-router-dom";
 
 import { DrawerLink, Typography } from "@atoms";
-import {
-  CONNECTED_NAV_ITEMS, ICONS, IMAGES, PATHS,
-} from "@consts";
+import { CONNECTED_NAV_ITEMS, ICONS, IMAGES, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { useTranslation } from "@hooks";
 import { WalletInfoCard, DRepInfoCard } from "@molecules";
@@ -32,6 +30,7 @@ export const Drawer = () => {
         to={PATHS.dashboard}
       >
         <img
+          alt="app-logo"
           height={35}
           src={IMAGES.appLogo}
           style={{ marginTop: 24, objectFit: "contain" }}
@@ -71,9 +70,11 @@ export const Drawer = () => {
             activeIcon={ICONS.helpIcon}
             icon={ICONS.helpIcon}
             navTo=""
-            onClick={() => openInNewTab(
-              "https://docs.sanchogov.tools/support/get-help-in-discord",
-            )}
+            onClick={() =>
+              openInNewTab(
+                "https://docs.sanchogov.tools/support/get-help-in-discord",
+              )
+            }
           />
         </Box>
         <Typography sx={{ mb: 2 }} variant="caption">

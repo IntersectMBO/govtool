@@ -1,9 +1,9 @@
-import { Box } from '@mui/material';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { Box } from "@mui/material";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
-import { Typography } from '@atoms';
+import { Typography } from "@atoms";
 
-import { LinkWithIconProps } from './types';
+import { LinkWithIconProps } from "./types";
 
 export const LinkWithIcon = ({
   label,
@@ -12,12 +12,12 @@ export const LinkWithIcon = ({
   sx,
 }: LinkWithIconProps) => (
   <Box
-    data-testid={`${label.split(' ').join('-')}-link`}
+    data-testid={`${label.split(" ").join("-")}-link`}
     sx={{
-      alignItems: 'center',
-      cursor: 'pointer',
-      display: 'flex',
-      width: 'fit-content',
+      alignItems: "center",
+      cursor: "pointer",
+      display: "flex",
+      width: "fit-content",
       ...sx,
     }}
     onClick={onClick}

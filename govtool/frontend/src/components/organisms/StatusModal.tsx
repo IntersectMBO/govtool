@@ -35,8 +35,8 @@ export const StatusModal = () => {
           state?.status === "warning"
             ? IMAGES.warningImage
             : state?.status === "success"
-              ? IMAGES.successImage
-              : ICONS.timerIcon
+            ? IMAGES.successImage
+            : ICONS.timerIcon
         }
         style={{ height: "84px", margin: "0 auto", width: "84px" }}
       />

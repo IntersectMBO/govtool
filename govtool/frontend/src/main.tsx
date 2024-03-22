@@ -20,16 +20,17 @@ import "./i18n";
 
 const queryClient = new QueryClient();
 
+interface SentryEventDataLayer {
+  event: string;
+  sentryEventId: string;
+  sentryErrorMessage?: JSONValue;
+}
+
+// TODO: Move to types
 declare global {
   interface Window {
     dataLayer: SentryEventDataLayer[];
   }
-}
-
-interface SentryEventDataLayer {
-  event: string;
-  sentryEventId: string;
-  sentryErrorMessage?: any;
 }
 
 const tagManagerArgs = {
@@ -62,11 +63,12 @@ Sentry.init({
 Sentry.addGlobalEventProcessor((event) => {
   window.dataLayer = window.dataLayer || [];
 
-  const errorMessage = (event.exception
-      && event.exception.values
-      && event.exception.values[0]
-      && event.exception.values[0].value)
-    || "Unknown Error";
+  const errorMessage =
+    (event.exception &&
+      event.exception.values &&
+      event.exception.values[0] &&
+      event.exception.values[0].value) ||
+    "Unknown Error";
 
   window.dataLayer.push({
     event: "sentryEvent",

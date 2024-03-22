@@ -19,16 +19,18 @@ export const HomeCards = () => {
   }, [openModal]);
 
   const onClickLearnMoreAboutDelegation = useCallback(
-    () => openInNewTab(
-      "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power",
-    ),
+    () =>
+      openInNewTab(
+        "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power",
+      ),
     [],
   );
 
   const onClickLearnMoreAboutDRepRegistration = useCallback(
-    () => openInNewTab(
-      "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
-    ),
+    () =>
+      openInNewTab(
+        "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
+      ),
     [],
   );
 
@@ -65,10 +67,10 @@ export const HomeCards = () => {
         screenWidth < 640
           ? 2
           : screenWidth < 1024
-            ? 5
-            : screenWidth < 1440
-              ? 10
-              : 34
+          ? 5
+          : screenWidth < 1440
+          ? 10
+          : 34
       }
       rowGap={4.625}
     >

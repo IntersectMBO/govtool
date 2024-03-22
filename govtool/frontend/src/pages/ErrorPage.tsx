@@ -68,6 +68,7 @@ export const ErrorPage = ({
           zIndex={-1}
         >
           <img
+            alt="error-page"
             height={IMAGE_SIZE}
             src={IMAGES.errorPageImage}
             width={IMAGE_SIZE}

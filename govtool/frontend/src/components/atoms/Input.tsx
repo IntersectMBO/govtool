@@ -10,9 +10,7 @@ import { InputBase } from "@mui/material";
 import { InputProps } from "./types";
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({
-    errorMessage, dataTestId, onBlur, onFocus, sx, ...rest
-  }, ref) => {
+  ({ errorMessage, dataTestId, onBlur, onFocus, sx, ...rest }, ref) => {
     const id = useId();
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -28,11 +26,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     useImperativeHandle(
       ref,
-      () => ({
-        focus: handleFocus,
-        blur: handleBlur,
-        ...inputRef.current,
-      } as unknown as HTMLInputElement),
+      () =>
+        ({
+          focus: handleFocus,
+          blur: handleBlur,
+          ...inputRef.current,
+        } as unknown as HTMLInputElement),
       [handleBlur, handleFocus],
     );
 

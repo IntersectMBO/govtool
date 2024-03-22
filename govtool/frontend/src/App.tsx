@@ -34,7 +34,7 @@ import { useGetVoterInfo, useWalletConnectionListener } from "./hooks";
 import { RegisterAsSoleVoter } from "./pages/RegisterAsSoleVoter";
 import { CreateGovernanceAction } from "./pages/CreateGovernanceAction";
 
-export default function App() {
+export default () => {
   const { enable, setVoter, setIsDrepLoading } = useCardano();
   const navigate = useNavigate();
   const { data } = useGetVoterInfo();
@@ -55,9 +55,10 @@ export default function App() {
   }, [data?.isRegisteredAsDRep, data?.isRegisteredAsSoleVoter]);
 
   const checkTheWalletIsActive = useCallback(() => {
-    const hrefCondition = window.location.pathname === PATHS.home
-      || window.location.pathname === PATHS.governanceActions
-      || window.location.pathname === PATHS.governanceActionsAction;
+    const hrefCondition =
+      window.location.pathname === PATHS.home ||
+      window.location.pathname === PATHS.governanceActions ||
+      window.location.pathname === PATHS.governanceActionsAction;
 
     const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
     if (window.cardano) {
@@ -68,8 +69,8 @@ export default function App() {
       }
     }
     if (
-      (!window.cardano && walletName)
-      || (walletName && !Object.keys(window.cardano).includes(walletName))
+      (!window.cardano && walletName) ||
+      (walletName && !Object.keys(window.cardano).includes(walletName))
     ) {
       if (!hrefCondition) {
         navigate(PATHS.home);
@@ -88,10 +89,7 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         <Route path={PATHS.home} element={<Home />} />
-        <Route
-          path={PATHS.governanceActions}
-          element={<GovernanceActions />}
-        />
+        <Route path={PATHS.governanceActions} element={<GovernanceActions />} />
         <Route
           path={PATHS.governanceActionsCategory}
           element={<GovernanceActionsCategory />}
@@ -136,13 +134,15 @@ export default function App() {
           open={Boolean(modals[modal.type].component)}
           handleClose={
             !modals[modal.type].preventDismiss
-              ? callAll(modals[modal.type]?.onClose, () => openModal({ type: "none", state: null }))
+              ? callAll(modals[modal.type]?.onClose, () =>
+                  openModal({ type: "none", state: null }),
+                )
               : undefined
           }
         >
-          {modals[modal.type]?.component ?? <></>}
+          {modals[modal.type].component!}
         </Modal>
       )}
     </>
   );
-}
+};

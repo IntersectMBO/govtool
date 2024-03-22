@@ -1,6 +1,4 @@
-import {
-  Box, Grid, IconButton, SwipeableDrawer,
-} from "@mui/material";
+import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 
 import { Background, Link } from "@atoms";
 import { CONNECTED_NAV_ITEMS, ICONS } from "@consts";
@@ -58,13 +56,13 @@ export const DashboardDrawerMobile = ({
                 width: screenWidth - CALCULATED_DRAWER_PADDING,
               }}
             >
-              <img src={ICONS.appLogoIcon} height={25} />
+              <img alt="app-logo" src={ICONS.appLogoIcon} height={25} />
               <IconButton
                 data-testid="close-drawer-button"
                 onClick={closeDrawer}
                 sx={{ padding: 0 }}
               >
-                <img src={ICONS.closeDrawerIcon} />
+                <img alt="drawer" src={ICONS.closeDrawerIcon} />
               </IconButton>
             </Box>
             <Grid container direction="column" rowGap={4} mt={6}>
@@ -74,6 +72,8 @@ export const DashboardDrawerMobile = ({
                     {...navItem}
                     size="big"
                     onClick={() => {
+                      // TODO: Refine if it is needed to remove this eslint-disable
+                      // eslint-disable-next-line no-unused-expressions
                       navItem.newTabLink && openInNewTab(navItem.newTabLink);
                       setIsDrawerOpen(false);
                     }}

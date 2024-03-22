@@ -1,13 +1,14 @@
-import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { PATHS } from '@/consts';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { PATHS } from "@/consts";
 
 export function debounce(
   fn: (...params: any) => void,
   wait: number,
 ): (...params: any) => void {
   let timer: any = null;
-  return function (...params: any) {
+  return (...params: any) => {
     clearTimeout(timer);
     timer = setTimeout(() => {
       fn(...params);
@@ -44,8 +45,8 @@ export const ScrollToManage = () => {
       }
     }, 200);
 
-    window.addEventListener('scroll', fn);
-    return () => window.removeEventListener('scroll', fn);
+    window.addEventListener("scroll", fn);
+    return () => window.removeEventListener("scroll", fn);
   }, [pathname]);
 
   return <></>;

@@ -1,16 +1,16 @@
-import { Dispatch, SetStateAction, useCallback } from 'react';
-import { useFieldArray } from 'react-hook-form';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { Dispatch, SetStateAction, useCallback } from "react";
+import { useFieldArray } from "react-hook-form";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
-import { Button, InfoText, Spacer, Typography } from '@atoms';
-import { GOVERNANCE_ACTION_FIELDS, Placeholders } from '@consts';
-import { useCreateGovernanceActionForm, useTranslation } from '@hooks';
-import { Field } from '@molecules';
-import { URL_REGEX } from '@/utils';
-import { GovernanceActionField } from '@/types/governanceAction';
+import { Button, InfoText, Spacer, Typography } from "@atoms";
+import { GOVERNANCE_ACTION_FIELDS, Placeholders } from "@consts";
+import { useCreateGovernanceActionForm, useTranslation } from "@hooks";
+import { Field } from "@molecules";
+import { URL_REGEX } from "@/utils";
+import { GovernanceActionField } from "@/types/governanceAction";
 
-import { BgCard } from '../BgCard';
-import { ControlledField } from '../ControlledField';
+import { BgCard } from "../BgCard";
+import { ControlledField } from "../ControlledField";
 
 const MAX_NUMBER_OF_LINKS = 8;
 
@@ -27,20 +27,21 @@ export const CreateGovernanceActionForm = ({
 
   const isError = Object.keys(errors).length > 0;
 
-  const type = getValues('governance_action_type');
+  const type = getValues("governance_action_type");
   const {
     append,
     fields: links,
     remove,
   } = useFieldArray({
     control,
-    name: 'links',
+    name: "links",
   });
 
-  // TODO: Replace any
   const isContinueButtonDisabled =
+    // TODO: Provide better typing for GOVERNANCE_ACTION_FIELDS
+    // to get rid of explicit type assertion
     Object.keys(GOVERNANCE_ACTION_FIELDS[type!]).some(
-      (field: any) => !watch(field),
+      (field) => !watch(field as unknown as Parameters<typeof watch>[0]),
     ) || isError;
 
   const onClickContinue = () => {
@@ -78,7 +79,7 @@ export const CreateGovernanceActionForm = ({
       }
     });
 
-  const addLink = useCallback(() => append({ link: '' }), [append]);
+  const addLink = useCallback(() => append({ link: "" }), [append]);
 
   const removeLink = useCallback((index: number) => remove(index), [remove]);
 
@@ -92,20 +93,20 @@ export const CreateGovernanceActionForm = ({
             links.length > 1 ? (
               <DeleteOutlineIcon
                 color="primary"
-                sx={{ cursor: 'pointer', height: 24, with: 24 }}
+                sx={{ cursor: "pointer", height: 24, with: 24 }}
                 onClick={() => removeLink(index)}
               />
             ) : null
           }
           key={field.id}
-          label={`${t('forms.link')} ${index + 1}`}
+          label={`${t("forms.link")} ${index + 1}`}
           layoutStyles={{ mb: 3 }}
           placeholder={Placeholders.LINK}
           name={`links.${index}.link`}
           rules={{
             pattern: {
               value: URL_REGEX,
-              message: t('createGovernanceAction.fields.validations.url'),
+              message: t("createGovernanceAction.fields.validations.url"),
             },
           }}
         />
@@ -115,33 +116,33 @@ export const CreateGovernanceActionForm = ({
 
   return (
     <BgCard
-      actionButtonLabel={t('continue')}
+      actionButtonLabel={t("continue")}
       isActionButtonDisabled={isContinueButtonDisabled}
       onClickActionButton={onClickContinue}
       onClickBackButton={onClickBack}
     >
-      <InfoText label={t('required')} sx={{ mb: 0.75, textAlign: 'center' }} />
-      <Typography sx={{ textAlign: 'center' }} variant="headline4">
-        {t('createGovernanceAction.formTitle')}
+      <InfoText label={t("required")} sx={{ mb: 0.75, textAlign: "center" }} />
+      <Typography sx={{ textAlign: "center" }} variant="headline4">
+        {t("createGovernanceAction.formTitle")}
       </Typography>
       <Spacer y={4.25} />
       <Field.Input
         disabled
-        helpfulText={t('forms.createGovernanceAction.typeTip')}
-        label={t('forms.createGovernanceAction.typeLabel')}
+        helpfulText={t("forms.createGovernanceAction.typeTip")}
+        label={t("forms.createGovernanceAction.typeLabel")}
         value={type}
       />
       <Spacer y={3} />
       {renderGovernanceActionField()}
-      <InfoText label={t('optional')} sx={{ mb: 0.75, textAlign: 'center' }} />
-      <Typography sx={{ textAlign: 'center' }} variant="headline4">
-        {t('createGovernanceAction.references')}
+      <InfoText label={t("optional")} sx={{ mb: 0.75, textAlign: "center" }} />
+      <Typography sx={{ textAlign: "center" }} variant="headline4">
+        {t("createGovernanceAction.references")}
       </Typography>
       <Spacer y={4.25} />
       {renderLinks()}
       {links?.length < MAX_NUMBER_OF_LINKS ? (
         <Button onClick={addLink} size="extraLarge" variant="text">
-          {t('addLink')}
+          {t("addLink")}
         </Button>
       ) : null}
       <Spacer y={3} />

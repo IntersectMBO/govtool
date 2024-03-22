@@ -1,24 +1,5 @@
 import { removeDuplicatedProposals } from "..";
 
-describe("remove duplicated proposals", () => {
-  it("returns all proposals when all are unique", () => {
-    expect(removeDuplicatedProposals(uniqueProposals).length).toBe(
-      uniqueProposals.length,
-    );
-  });
-
-  it("removes duplicate proposals based on txHash and index", () => {
-    expect(removeDuplicatedProposals(duplicatedProposals).length).toBe(
-      uniqueProposals.length,
-    );
-  });
-
-  it("returns empty array if input is empty", () => {
-    const proposals: ActionType[] = [];
-    expect(removeDuplicatedProposals(proposals).length).toBe(0);
-  });
-});
-
 const uniqueProposals = [
   {
     id: "1322",
@@ -76,3 +57,22 @@ const duplicatedProposals = [
     ...uniqueProposals[1],
   },
 ];
+
+describe("remove duplicated proposals", () => {
+  it("returns all proposals when all are unique", () => {
+    expect(removeDuplicatedProposals(uniqueProposals).length).toBe(
+      uniqueProposals.length,
+    );
+  });
+
+  it("removes duplicate proposals based on txHash and index", () => {
+    expect(removeDuplicatedProposals(duplicatedProposals).length).toBe(
+      uniqueProposals.length,
+    );
+  });
+
+  it("returns empty array if input is empty", () => {
+    const proposals: ActionType[] = [];
+    expect(removeDuplicatedProposals(proposals).length).toBe(0);
+  });
+});

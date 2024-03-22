@@ -1,6 +1,4 @@
-import {
-  createContext, useContext, useMemo, useReducer,
-} from "react";
+import { createContext, useContext, useMemo, useReducer } from "react";
 
 import { type MuiModalChildren } from "@atoms";
 import {
@@ -16,7 +14,7 @@ interface ProviderProps {
 }
 
 interface ContextModal {
-  component: null | MuiModalChildren;
+  component: MuiModalChildren | null;
   variant?: "modal" | "popup";
   preventDismiss?: boolean;
   onClose?: () => void;
@@ -54,7 +52,7 @@ export interface ModalState<T> {
   state: T | null;
 }
 
-interface ModalContext<T> {
+interface ModalContextType<T> {
   modal: ModalState<T>;
   modals: Record<ModalType, ContextModal>;
   state: T | null;
@@ -63,10 +61,13 @@ interface ModalContext<T> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ModalContext = createContext<ModalContext<any>>({} as ModalContext<any>);
+const ModalContext = createContext<ModalContextType<any>>(
+  {} as ModalContextType<unknown>,
+);
 ModalContext.displayName = "ModalContext";
 
-function ModalProvider<T>(props: ProviderProps) {
+// eslint-disable-next-line react/function-component-definition
+function ModalProvider<T>({ children, ...props }: ProviderProps) {
   const [modal, openModal] = useReducer<BasicReducer<ModalState<T>>>(
     basicReducer,
     {
@@ -81,20 +82,22 @@ function ModalProvider<T>(props: ProviderProps) {
       modal,
       state: modal.state,
       openModal,
-      closeModal: callAll(modals[modal.type]?.onClose, () => openModal({ type: "none", state: null })),
+      closeModal: callAll(modals[modal.type]?.onClose, () =>
+        openModal({ type: "none", state: null }),
+      ),
     }),
     [modal, openModal],
   );
 
   return (
     <ModalContext.Provider value={value} {...props}>
-      {props.children}
+      {children}
     </ModalContext.Provider>
   );
 }
 
 function useModal<T>() {
-  const context = useContext<ModalContext<T>>(ModalContext);
+  const context = useContext<ModalContextType<T>>(ModalContext);
   if (context === undefined) {
     throw new Error("useModal must be used within a ModalProvider");
   }

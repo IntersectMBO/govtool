@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
-import { Box } from '@mui/material';
+import { useMemo } from "react";
+import { Box } from "@mui/material";
 
-import { Button, LoadingButton } from '@atoms';
-import { useScreenDimension, useTranslation } from '@hooks';
+import { Button, LoadingButton } from "@atoms";
+import { useScreenDimension, useTranslation } from "@hooks";
 
 interface Props {
   onBackButton: () => void;
@@ -33,7 +33,7 @@ export const CenteredBoxBottomButtons = ({
         }}
         variant="outlined"
       >
-        {backButtonText ?? t('cancel')}
+        {backButtonText ?? t("cancel")}
       </Button>
     ),
     [isMobile],
@@ -52,7 +52,7 @@ export const CenteredBoxBottomButtons = ({
         }}
         variant="contained"
       >
-        {actionButtonText ?? t('continue')}
+        {actionButtonText ?? t("continue")}
       </LoadingButton>
     ),
     [isLoading, isMobile],
@@ -61,7 +61,7 @@ export const CenteredBoxBottomButtons = ({
   return (
     <Box
       display="flex"
-      flexDirection={isMobile ? 'column-reverse' : 'row'}
+      flexDirection={isMobile ? "column-reverse" : "row"}
       justifyContent="space-around"
       mt={6}
     >

@@ -1,9 +1,7 @@
 import { useEffect } from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import { expect } from "@storybook/jest";
-import {
-  within, waitFor, screen, userEvent,
-} from "@storybook/testing-library";
+import { within, waitFor, screen, userEvent } from "@storybook/testing-library";
 
 import { Modal } from "@atoms";
 import { StatusModal, StatusModalState } from "@organisms";
@@ -17,13 +15,18 @@ const meta = {
 
 export default meta;
 
-const performCommonAction = async (canvas: any, args: any) => {
+const performCommonAction = async (
+  canvas: ReturnType<typeof within>,
+  args: StatusModalState,
+) => {
   waitFor(async () => {
     const modalScreen = screen.getAllByTestId(args.dataTestId)[0];
     let modalCanvas = within(modalScreen);
 
     expect(modalCanvas.getByText(args.title)).toBeInTheDocument();
-    expect(modalCanvas.getByText(args.message)).toBeInTheDocument();
+    expect(
+      modalCanvas.getByText((args as { message: string }).message),
+    ).toBeInTheDocument();
 
     // Validating closing of modal
     await userEvent.click(modalCanvas.getByTestId("confirm-modal-button"));
@@ -35,23 +38,27 @@ const performCommonAction = async (canvas: any, args: any) => {
     expect(screen.queryAllByTestId(args.dataTestId)).toHaveLength(0); // checking id modal is closed
   });
 };
-const Template: StoryFn<StatusModalState> = (args) => {
-  const {
-    openModal, modal, modals, closeModal,
-  } = useModal();
+const Template: StoryFn<StatusModalState> = ({
+  buttonText,
+  status,
+  message,
+  title,
+  dataTestId,
+}) => {
+  const { openModal, modal, modals, closeModal } = useModal();
 
   const open = () => {
     openModal({
       type: "statusModal",
       state: {
-        buttonText: args.buttonText,
-        status: args.status,
-        message: args.message,
-        title: args.title,
+        buttonText,
+        status,
+        message,
+        title,
         onSubmit: () => {
           closeModal();
         },
-        dataTestId: args.dataTestId,
+        dataTestId,
       },
     });
   };
@@ -62,15 +69,17 @@ const Template: StoryFn<StatusModalState> = (args) => {
 
   return (
     <>
-      <button onClick={open} style={{ cursor: "pointer" }}>
+      <button type="button" onClick={open} style={{ cursor: "pointer" }}>
         Open Modal
       </button>
       {modals[modal.type]?.component && (
         <Modal
           open={Boolean(modals[modal.type].component)}
-          handleClose={callAll(modals[modal.type]?.onClose, () => openModal({ type: "none", state: null }))}
+          handleClose={callAll(modals[modal.type]?.onClose, () =>
+            openModal({ type: "none", state: null }),
+          )}
         >
-          {modals[modal.type]?.component ?? <></>}
+          {modals[modal.type].component!}
         </Modal>
       )}
     </>

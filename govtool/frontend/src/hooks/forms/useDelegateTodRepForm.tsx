@@ -43,7 +43,10 @@ export const useDelegateTodRepForm = () => {
         setDelegatedDRepID(dRepID);
         let isValidDrep = false;
         if (drepList?.length) {
-          isValidDrep = drepList.some((i) => i.drepId === dRepID || formHexToBech32(i.drepId) === dRepID);
+          isValidDrep = drepList.some(
+            (dRep) =>
+              dRep.drepId === dRepID || formHexToBech32(dRep.drepId) === dRepID,
+          );
         }
         if (!drepList?.length || !isValidDrep) {
           throw new Error(t("errors.dRepIdNotFound"));

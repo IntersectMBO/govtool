@@ -1,17 +1,17 @@
-import { Dispatch, SetStateAction, useCallback } from 'react';
-import { Box } from '@mui/material';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { Dispatch, SetStateAction, useCallback } from "react";
+import { Box } from "@mui/material";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
-import { Button, Spacer, Typography } from '@atoms';
-import { ICONS } from '@consts';
+import { Button, Spacer, Typography } from "@atoms";
+import { ICONS } from "@consts";
 import {
   useCreateGovernanceActionForm,
   useTranslation,
   useScreenDimension,
-} from '@hooks';
-import { Step } from '@molecules';
-import { BgCard, ControlledField } from '@organisms';
-import { URL_REGEX, openInNewTab } from '@utils';
+} from "@hooks";
+import { Step } from "@molecules";
+import { BgCard, ControlledField } from "@organisms";
+import { URL_REGEX, openInNewTab } from "@utils";
 
 type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -31,35 +31,35 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
   const { screenWidth } = useScreenDimension();
 
   // TODO: change on correct file name
-  const fileName = getValues('governance_action_type');
+  const fileName = getValues("governance_action_type");
 
   // TODO: Change link to correct
   const openGuideAboutStoringInformation = useCallback(
-    () => openInNewTab('https://sancho.network/'),
+    () => openInNewTab("https://sancho.network/"),
     [],
   );
 
-  const isActionButtonDisabled = !watch('storingURL');
+  const isActionButtonDisabled = !watch("storingURL");
 
   const onClickBack = useCallback(() => setStep(5), []);
 
   return (
     <BgCard
-      actionButtonLabel={t('continue')}
-      backButtonLabel={t('back')}
+      actionButtonLabel={t("continue")}
+      backButtonLabel={t("back")}
       isActionButtonDisabled={isActionButtonDisabled}
       onClickActionButton={createGovernanceAction}
       onClickBackButton={onClickBack}
       isLoadingActionButton={isLoading}
     >
-      <Typography sx={{ textAlign: 'center' }} variant="headline4">
-        {t('createGovernanceAction.storingInformationTitle')}
+      <Typography sx={{ textAlign: "center" }} variant="headline4">
+        {t("createGovernanceAction.storingInformationTitle")}
       </Typography>
       <Button
         endIcon={
           <OpenInNewIcon
             sx={{
-              color: 'primary',
+              color: "primary",
               height: 17,
               width: 17,
             }}
@@ -67,13 +67,13 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
         }
         onClick={openGuideAboutStoringInformation}
         size="extraLarge"
-        sx={{ alignSelf: 'center', width: 'fit-content' }}
+        sx={{ alignSelf: "center", width: "fit-content" }}
         variant="text"
       >
-        {t('createGovernanceAction.storingInformationStep2Link')}
+        {t("createGovernanceAction.storingInformationStep2Link")}
       </Button>
-      <Typography fontWeight={400} sx={{ textAlign: 'center' }} variant="body1">
-        {t('createGovernanceAction.storingInformationDescription')}
+      <Typography fontWeight={400} sx={{ textAlign: "center" }} variant="body1">
+        {t("createGovernanceAction.storingInformationDescription")}
       </Typography>
       <Box sx={{ my: 4 }}>
         <Step
@@ -81,9 +81,9 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
             <Button
               onClick={onClickDownloadJson}
               size="extraLarge"
-              startIcon={<img src={ICONS.download} />}
+              startIcon={<img alt="download" src={ICONS.download} />}
               sx={{
-                width: 'fit-content',
+                width: "fit-content",
                 ml: screenWidth < 1024 ? 0 : 1.75,
                 mt: screenWidth < 1024 ? 1.5 : 0,
               }}
@@ -93,15 +93,34 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
             </Button>
           }
           componentsLayoutStyles={{
-            alignItems: screenWidth < 1024 ? undefined : 'center',
-            flexDirection: screenWidth < 1024 ? 'column' : 'row',
+            alignItems: screenWidth < 1024 ? undefined : "center",
+            flexDirection: screenWidth < 1024 ? "column" : "row",
           }}
-          label={t('createGovernanceAction.storingInformationStep1Label')}
+          label={t("createGovernanceAction.storingInformationStep1Label")}
           stepNumber={1}
         />
         <Spacer y={6} />
         <Step
-          label={t('createGovernanceAction.storingInformationStep2Label')}
+          component={
+            <Button
+              endIcon={
+                <OpenInNewIcon
+                  sx={{
+                    color: "primary",
+                    height: 17,
+                    width: 17,
+                  }}
+                />
+              }
+              onClick={openGuideAboutStoringInformation}
+              size="extraLarge"
+              sx={{ width: "fit-content" }}
+              variant="text"
+            >
+              {t("createGovernanceAction.storingInformationStep2Link")}
+            </Button>
+          }
+          label={t("createGovernanceAction.storingInformationStep2Label")}
           stepNumber={2}
         />
         <Spacer y={6} />
@@ -112,23 +131,23 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
               name="storingURL"
               layoutStyles={{ mt: 1.5 }}
               placeholder={t(
-                'createGovernanceAction.storingInformationURLPlaceholder',
+                "createGovernanceAction.storingInformationURLPlaceholder",
               )}
               rules={{
                 required: {
                   value: true,
                   message: t(
-                    'createGovernanceAction.fields.validations.required',
+                    "createGovernanceAction.fields.validations.required",
                   ),
                 },
                 pattern: {
                   value: URL_REGEX,
-                  message: t('createGovernanceAction.fields.validations.url'),
+                  message: t("createGovernanceAction.fields.validations.url"),
                 },
               }}
             />
           }
-          label={t('createGovernanceAction.storingInformationStep3Label')}
+          label={t("createGovernanceAction.storingInformationStep3Label")}
           stepNumber={3}
         />
       </Box>

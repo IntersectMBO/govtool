@@ -1,6 +1,4 @@
-import {
-  Dispatch, SetStateAction, useCallback, useState,
-} from "react";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormContext } from "react-hook-form";
 import * as blake from "blakejs";
@@ -34,11 +32,12 @@ export type CreateGovernanceActionValues = {
   governance_action_type?: GovernanceActionType;
 } & Partial<Record<keyof GovernanceActionFieldSchemas, string>>;
 
-export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues = {
-  links: [{ link: "" }],
-  storeData: false,
-  storingURL: "",
-};
+export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues =
+  {
+    links: [{ link: "" }],
+    storeData: false,
+    storingURL: "",
+  };
 
 export const useCreateGovernanceActionForm = (
   setStep?: Dispatch<SetStateAction<number>>,
@@ -76,8 +75,9 @@ export const useCreateGovernanceActionForm = (
   }, []);
 
   const generateMetadata = async (data: CreateGovernanceActionValues) => {
-    if (!govActionType) throw new Error("Governance action type is not defined");
-
+    if (!govActionType) {
+      throw new Error("Governance action type is not defined");
+    }
     const acceptedKeys = ["title", "motivation", "abstract", "rationale"];
 
     const filteredData = Object.entries(data)
@@ -100,10 +100,10 @@ export const useCreateGovernanceActionForm = (
     const jsonld = await generateJsonld(body, GOVERNANCE_ACTION_CONTEXT);
 
     const canonizedJson = await canonizeJSON(jsonld);
-    const hash = blake.blake2bHex(canonizedJson, undefined, 32);
+    const generatedHash = blake.blake2bHex(canonizedJson, undefined, 32);
 
     // That allows to validate metadata hash
-    setHash(hash);
+    setHash(generatedHash);
 
     return jsonld;
   };
@@ -116,11 +116,13 @@ export const useCreateGovernanceActionForm = (
   };
 
   const validateHash = useCallback(
-    async (storingUrl: string, hash: string | null) => {
+    async (storingUrl: string, localHash: string | null) => {
       try {
-        if (!hash) throw new Error(MetadataHashValidationErrors.INVALID_HASH);
-
-        await validateMetadataHash(storingUrl, hash);
+        if (!localHash) {
+          throw new Error(MetadataHashValidationErrors.INVALID_HASH);
+        }
+        await validateMetadataHash(storingUrl, localHash);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         if (
           Object.values(MetadataHashValidationErrors).includes(error.message)
@@ -156,10 +158,10 @@ export const useCreateGovernanceActionForm = (
         switch (govActionType) {
           case GovernanceActionType.Info:
             return await buildNewInfoGovernanceAction(commonGovActionDetails);
-          case GovernanceActionType.Treasury:
+          case GovernanceActionType.Treasury: {
             if (
-              data.amount === undefined
-              || data.receivingAddress === undefined
+              data.amount === undefined ||
+              data.receivingAddress === undefined
             ) {
               throw new Error(t("errors.invalidTreasuryGovernanceActionType"));
             }
@@ -171,10 +173,13 @@ export const useCreateGovernanceActionForm = (
             };
 
             return await buildTreasuryGovernanceAction(treasuryActionDetails);
+          }
           default:
             throw new Error(t("errors.invalidGovernanceActionType"));
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
+        // eslint-disable-next-line no-console
         console.error(error);
         throw error;
       }
@@ -210,8 +215,10 @@ export const useCreateGovernanceActionForm = (
         await buildSignSubmitConwayCertTx({ govActionBuilder });
 
         showSuccessModal();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         Sentry.captureException(error);
+        // eslint-disable-next-line no-console
         console.error(error);
       } finally {
         setIsLoading(false);

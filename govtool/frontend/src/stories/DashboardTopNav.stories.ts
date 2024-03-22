@@ -1,9 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { DashboardTopNav } from "@organisms";
-import {
-  within, userEvent, waitFor, screen,
-} from "@storybook/testing-library";
+import { within, userEvent, waitFor, screen } from "@storybook/testing-library";
 import { expect } from "@storybook/jest";
 
 const meta = {

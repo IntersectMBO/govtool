@@ -14,7 +14,7 @@ export const useGetVoterInfo = () => {
       soleVoterTransaction?.transactionHash,
     ],
     enabled: !!dRepID,
-    queryFn: async () => await getVoterInfo(dRepID),
+    queryFn: () => getVoterInfo(dRepID),
   });
 
   return { data, isLoading };

@@ -18,7 +18,8 @@ export const Hero = () => {
   const IMAGE_SIZE = screenWidth < 640 ? 300 : screenWidth < 860 ? 400 : 600;
 
   const onClickVotingPower = useCallback(
-    () => openInNewTab("https://docs.sanchogov.tools/faqs/what-is-voting-power"),
+    () =>
+      openInNewTab("https://docs.sanchogov.tools/faqs/what-is-voting-power"),
     [],
   );
 
@@ -84,15 +85,20 @@ export const Hero = () => {
           screenWidth >= 1728
             ? IMAGE_SIZE / 8
             : screenWidth >= 1512
-              ? -(IMAGE_SIZE / 12)
-              : screenWidth >= 860
-                ? -(IMAGE_SIZE / 8)
-                : -(IMAGE_SIZE / 4)
+            ? -(IMAGE_SIZE / 12)
+            : screenWidth >= 860
+            ? -(IMAGE_SIZE / 8)
+            : -(IMAGE_SIZE / 4)
         }
         top={-80}
         zIndex={-1}
       >
-        <img src={IMAGES.heroImage} width={IMAGE_SIZE} height={IMAGE_SIZE} />
+        <img
+          alt="hero"
+          src={IMAGES.heroImage}
+          width={IMAGE_SIZE}
+          height={IMAGE_SIZE}
+        />
       </Box>
     </Box>
   );

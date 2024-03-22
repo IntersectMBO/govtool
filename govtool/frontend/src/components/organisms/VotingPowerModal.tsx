@@ -1,8 +1,6 @@
 import { Box } from "@mui/material";
 
-import {
-  ModalContents, ModalWrapper, Typography, VotePill,
-} from "@atoms";
+import { ModalContents, ModalWrapper, Typography, VotePill } from "@atoms";
 import { useModal } from "@context";
 import { correctAdaFormat } from "@utils";
 import { useScreenDimension, useTranslation } from "@hooks";
@@ -88,9 +86,7 @@ export const VotingPowerModal = () => {
                 sx={{ marginLeft: "12px", whiteSpace: "nowrap" }}
                 variant="body1"
               >
-                ₳
-                {" "}
-                {correctAdaFormat(vote.vote)}
+                ₳ {correctAdaFormat(vote.vote)}
               </Typography>
             </Box>
           ))}

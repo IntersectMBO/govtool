@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import {
-  AppBar, Box, Grid, IconButton,
-} from "@mui/material";
+import { AppBar, Box, Grid, IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 
 import { Button, Link } from "@atoms";
-import {
-  ICONS, IMAGES, PATHS, NAV_ITEMS,
-} from "@consts";
+import { ICONS, IMAGES, PATHS, NAV_ITEMS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
@@ -54,8 +50,8 @@ export const TopNav = ({ isConnectButton = true }) => {
             windowScroll > POSITION_TO_BLUR
               ? "rgba(256, 256, 256, 0.7)"
               : isMobile
-                ? "white"
-                : "transparent",
+              ? "white"
+              : "transparent",
           borderBottom: isMobile ? 1 : 0,
           borderColor: "lightblue",
           borderRadius: 0,
@@ -82,7 +78,11 @@ export const TopNav = ({ isConnectButton = true }) => {
             onClick={() => (isConnectButton ? {} : disconnectWallet())}
             to={PATHS.home}
           >
-            <img height={isMobile ? 25 : 35} src={IMAGES.appLogo} />
+            <img
+              alt="app-logo"
+              height={isMobile ? 25 : 35}
+              src={IMAGES.appLogo}
+            />
           </NavLink>
           {screenWidth >= 1024 ? (
             <nav
@@ -104,7 +104,9 @@ export const TopNav = ({ isConnectButton = true }) => {
                       {...navItem}
                       isConnectWallet={isConnectButton}
                       onClick={() => {
-                        if (navItem.newTabLink) openInNewTab(navItem.newTabLink);
+                        if (navItem.newTabLink) {
+                          openInNewTab(navItem.newTabLink);
+                        }
                         setIsDrawerOpen(false);
                       }}
                     />
@@ -160,7 +162,11 @@ export const TopNav = ({ isConnectButton = true }) => {
                     <MenuIcon color="primary" />
                   </IconButton>
                 ) : (
-                  <img src={ICONS.drawerIcon} onClick={openDrawer} />
+                  <img
+                    alt="drawer-icon"
+                    src={ICONS.drawerIcon}
+                    onClick={openDrawer}
+                  />
                 )}
               </Box>
               <DrawerMobile

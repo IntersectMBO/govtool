@@ -6,7 +6,7 @@ import I18n from "@/i18n";
  * @param value - The string value to be validated.
  * @returns Either an error message or `true` if the value is a valid number.
  */
-export default (value: string) => {
+export const numberValidation = (value: string) => {
   const parsedValue = Number(
     value.includes(",") ? value.replace(",", ".") : value,
   );

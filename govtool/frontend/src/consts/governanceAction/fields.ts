@@ -1,5 +1,4 @@
-import { Validations } from "@utils";
-
+import { bech32Validation, numberValidation } from "@utils";
 import I18n from "@/i18n";
 import {
   GovernanceActionType,
@@ -96,7 +95,7 @@ export const GOVERNANCE_ACTION_FIELDS: GovernanceActionFields = {
       placeholderI18nKey:
         "createGovernanceAction.fields.declarations.receivingAddress.placeholder",
       rules: {
-        validate: Validations.bech32,
+        validate: bech32Validation,
       },
     },
     amount: {
@@ -109,7 +108,7 @@ export const GOVERNANCE_ACTION_FIELDS: GovernanceActionFields = {
           value: true,
           message: I18n.t("createGovernanceAction.fields.validations.required"),
         },
-        validate: Validations.number,
+        validate: numberValidation,
       },
     },
   },

@@ -37,6 +37,7 @@ changes.
 - i18next library added to FE [Issue 80](https://github.com/IntersectMBO/govtool/issues/80)
 - Add possibility to vote on behalf of myself - Sole Voter [Issue 119](https://github.com/IntersectMBO/govtool/issues/119)
 - Added Nix Flakes configurtion to handle unified developers setup [Issue 526](https://github.com/IntersectMBO/govtool/issues/526)
+- Add missing test to utils [Issue 500](https://github.com/IntersectMBO/govtool/issues/500).
 
 ### Fixed
 
@@ -53,6 +54,7 @@ changes.
 - Fixed deployment scripts to address [Issue 171](https://github.com/IntersectMBO/govtool/issues/171).
 - Fixed get drep voting power incorrectly executed endpoint [Issue 280](https://github.com/IntersectMBO/govtool/issues/280).
 - Fixed CSP settings to allow error reports with Sentry [Issue 291](https://github.com/IntersectMBO/govtool/issues/291).
+- Fix frontend package tests [Issue 500](https://github.com/IntersectMBO/govtool/issues/500).
 
 ### Changed
 

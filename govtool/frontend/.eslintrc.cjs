@@ -101,5 +101,6 @@ module.exports = {
     ".vite/",
     "dist/",
     "node_modules/",
+    "vite.config.ts",
   ],
 };

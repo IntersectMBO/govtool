@@ -20,19 +20,13 @@ export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
   const { isMobile } = useScreenDimension();
 
   // TODO: change link when available
-  const openLink = () => {
-    openInNewTab("https://docs.sanchogov.tools");
-  };
+  const openLink = () => openInNewTab("https://docs.sanchogov.tools");
 
   const isContinueDisabled = !watch("storeData");
 
-  const onClickContinue = () => {
-    setStep(6);
-  };
+  const onClickContinue = () => setStep(6);
 
-  const onClickBack = () => {
-    setStep(4);
-  };
+  const onClickBack = () => setStep(4);
 
   return (
     <BgCard

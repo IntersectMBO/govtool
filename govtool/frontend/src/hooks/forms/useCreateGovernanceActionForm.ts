@@ -1,9 +1,10 @@
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormContext } from "react-hook-form";
-import * as blake from "blakejs";
-import * as Sentry from "@sentry/react";
+import { blake2bHex } from "blakejs";
+import { captureException } from "@sentry/react";
 import { useTranslation } from "react-i18next";
+import { NodeObject } from "jsonld";
 
 import {
   CIP_100,
@@ -50,6 +51,7 @@ export const useCreateGovernanceActionForm = (
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hash, setHash] = useState<string | null>(null);
+  const [json, setJson] = useState<NodeObject | null>(null);
   const navigate = useNavigate();
   const { openModal, closeModal } = useModal();
   const {
@@ -74,10 +76,13 @@ export const useCreateGovernanceActionForm = (
     closeModal();
   }, []);
 
-  const generateMetadata = async (data: CreateGovernanceActionValues) => {
+  const generateMetadata = useCallback(async () => {
+    const data = getValues();
+
     if (!govActionType) {
       throw new Error("Governance action type is not defined");
     }
+
     const acceptedKeys = ["title", "motivation", "abstract", "rationale"];
 
     const filteredData = Object.entries(data)
@@ -100,20 +105,19 @@ export const useCreateGovernanceActionForm = (
     const jsonld = await generateJsonld(body, GOVERNANCE_ACTION_CONTEXT);
 
     const canonizedJson = await canonizeJSON(jsonld);
-    const generatedHash = blake.blake2bHex(canonizedJson, undefined, 32);
+    const canonizedJsonHash = blake2bHex(canonizedJson, undefined, 32);
 
     // That allows to validate metadata hash
-    setHash(generatedHash);
+    setHash(canonizedJsonHash);
+    setJson(jsonld);
 
     return jsonld;
-  };
+  }, [getValues]);
 
-  const onClickDownloadJson = async () => {
-    const data = getValues();
-    const json = await generateMetadata(data);
-
+  const onClickDownloadJson = useCallback(() => {
+    if (!json) return;
     downloadJson(json, govActionType);
-  };
+  }, [govActionType, json]);
 
   const validateHash = useCallback(
     async (storingUrl: string, localHash: string | null) => {
@@ -143,7 +147,7 @@ export const useCreateGovernanceActionForm = (
         throw error;
       }
     },
-    [hash, backToForm],
+    [backToForm],
   );
 
   const buildTransaction = useCallback(
@@ -217,9 +221,7 @@ export const useCreateGovernanceActionForm = (
         showSuccessModal();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        Sentry.captureException(error);
-        // eslint-disable-next-line no-console
-        console.error(error);
+        captureException(error);
       } finally {
         setIsLoading(false);
       }
@@ -229,15 +231,16 @@ export const useCreateGovernanceActionForm = (
 
   return {
     control,
+    createGovernanceAction: handleSubmit(onSubmit),
     errors,
+    generateMetadata,
     getValues,
     isLoading,
     isValid,
-    setValue,
-    createGovernanceAction: handleSubmit(onSubmit),
-    watch,
+    onClickDownloadJson,
     register,
     reset,
-    onClickDownloadJson,
+    setValue,
+    watch,
   };
 };

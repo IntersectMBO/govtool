@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import { Box } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
@@ -25,23 +25,25 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
     createGovernanceAction,
     getValues,
     watch,
+    generateMetadata,
     onClickDownloadJson,
     isLoading,
   } = useCreateGovernanceActionForm(setStep);
   const { screenWidth } = useScreenDimension();
 
-  // TODO: change on correct file name
   const fileName = getValues("governance_action_type");
 
   // TODO: Change link to correct
-  const openGuideAboutStoringInformation = useCallback(
-    () => openInNewTab("https://sancho.network/"),
-    [],
-  );
+  const openGuideAboutStoringInformation = () =>
+    openInNewTab("https://sancho.network/");
 
   const isActionButtonDisabled = !watch("storingURL");
 
-  const onClickBack = useCallback(() => setStep(5), []);
+  const onClickBack = () => setStep(5);
+
+  useEffect(() => {
+    generateMetadata();
+  }, []);
 
   return (
     <BgCard

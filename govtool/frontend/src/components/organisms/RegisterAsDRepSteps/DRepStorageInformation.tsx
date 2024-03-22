@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { Box } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
@@ -24,24 +24,23 @@ export const DRepStorageInformation = ({
   const {
     control,
     errors,
+    getValues,
     isRegistrationAsDRepLoading,
+    onClickDownloadJson,
     registerAsDrep,
     watch,
   } = useRegisterAsdRepForm();
   const { screenWidth } = useScreenDimension();
 
-  // TODO: change on correct file name
-  const fileName = "fileName";
+  const fileName = getValues("dRepName");
 
   // TODO: Change link to correct
-  const openGuideAboutStoringInformation = useCallback(
-    () => openInNewTab("https://sancho.network/"),
-    [],
-  );
+  const openGuideAboutStoringInformation = () =>
+    openInNewTab("https://sancho.network/");
 
-  const isActionButtonDisabled = !watch("storingURL");
+  const isActionButtonDisabled = !watch("storingURL") || !!errors["storingURL"];
 
-  const onClickBack = useCallback(() => setStep(3), []);
+  const onClickBack = () => setStep(3);
 
   return (
     <BgCard
@@ -79,8 +78,7 @@ export const DRepStorageInformation = ({
         <Step
           component={
             <Button
-              // TODO: add function onClickDownloadJson
-              // onClick={onClickDownloadJson}
+              onClick={onClickDownloadJson}
               size="extraLarge"
               startIcon={<img alt="download" src={ICONS.download} />}
               sx={{

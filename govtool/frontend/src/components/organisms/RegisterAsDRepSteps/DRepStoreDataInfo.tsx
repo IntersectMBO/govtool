@@ -18,13 +18,10 @@ export const DRepStoreDataInfo = ({
 }) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
-  const { control, errors, isRegistrationAsDRepLoading, resetField, watch } =
+  const { control, errors, isRegistrationAsDRepLoading, watch } =
     useRegisterAsdRepForm();
 
-  const onClickBackButton = () => {
-    setStep(2);
-    resetField("storeData");
-  };
+  const onClickBackButton = () => setStep(2);
 
   const isContinueDisabled = !watch("storeData");
 

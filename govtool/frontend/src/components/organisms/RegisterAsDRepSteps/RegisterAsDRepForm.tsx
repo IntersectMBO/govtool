@@ -4,17 +4,16 @@ import { Box } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 import { Button, InfoText, Spacer, Typography } from "@atoms";
+import { Placeholders, Rules } from "@consts";
 import {
   useRegisterAsdRepForm,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import { URL_REGEX } from "@utils";
 
 import { BgCard, ControlledField } from "..";
-import { Placeholders } from "@/consts";
 
-const MAX_NUMBER_OF_LINKS = 8;
+const MAX_NUMBER_OF_LINKS = 7;
 
 export const RegisterAsDRepForm = ({
   setStep,
@@ -23,7 +22,7 @@ export const RegisterAsDRepForm = ({
 }) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
-  const { control, errors, register, watch } = useRegisterAsdRepForm();
+  const { control, errors, isError, register, watch } = useRegisterAsdRepForm();
   const {
     append,
     fields: links,
@@ -41,7 +40,7 @@ export const RegisterAsDRepForm = ({
 
   const removeLink = useCallback((index: number) => remove(index), [remove]);
 
-  const isContinueButtonDisabled = !watch("dRepName");
+  const isContinueButtonDisabled = !watch("dRepName") || isError;
 
   const renderLinks = useCallback(
     () =>
@@ -65,12 +64,7 @@ export const RegisterAsDRepForm = ({
           layoutStyles={{ mb: 3 }}
           placeholder={Placeholders.LINK}
           name={`links.${index}.link`}
-          rules={{
-            pattern: {
-              value: URL_REGEX,
-              message: t("createGovernanceAction.fields.validations.url"),
-            },
-          }}
+          rules={Rules.LINK}
         />
       )),
     [links],
@@ -98,6 +92,7 @@ export const RegisterAsDRepForm = ({
         helpfulText={t("forms.registerAsDRep.dRepNameHelpfulText")}
         label={t("forms.registerAsDRep.dRepName")}
         name="dRepName"
+        rules={Rules.DREP_NAME}
         placeholder={t("forms.registerAsDRep.dRepNamePlaceholder")}
       />
       <Spacer y={isMobile ? 5 : 6} />
@@ -115,6 +110,7 @@ export const RegisterAsDRepForm = ({
         label={t("forms.registerAsDRep.email")}
         name="email"
         placeholder={t("forms.registerAsDRep.emailPlaceholder")}
+        rules={Rules.EMAIL}
       />
       <Spacer y={3} />
       <ControlledField.TextArea
@@ -123,6 +119,7 @@ export const RegisterAsDRepForm = ({
         name="bio"
         placeholder={t("forms.registerAsDRep.bioPlaceholder")}
         helpfulText={t("forms.registerAsDRep.bioHelpfulText")}
+        rules={Rules.BIO}
       />
       <Spacer y={4} />
       <p
@@ -136,7 +133,9 @@ export const RegisterAsDRepForm = ({
       >
         {t("registration.linksDescription")}
         <span style={{ fontSize: 16, fontWeight: 400 }}>
-          {t("registration.maximumLinks")}
+          {t("registration.maximumLinks", {
+            numberOfLinks: MAX_NUMBER_OF_LINKS,
+          })}
         </span>
       </p>
       <Spacer y={3} />

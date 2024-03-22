@@ -37,7 +37,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
   const openGuideAboutStoringInformation = () =>
     openInNewTab("https://sancho.network/");
 
-  const isActionButtonDisabled = !watch("storingURL");
+  const isActionButtonDisabled = !watch("storingURL") || !!errors["storingURL"];
 
   const onClickBack = () => setStep(5);
 

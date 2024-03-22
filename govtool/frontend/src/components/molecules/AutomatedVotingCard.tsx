@@ -1,31 +1,46 @@
 import { Box, Divider } from "@mui/material";
 
-import { Button, Spacer, Typography } from "@atoms";
+import { Button, Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { AutomatedVotingCardProps } from "./types";
+import { Card } from "./Card";
+import { primaryBlue } from "@/consts";
+import { useModal } from "@/context";
 
 export const AutomatedVotingCard = ({
   description,
+  inProgress,
+  isConnected,
+  isSelected,
   onClickDelegate,
   onClickInfo,
   title,
   votingPower,
 }: AutomatedVotingCardProps) => {
   const { isMobile, screenWidth } = useScreenDimension();
+  const { openModal } = useModal();
   const { t } = useTranslation();
 
   return (
-    <Box
+    <Card
+      {...(inProgress && {
+        variant: "warning",
+        label: t("inProgress"),
+      })}
+      {...(isSelected && {
+        variant: "primary",
+        label: "Selected",
+      })}
       sx={{
         alignItems: "center",
-        bgcolor: "#FFFFFF4D",
-        borderRadius: 4,
-        boxShadow: `0px 4px 15px 0px #DDE3F5`,
+        bgcolor: (theme) => `${theme.palette.neutralWhite}40`,
+        boxShadow: `0px 4px 15px 0px ${primaryBlue.c100}`,
         display: "flex",
         flex: 1,
         flexDirection: screenWidth < 1440 ? "column" : "row",
         justifyContent: "space-between",
-        padding: "18px 24px",
+        mt: inProgress || isSelected ? 2 : 0,
+        py: 2.25,
       }}
     >
       <Box
@@ -74,11 +89,13 @@ export const AutomatedVotingCard = ({
         sx={{
           display: "flex",
           flexDirection: "row",
+          gap: 2.5,
           mt: screenWidth < 1440 ? 3 : 0,
           width: screenWidth < 1440 ? "100%" : "auto",
         }}
       >
         <Button
+          // TODO handle button click
           onClick={onClickInfo}
           size={isMobile ? "medium" : "large"}
           sx={{ flex: screenWidth < 768 ? 1 : undefined }}
@@ -86,15 +103,26 @@ export const AutomatedVotingCard = ({
         >
           {t("info")}
         </Button>
-        <Spacer x={2.5} />
-        <Button
-          onClick={onClickDelegate}
-          size={isMobile ? "medium" : "large"}
-          sx={{ flex: screenWidth < 768 ? 1 : undefined }}
-        >
-          {t("delegate")}
-        </Button>
+        {!isConnected
+          ? (
+            <Button
+              onClick={() => openModal({ type: "chooseWallet" })}
+              size={isMobile ? "medium" : "large"}
+              sx={{ flex: screenWidth < 768 ? 1 : undefined }}
+            >
+              {t("connectToDelegate")}
+            </Button>
+          )
+          : !isSelected && (
+            <Button
+              onClick={onClickDelegate}
+              size={isMobile ? "medium" : "large"}
+              sx={{ flex: screenWidth < 768 ? 1 : undefined }}
+            >
+              {t("delegate")}
+            </Button>
+          )}
       </Box>
-    </Box>
+    </Card>
   );
 };

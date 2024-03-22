@@ -51,7 +51,7 @@ jobs:
           node-version-file: "govtool/frontend/.nvmrc"
 
       - name: 👕 Lint
-        run: /
+        run: |
           npm install
           npm run lint
 
@@ -73,6 +73,6 @@ jobs:
           node-version-file: "govtool/frontend/.nvmrc"
 
       - name: 🔍 Type Check
-        run: /
+        run: |
           npm install
           npm run tsc

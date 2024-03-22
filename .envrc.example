@@ -1,10 +1,6 @@
 # vim: set ft=bash
 # This file is a template for the environment variables that need to be set and
-# should be copied to `.env` or `.envrc` and filled in with the correct values.
-
-# Tell direnv to use Nix configuration.
-# See https://direnv.net/docs/hook.html#nix.
-use nix shell.nix
+# should be copied to `.envrc` and filled in with the correct values.
 
 # target environment: dev, test, staging or beta
 export ENVIRONMENT=<ENVIRONMENT>
@@ -34,33 +30,25 @@ export GRAFANA_SLACK_RECIPIENT=<GRAFANA_SLACK_RECIPIENT>
 export GRAFANA_SLACK_OAUTH_TOKEN=<GRAFANA_SLACK_OAUTH_TOKEN>
 # the basic auth credentials for the Nginx proxy
 export NGINX_BASIC_AUTH=<NGINX_BASIC_AUTH>
+# the IP addresses that bypass the basic auth
+export IP_ADDRESS_BYPASSING_BASIC_AUTH1=<IP_ADDRESS_BYPASSING_BASIC_AUTH1>
+export IP_ADDRESS_BYPASSING_BASIC_AUTH2=<IP_ADDRESS_BYPASSING_BASIC_AUTH2>
 
-
-# The following code is a nice way to display what environment we are in.
-function warn() {
-  tput bold; tput setaf $2; echo "GovTool: $1"; tput sgr0
-}
-
-tput bold
+# the domain name for the target environment
 case "$ENVIRONMENT" in
   "dev")
     export DOMAIN="dev-${CARDANO_NETWORK}.govtool.byron.network"
-    warn "This is a DEV environment, all good!" 2
     ;;
   "test")
     export DOMAIN="test-${CARDANO_NETWORK}.govtool.byron.network"
-    warn "This is TEST environment, be careful…" 4
     ;;
   "staging")
     export DOMAIN="staging.govtool.byron.network"
-    warn "This is STAGING environment, be careful…" 5
     ;;
   "beta")
     export DOMAIN="sanchogov.tools"
-    warn "This is BETA environment, BE CAREFUL!" 1
     ;;
   *)
-    warn "Unknown environment, exiting…" 1
     exit 1
     ;;
 esac

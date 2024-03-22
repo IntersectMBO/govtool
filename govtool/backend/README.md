@@ -18,29 +18,24 @@ You will need your `cardano-node` and `cardano-db-sync` to be compatible with Sa
 
 [`sancho` testnet config files](https://sancho.network/tutorials/start-node/)
 
-### Using Nix
+### Using Nix and Direnv
 
 Due to problems with openapi3 package it's hard to build this project with plain `ghc` and `cabal-install`. Until the prolem is solved we reccomend using `nix` - this problem is fixed when you build your project from inside of the nix shell.
 
 1. Get [Nix](https://nixos.org/download).
 
-2. Enter `govtool/backend` directory:
+2. Get [direnv](https://direnv.net/).
+
+3. Enter `govtool/backend` directory:
 
     ```sh
     cd govtool/backend
     ```
 
-3. Allow broken nix packages
+4. Allow direnv to setup your environment:
 
     ```sh
-    export NIXPKGS_ALLOW_BROKEN=1
-    ```
-    This is due to `openapi3` package being marked as broken.
-
-4. Run `nix-shell`
-
-    ```sh
-    nix-shell
+    direnv allow
     ```
 
 5. Update cabal & build project

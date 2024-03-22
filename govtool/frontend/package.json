@@ -39,7 +39,6 @@
     "jsonld": "^8.3.2",
     "keen-slider": "^6.8.5",
     "patch-package": "^8.0.0",
-    "postinstall-postinstall": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-gtm-module": "^2.0.11",

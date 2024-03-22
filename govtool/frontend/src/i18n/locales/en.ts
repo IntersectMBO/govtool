@@ -757,5 +757,6 @@ export const en = {
     viewDetails: "View details",
     votingPower: "Voting power",
     yes: "Yes",
+    yourself: "Yourself",
   },
 };

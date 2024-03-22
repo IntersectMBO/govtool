@@ -221,9 +221,7 @@ export const useCreateGovernanceActionForm = (
         showSuccessModal();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        // eslint-disable-next-line no-console
         captureException(error);
-        console.error(error);
       } finally {
         setIsLoading(false);
       }

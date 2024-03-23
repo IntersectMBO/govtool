@@ -64,7 +64,7 @@ export const GovernanceActionsDatesBox = ({
         <Tooltip
           heading={t("tooltips.submissionDate.heading")}
           paragraphOne={t("tooltips.submissionDate.paragraphOne")}
-          placement={"bottom-end"}
+          placement="bottom-end"
           arrow
         >
           <InfoOutlinedIcon
@@ -107,7 +107,7 @@ export const GovernanceActionsDatesBox = ({
           heading={t("tooltips.expiryDate.heading")}
           paragraphOne={t("tooltips.expiryDate.paragraphOne")}
           paragraphTwo={t("tooltips.expiryDate.paragraphTwo")}
-          placement={"bottom-end"}
+          placement="bottom-end"
           arrow
         >
           <InfoOutlinedIcon

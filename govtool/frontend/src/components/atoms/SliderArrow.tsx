@@ -5,7 +5,7 @@ import { theme } from "@/theme";
 
 interface Props {
   disabled: boolean;
-  onClick: (e: any) => void;
+  onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   left?: boolean;
 }
 

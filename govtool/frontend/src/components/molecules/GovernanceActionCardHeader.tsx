@@ -43,9 +43,9 @@ export const GovernanceActionCardHeader = ({
       </Typography>
       {isDataMissing && (
         <Tooltip
-          heading={"Data Missing"}
+          heading="Data Missing"
           paragraphOne={mockedLongText}
-          placement={"bottom-end"}
+          placement="bottom-end"
           arrow
         >
           <InfoOutlinedIcon

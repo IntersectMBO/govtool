@@ -38,8 +38,8 @@ export const GovernanceActionDetailsCardLinks = () => {
           rowGap: 2,
         }}
       >
-        {LINKS.map((link, index) => (
-          <IconLink key={index} label={link} navTo={link} isSmall />
+        {LINKS.map((link) => (
+          <IconLink key={link} label={link} navTo={link} isSmall />
         ))}
       </Box>
     </>

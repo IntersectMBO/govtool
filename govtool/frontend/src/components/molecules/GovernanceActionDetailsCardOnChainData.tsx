@@ -57,7 +57,7 @@ export const GovernanceActionDetailsCardOnChainData = ({
             }}
           >
             {label}
-            {":"}
+            :
           </Typography>
           <Typography
             sx={{

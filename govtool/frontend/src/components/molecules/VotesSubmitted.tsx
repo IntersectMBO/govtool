@@ -47,7 +47,7 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
       >
         {t("govActions.forGovAction")}
       </Typography>
-      <Typography color={"textGray"} fontSize={"14px"} sx={{ mb: 3 }}>
+      <Typography color="textGray" fontSize="14px" sx={{ mb: 3 }}>
         {t("govActions.votesSubmittedOnChain")}
       </Typography>
       <Box

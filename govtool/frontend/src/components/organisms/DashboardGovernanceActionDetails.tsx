@@ -130,7 +130,8 @@ export const DashboardGovernanceActionDetails = () => {
                 ? formatDisplayDate(state.createdDate)
                 : formatDisplayDate(data.proposal.createdDate)
             }
-            details={state ? state.details : data.proposal.details}
+            // TODO: To decide if we want to keep it when metadate BE is ready
+            // details={state ? state.details : data.proposal.details}
             expiryDate={
               state
                 ? formatDisplayDate(state.expiryDate)
@@ -145,7 +146,8 @@ export const DashboardGovernanceActionDetails = () => {
                 ? getProposalTypeLabel(state.type)
                 : getProposalTypeLabel(data.proposal.type)
             }
-            url={state ? state.url : data.proposal.url}
+            // TODO: To decide if we want to keep it when metadate BE is ready
+            // url={state ? state.url : data.proposal.url}
             yesVotes={state ? state.yesVotes : data.proposal.yesVotes}
             voteFromEP={data?.vote?.vote}
             govActionId={fullProposalId}

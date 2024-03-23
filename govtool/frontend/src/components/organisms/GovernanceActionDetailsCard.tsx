@@ -10,11 +10,11 @@ import { useState } from "react";
 type GovernanceActionDetailsCardProps = {
   abstainVotes: number;
   createdDate: string;
-  details: unknown;
+  // details: unknown;
   expiryDate: string;
   noVotes: number;
   type: string;
-  url: string;
+  // url: string;
   yesVotes: number;
   govActionId: string;
   isDashboard?: boolean;
@@ -26,11 +26,11 @@ type GovernanceActionDetailsCardProps = {
 export const GovernanceActionDetailsCard = ({
   abstainVotes,
   createdDate,
-  details,
+  // details,
   expiryDate,
   noVotes,
   type,
-  url,
+  // url,
   yesVotes,
   isDashboard,
   isVoter,

@@ -32,7 +32,7 @@ interface ActionTypeProps
     | "index"
   > {
   onClick?: () => void;
-  inProgress?: boolean;
+  // inProgress?: boolean;
   txHash: string;
   index: number;
   isDataMissing: boolean;
@@ -41,7 +41,7 @@ interface ActionTypeProps
 export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
   const {
     type,
-    inProgress = false,
+    // inProgress = false,
     expiryDate,
     onClick,
     createdDate,

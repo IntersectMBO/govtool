@@ -9,7 +9,7 @@ export const GovernanceActionCardMyVote = ({ vote }: { vote: Vote }) => {
   const { t } = useTranslation();
 
   return (
-    <Box data-testid="my-vote" mb={"20px"}>
+    <Box data-testid="my-vote" mb="20px">
       <Typography
         variant="caption"
         sx={{

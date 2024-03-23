@@ -9,21 +9,19 @@ import { useTranslation } from "@hooks";
 export const Share = ({ link }: { link: string }) => {
   const { addSuccessAlert } = useSnackbar();
   const { t } = useTranslation();
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [isActive, setIsActive] = useState<boolean>(true);
+  const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
 
-  const handleClick = (event: any) => {
-    setAnchorEl(event.currentTarget);
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    setAnchorEl(e.currentTarget);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  const onCopy = (e: any) => {
+  const onCopy = (e: React.MouseEvent<HTMLDivElement>) => {
     navigator.clipboard.writeText(link);
     addSuccessAlert(t("alerts.copiedToClipboard"));
-    setIsActive(false);
     e.stopPropagation();
   };
 
@@ -46,7 +44,7 @@ export const Share = ({ link }: { link: string }) => {
           padding: 1.5,
         }}
       >
-        <img height={24} width={24} src={ICONS.share} />
+        <img height={24} width={24} src={ICONS.share} alt="share icon" />
       </Box>
       <Popover
         id={id}

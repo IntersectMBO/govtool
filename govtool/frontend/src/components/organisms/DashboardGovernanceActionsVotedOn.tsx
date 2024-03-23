@@ -76,7 +76,7 @@ export const DashboardGovernanceActionsVotedOn = ({
                   >
                     <GovernanceVotedOnCard
                       votedProposal={action}
-                      searchPhrase={searchPhrase}
+                      // searchPhrase={searchPhrase}
                       // TODO: Add data validation
                       isDataMissing={false}
                       inProgress={

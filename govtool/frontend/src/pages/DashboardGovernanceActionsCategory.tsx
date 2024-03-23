@@ -175,49 +175,51 @@ export const DashboardGovernanceActionsCategory = () => {
               <Box
                 columnGap={4}
                 display="grid"
-                gridTemplateColumns={`repeat(auto-fit, minmax(${screenWidth < 375
+                gridTemplateColumns={`repeat(auto-fit, minmax(${
+                  screenWidth < 375
                     ? "255px"
                     : screenWidth < 768
-                      ? "294px"
-                      : "402px"
-                  }, 1fr))`}
+                    ? "294px"
+                    : "402px"
+                }, 1fr))`}
               >
                 {mappedData.map((item) => (
                   <Box pb={4.25} key={item.txHash + item.index}>
                     <GovernanceActionCard
                       {...item}
                       index={item.index}
-                      inProgress={
-                        pendingTransaction.vote?.resourceId ===
-                        item.txHash + item.index
-                      }
+                      // inProgress={
+                      //   pendingTransaction.vote?.resourceId ===
+                      //   item.txHash + item.index
+                      // }
                       // TODO: Add data validation
                       isDataMissing={false}
                       onClick={() => {
                         saveScrollPosition();
 
                         // eslint-disable-next-line no-unused-expressions
-                        pendingTransaction.vote?.resourceId === item.txHash + item.index
+                        pendingTransaction.vote?.resourceId ===
+                        item.txHash + item.index
                           ? openInNewTab(
-                            "https://adanordic.com/latest_transactions",
-                          )
+                              "https://adanordic.com/latest_transactions",
+                            )
                           : navigate(
-                            generatePath(
-                              PATHS.dashboardGovernanceActionsAction,
+                              generatePath(
+                                PATHS.dashboardGovernanceActionsAction,
+                                {
+                                  proposalId: getFullGovActionId(
+                                    item.txHash,
+                                    item.index,
+                                  ),
+                                },
+                              ),
                               {
-                                proposalId: getFullGovActionId(
-                                  item.txHash,
-                                  item.index,
-                                ),
+                                state: {
+                                  ...item,
+                                  openedFromCategoryPage: true,
+                                },
                               },
-                            ),
-                            {
-                              state: {
-                                ...item,
-                                openedFromCategoryPage: true,
-                              },
-                            },
-                          );
+                            );
                       }}
                       txHash={item.txHash}
                     />

@@ -20,8 +20,8 @@ import {
 } from "@hooks";
 import { openInNewTab } from "@utils";
 
-import { ControlledField } from "../organisms";
 import { Trans } from "react-i18next";
+import { ControlledField } from "../organisms";
 
 // TODO: Change into props when BE is ready
 const castVoteDate = undefined;
@@ -237,8 +237,8 @@ export const VoteActionForm = ({
           flexDirection="row"
           flexWrap="wrap"
           justifyContent="center"
-          mb={"15px"}
-          mt={"58px"}
+          mb="15px"
+          mt="58px"
           onClick={handleContext}
         >
           <p
@@ -296,7 +296,7 @@ export const VoteActionForm = ({
                   "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor",
                 )
               }
-              mt={"12px"}
+              mt="12px"
               mb={isMobile ? 2 : 6}
               sx={{ cursor: "pointer" }}
               textAlign="center"

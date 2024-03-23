@@ -8,8 +8,8 @@ import { useCardano } from "@context";
 import { useScreenDimension, useTranslation, useSlider } from "@hooks";
 import { Button, Typography } from "@atoms";
 import { SliderArrows } from "@molecules";
-import { theme } from "@/theme";
 import { PATHS } from "@consts";
+import { theme } from "@/theme";
 
 const SLIDER_MAX_LENGTH = 1000;
 
@@ -115,7 +115,7 @@ export const Slider = ({
                 "&:hover": { backgroundColor: arcticWhite },
               }}
               onClick={() =>
-                onDashboard
+                (onDashboard
                   ? navigate(
                       generatePath(PATHS.dashboardGovernanceActionsCategory, {
                         category: navigateKey,
@@ -125,7 +125,7 @@ export const Slider = ({
                       generatePath(PATHS.governanceActionsCategory, {
                         category: navigateKey,
                       }),
-                    )
+                    ))
               }
             >
               {t("slider.showAll")}

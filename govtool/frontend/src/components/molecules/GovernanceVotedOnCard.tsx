@@ -24,13 +24,14 @@ const mockedLongText =
 interface Props {
   votedProposal: VotedProposal;
   isDataMissing: boolean;
-  searchPhrase?: string;
+  // searchPhrase?: string;
   inProgress?: boolean;
 }
 
 export const GovernanceVotedOnCard = ({
   votedProposal,
   isDataMissing,
+  // searchPhrase,
   inProgress,
 }: Props) => {
   const navigate = useNavigate();
@@ -104,7 +105,7 @@ export const GovernanceVotedOnCard = ({
         <GovernanceActionCardMyVote vote={vote.vote} />
       </Box>
       <Box
-        bgcolor={"white"}
+        bgcolor="white"
         px={isMobile ? 2 : 5}
         py={2}
         sx={{

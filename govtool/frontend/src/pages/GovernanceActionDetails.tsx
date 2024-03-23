@@ -130,7 +130,7 @@ export const GovernanceActionDetails = () => {
                 <CircularProgress />
               </Box>
             ) : data || state ? (
-              <Box data-testid={"governance-action-details"}>
+              <Box data-testid="governance-action-details">
                 <GovernanceActionDetailsCard
                   abstainVotes={
                     state ? state.abstainVotes : data.proposal.abstainVotes
@@ -140,7 +140,8 @@ export const GovernanceActionDetails = () => {
                       ? formatDisplayDate(state.createdDate)
                       : formatDisplayDate(data.proposal.createdDate)
                   }
-                  details={state ? state.details : data.proposal.details}
+                  // TODO: To decide if we want to keep it when metadate BE is ready
+                  // details={state ? state.details : data.proposal.details}
                   expiryDate={
                     state
                       ? formatDisplayDate(state.expiryDate)
@@ -152,7 +153,8 @@ export const GovernanceActionDetails = () => {
                       ? getProposalTypeLabel(state.type)
                       : getProposalTypeLabel(data.proposal.type)
                   }
-                  url={state ? state.url : data.proposal.url}
+                  // TODO: To decide if we want to keep it when metadate BE is ready
+                  // url={state ? state.url : data.proposal.url}
                   yesVotes={state ? state.yesVotes : data.proposal.yesVotes}
                   govActionId={fullProposalId}
                 />

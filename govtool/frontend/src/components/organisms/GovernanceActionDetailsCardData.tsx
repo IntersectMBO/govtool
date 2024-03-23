@@ -57,7 +57,7 @@ export const GovernanceActionDetailsCardData = ({
       }}
     >
       <GovernanceActionDetailsCardHeader
-        title={"Test Title"}
+        title="Test Title"
         isDataMissing={isDataMissing}
       />
       {isDataMissing && <DataMissingInfoBox />}
@@ -72,7 +72,7 @@ export const GovernanceActionDetailsCardData = ({
       />
       {isDataMissing && (
         <ExternalModalButton
-          url={"https://dev-sanchonet.govtool.byron.network/"}
+          url="https://dev-sanchonet.govtool.byron.network/"
           label={t("govActions.seeExternalData")}
         />
       )}

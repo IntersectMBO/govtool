@@ -33,21 +33,20 @@ export const GovernanceActionCardElement = ({
   isCopyButton,
   tooltipProps,
   marginBottom,
-}: GovernanceActionCardElementProps) => {
-  return (
+}: GovernanceActionCardElementProps) => (
+  <Box
+    data-testid={dataTestId}
+    mb={marginBottom ?? isSliderCard ? "20px" : "32px"}
+  >
     <Box
-      data-testid={dataTestId}
-      mb={marginBottom ?? isSliderCard ? "20px" : "32px"}
-    >
-      <Box
-        sx={{
+      sx={{
           display: "flex",
           alignItems: "center",
           mb: "4px",
         }}
-      >
-        <Typography
-          sx={{
+    >
+      <Typography
+        sx={{
             fontSize: isSliderCard ? 12 : 14,
             fontWeight: isSliderCard ? 500 : 600,
             lineHeight: isSliderCard ? "16px" : "20px",
@@ -56,45 +55,45 @@ export const GovernanceActionCardElement = ({
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
           }}
-        >
-          {label}
-        </Typography>
-        {tooltipProps && (
-          <Tooltip
-            heading={tooltipProps?.heading}
-            paragraphOne={tooltipProps?.paragraphOne}
-            placement="bottom-end"
-            arrow
-            {...tooltipProps}
-          >
-            <InfoOutlinedIcon
-              style={{}}
-              sx={{ ml: 0.7, mb: 0.1, color: "#ADAEAD", fontSize: "small" }}
-            />
-          </Tooltip>
+      >
+        {label}
+      </Typography>
+      {tooltipProps && (
+      <Tooltip
+        heading={tooltipProps?.heading}
+        paragraphOne={tooltipProps?.paragraphOne}
+        placement="bottom-end"
+        arrow
+        {...tooltipProps}
+      >
+        <InfoOutlinedIcon
+          style={{}}
+          sx={{ ml: 0.7, mb: 0.1, color: "#ADAEAD", fontSize: "small" }}
+        />
+      </Tooltip>
         )}
-      </Box>
-      <Box display="flex">
-        {textVariant === "pill" ? (
-          <Box
-            sx={{
+    </Box>
+    <Box display="flex">
+      {textVariant === "pill" ? (
+        <Box
+          sx={{
               padding: "6px 18px",
               overflow: "hidden",
               bgcolor: "lightBlue",
               borderRadius: 100,
             }}
-          >
-            <Typography
-              variant="caption"
-              sx={{
+        >
+          <Typography
+            variant="caption"
+            sx={{
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
               }}
-            >
-              {text}
-            </Typography>
-          </Box>
+          >
+            {text}
+          </Typography>
+        </Box>
         ) : (
           <Box
             sx={{
@@ -134,7 +133,6 @@ export const GovernanceActionCardElement = ({
             )}
           </Box>
         )}
-      </Box>
     </Box>
+  </Box>
   );
-};

@@ -10,6 +10,13 @@ import { GovernanceActionCard } from "@molecules";
 import { getProposalTypeLabel, getFullGovActionId, openInNewTab } from "@utils";
 import { Slider } from "@organisms";
 
+type GroupedActions = {
+  [key: string]: {
+    title: string;
+    actions: ActionType[];
+  };
+};
+
 type GovernanceActionsToVoteProps = {
   filters: string[];
   sorting: string;
@@ -54,44 +61,47 @@ export const GovernanceActionsToVote = ({
                       {...action}
                       txHash={action.txHash}
                       index={action.index}
+                      // inProgress={
+                      //   onDashboard &&
+                      //   pendingTransaction.vote?.resourceId ===
+                      //     action?.txHash + action?.index
+                      // }
                       // TODO: Add data validation
                       isDataMissing={false}
-                      inProgress={
-                        onDashboard &&
-                        pendingTransaction.vote?.resourceId ===
-                          action?.txHash + action?.index
-                      }
-                      // eslint-disable-next-line no-confusing-arrow
-                      onClick={() =>
-                        onDashboard &&
-                        pendingTransaction.vote?.resourceId ===
-                          action?.txHash + action?.index
-                          ? openInNewTab(
-                              "https://adanordic.com/latest_transactions",
-                            )
-                          : navigate(
-                              onDashboard
-                                ? generatePath(
-                                    PATHS.dashboardGovernanceActionsAction,
-                                    {
-                                      proposalId: getFullGovActionId(
-                                        action.txHash,
-                                        action.index,
-                                      ),
-                                    },
-                                  )
-                                : PATHS.governanceActionsAction.replace(
-                                    ":proposalId",
-                                    getFullGovActionId(
+                      onClick={() => {
+                        if (
+                          onDashboard &&
+                          pendingTransaction.vote?.resourceId ===
+                            `${action.txHash ?? ""}${action.index ?? ""}`
+                        ) {
+                          openInNewTab(
+                            "https://adanordic.com/latest_transactions",
+                          );
+                        } else {
+                          navigate(
+                            onDashboard
+                              ? generatePath(
+                                  PATHS.dashboardGovernanceActionsAction,
+                                  {
+                                    proposalId: getFullGovActionId(
                                       action.txHash,
                                       action.index,
                                     ),
+                                  },
+                                )
+                              : PATHS.governanceActionsAction.replace(
+                                  ":proposalId",
+                                  getFullGovActionId(
+                                    action.txHash,
+                                    action.index,
                                   ),
-                              {
-                                state: { ...action },
-                              },
-                            )
-                      }
+                                ),
+                            {
+                              state: { ...action },
+                            },
+                          );
+                        }
+                      }}
                     />
                   </div>
                 ))}

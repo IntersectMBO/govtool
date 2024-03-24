@@ -71,7 +71,7 @@ export const Share = ({ link }: { link: string }) => {
             padding: "12px 24px",
           }}
         >
-          <Typography sx={{ alignSelf: "flex-start" }}>Share</Typography>
+          <Typography sx={{ alignSelf: "flex-start" }}>{t("share")}</Typography>
           <Box
             onClick={onCopy}
             sx={{
@@ -89,7 +89,7 @@ export const Share = ({ link }: { link: string }) => {
           >
             <img alt="link" height={24} src={ICONS.link} width={24} />
           </Box>
-          <Typography variant="caption">Click to copy</Typography>
+          <Typography variant="caption">{t("clickToCopyLink")}</Typography>
         </Box>
       </Popover>
     </>

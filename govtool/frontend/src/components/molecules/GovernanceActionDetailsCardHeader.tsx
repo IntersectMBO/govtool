@@ -30,6 +30,7 @@ export const GovernanceActionDetailsCardHeader = ({
         alignItems: "center",
         mb: 2,
       }}
+      data-testid="governance-action-details-card-header"
     >
       <Box
         sx={{

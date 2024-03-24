@@ -10,6 +10,7 @@ import {
   GovernanceActionDetailsCardOnChainData,
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
+import { getProposalTypeNoEmptySpaces } from "@utils";
 
 const mockedLongDescription =
   "I am the Cardano crusader carving his path in the blockchain battleground. With a mind sharper than a Ledger Nano X, this fearless crypto connoisseur fearlessly navigates the volatile seas of Cardano, turning code into currency. Armed with a keyboard and a heart pumping with blockchain beats, Mister Big Bad fearlessly champions decentralization, smart contracts, and the Cardano community. His Twitter feed is a mix of market analysis that rivals CNBC and memes that could break the internet.";
@@ -57,7 +58,10 @@ export const GovernanceActionDetailsCardData = ({
       }}
     >
       <GovernanceActionDetailsCardHeader
-        title="Test Title"
+        // TODO: Add real title from props when BE is ready
+        title="Fund our project"
+        // TODO: Modify props regarding missing data
+        // (e.g. title, description) when validation is done
         isDataMissing={isDataMissing}
       />
       {isDataMissing && <DataMissingInfoBox />}
@@ -65,6 +69,7 @@ export const GovernanceActionDetailsCardData = ({
         label={t("govActions.governanceActionType")}
         text={type}
         textVariant="pill"
+        dataTestId={`${getProposalTypeNoEmptySpaces(type)}-type`}
       />
       <GovernanceActionsDatesBox
         createdDate={createdDate}
@@ -98,22 +103,27 @@ export const GovernanceActionDetailsCardData = ({
         label={t("govActions.governanceActionId")}
         text={govActionId}
         isCopyButton
+        dataTestId={`${govActionId}-id`}
       />
       <GovernanceActionCardElement
         label={t("govActions.about")}
         text={mockedLongDescription}
         textVariant="longText"
+        dataTestId="about"
       />
       <GovernanceActionCardElement
         label={t("govActions.motivation")}
         text={mockedLongDescription}
         textVariant="longText"
+        dataTestId="motivation"
       />
       <GovernanceActionCardElement
         label={t("govActions.rationale")}
         text={mockedLongDescription}
         textVariant="longText"
+        dataTestId="rationale"
       />
+      {/* TODO: To add option display of on-chain data when BE is ready */}
       <GovernanceActionDetailsCardOnChainData data={mockedOnChainData} />
       <GovernanceActionDetailsCardLinks />
     </Box>

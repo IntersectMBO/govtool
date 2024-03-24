@@ -47,12 +47,7 @@ const WheelControls = (slider: KeenSliderInstance) => {
   });
 };
 
-export const useSlider = ({
-  config,
-}: {
-  config: KeenSliderOptions;
-  sliderMaxLength: number;
-}) => {
+export const useSlider = ({ config }: { config: KeenSliderOptions }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const [sliderRef, instanceRef] = useKeenSlider(
@@ -66,9 +61,14 @@ export const useSlider = ({
     [WheelControls],
   );
 
+  const dataLength = instanceRef?.current?.slides?.length ?? 10;
+  const itemsPerView =
+    dataLength - (instanceRef?.current?.track?.details?.maxIdx ?? 2);
+
   return {
     sliderRef,
     instanceRef,
     currentSlide,
+    itemsPerView,
   };
 };

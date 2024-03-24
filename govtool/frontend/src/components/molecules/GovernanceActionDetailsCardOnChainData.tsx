@@ -16,7 +16,7 @@ export const GovernanceActionDetailsCardOnChainData = ({
   const { t } = useTranslation();
 
   return (
-    <Box mb="32px">
+    <Box mb="32px" data-testid="governance-action-on-chain-data">
       <Box
         sx={{
           display: "flex",
@@ -40,6 +40,7 @@ export const GovernanceActionDetailsCardOnChainData = ({
       </Box>
       {data.map(({ label, content }) => (
         <Box
+          key={label}
           sx={{
             display: "flex",
             alignItems: "center",
@@ -56,8 +57,7 @@ export const GovernanceActionDetailsCardOnChainData = ({
               textOverflow: "ellipsis",
             }}
           >
-            {label}
-            :
+            {label}:
           </Typography>
           <Typography
             sx={{

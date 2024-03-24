@@ -23,7 +23,8 @@ import { openInNewTab } from "@utils";
 import { Trans } from "react-i18next";
 import { ControlledField } from "../organisms";
 
-// TODO: Change into props when BE is ready
+// TODO: Decide with BE on how cast votes will be implemented
+// and adjust accordingly the component below (UI is ready).
 const castVoteDate = undefined;
 const castVoteChangeDeadline = "20.06.2024 (Epoch 445)";
 
@@ -99,27 +100,28 @@ export const VoteActionForm = ({
     [state],
   );
 
-  const renderChangeVoteButton = useMemo(() => (
-    <LoadingButton
-      data-testid="change-vote"
-      onClick={confirmVote}
-      disabled={
-        (!areFormErrors && voteFromEP === vote) ||
-        areFormErrors ||
-        (!isContext && voteFromEP === vote)
-      }
-      isLoading={isVoteLoading}
-      variant="contained"
-      sx={{
-        borderRadius: 50,
-        textTransform: 'none',
-        width: '100%',
-        height: 48,
-      }}
-    >
-      {t('govActions.changeVote')}
-    </LoadingButton>
-  ),
+  const renderChangeVoteButton = useMemo(
+    () => (
+      <LoadingButton
+        data-testid="change-vote"
+        onClick={confirmVote}
+        disabled={
+          (!areFormErrors && voteFromEP === vote) ||
+          areFormErrors ||
+          (!isContext && voteFromEP === vote)
+        }
+        isLoading={isVoteLoading}
+        variant="contained"
+        sx={{
+          borderRadius: 50,
+          textTransform: "none",
+          width: "100%",
+          height: 48,
+        }}
+      >
+        {t("govActions.changeVote")}
+      </LoadingButton>
+    ),
     [confirmVote, areFormErrors, vote, isVoteLoading],
   );
 
@@ -209,6 +211,7 @@ export const VoteActionForm = ({
             data-testid="show-votes-button"
             variant="text"
             size="large"
+            disabled={isInProgress}
             sx={{
               mt: "26px",
               fontSize: "14px",
@@ -230,6 +233,7 @@ export const VoteActionForm = ({
             {t("govActions.showVotes")}
           </Button>
         )}
+        {/* TODO: Change below into new voting context */}
         <Box
           alignItems="center"
           data-testid="context-button"
@@ -320,16 +324,16 @@ export const VoteActionForm = ({
         {t("govActions.selectDifferentOption")}
       </Typography>
       {(state?.vote && state?.vote !== vote) ||
-        (voteFromEP && voteFromEP !== vote) ? (
-          <Box
-            display="flex"
-            flexDirection={isMobile ? "column" : "row"}
-            justifyContent="space-between"
-          >
-            {isMobile ? renderChangeVoteButton : renderCancelButton}
-            <Box px={1} py={isMobile ? 1.5 : 0} />
-            {isMobile ? renderCancelButton : renderChangeVoteButton}
-          </Box>
+      (voteFromEP && voteFromEP !== vote) ? (
+        <Box
+          display="flex"
+          flexDirection={isMobile ? "column" : "row"}
+          justifyContent="space-between"
+        >
+          {isMobile ? renderChangeVoteButton : renderCancelButton}
+          <Box px={1} py={isMobile ? 1.5 : 0} />
+          {isMobile ? renderCancelButton : renderChangeVoteButton}
+        </Box>
       ) : (
         <LoadingButton
           data-testid="vote-button"

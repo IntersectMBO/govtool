@@ -5,6 +5,7 @@ import { Button } from "@atoms";
 import {
   GovernanceActionCardElement,
   GovernanceActionCardHeader,
+  GovernanceActionCardStatePill,
   GovernanceActionsDatesBox,
 } from "@molecules";
 
@@ -13,6 +14,7 @@ import {
   formatDisplayDate,
   getFullGovActionId,
   getProposalTypeLabel,
+  getProposalTypeNoEmptySpaces,
 } from "@utils";
 
 const mockedLongText =
@@ -31,17 +33,17 @@ interface ActionTypeProps
     | "txHash"
     | "index"
   > {
-  onClick?: () => void;
-  // inProgress?: boolean;
   txHash: string;
   index: number;
   isDataMissing: boolean;
+  onClick?: () => void;
+  inProgress?: boolean;
 }
 
 export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
   const {
     type,
-    // inProgress = false,
+    inProgress = false,
     expiryDate,
     onClick,
     createdDate,
@@ -53,10 +55,6 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
   const { t } = useTranslation();
 
   const govActionId = getFullGovActionId(txHash, index);
-  const proposalTypeNoEmptySpaces = getProposalTypeLabel(type).replace(
-    / /g,
-    "",
-  );
 
   return (
     <Box
@@ -75,16 +73,21 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
         ...(isDataMissing && {
           border: "1px solid #F6D5D5",
         }),
+        ...(inProgress && {
+          border: "1px solid #FFCBAD",
+        }),
       }}
-      data-testid={`govaction-${proposalTypeNoEmptySpaces}-card`}
+      data-testid={`govaction-${getProposalTypeNoEmptySpaces(type)}-card`}
     >
+      {inProgress && <GovernanceActionCardStatePill variant="inProgress" />}
       <Box
         sx={{
           padding: "40px 24px 0",
         }}
       >
         <GovernanceActionCardHeader
-          title={mockedLongText}
+          // TODO: Add real title from props when BE is ready
+          title="Fund our project"
           isDataMissing={isDataMissing}
         />
         <GovernanceActionCardElement
@@ -98,7 +101,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           label={t("govActions.governanceActionType")}
           text={getProposalTypeLabel(type)}
           textVariant="pill"
-          dataTestId={`${proposalTypeNoEmptySpaces}-type`}
+          dataTestId={`${getProposalTypeNoEmptySpaces(type)}-type`}
           isSliderCard
         />
         <GovernanceActionsDatesBox
@@ -125,7 +128,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
       >
         <Button
           onClick={onClick}
-          variant="contained"
+          variant={inProgress ? "outlined" : "contained"}
           size="large"
           sx={{
             width: "100%",

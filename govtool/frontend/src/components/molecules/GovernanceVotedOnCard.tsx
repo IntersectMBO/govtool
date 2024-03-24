@@ -9,6 +9,7 @@ import {
   formatDisplayDate,
   getFullGovActionId,
   getProposalTypeLabel,
+  getProposalTypeNoEmptySpaces,
 } from "@utils";
 import {
   GovernanceActionCardElement,
@@ -24,14 +25,12 @@ const mockedLongText =
 interface Props {
   votedProposal: VotedProposal;
   isDataMissing: boolean;
-  // searchPhrase?: string;
   inProgress?: boolean;
 }
 
 export const GovernanceVotedOnCard = ({
   votedProposal,
   isDataMissing,
-  // searchPhrase,
   inProgress,
 }: Props) => {
   const navigate = useNavigate();
@@ -39,11 +38,6 @@ export const GovernanceVotedOnCard = ({
 
   const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
-
-  const proposalTypeNoEmptySpaces = getProposalTypeLabel(proposal.type).replace(
-    / /g,
-    "",
-  );
 
   return (
     <Box
@@ -56,10 +50,19 @@ export const GovernanceVotedOnCard = ({
         justifyContent: "space-between",
         boxShadow: "0px 4px 15px 0px #DDE3F5",
         borderRadius: "20px",
-        backgroundColor: "rgba(255, 255, 255, 0.3)",
-        border: inProgress ? "1px solid #FFCBAD" : "1px solid #C0E4BA",
+        backgroundColor: isDataMissing
+          ? "rgba(251, 235, 235, 0.50)"
+          : "rgba(255, 255, 255, 0.3)",
+        // TODO: To decide if voted on cards can be actually in progress
+        border: inProgress
+          ? "1px solid #FFCBAD"
+          : isDataMissing
+          ? "1px solid #F6D5D5"
+          : "1px solid #C0E4BA",
       }}
-      data-testid={`govaction-${proposalTypeNoEmptySpaces}-card`}
+      data-testid={`govaction-${getProposalTypeNoEmptySpaces(
+        proposal.type,
+      )}-card`}
     >
       <GovernanceActionCardStatePill
         variant={inProgress ? "inProgress" : "voteSubmitted"}
@@ -70,7 +73,8 @@ export const GovernanceVotedOnCard = ({
         }}
       >
         <GovernanceActionCardHeader
-          title={mockedLongText}
+          // TODO: Add real title from props when BE is ready
+          title="Fund our project"
           isDataMissing={isDataMissing}
         />
         <GovernanceActionCardElement
@@ -84,7 +88,7 @@ export const GovernanceVotedOnCard = ({
           label={t("govActions.governanceActionType")}
           text={getProposalTypeLabel(proposal.type)}
           textVariant="pill"
-          dataTestId={`${proposalTypeNoEmptySpaces}-type`}
+          dataTestId={`${getProposalTypeNoEmptySpaces(proposal.type)}-type`}
           isSliderCard
         />
         <GovernanceActionsDatesBox

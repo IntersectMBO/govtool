@@ -2,16 +2,21 @@ import { KeenSliderHooks, KeenSliderInstance } from "keen-slider/react";
 import { SliderArrow } from "@atoms";
 import { Box } from "@mui/material";
 
-interface ArrowsProps {
+type SliderArrowsProps = {
   currentSlide: number;
   instanceRef: React.MutableRefObject<KeenSliderInstance<
     object,
     object,
     KeenSliderHooks
   > | null>;
-}
+  itemsPerView: number;
+};
 
-export const SliderArrows = ({ currentSlide, instanceRef }: ArrowsProps) => (
+export const SliderArrows = ({
+  currentSlide,
+  instanceRef,
+  itemsPerView,
+}: SliderArrowsProps) => (
   <>
     {instanceRef.current && (
       <Box
@@ -34,7 +39,8 @@ export const SliderArrows = ({ currentSlide, instanceRef }: ArrowsProps) => (
             instanceRef.current?.next();
           }}
           disabled={
-            currentSlide === instanceRef.current.track.details.slides.length - 1
+            currentSlide + itemsPerView >=
+            instanceRef.current.track.details.slides.length
           }
         />
       </Box>

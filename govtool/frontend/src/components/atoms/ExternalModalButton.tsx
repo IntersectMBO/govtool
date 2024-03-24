@@ -32,6 +32,7 @@ export const ExternalModalButton = ({
       }}
       disableRipple
       variant="text"
+      data-testid="external-modal-button"
     >
       <Typography variant="body1" fontWeight={500} color="primary">
         {label}

@@ -3,11 +3,12 @@ import { Box } from "@mui/material";
 import { IconLink, Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 
+// TODO: When BE is ready, pass links as props
 const LINKS = [
-  "https://www.google.com",
-  "https://www.google.com",
-  "https://www.google.com",
-  "https://www.google.com",
+  "https://docs.sanchogov.tools/support/get-help-in-discord",
+  "https://docs.sanchogov.tools/how-to-use-the-govtool/prerequsites",
+  "https://docs.sanchogov.tools/faqs",
+  "https://docs.sanchogov.tools/",
 ];
 
 export const GovernanceActionDetailsCardLinks = () => {
@@ -27,6 +28,7 @@ export const GovernanceActionDetailsCardLinks = () => {
           whiteSpace: "nowrap",
           mb: 2,
         }}
+        data-testid="supporting-links"
       >
         {t("govActions.supportingLinks")}
       </Typography>

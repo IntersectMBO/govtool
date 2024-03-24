@@ -26,6 +26,7 @@ export const ICONS = {
   guidesIcon: "/icons/Guides.svg",
   helpIcon: "/icons/Help.svg",
   link: "/icons/Link.svg",
+  separator: "/icons/Separator.svg",
   share: "/icons/Share.svg",
   sortActiveIcon: "/icons/SortActive.svg",
   sortIcon: "/icons/Sort.svg",

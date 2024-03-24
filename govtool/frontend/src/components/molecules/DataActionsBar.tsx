@@ -2,10 +2,9 @@ import { Dispatch, FC, SetStateAction } from "react";
 import { Box, InputBase } from "@mui/material";
 import Search from "@mui/icons-material/Search";
 
-import { GovernanceActionsFilters, GovernanceActionsSorting } from ".";
+import { GovernanceActionsFilters, GovernanceActionsSorting } from "@molecules";
 import { OrderActionsChip } from "./OrderActionsChip";
 import { ClickOutside } from "../atoms";
-
 import { theme } from "@/theme";
 
 type DataActionsBarProps = {

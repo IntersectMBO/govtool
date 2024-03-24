@@ -68,6 +68,7 @@ export const DashboardGovernanceActionsVotedOn = ({
                 navigateKey={item.title}
                 searchPhrase={searchPhrase}
                 dataLength={item.actions.slice(0, 6).length}
+                onDashboard
                 data={item.actions.map((action) => (
                   <div
                     className="keen-slider__slide"
@@ -76,7 +77,6 @@ export const DashboardGovernanceActionsVotedOn = ({
                   >
                     <GovernanceVotedOnCard
                       votedProposal={action}
-                      // searchPhrase={searchPhrase}
                       // TODO: Add data validation
                       isDataMissing={false}
                       inProgress={

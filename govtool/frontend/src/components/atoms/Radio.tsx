@@ -41,8 +41,17 @@ export const Radio = ({ ...props }: RadioProps) => {
       p={isChecked ? "2px" : 0}
       border={isChecked ? 2 : 0}
       borderColor={isChecked ? "specialCyanBorder" : undefined}
-      sx={[{ "&:hover": { color: "blue", cursor: "pointer" } }]}
-      boxShadow="0px 1px 2px 0px rgba(0, 51, 173, 0.08), 0px 1px 6px 1px rgba(0, 51, 173, 0.15)"
+      sx={[
+        {
+          boxShadow:
+            "0px 1px 2px 0px rgba(0, 51, 173, 0.08), 0px 1px 6px 1px rgba(0, 51, 173, 0.15)",
+
+          "&:hover": {
+            color: "blue",
+            cursor: disabled ? "default" : "pointer",
+          },
+        },
+      ]}
     >
       <input
         type="radio"

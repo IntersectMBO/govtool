@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { generatePath, useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 import { KeenSliderOptions } from "keen-slider";
@@ -10,8 +10,6 @@ import { Button, Typography } from "@atoms";
 import { SliderArrows } from "@molecules";
 import { PATHS } from "@consts";
 import { theme } from "@/theme";
-
-const SLIDER_MAX_LENGTH = 1000;
 
 type SliderProps = {
   title: string;
@@ -38,6 +36,8 @@ export const Slider = ({
   searchPhrase,
   sorting,
 }: SliderProps) => {
+  const [isSliderInitialized, setIsSliderInitialized] = useState(false);
+
   const { isMobile, screenWidth } = useScreenDimension();
   const navigate = useNavigate();
   const { pendingTransaction } = useCardano();
@@ -56,12 +56,15 @@ export const Slider = ({
     },
   } as KeenSliderOptions;
 
-  const isShowArrows =
-    screenWidth < 268 + 28 + dataLength * 350 + 20 * dataLength - 5;
+  const isShowArrows = useMemo(
+    () =>
+      screenWidth <
+      (onDashboard ? 268 : 40) + 28 + dataLength * 350 + 20 * dataLength - 5,
+    [screenWidth, dataLength],
+  );
 
-  const { sliderRef, instanceRef, currentSlide } = useSlider({
+  const { sliderRef, instanceRef, currentSlide, itemsPerView } = useSlider({
     config: DEFAULT_SLIDER_CONFIG,
-    sliderMaxLength: SLIDER_MAX_LENGTH,
   });
 
   const refresh = () => {
@@ -71,8 +74,20 @@ export const Slider = ({
   };
 
   useEffect(() => {
+    if (instanceRef.current) {
+      setIsSliderInitialized(true);
+    }
+  }, [instanceRef.current]);
+
+  useEffect(() => {
     refresh();
-  }, [filters, sorting, searchPhrase, pendingTransaction.vote?.resourceId, data]);
+  }, [
+    filters,
+    sorting,
+    searchPhrase,
+    pendingTransaction.vote?.resourceId,
+    data,
+  ]);
 
   return (
     <Box>
@@ -93,15 +108,7 @@ export const Slider = ({
             gap: 2,
           }}
         >
-          <Typography
-            sx={{
-              fontSize: 22,
-              fontWeight: 500,
-              lineHeight: "28px",
-            }}
-          >
-            {title}
-          </Typography>
+          <Typography variant="title2">{title}</Typography>
           {(notSlicedDataLength > 6 || (isMobile && isShowAll)) && (
             <Button
               variant="contained"
@@ -114,26 +121,32 @@ export const Slider = ({
                 minWidth: 93,
                 "&:hover": { backgroundColor: arcticWhite },
               }}
-              onClick={() =>
-                (onDashboard
-                  ? navigate(
-                      generatePath(PATHS.dashboardGovernanceActionsCategory, {
-                        category: navigateKey,
-                      }),
-                    )
-                  : navigate(
-                      generatePath(PATHS.governanceActionsCategory, {
-                        category: navigateKey,
-                      }),
-                    ))
-              }
+              onClick={() => {
+                if (onDashboard) {
+                  navigate(
+                    generatePath(PATHS.dashboardGovernanceActionsCategory, {
+                      category: navigateKey,
+                    }),
+                  );
+                } else {
+                  navigate(
+                    generatePath(PATHS.governanceActionsCategory, {
+                      category: navigateKey,
+                    }),
+                  );
+                }
+              }}
             >
               {t("slider.showAll")}
             </Button>
           )}
         </Box>
-        {isShowArrows && dataLength > 1 && !isMobile && (
-          <SliderArrows currentSlide={currentSlide} instanceRef={instanceRef} />
+        {isSliderInitialized && isShowArrows && dataLength > 1 && !isMobile && (
+          <SliderArrows
+            currentSlide={currentSlide}
+            instanceRef={instanceRef}
+            itemsPerView={itemsPerView}
+          />
         )}
       </Box>
       <div

@@ -14,6 +14,7 @@ export const GovernanceActionCardStatePill = ({
   return (
     <Box
       sx={{
+        // TODO: To decide on final state pill design
         position: "absolute",
         top: -15,
         right: 30,

@@ -3,13 +3,13 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 import { theme } from "@/theme";
 
-interface Props {
+interface SliderArrowProps {
   disabled: boolean;
   onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   left?: boolean;
 }
 
-export const SliderArrow = ({ disabled, onClick, left }: Props) => {
+export const SliderArrow = ({ disabled, onClick, left }: SliderArrowProps) => {
   const {
     palette: { primaryBlue, arcticWhite, lightBlue },
   } = theme;
@@ -27,6 +27,11 @@ export const SliderArrow = ({ disabled, onClick, left }: Props) => {
         justifyContent: "center",
         alignItems: "center",
         cursor: "pointer",
+        transition: "0.3s",
+
+        "&:hover": {
+          boxShadow: disabled ? 0 : 2,
+        },
       }}
     >
       <ChevronRightIcon

@@ -1,6 +1,8 @@
 import { Dispatch, SetStateAction } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 
+import { useTranslation } from "@hooks";
+import { Typography } from "@atoms";
 import { ICONS } from "@consts";
 import { theme } from "@/theme";
 
@@ -15,9 +17,12 @@ interface Props {
 }
 
 export const OrderActionsChip = (props: Props) => {
+  const { t } = useTranslation();
+
   const {
     palette: { secondary },
   } = theme;
+
   const {
     filtersOpen,
     setFiltersOpen = () => {},
@@ -31,21 +36,28 @@ export const OrderActionsChip = (props: Props) => {
   return (
     <Box display="flex" width="min-content" alignItems="center" ml="8px">
       {isFiltering && (
-        <Box position="relative">
+        <Box
+          sx={{
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+          }}
+          onClick={() => {
+            setSortOpen(false);
+            if (isFiltering) {
+              setFiltersOpen(!filtersOpen);
+            }
+          }}
+          data-testid="filters-button"
+        >
           <img
-            data-testid="filters-button"
             alt="filter"
-            onClick={() => {
-              setSortOpen(false);
-              if (isFiltering) {
-                setFiltersOpen(!filtersOpen);
-              }
-            }}
             src={filtersOpen ? ICONS.filterWhiteIcon : ICONS.filterIcon}
             style={{
               background: filtersOpen ? secondary.main : "transparent",
               borderRadius: "100%",
-              cursor: "pointer",
               padding: "14px",
               overflow: "visible",
               height: 20,
@@ -53,6 +65,15 @@ export const OrderActionsChip = (props: Props) => {
               objectFit: "contain",
             }}
           />
+          <Typography
+            variant="body1"
+            sx={{
+              color: "primaryBlue",
+              fontWeight: 500,
+            }}
+          >
+            {t("filter")}
+          </Typography>
           {!filtersOpen && chosenFiltersLength > 0 && (
             <Box
               sx={{
@@ -65,7 +86,7 @@ export const OrderActionsChip = (props: Props) => {
                 height: "16px",
                 justifyContent: "center",
                 position: "absolute",
-                right: "0",
+                left: "32px",
                 top: "0",
                 width: "16px",
               }}
@@ -77,27 +98,43 @@ export const OrderActionsChip = (props: Props) => {
           )}
         </Box>
       )}
-      <Box position="relative">
+      <Box
+        sx={{
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+        }}
+        onClick={() => {
+          if (isFiltering) {
+            setFiltersOpen(false);
+          }
+          setSortOpen(!sortOpen);
+        }}
+        data-testid="sort-button"
+      >
         <img
           alt="sort"
-          data-testid="sort-button"
-          onClick={() => {
-            if (isFiltering) {
-              setFiltersOpen(false);
-            }
-            setSortOpen(!sortOpen);
-          }}
           src={sortOpen ? ICONS.sortWhiteIcon : ICONS.sortIcon}
           style={{
             background: sortOpen ? secondary.main : "transparent",
             borderRadius: "100%",
-            cursor: "pointer",
             padding: "14px",
             height: 24,
             width: 24,
             objectFit: "contain",
           }}
         />
+        <Typography
+          variant="body1"
+          sx={{
+            color: "primaryBlue",
+            fontWeight: 500,
+          }}
+        >
+          {t("sort")}
+        </Typography>
         {!sortOpen && sortingActive && (
           <Box
             sx={{
@@ -110,7 +147,7 @@ export const OrderActionsChip = (props: Props) => {
               height: "16px",
               justifyContent: "center",
               position: "absolute",
-              right: "0",
+              left: "36px",
               top: "0",
               width: "16px",
             }}

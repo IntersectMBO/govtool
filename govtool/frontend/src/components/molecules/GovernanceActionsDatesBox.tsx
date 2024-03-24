@@ -50,6 +50,7 @@ export const GovernanceActionsDatesBox = ({
             fontSize: isFontSizeSmaller ? 11 : 12,
             fontWeight: 300,
           }}
+          data-testid="submission-date"
         >
           <Trans
             i18nKey="govActions.submittedDateWithEpoch"
@@ -92,6 +93,7 @@ export const GovernanceActionsDatesBox = ({
             fontSize: isFontSizeSmaller ? 11 : 12,
             fontWeight: 300,
           }}
+          data-testid="expiry-date"
         >
           <Trans
             i18nKey="govActions.expiresDateWithEpoch"

@@ -4,9 +4,6 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { Tooltip, Typography } from "@atoms";
 import { useTranslation } from "@hooks";
 
-const mockedLongText =
-  "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sit, distinctio culpa minus eaque illo quidem voluptates quisquam mollitia consequuntur ex, sequi saepe? Ad ex adipisci molestiae sed.";
-
 type GovernanceActionCardHeaderProps = {
   title: string;
   isDataMissing: boolean;
@@ -25,6 +22,7 @@ export const GovernanceActionCardHeader = ({
         alignItems: "center",
         mb: "20px",
       }}
+      data-testid="governance-action-card-header"
     >
       <Typography
         sx={{
@@ -43,8 +41,8 @@ export const GovernanceActionCardHeader = ({
       </Typography>
       {isDataMissing && (
         <Tooltip
-          heading="Data Missing"
-          paragraphOne={mockedLongText}
+          heading={t("govActions.dataMissing")}
+          paragraphOne={t("govActions.dataMissingTooltipExplanation")}
           placement="bottom-end"
           arrow
         >

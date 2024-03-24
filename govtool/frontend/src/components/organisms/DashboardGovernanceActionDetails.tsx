@@ -1,17 +1,10 @@
 import {
   useNavigate,
   useLocation,
-  NavLink,
   useParams,
   generatePath,
 } from "react-router-dom";
-import {
-  Box,
-  Breadcrumbs,
-  CircularProgress,
-  Link,
-  Typography,
-} from "@mui/material";
+import { Box, CircularProgress, Link, Typography } from "@mui/material";
 
 import { ICONS, PATHS } from "@consts";
 import {
@@ -26,14 +19,18 @@ import {
   getProposalTypeLabel,
 } from "@utils";
 import { GovernanceActionDetailsCard } from "@organisms";
+import { Breadcrumbs } from "@molecules";
 import { useCardano } from "@/context";
+
+// TODO: Remove when data validation is ready
+const isDataMissing = false;
 
 export const DashboardGovernanceActionDetails = () => {
   const { voter } = useGetVoterInfo();
   const { pendingTransaction } = useCardano();
   const { state, hash } = useLocation();
   const navigate = useNavigate();
-  const { isMobile, screenWidth } = useScreenDimension();
+  const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
   const { proposalId } = useParams();
   const fullProposalId = proposalId + hash;
@@ -45,21 +42,6 @@ export const DashboardGovernanceActionDetails = () => {
     state ? state.index : data?.proposal.index ?? "",
   );
 
-  const breadcrumbs = [
-    <NavLink
-      key="1"
-      to={PATHS.dashboardGovernanceActions}
-      style={{ textDecorationColor: "#0033AD" }}
-    >
-      <Typography color="primary" fontWeight={300} fontSize={12}>
-        {t("govActions.title")}
-      </Typography>
-    </NavLink>,
-    <Typography fontSize={12} fontWeight={500} key="2">
-      {t("govActions.voteOnGovActions")}
-    </Typography>,
-  ];
-
   return (
     <Box
       px={isMobile ? 2 : 4}
@@ -70,15 +52,11 @@ export const DashboardGovernanceActionDetails = () => {
       flex={1}
     >
       <Breadcrumbs
-        separator="|"
-        aria-label="breadcrumb"
-        sx={{
-          marginTop: screenWidth < 1024 ? 2.5 : 0,
-          marginBottom: "24px",
-        }}
-      >
-        {breadcrumbs}
-      </Breadcrumbs>
+        elementOne={t("govActions.title")}
+        elementOnePath={PATHS.dashboardGovernanceActions}
+        elementTwo="Fund our project"
+        isDataMissing={false}
+      />
       <Link
         data-testid="back-to-list-link"
         sx={{
@@ -107,7 +85,7 @@ export const DashboardGovernanceActionDetails = () => {
           style={{ marginRight: "12px", transform: "rotate(180deg)" }}
         />
         <Typography variant="body2" color="primary">
-          {t("backToList")}
+          {t("back")}
         </Typography>
       </Link>
       <Box display="flex" justifyContent="center">
@@ -130,6 +108,8 @@ export const DashboardGovernanceActionDetails = () => {
                 ? formatDisplayDate(state.createdDate)
                 : formatDisplayDate(data.proposal.createdDate)
             }
+            // TODO: Add data validation
+            isDataMissing={isDataMissing}
             // TODO: To decide if we want to keep it when metadate BE is ready
             // details={state ? state.details : data.proposal.details}
             expiryDate={

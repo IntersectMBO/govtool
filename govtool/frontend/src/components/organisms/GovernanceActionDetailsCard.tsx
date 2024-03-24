@@ -17,6 +17,7 @@ type GovernanceActionDetailsCardProps = {
   // url: string;
   yesVotes: number;
   govActionId: string;
+  isDataMissing: boolean;
   isDashboard?: boolean;
   isVoter?: boolean;
   voteFromEP?: string;
@@ -37,12 +38,10 @@ export const GovernanceActionDetailsCard = ({
   voteFromEP,
   govActionId,
   isInProgress,
+  isDataMissing,
 }: GovernanceActionDetailsCardProps) => {
   const [isVoteSubmitted, setIsVoteSubmitted] = useState<boolean>(false);
   const { screenWidth, isMobile } = useScreenDimension();
-
-  // TODO: Add as a prop when BE is ready
-  const isDataMissing = false;
 
   const isOneColumn = (isDashboard && screenWidth < 1036) ?? isMobile;
 
@@ -57,9 +56,12 @@ export const GovernanceActionDetailsCard = ({
         position: "relative",
         boxShadow: isInProgress
           ? "2px 2px 20px 0px rgba(245, 90, 0, 0.20)"
-          : isVoteSubmitted
+          : isVoteSubmitted && !isDataMissing
           ? "2px 2px 20px 0px rgba(98, 188, 82, 0.20)"
           : "2px 2px 20px 0px rgba(47, 98, 220, 0.20)",
+        ...(isDataMissing && {
+          border: "1px solid #F6D5D5",
+        }),
       }}
       data-testid="governance-action-details-card"
     >

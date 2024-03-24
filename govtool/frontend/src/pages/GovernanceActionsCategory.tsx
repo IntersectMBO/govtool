@@ -1,12 +1,6 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
-import { NavLink, useNavigate, useParams } from "react-router-dom";
-import {
-  Box,
-  Breadcrumbs,
-  CircularProgress,
-  Divider,
-  Link,
-} from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import { Box, CircularProgress, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
@@ -65,21 +59,6 @@ export const GovernanceActionsCategory = () => {
     isProposalsFetching,
   );
 
-  const breadcrumbs = [
-    <NavLink
-      key="1"
-      to={PATHS.dashboardGovernanceActions}
-      style={{ textDecorationColor: "#0033AD" }}
-    >
-      <Typography color="primary" fontWeight={300} variant="caption">
-        {t("govActions.title")}
-      </Typography>
-    </NavLink>,
-    <Typography fontWeight={500} key="2" variant="caption">
-      {getProposalTypeLabel(category ?? "")}
-    </Typography>,
-  ];
-
   const mappedData = useMemo(() => {
     const uniqueProposals = removeDuplicatedProposals(proposals);
 
@@ -116,32 +95,7 @@ export const GovernanceActionsCategory = () => {
       >
         <TopNav />
         <Box flex={1} mt={isMobile ? 3.25 : 6.25} overflow="hidden">
-          <Typography
-            sx={{ mb: isMobile ? 3.75 : 6, px: pagePadding }}
-            variant={isMobile ? "title1" : "headline3"}
-          >
-            {t("govActions.title")}
-          </Typography>
-          {isMobile && (
-            <Divider
-              style={{
-                borderColor: "#FFFFFF",
-                borderWidth: 1,
-                marginBottom: 30,
-              }}
-            />
-          )}
           <Box px={pagePadding} flex={1}>
-            <Breadcrumbs
-              separator="|"
-              aria-label="breadcrumb"
-              sx={{
-                marginTop: screenWidth < 1024 ? 2.5 : 0,
-                marginBottom: 5,
-              }}
-            >
-              {breadcrumbs}
-            </Breadcrumbs>
             <Link
               data-testid="back-to-list-link"
               sx={{
@@ -157,8 +111,8 @@ export const GovernanceActionsCategory = () => {
                 alt="arrow"
                 style={{ marginRight: "12px", transform: "rotate(180deg)" }}
               />
-              <Typography color="primary" fontWeight={400} variant="body2">
-                {t("backToList")}
+              <Typography variant="body2" color="primary" fontWeight={400}>
+                {t("govActions.backToGovActions")}
               </Typography>
             </Link>
             <DataActionsBar
@@ -172,7 +126,14 @@ export const GovernanceActionsCategory = () => {
               closeSorts={closeSorts}
               setChosenSorting={setChosenSorting}
             />
-            <Box height={isMobile ? 60 : 80} />
+            <Typography
+              variant="title2"
+              sx={{
+                m: "32px 0 32px",
+              }}
+            >
+              {getProposalTypeLabel(category ?? "")}
+            </Typography>
             {!isProposalsLoading ? (
               !mappedData?.length ? (
                 <Typography fontWeight={300} sx={{ py: 4 }}>
@@ -202,14 +163,10 @@ export const GovernanceActionsCategory = () => {
                 </Typography>
               ) : (
                 <Box
-                  columnGap={4}
+                  columnGap="20px"
                   display="grid"
                   gridTemplateColumns={`repeat(auto-fit, minmax(${
-                    screenWidth < 375
-                      ? "255px"
-                      : screenWidth < 768
-                      ? "294px"
-                      : "402px"
+                    screenWidth < 420 ? "290px" : isMobile ? "324px" : "350px"
                   }, 1fr))`}
                 >
                   {mappedData.map((item) => (

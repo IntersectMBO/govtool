@@ -164,7 +164,7 @@ export const DashboardGovernanceActions = () => {
                 />
                 <StyledTab
                   data-testid="voted-tab"
-                  label={t("govActions.voted")}
+                  label={t("govActions.votedOnByMe")}
                   sx={{
                     textTransform: "none",
                     width: !isMobile ? "auto" : "50%",

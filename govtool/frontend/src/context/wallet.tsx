@@ -4,7 +4,7 @@ import {
   useContext,
   useMemo,
   useState,
-} from 'react';
+} from "react";
 import {
   Address,
   BigNum,
@@ -40,16 +40,16 @@ import {
   GovernanceAction,
   TreasuryWithdrawals,
   TreasuryWithdrawalsAction,
-} from '@emurgo/cardano-serialization-lib-asmjs';
-import { Buffer } from 'buffer';
-import { useNavigate } from 'react-router-dom';
-import { Link } from '@mui/material';
-import * as Sentry from '@sentry/react';
-import { Trans } from 'react-i18next';
+} from "@emurgo/cardano-serialization-lib-asmjs";
+import { Buffer } from "buffer";
+import { useNavigate } from "react-router-dom";
+import { Link } from "@mui/material";
+import * as Sentry from "@sentry/react";
+import { Trans } from "react-i18next";
 
-import { PATHS } from '@consts';
-import { CardanoApiWallet, Protocol } from '@models';
-import type { StatusModalState } from '@organisms';
+import { PATHS } from "@consts";
+import { CardanoApiWallet, Protocol } from "@models";
+import type { StatusModalState } from "@organisms";
 import {
   checkIsMaintenanceOn,
   generateAnchor,
@@ -61,17 +61,17 @@ import {
   SANCHO_INFO_KEY,
   setItemToLocalStorage,
   WALLET_LS_KEY,
-} from '@utils';
-import { getEpochParams } from '@services';
-import { useTranslation } from '@hooks';
-import { getUtxos } from './getUtxos';
-import { useModal, useSnackbar } from '.';
+} from "@utils";
+import { getEpochParams } from "@services";
+import { useTranslation } from "@hooks";
+import { getUtxos } from "./getUtxos";
+import { useModal, useSnackbar } from ".";
 import {
   PendingTransaction,
   TransactionStateWithResource,
   TransactionStateWithoutResource,
   usePendingTransaction,
-} from './pendingTransaction';
+} from "./pendingTransaction";
 
 interface Props {
   children: React.ReactNode;
@@ -178,9 +178,9 @@ const CardanoProvider = (props: Props) => {
     undefined,
   );
   const [address, setAddress] = useState<string | undefined>(undefined);
-  const [pubDRepKey, setPubDRepKey] = useState<string>('');
-  const [dRepID, setDRepID] = useState<string>('');
-  const [dRepIDBech32, setDRepIDBech32] = useState<string>('');
+  const [pubDRepKey, setPubDRepKey] = useState<string>("");
+  const [dRepID, setDRepID] = useState<string>("");
+  const [dRepIDBech32, setDRepIDBech32] = useState<string>("");
   const [stakeKey, setStakeKey] = useState<string | undefined>(undefined);
   const [stakeKeys, setStakeKeys] = useState<string[]>([]);
   const [isMainnet, setIsMainnet] = useState<boolean>(false);
@@ -204,7 +204,7 @@ const CardanoProvider = (props: Props) => {
     try {
       const raw = await enabledApi.getChangeAddress();
       const changeAddress = Address.from_bytes(
-        Buffer.from(raw, 'hex'),
+        Buffer.from(raw, "hex"),
       ).to_bech32();
       setWalletState((prev) => ({ ...prev, changeAddress }));
     } catch (err) {
@@ -218,7 +218,7 @@ const CardanoProvider = (props: Props) => {
       const raw = await enabledApi.getUsedAddresses();
       const rawFirst = raw[0];
       const usedAddress = Address.from_bytes(
-        Buffer.from(rawFirst, 'hex'),
+        Buffer.from(rawFirst, "hex"),
       ).to_bech32();
       setWalletState((prev) => ({ ...prev, usedAddress }));
     } catch (err) {
@@ -237,13 +237,13 @@ const CardanoProvider = (props: Props) => {
         try {
           // Check that this wallet supports CIP-95 connection
           if (!window.cardano[walletName].supportedExtensions) {
-            throw new Error(t('errors.walletNoCIP30Support'));
+            throw new Error(t("errors.walletNoCIP30Support"));
           } else if (
             !window.cardano[walletName].supportedExtensions.some(
               (item) => item.cip === 95,
             )
           ) {
-            throw new Error(t('errors.walletNoCIP30Nor90Support'));
+            throw new Error(t("errors.walletNoCIP30Nor90Support"));
           }
           // Enable wallet connection
           const enabledApi: CardanoApiWallet = await window.cardano[walletName]
@@ -261,7 +261,7 @@ const CardanoProvider = (props: Props) => {
           // Check if wallet has enabled the CIP-95 extension
           const enabledExtensions = await enabledApi.getExtensions();
           if (!enabledExtensions.some((item) => item.cip === 95)) {
-            throw new Error(t('errors.walletNoCIP90FunctionsEnabled'));
+            throw new Error(t("errors.walletNoCIP90FunctionsEnabled"));
           }
           const network = await enabledApi.getNetworkId();
           if (network !== NETWORK) {
@@ -277,7 +277,7 @@ const CardanoProvider = (props: Props) => {
           const usedAddresses = await enabledApi.getUsedAddresses();
           const unusedAddresses = await enabledApi.getUnusedAddresses();
           if (!usedAddresses.length && !unusedAddresses.length) {
-            throw new Error(t('errors.noAddressesFound'));
+            throw new Error(t("errors.noAddressesFound"));
           }
           if (!usedAddresses.length) {
             setAddress(unusedAddresses[0]);
@@ -341,22 +341,22 @@ const CardanoProvider = (props: Props) => {
             stakeKeySet = true;
           }
           const dRepIDs = await getPubDRepID(enabledApi);
-          setPubDRepKey(dRepIDs?.dRepKey || '');
-          setDRepID(dRepIDs?.dRepID || '');
-          setDRepIDBech32(dRepIDs?.dRepIDBech32 || '');
+          setPubDRepKey(dRepIDs?.dRepKey || "");
+          setDRepID(dRepIDs?.dRepID || "");
+          setDRepIDBech32(dRepIDs?.dRepIDBech32 || "");
           setItemToLocalStorage(`${WALLET_LS_KEY}_name`, walletName);
 
           const protocol = await getEpochParams();
           setItemToLocalStorage(PROTOCOL_PARAMS_KEY, protocol);
 
-          return { status: t('ok'), stakeKey: stakeKeySet };
+          return { status: t("ok"), stakeKey: stakeKeySet };
         } catch (e) {
           Sentry.captureException(e);
           console.error(e);
           setError(`${e}`);
           setAddress(undefined);
           setWalletApi(undefined);
-          setPubDRepKey('');
+          setPubDRepKey("");
           setStakeKey(undefined);
           setIsEnabled(false);
           // eslint-disable-next-line no-throw-literal
@@ -439,7 +439,7 @@ const CardanoProvider = (props: Props) => {
         const txBuilder = await initTransactionBuilder();
 
         if (!txBuilder) {
-          throw new Error(t('errors.appCannotCreateTransaction'));
+          throw new Error(t("errors.appCannotCreateTransaction"));
         }
 
         if (certBuilder) {
@@ -468,10 +468,10 @@ const CardanoProvider = (props: Props) => {
         );
 
         // Add output of 1 ADA to the address of our wallet
-        let outputValue = BigNum.from_str('1000000');
+        let outputValue = BigNum.from_str("1000000");
 
         if (
-          (type === 'retireAsDrep' || type === 'retireAsSoleVoter') &&
+          (type === "retireAsDrep" || type === "retireAsSoleVoter") &&
           voterDeposit
         ) {
           outputValue = outputValue.checked_add(BigNum.from_str(voterDeposit));
@@ -484,7 +484,7 @@ const CardanoProvider = (props: Props) => {
         const utxos = await getUtxos(walletApi);
 
         if (!utxos) {
-          throw new Error(t('errors.appCannotGetUtxos'));
+          throw new Error(t("errors.appCannotGetUtxos"));
         }
         // Find the available UTXOs in the wallet and use them as Inputs for the transaction
         const txUnspentOutputs = await getTxUnspentOutputs(utxos);
@@ -511,11 +511,11 @@ const CardanoProvider = (props: Props) => {
 
         // Create witness set object using the witnesses provided by the wallet
         txVkeyWitnesses = TransactionWitnessSet.from_bytes(
-          Buffer.from(txVkeyWitnesses, 'hex'),
+          Buffer.from(txVkeyWitnesses, "hex"),
         );
         const vkeys = txVkeyWitnesses.vkeys();
 
-        if (!vkeys) throw new Error(t('errors.appCannotGetVkeys'));
+        if (!vkeys) throw new Error(t("errors.appCannotGetVkeys"));
 
         transactionWitnessSet.set_vkeys(vkeys);
         // Build transaction with witnesses
@@ -546,7 +546,7 @@ const CardanoProvider = (props: Props) => {
         }
 
         Sentry.captureException(error);
-        console.error(error, 'error');
+        console.error(error, "error");
         throw error?.info ?? error;
       }
     },
@@ -560,7 +560,7 @@ const CardanoProvider = (props: Props) => {
         const certBuilder = CertificatesBuilder.new();
         let stakeCred;
         if (!stakeKey) {
-          throw new Error(t('errors.noStakeKeySelected'));
+          throw new Error(t("errors.noStakeKeySelected"));
         }
         // Remove network tag from stake key hash
         const stakeKeyHash = Ed25519KeyHash.from_hex(stakeKey.substring(2));
@@ -575,11 +575,11 @@ const CardanoProvider = (props: Props) => {
 
         // Create correct DRep
         let targetDRep;
-        if (target === 'abstain') {
+        if (target === "abstain") {
           targetDRep = DRep.new_always_abstain();
-        } else if (target === 'no confidence') {
+        } else if (target === "no confidence") {
           targetDRep = DRep.new_always_no_confidence();
-        } else if (target.includes('drep')) {
+        } else if (target.includes("drep")) {
           targetDRep = DRep.new_key_hash(Ed25519KeyHash.from_bech32(target));
         } else {
           targetDRep = DRep.new_key_hash(Ed25519KeyHash.from_hex(target));
@@ -725,9 +725,9 @@ const CardanoProvider = (props: Props) => {
         );
 
         let votingChoice;
-        if (voteChoice === 'yes') {
+        if (voteChoice === "yes") {
           votingChoice = 1;
-        } else if (voteChoice === 'no') {
+        } else if (voteChoice === "no") {
           votingChoice = 0;
         } else {
           votingChoice = 2;
@@ -761,11 +761,11 @@ const CardanoProvider = (props: Props) => {
   const getRewardAddress = useCallback(async () => {
     const addresses = await walletApi?.getRewardAddresses();
     if (!addresses) {
-      throw new Error('Can not get reward addresses from wallet.');
+      throw new Error("Can not get reward addresses from wallet.");
     }
     const firstAddress = addresses[0];
     const bech32Address = Address.from_bytes(
-      Buffer.from(firstAddress, 'hex'),
+      Buffer.from(firstAddress, "hex"),
     ).to_bech32();
 
     return RewardAddress.from_address(Address.from_bech32(bech32Address));
@@ -783,7 +783,7 @@ const CardanoProvider = (props: Props) => {
         const anchor = generateAnchor(url, hash);
 
         const rewardAddr = await getRewardAddress();
-        if (!rewardAddr) throw new Error('Can not get reward address');
+        if (!rewardAddr) throw new Error("Can not get reward address");
 
         // Create voting proposal
         const votingProposal = VotingProposal.new(
@@ -811,7 +811,7 @@ const CardanoProvider = (props: Props) => {
           Address.from_bech32(receivingAddress),
         );
 
-        if (!treasuryTarget) throw new Error('Can not get tresasury target');
+        if (!treasuryTarget) throw new Error("Can not get tresasury target");
 
         const myWithdrawal = BigNum.from_str(amount);
         const withdrawals = TreasuryWithdrawals.new();
@@ -825,7 +825,7 @@ const CardanoProvider = (props: Props) => {
 
         const rewardAddr = await getRewardAddress();
 
-        if (!rewardAddr) throw new Error('Can not get reward address');
+        if (!rewardAddr) throw new Error("Can not get reward address");
         // Create voting proposal
         const votingProposal = VotingProposal.new(
           treasuryGovAct,
@@ -909,7 +909,7 @@ function useCardano() {
   const { t } = useTranslation();
 
   if (context === undefined) {
-    throw new Error(t('errors.useCardano'));
+    throw new Error(t("errors.useCardano"));
   }
 
   const enable = useCallback(
@@ -922,22 +922,22 @@ function useCardano() {
         if (!result.error) {
           closeModal();
           if (result.stakeKey) {
-            addSuccessAlert(t('alerts.walletConnected'), 3000);
+            addSuccessAlert(t("alerts.walletConnected"), 3000);
           }
           if (!isSanchoInfoShown) {
             openModal({
-              type: 'statusModal',
+              type: "statusModal",
               state: {
-                status: 'info',
-                dataTestId: 'info-about-sancho-net-modal',
+                status: "info",
+                dataTestId: "info-about-sancho-net-modal",
                 message: (
                   <p style={{ margin: 0 }}>
-                    {t('system.sanchoNetIsBeta')}
+                    {t("system.sanchoNetIsBeta")}
                     <Link
-                      onClick={() => openInNewTab('https://sancho.network/')}
-                      sx={{ cursor: 'pointer' }}
+                      onClick={() => openInNewTab("https://sancho.network/")}
+                      sx={{ cursor: "pointer" }}
                     >
-                      {t('system.sanchoNet')}
+                      {t("system.sanchoNet")}
                     </Link>
                     .
                     <br />
@@ -950,8 +950,8 @@ function useCardano() {
                     />
                   </p>
                 ),
-                title: t('system.toolConnectedToSanchonet'),
-                buttonText: t('ok'),
+                title: t("system.toolConnectedToSanchonet"),
+                buttonText: t("ok"),
               },
             });
             setItemToLocalStorage(`${SANCHO_INFO_KEY}_${walletName}`, true);
@@ -965,15 +965,15 @@ function useCardano() {
         await context.disconnectWallet();
         navigate(PATHS.home);
         openModal({
-          type: 'statusModal',
+          type: "statusModal",
           state: {
-            status: 'warning',
-            message: e?.error?.replace('Error: ', ''),
+            status: "warning",
+            message: e?.error?.replace("Error: ", ""),
             onSubmit: () => {
               closeModal();
             },
-            title: t('modals.common.oops'),
-            dataTestId: 'wallet-connection-error-modal',
+            title: t("modals.common.oops"),
+            dataTestId: "wallet-connection-error-modal",
           },
         });
         throw e;

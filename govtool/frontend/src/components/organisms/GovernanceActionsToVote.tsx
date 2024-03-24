@@ -1,4 +1,3 @@
-/* eslint-disable no-unsafe-optional-chaining */
 import { useNavigate, generatePath } from "react-router-dom";
 import { Box } from "@mui/material";
 
@@ -9,13 +8,6 @@ import { useScreenDimension, useTranslation } from "@hooks";
 import { GovernanceActionCard } from "@molecules";
 import { getProposalTypeLabel, getFullGovActionId, openInNewTab } from "@utils";
 import { Slider } from "@organisms";
-
-type GroupedActions = {
-  [key: string]: {
-    title: string;
-    actions: ActionType[];
-  };
-};
 
 type GovernanceActionsToVoteProps = {
   filters: string[];
@@ -61,11 +53,11 @@ export const GovernanceActionsToVote = ({
                       {...action}
                       txHash={action.txHash}
                       index={action.index}
-                      // inProgress={
-                      //   onDashboard &&
-                      //   pendingTransaction.vote?.resourceId ===
-                      //     action?.txHash + action?.index
-                      // }
+                      inProgress={
+                        onDashboard &&
+                        pendingTransaction.vote?.resourceId ===
+                          `${action.txHash ?? ""}${action.index ?? ""}`
+                      }
                       // TODO: Add data validation
                       isDataMissing={false}
                       onClick={() => {

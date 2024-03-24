@@ -26,6 +26,7 @@ module.exports = {
   },
   rules: {
     "array-callback-return": "off",
+    curly: "off",
     indent: "off",
     quotes: "off",
     semi: ["error", "always"],
@@ -33,6 +34,7 @@ module.exports = {
     "no-redeclare": "off",
     "no-undef": "off",
     "no-prototype-builtins": "off",
+    "nonblock-statement-body-position": "off",
 
     // TODO: This rule should be enabled in the future
     "no-param-reassign": "off",

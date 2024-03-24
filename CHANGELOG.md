@@ -25,6 +25,7 @@ changes.
 - Extend the eslint config to apply to the style guide of the project [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
 - Fix all the existing eslint errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
 - Fix all the existing typescript errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
+- Fix endless spinner on a dashboard [Issue 539](https://github.com/IntersectMBO/govtool/issues/539)
 
 ### Added
 

@@ -1,6 +1,5 @@
 // TODO: enable eslint and fix all the errors with wallet refactor
 /* eslint-disable */
-// @ts-nocheck
 import {
   createContext,
   useCallback,
@@ -71,7 +70,8 @@ import { getUtxos } from './getUtxos';
 import { useModal, useSnackbar } from '.';
 import {
   PendingTransaction,
-  TransactionType,
+  TransactionStateWithResource,
+  TransactionStateWithoutResource,
   usePendingTransaction,
 } from './pendingTransaction';
 
@@ -97,6 +97,16 @@ type TreasuryProps = {
   url: string;
 };
 
+type BuildSignSubmitConwayCertTxArgs = {
+  certBuilder?: CertificatesBuilder;
+  govActionBuilder?: VotingProposalBuilder;
+  votingBuilder?: VotingBuilder;
+  voterDeposit?: string;
+} & (
+  | Pick<TransactionStateWithoutResource, 'type' | 'resourceId'>
+  | Pick<TransactionStateWithResource, 'type' | 'resourceId'>
+  );
+
 interface CardanoContext {
   address?: string;
   disconnectWallet: () => Promise<void>;
@@ -119,23 +129,14 @@ interface CardanoContext {
     type,
     votingBuilder,
     voterDeposit,
-  }: {
-    certBuilder?: CertificatesBuilder;
-    govActionBuilder?: VotingProposalBuilder;
-    resourceId?: string;
-    type: TransactionType;
-    votingBuilder?: VotingBuilder;
-    voterDeposit?: string;
-  }) => Promise<string>;
+  }: BuildSignSubmitConwayCertTxArgs) => Promise<string>;
   buildDRepRegCert: (
     url?: string,
-    hash?: string,
     hash?: string,
   ) => Promise<CertificatesBuilder>;
   buildVoteDelegationCert: (vote: string) => Promise<CertificatesBuilder>;
   buildDRepUpdateCert: (
     url?: string,
-    hash?: string,
     hash?: string,
   ) => Promise<CertificatesBuilder>;
   buildDRepRetirementCert: (
@@ -146,7 +147,6 @@ interface CardanoContext {
     txHash: string,
     index: number,
     cip95MetadataURL?: string,
-    cip95MetadataHash?: string,
     cip95MetadataHash?: string,
   ) => Promise<VotingBuilder>;
   pendingTransaction: PendingTransaction;
@@ -186,7 +186,6 @@ const CardanoProvider = (props: Props) => {
   const [stakeKey, setStakeKey] = useState<string | undefined>(undefined);
   const [stakeKeys, setStakeKeys] = useState<string[]>([]);
   const [isMainnet, setIsMainnet] = useState<boolean>(false);
-  const { openModal, closeModal } = useModal<StatusModalState>();
   const [registeredStakeKeysListState, setRegisteredPubStakeKeysState] =
     useState<string[]>([]);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -201,7 +200,7 @@ const CardanoProvider = (props: Props) => {
   const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
   const { isPendingTransaction, updateTransaction, pendingTransaction } =
-    usePendingTransaction({ dRepID, isEnabled, stakeKey });
+    usePendingTransaction({ isEnabled, stakeKey });
 
   const getChangeAddress = async (enabledApi: CardanoApiWallet) => {
     try {
@@ -430,14 +429,7 @@ const CardanoProvider = (props: Props) => {
       type,
       votingBuilder,
       voterDeposit,
-    }: {
-      certBuilder?: CertificatesBuilder;
-      govActionBuilder?: VotingProposalBuilder;
-      resourceId?: string;
-      type: TransactionType;
-      votingBuilder?: VotingBuilder;
-      voterDeposit?: string;
-    }) => {
+    }: BuildSignSubmitConwayCertTxArgs) => {
       await checkIsMaintenanceOn();
       const isPendingTx = isPendingTransaction();
       if (isPendingTx) return;

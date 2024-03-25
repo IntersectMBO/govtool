@@ -15,14 +15,14 @@ export type TransactionType =
 export type TransactionStateWithoutResource = {
   type: TransactionTypeWithoutResource;
   transactionHash: string;
-  time: Date;
+  time: string;
   resourceId?: never;
 };
 
 export type TransactionStateWithResource = {
   type: TransactionTypeWithResource;
   transactionHash: string;
-  time: Date;
+  time: string;
   resourceId: string;
 };
 

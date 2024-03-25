@@ -20,7 +20,6 @@ const DB_SYNC_REFRESH_TIME = 3 * 1000; // 3 SECONDS
 const DB_SYNC_MAX_ATTEMPTS = 10;
 
 type UsePendingTransactionProps = {
-  dRepID: string;
   isEnabled: boolean;
   stakeKey: string | undefined;
 };
@@ -28,7 +27,6 @@ type UsePendingTransactionProps = {
 export const usePendingTransaction = ({
   isEnabled,
   stakeKey,
-  dRepID,
 }: UsePendingTransactionProps) => {
   const { t } = useTranslation();
   const { openModal, closeModal } = useModal<StatusModalState>();
@@ -57,11 +55,10 @@ export const usePendingTransaction = ({
       const fromLocalStorage = getItemFromLocalStorage(
         `${PENDING_TRANSACTION_KEY}_${stakeKey}`
       );
-      setTransaction(
-        fromLocalStorage
-          ? { ...fromLocalStorage, time: new Date(fromLocalStorage.time) }
-          : null
-      );
+      setTransaction({
+        ...fromLocalStorage,
+        resourceId: fromLocalStorage?.resourceId ?? undefined,
+      });
     }
   }, [isEnabled, stakeKey]);
 
@@ -84,9 +81,7 @@ export const usePendingTransaction = ({
         if (isEnabled) {
           const desiredResult = getDesiredResult(
             type,
-            dRepID,
             resourceId,
-            stakeKey
           );
           const queryKey = getQueryKey(type, transaction);
 
@@ -120,7 +115,7 @@ export const usePendingTransaction = ({
     if (isEnabled && transaction) {
       addWarningAlert(t("alerts.transactionInProgress"), 10000);
     }
-  }, [transaction]);
+  }, [isEnabled, transaction]);
 
   const isPendingTransaction = useCallback(() => {
     if (transaction) {
@@ -144,14 +139,17 @@ export const usePendingTransaction = ({
 
   const updateTransaction = (data: Omit<TransactionState, "time">) => {
     const newTransaction = {
-      time: new Date(),
+      time: new Date().toISOString(),
       ...data,
     } as TransactionState;
 
     setTransaction(newTransaction);
     setItemToLocalStorage(
       `${PENDING_TRANSACTION_KEY}_${stakeKey}`,
-      JSON.stringify(newTransaction)
+      {
+        ...newTransaction,
+        resourceId: newTransaction.resourceId || null,
+      }
     );
   };
 
@@ -162,5 +160,5 @@ export const usePendingTransaction = ({
   };
 };
 
-const isTransactionExpired = (time: Date): boolean =>
-  Date.now() - time.getTime() > TIME_TO_EXPIRE_TRANSACTION;
+const isTransactionExpired = (time: string): boolean =>
+  Date.now() - new Date(time).getTime() > TIME_TO_EXPIRE_TRANSACTION;

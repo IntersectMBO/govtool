@@ -11,7 +11,7 @@ export const useGetDRepVotesQuery = (filters: string[], sorting: string) => {
   const { data, isLoading, refetch, isRefetching } = useQuery({
     queryKey: [
       QUERY_KEYS.useGetDRepVotesKey,
-      pendingTransaction.vote,
+      pendingTransaction.vote?.transactionHash,
       filters,
       sorting,
     ],

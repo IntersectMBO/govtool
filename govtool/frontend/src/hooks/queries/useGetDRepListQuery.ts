@@ -10,10 +10,10 @@ export const useGetDRepListQuery = () => {
   const { data, isLoading } = useQuery({
     queryKey: [
       QUERY_KEYS.useGetDRepListKey,
-      pendingTransaction.registerAsSoleVoter ||
+      (pendingTransaction.registerAsSoleVoter ||
         pendingTransaction.registerAsDrep ||
         pendingTransaction.retireAsSoleVoter ||
-        pendingTransaction.retireAsDrep,
+        pendingTransaction.retireAsDrep)?.transactionHash,
     ],
     queryFn: getDRepList,
   });

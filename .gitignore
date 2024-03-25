@@ -120,6 +120,7 @@ local/
 
 # used by haskell
 govtool/backend/dist-newstyle/
+govtool/backend/.stack-work/
 
 # target environment config dir
 scripts/govtool/config/target

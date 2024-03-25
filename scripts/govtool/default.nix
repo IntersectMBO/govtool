@@ -7,7 +7,7 @@ pkgs.mkShell {
     tput bold
     warn "Welcome to GovTool!" 4
     warn "This is a deployment shell." 4
-    warn "Read the scripts/govtool/README.md to get more info about the deployment processes." 8
+    warn "Read the ${./README.md} to get more info about the deployment processes." 8
     case "''${ENVIRONMENT}" in
       "dev")
         warn "Your configuration is set to deploy to DEV environment, you are safe." 2

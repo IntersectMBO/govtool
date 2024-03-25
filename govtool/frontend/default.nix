@@ -15,7 +15,7 @@ project.overrideAttrs (attrs: {
     tput bold
     warn "Welcome to GovTool!" 4
     warn "This is a frontend development shell." 4
-    warn "Read the govtool/frontend/README.md to get more info about this module." 8
+    warn "Read the ${./README.md} to get more info about this module." 8
     rm -rf ./node_modules
     ln -s ${project.out}/libexec/voltaire-voting-app/node_modules ./node_modules
   '';

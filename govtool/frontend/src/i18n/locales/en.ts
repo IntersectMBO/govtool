@@ -243,6 +243,7 @@ export const en = {
     },
     errors: {
       appCannotCreateTransaction: "Application can not create transaction.",
+      appCannotGetDeposit: "Can not fetch deposit",
       appCannotGetUtxos: "Application can not get utxos",
       appCannotGetVkeys: "Application can not get vkey",
       checkIsWalletConnected: "Check if the wallet is connected.",
@@ -515,6 +516,13 @@ export const en = {
           url: "Invalid URL",
         },
       },
+    },
+    retirement: {
+      continue: "Continue to Retirement",
+      retireAsDrep: "Retire as a Drep",
+      whatRetirementMeansTitle: "What Retirement Means",
+      whatRetirementMeansDescription:
+        "By retiring you are giving up your voting rights. Voting Power that is delegated to you will remain in place.\n\nADA Holders that have delegated to be able to see that you are retired in the DRep directory. They will be able to re-delegate their Voting Power to another DRep.\n\nYou can still participate in Governance by proposing Governance Actions, by delegating your personal Voting Power to another DRep, or by coming out of retirement, and assuming your previous role as a DRep.\n\nIf you come out of retirement, your DRep ID will be the same as it was before retirement, and your Voting Power will consist of your own ADA balance and what delegated power that remains associated\nto your DRep ID.",
     },
     slider: {
       showAll: "Show All",

@@ -27,10 +27,10 @@ export const RetireAsSoleVoterBox = () => {
       const isPendingTx = isPendingTransaction();
       if (isPendingTx) return;
       if (!voter?.deposit) {
-        throw new Error("Can not fetch deposit");
+        throw new Error(t("errors.appCannotGetDeposit"));
       }
       const certBuilder = await buildDRepRetirementCert(
-        voter?.deposit?.toString()
+        voter?.deposit?.toString(),
       );
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,

@@ -4,6 +4,7 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import { Modal, ScrollToTop } from "@atoms";
 import { PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
+import { useWalletConnectionListener } from "@hooks";
 import {
   DashboardCards,
   DashboardGovernanceActions,
@@ -11,28 +12,28 @@ import {
 } from "@organisms";
 import {
   ChooseStakeKey,
+  CreateGovernanceAction,
   Dashboard,
-  ErrorPage,
-  Home,
-  GovernanceActions,
-  DelegateTodRep,
-  RegisterAsdRep,
-  GovernanceActionDetails,
-  UpdatedRepMetadata,
-  GovernanceActionsCategory,
   DashboardGovernanceActionsCategory,
+  DelegateTodRep,
+  ErrorPage,
+  GovernanceActionDetails,
+  GovernanceActions,
+  GovernanceActionsCategory,
+  Home,
+  RegisterAsdRep,
+  RegisterAsSoleVoter,
+  RetireAsDrep,
   RetireAsSoleVoter,
+  UpdatedRepMetadata,
 } from "@pages";
+import { SetupInterceptors } from "@services";
 import {
   callAll,
   getItemFromLocalStorage,
   WALLET_LS_KEY,
   removeItemFromLocalStorage,
 } from "@utils";
-import { SetupInterceptors } from "./services";
-import { useWalletConnectionListener } from "./hooks";
-import { RegisterAsSoleVoter } from "./pages/RegisterAsSoleVoter";
-import { CreateGovernanceAction } from "./pages/CreateGovernanceAction";
 
 export default () => {
   const { enable } = useCardano();
@@ -110,6 +111,7 @@ export default () => {
         />
         <Route path={PATHS.delegateTodRep} element={<DelegateTodRep />} />
         <Route path={PATHS.registerAsdRep} element={<RegisterAsdRep />} />
+        <Route path={PATHS.retireAsDrep} element={<RetireAsDrep />} />
         <Route
           path={PATHS.registerAsSoleVoter}
           element={<RegisterAsSoleVoter />}
@@ -126,8 +128,8 @@ export default () => {
           handleClose={
             !modals[modal.type].preventDismiss
               ? callAll(modals[modal.type]?.onClose, () =>
-                openModal({ type: "none", state: null }),
-              )
+                  openModal({ type: "none", state: null }),
+                )
               : undefined
           }
         >

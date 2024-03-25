@@ -13,6 +13,7 @@ type Props = {
   sortOpen: boolean;
   setSortOpen: Dispatch<SetStateAction<boolean>>;
   sortingActive: boolean;
+  children?: React.ReactNode;
   isFiltering?: boolean;
 };
 
@@ -32,6 +33,7 @@ export const OrderActionsChip = (props: Props) => {
     setSortOpen,
     sortingActive,
     isFiltering = true,
+    children,
   } = props;
 
   return (
@@ -41,6 +43,8 @@ export const OrderActionsChip = (props: Props) => {
       alignItems="center"
       ml="8px"
       gap={isMobile ? "8px" : "24px"}
+      position="relative"
+      sx={{ alignSelf: "end" }}
     >
       {isFiltering && (
         <Box
@@ -185,6 +189,7 @@ export const OrderActionsChip = (props: Props) => {
           </Box>
         )}
       </Box>
+      {children}
     </Box>
   );
 };

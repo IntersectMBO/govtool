@@ -4,7 +4,6 @@ import Search from "@mui/icons-material/Search";
 
 import { GovernanceActionsFilters, GovernanceActionsSorting } from "@molecules";
 import { OrderActionsChip } from "./OrderActionsChip";
-import { ClickOutside } from "../atoms";
 import { theme } from "@/theme";
 
 type DataActionsBarProps = {
@@ -86,24 +85,23 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
           setSortOpen={setSortOpen}
           sortingActive={sortingActive}
           sortOpen={sortOpen}
-        />
+        >
+          {filtersOpen && (
+            <GovernanceActionsFilters
+              chosenFilters={chosenFilters}
+              setChosenFilters={setChosenFilters}
+              closeFilters={closeFilters}
+            />
+          )}
+          {sortOpen && (
+            <GovernanceActionsSorting
+              chosenSorting={chosenSorting}
+              setChosenSorting={setChosenSorting}
+              closeSorts={closeSorts}
+            />
+          )}
+        </OrderActionsChip>
       </Box>
-      {filtersOpen && (
-        <ClickOutside onClick={closeFilters}>
-          <GovernanceActionsFilters
-            chosenFilters={chosenFilters}
-            setChosenFilters={setChosenFilters}
-          />
-        </ClickOutside>
-      )}
-      {sortOpen && (
-        <ClickOutside onClick={closeSorts}>
-          <GovernanceActionsSorting
-            chosenSorting={chosenSorting}
-            setChosenSorting={setChosenSorting}
-          />
-        </ClickOutside>
-      )}
     </>
   );
 };

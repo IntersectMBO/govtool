@@ -2,7 +2,6 @@ export * from "./ActionRadio";
 export * from "./Background";
 export * from "./Button";
 export * from "./Checkbox";
-export * from "./ClickOutside";
 export * from "./CopyButton";
 export * from "./DrawerLink";
 export * from "./ExternalModalButton";

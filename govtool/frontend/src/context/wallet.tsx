@@ -1,5 +1,3 @@
-// TODO: enable eslint and fix all the errors with wallet refactor
-/* eslint-disable */
 import {
   createContext,
   useCallback,
@@ -107,7 +105,7 @@ type BuildSignSubmitConwayCertTxArgs = {
   | Pick<TransactionStateWithResource, 'type' | 'resourceId'>
   );
 
-interface CardanoContext {
+interface CardanoContextType {
   address?: string;
   disconnectWallet: () => Promise<void>;
   enable: (walletName: string) => Promise<EnableResponse>;
@@ -160,7 +158,7 @@ interface CardanoContext {
 }
 
 type Utxos = {
-  txid: any;
+  txid: unknown;
   txindx: number;
   amount: string;
   str: string;
@@ -168,9 +166,9 @@ type Utxos = {
   TransactionUnspentOutput: TransactionUnspentOutput;
 }[];
 
-const NETWORK = import.meta.env.VITE_NETWORK_FLAG;
+const NETWORK = +import.meta.env.VITE_NETWORK_FLAG;
 
-const CardanoContext = createContext<CardanoContext>({} as CardanoContext);
+const CardanoContext = createContext<CardanoContextType>({} as CardanoContextType);
 CardanoContext.displayName = 'CardanoContext';
 
 const CardanoProvider = (props: Props) => {
@@ -248,7 +246,7 @@ const CardanoProvider = (props: Props) => {
             throw new Error(t('errors.walletNoCIP30Nor90Support'));
           }
           // Enable wallet connection
-          const enabledApi = await window.cardano[walletName]
+          const enabledApi: CardanoApiWallet = await window.cardano[walletName]
             .enable({
               extensions: [{ cip: 95 }],
             })
@@ -266,15 +264,15 @@ const CardanoProvider = (props: Props) => {
             throw new Error(t('errors.walletNoCIP90FunctionsEnabled'));
           }
           const network = await enabledApi.getNetworkId();
-          if (network != NETWORK) {
+          if (network !== NETWORK) {
             throw new Error(
               t('errors.tryingConnectTo', {
-                networkFrom: network == 1 ? 'mainnet' : 'testnet',
-                networkTo: network != 1 ? 'mainnet' : 'testnet',
+                networkFrom: network === 1 ? 'mainnet' : 'testnet',
+                networkTo: network !== 1 ? 'mainnet' : 'testnet',
               }),
             );
           }
-          setIsMainnet(network == 1);
+          setIsMainnet(network === 1);
           // Check and set wallet address
           const usedAddresses = await enabledApi.getUsedAddresses();
           const unusedAddresses = await enabledApi.getUnusedAddresses();
@@ -296,8 +294,8 @@ const CardanoProvider = (props: Props) => {
 
           let stakeKeysList;
           if (registeredStakeKeysList.length > 0) {
-            stakeKeysList = registeredStakeKeysList.map((stakeKey) => {
-              const stakeKeyHash = PublicKey.from_hex(stakeKey).hash();
+            stakeKeysList = registeredStakeKeysList.map((key) => {
+              const stakeKeyHash = PublicKey.from_hex(key).hash();
               const stakeCredential = Credential.from_keyhash(stakeKeyHash);
               if (network === 1) {
                 return RewardAddress.new(1, stakeCredential)
@@ -310,8 +308,8 @@ const CardanoProvider = (props: Props) => {
             });
           } else {
             console.warn(t('warnings.usingUnregisteredStakeKeys'));
-            stakeKeysList = unregisteredStakeKeysList.map((stakeKey) => {
-              const stakeKeyHash = PublicKey.from_hex(stakeKey).hash();
+            stakeKeysList = unregisteredStakeKeysList.map((key) => {
+              const stakeKeyHash = PublicKey.from_hex(key).hash();
               const stakeCredential = Credential.from_keyhash(stakeKeyHash);
               if (network === 1) {
                 return RewardAddress.new(1, stakeCredential)
@@ -361,14 +359,16 @@ const CardanoProvider = (props: Props) => {
           setPubDRepKey('');
           setStakeKey(undefined);
           setIsEnabled(false);
+          // eslint-disable-next-line no-throw-literal
           throw {
             status: 'ERROR',
-            error: `${e == undefined ? t('errors.somethingWentWrong') : e}`,
+            error: `${e ?? t('errors.somethingWentWrong')}`,
           };
         } finally {
           setIsEnableLoading(null);
         }
       }
+      // eslint-disable-next-line no-throw-literal
       throw { status: 'ERROR', error: t('errors.somethingWentWrong') };
     },
     [isEnabled, stakeKeys],
@@ -414,6 +414,7 @@ const CardanoProvider = (props: Props) => {
 
   const getTxUnspentOutputs = async (utxos: Utxos) => {
     const txOutputs = TransactionUnspentOutputs.new();
+    // eslint-disable-next-line no-restricted-syntax
     for (const utxo of utxos) {
       txOutputs.add(utxo.TransactionUnspentOutput);
     }
@@ -531,9 +532,11 @@ const CardanoProvider = (props: Props) => {
           resourceId,
         });
 
+        // eslint-disable-next-line no-console
         console.log(signedTx.to_hex(), 'signed tx cbor');
         return resultHash;
-        // TODO: type error
+      // TODO: type error
+      // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-explicit-any
       } catch (error: any) {
         const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
         const isWalletConnected = await window.cardano[walletName].isEnabled();
@@ -589,7 +592,7 @@ const CardanoProvider = (props: Props) => {
         return certBuilder;
       } catch (e) {
         Sentry.captureException(e);
-        console.log(e);
+        console.error(e);
         throw e;
       }
     },
@@ -621,7 +624,7 @@ const CardanoProvider = (props: Props) => {
             anchor,
           );
         } else {
-          console.log(t('errors.notUsingAnchor'));
+          console.error(t('errors.notUsingAnchor'));
           dRepRegCert = DrepRegistration.new(
             dRepCred,
             BigNum.from_str(`${epochParams.drep_deposit}`),
@@ -667,7 +670,7 @@ const CardanoProvider = (props: Props) => {
         return certBuilder;
       } catch (e) {
         Sentry.captureException(e);
-        console.log(e);
+        console.error(e);
         throw e;
       }
     },
@@ -695,7 +698,7 @@ const CardanoProvider = (props: Props) => {
         return certBuilder;
       } catch (e) {
         Sentry.captureException(e);
-        console.log(e);
+        console.error(e);
         throw e;
       }
     },
@@ -748,7 +751,7 @@ const CardanoProvider = (props: Props) => {
         return votingBuilder;
       } catch (e) {
         Sentry.captureException(e);
-        console.log(e);
+        console.error(e);
         throw e;
       }
     },
@@ -955,6 +958,8 @@ function useCardano() {
           }
           return result;
         }
+      // TODO: type error
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         Sentry.captureException(e);
         await context.disconnectWallet();

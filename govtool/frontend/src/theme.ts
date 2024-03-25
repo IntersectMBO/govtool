@@ -9,57 +9,6 @@ import {
   successGreen,
 } from "./consts";
 
-declare module "@mui/material/styles" {
-  interface Palette {
-    accentOrange: string;
-    accentYellow: string;
-    arcticWhite: string;
-    boxShadow1: string;
-    boxShadow2: string;
-    errorRed: string;
-    highlightBlue: string;
-    inputRed: string;
-    negativeRed: string;
-    neutralGray: string;
-    orangeDark: string;
-    neutralWhite: string;
-    positiveGreen: string;
-    primaryBlue: string;
-    secondaryBlue: string;
-    specialCyan: string;
-    specialCyanBorder: string;
-    lightBlue: string;
-    textBlack: string;
-    textGray: string;
-    lightOrange: string;
-    fadedPurple: string;
-  }
-  interface PaletteOptions {
-    accentOrange: string;
-    accentYellow: string;
-    arcticWhite: string;
-    boxShadow1: string;
-    boxShadow2: string;
-    errorRed: string;
-    highlightBlue: string;
-    orangeDark: string;
-    inputRed: string;
-    negativeRed: string;
-    neutralGray: string;
-    neutralWhite: string;
-    positiveGreen: string;
-    primaryBlue: string;
-    secondaryBlue: string;
-    specialCyan: string;
-    specialCyanBorder: string;
-    lightBlue: string;
-    textBlack: string;
-    textGray: string;
-    lightOrange: string;
-    fadedPurple: string;
-  }
-}
-
 export type Theme = typeof theme;
 
 export const theme = createTheme({

@@ -4,11 +4,11 @@ import { ICONS } from "@consts";
 import { useSnackbar } from "@context";
 import { useTranslation } from "@hooks";
 
-interface Props {
+type Props = {
   isChecked?: boolean;
   text: string;
   variant?: "blueThin" | "blue";
-}
+};
 
 export const CopyButton = ({ isChecked, text, variant }: Props) => {
   const { addSuccessAlert } = useSnackbar();

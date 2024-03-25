@@ -22,11 +22,11 @@ import {
 const mockedLongText =
   "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sit, distinctio culpa minus eaque illo quidem voluptates quisquam mollitia consequuntur ex, sequi saepe? Ad ex adipisci molestiae sed.";
 
-interface Props {
+type Props = {
   votedProposal: VotedProposal;
   isDataMissing: boolean;
   inProgress?: boolean;
-}
+};
 
 export const GovernanceVotedOnCard = ({
   votedProposal,

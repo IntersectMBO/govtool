@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 
 import { GOVERNANCE_ACTIONS_SORTING } from "@consts";
-import { useTranslation } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 
 interface Props {
   chosenSorting: string;
@@ -21,6 +21,7 @@ export const GovernanceActionsSorting = ({
   setChosenSorting,
 }: Props) => {
   const { t } = useTranslation();
+  const { isMobile } = useScreenDimension();
 
   return (
     <Box
@@ -34,6 +35,8 @@ export const GovernanceActionsSorting = ({
         padding: "12px 0px",
         width: "auto",
         zIndex: "1",
+        right: isMobile ? "17px" : "29px",
+        top: isMobile ? "274px" : "200px",
       }}
     >
       <FormControl>

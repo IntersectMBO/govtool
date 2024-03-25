@@ -1,12 +1,7 @@
 import { styled } from "@mui/material";
 import * as TooltipMUI from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-
-export type TooltipProps = Omit<TooltipMUI.TooltipProps, "title"> & {
-  heading?: string;
-  paragraphOne?: string;
-  paragraphTwo?: string;
-};
+import { TooltipProps } from "@atoms";
 
 const StyledTooltip = styled(
   ({ className, ...props }: TooltipMUI.TooltipProps) => (

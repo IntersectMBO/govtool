@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 
 import { GOVERNANCE_ACTIONS_FILTERS } from "@consts";
-import { useTranslation } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 
 interface Props {
   chosenFilters: string[];
@@ -36,6 +36,7 @@ export const GovernanceActionsFilters = ({
   );
 
   const { t } = useTranslation();
+  const { isMobile } = useScreenDimension();
 
   return (
     <Box
@@ -49,6 +50,8 @@ export const GovernanceActionsFilters = ({
         padding: "12px 0px",
         width: "auto",
         zIndex: "1",
+        right: isMobile ? "73px" : "141px",
+        top: isMobile ? "274px" : "200px",
       }}
     >
       <FormLabel

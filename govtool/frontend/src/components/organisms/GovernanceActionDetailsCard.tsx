@@ -10,7 +10,6 @@ import { useState } from "react";
 type GovernanceActionDetailsCardProps = {
   abstainVotes: number;
   createdDate: string;
-  // details: unknown;
   expiryDate: string;
   noVotes: number;
   type: string;
@@ -27,7 +26,6 @@ type GovernanceActionDetailsCardProps = {
 export const GovernanceActionDetailsCard = ({
   abstainVotes,
   createdDate,
-  // details,
   expiryDate,
   noVotes,
   type,

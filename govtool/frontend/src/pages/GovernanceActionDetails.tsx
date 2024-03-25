@@ -136,8 +136,6 @@ export const GovernanceActionDetails = () => {
                   }
                   // TODO: Add data validation
                   isDataMissing={isDataMissing}
-                  // TODO: To decide if we want to keep it when metadate BE is ready
-                  // details={state ? state.details : data.proposal.details}
                   expiryDate={
                     state
                       ? formatDisplayDate(state.expiryDate)

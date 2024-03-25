@@ -5,7 +5,11 @@ import { openInNewTab } from "@utils";
 import { useTranslation } from "@hooks";
 import { Vote } from "@models";
 
-export const GovernanceActionCardMyVote = ({ vote }: { vote: Vote }) => {
+type Props = {
+  vote: Vote;
+};
+
+export const GovernanceActionCardMyVote = ({ vote }: Props) => {
   const { t } = useTranslation();
 
   return (

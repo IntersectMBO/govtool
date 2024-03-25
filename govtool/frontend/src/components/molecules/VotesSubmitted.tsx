@@ -5,11 +5,11 @@ import { VotePill } from "@atoms";
 import { useTranslation } from "@hooks";
 import { correctAdaFormat } from "@/utils/adaFormat";
 
-interface Props {
+type Props = {
   yesVotes: number;
   noVotes: number;
   abstainVotes: number;
-}
+};
 
 export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
   const { t } = useTranslation();

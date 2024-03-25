@@ -25,6 +25,7 @@ export * from "./GovernanceVotedOnCard";
 export * from "./LinkWithIcon";
 export * from "./OrderActionsChip";
 export * from "./Share";
+export * from "./SliderArrow";
 export * from "./SliderArrows";
 export * from "./Step";
 export * from "./VoteActionForm";

@@ -1,7 +1,10 @@
 import { Box } from "@mui/material";
 
-import { IconLink, Typography } from "@atoms";
+import { Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
+import { LinkWithIcon } from "@molecules";
+import { openInNewTab } from "@/utils";
+import { ICONS } from "@/consts";
 
 // TODO: When BE is ready, pass links as props
 const LINKS = [
@@ -41,7 +44,13 @@ export const GovernanceActionDetailsCardLinks = () => {
         }}
       >
         {LINKS.map((link) => (
-          <IconLink key={link} label={link} navTo={link} isSmall />
+          <LinkWithIcon
+            key={link}
+            label={link}
+            onClick={() => openInNewTab(link)}
+            icon={<img alt="link" src={ICONS.link} />}
+            cutWithEllipsis
+          />
         ))}
       </Box>
     </>

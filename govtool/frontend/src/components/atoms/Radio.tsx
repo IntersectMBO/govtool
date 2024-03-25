@@ -3,6 +3,7 @@ import { Box } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { UseFormRegister, UseFormSetValue } from "react-hook-form";
+import { theme } from "@/theme";
 
 type RadioProps = {
   isChecked: boolean;
@@ -43,8 +44,7 @@ export const Radio = ({ ...props }: RadioProps) => {
       borderColor={isChecked ? "specialCyanBorder" : undefined}
       sx={[
         {
-          boxShadow:
-            "0px 1px 2px 0px rgba(0, 51, 173, 0.08), 0px 1px 6px 1px rgba(0, 51, 173, 0.15)",
+          boxShadow: theme.shadows[1],
 
           "&:hover": {
             color: "blue",

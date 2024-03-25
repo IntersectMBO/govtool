@@ -12,11 +12,11 @@ import { getProposalTypeLabel } from "@/utils/getProposalTypeLabel";
 import { getFullGovActionId } from "@/utils";
 import { useCardano } from "@/context";
 
-interface DashboardGovernanceActionsVotedOnProps {
+type DashboardGovernanceActionsVotedOnProps = {
   filters: string[];
   searchPhrase?: string;
   sorting: string;
-}
+};
 
 export const DashboardGovernanceActionsVotedOn = ({
   filters,

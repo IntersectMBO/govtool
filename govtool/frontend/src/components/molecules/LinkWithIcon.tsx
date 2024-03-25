@@ -10,6 +10,7 @@ export const LinkWithIcon = ({
   onClick,
   icon,
   sx,
+  cutWithEllipsis,
 }: LinkWithIconProps) => (
   <Box
     data-testid={`${label.split(" ").join("-")}-link`}
@@ -18,6 +19,10 @@ export const LinkWithIcon = ({
       cursor: "pointer",
       display: "flex",
       width: "fit-content",
+      ...(cutWithEllipsis && {
+        overflow: "hidden",
+        width: "auto",
+      }),
       ...sx,
     }}
     onClick={onClick}
@@ -26,8 +31,15 @@ export const LinkWithIcon = ({
     <Typography
       color="primary"
       fontWeight={400}
-      sx={{ ml: 0.5 }}
       variant="body2"
+      sx={{
+        ml: 0.5,
+        ...(cutWithEllipsis && {
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }),
+      }}
     >
       {label}
     </Typography>

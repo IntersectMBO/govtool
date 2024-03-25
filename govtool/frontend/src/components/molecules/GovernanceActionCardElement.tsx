@@ -40,99 +40,97 @@ export const GovernanceActionCardElement = ({
   >
     <Box
       sx={{
-          display: "flex",
-          alignItems: "center",
-          mb: "4px",
-        }}
+        display: "flex",
+        alignItems: "center",
+        mb: "4px",
+      }}
     >
       <Typography
         sx={{
-            fontSize: isSliderCard ? 12 : 14,
-            fontWeight: isSliderCard ? 500 : 600,
-            lineHeight: isSliderCard ? "16px" : "20px",
-            color: "neutralGray",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
+          fontSize: isSliderCard ? 12 : 14,
+          fontWeight: isSliderCard ? 500 : 600,
+          lineHeight: isSliderCard ? "16px" : "20px",
+          color: "neutralGray",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
       >
         {label}
       </Typography>
       {tooltipProps && (
-      <Tooltip
-        heading={tooltipProps?.heading}
-        paragraphOne={tooltipProps?.paragraphOne}
-        placement="bottom-end"
-        arrow
-        {...tooltipProps}
-      >
-        <InfoOutlinedIcon
-          style={{}}
-          sx={{ ml: 0.7, mb: 0.1, color: "#ADAEAD", fontSize: "small" }}
-        />
-      </Tooltip>
-        )}
+        <Tooltip
+          heading={tooltipProps?.heading}
+          paragraphOne={tooltipProps?.paragraphOne}
+          placement="bottom-end"
+          arrow
+          {...tooltipProps}
+        >
+          <InfoOutlinedIcon
+            sx={{ ml: 0.7, mb: 0.1, color: "#ADAEAD", fontSize: "small" }}
+          />
+        </Tooltip>
+      )}
     </Box>
     <Box display="flex">
       {textVariant === "pill" ? (
         <Box
           sx={{
-              padding: "6px 18px",
-              overflow: "hidden",
-              bgcolor: "lightBlue",
-              borderRadius: 100,
-            }}
+            padding: "6px 18px",
+            overflow: "hidden",
+            bgcolor: "lightBlue",
+            borderRadius: 100,
+          }}
         >
           <Typography
             variant="caption"
             sx={{
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
           >
             {text}
           </Typography>
         </Box>
-        ) : (
-          <Box
+      ) : (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            overflow: "hidden",
+          }}
+        >
+          <Typography
             sx={{
-              display: "flex",
-              alignItems: "center",
-              overflow: "hidden",
+              fontSize: isSliderCard ? 14 : 16,
+              fontWeight: 400,
+              lineHeight: isSliderCard ? "20px" : "24px",
+              ...(textVariant === "oneLine" && { whiteSpace: "nowrap" }),
+              ...((textVariant === "oneLine" || textVariant === "twoLines") && {
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }),
+              ...(textVariant === "twoLines" && {
+                display: "-webkit-box",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 2,
+                whiteSpace: "normal",
+              }),
+              ...(isCopyButton && {
+                color: "primaryBlue",
+              }),
             }}
           >
-            <Typography
-              sx={{
-                fontSize: isSliderCard ? 14 : 16,
-                fontWeight: 400,
-                lineHeight: isSliderCard ? "20px" : "24px",
-                ...(textVariant === "oneLine" && { whiteSpace: "nowrap" }),
-                ...((textVariant === "oneLine" ||
-                  textVariant === "twoLines") && {
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }),
-                ...(textVariant === "twoLines" && {
-                  display: "-webkit-box",
-                  WebkitBoxOrient: "vertical",
-                  WebkitLineClamp: 2,
-                  whiteSpace: "normal",
-                }),
-                ...(isCopyButton && {
-                  color: "primaryBlue",
-                }),
-              }}
-            >
-              {text}
-            </Typography>
-            {isCopyButton && (
-              <Box ml={1}>
-                <CopyButton text={text} variant="blueThin" />
-              </Box>
-            )}
-          </Box>
-        )}
+            {text}
+          </Typography>
+          {isCopyButton && (
+            <Box ml={1}>
+              <CopyButton text={text} variant="blueThin" />
+            </Box>
+          )}
+        </Box>
+      )}
     </Box>
   </Box>
-  );
+);

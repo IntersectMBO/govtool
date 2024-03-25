@@ -58,6 +58,10 @@ export const Slider = ({
 
   const isShowArrows = useMemo(
     () =>
+      // Arrows are to be show only on desktop view.
+      // 268 - side menu width; 40 - distance needed from the left on
+      // disconnected wallet (no side menu); 350 - gov action card width;
+      // other values are for paddings and margins
       screenWidth <
       (onDashboard ? 268 : 40) + 28 + dataLength * 350 + 20 * dataLength - 5,
     [screenWidth, dataLength],

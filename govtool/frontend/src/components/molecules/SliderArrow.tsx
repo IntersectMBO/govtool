@@ -3,11 +3,11 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 import { theme } from "@/theme";
 
-interface SliderArrowProps {
+type SliderArrowProps = {
   disabled: boolean;
   onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   left?: boolean;
-}
+};
 
 export const SliderArrow = ({ disabled, onClick, left }: SliderArrowProps) => {
   const {

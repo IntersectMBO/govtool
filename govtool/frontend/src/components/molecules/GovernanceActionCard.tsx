@@ -20,25 +20,24 @@ import {
 const mockedLongText =
   "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sit, distinctio culpa minus eaque illo quidem voluptates quisquam mollitia consequuntur ex, sequi saepe? Ad ex adipisci molestiae sed.";
 
-interface ActionTypeProps
-  extends Omit<
-    ActionType,
-    | "yesVotes"
-    | "noVotes"
-    | "abstainVotes"
-    | "metadataHash"
-    | "url"
-    | "details"
-    | "id"
-    | "txHash"
-    | "index"
-  > {
+type ActionTypeProps = Omit<
+  ActionType,
+  | "yesVotes"
+  | "noVotes"
+  | "abstainVotes"
+  | "metadataHash"
+  | "url"
+  | "details"
+  | "id"
+  | "txHash"
+  | "index"
+> & {
   txHash: string;
   index: number;
   isDataMissing: boolean;
   onClick?: () => void;
   inProgress?: boolean;
-}
+};
 
 export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
   const {

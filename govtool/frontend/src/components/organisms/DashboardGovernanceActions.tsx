@@ -16,11 +16,11 @@ import {
   DashboardGovernanceActionsVotedOn,
 } from "@organisms";
 
-interface TabPanelProps {
+type TabPanelProps = {
   children?: React.ReactNode;
   index: number;
   value: number;
-}
+};
 
 const defaultCategories = GOVERNANCE_ACTIONS_FILTERS.map(
   (category) => category.key,

@@ -1,7 +1,7 @@
 import { NavLink, To } from "react-router-dom";
 import { Box } from "@mui/material";
+import Divider from "@mui/material/Divider";
 
-import { ICONS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { Typography } from "@atoms";
 
@@ -40,7 +40,12 @@ export const Breadcrumbs = ({
           {elementOne}
         </Typography>
       </NavLink>
-      <img src={ICONS.separator} alt="separator" style={{ margin: "0 6px" }} />
+      <Divider
+        orientation="vertical"
+        flexItem
+        color="textBlack"
+        sx={{ margin: "0 6px" }}
+      />
       <Typography
         variant="caption"
         sx={{

@@ -60,6 +60,8 @@ changes.
 
 ### Changed
 
+- `proposal/list` returns additional data such ass `expiryEpochNo`, `createdEpochNo`, `title`, `about`, `motivation`,
+ `rationale`. `TreasuryWithdrawals` GAs also got nicely formated details. [Issue 372](https://github.com/IntersectMBO/govtool/issues/372)
 - `drep/list` now return also `status` and `type` fields. Also it now returns the retired dreps, and you can search for given drep by name using optional query parameter. If the drep name is passed exactly, then you can even find a drep that's sole voter. [Issue 446](https://github.com/IntersectMBO/govtool/issues/446)
 - `drep/list` and `drep/info` endpoints now return additional data such as metadata url and hash, and voting power [Issue 223](https://github.com/IntersectMBO/govtool/issues/223)
 - `drep/info` now does not return sole voters (dreps without metadata) [Issue 317](https://github.com/IntersectMBO/govtool/issues/317)

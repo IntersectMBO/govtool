@@ -6,9 +6,7 @@ import {
   NavLink,
   generatePath,
 } from "react-router-dom";
-import {
-  Box, Breadcrumbs, CircularProgress, Link,
-} from "@mui/material";
+import { Box, Breadcrumbs, CircularProgress, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
@@ -103,13 +101,15 @@ export const GovernanceActionDetails = () => {
                 display: "flex",
                 textDecoration: "none",
               }}
-              onClick={() => navigate(
-                state && state.openedFromCategoryPage
-                  ? generatePath(PATHS.governanceActionsCategory, {
-                    category: state.type,
-                  })
-                  : PATHS.governanceActions,
-              )}
+              onClick={() =>
+                navigate(
+                  state && state.openedFromCategoryPage
+                    ? generatePath(PATHS.governanceActionsCategory, {
+                        category: state.type,
+                      })
+                    : PATHS.governanceActions,
+                )
+              }
             >
               <img
                 alt="arrow"
@@ -165,11 +165,9 @@ export const GovernanceActionDetails = () => {
               <Box display="flex" flexWrap="wrap" mt={4}>
                 <Typography fontWeight={300}>
                   {t("govActions.withIdNotExist.partOne")}
-&nbsp;
+                  &nbsp;
                 </Typography>
-                <Typography
-                  fontWeight={500}
-                >
+                <Typography fontWeight={500}>
                   {` ${shortenedGovActionId} `}
                 </Typography>
                 <Typography fontWeight={300}>

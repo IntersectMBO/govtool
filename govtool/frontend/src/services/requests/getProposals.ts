@@ -6,6 +6,7 @@ export type getProposalsArguments = {
   page?: number;
   pageSize?: number;
   sorting?: string;
+  searchPhrase: string;
 };
 
 export const getProposals = async ({
@@ -15,7 +16,7 @@ export const getProposals = async ({
   // It allows fetch proposals and if we have 7 items, display 6 cards and "view all" button
   pageSize = 7,
   sorting = "",
-}: getProposalsArguments) => {
+}: Omit<getProposalsArguments, "searchPhrase">) => {
   const urlBase = "/proposal/list";
   let urlParameters = `?page=${page}&pageSize=${pageSize}`;
 

@@ -1,11 +1,10 @@
-import {
-  Dispatch, SetStateAction, useCallback, useState,
-} from "react";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormContext } from "react-hook-form";
-import * as blake from "blakejs";
-import * as Sentry from "@sentry/react";
+import { blake2bHex } from "blakejs";
+import { captureException } from "@sentry/react";
 import { useTranslation } from "react-i18next";
+import { NodeObject } from "jsonld";
 
 import {
   CIP_100,
@@ -15,17 +14,17 @@ import {
   PATHS,
   storageInformationErrorModals,
 } from "@consts";
-import {
-  GovernanceActionFieldSchemas,
-  GovernanceActionType,
-} from "@/types/governanceAction";
+import { useCardano, useModal } from "@context";
 import {
   canonizeJSON,
   downloadJson,
   generateJsonld,
   validateMetadataHash,
-} from "@/utils";
-import { useCardano, useModal } from "@/context";
+} from "@utils";
+import {
+  GovernanceActionFieldSchemas,
+  GovernanceActionType,
+} from "@/types/governanceAction";
 
 export type CreateGovernanceActionValues = {
   links?: { link: string }[];
@@ -34,11 +33,12 @@ export type CreateGovernanceActionValues = {
   governance_action_type?: GovernanceActionType;
 } & Partial<Record<keyof GovernanceActionFieldSchemas, string>>;
 
-export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues = {
-  links: [{ link: "" }],
-  storeData: false,
-  storingURL: "",
-};
+export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues =
+  {
+    links: [{ link: "" }],
+    storeData: false,
+    storingURL: "",
+  };
 
 export const useCreateGovernanceActionForm = (
   setStep?: Dispatch<SetStateAction<number>>,
@@ -51,6 +51,7 @@ export const useCreateGovernanceActionForm = (
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hash, setHash] = useState<string | null>(null);
+  const [json, setJson] = useState<NodeObject | null>(null);
   const navigate = useNavigate();
   const { openModal, closeModal } = useModal();
   const {
@@ -75,8 +76,12 @@ export const useCreateGovernanceActionForm = (
     closeModal();
   }, []);
 
-  const generateMetadata = async (data: CreateGovernanceActionValues) => {
-    if (!govActionType) throw new Error("Governance action type is not defined");
+  const generateMetadata = useCallback(async () => {
+    const data = getValues();
+
+    if (!govActionType) {
+      throw new Error("Governance action type is not defined");
+    }
 
     const acceptedKeys = ["title", "motivation", "abstract", "rationale"];
 
@@ -100,27 +105,28 @@ export const useCreateGovernanceActionForm = (
     const jsonld = await generateJsonld(body, GOVERNANCE_ACTION_CONTEXT);
 
     const canonizedJson = await canonizeJSON(jsonld);
-    const hash = blake.blake2bHex(canonizedJson, undefined, 32);
+    const canonizedJsonHash = blake2bHex(canonizedJson, undefined, 32);
 
     // That allows to validate metadata hash
-    setHash(hash);
+    setHash(canonizedJsonHash);
+    setJson(jsonld);
 
     return jsonld;
-  };
+  }, [getValues]);
 
-  const onClickDownloadJson = async () => {
-    const data = getValues();
-    const json = await generateMetadata(data);
-
+  const onClickDownloadJson = useCallback(() => {
+    if (!json) return;
     downloadJson(json, govActionType);
-  };
+  }, [govActionType, json]);
 
   const validateHash = useCallback(
-    async (storingUrl: string, hash: string | null) => {
+    async (storingUrl: string, localHash: string | null) => {
       try {
-        if (!hash) throw new Error(MetadataHashValidationErrors.INVALID_HASH);
-
-        await validateMetadataHash(storingUrl, hash);
+        if (!localHash) {
+          throw new Error(MetadataHashValidationErrors.INVALID_HASH);
+        }
+        await validateMetadataHash(storingUrl, localHash);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         if (
           Object.values(MetadataHashValidationErrors).includes(error.message)
@@ -129,7 +135,7 @@ export const useCreateGovernanceActionForm = (
             type: "statusModal",
             state: {
               ...storageInformationErrorModals[
-                error.message as MetadataHashValidationErrors
+              error.message as MetadataHashValidationErrors
               ],
               onSubmit: backToForm,
               onCancel: backToDashboard,
@@ -141,7 +147,7 @@ export const useCreateGovernanceActionForm = (
         throw error;
       }
     },
-    [hash, backToForm],
+    [backToForm],
   );
 
   const buildTransaction = useCallback(
@@ -156,10 +162,10 @@ export const useCreateGovernanceActionForm = (
         switch (govActionType) {
           case GovernanceActionType.Info:
             return await buildNewInfoGovernanceAction(commonGovActionDetails);
-          case GovernanceActionType.Treasury:
+          case GovernanceActionType.Treasury: {
             if (
-              data.amount === undefined
-              || data.receivingAddress === undefined
+              data.amount === undefined ||
+              data.receivingAddress === undefined
             ) {
               throw new Error(t("errors.invalidTreasuryGovernanceActionType"));
             }
@@ -171,10 +177,13 @@ export const useCreateGovernanceActionForm = (
             };
 
             return await buildTreasuryGovernanceAction(treasuryActionDetails);
+          }
           default:
             throw new Error(t("errors.invalidGovernanceActionType"));
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
+        // eslint-disable-next-line no-console
         console.error(error);
         throw error;
       }
@@ -207,12 +216,15 @@ export const useCreateGovernanceActionForm = (
 
         await validateHash(data.storingURL, hash);
         const govActionBuilder = await buildTransaction(data);
-        await buildSignSubmitConwayCertTx({ govActionBuilder });
+        await buildSignSubmitConwayCertTx({
+          govActionBuilder,
+          type: "createGovAction",
+        });
 
         showSuccessModal();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        Sentry.captureException(error);
-        console.error(error);
+        captureException(error);
       } finally {
         setIsLoading(false);
       }
@@ -222,15 +234,16 @@ export const useCreateGovernanceActionForm = (
 
   return {
     control,
+    createGovernanceAction: handleSubmit(onSubmit),
     errors,
+    generateMetadata,
     getValues,
     isLoading,
     isValid,
-    setValue,
-    createGovernanceAction: handleSubmit(onSubmit),
-    watch,
+    onClickDownloadJson,
     register,
     reset,
-    onClickDownloadJson,
+    setValue,
+    watch,
   };
 };

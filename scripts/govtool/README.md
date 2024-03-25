@@ -37,13 +37,6 @@ effectively. This includes configurations for:
 Each environment has its own Docker Compose file, generated from the template,
 enabling tailored setups that meet specific requirements.
 
-## Nix shell
-
-The `shell.nix` file provides a comprehensive toolset for deploying the GovTool
-stack, ensuring that all necessary dependencies and tools are available.
-
-See [Nix official site](https://nixos.org/).
-
 ## Context
 
 Deployment context, including environment variables, is managed through `.env`

@@ -12,11 +12,7 @@ export interface DelegateTodrepFormValues {
 }
 
 export const useDelegateTodRepForm = () => {
-  const {
-    setDelegatedDRepID,
-    buildSignSubmitConwayCertTx,
-    buildVoteDelegationCert,
-  } = useCardano();
+  const { buildSignSubmitConwayCertTx, buildVoteDelegationCert } = useCardano();
   const { data: drepList } = useGetDRepListQuery();
   const { openModal, closeModal, modal } = useModal();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -40,10 +36,12 @@ export const useDelegateTodRepForm = () => {
     async ({ dRepID }: DelegateTodrepFormValues) => {
       setIsLoading(true);
       try {
-        setDelegatedDRepID(dRepID);
         let isValidDrep = false;
         if (drepList?.length) {
-          isValidDrep = drepList.some((i) => i.drepId === dRepID || formHexToBech32(i.drepId) === dRepID);
+          isValidDrep = drepList.some(
+            (dRep) =>
+              dRep.drepId === dRepID || formHexToBech32(dRep.drepId) === dRepID,
+          );
         }
         if (!drepList?.length || !isValidDrep) {
           throw new Error(t("errors.dRepIdNotFound"));
@@ -51,7 +49,8 @@ export const useDelegateTodRepForm = () => {
         const certBuilder = await buildVoteDelegationCert(dRepID);
         const result = await buildSignSubmitConwayCertTx({
           certBuilder,
-          type: "delegation",
+          type: "delegate",
+          resourceId: dRepID,
         });
         if (result) {
           openModal({

@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import {
-  within, userEvent, waitFor, screen,
-} from "@storybook/testing-library";
+import { within, userEvent, waitFor, screen } from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
 
 import { formatDisplayDate } from "@utils";

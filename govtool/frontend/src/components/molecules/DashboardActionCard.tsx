@@ -100,6 +100,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
             />
           ) : (
             <img
+              alt="card"
               src={imageURL}
               width={64}
               height={64}
@@ -157,14 +158,14 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
                     screenWidth < 375
                       ? "150px"
                       : screenWidth < 425
-                        ? "200px"
-                        : screenWidth < 768
-                          ? "240px"
-                          : screenWidth < 1024
-                            ? "300px"
-                            : screenWidth < 1440
-                              ? "150px"
-                              : "300px",
+                      ? "200px"
+                      : screenWidth < 768
+                      ? "240px"
+                      : screenWidth < 1024
+                      ? "300px"
+                      : screenWidth < 1440
+                      ? "150px"
+                      : "300px",
                 }}
               >
                 {cardId}

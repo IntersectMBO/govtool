@@ -1,26 +1,23 @@
-import { useNavigate } from 'react-router-dom';
-import { Box } from '@mui/material';
-import CheckIcon from '@mui/icons-material/Check';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { useNavigate } from "react-router-dom";
+import { Box } from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
-import {
-  Button, VotePill, Typography, Tooltip
-} from '@atoms';
-import { PATHS } from '@consts';
-import { useScreenDimension, useTranslation } from '@hooks';
-import { VotedProposal } from '@models';
+import { Button, VotePill, Typography, Tooltip } from "@atoms";
+import { PATHS } from "@consts";
+import { useScreenDimension, useTranslation } from "@hooks";
+import { VotedProposal } from "@models";
 import {
   formatDisplayDate,
   getFullGovActionId,
   getProposalTypeLabel,
   getShortenedGovActionId,
   openInNewTab,
-} from '@utils';
-import { theme } from '@/theme';
+} from "@utils";
+import { theme } from "@/theme";
 
 interface Props {
   votedProposal: VotedProposal;
-  searchPhrase?: string;
   inProgress?: boolean;
 }
 
@@ -35,7 +32,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
 
   const proposalTypeNoEmptySpaces = getProposalTypeLabel(proposal.type).replace(
     / /g,
-    '',
+    "",
   );
 
   return (
@@ -45,44 +42,44 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
       maxWidth={402}
       minWidth={isMobile ? 295 : 402}
       sx={{
-        backgroundColor: 'transparent',
-        borderRadius: '20px',
+        backgroundColor: "transparent",
+        borderRadius: "20px",
         boxShadow: inProgress
-          ? '2px 2px 20px 0px #F55A0033'
-          : '0px 4px 15px 0px #DDE3F5',
-        position: 'relative',
+          ? "2px 2px 20px 0px #F55A0033"
+          : "0px 4px 15px 0px #DDE3F5",
+        position: "relative",
       }}
       data-testid={`govaction-${proposalTypeNoEmptySpaces}-voted-on-card`}
     >
       <Box
         alignItems="center"
-        bgcolor={inProgress ? '#F8ECD4' : '#E0F2DC'}
+        bgcolor={inProgress ? "#F8ECD4" : "#E0F2DC"}
         border={1}
-        borderColor={inProgress ? '#DEA029' : '#62BC52'}
+        borderColor={inProgress ? "#DEA029" : "#62BC52"}
         borderRadius={100}
         px={2.25}
         py={0.5}
         sx={{
-          position: 'absolute',
+          position: "absolute",
           top: -15,
           right: 20,
         }}
       >
         <Typography
-          color={inProgress ? '#DEA029' : '#62BC52'}
+          color={inProgress ? "#DEA029" : "#62BC52"}
           sx={{
-            alignItems: 'center',
-            display: 'flex',
-            justifyContent: 'center',
+            alignItems: "center",
+            display: "flex",
+            justifyContent: "center",
           }}
           variant="body2"
         >
           {inProgress ? (
-            t('inProgress')
+            t("inProgress")
           ) : (
             <>
               <CheckIcon fontSize="small" sx={{ marginRight: 0.5 }} />
-              {t('govActions.voteSubmitted')}
+              {t("govActions.voteSubmitted")}
             </>
           )}
         </Typography>
@@ -94,12 +91,12 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         sx={{
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
-          backgroundColor: 'rgba(255, 255, 255, 0.3)',
+          backgroundColor: "rgba(255, 255, 255, 0.3)",
         }}
       >
         <Box data-testid="governance-action-type">
           <Typography color="#8E908E" variant="caption">
-            {t('govActions.governanceActionType')}
+            {t("govActions.governanceActionType")}
           </Typography>
           <Box display="flex">
             <Box
@@ -120,7 +117,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         </Box>
         <Box mt={5}>
           <Typography color="#8E908E" variant="caption">
-            {t('govActions.governanceActionId')}
+            {t("govActions.governanceActionId")}
           </Typography>
           <Box display="flex" mt={0.5}>
             <Box
@@ -144,7 +141,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         </Box>
         <Box data-testid="my-vote" mt={5}>
           <Typography color="#8E908E" variant="caption">
-            {t('govActions.myVote')}
+            {t("govActions.myVote")}
           </Typography>
           <Box
             mt={1}
@@ -163,16 +160,17 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
             </Box>
             <Button
               onClick={() =>
-                openInNewTab('https://adanordic.com/latest_transactions')}
+                openInNewTab("https://adanordic.com/latest_transactions")
+              }
               variant="text"
               size="small"
               sx={{
                 paddingY: 0.75,
                 flex: 1,
-                whiteSpace: 'nowrap',
+                whiteSpace: "nowrap",
               }}
             >
-              {t('govActions.voteTransaction')}
+              {t("govActions.voteTransaction")}
             </Button>
           </Box>
         </Box>
@@ -187,20 +185,20 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           py={0.75}
         >
           <Typography fontWeight={300} sx={{ mr: 1 }} variant="caption">
-            {t('govActions.submissionDate')}
+            {t("govActions.submissionDate")}
           </Typography>
           <Typography fontWeight={600} variant="caption">
             {formatDisplayDate(proposal.createdDate)}
           </Typography>
           <Tooltip
-            heading={t('tooltips.submissionDate.heading')}
-            paragraphOne={t('tooltips.submissionDate.paragraphOne')}
+            heading={t("tooltips.submissionDate.heading")}
+            paragraphOne={t("tooltips.submissionDate.paragraphOne")}
             placement="bottom-end"
             arrow
           >
             <InfoOutlinedIcon
               style={{
-                color: '#ADAEAD',
+                color: "#ADAEAD",
               }}
               sx={{ ml: 0.7 }}
               fontSize="small"
@@ -219,21 +217,21 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           py={0.75}
         >
           <Typography fontWeight={300} sx={{ mr: 1 }} variant="caption">
-            {t('govActions.expiryDate')}
+            {t("govActions.expiryDate")}
           </Typography>
           <Typography variant="caption" fontWeight={600}>
             {formatDisplayDate(proposal.expiryDate)}
           </Typography>
           <Tooltip
-            heading={t('tooltips.expiryDate.heading')}
-            paragraphOne={t('tooltips.expiryDate.paragraphOne')}
-            paragraphTwo={t('tooltips.expiryDate.paragraphTwo')}
+            heading={t("tooltips.expiryDate.heading")}
+            paragraphOne={t("tooltips.expiryDate.paragraphOne")}
+            paragraphTwo={t("tooltips.expiryDate.paragraphTwo")}
             placement="bottom-end"
             arrow
           >
             <InfoOutlinedIcon
               style={{
-                color: '#ADAEAD',
+                color: "#ADAEAD",
               }}
               sx={{ ml: 0.7 }}
               fontSize="small"
@@ -256,7 +254,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           onClick={() =>
             navigate(
               PATHS.dashboardGovernanceActionsAction.replace(
-                ':proposalId',
+                ":proposalId",
                 getFullGovActionId(proposal.txHash, proposal.index),
               ),
               {
@@ -265,14 +263,15 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
                   vote: vote.vote.toLowerCase(),
                 },
               },
-            )}
+            )
+          }
           sx={{
-            backgroundColor: '#FBFBFF',
-            width: '100%',
+            backgroundColor: "#FBFBFF",
+            width: "100%",
           }}
           variant="outlined"
         >
-          {t('govActions.changeYourVote')}
+          {t("govActions.changeYourVote")}
         </Button>
       </Box>
     </Box>

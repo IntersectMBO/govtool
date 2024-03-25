@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Box, Typography } from "@mui/material";
-import {
-  screen, userEvent, waitFor, within,
-} from "@storybook/testing-library";
+import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
 import { expect } from "@storybook/jest";
 import { Tooltip } from "@/components/atoms";
 
@@ -29,7 +27,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const hoverTooltip = async (canvas: any) => {
+const hoverTooltip = async (canvas: ReturnType<typeof within>) => {
   const tooltip = canvas.getByText(/hover to show tooltip/i);
   await userEvent.hover(tooltip);
 };

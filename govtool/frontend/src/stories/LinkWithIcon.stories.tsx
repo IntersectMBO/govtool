@@ -21,6 +21,6 @@ export const Default: StoryObj<typeof LinkWithIcon> = {
 export const WithCustomIcon: StoryObj<typeof LinkWithIcon> = {
   args: {
     label: "Custom Icon Link",
-    icon: <img src={ICONS.link} />,
+    icon: <img alt="custom icon" src={ICONS.link} />,
   },
 };

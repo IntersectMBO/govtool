@@ -1,1 +1,4 @@
-export const callAll = (...fns: any[]) => (...args: any[]) => fns.forEach((fn) => fn && fn(...args));
+export const callAll =
+  (...fns: (((...args: unknown[]) => void) | undefined)[]) =>
+  (...args: unknown[]) =>
+    fns.forEach((fn) => fn && fn(...args));

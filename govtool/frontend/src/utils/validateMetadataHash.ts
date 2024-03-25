@@ -1,11 +1,11 @@
-import * as blake from 'blakejs';
-import { isAxiosError } from 'axios';
+import * as blake from "blakejs";
+import { isAxiosError } from "axios";
 
-import { API } from '@services';
-import { MetadataHashValidationErrors } from '@consts';
+import { API } from "@services";
+import { MetadataHashValidationErrors } from "@consts";
 
-import { URL_REGEX } from '.';
-import { canonizeJSON } from './canonizeJSON';
+import { URL_REGEX } from ".";
+import { canonizeJSON } from "./canonizeJSON";
 
 /**
  * Validates the metadata hash by fetching the metadata from the given URL,

@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { Trans } from "react-i18next";
 import { Link } from "@mui/material";
 
@@ -11,9 +11,9 @@ import {
   PROTOCOL_PARAMS_KEY,
 } from "@utils";
 
-import { BgCard } from ".";
+import { BgCard } from "..";
 
-export const RegisterAsdRepStepOne = ({
+export const RolesAndResponsibilities = ({
   onClickCancel,
   setStep,
 }: {
@@ -25,12 +25,10 @@ export const RegisterAsdRepStepOne = ({
 
   const deposit = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
-  const onClickContinue = useCallback(() => setStep(2), []);
+  const onClickContinue = () => setStep(2);
 
-  const openLearnMoreAboutDrep = useCallback(
-    () => openInNewTab("https://sancho.network/roles/drep"),
-    [],
-  );
+  const openLearnMoreAboutDrep = () =>
+    openInNewTab("https://sancho.network/roles/drep");
 
   return (
     <BgCard
@@ -38,7 +36,7 @@ export const RegisterAsdRepStepOne = ({
       backButtonLabel={t("cancel")}
       onClickActionButton={onClickContinue}
       onClickBackButton={onClickCancel}
-      sx={{ paddingBottom: isMobile ? undefined : 3 }}
+      sx={{ pb: isMobile ? undefined : 5, pt: isMobile ? 4 : 8 }}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("registration.rolesAndResponsibilitiesTitle")}
@@ -46,7 +44,7 @@ export const RegisterAsdRepStepOne = ({
       <Typography
         fontWeight={400}
         sx={{
-          pb: isMobile ? 6 : 4,
+          pb: isMobile ? 4 : 6,
           pt: 4,
           textAlign: "center",
           whiteSpace: "pre-line",

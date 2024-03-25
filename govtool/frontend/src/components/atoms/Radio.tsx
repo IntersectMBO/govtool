@@ -1,5 +1,6 @@
-import { Box, Typography } from '@mui/material';
-import { UseFormRegister, UseFormSetValue } from 'react-hook-form';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Box, Typography } from "@mui/material";
+import { UseFormRegister, UseFormSetValue } from "react-hook-form";
 
 type RadioProps = {
   isChecked: boolean;
@@ -12,9 +13,7 @@ type RadioProps = {
 };
 
 export const Radio = ({ ...props }: RadioProps) => {
-  const {
-    isChecked, name, setValue, title, value, dataTestId, register
-  } =
+  const { isChecked, name, setValue, title, value, dataTestId, register } =
     props;
 
   const handleClick = () => {
@@ -28,27 +27,27 @@ export const Radio = ({ ...props }: RadioProps) => {
       borderRadius={2}
       p={0.2}
       border={isChecked ? 1 : 0}
-      borderColor={isChecked ? 'specialCyanBorder' : 'white'}
-      sx={[{ '&:hover': { color: 'blue', cursor: 'pointer' } }]}
+      borderColor={isChecked ? "specialCyanBorder" : "white"}
+      sx={[{ "&:hover": { color: "blue", cursor: "pointer" } }]}
       flex={1}
     >
       <input
         type="radio"
         value={value}
         {...register(name)}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
         checked={isChecked}
       />
       <Box
         borderRadius={1.5}
-        bgcolor={isChecked ? 'specialCyan' : 'white'}
+        bgcolor={isChecked ? "specialCyan" : "white"}
         py={1.5}
         border={isChecked ? 0 : 1}
         borderColor="lightBlue"
       >
         <Typography
           textAlign="center"
-          color={isChecked ? 'white' : 'textBlack'}
+          color={isChecked ? "white" : "textBlack"}
         >
           {title}
         </Typography>

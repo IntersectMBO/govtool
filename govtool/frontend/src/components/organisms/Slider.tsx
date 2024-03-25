@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Box, Link, Typography } from "@mui/material";
 import { KeenSliderOptions } from "keen-slider";
 import "keen-slider/keen-slider.min.css";
@@ -38,7 +38,7 @@ export const Slider = ({
 }: SliderProps) => {
   const { isMobile, screenWidth, pagePadding } = useScreenDimension();
   const navigate = useNavigate();
-  const { voteTransaction } = useCardano();
+  const { pendingTransaction } = useCardano();
   const { t } = useTranslation();
 
   const DEFAULT_SLIDER_CONFIG = {
@@ -75,14 +75,31 @@ export const Slider = ({
 
   useEffect(() => {
     refresh();
-  }, [filters, sorting, searchPhrase, voteTransaction?.proposalId, data]);
+  }, [filters, sorting, searchPhrase, pendingTransaction.vote?.resourceId, data]);
 
-  const rangeSliderCalculationElement = dataLength < notSlicedDataLength
-    ? (screenWidth
-          + (onDashboard ? -290 - paddingOffset : -paddingOffset + 250))
-        / 437
-    : (screenWidth + (onDashboard ? -280 - paddingOffset : -paddingOffset))
-        / 402;
+  const rangeSliderCalculationElement =
+    dataLength < notSlicedDataLength
+      ? (screenWidth +
+          (onDashboard ? -290 - paddingOffset : -paddingOffset + 250)) /
+        437
+      : (screenWidth + (onDashboard ? -280 - paddingOffset : -paddingOffset)) /
+        402;
+
+  const handleLinkPress = useCallback(() => {
+    if (onDashboard) {
+      navigate(
+        generatePath(PATHS.dashboardGovernanceActionsCategory, {
+          category: navigateKey,
+        }),
+      );
+    } else {
+      navigate(
+        generatePath(PATHS.governanceActionsCategory, {
+          category: navigateKey,
+        }),
+      );
+    }
+  }, [onDashboard]);
 
   return (
     <Box>
@@ -100,17 +117,7 @@ export const Slider = ({
                 display: "flex",
               },
             ]}
-            onClick={() => (onDashboard
-              ? navigate(
-                generatePath(PATHS.dashboardGovernanceActionsCategory, {
-                  category: navigateKey,
-                }),
-              )
-              : navigate(
-                generatePath(PATHS.governanceActionsCategory, {
-                  category: navigateKey,
-                }),
-              ))}
+            onClick={handleLinkPress}
           >
             <Typography
               color="primary"
@@ -150,17 +157,7 @@ export const Slider = ({
                   display: "flex",
                 },
               ]}
-              onClick={() => (onDashboard
-                ? navigate(
-                  generatePath(PATHS.dashboardGovernanceActionsCategory, {
-                    category: navigateKey,
-                  }),
-                )
-                : navigate(
-                  generatePath(PATHS.governanceActionsCategory, {
-                    category: navigateKey,
-                  }),
-                ))}
+              onClick={handleLinkPress}
             >
               <Typography noWrap color="primary" fontSize={16} fontWeight={500}>
                 {t("slider.viewAll")}

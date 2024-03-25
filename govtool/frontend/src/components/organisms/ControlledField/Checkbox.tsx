@@ -1,9 +1,9 @@
-import { useCallback } from 'react';
-import { Controller, get } from 'react-hook-form';
+import { useCallback } from "react";
+import { Controller, get } from "react-hook-form";
 
-import { Field } from '@molecules';
+import { Field } from "@molecules";
 
-import { ControlledCheckboxProps, RenderInputProps } from './types';
+import { ControlledCheckboxProps, RenderInputProps } from "./types";
 
 export const Checkbox = ({
   control,

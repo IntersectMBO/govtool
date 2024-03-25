@@ -1,9 +1,9 @@
-import { Box } from '@mui/material';
+import { Box } from "@mui/material";
 
-import { Checkbox as CheckboxBase, FormErrorMessage, Typography } from '@atoms';
+import { Checkbox as CheckboxBase, FormErrorMessage, Typography } from "@atoms";
 
-import { useCallback } from 'react';
-import { CheckboxFieldProps } from './types';
+import { useCallback } from "react";
+import { CheckboxFieldProps } from "./types";
 
 export const Checkbox = ({
   errorMessage,
@@ -20,15 +20,15 @@ export const Checkbox = ({
   }, [value]);
 
   return (
-    <Box sx={{ width: '100%', ...layoutStyles }}>
+    <Box sx={{ width: "100%", ...layoutStyles }}>
       <Box
         onClick={handleValue}
         sx={{
-          alignItems: 'center',
-          cursor: 'pointer',
-          display: 'flex',
-          flexDirection: 'row',
-          width: 'fit-content',
+          alignItems: "center",
+          cursor: "pointer",
+          display: "flex",
+          flexDirection: "row",
+          width: "fit-content",
         }}
       >
         <CheckboxBase

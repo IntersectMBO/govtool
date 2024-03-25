@@ -29,6 +29,8 @@ jobs:
           node-version-file: "govtool/frontend/.nvmrc"
 
       - name: 🧪 Test
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
         run: |
           npm install
           npm run test
@@ -51,7 +53,7 @@ jobs:
           node-version-file: "govtool/frontend/.nvmrc"
 
       - name: 👕 Lint
-        run: /
+        run: |
           npm install
           npm run lint
 
@@ -73,6 +75,6 @@ jobs:
           node-version-file: "govtool/frontend/.nvmrc"
 
       - name: 🔍 Type Check
-        run: /
+        run: |
           npm install
           npm run tsc

@@ -8,6 +8,7 @@ import {
   useNavigationType,
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 import TagManager from "react-gtm-module";
 import { ThemeProvider } from "@emotion/react";
 import * as Sentry from "@sentry/react";
@@ -20,16 +21,17 @@ import "./i18n";
 
 const queryClient = new QueryClient();
 
+interface SentryEventDataLayer {
+  event: string;
+  sentryEventId: string;
+  sentryErrorMessage?: JSONValue;
+}
+
+// TODO: Move to types
 declare global {
   interface Window {
     dataLayer: SentryEventDataLayer[];
   }
-}
-
-interface SentryEventDataLayer {
-  event: string;
-  sentryEventId: string;
-  sentryErrorMessage?: any;
 }
 
 const tagManagerArgs = {
@@ -62,11 +64,12 @@ Sentry.init({
 Sentry.addGlobalEventProcessor((event) => {
   window.dataLayer = window.dataLayer || [];
 
-  const errorMessage = (event.exception
-      && event.exception.values
-      && event.exception.values[0]
-      && event.exception.values[0].value)
-    || "Unknown Error";
+  const errorMessage =
+    (event.exception &&
+      event.exception.values &&
+      event.exception.values[0] &&
+      event.exception.values[0].value) ||
+    "Unknown Error";
 
   window.dataLayer.push({
     event: "sentryEvent",
@@ -87,6 +90,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           </ContextProviders>
         </BrowserRouter>
       </ThemeProvider>
+      {import.meta.env.VITE_IS_DEV && (
+        <ReactQueryDevtools initialIsOpen={false} />
+      )}
     </QueryClientProvider>
   </React.StrictMode>,
 );

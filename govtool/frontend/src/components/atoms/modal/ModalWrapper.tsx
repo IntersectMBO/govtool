@@ -13,31 +13,6 @@ interface Props {
   sx?: SxProps;
 }
 
-export const ModalWrapper = ({
-  children,
-  onClose,
-  variant = "modal",
-  hideCloseButton = false,
-  dataTestId = "modal",
-  sx,
-}: Props) => {
-  const { closeModal } = useModal();
-
-  return (
-    <BaseWrapper variant={variant} data-testid={dataTestId} sx={sx}>
-      {variant !== "popup" && !hideCloseButton && (
-        <CloseButton
-          data-testid="close-modal-button"
-          alt="close"
-          onClick={callAll(closeModal, onClose)}
-          src={ICONS.closeIcon}
-        />
-      )}
-      {children}
-    </BaseWrapper>
-  );
-};
-
 export const BaseWrapper = styled("div")<Pick<Props, "variant">>`
   box-shadow: 1px 2px 11px 0px #00123d5e;
   max-height: 90vh;
@@ -73,3 +48,28 @@ export const CloseButton = styled("img")`
   top: 24px;
   right: 24px;
 `;
+
+export const ModalWrapper = ({
+  children,
+  onClose,
+  variant = "modal",
+  hideCloseButton = false,
+  dataTestId = "modal",
+  sx,
+}: Props) => {
+  const { closeModal } = useModal();
+
+  return (
+    <BaseWrapper variant={variant} data-testid={dataTestId} sx={sx}>
+      {variant !== "popup" && !hideCloseButton && (
+        <CloseButton
+          data-testid="close-modal-button"
+          alt="close"
+          onClick={callAll(closeModal, onClose)}
+          src={ICONS.closeIcon}
+        />
+      )}
+      {children}
+    </BaseWrapper>
+  );
+};

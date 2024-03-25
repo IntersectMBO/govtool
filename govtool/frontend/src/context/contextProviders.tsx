@@ -14,6 +14,4 @@ const ContextProviders = ({ children }: Props) => (
   </ModalProvider>
 );
 
-export {
-  ContextProviders, useCardano, useModal, useSnackbar,
-};
+export { ContextProviders, useCardano, useModal, useSnackbar };

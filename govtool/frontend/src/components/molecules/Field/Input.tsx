@@ -1,6 +1,4 @@
-import {
-  forwardRef, useCallback, useImperativeHandle, useRef,
-} from "react";
+import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 import { Box } from "@mui/material";
 
 import {
@@ -42,11 +40,12 @@ export const Input = forwardRef<HTMLInputElement, InputFieldProps>(
 
     useImperativeHandle(
       ref,
-      () => ({
-        focus: handleFocus,
-        blur: handleBlur,
-        ...inputRef.current,
-      } as unknown as HTMLInputElement),
+      () =>
+        ({
+          focus: handleFocus,
+          blur: handleBlur,
+          ...inputRef.current,
+        } as unknown as HTMLInputElement),
       [handleBlur, handleFocus],
     );
 

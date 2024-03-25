@@ -1,9 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { VotingPowerChips } from "@atoms";
-import {
-  userEvent, waitFor, within, screen,
-} from "@storybook/testing-library";
+import { userEvent, waitFor, within, screen } from "@storybook/testing-library";
 import { expect } from "@storybook/jest";
 
 const meta = {

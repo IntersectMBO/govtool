@@ -9,6 +9,7 @@ As a minor extension, we also keep a semantic version for the `UNRELEASED`
 changes.
 
 ## [Unreleased]
+
 - Update Cardano Serialization Lib to 12.0.0-alpha.19 [Issue 521](https://github.com/IntersectMBO/govtool/issues/521)
 - Add generate jsonld function [Issue 451](https://github.com/IntersectMBO/govtool/issues/451)
 - Create GA review subbmision page [Issue 362](https://github.com/IntersectMBO/govtool/issues/362)
@@ -18,9 +19,13 @@ changes.
 - Add on-chain inputs validation [Issue 377](https://github.com/IntersectMBO/govtool/issues/377)
 - Add hash and validation of the metadata [Issue 378](https://github.com/IntersectMBO/govtool/issues/378)
 - Add githubusercontent.com and ipfs.io to content security policy header [Issue 451](https://github.com/IntersectMBO/govtool/issues/451)
-- Add frontend test workflow on github actions [Issue 500](https://github.com/IntesectMBO/govtool/issues/500)
-- Add type check & lint to github actions [Issue 512](https://github.com/IntesectMBO/govtool/issues/512)
-- Add eslint & prettier to frontend package [Issue 166](https://github.com/IntesectMBO/govtool/issues/166)
+- Add frontend test workflow on github actions [Issue 500](https://github.com/IntersectMBO/govtool/issues/500)
+- Add type check & lint to github actions [Issue 512](https://github.com/IntersectMBO/govtool/issues/512)
+- Add eslint & prettier to frontend package [Issue 166](https://github.com/IntersectMBO/govtool/issues/166)
+- Extend the eslint config to apply to the style guide of the project [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
+- Fix all the existing eslint errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
+- Fix all the existing typescript errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
+- Fix endless spinner on a dashboard [Issue 539](https://github.com/IntersectMBO/govtool/issues/539)
 
 ### Added
 
@@ -32,6 +37,8 @@ changes.
 - Vitest unit tests added for utils functions [Issue 81](https://github.com/IntersectMBO/govtool/issues/81)
 - i18next library added to FE [Issue 80](https://github.com/IntersectMBO/govtool/issues/80)
 - Add possibility to vote on behalf of myself - Sole Voter [Issue 119](https://github.com/IntersectMBO/govtool/issues/119)
+- Added Nix Flakes configurtion to handle unified developers setup [Issue 526](https://github.com/IntersectMBO/govtool/issues/526)
+- Add missing test to utils [Issue 500](https://github.com/IntersectMBO/govtool/issues/500).
 
 ### Fixed
 
@@ -48,6 +55,7 @@ changes.
 - Fixed deployment scripts to address [Issue 171](https://github.com/IntersectMBO/govtool/issues/171).
 - Fixed get drep voting power incorrectly executed endpoint [Issue 280](https://github.com/IntersectMBO/govtool/issues/280).
 - Fixed CSP settings to allow error reports with Sentry [Issue 291](https://github.com/IntersectMBO/govtool/issues/291).
+- Fix frontend package tests [Issue 500](https://github.com/IntersectMBO/govtool/issues/500).
 
 ### Changed
 

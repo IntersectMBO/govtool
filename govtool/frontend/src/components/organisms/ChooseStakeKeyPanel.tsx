@@ -1,8 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Box, Button, Grid, Typography,
-} from "@mui/material";
+import { Box, Button, Grid, Typography } from "@mui/material";
 
 import { StakeRadio } from "@atoms";
 import { useCardano, useSnackbar } from "@context";
@@ -22,48 +20,54 @@ export const ChooseStakeKeyPanel = () => {
     palette: { boxShadow2 },
   } = theme;
 
-  const renderCancelButton = useMemo(() => (
-    <Button
-      data-testid="cancel-button"
-      variant="outlined"
-      onClick={() => {
-        disconnectWallet();
-        navigate(PATHS.home);
-      }}
-      sx={{
-        borderRadius: 50,
-        textTransform: "none",
-        width: isMobile ? "100%" : "auto",
-        height: 48,
-        px: isMobile ? 0 : 6,
-      }}
-    >
-      {t("cancel")}
-    </Button>
-  ), [isMobile]);
+  const renderCancelButton = useMemo(
+    () => (
+      <Button
+        data-testid="cancel-button"
+        variant="outlined"
+        onClick={() => {
+          disconnectWallet();
+          navigate(PATHS.home);
+        }}
+        sx={{
+          borderRadius: 50,
+          textTransform: "none",
+          width: isMobile ? "100%" : "auto",
+          height: 48,
+          px: isMobile ? 0 : 6,
+        }}
+      >
+        {t("cancel")}
+      </Button>
+    ),
+    [isMobile],
+  );
 
-  const renderSelectButton = useMemo(() => (
-    <Button
-      data-testid="select-button"
-      disabled={!chosenKey}
-      onClick={() => {
-        setStakeKey(chosenKey);
-        setItemToLocalStorage(`${WALLET_LS_KEY}_stake_key`, chosenKey);
-        addSuccessAlert("Wallet connected", 3000);
-        navigate(PATHS.dashboard);
-      }}
-      sx={{
-        borderRadius: 50,
-        textTransform: "none",
-        width: isMobile ? "100%" : "auto",
-        px: isMobile ? 0 : 6,
-        height: 48,
-      }}
-      variant="contained"
-    >
-      {t("select")}
-    </Button>
-  ), [isMobile, chosenKey, setStakeKey]);
+  const renderSelectButton = useMemo(
+    () => (
+      <Button
+        data-testid="select-button"
+        disabled={!chosenKey}
+        onClick={() => {
+          setStakeKey(chosenKey);
+          setItemToLocalStorage(`${WALLET_LS_KEY}_stake_key`, chosenKey);
+          addSuccessAlert("Wallet connected", 3000);
+          navigate(PATHS.dashboard);
+        }}
+        sx={{
+          borderRadius: 50,
+          textTransform: "none",
+          width: isMobile ? "100%" : "auto",
+          px: isMobile ? 0 : 6,
+          height: 48,
+        }}
+        variant="contained"
+      >
+        {t("select")}
+      </Button>
+    ),
+    [isMobile, chosenKey, setStakeKey],
+  );
 
   return (
     <Box

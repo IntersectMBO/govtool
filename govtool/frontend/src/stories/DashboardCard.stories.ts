@@ -47,7 +47,7 @@ export const WithDRepIdDashboardCardComponent: Story = {
   },
 };
 
-export const isLoadingDashboardCard: Story = {
+export const LoadingDashboardCard: Story = {
   args: {
     description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
     firstButtonLabel: "first button",
@@ -65,7 +65,7 @@ export const isLoadingDashboardCard: Story = {
   },
 };
 
-export const isProgressDashboardCard: Story = {
+export const InProgressDashboardCard: Story = {
   args: {
     description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
     firstButtonLabel: "first button",

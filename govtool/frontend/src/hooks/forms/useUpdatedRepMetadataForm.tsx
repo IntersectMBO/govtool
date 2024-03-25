@@ -41,13 +41,12 @@ export const useUpdatedRepMetadataForm = () => {
         );
         const result = await buildSignSubmitConwayCertTx({
           certBuilder,
-          type: "registration",
-          registrationType: "update",
+          type: "updateMetaData",
         });
-        if (result) addSuccessAlert(t("alerts.metadataUpdate.success"));
+        if (result) addSuccessAlert(t("alerts.updateMetaData.success"));
         navigate(PATHS.dashboard);
       } catch (e) {
-        addErrorAlert(t("alerts.metadataUpdate.failed"));
+        addErrorAlert(t("alerts.updateMetaData.failed"));
       } finally {
         setIsLoading(false);
       }

@@ -1,6 +1,4 @@
-import {
-  useCallback, useMemo, useRef, useState,
-} from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   generatePath,
   NavLink,
@@ -22,6 +20,7 @@ import { DataActionsBar, GovernanceActionCard } from "@molecules";
 import {
   useFetchNextPageDetector,
   useGetProposalsInfiniteQuery,
+  useGetVoterInfo,
   useSaveScrollPosition,
   useScreenDimension,
   useTranslation,
@@ -40,7 +39,8 @@ export const DashboardGovernanceActionsCategory = () => {
   const [chosenSorting, setChosenSorting] = useState<string>("");
   const { isMobile, screenWidth } = useScreenDimension();
   const navigate = useNavigate();
-  const { voter, isDrepLoading, voteTransaction } = useCardano();
+  const { pendingTransaction, isEnableLoading } = useCardano();
+  const { voter } = useGetVoterInfo();
   const { t } = useTranslation();
 
   const {
@@ -53,6 +53,7 @@ export const DashboardGovernanceActionsCategory = () => {
   } = useGetProposalsInfiniteQuery({
     filters: [category?.replace(/ /g, "") ?? ""],
     sorting: chosenSorting,
+    searchPhrase: searchText,
   });
   const loadNextPageRef = useRef(null);
 
@@ -85,9 +86,11 @@ export const DashboardGovernanceActionsCategory = () => {
   const mappedData = useMemo(() => {
     const uniqueProposals = removeDuplicatedProposals(proposals);
 
-    return uniqueProposals?.filter((i) => getFullGovActionId(i.txHash, i.index)
-      .toLowerCase()
-      .includes(searchText.toLowerCase()));
+    return uniqueProposals?.filter((i) =>
+      getFullGovActionId(i.txHash, i.index)
+        .toLowerCase()
+        .includes(searchText.toLowerCase()),
+    );
   }, [
     proposals,
     voter?.isRegisteredAsDRep,
@@ -150,7 +153,7 @@ export const DashboardGovernanceActionsCategory = () => {
               sortOpen={sortOpen}
             />
             <Box height={24} />
-            {isProposalsLoading || isDrepLoading ? (
+            {!mappedData || isEnableLoading || isProposalsLoading ? (
               <Box display="flex" justifyContent="center" py={4}>
                 <CircularProgress />
               </Box>
@@ -159,7 +162,7 @@ export const DashboardGovernanceActionsCategory = () => {
                 <Box display="flex" flexWrap="wrap" mt={4}>
                   <Typography fontWeight={300}>
                     {t("govActions.withCategoryNotExist.partOne")}
-&nbsp;
+                    &nbsp;
                   </Typography>
                   <Typography fontWeight="bold">{` ${category} `}</Typography>
                   <Typography fontWeight={300}>
@@ -172,13 +175,12 @@ export const DashboardGovernanceActionsCategory = () => {
               <Box
                 columnGap={4}
                 display="grid"
-                gridTemplateColumns={`repeat(auto-fit, minmax(${
-                  screenWidth < 375
+                gridTemplateColumns={`repeat(auto-fit, minmax(${screenWidth < 375
                     ? "255px"
                     : screenWidth < 768
                       ? "294px"
                       : "402px"
-                }, 1fr))`}
+                  }, 1fr))`}
               >
                 {mappedData.map((item) => (
                   <Box pb={4.25} key={item.txHash + item.index}>
@@ -186,12 +188,14 @@ export const DashboardGovernanceActionsCategory = () => {
                       {...item}
                       index={item.index}
                       inProgress={
-                        voteTransaction.proposalId === item.txHash + item.index
+                        pendingTransaction.vote?.resourceId ===
+                        item.txHash + item.index
                       }
                       onClick={() => {
                         saveScrollPosition();
 
-                        voteTransaction.proposalId === item.txHash + item.index
+                        // eslint-disable-next-line no-unused-expressions
+                        pendingTransaction.vote?.resourceId === item.txHash + item.index
                           ? openInNewTab(
                             "https://adanordic.com/latest_transactions",
                           )

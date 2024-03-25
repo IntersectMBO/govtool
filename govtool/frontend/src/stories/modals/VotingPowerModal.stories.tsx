@@ -26,15 +26,17 @@ const Template: StoryFn<VotingPowerModalState> = (args) => {
 
   return (
     <>
-      <button onClick={open} style={{ cursor: "pointer" }}>
+      <button type="button" onClick={open} style={{ cursor: "pointer" }}>
         Open Modal
       </button>
       {modals[modal.type]?.component && (
         <Modal
           open={Boolean(modals[modal.type].component)}
-          handleClose={callAll(modals[modal.type]?.onClose, () => openModal({ type: "none", state: null }))}
+          handleClose={callAll(modals[modal.type]?.onClose, () =>
+            openModal({ type: "none", state: null }),
+          )}
         >
-          {modals[modal.type]?.component ?? <></>}
+          {modals[modal.type].component!}
         </Modal>
       )}
     </>

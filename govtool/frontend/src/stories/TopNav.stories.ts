@@ -12,7 +12,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const performCommonActions = async (canvas: any) => {
+const performCommonActions = async (canvas: ReturnType<typeof within>) => {
   window.open = jest.fn();
 
   await userEvent.click(canvas.getByTestId("logo-button"));

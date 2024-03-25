@@ -3,29 +3,23 @@ import { Box, Link } from "@mui/material";
 
 import { Spacer, Typography } from "@atoms";
 import {
-  useRegisterAsdRepFormContext,
   useScreenDimension,
   useTranslation,
+  useRegisterAsdRepForm,
 } from "@hooks";
 import { openInNewTab } from "@utils";
 
-import { BgCard, ControlledField } from ".";
+import { BgCard, ControlledField } from "..";
 
-export const RegisterAsdRepStepThree = ({
+export const DRepStoreDataInfo = ({
   setStep,
 }: {
   setStep: Dispatch<SetStateAction<number>>;
 }) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
-  const {
-    control,
-    errors,
-    isRegistrationAsDRepLoading,
-    resetField,
-    submitForm,
-    watch,
-  } = useRegisterAsdRepFormContext();
+  const { control, errors, isRegistrationAsDRepLoading, resetField, watch } =
+    useRegisterAsdRepForm();
 
   const onClickBackButton = () => {
     setStep(2);
@@ -33,6 +27,8 @@ export const RegisterAsdRepStepThree = ({
   };
 
   const isContinueDisabled = !watch("storeData");
+
+  const onClickContinue = () => setStep(4);
 
   // TODO: Add link about store data when available
   const openLink = () => openInNewTab("https://sancho.network/get-started");
@@ -42,7 +38,7 @@ export const RegisterAsdRepStepThree = ({
       actionButtonLabel={t("register")}
       isActionButtonDisabled={isContinueDisabled}
       isLoadingActionButton={isRegistrationAsDRepLoading}
-      onClickActionButton={submitForm}
+      onClickActionButton={onClickContinue}
       onClickBackButton={onClickBackButton}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">

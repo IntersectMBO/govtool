@@ -42,22 +42,23 @@ export const CreateGovernanceAction = () => {
     }
   }, []);
 
-  const onClickBackToDashboard = () => openModal({
-    type: "statusModal",
-    state: {
-      status: "warning",
-      message: t("modals.createGovernanceAction.cancelModalDescription"),
-      buttonText: t("modals.common.goToDashboard"),
-      title: t("modals.createGovernanceAction.cancelModalTitle"),
-      dataTestId: "cancel-governance-action-creation-modal",
-      onSubmit: backToDashboard,
-    },
-  });
-
   const backToDashboard = () => {
     navigate(PATHS.dashboard);
     closeModal();
   };
+
+  const onClickBackToDashboard = () =>
+    openModal({
+      type: "statusModal",
+      state: {
+        status: "warning",
+        message: t("modals.createGovernanceAction.cancelModalDescription"),
+        buttonText: t("modals.common.goToDashboard"),
+        title: t("modals.createGovernanceAction.cancelModalTitle"),
+        dataTestId: "cancel-governance-action-creation-modal",
+        onSubmit: backToDashboard,
+      },
+    });
 
   return (
     <Background isReverted>

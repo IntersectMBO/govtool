@@ -1,12 +1,13 @@
-import { Box } from '@mui/material';
+import { Box } from "@mui/material";
 
-import { Typography } from '@atoms';
-import { theme } from '@/theme';
+import { Typography } from "@atoms";
+import { theme } from "@/theme";
 
-import { StepProps } from './types';
+import { StepProps } from "./types";
 
 export const Step = ({
   component,
+  componentsLayoutStyles,
   label,
   layoutStyles,
   stepNumber,
@@ -18,20 +19,20 @@ export const Step = ({
   return (
     <Box
       sx={{
-        flexDirection: 'row',
-        display: 'flex',
-        width: '100%',
+        flexDirection: "row",
+        display: "flex",
+        width: "100%",
         ...layoutStyles,
       }}
     >
       <Box
         sx={{
-          alignItems: 'center',
-          borderRadius: '100%',
+          alignItems: "center",
+          borderRadius: "100%",
           boxShadow: `2px 2px 20px 0px ${boxShadow2}`,
-          display: 'flex',
+          display: "flex",
           height: 54,
-          justifyContent: 'center',
+          justifyContent: "center",
           width: 54,
         }}
       >
@@ -42,13 +43,14 @@ export const Step = ({
 
       <Box
         sx={{
-          display: 'flex',
+          display: "flex",
           flex: 1,
-          flexDirection: 'column',
+          flexDirection: "column",
           ml: 3,
+          ...componentsLayoutStyles,
         }}
       >
-        <Typography fontWeight={500} sx={{ mb: 1.5 }} variant="body1">
+        <Typography fontWeight={500} variant="body1">
           {label}
         </Typography>
         {component}

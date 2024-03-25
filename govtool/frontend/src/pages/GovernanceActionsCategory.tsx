@@ -1,6 +1,4 @@
-import {
-  useState, useCallback, useEffect, useMemo, useRef,
-} from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import {
   Box,
@@ -21,6 +19,7 @@ import {
   useSaveScrollPosition,
   useScreenDimension,
   useTranslation,
+  useGetVoterInfo,
 } from "@hooks";
 import {
   WALLET_LS_KEY,
@@ -38,7 +37,7 @@ export const GovernanceActionsCategory = () => {
   const { isMobile, pagePadding, screenWidth } = useScreenDimension();
   const { isEnabled } = useCardano();
   const navigate = useNavigate();
-  const { voter } = useCardano();
+  const { voter } = useGetVoterInfo();
   const { t } = useTranslation();
 
   const {
@@ -51,6 +50,7 @@ export const GovernanceActionsCategory = () => {
   } = useGetProposalsInfiniteQuery({
     filters: [category?.replace(/ /g, "") ?? ""],
     sorting: chosenSorting,
+    searchPhrase: searchText,
   });
   const loadNextPageRef = useRef(null);
 
@@ -83,9 +83,11 @@ export const GovernanceActionsCategory = () => {
   const mappedData = useMemo(() => {
     const uniqueProposals = removeDuplicatedProposals(proposals);
 
-    return uniqueProposals?.filter((i) => getFullGovActionId(i.txHash, i.index)
-      .toLowerCase()
-      .includes(searchText.toLowerCase()));
+    return uniqueProposals?.filter((i) =>
+      getFullGovActionId(i.txHash, i.index)
+        .toLowerCase()
+        .includes(searchText.toLowerCase()),
+    );
   }, [
     voter?.isRegisteredAsDRep,
     isProposalsFetchingNextPage,
@@ -177,17 +179,17 @@ export const GovernanceActionsCategory = () => {
                   <Box mt={4} display="flex" flexWrap="wrap">
                     <Typography fontWeight={300}>
                       {t("govActions.withCategoryNotExist.partOne")}
-&nbsp;
+                      &nbsp;
                     </Typography>
                     <Typography fontWeight={700}>
                       {category}
-&nbsp;
+                      &nbsp;
                     </Typography>
                     {searchText && (
                       <>
                         <Typography fontWeight={300}>
                           {t("govActions.withCategoryNotExist.optional")}
-&nbsp;
+                          &nbsp;
                         </Typography>
                         <Typography fontWeight={700}>{searchText}</Typography>
                       </>
@@ -206,8 +208,8 @@ export const GovernanceActionsCategory = () => {
                     screenWidth < 375
                       ? "255px"
                       : screenWidth < 768
-                        ? "294px"
-                        : "402px"
+                      ? "294px"
+                      : "402px"
                   }, 1fr))`}
                 >
                   {mappedData.map((item) => (

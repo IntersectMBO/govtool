@@ -14,9 +14,9 @@ export const useFetchNextPageDetector = (
       const fullHeight = document.documentElement.offsetHeight;
 
       if (
-        scrollTop + windowHeight > fullHeight * windowHeightFetchThreshold
-        && hasNextPage
-        && !isLoading
+        scrollTop + windowHeight > fullHeight * windowHeightFetchThreshold &&
+        hasNextPage &&
+        !isLoading
       ) {
         fetchNextPage();
       }

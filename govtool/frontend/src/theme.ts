@@ -1,64 +1,13 @@
 import { createTheme } from "@mui/material/styles";
 import {
-  cyan, errorRed, fadedPurple, orange, primaryBlue, progressYellow, successGreen,
+  cyan,
+  errorRed,
+  fadedPurple,
+  orange,
+  primaryBlue,
+  progressYellow,
+  successGreen,
 } from "./consts";
-
-declare module "@mui/material/styles" {
-  interface BreakpointOverrides {
-    xxs: true;
-    xs: true;
-    sm: true;
-    md: true;
-    lg: true;
-    xl: true;
-  }
-  interface Palette {
-    accentOrange: string;
-    accentYellow: string;
-    boxShadow1: string;
-    boxShadow2: string;
-    highlightBlue: string;
-    inputRed: string;
-    negativeRed: string;
-    neutralGray: string;
-    orangeDark: string;
-    neutralWhite: string;
-    positiveGreen: string;
-    primaryBlue: string;
-    secondaryBlue: string;
-    specialCyan: string;
-    specialCyanBorder: string;
-    lightBlue: string;
-    textBlack: string;
-    textGray: string;
-    lightOrange: string;
-    fadedPurple: string;
-  }
-  interface PaletteOptions {
-    accentOrange: string;
-    accentYellow: string;
-    boxShadow1: string;
-    boxShadow2: string;
-    highlightBlue: string;
-    orangeDark: string;
-    inputRed: string;
-    negativeRed: string;
-    neutralGray: string;
-    neutralWhite: string;
-    positiveGreen: string;
-    primaryBlue: string;
-    secondaryBlue: string;
-    specialCyan: string;
-    specialCyanBorder: string;
-    lightBlue: string;
-    textBlack: string;
-    textGray: string;
-    lightOrange: string;
-    fadedPurple: string;
-  }
-}
-
-export type Theme = typeof theme;
 
 export const theme = createTheme({
   breakpoints: {
@@ -90,8 +39,8 @@ export const theme = createTheme({
           borderRadius: 50,
           textTransform: "none",
         },
-        outlined: ({ theme }) => ({
-          borderColor: theme.palette.lightBlue,
+        outlined: (props) => ({
+          borderColor: props.theme.palette.lightBlue,
         }),
       },
     },
@@ -188,8 +137,13 @@ export const theme = createTheme({
   },
 });
 
-theme.shadows[1] = "0px 1px 2px 0px rgba(0, 51, 173, 0.08), 0px 1px 6px 1px rgba(0, 51, 173, 0.15)";
-theme.shadows[2] = "0px 1px 2px 0px rgba(0, 51, 173, 0.08), 0px 2px 10px 2px rgba(0, 51, 173, 0.15)";
-theme.shadows[3] = "0px 1px 3px 0px rgba(0, 51, 173, 0.08), 0px 4px 12px 3px rgba(0, 51, 173, 0.15)";
-theme.shadows[4] = "0px 2px 3px 0px rgba(0, 51, 173, 0.08), 0px 6px 14px 4px rgba(0, 51, 173, 0.15)";
-theme.shadows[5] = "0px 4px 4px 0px rgba(0, 51, 173, 0.08), 0px 8px 20px 6px rgba(0, 51, 173, 0.15)";
+theme.shadows[1] =
+  "0px 1px 2px 0px rgba(0, 51, 173, 0.08), 0px 1px 6px 1px rgba(0, 51, 173, 0.15)";
+theme.shadows[2] =
+  "0px 1px 2px 0px rgba(0, 51, 173, 0.08), 0px 2px 10px 2px rgba(0, 51, 173, 0.15)";
+theme.shadows[3] =
+  "0px 1px 3px 0px rgba(0, 51, 173, 0.08), 0px 4px 12px 3px rgba(0, 51, 173, 0.15)";
+theme.shadows[4] =
+  "0px 2px 3px 0px rgba(0, 51, 173, 0.08), 0px 6px 14px 4px rgba(0, 51, 173, 0.15)";
+theme.shadows[5] =
+  "0px 4px 4px 0px rgba(0, 51, 173, 0.08), 0px 8px 20px 6px rgba(0, 51, 173, 0.15)";

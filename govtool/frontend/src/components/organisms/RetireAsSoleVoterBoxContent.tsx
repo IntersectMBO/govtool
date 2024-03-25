@@ -2,14 +2,13 @@ import { Link } from "@mui/material";
 import { Trans } from "react-i18next";
 
 import { Typography } from "@atoms";
-import { useScreenDimension, useTranslation } from "@hooks";
-import { correctAdaFormat, openInNewTab } from "@/utils";
-import { useCardano } from "@/context";
+import { useGetVoterInfo, useScreenDimension, useTranslation } from "@hooks";
+import { correctAdaFormat, openInNewTab } from "@utils";
 
 export const RetireAsSoleVoterBoxContent = () => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
-  const { voter } = useCardano();
+  const { voter } = useGetVoterInfo();
 
   return (
     <>

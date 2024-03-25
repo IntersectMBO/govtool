@@ -1,9 +1,9 @@
-import { Box } from '@mui/material';
+import { Box } from "@mui/material";
 
-import { Background } from '@atoms';
+import { Background } from "@atoms";
 
-import { TopNav, ChooseStakeKeyPanel, Footer } from '@organisms';
-import { useScreenDimension } from '@/hooks';
+import { TopNav, ChooseStakeKeyPanel, Footer } from "@organisms";
+import { useScreenDimension } from "@/hooks";
 
 export const ChooseStakeKey = () => {
   const { isMobile } = useScreenDimension();

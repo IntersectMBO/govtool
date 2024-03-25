@@ -13,7 +13,7 @@ let
     lib.addBuildTools drv (with ghcPackages; [
       cabal-install
       haskell-language-server
-      ormolu
+      stylish-haskell
     ]);
 
   useBroken = drv: pipe drv [ lib.markBroken lib.dontCheck ];

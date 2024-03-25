@@ -238,11 +238,17 @@ data ProposalResponse = ProposalResponse
     proposalResponseTxHash :: HexText,
     proposalResponseIndex :: Integer,
     proposalResponseType :: GovernanceActionType,
-    proposalResponseDetails :: GovernanceActionDetails,
+    proposalResponseDetails :: Maybe GovernanceActionDetails,
     proposalResponseExpiryDate :: Maybe UTCTime,
+    proposalResponseExpiryEpochNo :: Maybe Integer,
     proposalResponseCreatedDate :: UTCTime,
+    proposalResponseCreatedEpochNo :: Integer,
     proposalResponseUrl :: Text,
     proposalResponseMetadataHash :: HexText,
+    proposalResponseTitle :: Maybe Text,
+    proposalResponseAbout :: Maybe Text,
+    proposalResponseMotivation :: Maybe Text,
+    proposalResponseRationale :: Maybe Text,
     proposalResponseYesVotes :: Integer,
     proposalResponseNoVotes :: Integer,
     proposalResponseAbstainVotes :: Integer
@@ -258,9 +264,15 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"type\": \"InfoAction\","
                   <> "\"details\": \"some details\","
                   <> "\"expiryDate\": \"1970-01-01T00:00:00Z\","
+                  <> "\"expiryEpochNo\": 0,"
                   <> "\"createdDate\": \"1970-01-01T00:00:00Z\","
+                  <> "\"createdEpochNo\": 0,"
                   <> "\"url\": \"https://proposal.metadata.xyz\","
                   <> "\"metadataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
+                  <> "\"title\": \"Proposal Title\","
+                  <> "\"about\": \"Proposal About\","
+                  <> "\"motivation\": \"Proposal Motivation\","
+                  <> "\"rationale\": \"Proposal Rationale\","
                   <> "\"yesVotes\": 0,"
                   <> "\"noVotes\": 0,"
                   <> "\"abstainVotes\": 0}"

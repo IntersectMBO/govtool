@@ -26,6 +26,7 @@ changes.
 - Fix all the existing eslint errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
 - Fix all the existing typescript errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
 - Fix endless spinner on a dashboard [Issue 539](https://github.com/IntersectMBO/govtool/issues/539)
+- Update frontend package readme to reflect recent changes [Issue 543](https://github.com/IntersectMBO/govtool/issues/543)
 
 ### Added
 

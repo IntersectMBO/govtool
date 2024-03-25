@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import { Box } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
@@ -24,6 +24,7 @@ export const DRepStorageInformation = ({
   const {
     control,
     errors,
+    generateMetadata,
     getValues,
     isRegistrationAsDRepLoading,
     onClickDownloadJson,
@@ -41,6 +42,10 @@ export const DRepStorageInformation = ({
   const isActionButtonDisabled = !watch("storingURL") || !!errors["storingURL"];
 
   const onClickBack = () => setStep(3);
+
+  useEffect(() => {
+    generateMetadata();
+  }, []);
 
   return (
     <BgCard

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
 import { captureException } from "@sentry/react";
+import { NodeObject } from "jsonld";
 
 import {
   CIP_100,
@@ -26,7 +27,7 @@ export type RegisterAsDRepValues = {
   bio?: string;
   dRepName: string;
   email?: string;
-  links?: { link: string }[];
+  links?: Array<{ link: string }>;
   storeData?: boolean;
   storingURL: string;
 };
@@ -47,6 +48,7 @@ export const useRegisterAsdRepForm = (
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hash, setHash] = useState<string | null>(null);
+  const [json, setJson] = useState<NodeObject | null>(null);
   const { closeModal, openModal } = useModal();
   const { buildDRepRegCert, buildDRepUpdateCert, buildSignSubmitConwayCertTx } =
     useCardano();
@@ -75,7 +77,8 @@ export const useRegisterAsdRepForm = (
   const dRepName = watch("dRepName");
   const isError = Object.keys(errors).length > 0;
 
-  const generateMetadata = async (data: RegisterAsDRepValues) => {
+  const generateMetadata = useCallback(async () => {
+    const data = getValues();
     const acceptedKeys = ["dRepName", "bio", "email"];
 
     const filteredData = Object.entries(data)
@@ -95,19 +98,19 @@ export const useRegisterAsdRepForm = (
       [`${CIP_QQQ}references`]: references,
     };
 
-    const jsonld = await generateJsonld(body, DREP_CONTEXT);
+    const jsonld = await generateJsonld(body, DREP_CONTEXT, CIP_QQQ);
 
     const canonizedJson = await canonizeJSON(jsonld);
     const hash = blake2bHex(canonizedJson, undefined, 32);
 
     setHash(hash);
+    setJson(jsonld);
 
     return jsonld;
-  };
+  }, []);
 
   const onClickDownloadJson = async () => {
-    const data = getValues();
-    const json = await generateMetadata(data);
+    if (!json) return;
 
     downloadJson(json, dRepName);
   };
@@ -141,23 +144,17 @@ export const useRegisterAsdRepForm = (
     [backToForm],
   );
 
-  const createCert = useCallback(
+  const createRegistrationCert = useCallback(
     async (data: RegisterAsDRepValues) => {
-      // if (!hash) return;
-      // const url = data.storingURL;
-      const urlSubmitValue =
-        "https://raw.githubusercontent.com/Thomas-Upfield/test-metadata/main/placeholder.json";
-      const hashSubmitValue =
-        "654e483feefc4d208ea02637a981a2046e17c73c09583e9dd0c84c25dab42749";
+      if (!hash) return;
+      const url = data.storingURL;
+
       try {
         let certBuilder;
         if (voter?.isRegisteredAsSoleVoter) {
-          certBuilder = await buildDRepUpdateCert(
-            urlSubmitValue,
-            hashSubmitValue,
-          );
+          certBuilder = await buildDRepUpdateCert(url, hash);
         } else {
-          certBuilder = await buildDRepRegCert(urlSubmitValue, hashSubmitValue);
+          certBuilder = await buildDRepRegCert(url, hash);
         }
         return certBuilder;
       } catch (error: any) {
@@ -192,8 +189,8 @@ export const useRegisterAsdRepForm = (
       try {
         setIsLoading(true);
 
-        // await validateHash(data.storingURL, hash);
-        const registerAsDRepCert = await createCert(data);
+        await validateHash(data.storingURL, hash);
+        const registerAsDRepCert = await createRegistrationCert(data);
         await buildSignSubmitConwayCertTx({
           certBuilder: registerAsDRepCert,
           type: "registerAsDrep",
@@ -207,12 +204,13 @@ export const useRegisterAsdRepForm = (
         setIsLoading(false);
       }
     },
-    [buildSignSubmitConwayCertTx, createCert, hash],
+    [buildSignSubmitConwayCertTx, createRegistrationCert, hash],
   );
 
   return {
     control,
     errors,
+    generateMetadata,
     getValues,
     isError,
     isRegistrationAsDRepLoading: isLoading,

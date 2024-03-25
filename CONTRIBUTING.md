@@ -202,7 +202,7 @@ Please see [CSS / SASS Style Guide](./docs/style-guides/css-sass/).
 
 #### Haskell
 
-TODO
+Please see [stylish-haskell configuration](./govtool/backend/.stylish-haskell.yaml).
 
 ## Bumping Node, DB-Sync, SanchoNet Versions
 

@@ -32,6 +32,6 @@ in project.overrideAttrs (oldAttrs: {
     tput bold
     warn "Welcome to GovTool!" 4
     warn "This is a backend development shell." 4
-    warn "Read the govtool/backend/README.md to get more info about this module." 8
+    warn "Read the ${./README.md} to get more info about this module." 8
   '' + (oldAttrs.shellHook or "");
 })

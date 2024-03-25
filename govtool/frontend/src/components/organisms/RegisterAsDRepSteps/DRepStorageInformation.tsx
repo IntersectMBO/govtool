@@ -39,7 +39,7 @@ export const DRepStorageInformation = ({
   const openGuideAboutStoringInformation = () =>
     openInNewTab("https://sancho.network/");
 
-  const isActionButtonDisabled = !watch("storingURL") || !!errors["storingURL"];
+  const isActionButtonDisabled = !watch("storingURL") || !!errors.storingURL;
 
   const onClickBack = () => setStep(3);
 

@@ -101,9 +101,9 @@ export const useRegisterAsdRepForm = (
     const jsonld = await generateJsonld(body, DREP_CONTEXT, CIP_QQQ);
 
     const canonizedJson = await canonizeJSON(jsonld);
-    const hash = blake2bHex(canonizedJson, undefined, 32);
+    const canonizedJsonHash = blake2bHex(canonizedJson, undefined, 32);
 
-    setHash(hash);
+    setHash(canonizedJsonHash);
     setJson(jsonld);
 
     return jsonld;
@@ -116,11 +116,12 @@ export const useRegisterAsdRepForm = (
   };
 
   const validateHash = useCallback(
-    async (storingUrl: string, hash: string | null) => {
+    async (storingUrl: string) => {
       try {
         if (!hash) throw new Error(MetadataHashValidationErrors.INVALID_HASH);
 
         await validateMetadataHash(storingUrl, hash);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         if (
           Object.values(MetadataHashValidationErrors).includes(error.message)
@@ -141,7 +142,7 @@ export const useRegisterAsdRepForm = (
         throw error;
       }
     },
-    [backToForm],
+    [backToForm, hash],
   );
 
   const createRegistrationCert = useCallback(
@@ -150,14 +151,14 @@ export const useRegisterAsdRepForm = (
       const url = data.storingURL;
 
       try {
-        let certBuilder;
         if (voter?.isRegisteredAsSoleVoter) {
-          certBuilder = await buildDRepUpdateCert(url, hash);
-        } else {
-          certBuilder = await buildDRepRegCert(url, hash);
+          return await buildDRepUpdateCert(url, hash);
         }
-        return certBuilder;
+
+        return await buildDRepRegCert(url, hash);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
+        // eslint-disable-next-line no-console
         console.error(error);
         throw error;
       }
@@ -189,7 +190,7 @@ export const useRegisterAsdRepForm = (
       try {
         setIsLoading(true);
 
-        await validateHash(data.storingURL, hash);
+        await validateHash(data.storingURL);
         const registerAsDRepCert = await createRegistrationCert(data);
         await buildSignSubmitConwayCertTx({
           certBuilder: registerAsDRepCert,
@@ -197,14 +198,14 @@ export const useRegisterAsdRepForm = (
         });
 
         showSuccessModal();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         captureException(error);
-        console.error(error);
       } finally {
         setIsLoading(false);
       }
     },
-    [buildSignSubmitConwayCertTx, createRegistrationCert, hash],
+    [buildSignSubmitConwayCertTx, createRegistrationCert, hash, validateHash],
   );
 
   return {

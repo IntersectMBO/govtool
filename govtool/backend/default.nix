@@ -13,6 +13,7 @@ let
     lib.addBuildTools drv (with ghcPackages; [
       cabal-install
       haskell-language-server
+      hlint
       stylish-haskell
     ]);
 

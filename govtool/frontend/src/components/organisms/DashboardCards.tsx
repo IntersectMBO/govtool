@@ -1,10 +1,10 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
 import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
-import { useCardano, useModal } from "@context";
+import { useCardano } from "@context";
 import {
   useGetAdaHolderVotingPowerQuery,
   useScreenDimension,
@@ -17,8 +17,6 @@ import { correctAdaFormat, formHexToBech32, openInNewTab } from "@utils";
 
 export const DashboardCards = () => {
   const {
-    buildDRepRetirementCert,
-    buildSignSubmitConwayCertTx,
     dRepID,
     dRepIDBech32,
     isPendingTransaction,
@@ -28,66 +26,9 @@ export const DashboardCards = () => {
   const navigate = useNavigate();
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const { screenWidth } = useScreenDimension();
-  const { openModal } = useModal();
-  const [isRetirementLoading, setIsRetirementLoading] =
-    useState<boolean>(false);
   const { votingPower } = useGetAdaHolderVotingPowerQuery(stakeKey);
   const { t } = useTranslation();
   const { voter } = useGetVoterInfo();
-
-  const retireAsDrep = useCallback(async () => {
-    try {
-      setIsRetirementLoading(true);
-      const isPendingTx = isPendingTransaction();
-
-      if (isPendingTx) return;
-      if (!voter?.deposit) throw new Error("Can not get deposit");
-
-      const certBuilder = await buildDRepRetirementCert(
-        voter.deposit.toString(),
-      );
-      const result = await buildSignSubmitConwayCertTx({
-        certBuilder,
-        type: "retireAsDrep",
-        voterDeposit: voter.deposit.toString(),
-      });
-      if (result) {
-        openModal({
-          type: "statusModal",
-          state: {
-            status: "success",
-            title: t("modals.retirement.title"),
-            message: t("modals.retirement.message"),
-            link: `https://adanordic.com/latest_transactions`,
-            buttonText: t("modals.common.goToDashboard"),
-            dataTestId: "retirement-transaction-submitted-modal",
-          },
-        });
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      const errorMessage = error.info ? error.info : error;
-
-      openModal({
-        type: "statusModal",
-        state: {
-          status: "warning",
-          message: errorMessage,
-          buttonText: t("modals.common.goToDashboard"),
-          title: t("modals.common.oops"),
-          dataTestId: "retirement-transaction-error-modal",
-        },
-      });
-    } finally {
-      setIsRetirementLoading(false);
-    }
-  }, [
-    buildDRepRetirementCert,
-    buildSignSubmitConwayCertTx,
-    isPendingTransaction,
-    openModal,
-    voter?.deposit,
-  ]);
 
   const delegationDescription = useMemo(() => {
     const correctAdaRepresentation = correctAdaFormat(votingPower);
@@ -416,12 +357,13 @@ export const DashboardCards = () => {
             : "register-learn-more-button"
         }
         description={registrationCardDescription}
-        firstButtonAction={
-          voter?.isRegisteredAsDRep
-            ? retireAsDrep
-            : () => navigateTo(PATHS.registerAsdRep)
+        firstButtonAction={() =>
+          navigateTo(
+            voter?.isRegisteredAsDRep
+              ? PATHS.retireAsDrep
+              : PATHS.registerAsdRep,
+          )
         }
-        firstButtonIsLoading={isRetirementLoading}
         firstButtonLabel={
           pendingTransaction.registerAsDrep || pendingTransaction.retireAsDrep
             ? ""

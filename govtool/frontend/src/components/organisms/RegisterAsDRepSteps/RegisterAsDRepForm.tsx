@@ -67,7 +67,7 @@ export const RegisterAsDRepForm = ({
           rules={Rules.LINK}
         />
       )),
-    [links],
+    [errors, links],
   );
 
   return (

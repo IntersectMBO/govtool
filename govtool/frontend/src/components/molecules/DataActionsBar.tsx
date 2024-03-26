@@ -2,7 +2,7 @@ import { Dispatch, FC, SetStateAction } from "react";
 import { Box, InputBase } from "@mui/material";
 import Search from "@mui/icons-material/Search";
 
-import { GovernanceActionsFilters, GovernanceActionsSorting } from "@molecules";
+import { DataActionsFilters, DataActionsSorting } from "@molecules";
 import { OrderActionsChip } from "./OrderActionsChip";
 import { theme } from "@/theme";
 
@@ -12,7 +12,12 @@ type DataActionsBarProps = {
   chosenSorting: string;
   closeFilters?: () => void;
   closeSorts: () => void;
+  filterOptions?: {
+    key: string;
+    label: string;
+  }[];
   filtersOpen?: boolean;
+  filtersTitle?: string;
   isFiltering?: boolean;
   searchText: string;
   setChosenFilters?: Dispatch<SetStateAction<string[]>>;
@@ -22,6 +27,10 @@ type DataActionsBarProps = {
   setSortOpen: Dispatch<SetStateAction<boolean>>;
   sortingActive: boolean;
   sortOpen: boolean;
+  sortOptions?: {
+    key: string;
+    label: string;
+  }[];
 };
 
 export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
@@ -31,7 +40,9 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
     chosenSorting,
     closeFilters = () => {},
     closeSorts,
+    filterOptions = [],
     filtersOpen,
+    filtersTitle,
     isFiltering = true,
     searchText,
     setChosenFilters = () => {},
@@ -41,6 +52,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
     setSortOpen,
     sortingActive,
     sortOpen,
+    sortOptions = [],
   } = props;
   const {
     palette: { boxShadow2 },
@@ -87,17 +99,20 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
           sortOpen={sortOpen}
         >
           {filtersOpen && (
-            <GovernanceActionsFilters
+            <DataActionsFilters
               chosenFilters={chosenFilters}
               setChosenFilters={setChosenFilters}
               closeFilters={closeFilters}
+              options={filterOptions}
+              title={filtersTitle}
             />
           )}
           {sortOpen && (
-            <GovernanceActionsSorting
+            <DataActionsSorting
               chosenSorting={chosenSorting}
               setChosenSorting={setChosenSorting}
               closeSorts={closeSorts}
+              options={sortOptions}
             />
           )}
         </OrderActionsChip>

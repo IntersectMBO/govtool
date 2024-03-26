@@ -7,19 +7,25 @@ import {
   Typography,
 } from "@mui/material";
 
-import { GOVERNANCE_ACTIONS_FILTERS } from "@consts";
-import { useOnClickOutside, useScreenDimension, useTranslation } from "@hooks";
+import { useOnClickOutside, useScreenDimension } from "@hooks";
 
 interface Props {
   chosenFilters: string[];
   setChosenFilters: Dispatch<SetStateAction<string[]>>;
   closeFilters: () => void;
+  options: {
+    key: string;
+    label: string;
+  }[];
+  title?: string;
 }
 
-export const GovernanceActionsFilters = ({
+export const DataActionsFilters = ({
   chosenFilters,
   setChosenFilters,
   closeFilters,
+  options,
+  title,
 }: Props) => {
   const handleFilterChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +43,6 @@ export const GovernanceActionsFilters = ({
     [chosenFilters, setChosenFilters],
   );
 
-  const { t } = useTranslation();
   const { isMobile, screenWidth } = useScreenDimension();
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -60,17 +65,19 @@ export const GovernanceActionsFilters = ({
       }}
       ref={wrapperRef}
     >
-      <FormLabel
-        sx={{
-          fontSize: 14,
-          fontWeight: 500,
-          color: "#9792B5",
-          paddingX: "20px",
-        }}
-      >
-        {t("govActions.filterTitle")}
-      </FormLabel>
-      {GOVERNANCE_ACTIONS_FILTERS.map((item) => (
+      {title && (
+        <FormLabel
+          sx={{
+            fontSize: 14,
+            fontWeight: 500,
+            color: "#9792B5",
+            paddingX: "20px",
+          }}
+        >
+          {title}
+        </FormLabel>
+      )}
+      {options.map((item) => (
         <Box
           key={item.key}
           paddingX="20px"

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Box, CircularProgress, Divider } from "@mui/material";
 
 import { Background, ScrollToManage, Typography } from "@atoms";
-import { GOVERNANCE_ACTIONS_FILTERS, PATHS } from "@consts";
+import { GOVERNANCE_ACTIONS_FILTERS, GOVERNANCE_ACTIONS_SORTING, PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
   useDataActionsBar,
@@ -69,7 +69,12 @@ export const GovernanceActions = () => {
             />
           )}
           <Box flex={1} px={pagePadding}>
-            <DataActionsBar {...dataActionsBarProps} />
+            <DataActionsBar
+              {...dataActionsBarProps}
+              filterOptions={GOVERNANCE_ACTIONS_FILTERS}
+              filtersTitle={t("govActions.filterTitle")}
+              sortOptions={GOVERNANCE_ACTIONS_SORTING}
+            />
             <Box height={isMobile ? 60 : 80} />
             {!proposals || isProposalsLoading ? (
               <Box

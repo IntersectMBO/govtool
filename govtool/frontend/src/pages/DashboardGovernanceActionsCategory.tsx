@@ -3,7 +3,7 @@ import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { Box, CircularProgress, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
-import { ICONS, PATHS } from "@consts";
+import { GOVERNANCE_ACTIONS_SORTING, ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { DataActionsBar, GovernanceActionCard } from "@molecules";
 import {
@@ -95,6 +95,7 @@ export const DashboardGovernanceActionsCategory = () => {
             <DataActionsBar
               {...dataActionsBarProps}
               isFiltering={false}
+              sortOptions={GOVERNANCE_ACTIONS_SORTING}
             />
             <Typography
               variant="title2"

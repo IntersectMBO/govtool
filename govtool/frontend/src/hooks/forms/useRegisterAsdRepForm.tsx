@@ -158,7 +158,6 @@ export const useRegisterAsdRepForm = (
         return await buildDRepRegCert(url, hash);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        // eslint-disable-next-line no-console
         console.error(error);
         throw error;
       }

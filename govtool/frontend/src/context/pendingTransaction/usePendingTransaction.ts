@@ -100,12 +100,12 @@ export const usePendingTransaction = ({
               await wait(DB_SYNC_REFRESH_TIME);
             }
           }
-
-          if (isTransactionExpired(transaction.time)) {
-            addErrorAlert(t(`alerts.${type}.failed`));
-            resetTransaction();
-          }
         }
+      }
+
+      if (isTransactionExpired(transaction.time)) {
+        addErrorAlert(t(`alerts.${type}.failed`));
+        resetTransaction();
       }
     };
 

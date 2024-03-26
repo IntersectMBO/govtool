@@ -47,6 +47,7 @@ type VVAApi =
                     :> QueryParam "page" Natural
                     :> QueryParam "pageSize" Natural
                     :> QueryParam "drepId" HexText
+                    :> QueryParam "search" Text
                     :> Get '[JSON] ListProposalsResponse
     :<|> "proposal" :> "get" :> Capture "proposalId" GovActionId :> QueryParam "drepId" HexText :> Get '[JSON] GetProposalResponse
     :<|> "epoch" :> "params" :> Get '[JSON] GetCurrentEpochParamsResponse
@@ -127,6 +128,7 @@ proposalToResponse Types.Proposal {..} =
     proposalResponseAbout = proposalAbout,
     proposalResponseMotivation = proposalMotivaiton,
     proposalResponseRationale = proposalRationale,
+    proposalResponseMetadata = GovernanceActionMetadata <$> proposalMetadata,
     proposalResponseYesVotes = proposalYesVotes,
     proposalResponseNoVotes = proposalNoVotes,
     proposalResponseAbstainVotes = proposalAbstainVotes
@@ -217,8 +219,9 @@ listProposals
   -> Maybe Natural
   -> Maybe Natural
   -> Maybe HexText
+  -> Maybe Text
   -> m ListProposalsResponse
-listProposals selectedTypes sortMode mPage mPageSize mDrepRaw = do
+listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
   let page = (fromIntegral $ fromMaybe 0 mPage) :: Int
       pageSize = (fromIntegral $ fromMaybe 10 mPageSize) :: Int
 
@@ -229,11 +232,29 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw = do
       map (voteParamsProposalId . voteResponseVote)
         <$> getVotes drepId [] Nothing
 
+
+
+  let filterF ProposalResponse{..} = case mSearchQuery of
+        Nothing -> True
+        Just searchQuery -> fromMaybe False $ do
+          title <- proposalResponseTitle
+          about <- proposalResponseAbout
+          motivation <- proposalResponseMotivation
+          rationale <- proposalResponseRationale
+
+          let result = searchQuery `isInfixOf` title
+                      || searchQuery `isInfixOf` about
+                      || searchQuery `isInfixOf` motivation
+                      || searchQuery `isInfixOf` rationale
+
+          pure result
+
   CacheEnv {proposalListCache} <- asks vvaCache
   mappedAndSortedProposals <-
     filter
-      ( \ProposalResponse {proposalResponseId} ->
+      ( \p@ProposalResponse {proposalResponseId} ->
           proposalResponseId `notElem` proposalsToRemove
+          && filterF p
       )
       <$>
     mapSortAndFilterProposals selectedTypes sortMode

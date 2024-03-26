@@ -85,6 +85,7 @@ getProposals mProposalIds = withPool $ \conn -> do
                , about'
                , motivation'
                , rationale'
+               , metadataJson'
                , yesVotes'
                , noVotes'
                , abstainVotes'
@@ -108,6 +109,7 @@ getProposals mProposalIds = withPool $ \conn -> do
                   about'
                   motivation'
                   rationale'
+                  metadataJson'
                   (floor @Scientific yesVotes')
                   (floor @Scientific noVotes')
                   (floor @Scientific abstainVotes')

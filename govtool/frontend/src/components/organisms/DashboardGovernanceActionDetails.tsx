@@ -1,17 +1,10 @@
 import {
   useNavigate,
   useLocation,
-  NavLink,
   useParams,
   generatePath,
 } from "react-router-dom";
-import {
-  Box,
-  Breadcrumbs,
-  CircularProgress,
-  Link,
-  Typography,
-} from "@mui/material";
+import { Box, CircularProgress, Link, Typography } from "@mui/material";
 
 import { ICONS, PATHS } from "@consts";
 import {
@@ -20,18 +13,24 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import { GovernanceActionDetailsCard } from "@organisms";
 import {
   formatDisplayDate,
   getShortenedGovActionId,
   getProposalTypeLabel,
 } from "@utils";
+import { GovernanceActionDetailsCard } from "@organisms";
+import { Breadcrumbs } from "@molecules";
+import { useCardano } from "@/context";
+
+// TODO: Remove when data validation is ready
+const isDataMissing = false;
 
 export const DashboardGovernanceActionDetails = () => {
   const { voter } = useGetVoterInfo();
+  const { pendingTransaction } = useCardano();
   const { state, hash } = useLocation();
   const navigate = useNavigate();
-  const { isMobile, screenWidth } = useScreenDimension();
+  const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
   const { proposalId } = useParams();
   const fullProposalId = proposalId + hash;
@@ -43,21 +42,6 @@ export const DashboardGovernanceActionDetails = () => {
     state ? state.index : data?.proposal.index ?? "",
   );
 
-  const breadcrumbs = [
-    <NavLink
-      key="1"
-      to={PATHS.dashboardGovernanceActions}
-      style={{ textDecorationColor: "#0033AD" }}
-    >
-      <Typography color="primary" fontWeight={300} fontSize={12}>
-        {t("govActions.title")}
-      </Typography>
-    </NavLink>,
-    <Typography fontSize={12} fontWeight={500} key="2">
-      {t("govActions.voteOnGovActions")}
-    </Typography>,
-  ];
-
   return (
     <Box
       px={isMobile ? 2 : 4}
@@ -68,15 +52,11 @@ export const DashboardGovernanceActionDetails = () => {
       flex={1}
     >
       <Breadcrumbs
-        separator="|"
-        aria-label="breadcrumb"
-        sx={{
-          marginTop: screenWidth < 1024 ? 2.5 : 0,
-          marginBottom: 5,
-        }}
-      >
-        {breadcrumbs}
-      </Breadcrumbs>
+        elementOne={t("govActions.title")}
+        elementOnePath={PATHS.dashboardGovernanceActions}
+        elementTwo="Fund our project"
+        isDataMissing={false}
+      />
       <Link
         data-testid="back-to-list-link"
         sx={{
@@ -105,7 +85,7 @@ export const DashboardGovernanceActionDetails = () => {
           style={{ marginRight: "12px", transform: "rotate(180deg)" }}
         />
         <Typography variant="body2" color="primary">
-          {t("backToList")}
+          {t("back")}
         </Typography>
       </Link>
       <Box display="flex" justifyContent="center">
@@ -128,23 +108,32 @@ export const DashboardGovernanceActionDetails = () => {
                 ? formatDisplayDate(state.createdDate)
                 : formatDisplayDate(data.proposal.createdDate)
             }
-            details={state ? state.details : data.proposal.details}
+            // TODO: Add data validation
+            isDataMissing={isDataMissing}
             expiryDate={
               state
                 ? formatDisplayDate(state.expiryDate)
                 : formatDisplayDate(data.proposal.expiryDate)
             }
-            isDRep={voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter}
+            isVoter={
+              voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
+            }
             noVotes={state ? state.noVotes : data.proposal.noVotes}
             type={
               state
                 ? getProposalTypeLabel(state.type)
                 : getProposalTypeLabel(data.proposal.type)
             }
-            url={state ? state.url : data.proposal.url}
+            // TODO: To decide if we want to keep it when metadate BE is ready
+            // url={state ? state.url : data.proposal.url}
             yesVotes={state ? state.yesVotes : data.proposal.yesVotes}
             voteFromEP={data?.vote?.vote}
-            shortenedGovActionId={shortenedGovActionId}
+            govActionId={fullProposalId}
+            isInProgress={
+              pendingTransaction.vote?.resourceId ===
+              fullProposalId.replace("#", "")
+            }
+            isDashboard
           />
         ) : (
           <Box mt={4} display="flex" flexWrap="wrap">

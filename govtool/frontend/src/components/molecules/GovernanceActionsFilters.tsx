@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback } from "react";
+import { Dispatch, SetStateAction, useCallback, useRef } from "react";
 import {
   Box,
   Checkbox,
@@ -8,16 +8,18 @@ import {
 } from "@mui/material";
 
 import { GOVERNANCE_ACTIONS_FILTERS } from "@consts";
-import { useTranslation } from "@hooks";
+import { useOnClickOutside, useScreenDimension, useTranslation } from "@hooks";
 
 interface Props {
   chosenFilters: string[];
   setChosenFilters: Dispatch<SetStateAction<string[]>>;
+  closeFilters: () => void;
 }
 
 export const GovernanceActionsFilters = ({
   chosenFilters,
   setChosenFilters,
+  closeFilters,
 }: Props) => {
   const handleFilterChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,6 +38,10 @@ export const GovernanceActionsFilters = ({
   );
 
   const { t } = useTranslation();
+  const { isMobile, screenWidth } = useScreenDimension();
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(wrapperRef, closeFilters);
 
   return (
     <Box
@@ -47,9 +53,12 @@ export const GovernanceActionsFilters = ({
         boxShadow: "1px 2px 11px 0px #00123D5E",
         borderRadius: "10px",
         padding: "12px 0px",
-        width: "auto",
+        width: screenWidth < 850 ? "315px" : "415px",
         zIndex: "1",
+        right: isMobile ? "59px" : "115px",
+        top: "53px",
       }}
+      ref={wrapperRef}
     >
       <FormLabel
         sx={{

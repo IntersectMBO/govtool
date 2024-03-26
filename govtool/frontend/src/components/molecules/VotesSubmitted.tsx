@@ -1,22 +1,17 @@
 import { Box, Typography } from "@mui/material";
 
+import { IMAGES } from "@consts";
 import { VotePill } from "@atoms";
-import { useScreenDimension, useTranslation } from "@hooks";
-import { theme } from "@/theme";
-import { IMAGES } from "@/consts";
+import { useTranslation } from "@hooks";
 import { correctAdaFormat } from "@/utils/adaFormat";
 
-interface Props {
+type Props = {
   yesVotes: number;
   noVotes: number;
   abstainVotes: number;
-}
+};
 
 export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
-  const {
-    palette: { lightBlue },
-  } = theme;
-  const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
 
   return (
@@ -31,68 +26,66 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
         src={IMAGES.govActionListImage}
         width="64px"
         height="64px"
-        style={{ marginBottom: "10px" }}
+        style={{ marginBottom: "24px" }}
       />
-      <Typography fontSize="22px" fontWeight="600">
-        {t("govActions.voteSubmitted")}
-      </Typography>
-      <Typography fontSize="22px" fontWeight="500">
-        {t("govActions.forGovAction")}
-      </Typography>
-      <Typography color="textGray" fontSize="14px" sx={{ marginTop: "8px" }}>
-        {t("govActions.votesSubmittedOnChain")}
-      </Typography>
       <Typography
-        color="neutralGray"
-        variant="caption"
         sx={{
-          marginTop: "40px",
+          fontSize: "22px",
+          fontWeight: "600",
+          lineHeight: "28px",
         }}
       >
-        {t("govActions.votes")}
+        {t("govActions.voteSubmitted")}
+      </Typography>
+      <Typography
+        sx={{
+          fontSize: "22px",
+          fontWeight: "500",
+          lineHeight: "28px",
+          mb: 1,
+        }}
+      >
+        {t("govActions.forGovAction")}
+      </Typography>
+      <Typography color="textGray" fontSize="14px" sx={{ mb: 3 }}>
+        {t("govActions.votesSubmittedOnChain")}
       </Typography>
       <Box
         sx={{
-          border: `1px solid ${lightBlue}`,
-          borderRadius: "20px",
           display: "flex",
           flexDirection: "column",
-          padding: isMobile ? "16px 12px" : "32px 24px",
+          gap: "12px",
         }}
       >
-        <Box
-          sx={{ alignItems: "center", display: "flex", marginBottom: "24px" }}
-        >
+        <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
           <VotePill vote="yes" maxWidth={82} />
           <Typography
             fontSize="16px"
             sx={{
               marginLeft: "12px",
-              whiteSpace: "nowrap",
+              wordBreak: "break-all",
             }}
           >
             ₳ {correctAdaFormat(yesVotes)}
           </Typography>
         </Box>
-        <Box
-          sx={{ alignItems: "center", display: "flex", marginBottom: "24px" }}
-        >
+        <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
           <VotePill vote="abstain" maxWidth={82} />
           <Typography
             sx={{
               marginLeft: "12px",
-              whiteSpace: "nowrap",
+              wordBreak: "break-all",
             }}
           >
             ₳ {correctAdaFormat(abstainVotes)}
           </Typography>
         </Box>
-        <Box sx={{ alignItems: "center", display: "flex" }}>
+        <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
           <VotePill vote="no" maxWidth={82} />
           <Typography
             sx={{
               marginLeft: "12px",
-              whiteSpace: "nowrap",
+              wordBreak: "break-all",
             }}
           >
             ₳ {correctAdaFormat(noVotes)}

@@ -9,6 +9,8 @@ import {
   successGreen,
 } from "./consts";
 
+export type Theme = typeof theme;
+
 export const theme = createTheme({
   breakpoints: {
     values: {
@@ -114,8 +116,10 @@ export const theme = createTheme({
   palette: {
     accentOrange: "#F29339",
     accentYellow: "#F2D9A9",
+    arcticWhite: "#FBFBFF",
     boxShadow1: "rgba(0, 18, 61, 0.37)",
     boxShadow2: "rgba(47, 98, 220, 0.2)",
+    errorRed: "#9E2323",
     fadedPurple: "#716E88",
     highlightBlue: "#C2EFF299",
     inputRed: "#FAEAEB",

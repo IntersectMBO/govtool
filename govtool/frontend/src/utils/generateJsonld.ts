@@ -17,9 +17,10 @@ export const generateJsonld = async <
 >(
   body: T,
   context: C,
+  bodyCip: string = CIP_108,
 ) => {
   const doc = {
-    [`${CIP_108}body`]: body,
+    [`${bodyCip}body`]: body,
     [`${CIP_100}hashAlgorithm`]: "blake2b-256",
     [`${CIP_100}authors`]: [],
   };

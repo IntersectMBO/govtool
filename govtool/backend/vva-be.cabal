@@ -60,11 +60,13 @@ executable vva-be
                     , lens
                     , cache
                     , clock
-                    , resource-pool >= 0.4.0.0
+                    , resource-pool
                     , postgresql-simple
                     , data-has
-                    , raven-haskell >= 0.1.4.1
                     , bytestring
+                    , http-client
+                    , http-client-tls
+                    , raven-haskell >= 0.1.4.1
 
     hs-source-dirs:   app
     default-language: Haskell2010
@@ -96,6 +98,7 @@ library
                , data-has
                , resource-pool
                , swagger2
+
 
   exposed-modules: VVA.Config
                  , VVA.CommandLine

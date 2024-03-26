@@ -3,7 +3,7 @@
 Installed on your machine:
 
 1. Node.js >= 18 ([official website](https://nodejs.org/en))
-2. npm or yarn - for package management
+2. npm or yarn (recommended) - for package management
 
 Clone the project
 
@@ -16,7 +16,7 @@ Fill .env based on env.example file
 Go to the project directory
 
 ```bash
-cd voltaire-era/govtool/frontend
+cd govtool/frontend
 ```
 
 Install dependencies
@@ -25,7 +25,7 @@ Install dependencies
 npm install
 ```
 
-or
+or (recommended)
 
 ```bash
 yarn install
@@ -37,7 +37,7 @@ Start the server
 npm run dev
 ```
 
-or
+or (recommended)
 
 ```bash
 yarn dev
@@ -59,12 +59,30 @@ yarn dev
 10. Yup - ^1.3.2
 11. Keen-Slider - ^6.8.5
 12. Sentry - ^7.77.0
-13. Cardano serialization lib - 12.0.0-alpha.13
+13. Cardano serialization lib - 12.0.0-alpha.19
+14. i18next - ^23.7.19
+
+### Code Quality and Checks Are Handled BY
+
+1. eslint - ^8.38.0
+2. vitest - ^1.1.0
+3. chromatic - ^10.0.0
 
 ### Prerequisites
 
-Install [`Git`](https://git-scm.com/) - version control
-Recommendetd [`React developer tools`](https://react.dev/learn/react-developer-tools)
+Install [`Git`](https://git-scm.com/) - version control.
+Recommended [`React developer tools`](https://react.dev/learn/react-developer-tools).
+
+To automatically set correct node version:
+
+1. Install [`nvm`](https://github.com/nvm-sh/nvm)
+2. Install `lts/hydrogen` version of node
+
+```bash
+  nvm install lts/hydrogen
+```
+
+3. Having that every time you enter the `govtool/frontend` package [`nvm`](https://github.com/nvm-sh/nvm) automatically sets the correct version of node.
 
 ## To Develop
 
@@ -76,10 +94,22 @@ Recommendetd [`React developer tools`](https://react.dev/learn/react-developer-t
 npm install
 ```
 
+or (recommended)
+
+```bash
+yarn install
+```
+
 2. Launch Server
 
 ```bash
 npm run dev
+```
+
+or (recommended)
+
+```bash
+yarn dev
 ```
 
 #### Using Nix and Direnv
@@ -108,17 +138,26 @@ direnv allow
 yarn dev
 ```
 
+## After development
+
+Check our [Contributing Documentation](../../CONTRIBUTING.md) on how to submit a PR.
+
 ### Users
 
 The GovTool application can read and display data from the Cardano chain using REST API.
 We distinguish two types of users:
 
 #### without a connected wallet who can:
-1. see the governance actions along with their details and the number of votes
+
+1. See the governance actions along with their details and the number of votes
+<!-- 2. See the list of DReps. -->
 
 #### with connected wallet who can:
-1.  see the governance actions along with their details and the number of votes.
-2.  display the wallet status
-3.  delegate his or her voting power in a form of ADA to dReps,
-4.  register as DRrep
-5.  vote for the governance actions of his or her choice (if the user is registered)
+
+1.  See the governance actions along with their details and the number of votes.
+2.  Display the wallet status.
+3.  Delegate his or her voting power in a form of ADA to dReps.
+4.  Register as DRrep or Sole Voter.
+5.  Vote for the Governance Actions of his or her choice (if the user is registered).
+6.  Create their own Governance Action.
+<!-- 7. See the list of DReps from which they can submit their vote. -->

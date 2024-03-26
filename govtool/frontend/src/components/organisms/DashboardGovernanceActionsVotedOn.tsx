@@ -1,22 +1,22 @@
-import { useMemo } from 'react';
-import { Box, Typography, CircularProgress } from '@mui/material';
+import { useMemo } from "react";
+import { Box, Typography, CircularProgress } from "@mui/material";
 
-import { GovernanceVotedOnCard } from '@molecules';
+import { GovernanceVotedOnCard } from "@molecules";
 import {
   useGetDRepVotesQuery,
   useScreenDimension,
   useTranslation,
-} from '@hooks';
-import { Slider } from '.';
-import { getProposalTypeLabel } from '@/utils/getProposalTypeLabel';
-import { getFullGovActionId } from '@/utils';
-import { useCardano } from '@/context';
+} from "@hooks";
+import { Slider } from "@organisms";
+import { getProposalTypeLabel } from "@/utils/getProposalTypeLabel";
+import { getFullGovActionId } from "@/utils";
+import { useCardano } from "@/context";
 
-interface DashboardGovernanceActionsVotedOnProps {
+type DashboardGovernanceActionsVotedOnProps = {
   filters: string[];
   searchPhrase?: string;
   sorting: string;
-}
+};
 
 export const DashboardGovernanceActionsVotedOn = ({
   filters,
@@ -52,11 +52,11 @@ export const DashboardGovernanceActionsVotedOn = ({
     <>
       {!data.length ? (
         <Typography py={4} fontWeight="300">
-          {t('govActions.youHaventVotedYet')}
+          {t("govActions.youHaventVotedYet")}
         </Typography>
       ) : !filteredData?.length ? (
         <Typography py={4} fontWeight="300">
-          {t('govActions.noResultsForTheSearch')}
+          {t("govActions.noResultsForTheSearch")}
         </Typography>
       ) : (
         <>
@@ -64,10 +64,11 @@ export const DashboardGovernanceActionsVotedOn = ({
             <div key={item.title}>
               <Slider
                 key={item.title}
-                isShowAll={false}
                 title={getProposalTypeLabel(item.title)}
                 navigateKey={item.title}
                 searchPhrase={searchPhrase}
+                dataLength={item.actions.slice(0, 6).length}
+                onDashboard
                 data={item.actions.map((action) => (
                   <div
                     className="keen-slider__slide"
@@ -76,6 +77,8 @@ export const DashboardGovernanceActionsVotedOn = ({
                   >
                     <GovernanceVotedOnCard
                       votedProposal={action}
+                      // TODO: Add data validation
+                      isDataMissing={false}
                       inProgress={
                         pendingTransaction.vote?.resourceId ===
                         action.proposal.txHash + action.proposal.index

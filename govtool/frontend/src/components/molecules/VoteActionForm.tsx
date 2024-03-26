@@ -1,4 +1,11 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { useLocation } from "react-router-dom";
 import { Box, Link } from "@mui/material";
 
@@ -13,22 +20,34 @@ import {
 } from "@hooks";
 import { openInNewTab } from "@utils";
 
+import { Trans } from "react-i18next";
 import { ControlledField } from "../organisms";
 
-export const VoteActionForm = ({
-  voteFromEP,
-  yesVotes,
-  noVotes,
-  abstainVotes,
-}: {
+// TODO: Decide with BE on how cast votes will be implemented
+// and adjust accordingly the component below (UI is ready).
+const castVoteDate = undefined;
+const castVoteChangeDeadline = "20.06.2024 (Epoch 445)";
+
+type VoteActionFormProps = {
+  setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
   voteFromEP?: string;
   yesVotes: number;
   noVotes: number;
   abstainVotes: number;
-}) => {
-  const { state } = useLocation();
+  isInProgress?: boolean;
+};
+
+export const VoteActionForm = ({
+  setIsVoteSubmitted,
+  voteFromEP,
+  yesVotes,
+  noVotes,
+  abstainVotes,
+  isInProgress,
+}: VoteActionFormProps) => {
   const [isContext, setIsContext] = useState<boolean>(false);
-  const { isMobile, screenWidth } = useScreenDimension();
+  const { state } = useLocation();
+  const { isMobile } = useScreenDimension();
   const { openModal } = useModal();
   const { t } = useTranslation();
   const { voter } = useGetVoterInfo();
@@ -49,8 +68,10 @@ export const VoteActionForm = ({
   useEffect(() => {
     if (state && state.vote) {
       setValue("vote", state.vote);
+      setIsVoteSubmitted(true);
     } else if (voteFromEP) {
       setValue("vote", voteFromEP);
+      setIsVoteSubmitted(true);
     }
   }, [state, voteFromEP, setValue]);
 
@@ -79,81 +100,124 @@ export const VoteActionForm = ({
     [state],
   );
 
-  const renderChangeVoteButton = useMemo(() => (
-    <LoadingButton
-      data-testid="change-vote"
-      onClick={confirmVote}
-      disabled={
-        (!areFormErrors && voteFromEP === vote) ||
-        areFormErrors ||
-        (!isContext && voteFromEP === vote)
-      }
-      isLoading={isVoteLoading}
-      variant="contained"
-      sx={{
-        borderRadius: 50,
-        textTransform: 'none',
-        width: '100%',
-        height: 48,
-      }}
-    >
-      {t('govActions.changeVote')}
-    </LoadingButton>
-  ),
+  const renderChangeVoteButton = useMemo(
+    () => (
+      <LoadingButton
+        data-testid="change-vote"
+        onClick={confirmVote}
+        disabled={
+          (!areFormErrors && voteFromEP === vote) ||
+          areFormErrors ||
+          (!isContext && voteFromEP === vote)
+        }
+        isLoading={isVoteLoading}
+        variant="contained"
+        sx={{
+          borderRadius: 50,
+          textTransform: "none",
+          width: "100%",
+          height: 48,
+        }}
+      >
+        {t("govActions.changeVote")}
+      </LoadingButton>
+    ),
     [confirmVote, areFormErrors, vote, isVoteLoading],
   );
 
   return (
-    <Box flex={1} display="flex" flexDirection="column" width="full">
-      <Box
-        flex={1}
-        display="flex"
-        flexDirection="column"
-        px={screenWidth < 1024 ? 0 : 5}
-      >
-        <Typography variant="body1">
-          {t("govActions.chooseHowToVote")}
-        </Typography>
-        <Box mt={3}>
-          <Box display="flex" flexDirection="row">
-            <Radio
-              dataTestId="yes-radio"
-              isChecked={vote?.toLowerCase() === "yes"}
-              name="vote"
-              register={registerInput}
-              setValue={setValue}
-              title={t("yes")}
-              value="yes"
-            />
-            <Box px={1} />
-            <Radio
-              dataTestId="no-radio"
-              isChecked={vote?.toLowerCase() === "no"}
-              name="vote"
-              register={registerInput}
-              setValue={setValue}
-              title={t("no")}
-              value="no"
-            />
-          </Box>
-          <Box mt={2}>
-            <Radio
-              dataTestId="abstain-radio"
-              isChecked={vote?.toLowerCase() === "abstain"}
-              name="vote"
-              register={registerInput}
-              setValue={setValue}
-              title={t("abstain")}
-              value="abstain"
-            />
-          </Box>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        width: "full",
+        ...(isInProgress && { opacity: 0.5 }),
+      }}
+    >
+      <Box flex={1} display="flex" flexDirection="column" alignItems="center">
+        {castVoteDate ? (
+          <>
+            <Typography
+              variant="body1"
+              sx={{
+                whiteSpace: "pre-line",
+                fontWeight: 400,
+                mb: 1,
+                alignSelf: "start",
+              }}
+            >
+              <Trans
+                i18nKey="govActions.castVote"
+                values={{ vote: vote?.toLocaleUpperCase(), date: castVoteDate }}
+                components={[<span style={{ fontWeight: 600 }} key="0" />]}
+              />
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{ lineHeight: "18px", alignSelf: "start" }}
+            >
+              {t("govActions.castVoteDeadline", {
+                date: castVoteChangeDeadline,
+              })}
+            </Typography>
+          </>
+        ) : (
+          <Typography variant="body1">
+            {t("govActions.chooseHowToVote")}
+          </Typography>
+        )}
+        <Box
+          mt={3}
+          sx={{
+            alignSelf: "stretch",
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
+          <Radio
+            dataTestId="yes-radio"
+            isChecked={vote?.toLowerCase() === "yes"}
+            name="vote"
+            register={registerInput}
+            setValue={setValue}
+            title={t("yes")}
+            value="yes"
+            disabled={isInProgress}
+          />
+          <Radio
+            dataTestId="no-radio"
+            isChecked={vote?.toLowerCase() === "no"}
+            name="vote"
+            register={registerInput}
+            setValue={setValue}
+            title={t("no")}
+            value="no"
+            disabled={isInProgress}
+          />
+          <Radio
+            dataTestId="abstain-radio"
+            isChecked={vote?.toLowerCase() === "abstain"}
+            name="vote"
+            register={registerInput}
+            setValue={setValue}
+            title={t("abstain")}
+            value="abstain"
+            disabled={isInProgress}
+          />
         </Box>
         {(voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter) && (
           <Button
             data-testid="show-votes-button"
             variant="text"
             size="large"
-            sx={{ mt: 3 }}
+            disabled={isInProgress}
+            sx={{
+              mt: "26px",
+              fontSize: "14px",
+              fontWeight: "500",
+              lineHeight: "20px",
+            }}
             onClick={() => {
               openModal({
                 type: "votingPower",
@@ -169,6 +233,7 @@ export const VoteActionForm = ({
             {t("govActions.showVotes")}
           </Button>
         )}
+        {/* TODO: Change below into new voting context */}
         <Box
           alignItems="center"
           data-testid="context-button"
@@ -176,8 +241,8 @@ export const VoteActionForm = ({
           flexDirection="row"
           flexWrap="wrap"
           justifyContent="center"
-          mb={1.5}
-          mt={2}
+          mb="15px"
+          mt="58px"
           onClick={handleContext}
         >
           <p
@@ -185,7 +250,8 @@ export const VoteActionForm = ({
               cursor: "pointer",
               fontFamily: "Poppins",
               fontSize: 12,
-              fontWeight: 400,
+              fontWeight: 300,
+              lineHeight: "18px",
               textAlign: "center",
               margin: 0,
             }}
@@ -206,7 +272,14 @@ export const VoteActionForm = ({
           </p>
         </Box>
         {isContext && (
-          <Box display="flex" flexDirection="column" flex={1}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            flex={1}
+            sx={{
+              alignSelf: "stretch",
+            }}
+          >
             <ControlledField.Input
               {...{ control, errors }}
               dataTestId="url-input"
@@ -220,7 +293,6 @@ export const VoteActionForm = ({
               name="hash"
               placeholder={t("forms.hashPlaceholder")}
             />
-            <Spacer y={3} />
             <Link
               data-testid="how-to-create-link"
               onClick={() =>
@@ -228,7 +300,8 @@ export const VoteActionForm = ({
                   "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor",
                 )
               }
-              mb={isMobile ? 2 : 8}
+              mt="12px"
+              mb={isMobile ? 2 : 6}
               sx={{ cursor: "pointer" }}
               textAlign="center"
               visibility={!isContext ? "hidden" : "visible"}
@@ -251,16 +324,16 @@ export const VoteActionForm = ({
         {t("govActions.selectDifferentOption")}
       </Typography>
       {(state?.vote && state?.vote !== vote) ||
-        (voteFromEP && voteFromEP !== vote) ? (
-          <Box
-            display="flex"
-            flexDirection={isMobile ? "column" : "row"}
-            justifyContent="space-between"
-          >
-            {isMobile ? renderChangeVoteButton : renderCancelButton}
-            <Box px={1} py={isMobile ? 1.5 : 0} />
-            {isMobile ? renderCancelButton : renderChangeVoteButton}
-          </Box>
+      (voteFromEP && voteFromEP !== vote) ? (
+        <Box
+          display="flex"
+          flexDirection={isMobile ? "column" : "row"}
+          justifyContent="space-between"
+        >
+          {isMobile ? renderChangeVoteButton : renderCancelButton}
+          <Box px={1} py={isMobile ? 1.5 : 0} />
+          {isMobile ? renderCancelButton : renderChangeVoteButton}
+        </Box>
       ) : (
         <LoadingButton
           data-testid="vote-button"

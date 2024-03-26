@@ -1,14 +1,13 @@
-/* eslint-disable no-unsafe-optional-chaining */
 import { useNavigate, generatePath } from "react-router-dom";
 import { Box } from "@mui/material";
 
-import { Typography } from '@atoms';
-import { PATHS } from '@consts';
-import { useCardano } from '@context';
-import { useScreenDimension, useTranslation } from '@hooks';
-import { GovernanceActionCard } from '@molecules';
-import { getProposalTypeLabel, getFullGovActionId, openInNewTab } from '@utils';
-import { Slider } from './Slider';
+import { Typography } from "@atoms";
+import { PATHS } from "@consts";
+import { useCardano } from "@context";
+import { useScreenDimension, useTranslation } from "@hooks";
+import { GovernanceActionCard } from "@molecules";
+import { getProposalTypeLabel, getFullGovActionId, openInNewTab } from "@utils";
+import { Slider } from "@organisms";
 
 type GovernanceActionsToVoteProps = {
   filters: string[];
@@ -34,7 +33,7 @@ export const GovernanceActionsToVote = ({
     <>
       {!proposals.length ? (
         <Typography fontWeight={300} sx={{ py: 4 }}>
-          {t('govActions.noResultsForTheSearch')}
+          {t("govActions.noResultsForTheSearch")}
         </Typography>
       ) : (
         <>
@@ -46,8 +45,8 @@ export const GovernanceActionsToVote = ({
                     className="keen-slider__slide"
                     key={action.id}
                     style={{
-                      overflow: 'visible',
-                      width: 'auto',
+                      overflow: "visible",
+                      width: "auto",
                     }}
                   >
                     <GovernanceActionCard
@@ -57,39 +56,44 @@ export const GovernanceActionsToVote = ({
                       inProgress={
                         onDashboard &&
                         pendingTransaction.vote?.resourceId ===
-                        action?.txHash + action?.index
+                          `${action.txHash ?? ""}${action.index ?? ""}`
                       }
-                      // eslint-disable-next-line no-confusing-arrow
-                      onClick={() =>
-                        onDashboard &&
+                      // TODO: Add data validation
+                      isDataMissing={false}
+                      onClick={() => {
+                        if (
+                          onDashboard &&
                           pendingTransaction.vote?.resourceId ===
-                          action?.txHash + action?.index
-                          ? openInNewTab(
+                            `${action.txHash ?? ""}${action.index ?? ""}`
+                        ) {
+                          openInNewTab(
                             "https://adanordic.com/latest_transactions",
-                          )
-                          : navigate(
+                          );
+                        } else {
+                          navigate(
                             onDashboard
                               ? generatePath(
-                                PATHS.dashboardGovernanceActionsAction,
-                                {
-                                  proposalId: getFullGovActionId(
+                                  PATHS.dashboardGovernanceActionsAction,
+                                  {
+                                    proposalId: getFullGovActionId(
+                                      action.txHash,
+                                      action.index,
+                                    ),
+                                  },
+                                )
+                              : PATHS.governanceActionsAction.replace(
+                                  ":proposalId",
+                                  getFullGovActionId(
                                     action.txHash,
                                     action.index,
                                   ),
-                                },
-                              )
-                              : PATHS.governanceActionsAction.replace(
-                                ":proposalId",
-                                getFullGovActionId(
-                                  action.txHash,
-                                  action.index,
                                 ),
-                              ),
                             {
                               state: { ...action },
                             },
-                          )
-                      }
+                          );
+                        }
+                      }}
                     />
                   </div>
                 ))}

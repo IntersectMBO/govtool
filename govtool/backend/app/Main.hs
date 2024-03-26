@@ -80,7 +80,7 @@ import Data.Monoid (mempty)
 import qualified Data.Cache as Cache
 import VVA.API.Types
 import System.Clock (TimeSpec(TimeSpec))
-import Data.Pool (newPool, defaultPoolConfig)
+import Data.Pool (createPool)
 import Database.PostgreSQL.Simple (connectPostgreSQL, close)
 import Data.Text.Encoding (encodeUtf8)
 import Data.Has (getter)
@@ -138,7 +138,7 @@ startApp vvaConfig = do
       , dRepListCache
       , networkMetricsCache
       }
-  connectionPool <- newPool $ defaultPoolConfig (connectPostgreSQL (encodeUtf8 (dbSyncConnectionString $ getter vvaConfig))) close 1 60
+  connectionPool <- createPool (connectPostgreSQL (encodeUtf8 (dbSyncConnectionString $ getter vvaConfig))) close 1 1 60
 
   let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool}
   server' <- mkVVAServer appEnv
@@ -160,6 +160,8 @@ exceptionHandler vvaConfig mRequest exception = do
     Error
     (formatMessage mRequest exception)
     (recordUpdate mRequest exception)
+
+
 
 formatMessage :: Maybe Request -> SomeException -> String
 formatMessage Nothing exception = "Exception before request could be parsed: " ++ show exception

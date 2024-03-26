@@ -1,0 +1,6 @@
+resolver: lts-20.24
+packages:
+  - .
+
+extra-deps:
+- raven-haskell-0.1.4.1@sha256:9187272adc064197528645b5ad9b89163b668f386f34016d97fa646d5c790784

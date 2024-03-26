@@ -31,6 +31,9 @@ import VVA.Pool (ConnectionPool, withPool)
 import Control.Exception (throw)
 import VVA.Types (Proposal(..), AppError(..))
 
+import Data.Aeson
+import Data.Aeson.Types (parseMaybe, Parser)
+import Data.Text (Text)
 
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
@@ -67,10 +70,46 @@ getProposals mProposalIds = withPool $ \conn -> do
 
   timeZone <- liftIO getCurrentTimeZone
   return $ map
-            ( \(id', txHash', index', type', details', expiryDate', createdDate', url', docHash', yesVotes', noVotes', abstainVotes') ->
+            ( \( id'
+               , txHash'
+               , index'
+               , type'
+               , details'
+               , expiryDate'
+               , expiryEpochNo'
+               , createdDate'
+               , createdEpochNo'
+               , url'
+               , docHash'
+               , title'
+               , about'
+               , motivation'
+               , rationale'
+               , yesVotes'
+               , noVotes'
+               , abstainVotes'
+               ) ->
               let eDate = localTimeToUTC timeZone <$> expiryDate'
                   cDate = localTimeToUTC timeZone createdDate'
               in
-                Proposal id' txHash' (floor @Scientific index') type' details' eDate cDate url' docHash' (floor @Scientific yesVotes') (floor @Scientific noVotes') (floor @Scientific abstainVotes')
+                Proposal
+                  id'
+                  txHash'
+                  (floor @Scientific index')
+                  type'
+                  details'
+                  eDate
+                  expiryEpochNo'
+                  cDate
+                  createdEpochNo'
+                  url'
+                  docHash'
+                  title'
+                  about'
+                  motivation'
+                  rationale'
+                  (floor @Scientific yesVotes')
+                  (floor @Scientific noVotes')
+                  (floor @Scientific abstainVotes')
             )
             proposalResults

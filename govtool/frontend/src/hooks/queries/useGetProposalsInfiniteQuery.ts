@@ -33,7 +33,7 @@ export const useGetProposalsInfiniteQuery = ({
       dRepID,
       filters,
       isEnabled,
-      pendingTransaction.vote,
+      pendingTransaction.vote?.transactionHash,
       sorting,
     ],
     fetchProposals,

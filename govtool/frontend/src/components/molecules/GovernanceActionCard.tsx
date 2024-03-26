@@ -1,35 +1,43 @@
 import { FC } from "react";
 import { Box } from "@mui/material";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
-import { Button, Typography, Tooltip } from "@atoms";
+import { Button } from "@atoms";
+import {
+  GovernanceActionCardElement,
+  GovernanceActionCardHeader,
+  GovernanceActionCardStatePill,
+  GovernanceActionsDatesBox,
+} from "@molecules";
+
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
   formatDisplayDate,
   getFullGovActionId,
   getProposalTypeLabel,
-  getShortenedGovActionId,
+  getProposalTypeNoEmptySpaces,
 } from "@utils";
-import { theme } from "@/theme";
 
-interface ActionTypeProps
-  extends Omit<
-    ActionType,
-    | "yesVotes"
-    | "noVotes"
-    | "abstainVotes"
-    | "metadataHash"
-    | "url"
-    | "details"
-    | "id"
-    | "txHash"
-    | "index"
-  > {
-  onClick?: () => void;
-  inProgress?: boolean;
+const mockedLongText =
+  "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sit, distinctio culpa minus eaque illo quidem voluptates quisquam mollitia consequuntur ex, sequi saepe? Ad ex adipisci molestiae sed.";
+
+type ActionTypeProps = Omit<
+  ActionType,
+  | "yesVotes"
+  | "noVotes"
+  | "abstainVotes"
+  | "metadataHash"
+  | "url"
+  | "details"
+  | "id"
+  | "txHash"
+  | "index"
+> & {
   txHash: string;
   index: number;
-}
+  isDataMissing: boolean;
+  onClick?: () => void;
+  inProgress?: boolean;
+};
 
 export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
   const {
@@ -40,193 +48,82 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
     createdDate,
     txHash,
     index,
+    isDataMissing,
   } = props;
   const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
 
-  const {
-    palette: { lightBlue },
-  } = theme;
-
   const govActionId = getFullGovActionId(txHash, index);
-  const proposalTypeNoEmptySpaces = getProposalTypeLabel(type).replace(
-    / /g,
-    "",
-  );
 
   return (
     <Box
-      maxWidth={402}
-      border={inProgress ? 1 : 0}
-      borderColor="lightOrange"
-      minWidth={screenWidth < 375 ? 255 : screenWidth < 768 ? 294 : 402}
       sx={{
-        boxShadow: inProgress
-          ? "2px 2px 20px 0px #F55A0033"
-          : "0px 4px 15px 0px #DDE3F5",
+        width: screenWidth < 420 ? 290 : isMobile ? 324 : 350,
+        height: "100%",
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        boxShadow: "0px 4px 15px 0px #DDE3F5",
         borderRadius: "20px",
-        backgroundColor: "transparent",
+        backgroundColor: isDataMissing
+          ? "rgba(251, 235, 235, 0.50)"
+          : "rgba(255, 255, 255, 0.3)",
+        ...(isDataMissing && {
+          border: "1px solid #F6D5D5",
+        }),
+        ...(inProgress && {
+          border: "1px solid #FFCBAD",
+        }),
       }}
-      position="relative"
-      data-testid={`govaction-${proposalTypeNoEmptySpaces}-card`}
+      data-testid={`govaction-${getProposalTypeNoEmptySpaces(type)}-card`}
     >
-      {inProgress && (
-        <Box
-          bgcolor="#F8ECD4"
-          border={1}
-          borderColor="#DEA029"
-          px={2.25}
-          py={0.5}
-          borderRadius={100}
-          sx={{
-            position: "absolute",
-            top: -15,
-            right: 30,
-          }}
-        >
-          <Typography color="#DEA029" variant="body2">
-            {t("inProgress")}
-          </Typography>
-        </Box>
-      )}
+      {inProgress && <GovernanceActionCardStatePill variant="inProgress" />}
       <Box
         sx={{
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          backgroundColor: "rgba(255, 255, 255, 0.3)",
+          padding: "40px 24px 0",
         }}
-        pt={isMobile ? 3 : 5}
-        px={isMobile ? 2.25 : 3}
-        pb={3}
       >
-        <Box data-testid="governance-action-type">
-          <Typography color="neutralGray" variant="caption">
-            {t("govActions.governanceActionType")}
-          </Typography>
-          <Box display="flex">
-            <Box
-              mt={1.5}
-              px={2.25}
-              py={0.75}
-              bgcolor={lightBlue}
-              borderRadius={100}
-            >
-              <Typography
-                data-testid={`${proposalTypeNoEmptySpaces}-type`}
-                variant="caption"
-              >
-                {getProposalTypeLabel(type)}
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
-        <Box mt={5}>
-          <Typography color="neutralGray" variant="caption">
-            {t("govActions.governanceActionId")}
-          </Typography>
-          <Box display="flex" mt={0.25}>
-            <Box
-              px={2.25}
-              py={0.75}
-              border={1}
-              borderColor={lightBlue}
-              borderRadius={100}
-            >
-              <Typography
-                data-testid={`${getFullGovActionId(txHash, index)}-id`}
-                variant="caption"
-              >
-                {getShortenedGovActionId(txHash, index)}
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
+        <GovernanceActionCardHeader
+          // TODO: Add real title from props when BE is ready
+          title="Fund our project"
+          isDataMissing={isDataMissing}
+        />
+        <GovernanceActionCardElement
+          label={t("govActions.abstract")}
+          text={mockedLongText}
+          textVariant="twoLines"
+          dataTestId="governance-action-abstract"
+          isSliderCard
+        />
+        <GovernanceActionCardElement
+          label={t("govActions.governanceActionType")}
+          text={getProposalTypeLabel(type)}
+          textVariant="pill"
+          dataTestId={`${getProposalTypeNoEmptySpaces(type)}-type`}
+          isSliderCard
+        />
+        <GovernanceActionsDatesBox
+          createdDate={formatDisplayDate(createdDate)}
+          expiryDate={formatDisplayDate(expiryDate)}
+          isSliderCard
+        />
+        <GovernanceActionCardElement
+          label={t("govActions.governanceActionId")}
+          text={getFullGovActionId(txHash, index)}
+          dataTestId={`${getFullGovActionId(txHash, index)}-id`}
+          isCopyButton
+          isSliderCard
+        />
       </Box>
-      {createdDate ? (
-        <Box
-          bgcolor="#D6E2FF80"
-          display="flex"
-          flexDirection="row"
-          justifyContent="center"
-          alignItems="center"
-          py={0.75}
-        >
-          <Typography
-            fontWeight={300}
-            sx={{ flexWrap: "nowrap", mr: 1 }}
-            variant="caption"
-          >
-            {t("govActions.submissionDate")}
-          </Typography>
-          <Typography
-            fontWeight={600}
-            sx={{ flexWrap: "nowrap" }}
-            variant="caption"
-          >
-            {formatDisplayDate(createdDate)}
-          </Typography>
-          <Tooltip
-            heading={t("tooltips.submissionDate.heading")}
-            paragraphOne={t("tooltips.submissionDate.paragraphOne")}
-            placement="bottom-end"
-            arrow
-          >
-            <InfoOutlinedIcon
-              style={{
-                color: "#ADAEAD",
-              }}
-              sx={{ ml: 0.7 }}
-              fontSize="small"
-            />
-          </Tooltip>
-        </Box>
-      ) : null}
-      {expiryDate ? (
-        <Box
-          data-testid="expiry-date"
-          bgcolor="rgba(247, 249, 251, 1)"
-          display="flex"
-          flexDirection="row"
-          justifyContent="center"
-          alignItems="center"
-          py={0.75}
-        >
-          <Typography
-            fontWeight={300}
-            sx={{ flexWrap: "nowrap", mr: 1 }}
-            variant="caption"
-          >
-            {t("govActions.expiryDate")}
-          </Typography>
-          <Typography
-            fontWeight={600}
-            sx={{ flexWrap: "nowrap" }}
-            variant="caption"
-          >
-            {formatDisplayDate(expiryDate)}
-          </Typography>
-          <Tooltip
-            heading={t("tooltips.expiryDate.heading")}
-            paragraphOne={t("tooltips.expiryDate.paragraphOne")}
-            paragraphTwo={t("tooltips.expiryDate.paragraphTwo")}
-            placement="bottom-end"
-            arrow
-          >
-            <InfoOutlinedIcon
-              style={{
-                color: "#ADAEAD",
-              }}
-              sx={{ ml: 0.7 }}
-              fontSize="small"
-            />
-          </Tooltip>
-        </Box>
-      ) : null}
       <Box
-        bgcolor="white"
-        px={isMobile ? 1.5 : 3}
-        py={2.5}
-        sx={{ borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}
+        sx={{
+          boxShadow: "0px 4px 15px 0px #DDE3F5",
+          borderBottomLeftRadius: 20,
+          borderBottomRightRadius: 20,
+          padding: 3,
+          bgcolor: "white",
+        }}
       >
         <Button
           onClick={onClick}
@@ -237,7 +134,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           }}
           data-testid={`govaction-${govActionId}-view-detail`}
         >
-          {t(inProgress ? "seeTransaction" : "govActions.viewProposalDetails")}
+          {t("govActions.viewDetails")}
         </Button>
       </Box>
     </Box>

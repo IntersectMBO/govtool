@@ -2,10 +2,8 @@ import { Dispatch, FC, SetStateAction } from "react";
 import { Box, InputBase } from "@mui/material";
 import Search from "@mui/icons-material/Search";
 
-import { GovernanceActionsFilters, GovernanceActionsSorting } from ".";
+import { GovernanceActionsFilters, GovernanceActionsSorting } from "@molecules";
 import { OrderActionsChip } from "./OrderActionsChip";
-import { ClickOutside } from "../atoms";
-
 import { theme } from "@/theme";
 
 type DataActionsBarProps = {
@@ -50,7 +48,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
 
   return (
     <>
-      <Box alignItems="center" display="flex" justifyContent="flex-start">
+      <Box alignItems="center" display="flex" justifyContent="space-between">
         <InputBase
           inputProps={{ "data-testid": "search-input" }}
           onChange={(e) => setSearchText(e.target.value)}
@@ -76,7 +74,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
             fontWeight: 500,
             height: 48,
             padding: "16px 24px",
-            width: 231,
+            width: 500,
           }}
         />
         <OrderActionsChip
@@ -87,24 +85,23 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
           setSortOpen={setSortOpen}
           sortingActive={sortingActive}
           sortOpen={sortOpen}
-        />
+        >
+          {filtersOpen && (
+            <GovernanceActionsFilters
+              chosenFilters={chosenFilters}
+              setChosenFilters={setChosenFilters}
+              closeFilters={closeFilters}
+            />
+          )}
+          {sortOpen && (
+            <GovernanceActionsSorting
+              chosenSorting={chosenSorting}
+              setChosenSorting={setChosenSorting}
+              closeSorts={closeSorts}
+            />
+          )}
+        </OrderActionsChip>
       </Box>
-      {filtersOpen && (
-        <ClickOutside onClick={closeFilters}>
-          <GovernanceActionsFilters
-            chosenFilters={chosenFilters}
-            setChosenFilters={setChosenFilters}
-          />
-        </ClickOutside>
-      )}
-      {sortOpen && (
-        <ClickOutside onClick={closeSorts}>
-          <GovernanceActionsSorting
-            chosenSorting={chosenSorting}
-            setChosenSorting={setChosenSorting}
-          />
-        </ClickOutside>
-      )}
     </>
   );
 };

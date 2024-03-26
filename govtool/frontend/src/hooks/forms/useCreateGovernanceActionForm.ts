@@ -135,7 +135,7 @@ export const useCreateGovernanceActionForm = (
             type: "statusModal",
             state: {
               ...storageInformationErrorModals[
-              error.message as MetadataHashValidationErrors
+                error.message as MetadataHashValidationErrors
               ],
               onSubmit: backToForm,
               onCancel: backToDashboard,

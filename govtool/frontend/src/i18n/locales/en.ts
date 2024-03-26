@@ -199,27 +199,10 @@ export const en = {
       supportingLinks: "Supporting links",
       title: "Create a Governance Action",
       modals: {
-        externalDataDoesntMatch: {
-          buttonText: "Go to Data Edit Screen",
-          cancelRegistrationText: "Cancel Registration",
-          feedbackText: "Feedback",
-          message:
-            "GovTool checks the URL you entered to see if the JSON file that you self-host matches the one that was generated in GovTool. To complete registration, this match must be exact.\n\nIn this case, there is a mismatch. You can go back to the data edit screen and try the process again.",
-          title: "Your External Data Does Not Match the Original File.",
-        },
         submitTransactionSuccess: {
           message:
             "Your Governance Action may take a little time to submit to the chain.",
           title: "Governance Action submitted!",
-        },
-        urlCannotBeFound: {
-          buttonText: "Go to Data Edit Screen",
-          cancelRegistrationText: "Cancel Registration",
-          feedbackText: "Feedback",
-          linkText: "Learn More about self-hosting",
-          message:
-            "GovTool cannot find the URL that you entered. Please check it and re-enter.",
-          title: "The URL You Entered Cannot Be Found",
         },
       },
     },
@@ -438,6 +421,14 @@ export const en = {
           "The confirmation of your actual delegation might take a bit of time but you can track it using",
         title: "Delegation Transaction Submitted!",
       },
+      externalDataDoesntMatch: {
+        buttonText: "Go to Data Edit Screen",
+        cancelRegistrationText: "Cancel Registration",
+        feedbackText: "Feedback",
+        message:
+          "GovTool checks the URL you entered to see if the JSON file that you self-host matches the one that was generated in GovTool. To complete registration, this match must be exact.\n\nIn this case, there is a mismatch. You can go back to the data edit screen and try the process again.",
+        title: "Your External Data Does Not Match the Original File.",
+      },
       externalLink: {
         beCareful: "Be Careful!",
         continueTo: "Continue to external link",
@@ -459,6 +450,15 @@ export const en = {
         message:
           "The confirmation of your retirement might take a bit of time but you can track it using",
         title: "Retirement Transaction Submitted!",
+      },
+      urlCannotBeFound: {
+        buttonText: "Go to Data Edit Screen",
+        cancelRegistrationText: "Cancel Registration",
+        feedbackText: "Feedback",
+        linkText: "Learn More about self-hosting",
+        message:
+          "GovTool cannot find the URL that you entered. Please check it and re-enter.",
+        title: "The URL You Entered Cannot Be Found",
       },
       votingPower: {
         govActionsVotes: "Governance Action votes",
@@ -486,7 +486,7 @@ export const en = {
         "This is the name that will be displayed in the DRep Directory and it will be used also by delegators to find your profile.",
       headingStepTwo: "Confirm DRep registration",
       linksDescription: "Links to extra content or social media contacts ",
-      maximumLinks: "(maximum of 7 entries)",
+      maximumLinks: "(maximum of {{numberOfLinks}} entries)",
       optional: "optional",
       register: "Register",
       required: "required",
@@ -508,6 +508,9 @@ export const en = {
       storingInformationURLPlaceholder: "URL",
       fields: {
         validations: {
+          email: "Invalid email address",
+          maxLength: "Max {{maxLength}} characters",
+          nickname: "Nickname can not contain whitespaces",
           required: "This field is required",
           url: "Invalid URL",
         },

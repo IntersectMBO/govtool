@@ -105,6 +105,7 @@ data Proposal = Proposal
     proposalAbout :: Maybe Text,
     proposalMotivaiton :: Maybe Text,
     proposalRationale :: Maybe Text,
+    proposalMetadata :: Maybe Value,
     proposalYesVotes :: Integer,
     proposalNoVotes :: Integer,
     proposalAbstainVotes :: Integer

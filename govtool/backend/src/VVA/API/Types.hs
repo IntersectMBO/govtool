@@ -233,6 +233,27 @@ instance ToSchema GovernanceActionDetails where
           ?~ toJSON
                 ("{\"some_key\": \"some value\", \"some_key2\": [1,2,3]}" :: Text)
 
+
+newtype GovernanceActionMetadata = GovernanceActionMetadata Value
+  deriving newtype (Show)
+
+instance FromJSON GovernanceActionMetadata where
+  parseJSON v@(Aeson.Object o) = pure (GovernanceActionMetadata v)
+  parseJSON _ = fail "GovernanceActionMetadata has to be an object"
+
+instance ToJSON GovernanceActionMetadata where
+  toJSON (GovernanceActionMetadata g) = g
+
+instance ToSchema GovernanceActionMetadata where
+    declareNamedSchema _ = pure $ NamedSchema (Just "GovernanceActionMetadata") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "A Governance Action metadata"
+        & example
+          ?~ toJSON
+                ("{\"some_key\": \"some value\", \"some_key2\": [1,2,3]}" :: Text)
+
+
+
 data ProposalResponse = ProposalResponse
   { proposalResponseId :: Text,
     proposalResponseTxHash :: HexText,
@@ -249,6 +270,7 @@ data ProposalResponse = ProposalResponse
     proposalResponseAbout :: Maybe Text,
     proposalResponseMotivation :: Maybe Text,
     proposalResponseRationale :: Maybe Text,
+    proposalResponseMetadata :: Maybe GovernanceActionMetadata,
     proposalResponseYesVotes :: Integer,
     proposalResponseNoVotes :: Integer,
     proposalResponseAbstainVotes :: Integer
@@ -273,6 +295,7 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"about\": \"Proposal About\","
                   <> "\"motivation\": \"Proposal Motivation\","
                   <> "\"rationale\": \"Proposal Rationale\","
+                  <> "\"metadata\": {\"key\": \"value\"},"
                   <> "\"yesVotes\": 0,"
                   <> "\"noVotes\": 0,"
                   <> "\"abstainVotes\": 0}"

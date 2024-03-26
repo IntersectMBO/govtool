@@ -55,9 +55,10 @@ export const usePendingTransaction = ({
       const fromLocalStorage = getItemFromLocalStorage(
         `${PENDING_TRANSACTION_KEY}_${stakeKey}`
       );
-      setTransaction({
+      if (!fromLocalStorage) setTransaction(null);
+      else setTransaction({
         ...fromLocalStorage,
-        resourceId: fromLocalStorage?.resourceId ?? undefined,
+        resourceId: fromLocalStorage.resourceId ?? undefined,
       });
     }
   }, [isEnabled, stakeKey]);

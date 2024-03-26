@@ -51,6 +51,7 @@ module.exports = {
     "operator-linebreak": "off",
     "implicit-arrow-linebreak": "off",
     "consistent-return": "off",
+    "no-console": ["error", { allow: ["warn", "error"] }],
     "no-shadow": "off",
     "function-paren-newline": "off",
     "object-curly-newline": "off",

@@ -28,7 +28,7 @@ export const useGetProposalsQuery = ({
       filters,
       sorting,
       dRepID,
-      pendingTransaction.vote,
+      pendingTransaction.vote?.transactionHash,
     ],
     fetchProposals,
   );

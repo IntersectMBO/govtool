@@ -77,7 +77,6 @@ export const getUtxos = async (
     return utxos;
   } catch (err) {
     Sentry.captureException(err);
-    // eslint-disable-next-line no-console
     console.error(err);
   }
 };

@@ -1,10 +1,11 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Box, CircularProgress, Tab, Tabs, styled } from "@mui/material";
 import { useLocation } from "react-router-dom";
 
 import { GOVERNANCE_ACTIONS_FILTERS } from "@consts";
 import { useCardano } from "@context";
 import {
+  useDataActionsBar,
   useGetProposalsQuery,
   useGetVoterInfo,
   useScreenDimension,
@@ -64,11 +65,8 @@ const StyledTab = styled((props: StyledTabProps) => (
 }));
 
 export const DashboardGovernanceActions = () => {
-  const [searchText, setSearchText] = useState<string>("");
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const [chosenFilters, setChosenFilters] = useState<string[]>([]);
-  const [sortOpen, setSortOpen] = useState(false);
-  const [chosenSorting, setChosenSorting] = useState<string>("");
+  const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
+  const { chosenFilters, chosenSorting } = dataActionsBarProps;
   const { voter } = useGetVoterInfo();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -80,7 +78,7 @@ export const DashboardGovernanceActions = () => {
   const { proposals, isProposalsLoading } = useGetProposalsQuery({
     filters: queryFilters,
     sorting: chosenSorting,
-    searchPhrase: searchText,
+    searchPhrase: debouncedSearchText,
   });
 
   const { state } = useLocation();
@@ -91,14 +89,6 @@ export const DashboardGovernanceActions = () => {
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setContent(newValue);
   };
-
-  const closeFilters = useCallback(() => {
-    setFiltersOpen(false);
-  }, [setFiltersOpen]);
-
-  const closeSorts = useCallback(() => {
-    setSortOpen(false);
-  }, [setSortOpen]);
 
   useEffect(() => {
     window.history.replaceState({}, document.title);
@@ -113,22 +103,7 @@ export const DashboardGovernanceActions = () => {
       flexDirection="column"
     >
       <>
-        <DataActionsBar
-          chosenFilters={chosenFilters}
-          chosenFiltersLength={chosenFilters.length}
-          chosenSorting={chosenSorting}
-          closeFilters={closeFilters}
-          closeSorts={closeSorts}
-          filtersOpen={filtersOpen}
-          searchText={searchText}
-          setChosenFilters={setChosenFilters}
-          setChosenSorting={setChosenSorting}
-          setFiltersOpen={setFiltersOpen}
-          setSearchText={setSearchText}
-          setSortOpen={setSortOpen}
-          sortingActive={Boolean(chosenSorting)}
-          sortOpen={sortOpen}
-        />
+        <DataActionsBar {...dataActionsBarProps} />
         {!proposals || !voter || isEnableLoading || isProposalsLoading ? (
           <Box
             alignItems="center"
@@ -177,7 +152,7 @@ export const DashboardGovernanceActions = () => {
               <GovernanceActionsToVote
                 filters={chosenFilters}
                 onDashboard
-                searchPhrase={searchText}
+                searchPhrase={debouncedSearchText}
                 sorting={chosenSorting}
                 proposals={proposals}
               />
@@ -185,7 +160,7 @@ export const DashboardGovernanceActions = () => {
             <CustomTabPanel value={content} index={1}>
               <DashboardGovernanceActionsVotedOn
                 filters={chosenFilters}
-                searchPhrase={searchText}
+                searchPhrase={debouncedSearchText}
                 sorting={chosenSorting}
               />
             </CustomTabPanel>

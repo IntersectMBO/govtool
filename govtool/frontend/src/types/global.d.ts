@@ -56,4 +56,7 @@ declare global {
     | null
     | { [property: string]: JSONValue }
     | JSONValue[];
+
+  type ArrayElement<ArrayType extends readonly unknown[]> =
+    ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 }

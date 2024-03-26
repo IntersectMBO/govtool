@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, CircularProgress, Divider } from "@mui/material";
 
@@ -6,6 +6,7 @@ import { Background, ScrollToManage, Typography } from "@atoms";
 import { GOVERNANCE_ACTIONS_FILTERS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
+  useDataActionsBar,
   useGetProposalsQuery,
   useScreenDimension,
   useTranslation,
@@ -19,11 +20,8 @@ const defaultCategories = GOVERNANCE_ACTIONS_FILTERS.map(
 );
 
 export const GovernanceActions = () => {
-  const [searchText, setSearchText] = useState<string>("");
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const [chosenFilters, setChosenFilters] = useState<string[]>([]);
-  const [sortOpen, setSortOpen] = useState(false);
-  const [chosenSorting, setChosenSorting] = useState<string>("");
+  const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
+  const { chosenFilters, chosenSorting } = dataActionsBarProps;
   const { isMobile, pagePadding } = useScreenDimension();
   const { isEnabled } = useCardano();
   const navigate = useNavigate();
@@ -35,7 +33,7 @@ export const GovernanceActions = () => {
   const { proposals, isProposalsLoading } = useGetProposalsQuery({
     filters: queryFilters,
     sorting: chosenSorting,
-    searchPhrase: searchText,
+    searchPhrase: debouncedSearchText,
   });
 
   useEffect(() => {
@@ -43,14 +41,6 @@ export const GovernanceActions = () => {
       navigate(PATHS.dashboardGovernanceActions);
     }
   }, [isEnabled]);
-
-  const closeFilters = useCallback(() => {
-    setFiltersOpen(false);
-  }, [setFiltersOpen]);
-
-  const closeSorts = useCallback(() => {
-    setSortOpen(false);
-  }, [setSortOpen]);
 
   return (
     <Background>
@@ -79,22 +69,7 @@ export const GovernanceActions = () => {
             />
           )}
           <Box flex={1} px={pagePadding}>
-            <DataActionsBar
-              chosenFilters={chosenFilters}
-              chosenFiltersLength={chosenFilters.length}
-              chosenSorting={chosenSorting}
-              closeFilters={closeFilters}
-              closeSorts={closeSorts}
-              filtersOpen={filtersOpen}
-              searchText={searchText}
-              setChosenFilters={setChosenFilters}
-              setChosenSorting={setChosenSorting}
-              setFiltersOpen={setFiltersOpen}
-              setSearchText={setSearchText}
-              setSortOpen={setSortOpen}
-              sortingActive={Boolean(chosenSorting)}
-              sortOpen={sortOpen}
-            />
+            <DataActionsBar {...dataActionsBarProps} />
             <Box height={isMobile ? 60 : 80} />
             {!proposals || isProposalsLoading ? (
               <Box
@@ -110,7 +85,7 @@ export const GovernanceActions = () => {
               <GovernanceActionsToVote
                 filters={chosenFilters}
                 onDashboard={false}
-                searchPhrase={searchText}
+                searchPhrase={debouncedSearchText}
                 sorting={chosenSorting}
                 proposals={proposals}
               />

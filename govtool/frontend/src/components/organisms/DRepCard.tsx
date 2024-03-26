@@ -7,6 +7,7 @@ import { Card } from "@molecules";
 import { correctAdaFormat } from "@/utils";
 import { ICONS, PATHS } from "@/consts";
 import { DRepData } from "@/models";
+import { useSnackbar } from "@/context";
 
 type DRepCardProps = {
   dRep: DRepData;
@@ -30,6 +31,7 @@ export const DRepCard = ({
 }: DRepCardProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { addSuccessAlert } = useSnackbar();
 
   return (
     <Card
@@ -71,6 +73,11 @@ export const DRepCard = ({
             <Box flex={1} minWidth={0}>
               <Typography sx={ellipsisStyles}>{type}</Typography>
               <ButtonBase
+                onClick={(e) => {
+                  navigator.clipboard.writeText(view);
+                  addSuccessAlert(t("alerts.copiedToClipboard"));
+                  e.stopPropagation();
+                }}
                 sx={{
                   gap: 1,
                   maxWidth: "100%",

@@ -16,7 +16,6 @@ export * from "./DelegateTodRepStepTwo";
 export * from "./Drawer";
 export * from "./DrawerMobile";
 export * from "./DRepCard";
-export * from "./DRepDirectoryContent";
 export * from "./EditDRepInfoSteps";
 export * from "./ExternalLinkModal";
 export * from "./Footer";

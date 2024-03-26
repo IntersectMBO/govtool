@@ -1,6 +1,7 @@
 export * from "./externalDataModalConfig";
 export * from "./colors";
 export * from "./dRepActions";
+export * from "./dRepDirectory";
 export * from "./governanceAction";
 export * from "./icons";
 export * from "./images";

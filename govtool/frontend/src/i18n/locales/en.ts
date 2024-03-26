@@ -255,6 +255,7 @@ export const en = {
       automatedVotingOptions: "Automated Voting Options",
       editBtn: "Edit DRep data",
       delegationOptions: "Delegation Options",
+      filterTitle: "DRep Status",
       meAsDRep: "This  DRep ID is connected  to your wallet",
       myDelegation: "You have delegated <strong>₳ {{ada}}</strong> to:",
       myDRep: "This is your DRep",
@@ -262,6 +263,8 @@ export const en = {
       noConfidenceDescription:
         "Select this to signal no confidence in the current constitutional committee by voting NO on every proposal and voting YES to no confidence proposals",
       noConfidenceTitle: "Signal No Confidence on Every Vote",
+      noResultsForTheSearchTitle: "No DReps found",
+      noResultsForTheSearchDescription: "Please try a different search",
       title: "DRep Directory",
       votingPower: "Voting Power",
     },

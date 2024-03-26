@@ -47,7 +47,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
   const { delegate, isDelegating } = useDelegateTodRep();
 
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
-  const { data, isLoading } = useGetDRepListQuery(dRepParam);
+  const { data, isLoading } = useGetDRepListQuery({ drepView: dRepParam });
   const dRep = data?.[0];
 
   if (!dRep && isLoading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;

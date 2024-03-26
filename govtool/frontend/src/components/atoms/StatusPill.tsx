@@ -1,10 +1,9 @@
 import { Chip, ChipProps, styled } from "@mui/material";
 import { cyan, errorRed, successGreen } from "@/consts";
-
-type Status = 'Active' | 'Inactive' | 'Retired';
+import { DRepStatus } from "@/models";
 
 interface StatusPillProps {
-  status: Status;
+  status: DRepStatus;
   label?: string;
   size?: 'small' | 'medium';
   sx?: ChipProps['sx'];
@@ -25,18 +24,18 @@ export const StatusPill = ({
 );
 
 const bgColor = {
-  Active: successGreen.c200,
-  Inactive: cyan.c100,
-  Retired: errorRed.c100,
+  [DRepStatus.Active]: successGreen.c200,
+  [DRepStatus.Inactive]: cyan.c100,
+  [DRepStatus.Retired]: errorRed.c100,
 };
 
 const textColor = {
-  Active: successGreen.c700,
-  Inactive: cyan.c500,
-  Retired: errorRed.c500,
+  [DRepStatus.Active]: successGreen.c700,
+  [DRepStatus.Inactive]: cyan.c500,
+  [DRepStatus.Retired]: errorRed.c500,
 };
 
-const StyledChip = styled(Chip)<{ status: Status }>(({ theme, status }) => ({
+const StyledChip = styled(Chip)<{ status: DRepStatus }>(({ theme, status }) => ({
   backgroundColor: bgColor[status],
   color: textColor[status],
   border: `2px solid ${theme.palette.neutralWhite}`,

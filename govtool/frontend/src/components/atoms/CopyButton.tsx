@@ -4,11 +4,11 @@ import { ICONS } from "@consts";
 import { useSnackbar } from "@context";
 import { useTranslation } from "@hooks";
 
-interface Props {
+type Props = {
   isChecked?: boolean;
   text: string;
-  variant?: string;
-}
+  variant?: "blueThin" | "blue";
+};
 
 export const CopyButton = ({ isChecked, text, variant }: Props) => {
   const { addSuccessAlert } = useSnackbar();
@@ -17,6 +17,10 @@ export const CopyButton = ({ isChecked, text, variant }: Props) => {
   const iconSrc = useMemo(() => {
     if (variant === "blue") {
       return ICONS.copyBlueIcon;
+    }
+
+    if (variant === "blueThin") {
+      return ICONS.copyBlueThinIcon;
     }
 
     if (isChecked) {

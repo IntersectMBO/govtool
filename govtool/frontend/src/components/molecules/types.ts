@@ -5,6 +5,7 @@ export type LinkWithIconProps = {
   onClick: () => void;
   icon?: JSX.Element;
   sx?: SxProps;
+  cutWithEllipsis?: boolean;
 };
 
 export type StepProps = {

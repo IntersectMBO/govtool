@@ -1,5 +1,6 @@
-import { Vote } from "@models";
 import { Box, Typography } from "@mui/material";
+
+import { Vote } from "@models";
 
 export const VotePill = ({
   vote,

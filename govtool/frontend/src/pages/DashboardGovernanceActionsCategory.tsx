@@ -1,19 +1,8 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import {
-  generatePath,
-  NavLink,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-import {
-  Box,
-  Breadcrumbs,
-  CircularProgress,
-  Link,
-  Typography,
-} from "@mui/material";
+import { generatePath, useNavigate, useParams } from "react-router-dom";
+import { Box, CircularProgress, Link } from "@mui/material";
 
-import { Background } from "@atoms";
+import { Background, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { DataActionsBar, GovernanceActionCard } from "@molecules";
@@ -68,21 +57,6 @@ export const DashboardGovernanceActionsCategory = () => {
     isProposalsFetching,
   );
 
-  const breadcrumbs = [
-    <NavLink
-      key="1"
-      style={{ textDecorationColor: "#0033AD" }}
-      to={PATHS.dashboardGovernanceActions}
-    >
-      <Typography color="primary" fontWeight={300} fontSize={12}>
-        {t("govActions.title")}
-      </Typography>
-    </NavLink>,
-    <Typography fontSize={12} fontWeight={500} key="2">
-      {getProposalTypeLabel(category ?? "")}
-    </Typography>,
-  ];
-
   const mappedData = useMemo(() => {
     const uniqueProposals = removeDuplicatedProposals(proposals);
 
@@ -112,23 +86,13 @@ export const DashboardGovernanceActionsCategory = () => {
       >
         <Box flex={1}>
           <Box px={isMobile ? 2 : 3.75} flex={1}>
-            <Breadcrumbs
-              aria-label="breadcrumb"
-              separator="|"
-              sx={{
-                marginBottom: isMobile ? 3 : 5,
-                marginTop: isMobile ? 2.5 : 1.25,
-              }}
-            >
-              {breadcrumbs}
-            </Breadcrumbs>
             <Link
               data-testid="back-to-list-link"
               sx={{
                 cursor: "pointer",
                 display: "flex",
                 textDecoration: "none",
-                marginBottom: 3,
+                margin: "12px 0 28px",
               }}
               onClick={() => navigate(PATHS.dashboardGovernanceActions)}
             >
@@ -137,8 +101,8 @@ export const DashboardGovernanceActionsCategory = () => {
                 alt="arrow"
                 style={{ marginRight: "12px", transform: "rotate(180deg)" }}
               />
-              <Typography variant="body2" color="primary">
-                {t("backToList")}
+              <Typography variant="body2" color="primary" fontWeight={400}>
+                {t("govActions.backToGovActions")}
               </Typography>
             </Link>
             <DataActionsBar
@@ -152,19 +116,37 @@ export const DashboardGovernanceActionsCategory = () => {
               sortingActive={Boolean(chosenSorting)}
               sortOpen={sortOpen}
             />
-            <Box height={24} />
+            <Typography
+              variant="title2"
+              sx={{
+                m: "32px 0 32px",
+              }}
+            >
+              {getProposalTypeLabel(category ?? "")}
+            </Typography>
             {!mappedData || isEnableLoading || isProposalsLoading ? (
               <Box display="flex" justifyContent="center" py={4}>
                 <CircularProgress />
               </Box>
             ) : !mappedData?.length ? (
-              <Typography fontWeight="300" py={4}>
+              <Typography
+                sx={{
+                  fontWeight: 300,
+                  py: 4,
+                }}
+              >
                 <Box display="flex" flexWrap="wrap" mt={4}>
                   <Typography fontWeight={300}>
                     {t("govActions.withCategoryNotExist.partOne")}
                     &nbsp;
                   </Typography>
-                  <Typography fontWeight="bold">{` ${category} `}</Typography>
+                  <Typography
+                    sx={{
+                      fontWeight: 700,
+                    }}
+                  >
+                    {` ${category} `}
+                  </Typography>
                   <Typography fontWeight={300}>
                     &nbsp;
                     {t("govActions.withCategoryNotExist.partTwo")}
@@ -173,14 +155,11 @@ export const DashboardGovernanceActionsCategory = () => {
               </Typography>
             ) : (
               <Box
-                columnGap={4}
+                columnGap="20px"
                 display="grid"
-                gridTemplateColumns={`repeat(auto-fit, minmax(${screenWidth < 375
-                    ? "255px"
-                    : screenWidth < 768
-                      ? "294px"
-                      : "402px"
-                  }, 1fr))`}
+                gridTemplateColumns={`repeat(auto-fit, minmax(${
+                  screenWidth < 420 ? "290px" : isMobile ? "324px" : "350px"
+                }, 1fr))`}
               >
                 {mappedData.map((item) => (
                   <Box pb={4.25} key={item.txHash + item.index}>
@@ -189,17 +168,22 @@ export const DashboardGovernanceActionsCategory = () => {
                       index={item.index}
                       inProgress={
                         pendingTransaction.vote?.resourceId ===
-                        item.txHash + item.index
+                        `${item.txHash ?? ""}${item.index ?? ""}`
                       }
+                      // TODO: Add data validation
+                      isDataMissing={false}
                       onClick={() => {
                         saveScrollPosition();
 
-                        // eslint-disable-next-line no-unused-expressions
-                        pendingTransaction.vote?.resourceId === item.txHash + item.index
-                          ? openInNewTab(
+                        if (
+                          pendingTransaction.vote?.resourceId ===
+                          item.txHash + item.index
+                        ) {
+                          openInNewTab(
                             "https://adanordic.com/latest_transactions",
-                          )
-                          : navigate(
+                          );
+                        } else {
+                          navigate(
                             generatePath(
                               PATHS.dashboardGovernanceActionsAction,
                               {
@@ -216,6 +200,7 @@ export const DashboardGovernanceActionsCategory = () => {
                               },
                             },
                           );
+                        }
                       }}
                       txHash={item.txHash}
                     />

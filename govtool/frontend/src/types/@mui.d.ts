@@ -16,8 +16,10 @@ declare module "@mui/material/styles" {
   interface PaletteOptions extends MuiPalette {
     accentOrange: string;
     accentYellow: string;
+    arcticWhite: string;
     boxShadow1: string;
     boxShadow2: string;
+    errorRed: string;
     highlightBlue: string;
     inputRed: string;
     negativeRed: string;

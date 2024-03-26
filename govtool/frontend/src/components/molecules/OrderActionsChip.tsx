@@ -1,23 +1,30 @@
 import { Dispatch, SetStateAction } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 
+import { useScreenDimension, useTranslation } from "@hooks";
+import { Typography } from "@atoms";
 import { ICONS } from "@consts";
 import { theme } from "@/theme";
 
-interface Props {
+type Props = {
   filtersOpen?: boolean;
   setFiltersOpen?: Dispatch<SetStateAction<boolean>>;
   chosenFiltersLength?: number;
   sortOpen: boolean;
   setSortOpen: Dispatch<SetStateAction<boolean>>;
   sortingActive: boolean;
+  children?: React.ReactNode;
   isFiltering?: boolean;
-}
+};
 
 export const OrderActionsChip = (props: Props) => {
+  const { t } = useTranslation();
+  const { isMobile } = useScreenDimension();
+
   const {
     palette: { secondary },
   } = theme;
+
   const {
     filtersOpen,
     setFiltersOpen = () => {},
@@ -26,33 +33,69 @@ export const OrderActionsChip = (props: Props) => {
     setSortOpen,
     sortingActive,
     isFiltering = true,
+    children,
   } = props;
 
   return (
-    <Box display="flex" width="min-content" alignItems="center" ml="8px">
+    <Box
+      display="flex"
+      width="min-content"
+      alignItems="center"
+      ml="8px"
+      gap={isMobile ? "8px" : "24px"}
+      position="relative"
+      sx={{ alignSelf: "end" }}
+    >
       {isFiltering && (
-        <Box position="relative">
+        <Box
+          sx={{
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            ...(!isMobile && {
+              background: filtersOpen ? secondary.main : "transparent",
+              borderRadius: "99px",
+              padding: "12px 14px",
+            }),
+          }}
+          onClick={() => {
+            setSortOpen(false);
+            if (isFiltering) {
+              setFiltersOpen(!filtersOpen);
+            }
+          }}
+          data-testid="filters-button"
+        >
           <img
-            data-testid="filters-button"
             alt="filter"
-            onClick={() => {
-              setSortOpen(false);
-              if (isFiltering) {
-                setFiltersOpen(!filtersOpen);
-              }
-            }}
             src={filtersOpen ? ICONS.filterWhiteIcon : ICONS.filterIcon}
             style={{
-              background: filtersOpen ? secondary.main : "transparent",
               borderRadius: "100%",
-              cursor: "pointer",
-              padding: "14px",
+              marginRight: "8px",
               overflow: "visible",
               height: 20,
               width: 20,
               objectFit: "contain",
+              ...(isMobile && {
+                background: filtersOpen ? secondary.main : "transparent",
+                padding: "14px",
+                marginRight: "0",
+              }),
             }}
           />
+          {!isMobile && (
+            <Typography
+              variant="body1"
+              sx={{
+                color: filtersOpen ? "white" : "primaryBlue",
+                fontWeight: 500,
+              }}
+            >
+              {t("filter")}
+            </Typography>
+          )}
           {!filtersOpen && chosenFiltersLength > 0 && (
             <Box
               sx={{
@@ -65,7 +108,7 @@ export const OrderActionsChip = (props: Props) => {
                 height: "16px",
                 justifyContent: "center",
                 position: "absolute",
-                right: "0",
+                right: "-3px",
                 top: "0",
                 width: "16px",
               }}
@@ -77,27 +120,54 @@ export const OrderActionsChip = (props: Props) => {
           )}
         </Box>
       )}
-      <Box position="relative">
+      <Box
+        sx={{
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          ...(!isMobile && {
+            background: sortOpen ? secondary.main : "transparent",
+            borderRadius: "99px",
+            padding: "12px 14px",
+          }),
+        }}
+        onClick={() => {
+          if (isFiltering) {
+            setFiltersOpen(false);
+          }
+          setSortOpen(!sortOpen);
+        }}
+        data-testid="sort-button"
+      >
         <img
           alt="sort"
-          data-testid="sort-button"
-          onClick={() => {
-            if (isFiltering) {
-              setFiltersOpen(false);
-            }
-            setSortOpen(!sortOpen);
-          }}
           src={sortOpen ? ICONS.sortWhiteIcon : ICONS.sortIcon}
           style={{
-            background: sortOpen ? secondary.main : "transparent",
             borderRadius: "100%",
-            cursor: "pointer",
-            padding: "14px",
-            height: 24,
-            width: 24,
+            marginRight: "8px",
+            height: 20,
+            width: 20,
             objectFit: "contain",
+            ...(isMobile && {
+              background: sortOpen ? secondary.main : "transparent",
+              padding: "14px",
+              marginRight: "0",
+            }),
           }}
         />
+        {!isMobile && (
+          <Typography
+            variant="body1"
+            sx={{
+              color: sortOpen ? "white" : "primaryBlue",
+              fontWeight: 500,
+            }}
+          >
+            {t("sort")}
+          </Typography>
+        )}
         {!sortOpen && sortingActive && (
           <Box
             sx={{
@@ -110,7 +180,7 @@ export const OrderActionsChip = (props: Props) => {
               height: "16px",
               justifyContent: "center",
               position: "absolute",
-              right: "0",
+              right: "-3px",
               top: "0",
               width: "16px",
             }}
@@ -119,6 +189,7 @@ export const OrderActionsChip = (props: Props) => {
           </Box>
         )}
       </Box>
+      {children}
     </Box>
   );
 };

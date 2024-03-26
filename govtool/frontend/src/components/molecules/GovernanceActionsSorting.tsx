@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useRef } from "react";
 import {
   Box,
   FormControl,
@@ -9,18 +9,23 @@ import {
 } from "@mui/material";
 
 import { GOVERNANCE_ACTIONS_SORTING } from "@consts";
-import { useTranslation } from "@hooks";
+import { useTranslation, useOnClickOutside } from "@hooks";
 
 interface Props {
   chosenSorting: string;
   setChosenSorting: Dispatch<SetStateAction<string>>;
+  closeSorts: () => void;
 }
 
 export const GovernanceActionsSorting = ({
   chosenSorting,
   setChosenSorting,
+  closeSorts,
 }: Props) => {
   const { t } = useTranslation();
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(wrapperRef, closeSorts);
 
   return (
     <Box
@@ -32,9 +37,12 @@ export const GovernanceActionsSorting = ({
         boxShadow: "1px 2px 11px 0px #00123D5E",
         borderRadius: "10px",
         padding: "12px 0px",
-        width: "auto",
+        width: "315px",
         zIndex: "1",
+        right: "3px",
+        top: "53px",
       }}
+      ref={wrapperRef}
     >
       <FormControl>
         <Box display="flex" justifyContent="space-between" px="20px">

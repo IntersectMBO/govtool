@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 import { KeenSliderOptions, useKeenSlider } from "keen-slider/react";
 import type { KeenSliderInstance } from "keen-slider";
 
@@ -47,53 +47,28 @@ const WheelControls = (slider: KeenSliderInstance) => {
   });
 };
 
-export const useSlider = ({
-  config,
-  sliderMaxLength,
-}: {
-  config: KeenSliderOptions;
-  sliderMaxLength: number;
-}) => {
+export const useSlider = ({ config }: { config: KeenSliderOptions }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [currentRange, setCurrentRange] = useState(0);
 
   const [sliderRef, instanceRef] = useKeenSlider(
     {
       ...config,
       rubberband: false,
       detailsChanged: (slider) => {
-        setCurrentRange(slider.track.details.progress * sliderMaxLength);
         setCurrentSlide(slider.track.details.rel);
       },
     },
     [WheelControls],
   );
 
-  const DATA_LENGTH = instanceRef?.current?.slides?.length ?? 10;
-  const ITEMS_PER_VIEW =
-    DATA_LENGTH - (instanceRef?.current?.track?.details?.maxIdx ?? 2);
-
-  const setPercentageValue = (e: ChangeEvent<HTMLInputElement>) => {
-    const target = e?.target;
-    const currentIndexOfSlide = Math.floor(
-      +(target?.value ?? 0) /
-        (sliderMaxLength / (DATA_LENGTH - Math.floor(ITEMS_PER_VIEW))),
-    );
-
-    instanceRef.current?.track.add(
-      (+(target?.value ?? 0) - currentRange) *
-        (instanceRef.current.track.details.length / sliderMaxLength),
-    );
-    setCurrentRange(+(target?.value ?? 0));
-    setCurrentSlide(currentIndexOfSlide);
-  };
+  const dataLength = instanceRef?.current?.slides?.length ?? 10;
+  const itemsPerView =
+    dataLength - (instanceRef?.current?.track?.details?.maxIdx ?? 2);
 
   return {
     sliderRef,
     instanceRef,
     currentSlide,
-    currentRange,
-    setCurrentRange,
-    setPercentageValue,
+    itemsPerView,
   };
 };

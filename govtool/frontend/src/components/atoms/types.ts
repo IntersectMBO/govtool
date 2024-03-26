@@ -7,6 +7,7 @@ import {
   TextareaAutosizeProps,
   SxProps,
 } from "@mui/material";
+import * as TooltipMUI from "@mui/material/Tooltip";
 
 export type ButtonProps = Omit<MUIButtonProps, "size"> & {
   size?: "small" | "medium" | "large" | "extraLarge";
@@ -70,4 +71,10 @@ export type TextAreaProps = TextareaAutosizeProps & {
 export type InfoTextProps = {
   label: string;
   sx?: SxProps;
+};
+
+export type TooltipProps = Omit<TooltipMUI.TooltipProps, "title"> & {
+  heading?: string;
+  paragraphOne?: string;
+  paragraphTwo?: string;
 };

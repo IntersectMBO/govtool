@@ -2,25 +2,25 @@ import { useState, useCallback, useEffect } from "react";
 import { Box, CircularProgress, Tab, Tabs, styled } from "@mui/material";
 import { useLocation } from "react-router-dom";
 
-import { GOVERNANCE_ACTIONS_FILTERS } from '@consts';
-import { useCardano } from '@context';
+import { GOVERNANCE_ACTIONS_FILTERS } from "@consts";
+import { useCardano } from "@context";
 import {
   useGetProposalsQuery,
   useGetVoterInfo,
   useScreenDimension,
   useTranslation,
-} from '@hooks';
-import { DataActionsBar } from '@molecules';
+} from "@hooks";
+import { DataActionsBar } from "@molecules";
 import {
   GovernanceActionsToVote,
   DashboardGovernanceActionsVotedOn,
-} from '@organisms';
+} from "@organisms";
 
-interface TabPanelProps {
+type TabPanelProps = {
   children?: React.ReactNode;
   index: number;
   value: number;
-}
+};
 
 const defaultCategories = GOVERNANCE_ACTIONS_FILTERS.map(
   (category) => category.key,
@@ -36,8 +36,8 @@ const CustomTabPanel = (props: TabPanelProps) => {
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
       style={{
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "column",
         flex: value !== index ? 0 : 1,
       }}
     >
@@ -53,22 +53,22 @@ type StyledTabProps = {
 const StyledTab = styled((props: StyledTabProps) => (
   <Tab disableRipple {...props} />
 ))(() => ({
-  textTransform: 'none',
+  textTransform: "none",
   fontWeight: 400,
   fontSize: 16,
-  color: '#242232',
-  '&.Mui-selected': {
-    color: '#FF640A',
+  color: "#242232",
+  "&.Mui-selected": {
+    color: "#FF640A",
     fontWeight: 500,
   },
 }));
 
 export const DashboardGovernanceActions = () => {
-  const [searchText, setSearchText] = useState<string>('');
+  const [searchText, setSearchText] = useState<string>("");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [chosenFilters, setChosenFilters] = useState<string[]>([]);
   const [sortOpen, setSortOpen] = useState(false);
-  const [chosenSorting, setChosenSorting] = useState<string>('');
+  const [chosenSorting, setChosenSorting] = useState<string>("");
   const { voter } = useGetVoterInfo();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -145,7 +145,7 @@ export const DashboardGovernanceActions = () => {
               <Tabs
                 sx={{
                   marginTop: 3,
-                  display: 'flex',
+                  display: "flex",
                   fontSize: 16,
                   fontWeight: 500,
                 }}
@@ -156,18 +156,18 @@ export const DashboardGovernanceActions = () => {
               >
                 <StyledTab
                   data-testid="to-vote-tab"
-                  label={t('govActions.toVote')}
+                  label={t("govActions.toVote")}
                   sx={{
-                    textTransform: 'none',
-                    width: !isMobile ? 'auto' : '50%',
+                    textTransform: "none",
+                    width: !isMobile ? "auto" : "50%",
                   }}
                 />
                 <StyledTab
                   data-testid="voted-tab"
-                  label={t('govActions.voted')}
+                  label={t("govActions.votedOnByMe")}
                   sx={{
-                    textTransform: 'none',
-                    width: !isMobile ? 'auto' : '50%',
+                    textTransform: "none",
+                    width: !isMobile ? "auto" : "50%",
                   }}
                 />
               </Tabs>

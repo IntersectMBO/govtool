@@ -50,7 +50,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
   const { data, isLoading } = useGetDRepListQuery(dRepParam);
   const dRep = data?.[0];
 
-  if (!dRep && isLoading) return <CircularProgress />;
+  if (!dRep && isLoading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
 
   if (!dRep) return <Navigate to={PATHS.error} />;
 

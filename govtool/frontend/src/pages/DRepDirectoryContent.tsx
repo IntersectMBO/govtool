@@ -21,7 +21,6 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 }) => {
   const {
     dRepID: myDRepId,
-    isEnabled,
     pendingTransaction,
     stakeKey,
   } = useCardano();
@@ -40,7 +39,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const myDrep = myDRepList?.[0];
   const { data: dRepList } = useGetDRepListQuery();
 
-  if (!isEnabled || votingPower === undefined || !dRepList) {
+  if ((stakeKey && votingPower === undefined) || !dRepList) {
     return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
   }
 

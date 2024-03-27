@@ -66,6 +66,7 @@ export type FormHelpfulTextProps = {
 
 export type TextAreaProps = TextareaAutosizeProps & {
   errorMessage?: string;
+  isModifiedLayout?: boolean;
 };
 
 export type InfoTextProps = {

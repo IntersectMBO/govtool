@@ -163,3 +163,33 @@ export const GOVERNANCE_ACTION_CONTEXT = {
     },
   },
 };
+
+export const VOTE_TEST_CONTEXT = {
+  "@language": "en-us",
+  CIP100:
+    "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#",
+  CIP108:
+    "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#",
+  hashAlgorithm: "CIP100:hashAlgorithm",
+  body: {
+    "@id": "CIP108:body",
+    "@context": {
+      text: "CIP108:text",
+    },
+  },
+  authors: {
+    "@id": "CIP100:authors",
+    "@container": "@set" as const,
+    "@context": {
+      name: "http://xmlns.com/foaf/0.1/name",
+      witness: {
+        "@id": "CIP100:witness",
+        "@context": {
+          witnessAlgorithm: "CIP100:witnessAlgorithm",
+          publicKey: "CIP100:publicKey",
+          signature: "CIP100:signature",
+        },
+      },
+    },
+  },
+};

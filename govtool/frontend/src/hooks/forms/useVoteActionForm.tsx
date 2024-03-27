@@ -6,54 +6,31 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { PATHS } from "@consts";
 import { useCardano, useSnackbar } from "@context";
-import { HASH_REGEX, URL_REGEX } from "@utils";
-import { useTranslation } from "@hooks";
-import { UrlAndHashFormValues } from "./useUrlAndHashFormController";
 
-export interface VoteActionFormValues extends UrlAndHashFormValues {
+export interface VoteActionFormValues {
   vote: string;
 }
 
 export const useVoteActionFormController = () => {
-  const { t } = useTranslation();
-
   const validationSchema = useMemo(
     () =>
       Yup.object().shape({
         vote: Yup.string().oneOf(["yes", "no", "abstain"]).required(),
-        url: Yup.string()
-          .trim()
-          .max(64, t("forms.errors.urlTooLong"))
-          .test(
-            "url-validation",
-            t("forms.errors.urlInvalidFormat"),
-            (value) => !value || URL_REGEX.test(value),
-          ),
-        hash: Yup.string()
-          .trim()
-          .test(
-            "hash-length-validation",
-            t("forms.errors.hashInvalidLength"),
-            (value) => !value || value.length === 64,
-          )
-          .test(
-            "hash-format-validation",
-            t("forms.errors.hashInvalidFormat"),
-            (value) => !value || HASH_REGEX.test(value),
-          ),
-        storeData: Yup.boolean(),
       }),
     [],
   );
 
   return useForm<VoteActionFormValues>({
-    defaultValues: { url: "", hash: "", vote: "" },
+    defaultValues: { vote: "" },
     mode: "onChange",
     resolver: yupResolver<VoteActionFormValues>(validationSchema),
   });
 };
 
-export const useVoteActionForm = () => {
+export const useVoteActionForm = (
+  voteContextHash?: string,
+  voteContextUrl?: string,
+) => {
   const [isLoading, setIsLoading] = useState(false);
   const { buildSignSubmitConwayCertTx, buildVote, isPendingTransaction } =
     useCardano();
@@ -67,23 +44,22 @@ export const useVoteActionForm = () => {
     formState: { errors, isDirty },
     setValue,
     register: registerInput,
-    clearErrors,
   } = useVoteActionFormController();
 
   const watch = useWatch({
     control,
   });
 
-  const areFormErrors = !!errors.vote || !!errors.url || !!errors.hash;
+  const areFormErrors = !!errors.vote;
 
   const confirmVote = useCallback(
     async (values: VoteActionFormValues) => {
       setIsLoading(true);
 
-      const { url, hash, vote } = values;
+      const { vote } = values;
 
-      const urlSubmitValue = url ?? "";
-      const hashSubmitValue = hash ?? "";
+      const urlSubmitValue = voteContextUrl ?? "";
+      const hashSubmitValue = voteContextHash ?? "";
 
       try {
         const isPendingTx = isPendingTransaction();
@@ -118,14 +94,11 @@ export const useVoteActionForm = () => {
   );
 
   return {
-    control,
-    errors,
     confirmVote: handleSubmit(confirmVote),
     setValue,
     vote: watch.vote,
     registerInput,
     isDirty,
-    clearErrors,
     areFormErrors,
     isVoteLoading: isLoading,
   };

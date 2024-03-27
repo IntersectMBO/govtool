@@ -24,33 +24,21 @@ export const StatusPill = ({
   />
 );
 
-const getBgColor = (status: Status): string => {
-  switch (status) {
-    case 'Active':
-      return successGreen.c200;
-    case 'Inactive':
-      return cyan.c100;
-    case 'Retired':
-      return errorRed.c100;
-      // no default
-  }
+const bgColor = {
+  Active: successGreen.c200,
+  Inactive: cyan.c100,
+  Retired: errorRed.c100,
 };
 
-const getTextColor = (status: Status): string => {
-  switch (status) {
-    case 'Active':
-      return successGreen.c700;
-    case 'Inactive':
-      return cyan.c500;
-    case 'Retired':
-      return errorRed.c500;
-      // no default
-  }
+const textColor = {
+  Active: successGreen.c700,
+  Inactive: cyan.c500,
+  Retired: errorRed.c500,
 };
 
 const StyledChip = styled(Chip)<{ status: Status }>(({ theme, status }) => ({
-  backgroundColor: getBgColor(status),
-  color: getTextColor(status),
+  backgroundColor: bgColor[status],
+  color: textColor[status],
   border: `2px solid ${theme.palette.neutralWhite}`,
   fontSize: '0.75rem',
   textTransform: 'capitalize',

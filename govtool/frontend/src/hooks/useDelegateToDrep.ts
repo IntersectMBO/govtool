@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import * as Sentry from "@sentry/react";
 import { useTranslation } from "@hooks";
 import { useCardano, useSnackbar } from "@/context";
 
@@ -26,6 +27,7 @@ export const useDelegateTodRep = () => {
         addSuccessAlert(t("alerts.delegate.success"));
       }
     } catch (error) {
+      Sentry.captureException(error);
       addErrorAlert(t("alerts.delegate.failed"));
     } finally {
       setIsDelegating(false);

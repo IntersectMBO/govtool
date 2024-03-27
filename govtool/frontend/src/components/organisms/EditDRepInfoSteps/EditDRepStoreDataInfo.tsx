@@ -5,26 +5,26 @@ import { Spacer, Typography } from "@atoms";
 import {
   useScreenDimension,
   useTranslation,
-  useRegisterAsdRepForm,
+  useEditDRepInfoForm,
 } from "@hooks";
 import { openInNewTab } from "@utils";
 
 import { BgCard, ControlledField } from "..";
 
-export const DRepStoreDataInfo = ({
+export const EditDRepStoreDataInfo = ({
   setStep,
 }: {
   setStep: Dispatch<SetStateAction<number>>;
 }) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
-  const { control, errors, watch } = useRegisterAsdRepForm();
+  const { control, errors, watch } = useEditDRepInfoForm();
 
-  const onClickBackButton = () => setStep(2);
+  const onClickBackButton = () => setStep(1);
+
+  const onClickContinue = () => setStep(3);
 
   const isContinueDisabled = !watch("storeData");
-
-  const onClickContinue = () => setStep(4);
 
   // TODO: Add link about store data when available
   const openLink = () => openInNewTab("https://sancho.network/get-started");
@@ -37,7 +37,7 @@ export const DRepStoreDataInfo = ({
       onClickBackButton={onClickBackButton}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
-        {t("registration.storeDataTitle")}
+        {t("editMetadata.storeDataTitle")}
       </Typography>
       <Link
         onClick={openLink}
@@ -51,12 +51,12 @@ export const DRepStoreDataInfo = ({
           textDecoration: "none",
         }}
       >
-        {t("registration.storeDataLink")}
+        {t("editMetadata.storeDataLink")}
       </Link>
       <ControlledField.Checkbox
         {...{ control, errors }}
         name="storeData"
-        label={t("registration.storeDataCheckboxLabel")}
+        label={t("editMetadata.storeDataCheckboxLabel")}
       />
       <Spacer y={isMobile ? 4 : 12.5} />
       <Box display="flex" flex={1} />

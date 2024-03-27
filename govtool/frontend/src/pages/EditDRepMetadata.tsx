@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FormProvider, useForm } from "react-hook-form";
-import { Box, CircularProgress } from "@mui/material";
+import { Box } from "@mui/material";
 
 import { Background } from "@atoms";
 import { PATHS } from "@consts";
@@ -9,31 +9,28 @@ import { useModal } from "@context";
 import {
   useScreenDimension,
   useTranslation,
-  defaultRegisterAsDRepValues,
-  useGetVoterInfo,
+  defaultEditDRepInfoValues,
 } from "@hooks";
 import { LinkWithIcon } from "@molecules";
 import {
   DashboardTopNav,
-  DRepStorageInformation,
-  DRepStoreDataInfo,
+  EditDRepStorageInformation,
+  EditDRepStoreDataInfo,
   Footer,
-  RegisterAsDRepForm,
-  RolesAndResponsibilities,
+  EditDRepForm,
 } from "@organisms";
 import { checkIsWalletConnected } from "@utils";
 
-export const RegisterAsdRep = () => {
+export const EditDRepMetadata = () => {
   const [step, setStep] = useState<number>(1);
   const { isMobile } = useScreenDimension();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { closeModal, openModal } = useModal();
-  const { voter } = useGetVoterInfo();
 
   const methods = useForm({
     mode: "onChange",
-    defaultValues: defaultRegisterAsDRepValues,
+    defaultValues: defaultEditDRepInfoValues,
   });
 
   const backToDashboard = () => {
@@ -49,7 +46,7 @@ export const RegisterAsdRep = () => {
         message: t("modals.registration.cancelDescription"),
         buttonText: t("modals.common.goToDashboard"),
         title: t("modals.registration.cancelTitle"),
-        dataTestId: "cancel-registration-modal",
+        dataTestId: "cancel-edit-drep-info-modal",
         onSubmit: backToDashboard,
       },
     });
@@ -60,16 +57,12 @@ export const RegisterAsdRep = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (voter?.wasRegisteredAsDRep) setStep(2);
-  }, [voter?.wasRegisteredAsDRep]);
-
   return (
     <Background isReverted>
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
-        <DashboardTopNav title={t("registration.becomeADRep")} />
+        <DashboardTopNav title={t("editMetadata.pageTitle")} />
         <LinkWithIcon
           label={t("backToDashboard")}
           onClick={onClickBackToDashboard}
@@ -79,39 +72,16 @@ export const RegisterAsdRep = () => {
             mt: isMobile ? 3 : 1.5,
           }}
         />
-        {!voter ? (
-          <Box
-            sx={{
-              alignItems: "center",
-              display: "flex",
-              flex: 1,
-              height: "100vh",
-              justifyContent: "center",
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        ) : (
-          <>
-            {step === 1 && !voter?.wasRegisteredAsDRep && (
-              <RolesAndResponsibilities
-                onClickCancel={onClickBackToDashboard}
-                setStep={setStep}
-              />
-            )}
-            <FormProvider {...methods}>
-              {step === 2 && (
-                <RegisterAsDRepForm
-                  onClickCancel={onClickBackToDashboard}
-                  setStep={setStep}
-                  voter={voter}
-                />
-              )}
-              {step === 3 && <DRepStoreDataInfo setStep={setStep} />}
-              {step === 4 && <DRepStorageInformation setStep={setStep} />}
-            </FormProvider>
-          </>
-        )}
+        <FormProvider {...methods}>
+          {step === 1 && (
+            <EditDRepForm
+              onClickCancel={onClickBackToDashboard}
+              setStep={setStep}
+            />
+          )}
+          {step === 2 && <EditDRepStoreDataInfo setStep={setStep} />}
+          {step === 3 && <EditDRepStorageInformation setStep={setStep} />}
+        </FormProvider>
         {isMobile && <Footer />}
       </Box>
     </Background>

@@ -43,7 +43,7 @@ export const GovernanceActionDetails = () => {
     state ? state.txHash : data?.proposal.txHash ?? "",
     state ? state.index : data?.proposal.index ?? "",
   );
-  const title = state ? state.title : data.proposal.title;
+  const title = state ? state.title : data?.proposal.title;
 
   useEffect(() => {
     if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {

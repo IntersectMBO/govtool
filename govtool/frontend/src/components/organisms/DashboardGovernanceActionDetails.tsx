@@ -41,7 +41,7 @@ export const DashboardGovernanceActionDetails = () => {
     state ? state.txHash : data?.proposal.txHash ?? "",
     state ? state.index : data?.proposal.index ?? "",
   );
-  const title = state ? state.title : data.proposal.title;
+  const title = state ? state.title : data?.proposal.title;
 
   return (
     <Box

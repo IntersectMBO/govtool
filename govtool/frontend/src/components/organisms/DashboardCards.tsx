@@ -26,7 +26,11 @@ export const DashboardCards = () => {
   const { votingPower } = useGetAdaHolderVotingPowerQuery(stakeKey);
   const { voter } = useGetVoterInfo();
 
-  if (!currentDelegation || !voter || !votingPower) {
+  if (
+    currentDelegation === undefined
+    || votingPower === undefined
+    || voter === undefined
+  ) {
     return (
       <Box
         sx={{

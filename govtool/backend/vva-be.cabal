@@ -60,7 +60,7 @@ executable vva-be
                     , lens
                     , cache
                     , clock
-                    , resource-pool
+                    , resource-pool == 0.2.3.2
                     , postgresql-simple
                     , data-has
                     , bytestring

@@ -19,10 +19,12 @@ type Story = StoryObj<typeof meta>;
 
 export const DashboardCardComponent: Story = {
   args: {
+    buttons: [
+      { children: "first button" },
+      { children: "second button" },
+    ],
     description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
-    firstButtonLabel: "first button",
     imageURL: IMAGES.govActionDelegateImage,
-    secondButtonLabel: "second button",
     title: "Action card",
   },
   play: async ({ canvasElement }) => {
@@ -38,21 +40,24 @@ export const DashboardCardComponent: Story = {
 
 export const WithDRepIdDashboardCardComponent: Story = {
   args: {
+    buttons: [
+      { children: "first button" },
+      { children: "second button" },
+    ],
     description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
-    firstButtonLabel: "first button",
     imageURL: IMAGES.govActionDelegateImage,
-    secondButtonLabel: "second button",
     title: "Action card",
-    cardId: "drep1gwsw9ckkhuwscj9savt5f7u9xsrudw209hne7pggcktzuw5sv32",
   },
 };
 
 export const LoadingDashboardCard: Story = {
   args: {
+    buttons: [
+      { children: "first button" },
+      { children: "second button" },
+    ],
     description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
-    firstButtonLabel: "first button",
     imageURL: IMAGES.govActionDelegateImage,
-    secondButtonLabel: "second button",
     title: "Action card",
     isLoading: true,
   },
@@ -67,12 +72,14 @@ export const LoadingDashboardCard: Story = {
 
 export const InProgressDashboardCard: Story = {
   args: {
+    buttons: [
+      { children: "first button" },
+      { children: "second button" },
+    ],
     description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
-    firstButtonLabel: "first button",
     imageURL: IMAGES.govActionDelegateImage,
-    secondButtonLabel: "second button",
     title: "Action card",
-    inProgress: true,
+    state: "inProgress",
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

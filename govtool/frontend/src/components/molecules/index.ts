@@ -3,6 +3,7 @@ export * from "./Breadcrumbs";
 export * from "./Card";
 export * from "./CenteredBoxBottomButtons";
 export * from "./CenteredBoxPageWrapper";
+export * from "./CopyableInfo";
 export * from "./DashboardActionCard";
 export * from "./DataActionsBar";
 export * from "./DataMissingInfoBox";

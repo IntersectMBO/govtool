@@ -3,15 +3,17 @@ import { Box, Typography } from "@mui/material";
 import { useCardano } from "@context";
 import { CopyButton } from "@atoms";
 import { useTranslation } from "@hooks";
+import { Card } from "./Card";
+import { gray } from "@/consts";
 
 export const DRepInfoCard = () => {
   const { dRepIDBech32 } = useCardano();
   const { t } = useTranslation();
 
   return (
-    <Box border={1} borderColor="#D6E2FF" py={1} px={2} borderRadius={3}>
+    <Card border elevation={0} sx={{ p: 1.5 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography color="gray" fontSize={12} fontWeight={500}>
+        <Typography color={gray.c300} fontSize={12} fontWeight={500}>
           {t("myDRepId")}
         </Typography>
         <CopyButton text={dRepIDBech32} variant="blue" />
@@ -28,6 +30,6 @@ export const DRepInfoCard = () => {
           {dRepIDBech32}
         </Typography>
       </Box>
-    </Box>
+    </Card>
   );
 };

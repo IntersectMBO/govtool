@@ -1,12 +1,13 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { Box, CircularProgress, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
-import { ICONS, PATHS } from "@consts";
+import { GOVERNANCE_ACTIONS_SORTING, ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { DataActionsBar, GovernanceActionCard } from "@molecules";
 import {
+  useDataActionsBar,
   useFetchNextPageDetector,
   useGetProposalsInfiniteQuery,
   useGetVoterInfo,
@@ -23,9 +24,8 @@ import {
 
 export const DashboardGovernanceActionsCategory = () => {
   const { category } = useParams();
-  const [searchText, setSearchText] = useState<string>("");
-  const [sortOpen, setSortOpen] = useState(false);
-  const [chosenSorting, setChosenSorting] = useState<string>("");
+  const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
+  const { chosenSorting } = dataActionsBarProps;
   const { isMobile, screenWidth } = useScreenDimension();
   const navigate = useNavigate();
   const { pendingTransaction, isEnableLoading } = useCardano();
@@ -42,7 +42,7 @@ export const DashboardGovernanceActionsCategory = () => {
   } = useGetProposalsInfiniteQuery({
     filters: [category?.replace(/ /g, "") ?? ""],
     sorting: chosenSorting,
-    searchPhrase: searchText,
+    searchPhrase: debouncedSearchText,
   });
   const loadNextPageRef = useRef(null);
 
@@ -57,24 +57,11 @@ export const DashboardGovernanceActionsCategory = () => {
     isProposalsFetching,
   );
 
-  const mappedData = useMemo(() => {
-    const uniqueProposals = removeDuplicatedProposals(proposals);
-
-    return uniqueProposals?.filter((i) =>
-      getFullGovActionId(i.txHash, i.index)
-        .toLowerCase()
-        .includes(searchText.toLowerCase()),
-    );
-  }, [
+  const mappedData = useMemo(() => removeDuplicatedProposals(proposals), [
     proposals,
     voter?.isRegisteredAsDRep,
-    searchText,
     isProposalsFetchingNextPage,
   ]);
-
-  const closeSorts = useCallback(() => {
-    setSortOpen(false);
-  }, [setSortOpen]);
 
   return (
     <Background>
@@ -106,15 +93,9 @@ export const DashboardGovernanceActionsCategory = () => {
               </Typography>
             </Link>
             <DataActionsBar
-              chosenSorting={chosenSorting}
-              closeSorts={closeSorts}
+              {...dataActionsBarProps}
               isFiltering={false}
-              searchText={searchText}
-              setChosenSorting={setChosenSorting}
-              setSearchText={setSearchText}
-              setSortOpen={setSortOpen}
-              sortingActive={Boolean(chosenSorting)}
-              sortOpen={sortOpen}
+              sortOptions={GOVERNANCE_ACTIONS_SORTING}
             />
             <Typography
               variant="title2"

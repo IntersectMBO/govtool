@@ -2,13 +2,14 @@ import { useInfiniteQuery } from "react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
-import { getProposals, getProposalsArguments } from "@services";
+import { getProposals, GetProposalsArguments } from "@services";
 
 export const useGetProposalsInfiniteQuery = ({
   filters = [],
   pageSize = 10,
+  searchPhrase,
   sorting = "",
-}: getProposalsArguments) => {
+}: GetProposalsArguments) => {
   const { dRepID, isEnabled, pendingTransaction } = useCardano();
 
   const fetchProposals = ({ pageParam = 0 }) =>
@@ -17,6 +18,7 @@ export const useGetProposalsInfiniteQuery = ({
       filters,
       page: pageParam,
       pageSize,
+      searchPhrase,
       sorting,
     });
 
@@ -34,6 +36,7 @@ export const useGetProposalsInfiniteQuery = ({
       filters,
       isEnabled,
       pendingTransaction.vote?.transactionHash,
+      searchPhrase,
       sorting,
     ],
     fetchProposals,

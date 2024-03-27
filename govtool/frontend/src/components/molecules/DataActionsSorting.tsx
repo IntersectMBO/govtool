@@ -8,19 +8,23 @@ import {
   Typography,
 } from "@mui/material";
 
-import { GOVERNANCE_ACTIONS_SORTING } from "@consts";
 import { useTranslation, useOnClickOutside } from "@hooks";
 
 interface Props {
   chosenSorting: string;
   setChosenSorting: Dispatch<SetStateAction<string>>;
   closeSorts: () => void;
+  options: {
+    key: string;
+    label: string;
+  }[];
 }
 
-export const GovernanceActionsSorting = ({
+export const DataActionsSorting = ({
   chosenSorting,
   setChosenSorting,
   closeSorts,
+  options,
 }: Props) => {
   const { t } = useTranslation();
 
@@ -63,7 +67,7 @@ export const GovernanceActionsSorting = ({
             setChosenSorting(e.target.value);
           }}
         >
-          {GOVERNANCE_ACTIONS_SORTING.map((item) => (
+          {options.map((item) => (
             <FormControlLabel
               sx={[
                 {

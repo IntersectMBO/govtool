@@ -2,20 +2,19 @@ import { useQuery } from "react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
-import { getProposals, getProposalsArguments } from "@services";
-import { getFullGovActionId } from "@utils";
+import { getProposals, GetProposalsArguments } from "@services";
 
 export const useGetProposalsQuery = ({
   filters = [],
-  sorting,
   searchPhrase,
-}: getProposalsArguments) => {
+  sorting,
+}: GetProposalsArguments) => {
   const { dRepID, pendingTransaction } = useCardano();
 
   const fetchProposals = async (): Promise<ActionType[]> => {
     const allProposals = await Promise.all(
       filters.map((filter) =>
-        getProposals({ dRepID, filters: [filter], sorting }),
+        getProposals({ dRepID, filters: [filter], searchPhrase, sorting }),
       ),
     );
 
@@ -26,6 +25,7 @@ export const useGetProposalsQuery = ({
     [
       QUERY_KEYS.useGetProposalsKey,
       filters,
+      searchPhrase,
       sorting,
       dRepID,
       pendingTransaction.vote?.transactionHash,
@@ -33,38 +33,27 @@ export const useGetProposalsQuery = ({
     fetchProposals,
   );
 
-  const mappedData = Object.values(
-    (groupedByType(
-      data?.filter((i) =>
-        getFullGovActionId(i.txHash, i.index)
-          .toLowerCase()
-          .includes(searchPhrase.toLowerCase()))
-    ) ?? []) as ToVoteDataType
+  const proposals = Object.values(
+    (groupByType(data) ?? [])
   );
 
   return {
     isProposalsLoading: isLoading,
-    proposals: mappedData,
+    proposals,
   };
 };
 
-const groupedByType = (data?: ActionType[]) => data?.reduce((groups, item) => {
-  const itemType = item.type;
+const groupByType = (data?: ActionType[]) =>
+  data?.reduce<Record<string, ArrayElement<ToVoteDataType>>>((groups, item) => {
+    const itemType = item.type;
 
-  // TODO: Provide better typing for groups
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-  if (!groups[itemType]) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    groups[itemType] = {
-      title: itemType,
-      actions: [],
-    };
-  }
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-  groups[itemType].actions.push(item);
+    if (!groups[itemType]) {
+      groups[itemType] = {
+        title: itemType,
+        actions: [],
+      };
+    }
+    groups[itemType].actions.push(item);
 
-  return groups;
-}, {});
+    return groups;
+  }, {});

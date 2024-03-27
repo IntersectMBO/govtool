@@ -27,13 +27,11 @@ type ActionTypeProps = Omit<
   | "abstainVotes"
   | "metadataHash"
   | "url"
-  | "details"
   | "id"
-  | "txHash"
-  | "index"
+  | "details"
+  | "rationale"
+  | "motivation"
 > & {
-  txHash: string;
-  index: number;
   isDataMissing: boolean;
   onClick?: () => void;
   inProgress?: boolean;
@@ -44,11 +42,15 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
     type,
     inProgress = false,
     expiryDate,
+    expiryEpochNo,
     onClick,
     createdDate,
+    createdEpochNo,
     txHash,
     index,
     isDataMissing,
+    title,
+    about,
   } = props;
   const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
@@ -85,13 +87,14 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
         }}
       >
         <GovernanceActionCardHeader
-          // TODO: Add real title from props when BE is ready
-          title="Fund our project"
+          // TODO: Remove "Fund our project" when title is implemented everywhere
+          title={title ?? "Fund our project"}
           isDataMissing={isDataMissing}
         />
         <GovernanceActionCardElement
           label={t("govActions.abstract")}
-          text={mockedLongText}
+          // TODO: Remove mock when possible
+          text={about ?? mockedLongText}
           textVariant="twoLines"
           dataTestId="governance-action-abstract"
           isSliderCard
@@ -106,6 +109,8 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
         <GovernanceActionsDatesBox
           createdDate={formatDisplayDate(createdDate)}
           expiryDate={formatDisplayDate(expiryDate)}
+          expiryEpochNo={expiryEpochNo}
+          createdEpochNo={createdEpochNo}
           isSliderCard
         />
         <GovernanceActionCardElement

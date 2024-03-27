@@ -26,9 +26,11 @@ export interface VotedProposal {
   proposal: {
     id: string;
     type: string;
-    details: string;
+    details?: ActionDetailsType;
     expiryDate: string;
+    expiryEpochNo: number;
     createdDate: string;
+    createdEpochNo: number;
     url: string;
     metadataHash: string;
     yesVotes: number;
@@ -36,5 +38,9 @@ export interface VotedProposal {
     abstainVotes: number;
     txHash: string;
     index: number;
+    title: string | null;
+    about: string | null;
+    motivation: string | null;
+    rationale: string | null;
   };
 }

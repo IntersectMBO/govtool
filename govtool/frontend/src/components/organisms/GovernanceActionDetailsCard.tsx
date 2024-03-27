@@ -10,10 +10,17 @@ import { useState } from "react";
 type GovernanceActionDetailsCardProps = {
   abstainVotes: number;
   createdDate: string;
+  createdEpochNo: number;
   expiryDate: string;
+  expiryEpochNo: number;
   noVotes: number;
   type: string;
-  // url: string;
+  details?: ActionDetailsType;
+  url: string;
+  title: string | null;
+  about: string | null;
+  motivation: string | null;
+  rationale: string | null;
   yesVotes: number;
   govActionId: string;
   isDataMissing: boolean;
@@ -26,10 +33,17 @@ type GovernanceActionDetailsCardProps = {
 export const GovernanceActionDetailsCard = ({
   abstainVotes,
   createdDate,
+  createdEpochNo,
   expiryDate,
+  expiryEpochNo,
   noVotes,
   type,
-  // url,
+  details,
+  url,
+  title,
+  about,
+  motivation,
+  rationale,
   yesVotes,
   isDashboard,
   isVoter,
@@ -72,7 +86,15 @@ export const GovernanceActionDetailsCard = ({
         type={type}
         govActionId={govActionId}
         createdDate={createdDate}
+        createdEpochNo={createdEpochNo}
         expiryDate={expiryDate}
+        expiryEpochNo={expiryEpochNo}
+        details={details}
+        url={url}
+        title={title}
+        about={about}
+        motivation={motivation}
+        rationale={rationale}
         isDataMissing={isDataMissing}
         isDashboard={isDashboard}
         isOneColumn={isOneColumn}

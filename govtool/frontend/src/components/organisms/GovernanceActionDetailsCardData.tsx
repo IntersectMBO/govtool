@@ -15,19 +15,19 @@ import { getProposalTypeNoEmptySpaces } from "@utils";
 const mockedLongDescription =
   "I am the Cardano crusader carving his path in the blockchain battleground. With a mind sharper than a Ledger Nano X, this fearless crypto connoisseur fearlessly navigates the volatile seas of Cardano, turning code into currency. Armed with a keyboard and a heart pumping with blockchain beats, Mister Big Bad fearlessly champions decentralization, smart contracts, and the Cardano community. His Twitter feed is a mix of market analysis that rivals CNBC and memes that could break the internet.";
 
-const mockedOnChainData = [
-  {
-    label: "Reward Address",
-    content: "Lorem ipsum dolor sit amet consectetur.",
-  },
-  { label: "Amount", content: "₳ 12,350" },
-];
-
 type GovernanceActionDetailsCardDataProps = {
   type: string;
   govActionId: string;
   createdDate: string;
+  createdEpochNo: number;
   expiryDate: string;
+  expiryEpochNo: number;
+  details?: ActionDetailsType;
+  url: string;
+  title: string | null;
+  about: string | null;
+  motivation: string | null;
+  rationale: string | null;
   isDataMissing: boolean;
   isOneColumn: boolean;
   isDashboard?: boolean;
@@ -37,7 +37,15 @@ export const GovernanceActionDetailsCardData = ({
   type,
   govActionId,
   createdDate,
+  createdEpochNo,
   expiryDate,
+  expiryEpochNo,
+  details,
+  url,
+  title,
+  about,
+  motivation,
+  rationale,
   isDataMissing,
   isOneColumn,
   isDashboard,
@@ -58,8 +66,8 @@ export const GovernanceActionDetailsCardData = ({
       }}
     >
       <GovernanceActionDetailsCardHeader
-        // TODO: Add real title from props when BE is ready
-        title="Fund our project"
+        // TODO: Remove "Fund our project" when title is implemented everywhere
+        title={title ?? "Fund our project"}
         // TODO: Modify props regarding missing data
         // (e.g. title, description) when validation is done
         isDataMissing={isDataMissing}
@@ -74,31 +82,15 @@ export const GovernanceActionDetailsCardData = ({
       <GovernanceActionsDatesBox
         createdDate={createdDate}
         expiryDate={expiryDate}
+        expiryEpochNo={expiryEpochNo}
+        createdEpochNo={createdEpochNo}
       />
       {isDataMissing && (
         <ExternalModalButton
-          url="https://dev-sanchonet.govtool.byron.network/"
+          url={url}
           label={t("govActions.seeExternalData")}
         />
       )}
-      <GovernanceActionCardElement
-        label={t("govActions.submissionDate")}
-        text={createdDate}
-        tooltipProps={{
-          heading: t("tooltips.submissionDate.heading"),
-          paragraphOne: t("tooltips.submissionDate.paragraphOne"),
-        }}
-        dataTestId="submission-date"
-      />
-      <GovernanceActionCardElement
-        label={t("govActions.expiryDate")}
-        text={expiryDate}
-        tooltipProps={{
-          heading: t("tooltips.expiryDate.heading"),
-          paragraphOne: t("tooltips.expiryDate.paragraphOne"),
-        }}
-        dataTestId="expiry-date"
-      />
       <GovernanceActionCardElement
         label={t("govActions.governanceActionId")}
         text={govActionId}
@@ -107,24 +99,27 @@ export const GovernanceActionDetailsCardData = ({
       />
       <GovernanceActionCardElement
         label={t("govActions.about")}
-        text={mockedLongDescription}
+        // TODO: Remove mock when possible
+        text={about ?? mockedLongDescription}
         textVariant="longText"
         dataTestId="about"
       />
       <GovernanceActionCardElement
         label={t("govActions.motivation")}
-        text={mockedLongDescription}
+        // TODO: Remove mock when possible
+        text={motivation ?? mockedLongDescription}
         textVariant="longText"
         dataTestId="motivation"
       />
       <GovernanceActionCardElement
         label={t("govActions.rationale")}
-        text={mockedLongDescription}
+        text={rationale ?? mockedLongDescription}
         textVariant="longText"
         dataTestId="rationale"
       />
-      {/* TODO: To add option display of on-chain data when BE is ready */}
-      <GovernanceActionDetailsCardOnChainData data={mockedOnChainData} />
+      {details && Object.keys(details).length !== 0 && (
+        <GovernanceActionDetailsCardOnChainData data={details} />
+      )}
       <GovernanceActionDetailsCardLinks />
     </Box>
   );

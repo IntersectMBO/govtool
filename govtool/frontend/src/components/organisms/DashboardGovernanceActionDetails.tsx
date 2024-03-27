@@ -41,6 +41,7 @@ export const DashboardGovernanceActionDetails = () => {
     state ? state.txHash : data?.proposal.txHash ?? "",
     state ? state.index : data?.proposal.index ?? "",
   );
+  const title = state ? state.title : data.proposal.title;
 
   return (
     <Box
@@ -54,7 +55,8 @@ export const DashboardGovernanceActionDetails = () => {
       <Breadcrumbs
         elementOne={t("govActions.title")}
         elementOnePath={PATHS.dashboardGovernanceActions}
-        elementTwo="Fund our project"
+        // TODO: Remove "Fund our project" when title is implemented everywhere
+        elementTwo={title ?? "Fund our project"}
         isDataMissing={false}
       />
       <Link
@@ -108,12 +110,18 @@ export const DashboardGovernanceActionDetails = () => {
                 ? formatDisplayDate(state.createdDate)
                 : formatDisplayDate(data.proposal.createdDate)
             }
+            createdEpochNo={
+              state ? state.createdEpochNo : data.proposal.createdEpochNo
+            }
             // TODO: Add data validation
             isDataMissing={isDataMissing}
             expiryDate={
               state
                 ? formatDisplayDate(state.expiryDate)
                 : formatDisplayDate(data.proposal.expiryDate)
+            }
+            expiryEpochNo={
+              state ? state.expiryEpochNo : data.proposal.expiryEpochNo
             }
             isVoter={
               voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
@@ -124,8 +132,12 @@ export const DashboardGovernanceActionDetails = () => {
                 ? getProposalTypeLabel(state.type)
                 : getProposalTypeLabel(data.proposal.type)
             }
-            // TODO: To decide if we want to keep it when metadate BE is ready
-            // url={state ? state.url : data.proposal.url}
+            details={state ? state.details : data.proposal.details}
+            url={state ? state.url : data.proposal.url}
+            title={state ? state.title : data.proposal.title}
+            about={state ? state.about : data.proposal.about}
+            motivation={state ? state.motivation : data.proposal.motivation}
+            rationale={state ? state.rationale : data.proposal.rationale}
             yesVotes={state ? state.yesVotes : data.proposal.yesVotes}
             voteFromEP={data?.vote?.vote}
             govActionId={fullProposalId}

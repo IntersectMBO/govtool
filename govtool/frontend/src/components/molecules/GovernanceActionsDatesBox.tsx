@@ -8,12 +8,16 @@ import { useScreenDimension, useTranslation } from "@hooks";
 type GovernanceActionsDatesBoxProps = {
   createdDate: string;
   expiryDate: string;
+  expiryEpochNo: number;
+  createdEpochNo: number;
   isSliderCard?: boolean;
 };
 
 export const GovernanceActionsDatesBox = ({
   createdDate,
   expiryDate,
+  expiryEpochNo,
+  createdEpochNo,
   isSliderCard,
 }: GovernanceActionsDatesBoxProps) => {
   const { t } = useTranslation();
@@ -54,8 +58,7 @@ export const GovernanceActionsDatesBox = ({
         >
           <Trans
             i18nKey="govActions.submittedDateWithEpoch"
-            // TODO: Add proper epoch
-            values={{ date: createdDate, epoch: "430" }}
+            values={{ date: createdDate, epoch: createdEpochNo }}
             components={[
               <span style={{ fontWeight: 600 }} key="0" />,
               <span style={{ fontWeight: 400 }} key="1" />,
@@ -97,8 +100,7 @@ export const GovernanceActionsDatesBox = ({
         >
           <Trans
             i18nKey="govActions.expiresDateWithEpoch"
-            // TODO: Add proper epoch
-            values={{ date: expiryDate, epoch: "440" }}
+            values={{ date: expiryDate, epoch: expiryEpochNo }}
             components={[
               <span style={{ fontWeight: 600 }} key="0" />,
               <span style={{ fontWeight: 400 }} key="1" />,

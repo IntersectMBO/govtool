@@ -4,10 +4,7 @@ import { Typography } from "@atoms";
 import { useTranslation } from "@hooks";
 
 type GovernanceActionDetailsCardOnChainDataProps = {
-  data: {
-    label: string;
-    content: string;
-  }[];
+  data: ActionDetailsType;
 };
 
 export const GovernanceActionDetailsCardOnChainData = ({
@@ -38,7 +35,7 @@ export const GovernanceActionDetailsCardOnChainData = ({
           {t("govActions.onChainTransactionDetails")}
         </Typography>
       </Box>
-      {data.map(({ label, content }) => (
+      {Object.entries(data).map(([label, content]) => (
         <Box
           key={label}
           sx={{
@@ -53,8 +50,6 @@ export const GovernanceActionDetailsCardOnChainData = ({
               fontWeight: 600,
               lineHeight: "24px",
               whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
             }}
           >
             {label}:

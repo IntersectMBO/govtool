@@ -9,10 +9,10 @@ This repository helps in creation of  Conway era transactions containing proposa
 - Sanchonet Faucet API
 
 ### Limitations
-Gov action loader backend instance uses fixed set of wallet to perform transactions. This means that gov action loader can be used by only 1 user at a time. 
+Gov action loader backend instance uses fixed set of wallet to perform transactions. This means that gov action loader can be used by only 1 user at a time.
 
 
-## 1. Setup 
+## 1. Setup
 
 ```
 python3 -m venv ./venv
@@ -22,7 +22,7 @@ pip install -r requirements.txt
 
 ## 1. Initialize Wallets
 
-### Prerequisite 
+### Prerequisite
     - You should have sancho-node, kuber server runnning and cardano-cli available.
 
 For bulk proposal creation , multiple wallets must be generated. Generate them with following command.

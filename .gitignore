@@ -101,7 +101,6 @@ book/src/08_event-db/db-diagrams/*.dot
 # Used by nix
 result*
 .direnv/
-/.pre-commit-config.yaml
 
 # Development Environments
 .vscode

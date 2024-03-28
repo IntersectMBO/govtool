@@ -8,14 +8,14 @@ This test is responsible for following
 ## Installation
 
 ```shell
-python -m venv venv 
+python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
 
 ## Wallet Setup
-Test requires that certain dreps/stakes be registered in the network. 
+Test requires that certain dreps/stakes be registered in the network.
 
 To run setup script the main wallet must have enough balance. The address for the main wallet is
 
@@ -35,6 +35,6 @@ In the root directory of tests/govtool-backend run the following command
 ```shell
 export BASE_URL="url" # server's url e.g. https://staging.govtool.byron.network/api"
 export METRICS_URL="url" # metrics server Url
-export METRICS_API_SECRET="metrics-api-secret" 
+export METRICS_API_SECRET="metrics-api-secret"
 pytest -v
 ```

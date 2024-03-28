@@ -1,0 +1,24 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v3.2.0
+  hooks:
+    - id: trailing-whitespace
+    - id: end-of-file-fixer
+
+- repo: local
+  hooks:
+    - id: hlint
+      name: hlint
+      description: HLint gives suggestions on how to improve your source code.
+      entry: hlint
+      language: system
+      files: '\.l?hs$'
+
+    - id: stylish-haskell
+      name: stylish-haskell
+      description: Haskell code format checker.
+      entry: stylish-haskell --config govtool/backend/.stylish-haskell.yaml
+      language: system
+      files: '\.l?hs$'

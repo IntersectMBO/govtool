@@ -5,9 +5,9 @@ It contains simple forms for loading multiple/specific proposals in the sancho n
 ### Depends On
 
 - [gov-action-loader-be](../gov-action-loader-be/)
-  
+
 ### Limitations
-Gov action loader backend instance uses fixed set of wallet to perform transactions. This means that gov action loader can be used by only 1 user at a time. 
+Gov action loader backend instance uses fixed set of wallet to perform transactions. This means that gov action loader can be used by only 1 user at a time.
 
 ## Running the frontend
 

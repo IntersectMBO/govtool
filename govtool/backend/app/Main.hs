@@ -1,90 +1,77 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE OverloadedLabels #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE NamedFieldPuns      #-}
+{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE OverloadedLabels #-}
-{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE TypeApplications    #-}
+{-# LANGUAGE TypeOperators       #-}
 
 module Main where
 
-import Control.Exception
-  ( Exception,
-    SomeException,
-    fromException,
-    throw,
-  )
-import Control.Lens.Operators ((.~))
-import Control.Monad
-import Control.Monad.IO.Class
-import Control.Monad.Trans.Except
-import Control.Monad.Trans.Reader
-import Data.Aeson hiding (Error)
-import Data.ByteString.Char8 (unpack)
-import qualified Data.ByteString as BS
-import Data.Function ((&))
-import Data.Monoid (mempty)
-import Data.OpenApi (OpenApi, Server (Server), servers, _openApiServers, _serverDescription, _serverUrl, _serverVariables)
-import Data.Proxy
-import Data.String (fromString)
-import Data.String.Conversions
-  ( cs,
-  )
-import qualified Data.Text as Text
-import qualified Data.Text.IO as Text
-import qualified Data.Text.Lazy as LazyText
-import qualified Data.Text.Lazy.Encoding as LazyText
-import Network.Wai
-import Network.Wai
-  ( Request,
-    rawPathInfo,
-    requestHeaderHost,
-  )
-import Network.Wai.Handler.Warp
-import Network.Wai.Handler.Warp
-  ( defaultOnException,
-    defaultSettings,
-    runSettings,
-    setOnException,
-    setPort,
-  )
-import Network.Wai.Middleware.Cors
-import Options.Applicative (execParser)
-import Servant
-import Servant.API.ContentTypes
-import Servant.OpenApi (toOpenApi)
-import qualified Servant.Server as Servant
-import Servant.Swagger.UI
-  ( SwaggerSchemaUI,
-    swaggerSchemaUIServer,
-  )
-import System.IO (stderr)
-import System.Log.Raven
-  ( initRaven,
-    register,
-    silentFallback,
-  )
-import System.Log.Raven.Transport.HttpConduit (sendRecord)
-import System.Log.Raven.Types
-  ( SentryLevel (Error),
-    SentryRecord (..),
-  )
-import VVA.API
-import VVA.CommandLine
-import VVA.Config
-import Data.Function ((&))
-import Control.Lens.Operators ((.~))
-import Data.Monoid (mempty)
-import qualified Data.Cache as Cache
-import VVA.API.Types
-import System.Clock (TimeSpec(TimeSpec))
-import Data.Pool (createPool)
-import Database.PostgreSQL.Simple (connectPostgreSQL, close)
-import Data.Text.Encoding (encodeUtf8)
-import Data.Has (getter)
-import VVA.Types (AppError(ValidationError, NotFoundError, CriticalError), CacheEnv(..), AppEnv(..))
+import           Control.Exception                      (Exception,
+                                                         SomeException,
+                                                         fromException, throw)
+import           Control.Lens.Operators                 ((.~))
+import           Control.Monad
+import           Control.Monad.IO.Class
+import           Control.Monad.Trans.Except
+import           Control.Monad.Trans.Reader
+
+import           Data.Aeson                             hiding (Error)
+import qualified Data.ByteString                        as BS
+import           Data.ByteString.Char8                  (unpack)
+import qualified Data.Cache                             as Cache
+import           Data.Function                          ((&))
+import           Data.Has                               (getter)
+import           Data.Monoid                            (mempty)
+import           Data.OpenApi                           (OpenApi,
+                                                         Server (Server),
+                                                         _openApiServers,
+                                                         _serverDescription,
+                                                         _serverUrl,
+                                                         _serverVariables,
+                                                         servers)
+import           Data.Pool                              (createPool)
+import           Data.Proxy
+import           Data.String                            (fromString)
+import           Data.String.Conversions                (cs)
+import qualified Data.Text                              as Text
+import           Data.Text.Encoding                     (encodeUtf8)
+import qualified Data.Text.IO                           as Text
+import qualified Data.Text.Lazy                         as LazyText
+import qualified Data.Text.Lazy.Encoding                as LazyText
+
+import           Database.PostgreSQL.Simple             (close,
+                                                         connectPostgreSQL)
+
+import           Network.Wai
+import           Network.Wai.Handler.Warp
+import           Network.Wai.Middleware.Cors
+
+import           Options.Applicative                    (execParser)
+
+import           Servant
+import           Servant.API.ContentTypes
+import           Servant.OpenApi                        (toOpenApi)
+import qualified Servant.Server                         as Servant
+import           Servant.Swagger.UI                     (SwaggerSchemaUI,
+                                                         swaggerSchemaUIServer)
+
+import           System.Clock                           (TimeSpec (TimeSpec))
+import           System.IO                              (stderr)
+import           System.Log.Raven                       (initRaven, register,
+                                                         silentFallback)
+import           System.Log.Raven.Transport.HttpConduit (sendRecord)
+import           System.Log.Raven.Types                 (SentryLevel (Error),
+                                                         SentryRecord (..))
+
+import           VVA.API
+import           VVA.API.Types
+import           VVA.CommandLine
+import           VVA.Config
+import           VVA.Types                              (AppEnv (..),
+                                                         AppError (CriticalError, NotFoundError, ValidationError),
+                                                         CacheEnv (..))
 
 proxyAPI :: Proxy (VVAApi :<|> SwaggerAPI)
 proxyAPI = Proxy
@@ -94,7 +81,7 @@ main = do
   commandLineConfig <- execParser cmdParser
   vvaConfig <- loadVVAConfig (clcConfigPath commandLineConfig)
   case clcCommand commandLineConfig of
-    StartApp -> startApp vvaConfig
+    StartApp   -> startApp vvaConfig
     ShowConfig -> Text.putStrLn $ vvaConfigToText vvaConfig
 
 startApp :: VVAConfig -> IO ()
@@ -172,7 +159,7 @@ recordUpdate Nothing exception record = record
 recordUpdate (Just request) exception record =
   record
     { srCulprit = Just $ unpack $ rawPathInfo request,
-      srServerName = fmap unpack $ requestHeaderHost request
+      srServerName = unpack <$> requestHeaderHost request
     }
 
 shouldDisplayException :: SomeException -> Bool
@@ -243,7 +230,8 @@ mkVVAServer appEnv = do
           (liftServer appEnv :<|> swagger)
       )
 
-newtype TextException = TextException Text.Text
+newtype TextException
+  = TextException Text.Text
 
 instance Show TextException where
   show (TextException e) = show e

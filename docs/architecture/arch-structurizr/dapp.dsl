@@ -77,4 +77,3 @@ hwWallet -> cardanoWallet "integrates"
 
 // User's browser attaches to GVC FE
 browser -> dAppFrontEnd "connects"
-

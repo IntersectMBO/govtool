@@ -17,9 +17,9 @@ export async function migrate() {
         outcome TEXT NOT NULL,
         start_date BIGINT NOT NULL,
         end_date BIGINT NOT NULL,
-        build_id TEXT NOT NULL, 
+        build_id TEXT NOT NULL,
         test_name TEXT NOT NULL,
-        commit_hash TEXT NOT NULL 
+        commit_hash TEXT NOT NULL
 
   )`
   await pool.query(createTableQuery)
@@ -29,11 +29,11 @@ export async function migrate() {
         build_id TEXT NOT NULL,
         method TEXT NOT NULL,
         endpoint TEXT NOT NULL,
-        path_param TEXT, 
+        path_param TEXT,
         json TEXT,
         status_code INTEGER NOT NULL,
-        response_json TEXT , 
-        response_time BIGINT NOT NULL, 
+        response_json TEXT ,
+        response_time BIGINT NOT NULL,
         start_date BIGINT NOT NULL
   )`
   await pool.query(createTableQuery)

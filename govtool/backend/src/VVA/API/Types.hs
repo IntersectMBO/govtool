@@ -1,60 +1,68 @@
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE ConstraintKinds            #-}
+{-# LANGUAGE DeriveAnyClass             #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE DerivingStrategies         #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE LambdaCase                 #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE NamedFieldPuns             #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE RecordWildCards            #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeApplications           #-}
 
 module VVA.API.Types where
 
-import Control.Lens ((?~), (.~))
-import Control.Monad.Except
-import Control.Monad.Reader
-import Data.Aeson
-import qualified Data.Aeson as Aeson
-import qualified Data.Text.Lazy.Encoding as Text
-import qualified Data.ByteString.Lazy.Char8 as Char8
-import qualified Data.Aeson.KeyMap as Aeson (toList)
-import Data.Aeson.TH (deriveJSON)
-import Data.Function ((&))
-import Data.Maybe (fromJust, fromMaybe)
-import Data.OpenApi hiding (Info)
-import Data.Text hiding (map)
-import qualified Data.Text as Text
-import Data.Time
-import GHC.Generics
-import Servant.API (FromHttpApiData, parseUrlPiece, parseQueryParam)
-import Text.Read (readMaybe)
-import VVA.API.Utils
-import VVA.Config
-import GHC.Exts (toList)
-import qualified Data.Cache as Cache
-import qualified VVA.Proposal as Proposal
-import Data.Hashable (Hashable)
-import Data.Has (Has, getter, modifier)
-import Data.Pool (Pool)
-import Database.PostgreSQL.Simple (Connection)
-import Data.Char (isHexDigit)
-import VVA.Types (AppError(ValidationError))
-import Data.Proxy (Proxy(Proxy))
-import Control.Exception (throw)
-import Data.Swagger.Internal (SwaggerType(SwaggerString))
-import Control.Monad (guard)
+import           Control.Exception          (throw)
+import           Control.Lens               ((.~), (?~))
+import           Control.Monad              (guard)
+import           Control.Monad.Except
+import           Control.Monad.Reader
 
-newtype HexText = HexText { unHexText :: Text }
-  deriving newtype (Show, Eq)
+import           Data.Aeson
+import qualified Data.Aeson                 as Aeson
+import qualified Data.Aeson.KeyMap          as Aeson (toList)
+import           Data.Aeson.TH              (deriveJSON)
+import qualified Data.ByteString.Lazy.Char8 as Char8
+import qualified Data.Cache                 as Cache
+import           Data.Char                  (isHexDigit)
+import           Data.Function              ((&))
+import           Data.Has                   (Has, getter, modifier)
+import           Data.Hashable              (Hashable)
+import           Data.Maybe                 (fromJust, fromMaybe)
+import           Data.OpenApi               hiding (Info)
+import           Data.Pool                  (Pool)
+import           Data.Proxy                 (Proxy (Proxy))
+import           Data.Swagger.Internal      (SwaggerType (SwaggerString))
+import           Data.Text                  hiding (map)
+import qualified Data.Text                  as Text
+import qualified Data.Text.Lazy.Encoding    as Text
+import           Data.Time
+
+import           Database.PostgreSQL.Simple (Connection)
+
+import           GHC.Exts                   (toList)
+import           GHC.Generics
+
+import           Servant.API                (FromHttpApiData, parseQueryParam,
+                                             parseUrlPiece)
+
+import           Text.Read                  (readMaybe)
+
+import           VVA.API.Utils
+import           VVA.Config
+import qualified VVA.Proposal               as Proposal
+import           VVA.Types                  (AppError (ValidationError))
+
+newtype HexText
+  = HexText { unHexText :: Text }
+  deriving newtype (Eq, Show)
 
 instance FromJSON HexText where
   parseJSON (Aeson.String t) = do
-    if (Text.length t `mod` 2 == 1 || Text.any (not . isHexDigit) t)
+    if Text.length t `mod` 2 == 1 || Text.any (not . isHexDigit) t
       then mzero
       else pure $ HexText t
 
@@ -64,7 +72,7 @@ instance ToJSON HexText where
 -- To use it in routes, we need to be able to parse it from Text:
 instance FromHttpApiData HexText where
   parseUrlPiece txt
-    | Text.all isHexDigit txt && (Text.length txt `mod` 2 == 0) = Right (HexText txt)
+    | Text.all isHexDigit txt && even (Text.length txt) = Right (HexText txt)
     | otherwise            = Left "Not a valid hex value"
 
 
@@ -82,10 +90,11 @@ instance ToSchema HexText where
       & schema . format ?~ "hex"
       & schema . example ?~ toJSON (HexText "a1b2c3")
 
-data GovActionId = GovActionId
-  { govActionIdTxHash :: HexText
-  , govActionIdIndex :: Integer
-  }
+data GovActionId
+  = GovActionId
+      { govActionIdTxHash :: HexText
+      , govActionIdIndex  :: Integer
+      }
   deriving (Eq)
 
 instance Show GovActionId where
@@ -135,15 +144,14 @@ instance ToSchema GovActionId where
       & schema . example ?~ Aeson.String exampleGovActionId
 
 
-data GovernanceActionType
-  = ParameterChange
-  | HardForkInitiation
-  | TreasuryWithdrawals
-  | NoConfidence
-  | NewCommittee
-  | NewConstitution
-  | InfoAction
-  deriving (Eq, Show, Read, Enum, Bounded, Generic)
+data GovernanceActionType = ParameterChange | HardForkInitiation | TreasuryWithdrawals | NoConfidence | NewCommittee | NewConstitution | InfoAction deriving
+    ( Bounded
+    , Enum
+    , Eq
+    , Generic
+    , Read
+    , Show
+    )
 
 instance FromJSON GovernanceActionType where
   parseJSON (Aeson.String governanceActionType) = pure $ fromMaybe InfoAction $ readMaybe (Text.unpack governanceActionType)
@@ -163,7 +171,7 @@ instance ToSchema GovernanceActionType where
 
 instance FromHttpApiData GovernanceActionType where
   parseQueryParam t = case readMaybe $ Text.unpack t of
-    Just x -> Right x
+    Just x  -> Right x
     Nothing -> Left ("incorrect governance action type: " <> t)
 
 instance ToParamSchema GovernanceActionType where
@@ -172,11 +180,14 @@ instance ToParamSchema GovernanceActionType where
       & type_ ?~ OpenApiString
       & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [GovernanceActionType])
 
-data GovernanceActionSortMode
-  = SoonestToExpire
-  | NewestCreated
-  | MostYesVotes
-  deriving (Eq, Show, Read, Enum, Bounded, Generic)
+data GovernanceActionSortMode = SoonestToExpire | NewestCreated | MostYesVotes deriving
+    ( Bounded
+    , Enum
+    , Eq
+    , Generic
+    , Read
+    , Show
+    )
 
 instance FromJSON GovernanceActionSortMode where
   parseJSON (Aeson.String governanceActionSortMode) = pure $ fromJust $ readMaybe (Text.unpack governanceActionSortMode)
@@ -196,7 +207,7 @@ instance ToSchema GovernanceActionSortMode where
 
 instance FromHttpApiData GovernanceActionSortMode where
   parseQueryParam t = case readMaybe $ Text.unpack t of
-    Just x -> Right x
+    Just x  -> Right x
     Nothing -> Left ("incorrect governance action sort mode: " <> t)
 
 instance ToParamSchema GovernanceActionSortMode where
@@ -206,7 +217,8 @@ instance ToParamSchema GovernanceActionSortMode where
       & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [GovernanceActionSortMode])
 
 
-newtype GovernanceActionDetails = GovernanceActionDetails { getValue :: Value }
+newtype GovernanceActionDetails
+  = GovernanceActionDetails { getValue :: Value }
   deriving newtype (Show)
 
 instance FromJSON GovernanceActionDetails where
@@ -216,8 +228,8 @@ instance FromJSON GovernanceActionDetails where
       (Aeson.Object _) -> fail "GovernanceActionDetails cannot have nested objects"
       (Aeson.Array a) -> forM_ (toList a) $ \case
         (Aeson.Object _) -> fail "GovernanceActionDetails cannot have nested objects"
-        (Aeson.Array _) ->  fail "GovernanceActionDetails cannot have nested arrays"
-        _ -> pure ()
+        (Aeson.Array _)  ->  fail "GovernanceActionDetails cannot have nested arrays"
+        _                -> pure ()
       _ -> pure ()
     return $ GovernanceActionDetails v
   parseJSON _ = fail "GovernanceActionDetails has to be an object"
@@ -234,12 +246,13 @@ instance ToSchema GovernanceActionDetails where
                 ("{\"some_key\": \"some value\", \"some_key2\": [1,2,3]}" :: Text)
 
 
-newtype GovernanceActionMetadata = GovernanceActionMetadata Value
+newtype GovernanceActionMetadata
+  = GovernanceActionMetadata Value
   deriving newtype (Show)
 
 instance FromJSON GovernanceActionMetadata where
   parseJSON v@(Aeson.Object o) = pure (GovernanceActionMetadata v)
-  parseJSON _ = fail "GovernanceActionMetadata has to be an object"
+  parseJSON _                  = fail "GovernanceActionMetadata has to be an object"
 
 instance ToJSON GovernanceActionMetadata where
   toJSON (GovernanceActionMetadata g) = g
@@ -254,27 +267,28 @@ instance ToSchema GovernanceActionMetadata where
 
 
 
-data ProposalResponse = ProposalResponse
-  { proposalResponseId :: Text,
-    proposalResponseTxHash :: HexText,
-    proposalResponseIndex :: Integer,
-    proposalResponseType :: GovernanceActionType,
-    proposalResponseDetails :: Maybe GovernanceActionDetails,
-    proposalResponseExpiryDate :: Maybe UTCTime,
-    proposalResponseExpiryEpochNo :: Maybe Integer,
-    proposalResponseCreatedDate :: UTCTime,
-    proposalResponseCreatedEpochNo :: Integer,
-    proposalResponseUrl :: Text,
-    proposalResponseMetadataHash :: HexText,
-    proposalResponseTitle :: Maybe Text,
-    proposalResponseAbout :: Maybe Text,
-    proposalResponseMotivation :: Maybe Text,
-    proposalResponseRationale :: Maybe Text,
-    proposalResponseMetadata :: Maybe GovernanceActionMetadata,
-    proposalResponseYesVotes :: Integer,
-    proposalResponseNoVotes :: Integer,
-    proposalResponseAbstainVotes :: Integer
-  }
+data ProposalResponse
+  = ProposalResponse
+      { proposalResponseId             :: Text
+      , proposalResponseTxHash         :: HexText
+      , proposalResponseIndex          :: Integer
+      , proposalResponseType           :: GovernanceActionType
+      , proposalResponseDetails        :: Maybe GovernanceActionDetails
+      , proposalResponseExpiryDate     :: Maybe UTCTime
+      , proposalResponseExpiryEpochNo  :: Maybe Integer
+      , proposalResponseCreatedDate    :: UTCTime
+      , proposalResponseCreatedEpochNo :: Integer
+      , proposalResponseUrl            :: Text
+      , proposalResponseMetadataHash   :: HexText
+      , proposalResponseTitle          :: Maybe Text
+      , proposalResponseAbout          :: Maybe Text
+      , proposalResponseMotivation     :: Maybe Text
+      , proposalResponseRationale      :: Maybe Text
+      , proposalResponseMetadata       :: Maybe GovernanceActionMetadata
+      , proposalResponseYesVotes       :: Integer
+      , proposalResponseNoVotes        :: Integer
+      , proposalResponseAbstainVotes   :: Integer
+      }
   deriving (Generic, Show)
 
 deriveJSON (jsonOptions "proposalResponse") ''ProposalResponse
@@ -323,12 +337,14 @@ exampleListProposalsResponse =
   <> "\"elements\": ["
   <> exampleProposalResponse <> "]}"
 
-data ListProposalsResponse = ListProposalsResponse
-  { listProposalsResponsePage :: Integer
-  , listProposalsResponsePageSize :: Integer
-  , listProposalsResponseTotal :: Integer
-  , listProposalsResponseElements :: [ProposalResponse]
-  } deriving (Generic, Show)
+data ListProposalsResponse
+  = ListProposalsResponse
+      { listProposalsResponsePage     :: Integer
+      , listProposalsResponsePageSize :: Integer
+      , listProposalsResponseTotal    :: Integer
+      , listProposalsResponseElements :: [ProposalResponse]
+      }
+  deriving (Generic, Show)
 
 deriveJSON (jsonOptions "listProposalsResponse") ''ListProposalsResponse
 
@@ -347,13 +363,14 @@ instance ToSchema ListProposalsResponse where
           & example
             ?~ toJSON exampleListProposalsResponse
 
-data VoteParams = VoteParams
-  { voteParamsProposalId :: Text,
-    voteParamsDrepId :: HexText,
-    voteParamsVote :: Text,
-    voteParamsUrl :: Maybe Text,
-    voteParamsMetadataHash :: Maybe HexText
-  }
+data VoteParams
+  = VoteParams
+      { voteParamsProposalId   :: Text
+      , voteParamsDrepId       :: HexText
+      , voteParamsVote         :: Text
+      , voteParamsUrl          :: Maybe Text
+      , voteParamsMetadataHash :: Maybe HexText
+      }
   deriving (Generic, Show)
 
 deriveJSON (jsonOptions "voteParams") ''VoteParams
@@ -381,10 +398,11 @@ instance ToSchema VoteParams where
           & example
             ?~ toJSON exampleVoteParams
 
-data VoteResponse = VoteResponse
-  { voteResponseVote :: VoteParams,
-    voteResponseProposal :: ProposalResponse
-  }
+data VoteResponse
+  = VoteResponse
+      { voteResponseVote     :: VoteParams
+      , voteResponseProposal :: ProposalResponse
+      }
   deriving (Generic, Show)
 
 deriveJSON (jsonOptions "voteResponse") ''VoteResponse
@@ -409,16 +427,18 @@ instance ToSchema VoteResponse where
           & example
             ?~ toJSON exampleVoteResponse
 
-data DRepInfoResponse = DRepInfoResponse
-  { dRepInfoResponseIsRegisteredAsDRep :: Bool
-  , dRepInfoResponseWasRegisteredAsDRep :: Bool
-  , dRepInfoResponseIsRegisteredAsSoleVoter :: Bool
-  , dRepInfoResponseWasRegisteredAsSoleVoter :: Bool
-  , dRepInfoResponseDeposit :: Maybe Integer
-  , dRepInfoResponseUrl :: Maybe Text
-  , dRepInfoResponseDataHash :: Maybe HexText
-  , dRepInfoResponseVotingPower :: Maybe Integer
-  } deriving (Generic, Show)
+data DRepInfoResponse
+  = DRepInfoResponse
+      { dRepInfoResponseIsRegisteredAsDRep       :: Bool
+      , dRepInfoResponseWasRegisteredAsDRep      :: Bool
+      , dRepInfoResponseIsRegisteredAsSoleVoter  :: Bool
+      , dRepInfoResponseWasRegisteredAsSoleVoter :: Bool
+      , dRepInfoResponseDeposit                  :: Maybe Integer
+      , dRepInfoResponseUrl                      :: Maybe Text
+      , dRepInfoResponseDataHash                 :: Maybe HexText
+      , dRepInfoResponseVotingPower              :: Maybe Integer
+      }
+  deriving (Generic, Show)
 
 deriveJSON (jsonOptions "dRepInfoResponse") ''DRepInfoResponse
 
@@ -447,10 +467,11 @@ instance ToSchema DRepInfoResponse where
             ?~ toJSON exampleDRepInfoResponse
 
 
-data GetProposalResponse = GetProposalResponse
-  { getProposalResponseVote :: Maybe VoteParams,
-    getProposalResponseProposal :: ProposalResponse
-  }
+data GetProposalResponse
+  = GetProposalResponse
+      { getProposalResponseVote     :: Maybe VoteParams
+      , getProposalResponseProposal :: ProposalResponse
+      }
   deriving (Generic, Show)
 
 exampleGetProposalResponse :: Text
@@ -477,14 +498,15 @@ instance ToSchema GetProposalResponse where
             ?~ toJSON exampleGetProposalResponse
 
 
-newtype GetCurrentEpochParamsResponse = GetCurrentEpochParamsResponse { getCurrentEpochParamsResponse :: Maybe Value }
+newtype GetCurrentEpochParamsResponse
+  = GetCurrentEpochParamsResponse { getCurrentEpochParamsResponse :: Maybe Value }
   deriving newtype (Show)
 
 instance FromJSON GetCurrentEpochParamsResponse where
   parseJSON = pure . GetCurrentEpochParamsResponse . Just
 
 instance ToJSON GetCurrentEpochParamsResponse where
-  toJSON (GetCurrentEpochParamsResponse Nothing) = Null
+  toJSON (GetCurrentEpochParamsResponse Nothing)       = Null
   toJSON (GetCurrentEpochParamsResponse (Just params)) = toJSON params
 
 exampleGetCurrentEpochParamsResponse :: Text
@@ -499,9 +521,8 @@ instance ToSchema GetCurrentEpochParamsResponse where
           ?~ toJSON exampleGetCurrentEpochParamsResponse
 
 newtype GetTransactionStatusResponse
-  = GetTransactionStatusResponse
-  { getTransactionstatusResponseTransactionConfirmed :: Bool
-  } deriving (Generic, Show)
+  = GetTransactionStatusResponse { getTransactionstatusResponseTransactionConfirmed :: Bool }
+  deriving (Generic, Show)
 
 
 deriveJSON (jsonOptions "getTransactionstatusResponse") ''GetTransactionStatusResponse
@@ -524,12 +545,13 @@ instance ToSchema GetTransactionStatusResponse where
           & example
             ?~ toJSON exampleGetTransactionStatusResponse
 
-newtype DRepHash = DRepHash Text
+newtype DRepHash
+  = DRepHash Text
   deriving (Generic, Show)
 
 instance FromJSON DRepHash where
   parseJSON (Aeson.String s) = pure $ DRepHash s
-  parseJSON x = fail ("expected DRepHash to be a string but got: " <> Char8.unpack (encode x))
+  parseJSON x                = fail ("expected DRepHash to be a string but got: " <> Char8.unpack (encode x))
 
 instance ToJSON DRepHash where
   toJSON (DRepHash raw) = toJSON raw
@@ -546,22 +568,21 @@ instance ToSchema DRepHash where
           ?~ toJSON exampleDrepHash
 
 
-data DRepStatus = Retired | Active | Inactive
-  deriving (Generic, Show)
+data DRepStatus = Retired | Active | Inactive deriving (Generic, Show)
 
 -- ToJSON instance for DRepStatus
 instance ToJSON DRepStatus where
-  toJSON Retired = "Retired"
-  toJSON Active = "Active"
+  toJSON Retired  = "Retired"
+  toJSON Active   = "Active"
   toJSON Inactive = "Inactive"
 
 -- FromJSON instance for DRepStatus
 instance FromJSON DRepStatus where
   parseJSON = withText "DRepStatus" $ \case
-    "Retired" -> pure Retired
-    "Active" -> pure Active
+    "Retired"  -> pure Retired
+    "Active"   -> pure Active
     "Inactive" -> pure Inactive
-    _ -> fail "Invalid DRepStatus"
+    _          -> fail "Invalid DRepStatus"
 
 -- ToSchema instance for DRepStatus
 instance ToSchema DRepStatus where
@@ -576,19 +597,19 @@ data DRepType = NormalDRep | SoleVoter
 
 instance Show DRepType where
   show NormalDRep = "DRep"
-  show SoleVoter = "SoleVoter"
+  show SoleVoter  = "SoleVoter"
 
 -- ToJSON instance for DRepType
 instance ToJSON DRepType where
   toJSON NormalDRep = "DRep"
-  toJSON SoleVoter = "SoleVoter"
+  toJSON SoleVoter  = "SoleVoter"
 
 -- FromJSON instance for DRepType
 instance FromJSON DRepType where
   parseJSON = withText "DRepType" $ \case
-    "DRep" -> pure NormalDRep
+    "DRep"      -> pure NormalDRep
     "SoleVoter" -> pure SoleVoter
-    _ -> fail "Invalid DRepType"
+    _           -> fail "Invalid DRepType"
 
 -- ToSchema instance for DRepType
 instance ToSchema DRepType where
@@ -597,16 +618,18 @@ instance ToSchema DRepType where
         & description ?~ "DRep Type"
         & enum_ ?~ map toJSON [NormalDRep, SoleVoter]
 
-data DRep = DRep
-  { dRepDrepId :: DRepHash
-  , dRepView :: Text
-  , dRepUrl :: Maybe Text
-  , dRepMetadataHash :: Maybe Text
-  , dRepDeposit :: Integer
-  , dRepVotingPower :: Maybe Integer
-  , dRepStatus :: DRepStatus
-  , dRepType :: DRepType
-  } deriving (Generic, Show)
+data DRep
+  = DRep
+      { dRepDrepId       :: DRepHash
+      , dRepView         :: Text
+      , dRepUrl          :: Maybe Text
+      , dRepMetadataHash :: Maybe Text
+      , dRepDeposit      :: Integer
+      , dRepVotingPower  :: Maybe Integer
+      , dRepStatus       :: DRepStatus
+      , dRepType         :: DRepType
+      }
+  deriving (Generic, Show)
 
 
 deriveJSON (jsonOptions "dRep") ''DRep
@@ -639,18 +662,19 @@ instance ToSchema DRep where
 
 
 
-data GetNetworkMetricsResponse = GetNetworkMetricsResponse
-  { getNetworkMetricsResponseCurrentTime :: UTCTime
-  , getNetworkMetricsResponseCurrentEpoch :: Integer
-  , getNetworkMetricsResponseCurrentBlock :: Integer
-  , getNetworkMetricsResponseUniqueDelegators :: Integer
-  , getNetworkMetricsResponseTotalDelegations :: Integer
-  , getNetworkMetricsResponseTotalGovernanceActions :: Integer
-  , getNetworkMetricsResponseTotalDRepVotes :: Integer
-  , getNetworkMetricsResponseTotalRegisteredDReps :: Integer
-  , getNetworkMetricsResponseAlwaysAbstainVotingPower :: Integer
-  , getNetworkMetricsResponseAlwaysNoConfidenceVotingPower :: Integer
-  }
+data GetNetworkMetricsResponse
+  = GetNetworkMetricsResponse
+      { getNetworkMetricsResponseCurrentTime                   :: UTCTime
+      , getNetworkMetricsResponseCurrentEpoch                  :: Integer
+      , getNetworkMetricsResponseCurrentBlock                  :: Integer
+      , getNetworkMetricsResponseUniqueDelegators              :: Integer
+      , getNetworkMetricsResponseTotalDelegations              :: Integer
+      , getNetworkMetricsResponseTotalGovernanceActions        :: Integer
+      , getNetworkMetricsResponseTotalDRepVotes                :: Integer
+      , getNetworkMetricsResponseTotalRegisteredDReps          :: Integer
+      , getNetworkMetricsResponseAlwaysAbstainVotingPower      :: Integer
+      , getNetworkMetricsResponseAlwaysNoConfidenceVotingPower :: Integer
+      }
 
 deriveJSON (jsonOptions "getNetworkMetricsResponse") ''GetNetworkMetricsResponse
 

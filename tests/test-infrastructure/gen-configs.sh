@@ -1,18 +1,18 @@
 #!/bin/bash
 ####### Script for generating docker secret files and configs.
 ####### If the docker is in swarm mode, it will also generate the docker swarm secrets.
-####### 
-if ! [ -f ./.env ] 
-then 
+#######
+if ! [ -f ./.env ]
+then
     echo ".env file is missing"
     exit 1
 fi
-set -a 
+set -a
 . ./.env
 set +a
 # Function to generate a random secret in base64 format without padding and '+'
 function generate_secret() {
-    openssl rand -base64 16 | tr -d '=+/' 
+    openssl rand -base64 16 | tr -d '=+/'
 }
 
 # Generate random secrets

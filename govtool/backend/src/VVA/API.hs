@@ -1,38 +1,46 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE NamedFieldPuns    #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TypeOperators     #-}
+{-# LANGUAGE ViewPatterns      #-}
 
 module VVA.API where
 
-import Control.Monad.Reader
-import Control.Monad.Except (throwError)
-import Data.List (sortOn)
-import Data.Maybe (fromMaybe, Maybe (Nothing))
-import Data.Ord (Down (..))
-import Data.Text hiding (elem, filter, map, null, take, drop, length)
-import Servant.API
-import Servant.Server
-import Text.Read (readMaybe)
-import VVA.API.Types
-import qualified VVA.AdaHolder as AdaHolder
-import VVA.Config
-import qualified VVA.DRep as DRep
-import qualified VVA.Proposal as Proposal
-import qualified VVA.Epoch as Epoch
-import qualified VVA.Transaction as Transaction
-import Data.Bool (Bool)
-import qualified Data.Map as Map
-import VVA.Cache (cacheRequest)
-import Control.Exception (throw)
-import VVA.Types (CacheEnv(..), AppError(ValidationError, CriticalError), App, AppEnv(..))
-import qualified VVA.Types as Types
-import qualified Data.Text as Text
-import VVA.Network as Network
-import Numeric.Natural (Natural)
+import           Control.Exception    (throw)
+import           Control.Monad.Except (throwError)
+import           Control.Monad.Reader
+
+import           Data.Bool            (Bool)
+import           Data.List            (sortOn)
+import qualified Data.Map             as Map
+import           Data.Maybe           (Maybe (Nothing), fromMaybe)
+import           Data.Ord             (Down (..))
+import           Data.Text            hiding (drop, elem, filter, length, map,
+                                       null, take)
+import qualified Data.Text            as Text
+
+import           Numeric.Natural      (Natural)
+
+import           Servant.API
+import           Servant.Server
+
+import           Text.Read            (readMaybe)
+
+import qualified VVA.AdaHolder        as AdaHolder
+import           VVA.API.Types
+import           VVA.Cache            (cacheRequest)
+import           VVA.Config
+import qualified VVA.DRep             as DRep
+import qualified VVA.Epoch            as Epoch
+import           VVA.Network          as Network
+import qualified VVA.Proposal         as Proposal
+import qualified VVA.Transaction      as Transaction
+import qualified VVA.Types            as Types
+import           VVA.Types            (App, AppEnv (..),
+                                       AppError (CriticalError, ValidationError),
+                                       CacheEnv (..))
 
 type VVAApi =
          "drep" :> "list" :> QueryParam "drepView" Text :> Get '[JSON] [DRep]
@@ -71,12 +79,12 @@ server = drepList
 
 
 mapDRepType :: Types.DRepType -> DRepType
-mapDRepType Types.DRep = NormalDRep
+mapDRepType Types.DRep      = NormalDRep
 mapDRepType Types.SoleVoter = SoleVoter
 
 mapDRepStatus :: Types.DRepStatus -> DRepStatus
-mapDRepStatus Types.Retired = Retired
-mapDRepStatus Types.Active = Active
+mapDRepStatus Types.Retired  = Retired
+mapDRepStatus Types.Active   = Active
 mapDRepStatus Types.Inactive = Inactive
 
 drepRegistrationToDrep :: Types.DRepRegistration -> DRep
@@ -99,9 +107,9 @@ drepList mDRepView = do
   let filtered = flip filter dreps $ \Types.DRepRegistration {..} ->
         case (dRepRegistrationType, mDRepView) of
           (Types.SoleVoter, Just x) -> x == dRepRegistrationView
-          (Types.DRep, Just x) -> isInfixOf x dRepRegistrationView
-          (Types.DRep, Nothing) -> True
-          _ -> False
+          (Types.DRep, Just x)      -> x `isInfixOf` dRepRegistrationView
+          (Types.DRep, Nothing)     -> True
+          _                         -> False
   return $ map drepRegistrationToDrep filtered
 
 getVotingPower :: App m => HexText -> m Integer
@@ -165,10 +173,10 @@ mapSortAndFilterProposals selectedTypes sortMode proposals =
               )
               mappedProposals
       sortedProposals = case sortMode of
-        Nothing -> filteredProposals
-        Just NewestCreated -> sortOn (Down . proposalResponseCreatedDate) filteredProposals
+        Nothing              -> filteredProposals
+        Just NewestCreated   -> sortOn (Down . proposalResponseCreatedDate) filteredProposals
         Just SoonestToExpire -> sortOn proposalResponseExpiryDate filteredProposals
-        Just MostYesVotes -> sortOn (Down . proposalResponseYesVotes) filteredProposals
+        Just MostYesVotes    -> sortOn (Down . proposalResponseYesVotes) filteredProposals
   in sortedProposals
 
 getVotes :: App m => HexText -> [GovernanceActionType] -> Maybe GovernanceActionSortMode -> m [VoteResponse]
@@ -179,7 +187,7 @@ getVotes (unHexText -> dRepId) selectedTypes sortMode = do
   let processedProposals = mapSortAndFilterProposals selectedTypes sortMode proposals
   return $
     [ VoteResponse
-      { voteResponseVote = voteToResponse (voteMap Map.! (read $ unpack proposalResponseId))
+      { voteResponseVote = voteToResponse (voteMap Map.! read (unpack proposalResponseId))
       , voteResponseProposal = proposalResponse
       }
     | proposalResponse@ProposalResponse{proposalResponseId} <- processedProposals
@@ -209,7 +217,7 @@ getCurrentDelegation (unHexText -> stakeKey) = do
 getStakeKeyVotingPower :: App m => HexText -> m Integer
 getStakeKeyVotingPower (unHexText -> stakeKey) = do
   CacheEnv {adaHolderVotingPowerCache} <- asks vvaCache
-  cacheRequest adaHolderVotingPowerCache stakeKey $ AdaHolder.getStakeKeyVotingPower $ stakeKey
+  cacheRequest adaHolderVotingPowerCache stakeKey $ AdaHolder.getStakeKeyVotingPower stakeKey
 
 
 listProposals
@@ -255,10 +263,7 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
       ( \p@ProposalResponse {proposalResponseId} ->
           proposalResponseId `notElem` proposalsToRemove
           && filterF p
-      )
-      <$>
-    mapSortAndFilterProposals selectedTypes sortMode
-    <$> cacheRequest proposalListCache () Proposal.listProposals
+      ) . mapSortAndFilterProposals selectedTypes sortMode <$> cacheRequest proposalListCache () Proposal.listProposals
 
   let total = length mappedAndSortedProposals :: Int
 
@@ -271,7 +276,7 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
     , listProposalsResponseElements = elements
     }
 
-getProposal :: App m => GovActionId -> Maybe (HexText) -> m GetProposalResponse
+getProposal :: App m => GovActionId -> Maybe HexText -> m GetProposalResponse
 getProposal g@(GovActionId govActionTxHash govActionIndex) mDrepId' = do
   let mDrepId = unHexText <$> mDrepId'
   CacheEnv {getProposalCache} <- asks vvaCache
@@ -300,7 +305,7 @@ getTransactionStatus :: App m => HexText -> m GetTransactionStatusResponse
 getTransactionStatus (unHexText -> transactionId) = do
   x <- Transaction.getTransactionStatus transactionId
   case x of
-    Types.TransactionConfirmed -> return $ GetTransactionStatusResponse True
+    Types.TransactionConfirmed   -> return $ GetTransactionStatusResponse True
     Types.TransactionUnconfirmed -> return $ GetTransactionStatusResponse False
 
 throw500 :: App m => m ()

@@ -1,5 +1,4 @@
 name: Backend Lint & Format Check
-description: 'Check Haskell code in backend module'
 
 on:
   workflow_dispatch:

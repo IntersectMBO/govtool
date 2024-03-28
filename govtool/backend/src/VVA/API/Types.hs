@@ -370,6 +370,8 @@ data VoteParams
       , voteParamsVote         :: Text
       , voteParamsUrl          :: Maybe Text
       , voteParamsMetadataHash :: Maybe HexText
+      , voteParamsEpochNo      :: Integer
+      , voteParamsDate         :: UTCTime
       }
   deriving (Generic, Show)
 
@@ -381,7 +383,9 @@ exampleVoteParams =
   <> "\"drepId\": \"b4e4184bfedf920fec53cdc327de4da661ae427784c0ccca9e3c2f50\","
   <> "\"vote\": \"yes\","
   <> "\"url\": \"https://vote.metadata.xyz\","
-  <> "\"metadataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\" }"
+  <> "\"metadataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
+  <> "\"epochNo\": 0,"
+  <> "\"date\": \"1970-01-01T00:00:00Z\"}"
 
 instance ToSchema VoteParams where
   declareNamedSchema proxy = do

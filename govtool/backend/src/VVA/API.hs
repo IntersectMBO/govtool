@@ -149,7 +149,9 @@ voteToResponse Types.Vote {..} =
     voteParamsDrepId = HexText voteDrepId,
     voteParamsVote = voteVote,
     voteParamsUrl = voteUrl,
-    voteParamsMetadataHash = HexText <$> voteDocHash
+    voteParamsMetadataHash = HexText <$> voteDocHash,
+    voteParamsEpochNo = voteEpochNo,
+    voteParamsDate = voteDate
   }
 
 

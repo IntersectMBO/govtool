@@ -64,4 +64,3 @@ Deploying new versions of the application is done using Github actions
 4. From the droping options - "Run workflow", select the branch, Cardano network and type of environment for your deployment
 5. Press "Run workflow"
 6. Wait for the final effect. It's done.
-

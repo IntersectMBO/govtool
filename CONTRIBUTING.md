@@ -133,7 +133,7 @@ Examples:
 
 ### Commit Messages
 
-Please make informative commit messages! 
+Please make informative commit messages!
 It makes it much easier to work out why things are the way they are when you’re debugging things later.
 
 A commit message is communication, so as usual, put yourself in the position of the reader: what does a reviewer, or someone reading the commit message later need to do their job?
@@ -175,7 +175,7 @@ If a branch is outdated, use the rebase button in PRs to rebase feature branches
 Keeping branches ahead of main not only make the git history a lot nicer to process, it also makes conflict resolutions easier.
 Merging main into a branch repeatedly is a good recipe to introduce invalid conflict resolutions and loose track of the actual changes brought by a the branch.
 
-### Versioning 
+### Versioning
 
 Not all releases are declared stable.
 Releases that aren't stable will be released as pre-releases and will append a -pre tag indicating it is not ready for running on production networks.
@@ -246,7 +246,7 @@ Please see [stylish-haskell configuration](./govtool/backend/.stylish-haskell.ya
 - If QA agrees that the code is good, they can make a PR from `test` branch to `staging` branch where end-to-end and performance tests are run.
 - If tests pass, then QA or tech lead can merge and deploy to staging environment (automatically).
 - Moving ticket to `staging` status this ready for PO check.
-  
+
 ### PO Workflow
 
 - Choose ticket from `staging` status.

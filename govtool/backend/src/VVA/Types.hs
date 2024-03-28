@@ -142,4 +142,3 @@ data NetworkMetrics = NetworkMetrics
   , networkMetricsAlwaysAbstainVotingPower :: Integer
   , networkMetricsAlwaysNoConfidenceVotingPower :: Integer
   }
-

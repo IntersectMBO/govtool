@@ -21,7 +21,7 @@ Services required for testing GovTool
 There's a helper script `deploy-swarm.sh` to load the environment variables from `.env` file and generate rendered docker compose file.
 ```bash
 cd ./test/test-infrastructire # cd into the test-infrastructure folder
-docker swarm init # if swarm mode is not enabled yet. 
+docker swarm init # if swarm mode is not enabled yet.
 docker compose build # build the images
 docker node update xxxx --label-add govtool-test-stack=true ## set the node to be used for deploying the services
 ./gen-configs.sh  # generate configs and secrets.
@@ -67,7 +67,7 @@ password: admin
 #### Requires
 - postgres database
 
-Metabase provides UI to show graphs and visualization from different datasource. 
+Metabase provides UI to show graphs and visualization from different datasource.
 It is used for visualizing the test metrics and the api response times over time.
 
 **Docker Image:** [metabase/metabase:v0.46.6.4](https://hub.docker.com/layers/metabase/metabase/v0.46.6.4/images/sha256-95c60db0c87c5da9cb81f6aefd0cd548fe2c14ff8c8dcba2ea58a338865cdbd9?context=explore)
@@ -122,8 +122,8 @@ The results are visualized in metabase.
 - cardano-node's socket connection
 
 #### Used by
-- Cypress integration test 
-- Governance Data Loader 
+- Cypress integration test
+- Governance Data Loader
 
 Opensource API server for transaction building and querying the ledger .
 Kuber makes it easy to construct and submit transaction from the frontend.

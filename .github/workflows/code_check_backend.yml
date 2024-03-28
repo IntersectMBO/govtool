@@ -1,0 +1,65 @@
+name: Backend Lint & Format Check
+description: 'Check Haskell code in backend module'
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - govtool/backend/**
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use Haskell
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: '9.2.7'
+          cabal-version: '3.6.0.0'
+
+      - name: Use Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install Pre-commit
+        run: pip install pre-commit
+
+      - name: Install HLint
+        run: |
+          cabal update
+          cabal install hlint
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run hlint
+        run: pre-commit run --all-files hlint
+
+  check-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use Haskell
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: '9.2.7'
+          cabal-version: '3.6.0.0'
+
+      - name: Use Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install Pre-commit
+        run: pip install pre-commit
+
+      - name: Install HLint
+        run: |
+          cabal update
+          cabal install stylish-haskell
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run hlint
+        run: pre-commit run --all-files stylish-haskell

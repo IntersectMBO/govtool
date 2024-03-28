@@ -102,6 +102,7 @@ export const Slider = ({
           alignItems: "center",
           gap: "10px",
           mb: 3.5,
+          height: "46px",
         }}
       >
         <Box

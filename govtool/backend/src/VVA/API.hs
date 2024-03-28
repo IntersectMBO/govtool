@@ -149,7 +149,9 @@ voteToResponse Types.Vote {..} =
     voteParamsDrepId = HexText voteDrepId,
     voteParamsVote = voteVote,
     voteParamsUrl = voteUrl,
-    voteParamsMetadataHash = HexText <$> voteDocHash
+    voteParamsMetadataHash = HexText <$> voteDocHash,
+    voteParamsEpochNo = voteEpochNo,
+    voteParamsDate = voteDate
   }
 
 
@@ -242,13 +244,13 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
 
 
 
-  let filterF ProposalResponse{..} = case mSearchQuery of
+  let filterF ProposalResponse{..} = case Text.toLower <$> mSearchQuery of
         Nothing -> True
         Just searchQuery -> fromMaybe False $ do
-          title <- proposalResponseTitle
-          about <- proposalResponseAbout
-          motivation <- proposalResponseMotivation
-          rationale <- proposalResponseRationale
+          title <- Text.toLower <$> proposalResponseTitle
+          about <- Text.toLower <$> proposalResponseAbout
+          motivation <- Text.toLower <$> proposalResponseMotivation
+          rationale <- Text.toLower <$> proposalResponseRationale
 
           let result = searchQuery `isInfixOf` title
                       || searchQuery `isInfixOf` about

@@ -31,6 +31,7 @@ changes.
 
 ### Added
 
+- added `epochNo` and `date` to `drep/getVotes` and `proposal/get`
 - Added `isRegisteredAsSoleVoter` and `wasRegisteredAsSoleVoter` fields to the drep/info response [Issue 212](https://github.com/IntersectMBO/govtool/issues/212)
 - Abandoning registration as DRep [Issue 151](https://github.com/IntersectMBO/govtool/issues/151)
 - Abandoning GA creation [Issue 359](https://github.com/IntersectMBO/govtool/issues/359)

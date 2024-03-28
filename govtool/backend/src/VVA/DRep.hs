@@ -23,6 +23,7 @@ import           Data.Scientific
 import           Data.String                (fromString)
 import           Data.Text                  (Text, pack, unpack)
 import qualified Data.Text.Encoding         as Text
+import           Data.Time
 
 import qualified Database.PostgreSQL.Simple as SQL
 
@@ -81,13 +82,14 @@ getVotes ::
 getVotes drepId selectedProposals = withPool $ \conn -> do
   results <- liftIO $ SQL.query conn getVotesSql (SQL.Only drepId)
   let proposalsToSelect = if null selectedProposals
-                          then [ govActionId | (_, govActionId, _, _, _, _) <- results]
+                          then [ govActionId | (_, govActionId, _, _, _, _, _, _) <- results]
                           else selectedProposals
   proposals <- Proposal.getProposals (Just proposalsToSelect)
   let proposalMap = M.fromList $ map (\x -> (proposalId x, x)) proposals
+  timeZone <- liftIO getCurrentTimeZone
   return
-    ([ Vote proposalId' drepId' vote' url' docHash'
-      | (proposalId', govActionId', drepId', vote', url', docHash') <- results
+    ([ Vote proposalId' drepId' vote' url' docHash' epochNo' (localTimeToUTC timeZone date')
+      | (proposalId', govActionId', drepId', vote', url', docHash', epochNo', date') <- results
       , govActionId' `elem` proposalsToSelect
     ], proposals)
 

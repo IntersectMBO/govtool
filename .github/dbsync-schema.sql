@@ -987,4 +987,3 @@ FROM tx_out
          LEFT JOIN block ON tx.block_id = block.id
 WHERE tx_in.tx_in_id IS NULL
   AND block.epoch_no IS NOT NULL;
-

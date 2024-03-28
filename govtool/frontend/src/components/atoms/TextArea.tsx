@@ -8,11 +8,9 @@ import { TextAreaProps } from "./types";
 const TextAreaBase = styled(TextareaAutosize)(
   () => `
   font-family: "Poppins";
-  font-size: 16px;
   font-weight: 400;
     ::placeholder {
       font-family: "Poppins";
-      font-size: 16px;
       font-weight: 400;
       color: #a6a6a6;
     }
@@ -20,7 +18,17 @@ const TextAreaBase = styled(TextareaAutosize)(
 );
 
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  ({ errorMessage, maxLength = 500, onBlur, onFocus, ...props }, ref) => {
+  (
+    {
+      errorMessage,
+      maxLength = 500,
+      onBlur,
+      onFocus,
+      isModifiedLayout,
+      ...props
+    },
+    ref,
+  ) => {
     const { isMobile } = useScreenDimension();
     const textAraeRef = useRef<HTMLTextAreaElement>(null);
 
@@ -51,19 +59,32 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       [handleBlur, handleFocus],
     );
 
+    const getTexAreaHeight = () => {
+      if (isModifiedLayout && isMobile) return "312px";
+      if (isModifiedLayout) return "208px";
+      if (isMobile) return "104px";
+      return "128px";
+    };
+
     return (
       <TextAreaBase
         style={{
           border: `1px solid ${errorMessage ? "red" : "#6F99FF"}`,
           backgroundColor: errorMessage ? "#FAEAEB" : "white",
           borderRadius: "24px",
-          height: isMobile ? "104px" : "128px",
+          height: getTexAreaHeight(),
           outline: "none",
           padding: "12px 14px",
           resize: "none",
         }}
         maxLength={maxLength}
         ref={textAraeRef}
+        sx={{
+          fontSize: isModifiedLayout ? "12px" : "auto",
+          "&::placeholder": {
+            fontSize: isModifiedLayout ? "12px" : "16px",
+          },
+        }}
         {...props}
       />
     );

@@ -1,9 +1,9 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, CircularProgress, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
-import { ICONS, PATHS } from "@consts";
+import { GOVERNANCE_ACTIONS_SORTING, ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { DataActionsBar, GovernanceActionCard } from "@molecules";
 import { Footer, TopNav } from "@organisms";
@@ -14,6 +14,7 @@ import {
   useScreenDimension,
   useTranslation,
   useGetVoterInfo,
+  useDataActionsBar,
 } from "@hooks";
 import {
   WALLET_LS_KEY,
@@ -25,9 +26,8 @@ import {
 
 export const GovernanceActionsCategory = () => {
   const { category } = useParams();
-  const [searchText, setSearchText] = useState<string>("");
-  const [sortOpen, setSortOpen] = useState(false);
-  const [chosenSorting, setChosenSorting] = useState<string>("");
+  const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
+  const { chosenSorting } = dataActionsBarProps;
   const { isMobile, pagePadding, screenWidth } = useScreenDimension();
   const { isEnabled } = useCardano();
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ export const GovernanceActionsCategory = () => {
   } = useGetProposalsInfiniteQuery({
     filters: [category?.replace(/ /g, "") ?? ""],
     sorting: chosenSorting,
-    searchPhrase: searchText,
+    searchPhrase: debouncedSearchText,
   });
   const loadNextPageRef = useRef(null);
 
@@ -59,19 +59,10 @@ export const GovernanceActionsCategory = () => {
     isProposalsFetching,
   );
 
-  const mappedData = useMemo(() => {
-    const uniqueProposals = removeDuplicatedProposals(proposals);
-
-    return uniqueProposals?.filter((i) =>
-      getFullGovActionId(i.txHash, i.index)
-        .toLowerCase()
-        .includes(searchText.toLowerCase()),
-    );
-  }, [
+  const mappedData = useMemo(() => removeDuplicatedProposals(proposals), [
     voter?.isRegisteredAsDRep,
     isProposalsFetchingNextPage,
     proposals,
-    searchText,
   ]);
 
   useEffect(() => {
@@ -80,10 +71,6 @@ export const GovernanceActionsCategory = () => {
       navigate(`/connected${pathname}`);
     }
   }, [isEnabled]);
-
-  const closeSorts = useCallback(() => {
-    setSortOpen(false);
-  }, [setSortOpen]);
 
   return (
     <Background>
@@ -116,15 +103,9 @@ export const GovernanceActionsCategory = () => {
               </Typography>
             </Link>
             <DataActionsBar
+              {...dataActionsBarProps}
               isFiltering={false}
-              searchText={searchText}
-              setSearchText={setSearchText}
-              sortOpen={sortOpen}
-              setSortOpen={setSortOpen}
-              sortingActive={Boolean(chosenSorting)}
-              chosenSorting={chosenSorting}
-              closeSorts={closeSorts}
-              setChosenSorting={setChosenSorting}
+              sortOptions={GOVERNANCE_ACTIONS_SORTING}
             />
             <Typography
               variant="title2"
@@ -146,13 +127,13 @@ export const GovernanceActionsCategory = () => {
                       {category}
                       &nbsp;
                     </Typography>
-                    {searchText && (
+                    {debouncedSearchText && (
                       <>
                         <Typography fontWeight={300}>
                           {t("govActions.withCategoryNotExist.optional")}
                           &nbsp;
                         </Typography>
-                        <Typography fontWeight={700}>{searchText}</Typography>
+                        <Typography fontWeight={700}>{debouncedSearchText}</Typography>
                       </>
                     )}
                     <Typography fontWeight={300}>

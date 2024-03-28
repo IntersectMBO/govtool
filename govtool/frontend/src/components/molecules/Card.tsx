@@ -39,7 +39,7 @@ export const Card = ({
   variant = "default",
   border = variant !== "default",
   children,
-  elevation = 4,
+  elevation = 3,
   label,
   sx,
 }: CardProps) => {

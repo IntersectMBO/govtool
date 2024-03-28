@@ -1,18 +1,18 @@
 module VVA.CommandLine
-  ( cmdParser,
-    CommandLineConfig (..),
-    Command (..),
-  )
-where
+    ( Command (..)
+    , CommandLineConfig (..)
+    , cmdParser
+    ) where
 
-import Options.Applicative
+import           Options.Applicative
 
 data Command = StartApp | ShowConfig deriving (Show)
 
-data CommandLineConfig = CommandLineConfig
-  { clcConfigPath :: Maybe FilePath,
-    clcCommand :: Command
-  }
+data CommandLineConfig
+  = CommandLineConfig
+      { clcConfigPath :: Maybe FilePath
+      , clcCommand    :: Command
+      }
   deriving (Show)
 
 cmdParser :: ParserInfo CommandLineConfig

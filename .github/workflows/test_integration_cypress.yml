@@ -30,7 +30,7 @@ jobs:
       run:
         working-directory: ./tests/govtool-frontend
     runs-on: ubuntu-latest
-    env: 
+    env:
       NODE_OPTIONS: --max_old_space_size=4096
 
     steps:

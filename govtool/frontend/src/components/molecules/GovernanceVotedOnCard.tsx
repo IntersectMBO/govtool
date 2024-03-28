@@ -35,6 +35,17 @@ export const GovernanceVotedOnCard = ({
 }: Props) => {
   const navigate = useNavigate();
   const { proposal, vote } = votedProposal;
+  const {
+    createdDate,
+    createdEpochNo,
+    expiryDate,
+    expiryEpochNo,
+    type,
+    txHash,
+    index,
+    title,
+    about,
+  } = proposal;
 
   const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
@@ -60,9 +71,7 @@ export const GovernanceVotedOnCard = ({
           ? "1px solid #F6D5D5"
           : "1px solid #C0E4BA",
       }}
-      data-testid={`govaction-${getProposalTypeNoEmptySpaces(
-        proposal.type,
-      )}-card`}
+      data-testid={`govaction-${getProposalTypeNoEmptySpaces(type)}-card`}
     >
       <GovernanceActionCardStatePill
         variant={inProgress ? "inProgress" : "voteSubmitted"}
@@ -73,36 +82,36 @@ export const GovernanceVotedOnCard = ({
         }}
       >
         <GovernanceActionCardHeader
-          // TODO: Add real title from props when BE is ready
-          title="Fund our project"
+          // TODO: Remove "Fund our project" when title is implemented everywhere
+          title={title ?? "Fund our project"}
           isDataMissing={isDataMissing}
         />
         <GovernanceActionCardElement
           label={t("govActions.abstract")}
-          text={mockedLongText}
+          // TODO: Remove mock when possible
+          text={about ?? mockedLongText}
           textVariant="twoLines"
           dataTestId="governance-action-abstract"
           isSliderCard
         />
         <GovernanceActionCardElement
           label={t("govActions.governanceActionType")}
-          text={getProposalTypeLabel(proposal.type)}
+          text={getProposalTypeLabel(type)}
           textVariant="pill"
-          dataTestId={`${getProposalTypeNoEmptySpaces(proposal.type)}-type`}
+          dataTestId={`${getProposalTypeNoEmptySpaces(type)}-type`}
           isSliderCard
         />
         <GovernanceActionsDatesBox
-          createdDate={formatDisplayDate(proposal.createdDate)}
-          expiryDate={formatDisplayDate(proposal.expiryDate)}
+          createdDate={formatDisplayDate(createdDate)}
+          expiryDate={formatDisplayDate(expiryDate)}
+          expiryEpochNo={expiryEpochNo}
+          createdEpochNo={createdEpochNo}
           isSliderCard
         />
         <GovernanceActionCardElement
           label={t("govActions.governanceActionId")}
-          text={getFullGovActionId(proposal.txHash, proposal.index)}
-          dataTestId={`${getFullGovActionId(
-            proposal.txHash,
-            proposal.index,
-          )}-id`}
+          text={getFullGovActionId(txHash, index)}
+          dataTestId={`${getFullGovActionId(txHash, index)}-id`}
           isCopyButton
           isSliderCard
         />
@@ -121,14 +130,14 @@ export const GovernanceVotedOnCard = ({
         <Button
           disabled={inProgress}
           data-testid={`govaction-${getFullGovActionId(
-            proposal.txHash,
-            proposal.index,
+            txHash,
+            index,
           )}-change-your-vote`}
           onClick={() =>
             navigate(
               PATHS.dashboardGovernanceActionsAction.replace(
                 ":proposalId",
-                getFullGovActionId(proposal.txHash, proposal.index),
+                getFullGovActionId(txHash, index),
               ),
               {
                 state: {

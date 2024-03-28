@@ -8,7 +8,7 @@ GovTool frontend Integration Test
 yarn
 
 # run cypress tests
-yarn cypress run 
+yarn cypress run
 ```
 
 ## Run tests in dev environment

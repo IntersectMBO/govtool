@@ -1,24 +1,26 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module VVA.Network where
 
+import           Control.Monad.Except       (MonadError, throwError)
+import           Control.Monad.Reader
 
-import Data.ByteString (ByteString)
-import Control.Monad.Except (MonadError, throwError)
-import Control.Monad.Reader
-import Data.FileEmbed (embedFile)
-import Data.Text (Text, unpack)
-import Data.String (fromString)
-import qualified Data.Text.Encoding as Text
+import           Data.Aeson                 (Value)
+import           Data.ByteString            (ByteString)
+import           Data.FileEmbed             (embedFile)
+import           Data.Has                   (Has)
+import           Data.String                (fromString)
+import           Data.Text                  (Text, unpack)
+import qualified Data.Text.Encoding         as Text
+import           Data.Time.Clock
+
 import qualified Database.PostgreSQL.Simple as SQL
-import VVA.Config
-import Data.Aeson (Value)
-import Data.Has (Has)
-import VVA.Pool (ConnectionPool, withPool)
-import VVA.Types
-import Data.Time.Clock
+
+import           VVA.Config
+import           VVA.Pool                   (ConnectionPool, withPool)
+import           VVA.Types
 
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
@@ -31,7 +33,7 @@ networkMetrics ::
   m NetworkMetrics
 networkMetrics = withPool $ \conn -> do
   result <- liftIO $ SQL.query_ conn networkMetricsSql
-  current_time <- liftIO $ getCurrentTime
+  current_time <- liftIO getCurrentTime
   case result of
     [( epoch_no
      , block_no

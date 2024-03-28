@@ -10,5 +10,3 @@ join tx
 on tx.id = gov_action_proposal.tx_id
 where drep_hash.raw = decode(?, 'hex')
 order by voting_procedure.gov_action_proposal_id, voting_procedure.drep_voter, voting_procedure.id desc
-
-

@@ -1,16 +1,10 @@
-import {
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-  Dispatch,
-  SetStateAction,
-} from "react";
+import { useState, useEffect, useMemo, Dispatch, SetStateAction } from "react";
 import { useLocation } from "react-router-dom";
-import { Box, Link } from "@mui/material";
+import { Box } from "@mui/material";
+import { Trans } from "react-i18next";
 
-import { Button, LoadingButton, Radio, Spacer, Typography } from "@atoms";
-import { ICONS } from "@consts";
+import { Button, LoadingButton, Radio, Typography } from "@atoms";
+import { orange } from "@consts";
 import { useModal } from "@context";
 import {
   useScreenDimension,
@@ -18,10 +12,6 @@ import {
   useTranslation,
   useGetVoterInfo,
 } from "@hooks";
-import { openInNewTab } from "@utils";
-
-import { Trans } from "react-i18next";
-import { ControlledField } from "../organisms";
 
 // TODO: Decide with BE on how cast votes will be implemented
 // and adjust accordingly the component below (UI is ready).
@@ -45,7 +35,12 @@ export const VoteActionForm = ({
   abstainVotes,
   isInProgress,
 }: VoteActionFormProps) => {
-  const [isContext, setIsContext] = useState<boolean>(false);
+  const [voteContextText, setVoteContextText] = useState<string | undefined>();
+  const [voteContextHash, setVoteContextHash] = useState<string | undefined>();
+  const [voteContextUrl, setVoteContextUrl] = useState<string | undefined>();
+  const [showWholeVoteContext, setShowWholeVoteContext] =
+    useState<boolean>(false);
+
   const { state } = useLocation();
   const { isMobile } = useScreenDimension();
   const { openModal } = useModal();
@@ -54,16 +49,19 @@ export const VoteActionForm = ({
 
   const {
     areFormErrors,
-    clearErrors,
     confirmVote,
-    control,
-    errors,
     isDirty,
     isVoteLoading,
     registerInput,
     setValue,
     vote,
-  } = useVoteActionForm();
+  } = useVoteActionForm(voteContextHash, voteContextUrl);
+
+  const setVoteContextData = (url: string, hash: string, text: string) => {
+    setVoteContextUrl(url);
+    setVoteContextHash(hash);
+    setVoteContextText(text);
+  };
 
   useEffect(() => {
     if (state && state.vote) {
@@ -74,14 +72,6 @@ export const VoteActionForm = ({
       setIsVoteSubmitted(true);
     }
   }, [state, voteFromEP, setValue]);
-
-  useEffect(() => {
-    clearErrors();
-  }, [isContext]);
-
-  const handleContext = useCallback(() => {
-    setIsContext((prev) => !prev);
-  }, []);
 
   const renderCancelButton = useMemo(
     () => (
@@ -108,7 +98,7 @@ export const VoteActionForm = ({
         disabled={
           (!areFormErrors && voteFromEP === vote) ||
           areFormErrors ||
-          (!isContext && voteFromEP === vote)
+          voteFromEP === vote
         }
         isLoading={isVoteLoading}
         variant="contained"
@@ -233,89 +223,102 @@ export const VoteActionForm = ({
             {t("govActions.showVotes")}
           </Button>
         )}
-        {/* TODO: Change below into new voting context */}
-        <Box
-          alignItems="center"
-          data-testid="context-button"
-          display="flex"
-          flexDirection="row"
-          flexWrap="wrap"
-          justifyContent="center"
-          mb="15px"
-          mt="58px"
-          onClick={handleContext}
+        <Typography
+          variant="body1"
+          sx={{
+            textTransform: "uppercase",
+            fontSize: "14px",
+            color: orange.c400,
+            mt: 6,
+          }}
         >
-          <p
-            style={{
-              cursor: "pointer",
-              fontFamily: "Poppins",
-              fontSize: 12,
-              fontWeight: 300,
-              lineHeight: "18px",
-              textAlign: "center",
-              margin: 0,
-            }}
-          >
-            {t("govActions.provideContext")}{" "}
-            <span style={{ fontSize: 12, fontWeight: 300 }}>
-              {t("govActions.optional")}
-              <img
-                alt="arrow"
-                src={ICONS.arrowDownIcon}
-                style={{
-                  marginBottom: 2,
-                  marginLeft: 12,
-                  transform: `rotate(${!isContext ? "180deg" : "0"})`,
-                }}
-              />
-            </span>
-          </p>
-        </Box>
-        {isContext && (
+          {t("optional")}
+        </Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            textAlign: "center",
+            mt: "5px",
+          }}
+        >
+          {voteContextText
+            ? t("govActions.contextAboutYourVote")
+            : t("govActions.youCanProvideContext")}
+        </Typography>
+        {voteContextText ? (
           <Box
-            display="flex"
-            flexDirection="column"
-            flex={1}
             sx={{
-              alignSelf: "stretch",
+              display: "flex",
+              flexDirection: "column",
+              mt: 2,
             }}
           >
-            <ControlledField.Input
-              {...{ control, errors }}
-              dataTestId="url-input"
-              name="url"
-              placeholder={t("forms.urlWithContextPlaceholder")}
-            />
-            <Spacer y={1.5} />
-            <ControlledField.Input
-              {...{ control, errors }}
-              dataTestId="hash-input"
-              name="hash"
-              placeholder={t("forms.hashPlaceholder")}
-            />
-            <Link
-              data-testid="how-to-create-link"
-              onClick={() =>
-                openInNewTab(
-                  "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor",
-                )
-              }
-              mt="12px"
-              mb={isMobile ? 2 : 6}
-              sx={{ cursor: "pointer" }}
-              textAlign="center"
-              visibility={!isContext ? "hidden" : "visible"}
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 400,
+                color: "neutralGray",
+                ...(!showWholeVoteContext && {
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  display: "-webkit-box",
+                  WebkitBoxOrient: "vertical",
+                  WebkitLineClamp: 2,
+                }),
+              }}
             >
-              <Typography color="primary" fontWeight={400} variant="body2">
-                {t("forms.howCreateUrlAndHash")}
+              {voteContextText}
+            </Typography>
+            <Button
+              onClick={() => {
+                setShowWholeVoteContext((prev) => !prev);
+              }}
+              sx={{
+                p: 0,
+                margin: "0 auto",
+                ":hover": {
+                  backgroundColor: "transparent",
+                },
+              }}
+              disableRipple
+              variant="text"
+              data-testid="external-modal-button"
+            >
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 400,
+                  color: "primaryBlue",
+                  borderBottom: "1px solid",
+                }}
+              >
+                {showWholeVoteContext ? t("showLess") : t("showMore")}
               </Typography>
-            </Link>
+            </Button>
           </Box>
+        ) : (
+          <Button
+            variant="outlined"
+            onClick={() => {
+              openModal({
+                type: "voteContext",
+                state: {
+                  onSubmit: setVoteContextData,
+                },
+              });
+            }}
+            sx={{
+              mt: "12px",
+            }}
+          >
+            {t("govActions.provideContextAboutYourVote")}
+          </Button>
         )}
       </Box>
       <Typography
         sx={{
-          mb: 1,
+          mb: 2,
+          mt: 3,
           textAlign: "center",
           visibility: state?.vote || voteFromEP ? "visible" : "hidden",
         }}
@@ -341,7 +344,7 @@ export const VoteActionForm = ({
           disabled={
             !vote ||
             state?.vote === vote ||
-            (isContext && areFormErrors && isDirty) ||
+            (areFormErrors && isDirty) ||
             voteFromEP === vote
           }
           isLoading={isVoteLoading}

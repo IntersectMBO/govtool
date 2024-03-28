@@ -12,12 +12,18 @@ declare global {
     metadataHash: string;
   };
 
+  type ActionDetailsType = {
+    [key: string]: string | number;
+  };
+
   type ActionType = {
     id: string;
     type: string;
-    details?: string;
+    details?: ActionDetailsType;
     expiryDate: string;
+    expiryEpochNo: number;
     createdDate: string;
+    createdEpochNo: number;
     url?: string;
     metadataHash?: string;
     yesVotes: number;
@@ -25,6 +31,10 @@ declare global {
     abstainVotes: number;
     index: number;
     txHash: string;
+    title: string | null;
+    about: string | null;
+    motivation: string | null;
+    rationale: string | null;
   };
 
   interface ActionVotedOnType extends ActionType {
@@ -56,4 +66,7 @@ declare global {
     | null
     | { [property: string]: JSONValue }
     | JSONValue[];
+
+  type ArrayElement<ArrayType extends readonly unknown[]> =
+    ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 }

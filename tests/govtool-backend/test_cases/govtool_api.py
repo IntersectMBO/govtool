@@ -35,7 +35,7 @@ class GovToolApi():
             response_json_str = response_json[:200]
         except:
             response_json_str = "Something went wrong"
-        
+
         request_info = {
             "method": method,
             "endpoint": endpoint,
@@ -73,6 +73,6 @@ class GovToolApi():
 
     def ada_holder_get_voting_power(self, stake_key) -> Response:
         return self.__get('/ada-holder/get-voting-power', stake_key)
-  
+
     def add_test_metrics(self, metrics: Metrics):
         self.tests_log.append(metrics)

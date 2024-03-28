@@ -29,4 +29,5 @@ export * from "./RetireAsSoleVoterBoxContent";
 export * from "./Slider";
 export * from "./StatusModal";
 export * from "./TopNav";
+export * from "./VoteContext";
 export * from "./VotingPowerModal";

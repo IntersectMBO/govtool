@@ -1,15 +1,12 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE DeriveAnyClass      #-}
+{-# LANGUAGE DeriveGeneric       #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE GADTs               #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PolyKinds           #-}
+{-# LANGUAGE RecordWildCards     #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeOperators #-}
 
 -- | Module      : VVA.Config
 --   Description : Configuration interface
@@ -19,65 +16,70 @@
 -- configuration backend (Conferer) and ensures that the provided configuration
 -- is valid and satisfies required invariants.
 module VVA.Config
-  ( -- * Data types and basic functions
-    VVAConfig (..),
-    loadVVAConfig,
+    ( -- * Data types and basic functions
+      VVAConfig (..)
+    , loadVVAConfig
+      -- * Data type conversions
+    , getDbSyncConnectionString
+    , getServerHost
+    , getServerPort
+    , vvaConfigToText
+    ) where
 
-    -- * Data type conversions
-    vvaConfigToText,
-    getDbSyncConnectionString,
-    getServerPort,
-    getServerHost,
-  )
-where
+import           Conferer
+import qualified Conferer.Source.Aeson    as JSON
+import qualified Conferer.Source.Env      as Env
 
-import Conferer
-import qualified Conferer.Source.Aeson as JSON
-import qualified Conferer.Source.Env as Env
-import Control.Monad.Reader
-import Data.Aeson
+import           Control.Monad.Reader
+
+import           Data.Aeson
 import qualified Data.Aeson.Encode.Pretty as AP
-import Data.ByteString (ByteString, toStrict)
-import Data.Maybe (fromMaybe)
-import Data.Text (Text)
-import qualified Data.Text as Text
-import Data.Text.Encoding (decodeUtf8, encodeUtf8)
-import GHC.Generics
-import VVA.CommandLine (CommandLineConfig (..), clcConfigPath)
-import Data.Has (Has, getter)
+import           Data.ByteString          (ByteString, toStrict)
+import           Data.Has                 (Has, getter)
+import           Data.Maybe               (fromMaybe)
+import           Data.Text                (Text)
+import qualified Data.Text                as Text
+import           Data.Text.Encoding       (decodeUtf8, encodeUtf8)
+
+import           GHC.Generics
+
+import           VVA.CommandLine          (CommandLineConfig (..),
+                                           clcConfigPath)
 -- | PostgreSQL database access information.
-data DBConfig = DBConfig
-  { -- | URL of host running the database
-    dBConfigHost :: Text,
-    -- | Database name
-    dBConfigDbname :: Text,
-    -- | User name
-    dBConfigUser :: Text,
-    -- | Database password
-    dBConfigPassword :: Text,
-    -- | Port
-    dBConfigPort :: Int
-  }
-  deriving (Generic, Show, FromConfig)
+data DBConfig
+  = DBConfig
+      { -- | URL of host running the database
+        dBConfigHost     :: Text
+        -- | Database name
+      , dBConfigDbname   :: Text
+        -- | User name
+      , dBConfigUser     :: Text
+        -- | Database password
+      , dBConfigPassword :: Text
+        -- | Port
+      , dBConfigPort     :: Int
+      }
+  deriving (FromConfig, Generic, Show)
 
 instance DefaultConfig DBConfig where
   configDef = DBConfig "localhost" "cexplorer" "postgres" "test" 9903
 
 -- | Internal, backend-dependent representation of configuration for DEX.  This
 -- data type should not be exported from this module.
-data VVAConfigInternal = VVAConfigInternal
-  { -- | db-sync database access.
-    vVAConfigInternalDbsyncconfig :: DBConfig,
-    -- | Server port.
-    vVAConfigInternalPort :: Int,
-    -- | Server host.
-    vVAConfigInternalHost :: Text,
-    -- | Request cache duration
-    vVaConfigInternalCacheDurationSeconds :: Int,
-    -- | Sentry DSN
-    vVAConfigInternalSentrydsn :: String
-  }
-  deriving (Generic, Show, FromConfig)
+data VVAConfigInternal
+  = VVAConfigInternal
+      { -- | db-sync database access.
+        vVAConfigInternalDbsyncconfig         :: DBConfig
+        -- | Server port.
+      , vVAConfigInternalPort                 :: Int
+        -- | Server host.
+      , vVAConfigInternalHost                 :: Text
+        -- | Request cache duration
+      , vVaConfigInternalCacheDurationSeconds :: Int
+        -- | Sentry DSN
+      , vVAConfigInternalSentrydsn            :: String
+      }
+  deriving (FromConfig, Generic, Show)
 
 instance DefaultConfig VVAConfigInternal where
   configDef =
@@ -90,19 +92,20 @@ instance DefaultConfig VVAConfigInternal where
       }
 
 -- | DEX configuration.
-data VVAConfig = VVAConfig
-  { -- | db-sync database credentials.
-    dbSyncConnectionString :: Text,
-    -- | Server port.
-    serverPort :: Int,
-    -- | Server host.
-    serverHost :: Text,
-    -- | Request cache duration
-    cacheDurationSeconds :: Int,
-    -- | Sentry DSN
-    sentryDSN :: String
-  }
-  deriving (Generic, ToJSON, Show)
+data VVAConfig
+  = VVAConfig
+      { -- | db-sync database credentials.
+        dbSyncConnectionString :: Text
+        -- | Server port.
+      , serverPort             :: Int
+        -- | Server host.
+      , serverHost             :: Text
+        -- | Request cache duration
+      , cacheDurationSeconds   :: Int
+        -- | Sentry DSN
+      , sentryDSN              :: String
+      }
+  deriving (Generic, Show, ToJSON)
 
 -- | Convert 'DBConfig' to a string required by PostgreSQL backend.
 dbConfigToText :: DBConfig -> Text
@@ -165,7 +168,7 @@ loadVVAConfig configFile = do
 getDbSyncConnectionString ::
   (Has VVAConfig r, MonadReader r m) =>
   m ByteString
-getDbSyncConnectionString = encodeUtf8 <$> asks (dbSyncConnectionString . getter)
+getDbSyncConnectionString = asks (encodeUtf8 . dbSyncConnectionString . getter)
 
 -- | Access server port.
 getServerPort ::

@@ -1,39 +1,41 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TypeApplications  #-}
 
 module VVA.Proposal where
 
-import Control.Monad.Except (MonadError, throwError)
-import Control.Monad.Reader
-import Data.ByteString (ByteString)
-import Data.FileEmbed (embedFile)
-import Data.Foldable (fold)
-import qualified Data.Map as Map
-import Data.Maybe (fromMaybe)
-import Data.Monoid (Sum (..), getSum)
-import Data.Scientific
-import Data.String (fromString)
-import Data.Text (Text, unpack, pack)
-import qualified Data.Text.Encoding as Text
-import qualified Data.Text.IO as Text
-import Data.Time
-import qualified Database.PostgreSQL.Simple as SQL
-import qualified GHC.Generics as SQL
-import VVA.Config
-import Data.Aeson (Value)
-import Text.Read (readMaybe)
-import Data.Has (Has)
-import VVA.Pool (ConnectionPool, withPool)
-import Control.Exception (throw)
-import VVA.Types (Proposal(..), AppError(..))
+import           Control.Exception          (throw)
+import           Control.Monad.Except       (MonadError, throwError)
+import           Control.Monad.Reader
 
-import Data.Aeson
-import Data.Aeson.Types (parseMaybe, Parser)
-import Data.Text (Text)
+import           Data.Aeson
+import           Data.Aeson.Types           (Parser, parseMaybe)
+import           Data.ByteString            (ByteString)
+import           Data.FileEmbed             (embedFile)
+import           Data.Foldable              (fold)
+import           Data.Has                   (Has)
+import qualified Data.Map                   as Map
+import           Data.Maybe                 (fromMaybe)
+import           Data.Monoid                (Sum (..), getSum)
+import           Data.Scientific
+import           Data.String                (fromString)
+import           Data.Text                  (Text, pack, unpack)
+import qualified Data.Text.Encoding         as Text
+import qualified Data.Text.IO               as Text
+import           Data.Time
+
+import qualified Database.PostgreSQL.Simple as SQL
+
+import qualified GHC.Generics               as SQL
+
+import           Text.Read                  (readMaybe)
+
+import           VVA.Config
+import           VVA.Pool                   (ConnectionPool, withPool)
+import           VVA.Types                  (AppError (..), Proposal (..))
 
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
@@ -57,7 +59,6 @@ getProposal txHash index = do
     [] -> throwError $ NotFoundError ("Proposal with id: " <> txHash <> "#" <> pack (show index) <> " not found")
     [a] -> return a
     _ -> throwError $ CriticalError ("Multiple proposal found for id: " <> txHash <> "#" <> pack (show index) <> ". This should never happen")
-
 
 getProposals ::
   (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>
@@ -85,6 +86,7 @@ getProposals mProposalIds = withPool $ \conn -> do
                , about'
                , motivation'
                , rationale'
+               , metadataJson'
                , yesVotes'
                , noVotes'
                , abstainVotes'
@@ -108,6 +110,7 @@ getProposals mProposalIds = withPool $ \conn -> do
                   about'
                   motivation'
                   rationale'
+                  metadataJson'
                   (floor @Scientific yesVotes')
                   (floor @Scientific noVotes')
                   (floor @Scientific abstainVotes')

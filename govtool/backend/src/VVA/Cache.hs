@@ -1,10 +1,11 @@
 module VVA.Cache where
 
-import qualified Data.Cache as Cache
-import Data.Hashable (Hashable)
-import Control.Monad.IO.Class (MonadIO, liftIO)
-import Data.Text (Text)
-import Data.Aeson (Value)
+import           Control.Monad.IO.Class (MonadIO, liftIO)
+
+import           Data.Aeson             (Value)
+import qualified Data.Cache             as Cache
+import           Data.Hashable          (Hashable)
+import           Data.Text              (Text)
 
 
 cacheRequest :: (Monad m, MonadIO m, Hashable k) => Cache.Cache k v -> k -> m v -> m v

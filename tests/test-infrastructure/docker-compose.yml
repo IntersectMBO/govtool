@@ -229,7 +229,7 @@ services:
       restart_policy:
         condition: on-failure
         delay: 15s
-  kuber: 
+  kuber:
     image: dquadrant/kuber
     environment:
       CARDANO_NODE_SOCKET_PATH: /ipc/node.socket
@@ -244,4 +244,3 @@ services:
           - node.labels.govtool-test-stack == true
       restart_policy:
         delay: "30s"
-

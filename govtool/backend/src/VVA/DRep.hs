@@ -1,42 +1,38 @@
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TypeApplications  #-}
 
 module VVA.DRep where
 
-import Control.Monad.Except (MonadError)
-import Control.Monad.Reader
-import Crypto.Hash
-import Data.Maybe (fromMaybe)
-import Data.ByteString (ByteString)
-import qualified Data.ByteString.Base16 as Base16
-import qualified Data.ByteString.Char8 as C
-import Data.FileEmbed (embedFile)
-import qualified Data.Map as M
-import Data.Scientific
-import Data.String (fromString)
-import Data.Text (Text, unpack, pack)
-import qualified Data.Text.Encoding as Text
+import           Control.Monad.Except       (MonadError)
+import           Control.Monad.Reader
+
+import           Crypto.Hash
+
+import           Data.ByteString            (ByteString)
+import qualified Data.ByteString.Base16     as Base16
+import qualified Data.ByteString.Char8      as C
+import           Data.FileEmbed             (embedFile)
+import           Data.Foldable              (Foldable (sum))
+import           Data.Has                   (Has)
+import qualified Data.Map                   as M
+import           Data.Maybe                 (fromMaybe, isJust, isNothing)
+import           Data.Scientific
+import           Data.String                (fromString)
+import           Data.Text                  (Text, pack, unpack)
+import qualified Data.Text.Encoding         as Text
+
 import qualified Database.PostgreSQL.Simple as SQL
-import VVA.Config
-import qualified VVA.Proposal as Proposal
-import Data.Foldable (Foldable(sum))
-import Data.Has (Has)
-import VVA.Pool (ConnectionPool, withPool)
-import VVA.Types
-  ( AppError
-  , DRepRegistration(..)
-  , Proposal(..)
-  , Vote(..)
-  , DRepInfo(..)
-  , DRepType(..)
-  , DRepStatus(..)
-  )
 
-
-
+import           VVA.Config
+import           VVA.Pool                   (ConnectionPool, withPool)
+import qualified VVA.Proposal               as Proposal
+import           VVA.Types                  (AppError, DRepInfo (..),
+                                             DRepRegistration (..),
+                                             DRepStatus (..), DRepType (..),
+                                             Proposal (..), Vote (..))
 
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
@@ -69,9 +65,9 @@ listDReps = withPool $ \conn -> do
                       (_, d)        | d < 0 -> Retired
                       (isActive, d) | d >= 0 && isActive -> Active
                                     | d >= 0 && not isActive -> Inactive
-    , let drepType | url == Nothing && wasDRep = DRep
-                   | url == Nothing && not wasDRep = SoleVoter
-                   | url /= Nothing = DRep
+    , let drepType | isNothing url && wasDRep = DRep
+                   | isNothing url && not wasDRep = SoleVoter
+                   | Data.Maybe.isJust url = DRep
     ]
 
 getVotesSql :: SQL.Query

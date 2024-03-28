@@ -55,6 +55,14 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
         } as unknown as HTMLTextAreaElement),
       [handleBlur, handleFocus],
     );
+
+    const getCounterBottomSxValue = () => {
+      if (props.isModifiedLayout && errorMessage) return 30;
+      if (props.isModifiedLayout) return 10;
+      if (errorMessage) return 52.5;
+      return 35;
+    };
+
     return (
       <Box
         sx={{
@@ -92,7 +100,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
         <Typography
           color="#8E908E"
           sx={{
-            bottom: errorMessage ? 52.5 : 35,
+            bottom: getCounterBottomSxValue(),
             position: "absolute",
             right: 15,
           }}

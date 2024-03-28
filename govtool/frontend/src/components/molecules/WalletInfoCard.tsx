@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Typography } from "@mui/material";
 
-import { PATHS } from "@consts";
+import { PATHS, gray } from "@consts";
 import { useCardano } from "@context";
 import { useTranslation } from "@hooks";
+import { Card } from "./Card";
 
 export const WalletInfoCard = () => {
   const { address, disconnectWallet } = useCardano();
@@ -18,17 +19,8 @@ export const WalletInfoCard = () => {
 
   return (
     address && (
-      <Box
-        sx={{
-          border: 1,
-          borderColor: "lightBlue",
-          borderRadius: 3,
-          px: 1.75,
-          py: 1.5,
-          position: "relative",
-        }}
-      >
-        <Typography sx={{ color: "#ADAEAD", fontSize: 12, fontWeight: 500 }}>
+      <Card border elevation={0} sx={{ p: 1.5 }}>
+        <Typography color={gray.c300} fontSize={12} fontWeight={500}>
           {t("wallet.connectedWallet")}
         </Typography>
         <Box sx={{ alignItems: "center", display: "flex" }}>
@@ -52,7 +44,7 @@ export const WalletInfoCard = () => {
             {t("wallet.disconnect")}
           </Button>
         </Box>
-      </Box>
+      </Card>
     )
   );
 };

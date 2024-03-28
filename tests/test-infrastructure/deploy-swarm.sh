@@ -7,7 +7,7 @@
 set -eo pipefail
 set -a
 . ./.env
-set +a 
+set +a
 
 if [ "$1" == "destroy" ]
 then
@@ -15,7 +15,7 @@ then
     echo "Are you Sure? (Y/N)"
     read user_input
     if ! ( [ "$user_input" = "y" ] || [ "$user_input" = "Y" ])
-    then 
+    then
         exit 1
     fi
     echo "Proceeding..."    # Delete the Docker stack if "destroy" argument is provided
@@ -31,7 +31,7 @@ then
 
 elif [ "$1" == "prepare" ]
 then
-    ## apply the enviroment to services compose file 
+    ## apply the enviroment to services compose file
     ## and deploy the stack
     envsubst < ./docker-compose-services.yml  > ./docker-compose-services-rendered.yml
     docker stack deploy -c './docker-compose-services-rendered.yml' ${STACK_NAME}-services
@@ -53,5 +53,3 @@ else
     echo "    finalize -> deploys the test infrastructure services"
     echo "    destroy  -> teardown everything except the volumes"
 fi
-
-

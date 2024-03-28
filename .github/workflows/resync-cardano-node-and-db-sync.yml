@@ -63,6 +63,16 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.GHA_SSH_PRIVATE_KEY }}
 
+      - name: Set domain
+        run: |
+          if [[ "${{ inputs.environment }}" == "staging" ]]; then
+            echo "DOMAIN=staging.govtool.byron.network" >> $GITHUB_ENV
+          elif [[ "${{ inputs.environment }}" == "beta" ]]; then
+            echo "DOMAIN=sanchogov.tools" >> $GITHUB_ENV
+          else
+            echo "DOMAIN=${DOMAIN:-$ENVIRONMENT-$CARDANO_NETWORK.govtool.byron.network}" >> $GITHUB_ENV
+          fi
+
       - name: Destroy Cardano Node, DB sync and Postgres database
         run: |
           make --debug=b destroy-cardano-node-and-dbsync

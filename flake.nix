@@ -16,5 +16,7 @@
         packages.infra = defaultPkgs.callPackage ./infra/terraform { pkgs = defaultPkgs; };
         packages.backend = defaultPkgs.callPackage ./govtool/backend { pkgs = defaultPkgs; };
         packages.frontend = nodePkgs.callPackage ./govtool/frontend { pkgs = nodePkgs; };
+
+        devShell = defaultPkgs.mkShell { buildInputs = [ defaultPkgs.pre-commit ]; };
       });
 }

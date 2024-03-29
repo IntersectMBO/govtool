@@ -15,12 +15,14 @@
 <hr/>
 
 ## 🌄 Purpose
+
 The SanchoNet GovTool enables ada holders to experience some of the governance features described in [CIP-1694](https://github.com/cardano-foundation/CIPs/blob/master/CIP-1694/README.md) and to test governance features on [SanchoNet](https://sancho.network/) through a guided and straightforward experience.
 The SanchoNet GovTool is currently open for beta testing and can be accessed at [sanchogov.tools](https://sanchogov.tools/).
 
 Learn more; [docs.sanchogov.tools](https://docs.sanchogov.tools/).
 
 ## 📍 Navigation
+
 - [GovTool Backend](./govtool/backend/README.md)
 - [GovTool Frontend](./govtool/frontend/README.md)
 - [GovTool deployment setup](./scripts/govtool/README.md)
@@ -28,22 +30,28 @@ Learn more; [docs.sanchogov.tools](https://docs.sanchogov.tools/).
 - [Tests](./tests/)
 
 ### Utilities
+
 - [Governance Action Loader](./src/governance-action-loader/)
 
 ## 🔩 Architecture
+
 GovTool consists of a Haskell backend and a React Typescript frontend.
 
 ### Backend
+
 GovTool backend implements an API wrapper around an instance of [DB-Sync](https://github.com/IntersectMBO/cardano-db-sync) which interfaces with a [Cardano Node](https://github.com/IntersectMBO/cardano-node).
 The API exposes endpoints making the querying of governance related data from DB-Sync straight forward.
 
 #### API Reference
-[`Swagger documentation`]()
+
+[`Swagger documentation`](https://sanchogov.tools/api/swagger-ui/)
 
 ### Frontend
+
 GovTool frontend web app communicates with the backend over a REST interface, reading and displaying on-chain governance data.
 Frontend is able to connect to Cardano wallets over the [CIP-30](https://github.com/cardano-foundation/CIPs/blob/master/CIP-0030/README.md) and [CIP-95](https://github.com/cardano-foundation/CIPs/blob/master/CIP-0095/README.md) standards.
 
 ## 🤝 Contributing
+
 Thanks for considering contributing and helping us on creating GovTool! 😎
 Please checkout our [Contributing Documentation](./CONTRIBUTING.md).

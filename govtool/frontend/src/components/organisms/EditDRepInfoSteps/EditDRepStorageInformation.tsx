@@ -5,7 +5,7 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { Button, Spacer, Typography } from "@atoms";
 import { ICONS, Rules } from "@consts";
 import {
-  useRegisterAsdRepForm,
+  useEditDRepInfoForm,
   useTranslation,
   useScreenDimension,
 } from "@hooks";
@@ -17,7 +17,7 @@ type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
 };
 
-export const DRepStorageInformation = ({
+export const EditDRepStorageInformation = ({
   setStep,
 }: StorageInformationProps) => {
   const { t } = useTranslation();
@@ -26,11 +26,11 @@ export const DRepStorageInformation = ({
     errors,
     generateMetadata,
     getValues,
-    isRegistrationAsDRepLoading,
+    isEditDRepMetadataLoading,
     onClickDownloadJson,
-    registerAsDrep,
+    editDRepInfo,
     watch,
-  } = useRegisterAsdRepForm();
+  } = useEditDRepInfoForm();
   const { screenWidth } = useScreenDimension();
 
   const fileName = getValues("dRepName");
@@ -41,7 +41,7 @@ export const DRepStorageInformation = ({
 
   const isActionButtonDisabled = !watch("storingURL") || !!errors.storingURL;
 
-  const onClickBack = () => setStep(3);
+  const onClickBack = () => setStep(2);
 
   useEffect(() => {
     generateMetadata();
@@ -52,12 +52,12 @@ export const DRepStorageInformation = ({
       actionButtonLabel={t("submit")}
       backButtonLabel={t("back")}
       isActionButtonDisabled={isActionButtonDisabled}
-      isLoadingActionButton={isRegistrationAsDRepLoading}
-      onClickActionButton={registerAsDrep}
+      onClickActionButton={editDRepInfo}
       onClickBackButton={onClickBack}
+      isLoadingActionButton={isEditDRepMetadataLoading}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
-        {t("registration.storingInformationTitle")}
+        {t("editMetadata.storingInformationTitle")}
       </Typography>
       <Button
         endIcon={
@@ -74,10 +74,10 @@ export const DRepStorageInformation = ({
         sx={{ alignSelf: "center", width: "fit-content" }}
         variant="text"
       >
-        {t("registration.storingInformationStep2Link")}
+        {t("editMetadata.storingInformationStep2Link")}
       </Button>
       <Typography fontWeight={400} sx={{ textAlign: "center" }} variant="body1">
-        {t("registration.storingInformationDescription")}
+        {t("editMetadata.storingInformationDescription")}
       </Typography>
       <Box sx={{ my: 4 }}>
         <Step
@@ -96,7 +96,7 @@ export const DRepStorageInformation = ({
               {`${fileName}.jsonld`}
             </Button>
           }
-          label={t("registration.storingInformationStep1Label")}
+          label={t("editMetadata.storingInformationStep1Label")}
           componentsLayoutStyles={{
             alignItems: screenWidth < 1024 ? undefined : "center",
             flexDirection: screenWidth < 1024 ? "column" : "row",
@@ -106,7 +106,7 @@ export const DRepStorageInformation = ({
         <Spacer y={6} />
         <Step
           layoutStyles={{ alignItems: "center" }}
-          label={t("registration.storingInformationStep2Label")}
+          label={t("editMetadata.storingInformationStep2Label")}
           stepNumber={2}
         />
         <Spacer y={6} />
@@ -116,11 +116,11 @@ export const DRepStorageInformation = ({
               {...{ control, errors }}
               layoutStyles={{ mt: 1.5 }}
               name="storingURL"
-              placeholder={t("registration.storingInformationURLPlaceholder")}
+              placeholder={t("editMetadata.storingInformationURLPlaceholder")}
               rules={Rules.STORING_LINK}
             />
           }
-          label={t("registration.storingInformationStep3Label")}
+          label={t("editMetadata.storingInformationStep3Label")}
           stepNumber={3}
         />
       </Box>

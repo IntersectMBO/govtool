@@ -6,6 +6,7 @@ export const PATHS = {
   dashboardGovernanceActionsCategory:
     "/connected/governance_actions/category/:category",
   delegateTodRep: "/delegate",
+  editDrepMetadata: "/edit_drep",
   error: "/error",
   faqs: "/faqs",
   governanceActions: "/governance_actions",
@@ -15,10 +16,9 @@ export const PATHS = {
     "/governance_actions/category/:category/:proposalId",
   guides: "/guides",
   home: "/",
-  registerAsdRep: "/register",
+  registerAsdRep: "/register_drep",
   registerAsSoleVoter: "/register_sole_voter",
   retireAsDrep: "/retire_drep",
   retireAsSoleVoter: "/retire_sole_voter",
   stakeKeys: "/stake_keys",
-  updateMetadata: "/update_metadata",
 };

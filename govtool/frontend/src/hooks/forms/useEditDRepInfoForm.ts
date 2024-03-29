@@ -21,9 +21,8 @@ import {
   generateJsonld,
   validateMetadataHash,
 } from "@utils";
-import { useGetVoterInfo } from "..";
 
-export type RegisterAsDRepValues = {
+export type EditDRepInfoValues = {
   bio?: string;
   dRepName: string;
   email?: string;
@@ -32,7 +31,7 @@ export type RegisterAsDRepValues = {
   storingURL: string;
 };
 
-export const defaultRegisterAsDRepValues: RegisterAsDRepValues = {
+export const defaultEditDRepInfoValues: EditDRepInfoValues = {
   bio: "",
   dRepName: "",
   email: "",
@@ -41,7 +40,7 @@ export const defaultRegisterAsDRepValues: RegisterAsDRepValues = {
   storingURL: "",
 };
 
-export const useRegisterAsdRepForm = (
+export const useEditDRepInfoForm = (
   setStep?: Dispatch<SetStateAction<number>>,
 ) => {
   const { t } = useTranslation();
@@ -50,12 +49,10 @@ export const useRegisterAsdRepForm = (
   const [hash, setHash] = useState<string | null>(null);
   const [json, setJson] = useState<NodeObject | null>(null);
   const { closeModal, openModal } = useModal();
-  const { buildDRepRegCert, buildDRepUpdateCert, buildSignSubmitConwayCertTx } =
-    useCardano();
-  const { voter } = useGetVoterInfo();
+  const { buildDRepUpdateCert, buildSignSubmitConwayCertTx } = useCardano();
 
   const backToForm = useCallback(() => {
-    setStep?.(2);
+    setStep?.(1);
     closeModal();
   }, [setStep]);
 
@@ -72,7 +69,7 @@ export const useRegisterAsdRepForm = (
     register,
     resetField,
     watch,
-  } = useFormContext<RegisterAsDRepValues>();
+  } = useFormContext<EditDRepInfoValues>();
 
   const dRepName = watch("dRepName");
   const isError = Object.keys(errors).length > 0;
@@ -85,7 +82,7 @@ export const useRegisterAsdRepForm = (
       .filter(([key]) => acceptedKeys.includes(key))
       .map(([key, value]) => [CIP_QQQ + key, value]);
 
-    const references = (data as RegisterAsDRepValues).links
+    const references = (data as EditDRepInfoValues).links
       ?.filter((link) => link.link)
       .map((link) => ({
         "@type": "Other",
@@ -145,31 +142,6 @@ export const useRegisterAsdRepForm = (
     [backToForm, hash],
   );
 
-  const createRegistrationCert = useCallback(
-    async (data: RegisterAsDRepValues) => {
-      if (!hash) return;
-      const url = data.storingURL;
-
-      try {
-        if (voter?.isRegisteredAsSoleVoter) {
-          return await buildDRepUpdateCert(url, hash);
-        }
-
-        return await buildDRepRegCert(url, hash);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        console.error(error);
-        throw error;
-      }
-    },
-    [
-      buildDRepRegCert,
-      buildDRepUpdateCert,
-      hash,
-      voter?.isRegisteredAsSoleVoter,
-    ],
-  );
-
   const showSuccessModal = useCallback(() => {
     openModal({
       type: "statusModal",
@@ -185,15 +157,19 @@ export const useRegisterAsdRepForm = (
   }, []);
 
   const onSubmit = useCallback(
-    async (data: RegisterAsDRepValues) => {
+    async (data: EditDRepInfoValues) => {
+      const url = data.storingURL;
+
+      if (!hash) return;
+
       try {
         setIsLoading(true);
 
-        await validateHash(data.storingURL);
-        const registerAsDRepCert = await createRegistrationCert(data);
+        await validateHash(url);
+        const updateDRepMetadataCert = await buildDRepUpdateCert(url, hash);
         await buildSignSubmitConwayCertTx({
-          certBuilder: registerAsDRepCert,
-          type: "registerAsDrep",
+          certBuilder: updateDRepMetadataCert,
+          type: "updateMetaData",
         });
 
         showSuccessModal();
@@ -204,7 +180,7 @@ export const useRegisterAsdRepForm = (
         setIsLoading(false);
       }
     },
-    [buildSignSubmitConwayCertTx, createRegistrationCert, hash, validateHash],
+    [buildDRepUpdateCert, buildSignSubmitConwayCertTx, hash, validateHash],
   );
 
   return {
@@ -213,11 +189,11 @@ export const useRegisterAsdRepForm = (
     generateMetadata,
     getValues,
     isError,
-    isRegistrationAsDRepLoading: isLoading,
+    isEditDRepMetadataLoading: isLoading,
     isValid,
     onClickDownloadJson,
     register,
-    registerAsDrep: handleSubmit(onSubmit),
+    editDRepInfo: handleSubmit(onSubmit),
     resetField,
     watch,
   };

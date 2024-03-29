@@ -6,28 +6,25 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { Button, InfoText, Spacer, Typography } from "@atoms";
 import { Placeholders, Rules } from "@consts";
 import {
-  useRegisterAsdRepForm,
+  useEditDRepInfoForm,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import { VoterInfo } from "@models";
 
 import { BgCard, ControlledField } from "..";
 
 const MAX_NUMBER_OF_LINKS = 7;
 
-export const RegisterAsDRepForm = ({
+export const EditDRepForm = ({
   onClickCancel,
   setStep,
-  voter,
 }: {
   onClickCancel: () => void;
   setStep: Dispatch<SetStateAction<number>>;
-  voter?: VoterInfo;
 }) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
-  const { control, errors, isError, register, watch } = useRegisterAsdRepForm();
+  const { control, errors, isError, register, watch } = useEditDRepInfoForm();
   const {
     append,
     fields: links,
@@ -37,9 +34,7 @@ export const RegisterAsDRepForm = ({
     name: "links",
   });
 
-  const onClickContinue = () => setStep(3);
-
-  const onClickBack = () => setStep(1);
+  const onClickContinue = () => setStep(2);
 
   const addLink = useCallback(() => append({ link: "" }), [append]);
 
@@ -78,55 +73,53 @@ export const RegisterAsDRepForm = ({
   return (
     <BgCard
       actionButtonLabel={t("continue")}
-      backButtonLabel={voter?.wasRegisteredAsDRep ? t("cancel") : t("back")}
+      backButtonLabel={t("cancel")}
       onClickActionButton={onClickContinue}
-      onClickBackButton={
-        voter?.wasRegisteredAsDRep ? onClickCancel : onClickBack
-      }
+      onClickBackButton={onClickCancel}
       isActionButtonDisabled={isContinueButtonDisabled}
       sx={{ pb: isMobile ? undefined : 6, pt: isMobile ? 4 : 8 }}
     >
       <Box textAlign="center">
-        <InfoText label={t("registration.required")} />
+        <InfoText label={t("editMetadata.required")} />
         <Typography sx={{ mt: 0.5, mb: isMobile ? 3 : 4 }} variant="headline4">
-          {t("registration.dRepName")}
+          {t("editMetadata.dRepName")}
         </Typography>
         <Typography fontWeight={400} sx={{ mb: 4 }} variant="body1">
-          {t("registration.dRepNameDescription")}
+          {t("editMetadata.dRepNameDescription")}
         </Typography>
       </Box>
       <ControlledField.Input
         {...{ control, errors }}
-        helpfulText={t("forms.registerAsDRep.dRepNameHelpfulText")}
-        label={t("forms.registerAsDRep.dRepName")}
+        helpfulText={t("forms.editMetadata.dRepNameHelpfulText")}
+        label={t("forms.editMetadata.dRepName")}
         name="dRepName"
         rules={Rules.DREP_NAME}
-        placeholder={t("forms.registerAsDRep.dRepNamePlaceholder")}
+        placeholder={t("forms.editMetadata.dRepNamePlaceholder")}
       />
       <Spacer y={isMobile ? 5 : 6} />
       <Box textAlign="center">
-        <InfoText label={t("registration.optional")} />
+        <InfoText label={t("editMetadata.optional")} />
         <Typography sx={{ mt: 0.5, mb: isMobile ? 3 : 4 }} variant="headline4">
-          {t("registration.aboutYou")}
+          {t("editMetadata.aboutYou")}
         </Typography>
         <Typography fontWeight={400} sx={{ mb: 4 }} variant="body1">
-          {t("registration.aboutYouDescription")}
+          {t("editMetadata.aboutYouDescription")}
         </Typography>
       </Box>
       <ControlledField.Input
         {...{ control, errors }}
-        label={t("forms.registerAsDRep.email")}
+        label={t("forms.editMetadata.email")}
         name="email"
-        placeholder={t("forms.registerAsDRep.emailPlaceholder")}
+        placeholder={t("forms.editMetadata.emailPlaceholder")}
         rules={Rules.EMAIL}
       />
       <Spacer y={3} />
       <ControlledField.TextArea
         {...{ control, errors }}
-        label={t("forms.registerAsDRep.bio")}
+        label={t("forms.editMetadata.bio")}
         name="bio"
-        placeholder={t("forms.registerAsDRep.bioPlaceholder")}
-        helpfulText={t("forms.registerAsDRep.bioHelpfulText")}
+        placeholder={t("forms.editMetadata.bioPlaceholder")}
+        helpfulText={t("forms.editMetadata.bioHelpfulText")}
         rules={Rules.BIO}
       />
       <Spacer y={4} />
@@ -139,9 +132,9 @@ export const RegisterAsDRepForm = ({
           margin: 0,
         }}
       >
-        {t("registration.linksDescription")}
+        {t("editMetadata.linksDescription")}
         <span style={{ fontSize: 16, fontWeight: 400 }}>
-          {t("registration.maximumLinks", {
+          {t("editMetadata.maximumLinks", {
             numberOfLinks: MAX_NUMBER_OF_LINKS,
           })}
         </span>

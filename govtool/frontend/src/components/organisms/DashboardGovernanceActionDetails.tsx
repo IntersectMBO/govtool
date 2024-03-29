@@ -141,6 +141,8 @@ export const DashboardGovernanceActionDetails = () => {
             yesVotes={state ? state.yesVotes : data.proposal.yesVotes}
             voteFromEP={data?.vote?.vote}
             voteUrlFromEP={data?.vote?.url}
+            voteDateFromEP={data?.vote?.date}
+            voteEpochNoFromEP={data?.vote?.epochNo}
             govActionId={fullProposalId}
             isInProgress={
               pendingTransaction.vote?.resourceId ===

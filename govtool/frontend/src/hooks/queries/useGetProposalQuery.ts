@@ -24,6 +24,8 @@ export const useGetProposalQuery = (proposalId: string, enabled?: boolean) => {
       vote: string;
       url: string;
       metadataHash: string;
+      date: string;
+      epochNo: number;
     };
   };
 

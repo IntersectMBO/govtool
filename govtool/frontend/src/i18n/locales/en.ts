@@ -301,9 +301,10 @@ export const en = {
       about: "About",
       abstract: "Abstract:",
       backToGovActions: "Back to Governance Actions",
-      castVote: "<0>You voted {{vote}} for this proposal</0>\nat {{date}}",
+      castVote:
+        "<0>You voted {{vote}} on this proposal</0>\non {{date}} (Epoch {{epoch}})",
       castVoteDeadline:
-        "You can change your vote up to the deadline of {{date}}",
+        "You can change your vote up to {{date}} (Epoch {{epoch}})",
       changeVote: "Change vote",
       changeYourVote: "Change your vote",
       chooseHowToVote: "Choose how you want to vote:",

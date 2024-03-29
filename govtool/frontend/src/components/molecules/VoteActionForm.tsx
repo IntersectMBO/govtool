@@ -13,16 +13,16 @@ import {
   useGetVoterInfo,
   useGetVoteContextTextFromFile,
 } from "@hooks";
-
-// TODO: Decide with BE on how cast votes will be implemented
-// and adjust accordingly the component below (UI is ready).
-const castVoteDate = undefined;
-const castVoteChangeDeadline = "20.06.2024 (Epoch 445)";
+import { formatDisplayDate } from "@utils";
 
 type VoteActionFormProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
+  expiryDate: string;
+  expiryEpochNo: number;
   voteFromEP?: string;
   voteUrlFromEP?: string;
+  voteDateFromEP?: string;
+  voteEpochNoFromEP?: number;
   yesVotes: number;
   noVotes: number;
   abstainVotes: number;
@@ -31,8 +31,12 @@ type VoteActionFormProps = {
 
 export const VoteActionForm = ({
   setIsVoteSubmitted,
+  expiryDate,
+  expiryEpochNo,
   voteFromEP,
   voteUrlFromEP,
+  voteDateFromEP,
+  voteEpochNoFromEP,
   yesVotes,
   noVotes,
   abstainVotes,
@@ -50,6 +54,9 @@ export const VoteActionForm = ({
   const { isMobile, screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { t } = useTranslation();
+
+  const voteDate = state ? state.voteDate : voteDateFromEP;
+  const voteEpochNo = state ? state.voteEpochNo : voteEpochNoFromEP;
 
   const {
     areFormErrors,
@@ -136,7 +143,7 @@ export const VoteActionForm = ({
       }}
     >
       <Box flex={1} display="flex" flexDirection="column" alignItems="center">
-        {castVoteDate ? (
+        {voteDate ? (
           <>
             <Typography
               variant="body1"
@@ -149,7 +156,11 @@ export const VoteActionForm = ({
             >
               <Trans
                 i18nKey="govActions.castVote"
-                values={{ vote: vote?.toLocaleUpperCase(), date: castVoteDate }}
+                values={{
+                  vote: vote?.toLocaleUpperCase(),
+                  date: formatDisplayDate(voteDate),
+                  epoch: voteEpochNo,
+                }}
                 components={[<span style={{ fontWeight: 600 }} key="0" />]}
               />
             </Typography>
@@ -158,7 +169,8 @@ export const VoteActionForm = ({
               sx={{ lineHeight: "18px", alignSelf: "start" }}
             >
               {t("govActions.castVoteDeadline", {
-                date: castVoteChangeDeadline,
+                date: expiryDate,
+                epoch: expiryEpochNo,
               })}
             </Typography>
           </>

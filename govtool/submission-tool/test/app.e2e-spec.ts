@@ -21,4 +21,18 @@ describe('AppController (e2e)', () => {
       .expect(200)
       .expect('Hello World!');
   });
+
+  it('/create-metadata (POST)', () => {
+    return request(app.getHttpServer())
+      .post('/create-metadata')
+      .expect(201)
+      .expect({});
+  });
+
+  it('/validate-metadata (POST)', () => {
+    return request(app.getHttpServer())
+      .post('/validate-metadata')
+      .expect(201)
+      .expect({});
+  });
 });

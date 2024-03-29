@@ -28,6 +28,8 @@ type GovernanceActionDetailsCardProps = {
   isVoter?: boolean;
   voteFromEP?: string;
   voteUrlFromEP?: string;
+  voteDateFromEP?: string;
+  voteEpochNoFromEP?: number;
   isInProgress?: boolean;
 };
 
@@ -50,6 +52,8 @@ export const GovernanceActionDetailsCard = ({
   isVoter,
   voteFromEP,
   voteUrlFromEP,
+  voteDateFromEP,
+  voteEpochNoFromEP,
   govActionId,
   isInProgress,
   isDataMissing,
@@ -106,9 +110,13 @@ export const GovernanceActionDetailsCard = ({
         abstainVotes={abstainVotes}
         noVotes={noVotes}
         yesVotes={yesVotes}
+        expiryDate={expiryDate}
+        expiryEpochNo={expiryEpochNo}
         isVoter={isVoter}
         voteFromEP={voteFromEP}
         voteUrlFromEP={voteUrlFromEP}
+        voteDateFromEP={voteDateFromEP}
+        voteEpochNoFromEP={voteEpochNoFromEP}
         isDashboard={isDashboard}
         isOneColumn={isOneColumn}
         isInProgress={isInProgress}

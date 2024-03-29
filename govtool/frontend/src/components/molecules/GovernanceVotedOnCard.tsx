@@ -144,6 +144,8 @@ export const GovernanceVotedOnCard = ({
                   ...proposal,
                   vote: vote.vote.toLowerCase(),
                   voteUrl: vote.url,
+                  voteDate: vote.date,
+                  voteEpochNo: vote.epochNo,
                 },
               },
             )

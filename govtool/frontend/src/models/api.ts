@@ -22,6 +22,8 @@ export interface VotedProposal {
     vote: Vote;
     url: string;
     metadataHash: string;
+    date: string;
+    epochNo: number;
   };
   proposal: {
     id: string;

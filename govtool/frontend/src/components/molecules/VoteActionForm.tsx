@@ -11,6 +11,7 @@ import {
   useVoteActionForm,
   useTranslation,
   useGetVoterInfo,
+  useGetVoteContextTextFromFile,
 } from "@hooks";
 
 // TODO: Decide with BE on how cast votes will be implemented
@@ -21,6 +22,7 @@ const castVoteChangeDeadline = "20.06.2024 (Epoch 445)";
 type VoteActionFormProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
   voteFromEP?: string;
+  voteUrlFromEP?: string;
   yesVotes: number;
   noVotes: number;
   abstainVotes: number;
@@ -30,22 +32,24 @@ type VoteActionFormProps = {
 export const VoteActionForm = ({
   setIsVoteSubmitted,
   voteFromEP,
+  voteUrlFromEP,
   yesVotes,
   noVotes,
   abstainVotes,
   isInProgress,
 }: VoteActionFormProps) => {
-  const [voteContextText, setVoteContextText] = useState<string | undefined>();
   const [voteContextHash, setVoteContextHash] = useState<string | undefined>();
   const [voteContextUrl, setVoteContextUrl] = useState<string | undefined>();
   const [showWholeVoteContext, setShowWholeVoteContext] =
     useState<boolean>(false);
 
+  const { voter } = useGetVoterInfo();
+  const { voteContextText } = useGetVoteContextTextFromFile(voteContextUrl);
+
   const { state } = useLocation();
-  const { isMobile } = useScreenDimension();
+  const { isMobile, screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { t } = useTranslation();
-  const { voter } = useGetVoterInfo();
 
   const {
     areFormErrors,
@@ -57,10 +61,9 @@ export const VoteActionForm = ({
     vote,
   } = useVoteActionForm(voteContextHash, voteContextUrl);
 
-  const setVoteContextData = (url: string, hash: string, text: string) => {
+  const setVoteContextData = (url: string, hash: string) => {
     setVoteContextUrl(url);
     setVoteContextHash(hash);
-    setVoteContextText(text);
   };
 
   useEffect(() => {
@@ -72,6 +75,14 @@ export const VoteActionForm = ({
       setIsVoteSubmitted(true);
     }
   }, [state, voteFromEP, setValue]);
+
+  useEffect(() => {
+    if (state && state.voteUrl) {
+      setVoteContextUrl(state.voteUrl);
+    } else if (voteUrlFromEP) {
+      setVoteContextUrl(voteUrlFromEP);
+    }
+  }, [voteUrlFromEP, state]);
 
   const renderCancelButton = useMemo(
     () => (
@@ -245,7 +256,7 @@ export const VoteActionForm = ({
             ? t("govActions.contextAboutYourVote")
             : t("govActions.youCanProvideContext")}
         </Typography>
-        {voteContextText ? (
+        {voteContextText && (
           <Box
             sx={{
               display: "flex",
@@ -296,24 +307,35 @@ export const VoteActionForm = ({
               </Typography>
             </Button>
           </Box>
-        ) : (
-          <Button
-            variant="outlined"
-            onClick={() => {
-              openModal({
-                type: "voteContext",
-                state: {
-                  onSubmit: setVoteContextData,
-                },
-              });
-            }}
-            sx={{
-              mt: "12px",
-            }}
-          >
-            {t("govActions.provideContextAboutYourVote")}
-          </Button>
         )}
+        <Button
+          variant="outlined"
+          onClick={() => {
+            openModal({
+              type: "voteContext",
+              state: {
+                onSubmit: setVoteContextData,
+              },
+            });
+          }}
+          sx={{
+            mt: voteContextText ? "40px" : "12px",
+            fontSize:
+              screenWidth < 390
+                ? "12px"
+                : screenWidth < 1036
+                ? "14px"
+                : screenWidth < 1080
+                ? "10.5px"
+                : screenWidth < 1480
+                ? "11.5px"
+                : "14px",
+          }}
+        >
+          {voteContextText
+            ? t("govActions.provideNewContextAboutYourVote")
+            : t("govActions.provideContextAboutYourVote")}
+        </Button>
       </Box>
       <Typography
         sx={{

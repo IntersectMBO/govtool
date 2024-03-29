@@ -8,6 +8,7 @@ export * from "./getEpochParams";
 export * from "./getProposal";
 export * from "./getProposals";
 export * from "./getTransactionStatus";
+export * from "./getVoteContextTextFromFile";
 export * from "./postAdaHolderDelegate";
 export * from "./postAdaHolderDelegateAbstain";
 export * from "./postAdaHolderDelegateNo";

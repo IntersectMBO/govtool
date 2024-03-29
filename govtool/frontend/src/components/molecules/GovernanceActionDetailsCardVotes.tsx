@@ -12,6 +12,7 @@ type GovernanceActionCardVotesProps = {
   isOneColumn: boolean;
   isVoter?: boolean;
   voteFromEP?: string;
+  voteUrlFromEP?: string;
   isDashboard?: boolean;
   isInProgress?: boolean;
 };
@@ -24,6 +25,7 @@ export const GovernanceActionDetailsCardVotes = ({
   isOneColumn,
   isVoter,
   voteFromEP,
+  voteUrlFromEP,
   isDashboard,
   isInProgress,
 }: GovernanceActionCardVotesProps) => {
@@ -44,6 +46,7 @@ export const GovernanceActionDetailsCardVotes = ({
         <VoteActionForm
           setIsVoteSubmitted={setIsVoteSubmitted}
           voteFromEP={voteFromEP ? voteFromEP.toLowerCase() : undefined}
+          voteUrlFromEP={voteUrlFromEP}
           yesVotes={yesVotes}
           noVotes={noVotes}
           abstainVotes={abstainVotes}

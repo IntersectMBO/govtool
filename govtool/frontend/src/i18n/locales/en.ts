@@ -326,6 +326,7 @@ export const en = {
       optional: "(optional)",
       provideContext: "Provide context",
       provideContextAboutYourVote: "Provide context about your vote",
+      provideNewContextAboutYourVote: "Provide new context about your vote",
       rationale: "Rationale",
       seeExternalData: "See external data",
       selectDifferentOption: "Select a different option to change your vote",

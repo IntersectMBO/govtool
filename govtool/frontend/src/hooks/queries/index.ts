@@ -7,3 +7,4 @@ export * from "./useGetDRepVotingPowerQuery";
 export * from "./useGetProposalQuery";
 export * from "./useGetProposalsQuery";
 export * from "./useGetProposalsInfiniteQuery";
+export * from "./useGetVoteContextTextFromFile";

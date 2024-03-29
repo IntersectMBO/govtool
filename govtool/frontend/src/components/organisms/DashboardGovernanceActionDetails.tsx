@@ -140,6 +140,7 @@ export const DashboardGovernanceActionDetails = () => {
             rationale={state ? state.rationale : data.proposal.rationale}
             yesVotes={state ? state.yesVotes : data.proposal.yesVotes}
             voteFromEP={data?.vote?.vote}
+            voteUrlFromEP={data?.vote?.url}
             govActionId={fullProposalId}
             isInProgress={
               pendingTransaction.vote?.resourceId ===

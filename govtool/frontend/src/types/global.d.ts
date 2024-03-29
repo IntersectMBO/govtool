@@ -54,7 +54,7 @@ declare global {
 
   type ToVoteDataType = {
     title: string;
-    actions: ActionType[];
+    actions: ActionTypeToDsiplay[];
   }[];
 
   type NestedKeys<T> = T extends Record<string, unknown>

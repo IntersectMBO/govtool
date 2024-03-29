@@ -12,7 +12,7 @@ export const useGetProposalsQuery = ({
 }: GetProposalsArguments) => {
   const { dRepID, pendingTransaction } = useCardano();
 
-  const fetchProposals = async (): Promise<ActionType[]> => {
+  const fetchProposals = async (): Promise<ActionTypeToDsiplay[]> => {
     const allProposals = await Promise.all(
       filters.map((filter) =>
         getProposals({ dRepID, filters: [filter], searchPhrase, sorting }),
@@ -52,7 +52,7 @@ export const useGetProposalsQuery = ({
   };
 };
 
-const groupByType = (data?: ActionType[]) =>
+const groupByType = (data?: ActionTypeToDsiplay[]) =>
   data?.reduce<Record<string, ArrayElement<ToVoteDataType>>>((groups, item) => {
     const itemType = item.type;
 

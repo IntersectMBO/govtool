@@ -28,7 +28,7 @@ export const RetireAsDrep = () => {
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
         <DashboardTopNav
-          isVotingPowerHidden={true}
+          isVotingPowerHidden
           title={t("retirement.retireAsDrep")}
         />
         <LinkWithIcon

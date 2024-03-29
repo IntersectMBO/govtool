@@ -1,6 +1,6 @@
 import { VotedProposal, VotedProposalToDisplay } from "@models";
-import { API } from "../API";
 import { checkIsMissingGAMetadata } from "@utils";
+import { API } from "../API";
 
 export const getDRepVotes = async ({
   dRepID,
@@ -24,9 +24,7 @@ export const getDRepVotes = async ({
   if (urlParameters.length) {
     urlParameters = urlParameters.replace("&", "?");
   }
-  const response = await API.get<VotedProposal[]>(`${urlBase}${urlParameters}`);
-
-  const data = response.data;
+  const { data } = await API.get<VotedProposal[]>(`${urlBase}${urlParameters}`);
 
   const mappedData = (await Promise.all(
     data.map(async (proposal) => {

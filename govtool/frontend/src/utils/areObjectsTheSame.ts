@@ -1,4 +1,4 @@
-export const areObjectsTheSame = (obj1: Object, obj2: Object) => {
+export const areObjectsTheSame = (obj1: object, obj2: object) => {
   const obj1Props = Object.keys(obj1);
   const obj2Props = Object.keys(obj2);
 

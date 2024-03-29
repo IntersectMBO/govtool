@@ -32,7 +32,7 @@ export const GovernanceActionCardHeader = ({
           ...(isDataMissing && { color: "#9E2323" }),
         }}
       >
-        {isDataMissing ? isDataMissing : title}
+        {isDataMissing || title}
       </Typography>
       {isDataMissing && typeof isDataMissing === "string" && (
         <Tooltip

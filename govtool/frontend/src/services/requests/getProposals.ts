@@ -28,5 +28,6 @@ export const getProposals = async ({
       ...(dRepID && { drepId: dRepID }),
     },
   });
+
   return response.data;
 };

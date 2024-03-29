@@ -19,7 +19,7 @@ export const useGetProposalsQuery = ({
       ),
     );
 
-    return await Promise.all(
+    return Promise.all(
       allProposals
         .flatMap((proposal) => proposal.elements)
         .map(async (proposal) => {

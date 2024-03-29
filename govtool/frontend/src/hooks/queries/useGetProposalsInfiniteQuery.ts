@@ -3,7 +3,7 @@ import { useInfiniteQuery } from "react-query";
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { getProposals, GetProposalsArguments } from "@services";
-import { checkIsMissingGAMetadata } from "@/utils";
+import { checkIsMissingGAMetadata } from "@utils";
 
 export const useGetProposalsInfiniteQuery = ({
   filters = [],
@@ -23,8 +23,7 @@ export const useGetProposalsInfiniteQuery = ({
       sorting,
     });
     const mappedElements = await Promise.all(
-      data.elements.map(async (proposal: any) => {
-        console.log(proposal);
+      data.elements.map(async (proposal) => {
         const isDataMissing = await checkIsMissingGAMetadata({
           hash: proposal.metadataHash,
           url: proposal.url,

@@ -33,8 +33,11 @@ export const GovernanceActionCardElement = ({
   isCopyButton,
   tooltipProps,
   marginBottom,
-}: GovernanceActionCardElementProps) =>
-  text ? (
+}: GovernanceActionCardElementProps) => {
+  if (!text) {
+    return null;
+  }
+  return (
     <Box
       data-testid={dataTestId}
       mb={marginBottom ?? isSliderCard ? "20px" : "32px"}
@@ -135,4 +138,5 @@ export const GovernanceActionCardElement = ({
         )}
       </Box>
     </Box>
-  ) : null;
+  );
+};

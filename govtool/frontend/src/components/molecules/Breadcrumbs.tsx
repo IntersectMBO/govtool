@@ -54,7 +54,7 @@ export const Breadcrumbs = ({
           textOverflow: "ellipsis",
         }}
       >
-        {isDataMissing ? isDataMissing : elementTwo}
+        {isDataMissing || elementTwo}
       </Typography>
     </Box>
   );

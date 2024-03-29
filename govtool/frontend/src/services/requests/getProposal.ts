@@ -4,10 +4,9 @@ import { API } from "../API";
 export const getProposal = async (proposalId: string, drepId?: string) => {
   const encodedHash = encodeURIComponent(proposalId);
 
-  const response = await API.get(
+  const { data } = await API.get(
     `/proposal/get/${encodedHash}?drepId=${drepId}`,
   );
-  const data = response.data;
 
   const isDataMissing = await checkIsMissingGAMetadata({
     hash: data?.proposal.metadataHash,

@@ -47,7 +47,7 @@ export const GovernanceActionDetailsCardHeader = ({
           }}
           variant="title2"
         >
-          {isDataMissing ? isDataMissing : title}
+          {isDataMissing || title}
         </Typography>
       </Box>
       <Share link={govActionLinkToShare} />

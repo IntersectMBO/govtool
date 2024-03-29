@@ -19,17 +19,19 @@ export const useGetProposalsQuery = ({
       ),
     );
 
-    return Promise.all(
+    const mappedData = await Promise.all(
       allProposals
         .flatMap((proposal) => proposal.elements)
         .map(async (proposal) => {
           const isDataMissing = await checkIsMissingGAMetadata({
-            hash: proposal.metadataHash,
-            url: proposal.url,
+            hash: proposal?.metadataHash ?? "",
+            url: proposal?.url ?? "",
           });
           return { ...proposal, isDataMissing };
         }),
     );
+
+    return mappedData;
   };
 
   const { data, isLoading } = useQuery(

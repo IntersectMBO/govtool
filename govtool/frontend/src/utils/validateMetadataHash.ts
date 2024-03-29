@@ -69,49 +69,45 @@ export const checkIsMissingGAMetadata = async ({
 }: {
   url: string;
   hash: string;
-}) => {
-  try {
-    if (!url?.match(URL_REGEX)) {
-      return GAMetedataErrors.DATA_MISSING;
-    }
-
-    let gaMetadata;
-    try {
-      const { data } = await API.get(url);
-      gaMetadata = data;
-    } catch (e) {
-      throw GAMetedataErrors.DATA_MISSING;
-    }
-    const JSONBody = gaMetadata?.body;
-
-    if (!JSONBody) {
-      return GAMetedataErrors.DATA_MISSING;
-    }
-
-    const govtoolFields = {
-      ...sharedGovernanceActionFields,
-      references: [],
-    };
-
-    if (!areObjectsTheSame(JSONBody, govtoolFields)) {
-      return GAMetedataErrors.INCORRECT_FORMAT;
-    }
-
-    let canonizedGAMetadata;
-    try {
-      canonizedGAMetadata = await canonizeJSON(gaMetadata);
-    } catch (error) {
-      return GAMetedataErrors.INCORRECT_FORMAT;
-    }
-
-    const gaHash = blake.blake2bHex(canonizedGAMetadata, undefined, 32);
-
-    if (gaHash !== hash) {
-      return GAMetedataErrors.NOT_VERIFIABLE;
-    }
-
-    return false;
-  } catch (e) {
-    return e;
+}): Promise<boolean | GAMetedataErrors> => {
+  if (!url?.match(URL_REGEX)) {
+    return GAMetedataErrors.DATA_MISSING;
   }
+
+  let gaMetadata;
+  try {
+    const { data } = await API.get(url);
+    gaMetadata = data;
+  } catch (e) {
+    return GAMetedataErrors.DATA_MISSING;
+  }
+  const JSONBody = gaMetadata?.body;
+
+  if (!JSONBody) {
+    return GAMetedataErrors.DATA_MISSING;
+  }
+
+  const govtoolFields = {
+    ...sharedGovernanceActionFields,
+    references: [],
+  };
+
+  if (!areObjectsTheSame(JSONBody, govtoolFields)) {
+    return GAMetedataErrors.INCORRECT_FORMAT;
+  }
+
+  let canonizedGAMetadata;
+  try {
+    canonizedGAMetadata = await canonizeJSON(gaMetadata);
+  } catch (error) {
+    return GAMetedataErrors.INCORRECT_FORMAT;
+  }
+
+  const gaHash = blake.blake2bHex(canonizedGAMetadata, undefined, 32);
+
+  if (gaHash !== hash) {
+    return GAMetedataErrors.NOT_VERIFIABLE;
+  }
+
+  return false;
 };

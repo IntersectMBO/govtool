@@ -23,10 +23,10 @@ export const useGetProposalsInfiniteQuery = ({
       sorting,
     });
     const mappedElements = await Promise.all(
-      data.elements.map(async (proposal) => {
+      data.elements.map(async (proposal: ActionType) => {
         const isDataMissing = await checkIsMissingGAMetadata({
-          hash: proposal.metadataHash,
-          url: proposal.url,
+          hash: proposal?.metadataHash ?? "",
+          url: proposal?.url ?? "",
         });
         return { ...proposal, isDataMissing };
       }),

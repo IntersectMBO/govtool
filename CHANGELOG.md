@@ -10,6 +10,7 @@ changes.
 
 ## [Unreleased]
 
+- Check a GA metadata is valid [Issue 535](https://github.com/IntersectMBO/govtool/issues/535)
 - DRep metadata builder [Issue 497](https://github.com/IntersectMBO/govtool/issues/497)
 - Update Cardano Serialization Lib to 12.0.0-alpha.19 [Issue 521](https://github.com/IntersectMBO/govtool/issues/521)
 - Add generate jsonld function [Issue 451](https://github.com/IntersectMBO/govtool/issues/451)

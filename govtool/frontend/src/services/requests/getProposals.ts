@@ -1,3 +1,4 @@
+import { InfinityProposals } from "@models";
 import { API } from "../API";
 
 export type GetProposalsArguments = {
@@ -28,6 +29,5 @@ export const getProposals = async ({
       ...(dRepID && { drepId: dRepID }),
     },
   });
-
-  return response.data;
+  return response.data as InfinityProposals;
 };

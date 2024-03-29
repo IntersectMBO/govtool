@@ -17,6 +17,13 @@ export interface DRepData {
 
 export type Vote = "yes" | "no" | "abstain";
 
+export type InfinityProposals = {
+  elements: ProposalData[];
+  page: number;
+  pageSize: number;
+  total: number;
+};
+
 type ProposalVote = {
   proposalId: string;
   drepId: string;

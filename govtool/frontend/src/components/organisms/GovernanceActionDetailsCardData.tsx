@@ -10,10 +10,7 @@ import {
   GovernanceActionDetailsCardOnChainData,
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { getProposalTypeNoEmptySpaces } from "@utils";
-
-const mockedLongDescription =
-  "I am the Cardano crusader carving his path in the blockchain battleground. With a mind sharper than a Ledger Nano X, this fearless crypto connoisseur fearlessly navigates the volatile seas of Cardano, turning code into currency. Armed with a keyboard and a heart pumping with blockchain beats, Mister Big Bad fearlessly champions decentralization, smart contracts, and the Cardano community. His Twitter feed is a mix of market analysis that rivals CNBC and memes that could break the internet.";
+import { GAMetedataErrors, getProposalTypeNoEmptySpaces } from "@utils";
 
 type GovernanceActionDetailsCardDataProps = {
   type: string;
@@ -24,13 +21,15 @@ type GovernanceActionDetailsCardDataProps = {
   expiryEpochNo: number;
   details?: ActionDetailsType;
   url: string;
-  title: string | null;
-  about: string | null;
-  motivation: string | null;
-  rationale: string | null;
-  isDataMissing: boolean;
+  title?: string;
+  about?: string;
+  motivation?: string;
+  rationale?: string;
+  isDataMissing: boolean | GAMetedataErrors;
   isOneColumn: boolean;
   isDashboard?: boolean;
+  isInProgress?: boolean;
+  isSubmitted?: boolean;
 };
 
 export const GovernanceActionDetailsCardData = ({
@@ -49,6 +48,8 @@ export const GovernanceActionDetailsCardData = ({
   isDataMissing,
   isOneColumn,
   isDashboard,
+  isInProgress,
+  isSubmitted,
 }: GovernanceActionDetailsCardDataProps) => {
   const { t } = useTranslation();
   const { screenWidth } = useScreenDimension();
@@ -66,13 +67,14 @@ export const GovernanceActionDetailsCardData = ({
       }}
     >
       <GovernanceActionDetailsCardHeader
-        // TODO: Remove "Fund our project" when title is implemented everywhere
-        title={title ?? "Fund our project"}
-        // TODO: Modify props regarding missing data
-        // (e.g. title, description) when validation is done
+        title={title}
         isDataMissing={isDataMissing}
       />
-      {isDataMissing && <DataMissingInfoBox />}
+      <DataMissingInfoBox
+        isDataMissing={isDataMissing}
+        isInProgress={isInProgress}
+        isSubmitted={isSubmitted}
+      />
       <GovernanceActionCardElement
         label={t("govActions.governanceActionType")}
         text={type}
@@ -99,21 +101,19 @@ export const GovernanceActionDetailsCardData = ({
       />
       <GovernanceActionCardElement
         label={t("govActions.about")}
-        // TODO: Remove mock when possible
-        text={about ?? mockedLongDescription}
+        text={about}
         textVariant="longText"
         dataTestId="about"
       />
       <GovernanceActionCardElement
         label={t("govActions.motivation")}
-        // TODO: Remove mock when possible
-        text={motivation ?? mockedLongDescription}
+        text={motivation}
         textVariant="longText"
         dataTestId="motivation"
       />
       <GovernanceActionCardElement
         label={t("govActions.rationale")}
-        text={rationale ?? mockedLongDescription}
+        text={rationale}
         textVariant="longText"
         dataTestId="rationale"
       />

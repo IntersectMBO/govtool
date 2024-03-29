@@ -12,7 +12,7 @@ export const CIP_100 =
 export const CIP_108 =
   "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#";
 
-const sharedGovernanceActionFields: SharedGovernanceActionFieldSchema = {
+export const sharedGovernanceActionFields: SharedGovernanceActionFieldSchema = {
   title: {
     component: GovernanceActionField.Input,
     labelI18nKey: "createGovernanceAction.fields.declarations.title.label",

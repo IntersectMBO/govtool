@@ -59,11 +59,10 @@ export const GovernanceActionsCategory = () => {
     isProposalsFetching,
   );
 
-  const mappedData = useMemo(() => removeDuplicatedProposals(proposals), [
-    voter?.isRegisteredAsDRep,
-    isProposalsFetchingNextPage,
-    proposals,
-  ]);
+  const mappedData = useMemo(
+    () => removeDuplicatedProposals(proposals),
+    [voter?.isRegisteredAsDRep, isProposalsFetchingNextPage, proposals],
+  );
 
   useEffect(() => {
     if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
@@ -91,7 +90,7 @@ export const GovernanceActionsCategory = () => {
                 textDecoration: "none",
                 marginBottom: 4.25,
               }}
-              onClick={() => navigate(PATHS.dashboardGovernanceActions)}
+              onClick={() => navigate(PATHS.governanceActions)}
             >
               <img
                 src={ICONS.arrowRightIcon}
@@ -133,7 +132,9 @@ export const GovernanceActionsCategory = () => {
                           {t("govActions.withCategoryNotExist.optional")}
                           &nbsp;
                         </Typography>
-                        <Typography fontWeight={700}>{debouncedSearchText}</Typography>
+                        <Typography fontWeight={700}>
+                          {debouncedSearchText}
+                        </Typography>
                       </>
                     )}
                     <Typography fontWeight={300}>
@@ -154,10 +155,6 @@ export const GovernanceActionsCategory = () => {
                     <Box pb={4.25} key={item.txHash + item.index}>
                       <GovernanceActionCard
                         {...item}
-                        txHash={item.txHash}
-                        index={item.index}
-                        // TODO: Add data validation
-                        isDataMissing={false}
                         onClick={() => {
                           saveScrollPosition();
 

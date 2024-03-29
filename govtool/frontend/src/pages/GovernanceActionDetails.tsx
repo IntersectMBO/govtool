@@ -25,9 +25,6 @@ import {
 } from "@utils";
 import { Breadcrumbs } from "@molecules";
 
-// TODO: Remove when data validation is ready
-const isDataMissing = false;
-
 export const GovernanceActionDetails = () => {
   const { state, hash } = useLocation();
   const navigate = useNavigate();
@@ -86,10 +83,9 @@ export const GovernanceActionDetails = () => {
             ) : null}
             <Breadcrumbs
               elementOne={t("govActions.title")}
-              elementOnePath={PATHS.dashboardGovernanceActions}
-              // TODO: Remove "Fund our project" when title is implemented everywhere
-              elementTwo={title ?? "Fund our project"}
-              isDataMissing={false}
+              elementOnePath={PATHS.governanceActions}
+              elementTwo={title}
+              isDataMissing={state ? state.isDataMissing : data?.isDataMissing}
             />
             <Link
               sx={{
@@ -139,8 +135,9 @@ export const GovernanceActionDetails = () => {
                   createdEpochNo={
                     state ? state.createdEpochNo : data.proposal.createdEpochNo
                   }
-                  // TODO: Add data validation
-                  isDataMissing={isDataMissing}
+                  isDataMissing={
+                    state ? state.isDataMissing : data?.isDataMissing
+                  }
                   expiryDate={
                     state
                       ? formatDisplayDate(state.expiryDate)

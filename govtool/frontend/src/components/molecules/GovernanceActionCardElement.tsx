@@ -5,7 +5,7 @@ import { Typography, Tooltip, CopyButton, TooltipProps } from "@atoms";
 
 type BaseProps = {
   label: string;
-  text: string;
+  text?: string;
   dataTestId?: string;
   isSliderCard?: boolean;
   tooltipProps?: Omit<TooltipProps, "children">;
@@ -33,104 +33,106 @@ export const GovernanceActionCardElement = ({
   isCopyButton,
   tooltipProps,
   marginBottom,
-}: GovernanceActionCardElementProps) => (
-  <Box
-    data-testid={dataTestId}
-    mb={marginBottom ?? isSliderCard ? "20px" : "32px"}
-  >
+}: GovernanceActionCardElementProps) =>
+  text ? (
     <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        mb: "4px",
-      }}
+      data-testid={dataTestId}
+      mb={marginBottom ?? isSliderCard ? "20px" : "32px"}
     >
-      <Typography
+      <Box
         sx={{
-          fontSize: isSliderCard ? 12 : 14,
-          fontWeight: isSliderCard ? 500 : 600,
-          lineHeight: isSliderCard ? "16px" : "20px",
-          color: "neutralGray",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
+          display: "flex",
+          alignItems: "center",
+          mb: "4px",
         }}
       >
-        {label}
-      </Typography>
-      {tooltipProps && (
-        <Tooltip
-          heading={tooltipProps?.heading}
-          paragraphOne={tooltipProps?.paragraphOne}
-          placement="bottom-end"
-          arrow
-          {...tooltipProps}
-        >
-          <InfoOutlinedIcon
-            sx={{ ml: 0.7, mb: 0.1, color: "#ADAEAD", fontSize: "small" }}
-          />
-        </Tooltip>
-      )}
-    </Box>
-    <Box display="flex">
-      {textVariant === "pill" ? (
-        <Box
+        <Typography
           sx={{
-            padding: "6px 18px",
+            fontSize: isSliderCard ? 12 : 14,
+            fontWeight: isSliderCard ? 500 : 600,
+            lineHeight: isSliderCard ? "16px" : "20px",
+            color: "neutralGray",
             overflow: "hidden",
-            bgcolor: "lightBlue",
-            borderRadius: 100,
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
           }}
         >
-          <Typography
-            variant="caption"
+          {label}
+        </Typography>
+        {tooltipProps && (
+          <Tooltip
+            heading={tooltipProps?.heading}
+            paragraphOne={tooltipProps?.paragraphOne}
+            placement="bottom-end"
+            arrow
+            {...tooltipProps}
+          >
+            <InfoOutlinedIcon
+              sx={{ ml: 0.7, mb: 0.1, color: "#ADAEAD", fontSize: "small" }}
+            />
+          </Tooltip>
+        )}
+      </Box>
+      <Box display="flex">
+        {textVariant === "pill" ? (
+          <Box
             sx={{
+              padding: "6px 18px",
               overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
+              bgcolor: "lightBlue",
+              borderRadius: 100,
             }}
           >
-            {text}
-          </Typography>
-        </Box>
-      ) : (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            overflow: "hidden",
-          }}
-        >
-          <Typography
-            sx={{
-              fontSize: isSliderCard ? 14 : 16,
-              fontWeight: 400,
-              lineHeight: isSliderCard ? "20px" : "24px",
-              ...(textVariant === "oneLine" && { whiteSpace: "nowrap" }),
-              ...((textVariant === "oneLine" || textVariant === "twoLines") && {
+            <Typography
+              variant="caption"
+              sx={{
                 overflow: "hidden",
                 textOverflow: "ellipsis",
-              }),
-              ...(textVariant === "twoLines" && {
-                display: "-webkit-box",
-                WebkitBoxOrient: "vertical",
-                WebkitLineClamp: 2,
-                whiteSpace: "normal",
-              }),
-              ...(isCopyButton && {
-                color: "primaryBlue",
-              }),
+                whiteSpace: "nowrap",
+              }}
+            >
+              {text}
+            </Typography>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              overflow: "hidden",
             }}
           >
-            {text}
-          </Typography>
-          {isCopyButton && (
-            <Box ml={1}>
-              <CopyButton text={text} variant="blueThin" />
-            </Box>
-          )}
-        </Box>
-      )}
+            <Typography
+              sx={{
+                fontSize: isSliderCard ? 14 : 16,
+                fontWeight: 400,
+                lineHeight: isSliderCard ? "20px" : "24px",
+                ...(textVariant === "oneLine" && { whiteSpace: "nowrap" }),
+                ...((textVariant === "oneLine" ||
+                  textVariant === "twoLines") && {
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }),
+                ...(textVariant === "twoLines" && {
+                  display: "-webkit-box",
+                  WebkitBoxOrient: "vertical",
+                  WebkitLineClamp: 2,
+                  whiteSpace: "normal",
+                }),
+                ...(isCopyButton && {
+                  color: "primaryBlue",
+                }),
+              }}
+            >
+              {text}
+            </Typography>
+            {isCopyButton && (
+              <Box ml={1}>
+                <CopyButton text={text} variant="blueThin" />
+              </Box>
+            )}
+          </Box>
+        )}
+      </Box>
     </Box>
-  </Box>
-);
+  ) : null;

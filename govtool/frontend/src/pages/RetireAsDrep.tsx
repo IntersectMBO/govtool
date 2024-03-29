@@ -27,7 +27,10 @@ export const RetireAsDrep = () => {
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
-        <DashboardTopNav title={t("retirement.retireAsDrep")} />
+        <DashboardTopNav
+          isVotingPowerHidden={true}
+          title={t("retirement.retireAsDrep")}
+        />
         <LinkWithIcon
           label={t("backToDashboard")}
           onClick={onClickBackToDashboard}

@@ -2,7 +2,7 @@ import { NavLink, To } from "react-router-dom";
 import { Box } from "@mui/material";
 import Divider from "@mui/material/Divider";
 
-import { useScreenDimension, useTranslation } from "@hooks";
+import { useScreenDimension } from "@hooks";
 import { Typography } from "@atoms";
 
 type BreadcrumbsProps = {
@@ -18,7 +18,6 @@ export const Breadcrumbs = ({
   elementTwo,
   isDataMissing,
 }: BreadcrumbsProps) => {
-  const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
 
   return (
@@ -55,7 +54,7 @@ export const Breadcrumbs = ({
           textOverflow: "ellipsis",
         }}
       >
-        {isDataMissing ? t("govActions.dataMissing") : elementTwo}
+        {isDataMissing ? isDataMissing : elementTwo}
       </Typography>
     </Box>
   );

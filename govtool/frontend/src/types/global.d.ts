@@ -1,3 +1,5 @@
+import { GAMetedataErrors } from "@utils";
+
 export {};
 
 declare global {
@@ -31,13 +33,17 @@ declare global {
     abstainVotes: number;
     index: number;
     txHash: string;
-    title: string | null;
-    about: string | null;
-    motivation: string | null;
-    rationale: string | null;
+    title?: string;
+    about?: string;
+    motivation?: string;
+    rationale?: string;
   };
 
-  interface ActionVotedOnType extends ActionType {
+  type ActionTypeToDsiplay = ActionType & {
+    isDataMissing: boolean | GAMetedataErrors;
+  };
+
+  interface ActionVotedOnType extends ActionTypeToDsiplay {
     vote: VoteType;
   }
 

@@ -8,4 +8,5 @@ export const QUERY_KEYS = {
   useGetProposalsKey: "useGetProposalsKey",
   useGetProposalsInfiniteKey: "useGetProposalsInfiniteKey",
   useGetDRepInfoKey: "useGetDRepInfoKey",
+  useGetVoteContextFromFile: "useGetVoteContextFromFile",
 };

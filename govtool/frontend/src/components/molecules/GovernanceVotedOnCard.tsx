@@ -143,6 +143,7 @@ export const GovernanceVotedOnCard = ({
                 state: {
                   ...proposal,
                   vote: vote.vote.toLowerCase(),
+                  voteUrl: vote.url,
                 },
               },
             )

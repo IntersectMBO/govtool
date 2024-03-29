@@ -27,6 +27,7 @@ type GovernanceActionDetailsCardProps = {
   isDashboard?: boolean;
   isVoter?: boolean;
   voteFromEP?: string;
+  voteUrlFromEP?: string;
   isInProgress?: boolean;
 };
 
@@ -48,6 +49,7 @@ export const GovernanceActionDetailsCard = ({
   isDashboard,
   isVoter,
   voteFromEP,
+  voteUrlFromEP,
   govActionId,
   isInProgress,
   isDataMissing,
@@ -106,6 +108,7 @@ export const GovernanceActionDetailsCard = ({
         yesVotes={yesVotes}
         isVoter={isVoter}
         voteFromEP={voteFromEP}
+        voteUrlFromEP={voteUrlFromEP}
         isDashboard={isDashboard}
         isOneColumn={isOneColumn}
         isInProgress={isInProgress}

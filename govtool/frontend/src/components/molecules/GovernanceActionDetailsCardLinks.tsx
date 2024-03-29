@@ -3,8 +3,8 @@ import { Box } from "@mui/material";
 import { Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { LinkWithIcon } from "@molecules";
-import { openInNewTab } from "@/utils";
 import { ICONS } from "@/consts";
+import { useModal } from "@/context";
 
 // TODO: When BE is ready, pass links as props
 const LINKS = [
@@ -17,6 +17,7 @@ const LINKS = [
 export const GovernanceActionDetailsCardLinks = () => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
+  const { openModal } = useModal();
 
   return (
     <>
@@ -47,7 +48,14 @@ export const GovernanceActionDetailsCardLinks = () => {
           <LinkWithIcon
             key={link}
             label={link}
-            onClick={() => openInNewTab(link)}
+            onClick={() => {
+              openModal({
+                type: "externalLink",
+                state: {
+                  externalLink: link,
+                },
+              });
+            }}
             icon={<img alt="link" src={ICONS.link} />}
             cutWithEllipsis
           />

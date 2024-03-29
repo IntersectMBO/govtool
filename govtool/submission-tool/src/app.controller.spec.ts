@@ -14,13 +14,14 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
-    });
-
-    it('should return null', () => {
-      expect(appController.createMetadata()).toBe(null);
+  describe('metadata validation', () => {
+    it('should return hash and url', () => {
+      expect(
+        appController.validateMetadata({ hash: '', url: '' }),
+      ).toStrictEqual({
+        hash: '',
+        url: '',
+      });
     });
   });
 });

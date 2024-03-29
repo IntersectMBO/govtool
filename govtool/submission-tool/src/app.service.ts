@@ -1,16 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { ValidateMetadataDTO } from './dto/validateMetadata.dto';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
-  }
-
-  createMetadata(): null {
-    return null;
-  }
-
-  validateMetadata(): null {
-    return null;
+  validateMetadata(
+    validateMetadataDto: ValidateMetadataDTO,
+  ): ValidateMetadataDTO {
+    return validateMetadataDto;
   }
 }

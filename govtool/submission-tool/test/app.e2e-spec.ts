@@ -15,24 +15,11 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
-  });
-
-  it('/create-metadata (POST)', () => {
-    return request(app.getHttpServer())
-      .post('/create-metadata')
-      .expect(201)
-      .expect({});
-  });
-
   it('/validate-metadata (POST)', () => {
     return request(app.getHttpServer())
-      .post('/validate-metadata')
-      .expect(201)
-      .expect({});
+      .get('/validate-metadata')
+      .send({ hash: '', url: '' })
+      .expect(200)
+      .expect({ hash: '', url: '' });
   });
 });

@@ -1,73 +1,107 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# GovTool submission tool
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Installed on your machine:
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+1. Node.js >= 18 ([official website](https://nodejs.org/en))
+2. yarn - for package management
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
+Clone the project
 
 ```bash
-$ yarn install
+git clone https://github.com/IntersectMBO/govtool
 ```
 
-## Running the app
+Fill .env based on env.example file
+
+Go to the project directory
 
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+cd govtool/submission-tool
 ```
 
-## Test
+Install dependencies
 
 ```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+yarn install
 ```
 
-## Support
+Start the server
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+yarn start:dev
+```
 
-## Stay in touch
+## Developing
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Built With
 
-## License
+1. @nestjs - ^10.0.0
+2. axios - ^1.6.8
+3. blakejs - ^1.2.1
+4. jsonld - ^8.3.2
+5. rxjs - ^7.8.1
+6. typescript - ^5.1.3
 
-Nest is [MIT licensed](LICENSE).
+### Code Quality and Checks Are Handled By
+
+1. eslint - ^8.42.0
+2. prettier - ^3.0.0
+3. jest - ^29.5.0
+
+### Prerequisites
+
+Install [`Git`](https://git-scm.com/) - version control.
+Recommended [`React developer tools`](https://react.dev/learn/react-developer-tools).
+
+To automatically set correct node version:
+
+1. Install [`nvm`](https://github.com/nvm-sh/nvm)
+2. Install `lts/hydrogen` version of node
+
+```bash
+  nvm install lts/hydrogen
+```
+
+3. Install [@nestjs/cli](https://docs.nestjs.com/cli/overview) globally
+
+```bash
+npm install -g @nestjs/cli
+```
+
+## To Develop
+
+### Standard way
+
+1. Install modules
+
+```bash
+yarn install
+```
+
+2. Launch Server
+
+```bash
+yarn start:dev
+```
+
+#### Using Docker
+
+1. Get [Docker](https://www.docker.com/).
+
+2. Build the image
+
+```bash
+docker build -t submission-tool .
+```
+
+3. Fill .env based on env.example file
+
+4. Run the container
+
+```bash
+docker run -p 3000:3000 -d submission-tool
+```
+
+## After development
+
+Check our [Contributing Documentation](../../CONTRIBUTING.md) on how to submit a PR.

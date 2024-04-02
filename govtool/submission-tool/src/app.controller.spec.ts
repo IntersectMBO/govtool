@@ -1,10 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpModule } from '@nestjs/axios';
-import { HttpException, HttpStatus } from '@nestjs/common';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ValidationError } from './enums/ValidationError';
+import { MetadataValidationStatus } from './enums/ValidationError';
 
 // TODO: Mock HttpService
 describe('AppController', () => {
@@ -27,37 +26,26 @@ describe('AppController', () => {
 
   describe('metadata validation', () => {
     it('should throw invalid URL', async () => {
-      try {
-        await appController.validateMetadata({
-          hash: 'hash',
-          url: 'url',
-        });
-      } catch (error) {
-        expect(error).toBeInstanceOf(HttpException);
-        expect((error as HttpException).getStatus()).toBe(
-          HttpStatus.BAD_REQUEST,
-        );
-        expect((error as HttpException).getResponse()).toEqual(
-          ValidationError.URL_NOT_FOUND,
-        );
-      }
+      const result = await appController.validateMetadata({
+        hash: 'hash',
+        url: 'url',
+      });
+      expect(result).toEqual({
+        status: MetadataValidationStatus.URL_NOT_FOUND,
+        valid: false,
+      });
     });
 
     it('should throw invalid JSONLD', async () => {
-      try {
-        await appController.validateMetadata({
-          hash: 'hash',
-          url: 'http://www.schema.org',
-        });
-      } catch (error) {
-        expect(error).toBeInstanceOf(HttpException);
-        expect((error as HttpException).getStatus()).toBe(
-          HttpStatus.BAD_REQUEST,
-        );
-        expect((error as HttpException).getResponse()).toEqual(
-          ValidationError.INVALID_JSONLD,
-        );
-      }
+      const result = await appController.validateMetadata({
+        hash: 'hash',
+        url: 'http://www.schema.org',
+      });
+
+      expect(result).toEqual({
+        status: MetadataValidationStatus.INVALID_JSONLD,
+        valid: false,
+      });
     });
   });
 });

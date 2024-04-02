@@ -1,5 +1,6 @@
+import { MetadataValidationStatus } from '../enums/ValidationError';
+
 export type ValidateMetadataResult = {
-  url: string;
-  hash: string;
+  status?: MetadataValidationStatus;
   valid: boolean;
 };

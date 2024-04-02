@@ -1,10 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { catchError, firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import * as blake from 'blakejs';
 
 import { ValidateMetadataDTO } from './dto/validateMetadata.dto';
-import { ValidationError } from './enums/ValidationError';
+import { MetadataValidationStatus } from './enums/ValidationError';
 import { canonizeJSON } from './utils/canonizeJSON';
 import { ValidateMetadataResult } from './types/validateMetadata';
 
@@ -16,35 +16,33 @@ export class AppService {
     hash,
     url,
   }: ValidateMetadataDTO): Promise<ValidateMetadataResult> {
-    const { data } = await firstValueFrom(
-      this.httpService.get(url).pipe(
-        catchError(() => {
-          throw new HttpException(
-            ValidationError.URL_NOT_FOUND,
-            HttpStatus.BAD_REQUEST,
-          );
-        }),
-      ),
-    );
-
-    let canonizedMetadata;
+    let status: MetadataValidationStatus;
     try {
-      canonizedMetadata = await canonizeJSON(data);
+      const { data } = await firstValueFrom(
+        this.httpService.get(url).pipe(
+          catchError(() => {
+            throw MetadataValidationStatus.URL_NOT_FOUND;
+          }),
+        ),
+      );
+
+      let canonizedMetadata;
+      try {
+        canonizedMetadata = await canonizeJSON(data);
+      } catch (error) {
+        throw MetadataValidationStatus.INVALID_JSONLD;
+      }
+
+      const hashedMetadata = blake.blake2bHex(canonizedMetadata, undefined, 32);
+      if (hashedMetadata !== hash) {
+        throw MetadataValidationStatus.INVALID_HASH;
+      }
     } catch (error) {
-      throw new HttpException(
-        ValidationError.INVALID_JSONLD,
-        HttpStatus.BAD_REQUEST,
-      );
+      if (Object.values(MetadataValidationStatus).includes(error)) {
+        status = error;
+      }
     }
 
-    const hashedMetadata = blake.blake2bHex(canonizedMetadata, undefined, 32);
-    if (hashedMetadata !== hash) {
-      throw new HttpException(
-        ValidationError.INVALID_HASH,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    return { hash, url, valid: true };
+    return { status, valid: !Boolean(status) };
   }
 }

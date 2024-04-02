@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FormProvider, useForm } from "react-hook-form";
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 
 import { Background } from "@atoms";
 import { PATHS } from "@consts";
@@ -10,6 +10,7 @@ import {
   useScreenDimension,
   useTranslation,
   defaultRegisterAsDRepValues,
+  useGetVoterInfo,
 } from "@hooks";
 import { LinkWithIcon } from "@molecules";
 import {
@@ -28,17 +29,12 @@ export const RegisterAsdRep = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { closeModal, openModal } = useModal();
+  const { voter } = useGetVoterInfo();
 
   const methods = useForm({
     mode: "onChange",
     defaultValues: defaultRegisterAsDRepValues,
   });
-
-  useEffect(() => {
-    if (checkIsWalletConnected()) {
-      navigate(PATHS.home);
-    }
-  }, []);
 
   const backToDashboard = () => {
     navigate(PATHS.dashboard);
@@ -58,6 +54,16 @@ export const RegisterAsdRep = () => {
       },
     });
 
+  useEffect(() => {
+    if (checkIsWalletConnected()) {
+      navigate(PATHS.home);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (voter?.wasRegisteredAsDRep) setStep(2);
+  }, [voter?.wasRegisteredAsDRep]);
+
   return (
     <Background isReverted>
       <Box
@@ -73,17 +79,39 @@ export const RegisterAsdRep = () => {
             mt: isMobile ? 3 : 1.5,
           }}
         />
-        {step === 1 && (
-          <RolesAndResponsibilities
-            onClickCancel={onClickBackToDashboard}
-            setStep={setStep}
-          />
+        {!voter ? (
+          <Box
+            sx={{
+              alignItems: "center",
+              display: "flex",
+              flex: 1,
+              height: "100vh",
+              justifyContent: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <>
+            {step === 1 && !voter?.wasRegisteredAsDRep && (
+              <RolesAndResponsibilities
+                onClickCancel={onClickBackToDashboard}
+                setStep={setStep}
+              />
+            )}
+            <FormProvider {...methods}>
+              {step === 2 && (
+                <RegisterAsDRepForm
+                  onClickCancel={onClickBackToDashboard}
+                  setStep={setStep}
+                  voter={voter}
+                />
+              )}
+              {step === 3 && <DRepStoreDataInfo setStep={setStep} />}
+              {step === 4 && <DRepStorageInformation setStep={setStep} />}
+            </FormProvider>
+          </>
         )}
-        <FormProvider {...methods}>
-          {step === 2 && <RegisterAsDRepForm setStep={setStep} />}
-          {step === 3 && <DRepStoreDataInfo setStep={setStep} />}
-          {step === 4 && <DRepStorageInformation setStep={setStep} />}
-        </FormProvider>
         {isMobile && <Footer />}
       </Box>
     </Background>

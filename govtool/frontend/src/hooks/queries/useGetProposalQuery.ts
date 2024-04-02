@@ -7,7 +7,7 @@ import { getProposal } from "@services";
 export const useGetProposalQuery = (proposalId: string, enabled?: boolean) => {
   const { dRepID } = useCardano();
 
-  const request = useQuery(
+  const { data, isLoading, refetch, isRefetching } = useQuery(
     [QUERY_KEYS.useGetProposalKey, dRepID],
     () => getProposal(proposalId, dRepID),
     {
@@ -16,21 +16,10 @@ export const useGetProposalQuery = (proposalId: string, enabled?: boolean) => {
     },
   );
 
-  const data = request.data as {
-    proposal: ActionType;
-    vote: {
-      proposalId: string;
-      drepId: string;
-      vote: string;
-      url: string;
-      metadataHash: string;
-    };
-  };
-
   return {
     data,
-    isLoading: request.isLoading,
-    refetch: request.refetch,
-    isFetching: request.isRefetching,
+    isLoading,
+    refetch,
+    isFetching: isRefetching,
   };
 };

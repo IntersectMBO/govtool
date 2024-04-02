@@ -7,6 +7,7 @@ import {
 import { Box, CircularProgress, Link, Typography } from "@mui/material";
 
 import { ICONS, PATHS } from "@consts";
+import { useCardano } from "@context";
 import {
   useGetProposalQuery,
   useGetVoterInfo,
@@ -20,14 +21,10 @@ import {
 } from "@utils";
 import { GovernanceActionDetailsCard } from "@organisms";
 import { Breadcrumbs } from "@molecules";
-import { useCardano } from "@/context";
-
-// TODO: Remove when data validation is ready
-const isDataMissing = false;
 
 export const DashboardGovernanceActionDetails = () => {
   const { voter } = useGetVoterInfo();
-  const { pendingTransaction } = useCardano();
+  const { pendingTransaction, isEnableLoading } = useCardano();
   const { state, hash } = useLocation();
   const navigate = useNavigate();
   const { isMobile } = useScreenDimension();
@@ -55,9 +52,8 @@ export const DashboardGovernanceActionDetails = () => {
       <Breadcrumbs
         elementOne={t("govActions.title")}
         elementOnePath={PATHS.dashboardGovernanceActions}
-        // TODO: Remove "Fund our project" when title is implemented everywhere
-        elementTwo={title ?? "Fund our project"}
-        isDataMissing={false}
+        elementTwo={title}
+        isDataMissing={state ? state.isDataMissing : data?.isDataMissing}
       />
       <Link
         data-testid="back-to-list-link"
@@ -90,13 +86,15 @@ export const DashboardGovernanceActionDetails = () => {
           {t("back")}
         </Typography>
       </Link>
-      <Box display="flex" justifyContent="center">
-        {isLoading ? (
+      <Box display="flex" flex={1} justifyContent="center">
+        {isLoading || isEnableLoading ? (
           <Box
-            display="flex"
-            flex={1}
-            justifyContent="center"
-            alignItems="center"
+            sx={{
+              alignItems: "center",
+              display: "flex",
+              flex: 1,
+              justifyContent: "center",
+            }}
           >
             <CircularProgress />
           </Box>
@@ -113,8 +111,7 @@ export const DashboardGovernanceActionDetails = () => {
             createdEpochNo={
               state ? state.createdEpochNo : data.proposal.createdEpochNo
             }
-            // TODO: Add data validation
-            isDataMissing={isDataMissing}
+            isDataMissing={state ? state.isDataMissing : data?.isDataMissing}
             expiryDate={
               state
                 ? formatDisplayDate(state.expiryDate)
@@ -140,6 +137,9 @@ export const DashboardGovernanceActionDetails = () => {
             rationale={state ? state.rationale : data.proposal.rationale}
             yesVotes={state ? state.yesVotes : data.proposal.yesVotes}
             voteFromEP={data?.vote?.vote}
+            voteUrlFromEP={data?.vote?.url}
+            voteDateFromEP={data?.vote?.date}
+            voteEpochNoFromEP={data?.vote?.epochNo}
             govActionId={fullProposalId}
             isInProgress={
               pendingTransaction.vote?.resourceId ===

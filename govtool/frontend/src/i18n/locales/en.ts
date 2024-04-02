@@ -108,6 +108,7 @@ export const en = {
         registerAsDRep: "Register as a DRep",
         registrationInProgress:
           "The registration process is ongoing. This may take several minutes.",
+        reRegister: "Re-register as a DRep",
         retire: "Retire as a DRep",
         retirementInProgress:
           "The retirement process is ongoing. This may take several minutes.",
@@ -263,6 +264,25 @@ export const en = {
       walletNoCIP30Support: "Your wallet does not support CIP-30 extensions.",
       walletNoCIP90FunctionsEnabled:
         "Your wallet did not enable the needed CIP-95 functions during connection.",
+      gAMetadata: {
+        description: {
+          notVerifiable:
+            "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that the data stored by the Proposer does not match the data when the Governance Action was originally posted.",
+          dataMissing:
+            "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that GovTool cannot locate the data on the URL specified when the Governance Action was originally posted.",
+          incorrectFormat:
+            "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that the data stored by the Proposer does not match the data format as defined by the Cardano community.",
+        },
+        message: {
+          notVerifiable:
+            "The data that was originally used when this Governance Action was created has changed.",
+          dataMissing:
+            "The data that was originally used when this Governance Action was created has not been found.",
+          incorrectFormat:
+            "The data that was originally used when this Governance Action was created has been formatted incorrectly. ",
+        },
+        title: {},
+      },
     },
     footer: {
       copyright: "© 2023 Voltaire Gov Tool",
@@ -278,6 +298,17 @@ export const en = {
         typeLabel: "Governance Action Type",
         typeTip:
           "To change the Governance Action Type go back to the previous page.",
+      },
+      editMetadata: {
+        bio: "Bio",
+        bioHelpfulText: "Some sentence about yourself",
+        bioPlaceholder: "Enter your Bio ...",
+        dRepName: "DRep Name",
+        dRepNameHelpfulText:
+          "This is name that will be shown on your DRep profile",
+        dRepNamePlaceholder: "ex. JohnDRep",
+        email: "Email",
+        emailPlaceholder: "john.smith@email.com",
       },
       errors: {
         hashInvalidFormat: "Invalid hash format",
@@ -301,9 +332,10 @@ export const en = {
       about: "About",
       abstract: "Abstract:",
       backToGovActions: "Back to Governance Actions",
-      castVote: "<0>You voted {{vote}} for this proposal</0>\nat {{date}}",
+      castVote:
+        "<0>You voted {{vote}} on this proposal</0>\non {{date}} (Epoch {{epoch}})",
       castVoteDeadline:
-        "You can change your vote up to the deadline of {{date}}",
+        "You can change your vote up to {{date}} (Epoch {{epoch}})",
       changeVote: "Change vote",
       changeYourVote: "Change your vote",
       chooseHowToVote: "Choose how you want to vote:",
@@ -326,6 +358,7 @@ export const en = {
       optional: "(optional)",
       provideContext: "Provide context",
       provideContextAboutYourVote: "Provide context about your vote",
+      provideNewContextAboutYourVote: "Provide new context about your vote",
       rationale: "Rationale",
       seeExternalData: "See external data",
       selectDifferentOption: "Select a different option to change your vote",
@@ -476,6 +509,41 @@ export const en = {
         title: "Please wait for your previous transaction to be completed.",
         message:
           "Before performing a new action please wait for the previous action transaction to be completed.",
+      },
+    },
+    editMetadata: {
+      pageTitle: "Edit DRep Info",
+      aboutYou: "About You",
+      aboutYouDescription:
+        "Some extra info about you to provide context to delegators.",
+      dRepName: "DRep Name",
+      dRepNameDescription:
+        "This is the name that will be displayed in the DRep Directory and it will be used also by delegators to find your profile.",
+      linksDescription: "Links to extra content or social media contacts ",
+      maximumLinks: "(maximum of {{numberOfLinks}} entries)",
+      optional: "optional",
+      required: "required",
+      storeDataCheckboxLabel:
+        "I agree to store correctly this information and to maintain them over the years",
+      storeDataLink: "Learn more about storing information",
+      storeDataTitle: "Store and maintain the data yourself",
+      storingInformationDescription:
+        "Download your file, save it to your chosen location, and enter the URL of that location in step 3",
+      storingInformationStep1Label: "Download this file",
+      storingInformationStep2Label:
+        "Save this file in a location that provides a public URL (ex. github)",
+      storingInformationStep2Link: "Read full guide",
+      storingInformationStep3Label: "Paste the URL here",
+      storingInformationTitle: "Information Storage Steps",
+      storingInformationURLPlaceholder: "URL",
+      fields: {
+        validations: {
+          email: "Invalid email address",
+          maxLength: "Max {{maxLength}} characters",
+          nickname: "Nickname can not contain whitespaces",
+          required: "This field is required",
+          url: "Invalid URL",
+        },
       },
     },
     registration: {

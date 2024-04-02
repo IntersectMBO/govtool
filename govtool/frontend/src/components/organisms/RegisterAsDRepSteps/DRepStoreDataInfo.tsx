@@ -18,8 +18,7 @@ export const DRepStoreDataInfo = ({
 }) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
-  const { control, errors, isRegistrationAsDRepLoading, watch } =
-    useRegisterAsdRepForm();
+  const { control, errors, watch } = useRegisterAsdRepForm();
 
   const onClickBackButton = () => setStep(2);
 
@@ -34,7 +33,6 @@ export const DRepStoreDataInfo = ({
     <BgCard
       actionButtonLabel={t("register")}
       isActionButtonDisabled={isContinueDisabled}
-      isLoadingActionButton={isRegistrationAsDRepLoading}
       onClickActionButton={onClickContinue}
       onClickBackButton={onClickBackButton}
     >

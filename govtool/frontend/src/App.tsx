@@ -25,7 +25,7 @@ import {
   RegisterAsSoleVoter,
   RetireAsDrep,
   RetireAsSoleVoter,
-  UpdatedRepMetadata,
+  EditDRepMetadata,
 } from "@pages";
 import { SetupInterceptors } from "@services";
 import {
@@ -118,7 +118,7 @@ export default () => {
         />
         <Route path={PATHS.retireAsSoleVoter} element={<RetireAsSoleVoter />} />
         <Route path={PATHS.stakeKeys} element={<ChooseStakeKey />} />
-        <Route path={PATHS.updateMetadata} element={<UpdatedRepMetadata />} />
+        <Route path={PATHS.editDrepMetadata} element={<EditDRepMetadata />} />
         <Route path="*" element={<ErrorPage />} />
         <Route path={PATHS.error} element={<ErrorPage />} />
       </Routes>

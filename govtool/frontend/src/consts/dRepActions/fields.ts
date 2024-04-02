@@ -38,4 +38,14 @@ export const Rules = {
       message: i18n.t("registration.fields.validations.url"),
     },
   },
+  STORING_LINK: {
+    required: {
+      value: true,
+      message: i18n.t("registration.fields.validations.required"),
+    },
+    pattern: {
+      value: URL_REGEX,
+      message: i18n.t("registration.fields.validations.url"),
+    },
+  },
 };

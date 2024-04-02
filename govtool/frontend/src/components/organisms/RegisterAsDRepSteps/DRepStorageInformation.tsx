@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import { Button, Spacer, Typography } from "@atoms";
-import { ICONS } from "@consts";
+import { ICONS, Rules } from "@consts";
 import {
   useRegisterAsdRepForm,
   useTranslation,
@@ -11,7 +11,7 @@ import {
 } from "@hooks";
 import { Step } from "@molecules";
 import { BgCard, ControlledField } from "@organisms";
-import { URL_REGEX, openInNewTab } from "@utils";
+import { openInNewTab } from "@utils";
 
 type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -52,9 +52,9 @@ export const DRepStorageInformation = ({
       actionButtonLabel={t("submit")}
       backButtonLabel={t("back")}
       isActionButtonDisabled={isActionButtonDisabled}
+      isLoadingActionButton={isRegistrationAsDRepLoading}
       onClickActionButton={registerAsDrep}
       onClickBackButton={onClickBack}
-      isLoadingActionButton={isRegistrationAsDRepLoading}
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("registration.storingInformationTitle")}
@@ -117,16 +117,7 @@ export const DRepStorageInformation = ({
               layoutStyles={{ mt: 1.5 }}
               name="storingURL"
               placeholder={t("registration.storingInformationURLPlaceholder")}
-              rules={{
-                required: {
-                  value: true,
-                  message: t("registration.fields.validations.required"),
-                },
-                pattern: {
-                  value: URL_REGEX,
-                  message: t("registration.fields.validations.url"),
-                },
-              }}
+              rules={Rules.STORING_LINK}
             />
           }
           label={t("registration.storingInformationStep3Label")}

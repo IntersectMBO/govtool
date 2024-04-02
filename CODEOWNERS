@@ -1,22 +1,22 @@
 # GovTool Project Codeowners
 
 # These owners will be the default owners for everything in the repository.
-* @kickloop @MSzalowski
+* @Ryun1 @MSzalowski
 
 # Frontend assets templates
-govtool/frontend/*                                                          @MSzalowski @Sworzen1 @JanJaroszczak @kickloop
-*.tsx                                                                       @MSzalowski @Sworzen1 @JanJaroszczak @kickloop
-*.ts                                                                        @MSzalowski @Sworzen1 @JanJaroszczak @kickloop
-*.css                                                                       @MSzalowski @Sworzen1 @JanJaroszczak @kickloop
+govtool/frontend/*                                                          @MSzalowski @Sworzen1 @JanJaroszczak
+*.tsx                                                                       @MSzalowski @Sworzen1 @JanJaroszczak
+*.ts                                                                        @MSzalowski @Sworzen1 @JanJaroszczak
+*.css                                                                       @MSzalowski @Sworzen1 @JanJaroszczak
 
 # Backend
-govtool/backend/*                                                           @MSzalowski @jankun4 @kickloop
+govtool/backend/*                                                           @MSzalowski @jankun4
 
 # DevOps
-.github/workflows/*                                                         @placek @adgud @kickloop
-config/govtool/*                                                            @placek @adgud @kickloop
-infra/terraform/*                                                           @placek @adgud @kickloop
+.github/workflows/*                                                         @placek @adgud
+config/govtool/*                                                            @placek @adgud
+infra/terraform/*                                                           @placek @adgud
 
 # Testing
-gov-action-loader/*                                                         @IntersectMBO/govtool-test @kickloop
-tests/*                                                                     @IntersectMBO/govtool-test @kickloop
+tests/*                                                                     @IntersectMBO/govtool-test
+gov-action-loader/*                                                         @IntersectMBO/govtool-test

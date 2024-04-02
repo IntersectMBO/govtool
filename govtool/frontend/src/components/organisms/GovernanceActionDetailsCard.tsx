@@ -1,11 +1,13 @@
+import { useState } from "react";
 import { Box } from "@mui/material";
+
+import { useScreenDimension } from "@hooks";
 import {
   GovernanceActionCardStatePill,
   GovernanceActionDetailsCardVotes,
 } from "@molecules";
-import { useScreenDimension } from "@hooks";
 import { GovernanceActionDetailsCardData } from "@organisms";
-import { useState } from "react";
+import { GAMetedataErrors } from "@utils";
 
 type GovernanceActionDetailsCardProps = {
   abstainVotes: number;
@@ -17,16 +19,19 @@ type GovernanceActionDetailsCardProps = {
   type: string;
   details?: ActionDetailsType;
   url: string;
-  title: string | null;
-  about: string | null;
-  motivation: string | null;
-  rationale: string | null;
+  title?: string;
+  about?: string;
+  motivation?: string;
+  rationale?: string;
   yesVotes: number;
   govActionId: string;
-  isDataMissing: boolean;
+  isDataMissing: boolean | GAMetedataErrors;
   isDashboard?: boolean;
   isVoter?: boolean;
   voteFromEP?: string;
+  voteUrlFromEP?: string;
+  voteDateFromEP?: string;
+  voteEpochNoFromEP?: number;
   isInProgress?: boolean;
 };
 
@@ -48,6 +53,9 @@ export const GovernanceActionDetailsCard = ({
   isDashboard,
   isVoter,
   voteFromEP,
+  voteUrlFromEP,
+  voteDateFromEP,
+  voteEpochNoFromEP,
   govActionId,
   isInProgress,
   isDataMissing,
@@ -98,14 +106,21 @@ export const GovernanceActionDetailsCard = ({
         isDataMissing={isDataMissing}
         isDashboard={isDashboard}
         isOneColumn={isOneColumn}
+        isInProgress={isInProgress}
+        isSubmitted={isVoteSubmitted}
       />
       <GovernanceActionDetailsCardVotes
         setIsVoteSubmitted={setIsVoteSubmitted}
         abstainVotes={abstainVotes}
         noVotes={noVotes}
         yesVotes={yesVotes}
+        expiryDate={expiryDate}
+        expiryEpochNo={expiryEpochNo}
         isVoter={isVoter}
         voteFromEP={voteFromEP}
+        voteUrlFromEP={voteUrlFromEP}
+        voteDateFromEP={voteDateFromEP}
+        voteEpochNoFromEP={voteEpochNoFromEP}
         isDashboard={isDashboard}
         isOneColumn={isOneColumn}
         isInProgress={isInProgress}

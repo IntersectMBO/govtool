@@ -10,15 +10,20 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
+import { VoterInfo } from "@models";
 
 import { BgCard, ControlledField } from "..";
 
 const MAX_NUMBER_OF_LINKS = 7;
 
 export const RegisterAsDRepForm = ({
+  onClickCancel,
   setStep,
+  voter,
 }: {
+  onClickCancel: () => void;
   setStep: Dispatch<SetStateAction<number>>;
+  voter?: VoterInfo;
 }) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
@@ -73,8 +78,11 @@ export const RegisterAsDRepForm = ({
   return (
     <BgCard
       actionButtonLabel={t("continue")}
+      backButtonLabel={voter?.wasRegisteredAsDRep ? t("cancel") : t("back")}
       onClickActionButton={onClickContinue}
-      onClickBackButton={onClickBack}
+      onClickBackButton={
+        voter?.wasRegisteredAsDRep ? onClickCancel : onClickBack
+      }
       isActionButtonDisabled={isContinueButtonDisabled}
       sx={{ pb: isMobile ? undefined : 6, pt: isMobile ? 4 : 8 }}
     >

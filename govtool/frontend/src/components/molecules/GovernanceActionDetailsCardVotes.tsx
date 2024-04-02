@@ -10,8 +10,13 @@ type GovernanceActionCardVotesProps = {
   noVotes: number;
   yesVotes: number;
   isOneColumn: boolean;
+  expiryDate: string;
+  expiryEpochNo: number;
   isVoter?: boolean;
   voteFromEP?: string;
+  voteUrlFromEP?: string;
+  voteDateFromEP?: string;
+  voteEpochNoFromEP?: number;
   isDashboard?: boolean;
   isInProgress?: boolean;
 };
@@ -22,8 +27,13 @@ export const GovernanceActionDetailsCardVotes = ({
   noVotes,
   yesVotes,
   isOneColumn,
+  expiryDate,
+  expiryEpochNo,
   isVoter,
   voteFromEP,
+  voteUrlFromEP,
+  voteDateFromEP,
+  voteEpochNoFromEP,
   isDashboard,
   isInProgress,
 }: GovernanceActionCardVotesProps) => {
@@ -43,7 +53,12 @@ export const GovernanceActionDetailsCardVotes = ({
       {isVoter ? (
         <VoteActionForm
           setIsVoteSubmitted={setIsVoteSubmitted}
+          expiryDate={expiryDate}
+          expiryEpochNo={expiryEpochNo}
           voteFromEP={voteFromEP ? voteFromEP.toLowerCase() : undefined}
+          voteUrlFromEP={voteUrlFromEP}
+          voteDateFromEP={voteDateFromEP}
+          voteEpochNoFromEP={voteEpochNoFromEP}
           yesVotes={yesVotes}
           noVotes={noVotes}
           abstainVotes={abstainVotes}

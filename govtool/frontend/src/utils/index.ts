@@ -1,4 +1,5 @@
 export * from "./adaFormat";
+export * from "./areObjectsTheSame";
 export * from "./basicReducer";
 export * from "./bech32Validation";
 export * from "./callAll";

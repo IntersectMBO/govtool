@@ -55,7 +55,7 @@ export const useRegisterAsdRepForm = (
   const { voter } = useGetVoterInfo();
 
   const backToForm = useCallback(() => {
-    setStep?.(3);
+    setStep?.(2);
     closeModal();
   }, [setStep]);
 

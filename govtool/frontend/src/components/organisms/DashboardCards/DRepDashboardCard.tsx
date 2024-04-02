@@ -70,7 +70,7 @@ export const DRepDashboardCard = ({
           {
             children: t("dashboard.registration.changeMetadata"),
             dataTestId: "change-metadata-button",
-            onClick: () => navigate(PATHS.updateMetadata),
+            onClick: () => navigate(PATHS.editDrepMetadata),
             variant: "text",
           },
         ],
@@ -84,7 +84,11 @@ export const DRepDashboardCard = ({
     const wasRegisteredOrNotRegisteredButtons: DashboardActionCardProps["buttons"] =
       [
         {
-          children: t("dashboard.registration.register"),
+          children: t(
+            voter.wasRegisteredAsDRep
+              ? "dashboard.registration.reRegister"
+              : "dashboard.registration.register",
+          ),
           dataTestId: "register-button",
           onClick: () => navigate(PATHS.registerAsdRep),
           variant: "contained",
@@ -94,7 +98,7 @@ export const DRepDashboardCard = ({
           dataTestId: "register-learn-more-button",
           onClick: () =>
             openInNewTab(
-              "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep"
+              "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
             ),
         },
       ];

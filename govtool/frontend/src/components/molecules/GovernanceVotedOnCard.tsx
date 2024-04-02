@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 import { Button } from "@atoms";
 import { PATHS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { VotedProposal } from "@models";
+import { VotedProposalToDisplay } from "@models";
 import {
   formatDisplayDate,
   getFullGovActionId,
@@ -19,32 +19,25 @@ import {
   GovernanceActionsDatesBox,
 } from "@molecules";
 
-const mockedLongText =
-  "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sit, distinctio culpa minus eaque illo quidem voluptates quisquam mollitia consequuntur ex, sequi saepe? Ad ex adipisci molestiae sed.";
-
 type Props = {
-  votedProposal: VotedProposal;
-  isDataMissing: boolean;
+  votedProposal: VotedProposalToDisplay;
   inProgress?: boolean;
 };
 
-export const GovernanceVotedOnCard = ({
-  votedProposal,
-  isDataMissing,
-  inProgress,
-}: Props) => {
+export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
   const navigate = useNavigate();
   const { proposal, vote } = votedProposal;
   const {
+    about,
     createdDate,
     createdEpochNo,
     expiryDate,
     expiryEpochNo,
-    type,
-    txHash,
     index,
     title,
-    about,
+    txHash,
+    type,
+    isDataMissing,
   } = proposal;
 
   const { isMobile, screenWidth } = useScreenDimension();
@@ -82,14 +75,12 @@ export const GovernanceVotedOnCard = ({
         }}
       >
         <GovernanceActionCardHeader
-          // TODO: Remove "Fund our project" when title is implemented everywhere
-          title={title ?? "Fund our project"}
+          title={title}
           isDataMissing={isDataMissing}
         />
         <GovernanceActionCardElement
           label={t("govActions.abstract")}
-          // TODO: Remove mock when possible
-          text={about ?? mockedLongText}
+          text={about}
           textVariant="twoLines"
           dataTestId="governance-action-abstract"
           isSliderCard
@@ -143,6 +134,9 @@ export const GovernanceVotedOnCard = ({
                 state: {
                   ...proposal,
                   vote: vote.vote.toLowerCase(),
+                  voteUrl: vote.url,
+                  voteDate: vote.date,
+                  voteEpochNo: vote.epochNo,
                 },
               },
             )

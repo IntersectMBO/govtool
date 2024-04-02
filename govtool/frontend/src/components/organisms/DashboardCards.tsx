@@ -14,12 +14,7 @@ import { ListGovActionsDashboardCards } from "./DashboardCards/ListGovActionsDas
 import { ProposeGovActionDashboardCard } from "./DashboardCards/ProposeGovActionDashboardCard";
 
 export const DashboardCards = () => {
-  const {
-    dRepID,
-    dRepIDBech32,
-    pendingTransaction,
-    stakeKey,
-  } = useCardano();
+  const { dRepID, dRepIDBech32, pendingTransaction, stakeKey } = useCardano();
   const { screenWidth } = useScreenDimension();
 
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);

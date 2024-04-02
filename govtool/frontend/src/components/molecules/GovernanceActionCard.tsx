@@ -17,11 +17,8 @@ import {
   getProposalTypeNoEmptySpaces,
 } from "@utils";
 
-const mockedLongText =
-  "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sit, distinctio culpa minus eaque illo quidem voluptates quisquam mollitia consequuntur ex, sequi saepe? Ad ex adipisci molestiae sed.";
-
 type ActionTypeProps = Omit<
-  ActionType,
+  ActionTypeToDsiplay,
   | "yesVotes"
   | "noVotes"
   | "abstainVotes"
@@ -32,7 +29,6 @@ type ActionTypeProps = Omit<
   | "rationale"
   | "motivation"
 > & {
-  isDataMissing: boolean;
   onClick?: () => void;
   inProgress?: boolean;
 };
@@ -87,14 +83,12 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
         }}
       >
         <GovernanceActionCardHeader
-          // TODO: Remove "Fund our project" when title is implemented everywhere
-          title={title ?? "Fund our project"}
+          title={title}
           isDataMissing={isDataMissing}
         />
         <GovernanceActionCardElement
           label={t("govActions.abstract")}
-          // TODO: Remove mock when possible
-          text={about ?? mockedLongText}
+          text={about}
           textVariant="twoLines"
           dataTestId="governance-action-abstract"
           isSliderCard

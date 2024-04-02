@@ -5,8 +5,8 @@ import { Tooltip, Typography } from "@atoms";
 import { useTranslation } from "@hooks";
 
 type GovernanceActionCardHeaderProps = {
-  title: string;
-  isDataMissing: boolean;
+  title?: string;
+  isDataMissing: string | boolean;
 };
 
 export const GovernanceActionCardHeader = ({
@@ -26,22 +26,17 @@ export const GovernanceActionCardHeader = ({
     >
       <Typography
         sx={{
-          fontSize: 22,
-          fontWeight: 400,
-          lineHeight: "28px",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          display: "-webkit-box",
-          WebkitBoxOrient: "vertical",
-          WebkitLineClamp: 2,
+          fontSize: 18,
+          fontWeight: 600,
+          lineHeight: "24px",
           ...(isDataMissing && { color: "#9E2323" }),
         }}
       >
-        {isDataMissing ? t("govActions.dataMissing") : title}
+        {isDataMissing || title}
       </Typography>
-      {isDataMissing && (
+      {isDataMissing && typeof isDataMissing === "string" && (
         <Tooltip
-          heading={t("govActions.dataMissing")}
+          heading={isDataMissing}
           paragraphOne={t("govActions.dataMissingTooltipExplanation")}
           placement="bottom-end"
           arrow

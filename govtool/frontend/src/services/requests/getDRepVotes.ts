@@ -1,4 +1,5 @@
-import { VotedProposal } from "@models";
+import { VotedProposal, VotedProposalToDisplay } from "@models";
+import { checkIsMissingGAMetadata } from "@utils";
 import { API } from "../API";
 
 export const getDRepVotes = async ({
@@ -23,7 +24,21 @@ export const getDRepVotes = async ({
   if (urlParameters.length) {
     urlParameters = urlParameters.replace("&", "?");
   }
-  const response = await API.get<VotedProposal[]>(`${urlBase}${urlParameters}`);
+  const { data } = await API.get<VotedProposal[]>(`${urlBase}${urlParameters}`);
 
-  return response.data;
+  const mappedData = (await Promise.all(
+    data.map(async (proposal) => {
+      const isDataMissing = await checkIsMissingGAMetadata({
+        hash: proposal?.proposal?.metadataHash,
+        url: proposal?.proposal?.url,
+      });
+
+      return {
+        vote: proposal.vote,
+        proposal: { ...proposal.proposal, isDataMissing },
+      };
+    }),
+  )) as VotedProposalToDisplay[];
+
+  return mappedData;
 };

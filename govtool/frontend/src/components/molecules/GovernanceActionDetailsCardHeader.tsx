@@ -3,18 +3,17 @@ import { Box } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { Share } from "@molecules";
-import { useTranslation } from "@hooks";
+import { GAMetedataErrors } from "@utils";
 
 type GovernanceActionDetailsCardHeaderProps = {
-  title: string;
-  isDataMissing: boolean;
+  title?: string;
+  isDataMissing: boolean | GAMetedataErrors;
 };
 
 export const GovernanceActionDetailsCardHeader = ({
   title,
   isDataMissing,
 }: GovernanceActionDetailsCardHeaderProps) => {
-  const { t } = useTranslation();
   const { pathname, hash } = useLocation();
 
   const govActionLinkToShare = `${window.location.protocol}//${
@@ -48,7 +47,7 @@ export const GovernanceActionDetailsCardHeader = ({
           }}
           variant="title2"
         >
-          {isDataMissing ? t("govActions.dataMissing") : title}
+          {isDataMissing || title}
         </Typography>
       </Box>
       <Share link={govActionLinkToShare} />

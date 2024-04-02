@@ -12,7 +12,7 @@ import { Slider } from "@organisms";
 type GovernanceActionsToVoteProps = {
   filters: string[];
   sorting: string;
-  proposals: { title: string; actions: ActionType[] }[];
+  proposals: { title: string; actions: ActionTypeToDsiplay[] }[];
   onDashboard?: boolean;
   searchPhrase?: string;
 };
@@ -51,15 +51,11 @@ export const GovernanceActionsToVote = ({
                   >
                     <GovernanceActionCard
                       {...action}
-                      txHash={action.txHash}
-                      index={action.index}
                       inProgress={
                         onDashboard &&
                         pendingTransaction.vote?.resourceId ===
                           `${action.txHash ?? ""}${action.index ?? ""}`
                       }
-                      // TODO: Add data validation
-                      isDataMissing={false}
                       onClick={() => {
                         if (
                           onDashboard &&
@@ -89,7 +85,10 @@ export const GovernanceActionsToVote = ({
                                   ),
                                 ),
                             {
-                              state: { ...action },
+                              state: {
+                                ...action,
+                                isDataMissing: action.isDataMissing,
+                              },
                             },
                           );
                         }

@@ -264,6 +264,25 @@ export const en = {
       walletNoCIP30Support: "Your wallet does not support CIP-30 extensions.",
       walletNoCIP90FunctionsEnabled:
         "Your wallet did not enable the needed CIP-95 functions during connection.",
+      gAMetadata: {
+        description: {
+          notVerifiable:
+            "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that the data stored by the Proposer does not match the data when the Governance Action was originally posted.",
+          dataMissing:
+            "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that GovTool cannot locate the data on the URL specified when the Governance Action was originally posted.",
+          incorrectFormat:
+            "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that the data stored by the Proposer does not match the data format as defined by the Cardano community.",
+        },
+        message: {
+          notVerifiable:
+            "The data that was originally used when this Governance Action was created has changed.",
+          dataMissing:
+            "The data that was originally used when this Governance Action was created has not been found.",
+          incorrectFormat:
+            "The data that was originally used when this Governance Action was created has been formatted incorrectly. ",
+        },
+        title: {},
+      },
     },
     footer: {
       copyright: "© 2023 Voltaire Gov Tool",

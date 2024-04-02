@@ -3,6 +3,7 @@ import { useInfiniteQuery } from "react-query";
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { getProposals, GetProposalsArguments } from "@services";
+import { checkIsMissingGAMetadata } from "@utils";
 
 export const useGetProposalsInfiniteQuery = ({
   filters = [],
@@ -12,8 +13,8 @@ export const useGetProposalsInfiniteQuery = ({
 }: GetProposalsArguments) => {
   const { dRepID, isEnabled, pendingTransaction } = useCardano();
 
-  const fetchProposals = ({ pageParam = 0 }) =>
-    getProposals({
+  const fetchProposals = async ({ pageParam = 0 }) => {
+    const data = await getProposals({
       dRepID,
       filters,
       page: pageParam,
@@ -21,6 +22,18 @@ export const useGetProposalsInfiniteQuery = ({
       searchPhrase,
       sorting,
     });
+    const mappedElements = await Promise.all(
+      data.elements.map(async (proposal: ActionType) => {
+        const isDataMissing = await checkIsMissingGAMetadata({
+          hash: proposal?.metadataHash ?? "",
+          url: proposal?.url ?? "",
+        });
+        return { ...proposal, isDataMissing };
+      }),
+    );
+
+    return { ...data, elements: mappedElements };
+  };
 
   const {
     data,
@@ -53,7 +66,7 @@ export const useGetProposalsInfiniteQuery = ({
 
   const proposals = data?.pages.flatMap(
     (page) => page.elements,
-  ) as ActionType[];
+  ) as ActionTypeToDsiplay[];
 
   return {
     proposalsfetchNextPage: fetchNextPage,

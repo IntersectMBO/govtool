@@ -1,16 +1,15 @@
 import { useMemo } from "react";
 import { Box, Typography, CircularProgress } from "@mui/material";
 
-import { GovernanceVotedOnCard } from "@molecules";
+import { useCardano } from "@context";
 import {
   useGetDRepVotesQuery,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
+import { GovernanceVotedOnCard } from "@molecules";
 import { Slider } from "@organisms";
-import { getProposalTypeLabel } from "@/utils/getProposalTypeLabel";
-import { getFullGovActionId } from "@/utils";
-import { useCardano } from "@/context";
+import { getFullGovActionId, getProposalTypeLabel } from "@utils";
 
 type DashboardGovernanceActionsVotedOnProps = {
   filters: string[];
@@ -77,8 +76,6 @@ export const DashboardGovernanceActionsVotedOn = ({
                   >
                     <GovernanceVotedOnCard
                       votedProposal={action}
-                      // TODO: Add data validation
-                      isDataMissing={false}
                       inProgress={
                         pendingTransaction.vote?.resourceId ===
                         action.proposal.txHash + action.proposal.index

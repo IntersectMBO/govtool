@@ -48,7 +48,7 @@ export const StatusModal = () => {
           textAlign="center"
           sx={{ fontSize: "16px", fontWeight: "400" }}
         >
-          {state?.message}
+          {state?.message}{" "}
           {state?.link && (
             <Link
               onClick={() => openInNewTab(state?.link || "")}

@@ -1,4 +1,4 @@
-# GovTool submission tool
+# GovTool metadata validation tool
 
 Installed on your machine:
 
@@ -16,7 +16,7 @@ Fill .env based on env.example file
 Go to the project directory
 
 ```bash
-cd govtool/submission-tool
+cd govtool/metadata-validation
 ```
 
 Install dependencies
@@ -91,7 +91,7 @@ yarn start:dev
 2. Build the image
 
 ```bash
-docker build -t submission-tool .
+docker build -t metadata-validation .
 ```
 
 3. Fill .env based on env.example file
@@ -99,7 +99,7 @@ docker build -t submission-tool .
 4. Run the container
 
 ```bash
-docker run -p 3000:3000 -d submission-tool
+docker run -p 3000:3000 -d metadata-validation
 ```
 
 ## After development

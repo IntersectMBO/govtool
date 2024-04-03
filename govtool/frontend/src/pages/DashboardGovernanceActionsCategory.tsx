@@ -57,11 +57,10 @@ export const DashboardGovernanceActionsCategory = () => {
     isProposalsFetching,
   );
 
-  const mappedData = useMemo(() => removeDuplicatedProposals(proposals), [
-    proposals,
-    voter?.isRegisteredAsDRep,
-    isProposalsFetchingNextPage,
-  ]);
+  const mappedData = useMemo(
+    () => removeDuplicatedProposals(proposals),
+    [proposals, voter?.isRegisteredAsDRep, isProposalsFetchingNextPage],
+  );
 
   return (
     <Background>
@@ -146,13 +145,10 @@ export const DashboardGovernanceActionsCategory = () => {
                   <Box pb={4.25} key={item.txHash + item.index}>
                     <GovernanceActionCard
                       {...item}
-                      index={item.index}
                       inProgress={
                         pendingTransaction.vote?.resourceId ===
                         `${item.txHash ?? ""}${item.index ?? ""}`
                       }
-                      // TODO: Add data validation
-                      isDataMissing={false}
                       onClick={() => {
                         saveScrollPosition();
 

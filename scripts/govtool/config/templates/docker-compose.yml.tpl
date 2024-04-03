@@ -208,6 +208,27 @@ services:
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
       - "traefik.http.services.backend.loadbalancer.server.port=9876"
 
+  metadata-validation:
+      build:
+        context: ../../govtool/metadata-validation
+      environment:
+        - PORT=3000
+      logging: *logging
+      restart: always
+      healthcheck:
+        test: ["CMD-SHELL", "curl -f 127.0.0.1:3000/health || exit 1"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.metadata-validation.rule=Host(`<DOMAIN>`) && PathPrefix(`/metadata-validation`)"
+        - "traefik.http.middlewares.metadata-validation-stripprefix.stripprefix.prefixes=/metadata-validation"
+        - "traefik.http.routers.metadata-validation.middlewares=metadata-validation-stripprefix@docker"
+        - "traefik.http.routers.metadata-validation.entrypoints=websecure"
+        - "traefik.http.routers.metadata-validation.tls.certresolver=myresolver"
+        - "traefik.http.services.metadata-validation.loadbalancer.server.port=3000"
+
   frontend:
     image: <REPO_URL>/frontend:${FRONTEND_TAG}
     volumes:

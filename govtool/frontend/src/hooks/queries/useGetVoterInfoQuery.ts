@@ -10,10 +10,12 @@ export const useGetVoterInfo = () => {
   const { data } = useQuery({
     queryKey: [
       QUERY_KEYS.useGetDRepInfoKey,
-      (pendingTransaction.registerAsDrep ||
-        pendingTransaction.registerAsSoleVoter ||
-        pendingTransaction.retireAsDrep ||
-        pendingTransaction.retireAsSoleVoter)?.transactionHash,
+      (
+        pendingTransaction?.registerAsDrep ||
+        pendingTransaction?.registerAsSoleVoter ||
+        pendingTransaction?.retireAsDrep ||
+        pendingTransaction?.retireAsSoleVoter
+      )?.transactionHash,
     ],
     enabled: !!dRepID,
     queryFn: () => getVoterInfo(dRepID),

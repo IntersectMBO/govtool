@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { generatePath, useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 import { KeenSliderOptions } from "keen-slider";
@@ -77,6 +77,19 @@ export const Slider = ({
     instanceRef.current?.moveToIdx(0);
   };
 
+  const onClickShowAll = useCallback(() => {
+    navigate(
+      generatePath(
+        onDashboard
+          ? PATHS.dashboardGovernanceActionsCategory
+          : PATHS.governanceActionsCategory,
+        {
+          category: navigateKey,
+        },
+      ),
+    );
+  }, [navigate, onDashboard]);
+
   useEffect(() => {
     if (instanceRef.current) {
       setIsSliderInitialized(true);
@@ -89,7 +102,7 @@ export const Slider = ({
     filters,
     sorting,
     searchPhrase,
-    pendingTransaction.vote?.resourceId,
+    pendingTransaction?.vote?.resourceId,
     data,
   ]);
 
@@ -126,21 +139,7 @@ export const Slider = ({
                 minWidth: 93,
                 "&:hover": { backgroundColor: arcticWhite },
               }}
-              onClick={() => {
-                if (onDashboard) {
-                  navigate(
-                    generatePath(PATHS.dashboardGovernanceActionsCategory, {
-                      category: navigateKey,
-                    }),
-                  );
-                } else {
-                  navigate(
-                    generatePath(PATHS.governanceActionsCategory, {
-                      category: navigateKey,
-                    }),
-                  );
-                }
-              }}
+              onClick={onClickShowAll}
             >
               {t("slider.showAll")}
             </Button>

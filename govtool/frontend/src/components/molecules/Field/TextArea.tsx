@@ -56,13 +56,6 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
       [handleBlur, handleFocus],
     );
 
-    const getCounterBottomSxValue = () => {
-      if (props.isModifiedLayout && errorMessage) return 30;
-      if (props.isModifiedLayout) return 10;
-      if (errorMessage) return 52.5;
-      return 35;
-    };
-
     return (
       <Box
         sx={{
@@ -83,12 +76,31 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
             {label}
           </Typography>
         )}
-        <TextAreaBase
-          errorMessage={errorMessage}
-          maxLength={maxLength}
-          {...props}
-          ref={textAreaRef}
-        />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            position: "relative",
+          }}
+        >
+          <TextAreaBase
+            errorMessage={errorMessage}
+            maxLength={maxLength}
+            {...props}
+            ref={textAreaRef}
+          />
+          <Typography
+            color="#8E908E"
+            sx={{
+              bottom: 12,
+              position: "absolute",
+              right: 14,
+            }}
+            variant="caption"
+          >
+            {props?.value?.toString()?.length ?? 0}/{maxLength}
+          </Typography>
+        </Box>
         <FormHelpfulText
           helpfulText={helpfulText}
           helpfulTextStyle={helpfulTextStyle}
@@ -97,17 +109,6 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
           errorMessage={errorMessage}
           errorStyles={errorStyles}
         />
-        <Typography
-          color="#8E908E"
-          sx={{
-            bottom: getCounterBottomSxValue(),
-            position: "absolute",
-            right: 15,
-          }}
-          variant="caption"
-        >
-          {props?.value?.toString()?.length ?? 0}/{maxLength}
-        </Typography>
       </Box>
     );
   },

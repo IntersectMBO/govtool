@@ -7,7 +7,7 @@ import { ValidateMetadataResult } from './types/validateMetadata';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('validate-metadata')
+  @Get('validate')
   validateMetadata(
     @Body() validateMetadataDto: ValidateMetadataDTO,
   ): Promise<ValidateMetadataResult> {

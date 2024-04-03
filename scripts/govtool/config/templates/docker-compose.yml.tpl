@@ -223,10 +223,12 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.metadata-validation.rule=Host(`<DOMAIN>`) && PathPrefix(`/metadata-validation`)"
+        - "traefik.http.middlewares.metadata-validation-stripprefix.stripprefix.prefixes=/metadata-validation"
+        - "traefik.http.routers.metadata-validation.middlewares=metadata-validation-stripprefix@docker"
         - "traefik.http.routers.metadata-validation.entrypoints=websecure"
         - "traefik.http.routers.metadata-validation.tls.certresolver=myresolver"
         - "traefik.http.services.metadata-validation.loadbalancer.server.port=3000"
-  
+
   frontend:
     image: <REPO_URL>/frontend:${FRONTEND_TAG}
     volumes:

@@ -1,15 +1,16 @@
 import { useNavigate } from "react-router-dom";
+import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
+import { PendingTransaction } from "@context";
 import { useTranslation } from "@hooks";
+import { VoterInfo } from "@models";
 import {
   CopyableInfo,
   DashboardActionCard,
   DashboardActionCardProps,
 } from "@molecules";
-import { openInNewTab } from "@utils";
-import { PendingTransaction } from "@/context/pendingTransaction";
-import { VoterInfo } from "@/models";
+import { correctAdaFormat, openInNewTab } from "@utils";
 
 type DRepDashboardCardProps = {
   dRepIDBech32: string;
@@ -31,29 +32,37 @@ export const DRepDashboardCard = ({
     pendingTransaction.updateMetaData
   );
 
+  const learnMoreButton = {
+    children: t("learnMore"),
+    dataTestId: "register-learn-more-button",
+    onClick: () =>
+      openInNewTab(
+        "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
+      ),
+  };
+
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress
     if (inProgress) {
       return {
-        buttons: [
-          {
-            children: t("seeTransaction"),
-            onClick: () =>
-              openInNewTab("https://adanordic.com/latest_transactions"),
-          },
-        ],
+        buttons: [learnMoreButton],
         state: "inProgress",
         ...(pendingTransaction.registerAsDrep && {
-          description: t("dashboard.registration.registrationInProgress"),
-          title: t("dashboard.registration.dRepRegistration"),
+          description: t("dashboard.cards.drep.registrationInProgress"),
+          title: t("dashboard.cards.drep.dRepRegistration"),
         }),
         ...(pendingTransaction.retireAsDrep && {
-          description: t("dashboard.registration.retirementInProgress"),
-          title: t("dashboard.registration.dRepRetirement"),
+          description: (
+            <Trans
+              i18nKey="dashboard.cards.drep.retirementInProgress"
+              values={{ deposit: correctAdaFormat(voter?.deposit) }}
+            />
+          ),
+          title: t("dashboard.cards.drep.dRepRetirement"),
         }),
         ...(pendingTransaction.updateMetaData && {
-          description: t("dashboard.registration.metadataUpdateInProgress"),
-          title: t("dashboard.registration.dRepUpdate"),
+          description: t("dashboard.cards.drep.metadataUpdateInProgress"),
+          title: t("dashboard.cards.drep.dRepUpdate"),
         }),
       };
     }
@@ -63,20 +72,23 @@ export const DRepDashboardCard = ({
       return {
         buttons: [
           {
-            children: t("dashboard.registration.retire"),
-            dataTestId: "retire-button",
-            onClick: () => navigate(PATHS.retireAsDrep),
+            children: t("dashboard.cards.drep.viewDetails"),
+            dataTestId: "view-drep-details-button",
+            // TODO: change navigation to drep explorer
+            onClick: () => navigate("/"),
+            variant: "outlined",
+            sx: { backgroundColor: "arcticWhite" },
           },
           {
-            children: t("dashboard.registration.changeMetadata"),
-            dataTestId: "change-metadata-button",
-            onClick: () => navigate(PATHS.editDrepMetadata),
+            children: t("dashboard.cards.drep.retire"),
+            dataTestId: "retire-button",
+            onClick: () => navigate(PATHS.retireAsDrep),
             variant: "text",
           },
         ],
-        description: t("dashboard.registration.holdersCanDelegate"),
+        description: t("dashboard.cards.drep.registeredDescription"),
         state: "active",
-        title: t("dashboard.registration.youAreRegistered"),
+        title: t("dashboard.cards.drep.registeredTitle"),
       };
     }
 
@@ -86,49 +98,49 @@ export const DRepDashboardCard = ({
         {
           children: t(
             voter.wasRegisteredAsDRep
-              ? "dashboard.registration.reRegister"
-              : "dashboard.registration.register",
+              ? "dashboard.cards.drep.reRegister"
+              : "dashboard.cards.drep.register",
           ),
           dataTestId: "register-button",
           onClick: () => navigate(PATHS.registerAsdRep),
           variant: "contained",
         },
-        {
-          children: t("learnMore"),
-          dataTestId: "register-learn-more-button",
-          onClick: () =>
-            openInNewTab(
-              "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
-            ),
-        },
+        learnMoreButton,
       ];
 
     // was registered
     if (voter?.wasRegisteredAsDRep) {
       return {
         buttons: wasRegisteredOrNotRegisteredButtons,
-        description: t("dashboard.registration.holdersCanDelegate"),
-        title: t("dashboard.registration.registerAgain"),
+        description: (
+          <Trans i18nKey="dashboard.cards.drep.notRegisteredWasRegisteredDescription" />
+        ),
+        title: t("dashboard.cards.drep.notRegisteredWasRegisteredTitle"),
       };
     }
 
     // not registered
     return {
       buttons: wasRegisteredOrNotRegisteredButtons,
-      description: t("dashboard.registration.ifYouWant"),
-      title: t("dashboard.registration.registerAsDRep"),
+      description: t("dashboard.cards.drep.notRegisteredDescription"),
+      title: t("dashboard.cards.drep.notRegisteredTitle"),
     };
   })();
 
   return (
     <DashboardActionCard
       imageURL={IMAGES.govActionRegisterImage}
+      transactionId={
+        pendingTransaction.registerAsDrep?.transactionHash ||
+        pendingTransaction.retireAsDrep?.transactionHash
+      }
       {...cardProps}
     >
-      {(voter?.isRegisteredAsDRep || voter?.wasRegisteredAsDRep) && (
+      {voter?.isRegisteredAsDRep && !pendingTransaction?.retireAsDrep && (
         <CopyableInfo
           dataTestId="my-drep-id"
-          label={t("myDRepId")}
+          label={t("dashboard.cards.drep.yourDRepId")}
+          sx={{ mt: 1 }}
           value={dRepIDBech32}
         />
       )}

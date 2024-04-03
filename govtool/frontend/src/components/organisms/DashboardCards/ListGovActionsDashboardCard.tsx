@@ -3,13 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { IMAGES, PATHS } from "@consts";
 import { useTranslation } from "@hooks";
 import { DashboardActionCard } from "@molecules";
-import { VoterInfo } from "@/models";
+import { openInNewTab } from "@utils";
 
-type ListGovActionsDashboardCardsProps = {
-  voter: VoterInfo;
-};
-
-export const ListGovActionsDashboardCards = ({ voter }: ListGovActionsDashboardCardsProps) => {
+export const ListGovActionsDashboardCards = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -17,18 +13,21 @@ export const ListGovActionsDashboardCards = ({ voter }: ListGovActionsDashboardC
     <DashboardActionCard
       buttons={[
         {
-          children: t(
-            `dashboard.govActions.${
-              voter?.isRegisteredAsDRep ? "reviewAndVote" : "view"
-            }`
-          ),
+          children: t("dashboard.cards.govActions.title"),
           dataTestId: "view-governance-actions-button",
           onClick: () => navigate(PATHS.dashboardGovernanceActions),
+          variant: "contained",
+        },
+        {
+          children: t("learnMore"),
+          dataTestId: "learn-more-governance-actions-button",
+          onClick: () => openInNewTab("https://sancho.network/actions"),
+          variant: "outlined",
         },
       ]}
-      description={t("dashboard.govActions.description")}
+      description={t("dashboard.cards.govActions.description")}
       imageURL={IMAGES.govActionListImage}
-      title={t("dashboard.govActions.title")}
+      title={t("dashboard.cards.govActions.title")}
     />
   );
 };

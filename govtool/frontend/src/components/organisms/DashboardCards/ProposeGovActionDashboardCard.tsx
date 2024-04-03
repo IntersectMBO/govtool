@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 
 import { IMAGES, PATHS } from "@consts";
+import { PendingTransaction } from "@context";
 import { useTranslation } from "@hooks";
 import { DashboardActionCard } from "@molecules";
 import { openInNewTab } from "@utils";
-import { PendingTransaction } from "@/context/pendingTransaction";
 
 type ProposeGovActionDashboardCardProps = {
   createGovActionTx: PendingTransaction["createGovAction"];
@@ -20,38 +20,40 @@ export const ProposeGovActionDashboardCard = ({
     <DashboardActionCard
       buttons={[
         ...(createGovActionTx
-          // transaction in progress
-          ? [
+          ? // transaction in progress
+            [
               {
-                children: t("dashboard.proposeGovernanceAction.view"),
+                children: t("dashboard.cards.proposeGovernanceAction.view"),
                 dataTestId: "propose-governance-actions-button",
                 onClick: () => navigate(PATHS.dashboardGovernanceActions),
                 variant: "contained",
               } as const,
-          ]
-          // default
-          : [
+            ]
+          : // default
+            [
               {
-                children: t("dashboard.proposeGovernanceAction.propose"),
+                children: t("dashboard.cards.proposeGovernanceAction.propose"),
                 dataTestId: "propose-governance-actions-button",
                 onClick: () => navigate(PATHS.createGovernanceAction),
                 variant: "contained",
               } as const,
-          ]),
+            ]),
         // common
         {
           children: t("learnMore"),
           dataTestId: "learn-more-button",
           onClick: () =>
             openInNewTab(
-              "https://docs.sanchogov.tools/faqs/what-is-a-governance-action"
+              "https://docs.sanchogov.tools/faqs/what-is-a-governance-action",
             ),
         },
       ]}
-      description={t("dashboard.proposeGovernanceAction.description")}
+      description={t("dashboard.cards.proposeGovernanceAction.description")}
       imageURL={IMAGES.proposeGovActionImage}
+      isInProgressOnCard={false}
+      transactionId={createGovActionTx?.transactionHash}
       state={createGovActionTx ? "inProgress" : "default"}
-      title={t("dashboard.proposeGovernanceAction.title")}
+      title={t("dashboard.cards.proposeGovernanceAction.title")}
     />
   );
 };

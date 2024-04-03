@@ -2,20 +2,26 @@ import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
+import { PendingTransaction } from "@context";
 import { useTranslation } from "@hooks";
-import { DashboardActionCard, DashboardActionCardProps } from "@molecules";
+import {
+  DashboardActionCard,
+  DashboardActionCardProps,
+  SoleVoterAction,
+} from "@molecules";
 import { correctAdaFormat, openInNewTab } from "@utils";
 import { LoadingButtonProps } from "@atoms";
-import { PendingTransaction } from "@/context/pendingTransaction";
-import { VoterInfo } from "@/models";
+import { VoterInfo } from "@models";
 
 type SoleVoterDashboardCardProps = {
+  dRepIDBech32: string;
   pendingTransaction: PendingTransaction;
   voter: VoterInfo;
   votingPower: number;
 };
 
 export const SoleVoterDashboardCard = ({
+  dRepIDBech32,
   pendingTransaction,
   voter,
   votingPower,
@@ -25,6 +31,19 @@ export const SoleVoterDashboardCard = ({
 
   const ada = correctAdaFormat(votingPower);
 
+  // TODO: Add navigation to DRep explorer
+  const onClickAction = () => navigate("/");
+
+  // learn more button
+  const learnMoreButton: LoadingButtonProps = {
+    children: t("learnMore"),
+    dataTestId: "learn-more-button",
+    onClick: () =>
+      openInNewTab(
+        "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
+      ),
+  };
+
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress
     if (
@@ -32,50 +51,40 @@ export const SoleVoterDashboardCard = ({
       !!pendingTransaction.retireAsSoleVoter
     ) {
       return {
-        buttons: [
-          {
-            children: t("seeTransaction"),
-            dataTestId: "see-transaction-button",
-            onClick: () =>
-              openInNewTab("https://adanordic.com/latest_transactions"),
-          },
-        ],
+        buttons: [learnMoreButton],
         state: "inProgress",
         ...(pendingTransaction.registerAsSoleVoter && {
-          description: t("dashboard.soleVoter.registrationInProgress"),
-          title: t("dashboard.soleVoter.registration"),
+          description: t("dashboard.cards.soleVoter.registrationInProgress"),
+          title: t("dashboard.cards.soleVoter.registration"),
+          transactionId: pendingTransaction.registerAsSoleVoter.resourceId,
         }),
         ...(pendingTransaction.retireAsSoleVoter && {
-          description: t("dashboard.soleVoter.retirementInProgress"),
-          title: t("dashboard.soleVoter.retirement"),
+          description: t("dashboard.cards.soleVoter.retirementInProgress"),
+          title: t("dashboard.cards.soleVoter.retirement"),
         }),
       };
     }
-
-    // learn more button
-    const learnMoreButton: LoadingButtonProps = {
-      children: t("learnMore"),
-      dataTestId: "learn-more-button",
-      onClick: () =>
-        openInNewTab(
-          "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep"
-        ),
-    };
 
     // currently registered
     if (voter?.isRegisteredAsSoleVoter) {
       return {
         buttons: [
           {
-            children: t("dashboard.soleVoter.retire"),
+            children: t("dashboard.cards.soleVoter.retire"),
             dataTestId: "retire-as-sole-voter-button",
             onClick: () => navigate(PATHS.retireAsSoleVoter),
+            sx: { backgroundColor: "arcticWhite" },
           },
-          learnMoreButton,
+          { ...learnMoreButton, variant: "text" },
         ],
-        description: <Trans i18nKey="dashboard.soleVoter.isRegisteredDescription" values={{ votingPower: ada }} />,
+        description: (
+          <Trans
+            i18nKey="dashboard.cards.soleVoter.isRegisteredDescription"
+            values={{ votingPower: ada }}
+          />
+        ),
         state: "active",
-        title: t("dashboard.soleVoter.youAreSoleVoterTitle"),
+        title: t("dashboard.cards.soleVoter.youAreSoleVoterTitle"),
       };
     }
 
@@ -84,14 +93,20 @@ export const SoleVoterDashboardCard = ({
       return {
         buttons: [
           {
-            children: t("dashboard.soleVoter.reRegister"),
+            children: t("dashboard.cards.soleVoter.reRegister"),
             dataTestId: "register-as-sole-voter-button",
             onClick: () => navigate(PATHS.registerAsSoleVoter),
+            variant: "contained",
           },
           learnMoreButton,
         ],
-        description: <Trans i18nKey="dashboard.soleVoter.wasRegisteredDescription" values={{ votingPower: ada }} />,
-        title: t("dashboard.soleVoter.wasSoleVoterTitle"),
+        description: (
+          <Trans
+            i18nKey="dashboard.cards.soleVoter.wasRegisteredDescription"
+            values={{ votingPower: ada }}
+          />
+        ),
+        title: t("dashboard.cards.soleVoter.wasSoleVoterTitle"),
       };
     }
 
@@ -99,19 +114,41 @@ export const SoleVoterDashboardCard = ({
     return {
       buttons: [
         {
-          children: t("dashboard.soleVoter.register"),
+          children: t("dashboard.cards.soleVoter.register"),
           dataTestId: "register-as-sole-voter-button",
           onClick: () => navigate(PATHS.registerAsSoleVoter),
           variant: "contained",
         },
         learnMoreButton,
       ],
-      description: <Trans i18nKey="dashboard.soleVoter.registerDescription" values={{ votingPower: ada }} />,
-      title: t("dashboard.soleVoter.registerTitle"),
+      description: (
+        <Trans
+          i18nKey="dashboard.cards.soleVoter.registerDescription"
+          values={{ votingPower: ada }}
+        />
+      ),
+      title: t("dashboard.cards.soleVoter.registerTitle"),
     };
   })();
 
   return (
-    <DashboardActionCard imageURL={IMAGES.soleVoterImage} {...cardProps} />
+    <DashboardActionCard
+      imageURL={IMAGES.soleVoterImage}
+      {...cardProps}
+      // TODO: add transaction which registes ada holder as sole voter as well
+      transactionId={
+        pendingTransaction?.registerAsSoleVoter?.transactionHash ||
+        pendingTransaction?.retireAsSoleVoter?.transactionHash
+      }
+    >
+      {(pendingTransaction?.registerAsSoleVoter ||
+        voter.isRegisteredAsSoleVoter) && (
+        <SoleVoterAction
+          dRepId={dRepIDBech32}
+          onClickArrow={onClickAction}
+          sx={{ mt: 1.5 }}
+        />
+      )}
+    </DashboardActionCard>
   );
 };

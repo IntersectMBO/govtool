@@ -1,19 +1,22 @@
-import { Box, Typography } from "@mui/material";
+import { Box, SxProps, Typography } from "@mui/material";
 
 import { CopyButton } from "@atoms";
+import { gray } from "@consts";
+
 import { Card } from "./Card";
-import { gray } from "@/consts";
 
 type CopyableInfoProps = {
   dataTestId?: string;
   label: string;
   value: string;
+  sx?: SxProps;
 };
 
 export const CopyableInfo = ({
   dataTestId,
   label,
   value,
+  sx,
 }: CopyableInfoProps) => (
   <Card
     border
@@ -24,24 +27,23 @@ export const CopyableInfo = ({
       py: 1,
       borderColor: gray.c100,
       backgroundColor: (theme) => theme.palette.neutralWhite,
+      ...sx,
     }}
   >
+    <Typography color={gray.c300} fontSize={12} fontWeight={500}>
+      {label}
+    </Typography>
     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-      <Typography color={gray.c300} fontSize={12} fontWeight={500}>
-        {label}
-      </Typography>
-      <CopyButton text={value} />
-    </Box>
-    <Box display="flex" flexDirection="row" alignItems="center">
       <Typography
         textOverflow="ellipsis"
         overflow="hidden"
         fontSize={14}
         fontWeight={500}
-        maxWidth="calc(100% - 1.5rem)"
+        width="90%"
       >
         {value}
       </Typography>
+      <CopyButton text={value} />
     </Box>
   </Card>
 );

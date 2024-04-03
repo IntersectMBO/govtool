@@ -22,9 +22,9 @@ export const DashboardCards = () => {
   const { voter } = useGetVoterInfo();
 
   if (
-    currentDelegation === undefined
-    || votingPower === undefined
-    || voter === undefined
+    currentDelegation === undefined ||
+    votingPower === undefined ||
+    voter === undefined
   ) {
     return (
       <Box
@@ -72,12 +72,13 @@ export const DashboardCards = () => {
       />
 
       <SoleVoterDashboardCard
+        dRepIDBech32={dRepIDBech32}
         pendingTransaction={pendingTransaction}
         voter={voter}
         votingPower={votingPower}
       />
 
-      <ListGovActionsDashboardCards voter={voter} />
+      <ListGovActionsDashboardCards />
 
       <ProposeGovActionDashboardCard
         createGovActionTx={pendingTransaction.createGovAction}

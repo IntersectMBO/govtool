@@ -15,12 +15,10 @@ import {
   storageInformationErrorModals,
 } from "@consts";
 import { useCardano, useModal } from "@context";
-import {
-  canonizeJSON,
-  downloadJson,
-  generateJsonld,
-  validateMetadataHash,
-} from "@utils";
+import { canonizeJSON, downloadJson, generateJsonld } from "@utils";
+import { MetadataValidationStatus } from "@models";
+
+import { useValidateMutation } from "../mutations";
 
 export type EditDRepInfoValues = {
   bio?: string;
@@ -43,6 +41,7 @@ export const defaultEditDRepInfoValues: EditDRepInfoValues = {
 export const useEditDRepInfoForm = (
   setStep?: Dispatch<SetStateAction<number>>,
 ) => {
+  const { validateMetadata } = useValidateMutation();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -113,21 +112,23 @@ export const useEditDRepInfoForm = (
   };
 
   const validateHash = useCallback(
-    async (storingUrl: string) => {
+    async (url: string) => {
       try {
         if (!hash) throw new Error(MetadataHashValidationErrors.INVALID_HASH);
 
-        await validateMetadataHash(storingUrl, hash);
+        const result = await validateMetadata({ url, hash });
+
+        if (result.status) {
+          throw result.status;
+        }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        if (
-          Object.values(MetadataHashValidationErrors).includes(error.message)
-        ) {
+        if (Object.values(MetadataValidationStatus).includes(error)) {
           openModal({
             type: "statusModal",
             state: {
               ...storageInformationErrorModals[
-                error.message as MetadataHashValidationErrors
+                error as MetadataValidationStatus
               ],
               onSubmit: backToForm,
               onCancel: backToDashboard,

@@ -36,23 +36,23 @@ jobs:
       - name: Run build  and lighthouse task
         working-directory: ./govtool/frontend
         run: |
-            npm install
-            VITE_BASE_URL=https://staging.govtool.byron.network/api npm run build
-            lhci collect
+          npm install
+          VITE_BASE_URL=https://staging.govtool.byron.network/ npm run build
+          lhci collect
 
       - name: Evaluate reports
         if: github.repository_owner != 'IntersectMBO'
         run: |
-            lhci assert  --preset "lighthouse:recommended"
+          lhci assert  --preset "lighthouse:recommended"
 
       - name: Publish reports
         working-directory: ./govtool/frontend
         if: github.repository_owner == 'IntersectMBO'
         run: |
-            lhci assert  --preset lighthouse:recommended || echo "LightHouse Assertion error ignored ..."
-            lhci upload --githubAppToken="${{ secrets.LHCI_GITHUB_APP_TOKEN }}" --token="${{ secrets.LHCI_SERVER_TOKEN }}" --serverBaseUrl=https://lighthouse.cardanoapi.io --ignoreDuplicateBuildFailure
-            curl -X POST https://ligththouse.cardanoapi.io/api/metrics/build-reports \
-              -d "@./lighthouseci/$(ls ./.lighthouseci |grep 'lhr.*\.json' | head -n 1)" \
-              -H "commit-hash: $(git rev-parse HEAD)" \
-              -H "secret-token: ${{ secrets.METRICS_SERVER_SECRET_TOKEN }}" \
-              -H 'Content-Type: application/json' || echo "Metric Upload error ignored ..."
+          lhci assert  --preset lighthouse:recommended || echo "LightHouse Assertion error ignored ..."
+          lhci upload --githubAppToken="${{ secrets.LHCI_GITHUB_APP_TOKEN }}" --token="${{ secrets.LHCI_SERVER_TOKEN }}" --serverBaseUrl=https://lighthouse.cardanoapi.io --ignoreDuplicateBuildFailure
+          curl -X POST https://ligththouse.cardanoapi.io/api/metrics/build-reports \
+            -d "@./lighthouseci/$(ls ./.lighthouseci |grep 'lhr.*\.json' | head -n 1)" \
+            -H "commit-hash: $(git rev-parse HEAD)" \
+            -H "secret-token: ${{ secrets.METRICS_SERVER_SECRET_TOKEN }}" \
+            -H 'Content-Type: application/json' || echo "Metric Upload error ignored ..."

@@ -1,4 +1,4 @@
-import { Controller, Get, Body } from '@nestjs/common';
+import { Controller, Body, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ValidateMetadataDTO } from './dto/validateMetadata.dto';
 import { ValidateMetadataResult } from './types/validateMetadata';
@@ -7,7 +7,7 @@ import { ValidateMetadataResult } from './types/validateMetadata';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('validate')
+  @Post('validate')
   validateMetadata(
     @Body() validateMetadataDto: ValidateMetadataDTO,
   ): Promise<ValidateMetadataResult> {

@@ -10,6 +10,8 @@ changes.
 
 ## [Unreleased]
 
+- Integrate frontend with metadata validation service [Issue 617](https://github.com/IntersectMBO/govtool/issues/617)
+
 ### Added
 
 - added `epochNo` and `date` to `drep/getVotes` and `proposal/get`

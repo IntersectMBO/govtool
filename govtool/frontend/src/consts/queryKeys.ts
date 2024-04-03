@@ -10,3 +10,7 @@ export const QUERY_KEYS = {
   useGetDRepInfoKey: "useGetDRepInfoKey",
   useGetVoteContextFromFile: "useGetVoteContextFromFile",
 };
+
+export const MUTATION_KEYS = {
+  postValidateKey: "postValidateKey",
+};

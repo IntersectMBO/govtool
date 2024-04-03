@@ -10,18 +10,15 @@ import {
   CIP_100,
   CIP_QQQ,
   DREP_CONTEXT,
-  MetadataHashValidationErrors,
   PATHS,
   storageInformationErrorModals,
 } from "@consts";
 import { useCardano, useModal } from "@context";
-import {
-  canonizeJSON,
-  downloadJson,
-  generateJsonld,
-  validateMetadataHash,
-} from "@utils";
+import { MetadataValidationStatus } from "@models";
+import { canonizeJSON, downloadJson, generateJsonld } from "@utils";
+
 import { useGetVoterInfo } from "..";
+import { useValidateMutation } from "../mutations";
 
 export type RegisterAsDRepValues = {
   bio?: string;
@@ -44,6 +41,7 @@ export const defaultRegisterAsDRepValues: RegisterAsDRepValues = {
 export const useRegisterAsdRepForm = (
   setStep?: Dispatch<SetStateAction<number>>,
 ) => {
+  const { validateMetadata } = useValidateMutation();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -116,21 +114,27 @@ export const useRegisterAsdRepForm = (
   };
 
   const validateHash = useCallback(
-    async (storingUrl: string) => {
+    async (url: string) => {
       try {
-        if (!hash) throw new Error(MetadataHashValidationErrors.INVALID_HASH);
+        if (!hash) throw new Error(MetadataValidationStatus.INVALID_HASH);
 
-        await validateMetadataHash(storingUrl, hash);
+        const result = await validateMetadata({ url, hash });
+
+        if (result.status) {
+          throw result.status;
+        }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         if (
-          Object.values(MetadataHashValidationErrors).includes(error.message)
+          Object.values(MetadataValidationStatus).includes(
+            error as MetadataValidationStatus,
+          )
         ) {
           openModal({
             type: "statusModal",
             state: {
               ...storageInformationErrorModals[
-                error.message as MetadataHashValidationErrors
+                error as MetadataValidationStatus
               ],
               onSubmit: backToForm,
               onCancel: backToDashboard,

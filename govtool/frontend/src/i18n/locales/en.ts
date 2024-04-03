@@ -714,6 +714,7 @@ export const en = {
     inProgress: "In Progress",
     learnMore: "Learn more",
     loading: "Loading...",
+    myDRepId: "My dRep ID:",
     nextStep: "Next step",
     no: "No",
     ok: "Ok",

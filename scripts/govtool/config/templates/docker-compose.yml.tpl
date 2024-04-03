@@ -213,8 +213,8 @@ services:
         context: ../../govtool/metadata-validation
       environment:
         - PORT=3000
-        logging: *logging
-        restart: always
+      logging: *logging
+      restart: always
       healthcheck:
         test: ["CMD-SHELL", "curl -f 127.0.0.1:3000/health || exit 1"]
         interval: 5s

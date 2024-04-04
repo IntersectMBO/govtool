@@ -5,7 +5,11 @@ import { Box, CircularProgress, Link } from "@mui/material";
 import { Background, Typography } from "@atoms";
 import { GOVERNANCE_ACTIONS_SORTING, ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
-import { DataActionsBar, GovernanceActionCard } from "@molecules";
+import {
+  DataActionsBar,
+  EmptyStateGovernanceActionsCategory,
+  GovernanceActionCard,
+} from "@molecules";
 import { Footer, TopNav } from "@organisms";
 import {
   useGetProposalsInfiniteQuery,
@@ -116,33 +120,10 @@ export const GovernanceActionsCategory = () => {
             </Typography>
             {!isProposalsLoading ? (
               !mappedData?.length ? (
-                <Typography fontWeight={300} sx={{ py: 4 }}>
-                  <Box mt={4} display="flex" flexWrap="wrap">
-                    <Typography fontWeight={300}>
-                      {t("govActions.withCategoryNotExist.partOne")}
-                      &nbsp;
-                    </Typography>
-                    <Typography fontWeight={700}>
-                      {category}
-                      &nbsp;
-                    </Typography>
-                    {debouncedSearchText && (
-                      <>
-                        <Typography fontWeight={300}>
-                          {t("govActions.withCategoryNotExist.optional")}
-                          &nbsp;
-                        </Typography>
-                        <Typography fontWeight={700}>
-                          {debouncedSearchText}
-                        </Typography>
-                      </>
-                    )}
-                    <Typography fontWeight={300}>
-                      &nbsp;
-                      {t("govActions.withCategoryNotExist.partTwo")}
-                    </Typography>
-                  </Box>
-                </Typography>
+                <EmptyStateGovernanceActionsCategory
+                  category={category}
+                  isSearch={!!debouncedSearchText.length}
+                />
               ) : (
                 <Box
                   columnGap="20px"

@@ -21,3 +21,8 @@ export type SoleVoterActionProps = {
   onClickArrow: () => void;
   sx?: SxProps;
 };
+
+export type EmptyStateGovernanceActionsCategoryProps = {
+  category?: string;
+  isSearch?: boolean;
+};

@@ -60,7 +60,7 @@ export const HomeCards = () => {
           ? "repeat(1, minmax(300px, 866px))"
           : "repeat(2, minmax(300px, 866px))"
       }
-      justifyItems="center"
+      justifyContent="center"
       mb={screenWidth < 640 ? 10 : 17}
       mt={screenWidth < 640 ? 10 : 14.5}
       px={

@@ -32,7 +32,19 @@ export const Hero = () => {
       flexDirection="row"
       overflow="visible"
       position="relative"
-      px={screenWidth < 640 ? 3 : screenWidth < 1512 ? 10 : 14}
+      px={
+        screenWidth < 640
+          ? 3
+          : screenWidth < 1512
+          ? 9.375
+          : screenWidth < 1728
+          ? 14
+          : screenWidth < 1920
+          ? 27.375
+          : screenWidth < 2560
+          ? 39.375
+          : 49.25
+      }
     >
       <Box alignItems="center" flex={1} height="min-content">
         <Typography
@@ -82,13 +94,13 @@ export const Hero = () => {
         flex={1}
         position="absolute"
         right={
-          screenWidth >= 1728
-            ? IMAGE_SIZE / 8
-            : screenWidth >= 1512
-            ? -(IMAGE_SIZE / 12)
-            : screenWidth >= 860
-            ? -(IMAGE_SIZE / 8)
-            : -(IMAGE_SIZE / 4)
+          screenWidth <= 860
+            ? -(IMAGE_SIZE / 4)
+            : screenWidth <= 1440
+            ? -(IMAGE_SIZE / 15)
+            : screenWidth <= 1728
+            ? screenWidth / 20
+            : screenWidth / 11
         }
         top={-80}
         zIndex={-1}

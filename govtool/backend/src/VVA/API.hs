@@ -256,6 +256,7 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
                       || searchQuery `isInfixOf` about
                       || searchQuery `isInfixOf` motivation
                       || searchQuery `isInfixOf` rationale
+                      || searchQuery `isInfixOf` ((unHexText proposalResponseTxHash) <> "#" <> (Text.pack $ show proposalResponseIndex))
 
           pure result
 

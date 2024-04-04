@@ -15,3 +15,9 @@ export type StepProps = {
   componentsLayoutStyles?: SxProps;
   layoutStyles?: SxProps;
 };
+
+export type SoleVoterActionProps = {
+  dRepId: string;
+  onClickArrow: () => void;
+  sx?: SxProps;
+};

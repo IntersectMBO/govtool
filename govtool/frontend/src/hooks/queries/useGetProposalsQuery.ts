@@ -4,6 +4,7 @@ import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { getProposals, GetProposalsArguments } from "@services";
 import { checkIsMissingGAMetadata } from "@utils";
+import { useGetVoterInfo } from ".";
 
 export const useGetProposalsQuery = ({
   filters = [],
@@ -11,11 +12,20 @@ export const useGetProposalsQuery = ({
   sorting,
 }: GetProposalsArguments) => {
   const { dRepID, pendingTransaction } = useCardano();
+  const { voter } = useGetVoterInfo();
 
   const fetchProposals = async (): Promise<ActionTypeToDsiplay[]> => {
     const allProposals = await Promise.all(
       filters.map((filter) =>
-        getProposals({ dRepID, filters: [filter], searchPhrase, sorting }),
+        getProposals({
+          dRepID:
+            voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
+              ? dRepID
+              : undefined,
+          filters: [filter],
+          searchPhrase,
+          sorting,
+        }),
       ),
     );
 

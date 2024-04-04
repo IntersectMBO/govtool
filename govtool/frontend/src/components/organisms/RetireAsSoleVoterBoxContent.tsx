@@ -22,7 +22,6 @@ export const RetireAsSoleVoterBoxContent = () => {
           mt: isMobile ? 4 : 10,
           textAlign: "center",
           whiteSpace: "pre-line",
-          textDecoration: "underline",
         }}
         variant="body1"
       >
@@ -32,7 +31,7 @@ export const RetireAsSoleVoterBoxContent = () => {
           components={[
             <Link
               onClick={() => openInNewTab("https://sancho.network/")}
-              sx={{ cursor: "pointer" }}
+              sx={{ cursor: "pointer", textDecoration: "none" }}
               key="0"
             />,
           ]}

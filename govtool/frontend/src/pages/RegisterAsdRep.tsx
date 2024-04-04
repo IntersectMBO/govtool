@@ -69,7 +69,10 @@ export const RegisterAsdRep = () => {
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
-        <DashboardTopNav title={t("registration.becomeADRep")} />
+        <DashboardTopNav
+          isVotingPowerHidden
+          title={t("registration.becomeADRep")}
+        />
         <LinkWithIcon
           label={t("backToDashboard")}
           onClick={onClickBackToDashboard}

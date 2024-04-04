@@ -52,6 +52,74 @@ export const en = {
       headingOne: "Your Participation",
       headingTwo: "See Active Governance Actions",
       title: "Dashboard",
+      cards: {
+        drepName: "Drep_name",
+        showTransaction: "Show Transaction",
+        drep: {
+          changeMetadata: "Change metadata",
+          dRepRegistration: "DRep Registration",
+          dRepRetirement: "DRep Retirement",
+          dRepUpdate: "DRep Update",
+          holdersCanDelegate:
+            "Ada holders can delegate their voting power to you.",
+          ifYouWant:
+            "If you want to directly participate in voting and have other ada holders delegate their voting power to you.",
+          metadataUpdateInProgress:
+            "The update DRep metadata is ongoing. This may take several minutes.",
+          notRegisteredDescription:
+            "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
+          notRegisteredTitle: "Become a DRep",
+          notRegisteredWasRegisteredDescription:
+            "You are now retired and your listing in the DRep directory as <strong>MrDRep</strong> has been marked as <strong><i>retired</i></strong>. You cannot vote on Governance Actions as <strong>MrDRep</strong>.\n\nYou can always re-register as a DRep, in which case you will have the same DRep ID as you had initially.",
+          notRegisteredWasRegisteredTitle: "You Have Retired as a DRep.",
+          register: "Register",
+          registerAgain: "Register Again as a dRep",
+          registerAsDRep: "Register as a DRep",
+          registeredDescription:
+            "You can Vote using your own Voting Power combined with any Voting Power delegated to you.",
+          registeredTitle: "You are Registered as a DRep",
+          registrationInProgress:
+            "The registration process is ongoing. This may take several minutes.",
+          reRegister: "Re-register as a DRep",
+          retire: "Retire as a DRep",
+          retirementInProgress:
+            "You are being retired as <strong>MrDRep</strong>. You will receive a refund of <strong>{{deposit}} ADA</strong> when the transaction  completes.",
+          viewDetails: "View your DRep details",
+          youAreRegistered: "You are Registered as a DRep",
+          yourDRepId: "Your DRep ID",
+        },
+        govActions: {
+          description: "Review governance actions submitted on-chain.",
+          reviewAndVote: "Review and vote",
+          title: "View Governance Actions",
+        },
+        proposeGovernanceAction: {
+          title: "Propose a Governance Action",
+          description: "Submit your proposal for a Governance Action.",
+          propose: "Propose",
+          view: "View Governance Actions",
+        },
+        soleVoter: {
+          isRegisteredDescription:
+            "Your Voting Power of ₳<strong>{{votingPower}}</strong> can be used to vote.",
+          register: "Register",
+          registerDescription:
+            "Vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>.",
+          registerTitle: "Become a Sole Voter",
+          reRegister: "Re-register",
+          registration: "Sole Voter Registration",
+          registrationInProgress:
+            "The registration process is ongoing. This may take several minutes.",
+          retire: "Retire",
+          wasSoleVoterTitle: "You Have Retired as a Sole Voter",
+          retirement: "Sole Voter Retirement",
+          retirementInProgress:
+            "The retirement process is ongoing. This may take several minutes.",
+          wasRegisteredDescription:
+            "You cannot vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>. until you re-register.",
+          youAreSoleVoterTitle: "You are a Sole Voter",
+        },
+      },
       delegation: {
         changeDelegation: "Change delegation",
         delegateOwnPower:
@@ -79,60 +147,6 @@ export const en = {
           voteNo:
             "Your own voting power of ₳<strong>{{ada}}</strong> is in progress of being delegated. You are going to vote ‘NO’ as default.",
         },
-      },
-      govActions: {
-        description: "Review governance actions submitted on-chain.",
-        reviewAndVote: "Review and vote",
-        title: "Governance Actions",
-        view: "View governance actions",
-      },
-      proposeGovernanceAction: {
-        title: "Propose a Governance Action",
-        description: "Submit your proposal for a Governance Action.",
-        propose: "Propose",
-        view: "View governance actions",
-      },
-      registration: {
-        changeMetadata: "Change metadata",
-        dRepRegistration: "DRep Registration",
-        dRepRetirement: "DRep Retirement",
-        dRepUpdate: "DRep Update",
-        holdersCanDelegate:
-          "Ada holders can delegate their voting power to you.",
-        ifYouWant:
-          "If you want to directly participate in voting and have other ada holders delegate their voting power to you.",
-        metadataUpdateInProgress:
-          "The update DRep metadata is ongoing. This may take several minutes.",
-        register: "Register",
-        registerAgain: "Register Again as a dRep",
-        registerAsDRep: "Register as a DRep",
-        registrationInProgress:
-          "The registration process is ongoing. This may take several minutes.",
-        reRegister: "Re-register as a DRep",
-        retire: "Retire as a DRep",
-        retirementInProgress:
-          "The retirement process is ongoing. This may take several minutes.",
-        youAreRegistered: "You are Registered as a DRep",
-      },
-      soleVoter: {
-        isRegisteredDescription:
-          "Your Voting Power of ₳<strong>{{votingPower}}</strong> can be used to vote.",
-        register: "Register",
-        registerDescription:
-          "Vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>.",
-        registerTitle: "Become a Sole Voter",
-        reRegister: "Re-register",
-        registration: "Sole Voter Registration",
-        registrationInProgress:
-          "The registration process is ongoing. This may take several minutes.",
-        retire: "Retire",
-        wasSoleVoterTitle: "You Have Retired as a Sole Voter",
-        retirement: "Sole Voter Retirement",
-        retirementInProgress:
-          "The retirement process is ongoing. This may take several minutes.",
-        wasRegisteredDescription:
-          "You cannot vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>. until you re-register.",
-        youAreSoleVoterTitle: "You are a Sole Voter",
       },
     },
     createGovernanceAction: {
@@ -697,10 +711,10 @@ export const en = {
     filter: "Filter",
     goBack: "Go back",
     here: "here",
-    inProgress: "In progress",
+    inProgress: "In Progress",
     learnMore: "Learn more",
     loading: "Loading...",
-    myDRepId: "My DRep ID:",
+    myDRepId: "My dRep ID:",
     nextStep: "Next step",
     no: "No",
     ok: "Ok",

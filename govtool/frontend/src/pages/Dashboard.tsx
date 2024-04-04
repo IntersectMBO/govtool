@@ -22,7 +22,7 @@ export const Dashboard = () => {
       return t("dashboard.title");
     }
     if (path.includes(PATHS.dashboardGovernanceActions)) {
-      return t("dashboard.govActions.title");
+      return t("govActions.title");
     }
     return "";
   };

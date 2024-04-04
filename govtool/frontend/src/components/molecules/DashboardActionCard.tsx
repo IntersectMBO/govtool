@@ -1,9 +1,10 @@
 import { Box, Skeleton } from "@mui/material";
 import { FC, ReactNode } from "react";
 
-import { LoadingButton, LoadingButtonProps, Typography } from "@atoms";
+import { Button, LoadingButton, LoadingButtonProps, Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { Card } from "./Card";
+import { openInNewTab } from "@/utils";
 
 export type DashboardActionCardProps = {
   buttons?: LoadingButtonProps[];
@@ -12,8 +13,10 @@ export type DashboardActionCardProps = {
   description?: ReactNode;
   imageURL?: string;
   isLoading?: boolean;
+  isInProgressOnCard?: boolean;
   state?: "active" | "inProgress" | "default";
   title?: ReactNode;
+  transactionId?: string;
 };
 
 export const DashboardActionCard: FC<DashboardActionCardProps> = ({
@@ -26,11 +29,16 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
     description,
     imageURL,
     isLoading = false,
+    isInProgressOnCard = true,
     state = "default",
     title,
+    transactionId,
   } = props;
 
   const { screenWidth } = useScreenDimension();
+
+  const onClickShowTransaction = () =>
+    openInNewTab(`https://sancho.cexplorer.io/tx/${transactionId}`);
 
   return (
     <Card
@@ -40,10 +48,10 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
         variant: "warning",
       })}
       sx={{
+        backgroundColor: state === "active" ? "#F0F4FF" : undefined,
         flex: 1,
         display: "flex",
         flexDirection: "column",
-        gap: 3,
         maxWidth: 524,
       }}
     >
@@ -69,11 +77,15 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
         {title ? (
           <Typography sx={{ mt: 2 }} variant="title2">
             {isLoading ? <Skeleton variant="rounded" /> : title}
-          </Typography>
-        ) : null}
-        {state === "inProgress" && !isLoading ? (
-          <Typography variant="title2" fontWeight={700}>
-            {t("inProgress")}
+            {state === "inProgress" && !isLoading && isInProgressOnCard ? (
+              <Typography
+                variant="title2"
+                fontWeight={600}
+                sx={{ display: "inline" }}
+              >
+                {` ${t("inProgress")}`}
+              </Typography>
+            ) : null}
           </Typography>
         ) : null}
         {description ? (
@@ -93,10 +105,20 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
         ) : null}
       </Box>
       {children}
+      {transactionId && (
+        <Button
+          onClick={onClickShowTransaction}
+          sx={{ width: "fit-content", p: 0 }}
+          variant="text"
+        >
+          {t("dashboard.cards.showTransaction")}
+        </Button>
+      )}
       <Box
         display="flex"
         flexDirection={screenWidth < 640 ? "column" : "row"}
-        gap={{ xxs: 0, md: 2 }}
+        mt={3}
+        gap={2}
       >
         {isLoading ? (
           <>
@@ -125,6 +147,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
                   xxs: "100%",
                   md: "auto",
                 },
+                ...buttonProps.sx,
               }}
               {...buttonProps}
             />

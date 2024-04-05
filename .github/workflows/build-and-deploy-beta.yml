@@ -1,10 +1,9 @@
 name: Build and deploy GovTool to BETA server
 run-name: Deploy by @${{ github.actor }}
 
+# That should be executed on create: tag event
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 env:
   ENVIRONMENT: "beta"

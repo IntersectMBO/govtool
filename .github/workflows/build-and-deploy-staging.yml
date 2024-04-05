@@ -2,9 +2,11 @@ name: Build and deploy GovTool to STAGING server
 run-name: Deploy by @${{ github.actor }}
 
 on:
-  push:
+  pull_request:
     branches:
       - staging
+    types:
+      - closed
 
 env:
   ENVIRONMENT: "staging"

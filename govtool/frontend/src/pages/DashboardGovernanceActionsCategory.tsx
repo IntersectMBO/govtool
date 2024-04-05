@@ -5,7 +5,11 @@ import { Box, CircularProgress, Link } from "@mui/material";
 import { Background, Typography } from "@atoms";
 import { GOVERNANCE_ACTIONS_SORTING, ICONS, PATHS } from "@consts";
 import { useCardano } from "@context";
-import { DataActionsBar, GovernanceActionCard } from "@molecules";
+import {
+  DataActionsBar,
+  EmptyStateGovernanceActionsCategory,
+  GovernanceActionCard,
+} from "@molecules";
 import {
   useDataActionsBar,
   useFetchNextPageDetector,
@@ -109,30 +113,10 @@ export const DashboardGovernanceActionsCategory = () => {
                 <CircularProgress />
               </Box>
             ) : !mappedData?.length ? (
-              <Typography
-                sx={{
-                  fontWeight: 300,
-                  py: 4,
-                }}
-              >
-                <Box display="flex" flexWrap="wrap" mt={4}>
-                  <Typography fontWeight={300}>
-                    {t("govActions.withCategoryNotExist.partOne")}
-                    &nbsp;
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontWeight: 700,
-                    }}
-                  >
-                    {` ${category} `}
-                  </Typography>
-                  <Typography fontWeight={300}>
-                    &nbsp;
-                    {t("govActions.withCategoryNotExist.partTwo")}
-                  </Typography>
-                </Box>
-              </Typography>
+              <EmptyStateGovernanceActionsCategory
+                category={category}
+                isSearch={!!debouncedSearchText.length}
+              />
             ) : (
               <Box
                 columnGap="20px"

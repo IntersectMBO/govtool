@@ -1,10 +1,9 @@
 name: Build and deploy GovTool to BETA server
 run-name: Deploy by @${{ github.actor }}
 
+# That should be executed on create: tag event
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 env:
   ENVIRONMENT: "beta"
@@ -35,7 +34,7 @@ jobs:
       IP_ADDRESS_BYPASSING_BASIC_AUTH2: ${{ secrets.IP_ADDRESS_BYPASSING_BASIC_AUTH2 }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 

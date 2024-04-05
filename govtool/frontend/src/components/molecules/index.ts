@@ -10,6 +10,7 @@ export * from "./DataActionsFilters";
 export * from "./DataActionsSorting";
 export * from "./DataMissingInfoBox";
 export * from "./DRepInfoCard";
+export * from "./EmptyStateGovernanceActionsCategory";
 export * from "./Field";
 export * from "./GovActionDetails";
 export * from "./GovernanceActionCard";

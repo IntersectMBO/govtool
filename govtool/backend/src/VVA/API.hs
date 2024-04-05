@@ -251,11 +251,12 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
           about <- Text.toLower <$> proposalResponseAbout
           motivation <- Text.toLower <$> proposalResponseMotivation
           rationale <- Text.toLower <$> proposalResponseRationale
-
+          let govActionId = unHexText proposalResponseTxHash <> "#" <> Text.pack (show proposalResponseIndex)
           let result = searchQuery `isInfixOf` title
                       || searchQuery `isInfixOf` about
                       || searchQuery `isInfixOf` motivation
                       || searchQuery `isInfixOf` rationale
+                      || searchQuery `isInfixOf` govActionId
 
           pure result
 

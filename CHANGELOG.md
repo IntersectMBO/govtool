@@ -10,27 +10,6 @@ changes.
 
 ## [Unreleased]
 
-- Check a GA metadata is valid [Issue 535](https://github.com/IntersectMBO/govtool/issues/535)
-- DRep metadata builder [Issue 497](https://github.com/IntersectMBO/govtool/issues/497)
-- Update Cardano Serialization Lib to 12.0.0-alpha.19 [Issue 521](https://github.com/IntersectMBO/govtool/issues/521)
-- Add generate jsonld function [Issue 451](https://github.com/IntersectMBO/govtool/issues/451)
-- Create GA review subbmision page [Issue 362](https://github.com/IntersectMBO/govtool/issues/362)
-- Create GA creation form [Issue 360](https://github.com/IntersectMBO/govtool/issues/360)
-- Create TextArea [Issue 110](https://github.com/IntersectMBO/govtool/issues/110)
-- Choose GA type - GA Submiter [Issue 358](https://github.com/IntersectMBO/govtool/issues/358)
-- Add on-chain inputs validation [Issue 377](https://github.com/IntersectMBO/govtool/issues/377)
-- Add hash and validation of the metadata [Issue 378](https://github.com/IntersectMBO/govtool/issues/378)
-- Add githubusercontent.com and ipfs.io to content security policy header [Issue 451](https://github.com/IntersectMBO/govtool/issues/451)
-- Add frontend test workflow on github actions [Issue 500](https://github.com/IntersectMBO/govtool/issues/500)
-- Add type check & lint to github actions [Issue 512](https://github.com/IntersectMBO/govtool/issues/512)
-- Add eslint & prettier to frontend package [Issue 166](https://github.com/IntersectMBO/govtool/issues/166)
-- Extend the eslint config to apply to the style guide of the project [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
-- Fix all the existing eslint errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
-- Fix all the existing typescript errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
-- Fix endless spinner on a dashboard [Issue 539](https://github.com/IntersectMBO/govtool/issues/539)
-- Update frontend package readme to reflect recent changes [Issue 543](https://github.com/IntersectMBO/govtool/issues/543)
-- Change input selection strategy to 3 (random) [Issue 575](https://github.com/IntersectMBO/govtool/issues/575)
-
 ### Added
 
 - added `epochNo` and `date` to `drep/getVotes` and `proposal/get`
@@ -44,6 +23,18 @@ changes.
 - Add possibility to vote on behalf of myself - Sole Voter [Issue 119](https://github.com/IntersectMBO/govtool/issues/119)
 - Added Nix Flakes configurtion to handle unified developers setup [Issue 526](https://github.com/IntersectMBO/govtool/issues/526)
 - Add missing test to utils [Issue 500](https://github.com/IntersectMBO/govtool/issues/500).
+- DRep metadata builder [Issue 497](https://github.com/IntersectMBO/govtool/issues/497)
+- Add generate jsonld function [Issue 451](https://github.com/IntersectMBO/govtool/issues/451)
+- Create GA review subbmision page [Issue 362](https://github.com/IntersectMBO/govtool/issues/362)
+- Create GA creation form [Issue 360](https://github.com/IntersectMBO/govtool/issues/360)
+- Create TextArea [Issue 110](https://github.com/IntersectMBO/govtool/issues/110)
+- Choose GA type - GA Submiter [Issue 358](https://github.com/IntersectMBO/govtool/issues/358)
+- Add on-chain inputs validation [Issue 377](https://github.com/IntersectMBO/govtool/issues/377)
+- Add hash and validation of the metadata [Issue 378](https://github.com/IntersectMBO/govtool/issues/378)
+- Add githubusercontent.com and ipfs.io to content security policy header [Issue 451](https://github.com/IntersectMBO/govtool/issues/451)
+- Add frontend test workflow on github actions [Issue 500](https://github.com/IntersectMBO/govtool/issues/500)
+- Add type check & lint to github actions [Issue 512](https://github.com/IntersectMBO/govtool/issues/512)
+- Add eslint & prettier to frontend package [Issue 166](https://github.com/IntersectMBO/govtool/issues/166)
 
 ### Fixed
 
@@ -63,9 +54,13 @@ changes.
 - Fixed get drep voting power incorrectly executed endpoint [Issue 280](https://github.com/IntersectMBO/govtool/issues/280).
 - Fixed CSP settings to allow error reports with Sentry [Issue 291](https://github.com/IntersectMBO/govtool/issues/291).
 - Fix frontend package tests [Issue 500](https://github.com/IntersectMBO/govtool/issues/500).
+- Fix all the existing eslint errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
+- Fix all the existing typescript errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
+- Fix endless spinner on a dashboard [Issue 539](https://github.com/IntersectMBO/govtool/issues/539)
 
 ### Changed
 
+- `proposal/list` allows user to search by tx hash [Issue 603](https://github.com/IntersectMBO/govtool/issues/603)
 - `proposal/list` returns additional data such ass `expiryEpochNo`, `createdEpochNo`, `title`, `about`, `motivation`,
   `rationale`. `TreasuryWithdrawals` GAs also got nicely formated details. [Issue 372](https://github.com/IntersectMBO/govtool/issues/372)
 - `drep/list` now return also `status` and `type` fields. Also it now returns the retired dreps, and you can search for given drep by name using optional query parameter. If the drep name is passed exactly, then you can even find a drep that's sole voter. [Issue 446](https://github.com/IntersectMBO/govtool/issues/446)
@@ -84,10 +79,17 @@ changes.
 - Applied unified policy on Docker images tagging [Issue 320](https://github.com/IntersectMBO/govtool/issues/320).
 - Reorganised deployment Makefiles in order to better document the process and easier management [Issue 385](https://github.com/IntersectMBO/govtool/issues/385).
 - Added a grafana panel to track all the deploys on the target machines [Issue 361](https://github.com/IntersectMBO/govtool/issues/361).
+- Check a GA metadata is valid [Issue 535](https://github.com/IntersectMBO/govtool/issues/535)
+- Update Cardano Serialization Lib to 12.0.0-alpha.19 [Issue 521](https://github.com/IntersectMBO/govtool/issues/521)
+- Extend the eslint config to apply to the style guide of the project [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
+- Update frontend package readme to reflect recent changes [Issue 543](https://github.com/IntersectMBO/govtool/issues/543)
+- Change input selection strategy to 3 (random) [Issue 575](https://github.com/IntersectMBO/govtool/issues/575)
 
 ### Removed
 
 -
+
+## [sancho-v1.0.2-alpha](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.0-alpha) 2023-04-05
 
 ## [sancho-v1.0.0](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.0) 2023-12-17
 

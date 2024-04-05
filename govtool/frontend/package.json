@@ -14,6 +14,7 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "test": "vitest",
+    "test:ui": "vitest --ui",
     "test-storybook": "test-storybook",
     "test:watch": "vitest watch",
     "tsc": "npx tsc --noEmit --skipLibCheck"

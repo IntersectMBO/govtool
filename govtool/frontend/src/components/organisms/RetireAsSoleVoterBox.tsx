@@ -44,7 +44,7 @@ export const RetireAsSoleVoterBox = () => {
             status: "success",
             title: t("modals.retirement.title"),
             message: t("modals.retirement.message"),
-            link: "https://sancho.cexplorer.io/tx/" + result,
+            link: `https://sancho.cexplorer.io/tx/${result}`,
             buttonText: t("modals.common.goToDashboard"),
             dataTestId: "retirement-transaction-submitted-modal",
             onSubmit: () => {

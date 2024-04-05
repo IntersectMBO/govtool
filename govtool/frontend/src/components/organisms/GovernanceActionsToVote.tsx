@@ -63,8 +63,7 @@ export const GovernanceActionsToVote = ({
                             `${action.txHash ?? ""}${action.index ?? ""}`
                         ) {
                           openInNewTab(
-                            "https://sancho.cexplorer.io/tx/" +
-                              pendingTransaction.vote?.transactionHash,
+                            `https://sancho.cexplorer.io/tx/${pendingTransaction?.vote?.transactionHash}`,
                           );
                         } else {
                           navigate(

@@ -1,4 +1,5 @@
 export * from "./ActionCard";
+export * from "./AutomatedVotingCard";
 export * from "./Breadcrumbs";
 export * from "./Card";
 export * from "./CenteredBoxBottomButtons";
@@ -31,6 +32,8 @@ export * from "./SliderArrow";
 export * from "./SliderArrows";
 export * from "./SoleVoterAction";
 export * from "./Step";
+export * from "./PageTitle";
+export * from "./Share";
 export * from "./VoteActionForm";
 export * from "./VotesSubmitted";
 export * from "./WalletInfoCard";

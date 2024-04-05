@@ -19,6 +19,7 @@ export const Button = ({
       sx={{
         fontSize: size === "extraLarge" ? 16 : 14,
         height: buttonHeight,
+        whiteSpace: "nowrap",
         ...sx,
       }}
       variant={variant}

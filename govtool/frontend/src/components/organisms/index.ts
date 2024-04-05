@@ -1,3 +1,4 @@
+export * from "./AutomatedVotingOptions";
 export * from "./BgCard";
 export * from "./ChooseStakeKeyPanel";
 export * from "./ChooseWalletModal";
@@ -14,6 +15,7 @@ export * from "./DelegateTodRepStepOne";
 export * from "./DelegateTodRepStepTwo";
 export * from "./Drawer";
 export * from "./DrawerMobile";
+export * from "./DRepCard";
 export * from "./EditDRepInfoSteps";
 export * from "./ExternalLinkModal";
 export * from "./Footer";

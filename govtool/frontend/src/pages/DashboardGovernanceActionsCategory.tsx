@@ -141,7 +141,8 @@ export const DashboardGovernanceActionsCategory = () => {
                           item.txHash + item.index
                         ) {
                           openInNewTab(
-                            "https://adanordic.com/latest_transactions",
+                            "https://sancho.cexplorer.io/tx/" +
+                              pendingTransaction.vote.transactionHash,
                           );
                         } else {
                           navigate(

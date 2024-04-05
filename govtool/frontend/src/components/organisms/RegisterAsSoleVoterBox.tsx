@@ -36,7 +36,7 @@ export const RegisterAsSoleVoterBox = () => {
             status: "success",
             title: t("modals.registration.title"),
             message: t("modals.registration.message"),
-            link: "https://adanordic.com/latest_transactions",
+            link: "https://sancho.cexplorer.io/tx/" + result,
             buttonText: t("modals.common.goToDashboard"),
             onSubmit: () => {
               navigate(PATHS.dashboard);

@@ -2,11 +2,9 @@ name: Build and deploy GovTool to TEST server
 run-name: Deploy by @${{ github.actor }}
 
 on:
-  pull_request:
+  push:
     branches:
       - test
-    types:
-      - closed
 
 env:
   ENVIRONMENT: "test"

@@ -1,12 +1,8 @@
 import { PropsWithChildren } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import {
-  Box, ButtonBase, Chip, CircularProgress
-} from "@mui/material";
+import { Box, ButtonBase, Chip, CircularProgress } from "@mui/material";
 
-import {
-  Button, LoadingButton, StatusPill, Typography
-} from "@atoms";
+import { Button, LoadingButton, StatusPill, Typography } from "@atoms";
 import { Card, LinkWithIcon, Share } from "@molecules";
 import { ICONS, PATHS } from "@consts";
 import {
@@ -14,7 +10,7 @@ import {
   useGetAdaHolderCurrentDelegationQuery,
   useGetDRepListQuery,
   useScreenDimension,
-  useTranslation
+  useTranslation,
 } from "@hooks";
 import { correctAdaFormat, openInNewTab } from "@utils";
 import { useCardano, useModal } from "@/context";
@@ -33,11 +29,7 @@ type DRepDetailsProps = {
 };
 
 export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
-  const {
-    dRepID: myDRepId,
-    pendingTransaction,
-    stakeKey,
-  } = useCardano();
+  const { dRepID: myDRepId, pendingTransaction, stakeKey } = useCardano();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { openModal } = useModal();
@@ -50,23 +42,29 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
   const { data, isLoading } = useGetDRepListQuery({ drepView: dRepParam });
   const dRep = data?.[0];
 
-  if (!dRep && isLoading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
+  if (!dRep && isLoading)
+    return <CircularProgress sx={{ display: "block", mx: "auto", mt: 4 }} />;
 
   if (!dRep) return <Navigate to={PATHS.error} />;
 
-  const {
-    view, status, votingPower, type
-  } = dRep;
+  const { view, status, votingPower, type } = dRep;
 
   const isMe = isSameDRep(dRep, myDRepId);
   const isMyDrep = isSameDRep(dRep, currentDelegation);
-  const isMyDrepInProgress = isSameDRep(dRep, pendingTransaction.delegate?.resourceId);
+  const isMyDrepInProgress = isSameDRep(
+    dRep,
+    pendingTransaction.delegate?.resourceId,
+  );
 
   return (
     <>
       <LinkWithIcon
         label={t("backToList")}
-        onClick={() => navigate(isConnected ? PATHS.dashboardDRepDirectory : PATHS.dRepDirectory)}
+        onClick={() =>
+          navigate(
+            isConnected ? PATHS.dashboardDRepDirectory : PATHS.dRepDirectory,
+          )
+        }
         sx={{ mb: 2 }}
       />
       <Card
@@ -79,20 +77,25 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
           label: t("inProgress"),
         })}
         sx={{
-          borderRadius: 5, mt: isMe || isMyDrep ? 1 : 0, pb: 4, pt: 2.25
+          borderRadius: 5,
+          mt: isMe || isMyDrep ? 1 : 0,
+          pb: 4,
+          pt: 2.25,
         }}
       >
         {(isMe || isMyDrep) && (
           <Chip
             color="primary"
-            label={isMe ? t("dRepDirectory.meAsDRep") : t("dRepDirectory.myDRep")}
+            label={
+              isMe ? t("dRepDirectory.meAsDRep") : t("dRepDirectory.myDRep")
+            }
             sx={{
               boxShadow: (theme) => theme.shadows[2],
               color: (theme) => theme.palette.text.primary,
               mb: 1.5,
               px: 2,
               py: 0.5,
-              width: '100%',
+              width: "100%",
             }}
           />
         )}
@@ -102,7 +105,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
             display: "flex",
             flexDirection: "row",
             gap: 1,
-            mb: 3
+            mb: 3,
           }}
         >
           <Typography
@@ -114,7 +117,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
           </Typography>
           {isMe && (
             <Button
-              onClick={() => navigate(PATHS.updateMetadata)}
+              onClick={() => navigate(PATHS.editDrepMetadata)}
               variant="outlined"
             >
               {t("dRepDirectory.editBtn")}
@@ -132,7 +135,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
           </DRepDetailsInfoItem>
           <DRepDetailsInfoItem label={t("votingPower")}>
             <Typography sx={{ display: "flex", flexDirection: "row", mt: 0.5 }}>
-              {'₳ '}
+              {"₳ "}
               {correctAdaFormat(votingPower)}
             </Typography>
           </DRepDetailsInfoItem>
@@ -144,7 +147,12 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
             />
           </DRepDetailsInfoItem>
           <DRepDetailsInfoItem label={t("moreInformation")}>
-            <Box alignItems="flex-start" display="flex" flexDirection="column" gap={1.5}>
+            <Box
+              alignItems="flex-start"
+              display="flex"
+              flexDirection="column"
+              gap={1.5}
+            >
               {LINKS.map((link) => (
                 <MoreInfoLink key={link} label={link} navTo={link} />
               ))}
@@ -158,7 +166,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
             width: screenWidth < 1024 ? "100%" : 286,
           }}
         >
-          {(isConnected && status === 'Active' && !isMyDrep) && (
+          {isConnected && status === "Active" && !isMyDrep && (
             <LoadingButton
               data-testid="delegate-button"
               disabled={!!pendingTransaction.delegate}
@@ -183,21 +191,18 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
           )}
         </Box>
 
-        <Typography variant="title2" sx={{ mb: 1.5 }}>{t("about")}</Typography>
-        <Typography
-          fontWeight={400}
-          sx={{ maxWidth: 608 }}
-          variant="body1"
-        >
-          {/* TODO replace with actual data */}
-          I am the Cardano crusader carving his path in the blockchain
-          battleground. With a mind sharper than a Ledger Nano X, this fearless
-          crypto connoisseur fearlessly navigates the volatile seas of Cardano,
-          turning code into currency. Armed with a keyboard and a heart pumping
-          with blockchain beats, Mister Big Bad fearlessly champions
-          decentralization, smart contracts, and the Cardano community. His
-          Twitter feed is a mix of market analysis that rivals CNBC and memes that
-          could break the internet.
+        <Typography variant="title2" sx={{ mb: 1.5 }}>
+          {t("about")}
+        </Typography>
+        <Typography fontWeight={400} sx={{ maxWidth: 608 }} variant="body1">
+          {/* TODO replace with actual data */}I am the Cardano crusader carving
+          his path in the blockchain battleground. With a mind sharper than a
+          Ledger Nano X, this fearless crypto connoisseur fearlessly navigates
+          the volatile seas of Cardano, turning code into currency. Armed with a
+          keyboard and a heart pumping with blockchain beats, Mister Big Bad
+          fearlessly champions decentralization, smart contracts, and the
+          Cardano community. His Twitter feed is a mix of market analysis that
+          rivals CNBC and memes that could break the internet.
         </Typography>
       </Card>
     </>
@@ -216,12 +221,8 @@ type DrepDetailsInfoItemProps = PropsWithChildren & {
 
 const DRepDetailsInfoItem = ({ children, label }: DrepDetailsInfoItemProps) => (
   <>
-    <Box component="dt" sx={{ mb: 0.5, '&:not(:first-of-type)': { mt: 2 } }}>
-      <Typography
-        color="neutralGray"
-        fontWeight={600}
-        variant="body2"
-      >
+    <Box component="dt" sx={{ mb: 0.5, "&:not(:first-of-type)": { mt: 2 } }}>
+      <Typography color="neutralGray" fontWeight={600} variant="body2">
         {label}
       </Typography>
     </Box>

@@ -299,8 +299,9 @@ export const en = {
       },
     },
     footer: {
-      copyright: "© 2023 Voltaire Gov Tool",
+      copyright: "© 2024 Intersect MBO",
       privacyPolicy: "Privacy policy",
+      termOfService: "Term of service",
     },
     forms: {
       hashPlaceholder: "The hash of metadata at URL",
@@ -708,6 +709,7 @@ export const en = {
     confirm: "Confirm",
     continue: "Continue",
     delegate: "Delegate",
+    feedback: "Feedback",
     filter: "Filter",
     goBack: "Go back",
     here: "here",

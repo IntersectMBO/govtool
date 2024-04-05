@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
 import { Box, Link } from "@mui/material";
@@ -17,11 +17,24 @@ export const Hero = () => {
   const { t } = useTranslation();
   const IMAGE_SIZE = screenWidth < 640 ? 300 : screenWidth < 860 ? 400 : 600;
 
-  const onClickVotingPower = useCallback(
-    () =>
-      openInNewTab("https://docs.sanchogov.tools/faqs/what-is-voting-power"),
-    [],
-  );
+  const paddingHorizontal = useMemo(() => {
+    if (screenWidth < 640) return 3;
+    if (screenWidth < 1512) return 9.375;
+    if (screenWidth < 1728) return 14;
+    if (screenWidth < 1920) return 27.375;
+    if (screenWidth < 2560) return 39.375;
+    return 49.25;
+  }, [screenWidth]);
+
+  const imageRightMargin = useMemo(() => {
+    if (screenWidth <= 860) return -(IMAGE_SIZE / 4);
+    if (screenWidth <= 1440) return -(IMAGE_SIZE / 15);
+    if (screenWidth <= 1728) return screenWidth / 20;
+    return screenWidth / 11;
+  }, [screenWidth]);
+
+  const onClickVotingPower = () =>
+    openInNewTab("https://docs.sanchogov.tools/faqs/what-is-voting-power");
 
   return (
     <Box
@@ -32,7 +45,7 @@ export const Hero = () => {
       flexDirection="row"
       overflow="visible"
       position="relative"
-      px={screenWidth < 640 ? 3 : screenWidth < 1512 ? 10 : 14}
+      px={paddingHorizontal}
     >
       <Box alignItems="center" flex={1} height="min-content">
         <Typography
@@ -81,15 +94,7 @@ export const Hero = () => {
       <Box
         flex={1}
         position="absolute"
-        right={
-          screenWidth >= 1728
-            ? IMAGE_SIZE / 8
-            : screenWidth >= 1512
-            ? -(IMAGE_SIZE / 12)
-            : screenWidth >= 860
-            ? -(IMAGE_SIZE / 8)
-            : -(IMAGE_SIZE / 4)
-        }
+        right={imageRightMargin}
         top={-80}
         zIndex={-1}
       >

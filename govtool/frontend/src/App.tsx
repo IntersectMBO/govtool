@@ -16,6 +16,9 @@ import {
   Dashboard,
   DashboardGovernanceActionsCategory,
   DelegateTodRep,
+  DRepDetails,
+  DRepDirectory,
+  DRepDirectoryContent,
   ErrorPage,
   GovernanceActionDetails,
   GovernanceActions,
@@ -103,6 +106,26 @@ export default () => {
           <Route
             path={PATHS.dashboardGovernanceActionsCategory}
             element={<DashboardGovernanceActionsCategory />}
+          />
+          <Route element={<DRepDirectory />}>
+            <Route
+              path={PATHS.dashboardDRepDirectory}
+              element={<DRepDirectoryContent isConnected />}
+            />
+            <Route
+              path={PATHS.dashboardDRepDirectoryDRep}
+              element={<DRepDetails isConnected />}
+            />
+          </Route>
+        </Route>
+        <Route element={<DRepDirectory />}>
+          <Route
+            path={PATHS.dRepDirectory}
+            element={<DRepDirectoryContent />}
+          />
+          <Route
+            path={PATHS.dRepDirectoryDRep}
+            element={<DRepDetails />}
           />
         </Route>
         <Route

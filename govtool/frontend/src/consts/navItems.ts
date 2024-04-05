@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { ICONS } from "./icons";
 import { PATHS } from "./paths";
 
@@ -5,25 +6,30 @@ export const NAV_ITEMS = [
   {
     dataTestId: "dashboard-link",
     navTo: PATHS.home,
-    label: "Dashboard",
+    label: i18n.t("dashboard.title"),
     newTabLink: null,
+  },
+  {
+    dataTestId: "drep-directory-link",
+    navTo: PATHS.dRepDirectory,
+    label: i18n.t("dRepDirectory.title"),
   },
   {
     dataTestId: "governance-actions-link",
     navTo: PATHS.governanceActions,
-    label: "Governance Actions",
+    label: i18n.t("govActions.title"),
     newTabLink: null,
   },
   {
     dataTestId: "guides-link",
     navTo: "",
-    label: "Guides",
+    label: i18n.t("menu.guides"),
     newTabLink: "https://docs.sanchogov.tools/about/what-is-sanchonet-govtool",
   },
   {
     dataTestId: "faqs-link",
     navTo: "",
-    label: "FAQs",
+    label: i18n.t("menu.faqs"),
     newTabLink: "https://docs.sanchogov.tools/faqs",
   },
 ];
@@ -31,15 +37,22 @@ export const NAV_ITEMS = [
 export const CONNECTED_NAV_ITEMS = [
   {
     dataTestId: "dashboard-link",
-    label: "Dashboard",
+    label: i18n.t("dashboard.title"),
     navTo: PATHS.dashboard,
     activeIcon: ICONS.dashboardActiveIcon,
     icon: ICONS.dashboardIcon,
     newTabLink: null,
   },
   {
+    dataTestId: "drep-directory-link",
+    label: i18n.t("dRepDirectory.title"),
+    navTo: PATHS.dashboardDRepDirectory,
+    activeIcon: ICONS.dRepDirectoryActiveIcon,
+    icon: ICONS.dRepDirectoryIcon,
+  },
+  {
     dataTestId: "governance-actions-link",
-    label: "Governance Actions",
+    label: i18n.t("govActions.title"),
     navTo: PATHS.dashboardGovernanceActions,
     activeIcon: ICONS.governanceActionsActiveIcon,
     icon: ICONS.governanceActionsIcon,
@@ -47,7 +60,7 @@ export const CONNECTED_NAV_ITEMS = [
   },
   {
     dataTestId: "guides-link",
-    label: "Guides",
+    label: i18n.t("menu.guides"),
     navTo: "",
     activeIcon: ICONS.guidesActiveIcon,
     icon: ICONS.guidesIcon,
@@ -55,7 +68,7 @@ export const CONNECTED_NAV_ITEMS = [
   },
   {
     dataTestId: "faqs-link",
-    label: "FAQs",
+    label: i18n.t("menu.faqs"),
     navTo: "",
     activeIcon: ICONS.faqsActiveIcon,
     icon: ICONS.faqsIcon,

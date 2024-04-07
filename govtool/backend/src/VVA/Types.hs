@@ -62,6 +62,7 @@ data Vote
       , voteDocHash    :: Maybe Text
       , voteEpochNo    :: Integer
       , voteDate       :: UTCTime
+      , voteTxHash     :: Text
       }
 
 data DRepInfo

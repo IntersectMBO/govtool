@@ -138,6 +138,7 @@ proposalToResponse Types.Proposal {..} =
     proposalResponseMotivation = proposalMotivaiton,
     proposalResponseRationale = proposalRationale,
     proposalResponseMetadata = GovernanceActionMetadata <$> proposalMetadata,
+    proposalResponseReferences = GovernanceActionReferences <$> proposalReferences,
     proposalResponseYesVotes = proposalYesVotes,
     proposalResponseNoVotes = proposalNoVotes,
     proposalResponseAbstainVotes = proposalAbstainVotes

@@ -113,6 +113,7 @@ data Proposal
       , proposalMotivaiton     :: Maybe Text
       , proposalRationale      :: Maybe Text
       , proposalMetadata       :: Maybe Value
+      , proposalReferences     :: Maybe Value
       , proposalYesVotes       :: Integer
       , proposalNoVotes        :: Integer
       , proposalAbstainVotes   :: Integer

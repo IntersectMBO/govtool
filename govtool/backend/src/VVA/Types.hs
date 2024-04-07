@@ -74,6 +74,7 @@ data DRepInfo
       , dRepInfoUrl                      :: Maybe Text
       , dRepInfoDataHash                 :: Maybe Text
       , dRepInfoVotingPower              :: Maybe Integer
+      , dRepInfoLatestTxHash             :: Maybe Text
       }
 
 data DRepStatus = Retired | Active | Inactive
@@ -82,14 +83,15 @@ data DRepType = DRep | SoleVoter
 
 data DRepRegistration
   = DRepRegistration
-      { dRepRegistrationDRepHash    :: Text
-      , dRepRegistrationView        :: Text
-      , dRepRegistrationUrl         :: Maybe Text
-      , dRepRegistrationDataHash    :: Maybe Text
-      , dRepRegistrationDeposit     :: Integer
-      , dRepRegistrationVotingPower :: Maybe Integer
-      , dRepRegistrationStatus      :: DRepStatus
-      , dRepRegistrationType        :: DRepType
+      { dRepRegistrationDRepHash     :: Text
+      , dRepRegistrationView         :: Text
+      , dRepRegistrationUrl          :: Maybe Text
+      , dRepRegistrationDataHash     :: Maybe Text
+      , dRepRegistrationDeposit      :: Integer
+      , dRepRegistrationVotingPower  :: Maybe Integer
+      , dRepRegistrationStatus       :: DRepStatus
+      , dRepRegistrationType         :: DRepType
+      , dRepRegistrationLatestTxHash :: Maybe Text
       }
 
 data Proposal

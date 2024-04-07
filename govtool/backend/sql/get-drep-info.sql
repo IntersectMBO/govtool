@@ -6,10 +6,12 @@ LatestRegistrationEntry AS (
     SELECT
         drep_registration.voting_anchor_id AS voting_anchor_id,
         deposit AS deposit
+        tx.hash as tx_hash
     FROM
         drep_registration
         CROSS JOIN DrepId
         JOIN drep_hash ON drep_hash.id = drep_registration.drep_hash_id
+        JOIN tx ON tx.id = drep_registration.tx_id
     WHERE
         drep_hash.raw = DRepId.raw
     ORDER BY
@@ -95,7 +97,8 @@ SELECT
     CurrentDeposit.value,
     CurrentMetadata.url,
     CurrentMetadata.data_hash,
-    CurrentVotingPower.amount
+    CurrentVotingPower.amount,
+    LatestRegistrationEntry.tx_hash
 FROM
     IsRegisteredAsDRep
     CROSS JOIN IsRegisteredAsSoleVoter

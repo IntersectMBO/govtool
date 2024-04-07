@@ -23,7 +23,8 @@ SELECT
    dr_deposit.deposit,
    DRepDistr.amount,
    (DRepActivity.epoch_no - Max(coalesce(block.epoch_no,block_first_register.epoch_no))) <= DRepActivity.drep_activity as active,
-   second_to_newest_drep_registration.voting_anchor_id is not null as has_voting_anchor
+   second_to_newest_drep_registration.voting_anchor_id is not null as has_voting_anchor,
+   encode(dr_voting_anchor.tx_hash, 'hex') as tx_hash
 FROM drep_hash dh
 JOIN (
   SELECT dr.id, dr.drep_hash_id, dr.deposit,
@@ -34,8 +35,10 @@ JOIN (
 on dr_deposit.drep_hash_id = dh.id and dr_deposit.rn = 1
 LEFT JOIN (
   SELECT dr.id, dr.drep_hash_id, dr.voting_anchor_id,
-         ROW_NUMBER() OVER(PARTITION BY dr.drep_hash_id ORDER BY dr.tx_id DESC) AS rn
+         ROW_NUMBER() OVER(PARTITION BY dr.drep_hash_id ORDER BY dr.tx_id DESC) AS rn,
+         tx.hash as tx_hash
   FROM drep_registration dr
+  JOIN tx on tx.id = dr.tx_id
 ) as dr_voting_anchor
 on dr_voting_anchor.drep_hash_id = dh.id and dr_voting_anchor.rn = 1
 LEFT JOIN (
@@ -65,4 +68,4 @@ on tx_first_register.id = dr_first_register.tx_id
 JOIN block as block_first_register
 ON block_first_register.id = tx_first_register.block_id
 
-GROUP BY dh.raw, second_to_newest_drep_registration.voting_anchor_id, dh.view, va.url, va.data_hash, dr_deposit.deposit, DRepDistr.amount, DRepActivity.epoch_no, DRepActivity.drep_activity
+GROUP BY dh.raw, second_to_newest_drep_registration.voting_anchor_id, dh.view, va.url, va.data_hash, dr_deposit.deposit, DRepDistr.amount, DRepActivity.epoch_no, DRepActivity.drep_activity, dr_voting_anchor.tx_hash

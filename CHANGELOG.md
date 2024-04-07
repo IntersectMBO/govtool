@@ -11,7 +11,7 @@ changes.
 ## [Unreleased]
 
 ### Added
-
+- addded latestTxHash to the `drep/info` and `drep/list` endpoints [Issue 627](https://github.com/IntersectMBO/govtool/issues/627)
 - added `epochNo` and `date` to `drep/getVotes` and `proposal/get`
 - Added `isRegisteredAsSoleVoter` and `wasRegisteredAsSoleVoter` fields to the drep/info response [Issue 212](https://github.com/IntersectMBO/govtool/issues/212)
 - Abandoning registration as DRep [Issue 151](https://github.com/IntersectMBO/govtool/issues/151)

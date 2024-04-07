@@ -267,6 +267,27 @@ instance ToSchema GovernanceActionMetadata where
 
 
 
+newtype GovernanceActionReferences
+  = GovernanceActionReferences Value
+  deriving newtype (Show)
+
+instance FromJSON GovernanceActionReferences where
+  parseJSON v@(Aeson.Array a) = pure (GovernanceActionReferences v)
+  parseJSON _                 = fail "GovernanceActionReferences has to be an array"
+
+instance ToJSON GovernanceActionReferences where
+  toJSON (GovernanceActionReferences g) = g
+
+instance ToSchema GovernanceActionReferences where
+    declareNamedSchema _ = pure $ NamedSchema (Just "GovernanceActionReferences") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "A Governance Action References"
+        & example
+          ?~ toJSON
+                ("[{\"uri\": \"google.com\", \"@type\": \"Other\", \"label\": \"example label\"}]" :: Text)
+
+
+
 data ProposalResponse
   = ProposalResponse
       { proposalResponseId             :: Text
@@ -285,6 +306,7 @@ data ProposalResponse
       , proposalResponseMotivation     :: Maybe Text
       , proposalResponseRationale      :: Maybe Text
       , proposalResponseMetadata       :: Maybe GovernanceActionMetadata
+      , proposalResponseReferences     :: Maybe GovernanceActionReferences
       , proposalResponseYesVotes       :: Integer
       , proposalResponseNoVotes        :: Integer
       , proposalResponseAbstainVotes   :: Integer
@@ -310,6 +332,7 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"motivation\": \"Proposal Motivation\","
                   <> "\"rationale\": \"Proposal Rationale\","
                   <> "\"metadata\": {\"key\": \"value\"},"
+                  <> "\"references\": [{\"uri\": \"google.com\", \"@type\": \"Other\", \"label\": \"example label\"}],"
                   <> "\"yesVotes\": 0,"
                   <> "\"noVotes\": 0,"
                   <> "\"abstainVotes\": 0}"

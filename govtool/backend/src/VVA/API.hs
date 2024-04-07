@@ -97,7 +97,8 @@ drepRegistrationToDrep Types.DRepRegistration {..} =
       dRepDeposit = dRepRegistrationDeposit,
       dRepVotingPower = dRepRegistrationVotingPower,
       dRepStatus = mapDRepStatus dRepRegistrationStatus,
-      dRepType = mapDRepType dRepRegistrationType
+      dRepType = mapDRepType dRepRegistrationType,
+      dRepLatestTxHash = HexText <$> dRepRegistrationLatestTxHash
     }
 
 drepList :: App m => Maybe Text -> m [DRep]
@@ -208,6 +209,7 @@ drepInfo (unHexText -> dRepId) = do
     , dRepInfoResponseUrl = dRepInfoUrl
     , dRepInfoResponseDataHash = HexText <$> dRepInfoDataHash
     , dRepInfoResponseVotingPower = dRepInfoVotingPower
+    , dRepInfoResponseLatestTxHash = HexText <$> dRepInfoLatestTxHash
     }
 
 getCurrentDelegation :: App m => HexText -> m (Maybe HexText)

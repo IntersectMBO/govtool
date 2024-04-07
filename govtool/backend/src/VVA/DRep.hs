@@ -60,8 +60,8 @@ listDReps ::
 listDReps = withPool $ \conn -> do
   results <- liftIO $ SQL.query_ conn listDRepsSql
   return
-    [ DRepRegistration drepHash drepView url dataHash (floor @Scientific deposit) votingPower status drepType
-    | (drepHash, drepView, url, dataHash, deposit, votingPower, isActive, wasDRep) <- results
+    [ DRepRegistration drepHash drepView url dataHash (floor @Scientific deposit) votingPower status drepType txHash
+    | (drepHash, drepView, url, dataHash, deposit, votingPower, isActive, wasDRep, txHash) <- results
     , let status = case (isActive, deposit) of
                       (_, d)        | d < 0 -> Retired
                       (isActive, d) | d >= 0 && isActive -> Active
@@ -117,6 +117,7 @@ getDRepInfo drepId = withPool $ \conn -> do
       , url
       , dataHash
       , votingPower
+      , txHash
       )] ->
       return $ DRepInfo
         { dRepInfoIsRegisteredAsDRep = fromMaybe False isRegisteredAsDRep
@@ -127,5 +128,6 @@ getDRepInfo drepId = withPool $ \conn -> do
         , dRepInfoUrl = url
         , dRepInfoDataHash = dataHash
         , dRepInfoVotingPower = votingPower
+        , dRepInfoLatestTxHash = Just txHash
         }
-    [] -> return $ DRepInfo False False False False Nothing Nothing Nothing Nothing
+    [] -> return $ DRepInfo False False False False Nothing Nothing Nothing Nothing Nothing

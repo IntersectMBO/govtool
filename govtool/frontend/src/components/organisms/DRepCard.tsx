@@ -145,9 +145,13 @@ export const DRepCard = ({
           >
             {t("viewDetails")}
           </Button>
-          {status === "Active" && isConnected && onDelegate && !isMe && (
-            <Button onClick={onDelegate}>{t("delegate")}</Button>
-          )}
+          {status === "Active" &&
+            isConnected &&
+            onDelegate &&
+            !isMe &&
+            !isInProgress && (
+              <Button onClick={onDelegate}>{t("delegate")}</Button>
+            )}
           {status === "Active" && !isConnected && (
             <Button>{t("connectToDelegate")}</Button>
           )}

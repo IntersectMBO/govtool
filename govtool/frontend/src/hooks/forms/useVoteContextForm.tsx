@@ -2,19 +2,13 @@ import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { NodeObject } from "jsonld";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
-
-import {
-  CIP_108,
-  MetadataHashValidationErrors,
-  VOTE_TEST_CONTEXT,
-} from "@consts";
-import {
-  canonizeJSON,
-  downloadJson,
-  generateJsonld,
-  validateMetadataHash,
-} from "@utils";
 import { captureException } from "@sentry/react";
+
+import { CIP_108, VOTE_TEST_CONTEXT } from "@consts";
+import { canonizeJSON, downloadJson, generateJsonld } from "@utils";
+import { MetadataValidationStatus } from "@models";
+
+import { useValidateMutation } from "../mutations";
 
 export type VoteContextFormValues = {
   voteContextText: string;
@@ -27,6 +21,7 @@ export const useVoteContextForm = (
   setStep?: Dispatch<SetStateAction<number>>,
   setErrorMessage?: Dispatch<SetStateAction<string | undefined>>,
 ) => {
+  const { validateMetadata } = useValidateMutation();
   const [hash, setHash] = useState<string | null>(null);
   const [json, setJson] = useState<NodeObject | null>(null);
 
@@ -71,18 +66,19 @@ export const useVoteContextForm = (
   }, [json]);
 
   const validateHash = useCallback(
-    async (storingUrl: string, localHash: string | null) => {
+    async (url: string, localHash: string | null) => {
       try {
         if (!localHash) {
-          throw new Error(MetadataHashValidationErrors.INVALID_HASH);
+          throw new Error(MetadataValidationStatus.INVALID_HASH);
         }
-        await validateMetadataHash(storingUrl, localHash);
+        const result = await validateMetadata({ url, hash: localHash });
+        if (result.status) {
+          throw result.status;
+        }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        if (
-          Object.values(MetadataHashValidationErrors).includes(error.message)
-        ) {
-          if (setErrorMessage) setErrorMessage(error.message);
+        if (Object.values(MetadataValidationStatus).includes(error)) {
+          if (setErrorMessage) setErrorMessage(error);
           if (setStep) setStep(4);
         }
         throw error;

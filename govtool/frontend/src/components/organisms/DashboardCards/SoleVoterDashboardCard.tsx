@@ -131,6 +131,6 @@ export const SoleVoterDashboardCard = ({
         pendingTransaction?.registerAsSoleVoter?.transactionHash ||
         pendingTransaction?.retireAsSoleVoter?.transactionHash
       }
-    ></DashboardActionCard>
+    />
   );
 };

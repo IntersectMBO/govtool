@@ -41,6 +41,9 @@ export const DRepDashboardCard = ({
       ),
   };
 
+  const navigateToDrepDirectory = () =>
+    navigate(PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRepIDBech32));
+
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress
     if (inProgress) {
@@ -74,8 +77,7 @@ export const DRepDashboardCard = ({
           {
             children: t("dashboard.cards.drep.viewDetails"),
             dataTestId: "view-drep-details-button",
-            // TODO: change navigation to drep explorer
-            onClick: () => navigate("/"),
+            onClick: navigateToDrepDirectory,
             variant: "outlined",
             sx: { backgroundColor: "arcticWhite" },
           },

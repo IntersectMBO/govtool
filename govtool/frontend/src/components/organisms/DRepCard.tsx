@@ -15,15 +15,10 @@ type DRepCardProps = {
   isInProgress?: boolean;
   isMe?: boolean;
   onDelegate?: () => void;
-}
+};
 
 export const DRepCard = ({
-  dRep: {
-    status,
-    type,
-    view,
-    votingPower,
-  },
+  dRep: { status, type, view, votingPower },
   isConnected,
   isInProgress,
   isMe,
@@ -36,12 +31,12 @@ export const DRepCard = ({
   return (
     <Card
       {...(isMe && {
-        variant: 'primary',
-        label: t('yourself')
+        variant: "primary",
+        label: t("yourself"),
       })}
       {...(isInProgress && {
-        variant: 'warning',
-        label: t('inProgress')
+        variant: "warning",
+        label: t("inProgress"),
       })}
       sx={{ container: "root / inline-size", py: 2.5 }}
     >
@@ -95,7 +90,7 @@ export const DRepCard = ({
             </Box>
 
             <Box display="flex" gap={3}>
-              <Box maxWidth={100}>
+              <Box>
                 <Typography
                   variant="caption"
                   color="textSecondary"
@@ -104,9 +99,7 @@ export const DRepCard = ({
                   {t("votingPower")}
                 </Typography>
                 <Typography sx={{ whiteSpace: "nowrap" }}>
-                  ₳
-                  {' '}
-                  {correctAdaFormat(votingPower)}
+                  ₳ {correctAdaFormat(votingPower)}
                 </Typography>
               </Box>
               <Divider
@@ -141,14 +134,18 @@ export const DRepCard = ({
         >
           <Button
             variant="outlined"
-            onClick={() => navigate((isConnected
-              ? PATHS.dashboardDRepDirectoryDRep
-              : PATHS.dRepDirectoryDRep
-            ).replace(':dRepId', view))}
+            onClick={() =>
+              navigate(
+                (isConnected
+                  ? PATHS.dashboardDRepDirectoryDRep
+                  : PATHS.dRepDirectoryDRep
+                ).replace(":dRepId", view),
+              )
+            }
           >
             {t("viewDetails")}
           </Button>
-          {status === "Active" && isConnected && onDelegate && (
+          {status === "Active" && isConnected && onDelegate && !isMe && (
             <Button onClick={onDelegate}>{t("delegate")}</Button>
           )}
           {status === "Active" && !isConnected && (

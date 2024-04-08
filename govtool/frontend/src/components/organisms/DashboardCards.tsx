@@ -72,7 +72,6 @@ export const DashboardCards = () => {
       />
 
       <SoleVoterDashboardCard
-        dRepIDBech32={dRepIDBech32}
         pendingTransaction={pendingTransaction}
         voter={voter}
         votingPower={votingPower}

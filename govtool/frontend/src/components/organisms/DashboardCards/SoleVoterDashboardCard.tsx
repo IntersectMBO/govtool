@@ -1,27 +1,21 @@
 import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
 
+import { LoadingButtonProps } from "@atoms";
 import { IMAGES, PATHS } from "@consts";
 import { PendingTransaction } from "@context";
 import { useTranslation } from "@hooks";
-import {
-  DashboardActionCard,
-  DashboardActionCardProps,
-  SoleVoterAction,
-} from "@molecules";
-import { correctAdaFormat, openInNewTab } from "@utils";
-import { LoadingButtonProps } from "@atoms";
 import { VoterInfo } from "@models";
+import { DashboardActionCard, DashboardActionCardProps } from "@molecules";
+import { correctAdaFormat, openInNewTab } from "@utils";
 
 type SoleVoterDashboardCardProps = {
-  dRepIDBech32: string;
   pendingTransaction: PendingTransaction;
   voter: VoterInfo;
   votingPower: number;
 };
 
 export const SoleVoterDashboardCard = ({
-  dRepIDBech32,
   pendingTransaction,
   voter,
   votingPower,
@@ -30,9 +24,6 @@ export const SoleVoterDashboardCard = ({
   const { t } = useTranslation();
 
   const ada = correctAdaFormat(votingPower);
-
-  // TODO: Add navigation to DRep explorer
-  const onClickAction = () => navigate("/");
 
   // learn more button
   const learnMoreButton: LoadingButtonProps = {
@@ -140,15 +131,6 @@ export const SoleVoterDashboardCard = ({
         pendingTransaction?.registerAsSoleVoter?.transactionHash ||
         pendingTransaction?.retireAsSoleVoter?.transactionHash
       }
-    >
-      {(pendingTransaction?.registerAsSoleVoter ||
-        voter.isRegisteredAsSoleVoter) && (
-        <SoleVoterAction
-          dRepId={dRepIDBech32}
-          onClickArrow={onClickAction}
-          sx={{ mt: 1.5 }}
-        />
-      )}
-    </DashboardActionCard>
+    ></DashboardActionCard>
   );
 };

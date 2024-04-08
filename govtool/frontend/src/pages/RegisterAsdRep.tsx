@@ -115,7 +115,7 @@ export const RegisterAsdRep = () => {
             </FormProvider>
           </>
         )}
-        {isMobile && <Footer />}
+        <Footer />
       </Box>
     </Background>
   );

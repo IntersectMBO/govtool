@@ -2,7 +2,7 @@ import { useTranslation } from "@hooks";
 import { Outlet } from "react-router-dom";
 import { checkIsWalletConnected } from "@/utils";
 import { Background, PagePaddingBox, ContentBox } from "@/components/atoms";
-import { TopNav } from "@/components/organisms";
+import { Footer, TopNav } from "@/components/organisms";
 import { PageTitle } from "@/components/molecules";
 
 export const DRepDirectory = () => {
@@ -29,6 +29,7 @@ export const DRepDirectory = () => {
           <Outlet />
         </ContentBox>
       </PagePaddingBox>
+      <Footer />
     </Background>
   );
 };

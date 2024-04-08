@@ -60,7 +60,7 @@ export const Dashboard = () => {
           <DashboardTopNav title={getPageTitle(window.location.pathname)} />
           <ScrollToManage />
           <Outlet />
-          {isMobile ? <Footer /> : null}
+          <Footer />
         </Box>
       </Box>
     </Background>

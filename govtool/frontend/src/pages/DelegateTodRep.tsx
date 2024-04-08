@@ -41,7 +41,7 @@ export const DelegateTodRep = () => {
           {step === 1 && <DelegateTodRepStepOne setStep={setStep} />}
           {step === 2 && <DelegateTodRepStepTwo setStep={setStep} />}
         </Box>
-        {isMobile && <Footer />}
+        <Footer />
       </Box>
     </Background>
   );

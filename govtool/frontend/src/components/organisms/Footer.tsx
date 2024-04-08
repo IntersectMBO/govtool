@@ -1,43 +1,101 @@
 import { Box, Link } from "@mui/material";
 
-import { Typography } from "@atoms";
+import { Button, Typography } from "@atoms";
+import { ICONS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
+type FooterLinkProps = {
+  label: string;
+  onClick: () => void;
+};
+
+const FooterLink = ({ label, onClick }: FooterLinkProps) => (
+  <Link
+    onClick={onClick}
+    sx={{
+      color: "textBlack",
+      cursor: "pointer",
+      fontFamily: "Poppins",
+      fontSize: 12,
+      fontWeight: 400,
+      textDecoration: "none",
+      "&:hover": { color: "primaryBlue" },
+    }}
+  >
+    {label}
+  </Link>
+);
+
 export const Footer = () => {
-  const { isMobile, pagePadding } = useScreenDimension();
+  const { screenWidth } = useScreenDimension();
   const { t } = useTranslation();
+
+  const onClickHelp = () =>
+    openInNewTab("https://docs.sanchogov.tools/support/get-help-in-discord");
+
+  const onClickPrivacyPolicy = () =>
+    openInNewTab("https://docs.sanchogov.tools/legal/privacy-policy");
+
+  // TODO: change term of service link
+  const onClickTermOfService = () =>
+    openInNewTab("https://docs.sanchogov.tools/legal/privacy-policy");
+
+  // TODO: add feedback action
+  const onClickFeedback = () => {};
 
   return (
     <Box
-      display="flex"
-      flexDirection={isMobile ? "column" : "row"}
-      justifyContent="space-between"
-      px={pagePadding}
-      py={4}
+      sx={{
+        alignItems: screenWidth < 640 ? undefined : "center",
+        display: "flex",
+        flexDirection: screenWidth < 640 ? "column" : "row",
+        justifyContent: "space-between",
+        px: screenWidth < 640 ? 2 : 5,
+        py: 2,
+      }}
     >
-      <Box flex={1}>
-        <Typography fontWeight={500} variant="caption">
-          {t("footer.copyright")}
-        </Typography>
+      <Typography fontWeight={500} variant="caption">
+        {t("footer.copyright")}
+      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          gap: 3,
+          mt: screenWidth < 640 ? 1.5 : 0,
+        }}
+      >
+        <FooterLink
+          label={t("footer.privacyPolicy")}
+          onClick={onClickPrivacyPolicy}
+        />
+        <FooterLink
+          label={t("footer.termOfService")}
+          onClick={onClickTermOfService}
+        />
       </Box>
-      <Box display="flex" flexDirection="row" mt={isMobile ? 1.5 : 0}>
-        <Link
-          data-testid="privacy-policy-link"
-          onClick={() =>
-            openInNewTab("https://docs.sanchogov.tools/legal/privacy-policy")
-          }
-          sx={[{ textDecoration: "none" }]}
-          mr={6}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          gap: 3,
+          justifyContent: screenWidth < 640 ? "space-between" : undefined,
+          mt: screenWidth < 640 ? 1.5 : 0,
+        }}
+      >
+        <Button
+          onClick={onClickHelp}
+          size="small"
+          startIcon={<img alt="helpIcon" src={ICONS.helpIcon} />}
+          sx={{ color: "#26252D" }}
+          variant="text"
         >
-          <Typography
-            fontWeight={isMobile ? 300 : 500}
-            sx={{ "&:hover": { color: "primaryBlue", cursor: "pointer" } }}
-            variant="caption"
-          >
-            {t("footer.privacyPolicy")}
-          </Typography>
-        </Link>
+          {t("menu.help")}
+        </Button>
+        <Button onClick={onClickFeedback} size="small" variant="outlined">
+          {t("feedback")}
+        </Button>
       </Box>
     </Box>
   );

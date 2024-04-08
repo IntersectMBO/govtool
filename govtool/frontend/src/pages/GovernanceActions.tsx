@@ -3,7 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Box, CircularProgress, Divider } from "@mui/material";
 
 import { Background, ScrollToManage, Typography } from "@atoms";
-import { GOVERNANCE_ACTIONS_FILTERS, GOVERNANCE_ACTIONS_SORTING, PATHS } from "@consts";
+import {
+  GOVERNANCE_ACTIONS_FILTERS,
+  GOVERNANCE_ACTIONS_SORTING,
+  PATHS,
+} from "@consts";
 import { useCardano } from "@context";
 import {
   useDataActionsBar,
@@ -16,7 +20,7 @@ import { Footer, TopNav, GovernanceActionsToVote } from "@organisms";
 import { WALLET_LS_KEY, getItemFromLocalStorage } from "@utils";
 
 const defaultCategories = GOVERNANCE_ACTIONS_FILTERS.map(
-  (category) => category.key
+  (category) => category.key,
 );
 
 export const GovernanceActions = () => {

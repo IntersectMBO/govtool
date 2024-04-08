@@ -82,7 +82,7 @@ export const EditDRepMetadata = () => {
           {step === 2 && <EditDRepStoreDataInfo setStep={setStep} />}
           {step === 3 && <EditDRepStorageInformation setStep={setStep} />}
         </FormProvider>
-        {isMobile && <Footer />}
+        <Footer />
       </Box>
     </Background>
   );

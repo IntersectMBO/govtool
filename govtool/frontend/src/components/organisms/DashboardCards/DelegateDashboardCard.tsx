@@ -35,7 +35,14 @@ export const DelegateDashboardCard = ({
       openInNewTab(
         "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power",
       ),
+    sx: { backgroundColor: "arcticWhite" },
   };
+
+  const displayedDelegationId = getDisplayedDelegationId(
+    currentDelegation,
+    delegateTx?.resourceId,
+    dRepID,
+  );
 
   const onClickDelegateToAnotherDRep = () =>
     navigate(PATHS.dashboardDRepDirectory);
@@ -56,22 +63,20 @@ export const DelegateDashboardCard = ({
     // current delegation
     if (currentDelegation) {
       return {
-        buttons: [
-          learnMoreButton,
-          {
-            children: t("dashboard.cards.delegation.delegateToAnotherDRep"),
-            dataTestId: "delegate-to-another-drep-button",
-            onClick: onClickDelegateToAnotherDRep,
-          },
-        ],
+        buttons: displayedDelegationId
+          ? [
+              learnMoreButton,
+              {
+                children: t("dashboard.cards.delegation.delegateToAnotherDRep"),
+                dataTestId: "delegate-to-another-drep-button",
+                onClick: onClickDelegateToAnotherDRep,
+                sx: { backgroundColor: "arcticWhite" },
+              },
+            ]
+          : [learnMoreButton],
         description: getDelegationDescription(currentDelegation),
         state: "active",
-        title: (
-          <Trans
-            i18nKey="dashboard.cards.delegation.delegationTitle"
-            values={{ ada }}
-          />
-        ),
+        title: getDelegationTitle(currentDelegation, ada),
       };
     }
 
@@ -90,12 +95,6 @@ export const DelegateDashboardCard = ({
       title: t("dashboard.cards.delegation.noDelegationTitle"),
     };
   })();
-
-  const displayedDelegationId = getDisplayedDelegationId(
-    currentDelegation,
-    delegateTx?.resourceId,
-    dRepID,
-  );
 
   const navigateToDRepDetails = useCallback(
     () =>
@@ -128,12 +127,23 @@ export const DelegateDashboardCard = ({
   );
 };
 
+const getDelegationTitle = (currentDelegation: string, ada: number) => {
+  const key =
+    currentDelegation === "drep_always_no_confidence"
+      ? "dashboard.cards.delegation.noConfidenceDelegationTitle"
+      : currentDelegation === "drep_always_abstain"
+      ? "dashboard.cards.delegation.abstainDelegationTitle"
+      : "dashboard.cards.delegation.dRepDelegationTitle";
+
+  return <Trans i18nKey={key} values={{ ada }} />;
+};
+
 const getDelegationDescription = (currentDelegation: string) => {
   const key =
     currentDelegation === "drep_always_no_confidence"
-      ? "dashboard.cards.delegation.no"
+      ? "dashboard.cards.delegation.noDescription"
       : currentDelegation === "drep_always_abstain"
-      ? "dashboard.cards.delegation.abstain"
+      ? "dashboard.cards.delegation.abstainDescription"
       : undefined;
   return <Trans i18nKey={key} />;
 };

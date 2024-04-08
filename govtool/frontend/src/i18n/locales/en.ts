@@ -124,16 +124,22 @@ export const en = {
           delegateToAnotherDRep: "Delegate to Another DRep",
           noDelegationDescription: "Find a DRep to vote on your behalf.",
           noDelegationActionButton: "View DRep Directory",
-          delegationTitle:
+          dRepDelegationTitle:
             "Your Voting Power of <strong>₳{{ada}}</strong>\nis Delegated to:",
-          abstain: "'ABSTAIN' as default.",
-          no: "'NO' as default.",
+          noConfidenceDelegationTitle:
+            "You have delegated <strong>₳{{ada}}</strong>\nto “No Confidence”",
+          abstainDelegationTitle:
+            "You have delegated <strong>₳{{ada}}</strong>\nto “Abstain”",
+          abstainDescription:
+            "You have selected to apply your Voting Power to Abstain on every vote.",
+          noDescription:
+            "You have selected to apply your Voting Power to No Confidence on every vote.",
           inProgress: {
             title: "Delegation",
             dRep: "Your voting power of ₳<strong>{{ada}}</strong> is being delegated to:",
             abstain:
-              "Your have deleated ₳<strong>{{ada}}</strong> into 'Abstain'.",
-            no: "Your have deleated ₳<strong>{{ada}}</strong> into 'No'.",
+              "You have selected to apply your Voting Power to Abstain on every vote.",
+            no: "You have selected to apply your Voting Power to No Confidence on every vote.",
           },
         },
       },

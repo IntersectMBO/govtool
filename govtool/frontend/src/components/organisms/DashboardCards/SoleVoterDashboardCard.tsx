@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
 
+import { LoadingButtonProps } from "@atoms";
 import { IMAGES, PATHS } from "@consts";
 import { PendingTransaction } from "@context";
 import { useTranslation } from "@hooks";
+import { VoterInfo } from "@models";
 import { DashboardActionCard, DashboardActionCardProps } from "@molecules";
 import { correctAdaFormat, openInNewTab } from "@utils";
-import { LoadingButtonProps } from "@atoms";
-import { VoterInfo } from "@models";
 
 type SoleVoterDashboardCardProps = {
   pendingTransaction: PendingTransaction;

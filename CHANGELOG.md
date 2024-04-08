@@ -11,6 +11,7 @@ changes.
 ## [Unreleased]
 
 - Integrate frontend with metadata validation service [Issue 617](https://github.com/IntersectMBO/govtool/issues/617)
+- Implement a loading modal for the validation of the metadata [Issue 646](https://github.com/IntersectMBO/govtool/issues/646)
 
 ### Added
 

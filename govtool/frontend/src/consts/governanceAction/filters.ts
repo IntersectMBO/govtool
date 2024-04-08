@@ -1,30 +1,39 @@
+import I18n from "@/i18n";
+
 export const GOVERNANCE_ACTIONS_FILTERS = [
   {
     key: "NoConfidence",
-    label: "No Confidence",
+    title: I18n.t("govActions.type.noConfidence.title"),
+    label: I18n.t("govActions.type.noConfidence.label"),
   },
   {
     key: "NewCommittee",
-    label: "New Constitutional Committee or Quorum Size",
+    title: I18n.t("govActions.type.newCommittee.title"),
+    label: I18n.t("govActions.type.newCommittee.label"),
   },
   {
     key: "NewConstitution",
-    label: "Update to the Constitution",
+    title: I18n.t("govActions.type.newConstitution.title"),
+    label: I18n.t("govActions.type.newConstitution.label"),
   },
   {
     key: "HardForkInitiation",
-    label: "Hard Fork",
+    title: I18n.t("govActions.type.hardFork.title"),
+    label: I18n.t("govActions.type.hardFork.label"),
   },
   {
     key: "ParameterChange",
-    label: "Protocol Parameter Changes",
+    title: I18n.t("govActions.type.parameterChange.title"),
+    label: I18n.t("govActions.type.parameterChange.label"),
   },
   {
     key: "TreasuryWithdrawals",
-    label: "Treasury Withdrawals",
+    title: I18n.t("govActions.type.treasuryWithdrawals.title"),
+    label: I18n.t("govActions.type.treasuryWithdrawals.label"),
   },
   {
     key: "InfoAction",
-    label: "Info Action",
+    title: I18n.t("govActions.type.infoAction.title"),
+    label: I18n.t("govActions.type.infoAction.label"),
   },
 ];

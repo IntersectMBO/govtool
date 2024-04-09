@@ -250,7 +250,8 @@ Deployment is timed to key moments in the development process:
 
 - Deploy to the **dev** branch by creating/pushing a tag with the prefix `dev-`. It's advised to name the tags adequately to indicate the testing purpose. Tags can also be described with an additional message.
 - Deploy to **test** on demand by creating/pushing a `test-` prefixed tag. The QA team can refer to these tags as the version they have verified.
-- Deployment to `preprod` and `main` branches is triggered automatically each time those branches are updated.
+- Deployment to the **staging** environment is done when the `preprod` branch is updated.
+- Deployment on **beta** is triggered manually (o far).
 
 ### Workflow Steps
 

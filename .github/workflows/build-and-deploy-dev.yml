@@ -2,7 +2,7 @@ name: Build and deploy GovTool to DEV server
 run-name: Deploy by @${{ github.actor }}
 
 on:
-  workflow_dispatch:
+  create:
 
 env:
   ENVIRONMENT: "dev"
@@ -12,6 +12,7 @@ env:
 jobs:
   deploy:
     name: Deploy app
+    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/dev-')
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -33,8 +34,9 @@ jobs:
       IP_ADDRESS_BYPASSING_BASIC_AUTH2: ${{ secrets.IP_ADDRESS_BYPASSING_BASIC_AUTH2 }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
         with:
+          ref: ${{ github.ref }}
           fetch-depth: 0
 
       - name: Configure AWS credentials

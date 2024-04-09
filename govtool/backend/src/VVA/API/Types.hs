@@ -267,6 +267,27 @@ instance ToSchema GovernanceActionMetadata where
 
 
 
+newtype GovernanceActionReferences
+  = GovernanceActionReferences Value
+  deriving newtype (Show)
+
+instance FromJSON GovernanceActionReferences where
+  parseJSON v@(Aeson.Array a) = pure (GovernanceActionReferences v)
+  parseJSON _                 = fail "GovernanceActionReferences has to be an array"
+
+instance ToJSON GovernanceActionReferences where
+  toJSON (GovernanceActionReferences g) = g
+
+instance ToSchema GovernanceActionReferences where
+    declareNamedSchema _ = pure $ NamedSchema (Just "GovernanceActionReferences") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "A Governance Action References"
+        & example
+          ?~ toJSON
+                ("[{\"uri\": \"google.com\", \"@type\": \"Other\", \"label\": \"example label\"}]" :: Text)
+
+
+
 data ProposalResponse
   = ProposalResponse
       { proposalResponseId             :: Text
@@ -285,6 +306,7 @@ data ProposalResponse
       , proposalResponseMotivation     :: Maybe Text
       , proposalResponseRationale      :: Maybe Text
       , proposalResponseMetadata       :: Maybe GovernanceActionMetadata
+      , proposalResponseReferences     :: Maybe GovernanceActionReferences
       , proposalResponseYesVotes       :: Integer
       , proposalResponseNoVotes        :: Integer
       , proposalResponseAbstainVotes   :: Integer
@@ -310,6 +332,7 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"motivation\": \"Proposal Motivation\","
                   <> "\"rationale\": \"Proposal Rationale\","
                   <> "\"metadata\": {\"key\": \"value\"},"
+                  <> "\"references\": [{\"uri\": \"google.com\", \"@type\": \"Other\", \"label\": \"example label\"}],"
                   <> "\"yesVotes\": 0,"
                   <> "\"noVotes\": 0,"
                   <> "\"abstainVotes\": 0}"
@@ -372,6 +395,7 @@ data VoteParams
       , voteParamsMetadataHash :: Maybe HexText
       , voteParamsEpochNo      :: Integer
       , voteParamsDate         :: UTCTime
+      , voteParamsTxHash       :: HexText
       }
   deriving (Generic, Show)
 
@@ -385,7 +409,8 @@ exampleVoteParams =
   <> "\"url\": \"https://vote.metadata.xyz\","
   <> "\"metadataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
   <> "\"epochNo\": 0,"
-  <> "\"date\": \"1970-01-01T00:00:00Z\"}"
+  <> "\"date\": \"1970-01-01T00:00:00Z\","
+  <> "\"txHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
 
 instance ToSchema VoteParams where
   declareNamedSchema proxy = do
@@ -441,6 +466,7 @@ data DRepInfoResponse
       , dRepInfoResponseUrl                      :: Maybe Text
       , dRepInfoResponseDataHash                 :: Maybe HexText
       , dRepInfoResponseVotingPower              :: Maybe Integer
+      , dRepInfoResponseLatestTxHash             :: Maybe HexText
       }
   deriving (Generic, Show)
 
@@ -455,7 +481,8 @@ exampleDRepInfoResponse =
   <> "\"deposit\": 2000000,"
   <> "\"url\": \"https://drep.metadata.xyz\","
   <> "\"dataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
-  <> "\"votingPower\": 1000000}"
+  <> "\"votingPower\": 1000000,"
+  <> "\"latestTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
 
 instance ToSchema DRepInfoResponse where
   declareNamedSchema proxy = do
@@ -632,6 +659,7 @@ data DRep
       , dRepVotingPower  :: Maybe Integer
       , dRepStatus       :: DRepStatus
       , dRepType         :: DRepType
+      , dRepLatestTxHash :: Maybe HexText
       }
   deriving (Generic, Show)
 
@@ -640,14 +668,15 @@ deriveJSON (jsonOptions "dRep") ''DRep
 
 exampleDrep :: Text
 exampleDrep =
-   "{\"drepId\": \"d3a62ffe9c214e1a6a9809f7ab2a104c117f85e1f171f8f839d94be5\","
- <> "\"view\": \"drep1l8uyy66sm8u82h82gc8hkcy2xu24dl8ffsh58aa0v7d37yp48u8\","
- <> "\"url\": \"https://proposal.metadata.xyz\","
- <> "\"metadataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
- <> "\"deposit\": 0,"
- <> "\"votingPower\": 0,"
- <> "\"status\": \"Active\","
-  <> "\"type\": \"DRep\"}"
+     "{\"drepId\": \"d3a62ffe9c214e1a6a9809f7ab2a104c117f85e1f171f8f839d94be5\","
+  <> "\"view\": \"drep1l8uyy66sm8u82h82gc8hkcy2xu24dl8ffsh58aa0v7d37yp48u8\","
+  <> "\"url\": \"https://proposal.metadata.xyz\","
+  <> "\"metadataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
+  <> "\"deposit\": 0,"
+  <> "\"votingPower\": 0,"
+  <> "\"status\": \"Active\","
+  <> "\"type\": \"DRep\","
+  <> "\"latestTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
 
 -- ToSchema instance for DRep
 instance ToSchema DRep where

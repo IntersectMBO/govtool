@@ -1,5 +1,6 @@
 import { ModalState } from "@/context";
 import I18n from "@/i18n";
+import { MetadataValidationStatus } from "@/models";
 
 export enum MetadataHashValidationErrors {
   INVALID_URL = "Invalid URL",
@@ -29,13 +30,12 @@ const urlCannotBeFound = {
 };
 
 export const storageInformationErrorModals: Record<
-  MetadataHashValidationErrors,
+  MetadataValidationStatus,
   ModalState<
     typeof externalDataDoesntMatchModal | typeof urlCannotBeFound
   >["state"]
 > = {
-  [MetadataHashValidationErrors.INVALID_URL]: urlCannotBeFound,
-  [MetadataHashValidationErrors.FETCH_ERROR]: urlCannotBeFound,
-  [MetadataHashValidationErrors.INVALID_JSON]: externalDataDoesntMatchModal,
-  [MetadataHashValidationErrors.INVALID_HASH]: externalDataDoesntMatchModal,
+  [MetadataValidationStatus.URL_NOT_FOUND]: urlCannotBeFound,
+  [MetadataValidationStatus.INVALID_JSONLD]: externalDataDoesntMatchModal,
+  [MetadataValidationStatus.INVALID_HASH]: externalDataDoesntMatchModal,
 };

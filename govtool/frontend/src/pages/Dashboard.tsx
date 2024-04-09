@@ -3,7 +3,7 @@ import { useLocation, Outlet, useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 
 import { Background, ScrollToManage } from "@atoms";
-import { PATHS } from "@consts";
+import { CONNECTED_NAV_ITEMS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { DashboardTopNav, Drawer, Footer } from "@organisms";
@@ -18,13 +18,11 @@ export const Dashboard = () => {
   const { t } = useTranslation();
 
   const getPageTitle = (path: string) => {
-    if (path === PATHS.dashboard) {
-      return t("dashboard.title");
-    }
-    if (path.includes(PATHS.dashboardGovernanceActions)) {
-      return t("govActions.title");
-    }
-    return "";
+    if (path === PATHS.dashboard) return t("dashboard.title");
+    return (
+      Object.values(CONNECTED_NAV_ITEMS).find(({ navTo }) => pathname.startsWith(navTo))
+        ?.label ?? ""
+    );
   };
 
   useEffect(() => {
@@ -62,7 +60,7 @@ export const Dashboard = () => {
           <DashboardTopNav title={getPageTitle(window.location.pathname)} />
           <ScrollToManage />
           <Outlet />
-          {isMobile ? <Footer /> : null}
+          <Footer />
         </Box>
       </Box>
     </Background>

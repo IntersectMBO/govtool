@@ -97,7 +97,8 @@ drepRegistrationToDrep Types.DRepRegistration {..} =
       dRepDeposit = dRepRegistrationDeposit,
       dRepVotingPower = dRepRegistrationVotingPower,
       dRepStatus = mapDRepStatus dRepRegistrationStatus,
-      dRepType = mapDRepType dRepRegistrationType
+      dRepType = mapDRepType dRepRegistrationType,
+      dRepLatestTxHash = HexText <$> dRepRegistrationLatestTxHash
     }
 
 drepList :: App m => Maybe Text -> m [DRep]
@@ -137,6 +138,7 @@ proposalToResponse Types.Proposal {..} =
     proposalResponseMotivation = proposalMotivaiton,
     proposalResponseRationale = proposalRationale,
     proposalResponseMetadata = GovernanceActionMetadata <$> proposalMetadata,
+    proposalResponseReferences = GovernanceActionReferences <$> proposalReferences,
     proposalResponseYesVotes = proposalYesVotes,
     proposalResponseNoVotes = proposalNoVotes,
     proposalResponseAbstainVotes = proposalAbstainVotes
@@ -151,7 +153,8 @@ voteToResponse Types.Vote {..} =
     voteParamsUrl = voteUrl,
     voteParamsMetadataHash = HexText <$> voteDocHash,
     voteParamsEpochNo = voteEpochNo,
-    voteParamsDate = voteDate
+    voteParamsDate = voteDate,
+    voteParamsTxHash = HexText voteTxHash
   }
 
 
@@ -208,6 +211,7 @@ drepInfo (unHexText -> dRepId) = do
     , dRepInfoResponseUrl = dRepInfoUrl
     , dRepInfoResponseDataHash = HexText <$> dRepInfoDataHash
     , dRepInfoResponseVotingPower = dRepInfoVotingPower
+    , dRepInfoResponseLatestTxHash = HexText <$> dRepInfoLatestTxHash
     }
 
 getCurrentDelegation :: App m => HexText -> m (Maybe HexText)

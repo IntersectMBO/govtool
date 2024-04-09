@@ -1,12 +1,6 @@
 import { createTheme } from "@mui/material/styles";
 import {
-  cyan,
-  errorRed,
-  fadedPurple,
-  orange,
-  primaryBlue,
-  progressYellow,
-  successGreen,
+  cyan, errorRed, orange, primaryBlue, progressYellow, successGreen,
 } from "./consts";
 
 export type Theme = typeof theme;
@@ -23,6 +17,13 @@ export const theme = createTheme({
     },
   },
   components: {
+    MuiAccordion: {
+      styleOverrides: {
+        root: {
+          borderRadius: `12px !important`,
+        }
+      }
+    },
     MuiInputBase: {
       styleOverrides: {
         root: {
@@ -51,7 +52,7 @@ export const theme = createTheme({
         {
           props: { color: "default", variant: "filled" },
           style: {
-            backgroundColor: fadedPurple.c100,
+            backgroundColor: primaryBlue.c50
           },
         },
         {
@@ -105,6 +106,11 @@ export const theme = createTheme({
           borderRadius: 12,
         },
       },
+    },
+    MuiPopover: {
+      defaultProps: {
+        elevation: 2,
+      }
     },
   },
   typography: {

@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 
 import { Background } from "@atoms";
 import { PATHS } from "@consts";
-import { DashboardTopNav, WhatRetirementMeans } from "@organisms";
+import { DashboardTopNav, Footer, WhatRetirementMeans } from "@organisms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { LinkWithIcon } from "@molecules";
 import { checkIsWalletConnected } from "@utils";
@@ -41,6 +41,7 @@ export const RetireAsDrep = () => {
           }}
         />
         <WhatRetirementMeans onClickCancel={onClickBackToDashboard} />
+        <Footer />
       </Box>
     </Background>
   );

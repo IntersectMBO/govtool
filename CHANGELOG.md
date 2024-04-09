@@ -10,12 +10,22 @@ changes.
 
 ## [Unreleased]
 
+- Integrate frontend with metadata validation service [Issue 617](https://github.com/IntersectMBO/govtool/issues/617)
+- Implement a loading modal for the validation of the metadata [Issue 646](https://github.com/IntersectMBO/govtool/issues/646)
+
 ### Added
 
+- addded latestTxHash to the `drep/info` and `drep/list` endpoints [Issue 627](https://github.com/IntersectMBO/govtool/issues/627)
+- added `txHash` to `drep/getVotes` [Issue 626](https://github.com/IntersectMBO/govtool/issues/626)
+- added `references` to all proposal related endpoints
 - added `epochNo` and `date` to `drep/getVotes` and `proposal/get`
 - Added `isRegisteredAsSoleVoter` and `wasRegisteredAsSoleVoter` fields to the drep/info response [Issue 212](https://github.com/IntersectMBO/govtool/issues/212)
 - Abandoning registration as DRep [Issue 151](https://github.com/IntersectMBO/govtool/issues/151)
 - Abandoning GA creation [Issue 359](https://github.com/IntersectMBO/govtool/issues/359)
+- Choose GA type - GA Submiter [Issue 358](https://github.com/IntersectMBO/govtool/issues/358)
+- Create Automated Voting Options component [Issue 216](https://github.com/IntersectMBO/govtool/issues/216)
+- Change step 3 components [Issue 152](https://github.com/intersectMBO/govtool/issues/152)
+- Add possibility to vote on behalf of myself - Sole Voter [Issue 119](https://github.com/IntersectMBO/govtool/issues/119)
 - Create DRep registration page about roles [Issue 205](https://github.com/IntersectMBO/govtool/issues/205)
 - Create Checkbox component. Improve Field and ControlledField [Issue 177](https://github.com/IntersectMBO/govtool/pull/177)
 - Vitest unit tests added for utils functions [Issue 81](https://github.com/IntersectMBO/govtool/issues/81)
@@ -38,6 +48,7 @@ changes.
 
 ### Fixed
 
+- drep/info no longer returns 500 [Issue 676](https://github.com/IntersectMBO/govtool/issues/676)
 - proposal/list search is case insensitive now [Issue 582](https://github.com/IntersectMBO/govtool/issues/582)
 - proposal/list now takes optional `search` query param [Issue 566](https://github.com/IntersectMBO/govtool/issues/566)
 - Fix possible sql error when there would be no predefined drep voting pwoer [Issue 501](https://github.com/IntersectMBO/govtool/issues/501)

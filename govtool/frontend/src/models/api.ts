@@ -8,11 +8,21 @@ export interface VoterInfo {
   deposit: number;
 }
 
+export enum DRepStatus {
+  Active = "Active",
+  Inactive = "Inactive",
+  Retired = "Retired",
+}
+
 export interface DRepData {
   drepId: string;
+  view: string;
   url: string;
   metadataHash: string;
   deposit: number;
+  votingPower: number;
+  status: DRepStatus;
+  type: 'DRep' | 'SoleVoter';
 }
 
 export type Vote = "yes" | "no" | "abstain";

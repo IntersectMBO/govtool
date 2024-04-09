@@ -1,22 +1,35 @@
-import { useQuery } from "react-query";
+import { UseQueryOptions, useQuery } from "react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
-import { getDRepList } from "@services";
+import { GetDRepListParams, getDRepList } from "@services";
+import { DRepData } from "@/models";
 
-export const useGetDRepListQuery = () => {
+export const useGetDRepListQuery = (
+  params?: GetDRepListParams,
+  options?: UseQueryOptions<DRepData[]>
+) => {
+  const { drepView, sort, status } = params || {};
   const { pendingTransaction } = useCardano();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isPreviousData } = useQuery<DRepData[]>({
     queryKey: [
       QUERY_KEYS.useGetDRepListKey,
       (pendingTransaction.registerAsSoleVoter ||
         pendingTransaction.registerAsDrep ||
         pendingTransaction.retireAsSoleVoter ||
         pendingTransaction.retireAsDrep)?.transactionHash,
+      drepView,
+      sort,
+      status,
     ],
-    queryFn: getDRepList,
+    queryFn: () => getDRepList({
+      ...(drepView && { drepView }),
+      ...(sort && { sort }),
+      ...(status && { status }),
+    }),
+    ...options
   });
 
-  return { data, isLoading };
+  return { data, isLoading, isPreviousData };
 };

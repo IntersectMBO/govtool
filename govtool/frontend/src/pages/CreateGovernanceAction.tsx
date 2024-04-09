@@ -88,7 +88,7 @@ export const CreateGovernanceAction = () => {
           {step === 5 && <StoreDataInfo setStep={setStep} />}
           {step === 6 && <StorageInformation setStep={setStep} />}
         </FormProvider>
-        {isMobile && <Footer />}
+        <Footer />
       </Box>
     </Background>
   );

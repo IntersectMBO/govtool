@@ -3,7 +3,7 @@ import { Box, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
 import { ICONS } from "@consts";
-import { DashboardTopNav } from "@organisms";
+import { DashboardTopNav, Footer } from "@organisms";
 import { useScreenDimension } from "@hooks";
 import { useNavigate } from "react-router-dom";
 import { theme } from "@/theme";
@@ -82,6 +82,7 @@ export const CenteredBoxPageWrapper: FC<PropsWithChildren<Props>> = ({
             </Box>
           </Box>
         </Box>
+        <Footer />
       </Box>
     </Background>
   );

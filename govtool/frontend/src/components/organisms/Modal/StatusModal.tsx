@@ -3,8 +3,8 @@ import { Button, Link, Typography } from "@mui/material";
 import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import { ICONS, IMAGES } from "@consts";
 import { useModal } from "@context";
-import { openInNewTab } from "@/utils";
-import { useScreenDimension, useTranslation } from "@/hooks";
+import { openInNewTab } from "@utils";
+import { useScreenDimension, useTranslation } from "@hooks";
 
 export interface StatusModalState {
   buttonText?: string;

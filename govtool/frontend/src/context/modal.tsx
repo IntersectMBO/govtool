@@ -7,6 +7,7 @@ import {
   StatusModal,
   VoteContextModal,
   VotingPowerModal,
+  LoadingModal,
 } from "@organisms";
 import { basicReducer, callAll, BasicReducer } from "@utils";
 
@@ -23,6 +24,7 @@ interface ContextModal {
 
 export type ModalType =
   | "none"
+  | "loadingModal"
   | "chooseWallet"
   | "statusModal"
   | "externalLink"
@@ -32,6 +34,9 @@ export type ModalType =
 const modals: Record<ModalType, ContextModal> = {
   none: {
     component: null,
+  },
+  loadingModal: {
+    component: <LoadingModal />,
   },
   chooseWallet: {
     component: <ChooseWalletModal />,

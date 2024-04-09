@@ -29,5 +29,6 @@ export * from "./Tooltip";
 export * from "./Typography";
 export * from "./VotePill";
 export * from "./VotingPowerChips";
+export * from "./Loader";
 
 export * from "./types";

@@ -34,4 +34,5 @@ export const ICONS = {
   sortWhiteIcon: "/icons/SortWhite.svg",
   timerIcon: "/icons/Timer.svg",
   warningIcon: "/icons/Warning.svg",
+  loaderIcon: "/icons/Loader.svg",
 };

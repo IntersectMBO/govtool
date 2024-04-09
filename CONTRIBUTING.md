@@ -2,7 +2,7 @@
 
 Thanks for considering contributing and helping us on creating GovTool! 😎
 
-The best way to contribute right now is to try things out and provide feedback, but we also accept contributions to the documentation and the obviously to the code itself.
+The best way to contribute right now is to try things out and provide feedback, but we also accept contributions to the documentation and the code itself.
 
 This document contains guidelines to help you get started and how to make sure your contribution gets accepted, making you our newest GovTool contributor!
 
@@ -50,7 +50,8 @@ See [`SUPPORT.md`](./SUPPORT.md) should you have any questions or need some help
 
 ## Roles and Responsibilities
 
-We maintain a [CODEOWNERS file](./CODEOWNERS) which provides information who should review a contributing PR.
+We maintain a [CODEOWNERS file](./CODEOWNERS) which provides information on who should review a contributing PR.
+
 Note that you might need to get approvals from all code owners (even though GitHub doesn't give a way to enforce it).
 
 ## I Want To Contribute
@@ -225,37 +226,66 @@ Please see [stylish-haskell configuration](./govtool/backend/.stylish-haskell.ya
 
 ## Development Processes
 
-### Developer workflow
+### Environments
 
-- Choose ticket/issue to work on from the project, move ticket from `todo` to `in progress`.
-- Create [well named](#branch-naming) branch from `develop` add changes, then make a pull request back to the `develop` branch.
-- If the changes are not ready for review then feel free to create a draft PR, and link this to the ticket/issue.
-- When the PR is ready for review move the ticket from `in progress` to `in review`. Remember to change the state of the PR from draft to actual PR.
-- Developers should review each other's pull requests, and should be requested via [CODEOWNERS](./CODEOWNERS).
-- Unit tests are run on each pull request to `develop`.
-- After a review remember to address all the requests of changes since they are blocking PR from being merged.
-- Once tests pass and peer review is done the branch can be merged into `develop` by author and then deployed to the dev environment (manually).
-- The ticket status can then be moved to `in QA` making sure that the PR/branch has been added to the ticket/issue as a comment.
+The project uses four key environments for deployment to optimize collaboration and ensure quality at each development stage:
 
-### QA Workflow
+- **dev**: For developers to test and refine their work.
+- **test**: For QA team verification.
+- **staging**: For product owner review and approval before production.
+- **beta**: The production environment, using specific semantic versioning.
 
-- Choose ticket from `in QA`.
-- Merge in the ticket's changes from `develop` branch into `test` branch.
-- Deploy to test environment is performed automatically once the ticket is merged to the `test` branch.
-- The QA tests the deployed test environment against the ticket.
-- If QA agrees that the code is good, they can make a PR from `test` branch to `staging` branch where end-to-end and performance tests are run.
-- If tests pass, then QA or tech lead can merge and deploy to staging environment (automatically).
-- Moving ticket to `staging` status this ready for PO check.
+### Branch Structure
 
-### PO Workflow
+The protected branches are prepared with the intention to structure the contribution workflow and clarify the deployment process.
 
-- Choose ticket from `staging` status.
-- Compare the deployment on staging environment to the contents of the ticket.
-- If the deployment has been satisfied via the staging environment, PO comments on the ticket to be included in next release.
+The purpose of the protected branches:
 
-### Tech Lead Workflow
+- `main`: The production branch, updated to deploy to the beta environment.
+- `preprod`: Serves as the base for feature branches, integrating verified work.
 
-- Bundle the staging status tickets together into a new tag.
-- Merge `staging` branch into the `main` branch.
-- Deploy tagged build to `beta` environment.
-- Move tickets from staging status to done status.
+### Deployment
+
+Deployment is timed to key moments in the development process:
+
+- Deploy to the **dev** branch by creating/pushing a tag with the prefix `dev-`. It's advised to name the tags adequately to indicate the testing purpose. Tags can also be described with an additional message.
+- Deploy to **test** on demand by creating/pushing a `test-` prefixed tag. The QA team can refer to these tags as the version they have verified.
+- Deployment to `preprod` and `main` branches is triggered automatically each time those branches are updated.
+
+### Workflow Steps
+
+- Select an issue from the project's **To Do** list and move it to **In Progress**.
+- Create a branch with a suitable name from `preprod`.
+- Organize changes into a pull request targeting the `preprod` branch.
+- If changes aren't ready for review, mark the pull request as a draft.
+- Link the pull request to the issue and describe it, explaining why the change is necessary and what outcomes are expected.
+- Creating a tag with a `dev-` prefix at any stage in git history allows for automatic deployment in the **dev** environment for testing proposed changes.
+- Removing the draft status from a pull request indicates it's ready for review by code owners.
+- The code checks run with each update to the associated branch. If all CI pipeline checks pass, the pull request is ready for review: move the issue to **In Review**.
+- Pull requests need peer reviews, requested through [CODEOWNERS](./CODEOWNERS).
+- Address all review feedback to clear the way for the pull request's advancement to QA testing.
+- Discuss code within comments to improve understanding and ensure a thorough review, aiming for a feature that is comprehensive and defect-free.
+- After a successful peer review and passing tests with all necessary approvals, the feature moves to the **test** environment for testing.
+- The final step in the contribution process is moving the ticket to **In QA**.
+
+#### QA Workflow
+
+- Choose an issue from the **In QA** column.
+- Start deploying the HEAD of the pull request to the **test** environment by creating a `test-` prefixed tag linked to any point in git history.
+- Perform end-to-end testing in the **test** environment for the chosen issue.
+- QA confirms the implementation's correctness in the issue's comments.
+- With this confirmation, the pull request moves to staging. Merging it into the `preprod` branch automatically deploys it to the **staging** environment.
+- Update the issue's status to **In Staging** for Product Owner review.
+
+#### PO Workflow
+
+- Select an issue from the **In Staging** status.
+- Check the deployment in the staging environment against the issue's details.
+- If the staging environment meets deployment requirements, the Product Owner comments on the issue for its inclusion in the next release.
+
+#### Tech Lead Workflow
+
+- Group tickets in the staging status under a new tag.
+- Merge the `staging` branch into the `main` branch.
+- Deploy the tagged build to the **beta** environment.
+- Move tickets from the **In Staging** status to the **Done / Beta** status.

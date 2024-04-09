@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useContext, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useContext,
+  useCallback,
+  useMemo,
+} from "react";
 import { InitOptions, WidgetApi, loadSpace } from "@usersnap/browser";
 import {
   SpaceEventCallback,
@@ -45,8 +51,10 @@ export const UsersnapProvider = ({
     });
   }, [initParams]);
 
+  const value = useMemo(() => ({ openFeedbackWindow }), [openFeedbackWindow]);
+
   return (
-    <UsersnapContext.Provider value={{ openFeedbackWindow }}>
+    <UsersnapContext.Provider value={value}>
       {children}
     </UsersnapContext.Provider>
   );

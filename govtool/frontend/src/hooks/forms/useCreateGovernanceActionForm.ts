@@ -223,7 +223,6 @@ export const useCreateGovernanceActionForm = (
               ],
               onSubmit: backToForm,
               onCancel: backToDashboard,
-              onFeedback: backToDashboard,
             },
           });
         } else {
@@ -233,7 +232,7 @@ export const useCreateGovernanceActionForm = (
         setIsLoading(false);
       }
     },
-    [hash],
+    [hash, buildTransaction, buildSignSubmitConwayCertTx],
   );
 
   return {

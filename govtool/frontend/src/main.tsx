@@ -13,7 +13,7 @@ import TagManager from "react-gtm-module";
 import { ThemeProvider } from "@emotion/react";
 import * as Sentry from "@sentry/react";
 
-import { ContextProviders } from "@context";
+import { ContextProviders, UsersnapProvider } from "@context";
 
 import App from "./App.tsx";
 import { theme } from "./theme.ts";
@@ -84,11 +84,13 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
-        <BrowserRouter>
-          <ContextProviders>
-            <App />
-          </ContextProviders>
-        </BrowserRouter>
+        <UsersnapProvider>
+          <BrowserRouter>
+            <ContextProviders>
+              <App />
+            </ContextProviders>
+          </BrowserRouter>
+        </UsersnapProvider>
       </ThemeProvider>
       {import.meta.env.VITE_IS_DEV && (
         <ReactQueryDevtools initialIsOpen={false} />

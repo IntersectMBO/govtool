@@ -3926,6 +3926,11 @@
   resolved "https://registry.npmjs.org/@ungap/structured-clone/-/structured-clone-1.2.0.tgz"
   integrity sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==
 
+"@usersnap/browser@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@usersnap/browser/-/browser-0.0.5.tgz#95e7ce2ede41448fdee252304922d37467a1bfde"
+  integrity sha512-EG6SOy63lKqqwgS03Olj7iQkptuCIYd2T/o9dM5KYa518F+jycWxlNFVY0Yd5uvzyIRoEAs9TN0goaBHXPBJ3w==
+
 "@vitejs/plugin-react@^3.0.1":
   version "3.1.0"
   resolved "https://registry.npmjs.org/@vitejs/plugin-react/-/plugin-react-3.1.0.tgz"

@@ -170,8 +170,6 @@ export const useEditDRepInfoForm = (
               ],
               onSubmit: backToForm,
               onCancel: backToDashboard,
-              // TODO: Open usersnap feedback
-              onFeedback: backToDashboard,
             },
           });
         } else {

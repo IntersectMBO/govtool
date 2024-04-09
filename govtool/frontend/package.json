@@ -30,6 +30,7 @@
     "@types/jsonld": "^1.5.13",
     "@types/react": "^18.2.12",
     "@types/react-gtm-module": "^2.0.2",
+    "@usersnap/browser": "^0.0.5",
     "axios": "^1.4.0",
     "bech32": "^2.0.0",
     "blakejs": "^1.2.1",

@@ -10,6 +10,7 @@ changes.
 
 ## [Unreleased]
 
+- Inicjalize Usersnap into App [Issue 546](https://github.com/IntersectMBO/govtool/issues/546)
 - Integrate frontend with metadata validation service [Issue 617](https://github.com/IntersectMBO/govtool/issues/617)
 - Implement a loading modal for the validation of the metadata [Issue 646](https://github.com/IntersectMBO/govtool/issues/646)
 - Fix displaying modals to not block signing transactions [Issue 710](https://github.com/IntersectMBO/govtool/issues/710)

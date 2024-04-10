@@ -3,8 +3,9 @@ import { FC, ReactNode } from "react";
 
 import { Button, LoadingButton, LoadingButtonProps, Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
+import { openInNewTab } from "@utils";
+
 import { Card } from "./Card";
-import { openInNewTab } from "@/utils";
 
 export type DashboardActionCardProps = {
   buttons?: LoadingButtonProps[];
@@ -17,6 +18,7 @@ export type DashboardActionCardProps = {
   state?: "active" | "inProgress" | "default";
   title?: ReactNode;
   transactionId?: string;
+  isSpaceBetweenButtons?: boolean;
 };
 
 export const DashboardActionCard: FC<DashboardActionCardProps> = ({
@@ -33,6 +35,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
     state = "default",
     title,
     transactionId,
+    isSpaceBetweenButtons,
   } = props;
 
   const { screenWidth } = useScreenDimension();
@@ -103,20 +106,21 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
             )}
           </Typography>
         ) : null}
+        {children}
+        {transactionId && (
+          <Button
+            onClick={onClickShowTransaction}
+            sx={{ width: "fit-content", p: 0 }}
+            variant="text"
+          >
+            {t("dashboard.cards.showTransaction")}
+          </Button>
+        )}
       </Box>
-      {children}
-      {transactionId && (
-        <Button
-          onClick={onClickShowTransaction}
-          sx={{ width: "fit-content", p: 0 }}
-          variant="text"
-        >
-          {t("dashboard.cards.showTransaction")}
-        </Button>
-      )}
       <Box
         display="flex"
         flexDirection={screenWidth < 640 ? "column" : "row"}
+        justifyContent={isSpaceBetweenButtons ? "space-between" : undefined}
         mt={3}
         gap={2}
       >

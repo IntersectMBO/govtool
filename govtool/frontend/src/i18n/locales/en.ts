@@ -119,33 +119,28 @@ export const en = {
             "You cannot vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>. until you re-register.",
           youAreSoleVoterTitle: "You are a Sole Voter",
         },
-      },
-      delegation: {
-        changeDelegation: "Change delegation",
-        delegateOwnPower:
-          "If you want to delegate your own voting power of ₳<strong>{{ada}}</strong>.",
-        dRepDelegatedTo: "DRep you delegated to",
-        toDRep:
-          "You have delegated your voting power of ₳<strong>{{ada}}</strong> to a selected DRep.",
-        toYourself:
-          "You have delegated your voting power of ₳<strong>{{ada}}</strong> to yourself.",
-        useYourVotingPower: "Use your Voting Power",
-        voteAbstain:
-          "You have delegated your voting power of ₳<strong>{{ada}}</strong>. You are going to vote 'ABSTAIN' as default.",
-        voteNo:
-          "You have delegated your voting power of ₳<strong>{{ada}}</strong>. You are going to vote 'NO' as default.",
-        votingPowerDelegation: "Voting Power Delegation",
-        yourVotingPowerIsDelegated:
-          "Your Voting Power <strong>is Delegated</strong>",
-        inProgress: {
-          toDRep:
-            "Your own voting power of ₳<strong>{{ada}}</strong> is progress of being delegated. You are going to delegate your voting power to a selected DRep.",
-          toYourself:
-            "Your own voting power of ₳<strong>{{ada}}</strong> is in progress of being delegated. You are going to delegate your voting power to yourself.",
-          voteAbstain:
-            "Your own voting power of ₳<strong>{{ada}}</strong> is in progress of being delegated. You are going to vote ‘ABSTAIN’ as default.",
-          voteNo:
-            "Your own voting power of ₳<strong>{{ada}}</strong> is in progress of being delegated. You are going to vote ‘NO’ as default.",
+        delegation: {
+          noDelegationTitle: "Delegate your Voting Power",
+          delegateToAnotherDRep: "Delegate to Another DRep",
+          noDelegationDescription: "Find a DRep to vote on your behalf.",
+          noDelegationActionButton: "View DRep Directory",
+          dRepDelegationTitle:
+            "Your Voting Power of <strong>₳{{ada}}</strong>\nis Delegated to:",
+          noConfidenceDelegationTitle:
+            "You have delegated <strong>₳{{ada}}</strong>\nto “No Confidence”",
+          abstainDelegationTitle:
+            "You have delegated <strong>₳{{ada}}</strong>\nto “Abstain”",
+          abstainDescription:
+            "You have selected to apply your Voting Power to Abstain on every vote.",
+          noDescription:
+            "You have selected to apply your Voting Power to No Confidence on every vote.",
+          inProgress: {
+            title: "Delegation",
+            dRep: "Your voting power of ₳<strong>{{ada}}</strong> is being delegated to:",
+            abstain:
+              "You have selected to apply your Voting Power to Abstain on every vote.",
+            no: "You have selected to apply your Voting Power to No Confidence on every vote.",
+          },
         },
       },
     },
@@ -741,7 +736,7 @@ export const en = {
     goBack: "Go back",
     here: "here",
     info: "Info",
-    inProgress: "In progress",
+    inProgress: "In Progress",
     learnMore: "Learn more",
     linkCopied: "Link copied",
     loading: "Loading...",

@@ -8,7 +8,7 @@ import { useTranslation } from "@hooks";
 import { Card } from "./Card";
 import { SoleVoterActionProps } from "./types";
 
-export const SoleVoterAction = ({
+export const DelegationAction = ({
   dRepId,
   onClickArrow,
   sx,

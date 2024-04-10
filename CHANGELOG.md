@@ -48,6 +48,7 @@ changes.
 
 ### Fixed
 
+- drep/getVotes no longer returns 500 [Issue 685](https://github.com/IntersectMBO/govtool/issues/685)
 - drep/info no longer returns 500 [Issue 676](https://github.com/IntersectMBO/govtool/issues/676)
 - proposal/list search is case insensitive now [Issue 582](https://github.com/IntersectMBO/govtool/issues/582)
 - proposal/list now takes optional `search` query param [Issue 566](https://github.com/IntersectMBO/govtool/issues/566)

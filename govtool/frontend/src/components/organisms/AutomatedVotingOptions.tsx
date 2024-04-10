@@ -84,6 +84,7 @@ export const AutomatedVotingOptions = ({
             isDelegateLoading={isDelegationLoading}
             isSelected={currentDelegation === "drep_always_abstain"}
             onClickDelegate={() => delegate("abstain")}
+            // TODO: Add onClick info
             onClickInfo={() => {}}
             title={t("dRepDirectory.abstainCardTitle")}
             votingPower={votingPower}
@@ -100,6 +101,7 @@ export const AutomatedVotingOptions = ({
             isDelegateLoading={isDelegationLoading}
             isSelected={currentDelegation === "drep_always_no_confidence"}
             onClickDelegate={() => delegate("no confidence")}
+            // TODO: Add onClick info
             onClickInfo={() => {}}
             title={t("dRepDirectory.noConfidenceTitle")}
             votingPower={votingPower}

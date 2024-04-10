@@ -1,4 +1,5 @@
 select DISTINCT ON (voting_procedure.gov_action_proposal_id, voting_procedure.drep_voter) voting_procedure.gov_action_proposal_id, concat(encode(gov_action_tx.hash,'hex'),'#',gov_action_proposal.index), encode(drep_hash.raw, 'hex'), voting_procedure.vote::text, voting_anchor.url, encode(voting_anchor.data_hash, 'hex'), block.epoch_no as epoch_no, block.time as time, encode(vote_tx.hash, 'hex') as vote_tx_hash
+from voting_procedure
 join gov_action_proposal
 on gov_action_proposal.id = voting_procedure.gov_action_proposal_id
 join drep_hash

@@ -35,13 +35,14 @@ export type InfinityProposals = {
 };
 
 type ProposalVote = {
-  proposalId: string;
-  drepId: string;
-  vote: Vote;
-  url: string;
-  metadataHash: string;
   date: string;
+  drepId: string;
   epochNo: number;
+  metadataHash: string;
+  proposalId: string;
+  txHash: string;
+  url: string;
+  vote: Vote;
 };
 
 type ProposalData = {

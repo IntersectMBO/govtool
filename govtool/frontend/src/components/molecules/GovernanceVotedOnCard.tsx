@@ -106,7 +106,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           isCopyButton
           isSliderCard
         />
-        <GovernanceActionCardMyVote vote={vote.vote} />
+        <GovernanceActionCardMyVote voteTxHash={vote.txHash} vote={vote.vote} />
       </Box>
       <Box
         bgcolor="white"

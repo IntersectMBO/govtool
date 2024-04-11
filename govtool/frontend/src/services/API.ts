@@ -7,12 +7,12 @@ const TIMEOUT_IN_SECONDS = 30 * 1000; // 1000 ms is 1 s then its 10 s
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const API = axios.create({
-  baseURL: `${BASE_URL}api`,
+  baseURL: `${BASE_URL}/api`,
   timeout: TIMEOUT_IN_SECONDS,
 });
 
 export const METADATA_VALIDATION_API = axios.create({
-  baseURL: `${BASE_URL}metadata-validation`,
+  baseURL: `${BASE_URL}/metadata-validation`,
   timeout: TIMEOUT_IN_SECONDS,
 });
 

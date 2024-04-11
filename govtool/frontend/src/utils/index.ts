@@ -7,6 +7,7 @@ export * from "./canonizeJSON";
 export * from "./checkIsMaintenanceOn";
 export * from "./checkIsWalletConnected";
 export * from "./dRep";
+export * from "./ellipsizeText";
 export * from "./formatDate";
 export * from "./generateAnchor";
 export * from "./generateJsonld";

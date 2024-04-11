@@ -35,9 +35,10 @@ export const EditDRepStorageInformation = ({
 
   const fileName = getValues("dRepName");
 
-  // TODO: Change link to correct
   const openGuideAboutStoringInformation = () =>
-    openInNewTab("https://sancho.network/");
+    openInNewTab(
+      "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor",
+    );
 
   const isActionButtonDisabled = !watch("storingURL") || !!errors.storingURL;
 

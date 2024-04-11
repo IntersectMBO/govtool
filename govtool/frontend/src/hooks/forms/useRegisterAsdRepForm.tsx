@@ -15,7 +15,12 @@ import {
 } from "@consts";
 import { useCardano, useModal } from "@context";
 import { MetadataValidationStatus } from "@models";
-import { canonizeJSON, downloadJson, generateJsonld } from "@utils";
+import {
+  canonizeJSON,
+  downloadJson,
+  ellipsizeText,
+  generateJsonld,
+} from "@utils";
 
 import { useGetVoterInfo } from "..";
 import { useValidateMutation } from "../mutations";
@@ -110,7 +115,7 @@ export const useRegisterAsdRepForm = (
   const onClickDownloadJson = async () => {
     if (!json) return;
 
-    downloadJson(json, dRepName);
+    downloadJson(json, ellipsizeText(dRepName, 16, ""));
   };
 
   const validateHash = useCallback(

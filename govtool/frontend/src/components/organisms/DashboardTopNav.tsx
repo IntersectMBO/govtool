@@ -53,6 +53,7 @@ export const DashboardTopNav = ({
           display: "flex",
           justifyContent: "space-between",
           position: "sticky",
+          minHeight: isMobile ? 36 : 48,
           px: isMobile ? 2 : 5,
           py: 3,
           top: 0,

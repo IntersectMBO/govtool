@@ -13,13 +13,12 @@ import {
 
 const API_KEY = import.meta.env.VITE_USERSNAP_SPACE_API_KEY;
 
-const defaultValues = {
-  openFeedbackWindow: () => {},
+type UsersnapProviderProps = {
+  initParams?: InitOptions;
+  children?: React.ReactNode;
 };
 
-export const UsersnapContext = React.createContext(defaultValues);
-
-type API = {
+type UsersnapAPI = {
   init: (params?: InitOptions | undefined) => Promise<void>;
   logEvent: (eventName: string) => Promise<void>;
   show: (apiKey: string) => Promise<WidgetApi>;
@@ -29,14 +28,17 @@ type API = {
   off: (eventName: SpaceEventName, callback: SpaceEventCallback) => void;
 };
 
+const defaultValues = {
+  openFeedbackWindow: () => {},
+};
+
+export const UsersnapContext = React.createContext(defaultValues);
+
 export const UsersnapProvider = ({
   initParams,
   children,
-}: {
-  initParams?: InitOptions;
-  children?: React.ReactNode;
-}) => {
-  const [usersnapApi, setUsersnapApi] = useState<API | null>(null);
+}: UsersnapProviderProps) => {
+  const [usersnapApi, setUsersnapApi] = useState<UsersnapAPI | null>(null);
 
   const openFeedbackWindow = useCallback(() => {
     if (usersnapApi) {

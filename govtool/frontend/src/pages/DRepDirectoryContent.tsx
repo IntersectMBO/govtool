@@ -20,6 +20,20 @@ interface DRepDirectoryContentProps {
   isConnected?: boolean;
 }
 
+const Loader = () => (
+  <Box
+    sx={{
+      display: "flex",
+      flex: 1,
+      height: "100%",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <CircularProgress />
+  </Box>
+);
+
 export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   isConnected,
 }) => {
@@ -54,8 +68,12 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     },
   );
 
-  if (stakeKey && votingPower === undefined) {
-    return <CircularProgress sx={{ display: "block", mx: "auto", mt: 4 }} />;
+  if (
+    (stakeKey && votingPower === undefined) ||
+    !dRepList ||
+    (isConnected && currentDelegation === undefined)
+  ) {
+    return <Loader />;
   }
 
   const ada = correctAdaFormat(votingPower);
@@ -107,7 +125,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       )}
 
       {/* DRep list */}
-      <div>
+      <>
         <Typography fontSize={18} fontWeight={500} sx={{ mb: 3 }}>
           {t("dRepDirectory.listTitle")}
         </Typography>
@@ -124,7 +142,11 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           gap={3}
           mt={4}
           p={0}
-          sx={{ opacity: isPreviousData ? 0.5 : 1, transition: "opacity 0.2s" }}
+          sx={{
+            opacity: isPreviousData ? 0.5 : 1,
+            transition: "opacity 0.2s",
+            flex: 1,
+          }}
         >
           {dRepList?.length === 0 && (
             <Card
@@ -163,7 +185,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             );
           })}
         </Box>
-      </div>
+      </>
     </Box>
   );
 };

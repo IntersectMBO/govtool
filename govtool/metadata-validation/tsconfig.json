@@ -16,6 +16,15 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@/*": ["src/*"],
+      "@dto": ["src/dto"],
+      "@enums": ["src/enums"],
+      "@health": ["src/health"],
+      "@schemas": ["src/schemas"],
+      "@types": ["src/types"],
+      "@utils": ["src/utils"]
+    }
   }
 }

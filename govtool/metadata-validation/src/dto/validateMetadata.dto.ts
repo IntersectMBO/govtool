@@ -1,4 +1,6 @@
-import { IsUrl, IsNotEmpty } from 'class-validator';
+import { IsUrl, IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
+
+import { MetadataStandard } from '@types';
 
 export class ValidateMetadataDTO {
   @IsNotEmpty()
@@ -6,4 +8,8 @@ export class ValidateMetadataDTO {
 
   @IsUrl()
   url: string;
+
+  @IsOptional()
+  @IsEnum(MetadataStandard)
+  standard?: MetadataStandard;
 }

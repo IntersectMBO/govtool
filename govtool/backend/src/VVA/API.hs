@@ -47,7 +47,7 @@ type VVAApi =
     :<|> "drep" :> "get-voting-power" :> Capture "drepId" HexText :> Get '[JSON] Integer
     :<|> "drep" :> "getVotes" :> Capture "drepId" HexText :> QueryParams "type" GovernanceActionType :> QueryParam "sort" GovernanceActionSortMode :> Get '[JSON] [VoteResponse]
     :<|> "drep" :> "info" :> Capture "drepId" HexText :> Get '[JSON] DRepInfoResponse
-    :<|> "ada-holder" :> "get-current-delegation" :> Capture "stakeKey" HexText :> Get '[JSON] (Maybe HexText)
+    :<|> "ada-holder" :> "get-current-delegation" :> Capture "stakeKey" HexText :> Get '[JSON] (Maybe DelegationResponse)
     :<|> "ada-holder" :> "get-voting-power" :> Capture "stakeKey" HexText :> Get '[JSON] Integer
     :<|> "proposal" :> "list"
                     :> QueryParams "type" GovernanceActionType
@@ -99,6 +99,14 @@ drepRegistrationToDrep Types.DRepRegistration {..} =
       dRepStatus = mapDRepStatus dRepRegistrationStatus,
       dRepType = mapDRepType dRepRegistrationType,
       dRepLatestTxHash = HexText <$> dRepRegistrationLatestTxHash
+    }
+
+delegationToResponse :: Types.Delegation -> DelegationResponse
+delegationToResponse Types.Delegation {..} =
+  DelegationResponse
+    { delegationResponseDRepHash = HexText <$> delegationDRepHash,
+      delegationResponseDRepView = delegationDRepView,
+      delegationResponseTxHash = HexText delegationTxHash
     }
 
 drepList :: App m => Maybe Text -> m [DRep]
@@ -214,11 +222,11 @@ drepInfo (unHexText -> dRepId) = do
     , dRepInfoResponseLatestTxHash = HexText <$> dRepInfoLatestTxHash
     }
 
-getCurrentDelegation :: App m => HexText -> m (Maybe HexText)
+getCurrentDelegation :: App m => HexText -> m (Maybe DelegationResponse)
 getCurrentDelegation (unHexText -> stakeKey) = do
   CacheEnv {adaHolderGetCurrentDelegationCache} <- asks vvaCache
-  result <- cacheRequest adaHolderGetCurrentDelegationCache stakeKey $ AdaHolder.getCurrentDelegation stakeKey
-  return $ HexText <$> result
+  delegation <- cacheRequest adaHolderGetCurrentDelegationCache stakeKey $ AdaHolder.getCurrentDelegation stakeKey
+  return $ delegationToResponse <$> delegation
 
 getStakeKeyVotingPower :: App m => HexText -> m Integer
 getStakeKeyVotingPower (unHexText -> stakeKey) = do

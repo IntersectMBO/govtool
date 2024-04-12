@@ -24,6 +24,7 @@ import qualified Database.PostgreSQL.Simple as SQL
 
 import           VVA.Config
 import           VVA.Pool                   (ConnectionPool, withPool)
+import           VVA.Types
 
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
@@ -37,12 +38,12 @@ getCurrentDelegationSql = sqlFrom $(embedFile "sql/get-current-delegation.sql")
 getCurrentDelegation ::
   (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m) =>
   Text ->
-  m (Maybe Text)
+  m (Maybe Delegation)
 getCurrentDelegation stakeKey = withPool $ \conn -> do
   result <- liftIO $ SQL.query conn getCurrentDelegationSql (SQL.Only stakeKey)
   case result of
     []                    -> return Nothing
-    [SQL.Only delegation] -> return $ Just delegation
+    [(mDRepHash, dRepView, txHash)] -> return $ Just $ Delegation mDRepHash dRepView txHash
     _                     -> error ("multiple delegations for stake key: " <> unpack stakeKey)
 
 getVotingPowerSql :: SQL.Query

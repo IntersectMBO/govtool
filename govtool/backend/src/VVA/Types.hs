@@ -128,7 +128,7 @@ data CacheEnv
       , getProposalCache                   :: Cache.Cache (Text, Integer) Proposal
       , currentEpochCache                  :: Cache.Cache () (Maybe Value)
       , adaHolderVotingPowerCache          :: Cache.Cache Text Integer
-      , adaHolderGetCurrentDelegationCache :: Cache.Cache Text (Maybe Text)
+      , adaHolderGetCurrentDelegationCache :: Cache.Cache Text (Maybe Delegation)
       , dRepGetVotesCache                  :: Cache.Cache Text ([Vote], [Proposal])
       , dRepInfoCache                      :: Cache.Cache Text DRepInfo
       , dRepVotingPowerCache               :: Cache.Cache Text Integer
@@ -148,4 +148,11 @@ data NetworkMetrics
       , networkMetricsTotalRegisteredDReps          :: Integer
       , networkMetricsAlwaysAbstainVotingPower      :: Integer
       , networkMetricsAlwaysNoConfidenceVotingPower :: Integer
+      }
+
+data Delegation
+  = Delegation
+      { delegationDRepHash :: Maybe Text
+      , delegationDRepView :: Text
+      , delegationTxHash   :: Text
       }

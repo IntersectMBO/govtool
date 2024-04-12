@@ -692,8 +692,25 @@ instance ToSchema DRep where
             & example
               ?~ toJSON exampleDrep
 
+data DelegationResponse
+  = DelegationResponse
+      { delegationResponseDRepHash       :: Maybe HexText
+      , delegationResponseDRepView       :: Text
+      , delegationResponseTxHash         :: HexText
+      }
+deriveJSON (jsonOptions "delegationResponse") ''DelegationResponse
 
+exampleDelegationResponse :: Text
+exampleDelegationResponse = "{\"drepHash\": \"b4e4184bfedf920fec53cdc327de4da661ae427784c0ccca9e3c2f50\","
+                          <> "\"drepView\": \"drep1l8uyy66sm8u82h82gc8hkcy2xu24dl8ffsh58aa0v7d37yp48u8\","
+                          <> "\"txHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
 
+instance ToSchema DelegationResponse where
+    declareNamedSchema _ = pure $ NamedSchema (Just "DelegationResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "Delegation Response"
+        & example
+          ?~ toJSON exampleDelegationResponse
 
 data GetNetworkMetricsResponse
   = GetNetworkMetricsResponse

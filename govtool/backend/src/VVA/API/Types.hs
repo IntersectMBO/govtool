@@ -466,7 +466,10 @@ data DRepInfoResponse
       , dRepInfoResponseUrl                      :: Maybe Text
       , dRepInfoResponseDataHash                 :: Maybe HexText
       , dRepInfoResponseVotingPower              :: Maybe Integer
-      , dRepInfoResponseLatestTxHash             :: Maybe HexText
+      , dRepInfoResponseDRepRegisterTxHash       :: Maybe HexText
+      , dRepInfoResponseDRepRetireTxHash         :: Maybe HexText
+      , dRepInfoResponseSoleVoterRegisterTxHash  :: Maybe HexText
+      , dRepInfoResponseSoleVoterRetireTxHash    :: Maybe HexText
       }
   deriving (Generic, Show)
 
@@ -482,7 +485,10 @@ exampleDRepInfoResponse =
   <> "\"url\": \"https://drep.metadata.xyz\","
   <> "\"dataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
   <> "\"votingPower\": 1000000,"
-  <> "\"latestTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
+  <> "\"dRepRegisterTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
+  <> "\"dRepRetireTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
+  <> "\"soleVoterRegisterTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
+  <> "\"soleVoterRetireTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
 
 instance ToSchema DRepInfoResponse where
   declareNamedSchema proxy = do

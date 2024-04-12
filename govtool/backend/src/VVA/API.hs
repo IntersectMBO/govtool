@@ -219,7 +219,10 @@ drepInfo (unHexText -> dRepId) = do
     , dRepInfoResponseUrl = dRepInfoUrl
     , dRepInfoResponseDataHash = HexText <$> dRepInfoDataHash
     , dRepInfoResponseVotingPower = dRepInfoVotingPower
-    , dRepInfoResponseLatestTxHash = HexText <$> dRepInfoLatestTxHash
+    , dRepInfoResponseDRepRegisterTxHash = HexText <$> dRepInfoDRepRegisterTx
+    , dRepInfoResponseDRepRetireTxHash = HexText <$> dRepInfoDRepRetireTx
+    , dRepInfoResponseSoleVoterRegisterTxHash = HexText <$> dRepInfoSoleVoterRegisterTx
+    , dRepInfoResponseSoleVoterRetireTxHash = HexText <$> dRepInfoSoleVoterRetireTx
     }
 
 getCurrentDelegation :: App m => HexText -> m (Maybe DelegationResponse)

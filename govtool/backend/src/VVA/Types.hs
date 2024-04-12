@@ -75,7 +75,10 @@ data DRepInfo
       , dRepInfoUrl                      :: Maybe Text
       , dRepInfoDataHash                 :: Maybe Text
       , dRepInfoVotingPower              :: Maybe Integer
-      , dRepInfoLatestTxHash             :: Maybe Text
+      , dRepInfoDRepRegisterTx           :: Maybe Text
+      , dRepInfoDRepRetireTx             :: Maybe Text
+      , dRepInfoSoleVoterRegisterTx      :: Maybe Text
+      , dRepInfoSoleVoterRetireTx        :: Maybe Text
       }
 
 data DRepStatus = Retired | Active | Inactive

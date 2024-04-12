@@ -117,7 +117,10 @@ getDRepInfo drepId = withPool $ \conn -> do
       , url
       , dataHash
       , votingPower
-      , txHash
+      , drepRegisterTx
+      , drepRetireTx
+      , soleVoterRegisterTx
+      , soleVoterRetireTx
       )] ->
       return $ DRepInfo
         { dRepInfoIsRegisteredAsDRep = fromMaybe False isRegisteredAsDRep
@@ -128,6 +131,9 @@ getDRepInfo drepId = withPool $ \conn -> do
         , dRepInfoUrl = url
         , dRepInfoDataHash = dataHash
         , dRepInfoVotingPower = votingPower
-        , dRepInfoLatestTxHash = Just txHash
+        , dRepInfoDRepRegisterTx = drepRegisterTx
+        , dRepInfoDRepRetireTx = drepRetireTx
+        , dRepInfoSoleVoterRegisterTx = soleVoterRegisterTx
+        , dRepInfoSoleVoterRetireTx = soleVoterRetireTx
         }
-    [] -> return $ DRepInfo False False False False Nothing Nothing Nothing Nothing Nothing
+    [] -> return $ DRepInfo False False False False Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing

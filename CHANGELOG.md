@@ -73,6 +73,7 @@ changes.
 
 ### Changed
 
+- `drep/info` now returns 4 different tx hashes instead of one latest tx hash [Issue 688](https://github.com/IntersectMBO/govtool/issues/688)
 - `proposal/list` allows user to search by tx hash [Issue 603](https://github.com/IntersectMBO/govtool/issues/603)
 - `proposal/list` returns additional data such ass `expiryEpochNo`, `createdEpochNo`, `title`, `about`, `motivation`,
   `rationale`. `TreasuryWithdrawals` GAs also got nicely formated details. [Issue 372](https://github.com/IntersectMBO/govtool/issues/372)

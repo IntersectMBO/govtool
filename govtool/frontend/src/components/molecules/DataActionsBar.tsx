@@ -86,7 +86,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
             fontWeight: 500,
             height: 48,
             padding: "16px 24px",
-            width: 500,
+            maxWidth: 500,
           }}
         />
         <OrderActionsChip

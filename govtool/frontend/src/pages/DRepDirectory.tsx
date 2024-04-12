@@ -14,7 +14,7 @@ export const DRepDirectory = () => {
 
   if (isConnected) {
     return (
-      <PagePaddingBox sx={{ flex: 1, py: 2 }}>
+      <PagePaddingBox sx={{ display: "flex", flex: 1, py: 2 }}>
         <Outlet />
       </PagePaddingBox>
     );

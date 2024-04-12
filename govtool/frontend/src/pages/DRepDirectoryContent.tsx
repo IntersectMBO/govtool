@@ -79,7 +79,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const ada = correctAdaFormat(votingPower);
 
   return (
-    <Box display="flex" flexDirection="column" gap={4}>
+    <Box display="flex" flex={1} flexDirection="column" gap={4}>
       {/* My delegation */}
       {myDrep && (
         <div>

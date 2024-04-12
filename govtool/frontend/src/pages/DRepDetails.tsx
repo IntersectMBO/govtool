@@ -39,7 +39,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
   const { data, isLoading } = useGetDRepListQuery({ drepView: dRepParam });
   const dRep = data?.[0];
 
-  if (!dRep || isLoading)
+  if (data === undefined || isLoading)
     return (
       <Box
         sx={{

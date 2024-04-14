@@ -21,6 +21,8 @@ export const GovernanceActionCardHeader = ({
         display: "flex",
         alignItems: "center",
         mb: "20px",
+        overflow: "hidden",
+
       }}
       data-testid="governance-action-card-header"
     >
@@ -29,6 +31,10 @@ export const GovernanceActionCardHeader = ({
           fontSize: 18,
           fontWeight: 600,
           lineHeight: "24px",
+          display: "-webkit-box",
+          WebkitBoxOrient: "vertical",
+          WebkitLineClamp: 2,
+          wordBreak: "break-word",
           ...(isDataMissing && { color: "#9E2323" }),
         }}
       >

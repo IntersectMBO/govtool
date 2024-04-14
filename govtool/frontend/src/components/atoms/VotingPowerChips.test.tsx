@@ -11,10 +11,6 @@ describe("VotingPowerChips", () => {
     Hooks,
     "useGetDRepVotingPowerQuery",
   );
-  const mockUseGetAdaHolderVotingPowerQuery = vi.spyOn(
-    Hooks,
-    "useGetAdaHolderVotingPowerQuery",
-  );
   const mockUseScreenDimension = vi.spyOn(Hooks, "useScreenDimension");
   const mockCorrectAdaFormat = vi.spyOn(Utils, "correctAdaFormat");
   const mockUseTranslation = vi.spyOn(Hooks, "useTranslation");
@@ -22,14 +18,10 @@ describe("VotingPowerChips", () => {
 
   it("renders loading spinner when data is loading", () => {
     mockUseCardano.mockReturnValue({
-      stakeKey: "fake_key",
-      isEnableLoading: "demos",
+      isEnableLoading: 'demos',
     } as ReturnType<typeof Context.useCardano>);
     mockUseGetDRepVotingPowerQuery.mockReturnValue(
       {} as ReturnType<typeof Hooks.useGetDRepVotingPowerQuery>,
-    );
-    mockUseGetAdaHolderVotingPowerQuery.mockReturnValue(
-      {} as ReturnType<typeof Hooks.useGetAdaHolderVotingPowerQuery>,
     );
     mockUseScreenDimension.mockReturnValue({
       isMobile: false,
@@ -39,7 +31,7 @@ describe("VotingPowerChips", () => {
       t: (key: string) => key,
     } as ReturnType<typeof Hooks.useTranslation>);
     mockUseGetVoterInfo.mockReturnValue(
-      {} as ReturnType<typeof Hooks.useGetVoterInfo>,
+      { voter: { isRegisteredAsDRep: true } } as ReturnType<typeof Hooks.useGetVoterInfo>,
     );
 
     render(<VotingPowerChips />);
@@ -48,15 +40,11 @@ describe("VotingPowerChips", () => {
 
   it("displays formatted ADA amount when data is available and not loading", () => {
     mockUseCardano.mockReturnValue({
-      stakeKey: "fake_key",
       isEnableLoading: null,
     } as ReturnType<typeof Context.useCardano>);
     mockUseGetDRepVotingPowerQuery.mockReturnValue({
       dRepVotingPower: 1000,
     } as ReturnType<typeof Hooks.useGetDRepVotingPowerQuery>);
-    mockUseGetAdaHolderVotingPowerQuery.mockReturnValue({
-      votingPower: 500,
-    } as ReturnType<typeof Hooks.useGetAdaHolderVotingPowerQuery>);
     mockUseScreenDimension.mockReturnValue({
       isMobile: false,
       screenWidth: 1024,
@@ -73,19 +61,15 @@ describe("VotingPowerChips", () => {
     expect(screen.getByText(/₳ 1000/)).toBeInTheDocument();
   });
 
-  it("displays the tooltip correctly for DRep registered users", async () => {
+  it("displays the tooltip correctly for non-mobile DRep registered users", async () => {
     mockUseCardano.mockReturnValue({
-      stakeKey: "fake_key",
       isEnableLoading: null,
     } as ReturnType<typeof Context.useCardano>);
     mockUseGetDRepVotingPowerQuery.mockReturnValue({
       dRepVotingPower: 1000,
     } as ReturnType<typeof Hooks.useGetDRepVotingPowerQuery>);
-    mockUseGetAdaHolderVotingPowerQuery.mockReturnValue({
-      votingPower: 500,
-    } as ReturnType<typeof Hooks.useGetAdaHolderVotingPowerQuery>);
     mockUseScreenDimension.mockReturnValue({
-      isMobile: true,
+      isMobile: false,
       screenWidth: 800,
     } as ReturnType<typeof Hooks.useScreenDimension>);
     mockUseTranslation.mockReturnValue({

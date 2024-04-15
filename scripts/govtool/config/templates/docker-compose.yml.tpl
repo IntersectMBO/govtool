@@ -209,29 +209,29 @@ services:
       - "traefik.http.services.backend.loadbalancer.server.port=9876"
 
   metadata-validation:
-      build:
-        context: ../../govtool/metadata-validation
-      environment:
-        - PORT=3000
-      logging: *logging
-      restart: always
-      healthcheck:
-        test: ["CMD-SHELL", "curl -f 127.0.0.1:3000/health || exit 1"]
-        interval: 5s
-        timeout: 5s
-        retries: 5
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.middlewares.metadata-validation-stripprefix.stripprefix.prefixes=/metadata-validation"
-        - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=*"
-        - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=*"
-        - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlist=https://<DOMAIN><CSP_ALLOWED_HOSTS>"
-        - "traefik.http.middlewares.backend-cors.headers.accesscontrolmaxage=100"
-        - "traefik.http.routers.to-metadata-validation.rule=Host(`<DOMAIN>`) && PathPrefix(`/metadata-validation`)"
-        - "traefik.http.routers.to-metadata-validation.middlewares=metadata-validation-stripprefix@docker"
-        - "traefik.http.routers.to-metadata-validation.entrypoints=websecure"
-        - "traefik.http.routers.to-metadata-validation.tls.certresolver=myresolver"
-        - "traefik.http.services.metadata-validation.loadbalancer.server.port=3000"
+    build:
+      context: ../../govtool/metadata-validation
+    environment:
+      - PORT=3000
+    logging: *logging
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f 127.0.0.1:3000/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.metadata-validation-stripprefix.stripprefix.prefixes=/metadata-validation"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=*"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=*"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlist=https://<DOMAIN><CSP_ALLOWED_HOSTS>"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolmaxage=100"
+      - "traefik.http.routers.to-metadata-validation.rule=Host(`<DOMAIN>`) && PathPrefix(`/metadata-validation`)"
+      - "traefik.http.routers.to-metadata-validation.middlewares=metadata-validation-stripprefix@docker"
+      - "traefik.http.routers.to-metadata-validation.entrypoints=websecure"
+      - "traefik.http.routers.to-metadata-validation.tls.certresolver=myresolver"
+      - "traefik.http.services.metadata-validation.loadbalancer.server.port=3000"
 
   frontend:
     image: <REPO_URL>/frontend:${FRONTEND_TAG}

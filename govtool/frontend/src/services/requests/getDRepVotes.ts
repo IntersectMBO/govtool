@@ -2,29 +2,22 @@ import { VotedProposal, VotedProposalToDisplay } from "@models";
 import { checkIsMissingGAMetadata } from "@utils";
 import { API } from "../API";
 
+type GetDRepVotesParams = {
+  type?: string[];
+  sort?: string;
+  search?: string;
+};
+
 export const getDRepVotes = async ({
   dRepID,
-  filters,
-  sorting,
+  params,
 }: {
   dRepID: string;
-  filters: string[];
-  sorting: string;
+  params: GetDRepVotesParams;
 }) => {
   const urlBase = `/drep/getVotes/${dRepID}`;
-  let urlParameters = "";
-  if (filters.length > 0) {
-    filters.forEach((item) => {
-      urlParameters += `&type=${item}`;
-    });
-  }
-  if (sorting.length) {
-    urlParameters += `&sort=${sorting}`;
-  }
-  if (urlParameters.length) {
-    urlParameters = urlParameters.replace("&", "?");
-  }
-  const { data } = await API.get<VotedProposal[]>(`${urlBase}${urlParameters}`);
+
+  const { data } = await API.get<VotedProposal[]>(urlBase, { params });
 
   const mappedData = (await Promise.all(
     data.map(async (proposal) => {

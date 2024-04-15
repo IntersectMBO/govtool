@@ -15,6 +15,7 @@ changes.
 
 ### Added
 
+- added search query param to the `drep/getVotes` [Issue 640](https://github.com/IntersectMBO/govtool/issues/640)
 - added drepView and txHash to the `ada-holder/get-current-delegation` [Issue 689](https://github.com/IntersectMBO/govtool/issues/689)
 - addded latestTxHash to the `drep/info` and `drep/list` endpoints [Issue 627](https://github.com/IntersectMBO/govtool/issues/627)
 - added `txHash` to `drep/getVotes` [Issue 626](https://github.com/IntersectMBO/govtool/issues/626)

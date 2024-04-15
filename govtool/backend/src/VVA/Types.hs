@@ -81,21 +81,22 @@ data DRepInfo
       , dRepInfoSoleVoterRetireTx        :: Maybe Text
       }
 
-data DRepStatus = Retired | Active | Inactive
+data DRepStatus = Active | Inactive | Retired deriving (Eq, Ord)
 
-data DRepType = DRep | SoleVoter
+data DRepType = DRep | SoleVoter deriving (Eq)
 
 data DRepRegistration
   = DRepRegistration
-      { dRepRegistrationDRepHash     :: Text
-      , dRepRegistrationView         :: Text
-      , dRepRegistrationUrl          :: Maybe Text
-      , dRepRegistrationDataHash     :: Maybe Text
-      , dRepRegistrationDeposit      :: Integer
-      , dRepRegistrationVotingPower  :: Maybe Integer
-      , dRepRegistrationStatus       :: DRepStatus
-      , dRepRegistrationType         :: DRepType
-      , dRepRegistrationLatestTxHash :: Maybe Text
+      { dRepRegistrationDRepHash               :: Text
+      , dRepRegistrationView                   :: Text
+      , dRepRegistrationUrl                    :: Maybe Text
+      , dRepRegistrationDataHash               :: Maybe Text
+      , dRepRegistrationDeposit                :: Integer
+      , dRepRegistrationVotingPower            :: Maybe Integer
+      , dRepRegistrationStatus                 :: DRepStatus
+      , dRepRegistrationType                   :: DRepType
+      , dRepRegistrationLatestTxHash           :: Maybe Text
+      , dRepRegistrationLatestRegistrationDate :: UTCTime
       }
 
 data Proposal

@@ -7,7 +7,7 @@ include config.mk
 .DEFAULT_GOAL := info
 
 # image tags
-cardano_node_image_tag := 8.9.0
+cardano_node_image_tag := 8.10.0-pre
 cardano_db_sync_image_tag := sancho-4.1.0
 
 .PHONY: all

@@ -14,6 +14,7 @@ changes.
 - Implement a loading modal for the validation of the metadata [Issue 646](https://github.com/IntersectMBO/govtool/issues/646)
 - Change style of url button to trim the file name [Issue 655](https://github.com/IntersectMBO/govtool/issues/655)
 - Change regex for parsing urls to match urls without protocol [Issue 655](https://github.com/IntersectMBO/govtool/issues/655)
+- Integrate ga displaying metadata validation with the validation service [Issue 712](https://github.com/IntersectMBO/govtool/issues/712)
 
 ### Added
 

@@ -4,12 +4,14 @@ import Divider from "@mui/material/Divider";
 
 import { useScreenDimension } from "@hooks";
 import { Typography } from "@atoms";
+import { getMetadataDataMissingStatusTranslation } from "@/utils";
+import { MetadataValidationStatus } from "@/models";
 
 type BreadcrumbsProps = {
   elementOne: string;
   elementOnePath: To;
   elementTwo: string;
-  isDataMissing: boolean;
+  isDataMissing: MetadataValidationStatus | boolean;
 };
 
 export const Breadcrumbs = ({
@@ -19,7 +21,6 @@ export const Breadcrumbs = ({
   isDataMissing,
 }: BreadcrumbsProps) => {
   const { isMobile } = useScreenDimension();
-
   return (
     <Box
       sx={{
@@ -54,7 +55,11 @@ export const Breadcrumbs = ({
           textOverflow: "ellipsis",
         }}
       >
-        {isDataMissing || elementTwo}
+        {(isDataMissing !== false &&
+          getMetadataDataMissingStatusTranslation(
+            isDataMissing as MetadataValidationStatus,
+          )) ||
+          elementTwo}
       </Typography>
     </Box>
   );

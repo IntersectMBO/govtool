@@ -7,7 +7,7 @@ import {
   GovernanceActionDetailsCardVotes,
 } from "@molecules";
 import { GovernanceActionDetailsCardData } from "@organisms";
-import { GAMetedataErrors } from "@utils";
+import { MetadataValidationStatus } from "@models";
 
 type GovernanceActionDetailsCardProps = {
   abstainVotes: number;
@@ -25,7 +25,7 @@ type GovernanceActionDetailsCardProps = {
   rationale?: string;
   yesVotes: number;
   govActionId: string;
-  isDataMissing: boolean | GAMetedataErrors;
+  isDataMissing: boolean | MetadataValidationStatus;
   isDashboard?: boolean;
   isVoter?: boolean;
   voteFromEP?: string;

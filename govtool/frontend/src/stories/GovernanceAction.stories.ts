@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { within, userEvent, waitFor, screen } from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
-import { GAMetedataErrors, formatDisplayDate } from "@utils";
+import { formatDisplayDate } from "@utils";
+import { MetadataValidationStatus } from "@models";
 import { GovernanceActionCard } from "@/components/molecules";
 
 const meta = {
@@ -74,20 +75,20 @@ export const GovernanceActionCardIsLoading: Story = {
 export const GovernanceActionCardDataMissing: Story = {
   args: {
     ...commonArgs,
-    isDataMissing: GAMetedataErrors.DATA_MISSING,
+    isDataMissing: MetadataValidationStatus.URL_NOT_FOUND,
   },
 };
 
 export const GovernanceActionCardIncorectFormat: Story = {
   args: {
     ...commonArgs,
-    isDataMissing: GAMetedataErrors.INCORRECT_FORMAT,
+    isDataMissing: MetadataValidationStatus.INVALID_JSONLD,
   },
 };
 
 export const GovernanceActionCardNotVerifiable: Story = {
   args: {
     ...commonArgs,
-    isDataMissing: GAMetedataErrors.NOT_VERIFIABLE,
+    isDataMissing: MetadataValidationStatus.INVALID_HASH,
   },
 };

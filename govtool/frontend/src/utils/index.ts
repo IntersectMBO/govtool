@@ -14,6 +14,7 @@ export * from "./generateJsonld";
 export * from "./getDRepID";
 export * from "./getGovActionId";
 export * from "./getLengthInBytes";
+export * from "./getMetadataDataMissingStatusTranslation";
 export * from "./getProposalTypeLabel";
 export * from "./isValidFormat";
 export * from "./jsonUtils";

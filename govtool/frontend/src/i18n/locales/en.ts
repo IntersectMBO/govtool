@@ -714,6 +714,11 @@ export const en = {
       usingUnregisteredStakeKeys:
         "Warning, no registered stake keys, using unregistered stake keys",
     },
+    dataMissingErrors: {
+      dataMissing: "Data Missing",
+      notVerifiable: "Not Verifiable",
+      incorrectFormat: "Incorrect Format",
+    },
     about: "About",
     abstain: "Abstain",
     addLink: "+ Add link",

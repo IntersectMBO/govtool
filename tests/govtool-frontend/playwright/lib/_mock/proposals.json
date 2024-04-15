@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1",
+    "txHash": "9db8d88fc58c6eb3e8d9379d748ad381132e2b12a5c72bcecde3aa05bce884d8",
+    "index": 0,
+    "type": "Info",
+    "details": "Info",
+    "createdDate": "2023-12-08T08:58:19.123Z",
+    "expiryDate": "2023-12-07T08:58:19.123Z",
+    "abstainVotes": 0,
+    "noVote": 0,
+    "metadataHash": "1111111111111111111111111111111111111111111111111111111111111111",
+    "url": "https://bit.ly/3zCH2HL",
+    "yesVotes": 0
+  }
+]

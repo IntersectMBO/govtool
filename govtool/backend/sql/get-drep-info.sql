@@ -125,13 +125,13 @@ DRepRegister AS (
 DRepRetire AS (
     SELECT
         encode(AllRegistrationEntries.tx_hash, 'hex') as tx_hash,
-        AllRegistrationEntries.tx_id
+        AllRegistrationEntries.tx_id as tx_id
     FROM
         DRepRegister
     LEFT JOIN
-        AllRegistrationEntries ON AllRegistrationEntries.deposit < 0
-            OR AllRegistrationEntries.voting_anchor_id IS NULL
-    WHERE AllRegistrationEntries.tx_id > DRepRegister.tx_id
+        AllRegistrationEntries ON (AllRegistrationEntries.deposit < 0
+            OR AllRegistrationEntries.voting_anchor_id IS NULL)
+            and  AllRegistrationEntries.tx_id > DRepRegister.tx_id
     ORDER BY
         AllRegistrationEntries.tx_id asc
 
@@ -156,9 +156,9 @@ SoleVoterRetire AS (
     FROM
         SoleVoterRegister
     LEFT JOIN
-        AllRegistrationEntries ON AllRegistrationEntries.deposit < 0
-            OR AllRegistrationEntries.voting_anchor_id IS NOT NULL
-    WHERE AllRegistrationEntries.tx_id > SoleVoterRegister.tx_id
+        AllRegistrationEntries ON (AllRegistrationEntries.deposit < 0
+            OR AllRegistrationEntries.voting_anchor_id IS NOT NULL)
+            AND AllRegistrationEntries.tx_id > SoleVoterRegister.tx_id
     ORDER BY
         AllRegistrationEntries.tx_id asc
 

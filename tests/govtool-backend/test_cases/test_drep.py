@@ -1,5 +1,7 @@
 from models.TestData import Drep, VoteonProposal, Vote, Proposal
+import allure
 
+@allure.story("Drep")
 def validate_drep_list(drep_list: [Drep]) -> bool:
     for item in drep_list:
         if not isinstance(item, dict):
@@ -10,6 +12,7 @@ def validate_drep_list(drep_list: [Drep]) -> bool:
             return False
     return True
 
+@allure.story("Drep")
 def validate_voteonproposal_list(voteonproposal_list: [VoteonProposal]) -> bool:
     for item in voteonproposal_list:
         if not isinstance(item, dict):
@@ -34,12 +37,13 @@ def validate_voteonproposal_list(voteonproposal_list: [VoteonProposal]) -> bool:
     return True
 
 
+@allure.story("Drep")
 def test_list_drep(govtool_api):
     response = govtool_api.drep_list()
     drep_list = response.json()
     validate_drep_list(drep_list)
 
-
+@allure.story("Drep")
 def test_initialized_getVotes( govtool_api, registered_drep):
     response = govtool_api.drep_getVotes(registered_drep["drepId"])
     validate_voteonproposal_list(response.json())
@@ -49,6 +53,7 @@ def test_initialized_getVotes( govtool_api, registered_drep):
     assert len(proposals)==0
 
 
+@allure.story("Drep")
 def test_initialized_getVotingPower(govtool_api, registered_drep):
     response = govtool_api.drep_get_voting_power(registered_drep["drepId"])
     assert isinstance(response.json(), int)

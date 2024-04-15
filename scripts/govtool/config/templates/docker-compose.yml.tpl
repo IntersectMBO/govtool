@@ -206,6 +206,10 @@ services:
       - "traefik.http.routers.to-metadata-validation.entrypoints=websecure"
       - "traefik.http.routers.to-metadata-validation.tls.certresolver=myresolver"
       - "traefik.http.services.metadata-validation.loadbalancer.server.port=3000"
+      - "traefik.http.services.metadata-validation.loadbalancer.healthcheck.path=/health"
+      - "traefik.http.services.metadata-validation.loadbalancer.healthcheck.port=3000"
+      - "traefik.http.services.metadata-validation.loadbalancer.healthcheck.interval=10s"
+      - "traefik.http.services.metadata-validation.loadbalancer.healthcheck.timeout=5s"
 
   backend:
     image: <REPO_URL>/backend:${BACKEND_TAG}
@@ -232,6 +236,10 @@ services:
       - "traefik.http.routers.to-backend.entrypoints=websecure"
       - "traefik.http.routers.to-backend.tls.certresolver=myresolver"
       - "traefik.http.services.backend.loadbalancer.server.port=9876"
+      - "traefik.http.services.backend.loadbalancer.healthcheck.path=/epoch/params"
+      - "traefik.http.services.backend.loadbalancer.healthcheck.port=9876"
+      - "traefik.http.services.backend.loadbalancer.healthcheck.interval=10s"
+      - "traefik.http.services.backend.loadbalancer.healthcheck.timeout=5s"
 
   frontend:
     image: <REPO_URL>/frontend:${FRONTEND_TAG}

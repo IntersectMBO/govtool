@@ -2,7 +2,7 @@ import type { DRepData } from "@models";
 import { API } from "../API";
 
 export type GetDRepListParams = {
-  drepView?: string;
+  search?: string;
   sort?: string;
   status?: string[];
 };

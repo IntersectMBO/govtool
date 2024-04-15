@@ -36,7 +36,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
 
   const { delegate, isDelegating } = useDelegateTodRep();
 
-  const { data, isLoading } = useGetDRepListQuery({ drepView: dRepParam });
+  const { data, isLoading } = useGetDRepListQuery({ search: dRepParam });
   const dRep = data?.[0];
 
   if (data === undefined || isLoading)

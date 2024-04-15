@@ -9,7 +9,7 @@ export const useGetDRepListQuery = (
   params?: GetDRepListParams,
   options?: UseQueryOptions<DRepData[]>
 ) => {
-  const { drepView, sort, status } = params || {};
+  const { search, sort, status } = params || {};
   const { pendingTransaction } = useCardano();
 
   const { data, isLoading, isPreviousData } = useQuery<DRepData[]>({
@@ -19,12 +19,12 @@ export const useGetDRepListQuery = (
         pendingTransaction.registerAsDrep ||
         pendingTransaction.retireAsSoleVoter ||
         pendingTransaction.retireAsDrep)?.transactionHash,
-      drepView,
+      search,
       sort,
       status,
     ],
     queryFn: () => getDRepList({
-      ...(drepView && { drepView }),
+      ...(search && { search }),
       ...(sort && { sort }),
       ...(status && { status }),
     }),

@@ -32,9 +32,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
-      - "traefik.http.routers.http-catchall.entrypoints=web"
-      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      - "traefik.http.routers.to-http-catchall.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.to-http-catchall.entrypoints=web"
+      - "traefik.http.routers.to-http-catchall.middlewares=redirect-to-https"
 
   loki:
     image: grafana/loki:2.9.4
@@ -79,9 +79,9 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`<DOMAIN>`) && PathPrefix(`/grafana`)"
-      - "traefik.http.routers.grafana.entrypoints=websecure"
-      - "traefik.http.routers.grafana.tls.certresolver=myresolver"
+      - "traefik.http.routers.to-grafana.rule=Host(`<DOMAIN>`) && PathPrefix(`/grafana`)"
+      - "traefik.http.routers.to-grafana.entrypoints=websecure"
+      - "traefik.http.routers.to-grafana.tls.certresolver=myresolver"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
   status-service:
@@ -94,9 +94,9 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.status-service.rule=Host(`<DOMAIN>`) && PathPrefix(`/status`)"
-      - "traefik.http.routers.status-service.entrypoints=websecure"
-      - "traefik.http.routers.status-service.tls.certresolver=myresolver"
+      - "traefik.http.routers.to-status-service.rule=Host(`<DOMAIN>`) && PathPrefix(`/status`)"
+      - "traefik.http.routers.to-status-service.entrypoints=websecure"
+      - "traefik.http.routers.to-status-service.tls.certresolver=myresolver"
       - "traefik.http.services.status-service.loadbalancer.server.port=8000"
 
   postgres:
@@ -196,16 +196,16 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`<DOMAIN>`) && PathPrefix(`/api`)"
       - "traefik.http.middlewares.backend-stripprefix.stripprefix.prefixes=/api"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=GET,HEAD,OPTIONS"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=*"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlist=https://<DOMAIN><CSP_ALLOWED_HOSTS>"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.backend-cors.headers.addvaryheader=true"
-      - "traefik.http.routers.backend.middlewares=backend-stripprefix@docker,backend-cors@docker"
-      - "traefik.http.routers.backend.entrypoints=websecure"
-      - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      - "traefik.http.routers.to-backend.rule=Host(`<DOMAIN>`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.to-backend.middlewares=backend-stripprefix@docker,backend-cors@docker"
+      - "traefik.http.routers.to-backend.entrypoints=websecure"
+      - "traefik.http.routers.to-backend.tls.certresolver=myresolver"
       - "traefik.http.services.backend.loadbalancer.server.port=9876"
 
   metadata-validation:
@@ -222,15 +222,15 @@ services:
         retries: 5
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.metadata-validation.rule=Host(`<DOMAIN>`) && PathPrefix(`/metadata-validation`)"
         - "traefik.http.middlewares.metadata-validation-stripprefix.stripprefix.prefixes=/metadata-validation"
-        - "traefik.http.routers.metadata-validation.middlewares=metadata-validation-stripprefix@docker"
         - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=*"
         - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=*"
         - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlist=https://<DOMAIN><CSP_ALLOWED_HOSTS>"
         - "traefik.http.middlewares.backend-cors.headers.accesscontrolmaxage=100"
-        - "traefik.http.routers.metadata-validation.entrypoints=websecure"
-        - "traefik.http.routers.metadata-validation.tls.certresolver=myresolver"
+        - "traefik.http.routers.to-metadata-validation.rule=Host(`<DOMAIN>`) && PathPrefix(`/metadata-validation`)"
+        - "traefik.http.routers.to-metadata-validation.middlewares=metadata-validation-stripprefix@docker"
+        - "traefik.http.routers.to-metadata-validation.entrypoints=websecure"
+        - "traefik.http.routers.to-metadata-validation.tls.certresolver=myresolver"
         - "traefik.http.services.metadata-validation.loadbalancer.server.port=3000"
 
   frontend:
@@ -247,11 +247,11 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`<DOMAIN>`)"
-      - "traefik.http.routers.frontend.entrypoints=websecure"
-      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.middlewares.frontend-csp.headers.contentSecurityPolicy=default-src 'self'; img-src *.usersnap.com https://www.googletagmanager.com 'self' data:; script-src *.usersnap.com 'self' 'unsafe-inline' https://www.googletagmanager.com https://browser.sentry-cdn.com; style-src *.usersnap.com *.googleapis.com 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src *.usersnap.com https://s3.eu-central-1.amazonaws.com/upload.usersnap.com 'self' o4506155985141760.ingest.sentry.io *.google-analytics.com; font-src *.usersnap.com *.gstatic.com 'self' 'unsafe-inline' https://fonts.gstatic.com; worker-src blob:"
-      - "traefik.http.routers.frontend.middlewares=frontend-csp@docker"
+      - "traefik.http.routers.to-frontend.rule=Host(`<DOMAIN>`)"
+      - "traefik.http.routers.to-frontend.entrypoints=websecure"
+      - "traefik.http.routers.to-frontend.tls.certresolver=myresolver"
+      - "traefik.http.routers.to-frontend.middlewares=frontend-csp@docker"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
 
 secrets:

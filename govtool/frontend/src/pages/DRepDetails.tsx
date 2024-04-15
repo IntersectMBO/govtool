@@ -39,8 +39,20 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
   const { data, isLoading } = useGetDRepListQuery({ drepView: dRepParam });
   const dRep = data?.[0];
 
-  if (!dRep && isLoading)
-    return <CircularProgress sx={{ display: "block", mx: "auto", mt: 4 }} />;
+  if (data === undefined || isLoading)
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flex: 1,
+          height: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
 
   if (!dRep) return <Navigate to={PATHS.error} />;
 

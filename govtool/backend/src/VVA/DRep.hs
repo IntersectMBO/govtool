@@ -59,9 +59,10 @@ listDReps ::
   m [DRepRegistration]
 listDReps = withPool $ \conn -> do
   results <- liftIO $ SQL.query_ conn listDRepsSql
+  timeZone <- liftIO getCurrentTimeZone
   return
-    [ DRepRegistration drepHash drepView url dataHash (floor @Scientific deposit) votingPower status drepType txHash
-    | (drepHash, drepView, url, dataHash, deposit, votingPower, isActive, wasDRep, txHash) <- results
+    [ DRepRegistration drepHash drepView url dataHash (floor @Scientific deposit) votingPower status drepType txHash (localTimeToUTC timeZone date)
+    | (drepHash, drepView, url, dataHash, deposit, votingPower, isActive, wasDRep, txHash, date) <- results
     , let status = case (isActive, deposit) of
                       (_, d)        | d < 0 -> Retired
                       (isActive, d) | d >= 0 && isActive -> Active

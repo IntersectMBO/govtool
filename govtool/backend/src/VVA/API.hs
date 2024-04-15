@@ -43,7 +43,11 @@ import           VVA.Types            (App, AppEnv (..),
                                        CacheEnv (..))
 
 type VVAApi =
-         "drep" :> "list" :> QueryParam "drepView" Text :> Get '[JSON] [DRep]
+         "drep" :> "list"
+                :> QueryParam "search" Text
+                :> QueryParams "status" DRepStatus
+                :> QueryParam "sort" DRepSortMode
+                :> Get '[JSON] [DRep]
     :<|> "drep" :> "get-voting-power" :> Capture "drepId" HexText :> Get '[JSON] Integer
     :<|> "drep" :> "getVotes"
                 :> Capture "drepId" HexText
@@ -103,7 +107,8 @@ drepRegistrationToDrep Types.DRepRegistration {..} =
       dRepVotingPower = dRepRegistrationVotingPower,
       dRepStatus = mapDRepStatus dRepRegistrationStatus,
       dRepType = mapDRepType dRepRegistrationType,
-      dRepLatestTxHash = HexText <$> dRepRegistrationLatestTxHash
+      dRepLatestTxHash = HexText <$> dRepRegistrationLatestTxHash,
+      dRepLatestRegistrationDate = dRepRegistrationLatestRegistrationDate
     }
 
 delegationToResponse :: Types.Delegation -> DelegationResponse
@@ -114,17 +119,36 @@ delegationToResponse Types.Delegation {..} =
       delegationResponseTxHash = HexText delegationTxHash
     }
 
-drepList :: App m => Maybe Text -> m [DRep]
-drepList mDRepView = do
+
+drepList :: App m => Maybe Text -> [DRepStatus] -> Maybe DRepSortMode -> m [DRep]
+drepList mSearchQuery statuses mSortMode = do
   CacheEnv {dRepListCache} <- asks vvaCache
   dreps <- cacheRequest dRepListCache () DRep.listDReps
-  let filtered = flip filter dreps $ \Types.DRepRegistration {..} ->
-        case (dRepRegistrationType, mDRepView) of
-          (Types.SoleVoter, Just x) -> x == dRepRegistrationView
-          (Types.DRep, Just x)      -> x `isInfixOf` dRepRegistrationView
-          (Types.DRep, Nothing)     -> True
-          _                         -> False
-  return $ map drepRegistrationToDrep filtered
+
+  let filterDRepsByQuery = case mSearchQuery of
+        Nothing -> filter $ \Types.DRepRegistration {..} -> dRepRegistrationType == Types.DRep
+        Just query -> filter $ \Types.DRepRegistration {..} ->
+          case dRepRegistrationType of
+            Types.SoleVoter -> query == dRepRegistrationView || query == dRepRegistrationDRepHash
+            Types.DRep      ->  query `isInfixOf` dRepRegistrationView
+                                || query `isInfixOf` dRepRegistrationDRepHash
+
+  let filterDRepsByStatus = case statuses of
+        [] -> id
+        _  -> filter $ \Types.DRepRegistration {..} ->
+          mapDRepStatus dRepRegistrationStatus `elem` statuses
+
+  let sortDReps = case mSortMode of
+        Nothing -> id
+        Just VotingPower -> sortOn $ \Types.DRepRegistration {..} ->
+          Down dRepRegistrationVotingPower
+        Just RegistrationDate -> sortOn $ \Types.DRepRegistration {..} ->
+          Down dRepRegistrationLatestRegistrationDate
+        Just Status -> sortOn $ \Types.DRepRegistration {..} ->
+          dRepRegistrationStatus
+
+
+  return $ map drepRegistrationToDrep $ sortDReps $ filterDRepsByQuery $ filterDRepsByStatus dreps
 
 getVotingPower :: App m => HexText -> m Integer
 getVotingPower (unHexText -> dRepId) = do

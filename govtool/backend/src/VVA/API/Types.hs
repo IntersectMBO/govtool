@@ -180,6 +180,45 @@ instance ToParamSchema GovernanceActionType where
       & type_ ?~ OpenApiString
       & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [GovernanceActionType])
 
+
+data DRepSortMode = VotingPower | RegistrationDate | Status
+   deriving
+    ( Bounded
+    , Enum
+    , Eq
+    , Generic
+    , Read
+    , Show
+    )
+
+instance FromJSON DRepSortMode where
+  parseJSON (Aeson.String dRepSortMode) = pure $ fromJust $ readMaybe (Text.unpack dRepSortMode)
+  parseJSON _ = fail ""
+
+instance ToJSON DRepSortMode where
+  toJSON x = Aeson.String $ Text.pack $ show x
+
+instance ToSchema DRepSortMode where
+  declareNamedSchema proxy = do
+    NamedSchema name_ schema_ <- genericDeclareNamedSchema (fromAesonOptions defaultOptions) proxy
+    return $
+      NamedSchema name_ $
+        schema_
+          & description ?~ "DRep Sort Mode"
+          & example ?~ toJSON VotingPower
+
+instance FromHttpApiData DRepSortMode where
+  parseQueryParam t = case readMaybe $ Text.unpack t of
+    Just x  -> Right x
+    Nothing -> Left ("incorrect DRep sort mode: " <> t)
+
+instance ToParamSchema DRepSortMode where
+  toParamSchema _ =
+    mempty
+      & type_ ?~ OpenApiString
+      & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [DRepSortMode])
+
+
 data GovernanceActionSortMode = SoonestToExpire | NewestCreated | MostYesVotes deriving
     ( Bounded
     , Enum
@@ -605,7 +644,7 @@ instance ToSchema DRepHash where
           ?~ toJSON exampleDrepHash
 
 
-data DRepStatus = Retired | Active | Inactive deriving (Generic, Show)
+data DRepStatus = Active | Inactive | Retired deriving (Generic, Show, Eq, Ord, Enum, Bounded, Read)
 
 -- ToJSON instance for DRepStatus
 instance ToJSON DRepStatus where
@@ -627,6 +666,17 @@ instance ToSchema DRepStatus where
         & type_ ?~ OpenApiString
         & description ?~ "DRep Status"
         & enum_ ?~ map toJSON [Retired, Active, Inactive]
+
+instance FromHttpApiData DRepStatus where
+  parseQueryParam t = case readMaybe $ Text.unpack t of
+    Just x  -> Right x
+    Nothing -> Left ("incorrect DRep status " <> t)
+
+instance ToParamSchema DRepStatus where
+  toParamSchema _ =
+    mempty
+      & type_ ?~ OpenApiString
+      & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [DRepStatus])
 
 
 
@@ -657,15 +707,16 @@ instance ToSchema DRepType where
 
 data DRep
   = DRep
-      { dRepDrepId       :: DRepHash
-      , dRepView         :: Text
-      , dRepUrl          :: Maybe Text
-      , dRepMetadataHash :: Maybe Text
-      , dRepDeposit      :: Integer
-      , dRepVotingPower  :: Maybe Integer
-      , dRepStatus       :: DRepStatus
-      , dRepType         :: DRepType
-      , dRepLatestTxHash :: Maybe HexText
+      { dRepDrepId                 :: DRepHash
+      , dRepView                   :: Text
+      , dRepUrl                    :: Maybe Text
+      , dRepMetadataHash           :: Maybe Text
+      , dRepDeposit                :: Integer
+      , dRepVotingPower            :: Maybe Integer
+      , dRepStatus                 :: DRepStatus
+      , dRepType                   :: DRepType
+      , dRepLatestTxHash           :: Maybe HexText
+      , dRepLatestRegistrationDate :: UTCTime
       }
   deriving (Generic, Show)
 
@@ -682,7 +733,8 @@ exampleDrep =
   <> "\"votingPower\": 0,"
   <> "\"status\": \"Active\","
   <> "\"type\": \"DRep\","
-  <> "\"latestTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
+  <> "\"latestTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
+  <> "\"latestRegistrationDate\": \"1970-01-01T00:00:00Z\"}"
 
 -- ToSchema instance for DRep
 instance ToSchema DRep where

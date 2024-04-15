@@ -1,0 +1,153 @@
+name: Integration Test [Playwright]
+
+on:
+  workflow_run:
+    workflows: ["Build and deploy app"]
+    types: [completed]
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    defaults:
+      run:
+        working-directory: tests/govtool-frontend/playwright
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: "./tests/govtool-frontend/playwright/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        id: cache-playwright-browsers
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-browsers
+
+      - name: Install Playwright browsers if not cached
+        if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+
+      - name: Run tests
+        run: |
+          npm test
+
+      - name: Upload report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: allure-results
+          path: tests/govtool-frontend/playwright/allure-results
+
+    env:
+      FRONTEND_URL: ${{vars.FRONTEND_URL}}
+      API_URL: ${{vars.API_URL}}
+      DOCS_URL: ${{ vars.DOCS_URL }}
+      FAUCET_API_URL: ${{ vars.FAUCET_API_URL }}
+      FAUCET_API_KEY: ${{secrets.FAUCET_API_KEY}}
+      KUBER_API_URL: ${{vars.KUBER_API_URL}}
+      KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}
+      WORKERS: ${{vars.WORKERS}}
+
+  publish-report:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: integration-tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download report
+        uses: actions/download-artifact@v3
+        with:
+          name: allure-results
+          path: allure-results
+
+      - name: Get Allure history
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+          repository: ${{vars.GH_PAGES}}
+          token: ${{ secrets.PERSONAL_TOKEN }}
+
+      - name: Create project if not exist
+        id: create-project
+        if: ${{success()}}
+        run: |
+          mkdir project
+          cp -r gh-pages/* project || true
+          if grep -q playwright project/projects.txt; then
+            echo "Project already exists"
+            echo "::set-output name=project_exists::true"
+          else
+            echo playwright >> project/projects.txt
+            echo "::set-output name=project_exists::false" 
+          fi
+
+      - name: Register Project
+        if: steps.create-project.outputs.project_exists != 'true'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          repository-name: ${{vars.GH_PAGES}}
+          branch: gh-pages
+          folder: project
+
+      - name: Generate report number
+        id: report_num
+        run: |
+          if [[ ! -d "gh-pages/playwright" ]]; then
+            latest_number=0
+          else
+            gh_pages_content=$(ls gh-pages/playwright/)
+            latest_number=$(echo "$gh_pages_content" | grep -Eo '[0-9]+' | sort -nr | head -n 1)
+          fi
+          echo "::set-output name=number::$((latest_number+1))"
+
+      - id: report_url
+        run: echo "::set-output name=url::https://$(dirname ${{vars.GH_PAGES}}).github.io/$(basename ${{vars.GH_PAGES}})/playwright"
+      - name: Build report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        id: allure-report
+        with:
+          allure_results: allure-results
+          gh_pages: gh-pages/playwright
+          allure_report: allure-report
+          allure_history: allure-history
+          keep_reports: 2000
+          report_url: ${{steps.report_url.outputs.url}}
+          github_run_num: ${{steps.report_num.outputs.number}}
+
+      - name: Generate Latest Report Redirect
+        run: |
+          mkdir -p build
+          cp -r allure-history/*[^index.html] build/
+          allure_report_path=$(basename ${{vars.GH_PAGES}})
+
+          cat <<EOF > build/index.html
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta http-equiv="refresh" content="0; url=/$allure_report_path/playwright/${{ steps.report_num.outputs.number }}">
+              <title>Redirecting...</title>
+          </head>
+          </html>
+          EOF
+
+      - name: Deploy report to Github Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          repository-name: ${{vars.GH_PAGES}}
+          branch: gh-pages
+          folder: build
+          target-folder: playwright

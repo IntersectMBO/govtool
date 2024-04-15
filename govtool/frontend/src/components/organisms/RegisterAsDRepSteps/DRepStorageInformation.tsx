@@ -11,7 +11,7 @@ import {
 } from "@hooks";
 import { Step } from "@molecules";
 import { BgCard, ControlledField } from "@organisms";
-import { openInNewTab } from "@utils";
+import { openInNewTab, ellipsizeText } from "@utils";
 
 type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -35,9 +35,10 @@ export const DRepStorageInformation = ({
 
   const fileName = getValues("dRepName");
 
-  // TODO: Change link to correct
   const openGuideAboutStoringInformation = () =>
-    openInNewTab("https://sancho.network/");
+    openInNewTab(
+      "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor",
+    );
 
   const isActionButtonDisabled = !watch("storingURL") || !!errors.storingURL;
 
@@ -93,7 +94,7 @@ export const DRepStorageInformation = ({
               }}
               variant="outlined"
             >
-              {`${fileName}.jsonld`}
+              {`${ellipsizeText(fileName, 8)}.jsonld`}
             </Button>
           }
           label={t("registration.storingInformationStep1Label")}

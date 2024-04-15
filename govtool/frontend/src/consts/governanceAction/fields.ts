@@ -19,6 +19,12 @@ export const sharedGovernanceActionFields: SharedGovernanceActionFieldSchema = {
     placeholderI18nKey:
       "createGovernanceAction.fields.declarations.title.placeholder",
     rules: {
+      maxLength: {
+        value: 80,
+        message: I18n.t("createGovernanceAction.fields.validations.maxLength", {
+          maxLength: 80,
+        }),
+      },
       required: {
         value: true,
         message: I18n.t("createGovernanceAction.fields.validations.required"),

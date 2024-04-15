@@ -15,10 +15,10 @@ import           Control.Monad.Reader
 import           Data.Bool            (Bool)
 import           Data.List            (sortOn)
 import qualified Data.Map             as Map
-import           Data.Maybe           (Maybe (Nothing), fromMaybe)
+import           Data.Maybe           (Maybe (Nothing), fromMaybe, catMaybes)
 import           Data.Ord             (Down (..))
 import           Data.Text            hiding (drop, elem, filter, length, map,
-                                       null, take)
+                                       null, take, any)
 import qualified Data.Text            as Text
 
 import           Numeric.Natural      (Natural)
@@ -45,7 +45,12 @@ import           VVA.Types            (App, AppEnv (..),
 type VVAApi =
          "drep" :> "list" :> QueryParam "drepView" Text :> Get '[JSON] [DRep]
     :<|> "drep" :> "get-voting-power" :> Capture "drepId" HexText :> Get '[JSON] Integer
-    :<|> "drep" :> "getVotes" :> Capture "drepId" HexText :> QueryParams "type" GovernanceActionType :> QueryParam "sort" GovernanceActionSortMode :> Get '[JSON] [VoteResponse]
+    :<|> "drep" :> "getVotes"
+                :> Capture "drepId" HexText
+                :> QueryParams "type" GovernanceActionType
+                :> QueryParam "sort" GovernanceActionSortMode
+                :> QueryParam "search" Text
+                :> Get '[JSON] [VoteResponse]
     :<|> "drep" :> "info" :> Capture "drepId" HexText :> Get '[JSON] DRepInfoResponse
     :<|> "ada-holder" :> "get-current-delegation" :> Capture "stakeKey" HexText :> Get '[JSON] (Maybe DelegationResponse)
     :<|> "ada-holder" :> "get-voting-power" :> Capture "stakeKey" HexText :> Get '[JSON] Integer
@@ -192,12 +197,12 @@ mapSortAndFilterProposals selectedTypes sortMode proposals =
         Just MostYesVotes    -> sortOn (Down . proposalResponseYesVotes) filteredProposals
   in sortedProposals
 
-getVotes :: App m => HexText -> [GovernanceActionType] -> Maybe GovernanceActionSortMode -> m [VoteResponse]
-getVotes (unHexText -> dRepId) selectedTypes sortMode = do
+getVotes :: App m => HexText -> [GovernanceActionType] -> Maybe GovernanceActionSortMode -> Maybe Text -> m [VoteResponse]
+getVotes (unHexText -> dRepId) selectedTypes sortMode mSearch = do
   CacheEnv {dRepGetVotesCache} <- asks vvaCache
   (votes, proposals) <- cacheRequest dRepGetVotesCache dRepId $ DRep.getVotes dRepId []
   let voteMap = Map.fromList $ map (\vote@Types.Vote {..} -> (voteProposalId, vote)) votes
-  let processedProposals = mapSortAndFilterProposals selectedTypes sortMode proposals
+  let processedProposals = filter (isProposalSearchedFor mSearch) $ mapSortAndFilterProposals selectedTypes sortMode proposals
   return $
     [ VoteResponse
       { voteResponseVote = voteToResponse (voteMap Map.! read (unpack proposalResponseId))
@@ -237,6 +242,21 @@ getStakeKeyVotingPower (unHexText -> stakeKey) = do
   cacheRequest adaHolderVotingPowerCache stakeKey $ AdaHolder.getStakeKeyVotingPower stakeKey
 
 
+isProposalSearchedFor :: Maybe Text -> ProposalResponse -> Bool
+isProposalSearchedFor Nothing _ = True
+isProposalSearchedFor (Just searchQuery) (ProposalResponse{..}) = fromMaybe False $ do
+          let normalisedSearchQuery = Text.toLower searchQuery
+          let govActionId = unHexText proposalResponseTxHash <> "#" <> Text.pack (show proposalResponseIndex)
+          let valuesToCheck = catMaybes
+                [ Just govActionId
+                , proposalResponseTitle
+                , proposalResponseAbout
+                , proposalResponseMotivation
+                , proposalResponseRationale
+                ]
+
+          pure $ any (\x -> normalisedSearchQuery `isInfixOf` Text.toLower x) valuesToCheck
+
 listProposals
   :: App m
   => [GovernanceActionType]
@@ -255,32 +275,15 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
     Nothing -> return []
     Just drepId ->
       map (voteParamsProposalId . voteResponseVote)
-        <$> getVotes drepId [] Nothing
+        <$> getVotes drepId [] Nothing Nothing
 
-
-
-  let filterF ProposalResponse{..} = case Text.toLower <$> mSearchQuery of
-        Nothing -> True
-        Just searchQuery -> fromMaybe False $ do
-          title <- Text.toLower <$> proposalResponseTitle
-          about <- Text.toLower <$> proposalResponseAbout
-          motivation <- Text.toLower <$> proposalResponseMotivation
-          rationale <- Text.toLower <$> proposalResponseRationale
-          let govActionId = unHexText proposalResponseTxHash <> "#" <> Text.pack (show proposalResponseIndex)
-          let result = searchQuery `isInfixOf` title
-                      || searchQuery `isInfixOf` about
-                      || searchQuery `isInfixOf` motivation
-                      || searchQuery `isInfixOf` rationale
-                      || searchQuery `isInfixOf` govActionId
-
-          pure result
 
   CacheEnv {proposalListCache} <- asks vvaCache
   mappedAndSortedProposals <-
     filter
       ( \p@ProposalResponse {proposalResponseId} ->
           proposalResponseId `notElem` proposalsToRemove
-          && filterF p
+          && isProposalSearchedFor mSearchQuery p
       ) . mapSortAndFilterProposals selectedTypes sortMode <$> cacheRequest proposalListCache () Proposal.listProposals
 
   let total = length mappedAndSortedProposals :: Int

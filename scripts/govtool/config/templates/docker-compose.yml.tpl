@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   traefik:
-    image: traefik:v2.10
+    image: traefik:v3.0
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -32,9 +32,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
-      - "traefik.http.routers.http-catchall.entrypoints=web"
-      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      - "traefik.http.routers.to-http-catchall.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.to-http-catchall.entrypoints=web"
+      - "traefik.http.routers.to-http-catchall.middlewares=redirect-to-https"
 
   loki:
     image: grafana/loki:2.9.4
@@ -79,25 +79,10 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`<DOMAIN>`) && PathPrefix(`/grafana`)"
-      - "traefik.http.routers.grafana.entrypoints=websecure"
-      - "traefik.http.routers.grafana.tls.certresolver=myresolver"
+      - "traefik.http.routers.to-grafana.rule=Host(`<DOMAIN>`) && PathPrefix(`/grafana`)"
+      - "traefik.http.routers.to-grafana.entrypoints=websecure"
+      - "traefik.http.routers.to-grafana.tls.certresolver=myresolver"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
-
-  status-service:
-    build:
-      context: ../../govtool/status-service
-    environment:
-      - GRAFANA_USERNAME=admin
-      - GRAFANA_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
-    restart: always
-    logging: *logging
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.status-service.rule=Host(`<DOMAIN>`) && PathPrefix(`/status`)"
-      - "traefik.http.routers.status-service.entrypoints=websecure"
-      - "traefik.http.routers.status-service.tls.certresolver=myresolver"
-      - "traefik.http.services.status-service.loadbalancer.server.port=8000"
 
   postgres:
     image: postgres:15-alpine
@@ -182,6 +167,50 @@ services:
     restart: always
     logging: *logging
 
+  status-service:
+    build:
+      context: ../../govtool/status-service
+    environment:
+      - GRAFANA_USERNAME=admin
+      - GRAFANA_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+    restart: always
+    logging: *logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.to-status-service.rule=Host(`<DOMAIN>`) && PathPrefix(`/status`)"
+      - "traefik.http.routers.to-status-service.entrypoints=websecure"
+      - "traefik.http.routers.to-status-service.tls.certresolver=myresolver"
+      - "traefik.http.services.status-service.loadbalancer.server.port=8000"
+
+  metadata-validation:
+    build:
+      context: ../../govtool/metadata-validation
+    environment:
+      - PORT=3000
+    logging: *logging
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f 127.0.0.1:3000/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.metadata-validation-stripprefix.stripprefix.prefixes=/metadata-validation"
+      - "traefik.http.middlewares.metadata-validation-cors.headers.accesscontrolallowmethods=*"
+      - "traefik.http.middlewares.metadata-validation-cors.headers.accesscontrolallowheaders=*"
+      - "traefik.http.middlewares.metadata-validation-cors.headers.accesscontrolalloworiginlist=https://<DOMAIN><CSP_ALLOWED_HOSTS>"
+      - "traefik.http.middlewares.metadata-validation-cors.headers.accesscontrolmaxage=100"
+      - "traefik.http.routers.to-metadata-validation.rule=Host(`<DOMAIN>`) && PathPrefix(`/metadata-validation`)"
+      - "traefik.http.routers.to-metadata-validation.middlewares=metadata-validation-stripprefix@docker,metadata-validation-cors@docker"
+      - "traefik.http.routers.to-metadata-validation.entrypoints=websecure"
+      - "traefik.http.routers.to-metadata-validation.tls.certresolver=myresolver"
+      - "traefik.http.services.metadata-validation.loadbalancer.server.port=3000"
+      - "traefik.http.services.metadata-validation.loadbalancer.healthcheck.path=/health"
+      - "traefik.http.services.metadata-validation.loadbalancer.healthcheck.port=3000"
+      - "traefik.http.services.metadata-validation.loadbalancer.healthcheck.interval=10s"
+      - "traefik.http.services.metadata-validation.loadbalancer.healthcheck.timeout=5s"
+
   backend:
     image: <REPO_URL>/backend:${BACKEND_TAG}
     command: /usr/local/bin/vva-be -c /run/secrets/backend-config.json start-app
@@ -196,42 +225,21 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`<DOMAIN>`) && PathPrefix(`/api`)"
       - "traefik.http.middlewares.backend-stripprefix.stripprefix.prefixes=/api"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=GET,HEAD,OPTIONS"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=*"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlist=https://<DOMAIN><CSP_ALLOWED_HOSTS>"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.backend-cors.headers.addvaryheader=true"
-      - "traefik.http.routers.backend.middlewares=backend-stripprefix@docker,backend-cors@docker"
-      - "traefik.http.routers.backend.entrypoints=websecure"
-      - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      - "traefik.http.routers.to-backend.rule=Host(`<DOMAIN>`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.to-backend.middlewares=backend-stripprefix@docker,backend-cors@docker"
+      - "traefik.http.routers.to-backend.entrypoints=websecure"
+      - "traefik.http.routers.to-backend.tls.certresolver=myresolver"
       - "traefik.http.services.backend.loadbalancer.server.port=9876"
-
-  metadata-validation:
-      build:
-        context: ../../govtool/metadata-validation
-      environment:
-        - PORT=3000
-      logging: *logging
-      restart: always
-      healthcheck:
-        test: ["CMD-SHELL", "curl -f 127.0.0.1:3000/health || exit 1"]
-        interval: 5s
-        timeout: 5s
-        retries: 5
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.metadata-validation.rule=Host(`<DOMAIN>`) && PathPrefix(`/metadata-validation`)"
-        - "traefik.http.middlewares.metadata-validation-stripprefix.stripprefix.prefixes=/metadata-validation"
-        - "traefik.http.routers.metadata-validation.middlewares=metadata-validation-stripprefix@docker"
-        - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=*"
-        - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=*"
-        - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlist=https://<DOMAIN><CSP_ALLOWED_HOSTS>"
-        - "traefik.http.middlewares.backend-cors.headers.accesscontrolmaxage=100"
-        - "traefik.http.routers.metadata-validation.entrypoints=websecure"
-        - "traefik.http.routers.metadata-validation.tls.certresolver=myresolver"
-        - "traefik.http.services.metadata-validation.loadbalancer.server.port=3000"
+      - "traefik.http.services.backend.loadbalancer.healthcheck.path=/epoch/params"
+      - "traefik.http.services.backend.loadbalancer.healthcheck.port=9876"
+      - "traefik.http.services.backend.loadbalancer.healthcheck.interval=10s"
+      - "traefik.http.services.backend.loadbalancer.healthcheck.timeout=5s"
 
   frontend:
     image: <REPO_URL>/frontend:${FRONTEND_TAG}
@@ -247,11 +255,12 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`<DOMAIN>`)"
-      - "traefik.http.routers.frontend.entrypoints=websecure"
-      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.middlewares.frontend-csp.headers.contentSecurityPolicy=default-src 'self'; img-src *.usersnap.com https://www.googletagmanager.com 'self' data:; script-src *.usersnap.com 'self' 'unsafe-inline' https://www.googletagmanager.com https://browser.sentry-cdn.com; style-src *.usersnap.com *.googleapis.com 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src *.usersnap.com https://s3.eu-central-1.amazonaws.com/upload.usersnap.com 'self' o4506155985141760.ingest.sentry.io *.google-analytics.com; font-src *.usersnap.com *.gstatic.com 'self' 'unsafe-inline' https://fonts.gstatic.com; worker-src blob:"
-      - "traefik.http.routers.frontend.middlewares=frontend-csp@docker"
+      - "traefik.http.routers.to-frontend.rule=Host(`<DOMAIN>`)"
+      - "traefik.http.routers.to-frontend.entrypoints=websecure"
+      - "traefik.http.routers.to-frontend.tls.certresolver=myresolver"
+      - "traefik.http.routers.to-frontend.middlewares=frontend-csp@docker"
+      - "traefik.http.routers.to-frontend.priority=1"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
 
 secrets:

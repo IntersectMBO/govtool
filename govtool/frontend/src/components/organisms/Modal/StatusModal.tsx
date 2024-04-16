@@ -2,7 +2,7 @@ import { Button, Link, Typography } from "@mui/material";
 
 import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import { ICONS, IMAGES } from "@consts";
-import { useModal } from "@context";
+import { useModal, useUsersnapApi } from "@context";
 import { openInNewTab } from "@utils";
 import { useScreenDimension, useTranslation } from "@hooks";
 
@@ -26,6 +26,12 @@ export const StatusModal = () => {
   const { state, closeModal } = useModal<StatusModalState>();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
+  const { openFeedbackWindow } = useUsersnapApi();
+
+  const onClickFeedback = () => {
+    openFeedbackWindow();
+    closeModal();
+  };
 
   return (
     <ModalWrapper dataTestId={state ? state.dataTestId : "status-modal"}>
@@ -95,7 +101,7 @@ export const StatusModal = () => {
       {state?.feedbackText && (
         <Button
           data-testid="feedback-button"
-          onClick={state?.onFeedback ? state?.onFeedback : closeModal}
+          onClick={state?.onFeedback ? state?.onFeedback : onClickFeedback}
           sx={{
             borderRadius: 50,
             margin: "0 auto",

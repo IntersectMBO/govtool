@@ -2,6 +2,7 @@ import { Box, Link } from "@mui/material";
 
 import { Button, Typography } from "@atoms";
 import { ICONS } from "@consts";
+import { useUsersnapApi } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
@@ -30,6 +31,7 @@ const FooterLink = ({ label, onClick }: FooterLinkProps) => (
 export const Footer = () => {
   const { screenWidth } = useScreenDimension();
   const { t } = useTranslation();
+  const { openFeedbackWindow } = useUsersnapApi();
 
   const onClickHelp = () =>
     openInNewTab("https://docs.sanchogov.tools/support/get-help-in-discord");
@@ -41,8 +43,7 @@ export const Footer = () => {
   const onClickTermOfService = () =>
     openInNewTab("https://docs.sanchogov.tools/legal/privacy-policy");
 
-  // TODO: add feedback action
-  const onClickFeedback = () => {};
+  const onClickFeedback = () => openFeedbackWindow();
 
   return (
     <Box

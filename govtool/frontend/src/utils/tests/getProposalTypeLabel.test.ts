@@ -9,7 +9,7 @@ describe("getProposalTypeLabel", () => {
 
   it("returns correct label for another known type", () => {
     const type = "ParameterChange";
-    const expectedLabel = "Protocol Parameter Changes";
+    const expectedLabel = "Protocol Parameter Change";
     expect(getProposalTypeLabel(type)).toBe(expectedLabel);
   });
 

@@ -6,7 +6,7 @@ import { PATHS } from "@consts";
 import { useCardano } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { GovernanceActionCard } from "@molecules";
-import { getProposalTypeLabel, getFullGovActionId, openInNewTab } from "@utils";
+import { getProposalTypeTitle, getFullGovActionId, openInNewTab } from "@utils";
 import { Slider } from "@organisms";
 
 type GovernanceActionsToVoteProps = {
@@ -103,7 +103,7 @@ export const GovernanceActionsToVote = ({
                 onDashboard={onDashboard}
                 searchPhrase={searchPhrase}
                 sorting={sorting}
-                title={getProposalTypeLabel(item.title)}
+                title={getProposalTypeTitle(item.title)}
               />
               {index < proposals.length - 1 && (
                 <Box height={isMobile ? 40 : 52} />

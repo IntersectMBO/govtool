@@ -9,7 +9,7 @@ describe("getProposalTypeNoEmptySpaces", () => {
 
   it("returns correct label with no spaces for another known type", () => {
     const type = "ParameterChange";
-    const expectedLabel = "ProtocolParameterChanges";
+    const expectedLabel = "ProtocolParameterChange";
     expect(getProposalTypeNoEmptySpaces(type)).toBe(expectedLabel);
   });
 

@@ -424,6 +424,36 @@ export const en = {
         partOne: "Governance action with id",
         partTwo: "does not exist.",
       },
+      type: {
+        noConfidence: {
+          title: "No Confidence",
+          label: "No Confidence",
+        },
+        newCommittee: {
+          title: "New Committee",
+          label: "New Committee",
+        },
+        newConstitution: {
+          title: "Update to the Constitution",
+          label: "Update to the Constitution",
+        },
+        hardFork: {
+          title: "Hard Fork",
+          label: "Hard Fork",
+        },
+        parameterChange: {
+          title: "Protocol Parameter Changes",
+          label: "Protocol Parameter Change",
+        },
+        treasuryWithdrawals: {
+          title: "Treasury Withdrawals",
+          label: "Treasury Withdrawal",
+        },
+        infoAction: {
+          title: "Info Action",
+          label: "Info Action",
+        },
+      },
     },
     hero: {
       connectWallet: "Connect your wallet",

@@ -6,10 +6,36 @@ import React, {
   useMemo,
 } from "react";
 import { InitOptions, WidgetApi, loadSpace } from "@usersnap/browser";
-import {
-  SpaceEventCallback,
-  SpaceEventName,
-} from "node_modules/@usersnap/browser/dist/types";
+
+type WidgetValues = {
+  assignee?: string;
+  custom?: object;
+  labels?: Array<string>;
+  visitor?: string;
+};
+type WidgetEventApi = {
+  setValue: <K extends keyof WidgetValues>(
+    key: K,
+    value: WidgetValues[K],
+  ) => void;
+};
+
+type WidgetBeforeSubmitEvent = {
+  apiKey: string;
+  api: WidgetEventApi;
+  values: WidgetValues;
+};
+
+type WidgetOpenEvent = {
+  api: WidgetEventApi;
+  type: "open";
+};
+
+type SpaceEventCallback = (
+  event: WidgetOpenEvent | WidgetBeforeSubmitEvent,
+) => void;
+
+type SpaceEventName = "open" | "close" | "beforeSubmit" | "submit";
 
 const API_KEY = import.meta.env.VITE_USERSNAP_SPACE_API_KEY;
 

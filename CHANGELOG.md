@@ -107,6 +107,7 @@ changes.
 - Extend the eslint config to apply to the style guide of the project [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
 - Update frontend package readme to reflect recent changes [Issue 543](https://github.com/IntersectMBO/govtool/issues/543)
 - Change input selection strategy to 3 (random) [Issue 575](https://github.com/IntersectMBO/govtool/issues/575)
+- Changed documents to prepare for open source [Issue 737](https://github.com/IntersectMBO/govtool/issues/737)
 
 ### Removed
 

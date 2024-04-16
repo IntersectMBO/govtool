@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-Please report (suspected) security vulnerabilities to [XXXX@intersectmbo.org](XXXX@intersectmbo.org).
+Please report (suspected) security vulnerabilities to [oso@intersectmbo.org](oso@intersectmbo.org).
 You will receive a response from us within 48 hours.
 If the issue is confirmed, we will release a patch as soon as possible.
 

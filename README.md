@@ -25,26 +25,18 @@ Learn more; [docs.sanchogov.tools](https://docs.sanchogov.tools/).
 
 - [GovTool Backend](./govtool/backend/README.md)
 - [GovTool Frontend](./govtool/frontend/README.md)
-- [GovTool deployment setup](./scripts/govtool/README.md)
+- [GovTool Infrastructure](./infra/)
 - [Documentation](./docs/)
 - [Tests](./tests/)
 
 ### Utilities
 
-- [Governance Action Loader](./src/governance-action-loader/)
-
-## 🔩 Architecture
-
-GovTool consists of a Haskell backend and a React Typescript frontend.
+- [Governance Action Loader](./governance-action-loader/)
 
 ### Backend
 
 GovTool backend implements an API wrapper around an instance of [DB-Sync](https://github.com/IntersectMBO/cardano-db-sync) which interfaces with a [Cardano Node](https://github.com/IntersectMBO/cardano-node).
 The API exposes endpoints making the querying of governance related data from DB-Sync straight forward.
-
-#### API Reference
-
-[`Swagger documentation`](https://sanchogov.tools/api/swagger-ui/)
 
 ### Frontend
 
@@ -54,4 +46,7 @@ Frontend is able to connect to Cardano wallets over the [CIP-30](https://github.
 ## 🤝 Contributing
 
 Thanks for considering contributing and helping us on creating GovTool! 😎
+
+⚠️ We are in the process of improving our contributing documentation, improvements to come.
+
 Please checkout our [Contributing Documentation](./CONTRIBUTING.md).

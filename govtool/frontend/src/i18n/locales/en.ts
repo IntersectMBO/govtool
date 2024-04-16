@@ -214,11 +214,6 @@ export const en = {
             "Your Governance Action may take a little time to submit to the chain.",
           title: "Governance Action submitted!",
         },
-        loading: {
-          title: "GovTool Is Checking Your Data",
-          message:
-            "GovTool will read the URL that you supplied and make a check to see if it’s identical with the information that you entered on the form.",
-        },
       },
     },
     delegation: {
@@ -541,6 +536,11 @@ export const en = {
         title: "Please wait for your previous transaction to be completed.",
         message:
           "Before performing a new action please wait for the previous action transaction to be completed.",
+      },
+      pendingValidation: {
+        title: "GovTool Is Checking Your Data",
+        message:
+          "GovTool will read the URL that you supplied and make a check to see if it’s identical with the information that you entered on the form.",
       },
     },
     editMetadata: {

@@ -23,3 +23,4 @@ export * from "./openInNewTab";
 export * from "./removeDuplicatedProposals";
 export * from "./validateMetadataHash";
 export * from "./wait";
+export * from "./generateMetadataBody";

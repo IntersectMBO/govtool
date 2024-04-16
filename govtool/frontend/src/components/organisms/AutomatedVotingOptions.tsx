@@ -14,7 +14,7 @@ import { useTranslation } from "@hooks";
 import { AutomatedVotingCard } from "@molecules";
 
 type AutomatedVotingOptionsProps = {
-  currentDelegation: string | undefined;
+  currentDelegation?: string | null;
   delegate: (delegateTo: string) => void;
   votingPower: string;
   delegationInProgress?: string;

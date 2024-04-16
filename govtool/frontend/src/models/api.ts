@@ -6,6 +6,10 @@ export interface VoterInfo {
   isRegisteredAsSoleVoter: boolean;
   wasRegisteredAsSoleVoter: boolean;
   deposit: number;
+  dRepRegisterTxHash: string | null;
+  dRepRetireTxHash: string | null;
+  soleVoterRegisterTxHash: string | null;
+  soleVoterRetireTxHash: string | null;
 }
 
 export enum DRepStatus {
@@ -75,3 +79,9 @@ export type VotedProposalToDisplay = {
     isDataMissing: boolean | MetadataValidationStatus;
   };
 };
+
+export type CurrentDelegation = {
+  dRepHash: string | null;
+  dRepView: string | null;
+  txHash: string | null;
+} | null;

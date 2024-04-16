@@ -3,12 +3,12 @@ name: Backend Test
 on:
   push:
     paths:
-    - .github/workflows/test_backend.yml
+      - .github/workflows/test_backend.yml
   #     - govtool/backend
   #     - tests/govtool-backend
 
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
   workflow_dispatch:
     inputs:
       deployment:
@@ -21,29 +21,104 @@ on:
           - "govtool-sanchonet.cardanoapi.io/api"
 
 jobs:
-  build:
+  backend-tests:
     runs-on: ubuntu-latest
     steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Set up Python
-          uses: actions/setup-python@v4
-          with:
-            python-version: 3.11.4
-            cache: 'pip'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11.4
+          cache: "pip"
 
-        - name: Run Backend Test
-          working-directory: tests/govtool-backend
-          run: |
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-            pytest -v --github-report
-          env:
-            BASE_URL:   https://${{inputs.deployment ||  'staging.govtool.byron.network/api' }}
-            METRICS_URL: https://metrics.cardanoapi.io
-            METRICS_API_SECRET: "${{ secrets.METRICS_SERVER_SECRET_TOKEN }}"
+      - name: Run Backend Test
+        working-directory: tests/govtool-backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m pytest --alluredir allure-results
+        env:
+          BASE_URL: https://${{inputs.deployment ||  'staging.govtool.byron.network/api' }}
+          METRICS_URL: https://metrics.cardanoapi.io
+          METRICS_API_SECRET: "${{ secrets.METRICS_SERVER_SECRET_TOKEN }}"
 
-        # - uses: schemathesis/action@v1
-        #   with:
-        #     schema: "http://localhost:8080/swagger.json"
+      - name: Upload report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: allure-results
+          path: tests/govtool-backend/allure-results
+
+  publish-report:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: backend-tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download results
+        uses: actions/download-artifact@v3
+        with:
+          name: allure-results
+          path: allure-results
+
+      - name: Get Allure history
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+          repository: ${{vars.GH_PAGES}}
+          token: ${{secrets.PERSONAL_TOKEN}}
+
+      - name: Register report
+        id: register-project
+        if: ${{success()}}
+        run: |
+          chmod +x ./register_report.sh
+          ./register_report.sh
+      - if: steps.register-project.outputs.project_exists != 'true'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          repository-name: ${{vars.GH_PAGES}}
+          branch: gh-pages
+          folder: project
+
+      - name: Generate report details
+        id: report-details
+        run: |
+          chmod +x ./generate_report_details.sh
+          ./generate_report_details.sh
+
+      - name: Build report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        id: allure-report
+        with:
+          allure_results: allure-results
+          gh_pages: gh-pages/${{env.REPORT_NAME}}
+          allure_report: allure-report
+          allure_history: allure-history
+          keep_reports: 2000
+          report_url: ${{steps.report-details.outputs.report_url}}
+          github_run_num: ${{steps.report-details.outputs.report_number}}
+
+      - name: Generate Latest Report
+        run: |
+          chmod +x ./generate_latest_report_redirect.sh
+          ./generate_latest_report_redirect.sh ${{steps.report-details.outputs.report_number}}
+
+      - name: Deploy report to Github Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          repository-name: ${{vars.GH_PAGES}}
+          branch: gh-pages
+          folder: build
+          target-folder: ${{ env.REPORT_NAME }}
+
+    env:
+      REPORT_NAME: backend
+      GH_PAGES: ${{vars.GH_PAGES}}

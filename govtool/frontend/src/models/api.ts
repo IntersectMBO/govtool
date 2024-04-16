@@ -1,4 +1,4 @@
-import { GAMetedataErrors } from "@utils";
+import { MetadataValidationStatus } from "@models";
 
 export interface VoterInfo {
   isRegisteredAsDRep: boolean;
@@ -22,7 +22,7 @@ export interface DRepData {
   deposit: number;
   votingPower: number;
   status: DRepStatus;
-  type: 'DRep' | 'SoleVoter';
+  type: "DRep" | "SoleVoter";
 }
 
 export type Vote = "yes" | "no" | "abstain";
@@ -70,5 +70,7 @@ export interface VotedProposal {
 }
 export type VotedProposalToDisplay = {
   vote: ProposalVote;
-  proposal: ProposalData & { isDataMissing: boolean | GAMetedataErrors };
+  proposal: ProposalData & {
+    isDataMissing: boolean | MetadataValidationStatus;
+  };
 };

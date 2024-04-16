@@ -49,7 +49,7 @@ export const WhatRetirementMeans = ({
           state: {
             buttonText: t("modals.common.goToDashboard"),
             dataTestId: "retirement-transaction-submitted-modal",
-            link: "https://adanordic.com/latest_transactions",
+            link: `https://sancho.cexplorer.io/tx/${result}`,
             message: t("modals.retirement.message"),
             onSubmit,
             status: "success",

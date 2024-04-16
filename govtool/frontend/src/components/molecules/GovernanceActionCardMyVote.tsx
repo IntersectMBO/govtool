@@ -6,10 +6,11 @@ import { useTranslation } from "@hooks";
 import { Vote } from "@models";
 
 type Props = {
+  voteTxHash: string;
   vote: Vote;
 };
 
-export const GovernanceActionCardMyVote = ({ vote }: Props) => {
+export const GovernanceActionCardMyVote = ({ voteTxHash, vote }: Props) => {
   const { t } = useTranslation();
 
   return (
@@ -41,8 +42,7 @@ export const GovernanceActionCardMyVote = ({ vote }: Props) => {
         </Box>
         <Button
           onClick={() =>
-            // TODO: Confirm/change the link
-            openInNewTab("https://adanordic.com/latest_transactions")
+            openInNewTab(`https://sancho.cexplorer.io/tx/${voteTxHash}`)
           }
           variant="text"
           size="small"

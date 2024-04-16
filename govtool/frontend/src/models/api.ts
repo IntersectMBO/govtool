@@ -6,6 +6,10 @@ export interface VoterInfo {
   isRegisteredAsSoleVoter: boolean;
   wasRegisteredAsSoleVoter: boolean;
   deposit: number;
+  dRepRegisterTxHash: string | null;
+  dRepRetireTxHash: string | null;
+  soleVoterRegisterTxHash: string | null;
+  soleVoterRetireTxHash: string | null;
 }
 
 export enum DRepStatus {
@@ -35,13 +39,14 @@ export type InfinityProposals = {
 };
 
 type ProposalVote = {
-  proposalId: string;
-  drepId: string;
-  vote: Vote;
-  url: string;
-  metadataHash: string;
   date: string;
+  drepId: string;
   epochNo: number;
+  metadataHash: string;
+  proposalId: string;
+  txHash: string;
+  url: string;
+  vote: Vote;
 };
 
 type ProposalData = {
@@ -74,3 +79,9 @@ export type VotedProposalToDisplay = {
     isDataMissing: boolean | MetadataValidationStatus;
   };
 };
+
+export type CurrentDelegation = {
+  dRepHash: string | null;
+  dRepView: string | null;
+  txHash: string | null;
+} | null;

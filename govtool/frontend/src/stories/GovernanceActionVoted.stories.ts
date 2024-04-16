@@ -59,6 +59,7 @@ export const GovernanceVotedOnCardComponent: Story = {
         proposalId: "exampleproposalid12dsadasdasda",
         url: "https://exampleurl.com",
         vote: "yes",
+        txHash: "dwq78dqw78qwd78wdq78dqw78dqw",
       },
       proposal: {
         createdEpochNo: 232,
@@ -95,6 +96,7 @@ export const GovernanceVotedOnCardAbstain: Story = {
         proposalId: "exampleproposalid12dsadasdasda",
         url: "https://exampleurl.com",
         vote: "abstain",
+        txHash: "dwq78dqw78qwd78wdq78dqw78dqw",
       },
       proposal: {
         createdEpochNo: 232,
@@ -132,6 +134,7 @@ export const GovernanceVotedOnCardYes: Story = {
         proposalId: "exampleproposalid12dsadasdasda",
         url: "https://exampleurl.com",
         vote: "yes",
+        txHash: "dwq78dqw78qwd78wdq78dqw78dqw",
       },
       proposal: {
         createdEpochNo: 232,
@@ -169,6 +172,7 @@ export const GovernanceVotedOnCardNo: Story = {
         proposalId: "exampleproposalid12dsadasdasda",
         url: "https://exampleurl.com",
         vote: "no",
+        txHash: "dwq78dqw78qwd78wdq78dqw78dqw",
       },
       proposal: {
         createdEpochNo: 232,

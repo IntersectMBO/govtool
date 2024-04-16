@@ -14,7 +14,9 @@ export const DRepDirectory = () => {
 
   if (isConnected) {
     return (
-      <PagePaddingBox sx={{ display: "flex", flex: 1, py: 2 }}>
+      <PagePaddingBox
+        sx={{ display: "flex", flex: 1, flexDirection: "column", py: 2 }}
+      >
         <Outlet />
       </PagePaddingBox>
     );
@@ -30,7 +32,9 @@ export const DRepDirectory = () => {
         <PageTitle title={t("dRepDirectory.title")} />
 
         <PagePaddingBox sx={{ display: "flex", flex: 1, py: 2 }}>
-          <ContentBox sx={{ display: "flex", flex: 1 }}>
+          <ContentBox
+            sx={{ display: "flex", flex: 1, flexDirection: "column" }}
+          >
             <Outlet />
           </ContentBox>
         </PagePaddingBox>

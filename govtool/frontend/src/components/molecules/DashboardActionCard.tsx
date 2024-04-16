@@ -17,7 +17,7 @@ export type DashboardActionCardProps = {
   isInProgressOnCard?: boolean;
   state?: "active" | "inProgress" | "default";
   title?: ReactNode;
-  transactionId?: string;
+  transactionId?: string | null;
   isSpaceBetweenButtons?: boolean;
 };
 

@@ -50,9 +50,9 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   const { data: myDRepList } = useGetDRepListQuery(
     {
-      search: currentDelegation?.startsWith("drep")
-        ? currentDelegation
-        : formHexToBech32(currentDelegation),
+      search: currentDelegation?.dRepView?.startsWith("drep")
+        ? currentDelegation.dRepView
+        : formHexToBech32(currentDelegation?.dRepHash ?? ""),
     },
     { enabled: !!inProgressDelegation || !!currentDelegation },
   );
@@ -103,10 +103,11 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           <AutomatedVotingOptions
             currentDelegation={
               !pendingTransaction.delegate &&
+              currentDelegation?.dRepView &&
               ["drep_always_abstain", "drep_always_no_confidence"].includes(
-                currentDelegation,
+                currentDelegation?.dRepView,
               )
-                ? currentDelegation
+                ? currentDelegation?.dRepView
                 : undefined
             }
             delegate={delegate}

@@ -3,17 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
+import { PendingTransaction } from "@context";
 import { useTranslation } from "@hooks";
+import { CurrentDelegation } from "@models";
 import {
   DashboardActionCard,
   DashboardActionCardProps,
   DelegationAction,
 } from "@molecules";
 import { correctAdaFormat, formHexToBech32, openInNewTab } from "@utils";
-import { PendingTransaction } from "@/context/pendingTransaction";
 
 type DelegateDashboardCardProps = {
-  currentDelegation: string;
+  currentDelegation: CurrentDelegation;
   delegateTx: PendingTransaction["delegate"];
   dRepID: string;
   votingPower: number;
@@ -38,11 +39,11 @@ export const DelegateDashboardCard = ({
     sx: { backgroundColor: "arcticWhite" },
   };
 
-  const displayedDelegationId = getDisplayedDelegationId(
-    currentDelegation,
-    delegateTx?.resourceId,
+  const displayedDelegationId = getDisplayedDelegationId({
+    currentDelegation: currentDelegation?.dRepView,
+    delegateTo: delegateTx?.resourceId,
     dRepID,
-  );
+  });
 
   const onClickDelegateToAnotherDRep = () =>
     navigate(PATHS.dashboardDRepDirectory);
@@ -63,7 +64,7 @@ export const DelegateDashboardCard = ({
     // current delegation
     if (currentDelegation) {
       return {
-        buttons: displayedDelegationId
+        buttons: currentDelegation?.dRepView
           ? [
               learnMoreButton,
               {
@@ -74,9 +75,9 @@ export const DelegateDashboardCard = ({
               },
             ]
           : [learnMoreButton],
-        description: getDelegationDescription(currentDelegation),
+        description: getDelegationDescription(currentDelegation.dRepView),
         state: "active",
-        title: getDelegationTitle(currentDelegation, ada),
+        title: getDelegationTitle(currentDelegation.dRepView, ada),
       };
     }
 
@@ -110,8 +111,8 @@ export const DelegateDashboardCard = ({
   return (
     <DashboardActionCard
       imageURL={IMAGES.govActionDelegateImage}
-      isSpaceBetweenButtons
-      transactionId={delegateTx?.resourceId}
+      isSpaceBetweenButtons={!!currentDelegation?.dRepView}
+      transactionId={delegateTx?.resourceId || currentDelegation?.txHash}
       {...cardProps}
     >
       {displayedDelegationId && (
@@ -127,7 +128,7 @@ export const DelegateDashboardCard = ({
   );
 };
 
-const getDelegationTitle = (currentDelegation: string, ada: number) => {
+const getDelegationTitle = (currentDelegation: string | null, ada: number) => {
   const key =
     currentDelegation === "drep_always_no_confidence"
       ? "dashboard.cards.delegation.noConfidenceDelegationTitle"
@@ -138,7 +139,7 @@ const getDelegationTitle = (currentDelegation: string, ada: number) => {
   return <Trans i18nKey={key} values={{ ada }} />;
 };
 
-const getDelegationDescription = (currentDelegation: string) => {
+const getDelegationDescription = (currentDelegation: string | null) => {
   const key =
     currentDelegation === "drep_always_no_confidence"
       ? "dashboard.cards.delegation.noDescription"
@@ -163,11 +164,15 @@ const getProgressDescription = (delegateTo: string, ada: number) => {
   return <Trans i18nKey={key} values={{ ada }} />;
 };
 
-const getDisplayedDelegationId = (
-  currentDelegation: string,
-  delegateTo: string | undefined,
-  dRepID: string,
-) => {
+const getDisplayedDelegationId = ({
+  dRepID,
+  currentDelegation,
+  delegateTo,
+}: {
+  dRepID: string;
+  currentDelegation?: string | null;
+  delegateTo?: string;
+}) => {
   const restrictedNames = [
     dRepID,
     "drep_always_abstain",
@@ -183,8 +188,9 @@ const getDisplayedDelegationId = (
     }
     return undefined;
   }
-  if (!restrictedNames.includes(currentDelegation)) {
-    return formHexToBech32(currentDelegation);
+
+  if (!restrictedNames.includes(currentDelegation ?? "")) {
+    return formHexToBech32(currentDelegation ?? "");
   }
   return undefined;
 };

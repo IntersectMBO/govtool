@@ -50,7 +50,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   const { data: myDRepList } = useGetDRepListQuery(
     {
-      drepView: currentDelegation?.startsWith("drep")
+      search: currentDelegation?.startsWith("drep")
         ? currentDelegation
         : formHexToBech32(currentDelegation),
     },
@@ -59,7 +59,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const myDrep = myDRepList?.[0];
   const { data: dRepList, isPreviousData } = useGetDRepListQuery(
     {
-      drepView: debouncedSearchText,
+      search: debouncedSearchText,
       sort: chosenSorting,
       status: chosenFilters,
     },

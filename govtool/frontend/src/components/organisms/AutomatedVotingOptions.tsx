@@ -12,6 +12,7 @@ import { ICONS } from "@consts";
 import { PendingTransaction } from "@context";
 import { useTranslation } from "@hooks";
 import { AutomatedVotingCard } from "@molecules";
+import { openInNewTab } from "@/utils";
 
 type AutomatedVotingOptionsProps = {
   currentDelegation?: string | null;
@@ -35,6 +36,9 @@ export const AutomatedVotingOptions = ({
   const { t } = useTranslation();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  // TODO: Change to certain automated voted option if available
+  const onClickInfo = () => openInNewTab("https://docs.sanchogov.tools/");
 
   return (
     <Accordion
@@ -84,8 +88,7 @@ export const AutomatedVotingOptions = ({
             isDelegateLoading={isDelegationLoading}
             isSelected={currentDelegation === "drep_always_abstain"}
             onClickDelegate={() => delegate("abstain")}
-            // TODO: Add onClick info
-            onClickInfo={() => {}}
+            onClickInfo={onClickInfo}
             title={t("dRepDirectory.abstainCardTitle")}
             votingPower={votingPower}
             transactionId={
@@ -101,8 +104,7 @@ export const AutomatedVotingOptions = ({
             isDelegateLoading={isDelegationLoading}
             isSelected={currentDelegation === "drep_always_no_confidence"}
             onClickDelegate={() => delegate("no confidence")}
-            // TODO: Add onClick info
-            onClickInfo={() => {}}
+            onClickInfo={onClickInfo}
             title={t("dRepDirectory.noConfidenceTitle")}
             votingPower={votingPower}
             transactionId={

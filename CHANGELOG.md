@@ -18,6 +18,7 @@ changes.
 - Change regex for parsing urls to match urls without protocol [Issue 655](https://github.com/IntersectMBO/govtool/issues/655)
 - Integrate ga displaying metadata validation with the validation service [Issue 712](https://github.com/IntersectMBO/govtool/issues/712)
 - Correct text of the governance action type [Issue 651](https://github.com/IntersectMBO/govtool/issues/651)
+- Enable coverage tests report
 
 ### Added
 

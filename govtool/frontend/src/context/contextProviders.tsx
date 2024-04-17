@@ -1,6 +1,7 @@
 import { CardanoProvider, useCardano } from "./wallet";
 import { ModalProvider, useModal } from "./modal";
 import { SnackbarProvider, useSnackbar } from "./snackbar";
+import { DataActionsBarProvider } from "./dataActionsBar";
 
 interface Props {
   children: React.ReactNode;
@@ -9,7 +10,9 @@ interface Props {
 const ContextProviders = ({ children }: Props) => (
   <ModalProvider>
     <SnackbarProvider>
-      <CardanoProvider>{children}</CardanoProvider>
+      <DataActionsBarProvider>
+        <CardanoProvider>{children}</CardanoProvider>
+      </DataActionsBarProvider>
     </SnackbarProvider>
   </ModalProvider>
 );

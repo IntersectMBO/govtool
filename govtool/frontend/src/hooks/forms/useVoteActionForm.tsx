@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { PATHS } from "@consts";
 import { useCardano, useSnackbar } from "@context";
+import { useWalletErrorModal } from "@hooks";
 
 export interface VoteActionFormValues {
   vote: string;
@@ -34,9 +35,10 @@ export const useVoteActionForm = (
   const [isLoading, setIsLoading] = useState(false);
   const { buildSignSubmitConwayCertTx, buildVote, isPendingTransaction } =
     useCardano();
-  const { addErrorAlert, addSuccessAlert } = useSnackbar();
+  const { addSuccessAlert } = useSnackbar();
   const navigate = useNavigate();
   const { state } = useLocation();
+  const openWalletErrorModal = useWalletErrorModal();
 
   const {
     control,
@@ -84,8 +86,11 @@ export const useVoteActionForm = (
             },
           });
         }
-      } catch (e) {
-        addErrorAlert("Please try again later");
+      } catch (error) {
+        openWalletErrorModal({
+          error,
+          dataTestId: "vote-transaction-error-modal",
+        });
       } finally {
         setIsLoading(false);
       }

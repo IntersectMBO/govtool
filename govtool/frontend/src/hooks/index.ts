@@ -9,6 +9,7 @@ export * from "./useSaveScrollPosition";
 export * from "./useScreenDimension";
 export * from "./useSlider";
 export * from "./useWalletConnectionListener";
+export * from "./useWalletErrorModal";
 
 export * from "./forms";
 export * from "./queries";

@@ -20,7 +20,7 @@ import {
   generateMetadataBody,
 } from "@utils";
 import { MetadataValidationStatus } from "@models";
-
+import { useWalletErrorModal } from "@hooks";
 import { useValidateMutation } from "../mutations";
 
 export type EditDRepInfoValues = {
@@ -56,6 +56,7 @@ export const useEditDRepInfoForm = (
   const { closeModal, openModal } = useModal();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const openWalletErrorModal = useWalletErrorModal();
 
   // Queries
   const { validateMetadata } = useValidateMutation();
@@ -174,18 +175,11 @@ export const useEditDRepInfoForm = (
           });
         } else {
           captureException(error);
-          openModal({
-            type: "statusModal",
-            state: {
-              status: "warning",
-              message: error?.replace("Error: ", ""),
-              onSubmit: () => {
-                closeModal();
-                backToDashboard();
-              },
-              title: t("modals.common.oops"),
-              dataTestId: "wallet-connection-error-modal",
-            },
+
+          openWalletErrorModal({
+            error,
+            onSumbit: () => backToDashboard(),
+            dataTestId: "edit-drep-transaction-error-modal",
           });
         }
       } finally {

@@ -2,7 +2,12 @@ import { useCallback, useState } from "react";
 
 import { Typography } from "@atoms";
 import { useCardano, useModal } from "@context";
-import { useGetVoterInfo, useScreenDimension, useTranslation } from "@hooks";
+import {
+  useGetVoterInfo,
+  useScreenDimension,
+  useTranslation,
+  useWalletErrorModal,
+} from "@hooks";
 
 import { BgCard } from "..";
 
@@ -22,6 +27,7 @@ export const WhatRetirementMeans = ({
   const [isRetirementLoading, setIsRetirementLoading] =
     useState<boolean>(false);
   const { voter } = useGetVoterInfo();
+  const openWalletErrorModal = useWalletErrorModal();
 
   const onSubmit = () => {
     onClickCancel();
@@ -59,18 +65,11 @@ export const WhatRetirementMeans = ({
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      const errorMessage = error.info ? error.info : error;
-
-      openModal({
-        type: "statusModal",
-        state: {
-          buttonText: t("modals.common.goToDashboard"),
-          dataTestId: "retirement-transaction-error-modal",
-          message: errorMessage,
-          onSubmit,
-          status: "warning",
-          title: t("modals.common.oops"),
-        },
+      openWalletErrorModal({
+        error,
+        onSumbit: onClickCancel,
+        buttonText: t("modals.common.goToDashboard"),
+        dataTestId: "retirement-transaction-error-modal",
       });
     } finally {
       setIsRetirementLoading(false);

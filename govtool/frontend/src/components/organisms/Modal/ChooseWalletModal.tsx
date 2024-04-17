@@ -2,13 +2,20 @@ import { Box, Link, Typography } from "@mui/material";
 import { useMemo } from "react";
 
 import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
+import { useModal } from "@context";
 import type { WalletOption } from "@molecules";
 import { WalletOptionButton } from "@molecules";
 import { openInNewTab } from "@utils";
 import { useTranslation } from "@hooks";
+import { To } from "react-router-dom";
+
+type ChooseWalletModalState = {
+  pathToNavigate?: To;
+};
 
 export const ChooseWalletModal = () => {
   const { t } = useTranslation();
+  const { state } = useModal<ChooseWalletModalState>();
 
   const walletOptions: WalletOption[] = useMemo(() => {
     if (!window.cardano) return [];
@@ -81,6 +88,7 @@ export const ChooseWalletModal = () => {
                 label={label}
                 name={name}
                 cip95Available={cip95Available}
+                pathToNavigate={state?.pathToNavigate}
               />
             ))
           )}

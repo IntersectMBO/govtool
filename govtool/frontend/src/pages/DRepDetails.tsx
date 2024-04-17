@@ -188,9 +188,19 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
               {t("delegate")}
             </LoadingButton>
           )}
-          {!isConnected && (
+          {!isConnected && status === "Active" && (
             <Button
-              onClick={() => openModal({ type: "chooseWallet" })}
+              onClick={() =>
+                openModal({
+                  type: "chooseWallet",
+                  state: {
+                    pathToNavigate: PATHS.dashboardDRepDirectoryDRep.replace(
+                      ":dRepId",
+                      view,
+                    ),
+                  },
+                })
+              }
               size="extraLarge"
               sx={{ width: "100%" }}
               variant="outlined"

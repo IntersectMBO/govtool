@@ -109,6 +109,7 @@ changes.
 - Update frontend package readme to reflect recent changes [Issue 543](https://github.com/IntersectMBO/govtool/issues/543)
 - Change input selection strategy to 3 (random) [Issue 575](https://github.com/IntersectMBO/govtool/issues/575)
 - Changed documents to prepare for open source [Issue 737](https://github.com/IntersectMBO/govtool/issues/737)
+- Changed copy on maintenance page [Issue 753](https://github.com/IntersectMBO/govtool/issues/753)
 
 ### Removed
 

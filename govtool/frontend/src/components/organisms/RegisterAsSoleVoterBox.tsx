@@ -6,7 +6,7 @@ import { PATHS } from "@consts";
 import { RegisterAsSoleVoterBoxContent } from "@organisms";
 import { CenteredBoxBottomButtons } from "@molecules";
 import { useCardano, useModal } from "@context";
-import { useGetVoterInfo } from "@/hooks";
+import { useGetVoterInfo, useWalletErrorModal } from "@hooks";
 
 export const RegisterAsSoleVoterBox = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -17,6 +17,7 @@ export const RegisterAsSoleVoterBox = () => {
   const { openModal, closeModal } = useModal();
   const { t } = useTranslation();
   const { voter } = useGetVoterInfo();
+  const openWalletErrorModal = useWalletErrorModal();
 
   const onRegister = useCallback(async () => {
     setIsLoading(true);
@@ -47,22 +48,12 @@ export const RegisterAsSoleVoterBox = () => {
         });
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      const errorMessage = e.info ? e.info : e;
-
-      openModal({
-        type: "statusModal",
-        state: {
-          status: "warning",
-          title: t("modals.common.oops"),
-          message: errorMessage,
-          buttonText: t("modals.common.goToDashboard"),
-          onSubmit: () => {
-            navigate(PATHS.dashboard);
-            closeModal();
-          },
-          dataTestId: "registration-transaction-error-modal",
-        },
+    } catch (error: any) {
+      openWalletErrorModal({
+        error,
+        buttonText: t("modals.common.goToDashboard"),
+        onSumbit: () => navigate(PATHS.dashboard),
+        dataTestId: "registration-transaction-error-modal",
       });
     } finally {
       setIsLoading(false);

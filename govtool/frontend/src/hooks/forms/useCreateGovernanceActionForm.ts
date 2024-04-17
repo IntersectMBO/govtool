@@ -19,6 +19,7 @@ import {
   generateJsonld,
   generateMetadataBody,
 } from "@utils";
+import { useWalletErrorModal } from "@hooks";
 import { MetadataValidationStatus } from "@models";
 import {
   GovernanceActionFieldSchemas,
@@ -60,6 +61,7 @@ export const useCreateGovernanceActionForm = (
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { openModal, closeModal } = useModal();
+  const openWalletErrorModal = useWalletErrorModal();
 
   // Queries
   const { validateMetadata } = useValidateMutation();
@@ -226,6 +228,10 @@ export const useCreateGovernanceActionForm = (
             },
           });
         } else {
+          openWalletErrorModal({
+            error,
+            dataTestId: "create-governance-action-error-modal",
+          });
           captureException(error);
         }
       } finally {

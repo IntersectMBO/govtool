@@ -22,7 +22,7 @@ import {
   generateMetadataBody,
 } from "@utils";
 
-import { useGetVoterInfo } from "..";
+import { useGetVoterInfo, useWalletErrorModal } from "@hooks";
 import { useValidateMutation } from "../mutations";
 
 export type RegisterAsDRepValues = {
@@ -59,6 +59,7 @@ export const useRegisterAsdRepForm = (
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { closeModal, openModal } = useModal();
+  const openWalletErrorModal = useWalletErrorModal();
 
   // Queries
   const { validateMetadata } = useValidateMutation();
@@ -200,18 +201,11 @@ export const useRegisterAsdRepForm = (
           });
         } else {
           captureException(error);
-          openModal({
-            type: "statusModal",
-            state: {
-              status: "warning",
-              message: error?.replace("Error: ", ""),
-              onSubmit: () => {
-                closeModal();
-                backToDashboard();
-              },
-              title: t("modals.common.oops"),
-              dataTestId: "wallet-connection-error-modal",
-            },
+
+          openWalletErrorModal({
+            error,
+            onSumbit: () => backToDashboard(),
+            dataTestId: "registration-transaction-error-modal",
           });
         }
       } finally {

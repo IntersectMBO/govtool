@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { Box, ButtonBase, Divider } from "@mui/material";
 
-import { useTranslation } from "@hooks";
 import { Button, StatusPill, Typography } from "@atoms";
+import { ICONS, PATHS } from "@consts";
+import { useModal, useSnackbar } from "@context";
+import { useTranslation } from "@hooks";
+import { DRepData } from "@models";
 import { Card } from "@molecules";
-import { correctAdaFormat } from "@/utils";
-import { ICONS, PATHS } from "@/consts";
-import { DRepData } from "@/models";
-import { useSnackbar } from "@/context";
+import { correctAdaFormat } from "@utils";
 
 type DRepCardProps = {
   dRep: DRepData;
@@ -27,6 +27,9 @@ export const DRepCard = ({
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { addSuccessAlert } = useSnackbar();
+  const { openModal } = useModal();
+
+  const openChooseWalletModal = () => openModal({ type: "chooseWallet" });
 
   return (
     <Card
@@ -153,7 +156,9 @@ export const DRepCard = ({
               <Button onClick={onDelegate}>{t("delegate")}</Button>
             )}
           {status === "Active" && !isConnected && (
-            <Button>{t("connectToDelegate")}</Button>
+            <Button onClick={openChooseWalletModal}>
+              {t("connectToDelegate")}
+            </Button>
           )}
         </Box>
       </Box>

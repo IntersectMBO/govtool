@@ -1,5 +1,5 @@
 import { FC, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { To, useNavigate } from "react-router-dom";
 import { Box, CircularProgress, Typography } from "@mui/material";
 
 import { PATHS } from "@consts";
@@ -12,22 +12,28 @@ export interface WalletOption {
   name: string;
   cip95Available: boolean;
   dataTestId?: string;
+  pathToNavigate?: To;
 }
 
-export const WalletOptionButton: FC<WalletOption> = ({ ...props }) => {
+export const WalletOptionButton: FC<WalletOption> = ({
+  dataTestId,
+  icon,
+  label,
+  name,
+  cip95Available,
+  pathToNavigate,
+}) => {
   const { enable, isEnableLoading } = useCardano();
   const {
     palette: { lightBlue },
   } = theme;
   const navigate = useNavigate();
 
-  const { dataTestId, icon, label, name, cip95Available } = props;
-
   const enableByWalletName = useCallback(async () => {
     if (isEnableLoading) return;
     const result = await enable(name);
     if (result?.stakeKey) {
-      navigate(PATHS.dashboard);
+      navigate(pathToNavigate ?? PATHS.dashboard);
       return;
     }
     navigate(PATHS.stakeKeys);

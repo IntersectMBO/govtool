@@ -29,7 +29,16 @@ export const DRepCard = ({
   const { addSuccessAlert } = useSnackbar();
   const { openModal } = useModal();
 
-  const openChooseWalletModal = () => openModal({ type: "chooseWallet" });
+  const openChooseWalletModal = () =>
+    openModal({
+      type: "chooseWallet",
+      state: {
+        pathToNavigate: PATHS.dashboardDRepDirectoryDRep.replace(
+          ":dRepId",
+          view,
+        ),
+      },
+    });
 
   return (
     <Card

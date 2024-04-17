@@ -6,9 +6,8 @@ import {
   GOVERNANCE_ACTIONS_FILTERS,
   GOVERNANCE_ACTIONS_SORTING,
 } from "@consts";
-import { useCardano } from "@context";
+import { useCardano, useDataActionsBar } from "@context";
 import {
-  useDataActionsBar,
   useGetProposalsQuery,
   useGetVoterInfo,
   useScreenDimension,

@@ -2,8 +2,7 @@ import { useModal } from "@context";
 import { useTranslation } from "react-i18next";
 
 type WalletErrorModalProps = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  error: any;
+  error: unknown;
   onSumbit?: () => void;
   title?: string;
   buttonText?: string;
@@ -21,7 +20,7 @@ export const useWalletErrorModal = () => {
     buttonText,
     dataTestId,
   }: WalletErrorModalProps) => {
-    const errorMessage = error.info ? error.info : error;
+    const errorMessage = (error && typeof error === 'object' && 'info' in error) ? error.info : error;
 
     openModal({
       type: "statusModal",

@@ -424,6 +424,10 @@ export const en = {
         partOne: "Governance action with id",
         partTwo: "does not exist.",
       },
+      tooltips: {
+        info: "An action that has no effect on-chain, other than an on-chain record",
+        treasury: "Withdrawals from the treasury",
+      },
       type: {
         noConfidence: {
           title: "No Confidence",

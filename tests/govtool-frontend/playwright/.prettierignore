@@ -1,6 +1,0 @@
-# Ignore artifacts:
-.github
-node_modules
-playwright-report
-test-results
-playwright.config.ts

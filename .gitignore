@@ -135,3 +135,7 @@ infra/terraform/.terraform*
 scripts/govtool/dev-postgres_db
 scripts/govtool/dev-postgres_user
 scripts/govtool/dev-postgres_password
+
+# nodejs/yarn
+
+node_modules

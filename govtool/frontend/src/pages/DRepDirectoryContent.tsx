@@ -43,7 +43,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   const { delegate, isDelegating } = useDelegateTodRep();
 
-  const { votingPower } = useGetAdaHolderVotingPowerQuery();
+  const { votingPower } = useGetAdaHolderVotingPowerQuery(stakeKey);
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const inProgressDelegation = pendingTransaction.delegate?.resourceId;
 

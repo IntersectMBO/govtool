@@ -65,21 +65,23 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     setChosenSorting("");
   }, []);
 
+  const userMovedToDifferentAppArea =
+    pathname !== lastPath && !pathname.startsWith(lastPath);
+  const userOpenedGADetailsFromCategoryPage =
+    lastPath.includes("governance_actions/category") &&
+    pathname.includes("governance_actions/");
+  const userMovedFromGAListToCategoryPage =
+    lastPath.endsWith("governance_actions") &&
+    pathname.includes("governance_actions/category");
+
   useEffect(() => {
     if (
-      (lastPath &&
-        pathname !== lastPath &&
-        !pathname.startsWith(lastPath) &&
-        !(
-          lastPath.includes("governance_actions/category") &&
-          pathname.includes("governance_actions/")
-        )) ||
-      (lastPath.endsWith("governance_actions") &&
-        pathname.includes("governance_actions/category"))
+      (userMovedToDifferentAppArea && !userOpenedGADetailsFromCategoryPage) ||
+      userMovedFromGAListToCategoryPage
     ) {
       resetState();
     }
-  }, [pathname, lastPath, resetState]);
+  }, [pathname, resetState]);
 
   useEffect(() => {
     setLastPath(pathname);

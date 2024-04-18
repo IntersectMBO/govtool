@@ -4,9 +4,8 @@ import { Box, CircularProgress } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { DREP_DIRECTORY_FILTERS, DREP_DIRECTORY_SORTING } from "@consts";
-import { useCardano } from "@context";
+import { useCardano, useDataActionsBar } from "@context";
 import {
-  useDataActionsBar,
   useDelegateTodRep,
   useGetAdaHolderCurrentDelegationQuery,
   useGetAdaHolderVotingPowerQuery,

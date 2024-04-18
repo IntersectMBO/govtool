@@ -66,7 +66,17 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (lastPath && pathname !== lastPath && !pathname.startsWith(lastPath)) {
+    if (
+      (lastPath &&
+        pathname !== lastPath &&
+        !pathname.startsWith(lastPath) &&
+        !(
+          lastPath.includes("governance_actions/category") &&
+          pathname.includes("governance_actions/")
+        )) ||
+      (lastPath.endsWith("governance_actions") &&
+        pathname.includes("governance_actions/category"))
+    ) {
       resetState();
     }
   }, [pathname, lastPath, resetState]);

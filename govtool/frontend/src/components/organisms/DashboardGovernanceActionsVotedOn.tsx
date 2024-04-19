@@ -22,7 +22,11 @@ export const DashboardGovernanceActionsVotedOn = ({
   searchPhrase,
   sorting,
 }: DashboardGovernanceActionsVotedOnProps) => {
-  const { data, areDRepVotesLoading } = useGetDRepVotesQuery(filters, sorting);
+  const { data, areDRepVotesLoading } = useGetDRepVotesQuery(
+    filters,
+    sorting,
+    searchPhrase,
+  );
   const { isMobile } = useScreenDimension();
   const { pendingTransaction } = useCardano();
   const { t } = useTranslation();

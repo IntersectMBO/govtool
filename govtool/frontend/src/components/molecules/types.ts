@@ -36,4 +36,6 @@ export type AutomatedVotingCardProps = {
   onClickInfo: () => void;
   title: string;
   votingPower: string | number;
+  isDelegateLoading?: boolean;
+  transactionId?: string;
 };

@@ -1,7 +1,9 @@
 import { Controller, Body, Post } from '@nestjs/common';
+
+import { ValidateMetadataDTO } from '@dto';
+import { ValidateMetadataResult } from '@types';
+
 import { AppService } from './app.service';
-import { ValidateMetadataDTO } from './dto/validateMetadata.dto';
-import { ValidateMetadataResult } from './types/validateMetadata';
 
 @Controller()
 export class AppController {

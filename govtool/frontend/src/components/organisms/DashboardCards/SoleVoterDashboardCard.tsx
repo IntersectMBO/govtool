@@ -46,11 +46,13 @@ export const SoleVoterDashboardCard = ({
         state: "inProgress",
         ...(pendingTransaction.registerAsSoleVoter && {
           description: t("dashboard.cards.soleVoter.registrationInProgress"),
+          transactionId:
+            pendingTransaction?.registerAsSoleVoter?.transactionHash,
           title: t("dashboard.cards.soleVoter.registration"),
-          transactionId: pendingTransaction.registerAsSoleVoter.resourceId,
         }),
         ...(pendingTransaction.retireAsSoleVoter && {
           description: t("dashboard.cards.soleVoter.retirementInProgress"),
+          transactionId: pendingTransaction?.retireAsSoleVoter?.transactionHash,
           title: t("dashboard.cards.soleVoter.retirement"),
         }),
       };
@@ -75,6 +77,7 @@ export const SoleVoterDashboardCard = ({
           />
         ),
         state: "active",
+        transactionId: voter?.soleVoterRegisterTxHash,
         title: t("dashboard.cards.soleVoter.youAreSoleVoterTitle"),
       };
     }
@@ -97,6 +100,7 @@ export const SoleVoterDashboardCard = ({
             values={{ votingPower: ada }}
           />
         ),
+        transactionId: voter?.soleVoterRetireTxHash,
         title: t("dashboard.cards.soleVoter.wasSoleVoterTitle"),
       };
     }
@@ -123,14 +127,6 @@ export const SoleVoterDashboardCard = ({
   })();
 
   return (
-    <DashboardActionCard
-      imageURL={IMAGES.soleVoterImage}
-      {...cardProps}
-      // TODO: add transaction which registes ada holder as sole voter as well
-      transactionId={
-        pendingTransaction?.registerAsSoleVoter?.transactionHash ||
-        pendingTransaction?.retireAsSoleVoter?.transactionHash
-      }
-    />
+    <DashboardActionCard imageURL={IMAGES.soleVoterImage} {...cardProps} />
   );
 };

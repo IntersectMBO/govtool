@@ -1,5 +1,12 @@
 # Contributing to the `GovTool` project
 
+⚠️ This is a work in progress document, more instruction on how-to contribute to come!
+
+Contributing todo:
+- [ ] Align with latest OSC policies
+- [ ] Refactor to reflect reality
+- [ ] Make more friendly to open source contributors
+
 Thanks for considering contributing and helping us on creating GovTool! 😎
 
 The best way to contribute right now is to try things out and provide feedback, but we also accept contributions to the documentation and the obviously to the code itself.

@@ -3,10 +3,10 @@ import { catchError, firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import * as blake from 'blakejs';
 
-import { ValidateMetadataDTO } from './dto/validateMetadata.dto';
-import { MetadataValidationStatus } from './enums/ValidationError';
-import { canonizeJSON } from './utils/canonizeJSON';
-import { ValidateMetadataResult } from './types/validateMetadata';
+import { ValidateMetadataDTO } from '@dto';
+import { MetadataValidationStatus } from '@enums';
+import { canonizeJSON, validateMetadataStandard } from '@utils';
+import { ValidateMetadataResult } from '@types';
 
 @Injectable()
 export class AppService {
@@ -15,6 +15,7 @@ export class AppService {
   async validateMetadata({
     hash,
     url,
+    standard,
   }: ValidateMetadataDTO): Promise<ValidateMetadataResult> {
     let status: MetadataValidationStatus;
     try {
@@ -25,6 +26,10 @@ export class AppService {
           }),
         ),
       );
+
+      if (standard) {
+        await validateMetadataStandard(data, standard);
+      }
 
       let canonizedMetadata;
       try {

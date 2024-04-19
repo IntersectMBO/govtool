@@ -50,8 +50,8 @@ clear:
 $(output_dirs):
 	mkdir -p $@
 
-$(target_config_dir)/docker-compose.yml: $(template_config_dir)/docker-compose.yml.tpl $(target_config_dir)/
-	if [[ "$(env)" == "dev" ]]; then CSP_ALLOWED_HOSTS=",http://localhost"; else CSP_ALLOWED_HOSTS=; fi; \
+$(docker_compose_file): $(template_config_dir)/docker-compose.yml.tpl $(target_config_dir)/
+	if [[ "$(env)" == "dev" ]]; then CSP_ALLOWED_HOSTS=",http://localhost,http://localhost:5173"; else CSP_ALLOWED_HOSTS=; fi; \
 	sed -e "s|<DOMAIN>|$(domain)|g" \
 		-e "s|<DOCKER_USER>|$(docker_user)|g" \
 		-e "s|<REPO_URL>|$(repo_url)|g" \

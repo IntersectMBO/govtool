@@ -1,9 +1,11 @@
-import { useTranslation } from "@hooks";
 import { Outlet } from "react-router-dom";
-import { checkIsWalletConnected } from "@/utils";
-import { Background, PagePaddingBox, ContentBox } from "@/components/atoms";
-import { Footer, TopNav } from "@/components/organisms";
-import { PageTitle } from "@/components/molecules";
+import { Box } from "@mui/material";
+
+import { Background, PagePaddingBox, ContentBox } from "@atoms";
+import { useTranslation } from "@hooks";
+import { PageTitle } from "@molecules";
+import { Footer, TopNav } from "@organisms";
+import { checkIsWalletConnected } from "@utils";
 
 export const DRepDirectory = () => {
   const { t } = useTranslation();
@@ -12,7 +14,9 @@ export const DRepDirectory = () => {
 
   if (isConnected) {
     return (
-      <PagePaddingBox py={2}>
+      <PagePaddingBox
+        sx={{ display: "flex", flex: 1, flexDirection: "column", py: 2 }}
+      >
         <Outlet />
       </PagePaddingBox>
     );
@@ -20,16 +24,22 @@ export const DRepDirectory = () => {
 
   return (
     <Background>
-      <TopNav />
+      <Box
+        sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
+      >
+        <TopNav />
 
-      <PageTitle title={t("dRepDirectory.title")} />
+        <PageTitle title={t("dRepDirectory.title")} />
 
-      <PagePaddingBox py={2}>
-        <ContentBox>
-          <Outlet />
-        </ContentBox>
-      </PagePaddingBox>
-      <Footer />
+        <PagePaddingBox sx={{ display: "flex", flex: 1, py: 2 }}>
+          <ContentBox
+            sx={{ display: "flex", flex: 1, flexDirection: "column" }}
+          >
+            <Outlet />
+          </ContentBox>
+        </PagePaddingBox>
+        <Footer />
+      </Box>
     </Background>
   );
 };

@@ -1,9 +1,12 @@
 select
   case
-    when drep_hash.raw is NULL then drep_hash.view
+    when drep_hash.raw is NULL then NULL
     else encode(drep_hash.raw,'hex')
-  end
+  end as drep_raw,
+  drep_hash.view as drep_view,
+  encode(tx.hash, 'hex')
 from delegation_vote
+join tx on tx.id = delegation_vote.tx_id
 join drep_hash
 on drep_hash.id = delegation_vote.drep_hash_id
 join stake_address

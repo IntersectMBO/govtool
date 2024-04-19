@@ -15,10 +15,10 @@ import           Control.Monad.Reader
 import           Data.Bool            (Bool)
 import           Data.List            (sortOn)
 import qualified Data.Map             as Map
-import           Data.Maybe           (Maybe (Nothing), fromMaybe)
+import           Data.Maybe           (Maybe (Nothing), fromMaybe, catMaybes)
 import           Data.Ord             (Down (..))
 import           Data.Text            hiding (drop, elem, filter, length, map,
-                                       null, take)
+                                       null, take, any)
 import qualified Data.Text            as Text
 
 import           Numeric.Natural      (Natural)
@@ -43,11 +43,20 @@ import           VVA.Types            (App, AppEnv (..),
                                        CacheEnv (..))
 
 type VVAApi =
-         "drep" :> "list" :> QueryParam "drepView" Text :> Get '[JSON] [DRep]
+         "drep" :> "list"
+                :> QueryParam "search" Text
+                :> QueryParams "status" DRepStatus
+                :> QueryParam "sort" DRepSortMode
+                :> Get '[JSON] [DRep]
     :<|> "drep" :> "get-voting-power" :> Capture "drepId" HexText :> Get '[JSON] Integer
-    :<|> "drep" :> "getVotes" :> Capture "drepId" HexText :> QueryParams "type" GovernanceActionType :> QueryParam "sort" GovernanceActionSortMode :> Get '[JSON] [VoteResponse]
+    :<|> "drep" :> "getVotes"
+                :> Capture "drepId" HexText
+                :> QueryParams "type" GovernanceActionType
+                :> QueryParam "sort" GovernanceActionSortMode
+                :> QueryParam "search" Text
+                :> Get '[JSON] [VoteResponse]
     :<|> "drep" :> "info" :> Capture "drepId" HexText :> Get '[JSON] DRepInfoResponse
-    :<|> "ada-holder" :> "get-current-delegation" :> Capture "stakeKey" HexText :> Get '[JSON] (Maybe HexText)
+    :<|> "ada-holder" :> "get-current-delegation" :> Capture "stakeKey" HexText :> Get '[JSON] (Maybe DelegationResponse)
     :<|> "ada-holder" :> "get-voting-power" :> Capture "stakeKey" HexText :> Get '[JSON] Integer
     :<|> "proposal" :> "list"
                     :> QueryParams "type" GovernanceActionType
@@ -98,20 +107,48 @@ drepRegistrationToDrep Types.DRepRegistration {..} =
       dRepVotingPower = dRepRegistrationVotingPower,
       dRepStatus = mapDRepStatus dRepRegistrationStatus,
       dRepType = mapDRepType dRepRegistrationType,
-      dRepLatestTxHash = HexText <$> dRepRegistrationLatestTxHash
+      dRepLatestTxHash = HexText <$> dRepRegistrationLatestTxHash,
+      dRepLatestRegistrationDate = dRepRegistrationLatestRegistrationDate
     }
 
-drepList :: App m => Maybe Text -> m [DRep]
-drepList mDRepView = do
+delegationToResponse :: Types.Delegation -> DelegationResponse
+delegationToResponse Types.Delegation {..} =
+  DelegationResponse
+    { delegationResponseDRepHash = HexText <$> delegationDRepHash,
+      delegationResponseDRepView = delegationDRepView,
+      delegationResponseTxHash = HexText delegationTxHash
+    }
+
+
+drepList :: App m => Maybe Text -> [DRepStatus] -> Maybe DRepSortMode -> m [DRep]
+drepList mSearchQuery statuses mSortMode = do
   CacheEnv {dRepListCache} <- asks vvaCache
   dreps <- cacheRequest dRepListCache () DRep.listDReps
-  let filtered = flip filter dreps $ \Types.DRepRegistration {..} ->
-        case (dRepRegistrationType, mDRepView) of
-          (Types.SoleVoter, Just x) -> x == dRepRegistrationView
-          (Types.DRep, Just x)      -> x `isInfixOf` dRepRegistrationView
-          (Types.DRep, Nothing)     -> True
-          _                         -> False
-  return $ map drepRegistrationToDrep filtered
+
+  let filterDRepsByQuery = case mSearchQuery of
+        Nothing -> filter $ \Types.DRepRegistration {..} -> dRepRegistrationType == Types.DRep
+        Just query -> filter $ \Types.DRepRegistration {..} ->
+          case dRepRegistrationType of
+            Types.SoleVoter -> query == dRepRegistrationView || query == dRepRegistrationDRepHash
+            Types.DRep      ->  query `isInfixOf` dRepRegistrationView
+                                || query `isInfixOf` dRepRegistrationDRepHash
+
+  let filterDRepsByStatus = case statuses of
+        [] -> id
+        _  -> filter $ \Types.DRepRegistration {..} ->
+          mapDRepStatus dRepRegistrationStatus `elem` statuses
+
+  let sortDReps = case mSortMode of
+        Nothing -> id
+        Just VotingPower -> sortOn $ \Types.DRepRegistration {..} ->
+          Down dRepRegistrationVotingPower
+        Just RegistrationDate -> sortOn $ \Types.DRepRegistration {..} ->
+          Down dRepRegistrationLatestRegistrationDate
+        Just Status -> sortOn $ \Types.DRepRegistration {..} ->
+          dRepRegistrationStatus
+
+
+  return $ map drepRegistrationToDrep $ sortDReps $ filterDRepsByQuery $ filterDRepsByStatus dreps
 
 getVotingPower :: App m => HexText -> m Integer
 getVotingPower (unHexText -> dRepId) = do
@@ -184,12 +221,12 @@ mapSortAndFilterProposals selectedTypes sortMode proposals =
         Just MostYesVotes    -> sortOn (Down . proposalResponseYesVotes) filteredProposals
   in sortedProposals
 
-getVotes :: App m => HexText -> [GovernanceActionType] -> Maybe GovernanceActionSortMode -> m [VoteResponse]
-getVotes (unHexText -> dRepId) selectedTypes sortMode = do
+getVotes :: App m => HexText -> [GovernanceActionType] -> Maybe GovernanceActionSortMode -> Maybe Text -> m [VoteResponse]
+getVotes (unHexText -> dRepId) selectedTypes sortMode mSearch = do
   CacheEnv {dRepGetVotesCache} <- asks vvaCache
   (votes, proposals) <- cacheRequest dRepGetVotesCache dRepId $ DRep.getVotes dRepId []
   let voteMap = Map.fromList $ map (\vote@Types.Vote {..} -> (voteProposalId, vote)) votes
-  let processedProposals = mapSortAndFilterProposals selectedTypes sortMode proposals
+  let processedProposals = filter (isProposalSearchedFor mSearch) $ mapSortAndFilterProposals selectedTypes sortMode proposals
   return $
     [ VoteResponse
       { voteResponseVote = voteToResponse (voteMap Map.! read (unpack proposalResponseId))
@@ -211,20 +248,38 @@ drepInfo (unHexText -> dRepId) = do
     , dRepInfoResponseUrl = dRepInfoUrl
     , dRepInfoResponseDataHash = HexText <$> dRepInfoDataHash
     , dRepInfoResponseVotingPower = dRepInfoVotingPower
-    , dRepInfoResponseLatestTxHash = HexText <$> dRepInfoLatestTxHash
+    , dRepInfoResponseDRepRegisterTxHash = HexText <$> dRepInfoDRepRegisterTx
+    , dRepInfoResponseDRepRetireTxHash = HexText <$> dRepInfoDRepRetireTx
+    , dRepInfoResponseSoleVoterRegisterTxHash = HexText <$> dRepInfoSoleVoterRegisterTx
+    , dRepInfoResponseSoleVoterRetireTxHash = HexText <$> dRepInfoSoleVoterRetireTx
     }
 
-getCurrentDelegation :: App m => HexText -> m (Maybe HexText)
+getCurrentDelegation :: App m => HexText -> m (Maybe DelegationResponse)
 getCurrentDelegation (unHexText -> stakeKey) = do
   CacheEnv {adaHolderGetCurrentDelegationCache} <- asks vvaCache
-  result <- cacheRequest adaHolderGetCurrentDelegationCache stakeKey $ AdaHolder.getCurrentDelegation stakeKey
-  return $ HexText <$> result
+  delegation <- cacheRequest adaHolderGetCurrentDelegationCache stakeKey $ AdaHolder.getCurrentDelegation stakeKey
+  return $ delegationToResponse <$> delegation
 
 getStakeKeyVotingPower :: App m => HexText -> m Integer
 getStakeKeyVotingPower (unHexText -> stakeKey) = do
   CacheEnv {adaHolderVotingPowerCache} <- asks vvaCache
   cacheRequest adaHolderVotingPowerCache stakeKey $ AdaHolder.getStakeKeyVotingPower stakeKey
 
+
+isProposalSearchedFor :: Maybe Text -> ProposalResponse -> Bool
+isProposalSearchedFor Nothing _ = True
+isProposalSearchedFor (Just searchQuery) (ProposalResponse{..}) = fromMaybe False $ do
+          let normalisedSearchQuery = Text.toLower searchQuery
+          let govActionId = unHexText proposalResponseTxHash <> "#" <> Text.pack (show proposalResponseIndex)
+          let valuesToCheck = catMaybes
+                [ Just govActionId
+                , proposalResponseTitle
+                , proposalResponseAbout
+                , proposalResponseMotivation
+                , proposalResponseRationale
+                ]
+
+          pure $ any (\x -> normalisedSearchQuery `isInfixOf` Text.toLower x) valuesToCheck
 
 listProposals
   :: App m
@@ -244,32 +299,15 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
     Nothing -> return []
     Just drepId ->
       map (voteParamsProposalId . voteResponseVote)
-        <$> getVotes drepId [] Nothing
+        <$> getVotes drepId [] Nothing Nothing
 
-
-
-  let filterF ProposalResponse{..} = case Text.toLower <$> mSearchQuery of
-        Nothing -> True
-        Just searchQuery -> fromMaybe False $ do
-          title <- Text.toLower <$> proposalResponseTitle
-          about <- Text.toLower <$> proposalResponseAbout
-          motivation <- Text.toLower <$> proposalResponseMotivation
-          rationale <- Text.toLower <$> proposalResponseRationale
-          let govActionId = unHexText proposalResponseTxHash <> "#" <> Text.pack (show proposalResponseIndex)
-          let result = searchQuery `isInfixOf` title
-                      || searchQuery `isInfixOf` about
-                      || searchQuery `isInfixOf` motivation
-                      || searchQuery `isInfixOf` rationale
-                      || searchQuery `isInfixOf` govActionId
-
-          pure result
 
   CacheEnv {proposalListCache} <- asks vvaCache
   mappedAndSortedProposals <-
     filter
       ( \p@ProposalResponse {proposalResponseId} ->
           proposalResponseId `notElem` proposalsToRemove
-          && filterF p
+          && isProposalSearchedFor mSearchQuery p
       ) . mapSortAndFilterProposals selectedTypes sortMode <$> cacheRequest proposalListCache () Proposal.listProposals
 
   let total = length mappedAndSortedProposals :: Int

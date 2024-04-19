@@ -7,14 +7,19 @@ import { useTranslation } from "react-i18next";
 import { NodeObject } from "jsonld";
 
 import {
-  CIP_100,
   CIP_108,
   GOVERNANCE_ACTION_CONTEXT,
   PATHS,
   storageInformationErrorModals,
 } from "@consts";
 import { useCardano, useModal } from "@context";
-import { canonizeJSON, downloadJson, generateJsonld } from "@utils";
+import {
+  canonizeJSON,
+  downloadJson,
+  generateJsonld,
+  generateMetadataBody,
+} from "@utils";
+import { useWalletErrorModal } from "@hooks";
 import { MetadataValidationStatus } from "@models";
 import {
   GovernanceActionFieldSchemas,
@@ -40,18 +45,28 @@ export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues =
 export const useCreateGovernanceActionForm = (
   setStep?: Dispatch<SetStateAction<number>>,
 ) => {
+  // Local state
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [hash, setHash] = useState<string | null>(null);
+  const [json, setJson] = useState<NodeObject | null>(null);
+
+  // DApp Connector
   const {
     buildNewInfoGovernanceAction,
     buildTreasuryGovernanceAction,
     buildSignSubmitConwayCertTx,
   } = useCardano();
-  const { validateMetadata } = useValidateMutation();
+
+  // App Management
   const { t } = useTranslation();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [hash, setHash] = useState<string | null>(null);
-  const [json, setJson] = useState<NodeObject | null>(null);
   const navigate = useNavigate();
   const { openModal, closeModal } = useModal();
+  const openWalletErrorModal = useWalletErrorModal();
+
+  // Queries
+  const { validateMetadata } = useValidateMutation();
+
+  // Form
   const {
     control,
     formState: { errors, isValid },
@@ -64,6 +79,7 @@ export const useCreateGovernanceActionForm = (
   } = useFormContext<CreateGovernanceActionValues>();
   const govActionType = watch("governance_action_type");
 
+  // Navigation
   const backToForm = useCallback(() => {
     setStep?.(3);
     closeModal();
@@ -74,31 +90,17 @@ export const useCreateGovernanceActionForm = (
     closeModal();
   }, []);
 
+  // Business Logic
   const generateMetadata = useCallback(async () => {
-    const data = getValues();
-
     if (!govActionType) {
       throw new Error("Governance action type is not defined");
     }
 
-    const acceptedKeys = ["title", "motivation", "abstract", "rationale"];
-
-    const filteredData = Object.entries(data)
-      .filter(([key]) => acceptedKeys.includes(key))
-      .map(([key, value]) => [CIP_108 + key, value]);
-
-    const references = (data as CreateGovernanceActionValues).links
-      ?.filter((link) => link.link)
-      .map((link) => ({
-        "@type": "Other",
-        [`${CIP_100}reference-label`]: "Label",
-        [`${CIP_100}reference-uri`]: link.link,
-      }));
-
-    const body = {
-      ...Object.fromEntries(filteredData),
-      [`${CIP_108}references`]: references,
-    };
+    const body = generateMetadataBody({
+      data: getValues(),
+      acceptedKeys: ["title", "motivation", "abstract", "rationale"],
+      standardReference: CIP_108,
+    });
 
     const jsonld = await generateJsonld(body, GOVERNANCE_ACTION_CONTEXT);
 
@@ -116,42 +118,6 @@ export const useCreateGovernanceActionForm = (
     if (!json) return;
     downloadJson(json, govActionType);
   }, [govActionType, json]);
-
-  const validateHash = useCallback(
-    async (url: string, localHash: string | null) => {
-      try {
-        if (!localHash) {
-          throw new Error(MetadataValidationStatus.INVALID_HASH);
-        }
-        const result = await validateMetadata({ url, hash: localHash });
-
-        if (result.status) {
-          throw result.status;
-        }
-      } catch (error) {
-        if (
-          Object.values(MetadataValidationStatus).includes(
-            error as MetadataValidationStatus,
-          )
-        ) {
-          openModal({
-            type: "statusModal",
-            state: {
-              ...storageInformationErrorModals[
-                error as MetadataValidationStatus
-              ],
-              onSubmit: backToForm,
-              onCancel: backToDashboard,
-              // TODO: Open usersnap feedback
-              onFeedback: backToDashboard,
-            },
-          });
-        }
-        throw error;
-      }
-    },
-    [backToForm],
-  );
 
   const buildTransaction = useCallback(
     async (data: CreateGovernanceActionValues) => {
@@ -184,10 +150,8 @@ export const useCreateGovernanceActionForm = (
           default:
             throw new Error(t("errors.invalidGovernanceActionType"));
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        console.error(error);
-        throw error;
+      } catch (error) {
+        captureException(error);
       }
     },
     [hash],
@@ -211,12 +175,33 @@ export const useCreateGovernanceActionForm = (
     });
   }, []);
 
+  const showLoadingModal = useCallback(() => {
+    openModal({
+      type: "loadingModal",
+      state: {
+        title: t("modals.pendingValidation.title"),
+        message: t("modals.pendingValidation.message"),
+        dataTestId: "storing-information-loading",
+      },
+    });
+  }, []);
+
   const onSubmit = useCallback(
     async (data: CreateGovernanceActionValues) => {
       try {
         setIsLoading(true);
+        showLoadingModal();
+        if (!hash) {
+          throw new Error(MetadataValidationStatus.INVALID_HASH);
+        }
+        const { status } = await validateMetadata({
+          url: data.storingURL,
+          hash,
+        });
 
-        await validateHash(data.storingURL, hash);
+        if (status) {
+          throw status;
+        }
 
         const govActionBuilder = await buildTransaction(data);
         await buildSignSubmitConwayCertTx({
@@ -227,12 +212,33 @@ export const useCreateGovernanceActionForm = (
         showSuccessModal();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        captureException(error);
+        if (
+          Object.values(MetadataValidationStatus).includes(
+            error as MetadataValidationStatus,
+          )
+        ) {
+          openModal({
+            type: "statusModal",
+            state: {
+              ...storageInformationErrorModals[
+                error as MetadataValidationStatus
+              ],
+              onSubmit: backToForm,
+              onCancel: backToDashboard,
+            },
+          });
+        } else {
+          openWalletErrorModal({
+            error,
+            dataTestId: "create-governance-action-error-modal",
+          });
+          captureException(error);
+        }
       } finally {
         setIsLoading(false);
       }
     },
-    [hash],
+    [hash, buildTransaction, buildSignSubmitConwayCertTx],
   );
 
   return {

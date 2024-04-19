@@ -51,7 +51,20 @@ const vitestConfig = defineVitestConfig({
     setupFiles: "./src/setupTests.ts",
     globals: true,
     environment: "jsdom",
-    reporters: "verbose",
+    reporters: ["verbose", "junit"],
+    coverage: {
+      include: [
+        "src/components/**/*",
+        "src/consts/**/*",
+        "src/context/**/*",
+        "src/hooks/**/*",
+        "src/services/**/*",
+        "src/utils/**/*",
+      ],
+      provider: "v8",
+      reporter: ["json-summary"],
+      enabled: true,
+    },
   },
 });
 

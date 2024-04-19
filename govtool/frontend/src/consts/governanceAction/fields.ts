@@ -7,6 +7,11 @@ import {
   SharedGovernanceActionFieldSchema,
 } from "@/types/governanceAction";
 
+export const GovernanceActionTootlip = {
+  Info: I18n.t("govActions.tooltips.info"),
+  Treasury: I18n.t("govActions.tooltips.treasury"),
+};
+
 export const CIP_100 =
   "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#";
 export const CIP_108 =
@@ -19,6 +24,12 @@ export const sharedGovernanceActionFields: SharedGovernanceActionFieldSchema = {
     placeholderI18nKey:
       "createGovernanceAction.fields.declarations.title.placeholder",
     rules: {
+      maxLength: {
+        value: 80,
+        message: I18n.t("createGovernanceAction.fields.validations.maxLength", {
+          maxLength: 80,
+        }),
+      },
       required: {
         value: true,
         message: I18n.t("createGovernanceAction.fields.validations.required"),

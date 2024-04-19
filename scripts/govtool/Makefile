@@ -7,8 +7,8 @@ include config.mk
 .DEFAULT_GOAL := info
 
 # image tags
-cardano_node_image_tag := 8.9.0
-cardano_db_sync_image_tag := sancho-4.1.0
+cardano_node_image_tag := 8.10.0-pre
+cardano_db_sync_image_tag := sancho-4-2-1
 
 .PHONY: all
 all: deploy-stack notify
@@ -26,7 +26,7 @@ deploy-stack: upload-config push-backend push-frontend
 	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \
 	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	$(ssh-keyscan) $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
-	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) up --detach --pull always --remove-orphans
+	$(docker) compose -f $(docker_compose_file) -p $(compose_stack_name) up --detach --build --pull always --remove-orphans
 
 .PHONY: destroy-cardano-node-and-dbsync
 destroy-cardano-node-and-dbsync: prepare-config

@@ -15,7 +15,6 @@ import {
   CreateGovernanceAction,
   Dashboard,
   DashboardGovernanceActionsCategory,
-  DelegateTodRep,
   DRepDetails,
   DRepDirectory,
   DRepDirectoryContent,
@@ -123,16 +122,12 @@ export default () => {
             path={PATHS.dRepDirectory}
             element={<DRepDirectoryContent />}
           />
-          <Route
-            path={PATHS.dRepDirectoryDRep}
-            element={<DRepDetails />}
-          />
+          <Route path={PATHS.dRepDirectoryDRep} element={<DRepDetails />} />
         </Route>
         <Route
           path={PATHS.createGovernanceAction}
           element={<CreateGovernanceAction />}
         />
-        <Route path={PATHS.delegateTodRep} element={<DelegateTodRep />} />
         <Route path={PATHS.registerAsdRep} element={<RegisterAsdRep />} />
         <Route path={PATHS.retireAsDrep} element={<RetireAsDrep />} />
         <Route

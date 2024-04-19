@@ -1,4 +1,4 @@
-import { GAMetedataErrors } from "@utils";
+import { MetadataValidationStatus } from "@models";
 
 export interface VoterInfo {
   isRegisteredAsDRep: boolean;
@@ -6,6 +6,10 @@ export interface VoterInfo {
   isRegisteredAsSoleVoter: boolean;
   wasRegisteredAsSoleVoter: boolean;
   deposit: number;
+  dRepRegisterTxHash: string | null;
+  dRepRetireTxHash: string | null;
+  soleVoterRegisterTxHash: string | null;
+  soleVoterRetireTxHash: string | null;
 }
 
 export enum DRepStatus {
@@ -22,7 +26,7 @@ export interface DRepData {
   deposit: number;
   votingPower: number;
   status: DRepStatus;
-  type: 'DRep' | 'SoleVoter';
+  type: "DRep" | "SoleVoter";
 }
 
 export type Vote = "yes" | "no" | "abstain";
@@ -35,13 +39,14 @@ export type InfinityProposals = {
 };
 
 type ProposalVote = {
-  proposalId: string;
-  drepId: string;
-  vote: Vote;
-  url: string;
-  metadataHash: string;
   date: string;
+  drepId: string;
   epochNo: number;
+  metadataHash: string;
+  proposalId: string;
+  txHash: string;
+  url: string;
+  vote: Vote;
 };
 
 type ProposalData = {
@@ -70,5 +75,13 @@ export interface VotedProposal {
 }
 export type VotedProposalToDisplay = {
   vote: ProposalVote;
-  proposal: ProposalData & { isDataMissing: boolean | GAMetedataErrors };
+  proposal: ProposalData & {
+    isDataMissing: boolean | MetadataValidationStatus;
+  };
 };
+
+export type CurrentDelegation = {
+  dRepHash: string | null;
+  dRepView: string | null;
+  txHash: string | null;
+} | null;

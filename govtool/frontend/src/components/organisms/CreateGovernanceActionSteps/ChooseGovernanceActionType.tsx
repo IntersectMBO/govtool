@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { ActionRadio, Spacer, Typography } from "@atoms";
+import { GovernanceActionTootlip } from "@consts";
 import {
   useCreateGovernanceActionForm,
   useScreenDimension,
@@ -34,7 +35,6 @@ export const ChooseGovernanceActionType = ({
     setValue("governance_action_type", value as GovernanceActionType);
   };
 
-  // TODO: Add tooltips when they will be available
   const renderGovernanceActionTypes = () =>
     Object.keys(GovernanceActionType).map(
       (type, index, governanceActionTypes) => {
@@ -46,6 +46,10 @@ export const ChooseGovernanceActionType = ({
               onChange={onChangeType}
               title={type}
               value={type}
+              tooltipTitle={type}
+              tooltipText={
+                GovernanceActionTootlip[type as GovernanceActionType]
+              }
             />
             {index + 1 < governanceActionTypes.length ? <Spacer y={2} /> : null}
           </div>

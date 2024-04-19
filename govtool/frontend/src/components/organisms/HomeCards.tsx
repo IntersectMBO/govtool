@@ -18,36 +18,31 @@ export const HomeCards = () => {
     openModal({ type: "chooseWallet" });
   }, [openModal]);
 
-  const onClickLearnMoreAboutDelegation = useCallback(
-    () =>
-      openInNewTab(
-        "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power",
-      ),
-    [],
-  );
+  const onClickLearnMoreAboutDelegation = () =>
+    openInNewTab(
+      "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power",
+    );
 
-  const onClickLearnMoreAboutDRepRegistration = useCallback(
-    () =>
-      openInNewTab(
-        "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
-      ),
-    [],
-  );
+  const onClickLearnMoreAboutDRepRegistration = () =>
+    openInNewTab(
+      "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
+    );
 
-  const onClickLearnMoreAboutSoleVoterRegistration = useCallback(
-    // TODO: Update the link
-    () => openInNewTab("https://docs.sanchogov.tools/"),
-    [],
-  );
+  // TODO: Update the link
+  const onClickLearnMoreAboutSoleVoterRegistration = () =>
+    openInNewTab("https://docs.sanchogov.tools/");
 
-  const onClickLearnMoreAboutProposingGovAction = useCallback(
-    // TODO: Update the link
-    () => openInNewTab("https://docs.sanchogov.tools/"),
-    [],
-  );
+  // TODO: Update the link
+  const onClickLearnMoreAboutProposingGovAction = () =>
+    openInNewTab("https://docs.sanchogov.tools/");
 
   const navigateToGovActions = useCallback(
     () => navigate(PATHS.governanceActions),
+    [navigate],
+  );
+
+  const navigateToDRepDirecotry = useCallback(
+    () => navigate(PATHS.dRepDirectory),
     [navigate],
   );
 
@@ -79,7 +74,7 @@ export const HomeCards = () => {
         dataTestIdFirstButton="delegate-connect-wallet-button"
         dataTestIdSecondButton="delegate-learn-more-button"
         description={t("home.cards.delegate.description")}
-        firstButtonAction={openWalletModal}
+        firstButtonAction={navigateToDRepDirecotry}
         firstButtonLabel={t("home.cards.delegate.firstButtonLabel")}
         imageHeight={80}
         imageURL={IMAGES.govActionDelegateImage}

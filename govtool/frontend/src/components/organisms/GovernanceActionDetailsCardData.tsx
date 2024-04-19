@@ -10,7 +10,8 @@ import {
   GovernanceActionDetailsCardOnChainData,
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { GAMetedataErrors, getProposalTypeNoEmptySpaces } from "@utils";
+import { getProposalTypeNoEmptySpaces } from "@utils";
+import { MetadataValidationStatus } from "@models";
 
 type GovernanceActionDetailsCardDataProps = {
   type: string;
@@ -25,7 +26,7 @@ type GovernanceActionDetailsCardDataProps = {
   about?: string;
   motivation?: string;
   rationale?: string;
-  isDataMissing: boolean | GAMetedataErrors;
+  isDataMissing: boolean | MetadataValidationStatus;
   isOneColumn: boolean;
   isDashboard?: boolean;
   isInProgress?: boolean;

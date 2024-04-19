@@ -6,3 +6,4 @@
 /.lighthouseci
 /yarn-error.log
 .env
+coverage

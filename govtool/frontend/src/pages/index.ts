@@ -5,7 +5,6 @@ export * from "./DRepDirectory";
 export * from "./DRepDirectoryContent";
 export * from "./Dashboard";
 export * from "./DashboardGovernanceActionsCategory";
-export * from "./DelegateTodRep";
 export * from "./DRepDirectory";
 export * from "./EditDRepMetadata";
 export * from "./ErrorPage";

@@ -10,7 +10,12 @@ export type ValidateMetadataResult = {
   valid: boolean;
 };
 
+export enum MetadataStandard {
+  CIP108 = "CIP108",
+}
+
 export type MetadataValidationDTO = {
   url: string;
   hash: string;
+  standard?: MetadataStandard;
 };

@@ -1,5 +1,7 @@
 from models.TestData import Proposal
+import allure
 
+@allure.story("Proposal")
 def validate_proposal_list(proposal_list: [Proposal]) -> bool:
     for item in proposal_list:
         if not isinstance(item, dict):
@@ -13,6 +15,7 @@ def validate_proposal_list(proposal_list: [Proposal]) -> bool:
     return True
 
 
+@allure.story("Proposal")
 def test_list_proposal(govtool_api):
     response = govtool_api.proposal_list()
     proposal_list = response.json()

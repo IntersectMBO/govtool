@@ -4,14 +4,13 @@ import { Box, CircularProgress, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
 import { GOVERNANCE_ACTIONS_SORTING, ICONS, PATHS } from "@consts";
-import { useCardano } from "@context";
+import { useCardano, useDataActionsBar } from "@context";
 import {
   DataActionsBar,
   EmptyStateGovernanceActionsCategory,
   GovernanceActionCard,
 } from "@molecules";
 import {
-  useDataActionsBar,
   useFetchNextPageDetector,
   useGetProposalsInfiniteQuery,
   useGetVoterInfo,
@@ -141,7 +140,7 @@ export const DashboardGovernanceActionsCategory = () => {
                           item.txHash + item.index
                         ) {
                           openInNewTab(
-                            "https://adanordic.com/latest_transactions",
+                            `https://sancho.cexplorer.io/tx/${pendingTransaction.vote.transactionHash}`,
                           );
                         } else {
                           navigate(

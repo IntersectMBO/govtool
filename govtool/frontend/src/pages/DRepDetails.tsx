@@ -3,18 +3,16 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Box, ButtonBase, Chip, CircularProgress } from "@mui/material";
 
 import { Button, LoadingButton, StatusPill, Typography } from "@atoms";
-import { Card, LinkWithIcon, Share } from "@molecules";
 import { ICONS, PATHS } from "@consts";
+import { useCardano, useModal } from "@context";
 import {
   useDelegateTodRep,
-  useGetAdaHolderCurrentDelegationQuery,
   useGetDRepListQuery,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import { correctAdaFormat, openInNewTab } from "@utils";
-import { useCardano, useModal } from "@/context";
-import { isSameDRep } from "@/utils";
+import { Card, LinkWithIcon, Share } from "@molecules";
+import { correctAdaFormat, isSameDRep, openInNewTab } from "@utils";
 
 const LINKS = [
   "darlenelonglink1.DRepwebsiteorwhatever.com",
@@ -29,7 +27,7 @@ type DRepDetailsProps = {
 };
 
 export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
-  const { dRepID: myDRepId, pendingTransaction, stakeKey } = useCardano();
+  const { dRepID: myDRepId, pendingTransaction } = useCardano();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { openModal } = useModal();
@@ -38,19 +36,30 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
 
   const { delegate, isDelegating } = useDelegateTodRep();
 
-  const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
-  const { data, isLoading } = useGetDRepListQuery({ drepView: dRepParam });
+  const { data, isLoading } = useGetDRepListQuery({ search: dRepParam });
   const dRep = data?.[0];
 
-  if (!dRep && isLoading)
-    return <CircularProgress sx={{ display: "block", mx: "auto", mt: 4 }} />;
+  if (data === undefined || isLoading)
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flex: 1,
+          height: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
 
   if (!dRep) return <Navigate to={PATHS.error} />;
 
   const { view, status, votingPower, type } = dRep;
 
   const isMe = isSameDRep(dRep, myDRepId);
-  const isMyDrep = isSameDRep(dRep, currentDelegation);
+  const isMyDrep = isSameDRep(dRep, myDRepId);
   const isMyDrepInProgress = isSameDRep(
     dRep,
     pendingTransaction.delegate?.resourceId,
@@ -179,9 +188,19 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
               {t("delegate")}
             </LoadingButton>
           )}
-          {!isConnected && (
+          {!isConnected && status === "Active" && (
             <Button
-              onClick={() => openModal({ type: "chooseWallet" })}
+              onClick={() =>
+                openModal({
+                  type: "chooseWallet",
+                  state: {
+                    pathToNavigate: PATHS.dashboardDRepDirectoryDRep.replace(
+                      ":dRepId",
+                      view,
+                    ),
+                  },
+                })
+              }
               size="extraLarge"
               sx={{ width: "100%" }}
               variant="outlined"

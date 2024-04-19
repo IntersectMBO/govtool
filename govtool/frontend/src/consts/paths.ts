@@ -7,7 +7,6 @@ export const PATHS = {
     "/connected/governance_actions/category/:category",
   dashboardDRepDirectory: "/connected/drep_directory",
   dashboardDRepDirectoryDRep: "/connected/drep_directory/:dRepId",
-  delegateTodRep: "/delegate",
   dRepDirectory: "/drep_directory",
   dRepDirectoryDRep: "/drep_directory/:dRepId",
   editDrepMetadata: "/edit_drep",

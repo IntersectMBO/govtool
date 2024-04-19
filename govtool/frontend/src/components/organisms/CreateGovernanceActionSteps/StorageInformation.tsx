@@ -10,9 +10,8 @@ import {
   useScreenDimension,
 } from "@hooks";
 import { Step } from "@molecules";
-import { BgCard, ControlledField, LoadingModalState } from "@organisms";
+import { BgCard, ControlledField } from "@organisms";
 import { URL_REGEX, openInNewTab } from "@utils";
-import { useModal } from "@context";
 
 type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -30,14 +29,14 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
     onClickDownloadJson,
     isLoading,
   } = useCreateGovernanceActionForm(setStep);
-  const { openModal, closeModal } = useModal<LoadingModalState>();
   const { screenWidth } = useScreenDimension();
 
   const fileName = getValues("governance_action_type");
 
-  // TODO: Change link to correct
   const openGuideAboutStoringInformation = () =>
-    openInNewTab("https://sancho.network/");
+    openInNewTab(
+      "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor",
+    );
 
   const isActionButtonDisabled = !watch("storingURL") || !!errors.storingURL;
 
@@ -46,21 +45,6 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
   useEffect(() => {
     generateMetadata();
   }, []);
-
-  useEffect(() => {
-    if (isLoading) {
-      openModal({
-        type: "loadingModal",
-        state: {
-          title: t("createGovernanceAction.modals.loading.title"),
-          message: t("createGovernanceAction.modals.loading.message"),
-          dataTestId: "storing-information-loading",
-        },
-      });
-    } else {
-      closeModal();
-    }
-  }, [isLoading]);
 
   return (
     <BgCard
@@ -120,25 +104,6 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
         />
         <Spacer y={6} />
         <Step
-          component={
-            <Button
-              endIcon={
-                <OpenInNewIcon
-                  sx={{
-                    color: "primary",
-                    height: 17,
-                    width: 17,
-                  }}
-                />
-              }
-              onClick={openGuideAboutStoringInformation}
-              size="extraLarge"
-              sx={{ width: "fit-content" }}
-              variant="text"
-            >
-              {t("createGovernanceAction.storingInformationStep2Link")}
-            </Button>
-          }
           label={t("createGovernanceAction.storingInformationStep2Label")}
           stepNumber={2}
         />

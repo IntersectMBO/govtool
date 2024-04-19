@@ -1,0 +1,132 @@
+name: Integration Test [Playwright]
+
+on:
+  push:
+    paths:
+      - .github/workflows/test_integration_playwright.yml
+  workflow_run:
+    workflows: ["Build and deploy GovTool to TEST server"]
+    types: [completed]
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
+    defaults:
+      run:
+        working-directory: tests/govtool-frontend/playwright
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: "./tests/govtool-frontend/playwright/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        id: cache-playwright-browsers
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-browsers
+
+      - name: Install Playwright browsers if not cached
+        if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+
+      - name: Run tests
+        run: |
+          npm test
+
+      - name: Upload report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: allure-results
+          path: tests/govtool-frontend/playwright/allure-results
+
+    env:
+      FRONTEND_URL: ${{vars.FRONTEND_URL}}
+      API_URL: ${{vars.API_URL}}
+      DOCS_URL: ${{ vars.DOCS_URL }}
+      FAUCET_API_URL: ${{ vars.FAUCET_API_URL }}
+      FAUCET_API_KEY: ${{secrets.FAUCET_API_KEY}}
+      KUBER_API_URL: ${{vars.KUBER_API_URL}}
+      KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}
+      WORKERS: ${{vars.WORKERS}}
+
+  publish-report:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
+    needs: integration-tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download report
+        uses: actions/download-artifact@v3
+        with:
+          name: allure-results
+          path: allure-results
+
+      - name: Get Allure history
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+          repository: ${{vars.GH_PAGES}}
+          token: ${{ secrets.PERSONAL_TOKEN }}
+
+      - name: Register report
+        id: register-project
+        if: ${{success()}}
+        run: |
+          chmod +x ./register_report.sh
+          ./register_report.sh
+      - if: steps.register-project.outputs.project_exists != 'true'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          repository-name: ${{vars.GH_PAGES}}
+          branch: gh-pages
+          folder: project
+
+      - name: Generate report details
+        id: report-details
+        run: |
+          chmod +x ./generate_report_details.sh
+          ./generate_report_details.sh
+
+      - name: Build report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        id: allure-report
+        with:
+          allure_results: allure-results
+          gh_pages: gh-pages/${{env.REPORT_NAME}}
+          allure_report: allure-report
+          allure_history: allure-history
+          keep_reports: 2000
+          report_url: ${{steps.report-details.outputs.report_url}}
+          github_run_num: ${{steps.report-details.outputs.report_number}}
+
+      - name: Generate Latest Report
+        run: |
+          chmod +x ./generate_latest_report_redirect.sh
+          ./generate_latest_report_redirect.sh ${{steps.report-details.outputs.report_number}}
+
+      - name: Deploy report to Github Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          repository-name: ${{vars.GH_PAGES}}
+          branch: gh-pages
+          folder: build
+          target-folder: ${{ env.REPORT_NAME }}
+
+    env:
+      REPORT_NAME: integration
+      GH_PAGES: ${{vars.GH_PAGES}}

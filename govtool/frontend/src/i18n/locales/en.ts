@@ -119,33 +119,28 @@ export const en = {
             "You cannot vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>. until you re-register.",
           youAreSoleVoterTitle: "You are a Sole Voter",
         },
-      },
-      delegation: {
-        changeDelegation: "Change delegation",
-        delegateOwnPower:
-          "If you want to delegate your own voting power of ₳<strong>{{ada}}</strong>.",
-        dRepDelegatedTo: "DRep you delegated to",
-        toDRep:
-          "You have delegated your voting power of ₳<strong>{{ada}}</strong> to a selected DRep.",
-        toYourself:
-          "You have delegated your voting power of ₳<strong>{{ada}}</strong> to yourself.",
-        useYourVotingPower: "Use your Voting Power",
-        voteAbstain:
-          "You have delegated your voting power of ₳<strong>{{ada}}</strong>. You are going to vote 'ABSTAIN' as default.",
-        voteNo:
-          "You have delegated your voting power of ₳<strong>{{ada}}</strong>. You are going to vote 'NO' as default.",
-        votingPowerDelegation: "Voting Power Delegation",
-        yourVotingPowerIsDelegated:
-          "Your Voting Power <strong>is Delegated</strong>",
-        inProgress: {
-          toDRep:
-            "Your own voting power of ₳<strong>{{ada}}</strong> is progress of being delegated. You are going to delegate your voting power to a selected DRep.",
-          toYourself:
-            "Your own voting power of ₳<strong>{{ada}}</strong> is in progress of being delegated. You are going to delegate your voting power to yourself.",
-          voteAbstain:
-            "Your own voting power of ₳<strong>{{ada}}</strong> is in progress of being delegated. You are going to vote ‘ABSTAIN’ as default.",
-          voteNo:
-            "Your own voting power of ₳<strong>{{ada}}</strong> is in progress of being delegated. You are going to vote ‘NO’ as default.",
+        delegation: {
+          noDelegationTitle: "Delegate your Voting Power",
+          delegateToAnotherDRep: "Delegate to Another DRep",
+          noDelegationDescription: "Find a DRep to vote on your behalf.",
+          noDelegationActionButton: "View DRep Directory",
+          dRepDelegationTitle:
+            "Your Voting Power of <strong>₳{{ada}}</strong>\nis Delegated to:",
+          noConfidenceDelegationTitle:
+            "You have delegated <strong>₳{{ada}}</strong>\nto “No Confidence”",
+          abstainDelegationTitle:
+            "You have delegated <strong>₳{{ada}}</strong>\nto “Abstain”",
+          abstainDescription:
+            "You have selected to apply your Voting Power to Abstain on every vote.",
+          noDescription:
+            "You have selected to apply your Voting Power to No Confidence on every vote.",
+          inProgress: {
+            title: "Delegation",
+            dRep: "Your voting power of ₳<strong>{{ada}}</strong> is being delegated to:",
+            abstain:
+              "You have selected to apply your Voting Power to Abstain on every vote.",
+            no: "You have selected to apply your Voting Power to No Confidence on every vote.",
+          },
         },
       },
     },
@@ -218,11 +213,6 @@ export const en = {
           message:
             "Your Governance Action may take a little time to submit to the chain.",
           title: "Governance Action submitted!",
-        },
-        loading: {
-          title: "GovTool Is Checking Your Data",
-          message:
-            "GovTool will read the URL that you supplied and make a check to see if it’s identical with the information that you entered on the form.",
         },
       },
     },
@@ -434,6 +424,40 @@ export const en = {
         partOne: "Governance action with id",
         partTwo: "does not exist.",
       },
+      tooltips: {
+        info: "An action that has no effect on-chain, other than an on-chain record",
+        treasury: "Withdrawals from the treasury",
+      },
+      type: {
+        noConfidence: {
+          title: "No Confidence",
+          label: "No Confidence",
+        },
+        newCommittee: {
+          title: "New Committee",
+          label: "New Committee",
+        },
+        newConstitution: {
+          title: "Update to the Constitution",
+          label: "Update to the Constitution",
+        },
+        hardFork: {
+          title: "Hard Fork",
+          label: "Hard Fork",
+        },
+        parameterChange: {
+          title: "Protocol Parameter Changes",
+          label: "Protocol Parameter Change",
+        },
+        treasuryWithdrawals: {
+          title: "Treasury Withdrawals",
+          label: "Treasury Withdrawal",
+        },
+        infoAction: {
+          title: "Info Action",
+          label: "Info Action",
+        },
+      },
     },
     hero: {
       connectWallet: "Connect your wallet",
@@ -546,6 +570,11 @@ export const en = {
         title: "Please wait for your previous transaction to be completed.",
         message:
           "Before performing a new action please wait for the previous action transaction to be completed.",
+      },
+      pendingValidation: {
+        title: "GovTool Is Checking Your Data",
+        message:
+          "GovTool will read the URL that you supplied and make a check to see if it’s identical with the information that you entered on the form.",
       },
     },
     editMetadata: {
@@ -719,6 +748,11 @@ export const en = {
       usingUnregisteredStakeKeys:
         "Warning, no registered stake keys, using unregistered stake keys",
     },
+    dataMissingErrors: {
+      dataMissing: "Data Missing",
+      notVerifiable: "Not Verifiable",
+      incorrectFormat: "Incorrect Format",
+    },
     about: "About",
     abstain: "Abstain",
     addLink: "+ Add link",
@@ -741,7 +775,7 @@ export const en = {
     goBack: "Go back",
     here: "here",
     info: "Info",
-    inProgress: "In progress",
+    inProgress: "In Progress",
     learnMore: "Learn more",
     linkCopied: "Link copied",
     loading: "Loading...",

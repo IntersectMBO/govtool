@@ -5,17 +5,30 @@ import { useCardano } from "@context";
 import { getDRepVotes } from "@services";
 import { VotedProposalToDisplay } from "@/models/api";
 
-export const useGetDRepVotesQuery = (filters: string[], sorting: string) => {
+export const useGetDRepVotesQuery = (
+  type?: string[],
+  sort?: string,
+  search?: string,
+) => {
   const { dRepID, pendingTransaction } = useCardano();
 
   const { data, isLoading, refetch, isRefetching } = useQuery({
     queryKey: [
       QUERY_KEYS.useGetDRepVotesKey,
       pendingTransaction.vote?.transactionHash,
-      filters,
-      sorting,
+      type,
+      sort,
+      search,
     ],
-    queryFn: () => getDRepVotes({ dRepID, filters, sorting }),
+    queryFn: () =>
+      getDRepVotes({
+        dRepID,
+        params: {
+          ...(search && { search }),
+          ...(sort && { sort }),
+          ...(type && { type }),
+        },
+      }),
     enabled: !!dRepID,
   });
 

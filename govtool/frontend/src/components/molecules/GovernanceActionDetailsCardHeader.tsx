@@ -3,11 +3,12 @@ import { Box } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { Share } from "@molecules";
-import { GAMetedataErrors } from "@utils";
+import { MetadataValidationStatus } from "@models";
+import { getMetadataDataMissingStatusTranslation } from "@/utils";
 
 type GovernanceActionDetailsCardHeaderProps = {
   title?: string;
-  isDataMissing: boolean | GAMetedataErrors;
+  isDataMissing: boolean | MetadataValidationStatus;
 };
 
 export const GovernanceActionDetailsCardHeader = ({
@@ -47,7 +48,11 @@ export const GovernanceActionDetailsCardHeader = ({
           }}
           variant="title2"
         >
-          {isDataMissing || title}
+          {(isDataMissing !== false &&
+            getMetadataDataMissingStatusTranslation(
+              isDataMissing as MetadataValidationStatus,
+            )) ||
+            title}
         </Typography>
       </Box>
       <Share link={govActionLinkToShare} />

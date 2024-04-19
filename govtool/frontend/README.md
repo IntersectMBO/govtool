@@ -138,6 +138,8 @@ direnv allow
 yarn dev
 ```
 
+*To update the yarn.lock file after changes are made, run `nix develop .#js` for a developer shell with correct yarn/nodejs versions*
+
 ## After development
 
 Check our [Contributing Documentation](../../CONTRIBUTING.md) on how to submit a PR.

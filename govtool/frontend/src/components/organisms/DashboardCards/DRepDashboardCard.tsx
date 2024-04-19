@@ -41,6 +41,9 @@ export const DRepDashboardCard = ({
       ),
   };
 
+  const navigateToDrepDirectory = () =>
+    navigate(PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRepIDBech32));
+
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress
     if (inProgress) {
@@ -49,6 +52,7 @@ export const DRepDashboardCard = ({
         state: "inProgress",
         ...(pendingTransaction.registerAsDrep && {
           description: t("dashboard.cards.drep.registrationInProgress"),
+          transactionId: pendingTransaction?.registerAsDrep.transactionHash,
           title: t("dashboard.cards.drep.dRepRegistration"),
         }),
         ...(pendingTransaction.retireAsDrep && {
@@ -58,10 +62,12 @@ export const DRepDashboardCard = ({
               values={{ deposit: correctAdaFormat(voter?.deposit) }}
             />
           ),
+          transactionId: pendingTransaction?.retireAsDrep.transactionHash,
           title: t("dashboard.cards.drep.dRepRetirement"),
         }),
         ...(pendingTransaction.updateMetaData && {
           description: t("dashboard.cards.drep.metadataUpdateInProgress"),
+          transactionId: pendingTransaction?.updateMetaData.transactionHash,
           title: t("dashboard.cards.drep.dRepUpdate"),
         }),
       };
@@ -74,8 +80,7 @@ export const DRepDashboardCard = ({
           {
             children: t("dashboard.cards.drep.viewDetails"),
             dataTestId: "view-drep-details-button",
-            // TODO: change navigation to drep explorer
-            onClick: () => navigate("/"),
+            onClick: navigateToDrepDirectory,
             variant: "outlined",
             sx: { backgroundColor: "arcticWhite" },
           },
@@ -88,6 +93,7 @@ export const DRepDashboardCard = ({
         ],
         description: t("dashboard.cards.drep.registeredDescription"),
         state: "active",
+        transactionId: voter?.dRepRegisterTxHash,
         title: t("dashboard.cards.drep.registeredTitle"),
       };
     }
@@ -115,6 +121,7 @@ export const DRepDashboardCard = ({
         description: (
           <Trans i18nKey="dashboard.cards.drep.notRegisteredWasRegisteredDescription" />
         ),
+        transactionId: voter?.dRepRetireTxHash,
         title: t("dashboard.cards.drep.notRegisteredWasRegisteredTitle"),
       };
     }
@@ -130,10 +137,6 @@ export const DRepDashboardCard = ({
   return (
     <DashboardActionCard
       imageURL={IMAGES.govActionRegisterImage}
-      transactionId={
-        pendingTransaction.registerAsDrep?.transactionHash ||
-        pendingTransaction.retireAsDrep?.transactionHash
-      }
       {...cardProps}
     >
       {voter?.isRegisteredAsDRep && !pendingTransaction?.retireAsDrep && (

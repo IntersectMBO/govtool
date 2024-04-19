@@ -5,7 +5,12 @@ import { blake2bHex } from "blakejs";
 import { captureException } from "@sentry/react";
 
 import { CIP_108, VOTE_TEST_CONTEXT } from "@consts";
-import { canonizeJSON, downloadJson, generateJsonld } from "@utils";
+import {
+  canonizeJSON,
+  downloadJson,
+  generateJsonld,
+  generateMetadataBody,
+} from "@utils";
 import { MetadataValidationStatus } from "@models";
 
 import { useValidateMutation } from "../mutations";
@@ -37,17 +42,11 @@ export const useVoteContextForm = (
   } = useFormContext<VoteContextFormValues>();
 
   const generateMetadata = useCallback(async () => {
-    const data = getValues();
-
-    const acceptedKeys = ["voteContextText"];
-
-    const filteredData = Object.entries(data)
-      .filter(([key]) => acceptedKeys.includes(key))
-      .map(([key, value]) => [CIP_108 + key, value]);
-
-    const body = {
-      ...Object.fromEntries(filteredData),
-    };
+    const body = generateMetadataBody({
+      data: getValues(),
+      acceptedKeys: ["voteContextText"],
+      standardReference: CIP_108,
+    });
 
     const jsonld = await generateJsonld(body, VOTE_TEST_CONTEXT);
     const canonizedJson = await canonizeJSON(jsonld);

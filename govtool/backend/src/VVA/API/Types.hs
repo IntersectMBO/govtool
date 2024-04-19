@@ -180,6 +180,45 @@ instance ToParamSchema GovernanceActionType where
       & type_ ?~ OpenApiString
       & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [GovernanceActionType])
 
+
+data DRepSortMode = VotingPower | RegistrationDate | Status
+   deriving
+    ( Bounded
+    , Enum
+    , Eq
+    , Generic
+    , Read
+    , Show
+    )
+
+instance FromJSON DRepSortMode where
+  parseJSON (Aeson.String dRepSortMode) = pure $ fromJust $ readMaybe (Text.unpack dRepSortMode)
+  parseJSON _ = fail ""
+
+instance ToJSON DRepSortMode where
+  toJSON x = Aeson.String $ Text.pack $ show x
+
+instance ToSchema DRepSortMode where
+  declareNamedSchema proxy = do
+    NamedSchema name_ schema_ <- genericDeclareNamedSchema (fromAesonOptions defaultOptions) proxy
+    return $
+      NamedSchema name_ $
+        schema_
+          & description ?~ "DRep Sort Mode"
+          & example ?~ toJSON VotingPower
+
+instance FromHttpApiData DRepSortMode where
+  parseQueryParam t = case readMaybe $ Text.unpack t of
+    Just x  -> Right x
+    Nothing -> Left ("incorrect DRep sort mode: " <> t)
+
+instance ToParamSchema DRepSortMode where
+  toParamSchema _ =
+    mempty
+      & type_ ?~ OpenApiString
+      & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [DRepSortMode])
+
+
 data GovernanceActionSortMode = SoonestToExpire | NewestCreated | MostYesVotes deriving
     ( Bounded
     , Enum
@@ -466,7 +505,10 @@ data DRepInfoResponse
       , dRepInfoResponseUrl                      :: Maybe Text
       , dRepInfoResponseDataHash                 :: Maybe HexText
       , dRepInfoResponseVotingPower              :: Maybe Integer
-      , dRepInfoResponseLatestTxHash             :: Maybe HexText
+      , dRepInfoResponseDRepRegisterTxHash       :: Maybe HexText
+      , dRepInfoResponseDRepRetireTxHash         :: Maybe HexText
+      , dRepInfoResponseSoleVoterRegisterTxHash  :: Maybe HexText
+      , dRepInfoResponseSoleVoterRetireTxHash    :: Maybe HexText
       }
   deriving (Generic, Show)
 
@@ -482,7 +524,10 @@ exampleDRepInfoResponse =
   <> "\"url\": \"https://drep.metadata.xyz\","
   <> "\"dataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
   <> "\"votingPower\": 1000000,"
-  <> "\"latestTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
+  <> "\"dRepRegisterTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
+  <> "\"dRepRetireTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
+  <> "\"soleVoterRegisterTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
+  <> "\"soleVoterRetireTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
 
 instance ToSchema DRepInfoResponse where
   declareNamedSchema proxy = do
@@ -599,7 +644,7 @@ instance ToSchema DRepHash where
           ?~ toJSON exampleDrepHash
 
 
-data DRepStatus = Retired | Active | Inactive deriving (Generic, Show)
+data DRepStatus = Active | Inactive | Retired deriving (Generic, Show, Eq, Ord, Enum, Bounded, Read)
 
 -- ToJSON instance for DRepStatus
 instance ToJSON DRepStatus where
@@ -621,6 +666,17 @@ instance ToSchema DRepStatus where
         & type_ ?~ OpenApiString
         & description ?~ "DRep Status"
         & enum_ ?~ map toJSON [Retired, Active, Inactive]
+
+instance FromHttpApiData DRepStatus where
+  parseQueryParam t = case readMaybe $ Text.unpack t of
+    Just x  -> Right x
+    Nothing -> Left ("incorrect DRep status " <> t)
+
+instance ToParamSchema DRepStatus where
+  toParamSchema _ =
+    mempty
+      & type_ ?~ OpenApiString
+      & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [DRepStatus])
 
 
 
@@ -651,15 +707,16 @@ instance ToSchema DRepType where
 
 data DRep
   = DRep
-      { dRepDrepId       :: DRepHash
-      , dRepView         :: Text
-      , dRepUrl          :: Maybe Text
-      , dRepMetadataHash :: Maybe Text
-      , dRepDeposit      :: Integer
-      , dRepVotingPower  :: Maybe Integer
-      , dRepStatus       :: DRepStatus
-      , dRepType         :: DRepType
-      , dRepLatestTxHash :: Maybe HexText
+      { dRepDrepId                 :: DRepHash
+      , dRepView                   :: Text
+      , dRepUrl                    :: Maybe Text
+      , dRepMetadataHash           :: Maybe Text
+      , dRepDeposit                :: Integer
+      , dRepVotingPower            :: Maybe Integer
+      , dRepStatus                 :: DRepStatus
+      , dRepType                   :: DRepType
+      , dRepLatestTxHash           :: Maybe HexText
+      , dRepLatestRegistrationDate :: UTCTime
       }
   deriving (Generic, Show)
 
@@ -676,7 +733,8 @@ exampleDrep =
   <> "\"votingPower\": 0,"
   <> "\"status\": \"Active\","
   <> "\"type\": \"DRep\","
-  <> "\"latestTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
+  <> "\"latestTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
+  <> "\"latestRegistrationDate\": \"1970-01-01T00:00:00Z\"}"
 
 -- ToSchema instance for DRep
 instance ToSchema DRep where
@@ -692,8 +750,25 @@ instance ToSchema DRep where
             & example
               ?~ toJSON exampleDrep
 
+data DelegationResponse
+  = DelegationResponse
+      { delegationResponseDRepHash       :: Maybe HexText
+      , delegationResponseDRepView       :: Text
+      , delegationResponseTxHash         :: HexText
+      }
+deriveJSON (jsonOptions "delegationResponse") ''DelegationResponse
 
+exampleDelegationResponse :: Text
+exampleDelegationResponse = "{\"drepHash\": \"b4e4184bfedf920fec53cdc327de4da661ae427784c0ccca9e3c2f50\","
+                          <> "\"drepView\": \"drep1l8uyy66sm8u82h82gc8hkcy2xu24dl8ffsh58aa0v7d37yp48u8\","
+                          <> "\"txHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
 
+instance ToSchema DelegationResponse where
+    declareNamedSchema _ = pure $ NamedSchema (Just "DelegationResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "Delegation Response"
+        & example
+          ?~ toJSON exampleDelegationResponse
 
 data GetNetworkMetricsResponse
   = GetNetworkMetricsResponse

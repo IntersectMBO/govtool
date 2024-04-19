@@ -6,7 +6,9 @@ import jsonld from "jsonld";
  * @param json - The JSON object to be canonized.
  * @returns A Promise that resolves to the canonized JSON object.
  */
-export const canonizeJSON = async (json: Record<string, unknown>) => {
+export const canonizeJSON = async (
+  json: Record<string, unknown>,
+): Promise<string> => {
   const canonized = await jsonld.canonize(json);
   return canonized;
 };

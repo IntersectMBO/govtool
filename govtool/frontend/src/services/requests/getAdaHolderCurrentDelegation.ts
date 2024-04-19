@@ -1,3 +1,5 @@
+import { CurrentDelegation } from "@models";
+
 import { API } from "../API";
 
 export const getAdaHolderCurrentDelegation = async ({
@@ -5,7 +7,7 @@ export const getAdaHolderCurrentDelegation = async ({
 }: {
   stakeKey?: string;
 }) => {
-  const response = await API.get(
+  const response = await API.get<CurrentDelegation>(
     `/ada-holder/get-current-delegation/${stakeKey}`,
   );
 

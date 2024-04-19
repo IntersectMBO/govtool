@@ -3,11 +3,10 @@ import { useQuery } from "react-query";
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { getDRepVotingPower } from "@services";
-import { useGetVoterInfo } from ".";
+import { VoterInfo } from "@/models";
 
-export const useGetDRepVotingPowerQuery = () => {
+export const useGetDRepVotingPowerQuery = (voter?: VoterInfo) => {
   const { dRepID } = useCardano();
-  const { voter } = useGetVoterInfo();
 
   const { data, isLoading } = useQuery({
     queryKey: [

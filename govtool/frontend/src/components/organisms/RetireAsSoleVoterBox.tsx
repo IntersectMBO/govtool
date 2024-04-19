@@ -6,7 +6,7 @@ import { PATHS } from "@consts";
 import { CenteredBoxBottomButtons } from "@molecules";
 import { useCardano, useModal } from "@context";
 import { RetireAsSoleVoterBoxContent } from "@organisms";
-import { useGetVoterInfo } from "@/hooks";
+import { useGetVoterInfo, useWalletErrorModal } from "@hooks";
 
 export const RetireAsSoleVoterBox = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -20,6 +20,7 @@ export const RetireAsSoleVoterBox = () => {
   const { openModal, closeModal } = useModal();
   const { t } = useTranslation();
   const { voter } = useGetVoterInfo();
+  const openWalletErrorModal = useWalletErrorModal();
 
   const onRetire = useCallback(async () => {
     try {
@@ -44,7 +45,7 @@ export const RetireAsSoleVoterBox = () => {
             status: "success",
             title: t("modals.retirement.title"),
             message: t("modals.retirement.message"),
-            link: "https://adanordic.com/latest_transactions",
+            link: `https://sancho.cexplorer.io/tx/${result}`,
             buttonText: t("modals.common.goToDashboard"),
             dataTestId: "retirement-transaction-submitted-modal",
             onSubmit: () => {
@@ -56,21 +57,11 @@ export const RetireAsSoleVoterBox = () => {
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      const errorMessage = error.info ? error.info : error;
-
-      openModal({
-        type: "statusModal",
-        state: {
-          status: "warning",
-          message: errorMessage,
-          buttonText: t("modals.common.goToDashboard"),
-          title: t("modals.common.oops"),
-          dataTestId: "retirement-transaction-error-modal",
-          onSubmit: () => {
-            navigate(PATHS.dashboard);
-            closeModal();
-          },
-        },
+      openWalletErrorModal({
+        error,
+        buttonText: t("modals.common.goToDashboard"),
+        onSumbit: () => navigate(PATHS.dashboard),
+        dataTestId: "retirement-transaction-error-modal",
       });
     } finally {
       setIsLoading(false);

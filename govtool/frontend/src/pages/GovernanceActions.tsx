@@ -8,9 +8,8 @@ import {
   GOVERNANCE_ACTIONS_SORTING,
   PATHS,
 } from "@consts";
-import { useCardano } from "@context";
+import { useCardano, useDataActionsBar } from "@context";
 import {
-  useDataActionsBar,
   useGetProposalsQuery,
   useScreenDimension,
   useTranslation,

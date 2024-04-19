@@ -7,17 +7,20 @@ import { captureException } from "@sentry/react";
 import { NodeObject } from "jsonld";
 
 import {
-  CIP_100,
   CIP_QQQ,
   DREP_CONTEXT,
-  MetadataHashValidationErrors,
   PATHS,
   storageInformationErrorModals,
 } from "@consts";
 import { useCardano, useModal } from "@context";
-import { canonizeJSON, downloadJson, generateJsonld } from "@utils";
+import {
+  canonizeJSON,
+  downloadJson,
+  generateJsonld,
+  generateMetadataBody,
+} from "@utils";
 import { MetadataValidationStatus } from "@models";
-
+import { useWalletErrorModal } from "@hooks";
 import { useValidateMutation } from "../mutations";
 
 export type EditDRepInfoValues = {
@@ -41,15 +44,37 @@ export const defaultEditDRepInfoValues: EditDRepInfoValues = {
 export const useEditDRepInfoForm = (
   setStep?: Dispatch<SetStateAction<number>>,
 ) => {
-  const { validateMetadata } = useValidateMutation();
-  const { t } = useTranslation();
-  const navigate = useNavigate();
+  // Local state
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hash, setHash] = useState<string | null>(null);
   const [json, setJson] = useState<NodeObject | null>(null);
-  const { closeModal, openModal } = useModal();
+
+  // DApp Connector
   const { buildDRepUpdateCert, buildSignSubmitConwayCertTx } = useCardano();
 
+  // App Management
+  const { closeModal, openModal } = useModal();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const openWalletErrorModal = useWalletErrorModal();
+
+  // Queries
+  const { validateMetadata } = useValidateMutation();
+
+  // Form
+  const {
+    control,
+    getValues,
+    handleSubmit,
+    formState: { errors, isValid },
+    register,
+    resetField,
+    watch,
+  } = useFormContext<EditDRepInfoValues>();
+  const dRepName = watch("dRepName");
+  const isError = Object.keys(errors).length > 0;
+
+  // Navigation
   const backToForm = useCallback(() => {
     setStep?.(1);
     closeModal();
@@ -60,39 +85,13 @@ export const useEditDRepInfoForm = (
     closeModal();
   }, []);
 
-  const {
-    control,
-    getValues,
-    handleSubmit,
-    formState: { errors, isValid },
-    register,
-    resetField,
-    watch,
-  } = useFormContext<EditDRepInfoValues>();
-
-  const dRepName = watch("dRepName");
-  const isError = Object.keys(errors).length > 0;
-
+  // Business Logic
   const generateMetadata = useCallback(async () => {
-    const data = getValues();
-    const acceptedKeys = ["dRepName", "bio", "email"];
-
-    const filteredData = Object.entries(data)
-      .filter(([key]) => acceptedKeys.includes(key))
-      .map(([key, value]) => [CIP_QQQ + key, value]);
-
-    const references = (data as EditDRepInfoValues).links
-      ?.filter((link) => link.link)
-      .map((link) => ({
-        "@type": "Other",
-        [`${CIP_100}reference-label`]: "Label",
-        [`${CIP_100}reference-uri`]: link.link,
-      }));
-
-    const body = {
-      ...Object.fromEntries(filteredData),
-      [`${CIP_QQQ}references`]: references,
-    };
+    const body = generateMetadataBody({
+      data: getValues(),
+      acceptedKeys: ["dRepName", "bio", "email"],
+      standardReference: CIP_QQQ,
+    });
 
     const jsonld = await generateJsonld(body, DREP_CONTEXT, CIP_QQQ);
 
@@ -107,41 +106,19 @@ export const useEditDRepInfoForm = (
 
   const onClickDownloadJson = async () => {
     if (!json) return;
-
     downloadJson(json, dRepName);
   };
 
-  const validateHash = useCallback(
-    async (url: string) => {
-      try {
-        if (!hash) throw new Error(MetadataHashValidationErrors.INVALID_HASH);
-
-        const result = await validateMetadata({ url, hash });
-
-        if (result.status) {
-          throw result.status;
-        }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        if (Object.values(MetadataValidationStatus).includes(error)) {
-          openModal({
-            type: "statusModal",
-            state: {
-              ...storageInformationErrorModals[
-                error as MetadataValidationStatus
-              ],
-              onSubmit: backToForm,
-              onCancel: backToDashboard,
-              // TODO: Open usersnap feedback
-              onFeedback: backToDashboard,
-            },
-          });
-        }
-        throw error;
-      }
-    },
-    [backToForm, hash],
-  );
+  const showLoadingModal = useCallback(() => {
+    openModal({
+      type: "loadingModal",
+      state: {
+        title: t("modals.pendingValidation.title"),
+        message: t("modals.pendingValidation.message"),
+        dataTestId: "storing-information-loading",
+      },
+    });
+  }, []);
 
   const showSuccessModal = useCallback(() => {
     openModal({
@@ -161,12 +138,21 @@ export const useEditDRepInfoForm = (
     async (data: EditDRepInfoValues) => {
       const url = data.storingURL;
 
-      if (!hash) return;
-
       try {
-        setIsLoading(true);
+        if (!hash) throw MetadataValidationStatus.INVALID_HASH;
 
-        await validateHash(url);
+        setIsLoading(true);
+        showLoadingModal();
+
+        const { status } = await validateMetadata({
+          url,
+          hash,
+        });
+
+        if (status) {
+          throw status;
+        }
+
         const updateDRepMetadataCert = await buildDRepUpdateCert(url, hash);
         await buildSignSubmitConwayCertTx({
           certBuilder: updateDRepMetadataCert,
@@ -176,12 +162,31 @@ export const useEditDRepInfoForm = (
         showSuccessModal();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        captureException(error);
+        if (Object.values(MetadataValidationStatus).includes(error)) {
+          openModal({
+            type: "statusModal",
+            state: {
+              ...storageInformationErrorModals[
+                error as MetadataValidationStatus
+              ],
+              onSubmit: backToForm,
+              onCancel: backToDashboard,
+            },
+          });
+        } else {
+          captureException(error);
+
+          openWalletErrorModal({
+            error,
+            onSumbit: () => backToDashboard(),
+            dataTestId: "edit-drep-transaction-error-modal",
+          });
+        }
       } finally {
         setIsLoading(false);
       }
     },
-    [buildDRepUpdateCert, buildSignSubmitConwayCertTx, hash, validateHash],
+    [buildDRepUpdateCert, buildSignSubmitConwayCertTx, hash],
   );
 
   return {

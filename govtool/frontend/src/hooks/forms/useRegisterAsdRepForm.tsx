@@ -7,7 +7,6 @@ import { captureException } from "@sentry/react";
 import { NodeObject } from "jsonld";
 
 import {
-  CIP_100,
   CIP_QQQ,
   DREP_CONTEXT,
   PATHS,
@@ -15,9 +14,15 @@ import {
 } from "@consts";
 import { useCardano, useModal } from "@context";
 import { MetadataValidationStatus } from "@models";
-import { canonizeJSON, downloadJson, generateJsonld } from "@utils";
+import {
+  canonizeJSON,
+  downloadJson,
+  ellipsizeText,
+  generateJsonld,
+  generateMetadataBody,
+} from "@utils";
 
-import { useGetVoterInfo } from "..";
+import { useGetVoterInfo, useWalletErrorModal } from "@hooks";
 import { useValidateMutation } from "../mutations";
 
 export type RegisterAsDRepValues = {
@@ -41,27 +46,26 @@ export const defaultRegisterAsDRepValues: RegisterAsDRepValues = {
 export const useRegisterAsdRepForm = (
   setStep?: Dispatch<SetStateAction<number>>,
 ) => {
-  const { validateMetadata } = useValidateMutation();
-  const { t } = useTranslation();
-  const navigate = useNavigate();
+  // Local state
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hash, setHash] = useState<string | null>(null);
   const [json, setJson] = useState<NodeObject | null>(null);
-  const { closeModal, openModal } = useModal();
+
+  // DApp Connector
   const { buildDRepRegCert, buildDRepUpdateCert, buildSignSubmitConwayCertTx } =
     useCardano();
+
+  // App Management
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { closeModal, openModal } = useModal();
+  const openWalletErrorModal = useWalletErrorModal();
+
+  // Queries
+  const { validateMetadata } = useValidateMutation();
   const { voter } = useGetVoterInfo();
 
-  const backToForm = useCallback(() => {
-    setStep?.(2);
-    closeModal();
-  }, [setStep]);
-
-  const backToDashboard = useCallback(() => {
-    navigate(PATHS.dashboard);
-    closeModal();
-  }, []);
-
+  // Form
   const {
     control,
     getValues,
@@ -75,26 +79,24 @@ export const useRegisterAsdRepForm = (
   const dRepName = watch("dRepName");
   const isError = Object.keys(errors).length > 0;
 
+  // Navigation
+  const backToForm = useCallback(() => {
+    setStep?.(2);
+    closeModal();
+  }, [setStep]);
+
+  const backToDashboard = useCallback(() => {
+    navigate(PATHS.dashboard);
+    closeModal();
+  }, []);
+
+  // Business Logic
   const generateMetadata = useCallback(async () => {
-    const data = getValues();
-    const acceptedKeys = ["dRepName", "bio", "email"];
-
-    const filteredData = Object.entries(data)
-      .filter(([key]) => acceptedKeys.includes(key))
-      .map(([key, value]) => [CIP_QQQ + key, value]);
-
-    const references = (data as RegisterAsDRepValues).links
-      ?.filter((link) => link.link)
-      .map((link) => ({
-        "@type": "Other",
-        [`${CIP_100}reference-label`]: "Label",
-        [`${CIP_100}reference-uri`]: link.link,
-      }));
-
-    const body = {
-      ...Object.fromEntries(filteredData),
-      [`${CIP_QQQ}references`]: references,
-    };
+    const body = generateMetadataBody({
+      data: getValues(),
+      acceptedKeys: ["dRepName", "bio", "email"],
+      standardReference: CIP_QQQ,
+    });
 
     const jsonld = await generateJsonld(body, DREP_CONTEXT, CIP_QQQ);
 
@@ -110,44 +112,8 @@ export const useRegisterAsdRepForm = (
   const onClickDownloadJson = async () => {
     if (!json) return;
 
-    downloadJson(json, dRepName);
+    downloadJson(json, ellipsizeText(dRepName, 16, ""));
   };
-
-  const validateHash = useCallback(
-    async (url: string) => {
-      try {
-        if (!hash) throw new Error(MetadataValidationStatus.INVALID_HASH);
-
-        const result = await validateMetadata({ url, hash });
-
-        if (result.status) {
-          throw result.status;
-        }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        if (
-          Object.values(MetadataValidationStatus).includes(
-            error as MetadataValidationStatus,
-          )
-        ) {
-          openModal({
-            type: "statusModal",
-            state: {
-              ...storageInformationErrorModals[
-                error as MetadataValidationStatus
-              ],
-              onSubmit: backToForm,
-              onCancel: backToDashboard,
-              // TODO: Open usersnap feedback
-              onFeedback: backToDashboard,
-            },
-          });
-        }
-        throw error;
-      }
-    },
-    [backToForm, hash],
-  );
 
   const createRegistrationCert = useCallback(
     async (data: RegisterAsDRepValues) => {
@@ -160,10 +126,8 @@ export const useRegisterAsdRepForm = (
         }
 
         return await buildDRepRegCert(url, hash);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        console.error(error);
-        throw error;
+      } catch (error) {
+        captureException(error);
       }
     },
     [
@@ -173,6 +137,17 @@ export const useRegisterAsdRepForm = (
       voter?.isRegisteredAsSoleVoter,
     ],
   );
+
+  const showLoadingModal = useCallback(() => {
+    openModal({
+      type: "loadingModal",
+      state: {
+        title: t("modals.pendingValidation.title"),
+        message: t("modals.pendingValidation.message"),
+        dataTestId: "storing-information-loading",
+      },
+    });
+  }, []);
 
   const showSuccessModal = useCallback(() => {
     openModal({
@@ -191,9 +166,19 @@ export const useRegisterAsdRepForm = (
   const onSubmit = useCallback(
     async (data: RegisterAsDRepValues) => {
       try {
-        setIsLoading(true);
+        if (!hash) throw MetadataValidationStatus.INVALID_HASH;
 
-        await validateHash(data.storingURL);
+        setIsLoading(true);
+        showLoadingModal();
+
+        const { status } = await validateMetadata({
+          url: data.storingURL,
+          hash,
+        });
+
+        if (status) {
+          throw status;
+        }
         const registerAsDRepCert = await createRegistrationCert(data);
         await buildSignSubmitConwayCertTx({
           certBuilder: registerAsDRepCert,
@@ -203,12 +188,31 @@ export const useRegisterAsdRepForm = (
         showSuccessModal();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        captureException(error);
+        if (Object.values(MetadataValidationStatus).includes(error)) {
+          openModal({
+            type: "statusModal",
+            state: {
+              ...storageInformationErrorModals[
+                error as MetadataValidationStatus
+              ],
+              onSubmit: backToForm,
+              onCancel: backToDashboard,
+            },
+          });
+        } else {
+          captureException(error);
+
+          openWalletErrorModal({
+            error,
+            onSumbit: () => backToDashboard(),
+            dataTestId: "registration-transaction-error-modal",
+          });
+        }
       } finally {
         setIsLoading(false);
       }
     },
-    [buildSignSubmitConwayCertTx, createRegistrationCert, hash, validateHash],
+    [buildSignSubmitConwayCertTx, createRegistrationCert, hash],
   );
 
   return {

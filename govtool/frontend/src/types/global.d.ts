@@ -1,4 +1,4 @@
-import { GAMetedataErrors } from "@utils";
+import { MetadataValidationStatus } from "@models";
 
 export {};
 
@@ -40,7 +40,7 @@ declare global {
   };
 
   type ActionTypeToDsiplay = ActionType & {
-    isDataMissing: boolean | GAMetedataErrors;
+    isDataMissing: boolean | MetadataValidationStatus;
   };
 
   interface ActionVotedOnType extends ActionTypeToDsiplay {

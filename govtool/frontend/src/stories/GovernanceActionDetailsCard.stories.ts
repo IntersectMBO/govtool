@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
 import { GovernanceActionDetailsCard } from "@organisms";
 import { expect } from "@storybook/jest";
-import { GAMetedataErrors } from "@/utils";
+import { MetadataValidationStatus } from "@models";
 
 const meta = {
   title: "Example/GovernanceActionDetailsCard",
@@ -79,20 +79,20 @@ export const GovernanceActionDetailsDrep: Story = {
 export const GovernanceActionDetailsDataMissing: Story = {
   args: {
     ...commonArgs,
-    isDataMissing: GAMetedataErrors.DATA_MISSING,
+    isDataMissing: MetadataValidationStatus.URL_NOT_FOUND,
   },
 };
 
 export const GovernanceActionDetailsIncorrectFormat: Story = {
   args: {
     ...commonArgs,
-    isDataMissing: GAMetedataErrors.INCORRECT_FORMAT,
+    isDataMissing: MetadataValidationStatus.INVALID_JSONLD,
   },
 };
 
 export const GovernanceActionDetailsNotVerifiable: Story = {
   args: {
     ...commonArgs,
-    isDataMissing: GAMetedataErrors.NOT_VERIFIABLE,
+    isDataMissing: MetadataValidationStatus.INVALID_HASH,
   },
 };

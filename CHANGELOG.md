@@ -10,11 +10,21 @@ changes.
 
 ## [Unreleased]
 
+- Inicialize Usersnap into App [Issue 546](https://github.com/IntersectMBO/govtool/issues/546)
 - Integrate frontend with metadata validation service [Issue 617](https://github.com/IntersectMBO/govtool/issues/617)
 - Implement a loading modal for the validation of the metadata [Issue 646](https://github.com/IntersectMBO/govtool/issues/646)
+- Fix displaying modals to not block signing transactions [Issue 710](https://github.com/IntersectMBO/govtool/issues/710)
+- Change style of url button to trim the file name [Issue 655](https://github.com/IntersectMBO/govtool/issues/655)
+- Change regex for parsing urls to match urls without protocol [Issue 655](https://github.com/IntersectMBO/govtool/issues/655)
+- Integrate ga displaying metadata validation with the validation service [Issue 712](https://github.com/IntersectMBO/govtool/issues/712)
+- Correct text of the governance action type [Issue 651](https://github.com/IntersectMBO/govtool/issues/651)
+- Enable coverage tests report
 
 ### Added
 
+- added search query param to the `drep/getVotes` [Issue 640](https://github.com/IntersectMBO/govtool/issues/640)
+- added filtering and sorting capabilities to the `drep/list` [Issue 722](https://github.com/IntersectMBO/govtool/issues/722)
+- added drepView and txHash to the `ada-holder/get-current-delegation` [Issue 689](https://github.com/IntersectMBO/govtool/issues/689)
 - addded latestTxHash to the `drep/info` and `drep/list` endpoints [Issue 627](https://github.com/IntersectMBO/govtool/issues/627)
 - added `txHash` to `drep/getVotes` [Issue 626](https://github.com/IntersectMBO/govtool/issues/626)
 - added `references` to all proposal related endpoints
@@ -48,6 +58,7 @@ changes.
 
 ### Fixed
 
+- drep/info no longer returns null values [Issue 720](https://github.com/IntersectMBO/govtool/issues/720)
 - drep/getVotes no longer returns 500 [Issue 685](https://github.com/IntersectMBO/govtool/issues/685)
 - drep/info no longer returns 500 [Issue 676](https://github.com/IntersectMBO/govtool/issues/676)
 - proposal/list search is case insensitive now [Issue 582](https://github.com/IntersectMBO/govtool/issues/582)
@@ -72,6 +83,7 @@ changes.
 
 ### Changed
 
+- `drep/info` now returns 4 different tx hashes instead of one latest tx hash [Issue 688](https://github.com/IntersectMBO/govtool/issues/688)
 - `proposal/list` allows user to search by tx hash [Issue 603](https://github.com/IntersectMBO/govtool/issues/603)
 - `proposal/list` returns additional data such ass `expiryEpochNo`, `createdEpochNo`, `title`, `about`, `motivation`,
   `rationale`. `TreasuryWithdrawals` GAs also got nicely formated details. [Issue 372](https://github.com/IntersectMBO/govtool/issues/372)
@@ -96,6 +108,7 @@ changes.
 - Extend the eslint config to apply to the style guide of the project [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
 - Update frontend package readme to reflect recent changes [Issue 543](https://github.com/IntersectMBO/govtool/issues/543)
 - Change input selection strategy to 3 (random) [Issue 575](https://github.com/IntersectMBO/govtool/issues/575)
+- Changed documents to prepare for open source [Issue 737](https://github.com/IntersectMBO/govtool/issues/737)
 
 ### Removed
 

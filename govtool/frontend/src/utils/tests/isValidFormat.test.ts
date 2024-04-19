@@ -11,6 +11,11 @@ describe("isValidURLFormat", () => {
     expect(isValidURLFormat(validHttpsUrl)).toBe(true);
   });
 
+  it("returns true for valid URL without protocol", () => {
+    const validUrl = "example.com";
+    expect(isValidURLFormat(validUrl)).toBe(true);
+  });
+
   it("returns true for valid HTTPS URLs with IP", () => {
     const validHttpsUrl = "http://192.168.0.1/resoruce";
     expect(isValidURLFormat(validHttpsUrl)).toBe(true);
@@ -37,9 +42,9 @@ describe("isValidURLFormat", () => {
     expect(isValidURLFormat(notUrl)).toBe(false);
   });
 
-  it("returns true for empty string", () => {
+  it("returns false for empty string", () => {
     const empty = "";
-    expect(isValidURLFormat(empty)).toBe(true);
+    expect(isValidURLFormat(empty)).toBe(false);
   });
 });
 
@@ -59,8 +64,8 @@ describe("isValidHashFormat", () => {
     expect(isValidHashFormat(invalidHash)).toBe(false);
   });
 
-  it("returns true for empty string", () => {
+  it("returns false for empty string", () => {
     const empty = "";
-    expect(isValidHashFormat(empty)).toBe(true);
+    expect(isValidHashFormat(empty)).toBe(false);
   });
 });

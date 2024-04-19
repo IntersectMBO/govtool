@@ -2,40 +2,43 @@ import { Box, Link } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { useTranslation } from "@hooks";
-import { GAMetedataErrors, openInNewTab } from "@utils";
+import { openInNewTab } from "@utils";
+import { MetadataValidationStatus } from "@/models";
 
 export const DataMissingInfoBox = ({
   isDataMissing,
   isInProgress,
   isSubmitted,
 }: {
-  isDataMissing: boolean | GAMetedataErrors;
+  isDataMissing: boolean | MetadataValidationStatus;
   isInProgress?: boolean;
   isSubmitted?: boolean;
 }) => {
   const { t } = useTranslation();
 
   const gaMetadataErrorMessage = {
-    [GAMetedataErrors.DATA_MISSING]: t("errors.gAMetadata.message.dataMissing"),
-    [GAMetedataErrors.INCORRECT_FORMAT]: t(
+    [MetadataValidationStatus.URL_NOT_FOUND]: t(
+      "errors.gAMetadata.message.dataMissing",
+    ),
+    [MetadataValidationStatus.INVALID_JSONLD]: t(
       "errors.gAMetadata.message.incorrectFormat",
     ),
-    [GAMetedataErrors.NOT_VERIFIABLE]: t(
+    [MetadataValidationStatus.INVALID_HASH]: t(
       "errors.gAMetadata.message.notVerifiable",
     ),
-  }[isDataMissing as GAMetedataErrors];
+  }[isDataMissing as MetadataValidationStatus];
 
   const gaMetadataErrorDescription = {
-    [GAMetedataErrors.DATA_MISSING]: t(
+    [MetadataValidationStatus.URL_NOT_FOUND]: t(
       "errors.gAMetadata.description.dataMissing",
     ),
-    [GAMetedataErrors.INCORRECT_FORMAT]: t(
+    [MetadataValidationStatus.INVALID_JSONLD]: t(
       "errors.gAMetadata.description.incorrectFormat",
     ),
-    [GAMetedataErrors.NOT_VERIFIABLE]: t(
+    [MetadataValidationStatus.INVALID_HASH]: t(
       "errors.gAMetadata.description.notVerifiable",
     ),
-  }[isDataMissing as GAMetedataErrors];
+  }[isDataMissing as MetadataValidationStatus];
 
   return isDataMissing && !isSubmitted && !isInProgress ? (
     <Box

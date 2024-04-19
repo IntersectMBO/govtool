@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { Box, CircularProgress, Tab, Tabs, styled } from "@mui/material";
 import { useLocation } from "react-router-dom";
 
-import { GOVERNANCE_ACTIONS_FILTERS, GOVERNANCE_ACTIONS_SORTING } from "@consts";
-import { useCardano } from "@context";
 import {
-  useDataActionsBar,
+  GOVERNANCE_ACTIONS_FILTERS,
+  GOVERNANCE_ACTIONS_SORTING,
+} from "@consts";
+import { useCardano, useDataActionsBar } from "@context";
+import {
   useGetProposalsQuery,
   useGetVoterInfo,
   useScreenDimension,

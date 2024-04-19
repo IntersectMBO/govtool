@@ -10,8 +10,6 @@ export * from "./DashboardGovernanceActionDetails";
 export * from "./DashboardGovernanceActions";
 export * from "./DashboardGovernanceActionsVotedOn";
 export * from "./DashboardTopNav";
-export * from "./DelegateTodRepStepOne";
-export * from "./DelegateTodRepStepTwo";
 export * from "./Drawer";
 export * from "./DrawerMobile";
 export * from "./DRepCard";

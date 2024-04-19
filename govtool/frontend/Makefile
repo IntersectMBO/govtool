@@ -19,6 +19,7 @@ build-frontend: docker-login
 		--build-arg VITE_GTM_ID="$${GTM_ID}" \
 		--build-arg VITE_NETWORK_FLAG="$$NETWORK_FLAG" \
 		--build-arg VITE_SENTRY_DSN="$${SENTRY_DSN}" \
+		--build-arg VITE_USERSNAP_SPACE_API_KEY="$${USERSNAP_SPACE_API_KEY}" \
 		$(root_dir)/govtool/frontend
 
 .PHONY: push-frontend

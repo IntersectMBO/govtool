@@ -1,4 +1,4 @@
-import { DRepData } from '@/models';
+import { DRepData } from "@/models";
 
 export const isSameDRep = (
   { drepId, view }: DRepData,

@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> { } }:
+{ pkgs ? import <nixpkgs> { }, incl }:
 let
   inherit (pkgs.lib.trivial) pipe;
   inherit (pkgs) haskell;
@@ -22,7 +22,13 @@ let
   modifier = drv: pipe drv [ appendLibraries appendTools ];
 
   project = ghcPackages.developPackage {
-    root = ./.;
+    root = incl ./. [
+      ./vva-be.cabal
+      ./app
+      ./src
+      ./CHANGELOG.md
+      ./sql
+    ];
     modifier = modifier;
     overrides = self: super: { openapi3 = useBroken super.openapi3; };
   };

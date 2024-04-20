@@ -17,7 +17,7 @@
       {
         packages.scripts = defaultPkgs.callPackage ./scripts/govtool { pkgs = nodePkgs; };
         packages.infra = defaultPkgs.callPackage ./infra/terraform { pkgs = nodePkgs; };
-        packages.backend = defaultPkgs.callPackage ./govtool/backend { pkgs = defaultPkgs; };
+        packages.backend = defaultPkgs.callPackage ./govtool/backend { pkgs = defaultPkgs; incl = nix-inclusive.lib.inclusive; };
         packages.frontend = frontend;
         packages.webserver = defaultPkgs.callPackage frontend.webserver {
           staticSiteRoot = frontend.staticSite.overrideAttrs (finalAttrs: prevAttrs: {

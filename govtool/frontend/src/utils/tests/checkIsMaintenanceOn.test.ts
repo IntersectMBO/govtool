@@ -1,13 +1,13 @@
 import { vi } from "vitest";
-import { checkIsMaintenanceOn } from "..";
 import axios from "axios";
+import { checkIsMaintenanceOn } from "..";
 
 vi.mock("axios");
 vi.stubEnv("VITE_IS_DEV", "");
 
 describe("checkIsMaintenanceOn function", () => {
   it("does not reload the page when maintenance mode is off", async () => {
-    const location: Location = window.location;
+    const { location } = window;
     delete window.location;
     window.location = {
       ...location,
@@ -23,7 +23,7 @@ describe("checkIsMaintenanceOn function", () => {
   });
 
   it("does not reload the page when maintenance mode is on", async () => {
-    const location: Location = window.location;
+    const { location } = window;
     delete window.location;
     window.location = {
       ...location,

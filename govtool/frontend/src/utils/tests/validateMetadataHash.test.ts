@@ -1,7 +1,7 @@
-import { checkIsMissingGAMetadata } from "..";
-import { postValidate } from "@services";
-import { MetadataStandard, MetadataValidationStatus } from "@/models";
 import { vi } from "vitest";
+import { postValidate } from "@services";
+import { checkIsMissingGAMetadata } from "..";
+import { MetadataStandard, MetadataValidationStatus } from "@/models";
 
 const url = "https://example.com";
 const hash = "abcdefg";

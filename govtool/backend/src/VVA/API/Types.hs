@@ -750,6 +750,42 @@ instance ToSchema DRep where
             & example
               ?~ toJSON exampleDrep
 
+
+exampleListDRepsResponse :: Text
+exampleListDRepsResponse =
+   "{ \"page\": 0,"
+  <> "\"pageSize\": 1,"
+  <> "\"total\": 1000,"
+  <> "\"elements\": ["
+  <> exampleDrep <> "]}"
+
+data ListDRepsResponse
+  = ListDRepsResponse
+      { listDRepsResponsePage     :: Integer
+      , listDRepsResponsePageSize :: Integer
+      , listDRepsResponseTotal    :: Integer
+      , listDRepsResponseElements :: [DRep]
+      }
+  deriving (Generic, Show)
+
+deriveJSON (jsonOptions "listDRepsResponse") ''ListDRepsResponse
+
+instance ToSchema ListDRepsResponse where
+  declareNamedSchema proxy = do
+    NamedSchema name_ schema_ <-
+      genericDeclareNamedSchema
+        ( fromAesonOptions $
+            jsonOptions "listDRepsResponse"
+        )
+        proxy
+    return $
+      NamedSchema name_ $
+        schema_
+          & description ?~ "ListProposalsResponse"
+          & example
+            ?~ toJSON exampleListDRepsResponse
+
+
 data DelegationResponse
   = DelegationResponse
       { delegationResponseDRepHash       :: Maybe HexText

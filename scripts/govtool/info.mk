@@ -22,10 +22,11 @@ info:
 	@echo "|  TIME      $(shell date +'%Y-%m-%d %H:%M:%S%z')"
 	@echo "|  BRANCH    $(branch) [$(commit)]"
 	@echo "|  ENV       $(env)"
-	@echo "I  NETWORK   $(cardano_network)"
-	@echo "N  BACKEND   $(repo_url)/backend:$(backend_image_tag)"
-	@echo "F  FRONTEND  $(repo_url)/frontend:$(frontend_image_tag)"
-	@echo "O  NODE      ghcr.io/intersectmbo/cardano-node:$(cardano_node_image_tag)"
+	@echo "|  NETWORK   $(cardano_network)"
+	@echo "|  BACKEND   $(repo_url)/backend:$(backend_image_tag)"
+	@echo "|  FRONTEND  $(repo_url)/frontend:$(frontend_image_tag)"
+	@echo "|  STATUS    $(repo_url)/status-service:$(status_service_image_tag)"
+	@echo "|  NODE      ghcr.io/intersectmbo/cardano-node:$(cardano_node_image_tag)"
 	@echo "|  DBSYNC    ghcr.io/intersectmbo/cardano-db-sync:$(cardano_db_sync_image_tag)"
 	@echo "|  SSH       $(ssh_url)"
 	@echo "|  URL       https://$(docker_host)"
@@ -38,4 +39,4 @@ notify: info log-deployment
 	$(curl) -X POST https://slack.com/api/chat.postMessage\
 		-H "Authorization: Bearer $${GRAFANA_SLACK_OAUTH_TOKEN}" \
 		-H "Content-Type: application/json; charset=utf-8" \
-		--data "{ \"channel\":\"$${GRAFANA_SLACK_RECIPIENT}\", \"text\":\":rocket: *Deploy performed on \`$(env)\`*\n- from *branch* \`$(branch)\` (\`$(commit)\`),\n- using *Cardano Node* version \`$(cardano_node_image_tag)\`,\n- using *Cardano DB Sync* version \`$(cardano_db_sync_image_tag)\`,\n- using *GovTool backend* version \`$(backend_image_tag)\`,\n- using *Govtool frontend* version \`$(frontend_image_tag)\`.\n$(pipeline_info)\" }"
+		--data "{ \"channel\":\"$${GRAFANA_SLACK_RECIPIENT}\", \"text\":\":rocket: *Deploy performed on \`$(env)\`*\n- from *branch* \`$(branch)\` (\`$(commit)\`),\n- using *Cardano Node* version \`$(cardano_node_image_tag)\`,\n- using *Cardano DB Sync* version \`$(cardano_db_sync_image_tag)\`,\n- using *GovTool backend* version \`$(backend_image_tag)\`,\n- using *Govtool frontend* version \`$(frontend_image_tag)\`,\n- using *Govtool status-service* version \`$(status_service_image_tag)\`.\n$(pipeline_info)\" }"

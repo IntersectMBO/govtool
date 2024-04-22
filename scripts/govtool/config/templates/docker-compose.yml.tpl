@@ -168,8 +168,7 @@ services:
     logging: *logging
 
   status-service:
-    build:
-      context: ../../govtool/status-service
+    image: <REPO_URL>/status-service:${STATUS_SERVICE_TAG}
     environment:
       - GRAFANA_USERNAME=admin
       - GRAFANA_PASSWORD=${GRAFANA_ADMIN_PASSWORD}

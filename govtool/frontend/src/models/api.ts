@@ -18,6 +18,12 @@ export enum DRepStatus {
   Retired = "Retired",
 }
 
+export enum DRepListSort {
+  VotingPower = "VotingPower",
+  RegistrationDate = "RegistrationDate",
+  Status = "Status",
+}
+
 export interface DRepData {
   drepId: string;
   view: string;
@@ -28,6 +34,12 @@ export interface DRepData {
   status: DRepStatus;
   type: "DRep" | "SoleVoter";
 }
+export type InfinityDRepData = {
+  elements: DRepData[];
+  page: number;
+  pageSize: number;
+  total: number;
+};
 
 export type Vote = "yes" | "no" | "abstain";
 

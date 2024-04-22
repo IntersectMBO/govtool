@@ -1,13 +1,32 @@
-import type { DRepData } from "@models";
+import type { InfinityDRepData, DRepStatus, DRepListSort } from "@models";
 import { API } from "../API";
 
-export type GetDRepListParams = {
-  search?: string;
-  sort?: string;
-  status?: string[];
+export type GetDRepListArguments = {
+  filters?: string[];
+  page?: number;
+  pageSize?: number;
+  sorting?: DRepListSort;
+  status?: DRepStatus[];
+  searchPhrase?: string;
 };
 
-export const getDRepList = async (params: GetDRepListParams) => {
-  const response = await API.get<DRepData[]>("/drep/list", { params });
+export const getDRepList = async ({
+  sorting,
+  filters = [],
+  page = 0,
+  pageSize = 10,
+  searchPhrase = "",
+  status = [],
+}: GetDRepListArguments): Promise<InfinityDRepData> => {
+  const response = await API.get("/drep/list", {
+    params: {
+      page,
+      pageSize,
+      ...(searchPhrase && { search: searchPhrase }),
+      ...(filters.length && { type: filters }),
+      ...(sorting && { sort: sorting }),
+      ...(status.length && { status }),
+    },
+  });
   return response.data;
 };

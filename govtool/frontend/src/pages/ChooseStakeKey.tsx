@@ -11,6 +11,8 @@ export const ChooseStakeKey = () => (
       <Box display="flex" flex={1} justifyContent="center">
         <ChooseStakeKeyPanel />
       </Box>
+      {/* FIXME: Footer should be on top of the layout.
+          Should not be rerendered across the pages */}
       <Footer />
     </Box>
   </Background>

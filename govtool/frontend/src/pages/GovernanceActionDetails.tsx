@@ -181,6 +181,8 @@ export const GovernanceActionDetails = () => {
             )}
           </Box>
         </Box>
+        {/* FIXME: Footer should be on top of the layout.
+        Should not be rerendered across the pages */}
         <Footer />
       </Box>
     </Background>

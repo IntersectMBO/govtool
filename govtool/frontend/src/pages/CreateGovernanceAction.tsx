@@ -88,6 +88,8 @@ export const CreateGovernanceAction = () => {
           {step === 5 && <StoreDataInfo setStep={setStep} />}
           {step === 6 && <StorageInformation setStep={setStep} />}
         </FormProvider>
+        {/* FIXME: Footer should be on top of the layout.
+        Should not be rerendered across the pages */}
         <Footer />
       </Box>
     </Background>

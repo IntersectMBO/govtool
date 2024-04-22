@@ -1,7 +1,7 @@
 export const QUERY_KEYS = {
   getAdaHolderCurrentDelegationKey: "getAdaHolderCurrentDelegationKey",
   getAdaHolderVotingPowerKey: "getAdaHolderVotingPowerKey",
-  useGetDRepListKey: "useGetDRepListKey",
+  useGetDRepListInfiniteKey: "useGetDRepListInfiniteKey",
   useGetDRepVotesKey: "useGetDRepVotesKey",
   useGetDRepVotingPowerKey: "useGetDRepVotingPowerKey",
   useGetProposalKey: "useGetProposalKey",

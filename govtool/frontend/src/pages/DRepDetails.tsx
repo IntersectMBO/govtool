@@ -7,7 +7,7 @@ import { ICONS, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import {
   useDelegateTodRep,
-  useGetDRepListQuery,
+  useGetDRepListInfiniteQuery,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
@@ -36,10 +36,12 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
 
   const { delegate, isDelegating } = useDelegateTodRep();
 
-  const { data, isLoading } = useGetDRepListQuery({ search: dRepParam });
-  const dRep = data?.[0];
+  const { dRepData, isDRepListLoading } = useGetDRepListInfiniteQuery({
+    searchPhrase: dRepParam,
+  });
+  const dRep = dRepData?.[0];
 
-  if (data === undefined || isLoading)
+  if (dRep === undefined || isDRepListLoading)
     return (
       <Box
         sx={{

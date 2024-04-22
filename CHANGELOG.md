@@ -56,6 +56,7 @@ changes.
 - Add frontend test workflow on github actions [Issue 500](https://github.com/IntersectMBO/govtool/issues/500)
 - Add type check & lint to github actions [Issue 512](https://github.com/IntersectMBO/govtool/issues/512)
 - Add eslint & prettier to frontend package [Issue 166](https://github.com/IntersectMBO/govtool/issues/166)
+- Add DRep list pagination [Issue 740](https://github.com/IntersectMBO/govtool/issues/740)
 
 ### Fixed
 

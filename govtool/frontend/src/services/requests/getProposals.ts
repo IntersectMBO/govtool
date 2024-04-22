@@ -18,7 +18,7 @@ export const getProposals = async ({
   pageSize = 7,
   searchPhrase = "",
   sorting = "",
-}: GetProposalsArguments) => {
+}: GetProposalsArguments): Promise<InfinityProposals> => {
   const response = await API.get("/proposal/list", {
     params: {
       page,
@@ -29,5 +29,5 @@ export const getProposals = async ({
       ...(dRepID && { drepId: dRepID }),
     },
   });
-  return response.data as InfinityProposals;
+  return response.data;
 };

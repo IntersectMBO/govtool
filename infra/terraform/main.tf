@@ -26,6 +26,11 @@ module "govtool-ecr-frontend" {
   repo_name = "frontend"
 }
 
+module "govtool-ecr-status-service" {
+  source    = "./modules/ecr"
+  repo_name = "status-service"
+}
+
 resource "aws_iam_policy" "cicd_ecr" {
   name = "CICD_ECR"
   policy = jsonencode({
@@ -39,7 +44,8 @@ resource "aws_iam_policy" "cicd_ecr" {
         Resource = [
           module.govtool-ecr-backend.repo_arn,
           module.govtool-ecr-backend-base.repo_arn,
-          module.govtool-ecr-frontend.repo_arn
+          module.govtool-ecr-frontend.repo_arn,
+          module.govtool-ecr-status-service.repo_arn
         ]
       },
       {
@@ -103,6 +109,10 @@ output "govtool-ecr-backend-base-url" {
 
 output "govtool-ecr-frontend-url" {
   value = module.govtool-ecr-frontend.repo_url
+}
+
+output "govtool-ecr-status-service-url" {
+  value = module.govtool-ecr-status-service.repo_url
 }
 
 output "govtool-dev-sanchonet-frontend-domain" {

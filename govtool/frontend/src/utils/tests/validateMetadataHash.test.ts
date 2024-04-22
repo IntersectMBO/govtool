@@ -8,47 +8,52 @@ const hash = "abcdefg";
 
 vi.mock("@services");
 
+const mockPostValidate = postValidate as jest.MockedFunction<
+  typeof postValidate
+>;
+
 describe("checkIsMissingGAMetadata", () => {
-  it("returns false when url and hash are correct", async () => {
-    // Mock postValidate to resolve with a status
-    postValidate.mockResolvedValueOnce({
-      status: false,
+  it("returns false when there are no issues with the metadata", async () => {
+    mockPostValidate.mockResolvedValueOnce({
+      valid: true,
     });
 
     const result = await checkIsMissingGAMetadata({ url, hash });
 
     expect(result).toBe(false);
-    expect(postValidate).toHaveBeenCalledWith({
+    expect(mockPostValidate).toHaveBeenCalledWith({
       url,
       hash,
       standard: MetadataStandard.CIP108,
     });
   });
 
-  it("returns a MetadataValidationStatus when postValidate resolves when status is invalid hash", async () => {
-    postValidate.mockResolvedValueOnce({
+  it("returns MetadataValidationStatus.INVALID_HASH when postValidate resolves with INVALID_HASH", async () => {
+    mockPostValidate.mockResolvedValueOnce({
+      valid: false,
       status: MetadataValidationStatus.INVALID_HASH,
     });
 
     const result = await checkIsMissingGAMetadata({ url, hash });
 
     expect(result).toBe(MetadataValidationStatus.INVALID_HASH);
-    expect(postValidate).toHaveBeenCalledWith({
+    expect(mockPostValidate).toHaveBeenCalledWith({
       url,
       hash,
       standard: MetadataStandard.CIP108,
     });
   });
 
-  it("returns a MetadataValidationStatus when postValidate resolves when status is invalid json", async () => {
-    postValidate.mockResolvedValueOnce({
+  it("returns MetadataValidationStatus.INVALID_JSONLD when postValidate resolves with INVALID_JSONLD", async () => {
+    mockPostValidate.mockResolvedValueOnce({
+      valid: false,
       status: MetadataValidationStatus.INVALID_JSONLD,
     });
 
     const result = await checkIsMissingGAMetadata({ url, hash });
 
     expect(result).toBe(MetadataValidationStatus.INVALID_JSONLD);
-    expect(postValidate).toHaveBeenCalledWith({
+    expect(mockPostValidate).toHaveBeenCalledWith({
       url,
       hash,
       standard: MetadataStandard.CIP108,
@@ -56,13 +61,12 @@ describe("checkIsMissingGAMetadata", () => {
   });
 
   it("returns MetadataValidationStatus.URL_NOT_FOUND when postValidate throws an error", async () => {
-    // Mock postValidate to throw an error
-    postValidate.mockRejectedValueOnce(new Error("404 Not Found"));
+    mockPostValidate.mockRejectedValueOnce(new Error("404 Not Found"));
 
     const result = await checkIsMissingGAMetadata({ url, hash });
 
     expect(result).toBe(MetadataValidationStatus.URL_NOT_FOUND);
-    expect(postValidate).toHaveBeenCalledWith({
+    expect(mockPostValidate).toHaveBeenCalledWith({
       url,
       hash,
       standard: MetadataStandard.CIP108,

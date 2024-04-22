@@ -69,7 +69,7 @@ FROM
   LEFT JOIN voting_procedure AS voting_procedure ON voting_procedure.drep_voter = dh.id
   LEFT JOIN tx AS tx ON tx.id = voting_procedure.tx_id
   LEFT JOIN block AS block ON block.id = tx.block_id
-  JOIN (
+  LEFT JOIN (
     SELECT
       block.time,
       dr.drep_hash_id,
@@ -79,9 +79,9 @@ FROM
       JOIN tx ON tx.id = dr.tx_id
       JOIN block ON block.id = tx.block_id
     WHERE
-      NOT (dr.deposit > 0)) AS newestRegister ON newestRegister.drep_hash_id = dh.id
+      NOT (dr.deposit < 0)) AS newestRegister ON newestRegister.drep_hash_id = dh.id
   AND newestRegister.rn = 1
-  JOIN (
+  LEFT JOIN (
     SELECT
       dr.tx_id,
       dr.drep_hash_id,
@@ -89,8 +89,8 @@ FROM
     FROM
       drep_registration dr) AS dr_first_register ON dr_first_register.drep_hash_id = dh.id
     AND dr_first_register.rn = 1
-  JOIN tx AS tx_first_register ON tx_first_register.id = dr_first_register.tx_id
-  JOIN block AS block_first_register ON block_first_register.id = tx_first_register.block_id
+  LEFT JOIN tx AS tx_first_register ON tx_first_register.id = dr_first_register.tx_id
+  LEFT JOIN block AS block_first_register ON block_first_register.id = tx_first_register.block_id
 GROUP BY
   dh.raw,
   second_to_newest_drep_registration.voting_anchor_id,

@@ -13,7 +13,9 @@ export interface DelegateTodrepFormValues {
 
 export const useDelegateTodRepForm = () => {
   const { buildSignSubmitConwayCertTx, buildVoteDelegationCert } = useCardano();
-  const { data: drepList } = useGetDRepListInfiniteQuery();
+  const { dRepData: drepList } = useGetDRepListInfiniteQuery({
+    page: 0,
+  });
   const { openModal, closeModal, modal } = useModal();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();

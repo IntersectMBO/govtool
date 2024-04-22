@@ -24,6 +24,8 @@ export const Home = () => {
         <TopNav />
         <Hero />
         <HomeCards />
+        {/* FIXME: Footer should be on top of the layout.
+        Should not be rerendered across the pages */}
         <Footer />
       </Box>
     </Background>

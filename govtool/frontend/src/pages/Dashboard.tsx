@@ -60,6 +60,8 @@ export const Dashboard = () => {
           <DashboardTopNav title={getPageTitle(window.location.pathname)} />
           <ScrollToManage />
           <Outlet />
+          {/* FIXME: Footer should be on top of the layout.
+          Should not be rerendered across the pages */}
           <Footer />
         </Box>
       </Box>

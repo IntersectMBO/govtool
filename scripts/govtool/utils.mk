@@ -15,6 +15,7 @@ docker-compose:
 	export BACKEND_TAG=$(backend_image_tag); \
 	export FRONTEND_TAG=$(frontend_image_tag); \
 	export STATUS_SERVICE_TAG=$(status_service_image_tag); \
+	export METADATA_VALIDATION_TAG=$(metadata_validation_image_tag); \
 	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \
 	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	$(ssh-keyscan) $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \

@@ -182,8 +182,7 @@ services:
       - "traefik.http.services.status-service.loadbalancer.server.port=8000"
 
   metadata-validation:
-    build:
-      context: ../../govtool/metadata-validation
+    image: <REPO_URL>/metadata-validation:${METADATA_VALIDATION_TAG}
     environment:
       - PORT=3000
     logging: *logging

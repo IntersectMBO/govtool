@@ -47,7 +47,7 @@ services:
       retries: 5
 
   cardano-node:
-    image: ghcr.io/intersectmbo/cardano-node:8.10.0-pre
+    image: ghcr.io/intersectmbo/cardano-node:8.8.0-pre
     environment:
       - NETWORK=sanchonet
     volumes:
@@ -61,7 +61,7 @@ services:
       retries: 10
 
   cardano-db-sync:
-    image: ghcr.io/intersectmbo/cardano-db-sync:sancho-4-2-1
+    image: ghcr.io/intersectmbo/cardano-db-sync:sancho-4-0-0-fix-config
     environment:
       - NETWORK=sanchonet
       - POSTGRES_HOST=postgres

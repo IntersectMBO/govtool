@@ -52,7 +52,15 @@ export const StatusModal = () => {
       <ModalContents>
         <Typography
           textAlign="center"
-          sx={{ fontSize: "16px", fontWeight: "400" }}
+          sx={{
+            fontSize: "16px",
+            fontWeight: "400",
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitBoxOrient: "vertical",
+            WebkitLineClamp: 8,
+            wordBreak: "break-word",
+          }}
         >
           {state?.message}{" "}
           {state?.link && (

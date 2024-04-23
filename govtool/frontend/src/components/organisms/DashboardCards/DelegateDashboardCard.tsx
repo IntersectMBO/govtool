@@ -112,7 +112,7 @@ export const DelegateDashboardCard = ({
     <DashboardActionCard
       imageURL={IMAGES.govActionDelegateImage}
       isSpaceBetweenButtons={!!currentDelegation?.dRepView}
-      transactionId={delegateTx?.resourceId || currentDelegation?.txHash}
+      transactionId={delegateTx?.transactionHash || currentDelegation?.txHash}
       {...cardProps}
     >
       {displayedDelegationId && (

@@ -48,11 +48,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const inProgressDelegation = pendingTransaction.delegate?.resourceId;
 
-  const {
-    dRepData: myDRepList,
-    dRepListHasNextPage,
-    dRepListFetchNextPage,
-  } = useGetDRepListInfiniteQuery(
+  const { dRepData: myDRepList } = useGetDRepListInfiniteQuery(
     {
       searchPhrase: currentDelegation?.dRepView?.startsWith("drep")
         ? currentDelegation.dRepView
@@ -61,7 +57,13 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     { enabled: !!inProgressDelegation || !!currentDelegation },
   );
   const myDrep = myDRepList?.[0];
-  const { dRepData: dRepList, isPreviousData } = useGetDRepListInfiniteQuery(
+
+  const {
+    dRepData: dRepList,
+    isPreviousData,
+    dRepListHasNextPage,
+    dRepListFetchNextPage,
+  } = useGetDRepListInfiniteQuery(
     {
       searchPhrase: debouncedSearchText,
       sorting: chosenSorting as DRepListSort,

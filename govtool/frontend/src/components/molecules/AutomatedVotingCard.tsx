@@ -4,7 +4,7 @@ import { Button, LoadingButton, Typography } from "@atoms";
 import { primaryBlue } from "@consts";
 import { useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { openInNewTab } from "@utils";
+import { openInNewTab, testIdFromLabel } from "@utils";
 
 import { Card } from "./Card";
 import { AutomatedVotingCardProps } from "./types";
@@ -24,6 +24,7 @@ export const AutomatedVotingCard = ({
   const { isMobile, screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { t } = useTranslation();
+  const testIdLabel = testIdFromLabel(title);
 
   const onClickShowTransaction = () =>
     openInNewTab(`https://sancho.cexplorer.io/tx/${transactionId}`);
@@ -121,7 +122,7 @@ export const AutomatedVotingCard = ({
             }}
           >
             <Button
-              // TODO handle button click
+              data-testid={`${testIdLabel}-info-button`}
               onClick={onClickInfo}
               size={isMobile ? "medium" : "large"}
               sx={{ flex: screenWidth < 768 ? 1 : undefined }}
@@ -131,6 +132,7 @@ export const AutomatedVotingCard = ({
             </Button>
             {!isConnected ? (
               <Button
+                data-testid={`${testIdLabel}-connect-to-delegate-button`}
                 onClick={() => openModal({ type: "chooseWallet" })}
                 size={isMobile ? "medium" : "large"}
                 sx={{ flex: screenWidth < 768 ? 1 : undefined }}
@@ -140,6 +142,7 @@ export const AutomatedVotingCard = ({
             ) : (
               !isSelected && (
                 <LoadingButton
+                  data-testid={`${testIdLabel}-delegate-button`}
                   isLoading={isDelegateLoading}
                   onClick={onClickDelegate}
                   size={isMobile ? "medium" : "large"}

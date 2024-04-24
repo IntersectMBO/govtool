@@ -4,7 +4,7 @@ import { Button, Typography } from "@atoms";
 import { ICONS } from "@consts";
 import { useUsersnapApi } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { openInNewTab } from "@utils";
+import { openInNewTab, testIdFromLabel } from "@utils";
 
 type FooterLinkProps = {
   label: string;
@@ -13,6 +13,7 @@ type FooterLinkProps = {
 
 const FooterLink = ({ label, onClick }: FooterLinkProps) => (
   <Link
+    data-testid={`${testIdFromLabel(label)}-footer-link`}
     onClick={onClick}
     sx={{
       color: "textBlack",
@@ -91,6 +92,7 @@ export const Footer = () => {
           }}
         >
           <Button
+            data-testid="help-footer-button"
             onClick={onClickHelp}
             size="small"
             startIcon={<img alt="helpIcon" src={ICONS.helpIcon} />}
@@ -99,7 +101,12 @@ export const Footer = () => {
           >
             {t("menu.help")}
           </Button>
-          <Button onClick={onClickFeedback} size="small" variant="outlined">
+          <Button
+            data-testid="feedback-footer-button"
+            onClick={onClickFeedback}
+            size="small"
+            variant="outlined"
+          >
             {t("feedback")}
           </Button>
         </Box>

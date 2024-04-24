@@ -12,7 +12,12 @@ import {
   useTranslation,
 } from "@hooks";
 import { Card, LinkWithIcon, Share } from "@molecules";
-import { correctAdaFormat, isSameDRep, openInNewTab } from "@utils";
+import {
+  correctAdaFormat,
+  isSameDRep,
+  openInNewTab,
+  testIdFromLabel,
+} from "@utils";
 
 const LINKS = [
   "darlenelonglink1.DRepwebsiteorwhatever.com",
@@ -70,6 +75,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
   return (
     <>
       <LinkWithIcon
+        data-testid="back-to-list-button"
         label={t("backToList")}
         onClick={() =>
           navigate(
@@ -128,6 +134,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
           </Typography>
           {isMe && (
             <Button
+              data-testid="edit-drep-data-button"
               onClick={() => navigate(PATHS.editDrepMetadata)}
               variant="outlined"
             >
@@ -192,6 +199,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
           )}
           {!isConnected && status === "Active" && (
             <Button
+              data-testid="connect-to-delegate-button"
               onClick={() =>
                 openModal({
                   type: "chooseWallet",
@@ -255,6 +263,7 @@ const DRepDetailsInfoItem = ({ children, label }: DrepDetailsInfoItemProps) => (
 
 const DRepId = ({ children }: PropsWithChildren) => (
   <ButtonBase
+    data-testid="copy-drep-id-button"
     sx={{
       gap: 1,
       maxWidth: "100%",
@@ -281,6 +290,7 @@ const MoreInfoLink = ({ label, navTo }: LinkWithIconProps) => {
 
   return (
     <ButtonBase
+      data-testid={`${testIdFromLabel(label)}-link`}
       onClick={openLink}
       sx={{
         gap: 0.5,

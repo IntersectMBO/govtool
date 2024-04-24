@@ -33,6 +33,7 @@ export const Share = ({ link }: { link: string }) => {
   return (
     <>
       <ButtonBase
+        data-testid="share-button"
         aria-describedby={id}
         onClick={handleClick}
         sx={(theme) => ({
@@ -44,11 +45,11 @@ export const Share = ({ link }: { link: string }) => {
           display: "flex",
           justifyContent: "center",
           padding: 1.5,
-          transition: 'all 0.3s',
-          '&:hover': {
+          transition: "all 0.3s",
+          "&:hover": {
             boxShadow: theme.shadows[1],
             bgcolor: "#F7F9FB",
-          }
+          },
         })}
       >
         <img alt="" height={24} width={24} src={ICONS.share} />
@@ -82,6 +83,7 @@ export const Share = ({ link }: { link: string }) => {
         >
           <Typography sx={{ alignSelf: "flex-start" }}>{t("share")}</Typography>
           <ButtonBase
+            data-testid="copy-link-from-share-button"
             onClick={onCopy}
             sx={{
               alignItems: "center",
@@ -99,7 +101,9 @@ export const Share = ({ link }: { link: string }) => {
           >
             <img alt="link" height={24} src={ICONS.link} width={24} />
           </ButtonBase>
-          <Typography variant="caption">{isActive ? t("clickToCopyLink") : t("linkCopied")}</Typography>
+          <Typography variant="caption">
+            {isActive ? t("clickToCopyLink") : t("linkCopied")}
+          </Typography>
         </Box>
       </Popover>
     </>

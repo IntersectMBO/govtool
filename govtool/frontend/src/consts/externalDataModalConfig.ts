@@ -36,6 +36,7 @@ export const storageInformationErrorModals: Record<
   >["state"]
 > = {
   [MetadataValidationStatus.URL_NOT_FOUND]: urlCannotBeFound,
+  [MetadataValidationStatus.INCORRECT_FORMAT]: externalDataDoesntMatchModal,
   [MetadataValidationStatus.INVALID_JSONLD]: externalDataDoesntMatchModal,
   [MetadataValidationStatus.INVALID_HASH]: externalDataDoesntMatchModal,
 };

@@ -5,7 +5,7 @@ import * as blake from 'blakejs';
 
 import { ValidateMetadataDTO } from '@dto';
 import { MetadataValidationStatus } from '@enums';
-import { canonizeJSON, validateMetadataStandard } from '@utils';
+import { canonizeJSON, validateMetadataStandard, parseMetadata } from '@utils';
 import { ValidateMetadataResult } from '@types';
 
 @Injectable()
@@ -18,6 +18,7 @@ export class AppService {
     standard,
   }: ValidateMetadataDTO): Promise<ValidateMetadataResult> {
     let status: MetadataValidationStatus;
+    let metadata: any;
     try {
       const { data } = await firstValueFrom(
         this.httpService.get(url).pipe(
@@ -30,6 +31,8 @@ export class AppService {
       if (standard) {
         await validateMetadataStandard(data, standard);
       }
+
+      metadata = parseMetadata(data.body, standard);
 
       let canonizedMetadata;
       try {
@@ -48,6 +51,6 @@ export class AppService {
       }
     }
 
-    return { status, valid: !Boolean(status) };
+    return { status, valid: !Boolean(status), metadata };
   }
 }

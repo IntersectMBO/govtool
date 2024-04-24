@@ -1,7 +1,7 @@
-include ../../govtool/backend/Makefile
-include ../../govtool/frontend/Makefile
-include ../../govtool/status-service/Makefile
-include ../../govtool/metadata-validation/Makefile
+include backend.mk
+include frontend.mk
+include status-service.mk
+include metadata-validation.mk
 include utils.mk
 include info.mk
 include config.mk

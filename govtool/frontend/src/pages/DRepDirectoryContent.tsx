@@ -195,7 +195,11 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       </>
       {dRepListHasNextPage && (
         <Box sx={{ justifyContent: "center", display: "flex" }}>
-          <Button variant="outlined" onClick={() => dRepListFetchNextPage()}>
+          <Button
+            data-testid="show-more-button"
+            variant="outlined"
+            onClick={() => dRepListFetchNextPage()}
+          >
             {t("showMore")}
           </Button>
         </Box>

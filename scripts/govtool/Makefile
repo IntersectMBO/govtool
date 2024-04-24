@@ -2,6 +2,7 @@ include backend.mk
 include frontend.mk
 include status-service.mk
 include metadata-validation.mk
+include analytics-dashboard.mk
 include utils.mk
 include info.mk
 include config.mk
@@ -16,7 +17,7 @@ cardano_db_sync_image_tag := sancho-4-2-1
 all: deploy-stack notify
 
 .PHONY: deploy-stack
-deploy-stack: upload-config push-backend push-frontend push-status-service push-metadata-validation
+deploy-stack: upload-config push-backend push-frontend push-status-service push-metadata-validation push-analytics-dashboard
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	export CARDANO_NETWORK=$(cardano_network); \

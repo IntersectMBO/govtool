@@ -13,5 +13,9 @@ export const getProposal = async (proposalId: string, drepId?: string) => {
     url: data?.proposal.url,
   });
   // workaround for the missing data in db-sync
-  return { ...data, ...metadata, isDataMissing: status || false };
+  return {
+    ...data,
+    proposal: { ...data.proposal, ...metadata },
+    isDataMissing: status || false,
+  };
 };

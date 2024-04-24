@@ -14,43 +14,45 @@ import { getProposalTypeNoEmptySpaces } from "@utils";
 import { MetadataValidationStatus } from "@models";
 
 type GovernanceActionDetailsCardDataProps = {
-  type: string;
-  govActionId: string;
+  about?: string;
   createdDate: string;
   createdEpochNo: number;
+  details?: ActionDetailsType;
   expiryDate: string;
   expiryEpochNo: number;
-  details?: ActionDetailsType;
-  url: string;
-  title?: string;
-  about?: string;
+  govActionId: string;
+  isDashboard?: boolean;
+  isDataMissing: boolean | MetadataValidationStatus;
+  isInProgress?: boolean;
+  isOneColumn: boolean;
+  isSubmitted?: boolean;
+  links?: string[];
   motivation?: string;
   rationale?: string;
-  isDataMissing: boolean | MetadataValidationStatus;
-  isOneColumn: boolean;
-  isDashboard?: boolean;
-  isInProgress?: boolean;
-  isSubmitted?: boolean;
+  title?: string;
+  type: string;
+  url: string;
 };
 
 export const GovernanceActionDetailsCardData = ({
-  type,
-  govActionId,
+  about,
   createdDate,
   createdEpochNo,
+  details,
   expiryDate,
   expiryEpochNo,
-  details,
-  url,
-  title,
-  about,
+  govActionId,
+  isDashboard,
+  isDataMissing,
+  isInProgress,
+  isOneColumn,
+  isSubmitted,
+  links,
   motivation,
   rationale,
-  isDataMissing,
-  isOneColumn,
-  isDashboard,
-  isInProgress,
-  isSubmitted,
+  title,
+  type,
+  url,
 }: GovernanceActionDetailsCardDataProps) => {
   const { t } = useTranslation();
   const { screenWidth } = useScreenDimension();
@@ -121,7 +123,7 @@ export const GovernanceActionDetailsCardData = ({
       {details && Object.keys(details).length !== 0 && (
         <GovernanceActionDetailsCardOnChainData data={details} />
       )}
-      <GovernanceActionDetailsCardLinks />
+      <GovernanceActionDetailsCardLinks links={links} />
     </Box>
   );
 };

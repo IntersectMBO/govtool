@@ -2,18 +2,19 @@ import { FC } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { Box, CircularProgress } from "@mui/material";
 
-import { Typography } from "@atoms";
+import { Button, Typography } from "@atoms";
 import { DREP_DIRECTORY_FILTERS, DREP_DIRECTORY_SORTING } from "@consts";
 import { useCardano, useDataActionsBar } from "@context";
 import {
   useDelegateTodRep,
   useGetAdaHolderCurrentDelegationQuery,
   useGetAdaHolderVotingPowerQuery,
-  useGetDRepListQuery,
+  useGetDRepListInfiniteQuery,
 } from "@hooks";
 import { Card, DataActionsBar } from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
 import { correctAdaFormat, formHexToBech32, isSameDRep } from "@utils";
+import { DRepListSort, DRepStatus } from "@models";
 
 interface DRepDirectoryContentProps {
   isConnected?: boolean;
@@ -47,20 +48,26 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const inProgressDelegation = pendingTransaction.delegate?.resourceId;
 
-  const { data: myDRepList } = useGetDRepListQuery(
+  const { dRepData: myDRepList } = useGetDRepListInfiniteQuery(
     {
-      search: currentDelegation?.dRepView?.startsWith("drep")
+      searchPhrase: currentDelegation?.dRepView?.startsWith("drep")
         ? currentDelegation.dRepView
         : formHexToBech32(currentDelegation?.dRepHash ?? ""),
     },
     { enabled: !!inProgressDelegation || !!currentDelegation },
   );
   const myDrep = myDRepList?.[0];
-  const { data: dRepList, isPreviousData } = useGetDRepListQuery(
+
+  const {
+    dRepData: dRepList,
+    isPreviousData,
+    dRepListHasNextPage,
+    dRepListFetchNextPage,
+  } = useGetDRepListInfiniteQuery(
     {
-      search: debouncedSearchText,
-      sort: chosenSorting,
-      status: chosenFilters,
+      searchPhrase: debouncedSearchText,
+      sorting: chosenSorting as DRepListSort,
+      status: chosenFilters as DRepStatus[],
     },
     {
       keepPreviousData: true,
@@ -186,6 +193,17 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           })}
         </Box>
       </>
+      {dRepListHasNextPage && (
+        <Box sx={{ justifyContent: "center", display: "flex" }}>
+          <Button
+            data-testid="show-more-button"
+            variant="outlined"
+            onClick={() => dRepListFetchNextPage()}
+          >
+            {t("showMore")}
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };

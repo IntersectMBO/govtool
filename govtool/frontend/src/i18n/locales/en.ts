@@ -751,7 +751,7 @@ export const en = {
     dataMissingErrors: {
       dataMissing: "Data Missing",
       notVerifiable: "Not Verifiable",
-      incorrectFormat: "Incorrect Format",
+      incorrectFormat: "Data Formatted Incorrectly",
     },
     about: "About",
     abstain: "Abstain",

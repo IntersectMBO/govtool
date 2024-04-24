@@ -80,6 +80,7 @@ export const DRepCard = ({
             <Box flex={1} minWidth={0}>
               <Typography sx={ellipsisStyles}>{type}</Typography>
               <ButtonBase
+                data-testid={`${view}-copy-id-button`}
                 onClick={(e) => {
                   navigator.clipboard.writeText(view);
                   addSuccessAlert(t("alerts.copiedToClipboard"));
@@ -145,6 +146,7 @@ export const DRepCard = ({
           }}
         >
           <Button
+            data-testid={`${view}-view-details-button`}
             variant="outlined"
             onClick={() =>
               navigate(
@@ -162,10 +164,18 @@ export const DRepCard = ({
             onDelegate &&
             !isMe &&
             !isInProgress && (
-              <Button onClick={onDelegate}>{t("delegate")}</Button>
+              <Button
+                data-testid={`${view}-delegate-button`}
+                onClick={onDelegate}
+              >
+                {t("delegate")}
+              </Button>
             )}
           {status === "Active" && !isConnected && (
-            <Button onClick={openChooseWalletModal}>
+            <Button
+              data-testid={`${view}-connect-to-delegate-button`}
+              onClick={openChooseWalletModal}
+            >
               {t("connectToDelegate")}
             </Button>
           )}

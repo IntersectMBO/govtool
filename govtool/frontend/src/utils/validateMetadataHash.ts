@@ -2,24 +2,31 @@ import { postValidate } from "@services";
 
 import { MetadataStandard, MetadataValidationStatus } from "@/models";
 
+type CheckIsMissingGAMetadataResponse = {
+  status?: MetadataValidationStatus;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  metadata?: any;
+  valid: boolean;
+};
+
 export const checkIsMissingGAMetadata = async ({
   url,
   hash,
 }: {
   url: string;
   hash: string;
-}): Promise<boolean | MetadataValidationStatus> => {
+}): Promise<CheckIsMissingGAMetadataResponse> => {
   try {
-    const { status } = await postValidate({
+    const { status, metadata, valid } = await postValidate({
       url,
       hash,
       standard: MetadataStandard.CIP108,
     });
     if (status) {
-      return status;
+      return { status, valid };
     }
-    return false;
+    return { metadata, valid };
   } catch (error) {
-    return MetadataValidationStatus.URL_NOT_FOUND;
+    return { status: MetadataValidationStatus.URL_NOT_FOUND, valid: false };
   }
 };

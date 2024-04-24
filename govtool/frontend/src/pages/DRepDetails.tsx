@@ -7,12 +7,17 @@ import { ICONS, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import {
   useDelegateTodRep,
-  useGetDRepListQuery,
+  useGetDRepListInfiniteQuery,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
 import { Card, LinkWithIcon, Share } from "@molecules";
-import { correctAdaFormat, isSameDRep, openInNewTab } from "@utils";
+import {
+  correctAdaFormat,
+  isSameDRep,
+  openInNewTab,
+  testIdFromLabel,
+} from "@utils";
 
 const LINKS = [
   "darlenelonglink1.DRepwebsiteorwhatever.com",
@@ -36,10 +41,12 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
 
   const { delegate, isDelegating } = useDelegateTodRep();
 
-  const { data, isLoading } = useGetDRepListQuery({ search: dRepParam });
-  const dRep = data?.[0];
+  const { dRepData, isDRepListLoading } = useGetDRepListInfiniteQuery({
+    searchPhrase: dRepParam,
+  });
+  const dRep = dRepData?.[0];
 
-  if (data === undefined || isLoading)
+  if (dRep === undefined || isDRepListLoading)
     return (
       <Box
         sx={{
@@ -68,6 +75,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
   return (
     <>
       <LinkWithIcon
+        data-testid="back-to-list-button"
         label={t("backToList")}
         onClick={() =>
           navigate(
@@ -126,6 +134,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
           </Typography>
           {isMe && (
             <Button
+              data-testid="edit-drep-data-button"
               onClick={() => navigate(PATHS.editDrepMetadata)}
               variant="outlined"
             >
@@ -190,6 +199,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
           )}
           {!isConnected && status === "Active" && (
             <Button
+              data-testid="connect-to-delegate-button"
               onClick={() =>
                 openModal({
                   type: "chooseWallet",
@@ -253,6 +263,7 @@ const DRepDetailsInfoItem = ({ children, label }: DrepDetailsInfoItemProps) => (
 
 const DRepId = ({ children }: PropsWithChildren) => (
   <ButtonBase
+    data-testid="copy-drep-id-button"
     sx={{
       gap: 1,
       maxWidth: "100%",
@@ -279,6 +290,7 @@ const MoreInfoLink = ({ label, navTo }: LinkWithIconProps) => {
 
   return (
     <ButtonBase
+      data-testid={`${testIdFromLabel(label)}-link`}
       onClick={openLink}
       sx={{
         gap: 0.5,

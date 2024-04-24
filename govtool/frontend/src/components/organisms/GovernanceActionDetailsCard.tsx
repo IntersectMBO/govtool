@@ -24,6 +24,7 @@ type GovernanceActionDetailsCardProps = {
   motivation?: string;
   rationale?: string;
   yesVotes: number;
+  links?: string[];
   govActionId: string;
   isDataMissing: boolean | MetadataValidationStatus;
   isDashboard?: boolean;
@@ -46,6 +47,7 @@ export const GovernanceActionDetailsCard = ({
   details,
   url,
   title,
+  links,
   about,
   motivation,
   rationale,
@@ -91,23 +93,24 @@ export const GovernanceActionDetailsCard = ({
         />
       )}
       <GovernanceActionDetailsCardData
-        type={type}
-        govActionId={govActionId}
+        about={about}
         createdDate={createdDate}
         createdEpochNo={createdEpochNo}
+        details={details}
         expiryDate={expiryDate}
         expiryEpochNo={expiryEpochNo}
-        details={details}
-        url={url}
-        title={title}
-        about={about}
+        govActionId={govActionId}
+        isDashboard={isDashboard}
+        isDataMissing={isDataMissing}
+        isInProgress={isInProgress}
+        isOneColumn={isOneColumn}
+        isSubmitted={isVoteSubmitted}
+        links={links}
         motivation={motivation}
         rationale={rationale}
-        isDataMissing={isDataMissing}
-        isDashboard={isDashboard}
-        isOneColumn={isOneColumn}
-        isInProgress={isInProgress}
-        isSubmitted={isVoteSubmitted}
+        title={title}
+        type={type}
+        url={url}
       />
       <GovernanceActionDetailsCardVotes
         setIsVoteSubmitted={setIsVoteSubmitted}

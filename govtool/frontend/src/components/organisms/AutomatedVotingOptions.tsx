@@ -42,6 +42,7 @@ export const AutomatedVotingOptions = ({
 
   return (
     <Accordion
+      data-testid="automated-voting-options-accordion"
       elevation={3}
       expanded={isOpen}
       onChange={(_, isExpanded) => setIsOpen(isExpanded)}

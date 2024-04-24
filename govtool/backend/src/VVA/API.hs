@@ -47,7 +47,9 @@ type VVAApi =
                 :> QueryParam "search" Text
                 :> QueryParams "status" DRepStatus
                 :> QueryParam "sort" DRepSortMode
-                :> Get '[JSON] [DRep]
+                :> QueryParam "page" Natural
+                :> QueryParam "pageSize" Natural
+                :> Get '[JSON] ListDRepsResponse
     :<|> "drep" :> "get-voting-power" :> Capture "drepId" HexText :> Get '[JSON] Integer
     :<|> "drep" :> "getVotes"
                 :> Capture "drepId" HexText
@@ -120,8 +122,8 @@ delegationToResponse Types.Delegation {..} =
     }
 
 
-drepList :: App m => Maybe Text -> [DRepStatus] -> Maybe DRepSortMode -> m [DRep]
-drepList mSearchQuery statuses mSortMode = do
+drepList :: App m => Maybe Text -> [DRepStatus] -> Maybe DRepSortMode -> Maybe Natural -> Maybe Natural -> m ListDRepsResponse
+drepList mSearchQuery statuses mSortMode mPage mPageSize = do
   CacheEnv {dRepListCache} <- asks vvaCache
   dreps <- cacheRequest dRepListCache () DRep.listDReps
 
@@ -148,7 +150,23 @@ drepList mSearchQuery statuses mSortMode = do
           dRepRegistrationStatus
 
 
-  return $ map drepRegistrationToDrep $ sortDReps $ filterDRepsByQuery $ filterDRepsByStatus dreps
+  let allValidDReps = map drepRegistrationToDrep $ sortDReps $ filterDRepsByQuery $ filterDRepsByStatus dreps
+
+
+  let page = (fromIntegral $ fromMaybe 0 mPage) :: Int
+      pageSize = (fromIntegral $ fromMaybe 10 mPageSize) :: Int
+
+      total = length allValidDReps :: Int
+
+  let elements = take pageSize $ drop (page * pageSize) allValidDReps
+
+  return $ ListDRepsResponse
+    { listDRepsResponsePage = fromIntegral page
+    , listDRepsResponsePageSize = fromIntegral pageSize
+    , listDRepsResponseTotal = fromIntegral total
+    , listDRepsResponseElements = elements
+    }
+
 
 getVotingPower :: App m => HexText -> m Integer
 getVotingPower (unHexText -> dRepId) = do

@@ -40,6 +40,7 @@ export const DashboardTopNav = ({
   return (
     <>
       <Box
+        component="nav"
         sx={{
           alignItems: "center",
           backdropFilter: "blur(10px)",

@@ -13,7 +13,7 @@ describe("getMetadataDataMissingStatusTranslation", () => {
     const translation = getMetadataDataMissingStatusTranslation(
       MetadataValidationStatus.INVALID_JSONLD,
     );
-    expect(translation).toBe("Incorrect Format");
+    expect(translation).toBe("Data Formatted Incorrectly");
   });
 
   it("should return the correct translation for INVALID_HASH status", () => {

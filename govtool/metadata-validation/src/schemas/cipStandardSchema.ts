@@ -32,9 +32,13 @@ export const cipStandardSchema: StandardSpecification = {
       references: Joi.array().items(
         Joi.object({
           '@type': Joi.string(),
-          label: Joi.object({ '@value': Joi.string().required() }),
-          uri: Joi.object({ '@value': Joi.string().uri().required() }),
-          referenceHash: Joi.object({
+          'CIP108:reference-label': Joi.object({
+            '@value': Joi.string().required(),
+          }),
+          'CIP108:reference-uri': Joi.object({
+            '@value': Joi.string().uri().required(),
+          }),
+          'CIP108:reference-hash': Joi.object({
             hashDigest: Joi.string().required(),
             hashAlgorithm: Joi.string().required(),
           }),

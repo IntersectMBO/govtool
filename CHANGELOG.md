@@ -22,6 +22,7 @@ changes.
 
 ### Added
 
+- added pagination to `drep/list` [Issue 756](https://github.com/IntersectMBO/govtool/issues/756)
 - added search query param to the `drep/getVotes` [Issue 640](https://github.com/IntersectMBO/govtool/issues/640)
 - added filtering and sorting capabilities to the `drep/list` [Issue 722](https://github.com/IntersectMBO/govtool/issues/722)
 - added drepView and txHash to the `ada-holder/get-current-delegation` [Issue 689](https://github.com/IntersectMBO/govtool/issues/689)
@@ -55,9 +56,11 @@ changes.
 - Add frontend test workflow on github actions [Issue 500](https://github.com/IntersectMBO/govtool/issues/500)
 - Add type check & lint to github actions [Issue 512](https://github.com/IntersectMBO/govtool/issues/512)
 - Add eslint & prettier to frontend package [Issue 166](https://github.com/IntersectMBO/govtool/issues/166)
+- Add DRep list pagination [Issue 740](https://github.com/IntersectMBO/govtool/issues/740)
 
 ### Fixed
 
+- drep/list sql fix (now the latest tx date is correct) [Issue 826](https://github.com/IntersectMBO/govtool/issues/826)
 - drep/info no longer returns null values [Issue 720](https://github.com/IntersectMBO/govtool/issues/720)
 - drep/getVotes no longer returns 500 [Issue 685](https://github.com/IntersectMBO/govtool/issues/685)
 - drep/info no longer returns 500 [Issue 676](https://github.com/IntersectMBO/govtool/issues/676)
@@ -109,6 +112,7 @@ changes.
 - Update frontend package readme to reflect recent changes [Issue 543](https://github.com/IntersectMBO/govtool/issues/543)
 - Change input selection strategy to 3 (random) [Issue 575](https://github.com/IntersectMBO/govtool/issues/575)
 - Changed documents to prepare for open source [Issue 737](https://github.com/IntersectMBO/govtool/issues/737)
+- Changed copy on maintenance page [Issue 753](https://github.com/IntersectMBO/govtool/issues/753)
 
 ### Removed
 

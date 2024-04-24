@@ -2,8 +2,8 @@ import { Box, Link } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { useTranslation } from "@hooks";
+import { MetadataValidationStatus } from "@models";
 import { openInNewTab } from "@utils";
-import { MetadataValidationStatus } from "@/models";
 
 export const DataMissingInfoBox = ({
   isDataMissing,
@@ -26,6 +26,9 @@ export const DataMissingInfoBox = ({
     [MetadataValidationStatus.INVALID_HASH]: t(
       "errors.gAMetadata.message.notVerifiable",
     ),
+    [MetadataValidationStatus.INCORRECT_FORMAT]: t(
+      "errors.gAMetadata.message.incorrectFormat",
+    ),
   }[isDataMissing as MetadataValidationStatus];
 
   const gaMetadataErrorDescription = {
@@ -37,6 +40,9 @@ export const DataMissingInfoBox = ({
     ),
     [MetadataValidationStatus.INVALID_HASH]: t(
       "errors.gAMetadata.description.notVerifiable",
+    ),
+    [MetadataValidationStatus.INCORRECT_FORMAT]: t(
+      "errors.gAMetadata.description.incorrectFormat",
     ),
   }[isDataMissing as MetadataValidationStatus];
 

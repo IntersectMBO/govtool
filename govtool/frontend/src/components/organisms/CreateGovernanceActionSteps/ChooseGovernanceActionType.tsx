@@ -43,6 +43,7 @@ export const ChooseGovernanceActionType = ({
           <div key={type}>
             <ActionRadio
               isChecked={isChecked}
+              dataTestId={`${type}-radio`}
               onChange={onChangeType}
               title={type}
               value={type}

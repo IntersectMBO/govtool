@@ -82,6 +82,8 @@ export const EditDRepMetadata = () => {
           {step === 2 && <EditDRepStoreDataInfo setStep={setStep} />}
           {step === 3 && <EditDRepStorageInformation setStep={setStep} />}
         </FormProvider>
+        {/* FIXME: Footer should be on top of the layout.
+        Should not be rerendered across the pages */}
         <Footer />
       </Box>
     </Background>

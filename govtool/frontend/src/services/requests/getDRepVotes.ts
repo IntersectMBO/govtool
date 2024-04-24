@@ -21,14 +21,19 @@ export const getDRepVotes = async ({
 
   const mappedData = (await Promise.all(
     data.map(async (proposal) => {
-      const isDataMissing = await checkIsMissingGAMetadata({
+      const { metadata, status } = await checkIsMissingGAMetadata({
         hash: proposal?.proposal?.metadataHash,
         url: proposal?.proposal?.url,
       });
 
       return {
         vote: proposal.vote,
-        proposal: { ...proposal.proposal, isDataMissing },
+        proposal: {
+          ...proposal.proposal,
+          // workaround for the missing data in db-sync
+          ...metadata,
+          isDataMissing: status || false,
+        },
       };
     }),
   )) as VotedProposalToDisplay[];

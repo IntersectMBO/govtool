@@ -193,3 +193,12 @@ resource "aws_route53_record" "frontend" {
   ttl     = 180
   records = [aws_eip.govtool.public_ip]
 }
+
+resource "aws_route53_record" "participation" {
+  count   = var.app_env == "beta" ? 0 : 1
+  zone_id = var.dns_zone_id
+  name    = "${var.custom_subdomain != "" ? "participation.${var.custom_subdomain}" : "participation.${var.app_env}-${var.cardano_network}"}"
+  type    = "A"
+  ttl     = 180
+  records = [aws_eip.govtool.public_ip]
+}

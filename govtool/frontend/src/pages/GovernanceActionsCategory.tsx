@@ -83,8 +83,14 @@ export const GovernanceActionsCategory = () => {
         minHeight="100vh"
       >
         <TopNav />
-        <Box flex={1} mt={isMobile ? 3.25 : 6.25} overflow="hidden">
-          <Box px={pagePadding} flex={1}>
+        <Box
+          flex={1}
+          mt={isMobile ? 3.25 : 6.25}
+          overflow="hidden"
+          display="flex"
+          flexDirection="column"
+        >
+          <Box px={pagePadding} flex={1} display="flex" flexDirection="column">
             <Link
               data-testid="back-to-list-link"
               sx={{
@@ -167,7 +173,13 @@ export const GovernanceActionsCategory = () => {
                 </Box>
               )
             ) : (
-              <Box py={4} display="flex" justifyContent="center">
+              <Box
+                alignItems="center"
+                py={4}
+                display="flex"
+                justifyContent="center"
+                flex={1}
+              >
                 <CircularProgress />
               </Box>
             )}

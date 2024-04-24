@@ -8,10 +8,10 @@ export const getProposal = async (proposalId: string, drepId?: string) => {
     `/proposal/get/${encodedHash}?drepId=${drepId}`,
   );
 
-  const isDataMissing = await checkIsMissingGAMetadata({
+  const { metadata, status } = await checkIsMissingGAMetadata({
     hash: data?.proposal.metadataHash,
     url: data?.proposal.url,
   });
-
-  return { ...data, isDataMissing };
+  // workaround for the missing data in db-sync
+  return { ...data, ...metadata, isDataMissing: status || false };
 };

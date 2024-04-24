@@ -24,11 +24,16 @@ export const useGetProposalsInfiniteQuery = ({
     });
     const mappedElements = await Promise.all(
       data.elements.map(async (proposal: ActionType) => {
-        const isDataMissing = await checkIsMissingGAMetadata({
+        const { metadata, status } = await checkIsMissingGAMetadata({
           hash: proposal?.metadataHash ?? "",
           url: proposal?.url ?? "",
         });
-        return { ...proposal, isDataMissing };
+        // workaround for the missing data in db-sync
+        return {
+          ...proposal,
+          ...metadata,
+          isDataMissing: status || false,
+        };
       }),
     );
 

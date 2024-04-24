@@ -13,14 +13,18 @@ const mockPostValidate = postValidate as jest.MockedFunction<
 >;
 
 describe("checkIsMissingGAMetadata", () => {
-  it("returns false when there are no issues with the metadata", async () => {
+  it("returns metadata when there are no issues with the validation", async () => {
     mockPostValidate.mockResolvedValueOnce({
       valid: true,
+      metadata: { some: "metadata" },
     });
 
     const result = await checkIsMissingGAMetadata({ url, hash });
 
-    expect(result).toBe(false);
+    expect(result).toStrictEqual({
+      valid: true,
+      metadata: { some: "metadata" },
+    });
     expect(mockPostValidate).toHaveBeenCalledWith({
       url,
       hash,
@@ -36,7 +40,7 @@ describe("checkIsMissingGAMetadata", () => {
 
     const result = await checkIsMissingGAMetadata({ url, hash });
 
-    expect(result).toBe(MetadataValidationStatus.INVALID_HASH);
+    expect(result.status).toBe(MetadataValidationStatus.INVALID_HASH);
     expect(mockPostValidate).toHaveBeenCalledWith({
       url,
       hash,
@@ -52,7 +56,7 @@ describe("checkIsMissingGAMetadata", () => {
 
     const result = await checkIsMissingGAMetadata({ url, hash });
 
-    expect(result).toBe(MetadataValidationStatus.INVALID_JSONLD);
+    expect(result.status).toBe(MetadataValidationStatus.INVALID_JSONLD);
     expect(mockPostValidate).toHaveBeenCalledWith({
       url,
       hash,
@@ -65,7 +69,7 @@ describe("checkIsMissingGAMetadata", () => {
 
     const result = await checkIsMissingGAMetadata({ url, hash });
 
-    expect(result).toBe(MetadataValidationStatus.URL_NOT_FOUND);
+    expect(result.status).toBe(MetadataValidationStatus.URL_NOT_FOUND);
     expect(mockPostValidate).toHaveBeenCalledWith({
       url,
       hash,

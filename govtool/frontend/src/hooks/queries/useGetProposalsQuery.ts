@@ -33,11 +33,12 @@ export const useGetProposalsQuery = ({
       allProposals
         .flatMap((proposal) => proposal.elements)
         .map(async (proposal) => {
-          const isDataMissing = await checkIsMissingGAMetadata({
+          const { metadata, status } = await checkIsMissingGAMetadata({
             hash: proposal?.metadataHash ?? "",
             url: proposal?.url ?? "",
           });
-          return { ...proposal, isDataMissing };
+          // workaround for the missing data in db-sync
+          return { ...proposal, ...metadata, isDataMissing: status || false };
         }),
     );
 

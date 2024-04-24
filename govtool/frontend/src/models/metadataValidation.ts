@@ -9,6 +9,8 @@ export enum MetadataValidationStatus {
 export type ValidateMetadataResult = {
   status?: MetadataValidationStatus;
   valid: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  metadata?: any;
 };
 
 export enum MetadataStandard {

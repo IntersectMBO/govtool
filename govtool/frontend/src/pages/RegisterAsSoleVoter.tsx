@@ -1,15 +1,89 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Trans } from "react-i18next";
+import { Box, Link } from "@mui/material";
 
+import { Background, Typography } from "@atoms";
 import { PATHS } from "@consts";
-import { RegisterAsSoleVoterBox } from "@organisms";
-import { useTranslation } from "@hooks";
-import { CenteredBoxPageWrapper } from "@molecules";
-import { checkIsWalletConnected } from "@/utils";
+import { useCardano, useModal } from "@context";
+import {
+  useGetVoterInfo,
+  useScreenDimension,
+  useTranslation,
+  useWalletErrorModal,
+} from "@hooks";
+import { LinkWithIcon } from "@molecules";
+import { BgCard, DashboardTopNav, Footer } from "@organisms";
+import {
+  PROTOCOL_PARAMS_KEY,
+  checkIsWalletConnected,
+  correctAdaFormat,
+  getItemFromLocalStorage,
+  openInNewTab,
+} from "@utils";
 
 export const RegisterAsSoleVoter = () => {
+  const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
+  const { isMobile } = useScreenDimension();
+  const { voter } = useGetVoterInfo();
+  const openWalletErrorModal = useWalletErrorModal();
+  const { buildSignSubmitConwayCertTx, buildDRepRegCert, buildDRepUpdateCert } =
+    useCardano();
+  const { openModal, closeModal } = useModal();
+
+  const onRegister = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const certBuilder = voter?.isRegisteredAsDRep
+        ? await buildDRepUpdateCert()
+        : await buildDRepRegCert();
+      const result = await buildSignSubmitConwayCertTx({
+        certBuilder,
+        type: "registerAsSoleVoter",
+      });
+      if (result) {
+        openModal({
+          type: "statusModal",
+          state: {
+            status: "success",
+            title: t("modals.registration.title"),
+            message: t("modals.registration.message"),
+            link: `https://sancho.cexplorer.io/tx/${result}`,
+            buttonText: t("modals.common.goToDashboard"),
+            onSubmit: () => {
+              navigate(PATHS.dashboard);
+              closeModal();
+            },
+            dataTestId: "registration-transaction-submitted-modal",
+          },
+        });
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      openWalletErrorModal({
+        error,
+        buttonText: t("modals.common.goToDashboard"),
+        onSumbit: () => navigate(PATHS.dashboard),
+        dataTestId: "registration-transaction-error-modal",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    buildSignSubmitConwayCertTx,
+    buildDRepRegCert,
+    openModal,
+    voter?.isRegisteredAsDRep,
+  ]);
+
+  const navigateToDashboard = useCallback(
+    () => navigate(PATHS.dashboard),
+    [navigate],
+  );
 
   useEffect(() => {
     if (checkIsWalletConnected()) {
@@ -18,13 +92,57 @@ export const RegisterAsSoleVoter = () => {
   }, []);
 
   return (
-    <CenteredBoxPageWrapper
-      pageTitle={t("soleVoter.becomeSoleVoter")}
-      backButtonText={t("backToDashboard")}
-      backButtonPath={PATHS.dashboard}
-      isVotingPowerHidden
-    >
-      <RegisterAsSoleVoterBox />
-    </CenteredBoxPageWrapper>
+    <Background isReverted>
+      <Box
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      >
+        <DashboardTopNav
+          isVotingPowerHidden
+          title={t("soleVoter.becomeSoleVoter")}
+        />
+        <LinkWithIcon
+          label={t("backToDashboard")}
+          onClick={navigateToDashboard}
+          sx={{
+            mb: isMobile ? 0 : 1.5,
+            ml: isMobile ? 2 : 5,
+            mt: isMobile ? 3 : 1.5,
+          }}
+        />
+        <BgCard
+          actionButtonLabel={t("continue")}
+          backButtonLabel={t("cancel")}
+          onClickActionButton={onRegister}
+          isLoadingActionButton={isLoading}
+        >
+          <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
+            {t("soleVoter.registerHeading")}
+          </Typography>
+          <Typography
+            fontWeight={400}
+            sx={{
+              mb: 7,
+              mt: isMobile ? 4 : 10,
+              textAlign: "center",
+              whiteSpace: "pre-line",
+            }}
+            variant="body1"
+          >
+            <Trans
+              i18nKey="soleVoter.registerDescription"
+              values={{ deposit: correctAdaFormat(epochParams.drep_deposit) }}
+              components={[
+                <Link
+                  onClick={() => openInNewTab("https://sancho.network/")}
+                  sx={{ cursor: "pointer" }}
+                  key="0"
+                />,
+              ]}
+            />
+          </Typography>
+        </BgCard>
+        <Footer />
+      </Box>
+    </Background>
   );
 };

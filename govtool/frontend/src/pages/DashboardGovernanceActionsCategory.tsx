@@ -68,118 +68,121 @@ export const DashboardGovernanceActionsCategory = () => {
   return (
     <Background>
       <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="flex-start"
-        minHeight="100vh"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          px: isMobile ? 2 : 3.75,
+        }}
       >
-        <Box flex={1}>
-          <Box px={isMobile ? 2 : 3.75} flex={1}>
-            <Link
-              data-testid="back-to-list-link"
-              sx={{
-                cursor: "pointer",
-                display: "flex",
-                textDecoration: "none",
-                margin: "12px 0 28px",
-              }}
-              onClick={() => navigate(PATHS.dashboardGovernanceActions)}
-            >
-              <img
-                src={ICONS.arrowRightIcon}
-                alt="arrow"
-                style={{ marginRight: "12px", transform: "rotate(180deg)" }}
-              />
-              <Typography variant="body2" color="primary" fontWeight={400}>
-                {t("govActions.backToGovActions")}
-              </Typography>
-            </Link>
-            <DataActionsBar
-              {...dataActionsBarProps}
-              isFiltering={false}
-              sortOptions={GOVERNANCE_ACTIONS_SORTING}
-            />
-            <Typography
-              variant="title2"
-              sx={{
-                m: "32px 0 32px",
-              }}
-            >
-              {getProposalTypeLabel(category ?? "")}
-            </Typography>
-            {!mappedData || isEnableLoading || isProposalsLoading ? (
-              <Box display="flex" justifyContent="center" py={4}>
-                <CircularProgress />
-              </Box>
-            ) : !mappedData?.length ? (
-              <EmptyStateGovernanceActionsCategory
-                category={category}
-                isSearch={!!debouncedSearchText.length}
-              />
-            ) : (
-              <Box
-                columnGap="20px"
-                display="grid"
-                gridTemplateColumns={`repeat(auto-fit, minmax(${
-                  screenWidth < 420 ? "290px" : isMobile ? "324px" : "350px"
-                }, 1fr))`}
-              >
-                {mappedData.map((item) => (
-                  <Box pb={4.25} key={item.txHash + item.index}>
-                    <GovernanceActionCard
-                      {...item}
-                      inProgress={
-                        pendingTransaction.vote?.resourceId ===
-                        `${item.txHash ?? ""}${item.index ?? ""}`
-                      }
-                      onClick={() => {
-                        saveScrollPosition();
+        <Link
+          data-testid="back-to-list-link"
+          sx={{
+            cursor: "pointer",
+            display: "flex",
+            textDecoration: "none",
+            margin: "12px 0 28px",
+          }}
+          onClick={() => navigate(PATHS.dashboardGovernanceActions)}
+        >
+          <img
+            src={ICONS.arrowRightIcon}
+            alt="arrow"
+            style={{ marginRight: "12px", transform: "rotate(180deg)" }}
+          />
+          <Typography variant="body2" color="primary" fontWeight={400}>
+            {t("govActions.backToGovActions")}
+          </Typography>
+        </Link>
+        <DataActionsBar
+          {...dataActionsBarProps}
+          isFiltering={false}
+          sortOptions={GOVERNANCE_ACTIONS_SORTING}
+        />
+        <Typography
+          variant="title2"
+          sx={{
+            m: "32px 0 32px",
+          }}
+        >
+          {getProposalTypeLabel(category ?? "")}
+        </Typography>
+        {!mappedData || isEnableLoading || isProposalsLoading ? (
+          <Box
+            sx={{
+              alignItems: "center",
+              display: "flex",
+              flex: 1,
+              justifyContent: "center",
+              py: 4,
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : !mappedData?.length ? (
+          <EmptyStateGovernanceActionsCategory
+            category={category}
+            isSearch={!!debouncedSearchText.length}
+          />
+        ) : (
+          <Box
+            columnGap="20px"
+            display="grid"
+            gridTemplateColumns={`repeat(auto-fit, minmax(${
+              screenWidth < 420 ? "290px" : isMobile ? "324px" : "350px"
+            }, 1fr))`}
+          >
+            {mappedData.map((item) => (
+              <Box pb={4.25} key={item.txHash + item.index}>
+                <GovernanceActionCard
+                  {...item}
+                  inProgress={
+                    pendingTransaction.vote?.resourceId ===
+                    `${item.txHash ?? ""}${item.index ?? ""}`
+                  }
+                  onClick={() => {
+                    saveScrollPosition();
 
-                        if (
-                          pendingTransaction.vote?.resourceId ===
-                          item.txHash + item.index
-                        ) {
-                          openInNewTab(
-                            `https://sancho.cexplorer.io/tx/${pendingTransaction.vote.transactionHash}`,
-                          );
-                        } else {
-                          navigate(
-                            generatePath(
-                              PATHS.dashboardGovernanceActionsAction,
-                              {
-                                proposalId: getFullGovActionId(
-                                  item.txHash,
-                                  item.index,
-                                ),
-                              },
-                            ),
-                            {
-                              state: {
-                                ...item,
-                                openedFromCategoryPage: true,
-                              },
-                            },
-                          );
-                        }
-                      }}
-                      txHash={item.txHash}
-                    />
-                  </Box>
-                ))}
-                {proposalsHaveNextPage && isProposalsFetchingNextPage && (
-                  <Box
-                    display="flex"
-                    justifyContent="center"
-                    py={4}
-                    ref={loadNextPageRef}
-                  >
-                    <CircularProgress />
-                  </Box>
-                )}
+                    if (
+                      pendingTransaction.vote?.resourceId ===
+                      item.txHash + item.index
+                    ) {
+                      openInNewTab(
+                        `https://sancho.cexplorer.io/tx/${pendingTransaction.vote.transactionHash}`,
+                      );
+                    } else {
+                      navigate(
+                        generatePath(PATHS.dashboardGovernanceActionsAction, {
+                          proposalId: getFullGovActionId(
+                            item.txHash,
+                            item.index,
+                          ),
+                        }),
+                        {
+                          state: {
+                            ...item,
+                            openedFromCategoryPage: true,
+                          },
+                        },
+                      );
+                    }
+                  }}
+                  txHash={item.txHash}
+                />
+              </Box>
+            ))}
+            {proposalsHaveNextPage && isProposalsFetchingNextPage && (
+              <Box
+                display="flex"
+                justifyContent="center"
+                py={4}
+                ref={loadNextPageRef}
+              >
+                <CircularProgress />
               </Box>
             )}
           </Box>
-        </Box>
+        )}
       </Box>
     </Background>
   );

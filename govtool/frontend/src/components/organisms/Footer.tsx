@@ -48,9 +48,6 @@ export const Footer = () => {
 
   return (
     <>
-      {/* TODO: That box below should not be needed.
-      Footer should be aligned under shared Layout component */}
-      <Box sx={{ flex: 1 }} />
       <Box
         component="footer"
         sx={{

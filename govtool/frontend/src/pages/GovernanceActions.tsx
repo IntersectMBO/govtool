@@ -49,13 +49,23 @@ export const GovernanceActions = () => {
     <Background>
       <ScrollToManage />
       <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="flex-start"
-        minHeight="100vh"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          minHeight: "100vh",
+        }}
       >
         <TopNav />
-        <Box flex={1} mt={isMobile ? 3.25 : 6.25} overflow="hidden">
+        <Box
+          sx={{
+            display: "flex",
+            flex: 1,
+            flexDirection: "column",
+            mt: isMobile ? 3.25 : 6.25,
+            overflow: "hidden",
+          }}
+        >
           <Typography
             sx={{ mb: isMobile ? 3.75 : 6, px: pagePadding }}
             variant={isMobile ? "title1" : "headline3"}
@@ -71,32 +81,43 @@ export const GovernanceActions = () => {
               }}
             />
           )}
-          <Box flex={1} px={pagePadding}>
+          <Box
+            sx={{
+              display: "flex",
+              flex: 1,
+              flexDirection: "column",
+              px: pagePadding,
+            }}
+          >
             <DataActionsBar
               {...dataActionsBarProps}
               filterOptions={GOVERNANCE_ACTIONS_FILTERS}
               filtersTitle={t("govActions.filterTitle")}
               sortOptions={GOVERNANCE_ACTIONS_SORTING}
             />
-            <Box height={isMobile ? 60 : 80} />
+
             {!proposals || isProposalsLoading ? (
               <Box
-                alignItems="center"
-                display="flex"
-                flex={1}
-                height="100%"
-                justifyContent="center"
+                sx={{
+                  alignItems: "center",
+                  display: "flex",
+                  flex: 1,
+                  justifyContent: "center",
+                }}
               >
                 <CircularProgress />
               </Box>
             ) : (
-              <GovernanceActionsToVote
-                filters={chosenFilters}
-                onDashboard={false}
-                searchPhrase={debouncedSearchText}
-                sorting={chosenSorting}
-                proposals={proposals}
-              />
+              <>
+                <Box height={isMobile ? 60 : 80} />
+                <GovernanceActionsToVote
+                  filters={chosenFilters}
+                  onDashboard={false}
+                  searchPhrase={debouncedSearchText}
+                  sorting={chosenSorting}
+                  proposals={proposals}
+                />
+              </>
             )}
           </Box>
         </Box>

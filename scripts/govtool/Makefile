@@ -28,6 +28,7 @@ deploy-stack: upload-config push-backend push-frontend push-status-service push-
 	export FRONTEND_TAG=$(frontend_image_tag); \
 	export STATUS_SERVICE_TAG=$(status_service_image_tag); \
 	export METADATA_VALIDATION_TAG=$(metadata_validation_image_tag); \
+	export ANALYTICS_DASHBOARD_TAG=$(analytics_dashboard_image_tag); \
 	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \
 	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	$(ssh-keyscan) $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
@@ -44,6 +45,7 @@ destroy-cardano-node-and-dbsync: prepare-config
 	export FRONTEND_TAG=$(frontend_image_tag); \
 	export STATUS_SERVICE_TAG=$(status_service_image_tag); \
 	export METADATA_VALIDATION_TAG=$(metadata_validation_image_tag); \
+	export ANALYTICS_DASHBOARD_TAG=$(analytics_dashboard_image_tag); \
 	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \
 	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	$(ssh-keyscan) $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \
@@ -65,6 +67,7 @@ toggle-maintenance: docker-login prepare-config
 	export FRONTEND_TAG=$(frontend_image_tag); \
 	export STATUS_SERVICE_TAG=$(status_service_image_tag); \
 	export METADATA_VALIDATION_TAG=$(metadata_validation_image_tag); \
+	export ANALYTICS_DASHBOARD_TAG=$(analytics_dashboard_image_tag); \
 	export CARDANO_NODE_TAG=$(cardano_node_image_tag); \
 	export CARDANO_DB_SYNC_TAG=$(cardano_db_sync_image_tag); \
 	$(ssh-keyscan) $(docker_host) 2>/dev/null >> ~/.ssh/known_hosts; \

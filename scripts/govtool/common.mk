@@ -49,5 +49,8 @@ check-env-defined:
 
 .PHONY: docker-login
 docker-login:
+	aws ecr get-login-password --region eu-west-1 | $(docker) login --username AWS --password-stdin $(repo_url)/analytics-dashboard
 	aws ecr get-login-password --region eu-west-1 | $(docker) login --username AWS --password-stdin $(repo_url)/backend
 	aws ecr get-login-password --region eu-west-1 | $(docker) login --username AWS --password-stdin $(repo_url)/frontend
+	aws ecr get-login-password --region eu-west-1 | $(docker) login --username AWS --password-stdin $(repo_url)/metadata-validation
+	aws ecr get-login-password --region eu-west-1 | $(docker) login --username AWS --password-stdin $(repo_url)/status-service

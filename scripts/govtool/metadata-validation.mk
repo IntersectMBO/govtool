@@ -1,4 +1,4 @@
-common_mk := ../../scripts/govtool/common.mk
+common_mk := common.mk
 ifeq ($(origin $(common_mk)), undefined)
   $(eval $(common_mk) := included)
   include $(common_mk)

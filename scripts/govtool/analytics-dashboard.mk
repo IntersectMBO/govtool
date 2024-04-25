@@ -12,7 +12,9 @@ analytics_dashboard_image_tag := $(shell git log -n 1 --format="%H" -- $(root_di
 .PHONY: build-analytics-dashboard
 build-analytics-dashboard:
 	$(call check_image_on_ecr,analytics-dashboard,$(analytics_dashboard_image_tag)) || \
-	$(docker) build --tag "$(repo_url)/analytics-dashboard:$(analytics_dashboard_image_tag)" $(root_dir)/govtool/analytics-dashboard
+	$(docker) build --tag "$(repo_url)/analytics-dashboard:$(analytics_dashboard_image_tag)" \
+		--build-arg NEXT_PUBLIC_API_URL="$${NEXT_PUBLIC_API_URL}" \
+		$(root_dir)/govtool/analytics-dashboard
 
 .PHONY: push-analytics-dashboard
 push-analytics-dashboard: build-analytics-dashboard

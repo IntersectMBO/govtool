@@ -102,8 +102,8 @@ export const DRepCard = ({
               </ButtonBase>
             </Box>
 
-            <Box display="flex" gap={3}>
-              <Box>
+            <Box sx={{ display: "flex", flex: { xl: 1 }, gap: 3 }}>
+              <Box sx={{ flex: { xl: 1 } }}>
                 <Typography
                   variant="caption"
                   color="textSecondary"

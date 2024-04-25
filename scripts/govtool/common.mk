@@ -47,8 +47,12 @@ check-env-defined:
 	echo "Environment $(env) for network $(cardano_network) is defined in Terraform" || \
 	{ echo "Environment $(env) for network $(cardano_network) is NOT defined in Terraform, cannot deploy there"; exit 1; }
 
+.PHONY: ssh-client-setup
+ssh-client-setup:
+	if [[ "$${CI}" == "true" ]]; then mkdir -p ~/.ssh; sed -e "s/DOCKER_HOST/$(docker_host)/g" ./config/templates/ssh-client-config > ~/.ssh/config; fi
+
 .PHONY: docker-login
-docker-login:
+docker-login: ssh-client-setup
 	aws ecr get-login-password --region eu-west-1 | $(docker) login --username AWS --password-stdin $(repo_url)/analytics-dashboard
 	aws ecr get-login-password --region eu-west-1 | $(docker) login --username AWS --password-stdin $(repo_url)/backend
 	aws ecr get-login-password --region eu-west-1 | $(docker) login --username AWS --password-stdin $(repo_url)/frontend

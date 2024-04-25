@@ -219,6 +219,8 @@ services:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - NEXT_PUBLIC_GA4_PROPERTY_ID=${NEXT_PUBLIC_GA4_PROPERTY_ID}
       - SENTRY_IGNORE_API_RESOLUTION_ERROR=${SENTRY_IGNORE_API_RESOLUTION_ERROR}
+    secrets:
+      - google-credentials.json
     logging: *logging
     restart: always
     labels:

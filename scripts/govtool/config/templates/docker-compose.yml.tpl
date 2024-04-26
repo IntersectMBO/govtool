@@ -291,6 +291,8 @@ secrets:
     file: /home/<DOCKER_USER>/config/dbsync-secrets/postgres_user
   backend-config.json:
     file: /home/<DOCKER_USER>/config/backend-config.json
+  google-credentials.json:
+    file: /home/<DOCKER_USER>/config/google-credentials.json
 
 volumes:
   letsencrypt:

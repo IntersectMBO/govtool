@@ -1,13 +1,18 @@
 import { useCallback, useState } from "react";
 import * as Sentry from "@sentry/react";
-import { useTranslation, useWalletErrorModal } from "@hooks";
+import { useGetVoterInfo, useTranslation, useWalletErrorModal } from "@hooks";
 import { useCardano, useSnackbar } from "@/context";
 
 export const useDelegateTodRep = () => {
-  const { buildSignSubmitConwayCertTx, buildVoteDelegationCert } = useCardano();
+  const {
+    buildSignSubmitConwayCertTx,
+    buildVoteDelegationCert,
+    buildDRepRetirementCert,
+  } = useCardano();
   const { t } = useTranslation();
   const { addSuccessAlert, addErrorAlert } = useSnackbar();
   const openWalletErrorModal = useWalletErrorModal();
+  const { voter } = useGetVoterInfo();
 
   const [isDelegating, setIsDelegating] = useState(false);
 
@@ -16,11 +21,19 @@ export const useDelegateTodRep = () => {
       if (!dRepId) return;
       setIsDelegating(true);
       try {
+        if (!voter?.deposit) {
+          throw new Error(t("errors.appCannotGetDeposit"));
+        }
+        const retirementCert = await buildDRepRetirementCert(
+          voter?.deposit?.toString(),
+        );
         const certBuilder = await buildVoteDelegationCert(dRepId);
+        certBuilder.add(retirementCert);
         const result = await buildSignSubmitConwayCertTx({
           certBuilder,
           type: "delegate",
           resourceId: dRepId,
+          voterDeposit: voter?.deposit?.toString(),
         });
         if (result) {
           addSuccessAlert(t("alerts.delegate.success"));

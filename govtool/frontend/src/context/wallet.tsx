@@ -96,7 +96,7 @@ type TreasuryProps = {
 };
 
 type BuildSignSubmitConwayCertTxArgs = {
-  certBuilder?: CertificatesBuilder;
+  certBuilder?: CertificatesBuilder | Certificate;
   govActionBuilder?: VotingProposalBuilder;
   votingBuilder?: VotingBuilder;
   voterDeposit?: string;
@@ -128,18 +128,10 @@ interface CardanoContextType {
     votingBuilder,
     voterDeposit,
   }: BuildSignSubmitConwayCertTxArgs) => Promise<string>;
-  buildDRepRegCert: (
-    url?: string,
-    hash?: string,
-  ) => Promise<CertificatesBuilder>;
+  buildDRepRegCert: (url?: string, hash?: string) => Promise<Certificate>;
   buildVoteDelegationCert: (vote: string) => Promise<CertificatesBuilder>;
-  buildDRepUpdateCert: (
-    url?: string,
-    hash?: string,
-  ) => Promise<CertificatesBuilder>;
-  buildDRepRetirementCert: (
-    voterDeposit: string,
-  ) => Promise<CertificatesBuilder>;
+  buildDRepUpdateCert: (url?: string, hash?: string) => Promise<Certificate>;
+  buildDRepRetirementCert: (voterDeposit: string) => Promise<Certificate>;
   buildVote: (
     voteChoice: string,
     txHash: string,
@@ -445,7 +437,13 @@ const CardanoProvider = (props: Props) => {
         }
 
         if (certBuilder) {
-          txBuilder.set_certs_builder(certBuilder);
+          if (certBuilder instanceof Certificate) {
+            const builder = CertificatesBuilder.new();
+            builder.add(certBuilder);
+            txBuilder.set_certs_builder(builder);
+          } else {
+            txBuilder.set_certs_builder(certBuilder);
+          }
         }
 
         if (votingBuilder) {
@@ -473,7 +471,9 @@ const CardanoProvider = (props: Props) => {
         let outputValue = BigNum.from_str("1000000");
 
         if (
-          (type === "retireAsDrep" || type === "retireAsSoleVoter") &&
+          (type === "retireAsDrep" ||
+            type === "retireAsSoleVoter" ||
+            type === "delegate") &&
           voterDeposit
         ) {
           outputValue = outputValue.checked_add(BigNum.from_str(voterDeposit));
@@ -612,11 +612,8 @@ const CardanoProvider = (props: Props) => {
     async (
       cip95MetadataURL?: string,
       cip95MetadataHash?: string,
-    ): Promise<CertificatesBuilder> => {
+    ): Promise<Certificate> => {
       try {
-        // Build DRep Registration Certificate
-        const certBuilder = CertificatesBuilder.new();
-
         // Get wallet's DRep key
         const dRepKeyHash = Ed25519KeyHash.from_hex(dRepID);
         const dRepCred = Credential.from_keyhash(dRepKeyHash);
@@ -638,9 +635,7 @@ const CardanoProvider = (props: Props) => {
             BigNum.from_str(`${epochParams.drep_deposit}`),
           );
         }
-        // add cert to tbuilder
-        certBuilder.add(Certificate.new_drep_registration(dRepRegCert));
-        return certBuilder;
+        return Certificate.new_drep_registration(dRepRegCert);
       } catch (e) {
         Sentry.captureException(e);
         console.error(e);
@@ -650,16 +645,12 @@ const CardanoProvider = (props: Props) => {
     [epochParams, dRepID],
   );
 
-  // conway alpha
   const buildDRepUpdateCert = useCallback(
     async (
       cip95MetadataURL?: string,
       cip95MetadataHash?: string,
-    ): Promise<CertificatesBuilder> => {
+    ): Promise<Certificate> => {
       try {
-        // Build DRep Registration Certificate
-        const certBuilder = CertificatesBuilder.new();
-
         // Get wallet's DRep key
         const dRepKeyHash = Ed25519KeyHash.from_hex(dRepID);
         const dRepCred = Credential.from_keyhash(dRepKeyHash);
@@ -673,9 +664,7 @@ const CardanoProvider = (props: Props) => {
         } else {
           dRepUpdateCert = DrepUpdate.new(dRepCred);
         }
-        // add cert to tbuilder
-        certBuilder.add(Certificate.new_drep_update(dRepUpdateCert));
-        return certBuilder;
+        return Certificate.new_drep_update(dRepUpdateCert);
       } catch (e) {
         Sentry.captureException(e);
         console.error(e);
@@ -685,12 +674,9 @@ const CardanoProvider = (props: Props) => {
     [dRepID],
   );
 
-  // conway alpha
   const buildDRepRetirementCert = useCallback(
-    async (voterDeposit: string): Promise<CertificatesBuilder> => {
+    async (voterDeposit: string): Promise<Certificate> => {
       try {
-        // Build DRep Registration Certificate
-        const certBuilder = CertificatesBuilder.new();
         // Get wallet's DRep key
         const dRepKeyHash = Ed25519KeyHash.from_hex(dRepID);
         const dRepCred = Credential.from_keyhash(dRepKeyHash);
@@ -699,11 +685,8 @@ const CardanoProvider = (props: Props) => {
           dRepCred,
           BigNum.from_str(voterDeposit),
         );
-        // add cert to tbuilder
-        certBuilder.add(
-          Certificate.new_drep_deregistration(dRepRetirementCert),
-        );
-        return certBuilder;
+
+        return Certificate.new_drep_deregistration(dRepRetirementCert);
       } catch (e) {
         Sentry.captureException(e);
         console.error(e);

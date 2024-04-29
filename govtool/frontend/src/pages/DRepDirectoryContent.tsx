@@ -193,7 +193,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           })}
         </Box>
       </>
-      {dRepListHasNextPage && (
+      {dRepListHasNextPage && dRepList.length >= 10 && (
         <Box sx={{ justifyContent: "center", display: "flex" }}>
           <Button
             data-testid="show-more-button"

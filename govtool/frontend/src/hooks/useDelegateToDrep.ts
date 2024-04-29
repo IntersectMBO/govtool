@@ -1,7 +1,8 @@
 import { useCallback, useState } from "react";
 import * as Sentry from "@sentry/react";
+
+import { useCardano, useSnackbar } from "@context";
 import { useGetVoterInfo, useTranslation, useWalletErrorModal } from "@hooks";
-import { useCardano, useSnackbar } from "@/context";
 
 export const useDelegateTodRep = () => {
   const {
@@ -21,19 +22,22 @@ export const useDelegateTodRep = () => {
       if (!dRepId) return;
       setIsDelegating(true);
       try {
-        if (!voter?.deposit) {
+        if (voter?.isRegisteredAsSoleVoter && !voter?.deposit) {
           throw new Error(t("errors.appCannotGetDeposit"));
         }
-        const retirementCert = await buildDRepRetirementCert(
-          voter?.deposit?.toString(),
-        );
+
         const certBuilder = await buildVoteDelegationCert(dRepId);
-        certBuilder.add(retirementCert);
+        if (voter?.isRegisteredAsSoleVoter) {
+          const retirementCert = await buildDRepRetirementCert(
+            voter?.deposit?.toString(),
+          );
+          certBuilder.add(retirementCert);
+        }
         const result = await buildSignSubmitConwayCertTx({
           certBuilder,
           type: "delegate",
           resourceId: dRepId,
-          voterDeposit: voter?.deposit?.toString(),
+          voter,
         });
         if (result) {
           addSuccessAlert(t("alerts.delegate.success"));
@@ -54,6 +58,8 @@ export const useDelegateTodRep = () => {
       buildSignSubmitConwayCertTx,
       buildVoteDelegationCert,
       t,
+      voter?.deposit,
+      voter?.isRegisteredAsSoleVoter,
     ],
   );
 

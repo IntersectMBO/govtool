@@ -38,7 +38,7 @@ export const RetireAsSoleVoter = () => {
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
         type: "retireAsSoleVoter",
-        voterDeposit: voter?.deposit?.toString(),
+        voter,
       });
       if (result) {
         openModal({

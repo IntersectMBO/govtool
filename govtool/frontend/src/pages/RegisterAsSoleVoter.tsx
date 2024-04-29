@@ -30,17 +30,24 @@ export const RegisterAsSoleVoter = () => {
   const { isMobile } = useScreenDimension();
   const { voter } = useGetVoterInfo();
   const openWalletErrorModal = useWalletErrorModal();
-  const { buildSignSubmitConwayCertTx, buildDRepRegCert, buildDRepUpdateCert } =
-    useCardano();
+  const {
+    buildSignSubmitConwayCertTx,
+    buildDRepRegCert,
+    buildDRepUpdateCert,
+    buildVoteDelegationCert,
+    dRepID,
+  } = useCardano();
   const { openModal, closeModal } = useModal();
 
   const onRegister = useCallback(async () => {
     setIsLoading(true);
 
     try {
-      const certBuilder = voter?.isRegisteredAsDRep
+      const certBuilder = await buildVoteDelegationCert(dRepID);
+      const registerCert = voter?.isRegisteredAsDRep
         ? await buildDRepUpdateCert()
         : await buildDRepRegCert();
+      certBuilder.add(registerCert);
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
         type: "registerAsSoleVoter",
@@ -76,6 +83,7 @@ export const RegisterAsSoleVoter = () => {
   }, [
     buildSignSubmitConwayCertTx,
     buildDRepRegCert,
+    dRepID,
     openModal,
     voter?.isRegisteredAsDRep,
   ]);

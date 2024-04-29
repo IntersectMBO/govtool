@@ -48,7 +48,7 @@ import * as Sentry from "@sentry/react";
 import { Trans } from "react-i18next";
 
 import { PATHS } from "@consts";
-import { CardanoApiWallet, Protocol } from "@models";
+import { CardanoApiWallet, Protocol, VoterInfo } from "@models";
 import type { StatusModalState } from "@organisms";
 import {
   checkIsMaintenanceOn,
@@ -99,7 +99,7 @@ type BuildSignSubmitConwayCertTxArgs = {
   certBuilder?: CertificatesBuilder | Certificate;
   govActionBuilder?: VotingProposalBuilder;
   votingBuilder?: VotingBuilder;
-  voterDeposit?: string;
+  voter?: VoterInfo;
 } & (
   | Pick<TransactionStateWithoutResource, "type" | "resourceId">
   | Pick<TransactionStateWithResource, "type" | "resourceId">
@@ -126,7 +126,7 @@ interface CardanoContextType {
     resourceId,
     type,
     votingBuilder,
-    voterDeposit,
+    voter,
   }: BuildSignSubmitConwayCertTxArgs) => Promise<string>;
   buildDRepRegCert: (url?: string, hash?: string) => Promise<Certificate>;
   buildVoteDelegationCert: (vote: string) => Promise<CertificatesBuilder>;
@@ -423,7 +423,7 @@ const CardanoProvider = (props: Props) => {
       resourceId,
       type,
       votingBuilder,
-      voterDeposit,
+      voter,
     }: BuildSignSubmitConwayCertTxArgs) => {
       await checkIsMaintenanceOn();
       const isPendingTx = isPendingTransaction();
@@ -473,10 +473,12 @@ const CardanoProvider = (props: Props) => {
         if (
           (type === "retireAsDrep" ||
             type === "retireAsSoleVoter" ||
-            type === "delegate") &&
-          voterDeposit
+            (type === "delegate" && voter?.isRegisteredAsSoleVoter)) &&
+          voter?.deposit
         ) {
-          outputValue = outputValue.checked_add(BigNum.from_str(voterDeposit));
+          outputValue = outputValue.checked_add(
+            BigNum.from_str(voter?.deposit?.toString()),
+          );
         }
 
         txBuilder.add_output(

@@ -2,7 +2,7 @@ import { PropsWithChildren } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Box, ButtonBase, Chip, CircularProgress } from "@mui/material";
 
-import { Button, LoadingButton, StatusPill, Typography } from "@atoms";
+import { Button, StatusPill, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import {
@@ -185,7 +185,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
           }}
         >
           {isConnected && status === "Active" && !isMyDrep && (
-            <LoadingButton
+            <Button
               data-testid="delegate-button"
               disabled={!!pendingTransaction.delegate}
               isLoading={isDelegating}
@@ -195,7 +195,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
               variant="contained"
             >
               {t("delegate")}
-            </LoadingButton>
+            </Button>
           )}
           {!isConnected && status === "Active" && (
             <Button

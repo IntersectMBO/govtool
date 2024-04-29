@@ -33,6 +33,15 @@ export const Contained: Story = {
   },
 };
 
+export const isLoading: Story = {
+  args: {
+    children: "Button",
+    size: "large",
+    variant: "contained",
+    isLoading: true,
+  },
+};
+
 export const Outlined: Story = {
   args: { size: "small", variant: "outlined", children: "Button" },
 };

@@ -3,6 +3,11 @@ import { Box, CircularProgress, Tab, Tabs, styled } from "@mui/material";
 import { useLocation } from "react-router-dom";
 
 import {
+  GovernanceActionsToVote,
+  DashboardGovernanceActionsVotedOn,
+} from "@govtool/voting";
+
+import {
   GOVERNANCE_ACTIONS_FILTERS,
   GOVERNANCE_ACTIONS_SORTING,
 } from "@consts";
@@ -14,10 +19,6 @@ import {
   useTranslation,
 } from "@hooks";
 import { DataActionsBar } from "@molecules";
-import {
-  GovernanceActionsToVote,
-  DashboardGovernanceActionsVotedOn,
-} from "@organisms";
 
 type TabPanelProps = {
   children?: React.ReactNode;

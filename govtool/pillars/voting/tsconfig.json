@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@pages": ["./src/pages/index.ts"],
+      "@consts": ["./src/consts/index.ts"],
+      "@hooks": ["./src/hooks/index.ts"],
+      "@mock": ["./src/mock/index.ts"],
+      "@atoms": ["./src/components/atoms/index.ts"],
+      "@services": ["./src/services/index.ts"],
+      "@molecules": ["./src/components/molecules/index.ts"],
+      "@organisms": ["./src/components/organisms/index.ts"],
+      "@context": ["./src/context/index.ts"],
+      "@models": ["./src/models/index.ts"],
+      "@utils": ["./src/utils/index.ts"]
+    }
+  },
+  "include": [
+    "src",
+    "vitest.config.ts",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
+  ]
+}

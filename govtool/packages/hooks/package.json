@@ -1,0 +1,9 @@
+{
+  "name": "@govtool/hooks",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "dependencies": {
+    "react": "^18.3.1"
+  }
+}

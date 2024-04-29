@@ -1,0 +1,16 @@
+{
+  "name": "@govtool/voting",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "dependencies": {
+    "@govtool/components": "../packages/components",
+    "@govtool/hooks": "../packages/hooks",
+    "@mui/material": "^5.15.15",
+    "react": "^18.3.1",
+    "react-router-dom": "^6.23.0"
+  },
+  "devDependencies": {
+    "@types/react-router-dom": "^5.3.3"
+  }
+}

@@ -9,5 +9,7 @@
     "port" : 9999,
     "host" : "localhost",
     "cachedurationseconds": 20,
-    "sentrydsn": "https://username:password@senty.host/id"
+    "sentrydsn": "https://username:password@senty.host/id",
+    "metadatavalidationhost": "localhost",
+    "metadatavalidationport": 3001
 }

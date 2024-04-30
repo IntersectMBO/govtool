@@ -42,7 +42,13 @@ describe("correctDRepDirectoryFormat", () => {
     expect(correctDRepDirectoryFormat(lovelace)).toBe(expectedResult);
   });
 
-  test("Returns 0 for undefined input", () => {
+  test("Returns 0 for numbers smaller than one million", () => {
+    const lovelace = 143;
+    const expectedResult = "0";
+    expect(correctDRepDirectoryFormat(lovelace)).toBe(expectedResult);
+  });
+
+  test("Returns result without comma", () => {
     const lovelace = undefined;
     const expectedResult = "0";
     expect(correctDRepDirectoryFormat(lovelace)).toBe(expectedResult);

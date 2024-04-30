@@ -13,5 +13,5 @@ export const correctDRepDirectoryFormat = (lovelace: number | undefined) => {
     return Number((lovelace / LOVELACE).toFixed(0))?.toLocaleString("en-US");
   }
 
-  return 0;
+  return "0";
 };

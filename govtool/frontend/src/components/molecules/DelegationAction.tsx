@@ -6,13 +6,13 @@ import { gray } from "@consts";
 import { useTranslation } from "@hooks";
 
 import { Card } from "./Card";
-import { SoleVoterActionProps } from "./types";
+import { DirectVoterActionProps } from "./types";
 
 export const DelegationAction = ({
   dRepId,
   onClickArrow,
   sx,
-}: SoleVoterActionProps) => {
+}: DirectVoterActionProps) => {
   const { t } = useTranslation();
 
   return (

@@ -9,7 +9,7 @@ import {
 } from "@hooks";
 import { DelegateDashboardCard } from "./DashboardCards/DelegateDashboardCard";
 import { DRepDashboardCard } from "./DashboardCards/DRepDashboardCard";
-import { SoleVoterDashboardCard } from "./DashboardCards/SoleVoterDashboardCard";
+import { DirectVoterDashboardCard } from "./DashboardCards/DirectVoterDashboardCard";
 import { ListGovActionsDashboardCards } from "./DashboardCards/ListGovActionsDashboardCard";
 import { ProposeGovActionDashboardCard } from "./DashboardCards/ProposeGovActionDashboardCard";
 
@@ -72,7 +72,7 @@ export const DashboardCards = () => {
           voter={voter}
         />
 
-        <SoleVoterDashboardCard
+        <DirectVoterDashboardCard
           pendingTransaction={pendingTransaction}
           voter={voter}
           votingPower={votingPower}

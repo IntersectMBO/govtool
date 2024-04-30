@@ -2,7 +2,7 @@ import { isSameDRep } from "..";
 
 import { DRepStatus } from "@/models";
 
-type TDRepType = "DRep" | "SoleVoter";
+type TDRepType = "DRep" | "DirectVoter";
 
 const EXAMPLE_DREP = {
   drepId: "drep123",

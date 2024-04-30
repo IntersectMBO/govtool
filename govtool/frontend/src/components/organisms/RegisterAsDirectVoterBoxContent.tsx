@@ -10,7 +10,7 @@ import {
   openInNewTab,
 } from "@utils";
 
-export const RegisterAsSoleVoterBoxContent = () => {
+export const RegisterAsDirectVoterBoxContent = () => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
 
@@ -19,7 +19,7 @@ export const RegisterAsSoleVoterBoxContent = () => {
   return (
     <>
       <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
-        {t("soleVoter.registerHeading")}
+        {t("directVoter.registerHeading")}
       </Typography>
       <Typography
         fontWeight={400}
@@ -32,7 +32,7 @@ export const RegisterAsSoleVoterBoxContent = () => {
         variant="body1"
       >
         <Trans
-          i18nKey="soleVoter.registerDescription"
+          i18nKey="directVoter.registerDescription"
           values={{ deposit: correctAdaFormat(epochParams.drep_deposit) }}
           components={[
             <Link

@@ -20,8 +20,8 @@ export const PATHS = {
   guides: "/guides",
   home: "/",
   registerAsdRep: "/register_drep",
-  registerAsSoleVoter: "/register_sole_voter",
+  registerAsDirectVoter: "/register_direct_voter",
   retireAsDrep: "/retire_drep",
-  retireAsSoleVoter: "/retire_sole_voter",
+  retireAsDirectVoter: "/retire_direct_voter",
   stakeKeys: "/stake_keys",
 };

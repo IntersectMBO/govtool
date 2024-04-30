@@ -9,17 +9,17 @@ import { VoterInfo } from "@models";
 import { DashboardActionCard, DashboardActionCardProps } from "@molecules";
 import { correctAdaFormat, openInNewTab } from "@utils";
 
-type SoleVoterDashboardCardProps = {
+type DirectVoterDashboardCardProps = {
   pendingTransaction: PendingTransaction;
   voter: VoterInfo;
   votingPower: number;
 };
 
-export const SoleVoterDashboardCard = ({
+export const DirectVoterDashboardCard = ({
   pendingTransaction,
   voter,
   votingPower,
-}: SoleVoterDashboardCardProps) => {
+}: DirectVoterDashboardCardProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -38,22 +38,23 @@ export const SoleVoterDashboardCard = ({
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress
     if (
-      !!pendingTransaction.registerAsSoleVoter ||
-      !!pendingTransaction.retireAsSoleVoter
+      !!pendingTransaction.registerAsDirectVoter ||
+      !!pendingTransaction.retireAsDirectVoter
     ) {
       return {
         buttons: [learnMoreButton],
         state: "inProgress",
-        ...(pendingTransaction.registerAsSoleVoter && {
-          description: t("dashboard.cards.soleVoter.registrationInProgress"),
+        ...(pendingTransaction.registerAsDirectVoter && {
+          description: t("dashboard.cards.directVoter.registrationInProgress"),
           transactionId:
-            pendingTransaction?.registerAsSoleVoter?.transactionHash,
-          title: t("dashboard.cards.soleVoter.registration"),
+            pendingTransaction?.registerAsDirectVoter?.transactionHash,
+          title: t("dashboard.cards.directVoter.registration"),
         }),
-        ...(pendingTransaction.retireAsSoleVoter && {
-          description: t("dashboard.cards.soleVoter.retirementInProgress"),
-          transactionId: pendingTransaction?.retireAsSoleVoter?.transactionHash,
-          title: t("dashboard.cards.soleVoter.retirement"),
+        ...(pendingTransaction.retireAsDirectVoter && {
+          description: t("dashboard.cards.directVoter.retirementInProgress"),
+          transactionId:
+            pendingTransaction?.retireAsDirectVoter?.transactionHash,
+          title: t("dashboard.cards.directVoter.retirement"),
         }),
       };
     }
@@ -63,22 +64,22 @@ export const SoleVoterDashboardCard = ({
       return {
         buttons: [
           {
-            children: t("dashboard.cards.soleVoter.retire"),
+            children: t("dashboard.cards.directVoter.retire"),
             dataTestId: "retire-as-sole-voter-button",
-            onClick: () => navigate(PATHS.retireAsSoleVoter),
+            onClick: () => navigate(PATHS.retireAsDirectVoter),
             sx: { backgroundColor: "arcticWhite" },
           },
           { ...learnMoreButton, variant: "text" },
         ],
         description: (
           <Trans
-            i18nKey="dashboard.cards.soleVoter.isRegisteredDescription"
+            i18nKey="dashboard.cards.directVoter.isRegisteredDescription"
             values={{ votingPower: ada }}
           />
         ),
         state: "active",
         transactionId: voter?.soleVoterRegisterTxHash,
-        title: t("dashboard.cards.soleVoter.youAreSoleVoterTitle"),
+        title: t("dashboard.cards.directVoter.youAreDirectVoterTitle"),
       };
     }
 
@@ -87,21 +88,21 @@ export const SoleVoterDashboardCard = ({
       return {
         buttons: [
           {
-            children: t("dashboard.cards.soleVoter.reRegister"),
+            children: t("dashboard.cards.directVoter.reRegister"),
             dataTestId: "register-as-sole-voter-button",
-            onClick: () => navigate(PATHS.registerAsSoleVoter),
+            onClick: () => navigate(PATHS.registerAsDirectVoter),
             variant: "contained",
           },
           learnMoreButton,
         ],
         description: (
           <Trans
-            i18nKey="dashboard.cards.soleVoter.wasRegisteredDescription"
+            i18nKey="dashboard.cards.directVoter.wasRegisteredDescription"
             values={{ votingPower: ada }}
           />
         ),
         transactionId: voter?.soleVoterRetireTxHash,
-        title: t("dashboard.cards.soleVoter.wasSoleVoterTitle"),
+        title: t("dashboard.cards.directVoter.wasDirectVoterTitle"),
       };
     }
 
@@ -109,24 +110,24 @@ export const SoleVoterDashboardCard = ({
     return {
       buttons: [
         {
-          children: t("dashboard.cards.soleVoter.register"),
+          children: t("dashboard.cards.directVoter.register"),
           dataTestId: "register-as-sole-voter-button",
-          onClick: () => navigate(PATHS.registerAsSoleVoter),
+          onClick: () => navigate(PATHS.registerAsDirectVoter),
           variant: "contained",
         },
         learnMoreButton,
       ],
       description: (
         <Trans
-          i18nKey="dashboard.cards.soleVoter.registerDescription"
+          i18nKey="dashboard.cards.directVoter.registerDescription"
           values={{ votingPower: ada }}
         />
       ),
-      title: t("dashboard.cards.soleVoter.registerTitle"),
+      title: t("dashboard.cards.directVoter.registerTitle"),
     };
   })();
 
   return (
-    <DashboardActionCard imageURL={IMAGES.soleVoterImage} {...cardProps} />
+    <DashboardActionCard imageURL={IMAGES.directVoterImage} {...cardProps} />
   );
 };

@@ -22,7 +22,7 @@ import {
   openInNewTab,
 } from "@utils";
 
-export const RegisterAsSoleVoter = () => {
+export const RegisterAsDirectVoter = () => {
   const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -50,7 +50,7 @@ export const RegisterAsSoleVoter = () => {
       certBuilder.add(registerCert);
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
-        type: "registerAsSoleVoter",
+        type: "registerAsDirectVoter",
       });
       if (result) {
         openModal({
@@ -106,7 +106,7 @@ export const RegisterAsSoleVoter = () => {
       >
         <DashboardTopNav
           isVotingPowerHidden
-          title={t("soleVoter.becomeSoleVoter")}
+          title={t("directVoter.becomeDirectVoter")}
         />
         <LinkWithIcon
           label={t("backToDashboard")}
@@ -124,7 +124,7 @@ export const RegisterAsSoleVoter = () => {
           isLoadingActionButton={isLoading}
         >
           <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
-            {t("soleVoter.registerHeading")}
+            {t("directVoter.registerHeading")}
           </Typography>
           <Typography
             fontWeight={400}
@@ -137,7 +137,7 @@ export const RegisterAsSoleVoter = () => {
             variant="body1"
           >
             <Trans
-              i18nKey="soleVoter.registerDescription"
+              i18nKey="directVoter.registerDescription"
               values={{ deposit: correctAdaFormat(epochParams.drep_deposit) }}
               components={[
                 <Link

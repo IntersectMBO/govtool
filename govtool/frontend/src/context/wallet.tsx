@@ -472,7 +472,7 @@ const CardanoProvider = (props: Props) => {
 
         if (
           (type === "retireAsDrep" ||
-            type === "retireAsSoleVoter" ||
+            type === "retireAsDirectVoter" ||
             (type === "delegate" && voter?.isRegisteredAsSoleVoter)) &&
           voter?.deposit
         ) {

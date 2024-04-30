@@ -8,14 +8,14 @@ export const Button = ({
   isLoading,
   ...props
 }: ButtonProps) => {
-  const buttonHeight = {
+  const height = {
     extraLarge: 48,
     large: 40,
     medium: 36,
     small: 32,
   }[size];
 
-  const buttonPaddingHorizontal = {
+  const px = {
     extraLarge: 3.5,
     large: 3.25,
     medium: 3,
@@ -27,8 +27,8 @@ export const Button = ({
       disabled={isLoading || props?.disabled}
       sx={{
         fontSize: size === "extraLarge" ? 16 : 14,
-        height: buttonHeight,
-        px: buttonPaddingHorizontal,
+        height,
+        px,
         whiteSpace: "nowrap",
         ...sx,
       }}

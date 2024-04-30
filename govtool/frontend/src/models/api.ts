@@ -16,6 +16,7 @@ export enum DRepStatus {
   Active = "Active",
   Inactive = "Inactive",
   Retired = "Retired",
+  Yourself = "Yourself",
 }
 
 export enum DRepListSort {

@@ -1,4 +1,4 @@
-import { correctAdaFormat } from "..";
+import { correctAdaFormat, correctDRepDirectoryFormat } from "..";
 
 describe("correctAdaFormat", () => {
   const LOVELACE = 1000000;
@@ -32,5 +32,19 @@ describe("correctAdaFormat", () => {
   it("returns 0 for zero lovelace value", () => {
     const lovelace = 0;
     expect(correctAdaFormat(lovelace)).toBe(0);
+  });
+});
+
+describe("correctDRepDirectoryFormat", () => {
+  test("Correctly formats lovelace value to directory format", () => {
+    const lovelace = 143500000000;
+    const expectedResult = "143,500";
+    expect(correctDRepDirectoryFormat(lovelace)).toBe(expectedResult);
+  });
+
+  test("Returns 0 for undefined input", () => {
+    const lovelace = undefined;
+    const expectedResult = "0";
+    expect(correctDRepDirectoryFormat(lovelace)).toBe(expectedResult);
   });
 });

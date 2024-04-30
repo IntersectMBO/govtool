@@ -43,7 +43,7 @@ describe("correctDRepDirectoryFormat", () => {
   });
 
   test("Returns 0 for numbers smaller than one million", () => {
-    const lovelace = 143;
+    const lovelace = 1435;
     const expectedResult = "0";
     expect(correctDRepDirectoryFormat(lovelace)).toBe(expectedResult);
   });

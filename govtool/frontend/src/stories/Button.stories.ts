@@ -44,3 +44,12 @@ export const Text: Story = {
     children: "Button",
   },
 };
+
+export const LoadingButton: Story = {
+  args: {
+    children: "Button",
+    size: "large",
+    variant: "contained",
+    isLoading: true,
+  },
+};

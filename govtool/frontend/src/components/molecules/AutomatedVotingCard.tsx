@@ -1,6 +1,6 @@
 import { Box, Divider } from "@mui/material";
 
-import { Button, LoadingButton, Typography } from "@atoms";
+import { Button, Typography } from "@atoms";
 import { primaryBlue } from "@consts";
 import { useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
@@ -141,7 +141,7 @@ export const AutomatedVotingCard = ({
               </Button>
             ) : (
               !isSelected && (
-                <LoadingButton
+                <Button
                   data-testid={`${testIdLabel}-delegate-button`}
                   isLoading={isDelegateLoading}
                   onClick={onClickDelegate}
@@ -150,7 +150,7 @@ export const AutomatedVotingCard = ({
                   variant="contained"
                 >
                   {t("delegate")}
-                </LoadingButton>
+                </Button>
               )
             )}
           </Box>

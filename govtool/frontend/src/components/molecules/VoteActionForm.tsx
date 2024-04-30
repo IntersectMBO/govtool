@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { Box } from "@mui/material";
 import { Trans } from "react-i18next";
 
-import { Button, LoadingButton, Radio, Typography } from "@atoms";
+import { Button, Radio, Typography } from "@atoms";
 import { orange } from "@consts";
 import { useModal } from "@context";
 import {
@@ -110,7 +110,7 @@ export const VoteActionForm = ({
 
   const renderChangeVoteButton = useMemo(
     () => (
-      <LoadingButton
+      <Button
         data-testid="change-vote"
         onClick={confirmVote}
         disabled={
@@ -128,7 +128,7 @@ export const VoteActionForm = ({
         }}
       >
         {t("govActions.changeVote")}
-      </LoadingButton>
+      </Button>
     ),
     [confirmVote, areFormErrors, vote, isVoteLoading],
   );
@@ -372,7 +372,7 @@ export const VoteActionForm = ({
           {isMobile ? renderCancelButton : renderChangeVoteButton}
         </Box>
       ) : (
-        <LoadingButton
+        <Button
           data-testid="vote-button"
           variant="contained"
           disabled={
@@ -386,7 +386,7 @@ export const VoteActionForm = ({
           size="extraLarge"
         >
           {t("govActions.vote")}
-        </LoadingButton>
+        </Button>
       )}
     </Box>
   );

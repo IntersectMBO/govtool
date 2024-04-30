@@ -20,7 +20,7 @@ export const StatusPill = ({
     size={size}
     label={label}
     sx={{
-      px: 1.5,
+      px: 0.5,
       py: 0.5,
       height: 24,
       ...sx,

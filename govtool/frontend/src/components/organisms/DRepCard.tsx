@@ -145,20 +145,22 @@ export const DRepCard = ({
             },
           }}
         >
-          <Button
-            data-testid={`${view}-view-details-button`}
-            variant="outlined"
-            onClick={() =>
-              navigate(
-                (isConnected
-                  ? PATHS.dashboardDRepDirectoryDRep
-                  : PATHS.dRepDirectoryDRep
-                ).replace(":dRepId", view),
-              )
-            }
-          >
-            {t("viewDetails")}
-          </Button>
+          {type === "DRep" && (
+            <Button
+              data-testid={`${view}-view-details-button`}
+              variant="outlined"
+              onClick={() =>
+                navigate(
+                  (isConnected
+                    ? PATHS.dashboardDRepDirectoryDRep
+                    : PATHS.dRepDirectoryDRep
+                  ).replace(":dRepId", view),
+                )
+              }
+            >
+              {t("viewDetails")}
+            </Button>
+          )}
           {status === "Active" &&
             isConnected &&
             onDelegate &&

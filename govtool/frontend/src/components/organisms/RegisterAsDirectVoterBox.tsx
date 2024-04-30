@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { PATHS } from "@consts";
-import { RegisterAsSoleVoterBoxContent } from "@organisms";
+import { RegisterAsDirectVoterBoxContent } from "@organisms";
 import { CenteredBoxBottomButtons } from "@molecules";
 import { useCardano, useModal } from "@context";
 import { useGetVoterInfo, useWalletErrorModal } from "@hooks";
 
-export const RegisterAsSoleVoterBox = () => {
+export const RegisterAsDirectVoterBox = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { buildSignSubmitConwayCertTx, buildDRepRegCert, buildDRepUpdateCert } =
@@ -28,7 +28,7 @@ export const RegisterAsSoleVoterBox = () => {
         : await buildDRepRegCert();
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
-        type: "registerAsSoleVoter",
+        type: "registerAsDirectVoter",
       });
       if (result) {
         openModal({
@@ -62,7 +62,7 @@ export const RegisterAsSoleVoterBox = () => {
 
   return (
     <>
-      <RegisterAsSoleVoterBoxContent />
+      <RegisterAsDirectVoterBoxContent />
       <CenteredBoxBottomButtons
         onBackButton={() => navigate(PATHS.dashboard)}
         onActionButton={onRegister}

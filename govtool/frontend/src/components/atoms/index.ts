@@ -12,7 +12,6 @@ export * from "./HighlightedText";
 export * from "./InfoText";
 export * from "./Input";
 export * from "./Link";
-export * from "./LoadingButton";
 export * from "./modal/Modal";
 export * from "./modal/ModalContents";
 export * from "./modal/ModalHeader";

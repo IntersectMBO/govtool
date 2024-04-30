@@ -16,7 +16,7 @@ export type StepProps = {
   layoutStyles?: SxProps;
 };
 
-export type SoleVoterActionProps = {
+export type DirectVoterActionProps = {
   dRepId: string;
   onClickArrow: () => void;
   sx?: SxProps;

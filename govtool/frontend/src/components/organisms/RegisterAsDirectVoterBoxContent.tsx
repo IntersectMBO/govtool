@@ -2,18 +2,24 @@ import { Link } from "@mui/material";
 import { Trans } from "react-i18next";
 
 import { Typography } from "@atoms";
-import { useGetVoterInfo, useScreenDimension, useTranslation } from "@hooks";
-import { correctAdaFormat, openInNewTab } from "@utils";
+import { useScreenDimension, useTranslation } from "@hooks";
+import {
+  PROTOCOL_PARAMS_KEY,
+  correctAdaFormat,
+  getItemFromLocalStorage,
+  openInNewTab,
+} from "@utils";
 
-export const RetireAsSoleVoterBoxContent = () => {
+export const RegisterAsDirectVoterBoxContent = () => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
-  const { voter } = useGetVoterInfo();
+
+  const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
   return (
     <>
       <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
-        {t("soleVoter.retirementHeading")}
+        {t("directVoter.registerHeading")}
       </Typography>
       <Typography
         fontWeight={400}
@@ -26,12 +32,12 @@ export const RetireAsSoleVoterBoxContent = () => {
         variant="body1"
       >
         <Trans
-          i18nKey="soleVoter.retirementDescription"
-          values={{ deposit: correctAdaFormat(voter?.deposit) }}
+          i18nKey="directVoter.registerDescription"
+          values={{ deposit: correctAdaFormat(epochParams.drep_deposit) }}
           components={[
             <Link
               onClick={() => openInNewTab("https://sancho.network/")}
-              sx={{ cursor: "pointer", textDecoration: "none" }}
+              sx={{ cursor: "pointer" }}
               key="0"
             />,
           ]}

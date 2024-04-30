@@ -134,7 +134,7 @@ export const DRepCard = ({
                   {t("status")}
                 </Typography>
                 <Box display="flex" flexDirection="row">
-                  <StatusPill status={status} sx={{ width: 80 }} />
+                  <StatusPill status={status} />
                   {isMe && (
                     <StatusPill
                       status={DRepStatus.Yourself}
@@ -158,20 +158,22 @@ export const DRepCard = ({
             },
           }}
         >
-          <Button
-            data-testid={`${view}-view-details-button`}
-            variant="outlined"
-            onClick={() =>
-              navigate(
-                (isConnected
-                  ? PATHS.dashboardDRepDirectoryDRep
-                  : PATHS.dRepDirectoryDRep
-                ).replace(":dRepId", view),
-              )
-            }
-          >
-            {t("viewDetails")}
-          </Button>
+          {type === "DRep" && (
+            <Button
+              data-testid={`${view}-view-details-button`}
+              variant="outlined"
+              onClick={() =>
+                navigate(
+                  (isConnected
+                    ? PATHS.dashboardDRepDirectoryDRep
+                    : PATHS.dRepDirectoryDRep
+                  ).replace(":dRepId", view),
+                )
+              }
+            >
+              {t("viewDetails")}
+            </Button>
+          )}
           {status === "Active" &&
             isConnected &&
             onDelegate &&

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Box } from "@mui/material";
 
-import { Button, LoadingButton } from "@atoms";
+import { Button } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 
 interface Props {
@@ -41,7 +41,7 @@ export const CenteredBoxBottomButtons = ({
 
   const renderActionButton = useMemo(
     () => (
-      <LoadingButton
+      <Button
         data-testid="register-button"
         isLoading={isLoading}
         onClick={onActionButton}
@@ -53,7 +53,7 @@ export const CenteredBoxBottomButtons = ({
         variant="contained"
       >
         {actionButtonText ?? t("continue")}
-      </LoadingButton>
+      </Button>
     ),
     [isLoading, isMobile],
   );

@@ -16,7 +16,7 @@ import { LinkWithIcon } from "@molecules";
 import { BgCard, DashboardTopNav, Footer } from "@organisms";
 import { checkIsWalletConnected, correctAdaFormat, openInNewTab } from "@utils";
 
-export const RetireAsSoleVoter = () => {
+export const RetireAsDirectVoter = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
@@ -37,8 +37,8 @@ export const RetireAsSoleVoter = () => {
       );
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
-        type: "retireAsSoleVoter",
-        voterDeposit: voter?.deposit?.toString(),
+        type: "retireAsDirectVoter",
+        voter,
       });
       if (result) {
         openModal({
@@ -91,7 +91,7 @@ export const RetireAsSoleVoter = () => {
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
-        <DashboardTopNav title={t("soleVoter.retireSoleVoter")} />
+        <DashboardTopNav title={t("directVoter.retireDirectVoter")} />
         <LinkWithIcon
           label={t("backToDashboard")}
           onClick={navigateToDashboard}
@@ -108,7 +108,7 @@ export const RetireAsSoleVoter = () => {
           isLoadingActionButton={isLoading}
         >
           <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
-            {t("soleVoter.retirementHeading")}
+            {t("directVoter.retirementHeading")}
           </Typography>
           <Typography
             fontWeight={400}
@@ -121,7 +121,7 @@ export const RetireAsSoleVoter = () => {
             variant="body1"
           >
             <Trans
-              i18nKey="soleVoter.retirementDescription"
+              i18nKey="directVoter.retirementDescription"
               values={{ deposit: correctAdaFormat(voter?.deposit) }}
               components={[
                 <Link

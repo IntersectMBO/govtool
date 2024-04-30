@@ -16,7 +16,17 @@ export const StatusPill = ({
   size = "small",
   sx,
 }: StatusPillProps) => (
-  <StyledChip status={status} size={size} label={label} sx={sx} />
+  <StyledChip
+    status={status}
+    size={size}
+    label={label}
+    sx={{
+      px: status === DRepStatus.Yourself ? 0.75 : 0.5,
+      py: 0.5,
+      height: 24,
+      ...sx,
+    }}
+  />
 );
 
 const bgColor = {

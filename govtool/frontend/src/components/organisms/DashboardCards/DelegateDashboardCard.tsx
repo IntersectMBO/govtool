@@ -117,9 +117,7 @@ export const DelegateDashboardCard = ({
     >
       {displayedDelegationId && (
         <DelegationAction
-          dRepId={
-            formHexToBech32(delegateTx?.resourceId) || displayedDelegationId
-          }
+          dRepId={displayedDelegationId}
           onClickArrow={navigateToDRepDetails}
           sx={{ mt: 1.5 }}
         />
@@ -190,7 +188,7 @@ const getDisplayedDelegationId = ({
   }
 
   if (!restrictedNames.includes(currentDelegation ?? "")) {
-    return formHexToBech32(currentDelegation ?? "");
+    return currentDelegation ?? "";
   }
   return undefined;
 };

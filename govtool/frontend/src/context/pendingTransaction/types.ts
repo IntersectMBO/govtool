@@ -1,9 +1,9 @@
 export type TransactionTypeWithoutResource =
   | "createGovAction"
   | "registerAsDrep"
-  | "registerAsSoleVoter"
+  | "registerAsDirectVoter"
   | "retireAsDrep"
-  | "retireAsSoleVoter"
+  | "retireAsDirectVoter"
   | "updateMetaData";
 
 export type TransactionTypeWithResource = "delegate" | "vote";
@@ -32,10 +32,7 @@ export type TransactionState =
 
 export type PendingTransaction =
   | Record<
-    TransactionTypeWithoutResource,
-    TransactionStateWithoutResource | null
-  > &
-  Record<
-    TransactionTypeWithResource,
-    TransactionStateWithResource | null
-  >;
+      TransactionTypeWithoutResource,
+      TransactionStateWithoutResource | null
+    > &
+      Record<TransactionTypeWithResource, TransactionStateWithResource | null>;

@@ -10,7 +10,7 @@ export const IMAGES = {
   govActionRegisterImage: "/images/GovActionRegister.png",
   heroImage: "/images/HeroImage.png",
   proposeGovActionImage: "/images/ProposeGovAction.png",
-  soleVoterImage: "/images/GovActionsSoleVoter.png",
+  directVoterImage: "/images/GovActionsDirectVoter.png",
   successImage: "/images/Success.png",
   warningImage: "/images/Warning.png",
   warningYellowImage: "/images/WarningYellow.png",

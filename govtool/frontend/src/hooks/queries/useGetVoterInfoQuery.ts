@@ -12,9 +12,9 @@ export const useGetVoterInfo = () => {
       QUERY_KEYS.useGetDRepInfoKey,
       (
         pendingTransaction?.registerAsDrep ||
-        pendingTransaction?.registerAsSoleVoter ||
+        pendingTransaction?.registerAsDirectVoter ||
         pendingTransaction?.retireAsDrep ||
-        pendingTransaction?.retireAsSoleVoter
+        pendingTransaction?.retireAsDirectVoter
       )?.transactionHash,
     ],
     enabled: !!dRepID,

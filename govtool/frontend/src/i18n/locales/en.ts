@@ -17,11 +17,11 @@ export const en = {
           "You have successfully registered as a DRep! Please refresh the page.",
         success: "You have successfully registered as a DRep!",
       },
-      registerAsSoleVoter: {
+      registerAsDirectVoter: {
         failed: "Registration transaction failed",
         warning:
-          "You have successfully registered as a Sole Voter! Please refresh the page.",
-        success: "You have successfully registered as a Sole Voter!",
+          "You have successfully registered as a Direct Voter! Please refresh the page.",
+        success: "You have successfully registered as a Direct Voter!",
       },
       retireAsDrep: {
         failed: "Retirement transaction failed",
@@ -29,11 +29,11 @@ export const en = {
           "You have successfully retired from being a DRep! Please refresh the page.",
         success: "You have successfully retired from being a DRep!",
       },
-      retireAsSoleVoter: {
+      retireAsDirectVoter: {
         failed: "Retirement transaction failed",
         warning:
-          "You have successfully retired from being a Sole Voter! Please refresh the page.",
-        success: "You have successfully retired from being a SoleVoter!",
+          "You have successfully retired from being a Direct Voter! Please refresh the page.",
+        success: "You have successfully retired from being a DirectVoter!",
       },
       updateMetaData: {
         failed: "Update DRep metadata transaction failed",
@@ -99,25 +99,25 @@ export const en = {
           propose: "Propose",
           view: "View Governance Actions",
         },
-        soleVoter: {
+        directVoter: {
           isRegisteredDescription:
             "Your Voting Power of ₳<strong>{{votingPower}}</strong> can be used to vote.",
           register: "Register",
           registerDescription:
             "Vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>.",
-          registerTitle: "Become a Sole Voter",
+          registerTitle: "Become a Direct Voter",
           reRegister: "Re-register",
-          registration: "Sole Voter Registration",
+          registration: "Direct Voter Registration",
           registrationInProgress:
             "The registration process is ongoing. This may take several minutes.",
           retire: "Retire",
-          wasSoleVoterTitle: "You Have Retired as a Sole Voter",
-          retirement: "Sole Voter Retirement",
+          wasDirectVoterTitle: "You Have Retired as a Direct Voter",
+          retirement: "Direct Voter Retirement",
           retirementInProgress:
             "The retirement process is ongoing. This may take several minutes.",
           wasRegisteredDescription:
             "You cannot vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>. until you re-register.",
-          youAreSoleVoterTitle: "You are a Sole Voter",
+          youAreDirectVoterTitle: "You are a Direct Voter",
         },
         delegation: {
           noDelegationTitle: "Delegate your Voting Power",
@@ -488,10 +488,10 @@ export const en = {
           firstButtonLabel: "Connect to Register",
           title: "Become a DRep",
         },
-        registerAsSoleVoter: {
+        registerAsDirectVoter: {
           description: "Vote on Governance Actions using your own voting power",
           firstButtonLabel: "Connect to Register",
-          title: "Become a Sole Voter",
+          title: "Become a Direct Voter",
         },
       },
     },
@@ -668,15 +668,15 @@ export const en = {
       showAll: "Show All",
       viewAll: "View all",
     },
-    soleVoter: {
-      becomeSoleVoter: "Become a Sole Voter",
+    directVoter: {
+      becomeDirectVoter: "Become a Direct Voter",
       registerDescription:
-        "A Sole Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of ADA in their connected wallet. <0>Learn More</0> about Sole Voter.\n\nBecoming a Sole Voter will require a refundable deposit of <strong>₳{{deposit}}</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
+        "A Direct Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of ADA in their connected wallet. <0>Learn More</0> about Direct Voter.\n\nBecoming a Direct Voter will require a refundable deposit of <strong>₳{{deposit}}</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
       registerHeading: "What this Means",
       retirementDescription:
-        "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of {{deposit}} ADA will be refunded.\n\nYou can at any time in the future re-register to become a Sole Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\nThese options are listed in our Guides here: <0>Voting options and Roles</0>",
+        "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of {{deposit}} ADA will be refunded.\n\nYou can at any time in the future re-register to become a Direct Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\nThese options are listed in our Guides here: <0>Voting options and Roles</0>",
       retirementHeading: "What Retirement Means",
-      retireSoleVoter: "Retire as a Sole Voter",
+      retireDirectVoter: "Retire as a Direct Voter",
     },
     system: {
       sanchoNet: "SanchoNet",

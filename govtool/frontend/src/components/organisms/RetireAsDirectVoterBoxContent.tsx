@@ -5,7 +5,7 @@ import { Typography } from "@atoms";
 import { useGetVoterInfo, useScreenDimension, useTranslation } from "@hooks";
 import { correctAdaFormat, openInNewTab } from "@utils";
 
-export const RetireAsSoleVoterBoxContent = () => {
+export const RetireAsDirectVoterBoxContent = () => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
   const { voter } = useGetVoterInfo();
@@ -13,7 +13,7 @@ export const RetireAsSoleVoterBoxContent = () => {
   return (
     <>
       <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
-        {t("soleVoter.retirementHeading")}
+        {t("directVoter.retirementHeading")}
       </Typography>
       <Typography
         fontWeight={400}
@@ -26,7 +26,7 @@ export const RetireAsSoleVoterBoxContent = () => {
         variant="body1"
       >
         <Trans
-          i18nKey="soleVoter.retirementDescription"
+          i18nKey="directVoter.retirementDescription"
           values={{ deposit: correctAdaFormat(voter?.deposit) }}
           components={[
             <Link

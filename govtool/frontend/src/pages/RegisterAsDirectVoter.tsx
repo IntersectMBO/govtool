@@ -14,46 +14,51 @@ import {
 } from "@hooks";
 import { LinkWithIcon } from "@molecules";
 import { BgCard, DashboardTopNav, Footer } from "@organisms";
-import { checkIsWalletConnected, correctAdaFormat, openInNewTab } from "@utils";
+import {
+  PROTOCOL_PARAMS_KEY,
+  checkIsWalletConnected,
+  correctAdaFormat,
+  getItemFromLocalStorage,
+  openInNewTab,
+} from "@utils";
 
-export const RetireAsSoleVoter = () => {
+export const RegisterAsDirectVoter = () => {
+  const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
   const { voter } = useGetVoterInfo();
   const openWalletErrorModal = useWalletErrorModal();
-  const { buildSignSubmitConwayCertTx, buildDRepRetirementCert } = useCardano();
+  const { buildSignSubmitConwayCertTx, buildDRepRegCert, buildDRepUpdateCert } =
+    useCardano();
   const { openModal, closeModal } = useModal();
 
-  const onRetire = useCallback(async () => {
+  const onRegister = useCallback(async () => {
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
-      if (!voter?.deposit) {
-        throw new Error(t("errors.appCannotGetDeposit"));
-      }
-      const certBuilder = await buildDRepRetirementCert(
-        voter?.deposit?.toString(),
-      );
+      const certBuilder = voter?.isRegisteredAsDRep
+        ? await buildDRepUpdateCert()
+        : await buildDRepRegCert();
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
-        type: "retireAsSoleVoter",
-        voterDeposit: voter?.deposit?.toString(),
+        type: "registerAsDirectVoter",
       });
       if (result) {
         openModal({
           type: "statusModal",
           state: {
             status: "success",
-            title: t("modals.retirement.title"),
-            message: t("modals.retirement.message"),
+            title: t("modals.registration.title"),
+            message: t("modals.registration.message"),
             link: `https://sancho.cexplorer.io/tx/${result}`,
             buttonText: t("modals.common.goToDashboard"),
-            dataTestId: "retirement-transaction-submitted-modal",
             onSubmit: () => {
               navigate(PATHS.dashboard);
               closeModal();
             },
+            dataTestId: "registration-transaction-submitted-modal",
           },
         });
       }
@@ -63,16 +68,16 @@ export const RetireAsSoleVoter = () => {
         error,
         buttonText: t("modals.common.goToDashboard"),
         onSumbit: () => navigate(PATHS.dashboard),
-        dataTestId: "retirement-transaction-error-modal",
+        dataTestId: "registration-transaction-error-modal",
       });
     } finally {
       setIsLoading(false);
     }
   }, [
-    buildDRepRetirementCert,
     buildSignSubmitConwayCertTx,
+    buildDRepRegCert,
     openModal,
-    voter?.deposit,
+    voter?.isRegisteredAsDRep,
   ]);
 
   const navigateToDashboard = useCallback(
@@ -91,7 +96,10 @@ export const RetireAsSoleVoter = () => {
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
-        <DashboardTopNav title={t("soleVoter.retireSoleVoter")} />
+        <DashboardTopNav
+          isVotingPowerHidden
+          title={t("directVoter.becomeDirectVoter")}
+        />
         <LinkWithIcon
           label={t("backToDashboard")}
           onClick={navigateToDashboard}
@@ -104,11 +112,11 @@ export const RetireAsSoleVoter = () => {
         <BgCard
           actionButtonLabel={t("continue")}
           backButtonLabel={t("cancel")}
-          onClickActionButton={onRetire}
+          onClickActionButton={onRegister}
           isLoadingActionButton={isLoading}
         >
           <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
-            {t("soleVoter.retirementHeading")}
+            {t("directVoter.registerHeading")}
           </Typography>
           <Typography
             fontWeight={400}
@@ -121,12 +129,12 @@ export const RetireAsSoleVoter = () => {
             variant="body1"
           >
             <Trans
-              i18nKey="soleVoter.retirementDescription"
-              values={{ deposit: correctAdaFormat(voter?.deposit) }}
+              i18nKey="directVoter.registerDescription"
+              values={{ deposit: correctAdaFormat(epochParams.drep_deposit) }}
               components={[
                 <Link
                   onClick={() => openInNewTab("https://sancho.network/")}
-                  sx={{ cursor: "pointer", textDecoration: "none" }}
+                  sx={{ cursor: "pointer" }}
                   key="0"
                 />,
               ]}

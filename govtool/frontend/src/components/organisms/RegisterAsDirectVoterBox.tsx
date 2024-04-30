@@ -3,55 +3,47 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { PATHS } from "@consts";
+import { RegisterAsDirectVoterBoxContent } from "@organisms";
 import { CenteredBoxBottomButtons } from "@molecules";
 import { useCardano, useModal } from "@context";
-import { RetireAsSoleVoterBoxContent } from "@organisms";
 import { useGetVoterInfo, useWalletErrorModal } from "@hooks";
 
-export const RetireAsSoleVoterBox = () => {
+export const RegisterAsDirectVoterBox = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const { buildSignSubmitConwayCertTx, buildDRepRegCert, buildDRepUpdateCert } =
+    useCardano();
   const navigate = useNavigate();
-  const {
-    buildDRepRetirementCert,
-    buildSignSubmitConwayCertTx,
-    isPendingTransaction,
-  } = useCardano();
   const { openModal, closeModal } = useModal();
   const { t } = useTranslation();
   const { voter } = useGetVoterInfo();
   const openWalletErrorModal = useWalletErrorModal();
 
-  const onRetire = useCallback(async () => {
+  const onRegister = useCallback(async () => {
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
-      const isPendingTx = isPendingTransaction();
-      if (isPendingTx) return;
-      if (!voter?.deposit) {
-        throw new Error(t("errors.appCannotGetDeposit"));
-      }
-      const certBuilder = await buildDRepRetirementCert(
-        voter?.deposit?.toString(),
-      );
+      const certBuilder = voter?.isRegisteredAsDRep
+        ? await buildDRepUpdateCert()
+        : await buildDRepRegCert();
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
-        type: "retireAsSoleVoter",
-        voterDeposit: voter?.deposit?.toString(),
+        type: "registerAsDirectVoter",
       });
       if (result) {
         openModal({
           type: "statusModal",
           state: {
             status: "success",
-            title: t("modals.retirement.title"),
-            message: t("modals.retirement.message"),
+            title: t("modals.registration.title"),
+            message: t("modals.registration.message"),
             link: `https://sancho.cexplorer.io/tx/${result}`,
             buttonText: t("modals.common.goToDashboard"),
-            dataTestId: "retirement-transaction-submitted-modal",
             onSubmit: () => {
               navigate(PATHS.dashboard);
               closeModal();
             },
+            dataTestId: "registration-transaction-submitted-modal",
           },
         });
       }
@@ -61,25 +53,19 @@ export const RetireAsSoleVoterBox = () => {
         error,
         buttonText: t("modals.common.goToDashboard"),
         onSumbit: () => navigate(PATHS.dashboard),
-        dataTestId: "retirement-transaction-error-modal",
+        dataTestId: "registration-transaction-error-modal",
       });
     } finally {
       setIsLoading(false);
     }
-  }, [
-    buildDRepRetirementCert,
-    buildSignSubmitConwayCertTx,
-    isPendingTransaction,
-    openModal,
-    voter?.deposit,
-  ]);
+  }, [buildSignSubmitConwayCertTx, buildDRepRegCert, openModal]);
 
   return (
     <>
-      <RetireAsSoleVoterBoxContent />
+      <RegisterAsDirectVoterBoxContent />
       <CenteredBoxBottomButtons
         onBackButton={() => navigate(PATHS.dashboard)}
-        onActionButton={onRetire}
+        onActionButton={onRegister}
         isLoading={isLoading}
       />
     </>

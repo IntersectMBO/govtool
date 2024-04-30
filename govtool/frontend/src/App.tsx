@@ -24,9 +24,9 @@ import {
   GovernanceActionsCategory,
   Home,
   RegisterAsdRep,
-  RegisterAsSoleVoter,
+  RegisterAsDirectVoter,
   RetireAsDrep,
-  RetireAsSoleVoter,
+  RetireAsDirectVoter,
   EditDRepMetadata,
 } from "@pages";
 import { SetupInterceptors } from "@services";
@@ -131,10 +131,13 @@ export default () => {
         <Route path={PATHS.registerAsdRep} element={<RegisterAsdRep />} />
         <Route path={PATHS.retireAsDrep} element={<RetireAsDrep />} />
         <Route
-          path={PATHS.registerAsSoleVoter}
-          element={<RegisterAsSoleVoter />}
+          path={PATHS.registerAsDirectVoter}
+          element={<RegisterAsDirectVoter />}
         />
-        <Route path={PATHS.retireAsSoleVoter} element={<RetireAsSoleVoter />} />
+        <Route
+          path={PATHS.retireAsDirectVoter}
+          element={<RetireAsDirectVoter />}
+        />
         <Route path={PATHS.stakeKeys} element={<ChooseStakeKey />} />
         <Route path={PATHS.editDrepMetadata} element={<EditDRepMetadata />} />
         <Route path="*" element={<ErrorPage />} />

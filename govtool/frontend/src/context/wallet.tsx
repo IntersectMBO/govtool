@@ -473,7 +473,7 @@ const CardanoProvider = (props: Props) => {
         let outputValue = BigNum.from_str("1000000");
 
         if (
-          (type === "retireAsDrep" || type === "retireAsSoleVoter") &&
+          (type === "retireAsDrep" || type === "retireAsDirectVoter") &&
           voterDeposit
         ) {
           outputValue = outputValue.checked_add(BigNum.from_str(voterDeposit));

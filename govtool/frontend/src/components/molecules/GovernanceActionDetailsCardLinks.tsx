@@ -16,7 +16,7 @@ export const GovernanceActionDetailsCardLinks = ({
   const { openModal } = useModal();
 
   return (
-    links && (
+    !!links?.length && (
       <>
         <Typography
           sx={{

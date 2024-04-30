@@ -38,7 +38,7 @@ export const RetireAsDirectVoter = () => {
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
         type: "retireAsDirectVoter",
-        voterDeposit: voter?.deposit?.toString(),
+        voter,
       });
       if (result) {
         openModal({

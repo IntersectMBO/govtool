@@ -24,8 +24,6 @@ export * from "./HomeCards";
 export * from "./RegisterAsDRepSteps";
 export * from "./RegisterAsDirectVoterBox";
 export * from "./RegisterAsDirectVoterBoxContent";
-export * from "./RetireAsDirectVoterBox";
-export * from "./RetireAsDirectVoterBoxContent";
 export * from "./Slider";
 export * from "./TopNav";
 export * from "./VoteContext";

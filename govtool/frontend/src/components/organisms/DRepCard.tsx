@@ -128,7 +128,7 @@ export const DRepCard = ({
                 >
                   {t("status")}
                 </Typography>
-                <StatusPill status={status} sx={{ width: 80 }} />
+                <StatusPill status={status} />
               </Box>
             </Box>
           </Box>

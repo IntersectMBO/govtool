@@ -5,9 +5,9 @@ import { Button, StatusPill, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useModal, useSnackbar } from "@context";
 import { useTranslation } from "@hooks";
-import { DRepData } from "@models";
+import { DRepData, DRepStatus } from "@models";
 import { Card } from "@molecules";
-import { correctAdaFormat } from "@utils";
+import { correctDRepDirectoryFormat } from "@utils";
 
 type DRepCardProps = {
   dRep: DRepData;
@@ -44,7 +44,6 @@ export const DRepCard = ({
     <Card
       {...(isMe && {
         variant: "primary",
-        label: t("yourself"),
       })}
       {...(isInProgress && {
         variant: "warning",
@@ -52,6 +51,12 @@ export const DRepCard = ({
       })}
       sx={{ container: "root / inline-size", py: 2.5 }}
     >
+      {isMe && (
+        <StatusPill
+          status={DRepStatus.Yourself}
+          sx={{ mb: 1.5, display: { lg: "none" } }}
+        />
+      )}
       <Box
         display="flex"
         flexDirection="column"
@@ -68,7 +73,7 @@ export const DRepCard = ({
             display="flex"
             flexDirection="column"
             rowGap={3}
-            columnGap={6}
+            columnGap={10}
             sx={{
               "@container (min-width: 480px)": {
                 flexDirection: "row",
@@ -77,7 +82,7 @@ export const DRepCard = ({
               containerType: "inline-size",
             }}
           >
-            <Box flex={1} minWidth={0}>
+            <Box minWidth={0} display="flex" flexDirection="column">
               <Typography sx={ellipsisStyles}>{type}</Typography>
               <ButtonBase
                 data-testid={`${view}-copy-id-button`}
@@ -88,7 +93,7 @@ export const DRepCard = ({
                 }}
                 sx={{
                   gap: 1,
-                  maxWidth: "100%",
+                  width: "250px",
                   "&:hover": {
                     opacity: 0.6,
                     transition: "opacity 0.3s",
@@ -103,7 +108,7 @@ export const DRepCard = ({
             </Box>
 
             <Box sx={{ display: "flex", flex: { xl: 1 }, gap: 3 }}>
-              <Box sx={{ flex: { xl: 1 } }}>
+              <Box sx={{ width: { lg: "128px" } }}>
                 <Typography
                   variant="caption"
                   color="textSecondary"
@@ -112,7 +117,7 @@ export const DRepCard = ({
                   {t("votingPower")}
                 </Typography>
                 <Typography sx={{ whiteSpace: "nowrap" }}>
-                  ₳ {correctAdaFormat(votingPower)}
+                  ₳ {correctDRepDirectoryFormat(votingPower)}
                 </Typography>
               </Box>
               <Divider
@@ -128,7 +133,15 @@ export const DRepCard = ({
                 >
                   {t("status")}
                 </Typography>
-                <StatusPill status={status} />
+                <Box display="flex" flexDirection="row">
+                  <StatusPill status={status} />
+                  {isMe && (
+                    <StatusPill
+                      status={DRepStatus.Yourself}
+                      sx={{ ml: 0.75, display: { lg: "flex", xxs: "none" } }}
+                    />
+                  )}
+                </Box>
               </Box>
             </Box>
           </Box>
@@ -136,12 +149,12 @@ export const DRepCard = ({
 
         <Box
           display="flex"
-          flex={1}
           gap={2.5}
           minWidth={isConnected ? 233 : 310}
           sx={{
             "@container root (min-width: 480px)": {
               justifyContent: "flex-end",
+              alignItems: "center",
             },
           }}
         >

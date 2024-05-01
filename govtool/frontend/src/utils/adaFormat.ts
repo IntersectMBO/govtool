@@ -7,3 +7,11 @@ export const correctAdaFormat = (lovelace: number | undefined) => {
   }
   return 0;
 };
+
+export const correctDRepDirectoryFormat = (lovelace: number | undefined) => {
+  if (lovelace) {
+    return Number((lovelace / LOVELACE).toFixed(0))?.toLocaleString("en-US");
+  }
+
+  return "0";
+};

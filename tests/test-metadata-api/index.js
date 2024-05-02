@@ -1,9 +1,10 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const lock_api = require('./locks_api')
+
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
-
 const app = express();
 
 
@@ -25,7 +26,7 @@ const swaggerOptions = {
             description: 'API for saving and deleting files',
         },
     },
-    apis: ['index.js'], // Update the path to reflect the compiled JavaScript file
+    apis: ['index.js','locks_api.js'], // Update the path to reflect the compiled JavaScript file
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
@@ -39,6 +40,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  * /data/{filename}:
  *   put:
  *     summary: Save data to a file
+ *     tags: [Metadata File]
  *     parameters:
  *       - in: path
  *         name: filename
@@ -70,12 +72,50 @@ app.put('/data/:filename', (req, res) => {
 });
 
 
+// GET endpoint to retrieve a file
+/**
+ * @swagger
+ * /data/{filename}:
+ *   get:
+ *     summary: Get a file
+ *     tags: [Metadata File]
+ *     parameters:
+ *       - in: path
+ *         name: filename
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The name of the file to retrieve
+ *     responses:
+ *       '200':
+ *         description: File retrieved successfully
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ */
+app.get('/data/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(dataDir, filename);
+
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+            return res.status(404).send({'message': 'File not found'});
+        }
+        res.status(200).send(data);
+    });
+});
+
+
+
 // DELETE endpoint to delete a file
 /**
  * @swagger
  * /data/{filename}:
  *   delete:
  *     summary: Delete a file
+ *     tags: [Metadata File]
  *     parameters:
  *       - in: path
  *         name: filename
@@ -100,9 +140,10 @@ app.delete('/data/:filename', (req, res) => {
     });
 });
 
-// Serve the directory where the files are saved
-app.use('/json_files', express.static(dataDir));
-
+app.get('/', (req, res) => {
+    res.redirect('/docs');
+});
+lock_api.setup(app)
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

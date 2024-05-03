@@ -50,14 +50,14 @@ jobs:
           path: tests/govtool-frontend/playwright/allure-results
 
     env:
-      FRONTEND_URL: ${{vars.FRONTEND_URL}}
-      API_URL: ${{vars.API_URL}}
+      FRONTEND_URL: ${{vars.HOST_URL}}
+      API_URL: ${{vars.HOST_URL}}/api
       DOCS_URL: ${{ vars.DOCS_URL }}
       FAUCET_API_URL: ${{ vars.FAUCET_API_URL }}
       FAUCET_API_KEY: ${{secrets.FAUCET_API_KEY}}
       KUBER_API_URL: ${{vars.KUBER_API_URL}}
       KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}
-      WORKERS: ${{vars.WORKERS}}
+      WORKERS: ${{vars.TEST_WORKERS}}
 
   publish-report:
     runs-on: ubuntu-latest

@@ -1,0 +1,16 @@
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+.env
+tests-out/
+.auth/
+.download/
+lib/_mock/
+allure-results/
+allure-report/
+.secrets
+.vars
+.lock-pool/
+.logs/

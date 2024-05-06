@@ -2,51 +2,53 @@
 ####### Script for generating docker secret files and configs.
 ####### If the docker is in swarm mode, it will also generate the docker swarm secrets.
 #######
+set -e
 if ! [ -f ./.env ]
 then
     echo ".env file is missing"
     exit 1
 fi
+
 set -a
 . ./.env
 set +a
+
 # Function to generate a random secret in base64 format without padding and '+'
 function generate_secret() {
     openssl rand -base64 16 | tr -d '=+/'
 }
 
-# Generate random secrets
-export POSTGRES_USER=postgres
-export POSTGRES_PASSWORD=$(generate_secret)
-metrics_api_secret=$(generate_secret)
-
 
 if [ "$1" == "clean" ]; then
+
+    # Create secrets from files
+    for SECRET_FILE in $(ls ./secrets)
+    do
+        SECRET_NAME="$(basename $SECRET_FILE)"
+        echo -n "Removing secret: ${STACK_NAME}_${SECRET_NAME}"
+        docker secret rm "${STACK_NAME}_${SECRET_NAME}" || true
+    done
+
+    # Create configs from files
+    for CONFIG_FILE in $(ls ./configs)
+    do
+        CONFIG_NAME=$(basename $CONFIG_FILE)
+        echo -n "Removing config: ${STACK_NAME}_${CONFIG_NAME}"
+        docker config rm "${STACK_NAME}_${CONFIG_NAME}" || true
+    done
+
     set -x
     rm -rf ./configs;
     rm -rf ./secrets;
 
-    set +x
-
-    docker info | grep 'Swarm: active' > /dev/null 2>/dev/null || exit 0
-    for CONFIG_FILE in $(ls ./configs_template)
-    do
-        echo -n "Removing Config : "
-       docker config rm "${STACK_NAME}_${CONFIG_FILE}" || true
-    done
-
-    for SECRET_FILE in "$(ls ./secrets_template)" "postgres_user" "postgres_password" "metrics_api_secret"
-    do
-        echo -n "Removing Secret : "
-        docker secret rm "${STACK_NAME}_${SECRET_FILE}"   ||true
-    done
+    set +x;
     exit 0
 fi
 
 ## Check if one fo the secrets already exists
-if [[ -f ./secrets/govtool_postgres_user ]]
+if [[ -f ./secrets/postgres_user ]]
 then
-    echo "File  ./secrets/govtool_postgres_user already exists."
+    echo "File  ./secrets/postgres_user already exists."
     echo "Assuming that the secrets were already generated"
     echo "   Use:"
     echo "      > ./gen-configs.sh clean"
@@ -58,29 +60,32 @@ fi
 mkdir -p ./configs;
 mkdir -p ./secrets;
 
+# Generate random secrets
+export POSTGRES_USER=postgres
+export POSTGRES_PASSWORD=$(generate_secret)
+metrics_api_secret=$(generate_secret)
+DBSYNC_DATABASE="${STACK_NAME}_dbsync"
 
-## save secrets to secrets folder
-echo -n $POSTGRES_USER > ./secrets/govtool_postgres_user
-echo -n $POSTGRES_PASSWORD > ./secrets/govtool_postgres_password
-echo -n $metrics_api_secret > ./secrets/govtool_metrics_api_secret
-$DBSYNC_DATABASE="${STACK_NAME}_dbsync"
-echo -n "$DBSYNC_DATABASE" > ./secrets/govtool_dbsync_database
 
-## loop over templates and updaete them.
 
+# Save secrets to files
+echo -n $POSTGRES_USER > ./secrets/postgres_user
+echo -n $POSTGRES_PASSWORD > ./secrets/postgres_password
+echo -n $metrics_api_secret > ./secrets/metrics_api_secret
+echo -n "$DBSYNC_DATABASE" > ./secrets/dbsync_database
+
+## loop over templates and update them.
 for CONFIG_FILE in $(ls ./configs_template)
 do
     echo -n "Config ${STACK_NAME}_${CONFIG_FILE}: "
-    envsubst < "./configs_template/$CONFIG_FILE"   > "./configs/${STACK_NAME}_${CONFIG_FILE}"
+    envsubst < "./configs_template/$CONFIG_FILE"   > "./configs/${CONFIG_FILE}"
 done
 
 for SECRET_FILE in $(ls ./secrets_template)
 do
     echo -n "Secret ${STACK_NAME}_${SECRET_FILE}: "
-    envsubst < "./secrets_template/$SECRET_FILE" > "./secrets/${STACK_NAME}_${SECRET_FILE}"
+    envsubst < "./secrets_template/$SECRET_FILE" > "./secrets/${SECRET_FILE}"
 done
-
-
 
 ################################################################################
 ################ Create secret/config for swarm  ###############################
@@ -88,28 +93,18 @@ done
 
 docker info | grep 'Swarm: active' > /dev/null 2>/dev/null || exit 0
 
-echo "Creating Secret: ${STACK_NAME}_postgres_user"
-echo "$POSTGRES_USER" | (docker secret create "${STACK_NAME}_postgres_user" - )  || true
-
-echo "Generating Secret: ${STACK_NAME}_postgres_password"
-echo "$POSTGRES_PASSWORD" | (docker secret create "${STACK_NAME}_postgres_password" -  ) || true
-
-echo "Generating Secret: ${STACK_NAME}_dbsync_database"
-echo "$DBSYNC_DATABASE" | (docker secret create "${STACK_NAME}_dbsync_database" - ) || true
-
-echo "Generating Secret: ${STACK_NAME}_metrics_api_secret"
-echo "$metrics_api_secret" | (docker secret create "${STACK_NAME}_metrics_api_secret" - )|| true
-
-
-
-for CONFIG_FILE in $(ls ./configs_template)
-do
-    echo -n "Creating Config: ${STACK_NAME}_${CONFIG_FILE} "
-    cat "./configs/${STACK_NAME}_${CONFIG_FILE}" | docker config create "${STACK_NAME}_${CONFIG_FILE}" - || true
+# Create secrets from files
+ls ./secrets | while IFS= read -r SECRET_FILE; do
+    SECRET_NAME=$(basename "$SECRET_FILE")
+    echo -n "Creating Secret: ${STACK_NAME}_${SECRET_NAME}: "
+    cat "./secrets/$SECRET_NAME" | (docker secret create "${STACK_NAME}_${SECRET_NAME}" -) || true
 done
 
-for SECRET_FILE in $(ls ./secrets_template)
+
+# Create configs from files
+for CONFIG_FILE in $(ls ./configs)
 do
-    echo -n "Creating Secret: ${STACK_NAME}_${SECRET_FILE} "
-    cat "./secrets/${STACK_NAME}_${SECRET_FILE}" | docker secret create "${STACK_NAME}_${SECRET_FILE}" -  ||true
+    CONFIG_NAME=$(basename $CONFIG_FILE)
+    echo -n "Creating Config: ${STACK_NAME}_${CONFIG_NAME}: "
+    cat "./configs/$CONFIG_NAME" | (docker config create "${STACK_NAME}_${CONFIG_NAME}" -) || true
 done

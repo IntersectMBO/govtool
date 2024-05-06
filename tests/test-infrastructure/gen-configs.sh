@@ -63,7 +63,8 @@ mkdir -p ./secrets;
 echo -n $POSTGRES_USER > ./secrets/govtool_postgres_user
 echo -n $POSTGRES_PASSWORD > ./secrets/govtool_postgres_password
 echo -n $metrics_api_secret > ./secrets/govtool_metrics_api_secret
-
+$DBSYNC_DATABASE="${STACK_NAME}_dbsync"
+echo -n "$DBSYNC_DATABASE" > ./secrets/govtool_dbsync_database
 
 ## loop over templates and updaete them.
 
@@ -92,6 +93,9 @@ echo "$POSTGRES_USER" | (docker secret create "${STACK_NAME}_postgres_user" - ) 
 
 echo "Generating Secret: ${STACK_NAME}_postgres_password"
 echo "$POSTGRES_PASSWORD" | (docker secret create "${STACK_NAME}_postgres_password" -  ) || true
+
+echo "Generating Secret: ${STACK_NAME}_dbsync_database"
+echo "$DBSYNC_DATABASE" | (docker secret create "${STACK_NAME}_dbsync_database" - ) || true
 
 echo "Generating Secret: ${STACK_NAME}_metrics_api_secret"
 echo "$metrics_api_secret" | (docker secret create "${STACK_NAME}_metrics_api_secret" - )|| true

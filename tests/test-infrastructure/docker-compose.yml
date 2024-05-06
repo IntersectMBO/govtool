@@ -97,7 +97,7 @@ services:
   governance-action-loader-ui:
     image: voltaire-era/govtool-governance-action-loader
     build:
-      context: ../../src/gov-action-loader-fe
+      context: ../../gov-action-loader/frontend
       dockerfile: Dockerfile
     environment:
       VIRTUAL_HOST: https://governance-${BASE_DOMAIN}
@@ -118,7 +118,7 @@ services:
   governance-action-loader-api:
     image: voltaire-era/govtool-kuber-proposal-loader-proxy
     build:
-      context: ../../src/gov-action-loader-be
+      context: ../../gov-action-loader/backend
       dockerfile: Dockerfile
     environment:
       KUBER_API_URL: "http://kuber:8081"
@@ -140,6 +140,7 @@ services:
           memory: 1G
         reservations:
           memory: 500M
+
   cardano-node:
     image: ghcr.io/intersectmbo/cardano-node:8.7.1-pre
     environment:
@@ -165,8 +166,9 @@ services:
       restart_policy:
         condition: on-failure
         delay: 15s
+
   kuber:
-    image: dquadrant/kuber
+    image: dquadrant/kuber:4c3c5230db9a9b8ac84487fbc11ccd28b0cd5917-amd64
     environment:
       CARDANO_NODE_SOCKET_PATH: /ipc/node.socket
       VIRTUAL_HOST: https://kuber-${BASE_DOMAIN}

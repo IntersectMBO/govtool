@@ -12,6 +12,9 @@ secrets:
   metrics_api_secret_token:
     external: true
     name: ${STACK_NAME}_metrics_api_secret
+  dbsync_database:
+      external: true
+      name: ${STACK_NAME}_dbsync_database
 
 ## secrets syntax for docker compose stack
 # secrets:
@@ -31,6 +34,7 @@ volumes:
   sonar_logs:
   node_data:
   node_ipc:
+  dbsync_data:
 
 networks:
   postgres:
@@ -142,7 +146,7 @@ services:
           memory: 500M
 
   cardano-node:
-    image: ghcr.io/intersectmbo/cardano-node:8.7.1-pre
+    image: ghcr.io/intersectmbo/cardano-node:8.10.0-pre
     environment:
       NETWORK: sanchonet
     volumes:
@@ -166,7 +170,39 @@ services:
       restart_policy:
         condition: on-failure
         delay: 15s
-
+  dbsync:
+    image: ghcr.io/intersectmbo/cardano-db-sync:sancho-4-2-1
+    networks:
+      - postgres
+    environment:
+      NETWORK: sanchonet
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      DISABLE_CACHE: ""
+      DISABLE_LEDGER: ""
+      DISABLE_EPOCH: ""
+    secrets:
+      - postgres_user
+      - source: dbsync_database
+        target: postgres_db
+      - postgres_password
+    volumes:
+      - dbsync_data:/var/lib/cexplorer
+      - node_ipc:/node-ipc
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    deploy:
+      labels:
+        "co_elastic_logs/enable": "false"
+      placement:
+        constraints:
+          - node.labels.govtool-test-stack == true
+      restart_policy:
+        condition: on-failure
+        delay: 15s
   kuber:
     image: dquadrant/kuber:4c3c5230db9a9b8ac84487fbc11ccd28b0cd5917-amd64
     environment:

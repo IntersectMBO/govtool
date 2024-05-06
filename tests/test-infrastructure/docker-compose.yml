@@ -39,50 +39,13 @@ networks:
     external: true
 
 services:
-  metabase:
-    image: metabase/metabase:v0.46.6.2
-    hostname: metabase
-    volumes:
-    - /dev/urandom:/dev/random:ro
-    environment:
-      VIRTUAL_HOST: https://metabase.${BASE_DOMAIN}
-      MB_DB_TYPE: postgres
-      MB_DB_DBNAME: ${STACK_NAME}_metabase
-      MB_DB_PORT: 5432
-      MB_DB_USER_FILE: /run/secrets/postgres_user
-      MB_DB_PASS_FILE: /run/secrets/postgres_password
-      MB_DB_HOST: postgres
-    networks:
-      - postgres
-      - frontend
-    secrets:
-      - postgres_password
-      - postgres_user
-    deploy:
-      placement:
-        constraints:
-          - node.labels.govtool-test-stack == true
-      restart_policy:
-        delay: "30s"
-      resources:
-        limits:
-          memory: 3G
-        reservations:
-          memory: 1.8G
-
-    healthcheck:
-      test: curl --fail -I http://localhost:3000/api/health || exit 1
-      interval: 15s
-      timeout: 5s
-      retries: 5
-
   metrics_api:
     image: voltaire-era/govtool-metrics-api
     build:
       context: ../test-metrics-api
 
     environment:
-      VIRTUAL_HOST: https://metrics.${BASE_DOMAIN}/ -> :3000/
+      VIRTUAL_HOST: https://metrics-${BASE_DOMAIN}/ -> :3000/
       PGHOST: postgres
       PGDATABASE: ${STACK_NAME}_metrics
     secrets:
@@ -110,7 +73,7 @@ services:
   lhci-server:
     image: patrickhulce/lhci-server:0.12.0
     environment:
-      VIRTUAL_HOST: https://lighthouse.${BASE_DOMAIN} -> :9001
+      VIRTUAL_HOST: https://lighthouse-${BASE_DOMAIN} -> :9001
     volumes:
       - lhci_data:/data
     secrets:
@@ -137,7 +100,7 @@ services:
       context: ../../src/gov-action-loader-fe
       dockerfile: Dockerfile
     environment:
-      VIRTUAL_HOST: https://govtool-governance.${BASE_DOMAIN}
+      VIRTUAL_HOST: https://governance-${BASE_DOMAIN}
     networks:
       - frontend
     deploy:
@@ -162,7 +125,7 @@ services:
       KUBER_API_KEY: ""
       BLOCKFROST_API_URL: "${BLOCKFROST_API_URL}"
       BLOCKFROST_PROJECT_ID: "${BLOCKFROST_PROJECT_ID}"
-      VIRTUAL_HOST: https://govtool-governance.${BASE_DOMAIN}/api/ -> /api/
+      VIRTUAL_HOST: https://governance-${BASE_DOMAIN}/api/ -> /api/
     networks:
       - default
       - frontend
@@ -177,33 +140,6 @@ services:
           memory: 1G
         reservations:
           memory: 500M
-
-  sonarqube_server:
-    image: mc1arke/sonarqube-with-community-branch-plugin:9.9-community
-    networks:
-      - frontend
-      - postgres
-    environment:
-      SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/${STACK_NAME}_sonarqube
-      VIRTUAL_HOST:	https+wss://sonarqube.${BASE_DOMAIN} -> :9000
-      SONAR_JDBC_USERNAME: postgres
-    volumes:
-      - sonar_data:/opt/sonarqube/data
-      - sonar_logs:/opt/sonarqube/logs
-    entrypoint: "sh -c 'SONAR_JDBC_PASSWORD=\"$$( cat /run/secrets/postgres_password )\" /opt/sonarqube/docker/entrypoint.sh'"
-    secrets:
-      - postgres_password
-    deploy:
-      placement:
-        constraints:
-          - node.labels.govtool-test-stack == true
-      restart_policy:
-        delay: 15s
-      resources:
-        limits:
-          memory: 3.5G
-        reservations:
-          memory: 2.2G
   cardano-node:
     image: ghcr.io/intersectmbo/cardano-node:8.7.1-pre
     environment:
@@ -233,7 +169,7 @@ services:
     image: dquadrant/kuber
     environment:
       CARDANO_NODE_SOCKET_PATH: /ipc/node.socket
-      VIRTUAL_HOST: https://kuber.${BASE_DOMAIN}
+      VIRTUAL_HOST: https://kuber-${BASE_DOMAIN}
       NETWORK: 4
       START_ERA: CONWAY
     volumes:

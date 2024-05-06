@@ -47,7 +47,7 @@ export const WhatRetirementMeans = ({
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
         type: "retireAsDrep",
-        voterDeposit: voter?.deposit.toString(),
+        voter,
       });
       if (result) {
         openModal({

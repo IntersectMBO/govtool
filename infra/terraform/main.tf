@@ -36,6 +36,11 @@ module "govtool-ecr-metadata-validation" {
   repo_name = "metadata-validation"
 }
 
+module "govtool-ecr-analytics-dashboard" {
+  source    = "./modules/ecr"
+  repo_name = "analytics-dashboard"
+}
+
 resource "aws_iam_policy" "cicd_ecr" {
   name = "CICD_ECR"
   policy = jsonencode({
@@ -51,7 +56,8 @@ resource "aws_iam_policy" "cicd_ecr" {
           module.govtool-ecr-backend-base.repo_arn,
           module.govtool-ecr-frontend.repo_arn,
           module.govtool-ecr-status-service.repo_arn,
-          module.govtool-ecr-metadata-validation.repo_arn
+          module.govtool-ecr-metadata-validation.repo_arn,
+          module.govtool-ecr-analytics-dashboard.repo_arn
         ]
       },
       {
@@ -123,6 +129,10 @@ output "govtool-ecr-status-service-url" {
 
 output "govtool-ecr-metadata-validation-url" {
   value = module.govtool-ecr-metadata-validation.repo_url
+}
+
+output "govtool-ecr-analytics-dashboard-url" {
+  value = module.govtool-ecr-analytics-dashboard.repo_url
 }
 
 output "govtool-dev-sanchonet-frontend-domain" {

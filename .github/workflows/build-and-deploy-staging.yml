@@ -20,19 +20,25 @@ jobs:
         working-directory: ./scripts/govtool
     env:
       DBSYNC_POSTGRES_DB: "cexplorer"
-      DBSYNC_POSTGRES_USER: "postgres"
       DBSYNC_POSTGRES_PASSWORD: "pSa8JCpQOACMUdGb"
+      DBSYNC_POSTGRES_USER: "postgres"
+      GA_CLIENT_EMAIL: ${{ secrets.GA_CLIENT_EMAIL }}
+      GA_PRIVATE_KEY: ${{ secrets.GA_PRIVATE_KEY }}
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
-      GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
       GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
-      NGINX_BASIC_AUTH: ${{ secrets.NGINX_BASIC_AUTH }}
-      SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
-      TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
+      GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
       GTM_ID: ${{ secrets.GTM_ID }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
-      PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       IP_ADDRESS_BYPASSING_BASIC_AUTH1: ${{ secrets.IP_ADDRESS_BYPASSING_BASIC_AUTH1 }}
       IP_ADDRESS_BYPASSING_BASIC_AUTH2: ${{ secrets.IP_ADDRESS_BYPASSING_BASIC_AUTH2 }}
+      NEXT_PUBLIC_API_URL: "https://staging.govtool.byron.network/api"
+      NEXT_PUBLIC_GA4_PROPERTY_ID: ${{ secrets.NEXT_PUBLIC_GA4_PROPERTY_ID }}
+      NGINX_BASIC_AUTH: ${{ secrets.NGINX_BASIC_AUTH }}
+      PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
+      SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
+      SENTRY_IGNORE_API_RESOLUTION_ERROR: "1"
+      TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
       USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
     steps:
       - name: Checkout code

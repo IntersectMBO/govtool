@@ -7,7 +7,7 @@ GRAFANA_USERNAME = environ['GRAFANA_USERNAME']
 GRAFANA_PASSWORD = environ['GRAFANA_PASSWORD']
 
 alert_health_mapping = {
-    'Inactive': 'healthy',
+    'inactive': 'healthy',
     'pending': 'warning',
     'firing': 'not healthy'
 }

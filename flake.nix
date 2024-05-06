@@ -9,12 +9,12 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         defaultPkgs = import default_nixpkgs { inherit system; config.allowBroken = true; };
-        nodePkgs = import node_nixpkgs { inherit system; };
+        nodePkgs = import node_nixpkgs { inherit system; config.allowUnfree = true; };
         frontend = nodePkgs.callPackage ./govtool/frontend { pkgs = nodePkgs; };
       in
       {
-        packages.scripts = defaultPkgs.callPackage ./scripts/govtool { pkgs = defaultPkgs; };
-        packages.infra = defaultPkgs.callPackage ./infra/terraform { pkgs = defaultPkgs; };
+        packages.scripts = defaultPkgs.callPackage ./scripts/govtool { pkgs = nodePkgs; };
+        packages.infra = defaultPkgs.callPackage ./infra/terraform { pkgs = nodePkgs; };
         packages.backend = defaultPkgs.callPackage ./govtool/backend { pkgs = defaultPkgs; };
         packages.frontendModules = frontend.nodeModules;
         packages.frontend = frontend.staticSite;

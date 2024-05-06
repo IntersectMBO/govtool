@@ -1,0 +1,4 @@
+Host DOCKER_HOST
+	ControlMaster     auto
+	ControlPath       ~/.ssh/control-%C
+	ControlPersist    yes

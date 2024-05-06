@@ -138,7 +138,7 @@ direnv allow
 yarn dev
 ```
 
-*To update the yarn.lock file after changes are made, run `nix develop .#js` for a developer shell with correct yarn/nodejs versions*
+_To update the yarn.lock file after changes are made, run `nix develop .#js` for a developer shell with correct yarn/nodejs versions_
 
 ## After development
 
@@ -159,7 +159,7 @@ We distinguish two types of users:
 1.  See the governance actions along with their details and the number of votes.
 2.  Display the wallet status.
 3.  Delegate his or her voting power in a form of ADA to dReps.
-4.  Register as DRrep or Sole Voter.
+4.  Register as DRrep or Direct Voter.
 5.  Vote for the Governance Actions of his or her choice (if the user is registered).
 6.  Create their own Governance Action.
 <!-- 7. See the list of DReps from which they can submit their vote. -->

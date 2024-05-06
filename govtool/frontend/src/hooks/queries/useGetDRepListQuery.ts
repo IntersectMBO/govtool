@@ -29,9 +29,9 @@ export const useGetDRepListInfiniteQuery = (
     [
       QUERY_KEYS.useGetDRepListInfiniteKey,
       (
-        pendingTransaction.registerAsSoleVoter ||
+        pendingTransaction.registerAsDirectVoter ||
         pendingTransaction.registerAsDrep ||
-        pendingTransaction.retireAsSoleVoter ||
+        pendingTransaction.retireAsDirectVoter ||
         pendingTransaction.retireAsDrep
       )?.transactionHash,
       filters,

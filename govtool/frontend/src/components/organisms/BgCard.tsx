@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 
-import { Button, LoadingButton } from "@atoms";
+import { Button } from "@atoms";
 import { PATHS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { theme } from "@/theme";
@@ -50,7 +50,7 @@ export const BgCard = ({
 
   const renderContinueButton = useMemo(
     () => (
-      <LoadingButton
+      <Button
         data-testid="retire-button"
         disabled={isActionButtonDisabled}
         isLoading={isLoadingActionButton}
@@ -62,7 +62,7 @@ export const BgCard = ({
         variant="contained"
       >
         {actionButtonLabel}
-      </LoadingButton>
+      </Button>
     ),
     [
       actionButtonLabel,

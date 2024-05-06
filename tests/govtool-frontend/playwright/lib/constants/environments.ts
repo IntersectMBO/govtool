@@ -1,6 +1,6 @@
 const environments = {
-  frontendUrl: process.env.HOST_URL || "http://localhost:5173",
-  apiUrl: `${process.env.HOST_URL}/api` || "http://localhost:9999",
+  frontendUrl: process.env.HOST_URL || "http://localhost:8080",
+  apiUrl: `${process.env.HOST_URL}/api` || "http://localhost:8080/api",
   docsUrl: process.env.DOCS_URL || "https://docs.sanchogov.tools",
   networkId: parseInt(process.env.NETWORK_ID) || 0,
   oneTimeWalletSetup: process.env.ONE_TIME_WALLET_SETUP === "true" || false,

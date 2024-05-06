@@ -1,5 +1,6 @@
 import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
+import { isMobile, openDrawerLoggedIn } from "@helpers/mobile";
 import removeAllSpaces from "@helpers/removeAllSpaces";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
@@ -26,6 +27,9 @@ test("4A.1: Should access Governance Actions page with connecting wallet @smoke 
   page,
 }) => {
   await page.goto("/");
+  if (isMobile(page)) {
+    await openDrawerLoggedIn(page);
+  }
 
   await page.getByTestId("governance-actions-link").click();
   await expect(page.getByText(/Governance Actions/i)).toHaveCount(2);

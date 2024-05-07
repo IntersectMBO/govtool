@@ -80,6 +80,7 @@ export const usePendingTransaction = ({
 
       if (status.transactionConfirmed) {
         clearInterval(interval);
+
         if (isEnabled) {
           const desiredResult = getDesiredResult(type, resourceId);
           const queryKey = getQueryKey(type, transaction);
@@ -89,7 +90,13 @@ export const usePendingTransaction = ({
           while (!isDBSyncUpdated && count < DB_SYNC_MAX_ATTEMPTS) {
             count++;
             // eslint-disable-next-line no-await-in-loop
-            const data = await refetchData(type, queryClient, queryKey);
+            const data = await refetchData(
+              type,
+              queryClient,
+              queryKey,
+              resourceId,
+            );
+
             if (desiredResult === data) {
               addSuccessAlert(t(`alerts.${type}.success`));
               resetTransaction();

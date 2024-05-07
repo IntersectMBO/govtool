@@ -16,7 +16,8 @@ secrets:
       external: true
       name: ${STACK_NAME}_dbsync_database
 
-## secrets syntax for docker compose stack
+# secrets syntax for docker compose stack
+##
 # secrets:
 #   postgres_user:
 #     file:  "./secrets/${STACK_NAME}_postgres_user"

@@ -1,0 +1,51 @@
+version: "3.9"
+networks:
+  frontend:
+    external: true
+  postgres:
+    external: true
+configs:
+  config.json:
+    name: govtool_backend_config.json
+    external: true
+services:
+  backend:
+    image: govtool/backend
+    build:
+      context: ../../govtool/backend
+      args:
+        BASE_IMAGE_TAG: govtool/backend-base
+    entrypoint:
+      - sh
+      - -c
+      - vva-be -c /config.json start-app
+    environment:
+      VIRTUAL_HOST: https://${BASE_DOMAIN} -> :8080
+      VIRTUAL_HOST_2: https://${BASE_DOMAIN}/swagger -> :8080/swagger
+      VIRTUAL_HOST_3: https://${BASE_DOMAIN}/api/ -> :8080/
+
+    networks:
+      - frontend
+      - postgres
+    configs:
+      - config.json
+    deploy:
+      restart_policy:
+        delay: "30s"
+      placement:
+        constraints:
+          - node.labels.govtool==true
+  frontend:
+    image: govtool/frontend
+    build:
+      context: ../../govtool/frontend
+    environment:
+      VIRTUAL_HOST: https://${BASE_DOMAIN}
+    networks:
+      - frontend
+    deploy:
+      restart_policy:
+        delay: "30s"
+      placement:
+        constraints:
+          - node.labels.govtool==true

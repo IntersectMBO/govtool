@@ -76,12 +76,8 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
     <>
       <LinkWithIcon
         data-testid="back-to-list-button"
-        label={t("backToList")}
-        onClick={() =>
-          navigate(
-            isConnected ? PATHS.dashboardDRepDirectory : PATHS.dRepDirectory,
-          )
-        }
+        label={t("back")}
+        onClick={() => navigate(-1)}
         sx={{ mb: 2 }}
       />
       <Card

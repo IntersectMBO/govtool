@@ -11,15 +11,6 @@ configs:
     external: true
     name: ${STACK_NAME}_postgres_db_setup.sql
 
-### secrets and configs in docker compose
-# secrets:
-#   postgres_user:
-#     file:  "./secrets/${STACK_NAME}_postgres_user"
-#   postgres_password:
-#     file: "./secrets/${STACK_NAME}_postgres_password"
-# configs:
-#   postgres_db_setup.sql:
-#     file: "./configs/${STACK_NAME}_postgres_db_setup.sql"
 volumes:
   postgres:
   nginx_dhparam:

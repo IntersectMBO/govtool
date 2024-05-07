@@ -5,9 +5,8 @@
 ##   ./deploy-swarm prepare
 ##
 set -eo pipefail
-set -a
-. ./.env
-set +a
+. ./scripts/deploy-stack.sh
+load_env
 
 if [ "$1" == "destroy" ]
 then
@@ -33,15 +32,14 @@ elif [ "$1" == "prepare" ]
 then
     ## apply the enviroment to services compose file
     ## and deploy the stack
-    envsubst < ./docker-compose-services.yml  > ./docker-compose-services-rendered.yml
-    docker stack deploy -c './docker-compose-services-rendered.yml' ${STACK_NAME}-services
+    deploy-stack ${STACK_NAME}-services './docker-compose-services-rendered.yml'
 
 elif [ "$1" == "finalize" ]
 then
     ## apply the environment to compose file
     ## deploy the govtool test infrastructure stack
-    envsubst < ./docker-compose.yml  > ./docker-compose-rendered.yml
-    docker stack deploy -c './docker-compose-rendered.yml' ${STACK_NAME}
+    deploy-stack ${STACK_NAME}  './docker-compose-rendered.yml'
+
 else
     echo "Something is wrong with the command"
     echo

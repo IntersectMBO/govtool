@@ -5,7 +5,7 @@ The WalletService.ts file contains the implementation of a wallet service, desig
 1. Install wallet-connector package.
 
 ```sh
-yarn install wallet-connector
+yarn add wallet-connector
 ```
 
 2. Import service from wallet-connector.
@@ -28,7 +28,7 @@ WalletProvider component which serves as a React Context Provider to facilitate 
 1. Install wallet-connector package
 
 ```sh
-yarn install wallet-connector
+yarn add wallet-connector
 ```
 
 2. Import WalletProvider from wallet-connector and wrap your app.

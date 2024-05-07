@@ -83,7 +83,9 @@ export const DRepCard = ({
             }}
           >
             <Box minWidth={0} display="flex" flexDirection="column">
-              <Typography sx={ellipsisStyles}>{type}</Typography>
+              <Typography sx={ellipsisStyles}>
+                {type === "SoleVoter" ? t("dRepDirectory.directVoter") : type}
+              </Typography>
               <ButtonBase
                 data-testid={`${view}-copy-id-button`}
                 onClick={(e) => {
@@ -177,7 +179,6 @@ export const DRepCard = ({
           {status === "Active" &&
             isConnected &&
             onDelegate &&
-            !isMe &&
             !isInProgress && (
               <Button
                 data-testid={`${view}-delegate-button`}

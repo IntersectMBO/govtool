@@ -1,0 +1,56 @@
+version: "3.9"
+
+networks:
+  frontend:
+    external: true
+  cardano:
+    external: true
+
+services:
+
+  governance-action-loader-ui:
+    image: govtool/gov-action-loader-frontend
+    build:
+      context: ../../gov-action-loader/frontend
+      dockerfile: Dockerfile
+    environment:
+      VIRTUAL_HOST: https://governance-${BASE_DOMAIN}
+    networks:
+      - frontend
+    deploy:
+      placement:
+        constraints:
+          - node.labels.govtool-test-stack == true
+      restart_policy:
+        delay: "30s"
+      resources:
+        limits:
+          memory: 500M
+        reservations:
+          memory: 100M
+
+  governance-action-loader-api:
+    image: govtool/gov-action-loader-backend
+    build:
+      context: ../../gov-action-loader/backend
+      dockerfile: Dockerfile
+    environment:
+      KUBER_API_URL: "http://kuber:8081"
+      KUBER_API_KEY: ""
+      BLOCKFROST_API_URL: "${BLOCKFROST_API_URL}"
+      BLOCKFROST_PROJECT_ID: "${BLOCKFROST_PROJECT_ID}"
+      VIRTUAL_HOST: https://governance-${BASE_DOMAIN}/api/ -> /api/
+    networks:
+      - default
+      - frontend
+    deploy:
+      placement:
+        constraints:
+          - node.labels.govtool-test-stack == true
+      restart_policy:
+        delay: "30s"
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 500M

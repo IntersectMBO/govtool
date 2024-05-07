@@ -33,13 +33,13 @@ elif [ "$1" == "prepare" ]
 then
     ## apply the enviroment to services compose file
     ## and deploy the stack
-    deploy-stack ${STACK_NAME}-services './docker-compose-services.yml'
+    deploy-stack ${STACK_NAME}-services './docker-compose-basic-services.yml'
 
 elif [ "$1" == "finalize" ]
 then
     ## apply the environment to compose file
     ## deploy the govtool test infrastructure stack
-    deploy-stack ${STACK_NAME}-base  './docker-compose.yml'
+    deploy-stack ${STACK_NAME}-base  './docker-compose-cardano.yml'
 elif [ "$1" == 'stack' ]
 then
    if [ "$#" -ne 2 ]
@@ -47,17 +47,18 @@ then
      echo 'stack requires the stack name "govtool" | "services" | "test"'
   else
      case "$2" in
-       govtool)
-         deploy-stack ${STACK_NAME}  './docker-compose.yml'
-         ;;
-       services)
-         deploy-stack ${STACK_NAME}-services  './docker-compose.yml'
-         ;;
-       base)
-         deploy-stack ${STACK_NAME}-base  './docker-compose.yml'
+       all)
+        for DEPLOY_STACK in "basic-services" "cardano" "govaction-loader" "govtool" "test"; do
+          deploy-stack $DEPLOY_STACK  "docker-compose-$DEPLOY_STACK.yml"
+        done
          ;;
        *)
-         echo 'Invalid stack name. Valid options are "base", "services", or "govtool"'
+         if [[ ! -f ./"docker-compose-$2.yml" ]]
+         then
+          echo "Invalid stack name. $2"
+         else
+          deploy-stack $2  "docker-compose-$2.yml"
+         fi
          ;;
      esac
   fi

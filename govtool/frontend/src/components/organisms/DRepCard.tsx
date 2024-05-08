@@ -168,6 +168,7 @@ export const DRepCard = ({
                     ? PATHS.dashboardDRepDirectoryDRep
                     : PATHS.dRepDirectoryDRep
                   ).replace(":dRepId", view),
+                  { state: { enteredFromWithinApp: true } },
                 )
               }
             >

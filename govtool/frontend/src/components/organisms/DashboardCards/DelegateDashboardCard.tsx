@@ -104,6 +104,7 @@ export const DelegateDashboardCard = ({
           ":dRepId",
           displayedDelegationId || "",
         ),
+        { state: { enteredFromWithinApp: true } },
       ),
     [displayedDelegationId],
   );

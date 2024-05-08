@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "baseUrl": "./", // This must be specified if "paths" is.
+    "paths": {
+      "@mock/*": ["lib/_mock/*"],
+      "@fixtures/*": ["lib/fixtures/*"],
+      "@helpers/*": ["lib/helpers/*"],
+      "@pages/*": ["lib/pages/*"],
+      "@services/*": ["lib/services/*"],
+      "@types": ["lib/types.ts"],
+      "@constants/*": ["lib/constants/*"],
+      "@datafactory/*": ["lib/datafactory/*"]
+    }
+  }
+}

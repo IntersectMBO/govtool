@@ -32,16 +32,16 @@ if [ "$1" == "clean" ]; then
     for SECRET_FILE in $(ls ./secrets)
     do
         SECRET_NAME="$(basename $SECRET_FILE)"
-        echo -n "Removing secret: ${STACK_NAME}_${SECRET_NAME}"
-        docker secret rm "${STACK_NAME}_${SECRET_NAME}" || true
+        echo -n "Removing secret: ${PROJECT_NAME}_${SECRET_NAME}"
+        docker secret rm "${PROJECT_NAME}_${SECRET_NAME}" || true
     done
 
     # Create configs from files
     for CONFIG_FILE in $(ls ./configs)
     do
         CONFIG_NAME=$(basename $CONFIG_FILE)
-        echo -n "Removing config: ${STACK_NAME}_${CONFIG_NAME}"
-        docker config rm "${STACK_NAME}_${CONFIG_NAME}" || true
+        echo -n "Removing config: ${PROJECT_NAME}_${CONFIG_NAME}"
+        docker config rm "${PROJECT_NAME}_${CONFIG_NAME}" || true
     done
 
     set -x
@@ -59,7 +59,7 @@ mkdir -p ./secrets;
 
 # Generate random secrets
 export POSTGRES_USER=postgres
-export DBSYNC_DATABASE="${STACK_NAME}_dbsync"
+export DBSYNC_DATABASE="${PROJECT_NAME}_dbsync"
 
 # Save secrets to files
 echo -n $POSTGRES_USER > ./secrets/postgres_user
@@ -71,13 +71,13 @@ generate_secret "POSTGRES_PASSWORD" "./secrets/postgres_password"
 ## loop over templates and update them.
 for CONFIG_FILE in $(ls ./configs_template)
 do
-    echo -n "Config ${STACK_NAME}_${CONFIG_FILE}: "
+    echo -n "Config ${PROJECT_NAME}_${CONFIG_FILE}: "
     envsubst < "./configs_template/$CONFIG_FILE"   > "./configs/${CONFIG_FILE}"
 done
 
 for SECRET_FILE in $(ls ./secrets_template)
 do
-    echo -n "Secret ${STACK_NAME}_${SECRET_FILE}: "
+    echo -n "Secret ${PROJECT_NAME}_${SECRET_FILE}: "
     envsubst < "./secrets_template/$SECRET_FILE" > "./secrets/${SECRET_FILE}"
 done
 
@@ -90,8 +90,8 @@ docker info | grep 'Swarm: active' > /dev/null 2>/dev/null || exit 0
 # Create secrets from files
 ls ./secrets | while IFS= read -r SECRET_FILE; do
     SECRET_NAME=$(basename "$SECRET_FILE")
-    echo -n "Secret: ${STACK_NAME}_${SECRET_NAME}: "
-    cat "./secrets/$SECRET_NAME" | (docker secret create "${STACK_NAME}_${SECRET_NAME}" -) || true
+    echo -n "Secret: ${PROJECT_NAME}_${SECRET_NAME}: "
+    cat "./secrets/$SECRET_NAME" | (docker secret create "${PROJECT_NAME}_${SECRET_NAME}" -) || true
 done
 
 
@@ -99,6 +99,6 @@ done
 for CONFIG_FILE in $(ls ./configs)
 do
     CONFIG_NAME=$(basename $CONFIG_FILE)
-    echo -n "Config: ${STACK_NAME}_${CONFIG_NAME}: "
-    cat "./configs/$CONFIG_NAME" | (docker config create "${STACK_NAME}_${CONFIG_NAME}" -) || true
+    echo -n "Config: ${PROJECT_NAME}_${CONFIG_NAME}: "
+    cat "./configs/$CONFIG_NAME" | (docker config create "${PROJECT_NAME}_${CONFIG_NAME}" -) || true
 done

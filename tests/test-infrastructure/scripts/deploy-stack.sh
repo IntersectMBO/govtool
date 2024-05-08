@@ -7,11 +7,49 @@
 set -eo pipefail
 
 function load_env(){
-  set -a
-  . ./.env
-  set +a
+  if  [[ -f ./.env ]]
+  then
+    set -a
+    . ./.env
+    set +a
+  fi
+  check_env
 }
 
+
+function check_env(){
+
+    # Path to the .env.example file
+    EXAMPLE_FILE=".env.example"
+
+    unset_keys=()
+
+    # Read each line of the .env.example file
+    while IFS= read -r line || [ -n "$line" ]; do
+        # Skip empty lines
+        if [ -z "$line" ]; then
+            continue
+        fi
+
+        line=$(echo "$line" | sed -e 's/^[[:space:]]*//')
+
+        # Extract the key from each line
+        key=$(echo "$line" | cut -d'=' -f1)
+
+        if [ -z "${!key}" ]; then
+            unset_keys+=("$key")
+        fi
+    done < "$EXAMPLE_FILE"
+
+    # Print error message for unset keys
+    if [ ${#unset_keys[@]} -gt 0 ]; then
+        echo "The following keys are not set in the environment:"
+        for key in "${unset_keys[@]}"; do
+            echo "- $key"
+        done
+        exit 1
+    fi
+}
 function deploy-stack(){
       echo "++ deploy-stack" "$@"
       ## apply the environment to compose file

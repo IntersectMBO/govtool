@@ -50,6 +50,7 @@ export const AutomatedVotingCard = ({
         mt: inProgress || isSelected ? 2 : 0,
         py: 2.25,
       }}
+      data-testid={`${testIdLabel}-card`}
     >
       <Box
         sx={{

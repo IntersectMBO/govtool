@@ -85,6 +85,7 @@ export const WhatRetirementMeans = ({
   return (
     <BgCard
       actionButtonLabel={t("retirement.continue")}
+      actionButtonDataTestId="continue-retirement-button"
       backButtonLabel={t("cancel")}
       isLoadingActionButton={isRetirementLoading}
       onClickActionButton={retireAsDrep}

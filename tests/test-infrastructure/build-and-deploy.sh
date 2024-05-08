@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 BASE_IMAGE_NAME=govtool
 export GOVTOOL_TAG="$(git rev-parse HEAD)"

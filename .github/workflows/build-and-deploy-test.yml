@@ -14,9 +14,6 @@ jobs:
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./tests/test-infrastructure
     env:
       DOCKER_HOST: ssh://ec2-user@${{secrets.TEST_STACK_SERVER_IP }}
       GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
@@ -40,5 +37,9 @@ jobs:
           ssh-private-key: ${{ secrets.TEST_STACK_SSH_KEY }}
 
       - name: Update images
+        working-directory: "./tests/test-infrastructure"
         run: |
+          pwd
+          ls
+          set +x
           ./build-and-deploy.sh update-images

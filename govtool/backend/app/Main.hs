@@ -70,8 +70,10 @@ import           VVA.API.Types
 import           VVA.CommandLine
 import           VVA.Config
 import           VVA.Types                              (AppEnv (..),
-                                                         AppError (CriticalError, NotFoundError, ValidationError),
+                                                         AppError (CriticalError, NotFoundError, ValidationError, InternalError),
                                                          CacheEnv (..))
+import Network.HTTP.Client hiding (Proxy, Request)
+import Network.HTTP.Client.TLS
 
 proxyAPI :: Proxy (VVAApi :<|> SwaggerAPI)
 proxyAPI = Proxy
@@ -113,6 +115,7 @@ startApp vvaConfig = do
     dRepVotingPowerCache <- newCache
     dRepListCache <- newCache
     networkMetricsCache <- newCache
+    metadataValidationCache <- newCache
     return $ CacheEnv
       { proposalListCache
       , getProposalCache
@@ -124,10 +127,12 @@ startApp vvaConfig = do
       , dRepVotingPowerCache
       , dRepListCache
       , networkMetricsCache
+      , metadataValidationCache
       }
   connectionPool <- createPool (connectPostgreSQL (encodeUtf8 (dbSyncConnectionString $ getter vvaConfig))) close 1 1 60
+  vvaTlsManager <- newManager tlsManagerSettings
 
-  let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool}
+  let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool, vvaTlsManager}
   server' <- mkVVAServer appEnv
   runSettings settings server'
 
@@ -252,7 +257,7 @@ liftServer appEnv =
     handleErrors (Left (ValidationError msg)) = throwError $ err400 { errBody = BS.fromStrict $ encodeUtf8 msg }
     handleErrors (Left (NotFoundError msg)) = throwError $ err404 { errBody = BS.fromStrict $ encodeUtf8 msg }
     handleErrors (Left (CriticalError msg)) = throwError $ err500 { errBody = BS.fromStrict $ encodeUtf8 msg }
-
+    handleErrors (Left (InternalError msg)) = throwError $ err500 { errBody = BS.fromStrict $ encodeUtf8 msg }
 -- * Swagger
 
 type SwaggerAPI = SwaggerSchemaUI "swagger-ui" "swagger.json"

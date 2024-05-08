@@ -98,7 +98,8 @@ library
                , data-has
                , resource-pool
                , swagger2
-
+               , http-client
+               , http-client-tls
 
   exposed-modules: VVA.Config
                  , VVA.CommandLine
@@ -114,3 +115,4 @@ library
                  , VVA.Pool
                  , VVA.Types
                  , VVA.Network
+                 , VVA.Metadata

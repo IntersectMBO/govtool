@@ -41,5 +41,5 @@ jobs:
         run: |
           pwd
           ls
-          set +x
+          set -x;
           ./build-and-deploy.sh update-images

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## Docker swarm doesn't read .env file.
 ## This script reads env file and variables
 ## and apply them to compose file and
@@ -47,7 +47,8 @@ function check_env(){
         for key in "${unset_keys[@]}"; do
             echo "- $key"
         done
-        exit 1
+        echo  " Exiting due to missing env variables"
+        exit 2
     fi
 }
 function deploy-stack(){

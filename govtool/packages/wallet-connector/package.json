@@ -1,6 +1,6 @@
 {
-  "name": "wallet-connector",
-  "version": "1.0.0",
+  "name": "govtool-wallet-connector",
+  "version": "0.0.1",
   "main": "index.ts",
   "license": "MIT",
   "dependencies": {

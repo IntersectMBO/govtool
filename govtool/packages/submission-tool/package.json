@@ -1,6 +1,6 @@
 {
-  "name": "submission-tool",
-  "packageManager": "yarn@3.6.4",
+  "name": "govtool-submission-tool",
+  "version": "0.0.1",
   "scripts": {
     "test": "jest"
   },

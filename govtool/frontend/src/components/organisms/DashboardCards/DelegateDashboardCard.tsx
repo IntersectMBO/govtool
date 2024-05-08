@@ -86,7 +86,7 @@ export const DelegateDashboardCard = ({
       buttons: [
         {
           children: t("dashboard.cards.delegation.noDelegationActionButton"),
-          dataTestId: "delegate-button",
+          dataTestId: "view-drep-directory-button",
           onClick: () => navigate(PATHS.dashboardDRepDirectory),
           variant: "contained",
         },

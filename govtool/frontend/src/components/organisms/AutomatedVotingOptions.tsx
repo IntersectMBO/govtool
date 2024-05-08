@@ -74,7 +74,10 @@ export const AutomatedVotingOptions = ({
           />
         )}
       </AccordionSummary>
-      <AccordionDetails sx={{ p: { xxs: 2, md: 3 }, pt: { xxs: 0, md: 0 } }}>
+      <AccordionDetails
+        sx={{ p: { xxs: 2, md: 3 }, pt: { xxs: 0, md: 0 } }}
+        data-testid="delegation-options-dropdown"
+      >
         <Box
           sx={{
             display: "flex",

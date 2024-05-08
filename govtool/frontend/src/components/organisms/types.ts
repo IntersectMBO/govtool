@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction } from "react";
 
 export type BgCardProps = {
   actionButtonLabel: string;
+  actionButtonDataTestId?: string;
   backButtonLabel?: string;
   children: React.ReactNode;
   isLoadingActionButton?: boolean;

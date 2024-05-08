@@ -11,6 +11,7 @@ import { BgCardProps } from "./types";
 
 export const BgCard = ({
   actionButtonLabel,
+  actionButtonDataTestId,
   backButtonLabel,
   children,
   isLoadingActionButton,
@@ -51,7 +52,7 @@ export const BgCard = ({
   const renderContinueButton = useMemo(
     () => (
       <Button
-        data-testid="retire-button"
+        data-testid={actionButtonDataTestId ?? "continue-button"}
         disabled={isActionButtonDisabled}
         isLoading={isLoadingActionButton}
         onClick={onClickActionButton}

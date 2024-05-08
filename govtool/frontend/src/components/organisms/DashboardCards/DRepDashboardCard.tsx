@@ -144,7 +144,7 @@ export const DRepDashboardCard = ({
     >
       {voter?.isRegisteredAsDRep && !pendingTransaction?.retireAsDrep && (
         <CopyableInfo
-          dataTestId="my-drep-id"
+          dataTestId="dRep-id-display-card-dashboard"
           label={t("dashboard.cards.drep.yourDRepId")}
           sx={{ mt: 1 }}
           value={dRepIDBech32}

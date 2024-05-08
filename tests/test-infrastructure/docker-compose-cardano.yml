@@ -2,13 +2,13 @@ version: "3.9"
 secrets:
   postgres_user:
     external: true
-    name:  ${STACK_NAME}_postgres_user
+    name:  ${PROJECT_NAME}_postgres_user
   postgres_password:
     external: true
-    name:  ${STACK_NAME}_postgres_password
+    name:  ${PROJECT_NAME}_postgres_password
   dbsync_database:
       external: true
-      name: ${STACK_NAME}_dbsync_database
+      name: ${PROJECT_NAME}_dbsync_database
 
 volumes:
   node_data:
@@ -25,10 +25,10 @@ networks:
     name: cardano
 
 services:
-  cardano-node:
+  node:
     image: ghcr.io/intersectmbo/cardano-node:8.10.0-pre
     environment:
-      NETWORK: sanchonet
+      NETWORK: ${CARDANO_NETWORK}
     volumes:
       - node_data:/data
       - node_ipc:/ipc
@@ -36,17 +36,17 @@ services:
     logging:
       driver: "json-file"
       options:
-        max-size: "200k"
+        max-size: "10M"
         max-file: "10"
     ports:
      - target: 3001
-       published: 30004
+       published: 3001
        protocol: tcp
        mode: host
     deploy:
       placement:
         constraints:
-          - node.labels.blockchain== true
+          - node.labels.blockchain==true
       restart_policy:
         condition: on-failure
         delay: 15s
@@ -55,7 +55,7 @@ services:
     networks:
       - postgres
     environment:
-      NETWORK: sanchonet
+      NETWORK: ${CARDANO_NETWORK}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       DISABLE_CACHE: ""
@@ -72,7 +72,7 @@ services:
     logging:
       driver: "json-file"
       options:
-        max-size: "200k"
+        max-size: "10M"
         max-file: "10"
     deploy:
       labels:

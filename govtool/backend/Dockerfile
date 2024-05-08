@@ -1,5 +1,6 @@
-ARG BASE_IMAGE_TAG
-FROM 733019650473.dkr.ecr.eu-west-1.amazonaws.com/backend-base:$BASE_IMAGE_TAG
+ARG BASE_IMAGE_TAG=latest
+ARG BASE_IMAGE_REPO=733019650473.dkr.ecr.eu-west-1.amazonaws.com/backend-base
+FROM $BASE_IMAGE_REPO:$BASE_IMAGE_TAG
 WORKDIR /src
 COPY . .
 RUN cabal build

@@ -30,19 +30,19 @@ const WalletProvider = ({ children }: WalletContextProviderProps) => {
     }
   };
 
-  const disconnectWallet = () => {
+  const disableWallet = () => {
     setWalletAPI(null);
   };
 
   const value = useMemo(
     () => ({
-      disconnectWallet,
+      disableWallet,
       enableError,
       enableWallet,
       isEnableLoading,
       walletAPI,
     }),
-    [disconnectWallet, enableError, enableWallet, isEnableLoading, walletAPI]
+    [disableWallet, enableError, enableWallet, isEnableLoading, walletAPI]
   );
 
   return (

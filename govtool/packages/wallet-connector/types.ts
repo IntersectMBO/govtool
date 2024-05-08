@@ -5,7 +5,7 @@ export type WalletContextProviderProps = {
 };
 
 export type WalletContextValues = {
-  disconnectWallet: () => void;
+  disableWallet: () => void;
   enableError: string | null;
   enableWallet: (walletName: string) => Promise<void>;
   isEnableLoading: boolean;

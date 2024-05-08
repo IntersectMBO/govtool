@@ -251,6 +251,7 @@ export const en = {
       editBtn: "Edit DRep data",
       delegationOptions: "Delegation Options",
       filterTitle: "DRep Status",
+      goToDRepDirectory: "Go to DRep Directory",
       meAsDRep: "This  DRep ID is connected  to your wallet",
       myDelegation: "You have delegated <strong>₳ {{ada}}</strong> to:",
       myDRep: "This is your DRep",

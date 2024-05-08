@@ -42,7 +42,10 @@ export const DRepDashboardCard = ({
   };
 
   const navigateToDrepDirectory = () =>
-    navigate(PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRepIDBech32));
+    navigate(
+      PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRepIDBech32),
+      { state: { enteredFromWithinApp: true } },
+    );
 
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress

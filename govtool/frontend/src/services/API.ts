@@ -3,19 +3,11 @@ import { NavigateFunction } from "react-router-dom";
 
 import { PATHS } from "@consts";
 
-const TIMEOUT_IN_SECONDS = 30 * 1000; // 1000 ms is 1 s then its 10 s
+const TIMEOUT_IN_SECONDS = 30 * 1000; // 1000 ms is 1 s then its 30 s
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-// Validation should be performed directly on the server
-// than no metadata service is needed and `/api` might be removed
 export const API = axios.create({
-  baseURL: `${BASE_URL}/api`,
-  timeout: TIMEOUT_IN_SECONDS,
-});
-
-// TODO: Remove this service and use the API service
-export const METADATA_VALIDATION_API = axios.create({
-  baseURL: `${BASE_URL}/metadata-validation`,
+  baseURL: `${BASE_URL}`,
   timeout: TIMEOUT_IN_SECONDS,
 });
 

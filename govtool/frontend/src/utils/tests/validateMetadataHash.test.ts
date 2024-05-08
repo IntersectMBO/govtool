@@ -1,7 +1,7 @@
 import { vi } from "vitest";
 import { postValidate } from "@services";
 import { checkIsMissingGAMetadata } from "..";
-import { MetadataStandard, MetadataValidationStatus } from "@/models";
+import { MetadataValidationStatus } from "@/models";
 
 const url = "https://example.com";
 const hash = "abcdefg";
@@ -28,7 +28,6 @@ describe("checkIsMissingGAMetadata", () => {
     expect(mockPostValidate).toHaveBeenCalledWith({
       url,
       hash,
-      standard: MetadataStandard.CIP108,
     });
   });
 
@@ -44,7 +43,6 @@ describe("checkIsMissingGAMetadata", () => {
     expect(mockPostValidate).toHaveBeenCalledWith({
       url,
       hash,
-      standard: MetadataStandard.CIP108,
     });
   });
 
@@ -60,7 +58,6 @@ describe("checkIsMissingGAMetadata", () => {
     expect(mockPostValidate).toHaveBeenCalledWith({
       url,
       hash,
-      standard: MetadataStandard.CIP108,
     });
   });
 
@@ -73,7 +70,6 @@ describe("checkIsMissingGAMetadata", () => {
     expect(mockPostValidate).toHaveBeenCalledWith({
       url,
       hash,
-      standard: MetadataStandard.CIP108,
     });
   });
 });

@@ -1,7 +1,20 @@
 {
   "name": "govtool-submission-tool",
+  "description": "A utility tool for creating the govtool metadata jsonld and hash.",
   "version": "0.0.1",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "license": "MIT",
+  "keywords": [
+    "govtool",
+    "metadata",
+    "jsonld",
+    "hash"
+  ],
+  "author": "IntersectMBO",
   "scripts": {
+    "build": "tsup",
     "test": "jest"
   },
   "dependencies": {
@@ -25,6 +38,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "text-encoding": "^0.7.0",
     "ts-jest": "^29.1.2",
+    "tsup": "^8.0.2",
     "typescript": "^5.4.5"
   }
 }

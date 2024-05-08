@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 
 import { WalletService } from "./WalletService";
 import {
@@ -23,7 +23,7 @@ const WalletProvider = ({ children }: WalletContextProviderProps) => {
 
       if (newWalletAPI) setWalletAPI(newWalletAPI);
     } catch (e) {
-      setEnableError(e);
+      setEnableError(e as string);
       throw e;
     } finally {
       setIsEnableLoading(false);

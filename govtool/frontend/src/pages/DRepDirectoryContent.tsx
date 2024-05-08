@@ -58,6 +58,11 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   );
   const myDrep = myDRepList?.[0];
 
+  const { dRepData: yourselfDRepList } = useGetDRepListInfiniteQuery({
+    searchPhrase: myDRepId,
+  });
+  const yourselfDRep = yourselfDRepList?.[0];
+
   const {
     dRepData: dRepList,
     isPreviousData,
@@ -84,6 +89,13 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   const ada = correctAdaFormat(votingPower);
 
+  const dRepsWithoutYourself = dRepList?.filter(
+    (dRep) => !isSameDRep(dRep, myDRepId),
+  );
+  const dRepListToDisplay = yourselfDRep
+    ? [yourselfDRep, ...dRepsWithoutYourself]
+    : dRepList;
+
   return (
     <Box display="flex" flex={1} flexDirection="column" gap={4}>
       {/* My delegation */}
@@ -96,6 +108,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             dRep={myDrep}
             isConnected={!!isConnected}
             isInProgress={isSameDRep(myDrep, inProgressDelegation)}
+            isMe={isSameDRep(myDrep, myDRepId)}
           />
         </div>
       )}
@@ -175,7 +188,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
               </Typography>
             </Card>
           )}
-          {dRepList?.map((dRep) => {
+          {dRepListToDisplay?.map((dRep) => {
             if (isSameDRep(dRep, myDrep?.view)) {
               return null;
             }

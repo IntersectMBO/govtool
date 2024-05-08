@@ -139,3 +139,7 @@ scripts/govtool/dev-postgres_password
 # nodejs/yarn
 
 node_modules
+
+
+# sonar scanner
+.scannerwork/

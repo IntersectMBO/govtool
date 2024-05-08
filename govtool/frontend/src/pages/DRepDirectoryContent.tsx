@@ -95,6 +95,11 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const dRepListToDisplay = yourselfDRep
     ? [yourselfDRep, ...dRepsWithoutYourself]
     : dRepList;
+  const isAnAutomatedOptionChosen =
+    currentDelegation?.dRepView &&
+    ["drep_always_abstain", "drep_always_no_confidence"].includes(
+      currentDelegation?.dRepView,
+    );
 
   return (
     <Box display="flex" flex={1} flexDirection="column" gap={4}>
@@ -121,11 +126,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           </Typography>
           <AutomatedVotingOptions
             currentDelegation={
-              !pendingTransaction.delegate &&
-              currentDelegation?.dRepView &&
-              ["drep_always_abstain", "drep_always_no_confidence"].includes(
-                currentDelegation?.dRepView,
-              )
+              !pendingTransaction.delegate && isAnAutomatedOptionChosen
                 ? currentDelegation?.dRepView
                 : undefined
             }
@@ -140,6 +141,11 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             isDelegationLoading={isDelegating}
             votingPower={ada.toString()}
             pendingTransaction={pendingTransaction}
+            txHash={
+              !pendingTransaction.delegate && isAnAutomatedOptionChosen
+                ? currentDelegation?.txHash
+                : undefined
+            }
           />
         </div>
       )}

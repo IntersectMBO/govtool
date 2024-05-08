@@ -1,15 +1,12 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE TypeApplications  #-}
 
 module VVA.Metadata where
 
 import           Control.Monad.Except       (MonadError, throwError)
 import           Control.Monad.Reader
 
-import           Data.Aeson                 (Value, decode)
+import           Data.Aeson                 (Value, decode, encode, object, (.=))
 import           Data.Maybe                 (fromJust)
 import           Data.ByteString            (ByteString)
 import           Data.FileEmbed             (embedFile)

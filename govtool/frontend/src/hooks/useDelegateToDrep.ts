@@ -33,15 +33,12 @@ export const useDelegateTodRep = () => {
           );
           certBuilder.add(retirementCert);
         }
-        const result = await buildSignSubmitConwayCertTx({
+        await buildSignSubmitConwayCertTx({
           certBuilder,
           type: "delegate",
           resourceId: dRepId,
           voter,
         });
-        if (result) {
-          addSuccessAlert(t("alerts.delegate.success"));
-        }
       } catch (error) {
         openWalletErrorModal({
           error,

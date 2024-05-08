@@ -1,0 +1,45 @@
+{
+  "name": "intersect-govtool",
+  "version": "1.0.0",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.41.2",
+    "@types/node": "^20.11.17",
+    "@types/node-fetch": "^2.6.11",
+    "allure-commandline": "^2.27.0",
+    "allure-playwright": "^2.15.0",
+    "copy-webpack-plugin": "^12.0.2",
+    "eslint": "^8.57.0",
+    "prettier": "3.2.5",
+    "ts-loader": "^9.5.1",
+    "tsconfig-paths-webpack-plugin": "^4.1.0",
+    "typescript": "^5.4.5",
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4"
+  },
+  "scripts": {
+    "package-wallet": "tsc ./lib/_mock/cardano-test-wallet/types.ts --outDir dist/@types/cardano-test-wallet --declaration && npx webpack",
+    "allure:generate": "npx allure generate ./allure-results --clean",
+    "allure:open": "npx allure open ./allure-report",
+    "allure:serve": "npx allure serve",
+    "test": "npx playwright test",
+    "format": "prettier . --write"
+  },
+  "dependencies": {
+    "@cardanoapi/cardano-test-wallet": "^1.0.2",
+    "@faker-js/faker": "^8.4.1",
+    "@noble/curves": "^1.3.0",
+    "@noble/ed25519": "^2.0.0",
+    "@types/seedrandom": "^3.0.8",
+    "bech32": "^2.0.0",
+    "blakejs": "^1.2.1",
+    "buffer": "^6.0.3",
+    "cbor-x": "^1.5.8",
+    "dotenv": "^16.4.4",
+    "fast-check": "^3.17.2",
+    "lockfile": "^1.0.4",
+    "node-fetch": "v2",
+    "path": "^0.12.7",
+    "seedrandom": "^3.0.5"
+  }
+}

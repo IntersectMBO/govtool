@@ -18,7 +18,7 @@ dRepWallets.forEach((wallet) => {
         wallet.stake.pkh
       );
 
-      await pollTransaction(res.txId, res.address);
+      await pollTransaction(res.txId, res.lockInfo);
     } catch (err) {
       if (err.status === 400) {
         expect(true, "DRep already registered").toBeTruthy();
@@ -36,7 +36,8 @@ setup("Setup dRep metadata", async () => {
       body: JSON.stringify(dRepInfo),
     });
     Logger.success("Uploaded dRep metadata to bucket");
-  } catch (e) {
-    Logger.fail(`Failed to upload dRep metadata: ${e}`);
+  } catch (err) {
+    Logger.fail(`Failed to upload dRep metadata: ${err}`);
+    throw err;
   }
 });

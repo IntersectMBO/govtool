@@ -1,14 +1,17 @@
 import environments from "@constants/environments";
 import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
-import { LockInterceptor } from "lib/lockInterceptor";
+import { LockInterceptor, LockInterceptorInfo } from "lib/lockInterceptor";
 import { Logger } from "../../../cypress/lib/logger/logger";
 
 /**
  * Polls the transaction status until it's resolved or times out.
  * address is used to release lock of that address
  */
-export async function pollTransaction(txHash: string, address?: string) {
+export async function pollTransaction(
+  txHash: string,
+  lockInfo?: LockInterceptorInfo
+) {
   try {
     Logger.info(`Waiting for tx completion: ${txHash}`);
     await expect
@@ -18,17 +21,33 @@ export async function pollTransaction(txHash: string, address?: string) {
           const data = await response.json();
           return data.length;
         },
-        { message: "Transaction failed", timeout: environments.txTimeOut }
+        {
+          timeout: environments.txTimeOut,
+        }
       )
       .toBeGreaterThan(0);
 
     Logger.success("Tx completed");
-  } catch (err) {
-    throw err;
-  } finally {
-    if (!address) return;
 
-    await LockInterceptor.releaseLockForAddress(address);
+    if (!lockInfo) return;
+
+    await LockInterceptor.releaseLockForAddress(
+      lockInfo.address,
+      lockInfo.lockId,
+      `Task completed for:${lockInfo.lockId}`
+    );
+  } catch (err) {
+    if (lockInfo) {
+      const errorMessage = { lockInfo, error: JSON.stringify(err) };
+
+      await LockInterceptor.releaseLockForAddress(
+        lockInfo.address,
+        lockInfo.lockId,
+        `Task failure: \n${JSON.stringify(errorMessage)}`
+      );
+    }
+
+    throw err;
   }
 }
 

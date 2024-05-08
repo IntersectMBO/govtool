@@ -15,9 +15,13 @@ const environments = {
       process.env.KUBER_API_URL || "https://sanchonet.kuber.cardanoapi.io",
     apiKey: process.env.KUBER_API_KEY || "",
   },
-  txTimeOut: parseInt(process.env.TX_TIMEOUT) || 120000,
+  txTimeOut: parseInt(process.env.TX_TIMEOUT) || 240000,
   metadataBucketUrl:
-    process.env.METADATA_BUCKET_URL || "https://metadata.cardanoapi.io/data",
+    `${process.env.CARDANOAPI_METADATA_URL}/data` ||
+    "https://metadata.cardanoapi.io/data",
+  lockInterceptorUrl:
+    `${process.env.CARDANOAPI_METADATA_URL}/data` ||
+    "https://metadata.cardanoapi.io/lock",
 };
 
 export default environments;

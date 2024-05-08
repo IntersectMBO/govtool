@@ -112,13 +112,13 @@ test.describe("Perform voting", () => {
       convertBufferToHex(wallet.stakeKey.private),
       convertBufferToHex(wallet.stakeKey.pkh)
     );
-    await pollTransaction(registrationRes.txId, registrationRes.address);
+    await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
 
     const res = await kuberService.transferADA(
       [wallet.addressBech32(environments.networkId)],
       40
     );
-    await pollTransaction(res.txId, registrationRes.address);
+    await pollTransaction(res.txId, registrationRes.lockInfo);
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 

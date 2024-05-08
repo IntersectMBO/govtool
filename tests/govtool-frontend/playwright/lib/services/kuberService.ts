@@ -3,7 +3,7 @@ import { ShelleyWallet } from "@helpers/crypto";
 import { KuberValue } from "@types";
 import * as blake from "blakejs";
 import environments from "lib/constants/environments";
-import { LockInterceptor } from "lib/lockInterceptor";
+import { LockInterceptor, LockInterceptorInfo } from "lib/lockInterceptor";
 import fetch, { BodyInit, RequestInit } from "node-fetch";
 import { cborxDecoder, cborxEncoder } from "../helpers/cborEncodeDecode";
 import convertBufferToHex from "../helpers/convertBufferToHex";
@@ -11,12 +11,16 @@ import { Logger } from "./../../../cypress/lib/logger/logger";
 
 type CertificateType = "registerstake" | "registerdrep" | "deregisterdrep";
 
-export type TxSubmitResponse = { cbor: string; txId: string; address?: string };
+export type TxSubmitResponse = {
+  cbor: string;
+  txId: string;
+  lockInfo?: LockInterceptorInfo;
+};
 
 type KuberBalanceResponse = {
-  address: string;
   txin: string;
   value: KuberValue;
+  address?: string;
 };
 
 const config = {
@@ -71,18 +75,20 @@ class Kuber {
 
   async signAndSubmitTx(tx: any) {
     const signedTx = this.signTx(tx);
+    const signedTxBody = Uint8Array.from(cborxEncoder.encode(tx));
+    const lockId = Buffer.from(
+      blake.blake2b(signedTxBody, undefined, 32)
+    ).toString("hex");
     const submitTxCallback = async () => {
-      return this.submitTx(signedTx);
+      return this.submitTx(signedTx, lockId);
     };
-    return LockInterceptor.intercept(
-      this.walletAddr,
-      submitTxCallback,
-      JSON.stringify(signedTx, null, 2)
-    );
+    return LockInterceptor.intercept(this.walletAddr, submitTxCallback, lockId);
   }
 
-  async submitTx(signedTx: any) {
-    Logger.info(`Submitting tx: ${JSON.stringify(signedTx)}`);
+  async submitTx(signedTx: any, lockId?: string) {
+    Logger.info(
+      `Submitting tx: ${JSON.stringify({ lock_id: lockId, tx: signedTx })}`
+    );
 
     const res = (await callKuber(
       `/api/${this.version}/tx?submit=true`,

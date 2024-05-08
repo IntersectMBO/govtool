@@ -10,6 +10,7 @@ import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
+import * as crypto from "crypto";
 
 test.describe("Logged in DReps", () => {
   test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
@@ -21,6 +22,16 @@ test.describe("Logged in DReps", () => {
     await expect(page.getByTestId("dRep-id-display")).toContainText(
       dRep01Wallet.dRepId
     ); // BUG: testId -> dRep-id-display-dashboard (It is taking sidebar dRep-id)
+  });
+
+  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
+
+  // Skipped: No option to update metadata
+  test.skip("3H. Should be able to update metadata @slow", async ({ page }) => {
+    page.getByTestId("change-metadata-button").click();
+    page.getByTestId("url-input").fill("https://google.com");
+    page.getByTestId("hash-input").fill(crypto.randomBytes(32).toString("hex"));
+    await expect(page.getByTestId("confirm-modal-button")).toBeVisible();
   });
 });
 
@@ -36,7 +47,7 @@ test.describe("Temporary DReps", () => {
       [wallet.addressBech32(environments.networkId)],
       600
     );
-    await pollTransaction(res.txId, res.address);
+    await pollTransaction(res.txId, res.lockInfo);
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {
@@ -66,7 +77,7 @@ test.describe("Temporary DReps", () => {
       convertBufferToHex(wallet.stakeKey.private),
       convertBufferToHex(wallet.stakeKey.pkh)
     );
-    await pollTransaction(registrationRes.txId, registrationRes.address);
+    await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {
@@ -95,12 +106,12 @@ test.describe("Temporary DReps", () => {
       convertBufferToHex(wallet.stakeKey.private),
       convertBufferToHex(wallet.stakeKey.pkh)
     );
-    await pollTransaction(registrationRes.txId, registrationRes.address);
+    await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
 
     const res = await kuberService.transferADA([
       wallet.addressBech32(environments.networkId),
     ]);
-    await pollTransaction(res.txId, res.address);
+    await pollTransaction(res.txId, res.lockInfo);
 
     const dRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {

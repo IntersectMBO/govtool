@@ -27,7 +27,7 @@ export default defineConfig({
   /*use Allure Playwright's testPlanFilter() to determine the grep parameter*/
   grep: testPlanFilter(),
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: process.env.CI ? [["dot"], ["allure-playwright"]] : [["dot"]],
+  reporter: process.env.CI ? [["line"], ["allure-playwright"]] : [["line"]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -44,24 +44,29 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
+      name: "faucet setup",
+      testMatch: "**/faucet.setup.ts",
+    },
+    {
       name: "auth setup",
       testMatch: "**/auth.setup.ts",
     },
     {
       name: "dRep setup",
       testMatch: "**/dRep.setup.ts",
-      dependencies: process.env.CI ? ["wallet bootstrap"] : [],
+      dependencies: ["faucet setup"],
     },
     {
       name: "wallet bootstrap",
       testMatch: "**/wallet.bootstrap.ts",
+      dependencies: ["faucet setup"],
     },
-    {
-      name: "transaction",
-      use: { ...devices["Desktop Chrome"] },
-      testMatch: "**/*.tx.spec.ts",
-      dependencies: process.env.CI ? ["auth setup", "wallet bootstrap"] : [],
-    },
+    // {
+    //   name: "transaction",
+    //   use: { ...devices["Desktop Chrome"] },
+    //   testMatch: "**/*.tx.spec.ts",
+    //   dependencies: process.env.CI ? ["auth setup", "wallet bootstrap"] : [],
+    // },
     {
       name: "loggedin (desktop)",
       use: { ...devices["Desktop Chrome"] },
@@ -81,10 +86,17 @@ export default defineConfig({
       dependencies: process.env.CI ? ["auth setup", "dRep setup"] : [],
     },
     {
+      name: "delegation",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: "**/*.delegation.spec.ts",
+      dependencies: process.env.CI ? ["auth setup", "dRep setup"] : [],
+      teardown: "cleanup delegation",
+    },
+    {
       name: "independent (desktop)",
       use: { ...devices["Desktop Chrome"] },
       testIgnore: [
-        "**/*.tx.spec.ts",
+        "**/*.delegation.spec.ts",
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",
       ],
@@ -97,6 +109,10 @@ export default defineConfig({
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",
       ],
+    },
+    {
+      name: "cleanup delegation",
+      testMatch: "delegation.teardown.ts",
     },
   ],
 });

@@ -18,8 +18,8 @@ export const faucetWallet: StaticWallet = {
 
 export const dRep01Wallet: StaticWallet = {
   payment: {
-    private: "2f1053f22707b9881ea6112024027a660bd5508e22081cf5e4e95cc663802dd9",
     public: "891ed5096ee248bc7f31a3094ea90f34485483eb1050c7ee368e64d04b90a009",
+    private: "2f1053f22707b9881ea6112024027a660bd5508e22081cf5e4e95cc663802dd9",
     pkh: "5775ad2fb14ca1b45381a40e40f0c06081edaf2261e02bbcebcf8dc3",
   },
   stake: {

@@ -1,5 +1,9 @@
 import environments from "@constants/environments";
-import { adaHolder01Wallet, dRep01Wallet } from "@constants/staticWallets";
+import {
+  adaHolder01Wallet,
+  adaHolder02Wallet,
+  dRep01Wallet,
+} from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
 import { ShelleyWallet } from "@helpers/crypto";
@@ -45,7 +49,7 @@ test.describe("Delegate to myself", () => {
       [wallet.addressBech32(environments.networkId)],
       600
     );
-    await pollTransaction(txRes.txId, txRes.address);
+    await pollTransaction(txRes.txId, txRes.lockInfo);
     const dRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {
       storageState: dRepAuth,
@@ -62,5 +66,27 @@ test.describe("Delegate to myself", () => {
     await waitForTxConfirmation(dRepPage);
 
     await expect(dRepPage.getByText("You are a Sole Voter")).toBeVisible();
+  });
+});
+
+test.describe("Change Delegation", () => {
+  test.use({
+    storageState: ".auth/adaHolder02.json",
+    wallet: adaHolder02Wallet,
+  });
+
+  // Skipped: Blocked because delegation is not working
+  test.skip("2F. Should change delegated dRep @slow @critical", async ({
+    page,
+  }) => {
+    const delegationPage = new DelegationPage(page);
+    await delegationPage.goto();
+    delegationPage.delegateToDRep(dRep01Wallet.dRepId);
+    await waitForTxConfirmation(page);
+
+    // await delegationPage.goto("/");
+    // await adaHolderPage.getByTestId("change-dRep-button").click();
+    // await delegationPage.delegateToDRep(dRep02Wallet.dRepId);
+    // await waitForTxConfirmation(page);
   });
 });

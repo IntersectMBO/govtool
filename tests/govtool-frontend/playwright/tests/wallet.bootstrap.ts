@@ -1,15 +1,10 @@
-import {
-  adaHolderWallets,
-  dRepWallets,
-  faucetWallet,
-} from "@constants/staticWallets";
+import { adaHolderWallets, dRepWallets } from "@constants/staticWallets";
 import { ShelleyWallet } from "@helpers/crypto";
 import extractDRepsFromStakePubKey from "@helpers/extractDRepsFromStakePubkey";
 import generateShellyWallets from "@helpers/generateShellyWallets";
 import setupWallets from "@helpers/setupWallets";
 import { pollTransaction } from "@helpers/transaction";
 import { expect, test as setup } from "@playwright/test";
-import { loadAmountFromFaucet } from "@services/faucetService";
 import kuberService from "@services/kuberService";
 import { writeFile } from "fs";
 import environments from "lib/constants/environments";
@@ -24,30 +19,22 @@ setup("Setup mock wallets", async () => {
   saveWallets(wallets);
 });
 
-setup("Fund faucet wallet", async () => {
-  const balance = await kuberService.getBalance(faucetWallet.address);
-  if (balance > 2000) return;
-
-  const res = await loadAmountFromFaucet(faucetWallet.address);
-  await pollTransaction(res.txid);
-});
-
 setup("Fund static wallets", async () => {
   const addresses = [...adaHolderWallets, ...dRepWallets].map((e) => e.address);
   const res = await kuberService.transferADA(addresses);
-  await pollTransaction(res.txId, res.address);
+  await pollTransaction(res.txId);
 });
 
 for (const wallet of [...adaHolderWallets, ...dRepWallets]) {
   setup(`Register stake of static wallet: ${wallet.address}`, async () => {
     try {
-      const { txId, address } = await kuberService.registerStake(
+      const { txId, lockInfo } = await kuberService.registerStake(
         wallet.stake.private,
         wallet.stake.pkh,
         wallet.payment.private,
         wallet.address
       );
-      await pollTransaction(txId, address);
+      await pollTransaction(txId, lockInfo);
     } catch (err) {
       if (err.status === 400) {
         expect(true, "Stake already registered").toBeTruthy();

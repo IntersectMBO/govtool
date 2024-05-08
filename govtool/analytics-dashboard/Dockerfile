@@ -17,6 +17,7 @@ RUN \
 
 # Rebuild the source code only when needed
 FROM base AS builder
+# Set the build arguments
 ARG NEXT_PUBLIC_API_URL
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules

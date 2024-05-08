@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -vx;
-BASE_IMAGE_NAME=govtool
+export BASE_IMAGE_NAME=govtool
 export GOVTOOL_TAG="$(git rev-parse HEAD)"
 export PROJECT_NAME=govtool
 export CARDANO_NETWORK=sanchonet

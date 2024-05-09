@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-set -vx;
 export BASE_IMAGE_NAME=govtool
-export GOVTOOL_TAG="$(git rev-parse HEAD)"
 export PROJECT_NAME=govtool
 export CARDANO_NETWORK=sanchonet
 export BASE_DOMAIN=govtool.cardanoapi.io
+
+if [ -z "$GOVTOOL_TAG" ]; then
+    GOVTOOL_TAG="$(git rev-parse HEAD)"
+fi
+export GOVTOOL_TAG
 
 . ./scripts/deploy-stack.sh
 

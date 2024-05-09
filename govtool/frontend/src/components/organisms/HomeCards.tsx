@@ -29,7 +29,7 @@ export const HomeCards = () => {
     );
 
   // TODO: Update the link
-  const onClickLearnMoreAboutSoleVoterRegistration = () =>
+  const onClickLearnMoreAboutDirectVoterRegistration = () =>
     openInNewTab("https://docs.sanchogov.tools/");
 
   // TODO: Update the link
@@ -103,15 +103,17 @@ export const HomeCards = () => {
       <ActionCard
         dataTestIdFirstButton="register-as-sole-voter-button"
         dataTestIdSecondButton="lear-more-about-sole-voter-button"
-        description={t("home.cards.registerAsSoleVoter.description")}
+        description={t("home.cards.registerAsDirectVoter.description")}
         firstButtonAction={openWalletModal}
-        firstButtonLabel={t("home.cards.registerAsSoleVoter.firstButtonLabel")}
+        firstButtonLabel={t(
+          "home.cards.registerAsDirectVoter.firstButtonLabel",
+        )}
         imageHeight={84}
-        imageURL={IMAGES.soleVoterImage}
+        imageURL={IMAGES.directVoterImage}
         imageWidth={84}
-        secondButtonAction={onClickLearnMoreAboutSoleVoterRegistration}
+        secondButtonAction={onClickLearnMoreAboutDirectVoterRegistration}
         secondButtonLabel={t("learnMore")}
-        title={t("home.cards.registerAsSoleVoter.title")}
+        title={t("home.cards.registerAsDirectVoter.title")}
       />
       {/* REGISTER AS SOLE VOTER CARD END */}
       {/* GOV ACTIONS CARD */}

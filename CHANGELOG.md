@@ -10,6 +10,8 @@ changes.
 
 ## [Unreleased]
 
+- Add wallet connector package [Issue 898](https://github.com/IntersectMBO/govtool/issues/898)
+- Change DRep without metadata name from "Sole Voter" to "Direct Voter" [Issue 880](https://github.com/IntersectMBO/govtool/issues/880)
 - Inicialize Usersnap into App [Issue 546](https://github.com/IntersectMBO/govtool/issues/546)
 - Integrate frontend with metadata validation service [Issue 617](https://github.com/IntersectMBO/govtool/issues/617)
 - Implement a loading modal for the validation of the metadata [Issue 646](https://github.com/IntersectMBO/govtool/issues/646)

@@ -209,6 +209,26 @@ services:
       - "traefik.http.services.metadata-validation.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.metadata-validation.loadbalancer.healthcheck.timeout=5s"
 
+  analytics-dashboard:
+    image: <REPO_URL>/analytics-dashboard:${ANALYTICS_DASHBOARD_TAG}
+    environment:
+      - GA_CLIENT_EMAIL=${GA_CLIENT_EMAIL}
+      - GA_PRIVATE_KEY=${GA_PRIVATE_KEY}
+      - GOOGLE_APPLICATION_CREDENTIALS=/run/secrets/google-credentials.json
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - NEXT_PUBLIC_GA4_PROPERTY_ID=${NEXT_PUBLIC_GA4_PROPERTY_ID}
+      - SENTRY_IGNORE_API_RESOLUTION_ERROR=${SENTRY_IGNORE_API_RESOLUTION_ERROR}
+    secrets:
+      - google-credentials.json
+    logging: *logging
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.to-analytics-dashboard.rule=Host(`participation.sanchogov.tools`)"
+      - "traefik.http.routers.to-analytics-dashboard.entrypoints=websecure"
+      - "traefik.http.routers.to-analytics-dashboard.tls.certresolver=myresolver"
+      - "traefik.http.services.analytics-dashboard.loadbalancer.server.port=3000"
+
   backend:
     image: <REPO_URL>/backend:${BACKEND_TAG}
     command: /usr/local/bin/vva-be -c /run/secrets/backend-config.json start-app
@@ -270,6 +290,8 @@ secrets:
     file: /home/<DOCKER_USER>/config/dbsync-secrets/postgres_user
   backend-config.json:
     file: /home/<DOCKER_USER>/config/backend-config.json
+  google-credentials.json:
+    file: /home/<DOCKER_USER>/config/google-credentials.json
 
 volumes:
   letsencrypt:

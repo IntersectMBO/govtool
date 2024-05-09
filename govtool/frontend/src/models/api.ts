@@ -16,6 +16,7 @@ export enum DRepStatus {
   Active = "Active",
   Inactive = "Inactive",
   Retired = "Retired",
+  Yourself = "Yourself",
 }
 
 export enum DRepListSort {
@@ -32,7 +33,7 @@ export interface DRepData {
   deposit: number;
   votingPower: number;
   status: DRepStatus;
-  type: "DRep" | "SoleVoter";
+  type: "DRep" | "DirectVoter";
 }
 export type InfinityDRepData = {
   elements: DRepData[];

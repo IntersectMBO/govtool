@@ -1,7 +1,7 @@
 import { Box, Skeleton } from "@mui/material";
 import { FC, ReactNode } from "react";
 
-import { Button, LoadingButton, LoadingButtonProps, Typography } from "@atoms";
+import { Button, LoadingButtonProps, Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
@@ -141,7 +141,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
           </>
         ) : (
           buttons?.map(({ dataTestId, ...buttonProps }) => (
-            <LoadingButton
+            <Button
               key={buttonProps.children?.toString()}
               data-testid={dataTestId}
               size="large"

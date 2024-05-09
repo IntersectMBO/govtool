@@ -4,7 +4,7 @@ run-name: Deploy by @${{ github.actor }}
 on:
   push:
     branches:
-      - test-deployment
+      - test
 
 env:
   ENVIRONMENT: "test"

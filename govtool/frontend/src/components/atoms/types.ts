@@ -10,6 +10,7 @@ import {
 import * as TooltipMUI from "@mui/material/Tooltip";
 
 export type ButtonProps = Omit<MUIButtonProps, "size"> & {
+  isLoading?: boolean;
   size?: "small" | "medium" | "large" | "extraLarge";
   dataTestId?: string;
 };

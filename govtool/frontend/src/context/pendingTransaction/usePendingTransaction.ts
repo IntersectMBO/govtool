@@ -40,11 +40,11 @@ export const usePendingTransaction = ({
     createGovAction:
       transaction?.type === "createGovAction" ? transaction : null,
     registerAsDrep: transaction?.type === "registerAsDrep" ? transaction : null,
-    registerAsSoleVoter:
-      transaction?.type === "registerAsSoleVoter" ? transaction : null,
+    registerAsDirectVoter:
+      transaction?.type === "registerAsDirectVoter" ? transaction : null,
     retireAsDrep: transaction?.type === "retireAsDrep" ? transaction : null,
-    retireAsSoleVoter:
-      transaction?.type === "retireAsSoleVoter" ? transaction : null,
+    retireAsDirectVoter:
+      transaction?.type === "retireAsDirectVoter" ? transaction : null,
     updateMetaData: transaction?.type === "updateMetaData" ? transaction : null,
     vote: transaction?.type === "vote" ? transaction : null,
   };
@@ -53,13 +53,14 @@ export const usePendingTransaction = ({
   useEffect(() => {
     if (isEnabled) {
       const fromLocalStorage = getItemFromLocalStorage(
-        `${PENDING_TRANSACTION_KEY}_${stakeKey}`
+        `${PENDING_TRANSACTION_KEY}_${stakeKey}`,
       );
       if (!fromLocalStorage) setTransaction(null);
-      else setTransaction({
-        ...fromLocalStorage,
-        resourceId: fromLocalStorage.resourceId ?? undefined,
-      });
+      else
+        setTransaction({
+          ...fromLocalStorage,
+          resourceId: fromLocalStorage.resourceId ?? undefined,
+        });
     }
   }, [isEnabled, stakeKey]);
 
@@ -79,11 +80,9 @@ export const usePendingTransaction = ({
 
       if (status.transactionConfirmed) {
         clearInterval(interval);
+
         if (isEnabled) {
-          const desiredResult = getDesiredResult(
-            type,
-            resourceId,
-          );
+          const desiredResult = getDesiredResult(type, resourceId);
           const queryKey = getQueryKey(type, transaction);
 
           let count = 0;
@@ -91,7 +90,13 @@ export const usePendingTransaction = ({
           while (!isDBSyncUpdated && count < DB_SYNC_MAX_ATTEMPTS) {
             count++;
             // eslint-disable-next-line no-await-in-loop
-            const data = await refetchData(type, queryClient, queryKey);
+            const data = await refetchData(
+              type,
+              queryClient,
+              queryKey,
+              resourceId,
+            );
+
             if (desiredResult === data) {
               addSuccessAlert(t(`alerts.${type}.success`));
               resetTransaction();
@@ -145,13 +150,10 @@ export const usePendingTransaction = ({
     } as TransactionState;
 
     setTransaction(newTransaction);
-    setItemToLocalStorage(
-      `${PENDING_TRANSACTION_KEY}_${stakeKey}`,
-      {
-        ...newTransaction,
-        resourceId: newTransaction.resourceId || null,
-      }
-    );
+    setItemToLocalStorage(`${PENDING_TRANSACTION_KEY}_${stakeKey}`, {
+      ...newTransaction,
+      resourceId: newTransaction.resourceId || null,
+    });
   };
 
   return {

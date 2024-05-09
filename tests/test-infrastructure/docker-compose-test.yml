@@ -6,10 +6,7 @@ secrets:
 
 volumes:
   lhci_data:
-  node_data:
-  node_ipc:
-  dbsync_data:
-
+  metadata_data:
 networks:
   postgres:
     external: true
@@ -40,3 +37,20 @@ services:
           memory: 1G
         reservations:
           memory: 300M
+
+  metadata:
+    image: govtool/metadata-api:${GOVTOOL_TAG}
+    build:
+      context: ../test-metadata-api
+    environment:
+      VIRTUAL_HOST: https://metadata-${BASE_DOMAIN} -> :3000
+    networks:
+      - frontend
+    volumes:
+      - metadata_data:/data
+    deploy:
+      restart_policy:
+        delay: "30s"
+      placement:
+        constraints:
+          - node.labels.govtool-test-stack==true

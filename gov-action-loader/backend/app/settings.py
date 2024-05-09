@@ -1,9 +1,8 @@
-from pydantic import BaseModel
+from pydantic_settings import BaseSettings
 
 
-class Settings(BaseModel):
+class Settings(BaseSettings):
     kuber_api_url: str
-    kuber_api_key: str = ""  # Default value is an empty string
+    kuber_api_key: str = ''
 
-
-settings = Settings(kuber_api_url="your_api_url_here")
+settings = Settings()

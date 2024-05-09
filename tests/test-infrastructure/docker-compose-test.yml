@@ -38,7 +38,7 @@ services:
         reservations:
           memory: 300M
 
-  metadata:
+  metadata-api:
     image: govtool/metadata-api:${GOVTOOL_TAG}
     build:
       context: ../test-metadata-api

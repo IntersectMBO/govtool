@@ -37,8 +37,6 @@ services:
     environment:
       KUBER_API_URL: "http://kuber:8081"
       KUBER_API_KEY: ""
-      BLOCKFROST_API_URL: "${BLOCKFROST_API_URL}"
-      BLOCKFROST_PROJECT_ID: "${BLOCKFROST_PROJECT_ID}"
       VIRTUAL_HOST: https://governance-${BASE_DOMAIN}/api/ -> /api/
     networks:
       - default

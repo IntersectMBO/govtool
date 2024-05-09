@@ -20,7 +20,7 @@ function update-service(){
 }
 
 if [[ "$1" == "update-images" ]]
-
+then
   update-service govtool_backend  "$BASE_IMAGE_NAME"/backend:${GOVTOOL_TAG}
   update-service govtool_frontend "$BASE_IMAGE_NAME"/frontend:${GOVTOOL_TAG}
   update-service govtool_metadata-validation "$BASE_IMAGE_NAME"/metadata-validation:${GOVTOOL_TAG}
@@ -29,5 +29,6 @@ if [[ "$1" == "update-images" ]]
   update-service govaction-loader_frontend "$BASE_IMAGE_NAME"/gov-action-loader-backend:${GOVTOOL_TAG}
 
 elif  [[ $1 == "full" ]]
+then
   ./deploy stack all
 fi

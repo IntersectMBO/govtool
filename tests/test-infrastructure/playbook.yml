@@ -1,39 +1,22 @@
 ---
-- name: Update deployed images.
+- name: Update deployed images
   hosts: test_server
   gather_facts: no
   tasks:
-    - name: Create /opt/govtool directory if it does not exist
-      ansible.builtin.file:
-        path: /opt/govtool
-        state: directory
-      become: yes
-
-    - name: Copy files to the server
-      ansible.builtin.copy:
-        src: "{{ item }}"
-        dest: "/opt/govtool/{{ item }}"
-        mode: '0755'
-      with_items:
-        - build-and-deploy.sh
-        - build-images.sh
-        - configs_template/
-        - deploy.sh
-        - docker-compose-basic-services.yml
-        - docker-compose-cardano.yml
-        - docker-compose-govaction-loader.yml
-        - docker-compose-govtool.yml
-        - docker-compose-test.yml
-        - gen-configs.sh
-        - scripts/
-        - secrets_template/
-        - .env.example
+    - name: Checkout to GOVTOOL_TAG commit
+      ansible.builtin.git:
+        repo: https://github.com/intersectmbo/govtool
+        dest: /opt/govtool
+        version: "{{ lookup('env', 'GOVTOOL_TAG') }}"
+        force: yes
+        update: yes
+        clone: yes
       become: yes
 
     - name: Execute build-and-deploy.sh
-      ansible.builtin.shell: "/opt/govtool/build-and-deploy.sh update-images"
+      ansible.builtin.shell: "/opt/govtool/tests/test-infrastructure/build-and-deploy.sh update-images"
       args:
-        chdir: "/opt/govtool"
+        chdir: "/opt/govtool/tests/test-infrastructure"
       environment:
         GOVTOOL_TAG: "{{ lookup('env', 'GOVTOOL_TAG') }}"
       become: yes

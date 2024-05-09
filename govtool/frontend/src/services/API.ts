@@ -7,7 +7,7 @@ const TIMEOUT_IN_SECONDS = 30 * 1000; // 1000 ms is 1 s then its 30 s
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const API = axios.create({
-  baseURL: `${BASE_URL}`,
+  baseURL: BASE_URL,
   timeout: TIMEOUT_IN_SECONDS,
 });
 

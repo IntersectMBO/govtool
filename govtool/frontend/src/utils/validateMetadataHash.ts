@@ -1,6 +1,6 @@
 import { postValidate } from "@services";
 
-import { MetadataStandard, MetadataValidationStatus } from "@/models";
+import { MetadataValidationStatus } from "@/models";
 
 type CheckIsMissingGAMetadataResponse = {
   status?: MetadataValidationStatus;
@@ -20,7 +20,6 @@ export const checkIsMissingGAMetadata = async ({
     const { status, metadata, valid } = await postValidate({
       url,
       hash,
-      standard: MetadataStandard.CIP108,
     });
     if (status) {
       return { status, valid };

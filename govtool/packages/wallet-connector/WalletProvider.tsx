@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import React from "react";
 
 import { WalletService } from "./WalletService";
 import {
@@ -8,12 +8,12 @@ import {
   WalletContextValues,
 } from "./types";
 
-const WalletContext = createContext<WalletContextValues | null>(null);
+const WalletContext = React.createContext<WalletContextValues | null>(null);
 
 const WalletProvider = ({ children }: WalletContextProviderProps) => {
-  const [isEnableLoading, setIsEnableLoading] = useState<boolean>(false);
-  const [enableError, setEnableError] = useState<string | null>(null);
-  const [walletAPI, setWalletAPI] = useState<TWalletAPI | null>(null);
+  const [isEnableLoading, setIsEnableLoading] = React.useState<boolean>(false);
+  const [enableError, setEnableError] = React.useState<string | null>(null);
+  const [walletAPI, setWalletAPI] = React.useState<TWalletAPI | null>(null);
 
   const enableWallet = async (walletName: string): Promise<void> => {
     setEnableError(null);
@@ -34,7 +34,7 @@ const WalletProvider = ({ children }: WalletContextProviderProps) => {
     setWalletAPI(null);
   };
 
-  const value = useMemo(
+  const value = React.useMemo(
     () => ({
       disableWallet,
       enableError,
@@ -51,7 +51,7 @@ const WalletProvider = ({ children }: WalletContextProviderProps) => {
 };
 
 const useWalletContext = (): WalletContextValues => {
-  const context = useContext(WalletContext);
+  const context = React.useContext(WalletContext);
   if (!context)
     throw new Error(
       WalletConnectorErrors.USE_WALLET_CONTEXT_USED_WITHOUT_PROVIDER
@@ -60,4 +60,4 @@ const useWalletContext = (): WalletContextValues => {
   return context;
 };
 
-export default { useWalletContext, WalletProvider };
+export { useWalletContext, WalletProvider };

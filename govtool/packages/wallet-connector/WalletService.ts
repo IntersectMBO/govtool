@@ -5,7 +5,7 @@ export namespace WalletService {
     walletName: string
   ): Promise<TWalletAPI> => {
     try {
-      if (!window.cardano[walletName].supportedExtensions)
+      if (!window.cardano[walletName]?.supportedExtensions)
         throw new Error(
           WalletConnectorErrors.NO_CIP30_SUPPORT.replace(
             "%WALLET_NAME%",
@@ -14,7 +14,7 @@ export namespace WalletService {
         );
 
       if (
-        !window.cardano[walletName].supportedExtensions.some(
+        !window.cardano[walletName]?.supportedExtensions.some(
           (item) => item.cip === 95
         )
       )
@@ -25,7 +25,7 @@ export namespace WalletService {
           )
         );
 
-      const walletApi = await window.cardano[walletName].enable({
+      const walletApi = await window.cardano[walletName]?.enable({
         extensions: [{ cip: 95 }],
       });
 

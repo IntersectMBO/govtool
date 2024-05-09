@@ -1,0 +1,55 @@
+version: "3.9"
+
+networks:
+  frontend:
+    external: true
+  cardano:
+    external: true
+
+services:
+
+  frontend:
+    image: govtool/gov-action-loader-frontend:${GOVTOOL_TAG}
+    build:
+      context: ../../gov-action-loader/frontend
+      dockerfile: Dockerfile
+    environment:
+      VIRTUAL_HOST: https://governance-${BASE_DOMAIN}
+    networks:
+      - frontend
+    deploy:
+      placement:
+        constraints:
+          - node.labels.gov-action-loader  == true
+      restart_policy:
+        delay: "30s"
+      resources:
+        limits:
+          memory: 500M
+        reservations:
+          memory: 100M
+
+  backend:
+    image: govtool/gov-action-loader-backend:${GOVTOOL_TAG}
+    build:
+      context: ../../gov-action-loader/backend
+      dockerfile: Dockerfile
+    environment:
+      KUBER_API_URL: "http://kuber:8081"
+      KUBER_API_KEY: ""
+      VIRTUAL_HOST: https://governance-${BASE_DOMAIN}/api/ -> /api/
+    networks:
+      - default
+      - frontend
+      - cardano
+    deploy:
+      placement:
+        constraints:
+          - node.labels.gov-action-loader == true
+      restart_policy:
+        delay: "30s"
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 500M

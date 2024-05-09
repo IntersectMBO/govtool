@@ -1,0 +1,102 @@
+version: "3.9"
+secrets:
+  postgres_user:
+    external: true
+    name:  ${PROJECT_NAME}_postgres_user
+  postgres_password:
+    external: true
+    name:  ${PROJECT_NAME}_postgres_password
+  dbsync_database:
+      external: true
+      name: ${PROJECT_NAME}_dbsync_database
+
+volumes:
+  node_data:
+  node_ipc:
+  dbsync_data:
+
+networks:
+  postgres:
+    external: true
+  frontend:
+    external: true
+  cardano:
+    attachable: true
+    name: cardano
+
+services:
+  node:
+    image: ghcr.io/intersectmbo/cardano-node:8.10.0-pre
+    environment:
+      NETWORK: ${CARDANO_NETWORK}
+    volumes:
+      - node_data:/data
+      - node_ipc:/ipc
+    stop_grace_period: 1m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10M"
+        max-file: "10"
+    ports:
+     - target: 3001
+       published: 3001
+       protocol: tcp
+       mode: host
+    deploy:
+      placement:
+        constraints:
+          - node.labels.blockchain==true
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+  dbsync:
+    image: ghcr.io/intersectmbo/cardano-db-sync:sancho-4-2-1
+    networks:
+      - postgres
+    environment:
+      NETWORK: ${CARDANO_NETWORK}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      DISABLE_CACHE: ""
+      DISABLE_LEDGER: ""
+      DISABLE_EPOCH: ""
+    secrets:
+      - postgres_user
+      - source: dbsync_database
+        target: postgres_db
+      - postgres_password
+    volumes:
+      - dbsync_data:/var/lib/cexplorer
+      - node_ipc:/node-ipc
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10M"
+        max-file: "10"
+    deploy:
+      labels:
+        "co_elastic_logs/enable": "false"
+      placement:
+        constraints:
+          - node.labels.blockchain== true
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+  kuber:
+    image: dquadrant/kuber:4c3c5230db9a9b8ac84487fbc11ccd28b0cd5917-amd64
+    environment:
+      CARDANO_NODE_SOCKET_PATH: /ipc/node.socket
+      VIRTUAL_HOST: https://kuber-${BASE_DOMAIN}
+      NETWORK: 4
+      START_ERA: CONWAY
+    volumes:
+      - node_ipc:/ipc/
+    networks:
+      - cardano
+    deploy:
+      placement:
+        constraints:
+          - node.labels.blockchain== true
+      restart_policy:
+        delay: "30s"

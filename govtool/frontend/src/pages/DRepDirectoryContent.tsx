@@ -96,6 +96,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             dRep={myDrep}
             isConnected={!!isConnected}
             isInProgress={isSameDRep(myDrep, inProgressDelegation)}
+            isMe={isSameDRep(myDrep, myDRepId)}
           />
         </div>
       )}

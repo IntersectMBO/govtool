@@ -250,10 +250,13 @@ export const en = {
       automatedVotingOptions: "Automated Voting Options",
       editBtn: "Edit DRep data",
       delegationOptions: "Delegation Options",
+      directVoter: "Direct Voter",
       filterTitle: "DRep Status",
       goToDRepDirectory: "Go to DRep Directory",
       meAsDRep: "This  DRep ID is connected  to your wallet",
       myDelegation: "You have delegated <strong>₳ {{ada}}</strong> to:",
+      myDelegationToYourself:
+        "You have delegated <strong>₳ {{ada}}</strong> to yourself:",
       myDRep: "This is your DRep",
       listTitle: "Find a DRep",
       noConfidenceDescription:

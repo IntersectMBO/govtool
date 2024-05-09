@@ -245,10 +245,18 @@ export const en = {
       },
     },
     dRepDirectory: {
-      abstainCardDescription: "Select this to vote ABSTAIN to every vote.",
-      abstainCardTitle: "Abstain from Every Vote",
+      abstainCardDefaultDescription:
+        "Select this to vote ABSTAIN to every vote.",
+      abstainCardDefaultTitle: "Abstain from Every Vote",
       automatedVotingOptions: "Automated Voting Options",
       editBtn: "Edit DRep data",
+      delegatedToAbstainTitle: "You have delegated ₳{{ada}} to “Abstain”",
+      delegatedToNoConfidenceTitle:
+        "You have delegated ₳{{ada}} to “No Confidence”",
+      delegatedToAbstainDescription:
+        "You have selected to apply your Voting Power to Abstain on every vote.",
+      delegatedToNoConfidenceDescription:
+        "You have selected to apply your Voting Power to No Confidence on every vote.",
       delegationOptions: "Delegation Options",
       directVoter: "Direct Voter",
       filterTitle: "DRep Status",
@@ -259,9 +267,9 @@ export const en = {
         "You have delegated <strong>₳ {{ada}}</strong> to yourself:",
       myDRep: "This is your DRep",
       listTitle: "Find a DRep",
-      noConfidenceDescription:
+      noConfidenceDefaultDescription:
         "Select this to signal no confidence in the current constitutional committee by voting NO on every proposal and voting YES to no confidence proposals",
-      noConfidenceTitle: "Signal No Confidence on Every Vote",
+      noConfidenceDefaultTitle: "Signal No Confidence on Every Vote",
       noResultsForTheSearchTitle: "No DReps found",
       noResultsForTheSearchDescription: "Please try a different search",
       title: "DRep Directory",

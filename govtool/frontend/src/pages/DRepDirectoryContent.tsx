@@ -15,6 +15,10 @@ import { Card, DataActionsBar } from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
 import { correctAdaFormat, formHexToBech32, isSameDRep } from "@utils";
 import { DRepListSort, DRepStatus } from "@models";
+import {
+  AutomatedVotingOptionCurrentDelegation,
+  AutomatedVotingOptionDelegationId,
+} from "@/types/automatedVotingOptions";
 
 interface DRepDirectoryContentProps {
   isConnected?: boolean;
@@ -96,6 +100,13 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     ? [yourselfDRep, ...dRepsWithoutYourself]
     : dRepList;
 
+  const isAnAutomatedVotingOptionChosen =
+    currentDelegation?.dRepView &&
+    (currentDelegation?.dRepView ===
+      AutomatedVotingOptionCurrentDelegation.drep_always_abstain ||
+      currentDelegation?.dRepView ===
+        AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence);
+
   return (
     <Box display="flex" flex={1} flexDirection="column" gap={4}>
       {/* My delegation */}
@@ -121,18 +132,17 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           </Typography>
           <AutomatedVotingOptions
             currentDelegation={
-              !pendingTransaction.delegate &&
-              currentDelegation?.dRepView &&
-              ["drep_always_abstain", "drep_always_no_confidence"].includes(
-                currentDelegation?.dRepView,
-              )
+              !pendingTransaction.delegate && isAnAutomatedVotingOptionChosen
                 ? currentDelegation?.dRepView
                 : undefined
             }
             delegate={delegate}
             delegationInProgress={
               inProgressDelegation &&
-              ["abstain", "no confidence"].includes(inProgressDelegation)
+              (inProgressDelegation ===
+                AutomatedVotingOptionDelegationId.abstain ||
+                inProgressDelegation ===
+                  AutomatedVotingOptionDelegationId.no_confidence)
                 ? inProgressDelegation
                 : undefined
             }
@@ -140,6 +150,11 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             isDelegationLoading={isDelegating}
             votingPower={ada.toString()}
             pendingTransaction={pendingTransaction}
+            txHash={
+              !pendingTransaction.delegate && isAnAutomatedVotingOptionChosen
+                ? currentDelegation?.txHash
+                : undefined
+            }
           />
         </div>
       )}

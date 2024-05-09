@@ -37,5 +37,5 @@ export type AutomatedVotingCardProps = {
   title: string;
   votingPower: string | number;
   isDelegateLoading?: boolean;
-  transactionId?: string;
+  transactionId?: string | null;
 };

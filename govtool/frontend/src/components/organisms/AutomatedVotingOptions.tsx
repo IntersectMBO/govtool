@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
   Box,
-  Chip,
 } from "@mui/material";
 
 import { Typography } from "@atoms";
@@ -13,6 +12,10 @@ import { PendingTransaction } from "@context";
 import { useTranslation } from "@hooks";
 import { AutomatedVotingCard } from "@molecules";
 import { openInNewTab } from "@/utils";
+import {
+  AutomatedVotingOptionCurrentDelegation,
+  AutomatedVotingOptionDelegationId,
+} from "@/types/automatedVotingOptions";
 
 type AutomatedVotingOptionsProps = {
   currentDelegation?: string | null;
@@ -22,6 +25,7 @@ type AutomatedVotingOptionsProps = {
   isConnected?: boolean;
   isDelegationLoading?: boolean;
   pendingTransaction?: PendingTransaction;
+  txHash?: string | null;
 };
 
 export const AutomatedVotingOptions = ({
@@ -32,6 +36,7 @@ export const AutomatedVotingOptions = ({
   isDelegationLoading,
   pendingTransaction,
   votingPower,
+  txHash,
 }: AutomatedVotingOptionsProps) => {
   const { t } = useTranslation();
 
@@ -39,6 +44,29 @@ export const AutomatedVotingOptions = ({
 
   // TODO: Change to certain automated voted option if available
   const onClickInfo = () => openInNewTab("https://docs.sanchogov.tools/");
+
+  const isDelegatedToAbstain =
+    currentDelegation ===
+    AutomatedVotingOptionCurrentDelegation.drep_always_abstain;
+  const isDelegationToAbstainInProgress =
+    delegationInProgress === AutomatedVotingOptionDelegationId.abstain;
+  const isDelegatedToNoConfidence =
+    currentDelegation ===
+    AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence;
+  const isDelegationToNoConfidenceInProgress =
+    delegationInProgress === AutomatedVotingOptionDelegationId.no_confidence;
+
+  useEffect(() => {
+    const shouldBeSetOpen =
+      isDelegatedToAbstain ||
+      isDelegatedToNoConfidence ||
+      isDelegationToAbstainInProgress ||
+      isDelegationToNoConfidenceInProgress;
+
+    if (shouldBeSetOpen) {
+      setIsOpen(true);
+    }
+  }, [currentDelegation, delegationInProgress]);
 
   return (
     <Accordion
@@ -56,23 +84,6 @@ export const AutomatedVotingOptions = ({
         sx={{ borderRadius: 3, px: { xxs: 2, md: 3 } }}
       >
         <Typography>{t("dRepDirectory.automatedVotingOptions")}</Typography>
-        {currentDelegation && !isOpen && (
-          // TODO this Chip is temporary, since there were no design for this case
-          <Chip
-            color="primary"
-            label={
-              currentDelegation === "drep_always_abstain"
-                ? "Abstain"
-                : "No confidence"
-            }
-            sx={{
-              backgroundColor: (theme) => theme.palette.neutralWhite,
-              fontWeight: 400,
-              ml: 2,
-              textTransform: "uppercase",
-            }}
-          />
-        )}
       </AccordionSummary>
       <AccordionDetails
         sx={{ p: { xxs: 2, md: 3 }, pt: { xxs: 0, md: 0 } }}
@@ -86,34 +97,64 @@ export const AutomatedVotingOptions = ({
           }}
         >
           <AutomatedVotingCard
-            description={t("dRepDirectory.abstainCardDescription")}
-            inProgress={delegationInProgress === "abstain"}
+            description={
+              isDelegatedToAbstain
+                ? t("dRepDirectory.delegatedToAbstainDescription")
+                : t("dRepDirectory.abstainCardDefaultDescription")
+            }
+            inProgress={isDelegationToAbstainInProgress}
             isConnected={isConnected}
             isDelegateLoading={isDelegationLoading}
-            isSelected={currentDelegation === "drep_always_abstain"}
-            onClickDelegate={() => delegate("abstain")}
+            isSelected={isDelegatedToAbstain}
+            onClickDelegate={() =>
+              delegate(AutomatedVotingOptionDelegationId.abstain)
+            }
             onClickInfo={onClickInfo}
-            title={t("dRepDirectory.abstainCardTitle")}
+            title={
+              isDelegatedToAbstain
+                ? t("dRepDirectory.delegatedToAbstainTitle", {
+                    ada: votingPower,
+                  })
+                : t("dRepDirectory.abstainCardDefaultTitle")
+            }
             votingPower={votingPower}
             transactionId={
-              pendingTransaction?.delegate?.resourceId === "abstain"
+              pendingTransaction?.delegate?.resourceId ===
+              AutomatedVotingOptionDelegationId.abstain
                 ? pendingTransaction?.delegate?.transactionHash
+                : isDelegatedToAbstain
+                ? txHash
                 : undefined
             }
           />
           <AutomatedVotingCard
-            description={t("dRepDirectory.noConfidenceDescription")}
-            inProgress={delegationInProgress === "no confidence"}
+            description={
+              isDelegatedToNoConfidence
+                ? t("dRepDirectory.delegatedToNoConfidenceDescription")
+                : t("dRepDirectory.noConfidenceDefaultDescription")
+            }
+            inProgress={isDelegationToNoConfidenceInProgress}
             isConnected={isConnected}
             isDelegateLoading={isDelegationLoading}
-            isSelected={currentDelegation === "drep_always_no_confidence"}
-            onClickDelegate={() => delegate("no confidence")}
+            isSelected={isDelegatedToNoConfidence}
+            onClickDelegate={() =>
+              delegate(AutomatedVotingOptionDelegationId.no_confidence)
+            }
             onClickInfo={onClickInfo}
-            title={t("dRepDirectory.noConfidenceTitle")}
+            title={
+              isDelegatedToNoConfidence
+                ? t("dRepDirectory.delegatedToNoConfidenceTitle", {
+                    ada: votingPower,
+                  })
+                : t("dRepDirectory.noConfidenceDefaultTitle")
+            }
             votingPower={votingPower}
             transactionId={
-              pendingTransaction?.delegate?.resourceId === "no confidence"
+              pendingTransaction?.delegate?.resourceId ===
+              AutomatedVotingOptionDelegationId.no_confidence
                 ? pendingTransaction?.delegate?.transactionHash
+                : isDelegatedToNoConfidence
+                ? txHash
                 : undefined
             }
           />

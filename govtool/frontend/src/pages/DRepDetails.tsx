@@ -175,7 +175,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
           </DRepDetailsInfoItem>
           {/* TODO: fetch metadata, add views for metadata errors */}
           <DRepDetailsInfoItem label={t("email")}>
-            {/* TODO: change email*/}
+            {/* TODO: change email */}
             <MoreInfoLink
               label="darlenelonglink.DRepwebsiteorwhatever.com"
               navTo="example@gmail.com"
@@ -189,7 +189,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
               flexDirection="column"
               gap={1.5}
             >
-              {/* TODO: update links*/}
+              {/* TODO: update links */}
               {LINKS.map((link) => (
                 <MoreInfoLink
                   key={link}
@@ -310,8 +310,14 @@ type LinkWithIconProps = {
 };
 
 const MoreInfoLink = ({ label, navTo, isEmail = false }: LinkWithIconProps) => {
-  const openLink = () =>
-    isEmail ? window.location.assign(`mailto:${navTo}`) : openInNewTab(navTo);
+  const openLink = () => {
+    if (isEmail) {
+      window.location.assign(`mailto:${navTo}`);
+
+      return;
+    }
+    openInNewTab(navTo);
+  };
 
   return (
     <ButtonBase

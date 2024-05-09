@@ -23,6 +23,7 @@ import           Database.PostgreSQL.Simple (Connection)
 
 import           VVA.Cache
 import           VVA.Config
+import           Network.HTTP.Client (Manager)
 
 type App m = (MonadReader AppEnv m, MonadIO m, MonadFail m, MonadError AppError m)
 
@@ -31,6 +32,7 @@ data AppEnv
       { vvaConfig         :: VVAConfig
       , vvaCache          :: CacheEnv
       , vvaConnectionPool :: Pool Connection
+      , vvaTlsManager     :: Manager
       }
 
 instance Has VVAConfig AppEnv where
@@ -45,10 +47,15 @@ instance Has (Pool Connection) AppEnv where
   getter AppEnv {vvaConnectionPool} = vvaConnectionPool
   modifier f a@AppEnv {vvaConnectionPool} = a {vvaConnectionPool = f vvaConnectionPool}
 
+instance Has Manager AppEnv where
+  getter AppEnv {vvaTlsManager} = vvaTlsManager
+  modifier f a@AppEnv {vvaTlsManager} = a {vvaTlsManager = f vvaTlsManager}
+
 data AppError
   = ValidationError Text
   | NotFoundError Text
   | CriticalError Text
+  | InternalError Text
   deriving (Show)
 
 instance Exception AppError
@@ -138,6 +145,7 @@ data CacheEnv
       , dRepVotingPowerCache               :: Cache.Cache Text Integer
       , dRepListCache                      :: Cache.Cache () [DRepRegistration]
       , networkMetricsCache                :: Cache.Cache () NetworkMetrics
+      , metadataValidationCache            :: Cache.Cache (Text, Text) Value
       }
 
 data NetworkMetrics
@@ -160,3 +168,10 @@ data Delegation
       , delegationDRepView :: Text
       , delegationTxHash   :: Text
       }
+
+
+data MetadataValidationStatus
+  = IncorrectFormat
+  | IncorrectJSONLD
+  | IncorrectHash
+  | UrlNotFound

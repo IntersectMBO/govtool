@@ -42,7 +42,10 @@ export const DRepDashboardCard = ({
   };
 
   const navigateToDrepDirectory = () =>
-    navigate(PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRepIDBech32));
+    navigate(
+      PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRepIDBech32),
+      { state: { enteredFromWithinApp: true } },
+    );
 
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress
@@ -141,7 +144,7 @@ export const DRepDashboardCard = ({
     >
       {voter?.isRegisteredAsDRep && !pendingTransaction?.retireAsDrep && (
         <CopyableInfo
-          dataTestId="my-drep-id"
+          dataTestId="dRep-id-display-card-dashboard"
           label={t("dashboard.cards.drep.yourDRepId")}
           sx={{ mt: 1 }}
           value={dRepIDBech32}

@@ -1,5 +1,10 @@
 import { PropsWithChildren } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import {
+  Navigate,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { Box, ButtonBase, Chip, CircularProgress } from "@mui/material";
 
 import { Button, StatusPill, Typography } from "@atoms";
@@ -35,11 +40,13 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
   const { dRepID: myDRepId, pendingTransaction } = useCardano();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { openModal } = useModal();
   const { screenWidth } = useScreenDimension();
   const { dRepId: dRepParam } = useParams();
-
   const { delegate, isDelegating } = useDelegateTodRep();
+
+  const displayBackButton = location.state?.enteredFromWithinApp || false;
 
   const { dRepData, isDRepListLoading } = useGetDRepListInfiniteQuery({
     searchPhrase: dRepParam,
@@ -74,16 +81,25 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
 
   return (
     <>
-      <LinkWithIcon
-        data-testid="back-to-list-button"
-        label={t("backToList")}
-        onClick={() =>
-          navigate(
-            isConnected ? PATHS.dashboardDRepDirectory : PATHS.dRepDirectory,
-          )
-        }
-        sx={{ mb: 2 }}
-      />
+      {displayBackButton ? (
+        <LinkWithIcon
+          data-testid="back-button"
+          label={t("back")}
+          onClick={() => navigate(-1)}
+          sx={{ mb: 2 }}
+        />
+      ) : (
+        <LinkWithIcon
+          data-testid="go-to-drep-directory-button"
+          label={t("dRepDirectory.goToDRepDirectory")}
+          onClick={() =>
+            navigate(
+              isConnected ? PATHS.dashboardDRepDirectory : PATHS.dRepDirectory,
+            )
+          }
+          sx={{ mb: 2 }}
+        />
+      )}
       <Card
         {...((isMe || isMyDrep) && {
           border: true,

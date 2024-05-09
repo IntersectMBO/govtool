@@ -72,6 +72,7 @@ import {
   TransactionStateWithoutResource,
   usePendingTransaction,
 } from "./pendingTransaction";
+import { AutomatedVotingOptionDelegationId } from "@/types/automatedVotingOptions";
 
 interface Props {
   children: React.ReactNode;
@@ -585,9 +586,9 @@ const CardanoProvider = (props: Props) => {
 
         // Create correct DRep
         let targetDRep;
-        if (target === "abstain") {
+        if (target === AutomatedVotingOptionDelegationId.abstain) {
           targetDRep = DRep.new_always_abstain();
-        } else if (target === "no confidence") {
+        } else if (target === AutomatedVotingOptionDelegationId.no_confidence) {
           targetDRep = DRep.new_always_no_confidence();
         } else if (target.includes("drep")) {
           targetDRep = DRep.new_key_hash(Ed25519KeyHash.from_bech32(target));

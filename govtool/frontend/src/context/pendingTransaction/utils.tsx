@@ -1,6 +1,10 @@
 import { QueryClient, QueryKey } from "react-query";
 import { QUERY_KEYS } from "@/consts";
 import { TransactionType, TransactionState } from "./types";
+import {
+  AutomatedVotingOptionCurrentDelegation,
+  AutomatedVotingOptionDelegationId,
+} from "@/types/automatedVotingOptions";
 
 export const getDesiredResult = (
   type: TransactionType,
@@ -9,8 +13,10 @@ export const getDesiredResult = (
   switch (type) {
     case "delegate": {
       // current delegation
-      if (resourceId === "no confidence") return "drep_always_no_confidence";
-      if (resourceId === "abstain") return "drep_always_abstain";
+      if (resourceId === AutomatedVotingOptionDelegationId.no_confidence)
+        return AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence;
+      if (resourceId === AutomatedVotingOptionDelegationId.abstain)
+        return AutomatedVotingOptionCurrentDelegation.drep_always_abstain;
       return resourceId;
     }
     case "registerAsDrep":
@@ -60,7 +66,10 @@ export const refetchData = async (
   const data = await queryClient.getQueryData<any>(queryKey);
 
   if (type === "delegate") {
-    if (resourceId === "no confidence" || resourceId === "abstain") {
+    if (
+      resourceId === AutomatedVotingOptionDelegationId.no_confidence ||
+      resourceId === AutomatedVotingOptionDelegationId.abstain
+    ) {
       return data.dRepView;
     }
     return data.dRepHash;

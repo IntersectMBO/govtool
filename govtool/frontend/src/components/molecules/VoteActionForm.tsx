@@ -343,6 +343,7 @@ export const VoteActionForm = ({
                 ? "11.5px"
                 : "14px",
           }}
+          data-testid="provide-context-button"
         >
           {voteContextText
             ? t("govActions.provideNewContextAboutYourVote")

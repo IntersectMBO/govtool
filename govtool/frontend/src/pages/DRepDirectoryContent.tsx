@@ -15,6 +15,10 @@ import { Card, DataActionsBar } from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
 import { correctAdaFormat, formHexToBech32, isSameDRep } from "@utils";
 import { DRepListSort, DRepStatus } from "@models";
+import {
+  AutomatedVotingOptionCurrentDelegation,
+  AutomatedVotingOptionDelegationId,
+} from "@/types/automatedVotingOptions";
 
 interface DRepDirectoryContentProps {
   isConnected?: boolean;
@@ -58,6 +62,11 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   );
   const myDrep = myDRepList?.[0];
 
+  const { dRepData: yourselfDRepList } = useGetDRepListInfiniteQuery({
+    searchPhrase: myDRepId,
+  });
+  const yourselfDRep = yourselfDRepList?.[0];
+
   const {
     dRepData: dRepList,
     isPreviousData,
@@ -84,6 +93,20 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   const ada = correctAdaFormat(votingPower);
 
+  const dRepsWithoutYourself = dRepList?.filter(
+    (dRep) => !isSameDRep(dRep, myDRepId),
+  );
+  const dRepListToDisplay = yourselfDRep
+    ? [yourselfDRep, ...dRepsWithoutYourself]
+    : dRepList;
+
+  const isAnAutomatedVotingOptionChosen =
+    currentDelegation?.dRepView &&
+    (currentDelegation?.dRepView ===
+      AutomatedVotingOptionCurrentDelegation.drep_always_abstain ||
+      currentDelegation?.dRepView ===
+        AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence);
+
   return (
     <Box display="flex" flex={1} flexDirection="column" gap={4}>
       {/* My delegation */}
@@ -96,6 +119,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             dRep={myDrep}
             isConnected={!!isConnected}
             isInProgress={isSameDRep(myDrep, inProgressDelegation)}
+            isMe={isSameDRep(myDrep, myDRepId)}
           />
         </div>
       )}
@@ -108,18 +132,17 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           </Typography>
           <AutomatedVotingOptions
             currentDelegation={
-              !pendingTransaction.delegate &&
-              currentDelegation?.dRepView &&
-              ["drep_always_abstain", "drep_always_no_confidence"].includes(
-                currentDelegation?.dRepView,
-              )
+              !pendingTransaction.delegate && isAnAutomatedVotingOptionChosen
                 ? currentDelegation?.dRepView
                 : undefined
             }
             delegate={delegate}
             delegationInProgress={
               inProgressDelegation &&
-              ["abstain", "no confidence"].includes(inProgressDelegation)
+              (inProgressDelegation ===
+                AutomatedVotingOptionDelegationId.abstain ||
+                inProgressDelegation ===
+                  AutomatedVotingOptionDelegationId.no_confidence)
                 ? inProgressDelegation
                 : undefined
             }
@@ -127,6 +150,11 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             isDelegationLoading={isDelegating}
             votingPower={ada.toString()}
             pendingTransaction={pendingTransaction}
+            txHash={
+              !pendingTransaction.delegate && isAnAutomatedVotingOptionChosen
+                ? currentDelegation?.txHash
+                : undefined
+            }
           />
         </div>
       )}
@@ -175,7 +203,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
               </Typography>
             </Card>
           )}
-          {dRepList?.map((dRep) => {
+          {dRepListToDisplay?.map((dRep) => {
             if (isSameDRep(dRep, myDrep?.view)) {
               return null;
             }

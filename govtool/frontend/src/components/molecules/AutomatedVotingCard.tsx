@@ -37,7 +37,6 @@ export const AutomatedVotingCard = ({
       })}
       {...(isSelected && {
         variant: "primary",
-        label: "Selected",
       })}
       sx={{
         alignItems: "center",
@@ -50,6 +49,7 @@ export const AutomatedVotingCard = ({
         mt: inProgress || isSelected ? 2 : 0,
         py: 2.25,
       }}
+      data-testid={`${testIdLabel}-card`}
     >
       <Box
         sx={{
@@ -76,7 +76,7 @@ export const AutomatedVotingCard = ({
             sx={{ width: "fit-content", p: 0 }}
             variant="text"
           >
-            {t("dashboard.cards.showTransaction")}
+            {t("seeTransaction")}
           </Button>
         )}
       </Box>

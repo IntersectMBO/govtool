@@ -33,7 +33,7 @@ export interface DRepData {
   deposit: number;
   votingPower: number;
   status: DRepStatus;
-  type: "DRep" | "DirectVoter";
+  type: "DRep" | "SoleVoter";
 }
 export type InfinityDRepData = {
   elements: DRepData[];

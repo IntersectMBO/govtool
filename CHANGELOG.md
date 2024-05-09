@@ -24,6 +24,7 @@ changes.
 
 ### Added
 
+- added `metadata/validate` endpoint [Issue 876](https://github.com/IntersectMBO/govtool/issues/876)
 - added pagination to `drep/list` [Issue 756](https://github.com/IntersectMBO/govtool/issues/756)
 - added search query param to the `drep/getVotes` [Issue 640](https://github.com/IntersectMBO/govtool/issues/640)
 - added filtering and sorting capabilities to the `drep/list` [Issue 722](https://github.com/IntersectMBO/govtool/issues/722)

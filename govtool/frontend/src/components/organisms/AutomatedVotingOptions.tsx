@@ -12,6 +12,10 @@ import { PendingTransaction } from "@context";
 import { useTranslation } from "@hooks";
 import { AutomatedVotingCard } from "@molecules";
 import { openInNewTab } from "@/utils";
+import {
+  AutomatedVotingOptionCurrentDelegation,
+  AutomatedVotingOptionDelegationId,
+} from "@/types/automatedVotingOptions";
 
 type AutomatedVotingOptionsProps = {
   currentDelegation?: string | null;
@@ -41,12 +45,16 @@ export const AutomatedVotingOptions = ({
   // TODO: Change to certain automated voted option if available
   const onClickInfo = () => openInNewTab("https://docs.sanchogov.tools/");
 
-  const isDelegatedToAbstain = currentDelegation === "drep_always_abstain";
-  const isDelegationToAbstainInProgress = delegationInProgress === "abstain";
+  const isDelegatedToAbstain =
+    currentDelegation ===
+    AutomatedVotingOptionCurrentDelegation.drep_always_abstain;
+  const isDelegationToAbstainInProgress =
+    delegationInProgress === AutomatedVotingOptionDelegationId.abstain;
   const isDelegatedToNoConfidence =
-    currentDelegation === "drep_always_no_confidence";
+    currentDelegation ===
+    AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence;
   const isDelegationToNoConfidenceInProgress =
-    delegationInProgress === "no confidence";
+    delegationInProgress === AutomatedVotingOptionDelegationId.no_confidence;
 
   useEffect(() => {
     const shouldBeSetOpen =
@@ -98,7 +106,9 @@ export const AutomatedVotingOptions = ({
             isConnected={isConnected}
             isDelegateLoading={isDelegationLoading}
             isSelected={isDelegatedToAbstain}
-            onClickDelegate={() => delegate("abstain")}
+            onClickDelegate={() =>
+              delegate(AutomatedVotingOptionDelegationId.abstain)
+            }
             onClickInfo={onClickInfo}
             title={
               isDelegatedToAbstain
@@ -109,7 +119,8 @@ export const AutomatedVotingOptions = ({
             }
             votingPower={votingPower}
             transactionId={
-              pendingTransaction?.delegate?.resourceId === "abstain"
+              pendingTransaction?.delegate?.resourceId ===
+              AutomatedVotingOptionDelegationId.abstain
                 ? pendingTransaction?.delegate?.transactionHash
                 : isDelegatedToAbstain
                 ? txHash
@@ -126,7 +137,9 @@ export const AutomatedVotingOptions = ({
             isConnected={isConnected}
             isDelegateLoading={isDelegationLoading}
             isSelected={isDelegatedToNoConfidence}
-            onClickDelegate={() => delegate("no confidence")}
+            onClickDelegate={() =>
+              delegate(AutomatedVotingOptionDelegationId.no_confidence)
+            }
             onClickInfo={onClickInfo}
             title={
               isDelegatedToNoConfidence
@@ -137,7 +150,8 @@ export const AutomatedVotingOptions = ({
             }
             votingPower={votingPower}
             transactionId={
-              pendingTransaction?.delegate?.resourceId === "no confidence"
+              pendingTransaction?.delegate?.resourceId ===
+              AutomatedVotingOptionDelegationId.no_confidence
                 ? pendingTransaction?.delegate?.transactionHash
                 : isDelegatedToNoConfidence
                 ? txHash

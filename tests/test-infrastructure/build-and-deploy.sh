@@ -29,7 +29,7 @@ then
   update-service govaction-loader_frontend "$BASE_IMAGE_NAME"/gov-action-loader-backend:${GOVTOOL_TAG}
 
   # test metadata API
-  update-service test_metadata-api "$BASE_IMAGE_NAME"/gov-action-loader-backend:${GOVTOOL_TAG}
+  update-service test_metadata-api "$BASE_IMAGE_NAME"/metadata-api:${GOVTOOL_TAG}
 
 elif  [[ $1 == "full" ]]
 then

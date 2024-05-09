@@ -38,7 +38,9 @@ test("1D. Should check correct network (Testnet/Mainnet) on connection @smoke @f
   page,
 }) => {
   const wrongNetworkId = 1; // mainnet network
-  await createWallet(page, { networkId: wrongNetworkId });
+  await createWallet(page, {
+    networkId: wrongNetworkId,
+  });
 
   const errors: Array<Error> = [];
   page.on("pageerror", (error) => {
@@ -49,4 +51,16 @@ test("1D. Should check correct network (Testnet/Mainnet) on connection @smoke @f
   await loginPage.login();
 
   expect(errors).not.toHaveLength(0);
+});
+
+test("1E. Should hide incompatible wallets when connecting", async ({
+  page,
+}) => {
+  // Disabling cip95 support for wallet
+  await createWallet(page, { supportedExtensions: [] });
+
+  await page.goto("/");
+  await page.getByTestId("connect-wallet-button").click();
+
+  await expect(page.getByTestId("demos-wallet-button")).not.toBeVisible();
 });

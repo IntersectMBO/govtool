@@ -12,3 +12,4 @@ fi
 
 docker compose -f ./docker-compose-govtool.yml build
 docker compose -f ./docker-compose-govaction-loader.yml build
+docker compose -f ./docker-compose-test.yml build

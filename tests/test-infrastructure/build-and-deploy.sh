@@ -28,7 +28,10 @@ then
   update-service govaction-loader_backend "$BASE_IMAGE_NAME"/gov-action-loader-frontend:${GOVTOOL_TAG}
   update-service govaction-loader_frontend "$BASE_IMAGE_NAME"/gov-action-loader-backend:${GOVTOOL_TAG}
 
+  # test metadata API
+  update-service test_metadata-api "$BASE_IMAGE_NAME"/gov-action-loader-backend:${GOVTOOL_TAG}
+
 elif  [[ $1 == "full" ]]
 then
-  ./deploy stack all
+  ./deploy.sh stack all
 fi

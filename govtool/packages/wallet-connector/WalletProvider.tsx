@@ -10,7 +10,7 @@ import {
 
 const WalletContext = createContext<WalletContextValues | null>(null);
 
-const WalletProvider = ({ children }: WalletContextProviderProps) => {
+export const WalletProvider = ({ children }: WalletContextProviderProps) => {
   const [isEnableLoading, setIsEnableLoading] = useState<boolean>(false);
   const [enableError, setEnableError] = useState<string | null>(null);
   const [walletAPI, setWalletAPI] = useState<TWalletAPI | null>(null);
@@ -50,7 +50,7 @@ const WalletProvider = ({ children }: WalletContextProviderProps) => {
   );
 };
 
-const useWalletContext = (): WalletContextValues => {
+export const useWalletContext = (): WalletContextValues => {
   const context = useContext(WalletContext);
   if (!context)
     throw new Error(
@@ -59,5 +59,3 @@ const useWalletContext = (): WalletContextValues => {
 
   return context;
 };
-
-export default { useWalletContext, WalletProvider };

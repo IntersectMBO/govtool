@@ -1,5 +1,5 @@
 {
-  "name": "wrapper",
+  "name": "govtool-wrapper",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -15,10 +15,11 @@
     "@mui/material": "^5.15.7",
     "@sentry/nextjs": "^7.100.1",
     "axios": "^1.6.7",
+    "govtool-submission-tool": "../packages/submission-tool",
+    "govtool-wallet-connector": "../packages/wallet-connector",
     "next": "14.1.0",
     "next-intl": "^3.5.4",
-    "react": "^18",
-    "react-dom": "^18"
+    "react": "^18"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",

@@ -4,7 +4,10 @@ import { Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 
 import { locales } from "@/constants";
+import { voltaire } from "@/constants/theme";
 import { AppContextProvider } from "@/context/context";
+import { UsersnapProvider } from "@/context/userSnapApi";
+import { ThemeProvider } from "@mui/material";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -44,7 +47,11 @@ async function RootLayout({ children, params: { locale } }) {
         {/* Provide internationalization context. */}
         <NextIntlClientProvider locale={locale} messages={messages}>
           {/* Wrap children in global state context */}
-          <AppContextProvider>{children}</AppContextProvider>
+          <ThemeProvider theme={voltaire}>
+            <AppContextProvider>
+              <UsersnapProvider>{children}</UsersnapProvider>
+            </AppContextProvider>
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>

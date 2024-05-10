@@ -1,3 +1,5 @@
+import { Footer } from "@/components/Layout/Footer";
+import { Header } from "@/components/Layout/Header";
 import { useTranslations } from "next-intl"; // Import hook for loading translated strings.
 import { unstable_setRequestLocale } from "next-intl/server";
 
@@ -10,12 +12,14 @@ export default function Home({ params: { locale } }) {
   return (
     <main>
       <div>
+        <Header />
         {/*Render the translated title. */}
         <h1>{t("title")}</h1>
         <Link href={`/${locale}/metadata`}>Go to metadata service</Link>
         <br />
         <Link href={`/${locale}/wallet`}>Go to wallet connector</Link>
       </div>
+      <Footer />
     </main>
   );
 }

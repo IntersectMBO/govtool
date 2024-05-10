@@ -6,7 +6,7 @@ import { WalletButton } from "./WalletButton";
 import { ChooseWalletModalProps, WalletInfo } from "./types";
 
 export const ChooseWalletModal = ({
-  handleClose,
+  onClose,
   isOpen,
   isWalletEnableLoading,
   onClickShowSupportedWallets,
@@ -16,21 +16,21 @@ export const ChooseWalletModal = ({
     if (!window.cardano) return [];
     const keys = Object.keys(window.cardano);
     let resultWallets: WalletInfo[] = [];
-    keys.forEach((k: string) => {
-      const { icon, name, supportedExtensions } = window.cardano[k];
+    keys.forEach((key: string) => {
+      const { icon, name, supportedExtensions } = window.cardano[key];
       if (icon && name && supportedExtensions) {
         const isNameDuplicate = resultWallets.some(
           (wallet) => wallet.name === name
         );
 
         const isCip95Available = Boolean(
-          supportedExtensions?.find((i) => i.cip === 95)
+          supportedExtensions?.find((extension) => extension.cip === 95)
         );
 
         if (!isNameDuplicate && isCip95Available) {
           resultWallets.push({
             icon,
-            label: k,
+            label: key,
             name,
           });
         }
@@ -41,11 +41,11 @@ export const ChooseWalletModal = ({
   }, [window]);
 
   return (
-    <Modal onClose={handleClose} open={isOpen}>
+    <Modal onClose={onClose} open={isOpen}>
       <Box sx={style.container}>
         <CloseIcon
           data-testid="close-modal-button"
-          onClick={handleClose}
+          onClick={onClose}
           sx={style.closeButton}
         />
         <Box>
@@ -73,12 +73,14 @@ export const ChooseWalletModal = ({
               ))
             )}
           </Box>
-          <Typography sx={style.information}>
-            For more information please check the{" "}
-            <Link onClick={onClickShowSupportedWallets} sx={style.link}>
-              supported wallets list.
-            </Link>
-          </Typography>
+          {onClickShowSupportedWallets && (
+            <Typography sx={style.information}>
+              For more information please check the{" "}
+              <Link onClick={onClickShowSupportedWallets} sx={style.link}>
+                supported wallets list.
+              </Link>
+            </Typography>
+          )}
         </Box>
       </Box>
     </Modal>

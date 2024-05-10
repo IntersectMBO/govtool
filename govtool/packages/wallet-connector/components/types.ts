@@ -1,9 +1,9 @@
 export type ChooseWalletModalProps = {
-  handleClose: () => void;
+  onClose: () => void;
   isOpen: boolean;
   isWalletEnableLoading: boolean;
-  onClickShowSupportedWallets: () => void;
   onClickWalletButton: (walletName: string) => void;
+  onClickShowSupportedWallets?: () => void;
 };
 
 export type WalletInfo = {

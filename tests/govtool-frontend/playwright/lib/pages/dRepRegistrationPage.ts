@@ -27,7 +27,7 @@ export default class DRepRegistrationPage {
     await this.continueBtn.click(); // BUG: testId -> continue-register-button
   }
 
-  async register(dRepInfo: IDRepInfo) {
+  async register(dRepInfo: IDRepInfo = { name: "Test_dRep" }) {
     await this.nameInput.fill(dRepInfo.name);
 
     if (dRepInfo.email != null) {

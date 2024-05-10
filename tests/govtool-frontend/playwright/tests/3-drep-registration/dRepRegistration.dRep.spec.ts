@@ -147,7 +147,7 @@ test.describe("Temporary DReps", () => {
 
     const res = await kuberService.transferADA(
       [wallet.addressBech32(environments.networkId)],
-      600,
+      600
     );
     await pollTransaction(res.txId, res.lockInfo);
 
@@ -166,7 +166,7 @@ test.describe("Temporary DReps", () => {
       .click();
 
     await expect(
-      dRepPage.locator("span").filter({ hasText: "In Progress" }),
+      dRepPage.locator("span").filter({ hasText: "In Progress" })
     ).toBeVisible(); // BUG add proper testId for dRep registration card
   });
 });

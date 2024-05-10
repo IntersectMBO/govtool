@@ -39,7 +39,7 @@ services:
     build:
       context: ../../govtool/frontend
       args:
-        VITE_BASE_URL: ""
+        VITE_BASE_URL: "/api"
     environment:
       VIRTUAL_HOST: https://${BASE_DOMAIN}
     networks:

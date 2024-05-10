@@ -23,8 +23,8 @@ test.describe("Logged in DRep", () => {
     const governanceActionsPage = new GovernanceActionsPage(page);
     await governanceActionsPage.goto();
 
-    const res = await votingPowerPromise;
-    const votingPower = await res.json();
+  const res = await votingPowerPromise;
+  const votingPower = await res.json();
 
     await expect(
       page.getByText(`₳ ${lovelaceToAda(votingPower)}`)

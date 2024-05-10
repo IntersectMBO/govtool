@@ -13,6 +13,7 @@ export default class GovernanceActionDetailsPage {
   readonly governanceActionType = this.page.getByText(
     "Governance Action Type:",
   );
+  readonly showVotesBtn = this.page.getByTestId("show-votes-button");
   readonly submittedDate = this.page.getByTestId("submission-date");
   readonly expiryDate = this.page.getByTestId("expiry-date");
   readonly externalModalBtn = this.page.getByTestId("external-modal-button");

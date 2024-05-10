@@ -12,8 +12,10 @@
   "dependencies": {
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.17",
     "@mui/material": "^5.15.7",
     "@sentry/nextjs": "^7.100.1",
+    "@usersnap/browser": "^0.0.5",
     "axios": "^1.6.7",
     "govtool-submission-tool": "../packages/submission-tool",
     "govtool-wallet-connector": "../packages/wallet-connector",

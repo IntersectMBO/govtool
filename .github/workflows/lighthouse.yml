@@ -1,9 +1,6 @@
 name: Lighthouse
 
 on:
-  push:
-    branches:
-      - tests/lighthouse
   workflow_run:
     workflows:
       - Build and deploy GovTool to TEST server
@@ -13,8 +10,6 @@ on:
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
-    env:
-      NODE_OPTIONS: --max_old_space_size=4096
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3

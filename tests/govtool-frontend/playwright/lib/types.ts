@@ -29,6 +29,7 @@ export interface IProposal {
   references: any;
   yesVotes: number;
   noVotes: number;
+  abstainVotes: number;
 }
 
 export type IVote = {
@@ -50,3 +51,12 @@ export type IDRepInfo = {
   bio?: string;
   extraContentLinks?: string[];
 };
+export enum FilterOption {
+  ProtocolParameterChange = "ParameterChange",
+  InfoAction = "InfoAction",
+  TreasuryWithdrawal = "TreasuryWithdrawals",
+  HardFork = "HardForkInitiation",
+  NoConfidence = "NoConfidence",
+  NewCommittee = "NewCommittee",
+  UpdatetotheConstitution = "NewConstitution",
+}

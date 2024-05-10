@@ -1,18 +1,8 @@
 import removeAllSpaces from "@helpers/removeAllSpaces";
 import { Locator, Page, expect } from "@playwright/test";
-import { IProposal } from "@types";
+import { FilterOption, IProposal } from "@types";
 import environments from "lib/constants/environments";
 import GovernanceActionDetailsPage from "./governanceActionDetailsPage";
-
-enum FilterOption {
-  ProtocolParameterChange = "ParameterChange",
-  InfoAction = "InfoAction",
-  TreasuryWithdrawal = "TreasuryWithdrawals",
-  HardFork = "HardForkInitiation",
-  NoConfidence = "NoConfidence",
-  NewCommittee = "NewCommittee",
-  UpdatetotheConstitution = "NewConstitution",
-}
 
 export default class GovernanceActionsPage {
   readonly filterBtn = this.page.getByTestId("filters-button");

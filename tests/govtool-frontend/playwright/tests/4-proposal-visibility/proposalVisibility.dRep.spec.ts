@@ -129,3 +129,48 @@ test.describe("Temporary DReps", async () => {
     expect(false, "No vote context displayed").toBe(true);
   });
 });
+
+test("4G. Should display correct vote counts on governance details page for DRep", async ({
+  page,
+}) => {
+  const responsesPromise = Object.keys(FilterOption).map((filterKey) =>
+    page.waitForResponse((response) =>
+      response.url().includes(`&type[]=${FilterOption[filterKey]}`)
+    )
+  );
+
+  const governanceActionsPage = new GovernanceActionsPage(page);
+  await governanceActionsPage.goto();
+  const responses = await Promise.all(responsesPromise);
+  const proposals: IProposal[] = (
+    await Promise.all(
+      responses.map(async (response) => {
+        const data = await response.json();
+        return data.elements;
+      })
+    )
+  ).flat();
+
+  expect(proposals.length, "No proposals found!").toBeGreaterThan(0);
+
+  const proposalToCheck = proposals[0];
+  const govActionDetailsPage =
+    await governanceActionsPage.viewProposal(proposalToCheck);
+  await govActionDetailsPage.showVotesBtn.click();
+
+  await expect(
+    page
+      .getByText("yes₳")
+      .getByText(`₳ ${lovelaceToAda(proposalToCheck.yesVotes)}`)
+  ).toBeVisible();
+  await expect(
+    page
+      .getByText("abstain₳")
+      .getByText(`₳ ${lovelaceToAda(proposalToCheck.abstainVotes)}`)
+  ).toBeVisible();
+  await expect(
+    page
+      .getByText("no₳")
+      .getByText(`₳ ${lovelaceToAda(proposalToCheck.noVotes)}`)
+  ).toBeVisible();
+});

@@ -23,6 +23,7 @@ import {
   openInNewTab,
   testIdFromLabel,
 } from "@utils";
+import { DRepStatus } from "@/models";
 
 const LINKS = [
   "darlenelonglink1.DRepwebsiteorwhatever.com",
@@ -166,6 +167,9 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
           </DRepDetailsInfoItem>
           <DRepDetailsInfoItem label={t("status")}>
             <StatusPill status={status} />
+            {isMe && (
+              <StatusPill status={DRepStatus.Yourself} sx={{ ml: 0.75 }} />
+            )}
           </DRepDetailsInfoItem>
           <DRepDetailsInfoItem label={t("votingPower")}>
             <Typography sx={{ display: "flex", flexDirection: "row", mt: 0.5 }}>

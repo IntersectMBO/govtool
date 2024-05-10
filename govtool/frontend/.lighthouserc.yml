@@ -1,5 +1,6 @@
 ci:
   collect:
-    staticDistDir: "./dist"
     url:
-      - "http://localhost"
+      - https://govtool.cardanoapi.io
+      - https://govtool.cardanoapi.io/drep_directory
+      - https://govtool.cardanoapi.io/governance_actions

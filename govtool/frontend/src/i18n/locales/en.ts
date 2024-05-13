@@ -261,11 +261,11 @@ export const en = {
       directVoter: "Direct Voter",
       filterTitle: "DRep Status",
       goToDRepDirectory: "Go to DRep Directory",
-      meAsDRep: "This  DRep ID is connected  to your wallet",
+      meAsDRep: "This DRep ID is connected to your wallet",
       myDelegation: "You have delegated <strong>₳ {{ada}}</strong> to:",
       myDelegationToYourself:
         "You have delegated <strong>₳ {{ada}}</strong> to yourself:",
-      myDRep: "This is your DRep",
+      myDRep: "This is your DRep profile",
       listTitle: "Find a DRep",
       noConfidenceDefaultDescription:
         "Select this to signal no confidence in the current constitutional committee by voting NO on every proposal and voting YES to no confidence proposals",

@@ -1,47 +1,31 @@
 name: Lighthouse
 
 on:
-  push:
-    paths:
-      - govtool/frontend/**
-      - .github/workflows/lighthouse.yml
+  workflow_run:
+    workflows:
+      - Build and deploy GovTool to TEST server
+    types:
+      - completed
 
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
-    env:
-      NODE_OPTIONS: --max_old_space_size=4096
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 16
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./govtool/frontend
-
-      - name: Cache npm dependencies
-        id: npm-cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('govtool/frontend/package-lock.json', 'tests/govtool-frontend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
-
       - run: npm install -g @lhci/cli@0.12.x
 
-      - name: Run build  and lighthouse task
+      - name: Run lighthouse task
         working-directory: ./govtool/frontend
         run: |
-          npm install
-          VITE_BASE_URL=https://staging.govtool.byron.network/ npm run build
           lhci collect
 
       - name: Evaluate reports
         if: github.repository_owner != 'IntersectMBO'
+        working-directory: ./govtool/frontend
         run: |
           lhci assert  --preset "lighthouse:recommended"
 
@@ -50,9 +34,4 @@ jobs:
         if: github.repository_owner == 'IntersectMBO'
         run: |
           lhci assert  --preset lighthouse:recommended || echo "LightHouse Assertion error ignored ..."
-          lhci upload --githubAppToken="${{ secrets.LHCI_GITHUB_APP_TOKEN }}" --token="${{ secrets.LHCI_SERVER_TOKEN }}" --serverBaseUrl=https://lighthouse.cardanoapi.io --ignoreDuplicateBuildFailure
-          curl -X POST https://ligththouse.cardanoapi.io/api/metrics/build-reports \
-            -d "@./lighthouseci/$(ls ./.lighthouseci |grep 'lhr.*\.json' | head -n 1)" \
-            -H "commit-hash: $(git rev-parse HEAD)" \
-            -H "secret-token: ${{ secrets.METRICS_SERVER_SECRET_TOKEN }}" \
-            -H 'Content-Type: application/json' || echo "Metric Upload error ignored ..."
+          lhci upload --githubAppToken="${{ secrets.LHCI_GITHUB_APP_TOKEN }}" --token="${{ secrets.LHCI_SERVER_TOKEN }}" --serverBaseUrl=https://lighthouse-govtool.cardanoapi.io --ignoreDuplicateBuildFailure

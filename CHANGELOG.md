@@ -63,6 +63,7 @@ changes.
 
 ### Fixed
 
+- drep/list sql fix (now the drep type is correct) [Issue 957](https://github.com/IntersectMBO/govtool/issues/957)
 - drep/list sql fix (now the latest tx date is correct) [Issue 826](https://github.com/IntersectMBO/govtool/issues/826)
 - drep/info no longer returns null values [Issue 720](https://github.com/IntersectMBO/govtool/issues/720)
 - drep/getVotes no longer returns 500 [Issue 685](https://github.com/IntersectMBO/govtool/issues/685)

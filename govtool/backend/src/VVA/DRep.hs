@@ -62,13 +62,16 @@ listDReps = withPool $ \conn -> do
   timeZone <- liftIO getCurrentTimeZone
   return
     [ DRepRegistration drepHash drepView url dataHash (floor @Scientific deposit) votingPower status drepType txHash (localTimeToUTC timeZone date)
-    | (drepHash, drepView, url, dataHash, deposit, votingPower, isActive, wasDRep, txHash, date) <- results
+    | (drepHash, drepView, url, dataHash, deposit, votingPower, isActive, txHash, date, latestDeposit, latestNonDeregisterVotingAnchorWasNotNull) <- results
     , let status = case (isActive, deposit) of
                       (_, d)        | d < 0 -> Retired
                       (isActive, d) | d >= 0 && isActive -> Active
                                     | d >= 0 && not isActive -> Inactive
-    , let drepType | isNothing url && wasDRep = DRep
-                   | isNothing url && not wasDRep = SoleVoter
+    , let latestDeposit' = floor @Scientific latestDeposit :: Integer
+    , let drepType | latestDeposit' >= 0 && isNothing url = SoleVoter
+                   | latestDeposit' >= 0 && not (isNothing url) = DRep
+                   | latestDeposit' < 0 && not latestNonDeregisterVotingAnchorWasNotNull = SoleVoter
+                   | latestDeposit' < 0 && latestNonDeregisterVotingAnchorWasNotNull = DRep
                    | Data.Maybe.isJust url = DRep
     ]
 

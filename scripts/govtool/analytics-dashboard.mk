@@ -7,7 +7,7 @@ endif
 .DEFAULT_GOAL := push-analytics-dashboard
 
 # image tags
-analytics_dashboard_image_tag := $(shell git log -n 1 --format="%H" -- $(root_dir)/govtool/analytics-dashboard)
+analytics_dashboard_image_tag := $(shell git log -n 1 --format="%H" -- $(root_dir)/govtool/analytics-dashboard)-$(env)
 
 .PHONY: build-analytics-dashboard
 build-analytics-dashboard:

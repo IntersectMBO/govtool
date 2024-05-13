@@ -71,7 +71,7 @@ export const HomeCards = () => {
     >
       {/* DELEGATE CARD */}
       <ActionCard
-        dataTestIdFirstButton="delegate-connect-wallet-button"
+        dataTestIdFirstButton="view-drep-directory-button"
         dataTestIdSecondButton="delegate-learn-more-button"
         description={t("home.cards.delegate.description")}
         firstButtonAction={navigateToDRepDirecotry}

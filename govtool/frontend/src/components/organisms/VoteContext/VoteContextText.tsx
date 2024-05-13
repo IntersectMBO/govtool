@@ -71,6 +71,7 @@ export const VoteContextText = ({
         {...{ control, errors }}
         {...fieldProps}
         isModifiedLayout
+        data-testid="provide-context-input"
       />
     </VoteContextWrapper>
   );

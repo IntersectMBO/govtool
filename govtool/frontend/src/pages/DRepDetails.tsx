@@ -1,5 +1,10 @@
 import { PropsWithChildren } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import {
+  Navigate,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { Box, ButtonBase, Chip, CircularProgress } from "@mui/material";
 
 import { Button, StatusPill, Typography } from "@atoms";
@@ -35,11 +40,13 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
   const { dRepID: myDRepId, pendingTransaction } = useCardano();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { openModal } = useModal();
   const { screenWidth } = useScreenDimension();
   const { dRepId: dRepParam } = useParams();
-
   const { delegate, isDelegating } = useDelegateTodRep();
+
+  const displayBackButton = location.state?.enteredFromWithinApp || false;
 
   const { dRepData, isDRepListLoading } = useGetDRepListInfiniteQuery({
     searchPhrase: dRepParam,
@@ -74,16 +81,25 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
 
   return (
     <>
-      <LinkWithIcon
-        data-testid="back-to-list-button"
-        label={t("backToList")}
-        onClick={() =>
-          navigate(
-            isConnected ? PATHS.dashboardDRepDirectory : PATHS.dRepDirectory,
-          )
-        }
-        sx={{ mb: 2 }}
-      />
+      {displayBackButton ? (
+        <LinkWithIcon
+          data-testid="back-button"
+          label={t("back")}
+          onClick={() => navigate(-1)}
+          sx={{ mb: 2 }}
+        />
+      ) : (
+        <LinkWithIcon
+          data-testid="go-to-drep-directory-button"
+          label={t("dRepDirectory.goToDRepDirectory")}
+          onClick={() =>
+            navigate(
+              isConnected ? PATHS.dashboardDRepDirectory : PATHS.dRepDirectory,
+            )
+          }
+          sx={{ mb: 2 }}
+        />
+      )}
       <Card
         {...((isMe || isMyDrep) && {
           border: true,
@@ -159,9 +175,11 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
           </DRepDetailsInfoItem>
           {/* TODO: fetch metadata, add views for metadata errors */}
           <DRepDetailsInfoItem label={t("email")}>
+            {/* TODO: change email */}
             <MoreInfoLink
               label="darlenelonglink.DRepwebsiteorwhatever.com"
-              navTo="google.com"
+              navTo="example@gmail.com"
+              isEmail
             />
           </DRepDetailsInfoItem>
           <DRepDetailsInfoItem label={t("moreInformation")}>
@@ -171,8 +189,13 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
               flexDirection="column"
               gap={1.5}
             >
+              {/* TODO: update links */}
               {LINKS.map((link) => (
-                <MoreInfoLink key={link} label={link} navTo={link} />
+                <MoreInfoLink
+                  key={link}
+                  label={link}
+                  navTo="https://sancho.network/"
+                />
               ))}
             </Box>
           </DRepDetailsInfoItem>
@@ -283,10 +306,18 @@ const DRepId = ({ children }: PropsWithChildren) => (
 type LinkWithIconProps = {
   label: string;
   navTo: string;
+  isEmail?: boolean;
 };
 
-const MoreInfoLink = ({ label, navTo }: LinkWithIconProps) => {
-  const openLink = () => openInNewTab(navTo);
+const MoreInfoLink = ({ label, navTo, isEmail = false }: LinkWithIconProps) => {
+  const openLink = () => {
+    if (isEmail) {
+      window.location.assign(`mailto:${navTo}`);
+
+      return;
+    }
+    openInNewTab(navTo);
+  };
 
   return (
     <ButtonBase

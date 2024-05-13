@@ -51,6 +51,7 @@ export const DRepStorageInformation = ({
   return (
     <BgCard
       actionButtonLabel={t("submit")}
+      actionButtonDataTestId="register-button"
       backButtonLabel={t("back")}
       isActionButtonDisabled={isActionButtonDisabled}
       isLoadingActionButton={isRegistrationAsDRepLoading}

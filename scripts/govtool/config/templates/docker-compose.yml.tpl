@@ -214,7 +214,6 @@ services:
     environment:
       - GA_CLIENT_EMAIL=${GA_CLIENT_EMAIL}
       - GA_PRIVATE_KEY=${GA_PRIVATE_KEY}
-      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
       - GOOGLE_APPLICATION_CREDENTIALS=/run/secrets/google-credentials.json
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - NEXT_PUBLIC_GA4_PROPERTY_ID=${NEXT_PUBLIC_GA4_PROPERTY_ID}
@@ -225,7 +224,7 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.to-analytics-dashboard.rule=Host(`participation.<DOMAIN>`)"
+      - "traefik.http.routers.to-analytics-dashboard.rule=Host(`participation.sanchogov.tools`)"
       - "traefik.http.routers.to-analytics-dashboard.entrypoints=websecure"
       - "traefik.http.routers.to-analytics-dashboard.tls.certresolver=myresolver"
       - "traefik.http.services.analytics-dashboard.loadbalancer.server.port=3000"

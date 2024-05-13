@@ -90,6 +90,102 @@ instance ToSchema HexText where
       & schema . format ?~ "hex"
       & schema . example ?~ toJSON (HexText "a1b2c3")
 
+newtype AnyValue
+  = AnyValue { unAnyValue :: Maybe Value }
+  deriving newtype (Show)
+
+instance FromJSON AnyValue where
+  parseJSON = pure . AnyValue . Just
+
+instance ToJSON AnyValue where
+  toJSON (AnyValue Nothing)       = Null
+  toJSON (AnyValue (Just params)) = toJSON params
+
+exampleAnyValue :: Text
+exampleAnyValue =
+  "{ \"any\": \"value\"}"
+
+instance ToSchema AnyValue where
+    declareNamedSchema _ = pure $ NamedSchema (Just "AnyValue") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "Any value"
+        & example
+          ?~ toJSON exampleAnyValue
+
+data MetadataValidationStatus
+  = IncorrectFormat
+  | IncorrectJSONLD
+  | IncorrectHash
+  | UrlNotFound
+  deriving (Show, Eq)
+
+instance ToJSON MetadataValidationStatus where
+  toJSON IncorrectFormat = "INCORRECT_FORMTAT"
+  toJSON IncorrectJSONLD = "INVALID_JSONLD"
+  toJSON IncorrectHash = "INVALID_HASH"
+  toJSON UrlNotFound = "URL_NOT_FOUND"
+
+instance FromJSON MetadataValidationStatus where
+  parseJSON (String s) = case s of
+    "INCORRECT_FORMTAT" -> pure IncorrectFormat
+    "INVALID_JSONLD" -> pure IncorrectJSONLD
+    "INVALID_HASH" -> pure IncorrectHash
+    "URL_NOT_FOUND" -> pure UrlNotFound
+    _ -> fail "Invalid MetadataValidationStatus"
+  parseJSON _ = fail "Invalid MetadataValidationStatus"
+
+instance ToSchema MetadataValidationStatus where
+    declareNamedSchema _ = pure $ NamedSchema (Just "MetadataValidationStatus") $ mempty
+        & type_ ?~ OpenApiString
+        & description ?~ "Metadata Validation Status"
+        & enum_ ?~ map toJSON [IncorrectFormat, IncorrectJSONLD, IncorrectHash, UrlNotFound]
+
+data MetadataValidationResponse
+  = MetadataValidationResponse
+      { metadataValidationResponseStatus :: Maybe MetadataValidationStatus
+      , metadataValidationResponseValid :: Bool
+      }
+  deriving (Generic, Show)
+
+deriveJSON (jsonOptions "metadataValidationResponse") ''MetadataValidationResponse
+
+instance ToSchema MetadataValidationResponse where
+    declareNamedSchema _ = do
+      NamedSchema name_ schema_ <-
+        genericDeclareNamedSchema
+        ( fromAesonOptions $ jsonOptions "metadataValidationResponse" )
+        (Proxy :: Proxy MetadataValidationResponse)
+      return $
+        NamedSchema name_ $
+          schema_
+            & description ?~ "Metadata Validation Response"
+            & example
+              ?~ toJSON ("{\"status\": \"INCORRECT_FORMTAT\", \"valid\":false}" :: Text)
+
+data MetadataValidationParams
+  = MetadataValidationParams
+      { metadataValidationParamsUrl :: Text
+      , metadataValidationParamsHash :: HexText
+      }
+  deriving (Generic, Show)
+
+deriveJSON (jsonOptions "metadataValidationParams") ''MetadataValidationParams
+
+instance ToSchema MetadataValidationParams where
+    declareNamedSchema proxy = do
+      NamedSchema name_ schema_ <-
+        genericDeclareNamedSchema
+        ( fromAesonOptions $ jsonOptions "metadataValidationParams" )
+        proxy
+      return $
+        NamedSchema name_ $
+          schema_
+            & description ?~ "Metadata Validation Params"
+            & example
+              ?~ toJSON ("{\"url\": \"https://metadata.xyz\", \"hash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\"}" :: Text)
+
+
+
 data GovActionId
   = GovActionId
       { govActionIdTxHash :: HexText
@@ -349,6 +445,7 @@ data ProposalResponse
       , proposalResponseYesVotes       :: Integer
       , proposalResponseNoVotes        :: Integer
       , proposalResponseAbstainVotes   :: Integer
+      , proposalResponseMetadataStatus :: Maybe MetadataValidationResponse
       }
   deriving (Generic, Show)
 
@@ -374,7 +471,8 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"references\": [{\"uri\": \"google.com\", \"@type\": \"Other\", \"label\": \"example label\"}],"
                   <> "\"yesVotes\": 0,"
                   <> "\"noVotes\": 0,"
-                  <> "\"abstainVotes\": 0}"
+                  <> "\"abstainVotes\": 0"
+                  <> "\"metadataStatus\": {\"status\": null, \"valid\": true}}"
 
 instance ToSchema ProposalResponse where
   declareNamedSchema proxy = do
@@ -841,3 +939,4 @@ instance ToSchema GetNetworkMetricsResponse where
         & description ?~ "GetNetworkMetricsResponse"
         & example
           ?~ toJSON exampleGetNetworkMetricsResponse
+

@@ -166,6 +166,7 @@ export const TopNav = ({ isConnectButton = true }) => {
                     alt="drawer-icon"
                     src={ICONS.drawerIcon}
                     onClick={openDrawer}
+                    data-testid="open-drawer-button"
                   />
                 )}
               </Box>

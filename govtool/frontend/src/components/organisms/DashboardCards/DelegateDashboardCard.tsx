@@ -12,6 +12,10 @@ import {
   DelegationAction,
 } from "@molecules";
 import { correctAdaFormat, formHexToBech32, openInNewTab } from "@utils";
+import {
+  AutomatedVotingOptionCurrentDelegation,
+  AutomatedVotingOptionDelegationId,
+} from "@/types/automatedVotingOptions";
 
 type DelegateDashboardCardProps = {
   currentDelegation: CurrentDelegation;
@@ -86,7 +90,7 @@ export const DelegateDashboardCard = ({
       buttons: [
         {
           children: t("dashboard.cards.delegation.noDelegationActionButton"),
-          dataTestId: "delegate-button",
+          dataTestId: "view-drep-directory-button",
           onClick: () => navigate(PATHS.dashboardDRepDirectory),
           variant: "contained",
         },
@@ -104,6 +108,7 @@ export const DelegateDashboardCard = ({
           ":dRepId",
           displayedDelegationId || "",
         ),
+        { state: { enteredFromWithinApp: true } },
       ),
     [displayedDelegationId],
   );
@@ -128,9 +133,11 @@ export const DelegateDashboardCard = ({
 
 const getDelegationTitle = (currentDelegation: string | null, ada: number) => {
   const key =
-    currentDelegation === "drep_always_no_confidence"
+    currentDelegation ===
+    AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence
       ? "dashboard.cards.delegation.noConfidenceDelegationTitle"
-      : currentDelegation === "drep_always_abstain"
+      : currentDelegation ===
+        AutomatedVotingOptionCurrentDelegation.drep_always_abstain
       ? "dashboard.cards.delegation.abstainDelegationTitle"
       : "dashboard.cards.delegation.dRepDelegationTitle";
 
@@ -139,9 +146,11 @@ const getDelegationTitle = (currentDelegation: string | null, ada: number) => {
 
 const getDelegationDescription = (currentDelegation: string | null) => {
   const key =
-    currentDelegation === "drep_always_no_confidence"
+    currentDelegation ===
+    AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence
       ? "dashboard.cards.delegation.noDescription"
-      : currentDelegation === "drep_always_abstain"
+      : currentDelegation ===
+        AutomatedVotingOptionCurrentDelegation.drep_always_abstain
       ? "dashboard.cards.delegation.abstainDescription"
       : undefined;
   return <Trans i18nKey={key} />;
@@ -151,9 +160,9 @@ const getProgressDescription = (delegateTo: string, ada: number) => {
   const key = (() => {
     if (!delegateTo) return undefined;
     switch (delegateTo) {
-      case "no confidence":
+      case AutomatedVotingOptionDelegationId.no_confidence:
         return "dashboard.cards.delegation.inProgress.no";
-      case "abstain":
+      case AutomatedVotingOptionDelegationId.abstain:
         return "dashboard.cards.delegation.inProgress.abstain";
       default:
         return "dashboard.cards.delegation.inProgress.dRep";
@@ -173,10 +182,10 @@ const getDisplayedDelegationId = ({
 }) => {
   const restrictedNames = [
     dRepID,
-    "drep_always_abstain",
-    "drep_always_no_confidence",
-    "abstain",
-    "no confidence",
+    AutomatedVotingOptionCurrentDelegation.drep_always_abstain,
+    AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence,
+    AutomatedVotingOptionDelegationId.abstain,
+    AutomatedVotingOptionDelegationId.no_confidence,
   ];
   if (delegateTo) {
     if (!restrictedNames.includes(delegateTo)) {

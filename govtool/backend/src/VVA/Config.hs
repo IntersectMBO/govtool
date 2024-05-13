@@ -24,6 +24,8 @@ module VVA.Config
     , getServerHost
     , getServerPort
     , vvaConfigToText
+    , getMetadataValidationHost
+    , getMetadataValidationPort
     ) where
 
 import           Conferer
@@ -69,15 +71,19 @@ instance DefaultConfig DBConfig where
 data VVAConfigInternal
   = VVAConfigInternal
       { -- | db-sync database access.
-        vVAConfigInternalDbsyncconfig         :: DBConfig
+        vVAConfigInternalDbsyncconfig           :: DBConfig
         -- | Server port.
-      , vVAConfigInternalPort                 :: Int
+      , vVAConfigInternalPort                   :: Int
         -- | Server host.
-      , vVAConfigInternalHost                 :: Text
+      , vVAConfigInternalHost                   :: Text
         -- | Request cache duration
-      , vVaConfigInternalCacheDurationSeconds :: Int
+      , vVaConfigInternalCacheDurationSeconds   :: Int
         -- | Sentry DSN
-      , vVAConfigInternalSentrydsn            :: String
+      , vVAConfigInternalSentrydsn              :: String
+        -- | Metadata validation service host
+      , vVAConfigInternalMetadataValidationHost :: Text
+        -- | Metadata validation service port
+      , vVAConfigInternalMetadataValidationPort :: Int
       }
   deriving (FromConfig, Generic, Show)
 
@@ -88,7 +94,9 @@ instance DefaultConfig VVAConfigInternal where
         vVAConfigInternalPort = 3000,
         vVAConfigInternalHost = "localhost",
         vVaConfigInternalCacheDurationSeconds = 20,
-        vVAConfigInternalSentrydsn = "https://username:password@senty.host/id"
+        vVAConfigInternalSentrydsn = "https://username:password@senty.host/id",
+        vVAConfigInternalMetadataValidationHost = "localhost",
+        vVAConfigInternalMetadataValidationPort = 3001
       }
 
 -- | DEX configuration.
@@ -104,6 +112,10 @@ data VVAConfig
       , cacheDurationSeconds   :: Int
         -- | Sentry DSN
       , sentryDSN              :: String
+        -- | Metadata validation service host
+      , metadataValidationHost :: Text
+        -- | Metadata validation service port
+      , metadataValidationPort :: Int
       }
   deriving (Generic, Show, ToJSON)
 
@@ -143,7 +155,9 @@ convertConfig VVAConfigInternal {..} =
       serverPort = vVAConfigInternalPort,
       serverHost = vVAConfigInternalHost,
       cacheDurationSeconds = vVaConfigInternalCacheDurationSeconds,
-      sentryDSN = vVAConfigInternalSentrydsn
+      sentryDSN = vVAConfigInternalSentrydsn,
+      metadataValidationHost = vVAConfigInternalMetadataValidationHost,
+      metadataValidationPort = vVAConfigInternalMetadataValidationPort
     }
 
 -- | Load configuration from a file specified on the command line.  Load from
@@ -181,3 +195,15 @@ getServerHost ::
   (Has VVAConfig r, MonadReader r m) =>
   m Text
 getServerHost = asks (serverHost . getter)
+
+-- | Access MetadataValidationService host
+getMetadataValidationHost ::
+  (Has VVAConfig r, MonadReader r m) =>
+  m Text
+getMetadataValidationHost = asks (metadataValidationHost . getter)
+
+-- | Access MetadataValidationService port
+getMetadataValidationPort ::
+  (Has VVAConfig r, MonadReader r m) =>
+  m Int
+getMetadataValidationPort = asks (metadataValidationPort . getter)

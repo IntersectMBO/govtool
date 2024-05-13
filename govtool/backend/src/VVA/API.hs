@@ -11,7 +11,7 @@ module VVA.API where
 import           Control.Exception    (throw)
 import           Control.Monad.Except (throwError)
 import           Control.Monad.Reader
-
+import           Data.Aeson           (Result(Error, Success), fromJSON)
 import           Data.Bool            (Bool)
 import           Data.List            (sortOn)
 import qualified Data.Map             as Map
@@ -39,8 +39,9 @@ import qualified VVA.Proposal         as Proposal
 import qualified VVA.Transaction      as Transaction
 import qualified VVA.Types            as Types
 import           VVA.Types            (App, AppEnv (..),
-                                       AppError (CriticalError, ValidationError),
+                                       AppError (CriticalError, ValidationError, InternalError),
                                        CacheEnv (..))
+import qualified VVA.Metadata         as Metadata
 
 type VVAApi =
          "drep" :> "list"
@@ -73,6 +74,7 @@ type VVAApi =
     :<|> "transaction" :> "status" :> Capture "transactionId" HexText :> Get '[JSON] GetTransactionStatusResponse
     :<|> "throw500" :> Get '[JSON] ()
     :<|> "network" :> "metrics" :> Get '[JSON] GetNetworkMetricsResponse
+    :<|> "metadata" :> "validate" :> ReqBody '[JSON] MetadataValidationParams :> Post '[JSON] MetadataValidationResponse
 
 server :: App m => ServerT VVAApi m
 server = drepList
@@ -87,6 +89,7 @@ server = drepList
     :<|> getTransactionStatus
     :<|> throw500
     :<|> getNetworkMetrics
+    :<|> validateMetadata
 
 
 mapDRepType :: Types.DRepType -> DRepType
@@ -174,8 +177,8 @@ getVotingPower (unHexText -> dRepId) = do
   cacheRequest dRepVotingPowerCache dRepId $ DRep.getVotingPower dRepId
 
 
-proposalToResponse :: Types.Proposal -> ProposalResponse
-proposalToResponse Types.Proposal {..} =
+proposalToResponse :: Types.Proposal -> MetadataValidationResponse -> ProposalResponse
+proposalToResponse Types.Proposal {..} metadataValidationResponse =
   ProposalResponse
   { proposalResponseId = pack $ show proposalId,
     proposalResponseTxHash = HexText proposalTxHash,
@@ -196,7 +199,8 @@ proposalToResponse Types.Proposal {..} =
     proposalResponseReferences = GovernanceActionReferences <$> proposalReferences,
     proposalResponseYesVotes = proposalYesVotes,
     proposalResponseNoVotes = proposalNoVotes,
-    proposalResponseAbstainVotes = proposalAbstainVotes
+    proposalResponseAbstainVotes = proposalAbstainVotes,
+    proposalResponseMetadataStatus = Just metadataValidationResponse
   }
 
 voteToResponse :: Types.Vote -> VoteParams
@@ -214,16 +218,17 @@ voteToResponse Types.Vote {..} =
 
 
 mapSortAndFilterProposals
-  :: [GovernanceActionType]
+  :: App m
+  => [GovernanceActionType]
   -> Maybe GovernanceActionSortMode
   -> [Types.Proposal]
-  -> [ProposalResponse]
-mapSortAndFilterProposals selectedTypes sortMode proposals =
-  let mappedProposals =
-        map
-          proposalToResponse
+  -> m [ProposalResponse]
+mapSortAndFilterProposals selectedTypes sortMode proposals = do
+  mappedProposals <-
+        mapM
+          (\proposal@Types.Proposal {proposalUrl, proposalDocHash} -> proposalToResponse proposal <$> validateMetadata (MetadataValidationParams proposalUrl $ HexText proposalDocHash))
           proposals
-      filteredProposals =
+  let filteredProposals =
         if null selectedTypes
           then mappedProposals
           else
@@ -232,19 +237,19 @@ mapSortAndFilterProposals selectedTypes sortMode proposals =
                   proposalResponseType `elem` selectedTypes
               )
               mappedProposals
-      sortedProposals = case sortMode of
+  let sortedProposals = case sortMode of
         Nothing              -> filteredProposals
         Just NewestCreated   -> sortOn (Down . proposalResponseCreatedDate) filteredProposals
         Just SoonestToExpire -> sortOn proposalResponseExpiryDate filteredProposals
         Just MostYesVotes    -> sortOn (Down . proposalResponseYesVotes) filteredProposals
-  in sortedProposals
+  return sortedProposals
 
 getVotes :: App m => HexText -> [GovernanceActionType] -> Maybe GovernanceActionSortMode -> Maybe Text -> m [VoteResponse]
 getVotes (unHexText -> dRepId) selectedTypes sortMode mSearch = do
   CacheEnv {dRepGetVotesCache} <- asks vvaCache
   (votes, proposals) <- cacheRequest dRepGetVotesCache dRepId $ DRep.getVotes dRepId []
   let voteMap = Map.fromList $ map (\vote@Types.Vote {..} -> (voteProposalId, vote)) votes
-  let processedProposals = filter (isProposalSearchedFor mSearch) $ mapSortAndFilterProposals selectedTypes sortMode proposals
+  processedProposals <- filter (isProposalSearchedFor mSearch) <$> mapSortAndFilterProposals selectedTypes sortMode proposals
   return $
     [ VoteResponse
       { voteResponseVote = voteToResponse (voteMap Map.! read (unpack proposalResponseId))
@@ -321,12 +326,14 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
 
 
   CacheEnv {proposalListCache} <- asks vvaCache
-  mappedAndSortedProposals <-
-    filter
+  mappedAndSortedProposals <- do
+    proposals <- cacheRequest proposalListCache () Proposal.listProposals
+    mappedSortedAndFilteredProposals <- mapSortAndFilterProposals selectedTypes sortMode proposals
+    return $ filter
       ( \p@ProposalResponse {proposalResponseId} ->
           proposalResponseId `notElem` proposalsToRemove
           && isProposalSearchedFor mSearchQuery p
-      ) . mapSortAndFilterProposals selectedTypes sortMode <$> cacheRequest proposalListCache () Proposal.listProposals
+      ) mappedSortedAndFilteredProposals
 
   let total = length mappedAndSortedProposals :: Int
 
@@ -343,7 +350,9 @@ getProposal :: App m => GovActionId -> Maybe HexText -> m GetProposalResponse
 getProposal g@(GovActionId govActionTxHash govActionIndex) mDrepId' = do
   let mDrepId = unHexText <$> mDrepId'
   CacheEnv {getProposalCache} <- asks vvaCache
-  proposalResponse <- proposalToResponse <$> cacheRequest getProposalCache (unHexText govActionTxHash, govActionIndex) (Proposal.getProposal (unHexText govActionTxHash) govActionIndex)
+  proposal@Types.Proposal {proposalUrl, proposalDocHash} <- cacheRequest getProposalCache (unHexText govActionTxHash, govActionIndex) (Proposal.getProposal (unHexText govActionTxHash) govActionIndex)
+  metadataStatus <- validateMetadata $ MetadataValidationParams proposalUrl $ HexText proposalDocHash
+  let proposalResponse = proposalToResponse proposal metadataStatus
   voteResponse <- case mDrepId of
     Nothing -> return Nothing
     Just drepId -> do
@@ -390,3 +399,13 @@ getNetworkMetrics = do
     , getNetworkMetricsResponseAlwaysAbstainVotingPower = networkMetricsAlwaysAbstainVotingPower
     , getNetworkMetricsResponseAlwaysNoConfidenceVotingPower = networkMetricsAlwaysNoConfidenceVotingPower
     }
+
+validateMetadata :: App m => MetadataValidationParams -> m MetadataValidationResponse
+validateMetadata MetadataValidationParams {..} = do
+  CacheEnv {metadataValidationCache} <- asks vvaCache
+  result <- cacheRequest metadataValidationCache (metadataValidationParamsUrl, unHexText metadataValidationParamsHash)
+      $ Metadata.validateMetadata metadataValidationParamsUrl (unHexText metadataValidationParamsHash)
+
+  case fromJSON result of
+    Error e -> throwError $ InternalError $ pack $ show e
+    Success a -> return a

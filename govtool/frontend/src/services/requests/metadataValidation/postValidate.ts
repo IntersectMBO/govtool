@@ -1,9 +1,9 @@
 import type { MetadataValidationDTO, ValidateMetadataResult } from "@models";
-import { METADATA_VALIDATION_API } from "../../API";
+import { API } from "@services";
 
 export const postValidate = async (body: MetadataValidationDTO) => {
-  const response = await METADATA_VALIDATION_API.post<ValidateMetadataResult>(
-    `/validate`,
+  const response = await API.post<ValidateMetadataResult>(
+    `/metadata/validate`,
     body,
   );
 

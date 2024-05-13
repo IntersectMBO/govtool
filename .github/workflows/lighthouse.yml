@@ -1,11 +1,13 @@
 name: Lighthouse
 
 on:
+  push:
+    paths:
+      - .github/workflows/lighthouse.yml
   workflow_run:
-    workflows:
-      - Build and deploy GovTool to TEST server
-    types:
-      - completed
+    workflows: ["Build and deploy GovTool to TEST server"]
+    types: [completed]
+  workflow_dispatch:
 
 jobs:
   lighthouse:

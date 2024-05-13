@@ -11,5 +11,5 @@
     "cachedurationseconds": 20,
     "sentrydsn": "<SENTRY_DSN>",
     "metadatavalidationhost": "metadata-validation",
-    "3000"   
+    "metadatavalidationport": "3000"   
 }

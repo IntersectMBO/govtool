@@ -1,5 +1,6 @@
 import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
+import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import { isMobile, openDrawerLoggedIn } from "@helpers/mobile";
 import removeAllSpaces from "@helpers/removeAllSpaces";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
@@ -121,4 +122,22 @@ test("4D: Should filter and sort Governance Action Type on governance actions pa
     [removeAllSpaces(filterOptionNames[0])],
   );
   await govActionsPage.validateFilters([filterOptionNames[0]]);
+});
+
+test("4H. Should verify none of the displayed governance actions have expired", async ({
+  page,
+}) => {
+  const govActionsPage = new GovernanceActionsPage(page);
+  await govActionsPage.goto();
+
+  await page.waitForTimeout(4000); // BUG: Delay to load governance actions
+  const proposalCards = await govActionsPage.getAllProposals();
+
+  for (const proposalCard of proposalCards) {
+    const expiryDateEl = proposalCard.getByTestId("expiry-date");
+    const expiryDateTxt = await expiryDateEl.innerText();
+    const expiryDate = extractExpiryDateFromText(expiryDateTxt);
+    const today = new Date();
+    expect(today <= expiryDate).toBeTruthy();
+  }
 });

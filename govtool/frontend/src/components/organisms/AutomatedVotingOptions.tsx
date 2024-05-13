@@ -63,10 +63,13 @@ export const AutomatedVotingOptions = ({
       isDelegationToAbstainInProgress ||
       isDelegationToNoConfidenceInProgress;
 
-    if (shouldBeSetOpen) {
-      setIsOpen(true);
-    }
-  }, [currentDelegation, delegationInProgress]);
+    setIsOpen(shouldBeSetOpen);
+  }, [
+    isDelegatedToAbstain,
+    isDelegatedToNoConfidence,
+    isDelegationToAbstainInProgress,
+    isDelegationToNoConfidenceInProgress,
+  ]);
 
   return (
     <Accordion

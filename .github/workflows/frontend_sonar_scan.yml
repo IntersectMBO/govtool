@@ -35,6 +35,8 @@ jobs:
         npm install
         npm run test:coverage
 
+# Running with docker
+#
 #    - name: Run SonarQube Scanner
 #      run: |
 #        docker run --rm \
@@ -49,4 +51,4 @@ jobs:
         projectBaseDir: govtool/frontend
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        SONAR_HOST_URL: https://sonarcloud.io

@@ -112,9 +112,9 @@ $(target_config_dir)/nginx/auth.conf: $(target_config_dir)/nginx/
 	fi
 
 $(target_config_dir)/nginx/govtool.htpasswd: $(target_config_dir)/nginx/
-	@:$(call check_defined, domain)
-	if [[ "$(domain)" == *"sanchonet.govtool.byron.network"* ]]; then \
-	  echo "$${NGINX_BASIC_AUTH}" > $@; \
+	@:$(call check_defined, env)
+	if [[ "$(env)" != "beta" ]]; then \
+	  echo "$${$(shell echo $(env) | tr a-z A-Z)_NGINX_BASIC_AUTH}" > $@; \
 	else \
 	  echo > $@; \
 	fi

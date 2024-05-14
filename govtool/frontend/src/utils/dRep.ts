@@ -2,7 +2,7 @@ import { DRepData } from "@/models";
 
 export const isSameDRep = (
   { drepId, view }: DRepData,
-  dRepIdOrView: string | undefined,
+  dRepIdOrView: string | undefined | null,
 ) => {
   if (!dRepIdOrView) {
     return false;

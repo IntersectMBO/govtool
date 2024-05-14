@@ -123,7 +123,7 @@ export const DelegateDashboardCard = ({
       {displayedDelegationId && (
         <DelegationAction
           dRepId={displayedDelegationId}
-          onClickArrow={navigateToDRepDetails}
+          onCardClick={navigateToDRepDetails}
           sx={{ mt: 1.5 }}
         />
       )}

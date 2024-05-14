@@ -18,3 +18,4 @@ export * from "./postDRepRemoveVote";
 export * from "./postDRepRetire";
 export * from "./postDRepVote";
 export * from "./metadataValidation";
+export * from "./getNetworkMetrics";

@@ -9,9 +9,9 @@ import {
 import { Typography } from "@atoms";
 import { ICONS } from "@consts";
 import { PendingTransaction } from "@context";
-import { useTranslation } from "@hooks";
+import { useGetNetworkMetrics, useTranslation } from "@hooks";
 import { AutomatedVotingCard } from "@molecules";
-import { openInNewTab } from "@/utils";
+import { correctAdaFormat, openInNewTab } from "@/utils";
 import {
   AutomatedVotingOptionCurrentDelegation,
   AutomatedVotingOptionDelegationId,
@@ -41,6 +41,8 @@ export const AutomatedVotingOptions = ({
   const { t } = useTranslation();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const { networkMetrics } = useGetNetworkMetrics();
 
   // TODO: Change to certain automated voted option if available
   const onClickInfo = () => openInNewTab("https://docs.sanchogov.tools/");
@@ -117,7 +119,11 @@ export const AutomatedVotingOptions = ({
                   })
                 : t("dRepDirectory.abstainCardDefaultTitle")
             }
-            votingPower={votingPower}
+            votingPower={
+              networkMetrics
+                ? correctAdaFormat(networkMetrics?.alwaysAbstainVotingPower)
+                : ""
+            }
             transactionId={
               pendingTransaction?.delegate?.resourceId ===
               AutomatedVotingOptionDelegationId.abstain
@@ -148,7 +154,13 @@ export const AutomatedVotingOptions = ({
                   })
                 : t("dRepDirectory.noConfidenceDefaultTitle")
             }
-            votingPower={votingPower}
+            votingPower={
+              networkMetrics
+                ? correctAdaFormat(
+                    networkMetrics?.alwaysNoConfidenceVotingPower,
+                  )
+                : ""
+            }
             transactionId={
               pendingTransaction?.delegate?.resourceId ===
               AutomatedVotingOptionDelegationId.no_confidence

@@ -65,7 +65,12 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const { dRepData: yourselfDRepList } = useGetDRepListInfiniteQuery({
     searchPhrase: myDRepId,
   });
-  const yourselfDRep = isConnected ? yourselfDRepList?.[0] : undefined;
+
+  const yourselfDRep =
+    !!isConnected &&
+    (debouncedSearchText === myDRepId || debouncedSearchText === "")
+      ? yourselfDRepList?.[0]
+      : undefined;
 
   const {
     dRepData: dRepList,

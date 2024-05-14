@@ -1,7 +1,12 @@
 import { dRep01Wallet } from "@constants/staticWallets";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
+import { setAllureEpic } from "@helpers/allure";
 import { expect, test } from "@playwright/test";
 import { DRepStatus } from "@types";
+
+test.beforeEach(async () => {
+  await setAllureEpic("2. Delegation");
+});
 
 test("2J. Should search by DRep id", async ({ page }) => {
   const dRepDirectory = new DRepDirectoryPage(page);

@@ -1,11 +1,13 @@
+import { setAllureEpic } from "@helpers/allure";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import { expect, test } from "@playwright/test";
 import environments from "lib/constants/environments";
 
-test("6C. Navigation within the dApp @smoke @fast", async ({
-  page,
-  context,
-}) => {
+test.beforeEach(async () => {
+  await setAllureEpic("6. Miscellaneous");
+});
+
+test("6C. Navigation within the dApp", async ({ page, context }) => {
   await page.goto("/");
 
   if (isMobile(page)) {

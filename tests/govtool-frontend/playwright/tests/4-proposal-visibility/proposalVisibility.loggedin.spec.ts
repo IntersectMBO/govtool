@@ -1,5 +1,6 @@
 import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
+import { setAllureEpic } from "@helpers/allure";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import removeAllSpaces from "@helpers/removeAllSpaces";
@@ -23,6 +24,10 @@ enum SortOption {
 }
 
 test.use({ storageState: ".auth/user01.json", wallet: user01Wallet });
+
+test.beforeEach(async () => {
+  await setAllureEpic("4. Proposal visibility");
+});
 
 test("4A.1: Should access Governance Actions page with connecting wallet", async ({
   page,

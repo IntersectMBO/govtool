@@ -1,4 +1,9 @@
+import { setAllureEpic } from "@helpers/allure";
 import { expect, test } from "@playwright/test";
+
+test.beforeEach(async () => {
+  await setAllureEpic("3. DRep registration");
+});
 
 test("3C. Should open wallet connection popup on DRep registration in disconnected state", async ({
   page,

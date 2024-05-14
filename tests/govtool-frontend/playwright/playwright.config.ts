@@ -27,7 +27,14 @@ export default defineConfig({
   /*use Allure Playwright's testPlanFilter() to determine the grep parameter*/
   grep: testPlanFilter(),
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: process.env.CI ? [["line"], ["allure-playwright"]] : [["line"]],
+  reporter: process.env.CI
+    ? [
+        ["line"],
+        [
+          "allure-playwright"
+        ],
+      ]
+    : [["line"]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */

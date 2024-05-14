@@ -94,6 +94,7 @@ services:
       - node_ipc:/ipc/
     networks:
       - cardano
+      - frontend
     deploy:
       placement:
         constraints:

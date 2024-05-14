@@ -99,6 +99,9 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const dRepListToDisplay = yourselfDRep
     ? [yourselfDRep, ...dRepsWithoutYourself]
     : dRepList;
+  const inProgressDelegationDRepData = dRepListToDisplay.find(
+    (dRep) => dRep.drepId === inProgressDelegation,
+  );
 
   const isAnAutomatedVotingOptionChosen =
     currentDelegation?.dRepView &&
@@ -110,7 +113,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   return (
     <Box display="flex" flex={1} flexDirection="column" gap={4}>
       {/* My delegation */}
-      {myDrep && (
+      {myDrep && !inProgressDelegation && (
         <div>
           <Typography variant="title2" sx={{ mb: 2 }}>
             <Trans i18nKey="dRepDirectory.myDelegation" values={{ ada }} />
@@ -122,6 +125,14 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             isMe={isSameDRep(myDrep, myDRepId)}
           />
         </div>
+      )}
+      {inProgressDelegation && inProgressDelegationDRepData && (
+        <DRepCard
+          dRep={inProgressDelegationDRepData}
+          isConnected={!!isConnected}
+          isMe={isSameDRep(inProgressDelegationDRepData, myDRepId)}
+          isInProgress
+        />
       )}
 
       {/* Automated voting options */}
@@ -204,7 +215,10 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             </Card>
           )}
           {dRepListToDisplay?.map((dRep) => {
-            if (isSameDRep(dRep, myDrep?.view)) {
+            if (
+              isSameDRep(dRep, myDrep?.view) ||
+              isSameDRep(dRep, inProgressDelegation)
+            ) {
               return null;
             }
             return (
@@ -212,7 +226,6 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
                 <DRepCard
                   dRep={dRep}
                   isConnected={!!isConnected}
-                  isInProgress={isSameDRep(dRep, inProgressDelegation)}
                   isMe={isSameDRep(dRep, myDRepId)}
                   onDelegate={() => delegate(dRep.drepId)}
                 />

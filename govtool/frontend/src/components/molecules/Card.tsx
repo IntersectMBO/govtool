@@ -10,6 +10,7 @@ type CardProps = PropsWithChildren & {
   label?: string;
   sx?: SxProps<Theme>;
   variant?: "default" | "error" | "primary" | "success" | "warning";
+  onCardClick?: () => void;
 };
 
 const COLORS = {
@@ -42,6 +43,7 @@ export const Card = ({
   elevation = 3,
   label,
   sx,
+  onCardClick,
 }: CardProps) => {
   const colors = COLORS[variant];
 
@@ -57,6 +59,7 @@ export const Card = ({
         position: "relative",
         ...sx,
       }}
+      onClick={onCardClick}
     >
       {label && (
         <Chip

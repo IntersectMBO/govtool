@@ -23,7 +23,6 @@ jobs:
       GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
       GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
       GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
-      SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
       GTM_ID: ${{ secrets.GTM_ID }}
       IP_ADDRESS_BYPASSING_BASIC_AUTH1: ${{ secrets.IP_ADDRESS_BYPASSING_BASIC_AUTH1 }}
       IP_ADDRESS_BYPASSING_BASIC_AUTH2: ${{ secrets.IP_ADDRESS_BYPASSING_BASIC_AUTH2 }}
@@ -32,7 +31,9 @@ jobs:
       TEST_NGINX_BASIC_AUTH: ${{ secrets.TEST_NGINX_BASIC_AUTH }}
       PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
-      PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
+      SENTRY_IGNORE_API_RESOLUTION_ERROR: "1"
+      TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
       USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
     steps:
       - name: Checkout code

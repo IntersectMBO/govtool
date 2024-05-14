@@ -244,7 +244,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.middlewares.backend-stripprefix.stripprefix.prefixes=/api"
-      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=GET,HEAD,OPTIONS"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=GET,POST,HEAD,OPTIONS"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=*"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlist=https://<DOMAIN><CSP_ALLOWED_HOSTS>"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolmaxage=100"

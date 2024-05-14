@@ -140,6 +140,5 @@ scripts/govtool/dev-postgres_password
 
 node_modules
 
-
 # sonar scanner
 .scannerwork/

@@ -9,5 +9,7 @@
     "port" : 9876,
     "host" : "0.0.0.0",
     "cachedurationseconds": 20,
-    "sentrydsn": "<SENTRY_DSN>"
+    "sentrydsn": "<SENTRY_DSN>",
+    "metadatavalidationhost": "metadata-validation",
+    "metadatavalidationport": "3000"   
 }

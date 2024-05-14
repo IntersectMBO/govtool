@@ -15,15 +15,40 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: govtool/frontend/node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: "govtool/frontend/.nvmrc"
+
+    - name: 🧪 Test
+      working-directory: govtool/frontend
+      env:
+        NODE_OPTIONS: "--max_old_space_size=4096"
+      run: |
+        npm install
+        npm run test:coverage
+
+# Running with docker
+#
+#    - name: Run SonarQube Scanner
+#      run: |
+#        docker run --rm \
+#          -e SONAR_HOST_URL="https://sonarcloud.io" \
+#          -e SONAR_TOKEN="ec4183646e59dd70c8077acfabe52062ccbea7a9" \
+#          -v "$(pwd):/usr/src" \
+#          --workdir=/usr/src/govtool/frontend \
+#          sonarsource/sonar-scanner-cli:5.0.1
+
     - uses: sonarsource/sonarqube-scan-action@master
       with:
         projectBaseDir: govtool/frontend
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: https://sonarcloud.io
-
-      # Fail the build if it doesn't meet quality gate
-      # - uses: sonarsource/sonarqube-quality-gate-action@master
-      #   timeout-minutes: 5
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

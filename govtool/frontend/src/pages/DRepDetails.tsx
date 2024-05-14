@@ -1,10 +1,5 @@
 import { PropsWithChildren } from "react";
-import {
-  Navigate,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Box, ButtonBase, Chip, CircularProgress } from "@mui/material";
 
 import { Button, StatusPill, Typography } from "@atoms";
@@ -16,7 +11,7 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import { Card, LinkWithIcon, Share } from "@molecules";
+import { Card, EmptyStateDrepDirectory, LinkWithIcon, Share } from "@molecules";
 import {
   correctAdaFormat,
   isSameDRep,
@@ -53,7 +48,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
   });
   const dRep = dRepData?.[0];
 
-  if (dRep === undefined || isDRepListLoading)
+  if (isDRepListLoading)
     return (
       <Box
         sx={{
@@ -68,7 +63,19 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
       </Box>
     );
 
-  if (!dRep) return <Navigate to={PATHS.error} />;
+  if (!dRep)
+    return (
+      <Box
+        sx={{
+          alignItems: "center",
+          display: "flex",
+          flex: 1,
+          justifyContent: "center",
+        }}
+      >
+        <EmptyStateDrepDirectory />
+      </Box>
+    );
 
   const { view, status, votingPower, type } = dRep;
 

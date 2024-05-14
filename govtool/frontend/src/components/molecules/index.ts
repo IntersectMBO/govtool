@@ -12,6 +12,7 @@ export * from "./DataActionsSorting";
 export * from "./DataMissingInfoBox";
 export * from "./DelegationAction";
 export * from "./DRepInfoCard";
+export * from "./EmptyStateDrepDirectory";
 export * from "./EmptyStateGovernanceActionsCategory";
 export * from "./Field";
 export * from "./GovActionDetails";

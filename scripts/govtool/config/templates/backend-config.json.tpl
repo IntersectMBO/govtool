@@ -10,6 +10,6 @@
     "host" : "0.0.0.0",
     "cachedurationseconds": 20,
     "sentrydsn": "<SENTRY_DSN>",
-    "metadatavalidationhost": "metadata-validation",
+    "metadatavalidationhost": "http://metadata-validation",
     "metadatavalidationport": "3000"   
 }

@@ -25,6 +25,7 @@ export default class GovernanceActionDetailsPage {
     "view-other-details-button",
   );
   readonly continueModalBtn = this.page.getByTestId("continue-modal-button");
+  readonly confirmModalBtn = this.page.getByTestId("confirm-modal-button");
 
   readonly voteSuccessModal = this.page.getByTestId("alert-success");
   readonly externalLinkModal = this.page.getByTestId("external-link-modal");
@@ -61,7 +62,7 @@ export default class GovernanceActionDetailsPage {
       const voteMetadata = await this.downloadVoteMetadata();
       const url = await metadataBucketService.uploadMetadata(
         voteMetadata.name,
-        voteMetadata.data,
+        voteMetadata.data
       );
 
       await this.page.getByPlaceholder("URL").fill(url);
@@ -70,6 +71,11 @@ export default class GovernanceActionDetailsPage {
     }
 
     await this.voteBtn.click();
+  }
+
+  async downloadVoteMetadata() {
+    const download: Download = await this.page.waitForEvent("download");
+    return downloadMetadata(download);
   }
 
   async reVote() {

@@ -27,7 +27,7 @@ test.describe("Logged in DRep", () => {
     const votingPower = await res.json();
 
     await expect(
-      page.getByText(`₳ ${lovelaceToAda(votingPower)}`),
+      page.getByText(`₳ ${lovelaceToAda(votingPower)}`)
     ).toBeVisible();
   });
 
@@ -49,8 +49,8 @@ test.describe("Logged in DRep", () => {
   }) => {
     const responsesPromise = Object.keys(FilterOption).map((filterKey) =>
       page.waitForResponse((response) =>
-        response.url().includes(`&type[]=${FilterOption[filterKey]}`),
-      ),
+        response.url().includes(`&type[]=${FilterOption[filterKey]}`)
+      )
     );
 
     const governanceActionsPage = new GovernanceActionsPage(page);
@@ -61,7 +61,7 @@ test.describe("Logged in DRep", () => {
         responses.map(async (response) => {
           const data = await response.json();
           return data.elements;
-        }),
+        })
       )
     ).flat();
 
@@ -75,17 +75,17 @@ test.describe("Logged in DRep", () => {
     await expect(
       page
         .getByText("yes₳")
-        .getByText(`₳ ${lovelaceToAda(proposalToCheck.yesVotes)}`),
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.yesVotes)}`)
     ).toBeVisible();
     await expect(
       page
         .getByText("abstain₳")
-        .getByText(`₳ ${lovelaceToAda(proposalToCheck.abstainVotes)}`),
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.abstainVotes)}`)
     ).toBeVisible();
     await expect(
       page
         .getByText("no₳")
-        .getByText(`₳ ${lovelaceToAda(proposalToCheck.noVotes)}`),
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.noVotes)}`)
     ).toBeVisible();
   });
 });
@@ -99,13 +99,13 @@ test.describe("Temporary DReps", async () => {
     const wallet = await ShelleyWallet.generate();
     const registrationRes = await kuberService.dRepRegistration(
       convertBufferToHex(wallet.stakeKey.private),
-      convertBufferToHex(wallet.stakeKey.pkh),
+      convertBufferToHex(wallet.stakeKey.pkh)
     );
     await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
 
     const res = await kuberService.transferADA(
       [wallet.addressBech32(environments.networkId)],
-      40,
+      40
     );
     await pollTransaction(res.txId, registrationRes.lockInfo);
 

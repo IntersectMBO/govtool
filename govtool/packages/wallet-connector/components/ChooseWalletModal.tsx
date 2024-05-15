@@ -3,7 +3,7 @@ import { Box, Link, Modal, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
 import { WalletButton } from "./WalletButton";
-import { ChooseWalletModalProps, WalletInfo } from "./types";
+import { ChooseWalletModalProps } from "./types";
 
 export const ChooseWalletModal = ({
   onClose,
@@ -14,30 +14,25 @@ export const ChooseWalletModal = ({
 }: ChooseWalletModalProps) => {
   const walletOptions = useMemo(() => {
     if (!window.cardano) return [];
-    const keys = Object.keys(window.cardano);
-    let resultWallets: WalletInfo[] = [];
-    keys.forEach((key: string) => {
-      const { icon, name, supportedExtensions } = window.cardano[key];
-      if (icon && name && supportedExtensions) {
-        const isNameDuplicate = resultWallets.some(
-          (wallet) => wallet.name === name
-        );
+    const wallets = Object.entries(window.cardano);
 
-        const isCip95Available = Boolean(
-          supportedExtensions?.find((extension) => extension.cip === 95)
-        );
+    const mappedWallets = wallets
+      .filter(
+        ([walletLabel, values]) =>
+          walletLabel === values.name.toLowerCase() &&
+          Boolean(
+            values?.supportedExtensions?.find(
+              (extension) => extension.cip === 95
+            )
+          )
+      )
+      .map(([walletLabel, values]) => ({
+        icon: values.icon,
+        label: walletLabel,
+        name: values.name,
+      }));
 
-        if (!isNameDuplicate && isCip95Available) {
-          resultWallets.push({
-            icon,
-            label: key,
-            name,
-          });
-        }
-      }
-    });
-
-    return resultWallets;
+    return mappedWallets;
   }, [window]);
 
   return (

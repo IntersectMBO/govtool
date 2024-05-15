@@ -1,5 +1,8 @@
 import environments from "@constants/environments";
-import { Page } from "@playwright/test";
+import { downloadMetadata } from "@helpers/metadata";
+import { Download, Page } from "@playwright/test";
+import metadataBucketService from "@services/metadataBucketService";
+import { withTxConfirmation } from "lib/transaction.decorator";
 
 export default class GovernanceActionDetailsPage {
   readonly voteBtn = this.page.getByTestId("vote-button");
@@ -8,7 +11,7 @@ export default class GovernanceActionDetailsPage {
   readonly noVoteRadio = this.page.getByTestId("no-radio");
   readonly abstainRadio = this.page.getByTestId("abstain-radio");
   readonly governanceActionType = this.page.getByText(
-    "Governance Action Type:"
+    "Governance Action Type:",
   );
   readonly submittedDate = this.page.getByTestId("submission-date");
   readonly expiryDate = this.page.getByTestId("expiry-date");
@@ -19,7 +22,7 @@ export default class GovernanceActionDetailsPage {
     name: "Provide context about your",
   }); // BUG testId
   readonly viewOtherDetailsLink = this.page.getByTestId(
-    "view-other-details-button"
+    "view-other-details-button",
   );
   readonly continueModalBtn = this.page.getByTestId("continue-modal-button");
 
@@ -37,12 +40,35 @@ export default class GovernanceActionDetailsPage {
 
   async goto(proposalId: string) {
     await this.page.goto(
-      `${environments.frontendUrl}/governance_actions/${proposalId}`
+      `${environments.frontendUrl}/governance_actions/${proposalId}`,
     );
   }
 
-  async vote() {
+  @withTxConfirmation
+  async vote(context?: string) {
     await this.yesVoteRadio.click();
+
+    if (context) {
+      await this.contextBtn.click();
+      await this.contextInput.fill(context);
+      await this.confirmModalBtn.click();
+      await this.page.getByRole("checkbox").click();
+      await this.confirmModalBtn.click();
+
+      this.page
+        .getByRole("button", { name: "download Vote_Context.jsonld" })
+        .click();
+      const voteMetadata = await this.downloadVoteMetadata();
+      const url = await metadataBucketService.uploadMetadata(
+        voteMetadata.name,
+        voteMetadata.data,
+      );
+
+      await this.page.getByPlaceholder("URL").fill(url);
+      await this.confirmModalBtn.click();
+      await this.page.getByTestId("go-to-vote-modal-button").click();
+    }
+
     await this.voteBtn.click();
   }
 

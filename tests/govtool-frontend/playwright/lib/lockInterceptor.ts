@@ -10,14 +10,6 @@ export interface LockInterceptorInfo {
   address: string;
 }
 
-abstract class BaseLock {
-  abstract acquireLock(key: string, id?: string): Promise<boolean>;
-
-  abstract releaseLock(key: string, id?: string): Promise<boolean>;
-
-  abstract checkLock(key: string): Promise<boolean>;
-}
-
 export class LockInterceptor {
   private static async acquireLock(
     address: string,

@@ -1,5 +1,6 @@
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import environments from "lib/constants/environments";
+import { withTxConfirmation } from "lib/transaction.decorator";
 
 export default class DelegationPage {
   readonly otherOptionsBtn = this.page.getByText("Other options");
@@ -37,8 +38,11 @@ export default class DelegationPage {
     );
   }
 
+  @withTxConfirmation
   async delegateToDRep(dRepId: string) {
     await this.searchInput.fill(dRepId);
+    const delegateBtn = this.page.getByTestId(`${dRepId}-delegate-button`);
+    await expect(delegateBtn).toBeVisible();
     await this.page.getByTestId(`${dRepId}-delegate-button`).click();
   }
 

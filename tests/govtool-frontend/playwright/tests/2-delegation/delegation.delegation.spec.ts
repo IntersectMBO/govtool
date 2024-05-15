@@ -27,8 +27,9 @@ test.describe("Delegate to others", () => {
     const delegationPage = new DelegationPage(page);
     await delegationPage.goto();
 
-    delegationPage.delegateToDRep(dRep01Wallet.dRepId);
-    await waitForTxConfirmation(page);
+    await delegationPage.delegateToDRep(
+      "drep1qzw234c0ly8csamxf8hrhfahvzwpllh2ckuzzvl38d22wwxxquu",
+    );
 
     page.goto("/");
     await expect(page.getByTestId("delegated-dRep-id")).toHaveText(
@@ -81,8 +82,7 @@ test.describe("Change Delegation", () => {
   }) => {
     const delegationPage = new DelegationPage(page);
     await delegationPage.goto();
-    delegationPage.delegateToDRep(dRep01Wallet.dRepId);
-    await waitForTxConfirmation(page);
+    await delegationPage.delegateToDRep(dRep01Wallet.dRepId);
 
     // await delegationPage.goto("/");
     // await adaHolderPage.getByTestId("change-dRep-button").click();

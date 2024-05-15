@@ -51,12 +51,23 @@ export async function pollTransaction(
   }
 }
 
-export async function waitForTxConfirmation(page: Page) {
+export async function waitForTxConfirmation(
+  page: Page,
+  triggerCallback?: () => Promise<void>,
+) {
   let transactionHash: string | undefined;
   const transactionStatusPromise = page.waitForRequest((request) => {
     return request.url().includes("/transaction/status/");
   });
 
+  await triggerCallback?.call(this);
+  await expect(
+    page
+      .getByTestId("alert-warning")
+      .getByText("Transaction in progress", { exact: false }),
+  ).toBeVisible({
+    timeout: 10000,
+  });
   const url = (await transactionStatusPromise).url();
   const regex = /\/transaction\/status\/([^\/]+)$/;
   const match = url.match(regex);

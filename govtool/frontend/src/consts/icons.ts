@@ -17,6 +17,7 @@ export const ICONS = {
   drawerIcon: "/icons/DrawerIcon.svg",
   dRepDirectoryActiveIcon: "/icons/DRepDirectoryActive.svg",
   dRepDirectoryIcon: "/icons/DRepDirectory.svg",
+  editIcon: "/icons/Edit.svg",
   externalLinkIcon: "/icons/ExternalLink.svg",
   faqsActiveIcon: "/icons/FaqsActive.svg",
   faqsIcon: "/icons/Faqs.svg",

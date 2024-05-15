@@ -10,7 +10,7 @@ import { DirectVoterActionProps } from "./types";
 
 export const DelegationAction = ({
   dRepId,
-  onClickArrow,
+  onCardClick,
   sx,
 }: DirectVoterActionProps) => {
   const { t } = useTranslation();
@@ -27,8 +27,10 @@ export const DelegationAction = ({
         justifyContent: "space-between",
         px: 1.5,
         py: 1,
+        cursor: "pointer",
         ...sx,
       }}
+      onCardClick={onCardClick}
     >
       <Box sx={{ width: "90%" }}>
         <Typography fontWeight={600} variant="body2">
@@ -45,11 +47,7 @@ export const DelegationAction = ({
           {dRepId}
         </Typography>
       </Box>
-      <ArrowForwardIosIcon
-        color="primary"
-        onClick={onClickArrow}
-        sx={{ cursor: "pointer", height: 16, width: 24 }}
-      />
+      <ArrowForwardIosIcon color="primary" sx={{ height: 16, width: 24 }} />
     </Card>
   );
 };

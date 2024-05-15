@@ -12,6 +12,7 @@ import { ICONS, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import {
   useDelegateTodRep,
+  useGetAdaHolderCurrentDelegationQuery,
   useGetDRepListInfiniteQuery,
   useScreenDimension,
   useTranslation,
@@ -37,7 +38,7 @@ type DRepDetailsProps = {
 };
 
 export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
-  const { dRepID: myDRepId, pendingTransaction } = useCardano();
+  const { dRepID: myDRepId, pendingTransaction, stakeKey } = useCardano();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,6 +46,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
   const { screenWidth } = useScreenDimension();
   const { dRepId: dRepParam } = useParams();
   const { delegate, isDelegating } = useDelegateTodRep();
+  const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
 
   const displayBackButton = location.state?.enteredFromWithinApp || false;
 
@@ -73,7 +75,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
   const { view, status, votingPower, type } = dRep;
 
   const isMe = isSameDRep(dRep, myDRepId);
-  const isMyDrep = isSameDRep(dRep, myDRepId);
+  const isMyDrep = isSameDRep(dRep, currentDelegation?.dRepView);
   const isMyDrepInProgress = isSameDRep(
     dRep,
     pendingTransaction.delegate?.resourceId,
@@ -117,50 +119,94 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
         }}
       >
         {(isMe || isMyDrep) && (
-          <Chip
-            color="primary"
-            label={
-              isMe ? t("dRepDirectory.meAsDRep") : t("dRepDirectory.myDRep")
-            }
+          <Box
             sx={{
-              boxShadow: (theme) => theme.shadows[2],
-              color: (theme) => theme.palette.text.primary,
-              mb: 1.5,
-              px: 2,
-              py: 0.5,
-              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              mb: "18px",
+              ...(screenWidth <= 1020 && {
+                flexDirection: "column",
+                gap: 3,
+              }),
             }}
-          />
-        )}
-        <Box
-          sx={{
-            alignItems: "center",
-            display: "flex",
-            flexDirection: "row",
-            gap: 1,
-            mb: 3,
-          }}
-        >
-          <Typography
-            fontWeight={600}
-            sx={{ ...ellipsisStyles, flex: 1 }}
-            variant="title2"
           >
-            {type}
-          </Typography>
-          {isMe && (
-            <Button
-              data-testid="edit-drep-data-button"
-              onClick={() => navigate(PATHS.editDrepMetadata)}
-              variant="outlined"
-            >
-              {t("dRepDirectory.editBtn")}
-            </Button>
-          )}
-          <Share link={window.location.href} />
-        </Box>
+            <Chip
+              color="primary"
+              label={
+                isMe ? t("dRepDirectory.meAsDRep") : t("dRepDirectory.myDRep")
+              }
+              sx={{
+                boxShadow: (theme) => theme.shadows[2],
+                color: (theme) => theme.palette.text.primary,
+                px: 2,
+                py: 0.5,
+                ...(isMe && {
+                  width: "351px",
+                }),
+                ...(isMyDrep &&
+                  !isMe && {
+                    width: "100%",
+                  }),
+                ...(screenWidth <= 1020 && {
+                  width: "100%",
+                }),
+              }}
+            />
 
+            {isMe && (
+              <Box
+                sx={{
+                  alignItems: "center",
+                  display: "flex",
+                  gap: 1,
+                  ...(screenWidth < 500 && {
+                    width: "100%",
+                  }),
+                }}
+              >
+                <Button
+                  data-testid="edit-drep-data-button"
+                  onClick={() => navigate(PATHS.editDrepMetadata)}
+                  variant="outlined"
+                  sx={{
+                    ...(screenWidth < 500 && {
+                      width: "100%",
+                    }),
+                  }}
+                >
+                  {t("dRepDirectory.editBtn")}
+                  <img
+                    alt="sorting active"
+                    src={ICONS.editIcon}
+                    style={{ marginLeft: "4px" }}
+                  />
+                </Button>
+                {screenWidth > 1020 && <Share link={window.location.href} />}
+              </Box>
+            )}
+          </Box>
+        )}
         <Box component="dl" gap={2} m={0}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              mb: 3,
+            }}
+          >
+            <Typography
+              fontWeight={600}
+              sx={{ ...ellipsisStyles, flex: 1 }}
+              variant="title2"
+            >
+              {type}
+            </Typography>
+            {(screenWidth <= 1020 || !isMe) && (
+              <Share link={window.location.href} />
+            )}
+          </Box>
           <DRepDetailsInfoItem label={t("drepId")}>
             <DRepId>{view}</DRepId>
           </DRepDetailsInfoItem>

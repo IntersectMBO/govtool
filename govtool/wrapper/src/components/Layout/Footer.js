@@ -5,7 +5,7 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { openInNewTab } from "@/utils";
 import { useUsersnapApi } from "@/context/userSnapApi";
 
-export const Footer = () => {
+export const Footer = ({ sx }) => {
   const { openFeedbackWindow } = useUsersnapApi();
 
   const onClickHelp = () =>
@@ -21,7 +21,7 @@ export const Footer = () => {
   const onClickFeedback = () => openFeedbackWindow();
 
   return (
-    <Box component="footer" sx={style.container}>
+    <Box component="footer" sx={{ ...style.container, ...sx }}>
       <Typography variant="bodyMediumS">© 2024 Intersect MBO</Typography>
       <Box sx={style.linksContainer}>
         <Link
@@ -79,8 +79,8 @@ const style = {
     display: "flex",
     flexDirection: { xxs: "column", md: "row" },
     justifyContent: "space-between",
-    px: { xxs: 2, md: 5 },
-    py: 2,
+    paddingX: { xxs: 2, md: 5 },
+    paddingY: 2,
   },
   helpButton: { color: "fadedPurple.800" },
   link: {

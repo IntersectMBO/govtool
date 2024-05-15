@@ -8,23 +8,23 @@ import { Tooltip } from "./Tooltip";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 export const VotingPowerChips = ({
-  votingPower,
+  sx,
   tooltipHeading,
   tooltipParagraphOne,
   tooltipParagraphTwo,
+  votingPower,
 }) => {
   const { tablet } = useMediaQuery();
   return (
     <Box
-      sx={[
-        style.container,
-        {
-          border: tablet ? 0 : 2,
-          height: tablet ? 24 : 16,
-          maxHeight: tablet ? "20px" : "9px",
-          py: tablet ? "14px" : "9.5px",
-        },
-      ]}
+      sx={{
+        ...style.container,
+        border: tablet ? 0 : 2,
+        height: tablet ? 24 : 16,
+        maxHeight: tablet ? "20px" : "9px",
+        py: tablet ? "14px" : "9.5px",
+        ...sx,
+      }}
     >
       {(tooltipHeading || tooltipParagraphOne || tooltipParagraphTwo) && (
         <Tooltip

@@ -1,14 +1,14 @@
 import { Box, Card, Typography } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
-export const DrepCard = ({ address }) => {
+export const DrepCard = ({ address, sx }) => {
   const copyAddress = (e) => {
     navigator.clipboard.writeText(address);
     e.stopPropagation();
   };
 
   return (
-    <Card elevation={0} sx={style.container}>
+    <Card elevation={0} sx={{ ...style.container, ...sx }}>
       <Box sx={style.leftContainer}>
         <Typography color="grays.400" variant="bodyMediumS">
           My dRep ID:

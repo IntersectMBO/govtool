@@ -1,8 +1,8 @@
 import { Box, Button, Card, Typography, Chip } from "@mui/material";
 
-export const WalletCard = ({ address, onClickDisconnect, network }) => {
+export const WalletCard = ({ address, onClickDisconnect, network, sx }) => {
   return (
-    <Card elevation={0} sx={style.container}>
+    <Card elevation={0} sx={{ ...style.container, ...sx }}>
       {network && (
         <Chip label={network} size="small" sx={style.chip} variant="info" />
       )}

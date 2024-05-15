@@ -7,11 +7,12 @@ export const NavLink = ({
   to,
   activeTypographyVariant,
   typographyVariant,
+  style,
 }) => {
   const isActive = window.location.pathname === to;
 
   return (
-    <Link href={to} style={{ textDecoration: "none" }}>
+    <Link href={to} style={{ textDecoration: "none", ...style }}>
       <Typography
         variant={
           isActive

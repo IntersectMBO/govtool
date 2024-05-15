@@ -24,20 +24,23 @@ import AppLogo from "../../../public/appLogo.svg";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
 export const Header = ({
+  drawerLinks,
+  drawerNavigation,
+  hasDrawerBorder,
+  headerLinks,
+  headerNavigation,
+  isLogo = true,
+  logo,
+  navToOnLogo,
   onClickBackButton,
+  onClickConnect,
+  positionToBlur = 50,
+  sx,
   title,
   votingPower,
-  onClickConnect,
-  navToOnLogo,
   votingPowerTooltipHeading,
   votingPowerTooltipParagraphOne,
   votingPowerTooltipParagraphTwo,
-  headerLinks,
-  headerNavigation,
-  hasDrawerBorder,
-  drawerNavigation,
-  drawerLinks,
-  positionToBlur = 50,
 }) => {
   const { desktop, tablet } = useMediaQuery();
   const [windowScroll, setWindowScroll] = useState(0);
@@ -60,123 +63,124 @@ export const Header = ({
   }, []);
 
   return (
-    <>
-      <AppBar
-        component="nav"
-        sx={[
-          style.header,
-          {
-            backdropFilter:
-              windowScroll > positionToBlur ? "blur(10px)" : "none",
-            backgroundColor:
-              windowScroll > positionToBlur
-                ? "arcticWhite.700"
-                : "arcticWhite.50",
-          },
-        ]}
-      >
-        <Box style={style.container}>
-          <Box sx={style.centeredBox}>
-            {onClickBackButton && (
-              <IconButton onClick={onClickBackButton} sx={style.backButton}>
-                <ArrowBackIosNewIcon color="primary" />
-              </IconButton>
-            )}
+    <AppBar
+      component="nav"
+      sx={{
+        ...style.header,
+        backdropFilter: windowScroll > positionToBlur ? "blur(10px)" : "none",
+        backgroundColor:
+          windowScroll > positionToBlur ? "arcticWhite.700" : "arcticWhite.50",
+        ...sx,
+      }}
+    >
+      <Box style={style.container}>
+        <Box sx={style.centeredBox}>
+          {onClickBackButton && (
+            <IconButton onClick={onClickBackButton} sx={style.backButton}>
+              <ArrowBackIosNewIcon color="primary" />
+            </IconButton>
+          )}
+          {isLogo && (
             <NextLink href={navToOnLogo ?? "/"} style={style.centeredBox}>
               <Image
                 alt="App logo"
-                src={AppLogo}
+                src={logo ? logo : AppLogo}
                 style={tablet ? style.logo : style.mobileLogo}
               />
             </NextLink>
-            {title && (
-              <Typography sx={{ marginLeft: "25px" }} variant="headlineM">
-                {title}
-              </Typography>
-            )}
-          </Box>
-          <Box sx={style.rightContainer}>
-            {(headerLinks?.length || headerNavigation?.length) && (
-              <Box
-                sx={[
-                  style.navItemsContainer,
-                  {
-                    display: { xxs: "none", lg: "grid" },
-                    gridTemplateColumns: `repeat(${
-                      (headerLinks?.length ?? 0) +
-                      (headerNavigation?.length ?? 0)
-                    }, auto)`,
-                  },
-                ]}
-              >
-                {headerNavigation?.map((navItem) => (
-                  <NavLink to={navItem.to} label={navItem.label} />
-                ))}
-                {headerLinks?.map((link) => (
-                  <Link
-                    data-testid={`${link.label}-link`}
-                    onClick={link.onClick}
-                    sx={style.link}
-                    variant="titleS"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </Box>
-            )}
-            {onClickConnect && (
-              <Button
-                size={tablet ? "large" : "small"}
-                onClick={onClickConnect}
-                variant="contained"
-                sx={{
-                  ml: "24px",
-                  height: tablet ? undefined : "32px",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {tablet ? "Connect wallet" : "Connect"}
-              </Button>
-            )}
-            {votingPower && (
-              <VotingPowerChips
-                votingPower={votingPower}
-                tooltipHeading={votingPowerTooltipHeading}
-                tooltipParagraphOne={votingPowerTooltipParagraphOne}
-                tooltipParagraphTwo={votingPowerTooltipParagraphTwo}
-              />
-            )}
-            {desktop ? null : tablet ? (
-              <IconButton
-                data-testid="open-drawer-button"
-                onClick={openDrawer}
-                sx={style.tabletIcon}
-              >
-                <MenuIcon color="primary" />
-              </IconButton>
-            ) : (
-              <IconButton
-                data-testid="open-drawer-button"
-                onClick={openDrawer}
-                sx={style.mobileIcon}
-              >
-                <MoreVertIcon color="primary" />
-              </IconButton>
-            )}
-          </Box>
+          )}
+          {title && (
+            <Typography
+              sx={{
+                marginLeft: isLogo ? "25px" : undefined,
+              }}
+              variant="headlineM"
+            >
+              {title}
+            </Typography>
+          )}
         </Box>
-      </AppBar>
-      <Drawer
-        onClose={closeDrawer}
-        onOpen={openDrawer}
-        isOpen={isDrawerOpen}
-        onClickConnect={onClickConnect}
-        navigation={drawerNavigation}
-        links={drawerLinks}
-        hasDrawerBorder={hasDrawerBorder}
-      />
-      <Toolbar />
-    </>
+        <Box sx={style.rightContainer}>
+          {(headerLinks?.length || headerNavigation?.length) && (
+            <Box
+              sx={[
+                style.navItemsContainer,
+                {
+                  display: { xxs: "none", lg: "grid" },
+                  gridTemplateColumns: `repeat(${
+                    (headerLinks?.length ?? 0) + (headerNavigation?.length ?? 0)
+                  }, auto)`,
+                },
+              ]}
+            >
+              {headerNavigation?.map((navItem) => (
+                <NavLink to={navItem.to} label={navItem.label} />
+              ))}
+              {headerLinks?.map((link) => (
+                <Link
+                  data-testid={`${link.label}-link`}
+                  onClick={link.onClick}
+                  sx={style.link}
+                  variant="titleS"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </Box>
+          )}
+          {onClickConnect && (
+            <Button
+              size={tablet ? "large" : "small"}
+              onClick={onClickConnect}
+              variant="contained"
+              sx={{
+                ml: "24px",
+                height: tablet ? undefined : "32px",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {tablet ? "Connect wallet" : "Connect"}
+            </Button>
+          )}
+          {votingPower && (
+            <VotingPowerChips
+              votingPower={votingPower}
+              tooltipHeading={votingPowerTooltipHeading}
+              tooltipParagraphOne={votingPowerTooltipParagraphOne}
+              tooltipParagraphTwo={votingPowerTooltipParagraphTwo}
+            />
+          )}
+          {desktop ? null : tablet ? (
+            <IconButton
+              data-testid="open-drawer-button"
+              onClick={openDrawer}
+              sx={style.tabletIcon}
+            >
+              <MenuIcon color="primary" />
+            </IconButton>
+          ) : (
+            <IconButton
+              data-testid="open-drawer-button"
+              onClick={openDrawer}
+              sx={style.mobileIcon}
+            >
+              <MoreVertIcon color="primary" />
+            </IconButton>
+          )}
+        </Box>
+      </Box>
+      {desktop ? null : (
+        <Drawer
+          onClose={closeDrawer}
+          onOpen={openDrawer}
+          isOpen={isDrawerOpen}
+          onClickConnect={onClickConnect}
+          navigation={drawerNavigation}
+          links={drawerLinks}
+          hasDrawerBorder={hasDrawerBorder}
+        />
+      )}
+    </AppBar>
   );
 };
 

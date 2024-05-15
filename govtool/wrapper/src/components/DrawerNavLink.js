@@ -3,22 +3,23 @@ import Image from "next/image";
 
 import { Typography } from "@mui/material";
 
-export const DrawerNavLink = ({ activeIcon, icon, label, to }) => {
+export const DrawerNavLink = ({ activeIcon, icon, label, to, style }) => {
   const isActive = window.location.pathname === to;
 
   return (
     <Link
       href={to}
       style={{
-        ...style.container,
+        ...insideStyle.container,
         backgroundColor: isActive ? "#C2EFF299" : undefined,
+        ...style,
       }}
     >
       {icon && (
         <Image
           alt="Sidebar icon"
           src={isActive ? activeIcon ?? icon : icon}
-          style={style.image}
+          style={insideStyle.image}
         />
       )}
       <Typography variant={isActive ? "bodyMediumM" : "bodyRegularM"}>
@@ -28,7 +29,7 @@ export const DrawerNavLink = ({ activeIcon, icon, label, to }) => {
   );
 };
 
-const style = {
+const insideStyle = {
   container: {
     alignItems: "center",
     display: "flex",

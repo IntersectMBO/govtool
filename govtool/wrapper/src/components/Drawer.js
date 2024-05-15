@@ -17,20 +17,27 @@ import AppLogo from "../../public/appLogo.svg";
 import AppLogoWithoutText from "../../public/appLogoWithoutText.svg";
 
 export const Drawer = ({
-  onClose,
-  onOpen,
-  isOpen,
-  votingPower,
   hasDrawerBorder,
-  onClickConnect,
+  isOpen,
   links,
   navigation,
+  onClickConnect,
+  onClose,
+  onOpen,
+  sx,
+  votingPower,
 }) => {
   const onClickHelp = () =>
     openInNewTab("https://docs.sanchogov.tools/support/get-help-in-discord");
 
   return (
-    <MUIDrawer anchor="right" onClose={onClose} onOpen={onOpen} open={isOpen}>
+    <MUIDrawer
+      anchor="right"
+      onClose={onClose}
+      onOpen={onOpen}
+      open={isOpen}
+      sx={sx}
+    >
       <Box
         sx={[
           style.topContainer,

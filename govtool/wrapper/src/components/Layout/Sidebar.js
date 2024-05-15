@@ -13,10 +13,16 @@ export const Sidebar = ({
   navigation,
   navigationLinks,
   network,
+  sx,
   walletAddress,
 }) => {
   return (
-    <Drawer variant="permanent" anchor="left" sx={style.container} open>
+    <Drawer
+      variant="permanent"
+      anchor="left"
+      sx={{ ...style.container, ...sx }}
+      open
+    >
       {/* TODO: Add paths */}
       <NextLink href={"/dashboard"}>
         <Image alt="App logo" src={AppLogo} style={style.logo} />

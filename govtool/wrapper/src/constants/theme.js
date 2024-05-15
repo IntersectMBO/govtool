@@ -286,6 +286,7 @@ export const voltaire = createTheme({
           },
         }),
         ghost: ({ theme }) => ({
+          color: theme.palette.primary[500],
           "&:hover": {
             backgroundColor: "transparent",
             color: theme.palette.primary[700],
@@ -365,6 +366,43 @@ export const voltaire = createTheme({
             paddingTop: "0px",
             maxHeight: 24,
           },
+        },
+      ],
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          boxSizing: "border-box",
+          "& .MuiChip-label": {
+            padding: 0,
+            ...theme.typography.titleS,
+          },
+        }),
+        info: ({ theme }) => ({
+          color: theme.palette.primary[500],
+          backgroundColor: theme.palette.primary[100],
+        }),
+        progress: ({ theme }) => ({
+          color: theme.palette.orange[800],
+          backgroundColor: theme.palette.progress[200],
+        }),
+        finished: ({ theme }) => ({
+          color: theme.palette.success[800],
+          backgroundColor: theme.palette.success[200],
+        }),
+        error: ({ theme }) => ({
+          color: theme.palette.error[500],
+          backgroundColor: theme.palette.error[50],
+        }),
+      },
+      variants: [
+        {
+          props: { size: "small" },
+          style: { padding: "4px 14px", height: "24px" },
+        },
+        {
+          props: { size: "medium" },
+          style: { height: "28px", padding: "6px 18px" },
         },
       ],
     },

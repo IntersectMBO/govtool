@@ -28,6 +28,7 @@ export const Header = ({
   title,
   votingPower,
   onClickConnect,
+  navToOnLogo,
   votingPowerTooltipHeading,
   votingPowerTooltipParagraphOne,
   votingPowerTooltipParagraphTwo,
@@ -81,7 +82,7 @@ export const Header = ({
                 <ArrowBackIosNewIcon color="primary" />
               </IconButton>
             )}
-            <NextLink href={"/"} style={style.centeredBox}>
+            <NextLink href={navToOnLogo ?? "/"} style={style.centeredBox}>
               <Image
                 alt="App logo"
                 src={AppLogo}

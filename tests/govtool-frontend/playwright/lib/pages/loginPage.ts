@@ -47,7 +47,7 @@ export default class LoginPage {
         }
 
         return { stakeKeys, rewardAddresses };
-      }
+      },
     );
 
     // Handle multiple stake keys

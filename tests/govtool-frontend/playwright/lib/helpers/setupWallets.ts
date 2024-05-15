@@ -15,7 +15,7 @@ export default async function setupWallets(wallets: ShelleyWallet[]) {
   const { txId, address } = await kuberService.initializeWallets(
     faucetWallet.address,
     signingKey,
-    wallets
+    wallets,
   );
   await pollTransaction(txId, address);
 

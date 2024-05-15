@@ -7,7 +7,7 @@ import { Page } from "@playwright/test";
 
 export default async function createWallet(
   page: Page,
-  config?: CardanoTestWalletConfig
+  config?: CardanoTestWalletConfig,
 ) {
   const wallet = (await ShelleyWallet.generate()).json();
 

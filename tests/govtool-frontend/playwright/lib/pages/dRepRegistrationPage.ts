@@ -1,4 +1,6 @@
-import { Page } from "@playwright/test";
+import { downloadMetadata } from "@helpers/metadata";
+import { Download, Page } from "@playwright/test";
+import metadataBucketService from "@services/metadataBucketService";
 import { IDRepInfo } from "@types";
 import environments from "lib/constants/environments";
 
@@ -7,7 +9,7 @@ export default class DRepRegistrationPage {
   readonly skipBtn = this.page.getByTestId("skip-button");
   readonly confirmBtn = this.page.getByTestId("confirm-modal-button");
   readonly registrationSuccessModal = this.page.getByTestId(
-    "governance-action-submitted-modal"
+    "governance-action-submitted-modal",
   );
   readonly continueBtn = this.page.getByTestId("retire-button"); // BUG testId -> continue-button
   readonly addLinkBtn = this.page.getByRole("button", { name: "+ Add link" }); // BUG: testId -> add-link-button
@@ -40,13 +42,24 @@ export default class DRepRegistrationPage {
       }
     }
 
+    this.page
+      .getByRole("button", { name: "download Vote_Context.jsonld" })
+      .click();
+    const dRepMetadata = await this.downloadVoteMetadata();
+    const url = await metadataBucketService.uploadMetadata(
+      dRepMetadata.name,
+      dRepMetadata.data,
+    );
     await this.continueBtn.click(); // BUG: testId -> submit-button
     await this.page.getByRole("checkbox").click();
     await this.continueBtn.click(); // BUG: testId -> submit-button
 
-    await this.page
-      .getByPlaceholder("URL")
-      .fill(`${environments.metadataBucketUrl}/Test_dRep`);
+    await this.page.getByPlaceholder("URL").fill(url);
     await this.continueBtn.click();
+  }
+
+  async downloadVoteMetadata() {
+    const download: Download = await this.page.waitForEvent("download");
+    return downloadMetadata(download);
   }
 }

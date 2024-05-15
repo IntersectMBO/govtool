@@ -86,7 +86,9 @@ test.describe("Proposal checks", () => {
 
     await expect(govActionDetailsPage.externalLinkModal).toBeVisible();
     await expect(
-      govActionDetailsPage.currentPage.getByText("Be careful", { exact: false })
+      govActionDetailsPage.currentPage.getByText("Be careful", {
+        exact: false,
+      }),
     ).toBeVisible();
   });
 
@@ -110,13 +112,13 @@ test.describe("Perform voting", () => {
     const wallet = await ShelleyWallet.generate();
     const registrationRes = await kuberService.dRepRegistration(
       convertBufferToHex(wallet.stakeKey.private),
-      convertBufferToHex(wallet.stakeKey.pkh)
+      convertBufferToHex(wallet.stakeKey.pkh),
     );
     await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
 
     const res = await kuberService.transferADA(
       [wallet.addressBech32(environments.networkId)],
-      40
+      40,
     );
     await pollTransaction(res.txId, registrationRes.lockInfo);
 
@@ -141,12 +143,12 @@ test.describe("Perform voting", () => {
     await waitForTxConfirmation(govActionDetailsPage.currentPage);
 
     const governanceActionsPage = new GovernanceActionsPage(
-      govActionDetailsPage.currentPage
+      govActionDetailsPage.currentPage,
     );
     await governanceActionsPage.goto();
     await governanceActionsPage.votedTab.click();
     await expect(
-      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")
+      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes"),
     ).toBeVisible();
 
     govActionDetailsPage = await governanceActionsPage.viewFirstVotedProposal();
@@ -155,7 +157,7 @@ test.describe("Perform voting", () => {
 
     await governanceActionsPage.votedTab.click();
     await expect(
-      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No")
+      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No"),
     ).toBeVisible();
   });
 
@@ -171,12 +173,56 @@ test.describe("Perform voting", () => {
     await waitForTxConfirmation(govActionDetailsPage.currentPage);
 
     const governanceActionsPage = new GovernanceActionsPage(
-      govActionDetailsPage.currentPage
+      govActionDetailsPage.currentPage,
     );
     await governanceActionsPage.goto();
     await governanceActionsPage.votedTab.click();
     await expect(
-      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")
+      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes"),
     ).toBeVisible();
+  });
+});
+
+test.describe("Check voting power", () => {
+  test("5K. Should return deposit on DRep retirement", async ({
+    page,
+    browser,
+  }, testInfo) => {
+    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
+
+    const wallet = await ShelleyWallet.generate();
+    const registrationRes = await kuberService.dRepRegistration(
+      convertBufferToHex(wallet.stakeKey.private),
+      convertBufferToHex(wallet.stakeKey.pkh),
+    );
+    await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
+
+    const res = await kuberService.transferADA(
+      [wallet.addressBech32(environments.networkId)],
+      40,
+    );
+    await pollTransaction(res.txId, registrationRes.lockInfo);
+
+    const tempDRepAuth = await createTempDRepAuth(page, wallet);
+
+    const dRepPage = await createNewPageWithWallet(browser, {
+      storageState: tempDRepAuth,
+      wallet,
+      enableStakeSigning: true,
+    });
+
+    await dRepPage.goto("/");
+    await dRepPage.getByTestId("retire-button").click();
+    await dRepPage.getByTestId("retire-button").click(); // BUG: testId -> continue-retire-button
+    await expect(
+      dRepPage.getByTestId("retirement-transaction-submitted-modal"),
+    ).toBeVisible();
+    dRepPage.getByTestId("confirm-modal-button").click();
+    await waitForTxConfirmation(dRepPage);
+
+    const balance = await kuberService.getBalance(
+      wallet.addressBech32(environments.networkId),
+    );
+    expect(balance, "Retirement deposit not returned").toBeGreaterThan(500);
   });
 });

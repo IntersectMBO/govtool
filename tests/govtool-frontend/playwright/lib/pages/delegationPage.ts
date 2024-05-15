@@ -19,22 +19,22 @@ export default class DelegationPage {
     .filter({ hasText: "Signal No Confidence on Every" })
     .nth(2); // BUG: testId -> signal-no-confidence-card
   readonly abstainDelegationCard = this.page.getByText(
-    "Abstain from Every VoteSelect this to vote ABSTAIN to every vote.Voting Power₳"
-  );// BUG: testId -> abstain-delegation-card
+    "Abstain from Every VoteSelect this to vote ABSTAIN to every vote.Voting Power₳",
+  ); // BUG: testId -> abstain-delegation-card
 
   readonly delegationErrorModal = this.page.getByTestId(
-    "delegation-transaction-error-modal"
+    "delegation-transaction-error-modal",
   );
 
   readonly delegateBtns = this.page.locator(
-    '[data-testid$="-delegate-button"]'
-  ); 
+    '[data-testid$="-delegate-button"]',
+  );
 
   constructor(private readonly page: Page) {}
 
   async goto() {
     await this.page.goto(
-      `${environments.frontendUrl}/connected/dRep_directory`
+      `${environments.frontendUrl}/connected/dRep_directory`,
     );
   }
 

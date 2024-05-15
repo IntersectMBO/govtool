@@ -11,7 +11,7 @@ interface BrowserConfig {
 
 export async function createNewPageWithWallet(
   browser: Browser,
-  { storageState, wallet, enableStakeSigning }: BrowserConfig
+  { storageState, wallet, enableStakeSigning }: BrowserConfig,
 ): Promise<Page> {
   const context = await browser.newContext({
     storageState: storageState,

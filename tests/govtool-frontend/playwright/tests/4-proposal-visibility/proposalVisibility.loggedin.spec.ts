@@ -85,19 +85,19 @@ test("4C.2: Should sort Governance Action Type on governance actions page @slow"
   govActionsPage.sortProposal(SortOption.SoonToExpire);
   await govActionsPage.validateSort(
     SortOption.SoonToExpire,
-    (p1, p2) => p1.expiryDate <= p2.expiryDate
+    (p1, p2) => p1.expiryDate <= p2.expiryDate,
   );
 
   govActionsPage.sortProposal(SortOption.NewestFirst);
   await govActionsPage.validateSort(
     SortOption.NewestFirst,
-    (p1, p2) => p1.createdDate >= p2.createdDate
+    (p1, p2) => p1.createdDate >= p2.createdDate,
   );
 
   govActionsPage.sortProposal(SortOption.HighestYesVotes);
   await govActionsPage.validateSort(
     SortOption.HighestYesVotes,
-    (p1, p2) => p1.yesVotes >= p2.yesVotes
+    (p1, p2) => p1.yesVotes >= p2.yesVotes,
   );
 });
 
@@ -118,7 +118,7 @@ test("4D: Should filter and sort Governance Action Type on governance actions pa
   await govActionsPage.validateSort(
     SortOption.SoonToExpire,
     (p1, p2) => p1.expiryDate <= p2.expiryDate,
-    [removeAllSpaces(filterOptionNames[0])]
+    [removeAllSpaces(filterOptionNames[0])],
   );
   await govActionsPage.validateFilters([filterOptionNames[0]]);
 });

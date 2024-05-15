@@ -44,7 +44,7 @@ export const GovernanceActionDetailsCardLinks = ({
           {links.map((link) => (
             <LinkWithIcon
               key={link.uri}
-              label={link.label}
+              label={link.uri}
               onClick={() => {
                 openModal({
                   type: "externalLink",

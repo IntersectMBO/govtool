@@ -3,7 +3,6 @@ const environments = {
   apiUrl: `${process.env.HOST_URL}/api` || "http://localhost:8080/api",
   docsUrl: process.env.DOCS_URL || "https://docs.sanchogov.tools",
   networkId: parseInt(process.env.NETWORK_ID) || 0,
-  oneTimeWalletSetup: process.env.ONE_TIME_WALLET_SETUP === "true" || false,
   faucet: {
     apiUrl:
       process.env.FAUCET_API_URL ||

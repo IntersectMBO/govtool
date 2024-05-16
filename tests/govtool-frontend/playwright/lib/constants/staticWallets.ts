@@ -32,21 +32,21 @@ export const dRep01Wallet: StaticWallet = {
   dRepId: "drep1g654cyehkfenyycl8sdemrnk38ka9avnulnfhawu7rp8skl824l",
 };
 
-// export const dRep02Wallet: StaticWallet = {
-//   payment: {
-//     private: "71120ea01dc0c367da113a7ee7b3744a46f793edb4f30a06b46d800324b2c999",
-//     public: "66724455eaacb6dea6686ba09bc159d5deef3d82ebf9c6a60d61748b59e32627",
-//     pkh: "363547ffb44d337f8055515e75e8af516e557b3270bfa4d9198e7195",
-//   },
-//   stake: {
-//     private: "4dfc89a9d680b237146dde69282c709e93ba91ac0b028e980bc40ec573c77f0f",
-//     public: "009c10056aff887d66135886d1fb9f046190bdf1d90a3f9cff954386f7cf37fb",
-//     pkh: "4d52d1d178157ab4c5ab6f8cb109ff91f750b367830463ef8344007e",
-//   },
-//   address:
-//     "addr_test1qqmr23llk3xnxluq24g4ua0g4agku4tmxfctlfxerx88r92d2tgaz7q4026vt2m03jcsnlu37agtxeurq337lq6yqplqftpnqu",
-//   dRepId: "drep1f4fdr5tcz4atf3dtd7xtzz0lj8m4pvm8svzx8murgsq8u6dkmf4",
-// };
+export const dRep02Wallet: StaticWallet = {
+  payment: {
+    private: "71120ea01dc0c367da113a7ee7b3744a46f793edb4f30a06b46d800324b2c999",
+    public: "66724455eaacb6dea6686ba09bc159d5deef3d82ebf9c6a60d61748b59e32627",
+    pkh: "363547ffb44d337f8055515e75e8af516e557b3270bfa4d9198e7195",
+  },
+  stake: {
+    private: "4dfc89a9d680b237146dde69282c709e93ba91ac0b028e980bc40ec573c77f0f",
+    public: "009c10056aff887d66135886d1fb9f046190bdf1d90a3f9cff954386f7cf37fb",
+    pkh: "4d52d1d178157ab4c5ab6f8cb109ff91f750b367830463ef8344007e",
+  },
+  address:
+    "addr_test1qqmr23llk3xnxluq24g4ua0g4agku4tmxfctlfxerx88r92d2tgaz7q4026vt2m03jcsnlu37agtxeurq337lq6yqplqftpnqu",
+  dRepId: "drep1f4fdr5tcz4atf3dtd7xtzz0lj8m4pvm8svzx8murgsq8u6dkmf4",
+};
 
 export const adaHolder01Wallet: StaticWallet = {
   payment: {

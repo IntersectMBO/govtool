@@ -3,6 +3,8 @@ import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
 import { LockInterceptor, LockInterceptorInfo } from "lib/lockInterceptor";
 import { Logger } from "../../../cypress/lib/logger/logger";
+import convertBufferToHex from "./convertBufferToHex";
+import { ShelleyWallet } from "./crypto";
 
 /**
  * Polls the transaction status until it's resolved or times out.
@@ -10,7 +12,7 @@ import { Logger } from "../../../cypress/lib/logger/logger";
  */
 export async function pollTransaction(
   txHash: string,
-  lockInfo?: LockInterceptorInfo,
+  lockInfo?: LockInterceptorInfo
 ) {
   try {
     Logger.info(`Waiting for tx completion: ${txHash}`);
@@ -23,7 +25,7 @@ export async function pollTransaction(
         },
         {
           timeout: environments.txTimeOut,
-        },
+        }
       )
       .toBeGreaterThan(0);
 
@@ -34,7 +36,7 @@ export async function pollTransaction(
     await LockInterceptor.releaseLockForAddress(
       lockInfo.address,
       lockInfo.lockId,
-      `Task completed for:${lockInfo.lockId}`,
+      `Task completed for:${lockInfo.lockId}`
     );
   } catch (err) {
     if (lockInfo) {
@@ -43,7 +45,7 @@ export async function pollTransaction(
       await LockInterceptor.releaseLockForAddress(
         lockInfo.address,
         lockInfo.lockId,
-        `Task failure: \n${JSON.stringify(errorMessage)}`,
+        `Task failure: \n${JSON.stringify(errorMessage)}`
       );
     }
 
@@ -53,7 +55,7 @@ export async function pollTransaction(
 
 export async function waitForTxConfirmation(
   page: Page,
-  triggerCallback?: () => Promise<void>,
+  triggerCallback?: () => Promise<void>
 ) {
   let transactionHash: string | undefined;
   const transactionStatusPromise = page.waitForRequest((request) => {
@@ -64,9 +66,9 @@ export async function waitForTxConfirmation(
   await expect(
     page
       .getByTestId("alert-warning")
-      .getByText("Transaction in progress", { exact: false }),
+      .getByText("Transaction in progress", { exact: false })
   ).toBeVisible({
-    timeout: 10000,
+    timeout: 10_000,
   });
   const url = (await transactionStatusPromise).url();
   const regex = /\/transaction\/status\/([^\/]+)$/;
@@ -77,6 +79,29 @@ export async function waitForTxConfirmation(
 
   if (transactionHash) {
     await pollTransaction(transactionHash);
-    await page.reload();
+    await expect(
+      page.getByText("In Progress", { exact: true }).first() //FIXME: Only one element needs to be displayed
+    ).not.toBeVisible({ timeout: 20_000 });
   }
+}
+
+export async function registerStakeForWallet(wallet: ShelleyWallet) {
+  const { txId, lockInfo } = await kuberService.registerStake(
+    convertBufferToHex(wallet.stakeKey.private),
+    convertBufferToHex(wallet.stakeKey.pkh),
+    convertBufferToHex(wallet.paymentKey.private),
+    wallet.addressBech32(environments.networkId)
+  );
+  await pollTransaction(txId, lockInfo);
+}
+
+export async function transferAdaForWallet(
+  wallet: ShelleyWallet,
+  amount?: number
+) {
+  const { txId, lockInfo } = await kuberService.transferADA(
+    [wallet.addressBech32(environments.networkId)],
+    amount
+  );
+  await pollTransaction(txId, lockInfo);
 }

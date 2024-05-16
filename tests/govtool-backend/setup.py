@@ -1,15 +1,11 @@
 import sys
 import requests
 import json
-from config import KUBER_API_URL, KUBER_API_KEY
 
+from lib.faucet_api import CardanoFaucet
+from lib.kuber_api import KuberApi
 
-if KUBER_API_URL is not None:
-    KUBER_API_URL = KUBER_API_URL[:-1] if KUBER_API_URL.endswith('/') else KUBER_API_URL
-    print(f"KUBER_API_URL: {KUBER_API_URL}")
-else:
-    print("KUBER_API_URL environment variable is not set.", file=sys.stderr)
-    sys.exit(1)
+kuber_api = KuberApi.from_env()
 
 # check fund for the main wallet
 main_wallet = {
@@ -100,6 +96,16 @@ def main():
             ada_wallets[0]["pay-skey"],
             ada_wallets[1]["stake-skey"],
             ada_wallets[1]["pay-skey"],
+            {
+                "type": "PaymentSigningKeyShelley_ed25519",
+                "description": "Payment Signing Key",
+                "cborHex": drep_wallets[0]["stake-skey"]["cborHex"],
+            },
+            {
+                "type": "PaymentSigningKeyShelley_ed25519",
+                "description": "Payment Signing Key",
+                "cborHex": drep_wallets[1]["stake-skey"]["cborHex"],
+            },
         ],
         "certificates": [
             {
@@ -123,7 +129,6 @@ def main():
         ],
         "proposals": [
             {
-                "deposit": 1000000000,
                 "refundAccount": {
                     "network": "Testnet",
                     "credential": {"key hash": ada_wallets[0]["stake-vkey"]},
@@ -136,22 +141,36 @@ def main():
             }
         ],
     }
-    kuber_url = KUBER_API_URL + "/api/v1/tx?submit=true"
-    print(json.dumps(kuber_json,indent=2))
+    print(json.dumps(kuber_json, indent=2))
     print("Submitting the above registration transaction..")
-    response = requests.post(
-        url=kuber_url, headers={"api-key": KUBER_API_KEY}, json=kuber_json
+    balance = kuber_api.get_balance(main_wallet["address"])
+    protocol_params = kuber_api.get_protocol_params()
+    total_locked = (
+            protocol_params["dRepDeposit"] * 2
+            + protocol_params["stakeAddressDeposit"] * 2
+            + protocol_params["govActionDeposit"]
     )
+    if balance < (total_locked + 10 * 10000000000000):
+        print("Loading balance to the bootstrap wallet")
+        faucet = CardanoFaucet.from_env()
+        result = faucet.send_money(main_wallet["address"])
+        if "error" in result:
+            print(result)
+            raise Exception("Failed to load balance from faucet")
+        kuber_api.wait_for_txout(result["txin"], log=True)
+    response = kuber_api.build_tx(kuber_json, submit=True)
+
     if response.status_code == 200:
         print("Transaction submitted", response.text)
+        data = response.json()
+        kuber_api.wait_for_txout(data["hash"] + '#0', log=True)
     else:
         print("Server Replied with Error [ StatusCode=", response.status_code, "]", response.reason, response.text)
-        if('DRepAlreadyRegistered' in response.text or 'StakeKeyRegisteredDELEG'):
+        if ("DRepAlreadyRegistered" in response.text) or ("StakeKeyRegisteredDELEG" in response.text):
             print("-----")
-            print("This might mean that you have already run the setup script.")
+            print("This probably means that you have already run the setup script.")
             print("-----")
             sys.exit(0)
-
         sys.exit(1)
 
     # vote from one of the dreps to the proposal
@@ -175,17 +194,16 @@ def main():
             },
         ],
     }
-    print(json.dumps(kuber_json,indent=2))
-    response = requests.post(
-        url=kuber_url, headers={"api-key": KUBER_API_KEY}, json=kuber_json
-    )
+    print(json.dumps(kuber_json, indent=2))
+    response = kuber_api.build_tx(kuber_json, submit=True)
     if response.status_code == 200:
         print("Transaction submitted", response.text)
+        data = response.json()
+        kuber_api.wait_for_txout(data["hash"] + '#0', log=True)
     else:
-        print("Server Replied with Error [ StatusCode=", response.status_code, "]", response.reason, response.text)
+        if "AlreadyRegistered" in response.text:
+            print("Server Replied with Error [ StatusCode=", response.status_code, "]", response.reason, response.text)
+            print("")
         sys.exit(1)
-
-    # write to the file in nice format
-\
 
 main()

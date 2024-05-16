@@ -1,5 +1,6 @@
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import environments from "lib/constants/environments";
+import { withTxConfirmation } from "lib/transaction.decorator";
 
 export default class DelegationPage {
   readonly otherOptionsBtn = this.page.getByText("Other options");
@@ -18,27 +19,30 @@ export default class DelegationPage {
     .filter({ hasText: "Signal No Confidence on Every" })
     .nth(2); // BUG: testId -> signal-no-confidence-card
   readonly abstainDelegationCard = this.page.getByText(
-    "Abstain from Every VoteSelect this to vote ABSTAIN to every vote.Voting Power₳"
-  );// BUG: testId -> abstain-delegation-card
+    "Abstain from Every VoteSelect this to vote ABSTAIN to every vote.Voting Power₳",
+  ); // BUG: testId -> abstain-delegation-card
 
   readonly delegationErrorModal = this.page.getByTestId(
-    "delegation-transaction-error-modal"
+    "delegation-transaction-error-modal",
   );
 
   readonly delegateBtns = this.page.locator(
-    '[data-testid$="-delegate-button"]'
-  ); 
+    '[data-testid$="-delegate-button"]',
+  );
 
   constructor(private readonly page: Page) {}
 
   async goto() {
     await this.page.goto(
-      `${environments.frontendUrl}/connected/dRep_directory`
+      `${environments.frontendUrl}/connected/dRep_directory`,
     );
   }
 
+  @withTxConfirmation
   async delegateToDRep(dRepId: string) {
     await this.searchInput.fill(dRepId);
+    const delegateBtn = this.page.getByTestId(`${dRepId}-delegate-button`);
+    await expect(delegateBtn).toBeVisible();
     await this.page.getByTestId(`${dRepId}-delegate-button`).click();
   }
 

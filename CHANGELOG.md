@@ -63,6 +63,7 @@ changes.
 
 ### Fixed
 
+- drep/list sql fix (now the drep type is correct) [Issue 957](https://github.com/IntersectMBO/govtool/issues/957)
 - drep/list sql fix (now the latest tx date is correct) [Issue 826](https://github.com/IntersectMBO/govtool/issues/826)
 - drep/info no longer returns null values [Issue 720](https://github.com/IntersectMBO/govtool/issues/720)
 - drep/getVotes no longer returns 500 [Issue 685](https://github.com/IntersectMBO/govtool/issues/685)
@@ -86,6 +87,7 @@ changes.
 - Fix all the existing eslint errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
 - Fix all the existing typescript errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
 - Fix endless spinner on a dashboard [Issue 539](https://github.com/IntersectMBO/govtool/issues/539)
+- Remove wrongly appended `Yourself` filter on DRep Directory [Issue 1028](https://github.com/IntersectMBO/govtool/issues/1028)
 
 ### Changed
 

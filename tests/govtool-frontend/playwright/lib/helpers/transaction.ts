@@ -10,7 +10,7 @@ import { Logger } from "../../../cypress/lib/logger/logger";
  */
 export async function pollTransaction(
   txHash: string,
-  lockInfo?: LockInterceptorInfo
+  lockInfo?: LockInterceptorInfo,
 ) {
   try {
     Logger.info(`Waiting for tx completion: ${txHash}`);
@@ -23,7 +23,7 @@ export async function pollTransaction(
         },
         {
           timeout: environments.txTimeOut,
-        }
+        },
       )
       .toBeGreaterThan(0);
 
@@ -34,7 +34,7 @@ export async function pollTransaction(
     await LockInterceptor.releaseLockForAddress(
       lockInfo.address,
       lockInfo.lockId,
-      `Task completed for:${lockInfo.lockId}`
+      `Task completed for:${lockInfo.lockId}`,
     );
   } catch (err) {
     if (lockInfo) {
@@ -43,7 +43,7 @@ export async function pollTransaction(
       await LockInterceptor.releaseLockForAddress(
         lockInfo.address,
         lockInfo.lockId,
-        `Task failure: \n${JSON.stringify(errorMessage)}`
+        `Task failure: \n${JSON.stringify(errorMessage)}`,
       );
     }
 
@@ -51,12 +51,23 @@ export async function pollTransaction(
   }
 }
 
-export async function waitForTxConfirmation(page: Page) {
+export async function waitForTxConfirmation(
+  page: Page,
+  triggerCallback?: () => Promise<void>,
+) {
   let transactionHash: string | undefined;
   const transactionStatusPromise = page.waitForRequest((request) => {
     return request.url().includes("/transaction/status/");
   });
 
+  await triggerCallback?.call(this);
+  await expect(
+    page
+      .getByTestId("alert-warning")
+      .getByText("Transaction in progress", { exact: false }),
+  ).toBeVisible({
+    timeout: 10000,
+  });
   const url = (await transactionStatusPromise).url();
   const regex = /\/transaction\/status\/([^\/]+)$/;
   const match = url.match(regex);

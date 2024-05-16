@@ -11,7 +11,7 @@ import {
   useGetAdaHolderVotingPowerQuery,
   useGetDRepListInfiniteQuery,
 } from "@hooks";
-import { Card, DataActionsBar } from "@molecules";
+import { DataActionsBar, EmptyStateDrepDirectory } from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
 import { correctAdaFormat, formHexToBech32, isSameDRep } from "@utils";
 import { DRepListSort, DRepStatus } from "@models";
@@ -65,7 +65,12 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const { dRepData: yourselfDRepList } = useGetDRepListInfiniteQuery({
     searchPhrase: myDRepId,
   });
-  const yourselfDRep = yourselfDRepList?.[0];
+
+  const yourselfDRep =
+    !!isConnected &&
+    (debouncedSearchText === myDRepId || debouncedSearchText === "")
+      ? yourselfDRepList?.[0]
+      : undefined;
 
   const {
     dRepData: dRepList,
@@ -194,26 +199,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             flex: 1,
           }}
         >
-          {dRepList?.length === 0 && (
-            <Card
-              border
-              elevation={0}
-              sx={{
-                alignItems: "center",
-                display: "flex",
-                flexDirection: "column",
-                gap: 1,
-                py: 5,
-              }}
-            >
-              <Typography fontSize={22}>
-                {t("dRepDirectory.noResultsForTheSearchTitle")}
-              </Typography>
-              <Typography fontWeight={400}>
-                {t("dRepDirectory.noResultsForTheSearchDescription")}
-              </Typography>
-            </Card>
-          )}
+          {dRepList?.length === 0 && <EmptyStateDrepDirectory />}
           {dRepListToDisplay?.map((dRep) => {
             if (
               isSameDRep(dRep, myDrep?.view) ||

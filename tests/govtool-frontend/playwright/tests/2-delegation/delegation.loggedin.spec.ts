@@ -12,7 +12,7 @@ test("2B. Should access delegation to dRep page @smoke @fast", async ({
 
   await page.getByTestId("delegate-button").click(); // BUG incorrect test ID
   await expect(
-    page.getByRole("navigation").getByText("DRep Directory")
+    page.getByRole("navigation").getByText("DRep Directory"),
   ).toBeVisible();
 });
 

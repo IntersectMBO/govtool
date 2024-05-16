@@ -26,9 +26,10 @@ SELECT
   dr_deposit.deposit,
   DRepDistr.amount,
 (DRepActivity.epoch_no - Max(coalesce(block.epoch_no, block_first_register.epoch_no))) <= DRepActivity.drep_activity AS active,
-  second_to_newest_drep_registration.voting_anchor_id IS NOT NULL AS has_voting_anchor,
   encode(dr_voting_anchor.tx_hash, 'hex') AS tx_hash,
-  newestRegister.time AS last_register_time
+  newestRegister.time AS last_register_time,
+  COALESCE(latestDeposit.deposit, 0),
+  non_deregister_voting_anchor.url IS NOT NULL AS has_non_deregister_voting_anchor
 FROM
   drep_hash dh
   JOIN (
@@ -42,6 +43,15 @@ FROM
     WHERE
       dr.deposit IS NOT NULL) AS dr_deposit ON dr_deposit.drep_hash_id = dh.id
   AND dr_deposit.rn = 1
+    JOIN (
+    SELECT
+      dr.id,
+      dr.drep_hash_id,
+      dr.deposit,
+      ROW_NUMBER() OVER (PARTITION BY dr.drep_hash_id ORDER BY dr.tx_id DESC) AS rn
+    FROM
+      drep_registration dr) AS latestDeposit ON latestDeposit.drep_hash_id = dh.id
+  AND latestDeposit.rn = 1
   LEFT JOIN (
     SELECT
       dr.id,
@@ -53,6 +63,19 @@ FROM
       drep_registration dr
       JOIN tx ON tx.id = dr.tx_id) AS dr_voting_anchor ON dr_voting_anchor.drep_hash_id = dh.id
     AND dr_voting_anchor.rn = 1
+    LEFT JOIN (
+    SELECT
+      dr.id,
+      dr.drep_hash_id,
+      dr.voting_anchor_id,
+      ROW_NUMBER() OVER (PARTITION BY dr.drep_hash_id ORDER BY dr.tx_id DESC) AS rn,
+      tx.hash AS tx_hash
+    FROM
+      drep_registration dr
+      JOIN tx ON tx.id = dr.tx_id
+      WHERE dr.deposit is not null
+      AND dr.deposit >= 0) AS dr_non_deregister_voting_anchor ON dr_non_deregister_voting_anchor.drep_hash_id = dh.id
+    AND dr_non_deregister_voting_anchor.rn = 1
   LEFT JOIN (
     SELECT
       dr.id,
@@ -65,6 +88,7 @@ FROM
   LEFT JOIN DRepDistr ON DRepDistr.hash_id = dh.id
     AND DRepDistr.rn = 1
   LEFT JOIN voting_anchor va ON va.id = dr_voting_anchor.voting_anchor_id
+  LEFT JOIN voting_anchor non_deregister_voting_anchor on non_deregister_voting_anchor.id = dr_non_deregister_voting_anchor.voting_anchor_id
   CROSS JOIN DRepActivity
   LEFT JOIN voting_procedure AS voting_procedure ON voting_procedure.drep_voter = dh.id
   LEFT JOIN tx AS tx ON tx.id = voting_procedure.tx_id
@@ -102,4 +126,6 @@ GROUP BY
   DRepActivity.epoch_no,
   DRepActivity.drep_activity,
   dr_voting_anchor.tx_hash,
-  newestRegister.time
+  newestRegister.time,
+  latestDeposit.deposit,
+  non_deregister_voting_anchor.url

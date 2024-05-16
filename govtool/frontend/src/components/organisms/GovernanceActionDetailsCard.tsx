@@ -24,7 +24,7 @@ type GovernanceActionDetailsCardProps = {
   motivation?: string;
   rationale?: string;
   yesVotes: number;
-  links?: string[];
+  links?: GovernanceActionLink[];
   govActionId: string;
   isDataMissing: boolean | MetadataValidationStatus;
   isDashboard?: boolean;

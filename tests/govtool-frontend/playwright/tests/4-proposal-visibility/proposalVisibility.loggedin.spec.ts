@@ -1,5 +1,6 @@
 import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
+import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import { isMobile, openDrawerLoggedIn } from "@helpers/mobile";
 import removeAllSpaces from "@helpers/removeAllSpaces";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
@@ -85,19 +86,19 @@ test("4C.2: Should sort Governance Action Type on governance actions page @slow"
   govActionsPage.sortProposal(SortOption.SoonToExpire);
   await govActionsPage.validateSort(
     SortOption.SoonToExpire,
-    (p1, p2) => p1.expiryDate <= p2.expiryDate
+    (p1, p2) => p1.expiryDate <= p2.expiryDate,
   );
 
   govActionsPage.sortProposal(SortOption.NewestFirst);
   await govActionsPage.validateSort(
     SortOption.NewestFirst,
-    (p1, p2) => p1.createdDate >= p2.createdDate
+    (p1, p2) => p1.createdDate >= p2.createdDate,
   );
 
   govActionsPage.sortProposal(SortOption.HighestYesVotes);
   await govActionsPage.validateSort(
     SortOption.HighestYesVotes,
-    (p1, p2) => p1.yesVotes >= p2.yesVotes
+    (p1, p2) => p1.yesVotes >= p2.yesVotes,
   );
 });
 
@@ -118,7 +119,25 @@ test("4D: Should filter and sort Governance Action Type on governance actions pa
   await govActionsPage.validateSort(
     SortOption.SoonToExpire,
     (p1, p2) => p1.expiryDate <= p2.expiryDate,
-    [removeAllSpaces(filterOptionNames[0])]
+    [removeAllSpaces(filterOptionNames[0])],
   );
   await govActionsPage.validateFilters([filterOptionNames[0]]);
+});
+
+test("4H. Should verify none of the displayed governance actions have expired", async ({
+  page,
+}) => {
+  const govActionsPage = new GovernanceActionsPage(page);
+  await govActionsPage.goto();
+
+  await page.waitForTimeout(4000); // BUG: Delay to load governance actions
+  const proposalCards = await govActionsPage.getAllProposals();
+
+  for (const proposalCard of proposalCards) {
+    const expiryDateEl = proposalCard.getByTestId("expiry-date");
+    const expiryDateTxt = await expiryDateEl.innerText();
+    const expiryDate = extractExpiryDateFromText(expiryDateTxt);
+    const today = new Date();
+    expect(today <= expiryDate).toBeTruthy();
+  }
 });

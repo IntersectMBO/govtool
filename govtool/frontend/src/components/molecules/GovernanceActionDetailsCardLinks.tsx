@@ -9,7 +9,7 @@ import { LinkWithIcon } from "@molecules";
 export const GovernanceActionDetailsCardLinks = ({
   links,
 }: {
-  links?: string[];
+  links?: GovernanceActionLink[];
 }) => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -43,13 +43,13 @@ export const GovernanceActionDetailsCardLinks = ({
         >
           {links.map((link) => (
             <LinkWithIcon
-              key={link}
-              label={link}
+              key={link.uri}
+              label={link.uri}
               onClick={() => {
                 openModal({
                   type: "externalLink",
                   state: {
-                    externalLink: link,
+                    externalLink: link.uri,
                   },
                 });
               }}

@@ -10,24 +10,16 @@ export interface LockInterceptorInfo {
   address: string;
 }
 
-abstract class BaseLock {
-  abstract acquireLock(key: string, id?: string): Promise<boolean>;
-
-  abstract releaseLock(key: string, id?: string): Promise<boolean>;
-
-  abstract checkLock(key: string): Promise<boolean>;
-}
-
 export class LockInterceptor {
   private static async acquireLock(
     address: string,
-    lockId: string
+    lockId: string,
   ): Promise<void> {
     const lockFilePath = path.resolve(__dirname, `../.lock-pool/${address}`);
 
     try {
       await log(
-        `Initiator: ${address} \n---------------------> acquiring lock for:${lockId}`
+        `Initiator: ${address} \n---------------------> acquiring lock for:${lockId}`,
       );
       await new Promise<void>((resolve, reject) => {
         lockfile.lock(lockFilePath, (err) => {
@@ -39,7 +31,7 @@ export class LockInterceptor {
         });
       });
       await log(
-        `Initiator: ${address} \n---------------------> acquired lock for:${lockId}`
+        `Initiator: ${address} \n---------------------> acquired lock for:${lockId}`,
       );
     } catch (err) {
       throw err;
@@ -48,13 +40,13 @@ export class LockInterceptor {
 
   private static async releaseLock(
     address: string,
-    lockId: string
+    lockId: string,
   ): Promise<void> {
     const lockFilePath = path.resolve(__dirname, `../.lock-pool/${address}`);
 
     try {
       await log(
-        `Initiator: ${address} \n---------------------> releasing lock for:${lockId}`
+        `Initiator: ${address} \n---------------------> releasing lock for:${lockId}`,
       );
       await new Promise<void>((resolve, reject) => {
         lockfile.unlock(lockFilePath, async (err) => {
@@ -66,7 +58,7 @@ export class LockInterceptor {
         });
       });
       await log(
-        `Initiator: ${address} \n---------------------> released lock for:${lockId}\n`
+        `Initiator: ${address} \n---------------------> released lock for:${lockId}\n`,
       );
     } catch (err) {
       throw err;
@@ -75,13 +67,13 @@ export class LockInterceptor {
 
   private static async waitForReleaseLock(
     address: string,
-    lockId: string
+    lockId: string,
   ): Promise<void> {
     const pollInterval = 4000; // 4 secs
 
     try {
       await log(
-        `Initiator: ${address} \n ---------------------> waiting lock for:${lockId}`
+        `Initiator: ${address} \n ---------------------> waiting lock for:${lockId}`,
       );
       return new Promise<void>((resolve, reject) => {
         const pollFn = () => {
@@ -108,7 +100,7 @@ export class LockInterceptor {
     address: string,
     callbackFn: () => Promise<TxSubmitResponse>,
     lockId: string,
-    provider: "local" | "server" = "local"
+    provider: "local" | "server" = "local",
   ): Promise<TxSubmitResponse> {
     while (true) {
       const isAddressLocked = checkAddressLock(address);
@@ -142,7 +134,7 @@ export class LockInterceptor {
   static async releaseLockForAddress(
     address: string,
     lockId: string,
-    message?: string
+    message?: string,
   ) {
     try {
       message && (await log(message));

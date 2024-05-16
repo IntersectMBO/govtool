@@ -32,7 +32,7 @@ for (const wallet of [...adaHolderWallets, ...dRepWallets]) {
         wallet.stake.private,
         wallet.stake.pkh,
         wallet.payment.private,
-        wallet.address
+        wallet.address,
       );
       await pollTransaction(txId, lockInfo);
     } catch (err) {
@@ -49,7 +49,7 @@ function saveWallets(wallets: ShelleyWallet[]) {
   const jsonWallets = [];
   for (let i = 0; i < wallets.length; i++) {
     const stakePublicKey = Buffer.from(wallets[i].stakeKey.public).toString(
-      "hex"
+      "hex",
     );
     const { dRepIdBech32 } = extractDRepsFromStakePubKey(stakePublicKey);
 

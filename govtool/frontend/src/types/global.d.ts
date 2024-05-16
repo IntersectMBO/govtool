@@ -75,4 +75,10 @@ declare global {
 
   type ArrayElement<ArrayType extends readonly unknown[]> =
     ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+
+  type GovernanceActionLink = {
+    "@type": string;
+    label: string;
+    uri: string;
+  };
 }

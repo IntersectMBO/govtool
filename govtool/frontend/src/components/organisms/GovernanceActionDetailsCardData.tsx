@@ -26,7 +26,7 @@ type GovernanceActionDetailsCardDataProps = {
   isInProgress?: boolean;
   isOneColumn: boolean;
   isSubmitted?: boolean;
-  links?: string[];
+  links?: GovernanceActionLink[];
   motivation?: string;
   rationale?: string;
   title?: string;

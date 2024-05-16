@@ -90,7 +90,7 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.delegation.spec.ts",
       dependencies: process.env.CI ? ["auth setup", "dRep setup"] : [],
-      teardown: "cleanup delegation",
+      teardown: process.env.CI && "cleanup delegation",
     },
     {
       name: "independent (desktop)",

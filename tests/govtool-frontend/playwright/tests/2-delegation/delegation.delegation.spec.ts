@@ -27,12 +27,13 @@ test.describe("Delegate to others", () => {
     const delegationPage = new DelegationPage(page);
     await delegationPage.goto();
 
-    delegationPage.delegateToDRep(dRep01Wallet.dRepId);
-    await waitForTxConfirmation(page);
+    await delegationPage.delegateToDRep(
+      "drep1qzw234c0ly8csamxf8hrhfahvzwpllh2ckuzzvl38d22wwxxquu",
+    );
 
     page.goto("/");
     await expect(page.getByTestId("delegated-dRep-id")).toHaveText(
-      dRep01Wallet.dRepId
+      dRep01Wallet.dRepId,
     );
   });
 });
@@ -47,7 +48,7 @@ test.describe("Delegate to myself", () => {
     const wallet = await ShelleyWallet.generate();
     const txRes = await kuberService.transferADA(
       [wallet.addressBech32(environments.networkId)],
-      600
+      600,
     );
     await pollTransaction(txRes.txId, txRes.lockInfo);
     const dRepAuth = await createTempDRepAuth(page, wallet);
@@ -60,7 +61,7 @@ test.describe("Delegate to myself", () => {
     await dRepPage.getByTestId("register-as-sole-voter-button").click();
     await dRepPage.getByTestId("retire-button").click(); // BUG: Incorrect test-id , it should be continue-retirement
     await expect(
-      dRepPage.getByTestId("registration-transaction-submitted-modal")
+      dRepPage.getByTestId("registration-transaction-submitted-modal"),
     ).toBeVisible();
     dRepPage.getByTestId("confirm-modal-button").click();
     await waitForTxConfirmation(dRepPage);
@@ -81,8 +82,7 @@ test.describe("Change Delegation", () => {
   }) => {
     const delegationPage = new DelegationPage(page);
     await delegationPage.goto();
-    delegationPage.delegateToDRep(dRep01Wallet.dRepId);
-    await waitForTxConfirmation(page);
+    await delegationPage.delegateToDRep(dRep01Wallet.dRepId);
 
     // await delegationPage.goto("/");
     // await adaHolderPage.getByTestId("change-dRep-button").click();

@@ -12,7 +12,7 @@ cleanup(`Abstain delegation`, async () => {
 
   const { txId, lockInfo } = await kuberService.abstainDelegations(
     stakePrivKeys,
-    stakePkhs
+    stakePkhs,
   );
   await pollTransaction(txId, lockInfo);
 });

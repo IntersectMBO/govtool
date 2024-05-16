@@ -9,7 +9,7 @@ export default class DRepRegistrationPage {
   readonly skipBtn = this.page.getByTestId("skip-button");
   readonly confirmBtn = this.page.getByTestId("confirm-modal-button");
   readonly registrationSuccessModal = this.page.getByTestId(
-    "governance-action-submitted-modal",
+    "governance-action-submitted-modal"
   );
   readonly continueBtn = this.page.getByTestId("retire-button"); // BUG testId -> continue-button
   readonly addLinkBtn = this.page.getByRole("button", { name: "+ Add link" }); // BUG: testId -> add-link-button
@@ -48,7 +48,7 @@ export default class DRepRegistrationPage {
     const dRepMetadata = await this.downloadVoteMetadata();
     const url = await metadataBucketService.uploadMetadata(
       dRepMetadata.name,
-      dRepMetadata.data,
+      dRepMetadata.data
     );
     await this.continueBtn.click(); // BUG: testId -> submit-button
     await this.page.getByRole("checkbox").click();

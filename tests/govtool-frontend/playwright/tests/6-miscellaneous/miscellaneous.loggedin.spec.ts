@@ -1,7 +1,7 @@
 import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
+import DelegationPage from "@pages/dRepDirectoryPage";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
-import DelegationPage from "@pages/delegationPage";
 import { expect } from "@playwright/test";
 
 test.use({ storageState: ".auth/user01.json", wallet: user01Wallet });

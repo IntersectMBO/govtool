@@ -22,7 +22,7 @@ export async function createTempDRepAuth(page: Page, wallet: ShelleyWallet) {
 
 export async function createTempAdaHolderAuth(
   page: Page,
-  wallet: ShelleyWallet,
+  wallet: ShelleyWallet
 ) {
   await importWallet(page, wallet.json());
 

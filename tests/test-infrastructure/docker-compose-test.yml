@@ -1,0 +1,56 @@
+version: "3.9"
+secrets:
+  lighthouserc.json:
+    external: true
+    name:  ${PROJECT_NAME}_lighthouserc.json
+
+volumes:
+  lhci_data:
+  metadata_data:
+networks:
+  postgres:
+    external: true
+  frontend:
+    external: true
+
+services:
+  lhci-server:
+    image: patrickhulce/lhci-server:0.12.0
+    environment:
+      VIRTUAL_HOST: https://lighthouse-${BASE_DOMAIN} -> :9001
+    volumes:
+      - lhci_data:/data
+    secrets:
+      - source: lighthouserc.json
+        target: /usr/src/lhci/lighthouserc.json
+    networks:
+      - postgres
+      - frontend
+    deploy:
+      placement:
+        constraints:
+          - node.labels.govtool-test-stack == true
+      restart_policy:
+        delay: "30s"
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 300M
+
+  metadata-api:
+    image: govtool/metadata-api:${GOVTOOL_TAG}
+    build:
+      context: ../test-metadata-api
+    environment:
+      VIRTUAL_HOST: https://metadata-${BASE_DOMAIN} -> :3000
+    networks:
+      - frontend
+    volumes:
+      - metadata_data:/data
+    deploy:
+      restart_policy:
+        delay: "30s"
+      placement:
+        constraints:
+          - node.labels.govtool-test-stack==true

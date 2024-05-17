@@ -1,8 +1,7 @@
 import { Page, expect } from "@playwright/test";
+import { IDRep } from "@types";
 import environments from "lib/constants/environments";
 import { withTxConfirmation } from "lib/transaction.decorator";
-
-export const dRepFilterOptions = ["Active", "Inactive", "Retired"];
 
 export default class DRepDirectoryPage {
   readonly otherOptionsBtn = this.page.getByText("Other options");
@@ -10,6 +9,7 @@ export default class DRepDirectoryPage {
   readonly dRepInput = this.page.getByRole("textbox");
   readonly searchInput = this.page.getByTestId("search-input");
   readonly filterBtn = this.page.getByTestId("filters-button");
+  readonly sortBtn = this.page.getByTestId("sort-button");
 
   readonly automaticDelegationOptionsDropdown = this.page.getByRole("button", {
     name: "Automated Voting Options arrow",
@@ -56,29 +56,71 @@ export default class DRepDirectoryPage {
     }
     await this.dRepInput.clear();
   }
-  async filterDRepByNames(names: string[]) {
-    for (const name of names) {
-      await this.page.getByTestId(`${name}-checkbox`).click();
+  async filterDReps(filterOptions: string[]) {
+    for (const option of filterOptions) {
+      await this.page.getByTestId(`${option}-checkbox`).click();
     }
   }
 
-  async unFilterDRepByNames(names: string[]) {
-    for (const name of names) {
-      await this.page.getByTestId(`${name}-checkbox`).click();
+  async unFilterDReps(filterOptions: string[]) {
+    for (const option of filterOptions) {
+      await this.page.getByTestId(`${option}-checkbox`).click();
     }
   }
 
-  async validateFilters(filters: string[]) {
-    const validatedFilters = dRepFilterOptions.filter(
+  async validateFilters(filters: string[], filterOptions: string[]) {
+    const validatedFilters = filterOptions.filter(
       (filter) => !filters.includes(filter)
     );
 
     for (const filter of validatedFilters) {
       await expect(this.page.getByText(filter, { exact: true })).toHaveCount(1);
     }
+
+    for (const filter of filters) {
+      expect(
+        (await this.page.getByText(filter, { exact: true }).all()).length
+      ).toBeGreaterThan(1);
+    }
   }
 
+  async sortDRep(option: string) {}
+
+  async sortAndValidate(
+    option: string,
+    validationFn: (p1: IDRep, p2: IDRep) => boolean
+  ) {
+    const responsePromise = this.page.waitForResponse((response) =>
+      response.url().includes(`&sort=${option}`)
+    );
+
+    await this.page.getByTestId(`${option}-radio`).click();
+    const response = await responsePromise;
+
+    const dRepList: IDRep[] = (await response.json()).elements;
+
+    // API validation
+    for (let i = 0; i <= dRepList.length - 2; i++) {
+      const isValid = validationFn(dRepList[i], dRepList[i + 1]);
+      expect(isValid, "API Sorting validation failed").toBe(true);
+    }
+
+    // Frontend validation
+    const dRepListFE = await this.page
+      .getByRole("list")
+      .locator('[data-testid$="-copy-id-button"]')
+      .all();
+
+    for (let i = 0; i <= dRepListFE.length - 1; i++) {
+      expect(dRepListFE[i], "Frontend validation failed").toHaveText(
+        dRepList[i].view
+      );
+    }
+  }
   getDRepCard(dRepId: string) {
     return this.page.getByRole("list").getByTestId(`${dRepId}-copy-id-button`);
+  }
+  async getallDRepCards() {
+    return this.page.getByRole("list").all();
   }
 }

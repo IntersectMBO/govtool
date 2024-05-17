@@ -3,7 +3,7 @@ name: Lighthouse
 on:
   workflow_run:
     workflows:
-      - Build and deploy GovTool to TEST server
+      - Build and deploy GovTool test stack
     types:
       - completed
 

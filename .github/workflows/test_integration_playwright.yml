@@ -5,7 +5,7 @@ on:
     paths:
       - .github/workflows/test_integration_playwright.yml
   workflow_run:
-    workflows: ["Build and deploy GovTool to TEST server"]
+    workflows: ["Build and deploy GovTool test stack"]
     types: [completed]
 
 jobs:

@@ -5,6 +5,7 @@ import { PeopleAltOutlined, ArticleOutlined, AccountBalanceWalletOutlined, HowTo
 import { useTheme } from '@mui/material/styles';
 import getGoogleData from '@/lib/api';
 import { useEffect, useState } from 'react';
+import { Link } from '@/navigation';
 
 function Dashboard() {
 
@@ -57,7 +58,7 @@ function Dashboard() {
 						Participation Dashboard
 					</Typography>
 					<Typography variant="subtitle1" sx={{ color: (theme) => theme?.palette?.text?.gray }}>
-						This dashboard show the overall participation and usage of govtool from 1 of January 2024
+						This dashboard shows the overall participation and usage of SanchoNet Govtool from 1st of December 2023
 					</Typography>
 				</Box>
 
@@ -88,9 +89,11 @@ function Dashboard() {
 				<Typography variant="caption" display="block" gutterBottom>
 					© {new Date().getFullYear()} Intersect MBO
 				</Typography>
-				<Typography variant="caption" display="block" sx={{ color: (theme) => theme?.palette?.text?.primaryBlue }}>
-					Sancho Govtool
-				</Typography>
+				<Link href="https://sanchogov.tools/">
+					<Typography variant="caption" display="block" sx={{ color: (theme) => theme?.palette?.text?.primaryBlue }}>
+						Sancho Govtool
+					</Typography>
+				</Link>
 			</Box>
 
 		</Box >

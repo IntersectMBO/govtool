@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         const [response] = await analyticsDataClient.runReport({
             property: `properties/${propertyId}`,
             dateRanges: [{
-                startDate: '2024-01-01',
+                startDate: '2023-12-01',
                 endDate: 'today',
             }],
             dimensions: [{ name: 'eventName' }],

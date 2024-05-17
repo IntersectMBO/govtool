@@ -98,8 +98,8 @@ $(target_config_dir)/grafana-provisioning/alerting/alerting.yml: $(template_conf
 		-i $@
 
 $(target_config_dir)/nginx/auth.conf: $(target_config_dir)/nginx/
-	@:$(call check_defined, domain)
-	if [[ "$(domain)" == *"sanchonet.govtool.byron.network"* ]]; then \
+	@:$(call check_defined, env)
+	if [[ "$(env)" != "beta" ]]; then \
 	  echo 'map $$http_x_forwarded_for $$auth {' > $@; \
 	  echo "  default \"Restricted\";" >> $@; \
 	  echo "  $${IP_ADDRESS_BYPASSING_BASIC_AUTH1} \"off\";" >> $@; \

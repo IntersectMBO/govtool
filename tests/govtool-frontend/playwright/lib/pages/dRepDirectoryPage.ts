@@ -10,6 +10,7 @@ export default class DRepDirectoryPage {
   readonly searchInput = this.page.getByTestId("search-input");
   readonly filterBtn = this.page.getByTestId("filters-button");
   readonly sortBtn = this.page.getByTestId("sort-button");
+  readonly showMoreBtn = this.page.getByTestId("show-more-button");
 
   readonly automaticDelegationOptionsDropdown = this.page.getByRole("button", {
     name: "Automated Voting Options arrow",
@@ -106,10 +107,7 @@ export default class DRepDirectoryPage {
     }
 
     // Frontend validation
-    const dRepListFE = await this.page
-      .getByRole("list")
-      .locator('[data-testid$="-copy-id-button"]')
-      .all();
+    const dRepListFE = await this.getAllListedDRepIds();
 
     for (let i = 0; i <= dRepListFE.length - 1; i++) {
       expect(dRepListFE[i], "Frontend validation failed").toHaveText(
@@ -120,7 +118,13 @@ export default class DRepDirectoryPage {
   getDRepCard(dRepId: string) {
     return this.page.getByRole("list").getByTestId(`${dRepId}-copy-id-button`);
   }
-  async getallDRepCards() {
-    return this.page.getByRole("list").all();
+
+  async getAllListedDRepIds() {
+    await this.page.waitForTimeout(2_000);
+
+    return await this.page
+      .getByRole("list")
+      .locator('[data-testid$="-copy-id-button"]')
+      .all();
   }
 }

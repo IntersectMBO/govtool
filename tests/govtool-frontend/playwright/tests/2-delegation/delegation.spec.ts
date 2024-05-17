@@ -3,7 +3,7 @@ import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { expect, test } from "@playwright/test";
 import { DRepStatus } from "@types";
 
-test("2C. Should open wallet connection popup on delegate in disconnect state", async ({
+test("2C. Should open wallet connection popup on delegate in disconnected state", async ({
   page,
 }) => {
   await page.goto("/");
@@ -54,7 +54,7 @@ test("2K. Should filter DReps", async ({ page }) => {
   }
 });
 
-test("2N. Should sort DReps", async ({ page }) => {
+test("2M. Should sort DReps", async ({ page }) => {
   test.slow();
 
   enum SortOption {
@@ -82,4 +82,22 @@ test("2N. Should sort DReps", async ({ page }) => {
     SortOption.Status,
     (d1, d2) => d1.status >= d2.status
   );
+});
+
+test("2O. Should load more DReps on show more", async ({ page }) => {
+  const dRepDirectory = new DRepDirectoryPage(page);
+  await dRepDirectory.goto();
+
+  const dRepIdsBefore = await dRepDirectory.getAllListedDRepIds();
+  await dRepDirectory.showMoreBtn.click();
+
+  const dRepIdsAfter = await dRepDirectory.getAllListedDRepIds();
+  expect(dRepIdsAfter.length).toBeGreaterThanOrEqual(dRepIdsBefore.length);
+
+  if (dRepIdsAfter.length > dRepIdsBefore.length) {
+    await expect(dRepDirectory.showMoreBtn).toBeVisible();
+    expect(true).toBeTruthy();
+  } else {
+    await expect(dRepDirectory.showMoreBtn).not.toBeVisible();
+  }
 });

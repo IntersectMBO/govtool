@@ -25,7 +25,7 @@ test("2L. Should copy DRepId", async ({ page, context }) => {
   expect(copiedText).toEqual(dRep01Wallet.dRepId);
 });
 
-test("2M. Should show DRep information on details page", async ({
+test("2N. Should show DRep information on details page", async ({
   page,
   browser,
 }, testInfo) => {

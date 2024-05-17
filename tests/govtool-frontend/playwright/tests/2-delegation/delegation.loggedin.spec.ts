@@ -1,20 +1,25 @@
 import { dRep01Wallet, user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
-import convertBufferToHex from "@helpers/convertBufferToHex";
 import { ShelleyWallet } from "@helpers/crypto";
+import { isMobile } from "@helpers/mobile";
 import extractDRepFromWallet from "@helpers/shellyWallet";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { expect } from "@playwright/test";
 
 test.use({ storageState: ".auth/user01.json", wallet: user01Wallet });
 
-test("2B. Should access delegation to dRep page", async ({ page }) => {
+test("2B. Should access DRep Directory page", async ({ page }) => {
   await page.goto("/");
 
   await page.getByTestId("view-drep-directory-button").click();
-  await expect(
-    page.getByRole("navigation").getByText("DRep Directory")
-  ).toBeVisible();
+
+  if (isMobile(page)) {
+    await expect(page.getByText("DRep Directory")).toBeVisible();
+  } else {
+    await expect(
+      page.getByRole("navigation").getByText("DRep Directory")
+    ).toBeVisible();
+  }
 });
 
 test("2I. Should check validity of DRep Id", async ({ page }) => {
@@ -33,7 +38,7 @@ test("2I. Should check validity of DRep Id", async ({ page }) => {
   await expect(dRepDirectory.getDRepCard(invalidDRepId)).not.toBeVisible();
 });
 
-test("2D. Verify Delegation Behavior in Connected State", async ({ page }) => {
+test("2D. Should show delegation options in connected state", async ({ page }) => {
   const dRepDirectoryPage = new DRepDirectoryPage(page);
   await dRepDirectoryPage.goto();
 

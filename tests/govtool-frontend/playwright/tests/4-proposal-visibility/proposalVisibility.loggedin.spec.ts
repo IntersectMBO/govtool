@@ -130,7 +130,6 @@ test("4H. Should verify none of the displayed governance actions have expired", 
   const govActionsPage = new GovernanceActionsPage(page);
   await govActionsPage.goto();
 
-  await page.waitForTimeout(4000); // BUG: Delay to load governance actions
   const proposalCards = await govActionsPage.getAllProposals();
 
   for (const proposalCard of proposalCards) {

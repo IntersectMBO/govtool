@@ -23,7 +23,7 @@ test.describe("Proposal checks", () => {
     govActionDetailsPage = await govActionsPage.viewFirstProposal();
   });
 
-  test("5A. Should show relevant details about governance action as DRep @slow", async () => {
+  test("5A. Should show relevant details about governance action as DRep", async () => {
     await expect(govActionDetailsPage.governanceActionType).toBeVisible();
     await expect(govActionDetailsPage.submittedDate).toBeVisible();
     await expect(govActionDetailsPage.expiryDate).toBeVisible();
@@ -37,11 +37,11 @@ test.describe("Proposal checks", () => {
     await expect(govActionDetailsPage.abstainRadio).toBeVisible();
   });
 
-  test("5B. Should view Vote button on governance action item on registered as DRep @slow", async () => {
+  test("5B. Should view Vote button on governance action item on registered as DRep", async () => {
     await expect(govActionDetailsPage.voteBtn).toBeVisible();
   });
 
-  test("5C. Should show required field in proposal voting on registered as DRep @slow", async () => {
+  test("5C. Should show required field in proposal voting on registered as DRep", async () => {
     await expect(govActionDetailsPage.voteBtn).toBeVisible();
     await expect(govActionDetailsPage.yesVoteRadio).toBeVisible();
     await expect(govActionDetailsPage.noVoteRadio).toBeVisible();
@@ -57,7 +57,7 @@ test.describe("Proposal checks", () => {
   });
 
   // Skipped: No url/hash input to validate
-  test.skip("5D. Should validate proposal voting @slow", async () => {
+  test.skip("5D. Should validate proposal voting", async () => {
     // const invalidURLs = ["testdotcom", "https://testdotcom", "https://test.c"];
     // invalidURLs.forEach(async (url) => {
     //   govActionDetailsPage.urlInput.fill(url);

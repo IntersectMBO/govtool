@@ -15,7 +15,7 @@ dRepWallets.forEach((wallet) => {
     try {
       const res = await kuberService.dRepRegistration(
         wallet.stake.private,
-        wallet.stake.pkh,
+        wallet.stake.pkh
       );
 
       await pollTransaction(res.txId, res.lockInfo);

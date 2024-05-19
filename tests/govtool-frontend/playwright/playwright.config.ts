@@ -89,7 +89,9 @@ export default defineConfig({
       name: "delegation",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.delegation.spec.ts",
-      dependencies: process.env.CI ? ["auth setup", "dRep setup"] : [],
+      dependencies: process.env.CI
+        ? ["auth setup", "dRep setup", "wallet bootstrap"]
+        : [],
       teardown: process.env.CI && "cleanup delegation",
     },
     {
@@ -105,9 +107,9 @@ export default defineConfig({
       name: "independent (mobile)",
       use: { ...devices["Pixel 5"] },
       testIgnore: [
-        "**/*.tx.spec.ts",
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",
+        "**/*.delegation.spec.ts",
       ],
     },
     {

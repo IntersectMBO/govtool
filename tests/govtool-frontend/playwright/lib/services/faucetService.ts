@@ -10,11 +10,11 @@ interface IFaucetResponse {
 }
 
 export const loadAmountFromFaucet = async (
-  walletAddress: string,
+  walletAddress: string
 ): Promise<IFaucetResponse> => {
   try {
     const res = await fetchClient(
-      `/send-money?type=default&action=funds&address=${walletAddress}&poolid=undefined&api_key=${environments.faucet.apiKey}`,
+      `/send-money?type=default&action=funds&address=${walletAddress}&poolid=undefined&api_key=${environments.faucet.apiKey}`
     );
     const responseBody = await res.json();
     // console.debug(`faucet response: ${JSON.stringify(responseBody)}`);

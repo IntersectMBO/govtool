@@ -11,7 +11,7 @@ test("1A. Should connect wallet and choose stake-key to use @smoke @fast", async
   const shellyWallet = await ShelleyWallet.generate();
   const extraPubStakeKey = convertBufferToHex(shellyWallet.stakeKey.public);
   const extraRewardAddress = convertBufferToHex(
-    shellyWallet.rewardAddressRawBytes(0),
+    shellyWallet.rewardAddressRawBytes(0)
   );
 
   await createWallet(page, {

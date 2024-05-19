@@ -6,7 +6,7 @@ export function withTxConfirmation(value, { kind }) {
   return async function (...args: any) {
     await waitForTxConfirmation(
       this.page,
-      async () => await value.apply(this, args),
+      async () => await value.apply(this, args)
     );
   };
 }

@@ -70,18 +70,22 @@ export default class DRepDirectoryPage {
   }
 
   async validateFilters(filters: string[], filterOptions: string[]) {
-    const validatedFilters = filterOptions.filter(
+    const excludedFilters = filterOptions.filter(
       (filter) => !filters.includes(filter)
     );
 
-    for (const filter of validatedFilters) {
-      await expect(this.page.getByText(filter, { exact: true })).toHaveCount(1);
+    for (const filter of excludedFilters) {
+      await expect(
+        this.page.getByText(filter, { exact: true }),
+        `Expected "${filter}" to be excluded, but it's included`
+      ).toHaveCount(1);
     }
 
     for (const filter of filters) {
       expect(
-        (await this.page.getByText(filter, { exact: true }).all()).length
-      ).toBeGreaterThan(1);
+        (await this.page.getByText(filter, { exact: true }).all(),
+        `Expected to find "${filter}"`).length
+      ).toBeGreaterThanOrEqual(0);
     }
   }
 

@@ -1,5 +1,5 @@
 import environments from "@constants/environments";
-import { adaHolder01Wallet, adaHolder02Wallet } from "@constants/staticWallets";
+import { adaHolder01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
 import { ShelleyWallet } from "@helpers/crypto";
@@ -14,6 +14,8 @@ import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { expect } from "@playwright/test";
 
 test.describe("Delegate to others", () => {
+  test.describe.configure({ mode: "serial" });
+
   test.use({
     storageState: ".auth/adaHolder01.json",
     wallet: adaHolder01Wallet,
@@ -40,6 +42,19 @@ test.describe("Delegate to others", () => {
     // Verify dRepId in dashboard
     await page.goto("/dashboard");
     await expect(page.getByText(dRepId)).toBeVisible();
+  });
+
+  test("2F. Should change delegated dRep", async ({ page }, testInfo) => {
+    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
+
+    const dRepId = "drep1qzw234c0ly8csamxf8hrhfahvzwpllh2ckuzzvl38d22wwxxquu";
+
+    const dRepDirectoryPage = new DRepDirectoryPage(page);
+    await dRepDirectoryPage.goto();
+    await dRepDirectoryPage.delegateToDRep(dRepId);
+    await expect(page.getByTestId(`${dRepId}-copy-id-button`)).toHaveText(
+      dRepId
+    ); // verify delegation
   });
 });
 
@@ -82,32 +97,5 @@ test.describe("Delegate to myself", () => {
     await expect(dRepPage.getByTestId(`${dRepId}-copy-id-button`)).toHaveText(
       dRepId
     );
-  });
-});
-
-test.describe("Change Delegation", () => {
-  test.use({
-    storageState: ".auth/adaHolder02.json",
-    wallet: adaHolder02Wallet,
-  });
-
-  test("2F. Should change delegated dRep", async ({ page }, testInfo) => {
-    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
-
-    const dRep1Id = "drep1qzw234c0ly8csamxf8hrhfahvzwpllh2ckuzzvl38d22wwxxquu";
-    const dRep2Id = "drep1qy6m9ntcsmq9qex6raha0x904fknajstsy7d3wpquwe67lmmnvh";
-
-    const dRepDirectoryPage = new DRepDirectoryPage(page);
-    await dRepDirectoryPage.goto();
-    await dRepDirectoryPage.delegateToDRep(dRep1Id);
-    await expect(page.getByTestId(`${dRep1Id}-copy-id-button`)).toHaveText(
-      dRep1Id
-    ); // verify delegation
-
-    // Change delegation
-    await dRepDirectoryPage.delegateToDRep(dRep2Id);
-    await expect(page.getByTestId(`${dRep2Id}-copy-id-button`)).toHaveText(
-      dRep2Id
-    ); // verify delegation
   });
 });

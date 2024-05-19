@@ -28,7 +28,7 @@ test.describe("Logged in DReps", () => {
   test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
 
   // Skipped: No option to update metadata
-  test.skip("3H. Should be able to update metadata @slow", async ({ page }) => {
+  test.skip("3H. Should be able to update metadata", async ({ page }) => {
     page.getByTestId("change-metadata-button").click();
     page.getByTestId("url-input").fill("https://google.com");
     page.getByTestId("hash-input").fill(crypto.randomBytes(32).toString("hex"));
@@ -37,7 +37,7 @@ test.describe("Logged in DReps", () => {
 });
 
 test.describe("Temporary DReps", () => {
-  test("3G. Should show confirmation message with link to view transaction, when DRep registration txn is submitted @slow ", async ({
+  test("3G. Should show confirmation message with link to view transaction, when DRep registration txn is submitted", async ({
     page,
     browser,
   }, testInfo) => {
@@ -67,7 +67,7 @@ test.describe("Temporary DReps", () => {
     ).toBeVisible();
   });
 
-  test("3I. Should verify retire as DRep @slow", async ({
+  test("3I. Should verify retire as DRep", async ({
     page,
     browser,
   }, testInfo) => {

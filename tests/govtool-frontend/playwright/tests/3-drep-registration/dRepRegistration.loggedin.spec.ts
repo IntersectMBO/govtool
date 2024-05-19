@@ -9,18 +9,14 @@ test.use({
   wallet: user01Wallet,
 });
 
-test("3B. Should access DRep registration page @fast @smoke", async ({
-  page,
-}) => {
+test("3B. Should access DRep registration page", async ({ page }) => {
   await page.goto("/");
 
   await page.getByTestId("register-button").click();
   await expect(page.getByText("Become a DRep")).toBeVisible();
 });
 
-test("3D.Verify DRep registration functionality with Wallet Connected State State @fast @smoke", async ({
-  page,
-}) => {
+test("3D. Verify DRep registration form", async ({ page }) => {
   const dRepRegistrationPage = new DRepRegistrationPage(page);
   await dRepRegistrationPage.goto();
 
@@ -32,8 +28,7 @@ test("3D.Verify DRep registration functionality with Wallet Connected State Stat
   await expect(dRepRegistrationPage.continueBtn).toBeVisible();
 });
 
-// Skipped: Because there are no fields for url and hash inputs.
-test.skip("3E. Should reject invalid data and accept valid data @smoke @fast", async ({
+test("3E. Should reject invalid data in DRep form", async ({
   page,
 }) => {
   const dRepRegistrationPage = new DRepRegistrationPage(page);
@@ -44,13 +39,13 @@ test.skip("3E. Should reject invalid data and accept valid data @smoke @fast", a
     .multiple(() => faker.internet.displayName(), { count: 100 })
     .forEach(async (dRepName) => {
       await dRepRegistrationPage.nameInput.fill(dRepName);
-      await dRepRegistrationPage.nameInput.clear({ force: true });
+      await dRepRegistrationPage.nameInput.clear();
     });
 
   // Validity test
 });
 
-test("3F. Should create proper DRep registration request, when registered with data @slow", async ({
+test("3F. Should create proper DRep registration request, when registered with data", async ({
   page,
 }) => {
   const urlToIntercept = "**/utxo?**";

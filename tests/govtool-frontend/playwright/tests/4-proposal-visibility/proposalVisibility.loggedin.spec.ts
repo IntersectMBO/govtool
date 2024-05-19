@@ -1,7 +1,7 @@
 import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
-import { isMobile, openDrawerLoggedIn } from "@helpers/mobile";
+import { isMobile, openDrawer } from "@helpers/mobile";
 import removeAllSpaces from "@helpers/removeAllSpaces";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
@@ -29,7 +29,7 @@ test("4A.1: Should access Governance Actions page with connecting wallet", async
 }) => {
   await page.goto("/");
   if (isMobile(page)) {
-    await openDrawerLoggedIn(page);
+    await openDrawer(page);
   }
 
   await page.getByTestId("governance-actions-link").click();

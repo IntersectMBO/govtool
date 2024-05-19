@@ -4,12 +4,29 @@ import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { ShelleyWallet } from "@helpers/crypto";
+import { isMobile, openDrawer } from "@helpers/mobile";
 import { createNewPageWithWallet } from "@helpers/page";
 import extractDRepFromWallet from "@helpers/shellyWallet";
 import { transferAdaForWallet } from "@helpers/transaction";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
+
+test("2C. Should open wallet connection popup on delegate in disconnected state", async ({
+  page,
+}) => {
+  await page.goto("/");
+  if (isMobile(page)) {
+    openDrawer(page);
+  }
+
+  await page.getByTestId("view-drep-directory-button").click();
+  await page
+    .locator('[data-testid$="-connect-to-delegate-button"]')
+    .first()
+    .click();
+  await expect(page.getByTestId("connect-your-wallet-modal")).toBeVisible();
+});
 
 test("2L. Should copy DRepId", async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);

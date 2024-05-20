@@ -49,6 +49,53 @@ test("3E. Should accept valid data in DRep form", async ({ page }) => {
   await expect(dRepRegistrationPage.addLinkBtn).toBeHidden();
 });
 
+test("3L. Should reject invalid data in DRep form", async ({ page }) => {
+  const dRepRegistrationPage = new DRepRegistrationPage(page);
+  await dRepRegistrationPage.goto();
+
+  function generateInvalidEmail() {
+    const choice = faker.number.int({ min: 1, max: 3 });
+
+    if (choice === 1) {
+      return faker.lorem.word() + faker.number + "@invalid.com";
+    } else if (choice == 2) {
+      return faker.lorem.word() + "@";
+    }
+    return faker.lorem.word() + "@gmail_com";
+  }
+  function generateInvalidUrl() {
+    const choice = faker.number.int({ min: 1, max: 3 });
+
+    if (choice === 1) {
+      return faker.internet.url().replace("https://", "http://");
+    } else if (choice === 2) {
+      return faker.lorem.word() + ".invalid";
+    }
+    return faker.lorem.word() + ".@com";
+  }
+  function generateInvalidName() {
+    const choice = faker.number.int({ min: 1, max: 3 });
+    if (choice === 1) {
+      // space invalid
+      return faker.lorem.word() + " " + faker.lorem.word();
+    } else if (choice === 2) {
+      // maximum 80 words invalid
+      return faker.lorem.paragraphs().replace(/\s+/g, "");
+    }
+    // empty invalid
+    return " ";
+  }
+
+  for (let i = 0; i < 100; i++) {
+    await dRepRegistrationPage.inValidateForm(
+      generateInvalidName(),
+      generateInvalidEmail(),
+      faker.lorem.paragraph(40),
+      generateInvalidUrl()
+    );
+  }
+});
+
 test("3F. Should create proper DRep registration request, when registered with data", async ({
   page,
 }) => {

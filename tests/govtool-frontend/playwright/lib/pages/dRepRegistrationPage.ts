@@ -103,4 +103,44 @@ export default class DRepRegistrationPage {
 
     await expect(this.continueBtn).toBeEnabled();
   }
+
+  async inValidateForm(name: string, email: string, bio: string, link: string) {
+    await this.nameInput.fill(name);
+    await this.emailInput.fill(email);
+    await this.bioInput.fill(bio);
+    await this.linkInput.fill(link);
+
+    function convertTestIdToText(testId: string) {
+      let text = testId.replace("-error", "");
+      text = text.replace(/-/g, " ");
+      return text[0].toUpperCase() + text.substring(1);
+    }
+
+    const regexPattern = new RegExp(
+      formErrors.dRepName.map(convertTestIdToText).join("|")
+    );
+
+    const nameErrors = await this.page
+      .locator('[data-testid$="-error"]')
+      .filter({
+        hasText: regexPattern,
+      })
+      .all();
+
+    expect(nameErrors.length, `Valid name: ${name}`).toEqual(1);
+
+    await expect(
+      this.page.getByTestId(formErrors.email),
+      `Valid email: ${email}`
+    ).toBeVisible();
+
+    expect(
+      await this.bioInput.textContent(),
+      "Bio less than 500 characters"
+    ).not.toEqual(bio);
+
+    await expect(this.page.getByTestId(formErrors.link)).toBeVisible();
+
+    await expect(this.continueBtn).toBeDisabled();
+  }
 }

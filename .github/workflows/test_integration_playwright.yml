@@ -2,19 +2,8 @@ name: Integration Test [Playwright]
 
 on:
   push:
-    branches:
-      - enhancement/allure-report
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: "Log level"
-        required: true
-        default: "warning"
-        type: choice
-        options:
-          - info
-          - warning
-          - debug
+    paths:
+      - .github/workflows/test_integration_playwright.yml
   workflow_run:
     workflows: ["Build and deploy GovTool test stack"]
     types: [completed]

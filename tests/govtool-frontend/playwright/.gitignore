@@ -12,4 +12,5 @@ allure-results/
 allure-report/
 .secrets
 .vars
-lock_logs.txt
+.lock-pool/
+.logs/

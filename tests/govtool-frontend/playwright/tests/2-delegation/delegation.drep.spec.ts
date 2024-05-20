@@ -9,6 +9,7 @@ import { isMobile, openDrawer } from "@helpers/mobile";
 import { createNewPageWithWallet } from "@helpers/page";
 import extractDRepFromWallet from "@helpers/shellyWallet";
 import { transferAdaForWallet } from "@helpers/transaction";
+import DRepDetailsPage from "@pages/dRepDetailsPage";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
@@ -101,4 +102,17 @@ test("2N. Should show DRep information on details page", async ({
     await expect(dRepPage.getByText(link, { exact: true })).toBeVisible();
   }
   await expect(dRepPage.getByText(bio, { exact: true })).toBeVisible();
+});
+
+test("2P. Should enable sharing of DRep details", async ({ page }) => {
+  const dRepDetailsPage = new DRepDetailsPage(page);
+  await dRepDetailsPage.goto(dRep01Wallet.dRepId);
+
+  await dRepDetailsPage.shareLink();
+  await expect(page.getByText("Copied to clipboard")).toBeVisible();
+
+  const copiedText = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copiedText).toEqual(
+    `${environments.frontendUrl}/drep_directory/${dRep01Wallet.dRepId}`
+  );
 });

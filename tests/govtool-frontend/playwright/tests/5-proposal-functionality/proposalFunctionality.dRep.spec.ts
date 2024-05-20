@@ -2,10 +2,13 @@ import environments from "@constants/environments";
 import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
-import convertBufferToHex from "@helpers/convertBufferToHex";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
-import { pollTransaction, waitForTxConfirmation } from "@helpers/transaction";
+import {
+  registerDRepForWallet,
+  transferAdaForWallet,
+  waitForTxConfirmation,
+} from "@helpers/transaction";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
@@ -110,17 +113,8 @@ test.describe("Perform voting", () => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
     const wallet = await ShelleyWallet.generate();
-    const registrationRes = await kuberService.dRepRegistration(
-      convertBufferToHex(wallet.stakeKey.private),
-      convertBufferToHex(wallet.stakeKey.pkh)
-    );
-    await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
-
-    const res = await kuberService.transferADA(
-      [wallet.addressBech32(environments.networkId)],
-      40
-    );
-    await pollTransaction(res.txId, registrationRes.lockInfo);
+    await registerDRepForWallet(wallet);
+    await transferAdaForWallet(wallet, 40);
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
@@ -191,17 +185,8 @@ test.describe("Check voting power", () => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
     const wallet = await ShelleyWallet.generate();
-    const registrationRes = await kuberService.dRepRegistration(
-      convertBufferToHex(wallet.stakeKey.private),
-      convertBufferToHex(wallet.stakeKey.pkh)
-    );
-    await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
-
-    const res = await kuberService.transferADA(
-      [wallet.addressBech32(environments.networkId)],
-      40
-    );
-    await pollTransaction(res.txId, registrationRes.lockInfo);
+    await registerDRepForWallet(wallet);
+    await transferAdaForWallet(wallet, 40);
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
@@ -213,7 +198,7 @@ test.describe("Check voting power", () => {
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("retire-button").click();
-    await dRepPage.getByTestId("retire-button").click(); // BUG: testId -> continue-retire-button
+    await dRepPage.getByTestId("continue-retirement-button").click(); 
     await expect(
       dRepPage.getByTestId("retirement-transaction-submitted-modal")
     ).toBeVisible();

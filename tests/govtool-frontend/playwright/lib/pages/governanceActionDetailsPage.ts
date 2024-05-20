@@ -31,7 +31,7 @@ export default class GovernanceActionDetailsPage {
   readonly voteSuccessModal = this.page.getByTestId("alert-success");
   readonly externalLinkModal = this.page.getByTestId("external-link-modal");
 
-  readonly contextInput = this.page.getByPlaceholder("Provide context"); // BUG testId
+  readonly contextInput = this.page.getByTestId("provide-context-input");
   readonly cancelModalBtn = this.page.getByTestId("cancel-modal-button");
 
   constructor(private readonly page: Page) {}

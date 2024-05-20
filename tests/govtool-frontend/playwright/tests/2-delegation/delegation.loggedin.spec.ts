@@ -38,7 +38,9 @@ test("2I. Should check validity of DRep Id", async ({ page }) => {
   await expect(dRepDirectory.getDRepCard(invalidDRepId)).not.toBeVisible();
 });
 
-test("2D. Should show delegation options in connected state", async ({ page }) => {
+test("2D. Should show delegation options in connected state", async ({
+  page,
+}) => {
   const dRepDirectoryPage = new DRepDirectoryPage(page);
   await dRepDirectoryPage.goto();
 

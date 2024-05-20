@@ -105,3 +105,11 @@ export async function transferAdaForWallet(
   );
   await pollTransaction(txId, lockInfo);
 }
+
+export async function registerDRepForWallet(wallet: ShelleyWallet) {
+  const registrationRes = await kuberService.dRepRegistration(
+    convertBufferToHex(wallet.stakeKey.private),
+    convertBufferToHex(wallet.stakeKey.pkh)
+  );
+  await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
+}

@@ -1,6 +1,6 @@
 import { importWallet } from "@fixtures/importWallet";
 import loadDemosExtension from "@fixtures/loadExtension";
-import { Browser, Page } from "@playwright/test";
+import { Browser, Page, expect } from "@playwright/test";
 import { ShelleyWallet } from "./crypto";
 
 interface BrowserConfig {

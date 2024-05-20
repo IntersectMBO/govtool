@@ -10,8 +10,7 @@ const environments = {
     apiKey: process.env.FAUCET_API_KEY || "",
   },
   kuber: {
-    apiUrl:
-      process.env.KUBER_API_URL || "https://sanchonet.kuber.cardanoapi.io",
+    apiUrl: process.env.KUBER_API_URL || "https://kuber-govtool.cardanoapi.io",
     apiKey: process.env.KUBER_API_KEY || "",
   },
   txTimeOut: parseInt(process.env.TX_TIMEOUT) || 240000,

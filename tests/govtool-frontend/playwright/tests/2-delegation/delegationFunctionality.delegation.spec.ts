@@ -1,5 +1,5 @@
 import environments from "@constants/environments";
-import { adaHolder01Wallet } from "@constants/staticWallets";
+import { adaHolder01Wallet, dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
 import { ShelleyWallet } from "@helpers/crypto";
@@ -26,7 +26,7 @@ test.describe("Delegate to others", () => {
   }, testInfo) => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
-    const dRepId = "drep1qzw234c0ly8csamxf8hrhfahvzwpllh2ckuzzvl38d22wwxxquu";
+    const dRepId = dRep01Wallet.dRepId;
 
     const dRepDirectoryPage = new DRepDirectoryPage(page);
     await dRepDirectoryPage.goto();

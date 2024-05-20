@@ -3,14 +3,16 @@ import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
-import convertBufferToHex from "@helpers/convertBufferToHex";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
-import { pollTransaction, waitForTxConfirmation } from "@helpers/transaction";
+import {
+  registerDRepForWallet,
+  transferAdaForWallet,
+  waitForTxConfirmation,
+} from "@helpers/transaction";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
-import kuberService from "@services/kuberService";
 import * as crypto from "crypto";
 
 test.describe("Logged in DReps", () => {
@@ -44,11 +46,7 @@ test.describe("Temporary DReps", () => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     const wallet = await ShelleyWallet.generate();
-    const res = await kuberService.transferADA(
-      [wallet.addressBech32(environments.networkId)],
-      600
-    );
-    await pollTransaction(res.txId, res.lockInfo);
+    await transferAdaForWallet(wallet, 600);
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {
@@ -74,11 +72,7 @@ test.describe("Temporary DReps", () => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     const wallet = await ShelleyWallet.generate();
-    const registrationRes = await kuberService.dRepRegistration(
-      convertBufferToHex(wallet.stakeKey.private),
-      convertBufferToHex(wallet.stakeKey.pkh)
-    );
-    await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
+    await registerDRepForWallet(wallet);
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {
@@ -89,7 +83,7 @@ test.describe("Temporary DReps", () => {
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("retire-button").click();
-    await dRepPage.getByTestId("retire-button").click(); // BUG testId -> continue-retire-button
+    await dRepPage.getByTestId("continue-retirement-button").click();
 
     await expect(
       dRepPage.getByTestId("retirement-transaction-error-modal")
@@ -103,16 +97,9 @@ test.describe("Temporary DReps", () => {
     test.setTimeout(testInfo.timeout + 3 * environments.txTimeOut);
 
     const wallet = await ShelleyWallet.generate();
-    const registrationRes = await kuberService.dRepRegistration(
-      convertBufferToHex(wallet.stakeKey.private),
-      convertBufferToHex(wallet.stakeKey.pkh)
-    );
-    await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
+    await registerDRepForWallet(wallet);
 
-    const res = await kuberService.transferADA([
-      wallet.addressBech32(environments.networkId),
-    ]);
-    await pollTransaction(res.txId, res.lockInfo);
+    await transferAdaForWallet(wallet);
 
     const dRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {
@@ -123,7 +110,7 @@ test.describe("Temporary DReps", () => {
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("retire-button").click();
-    await dRepPage.getByTestId("retire-button").click(); // BUG: testId -> continue-retire-button
+    await dRepPage.getByTestId("continue-retirement-button").click();
     await expect(
       dRepPage.getByTestId("retirement-transaction-submitted-modal")
     ).toBeVisible();
@@ -145,11 +132,7 @@ test.describe("Temporary DReps", () => {
 
     const wallet = await ShelleyWallet.generate();
 
-    const res = await kuberService.transferADA(
-      [wallet.addressBech32(environments.networkId)],
-      600
-    );
-    await pollTransaction(res.txId, res.lockInfo);
+    await transferAdaForWallet(wallet, 600);
 
     const dRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {

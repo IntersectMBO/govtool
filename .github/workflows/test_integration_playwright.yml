@@ -4,14 +4,26 @@ on:
   push:
     paths:
       - .github/workflows/test_integration_playwright.yml
+    branches:
+      - test
+  workflow_dispatch:
+    inputs:
+      deployment:
+        required: true
+        type: choice
+        default: "govtool.cardanoapi.io"
+        options:
+          - "sanchogov.tools"
+          - "staging.govtool.byron.network"
+          - "govtool.cardanoapi.io"
+
   workflow_run:
-    workflows: ["Build and deploy GovTool test stack"]
+    workflows: ["Build and deploy GovTool to TEST server"]
     types: [completed]
 
 jobs:
   integration-tests:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
     defaults:
       run:
         working-directory: tests/govtool-frontend/playwright
@@ -50,18 +62,20 @@ jobs:
           path: tests/govtool-frontend/playwright/allure-results
 
     env:
-      FRONTEND_URL: ${{vars.HOST_URL}}
-      API_URL: ${{vars.HOST_URL}}/api
+      HOST_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io' }}
+      API_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io' }}/api
       DOCS_URL: ${{ vars.DOCS_URL }}
       FAUCET_API_URL: ${{ vars.FAUCET_API_URL }}
       FAUCET_API_KEY: ${{secrets.FAUCET_API_KEY}}
       KUBER_API_URL: ${{vars.KUBER_API_URL}}
       KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}
-      WORKERS: ${{vars.TEST_WORKERS}}
+      TEST_WORKERS: ${{vars.TEST_WORKERS}}
+      CI: ${{vars.CI}}
+      CARDANOAPI_METADATA_URL: ${{vars.CARDANOAPI_METADATA_URL}}
 
   publish-report:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
+    if: always()
     needs: integration-tests
     steps:
       - uses: actions/checkout@v4
@@ -128,5 +142,5 @@ jobs:
           target-folder: ${{ env.REPORT_NAME }}
 
     env:
-      REPORT_NAME: integration
+      REPORT_NAME: govtool-frontend
       GH_PAGES: ${{vars.GH_PAGES}}

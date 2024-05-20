@@ -4,21 +4,20 @@ on:
   push:
     paths:
       - .github/workflows/test_backend.yml
-  #     - govtool/backend
-  #     - tests/govtool-backend
+    branches:
+      - test
+      - chore/update-backend-workflow
 
-  schedule:
-    - cron: "0 0 * * *"
   workflow_dispatch:
     inputs:
       deployment:
         required: true
         type: choice
-        default: "staging.govtool.byron.network/api"
+        default: "govtool.cardanoapi.io/api"
         options:
           - "sanchogov.tools/api"
           - "staging.govtool.byron.network/api"
-          - "govtool-sanchonet.cardanoapi.io/api"
+          - "govtool.cardanoapi.io/api"
 
 jobs:
   backend-tests:
@@ -70,7 +69,7 @@ jobs:
           ref: gh-pages
           path: gh-pages
           repository: ${{vars.GH_PAGES}}
-          token: ${{secrets.PERSONAL_TOKEN}}
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
 
       - name: Register report
         id: register-project
@@ -81,7 +80,7 @@ jobs:
       - if: steps.register-project.outputs.project_exists != 'true'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          token: ${{ secrets.PERSONAL_TOKEN }}
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
           repository-name: ${{vars.GH_PAGES}}
           branch: gh-pages
           folder: project
@@ -113,7 +112,7 @@ jobs:
       - name: Deploy report to Github Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          token: ${{ secrets.PERSONAL_TOKEN }}
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
           repository-name: ${{vars.GH_PAGES}}
           branch: gh-pages
           folder: build

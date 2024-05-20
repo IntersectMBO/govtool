@@ -3,6 +3,7 @@ import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
+import { setAllureEpic } from "@helpers/allure";
 import { lovelaceToAda } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
@@ -17,12 +18,16 @@ import { FilterOption, IProposal } from "@types";
 test.describe("Logged in DRep", () => {
   test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
 
-  test("4E. Should display DRep's voting power in governance actions page", async ({
-    page,
-  }) => {
-    const votingPowerPromise = page.waitForResponse("**/get-voting-power/**");
-    const governanceActionsPage = new GovernanceActionsPage(page);
-    await governanceActionsPage.goto();
+test.beforeEach(async () => {
+  await setAllureEpic("4. Proposal visibility");
+});
+
+test("4E. Should display DRep's voting power in governance actions page", async ({
+  page,
+}) => {
+  const votingPowerPromise = page.waitForResponse("**/get-voting-power/**");
+  const governanceActionsPage = new GovernanceActionsPage(page);
+  await governanceActionsPage.goto();
 
     const res = await votingPowerPromise;
     const votingPower = await res.json();

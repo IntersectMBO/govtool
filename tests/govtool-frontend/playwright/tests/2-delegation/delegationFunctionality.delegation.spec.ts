@@ -2,6 +2,7 @@ import environments from "@constants/environments";
 import { adaHolder01Wallet, dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
+import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
 import extractDRepFromWallet from "@helpers/shellyWallet";
@@ -12,6 +13,10 @@ import {
 } from "@helpers/transaction";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { expect } from "@playwright/test";
+
+test.beforeEach(async () => {
+  await setAllureEpic("2. Delegation");
+});
 
 test.describe("Delegate to others", () => {
   test.describe.configure({ mode: "serial" });

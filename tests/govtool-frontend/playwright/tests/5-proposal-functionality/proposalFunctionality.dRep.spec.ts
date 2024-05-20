@@ -2,6 +2,7 @@ import environments from "@constants/environments";
 import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
+import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
 import {
@@ -13,6 +14,10 @@ import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
+
+test.beforeEach(async () => {
+  await setAllureEpic("5. Proposal functionality");
+});
 
 test.describe("Proposal checks", () => {
   test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
@@ -60,7 +65,8 @@ test.describe("Proposal checks", () => {
   });
 
   // Skipped: No url/hash input to validate
-  test.skip("5D. Should validate proposal voting", async () => {
+  test("5D. Should validate proposal voting", async () => {
+    test.skip();
     // const invalidURLs = ["testdotcom", "https://testdotcom", "https://test.c"];
     // invalidURLs.forEach(async (url) => {
     //   govActionDetailsPage.urlInput.fill(url);
@@ -198,7 +204,7 @@ test.describe("Check voting power", () => {
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("retire-button").click();
-    await dRepPage.getByTestId("continue-retirement-button").click(); 
+    await dRepPage.getByTestId("continue-retirement-button").click();
     await expect(
       dRepPage.getByTestId("retirement-transaction-submitted-modal")
     ).toBeVisible();

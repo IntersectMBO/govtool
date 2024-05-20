@@ -83,21 +83,12 @@ export default class DRepRegistrationPage {
     await this.linkInput.fill(link);
 
     for (const err of formErrors.dRepName) {
-      await expect(
-        this.page.getByTestId(err),
-        `Invalid name: ${name}`
-      ).toBeHidden();
+      await expect(this.page.getByTestId(err)).toBeHidden();
     }
 
-    await expect(
-      this.page.getByTestId(formErrors.email),
-      `Invalid email: ${email}`
-    ).toBeHidden();
+    await expect(this.page.getByTestId(formErrors.email)).toBeHidden();
 
-    expect(
-      await this.bioInput.textContent(),
-      "Bio exceeded 500 characters"
-    ).toEqual(bio);
+    expect(await this.bioInput.textContent()).toEqual(bio);
 
     await expect(this.page.getByTestId(formErrors.link)).toBeHidden();
 
@@ -127,17 +118,11 @@ export default class DRepRegistrationPage {
       })
       .all();
 
-    expect(nameErrors.length, `Valid name: ${name}`).toEqual(1);
+    expect(nameErrors.length).toEqual(1);
 
-    await expect(
-      this.page.getByTestId(formErrors.email),
-      `Valid email: ${email}`
-    ).toBeVisible();
+    await expect(this.page.getByTestId(formErrors.email)).toBeVisible();
 
-    expect(
-      await this.bioInput.textContent(),
-      "Bio less than 500 characters"
-    ).not.toEqual(bio);
+    expect(await this.bioInput.textContent()).not.toEqual(bio);
 
     await expect(this.page.getByTestId(formErrors.link)).toBeVisible();
 

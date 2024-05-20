@@ -3,6 +3,7 @@ import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
+import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import { createNewPageWithWallet } from "@helpers/page";
@@ -11,6 +12,10 @@ import { transferAdaForWallet } from "@helpers/transaction";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
+
+test.beforeEach(async () => {
+  await setAllureEpic("2. Delegation");
+});
 
 test("2C. Should open wallet connection popup on delegate in disconnected state", async ({
   page,

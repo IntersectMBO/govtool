@@ -1,9 +1,19 @@
 import { downloadMetadata } from "@helpers/metadata";
-import { Download, Page } from "@playwright/test";
+import { Download, Page, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
 import { IDRepInfo } from "@types";
 import environments from "lib/constants/environments";
 import { withTxConfirmation } from "lib/transaction.decorator";
+
+const formErrors = {
+  dRepName: [
+    "max-80-characters-error",
+    "this-field-is-required-error",
+    "nickname-can-not-contain-whitespaces-error",
+  ],
+  email: "invalid-email-address-error",
+  link: "invalid-url-error",
+};
 
 export default class DRepRegistrationPage {
   readonly registerBtn = this.page.getByTestId("register-button");
@@ -64,5 +74,73 @@ export default class DRepRegistrationPage {
   async downloadVoteMetadata() {
     const download: Download = await this.page.waitForEvent("download");
     return downloadMetadata(download);
+  }
+
+  async validateForm(name: string, email: string, bio: string, link: string) {
+    await this.nameInput.fill(name);
+    await this.emailInput.fill(email);
+    await this.bioInput.fill(bio);
+    await this.linkInput.fill(link);
+
+    for (const err of formErrors.dRepName) {
+      await expect(
+        this.page.getByTestId(err),
+        `Invalid name: ${name}`
+      ).toBeHidden();
+    }
+
+    await expect(
+      this.page.getByTestId(formErrors.email),
+      `Invalid email: ${email}`
+    ).toBeHidden();
+
+    expect(
+      await this.bioInput.textContent(),
+      "Bio exceeded 500 characters"
+    ).toEqual(bio);
+
+    await expect(this.page.getByTestId(formErrors.link)).toBeHidden();
+
+    await expect(this.continueBtn).toBeEnabled();
+  }
+
+  async inValidateForm(name: string, email: string, bio: string, link: string) {
+    await this.nameInput.fill(name);
+    await this.emailInput.fill(email);
+    await this.bioInput.fill(bio);
+    await this.linkInput.fill(link);
+
+    function convertTestIdToText(testId: string) {
+      let text = testId.replace("-error", "");
+      text = text.replace(/-/g, " ");
+      return text[0].toUpperCase() + text.substring(1);
+    }
+
+    const regexPattern = new RegExp(
+      formErrors.dRepName.map(convertTestIdToText).join("|")
+    );
+
+    const nameErrors = await this.page
+      .locator('[data-testid$="-error"]')
+      .filter({
+        hasText: regexPattern,
+      })
+      .all();
+
+    expect(nameErrors.length, `Valid name: ${name}`).toEqual(1);
+
+    await expect(
+      this.page.getByTestId(formErrors.email),
+      `Valid email: ${email}`
+    ).toBeVisible();
+
+    expect(
+      await this.bioInput.textContent(),
+      "Bio less than 500 characters"
+    ).not.toEqual(bio);
+
+    await expect(this.page.getByTestId(formErrors.link)).toBeVisible();
+
+    await expect(this.continueBtn).toBeDisabled();
   }
 }

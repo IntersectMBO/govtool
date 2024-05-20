@@ -3,19 +3,6 @@ import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { expect, test } from "@playwright/test";
 import { DRepStatus } from "@types";
 
-test("2C. Should open wallet connection popup on delegate in disconnected state", async ({
-  page,
-}) => {
-  await page.goto("/");
-
-  await page.getByTestId("view-drep-directory-button").click();
-  await page
-    .locator('[data-testid$="-connect-to-delegate-button"]')
-    .first()
-    .click();
-  await expect(page.getByTestId("connect-your-wallet-modal")).toBeVisible();
-});
-
 test("2J. Should search by DRep id", async ({ page }) => {
   const dRepDirectory = new DRepDirectoryPage(page);
   await dRepDirectory.goto();

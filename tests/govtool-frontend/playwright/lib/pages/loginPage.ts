@@ -2,7 +2,7 @@ import {
   CIP30Instance,
   Cip95Instance,
 } from "@cardanoapi/cardano-test-wallet/types";
-import { isMobile, openDrawer, openDrawerLoggedIn } from "@helpers/mobile";
+import { isMobile, openDrawer } from "@helpers/mobile";
 import { Page, expect } from "@playwright/test";
 
 export default class LoginPage {
@@ -23,14 +23,7 @@ export default class LoginPage {
   async login() {
     await this.goto();
 
-    if (isMobile(this.page)) {
-      await openDrawer(this.page);
-      await this.page
-        .getByRole("button", { name: "Connect your wallet" }) // BUG testId should be same as connect-wallet-button
-        .click();
-    } else {
-      await this.connectWalletBtn.click();
-    }
+    await this.connectWalletBtn.click();
     await this.demosWalletBtn.click({ force: true });
     await this.acceptSanchoNetInfoBtn.click({ force: true });
 
@@ -62,14 +55,14 @@ export default class LoginPage {
 
   async logout() {
     if (isMobile(this.page)) {
-      await openDrawerLoggedIn(this.page);
+      await openDrawer(this.page);
     }
     await this.disconnectWalletBtn.click();
   }
 
   async isLoggedIn() {
     if (isMobile(this.page)) {
-      await openDrawerLoggedIn(this.page);
+      await openDrawer(this.page);
     }
     await expect(this.disconnectWalletBtn).toBeVisible();
   }

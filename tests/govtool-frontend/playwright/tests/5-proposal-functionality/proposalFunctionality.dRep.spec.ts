@@ -2,10 +2,13 @@ import environments from "@constants/environments";
 import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
-import convertBufferToHex from "@helpers/convertBufferToHex";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
-import { pollTransaction, waitForTxConfirmation } from "@helpers/transaction";
+import {
+  registerDRepForWallet,
+  transferAdaForWallet,
+  waitForTxConfirmation,
+} from "@helpers/transaction";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
@@ -23,7 +26,7 @@ test.describe("Proposal checks", () => {
     govActionDetailsPage = await govActionsPage.viewFirstProposal();
   });
 
-  test("5A. Should show relevant details about governance action as DRep @slow", async () => {
+  test("5A. Should show relevant details about governance action as DRep", async () => {
     await expect(govActionDetailsPage.governanceActionType).toBeVisible();
     await expect(govActionDetailsPage.submittedDate).toBeVisible();
     await expect(govActionDetailsPage.expiryDate).toBeVisible();
@@ -37,11 +40,11 @@ test.describe("Proposal checks", () => {
     await expect(govActionDetailsPage.abstainRadio).toBeVisible();
   });
 
-  test("5B. Should view Vote button on governance action item on registered as DRep @slow", async () => {
+  test("5B. Should view Vote button on governance action item on registered as DRep", async () => {
     await expect(govActionDetailsPage.voteBtn).toBeVisible();
   });
 
-  test("5C. Should show required field in proposal voting on registered as DRep @slow", async () => {
+  test("5C. Should show required field in proposal voting on registered as DRep", async () => {
     await expect(govActionDetailsPage.voteBtn).toBeVisible();
     await expect(govActionDetailsPage.yesVoteRadio).toBeVisible();
     await expect(govActionDetailsPage.noVoteRadio).toBeVisible();
@@ -57,7 +60,7 @@ test.describe("Proposal checks", () => {
   });
 
   // Skipped: No url/hash input to validate
-  test.skip("5D. Should validate proposal voting @slow", async () => {
+  test.skip("5D. Should validate proposal voting", async () => {
     // const invalidURLs = ["testdotcom", "https://testdotcom", "https://test.c"];
     // invalidURLs.forEach(async (url) => {
     //   govActionDetailsPage.urlInput.fill(url);
@@ -110,17 +113,8 @@ test.describe("Perform voting", () => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
     const wallet = await ShelleyWallet.generate();
-    const registrationRes = await kuberService.dRepRegistration(
-      convertBufferToHex(wallet.stakeKey.private),
-      convertBufferToHex(wallet.stakeKey.pkh)
-    );
-    await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
-
-    const res = await kuberService.transferADA(
-      [wallet.addressBech32(environments.networkId)],
-      40
-    );
-    await pollTransaction(res.txId, registrationRes.lockInfo);
+    await registerDRepForWallet(wallet);
+    await transferAdaForWallet(wallet, 40);
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
@@ -191,17 +185,8 @@ test.describe("Check voting power", () => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
     const wallet = await ShelleyWallet.generate();
-    const registrationRes = await kuberService.dRepRegistration(
-      convertBufferToHex(wallet.stakeKey.private),
-      convertBufferToHex(wallet.stakeKey.pkh)
-    );
-    await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
-
-    const res = await kuberService.transferADA(
-      [wallet.addressBech32(environments.networkId)],
-      40
-    );
-    await pollTransaction(res.txId, registrationRes.lockInfo);
+    await registerDRepForWallet(wallet);
+    await transferAdaForWallet(wallet, 40);
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
@@ -213,7 +198,7 @@ test.describe("Check voting power", () => {
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("retire-button").click();
-    await dRepPage.getByTestId("retire-button").click(); // BUG: testId -> continue-retire-button
+    await dRepPage.getByTestId("continue-retirement-button").click(); 
     await expect(
       dRepPage.getByTestId("retirement-transaction-submitted-modal")
     ).toBeVisible();

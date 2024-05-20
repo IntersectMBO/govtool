@@ -1,6 +1,6 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-test("3C. Should open wallet connection popup, when Register as DRep from wallet unconnected state @smoke @fast", async ({
+test("3C. Should open wallet connection popup on DRep registration in disconnected state", async ({
   page,
 }) => {
   await page.goto("/");

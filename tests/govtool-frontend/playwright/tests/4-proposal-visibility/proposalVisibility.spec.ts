@@ -1,7 +1,12 @@
+import { setAllureEpic } from "@helpers/allure";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect, test } from "@playwright/test";
 
-test("4A.2: Should access Governance Actions page without connecting wallet @smoke @fast", async ({
+test.beforeEach(async () => {
+  await setAllureEpic("4. Proposal visibility");
+});
+
+test("4A.2: Should access Governance Actions page without connecting wallet", async ({
   page,
 }) => {
   await page.goto("/");
@@ -10,7 +15,7 @@ test("4A.2: Should access Governance Actions page without connecting wallet @smo
   await expect(page.getByText(/Governance actions/i)).toHaveCount(2);
 });
 
-test("4B.2: Should restrict voting for users who are not registered as DReps (without wallet connected)  @flaky @fast", async ({
+test("4B.2: Should restrict voting for users who are not registered as DReps (without wallet connected)", async ({
   page,
 }) => {
   const govActionsPage = new GovernanceActionsPage(page);

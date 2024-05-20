@@ -1,0 +1,49 @@
+name: Build and deploy GovTool test stack
+run-name: Deploy by @${{ github.actor }}
+
+on:
+  push:
+    branches:
+      - test
+
+env:
+  ENVIRONMENT: "test"
+  CARDANO_NETWORK: "sanchonet"
+
+jobs:
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest
+    env:
+      GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+      GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
+      GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
+      SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
+      GTM_ID: ${{ secrets.GTM_ID }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
+      PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.TEST_STACK_SSH_KEY }}
+
+      - name: Run Ansible playbook
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: playbook.yml
+          directory: ./tests/test-infrastructure
+          key: ${{ secrets.TEST_STACK_SSH_KEY }}
+          inventory: |
+            [test_server]
+            ${{ secrets.TEST_STACK_SERVER_IP }} ansible_user=ec2-user
+          options: |
+            --verbose
+        env:
+          GOVTOOL_TAG: ${{ github.sha }}

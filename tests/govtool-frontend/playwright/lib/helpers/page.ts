@@ -1,6 +1,6 @@
 import { importWallet } from "@fixtures/importWallet";
 import loadDemosExtension from "@fixtures/loadExtension";
-import { Browser, Page } from "@playwright/test";
+import { Browser, Page, expect } from "@playwright/test";
 import { ShelleyWallet } from "./crypto";
 
 interface BrowserConfig {
@@ -11,7 +11,7 @@ interface BrowserConfig {
 
 export async function createNewPageWithWallet(
   browser: Browser,
-  { storageState, wallet, enableStakeSigning }: BrowserConfig,
+  { storageState, wallet, enableStakeSigning }: BrowserConfig
 ): Promise<Page> {
   const context = await browser.newContext({
     storageState: storageState,

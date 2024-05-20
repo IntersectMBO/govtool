@@ -8,9 +8,5 @@ export function isMobile(page: Page) {
 }
 
 export async function openDrawer(page: Page) {
-  await page.getByRole("img", { name: "drawer-icon" }).click(); //BUG testId
-}
-
-export async function openDrawerLoggedIn(page: Page) {
   await page.getByTestId("open-drawer-button").click();
 }

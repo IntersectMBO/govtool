@@ -11,7 +11,7 @@ export default class GovernanceActionDetailsPage {
   readonly noVoteRadio = this.page.getByTestId("no-radio");
   readonly abstainRadio = this.page.getByTestId("abstain-radio");
   readonly governanceActionType = this.page.getByText(
-    "Governance Action Type:",
+    "Governance Action Type:"
   );
   readonly showVotesBtn = this.page.getByTestId("show-votes-button");
   readonly submittedDate = this.page.getByTestId("submission-date");
@@ -23,7 +23,7 @@ export default class GovernanceActionDetailsPage {
     name: "Provide context about your",
   }); // BUG testId
   readonly viewOtherDetailsLink = this.page.getByTestId(
-    "view-other-details-button",
+    "view-other-details-button"
   );
   readonly continueModalBtn = this.page.getByTestId("continue-modal-button");
   readonly confirmModalBtn = this.page.getByTestId("confirm-modal-button");
@@ -31,7 +31,7 @@ export default class GovernanceActionDetailsPage {
   readonly voteSuccessModal = this.page.getByTestId("alert-success");
   readonly externalLinkModal = this.page.getByTestId("external-link-modal");
 
-  readonly contextInput = this.page.getByPlaceholder("Provide context"); // BUG testId
+  readonly contextInput = this.page.getByTestId("provide-context-input");
   readonly cancelModalBtn = this.page.getByTestId("cancel-modal-button");
 
   constructor(private readonly page: Page) {}
@@ -42,7 +42,7 @@ export default class GovernanceActionDetailsPage {
 
   async goto(proposalId: string) {
     await this.page.goto(
-      `${environments.frontendUrl}/governance_actions/${proposalId}`,
+      `${environments.frontendUrl}/governance_actions/${proposalId}`
     );
   }
 

@@ -29,7 +29,7 @@ export class Ed25519Key {
   }
   public static async fromPrivateKeyHex(privKey) {
     return await Ed25519Key.fromPrivateKey(
-      Uint8Array.from(Buffer.from(privKey, "hex")),
+      Uint8Array.from(Buffer.from(privKey, "hex"))
     );
   }
 
@@ -59,20 +59,20 @@ export class Ed25519Key {
   public static fromJson(json: any): Ed25519Key {
     if (!json || typeof json !== "object") {
       throw new Error(
-        "Invalid JSON format for Ed25519Key: Input must be a non-null object.",
+        "Invalid JSON format for Ed25519Key: Input must be a non-null object."
       );
     }
 
     if (!json.private || !json.public || !json.pkh) {
       throw new Error(
-        "Invalid JSON format for Ed25519Key: Missing required fields (private, public, or pkh).",
+        "Invalid JSON format for Ed25519Key: Missing required fields (private, public, or pkh)."
       );
     }
 
     return new Ed25519Key(
       Uint8Array.from(Buffer.from(json.private, "hex")),
       Uint8Array.from(Buffer.from(json.public, "hex")),
-      Uint8Array.from(Buffer.from(json.pkh, "hex")),
+      Uint8Array.from(Buffer.from(json.pkh, "hex"))
     );
   }
 }
@@ -92,7 +92,7 @@ export class ShelleyWallet {
   public static async generate() {
     const wallet = new ShelleyWallet(
       await Ed25519Key.generate(),
-      await Ed25519Key.generate(),
+      await Ed25519Key.generate()
     );
     return wallet;
   }
@@ -102,7 +102,7 @@ export class ShelleyWallet {
     return bech32.encode(
       prefix,
       bech32.toWords(Buffer.from(this.addressRawBytes(networkId))),
-      200,
+      200
     );
   }
 
@@ -127,7 +127,7 @@ export class ShelleyWallet {
     return bech32.encode(
       prefix,
       bech32.toWords(Buffer.from(this.rewardAddressRawBytes(networkId))),
-      200,
+      200
     );
   }
   public json() {
@@ -150,18 +150,18 @@ export class ShelleyWallet {
 
     if (!paymentKey || typeof paymentKey !== "object") {
       throw new Error(
-        "ShelleyWallet.fromJson : Invalid payment key: It must be an object.",
+        "ShelleyWallet.fromJson : Invalid payment key: It must be an object."
       );
     }
 
     if (!stakeKey || typeof stakeKey !== "object") {
       throw new Error(
-        "ShelleyWallet.fromJson : Invalid stake key: It must be an object.",
+        "ShelleyWallet.fromJson : Invalid stake key: It must be an object."
       );
     }
     return new ShelleyWallet(
       Ed25519Key.fromJson(paymentKey),
-      Ed25519Key.fromJson(stakeKey),
+      Ed25519Key.fromJson(stakeKey)
     );
   }
 
@@ -198,7 +198,7 @@ export class ShelleyWalletAddress implements Address {
   private constructor(
     network: number | "mainnet" | "testnet",
     pkh: Uint8Array,
-    skh: Uint8Array,
+    skh: Uint8Array
   ) {
     this.network =
       network == "mainnet" ? 1 : network == "testnet" ? 0 : network;
@@ -215,7 +215,7 @@ export class ShelleyWalletAddress implements Address {
           "ShelleyAddress.fromRawBytes: Invalid byte array length. expected: " +
             ADDR_LENGTH +
             " got: " +
-            bytea.length,
+            bytea.length
         );
       }
       bytebuffer = Buffer.from(bytea);
@@ -227,7 +227,7 @@ export class ShelleyWalletAddress implements Address {
     return new ShelleyWalletAddress(
       bytebuffer.at(0),
       paymentKeyHash,
-      stakeKeyHash,
+      stakeKeyHash
     );
   }
   toBech32(): string {
@@ -235,7 +235,7 @@ export class ShelleyWalletAddress implements Address {
     return bech32.encode(
       prefix,
       bech32.toWords(Buffer.from(this.toRawBytes())),
-      200,
+      200
     );
   }
   toRawBytes(): Uint8Array {

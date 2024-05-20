@@ -1,15 +1,18 @@
 import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
+import DelegationPage from "@pages/dRepDirectoryPage";
+import { setAllureEpic } from "@helpers/allure";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
-import DelegationPage from "@pages/delegationPage";
 import { expect } from "@playwright/test";
 
 test.use({ storageState: ".auth/user01.json", wallet: user01Wallet });
 
+test.beforeEach(async () => {
+  await setAllureEpic("6. Miscellaneous");
+});
 // Skipped: No dRepId to validate
-test.skip("6B. Provides error for invalid format @fast @smoke", async ({
-  page,
-}) => {
+test("6B. Provides error for invalid format", async ({ page }) => {
+  test.skip();
   // invalid dRep delegation
   const delegationPage = new DelegationPage(page);
   await delegationPage.goto();
@@ -27,7 +30,7 @@ test.skip("6B. Provides error for invalid format @fast @smoke", async ({
   // await expect(dRepRegistrationPage.hashInputError).toBeVisible();
 });
 
-test("6D: Proper label and recognition of the testnet network @fast @smoke", async ({
+test("6D: Proper label and recognition of the testnet network", async ({
   page,
 }) => {
   await page.goto("/");

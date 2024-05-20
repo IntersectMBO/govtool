@@ -11,7 +11,7 @@ cat <<EOF > build/index.html
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=/$allure_report_path/$REPORT_NAME/$REPORT_NUMBER">
+    <meta http-equiv="refresh" content="0; url=/$allure_report_path/$REPORT_NAME/$REPORT_NUMBER#behaviors">
     <title>Redirecting...</title>
 </head>
 </html>

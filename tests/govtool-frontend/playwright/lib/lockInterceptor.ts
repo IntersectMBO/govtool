@@ -15,7 +15,7 @@ export class LockInterceptor {
     address: string,
     lockId: string
   ): Promise<void> {
-    const lockFilePath = path.resolve(__dirname, `../.lock-pool/${address}`);
+    const lockFilePath = path.resolve(__dirname, `../${address}`);
 
     try {
       await log(
@@ -42,7 +42,7 @@ export class LockInterceptor {
     address: string,
     lockId: string
   ): Promise<void> {
-    const lockFilePath = path.resolve(__dirname, `../.lock-pool/${address}`);
+    const lockFilePath = path.resolve(__dirname, `../${address}`);
 
     try {
       await log(
@@ -147,7 +147,7 @@ export class LockInterceptor {
 }
 
 function checkAddressLock(address: string): boolean {
-  const lockFilePath = path.resolve(__dirname, `../.lock-pool/${address}`);
+  const lockFilePath = path.resolve(__dirname, `../${address}`);
   return lockfile.checkSync(lockFilePath);
 }
 
@@ -162,7 +162,7 @@ function log(message: string): Promise<void> {
     hour12: false,
     timeZone: "Asia/Kathmandu",
   };
-  const logFilePath = path.resolve(__dirname, "../.logs/lock_logs.txt");
+  const logFilePath = path.resolve(__dirname, "../lock_logs.txt");
   const logMessage = `[${new Date().toLocaleString("en-US", options)}] ${message}\n`;
   return new Promise((resolve, reject) => {
     fs.appendFile(logFilePath, logMessage, (err) => {

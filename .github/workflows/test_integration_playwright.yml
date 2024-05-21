@@ -50,6 +50,7 @@ jobs:
 
       - name: Run tests
         run: |
+          npm run generate-wallets
           npm test
 
       - name: Upload report

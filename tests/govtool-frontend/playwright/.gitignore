@@ -7,7 +7,6 @@ node_modules/
 tests-out/
 .auth/
 .download/
-lib/_mock/
 allure-results/
 allure-report/
 .secrets

@@ -104,7 +104,9 @@ test("2N. Should show DRep information on details page", async ({
   await expect(dRepPage.getByText(bio, { exact: true })).toBeVisible();
 });
 
-test("2P. Should enable sharing of DRep details", async ({ page }) => {
+test("2P. Should enable sharing of DRep details", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+
   const dRepDetailsPage = new DRepDetailsPage(page);
   await dRepDetailsPage.goto(dRep01Wallet.dRepId);
 
@@ -115,4 +117,16 @@ test("2P. Should enable sharing of DRep details", async ({ page }) => {
   expect(copiedText).toEqual(
     `${environments.frontendUrl}/drep_directory/${dRep01Wallet.dRepId}`
   );
+});
+
+test("2Q. Should include DRep status and voting power on the DRep card", async ({
+  page,
+}) => {
+  test.skip(); // Cannot access dRep card
+
+  const dRepDirectory = new DRepDirectoryPage(page);
+  await dRepDirectory.goto();
+
+  const dRepCard = dRepDirectory.getDRepCard(dRep01Wallet.dRepId);
+  await expect(dRepCard).toHaveText("20");
 });

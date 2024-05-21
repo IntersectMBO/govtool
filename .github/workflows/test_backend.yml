@@ -33,15 +33,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          python ./setup.py
           python -m pytest --alluredir allure-results
         env:
-          BASE_URL: https://${{inputs.deployment ||  'staging.govtool.byron.network/api' }}
-          METRICS_URL: https://metrics.cardanoapi.io
-          METRICS_API_SECRET: "${{ secrets.METRICS_SERVER_SECRET_TOKEN }}"
+          BASE_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io/api' }}
+          FAUCET_API_KEY: ${{ secrets.FAUCET_API_KEY }}
+          KUBER_API_URL: https://kuber-govtool.cardanoapi.io
 
       - name: Upload report
         uses: actions/upload-artifact@v3
-        if: always()
         with:
           name: allure-results
           path: tests/govtool-backend/allure-results
@@ -89,7 +89,6 @@ jobs:
 
       - name: Build report
         uses: simple-elf/allure-report-action@master
-        if: always()
         id: allure-report
         with:
           allure_results: allure-results
@@ -115,5 +114,5 @@ jobs:
           target-folder: ${{ env.REPORT_NAME }}
 
     env:
-      REPORT_NAME: backend
+      REPORT_NAME: govtool-backend
       GH_PAGES: ${{vars.GH_PAGES}}

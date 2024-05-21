@@ -6,6 +6,7 @@ on:
       - Build and deploy GovTool test stack
     types:
       - completed
+  workflow_dispatch:
 
 jobs:
   lighthouse:
@@ -34,4 +35,6 @@ jobs:
         if: github.repository_owner == 'IntersectMBO'
         run: |
           lhci assert  --preset lighthouse:recommended || echo "LightHouse Assertion error ignored ..."
-          lhci upload --githubAppToken="${{ secrets.LHCI_GITHUB_APP_TOKEN }}" --token="${{ secrets.LHCI_SERVER_TOKEN }}" --serverBaseUrl=https://lighthouse-govtool.cardanoapi.io --ignoreDuplicateBuildFailure
+          lhci upload --githubAppToken="${{ secrets.LHCI_GITHUB_APP_TOKEN }}" --token="${{ secrets.LHCI_SERVER_TOKEN }}" --serverBaseUrl=${LHCI_SERVER_URL} --ignoreDuplicateBuildFailure
+        env:
+          LHCI_SERVER_URL: https://lighthouse-govtool.cardanoapi.io

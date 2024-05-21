@@ -51,11 +51,7 @@ const vitestConfig = defineVitestConfig({
     setupFiles: "./src/setupTests.ts",
     globals: true,
     environment: "jsdom",
-    reporters: ["default","junit"],
-    outputFile: {
-      junit: './junit-report.xml',
-      json: './json-report.json',
-    },
+    reporters: ["verbose", "junit"],
     coverage: {
       include: [
         "src/components/**/*",
@@ -66,8 +62,7 @@ const vitestConfig = defineVitestConfig({
         "src/utils/**/*",
       ],
       provider: "v8",
-      reporter: ["json-summary","lcov"],
-      reportOnFailure: true,
+      reporter: ["json-summary"],
       enabled: true,
     },
   },

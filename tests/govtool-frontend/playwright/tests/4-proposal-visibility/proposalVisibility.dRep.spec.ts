@@ -18,16 +18,16 @@ import { FilterOption, IProposal } from "@types";
 test.describe("Logged in DRep", () => {
   test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
 
-test.beforeEach(async () => {
-  await setAllureEpic("4. Proposal visibility");
-});
+  test.beforeEach(async () => {
+    await setAllureEpic("4. Proposal visibility");
+  });
 
-test("4E. Should display DRep's voting power in governance actions page", async ({
-  page,
-}) => {
-  const votingPowerPromise = page.waitForResponse("**/get-voting-power/**");
-  const governanceActionsPage = new GovernanceActionsPage(page);
-  await governanceActionsPage.goto();
+  test("4E. Should display DRep's voting power in governance actions page", async ({
+    page,
+  }) => {
+    const votingPowerPromise = page.waitForResponse("**/get-voting-power/**");
+    const governanceActionsPage = new GovernanceActionsPage(page);
+    await governanceActionsPage.goto();
 
     const res = await votingPowerPromise;
     const votingPower = await res.json();

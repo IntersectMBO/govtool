@@ -8,11 +8,15 @@ import { ShelleyWallet } from "@helpers/crypto";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import { createNewPageWithWallet } from "@helpers/page";
 import extractDRepFromWallet from "@helpers/shellyWallet";
-import { transferAdaForWallet } from "@helpers/transaction";
+import {
+  registerStakeForWallet,
+  transferAdaForWallet,
+  waitForTxConfirmation,
+} from "@helpers/transaction";
 import DRepDetailsPage from "@pages/dRepDetailsPage";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
-import { expect } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
@@ -129,4 +133,47 @@ test("2Q. Should include DRep status and voting power on the DRep card", async (
 
   const dRepCard = dRepDirectory.getDRepCard(dRep01Wallet.dRepId);
   await expect(dRepCard).toHaveText("20");
+});
+
+test.describe("Direct Voter retirement", () => {
+  let dRepPage: Page;
+  let wallet: ShelleyWallet;
+
+  test.beforeEach(async ({ page, browser }, testInfo) => {
+    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
+
+    wallet = await ShelleyWallet.generate();
+
+    await transferAdaForWallet(wallet, 600);
+    await registerStakeForWallet(wallet);
+
+    const dRepAuth = await createTempDRepAuth(page, wallet);
+    dRepPage = await createNewPageWithWallet(browser, {
+      storageState: dRepAuth,
+      wallet,
+      enableStakeSigning: true,
+    });
+  });
+
+  test("2S. Should retire as a Direct Voter on delegating to another DRep", async () => {
+    await dRepPage.goto("/");
+    await dRepPage.getByTestId("register-as-sole-voter-button").click();
+    await dRepPage.getByTestId("continue-button").click();
+    await expect(
+      dRepPage.getByTestId("registration-transaction-submitted-modal")
+    ).toBeVisible();
+    await dRepPage.getByTestId("confirm-modal-button").click();
+    await waitForTxConfirmation(dRepPage);
+    await expect(dRepPage.getByText("You are a Direct Voter")).toBeVisible();
+
+    const dRepDirectoryPage = new DRepDirectoryPage(dRepPage);
+    await dRepDirectoryPage.goto();
+
+    await dRepDirectoryPage.delegateToDRep(dRep01Wallet.dRepId);
+    await dRepPage.goto("/dashboard");
+
+    await expect(
+      dRepPage.getByText("You Have Retired as a Direct")
+    ).toBeVisible();
+  });
 });

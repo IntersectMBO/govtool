@@ -1,10 +1,5 @@
 import environments from "@constants/environments";
-import {
-  adaHolder01Wallet,
-  adaHolder02Wallet,
-  dRep01Wallet,
-  dRep02Wallet,
-} from "@constants/staticWallets";
+import { adaHolder01Wallet, dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
@@ -107,36 +102,5 @@ test.describe("Delegate to myself", () => {
     await expect(dRepPage.getByTestId(`${dRepId}-copy-id-button`)).toHaveText(
       dRepId
     );
-  });
-});
-
-test.describe("Multiple delegations", () => {
-  test.use({
-    storageState: ".auth/adaHolder02.json",
-    wallet: adaHolder02Wallet,
-  });
-
-  test("2R. Should display a modal indicating waiting for previous transaction when delegating if the previous transaction is not completed", async ({
-    page,
-  }) => {
-    const dRepDirectoryPage = new DRepDirectoryPage(page);
-    await dRepDirectoryPage.goto();
-
-    await dRepDirectoryPage.searchInput.fill(dRep01Wallet.dRepId);
-    const delegateBtn = page.getByTestId(
-      `${dRep01Wallet.dRepId}-delegate-button`
-    );
-    await expect(delegateBtn).toBeVisible();
-    await page.getByTestId(`${dRep01Wallet.dRepId}-delegate-button`).click();
-
-    await page.waitForTimeout(2_000);
-    try {
-      await dRepDirectoryPage.delegateToDRep(dRep02Wallet.dRepId);
-      expect(true, "Previous transaction modal not shown").toBeFalsy();
-    } catch (error) {
-      await expect(
-        page.getByTestId("transaction-inprogress-modal")
-      ).toBeVisible();
-    }
   });
 });

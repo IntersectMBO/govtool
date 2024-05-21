@@ -1,5 +1,10 @@
 import environments from "@constants/environments";
-import { dRep01Wallet, user01Wallet } from "@constants/staticWallets";
+import {
+  adaHolder02Wallet,
+  dRep01Wallet,
+  dRep02Wallet,
+  user01Wallet,
+} from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
@@ -195,5 +200,34 @@ test.describe("Insufficient funds", () => {
     await page.getByTestId(`${dRep01Wallet.dRepId}-delegate-button`).click();
 
     await expect(dRepDirectoryPage.delegationErrorModal).toBeVisible();
+  });
+});
+
+test.describe("Multiple delegations", () => {
+  test.use({
+    storageState: ".auth/adaHolder02.json",
+    wallet: adaHolder02Wallet,
+  });
+
+  test("2R. Should display a modal indicating waiting for previous transaction when delegating if the previous transaction is not completed", async ({
+    page,
+  }) => {
+    const dRepDirectoryPage = new DRepDirectoryPage(page);
+    await dRepDirectoryPage.goto();
+
+    await dRepDirectoryPage.searchInput.fill(dRep01Wallet.dRepId);
+    const delegateBtn = page.getByTestId(
+      `${dRep01Wallet.dRepId}-delegate-button`
+    );
+    await expect(delegateBtn).toBeVisible();
+    await page.getByTestId(`${dRep01Wallet.dRepId}-delegate-button`).click();
+
+    await page.waitForTimeout(2_000);
+    await dRepDirectoryPage.searchInput.fill(dRep02Wallet.dRepId);
+    await page.getByTestId(`${dRep02Wallet.dRepId}-delegate-button`).click();
+
+    await expect(
+      page.getByTestId("transaction-inprogress-modal")
+    ).toBeVisible();
   });
 });

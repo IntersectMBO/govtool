@@ -1,5 +1,5 @@
 import { faucetWallet } from "@constants/staticWallets";
-import { setAllureStory, setAllureEpic } from "@helpers/allure";
+import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import { pollTransaction } from "@helpers/transaction";
 import { test as setup } from "@playwright/test";
 import { loadAmountFromFaucet } from "@services/faucetService";

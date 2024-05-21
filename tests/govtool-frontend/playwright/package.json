@@ -12,6 +12,7 @@
     "eslint": "^8.57.0",
     "prettier": "3.2.5",
     "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
     "typescript": "^5.4.5",
     "webpack": "^5.90.3",
@@ -23,7 +24,8 @@
     "allure:open": "npx allure open ./allure-report",
     "allure:serve": "npx allure serve",
     "test": "npx playwright test",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "generate-wallets": "ts-node ./generate_wallets.ts 6"
   },
   "dependencies": {
     "@cardanoapi/cardano-test-wallet": "^1.1.2",

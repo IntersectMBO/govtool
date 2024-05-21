@@ -50,6 +50,8 @@ jobs:
 
       - name: Run tests
         run: |
+          mkdir ./lib/_mock
+          chmod +w ./lib/_mock
           npm run generate-wallets
           npm test
 

@@ -2,12 +2,8 @@ name: Backend Test
 
 on:
   push:
-    paths:
-      - .github/workflows/test_backend.yml
     branches:
       - test
-      - chore/update-backend-workflow
-
   workflow_dispatch:
     inputs:
       deployment:

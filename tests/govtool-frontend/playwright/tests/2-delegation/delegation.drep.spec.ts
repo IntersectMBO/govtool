@@ -1,5 +1,5 @@
 import environments from "@constants/environments";
-import { dRep01Wallet } from "@constants/staticWallets";
+import { dRep01Wallet, user01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
@@ -175,5 +175,25 @@ test.describe("Direct Voter retirement", () => {
     await expect(
       dRepPage.getByText("You Have Retired as a Direct")
     ).toBeVisible();
+  });
+});
+
+test.describe("Insufficient funds", () => {
+  test.use({ storageState: ".auth/user01.json", wallet: user01Wallet });
+
+  test("2T. Should show warning message on delegation when insufficient funds", async ({
+    page,
+  }) => {
+    const dRepDirectoryPage = new DRepDirectoryPage(page);
+    await dRepDirectoryPage.goto();
+
+    await dRepDirectoryPage.searchInput.fill(dRep01Wallet.dRepId);
+    const delegateBtn = page.getByTestId(
+      `${dRep01Wallet.dRepId}-delegate-button`
+    );
+    await expect(delegateBtn).toBeVisible();
+    await page.getByTestId(`${dRep01Wallet.dRepId}-delegate-button`).click();
+
+    await expect(dRepDirectoryPage.delegationErrorModal).toBeVisible();
   });
 });

@@ -26,7 +26,7 @@
     "format": "prettier . --write"
   },
   "dependencies": {
-    "@cardanoapi/cardano-test-wallet": "^1.1.1",
+    "@cardanoapi/cardano-test-wallet": "^1.1.2",
     "@faker-js/faker": "^8.4.1",
     "@noble/curves": "^1.3.0",
     "@noble/ed25519": "^2.0.0",

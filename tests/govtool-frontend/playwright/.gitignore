@@ -13,3 +13,4 @@ allure-report/
 .vars
 .lock-pool/
 .logs/
+lib/_mock/wallets.json

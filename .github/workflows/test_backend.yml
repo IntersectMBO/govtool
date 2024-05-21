@@ -115,5 +115,5 @@ jobs:
           target-folder: ${{ env.REPORT_NAME }}
 
     env:
-      REPORT_NAME: backend
+      REPORT_NAME: govtool-backend
       GH_PAGES: ${{vars.GH_PAGES}}

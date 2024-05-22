@@ -52,6 +52,22 @@ export type IDRepInfo = {
   extraContentLinks?: string[];
 };
 
+export type IProposalForm = {
+  title: string;
+  abstract: string;
+  motivation: string;
+  rationale: string;
+  extraContentLinks?: string[];
+  type: ProposalType;
+  receivingAddress?: string;
+  amount?: string;
+};
+
+export enum ProposalType {
+  info = "Info",
+  treasury = "Treasury",
+}
+
 export enum FilterOption {
   ProtocolParameterChange = "ParameterChange",
   InfoAction = "InfoAction",

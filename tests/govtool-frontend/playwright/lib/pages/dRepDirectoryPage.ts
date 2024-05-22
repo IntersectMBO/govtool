@@ -27,7 +27,7 @@ export default class DRepDirectoryPage {
   ); // BUG: testId -> abstain-delegation-card
 
   readonly delegationErrorModal = this.page.getByTestId(
-    "delegation-transaction-error-modal"
+    "delegate-transaction-error-modal"
   );
 
   readonly delegateBtns = this.page.locator(

@@ -23,11 +23,6 @@ import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
 
-const automaticDelegationOptions = [
-  "Abstain from Every Vote",
-  "Signal no Confidence on Every Vote",
-];
-
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
 });
@@ -56,17 +51,36 @@ test.describe("Delegate to others", () => {
     await expect(
       page.getByTestId(`${dRepId}-delegate-button')`)
     ).not.toBeVisible();
-    await expect(page.getByText(dRepId)).toHaveCount(1);
+    await expect(page.getByText(dRepId)).toHaveCount(1, { timeout: 10_000 });
 
     // Verify dRepId in dashboard
     await page.goto("/dashboard");
     await expect(page.getByText(dRepId)).toBeVisible();
   });
 
+  test("2W. Should display voting power of DRep", async ({ page, browser }) => {
+    const dRepPage = await createNewPageWithWallet(browser, {
+      storageState: ".auth/dRep01.json",
+      wallet: ShelleyWallet.fromJson(dRep01Wallet),
+      enableStakeSigning: true,
+    });
+
+    const adaHolder01VotingPower = await kuberService.getBalance(
+      adaHolder01Wallet.address
+    );
+
+    await expect(
+      dRepPage.getByText(`Voting power:₳ ${adaHolder01VotingPower}`)
+    ).toBeVisible();
+    console.log({ adaHolder01VotingPower });
+
+    await dRepPage.goto("/");
+  });
+
   test("2F. Should change delegated dRep", async ({ page }, testInfo) => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
-    const dRepId = "drep1qzw234c0ly8csamxf8hrhfahvzwpllh2ckuzzvl38d22wwxxquu";
+    const dRepId = dRep02Wallet.dRepId;
 
     const dRepDirectoryPage = new DRepDirectoryPage(page);
     await dRepDirectoryPage.goto();

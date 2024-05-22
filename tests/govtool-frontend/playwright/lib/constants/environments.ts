@@ -1,6 +1,11 @@
+const CARDANO_API_METADATA_HOST_URL =
+  process.env.CARDANOAPI_METADATA_URL ||
+  "https://metadata-govtool.cardanoapi.io";
+const SERVER_HOST_URL = process.env.HOST_URL || "http://localhost:8080";
+
 const environments = {
-  frontendUrl: process.env.HOST_URL || "http://localhost:8080",
-  apiUrl: `${process.env.HOST_URL}/api` || "http://localhost:8080/api",
+  frontendUrl: SERVER_HOST_URL,
+  apiUrl: `${SERVER_HOST_URL}/api`,
   docsUrl: process.env.DOCS_URL || "https://docs.sanchogov.tools",
   networkId: parseInt(process.env.NETWORK_ID) || 0,
   faucet: {
@@ -14,12 +19,8 @@ const environments = {
     apiKey: process.env.KUBER_API_KEY || "",
   },
   txTimeOut: parseInt(process.env.TX_TIMEOUT) || 240000,
-  metadataBucketUrl:
-    `${process.env.CARDANOAPI_METADATA_URL}/data` ||
-    "https://metadata.cardanoapi.io/data",
-  lockInterceptorUrl:
-    `${process.env.CARDANOAPI_METADATA_URL}/data` ||
-    "https://metadata.cardanoapi.io/lock",
+  metadataBucketUrl: `${CARDANO_API_METADATA_HOST_URL}/data`,
+  lockInterceptorUrl: `${CARDANO_API_METADATA_HOST_URL}/lock`,
 };
 
 export default environments;

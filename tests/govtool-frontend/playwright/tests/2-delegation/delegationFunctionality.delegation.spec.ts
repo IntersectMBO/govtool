@@ -292,3 +292,35 @@ test.describe("No confidence delegation", () => {
     ).toBeVisible();
   });
 });
+
+test.describe("Delegated ADA visibility", () => {
+  test.use({
+    storageState: ".auth/adaHolder05.json",
+    wallet: adaHolder05Wallet,
+  });
+
+  test("2W. Should show my delegated ADA to the DRep", async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+
+    const dRepDirectoryPage = new DRepDirectoryPage(page);
+    await dRepDirectoryPage.goto();
+
+    await dRepDirectoryPage.delegateToDRep(dRep01Wallet.dRepId);
+
+    const adaHolderVotingPower = await kuberService.getBalance(
+      adaHolder05Wallet.address
+    );
+    await expect(
+      page.getByText(`You have delegated ₳ ${adaHolderVotingPower}`)
+    ).toBeVisible();
+
+    await page.goto("/");
+    await expect(
+      page.getByText(
+        `Your Voting Power of ₳${adaHolderVotingPower} is Delegated to`
+      )
+    ).toBeVisible();
+  });
+});

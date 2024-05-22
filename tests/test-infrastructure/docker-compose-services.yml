@@ -2,15 +2,24 @@ version: "3.9"
 secrets:
   postgres_user:
     external: true
-    name:  ${PROJECT_NAME}_postgres_user
+    name:  ${STACK_NAME}_postgres_user
   postgres_password:
     external: true
-    name:  ${PROJECT_NAME}_postgres_password
+    name:  ${STACK_NAME}_postgres_password
 configs:
   postgres_db_setup.sql:
     external: true
-    name: ${PROJECT_NAME}_postgres_db_setup.sql
+    name: ${STACK_NAME}_postgres_db_setup.sql
 
+### secrets and configs in docker compose
+# secrets:
+#   postgres_user:
+#     file:  "./secrets/${STACK_NAME}_postgres_user"
+#   postgres_password:
+#     file: "./secrets/${STACK_NAME}_postgres_password"
+# configs:
+#   postgres_db_setup.sql:
+#     file: "./configs/${STACK_NAME}_postgres_db_setup.sql"
 volumes:
   postgres:
   nginx_dhparam:
@@ -45,7 +54,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.gateway == true
+          - node.labels.govtool-test-stack == true
       restart_policy:
         delay: "10s"
   postgres:
@@ -64,8 +73,6 @@ services:
       - postgres
     volumes:
       - postgres:/var/lib/postgresql/data
-    ports:
-      - 5432:5432
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -76,6 +83,6 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.blockchain == true
+          - node.labels.govtool-test-stack == true
       restart_policy:
         delay: "30s"

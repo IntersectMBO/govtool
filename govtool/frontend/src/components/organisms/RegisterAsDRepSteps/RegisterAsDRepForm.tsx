@@ -57,6 +57,7 @@ export const RegisterAsDRepForm = ({
             links.length > 1 ? (
               <DeleteOutlineIcon
                 color="primary"
+                data-testid={`delete-link-${index + 1}-button`}
                 sx={{ cursor: "pointer", height: 24, with: 24 }}
                 onClick={() => removeLink(index)}
               />
@@ -70,7 +71,6 @@ export const RegisterAsDRepForm = ({
           placeholder={Placeholders.LINK}
           name={`links.${index}.link`}
           rules={Rules.LINK}
-          data-testid="link-input"
         />
       )),
     [errors, links],
@@ -103,7 +103,6 @@ export const RegisterAsDRepForm = ({
         name="dRepName"
         rules={Rules.DREP_NAME}
         placeholder={t("forms.registerAsDRep.dRepNamePlaceholder")}
-        dataTestId="name-input"
       />
       <Spacer y={isMobile ? 5 : 6} />
       <Box textAlign="center">
@@ -121,7 +120,6 @@ export const RegisterAsDRepForm = ({
         name="email"
         placeholder={t("forms.registerAsDRep.emailPlaceholder")}
         rules={Rules.EMAIL}
-        data-testid="email-input"
       />
       <Spacer y={3} />
       <ControlledField.TextArea
@@ -154,10 +152,10 @@ export const RegisterAsDRepForm = ({
       {renderLinks()}
       {links?.length < MAX_NUMBER_OF_LINKS ? (
         <Button
+          data-testid="add-link-button"
           onClick={addLink}
           size="extraLarge"
           variant="text"
-          data-testid="add-link-button"
         >
           {t("addLink")}
         </Button>

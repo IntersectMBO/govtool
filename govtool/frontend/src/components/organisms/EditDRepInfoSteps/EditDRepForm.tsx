@@ -41,7 +41,6 @@ export const EditDRepForm = ({
   const removeLink = useCallback((index: number) => remove(index), [remove]);
 
   const isContinueButtonDisabled = !watch("dRepName") || isError;
-
   const renderLinks = useCallback(
     () =>
       links.map((field, index) => (
@@ -52,6 +51,7 @@ export const EditDRepForm = ({
             links.length > 1 ? (
               <DeleteOutlineIcon
                 color="primary"
+                data-testid={`delete-link-${index + 1}-button`}
                 sx={{ cursor: "pointer", height: 24, with: 24 }}
                 onClick={() => removeLink(index)}
               />
@@ -116,6 +116,7 @@ export const EditDRepForm = ({
       <Spacer y={3} />
       <ControlledField.TextArea
         {...{ control, errors }}
+        data-testid="bio-input"
         label={t("forms.editMetadata.bio")}
         name="bio"
         placeholder={t("forms.editMetadata.bioPlaceholder")}
@@ -142,7 +143,12 @@ export const EditDRepForm = ({
       <Spacer y={3} />
       {renderLinks()}
       {links?.length < MAX_NUMBER_OF_LINKS ? (
-        <Button onClick={addLink} size="extraLarge" variant="text">
+        <Button
+          data-testid="add-link-button"
+          onClick={addLink}
+          size="extraLarge"
+          variant="text"
+        >
           {t("addLink")}
         </Button>
       ) : null}

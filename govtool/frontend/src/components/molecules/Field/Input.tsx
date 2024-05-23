@@ -7,6 +7,7 @@ import {
   Input as InputBase,
   Typography,
 } from "@atoms";
+import { testIdFromLabel } from "@/utils";
 
 import { InputFieldProps } from "./types";
 
@@ -61,7 +62,12 @@ export const Input = forwardRef<HTMLInputElement, InputFieldProps>(
             {label}
           </Typography>
         )}
-        <InputBase errorMessage={errorMessage} {...rest} ref={inputRef} />
+        <InputBase
+          dataTestId={`${label && testIdFromLabel(label) + "-"}input`}
+          errorMessage={errorMessage}
+          {...rest}
+          ref={inputRef}
+        />
         <FormHelpfulText
           helpfulText={helpfulText}
           helpfulTextStyle={helpfulTextStyle}

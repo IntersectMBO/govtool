@@ -29,6 +29,7 @@ export type EmptyStateGovernanceActionsCategoryProps = {
 
 export type AutomatedVotingCardProps = {
   description: string;
+  dataTestId?: string;
   inProgress?: boolean;
   isConnected?: boolean;
   isSelected?: boolean;

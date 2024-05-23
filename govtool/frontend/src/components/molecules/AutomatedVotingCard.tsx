@@ -10,6 +10,7 @@ import { Card } from "./Card";
 import { AutomatedVotingCardProps } from "./types";
 
 export const AutomatedVotingCard = ({
+  dataTestId,
   description,
   inProgress,
   isConnected,
@@ -49,7 +50,7 @@ export const AutomatedVotingCard = ({
         mt: inProgress || isSelected ? 2 : 0,
         py: 2.25,
       }}
-      data-testid={`${testIdLabel}-card`}
+      dataTestId={dataTestId ?? `${testIdLabel}-card`}
     >
       <Box
         sx={{

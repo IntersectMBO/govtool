@@ -221,7 +221,10 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
             <StatusPill status={status} />
           </DRepDetailsInfoItem>
           <DRepDetailsInfoItem label={t("votingPower")}>
-            <Typography sx={{ display: "flex", flexDirection: "row", mt: 0.5 }}>
+            <Typography
+              data-testid="voting-power"
+              sx={{ display: "flex", flexDirection: "row", mt: 0.5 }}
+            >
               {"₳ "}
               {correctAdaFormat(votingPower)}
             </Typography>

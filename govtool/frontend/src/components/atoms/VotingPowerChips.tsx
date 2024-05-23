@@ -21,6 +21,7 @@ export const VotingPowerChips = () => {
   return (
     (voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter) && (
       <Box
+        data-testid="voting-power-chips"
         sx={{
           alignItems: "center",
           bgcolor: "textBlack",
@@ -59,6 +60,7 @@ export const VotingPowerChips = () => {
           <CircularProgress size={20} color="primary" />
         ) : (
           <Typography
+            data-testid="voting-power-chips-value"
             color="white"
             fontSize={18}
             fontWeight={600}

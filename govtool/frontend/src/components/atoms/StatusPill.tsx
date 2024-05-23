@@ -5,18 +5,21 @@ import { theme } from "@/theme";
 
 interface StatusPillProps {
   status: DRepStatus;
+  dataTestId?: string;
   label?: string;
   size?: "small" | "medium";
   sx?: ChipProps["sx"];
 }
 
 export const StatusPill = ({
+  dataTestId,
   status,
   label = status,
   size = "small",
   sx,
 }: StatusPillProps) => (
   <StyledChip
+    data-testid={dataTestId ?? `${status}-pill`}
     status={status}
     size={size}
     label={label}

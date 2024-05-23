@@ -142,6 +142,7 @@ test.describe("Temporary DReps", () => {
     ).toBeVisible();
     dRepPage.getByTestId("confirm-modal-button").click();
     await waitForTxConfirmation(dRepPage);
+    await expect(dRepPage.getByText("Voting power:₳")).not.toBeVisible();
 
     const governanceActionsPage = new GovernanceActionsPage(dRepPage);
     await governanceActionsPage.goto();

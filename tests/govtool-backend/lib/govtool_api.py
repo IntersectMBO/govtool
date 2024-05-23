@@ -9,7 +9,7 @@ from models.TestResult import Metrics
 from config import BUILD_ID
 
 
-class GovToolApi():
+class GovToolApi:
 
     def __init__(self, base_url: str):
         self._base_url = base_url
@@ -18,16 +18,15 @@ class GovToolApi():
         self.requests_log = []
         self.tests_log = []
 
-    def __request(self, method: str, endpoint: str, param: Any | None = None,
-                  body: Any | None = None) -> Response:
-        endpoint = endpoint if endpoint.startswith('/') else '/' + endpoint
+    def __request(self, method: str, endpoint: str, param: Any | None = None, body: Any | None = None) -> Response:
+        endpoint = endpoint if endpoint.startswith("/") else "/" + endpoint
         full_url = self._base_url + endpoint
         full_url = full_url + "/" + param if param else full_url
-        start_time = int(time.time()*1000000)
+        start_time = int(time.time() * 1000000)
 
         response = self._session.request(method, full_url, json=body)
 
-        end_time = int(time.time()*1000000)
+        end_time = int(time.time() * 1000000)
         response_time = end_time - start_time
 
         try:
@@ -45,34 +44,57 @@ class GovToolApi():
             "response_json": response_json_str,
             "response_time": response_time,
             "start_date": int(start_time),
-            "build_id": BUILD_ID
+            "build_id": BUILD_ID,
         }
 
         self.requests_log.append(request_info)
 
-        assert 200 >= response.status_code <= 299, f"Expected {method}{endpoint} to succeed but got statusCode:{response.status_code} : body:{response.text}"
+        assert (
+            200 >= response.status_code <= 299
+        ), f"Expected {method}{endpoint} to succeed but got statusCode:{response.status_code} : body:{response.text}"
         return response
 
     def __get(self, endpoint: str, param: str | None = None) -> Response:
-        return self.__request('GET', endpoint, param)
+        return self.__request("GET", endpoint, param)
+
+    def __post(self, endpoint: str, param: str | None = None, body=None) -> Response:
+        return self.__request("POST", endpoint, param, body)
 
     def drep_list(self) -> Response:
-        return self.__get('/drep/list')
+        return self.__get("/drep/list")
+
+    def drep_info(self, drep_id) -> Response:
+        return self.__get("/drep/info", drep_id)
 
     def drep_getVotes(self, drep_id) -> Response:
-        return self.__get('/drep/getVotes', drep_id)
+        return self.__get("/drep/getVotes", drep_id)
 
     def drep_get_voting_power(self, drep_id) -> Response:
-        return self.__get('/drep/get-voting-power', drep_id)
+        return self.__get("/drep/get-voting-power", drep_id)
 
     def proposal_list(self) -> Response:
-        return self.__get('/proposal/list')
+        return self.__get("/proposal/list")
+
+    def get_proposal(self, id) -> Response:
+        return self.__get("/proposal/get", id)
 
     def ada_holder_get_current_delegation(self, stake_key: str) -> Response:
-        return self.__get('/ada-holder/get-current-delegation', stake_key)
+        return self.__get("/ada-holder/get-current-delegation", stake_key)
 
     def ada_holder_get_voting_power(self, stake_key) -> Response:
-        return self.__get('/ada-holder/get-voting-power', stake_key)
+        return self.__get("/ada-holder/get-voting-power", stake_key)
+
+    def epoch_params(self) -> Response:
+        return self.__get("/epoch/params")
+
+    def validate_metadata(self, metadata) -> Response:
+        return self.__post("/metadata/validate", body=metadata)
+
+    def network_metrics(self) -> Response:
+        return self.__get("/network/metrics")
+
+    def get_transaction_status(self, tx_id) -> Response:
+        return self.__get("/transaction/status", tx_id)
 
     def add_test_metrics(self, metrics: Metrics):
-        self.tests_log.append(metrics)
+        return self.tests_log.append(metrics)

@@ -61,12 +61,12 @@ export default defineConfig({
       testMatch: "**/wallet.bootstrap.ts",
       dependencies: ["faucet setup"],
     },
-    // {
-    //   name: "transaction",
-    //   use: { ...devices["Desktop Chrome"] },
-    //   testMatch: "**/*.tx.spec.ts",
-    //   dependencies: process.env.CI ? ["auth setup", "wallet bootstrap"] : [],
-    // },
+    {
+      name: "transaction",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: "**/*.tx.spec.ts",
+      dependencies: process.env.CI ? ["auth setup", "wallet bootstrap"] : [],
+    },
     {
       name: "loggedin (desktop)",
       use: { ...devices["Desktop Chrome"] },
@@ -89,7 +89,9 @@ export default defineConfig({
       name: "delegation",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.delegation.spec.ts",
-      dependencies: process.env.CI ? ["auth setup", "dRep setup"] : [],
+      dependencies: process.env.CI
+        ? ["auth setup", "dRep setup", "wallet bootstrap"]
+        : [],
       teardown: process.env.CI && "cleanup delegation",
     },
     {
@@ -99,15 +101,17 @@ export default defineConfig({
         "**/*.delegation.spec.ts",
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",
+        "**/*.tx.spec.ts",
       ],
     },
     {
       name: "independent (mobile)",
       use: { ...devices["Pixel 5"] },
       testIgnore: [
-        "**/*.tx.spec.ts",
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",
+        "**/*.delegation.spec.ts",
+        "**/*.tx.spec.ts",
       ],
     },
     {

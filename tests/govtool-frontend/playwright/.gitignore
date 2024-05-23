@@ -7,10 +7,10 @@ node_modules/
 tests-out/
 .auth/
 .download/
-lib/_mock/
 allure-results/
 allure-report/
 .secrets
 .vars
 .lock-pool/
 .logs/
+lib/_mock/wallets.json

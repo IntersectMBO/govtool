@@ -1,7 +1,7 @@
 import { ShelleyWallet } from "./crypto";
 
 export default async function generateShellyWallets(
-  numWallets: number = 100,
+  numWallets: number = 100
 ): Promise<ShelleyWallet[]> {
   const wallets: ShelleyWallet[] = [];
 

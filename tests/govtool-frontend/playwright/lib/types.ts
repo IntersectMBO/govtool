@@ -51,6 +51,23 @@ export type IDRepInfo = {
   bio?: string;
   extraContentLinks?: string[];
 };
+
+export type IProposalForm = {
+  title: string;
+  abstract: string;
+  motivation: string;
+  rationale: string;
+  extraContentLinks?: string[];
+  type: ProposalType;
+  receivingAddress?: string;
+  amount?: string;
+};
+
+export enum ProposalType {
+  info = "Info",
+  treasury = "Treasury",
+}
+
 export enum FilterOption {
   ProtocolParameterChange = "ParameterChange",
   InfoAction = "InfoAction",
@@ -60,3 +77,18 @@ export enum FilterOption {
   NewCommittee = "NewCommittee",
   UpdatetotheConstitution = "NewConstitution",
 }
+
+export type DRepStatus = "Active" | "Inactive" | "Retired";
+
+export type IDRep = {
+  drepId: string;
+  view: string;
+  url: string;
+  metadataHash: string;
+  deposit: number;
+  votingPower: number;
+  status: DRepStatus;
+  type: string;
+  latestTxHash: string;
+  latestRegistrationDate: string;
+};

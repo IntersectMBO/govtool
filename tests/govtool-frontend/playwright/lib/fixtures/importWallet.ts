@@ -4,7 +4,7 @@ import { StaticWallet } from "@types";
 
 export async function importWallet(
   page: Page,
-  wallet: StaticWallet | CardanoTestWallet,
+  wallet: StaticWallet | CardanoTestWallet
 ) {
   await page.addInitScript((wallet) => {
     // @ts-ignore

@@ -2,23 +2,18 @@ name: Backend Test
 
 on:
   push:
-    paths:
-      - .github/workflows/test_backend.yml
-  #     - govtool/backend
-  #     - tests/govtool-backend
-
-  schedule:
-    - cron: "0 0 * * *"
+    branches:
+      - test
   workflow_dispatch:
     inputs:
       deployment:
         required: true
         type: choice
-        default: "staging.govtool.byron.network/api"
+        default: "govtool.cardanoapi.io/api"
         options:
           - "sanchogov.tools/api"
           - "staging.govtool.byron.network/api"
-          - "govtool-sanchonet.cardanoapi.io/api"
+          - "govtool.cardanoapi.io/api"
 
 jobs:
   backend-tests:
@@ -38,15 +33,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          python ./setup.py
           python -m pytest --alluredir allure-results
         env:
-          BASE_URL: https://${{inputs.deployment ||  'staging.govtool.byron.network/api' }}
-          METRICS_URL: https://metrics.cardanoapi.io
-          METRICS_API_SECRET: "${{ secrets.METRICS_SERVER_SECRET_TOKEN }}"
+          BASE_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io/api' }}
+          FAUCET_API_KEY: ${{ secrets.FAUCET_API_KEY }}
+          KUBER_API_URL: https://kuber-govtool.cardanoapi.io
 
       - name: Upload report
         uses: actions/upload-artifact@v3
-        if: always()
         with:
           name: allure-results
           path: tests/govtool-backend/allure-results
@@ -70,7 +65,7 @@ jobs:
           ref: gh-pages
           path: gh-pages
           repository: ${{vars.GH_PAGES}}
-          token: ${{secrets.PERSONAL_TOKEN}}
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
 
       - name: Register report
         id: register-project
@@ -81,7 +76,7 @@ jobs:
       - if: steps.register-project.outputs.project_exists != 'true'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          token: ${{ secrets.PERSONAL_TOKEN }}
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
           repository-name: ${{vars.GH_PAGES}}
           branch: gh-pages
           folder: project
@@ -94,7 +89,6 @@ jobs:
 
       - name: Build report
         uses: simple-elf/allure-report-action@master
-        if: always()
         id: allure-report
         with:
           allure_results: allure-results
@@ -113,12 +107,12 @@ jobs:
       - name: Deploy report to Github Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          token: ${{ secrets.PERSONAL_TOKEN }}
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
           repository-name: ${{vars.GH_PAGES}}
           branch: gh-pages
           folder: build
           target-folder: ${{ env.REPORT_NAME }}
 
     env:
-      REPORT_NAME: backend
+      REPORT_NAME: govtool-backend
       GH_PAGES: ${{vars.GH_PAGES}}

@@ -6,11 +6,11 @@ import path = require("path");
 
 export default async function loadDemosExtension(
   page: Page,
-  enableStakeSigning = false,
+  enableStakeSigning = false
 ) {
   const demosBundleScriptPath = path.resolve(
     __dirname,
-    "../../node_modules/@cardanoapi/cardano-test-wallet/script.js",
+    "../../node_modules/@cardanoapi/cardano-test-wallet/script.js"
   );
   let walletConfig: CardanoTestWalletConfig = {
     enableStakeSigning,

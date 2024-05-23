@@ -1,7 +1,8 @@
 import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
+import { setAllureEpic } from "@helpers/allure";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
-import { isMobile, openDrawerLoggedIn } from "@helpers/mobile";
+import { isMobile, openDrawer } from "@helpers/mobile";
 import removeAllSpaces from "@helpers/removeAllSpaces";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
@@ -24,19 +25,23 @@ enum SortOption {
 
 test.use({ storageState: ".auth/user01.json", wallet: user01Wallet });
 
-test("4A.1: Should access Governance Actions page with connecting wallet @smoke @fast", async ({
+test.beforeEach(async () => {
+  await setAllureEpic("4. Proposal visibility");
+});
+
+test("4A.1: Should access Governance Actions page with connecting wallet", async ({
   page,
 }) => {
   await page.goto("/");
   if (isMobile(page)) {
-    await openDrawerLoggedIn(page);
+    await openDrawer(page);
   }
 
   await page.getByTestId("governance-actions-link").click();
   await expect(page.getByText(/Governance Actions/i)).toHaveCount(2);
 });
 
-test("4B.1: Should restrict voting for users who are not registered as DReps (with wallet connected) @fast", async ({
+test("4B.1: Should restrict voting for users who are not registered as DReps (with wallet connected)", async ({
   page,
 }) => {
   const govActionsPage = new GovernanceActionsPage(page);
@@ -46,7 +51,7 @@ test("4B.1: Should restrict voting for users who are not registered as DReps (wi
   await expect(govActionDetailsPage.voteBtn).not.toBeVisible();
 });
 
-test("4C.1: Should filter Governance Action Type on governance actions page @slow", async ({
+test("4C.1: Should filter Governance Action Type on governance actions page", async ({
   page,
 }) => {
   test.slow();
@@ -73,7 +78,7 @@ test("4C.1: Should filter Governance Action Type on governance actions page @slo
   }
 });
 
-test("4C.2: Should sort Governance Action Type on governance actions page @slow", async ({
+test("4C.2: Should sort Governance Action Type on governance actions page", async ({
   page,
 }) => {
   test.slow();
@@ -86,23 +91,23 @@ test("4C.2: Should sort Governance Action Type on governance actions page @slow"
   govActionsPage.sortProposal(SortOption.SoonToExpire);
   await govActionsPage.validateSort(
     SortOption.SoonToExpire,
-    (p1, p2) => p1.expiryDate <= p2.expiryDate,
+    (p1, p2) => p1.expiryDate <= p2.expiryDate
   );
 
   govActionsPage.sortProposal(SortOption.NewestFirst);
   await govActionsPage.validateSort(
     SortOption.NewestFirst,
-    (p1, p2) => p1.createdDate >= p2.createdDate,
+    (p1, p2) => p1.createdDate >= p2.createdDate
   );
 
   govActionsPage.sortProposal(SortOption.HighestYesVotes);
   await govActionsPage.validateSort(
     SortOption.HighestYesVotes,
-    (p1, p2) => p1.yesVotes >= p2.yesVotes,
+    (p1, p2) => p1.yesVotes >= p2.yesVotes
   );
 });
 
-test("4D: Should filter and sort Governance Action Type on governance actions page @slow", async ({
+test("4D: Should filter and sort Governance Action Type on governance actions page", async ({
   page,
 }) => {
   test.slow();
@@ -119,7 +124,7 @@ test("4D: Should filter and sort Governance Action Type on governance actions pa
   await govActionsPage.validateSort(
     SortOption.SoonToExpire,
     (p1, p2) => p1.expiryDate <= p2.expiryDate,
-    [removeAllSpaces(filterOptionNames[0])],
+    [removeAllSpaces(filterOptionNames[0])]
   );
   await govActionsPage.validateFilters([filterOptionNames[0]]);
 });
@@ -130,7 +135,6 @@ test("4H. Should verify none of the displayed governance actions have expired", 
   const govActionsPage = new GovernanceActionsPage(page);
   await govActionsPage.goto();
 
-  await page.waitForTimeout(4000); // BUG: Delay to load governance actions
   const proposalCards = await govActionsPage.getAllProposals();
 
   for (const proposalCard of proposalCards) {

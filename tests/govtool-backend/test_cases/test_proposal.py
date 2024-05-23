@@ -1,17 +1,15 @@
-from models.TestData import Proposal
+from models.TestData import Proposal, ProposalListResponse, GetProposalResponse
 import allure
 
-@allure.story("Proposal")
-def validate_proposal_list(proposal_list: [Proposal]) -> bool:
-    for item in proposal_list:
-        if not isinstance(item, dict):
-            return False
-        if not all(key in item for key in Proposal.__annotations__):
-            return False
-        if not all(isinstance(item[key], Proposal.__annotations__[key]) for key in Proposal.__annotations__):
-            return False
-        if not all(isinstance(item[key], int) for key in ['yesVotes', 'noVotes', 'abstainVotes']):
-            return False
+
+def validate_proposal(proposal: Proposal) -> bool:
+    assert isinstance(proposal, dict), f"Expected Proposal to be of type dict, got {type(proposal)}"
+
+    for key in Proposal.__annotations__:
+        assert key in proposal, f"Expected Proposal.{key} to be present"
+        assert isinstance(
+            proposal[key], Proposal.__annotations__[key]
+        ), f"drepInfo.{key} should be of type {Proposal.__annotations__[key]} got {type(proposal[key])}"
     return True
 
 
@@ -19,4 +17,15 @@ def validate_proposal_list(proposal_list: [Proposal]) -> bool:
 def test_list_proposal(govtool_api):
     response = govtool_api.proposal_list()
     proposal_list = response.json()
-    assert validate_proposal_list(proposal_list)
+    for proposal in proposal_list["elements"]:
+        assert validate_proposal(proposal)
+
+
+@allure.story("Proposal")
+def test_get_proposal(govtool_api):
+    response: ProposalListResponse = govtool_api.proposal_list().json()
+    for proposal in response["elements"]:
+        proposal_get: GetProposalResponse = govtool_api.get_proposal(
+            proposal["txHash"] + "%23" + str(proposal["index"])
+        ).json()
+        assert validate_proposal(proposal_get["proposal"])

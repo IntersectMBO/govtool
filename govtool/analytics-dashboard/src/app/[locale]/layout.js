@@ -5,6 +5,7 @@ import { unstable_setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import '@/styles/index.css';
 import ThemeProviderWrapper from "@/components/ThemeProviderWrapper";
+import Head from "next/head";
 
 
 export function generateStaticParams() {
@@ -14,8 +15,8 @@ export function generateStaticParams() {
 
 // Define common metadata for the application.
 export const metadata = {
-	title: "Web App Boilerplate",
-	description: "Web App Boilerplate",
+	title: "Participation dashboard",
+	description: "Participation dashboard",
 };
 
 async function RootLayout({ children, params: { locale } }) {
@@ -36,10 +37,10 @@ async function RootLayout({ children, params: { locale } }) {
 		<html lang={locale}>
 			<head>
 				<title>{metadata.title}</title>
-				<link rel="icon" href="/favicon.ico" sizes="any" />
+				<link rel="icon" type="image/svg+xml" href="assets/svgs/favicon.svg" />
 			</head>
 			{/* Apply font class and suppress hydration warning. */}
-			<body style={{ margin: 0 }} suppressHydrationWarning={true}>
+			<body style={{ margin: 0 }} >
 				{/* Provide internationalization context. */}
 				<NextIntlClientProvider locale={locale} messages={messages}>
 					{/* Wrap children in global state context */}

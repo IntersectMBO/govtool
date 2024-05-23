@@ -107,10 +107,7 @@ test("3F. Should create proper DRep registration request, when registered with d
   const dRepRegistrationPage = new DRepRegistrationPage(page);
   await dRepRegistrationPage.goto();
 
-  await dRepRegistrationPage.register({ name: "Test" }).catch((err) => {
-    // Fails because real tx is not submitted
-  });
-
+  await dRepRegistrationPage.registerWithoutTxConfirmation({ name: "Test" });
   await expect(
     page.getByTestId("registration-transaction-error-modal")
   ).toBeVisible();

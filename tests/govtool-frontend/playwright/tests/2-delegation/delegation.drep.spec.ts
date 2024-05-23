@@ -150,3 +150,29 @@ test.describe("Insufficient funds", () => {
     await expect(dRepDirectoryPage.delegationErrorModal).toBeVisible();
   });
 });
+
+test("2I. Should check validity of DRep Id", async ({ page }) => {
+  const dRepDirectory = new DRepDirectoryPage(page);
+  await dRepDirectory.goto();
+
+  await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
+  await expect(dRepDirectory.getDRepCard(dRep01Wallet.dRepId)).toHaveText(
+    dRep01Wallet.dRepId
+  );
+
+  const wallet = await ShelleyWallet.generate();
+  const invalidDRepId = extractDRepFromWallet(wallet);
+
+  await dRepDirectory.searchInput.fill(invalidDRepId);
+  await expect(dRepDirectory.getDRepCard(invalidDRepId)).not.toBeVisible();
+});
+
+test("2J. Should search by DRep id", async ({ page }) => {
+  const dRepDirectory = new DRepDirectoryPage(page);
+  await dRepDirectory.goto();
+
+  await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
+  await expect(dRepDirectory.getDRepCard(dRep01Wallet.dRepId)).toHaveText(
+    dRep01Wallet.dRepId
+  );
+});

@@ -14,7 +14,7 @@ export const LinkWithIcon = ({
   cutWithEllipsis,
 }: LinkWithIconProps) => (
   <Box
-    data-testid={dataTestId ? dataTestId : `${label.split(" ").join("-")}-link`}
+    data-testid={dataTestId ?? `${label.split(" ").join("-")}-link`}
     sx={{
       alignItems: "center",
       cursor: "pointer",

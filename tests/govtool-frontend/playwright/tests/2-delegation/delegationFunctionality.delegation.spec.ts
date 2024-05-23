@@ -186,13 +186,10 @@ test.describe("Abstain delegation", () => {
 
   let dRepWallet: ShelleyWallet;
 
-  test.beforeAll(async () => {
+  test.beforeAll(async ({ browser }, testInfo) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+
     dRepWallet = await ShelleyWallet.generate();
-  });
-
-  test("2U_1. Register DRep and Delegate", async ({ browser }, testInfo) => {
-    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
-
     await registerDRepForWallet(dRepWallet);
 
     const adaHolderPage = await createNewPageWithWallet(browser, {
@@ -205,10 +202,9 @@ test.describe("Abstain delegation", () => {
 
     const dRepId = extractDRepFromWallet(dRepWallet);
     await dRepDirectoryPage.delegateToDRep(dRepId);
-    console.debug(`Delegated to ${dRepId}`);
   });
 
-  test("2U_2. Should delegate my own voting power to Abstain as registered DRep with delegated voting power", async ({
+  test("2U. Should delegate my own voting power to Abstain as registered DRep with delegated voting power", async ({
     page,
     browser,
   }, testInfo) => {
@@ -244,17 +240,12 @@ test.describe("Abstain delegation", () => {
 });
 
 test.describe("No confidence delegation", () => {
-  test.describe.configure({ mode: "serial" });
-
   let dRepWallet: ShelleyWallet;
 
-  test.beforeAll(async () => {
-    dRepWallet = await ShelleyWallet.generate();
-  });
-
-  test("2V_1. Register DRep and Delegate", async ({ browser }, testInfo) => {
+  test.beforeAll(async ({ browser }, testInfo) => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
+    dRepWallet = await ShelleyWallet.generate();
     await registerDRepForWallet(dRepWallet);
 
     const adaHolderPage = await createNewPageWithWallet(browser, {
@@ -267,10 +258,9 @@ test.describe("No confidence delegation", () => {
 
     const dRepId = extractDRepFromWallet(dRepWallet);
     await dRepDirectoryPage.delegateToDRep(dRepId);
-    console.debug(`Delegated to ${dRepId}`);
   });
 
-  test("2V_2. Should delegate my own voting power to Abstain as registered DRep with delegated voting power", async ({
+  test("2V. Should delegate my own voting power to Abstain as registered DRep with delegated voting power", async ({
     page,
     browser,
   }, testInfo) => {

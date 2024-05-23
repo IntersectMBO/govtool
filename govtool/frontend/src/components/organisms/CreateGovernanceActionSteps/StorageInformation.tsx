@@ -59,6 +59,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
         {t("createGovernanceAction.storingInformationTitle")}
       </Typography>
       <Button
+        data-testid="read-guide-button"
         endIcon={
           <OpenInNewIcon
             sx={{
@@ -82,6 +83,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
         <Step
           component={
             <Button
+              data-testid="metadata-download-button"
               onClick={onClickDownloadJson}
               size="extraLarge"
               startIcon={<img alt="download" src={ICONS.download} />}
@@ -112,6 +114,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
           component={
             <ControlledField.Input
               {...{ control, errors }}
+              data-testid="metadata-url-input"
               name="storingURL"
               layoutStyles={{ mt: 1.5 }}
               placeholder={t(

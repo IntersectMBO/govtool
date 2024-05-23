@@ -6,6 +6,7 @@ import { Typography } from "@atoms";
 import { LinkWithIconProps } from "./types";
 
 export const LinkWithIcon = ({
+  dataTestId,
   label,
   onClick,
   icon,
@@ -13,7 +14,7 @@ export const LinkWithIcon = ({
   cutWithEllipsis,
 }: LinkWithIconProps) => (
   <Box
-    data-testid={`${label.split(" ").join("-")}-link`}
+    data-testid={dataTestId ? dataTestId : `${label.split(" ").join("-")}-link`}
     sx={{
       alignItems: "center",
       cursor: "pointer",

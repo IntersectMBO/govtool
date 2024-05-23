@@ -6,6 +6,7 @@ export type LinkWithIconProps = {
   icon?: JSX.Element;
   sx?: SxProps;
   cutWithEllipsis?: boolean;
+  dataTestId?: string;
 };
 
 export type StepProps = {

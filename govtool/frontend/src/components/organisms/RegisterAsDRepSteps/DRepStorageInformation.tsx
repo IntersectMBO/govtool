@@ -118,6 +118,7 @@ export const DRepStorageInformation = ({
           component={
             <ControlledField.Input
               {...{ control, errors }}
+              dataTestId="metadata-url-input"
               layoutStyles={{ mt: 1.5 }}
               name="storingURL"
               placeholder={t("registration.storingInformationURLPlaceholder")}

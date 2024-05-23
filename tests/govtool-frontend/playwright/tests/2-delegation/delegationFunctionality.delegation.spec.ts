@@ -28,8 +28,6 @@ test.beforeEach(async () => {
 });
 
 test.describe("Delegate to others", () => {
-  test.describe.configure({ mode: "serial" });
-
   test.use({
     storageState: ".auth/adaHolder01.json",
     wallet: adaHolder01Wallet,
@@ -57,36 +55,30 @@ test.describe("Delegate to others", () => {
     await page.goto("/dashboard");
     await expect(page.getByText(dRepId)).toBeVisible();
   });
+});
 
-  test("2W. Should display voting power of DRep", async ({ page, browser }) => {
-    const dRepPage = await createNewPageWithWallet(browser, {
-      storageState: ".auth/dRep01.json",
-      wallet: ShelleyWallet.fromJson(dRep01Wallet),
-      enableStakeSigning: true,
-    });
-
-    const adaHolder01VotingPower = await kuberService.getBalance(
-      adaHolder01Wallet.address
-    );
-
-    await expect(
-      dRepPage.getByText(`Voting power:₳ ${adaHolder01VotingPower}`)
-    ).toBeVisible();
-    console.log({ adaHolder01VotingPower });
-
-    await dRepPage.goto("/");
+test.describe("Change delegation", () => {
+  test.use({
+    storageState: ".auth/adaHolder02.json",
+    wallet: adaHolder02Wallet,
   });
 
   test("2F. Should change delegated dRep", async ({ page }, testInfo) => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
-    const dRepId = dRep02Wallet.dRepId;
+    const dRepIdFirst = dRep01Wallet.dRepId;
+    const dRepIdSecond = dRep02Wallet.dRepId;
 
     const dRepDirectoryPage = new DRepDirectoryPage(page);
     await dRepDirectoryPage.goto();
-    await dRepDirectoryPage.delegateToDRep(dRepId);
-    await expect(page.getByTestId(`${dRepId}-copy-id-button`)).toHaveText(
-      dRepId
+    await dRepDirectoryPage.delegateToDRep(dRepIdFirst);
+    await expect(page.getByTestId(`${dRepIdFirst}-copy-id-button`)).toHaveText(
+      dRepIdFirst
+    ); // verify delegation
+
+    await dRepDirectoryPage.delegateToDRep(dRepIdSecond);
+    await expect(page.getByTestId(`${dRepIdSecond}-copy-id-button`)).toHaveText(
+      dRepIdSecond
     ); // verify delegation
   });
 });
@@ -198,10 +190,7 @@ test.describe("Abstain delegation", () => {
     dRepWallet = await ShelleyWallet.generate();
   });
 
-  test("2U_1. Register DRep and Delegate", async ({
-    page,
-    browser,
-  }, testInfo) => {
+  test("2U_1. Register DRep and Delegate", async ({ browser }, testInfo) => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
     await registerDRepForWallet(dRepWallet);
@@ -251,7 +240,6 @@ test.describe("Abstain delegation", () => {
     await expect(
       dRepPage.getByText(`You have delegated ₳${balance}`)
     ).toBeVisible();
-    console.log({ balance });
   });
 });
 
@@ -264,10 +252,7 @@ test.describe("No confidence delegation", () => {
     dRepWallet = await ShelleyWallet.generate();
   });
 
-  test("2V_1. Register DRep and Delegate", async ({
-    page,
-    browser,
-  }, testInfo) => {
+  test("2V_1. Register DRep and Delegate", async ({ browser }, testInfo) => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
     await registerDRepForWallet(dRepWallet);
@@ -317,6 +302,5 @@ test.describe("No confidence delegation", () => {
     await expect(
       dRepPage.getByText(`You have delegated ₳${balance}`)
     ).toBeVisible();
-    console.log({ balance });
   });
 });

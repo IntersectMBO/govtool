@@ -63,7 +63,7 @@ export const Input = forwardRef<HTMLInputElement, InputFieldProps>(
           </Typography>
         )}
         <InputBase
-          dataTestId={`${label && testIdFromLabel(label) + "-"}input`}
+          dataTestId={`${label && `${testIdFromLabel(label)}-`}input`}
           errorMessage={errorMessage}
           {...rest}
           ref={inputRef}

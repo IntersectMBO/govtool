@@ -114,7 +114,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
           component={
             <ControlledField.Input
               {...{ control, errors }}
-              data-testid="metadata-url-input"
+              dataTestId="metadata-url-input"
               name="storingURL"
               layoutStyles={{ mt: 1.5 }}
               placeholder={t(

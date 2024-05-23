@@ -115,6 +115,7 @@ export const EditDRepStorageInformation = ({
           component={
             <ControlledField.Input
               {...{ control, errors }}
+              dataTestId="metadata-url-input"
               layoutStyles={{ mt: 1.5 }}
               name="storingURL"
               placeholder={t("editMetadata.storingInformationURLPlaceholder")}

@@ -69,11 +69,7 @@ export const CreateGovernanceActionForm = ({
 
       if (field.component === GovernanceActionField.Input) {
         return (
-          <ControlledField.Input
-            {...{ control, errors }}
-            {...fieldProps}
-            data-testid={`${testIdFromLabel(fieldProps.label)}-input`}
-          />
+          <ControlledField.Input {...{ control, errors }} {...fieldProps} />
         );
       }
       if (field.component === GovernanceActionField.TextArea) {
@@ -96,7 +92,6 @@ export const CreateGovernanceActionForm = ({
       links.map((field, index) => (
         <ControlledField.Input
           {...register(`links.${index}.link`)}
-          data-testid={`link-${index + 1}-input`}
           errors={errors}
           endAdornment={
             links.length > 1 ? (
@@ -137,7 +132,6 @@ export const CreateGovernanceActionForm = ({
       </Typography>
       <Spacer y={4.25} />
       <Field.Input
-        data-testid="type-input"
         disabled
         helpfulText={t("forms.createGovernanceAction.typeTip")}
         label={t("forms.createGovernanceAction.typeLabel")}

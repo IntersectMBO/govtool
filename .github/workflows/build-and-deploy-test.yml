@@ -9,11 +9,15 @@ on:
 env:
   ENVIRONMENT: "test"
   CARDANO_NETWORK: "sanchonet"
+  DOMAIN: "test-sanchonet.govtool.byron.network"
 
 jobs:
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./scripts/govtool
     env:
       DBSYNC_POSTGRES_DB: "cexplorer"
       DBSYNC_POSTGRES_PASSWORD: "pSa8JCpQOACMUdGb"
@@ -21,8 +25,8 @@ jobs:
       GA_CLIENT_EMAIL: ${{ secrets.GA_CLIENT_EMAIL }}
       GA_PRIVATE_KEY: ${{ secrets.GA_PRIVATE_KEY }}
       GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
-      GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
       GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
+      GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
       GTM_ID: ${{ secrets.GTM_ID }}
       IP_ADDRESS_BYPASSING_BASIC_AUTH1: ${{ secrets.IP_ADDRESS_BYPASSING_BASIC_AUTH1 }}
       IP_ADDRESS_BYPASSING_BASIC_AUTH2: ${{ secrets.IP_ADDRESS_BYPASSING_BASIC_AUTH2 }}
@@ -41,21 +45,28 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.GHA_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.GHA_AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Login to AWS ECR
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: eu-west-1
+
       - name: Setup SSH agent
         uses: webfactory/ssh-agent@v0.8.0
         with:
-          ssh-private-key: ${{ secrets.TEST_STACK_SSH_KEY }}
+          ssh-private-key: ${{ secrets.GHA_SSH_PRIVATE_KEY }}
 
-      - name: Run Ansible playbook
-        uses: dawidd6/action-ansible-playbook@v2
-        with:
-          playbook: playbook.yml
-          directory: ./tests/test-infrastructure
-          key: ${{ secrets.TEST_STACK_SSH_KEY }}
-          inventory: |
-            [test_server]
-            ${{ secrets.TEST_STACK_SERVER_IP }} ansible_user=ec2-user
-          options: |
-            --verbose
-        env:
-          GOVTOOL_TAG: ${{ github.sha }}
+      - name: Deploy app
+        run: |
+          make --debug=b all
+
+      - name: Reprovision Grafana
+        run: |
+          sleep 30 # give grafana time to start up
+          make --debug=b reload-grafana

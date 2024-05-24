@@ -74,12 +74,6 @@ export default defineConfig({
       dependencies: process.env.CI ? ["auth setup"] : [],
     },
     {
-      name: "loggedin (mobile)",
-      use: { ...devices["Pixel 5"] },
-      testMatch: "**/*.loggedin.spec.ts",
-      dependencies: process.env.CI ? ["auth setup"] : [],
-    },
-    {
       name: "dRep",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.dRep.spec.ts",

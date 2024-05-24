@@ -62,6 +62,13 @@ jobs:
           name: allure-results
           path: tests/govtool-frontend/playwright/allure-results
 
+      - name: Upload lock logs
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: lock-logs
+          path: tests/govtool-frontend/playwright/lock_logs.txt
+
     env:
       HOST_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io' }}
       API_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io' }}/api

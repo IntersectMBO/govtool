@@ -48,7 +48,6 @@ export default class DRepDirectoryPage {
     const delegateBtn = this.page.getByTestId(`${dRepId}-delegate-button`);
     await expect(delegateBtn).toBeVisible();
     await this.page.getByTestId(`${dRepId}-delegate-button`).click();
-    await this.searchInput.clear();
   }
 
   async resetDRepForm() {

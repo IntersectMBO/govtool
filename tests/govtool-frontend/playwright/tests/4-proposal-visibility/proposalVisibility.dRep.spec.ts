@@ -15,12 +15,12 @@ import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import { FilterOption, IProposal } from "@types";
 
+test.beforeEach(async () => {
+  await setAllureEpic("4. Proposal visibility");
+});
+
 test.describe("Logged in DRep", () => {
   test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
-
-  test.beforeEach(async () => {
-    await setAllureEpic("4. Proposal visibility");
-  });
 
   test("4E. Should display DRep's voting power in governance actions page", async ({
     page,
@@ -35,19 +35,6 @@ test.describe("Logged in DRep", () => {
     await expect(
       page.getByText(`₳ ${lovelaceToAda(votingPower)}`)
     ).toBeVisible();
-  });
-
-  test("4F. Should Disable DRep functionality upon wallet disconnection on governance page", async ({
-    page,
-  }) => {
-    const governanceActionsPage = new GovernanceActionsPage(page);
-    await governanceActionsPage.goto();
-
-    await page.getByTestId("disconnect-button").click();
-
-    const govActionDetailsPage =
-      await governanceActionsPage.viewFirstProposal();
-    await expect(govActionDetailsPage.voteBtn).not.toBeVisible();
   });
 });
 
@@ -127,13 +114,26 @@ test("4G. Should display correct vote counts on governance details page for DRep
   ).toBeVisible();
 });
 
-test("4F. Should Disable DRep functionality upon wallet disconnection on governance page", async ({
+test("4F. Should Disable DRep functionality upon wallet disconnection on governance actions page", async ({
   page,
+  browser,
 }) => {
-  const governanceActionsPage = new GovernanceActionsPage(page);
+  const wallet = await ShelleyWallet.generate();
+  await registerDRepForWallet(wallet);
+
+  const tempDRepAuth = await createTempDRepAuth(page, wallet);
+
+  const dRepPage = await createNewPageWithWallet(browser, {
+    storageState: tempDRepAuth,
+    wallet,
+  });
+
+  const governanceActionsPage = new GovernanceActionsPage(dRepPage);
   await governanceActionsPage.goto();
 
-  await page.getByTestId("disconnect-button").click();
+  await dRepPage.getByTestId("disconnect-button").click();
+
+  await expect(dRepPage).toHaveURL("/governance_actions");
 
   const govActionDetailsPage = await governanceActionsPage.viewFirstProposal();
   await expect(govActionDetailsPage.voteBtn).not.toBeVisible();

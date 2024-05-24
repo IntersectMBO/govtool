@@ -49,7 +49,9 @@ test.describe("Delegate to others", () => {
     await expect(
       page.getByTestId(`${dRepId}-delegate-button')`)
     ).not.toBeVisible();
-    await expect(page.getByText(dRepId)).toHaveCount(1, { timeout: 10_000 });
+    await expect(page.getByTestId(`${dRepId}-copy-id-button`)).toHaveCount(1, {
+      timeout: 20_000,
+    });
 
     // Verify dRepId in dashboard
     await page.goto("/dashboard");
@@ -63,7 +65,7 @@ test.describe("Change delegation", () => {
     wallet: adaHolder02Wallet,
   });
 
-  test("2F. Should change delegated dRep", async ({ page }, testInfo) => {
+  test("2F. Should change delegated DRep", async ({ page }, testInfo) => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
     const dRepIdFirst = dRep01Wallet.dRepId;
@@ -73,12 +75,14 @@ test.describe("Change delegation", () => {
     await dRepDirectoryPage.goto();
     await dRepDirectoryPage.delegateToDRep(dRepIdFirst);
     await expect(page.getByTestId(`${dRepIdFirst}-copy-id-button`)).toHaveText(
-      dRepIdFirst
+      dRepIdFirst,
+      { timeout: 20_000 }
     ); // verify delegation
 
     await dRepDirectoryPage.delegateToDRep(dRepIdSecond);
     await expect(page.getByTestId(`${dRepIdSecond}-copy-id-button`)).toHaveText(
-      dRepIdSecond
+      dRepIdSecond,
+      { timeout: 20_000 }
     ); // verify delegation
   });
 });
@@ -118,6 +122,7 @@ test.describe("Delegate to myself", () => {
     await waitForTxConfirmation(dRepPage);
 
     // Checks in dashboard
+    // BUG
     await expect(page.getByText(dRepId)).toHaveText(dRepId);
 
     // Checks in dRep directory

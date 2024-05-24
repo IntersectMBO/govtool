@@ -4,6 +4,7 @@ import {
   adaHolder02Wallet,
   adaHolder03Wallet,
   adaHolder04Wallet,
+  adaHolder05Wallet,
   dRep01Wallet,
   dRep02Wallet,
 } from "@constants/staticWallets";
@@ -114,6 +115,9 @@ test.describe("Delegate to myself", () => {
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("register-as-sole-voter-button").click();
+
+    await expect(dRepPage.getByTestId("continue-button")).toBeVisible();
+
     await dRepPage.getByTestId("continue-button").click();
     await expect(
       dRepPage.getByTestId("registration-transaction-submitted-modal")
@@ -160,7 +164,7 @@ test.describe("Delegate to myself", () => {
 test.describe("Multiple delegations", () => {
   test.use({
     storageState: ".auth/adaHolder02.json",
-    wallet: adaHolder02Wallet,
+    wallet: adaHolder05Wallet,
   });
 
   test("2R. Should display a modal indicating waiting for previous transaction when delegating if the previous transaction is not completed", async ({

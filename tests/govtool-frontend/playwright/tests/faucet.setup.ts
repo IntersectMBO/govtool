@@ -14,9 +14,6 @@ setup.beforeEach(async () => {
 });
 
 setup("Fund faucet wallet", async () => {
-  const balance = await kuberService.getBalance(faucetWallet.address);
-  if (balance > 10000) return;
-
   const res = await loadAmountFromFaucet(faucetWallet.address);
   await pollTransaction(res.txid);
 });

@@ -99,13 +99,14 @@ export default defineConfig({
       ],
     },
     {
-      name: "independent (mobile)",
+      name: "mobile",
       use: { ...devices["Pixel 5"] },
       testIgnore: [
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",
         "**/*.delegation.spec.ts",
         "**/*.tx.spec.ts",
+        "**/walletConnect.spec.ts",
       ],
     },
     {

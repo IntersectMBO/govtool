@@ -11,8 +11,7 @@ import static io.gatling.javaapi.http.HttpDsl.poll;
 
 public class AuthenticationAction {
     public static ChainBuilder connect = group("Login")
-            .on(exec(ApiService.getAllDReps)
-                    .feed(RandomDataFeeder.stakeKey)
+            .on(feed(RandomDataFeeder.stakeKey)
                     .exec(ApiService.getCurrentDelegation)
                     .exec(ApiService.getParams)
                     .feed(RandomDataFeeder.dRepId)

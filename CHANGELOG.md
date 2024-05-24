@@ -37,6 +37,7 @@ changes.
 - (`docs/update-working-conventions`) Addressing [Issue 25](https://github.com/IntersectMBO/govtool/issues/25) changed working conventions documentation to improve intended flows.
 - Adjusted Nix configuration to meet projects needs [Issue 187](https://github.com/IntersectMBO/govtool/issues/187).
 - Change title of maintenance page [Issue 776](https://github.com/IntersectMBO/govtool/issues/776).
+- Changed copy on maintenance page [Issue 753](https://github.com/IntersectMBO/govtool/issues/753)
 
 ### Removed
 

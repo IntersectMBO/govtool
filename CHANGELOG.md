@@ -63,6 +63,7 @@ changes.
 
 ### Fixed
 
+- proposal/list no longer throws 500 error when proposal's url is incorrect [Issue 1073](https://github.com/IntersectMBO/govtool/issues/1073)
 - drep/list sql fix (now the drep type is correct) [Issue 957](https://github.com/IntersectMBO/govtool/issues/957)
 - drep/list sql fix (now the latest tx date is correct) [Issue 826](https://github.com/IntersectMBO/govtool/issues/826)
 - drep/info no longer returns null values [Issue 720](https://github.com/IntersectMBO/govtool/issues/720)

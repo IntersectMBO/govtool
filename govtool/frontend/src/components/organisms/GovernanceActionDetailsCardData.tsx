@@ -7,7 +7,6 @@ import {
   DataMissingInfoBox,
   GovernanceActionDetailsCardHeader,
   GovernanceActionsDatesBox,
-  GovernanceActionDetailsCardOnChainData,
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { getProposalTypeNoEmptySpaces, testIdFromLabel } from "@utils";

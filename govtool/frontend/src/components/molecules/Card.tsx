@@ -7,6 +7,7 @@ import { errorRed, orange, primaryBlue, successGreen } from "@/consts";
 type CardProps = PropsWithChildren & {
   border?: boolean;
   elevation?: number;
+  dataTestId?: string;
   label?: string;
   sx?: SxProps<Theme>;
   variant?: "default" | "error" | "primary" | "success" | "warning";
@@ -39,6 +40,7 @@ const COLORS = {
 export const Card = ({
   variant = "default",
   border = variant !== "default",
+  dataTestId,
   children,
   elevation = 3,
   label,
@@ -50,6 +52,8 @@ export const Card = ({
   return (
     <Paper
       elevation={elevation}
+      data-testid={dataTestId}
+      onClick={onCardClick}
       sx={{
         backgroundColor: (theme) =>
           colors.backgroundColor ?? `${theme.palette.neutralWhite}4D`,
@@ -59,7 +63,6 @@ export const Card = ({
         position: "relative",
         ...sx,
       }}
-      onClick={onCardClick}
     >
       {label && (
         <Chip

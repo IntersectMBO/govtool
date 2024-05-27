@@ -49,6 +49,13 @@ export const DRepCard = ({
         variant: "warning",
         label: t("inProgress"),
       })}
+      dataTestId={`${view}-${
+        onDelegate
+          ? "drep"
+          : isInProgress
+          ? "delegation-in-progress"
+          : "delegated"
+      }-card`}
       sx={{ container: "root / inline-size", py: 2.5 }}
     >
       {isMe && (
@@ -112,13 +119,17 @@ export const DRepCard = ({
             <Box sx={{ display: "flex", flex: { xl: 1 }, gap: 3 }}>
               <Box sx={{ width: { lg: "128px" } }}>
                 <Typography
+                  data-testid={`${view}-voting-power-label`}
                   variant="caption"
                   color="textSecondary"
                   sx={{ mb: 0.5 }}
                 >
                   {t("votingPower")}
                 </Typography>
-                <Typography sx={{ whiteSpace: "nowrap" }}>
+                <Typography
+                  data-testid={`${view}-voting-power`}
+                  sx={{ whiteSpace: "nowrap" }}
+                >
                   ₳ {correctDRepDirectoryFormat(votingPower)}
                 </Typography>
               </Box>
@@ -129,6 +140,7 @@ export const DRepCard = ({
               />
               <Box>
                 <Typography
+                  data-testid={`${view}-status-label`}
                   variant="caption"
                   color="textSecondary"
                   sx={{ mb: 0.5 }}
@@ -136,9 +148,13 @@ export const DRepCard = ({
                   {t("status")}
                 </Typography>
                 <Box display="flex" flexDirection="row">
-                  <StatusPill status={status} />
+                  <StatusPill
+                    dataTestId={`${view}-${status}-pill`}
+                    status={status}
+                  />
                   {isMe && (
                     <StatusPill
+                      dataTestId={`${view}-yourself-pill`}
                       status={DRepStatus.Yourself}
                       sx={{ ml: 0.75, display: { lg: "flex", xxs: "none" } }}
                     />

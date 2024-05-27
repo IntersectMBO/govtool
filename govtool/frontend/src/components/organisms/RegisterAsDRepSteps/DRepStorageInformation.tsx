@@ -62,6 +62,7 @@ export const DRepStorageInformation = ({
         {t("registration.storingInformationTitle")}
       </Typography>
       <Button
+        data-testid="read-guide-button"
         endIcon={
           <OpenInNewIcon
             sx={{
@@ -85,6 +86,7 @@ export const DRepStorageInformation = ({
         <Step
           component={
             <Button
+              data-testid="metadata-download-button"
               onClick={onClickDownloadJson}
               size="extraLarge"
               startIcon={<img alt="download" src={ICONS.download} />}
@@ -116,6 +118,7 @@ export const DRepStorageInformation = ({
           component={
             <ControlledField.Input
               {...{ control, errors }}
+              dataTestId="metadata-url-input"
               layoutStyles={{ mt: 1.5 }}
               name="storingURL"
               placeholder={t("registration.storingInformationURLPlaceholder")}

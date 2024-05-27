@@ -102,6 +102,7 @@ export const AutomatedVotingOptions = ({
           }}
         >
           <AutomatedVotingCard
+            dataTestId="abstain-delegation-card"
             description={
               isDelegatedToAbstain
                 ? t("dRepDirectory.delegatedToAbstainDescription")
@@ -137,6 +138,7 @@ export const AutomatedVotingOptions = ({
             }
           />
           <AutomatedVotingCard
+            dataTestId="no-confidence-delegation-card"
             description={
               isDelegatedToNoConfidence
                 ? t("dRepDirectory.delegatedToNoConfidenceDescription")

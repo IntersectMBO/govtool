@@ -56,8 +56,6 @@ export const DelegateDashboardCard = ({
 
   const ada = correctAdaFormat(votingPower);
 
-  console.log(voter.isRegisteredAsSoleVoter);
-
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress
     if (delegateTx && !voter.isRegisteredAsSoleVoter) {

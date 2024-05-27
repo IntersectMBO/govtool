@@ -39,6 +39,7 @@ export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
         {t("createGovernanceAction.storeDataTitle")}
       </Typography>
       <Link
+        data-testid="storing-information-link"
         onClick={openLink}
         sx={{
           cursor: "pointer",
@@ -54,6 +55,7 @@ export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
       </Link>
       <ControlledField.Checkbox
         {...{ control, errors }}
+        data-testid="storing-information-checkbox"
         name="storeData"
         label={t("createGovernanceAction.storeDataCheckboxLabel")}
       />

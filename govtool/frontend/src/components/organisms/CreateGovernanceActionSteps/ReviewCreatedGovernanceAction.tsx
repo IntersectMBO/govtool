@@ -9,7 +9,7 @@ import {
   useTranslation,
 } from "@hooks";
 import { LinkWithIcon } from "@molecules";
-import { openInNewTab } from "@utils";
+import { openInNewTab, testIdFromLabel } from "@utils";
 
 import { Dispatch, SetStateAction } from "react";
 import { BgCard } from "../BgCard";
@@ -58,6 +58,8 @@ export const ReviewCreatedGovernanceAction = ({
               {label}
             </Typography>
             <Typography
+              data-testid={`governance-action-${testIdFromLabel(label)}-
+                content`}
               sx={{ mt: 0.5, wordBreak: "break-word" }}
               variant="body2"
             >
@@ -82,9 +84,10 @@ export const ReviewCreatedGovernanceAction = ({
           {t("createGovernanceAction.supportingLinks")}
         </Typography>
         {links.map(
-          (link: string) =>
+          (link: string, index: number) =>
             link && (
               <LinkWithIcon
+                dataTestId={`governance-action-link-${index + 1}-content`}
                 icon={<img alt="link" src={ICONS.link} />}
                 label={link}
                 onClick={() => onClickLink(link)}
@@ -107,6 +110,7 @@ export const ReviewCreatedGovernanceAction = ({
       </Typography>
       <Spacer y={4.25} />
       <Button
+        data-testid="edit-submission-button"
         startIcon={
           <DriveFileRenameOutlineOutlinedIcon
             color="primary"

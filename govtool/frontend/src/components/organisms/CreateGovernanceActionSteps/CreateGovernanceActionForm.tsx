@@ -6,7 +6,7 @@ import { Button, InfoText, Spacer, Typography } from "@atoms";
 import { GOVERNANCE_ACTION_FIELDS, Placeholders } from "@consts";
 import { useCreateGovernanceActionForm, useTranslation } from "@hooks";
 import { Field } from "@molecules";
-import { URL_REGEX } from "@/utils";
+import { URL_REGEX, testIdFromLabel } from "@/utils";
 import { GovernanceActionField } from "@/types/governanceAction";
 
 import { BgCard } from "../BgCard";
@@ -74,7 +74,11 @@ export const CreateGovernanceActionForm = ({
       }
       if (field.component === GovernanceActionField.TextArea) {
         return (
-          <ControlledField.TextArea {...{ control, errors }} {...fieldProps} />
+          <ControlledField.TextArea
+            {...{ control, errors }}
+            {...fieldProps}
+            data-testid={`${testIdFromLabel(fieldProps.label)}-input`}
+          />
         );
       }
     });
@@ -93,8 +97,9 @@ export const CreateGovernanceActionForm = ({
             links.length > 1 ? (
               <DeleteOutlineIcon
                 color="primary"
-                sx={{ cursor: "pointer", height: 24, with: 24 }}
+                data-testid={`delete-link-${index + 1}-button`}
                 onClick={() => removeLink(index)}
+                sx={{ cursor: "pointer", height: 24, with: 24 }}
               />
             ) : null
           }
@@ -141,7 +146,12 @@ export const CreateGovernanceActionForm = ({
       <Spacer y={4.25} />
       {renderLinks()}
       {links?.length < MAX_NUMBER_OF_LINKS ? (
-        <Button onClick={addLink} size="extraLarge" variant="text">
+        <Button
+          data-testid="add-link-button"
+          onClick={addLink}
+          size="extraLarge"
+          variant="text"
+        >
           {t("addLink")}
         </Button>
       ) : null}

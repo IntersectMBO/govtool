@@ -108,7 +108,6 @@ export default defineConfig({
         "**/*.delegation.spec.ts",
         "**/*.tx.spec.ts",
         "**/walletConnect.spec.ts",
-        "**/example.spec.ts"
       ],
     },
     {

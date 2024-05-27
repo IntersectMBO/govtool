@@ -12,7 +12,7 @@ export interface LockInterceptorInfo {
 export class LockInterceptor {
   private static async acquireLock(
     initiator: string,
-    lockId: string
+    lockId?: string
   ): Promise<void> {
     const lockFilePath = path.resolve(__dirname, `../${initiator}`);
 
@@ -39,7 +39,7 @@ export class LockInterceptor {
 
   private static async _releaseLock(
     initiator: string,
-    lockId: string
+    lockId?: string
   ): Promise<void> {
     const lockFilePath = path.resolve(__dirname, `../${initiator}`);
 
@@ -97,8 +97,8 @@ export class LockInterceptor {
 
   static async intercept<T>(
     initiator: string,
-    lockId: string,
-    callbackFn: () => Promise<T>
+    callbackFn: () => Promise<T>,
+    lockId?: string
   ): Promise<T> {
     while (true) {
       const isAddressLocked = checkLock(initiator);
@@ -131,7 +131,7 @@ export class LockInterceptor {
 
   static async releaseLock(
     interceptor: string,
-    lockId: string,
+    lockId?: string,
     message?: string
   ) {
     try {
@@ -150,18 +150,8 @@ function checkLock(initiator: string): boolean {
 }
 
 function log(message: string): Promise<void> {
-  const options: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-    timeZone: "Asia/Kathmandu",
-  };
   const logFilePath = path.resolve(__dirname, "../lock_logs.txt");
-  const logMessage = `[${new Date().toLocaleString("en-US", options)}] ${message}\n`;
+  const logMessage = `[${new Date().toLocaleString()}] ${message}\n`;
   return new Promise((resolve, reject) => {
     fs.appendFile(logFilePath, logMessage, (err) => {
       if (err) {

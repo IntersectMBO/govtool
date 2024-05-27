@@ -4,18 +4,14 @@ import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { ShelleyWallet } from "@helpers/crypto";
 import { downloadMetadata } from "@helpers/metadata";
 import { createNewPageWithWallet } from "@helpers/page";
-import {
-  registerDRepForWallet,
-  transferAdaForWallet,
-  waitForTxConfirmation,
-} from "@helpers/transaction";
+import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Download, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
+import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
@@ -68,11 +64,8 @@ test.describe("Temporary DReps", () => {
   test("3G. Should show confirmation message with link to view transaction, when DRep registration txn is submitted", async ({
     page,
     browser,
-  }, testInfo) => {
-    test.setTimeout(testInfo.timeout + environments.txTimeOut);
-
-    const wallet = await ShelleyWallet.generate();
-    await transferAdaForWallet(wallet, 600);
+  }) => {
+    const wallet = await walletManager.popWallet("registerDRep");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {
@@ -91,14 +84,8 @@ test.describe("Temporary DReps", () => {
     ).toBeVisible();
   });
 
-  test("3I. Should verify retire as DRep", async ({
-    page,
-    browser,
-  }, testInfo) => {
-    test.setTimeout(testInfo.timeout + environments.txTimeOut);
-
-    const wallet = await ShelleyWallet.generate();
-    await registerDRepForWallet(wallet);
+  test("3I. Should verify retire as DRep", async ({ page, browser }) => {
+    const wallet = await walletManager.popWallet("registeredDRep");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {
@@ -120,12 +107,9 @@ test.describe("Temporary DReps", () => {
     page,
     browser,
   }, testInfo) => {
-    test.setTimeout(testInfo.timeout + 3 * environments.txTimeOut);
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
-    const wallet = await ShelleyWallet.generate();
-    await registerDRepForWallet(wallet);
-
-    await transferAdaForWallet(wallet);
+    const wallet = await walletManager.popWallet("registeredDRep");
 
     const dRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {
@@ -157,9 +141,7 @@ test.describe("Temporary DReps", () => {
   }, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
-    const wallet = await ShelleyWallet.generate();
-
-    await transferAdaForWallet(wallet, 600);
+    const wallet = await walletManager.popWallet("registerDRep");
 
     const dRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {

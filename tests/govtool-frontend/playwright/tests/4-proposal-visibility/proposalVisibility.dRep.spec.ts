@@ -1,19 +1,14 @@
-import environments from "@constants/environments";
 import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { lovelaceToAda } from "@helpers/cardano";
-import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
-import {
-  registerDRepForWallet,
-  transferAdaForWallet,
-} from "@helpers/transaction";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import { FilterOption, IProposal } from "@types";
+import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
@@ -41,12 +36,8 @@ test.describe("Logged in DRep", () => {
 test.describe("Temporary DReps", async () => {
   let dRepPage: Page;
 
-  test.beforeEach(async ({ page, browser }, testInfo) => {
-    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
-
-    const wallet = await ShelleyWallet.generate();
-    await registerDRepForWallet(wallet);
-    await transferAdaForWallet(wallet, 40);
+  test.beforeEach(async ({ page, browser }) => {
+    const wallet = await walletManager.popWallet("registeredDRep");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
@@ -118,8 +109,7 @@ test("4F. Should Disable DRep functionality upon wallet disconnection on governa
   page,
   browser,
 }) => {
-  const wallet = await ShelleyWallet.generate();
-  await registerDRepForWallet(wallet);
+  const wallet = await walletManager.popWallet("registeredDRep");
 
   const tempDRepAuth = await createTempDRepAuth(page, wallet);
 

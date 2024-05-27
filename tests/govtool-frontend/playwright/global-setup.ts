@@ -1,8 +1,43 @@
-import { adaHolder01Wallet } from "@constants/staticWallets";
+import { ShelleyWallet } from "@helpers/crypto";
+import { pollTransaction } from "@helpers/transaction";
+import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 
+async function generateWallets(num: number) {
+  return await Promise.all(
+    Array.from({ length: num }, () =>
+      ShelleyWallet.generate().then((wallet) => wallet.json())
+    )
+  );
+}
+
 async function globalSetup() {
-  walletManager.writeWallets(Array(40).fill(adaHolder01Wallet));
+  const registeredDRepWallets = await generateWallets(9);
+  const registerDRepWallets = await generateWallets(5);
+
+  // initialize wallets
+  const initializeRes = await kuberService.initializeWallets([
+    ...registeredDRepWallets,
+    ...registerDRepWallets,
+  ]);
+  await pollTransaction(initializeRes.txId, initializeRes.lockInfo);
+
+  // register dRep
+  const registrationRes = await kuberService.multipleDRepRegistration(
+    registeredDRepWallets
+  );
+  await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
+
+  // transfer 600 ADA for dRep registration
+  const amountOutputs = registerDRepWallets.map((wallet) => {
+    return { address: wallet.address, value: `${600}A` };
+  });
+  const transferRes = await kuberService.multipleTransferADA(amountOutputs);
+  await pollTransaction(transferRes.txId, transferRes.lockInfo);
+
+  // save to file
+  await walletManager.writeWallets(registeredDRepWallets, "registeredDRep");
+  await walletManager.writeWallets(registerDRepWallets, "registerDRep");
 }
 
 export default globalSetup;

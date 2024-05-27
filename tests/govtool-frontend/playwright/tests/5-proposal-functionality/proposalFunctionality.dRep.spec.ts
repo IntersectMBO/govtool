@@ -3,17 +3,13 @@ import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
-import {
-  registerDRepForWallet,
-  transferAdaForWallet,
-  waitForTxConfirmation,
-} from "@helpers/transaction";
+import { waitForTxConfirmation } from "@helpers/transaction";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
+import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
   await setAllureEpic("5. Proposal functionality");
@@ -115,12 +111,8 @@ test.describe("Proposal checks", () => {
 test.describe("Perform voting", () => {
   let govActionDetailsPage: GovernanceActionDetailsPage;
 
-  test.beforeEach(async ({ page, browser }, testInfo) => {
-    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
-
-    const wallet = await ShelleyWallet.generate();
-    await registerDRepForWallet(wallet);
-    await transferAdaForWallet(wallet, 40);
+  test.beforeEach(async ({ page, browser }) => {
+    const wallet = await walletManager.popWallet("registeredDRep");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
@@ -188,11 +180,9 @@ test.describe("Check voting power", () => {
     page,
     browser,
   }, testInfo) => {
-    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
-    const wallet = await ShelleyWallet.generate();
-    await registerDRepForWallet(wallet);
-    await transferAdaForWallet(wallet, 40);
+    const wallet = await walletManager.popWallet("registeredDRep");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
@@ -211,9 +201,7 @@ test.describe("Check voting power", () => {
     dRepPage.getByTestId("confirm-modal-button").click();
     await waitForTxConfirmation(dRepPage);
 
-    const balance = await kuberService.getBalance(
-      wallet.addressBech32(environments.networkId)
-    );
+    const balance = await kuberService.getBalance(wallet.address);
     expect(balance, "Retirement deposit not returned").toBeGreaterThan(500);
   });
 });

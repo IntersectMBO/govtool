@@ -1,5 +1,5 @@
 import { adaHolderWallets, dRepWallets } from "@constants/staticWallets";
-import { setAllureStory, setAllureEpic } from "@helpers/allure";
+import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import { pollTransaction } from "@helpers/transaction";
 import { expect, test as setup } from "@playwright/test";
 import kuberService from "@services/kuberService";

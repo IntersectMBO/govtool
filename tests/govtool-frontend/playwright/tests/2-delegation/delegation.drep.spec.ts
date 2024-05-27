@@ -8,11 +8,11 @@ import { ShelleyWallet } from "@helpers/crypto";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import { createNewPageWithWallet } from "@helpers/page";
 import extractDRepFromWallet from "@helpers/shellyWallet";
-import { transferAdaForWallet } from "@helpers/transaction";
 import DRepDetailsPage from "@pages/dRepDetailsPage";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
+import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
@@ -52,11 +52,9 @@ test("2N. Should show DRep information on details page", async ({
   page,
   browser,
 }, testInfo) => {
-  test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
+  test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
-  const wallet = await ShelleyWallet.generate();
-
-  await transferAdaForWallet(wallet, 600);
+  const wallet = await walletManager.popWallet("registerDRep");
 
   const tempDRepAuth = await createTempDRepAuth(page, wallet);
   const dRepPage = await createNewPageWithWallet(browser, {
@@ -68,7 +66,6 @@ test("2N. Should show DRep information on details page", async ({
   const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);
   await dRepRegistrationPage.goto();
 
-  const dRepId = extractDRepFromWallet(wallet);
   const name = faker.person.firstName();
   const email = faker.internet.email({ firstName: name });
   const bio = faker.person.bio();
@@ -89,11 +86,11 @@ test("2N. Should show DRep information on details page", async ({
   const dRepDirectory = new DRepDirectoryPage(dRepPage);
   await dRepDirectory.goto();
 
-  await dRepDirectory.searchInput.fill(dRepId);
-  await dRepPage.getByTestId(`${dRepId}-view-details-button`).click();
+  await dRepDirectory.searchInput.fill(wallet.dRepId);
+  await dRepPage.getByTestId(`${wallet.dRepId}-view-details-button`).click();
 
   // Verification
-  await expect(dRepPage.getByTestId("copy-drep-id-button")).toHaveText(dRepId);
+  await expect(dRepPage.getByTestId("copy-drep-id-button")).toHaveText(wallet.dRepId);
   await expect(dRepPage.getByText("Active", { exact: true })).toBeVisible();
   await expect(dRepPage.locator("dl").getByText("₳ 0")).toBeVisible();
   await expect(dRepPage.getByText(email, { exact: true })).toBeVisible();

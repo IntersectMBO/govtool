@@ -11,17 +11,13 @@ import {
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
-import extractDRepFromWallet from "@helpers/shellyWallet";
-import {
-  registerStakeForWallet,
-  transferAdaForWallet,
-  waitForTxConfirmation,
-} from "@helpers/transaction";
+import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
+import { StaticWallet } from "@types";
+import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
@@ -89,15 +85,10 @@ test.describe("Change delegation", () => {
 
 test.describe("Delegate to myself", () => {
   let dRepPage: Page;
-  let wallet: ShelleyWallet;
+  let wallet: StaticWallet;
 
   test.beforeEach(async ({ page, browser }, testInfo) => {
-    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
-
-    wallet = await ShelleyWallet.generate();
-
-    await transferAdaForWallet(wallet, 600);
-    await registerStakeForWallet(wallet);
+    wallet = await walletManager.popWallet("registerDRep");
 
     const dRepAuth = await createTempDRepAuth(page, wallet);
     dRepPage = await createNewPageWithWallet(browser, {
@@ -108,9 +99,9 @@ test.describe("Delegate to myself", () => {
   });
 
   test("2E. Should register as Sole voter", async ({ page }, testInfo) => {
-    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
-    const dRepId = extractDRepFromWallet(wallet);
+    const dRepId = wallet.dRepId;
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("register-as-sole-voter-button").click();

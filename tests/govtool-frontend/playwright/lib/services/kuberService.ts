@@ -82,7 +82,7 @@ class Kuber {
     const submitTxCallback = async () => {
       return this.submitTx(signedTx, lockId);
     };
-    return LockInterceptor.intercept(this.walletAddr, submitTxCallback, lockId);
+    return LockInterceptor.intercept<TxSubmitResponse>(this.walletAddr,lockId, submitTxCallback);
   }
 
   async submitTx(signedTx: any, lockId?: string) {

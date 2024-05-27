@@ -15,6 +15,7 @@ config();
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+  globalSetup: require.resolve("./global-setup.ts"),
   testDir: "./tests",
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -107,6 +108,7 @@ export default defineConfig({
         "**/*.delegation.spec.ts",
         "**/*.tx.spec.ts",
         "**/walletConnect.spec.ts",
+        "**/example.spec.ts"
       ],
     },
     {

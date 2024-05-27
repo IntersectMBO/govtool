@@ -33,8 +33,8 @@ export async function pollTransaction(
 
     if (!lockInfo) return;
 
-    await LockInterceptor.releaseLockForAddress(
-      lockInfo.address,
+    await LockInterceptor.releaseLock(
+      lockInfo.initiator,
       lockInfo.lockId,
       `Task completed for:${lockInfo.lockId}`
     );
@@ -42,8 +42,8 @@ export async function pollTransaction(
     if (lockInfo) {
       const errorMessage = { lockInfo, error: JSON.stringify(err) };
 
-      await LockInterceptor.releaseLockForAddress(
-        lockInfo.address,
+      await LockInterceptor.releaseLock(
+        lockInfo.initiator,
         lockInfo.lockId,
         `Task failure: \n${JSON.stringify(errorMessage)}`
       );

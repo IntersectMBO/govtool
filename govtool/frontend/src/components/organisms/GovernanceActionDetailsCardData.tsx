@@ -10,7 +10,7 @@ import {
   GovernanceActionDetailsCardOnChainData,
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { getProposalTypeNoEmptySpaces } from "@utils";
+import { getProposalTypeNoEmptySpaces, testIdFromLabel } from "@utils";
 import { MetadataValidationStatus } from "@models";
 
 type GovernanceActionDetailsCardDataProps = {
@@ -120,9 +120,16 @@ export const GovernanceActionDetailsCardData = ({
         textVariant="longText"
         dataTestId="rationale"
       />
-      {details && Object.keys(details).length !== 0 && (
-        <GovernanceActionDetailsCardOnChainData data={details} />
-      )}
+      {details &&
+        Object.keys(details).length !== 0 &&
+        Object.entries(details).map(([label, content]) => (
+          <GovernanceActionCardElement
+            isCopyButton={label.toLowerCase().includes("address")}
+            label={label}
+            text={content}
+            dataTestId={testIdFromLabel(label)}
+          />
+        ))}
       <GovernanceActionDetailsCardLinks links={links} />
     </Box>
   );

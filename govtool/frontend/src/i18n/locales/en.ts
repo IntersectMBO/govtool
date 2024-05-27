@@ -104,7 +104,7 @@ export const en = {
             "Your Voting Power of ₳<strong>{{votingPower}}</strong> can be used to vote.",
           register: "Register",
           registerDescription:
-            "Vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>.",
+            "Register to Vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>.",
           registerTitle: "Become a Direct Voter",
           reRegister: "Re-register",
           registration: "Direct Voter Registration",

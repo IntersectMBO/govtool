@@ -10,7 +10,8 @@
 
 [![npm](https://img.shields.io/npm/v/npm.svg?style=flat-square)](https://www.npmjs.com/package/npm) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-![Statements](https://img.shields.io/badge/statements-29.28%25-red.svg?style=flat) ![Branches](https://img.shields.io/badge/branches-86.39%25-yellow.svg?style=flat) ![Functions](https://img.shields.io/badge/functions-14.28%25-red.svg?style=flat) ![Lines](https://img.shields.io/badge/lines-29.28%25-red.svg?style=flat)
+
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=intersect-govtool&metric=ncloc)](https://sonarcloud.io/summary/overall?id=intersect-govtool) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=intersect-govtool&metric=coverage)](https://sonarcloud.io/summary/overall?id=intersect-govtool) [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=intersect-govtool&metric=sqale_index)](https://sonarcloud.io/summary/overall?id=intersect-govtool) 
 
 </div>
 

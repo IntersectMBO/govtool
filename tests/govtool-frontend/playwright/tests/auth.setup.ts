@@ -5,6 +5,7 @@ import {
   adaHolder02Wallet,
   adaHolder03Wallet,
   adaHolder04Wallet,
+  adaHolder05Wallet,
   dRep01Wallet,
   user01Wallet,
 } from "@constants/staticWallets";
@@ -18,6 +19,7 @@ const adaHolder01AuthFile = ".auth/adaHolder01.json";
 const adaHolder02AuthFile = ".auth/adaHolder02.json";
 const adaHolder03AuthFile = ".auth/adaHolder03.json";
 const adaHolder04AuthFile = ".auth/adaHolder04.json";
+const adaHolder05AuthFile = ".auth/adaHolder05.json";
 
 const user01AuthFile = ".auth/user01.json";
 
@@ -84,4 +86,14 @@ setup("Create AdaHolder 04 auth", async ({ page, context }) => {
   await loginPage.isLoggedIn();
 
   await context.storageState({ path: adaHolder04AuthFile });
+});
+
+setup("Create AdaHolder 05 auth", async ({ page, context }) => {
+  await importWallet(page, adaHolder05Wallet);
+
+  const loginPage = new LoginPage(page);
+  await loginPage.login();
+  await loginPage.isLoggedIn();
+
+  await context.storageState({ path: adaHolder05AuthFile });
 });

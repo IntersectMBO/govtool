@@ -150,7 +150,7 @@ test.describe("Delegate to myself", () => {
 
 test.describe("Multiple delegations", () => {
   test.use({
-    storageState: ".auth/adaHolder02.json",
+    storageState: ".auth/adaHolder05.json",
     wallet: adaHolder05Wallet,
   });
 

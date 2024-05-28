@@ -1,4 +1,4 @@
-import environments from "@constants/environments";
+import environments from "../constants/environments";
 import { ed25519 as ed } from "@noble/curves/ed25519";
 import { bech32 } from "bech32";
 import * as blake from "blakejs";

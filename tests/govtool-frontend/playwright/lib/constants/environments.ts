@@ -24,6 +24,7 @@ const environments = {
   txTimeOut: parseInt(process.env.TX_TIMEOUT) || 240000,
   metadataBucketUrl: `${CARDANO_API_METADATA_HOST_URL}/data`,
   lockInterceptorUrl: `${CARDANO_API_METADATA_HOST_URL}/lock`,
+  ci: process.env.CI,
 };
 
 export default environments;

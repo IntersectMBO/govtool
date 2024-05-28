@@ -1,9 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 import { testPlanFilter } from "allure-playwright/dist/testplan";
-import { config } from "dotenv";
 import environments from "lib/constants/environments";
-
-config();
 
 /**
  * Read environment variables from file.
@@ -45,22 +42,16 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "faucet setup",
-      testMatch: "**/faucet.setup.ts",
-    },
-    {
       name: "auth setup",
       testMatch: "**/auth.setup.ts",
     },
     {
       name: "dRep setup",
       testMatch: "**/dRep.setup.ts",
-      dependencies: ["faucet setup"],
     },
     {
       name: "wallet bootstrap",
       testMatch: "**/wallet.bootstrap.ts",
-      dependencies: ["faucet setup"],
     },
     {
       name: "transaction",

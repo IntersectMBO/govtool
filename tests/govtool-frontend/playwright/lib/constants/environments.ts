@@ -1,3 +1,6 @@
+import { config } from "dotenv";
+config();
+
 const CARDANO_API_METADATA_HOST_URL =
   process.env.CARDANOAPI_METADATA_URL ||
   "https://metadata-govtool.cardanoapi.io";

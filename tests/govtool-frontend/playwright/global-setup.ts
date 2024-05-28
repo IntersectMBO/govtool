@@ -1,5 +1,7 @@
+import { faucetWallet } from "@constants/staticWallets";
 import { ShelleyWallet } from "@helpers/crypto";
 import { pollTransaction } from "@helpers/transaction";
+import { loadAmountFromFaucet } from "@services/faucetService";
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 
@@ -14,6 +16,10 @@ async function generateWallets(num: number) {
 async function globalSetup() {
   const registeredDRepWallets = await generateWallets(9);
   const registerDRepWallets = await generateWallets(5);
+
+  // faucet setup
+  const res = await loadAmountFromFaucet(faucetWallet.address);
+  await pollTransaction(res.txid);
 
   // initialize wallets
   const initializeRes = await kuberService.initializeWallets([

@@ -8,6 +8,7 @@ import { useCardano, useModal } from "@context";
 import {
   useDelegateTodRep,
   useGetAdaHolderCurrentDelegationQuery,
+  useGetAdaHolderVotingPowerQuery,
   useGetDRepListInfiniteQuery,
   useScreenDimension,
   useTranslation,
@@ -15,6 +16,7 @@ import {
 import { Card, EmptyStateDrepDirectory, LinkWithIcon, Share } from "@molecules";
 import {
   correctAdaFormat,
+  correctDRepDirectoryFormat,
   isSameDRep,
   openInNewTab,
   testIdFromLabel,
@@ -42,6 +44,8 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
   const { dRepId: dRepParam } = useParams();
   const { delegate, isDelegating } = useDelegateTodRep();
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
+  const { votingPower: myVotingPower } =
+    useGetAdaHolderVotingPowerQuery(stakeKey);
 
   const displayBackButton = location.state?.enteredFromWithinApp || false;
 
@@ -141,7 +145,11 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
             <Chip
               color="primary"
               label={
-                isMe ? t("dRepDirectory.meAsDRep") : t("dRepDirectory.myDRep")
+                isMe
+                  ? t("dRepDirectory.meAsDRep")
+                  : t("dRepDirectory.myDRep", {
+                      ada: correctDRepDirectoryFormat(myVotingPower),
+                    })
               }
               sx={{
                 boxShadow: (theme) => theme.shadows[2],

@@ -27,9 +27,9 @@ test("2C. Should open wallet connection popup on delegate in disconnected state"
   }
 
   await page.getByTestId("view-drep-directory-button").click();
+  await page.getByTestId("search-input").fill(dRep01Wallet.dRepId);
   await page
-    .locator('[data-testid$="-connect-to-delegate-button"]')
-    .first()
+    .getByTestId(`${dRep01Wallet.dRepId}-connect-to-delegate-button`)
     .click();
   await expect(page.getByTestId("connect-your-wallet-modal")).toBeVisible();
 });

@@ -32,7 +32,7 @@ test.describe("Delegate to others", () => {
   test("2A. Should show delegated DRep Id (on Dashboard, and DRep Directory) after delegation", async ({
     page,
   }, testInfo) => {
-    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     const dRepId = dRep01Wallet.dRepId;
 
@@ -125,7 +125,9 @@ test.describe("Delegate to myself", () => {
     );
   });
 
-  test("2S. Should retire as a Direct Voter on delegating to another DRep", async () => {
+  test("2S. Should retire as a Direct Voter on delegating to another DRep", async ({}, testInfo) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+
     await dRepPage.goto("/");
     await dRepPage.getByTestId("register-as-sole-voter-button").click();
     await dRepPage.getByTestId("continue-button").click();

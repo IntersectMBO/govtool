@@ -29,7 +29,7 @@ test.describe("Logged in DReps", () => {
     ); // BUG: testId -> dRep-id-display-dashboard (It is taking sidebar dRep-id)
   });
 
-  test("3H. Should be able to DRep data", async ({ page }, testInfo) => {
+  test("3H. Should Update DRep data", async ({ page }, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     await page.goto("/");

@@ -140,10 +140,36 @@ instance ToSchema MetadataValidationStatus where
         & description ?~ "Metadata Validation Status"
         & enum_ ?~ map toJSON [IncorrectFormat, IncorrectJSONLD, IncorrectHash, UrlNotFound]
 
+
+
+data InternalMetadataValidationResponse
+  = InternalMetadataValidationResponse
+      { internalMetadataValidationResponseStatus :: Maybe MetadataValidationStatus
+      , internalMmetadataValidationResponseValid :: Bool
+      }
+  deriving (Generic, Show)
+
+deriveJSON (jsonOptions "internalMetadataValidationResponse") ''InternalMetadataValidationResponse
+
+instance ToSchema InternalMetadataValidationResponse where
+    declareNamedSchema _ = do
+      NamedSchema name_ schema_ <-
+        genericDeclareNamedSchema
+        ( fromAesonOptions $ jsonOptions "internalMetadataValidationResponse" )
+        (Proxy :: Proxy InternalMetadataValidationResponse)
+      return $
+        NamedSchema name_ $
+          schema_
+            & description ?~ "Metadata Validation Response"
+            & example
+              ?~ toJSON ("{\"status\": \"INCORRECT_FORMTAT\", \"valid\":false, \"raw\":{\"some\":\"key\"}}" :: Text)
+
+
 data MetadataValidationResponse
   = MetadataValidationResponse
       { metadataValidationResponseStatus :: Maybe MetadataValidationStatus
       , metadataValidationResponseValid :: Bool
+      , metadataValidationResponseRaw :: AnyValue
       }
   deriving (Generic, Show)
 

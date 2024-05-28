@@ -407,5 +407,7 @@ validateMetadata MetadataValidationParams {..} = do
       $ Metadata.validateMetadata metadataValidationParamsUrl (unHexText metadataValidationParamsHash)
 
   case fromJSON result of
-    Error e -> throwError $ InternalError $ pack $ show e
-    Success a -> return a
+    Error e -> return $ MetadataValidationResponse Nothing False (AnyValue $ Just result)
+    Success (InternalMetadataValidationResponse {..}) -> return $ MetadataValidationResponse {metadataValidationResponseStatus=internalMetadataValidationResponseStatus, metadataValidationResponseValid=internalMmetadataValidationResponseValid, metadataValidationResponseRaw=AnyValue $ Just result}
+
+

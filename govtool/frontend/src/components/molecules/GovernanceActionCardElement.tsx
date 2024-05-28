@@ -5,7 +5,7 @@ import { Typography, Tooltip, CopyButton, TooltipProps } from "@atoms";
 
 type BaseProps = {
   label: string;
-  text?: string;
+  text?: string | number;
   dataTestId?: string;
   isSliderCard?: boolean;
   tooltipProps?: Omit<TooltipProps, "children">;
@@ -109,6 +109,7 @@ export const GovernanceActionCardElement = ({
               sx={{
                 fontSize: isSliderCard ? 14 : 16,
                 fontWeight: 400,
+                maxWidth: textVariant === "oneLine" ? "283px" : "auto",
                 lineHeight: isSliderCard ? "20px" : "24px",
                 ...(textVariant === "oneLine" && { whiteSpace: "nowrap" }),
                 ...((textVariant === "oneLine" ||
@@ -131,7 +132,7 @@ export const GovernanceActionCardElement = ({
             </Typography>
             {isCopyButton && (
               <Box ml={1}>
-                <CopyButton text={text} variant="blueThin" />
+                <CopyButton text={text.toString()} variant="blueThin" />
               </Box>
             )}
           </Box>

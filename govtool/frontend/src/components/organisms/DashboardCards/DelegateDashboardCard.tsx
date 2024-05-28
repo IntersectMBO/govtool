@@ -5,7 +5,7 @@ import { Trans } from "react-i18next";
 import { IMAGES, PATHS } from "@consts";
 import { PendingTransaction } from "@context";
 import { useTranslation } from "@hooks";
-import { CurrentDelegation } from "@models";
+import { CurrentDelegation, VoterInfo } from "@models";
 import {
   DashboardActionCard,
   DashboardActionCardProps,
@@ -21,6 +21,7 @@ type DelegateDashboardCardProps = {
   currentDelegation: CurrentDelegation;
   delegateTx: PendingTransaction["delegate"];
   dRepID: string;
+  voter: VoterInfo;
   votingPower: number;
 };
 
@@ -28,6 +29,7 @@ export const DelegateDashboardCard = ({
   currentDelegation,
   delegateTx,
   dRepID,
+  voter,
   votingPower,
 }: DelegateDashboardCardProps) => {
   const navigate = useNavigate();
@@ -56,7 +58,7 @@ export const DelegateDashboardCard = ({
 
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress
-    if (delegateTx) {
+    if (delegateTx && !voter.isRegisteredAsSoleVoter) {
       return {
         buttons: [learnMoreButton],
         description: getProgressDescription(delegateTx?.resourceId, ada),
@@ -66,7 +68,7 @@ export const DelegateDashboardCard = ({
     }
 
     // current delegation
-    if (currentDelegation) {
+    if (currentDelegation && !voter.isRegisteredAsSoleVoter) {
       return {
         buttons: currentDelegation?.dRepView
           ? [
@@ -116,11 +118,17 @@ export const DelegateDashboardCard = ({
   return (
     <DashboardActionCard
       imageURL={IMAGES.govActionDelegateImage}
-      isSpaceBetweenButtons={!!currentDelegation?.dRepView}
-      transactionId={delegateTx?.transactionHash || currentDelegation?.txHash}
+      isSpaceBetweenButtons={
+        !!currentDelegation?.dRepView && !voter.isRegisteredAsSoleVoter
+      }
+      transactionId={
+        !voter.isRegisteredAsSoleVoter
+          ? delegateTx?.transactionHash ?? currentDelegation?.txHash
+          : undefined
+      }
       {...cardProps}
     >
-      {displayedDelegationId && (
+      {displayedDelegationId && !voter.isRegisteredAsSoleVoter && (
         <DelegationAction
           dRepId={displayedDelegationId}
           onCardClick={navigateToDRepDetails}

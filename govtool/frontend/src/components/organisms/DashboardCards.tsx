@@ -63,6 +63,7 @@ export const DashboardCards = () => {
           currentDelegation={currentDelegation}
           delegateTx={pendingTransaction.delegate}
           dRepID={dRepID}
+          voter={voter}
           votingPower={votingPower}
         />
 

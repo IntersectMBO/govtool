@@ -24,24 +24,3 @@ setup("Initialize static wallets", async () => {
     }
   }
 });
-
-// for (const wallet of [...adaHolderWallets, ...dRepWallets]) {
-//   setup(`Register stake of static wallets: ${wallet.address}`, async () => {
-//     await setAllureStory("Register stake");
-//     try {
-//       const { txId, lockInfo } = await kuberService.registerStake(
-//         wallet.stake.private,
-//         wallet.stake.pkh,
-//         wallet.payment.private,
-//         wallet.address
-//       );
-//       await pollTransaction(txId, lockInfo);
-//     } catch (err) {
-//       if (err.status === 400) {
-//         expect(true, "Stake already registered").toBeTruthy();
-//       } else {
-//         throw Error(err);
-//       }
-//     }
-//   });
-// }

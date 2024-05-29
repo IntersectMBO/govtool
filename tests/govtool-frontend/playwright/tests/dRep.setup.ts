@@ -18,7 +18,10 @@ setup("Register DRep of static wallets", async () => {
 
     await pollTransaction(res.txId, res.lockInfo);
   } catch (err) {
-    if (err.status === 400) {
+    if (
+      err.status === 400 &&
+      err.message.includes("ConwayDRepAlreadyRegistered")
+    ) {
       expect(true, "DRep already registered").toBeTruthy();
     } else {
       throw err;

@@ -17,7 +17,7 @@ setup("Initialize static wallets", async () => {
     const res = await kuberService.initializeWallets(wallets);
     await pollTransaction(res.txId);
   } catch (err) {
-    if (err.status === 400) {
+    if (err.status === 400 && err.message.includes("StakeKeyRegisteredDELEG")) {
       expect(true, "Wallets already initialized").toBeTruthy();
     } else {
       throw Error(err);

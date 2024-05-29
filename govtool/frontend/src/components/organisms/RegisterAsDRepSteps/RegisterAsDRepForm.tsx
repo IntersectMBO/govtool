@@ -98,6 +98,7 @@ export const RegisterAsDRepForm = ({
       </Box>
       <ControlledField.Input
         {...{ control, errors }}
+        dataTestId="name-input"
         helpfulText={t("forms.registerAsDRep.dRepNameHelpfulText")}
         label={t("forms.registerAsDRep.dRepName")}
         name="dRepName"
@@ -129,7 +130,6 @@ export const RegisterAsDRepForm = ({
         placeholder={t("forms.registerAsDRep.bioPlaceholder")}
         helpfulText={t("forms.registerAsDRep.bioHelpfulText")}
         rules={Rules.BIO}
-        data-testid="bio-input"
       />
       <Spacer y={4} />
       <p

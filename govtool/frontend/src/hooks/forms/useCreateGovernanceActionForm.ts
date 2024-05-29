@@ -191,9 +191,7 @@ export const useCreateGovernanceActionForm = (
       try {
         setIsLoading(true);
         showLoadingModal();
-        if (!hash) {
-          throw new Error(MetadataValidationStatus.INVALID_HASH);
-        }
+        if (!hash) throw MetadataValidationStatus.INVALID_HASH;
         const { status } = await validateMetadata({
           url: data.storingURL,
           hash,

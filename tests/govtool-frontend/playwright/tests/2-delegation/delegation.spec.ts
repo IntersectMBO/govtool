@@ -1,49 +1,10 @@
-import { dRep01Wallet } from "@constants/staticWallets";
-import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { setAllureEpic } from "@helpers/allure";
+import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { expect, test } from "@playwright/test";
 import { DRepStatus } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
-});
-
-test("2J. Should search by DRep id", async ({ page }) => {
-  const dRepDirectory = new DRepDirectoryPage(page);
-  await dRepDirectory.goto();
-
-  await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
-  await expect(dRepDirectory.getDRepCard(dRep01Wallet.dRepId)).toHaveText(
-    dRep01Wallet.dRepId
-  );
-});
-
-test("2K. Should filter DReps", async ({ page }) => {
-  const dRepFilterOptions: DRepStatus[] = ["Active", "Inactive", "Retired"];
-
-  const dRepDirectory = new DRepDirectoryPage(page);
-  await dRepDirectory.goto();
-
-  await dRepDirectory.filterBtn.click();
-
-  // Single filter
-  for (const option of dRepFilterOptions) {
-    await dRepDirectory.filterDReps([option]);
-    await dRepDirectory.validateFilters([option], dRepFilterOptions);
-    await dRepDirectory.unFilterDReps([option]);
-  }
-
-  // Multiple filters
-  const multipleFilterOptionNames = [...dRepFilterOptions];
-  while (multipleFilterOptionNames.length > 1) {
-    await dRepDirectory.filterDReps(multipleFilterOptionNames);
-    await dRepDirectory.validateFilters(
-      multipleFilterOptionNames,
-      dRepFilterOptions
-    );
-    await dRepDirectory.unFilterDReps(multipleFilterOptionNames);
-    multipleFilterOptionNames.pop();
-  }
 });
 
 test("2M. Should sort DReps", async ({ page }) => {
@@ -91,5 +52,33 @@ test("2O. Should load more DReps on show more", async ({ page }) => {
     expect(true).toBeTruthy();
   } else {
     await expect(dRepDirectory.showMoreBtn).not.toBeVisible();
+  }
+});
+
+test("2K. Should filter DReps", async ({ page }) => {
+  const dRepFilterOptions: DRepStatus[] = ["Active", "Inactive", "Retired"];
+
+  const dRepDirectory = new DRepDirectoryPage(page);
+  await dRepDirectory.goto();
+
+  await dRepDirectory.filterBtn.click();
+
+  // Single filter
+  for (const option of dRepFilterOptions) {
+    await dRepDirectory.filterDReps([option]);
+    await dRepDirectory.validateFilters([option], dRepFilterOptions);
+    await dRepDirectory.unFilterDReps([option]);
+  }
+
+  // Multiple filters
+  const multipleFilterOptionNames = [...dRepFilterOptions];
+  while (multipleFilterOptionNames.length > 1) {
+    await dRepDirectory.filterDReps(multipleFilterOptionNames);
+    await dRepDirectory.validateFilters(
+      multipleFilterOptionNames,
+      dRepFilterOptions
+    );
+    await dRepDirectory.unFilterDReps(multipleFilterOptionNames);
+    multipleFilterOptionNames.pop();
   }
 });

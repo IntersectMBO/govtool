@@ -37,23 +37,20 @@ test("1C: Should disconnect Wallet When connected", async ({ page }) => {
   await loginPage.logout();
 });
 
-test("1D. Should check correct network (Testnet/Mainnet) on connection", async ({
-  page,
-}) => {
+test("1D. Should reject wallet connection in mainnet", async ({ page }) => {
   const wrongNetworkId = 1; // mainnet network
   await createWallet(page, {
     networkId: wrongNetworkId,
   });
 
-  const errors: Array<Error> = [];
-  page.on("pageerror", (error) => {
-    errors.push(error);
-  });
+  await page.goto("/");
 
-  const loginPage = new LoginPage(page);
-  await loginPage.login();
+  await page.getByTestId("connect-wallet-button").click();
+  await page.getByTestId("demos-wallet-button").click();
 
-  expect(errors).not.toHaveLength(0);
+  await expect(page.getByTestId("wallet-connection-error-modal")).toHaveText(
+    /You are trying to connect/
+  );
 });
 
 test("1E. Should hide incompatible wallets when connecting", async ({

@@ -1,11 +1,11 @@
 import { importWallet } from "@fixtures/importWallet";
 import loadDemosExtension from "@fixtures/loadExtension";
-import { Browser, Page, expect } from "@playwright/test";
-import { ShelleyWallet } from "./crypto";
+import { Browser, Page } from "@playwright/test";
+import { StaticWallet } from "@types";
 
 interface BrowserConfig {
   storageState: string;
-  wallet: ShelleyWallet;
+  wallet: StaticWallet;
   enableStakeSigning?: boolean;
 }
 
@@ -19,7 +19,7 @@ export async function createNewPageWithWallet(
   const newPage = await context.newPage();
 
   await loadDemosExtension(newPage, enableStakeSigning);
-  await importWallet(newPage, wallet.json());
+  await importWallet(newPage, wallet);
 
   return newPage;
 }

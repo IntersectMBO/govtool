@@ -1,26 +1,21 @@
-import environments from "@constants/environments";
 import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { lovelaceToAda } from "@helpers/cardano";
-import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
-import {
-  registerDRepForWallet,
-  transferAdaForWallet,
-} from "@helpers/transaction";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import { FilterOption, IProposal } from "@types";
+import walletManager from "lib/walletManager";
+
+test.beforeEach(async () => {
+  await setAllureEpic("4. Proposal visibility");
+});
 
 test.describe("Logged in DRep", () => {
   test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
-
-  test.beforeEach(async () => {
-    await setAllureEpic("4. Proposal visibility");
-  });
 
   test("4E. Should display DRep's voting power in governance actions page", async ({
     page,
@@ -36,30 +31,13 @@ test.describe("Logged in DRep", () => {
       page.getByText(`₳ ${lovelaceToAda(votingPower)}`)
     ).toBeVisible();
   });
-
-  test("4F. Should Disable DRep functionality upon wallet disconnection on governance page", async ({
-    page,
-  }) => {
-    const governanceActionsPage = new GovernanceActionsPage(page);
-    await governanceActionsPage.goto();
-
-    await page.getByTestId("disconnect-button").click();
-
-    const govActionDetailsPage =
-      await governanceActionsPage.viewFirstProposal();
-    await expect(govActionDetailsPage.voteBtn).not.toBeVisible();
-  });
 });
 
 test.describe("Temporary DReps", async () => {
   let dRepPage: Page;
 
-  test.beforeEach(async ({ page, browser }, testInfo) => {
-    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
-
-    const wallet = await ShelleyWallet.generate();
-    await registerDRepForWallet(wallet);
-    await transferAdaForWallet(wallet, 40);
+  test.beforeEach(async ({ page, browser }) => {
+    const wallet = await walletManager.popWallet("registeredDRep");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
@@ -82,58 +60,75 @@ test.describe("Temporary DReps", async () => {
   });
 });
 
-test("4G. Should display correct vote counts on governance details page for DRep", async ({
-  page,
-}) => {
-  const responsesPromise = Object.keys(FilterOption).map((filterKey) =>
-    page.waitForResponse((response) =>
-      response.url().includes(`&type[]=${FilterOption[filterKey]}`)
-    )
-  );
+test.describe("Check vote count", () => {
+  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
 
-  const governanceActionsPage = new GovernanceActionsPage(page);
-  await governanceActionsPage.goto();
-  const responses = await Promise.all(responsesPromise);
-  const proposals: IProposal[] = (
-    await Promise.all(
-      responses.map(async (response) => {
-        const data = await response.json();
-        return data.elements;
-      })
-    )
-  ).flat();
+  test("4G. Should display correct vote counts on governance details page for DRep", async ({
+    page,
+  }) => {
+    const responsesPromise = Object.keys(FilterOption).map((filterKey) =>
+      page.waitForResponse((response) =>
+        response.url().includes(`&type[]=${FilterOption[filterKey]}`)
+      )
+    );
 
-  expect(proposals.length, "No proposals found!").toBeGreaterThan(0);
+    const governanceActionsPage = new GovernanceActionsPage(page);
+    await governanceActionsPage.goto();
 
-  const proposalToCheck = proposals[0];
-  const govActionDetailsPage =
-    await governanceActionsPage.viewProposal(proposalToCheck);
-  await govActionDetailsPage.showVotesBtn.click();
+    const responses = await Promise.all(responsesPromise);
+    const proposals: IProposal[] = (
+      await Promise.all(
+        responses.map(async (response) => {
+          const data = await response.json();
+          return data.elements;
+        })
+      )
+    ).flat();
 
-  await expect(
-    page
-      .getByText("yes₳")
-      .getByText(`₳ ${lovelaceToAda(proposalToCheck.yesVotes)}`)
-  ).toBeVisible();
-  await expect(
-    page
-      .getByText("abstain₳")
-      .getByText(`₳ ${lovelaceToAda(proposalToCheck.abstainVotes)}`)
-  ).toBeVisible();
-  await expect(
-    page
-      .getByText("no₳")
-      .getByText(`₳ ${lovelaceToAda(proposalToCheck.noVotes)}`)
-  ).toBeVisible();
+    expect(proposals.length, "No proposals found!").toBeGreaterThan(0);
+
+    const proposalToCheck = proposals[0];
+    const govActionDetailsPage =
+      await governanceActionsPage.viewProposal(proposalToCheck);
+    await govActionDetailsPage.showVotesBtn.click();
+
+    await expect(
+      page
+        .getByText("yes₳")
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.yesVotes)}`)
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText("abstain₳")
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.abstainVotes)}`)
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText("no₳")
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.noVotes)}`)
+    ).toBeVisible();
+  });
 });
 
-test("4F. Should Disable DRep functionality upon wallet disconnection on governance page", async ({
+test("4F. Should Disable DRep functionality upon wallet disconnection on governance actions page", async ({
   page,
+  browser,
 }) => {
-  const governanceActionsPage = new GovernanceActionsPage(page);
+  const wallet = await walletManager.popWallet("registeredDRep");
+
+  const tempDRepAuth = await createTempDRepAuth(page, wallet);
+
+  const dRepPage = await createNewPageWithWallet(browser, {
+    storageState: tempDRepAuth,
+    wallet,
+  });
+
+  const governanceActionsPage = new GovernanceActionsPage(dRepPage);
   await governanceActionsPage.goto();
 
-  await page.getByTestId("disconnect-button").click();
+  await dRepPage.getByTestId("disconnect-button").click();
+
+  await expect(dRepPage).toHaveURL("/governance_actions");
 
   const govActionDetailsPage = await governanceActionsPage.viewFirstProposal();
   await expect(govActionDetailsPage.voteBtn).not.toBeVisible();

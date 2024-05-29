@@ -8,11 +8,11 @@ import { ShelleyWallet } from "@helpers/crypto";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import { createNewPageWithWallet } from "@helpers/page";
 import extractDRepFromWallet from "@helpers/shellyWallet";
-import { transferAdaForWallet } from "@helpers/transaction";
 import DRepDetailsPage from "@pages/dRepDetailsPage";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
+import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
@@ -27,9 +27,9 @@ test("2C. Should open wallet connection popup on delegate in disconnected state"
   }
 
   await page.getByTestId("view-drep-directory-button").click();
+  await page.getByTestId("search-input").fill(dRep01Wallet.dRepId);
   await page
-    .locator('[data-testid$="-connect-to-delegate-button"]')
-    .first()
+    .getByTestId(`${dRep01Wallet.dRepId}-connect-to-delegate-button`)
     .click();
   await expect(page.getByTestId("connect-your-wallet-modal")).toBeVisible();
 });
@@ -52,11 +52,9 @@ test("2N. Should show DRep information on details page", async ({
   page,
   browser,
 }, testInfo) => {
-  test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
+  test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
-  const wallet = await ShelleyWallet.generate();
-
-  await transferAdaForWallet(wallet, 600);
+  const wallet = await walletManager.popWallet("registerDRep");
 
   const tempDRepAuth = await createTempDRepAuth(page, wallet);
   const dRepPage = await createNewPageWithWallet(browser, {
@@ -68,7 +66,6 @@ test("2N. Should show DRep information on details page", async ({
   const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);
   await dRepRegistrationPage.goto();
 
-  const dRepId = extractDRepFromWallet(wallet);
   const name = faker.person.firstName();
   const email = faker.internet.email({ firstName: name });
   const bio = faker.person.bio();
@@ -89,11 +86,11 @@ test("2N. Should show DRep information on details page", async ({
   const dRepDirectory = new DRepDirectoryPage(dRepPage);
   await dRepDirectory.goto();
 
-  await dRepDirectory.searchInput.fill(dRepId);
-  await dRepPage.getByTestId(`${dRepId}-view-details-button`).click();
+  await dRepDirectory.searchInput.fill(wallet.dRepId);
+  await dRepPage.getByTestId(`${wallet.dRepId}-view-details-button`).click();
 
   // Verification
-  await expect(dRepPage.getByTestId("copy-drep-id-button")).toHaveText(dRepId);
+  await expect(dRepPage.getByTestId("copy-drep-id-button")).toHaveText(wallet.dRepId);
   await expect(dRepPage.getByText("Active", { exact: true })).toBeVisible();
   await expect(dRepPage.locator("dl").getByText("₳ 0")).toBeVisible();
   await expect(dRepPage.getByText(email, { exact: true })).toBeVisible();
@@ -149,4 +146,30 @@ test.describe("Insufficient funds", () => {
 
     await expect(dRepDirectoryPage.delegationErrorModal).toBeVisible();
   });
+});
+
+test("2I. Should check validity of DRep Id", async ({ page }) => {
+  const dRepDirectory = new DRepDirectoryPage(page);
+  await dRepDirectory.goto();
+
+  await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
+  await expect(dRepDirectory.getDRepCard(dRep01Wallet.dRepId)).toHaveText(
+    dRep01Wallet.dRepId
+  );
+
+  const wallet = await ShelleyWallet.generate();
+  const invalidDRepId = extractDRepFromWallet(wallet);
+
+  await dRepDirectory.searchInput.fill(invalidDRepId);
+  await expect(dRepDirectory.getDRepCard(invalidDRepId)).not.toBeVisible();
+});
+
+test("2J. Should search by DRep id", async ({ page }) => {
+  const dRepDirectory = new DRepDirectoryPage(page);
+  await dRepDirectory.goto();
+
+  await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
+  await expect(dRepDirectory.getDRepCard(dRep01Wallet.dRepId)).toHaveText(
+    dRep01Wallet.dRepId
+  );
 });

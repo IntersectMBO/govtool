@@ -1,25 +1,24 @@
-import { TxSubmitResponse } from "@services/kuberService";
+import { Logger } from "@helpers/logger";
 import * as fs from "fs";
 import * as lockfile from "lockfile";
-import { Logger } from "../../cypress/lib/logger/logger";
 
 import path = require("path");
 
 export interface LockInterceptorInfo {
   lockId: string;
-  address: string;
+  initiator: string;
 }
 
 export class LockInterceptor {
   private static async acquireLock(
-    address: string,
-    lockId: string
+    initiator: string,
+    lockId?: string
   ): Promise<void> {
-    const lockFilePath = path.resolve(__dirname, `../${address}`);
+    const lockFilePath = path.resolve(__dirname, `../${initiator}`);
 
     try {
       await log(
-        `Initiator: ${address} \n---------------------> acquiring lock for:${lockId}`
+        `Initiator: ${initiator} \n---------------------> acquiring lock for:${lockId}`
       );
       await new Promise<void>((resolve, reject) => {
         lockfile.lock(lockFilePath, (err) => {
@@ -31,22 +30,22 @@ export class LockInterceptor {
         });
       });
       await log(
-        `Initiator: ${address} \n---------------------> acquired lock for:${lockId}`
+        `Initiator: ${initiator} \n---------------------> acquired lock for:${lockId}`
       );
     } catch (err) {
       throw err;
     }
   }
 
-  private static async releaseLock(
-    address: string,
-    lockId: string
+  private static async _releaseLock(
+    initiator: string,
+    lockId?: string
   ): Promise<void> {
-    const lockFilePath = path.resolve(__dirname, `../${address}`);
+    const lockFilePath = path.resolve(__dirname, `../${initiator}`);
 
     try {
       await log(
-        `Initiator: ${address} \n---------------------> releasing lock for:${lockId}`
+        `Initiator: ${initiator} \n---------------------> releasing lock for:${lockId}`
       );
       await new Promise<void>((resolve, reject) => {
         lockfile.unlock(lockFilePath, async (err) => {
@@ -58,7 +57,7 @@ export class LockInterceptor {
         });
       });
       await log(
-        `Initiator: ${address} \n---------------------> released lock for:${lockId}\n`
+        `Initiator: ${initiator} \n---------------------> released lock for:${lockId}\n`
       );
     } catch (err) {
       throw err;
@@ -66,19 +65,19 @@ export class LockInterceptor {
   }
 
   private static async waitForReleaseLock(
-    address: string,
+    initiator: string,
     lockId: string
   ): Promise<void> {
-    const pollInterval = 4000; // 4 secs
+    const pollInterval = 100; // 100 milliseconds
 
     try {
       await log(
-        `Initiator: ${address} \n ---------------------> waiting lock for:${lockId}`
+        `Initiator: ${initiator} \n ---------------------> waiting lock for:${lockId}`
       );
       return new Promise<void>((resolve, reject) => {
         const pollFn = () => {
           try {
-            const isAddressLocked = checkAddressLock(address);
+            const isAddressLocked = checkLock(initiator);
             if (!isAddressLocked) {
               resolve();
             } else {
@@ -96,20 +95,19 @@ export class LockInterceptor {
     }
   }
 
-  static async intercept(
-    address: string,
-    callbackFn: () => Promise<TxSubmitResponse>,
-    lockId: string,
-    provider: "local" | "server" = "local"
-  ): Promise<TxSubmitResponse> {
+  static async intercept<T>(
+    initiator: string,
+    callbackFn: () => Promise<T>,
+    lockId?: string
+  ): Promise<T> {
     while (true) {
-      const isAddressLocked = checkAddressLock(address);
+      const isAddressLocked = checkLock(initiator);
       if (isAddressLocked) {
-        await LockInterceptor.waitForReleaseLock(address, lockId);
+        await LockInterceptor.waitForReleaseLock(initiator, lockId);
       }
 
       try {
-        await LockInterceptor.acquireLock(address, lockId);
+        await LockInterceptor.acquireLock(initiator, lockId);
         break;
       } catch (err) {
         if (err.code === "EEXIST") {
@@ -122,48 +120,38 @@ export class LockInterceptor {
     }
     try {
       const res = await callbackFn();
-      return { ...res, lockInfo: { lockId, address } };
+      return { ...res, lockInfo: { lockId, initiator } };
     } catch (err) {
       const errorMessage = { lock_id: lockId, error: JSON.stringify(err) };
       await log(`Task failure: \n${JSON.stringify(errorMessage)}`);
-      await LockInterceptor.releaseLock(address, lockId);
+      await LockInterceptor._releaseLock(initiator, lockId);
       throw err;
     }
   }
 
-  static async releaseLockForAddress(
-    address: string,
-    lockId: string,
+  static async releaseLock(
+    interceptor: string,
+    lockId?: string,
     message?: string
   ) {
     try {
       message && (await log(message));
 
-      await this.releaseLock(address, lockId);
+      await this._releaseLock(interceptor, lockId);
     } catch {
       Logger.fail("Failed to write lock logs");
     }
   }
 }
 
-function checkAddressLock(address: string): boolean {
-  const lockFilePath = path.resolve(__dirname, `../${address}`);
+function checkLock(initiator: string): boolean {
+  const lockFilePath = path.resolve(__dirname, `../${initiator}`);
   return lockfile.checkSync(lockFilePath);
 }
 
 function log(message: string): Promise<void> {
-  const options: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-    timeZone: "Asia/Kathmandu",
-  };
   const logFilePath = path.resolve(__dirname, "../lock_logs.txt");
-  const logMessage = `[${new Date().toLocaleString("en-US", options)}] ${message}\n`;
+  const logMessage = `[${new Date().toLocaleString()}] ${message}\n`;
   return new Promise((resolve, reject) => {
     fs.appendFile(logFilePath, logMessage, (err) => {
       if (err) {

@@ -1,3 +1,4 @@
+import environments from "../constants/environments";
 import { ed25519 as ed } from "@noble/curves/ed25519";
 import { bech32 } from "bech32";
 import * as blake from "blakejs";
@@ -130,10 +131,22 @@ export class ShelleyWallet {
       200
     );
   }
+
+  dRepIdBech32() {
+    const stakePubKey = Buffer.from(this.stakeKey.public).toString("hex");
+    const dRepKeyBytes = Buffer.from(stakePubKey, "hex");
+    const dRepId = blake.blake2bHex(dRepKeyBytes, undefined, 28);
+    const words = bech32.toWords(Buffer.from(dRepId, "hex"));
+    const dRepIdBech32 = bech32.encode("drep", words);
+    return dRepIdBech32;
+  }
+
   public json() {
     return {
       payment: this.paymentKey.json(),
       stake: this.stakeKey.json(),
+      dRepId: this.dRepIdBech32(),
+      address: this.addressBech32(environments.networkId),
     };
   }
 

@@ -10,6 +10,7 @@ export const adaHolder01Wallet = staticWallets[3];
 export const adaHolder02Wallet = staticWallets[4];
 export const adaHolder03Wallet = staticWallets[6];
 export const adaHolder04Wallet = staticWallets[7];
+export const adaHolder05Wallet = staticWallets[8];
 
 // Does not takes part in transaction
 export const user01Wallet: StaticWallet = staticWallets[5];
@@ -19,6 +20,7 @@ export const adaHolderWallets = [
   adaHolder02Wallet,
   adaHolder03Wallet,
   adaHolder04Wallet,
+  adaHolder05Wallet,
 ];
 
 export const userWallets = [user01Wallet];

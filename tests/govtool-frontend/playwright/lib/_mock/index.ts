@@ -17,6 +17,30 @@ export const invalid = {
     return `${scheme}://${randomDomain}`;
   },
 
+  name: () => {
+    const choice = faker.number.int({ min: 1, max: 3 });
+    if (choice === 1) {
+      // space invalid
+      return faker.lorem.word() + " " + faker.lorem.word();
+    } else if (choice === 2) {
+      // maximum 80 words invalid
+      return faker.lorem.paragraphs().replace(/\s+/g, "");
+    }
+    // empty invalid
+    return " ";
+  },
+
+  email: () => {
+    const choice = faker.number.int({ min: 1, max: 3 });
+
+    if (choice === 1) {
+      return faker.lorem.word() + faker.number + "@invalid.com";
+    } else if (choice == 2) {
+      return faker.lorem.word() + "@";
+    }
+    return faker.lorem.word() + "@gmail_com";
+  },
+
   proposalTitle: () => {
     const choice = faker.number.int({ min: 1, max: 2 });
     if (choice === 1) {

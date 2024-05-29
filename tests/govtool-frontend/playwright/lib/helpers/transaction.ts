@@ -33,8 +33,8 @@ export async function pollTransaction(
 
     if (!lockInfo) return;
 
-    await LockInterceptor.releaseLockForAddress(
-      lockInfo.address,
+    await LockInterceptor.releaseLock(
+      lockInfo.initiator,
       lockInfo.lockId,
       `Task completed for:${lockInfo.lockId}`
     );
@@ -42,8 +42,8 @@ export async function pollTransaction(
     if (lockInfo) {
       const errorMessage = { lockInfo, error: JSON.stringify(err) };
 
-      await LockInterceptor.releaseLockForAddress(
-        lockInfo.address,
+      await LockInterceptor.releaseLock(
+        lockInfo.initiator,
         lockInfo.lockId,
         `Task failure: \n${JSON.stringify(errorMessage)}`
       );
@@ -58,30 +58,35 @@ export async function waitForTxConfirmation(
   triggerCallback?: () => Promise<void>
 ) {
   let transactionHash: string | undefined;
-  const transactionStatusPromise = page.waitForRequest((request) => {
-    return request.url().includes("/transaction/status/");
-  });
+  try {
+    await triggerCallback?.call(this);
+    const transactionStatusPromise = page.waitForRequest((request) => {
+      return request.url().includes("/transaction/status/");
+    });
 
-  await triggerCallback?.call(this);
-  await expect(
-    page
-      .getByTestId("alert-warning")
-      .getByText("Transaction in progress", { exact: false })
-  ).toBeVisible({
-    timeout: 10_000,
-  });
-  const url = (await transactionStatusPromise).url();
-  const regex = /\/transaction\/status\/([^\/]+)$/;
-  const match = url.match(regex);
-  if (match) {
-    transactionHash = match[1];
-  }
-
-  if (transactionHash) {
-    await pollTransaction(transactionHash);
     await expect(
-      page.getByText("In Progress", { exact: true }).first() //FIXME: Only one element needs to be displayed
-    ).not.toBeVisible({ timeout: 20_000 });
+      page
+        .getByTestId("alert-warning")
+        .getByText("Transaction in progress", { exact: false })
+    ).toBeVisible({
+      timeout: 10_000,
+    });
+    const url = (await transactionStatusPromise).url();
+    const regex = /\/transaction\/status\/([^\/]+)$/;
+    const match = url.match(regex);
+    if (match) {
+      transactionHash = match[1];
+    }
+
+    if (transactionHash) {
+      await pollTransaction(transactionHash);
+      await expect(
+        page.getByText("In Progress", { exact: true }).first() //FIXME: Only one element needs to be displayed
+      ).not.toBeVisible({ timeout: 20_000 });
+    }
+  } catch (error) {
+    Logger.fail(error.message);
+    throw new Error(error);
   }
 }
 

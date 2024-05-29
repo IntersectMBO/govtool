@@ -40,6 +40,10 @@ export default class DRepRegistrationPage {
 
   @withTxConfirmation
   async register(dRepInfo: IDRepInfo) {
+    await this.registerWithoutTxConfirmation(dRepInfo);
+  }
+
+  async registerWithoutTxConfirmation(dRepInfo: IDRepInfo) {
     await this.nameInput.fill(dRepInfo.name);
 
     if (dRepInfo.email != null) {

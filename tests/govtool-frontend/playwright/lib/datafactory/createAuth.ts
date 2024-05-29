@@ -4,13 +4,14 @@ import { importWallet } from "@fixtures/importWallet";
 import { ShelleyWallet } from "@helpers/crypto";
 import LoginPage from "@pages/loginPage";
 import { Page } from "@playwright/test";
+import { StaticWallet } from "@types";
 
 const tempDRepAuth = ".auth/tempDRepAuth.json";
 const tempUserAuth = ".auth/tempUserAuth.json";
 const tempAdaHolderAuth = ".auth/tempAdaHolderAuth.json";
 
-export async function createTempDRepAuth(page: Page, wallet: ShelleyWallet) {
-  await importWallet(page, wallet.json());
+export async function createTempDRepAuth(page: Page, wallet: StaticWallet) {
+  await importWallet(page, wallet);
 
   const loginPage = new LoginPage(page);
   await loginPage.login();

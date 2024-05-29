@@ -88,20 +88,17 @@ test("4C.2: Should sort Governance Action Type on governance actions page", asyn
 
   await govActionsPage.sortBtn.click();
 
-  govActionsPage.sortProposal(SortOption.SoonToExpire);
-  await govActionsPage.validateSort(
+  await govActionsPage.sortAndValidate(
     SortOption.SoonToExpire,
     (p1, p2) => p1.expiryDate <= p2.expiryDate
   );
 
-  govActionsPage.sortProposal(SortOption.NewestFirst);
-  await govActionsPage.validateSort(
+  await govActionsPage.sortAndValidate(
     SortOption.NewestFirst,
     (p1, p2) => p1.createdDate >= p2.createdDate
   );
 
-  govActionsPage.sortProposal(SortOption.HighestYesVotes);
-  await govActionsPage.validateSort(
+  await govActionsPage.sortAndValidate(
     SortOption.HighestYesVotes,
     (p1, p2) => p1.yesVotes >= p2.yesVotes
   );
@@ -115,13 +112,11 @@ test("4D: Should filter and sort Governance Action Type on governance actions pa
   const govActionsPage = new GovernanceActionsPage(page);
   await govActionsPage.goto();
 
-  await govActionsPage.sortBtn.click();
-  await govActionsPage.sortProposal(SortOption.SoonToExpire);
-
   await govActionsPage.filterBtn.click();
   govActionsPage.filterProposalByNames([filterOptionNames[0]]);
 
-  await govActionsPage.validateSort(
+  await govActionsPage.sortBtn.click();
+  await govActionsPage.sortAndValidate(
     SortOption.SoonToExpire,
     (p1, p2) => p1.expiryDate <= p2.expiryDate,
     [removeAllSpaces(filterOptionNames[0])]

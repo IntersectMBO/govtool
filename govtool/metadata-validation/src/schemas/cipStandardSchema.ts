@@ -9,6 +9,10 @@ const CIP100_URL =
 const CIP108_URL =
   'https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#';
 
+// Temporary URL for the CIP-119 metadata
+const CIPQQQ_URL =
+  'https://github.com/cardano-foundation/CIPs/blob/master/CIP-QQQ/README.md#';
+
 export const cipStandardSchema: StandardSpecification = {
   // Source of CIP-108: https://github.com/Ryun1/CIPs/blob/governance-metadata-actions/CIP-0108/README.md
   [MetadataStandard.CIP108]: Joi.object({
@@ -43,6 +47,40 @@ export const cipStandardSchema: StandardSpecification = {
             hashAlgorithm: Joi.string().required(),
           }),
         }).required(),
+      ),
+    }),
+  }),
+  [MetadataStandard.CIPQQQ]: Joi.object({
+    '@context': Joi.object({
+      '@language': Joi.string().required(),
+      CIP100: Joi.string().valid(CIP100_URL).required(),
+      CIPQQQ: Joi.string().valid(CIPQQQ_URL).required(),
+      hashAlgorithm: Joi.string().valid('CIP100:hashAlgorithm').required(),
+      body: Joi.object(),
+      authors: Joi.object(),
+    }),
+    authors: Joi.array(),
+    hashAlgorithm: Joi.object({
+      '@value': Joi.string().valid('blake2b-256').required(),
+    }),
+    body: Joi.object({
+      bio: Joi.object({ '@value': Joi.string() }),
+      dRepName: Joi.object({ '@value': Joi.string() }),
+      email: Joi.object({ '@value': Joi.string() }),
+      references: Joi.array().items(
+        Joi.object({
+          '@type': Joi.string(),
+          'CIPQQQ:reference-label': Joi.object({
+            '@value': Joi.string().required(),
+          }),
+          'CIPQQQ:reference-uri': Joi.object({
+            '@value': Joi.string().uri().required(),
+          }),
+          'CIPQQQ:reference-hash': Joi.object({
+            hashDigest: Joi.string().required(),
+            hashAlgorithm: Joi.string().required(),
+          }),
+        }),
       ),
     }),
   }),

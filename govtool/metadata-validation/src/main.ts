@@ -17,7 +17,12 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      // Do not throw error on missing fields
+      exceptionFactory: () => ({ status: 200, valid: false }),
+    }),
+  );
   await app.listen(process.env.PORT);
 }
 bootstrap();

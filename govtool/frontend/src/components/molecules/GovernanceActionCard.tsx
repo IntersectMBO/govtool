@@ -18,7 +18,7 @@ import {
 } from "@utils";
 
 type ActionTypeProps = Omit<
-  ActionTypeToDsiplay,
+  ActionType,
   | "yesVotes"
   | "noVotes"
   | "abstainVotes"
@@ -44,7 +44,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
     createdEpochNo,
     txHash,
     index,
-    isDataMissing,
+    metadataStatus,
     title,
     about,
   } = props;
@@ -64,10 +64,10 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
         justifyContent: "space-between",
         boxShadow: "0px 4px 15px 0px #DDE3F5",
         borderRadius: "20px",
-        backgroundColor: isDataMissing
+        backgroundColor: !metadataStatus.raw.valid
           ? "rgba(251, 235, 235, 0.50)"
           : "rgba(255, 255, 255, 0.3)",
-        ...(isDataMissing && {
+        ...(!metadataStatus.raw.valid && {
           border: "1px solid #F6D5D5",
         }),
         ...(inProgress && {
@@ -84,7 +84,9 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
       >
         <GovernanceActionCardHeader
           title={title}
-          isDataMissing={isDataMissing}
+          isDataMissing={
+            metadataStatus.raw.valid ? false : metadataStatus.raw.status
+          }
         />
         <GovernanceActionCardElement
           label={t("govActions.abstract")}

@@ -72,6 +72,11 @@ type ProposalData = {
   createdEpochNo: number;
   url: string;
   metadataHash: string;
+  metadataStatus: {
+    raw: { valid: boolean; status?: MetadataValidationStatus };
+    status: MetadataValidationStatus;
+    valid: false;
+  };
   yesVotes: number;
   noVotes: number;
   abstainVotes: number;
@@ -86,12 +91,6 @@ export interface VotedProposal {
   vote: ProposalVote;
   proposal: ProposalData;
 }
-export type VotedProposalToDisplay = {
-  vote: ProposalVote;
-  proposal: ProposalData & {
-    isDataMissing: boolean | MetadataValidationStatus;
-  };
-};
 
 export type CurrentDelegation = {
   dRepHash: string | null;

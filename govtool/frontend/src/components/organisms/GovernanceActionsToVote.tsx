@@ -12,7 +12,7 @@ import { Slider } from "@organisms";
 type GovernanceActionsToVoteProps = {
   filters: string[];
   sorting: string;
-  proposals: { title: string; actions: ActionTypeToDsiplay[] }[];
+  proposals: { title: string; actions: ActionType[] }[];
   onDashboard?: boolean;
   searchPhrase?: string;
 };
@@ -87,7 +87,9 @@ export const GovernanceActionsToVote = ({
                             {
                               state: {
                                 ...action,
-                                isDataMissing: action.isDataMissing,
+                                isDataMissing: action.metadataStatus.raw.valid
+                                  ? false
+                                  : action.metadataStatus.raw.status,
                               },
                             },
                           );

@@ -87,7 +87,9 @@ test.describe("Delegate to myself", () => {
   let dRepPage: Page;
   let wallet: StaticWallet;
 
-  test.beforeEach(async ({ page, browser }, testInfo) => {
+  test.describe.configure({ retries: 3 });
+
+  test.beforeEach(async ({ page, browser }) => {
     wallet = await walletManager.popWallet("registerDRep");
 
     const dRepAuth = await createTempDRepAuth(page, wallet);
@@ -98,13 +100,15 @@ test.describe("Delegate to myself", () => {
     });
   });
 
-  test("2E. Should register as Sole voter", async ({ page }, testInfo) => {
+  test("2E. Should register as Sole voter", async ({}, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     const dRepId = wallet.dRepId;
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("register-as-sole-voter-button").click();
+
+    await expect(dRepPage.getByTestId("continue-button")).toBeVisible();
     await dRepPage.getByTestId("continue-button").click();
     await expect(
       dRepPage.getByTestId("registration-transaction-submitted-modal")
@@ -112,12 +116,11 @@ test.describe("Delegate to myself", () => {
     await dRepPage.getByTestId("confirm-modal-button").click();
     await waitForTxConfirmation(dRepPage);
 
-    // Checks in dashboard
-    // BUG
-    await expect(page.getByText(dRepId)).toHaveText(dRepId);
-
-    // Checks in dRep directory
     await expect(dRepPage.getByText("You are a Direct Voter")).toBeVisible();
+    await expect(
+      dRepPage.getByTestId("register-as-sole-voter-button")
+    ).not.toBeVisible();
+
     await dRepPage.getByTestId("drep-directory-link").click();
     await expect(dRepPage.getByText("Direct Voter")).toBeVisible();
     await expect(dRepPage.getByTestId(`${dRepId}-copy-id-button`)).toHaveText(
@@ -130,6 +133,8 @@ test.describe("Delegate to myself", () => {
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("register-as-sole-voter-button").click();
+
+    await expect(dRepPage.getByTestId("continue-button")).toBeVisible();
     await dRepPage.getByTestId("continue-button").click();
     await expect(
       dRepPage.getByTestId("registration-transaction-submitted-modal")

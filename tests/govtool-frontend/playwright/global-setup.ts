@@ -15,7 +15,7 @@ async function generateWallets(num: number) {
 
 async function globalSetup() {
   const registeredDRepWallets = await generateWallets(9);
-  const registerDRepWallets = await generateWallets(5);
+  const registerDRepWallets = await generateWallets(9);
 
   // faucet setup
   const res = await loadAmountFromFaucet(faucetWallet.address);

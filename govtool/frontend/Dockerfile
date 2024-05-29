@@ -3,8 +3,15 @@ ARG VITE_BASE_URL
 ARG VITE_GTM_ID
 ARG VITE_NETWORK_FLAG=0
 ARG VITE_SENTRY_DSN
+ARG NPMRC_TOKEN
+
 ENV NODE_OPTIONS=--max_old_space_size=4096
 WORKDIR /src
+
+# Set npm configuration settings using environment variables
+RUN npm config set @intersect.mbo:registry "https://registry.npmjs.org/" --location=global
+RUN npm config set //registry.npmjs.org/:_authToken ${NPMRC_TOKEN} --location=global
+
 COPY package.json package-lock.json ./
 RUN npm install
 COPY . .

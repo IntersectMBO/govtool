@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "allowJs": true,
     "jsx": "react-jsx",
 
     /* Linting */
@@ -37,6 +38,7 @@
     }
   },
   "include": [
+    "node_modules/@intersect.mbo/**/*.(js|ts)",
     "src",
     "vitest.config.ts",
     "src/**/*.test.ts",

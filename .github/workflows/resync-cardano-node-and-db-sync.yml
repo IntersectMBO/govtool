@@ -36,6 +36,7 @@ jobs:
       SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
       TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
       GTM_ID: ${{ secrets.GTM_ID }}
+      NPMRC_TOKEN: ${{ secrets.NPMRC_TOKEN }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
       PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       IP_ADDRESS_BYPASSING_BASIC_AUTH1: ${{ secrets.IP_ADDRESS_BYPASSING_BASIC_AUTH1 }}

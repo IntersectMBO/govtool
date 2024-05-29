@@ -28,6 +28,11 @@ declare global {
     createdEpochNo: number;
     url?: string;
     metadataHash?: string;
+    metadataStatus: {
+      raw: { valid: boolean; status?: MetadataValidationStatus };
+      status: MetadataValidationStatus;
+      valid: false;
+    };
     yesVotes: number;
     noVotes: number;
     abstainVotes: number;
@@ -37,10 +42,6 @@ declare global {
     about?: string;
     motivation?: string;
     rationale?: string;
-  };
-
-  type ActionTypeToDsiplay = ActionType & {
-    isDataMissing: boolean | MetadataValidationStatus;
   };
 
   interface ActionVotedOnType extends ActionTypeToDsiplay {

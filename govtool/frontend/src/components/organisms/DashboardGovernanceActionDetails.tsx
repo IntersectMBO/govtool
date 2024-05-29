@@ -53,7 +53,13 @@ export const DashboardGovernanceActionDetails = () => {
         elementOne={t("govActions.title")}
         elementOnePath={PATHS.dashboardGovernanceActions}
         elementTwo={title}
-        isDataMissing={state ? state.isDataMissing : data?.isDataMissing}
+        isDataMissing={
+          state
+            ? state.isDataMissing
+            : data?.proposal.metadataStatus.raw.valid
+            ? false
+            : data?.proposal.metadataStatus.raw.status
+        }
       />
       <Link
         data-testid="back-to-list-link"
@@ -111,11 +117,17 @@ export const DashboardGovernanceActionDetails = () => {
             createdEpochNo={
               state ? state.createdEpochNo : data.proposal.createdEpochNo
             }
-            isDataMissing={state ? state.isDataMissing : data?.isDataMissing}
+            isDataMissing={
+              state
+                ? state.isDataMissing
+                : data?.proposal.metadataStatus.raw.valid
+                ? false
+                : data?.proposal.metadataStatus.raw.status
+            }
             expiryDate={
               state
                 ? formatDisplayDate(state.expiryDate)
-                : formatDisplayDate(data.proposal.expiryDate)
+                : formatDisplayDate(data?.proposal.expiryDate)
             }
             expiryEpochNo={
               state ? state.expiryEpochNo : data.proposal.expiryEpochNo

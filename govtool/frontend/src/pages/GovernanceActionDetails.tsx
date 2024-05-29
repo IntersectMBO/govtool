@@ -85,7 +85,13 @@ export const GovernanceActionDetails = () => {
               elementOne={t("govActions.title")}
               elementOnePath={PATHS.governanceActions}
               elementTwo={title}
-              isDataMissing={state ? state.isDataMissing : data?.isDataMissing}
+              isDataMissing={
+                state
+                  ? state.isDataMissing
+                  : data?.proposal.metadataStatus.raw.valid
+                  ? false
+                  : data?.proposal.metadataStatus.raw.status
+              }
             />
             <Link
               sx={{
@@ -136,7 +142,11 @@ export const GovernanceActionDetails = () => {
                     state ? state.createdEpochNo : data.proposal.createdEpochNo
                   }
                   isDataMissing={
-                    state ? state.isDataMissing : data?.isDataMissing
+                    state
+                      ? state.isDataMissing
+                      : data?.proposal.metadataStatus.raw.valid
+                      ? false
+                      : data?.proposal.metadataStatus.raw.status
                   }
                   expiryDate={
                     state

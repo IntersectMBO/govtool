@@ -90,6 +90,7 @@ export const EditDRepForm = ({
       </Box>
       <ControlledField.Input
         {...{ control, errors }}
+        dataTestId="name-input"
         helpfulText={t("forms.editMetadata.dRepNameHelpfulText")}
         label={t("forms.editMetadata.dRepName")}
         name="dRepName"

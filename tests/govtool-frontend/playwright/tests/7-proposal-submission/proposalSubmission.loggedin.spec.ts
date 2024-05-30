@@ -70,3 +70,44 @@ test.describe("Reject invalid  data", () => {
     });
   });
 });
+
+test.describe("Review fillup form", () => {
+  Object.values(ProposalType).map((type: ProposalType, index) => {
+    test(`7I.${index + 1} Should valid review submission in ${type.toLowerCase()} Proposal form`, async ({
+      page,
+    }) => {
+      test.slow();
+
+      const proposalSubmissionPage = new ProposalSubmissionPage(page);
+
+      await proposalSubmissionPage.goto();
+
+      await page.getByTestId(`${type}-radio`).click();
+      await proposalSubmissionPage.continueBtn.click();
+
+      const randomBytes = new Uint8Array(10);
+      const bech32Address = bech32.encode("addr_test", randomBytes);
+
+      const formFields: IProposalForm =
+        proposalSubmissionPage.generateValidProposalFormFields(
+          type,
+          bech32Address
+        );
+      await proposalSubmissionPage.validateForm(formFields);
+      proposalSubmissionPage.continueBtn.click();
+
+      await expect(page.getByText(formFields.title)).toBeVisible();
+      await expect(page.getByText(formFields.abstract)).toBeVisible();
+      await expect(page.getByText(formFields.motivation)).toBeVisible();
+      await expect(page.getByText(formFields.rationale)).toBeVisible();
+      await expect(
+        page.getByText(formFields.extraContentLinks[0])
+      ).toBeVisible();
+
+      if (type === ProposalType.treasury) {
+        await expect(page.getByText(formFields.receivingAddress)).toBeVisible();
+        await expect(page.getByText(formFields.amount)).toBeVisible();
+      }
+    });
+  });
+});

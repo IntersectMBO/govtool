@@ -58,7 +58,10 @@ export const DelegateDashboardCard = ({
 
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress
-    if (delegateTx && !voter.isRegisteredAsSoleVoter) {
+    if (
+      delegateTx &&
+      (!(delegateTx?.resourceId === dRepID) || voter?.isRegisteredAsDRep)
+    ) {
       return {
         buttons: [learnMoreButton],
         description: getProgressDescription(delegateTx?.resourceId, ada),
@@ -66,9 +69,12 @@ export const DelegateDashboardCard = ({
         title: t("dashboard.cards.delegation.inProgress.title"),
       };
     }
-
+    // console.log(currentDelegation?.dRepHash, dRepID);
     // current delegation
-    if (currentDelegation && !voter.isRegisteredAsSoleVoter) {
+    if (
+      currentDelegation &&
+      (!(currentDelegation?.dRepHash === dRepID) || voter?.isRegisteredAsDRep)
+    ) {
       return {
         buttons: currentDelegation?.dRepView
           ? [
@@ -119,22 +125,25 @@ export const DelegateDashboardCard = ({
     <DashboardActionCard
       imageURL={IMAGES.govActionDelegateImage}
       isSpaceBetweenButtons={
-        !!currentDelegation?.dRepView && !voter.isRegisteredAsSoleVoter
+        !!currentDelegation?.dRepView &&
+        (!(currentDelegation?.dRepHash === dRepID) || voter?.isRegisteredAsDRep)
       }
       transactionId={
-        !voter.isRegisteredAsSoleVoter
+        !(currentDelegation?.dRepHash === dRepID) || voter?.isRegisteredAsDRep
           ? delegateTx?.transactionHash ?? currentDelegation?.txHash
           : undefined
       }
       {...cardProps}
     >
-      {displayedDelegationId && !voter.isRegisteredAsSoleVoter && (
-        <DelegationAction
-          dRepId={displayedDelegationId}
-          onCardClick={navigateToDRepDetails}
-          sx={{ mt: 1.5 }}
-        />
-      )}
+      {displayedDelegationId &&
+        (!(currentDelegation?.dRepHash === dRepID) ||
+          voter?.isRegisteredAsDRep) && (
+          <DelegationAction
+            dRepId={displayedDelegationId}
+            onCardClick={navigateToDRepDetails}
+            sx={{ mt: 1.5 }}
+          />
+        )}
     </DashboardActionCard>
   );
 };

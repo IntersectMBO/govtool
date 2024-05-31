@@ -28,14 +28,12 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
   const navigate = useNavigate();
   const { proposal, vote } = votedProposal;
   const {
-    about,
     createdDate,
     createdEpochNo,
     expiryDate,
     expiryEpochNo,
     index,
     metadataStatus,
-    title,
     txHash,
     type,
   } = proposal;
@@ -75,14 +73,14 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         }}
       >
         <GovernanceActionCardHeader
-          title={title}
+          title={metadataStatus.raw.metadata?.title ?? ""}
           isDataMissing={
             metadataStatus.raw.valid ? false : metadataStatus.raw.status
           }
         />
         <GovernanceActionCardElement
           label={t("govActions.abstract")}
-          text={about}
+          text={metadataStatus.raw.metadata?.abstract ?? ""}
           textVariant="twoLines"
           dataTestId="governance-action-abstract"
           isSliderCard

@@ -53,7 +53,7 @@ export const BgCard = ({
     () => (
       <Button
         data-testid={actionButtonDataTestId ?? "continue-button"}
-        disabled={isActionButtonDisabled}
+        disabled={isActionButtonDisabled || isLoadingActionButton}
         isLoading={isLoadingActionButton}
         onClick={onClickActionButton}
         size="extraLarge"

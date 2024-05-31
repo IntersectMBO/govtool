@@ -24,9 +24,20 @@ test.describe("Logged in DReps", () => {
     page,
   }) => {
     await page.goto("/");
+
+    await expect(page.getByTestId("voting-power-chips")).toBeVisible();
+
     await expect(page.getByTestId("dRep-id-display")).toContainText(
       dRep01Wallet.dRepId
     ); // BUG: testId -> dRep-id-display-dashboard (It is taking sidebar dRep-id)
+
+    await page.goto(`${environments.frontendUrl}/governance_actions`);
+    await page
+      .locator('[data-testid^="govaction-"][data-testid$="-view-detail"]')
+      .first()
+      .click();
+
+    await expect(page.getByTestId("vote-button")).toBeVisible();
   });
 
   test("3H. Should Update DRep data", async ({ page }, testInfo) => {
@@ -84,7 +95,7 @@ test.describe("Temporary DReps", () => {
     ).toBeVisible();
   });
 
-  test("3I. Should verify retire as DRep", async ({ page, browser }) => {
+  test("3J. Should verify retire as DRep", async ({ page, browser }) => {
     const wallet = await walletManager.popWallet("registeredDRep");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
@@ -99,11 +110,11 @@ test.describe("Temporary DReps", () => {
     await dRepPage.getByTestId("continue-retirement-button").click();
 
     await expect(
-      dRepPage.getByTestId("retirement-transaction-error-modal")
+      dRepPage.getByTestId("retirement-transaction-submitted-modal")
     ).toBeVisible();
   });
 
-  test("3J. Verify DRep behavior in retired state", async ({
+  test("3K. Verify DRep behavior in retired state", async ({
     page,
     browser,
   }, testInfo) => {
@@ -125,8 +136,12 @@ test.describe("Temporary DReps", () => {
       dRepPage.getByTestId("retirement-transaction-submitted-modal")
     ).toBeVisible();
     dRepPage.getByTestId("confirm-modal-button").click();
+
     await waitForTxConfirmation(dRepPage);
-    await expect(dRepPage.getByText("Voting power:₳")).not.toBeVisible();
+
+    await expect(dRepPage.getByTestId("voting-power-chips")).not.toBeVisible();
+
+    await expect(dRepPage.getByTestId("dRep-id-display")).not.toBeVisible();
 
     const governanceActionsPage = new GovernanceActionsPage(dRepPage);
     await governanceActionsPage.goto();
@@ -135,7 +150,7 @@ test.describe("Temporary DReps", () => {
     await expect(govActionDetailsPage.voteBtn).not.toBeVisible();
   });
 
-  test("3K. Should display 'In Progress' status on dashboard until blockchain confirms DRep registration", async ({
+  test("3I. Should display 'In Progress' status on dashboard until blockchain confirms DRep registration", async ({
     page,
     browser,
   }, testInfo) => {

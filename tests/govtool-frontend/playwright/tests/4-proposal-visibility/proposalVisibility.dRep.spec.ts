@@ -1,3 +1,4 @@
+import environments from "@constants/environments";
 import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
@@ -5,6 +6,7 @@ import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { lovelaceToAda } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
+import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import { FilterOption, IProposal } from "@types";
@@ -27,9 +29,9 @@ test.describe("Logged in DRep", () => {
     const res = await votingPowerPromise;
     const votingPower = await res.json();
 
-    await expect(
-      page.getByText(`₳ ${lovelaceToAda(votingPower)}`)
-    ).toBeVisible();
+    await expect(page.getByTestId("voting-power-chips-value")).toHaveText(
+      `₳ ${lovelaceToAda(votingPower)}`
+    );
   });
 });
 
@@ -48,15 +50,47 @@ test.describe("Temporary DReps", async () => {
     });
   });
 
-  test("4J. Should include metadata anchor in the vote transaction", async () => {
+  test("4J. Should include metadata anchor in the vote transaction", async ({}, testInfo) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+
     const govActionsPage = new GovernanceActionsPage(dRepPage);
     await govActionsPage.goto();
 
     const govActionDetailsPage = await govActionsPage.viewFirstProposal();
     await govActionDetailsPage.vote(faker.lorem.sentence(200));
+
     await govActionsPage.votedTab.click();
     await govActionsPage.viewFirstVotedProposal();
     expect(false, "No vote context displayed").toBe(true);
+  });
+
+  test("4I. Should display the recent vote on same sameshot", async ({
+    context,
+  }, testInfo) => {
+    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
+
+    const govActionsPage = new GovernanceActionsPage(dRepPage);
+    await govActionsPage.goto();
+
+    const govActionDetailsPage = await govActionsPage.viewFirstProposal();
+    const urlList = dRepPage.url().split("/");
+    const governanceActionId = urlList[urlList.length - 1];
+    await govActionDetailsPage.vote();
+
+    await govActionsPage.votedTab.click();
+
+    await govActionsPage.searchInput.fill(governanceActionId);
+
+    await dRepPage
+      .getByTestId(`govaction-${governanceActionId}-change-your-vote`)
+      .click();
+    const votedActionDetailsPage = new GovernanceActionDetailsPage(dRepPage);
+    await votedActionDetailsPage.noVoteRadio.click();
+    await votedActionDetailsPage.changeVoteBtn.click();
+
+    await govActionsPage.searchInput.fill(governanceActionId);
+
+    await expect(dRepPage.getByTestId("my-vote").getByText("No")).toBeVisible();
   });
 });
 

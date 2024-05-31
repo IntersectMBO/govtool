@@ -1,4 +1,4 @@
-export const removeDuplicatedProposals = (proposals: ActionTypeToDsiplay[]) => {
+export const removeDuplicatedProposals = (proposals: ActionType[]) => {
   if (!proposals) return [];
   const uniqueGovActionIds = new Set();
   return proposals.filter((item) => {

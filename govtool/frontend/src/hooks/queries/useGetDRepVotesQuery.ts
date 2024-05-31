@@ -3,7 +3,7 @@ import { useQuery } from "react-query";
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { getDRepVotes } from "@services";
-import { VotedProposalToDisplay } from "@/models/api";
+import { VotedProposal } from "@/models";
 
 export const useGetDRepVotesQuery = (
   type?: string[],
@@ -56,7 +56,7 @@ export const useGetDRepVotesQuery = (
   return {
     data: Object.values(groupedByType ?? []) as {
       title: string;
-      actions: VotedProposalToDisplay[];
+      actions: VotedProposal[];
     }[],
     areDRepVotesLoading: isLoading,
     refetch,

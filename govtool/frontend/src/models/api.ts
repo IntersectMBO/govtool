@@ -74,7 +74,7 @@ type ProposalData = {
   metadataHash: string;
   metadataStatus: {
     raw: { valid: boolean; status?: MetadataValidationStatus };
-    status: MetadataValidationStatus;
+    status?: MetadataValidationStatus;
     valid: boolean;
   };
   yesVotes: number;

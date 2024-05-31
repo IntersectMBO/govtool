@@ -30,8 +30,8 @@ declare global {
     metadataHash?: string;
     metadataStatus: {
       raw: { valid: boolean; status?: MetadataValidationStatus };
-      status: MetadataValidationStatus;
-      valid: false;
+      status?: MetadataValidationStatus;
+      valid: boolean;
     };
     yesVotes: number;
     noVotes: number;

@@ -45,8 +45,6 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
     txHash,
     index,
     metadataStatus,
-    title,
-    about,
   } = props;
   const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
@@ -83,14 +81,14 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
         }}
       >
         <GovernanceActionCardHeader
-          title={title}
+          title={metadataStatus.raw.metadata?.title ?? ""}
           isDataMissing={
             metadataStatus.raw.valid ? false : metadataStatus.raw.status
           }
         />
         <GovernanceActionCardElement
           label={t("govActions.abstract")}
-          text={about}
+          text={metadataStatus.raw.metadata?.abstract ?? ""}
           textVariant="twoLines"
           dataTestId="governance-action-abstract"
           isSliderCard

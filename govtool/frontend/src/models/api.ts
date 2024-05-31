@@ -73,7 +73,17 @@ type ProposalData = {
   url: string;
   metadataHash: string;
   metadataStatus: {
-    raw: { valid: boolean; status?: MetadataValidationStatus };
+    raw: {
+      valid: boolean;
+      status?: MetadataValidationStatus;
+      metadata?: {
+        abstract?: string;
+        motivation?: string;
+        rationale?: string;
+        references?: string[];
+        title?: string;
+      };
+    };
     status?: MetadataValidationStatus;
     valid: boolean;
   };

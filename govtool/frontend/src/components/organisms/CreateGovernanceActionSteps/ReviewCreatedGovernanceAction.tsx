@@ -58,8 +58,9 @@ export const ReviewCreatedGovernanceAction = ({
               {label}
             </Typography>
             <Typography
-              data-testid={`governance-action-${testIdFromLabel(label)}-
-                content`}
+              data-testid={`governance-action-${testIdFromLabel(
+                label,
+              )}-content`}
               sx={{ mt: 0.5, wordBreak: "break-word" }}
               variant="body2"
             >

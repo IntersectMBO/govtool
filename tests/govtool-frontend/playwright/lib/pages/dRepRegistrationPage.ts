@@ -27,9 +27,9 @@ export default class DRepRegistrationPage {
 
   // input fields
   readonly nameInput = this.page.getByTestId("name-input");
-  readonly emailInput = this.page.locator('[data-testid="email-input"] input'); // BUG incorrect cannot interact with text input
+  readonly emailInput = this.page.getByTestId("email-input");
   readonly bioInput = this.page.getByTestId("bio-input");
-  readonly linkInput = this.page.locator('[data-testid="link-input"] input'); // BUG incorrect cannot interact with text input
+  readonly linkInput = this.page.getByTestId("link-1-input");
 
   constructor(private readonly page: Page) {}
 

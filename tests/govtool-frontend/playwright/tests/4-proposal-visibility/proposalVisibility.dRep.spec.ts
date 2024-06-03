@@ -60,6 +60,8 @@ test.describe("Temporary DReps", async () => {
     const govActionDetailsPage = await govActionsPage.viewFirstProposal();
     await govActionDetailsPage.vote(faker.lorem.sentence(200));
 
+    await dRepPage.waitForTimeout(5_000);
+
     await govActionsPage.votedTab.click();
     await govActionsPage.viewFirstVotedProposal();
     expect(false, "No vote context displayed").toBe(true);

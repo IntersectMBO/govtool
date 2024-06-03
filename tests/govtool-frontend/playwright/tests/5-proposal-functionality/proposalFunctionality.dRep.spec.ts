@@ -11,6 +11,8 @@ import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 
+const invalidInfinityProposals = require("../../lib/_mock/invalidInfinityProposals.json");
+
 test.beforeEach(async () => {
   await setAllureEpic("5. Proposal functionality");
 });
@@ -40,10 +42,6 @@ test.describe("Proposal checks", () => {
     await expect(govActionDetailsPage.noVoteRadio).toBeVisible();
     await expect(govActionDetailsPage.abstainRadio).toBeVisible();
   });
-
-  // test("5B. Should view Vote button on governance action item on registered as DRep", async () => {
-  //   await expect(govActionDetailsPage.voteBtn).toBeVisible();
-  // });
 
   test("5C. Should show required field in proposal voting on registered as DRep", async () => {
     await expect(govActionDetailsPage.voteBtn).toBeVisible();
@@ -85,34 +83,48 @@ test.describe("Proposal checks", () => {
     // govActionDetailsPage.hashInput.fill(validHash);
     // await expect(govActionDetailsPage.hashInputError).not.toBeVisible();
   });
+});
+
+test.describe("Bad Proposals", () => {
+  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
+
+  let govActionsPage: GovernanceActionsPage;
+
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/proposal/list?**", async (route) =>
+      route.fulfill({
+        body: JSON.stringify(invalidInfinityProposals),
+      })
+    );
+
+    govActionsPage = new GovernanceActionsPage(page);
+    await govActionsPage.goto();
+  });
 
   test("5G. Should show warning in bad governance action proposal to the users to visit the site at their own risk, when external url is opened", async () => {
-    if (await govActionDetailsPage.externalModalBtn.isVisible()) {
-      await govActionDetailsPage.externalModalBtn.click();
+    const govActionDetailsPage = await govActionsPage.viewFirstProposal();
 
-      await expect(govActionDetailsPage.externalLinkModal).toBeVisible();
-      await expect(
-        govActionDetailsPage.currentPage.getByText("Be careful", {
-          exact: false,
-        })
-      ).toBeVisible();
-    } else {
-      expect(true, "Is not a bad or data missing proposal").toBeTruthy();
-    }
+    await govActionDetailsPage.externalModalBtn.click();
+
+    await expect(govActionDetailsPage.externalLinkModal).toBeVisible();
+    await expect(
+      govActionDetailsPage.currentPage.getByText("Be careful", {
+        exact: false,
+      })
+    ).toBeVisible();
+    expect(true, "Is not a bad or data missing proposal").toBeTruthy();
   });
 
   test("5H. Should open a new tab in Bad governance action proposal, when external URL is opened", async ({
     page,
   }) => {
-    if (await govActionDetailsPage.externalModalBtn.isVisible()) {
-      await govActionDetailsPage.externalModalBtn.click();
-      await govActionDetailsPage.continueModalBtn.click();
+    const govActionDetailsPage = await govActionsPage.viewFirstProposal();
 
-      const existingPages = page.context().pages();
-      expect(existingPages).toHaveLength(1);
-    } else {
-      expect(true, "Is not a bad or data missing proposal").toBeTruthy();
-    }
+    await govActionDetailsPage.externalModalBtn.click();
+    await govActionDetailsPage.continueModalBtn.click();
+    const existingPages = page.context().pages();
+    expect(existingPages).toHaveLength(1);
+    expect(true, "Is not a bad or data missing proposal").toBeTruthy();
   });
 });
 

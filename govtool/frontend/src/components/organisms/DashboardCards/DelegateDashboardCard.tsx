@@ -69,7 +69,7 @@ export const DelegateDashboardCard = ({
         title: t("dashboard.cards.delegation.inProgress.title"),
       };
     }
-    // console.log(currentDelegation?.dRepHash, dRepID);
+
     // current delegation
     if (
       currentDelegation &&

@@ -1,30 +1,45 @@
 package org.cardano.govtool.simulations;
 
-import org.cardano.govtool.Scenario;
+import io.gatling.javaapi.core.ChainBuilder;
+import io.gatling.javaapi.core.PopulationBuilder;
 import io.gatling.javaapi.core.Simulation;
 import io.gatling.javaapi.http.HttpProtocolBuilder;
+import org.cardano.govtool.actions.Action;
+import org.cardano.govtool.actions.AdaHolderAction;
+import org.cardano.govtool.actions.AuthenticationAction;
+import org.cardano.govtool.actions.DRepAction;
+import org.cardano.govtool.feeders.DrepListFetcher;
+import org.cardano.govtool.feeders.PageVisits;
 
+import java.util.List;
 import java.util.Optional;
 
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.http;
-import static org.cardano.govtool.actions.AdaHolderAction.drepListDelegateScenario;
 
 
 public class VvaSimulation extends Simulation {
-    private static final String API_URL = Optional.ofNullable(System.getenv("API_URL")).orElse("https://govtool.cardanoapi.io/api");
-    private static final int TARGET_USER_RATE = Integer.parseInt(Optional.ofNullable(System.getenv("TARGET_USER_RATE")).orElse("5"));
-    private static final int PEAK_USERS = Integer.parseInt(Optional.ofNullable(System.getenv("PEAK_USERS")).orElse("10"));
-    private static final int STRESS_DURATION = Integer.parseInt(Optional.ofNullable(System.getenv("STRESS_DURATION")).orElse("10"));
-    private static final int RAMP_DURATION = Integer.parseInt(Optional.ofNullable(System.getenv("RAMP_DURATION")).orElse("10"));
-
+    private static final String API_URL = Optional.ofNullable(System.getenv("API_URL")).orElse("https://govtool.cardanoapi.io/api2");
+    private static final int PEAK_USERS = Integer.parseInt(Optional.ofNullable(System.getenv("PEAK_USERS")).orElse("600"));
+    private static final int STRESS_DURATION = Integer.parseInt(Optional.ofNullable(System.getenv("STRESS_DURATION")).orElse("20"));
+    private static final int RAMP_DURATION = Integer.parseInt(Optional.ofNullable(System.getenv("RAMP_DURATION")).orElse("20"));
+    private List<String>knownDreps;
     @Override
     public void before() {
         System.out.printf("Base API URL: %s%n", API_URL);
-        System.out.printf("Target user rate: %d users/sec%n", TARGET_USER_RATE);
-        System.out.printf("Ramping users over %d seconds%n", RAMP_DURATION);
         System.out.printf("Peak users count: %d%n", PEAK_USERS);
+        System.out.printf("Ramping users over %d seconds%n", RAMP_DURATION);
         System.out.printf("Stress interval %d seconds%n", STRESS_DURATION);
+
+    }
+
+    private PopulationBuilder makeScenario(String name, ChainBuilder chain, double userPercent) {
+        var rampUserRate = ((double) PEAK_USERS) * userPercent / (double) RAMP_DURATION;
+        return scenario(name).exec(AuthenticationAction.connect(knownDreps).pause(2).exec(chain)).injectOpen(
+                nothingFor(5),
+                constantUsersPerSec(rampUserRate).during(RAMP_DURATION),
+                stressPeakUsers(PEAK_USERS).during(STRESS_DURATION)
+        );
     }
 
     private final HttpProtocolBuilder httpProtocol = http
@@ -37,49 +52,23 @@ public class VvaSimulation extends Simulation {
 
     // Load Simulation
     {
-        setUp(
-//                Scenario.userConnectAndLeave.injectOpen(
-//                        nothingFor(5),
-//                        rampUsersPerSec(1).to(TARGET_USER_RATE * 0.2).during(RAMP_DURATION),
-//                        stressPeakUsers(PEAK_USERS).during(STRESS_DURATION)
-//                )
+        knownDreps= DrepListFetcher.fetchDrepIds(API_URL);
 
-                drepListDelegateScenario.injectOpen(
-                        nothingFor(5),
-                        rampUsersPerSec(1).to(TARGET_USER_RATE * 0.3).during(RAMP_DURATION),
-                        stressPeakUsers(PEAK_USERS).during(STRESS_DURATION)
-                )
-//                Scenario.userRegisterAsDRep.injectOpen(
-//                        nothingFor(5),
-//                        rampUsersPerSec(1).to(TARGET_USER_RATE * 0.3).during(RAMP_DURATION),
-//                        stressPeakUsers(PEAK_USERS).during(STRESS_DURATION)
-//                ),
-//                Scenario.userOnlyViewsProposal.injectOpen(
-//                        nothingFor(5),
-//                        rampUsersPerSec(1).to(TARGET_USER_RATE * 0.1).during(RAMP_DURATION),
-//                        stressPeakUsers(PEAK_USERS).during(STRESS_DURATION)
-//                ),
-//                Scenario.adaHolderDelegateToDRep.injectOpen(
-//                        nothingFor(5),
-//                        rampUsersPerSec(1).to(TARGET_USER_RATE * 0.4).during(RAMP_DURATION),
-//                        stressPeakUsers(PEAK_USERS).during(STRESS_DURATION)
-//                ),
-//                // Further DRep scenarios
-//                Scenario.dRepVoteOnProposal.injectOpen(
-//                        nothingFor(5),
-//                        rampUsersPerSec(1).to(TARGET_USER_RATE * 0.3 * 0.4).during(RAMP_DURATION),
-//                        stressPeakUsers(PEAK_USERS).during(STRESS_DURATION)
-//                ),
-//                Scenario.dRepViewVotes.injectOpen(
-//                        nothingFor(5),
-//                        rampUsersPerSec(1).to(TARGET_USER_RATE * 0.3 * 0.5).during(RAMP_DURATION),
-//                        stressPeakUsers(PEAK_USERS).during(STRESS_DURATION)
-//                ),
-//                Scenario.dRepRetires.injectOpen(
-//                        nothingFor(5),
-//                        rampUsersPerSec(1).to(TARGET_USER_RATE * 0.3 * 0.1).during(RAMP_DURATION),
-//                        stressPeakUsers(PEAK_USERS).during(STRESS_DURATION)
-//                )
+        setUp(
+                  makeScenario("User Connects and Leave", exec(), 0.1)
+                , makeScenario("User Registers as Drep",
+                        exec(DRepAction.registerAsDRep), 0.1),
+                 makeScenario("User Views Proposals",
+                        exec(Action.viewProposals), 0.2)
+                , makeScenario("AdaHolder delegates to Drep",
+                        exec(AdaHolderAction.delegateToDRep), 0.1)
+                , makeScenario("Drep votes on Proposal",
+                        exec(DRepAction.vote), 0.3 * 0.4)
+                , makeScenario("Drep view Votes",
+                        exec(Action.viewProposals).pause(2).exec(Action.viewProposals), 0.3 * 0.5)
+                , makeScenario("Drep Retirement",
+                        exec(DRepAction.retireAsDRep), 0.3 * 0.1)
+                , makeScenario("ListProposals", PageVisits.visitProposalPage(), 0.2)
         ).protocols(httpProtocol);
     }
 

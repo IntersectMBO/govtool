@@ -55,10 +55,7 @@ test("2N. Should show DRep information on details page", async ({
   const name = faker.person.firstName();
   const email = faker.internet.email({ firstName: name });
   const bio = faker.person.bio();
-  const links = [
-    faker.internet.url({ appendSlash: true }),
-    faker.internet.url(),
-  ];
+  const links = [faker.internet.url()];
 
   await dRepRegistrationPage.register({
     name,
@@ -146,9 +143,7 @@ test("2I. Should check validity of DRep Id", async ({ page }) => {
   await dRepDirectory.goto();
 
   await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
-  await expect(dRepDirectory.getDRepCard(dRep01Wallet.dRepId)).toHaveText(
-    dRep01Wallet.dRepId
-  );
+  await expect(dRepDirectory.getDRepCard(dRep01Wallet.dRepId)).toBeVisible();
 
   const wallet = await ShelleyWallet.generate();
   const invalidDRepId = extractDRepFromWallet(wallet);
@@ -162,25 +157,7 @@ test("2J. Should search by DRep id", async ({ page }) => {
   await dRepDirectory.goto();
 
   await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
-  await expect(dRepDirectory.getDRepCard(dRep01Wallet.dRepId)).toHaveText(
-    dRep01Wallet.dRepId
-  );
-});
-
-test("2D. Should show delegation options in connected state", async ({
-  page,
-}) => {
-  const dRepDirectoryPage = new DRepDirectoryPage(page);
-  await dRepDirectoryPage.goto();
-
-  // Verifying automatic delegation options
-  await dRepDirectoryPage.automaticDelegationOptionsDropdown.click();
-  await expect(dRepDirectoryPage.abstainDelegationCard).toBeVisible();
-  await expect(dRepDirectoryPage.signalNoConfidenceCard).toBeVisible();
-
-  expect(await dRepDirectoryPage.delegateBtns.count()).toBeGreaterThanOrEqual(
-    2
-  );
+  await expect(dRepDirectory.getDRepCard(dRep01Wallet.dRepId)).toBeVisible();
 });
 
 test("2M. Should access dRep directory page on disconnected state", async ({

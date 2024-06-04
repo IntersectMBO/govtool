@@ -212,6 +212,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
                 <DRepCard
                   dRep={dRep}
                   isConnected={!!isConnected}
+                  isDelegationLoading={isDelegating === dRep.drepId}
                   isMe={isSameDRep(dRep, myDRepId)}
                   onDelegate={() => delegate(dRep.drepId)}
                 />

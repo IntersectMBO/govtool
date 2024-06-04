@@ -50,11 +50,12 @@ export default defineConfig({
     {
       name: "dRep setup",
       testMatch: "**/dRep.setup.ts",
+      dependencies: environments.ci ? ["faucet setup"] : [],
     },
     {
       name: "wallet bootstrap",
       testMatch: "**/wallet.bootstrap.ts",
-      dependencies: !environments.ci ? ["faucet setup"] : [],
+      dependencies: environments.ci ? ["faucet setup"] : [],
     },
     {
       name: "transaction",

@@ -24,12 +24,16 @@ export default class DRepRegistrationPage {
   );
   readonly continueBtn = this.page.getByTestId("continue-button");
   readonly addLinkBtn = this.page.getByTestId("add-link-button");
+  readonly metadataDownloadBtn = this.page.getByTestId(
+    "metadata-download-button"
+  );
 
   // input fields
   readonly nameInput = this.page.getByTestId("name-input");
   readonly emailInput = this.page.getByTestId("email-input");
   readonly bioInput = this.page.getByTestId("bio-input");
   readonly linkInput = this.page.getByTestId("link-1-input");
+  readonly metadataUrlInput = this.page.getByTestId("metadata-url-input");
 
   constructor(private readonly page: Page) {}
 
@@ -64,14 +68,14 @@ export default class DRepRegistrationPage {
     await this.page.getByRole("checkbox").click();
     await this.continueBtn.click();
 
-    this.page.getByRole("button", { name: `${dRepInfo.name}.jsonld` }).click();
+    this.metadataDownloadBtn.click();
     const dRepMetadata = await this.downloadVoteMetadata();
     const url = await metadataBucketService.uploadMetadata(
       dRepMetadata.name,
       dRepMetadata.data
     );
 
-    await this.page.getByPlaceholder("URL").fill(url);
+    await this.metadataUrlInput.fill(url);
     await this.page.getByTestId("register-button").click();
   }
 

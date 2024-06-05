@@ -4,15 +4,14 @@ on:
   push:
     paths:
       - govtool/frontend/**
-      - .github/workflows/test_frontend.yml
-
-defaults:
-  run:
-    working-directory: govtool/frontend
+      - .github/workflows/code_check_frontend.yml
 
 jobs:
-  test:
+  setup_nodejs:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./govtool/frontend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,55 +25,44 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: "govtool/frontend/.nvmrc"
+          registry-url: "https://registry.npmjs.org/"
+          node-version-file: "./govtool/frontend/.nvmrc"
+          scope: "@intersect.mbo"
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 
+  test:
+    needs: setup_nodejs
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
       - name: 🧪 Test
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
         run: |
-          npm install
           npm run test
 
   lint:
+    needs: setup_nodejs
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: govtool/frontend/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "govtool/frontend/.nvmrc"
-
       - name: 👕 Lint
         run: |
-          npm install
           npm run lint
 
   type_check:
+    needs: setup_nodejs
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: govtool/frontend/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "govtool/frontend/.nvmrc"
-
       - name: 🔍 Type Check
         run: |
-          npm install
           npm run tsc

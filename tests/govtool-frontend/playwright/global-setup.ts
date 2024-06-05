@@ -5,8 +5,8 @@ import { loadAmountFromFaucet } from "@services/faucetService";
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 
-const REGISTER_DREP_WALLETS = 9;
-const DREP_WALLETS = 9;
+const REGISTER_DREP_WALLETS_COUNT = 9;
+const DREP_WALLETS_COUNT = 9;
 
 async function generateWallets(num: number) {
   return await Promise.all(
@@ -17,8 +17,10 @@ async function generateWallets(num: number) {
 }
 
 async function globalSetup() {
-  const dRepWallets = await generateWallets(DREP_WALLETS);
-  const registerDRepWallets = await generateWallets(REGISTER_DREP_WALLETS);
+  const dRepWallets = await generateWallets(DREP_WALLETS_COUNT);
+  const registerDRepWallets = await generateWallets(
+    REGISTER_DREP_WALLETS_COUNT
+  );
 
   // faucet setup
   const res = await loadAmountFromFaucet(faucetWallet.address);

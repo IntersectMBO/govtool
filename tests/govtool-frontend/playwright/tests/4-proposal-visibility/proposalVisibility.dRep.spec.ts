@@ -66,7 +66,7 @@ test.describe("Temporary DReps", async () => {
     expect(false, "No vote context displayed").toBe(true);
   });
 
-  test("4I. Should display the recent vote on same sameshot", async ({
+  test("4I. Should display the recent vote on same snapshot", async ({
     context,
   }, testInfo) => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);

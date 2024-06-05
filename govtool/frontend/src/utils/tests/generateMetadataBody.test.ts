@@ -44,8 +44,6 @@ describe("generateMetadataBody", () => {
       standardReference,
     });
 
-    console.log(result);
-
     expect(result).toEqual({
       "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#name":
         "John Doe",

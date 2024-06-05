@@ -136,3 +136,25 @@ test("3F. Should create proper DRep registration request, when registered with d
     page.getByTestId("registration-transaction-error-modal")
   ).toBeVisible();
 });
+
+test("3O. Should reject invalid dRep registration metadata", async ({
+  page,
+}) => {
+  const dRepRegistrationPage = new DRepRegistrationPage(page);
+  await dRepRegistrationPage.goto();
+
+  const dRepName = "Test_DRep";
+  await dRepRegistrationPage.nameInput.fill(dRepName);
+
+  await dRepRegistrationPage.continueBtn.click();
+  await page.getByRole("checkbox").click();
+  await dRepRegistrationPage.continueBtn.click();
+
+  const invalidMetadataAnchor = "https://www.google.com";
+  await dRepRegistrationPage.metadataUrlInput.fill(invalidMetadataAnchor);
+  await dRepRegistrationPage.registerBtn.click();
+
+  await expect(
+    page.getByTestId("registration-transaction-error-modal")
+  ).toBeVisible();
+});

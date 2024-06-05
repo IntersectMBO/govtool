@@ -74,7 +74,9 @@ test.describe("Validation of dRep Registration Form", () => {
     }
   });
 
-  test("3L_1. Should accept valid dRep metadata anchor", async ({ page }) => {
+  test("3L_1. Should accept valid metadata anchor on create dRep", async ({
+    page,
+  }) => {
     const dRepRegistrationPage = new DRepRegistrationPage(page);
     await dRepRegistrationPage.goto();
 
@@ -91,7 +93,9 @@ test.describe("Validation of dRep Registration Form", () => {
     }
   });
 
-  test("3L_2. Should reject invalid dRep metadata anchor", async ({ page }) => {
+  test("3L_2. Should reject invalid dRep metadata anchor on create dRep", async ({
+    page,
+  }) => {
     const dRepRegistrationPage = new DRepRegistrationPage(page);
     await dRepRegistrationPage.goto();
 

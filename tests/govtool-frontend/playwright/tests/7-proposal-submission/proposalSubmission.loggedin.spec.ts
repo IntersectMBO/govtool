@@ -17,7 +17,7 @@ test.describe("Accept valid data", () => {
     test(`7E_${index + 1} Should accept valid data in ${type.toLowerCase()} proposal form`, async ({
       page,
     }) => {
-      test.slow(); // Brute-force testing with 100 random datas
+      test.slow(); // Brute-force testing with 100 random data
 
       const proposalSubmissionPage = new ProposalSubmissionPage(page);
 
@@ -52,7 +52,7 @@ test.describe("Reject invalid  data", () => {
     test(`7F_${index + 1} Should reject invalid data in ${type.toLowerCase()} Proposal form`, async ({
       page,
     }) => {
-      test.slow(); // Brute-force testing with 100 random datas
+      test.slow(); // Brute-force testing with 100 random data
 
       const proposalSubmissionPage = new ProposalSubmissionPage(page);
 

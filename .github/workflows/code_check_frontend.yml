@@ -32,13 +32,22 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 
+      - name: Upload working directory as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend
+          path: .
+
   test:
     needs: setup_nodejs
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
     steps:
+      - name: Download working directory artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend
+          path: .
+
       - name: 🧪 Test
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
@@ -48,10 +57,13 @@ jobs:
   lint:
     needs: setup_nodejs
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
     steps:
+      - name: Download working directory artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend
+          path: .
+
       - name: 👕 Lint
         run: |
           npm run lint
@@ -59,10 +71,13 @@ jobs:
   type_check:
     needs: setup_nodejs
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
     steps:
+      - name: Download working directory artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend
+          path: .
+
       - name: 🔍 Type Check
         run: |
           npm run tsc

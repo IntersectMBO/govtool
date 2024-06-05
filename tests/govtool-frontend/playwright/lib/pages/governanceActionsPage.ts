@@ -8,6 +8,7 @@ export default class GovernanceActionsPage {
   readonly filterBtn = this.page.getByTestId("filters-button");
   readonly sortBtn = this.page.getByTestId("sort-button");
   readonly votedTab = this.page.getByTestId("voted-tab");
+  readonly searchInput = this.page.getByTestId("search-input");
 
   constructor(private readonly page: Page) {}
 

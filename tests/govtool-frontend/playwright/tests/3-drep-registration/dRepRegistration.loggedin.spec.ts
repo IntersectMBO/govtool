@@ -34,43 +34,45 @@ test("3D. Verify DRep registration form", async ({ page }) => {
   await expect(dRepRegistrationPage.continueBtn).toBeVisible();
 });
 
-test("3E. Should accept valid data in DRep form", async ({ page }) => {
-  test.slow();
+test.describe("Validation of dRep Registration Form", () => {
+  test("3E.1 Should accept valid data in DRep form", async ({ page }) => {
+    test.slow();
 
-  const dRepRegistrationPage = new DRepRegistrationPage(page);
-  await dRepRegistrationPage.goto();
+    const dRepRegistrationPage = new DRepRegistrationPage(page);
+    await dRepRegistrationPage.goto();
 
-  for (let i = 0; i < 100; i++) {
-    await dRepRegistrationPage.validateForm(
-      faker.internet.displayName(),
-      faker.internet.email(),
-      faker.lorem.paragraph(),
-      faker.internet.url()
-    );
-  }
+    for (let i = 0; i < 100; i++) {
+      await dRepRegistrationPage.validateForm(
+        faker.internet.displayName(),
+        faker.internet.email(),
+        faker.lorem.paragraph(),
+        faker.internet.url()
+      );
+    }
 
-  for (let i = 0; i < 6; i++) {
-    await expect(dRepRegistrationPage.addLinkBtn).toBeVisible();
-    await dRepRegistrationPage.addLinkBtn.click();
-  }
+    for (let i = 0; i < 6; i++) {
+      await expect(dRepRegistrationPage.addLinkBtn).toBeVisible();
+      await dRepRegistrationPage.addLinkBtn.click();
+    }
 
-  await expect(dRepRegistrationPage.addLinkBtn).toBeHidden();
-});
+    await expect(dRepRegistrationPage.addLinkBtn).toBeHidden();
+  });
 
-test("3L. Should reject invalid data in DRep form", async ({ page }) => {
-  test.slow();
+  test("3E.2. Should reject invalid data in DRep form", async ({ page }) => {
+    test.slow();
 
-  const dRepRegistrationPage = new DRepRegistrationPage(page);
-  await dRepRegistrationPage.goto();
+    const dRepRegistrationPage = new DRepRegistrationPage(page);
+    await dRepRegistrationPage.goto();
 
-  for (let i = 0; i < 100; i++) {
-    await dRepRegistrationPage.inValidateForm(
-      mockInvalid.name(),
-      mockInvalid.email(),
-      faker.lorem.paragraph(40),
-      mockInvalid.url()
-    );
-  }
+    for (let i = 0; i < 100; i++) {
+      await dRepRegistrationPage.inValidateForm(
+        mockInvalid.name(),
+        mockInvalid.email(),
+        faker.lorem.paragraph(40),
+        mockInvalid.url()
+      );
+    }
+  });
 });
 
 test("3F. Should create proper DRep registration request, when registered with data", async ({

@@ -119,7 +119,7 @@ export default class DRepDirectoryPage {
     }
   }
   getDRepCard(dRepId: string) {
-    return this.page.getByRole("list").getByTestId(`${dRepId}-copy-id-button`);
+    return this.page.getByTestId(`${dRepId}-drep-card`);
   }
 
   async getAllListedDRepIds() {
@@ -128,6 +128,15 @@ export default class DRepDirectoryPage {
     return await this.page
       .getByRole("list")
       .locator('[data-testid$="-copy-id-button"]')
+      .all();
+  }
+
+  async getAllListedDReps() {
+    await this.page.waitForTimeout(2_000);
+
+    return await this.page
+      .getByRole("list")
+      .locator('[data-testid$="-drep-card"]')
       .all();
   }
 }

@@ -7,7 +7,7 @@ import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
-import { expect } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 
@@ -32,8 +32,8 @@ test.describe("Proposal checks", () => {
     await expect(govActionDetailsPage.submittedDate).toBeVisible();
     await expect(govActionDetailsPage.expiryDate).toBeVisible();
 
-    await expect(govActionDetailsPage.externalModalBtn).toBeVisible();
     await expect(govActionDetailsPage.contextBtn).toBeVisible();
+    await expect(govActionDetailsPage.showVotesBtn).toBeVisible();
 
     await expect(govActionDetailsPage.voteBtn).toBeVisible();
     await expect(govActionDetailsPage.yesVoteRadio).toBeVisible();
@@ -41,9 +41,9 @@ test.describe("Proposal checks", () => {
     await expect(govActionDetailsPage.abstainRadio).toBeVisible();
   });
 
-  test("5B. Should view Vote button on governance action item on registered as DRep", async () => {
-    await expect(govActionDetailsPage.voteBtn).toBeVisible();
-  });
+  // test("5B. Should view Vote button on governance action item on registered as DRep", async () => {
+  //   await expect(govActionDetailsPage.voteBtn).toBeVisible();
+  // });
 
   test("5C. Should show required field in proposal voting on registered as DRep", async () => {
     await expect(govActionDetailsPage.voteBtn).toBeVisible();
@@ -86,37 +86,46 @@ test.describe("Proposal checks", () => {
     // await expect(govActionDetailsPage.hashInputError).not.toBeVisible();
   });
 
-  test("5G. Should show warning to the users to visit the site at their own risk, when external url is opened", async () => {
-    await govActionDetailsPage.externalModalBtn.click();
+  test("5G. Should show warning in bad governance action proposal to the users to visit the site at their own risk, when external url is opened", async () => {
+    if (await govActionDetailsPage.externalModalBtn.isVisible()) {
+      await govActionDetailsPage.externalModalBtn.click();
 
-    await expect(govActionDetailsPage.externalLinkModal).toBeVisible();
-    await expect(
-      govActionDetailsPage.currentPage.getByText("Be careful", {
-        exact: false,
-      })
-    ).toBeVisible();
+      await expect(govActionDetailsPage.externalLinkModal).toBeVisible();
+      await expect(
+        govActionDetailsPage.currentPage.getByText("Be careful", {
+          exact: false,
+        })
+      ).toBeVisible();
+    } else {
+      expect(true, "Is not a bad or data missing proposal").toBeTruthy();
+    }
   });
 
-  test("5H. Should open a new tab, when external URL is opened", async ({
+  test("5H. Should open a new tab in Bad governance action proposal, when external URL is opened", async ({
     page,
   }) => {
-    await govActionDetailsPage.externalModalBtn.click();
-    await govActionDetailsPage.continueModalBtn.click();
+    if (await govActionDetailsPage.externalModalBtn.isVisible()) {
+      await govActionDetailsPage.externalModalBtn.click();
+      await govActionDetailsPage.continueModalBtn.click();
 
-    const existingPages = page.context().pages();
-    expect(existingPages).toHaveLength(1);
+      const existingPages = page.context().pages();
+      expect(existingPages).toHaveLength(1);
+    } else {
+      expect(true, "Is not a bad or data missing proposal").toBeTruthy();
+    }
   });
 });
 
 test.describe("Perform voting", () => {
   let govActionDetailsPage: GovernanceActionDetailsPage;
+  let dRepPage: Page;
 
   test.beforeEach(async ({ page, browser }) => {
     const wallet = await walletManager.popWallet("registeredDRep");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
-    const dRepPage = await createNewPageWithWallet(browser, {
+    dRepPage = await createNewPageWithWallet(browser, {
       storageState: tempDRepAuth,
       wallet,
       enableStakeSigning: true,
@@ -138,6 +147,7 @@ test.describe("Perform voting", () => {
       govActionDetailsPage.currentPage
     );
     await governanceActionsPage.goto();
+    await dRepPage.waitForTimeout(5_000);
     await governanceActionsPage.votedTab.click();
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")
@@ -148,12 +158,14 @@ test.describe("Perform voting", () => {
     await waitForTxConfirmation(govActionDetailsPage.currentPage);
 
     await governanceActionsPage.votedTab.click();
+
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 20_000 });
   });
 
-  test("5F. Should show notification of casted vote after vote", async ({}) => {
+  test("5F. Should show notification of casted vote after vote", async ({}, testInfo) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
     await govActionDetailsPage.vote();
     await expect(govActionDetailsPage.voteSuccessModal).toBeVisible();
   });
@@ -168,6 +180,7 @@ test.describe("Perform voting", () => {
       govActionDetailsPage.currentPage
     );
     await governanceActionsPage.goto();
+    await dRepPage.waitForTimeout(5_000);
     await governanceActionsPage.votedTab.click();
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")

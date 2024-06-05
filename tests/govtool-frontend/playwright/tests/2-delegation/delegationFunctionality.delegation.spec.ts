@@ -29,6 +29,8 @@ test.describe("Delegate to others", () => {
     wallet: adaHolder01Wallet,
   });
 
+  test.describe.configure({ mode: "serial" });
+
   test("2A. Should show delegated DRep Id (on Dashboard, and DRep Directory) after delegation", async ({
     page,
   }, testInfo) => {
@@ -52,6 +54,32 @@ test.describe("Delegate to others", () => {
     // Verify dRepId in dashboard
     await page.goto("/dashboard");
     await expect(page.getByText(dRepId)).toBeVisible();
+  });
+
+  test("2H. Should prompt to change delegation after delegation", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    await expect(
+      page.getByTestId("delegate-to-another-drep-button")
+    ).toBeVisible();
+  });
+
+  test("2L. Should copy delegated DRepId", async ({ page, context }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+
+    const dRepDirectory = new DRepDirectoryPage(page);
+    await dRepDirectory.goto();
+
+    await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
+    await page.getByTestId(`${dRep01Wallet.dRepId}-copy-id-button`).click();
+    await expect(page.getByText("Copied to clipboard")).toBeVisible();
+
+    const copiedTextDRepDirectory = await page.evaluate(() =>
+      navigator.clipboard.readText()
+    );
+    expect(copiedTextDRepDirectory).toEqual(dRep01Wallet.dRepId);
   });
 });
 
@@ -83,7 +111,7 @@ test.describe("Change delegation", () => {
   });
 });
 
-test.describe("Delegate to myself", () => {
+test.describe("Register DRep state", () => {
   let dRepPage: Page;
   let wallet: StaticWallet;
 
@@ -103,6 +131,7 @@ test.describe("Delegate to myself", () => {
   test("2E. Should register as Sole voter", async ({}, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
+    const wallet = await walletManager.popWallet("registeredDRep");
     const dRepId = wallet.dRepId;
 
     await dRepPage.goto("/");
@@ -153,6 +182,35 @@ test.describe("Delegate to myself", () => {
       dRepPage.getByText("You Have Retired as a Direct")
     ).toBeVisible();
   });
+});
+
+test("2G. Should delegate to myself", async ({ page, browser }, testInfo) => {
+  test.setTimeout(testInfo.timeout + environments.txTimeOut);
+
+  const wallet = await walletManager.popWallet("registeredDRep");
+  const dRepId = wallet.dRepId;
+
+  const dRepAuth = await createTempDRepAuth(page, wallet);
+  const dRepPage = await createNewPageWithWallet(browser, {
+    storageState: dRepAuth,
+    wallet,
+    enableStakeSigning: true,
+  });
+
+  const dRepDirectoryPage = new DRepDirectoryPage(dRepPage);
+  await dRepDirectoryPage.goto();
+
+  await dRepDirectoryPage.delegateToDRep(dRepId);
+
+  await expect(
+    dRepPage.getByTestId(`${dRepId}-delegate-button')`)
+  ).not.toBeVisible();
+  await expect(dRepPage.getByTestId(`${dRepId}-copy-id-button`)).toHaveCount(
+    1,
+    {
+      timeout: 20_000,
+    }
+  );
 });
 
 test.describe("Multiple delegations", () => {

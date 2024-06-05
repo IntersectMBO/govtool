@@ -104,7 +104,7 @@ test("4C.2: Should sort Governance Action Type on governance actions page", asyn
   );
 });
 
-test("4D: Should filter and sort Governance Action Type on governance actions page", async ({
+test("4C.3: Should filter and sort Governance Action Type on governance actions page", async ({
   page,
 }) => {
   test.slow();
@@ -113,7 +113,9 @@ test("4D: Should filter and sort Governance Action Type on governance actions pa
   await govActionsPage.goto();
 
   await govActionsPage.filterBtn.click();
-  govActionsPage.filterProposalByNames([filterOptionNames[0]]);
+
+  const choice = Math.floor(Math.random() * filterOptionNames.length);
+  await govActionsPage.filterProposalByNames([filterOptionNames[choice]]);
 
   await govActionsPage.sortBtn.click();
   await govActionsPage.sortAndValidate(

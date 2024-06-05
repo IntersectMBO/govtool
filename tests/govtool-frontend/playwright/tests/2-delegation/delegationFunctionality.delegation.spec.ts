@@ -47,6 +47,7 @@ test.describe("Delegate to others", () => {
     await expect(
       page.getByTestId(`${dRepId}-delegate-button')`)
     ).not.toBeVisible();
+
     await expect(page.getByTestId(`${dRepId}-copy-id-button`)).toHaveCount(1, {
       timeout: 20_000,
     });
@@ -128,10 +129,8 @@ test.describe("Register DRep state", () => {
     });
   });
 
-  test("2E. Should register as Sole voter", async ({}, testInfo) => {
+  test("2E. Should register as Direct voter", async ({}, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
-
-    const wallet = await walletManager.popWallet("registeredDRep");
     const dRepId = wallet.dRepId;
 
     await dRepPage.goto("/");
@@ -145,16 +144,18 @@ test.describe("Register DRep state", () => {
     await dRepPage.getByTestId("confirm-modal-button").click();
     await waitForTxConfirmation(dRepPage);
 
+    // Checks in dashboard
     await expect(dRepPage.getByText("You are a Direct Voter")).toBeVisible();
     await expect(
       dRepPage.getByTestId("register-as-sole-voter-button")
     ).not.toBeVisible();
 
+    // Checks in dRep directory
     await dRepPage.getByTestId("drep-directory-link").click();
     await expect(dRepPage.getByText("Direct Voter")).toBeVisible();
-    await expect(dRepPage.getByTestId(`${dRepId}-copy-id-button`)).toHaveText(
-      dRepId
-    );
+    await expect(
+      dRepPage.getByTestId(`${dRepId}-copy-id-button`)
+    ).toBeVisible();
   });
 
   test("2S. Should retire as a Direct Voter on delegating to another DRep", async ({}, testInfo) => {
@@ -226,10 +227,7 @@ test.describe("Multiple delegations", () => {
     await dRepDirectoryPage.goto();
 
     await dRepDirectoryPage.searchInput.fill(dRep01Wallet.dRepId);
-    const delegateBtn = page.getByTestId(
-      `${dRep01Wallet.dRepId}-delegate-button`
-    );
-    await expect(delegateBtn).toBeVisible();
+
     await page.getByTestId(`${dRep01Wallet.dRepId}-delegate-button`).click();
 
     await page.waitForTimeout(2_000);

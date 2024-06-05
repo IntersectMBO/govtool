@@ -60,39 +60,12 @@ test.describe("Temporary DReps", async () => {
     const govActionDetailsPage = await govActionsPage.viewFirstProposal();
     await govActionDetailsPage.vote(faker.lorem.sentence(200));
 
+    await dRepPage.waitForTimeout(5_000);
+
     await govActionsPage.votedTab.click();
     await govActionsPage.viewFirstVotedProposal();
     expect(false, "No vote context displayed").toBe(true);
   });
-
-  // test("4I. Should display the recent vote on same snapshot", async ({
-  //   context,
-  // }, testInfo) => {
-  //   test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
-
-  //   const govActionsPage = new GovernanceActionsPage(dRepPage);
-  //   await govActionsPage.goto();
-
-  //   const govActionDetailsPage = await govActionsPage.viewFirstProposal();
-  //   const urlList = dRepPage.url().split("/");
-  //   const governanceActionId = urlList[urlList.length - 1];
-  //   await govActionDetailsPage.vote();
-
-  //   await govActionsPage.votedTab.click();
-
-  //   await govActionsPage.searchInput.fill(governanceActionId);
-
-  //   await dRepPage
-  //     .getByTestId(`govaction-${governanceActionId}-change-your-vote`)
-  //     .click();
-  //   const votedActionDetailsPage = new GovernanceActionDetailsPage(dRepPage);
-  //   await votedActionDetailsPage.noVoteRadio.click();
-  //   await votedActionDetailsPage.changeVoteBtn.click();
-
-  //   await govActionsPage.searchInput.fill(governanceActionId);
-
-  //   await expect(dRepPage.getByTestId("my-vote").getByText("No")).toBeVisible();
-  // });
 });
 
 test.describe("Check vote count", () => {

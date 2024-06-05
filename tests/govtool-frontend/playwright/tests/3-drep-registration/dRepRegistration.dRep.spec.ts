@@ -168,7 +168,7 @@ test.describe("Temporary DReps", () => {
     const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);
     await dRepRegistrationPage.goto();
     await dRepRegistrationPage.register({ name: faker.person.firstName() });
-    dRepRegistrationPage.registrationSuccessModal
+    await dRepRegistrationPage.registrationSuccessModal
       .getByTestId("confirm-modal-button")
       .click();
 

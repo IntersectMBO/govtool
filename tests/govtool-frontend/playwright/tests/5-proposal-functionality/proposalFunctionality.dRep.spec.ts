@@ -150,28 +150,27 @@ test.describe("Perform voting", () => {
   test("5E. Should re-vote with new data on a already voted governance action", async ({}, testInfo) => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
-    govActionDetailsPage.vote();
-    await waitForTxConfirmation(govActionDetailsPage.currentPage);
+    await govActionDetailsPage.vote();
 
     const governanceActionsPage = new GovernanceActionsPage(
       govActionDetailsPage.currentPage
     );
-    await governanceActionsPage.goto();
+
     await dRepPage.waitForTimeout(5_000);
+
     await governanceActionsPage.votedTab.click();
+
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")
     ).toBeVisible();
 
     govActionDetailsPage = await governanceActionsPage.viewFirstVotedProposal();
-    govActionDetailsPage.reVote();
-    await waitForTxConfirmation(govActionDetailsPage.currentPage);
-
+    await govActionDetailsPage.reVote();
     await governanceActionsPage.votedTab.click();
 
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No")
-    ).toBeVisible({ timeout: 20_000 });
+    ).toBeVisible();
   });
 
   test("5F. Should show notification of casted vote after vote", async ({}, testInfo) => {
@@ -183,14 +182,14 @@ test.describe("Perform voting", () => {
   test("5I. Should view the vote details,when viewing governance action already voted by the DRep", async ({}, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
-    govActionDetailsPage.vote();
-    await waitForTxConfirmation(govActionDetailsPage.currentPage);
+    await govActionDetailsPage.vote();
 
     const governanceActionsPage = new GovernanceActionsPage(
       govActionDetailsPage.currentPage
     );
-    await governanceActionsPage.goto();
+
     await dRepPage.waitForTimeout(5_000);
+
     await governanceActionsPage.votedTab.click();
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")

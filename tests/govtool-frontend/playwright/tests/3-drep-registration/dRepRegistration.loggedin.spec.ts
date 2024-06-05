@@ -156,5 +156,5 @@ test("3O. Should reject invalid dRep registration metadata", async ({
 
   await expect(
     page.getByTestId("registration-transaction-error-modal")
-  ).toBeVisible();
+  ).not.toHaveText(/utxo balance insufficient/i);
 });

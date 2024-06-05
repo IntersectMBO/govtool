@@ -1,9 +1,14 @@
 import { dRep02Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
+import { setAllureEpic } from "@helpers/allure";
 import { invalid as mockInvalid } from "@mock/index";
 import EditDRepPage from "@pages/editDRepPage";
 import { expect } from "@playwright/test";
+
+test.beforeEach(async () => {
+  await setAllureEpic("3. DRep registration");
+});
 
 test.use({ wallet: dRep02Wallet, storageState: ".auth/dRep02.json" });
 

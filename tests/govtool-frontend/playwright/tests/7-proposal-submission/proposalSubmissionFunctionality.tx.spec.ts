@@ -10,13 +10,15 @@ import { Page, expect } from "@playwright/test";
 import { IProposalForm, ProposalType, StaticWallet } from "@types";
 import walletManager from "lib/walletManager";
 
+test.beforeEach(async () => {
+  await setAllureEpic("7. Proposal submission");
+});
+
 test.describe("Proposal submission check", () => {
   let userPage: Page;
   let wallet: StaticWallet;
 
   test.beforeEach(async ({ browser, page }, testInfo) => {
-    await setAllureEpic("7. Proposal submission");
-
     wallet = await walletManager.popWallet("adaHolder");
 
     const tempUserAuth = await createTempUserAuth(page, wallet);

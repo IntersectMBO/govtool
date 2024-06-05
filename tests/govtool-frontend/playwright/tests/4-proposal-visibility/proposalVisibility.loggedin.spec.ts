@@ -7,6 +7,8 @@ import removeAllSpaces from "@helpers/removeAllSpaces";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
 
+const infoTypeProposal = require("../../lib/_mock/infoTypeProposal.json");
+
 const filterOptionNames = [
   "Protocol Parameter Change",
   "New Committee",
@@ -124,6 +126,44 @@ test("4C.3: Should filter and sort Governance Action Type on governance actions 
     [removeAllSpaces(filterOptionNames[0])]
   );
   await govActionsPage.validateFilters([filterOptionNames[0]]);
+});
+
+test("4L: Should search governance actions", async ({ page }) => {
+  const governanceActionTitle = "TreasuryTitle";
+  const governanceActionPage = new GovernanceActionsPage(page);
+
+  await governanceActionPage.goto();
+
+  await governanceActionPage.searchInput.fill(governanceActionTitle);
+
+  const proposalCards = await governanceActionPage.getAllProposals();
+
+  for (const proposalCard of proposalCards) {
+    expect(
+      (await proposalCard.textContent()).includes(`${governanceActionTitle}`)
+    ).toBeTruthy();
+  }
+});
+
+test("4M: Should show view-all categorized governance actions", async ({
+  page,
+}) => {
+  await page.route("**/proposal/list?**", async (route) =>
+    route.fulfill({
+      body: JSON.stringify(infoTypeProposal),
+    })
+  );
+
+  const governanceActionPage = new GovernanceActionsPage(page);
+  await governanceActionPage.goto();
+
+  await page.getByRole("button", { name: "Show All" }).click();
+
+  const proposalCards = await governanceActionPage.getAllProposals();
+
+  for (const proposalCard of proposalCards) {
+    await expect(proposalCard.getByTestId("InfoAction-type")).toBeVisible();
+  }
 });
 
 test("4H. Should verify none of the displayed governance actions have expired", async ({

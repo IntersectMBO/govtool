@@ -11,7 +11,6 @@ import environments from "lib/constants/environments";
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  globalSetup: environments.ci ? require.resolve("./global-setup.ts") : "",
   testDir: "./tests",
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -45,12 +44,17 @@ export default defineConfig({
       testMatch: "**/auth.setup.ts",
     },
     {
+      name: "faucet setup",
+      testMatch: "**/faucet.setup.ts",
+    },
+    {
       name: "dRep setup",
       testMatch: "**/dRep.setup.ts",
     },
     {
       name: "wallet bootstrap",
       testMatch: "**/wallet.bootstrap.ts",
+      dependencies: !environments.ci ? ["faucet setup"] : [],
     },
     {
       name: "transaction",

@@ -11,6 +11,13 @@ export default class DRepDirectoryPage {
   readonly filterBtn = this.page.getByTestId("filters-button");
   readonly sortBtn = this.page.getByTestId("sort-button");
   readonly showMoreBtn = this.page.getByTestId("show-more-button");
+  readonly abstainInfoButton = this.page.getByTestId(
+    "abstain-from-every-vote-info-button"
+  );
+
+  readonly signalNoConfidenceInfoButton = this.page.getByTestId(
+    "signal-no-confidence-on-every-vote-info-button"
+  );
 
   readonly automaticDelegationOptionsDropdown = this.page.getByRole("button", {
     name: "Automated Voting Options arrow",

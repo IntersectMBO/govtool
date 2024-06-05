@@ -6,12 +6,13 @@ on:
       - govtool/frontend/**
       - .github/workflows/code_check_frontend.yml
 
+defaults:
+  run:
+    working-directory: govtool/frontend
+
 jobs:
-  setup_nodejs:
+  test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./govtool/frontend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,22 +33,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 
-      - name: Upload working directory as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend
-          path: .
-
-  test:
-    needs: setup_nodejs
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download working directory artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend
-          path: .
-
       - name: 🧪 Test
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
@@ -55,28 +40,52 @@ jobs:
           npm run test
 
   lint:
-    needs: setup_nodejs
     runs-on: ubuntu-latest
     steps:
-      - name: Download working directory artifact
-        uses: actions/download-artifact@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
         with:
-          name: frontend
-          path: .
+          path: govtool/frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          registry-url: "https://registry.npmjs.org/"
+          node-version-file: "./govtool/frontend/.nvmrc"
+          scope: "@intersect.mbo"
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 
       - name: 👕 Lint
         run: |
           npm run lint
 
   type_check:
-    needs: setup_nodejs
     runs-on: ubuntu-latest
     steps:
-      - name: Download working directory artifact
-        uses: actions/download-artifact@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
         with:
-          name: frontend
-          path: .
+          path: govtool/frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          registry-url: "https://registry.npmjs.org/"
+          node-version-file: "./govtool/frontend/.nvmrc"
+          scope: "@intersect.mbo"
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 
       - name: 🔍 Type Check
         run: |

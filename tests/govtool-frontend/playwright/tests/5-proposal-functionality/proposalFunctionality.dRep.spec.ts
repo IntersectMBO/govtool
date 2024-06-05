@@ -112,7 +112,6 @@ test.describe("Bad Proposals", () => {
         exact: false,
       })
     ).toBeVisible();
-    expect(true, "Is not a bad or data missing proposal").toBeTruthy();
   });
 
   test("5H. Should open a new tab in Bad governance action proposal, when external URL is opened", async ({
@@ -124,7 +123,6 @@ test.describe("Bad Proposals", () => {
     await govActionDetailsPage.continueModalBtn.click();
     const existingPages = page.context().pages();
     expect(existingPages).toHaveLength(1);
-    expect(true, "Is not a bad or data missing proposal").toBeTruthy();
   });
 });
 

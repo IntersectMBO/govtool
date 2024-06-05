@@ -28,7 +28,7 @@ test.describe("Proposal submission check", () => {
   });
 
   Object.values(ProposalType).map((type: ProposalType, index) => {
-    test(`7G.${index + 1}: Should open wallet connection popup, when registered with proper ${type.toLowerCase()} data`, async ({
+    test(`7G_${index + 1}: Should open wallet connection popup, when registered with proper ${type.toLowerCase()} data`, async ({
       page,
       browser,
     }, testInfo) => {

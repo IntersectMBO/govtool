@@ -1,4 +1,3 @@
-import environments from "@constants/environments";
 import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
@@ -15,7 +14,7 @@ test.beforeEach(async () => {
 
 test.describe("Accept valid data", () => {
   Object.values(ProposalType).map((type: ProposalType, index) => {
-    test(`7E.${index + 1} Should accept valid data in ${type.toLowerCase()} proposal form`, async ({
+    test(`7E_${index + 1} Should accept valid data in ${type.toLowerCase()} proposal form`, async ({
       page,
     }) => {
       test.slow(); // Brute-force testing with 100 random datas
@@ -50,7 +49,7 @@ test.describe("Accept valid data", () => {
 
 test.describe("Reject invalid  data", () => {
   Object.values(ProposalType).map((type: ProposalType, index) => {
-    test(`7F.${index + 1} Should reject invalid data in ${type.toLowerCase()} Proposal form`, async ({
+    test(`7F_${index + 1} Should reject invalid data in ${type.toLowerCase()} Proposal form`, async ({
       page,
     }) => {
       test.slow(); // Brute-force testing with 100 random datas
@@ -73,7 +72,7 @@ test.describe("Reject invalid  data", () => {
 
 test.describe("Review fillup form", () => {
   Object.values(ProposalType).map((type: ProposalType, index) => {
-    test(`7I.${index + 1} Should valid review submission in ${type.toLowerCase()} Proposal form`, async ({
+    test(`7I_${index + 1} Should valid review submission in ${type.toLowerCase()} Proposal form`, async ({
       page,
     }) => {
       const proposalSubmissionPage = new ProposalSubmissionPage(page);

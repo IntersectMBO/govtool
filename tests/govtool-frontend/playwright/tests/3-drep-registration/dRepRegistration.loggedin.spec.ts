@@ -74,7 +74,7 @@ test.describe("Validation of dRep Registration Form", () => {
     }
   });
 
-  test("3L_1. Should accept valid metadata anchor", async ({ page }) => {
+  test("3L_1. Should accept valid dRep metadata anchor", async ({ page }) => {
     const dRepRegistrationPage = new DRepRegistrationPage(page);
     await dRepRegistrationPage.goto();
 
@@ -91,7 +91,7 @@ test.describe("Validation of dRep Registration Form", () => {
     }
   });
 
-  test("3L_2. Should reject ivalid metadata anchor", async ({ page }) => {
+  test("3L_2. Should reject invalid dRep metadata anchor", async ({ page }) => {
     const dRepRegistrationPage = new DRepRegistrationPage(page);
     await dRepRegistrationPage.goto();
 
@@ -110,9 +110,9 @@ test.describe("Validation of dRep Registration Form", () => {
     const sentenceWithoutSpace = faker.lorem
       .sentence(128)
       .replace(/[\s.]/g, "");
-
     const metadataAnchorGreaterThan128Bytes =
       faker.internet.url({ appendSlash: true }) + sentenceWithoutSpace;
+
     await dRepRegistrationPage.metadataUrlInput.fill(
       metadataAnchorGreaterThan128Bytes
     );

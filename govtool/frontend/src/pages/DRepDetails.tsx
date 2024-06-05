@@ -275,7 +275,9 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
             <Button
               data-testid="delegate-button"
               disabled={!!pendingTransaction.delegate}
-              isLoading={isDelegating}
+              isLoading={
+                isDelegating === dRep.view || isDelegating === dRep.drepId
+              }
               onClick={() => delegate(dRep.view)}
               size="extraLarge"
               sx={{ width: "100%" }}

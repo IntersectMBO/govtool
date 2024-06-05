@@ -18,7 +18,7 @@ test.describe("Accept valid data", () => {
     test(`7E.${index + 1} Should accept valid data in ${type.toLowerCase()} proposal form`, async ({
       page,
     }) => {
-      test.slow();
+      test.slow(); // Brute-force testing with 100 random datas
 
       const proposalSubmissionPage = new ProposalSubmissionPage(page);
 
@@ -53,7 +53,7 @@ test.describe("Reject invalid  data", () => {
     test(`7F.${index + 1} Should reject invalid data in ${type.toLowerCase()} Proposal form`, async ({
       page,
     }) => {
-      test.slow();
+      test.slow(); // Brute-force testing with 100 random datas
 
       const proposalSubmissionPage = new ProposalSubmissionPage(page);
 
@@ -66,6 +66,45 @@ test.describe("Reject invalid  data", () => {
         proposalSubmissionPage.generateInValidProposalFormFields(type);
       for (let i = 0; i < 100; i++) {
         await proposalSubmissionPage.inValidateForm(formFields);
+      }
+    });
+  });
+});
+
+test.describe("Review fillup form", () => {
+  Object.values(ProposalType).map((type: ProposalType, index) => {
+    test(`7I.${index + 1} Should valid review submission in ${type.toLowerCase()} Proposal form`, async ({
+      page,
+    }) => {
+      const proposalSubmissionPage = new ProposalSubmissionPage(page);
+
+      await proposalSubmissionPage.goto();
+
+      await page.getByTestId(`${type}-radio`).click();
+      await proposalSubmissionPage.continueBtn.click();
+
+      const randomBytes = new Uint8Array(10);
+      const bech32Address = bech32.encode("addr_test", randomBytes);
+
+      const formFields: IProposalForm =
+        proposalSubmissionPage.generateValidProposalFormFields(
+          type,
+          bech32Address
+        );
+      await proposalSubmissionPage.validateForm(formFields);
+      proposalSubmissionPage.continueBtn.click();
+
+      await expect(page.getByText(formFields.title)).toBeVisible();
+      await expect(page.getByText(formFields.abstract)).toBeVisible();
+      await expect(page.getByText(formFields.motivation)).toBeVisible();
+      await expect(page.getByText(formFields.rationale)).toBeVisible();
+      await expect(
+        page.getByText(formFields.extraContentLinks[0])
+      ).toBeVisible();
+
+      if (type === ProposalType.treasury) {
+        await expect(page.getByText(formFields.receivingAddress)).toBeVisible();
+        await expect(page.getByText(formFields.amount)).toBeVisible();
       }
     });
   });

@@ -44,6 +44,8 @@ describe("generateMetadataBody", () => {
       standardReference,
     });
 
+    console.log(result);
+
     expect(result).toEqual({
       "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#name":
         "John Doe",
@@ -52,16 +54,16 @@ describe("generateMetadataBody", () => {
         [
           {
             "@type": "Other",
-            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#reference-label":
+            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#reference-label":
               "Label",
-            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#reference-uri":
+            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#reference-uri":
               "https://example.com/link1",
           },
           {
             "@type": "Other",
-            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#reference-label":
+            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#reference-label":
               "Label",
-            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#reference-uri":
+            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#reference-uri":
               "https://example.com/link2",
           },
         ],

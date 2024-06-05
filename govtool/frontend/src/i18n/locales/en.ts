@@ -372,6 +372,10 @@ export const en = {
         emailPlaceholder: "john.smith@email.com",
       },
     },
+    proposalDiscussion: {
+      title: "Proposal Discussion",
+      proposeAGovernanceAction: "Propose a Governance Action",
+    },
     govActions: {
       about: "About",
       abstract: "Abstract:",

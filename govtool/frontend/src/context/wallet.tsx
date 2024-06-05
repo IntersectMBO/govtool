@@ -109,6 +109,8 @@ type BuildSignSubmitConwayCertTxArgs = {
 interface CardanoContextType {
   address?: string;
   disconnectWallet: () => Promise<void>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getChangeAddress: (enabledApi: CardanoApiWallet) => Promise<any>;
   enable: (walletName: string) => Promise<EnableResponse>;
   isEnableLoading: string | null;
   error?: string;
@@ -202,6 +204,9 @@ const CardanoProvider = (props: Props) => {
         Buffer.from(raw, "hex"),
       ).to_bech32();
       setWalletState((prev) => ({ ...prev, changeAddress }));
+
+      // return changeAddress for the usage of the pillars;
+      return changeAddress;
     } catch (err) {
       Sentry.captureException(err);
       console.error(err);
@@ -849,6 +854,7 @@ const CardanoProvider = (props: Props) => {
       buildVote,
       buildVoteDelegationCert,
       disconnectWallet,
+      getChangeAddress,
       dRepID,
       dRepIDBech32,
       enable,
@@ -875,6 +881,7 @@ const CardanoProvider = (props: Props) => {
       buildVote,
       buildVoteDelegationCert,
       disconnectWallet,
+      getChangeAddress,
       dRepID,
       dRepIDBech32,
       enable,

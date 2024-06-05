@@ -60,6 +60,7 @@ changes.
 - Add type check & lint to github actions [Issue 512](https://github.com/IntersectMBO/govtool/issues/512)
 - Add eslint & prettier to frontend package [Issue 166](https://github.com/IntersectMBO/govtool/issues/166)
 - Add DRep list pagination [Issue 740](https://github.com/IntersectMBO/govtool/issues/740)
+- Add PDF pillar [Issue 1090](https://github.com/IntersectMBO/govtool/issues/1090)
 
 ### Fixed
 

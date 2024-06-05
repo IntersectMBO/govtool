@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - govtool/frontend/**
-      - .github/workflows/test_frontend.yml
+      - .github/workflows/code_check_frontend.yml
 
 defaults:
   run:
@@ -26,13 +26,17 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: "govtool/frontend/.nvmrc"
+          registry-url: "https://registry.npmjs.org/"
+          node-version-file: "./govtool/frontend/.nvmrc"
+          scope: "@intersect.mbo"
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 
       - name: 🧪 Test
         env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
+          NODE_OPTIONS: "--max_old_space_size=8192"
         run: |
-          npm install
           npm run test
 
   lint:
@@ -50,11 +54,15 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: "govtool/frontend/.nvmrc"
+          registry-url: "https://registry.npmjs.org/"
+          node-version-file: "./govtool/frontend/.nvmrc"
+          scope: "@intersect.mbo"
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 
       - name: 👕 Lint
         run: |
-          npm install
           npm run lint
 
   type_check:
@@ -72,9 +80,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: "govtool/frontend/.nvmrc"
+          registry-url: "https://registry.npmjs.org/"
+          node-version-file: "./govtool/frontend/.nvmrc"
+          scope: "@intersect.mbo"
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 
       - name: 🔍 Type Check
         run: |
-          npm install
           npm run tsc

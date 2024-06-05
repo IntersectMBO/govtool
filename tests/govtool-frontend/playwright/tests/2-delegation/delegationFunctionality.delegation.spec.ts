@@ -313,7 +313,7 @@ test.describe("Delegated ADA visibility", () => {
       adaHolder05Wallet.address
     );
     await expect(
-      page.getByText(`You have delegated ₳${adaHolderVotingPower}`)
+      page.getByText(`You have delegated ₳ ${adaHolderVotingPower}`)
     ).toBeVisible();
 
     await page.goto("/");

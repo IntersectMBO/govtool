@@ -97,3 +97,23 @@ test.describe("Validation of edit dRep Form", () => {
     await expect(page.getByTestId("invalid-url-error")).toBeVisible();
   });
 });
+
+test("3P. Should reject invalid edit dRep metadata", async ({ page }) => {
+  const editDRepPage = new EditDRepPage(page);
+  await editDRepPage.goto();
+
+  const dRepName = "Test_DRep";
+  await editDRepPage.nameInput.fill(dRepName);
+
+  await editDRepPage.continueBtn.click();
+  await page.getByRole("checkbox").click();
+  await editDRepPage.continueBtn.click();
+
+  const invalidMetadataAnchor = "https://www.google.com";
+  await editDRepPage.metadataUrlInput.fill(invalidMetadataAnchor);
+  await editDRepPage.continueBtn.click();
+
+  await expect(
+    page.getByTestId("registration-transaction-error-modal")
+  ).toBeVisible();
+});

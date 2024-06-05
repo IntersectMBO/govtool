@@ -5,6 +5,7 @@ import {
   adaHolder03Wallet,
   adaHolder04Wallet,
   adaHolder05Wallet,
+  adaHolder06Wallet,
   dRep01Wallet,
   dRep02Wallet,
 } from "@constants/staticWallets";
@@ -295,8 +296,8 @@ test.describe("No confidence delegation", () => {
 
 test.describe("Delegated ADA visibility", () => {
   test.use({
-    storageState: ".auth/adaHolder05.json",
-    wallet: adaHolder05Wallet,
+    storageState: ".auth/adaHolder06.json",
+    wallet: adaHolder06Wallet,
   });
 
   test("2W. Should show my delegated ADA to the DRep", async ({

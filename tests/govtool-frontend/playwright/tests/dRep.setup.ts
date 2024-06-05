@@ -7,8 +7,8 @@ import { expect, test as setup } from "@playwright/test";
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 
-const REGISTER_DREP_WALLETS = 9;
-const DREP_WALLETS = 9;
+const REGISTER_DREP_WALLETS_COUNT = 9;
+const DREP_WALLETS_COUNT = 9;
 
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
@@ -45,8 +45,10 @@ setup("Register DRep of static wallets", async () => {
 setup("Setup temporary DRep wallets", async () => {
   setup.setTimeout(3 * environments.txTimeOut);
 
-  const dRepWallets = await generateWallets(DREP_WALLETS);
-  const registerDRepWallets = await generateWallets(REGISTER_DREP_WALLETS);
+  const dRepWallets = await generateWallets(DREP_WALLETS_COUNT);
+  const registerDRepWallets = await generateWallets(
+    REGISTER_DREP_WALLETS_COUNT
+  );
 
   // initialize wallets
   const initializeRes = await kuberService.initializeWallets([

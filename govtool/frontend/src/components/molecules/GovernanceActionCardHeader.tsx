@@ -36,7 +36,7 @@ export const GovernanceActionCardHeader = ({
           WebkitBoxOrient: "vertical",
           WebkitLineClamp: 2,
           wordBreak: "break-word",
-          ...(isDataMissing && { color: "#9E2323" }),
+          ...(isDataMissing && { color: "errorRed" }),
         }}
       >
         {(isDataMissing &&

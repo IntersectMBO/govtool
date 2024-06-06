@@ -5,12 +5,13 @@ import {
   GovernanceActionCardElement,
   GovernanceActionDetailsCardLinks,
   DataMissingInfoBox,
-  GovernanceActionDetailsCardHeader,
+  DataMissingHeader,
   GovernanceActionsDatesBox,
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { getProposalTypeNoEmptySpaces, testIdFromLabel } from "@utils";
 import { MetadataValidationStatus } from "@models";
+import { useLocation } from "react-router-dom";
 
 type GovernanceActionDetailsCardDataProps = {
   about?: string;
@@ -59,6 +60,12 @@ export const GovernanceActionDetailsCardData = ({
   const isModifiedPadding =
     (isDashboard && screenWidth < 1168) ?? screenWidth < 900;
 
+  const { pathname, hash } = useLocation();
+
+  const govActionLinkToShare = `${window.location.protocol}//${
+    window.location.hostname
+  }${window.location.port ? `:${window.location.port}` : ""}${pathname}${hash}`;
+
   return (
     <Box
       sx={{
@@ -68,9 +75,10 @@ export const GovernanceActionDetailsCardData = ({
         overflow: "hidden",
       }}
     >
-      <GovernanceActionDetailsCardHeader
-        title={title}
+      <DataMissingHeader
         isDataMissing={isDataMissing}
+        shareLink={govActionLinkToShare}
+        title={title}
       />
       <DataMissingInfoBox
         isDataMissing={isDataMissing}

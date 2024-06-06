@@ -6,7 +6,8 @@ import * as blake from 'blakejs';
 import { ValidateMetadataDTO } from '@dto';
 import { MetadataValidationStatus } from '@enums';
 import { canonizeJSON, validateMetadataStandard, parseMetadata } from '@utils';
-import { ValidateMetadataResult } from '@types';
+import { MetadataStandard, ValidateMetadataResult } from '@types';
+
 
 @Injectable()
 export class AppService {
@@ -15,14 +16,16 @@ export class AppService {
   async validateMetadata({
     hash,
     url,
-    standard,
+    standard = MetadataStandard.CIP108,
   }: ValidateMetadataDTO): Promise<ValidateMetadataResult> {
     let status: MetadataValidationStatus;
     let metadata: any;
     try {
+      console.log(standard);
       const { data } = await firstValueFrom(
         this.httpService.get(url).pipe(
           catchError(() => {
+            console.log('url',url);
             throw MetadataValidationStatus.URL_NOT_FOUND;
           }),
         ),

@@ -34,6 +34,12 @@ export interface DRepData {
   votingPower: number;
   status: DRepStatus;
   type: "DRep" | "SoleVoter";
+  bio: string | null;
+  dRepName: string | null;
+  email: string | null;
+  references: string[];
+  metadataStatus: MetadataValidationStatus | null;
+  metadataValid: boolean;
 }
 export type InfinityDRepData = {
   elements: DRepData[];

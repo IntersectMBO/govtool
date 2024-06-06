@@ -34,6 +34,7 @@ import {
   getItemFromLocalStorage,
   WALLET_LS_KEY,
   removeItemFromLocalStorage,
+  isDevEnv,
 } from "@utils";
 
 import { PDFWrapper } from "./components/organisms/PDFWrapper";
@@ -80,6 +81,7 @@ export default () => {
   }, [checkTheWalletIsActive]);
 
   useEffect(() => {
+    if (!isDevEnv) return;
     if (
       window.location.pathname.includes(PDF_PATHS.proposalDiscussion) &&
       !window.location.pathname.includes(PATHS.proposalPillar.replace("/*", ""))
@@ -99,7 +101,7 @@ export default () => {
       <Routes>
         <Route path={PATHS.home} element={<Home />} />
         <Route path={PATHS.governanceActions} element={<GovernanceActions />} />
-        {!isEnabled && (
+        {isDevEnv && !isEnabled && (
           <Route path={PATHS.proposalPillar} element={<PDFWrapper />} />
         )}
         <Route
@@ -112,10 +114,12 @@ export default () => {
         />
         <Route element={<Dashboard />}>
           <Route path={PATHS.dashboard} element={<DashboardCards />} />
-          <Route
-            path={PATHS.connectedProposalPillar}
-            element={<PDFWrapper />}
-          />
+          {isDevEnv && (
+            <Route
+              path={PATHS.connectedProposalPillar}
+              element={<PDFWrapper />}
+            />
+          )}
           <Route
             path={PATHS.dashboardGovernanceActions}
             element={<DashboardGovernanceActions />}

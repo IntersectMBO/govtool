@@ -26,15 +26,12 @@ const commonArgs = {
   expiryEpochNo: 420,
   index: 2,
   inProgress: false,
-  metadataStatus: {
-    raw: { status: undefined, valid: true },
-    status: undefined,
-    valid: false,
-  },
   onClick: jest.fn(),
   title: "Example title",
   txHash: "sad78afdsf7jasd98d",
   type: "exampleType",
+  metadataValid: true,
+  metadataStatus: null,
 };
 
 export const GovernanceActionCardComponent: Story = {
@@ -79,32 +76,23 @@ export const GovernanceActionCardIsLoading: Story = {
 export const GovernanceActionCardDataMissing: Story = {
   args: {
     ...commonArgs,
-    metadataStatus: {
-      raw: { status: MetadataValidationStatus.URL_NOT_FOUND, valid: false },
-      status: MetadataValidationStatus.URL_NOT_FOUND,
-      valid: false,
-    },
+    metadataStatus: MetadataValidationStatus.URL_NOT_FOUND,
+    metadataValid: false,
   },
 };
 
 export const GovernanceActionCardIncorectFormat: Story = {
   args: {
     ...commonArgs,
-    metadataStatus: {
-      raw: { status: MetadataValidationStatus.INVALID_JSONLD, valid: false },
-      status: MetadataValidationStatus.INVALID_JSONLD,
-      valid: false,
-    },
+    metadataStatus: MetadataValidationStatus.INVALID_JSONLD,
+    metadataValid: false,
   },
 };
 
 export const GovernanceActionCardNotVerifiable: Story = {
   args: {
     ...commonArgs,
-    metadataStatus: {
-      raw: { status: MetadataValidationStatus.INVALID_HASH, valid: false },
-      status: MetadataValidationStatus.INVALID_HASH,
-      valid: false,
-    },
+    metadataStatus: MetadataValidationStatus.INVALID_HASH,
+    metadataValid: false,
   },
 };

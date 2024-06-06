@@ -86,7 +86,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
       >
         <GovernanceActionCardHeader
           title={title}
-          isDataMissing={metadataValid ? false : metadataStatus}
+          isDataMissing={metadataStatus}
         />
         <GovernanceActionCardElement
           label={t("govActions.abstract")}

@@ -8,7 +8,7 @@ import { getMetadataDataMissingStatusTranslation } from "@/utils";
 
 type GovernanceActionDetailsCardHeaderProps = {
   title?: string;
-  isDataMissing: boolean | MetadataValidationStatus;
+  isDataMissing: MetadataValidationStatus | null;
 };
 
 export const GovernanceActionDetailsCardHeader = ({
@@ -48,7 +48,7 @@ export const GovernanceActionDetailsCardHeader = ({
           }}
           variant="title2"
         >
-          {(isDataMissing !== false &&
+          {(isDataMissing &&
             getMetadataDataMissingStatusTranslation(
               isDataMissing as MetadataValidationStatus,
             )) ||

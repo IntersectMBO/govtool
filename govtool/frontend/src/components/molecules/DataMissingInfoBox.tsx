@@ -10,7 +10,7 @@ export const DataMissingInfoBox = ({
   isInProgress,
   isSubmitted,
 }: {
-  isDataMissing: boolean | MetadataValidationStatus;
+  isDataMissing: MetadataValidationStatus | null;
   isInProgress?: boolean;
   isSubmitted?: boolean;
 }) => {

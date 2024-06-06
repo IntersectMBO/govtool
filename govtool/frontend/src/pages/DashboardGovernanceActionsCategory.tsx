@@ -162,9 +162,6 @@ export const DashboardGovernanceActionsCategory = () => {
                           state: {
                             ...item,
                             openedFromCategoryPage: true,
-                            isDataMissing: item.metadataValid
-                              ? false
-                              : item.metadataStatus,
                           },
                         },
                       );

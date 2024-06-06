@@ -88,9 +88,6 @@ export const GovernanceActionsToVote = ({
                             {
                               state: {
                                 ...action,
-                                isDataMissing: action.metadataValid
-                                  ? false
-                                  : action.metadataStatus,
                               },
                             },
                           );

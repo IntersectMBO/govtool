@@ -7,8 +7,8 @@ import { expect, test as setup } from "@playwright/test";
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 
-const REGISTER_DREP_WALLETS_COUNT = 8;
-const DREP_WALLETS_COUNT = 7;
+const REGISTER_DREP_WALLETS_COUNT = 5;
+const DREP_WALLETS_COUNT = 9;
 
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");

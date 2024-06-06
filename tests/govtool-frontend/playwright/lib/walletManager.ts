@@ -5,11 +5,7 @@ const path = require("path");
 
 const baseFilePath = path.resolve(__dirname, "./_mock");
 
-export type Purpose =
-  | "registerDRep"
-  | "registeredDRep"
-  | "proposalSubmission"
-  | "adaHolder";
+export type Purpose = "registerDRep" | "registeredDRep" | "proposalSubmission";
 
 /**
  * WalletManager class is responsible for managing a list of temporary wallets.

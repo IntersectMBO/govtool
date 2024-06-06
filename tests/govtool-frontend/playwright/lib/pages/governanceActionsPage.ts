@@ -18,8 +18,7 @@ export default class GovernanceActionsPage {
 
   async goto() {
     await this.page.goto(`${environments.frontendUrl}/governance_actions`);
-    await expect(this.page.getByTestId("alert-success")).not.toBeVisible();
-    // await this.page.waitForTimeout(2_000); // Wallet popup affects filter in test
+    await this.page.waitForTimeout(2_000); // Waits to ensure the alert-success popup does not interfere
   }
 
   async viewProposal(

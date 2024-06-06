@@ -1,4 +1,6 @@
-export const removeDuplicatedProposals = (proposals: ActionType[]) => {
+import { ProposalData } from "@models";
+
+export const removeDuplicatedProposals = (proposals: ProposalData[]) => {
   if (!proposals) return [];
   const uniqueGovActionIds = new Set();
   return proposals.filter((item) => {

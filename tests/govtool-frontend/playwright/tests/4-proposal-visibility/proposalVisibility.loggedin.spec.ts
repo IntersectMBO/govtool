@@ -114,6 +114,8 @@ test("4C_3: Should filter and sort Governance Action Type on governance actions 
   const govActionsPage = new GovernanceActionsPage(page);
   await govActionsPage.goto();
 
+  await page.waitForTimeout(2_000); // Waits to ensure the alert-success popup does not interfere with the filter operation
+
   await govActionsPage.filterBtn.click();
 
   const choice = Math.floor(Math.random() * filterOptionNames.length);

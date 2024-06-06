@@ -18,6 +18,8 @@ export default class GovernanceActionsPage {
 
   async goto() {
     await this.page.goto(`${environments.frontendUrl}/governance_actions`);
+    await expect(this.page.getByTestId("alert-success")).not.toBeVisible();
+    // await this.page.waitForTimeout(2_000); // Wallet popup affects filter in test
   }
 
   async viewProposal(
@@ -69,7 +71,7 @@ export default class GovernanceActionsPage {
   }
 
   async getAllProposals() {
-    await this.page.waitForLoadState("networkidle");
+    await this.page.waitForTimeout(4_000); // waits for proposals to render
     return this.page.locator('[data-testid$="-card"]').all();
   }
 
@@ -129,7 +131,7 @@ export default class GovernanceActionsPage {
       }
     });
 
-    await this.page.waitForTimeout(2_000); // wait for proposals to render
+    await this.page.waitForTimeout(4_000); // wait for proposals to render
 
     // Frontend validation
     for (let dIdx = 0; dIdx <= proposalsByType.length - 1; dIdx++) {
@@ -155,12 +157,11 @@ export default class GovernanceActionsPage {
     proposalCard: Locator,
     filters: string[]
   ): Promise<boolean> {
-    for (const filter of filters) {
-      try {
-        await expect(proposalCard.getByText(filter)).toBeVisible();
-        return true;
-      } catch (e) {}
-      return false;
-    }
+    const govActionTypeTextContent = await proposalCard
+      .locator('[data-testid$="-type"]')
+      .textContent();
+    const govActionType = govActionTypeTextContent.split(":")[1];
+
+    return filters.includes(govActionType);
   }
 }

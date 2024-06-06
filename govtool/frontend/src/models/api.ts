@@ -62,40 +62,28 @@ type ProposalVote = {
   vote: Vote;
 };
 
-type ProposalData = {
-  id: string;
-  type: string;
-  details?: ActionDetailsType;
-  expiryDate: string;
-  expiryEpochNo: number;
+export type ProposalData = {
+  abstainVotes: number;
   createdDate: string;
   createdEpochNo: number;
-  url: string;
-  metadataHash: string;
-  metadataStatus: {
-    raw: {
-      valid: boolean;
-      status?: MetadataValidationStatus;
-      metadata?: {
-        abstract?: string;
-        motivation?: string;
-        rationale?: string;
-        references?: string[];
-        title?: string;
-      };
-    };
-    status?: MetadataValidationStatus;
-    valid: boolean;
-  };
-  yesVotes: number;
-  noVotes: number;
-  abstainVotes: number;
-  txHash: string;
+  expiryDate: string;
+  expiryEpochNo: number;
+  id: string;
   index: number;
-  title?: string;
-  about?: string;
+  metadataValid: boolean;
+  noVotes: number;
+  txHash: string;
+  type: string;
+  yesVotes: number;
+  abstract?: string;
+  details?: ActionDetailsType;
+  metadataHash?: string;
+  metadataStatus?: MetadataValidationStatus;
   motivation?: string;
   rationale?: string;
+  references?: string[];
+  title?: string;
+  url?: string;
 };
 export interface VotedProposal {
   vote: ProposalVote;

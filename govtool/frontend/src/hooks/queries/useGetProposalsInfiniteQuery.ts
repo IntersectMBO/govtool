@@ -2,6 +2,7 @@ import { useInfiniteQuery } from "react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
+import { ProposalData } from "@models";
 import { getProposals, GetProposalsArguments } from "@services";
 
 export const useGetProposalsInfiniteQuery = ({
@@ -56,7 +57,7 @@ export const useGetProposalsInfiniteQuery = ({
 
   const proposals = data?.pages.flatMap(
     (page) => page.elements,
-  ) as ActionType[];
+  ) as ProposalData[];
 
   return {
     proposalsfetchNextPage: fetchNextPage,

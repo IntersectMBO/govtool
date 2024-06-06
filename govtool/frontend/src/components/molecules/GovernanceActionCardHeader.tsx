@@ -8,7 +8,7 @@ import { MetadataValidationStatus } from "@/models";
 
 type GovernanceActionCardHeaderProps = {
   title?: string;
-  isDataMissing: MetadataValidationStatus | boolean;
+  isDataMissing?: MetadataValidationStatus | boolean;
 };
 
 export const GovernanceActionCardHeader = ({

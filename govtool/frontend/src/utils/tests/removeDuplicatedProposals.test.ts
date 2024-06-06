@@ -22,7 +22,11 @@ const uniqueProposals = [
     abstainVotes: 81528377728,
     title: "Proposal 1322 Title",
     about: "This is about Proposal 1322",
-    isDataMissing: false,
+    metadataStatus: {
+      raw: { status: undefined, valid: true },
+      status: undefined,
+      valid: false,
+    },
     motivation: "Motivation behind Proposal 1322",
     rationale: "Rationale for Proposal 1322",
   },
@@ -47,7 +51,11 @@ const uniqueProposals = [
     abstainVotes: 81528377728,
     title: "Proposal 1338 Title",
     about: "This is about Proposal 1338",
-    isDataMissing: false,
+    metadataStatus: {
+      raw: { status: undefined, valid: true },
+      status: undefined,
+      valid: false,
+    },
     motivation: "Motivation behind Proposal 1338",
     rationale: "Rationale for Proposal 1338",
   },
@@ -72,7 +80,11 @@ const uniqueProposals = [
     abstainVotes: 81528377728,
     title: "Proposal 1335 Title",
     about: "This is about Proposal 1335",
-    isDataMissing: false,
+    metadataStatus: {
+      raw: { status: undefined, valid: true },
+      status: undefined,
+      valid: false,
+    },
     motivation: "Motivation behind Proposal 1335",
     rationale: "Rationale for Proposal 1335",
   },
@@ -102,7 +114,7 @@ describe("remove duplicated proposals", () => {
   });
 
   it("returns empty array if input is empty", () => {
-    const proposals: ActionTypeToDsiplay[] = [];
+    const proposals: ActionType[] = [];
     expect(removeDuplicatedProposals(proposals).length).toBe(0);
   });
 });

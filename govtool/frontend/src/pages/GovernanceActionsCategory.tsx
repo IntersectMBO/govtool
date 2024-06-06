@@ -153,6 +153,9 @@ export const GovernanceActionsCategory = () => {
                               state: {
                                 ...item,
                                 openedFromCategoryPage: true,
+                                isDataMissing: item.metadataStatus.raw.valid
+                                  ? false
+                                  : item.metadataStatus.raw.status,
                               },
                             },
                           );

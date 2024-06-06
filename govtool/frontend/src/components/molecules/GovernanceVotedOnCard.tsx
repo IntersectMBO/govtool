@@ -4,7 +4,6 @@ import { Box } from "@mui/material";
 import { Button } from "@atoms";
 import { PATHS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { VotedProposalToDisplay } from "@models";
 import {
   formatDisplayDate,
   getFullGovActionId,
@@ -18,9 +17,10 @@ import {
   GovernanceActionCardStatePill,
   GovernanceActionsDatesBox,
 } from "@molecules";
+import { VotedProposal } from "@/models";
 
 type Props = {
-  votedProposal: VotedProposalToDisplay;
+  votedProposal: VotedProposal;
   inProgress?: boolean;
 };
 
@@ -28,16 +28,14 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
   const navigate = useNavigate();
   const { proposal, vote } = votedProposal;
   const {
-    about,
     createdDate,
     createdEpochNo,
     expiryDate,
     expiryEpochNo,
     index,
-    title,
+    metadataStatus,
     txHash,
     type,
-    isDataMissing,
   } = proposal;
 
   const { isMobile, screenWidth } = useScreenDimension();
@@ -54,13 +52,13 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         justifyContent: "space-between",
         boxShadow: "0px 4px 15px 0px #DDE3F5",
         borderRadius: "20px",
-        backgroundColor: isDataMissing
+        backgroundColor: !metadataStatus.raw.valid
           ? "rgba(251, 235, 235, 0.50)"
           : "rgba(255, 255, 255, 0.3)",
         // TODO: To decide if voted on cards can be actually in progress
         border: inProgress
           ? "1px solid #FFCBAD"
-          : isDataMissing
+          : !metadataStatus.raw.valid
           ? "1px solid #F6D5D5"
           : "1px solid #C0E4BA",
       }}
@@ -75,12 +73,14 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         }}
       >
         <GovernanceActionCardHeader
-          title={title}
-          isDataMissing={isDataMissing}
+          title={metadataStatus.raw.metadata?.title ?? ""}
+          isDataMissing={
+            metadataStatus.raw.valid ? false : metadataStatus.raw.status
+          }
         />
         <GovernanceActionCardElement
           label={t("govActions.abstract")}
-          text={about}
+          text={metadataStatus.raw.metadata?.abstract ?? ""}
           textVariant="twoLines"
           dataTestId="governance-action-abstract"
           isSliderCard
@@ -137,6 +137,9 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
                   voteUrl: vote.url,
                   voteDate: vote.date,
                   voteEpochNo: vote.epochNo,
+                  isDataMissing: metadataStatus.raw.valid
+                    ? false
+                    : metadataStatus.raw.status,
                 },
               },
             )

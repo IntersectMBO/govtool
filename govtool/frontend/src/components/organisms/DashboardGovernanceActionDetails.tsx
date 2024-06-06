@@ -38,7 +38,9 @@ export const DashboardGovernanceActionDetails = () => {
     state ? state.txHash : data?.proposal.txHash ?? "",
     state ? state.index : data?.proposal.index ?? "",
   );
-  const title = state ? state.title : data?.proposal.title;
+  const title = state
+    ? state.metadataStatus.raw?.metadata?.title
+    : data?.proposal.metadataStatus.raw?.metadata?.title;
 
   return (
     <Box
@@ -53,7 +55,13 @@ export const DashboardGovernanceActionDetails = () => {
         elementOne={t("govActions.title")}
         elementOnePath={PATHS.dashboardGovernanceActions}
         elementTwo={title}
-        isDataMissing={state ? state.isDataMissing : data?.isDataMissing}
+        isDataMissing={
+          state
+            ? state.isDataMissing
+            : data?.proposal.metadataStatus.raw.valid
+            ? false
+            : data?.proposal.metadataStatus.raw.status
+        }
       />
       <Link
         data-testid="back-to-list-link"
@@ -111,11 +119,17 @@ export const DashboardGovernanceActionDetails = () => {
             createdEpochNo={
               state ? state.createdEpochNo : data.proposal.createdEpochNo
             }
-            isDataMissing={state ? state.isDataMissing : data?.isDataMissing}
+            isDataMissing={
+              state
+                ? state.isDataMissing
+                : data?.proposal.metadataStatus.raw.valid
+                ? false
+                : data?.proposal.metadataStatus.raw.status
+            }
             expiryDate={
               state
                 ? formatDisplayDate(state.expiryDate)
-                : formatDisplayDate(data.proposal.expiryDate)
+                : formatDisplayDate(data?.proposal.expiryDate)
             }
             expiryEpochNo={
               state ? state.expiryEpochNo : data.proposal.expiryEpochNo
@@ -131,11 +145,27 @@ export const DashboardGovernanceActionDetails = () => {
             }
             details={state ? state.details : data.proposal.details}
             url={state ? state.url : data.proposal.url}
-            title={state ? state.title : data.proposal.title}
-            links={state ? state.references : data.proposal.references}
-            about={state ? state.about : data.proposal.about}
-            motivation={state ? state.motivation : data.proposal.motivation}
-            rationale={state ? state.rationale : data.proposal.rationale}
+            title={title}
+            links={
+              state
+                ? state.metadataStatus.raw?.metadata?.references
+                : data.proposal.metadataStatus.raw?.metadata?.references
+            }
+            about={
+              state
+                ? state.metadataStatus.raw?.metadata?.abstract
+                : data.proposal.metadataStatus.raw?.metadata?.abstract
+            }
+            motivation={
+              state
+                ? state.metadataStatus.raw?.metadata?.motivation
+                : data.proposal.metadataStatus.raw?.metadata?.motivation
+            }
+            rationale={
+              state
+                ? state.metadataStatus.raw?.metadata?.rationale
+                : data.proposal.metadataStatus.raw?.metadata?.rationale
+            }
             yesVotes={state ? state.yesVotes : data.proposal.yesVotes}
             voteFromEP={data?.vote?.vote}
             voteUrlFromEP={data?.vote?.url}

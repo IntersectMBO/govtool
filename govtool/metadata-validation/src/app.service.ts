@@ -8,7 +8,6 @@ import { MetadataValidationStatus } from '@enums';
 import { canonizeJSON, validateMetadataStandard, parseMetadata } from '@utils';
 import { MetadataStandard, ValidateMetadataResult } from '@types';
 
-
 @Injectable()
 export class AppService {
   constructor(private readonly httpService: HttpService) {}
@@ -21,16 +20,13 @@ export class AppService {
     let status: MetadataValidationStatus;
     let metadata: any;
     try {
-      console.log(standard);
       const { data } = await firstValueFrom(
         this.httpService.get(url).pipe(
           catchError(() => {
-            console.log('url',url);
             throw MetadataValidationStatus.URL_NOT_FOUND;
           }),
         ),
       );
-
       if (standard) {
         await validateMetadataStandard(data, standard);
       }

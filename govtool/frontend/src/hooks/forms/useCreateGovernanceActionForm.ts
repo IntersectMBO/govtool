@@ -23,7 +23,7 @@ import {
   PROTOCOL_PARAMS_KEY,
 } from "@utils";
 import { useWalletErrorModal } from "@hooks";
-import { MetadataValidationStatus } from "@models";
+import { MetadataStandard, MetadataValidationStatus } from "@models";
 import {
   GovernanceActionFieldSchemas,
   GovernanceActionType,
@@ -200,6 +200,7 @@ export const useCreateGovernanceActionForm = (
         const { status } = await validateMetadata({
           url: data.storingURL,
           hash,
+          standard: MetadataStandard.CIP108,
         });
 
         if (status) {

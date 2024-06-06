@@ -6,6 +6,11 @@ export enum MetadataValidationStatus {
   INCORRECT_FORMAT = "INCORRECT_FORMAT",
 }
 
+export enum MetadataStandard {
+  CIP108 = "CIP108",
+  CIPQQQ = "CIPQQQ",
+}
+
 export type ValidateMetadataResult = {
   status?: MetadataValidationStatus;
   valid: boolean;
@@ -16,4 +21,5 @@ export type ValidateMetadataResult = {
 export type MetadataValidationDTO = {
   url: string;
   hash: string;
+  standard?: MetadataStandard;
 };

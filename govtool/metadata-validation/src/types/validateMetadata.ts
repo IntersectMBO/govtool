@@ -8,5 +8,5 @@ export enum MetadataStandard {
 export type ValidateMetadataResult = {
   status?: MetadataValidationStatus;
   valid: boolean;
-  metadata: any;
+  metadata?: any;
 };

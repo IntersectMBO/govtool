@@ -41,9 +41,7 @@ export const GovernanceActionDetails = () => {
     state ? state.index : data?.proposal.index ?? "",
   );
 
-  const title = state
-    ? state.metadataStatus.raw?.metadata?.title
-    : data?.proposal.metadataStatus.raw?.metadata?.title;
+  const title = state ? state?.title : data?.proposal?.title;
 
   useEffect(() => {
     if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
@@ -91,9 +89,9 @@ export const GovernanceActionDetails = () => {
               isDataMissing={
                 state
                   ? state.isDataMissing
-                  : data?.proposal.metadataStatus.raw.valid
+                  : data?.proposal.metadataValid
                   ? false
-                  : data?.proposal.metadataStatus.raw.status
+                  : data?.proposal.metadataStatus
               }
             />
             <Link
@@ -147,9 +145,9 @@ export const GovernanceActionDetails = () => {
                   isDataMissing={
                     state
                       ? state.isDataMissing
-                      : data?.proposal.metadataStatus.raw.valid
+                      : data?.proposal.metadataValid
                       ? false
-                      : data?.proposal.metadataStatus.raw.status
+                      : data?.proposal.metadataStatus
                   }
                   expiryDate={
                     state
@@ -168,26 +166,14 @@ export const GovernanceActionDetails = () => {
                   details={state ? state.details : data.proposal.details}
                   url={state ? state.url : data.proposal.url}
                   title={title}
-                  about={
-                    state
-                      ? state.metadataStatus.raw?.metadata?.abstract
-                      : data.proposal.metadataStatus.raw?.metadata?.abstract
-                  }
+                  about={state ? state?.abstract : data.proposal?.abstract}
                   motivation={
-                    state
-                      ? state.metadataStatus.raw?.metadata?.motivation
-                      : data.proposal.metadataStatus.raw?.metadata?.motivation
+                    state ? state?.motivation : data.proposal?.motivation
                   }
                   rationale={
-                    state
-                      ? state.metadataStatus.raw?.metadata?.rationale
-                      : data.proposal.metadataStatus.raw?.metadata?.rationale
+                    state ? state?.rationale : data.proposal?.rationale
                   }
-                  links={
-                    state
-                      ? state.metadataStatus.raw?.metadata?.references
-                      : data.proposal.metadataStatus.raw?.metadata?.references
-                  }
+                  links={state ? state?.references : data.proposal?.references}
                   yesVotes={state ? state.yesVotes : data.proposal.yesVotes}
                   govActionId={fullProposalId}
                 />

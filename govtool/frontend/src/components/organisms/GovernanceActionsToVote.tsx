@@ -5,6 +5,7 @@ import { Typography } from "@atoms";
 import { PATHS } from "@consts";
 import { useCardano } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
+import { ProposalData } from "@models";
 import { GovernanceActionCard } from "@molecules";
 import { getProposalTypeTitle, getFullGovActionId, openInNewTab } from "@utils";
 import { Slider } from "@organisms";
@@ -12,7 +13,7 @@ import { Slider } from "@organisms";
 type GovernanceActionsToVoteProps = {
   filters: string[];
   sorting: string;
-  proposals: { title: string; actions: ActionType[] }[];
+  proposals: { title: string; actions: ProposalData[] }[];
   onDashboard?: boolean;
   searchPhrase?: string;
 };
@@ -87,9 +88,9 @@ export const GovernanceActionsToVote = ({
                             {
                               state: {
                                 ...action,
-                                isDataMissing: action.metadataStatus.raw.valid
+                                isDataMissing: action.metadataValid
                                   ? false
-                                  : action.metadataStatus.raw.status,
+                                  : action.metadataStatus,
                               },
                             },
                           );

@@ -46,7 +46,7 @@ export const cipStandardSchema: StandardSpecification = {
             hashDigest: Joi.string().required(),
             hashAlgorithm: Joi.string().required(),
           }),
-        }).required(),
+        }),
       ),
     }),
   }),

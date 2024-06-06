@@ -5,6 +5,7 @@ import {
   adaHolder03Wallet,
   adaHolder04Wallet,
   adaHolder05Wallet,
+  adaHolder06Wallet,
   dRep01Wallet,
   dRep02Wallet,
 } from "@constants/staticWallets";
@@ -289,6 +290,38 @@ test.describe("No confidence delegation", () => {
     const balance = await kuberService.getBalance(adaHolder04Wallet.address);
     await expect(
       page.getByText(`You have delegated ₳${balance}`)
+    ).toBeVisible();
+  });
+});
+
+test.describe("Delegated ADA visibility", () => {
+  test.use({
+    storageState: ".auth/adaHolder06.json",
+    wallet: adaHolder06Wallet,
+  });
+
+  test("2W. Should show my delegated ADA to the DRep", async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+
+    const dRepDirectoryPage = new DRepDirectoryPage(page);
+    await dRepDirectoryPage.goto();
+
+    await dRepDirectoryPage.delegateToDRep(dRep01Wallet.dRepId);
+
+    const adaHolderVotingPower = await kuberService.getBalance(
+      adaHolder05Wallet.address
+    );
+    await expect(
+      page.getByText(`You have delegated ₳ ${adaHolderVotingPower}`)
+    ).toBeVisible();
+
+    await page.goto("/");
+    await expect(
+      page.getByText(
+        `Your Voting Power of ₳${adaHolderVotingPower} is Delegated to`
+      )
     ).toBeVisible();
   });
 });

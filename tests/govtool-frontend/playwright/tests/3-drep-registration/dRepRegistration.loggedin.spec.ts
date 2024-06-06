@@ -35,7 +35,7 @@ test("3D. Verify DRep registration form", async ({ page }) => {
 });
 
 test.describe("Validation of dRep Registration Form", () => {
-  test("3E.1 Should accept valid data in DRep form", async ({ page }) => {
+  test("3E_1 Should accept valid data in DRep form", async ({ page }) => {
     test.slow();
 
     const dRepRegistrationPage = new DRepRegistrationPage(page);
@@ -58,7 +58,7 @@ test.describe("Validation of dRep Registration Form", () => {
     await expect(dRepRegistrationPage.addLinkBtn).toBeHidden();
   });
 
-  test("3E.2. Should reject invalid data in DRep form", async ({ page }) => {
+  test("3E_2. Should reject invalid data in DRep form", async ({ page }) => {
     test.slow();
 
     const dRepRegistrationPage = new DRepRegistrationPage(page);
@@ -73,6 +73,56 @@ test.describe("Validation of dRep Registration Form", () => {
       );
     }
   });
+
+  test("3L_1. Should accept valid metadata anchor on create dRep", async ({
+    page,
+  }) => {
+    const dRepRegistrationPage = new DRepRegistrationPage(page);
+    await dRepRegistrationPage.goto();
+
+    const dRepName = "Test_DRep";
+    await dRepRegistrationPage.nameInput.fill(dRepName);
+
+    await dRepRegistrationPage.continueBtn.click();
+    await page.getByRole("checkbox").click();
+    await dRepRegistrationPage.continueBtn.click();
+
+    for (let i = 0; i < 100; i++) {
+      await dRepRegistrationPage.metadataUrlInput.fill(faker.internet.url());
+      await expect(page.getByTestId("invalid-url-error")).toBeHidden();
+    }
+  });
+
+  test("3L_2. Should reject invalid dRep metadata anchor on create dRep", async ({
+    page,
+  }) => {
+    const dRepRegistrationPage = new DRepRegistrationPage(page);
+    await dRepRegistrationPage.goto();
+
+    const dRepName = "Test_DRep";
+    await dRepRegistrationPage.nameInput.fill(dRepName);
+
+    await dRepRegistrationPage.continueBtn.click();
+    await page.getByRole("checkbox").click();
+    await dRepRegistrationPage.continueBtn.click();
+
+    for (let i = 0; i < 100; i++) {
+      await dRepRegistrationPage.metadataUrlInput.fill(mockInvalid.url());
+      await expect(page.getByTestId("invalid-url-error")).toBeVisible();
+    }
+
+    const sentenceWithoutSpace = faker.lorem
+      .sentence(128)
+      .replace(/[\s.]/g, "");
+    const metadataAnchorGreaterThan128Bytes =
+      faker.internet.url({ appendSlash: true }) + sentenceWithoutSpace;
+
+    await dRepRegistrationPage.metadataUrlInput.fill(
+      metadataAnchorGreaterThan128Bytes
+    );
+
+    await expect(page.getByTestId("invalid-url-error")).toBeVisible();
+  });
 });
 
 test("3F. Should create proper DRep registration request, when registered with data", async ({
@@ -85,4 +135,26 @@ test("3F. Should create proper DRep registration request, when registered with d
   await expect(
     page.getByTestId("registration-transaction-error-modal")
   ).toBeVisible();
+});
+
+test("3O. Should reject invalid dRep registration metadata", async ({
+  page,
+}) => {
+  const dRepRegistrationPage = new DRepRegistrationPage(page);
+  await dRepRegistrationPage.goto();
+
+  const dRepName = "Test_DRep";
+  await dRepRegistrationPage.nameInput.fill(dRepName);
+
+  await dRepRegistrationPage.continueBtn.click();
+  await page.getByRole("checkbox").click();
+  await dRepRegistrationPage.continueBtn.click();
+
+  const invalidMetadataAnchor = "https://www.google.com";
+  await dRepRegistrationPage.metadataUrlInput.fill(invalidMetadataAnchor);
+  await dRepRegistrationPage.registerBtn.click();
+
+  await expect(
+    page.getByTestId("registration-transaction-error-modal")
+  ).not.toHaveText(/utxo balance insufficient/i);
 });

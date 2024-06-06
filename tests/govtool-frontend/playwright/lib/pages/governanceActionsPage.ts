@@ -65,7 +65,8 @@ export default class GovernanceActionsPage {
   }
 
   async getAllProposals() {
-    return this.page.locator('[data-test-id$="-card"]').all();
+    await this.page.waitForTimeout(2_000);
+    return this.page.locator('[data-testid$="-card"]').all();
   }
 
   async validateFilters(filters: string[]) {

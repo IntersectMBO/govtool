@@ -2,7 +2,7 @@ import environments from "@constants/environments";
 import { Page } from "@playwright/test";
 import DRepForm from "../forms/dRepForm";
 
-export default class DRepRegistrationPage extends DRepForm {
+export default class EditDRepPage extends DRepForm {
   readonly registerBtn = this.page.getByTestId("register-button");
   readonly confirmBtn = this.page.getByTestId("confirm-modal-button");
   readonly registrationSuccessModal = this.page.getByTestId(
@@ -14,7 +14,6 @@ export default class DRepRegistrationPage extends DRepForm {
   }
 
   async goto() {
-    await this.page.goto(`${environments.frontendUrl}/register_drep`);
-    await this.continueBtn.click(); // BUG: testId -> continue-register-button
+    await this.page.goto(`${environments.frontendUrl}/edit_dRep`);
   }
 }

@@ -25,7 +25,7 @@
     "allure:serve": "npx allure serve",
     "test": "npx playwright test",
     "format": "prettier . --write",
-    "generate-wallets": "ts-node ./generate_wallets.ts 9"
+    "generate-wallets": "ts-node ./generate_wallets.ts 10"
   },
   "dependencies": {
     "@cardanoapi/cardano-test-wallet": "^1.1.2",

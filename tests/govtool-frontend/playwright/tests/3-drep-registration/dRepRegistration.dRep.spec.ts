@@ -75,7 +75,9 @@ test.describe("Temporary DReps", () => {
   test("3G. Should show confirmation message with link to view transaction, when DRep registration txn is submitted", async ({
     page,
     browser,
-  }) => {
+  }, testInfo) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+
     const wallet = await walletManager.popWallet("registerDRep");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
@@ -96,6 +98,8 @@ test.describe("Temporary DReps", () => {
   });
 
   test("3J. Should verify retire as DRep", async ({ page, browser }) => {
+    test.slow(); // Due to queue in pop wallets
+
     const wallet = await walletManager.popWallet("registeredDRep");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);

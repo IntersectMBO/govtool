@@ -10,13 +10,15 @@ import { Page, expect } from "@playwright/test";
 import { IProposalForm, ProposalType, StaticWallet } from "@types";
 import walletManager from "lib/walletManager";
 
+test.beforeEach(async () => {
+  await setAllureEpic("7. Proposal submission");
+});
+
 test.describe("Proposal submission check", () => {
   let userPage: Page;
   let wallet: StaticWallet;
 
   test.beforeEach(async ({ browser, page }, testInfo) => {
-    await setAllureEpic("7. Proposal submission");
-
     wallet = await walletManager.popWallet("adaHolder");
 
     const tempUserAuth = await createTempUserAuth(page, wallet);
@@ -28,7 +30,7 @@ test.describe("Proposal submission check", () => {
   });
 
   Object.values(ProposalType).map((type: ProposalType, index) => {
-    test(`7G.${index + 1}: Should open wallet connection popup, when registered with proper ${type.toLowerCase()} data`, async ({
+    test(`7G_${index + 1}. Should open wallet connection popup, when registered with proper ${type.toLowerCase()} data`, async ({
       page,
       browser,
     }, testInfo) => {
@@ -57,7 +59,7 @@ test.describe("Proposal submission check", () => {
   });
 });
 
-test("7H should submit a proposal", async ({ page, browser }, testInfo) => {
+test("7H. should submit a proposal", async ({ page, browser }, testInfo) => {
   test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
   const wallet = await walletManager.popWallet("proposalSubmission");

@@ -1,6 +1,7 @@
 import environments from "@constants/environments";
 import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
+import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { createNewPageWithWallet } from "@helpers/page";
@@ -58,30 +59,36 @@ test.describe("Proposal checks", () => {
     await expect(govActionDetailsPage.voteBtn).toBeEnabled();
   });
 
-  // Skipped: No url/hash input to validate
-  test("5D. Should validate proposal voting", async () => {
-    test.skip();
-    // const invalidURLs = ["testdotcom", "https://testdotcom", "https://test.c"];
-    // invalidURLs.forEach(async (url) => {
-    //   govActionDetailsPage.urlInput.fill(url);
-    //   await expect(govActionDetailsPage.urlInputError).toBeVisible();
-    // });
-    // const validURLs = ["https://test.com"];
-    // validURLs.forEach(async (url) => {
-    //   govActionDetailsPage.urlInput.fill(url);
-    //   await expect(govActionDetailsPage.urlInputError).not.toBeVisible();
-    // });
-    // const invalidHashes = [
-    //   randomBytes(20).toString("hex"),
-    //   randomBytes(32).toString(),
-    // ];
-    // invalidHashes.forEach(async (hash) => {
-    //   govActionDetailsPage.hashInput.fill(hash);
-    //   await expect(govActionDetailsPage.hashInputError).toBeVisible();
-    // });
-    // const validHash = randomBytes(32).toString("hex");
-    // govActionDetailsPage.hashInput.fill(validHash);
-    // await expect(govActionDetailsPage.hashInputError).not.toBeVisible();
+  test.describe("Validate provide context about vote", () => {
+    test("5D_1. Should accept valid data in provide context", async () => {
+      await govActionDetailsPage.contextBtn.click();
+
+      await expect(govActionDetailsPage.contextInput).toBeVisible();
+
+      for (let i = 0; i < 100; i++) {
+        const randomContext = faker.lorem.paragraph(2);
+        await govActionDetailsPage.contextInput.fill(randomContext);
+        expect(await govActionDetailsPage.contextInput.textContent()).toEqual(
+          randomContext
+        );
+
+        await expect(govActionDetailsPage.confirmModalBtn).toBeVisible();
+      }
+    });
+
+    test("5D_2. Should reject invalid data in provide context", async () => {
+      await govActionDetailsPage.contextBtn.click();
+
+      await expect(govActionDetailsPage.contextInput).toBeVisible();
+
+      for (let i = 0; i < 100; i++) {
+        const randomContext = faker.lorem.paragraph(40);
+        await govActionDetailsPage.contextInput.fill(randomContext);
+        expect(
+          await govActionDetailsPage.contextInput.textContent()
+        ).not.toEqual(randomContext);
+      }
+    });
   });
 });
 

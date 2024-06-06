@@ -7,6 +7,8 @@ import removeAllSpaces from "@helpers/removeAllSpaces";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
 
+const infoTypeProposal = require("../../lib/_mock/infoTypeProposal.json");
+
 const filterOptionNames = [
   "Protocol Parameter Change",
   "New Committee",
@@ -29,7 +31,7 @@ test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
 });
 
-test("4A.1: Should access Governance Actions page with connecting wallet", async ({
+test("4A_1: Should access Governance Actions page with connecting wallet", async ({
   page,
 }) => {
   await page.goto("/");
@@ -41,7 +43,7 @@ test("4A.1: Should access Governance Actions page with connecting wallet", async
   await expect(page.getByText(/Governance Actions/i)).toHaveCount(2);
 });
 
-test("4B.1: Should restrict voting for users who are not registered as DReps (with wallet connected)", async ({
+test("4B_1: Should restrict voting for users who are not registered as DReps (with wallet connected)", async ({
   page,
 }) => {
   const govActionsPage = new GovernanceActionsPage(page);
@@ -51,7 +53,7 @@ test("4B.1: Should restrict voting for users who are not registered as DReps (wi
   await expect(govActionDetailsPage.voteBtn).not.toBeVisible();
 });
 
-test("4C.1: Should filter Governance Action Type on governance actions page", async ({
+test("4C_1: Should filter Governance Action Type on governance actions page", async ({
   page,
 }) => {
   test.slow();
@@ -78,7 +80,7 @@ test("4C.1: Should filter Governance Action Type on governance actions page", as
   }
 });
 
-test("4C.2: Should sort Governance Action Type on governance actions page", async ({
+test("4C_2: Should sort Governance Action Type on governance actions page", async ({
   page,
 }) => {
   test.slow();
@@ -104,7 +106,7 @@ test("4C.2: Should sort Governance Action Type on governance actions page", asyn
   );
 });
 
-test("4C.3: Should filter and sort Governance Action Type on governance actions page", async ({
+test("4C_3: Should filter and sort Governance Action Type on governance actions page", async ({
   page,
 }) => {
   test.slow();
@@ -124,6 +126,44 @@ test("4C.3: Should filter and sort Governance Action Type on governance actions 
     [removeAllSpaces(filterOptionNames[0])]
   );
   await govActionsPage.validateFilters([filterOptionNames[0]]);
+});
+
+test("4L: Should search governance actions", async ({ page }) => {
+  const governanceActionTitle = "TreasuryTitle";
+  const governanceActionPage = new GovernanceActionsPage(page);
+
+  await governanceActionPage.goto();
+
+  await governanceActionPage.searchInput.fill(governanceActionTitle);
+
+  const proposalCards = await governanceActionPage.getAllProposals();
+
+  for (const proposalCard of proposalCards) {
+    expect(
+      (await proposalCard.textContent()).includes(`${governanceActionTitle}`)
+    ).toBeTruthy();
+  }
+});
+
+test("4M: Should show view-all categorized governance actions", async ({
+  page,
+}) => {
+  await page.route("**/proposal/list?**", async (route) =>
+    route.fulfill({
+      body: JSON.stringify(infoTypeProposal),
+    })
+  );
+
+  const governanceActionPage = new GovernanceActionsPage(page);
+  await governanceActionPage.goto();
+
+  await page.getByRole("button", { name: "Show All" }).click();
+
+  const proposalCards = await governanceActionPage.getAllProposals();
+
+  for (const proposalCard of proposalCards) {
+    await expect(proposalCard.getByTestId("InfoAction-type")).toBeVisible();
+  }
 });
 
 test("4H. Should verify none of the displayed governance actions have expired", async ({

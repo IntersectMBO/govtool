@@ -122,6 +122,8 @@ test("4F. Should Disable DRep functionality upon wallet disconnection on governa
   page,
   browser,
 }) => {
+  test.slow(); // Due to queue in pop wallets
+
   const wallet = await walletManager.popWallet("registeredDRep");
 
   const tempDRepAuth = await createTempDRepAuth(page, wallet);

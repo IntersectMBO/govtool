@@ -28,7 +28,7 @@ const commonArgs = {
   createdEpochNo: 302,
   expiryEpochNo: 350,
   govActionId: "exampleId1232312312312",
-  isDataMissing: false,
+  isDataMissing: null,
   title: "Example title",
 };
 

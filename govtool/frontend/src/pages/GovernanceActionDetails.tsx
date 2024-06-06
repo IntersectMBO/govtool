@@ -87,11 +87,7 @@ export const GovernanceActionDetails = () => {
               elementOnePath={PATHS.governanceActions}
               elementTwo={title}
               isDataMissing={
-                state
-                  ? state.isDataMissing
-                  : data?.proposal.metadataValid
-                  ? false
-                  : data?.proposal.metadataStatus
+                state ? state.metadataStatus : data?.proposal.metadataStatus
               }
             />
             <Link
@@ -143,11 +139,7 @@ export const GovernanceActionDetails = () => {
                     state ? state.createdEpochNo : data.proposal.createdEpochNo
                   }
                   isDataMissing={
-                    state
-                      ? state.isDataMissing
-                      : data?.proposal.metadataValid
-                      ? false
-                      : data?.proposal.metadataStatus
+                    state ? state.metadataStatus : data?.proposal.metadataStatus
                   }
                   expiryDate={
                     state

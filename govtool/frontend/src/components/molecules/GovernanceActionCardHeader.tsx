@@ -8,7 +8,7 @@ import { MetadataValidationStatus } from "@/models";
 
 type GovernanceActionCardHeaderProps = {
   title?: string;
-  isDataMissing?: MetadataValidationStatus | boolean;
+  isDataMissing: MetadataValidationStatus | null;
 };
 
 export const GovernanceActionCardHeader = ({
@@ -39,7 +39,7 @@ export const GovernanceActionCardHeader = ({
           ...(isDataMissing && { color: "#9E2323" }),
         }}
       >
-        {(isDataMissing !== false &&
+        {(isDataMissing &&
           getMetadataDataMissingStatusTranslation(
             isDataMissing as MetadataValidationStatus,
           )) ||

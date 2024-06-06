@@ -21,11 +21,11 @@ type GovernanceActionDetailsCardDataProps = {
   expiryEpochNo: number;
   govActionId: string;
   isDashboard?: boolean;
-  isDataMissing: boolean | MetadataValidationStatus;
+  isDataMissing: MetadataValidationStatus | null;
   isInProgress?: boolean;
   isOneColumn: boolean;
   isSubmitted?: boolean;
-  links?: GovernanceActionLink[];
+  links?: string[];
   motivation?: string;
   rationale?: string;
   title?: string;

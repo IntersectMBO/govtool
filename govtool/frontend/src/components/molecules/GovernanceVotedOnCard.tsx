@@ -77,7 +77,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
       >
         <GovernanceActionCardHeader
           title={title}
-          isDataMissing={metadataValid ? false : metadataStatus}
+          isDataMissing={metadataStatus}
         />
         <GovernanceActionCardElement
           label={t("govActions.abstract")}
@@ -138,7 +138,6 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
                   voteUrl: vote.url,
                   voteDate: vote.date,
                   voteEpochNo: vote.epochNo,
-                  isDataMissing: metadataValid ? false : metadataStatus,
                 },
               },
             )

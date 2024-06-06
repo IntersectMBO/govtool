@@ -69,6 +69,7 @@ export const useEditDRepInfoForm = (
     formState: { errors, isValid },
     register,
     resetField,
+    reset,
     watch,
   } = useFormContext<EditDRepInfoValues>();
   const dRepName = watch("dRepName");
@@ -203,5 +204,6 @@ export const useEditDRepInfoForm = (
     editDRepInfo: handleSubmit(onSubmit),
     resetField,
     watch,
+    reset,
   };
 };

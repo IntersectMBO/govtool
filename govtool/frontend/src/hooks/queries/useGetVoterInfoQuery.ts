@@ -1,12 +1,11 @@
-import { useQuery } from "react-query";
+import { UseQueryOptions, useQuery } from "react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { getVoterInfo } from "@services";
 
-export const useGetVoterInfo = () => {
+export const useGetVoterInfo = (options?: UseQueryOptions) => {
   const { dRepID, pendingTransaction } = useCardano();
-
   const { data } = useQuery({
     queryKey: [
       QUERY_KEYS.useGetDRepInfoKey,
@@ -17,7 +16,7 @@ export const useGetVoterInfo = () => {
         pendingTransaction?.retireAsDirectVoter
       )?.transactionHash,
     ],
-    enabled: !!dRepID,
+    enabled: !!dRepID && options?.enabled,
     queryFn: () => getVoterInfo(dRepID),
   });
 

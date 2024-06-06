@@ -11,5 +11,6 @@
     "cachedurationseconds": 20,
     "sentrydsn": "https://username:password@senty.host/id",
     "metadatavalidationhost": "localhost",
-    "metadatavalidationport": 3001
+    "metadatavalidationport": 3001,
+    "metadatavalidationmaxconcurrentrequests": 10
 }

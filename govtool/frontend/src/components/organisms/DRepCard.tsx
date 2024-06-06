@@ -12,6 +12,7 @@ import { correctDRepDirectoryFormat } from "@utils";
 type DRepCardProps = {
   dRep: DRepData;
   isConnected: boolean;
+  isDelegationLoading?: boolean;
   isInProgress?: boolean;
   isMe?: boolean;
   onDelegate?: () => void;
@@ -20,6 +21,7 @@ type DRepCardProps = {
 export const DRepCard = ({
   dRep: { status, type, view, votingPower },
   isConnected,
+  isDelegationLoading,
   isInProgress,
   isMe,
   onDelegate,
@@ -200,6 +202,7 @@ export const DRepCard = ({
               <Button
                 data-testid={`${view}-delegate-button`}
                 onClick={onDelegate}
+                isLoading={isDelegationLoading}
               >
                 {t("delegate")}
               </Button>

@@ -1,15 +1,18 @@
 import environments from "@constants/environments";
 import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
+import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
-import { expect } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
+
+const invalidInfinityProposals = require("../../lib/_mock/invalidInfinityProposals.json");
 
 test.beforeEach(async () => {
   await setAllureEpic("5. Proposal functionality");
@@ -32,17 +35,13 @@ test.describe("Proposal checks", () => {
     await expect(govActionDetailsPage.submittedDate).toBeVisible();
     await expect(govActionDetailsPage.expiryDate).toBeVisible();
 
-    await expect(govActionDetailsPage.externalModalBtn).toBeVisible();
     await expect(govActionDetailsPage.contextBtn).toBeVisible();
+    await expect(govActionDetailsPage.showVotesBtn).toBeVisible();
 
     await expect(govActionDetailsPage.voteBtn).toBeVisible();
     await expect(govActionDetailsPage.yesVoteRadio).toBeVisible();
     await expect(govActionDetailsPage.noVoteRadio).toBeVisible();
     await expect(govActionDetailsPage.abstainRadio).toBeVisible();
-  });
-
-  test("5B. Should view Vote button on governance action item on registered as DRep", async () => {
-    await expect(govActionDetailsPage.voteBtn).toBeVisible();
   });
 
   test("5C. Should show required field in proposal voting on registered as DRep", async () => {
@@ -60,33 +59,58 @@ test.describe("Proposal checks", () => {
     await expect(govActionDetailsPage.voteBtn).toBeEnabled();
   });
 
-  // Skipped: No url/hash input to validate
-  test("5D. Should validate proposal voting", async () => {
-    test.skip();
-    // const invalidURLs = ["testdotcom", "https://testdotcom", "https://test.c"];
-    // invalidURLs.forEach(async (url) => {
-    //   govActionDetailsPage.urlInput.fill(url);
-    //   await expect(govActionDetailsPage.urlInputError).toBeVisible();
-    // });
-    // const validURLs = ["https://test.com"];
-    // validURLs.forEach(async (url) => {
-    //   govActionDetailsPage.urlInput.fill(url);
-    //   await expect(govActionDetailsPage.urlInputError).not.toBeVisible();
-    // });
-    // const invalidHashes = [
-    //   randomBytes(20).toString("hex"),
-    //   randomBytes(32).toString(),
-    // ];
-    // invalidHashes.forEach(async (hash) => {
-    //   govActionDetailsPage.hashInput.fill(hash);
-    //   await expect(govActionDetailsPage.hashInputError).toBeVisible();
-    // });
-    // const validHash = randomBytes(32).toString("hex");
-    // govActionDetailsPage.hashInput.fill(validHash);
-    // await expect(govActionDetailsPage.hashInputError).not.toBeVisible();
+  test.describe("Validate provide context about vote", () => {
+    test("5D_1. Should accept valid data in provide context", async () => {
+      await govActionDetailsPage.contextBtn.click();
+
+      await expect(govActionDetailsPage.contextInput).toBeVisible();
+
+      for (let i = 0; i < 100; i++) {
+        const randomContext = faker.lorem.paragraph(2);
+        await govActionDetailsPage.contextInput.fill(randomContext);
+        expect(await govActionDetailsPage.contextInput.textContent()).toEqual(
+          randomContext
+        );
+
+        await expect(govActionDetailsPage.confirmModalBtn).toBeVisible();
+      }
+    });
+
+    test("5D_2. Should reject invalid data in provide context", async () => {
+      await govActionDetailsPage.contextBtn.click();
+
+      await expect(govActionDetailsPage.contextInput).toBeVisible();
+
+      for (let i = 0; i < 100; i++) {
+        const randomContext = faker.lorem.paragraph(40);
+        await govActionDetailsPage.contextInput.fill(randomContext);
+        expect(
+          await govActionDetailsPage.contextInput.textContent()
+        ).not.toEqual(randomContext);
+      }
+    });
+  });
+});
+
+test.describe("Bad Proposals", () => {
+  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
+
+  let govActionsPage: GovernanceActionsPage;
+
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/proposal/list?**", async (route) =>
+      route.fulfill({
+        body: JSON.stringify(invalidInfinityProposals),
+      })
+    );
+
+    govActionsPage = new GovernanceActionsPage(page);
+    await govActionsPage.goto();
   });
 
-  test("5G. Should show warning to the users to visit the site at their own risk, when external url is opened", async () => {
+  test("5G. Should show warning in bad governance action proposal to the users to visit the site at their own risk, when external url is opened", async () => {
+    const govActionDetailsPage = await govActionsPage.viewFirstProposal();
+
     await govActionDetailsPage.externalModalBtn.click();
 
     await expect(govActionDetailsPage.externalLinkModal).toBeVisible();
@@ -97,12 +121,13 @@ test.describe("Proposal checks", () => {
     ).toBeVisible();
   });
 
-  test("5H. Should open a new tab, when external URL is opened", async ({
+  test("5H. Should open a new tab in Bad governance action proposal, when external URL is opened", async ({
     page,
   }) => {
+    const govActionDetailsPage = await govActionsPage.viewFirstProposal();
+
     await govActionDetailsPage.externalModalBtn.click();
     await govActionDetailsPage.continueModalBtn.click();
-
     const existingPages = page.context().pages();
     expect(existingPages).toHaveLength(1);
   });
@@ -110,13 +135,14 @@ test.describe("Proposal checks", () => {
 
 test.describe("Perform voting", () => {
   let govActionDetailsPage: GovernanceActionDetailsPage;
+  let dRepPage: Page;
 
   test.beforeEach(async ({ page, browser }) => {
     const wallet = await walletManager.popWallet("registeredDRep");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
-    const dRepPage = await createNewPageWithWallet(browser, {
+    dRepPage = await createNewPageWithWallet(browser, {
       storageState: tempDRepAuth,
       wallet,
       enableStakeSigning: true,
@@ -131,29 +157,31 @@ test.describe("Perform voting", () => {
   test("5E. Should re-vote with new data on a already voted governance action", async ({}, testInfo) => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
-    govActionDetailsPage.vote();
-    await waitForTxConfirmation(govActionDetailsPage.currentPage);
+    await govActionDetailsPage.vote();
 
     const governanceActionsPage = new GovernanceActionsPage(
       govActionDetailsPage.currentPage
     );
-    await governanceActionsPage.goto();
+
+    await dRepPage.waitForTimeout(5_000);
+
     await governanceActionsPage.votedTab.click();
+
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")
     ).toBeVisible();
 
     govActionDetailsPage = await governanceActionsPage.viewFirstVotedProposal();
-    govActionDetailsPage.reVote();
-    await waitForTxConfirmation(govActionDetailsPage.currentPage);
-
+    await govActionDetailsPage.reVote();
     await governanceActionsPage.votedTab.click();
+
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No")
     ).toBeVisible();
   });
 
-  test("5F. Should show notification of casted vote after vote", async ({}) => {
+  test("5F. Should show notification of casted vote after vote", async ({}, testInfo) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
     await govActionDetailsPage.vote();
     await expect(govActionDetailsPage.voteSuccessModal).toBeVisible();
   });
@@ -161,13 +189,14 @@ test.describe("Perform voting", () => {
   test("5I. Should view the vote details,when viewing governance action already voted by the DRep", async ({}, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
-    govActionDetailsPage.vote();
-    await waitForTxConfirmation(govActionDetailsPage.currentPage);
+    await govActionDetailsPage.vote();
 
     const governanceActionsPage = new GovernanceActionsPage(
       govActionDetailsPage.currentPage
     );
-    await governanceActionsPage.goto();
+
+    await dRepPage.waitForTimeout(5_000);
+
     await governanceActionsPage.votedTab.click();
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")

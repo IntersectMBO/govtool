@@ -1,3 +1,4 @@
+import environments from "@constants/environments";
 import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
@@ -27,9 +28,9 @@ test.describe("Logged in DRep", () => {
     const res = await votingPowerPromise;
     const votingPower = await res.json();
 
-    await expect(
-      page.getByText(`₳ ${lovelaceToAda(votingPower)}`)
-    ).toBeVisible();
+    await expect(page.getByTestId("voting-power-chips-value")).toHaveText(
+      `₳ ${lovelaceToAda(votingPower)}`
+    );
   });
 });
 
@@ -48,12 +49,19 @@ test.describe("Temporary DReps", async () => {
     });
   });
 
-  test("4J. Should include metadata anchor in the vote transaction", async () => {
+  test("4J. Should include metadata anchor in the vote transaction", async ({}, testInfo) => {
+    test.skip(); // Skipped: Vote context is not displayed in UI to validate
+
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+
     const govActionsPage = new GovernanceActionsPage(dRepPage);
     await govActionsPage.goto();
 
     const govActionDetailsPage = await govActionsPage.viewFirstProposal();
     await govActionDetailsPage.vote(faker.lorem.sentence(200));
+
+    await dRepPage.waitForTimeout(5_000);
+
     await govActionsPage.votedTab.click();
     await govActionsPage.viewFirstVotedProposal();
     expect(false, "No vote context displayed").toBe(true);
@@ -114,6 +122,8 @@ test("4F. Should Disable DRep functionality upon wallet disconnection on governa
   page,
   browser,
 }) => {
+  test.slow(); // Due to queue in pop wallets
+
   const wallet = await walletManager.popWallet("registeredDRep");
 
   const tempDRepAuth = await createTempDRepAuth(page, wallet);

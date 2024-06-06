@@ -289,6 +289,9 @@ export const en = {
       appCannotGetVkeys: "Application can not get vkey",
       checkIsWalletConnected: "Check if the wallet is connected.",
       dRepIdNotFound: "DrepId not found",
+      insufficientBalanceDescription:
+        "To submit a Governance Action, you will be required to post a refundable balance of ₳{{ada}}. You do not currently have enough ADA in your wallet to continue.",
+      insufficientBalanceTitle: "Insufficient Balance",
       invalidGovernanceActionType: "Invalid Governance Action Type",
       invalidTreasuryGovernanceActionType: "Invalid Treasury Governance Action",
       noAddressesFound: "No addresses found",
@@ -368,6 +371,10 @@ export const en = {
         email: "Email",
         emailPlaceholder: "john.smith@email.com",
       },
+    },
+    proposalDiscussion: {
+      title: "Proposal Discussion",
+      proposeAGovernanceAction: "Propose a Governance Action",
     },
     govActions: {
       about: "About",

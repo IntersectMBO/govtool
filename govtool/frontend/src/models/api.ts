@@ -78,7 +78,7 @@ export type ProposalData = {
   abstract?: string;
   details?: ActionDetailsType;
   metadataHash?: string;
-  metadataStatus?: MetadataValidationStatus;
+  metadataStatus: MetadataValidationStatus | null;
   motivation?: string;
   rationale?: string;
   references?: string[];

@@ -1,6 +1,8 @@
+import { IconAcademicCap } from "@intersect.mbo/intersectmbo.org-icons-set";
 import i18n from "@/i18n";
 import { ICONS } from "./icons";
-import { PATHS } from "./paths";
+import { PATHS, PDF_PATHS } from "./paths";
+import { theme } from "@/theme";
 
 export const NAV_ITEMS = [
   {
@@ -56,6 +58,30 @@ export const CONNECTED_NAV_ITEMS = [
     navTo: PATHS.dashboardGovernanceActions,
     activeIcon: ICONS.governanceActionsActiveIcon,
     icon: ICONS.governanceActionsIcon,
+    newTabLink: null,
+  },
+  {
+    dataTestId: "proposal-discussion-link",
+    label: i18n.t("proposalDiscussion.title"),
+    navTo: `${PATHS.connectedProposalPillar.replace("/*", "")}${
+      PDF_PATHS.proposalDiscussion
+    }`,
+    activeIcon: (
+      <IconAcademicCap
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill={theme.palette.accentOrange}
+      />
+    ),
+    icon: (
+      <IconAcademicCap
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill={theme.palette.lightOrange}
+      />
+    ),
     newTabLink: null,
   },
   {

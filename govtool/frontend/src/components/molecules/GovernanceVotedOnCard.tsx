@@ -28,14 +28,17 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
   const navigate = useNavigate();
   const { proposal, vote } = votedProposal;
   const {
+    abstract,
     createdDate,
     createdEpochNo,
     expiryDate,
     expiryEpochNo,
     index,
     metadataStatus,
+    metadataValid,
     txHash,
     type,
+    title,
   } = proposal;
 
   const { isMobile, screenWidth } = useScreenDimension();
@@ -52,13 +55,13 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         justifyContent: "space-between",
         boxShadow: "0px 4px 15px 0px #DDE3F5",
         borderRadius: "20px",
-        backgroundColor: !metadataStatus.raw.valid
+        backgroundColor: !metadataValid
           ? "rgba(251, 235, 235, 0.50)"
           : "rgba(255, 255, 255, 0.3)",
         // TODO: To decide if voted on cards can be actually in progress
         border: inProgress
           ? "1px solid #FFCBAD"
-          : !metadataStatus.raw.valid
+          : !metadataValid
           ? "1px solid #F6D5D5"
           : "1px solid #C0E4BA",
       }}
@@ -73,14 +76,12 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         }}
       >
         <GovernanceActionCardHeader
-          title={metadataStatus.raw.metadata?.title ?? ""}
-          isDataMissing={
-            metadataStatus.raw.valid ? false : metadataStatus.raw.status
-          }
+          title={title}
+          isDataMissing={metadataValid ? false : metadataStatus}
         />
         <GovernanceActionCardElement
           label={t("govActions.abstract")}
-          text={metadataStatus.raw.metadata?.abstract ?? ""}
+          text={abstract}
           textVariant="twoLines"
           dataTestId="governance-action-abstract"
           isSliderCard
@@ -137,9 +138,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
                   voteUrl: vote.url,
                   voteDate: vote.date,
                   voteEpochNo: vote.epochNo,
-                  isDataMissing: metadataStatus.raw.valid
-                    ? false
-                    : metadataStatus.raw.status,
+                  isDataMissing: metadataValid ? false : metadataStatus,
                 },
               },
             )

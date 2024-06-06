@@ -16,9 +16,10 @@ import {
   getProposalTypeLabel,
   getProposalTypeNoEmptySpaces,
 } from "@utils";
+import { ProposalData } from "@models";
 
 type ActionTypeProps = Omit<
-  ActionType,
+  ProposalData,
   | "yesVotes"
   | "noVotes"
   | "abstainVotes"
@@ -35,6 +36,7 @@ type ActionTypeProps = Omit<
 
 export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
   const {
+    abstract,
     type,
     inProgress = false,
     expiryDate,
@@ -45,6 +47,8 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
     txHash,
     index,
     metadataStatus,
+    metadataValid,
+    title,
   } = props;
   const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
@@ -62,10 +66,10 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
         justifyContent: "space-between",
         boxShadow: "0px 4px 15px 0px #DDE3F5",
         borderRadius: "20px",
-        backgroundColor: !metadataStatus.raw.valid
+        backgroundColor: !metadataValid
           ? "rgba(251, 235, 235, 0.50)"
           : "rgba(255, 255, 255, 0.3)",
-        ...(!metadataStatus.raw.valid && {
+        ...(!metadataValid && {
           border: "1px solid #F6D5D5",
         }),
         ...(inProgress && {
@@ -81,14 +85,12 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
         }}
       >
         <GovernanceActionCardHeader
-          title={metadataStatus.raw.metadata?.title ?? ""}
-          isDataMissing={
-            metadataStatus.raw.valid ? false : metadataStatus.raw.status
-          }
+          title={title}
+          isDataMissing={metadataValid ? false : metadataStatus}
         />
         <GovernanceActionCardElement
           label={t("govActions.abstract")}
-          text={metadataStatus.raw.metadata?.abstract ?? ""}
+          text={abstract}
           textVariant="twoLines"
           dataTestId="governance-action-abstract"
           isSliderCard

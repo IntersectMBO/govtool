@@ -2,6 +2,7 @@ import { useQuery } from "react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
+import { ProposalData } from "@models";
 import { getProposals, GetProposalsArguments } from "@services";
 import { useGetVoterInfo } from ".";
 
@@ -13,7 +14,7 @@ export const useGetProposalsQuery = ({
   const { dRepID, pendingTransaction } = useCardano();
   const { voter } = useGetVoterInfo();
 
-  const fetchProposals = async (): Promise<ActionType[]> => {
+  const fetchProposals = async (): Promise<ProposalData[]> => {
     const allProposals = await Promise.all(
       filters.map((filter) =>
         getProposals({
@@ -51,7 +52,7 @@ export const useGetProposalsQuery = ({
   };
 };
 
-const groupByType = (data?: ActionType[]) =>
+const groupByType = (data?: ProposalData[]) =>
   data?.reduce<Record<string, ArrayElement<ToVoteDataType>>>((groups, item) => {
     const itemType = item.type;
 

@@ -4,11 +4,15 @@ import { FilterOption, IProposal } from "@types";
 import environments from "lib/constants/environments";
 import GovernanceActionDetailsPage from "./governanceActionDetailsPage";
 
+const MAX_SLIDES_DISPLAY_PER_TYPE = 6;
+
 export default class GovernanceActionsPage {
   readonly filterBtn = this.page.getByTestId("filters-button");
   readonly sortBtn = this.page.getByTestId("sort-button");
   readonly votedTab = this.page.getByTestId("voted-tab");
   readonly searchInput = this.page.getByTestId("search-input");
+
+  readonly actionsLoading = this.page.getByRole("progressbar").getByRole("img");
 
   constructor(private readonly page: Page) {}
 
@@ -65,7 +69,7 @@ export default class GovernanceActionsPage {
   }
 
   async getAllProposals() {
-    await this.page.waitForTimeout(2_000);
+    await this.page.waitForLoadState("networkidle");
     return this.page.locator('[data-testid$="-card"]').all();
   }
 
@@ -112,25 +116,35 @@ export default class GovernanceActionsPage {
         return elements.length ? elements : null;
       })
     );
-    proposalData = proposalData.filter(Boolean);
+    const proposalsByType = proposalData.filter(Boolean);
 
     // API validation
-    proposalData.forEach(async (proposal) => {
-      if (proposal.length <= 1) return;
+    proposalsByType.forEach(async (proposalList) => {
+      if (proposalList.length <= 1) return;
 
-      const proposals = proposal;
+      const proposals = proposalList;
       for (let i = 0; i <= proposals.length - 2; i++) {
         const isValid = validationFn(proposals[i], proposals[i + 1]);
         expect(isValid).toBe(true);
       }
     });
 
+    await this.page.waitForTimeout(2_000); // wait for proposals to render
+
     // Frontend validation
-    for (let dIdx = 0; dIdx <= proposalData.length - 1; dIdx++) {
-      const proposals = proposalData[dIdx] as IProposal[];
+    for (let dIdx = 0; dIdx <= proposalsByType.length - 1; dIdx++) {
+      const proposals = proposalsByType[0] as IProposal[];
       const slides = await this.page
         .locator(`[data-testid="govaction-${proposals[0].type}-card"]`)
         .all();
+
+      const actualSlidesInDisplay =
+        proposals.length > MAX_SLIDES_DISPLAY_PER_TYPE
+          ? MAX_SLIDES_DISPLAY_PER_TYPE
+          : proposals.length;
+
+      expect(slides).toHaveLength(actualSlidesInDisplay);
+
       for (let i = 0; i <= slides.length - 1; i++) {
         await expect(slides[i]).toContainText(`${proposals[i].txHash}`);
       }

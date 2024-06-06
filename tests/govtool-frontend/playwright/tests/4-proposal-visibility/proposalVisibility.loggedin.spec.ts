@@ -123,9 +123,9 @@ test("4C_3: Should filter and sort Governance Action Type on governance actions 
   await govActionsPage.sortAndValidate(
     SortOption.SoonToExpire,
     (p1, p2) => p1.expiryDate <= p2.expiryDate,
-    [removeAllSpaces(filterOptionNames[0])]
+    [removeAllSpaces(filterOptionNames[choice])]
   );
-  await govActionsPage.validateFilters([filterOptionNames[0]]);
+  await govActionsPage.validateFilters([filterOptionNames[choice]]);
 });
 
 test("4L: Should search governance actions", async ({ page }) => {

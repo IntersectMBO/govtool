@@ -13,7 +13,7 @@ import {
   storageInformationErrorModals,
 } from "@consts";
 import { useCardano, useModal } from "@context";
-import { MetadataValidationStatus } from "@models";
+import { MetadataStandard, MetadataValidationStatus } from "@models";
 import {
   canonizeJSON,
   downloadJson,
@@ -174,6 +174,7 @@ export const useRegisterAsdRepForm = (
         const { status } = await validateMetadata({
           url: data.storingURL,
           hash,
+          standard: MetadataStandard.CIPQQQ,
         });
 
         if (status) {

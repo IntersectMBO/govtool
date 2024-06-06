@@ -19,7 +19,7 @@ import {
   generateJsonld,
   generateMetadataBody,
 } from "@utils";
-import { MetadataValidationStatus } from "@models";
+import { MetadataStandard, MetadataValidationStatus } from "@models";
 import { useWalletErrorModal } from "@hooks";
 import { useValidateMutation } from "../mutations";
 
@@ -147,6 +147,7 @@ export const useEditDRepInfoForm = (
         const { status } = await validateMetadata({
           url,
           hash,
+          standard: MetadataStandard.CIPQQQ,
         });
 
         if (status) {

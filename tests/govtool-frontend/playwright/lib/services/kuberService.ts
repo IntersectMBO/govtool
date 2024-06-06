@@ -1,5 +1,5 @@
 import { faucetWallet } from "@constants/staticWallets";
-import { KuberValue, StaticWallet } from "@types";
+import { KuberValue, QueryProtocolParams, StaticWallet } from "@types";
 import * as blake from "blakejs";
 import environments from "lib/constants/environments";
 import { LockInterceptor, LockInterceptorInfo } from "lib/lockInterceptor";
@@ -168,7 +168,9 @@ const kuberService = {
     return kuber.signAndSubmitTx(req);
   },
 
-  multipleTransferADA: (outputs: { address: string; value: string }[]) => {
+  multipleTransferADA: (
+    outputs: { address: string; value: string | number }[]
+  ) => {
     const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
     const req = {
       outputs,
@@ -324,6 +326,10 @@ const kuberService = {
     return callKuber("/api/v3/utxo?address=" + address) as Promise<
       [KuberBalanceResponse]
     >;
+  },
+
+  queryProtocolParams() {
+    return callKuber("/api/v3/protocol-params") as Promise<QueryProtocolParams>;
   },
 
   voteOnProposal(

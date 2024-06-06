@@ -10,6 +10,13 @@ import walletManager from "lib/walletManager";
 const REGISTER_DREP_WALLETS_COUNT = 9;
 const DREP_WALLETS_COUNT = 9;
 
+let dRepDeposit: number;
+
+setup.beforeAll(async () => {
+  const res = await kuberService.queryProtocolParams();
+  dRepDeposit = res.dRepDeposit;
+});
+
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Register DRep");
@@ -64,7 +71,7 @@ setup("Setup temporary DRep wallets", async () => {
 
   // transfer 600 ADA for dRep registration
   const amountOutputs = registerDRepWallets.map((wallet) => {
-    return { address: wallet.address, value: `${600}A` };
+    return { address: wallet.address, value: dRepDeposit };
   });
   const transferRes = await kuberService.multipleTransferADA(amountOutputs);
   await pollTransaction(transferRes.txId, transferRes.lockInfo);

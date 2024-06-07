@@ -320,7 +320,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
         </Box>
         {bio && !metadataStatus && (
           <>
-            <Typography variant="title2" sx={{ mb: 1.5 }}>
+            <Typography variant="title2" sx={{ mb: 1.5, mt: 5.75 }}>
               {t("about")}
             </Typography>
             <Typography fontWeight={400} sx={{ maxWidth: 608 }} variant="body1">

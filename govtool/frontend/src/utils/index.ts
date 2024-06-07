@@ -24,6 +24,5 @@ export * from "./numberValidation";
 export * from "./openInNewTab";
 export * from "./removeDuplicatedProposals";
 export * from "./testIdFromLabel";
-export * from "./validateMetadataHash";
 export * from "./wait";
 export * from "./isDevEnv";

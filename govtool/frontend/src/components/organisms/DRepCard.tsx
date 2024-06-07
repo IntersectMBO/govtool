@@ -7,7 +7,10 @@ import { useModal, useSnackbar } from "@context";
 import { useTranslation } from "@hooks";
 import { DRepData, DRepStatus } from "@models";
 import { Card } from "@molecules";
-import { correctDRepDirectoryFormat } from "@utils";
+import {
+  correctDRepDirectoryFormat,
+  getMetadataDataMissingStatusTranslation,
+} from "@utils";
 
 type DRepCardProps = {
   dRep: DRepData;
@@ -19,7 +22,7 @@ type DRepCardProps = {
 };
 
 export const DRepCard = ({
-  dRep: { status, type, view, votingPower },
+  dRep: { status, type, view, votingPower, dRepName, metadataStatus },
   isConnected,
   isDelegationLoading,
   isInProgress,
@@ -46,6 +49,9 @@ export const DRepCard = ({
     <Card
       {...(isMe && {
         variant: "primary",
+      })}
+      {...(metadataStatus && {
+        variant: "error",
       })}
       {...(isInProgress && {
         variant: "warning",
@@ -92,8 +98,12 @@ export const DRepCard = ({
             }}
           >
             <Box minWidth={0} display="flex" flexDirection="column">
-              <Typography sx={ellipsisStyles}>
-                {type === "SoleVoter" ? t("dRepDirectory.directVoter") : type}
+              <Typography
+                sx={{ ellipsisStyles, color: metadataStatus && "errorRed" }}
+              >
+                {metadataStatus
+                  ? getMetadataDataMissingStatusTranslation(metadataStatus)
+                  : dRepName}
               </Typography>
               <ButtonBase
                 data-testid={`${view}-copy-id-button`}

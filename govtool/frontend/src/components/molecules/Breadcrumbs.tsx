@@ -11,7 +11,7 @@ type BreadcrumbsProps = {
   elementOne: string;
   elementOnePath: To;
   elementTwo: string;
-  isDataMissing: MetadataValidationStatus | boolean;
+  isDataMissing: MetadataValidationStatus | null;
 };
 
 export const Breadcrumbs = ({
@@ -55,7 +55,7 @@ export const Breadcrumbs = ({
           textOverflow: "ellipsis",
         }}
       >
-        {(isDataMissing !== false &&
+        {(isDataMissing &&
           getMetadataDataMissingStatusTranslation(
             isDataMissing as MetadataValidationStatus,
           )) ||

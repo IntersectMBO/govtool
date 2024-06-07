@@ -70,7 +70,11 @@ export const useVoteContextForm = (
         if (!localHash) {
           throw new Error(MetadataValidationStatus.INVALID_HASH);
         }
-        const result = await validateMetadata({ url, hash: localHash });
+        const result = await validateMetadata({
+          url,
+          hash: localHash,
+          standard: undefined,
+        });
         if (result.status) {
           throw result.status;
         }

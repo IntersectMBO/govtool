@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FormProvider, useForm } from "react-hook-form";
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 
 import { Background } from "@atoms";
 import { PATHS } from "@consts";
@@ -10,6 +10,7 @@ import {
   useScreenDimension,
   useTranslation,
   defaultEditDRepInfoValues,
+  useGetVoterInfo,
 } from "@hooks";
 import { LinkWithIcon } from "@molecules";
 import {
@@ -27,6 +28,8 @@ export const EditDRepMetadata = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { closeModal, openModal } = useModal();
+  const { state } = useLocation();
+  const { voter } = useGetVoterInfo({ enabled: !state });
 
   const methods = useForm({
     mode: "onChange",
@@ -54,8 +57,10 @@ export const EditDRepMetadata = () => {
   useEffect(() => {
     if (checkIsWalletConnected()) {
       navigate(PATHS.home);
+      return;
     }
-  }, []);
+    if (voter && !voter?.isRegisteredAsDRep) navigate(PATHS.dashboard);
+  }, [voter]);
 
   return (
     <Background isReverted>
@@ -72,16 +77,30 @@ export const EditDRepMetadata = () => {
             mt: isMobile ? 3 : 1.5,
           }}
         />
-        <FormProvider {...methods}>
-          {step === 1 && (
-            <EditDRepForm
-              onClickCancel={onClickBackToDashboard}
-              setStep={setStep}
-            />
-          )}
-          {step === 2 && <EditDRepStoreDataInfo setStep={setStep} />}
-          {step === 3 && <EditDRepStorageInformation setStep={setStep} />}
-        </FormProvider>
+        {!voter || !voter.isRegisteredAsDRep ? (
+          <Box
+            sx={{
+              display: "flex",
+              flex: 1,
+              height: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <FormProvider {...methods}>
+            {step === 1 && (
+              <EditDRepForm
+                onClickCancel={onClickBackToDashboard}
+                setStep={setStep}
+              />
+            )}
+            {step === 2 && <EditDRepStoreDataInfo setStep={setStep} />}
+            {step === 3 && <EditDRepStorageInformation setStep={setStep} />}
+          </FormProvider>
+        )}
         {/* FIXME: Footer should be on top of the layout.
         Should not be rerendered across the pages */}
         <Footer />

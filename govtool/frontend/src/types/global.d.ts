@@ -1,5 +1,3 @@
-import { MetadataValidationStatus } from "@models";
-
 export {};
 
 declare global {
@@ -16,31 +14,6 @@ declare global {
 
   type ActionDetailsType = {
     [key: string]: string | number;
-  };
-
-  type ActionType = {
-    id: string;
-    type: string;
-    details?: ActionDetailsType;
-    expiryDate: string;
-    expiryEpochNo: number;
-    createdDate: string;
-    createdEpochNo: number;
-    url?: string;
-    metadataHash?: string;
-    yesVotes: number;
-    noVotes: number;
-    abstainVotes: number;
-    index: number;
-    txHash: string;
-    title?: string;
-    about?: string;
-    motivation?: string;
-    rationale?: string;
-  };
-
-  type ActionTypeToDsiplay = ActionType & {
-    isDataMissing: boolean | MetadataValidationStatus;
   };
 
   interface ActionVotedOnType extends ActionTypeToDsiplay {

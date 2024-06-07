@@ -6,7 +6,7 @@ import * as blake from 'blakejs';
 import { ValidateMetadataDTO } from '@dto';
 import { MetadataValidationStatus } from '@enums';
 import { canonizeJSON, validateMetadataStandard, parseMetadata } from '@utils';
-import { ValidateMetadataResult } from '@types';
+import { MetadataStandard, ValidateMetadataResult } from '@types';
 
 @Injectable()
 export class AppService {
@@ -15,7 +15,7 @@ export class AppService {
   async validateMetadata({
     hash,
     url,
-    standard,
+    standard = MetadataStandard.CIP108,
   }: ValidateMetadataDTO): Promise<ValidateMetadataResult> {
     let status: MetadataValidationStatus;
     let metadata: any;
@@ -27,7 +27,6 @@ export class AppService {
           }),
         ),
       );
-
       if (standard) {
         await validateMetadataStandard(data, standard);
       }

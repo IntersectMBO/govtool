@@ -24,6 +24,8 @@ changes.
 
 ### Added
 
+- added `bio` `dRepName` `email` `references` `metadataValid` and `metadataStatus` fields to `drep/list`
+- added `metadatavalidationmaxconcurrentrequests` field to the backend config
 - added `metadata/validate` endpoint [Issue 876](https://github.com/IntersectMBO/govtool/issues/876)
 - added pagination to `drep/list` [Issue 756](https://github.com/IntersectMBO/govtool/issues/756)
 - added search query param to the `drep/getVotes` [Issue 640](https://github.com/IntersectMBO/govtool/issues/640)
@@ -93,6 +95,7 @@ changes.
 
 ### Changed
 
+- `proposal.about` changed to `proposal.abstract`
 - `drep/info` now returns 4 different tx hashes instead of one latest tx hash [Issue 688](https://github.com/IntersectMBO/govtool/issues/688)
 - `proposal/list` allows user to search by tx hash [Issue 603](https://github.com/IntersectMBO/govtool/issues/603)
 - `proposal/list` returns additional data such ass `expiryEpochNo`, `createdEpochNo`, `title`, `about`, `motivation`,

@@ -1,0 +1,40 @@
+{
+  "page": 0,
+  "pageSize": 7,
+  "total": 1,
+  "elements": [
+    {
+      "id": "39",
+      "txHash": "a12bf9128d4a2c0258a9427b4774756b6a9e1d6fef05011dec20d288a82e8590",
+      "index": 0,
+      "type": "TreasuryWithdrawals",
+      "details": {
+        "Amount": 606,
+        "Reward Address": "stake_test1uz8f3zv44rax4uey5hfxyurnezej9em2pfpwgqxevzxp9hq57qcsh"
+      },
+      "expiryDate": "2024-06-04T08:05:53.728813Z",
+      "expiryEpochNo": 355,
+      "createdDate": "2024-05-29T10:24:17Z",
+      "createdEpochNo": 349,
+      "url": "https://metadata.cardanoapi.io/data/Treasuy.jsonld",
+      "metadataHash": "37ac1dcf986c08517f2f64a0b70a6b5b3c72ac608b6f8e94ba532e8f4817361",
+      "title": null,
+      "about": null,
+      "motivation": null,
+      "rationale": null,
+      "metadata": null,
+      "references": null,
+      "yesVotes": 0,
+      "noVotes": 435025714,
+      "abstainVotes": 3029426246762,
+      "metadataStatus": {
+        "status": null,
+        "valid": false,
+        "raw": {
+          "status": "INVALID_HASH",
+          "valid": false
+        }
+      }
+    }
+  ]
+}

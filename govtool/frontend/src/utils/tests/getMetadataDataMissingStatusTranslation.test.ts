@@ -20,7 +20,7 @@ describe("getMetadataDataMissingStatusTranslation", () => {
     const translation = getMetadataDataMissingStatusTranslation(
       MetadataValidationStatus.INVALID_HASH,
     );
-    expect(translation).toBe("Not Verifiable");
+    expect(translation).toBe("Data Not Verifiable");
   });
 
   it("should return the default translation for unknown status", () => {

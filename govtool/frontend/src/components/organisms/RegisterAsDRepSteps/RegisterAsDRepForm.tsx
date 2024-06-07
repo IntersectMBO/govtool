@@ -125,6 +125,7 @@ export const RegisterAsDRepForm = ({
       <Spacer y={3} />
       <ControlledField.TextArea
         {...{ control, errors }}
+        data-testid="bio-input"
         label={t("forms.registerAsDRep.bio")}
         name="bio"
         placeholder={t("forms.registerAsDRep.bioPlaceholder")}

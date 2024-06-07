@@ -289,6 +289,9 @@ export const en = {
       appCannotGetVkeys: "Application can not get vkey",
       checkIsWalletConnected: "Check if the wallet is connected.",
       dRepIdNotFound: "DrepId not found",
+      insufficientBalanceDescription:
+        "To submit a Governance Action, you will be required to post a refundable balance of ₳{{ada}}. You do not currently have enough ADA in your wallet to continue.",
+      insufficientBalanceTitle: "Insufficient Balance",
       invalidGovernanceActionType: "Invalid Governance Action Type",
       invalidTreasuryGovernanceActionType: "Invalid Treasury Governance Action",
       noAddressesFound: "No addresses found",
@@ -304,6 +307,24 @@ export const en = {
       walletNoCIP30Support: "Your wallet does not support CIP-30 extensions.",
       walletNoCIP90FunctionsEnabled:
         "Your wallet did not enable the needed CIP-95 functions during connection.",
+      dRep: {
+        description: {
+          notVerifiable:
+            "GovTool uses external sources for DRep data, and these sources are maintianed by the DReps themselves. This error means that the data stored by the DRep does not match the data supplied by the DRep when they originally registered",
+          dataMissing:
+            "GovTool uses external sources for DRep data, and these sources are maintianed by the DReps themselves. This error means that GovTool cannot locate the data on the URL specified when the DRep was originally registered.",
+          incorrectFormat:
+            "GovTool uses external sources for DRep data, and these sources are maintianed by the DReps themselves. This error means that the data stored by the DRep does not match the format defined by the DRep spec.",
+        },
+        message: {
+          notVerifiable:
+            "The data that was originally used when this DRep was created has changed.",
+          dataMissing:
+            "The data that was originally used when this DRep was created has not been found.",
+          incorrectFormat:
+            "The data that was originally used when this DRep was created has been formatted incorrectly.",
+        },
+      },
       gAMetadata: {
         description: {
           notVerifiable:
@@ -319,7 +340,7 @@ export const en = {
           dataMissing:
             "The data that was originally used when this Governance Action was created has not been found.",
           incorrectFormat:
-            "The data that was originally used when this Governance Action was created has been formatted incorrectly. ",
+            "The data that was originally used when this Governance Action was created has been formatted incorrectly.",
         },
         title: {},
       },
@@ -369,6 +390,10 @@ export const en = {
         emailPlaceholder: "john.smith@email.com",
       },
     },
+    proposalDiscussion: {
+      title: "Proposal Discussion",
+      proposeAGovernanceAction: "Propose a Governance Action",
+    },
     govActions: {
       about: "About",
       abstract: "Abstract:",
@@ -414,7 +439,7 @@ export const en = {
       viewOtherDetails: "View other details",
       viewProposalDetails: "View proposal details",
       vote: "Vote",
-      voteContextJsonldFileName: "Vote_Context.jsonld",
+      voteContextFileName: "Vote_Context.txt",
       votedOnByMe: "Voted on by me",
       voteOnGovActions: "Vote on Governance Action",
       voteSubmitted: "Vote submitted",
@@ -762,7 +787,7 @@ export const en = {
     },
     dataMissingErrors: {
       dataMissing: "Data Missing",
-      notVerifiable: "Not Verifiable",
+      notVerifiable: "Data Not Verifiable",
       incorrectFormat: "Data Formatted Incorrectly",
     },
     about: "About",

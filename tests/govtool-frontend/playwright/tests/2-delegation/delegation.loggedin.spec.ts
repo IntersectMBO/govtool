@@ -39,3 +39,33 @@ test("2D. Should show delegation options in connected state", async ({
     2
   );
 });
+
+test("2X_1. Should include info button and voting power on the Abstain card", async ({
+  page,
+}) => {
+  const dRepDirectoryPage = new DRepDirectoryPage(page);
+  await dRepDirectoryPage.goto();
+
+  await dRepDirectoryPage.automaticDelegationOptionsDropdown.click();
+
+  await expect(
+    dRepDirectoryPage.abstainDelegationCard.getByText("₳")
+  ).toBeVisible();
+
+  await expect(dRepDirectoryPage.abstainInfoButton).toBeVisible();
+});
+
+test("2X_2. Should include info button and voting power on the Signal-No-Confidence card", async ({
+  page,
+}) => {
+  const dRepDirectoryPage = new DRepDirectoryPage(page);
+  await dRepDirectoryPage.goto();
+
+  await dRepDirectoryPage.automaticDelegationOptionsDropdown.click();
+
+  await expect(
+    dRepDirectoryPage.signalNoConfidenceCard.getByText("₳")
+  ).toBeVisible();
+
+  await expect(dRepDirectoryPage.signalNoConfidenceInfoButton).toBeVisible();
+});

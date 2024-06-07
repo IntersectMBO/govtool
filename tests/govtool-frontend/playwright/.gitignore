@@ -13,6 +13,7 @@ allure-report/
 .vars
 .lock-pool/
 .logs/
-lib/_mock/*.json
-
+lib/_mock/registerDRepWallets.json
+lib/_mock/registeredDRepWallets.json
+lib/_mock/wallets.json
 ./lock_logs.txt

@@ -84,6 +84,8 @@ data VVAConfigInternal
       , vVAConfigInternalMetadataValidationHost :: Text
         -- | Metadata validation service port
       , vVAConfigInternalMetadataValidationPort :: Int
+        -- | Maximum number of concurrent metadata requests
+      , vVAConfigInternalMetadataValidationMaxConcurrentRequests :: Int
       }
   deriving (FromConfig, Generic, Show)
 
@@ -96,7 +98,8 @@ instance DefaultConfig VVAConfigInternal where
         vVaConfigInternalCacheDurationSeconds = 20,
         vVAConfigInternalSentrydsn = "https://username:password@senty.host/id",
         vVAConfigInternalMetadataValidationHost = "localhost",
-        vVAConfigInternalMetadataValidationPort = 3001
+        vVAConfigInternalMetadataValidationPort = 3001,
+        vVAConfigInternalMetadataValidationMaxConcurrentRequests = 10
       }
 
 -- | DEX configuration.
@@ -116,6 +119,8 @@ data VVAConfig
       , metadataValidationHost :: Text
         -- | Metadata validation service port
       , metadataValidationPort :: Int
+        -- | Maximum number of concurrent metadata requests
+      , metadataValidationMaxConcurrentRequests :: Int
       }
   deriving (Generic, Show, ToJSON)
 
@@ -157,7 +162,8 @@ convertConfig VVAConfigInternal {..} =
       cacheDurationSeconds = vVaConfigInternalCacheDurationSeconds,
       sentryDSN = vVAConfigInternalSentrydsn,
       metadataValidationHost = vVAConfigInternalMetadataValidationHost,
-      metadataValidationPort = vVAConfigInternalMetadataValidationPort
+      metadataValidationPort = vVAConfigInternalMetadataValidationPort,
+      metadataValidationMaxConcurrentRequests = vVAConfigInternalMetadataValidationMaxConcurrentRequests
     }
 
 -- | Load configuration from a file specified on the command line.  Load from

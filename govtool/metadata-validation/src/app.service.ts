@@ -6,7 +6,7 @@ import * as blake from 'blakejs';
 import { ValidateMetadataDTO } from '@dto';
 import { MetadataValidationStatus } from '@enums';
 import { canonizeJSON, validateMetadataStandard, parseMetadata } from '@utils';
-import { ValidateMetadataResult } from '@types';
+import { MetadataStandard, ValidateMetadataResult } from '@types';
 
 @Injectable()
 export class AppService {
@@ -15,7 +15,9 @@ export class AppService {
   async validateMetadata({
     hash,
     url,
-    standard,
+    standard = MetadataStandard.CIP108,
+    // workaround property to not break the haskell backend
+    noStandard = false,
   }: ValidateMetadataDTO): Promise<ValidateMetadataResult> {
     let status: MetadataValidationStatus;
     let metadata: any;
@@ -27,21 +29,29 @@ export class AppService {
           }),
         ),
       );
-
-      if (standard) {
+      if (standard && !noStandard) {
         await validateMetadataStandard(data, standard);
       }
 
-      metadata = parseMetadata(data.body, standard);
-
-      let canonizedMetadata;
-      try {
-        canonizedMetadata = await canonizeJSON(data);
-      } catch (error) {
-        throw MetadataValidationStatus.INVALID_JSONLD;
+      if (!noStandard) {
+        metadata = parseMetadata(data.body, standard);
       }
 
-      const hashedMetadata = blake.blake2bHex(canonizedMetadata, undefined, 32);
+      let canonizedMetadata;
+      if (!noStandard) {
+        try {
+          canonizedMetadata = await canonizeJSON(data);
+        } catch (error) {
+          throw MetadataValidationStatus.INVALID_JSONLD;
+        }
+      }
+
+      const hashedMetadata = blake.blake2bHex(
+        !standard ? data : canonizedMetadata,
+        undefined,
+        32,
+      );
+
       if (hashedMetadata !== hash) {
         throw MetadataValidationStatus.INVALID_HASH;
       }

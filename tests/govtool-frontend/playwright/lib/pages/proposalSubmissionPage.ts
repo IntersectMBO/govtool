@@ -35,10 +35,14 @@ export default class ProposalSubmissionPage {
   readonly addLinkBtn = this.page.getByRole("button", { name: "+ Add link" }); // BUG testid= add-link-button
   readonly infoRadioButton = this.page.getByTestId("Info-radio");
   readonly treasuryRadioButton = this.page.getByTestId("Treasury-radio");
+  readonly editSubmissionButton = this.page.getByTestId(
+    "edit-submission-button"
+  );
 
   // input fields
   readonly titleInput = this.page.getByPlaceholder("A name for this Action"); // BUG testid = title-input
   readonly abstractInput = this.page.getByPlaceholder("Summary"); // BUG testid = abstract-input
+  readonly metadataUrlInput = this.page.getByTestId("metadata-url-input");
   readonly motivationInput = this.page.getByPlaceholder(
     "Problem this GA will solve"
   ); // BUG testid = motivation-input
@@ -77,7 +81,7 @@ export default class ProposalSubmissionPage {
       dRepMetadata.name,
       dRepMetadata.data
     );
-    await this.page.getByPlaceholder("URL").fill(url);
+    await this.metadataUrlInput.fill(url);
     await this.continueBtn.click();
   }
 

@@ -7,7 +7,7 @@ test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
 });
 
-test("2M. Should sort DReps", async ({ page }) => {
+test("2K_2. Should sort DReps", async ({ page }) => {
   test.slow();
 
   enum SortOption {
@@ -55,7 +55,7 @@ test("2O. Should load more DReps on show more", async ({ page }) => {
   }
 });
 
-test("2K. Should filter DReps", async ({ page }) => {
+test("2K_1. Should filter DReps", async ({ page }) => {
   const dRepFilterOptions: DRepStatus[] = ["Active", "Inactive", "Retired"];
 
   const dRepDirectory = new DRepDirectoryPage(page);

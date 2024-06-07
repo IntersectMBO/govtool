@@ -27,8 +27,12 @@
     "@emotion/styled": "^11.11.0",
     "@emurgo/cardano-serialization-lib-asmjs": "12.0.0-alpha.29",
     "@hookform/resolvers": "^3.3.1",
+    "@intersect.mbo/intersectmbo.org-icons-set": "^1.0.8",
+    "@intersect.mbo/pdf-ui": "^0.1.2",
     "@mui/icons-material": "^5.14.3",
     "@mui/material": "^5.14.4",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/pluginutils": "^5.1.0",
     "@sentry/react": "^7.77.0",
     "@types/jsonld": "^1.5.13",
     "@types/react": "^18.2.12",
@@ -53,6 +57,7 @@
     "react-router-dom": "^6.13.0",
     "storybook-addon-manual-mocks": "^1.0.3",
     "storybook-addon-module-mock": "^1.1.2",
+    "vite-plugin-babel": "^1.2.0",
     "yup": "^1.3.2"
   },
   "devDependencies": {
@@ -75,7 +80,7 @@
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^7.3.1",
     "@typescript-eslint/parser": "^7.3.1",
-    "@vitejs/plugin-react": "^4.0.0",
+    "@vitejs/plugin-react": "^4.3.0",
     "@vitest/coverage-v8": "^1.5.0",
     "@vitest/ui": "^1.1.0",
     "chromatic": "^11.3.0",
@@ -96,6 +101,9 @@
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-arm64-musl": "4.12.0"
+  },
+  "overrides": {
+    "typescript": "^5.0.2"
   },
   "readme": "ERROR: No README data found!",
   "_id": "voltaire-voting-app@0.0.0"

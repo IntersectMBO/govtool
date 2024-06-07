@@ -79,6 +79,7 @@ export default class GovernanceActionDetailsPage {
     return downloadMetadata(download);
   }
 
+  @withTxConfirmation
   async reVote() {
     await this.noVoteRadio.click();
     await this.changeVoteBtn.click();

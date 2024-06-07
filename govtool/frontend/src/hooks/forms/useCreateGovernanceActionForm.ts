@@ -15,12 +15,15 @@ import {
 import { useCardano, useModal } from "@context";
 import {
   canonizeJSON,
+  correctAdaFormat,
   downloadJson,
   generateJsonld,
   generateMetadataBody,
+  getItemFromLocalStorage,
+  PROTOCOL_PARAMS_KEY,
 } from "@utils";
 import { useWalletErrorModal } from "@hooks";
-import { MetadataValidationStatus } from "@models";
+import { MetadataStandard, MetadataValidationStatus } from "@models";
 import {
   GovernanceActionFieldSchemas,
   GovernanceActionType,
@@ -41,6 +44,8 @@ export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues =
     storeData: false,
     storingURL: "",
   };
+
+const protocolParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
 export const useCreateGovernanceActionForm = (
   setStep?: Dispatch<SetStateAction<number>>,
@@ -195,6 +200,7 @@ export const useCreateGovernanceActionForm = (
         const { status } = await validateMetadata({
           url: data.storingURL,
           hash,
+          standard: MetadataStandard.CIP108,
         });
 
         if (status) {
@@ -210,6 +216,10 @@ export const useCreateGovernanceActionForm = (
         showSuccessModal();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
+        const isInsufficientBalance = error
+          ?.toLowerCase()
+          ?.includes("insufficient");
+
         if (
           Object.values(MetadataValidationStatus).includes(
             error as MetadataValidationStatus,
@@ -227,7 +237,14 @@ export const useCreateGovernanceActionForm = (
           });
         } else {
           openWalletErrorModal({
-            error,
+            error: isInsufficientBalance
+              ? t("errors.insufficientBalanceDescription", {
+                  ada: correctAdaFormat(protocolParams.gov_action_deposit),
+                })
+              : error,
+            title: isInsufficientBalance
+              ? t("errors.insufficientBalanceTitle")
+              : undefined,
             dataTestId: "create-governance-action-error-modal",
           });
           captureException(error);

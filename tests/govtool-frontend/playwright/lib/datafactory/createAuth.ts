@@ -35,8 +35,8 @@ export async function createTempAdaHolderAuth(
   return tempAdaHolderAuth;
 }
 
-export async function createTempUserAuth(page: Page, wallet: ShelleyWallet) {
-  await importWallet(page, wallet.json());
+export async function createTempUserAuth(page: Page, wallet: StaticWallet) {
+  await importWallet(page, wallet);
 
   const loginPage = new LoginPage(page);
   await loginPage.login();

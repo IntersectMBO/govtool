@@ -5,6 +5,7 @@ import { CONNECTED_NAV_ITEMS, ICONS } from "@consts";
 import { DRepInfoCard, WalletInfoCard } from "@molecules";
 import { useGetVoterInfo, useScreenDimension } from "@hooks";
 import { openInNewTab } from "@utils";
+import { useFeatureFlag } from "@context";
 
 import { DashboardDrawerMobileProps } from "./types";
 
@@ -16,6 +17,7 @@ export const DashboardDrawerMobile = ({
   isDrawerOpen,
   setIsDrawerOpen,
 }: DashboardDrawerMobileProps) => {
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { screenWidth } = useScreenDimension();
   const { voter } = useGetVoterInfo();
 
@@ -65,21 +67,30 @@ export const DashboardDrawerMobile = ({
               </IconButton>
             </Box>
             <Grid container direction="column" rowGap={4} mt={6}>
-              {CONNECTED_NAV_ITEMS.map((navItem) => (
-                <Grid item>
-                  <Link
-                    {...navItem}
-                    size="big"
-                    onClick={() => {
-                      // TODO: Refine if it is needed to remove this eslint-disable
-                      // eslint-disable-next-line no-unused-expressions
-                      navItem.newTabLink && openInNewTab(navItem.newTabLink);
-                      setIsDrawerOpen(false);
-                    }}
-                    isConnectWallet
-                  />
-                </Grid>
-              ))}
+              {CONNECTED_NAV_ITEMS.map((navItem) => {
+                if (
+                  !isProposalDiscussionForumEnabled &&
+                  navItem.dataTestId === "proposal-discussion-link"
+                ) {
+                  return null;
+                }
+
+                return (
+                  <Grid item>
+                    <Link
+                      {...navItem}
+                      size="big"
+                      onClick={() => {
+                        // TODO: Refine if it is needed to remove this eslint-disable
+                        // eslint-disable-next-line no-unused-expressions
+                        navItem.newTabLink && openInNewTab(navItem.newTabLink);
+                        setIsDrawerOpen(false);
+                      }}
+                      isConnectWallet
+                    />
+                  </Grid>
+                );
+              })}
             </Grid>
           </Box>
           {(voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter) && (

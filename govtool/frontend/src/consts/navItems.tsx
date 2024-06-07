@@ -1,5 +1,4 @@
 import { IconAcademicCap } from "@intersect.mbo/intersectmbo.org-icons-set";
-import { isDevEnv } from "@utils";
 import i18n from "@/i18n";
 import { theme } from "@/theme";
 
@@ -102,9 +101,4 @@ export const CONNECTED_NAV_ITEMS = [
     icon: ICONS.faqsIcon,
     newTabLink: "https://docs.sanchogov.tools/faqs",
   },
-].filter((item) => {
-  if (!isDevEnv && item.dataTestId === "proposal-discussion-link") {
-    return false;
-  }
-  return true;
-});
+];

@@ -17,7 +17,6 @@ env:
   ENVIRONMENT: "dev"
   CARDANO_NETWORK: "sanchonet"
   DOMAIN: "dev-sanchonet.govtool.byron.network"
-  IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: ${{ inputs.isProposalDiscussionForumEnabled == 'enabled' }}
 
 jobs:
   deploy:
@@ -48,6 +47,7 @@ jobs:
       SENTRY_IGNORE_API_RESOLUTION_ERROR: "1"
       TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
       USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
+      IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: ${{ inputs.isProposalDiscussionForumEnabled == 'enabled' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

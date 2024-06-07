@@ -439,7 +439,7 @@ export const en = {
       viewOtherDetails: "View other details",
       viewProposalDetails: "View proposal details",
       vote: "Vote",
-      voteContextJsonldFileName: "Vote_Context.jsonld",
+      voteContextFileName: "Vote_Context.txt",
       votedOnByMe: "Voted on by me",
       voteOnGovActions: "Vote on Governance Action",
       voteSubmitted: "Vote submitted",

@@ -22,4 +22,5 @@ export type MetadataValidationDTO = {
   url: string;
   hash: string;
   standard?: MetadataStandard;
+  noStandard?: boolean;
 };

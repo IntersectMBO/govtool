@@ -2,6 +2,7 @@ import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { isMobile, openDrawer } from "@helpers/mobile";
+import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { expect } from "@playwright/test";
 import environments from "lib/constants/environments";
 
@@ -145,6 +146,32 @@ test.describe("wallet connect state", () => {
 
     await expect(proposed_GA_VoterLearnMorepage).toHaveURL(
       `${environments.docsUrl}/faqs/what-is-a-governance-action`
+    );
+  });
+
+  test("6F should open sanchonet docs in a new tab when clicking `info` button of abstain and signal-no-confidence card", async ({
+    page,
+    context,
+  }) => {
+    const dRepDirectoryPage = new DRepDirectoryPage(page);
+    await dRepDirectoryPage.goto();
+
+    await dRepDirectoryPage.automaticDelegationOptionsDropdown.click();
+
+    const [abstain_Info_Page] = await Promise.all([
+      context.waitForEvent("page"),
+      dRepDirectoryPage.abstainInfoButton.click(),
+    ]);
+
+    await expect(abstain_Info_Page).toHaveURL(`${environments.docsUrl}`);
+
+    const [signal_No_Confidence_Info_Page] = await Promise.all([
+      context.waitForEvent("page"),
+      dRepDirectoryPage.signalNoConfidenceInfoButton.click(),
+    ]);
+
+    await expect(signal_No_Confidence_Info_Page).toHaveURL(
+      `${environments.docsUrl}`
     );
   });
 });

@@ -28,8 +28,8 @@ specific stages of the development and deployment lifecycle:
 Docker Compose is utilized to manage per-environment services setups
 effectively. This includes configurations for:
 
-- Services such as Cardano Node, Cardano DB Sync, GovTool backend, and GovTool
-  frontend.
+- Services such as Cardano Node, Cardano DB Sync, GovTool backend, GovTool
+  frontend, the metadata validation service and an analytics dashboard.
 - Network configuration with Traefik to handle requests efficiently.
 - Monitoring solutions with Prometheus and Grafana to ensure optimal performance
   and availability.
@@ -116,7 +116,7 @@ Displays deployment parameters for review and verification.
 
 Sends a notification to stakeholders about the deployment status via Slack.
 
-### Building backend images steps in [backend `Makefile`](../../govtool/backend/Makefile)
+### Building backend images steps in [`backend.mk`](./backend.mk)
 
 This file is responsible for generating images for backend and for pushing them
 to the ECR repository.
@@ -130,7 +130,7 @@ are detected in the Cabal file.
 
 Pushes the backend and backend-base images to the Docker repository.
 
-### Building frontend images steps in [frontend `Makefile`](../../govtool/frontend/Makefile)
+### Building frontend images steps in [`frontend.mk`](./frontend.mk)
 
 This file is responsible for generating images for frontend and for pushing them
 to the ECR repository.
@@ -142,3 +142,42 @@ Handles the construction of the frontend image.
 #### `push-frontend`
 
 Pushes the frontend image to the Docker repository.
+
+### Building status service images steps in [`status-service.mk`](./status-service.mk)
+
+This file is responsible for generating images for status service and for
+pushing them to the ECR repository.
+
+#### `build-status-service`
+
+Handles the construction of the status service image.
+
+#### `push-status-service`
+
+Pushes the status service image to the Docker repository.
+
+### Building metadata validation service images steps in [`metadata-validation.mk`](./metadata-validation.mk)
+
+This file is responsible for generating images for metadata validation service
+and for pushing them to the ECR repository.
+
+#### `build-metadata-validation`
+
+Handles the construction of the metadata validation service image.
+
+#### `push-metadata-validation`
+
+Pushes the metadata validation service image to the Docker repository.
+
+### Building analytics dashboard service images steps in [`analytics-dashboard.mk`](./analytics-dashboard.mk)
+
+This file is responsible for generating images for analytics dashboard service
+and for pushing them to the ECR repository.
+
+#### `build-analytics-dashboard`
+
+Handles the construction of the analytics dashboard service image.
+
+#### `push-analytics-dashboard`
+
+Pushes the analytics dashboard service image to the Docker repository.

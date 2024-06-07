@@ -2,7 +2,7 @@ import { useCallback, useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { Modal, ScrollToTop } from "@atoms";
 import { PATHS, PDF_PATHS } from "@consts";
-import { useCardano, useModal } from "@context";
+import { useCardano, useFeatureFlag, useModal } from "@context";
 import { useWalletConnectionListener } from "@hooks";
 import {
   DashboardCards,
@@ -34,12 +34,12 @@ import {
   getItemFromLocalStorage,
   WALLET_LS_KEY,
   removeItemFromLocalStorage,
-  isDevEnv,
 } from "@utils";
 
 import { PDFWrapper } from "./components/organisms/PDFWrapper";
 
 export default () => {
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { enable, isEnabled } = useCardano();
   const navigate = useNavigate();
   const { modal, openModal, modals } = useModal();
@@ -81,7 +81,7 @@ export default () => {
   }, [checkTheWalletIsActive]);
 
   useEffect(() => {
-    if (!isDevEnv) return;
+    if (!isProposalDiscussionForumEnabled) return;
     if (
       window.location.pathname.includes(PDF_PATHS.proposalDiscussion) &&
       !window.location.pathname.includes(PATHS.proposalPillar.replace("/*", ""))
@@ -101,7 +101,7 @@ export default () => {
       <Routes>
         <Route path={PATHS.home} element={<Home />} />
         <Route path={PATHS.governanceActions} element={<GovernanceActions />} />
-        {isDevEnv && !isEnabled && (
+        {isProposalDiscussionForumEnabled && !isEnabled && (
           <Route path={PATHS.proposalPillar} element={<PDFWrapper />} />
         )}
         <Route
@@ -114,7 +114,7 @@ export default () => {
         />
         <Route element={<Dashboard />}>
           <Route path={PATHS.dashboard} element={<DashboardCards />} />
-          {isDevEnv && (
+          {isProposalDiscussionForumEnabled && (
             <Route
               path={PATHS.connectedProposalPillar}
               element={<PDFWrapper />}

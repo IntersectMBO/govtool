@@ -3,11 +3,21 @@ run-name: Deploy by @${{ github.actor }}
 
 on:
   workflow_dispatch:
+    inputs:
+      isProposalDiscussionForumEnabled:
+        description: "Enable proposal discussion forum"
+        required: true
+        type: choice
+        default: "disabled"
+        options:
+          - "enabled"
+          - "disabled"
 
 env:
   ENVIRONMENT: "dev"
   CARDANO_NETWORK: "sanchonet"
   DOMAIN: "dev-sanchonet.govtool.byron.network"
+  IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: ${{ inputs.isProposalDiscussionForumEnabled == 'enabled' }}
 
 jobs:
   deploy:

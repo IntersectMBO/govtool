@@ -3,11 +3,13 @@ import { NavLink } from "react-router-dom";
 
 import { DrawerLink, Spacer } from "@atoms";
 import { CONNECTED_NAV_ITEMS, IMAGES, PATHS } from "@consts";
+import { useFeatureFlag } from "@context";
 import { useGetVoterInfo } from "@hooks";
 import { WalletInfoCard, DRepInfoCard } from "@molecules";
 import { openInNewTab } from "@utils";
 
 export const Drawer = () => {
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { voter } = useGetVoterInfo();
 
   return (
@@ -44,18 +46,27 @@ export const Drawer = () => {
         px={3}
         rowGap={2}
       >
-        {CONNECTED_NAV_ITEMS.map((navItem) => (
-          <Grid item key={navItem.label}>
-            <DrawerLink
-              {...navItem}
-              onClick={
-                navItem.newTabLink
-                  ? () => openInNewTab(navItem.newTabLink)
-                  : undefined
-              }
-            />
-          </Grid>
-        ))}
+        {CONNECTED_NAV_ITEMS.map((navItem) => {
+          if (
+            !isProposalDiscussionForumEnabled &&
+            navItem.dataTestId === "proposal-discussion-link"
+          ) {
+            return null;
+          }
+
+          return (
+            <Grid item key={navItem.label}>
+              <DrawerLink
+                {...navItem}
+                onClick={
+                  navItem.newTabLink
+                    ? () => openInNewTab(navItem.newTabLink)
+                    : undefined
+                }
+              />
+            </Grid>
+          );
+        })}
       </Grid>
       <Box p={2}>
         {voter?.isRegisteredAsDRep && <DRepInfoCard />}

@@ -21,4 +21,5 @@
         GOVTOOL_TAG: "{{ lookup('env', 'GOVTOOL_TAG') }}"
         NPMRC_TOKEN: "{{ lookup('env','NPMRC_TOKEN') }}"
         SENTRY_DSN_FRONTEND: "{{ lookup ('env', 'SENTRY_DSN_FRONTEND') }}"
+        SENTRY_DSN_BACKEND: "{{ lookup ('env', 'SENTRY_DSN_BACKEND') }}"
       become: yes

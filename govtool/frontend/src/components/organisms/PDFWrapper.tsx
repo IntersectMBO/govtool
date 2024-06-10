@@ -1,12 +1,11 @@
 import { Box } from "@mui/material";
 import PDF from "@intersect.mbo/pdf-ui/cjs";
 import "@intersect.mbo/pdf-ui/style";
-import { useCardano } from "@/context";
-import { TopNav } from "./TopNav";
+import { useCardano, useGovernanceActions } from "@/context";
 
 export const PDFWrapper = () => {
   const walletAPI = useCardano();
-  const isWalletConnected = walletAPI.isEnabled;
+  const { createGovernanceActionJsonLD, createHash } = useGovernanceActions();
 
   return (
     <Box
@@ -15,8 +14,10 @@ export const PDFWrapper = () => {
         py: 3,
       }}
     >
-      {!isWalletConnected && <TopNav />}
-      <PDF walletAPI={{ ...walletAPI }} pathname={window.location.pathname} />
+      <PDF
+        walletAPI={{ ...walletAPI, createGovernanceActionJsonLD, createHash }}
+        pathname={window.location.pathname}
+      />
     </Box>
   );
 };

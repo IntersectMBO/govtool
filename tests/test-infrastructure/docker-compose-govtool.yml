@@ -40,6 +40,9 @@ services:
       context: ../../govtool/frontend
       args:
         VITE_BASE_URL: "/api"
+        VITE_SENTRY_DSN: ${SENTRY_DSN_FRONTEND}
+        NPMRC_TOKEN: ${NPMRC_TOKEN}
+        VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "true"
     environment:
       VIRTUAL_HOST: https://${BASE_DOMAIN}
     networks:

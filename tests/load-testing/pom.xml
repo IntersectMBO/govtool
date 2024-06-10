@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.gatling.govtool</groupId>
     <artifactId>govtool-backend</artifactId>
-    <version>0.0.1</version>
+    <version>1.0.0</version>
     <properties>
         <!-- use the following if you're compiling with JDK 8-->
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -12,7 +12,7 @@
         <!-- comment the 2 lines above and uncomment the line bellow if you're compiling with JDK 11 or 17 -->
         <!--    <maven.compiler.release>11</maven.compiler.release>-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <gatling.version>3.9.5</gatling.version>
+        <gatling.version>3.11.3</gatling.version>
         <gatling-maven-plugin.version>4.5.0</gatling-maven-plugin.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
@@ -28,17 +28,17 @@
         <dependency>
             <groupId>io.gatling</groupId>
             <artifactId>gatling-app</artifactId>
-            <version>3.9.5</version>
+            <version>3.11.3</version>
         </dependency>
         <dependency>
             <groupId>io.gatling</groupId>
             <artifactId>gatling-core</artifactId>
-            <version>3.9.5</version>
+            <version>3.11.3</version>
         </dependency>
         <dependency>
             <groupId>io.gatling</groupId>
             <artifactId>gatling-recorder</artifactId>
-            <version>3.9.5</version>
+            <version>3.11.3</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>

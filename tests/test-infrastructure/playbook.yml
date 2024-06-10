@@ -19,4 +19,6 @@
         chdir: "/opt/govtool/tests/test-infrastructure"
       environment:
         GOVTOOL_TAG: "{{ lookup('env', 'GOVTOOL_TAG') }}"
+        NPMRC_TOKEN: "{{ lookup('env','NPMRC_TOKEN') }}"
+        SENTRY_DSN_FRONTEND: "{{ lookup ('env', 'SENTRY_DSN_FRONTEND') }}"
       become: yes

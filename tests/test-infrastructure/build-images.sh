@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/e bash
 set -e
 export BASE_IMAGE_NAME="govtool"
 BASE_IMAGE_EXISTS=$(docker images -q "$BASE_IMAGE_NAME"/backend-base)

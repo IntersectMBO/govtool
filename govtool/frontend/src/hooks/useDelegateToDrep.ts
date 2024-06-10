@@ -15,12 +15,12 @@ export const useDelegateTodRep = () => {
   const openWalletErrorModal = useWalletErrorModal();
   const { voter } = useGetVoterInfo();
 
-  const [isDelegating, setIsDelegating] = useState(false);
+  const [isDelegating, setIsDelegating] = useState<string | null>(null);
 
   const delegate = useCallback(
     async (dRepId: string | undefined) => {
       if (!dRepId) return;
-      setIsDelegating(true);
+      setIsDelegating(dRepId);
       try {
         if (voter?.isRegisteredAsSoleVoter && !voter?.deposit) {
           throw new Error(t("errors.appCannotGetDeposit"));
@@ -46,7 +46,7 @@ export const useDelegateTodRep = () => {
         });
         Sentry.captureException(error);
       } finally {
-        setIsDelegating(false);
+        setIsDelegating(null);
       }
     },
     [

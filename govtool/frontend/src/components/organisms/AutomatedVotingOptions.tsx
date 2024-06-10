@@ -23,7 +23,7 @@ type AutomatedVotingOptionsProps = {
   votingPower: string;
   delegationInProgress?: string;
   isConnected?: boolean;
-  isDelegationLoading?: boolean;
+  isDelegationLoading?: string | null;
   pendingTransaction?: PendingTransaction;
   txHash?: string | null;
 };
@@ -110,7 +110,9 @@ export const AutomatedVotingOptions = ({
             }
             inProgress={isDelegationToAbstainInProgress}
             isConnected={isConnected}
-            isDelegateLoading={isDelegationLoading}
+            isDelegateLoading={
+              isDelegationLoading === AutomatedVotingOptionDelegationId.abstain
+            }
             isSelected={isDelegatedToAbstain}
             onClickDelegate={() =>
               delegate(AutomatedVotingOptionDelegationId.abstain)
@@ -146,7 +148,10 @@ export const AutomatedVotingOptions = ({
             }
             inProgress={isDelegationToNoConfidenceInProgress}
             isConnected={isConnected}
-            isDelegateLoading={isDelegationLoading}
+            isDelegateLoading={
+              isDelegationLoading ===
+              AutomatedVotingOptionDelegationId.no_confidence
+            }
             isSelected={isDelegatedToNoConfidence}
             onClickDelegate={() =>
               delegate(AutomatedVotingOptionDelegationId.no_confidence)

@@ -1,16 +1,9 @@
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
-import { NodeObject } from "jsonld";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
 import { captureException } from "@sentry/react";
 
-import { CIP_108, VOTE_TEST_CONTEXT } from "@consts";
-import {
-  canonizeJSON,
-  downloadJson,
-  generateJsonld,
-  generateMetadataBody,
-} from "@utils";
+import { downloadTextFile } from "@utils";
 import { MetadataValidationStatus } from "@models";
 
 import { useValidateMutation } from "../mutations";
@@ -28,7 +21,6 @@ export const useVoteContextForm = (
 ) => {
   const { validateMetadata } = useValidateMutation();
   const [hash, setHash] = useState<string | null>(null);
-  const [json, setJson] = useState<NodeObject | null>(null);
 
   const {
     control,
@@ -42,27 +34,21 @@ export const useVoteContextForm = (
   } = useFormContext<VoteContextFormValues>();
 
   const generateMetadata = useCallback(async () => {
-    const body = generateMetadataBody({
-      data: getValues(),
-      acceptedKeys: ["voteContextText"],
-      standardReference: CIP_108,
-    });
+    const { voteContextText } = getValues();
 
-    const jsonld = await generateJsonld(body, VOTE_TEST_CONTEXT);
-    const canonizedJson = await canonizeJSON(jsonld);
-    const canonizedJsonHash = blake2bHex(canonizedJson, undefined, 32);
+    const canonizedJsonHash = blake2bHex(voteContextText, undefined, 32);
 
     // That allows to validate metadata hash
     setHash(canonizedJsonHash);
-    setJson(jsonld);
 
-    return jsonld;
+    return voteContextText;
   }, [getValues]);
 
-  const onClickDownloadJson = useCallback(() => {
-    if (!json) return;
-    downloadJson(json, "Vote_Context");
-  }, [json]);
+  const onClickDownloadFile = useCallback(() => {
+    const { voteContextText } = getValues();
+    if (!voteContextText) return;
+    downloadTextFile(voteContextText, "Vote_Context");
+  }, [getValues]);
 
   const validateHash = useCallback(
     async (url: string, localHash: string | null) => {
@@ -70,10 +56,17 @@ export const useVoteContextForm = (
         if (!localHash) {
           throw new Error(MetadataValidationStatus.INVALID_HASH);
         }
-        const result = await validateMetadata({ url, hash: localHash });
+
+        const result = await validateMetadata({
+          hash: localHash,
+          url,
+          noStandard: true,
+        });
+
         if (result.status) {
           throw result.status;
         }
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         if (Object.values(MetadataValidationStatus).includes(error)) {
@@ -108,7 +101,7 @@ export const useVoteContextForm = (
     generateMetadata,
     getValues,
     isValid,
-    onClickDownloadJson,
+    onClickDownloadFile,
     register,
     reset,
     setValue,

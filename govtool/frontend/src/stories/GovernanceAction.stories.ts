@@ -26,11 +26,12 @@ const commonArgs = {
   expiryEpochNo: 420,
   index: 2,
   inProgress: false,
-  isDataMissing: false,
   onClick: jest.fn(),
   title: "Example title",
   txHash: "sad78afdsf7jasd98d",
   type: "exampleType",
+  metadataValid: true,
+  metadataStatus: null,
 };
 
 export const GovernanceActionCardComponent: Story = {
@@ -75,20 +76,23 @@ export const GovernanceActionCardIsLoading: Story = {
 export const GovernanceActionCardDataMissing: Story = {
   args: {
     ...commonArgs,
-    isDataMissing: MetadataValidationStatus.URL_NOT_FOUND,
+    metadataStatus: MetadataValidationStatus.URL_NOT_FOUND,
+    metadataValid: false,
   },
 };
 
 export const GovernanceActionCardIncorectFormat: Story = {
   args: {
     ...commonArgs,
-    isDataMissing: MetadataValidationStatus.INVALID_JSONLD,
+    metadataStatus: MetadataValidationStatus.INVALID_JSONLD,
+    metadataValid: false,
   },
 };
 
 export const GovernanceActionCardNotVerifiable: Story = {
   args: {
     ...commonArgs,
-    isDataMissing: MetadataValidationStatus.INVALID_HASH,
+    metadataStatus: MetadataValidationStatus.INVALID_HASH,
+    metadataValid: false,
   },
 };

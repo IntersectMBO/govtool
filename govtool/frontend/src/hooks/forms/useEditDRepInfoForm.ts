@@ -19,7 +19,7 @@ import {
   generateJsonld,
   generateMetadataBody,
 } from "@utils";
-import { MetadataValidationStatus } from "@models";
+import { MetadataStandard, MetadataValidationStatus } from "@models";
 import { useWalletErrorModal } from "@hooks";
 import { useValidateMutation } from "../mutations";
 
@@ -69,6 +69,7 @@ export const useEditDRepInfoForm = (
     formState: { errors, isValid },
     register,
     resetField,
+    reset,
     watch,
   } = useFormContext<EditDRepInfoValues>();
   const dRepName = watch("dRepName");
@@ -147,6 +148,7 @@ export const useEditDRepInfoForm = (
         const { status } = await validateMetadata({
           url,
           hash,
+          standard: MetadataStandard.CIPQQQ,
         });
 
         if (status) {
@@ -202,5 +204,6 @@ export const useEditDRepInfoForm = (
     editDRepInfo: handleSubmit(onSubmit),
     resetField,
     watch,
+    reset,
   };
 };

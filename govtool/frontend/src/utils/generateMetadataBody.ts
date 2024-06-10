@@ -29,8 +29,8 @@ export const generateMetadataBody = ({
         .filter((link) => link.link)
         .map((link) => ({
           "@type": "Other",
-          [`${standardReference}reference-label`]: "Label",
-          [`${standardReference}reference-uri`]: link.link,
+          [`${CIP_100}reference-label`]: "Label",
+          [`${CIP_100}reference-uri`]: link.link,
         }))
     : undefined;
 

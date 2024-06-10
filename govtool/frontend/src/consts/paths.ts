@@ -24,4 +24,12 @@ export const PATHS = {
   retireAsDrep: "/retire_drep",
   retireAsDirectVoter: "/retire_direct_voter",
   stakeKeys: "/stake_keys",
+  proposalPillar: "/proposal_pillar/*",
+  connectedProposalPillar: "/connected/proposal_pillar/*",
+};
+
+export const PDF_PATHS = {
+  proposalDiscussion: "/proposal_discussion",
+  proposalDiscussionProposal: "/proposal_discussion/:id",
+  proposalDiscussionCreateGovernanceAction: "/create-governance-action",
 };

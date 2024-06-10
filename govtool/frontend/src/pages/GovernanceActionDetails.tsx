@@ -40,7 +40,8 @@ export const GovernanceActionDetails = () => {
     state ? state.txHash : data?.proposal.txHash ?? "",
     state ? state.index : data?.proposal.index ?? "",
   );
-  const title = state ? state.title : data?.proposal.title;
+
+  const title = state ? state?.title : data?.proposal?.title;
 
   useEffect(() => {
     if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
@@ -85,7 +86,9 @@ export const GovernanceActionDetails = () => {
               elementOne={t("govActions.title")}
               elementOnePath={PATHS.governanceActions}
               elementTwo={title}
-              isDataMissing={state ? state.isDataMissing : data?.isDataMissing}
+              isDataMissing={
+                state ? state.metadataStatus : data?.proposal.metadataStatus
+              }
             />
             <Link
               sx={{
@@ -136,7 +139,7 @@ export const GovernanceActionDetails = () => {
                     state ? state.createdEpochNo : data.proposal.createdEpochNo
                   }
                   isDataMissing={
-                    state ? state.isDataMissing : data?.isDataMissing
+                    state ? state.metadataStatus : data?.proposal.metadataStatus
                   }
                   expiryDate={
                     state
@@ -154,12 +157,15 @@ export const GovernanceActionDetails = () => {
                   }
                   details={state ? state.details : data.proposal.details}
                   url={state ? state.url : data.proposal.url}
-                  title={state ? state.title : data.proposal.title}
-                  about={state ? state.about : data.proposal.about}
+                  title={title}
+                  about={state ? state?.abstract : data.proposal?.abstract}
                   motivation={
-                    state ? state.motivation : data.proposal.motivation
+                    state ? state?.motivation : data.proposal?.motivation
                   }
-                  rationale={state ? state.rationale : data.proposal.rationale}
+                  rationale={
+                    state ? state?.rationale : data.proposal?.rationale
+                  }
+                  links={state ? state?.references : data.proposal?.references}
                   yesVotes={state ? state.yesVotes : data.proposal.yesVotes}
                   govActionId={fullProposalId}
                 />

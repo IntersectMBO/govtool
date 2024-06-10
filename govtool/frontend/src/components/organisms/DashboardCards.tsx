@@ -7,11 +7,14 @@ import {
   useGetAdaHolderCurrentDelegationQuery,
   useGetVoterInfo,
 } from "@hooks";
+import { PROTOCOL_PARAMS_KEY, getItemFromLocalStorage } from "@utils";
 import { DelegateDashboardCard } from "./DashboardCards/DelegateDashboardCard";
 import { DRepDashboardCard } from "./DashboardCards/DRepDashboardCard";
 import { DirectVoterDashboardCard } from "./DashboardCards/DirectVoterDashboardCard";
 import { ListGovActionsDashboardCards } from "./DashboardCards/ListGovActionsDashboardCard";
 import { ProposeGovActionDashboardCard } from "./DashboardCards/ProposeGovActionDashboardCard";
+
+const protocolParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
 export const DashboardCards = () => {
   const { dRepID, dRepIDBech32, pendingTransaction, stakeKey } = useCardano();
@@ -83,6 +86,8 @@ export const DashboardCards = () => {
 
         <ProposeGovActionDashboardCard
           createGovActionTx={pendingTransaction.createGovAction}
+          deposit={protocolParams.gov_action_deposit}
+          votingPower={votingPower}
         />
       </Box>
     </Box>

@@ -5,3 +5,4 @@ export * from "./pendingTransaction";
 export * from "./snackbar";
 export * from "./usersnapContext";
 export * from "./wallet";
+export * from "./featureFlag";

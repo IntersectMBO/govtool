@@ -34,6 +34,12 @@ export interface DRepData {
   votingPower: number;
   status: DRepStatus;
   type: "DRep" | "SoleVoter";
+  bio: string | null;
+  dRepName: string | null;
+  email: string | null;
+  references: string[];
+  metadataStatus: MetadataValidationStatus | null;
+  metadataValid: boolean;
 }
 export type InfinityDRepData = {
   elements: DRepData[];
@@ -62,36 +68,33 @@ type ProposalVote = {
   vote: Vote;
 };
 
-type ProposalData = {
-  id: string;
-  type: string;
-  details?: ActionDetailsType;
-  expiryDate: string;
-  expiryEpochNo: number;
+export type ProposalData = {
+  abstainVotes: number;
   createdDate: string;
   createdEpochNo: number;
-  url: string;
-  metadataHash: string;
-  yesVotes: number;
-  noVotes: number;
-  abstainVotes: number;
-  txHash: string;
+  expiryDate: string;
+  expiryEpochNo: number;
+  id: string;
   index: number;
-  title?: string;
-  about?: string;
+  metadataValid: boolean;
+  noVotes: number;
+  txHash: string;
+  type: string;
+  yesVotes: number;
+  abstract?: string;
+  details?: ActionDetailsType;
+  metadataHash?: string;
+  metadataStatus: MetadataValidationStatus | null;
   motivation?: string;
   rationale?: string;
+  references?: string[];
+  title?: string;
+  url?: string;
 };
 export interface VotedProposal {
   vote: ProposalVote;
   proposal: ProposalData;
 }
-export type VotedProposalToDisplay = {
-  vote: ProposalVote;
-  proposal: ProposalData & {
-    isDataMissing: boolean | MetadataValidationStatus;
-  };
-};
 
 export type CurrentDelegation = {
   dRepHash: string | null;

@@ -1,9 +1,8 @@
 import { useCallback, useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
-
 import { Modal, ScrollToTop } from "@atoms";
-import { PATHS } from "@consts";
-import { useCardano, useModal } from "@context";
+import { PATHS, PDF_PATHS } from "@consts";
+import { useCardano, useFeatureFlag, useModal } from "@context";
 import { useWalletConnectionListener } from "@hooks";
 import {
   DashboardCards,
@@ -37,8 +36,11 @@ import {
   removeItemFromLocalStorage,
 } from "@utils";
 
+import { PDFWrapper } from "./components/organisms/PDFWrapper";
+
 export default () => {
-  const { enable } = useCardano();
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
+  const { enable, isEnabled } = useCardano();
   const navigate = useNavigate();
   const { modal, openModal, modals } = useModal();
 
@@ -78,12 +80,30 @@ export default () => {
     checkTheWalletIsActive();
   }, [checkTheWalletIsActive]);
 
+  useEffect(() => {
+    if (!isProposalDiscussionForumEnabled) return;
+    if (
+      window.location.pathname.includes(PDF_PATHS.proposalDiscussion) &&
+      !window.location.pathname.includes(PATHS.proposalPillar.replace("/*", ""))
+    ) {
+      navigate(
+        `${(isEnabled
+          ? PATHS.connectedProposalPillar
+          : PATHS.proposalPillar
+        ).replace("/*", "")}${window.location.pathname}`,
+      );
+    }
+  }, [window.location.pathname]);
+
   return (
     <>
       <ScrollToTop />
       <Routes>
         <Route path={PATHS.home} element={<Home />} />
         <Route path={PATHS.governanceActions} element={<GovernanceActions />} />
+        {isProposalDiscussionForumEnabled && !isEnabled && (
+          <Route path={PATHS.proposalPillar} element={<PDFWrapper />} />
+        )}
         <Route
           path={PATHS.governanceActionsCategory}
           element={<GovernanceActionsCategory />}
@@ -94,6 +114,12 @@ export default () => {
         />
         <Route element={<Dashboard />}>
           <Route path={PATHS.dashboard} element={<DashboardCards />} />
+          {isProposalDiscussionForumEnabled && (
+            <Route
+              path={PATHS.connectedProposalPillar}
+              element={<PDFWrapper />}
+            />
+          )}
           <Route
             path={PATHS.dashboardGovernanceActions}
             element={<DashboardGovernanceActions />}

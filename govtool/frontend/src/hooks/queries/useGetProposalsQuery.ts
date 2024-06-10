@@ -2,8 +2,8 @@ import { useQuery } from "react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
+import { ProposalData } from "@models";
 import { getProposals, GetProposalsArguments } from "@services";
-import { checkIsMissingGAMetadata } from "@utils";
 import { useGetVoterInfo } from ".";
 
 export const useGetProposalsQuery = ({
@@ -14,7 +14,7 @@ export const useGetProposalsQuery = ({
   const { dRepID, pendingTransaction } = useCardano();
   const { voter } = useGetVoterInfo();
 
-  const fetchProposals = async (): Promise<ActionTypeToDsiplay[]> => {
+  const fetchProposals = async (): Promise<ProposalData[]> => {
     const allProposals = await Promise.all(
       filters.map((filter) =>
         getProposals({
@@ -29,20 +29,7 @@ export const useGetProposalsQuery = ({
       ),
     );
 
-    const mappedData = await Promise.all(
-      allProposals
-        .flatMap((proposal) => proposal.elements)
-        .map(async (proposal) => {
-          const { metadata, status } = await checkIsMissingGAMetadata({
-            hash: proposal?.metadataHash ?? "",
-            url: proposal?.url ?? "",
-          });
-          // workaround for the missing data in db-sync
-          return { ...proposal, ...metadata, isDataMissing: status || false };
-        }),
-    );
-
-    return mappedData;
+    return allProposals.flatMap((proposal) => proposal.elements);
   };
 
   const { data, isLoading } = useQuery(
@@ -65,7 +52,7 @@ export const useGetProposalsQuery = ({
   };
 };
 
-const groupByType = (data?: ActionTypeToDsiplay[]) =>
+const groupByType = (data?: ProposalData[]) =>
   data?.reduce<Record<string, ArrayElement<ToVoteDataType>>>((groups, item) => {
     const itemType = item.type;
 

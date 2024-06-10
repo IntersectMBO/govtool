@@ -23,7 +23,7 @@ export const WhatGovernanceActionIsAbout = ({
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
 
-  const deposit = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
+  const protocolParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
   const onClickContinue = useCallback(() => setStep(2), []);
 
@@ -50,7 +50,7 @@ export const WhatGovernanceActionIsAbout = ({
         <Trans
           i18nKey="createGovernanceAction.creatingAGovernanceActionDescription"
           values={{
-            deposit: correctAdaFormat(deposit.gov_action_deposit),
+            deposit: correctAdaFormat(protocolParams.gov_action_deposit),
           }}
         />
       </Typography>

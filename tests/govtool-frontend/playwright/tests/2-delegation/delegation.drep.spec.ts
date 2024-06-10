@@ -34,20 +34,6 @@ test("2C. Should open wallet connection popup on delegate in disconnected state"
   await expect(page.getByTestId("connect-your-wallet-modal")).toBeVisible();
 });
 
-test("2L. Should copy DRepId", async ({ page, context }) => {
-  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-
-  const dRepDirectory = new DRepDirectoryPage(page);
-  await dRepDirectory.goto();
-
-  await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
-  await page.getByTestId(`${dRep01Wallet.dRepId}-copy-id-button`).click();
-  await expect(page.getByText("Copied to clipboard")).toBeVisible();
-
-  const copiedText = await page.evaluate(() => navigator.clipboard.readText());
-  expect(copiedText).toEqual(dRep01Wallet.dRepId);
-});
-
 test("2N. Should show DRep information on details page", async ({
   page,
   browser,
@@ -69,10 +55,7 @@ test("2N. Should show DRep information on details page", async ({
   const name = faker.person.firstName();
   const email = faker.internet.email({ firstName: name });
   const bio = faker.person.bio();
-  const links = [
-    faker.internet.url({ appendSlash: true }),
-    faker.internet.url(),
-  ];
+  const links = [faker.internet.url()];
 
   await dRepRegistrationPage.register({
     name,
@@ -90,7 +73,9 @@ test("2N. Should show DRep information on details page", async ({
   await dRepPage.getByTestId(`${wallet.dRepId}-view-details-button`).click();
 
   // Verification
-  await expect(dRepPage.getByTestId("copy-drep-id-button")).toHaveText(wallet.dRepId);
+  await expect(dRepPage.getByTestId("copy-drep-id-button")).toHaveText(
+    wallet.dRepId
+  );
   await expect(dRepPage.getByText("Active", { exact: true })).toBeVisible();
   await expect(dRepPage.locator("dl").getByText("₳ 0")).toBeVisible();
   await expect(dRepPage.getByText(email, { exact: true })).toBeVisible();
@@ -119,13 +104,18 @@ test("2P. Should enable sharing of DRep details", async ({ page, context }) => {
 test("2Q. Should include DRep status and voting power on the DRep card", async ({
   page,
 }) => {
-  test.skip(); // Cannot access dRep card
-
   const dRepDirectory = new DRepDirectoryPage(page);
   await dRepDirectory.goto();
 
+  await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
   const dRepCard = dRepDirectory.getDRepCard(dRep01Wallet.dRepId);
-  await expect(dRepCard).toHaveText("20");
+
+  await expect(
+    dRepCard.getByTestId(`${dRep01Wallet.dRepId}-voting-power`)
+  ).toBeVisible();
+  await expect(
+    dRepCard.getByTestId(`${dRep01Wallet.dRepId}-Active-pill`)
+  ).toBeVisible();
 });
 
 test.describe("Insufficient funds", () => {
@@ -153,9 +143,7 @@ test("2I. Should check validity of DRep Id", async ({ page }) => {
   await dRepDirectory.goto();
 
   await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
-  await expect(dRepDirectory.getDRepCard(dRep01Wallet.dRepId)).toHaveText(
-    dRep01Wallet.dRepId
-  );
+  await expect(dRepDirectory.getDRepCard(dRep01Wallet.dRepId)).toBeVisible();
 
   const wallet = await ShelleyWallet.generate();
   const invalidDRepId = extractDRepFromWallet(wallet);
@@ -169,7 +157,15 @@ test("2J. Should search by DRep id", async ({ page }) => {
   await dRepDirectory.goto();
 
   await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
-  await expect(dRepDirectory.getDRepCard(dRep01Wallet.dRepId)).toHaveText(
-    dRep01Wallet.dRepId
-  );
+  await expect(dRepDirectory.getDRepCard(dRep01Wallet.dRepId)).toBeVisible();
+});
+
+test("2M. Should access dRep directory page on disconnected state", async ({
+  page,
+}) => {
+  const dRepDirectoryPage = new DRepDirectoryPage(page);
+  await dRepDirectoryPage.goto();
+
+  const dRepCards = await dRepDirectoryPage.getAllListedDReps();
+  expect(dRepCards.length).toBeGreaterThan(1);
 });

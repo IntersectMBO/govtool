@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { SxProps, Typography } from "@mui/material";
 
 import { Button } from "@atoms";
 import { ICONS } from "@consts";
@@ -6,10 +6,12 @@ import { useModal } from "@context";
 
 export const ExternalModalButton = ({
   label,
+  sx,
   url,
 }: {
   label: string;
   url: string;
+  sx?: SxProps;
 }) => {
   const { openModal } = useModal();
 
@@ -29,6 +31,7 @@ export const ExternalModalButton = ({
         ":hover": {
           backgroundColor: "transparent",
         },
+        ...sx,
       }}
       disableRipple
       variant="text"

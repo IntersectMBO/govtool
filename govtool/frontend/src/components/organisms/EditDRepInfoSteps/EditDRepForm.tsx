@@ -1,12 +1,15 @@
-import { Dispatch, SetStateAction, useCallback } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useFieldArray } from "react-hook-form";
 import { Box } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 import { Button, InfoText, Spacer, Typography } from "@atoms";
 import { Placeholders, Rules } from "@consts";
+import { useCardano } from "@context";
 import {
   useEditDRepInfoForm,
+  useGetDRepListInfiniteQuery,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
@@ -22,9 +25,12 @@ export const EditDRepForm = ({
   onClickCancel: () => void;
   setStep: Dispatch<SetStateAction<number>>;
 }) => {
+  const { state } = useLocation();
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
-  const { control, errors, isError, register, watch } = useEditDRepInfoForm();
+  const { dRepID } = useCardano();
+  const { control, errors, isError, register, watch, reset, getValues } =
+    useEditDRepInfoForm();
   const {
     append,
     fields: links,
@@ -34,6 +40,13 @@ export const EditDRepForm = ({
     name: "links",
   });
 
+  const { dRepData: yourselfDRepList } = useGetDRepListInfiniteQuery(
+    {
+      searchPhrase: dRepID,
+    },
+    { enabled: !state },
+  );
+
   const onClickContinue = () => setStep(2);
 
   const addLink = useCallback(() => append({ link: "" }), [append]);
@@ -41,6 +54,26 @@ export const EditDRepForm = ({
   const removeLink = useCallback((index: number) => remove(index), [remove]);
 
   const isContinueButtonDisabled = !watch("dRepName") || isError;
+
+  useEffect(() => {
+    if (!getValues().dRepName)
+      reset(
+        state
+          ? {
+              ...state,
+              links: state.references.map((link: string) => ({
+                link,
+              })),
+            }
+          : {
+              ...yourselfDRepList?.[0],
+              links: yourselfDRepList?.[0].references.map((link: string) => ({
+                link,
+              })),
+            },
+      );
+  }, [yourselfDRepList]);
+
   const renderLinks = useCallback(
     () =>
       links.map((field, index) => (

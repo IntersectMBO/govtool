@@ -64,7 +64,8 @@ export const GovernanceVotedOnCardComponent: Story = {
       proposal: {
         createdEpochNo: 232,
         expiryEpochNo: 323,
-        isDataMissing: false,
+        metadataStatus: null,
+        metadataValid: true,
         createdDate: "1970-01-01T00:00:00Z",
         expiryDate: "1970-02-01T00:00:00Z",
         id: "exampleId",
@@ -101,7 +102,8 @@ export const GovernanceVotedOnCardAbstain: Story = {
       proposal: {
         createdEpochNo: 232,
         expiryEpochNo: 323,
-        isDataMissing: false,
+        metadataStatus: null,
+        metadataValid: true,
         createdDate: "1970-01-01T00:00:00Z",
         expiryDate: "1970-02-01T00:00:00Z",
         id: "exampleId",
@@ -139,7 +141,8 @@ export const GovernanceVotedOnCardYes: Story = {
       proposal: {
         createdEpochNo: 232,
         expiryEpochNo: 323,
-        isDataMissing: false,
+        metadataStatus: null,
+        metadataValid: true,
         createdDate: "1970-01-01T00:00:00Z",
         expiryDate: "1970-02-01T00:00:00Z",
         id: "exampleId",
@@ -177,7 +180,8 @@ export const GovernanceVotedOnCardNo: Story = {
       proposal: {
         createdEpochNo: 232,
         expiryEpochNo: 323,
-        isDataMissing: false,
+        metadataStatus: null,
+        metadataValid: true,
         createdDate: "1970-01-01T00:00:00Z",
         expiryDate: "1970-02-01T00:00:00Z",
         id: "exampleId",

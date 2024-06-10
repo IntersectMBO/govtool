@@ -8,6 +8,7 @@ export default class GovernanceActionsPage {
   readonly filterBtn = this.page.getByTestId("filters-button");
   readonly sortBtn = this.page.getByTestId("sort-button");
   readonly votedTab = this.page.getByTestId("voted-tab");
+  readonly searchInput = this.page.getByTestId("search-input");
 
   constructor(private readonly page: Page) {}
 
@@ -64,7 +65,8 @@ export default class GovernanceActionsPage {
   }
 
   async getAllProposals() {
-    return this.page.locator('[data-test-id$="-card"]').all();
+    await this.page.waitForTimeout(2_000);
+    return this.page.locator('[data-testid$="-card"]').all();
   }
 
   async validateFilters(filters: string[]) {

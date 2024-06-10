@@ -19,6 +19,7 @@ export type StepProps = {
 
 export type DirectVoterActionProps = {
   dRepId: string;
+  drepName: string;
   onCardClick: () => void;
   sx?: SxProps;
 };

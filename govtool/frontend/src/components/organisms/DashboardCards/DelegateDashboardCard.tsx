@@ -4,14 +4,19 @@ import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
 import { PendingTransaction } from "@context";
-import { useTranslation } from "@hooks";
+import { useGetDRepListInfiniteQuery, useTranslation } from "@hooks";
 import { CurrentDelegation, VoterInfo } from "@models";
 import {
   DashboardActionCard,
   DashboardActionCardProps,
   DelegationAction,
 } from "@molecules";
-import { correctAdaFormat, formHexToBech32, openInNewTab } from "@utils";
+import {
+  correctAdaFormat,
+  formHexToBech32,
+  getMetadataDataMissingStatusTranslation,
+  openInNewTab,
+} from "@utils";
 import {
   AutomatedVotingOptionCurrentDelegation,
   AutomatedVotingOptionDelegationId,
@@ -34,6 +39,16 @@ export const DelegateDashboardCard = ({
 }: DelegateDashboardCardProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { dRepData, isDRepListFetching } = useGetDRepListInfiniteQuery(
+    {
+      searchPhrase: currentDelegation?.dRepHash ?? delegateTx?.resourceId ?? "",
+    },
+    {
+      enabled: !!currentDelegation?.dRepHash || !!delegateTx?.resourceId,
+    },
+  );
+
+  const myDRepDelegationData = dRepData?.[0];
 
   const learnMoreButton = {
     children: t("learnMore"),
@@ -129,7 +144,9 @@ export const DelegateDashboardCard = ({
         (!(currentDelegation?.dRepHash === dRepID) || voter?.isRegisteredAsDRep)
       }
       transactionId={
-        !(currentDelegation?.dRepHash === dRepID) || voter?.isRegisteredAsDRep
+        !(currentDelegation?.dRepHash === dRepID) ||
+        voter?.isRegisteredAsDRep ||
+        !voter?.isRegisteredAsSoleVoter
           ? delegateTx?.transactionHash ?? currentDelegation?.txHash
           : undefined
       }
@@ -137,8 +154,18 @@ export const DelegateDashboardCard = ({
     >
       {displayedDelegationId &&
         (!(currentDelegation?.dRepHash === dRepID) ||
-          voter?.isRegisteredAsDRep) && (
+          voter?.isRegisteredAsDRep ||
+          !voter?.isRegisteredAsSoleVoter) && (
           <DelegationAction
+            drepName={
+              isDRepListFetching
+                ? "Loading..."
+                : myDRepDelegationData?.metadataStatus
+                ? getMetadataDataMissingStatusTranslation(
+                    myDRepDelegationData.metadataStatus,
+                  )
+                : myDRepDelegationData?.dRepName ?? ""
+            }
             dRepId={displayedDelegationId}
             onCardClick={navigateToDRepDetails}
             sx={{ mt: 1.5 }}

@@ -11,7 +11,12 @@ import {
 } from "@hooks";
 import { Step } from "@molecules";
 import { BgCard, ControlledField } from "@organisms";
-import { URL_REGEX, ellipsizeText, openInNewTab } from "@utils";
+import {
+  URL_REGEX,
+  ellipsizeText,
+  isValidURLLength,
+  openInNewTab,
+} from "@utils";
 
 type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -131,6 +136,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
                   value: URL_REGEX,
                   message: t("createGovernanceAction.fields.validations.url"),
                 },
+                validate: isValidURLLength,
               }}
             />
           }

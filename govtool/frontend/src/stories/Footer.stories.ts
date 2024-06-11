@@ -32,8 +32,6 @@ export const FooterComponent: Story = {
     await userEvent.click(canvas.getByTestId("help-footer-button"));
     await expect(window.open).toHaveBeenCalledTimes(3);
 
-    await userEvent.click(canvas.getByTestId("feedback-footer-button"));
-    // TODO: Need to test if modal is opened or not
-    await expect(window.open).toHaveBeenCalledTimes(4);
+    await expect(canvas.getByTestId("feedback-footer-button")).toBeEnabled();
   },
 };

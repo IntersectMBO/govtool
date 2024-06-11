@@ -52,8 +52,13 @@ export const useRegisterAsdRepForm = (
   const [json, setJson] = useState<NodeObject | null>(null);
 
   // DApp Connector
-  const { buildDRepRegCert, buildDRepUpdateCert, buildSignSubmitConwayCertTx } =
-    useCardano();
+  const {
+    buildDRepRegCert,
+    buildDRepUpdateCert,
+    buildSignSubmitConwayCertTx,
+    buildVoteDelegationCert,
+    dRepID,
+  } = useCardano();
 
   // App Management
   const { t } = useTranslation();
@@ -81,6 +86,7 @@ export const useRegisterAsdRepForm = (
 
   // Navigation
   const backToForm = useCallback(() => {
+    window.scrollTo(0, 0);
     setStep?.(2);
     closeModal();
   }, [setStep]);
@@ -119,15 +125,19 @@ export const useRegisterAsdRepForm = (
     async (data: RegisterAsDRepValues) => {
       if (!hash) return;
       const url = data.storingURL;
-
       try {
-        if (voter?.isRegisteredAsSoleVoter) {
-          return await buildDRepUpdateCert(url, hash);
-        }
+        const certBuilder = await buildVoteDelegationCert(dRepID);
 
-        return await buildDRepRegCert(url, hash);
+        const registerCert = voter?.isRegisteredAsSoleVoter
+          ? await buildDRepUpdateCert(url, hash)
+          : await buildDRepRegCert(url, hash);
+
+        certBuilder.add(registerCert);
+
+        return certBuilder;
       } catch (error) {
         captureException(error);
+        throw error;
       }
     },
     [
@@ -149,10 +159,11 @@ export const useRegisterAsdRepForm = (
     });
   }, []);
 
-  const showSuccessModal = useCallback(() => {
+  const showSuccessModal = useCallback((link: string) => {
     openModal({
       type: "statusModal",
       state: {
+        link: `https://sancho.cexplorer.io/tx/${link}`,
         status: "success",
         title: t("modals.registration.title"),
         message: t("modals.registration.message"),
@@ -181,12 +192,12 @@ export const useRegisterAsdRepForm = (
           throw status;
         }
         const registerAsDRepCert = await createRegistrationCert(data);
-        await buildSignSubmitConwayCertTx({
+        const result = await buildSignSubmitConwayCertTx({
           certBuilder: registerAsDRepCert,
           type: "registerAsDrep",
         });
 
-        showSuccessModal();
+        if (result) showSuccessModal(result);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         if (Object.values(MetadataValidationStatus).includes(error)) {

@@ -121,10 +121,11 @@ export const useEditDRepInfoForm = (
     });
   }, []);
 
-  const showSuccessModal = useCallback(() => {
+  const showSuccessModal = useCallback((link: string) => {
     openModal({
       type: "statusModal",
       state: {
+        link: `https://sancho.cexplorer.io/tx/${link}`,
         status: "success",
         title: t("modals.registration.title"),
         message: t("modals.registration.message"),
@@ -156,12 +157,12 @@ export const useEditDRepInfoForm = (
         }
 
         const updateDRepMetadataCert = await buildDRepUpdateCert(url, hash);
-        await buildSignSubmitConwayCertTx({
+        const result = await buildSignSubmitConwayCertTx({
           certBuilder: updateDRepMetadataCert,
           type: "updateMetaData",
         });
 
-        showSuccessModal();
+        if (result) showSuccessModal(result);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         if (Object.values(MetadataValidationStatus).includes(error)) {

@@ -73,7 +73,10 @@ const { buildSignSubmitConwayCertTx, buildNewInfoGovernanceAction } =
 const govActionBuilder = await buildNewInfoGovernanceAction({ hash, url });
 
 // sign and submit the transaction
-await buildSignSubmitConwayCertTx(govActionBuilder);
+await buildSignSubmitConwayCertTx({
+  govActionBuilder,
+  type: "createGovAction",
+});
 
 // or if you want to use the Treasury Governance Action
 const { buildTreasuryGovernanceAction } = useCardano();
@@ -87,7 +90,10 @@ const govActionBuilder = await buildTreasuryGovernanceAction({
 });
 
 // sign and submit the transaction
-await buildSignSubmitConwayCertTx(govActionBuilder);
+await buildSignSubmitConwayCertTx({
+  govActionBuilder,
+  type: "createGovAction",
+});
 ```
 
 ### Step 6: Verify the Governance Action

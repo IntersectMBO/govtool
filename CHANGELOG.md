@@ -92,6 +92,7 @@ changes.
 - Fix all the existing typescript errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
 - Fix endless spinner on a dashboard [Issue 539](https://github.com/IntersectMBO/govtool/issues/539)
 - Remove wrongly appended `Yourself` filter on DRep Directory [Issue 1028](https://github.com/IntersectMBO/govtool/issues/1028)
+- Fix validation of uris in metadata [Issue 1011](https://github.com/IntersectMBO/govtool/issues/1011)
 
 ### Changed
 

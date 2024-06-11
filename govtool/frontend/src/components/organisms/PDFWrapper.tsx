@@ -1,7 +1,9 @@
-import { Box } from "@mui/material";
-import PDF from "@intersect.mbo/pdf-ui/cjs";
+import React, { Suspense } from "react";
+import { Box, CircularProgress } from "@mui/material";
 import "@intersect.mbo/pdf-ui/style";
 import { useCardano, useGovernanceActions } from "@/context";
+
+const PDF = React.lazy(() => import("@intersect.mbo/pdf-ui/cjs"));
 
 export const PDFWrapper = () => {
   const walletAPI = useCardano();
@@ -14,10 +16,26 @@ export const PDFWrapper = () => {
         py: 3,
       }}
     >
-      <PDF
-        walletAPI={{ ...walletAPI, createGovernanceActionJsonLD, createHash }}
-        pathname={window.location.pathname}
-      />
+      <Suspense
+        fallback={
+          <Box
+            sx={{
+              display: "flex",
+              flex: 1,
+              height: "100vw",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        }
+      >
+        <PDF
+          walletAPI={{ ...walletAPI, createGovernanceActionJsonLD, createHash }}
+          pathname={window.location.pathname}
+        />
+      </Suspense>
     </Box>
   );
 };

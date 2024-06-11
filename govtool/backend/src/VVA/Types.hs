@@ -9,8 +9,6 @@
 
 module VVA.Types where
 
-
-
 import           GHC.Conc (TVar)
 import qualified Network.WebSockets.Connection as WS
 import           Data.Aeson.TH              (deriveJSON)
@@ -245,3 +243,4 @@ instance Has QSem AppEnv where
 instance Has (TVar (Map Text WS.Connection)) AppEnv where
   getter AppEnv {vvaWebSocketConnections} = vvaWebSocketConnections
   modifier f a@AppEnv {vvaWebSocketConnections} = a {vvaWebSocketConnections = f vvaWebSocketConnections}
+

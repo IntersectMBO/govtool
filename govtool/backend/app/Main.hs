@@ -139,8 +139,12 @@ startApp vvaConfig = do
   connectionPool <- createPool (connectPostgreSQL (encodeUtf8 (dbSyncConnectionString $ getter vvaConfig))) close 1 1 60
   vvaTlsManager <- newManager tlsManagerSettings
   qsem <- newQSem (metadataValidationMaxConcurrentRequests vvaConfig)
+<<<<<<< HEAD
   websocketConnectionsTVar <- newTVarIO mempty
   let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool, vvaTlsManager, vvaMetadataQSem=qsem, vvaWebSocketConnections=websocketConnectionsTVar}
+=======
+  let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool, vvaTlsManager, vvaMetadataQSem=qsem}
+>>>>>>> b45e63d1... [#1234] Add reddis support for storing metadata validation results
 
   _ <- forkIO $ do
      result <- runReaderT (runExceptT startFetchProcess) appEnv
@@ -148,12 +152,15 @@ startApp vvaConfig = do
         Left e -> throw e
         Right _ -> return ()
 
+<<<<<<< HEAD
   _ <- forkIO $ do
       result <- runReaderT (runExceptT $ processTransactionStatuses websocketConnectionsTVar) appEnv
       case result of
         Left e -> throw e
         Right _ -> return ()
 
+=======
+>>>>>>> b45e63d1... [#1234] Add reddis support for storing metadata validation results
   server' <- mkVVAServer appEnv
   runSettings settings server'
 

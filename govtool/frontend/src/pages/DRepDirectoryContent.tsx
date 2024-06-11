@@ -107,7 +107,9 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     ? [yourselfDRep, ...dRepsWithoutYourself]
     : dRepList;
   const inProgressDelegationDRepData = dRepListToDisplay.find(
-    (dRep) => dRep.drepId === inProgressDelegation,
+    (dRep) =>
+      dRep.drepId === inProgressDelegation ||
+      dRep.view === inProgressDelegation,
   );
 
   const isAnAutomatedVotingOptionChosen =
@@ -221,7 +223,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
                     isDelegating === dRep.view || isDelegating === dRep.drepId
                   }
                   isMe={isSameDRep(dRep, myDRepId)}
-                  onDelegate={() => delegate(dRep.drepId)}
+                  onDelegate={() => delegate(dRep.view)}
                 />
               </Box>
             );

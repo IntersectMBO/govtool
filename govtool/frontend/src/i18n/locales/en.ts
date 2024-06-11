@@ -370,6 +370,7 @@ export const en = {
       },
       errors: {
         tooLongUrl: "Url must be less than 128 bytes",
+        mustBeStakeAddress: "It must be reward address in bech32 format",
       },
       registerAsDRep: {
         bio: "Bio",

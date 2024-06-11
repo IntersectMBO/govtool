@@ -1,3 +1,7 @@
+import {
+  Address,
+  RewardAddress,
+} from "@emurgo/cardano-serialization-lib-asmjs";
 import i18n from "@/i18n";
 
 export const URL_REGEX =
@@ -25,4 +29,13 @@ export function isValidURLLength(s: string) {
   const byteLength = encoder.encode(s).length;
 
   return byteLength <= 128 ? true : i18n.t("forms.errors.tooLongUrl");
+}
+
+export async function isRewardAddress(address: string) {
+  try {
+    const stake = RewardAddress.from_address(Address.from_bech32(address));
+    return stake ? true : i18n.t("forms.errors.mustBeStakeAddress");
+  } catch (e) {
+    return i18n.t("forms.errors.mustBeStakeAddress");
+  }
 }

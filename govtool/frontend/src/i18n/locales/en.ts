@@ -376,6 +376,7 @@ export const en = {
         hashInvalidFormat: "Invalid hash format",
         hashInvalidLength: "Hash must be exactly 64 characters long",
         urlTooLong: "Url must be less than 65 characters",
+        tooLongUrl: "Url must be less than 128 bytes",
         urlInvalidFormat: "Invalid URL format",
       },
       registerAsDRep: {

@@ -23,6 +23,8 @@ module VVA.Config
     , getDbSyncConnectionString
     , getServerHost
     , getServerPort
+    , getRedisHost
+    , getRedisPort
     , vvaConfigToText
     , getMetadataValidationHost
     , getMetadataValidationPort
@@ -88,6 +90,10 @@ data VVAConfigInternal
       , vVAConfigInternalMetadataValidationPort :: Int
         -- | Maximum number of concurrent metadata requests
       , vVAConfigInternalMetadataValidationMaxConcurrentRequests :: Int
+        -- | Redis host
+      , vVAConfigInternalRedisHost :: Text
+        -- | Redis port
+      , vVAConfigInternalRedisPort :: Int
       }
   deriving (FromConfig, Generic, Show)
 
@@ -102,7 +108,9 @@ instance DefaultConfig VVAConfigInternal where
         vVAConfigInternalSentryEnv = "development",
         vVAConfigInternalMetadataValidationHost = "localhost",
         vVAConfigInternalMetadataValidationPort = 3001,
-        vVAConfigInternalMetadataValidationMaxConcurrentRequests = 10
+        vVAConfigInternalMetadataValidationMaxConcurrentRequests = 10,
+        vVAConfigInternalRedisHost = "localhost",
+        vVAConfigInternalRedisPort = 6379
       }
 
 -- | DEX configuration.
@@ -126,6 +134,10 @@ data VVAConfig
       , metadataValidationPort :: Int
         -- | Maximum number of concurrent metadata requests
       , metadataValidationMaxConcurrentRequests :: Int
+        -- | Redis host
+      , redisHost :: Text
+        -- | Redis port
+      , redisPort :: Int
       }
   deriving (Generic, Show, ToJSON)
 
@@ -169,7 +181,9 @@ convertConfig VVAConfigInternal {..} =
       sentryEnv = vVAConfigInternalSentryEnv,
       metadataValidationHost = vVAConfigInternalMetadataValidationHost,
       metadataValidationPort = vVAConfigInternalMetadataValidationPort,
-      metadataValidationMaxConcurrentRequests = vVAConfigInternalMetadataValidationMaxConcurrentRequests
+      metadataValidationMaxConcurrentRequests = vVAConfigInternalMetadataValidationMaxConcurrentRequests,
+      redisHost = vVAConfigInternalRedisHost,
+      redisPort = vVAConfigInternalRedisPort
     }
 
 -- | Load configuration from a file specified on the command line.  Load from
@@ -207,6 +221,18 @@ getServerHost ::
   (Has VVAConfig r, MonadReader r m) =>
   m Text
 getServerHost = asks (serverHost . getter)
+
+-- | Access redis host
+getRedisHost ::
+  (Has VVAConfig r, MonadReader r m) =>
+  m Text
+getRedisHost = asks (redisHost . getter)
+
+-- | Access redis port
+getRedisPort ::
+  (Has VVAConfig r, MonadReader r m) =>
+  m Int
+getRedisPort = asks (redisPort . getter)
 
 -- | Access MetadataValidationService host
 getMetadataValidationHost ::

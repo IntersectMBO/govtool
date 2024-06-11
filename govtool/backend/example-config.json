@@ -13,5 +13,7 @@
     "sentryenv": "dev",
     "metadatavalidationhost": "localhost",
     "metadatavalidationport": 3001,
-    "metadatavalidationmaxconcurrentrequests": 10
+    "metadatavalidationmaxconcurrentrequests": 10,
+    "redishost": "localhost",
+    "redisport": 6379
 }

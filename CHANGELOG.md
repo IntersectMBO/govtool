@@ -25,6 +25,7 @@ changes.
 
 ### Added
 
+- added separate async process that fetches new voting_anchors, validates their metadata using metadata-validation service, and then stores it in Redis database [Issue 1234](https://github.com/IntersectMBO/govtool/issues/1234)
 - added `bio` `dRepName` `email` `references` `metadataValid` and `metadataStatus` fields to `drep/list`
 - added `metadatavalidationmaxconcurrentrequests` field to the backend config
 - added `metadata/validate` endpoint [Issue 876](https://github.com/IntersectMBO/govtool/issues/876)

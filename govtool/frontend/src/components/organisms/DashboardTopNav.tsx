@@ -91,7 +91,9 @@ export const DashboardTopNav = ({
           ) : null}
         </Box>
         <Box display="flex">
-          {!isVotingPowerHidden && <VotingPowerChips />}
+          {!isVotingPowerHidden && !isProposalDiscussion && (
+            <VotingPowerChips />
+          )}
           {isMobile && (
             <IconButton
               data-testid="open-drawer-button"

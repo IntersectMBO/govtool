@@ -5,6 +5,16 @@ on:
   push:
     branches:
       - staging
+  workflow_dispatch:
+    inputs:
+      isProposalDiscussionForumEnabled:
+        description: "Enable proposal discussion forum"
+        required: true
+        type: choice
+        default: "disabled"
+        options:
+          - "enabled"
+          - "disabled"
 
 env:
   ENVIRONMENT: "staging"
@@ -40,7 +50,7 @@ jobs:
       SENTRY_IGNORE_API_RESOLUTION_ERROR: "1"
       TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
       USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
-      IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "false"
+      IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: ${{github.event_name == 'push' && 'false' || inputs.isProposalDiscussionForumEnabled == 'enabled'}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

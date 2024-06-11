@@ -162,10 +162,11 @@ export const useCreateGovernanceActionForm = (
     [hash],
   );
 
-  const showSuccessModal = useCallback(() => {
+  const showSuccessModal = useCallback((link: string) => {
     openModal({
       type: "statusModal",
       state: {
+        link: `https://sancho.cexplorer.io/tx/${link}`,
         status: "success",
         title: t(
           "createGovernanceAction.modals.submitTransactionSuccess.title",
@@ -208,12 +209,12 @@ export const useCreateGovernanceActionForm = (
         }
 
         const govActionBuilder = await buildTransaction(data);
-        await buildSignSubmitConwayCertTx({
+        const result = await buildSignSubmitConwayCertTx({
           govActionBuilder,
           type: "createGovAction",
         });
 
-        showSuccessModal();
+        if (result) showSuccessModal(result);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         const isInsufficientBalance = error

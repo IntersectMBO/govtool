@@ -30,7 +30,7 @@ export const EditDRepStorageInformation = ({
     onClickDownloadJson,
     editDRepInfo,
     watch,
-  } = useEditDRepInfoForm();
+  } = useEditDRepInfoForm(setStep);
   const { screenWidth } = useScreenDimension();
 
   const fileName = getValues("dRepName");

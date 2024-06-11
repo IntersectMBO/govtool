@@ -30,7 +30,7 @@ export const DRepStorageInformation = ({
     onClickDownloadJson,
     registerAsDrep,
     watch,
-  } = useRegisterAsdRepForm();
+  } = useRegisterAsdRepForm(setStep);
   const { screenWidth } = useScreenDimension();
 
   const fileName = getValues("dRepName");

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { StatusPill } from "@atoms";
+import { expect } from "@storybook/jest";
+import { within } from "@storybook/testing-library";
 import { DRepStatus } from "@/models";
 
 const meta = {
@@ -8,6 +10,11 @@ const meta = {
   component: StatusPill,
   parameters: {
     layout: "centered",
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByText(args.status)).toBeVisible();
   },
   tags: ["autodocs"],
 } satisfies Meta<typeof StatusPill>;

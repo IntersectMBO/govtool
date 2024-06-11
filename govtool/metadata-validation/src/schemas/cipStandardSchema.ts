@@ -40,7 +40,7 @@ export const cipStandardSchema: StandardSpecification = {
             '@value': Joi.string().required(),
           }),
           uri: Joi.object({
-            '@value': Joi.string().uri().required(),
+            '@value': Joi.string().required(),
           }),
           referenceHash: Joi.object({
             hashDigest: Joi.string().required(),
@@ -71,10 +71,10 @@ export const cipStandardSchema: StandardSpecification = {
         Joi.object({
           '@type': Joi.string(),
           label: Joi.object({
-            '@value': Joi.string().required(),
+            '@value': Joi.string().allow('').required(),
           }),
           uri: Joi.object({
-            '@value': Joi.string().uri().required(),
+            '@value': Joi.string().required(),
           }),
           referenceHash: Joi.object({
             hashDigest: Joi.string().required(),

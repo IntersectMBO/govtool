@@ -40,7 +40,7 @@ export const cipStandardSchema: StandardSpecification = {
             '@value': Joi.string().required(),
           }),
           uri: Joi.object({
-            '@value': Joi.string().uri().required(),
+            '@value': Joi.string().required(),
           }),
           referenceHash: Joi.object({
             hashDigest: Joi.string().required(),
@@ -64,17 +64,17 @@ export const cipStandardSchema: StandardSpecification = {
       '@value': Joi.string().valid('blake2b-256').required(),
     }),
     body: Joi.object({
-      bio: Joi.object({ '@value': Joi.string() }),
-      dRepName: Joi.object({ '@value': Joi.string() }),
-      email: Joi.object({ '@value': Joi.string() }),
+      bio: Joi.object({ '@value': Joi.string().allow('') }),
+      dRepName: Joi.object({ '@value': Joi.string().allow('') }),
+      email: Joi.object({ '@value': Joi.string().allow('') }),
       references: Joi.array().items(
         Joi.object({
           '@type': Joi.string(),
           label: Joi.object({
-            '@value': Joi.string().required(),
+            '@value': Joi.string().allow('').required(),
           }),
           uri: Joi.object({
-            '@value': Joi.string().uri().required(),
+            '@value': Joi.string().required(),
           }),
           referenceHash: Joi.object({
             hashDigest: Joi.string().required(),

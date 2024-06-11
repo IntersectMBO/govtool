@@ -1,5 +1,10 @@
 import i18n from "@/i18n";
-import { EMAIL_REGEX, NICKNAME_REGEX, URL_REGEX } from "@/utils";
+import {
+  EMAIL_REGEX,
+  NICKNAME_REGEX,
+  URL_REGEX,
+  isValidURLLength,
+} from "@/utils";
 
 export const Rules = {
   BIO: {
@@ -47,5 +52,6 @@ export const Rules = {
       value: URL_REGEX,
       message: i18n.t("registration.fields.validations.url"),
     },
+    validate: isValidURLLength,
   },
 };

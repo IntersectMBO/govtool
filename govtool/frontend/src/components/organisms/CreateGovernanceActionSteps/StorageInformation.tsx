@@ -11,7 +11,12 @@ import {
 } from "@hooks";
 import { Step } from "@molecules";
 import { BgCard, ControlledField } from "@organisms";
-import { URL_REGEX, openInNewTab } from "@utils";
+import {
+  URL_REGEX,
+  ellipsizeText,
+  isValidURLLength,
+  openInNewTab,
+} from "@utils";
 
 type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -31,7 +36,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
   } = useCreateGovernanceActionForm(setStep);
   const { screenWidth } = useScreenDimension();
 
-  const fileName = getValues("governance_action_type");
+  const fileName = getValues("governance_action_type") as string;
 
   const openGuideAboutStoringInformation = () =>
     openInNewTab(
@@ -94,7 +99,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
               }}
               variant="outlined"
             >
-              {`${fileName}.jsonld`}
+              {`${ellipsizeText(fileName, 8)}.jsonld`}
             </Button>
           }
           componentsLayoutStyles={{
@@ -131,6 +136,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
                   value: URL_REGEX,
                   message: t("createGovernanceAction.fields.validations.url"),
                 },
+                validate: isValidURLLength,
               }}
             />
           }

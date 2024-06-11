@@ -351,11 +351,7 @@ export const en = {
       termOfService: "Term of service",
     },
     forms: {
-      hashPlaceholder: "The hash of metadata at URL",
-      howCreateUrlAndHash: "How to create URL and hash?",
       link: "Link",
-      urlWithContextPlaceholder: "Your URL with with your context",
-      urlWithInfoPlaceholder: "Your URL with extra info about you",
       createGovernanceAction: {
         typeLabel: "Governance Action Type",
         typeTip:
@@ -373,10 +369,7 @@ export const en = {
         emailPlaceholder: "john.smith@email.com",
       },
       errors: {
-        hashInvalidFormat: "Invalid hash format",
-        hashInvalidLength: "Hash must be exactly 64 characters long",
-        urlTooLong: "Url must be less than 65 characters",
-        urlInvalidFormat: "Invalid URL format",
+        tooLongUrl: "Url must be less than 128 bytes",
       },
       registerAsDRep: {
         bio: "Bio",

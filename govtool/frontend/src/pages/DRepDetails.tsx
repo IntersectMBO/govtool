@@ -288,7 +288,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
               isLoading={
                 isDelegating === dRep.view || isDelegating === dRep.drepId
               }
-              onClick={() => delegate(dRep.view)}
+              onClick={() => delegate(dRep.drepId)}
               size="extraLarge"
               sx={{ width: "100%" }}
               variant="contained"

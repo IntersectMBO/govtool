@@ -1,12 +1,12 @@
-import React from "react";
-import type { Preview } from "@storybook/react";
 import { ThemeProvider } from "@emotion/react";
-import { theme } from "../src/theme";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "react-query";
+import type { Preview } from "@storybook/react";
+import React from "react";
 import { I18nextProvider } from "react-i18next";
-import i18n from "../src/i18n";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { ModalProvider } from "../src/context/modal";
+import i18n from "../src/i18n";
+import { theme } from "../src/theme";
 
 const queryClient = new QueryClient();
 
@@ -23,9 +23,9 @@ const preview: Preview = {
   decorators: [
     (Story) => (
       <QueryClientProvider client={queryClient}>
-        <ModalProvider>
-          <I18nextProvider i18n={i18n}>
-            <ThemeProvider theme={theme}>
+        <ThemeProvider theme={theme}>
+          <ModalProvider>
+            <I18nextProvider i18n={i18n}>
               <MemoryRouter>
                 <Routes>
                   <Route
@@ -44,9 +44,9 @@ const preview: Preview = {
                   />
                 </Routes>
               </MemoryRouter>
-            </ThemeProvider>
-          </I18nextProvider>
-        </ModalProvider>
+            </I18nextProvider>
+          </ModalProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     ),
   ],

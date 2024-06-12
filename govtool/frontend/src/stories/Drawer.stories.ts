@@ -1,7 +1,7 @@
+import { Drawer } from "@organisms";
+import { expect, jest } from "@storybook/jest";
 import type { Meta, StoryObj } from "@storybook/react";
 import { userEvent, within } from "@storybook/testing-library";
-import { expect, jest } from "@storybook/jest";
-import { Drawer } from "@organisms";
 
 const meta = {
   title: "Example/Drawer",
@@ -26,7 +26,6 @@ export const DrawerComponent: Story = {
     await expect(governanceActionsLink).toHaveClass("active");
     await userEvent.click(canvas.getByTestId("guides-link"));
     await userEvent.click(canvas.getByTestId("faqs-link"));
-    await userEvent.click(canvas.getByTestId("helps-link"));
-    await expect(window.open).toHaveBeenCalledTimes(3);
+    await expect(window.open).toHaveBeenCalledTimes(2);
   },
 };

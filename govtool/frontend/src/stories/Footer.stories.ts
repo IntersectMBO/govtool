@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { userEvent, within } from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
+import { userEvent, within } from "@storybook/testing-library";
 import { Footer } from "@/components/organisms";
 
 const meta = {
@@ -19,10 +19,19 @@ export const FooterComponent: Story = {
     const canvas = within(canvasElement);
     window.open = jest.fn();
 
+    const nowDate = new Date();
     await expect(
-      canvas.getByText(/ 2023 Voltaire Gov Tool/i),
+      canvas.getByText(`© ${nowDate.getFullYear()} Intersect MBO`),
     ).toBeInTheDocument();
-    await userEvent.click(canvas.getByTestId("privacy-policy-link"));
+    await userEvent.click(canvas.getByTestId("privacy-policy-footer-link"));
     await expect(window.open).toHaveBeenCalledTimes(1);
+
+    await userEvent.click(canvas.getByTestId("term-of-service-footer-link"));
+    await expect(window.open).toHaveBeenCalledTimes(2);
+
+    await userEvent.click(canvas.getByTestId("help-footer-button"));
+    await expect(window.open).toHaveBeenCalledTimes(3);
+
+    await expect(canvas.getByTestId("feedback-footer-button")).toBeEnabled();
   },
 };

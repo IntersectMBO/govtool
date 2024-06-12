@@ -1,6 +1,6 @@
+import { expect, jest } from "@storybook/jest";
 import type { Meta, StoryObj } from "@storybook/react";
 import { userEvent, within } from "@storybook/testing-library";
-import { expect, jest } from "@storybook/jest";
 
 import { Button } from "@atoms";
 
@@ -9,12 +9,6 @@ const meta = {
   component: Button,
   args: {
     onClick: jest.fn(),
-  },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    expect(canvas.getByRole("button")).toHaveTextContent("Button");
-    await userEvent.click(canvas.getByRole("button"));
-    await expect(args.onClick).toHaveBeenCalled();
   },
   parameters: {
     layout: "centered",
@@ -31,10 +25,22 @@ export const Contained: Story = {
     size: "medium",
     variant: "contained",
   },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    expect(canvas.getByRole("button")).toHaveTextContent("Button");
+    await userEvent.click(canvas.getByRole("button"));
+    await expect(args.onClick).toHaveBeenCalled();
+  },
 };
 
 export const Outlined: Story = {
   args: { size: "small", variant: "outlined", children: "Button" },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    expect(canvas.getByRole("button")).toHaveTextContent("Button");
+    await userEvent.click(canvas.getByRole("button"));
+    await expect(args.onClick).toHaveBeenCalled();
+  },
 };
 
 export const Text: Story = {
@@ -42,6 +48,12 @@ export const Text: Story = {
     size: "large",
     variant: "text",
     children: "Button",
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    expect(canvas.getByRole("button")).toHaveTextContent("Button");
+    await userEvent.click(canvas.getByRole("button"));
+    await expect(args.onClick).toHaveBeenCalled();
   },
 };
 
@@ -51,5 +63,10 @@ export const LoadingButton: Story = {
     size: "large",
     variant: "contained",
     isLoading: true,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    expect(canvas.getByRole("button")).toHaveTextContent("Button");
+    await expect(canvas.getByRole("button")).toBeDisabled();
   },
 };

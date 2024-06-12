@@ -222,6 +222,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
             title={dRepName ?? undefined}
             isDataMissing={metadataStatus}
             shareLink={!isMe ? window.location.href : undefined}
+            titleStyle={{ wordBreak: "break-word", whiteSpace: "wrap" }}
           />
           {metadataStatus && (
             <DataMissingInfoBox
@@ -288,7 +289,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
               isLoading={
                 isDelegating === dRep.view || isDelegating === dRep.drepId
               }
-              onClick={() => delegate(dRep.view)}
+              onClick={() => delegate(dRep.drepId)}
               size="extraLarge"
               sx={{ width: "100%" }}
               variant="contained"

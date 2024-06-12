@@ -1,15 +1,19 @@
-import { userEvent, within } from "@storybook/testing-library";
-import { expect, jest } from "@storybook/jest";
-import type { Meta, StoryObj } from "@storybook/react";
 import {
   GOVERNANCE_ACTIONS_FILTERS,
   GOVERNANCE_ACTIONS_SORTING,
 } from "@consts";
+import { expect, jest } from "@storybook/jest";
+import type { Meta, StoryObj } from "@storybook/react";
+import { userEvent, within } from "@storybook/testing-library";
 import { DataActionsBar } from "@/components/molecules";
 
 const meta = {
   title: "Example/DataActionsBar",
   component: DataActionsBar,
+  args: {
+    filterOptions: GOVERNANCE_ACTIONS_FILTERS,
+    sortOptions: GOVERNANCE_ACTIONS_SORTING,
+  },
   parameters: {
     layout: "centered",
   },
@@ -25,6 +29,7 @@ export const ActionsBarComponent: Story = {
     searchText: "",
     sortingActive: false,
     sortOpen: false,
+    filterOptions: GOVERNANCE_ACTIONS_FILTERS,
     isFiltering: true,
     setFiltersOpen: jest.fn(),
     setSortOpen: jest.fn(),

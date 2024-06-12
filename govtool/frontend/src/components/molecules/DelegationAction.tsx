@@ -3,6 +3,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 import { Typography } from "@atoms";
 import { gray } from "@consts";
+import { ellipsizeText } from "@utils";
 
 import { Card } from "./Card";
 import { DirectVoterActionProps } from "./types";
@@ -31,7 +32,7 @@ export const DelegationAction = ({
   >
     <Box sx={{ width: "90%" }}>
       <Typography fontWeight={600} variant="body2">
-        {drepName}
+        {ellipsizeText(drepName, 30)}
       </Typography>
       <Typography
         sx={{

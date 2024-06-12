@@ -35,7 +35,7 @@ test("3D. Verify DRep registration form", async ({ page }) => {
 });
 
 test.describe("Validation of dRep Registration Form", () => {
-  test("3E_1 Should accept valid data in DRep form", async ({ page }) => {
+  test("3E_1. Should accept valid data in DRep form", async ({ page }) => {
     test.slow();
 
     const dRepRegistrationPage = new DRepRegistrationPage(page);

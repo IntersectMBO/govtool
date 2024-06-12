@@ -22,6 +22,7 @@ export const adaHolderWallets = [
   adaHolder03Wallet,
   adaHolder04Wallet,
   adaHolder05Wallet,
+  adaHolder06Wallet,
 ];
 
 export const userWallets = [user01Wallet];

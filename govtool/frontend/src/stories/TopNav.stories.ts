@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { userEvent, within } from "@storybook/testing-library";
 import { TopNav } from "@organisms";
 import { expect, jest } from "@storybook/jest";
+import type { Meta, StoryObj } from "@storybook/react";
+import { userEvent, within } from "@storybook/testing-library";
 
 const meta = {
   title: "Example/TopNav",
@@ -16,10 +16,7 @@ const performCommonActions = async (canvas: ReturnType<typeof within>) => {
   window.open = jest.fn();
 
   await userEvent.click(canvas.getByTestId("logo-button"));
-  const homeLink = canvas.getByTestId("home-link");
   const governanceActionsLink = canvas.getByTestId("governance-actions-link");
-  await userEvent.click(homeLink);
-  await expect(homeLink).toHaveClass("active");
   await userEvent.click(canvas.getByTestId("governance-actions-link"));
   await expect(governanceActionsLink).toHaveClass("active");
   await userEvent.click(canvas.getByTestId("guides-link"));

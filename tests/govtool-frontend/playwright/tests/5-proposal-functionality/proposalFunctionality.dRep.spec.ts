@@ -138,6 +138,8 @@ test.describe("Perform voting", () => {
   let dRepPage: Page;
 
   test.beforeEach(async ({ page, browser }) => {
+    test.slow(); // Due to queue in pop wallets
+
     const wallet = await walletManager.popWallet("registeredDRep");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);

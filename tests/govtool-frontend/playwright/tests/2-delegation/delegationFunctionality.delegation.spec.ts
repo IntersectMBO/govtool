@@ -117,8 +117,6 @@ test.describe("Register DRep state", () => {
   let dRepPage: Page;
   let wallet: StaticWallet;
 
-  test.describe.configure({ retries: 3 });
-
   test.beforeEach(async ({ page, browser }) => {
     wallet = await walletManager.popWallet("registerDRep");
 
@@ -128,16 +126,16 @@ test.describe("Register DRep state", () => {
       wallet,
       enableStakeSigning: true,
     });
+
+    await dRepPage.goto("/");
+    await dRepPage.waitForTimeout(2_000); // Waits to ensure the wallet-connection modal not interfere with interactions
   });
 
   test("2E. Should register as Direct voter", async ({}, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
     const dRepId = wallet.dRepId;
 
-    await dRepPage.goto("/");
     await dRepPage.getByTestId("register-as-sole-voter-button").click();
-
-    await expect(dRepPage.getByTestId("continue-button")).toBeVisible();
     await dRepPage.getByTestId("continue-button").click();
     await expect(
       dRepPage.getByTestId("registration-transaction-submitted-modal")
@@ -162,10 +160,7 @@ test.describe("Register DRep state", () => {
   test("2S. Should retire as a Direct Voter on delegating to another DRep", async ({}, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
-    await dRepPage.goto("/");
     await dRepPage.getByTestId("register-as-sole-voter-button").click();
-
-    await expect(dRepPage.getByTestId("continue-button")).toBeVisible();
     await dRepPage.getByTestId("continue-button").click();
     await expect(
       dRepPage.getByTestId("registration-transaction-submitted-modal")

@@ -92,3 +92,8 @@ export type IDRep = {
   latestTxHash: string;
   latestRegistrationDate: string;
 };
+
+export type ProtocolParams = {
+  dRepDeposit: number;
+  govActionDeposit: number;
+};

@@ -7,7 +7,7 @@ import { useCardano } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { ProposalData } from "@models";
 import { GovernanceActionCard } from "@molecules";
-import { getProposalTypeTitle, getFullGovActionId, openInNewTab } from "@utils";
+import { getProposalTypeTitle, getFullGovActionId } from "@utils";
 import { Slider } from "@organisms";
 
 type GovernanceActionsToVoteProps = {
@@ -58,40 +58,27 @@ export const GovernanceActionsToVote = ({
                           `${action.txHash ?? ""}${action.index ?? ""}`
                       }
                       onClick={() => {
-                        if (
-                          onDashboard &&
-                          pendingTransaction.vote?.resourceId ===
-                            `${action.txHash ?? ""}${action.index ?? ""}`
-                        ) {
-                          openInNewTab(
-                            `https://sancho.cexplorer.io/tx/${pendingTransaction?.vote?.transactionHash}`,
-                          );
-                        } else {
-                          navigate(
-                            onDashboard
-                              ? generatePath(
-                                  PATHS.dashboardGovernanceActionsAction,
-                                  {
-                                    proposalId: getFullGovActionId(
-                                      action.txHash,
-                                      action.index,
-                                    ),
-                                  },
-                                )
-                              : PATHS.governanceActionsAction.replace(
-                                  ":proposalId",
-                                  getFullGovActionId(
+                        navigate(
+                          onDashboard
+                            ? generatePath(
+                                PATHS.dashboardGovernanceActionsAction,
+                                {
+                                  proposalId: getFullGovActionId(
                                     action.txHash,
                                     action.index,
                                   ),
-                                ),
-                            {
-                              state: {
-                                ...action,
-                              },
+                                },
+                              )
+                            : PATHS.governanceActionsAction.replace(
+                                ":proposalId",
+                                getFullGovActionId(action.txHash, action.index),
+                              ),
+                          {
+                            state: {
+                              ...action,
                             },
-                          );
-                        }
+                          },
+                        );
                       }}
                     />
                   </div>

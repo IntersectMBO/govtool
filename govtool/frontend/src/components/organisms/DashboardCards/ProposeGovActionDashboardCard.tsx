@@ -65,7 +65,7 @@ export const ProposeGovActionDashboardCard = ({
           dataTestId: "learn-more-button",
           onClick: () =>
             openInNewTab(
-              "https://docs.sanchogov.tools/faqs/what-is-a-governance-action",
+              "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/propose-a-governance-action",
             ),
         },
       ]}

@@ -41,7 +41,7 @@ export const RegisterAsDRepForm = ({
 
   const onClickBack = () => setStep(1);
 
-  const addLink = useCallback(() => append({ link: "" }), [append]);
+  const addLink = useCallback(() => append({ uri: "" }), [append]);
 
   const removeLink = useCallback((index: number) => remove(index), [remove]);
 
@@ -51,7 +51,7 @@ export const RegisterAsDRepForm = ({
     () =>
       references.map((field, index) => (
         <ControlledField.Input
-          {...register(`references.${index}.link`)}
+          {...register(`references.${index}.uri`)}
           errors={errors}
           endAdornment={
             references.length > 1 ? (
@@ -69,7 +69,7 @@ export const RegisterAsDRepForm = ({
           label={t("forms.link") + ` ${index + 1}`}
           layoutStyles={{ mb: 3 }}
           placeholder={Placeholders.LINK}
-          name={`references.${index}.link`}
+          name={`references.${index}.uri`}
           rules={Rules.LINK}
         />
       )),

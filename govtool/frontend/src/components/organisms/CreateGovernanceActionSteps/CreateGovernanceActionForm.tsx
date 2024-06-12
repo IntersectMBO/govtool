@@ -83,7 +83,7 @@ export const CreateGovernanceActionForm = ({
       }
     });
 
-  const addLink = useCallback(() => append({ link: "" }), [append]);
+  const addLink = useCallback(() => append({ uri: "" }), [append]);
 
   const removeLink = useCallback((index: number) => remove(index), [remove]);
 
@@ -91,7 +91,7 @@ export const CreateGovernanceActionForm = ({
     () =>
       references.map((field, index) => (
         <ControlledField.Input
-          {...register(`references.${index}.link`)}
+          {...register(`references.${index}.uri`)}
           errors={errors}
           endAdornment={
             references.length > 1 ? (
@@ -107,7 +107,7 @@ export const CreateGovernanceActionForm = ({
           label={`${t("forms.link")} ${index + 1}`}
           layoutStyles={{ mb: 3 }}
           placeholder={Placeholders.LINK}
-          name={`references.${index}.link`}
+          name={`references.${index}.uri`}
           rules={{
             pattern: {
               value: URL_REGEX,

@@ -49,7 +49,7 @@ export const EditDRepForm = ({
 
   const onClickContinue = () => setStep(2);
 
-  const addLink = useCallback(() => append({ link: "" }), [append]);
+  const addLink = useCallback(() => append({ uri: "" }), [append]);
 
   const removeLink = useCallback((index: number) => remove(index), [remove]);
 
@@ -61,15 +61,17 @@ export const EditDRepForm = ({
         state
           ? {
               ...state,
-              links: state.references.map((link: string) => ({
-                link,
+              references: state.references.map((uri: string) => ({
+                uri,
               })),
             }
           : {
               ...yourselfDRepList?.[0],
-              links: yourselfDRepList?.[0].references.map((link: string) => ({
-                link,
-              })),
+              references: yourselfDRepList?.[0].references.map(
+                (uri: string) => ({
+                  uri,
+                }),
+              ),
             },
       );
   }, [yourselfDRepList]);
@@ -78,7 +80,7 @@ export const EditDRepForm = ({
     () =>
       references.map((field, index) => (
         <ControlledField.Input
-          {...register(`references.${index}.link`)}
+          {...register(`references.${index}.uri`)}
           errors={errors}
           endAdornment={
             references.length > 1 ? (
@@ -96,7 +98,7 @@ export const EditDRepForm = ({
           label={t("forms.link") + ` ${index + 1}`}
           layoutStyles={{ mb: 3 }}
           placeholder={Placeholders.LINK}
-          name={`references.${index}.link`}
+          name={`references.${index}.uri`}
           rules={Rules.LINK}
         />
       )),

@@ -32,7 +32,7 @@ import {
 import { useValidateMutation } from "../mutations";
 
 export type CreateGovernanceActionValues = {
-  references?: { link: string }[];
+  references?: { uri: string }[];
   storeData?: boolean;
   storingURL: string;
   governance_action_type?: GovernanceActionType;
@@ -40,7 +40,7 @@ export type CreateGovernanceActionValues = {
 
 export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues =
   {
-    references: [{ link: "" }],
+    references: [{ uri: "" }],
     storeData: false,
     storingURL: "",
   };

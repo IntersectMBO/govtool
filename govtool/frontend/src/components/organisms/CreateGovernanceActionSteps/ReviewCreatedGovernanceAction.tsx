@@ -71,7 +71,7 @@ export const ReviewCreatedGovernanceAction = ({
       });
 
   const renderLinks = () => {
-    const references = values.references?.map((item) => item.link) ?? [];
+    const references = values.references?.map((item) => item.uri) ?? [];
     const areReferences = references.some((item) => item);
 
     return areReferences ? (
@@ -85,13 +85,13 @@ export const ReviewCreatedGovernanceAction = ({
           {t("createGovernanceAction.supportingLinks")}
         </Typography>
         {references.map(
-          (link: string, index: number) =>
-            link && (
+          (uri: string, index: number) =>
+            uri && (
               <LinkWithIcon
                 dataTestId={`governance-action-link-${index + 1}-content`}
                 icon={<img alt="link" src={ICONS.link} />}
-                label={link}
-                onClick={() => onClickLink(link)}
+                label={uri}
+                onClick={() => onClickLink(uri)}
                 sx={{ mb: 1.75 }}
               />
             ),

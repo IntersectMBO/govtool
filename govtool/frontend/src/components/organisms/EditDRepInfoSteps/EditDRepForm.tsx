@@ -33,11 +33,11 @@ export const EditDRepForm = ({
     useEditDRepInfoForm();
   const {
     append,
-    fields: links,
+    fields: references,
     remove,
   } = useFieldArray({
     control,
-    name: "links",
+    name: "references",
   });
 
   const { dRepData: yourselfDRepList } = useGetDRepListInfiniteQuery(
@@ -76,12 +76,12 @@ export const EditDRepForm = ({
 
   const renderLinks = useCallback(
     () =>
-      links.map((field, index) => (
+      references.map((field, index) => (
         <ControlledField.Input
-          {...register(`links.${index}.link`)}
+          {...register(`references.${index}.link`)}
           errors={errors}
           endAdornment={
-            links.length > 1 ? (
+            references.length > 1 ? (
               <DeleteOutlineIcon
                 color="primary"
                 data-testid={`delete-link-${index + 1}-button`}
@@ -96,11 +96,11 @@ export const EditDRepForm = ({
           label={t("forms.link") + ` ${index + 1}`}
           layoutStyles={{ mb: 3 }}
           placeholder={Placeholders.LINK}
-          name={`links.${index}.link`}
+          name={`references.${index}.link`}
           rules={Rules.LINK}
         />
       )),
-    [errors, links],
+    [errors, references],
   );
 
   return (
@@ -176,7 +176,7 @@ export const EditDRepForm = ({
       </p>
       <Spacer y={3} />
       {renderLinks()}
-      {links?.length < MAX_NUMBER_OF_LINKS ? (
+      {references?.length < MAX_NUMBER_OF_LINKS ? (
         <Button
           data-testid="add-link-button"
           onClick={addLink}

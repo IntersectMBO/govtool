@@ -12,6 +12,51 @@
 
 For creating the Governance Action, you need to consume 2 utility methods provided by `GovernanceActionProvided` (documented later within this document), and 3 exported from `CardanoProvider` wallet actions (2 for the 2 types of supported by GovTool Governance Actions and 1 for Signing and Submitting the transaction)
 
+### Types
+
+```typescript
+import { VotingProposalBuilder } from "@emurgo/cardano-serialization-lib-nodejs";
+
+interface GovernanceAction {
+  title: string;
+  abstract: string;
+  motivation: string;
+  rationale: string;
+  references: [{ title: string; url: string }];
+}
+
+interface InfoProps {
+  hash: string;
+  url: string;
+}
+
+interface TreasuryProps {
+  amount: string;
+  hash: string;
+  receivingAddress: string;
+  url: string;
+}
+
+const createGovernanceActionJsonLD: (
+  governanceAction: GovernanceAction
+) => NodeObject;
+
+const createHash: (jsonLd: NodeObject) => string;
+
+const buildNewInfoGovernanceAction: (
+  infoProps: InfoProps
+) => Promise<VotingProposalBuilder | undefined>;
+
+const buildTreasuryGovernanceAction: (
+  treasuryProps: TreasuryProps
+) => Promise<VotingProposalBuilder | undefined>;
+
+const buildSignSubmitConwayCertTx: (params: {
+  govActionBuilder: VotingProposalBuilder;
+  type: "createGovAction";
+}) => Promise<void>;
+```
+
 ### Step 1: Create the Governance Action metadata object
 
 Create the Governance Action object with the fields specified by [CIP-108](https://github.com/cardano-foundation/CIPs/tree/master/CIP-0108), which are:

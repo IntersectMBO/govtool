@@ -35,6 +35,11 @@ const GovernanceActionContext =
  * @param children - The child components to render.
  */
 const GovernanceActionProvider = ({ children }: PropsWithChildren) => {
+  /**
+   * Creates a JSON-LD representation of a governance action.
+   * @param {GovActionMetadata} govActionMetadata - The metadata of the governance action.
+   * @returns The JSON-LD representation of the governance action.
+   */
   const createGovernanceActionJsonLD = useCallback(
     async (govActionMetadata: GovActionMetadata) => {
       try {
@@ -56,6 +61,11 @@ const GovernanceActionProvider = ({ children }: PropsWithChildren) => {
     [],
   );
 
+  /**
+   * Creates a hash of a JSON-LD object.
+   * @param {NodeObject} jsonLD - The JSON-LD object to hash.
+   * @returns The hash of the JSON-LD object.
+   */
   const createHash = useCallback(async (jsonLD: NodeObject) => {
     try {
       const canonizedJson = await canonizeJSON(jsonLD);

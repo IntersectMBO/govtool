@@ -27,7 +27,7 @@ export type EditDRepInfoValues = {
   bio?: string;
   dRepName: string;
   email?: string;
-  links?: Array<{ link: string }>;
+  references?: Array<{ link: string }>;
   storeData?: boolean;
   storingURL: string;
 };
@@ -36,7 +36,7 @@ export const defaultEditDRepInfoValues: EditDRepInfoValues = {
   bio: "",
   dRepName: "",
   email: "",
-  links: [{ link: "" }],
+  references: [{ link: "" }],
   storeData: false,
   storingURL: "",
 };

@@ -97,7 +97,7 @@ export const GovernanceActionDetailsCardData = ({
         expiryEpochNo={expiryEpochNo}
         createdEpochNo={createdEpochNo}
       />
-      {isDataMissing && (
+      {!isDataMissing && (
         <ExternalModalButton
           url={url}
           label={t("govActions.seeExternalData")}

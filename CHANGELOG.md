@@ -126,6 +126,7 @@ changes.
 - Changed documents to prepare for open source [Issue 737](https://github.com/IntersectMBO/govtool/issues/737)
 - Changed copy on maintenance page [Issue 753](https://github.com/IntersectMBO/govtool/issues/753)
 - Update link to docs [Issue 1246](https://github.com/IntersectMBO/govtool/issues/1246)
+- Hide the external data link when the metadata validation fails [Issue 1267](https://github.com/IntersectMBO/govtool/issues/1267)
 
 ### Removed
 

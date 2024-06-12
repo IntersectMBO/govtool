@@ -92,6 +92,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
     url,
     view,
     votingPower,
+    metadataValid,
   } = dRep;
 
   const isMe = isSameDRep(dRep, myDRepId);
@@ -231,7 +232,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
               sx={{ mb: 3 }}
             />
           )}
-          {metadataStatus && !!url && (
+          {metadataValid && !!url && (
             <ExternalModalButton
               label={t("govActions.seeExternalData")}
               sx={{ mb: 3 }}

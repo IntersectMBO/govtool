@@ -21,7 +21,6 @@ import {
 import {
   getFullGovActionId,
   getProposalTypeLabel,
-  openInNewTab,
   removeDuplicatedProposals,
 } from "@utils";
 
@@ -143,29 +142,17 @@ export const DashboardGovernanceActionsCategory = () => {
                   onClick={() => {
                     saveScrollPosition();
 
-                    if (
-                      pendingTransaction.vote?.resourceId ===
-                      item.txHash + item.index
-                    ) {
-                      openInNewTab(
-                        `https://sancho.cexplorer.io/tx/${pendingTransaction.vote.transactionHash}`,
-                      );
-                    } else {
-                      navigate(
-                        generatePath(PATHS.dashboardGovernanceActionsAction, {
-                          proposalId: getFullGovActionId(
-                            item.txHash,
-                            item.index,
-                          ),
-                        }),
-                        {
-                          state: {
-                            ...item,
-                            openedFromCategoryPage: true,
-                          },
+                    navigate(
+                      generatePath(PATHS.dashboardGovernanceActionsAction, {
+                        proposalId: getFullGovActionId(item.txHash, item.index),
+                      }),
+                      {
+                        state: {
+                          ...item,
+                          openedFromCategoryPage: true,
                         },
-                      );
-                    }
+                      },
+                    );
                   }}
                   txHash={item.txHash}
                 />

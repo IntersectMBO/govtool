@@ -430,6 +430,7 @@ export const en = {
       title: "Governance Actions",
       toVote: "To vote",
       viewDetails: "View Details",
+      viewDetailsAndVote: "View Details and Vote",
       viewOtherDetails: "View other details",
       viewProposalDetails: "View proposal details",
       vote: "Vote",

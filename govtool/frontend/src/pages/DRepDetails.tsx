@@ -222,6 +222,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
             title={dRepName ?? undefined}
             isDataMissing={metadataStatus}
             shareLink={!isMe ? window.location.href : undefined}
+            titleStyle={{ wordBreak: "break-word", whiteSpace: "wrap" }}
           />
           {metadataStatus && (
             <DataMissingInfoBox

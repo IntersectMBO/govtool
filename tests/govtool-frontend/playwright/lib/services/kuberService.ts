@@ -1,5 +1,5 @@
 import { faucetWallet } from "@constants/staticWallets";
-import { KuberValue, QueryProtocolParams, StaticWallet } from "@types";
+import { KuberValue, ProtocolParams, StaticWallet } from "@types";
 import * as blake from "blakejs";
 import environments from "lib/constants/environments";
 import { LockInterceptor, LockInterceptorInfo } from "lib/lockInterceptor";
@@ -329,7 +329,7 @@ const kuberService = {
   },
 
   queryProtocolParams() {
-    return callKuber("/api/v3/protocol-params") as Promise<QueryProtocolParams>;
+    return callKuber("/api/v3/protocol-params") as Promise<ProtocolParams>;
   },
 
   voteOnProposal(

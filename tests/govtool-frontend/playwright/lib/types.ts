@@ -93,7 +93,7 @@ export type IDRep = {
   latestRegistrationDate: string;
 };
 
-export type QueryProtocolParams = {
+export type ProtocolParams = {
   dRepDeposit: number;
   govActionDeposit: number;
 };

@@ -29,7 +29,7 @@ export type RegisterAsDRepValues = {
   bio?: string;
   dRepName: string;
   email?: string;
-  links?: Array<{ link: string }>;
+  references?: Array<{ uri: string }>;
   storeData?: boolean;
   storingURL: string;
 };
@@ -38,7 +38,7 @@ export const defaultRegisterAsDRepValues: RegisterAsDRepValues = {
   bio: "",
   dRepName: "",
   email: "",
-  links: [{ link: "" }],
+  references: [{ uri: "" }],
   storeData: false,
   storingURL: "",
 };

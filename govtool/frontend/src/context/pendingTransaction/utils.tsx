@@ -72,7 +72,7 @@ export const refetchData = async (
     ) {
       return data.dRepView;
     }
-    return data.dRepView;
+    return data.dRepHash;
   }
   if (type === "registerAsDrep" || type === "retireAsDrep")
     return data.isRegisteredAsDRep;

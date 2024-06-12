@@ -158,7 +158,7 @@ export const GovernanceActionDetails = () => {
                   details={state ? state.details : data.proposal.details}
                   url={state ? state.url : data.proposal.url}
                   title={title}
-                  about={state ? state?.abstract : data.proposal?.abstract}
+                  abstract={state ? state?.abstract : data.proposal?.abstract}
                   motivation={
                     state ? state?.motivation : data.proposal?.motivation
                   }

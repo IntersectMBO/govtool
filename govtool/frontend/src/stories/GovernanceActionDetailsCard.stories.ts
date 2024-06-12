@@ -59,7 +59,7 @@ async function assertGovActionDetails(
 export const GovernanceActionDetailsCardComponent: Story = {
   args: {
     ...commonArgs,
-    about: "Example about section",
+    abstract: "Example about section",
     rationale: "Example rationale section",
     motivation: "Example motivation section",
   },
@@ -86,7 +86,7 @@ export const GovernanceActionDetailsDrep: Story = {
     ...commonArgs,
     isDashboard: true,
     isVoter: true,
-    about: "Example about section",
+    abstract: "Example about section",
     rationale: "Example rationale section",
     motivation: "Example motivation section",
   },

@@ -14,7 +14,7 @@ import { MetadataValidationStatus } from "@models";
 import { useLocation } from "react-router-dom";
 
 type GovernanceActionDetailsCardDataProps = {
-  about?: string;
+  abstract?: string;
   createdDate: string;
   createdEpochNo: number;
   details?: ActionDetailsType;
@@ -35,7 +35,7 @@ type GovernanceActionDetailsCardDataProps = {
 };
 
 export const GovernanceActionDetailsCardData = ({
-  about,
+  abstract,
   createdDate,
   createdEpochNo,
   details,
@@ -110,10 +110,10 @@ export const GovernanceActionDetailsCardData = ({
         dataTestId={`${govActionId}-id`}
       />
       <GovernanceActionCardElement
-        label={t("govActions.about")}
-        text={about}
+        label={t("govActions.abstract")}
+        text={abstract}
         textVariant="longText"
-        dataTestId="about"
+        dataTestId="abstract"
       />
       <GovernanceActionCardElement
         label={t("govActions.motivation")}

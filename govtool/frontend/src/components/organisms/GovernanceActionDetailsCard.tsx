@@ -20,7 +20,7 @@ type GovernanceActionDetailsCardProps = {
   details?: ActionDetailsType;
   url: string;
   title?: string;
-  about?: string;
+  abstract?: string;
   motivation?: string;
   rationale?: string;
   yesVotes: number;
@@ -48,7 +48,7 @@ export const GovernanceActionDetailsCard = ({
   url,
   title,
   links,
-  about,
+  abstract,
   motivation,
   rationale,
   yesVotes,
@@ -93,7 +93,7 @@ export const GovernanceActionDetailsCard = ({
         />
       )}
       <GovernanceActionDetailsCardData
-        about={about}
+        abstract={abstract}
         createdDate={createdDate}
         createdEpochNo={createdEpochNo}
         details={details}

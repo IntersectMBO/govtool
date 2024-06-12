@@ -390,7 +390,7 @@ export const en = {
     },
     govActions: {
       about: "About",
-      abstract: "Abstract:",
+      abstract: "Abstract",
       backToGovActions: "Back to Governance Actions",
       castVote:
         "<0>You voted {{vote}} on this proposal</0>\non {{date}} (Epoch {{epoch}})",

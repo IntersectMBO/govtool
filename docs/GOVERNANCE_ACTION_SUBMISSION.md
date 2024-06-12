@@ -22,7 +22,7 @@ interface GovernanceAction {
   abstract: string;
   motivation: string;
   rationale: string;
-  references: [{ title: string; url: string }];
+  references: [{ label: string; uri: string }];
 }
 
 interface InfoProps {

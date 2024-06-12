@@ -124,6 +124,7 @@ changes.
 - Change input selection strategy to 3 (random) [Issue 575](https://github.com/IntersectMBO/govtool/issues/575)
 - Changed documents to prepare for open source [Issue 737](https://github.com/IntersectMBO/govtool/issues/737)
 - Changed copy on maintenance page [Issue 753](https://github.com/IntersectMBO/govtool/issues/753)
+- Update link to docs [Issue 1246](https://github.com/IntersectMBO/govtool/issues/1246)
 
 ### Removed
 

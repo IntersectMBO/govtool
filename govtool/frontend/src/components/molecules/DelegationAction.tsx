@@ -32,7 +32,7 @@ export const DelegationAction = ({
   >
     <Box sx={{ width: "90%" }}>
       <Typography fontWeight={600} variant="body2">
-        {ellipsizeText(drepName, 25)}
+        {ellipsizeText(drepName, 30)}
       </Typography>
       <Typography
         sx={{

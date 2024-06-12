@@ -135,7 +135,11 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           }}
           data-testid={`govaction-${govActionId}-view-detail`}
         >
-          {t("govActions.viewDetails")}
+          {t(
+            inProgress
+              ? "govActions.viewDetails"
+              : "govActions.viewDetailsAndVote",
+          )}
         </Button>
       </Box>
     </Box>

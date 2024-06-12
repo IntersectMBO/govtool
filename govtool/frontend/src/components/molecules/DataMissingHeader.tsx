@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, SxProps } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { Share } from "@molecules";
@@ -9,12 +9,14 @@ type DataMissingHeaderProps = {
   isDataMissing: MetadataValidationStatus | null;
   shareLink?: string;
   title?: string;
+  titleStyle?: SxProps;
 };
 
 export const DataMissingHeader = ({
   title,
   isDataMissing,
   shareLink,
+  titleStyle,
 }: DataMissingHeaderProps) => (
   <Box
     sx={{
@@ -39,6 +41,7 @@ export const DataMissingHeader = ({
           whiteSpace: "nowrap",
           fontWeight: 600,
           ...(isDataMissing && { color: "errorRed" }),
+          ...titleStyle,
         }}
         variant="title2"
       >

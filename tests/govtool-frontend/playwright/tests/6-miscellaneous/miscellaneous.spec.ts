@@ -46,7 +46,7 @@ test("6C. Navigation within the dApp", async ({ page, context }) => {
   expect(page.url()).toEqual(`${environments.frontendUrl}/`);
 });
 
-test("6D Should open Sanchonet docs in a new tab when clicking `Learn More` on dashboards in disconnected state.", async ({
+test("6D. Should open Sanchonet docs in a new tab when clicking `Learn More` on dashboards in disconnected state.", async ({
   page,
   context,
 }) => {

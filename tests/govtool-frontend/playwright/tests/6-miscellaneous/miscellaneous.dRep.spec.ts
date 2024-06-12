@@ -13,7 +13,7 @@ test.use({
   wallet: dRep01Wallet,
 });
 
-test("6H Should restrict dRep registration for dRep", async ({ page }) => {
+test("6H. Should restrict dRep registration for dRep", async ({ page }) => {
   await page.goto(`${environments.frontendUrl}/register_drep`);
 
   await page.waitForTimeout(2_000);

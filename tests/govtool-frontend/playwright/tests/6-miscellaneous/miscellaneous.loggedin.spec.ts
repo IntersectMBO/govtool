@@ -15,7 +15,7 @@ test.use({
   wallet: user01Wallet,
 });
 
-test("6E Should open Sanchonet docs in a new tab when clicking `Learn More` on dashboards in connected state.", async ({
+test("6E. Should open Sanchonet docs in a new tab when clicking `Learn More` on dashboards in connected state.", async ({
   page,
   context,
 }) => {
@@ -69,7 +69,7 @@ test("6E Should open Sanchonet docs in a new tab when clicking `Learn More` on d
   );
 });
 
-test("6F should open sanchonet docs in a new tab when clicking `info` button of abstain and signal-no-confidence card", async ({
+test("6F. should open sanchonet docs in a new tab when clicking `info` button of abstain and signal-no-confidence card", async ({
   page,
   context,
 }) => {
@@ -95,7 +95,7 @@ test("6F should open sanchonet docs in a new tab when clicking `info` button of 
   );
 });
 
-test("6G Should restrict edit dRep for non dRep", async ({ page }) => {
+test("6G. Should restrict edit dRep for non dRep", async ({ page }) => {
   const editDrepPage = new EditDRepPage(page);
   await editDrepPage.goto();
 

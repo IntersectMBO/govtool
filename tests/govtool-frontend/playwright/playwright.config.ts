@@ -53,6 +53,11 @@ export default defineConfig({
       dependencies: environments.ci ? ["faucet setup"] : [],
     },
     {
+      name: "proposal setup",
+      testMatch: "**/proposal.setup.ts",
+      dependencies: environments.ci ? ["faucet setup"] : [],
+    },
+    {
       name: "wallet bootstrap",
       testMatch: "**/wallet.bootstrap.ts",
       dependencies: environments.ci ? ["faucet setup"] : [],
@@ -62,6 +67,14 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.tx.spec.ts",
       dependencies: environments.ci ? ["auth setup", "wallet bootstrap"] : [],
+    },
+    {
+      name: "proposal",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: "**/*.proposal.spec.ts",
+      dependencies: environments.ci
+        ? ["auth setup", "wallet bootstrap", "proposal setup"]
+        : [],
     },
     {
       name: "loggedin (desktop)",
@@ -92,6 +105,7 @@ export default defineConfig({
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",
         "**/*.tx.spec.ts",
+        "**/*.proposal.spec.ts",
       ],
     },
     {
@@ -102,6 +116,7 @@ export default defineConfig({
         "**/*.dRep.spec.ts",
         "**/*.delegation.spec.ts",
         "**/*.tx.spec.ts",
+        "**/*.proposal.spec.ts",
         "**/walletConnect.spec.ts",
       ],
     },

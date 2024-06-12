@@ -2,6 +2,7 @@ import { user01Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { ShelleyWallet } from "@helpers/crypto";
 import { invalid } from "@mock/index";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
@@ -72,6 +73,37 @@ test.describe("Reject invalid  data", () => {
   });
 });
 
+test.describe("Proposal submission check", () => {
+  Object.values(ProposalType).map((type: ProposalType, index) => {
+    test(`7G_${index + 1}. Should open wallet connection popup, when registered with proper ${type.toLowerCase()} data`, async ({
+      page,
+      wallet,
+    }) => {
+      const proposalSubmissionPage = new ProposalSubmissionPage(page);
+
+      await proposalSubmissionPage.goto();
+
+      await page.getByTestId(`${type}-radio`).click();
+      await proposalSubmissionPage.continueBtn.click();
+
+      const walletAddressBech32 =
+        ShelleyWallet.fromJson(wallet).rewardAddressBech32(0);
+
+      const proposal: IProposalForm =
+        proposalSubmissionPage.generateValidProposalFormFields(
+          type,
+          walletAddressBech32
+        );
+      await proposalSubmissionPage.register({ ...proposal });
+      await expect(
+        proposalSubmissionPage.registrationErrorModal.getByText(
+          "UTxO Balance Insufficient"
+        )
+      ).toBeVisible();
+    });
+  });
+});
+
 test.describe("Review fillup form", () => {
   Object.values(ProposalType).map((type: ProposalType, index) => {
     test(`7I_${index + 1}. Should valid review submission in ${type.toLowerCase()} Proposal form`, async ({
@@ -111,7 +143,7 @@ test.describe("Review fillup form", () => {
   });
 });
 
-test("7I. Should reject invalid proposal metadata", async ({ page }) => {
+test("7L. Should reject invalid proposal metadata", async ({ page }) => {
   const invalidMetadataAnchor = "https://www.google.com";
 
   const proposalSubmissionPage = new ProposalSubmissionPage(page);
@@ -184,7 +216,9 @@ test.describe("Edit proposal form", () => {
   });
 });
 
-test("7K_1. Should accept valid anchor proposal metadata", async ({ page }) => {
+test("7K_1. Should accept valid metadata anchor on proposal submission", async ({
+  page,
+}) => {
   const invalidMetadataAnchor = "https://www.google.com";
 
   const proposalSubmissionPage = new ProposalSubmissionPage(page);
@@ -208,7 +242,9 @@ test("7K_1. Should accept valid anchor proposal metadata", async ({ page }) => {
   }
 });
 
-test("7K_2. Should reject valid anchor proposal metadata", async ({ page }) => {
+test("7K_2. Should reject invalid metadata anchor on proposal submission", async ({
+  page,
+}) => {
   const invalidMetadataAnchor = "https://www.google.com";
 
   const proposalSubmissionPage = new ProposalSubmissionPage(page);

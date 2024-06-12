@@ -13,7 +13,7 @@ test.beforeEach(async () => {
 test.use({ wallet: dRep02Wallet, storageState: ".auth/dRep02.json" });
 
 test.describe("Validation of edit dRep Form", () => {
-  test("3M_1 Should accept valid data in edit dRep form", async ({ page }) => {
+  test("3M_1. Should accept valid data in edit dRep form", async ({ page }) => {
     test.slow();
 
     const editDRepPage = new EditDRepPage(page);

@@ -20,7 +20,7 @@ const formErrors = {
 export default class ProposalSubmissionPage {
   // modals
   readonly registrationSuccessModal = this.page.getByTestId(
-    "create-governance-action-submitted-modal"
+    "governance-action-submitted-modal"
   );
   readonly registrationErrorModal = this.page.getByTestId(
     "create-governance-action-error-modal"

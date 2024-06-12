@@ -8,7 +8,7 @@ test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
 });
 
-test("4A.2: Should access Governance Actions page without connecting wallet", async ({
+test("4A.2. Should access Governance Actions page without connecting wallet", async ({
   page,
 }) => {
   await page.goto("/");
@@ -17,7 +17,7 @@ test("4A.2: Should access Governance Actions page without connecting wallet", as
   await expect(page.getByText(/Governance actions/i)).toHaveCount(2);
 });
 
-test("4B.2: Should restrict voting for users who are not registered as DReps (without wallet connected)", async ({
+test("4B.2. Should restrict voting for users who are not registered as DReps (without wallet connected)", async ({
   page,
 }) => {
   const govActionsPage = new GovernanceActionsPage(page);

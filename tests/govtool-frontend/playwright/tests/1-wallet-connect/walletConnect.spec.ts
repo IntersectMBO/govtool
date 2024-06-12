@@ -28,7 +28,7 @@ test("1A. Should connect wallet and choose stake-key to use", async ({
   await loginPage.login();
 });
 
-test("1C: Should disconnect Wallet When connected", async ({ page }) => {
+test("1C. Should disconnect Wallet When connected", async ({ page }) => {
   await createWallet(page);
 
   const loginPage = new LoginPage(page);

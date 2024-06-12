@@ -151,24 +151,25 @@ export const DelegateDashboardCard = ({
       }
       {...cardProps}
     >
-      {(delegateTx && delegateTx?.resourceId !== dRepID) ||
-      (!delegateTx &&
-        currentDelegation &&
-        currentDelegation?.dRepHash !== dRepID) ? (
-          <DelegationAction
-            drepName={
-              isDRepListFetching
-                ? "Loading..."
-                : myDRepDelegationData?.metadataStatus
-                ? getMetadataDataMissingStatusTranslation(
-                    myDRepDelegationData.metadataStatus,
-                  )
-                : myDRepDelegationData?.dRepName ?? ""
-            }
-            dRepId={displayedDelegationId ?? ""}
-            onCardClick={navigateToDRepDetails}
-            sx={{ mt: 1.5 }}
-          />
+      {displayedDelegationId &&
+      ((delegateTx && delegateTx?.resourceId !== dRepID) ||
+        (!delegateTx &&
+          currentDelegation &&
+          currentDelegation?.dRepHash !== dRepID)) ? (
+            <DelegationAction
+              drepName={
+                isDRepListFetching
+                  ? "Loading..."
+                  : myDRepDelegationData?.metadataStatus
+                  ? getMetadataDataMissingStatusTranslation(
+                      myDRepDelegationData.metadataStatus,
+                    )
+                  : myDRepDelegationData?.dRepName ?? ""
+              }
+              dRepId={displayedDelegationId}
+              onCardClick={navigateToDRepDetails}
+              sx={{ mt: 1.5 }}
+            />
       ) : null}
     </DashboardActionCard>
   );

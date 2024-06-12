@@ -42,7 +42,7 @@ export const Footer = () => {
 
   // TODO: change term of service link
   const onClickTermOfService = () =>
-    openInNewTab("https://docs.sanchogov.tools/legal/privacy-policy");
+    openInNewTab("https://docs.sanchogov.tools/legal/terms-and-conditions");
 
   const onClickFeedback = () => openFeedbackWindow();
 

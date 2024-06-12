@@ -28,13 +28,15 @@ export const HomeCards = () => {
       "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
     );
 
-  // TODO: Update the link
   const onClickLearnMoreAboutDirectVoterRegistration = () =>
-    openInNewTab("https://docs.sanchogov.tools/");
+    openInNewTab(
+      "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/direct-voting",
+    );
 
-  // TODO: Update the link
   const onClickLearnMoreAboutProposingGovAction = () =>
-    openInNewTab("https://docs.sanchogov.tools/");
+    openInNewTab(
+      "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/propose-a-governance-action",
+    );
 
   const navigateToGovActions = useCallback(
     () => navigate(PATHS.governanceActions),

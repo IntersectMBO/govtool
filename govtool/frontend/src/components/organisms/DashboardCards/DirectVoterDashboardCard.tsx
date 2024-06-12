@@ -31,7 +31,7 @@ export const DirectVoterDashboardCard = ({
     dataTestId: "learn-more-button",
     onClick: () =>
       openInNewTab(
-        "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
+        "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/direct-voting",
       ),
   };
 

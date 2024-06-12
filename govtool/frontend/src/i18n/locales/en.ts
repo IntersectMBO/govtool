@@ -456,8 +456,9 @@ export const en = {
         partTwo: "does not exist.",
       },
       tooltips: {
-        info: "An action that has no effect on-chain, other than an on-chain record",
-        treasury: "Withdrawals from the treasury",
+        info: "An action that doesn't have any on-chain impact except for being recorded on-chain.",
+        treasury:
+          "Treasury withdrawals are sub-categorized into small, medium, or large and are determined by the amount of lovelace to be withdrawn.",
       },
       type: {
         noConfidence: {

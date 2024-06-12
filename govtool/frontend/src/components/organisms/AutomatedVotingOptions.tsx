@@ -44,9 +44,6 @@ export const AutomatedVotingOptions = ({
 
   const { networkMetrics } = useGetNetworkMetrics();
 
-  // TODO: Change to certain automated voted option if available
-  const onClickInfo = () => openInNewTab("https://docs.sanchogov.tools/");
-
   const isDelegatedToAbstain =
     currentDelegation ===
     AutomatedVotingOptionCurrentDelegation.drep_always_abstain;
@@ -117,7 +114,11 @@ export const AutomatedVotingOptions = ({
             onClickDelegate={() =>
               delegate(AutomatedVotingOptionDelegationId.abstain)
             }
-            onClickInfo={onClickInfo}
+            onClickInfo={() =>
+              openInNewTab(
+                "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/delegating-overview/abstain-from-every-vote",
+              )
+            }
             title={
               isDelegatedToAbstain
                 ? t("dRepDirectory.delegatedToAbstainTitle", {
@@ -156,7 +157,11 @@ export const AutomatedVotingOptions = ({
             onClickDelegate={() =>
               delegate(AutomatedVotingOptionDelegationId.no_confidence)
             }
-            onClickInfo={onClickInfo}
+            onClickInfo={() =>
+              openInNewTab(
+                "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/delegating-overview/signal-no-confidence-on-every-vote",
+              )
+            }
             title={
               isDelegatedToNoConfidence
                 ? t("dRepDirectory.delegatedToNoConfidenceTitle", {

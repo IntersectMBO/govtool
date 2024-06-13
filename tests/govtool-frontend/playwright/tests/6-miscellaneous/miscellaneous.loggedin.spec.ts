@@ -1,5 +1,6 @@
 import environments from "@constants/environments";
-import { user01Wallet } from "@constants/staticWallets";
+import { adaHolder01Wallet, user01Wallet } from "@constants/staticWallets";
+import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
@@ -101,4 +102,51 @@ test("6G. Should restrict edit dRep for non dRep", async ({ page }) => {
 
   await page.waitForTimeout(2_000);
   await expect(editDrepPage.nameInput).not.toBeVisible();
+});
+
+test("6I. Should prompt for a username after clicking on proposal discussion link if username is not set", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByTestId("proposal-discussion-link").click();
+
+  await expect(
+    page.getByText(
+      "Hey, setup your usernameUsername cannot be changed in the Future. Some subtext"
+    )
+  ).toBeVisible(); //BUG Add modal testid instead should be username-modal
+
+  await expect(page.getByLabel("Username *")).toBeVisible(); // BUG use testid instead
+});
+
+test.describe("Add username", () => {
+  test.use({
+    storageState: ".auth/adaHolder01.json",
+    wallet: adaHolder01Wallet,
+  });
+
+  test("6J. Should add a username.", async ({ page }) => {
+    const username = faker.person.firstName();
+
+    await page.goto("/");
+    await page.getByTestId("proposal-discussion-link").click();
+
+    await page.getByLabel("Username *").fill(username); //BUG used testid instead
+
+    await page
+      .getByRole("button", { name: "Proceed with this username" })
+      .click(); //BUG used testid instead
+
+    await page
+      .getByRole("button", { name: "Proceed with this username" })
+      .click();
+
+    await page.getByRole("button", { name: "Close" }).click();
+
+    await expect(
+      page.getByRole("button", { name: "Propose a Governance Action" })
+    ).toBeVisible();
+
+    await expect(page.getByPlaceholder("Search...")).toBeVisible();
+  });
 });

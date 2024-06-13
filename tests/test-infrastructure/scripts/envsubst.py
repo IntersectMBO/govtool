@@ -1,7 +1,20 @@
 #!/usr/bin/python3
+"""
+NAME
+       envsubst.py - substitutes environment variables in bash format strings
+
+DESCRIPTION
+    envsubst.py is upgrade of POSIX command `envsubst`
+
+    supported syntax:
+      normal       - ${VARIABLE1}
+      with default - ${VARIABLE1:-somevalue}
+"""
+
 import os
 import re
 import sys
+
 
 def envsubst(template_str, env=os.environ):
     """Substitute environment variables in the template string, supporting default values."""
@@ -13,6 +26,7 @@ def envsubst(template_str, env=os.environ):
         return env.get(var, default_value)
 
     return pattern.sub(replace, template_str)
+
 
 def main():
     if len(sys.argv) > 2:
@@ -29,6 +43,7 @@ def main():
     result = envsubst(template_str)
 
     print(result)
+
 
 if __name__ == "__main__":
     main()

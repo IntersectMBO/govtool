@@ -8,7 +8,7 @@ test.beforeEach(async () => {
   await setAllureEpic("1. Wallet connect");
 });
 
-test("1B: Should connect wallet with single stake key", async ({ page }) => {
+test("1B. Should connect wallet with single stake key", async ({ page }) => {
   const loginPage = new LoginPage(page);
   await loginPage.goto();
   await loginPage.isLoggedIn();

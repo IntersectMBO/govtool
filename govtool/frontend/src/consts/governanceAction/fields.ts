@@ -1,4 +1,4 @@
-import { bech32Validation, numberValidation } from "@utils";
+import { isRewardAddress, numberValidation } from "@utils";
 import I18n from "@/i18n";
 import {
   GovernanceActionType,
@@ -106,7 +106,7 @@ export const GOVERNANCE_ACTION_FIELDS: GovernanceActionFields = {
       placeholderI18nKey:
         "createGovernanceAction.fields.declarations.receivingAddress.placeholder",
       rules: {
-        validate: bech32Validation,
+        validate: isRewardAddress,
       },
     },
     amount: {

@@ -137,7 +137,7 @@ export const DashboardGovernanceActionDetails = () => {
             url={state ? state.url : data.proposal.url}
             title={title}
             links={state ? state?.references : data.proposal?.references}
-            about={state ? state?.abstract : data.proposal?.abstract}
+            abstract={state ? state?.abstract : data.proposal?.abstract}
             motivation={state ? state?.motivation : data.proposal?.motivation}
             rationale={state ? state?.rationale : data.proposal?.rationale}
             yesVotes={state ? state.yesVotes : data.proposal.yesVotes}

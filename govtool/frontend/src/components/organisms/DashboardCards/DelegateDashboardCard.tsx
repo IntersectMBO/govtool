@@ -34,14 +34,14 @@ export const DelegateDashboardCard = ({
   currentDelegation,
   delegateTx,
   dRepID,
-  voter,
   votingPower,
 }: DelegateDashboardCardProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+
   const { dRepData, isDRepListFetching } = useGetDRepListInfiniteQuery(
     {
-      searchPhrase: currentDelegation?.dRepHash ?? delegateTx?.resourceId ?? "",
+      searchPhrase: delegateTx?.resourceId ?? currentDelegation?.dRepHash ?? "",
     },
     {
       enabled: !!currentDelegation?.dRepHash || !!delegateTx?.resourceId,
@@ -73,10 +73,7 @@ export const DelegateDashboardCard = ({
 
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress
-    if (
-      delegateTx &&
-      (!(delegateTx?.resourceId === dRepID) || voter?.isRegisteredAsDRep)
-    ) {
+    if (delegateTx && delegateTx?.resourceId !== dRepID) {
       return {
         buttons: [learnMoreButton],
         description: getProgressDescription(delegateTx?.resourceId, ada),
@@ -87,8 +84,9 @@ export const DelegateDashboardCard = ({
 
     // current delegation
     if (
+      !delegateTx &&
       currentDelegation &&
-      (!(currentDelegation?.dRepHash === dRepID) || voter?.isRegisteredAsDRep)
+      currentDelegation?.dRepHash !== dRepID
     ) {
       return {
         buttons: currentDelegation?.dRepView
@@ -141,36 +139,38 @@ export const DelegateDashboardCard = ({
       imageURL={IMAGES.govActionDelegateImage}
       isSpaceBetweenButtons={
         !!currentDelegation?.dRepView &&
-        (!(currentDelegation?.dRepHash === dRepID) || voter?.isRegisteredAsDRep)
+        !(currentDelegation?.dRepHash === dRepID)
       }
       transactionId={
-        !(currentDelegation?.dRepHash === dRepID) ||
-        voter?.isRegisteredAsDRep ||
-        !voter?.isRegisteredAsSoleVoter
+        (delegateTx && delegateTx?.resourceId !== dRepID) ||
+        (!delegateTx &&
+          currentDelegation &&
+          currentDelegation?.dRepHash !== dRepID)
           ? delegateTx?.transactionHash ?? currentDelegation?.txHash
           : undefined
       }
       {...cardProps}
     >
       {displayedDelegationId &&
-        (!(currentDelegation?.dRepHash === dRepID) ||
-          voter?.isRegisteredAsDRep ||
-          !voter?.isRegisteredAsSoleVoter) && (
-          <DelegationAction
-            drepName={
-              isDRepListFetching
-                ? "Loading..."
-                : myDRepDelegationData?.metadataStatus
-                ? getMetadataDataMissingStatusTranslation(
-                    myDRepDelegationData.metadataStatus,
-                  )
-                : myDRepDelegationData?.dRepName ?? ""
-            }
-            dRepId={displayedDelegationId}
-            onCardClick={navigateToDRepDetails}
-            sx={{ mt: 1.5 }}
-          />
-        )}
+      ((delegateTx && delegateTx?.resourceId !== dRepID) ||
+        (!delegateTx &&
+          currentDelegation &&
+          currentDelegation?.dRepHash !== dRepID)) ? (
+            <DelegationAction
+              drepName={
+                isDRepListFetching
+                  ? "Loading..."
+                  : myDRepDelegationData?.metadataStatus
+                  ? getMetadataDataMissingStatusTranslation(
+                      myDRepDelegationData.metadataStatus,
+                    )
+                  : myDRepDelegationData?.dRepName ?? ""
+              }
+              dRepId={displayedDelegationId}
+              onCardClick={navigateToDRepDetails}
+              sx={{ mt: 1.5 }}
+            />
+      ) : null}
     </DashboardActionCard>
   );
 };

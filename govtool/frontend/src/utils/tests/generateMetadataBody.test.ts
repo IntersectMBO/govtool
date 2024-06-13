@@ -30,9 +30,9 @@ describe("generateMetadataBody", () => {
       name: "John Doe",
       age: 30,
       email: "johndoe@example.com",
-      links: [
-        { link: "https://example.com/link1" },
-        { link: "https://example.com/link2" },
+      references: [
+        { uri: "https://example.com/link1" },
+        { uri: "https://example.com/link2" },
       ],
     };
     const acceptedKeys = ["name", "age"];

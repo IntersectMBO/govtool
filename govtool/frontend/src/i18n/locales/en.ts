@@ -370,6 +370,7 @@ export const en = {
       },
       errors: {
         tooLongUrl: "Url must be less than 128 bytes",
+        mustBeStakeAddress: "It must be reward address in bech32 format",
       },
       registerAsDRep: {
         bio: "Bio",
@@ -389,7 +390,7 @@ export const en = {
     },
     govActions: {
       about: "About",
-      abstract: "Abstract:",
+      abstract: "Abstract",
       backToGovActions: "Back to Governance Actions",
       castVote:
         "<0>You voted {{vote}} on this proposal</0>\non {{date}} (Epoch {{epoch}})",
@@ -429,6 +430,7 @@ export const en = {
       title: "Governance Actions",
       toVote: "To vote",
       viewDetails: "View Details",
+      viewDetailsAndVote: "View Details and Vote",
       viewOtherDetails: "View other details",
       viewProposalDetails: "View proposal details",
       vote: "Vote",
@@ -455,8 +457,9 @@ export const en = {
         partTwo: "does not exist.",
       },
       tooltips: {
-        info: "An action that has no effect on-chain, other than an on-chain record",
-        treasury: "Withdrawals from the treasury",
+        info: "An action that doesn't have any on-chain impact except for being recorded on-chain.",
+        treasury:
+          "Treasury withdrawals are sub-categorized into small, medium, or large and are determined by the amount of lovelace to be withdrawn.",
       },
       type: {
         noConfidence: {

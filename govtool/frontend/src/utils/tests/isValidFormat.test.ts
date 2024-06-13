@@ -1,4 +1,5 @@
-import { isValidURLFormat, isValidHashFormat } from "..";
+import i18n from "@/i18n";
+import { isValidURLFormat, isValidHashFormat, isRewardAddress } from "..";
 
 describe("isValidURLFormat", () => {
   it("returns true for valid HTTP URLs", () => {
@@ -67,5 +68,26 @@ describe("isValidHashFormat", () => {
   it("returns false for empty string", () => {
     const empty = "";
     expect(isValidHashFormat(empty)).toBe(false);
+  });
+});
+
+describe("isRewardAddress", () => {
+  it("returns true for stake address", async () => {
+    const validStake =
+      "stake_test1urmj8g9d09pdhrzxcuhhfkx2rxmldnrzyumyt90qvmurrpgg4c5zj";
+    const result = await isRewardAddress(validStake);
+    expect(result).toBe(true);
+  });
+
+  it("returns error for empty string", async () => {
+    const invalid = "";
+    const result = await isRewardAddress(invalid);
+    expect(result).toBe(i18n.t("forms.errors.mustBeStakeAddress"));
+  });
+
+  it("returns error for another bech32 string", async () => {
+    const invalid = "drep1l8uyy66sm8u82h82gc8hkcy2xu24dl8ffsh58aa0v7d37yp48u8";
+    const result = await isRewardAddress(invalid);
+    expect(result).toBe(i18n.t("forms.errors.mustBeStakeAddress"));
   });
 });

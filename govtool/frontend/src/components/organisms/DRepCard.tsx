@@ -9,6 +9,7 @@ import { DRepData, DRepStatus } from "@models";
 import { Card } from "@molecules";
 import {
   correctDRepDirectoryFormat,
+  ellipsizeText,
   getMetadataDataMissingStatusTranslation,
 } from "@utils";
 
@@ -103,7 +104,7 @@ export const DRepCard = ({
               >
                 {metadataStatus
                   ? getMetadataDataMissingStatusTranslation(metadataStatus)
-                  : dRepName}
+                  : ellipsizeText(dRepName ?? "", 25)}
               </Typography>
               <ButtonBase
                 data-testid={`${view}-copy-id-button`}

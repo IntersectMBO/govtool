@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { within, userEvent, waitFor, screen } from "@storybook/testing-library";
-import { expect, jest } from "@storybook/jest";
-import { formatDisplayDate } from "@utils";
 import { MetadataValidationStatus } from "@models";
+import { expect, jest } from "@storybook/jest";
+import type { Meta, StoryObj } from "@storybook/react";
+import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
+import { formatDisplayDate } from "@utils";
 import { GovernanceActionCard } from "@/components/molecules";
 
 const meta = {
@@ -71,6 +71,10 @@ export const GovernanceActionCardIsLoading: Story = {
     ...commonArgs,
     inProgress: true,
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText(/in progress/i)).toBeVisible();
+  },
 };
 
 export const GovernanceActionCardDataMissing: Story = {
@@ -78,6 +82,18 @@ export const GovernanceActionCardDataMissing: Story = {
     ...commonArgs,
     metadataStatus: MetadataValidationStatus.URL_NOT_FOUND,
     metadataValid: false,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const tooltips = canvas.getAllByTestId("InfoOutlinedIcon");
+
+    await expect(canvas.getByText("Data Missing")).toBeVisible();
+    await userEvent.hover(tooltips[0]);
+    await waitFor(async () => {
+      expect(screen.getByRole("tooltip")).toBeInTheDocument();
+      expect(screen.getByRole("tooltip")).toHaveTextContent(/Data Missing/i);
+      await userEvent.unhover(tooltips[0]);
+    });
   },
 };
 
@@ -87,6 +103,20 @@ export const GovernanceActionCardIncorectFormat: Story = {
     metadataStatus: MetadataValidationStatus.INVALID_JSONLD,
     metadataValid: false,
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const tooltips = canvas.getAllByTestId("InfoOutlinedIcon");
+
+    await expect(canvas.getByText("Data Formatted Incorrectly")).toBeVisible();
+    await userEvent.hover(tooltips[0]);
+    await waitFor(async () => {
+      expect(screen.getByRole("tooltip")).toBeInTheDocument();
+      expect(screen.getByRole("tooltip")).toHaveTextContent(
+        /Data Formatted Incorrectly/i,
+      );
+      await userEvent.unhover(tooltips[0]);
+    });
+  },
 };
 
 export const GovernanceActionCardNotVerifiable: Story = {
@@ -94,5 +124,19 @@ export const GovernanceActionCardNotVerifiable: Story = {
     ...commonArgs,
     metadataStatus: MetadataValidationStatus.INVALID_HASH,
     metadataValid: false,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const tooltips = canvas.getAllByTestId("InfoOutlinedIcon");
+
+    await expect(canvas.getByText("Data Not Verifiable")).toBeVisible();
+    await userEvent.hover(tooltips[0]);
+    await waitFor(async () => {
+      expect(screen.getByRole("tooltip")).toBeInTheDocument();
+      expect(screen.getByRole("tooltip")).toHaveTextContent(
+        /Data Not Verifiable/i,
+      );
+      await userEvent.unhover(tooltips[0]);
+    });
   },
 };

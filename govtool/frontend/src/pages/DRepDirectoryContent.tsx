@@ -10,7 +10,6 @@ import {
   useGetAdaHolderCurrentDelegationQuery,
   useGetAdaHolderVotingPowerQuery,
   useGetDRepListInfiniteQuery,
-  useGetVoterInfo,
 } from "@hooks";
 import { DataActionsBar, EmptyStateDrepDirectory } from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
@@ -49,7 +48,6 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   const { delegate, isDelegating } = useDelegateTodRep();
 
-  const { voter } = useGetVoterInfo();
   const { votingPower } = useGetAdaHolderVotingPowerQuery(stakeKey);
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const inProgressDelegation = pendingTransaction.delegate?.resourceId;
@@ -106,6 +104,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const dRepListToDisplay = yourselfDRep
     ? [yourselfDRep, ...dRepsWithoutYourself]
     : dRepList;
+
   const inProgressDelegationDRepData = dRepListToDisplay.find(
     (dRep) =>
       dRep.drepId === inProgressDelegation ||
@@ -124,8 +123,8 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       {/* My delegation */}
       {myDrep &&
         !inProgressDelegation &&
-        (!(currentDelegation?.dRepHash === myDRepId) ||
-          voter?.isRegisteredAsDRep) && (
+        currentDelegation &&
+        currentDelegation?.dRepHash !== myDRepId && (
           <div>
             <Typography variant="title2" sx={{ mb: 2 }}>
               <Trans i18nKey="dRepDirectory.myDelegation" values={{ ada }} />
@@ -138,14 +137,16 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             />
           </div>
         )}
-      {inProgressDelegation && inProgressDelegationDRepData && (
-        <DRepCard
-          dRep={inProgressDelegationDRepData}
-          isConnected={!!isConnected}
-          isMe={isSameDRep(inProgressDelegationDRepData, myDRepId)}
-          isInProgress
-        />
-      )}
+      {inProgressDelegation &&
+        inProgressDelegation !== myDRepId &&
+        inProgressDelegationDRepData && (
+          <DRepCard
+            dRep={inProgressDelegationDRepData}
+            isConnected={!!isConnected}
+            isMe={isSameDRep(inProgressDelegationDRepData, myDRepId)}
+            isInProgress
+          />
+        )}
 
       {/* Automated voting options */}
       {isConnected && (
@@ -223,7 +224,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
                     isDelegating === dRep.view || isDelegating === dRep.drepId
                   }
                   isMe={isSameDRep(dRep, myDRepId)}
-                  onDelegate={() => delegate(dRep.view)}
+                  onDelegate={() => delegate(dRep.drepId)}
                 />
               </Box>
             );

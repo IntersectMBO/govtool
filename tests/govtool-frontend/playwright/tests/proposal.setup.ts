@@ -1,14 +1,22 @@
 import environments from "@constants/environments";
 import { faker } from "@faker-js/faker";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
+import { generateWalletAddress } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createFile } from "@helpers/file";
 import { pollTransaction } from "@helpers/transaction";
-import { mockProposalCreationPayload } from "@mock/index";
 import { test as setup } from "@playwright/test";
 import kuberService from "@services/kuberService";
-import proposalDiscussionService from "@services/proposalDiscussionService";
-import { AddCommentPayload, AddPollPayload, StaticProposal } from "@types";
+import {
+  postAddComment,
+  postAddPoll,
+  postCreateProposal,
+} from "@services/proposalDiscussion";
+import {
+  CommentRequest,
+  ProposalCreateRequest,
+} from "@services/proposalDiscussion/types";
+import { StaticProposal } from "@types";
 import walletManager from "lib/walletManager";
 
 const PROPOSAL_SUBMISSIONS_WALLETS_COUNT = 1;
@@ -54,29 +62,47 @@ setup("Setup temporary proposal wallets", async () => {
 });
 
 setup("Create temporary proposal", async () => {
-  const response: StaticProposal =
-    await proposalDiscussionService.createProposal(mockProposalCreationPayload);
-
-  const mockAddPollPayload: AddPollPayload = {
-    data: {
-      proposal_id: response.data.attributes.proposal_id.toString(),
-      poll_start_dt: new Date().toISOString(),
-      is_poll_active: true,
-    },
+  const receivingAddr = generateWalletAddress();
+  const proposalRequest: ProposalCreateRequest = {
+    proposal_links: [
+      {
+        prop_link: faker.internet.url(),
+        prop_link_text: faker.internet.displayName(),
+      },
+    ],
+    gov_action_type_id: 1,
+    prop_name: faker.company.name(),
+    prop_abstract: faker.lorem.paragraph(2),
+    prop_motivation: faker.lorem.paragraph(2),
+    prop_rationale: faker.lorem.paragraph(2),
+    prop_receiving_address: receivingAddr,
+    prop_amount: faker.number.int({ min: 100, max: 1000 }).toString(),
+    is_draft: false,
   };
-  await proposalDiscussionService.addPoll(mockAddPollPayload);
+
+  const createProposalRes = await postCreateProposal(proposalRequest);
+
+  await postAddPoll({
+    proposal_id: createProposalRes.data.attributes.proposal_id.toString(),
+    poll_start_dt: new Date().toISOString(),
+    is_poll_active: true,
+  });
+
+  const comments: CommentRequest[] = [];
 
   for (let i = 0; i < 4; i++) {
-    const comment: AddCommentPayload = {
-      data: {
-        proposal_id: response.data.attributes.proposal_id.toString(),
-        comment_text: faker.lorem.paragraph(2),
-      },
+    const comment: CommentRequest = {
+      proposal_id: createProposalRes.data.attributes.proposal_id.toString(),
+      comment_text: faker.lorem.paragraph(2),
     };
+    comments.push(comment);
 
-    await proposalDiscussionService.addComment(comment);
+    await postAddComment(comment);
   }
 
-  const data = [{ payload: mockProposalCreationPayload, response: response }];
-  await createFile("proposals.json", data);
+  const staticProposal: StaticProposal = {
+    id: createProposalRes.data.attributes.proposal_id,
+    comments,
+  };
+  await createFile("proposals.json", [staticProposal]);
 });

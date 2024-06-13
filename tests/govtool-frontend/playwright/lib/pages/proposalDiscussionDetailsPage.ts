@@ -2,7 +2,6 @@ import environments from "@constants/environments";
 import { Page } from "@playwright/test";
 
 export default class ProposalDiscussionDetailsPage {
-  private readonly proposalId: number | null;
   // Buttons
   readonly likeBtn = this.page.getByTestId("like-button");
   readonly dislikeBtn = this.page.getByTestId("dislike-button");
@@ -44,20 +43,15 @@ export default class ProposalDiscussionDetailsPage {
   readonly commentCard =
     this.proposeGovernanceAction.getByTestId("comment-card");
 
-  constructor(
-    private readonly page: Page,
-    proposalId?: number
-  ) {
-    this.proposalId = proposalId;
-  }
+  constructor(private readonly page: Page) {}
 
   get currentPage(): Page {
     return this.page;
   }
 
-  async goto(proposalId?: number) {
+  async goto(proposalId: number) {
     await this.page.goto(
-      `${environments.frontendUrl}/proposal_discussion/${proposalId ?? this.proposalId}`
+      `${environments.frontendUrl}/proposal_discussion/${proposalId}`
     );
   }
 }

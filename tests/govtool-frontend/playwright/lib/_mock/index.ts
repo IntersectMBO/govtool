@@ -1,6 +1,4 @@
 import { faker } from "@faker-js/faker";
-import { ProposalCreationPayload } from "@types";
-import { bech32 } from "bech32";
 
 export const invalid = {
   url: () => {
@@ -71,29 +69,5 @@ export const invalid = {
     }
     // empty invalid
     return " ";
-  },
-};
-
-const randomBytes = new Uint8Array(10);
-const bech32Address = bech32.encode("addr_test", randomBytes);
-
-export const mockProposalCreationPayload: {
-  data: ProposalCreationPayload;
-} = {
-  data: {
-    proposal_links: [
-      {
-        prop_link: faker.internet.url(),
-        prop_link_text: faker.internet.displayName(),
-      },
-    ],
-    gov_action_type_id: 1,
-    prop_name: faker.company.name(),
-    prop_abstract: faker.lorem.paragraph(2),
-    prop_motivation: faker.lorem.paragraph(2),
-    prop_rationale: faker.lorem.paragraph(2),
-    prop_receiving_address: bech32Address,
-    prop_amount: faker.number.int({ min: 100, max: 1000 }).toString(),
-    is_draft: false,
   },
 };

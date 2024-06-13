@@ -18,7 +18,6 @@ test("8B. Should filter and sort the list of proposed governance actions.", asyn
   await proposalDiscussionPage.treasuryRadio.click();
 });
 
-
 test("8C. Should search the list of proposed governance actions.", async ({
   page,
 }) => {
@@ -39,7 +38,6 @@ test("8C. Should search the list of proposed governance actions.", async ({
   }
 });
 
-
 test("8D.Should show the view-all categorized proposed governance actions.", async ({
   page,
 }) => {
@@ -50,7 +48,6 @@ test("8D.Should show the view-all categorized proposed governance actions.", asy
 
   await expect(proposalDiscussionPage.showLessBtn).toBeVisible();
 });
-
 
 test("8H. Should disable proposal interaction on a disconnected state.", async ({
   page,
@@ -73,11 +70,10 @@ test("8H. Should disable proposal interaction on a disconnected state.", async (
 test("8I. Should disable poll voting functionality.", async ({
   proposalDiscussionDetailsPage,
 }) => {
-  await proposalDiscussionDetailsPage.goto();
-
   await expect(proposalDiscussionDetailsPage.pollVoteCard).not.toBeVisible();
-  await expect(proposalDiscussionDetailsPage.pollYesVoteCount).not.toBeVisible();
+  await expect(
+    proposalDiscussionDetailsPage.pollYesVoteCount
+  ).not.toBeVisible();
 
   await expect(proposalDiscussionDetailsPage.pollNoVoteCount).not.toBeVisible();
-   
 });

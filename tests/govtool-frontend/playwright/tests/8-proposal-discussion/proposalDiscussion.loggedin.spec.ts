@@ -4,12 +4,9 @@ import { expect } from "@playwright/test";
 
 test.use({ storageState: ".auth/user01.json", wallet: user01Wallet });
 
-
 test("8G. Should display the proper likes and dislikes count.", async ({
   proposalDiscussionDetailsPage,
 }) => {
-  await proposalDiscussionDetailsPage.goto();
-
   await proposalDiscussionDetailsPage.likeBtn.click();
 
   await expect(proposalDiscussionDetailsPage.likesCounts).toHaveValue("1");

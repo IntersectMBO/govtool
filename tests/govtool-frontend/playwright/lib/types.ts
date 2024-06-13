@@ -98,44 +98,12 @@ export type ProtocolParams = {
   govActionDeposit: number;
 };
 
-export type ProposalCreationPayload = {
-  proposal_links: Array<ProposalLinksType>;
-  gov_action_type_id: number;
-  prop_name: string;
-  prop_abstract: string;
-  prop_motivation: string;
-  prop_rationale: string;
-  prop_receiving_address: string;
-  prop_amount: string;
-  is_draft: boolean;
-};
-
-type ProposalLinksType = {
-  prop_link: string;
-  prop_link_text: string;
+type Comment = {
+  proposal_id: string;
+  comment_text: string;
 };
 
 export type StaticProposal = {
-  data: {
-    attributes: {
-      proposal_id: number;
-      proposal_content_id: number;
-    };
-  };
-  meta: Object;
-};
-
-export type AddPollPayload = {
-  data: {
-    proposal_id: string;
-    poll_start_dt: string;
-    is_poll_active: boolean;
-  };
-};
-
-export type AddCommentPayload = {
-  data: {
-    proposal_id: string;
-    comment_text: string;
-  };
+  id: number;
+  comments?: Comment[];
 };

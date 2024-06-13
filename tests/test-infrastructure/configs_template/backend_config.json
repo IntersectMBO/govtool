@@ -9,7 +9,7 @@
   "port" : 8080,
   "host" : "0.0.0.0",
   "cachedurationseconds": 20,
-  "sentrydsn": "https://username:password@senty.host/id",
-  "metadatavalidationhost": "http://metadata-validation",
+  "sentrydsn": "${SENTRY_DSN_BACKEND:-https://username:password@senty.host/id}",
+  "metadatavalidationhost": "${METADATA_VALIDATION_URL:-http://metadata-validation}",
   "metadatavalidationport": 3000
 }

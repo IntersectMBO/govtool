@@ -1,5 +1,6 @@
 import environments from "@constants/environments";
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
+import { CommentResponse } from "@types";
 
 export default class ProposalDiscussionDetailsPage {
   // Buttons
@@ -24,6 +25,7 @@ export default class ProposalDiscussionDetailsPage {
   readonly replyBtn = this.page.getByTestId("reply-button");
   readonly pollYesBtn = this.page.getByTestId("poll-yes-button");
   readonly pollNoBtn = this.page.getByTestId("poll-No-button");
+  readonly showReplyButton = this.page.getByTestId("show-more-reply");
 
   // Inputs
   readonly commentInput = this.page.getByRole("textbox"); //this.page.getByTestId("comment-input");
@@ -53,5 +55,33 @@ export default class ProposalDiscussionDetailsPage {
     await this.page.goto(
       `${environments.frontendUrl}/proposal_discussion/${proposalId}`
     );
+  }
+
+  async getFirstComment() {
+    await this.page.waitForTimeout(2_000);
+    return this.page.locator('[data-testid$="-comment-card"]').first();
+  }
+
+  async sortAndValidate(
+    order: string,
+    validationFn: (date1: string, date2: string) => boolean
+  ) {
+    const responsePromise = this.page.waitForResponse((response) =>
+      response.url().includes(`&sort[createdAt]=${order}`)
+    );
+
+    await this.sortBtn.click();
+    const response = await responsePromise;
+
+    const comments: CommentResponse[] = (await response.json()).data;
+
+    // API validation
+    for (let i = 0; i < comments.length - 1; i++) {
+      const isValid = validationFn(
+        comments[i].attributes.updatedAt,
+        comments[i + 1].attributes.updatedAt
+      );
+      expect(isValid).toBe(true);
+    }
   }
 }

@@ -16,4 +16,5 @@ allure-report/
 lib/_mock/registerDRepWallets.json
 lib/_mock/registeredDRepWallets.json
 lib/_mock/wallets.json
+lib/_mock/proposals.json
 ./lock_logs.txt

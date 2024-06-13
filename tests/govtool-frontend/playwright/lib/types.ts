@@ -115,7 +115,7 @@ type ProposalLinksType = {
   prop_link_text: string;
 };
 
-export type ProposalCreationResponse = {
+export type StaticProposal = {
   data: {
     attributes: {
       proposal_id: number;

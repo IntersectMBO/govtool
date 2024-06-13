@@ -1,19 +1,15 @@
 import environments from "@constants/environments";
+import { faker } from "@faker-js/faker";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
+import { createFile } from "@helpers/file";
 import { pollTransaction } from "@helpers/transaction";
+import { mockProposalCreationPayload } from "@mock/index";
 import { test as setup } from "@playwright/test";
 import kuberService from "@services/kuberService";
 import proposalDiscussionService from "@services/proposalDiscussionService";
-import {
-  AddCommentPayload,
-  AddPollPayload,
-  ProposalCreationResponse,
-} from "@types";
+import { AddCommentPayload, AddPollPayload, StaticProposal } from "@types";
 import walletManager from "lib/walletManager";
-import { mockProposalCreationPayload } from "@mock/index";
-import proposalManager from "lib/proposalManager";
-import { faker } from "@faker-js/faker";
 
 const PROPOSAL_SUBMISSIONS_WALLETS_COUNT = 1;
 
@@ -58,7 +54,7 @@ setup("Setup temporary proposal wallets", async () => {
 });
 
 setup("Create temporary proposal", async () => {
-  const response: ProposalCreationResponse =
+  const response: StaticProposal =
     await proposalDiscussionService.createProposal(mockProposalCreationPayload);
 
   const mockAddPollPayload: AddPollPayload = {
@@ -81,8 +77,6 @@ setup("Create temporary proposal", async () => {
     await proposalDiscussionService.addComment(comment);
   }
 
-  await proposalManager.writeProposal({
-    payload: mockProposalCreationPayload,
-    response: response,
-  });
+  const data = [{ payload: mockProposalCreationPayload, response: response }];
+  await createFile("proposals.json", data);
 });

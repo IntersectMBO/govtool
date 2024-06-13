@@ -31,7 +31,7 @@ export const VoteContextStoringInformation = ({
     validateURL,
     watch,
     generateMetadata,
-    onClickDownloadJson,
+    onClickDownloadFile,
   } = useVoteContextForm(setSavedHash, setStep, setErrorMessage);
 
   const openGuideAboutStoringInformation = () =>
@@ -78,7 +78,7 @@ export const VoteContextStoringInformation = ({
         <Step
           component={
             <Button
-              onClick={onClickDownloadJson}
+              onClick={onClickDownloadFile}
               size="extraLarge"
               startIcon={<img alt="download" src={ICONS.download} />}
               sx={{
@@ -88,7 +88,7 @@ export const VoteContextStoringInformation = ({
               }}
               variant="outlined"
             >
-              {t("govActions.voteContextJsonldFileName")}
+              {t("govActions.voteContextFileName")}
             </Button>
           }
           componentsLayoutStyles={{

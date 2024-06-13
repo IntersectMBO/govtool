@@ -15,12 +15,15 @@ import {
 import { useCardano, useModal } from "@context";
 import {
   canonizeJSON,
+  correctAdaFormat,
   downloadJson,
   generateJsonld,
   generateMetadataBody,
+  getItemFromLocalStorage,
+  PROTOCOL_PARAMS_KEY,
 } from "@utils";
 import { useWalletErrorModal } from "@hooks";
-import { MetadataValidationStatus } from "@models";
+import { MetadataStandard, MetadataValidationStatus } from "@models";
 import {
   GovernanceActionFieldSchemas,
   GovernanceActionType,
@@ -29,7 +32,7 @@ import {
 import { useValidateMutation } from "../mutations";
 
 export type CreateGovernanceActionValues = {
-  links?: { link: string }[];
+  references?: { uri: string }[];
   storeData?: boolean;
   storingURL: string;
   governance_action_type?: GovernanceActionType;
@@ -37,10 +40,12 @@ export type CreateGovernanceActionValues = {
 
 export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues =
   {
-    links: [{ link: "" }],
+    references: [{ uri: "" }],
     storeData: false,
     storingURL: "",
   };
+
+const protocolParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
 export const useCreateGovernanceActionForm = (
   setStep?: Dispatch<SetStateAction<number>>,
@@ -157,10 +162,11 @@ export const useCreateGovernanceActionForm = (
     [hash],
   );
 
-  const showSuccessModal = useCallback(() => {
+  const showSuccessModal = useCallback((link: string) => {
     openModal({
       type: "statusModal",
       state: {
+        link: `https://sancho.cexplorer.io/tx/${link}`,
         status: "success",
         title: t(
           "createGovernanceAction.modals.submitTransactionSuccess.title",
@@ -195,6 +201,7 @@ export const useCreateGovernanceActionForm = (
         const { status } = await validateMetadata({
           url: data.storingURL,
           hash,
+          standard: MetadataStandard.CIP108,
         });
 
         if (status) {
@@ -202,14 +209,18 @@ export const useCreateGovernanceActionForm = (
         }
 
         const govActionBuilder = await buildTransaction(data);
-        await buildSignSubmitConwayCertTx({
+        const result = await buildSignSubmitConwayCertTx({
           govActionBuilder,
           type: "createGovAction",
         });
 
-        showSuccessModal();
+        if (result) showSuccessModal(result);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
+        const isInsufficientBalance = error
+          ?.toLowerCase()
+          ?.includes("insufficient");
+
         if (
           Object.values(MetadataValidationStatus).includes(
             error as MetadataValidationStatus,
@@ -227,7 +238,14 @@ export const useCreateGovernanceActionForm = (
           });
         } else {
           openWalletErrorModal({
-            error,
+            error: isInsufficientBalance
+              ? t("errors.insufficientBalanceDescription", {
+                  ada: correctAdaFormat(protocolParams.gov_action_deposit),
+                })
+              : error,
+            title: isInsufficientBalance
+              ? t("errors.insufficientBalanceTitle")
+              : undefined,
             dataTestId: "create-governance-action-error-modal",
           });
           captureException(error);

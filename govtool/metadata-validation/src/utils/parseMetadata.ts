@@ -16,7 +16,7 @@ export const parseMetadata = (
 
         if (key === 'references') {
           parsedMetadata[key] = (Array.isArray(value) ? value : [])?.map(
-            (reference) => reference['CIP108:reference-uri']['@value'],
+            (reference) => reference?.uri['@value'],
           );
         }
       }
@@ -29,7 +29,7 @@ export const parseMetadata = (
         }
         if (key === 'references') {
           parsedMetadata[key] = (Array.isArray(value) ? value : [])?.map(
-            (reference) => reference['CIPQQQ:reference-uri']['@value'],
+            (reference) => reference?.uri['@value'],
           );
         }
       }

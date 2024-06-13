@@ -28,7 +28,8 @@ Learn more; [docs.sanchogov.tools](https://docs.sanchogov.tools/).
 
 - [GovTool Backend](./govtool/backend/README.md)
 - [GovTool Frontend](./govtool/frontend/README.md)
-- [GovTool Infrastructure](./infra/)
+- [GovTool Infrastructure](./infra/terraform/README.md)
+- [GovTool deployment process](./scripts/govtool/README.md)
 - [Documentation](./docs/)
 - [Tests](./tests/)
 

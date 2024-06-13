@@ -21,7 +21,10 @@ export const ListGovActionsDashboardCards = () => {
         {
           children: t("learnMore"),
           dataTestId: "learn-more-governance-actions-button",
-          onClick: () => openInNewTab("https://sancho.network/actions"),
+          onClick: () =>
+            openInNewTab(
+              "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/governance-actions-view-and-vote",
+            ),
           variant: "outlined",
         },
       ]}

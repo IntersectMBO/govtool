@@ -11,7 +11,7 @@ import {
 } from "@hooks";
 import { Step } from "@molecules";
 import { BgCard, ControlledField } from "@organisms";
-import { openInNewTab } from "@utils";
+import { ellipsizeText, openInNewTab } from "@utils";
 
 type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -30,7 +30,7 @@ export const EditDRepStorageInformation = ({
     onClickDownloadJson,
     editDRepInfo,
     watch,
-  } = useEditDRepInfoForm();
+  } = useEditDRepInfoForm(setStep);
   const { screenWidth } = useScreenDimension();
 
   const fileName = getValues("dRepName");
@@ -94,7 +94,7 @@ export const EditDRepStorageInformation = ({
               }}
               variant="outlined"
             >
-              {`${fileName}.jsonld`}
+              {`${ellipsizeText(fileName, 8)}.jsonld`}
             </Button>
           }
           label={t("editMetadata.storingInformationStep1Label")}

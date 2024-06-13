@@ -5,6 +5,16 @@ on:
   push:
     branches:
       - test
+  workflow_dispatch:
+    inputs:
+      isProposalDiscussionForumEnabled:
+        description: "Enable proposal discussion forum"
+        required: true
+        type: choice
+        default: "disabled"
+        options:
+          - "enabled"
+          - "disabled"
 
 env:
   ENVIRONMENT: "test"
@@ -28,6 +38,7 @@ jobs:
       GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
       GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
       GTM_ID: ${{ secrets.GTM_ID }}
+      NPMRC_TOKEN: ${{ secrets.NPMRC_TOKEN }}
       IP_ADDRESS_BYPASSING_BASIC_AUTH1: ${{ secrets.IP_ADDRESS_BYPASSING_BASIC_AUTH1 }}
       IP_ADDRESS_BYPASSING_BASIC_AUTH2: ${{ secrets.IP_ADDRESS_BYPASSING_BASIC_AUTH2 }}
       NEXT_PUBLIC_API_URL: "https://participation.sanchogov.tools"
@@ -39,6 +50,7 @@ jobs:
       SENTRY_IGNORE_API_RESOLUTION_ERROR: "1"
       TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
       USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
+      IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: ${{github.event_name == 'push' && 'false' || inputs.isProposalDiscussionForumEnabled == 'enabled'}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

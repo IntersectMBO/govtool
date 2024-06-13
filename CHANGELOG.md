@@ -24,6 +24,8 @@ changes.
 
 ### Added
 
+- added `bio` `dRepName` `email` `references` `metadataValid` and `metadataStatus` fields to `drep/list`
+- added `metadatavalidationmaxconcurrentrequests` field to the backend config
 - added `metadata/validate` endpoint [Issue 876](https://github.com/IntersectMBO/govtool/issues/876)
 - added pagination to `drep/list` [Issue 756](https://github.com/IntersectMBO/govtool/issues/756)
 - added search query param to the `drep/getVotes` [Issue 640](https://github.com/IntersectMBO/govtool/issues/640)
@@ -60,6 +62,7 @@ changes.
 - Add type check & lint to github actions [Issue 512](https://github.com/IntersectMBO/govtool/issues/512)
 - Add eslint & prettier to frontend package [Issue 166](https://github.com/IntersectMBO/govtool/issues/166)
 - Add DRep list pagination [Issue 740](https://github.com/IntersectMBO/govtool/issues/740)
+- Add PDF pillar [Issue 1090](https://github.com/IntersectMBO/govtool/issues/1090)
 
 ### Fixed
 
@@ -89,9 +92,12 @@ changes.
 - Fix all the existing typescript errors [Issue 514](https://github.com/IntersectMBO/govtool/issues/514)
 - Fix endless spinner on a dashboard [Issue 539](https://github.com/IntersectMBO/govtool/issues/539)
 - Remove wrongly appended `Yourself` filter on DRep Directory [Issue 1028](https://github.com/IntersectMBO/govtool/issues/1028)
+- Fix validation of uris in metadata [Issue 1011](https://github.com/IntersectMBO/govtool/issues/1011)
+- Fix wrong link to the GA Details once it is in progress [Issue 1252](https://github.com/IntersectMBO/govtool/issues/1252)
 
 ### Changed
 
+- `proposal.about` changed to `proposal.abstract`
 - `drep/info` now returns 4 different tx hashes instead of one latest tx hash [Issue 688](https://github.com/IntersectMBO/govtool/issues/688)
 - `proposal/list` allows user to search by tx hash [Issue 603](https://github.com/IntersectMBO/govtool/issues/603)
 - `proposal/list` returns additional data such ass `expiryEpochNo`, `createdEpochNo`, `title`, `about`, `motivation`,
@@ -119,6 +125,7 @@ changes.
 - Change input selection strategy to 3 (random) [Issue 575](https://github.com/IntersectMBO/govtool/issues/575)
 - Changed documents to prepare for open source [Issue 737](https://github.com/IntersectMBO/govtool/issues/737)
 - Changed copy on maintenance page [Issue 753](https://github.com/IntersectMBO/govtool/issues/753)
+- Update link to docs [Issue 1246](https://github.com/IntersectMBO/govtool/issues/1246)
 
 ### Removed
 

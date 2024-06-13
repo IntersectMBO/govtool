@@ -24,7 +24,6 @@ export const Button = ({
 
   return (
     <MUIButton
-      disabled={isLoading || props?.disabled}
       sx={{
         fontSize: size === "extraLarge" ? 16 : 14,
         height,
@@ -34,6 +33,7 @@ export const Button = ({
       }}
       variant={variant}
       {...props}
+      disabled={isLoading || props?.disabled}
     >
       {isLoading && (
         <CircularProgress size={26} sx={{ position: "absolute" }} />

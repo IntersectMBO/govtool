@@ -167,9 +167,8 @@ instance ToSchema InternalMetadataValidationResponse where
 
 data MetadataValidationResponse
   = MetadataValidationResponse
-      { metadataValidationResponseStatus :: Maybe MetadataValidationStatus
+      { metadataValidationResponseStatus :: Maybe Text
       , metadataValidationResponseValid :: Bool
-      , metadataValidationResponseRaw :: AnyValue
       }
   deriving (Generic, Show)
 
@@ -463,15 +462,16 @@ data ProposalResponse
       , proposalResponseUrl            :: Text
       , proposalResponseMetadataHash   :: HexText
       , proposalResponseTitle          :: Maybe Text
-      , proposalResponseAbout          :: Maybe Text
+      , proposalResponseAbstract       :: Maybe Text
       , proposalResponseMotivation     :: Maybe Text
       , proposalResponseRationale      :: Maybe Text
       , proposalResponseMetadata       :: Maybe GovernanceActionMetadata
-      , proposalResponseReferences     :: Maybe GovernanceActionReferences
+      , proposalResponseReferences     :: [Text]
       , proposalResponseYesVotes       :: Integer
       , proposalResponseNoVotes        :: Integer
       , proposalResponseAbstainVotes   :: Integer
-      , proposalResponseMetadataStatus :: Maybe MetadataValidationResponse
+      , proposalResponseMetadataStatus :: Maybe Text
+      , proposalResponseMetadataValid  :: Bool
       }
   deriving (Generic, Show)
 
@@ -490,15 +490,16 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"url\": \"https://proposal.metadata.xyz\","
                   <> "\"metadataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
                   <> "\"title\": \"Proposal Title\","
-                  <> "\"about\": \"Proposal About\","
+                  <> "\"abstract\": \"Proposal About\","
                   <> "\"motivation\": \"Proposal Motivation\","
                   <> "\"rationale\": \"Proposal Rationale\","
                   <> "\"metadata\": {\"key\": \"value\"},"
-                  <> "\"references\": [{\"uri\": \"google.com\", \"@type\": \"Other\", \"label\": \"example label\"}],"
+                  <> "\"references\": [\"google.com\"],"
                   <> "\"yesVotes\": 0,"
                   <> "\"noVotes\": 0,"
-                  <> "\"abstainVotes\": 0"
-                  <> "\"metadataStatus\": {\"status\": null, \"valid\": true}}"
+                  <> "\"abstainVotes\": 0,"
+                  <> "\"metadataStatus\": \"URL_NOT_FOUND\","
+                  <> "\"metadataValid\": true}"
 
 instance ToSchema ProposalResponse where
   declareNamedSchema proxy = do
@@ -841,6 +842,12 @@ data DRep
       , dRepType                   :: DRepType
       , dRepLatestTxHash           :: Maybe HexText
       , dRepLatestRegistrationDate :: UTCTime
+      , dRepBio                    :: Maybe Text
+      , dRepDRepName               :: Maybe Text
+      , dRepEmail                  :: Maybe Text
+      , dRepReferences             :: [Text]
+      , dRepMetadataStatus         :: Maybe Text
+      , dRepMetadataValid          :: Bool
       }
   deriving (Generic, Show)
 
@@ -858,7 +865,13 @@ exampleDrep =
   <> "\"status\": \"Active\","
   <> "\"type\": \"DRep\","
   <> "\"latestTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
-  <> "\"latestRegistrationDate\": \"1970-01-01T00:00:00Z\"}"
+  <> "\"latestRegistrationDate\": \"1970-01-01T00:00:00Z\","
+  <> "\"bio\": \"DRep Bio\","
+  <> "\"dRepName\": \"DRep Name\","
+  <> "\"email\": \"google@gmail.com\","
+  <> "\"references\": [\"google.com\"],"
+  <> "\"metadataStatus\": \"URL_NOT_FOUND\","
+  <> "\"metadataValid\": true}"
 
 -- ToSchema instance for DRep
 instance ToSchema DRep where

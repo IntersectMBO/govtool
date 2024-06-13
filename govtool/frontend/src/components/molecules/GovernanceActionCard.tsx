@@ -16,9 +16,10 @@ import {
   getProposalTypeLabel,
   getProposalTypeNoEmptySpaces,
 } from "@utils";
+import { ProposalData } from "@models";
 
 type ActionTypeProps = Omit<
-  ActionTypeToDsiplay,
+  ProposalData,
   | "yesVotes"
   | "noVotes"
   | "abstainVotes"
@@ -35,6 +36,7 @@ type ActionTypeProps = Omit<
 
 export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
   const {
+    abstract,
     type,
     inProgress = false,
     expiryDate,
@@ -44,9 +46,9 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
     createdEpochNo,
     txHash,
     index,
-    isDataMissing,
+    metadataStatus,
+    metadataValid,
     title,
-    about,
   } = props;
   const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
@@ -64,10 +66,10 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
         justifyContent: "space-between",
         boxShadow: "0px 4px 15px 0px #DDE3F5",
         borderRadius: "20px",
-        backgroundColor: isDataMissing
+        backgroundColor: !metadataValid
           ? "rgba(251, 235, 235, 0.50)"
           : "rgba(255, 255, 255, 0.3)",
-        ...(isDataMissing && {
+        ...(!metadataValid && {
           border: "1px solid #F6D5D5",
         }),
         ...(inProgress && {
@@ -84,11 +86,11 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
       >
         <GovernanceActionCardHeader
           title={title}
-          isDataMissing={isDataMissing}
+          isDataMissing={metadataStatus}
         />
         <GovernanceActionCardElement
           label={t("govActions.abstract")}
-          text={about}
+          text={abstract}
           textVariant="twoLines"
           dataTestId="governance-action-abstract"
           isSliderCard
@@ -133,7 +135,11 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           }}
           data-testid={`govaction-${govActionId}-view-detail`}
         >
-          {t("govActions.viewDetails")}
+          {t(
+            inProgress
+              ? "govActions.viewDetails"
+              : "govActions.viewDetailsAndVote",
+          )}
         </Button>
       </Box>
     </Box>

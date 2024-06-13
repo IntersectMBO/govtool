@@ -2,7 +2,7 @@ import { PropsWithChildren } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Box, ButtonBase, Chip, CircularProgress } from "@mui/material";
 
-import { Button, StatusPill, Typography } from "@atoms";
+import { Button, ExternalModalButton, StatusPill, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import {
@@ -13,7 +13,14 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import { Card, EmptyStateDrepDirectory, LinkWithIcon, Share } from "@molecules";
+import {
+  Card,
+  DataMissingInfoBox,
+  EmptyStateDrepDirectory,
+  DataMissingHeader,
+  LinkWithIcon,
+  Share,
+} from "@molecules";
 import {
   correctAdaFormat,
   correctDRepDirectoryFormat,
@@ -21,14 +28,6 @@ import {
   openInNewTab,
   testIdFromLabel,
 } from "@utils";
-
-const LINKS = [
-  "darlenelonglink1.DRepwebsiteorwhatever.com",
-  "darlenelonglink2.DRepwebsiteorwhatever.com",
-  "darlenelonglink3.DRepwebsiteorwhatever.com",
-  "darlenelonglink4.DRepwebsiteorwhatever.com",
-  "darlenelonglink5.DRepwebsiteorwhatever.com",
-];
 
 type DRepDetailsProps = {
   isConnected?: boolean;
@@ -83,7 +82,17 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
       </Box>
     );
 
-  const { view, status, votingPower, type } = dRep;
+  const {
+    bio,
+    dRepName,
+    email,
+    metadataStatus,
+    references,
+    status,
+    url,
+    view,
+    votingPower,
+  } = dRep;
 
   const isMe = isSameDRep(dRep, myDRepId);
   const isMyDrep = isSameDRep(dRep, currentDelegation?.dRepView);
@@ -91,6 +100,12 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
     dRep,
     pendingTransaction.delegate?.resourceId,
   );
+
+  const navigateToEditDRep = () => {
+    navigate(PATHS.editDrepMetadata, {
+      state: { dRepName, email, bio, references },
+    });
+  };
 
   return (
     <>
@@ -125,7 +140,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
         sx={{
           borderRadius: 5,
           mt: isMe || isMyDrep ? 1 : 0,
-          pb: 4,
+          pb: 4.25,
           pt: 2.25,
         }}
       >
@@ -182,7 +197,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
               >
                 <Button
                   data-testid="edit-drep-data-button"
-                  onClick={() => navigate(PATHS.editDrepMetadata)}
+                  onClick={navigateToEditDRep}
                   variant="outlined"
                   sx={{
                     ...(screenWidth < 500 && {
@@ -203,25 +218,26 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
           </Box>
         )}
         <Box component="dl" gap={2} m={0}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              mb: 3,
-            }}
-          >
-            <Typography
-              fontWeight={600}
-              sx={{ ...ellipsisStyles, flex: 1 }}
-              variant="title2"
-            >
-              {type}
-            </Typography>
-            {(screenWidth <= 1020 || !isMe) && (
-              <Share link={window.location.href} />
-            )}
-          </Box>
+          <DataMissingHeader
+            title={dRepName ?? undefined}
+            isDataMissing={metadataStatus}
+            shareLink={!isMe ? window.location.href : undefined}
+            titleStyle={{ wordBreak: "break-word", whiteSpace: "wrap" }}
+          />
+          {metadataStatus && (
+            <DataMissingInfoBox
+              isDataMissing={metadataStatus}
+              isDrep
+              sx={{ mb: 3 }}
+            />
+          )}
+          {metadataStatus && !!url && (
+            <ExternalModalButton
+              label={t("govActions.seeExternalData")}
+              sx={{ mb: 3 }}
+              url={url}
+            />
+          )}
           <DRepDetailsInfoItem label={t("drepId")}>
             <DRepId>{view}</DRepId>
           </DRepDetailsInfoItem>
@@ -237,37 +253,32 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
               {correctAdaFormat(votingPower)}
             </Typography>
           </DRepDetailsInfoItem>
-          {/* TODO: fetch metadata, add views for metadata errors */}
-          <DRepDetailsInfoItem label={t("email")}>
-            {/* TODO: change email */}
-            <MoreInfoLink
-              label="darlenelonglink.DRepwebsiteorwhatever.com"
-              navTo="example@gmail.com"
-              isEmail
-            />
-          </DRepDetailsInfoItem>
-          <DRepDetailsInfoItem label={t("moreInformation")}>
-            <Box
-              alignItems="flex-start"
-              display="flex"
-              flexDirection="column"
-              gap={1.5}
-            >
-              {/* TODO: update links */}
-              {LINKS.map((link) => (
-                <MoreInfoLink
-                  key={link}
-                  label={link}
-                  navTo="https://sancho.network/"
-                />
-              ))}
-            </Box>
-          </DRepDetailsInfoItem>
+          {email && !metadataStatus && (
+            <DRepDetailsInfoItem label={t("email")}>
+              <MoreInfoLink label={email} navTo={email} isEmail />
+            </DRepDetailsInfoItem>
+          )}
+          {references.length > 0 && !metadataStatus && (
+            <DRepDetailsInfoItem label={t("moreInformation")}>
+              <Box
+                alignItems="flex-start"
+                display="flex"
+                flexDirection="column"
+                gap={1.5}
+              >
+                {references.map((link) => (
+                  <MoreInfoLink key={link} label={link} navTo={link} />
+                ))}
+              </Box>
+            </DRepDetailsInfoItem>
+          )}
         </Box>
-
         <Box
           sx={{
-            my: 5.75,
+            mt:
+              (!isMyDrep || !isConnected) && status === "Active"
+                ? 5.75
+                : undefined,
             width: screenWidth < 1024 ? "100%" : 286,
           }}
         >
@@ -275,8 +286,10 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
             <Button
               data-testid="delegate-button"
               disabled={!!pendingTransaction.delegate}
-              isLoading={isDelegating}
-              onClick={() => delegate(dRep.view)}
+              isLoading={
+                isDelegating === dRep.view || isDelegating === dRep.drepId
+              }
+              onClick={() => delegate(dRep.drepId)}
               size="extraLarge"
               sx={{ width: "100%" }}
               variant="contained"
@@ -306,20 +319,16 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
             </Button>
           )}
         </Box>
-
-        <Typography variant="title2" sx={{ mb: 1.5 }}>
-          {t("about")}
-        </Typography>
-        <Typography fontWeight={400} sx={{ maxWidth: 608 }} variant="body1">
-          {/* TODO replace with actual data */}I am the Cardano crusader carving
-          his path in the blockchain battleground. With a mind sharper than a
-          Ledger Nano X, this fearless crypto connoisseur fearlessly navigates
-          the volatile seas of Cardano, turning code into currency. Armed with a
-          keyboard and a heart pumping with blockchain beats, Mister Big Bad
-          fearlessly champions decentralization, smart contracts, and the
-          Cardano community. His Twitter feed is a mix of market analysis that
-          rivals CNBC and memes that could break the internet.
-        </Typography>
+        {bio && !metadataStatus && (
+          <>
+            <Typography variant="title2" sx={{ mb: 1.5, mt: 5.75 }}>
+              {t("about")}
+            </Typography>
+            <Typography fontWeight={400} sx={{ maxWidth: 608 }} variant="body1">
+              {bio}
+            </Typography>
+          </>
+        )}
       </Card>
     </>
   );
@@ -350,6 +359,11 @@ const DRepDetailsInfoItem = ({ children, label }: DrepDetailsInfoItemProps) => (
 
 const DRepId = ({ children }: PropsWithChildren) => (
   <ButtonBase
+    onClick={(e) => {
+      if (!children) return;
+      navigator.clipboard.writeText(children?.toString());
+      e.stopPropagation();
+    }}
     data-testid="copy-drep-id-button"
     sx={{
       gap: 1,

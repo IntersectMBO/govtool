@@ -5,15 +5,16 @@ import {
   GovernanceActionCardElement,
   GovernanceActionDetailsCardLinks,
   DataMissingInfoBox,
-  GovernanceActionDetailsCardHeader,
+  DataMissingHeader,
   GovernanceActionsDatesBox,
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { getProposalTypeNoEmptySpaces, testIdFromLabel } from "@utils";
 import { MetadataValidationStatus } from "@models";
+import { useLocation } from "react-router-dom";
 
 type GovernanceActionDetailsCardDataProps = {
-  about?: string;
+  abstract?: string;
   createdDate: string;
   createdEpochNo: number;
   details?: ActionDetailsType;
@@ -21,11 +22,11 @@ type GovernanceActionDetailsCardDataProps = {
   expiryEpochNo: number;
   govActionId: string;
   isDashboard?: boolean;
-  isDataMissing: boolean | MetadataValidationStatus;
+  isDataMissing: MetadataValidationStatus | null;
   isInProgress?: boolean;
   isOneColumn: boolean;
   isSubmitted?: boolean;
-  links?: GovernanceActionLink[];
+  links?: string[];
   motivation?: string;
   rationale?: string;
   title?: string;
@@ -34,7 +35,7 @@ type GovernanceActionDetailsCardDataProps = {
 };
 
 export const GovernanceActionDetailsCardData = ({
-  about,
+  abstract,
   createdDate,
   createdEpochNo,
   details,
@@ -59,6 +60,12 @@ export const GovernanceActionDetailsCardData = ({
   const isModifiedPadding =
     (isDashboard && screenWidth < 1168) ?? screenWidth < 900;
 
+  const { pathname, hash } = useLocation();
+
+  const govActionLinkToShare = `${window.location.protocol}//${
+    window.location.hostname
+  }${window.location.port ? `:${window.location.port}` : ""}${pathname}${hash}`;
+
   return (
     <Box
       sx={{
@@ -68,9 +75,10 @@ export const GovernanceActionDetailsCardData = ({
         overflow: "hidden",
       }}
     >
-      <GovernanceActionDetailsCardHeader
-        title={title}
+      <DataMissingHeader
         isDataMissing={isDataMissing}
+        shareLink={govActionLinkToShare}
+        title={title}
       />
       <DataMissingInfoBox
         isDataMissing={isDataMissing}
@@ -102,10 +110,10 @@ export const GovernanceActionDetailsCardData = ({
         dataTestId={`${govActionId}-id`}
       />
       <GovernanceActionCardElement
-        label={t("govActions.about")}
-        text={about}
+        label={t("govActions.abstract")}
+        text={abstract}
         textVariant="longText"
-        dataTestId="about"
+        dataTestId="abstract"
       />
       <GovernanceActionCardElement
         label={t("govActions.motivation")}

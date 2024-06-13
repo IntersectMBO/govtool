@@ -30,7 +30,7 @@ test("7C. Should list governance action types", async ({ page }) => {
 
 test.describe("Verify Proposal form", () => {
   Object.values(ProposalType).map((type: ProposalType, index) => {
-    test(`7D.${index + 1}: Verify ${type.toLocaleLowerCase()} proposal form`, async ({
+    test(`7D_${index + 1}. Verify ${type.toLocaleLowerCase()} proposal form`, async ({
       page,
     }) => {
       const proposalSubmissionPage = new ProposalSubmissionPage(page);

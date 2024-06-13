@@ -11,5 +11,6 @@
     "cachedurationseconds": 20,
     "sentrydsn": "<SENTRY_DSN>",
     "metadatavalidationhost": "http://metadata-validation",
-    "metadatavalidationport": "3000"   
+    "metadatavalidationport": "3000",
+    "metadatavalidationmaxconcurrentrequests": 10
 }

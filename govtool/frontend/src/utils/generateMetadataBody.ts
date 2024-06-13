@@ -24,13 +24,14 @@ export const generateMetadataBody = ({
     .filter(([key]) => acceptedKeys.includes(key))
     .map(([key, value]) => [standardReference + key, value]);
 
-  const references = data?.links
-    ? (data.links as Array<{ link: string }>)
-        .filter((link) => link.link)
+  const references = data?.references
+    ? // uri should not be optional. It is just not yet supported on govtool
+      (data.references as Array<{ uri?: string; label: string }>)
+        .filter((link) => link.uri)
         .map((link) => ({
           "@type": "Other",
-          [`${standardReference}reference-label`]: "Label",
-          [`${standardReference}reference-uri`]: link.link,
+          [`${CIP_100}reference-label`]: link.label || "Label",
+          [`${CIP_100}reference-uri`]: link.uri,
         }))
     : undefined;
 

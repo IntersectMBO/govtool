@@ -56,7 +56,7 @@ destroy-cardano-node-and-dbsync: prepare-config
 	$(docker) volume rm $${volumes}
 
 .PHONY: toggle-maintenance
-toggle-maintenance: docker-login prepare-config
+toggle-maintenance: docker-login
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	@:$(call check_defined, maintenance)

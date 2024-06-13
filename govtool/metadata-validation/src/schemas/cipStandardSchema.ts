@@ -36,17 +36,17 @@ export const cipStandardSchema: StandardSpecification = {
       references: Joi.array().items(
         Joi.object({
           '@type': Joi.string(),
-          'CIP108:reference-label': Joi.object({
+          label: Joi.object({
             '@value': Joi.string().required(),
           }),
-          'CIP108:reference-uri': Joi.object({
-            '@value': Joi.string().uri().required(),
+          uri: Joi.object({
+            '@value': Joi.string().required(),
           }),
-          'CIP108:reference-hash': Joi.object({
+          referenceHash: Joi.object({
             hashDigest: Joi.string().required(),
             hashAlgorithm: Joi.string().required(),
           }),
-        }).required(),
+        }),
       ),
     }),
   }),
@@ -64,19 +64,19 @@ export const cipStandardSchema: StandardSpecification = {
       '@value': Joi.string().valid('blake2b-256').required(),
     }),
     body: Joi.object({
-      bio: Joi.object({ '@value': Joi.string() }),
-      dRepName: Joi.object({ '@value': Joi.string() }),
-      email: Joi.object({ '@value': Joi.string() }),
+      bio: Joi.object({ '@value': Joi.string().allow('') }),
+      dRepName: Joi.object({ '@value': Joi.string().allow('') }),
+      email: Joi.object({ '@value': Joi.string().allow('') }),
       references: Joi.array().items(
         Joi.object({
           '@type': Joi.string(),
-          'CIPQQQ:reference-label': Joi.object({
+          label: Joi.object({
+            '@value': Joi.string().allow('').required(),
+          }),
+          uri: Joi.object({
             '@value': Joi.string().required(),
           }),
-          'CIPQQQ:reference-uri': Joi.object({
-            '@value': Joi.string().uri().required(),
-          }),
-          'CIPQQQ:reference-hash': Joi.object({
+          referenceHash: Joi.object({
             hashDigest: Joi.string().required(),
             hashAlgorithm: Joi.string().required(),
           }),

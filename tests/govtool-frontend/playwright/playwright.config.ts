@@ -11,7 +11,6 @@ import environments from "lib/constants/environments";
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  globalSetup: environments.ci ? require.resolve("./global-setup.ts") : "",
   testDir: "./tests",
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -45,18 +44,37 @@ export default defineConfig({
       testMatch: "**/auth.setup.ts",
     },
     {
+      name: "faucet setup",
+      testMatch: "**/faucet.setup.ts",
+    },
+    {
       name: "dRep setup",
       testMatch: "**/dRep.setup.ts",
+      dependencies: environments.ci ? ["faucet setup"] : [],
+    },
+    {
+      name: "proposal setup",
+      testMatch: "**/proposal.setup.ts",
+      dependencies: environments.ci ? ["faucet setup"] : [],
     },
     {
       name: "wallet bootstrap",
       testMatch: "**/wallet.bootstrap.ts",
+      dependencies: environments.ci ? ["faucet setup"] : [],
     },
     {
       name: "transaction",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.tx.spec.ts",
       dependencies: environments.ci ? ["auth setup", "wallet bootstrap"] : [],
+    },
+    {
+      name: "proposal",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: "**/*.proposal.spec.ts",
+      dependencies: environments.ci
+        ? ["auth setup", "wallet bootstrap", "proposal setup"]
+        : [],
     },
     {
       name: "loggedin (desktop)",
@@ -87,6 +105,7 @@ export default defineConfig({
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",
         "**/*.tx.spec.ts",
+        "**/*.proposal.spec.ts",
       ],
     },
     {
@@ -97,6 +116,7 @@ export default defineConfig({
         "**/*.dRep.spec.ts",
         "**/*.delegation.spec.ts",
         "**/*.tx.spec.ts",
+        "**/*.proposal.spec.ts",
         "**/walletConnect.spec.ts",
       ],
     },

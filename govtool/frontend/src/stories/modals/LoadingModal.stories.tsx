@@ -1,8 +1,10 @@
-import { useEffect } from "react";
 import { Meta, StoryFn } from "@storybook/react";
+import { useEffect } from "react";
 
 import { Modal } from "@atoms";
 import { LoadingModal, LoadingModalState } from "@organisms";
+import { expect } from "@storybook/jest";
+import { screen, waitFor, within } from "@storybook/testing-library";
 import { callAll } from "@utils";
 import { useModal } from "../../context/modal";
 
@@ -64,4 +66,19 @@ Loading.args = {
     "GovTool will read the URL that you supplied and make a check to see if it’s identical with the information that you entered on the form.",
   title: "GovTool Is Checking Your Data",
   dataTestId: "loading-modal",
+};
+Loading.play = async ({ args }) => {
+  waitFor(async () => {
+    const modalScreen = screen.getAllByTestId("loading-modal")[0];
+    const loadingModalCanvas = within(modalScreen);
+
+    await expect(loadingModalCanvas.getByRole("img")).toHaveAttribute(
+      "alt",
+      "loader",
+    );
+    await expect(loadingModalCanvas.getByText(args.title)).toBeVisible();
+    await expect(
+      loadingModalCanvas.getByText(args.message as string),
+    ).toBeVisible();
+  });
 };

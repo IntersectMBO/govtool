@@ -4,14 +4,19 @@ import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
 import { PendingTransaction } from "@context";
-import { useTranslation } from "@hooks";
+import { useGetDRepListInfiniteQuery, useTranslation } from "@hooks";
 import { CurrentDelegation, VoterInfo } from "@models";
 import {
   DashboardActionCard,
   DashboardActionCardProps,
   DelegationAction,
 } from "@molecules";
-import { correctAdaFormat, formHexToBech32, openInNewTab } from "@utils";
+import {
+  correctAdaFormat,
+  formHexToBech32,
+  getMetadataDataMissingStatusTranslation,
+  openInNewTab,
+} from "@utils";
 import {
   AutomatedVotingOptionCurrentDelegation,
   AutomatedVotingOptionDelegationId,
@@ -29,11 +34,21 @@ export const DelegateDashboardCard = ({
   currentDelegation,
   delegateTx,
   dRepID,
-  voter,
   votingPower,
 }: DelegateDashboardCardProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const { dRepData, isDRepListFetching } = useGetDRepListInfiniteQuery(
+    {
+      searchPhrase: delegateTx?.resourceId ?? currentDelegation?.dRepHash ?? "",
+    },
+    {
+      enabled: !!currentDelegation?.dRepHash || !!delegateTx?.resourceId,
+    },
+  );
+
+  const myDRepDelegationData = dRepData?.[0];
 
   const learnMoreButton = {
     children: t("learnMore"),
@@ -58,7 +73,7 @@ export const DelegateDashboardCard = ({
 
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress
-    if (delegateTx && !voter.isRegisteredAsSoleVoter) {
+    if (delegateTx && delegateTx?.resourceId !== dRepID) {
       return {
         buttons: [learnMoreButton],
         description: getProgressDescription(delegateTx?.resourceId, ada),
@@ -68,7 +83,11 @@ export const DelegateDashboardCard = ({
     }
 
     // current delegation
-    if (currentDelegation && !voter.isRegisteredAsSoleVoter) {
+    if (
+      !delegateTx &&
+      currentDelegation &&
+      currentDelegation?.dRepHash !== dRepID
+    ) {
       return {
         buttons: currentDelegation?.dRepView
           ? [
@@ -119,22 +138,39 @@ export const DelegateDashboardCard = ({
     <DashboardActionCard
       imageURL={IMAGES.govActionDelegateImage}
       isSpaceBetweenButtons={
-        !!currentDelegation?.dRepView && !voter.isRegisteredAsSoleVoter
+        !!currentDelegation?.dRepView &&
+        !(currentDelegation?.dRepHash === dRepID)
       }
       transactionId={
-        !voter.isRegisteredAsSoleVoter
+        (delegateTx && delegateTx?.resourceId !== dRepID) ||
+        (!delegateTx &&
+          currentDelegation &&
+          currentDelegation?.dRepHash !== dRepID)
           ? delegateTx?.transactionHash ?? currentDelegation?.txHash
           : undefined
       }
       {...cardProps}
     >
-      {displayedDelegationId && !voter.isRegisteredAsSoleVoter && (
-        <DelegationAction
-          dRepId={displayedDelegationId}
-          onCardClick={navigateToDRepDetails}
-          sx={{ mt: 1.5 }}
-        />
-      )}
+      {displayedDelegationId &&
+      ((delegateTx && delegateTx?.resourceId !== dRepID) ||
+        (!delegateTx &&
+          currentDelegation &&
+          currentDelegation?.dRepHash !== dRepID)) ? (
+            <DelegationAction
+              drepName={
+                isDRepListFetching
+                  ? "Loading..."
+                  : myDRepDelegationData?.metadataStatus
+                  ? getMetadataDataMissingStatusTranslation(
+                      myDRepDelegationData.metadataStatus,
+                    )
+                  : myDRepDelegationData?.dRepName ?? ""
+              }
+              dRepId={displayedDelegationId}
+              onCardClick={navigateToDRepDetails}
+              sx={{ mt: 1.5 }}
+            />
+      ) : null}
     </DashboardActionCard>
   );
 };

@@ -23,7 +23,7 @@ type AutomatedVotingOptionsProps = {
   votingPower: string;
   delegationInProgress?: string;
   isConnected?: boolean;
-  isDelegationLoading?: boolean;
+  isDelegationLoading?: string | null;
   pendingTransaction?: PendingTransaction;
   txHash?: string | null;
 };
@@ -43,9 +43,6 @@ export const AutomatedVotingOptions = ({
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const { networkMetrics } = useGetNetworkMetrics();
-
-  // TODO: Change to certain automated voted option if available
-  const onClickInfo = () => openInNewTab("https://docs.sanchogov.tools/");
 
   const isDelegatedToAbstain =
     currentDelegation ===
@@ -110,12 +107,18 @@ export const AutomatedVotingOptions = ({
             }
             inProgress={isDelegationToAbstainInProgress}
             isConnected={isConnected}
-            isDelegateLoading={isDelegationLoading}
+            isDelegateLoading={
+              isDelegationLoading === AutomatedVotingOptionDelegationId.abstain
+            }
             isSelected={isDelegatedToAbstain}
             onClickDelegate={() =>
               delegate(AutomatedVotingOptionDelegationId.abstain)
             }
-            onClickInfo={onClickInfo}
+            onClickInfo={() =>
+              openInNewTab(
+                "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/delegating-overview/abstain-from-every-vote",
+              )
+            }
             title={
               isDelegatedToAbstain
                 ? t("dRepDirectory.delegatedToAbstainTitle", {
@@ -146,12 +149,19 @@ export const AutomatedVotingOptions = ({
             }
             inProgress={isDelegationToNoConfidenceInProgress}
             isConnected={isConnected}
-            isDelegateLoading={isDelegationLoading}
+            isDelegateLoading={
+              isDelegationLoading ===
+              AutomatedVotingOptionDelegationId.no_confidence
+            }
             isSelected={isDelegatedToNoConfidence}
             onClickDelegate={() =>
               delegate(AutomatedVotingOptionDelegationId.no_confidence)
             }
-            onClickInfo={onClickInfo}
+            onClickInfo={() =>
+              openInNewTab(
+                "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/delegating-overview/signal-no-confidence-on-every-vote",
+              )
+            }
             title={
               isDelegatedToNoConfidence
                 ? t("dRepDirectory.delegatedToNoConfidenceTitle", {

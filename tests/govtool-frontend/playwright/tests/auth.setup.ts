@@ -6,7 +6,9 @@ import {
   adaHolder03Wallet,
   adaHolder04Wallet,
   adaHolder05Wallet,
+  adaHolder06Wallet,
   dRep01Wallet,
+  dRep02Wallet,
   user01Wallet,
 } from "@constants/staticWallets";
 import { importWallet } from "@fixtures/importWallet";
@@ -15,11 +17,14 @@ import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import LoginPage from "@pages/loginPage";
 
 const dRep01AuthFile = ".auth/dRep01.json";
+const dRep02AuthFile = ".auth/dRep02.json";
+
 const adaHolder01AuthFile = ".auth/adaHolder01.json";
 const adaHolder02AuthFile = ".auth/adaHolder02.json";
 const adaHolder03AuthFile = ".auth/adaHolder03.json";
 const adaHolder04AuthFile = ".auth/adaHolder04.json";
 const adaHolder05AuthFile = ".auth/adaHolder05.json";
+const adaHolder06AuthFile = ".auth/adaHolder06.json";
 
 const user01AuthFile = ".auth/user01.json";
 
@@ -36,6 +41,16 @@ setup("Create DRep 01 auth", async ({ page, context }) => {
   await loginPage.isLoggedIn();
 
   await context.storageState({ path: dRep01AuthFile });
+});
+
+setup("Create DRep 02 auth", async ({ page, context }) => {
+  await importWallet(page, dRep02Wallet);
+
+  const loginPage = new LoginPage(page);
+  await loginPage.login();
+  await loginPage.isLoggedIn();
+
+  await context.storageState({ path: dRep02AuthFile });
 });
 
 setup("Create User 01 auth", async ({ page, context }) => {
@@ -96,4 +111,14 @@ setup("Create AdaHolder 05 auth", async ({ page, context }) => {
   await loginPage.isLoggedIn();
 
   await context.storageState({ path: adaHolder05AuthFile });
+});
+
+setup("Create AdaHolder 06 auth", async ({ page, context }) => {
+  await importWallet(page, adaHolder06Wallet);
+
+  const loginPage = new LoginPage(page);
+  await loginPage.login();
+  await loginPage.isLoggedIn();
+
+  await context.storageState({ path: adaHolder06AuthFile });
 });

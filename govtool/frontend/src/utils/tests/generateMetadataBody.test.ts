@@ -30,9 +30,9 @@ describe("generateMetadataBody", () => {
       name: "John Doe",
       age: 30,
       email: "johndoe@example.com",
-      links: [
-        { link: "https://example.com/link1" },
-        { link: "https://example.com/link2" },
+      references: [
+        { uri: "https://example.com/link1" },
+        { uri: "https://example.com/link2" },
       ],
     };
     const acceptedKeys = ["name", "age"];
@@ -52,16 +52,16 @@ describe("generateMetadataBody", () => {
         [
           {
             "@type": "Other",
-            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#reference-label":
+            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#reference-label":
               "Label",
-            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#reference-uri":
+            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#reference-uri":
               "https://example.com/link1",
           },
           {
             "@type": "Other",
-            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#reference-label":
+            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#reference-label":
               "Label",
-            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#reference-uri":
+            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#reference-uri":
               "https://example.com/link2",
           },
         ],

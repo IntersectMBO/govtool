@@ -289,6 +289,9 @@ export const en = {
       appCannotGetVkeys: "Application can not get vkey",
       checkIsWalletConnected: "Check if the wallet is connected.",
       dRepIdNotFound: "DrepId not found",
+      insufficientBalanceDescription:
+        "To submit a Governance Action, you will be required to post a refundable balance of ₳{{ada}}. You do not currently have enough ADA in your wallet to continue.",
+      insufficientBalanceTitle: "Insufficient Balance",
       invalidGovernanceActionType: "Invalid Governance Action Type",
       invalidTreasuryGovernanceActionType: "Invalid Treasury Governance Action",
       noAddressesFound: "No addresses found",
@@ -304,6 +307,24 @@ export const en = {
       walletNoCIP30Support: "Your wallet does not support CIP-30 extensions.",
       walletNoCIP90FunctionsEnabled:
         "Your wallet did not enable the needed CIP-95 functions during connection.",
+      dRep: {
+        description: {
+          notVerifiable:
+            "GovTool uses external sources for DRep data, and these sources are maintianed by the DReps themselves. This error means that the data stored by the DRep does not match the data supplied by the DRep when they originally registered",
+          dataMissing:
+            "GovTool uses external sources for DRep data, and these sources are maintianed by the DReps themselves. This error means that GovTool cannot locate the data on the URL specified when the DRep was originally registered.",
+          incorrectFormat:
+            "GovTool uses external sources for DRep data, and these sources are maintianed by the DReps themselves. This error means that the data stored by the DRep does not match the format defined by the DRep spec.",
+        },
+        message: {
+          notVerifiable:
+            "The data that was originally used when this DRep was created has changed.",
+          dataMissing:
+            "The data that was originally used when this DRep was created has not been found.",
+          incorrectFormat:
+            "The data that was originally used when this DRep was created has been formatted incorrectly.",
+        },
+      },
       gAMetadata: {
         description: {
           notVerifiable:
@@ -319,7 +340,7 @@ export const en = {
           dataMissing:
             "The data that was originally used when this Governance Action was created has not been found.",
           incorrectFormat:
-            "The data that was originally used when this Governance Action was created has been formatted incorrectly. ",
+            "The data that was originally used when this Governance Action was created has been formatted incorrectly.",
         },
         title: {},
       },
@@ -330,11 +351,7 @@ export const en = {
       termOfService: "Term of service",
     },
     forms: {
-      hashPlaceholder: "The hash of metadata at URL",
-      howCreateUrlAndHash: "How to create URL and hash?",
       link: "Link",
-      urlWithContextPlaceholder: "Your URL with with your context",
-      urlWithInfoPlaceholder: "Your URL with extra info about you",
       createGovernanceAction: {
         typeLabel: "Governance Action Type",
         typeTip:
@@ -352,10 +369,8 @@ export const en = {
         emailPlaceholder: "john.smith@email.com",
       },
       errors: {
-        hashInvalidFormat: "Invalid hash format",
-        hashInvalidLength: "Hash must be exactly 64 characters long",
-        urlTooLong: "Url must be less than 65 characters",
-        urlInvalidFormat: "Invalid URL format",
+        tooLongUrl: "Url must be less than 128 bytes",
+        mustBeStakeAddress: "It must be reward address in bech32 format",
       },
       registerAsDRep: {
         bio: "Bio",
@@ -369,9 +384,13 @@ export const en = {
         emailPlaceholder: "john.smith@email.com",
       },
     },
+    proposalDiscussion: {
+      title: "Proposal Discussion",
+      proposeAGovernanceAction: "Propose a Governance Action",
+    },
     govActions: {
       about: "About",
-      abstract: "Abstract:",
+      abstract: "Abstract",
       backToGovActions: "Back to Governance Actions",
       castVote:
         "<0>You voted {{vote}} on this proposal</0>\non {{date}} (Epoch {{epoch}})",
@@ -411,10 +430,11 @@ export const en = {
       title: "Governance Actions",
       toVote: "To vote",
       viewDetails: "View Details",
+      viewDetailsAndVote: "View Details and Vote",
       viewOtherDetails: "View other details",
       viewProposalDetails: "View proposal details",
       vote: "Vote",
-      voteContextJsonldFileName: "Vote_Context.jsonld",
+      voteContextFileName: "Vote_Context.txt",
       votedOnByMe: "Voted on by me",
       voteOnGovActions: "Vote on Governance Action",
       voteSubmitted: "Vote submitted",
@@ -437,8 +457,9 @@ export const en = {
         partTwo: "does not exist.",
       },
       tooltips: {
-        info: "An action that has no effect on-chain, other than an on-chain record",
-        treasury: "Withdrawals from the treasury",
+        info: "An action that doesn't have any on-chain impact except for being recorded on-chain.",
+        treasury:
+          "Treasury withdrawals are sub-categorized into small, medium, or large and are determined by the amount of lovelace to be withdrawn.",
       },
       type: {
         noConfidence: {
@@ -762,7 +783,7 @@ export const en = {
     },
     dataMissingErrors: {
       dataMissing: "Data Missing",
-      notVerifiable: "Not Verifiable",
+      notVerifiable: "Data Not Verifiable",
       incorrectFormat: "Data Formatted Incorrectly",
     },
     about: "About",

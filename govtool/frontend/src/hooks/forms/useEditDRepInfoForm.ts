@@ -19,7 +19,7 @@ import {
   generateJsonld,
   generateMetadataBody,
 } from "@utils";
-import { MetadataValidationStatus } from "@models";
+import { MetadataStandard, MetadataValidationStatus } from "@models";
 import { useWalletErrorModal } from "@hooks";
 import { useValidateMutation } from "../mutations";
 
@@ -27,7 +27,7 @@ export type EditDRepInfoValues = {
   bio?: string;
   dRepName: string;
   email?: string;
-  links?: Array<{ link: string }>;
+  references?: Array<{ uri: string }>;
   storeData?: boolean;
   storingURL: string;
 };
@@ -36,7 +36,7 @@ export const defaultEditDRepInfoValues: EditDRepInfoValues = {
   bio: "",
   dRepName: "",
   email: "",
-  links: [{ link: "" }],
+  references: [{ uri: "" }],
   storeData: false,
   storingURL: "",
 };
@@ -69,6 +69,7 @@ export const useEditDRepInfoForm = (
     formState: { errors, isValid },
     register,
     resetField,
+    reset,
     watch,
   } = useFormContext<EditDRepInfoValues>();
   const dRepName = watch("dRepName");
@@ -120,10 +121,11 @@ export const useEditDRepInfoForm = (
     });
   }, []);
 
-  const showSuccessModal = useCallback(() => {
+  const showSuccessModal = useCallback((link: string) => {
     openModal({
       type: "statusModal",
       state: {
+        link: `https://sancho.cexplorer.io/tx/${link}`,
         status: "success",
         title: t("modals.registration.title"),
         message: t("modals.registration.message"),
@@ -147,6 +149,7 @@ export const useEditDRepInfoForm = (
         const { status } = await validateMetadata({
           url,
           hash,
+          standard: MetadataStandard.CIPQQQ,
         });
 
         if (status) {
@@ -154,12 +157,12 @@ export const useEditDRepInfoForm = (
         }
 
         const updateDRepMetadataCert = await buildDRepUpdateCert(url, hash);
-        await buildSignSubmitConwayCertTx({
+        const result = await buildSignSubmitConwayCertTx({
           certBuilder: updateDRepMetadataCert,
           type: "updateMetaData",
         });
 
-        showSuccessModal();
+        if (result) showSuccessModal(result);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         if (Object.values(MetadataValidationStatus).includes(error)) {
@@ -202,5 +205,6 @@ export const useEditDRepInfoForm = (
     editDRepInfo: handleSubmit(onSubmit),
     resetField,
     watch,
+    reset,
   };
 };

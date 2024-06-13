@@ -1,6 +1,8 @@
+import { expect } from "@storybook/jest";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Card } from "@molecules";
+import { within } from "@storybook/testing-library";
 
 const meta = {
   title: "Example/Card",
@@ -33,10 +35,23 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {},
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByText("Put here whatever you want to display in the card."),
+    ).toBeVisible();
+  },
 };
 
 export const WithLabel: Story = {
   args: {
     label: "Label goes here",
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByText("Put here whatever you want to display in the card."),
+    ).toBeVisible();
+    await expect(canvas.getByText("Label goes here")).toBeVisible();
   },
 };

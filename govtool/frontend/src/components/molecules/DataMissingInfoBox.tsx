@@ -1,4 +1,4 @@
-import { Box, Link } from "@mui/material";
+import { Box, Link, SxProps } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { useTranslation } from "@hooks";
@@ -9,41 +9,45 @@ export const DataMissingInfoBox = ({
   isDataMissing,
   isInProgress,
   isSubmitted,
+  isDrep = false,
+  sx,
 }: {
-  isDataMissing: boolean | MetadataValidationStatus;
+  isDataMissing: MetadataValidationStatus | null;
   isInProgress?: boolean;
   isSubmitted?: boolean;
+  isDrep?: boolean;
+  sx?: SxProps;
 }) => {
   const { t } = useTranslation();
 
   const gaMetadataErrorMessage = {
-    [MetadataValidationStatus.URL_NOT_FOUND]: t(
-      "errors.gAMetadata.message.dataMissing",
-    ),
-    [MetadataValidationStatus.INVALID_JSONLD]: t(
-      "errors.gAMetadata.message.incorrectFormat",
-    ),
-    [MetadataValidationStatus.INVALID_HASH]: t(
-      "errors.gAMetadata.message.notVerifiable",
-    ),
-    [MetadataValidationStatus.INCORRECT_FORMAT]: t(
-      "errors.gAMetadata.message.incorrectFormat",
-    ),
+    [MetadataValidationStatus.URL_NOT_FOUND]: isDrep
+      ? t("errors.dRep.message.dataMissing")
+      : t("errors.gAMetadata.message.dataMissing"),
+    [MetadataValidationStatus.INVALID_JSONLD]: isDrep
+      ? t("errors.dRep.message.incorrectFormat")
+      : t("errors.gAMetadata.message.incorrectFormat"),
+    [MetadataValidationStatus.INVALID_HASH]: isDrep
+      ? t("errors.dRep.message.notVerifiable")
+      : t("errors.gAMetadata.message.notVerifiable"),
+    [MetadataValidationStatus.INCORRECT_FORMAT]: isDrep
+      ? t("errors.dRep.message.incorrectFormat")
+      : t("errors.gAMetadata.message.incorrectFormat"),
   }[isDataMissing as MetadataValidationStatus];
 
   const gaMetadataErrorDescription = {
-    [MetadataValidationStatus.URL_NOT_FOUND]: t(
-      "errors.gAMetadata.description.dataMissing",
-    ),
-    [MetadataValidationStatus.INVALID_JSONLD]: t(
-      "errors.gAMetadata.description.incorrectFormat",
-    ),
-    [MetadataValidationStatus.INVALID_HASH]: t(
-      "errors.gAMetadata.description.notVerifiable",
-    ),
-    [MetadataValidationStatus.INCORRECT_FORMAT]: t(
-      "errors.gAMetadata.description.incorrectFormat",
-    ),
+    [MetadataValidationStatus.URL_NOT_FOUND]: isDrep
+      ? t("errors.dRep.description.dataMissing")
+      : t("errors.gAMetadata.description.dataMissing"),
+    [MetadataValidationStatus.INVALID_JSONLD]: isDrep
+      ? t("errors.dRep.description.incorrectFormat")
+      : t("errors.gAMetadata.description.incorrectFormat"),
+    [MetadataValidationStatus.INVALID_HASH]: isDrep
+      ? t("errors.dRep.description.notVerifiable")
+      : t("errors.gAMetadata.description.notVerifiable"),
+    [MetadataValidationStatus.INCORRECT_FORMAT]: isDrep
+      ? t("errors.dRep.description.incorrectFormat")
+      : t("errors.gAMetadata.description.incorrectFormat"),
   }[isDataMissing as MetadataValidationStatus];
 
   return isDataMissing && !isSubmitted && !isInProgress ? (
@@ -51,6 +55,7 @@ export const DataMissingInfoBox = ({
       sx={{
         mb: 4,
         pr: 6,
+        ...sx,
       }}
     >
       <Typography

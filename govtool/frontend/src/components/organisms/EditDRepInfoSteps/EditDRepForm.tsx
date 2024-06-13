@@ -1,12 +1,15 @@
-import { Dispatch, SetStateAction, useCallback } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useFieldArray } from "react-hook-form";
 import { Box } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 import { Button, InfoText, Spacer, Typography } from "@atoms";
 import { Placeholders, Rules } from "@consts";
+import { useCardano } from "@context";
 import {
   useEditDRepInfoForm,
+  useGetDRepListInfiniteQuery,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
@@ -22,33 +25,65 @@ export const EditDRepForm = ({
   onClickCancel: () => void;
   setStep: Dispatch<SetStateAction<number>>;
 }) => {
+  const { state } = useLocation();
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
-  const { control, errors, isError, register, watch } = useEditDRepInfoForm();
+  const { dRepID } = useCardano();
+  const { control, errors, isError, register, watch, reset, getValues } =
+    useEditDRepInfoForm();
   const {
     append,
-    fields: links,
+    fields: references,
     remove,
   } = useFieldArray({
     control,
-    name: "links",
+    name: "references",
   });
+
+  const { dRepData: yourselfDRepList } = useGetDRepListInfiniteQuery(
+    {
+      searchPhrase: dRepID,
+    },
+    { enabled: !state },
+  );
 
   const onClickContinue = () => setStep(2);
 
-  const addLink = useCallback(() => append({ link: "" }), [append]);
+  const addLink = useCallback(() => append({ uri: "" }), [append]);
 
   const removeLink = useCallback((index: number) => remove(index), [remove]);
 
   const isContinueButtonDisabled = !watch("dRepName") || isError;
+
+  useEffect(() => {
+    if (!getValues().dRepName)
+      reset(
+        state
+          ? {
+              ...state,
+              references: state.references.map((uri: string) => ({
+                uri,
+              })),
+            }
+          : {
+              ...yourselfDRepList?.[0],
+              references: yourselfDRepList?.[0].references.map(
+                (uri: string) => ({
+                  uri,
+                }),
+              ),
+            },
+      );
+  }, [yourselfDRepList]);
+
   const renderLinks = useCallback(
     () =>
-      links.map((field, index) => (
+      references.map((field, index) => (
         <ControlledField.Input
-          {...register(`links.${index}.link`)}
+          {...register(`references.${index}.uri`)}
           errors={errors}
           endAdornment={
-            links.length > 1 ? (
+            references.length > 1 ? (
               <DeleteOutlineIcon
                 color="primary"
                 data-testid={`delete-link-${index + 1}-button`}
@@ -63,11 +98,11 @@ export const EditDRepForm = ({
           label={t("forms.link") + ` ${index + 1}`}
           layoutStyles={{ mb: 3 }}
           placeholder={Placeholders.LINK}
-          name={`links.${index}.link`}
+          name={`references.${index}.uri`}
           rules={Rules.LINK}
         />
       )),
-    [errors, links],
+    [errors, references],
   );
 
   return (
@@ -143,7 +178,7 @@ export const EditDRepForm = ({
       </p>
       <Spacer y={3} />
       {renderLinks()}
-      {links?.length < MAX_NUMBER_OF_LINKS ? (
+      {references?.length < MAX_NUMBER_OF_LINKS ? (
         <Button
           data-testid="add-link-button"
           onClick={addLink}

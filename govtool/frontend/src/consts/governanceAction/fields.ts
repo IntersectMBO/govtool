@@ -1,4 +1,4 @@
-import { bech32Validation, numberValidation } from "@utils";
+import { isRewardAddress, numberValidation } from "@utils";
 import I18n from "@/i18n";
 import {
   GovernanceActionType,
@@ -106,7 +106,7 @@ export const GOVERNANCE_ACTION_FIELDS: GovernanceActionFields = {
       placeholderI18nKey:
         "createGovernanceAction.fields.declarations.receivingAddress.placeholder",
       rules: {
-        validate: bech32Validation,
+        validate: isRewardAddress,
       },
     },
     amount: {
@@ -156,36 +156,6 @@ export const GOVERNANCE_ACTION_CONTEXT = {
       abstract: "CIP108:abstract",
       motivation: "CIP108:motivation",
       rationale: "CIP108:rationale",
-    },
-  },
-  authors: {
-    "@id": "CIP100:authors",
-    "@container": "@set" as const,
-    "@context": {
-      name: "http://xmlns.com/foaf/0.1/name",
-      witness: {
-        "@id": "CIP100:witness",
-        "@context": {
-          witnessAlgorithm: "CIP100:witnessAlgorithm",
-          publicKey: "CIP100:publicKey",
-          signature: "CIP100:signature",
-        },
-      },
-    },
-  },
-};
-
-export const VOTE_TEST_CONTEXT = {
-  "@language": "en-us",
-  CIP100:
-    "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#",
-  CIP108:
-    "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#",
-  hashAlgorithm: "CIP100:hashAlgorithm",
-  body: {
-    "@id": "CIP108:body",
-    "@context": {
-      text: "CIP108:text",
     },
   },
   authors: {

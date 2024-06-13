@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
+import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
 
 import { ActionRadio } from "@atoms";
 
@@ -60,8 +60,23 @@ export const ActionRadioActive: Story = {
     tooltipTitle: "Tooltip title",
     value: "",
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
+    expect(canvas.getByText("Title")).toBeInTheDocument();
+    expect(canvas.getByText("Example subtitle")).toBeInTheDocument();
+
+    await userEvent.hover(canvas.getByTestId("InfoOutlinedIcon"));
+    await waitFor(() => {
+      expect(screen.getByRole("tooltip")).toBeInTheDocument();
+      expect(screen.getByRole("tooltip")).toHaveTextContent("Tooltip title");
+      expect(screen.getByRole("tooltip")).toHaveTextContent(
+        "Example tooltip text",
+      );
+    });
+
+    await userEvent.click(canvas.getByTestId("radio"));
+    await expect(args.onChange).toHaveBeenCalled();
+
     await expect(canvas.getByTestId("radio")).toHaveAttribute(
       "aria-checked",
       "true",
@@ -75,6 +90,13 @@ export const ActionRadioOnlyTitle: Story = {
     value: "",
     isChecked: false,
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByTestId("radio")).toHaveAttribute(
+      "aria-checked",
+      "false",
+    );
+  },
 };
 
 export const ActionRadioOnlyTitleChecked: Story = {
@@ -82,5 +104,12 @@ export const ActionRadioOnlyTitleChecked: Story = {
     title: "Title",
     value: "",
     isChecked: true,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByTestId("radio")).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
   },
 };

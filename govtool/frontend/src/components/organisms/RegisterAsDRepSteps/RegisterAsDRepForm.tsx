@@ -30,18 +30,18 @@ export const RegisterAsDRepForm = ({
   const { control, errors, isError, register, watch } = useRegisterAsdRepForm();
   const {
     append,
-    fields: links,
+    fields: references,
     remove,
   } = useFieldArray({
     control,
-    name: "links",
+    name: "references",
   });
 
   const onClickContinue = () => setStep(3);
 
   const onClickBack = () => setStep(1);
 
-  const addLink = useCallback(() => append({ link: "" }), [append]);
+  const addLink = useCallback(() => append({ uri: "" }), [append]);
 
   const removeLink = useCallback((index: number) => remove(index), [remove]);
 
@@ -49,12 +49,12 @@ export const RegisterAsDRepForm = ({
 
   const renderLinks = useCallback(
     () =>
-      links.map((field, index) => (
+      references.map((field, index) => (
         <ControlledField.Input
-          {...register(`links.${index}.link`)}
+          {...register(`references.${index}.uri`)}
           errors={errors}
           endAdornment={
-            links.length > 1 ? (
+            references.length > 1 ? (
               <DeleteOutlineIcon
                 color="primary"
                 data-testid={`delete-link-${index + 1}-button`}
@@ -69,11 +69,11 @@ export const RegisterAsDRepForm = ({
           label={t("forms.link") + ` ${index + 1}`}
           layoutStyles={{ mb: 3 }}
           placeholder={Placeholders.LINK}
-          name={`links.${index}.link`}
+          name={`references.${index}.uri`}
           rules={Rules.LINK}
         />
       )),
-    [errors, links],
+    [errors, references],
   );
 
   return (
@@ -125,6 +125,7 @@ export const RegisterAsDRepForm = ({
       <Spacer y={3} />
       <ControlledField.TextArea
         {...{ control, errors }}
+        data-testid="bio-input"
         label={t("forms.registerAsDRep.bio")}
         name="bio"
         placeholder={t("forms.registerAsDRep.bioPlaceholder")}
@@ -150,7 +151,7 @@ export const RegisterAsDRepForm = ({
       </p>
       <Spacer y={3} />
       {renderLinks()}
-      {links?.length < MAX_NUMBER_OF_LINKS ? (
+      {references?.length < MAX_NUMBER_OF_LINKS ? (
         <Button
           data-testid="add-link-button"
           onClick={addLink}

@@ -8,6 +8,7 @@
 
 module Main where
 
+import           Control.Concurrent.QSem                (newQSem)
 import           Control.Exception                      (Exception,
                                                          SomeException,
                                                          fromException, throw)
@@ -115,7 +116,8 @@ startApp vvaConfig = do
     dRepVotingPowerCache <- newCache
     dRepListCache <- newCache
     networkMetricsCache <- newCache
-    metadataValidationCache <- newCache
+    proposalMetadataValidationCache <- newCache
+    dRepMetadataValidationCache <- newCache
     return $ CacheEnv
       { proposalListCache
       , getProposalCache
@@ -127,12 +129,13 @@ startApp vvaConfig = do
       , dRepVotingPowerCache
       , dRepListCache
       , networkMetricsCache
-      , metadataValidationCache
+      , proposalMetadataValidationCache
+      , dRepMetadataValidationCache
       }
   connectionPool <- createPool (connectPostgreSQL (encodeUtf8 (dbSyncConnectionString $ getter vvaConfig))) close 1 1 60
   vvaTlsManager <- newManager tlsManagerSettings
-
-  let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool, vvaTlsManager}
+  qsem <- newQSem (metadataValidationMaxConcurrentRequests vvaConfig)
+  let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool, vvaTlsManager, vvaMetadataQSem=qsem}
   server' <- mkVVAServer appEnv
   runSettings settings server'
 

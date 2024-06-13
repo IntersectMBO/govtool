@@ -1,6 +1,10 @@
 import environments from "@constants/environments";
 import { Logger } from "@helpers/logger";
-import { AddPollPayload, ProposalCreationPayload } from "@types";
+import {
+  AddCommentPayload,
+  AddPollPayload,
+  ProposalCreationPayload,
+} from "@types";
 
 import fetch = require("node-fetch");
 
@@ -44,8 +48,15 @@ const proposalDiscussionService = {
           },
         }
       );
-      await res.json();
-      Logger.success("Governance action proposal deleted successfully");
+
+      const response = await res.json();
+      if (res.status === 200) {
+        Logger.success("Governance action proposal deleted successfully");
+        return response;
+      }
+
+      Logger.fail("Failed to delete governance action proposal");
+      throw new Error(response["error"]["message"]);
     } catch (err) {
       Logger.fail("Failed to delete governance action proposal");
       throw err;
@@ -63,10 +74,44 @@ const proposalDiscussionService = {
         },
         body: JSON.stringify(data),
       });
-      await res.json();
-      Logger.success("Poll added successfully");
+
+      const response = await res.json();
+      console.log(response);
+      if (res.status === 200) {
+        Logger.success("Poll added successfully");
+        return response;
+      }
+
+      Logger.fail("Failed to add poll  governance action proposal");
+      throw new Error(response["error"]["message"]);
     } catch (err) {
-      Logger.fail("Failed to delete governance action proposal");
+      Logger.fail("Failed to add poll governance action proposal");
+      throw err;
+    }
+  },
+
+  addComment: async (data: AddCommentPayload) => {
+    try {
+      const res = await fetch(`${environments.pdfUrl}/api/comments`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          authorization:
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzMsImlhdCI6MTcxODE2NjA5NiwiZXhwIjoxNzIwNzU4MDk2fQ.oWJefxnDGosktBlPQTvJ01Xqxa8YVAuhYs9MQPJE9po",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const response = await res.json();
+      if (res.status === 200) {
+        Logger.success("Comment added successfully");
+        return response;
+      }
+
+      Logger.fail("Failed to add comment on  governance action proposal");
+      throw new Error(response["error"]["message"]);
+    } catch (err) {
+      Logger.fail("Failed to add comment on  governance action proposal");
       throw err;
     }
   },

@@ -132,3 +132,10 @@ export type AddPollPayload = {
     is_poll_active: boolean;
   };
 };
+
+export type AddCommentPayload = {
+  data: {
+    proposal_id: string;
+    comment_text: string;
+  };
+};

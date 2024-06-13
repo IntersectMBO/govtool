@@ -5,10 +5,15 @@ import { pollTransaction } from "@helpers/transaction";
 import { test as setup } from "@playwright/test";
 import kuberService from "@services/kuberService";
 import proposalDiscussionService from "@services/proposalDiscussionService";
-import { AddPollPayload, ProposalCreationResponse } from "@types";
+import {
+  AddCommentPayload,
+  AddPollPayload,
+  ProposalCreationResponse,
+} from "@types";
 import walletManager from "lib/walletManager";
 import { mockProposalCreationPayload } from "@mock/index";
 import proposalManager from "lib/proposalManager";
+import { faker } from "@faker-js/faker";
 
 const PROPOSAL_SUBMISSIONS_WALLETS_COUNT = 1;
 
@@ -64,6 +69,17 @@ setup("Create temporary proposal", async () => {
     },
   };
   await proposalDiscussionService.addPoll(mockAddPollPayload);
+
+  for (let i = 0; i < 4; i++) {
+    const comment: AddCommentPayload = {
+      data: {
+        proposal_id: response.data.attributes.proposal_id.toString(),
+        comment_text: faker.lorem.paragraph(2),
+      },
+    };
+
+    await proposalDiscussionService.addComment(comment);
+  }
 
   await proposalManager.writeProposal({
     payload: mockProposalCreationPayload,

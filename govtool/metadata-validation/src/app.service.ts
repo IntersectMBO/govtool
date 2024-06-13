@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { catchError, firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import * as blake from 'blakejs';
 
 import { ValidateMetadataDTO } from '@dto';
-import { MetadataValidationStatus } from '@enums';
+import { LoggerMessage, MetadataValidationStatus } from '@enums';
 import { canonizeJSON, validateMetadataStandard, parseMetadata } from '@utils';
 import { MetadataStandard, ValidateMetadataResult } from '@types';
 
@@ -29,6 +29,9 @@ export class AppService {
           }),
         ),
       );
+
+      Logger.debug(LoggerMessage.METADATA_DATA, data);
+
       if (standard && !noStandard) {
         await validateMetadataStandard(data, standard);
       }
@@ -56,6 +59,7 @@ export class AppService {
         throw MetadataValidationStatus.INVALID_HASH;
       }
     } catch (error) {
+      Logger.error(LoggerMessage.METADATA_VALIDATION_ERROR, error);
       if (Object.values(MetadataValidationStatus).includes(error)) {
         status = error;
       }

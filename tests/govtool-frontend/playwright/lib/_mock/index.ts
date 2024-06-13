@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { proposalCreationPayload } from "@types";
+import { ProposalCreationPayload } from "@types";
 import { bech32 } from "bech32";
 
 export const invalid = {
@@ -78,7 +78,7 @@ const randomBytes = new Uint8Array(10);
 const bech32Address = bech32.encode("addr_test", randomBytes);
 
 export const mockProposalCreationPayload: {
-  data: proposalCreationPayload;
+  data: ProposalCreationPayload;
 } = {
   data: {
     proposal_links: [

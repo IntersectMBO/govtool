@@ -1,11 +1,11 @@
 import environments from "@constants/environments";
 import { Logger } from "@helpers/logger";
-import { addPollPayload, proposalCreationPayload } from "@types";
+import { AddPollPayload, ProposalCreationPayload } from "@types";
 
 import fetch = require("node-fetch");
 
 const proposalDiscussionService = {
-  createProposal: async (data: { data: proposalCreationPayload }) => {
+  createProposal: async (data: { data: ProposalCreationPayload }) => {
     try {
       const res = await fetch(`${environments.pdfUrl}/api/proposals`, {
         method: "POST",
@@ -18,15 +18,14 @@ const proposalDiscussionService = {
       });
 
       const response = await res.json();
-      if(res.status === 200){
+      if (res.status === 200) {
         console.log(JSON.stringify(data));
         Logger.success("Governance action proposal created successfully");
         return response;
       }
 
       Logger.fail("Failed to create governance action proposal");
-      throw new Error(response['error']['message']);
-
+      throw new Error(response["error"]["message"]);
     } catch (err) {
       Logger.fail("Failed to create governance action proposal");
       throw err;
@@ -52,26 +51,25 @@ const proposalDiscussionService = {
       throw err;
     }
   },
-  
-  addPoll:async(data:addPollPayload)=>{
-    try{
-      const res = await fetch(`${environments.pdfUrl}/api/polls`,{
-        method:"POST",
+
+  addPoll: async (data: AddPollPayload) => {
+    try {
+      const res = await fetch(`${environments.pdfUrl}/api/polls`, {
+        method: "POST",
         headers: {
           "content-type": "application/json",
           authorization:
             "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzMsImlhdCI6MTcxODE2NjA5NiwiZXhwIjoxNzIwNzU4MDk2fQ.oWJefxnDGosktBlPQTvJ01Xqxa8YVAuhYs9MQPJE9po",
         },
-        body:JSON.stringify(data),
-      })
+        body: JSON.stringify(data),
+      });
       await res.json();
       Logger.success("Poll added successfully");
-    }  catch (err) {
+    } catch (err) {
       Logger.fail("Failed to delete governance action proposal");
       throw err;
     }
-    
-  }
+  },
 };
 
 export default proposalDiscussionService;

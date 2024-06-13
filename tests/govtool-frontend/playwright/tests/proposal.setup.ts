@@ -5,7 +5,7 @@ import { pollTransaction } from "@helpers/transaction";
 import { test as setup } from "@playwright/test";
 import kuberService from "@services/kuberService";
 import proposalDiscussionService from "@services/proposalDiscussionService";
-import { addPollPayload, proposalCreationResponse } from "@types";
+import { AddPollPayload, ProposalCreationResponse } from "@types";
 import walletManager from "lib/walletManager";
 import { mockProposalCreationPayload } from "@mock/index";
 import proposalManager from "lib/proposalManager";
@@ -52,23 +52,21 @@ setup("Setup temporary proposal wallets", async () => {
   );
 });
 
-
 setup("Create temporary proposal", async () => {
-  const response: proposalCreationResponse =
+  const response: ProposalCreationResponse =
     await proposalDiscussionService.createProposal(mockProposalCreationPayload);
 
-    const mockAddPollPayload:addPollPayload={
-      data:{
-        proposal_id: response.data.attributes.proposal_id.toString(),
-        poll_start_dt:new Date().toISOString(),
-        is_poll_active:true
-      }
-    }
-  await proposalDiscussionService.addPoll(mockAddPollPayload)
+  const mockAddPollPayload: AddPollPayload = {
+    data: {
+      proposal_id: response.data.attributes.proposal_id.toString(),
+      poll_start_dt: new Date().toISOString(),
+      is_poll_active: true,
+    },
+  };
+  await proposalDiscussionService.addPoll(mockAddPollPayload);
 
   await proposalManager.writeProposal({
     payload: mockProposalCreationPayload,
     response: response,
   });
 });
-

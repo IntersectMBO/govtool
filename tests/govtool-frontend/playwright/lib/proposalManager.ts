@@ -1,4 +1,4 @@
-import { proposalCreationPayload } from "@types";
+import { ProposalCreationPayload } from "@types";
 import * as fs from "fs";
 const path = require("path");
 
@@ -48,7 +48,7 @@ class ProposalManager {
     return proposal["response"]["data"]["attributes"]["proposal_id"];
   }
 
-  async getProposalPayload(): Promise<proposalCreationPayload> {
+  async getProposalPayload(): Promise<ProposalCreationPayload> {
     const proposal = await this.readProposal();
     return proposal["payload"]["data"];
   }

@@ -98,8 +98,8 @@ export type ProtocolParams = {
   govActionDeposit: number;
 };
 
-export type proposalCreationPayload = {
-  proposal_links: Array<proposalLinksType>;
+export type ProposalCreationPayload = {
+  proposal_links: Array<ProposalLinksType>;
   gov_action_type_id: number;
   prop_name: string;
   prop_abstract: string;
@@ -110,12 +110,12 @@ export type proposalCreationPayload = {
   is_draft: boolean;
 };
 
-type proposalLinksType = {
+type ProposalLinksType = {
   prop_link: string;
   prop_link_text: string;
 };
 
-export type proposalCreationResponse = {
+export type ProposalCreationResponse = {
   data: {
     attributes: {
       proposal_id: number;
@@ -125,11 +125,10 @@ export type proposalCreationResponse = {
   meta: Object;
 };
 
-
-export type addPollPayload = {
- data: {
-    proposal_id: string,
-    poll_start_dt: string,
-    is_poll_active: boolean
-  }
-}
+export type AddPollPayload = {
+  data: {
+    proposal_id: string;
+    poll_start_dt: string;
+    is_poll_active: boolean;
+  };
+};

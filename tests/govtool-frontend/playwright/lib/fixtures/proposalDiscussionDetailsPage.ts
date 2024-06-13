@@ -2,13 +2,13 @@ import { mockProposalCreationPayload } from "@mock/index";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import { test as base } from "@fixtures/walletExtension";
 import proposalDiscussionService from "@services/proposalDiscussionService";
-import { proposalCreationResponse } from "@types";
+import { ProposalCreationResponse } from "@types";
 
 export const test = base.extend<{
   proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
 }>({
   proposalDiscussionDetailsPage: async ({ page }, use) => {
-    const response: proposalCreationResponse =
+    const response: ProposalCreationResponse =
       await proposalDiscussionService.createProposal(
         mockProposalCreationPayload
       );

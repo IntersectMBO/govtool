@@ -4,6 +4,10 @@ import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
 
 export default class ProposalDiscussionPage {
   // Buttons
+  readonly proposalCreateBtn = this.page.getByRole("button", {
+    name: "Propose a Governance Action",
+  });
+
   readonly filterBtn = this.page.locator("#filters-button"); // this.page.getByTestId("filters-button");
   readonly shareBtn = this.page
     .locator(".MuiCardHeader-action > .MuiButtonBase-root")

@@ -63,6 +63,7 @@ changes.
 - Add eslint & prettier to frontend package [Issue 166](https://github.com/IntersectMBO/govtool/issues/166)
 - Add DRep list pagination [Issue 740](https://github.com/IntersectMBO/govtool/issues/740)
 - Add PDF pillar [Issue 1090](https://github.com/IntersectMBO/govtool/issues/1090)
+- Replace govtool-wrapper governance action creation in favor of pdf-pillar [Issue 1284](https://github.com/IntersectMBO/govtool/issues/1284)
 
 ### Fixed
 

@@ -103,6 +103,7 @@ setup("Create temporary proposal", async () => {
   const staticProposal: StaticProposal = {
     id: createProposalRes.data.attributes.proposal_id,
     comments,
+    title: proposalRequest.prop_name,
   };
   await createFile("proposals.json", [staticProposal]);
 });

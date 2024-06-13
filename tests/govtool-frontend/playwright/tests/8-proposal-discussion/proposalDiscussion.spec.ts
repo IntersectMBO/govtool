@@ -1,9 +1,9 @@
+import { proposal01 } from "@constants/staticProposals";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposalDiscussionDetailsPage";
 import { setAllureEpic } from "@helpers/allure";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { expect } from "@playwright/test";
-import proposalManager from "lib/proposalManager";
 
 test.beforeEach(() => {
   setAllureEpic("Proposal Discussion Forum");
@@ -35,11 +35,10 @@ test("8B. Should filter and sort the list of proposed governance actions.", asyn
 test("8C. Should search the list of proposed governance actions.", async ({
   page,
 }) => {
-  const proposalPayload = await proposalManager.getProposalPayload();
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
 
-  await proposalDiscussionPage.searchInput.fill(proposalPayload.prop_name);
+  await proposalDiscussionPage.searchInput.fill(proposal01.title);
 
   const proposalCards = await proposalDiscussionPage.getAllProposals();
 
@@ -47,7 +46,7 @@ test("8C. Should search the list of proposed governance actions.", async ({
     expect(
       (await proposalCard.textContent())
         .toLowerCase()
-        .includes(`${proposalPayload.prop_name}`)
+        .includes(`${proposal01.title}`)
     ).toBeTruthy();
   }
 });

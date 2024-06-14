@@ -16,6 +16,9 @@ export const adaHolder06Wallet = staticWallets[9];
 // Does not takes part in transaction
 export const user01Wallet: StaticWallet = staticWallets[5];
 
+// Username is already set
+export const proposal01Wallet: StaticWallet = staticWallets[10];
+
 export const adaHolderWallets = [
   adaHolder01Wallet,
   adaHolder02Wallet,
@@ -28,3 +31,5 @@ export const adaHolderWallets = [
 export const userWallets = [user01Wallet];
 
 export const dRepWallets = [dRep01Wallet, dRep02Wallet];
+
+export const proposalWallets = [proposal01Wallet];

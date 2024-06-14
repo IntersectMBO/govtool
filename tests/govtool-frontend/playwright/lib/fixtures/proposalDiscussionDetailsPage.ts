@@ -1,47 +1,39 @@
-import { faker } from "@faker-js/faker";
+import { proposal01Wallet } from "@constants/staticWallets";
 import { test as base } from "@fixtures/walletExtension";
-import { generateWalletAddress } from "@helpers/cardano";
+import { createNewPageWithWallet } from "@helpers/page";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
-import {
-  deleteProposal,
-  postCreateProposal,
-} from "@services/proposalDiscussion";
-import { ProposalCreateRequest } from "@services/proposalDiscussion/types";
+import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 
-export const test = base.extend<{
+type TestOptions = {
   proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
-}>({
-  // setup
-  proposalDiscussionDetailsPage: async ({ page }, use) => {
-    const receivingAddr = generateWalletAddress();
-    const proposalRequest: ProposalCreateRequest = {
-      proposal_links: [
-        {
-          prop_link: faker.internet.url(),
-          prop_link_text: faker.internet.displayName(),
-        },
-      ],
-      gov_action_type_id: 1,
-      prop_name: faker.company.name(),
-      prop_abstract: faker.lorem.paragraph(2),
-      prop_motivation: faker.lorem.paragraph(2),
-      prop_rationale: faker.lorem.paragraph(2),
-      prop_receiving_address: receivingAddr,
-      prop_amount: faker.number.int({ min: 100, max: 1000 }).toString(),
-      is_draft: false,
-    };
+};
 
-    const createProposalRes = await postCreateProposal(proposalRequest);
+export const test = base.extend<TestOptions>({
+  proposalDiscussionDetailsPage: async ({ page, browser }, use) => {
+    // setup
+    const proposalPage = await createNewPageWithWallet(browser, {
+      storageState: ".auth/proposal01.json",
+      wallet: proposal01Wallet,
+    });
 
-    const proposalId = createProposalRes.data.attributes.proposal_id;
-    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
-      page
-    );
-    await proposalDiscussionDetailsPage.goto(proposalId);
+    const proposalDiscussionPage = new ProposalDiscussionPage(proposalPage);
+    await proposalDiscussionPage.goto();
+    const proposalId = await proposalDiscussionPage.createProposal();
 
-    await use(proposalDiscussionDetailsPage);
+    const userProposalDetailsPage = new ProposalDiscussionDetailsPage(page);
+    await userProposalDetailsPage.goto(proposalId);
+    await page
+      .locator("div")
+      .filter({ hasText: /^Hey, setup your username$/ })
+      .getByRole("button")
+      .click();
+    await use(userProposalDetailsPage);
 
     // cleanup
-    await deleteProposal(proposalId);
+    const ownerProposalDetailsPage = new ProposalDiscussionDetailsPage(
+      proposalPage
+    );
+    await ownerProposalDetailsPage.goto(proposalId);
+    await ownerProposalDetailsPage.deleteProposal();
   },
 });

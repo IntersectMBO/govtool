@@ -4,8 +4,10 @@ import { CommentResponse } from "@types";
 
 export default class ProposalDiscussionDetailsPage {
   // Buttons
-  readonly likeBtn = this.page.getByTestId("like-button");
-  readonly dislikeBtn = this.page.getByTestId("dislike-button");
+  readonly likeBtn = this.page.getByRole("button").nth(6);
+  readonly dislikeBtn = this.page.getByRole("button", {
+    name: "proposal dislikes",
+  });
   readonly commentBtn = this.page.getByRole("button", {
     name: "Comment",
     exact: true,
@@ -53,7 +55,7 @@ export default class ProposalDiscussionDetailsPage {
 
   async goto(proposalId: number) {
     await this.page.goto(
-      `${environments.frontendUrl}/proposal_discussion/${proposalId}`
+      `${environments.frontendUrl}/connected/proposal_pillar/proposal_discussion/${proposalId}`
     );
   }
 
@@ -83,5 +85,17 @@ export default class ProposalDiscussionDetailsPage {
       );
       expect(isValid).toBe(true);
     }
+  }
+
+  async deleteProposal() {
+    await this.page.waitForTimeout(2_000);
+
+    await this.page.locator("#menu-button").click();
+    await this.page.getByRole("menuitem", { name: "Delete Proposal" }).click();
+
+    // confirm deletion
+    await this.page
+      .getByRole("button", { name: "Yes, delete my proposal" })
+      .click();
   }
 }

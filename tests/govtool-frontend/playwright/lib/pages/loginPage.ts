@@ -25,7 +25,17 @@ export default class LoginPage {
 
     await this.connectWalletBtn.click();
     await this.demosWalletBtn.click({ force: true });
-    await this.acceptSanchoNetInfoBtn.click({ force: true });
+
+    /**
+     * TODO: Remove this
+     * This has been set to tackle dashboard white screen issue on initial login
+     */
+    await this.page.reload();
+    /**
+     * TODO: Uncomment this
+     * Accept sanchonet info modal is not showing for now
+     */
+    // await this.acceptSanchoNetInfoBtn.click({ force: true });
 
     const { stakeKeys, rewardAddresses } = await this.page.evaluate(
       async () => {

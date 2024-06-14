@@ -29,25 +29,31 @@ export const cipStandardSchema: StandardSpecification = {
       '@value': Joi.string().valid('blake2b-256').required(),
     }),
     body: Joi.object({
-      title: Joi.object({ '@value': Joi.string().max(80).required() }),
-      abstract: Joi.object({ '@value': Joi.string().max(2500).required() }),
-      motivation: Joi.object({ '@value': Joi.string().required() }),
-      rationale: Joi.object({ '@value': Joi.string().required() }),
-      references: Joi.array().items(
-        Joi.object({
-          '@type': Joi.string(),
-          label: Joi.object({
-            '@value': Joi.string().required(),
+      title: Joi.object({
+        '@value': Joi.string().max(80).required(),
+      }).required(),
+      abstract: Joi.object({
+        '@value': Joi.string().max(2500).required(),
+      }).required(),
+      motivation: Joi.object({ '@value': Joi.string().required() }).required(),
+      rationale: Joi.object({ '@value': Joi.string().required() }).required(),
+      references: Joi.array()
+        .items(
+          Joi.object({
+            '@type': Joi.string().required(),
+            label: Joi.object({
+              '@value': Joi.string().required(),
+            }).required(),
+            uri: Joi.object({
+              '@value': Joi.string().required(),
+            }).required(),
+            referenceHash: Joi.object({
+              hashDigest: Joi.string().required(),
+              hashAlgorithm: Joi.string().required(),
+            }),
           }),
-          uri: Joi.object({
-            '@value': Joi.string().required(),
-          }),
-          referenceHash: Joi.object({
-            hashDigest: Joi.string().required(),
-            hashAlgorithm: Joi.string().required(),
-          }),
-        }),
-      ),
+        )
+        .required(),
     }),
   }),
   [MetadataStandard.CIPQQQ]: Joi.object({
@@ -64,24 +70,26 @@ export const cipStandardSchema: StandardSpecification = {
       '@value': Joi.string().valid('blake2b-256').required(),
     }),
     body: Joi.object({
-      bio: Joi.object({ '@value': Joi.string().allow('') }),
-      dRepName: Joi.object({ '@value': Joi.string().allow('') }),
-      email: Joi.object({ '@value': Joi.string().allow('') }),
-      references: Joi.array().items(
-        Joi.object({
-          '@type': Joi.string(),
-          label: Joi.object({
-            '@value': Joi.string().allow('').required(),
+      bio: Joi.object({ '@value': Joi.string().allow('') }).required(),
+      dRepName: Joi.object({ '@value': Joi.string().allow('') }).required(),
+      email: Joi.object({ '@value': Joi.string().allow('') }).required(),
+      references: Joi.array()
+        .items(
+          Joi.object({
+            '@type': Joi.string(),
+            label: Joi.object({
+              '@value': Joi.string().allow('').required(),
+            }).required(),
+            uri: Joi.object({
+              '@value': Joi.string().required(),
+            }).required(),
+            referenceHash: Joi.object({
+              hashDigest: Joi.string().required(),
+              hashAlgorithm: Joi.string().required(),
+            }),
           }),
-          uri: Joi.object({
-            '@value': Joi.string().required(),
-          }),
-          referenceHash: Joi.object({
-            hashDigest: Joi.string().required(),
-            hashAlgorithm: Joi.string().required(),
-          }),
-        }),
-      ),
+        )
+        .required(),
     }),
   }),
 };

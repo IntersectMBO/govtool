@@ -79,7 +79,6 @@ export default defineConfig({
       dependencies: environments.ci
         ? ["auth setup", "wallet bootstrap", "proposal setup"]
         : [],
-      teardown: environments.ci && "cleanup proposal",
     },
     {
       name: "loggedin (desktop)",
@@ -128,10 +127,6 @@ export default defineConfig({
     {
       name: "cleanup delegation",
       testMatch: "delegation.teardown.ts",
-    },
-    {
-      name: "cleanup proposal",
-      testMatch: "proposal.teardown.ts",
     },
   ],
 });

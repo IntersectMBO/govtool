@@ -9,7 +9,11 @@ import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { Page, expect } from "@playwright/test";
 
 test.describe("Proposal created logged in state", () => {
-  test.use({ storageState: ".auth/user01.json", wallet: user01Wallet });
+  test.use({
+    storageState: ".auth/user01.json",
+    wallet: user01Wallet,
+    pollEnabled: true,
+  });
 
   let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
 
@@ -48,6 +52,43 @@ test.describe("Proposal created logged in state", () => {
 
     await proposalDiscussionDetailsPage.replyComment(randReply);
     await expect(page.getByText(randReply)).toBeVisible();
+  });
+
+  test("8Q. Should vote on poll.", async ({ page }) => {
+    const pollVotes = ["Yes", "No"];
+    const choice = Math.floor(Math.random() * pollVotes.length);
+    const vote = pollVotes[choice];
+
+    await proposalDiscussionDetailsPage.voteOnPoll(vote);
+
+    await expect(proposalDiscussionDetailsPage.pollYesBtn).not.toBeVisible();
+    await expect(proposalDiscussionDetailsPage.pollNoBtn).not.toBeVisible();
+    await expect(page.getByText(`${vote}: (100%)`)).toBeVisible();
+    // opposite of random choice vote
+    const oppositeVote = pollVotes[pollVotes.length - 1 - choice];
+    await expect(page.getByText(`${oppositeVote}: (0%)`)).toBeVisible();
+  });
+
+  test("8R. Should change vote on poll.", async ({ page }) => {
+    const pollVotes = ["Yes", "No"];
+    const choice = Math.floor(Math.random() * pollVotes.length);
+    const vote = pollVotes[choice];
+
+    await proposalDiscussionDetailsPage.voteOnPoll(vote);
+
+    await proposalDiscussionDetailsPage.changeVoteBtn.click();
+    await page
+      .getByRole("button", { name: "Yes, change my Poll Vote" })
+      .click();
+
+    await expect(proposalDiscussionDetailsPage.pollYesBtn).not.toBeVisible();
+    await expect(proposalDiscussionDetailsPage.pollNoBtn).not.toBeVisible();
+
+    // vote must be changed
+    await expect(page.getByText(`${vote}: (0%)`)).toBeVisible();
+    // opposite of random choice vote
+    const oppositeVote = pollVotes[pollVotes.length - 1 - choice];
+    await expect(page.getByText(`${oppositeVote}: (100%)`)).toBeVisible();
   });
 });
 

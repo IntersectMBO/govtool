@@ -10,29 +10,37 @@ export default class ProposalDiscussionDetailsPage {
   readonly dislikeBtn = this.page.getByRole("button", {
     name: "proposal dislikes",
   });
-  readonly addPollBtn = this.page.getByTestId("add-poll");
+  readonly commentBtn = this.page.getByRole("button", {
+    name: "Comment",
+    exact: true,
+  }); // this.page.getByTestId("comment-button");
+  readonly addPollBtn = this.page.getByRole("button", { name: "Add Poll" }); // BUG missing test id
   readonly SubmitBtn = this.page.getByTestId("submit-button");
   readonly menuBtn = this.page.getByTestId("menu-button");
   readonly editProposalBtn = this.page.getByTestId("edit-proposal");
   readonly deleteProposalBtn = this.page.getByTestId("delete-proposal");
   readonly reviewVersionsBtn = this.page.getByTestId("review-versions");
-  readonly closePollBtn = this.page.getByTestId("close-poll");
+  readonly closePollBtn = this.page.getByRole("button", { name: "Close Poll" }); // BUG missing test id
   readonly sortBtn = this.page
     .locator("div")
     .filter({ hasText: /^Comments$/ })
     .getByRole("button"); // this.page.getByTestId("sort-button");
   readonly proposeGovernanceAction = this.page.getByTestId("propose-GA-button");
-  readonly pollYesBtn = this.page.getByTestId("poll-yes-button");
-  readonly pollNoBtn = this.page.getByTestId("poll-No-button");
-  readonly showReplyButton = this.page.getByTestId("show-more-reply");
+  readonly replyBtn = this.page.getByTestId("reply-button");
+  readonly pollYesBtn = this.page.getByRole("button", { name: "Yes" }); //BUG missing test id
+  readonly pollNoBtn = this.page.getByRole("button", { name: "No" }); //BUG missing test id
+  readonly showReplyBtn = this.page.getByTestId("show-more-reply");
+  readonly closePollYesBtn = this.page.getByRole("button", {
+    name: "Yes, close Poll",
+  }); // BUG missing test id
+  readonly changeVoteBtn = this.page.getByRole("button", {
+    name: "Change Vote",
+  });
 
   // Indicators
   readonly likesCounts = this.page.getByTestId("likes-count");
   readonly dislikesCounts = this.page.getByTestId("dislikse-count");
   readonly commentsCount = this.page.getByTestId("comments-count");
-
-  readonly pollYesVoteCount = this.page.getByTestId("poll-yes-vote-count");
-  readonly pollNoVoteCount = this.page.getByTestId("poll-No-vote-count");
 
   // Cards
   readonly pollVoteCard = this.page.getByTestId("poll-vote-card");
@@ -90,6 +98,10 @@ export default class ProposalDiscussionDetailsPage {
       );
       expect(isValid).toBe(true);
     }
+  }
+
+  async voteOnPoll(vote: string) {
+    await this.page.getByRole("button", { name: `${vote}` }).click();
   }
 
   async deleteProposal() {

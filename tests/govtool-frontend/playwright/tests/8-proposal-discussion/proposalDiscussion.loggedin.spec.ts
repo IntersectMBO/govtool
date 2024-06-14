@@ -1,4 +1,4 @@
-import { user01Wallet } from "@constants/staticWallets";
+import { proposal01Wallet, user01Wallet } from "@constants/staticWallets";
 import { createTempUserAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
@@ -12,7 +12,6 @@ test.describe("Proposal created logged in state", () => {
   test.use({
     storageState: ".auth/user01.json",
     wallet: user01Wallet,
-    pollEnabled: true,
   });
 
   let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
@@ -35,10 +34,13 @@ test.describe("Proposal created logged in state", () => {
     await expect(page.getByText("01", { exact: true })).toBeVisible();
   });
 
-  test("8J. Should sort the proposed governance action comments.", async ({}) => {
+  test("8J. Should sort the proposed governance action comments.", async ({
+    page,
+  }) => {
     for (let i = 0; i < 4; i++) {
       const comment = faker.lorem.paragraph(2);
       await proposalDiscussionDetailsPage.addComment(comment);
+      await page.waitForTimeout(2_000);
     }
 
     await proposalDiscussionDetailsPage.sortAndValidate(
@@ -65,7 +67,27 @@ test.describe("Proposal created logged in state", () => {
     await proposalDiscussionDetailsPage.replyComment(randReply);
     await expect(page.getByText(randReply)).toBeVisible();
   });
+});
 
+test.describe("Proposal created with poll enabled (user auth)", () => {
+  test.use({
+    storageState: ".auth/user01.json",
+    wallet: user01Wallet,
+    pollEnabled: true,
+  });
+
+  let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
+
+  test.beforeEach(async ({ page, proposalId, browser }) => {
+    const proposalPage = await createNewPageWithWallet(browser, {
+      storageState: ".auth/proposal01.json",
+      wallet: proposal01Wallet,
+    });
+
+    proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
+    await proposalDiscussionDetailsPage.goto(proposalId);
+    await proposalDiscussionDetailsPage.closeUsernamePrompt();
+  });
   test("8Q. Should vote on poll.", async ({ page }) => {
     const pollVotes = ["Yes", "No"];
     const choice = Math.floor(Math.random() * pollVotes.length);
@@ -81,7 +103,7 @@ test.describe("Proposal created logged in state", () => {
     await expect(page.getByText(`${oppositeVote}: (0%)`)).toBeVisible();
   });
 
-  test("8R. Should change vote on poll.", async ({ page }) => {
+  test("8T. Should change vote on poll.", async ({ page }) => {
     const pollVotes = ["Yes", "No"];
     const choice = Math.floor(Math.random() * pollVotes.length);
     const vote = pollVotes[choice];
@@ -145,53 +167,40 @@ test.describe("Proposal created logged out state", () => {
   });
 });
 
-test.describe("Add and cancel poll", () => {
-  test.use({ storageState: ".auth/user01.json", wallet: user01Wallet });
-  let proposalId: number;
-  test.beforeEach(async ({ page }) => {
-    const proposalDiscussionPage = new ProposalDiscussionPage(page);
-    await proposalDiscussionPage.goto();
-    await proposalDiscussionPage.closeUsernamePrompt();
-
-    proposalId = await proposalDiscussionPage.createProposal();
-    console.log({ proposalId });
+test.describe("Proposal created with poll enabled (proposal auth)", () => {
+  test.use({
+    storageState: ".auth/user01.json",
+    wallet: user01Wallet,
+    pollEnabled: true,
   });
 
-  test.afterEach(async ({ page }) => {
-    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
-      page
-    );
-    await proposalDiscussionDetailsPage.goto(proposalId);
+  let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
 
-    await proposalDiscussionDetailsPage.deleteProposal();
+  test.beforeEach(async ({ browser, proposalId }) => {
+    const proposalPage = await createNewPageWithWallet(browser, {
+      storageState: ".auth/proposal01.json",
+      wallet: proposal01Wallet,
+    });
+    proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
+      proposalPage
+    );
+    proposalDiscussionDetailsPage.goto(proposalId);
   });
 
-  test("8P. Should add poll on own proposal", async ({ page }) => {
-    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
-      page
-    );
-    await proposalDiscussionDetailsPage.goto(proposalId);
-
-    await proposalDiscussionDetailsPage.addPollBtn.click();
-
+  test("8P. Should add poll on own proposal", async ({}) => {
     await expect(proposalDiscussionDetailsPage.addPollBtn).not.toBeVisible();
-    await expect(proposalDiscussionDetailsPage.closePollBtn).toBeVisible();
   });
 
   test("8R. Should disable voting after cancelling the poll with the current poll result.", async ({
     page,
   }) => {
-    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
-      page
-    );
-    await proposalDiscussionDetailsPage.goto(proposalId);
-
-    await proposalDiscussionDetailsPage.addPollBtn.click();
-
     await proposalDiscussionDetailsPage.closePollBtn.click();
-
     await proposalDiscussionDetailsPage.closePollYesBtn.click();
-
     await expect(proposalDiscussionDetailsPage.closePollBtn).not.toBeVisible();
+
+    // user
+    const userProposalDetailsPage = new ProposalDiscussionDetailsPage(page);
+    await expect(userProposalDetailsPage.pollYesBtn).not.toBeVisible();
+    await expect(userProposalDetailsPage.pollNoBtn).not.toBeVisible();
   });
 });

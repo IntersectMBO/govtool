@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
-import { IMAGES, PATHS } from "@consts";
-import { PendingTransaction } from "@context";
+import { IMAGES, PATHS, PDF_PATHS } from "@consts";
+import { PendingTransaction, useFeatureFlag } from "@context";
 import { useTranslation, useWalletErrorModal } from "@hooks";
 import { DashboardActionCard } from "@molecules";
 import { correctAdaFormat, openInNewTab } from "@utils";
@@ -18,6 +18,7 @@ export const ProposeGovActionDashboardCard = ({
   deposit,
   votingPower,
 }: ProposeGovActionDashboardCardProps) => {
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const openWalletErrorModal = useWalletErrorModal();
@@ -34,8 +35,14 @@ export const ProposeGovActionDashboardCard = ({
       return;
     }
 
-    navigate(PATHS.createGovernanceAction);
-  }, [deposit, votingPower]);
+    navigate(
+      isProposalDiscussionForumEnabled
+        ? `${PATHS.connectedProposalPillar.replace("/*", "")}${
+            PDF_PATHS.proposalDiscussion
+          }`
+        : PATHS.createGovernanceAction,
+    );
+  }, [deposit, votingPower, isProposalDiscussionForumEnabled]);
 
   return (
     <DashboardActionCard

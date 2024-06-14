@@ -41,6 +41,7 @@ jobs:
           KUBER_API_URL: https://kuber-govtool.cardanoapi.io
 
       - name: Upload report
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: allure-results

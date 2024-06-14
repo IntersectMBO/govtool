@@ -5,11 +5,11 @@ import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage"
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 
 type TestOptions = {
-  proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
+  proposalId: number;
 };
 
 export const test = base.extend<TestOptions>({
-  proposalDiscussionDetailsPage: async ({ page, browser }, use) => {
+  proposalId: async ({ page, browser }, use) => {
     // setup
     const proposalPage = await createNewPageWithWallet(browser, {
       storageState: ".auth/proposal01.json",
@@ -20,20 +20,11 @@ export const test = base.extend<TestOptions>({
     await proposalDiscussionPage.goto();
     const proposalId = await proposalDiscussionPage.createProposal();
 
-    const userProposalDetailsPage = new ProposalDiscussionDetailsPage(page);
-    await userProposalDetailsPage.goto(proposalId);
-    await page
-      .locator("div")
-      .filter({ hasText: /^Hey, setup your username$/ })
-      .getByRole("button")
-      .click();
-    await use(userProposalDetailsPage);
+    await use(proposalId);
 
     // cleanup
-    const ownerProposalDetailsPage = new ProposalDiscussionDetailsPage(
-      proposalPage
-    );
-    await ownerProposalDetailsPage.goto(proposalId);
-    await ownerProposalDetailsPage.deleteProposal();
+    const proposalDetailsPage = new ProposalDiscussionDetailsPage(proposalPage);
+    await proposalDetailsPage.goto(proposalId);
+    await proposalDetailsPage.deleteProposal();
   },
 });

@@ -42,14 +42,18 @@ export default class ProposalDiscussionDetailsPage {
 
   constructor(private readonly page: Page) {}
 
-  get currentPage(): Page {
-    return this.page;
-  }
-
   async goto(proposalId: number) {
     await this.page.goto(
       `${environments.frontendUrl}/connected/proposal_pillar/proposal_discussion/${proposalId}`
     );
+  }
+
+  async closeUsernamePrompt() {
+    await this.page
+      .locator("div")
+      .filter({ hasText: /^Hey, setup your username$/ })
+      .getByRole("button")
+      .click();
   }
 
   async addComment(comment: string) {

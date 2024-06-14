@@ -114,18 +114,21 @@ export const GovernanceActionDetailsCardData = ({
         text={abstract}
         textVariant="longText"
         dataTestId="abstract"
+        isMarkdown
       />
       <GovernanceActionCardElement
         label={t("govActions.motivation")}
         text={motivation}
         textVariant="longText"
         dataTestId="motivation"
+        isMarkdown
       />
       <GovernanceActionCardElement
         label={t("govActions.rationale")}
         text={rationale}
         textVariant="longText"
         dataTestId="rationale"
+        isMarkdown
       />
       {details &&
         Object.keys(details).length !== 0 &&

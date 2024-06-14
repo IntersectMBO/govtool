@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import Markdown from "react-markdown";
 
 import { Typography, Tooltip, CopyButton, TooltipProps } from "@atoms";
 
@@ -22,7 +23,10 @@ type OtherVariantsProps = BaseProps & {
   isCopyButton?: boolean;
 };
 
-type GovernanceActionCardElementProps = PillVariantProps | OtherVariantsProps;
+type GovernanceActionCardElementProps = (
+  | PillVariantProps
+  | OtherVariantsProps
+) & { isMarkdown?: boolean };
 
 export const GovernanceActionCardElement = ({
   label,
@@ -33,6 +37,7 @@ export const GovernanceActionCardElement = ({
   isCopyButton,
   tooltipProps,
   marginBottom,
+  isMarkdown = false,
 }: GovernanceActionCardElementProps) => {
   if (!text) {
     return null;
@@ -105,31 +110,56 @@ export const GovernanceActionCardElement = ({
               overflow: "hidden",
             }}
           >
-            <Typography
-              sx={{
-                fontSize: isSliderCard ? 14 : 16,
-                fontWeight: 400,
-                maxWidth: textVariant === "oneLine" ? "283px" : "auto",
-                lineHeight: isSliderCard ? "20px" : "24px",
-                ...(textVariant === "oneLine" && { whiteSpace: "nowrap" }),
-                ...((textVariant === "oneLine" ||
-                  textVariant === "twoLines") && {
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }),
-                ...(textVariant === "twoLines" && {
-                  display: "-webkit-box",
-                  WebkitBoxOrient: "vertical",
-                  WebkitLineClamp: 2,
-                  whiteSpace: "normal",
-                }),
-                ...(isCopyButton && {
-                  color: "primaryBlue",
-                }),
-              }}
-            >
-              {text}
-            </Typography>
+            {isMarkdown ? (
+              <Markdown
+                components={{
+                  // eslint-disable-next-line
+                  p(props) {
+                    const { children } = props;
+                    return (
+                      <Typography
+                        sx={{
+                          fontSize: 16,
+                          fontWeight: 400,
+                          lineHeight: "24px",
+                          maxWidth: "auto",
+                        }}
+                      >
+                        {children}
+                      </Typography>
+                    );
+                  },
+                }}
+              >
+                {text.toString()}
+              </Markdown>
+            ) : (
+              <Typography
+                sx={{
+                  fontSize: isSliderCard ? 14 : 16,
+                  fontWeight: 400,
+                  maxWidth: textVariant === "oneLine" ? "283px" : "auto",
+                  lineHeight: isSliderCard ? "20px" : "24px",
+                  ...(textVariant === "oneLine" && { whiteSpace: "nowrap" }),
+                  ...((textVariant === "oneLine" ||
+                    textVariant === "twoLines") && {
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }),
+                  ...(textVariant === "twoLines" && {
+                    display: "-webkit-box",
+                    WebkitBoxOrient: "vertical",
+                    WebkitLineClamp: 2,
+                    whiteSpace: "normal",
+                  }),
+                  ...(isCopyButton && {
+                    color: "primaryBlue",
+                  }),
+                }}
+              >
+                {text}
+              </Typography>
+            )}
             {isCopyButton && (
               <Box ml={1}>
                 <CopyButton text={text.toString()} variant="blueThin" />

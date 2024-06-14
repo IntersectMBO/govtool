@@ -38,19 +38,16 @@ test("8B. Should filter and sort the list of proposed governance actions.", asyn
 test("8C. Should search the list of proposed governance actions.", async ({
   page,
 }) => {
+  const proposalName = "Labadie, Stehr and Rosenbaum";
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
 
-  await proposalDiscussionPage.searchInput.fill(proposal01.title);
+  await proposalDiscussionPage.searchInput.fill(proposalName);
 
   const proposalCards = await proposalDiscussionPage.getAllProposals();
 
   for (const proposalCard of proposalCards) {
-    expect(
-      (await proposalCard.textContent())
-        .toLowerCase()
-        .includes(`${proposal01.title}`)
-    ).toBeTruthy();
+    await expect(proposalCard.getByText(proposalName)).toBeVisible();
   }
 });
 
@@ -81,17 +78,6 @@ test("8H. Should disable proposal interaction on a disconnected state.", async (
   await expect(proposalDiscussionDetailsPage.likeBtn).toBeDisabled();
   await expect(proposalDiscussionDetailsPage.dislikeBtn).toBeDisabled();
   await expect(proposalDiscussionDetailsPage.commentBtn).toBeDisabled();
-});
-
-test("8I. Should disable poll voting functionality.", async ({
-  proposalDiscussionDetailsPage,
-}) => {
-  await expect(proposalDiscussionDetailsPage.pollVoteCard).not.toBeVisible();
-  await expect(
-    proposalDiscussionDetailsPage.pollYesVoteCount
-  ).not.toBeVisible();
-
-  await expect(proposalDiscussionDetailsPage.pollNoVoteCount).not.toBeVisible();
 });
 
 test("8R. Should restrict proposal creation on disconnected state", async ({

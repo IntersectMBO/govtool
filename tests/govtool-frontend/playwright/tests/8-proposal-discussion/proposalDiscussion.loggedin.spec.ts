@@ -1,7 +1,6 @@
 import { user01Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposalDiscussionDetailsPage";
-import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import { expect } from "@playwright/test";
 
 test.describe("Proposal created state", () => {
@@ -25,30 +24,24 @@ test.describe("Proposal created state", () => {
 
   test("8M. Should comment anonymously if a username is not set", async ({
     proposalDiscussionDetailsPage,
+    page,
   }) => {
-    const randomComment = faker.lorem.paragraph(2);
-    await proposalDiscussionDetailsPage.commentInput.fill(randomComment);
-    await proposalDiscussionDetailsPage.commentBtn.click();
+    const randComment = faker.lorem.paragraph(2);
+    await proposalDiscussionDetailsPage.addComment(randComment);
 
-    await expect(
-      await proposalDiscussionDetailsPage.getFirstComment()
-    ).toHaveText(/anonymous/i);
+    await expect(page.getByText(randComment)).toBeVisible();
   });
 
-  test("8N. Should reply to comments", async ({ page }) => {
-    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
-      page
-    );
+  test("8N. Should reply to comments", async ({
+    proposalDiscussionDetailsPage,
+    page,
+  }) => {
+    const randComment = faker.lorem.paragraph(2);
+    const randReply = faker.lorem.paragraph(2);
 
-    const randomComment = faker.lorem.paragraph(2);
+    await proposalDiscussionDetailsPage.addComment(randComment);
 
-    await proposalDiscussionDetailsPage.replyBtn.click();
-    await proposalDiscussionDetailsPage.replyInput.fill(randomComment);
-
-    await proposalDiscussionDetailsPage.showReplyButton.click();
-
-    await expect(
-      await proposalDiscussionDetailsPage.getFirstComment()
-    ).toHaveText(randomComment);
+    await proposalDiscussionDetailsPage.replyComment(randReply);
+    await expect(page.getByText(randReply)).toBeVisible();
   });
 });

@@ -4,14 +4,12 @@ import { CommentResponse } from "@types";
 
 export default class ProposalDiscussionDetailsPage {
   // Buttons
-  readonly likeBtn = this.page.getByRole("button").nth(6);
+  readonly likeBtn = this.page.getByRole("button", {
+    name: "proposal likes",
+  });
   readonly dislikeBtn = this.page.getByRole("button", {
     name: "proposal dislikes",
   });
-  readonly commentBtn = this.page.getByRole("button", {
-    name: "Comment",
-    exact: true,
-  }); // this.page.getByTestId("comment-button");
   readonly addPollBtn = this.page.getByTestId("add-poll");
   readonly SubmitBtn = this.page.getByTestId("submit-button");
   readonly menuBtn = this.page.getByTestId("menu-button");
@@ -24,14 +22,9 @@ export default class ProposalDiscussionDetailsPage {
     .filter({ hasText: /^Comments$/ })
     .getByRole("button"); // this.page.getByTestId("sort-button");
   readonly proposeGovernanceAction = this.page.getByTestId("propose-GA-button");
-  readonly replyBtn = this.page.getByTestId("reply-button");
   readonly pollYesBtn = this.page.getByTestId("poll-yes-button");
   readonly pollNoBtn = this.page.getByTestId("poll-No-button");
   readonly showReplyButton = this.page.getByTestId("show-more-reply");
-
-  // Inputs
-  readonly commentInput = this.page.getByRole("textbox"); //this.page.getByTestId("comment-input");
-  readonly replyInput = this.page.getByTestId("reply-input");
 
   // Indicators
   readonly likesCounts = this.page.getByTestId("likes-count");
@@ -59,9 +52,17 @@ export default class ProposalDiscussionDetailsPage {
     );
   }
 
-  async getFirstComment() {
-    await this.page.waitForTimeout(2_000);
-    return this.page.locator('[data-testid$="-comment-card"]').first();
+  async addComment(comment: string) {
+    await this.page.getByRole("textbox").fill(comment);
+    await this.page
+      .getByRole("button", { name: "Comment", exact: true })
+      .click();
+  }
+
+  async replyComment(reply: string) {
+    await this.page.getByRole("button", { name: "Reply" }).click();
+    await this.page.getByPlaceholder("Add comment").fill(reply);
+    await this.page.getByRole("button", { name: "Comment" }).nth(2).click();
   }
 
   async sortAndValidate(

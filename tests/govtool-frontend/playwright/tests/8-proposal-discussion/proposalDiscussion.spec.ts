@@ -6,7 +6,8 @@ import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { expect } from "@playwright/test";
 
 const mockProposal = require("../../lib/_mock/proposal.json");
-const mockPoll = require("../../lib/_mock/poll.json");
+const mockPoll = require("../../lib/_mock/proposalPoll.json");
+const mockComments = require("../../lib/_mock/proposalComments.json");
 
 test.beforeEach(() => {
   setAllureEpic("Proposal Discussion Forum");
@@ -80,7 +81,7 @@ test("8H. Should disable proposal interaction on a disconnected state.", async (
   await expect(proposalDiscussionDetailsPage.commentBtn).toBeDisabled();
 });
 
-test("8R. Should restrict proposal creation on disconnected state", async ({
+test("8S. Should restrict proposal creation on disconnected state", async ({
   page,
 }) => {
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
@@ -99,9 +100,15 @@ test.describe("Mocked proposal", () => {
       })
     );
 
-    await page.route("**/api/polls/**", async (route) =>
+    await page.route("**/api/polls**", async (route) =>
       route.fulfill({
         body: JSON.stringify(mockPoll),
+      })
+    );
+
+    await page.route("**/api/comments**", async (route) =>
+      route.fulfill({
+        body: JSON.stringify(mockComments),
       })
     );
 
@@ -128,5 +135,11 @@ test.describe("Mocked proposal", () => {
     await expect(proposalDiscussionDetailsPage.pollYesBtn).not.toBeVisible();
 
     await expect(proposalDiscussionDetailsPage.pollNoBtn).not.toBeVisible();
+  });
+
+  test("8F. Should display all comments with count indication.", async () => {
+    await expect(proposalDiscussionDetailsPage.commentsCount).toHaveText(
+      mockProposal.data.attributes.prop_comments_number
+    );
   });
 });

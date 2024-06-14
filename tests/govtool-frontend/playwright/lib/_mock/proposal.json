@@ -4,7 +4,7 @@
     "attributes": {
       "prop_likes": 0,
       "prop_dislikes": 0,
-      "prop_comments_number": 0,
+      "prop_comments_number": 3,
       "prop_submited": false,
       "prop_status_id": null,
       "user_id": "52",

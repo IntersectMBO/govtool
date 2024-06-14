@@ -34,6 +34,14 @@ export default class ProposalDiscussionPage {
     await this.page.waitForTimeout(2_000);
   }
 
+  async closeUsernamePrompt() {
+    await this.page
+      .locator("div")
+      .filter({ hasText: /^Hey, setup your username$/ })
+      .getByRole("button")
+      .click();
+  }
+
   async viewFirstProposal(): Promise<ProposalDiscussionDetailsPage> {
     await this.page
       .locator('[data-testid^="govaction-"][data-testid$="-view-detail"]')

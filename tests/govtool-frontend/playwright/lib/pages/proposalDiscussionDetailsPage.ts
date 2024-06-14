@@ -48,6 +48,9 @@ export default class ProposalDiscussionDetailsPage {
   readonly commentCard =
     this.proposeGovernanceAction.getByTestId("comment-card");
 
+  //inputs
+  readonly commentInput = this.page.getByRole("textbox");
+
   constructor(private readonly page: Page) {}
 
   async goto(proposalId: number) {
@@ -65,7 +68,7 @@ export default class ProposalDiscussionDetailsPage {
   }
 
   async addComment(comment: string) {
-    await this.page.getByRole("textbox").fill(comment);
+    await this.commentInput.fill(comment);
     await this.page
       .getByRole("button", { name: "Comment", exact: true })
       .click();

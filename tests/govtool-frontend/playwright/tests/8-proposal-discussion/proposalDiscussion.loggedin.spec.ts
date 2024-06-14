@@ -35,6 +35,18 @@ test.describe("Proposal created logged in state", () => {
     await expect(page.getByText("01", { exact: true })).toBeVisible();
   });
 
+  test("8J. Should sort the proposed governance action comments.", async ({}) => {
+    for (let i = 0; i < 4; i++) {
+      const comment = faker.lorem.paragraph(2);
+      await proposalDiscussionDetailsPage.addComment(comment);
+    }
+
+    await proposalDiscussionDetailsPage.sortAndValidate(
+      "asc",
+      (date1, date2) => new Date(date1) <= new Date(date2)
+    );
+  });
+
   test("8M. Should comment anonymously if a username is not set", async ({
     page,
   }) => {
@@ -130,5 +142,56 @@ test.describe("Proposal created logged out state", () => {
 
     await expect(userPage.getByText(/anonymous/i)).not.toBeVisible();
     await expect(userPage.getByText(userName)).toBeVisible();
+  });
+});
+
+test.describe("Add and cancel poll", () => {
+  test.use({ storageState: ".auth/user01.json", wallet: user01Wallet });
+  let proposalId: number;
+  test.beforeEach(async ({ page }) => {
+    const proposalDiscussionPage = new ProposalDiscussionPage(page);
+    await proposalDiscussionPage.goto();
+    await proposalDiscussionPage.closeUsernamePrompt();
+
+    proposalId = await proposalDiscussionPage.createProposal();
+    console.log({ proposalId });
+  });
+
+  test.afterEach(async ({ page }) => {
+    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
+      page
+    );
+    await proposalDiscussionDetailsPage.goto(proposalId);
+
+    await proposalDiscussionDetailsPage.deleteProposal();
+  });
+
+  test("8P. Should add poll on own proposal", async ({ page }) => {
+    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
+      page
+    );
+    await proposalDiscussionDetailsPage.goto(proposalId);
+
+    await proposalDiscussionDetailsPage.addPollBtn.click();
+
+    await expect(proposalDiscussionDetailsPage.addPollBtn).not.toBeVisible();
+    await expect(proposalDiscussionDetailsPage.closePollBtn).toBeVisible();
+  });
+
+  test("8R. Should disable voting after cancelling the poll with the current poll result.", async ({
+    page,
+  }) => {
+    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
+      page
+    );
+    await proposalDiscussionDetailsPage.goto(proposalId);
+
+    await proposalDiscussionDetailsPage.addPollBtn.click();
+
+    await proposalDiscussionDetailsPage.closePollBtn.click();
+
+    await proposalDiscussionDetailsPage.closePollYesBtn.click();
+
+    await expect(proposalDiscussionDetailsPage.closePollBtn).not.toBeVisible();
   });
 });

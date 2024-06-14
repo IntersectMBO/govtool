@@ -1,9 +1,12 @@
-import { proposal01 } from "@constants/staticProposals";
 import { faker } from "@faker-js/faker";
-import { test } from "@fixtures/proposalDiscussionDetailsPage";
+import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
+import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { expect } from "@playwright/test";
+
+const mockProposal = require("../../lib/_mock/proposal.json");
+const mockPoll = require("../../lib/_mock/poll.json");
 
 test.beforeEach(() => {
   setAllureEpic("Proposal Discussion Forum");
@@ -98,4 +101,46 @@ test("8R. Should restrict proposal creation on disconnected state", async ({
   await proposalDiscussionPage.goto();
 
   await expect(proposalDiscussionPage.proposalCreateBtn).not.toBeVisible();
+});
+
+test.describe("Mocked proposal", () => {
+  let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
+
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/proposals/**", async (route) =>
+      route.fulfill({
+        body: JSON.stringify(mockProposal),
+      })
+    );
+
+    await page.route("**/api/polls/**", async (route) =>
+      route.fulfill({
+        body: JSON.stringify(mockPoll),
+      })
+    );
+
+    proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
+    await proposalDiscussionDetailsPage.goto(10);
+  });
+
+  test("8E. Should share proposed governance action", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+
+    await page.getByTestId("share-button").click();
+    await expect(page.getByText("Copied to clipboard")).toBeVisible();
+    const copiedTextDRepDirectory = await page.evaluate(() =>
+      navigator.clipboard.readText()
+    );
+    expect(copiedTextDRepDirectory).toEqual(mockProposal.data.id);
+  });
+
+  test("8I. Should disable poll voting functionality.", async () => {
+    await expect(proposalDiscussionDetailsPage.pollVoteCard).not.toBeVisible();
+    await expect(proposalDiscussionDetailsPage.pollYesBtn).not.toBeVisible();
+
+    await expect(proposalDiscussionDetailsPage.pollNoBtn).not.toBeVisible();
+  });
 });

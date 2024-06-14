@@ -1,0 +1,44 @@
+{
+  "data": {
+    "id": 128,
+    "attributes": {
+      "prop_likes": 0,
+      "prop_dislikes": 0,
+      "prop_comments_number": 0,
+      "prop_submited": false,
+      "prop_status_id": null,
+      "user_id": "52",
+      "createdAt": "2024-06-14T08:28:18.000Z",
+      "updatedAt": "2024-06-14T08:28:18.000Z",
+      "content": {
+        "id": 121,
+        "attributes": {
+          "proposal_id": "128",
+          "prop_rev_active": true,
+          "prop_abstract": "Calamitas suppono coniuratio aiunt pecto uberrime deleniti tepidus acerbitas. Nihil vitium conservo abeo tametsi odit creator basium.",
+          "prop_motivation": "Demonstro apparatus torrens patrocinor. Concedo campana possimus agnosco tutamen astrum conventus defendo sublime.",
+          "prop_rationale": "Brevis suppellex coadunatio vis. Alii terreo carbo sono utilis vicissitudo.",
+          "gov_action_type_id": "1",
+          "prop_name": "Labadie, Stehr and Rosenbaum",
+          "prop_receiving_address": "addr_test1qqqqqqqqqqa4kpmh",
+          "prop_amount": 402,
+          "createdAt": "2024-06-14T08:28:18.012Z",
+          "updatedAt": "2024-06-14T08:28:18.012Z",
+          "is_draft": false,
+          "user_id": "52",
+          "proposal_links": [],
+          "gov_action_type": {
+            "id": 1,
+            "attributes": {
+              "gov_action_type_name": "Info",
+              "createdAt": "2024-05-27T15:06:15.640Z",
+              "updatedAt": "2024-05-27T15:06:15.640Z"
+            }
+          }
+        }
+      },
+      "user_govtool_username": "Jett.Hagenes21"
+    }
+  },
+  "meta": {}
+}

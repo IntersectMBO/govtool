@@ -105,6 +105,10 @@ library
                , vector
                , async
                , hedis
+               , websockets
+               , uuid
+               , servant-websockets
+               , servant-openapi3
 
   exposed-modules: VVA.Config
                  , VVA.CommandLine

@@ -108,6 +108,7 @@ export const GovernanceActionCardElement = ({
               display: "flex",
               alignItems: "center",
               overflow: "hidden",
+              flexDirection: "column",
             }}
           >
             {isMarkdown ? (

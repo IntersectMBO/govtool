@@ -20,7 +20,7 @@ type Story = StoryObj<typeof meta>;
 async function assertCardInfo(canvas: ReturnType<typeof within>) {
   expect(canvas.getByText("Action card")).toBeVisible();
   expect(canvas.queryByText(/lorem/i)).toBeInTheDocument();
-  expect(canvas.queryByRole("img")).toBeInTheDocument();
+  expect(canvas.queryAllByRole("img")).not.toHaveLength(0);
 }
 
 export const DashboardCardComponent: Story = {
@@ -61,11 +61,13 @@ export const WithDRepIdDashboardCardComponent: Story = {
     ),
   },
   play: async ({ canvasElement }) => {
-    const dRepId = "";
+    const dRepId = "drep133vmtzlem9asdkl4jfs3f9mrg5jg34tymf4uzwj2nx0fgwyg9ds";
     const canvas = within(canvasElement);
 
     await assertCardInfo(canvas);
-    await expect(canvas.getByTestId("drep-id-info")).toHaveTextContent(dRepId);
+    await expect(
+      canvas.getByTestId("dRep-id-display-card-dashboard"),
+    ).toHaveTextContent(dRepId);
   },
 };
 

@@ -789,7 +789,7 @@ const CardanoProvider = (props: Props) => {
           infoGovAct,
           anchor,
           rewardAddr,
-          BigNum.from_str(epochParams.gov_action_deposit.toString()),
+          BigNum.from_str(epochParams?.gov_action_deposit.toString()),
         );
         govActionBuilder.add(votingProposal);
 
@@ -830,7 +830,7 @@ const CardanoProvider = (props: Props) => {
           treasuryGovAct,
           anchor,
           rewardAddr,
-          BigNum.from_str(epochParams.gov_action_deposit.toString()),
+          BigNum.from_str(epochParams?.gov_action_deposit.toString()),
         );
         govActionBuilder.add(votingProposal);
 

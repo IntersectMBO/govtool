@@ -86,7 +86,7 @@ export const DashboardCards = () => {
 
         <ProposeGovActionDashboardCard
           createGovActionTx={pendingTransaction.createGovAction}
-          deposit={protocolParams.gov_action_deposit}
+          deposit={protocolParams?.gov_action_deposit}
           votingPower={votingPower}
         />
       </Box>

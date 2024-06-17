@@ -59,7 +59,7 @@ services:
       context: ../../govtool/metadata-validation
     environment:
       VIRTUAL_HOST: https://${BASE_DOMAIN}/metadata-validation/ -> :3000
-      PORT: '3000'
+      PORT: "3000"
     networks:
       - frontend
     deploy:
@@ -68,3 +68,15 @@ services:
       placement:
         constraints:
           - node.labels.govtool==true
+  storybook:
+    image: govtool/storybook:${GOVTOOL_TAG}
+    build:
+      context: ../../govtool/frontend
+      dockerfile: Dockerfile.story
+      args:
+        NPMRC_TOKEN: ${NPMRC_TOKEN}
+    environments:
+      VIRTUAL_HOST: https://${BASE_DOMAIN}-storybook
+    deploy:
+      restart_policy:
+        delay: "30s"

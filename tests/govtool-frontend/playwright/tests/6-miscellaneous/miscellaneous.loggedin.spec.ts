@@ -91,7 +91,9 @@ test.describe("Logged in user", () => {
       dRepDirectoryPage.abstainInfoButton.click(),
     ]);
 
-    await expect(abstain_Info_Page).toHaveURL(`${environments.docsUrl}`);
+    await expect(abstain_Info_Page).toHaveURL(
+      `${environments.docsUrl}/how-to-use-the-govtool/using-govtool/delegating/abstain-from-every-vote`
+    );
 
     const [signal_No_Confidence_Info_Page] = await Promise.all([
       context.waitForEvent("page"),
@@ -99,7 +101,7 @@ test.describe("Logged in user", () => {
     ]);
 
     await expect(signal_No_Confidence_Info_Page).toHaveURL(
-      `${environments.docsUrl}`
+      `${environments.docsUrl}/how-to-use-the-govtool/using-govtool/delegating/signal-no-confidence-on-every-vote`
     );
   });
 

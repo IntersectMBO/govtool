@@ -10,7 +10,6 @@ import           Data.Map (Map)
 import qualified Network.WebSockets.Connection as WS
 import           GHC.Conc (TVar, threadDelay, readTVar, readTVarIO, writeTVar, atomically)
 import           Data.Maybe
-import           Data.Either.Extra (mapRight)
 import Data.UUID.V4 (nextRandom)
 import           Network.WebSockets.Connection (Connection)
 import qualified Database.Redis as Redis

@@ -3,8 +3,13 @@ import { Box, IconButton } from "@mui/material";
 
 import { VotingPowerChips, Typography } from "@atoms";
 import { ICONS } from "@consts";
-import { useScreenDimension } from "@hooks";
+import {
+  useGetDRepVotingPowerQuery,
+  useGetVoterInfo,
+  useScreenDimension,
+} from "@hooks";
 import { DashboardDrawerMobile } from "@organisms";
+import { useCardano } from "@context";
 
 type DashboardTopNavProps = {
   title: string;
@@ -20,6 +25,9 @@ export const DashboardTopNav = ({
   const [windowScroll, setWindowScroll] = useState<number>(0);
   const { isMobile } = useScreenDimension();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const { isEnableLoading } = useCardano();
+  const { voter } = useGetVoterInfo();
+  const { dRepVotingPower } = useGetDRepVotingPowerQuery(voter);
 
   const openDrawer = () => {
     setIsDrawerOpen(true);
@@ -76,7 +84,17 @@ export const DashboardTopNav = ({
           ) : null}
         </Box>
         <Box display="flex">
-          {!isVotingPowerHidden && <VotingPowerChips />}
+          {!isVotingPowerHidden && (
+            <VotingPowerChips
+              isLoading={
+                dRepVotingPower === undefined || !!isEnableLoading || !voter
+              }
+              isShown={
+                voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
+              }
+              votingPower={dRepVotingPower}
+            />
+          )}
           {isMobile && (
             <IconButton
               data-testid="open-drawer-button"

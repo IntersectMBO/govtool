@@ -26,7 +26,7 @@ class Proposal(TypedDict):
     url: str
     metadataHash: str
     title: Optional[str]
-    about: Optional[str]
+    abstract: Optional[str]
     motivation: Optional[str]
     rationale: Optional[str]
     metadata: Optional[dict]
@@ -34,6 +34,8 @@ class Proposal(TypedDict):
     yesVotes: int
     noVotes: int
     abstainVotes: int
+    metadataStatus: str
+    metadataValid: bool
 
 
 class Drep(TypedDict):

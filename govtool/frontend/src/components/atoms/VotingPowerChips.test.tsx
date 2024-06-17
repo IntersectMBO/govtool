@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as Hooks from "@hooks";
-import * as Context from "@context";
 import * as Utils from "@utils";
 import { VotingPowerChips } from "@atoms";
 

@@ -51,7 +51,7 @@ test.describe("Logged in user", () => {
     ]);
 
     await expect(directVoterLearnMorepage).toHaveURL(
-      `${environments.docsUrl}/faqs/what-does-it-mean-to-register-as-a-drep`
+      `${environments.docsUrl}/how-to-use-the-govtool/using-govtool/direct-voting`
     );
 
     const [GA_LearnMorepage] = await Promise.all([
@@ -59,7 +59,9 @@ test.describe("Logged in user", () => {
       page.getByTestId("learn-more-governance-actions-button").click(),
     ]);
 
-    await expect(GA_LearnMorepage).toHaveURL("https://sancho.network/actions/");
+    await expect(GA_LearnMorepage).toHaveURL(
+      `${environments.docsUrl}/how-to-use-the-govtool/using-govtool/governance-actions/governance-actions-how-to-vote`
+    );
 
     const [proposed_GA_VoterLearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
@@ -71,7 +73,7 @@ test.describe("Logged in user", () => {
     ]); // BUG should be unique test id
 
     await expect(proposed_GA_VoterLearnMorepage).toHaveURL(
-      `${environments.docsUrl}/faqs/what-is-a-governance-action`
+      `${environments.docsUrl}/how-to-use-the-govtool/using-govtool/governance-actions`
     );
   });
 

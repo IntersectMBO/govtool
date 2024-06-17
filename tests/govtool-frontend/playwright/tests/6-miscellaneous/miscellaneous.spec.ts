@@ -75,7 +75,9 @@ test("6D. Should open Sanchonet docs in a new tab when clicking `Learn More` on 
     page.getByTestId("lear-more-about-sole-voter-button").click(),
   ]);
 
-  await expect(directVoterLearnMorepage).toHaveURL(`${environments.docsUrl}`);
+  await expect(directVoterLearnMorepage).toHaveURL(
+    `${environments.docsUrl}/how-to-use-the-govtool/using-govtool/direct-voting`
+  );
 
   const [proposed_GA_VoterLearnMorepage] = await Promise.all([
     context.waitForEvent("page"),
@@ -83,6 +85,6 @@ test("6D. Should open Sanchonet docs in a new tab when clicking `Learn More` on 
   ]);
 
   await expect(proposed_GA_VoterLearnMorepage).toHaveURL(
-    `${environments.docsUrl}`
+    `${environments.docsUrl}/how-to-use-the-govtool/using-govtool/governance-actions`
   );
 });

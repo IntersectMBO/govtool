@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { Box, Button, IconButton } from "@mui/material";
-import { IconPlusCircle } from "@intersect.mbo/intersectmbo.org-icons-set";
+import { Box, IconButton } from "@mui/material";
 
 import { VotingPowerChips, Typography } from "@atoms";
-import { ICONS, PATHS, PDF_PATHS } from "@consts";
-import { useScreenDimension, useTranslation } from "@hooks";
+import { ICONS } from "@consts";
+import { useScreenDimension } from "@hooks";
 import { DashboardDrawerMobile } from "@organisms";
 
 type DashboardTopNavProps = {
@@ -18,26 +17,12 @@ export const DashboardTopNav = ({
   title,
   isVotingPowerHidden,
 }: DashboardTopNavProps) => {
-  const { t } = useTranslation();
-  const isProposalDiscussion = Object.values(PDF_PATHS).some(
-    (pdfPath) =>
-      window.location.pathname.includes(pdfPath) &&
-      window.location.pathname.includes(
-        PATHS.connectedProposalPillar.replace("/*", ""),
-      ),
-  );
   const [windowScroll, setWindowScroll] = useState<number>(0);
   const { isMobile } = useScreenDimension();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
   const openDrawer = () => {
     setIsDrawerOpen(true);
-  };
-
-  const goToProposalDiscussionCreateGovernanceAction = () => {
-    window.location.href = `${PATHS.connectedProposalPillar.replace("/*", "")}${
-      PDF_PATHS.proposalDiscussionCreateGovernanceAction
-    }`;
   };
 
   useEffect(() => {
@@ -91,9 +76,7 @@ export const DashboardTopNav = ({
           ) : null}
         </Box>
         <Box display="flex">
-          {!isVotingPowerHidden && !isProposalDiscussion && (
-            <VotingPowerChips />
-          )}
+          {!isVotingPowerHidden && <VotingPowerChips />}
           {isMobile && (
             <IconButton
               data-testid="open-drawer-button"
@@ -102,15 +85,6 @@ export const DashboardTopNav = ({
             >
               <img alt="drawer" src={ICONS.drawerIcon} />
             </IconButton>
-          )}
-          {isProposalDiscussion && (
-            <Button
-              variant="contained"
-              startIcon={<IconPlusCircle fill="white" />}
-              onClick={goToProposalDiscussionCreateGovernanceAction}
-            >
-              {t("proposalDiscussion.proposeAGovernanceAction")}
-            </Button>
           )}
         </Box>
         {isMobile && (

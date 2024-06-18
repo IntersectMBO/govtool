@@ -46,6 +46,8 @@ export const GovernanceActionCardElement = ({
     <Box
       data-testid={dataTestId}
       mb={marginBottom ?? isSliderCard ? "20px" : "32px"}
+      maxHeight={isSliderCard ? "72px" : "none"}
+      overflow={isSliderCard ? "hidden" : "visible"}
     >
       <Box
         sx={{
@@ -108,7 +110,7 @@ export const GovernanceActionCardElement = ({
               display: "flex",
               alignItems: "center",
               overflow: "hidden",
-              flexDirection: "column",
+              flexDirection: isMarkdown ? "column" : "row",
             }}
           >
             {isMarkdown ? (

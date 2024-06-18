@@ -20,7 +20,7 @@ export const CopyableInfo = ({
 }: CopyableInfoProps) => (
   <Card
     border
-    data-testid={dataTestId}
+    dataTestId={dataTestId}
     elevation={0}
     sx={{
       px: 1.5,

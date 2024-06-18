@@ -3,7 +3,7 @@ import type { Meta, StoryFn } from "@storybook/react";
 
 import { Field } from "@molecules";
 import { userEvent, within } from "@storybook/testing-library";
-import { ComponentProps } from "react";
+import { ComponentProps, useState } from "react";
 
 const meta: Meta<typeof Field.TextArea> = {
   title: "Example/TextArea",
@@ -16,9 +16,17 @@ const meta: Meta<typeof Field.TextArea> = {
 
 export default meta;
 
-const Template: StoryFn<ComponentProps<typeof Field.TextArea>> = (args) => (
-  <Field.TextArea {...args} />
-);
+const Template: StoryFn<ComponentProps<typeof Field.TextArea>> = (args) => {
+  const [val, setVal] = useState("");
+
+  return (
+    <Field.TextArea
+      {...args}
+      value={val}
+      onChange={(e) => setVal(e.target.value)}
+    />
+  );
+};
 
 async function assertTextbox(canvas: ReturnType<typeof within>) {
   const text = "test";

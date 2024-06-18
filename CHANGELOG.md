@@ -97,6 +97,7 @@ changes.
 - Fix wrong link to the GA Details once it is in progress [Issue 1252](https://github.com/IntersectMBO/govtool/issues/1252)
 - Fix validation of the GAs with missing references [Issue 1282](https://github.com/IntersectMBO/govtool/issues/1282)
 - Fix displaying the GA Markdowns [Issue 1244](https://github.com/IntersectMBO/govtool/issues/1244)
+- Fix app crash on voting on the GA without the connected wallet before [Issue 1313](https://github.com/IntersectMBO/govtool/issues/1313)
 
 ### Changed
 

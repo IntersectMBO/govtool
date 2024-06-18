@@ -1596,10 +1596,10 @@
   resolved "https://registry.npmjs.org/@intersect.mbo/intersectmbo.org-icons-set/-/intersectmbo.org-icons-set-1.0.8.tgz"
   integrity sha512-Y+5vYGlF3Smg/QscQT/4ZwsKTNm2C0GCs2czzYWrE4O4RV2YAAg9MZkQ52u8uZp3cEW0h9vr+f9W9ihhwsNHGQ==
 
-"@intersect.mbo/pdf-ui@^0.1.8":
-  version "0.1.8"
-  resolved "https://registry.npmjs.org/@intersect.mbo/pdf-ui/-/pdf-ui-0.1.8.tgz"
-  integrity sha512-KMprTN0YbYcRAYWF8zmZIQzokdQUh3Q0Fly7zcDstfF8MZB64X5ZphoT1SP7GLSXryLadLVkqK/MuGFrr6LAcQ==
+"@intersect.mbo/pdf-ui@^0.1.9":
+  version "0.1.9"
+  resolved "https://registry.npmjs.org/@intersect.mbo/pdf-ui/-/pdf-ui-0.1.9.tgz"
+  integrity sha512-bP235xVVycjqKQRvECJNvTDYHJ9Lo0CHr+6T1kD0GRHzDEx8tBXAxewv0bMmg/tzVYApWeGvLNaQXR6xJfxl/g==
   dependencies:
     "@fontsource/poppins" "^5.0.14"
     "@intersect.mbo/intersectmbo.org-icons-set" "^1.0.8"

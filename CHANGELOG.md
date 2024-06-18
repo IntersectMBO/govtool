@@ -63,6 +63,8 @@ changes.
 - Add eslint & prettier to frontend package [Issue 166](https://github.com/IntersectMBO/govtool/issues/166)
 - Add DRep list pagination [Issue 740](https://github.com/IntersectMBO/govtool/issues/740)
 - Add PDF pillar [Issue 1090](https://github.com/IntersectMBO/govtool/issues/1090)
+- Replace govtool-wrapper governance action creation in favor of pdf-pillar [Issue 1284](https://github.com/IntersectMBO/govtool/issues/1284)
+- Add sentry environment config [Issue 1324](https://github.com/IntersectMBO/govtool/issues/1324)
 
 ### Fixed
 
@@ -94,6 +96,9 @@ changes.
 - Remove wrongly appended `Yourself` filter on DRep Directory [Issue 1028](https://github.com/IntersectMBO/govtool/issues/1028)
 - Fix validation of uris in metadata [Issue 1011](https://github.com/IntersectMBO/govtool/issues/1011)
 - Fix wrong link to the GA Details once it is in progress [Issue 1252](https://github.com/IntersectMBO/govtool/issues/1252)
+- Fix validation of the GAs with missing references [Issue 1282](https://github.com/IntersectMBO/govtool/issues/1282)
+- Fix displaying the GA Markdowns [Issue 1244](https://github.com/IntersectMBO/govtool/issues/1244)
+- Fix app crash on voting on the GA without the connected wallet before [Issue 1313](https://github.com/IntersectMBO/govtool/issues/1313)
 
 ### Changed
 

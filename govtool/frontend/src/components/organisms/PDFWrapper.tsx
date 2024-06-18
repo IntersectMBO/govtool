@@ -6,7 +6,7 @@ import { useCardano, useGovernanceActions } from "@/context";
 const PDF = React.lazy(() => import("@intersect.mbo/pdf-ui/cjs"));
 
 export const PDFWrapper = () => {
-  const walletAPI = useCardano();
+  const { walletApi, ...context } = useCardano();
   const { createGovernanceActionJsonLD, createHash } = useGovernanceActions();
 
   return (
@@ -14,6 +14,8 @@ export const PDFWrapper = () => {
       sx={{
         px: { xs: 2, sm: 5 },
         py: 3,
+        display: "flex",
+        flex: 1,
       }}
     >
       <Suspense
@@ -32,7 +34,12 @@ export const PDFWrapper = () => {
         }
       >
         <PDF
-          walletAPI={{ ...walletAPI, createGovernanceActionJsonLD, createHash }}
+          walletAPI={{
+            ...context,
+            ...walletApi,
+            createGovernanceActionJsonLD,
+            createHash,
+          }}
           pathname={window.location.pathname}
         />
       </Suspense>

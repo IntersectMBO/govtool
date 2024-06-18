@@ -72,13 +72,13 @@ generate_secret "POSTGRES_PASSWORD" "./secrets/postgres_password"
 for CONFIG_FILE in $(ls ./configs_template)
 do
     echo -n "Config ${PROJECT_NAME}_${CONFIG_FILE}: "
-    envsubst < "./configs_template/$CONFIG_FILE"   > "./configs/${CONFIG_FILE}"
+    ./scripts/envsubst.py < "./configs_template/$CONFIG_FILE"   > "./configs/${CONFIG_FILE}"
 done
 
 for SECRET_FILE in $(ls ./secrets_template)
 do
     echo -n "Secret ${PROJECT_NAME}_${SECRET_FILE}: "
-    envsubst < "./secrets_template/$SECRET_FILE" > "./secrets/${SECRET_FILE}"
+    ./scripts/envsubst.py < "./secrets_template/$SECRET_FILE" > "./secrets/${SECRET_FILE}"
 done
 
 ################################################################################

@@ -1,6 +1,7 @@
+import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { isMobile, openDrawer } from "@helpers/mobile";
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
 import environments from "lib/constants/environments";
 
 test.beforeEach(async () => {
@@ -43,4 +44,45 @@ test("6C. Navigation within the dApp", async ({ page, context }) => {
   }
   await page.getByTestId("dashboard-link").click();
   expect(page.url()).toEqual(`${environments.frontendUrl}/`);
+});
+
+test("6D. Should open Sanchonet docs in a new tab when clicking `Learn More` on dashboards in disconnected state.", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/");
+
+  const [delegationLearnMorepage] = await Promise.all([
+    context.waitForEvent("page"),
+    page.getByTestId("delegate-learn-more-button").click(),
+  ]);
+
+  await expect(delegationLearnMorepage).toHaveURL(
+    `${environments.docsUrl}/faqs/ways-to-use-your-voting-power`
+  );
+
+  const [registerLearnMorepage] = await Promise.all([
+    context.waitForEvent("page"),
+    page.getByTestId("register-learn-more-button").click(),
+  ]);
+
+  await expect(registerLearnMorepage).toHaveURL(
+    `${environments.docsUrl}/faqs/what-does-it-mean-to-register-as-a-drep`
+  );
+
+  const [directVoterLearnMorepage] = await Promise.all([
+    context.waitForEvent("page"),
+    page.getByTestId("lear-more-about-sole-voter-button").click(),
+  ]);
+
+  await expect(directVoterLearnMorepage).toHaveURL(`${environments.docsUrl}`);
+
+  const [proposed_GA_VoterLearnMorepage] = await Promise.all([
+    context.waitForEvent("page"),
+    page.getByRole("button", { name: "Learn more" }).nth(3).click(), // BUG missing test id
+  ]);
+
+  await expect(proposed_GA_VoterLearnMorepage).toHaveURL(
+    `${environments.docsUrl}`
+  );
 });

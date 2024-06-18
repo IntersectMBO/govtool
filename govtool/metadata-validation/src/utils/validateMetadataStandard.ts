@@ -1,4 +1,5 @@
-import { MetadataValidationStatus } from '@enums';
+import { Logger } from '@nestjs/common';
+import { LoggerMessage, MetadataValidationStatus } from '@enums';
 import { cipStandardSchema } from '@schemas';
 import { MetadataStandard } from '@types';
 
@@ -15,6 +16,7 @@ export const validateMetadataStandard = async (
   try {
     await cipStandardSchema[standard]?.validateAsync(data);
   } catch (error) {
+    Logger.error(LoggerMessage.METADATA_VALIDATION_ERROR, error);
     throw MetadataValidationStatus.INCORRECT_FORMAT;
   }
 };

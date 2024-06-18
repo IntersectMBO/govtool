@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { DashboardActionCard } from "@molecules";
+import { CopyableInfo, DashboardActionCard } from "@molecules";
 import { expect } from "@storybook/jest";
 import { within } from "@storybook/testing-library";
 import { IMAGES } from "@/consts";
@@ -20,7 +20,7 @@ type Story = StoryObj<typeof meta>;
 async function assertCardInfo(canvas: ReturnType<typeof within>) {
   expect(canvas.getByText("Action card")).toBeVisible();
   expect(canvas.queryByText(/lorem/i)).toBeInTheDocument();
-  expect(canvas.queryByRole("img")).toBeInTheDocument();
+  expect(canvas.queryAllByRole("img")).not.toHaveLength(0);
 }
 
 export const DashboardCardComponent: Story = {
@@ -43,17 +43,31 @@ export const DashboardCardComponent: Story = {
 
 export const WithDRepIdDashboardCardComponent: Story = {
   args: {
-    buttons: [{ children: "first button" }, { children: "second button" }],
+    buttons: [
+      { children: "first button", variant: "contained" },
+      { children: "second button" },
+    ],
     description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
     imageURL: IMAGES.govActionDelegateImage,
+    state: "active",
     title: "Action card",
+    children: (
+      <CopyableInfo
+        dataTestId="dRep-id-display-card-dashboard"
+        label="Your DRep ID"
+        sx={{ mt: 1 }}
+        value="drep133vmtzlem9asdkl4jfs3f9mrg5jg34tymf4uzwj2nx0fgwyg9ds"
+      />
+    ),
   },
   play: async ({ canvasElement }) => {
-    const dRepId = "";
+    const dRepId = "drep133vmtzlem9asdkl4jfs3f9mrg5jg34tymf4uzwj2nx0fgwyg9ds";
     const canvas = within(canvasElement);
 
     await assertCardInfo(canvas);
-    await expect(canvas.getByTestId("drep-id-info")).toHaveTextContent(dRepId);
+    await expect(
+      canvas.getByTestId("dRep-id-display-card-dashboard"),
+    ).toHaveTextContent(dRepId);
   },
 };
 

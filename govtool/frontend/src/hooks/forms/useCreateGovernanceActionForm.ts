@@ -240,7 +240,7 @@ export const useCreateGovernanceActionForm = (
           openWalletErrorModal({
             error: isInsufficientBalance
               ? t("errors.insufficientBalanceDescription", {
-                  ada: correctAdaFormat(protocolParams.gov_action_deposit),
+                  ada: correctAdaFormat(protocolParams?.gov_action_deposit),
                 })
               : error,
             title: isInsufficientBalance

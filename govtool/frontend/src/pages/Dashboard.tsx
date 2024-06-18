@@ -3,7 +3,7 @@ import { useLocation, Outlet, useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 
 import { Background, ScrollToManage } from "@atoms";
-import { CONNECTED_NAV_ITEMS, PATHS } from "@consts";
+import { CONNECTED_NAV_ITEMS, DRAWER_WIDTH, PATHS } from "@consts";
 import { useCardano } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { DashboardTopNav, Drawer, Footer } from "@organisms";
@@ -20,8 +20,9 @@ export const Dashboard = () => {
   const getPageTitle = (path: string) => {
     if (path === PATHS.dashboard) return t("dashboard.title");
     return (
-      Object.values(CONNECTED_NAV_ITEMS).find(({ navTo }) => pathname.startsWith(navTo))
-        ?.label ?? ""
+      Object.values(CONNECTED_NAV_ITEMS).find(({ navTo }) =>
+        pathname.startsWith(navTo),
+      )?.label ?? ""
     );
   };
 
@@ -53,6 +54,7 @@ export const Dashboard = () => {
             flex: 1,
             flexDirection: "column",
             minHeight: "100vh",
+            width: `calc(100vw - ${DRAWER_WIDTH}px)`,
             overflow: "clip",
             position: "relative",
           }}

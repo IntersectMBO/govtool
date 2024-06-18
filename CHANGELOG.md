@@ -64,6 +64,7 @@ changes.
 - Add DRep list pagination [Issue 740](https://github.com/IntersectMBO/govtool/issues/740)
 - Add PDF pillar [Issue 1090](https://github.com/IntersectMBO/govtool/issues/1090)
 - Replace govtool-wrapper governance action creation in favor of pdf-pillar [Issue 1284](https://github.com/IntersectMBO/govtool/issues/1284)
+- Add sentry environment config [Issue 1324](https://github.com/IntersectMBO/govtool/issues/1324)
 
 ### Fixed
 

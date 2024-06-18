@@ -5,23 +5,11 @@ import * as Utils from "@utils";
 import { VotingPowerChips } from "@atoms";
 
 describe("VotingPowerChips", () => {
-  // const mockUseCardano = vi.spyOn(Context, "useCardano");
-  // const mockUseGetDRepVotingPowerQuery = vi.spyOn(
-  // Hooks,
-  // "useGetDRepVotingPowerQuery",
-  // );
   const mockUseScreenDimension = vi.spyOn(Hooks, "useScreenDimension");
   const mockCorrectAdaFormat = vi.spyOn(Utils, "correctAdaFormat");
   const mockUseTranslation = vi.spyOn(Hooks, "useTranslation");
-  // const mockUseGetVoterInfo = vi.spyOn(Hooks, "useGetVoterInfo");
 
   it("renders loading spinner when data is loading", () => {
-    // mockUseCardano.mockReturnValue({
-    //   isEnableLoading: "demos",
-    // } as ReturnType<typeof Context.useCardano>);
-    // mockUseGetDRepVotingPowerQuery.mockReturnValue(
-    //   {} as ReturnType<typeof Hooks.useGetDRepVotingPowerQuery>,
-    // );
     mockUseScreenDimension.mockReturnValue({
       isMobile: false,
       screenWidth: 1024,
@@ -29,9 +17,6 @@ describe("VotingPowerChips", () => {
     mockUseTranslation.mockReturnValue({
       t: (key: string) => key,
     } as ReturnType<typeof Hooks.useTranslation>);
-    // mockUseGetVoterInfo.mockReturnValue({
-    // voter: { isRegisteredAsDRep: true },
-    // } as ReturnType<typeof Hooks.useGetVoterInfo>);
 
     render(<VotingPowerChips isLoading isShown />);
     expect(screen.getByRole("progressbar")).toBeInTheDocument();

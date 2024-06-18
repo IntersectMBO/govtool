@@ -1,4 +1,6 @@
 FROM node:18-alpine as builder
+
+ARG VITE_APP_ENV='beta'
 ARG VITE_BASE_URL
 ARG VITE_GTM_ID
 ARG VITE_NETWORK_FLAG=0

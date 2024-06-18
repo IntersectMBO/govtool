@@ -9,3 +9,5 @@ export * from "./navItems";
 export * from "./paths";
 export * from "./placeholders";
 export * from "./queryKeys";
+
+export const DRAWER_WIDTH = 268;

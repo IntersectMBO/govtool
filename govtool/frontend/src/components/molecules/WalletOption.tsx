@@ -23,7 +23,7 @@ export const WalletOptionButton: FC<WalletOption> = ({
   cip95Available,
   pathToNavigate,
 }) => {
-  const { pathname, hash } = useLocation();
+  const { pathname, hash, state } = useLocation();
   const { enable, isEnableLoading } = useCardano();
   const {
     palette: { lightBlue },
@@ -38,6 +38,7 @@ export const WalletOptionButton: FC<WalletOption> = ({
         pathToNavigate ?? pathname === "/"
           ? "/dashboard"
           : `connected${pathname}${hash}`,
+        { state },
       );
       return;
     }

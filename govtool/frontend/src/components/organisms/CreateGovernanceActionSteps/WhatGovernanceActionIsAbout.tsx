@@ -50,7 +50,7 @@ export const WhatGovernanceActionIsAbout = ({
         <Trans
           i18nKey="createGovernanceAction.creatingAGovernanceActionDescription"
           values={{
-            deposit: correctAdaFormat(protocolParams.gov_action_deposit),
+            deposit: correctAdaFormat(protocolParams?.gov_action_deposit),
           }}
         />
       </Typography>

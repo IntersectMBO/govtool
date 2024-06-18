@@ -2,24 +2,25 @@ import { Box, CircularProgress } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 import { Typography, Tooltip } from "@atoms";
-import { useCardano } from "@context";
-import {
-  useGetDRepVotingPowerQuery,
-  useGetVoterInfo,
-  useScreenDimension,
-  useTranslation,
-} from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { correctAdaFormat } from "@utils";
 
-export const VotingPowerChips = () => {
-  const { isEnableLoading } = useCardano();
-  const { voter } = useGetVoterInfo();
-  const { dRepVotingPower } = useGetDRepVotingPowerQuery(voter);
+type VotingPowerChipsProps = {
+  votingPower?: number;
+  isLoading?: boolean;
+  isShown?: boolean;
+};
+
+export const VotingPowerChips = ({
+  isLoading,
+  isShown,
+  votingPower,
+}: VotingPowerChipsProps) => {
   const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
 
   return (
-    (voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter) && (
+    isShown && (
       <Box
         data-testid="voting-power-chips"
         sx={{
@@ -56,7 +57,7 @@ export const VotingPowerChips = () => {
             {t("votingPower")}:
           </Typography>
         )}
-        {dRepVotingPower === undefined || isEnableLoading || !voter ? (
+        {isLoading ? (
           <CircularProgress size={20} color="primary" />
         ) : (
           <Typography
@@ -66,7 +67,7 @@ export const VotingPowerChips = () => {
             fontWeight={600}
             sx={{ whiteSpace: "nowrap" }}
           >
-            ₳ {correctAdaFormat(dRepVotingPower) ?? 0}
+            ₳ {correctAdaFormat(votingPower) ?? 0}
           </Typography>
         )}
       </Box>

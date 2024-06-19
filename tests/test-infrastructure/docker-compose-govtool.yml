@@ -80,3 +80,6 @@ services:
     deploy:
       restart_policy:
         delay: "30s"
+      placement:
+        constraints:
+          - node.labels.govtool==true

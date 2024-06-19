@@ -18,6 +18,7 @@
       args:
         chdir: "/opt/govtool/tests/test-infrastructure"
       environment:
+        APP_ENV: :{{ lookup('env', 'APP_ENV') }}
         GTM_ID: "{{ lookup ('env', 'GTM_ID') }}"
         GOVTOOL_TAG: "{{ lookup('env', 'GOVTOOL_TAG') }}"
         NPMRC_TOKEN: "{{ lookup('env','NPMRC_TOKEN') }}"

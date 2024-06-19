@@ -712,12 +712,9 @@ export const en = {
       retireDirectVoter: "Retire as a Direct Voter",
     },
     system: {
-      sanchoNet: "SanchoNet",
-      sanchoNetIsBeta:
-        "The SanchoNet GovTool is currently in beta and it connects to ",
-      testAdaNote:
-        "Please note, this tool uses ‘Test ada’ <0>NOT real ada</0>. All governance actions and related terms pertain to SanchoNet.",
-      toolConnectedToSanchonet: "This tool is connected to SanchoNet",
+      testnetDescription:
+        "The SanchoNet GovTool is currently in beta and it connects to <0>SanchoNet</0>.\n\n Please note, this tool uses ‘Test ada’ <strong>NOT real ada</strong>. All governance actions and related terms pertain to SanchoNet.",
+      testnetTitle: "This tool is connected to SanchoNet",
     },
     tooltips: {
       delegateTodRep: {

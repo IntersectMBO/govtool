@@ -16,7 +16,7 @@ export const WalletInfoCard = () => {
     await disconnectWallet();
     navigate(
       pathname.includes("/connected")
-        ? `${pathname.replace("/connected", "")}${hash}`
+        ? `${pathname.replace("/connected", "")}${hash ?? ""}`
         : PATHS.home,
     );
     window.location.reload();

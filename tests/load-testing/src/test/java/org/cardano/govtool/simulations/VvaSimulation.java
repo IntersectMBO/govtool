@@ -53,7 +53,7 @@ public class VvaSimulation extends Simulation {
     // Load Simulation
     {
         knownDreps= DrepListFetcher.fetchDrepIds(API_URL);
-
+        var DREP_USER_RATI0=0.3
         setUp(
                   makeScenario("User Connects and Leave", exec(), 0.1)
                 , makeScenario("User Registers as Drep",
@@ -62,13 +62,15 @@ public class VvaSimulation extends Simulation {
                         exec(Action.viewProposals), 0.2)
                 , makeScenario("AdaHolder delegates to Drep",
                         exec(AdaHolderAction.delegateToDRep), 0.1)
-                , makeScenario("Drep votes on Proposal",
-                        exec(DRepAction.vote), 0.3 * 0.4)
-                , makeScenario("Drep view Votes",
-                        exec(Action.viewProposals).pause(2).exec(Action.viewProposals), 0.3 * 0.5)
-                , makeScenario("Drep Retirement",
-                        exec(DRepAction.retireAsDRep), 0.3 * 0.1)
                 , makeScenario("ListProposals", PageVisits.visitProposalPage(), 0.2)
+
+                // Further split drep users on scenarios
+                , makeScenario("Drep view Votes",
+                        exec(Action.viewProposals).pause(2).exec(Action.viewProposals), DREP_USER_RATI0 * 0.5)
+                , makeScenario("Drep votes on Proposal",
+                        exec(DRepAction.vote), DREP_USER_RATI0 * 0.4)
+                , makeScenario("Drep Retirement",
+                        exec(DRepAction.retireAsDRep), DREP_USER_RATI0 * 0.1)
         ).protocols(httpProtocol);
     }
 

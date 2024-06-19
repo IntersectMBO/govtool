@@ -15,11 +15,20 @@ on:
         options:
           - "enabled"
           - "disabled"
+      forceRebuildDockerImages:
+        description: "Force rebuild the docker images"
+        required: false
+        type: choice
+        default: "false"
+        options:
+          - "true"
+          - "false"
 
 env:
   ENVIRONMENT: "test"
   CARDANO_NETWORK: "sanchonet"
   DOMAIN: "test-sanchonet.govtool.byron.network"
+  FORCE_REBUILD: ${{inputs.forceRebuildDockerImages == 'true'}}
 
 jobs:
   deploy:

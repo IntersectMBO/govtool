@@ -38,6 +38,7 @@ jobs:
         npm run test:coverage
 
     - uses: sonarsource/sonarqube-scan-action@master
+      if: always()
       with:
         projectBaseDir: govtool/frontend
       env:

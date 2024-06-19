@@ -1,0 +1,24 @@
+{
+  "data": [
+    {
+      "id": 39,
+      "attributes": {
+        "proposal_id": "128",
+        "poll_yes": 0,
+        "poll_no": 0,
+        "poll_start_dt": "2024-06-14T08:26:34.400Z",
+        "is_poll_active": true,
+        "createdAt": "2024-06-14T08:28:20.210Z",
+        "updatedAt": "2024-06-14T08:28:20.210Z"
+      }
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pageSize": 1,
+      "pageCount": 1,
+      "total": 1
+    }
+  }
+}

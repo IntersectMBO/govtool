@@ -20,9 +20,9 @@ services:
       - -c
       - vva-be -c /config.json start-app
     environment:
+      APP_ENV: ${APP_ENV:-test}
       VIRTUAL_HOST: https://${BASE_DOMAIN}/api/ -> :8080/
       VIRTUAL_HOST_2: https://${BASE_DOMAIN}/swagger -> :8080/swagger
-
     networks:
       - frontend
       - postgres
@@ -42,7 +42,9 @@ services:
         VITE_BASE_URL: "/api"
         VITE_SENTRY_DSN: ${SENTRY_DSN_FRONTEND}
         NPMRC_TOKEN: ${NPMRC_TOKEN}
+        VITE_APP_ENV: ${APP_ENV:-test}
         VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "true"
+        GTM_ID: ${GTM_ID}
     environment:
       VIRTUAL_HOST: https://${BASE_DOMAIN}
     networks:
@@ -59,9 +61,24 @@ services:
       context: ../../govtool/metadata-validation
     environment:
       VIRTUAL_HOST: https://${BASE_DOMAIN}/metadata-validation/ -> :3000
-      PORT: '3000'
+      PORT: "3000"
     networks:
       - frontend
+    deploy:
+      restart_policy:
+        delay: "30s"
+      placement:
+        constraints:
+          - node.labels.govtool==true
+  storybook:
+    image: govtool/storybook:${GOVTOOL_TAG}
+    build:
+      context: ../../govtool/frontend
+      dockerfile: storybook.Dockerfile
+      args:
+        NPMRC_TOKEN: ${NPMRC_TOKEN}
+    environment:
+      VIRTUAL_HOST: https://storybook-${BASE_DOMAIN}
     deploy:
       restart_policy:
         delay: "30s"

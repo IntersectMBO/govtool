@@ -75,7 +75,7 @@ test.describe("Logged in user", () => {
     );
   });
 
-  test("6F. should open sanchonet docs in a new tab when clicking `info` button of abstain and signal-no-confidence card", async ({
+  test("6F. Should open sanchonet docs in a new tab when clicking `info` button of abstain and signal-no-confidence card", async ({
     page,
     context,
   }) => {

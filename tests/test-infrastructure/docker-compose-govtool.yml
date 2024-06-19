@@ -72,11 +72,11 @@ services:
     image: govtool/storybook:${GOVTOOL_TAG}
     build:
       context: ../../govtool/frontend
-      dockerfile: Dockerfile.story
+      dockerfile: storybook.Dockerfile
       args:
         NPMRC_TOKEN: ${NPMRC_TOKEN}
-    environments:
-      VIRTUAL_HOST: https://${BASE_DOMAIN}-storybook
+    environment:
+      VIRTUAL_HOST: https://storybook-${BASE_DOMAIN}
     deploy:
       restart_policy:
         delay: "30s"

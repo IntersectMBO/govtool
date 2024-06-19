@@ -31,20 +31,10 @@ jobs:
       working-directory: govtool/frontend
       env:
         NODE_OPTIONS: "--max_old_space_size=4096"
+        NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
       run: |
-        npm install
+        npm ci
         npm run test:coverage
-
-# Running with docker
-#
-#    - name: Run SonarQube Scanner
-#      run: |
-#        docker run --rm \
-#          -e SONAR_HOST_URL="https://sonarcloud.io" \
-#          -e SONAR_TOKEN="ec4183646e59dd70c8077acfabe52062ccbea7a9" \
-#          -v "$(pwd):/usr/src" \
-#          --workdir=/usr/src/govtool/frontend \
-#          sonarsource/sonar-scanner-cli:5.0.1
 
     - uses: sonarsource/sonarqube-scan-action@master
       with:

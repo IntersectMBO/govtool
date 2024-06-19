@@ -24,6 +24,7 @@ then
   update-service govtool_backend  "$BASE_IMAGE_NAME"/backend:${GOVTOOL_TAG}
   update-service govtool_frontend "$BASE_IMAGE_NAME"/frontend:${GOVTOOL_TAG}
   update-service govtool_metadata-validation "$BASE_IMAGE_NAME"/metadata-validation:${GOVTOOL_TAG}
+  update-service govtool_storybook "$BASE_IMAGE_NAME"/storybook:${GOVTOOL_TAG}
 
   update-service govaction-loader_backend "$BASE_IMAGE_NAME"/gov-action-loader-backend:${GOVTOOL_TAG}
   update-service govaction-loader_frontend "$BASE_IMAGE_NAME"/gov-action-loader-frontend:${GOVTOOL_TAG}

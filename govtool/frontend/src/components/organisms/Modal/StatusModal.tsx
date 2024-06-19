@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { Button, Link, Typography } from "@mui/material";
 
 import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
@@ -22,7 +23,7 @@ export interface StatusModalState {
   dataTestId: string;
 }
 
-export const StatusModal = () => {
+export const StatusModal = forwardRef<HTMLDivElement>((_, ref) => {
   const { state, closeModal } = useModal<StatusModalState>();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -34,7 +35,10 @@ export const StatusModal = () => {
   };
 
   return (
-    <ModalWrapper dataTestId={state ? state.dataTestId : "status-modal"}>
+    <ModalWrapper
+      dataTestId={state ? state.dataTestId : "status-modal"}
+      ref={ref}
+    >
       <img
         alt="Status icon"
         src={
@@ -60,6 +64,7 @@ export const StatusModal = () => {
             WebkitBoxOrient: "vertical",
             WebkitLineClamp: 8,
             wordBreak: "break-word",
+            whiteSpace: "pre-line",
           }}
         >
           {state?.message}{" "}
@@ -125,4 +130,4 @@ export const StatusModal = () => {
       )}
     </ModalWrapper>
   );
-};
+});

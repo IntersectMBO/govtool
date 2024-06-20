@@ -121,7 +121,9 @@ test.describe("Validation of dRep Registration Form", () => {
       metadataAnchorGreaterThan128Bytes
     );
 
-    await expect(page.getByTestId("invalid-url-error")).toBeVisible();
+    await expect(
+      page.getByTestId("url-must-be-less-than-128-bytes-error")
+    ).toBeVisible();
   });
 });
 

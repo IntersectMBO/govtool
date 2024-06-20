@@ -156,7 +156,7 @@ test("3O. Should reject invalid dRep registration metadata", async ({
   await dRepRegistrationPage.metadataUrlInput.fill(invalidMetadataAnchor);
   await dRepRegistrationPage.registerBtn.click();
 
-  await expect(
-    page.getByTestId("registration-transaction-error-modal")
-  ).not.toHaveText(/utxo balance insufficient/i);
+  await expect(dRepRegistrationPage.metadataErrorModal).toHaveText(
+    /your external data does not/i
+  );
 });

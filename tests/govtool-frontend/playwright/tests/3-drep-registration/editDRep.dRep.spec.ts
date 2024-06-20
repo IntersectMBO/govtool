@@ -120,7 +120,7 @@ test("3P. Should reject invalid edit dRep metadata", async ({ page }) => {
   await editDRepPage.metadataUrlInput.fill(invalidMetadataAnchor);
   await editDRepPage.continueBtn.click();
 
-  await expect(
-    page.getByTestId("registration-transaction-error-modal")
-  ).toBeVisible();
+  await expect(page.getByTestId("modal")).toHaveText(
+    /your external data does not/i
+  );
 });

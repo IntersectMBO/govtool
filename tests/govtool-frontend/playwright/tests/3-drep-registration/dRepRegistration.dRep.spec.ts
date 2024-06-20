@@ -27,9 +27,9 @@ test.describe("Logged in DReps", () => {
 
     await expect(page.getByTestId("voting-power-chips")).toBeVisible();
 
-    await expect(page.getByTestId("dRep-id-display")).toContainText(
-      dRep01Wallet.dRepId
-    ); // BUG: testId -> dRep-id-display-dashboard (It is taking sidebar dRep-id)
+    await expect(
+      page.getByTestId("dRep-id-display-card-dashboard")
+    ).toContainText(dRep01Wallet.dRepId);
 
     await page.goto(`${environments.frontendUrl}/governance_actions`);
     await page
@@ -63,7 +63,7 @@ test.describe("Logged in DReps", () => {
       dRepMetadata.data
     );
 
-    await page.getByPlaceholder("URL").fill(url);
+    await page.getByTestId("metadata-url-input").fill(url);
     await page.getByTestId("continue-button").click(); // BUG -> incorrect test id
     await page.getByTestId("confirm-modal-button").click();
 

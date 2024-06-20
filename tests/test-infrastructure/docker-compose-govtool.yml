@@ -79,6 +79,8 @@ services:
         NPMRC_TOKEN: ${NPMRC_TOKEN}
     environment:
       VIRTUAL_HOST: https://storybook-${BASE_DOMAIN}
+    networks:
+      - frontend
     deploy:
       restart_policy:
         delay: "30s"

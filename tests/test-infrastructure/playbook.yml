@@ -22,6 +22,7 @@
         GTM_ID: "{{ lookup ('env', 'GTM_ID') }}"
         GOVTOOL_TAG: "{{ lookup('env', 'GOVTOOL_TAG') }}"
         NPMRC_TOKEN: "{{ lookup('env','NPMRC_TOKEN') }}"
+        USERSNAP_SPACE_API_KEY: "{{ lookup('env','USERSNAP_SPACE_API_KEY') }}"
         SENTRY_DSN_FRONTEND: "{{ lookup ('env', 'SENTRY_DSN_FRONTEND') }}"
         SENTRY_DSN_BACKEND: "{{ lookup ('env', 'SENTRY_DSN_BACKEND') }}"
       become: yes

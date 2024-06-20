@@ -25,3 +25,4 @@ export * from "./openInNewTab";
 export * from "./removeDuplicatedProposals";
 export * from "./testIdFromLabel";
 export * from "./wait";
+export * from "./getCip95Wallets";

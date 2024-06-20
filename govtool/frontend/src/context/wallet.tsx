@@ -232,7 +232,6 @@ const CardanoProvider = (props: Props) => {
       setIsEnableLoading(walletName);
       await checkIsMaintenanceOn();
 
-      // todo: use .getSupportedExtensions() to check if wallet supports CIP-95
       if (!isEnabled && walletName) {
         try {
           // Check that this wallet supports CIP-95 connection
@@ -247,9 +246,7 @@ const CardanoProvider = (props: Props) => {
           }
           // Enable wallet connection
           const enabledApi: CardanoApiWallet = await window.cardano[walletName]
-            .enable({
-              extensions: [{ cip: 95 }],
-            })
+            .enable({ extensions: [{ cip: 95 }] })
             .catch((e) => {
               Sentry.captureException(e);
               throw e.info;
@@ -258,8 +255,13 @@ const CardanoProvider = (props: Props) => {
           await getUsedAddresses(enabledApi);
           setIsEnabled(true);
           setWalletApi(enabledApi);
+
           // Check if wallet has enabled the CIP-95 extension
-          const enabledExtensions = await enabledApi.getExtensions();
+          const enabledExtensions = await enabledApi?.getExtensions();
+          if (!enabledExtensions) {
+            throw new Error(t("errors.walletNoCIP30Support"));
+          }
+
           if (!enabledExtensions.some((item) => item.cip === 95)) {
             throw new Error(t("errors.walletNoCIP90FunctionsEnabled"));
           }

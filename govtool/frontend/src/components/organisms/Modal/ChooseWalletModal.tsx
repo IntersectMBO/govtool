@@ -1,13 +1,12 @@
 import { Box, Link, Typography } from "@mui/material";
-import { useMemo } from "react";
+import { To } from "react-router-dom";
 
 import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import { useModal } from "@context";
 import type { WalletOption } from "@molecules";
 import { WalletOptionButton } from "@molecules";
-import { openInNewTab } from "@utils";
+import { openInNewTab, getCip95Wallets } from "@utils";
 import { useTranslation } from "@hooks";
-import { To } from "react-router-dom";
 
 type ChooseWalletModalState = {
   pathToNavigate?: To;
@@ -17,34 +16,7 @@ export const ChooseWalletModal = () => {
   const { t } = useTranslation();
   const { state } = useModal<ChooseWalletModalState>();
 
-  const walletOptions: WalletOption[] = useMemo(() => {
-    if (!window.cardano) return [];
-    const keys = Object.keys(window.cardano);
-    const resultWallets: WalletOption[] = [];
-    keys.forEach((k: string) => {
-      const { icon, name, supportedExtensions } = window.cardano[k];
-      if (icon && name && supportedExtensions) {
-        // Check if the name already exists in resultWallets
-        const isNameDuplicate = resultWallets.some(
-          (wallet) => wallet.label === name,
-        );
-        // Check if the supportedExtensions array contains an entry with cip === 95
-        const isCip95Available = Boolean(
-          supportedExtensions?.find((i) => i.cip === 95),
-        );
-        // If the name is not a duplicate and cip === 95 is available, add it to resultWallets
-        if (!isNameDuplicate && isCip95Available) {
-          resultWallets.push({
-            icon,
-            label: name,
-            name: k,
-            cip95Available: true,
-          });
-        }
-      }
-    });
-    return resultWallets;
-  }, [window]);
+  const walletOptions: WalletOption[] = getCip95Wallets(window.cardano);
 
   return (
     <ModalWrapper dataTestId="connect-your-wallet-modal">

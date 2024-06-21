@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
-import { captureException } from "@sentry/react";
+import * as Sentry from "@sentry/react";
 
 import { downloadTextFile } from "@utils";
 import { MetadataValidationStatus } from "@models";
@@ -85,7 +85,8 @@ export const useVoteContextForm = (
         await validateHash(data.storingURL, hash);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        captureException(error);
+        Sentry.setTag("hook", "useVoteContextForm");
+        Sentry.captureException(error);
       } finally {
         if (setSavedHash) setSavedHash(hash);
         if (setStep) setStep(4);

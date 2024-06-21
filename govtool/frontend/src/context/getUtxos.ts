@@ -13,7 +13,7 @@ type Utxos = {
 }[];
 
 export const getUtxos = async (
-  enabledApi: CardanoApiWallet
+  enabledApi: CardanoApiWallet,
 ): Promise<Utxos | undefined> => {
   const utxos = [];
 
@@ -24,7 +24,7 @@ export const getUtxos = async (
     // eslint-disable-next-line no-restricted-syntax
     for (const rawUtxo of rawUtxos) {
       const utxo = TransactionUnspentOutput.from_bytes(
-        Buffer.from(rawUtxo, "hex")
+        Buffer.from(rawUtxo, "hex"),
       );
       const input = utxo.input();
       const txid = input.transaction_id().to_hex();
@@ -54,7 +54,7 @@ export const getUtxos = async (
               // @ts-ignore
               const assetNameHex = Buffer.from(
                 assetName.name(),
-                "utf8"
+                "utf8",
               ).toString("hex");
               const multiassetAmt = multiasset.get_asset(policyId, assetName);
               multiAssetStr += `+ ${multiassetAmt.to_str()} + ${policyIdHex}.${assetNameHex} (${assetNameString})`;
@@ -76,6 +76,7 @@ export const getUtxos = async (
 
     return utxos;
   } catch (err) {
+    Sentry.setTag("util", "getUtxos");
     Sentry.captureException(err);
     console.error(err);
   }

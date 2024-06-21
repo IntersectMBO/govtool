@@ -1,4 +1,5 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import * as Sentry from "@sentry/react";
 
 import { Typography } from "@atoms";
 import { useCardano, useModal } from "@context";
@@ -34,6 +35,10 @@ export const WhatRetirementMeans = ({
     closeModal();
   };
 
+  useEffect(() => {
+    Sentry.setTag("component_name", "WhatRetirementMeans");
+  }, []);
+
   const retireAsDrep = useCallback(async () => {
     try {
       setIsRetirementLoading(true);
@@ -65,6 +70,7 @@ export const WhatRetirementMeans = ({
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
+      Sentry.captureException(error);
       openWalletErrorModal({
         error,
         onSumbit: onClickCancel,

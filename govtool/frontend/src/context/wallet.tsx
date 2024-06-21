@@ -208,6 +208,7 @@ const CardanoProvider = (props: Props) => {
       // return changeAddress for the usage of the pillars;
       return changeAddress;
     } catch (err) {
+      Sentry.setTag("wallet-action", "getChangeAddress");
       Sentry.captureException(err);
       console.error(err);
     }
@@ -223,6 +224,7 @@ const CardanoProvider = (props: Props) => {
       ).to_bech32();
       setWalletState((prev) => ({ ...prev, usedAddress }));
     } catch (err) {
+      Sentry.setTag("wallet-action", "getUsedAddresses");
       Sentry.captureException(err);
       console.error(err);
     }
@@ -251,8 +253,22 @@ const CardanoProvider = (props: Props) => {
             .enable({
               extensions: [{ cip: 95 }],
             })
+            .then((enabledWalletApi) => {
+              Sentry.addBreadcrumb({
+                category: "wallet",
+                message: "Wallet connected",
+                level: "info",
+                data: window.cardano[walletName],
+              });
+              return enabledWalletApi;
+            })
             .catch((e) => {
-              Sentry.captureException(e);
+              Sentry.addBreadcrumb({
+                category: "wallet",
+                message: "Wallet connection failed",
+                level: "warning",
+              });
+              Sentry.captureException(e, { data: window.cardano[walletName] });
               throw e.info;
             });
           await getChangeAddress(enabledApi);
@@ -352,6 +368,7 @@ const CardanoProvider = (props: Props) => {
 
           return { status: t("ok"), stakeKey: stakeKeySet };
         } catch (e) {
+          Sentry.setTag("wallet-action", "enable");
           Sentry.captureException(e);
           console.error(e);
           setError(`${e}`);
@@ -382,6 +399,12 @@ const CardanoProvider = (props: Props) => {
     setAddress(undefined);
     setStakeKey(undefined);
     setIsEnabled(false);
+
+    Sentry.addBreadcrumb({
+      category: "wallet",
+      message: "Wallet disconnected",
+      level: "info",
+    });
   }, []);
 
   // Create transaction builder
@@ -562,6 +585,7 @@ const CardanoProvider = (props: Props) => {
           disconnectWallet();
         }
 
+        Sentry.setTag("wallet-action", "buildSignSubmitConwayCertTx");
         Sentry.captureException(error);
         console.error(error, "error");
         throw error?.info ?? error;
@@ -608,6 +632,7 @@ const CardanoProvider = (props: Props) => {
 
         return certBuilder;
       } catch (e) {
+        Sentry.setTag("wallet-action", "buildVoteDelegationCert");
         Sentry.captureException(e);
         console.error(e);
         throw e;
@@ -646,6 +671,7 @@ const CardanoProvider = (props: Props) => {
         }
         return Certificate.new_drep_registration(dRepRegCert);
       } catch (e) {
+        Sentry.setTag("wallet-action", "buildDRepRegCert");
         Sentry.captureException(e);
         console.error(e);
         throw e;
@@ -675,6 +701,7 @@ const CardanoProvider = (props: Props) => {
         }
         return Certificate.new_drep_update(dRepUpdateCert);
       } catch (e) {
+        Sentry.setTag("wallet-action", "buildDRepUpdateCert");
         Sentry.captureException(e);
         console.error(e);
         throw e;
@@ -697,6 +724,7 @@ const CardanoProvider = (props: Props) => {
 
         return Certificate.new_drep_deregistration(dRepRetirementCert);
       } catch (e) {
+        Sentry.setTag("wallet-action", "buildDRepRetirementCert");
         Sentry.captureException(e);
         console.error(e);
         throw e;
@@ -750,6 +778,7 @@ const CardanoProvider = (props: Props) => {
 
         return votingBuilder;
       } catch (e) {
+        Sentry.setTag("wallet-action", "buildVote");
         Sentry.captureException(e);
         console.error(e);
         throw e;
@@ -954,6 +983,7 @@ function useCardano() {
         // TODO: type error
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
+        Sentry.setTag("wallet-action", "enable");
         Sentry.captureException(e);
         await context.disconnectWallet();
         navigate(PATHS.home);

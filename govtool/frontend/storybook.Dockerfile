@@ -18,7 +18,7 @@ WORKDIR /src
 COPY --from=deps /src/node_modules ./node_modules
 COPY . .
 
-RUN npm run build-storybook --quiet
+RUN npm run build:storybook --quiet
 
 FROM nginx:stable-alpine
 EXPOSE 80

@@ -144,3 +144,46 @@ await buildSignSubmitConwayCertTx({
 ### Step 6: Verify the Governance Action
 
 `buildSignSubmitConwayCertTx` logs the transaction CBOR making it able to be tracked on the transactions tools such as cexplorer.
+
+## Additional steps for using the GovTool metadata validation on the imported Pillar component
+
+```tsx
+enum MetadataValidationStatus {
+  URL_NOT_FOUND = "URL_NOT_FOUND",
+  INVALID_JSONLD = "INVALID_JSONLD",
+  INVALID_HASH = "INVALID_HASH",
+  INCORRECT_FORMAT = "INCORRECT_FORMAT",
+}
+// Using the props passed to the component
+type Props = {
+  validateMetadata: ({
+    url,
+    hash,
+    standard,
+  }: {
+    url: string;
+    hash: string;
+    standard: "CIP108";
+  }) => Promise<{
+    metadata?: any;
+    status?: MetadataValidationStatus;
+    valid: boolean;
+  }>;
+};
+
+import React, { Suspense } from "react";
+
+const SomeImportedPillar: React.FC<Props> = React.lazy(
+  () => import("path/to/SomeImportedPillar")
+);
+
+const SomeWrapperComponent = () => {
+  const { validateMetadata } = useValidateMutation();
+
+  return (
+    <Suspense fallback={<div>I am lazy loading...</div>}>
+      <SomeImportedPillar validateMetadata={validateMetadata} />
+    </Suspense>
+  );
+};
+```

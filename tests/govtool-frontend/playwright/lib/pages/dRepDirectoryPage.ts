@@ -19,19 +19,17 @@ export default class DRepDirectoryPage {
     "signal-no-confidence-on-every-vote-info-button"
   );
 
-  readonly automaticDelegationOptionsDropdown = this.page.getByRole("button", {
-    name: "Automated Voting Options arrow",
-  }); // BUG: testId -> delegation-options-dropdown
+  readonly automaticDelegationOptionsDropdown = this.page.getByTestId(
+    "automated-voting-options-accordion"
+  );
 
   readonly delegateToDRepCard = this.page.getByTestId("delegate-to-drep-card");
-  readonly signalNoConfidenceCard = this.page
-    .getByRole("region")
-    .locator("div")
-    .filter({ hasText: "Signal No Confidence on Every" })
-    .nth(2); // BUG: testId -> signal-no-confidence-card
-  readonly abstainDelegationCard = this.page.getByText(
-    "Abstain from Every VoteSelect this to vote ABSTAIN to every vote.Voting Power₳"
-  ); // BUG: testId -> abstain-delegation-card
+  readonly signalNoConfidenceCard = this.page.getByTestId(
+    "no-confidence-delegation-card"
+  );
+  readonly abstainDelegationCard = this.page.getByTestId(
+    "abstain-delegation-card"
+  );
 
   readonly delegationErrorModal = this.page.getByTestId(
     "delegate-transaction-error-modal"

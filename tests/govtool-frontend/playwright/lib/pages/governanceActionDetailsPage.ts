@@ -19,9 +19,7 @@ export default class GovernanceActionDetailsPage {
   readonly externalModalBtn = this.page.getByTestId("external-modal-button");
   readonly governanceActionId = this.page.getByText("Governance Action ID:");
 
-  readonly contextBtn = this.page.getByRole("button", {
-    name: "Provide context about your",
-  }); // BUG testId
+  readonly contextBtn = this.page.getByTestId("provide-context-button");
   readonly viewOtherDetailsLink = this.page.getByTestId(
     "view-other-details-button"
   );
@@ -59,14 +57,14 @@ export default class GovernanceActionDetailsPage {
 
       this.page
         .getByRole("button", { name: "download Vote_Context.jsonld" })
-        .click();
+        .click(); // BUG missing test id
       const voteMetadata = await this.downloadVoteMetadata();
       const url = await metadataBucketService.uploadMetadata(
         voteMetadata.name,
         voteMetadata.data
       );
 
-      await this.page.getByPlaceholder("URL").fill(url);
+      await this.page.getByPlaceholder("URL").fill(url); // Bug showing data-testid="undefinedinput" on url
       await this.confirmModalBtn.click();
       await this.page.getByTestId("go-to-vote-modal-button").click();
     }

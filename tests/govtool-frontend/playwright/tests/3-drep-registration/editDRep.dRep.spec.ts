@@ -19,6 +19,8 @@ test.describe("Validation of edit dRep Form", () => {
     const editDRepPage = new EditDRepPage(page);
     await editDRepPage.goto();
 
+    await editDRepPage.addLinkBtn.click();
+
     for (let i = 0; i < 100; i++) {
       await editDRepPage.validateForm(
         faker.internet.displayName(),
@@ -43,6 +45,8 @@ test.describe("Validation of edit dRep Form", () => {
 
     const editDRepPage = new EditDRepPage(page);
     await editDRepPage.goto();
+
+    await editDRepPage.addLinkBtn.click();
 
     for (let i = 0; i < 100; i++) {
       await editDRepPage.inValidateForm(

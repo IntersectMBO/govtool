@@ -217,6 +217,7 @@ const CardanoProvider = (props: Props) => {
     try {
       const raw = await enabledApi.getUsedAddresses();
       const rawFirst = raw[0];
+      if (!rawFirst) return [];
       const usedAddress = Address.from_bytes(
         Buffer.from(rawFirst, "hex"),
       ).to_bech32();
@@ -932,26 +933,17 @@ function useCardano() {
                 status: "info",
                 dataTestId: "info-about-sancho-net-modal",
                 message: (
-                  <p style={{ margin: 0 }}>
-                    {t("system.sanchoNetIsBeta")}
-                    <Link
-                      onClick={() => openInNewTab("https://sancho.network/")}
-                      sx={{ cursor: "pointer" }}
-                    >
-                      {t("system.sanchoNet")}
-                    </Link>
-                    .
-                    <br />
-                    <br />
-                    <Trans
-                      i18nKey="system.testAdaNote"
-                      components={[
-                        <span style={{ fontWeight: 700 }} key="0" />,
-                      ]}
-                    />
-                  </p>
+                  <Trans
+                    i18nKey="system.testnetDescription"
+                    components={[
+                      <Link
+                        onClick={() => openInNewTab("https://sancho.network/")}
+                        sx={{ cursor: "pointer" }}
+                      />,
+                    ]}
+                  />
                 ),
-                title: t("system.toolConnectedToSanchonet"),
+                title: t("system.testnetTitle"),
                 buttonText: t("ok"),
               },
             });

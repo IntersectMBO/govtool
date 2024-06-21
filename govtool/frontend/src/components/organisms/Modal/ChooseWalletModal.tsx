@@ -1,5 +1,5 @@
 import { Box, Link, Typography } from "@mui/material";
-import { useMemo } from "react";
+import { forwardRef, useMemo } from "react";
 
 import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import { useModal } from "@context";
@@ -13,7 +13,7 @@ type ChooseWalletModalState = {
   pathToNavigate?: To;
 };
 
-export const ChooseWalletModal = () => {
+export const ChooseWalletModal = forwardRef<HTMLDivElement>((_, ref) => {
   const { t } = useTranslation();
   const { state } = useModal<ChooseWalletModalState>();
 
@@ -47,7 +47,7 @@ export const ChooseWalletModal = () => {
   }, [window]);
 
   return (
-    <ModalWrapper dataTestId="connect-your-wallet-modal">
+    <ModalWrapper dataTestId="connect-your-wallet-modal" ref={ref}>
       <ModalHeader>{t("wallet.connectYourWallet")}</ModalHeader>
       <ModalContents>
         <Typography
@@ -119,4 +119,4 @@ export const ChooseWalletModal = () => {
       </ModalContents>
     </ModalWrapper>
   );
-};
+});

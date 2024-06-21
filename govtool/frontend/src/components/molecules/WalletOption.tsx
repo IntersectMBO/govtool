@@ -35,9 +35,12 @@ export const WalletOptionButton: FC<WalletOption> = ({
     const result = await enable(name);
     if (result?.stakeKey) {
       navigate(
-        pathToNavigate ?? pathname === "/"
+        // eslint-disable-next-line no-unneeded-ternary
+        pathToNavigate
+          ? pathToNavigate
+          : pathname === "/"
           ? "/dashboard"
-          : `connected${pathname}${hash}`,
+          : `connected${pathname}${hash ?? ""}`,
         { state },
       );
       return;

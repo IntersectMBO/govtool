@@ -1,4 +1,12 @@
-import environments from "@constants/environments";
+import {
+  ABSTAIN_VOTE_DOC_URL,
+  DELEGATION_DOC_URL,
+  DIRECT_VOTER_DOC_URL,
+  GOVERNANCE_ACTION_DOC_URL,
+  PROPOSE_GOVERNANCE_ACTION_DOC_URL,
+  REGISTER_DREP_DOC_URL,
+  SIGNAL_NO_CONFIDENCE_VOTE_DOC_URL,
+} from "@constants/docsUrl";
 import { user01Wallet } from "@constants/staticWallets";
 import { createTempUserAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
@@ -31,37 +39,25 @@ test.describe("Logged in user", () => {
       context.waitForEvent("page"),
       page.getByTestId("delegate-learn-more-button").click(),
     ]);
-
-    await expect(delegationLearnMorepage).toHaveURL(
-      `${environments.docsUrl}/faqs/ways-to-use-your-voting-power`
-    );
+    await expect(delegationLearnMorepage).toHaveURL(DELEGATION_DOC_URL);
 
     const [registerLearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
       page.getByTestId("register-learn-more-button").click(),
     ]);
-
-    await expect(registerLearnMorepage).toHaveURL(
-      `${environments.docsUrl}/faqs/what-does-it-mean-to-register-as-a-drep`
-    );
+    await expect(registerLearnMorepage).toHaveURL(REGISTER_DREP_DOC_URL);
 
     const [directVoterLearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
       page.getByTestId("learn-more-button").first().click(), // BUG should be unique test id
     ]);
-
-    await expect(directVoterLearnMorepage).toHaveURL(
-      `${environments.docsUrl}/how-to-use-the-govtool/using-govtool/direct-voting`
-    );
+    await expect(directVoterLearnMorepage).toHaveURL(DIRECT_VOTER_DOC_URL);
 
     const [GA_LearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
       page.getByTestId("learn-more-governance-actions-button").click(),
     ]);
-
-    await expect(GA_LearnMorepage).toHaveURL(
-      `${environments.docsUrl}/how-to-use-the-govtool/using-govtool/governance-actions/governance-actions-how-to-vote`
-    );
+    await expect(GA_LearnMorepage).toHaveURL(GOVERNANCE_ACTION_DOC_URL);
 
     const [proposed_GA_VoterLearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
@@ -71,9 +67,8 @@ test.describe("Logged in user", () => {
         .getByTestId("learn-more-button")
         .click(),
     ]); // BUG should be unique test id
-
     await expect(proposed_GA_VoterLearnMorepage).toHaveURL(
-      `${environments.docsUrl}/how-to-use-the-govtool/using-govtool/governance-actions`
+      PROPOSE_GOVERNANCE_ACTION_DOC_URL
     );
   });
 
@@ -90,18 +85,14 @@ test.describe("Logged in user", () => {
       context.waitForEvent("page"),
       dRepDirectoryPage.abstainInfoButton.click(),
     ]);
-
-    await expect(abstain_Info_Page).toHaveURL(
-      `${environments.docsUrl}/how-to-use-the-govtool/using-govtool/delegating/abstain-from-every-vote`
-    );
+    await expect(abstain_Info_Page).toHaveURL(ABSTAIN_VOTE_DOC_URL);
 
     const [signal_No_Confidence_Info_Page] = await Promise.all([
       context.waitForEvent("page"),
       dRepDirectoryPage.signalNoConfidenceInfoButton.click(),
     ]);
-
     await expect(signal_No_Confidence_Info_Page).toHaveURL(
-      `${environments.docsUrl}/how-to-use-the-govtool/using-govtool/delegating/signal-no-confidence-on-every-vote`
+      SIGNAL_NO_CONFIDENCE_VOTE_DOC_URL
     );
   });
 

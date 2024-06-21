@@ -99,7 +99,9 @@ test.describe("Validation of edit dRep Form", () => {
 
     await editDRepPage.metadataUrlInput.fill(metadataAnchorGreaterThan128Bytes);
 
-    await expect(page.getByTestId("invalid-url-error")).toBeVisible();
+    await expect(
+      page.getByTestId("url-must-be-less-than-128-bytes-error")
+    ).toBeVisible();
   });
 });
 
@@ -118,7 +120,7 @@ test("3P. Should reject invalid edit dRep metadata", async ({ page }) => {
   await editDRepPage.metadataUrlInput.fill(invalidMetadataAnchor);
   await editDRepPage.continueBtn.click();
 
-  await expect(
-    page.getByTestId("registration-transaction-error-modal")
-  ).toBeVisible();
+  await expect(page.getByTestId("modal")).toHaveText(
+    /your external data does not/i
+  );
 });

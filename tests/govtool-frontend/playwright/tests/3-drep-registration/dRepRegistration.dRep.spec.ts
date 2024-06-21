@@ -48,13 +48,17 @@ test.describe("Logged in DReps", () => {
     await page.getByTestId("view-drep-details-button").click();
     await page.getByTestId("edit-drep-data-button").click();
 
-    const newDRepName = faker.internet.userName();
-    await page.getByPlaceholder("ex. JohnDRep").fill(newDRepName);
+    const newDRepName = faker.person.firstName();
+    await page.getByTestId("name-input").fill(newDRepName);
+    await page.getByTestId("email-input").fill(faker.internet.email());
+    await page.getByTestId("bio-input").fill(faker.lorem.paragraph(2));
+
     await page.getByTestId("continue-button").click();
     await page.getByRole("checkbox").click();
     await page.getByTestId("continue-button").click();
 
-    page.getByRole("button", { name: `${newDRepName}.jsonld` }).click();
+    page.getByRole("button", { name: `${newDRepName}.jsonld` }).click(); // BUG missing test ids
+
     const download: Download = await page.waitForEvent("download");
     const dRepMetadata = await downloadMetadata(download);
 

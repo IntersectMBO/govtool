@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { PATHS } from "@consts";
 import { useCardano, useSnackbar } from "@context";
@@ -37,7 +37,8 @@ export const useVoteActionForm = (
     useCardano();
   const { addSuccessAlert } = useSnackbar();
   const navigate = useNavigate();
-  const { state } = useLocation();
+  const { state, hash } = useLocation();
+  const params = useParams();
   const openWalletErrorModal = useWalletErrorModal();
 
   const {
@@ -62,21 +63,23 @@ export const useVoteActionForm = (
 
       const urlSubmitValue = voteContextUrl ?? "";
       const hashSubmitValue = voteContextHash ?? "";
+      const txHash = state?.txHash ?? params.proposalId;
+      const index = state?.index ?? hash.replace("#", "");
 
       try {
         const isPendingTx = isPendingTransaction();
         if (isPendingTx) return;
         const votingBuilder = await buildVote(
           vote,
-          state.txHash,
-          state.index,
+          txHash,
+          index,
           urlSubmitValue,
           hashSubmitValue,
         );
         const result = await buildSignSubmitConwayCertTx({
           votingBuilder,
           type: "vote",
-          resourceId: state.txHash + state.index,
+          resourceId: txHash + index,
         });
         if (result) {
           addSuccessAlert("Vote submitted");
@@ -95,7 +98,7 @@ export const useVoteActionForm = (
         setIsLoading(false);
       }
     },
-    [state, buildVote, buildSignSubmitConwayCertTx],
+    [state, buildVote, buildSignSubmitConwayCertTx, params, hash],
   );
 
   return {

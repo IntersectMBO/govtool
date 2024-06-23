@@ -18,5 +18,6 @@
       "host"    : "localhost",
       "port"    : 8094,
       "password": null
-  }
+    },
+    "websocketlifetimeseconds": 60
 }

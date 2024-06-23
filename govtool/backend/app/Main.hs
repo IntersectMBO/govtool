@@ -78,7 +78,7 @@ import           VVA.Types                              (AppEnv (..),
                                                          CacheEnv (..))
 import Network.HTTP.Client hiding (Proxy, Request)
 import Network.HTTP.Client.TLS
-import           VVA.Transaction (processTransactionStatuses)
+import           VVA.Transaction (processTransactionStatuses, timeoutStaleWebsocketConnections)
 
 proxyAPI :: Proxy (VVAApi :<|> SwaggerAPI)
 proxyAPI = Proxy
@@ -150,6 +150,12 @@ startApp vvaConfig = do
 
   _ <- forkIO $ do
       result <- runReaderT (runExceptT $ processTransactionStatuses websocketConnectionsTVar) appEnv
+      case result of
+        Left e -> throw e
+        Right _ -> return ()
+
+  _ <- forkIO $ do
+      result <- runReaderT (runExceptT $ timeoutStaleWebsocketConnections websocketConnectionsTVar) appEnv
       case result of
         Left e -> throw e
         Right _ -> return ()

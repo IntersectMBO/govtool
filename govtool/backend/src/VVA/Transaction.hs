@@ -2,9 +2,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE TypeApplications  #-}
+{-# LANGUAGE BlockArguments    #-}
 
 module VVA.Transaction where
 
+import           Data.Time
 import qualified Data.Map as Map
 import           Data.Map (Map)
 import qualified Network.WebSockets.Connection as WS
@@ -49,6 +51,20 @@ getTransactionStatus transactionId = withPool $ \conn -> do
     [SQL.Only False] -> return TransactionUnconfirmed
     x -> throwError $ CriticalError ("Expected exactly one result from get-transaction-status.sql but got " <> pack (show (length x)) <> " of them. This should never happen")
 
+timeoutStaleWebsocketConnections ::
+  (Has AppEnv r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m)
+  => WebsocketTvar
+  -> m ()
+timeoutStaleWebsocketConnections tvar = do
+  currentTime <- liftIO getCurrentTime
+  connections <- liftIO $ readTVarIO tvar
+  websocketLifetimeSeconds <- getWebsocketLifetimeSeconds
+  let staleConnections = Map.filter (\(_, time) -> diffUTCTime currentTime time > fromIntegral websocketLifetimeSeconds) connections
+  forM_ (Map.keys staleConnections) $ \txHash -> do
+    removeWebsocketConnection tvar txHash "Websocket timed out."
+  liftIO $ threadDelay (30 * 1000000)
+  timeoutStaleWebsocketConnections tvar
+
 processTransactionStatuses ::
   (Has AppEnv r, Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m)
   => WebsocketTvar
@@ -61,10 +77,11 @@ processTransactionStatuses tvar = do
       TransactionConfirmed -> do
         connection <- getWebsocketConnection tvar uuid
         case connection of
-          Just conn -> do
+          Just (conn, _) -> do
             liftIO $ WS.sendTextData conn ("{\"status\": \"confirmed\"}" :: Text)
-            removeWebsocketConnection tvar uuid
-          Nothing -> return ()
+            unWatchTransaciton tvar uuid
+            removeWebsocketConnection tvar uuid "Tx confirmed. Closing connection."
+          Nothing -> unWatchTransaciton tvar uuid
       TransactionUnconfirmed -> return ()
 
   liftIO $ threadDelay (20 * 1000000)
@@ -84,13 +101,28 @@ watchTransaction tVar txHash connection = do
   port <- getRedisPort
   host <- getRedisHost
   conn <- liftIO $ Redis.checkedConnect $ Redis.defaultConnectInfo {Redis.connectHost = unpack host, Redis.connectPort = Redis.PortNumber $ fromIntegral port, Redis.connectDatabase = 1}
+  websocketLifetimeSeconds <- getWebsocketLifetimeSeconds
 
   liftIO $ Redis.runRedis conn $ do
     _ <- Redis.set (Text.encodeUtf8 txHash) (Text.encodeUtf8 uuid)
-
+    Redis.expire (Text.encodeUtf8 txHash) $ fromIntegral websocketLifetimeSeconds
     return ()
+
   setWebsocketConnection tVar uuid connection
 
+unWatchTransaciton ::
+  (Has AppEnv r, Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m)
+  => WebsocketTvar
+  -> Text
+  -> m ()
+unWatchTransaciton tVar uuid = do
+  port <- getRedisPort
+  host <- getRedisHost
+  conn <- liftIO $ Redis.checkedConnect $ Redis.defaultConnectInfo {Redis.connectHost = unpack host, Redis.connectPort = Redis.PortNumber $ fromIntegral port, Redis.connectDatabase = 1}
+
+  liftIO $ Redis.runRedis conn $ do
+    _ <- Redis.del [Text.encodeUtf8 uuid]
+    return ()
 
 
 getWatchedTransactions ::
@@ -126,16 +158,18 @@ setWebsocketConnection ::
   -> Connection
   -> m ()
 setWebsocketConnection tvar txHash connection = do
-  liftIO $ atomically $ do
-    connections <- readTVar tvar
-    writeTVar tvar $ Map.insert txHash connection connections
+  liftIO do
+    currentTime <- getCurrentTime
+    atomically $ do
+      connections <- readTVar tvar
+      writeTVar tvar $ Map.insert txHash (connection, currentTime) connections
 
 
 getWebsocketConnection ::
   (MonadReader r m, MonadIO m, MonadError AppError m)
   => WebsocketTvar
   -> Text
-  -> m (Maybe Connection)
+  -> m (Maybe (Connection, UTCTime))
 getWebsocketConnection tvar txHash = do
   connections <- liftIO $ readTVarIO tvar
   return $ Map.lookup txHash connections
@@ -144,8 +178,14 @@ removeWebsocketConnection ::
   (MonadReader r m, MonadIO m, MonadError AppError m)
   => WebsocketTvar
   -> Text
+  -> Text
   -> m ()
-removeWebsocketConnection tvar txHash = do
-  liftIO $ atomically $ do
+removeWebsocketConnection tvar txHash message = liftIO $ do
+  mConn <- atomically $ do
     connections <- readTVar tvar
     writeTVar tvar $ Map.delete txHash connections
+    return $ Map.lookup txHash connections
+
+  case mConn of
+      Just (conn, _) -> liftIO $ WS.sendClose conn message
+      Nothing -> return ()

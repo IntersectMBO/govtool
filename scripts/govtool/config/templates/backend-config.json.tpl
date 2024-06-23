@@ -18,5 +18,6 @@
         "host"    : "http://redis",
         "port"    : 8094,
         "password": "<REDIS_PASSWORD>"
-    }
+    },
+    "websocketlifetimeseconds": 60
 }

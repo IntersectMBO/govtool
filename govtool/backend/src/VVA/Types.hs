@@ -208,7 +208,7 @@ data VotingAnchor
 
 type App m = (MonadReader AppEnv m, MonadIO m, MonadFail m, MonadError AppError m)
 
-type WebsocketTvar = TVar (Map Text WS.Connection)
+type WebsocketTvar = TVar (Map Text (WS.Connection, UTCTime))
 
 data AppEnv
   = AppEnv
@@ -240,7 +240,7 @@ instance Has QSem AppEnv where
   getter AppEnv {vvaMetadataQSem} = vvaMetadataQSem
   modifier f a@AppEnv {vvaMetadataQSem} = a {vvaMetadataQSem = f vvaMetadataQSem}
 
-instance Has (TVar (Map Text WS.Connection)) AppEnv where
+instance Has (TVar (Map Text (WS.Connection, UTCTime))) AppEnv where
   getter AppEnv {vvaWebSocketConnections} = vvaWebSocketConnections
   modifier f a@AppEnv {vvaWebSocketConnections} = a {vvaWebSocketConnections = f vvaWebSocketConnections}
 

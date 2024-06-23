@@ -109,6 +109,7 @@ library
                , uuid
                , servant-websockets
                , servant-openapi3
+               , monad-loops
 
   exposed-modules: VVA.Config
                  , VVA.CommandLine

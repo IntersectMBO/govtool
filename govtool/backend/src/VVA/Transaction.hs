@@ -15,7 +15,7 @@ import           Data.Maybe
 import Data.UUID.V4 (nextRandom)
 import           Network.WebSockets.Connection (Connection)
 import qualified Database.Redis as Redis
-import           Control.Exception          (throw)
+import           Control.Exception          (throw, try, SomeException)
 import           Control.Monad.Except       (MonadError, throwError)
 import           Control.Monad.Reader
 
@@ -60,8 +60,9 @@ timeoutStaleWebsocketConnections tvar = do
   connections <- liftIO $ readTVarIO tvar
   websocketLifetimeSeconds <- getWebsocketLifetimeSeconds
   let staleConnections = Map.filter (\(_, time) -> diffUTCTime currentTime time > fromIntegral websocketLifetimeSeconds) connections
-  forM_ (Map.keys staleConnections) $ \txHash -> do
-    removeWebsocketConnection tvar txHash "Websocket timed out."
+  forM_ (Map.keys staleConnections) $ \uuid -> do
+    removeWebsocketConnection tvar uuid "Websocket timed out."
+
   liftIO $ threadDelay (30 * 1000000)
   timeoutStaleWebsocketConnections tvar
 
@@ -78,10 +79,9 @@ processTransactionStatuses tvar = do
         connection <- getWebsocketConnection tvar uuid
         case connection of
           Just (conn, _) -> do
-            liftIO $ WS.sendTextData conn ("{\"status\": \"confirmed\"}" :: Text)
-            unWatchTransaciton tvar uuid
-            removeWebsocketConnection tvar uuid "Tx confirmed. Closing connection."
-          Nothing -> unWatchTransaciton tvar uuid
+            liftIO $ try @SomeException $ WS.sendTextData conn ("{\"status\": \"confirmed\"}" :: Text)
+            return ()
+          Nothing -> return ()
       TransactionUnconfirmed -> return ()
 
   liftIO $ threadDelay (20 * 1000000)
@@ -93,7 +93,7 @@ watchTransaction ::
   => WebsocketTvar
   -> Text
   -> Connection
-  -> m ()
+  -> m Text
 watchTransaction tVar txHash connection = do
 
   uuid <- (pack . show) <$> liftIO nextRandom
@@ -109,21 +109,7 @@ watchTransaction tVar txHash connection = do
     return ()
 
   setWebsocketConnection tVar uuid connection
-
-unWatchTransaciton ::
-  (Has AppEnv r, Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m)
-  => WebsocketTvar
-  -> Text
-  -> m ()
-unWatchTransaciton tVar uuid = do
-  port <- getRedisPort
-  host <- getRedisHost
-  conn <- liftIO $ Redis.checkedConnect $ Redis.defaultConnectInfo {Redis.connectHost = unpack host, Redis.connectPort = Redis.PortNumber $ fromIntegral port, Redis.connectDatabase = 1}
-
-  liftIO $ Redis.runRedis conn $ do
-    _ <- Redis.del [Text.encodeUtf8 uuid]
-    return ()
-
+  return uuid
 
 getWatchedTransactions ::
   (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m)
@@ -187,5 +173,7 @@ removeWebsocketConnection tvar txHash message = liftIO $ do
     return $ Map.lookup txHash connections
 
   case mConn of
-      Just (conn, _) -> liftIO $ WS.sendClose conn message
+      Just (conn, _) -> do
+        liftIO $ try @SomeException $ WS.sendClose conn message
+        return ()
       Nothing -> return ()

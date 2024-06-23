@@ -9,6 +9,7 @@
 
 module VVA.API where
 
+import Control.Monad.Loops (iterateUntil)
 import qualified Network.WebSockets.Connection as WS
 import Servant.API.WebSocket (WebSocket)
 import Control.Concurrent.QSem (waitQSem, signalQSem)
@@ -108,11 +109,12 @@ instance HasOpenApi WebSocket where
 transactionWatch :: App m => HexText -> WS.Connection -> m ()
 transactionWatch (unHexText -> transactionId) c = do
   tvar <- asks vvaWebSocketConnections
-  Transaction.watchTransaction tvar transactionId c
-  liftIO $ forever $ do
-        msg <- WS.receiveData c
-        putStrLn $ Text.unpack $ ("Received: " <> msg)
-        WS.sendTextData c (msg :: Text)
+  uuid <- Transaction.watchTransaction tvar transactionId c
+  liftIO $ iterateUntil (== ("ACK" :: Text)) $ Text.stripEnd <$> WS.receiveData c
+  Transaction.removeWebsocketConnection tvar uuid "Tx confirmed. Closing connection."
+  return ()
+
+
 
 
 mapDRepType :: Types.DRepType -> DRepType

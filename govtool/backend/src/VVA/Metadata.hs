@@ -12,7 +12,8 @@ import           Control.Exception          (try, Exception)
 import           Data.Typeable              (Typeable)
 import           Data.Vector                (toList)
 import           Data.Aeson.KeyMap          (lookup)
-import           Data.Aeson                 (Value(..), decode, encode, object, (.=))
+import Data.Aeson
+    ( Value(..), decode, encode, object, (.=), encode, object, (.=) )
 import           Data.Maybe                 (fromJust)
 import           Data.ByteString            (ByteString)
 import           Data.FileEmbed             (embedFile)
@@ -29,7 +30,6 @@ import           VVA.Pool                   (ConnectionPool, withPool)
 import           VVA.Types
 import Network.HTTP.Client
 import Network.HTTP.Client.TLS
-import Data.Aeson (encode, object, (.=))
 
 validateMetadata
     :: (Has VVAConfig r, Has Manager r, MonadReader r m, MonadIO m, MonadError AppError m)

@@ -71,7 +71,7 @@ listDReps = withPool $ \conn -> do
                                     | d >= 0 && not isActive -> Inactive
     , let latestDeposit' = floor @Scientific latestDeposit :: Integer
     , let drepType | latestDeposit' >= 0 && isNothing url = SoleVoter
-                   | latestDeposit' >= 0 && not (isNothing url) = DRep
+                   | latestDeposit' >= 0 && isJust url = DRep
                    | latestDeposit' < 0 && not latestNonDeregisterVotingAnchorWasNotNull = SoleVoter
                    | latestDeposit' < 0 && latestNonDeregisterVotingAnchorWasNotNull = DRep
                    | Data.Maybe.isJust url = DRep

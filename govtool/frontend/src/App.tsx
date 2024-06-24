@@ -40,7 +40,7 @@ import { PDFWrapper } from "./components/organisms/PDFWrapper";
 
 export default () => {
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
-  const { enable, isEnabled } = useCardano();
+  const { enable } = useCardano();
   const navigate = useNavigate();
   const { modal, openModal, modals } = useModal();
 
@@ -87,10 +87,7 @@ export default () => {
       !window.location.pathname.includes(PATHS.proposalPillar.replace("/*", ""))
     ) {
       navigate(
-        `${(isEnabled
-          ? PATHS.connectedProposalPillar
-          : PATHS.proposalPillar
-        ).replace("/*", "")}${window.location.pathname}`,
+        `${PATHS.proposalPillar.replace("/*", "")}${window.location.pathname}`,
       );
     }
   }, [window.location.pathname]);
@@ -101,9 +98,6 @@ export default () => {
       <Routes>
         <Route path={PATHS.home} element={<Home />} />
         <Route path={PATHS.governanceActions} element={<GovernanceActions />} />
-        {isProposalDiscussionForumEnabled && !isEnabled && (
-          <Route path={PATHS.proposalPillar} element={<PDFWrapper />} />
-        )}
         <Route
           path={PATHS.governanceActionsCategory}
           element={<GovernanceActionsCategory />}
@@ -115,10 +109,7 @@ export default () => {
         <Route element={<Dashboard />}>
           <Route path={PATHS.dashboard} element={<DashboardCards />} />
           {isProposalDiscussionForumEnabled && (
-            <Route
-              path={PATHS.connectedProposalPillar}
-              element={<PDFWrapper />}
-            />
+            <Route path={PATHS.proposalPillar} element={<PDFWrapper />} />
           )}
           <Route
             path={PATHS.dashboardGovernanceActions}

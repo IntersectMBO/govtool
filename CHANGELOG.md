@@ -100,6 +100,7 @@ changes.
 - Fix validation of the GAs with missing references [Issue 1282](https://github.com/IntersectMBO/govtool/issues/1282)
 - Fix displaying the GA Markdowns [Issue 1244](https://github.com/IntersectMBO/govtool/issues/1244)
 - Fix app crash on voting on the GA without the connected wallet before [Issue 1313](https://github.com/IntersectMBO/govtool/issues/1313)
+- Fix the navigation to Home from Proposal pillar on disconnected wallet [Issue 1355](https://github.com/IntersectMBO/govtool/issues/1355)
 
 ### Changed
 

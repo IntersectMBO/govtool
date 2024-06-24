@@ -17,7 +17,7 @@ type LinkProps = {
 const isRouteActive = (isActive: boolean, route: string) =>
   isActive ||
   (route ===
-    `${PATHS.connectedProposalPillar.replace("/*", "")}${
+    `${PATHS.proposalPillar.replace("/*", "")}${
       PDF_PATHS.proposalDiscussion
     }` &&
     Object.values(PDF_PATHS).some((pdfPath) =>

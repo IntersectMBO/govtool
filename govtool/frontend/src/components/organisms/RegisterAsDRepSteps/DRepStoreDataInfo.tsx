@@ -7,7 +7,6 @@ import {
   useTranslation,
   useRegisterAsdRepForm,
 } from "@hooks";
-import { openInNewTab } from "@utils";
 
 import { BgCard, ControlledField } from "..";
 

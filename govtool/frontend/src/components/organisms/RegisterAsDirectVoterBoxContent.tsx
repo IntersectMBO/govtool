@@ -7,7 +7,6 @@ import {
   PROTOCOL_PARAMS_KEY,
   correctAdaFormat,
   getItemFromLocalStorage,
-  openInNewTab,
 } from "@utils";
 
 export const RegisterAsDirectVoterBoxContent = () => {

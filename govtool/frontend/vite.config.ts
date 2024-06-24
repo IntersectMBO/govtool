@@ -81,6 +81,13 @@ const vitestConfig = defineVitestConfig({
   test: {
     setupFiles: "./src/setupTests.ts",
     globals: true,
+    pool: "forks",
+    poolOptions: {
+      threads: {
+        minThreads: 2,
+      },
+    },
+    maxConcurrency: 4,
     environment: "jsdom",
     reporters: ["default", "junit"],
     outputFile: {

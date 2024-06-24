@@ -4,9 +4,11 @@ import {
   createContext,
   useContext,
   useCallback,
+  useEffect,
 } from "react";
 import { NodeObject } from "jsonld";
 import { blake2bHex } from "blakejs";
+import * as Sentry from "@sentry/react";
 
 import { CIP_108, GOVERNANCE_ACTION_CONTEXT } from "@/consts";
 import { canonizeJSON, generateJsonld, generateMetadataBody } from "@/utils";
@@ -40,6 +42,11 @@ const GovernanceActionProvider = ({ children }: PropsWithChildren) => {
    * @param {GovActionMetadata} govActionMetadata - The metadata of the governance action.
    * @returns The JSON-LD representation of the governance action.
    */
+
+  useEffect(() => {
+    Sentry.setTag("component_name", "GovernanceActionProvider");
+  }, []);
+
   const createGovernanceActionJsonLD = useCallback(
     async (govActionMetadata: GovActionMetadata) => {
       try {
@@ -55,6 +62,7 @@ const GovernanceActionProvider = ({ children }: PropsWithChildren) => {
         );
         return jsonLD;
       } catch (error) {
+        Sentry.captureException(error);
         console.error(error);
       }
     },
@@ -72,6 +80,7 @@ const GovernanceActionProvider = ({ children }: PropsWithChildren) => {
       const canonizedJsonHash = blake2bHex(canonizedJson, undefined, 32);
       return canonizedJsonHash;
     } catch (error) {
+      Sentry.captureException(error);
       console.error(error);
     }
   }, []);

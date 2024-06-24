@@ -64,7 +64,9 @@ export const GovernanceActionDetailsCardData = ({
 
   const govActionLinkToShare = `${window.location.protocol}//${
     window.location.hostname
-  }${window.location.port ? `:${window.location.port}` : ""}${pathname}${hash}`;
+  }${window.location.port ? `:${window.location.port}` : ""}${pathname}${
+    hash ?? ""
+  }`;
 
   return (
     <Box

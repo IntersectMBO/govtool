@@ -3,6 +3,7 @@ import { SxProps, styled } from "@mui/material/styles";
 import { ICONS } from "@consts";
 import { useModal } from "@context";
 import { callAll } from "@utils";
+import { forwardRef } from "react";
 
 interface Props {
   variant?: "modal" | "popup";
@@ -49,27 +50,32 @@ export const CloseButton = styled("img")`
   right: 24px;
 `;
 
-export const ModalWrapper = ({
-  children,
-  onClose,
-  variant = "modal",
-  hideCloseButton = false,
-  dataTestId = "modal",
-  sx,
-}: Props) => {
-  const { closeModal } = useModal();
+export const ModalWrapper = forwardRef<HTMLDivElement, Props>(
+  (
+    {
+      children,
+      onClose,
+      variant = "modal",
+      hideCloseButton = false,
+      dataTestId = "modal",
+      sx,
+    },
+    ref,
+  ) => {
+    const { closeModal } = useModal();
 
-  return (
-    <BaseWrapper variant={variant} data-testid={dataTestId} sx={sx}>
-      {variant !== "popup" && !hideCloseButton && (
-        <CloseButton
-          data-testid="close-modal-button"
-          alt="close"
-          onClick={callAll(closeModal, onClose)}
-          src={ICONS.closeIcon}
-        />
-      )}
-      {children}
-    </BaseWrapper>
-  );
-};
+    return (
+      <BaseWrapper variant={variant} data-testid={dataTestId} sx={sx} ref={ref}>
+        {variant !== "popup" && !hideCloseButton && (
+          <CloseButton
+            data-testid="close-modal-button"
+            alt="close"
+            onClick={callAll(closeModal, onClose)}
+            src={ICONS.closeIcon}
+          />
+        )}
+        {children}
+      </BaseWrapper>
+    );
+  },
+);

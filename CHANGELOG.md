@@ -68,6 +68,7 @@ changes.
 
 ### Fixed
 
+- drep/get-voting-power no longer throws 500 for non-existing dreps. Instead it returns 0 [Issue 1093](https://github.com/IntersectMBO/govtool/issues/1093)
 - proposal/list no longer throws 500 error when proposal's url is incorrect [Issue 1073](https://github.com/IntersectMBO/govtool/issues/1073)
 - drep/list sql fix (now the drep type is correct) [Issue 957](https://github.com/IntersectMBO/govtool/issues/957)
 - drep/list sql fix (now the latest tx date is correct) [Issue 826](https://github.com/IntersectMBO/govtool/issues/826)
@@ -99,6 +100,7 @@ changes.
 - Fix validation of the GAs with missing references [Issue 1282](https://github.com/IntersectMBO/govtool/issues/1282)
 - Fix displaying the GA Markdowns [Issue 1244](https://github.com/IntersectMBO/govtool/issues/1244)
 - Fix app crash on voting on the GA without the connected wallet before [Issue 1313](https://github.com/IntersectMBO/govtool/issues/1313)
+- Fix the navigation to Home from Proposal pillar on disconnected wallet [Issue 1355](https://github.com/IntersectMBO/govtool/issues/1355)
 
 ### Changed
 
@@ -131,6 +133,7 @@ changes.
 - Changed documents to prepare for open source [Issue 737](https://github.com/IntersectMBO/govtool/issues/737)
 - Changed copy on maintenance page [Issue 753](https://github.com/IntersectMBO/govtool/issues/753)
 - Update link to docs [Issue 1246](https://github.com/IntersectMBO/govtool/issues/1246)
+- Change label of Proposal Discussion nav item [Issue 1349](https://github.com/IntersectMBO/govtool/issues/1349)
 
 ### Removed
 

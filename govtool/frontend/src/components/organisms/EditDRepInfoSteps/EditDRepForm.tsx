@@ -21,15 +21,19 @@ const MAX_NUMBER_OF_LINKS = 7;
 export const EditDRepForm = ({
   onClickCancel,
   setStep,
+  loadUserData,
+  setLoadUserData,
 }: {
   onClickCancel: () => void;
   setStep: Dispatch<SetStateAction<number>>;
+  loadUserData: boolean;
+  setLoadUserData: Dispatch<SetStateAction<boolean>>;
 }) => {
   const { state } = useLocation();
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
   const { dRepID } = useCardano();
-  const { control, errors, isError, register, watch, reset, getValues } =
+  const { control, errors, isError, register, watch, reset } =
     useEditDRepInfoForm();
   const {
     append,
@@ -47,7 +51,10 @@ export const EditDRepForm = ({
     { enabled: !state },
   );
 
-  const onClickContinue = () => setStep(2);
+  const onClickContinue = () => {
+    setStep(2);
+    setLoadUserData(false);
+  };
 
   const addLink = useCallback(() => append({ uri: "" }), [append]);
 
@@ -56,25 +63,28 @@ export const EditDRepForm = ({
   const isContinueButtonDisabled = !watch("dRepName") || isError;
 
   useEffect(() => {
-    if (!getValues().dRepName)
+    if (loadUserData) {
       reset(
         state
           ? {
               ...state,
-              references: state.references.map((uri: string) => ({
-                uri,
-              })),
+              references: state.references.length
+                ? state.references.map((uri: string) => ({
+                    uri,
+                  }))
+                : [{ uri: "" }],
             }
           : {
               ...yourselfDRepList?.[0],
-              references: yourselfDRepList?.[0].references.map(
-                (uri: string) => ({
-                  uri,
-                }),
-              ),
+              references: yourselfDRepList?.[0].references.length
+                ? yourselfDRepList?.[0].references.map((uri: string) => ({
+                    uri,
+                  }))
+                : [{ uri: "" }],
             },
       );
-  }, [yourselfDRepList]);
+    }
+  }, [yourselfDRepList?.[0], loadUserData]);
 
   const renderLinks = useCallback(
     () =>

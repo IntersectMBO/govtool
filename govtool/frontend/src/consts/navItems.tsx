@@ -64,7 +64,7 @@ export const CONNECTED_NAV_ITEMS = [
   {
     dataTestId: "proposal-discussion-link",
     label: i18n.t("proposalDiscussion.title"),
-    navTo: `${PATHS.connectedProposalPillar.replace("/*", "")}${
+    navTo: `${PATHS.proposalPillar.replace("/*", "")}${
       PDF_PATHS.proposalDiscussion
     }`,
     activeIcon: (

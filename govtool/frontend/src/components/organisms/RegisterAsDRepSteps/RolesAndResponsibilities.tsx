@@ -7,11 +7,12 @@ import { useScreenDimension, useTranslation } from "@hooks";
 import {
   correctAdaFormat,
   getItemFromLocalStorage,
-  openInNewTab,
   PROTOCOL_PARAMS_KEY,
 } from "@utils";
 
 import { BgCard } from "..";
+
+const MORE_ABOUT_DREPS = "https://sancho.network/roles/drep";
 
 export const RolesAndResponsibilities = ({
   onClickCancel,
@@ -26,9 +27,6 @@ export const RolesAndResponsibilities = ({
   const deposit = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
   const onClickContinue = () => setStep(2);
-
-  const openLearnMoreAboutDrep = () =>
-    openInNewTab("https://sancho.network/roles/drep");
 
   return (
     <BgCard
@@ -55,7 +53,8 @@ export const RolesAndResponsibilities = ({
           components={[
             <Link
               key="1"
-              onClick={openLearnMoreAboutDrep}
+              href={MORE_ABOUT_DREPS}
+              target="_blank"
               sx={{ cursor: "pointer" }}
             />,
           ]}

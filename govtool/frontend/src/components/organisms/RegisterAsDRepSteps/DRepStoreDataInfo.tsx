@@ -27,7 +27,7 @@ export const DRepStoreDataInfo = ({
   const onClickContinue = () => setStep(4);
 
   // TODO: Add link about store data when available
-  const openLink = () => openInNewTab("https://sancho.network/get-started");
+  const link = "https://sancho.network/get-started";
 
   return (
     <BgCard
@@ -40,7 +40,8 @@ export const DRepStoreDataInfo = ({
         {t("registration.storeDataTitle")}
       </Typography>
       <Link
-        onClick={openLink}
+        href={link}
+        target="_blank"
         sx={{
           cursor: "pointer",
           fontSize: 16,

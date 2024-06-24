@@ -8,13 +8,18 @@ import { openInNewTab, testIdFromLabel } from "@utils";
 
 type FooterLinkProps = {
   label: string;
-  onClick: () => void;
+  href: string;
 };
 
-const FooterLink = ({ label, onClick }: FooterLinkProps) => (
+const PRIVACY_POLICY = "https://docs.sanchogov.tools/legal/privacy-policy";
+const TERM_OF_SERVICE =
+  "https://docs.sanchogov.tools/legal/terms-and-conditions";
+
+const FooterLink = ({ label, href }: FooterLinkProps) => (
   <Link
     data-testid={`${testIdFromLabel(label)}-footer-link`}
-    onClick={onClick}
+    href={href}
+    target="_blank"
     sx={{
       color: "textBlack",
       cursor: "pointer",
@@ -36,13 +41,6 @@ export const Footer = () => {
 
   const onClickHelp = () =>
     openInNewTab("https://docs.sanchogov.tools/support/get-help-in-discord");
-
-  const onClickPrivacyPolicy = () =>
-    openInNewTab("https://docs.sanchogov.tools/legal/privacy-policy");
-
-  // TODO: change term of service link
-  const onClickTermOfService = () =>
-    openInNewTab("https://docs.sanchogov.tools/legal/terms-and-conditions");
 
   const onClickFeedback = () => openFeedbackWindow();
 
@@ -70,13 +68,10 @@ export const Footer = () => {
             mt: screenWidth < 640 ? 1.5 : 0,
           }}
         >
-          <FooterLink
-            label={t("footer.privacyPolicy")}
-            onClick={onClickPrivacyPolicy}
-          />
+          <FooterLink label={t("footer.privacyPolicy")} href={PRIVACY_POLICY} />
           <FooterLink
             label={t("footer.termOfService")}
-            onClick={onClickTermOfService}
+            href={TERM_OF_SERVICE}
           />
         </Box>
         <Box

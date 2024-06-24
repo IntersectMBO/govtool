@@ -19,7 +19,6 @@ import {
   checkIsWalletConnected,
   correctAdaFormat,
   getItemFromLocalStorage,
-  openInNewTab,
 } from "@utils";
 
 export const RegisterAsDirectVoter = () => {
@@ -141,7 +140,8 @@ export const RegisterAsDirectVoter = () => {
               values={{ deposit: correctAdaFormat(epochParams.drep_deposit) }}
               components={[
                 <Link
-                  onClick={() => openInNewTab("https://sancho.network/")}
+                  href="https://sancho.network/"
+                  target="_blank"
                   sx={{ cursor: "pointer" }}
                   key="0"
                 />,

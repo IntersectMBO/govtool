@@ -4,7 +4,6 @@ import { Button, Link, Typography } from "@mui/material";
 import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import { ICONS, IMAGES } from "@consts";
 import { useModal, useUsersnapApi } from "@context";
-import { openInNewTab } from "@utils";
 import { useScreenDimension, useTranslation } from "@hooks";
 
 export interface StatusModalState {
@@ -70,7 +69,7 @@ export const StatusModal = forwardRef<HTMLDivElement>((_, ref) => {
           {state?.message}{" "}
           {state?.link && (
             <Link
-              onClick={() => openInNewTab(state?.link || "")}
+              href={state?.link || ""}
               target="_blank"
               sx={[{ "&:hover": { cursor: "pointer" } }]}
             >

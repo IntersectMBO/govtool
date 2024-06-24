@@ -3,7 +3,6 @@ import { Box, Link, SxProps } from "@mui/material";
 import { Typography } from "@atoms";
 import { useTranslation } from "@hooks";
 import { MetadataValidationStatus } from "@models";
-import { openInNewTab } from "@utils";
 
 export const DataMissingInfoBox = ({
   isDataMissing,
@@ -78,12 +77,9 @@ export const DataMissingInfoBox = ({
         {gaMetadataErrorDescription}
       </Typography>
       <Link
-        onClick={() =>
-          // TODO: Add the correct link
-          openInNewTab(
-            "https://docs.sanchogov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet",
-          )
-        }
+        // TODO: Add the correct link
+        href="https://docs.sanchogov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet"
+        target="_blank"
         sx={{
           fontFamily: "Poppins",
           fontSize: "16px",

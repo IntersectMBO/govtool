@@ -36,7 +36,8 @@ export const RegisterAsDirectVoterBoxContent = () => {
           values={{ deposit: correctAdaFormat(epochParams.drep_deposit) }}
           components={[
             <Link
-              onClick={() => openInNewTab("https://sancho.network/")}
+              href="https://sancho.network/"
+              target="_blank"
               sx={{ cursor: "pointer" }}
               key="0"
             />,

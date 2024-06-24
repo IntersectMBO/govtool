@@ -6,6 +6,7 @@ import {
 } from "vite";
 import { defineConfig as defineVitestConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
+import Sitemap from "vite-plugin-sitemap";
 
 // https://vitejs.dev/config/
 const viteConfig = defineViteConfig({
@@ -24,6 +25,7 @@ const viteConfig = defineViteConfig({
       },
     },
     react(),
+    Sitemap(),
   ],
   cacheDir: ".vite",
   optimizeDeps: {

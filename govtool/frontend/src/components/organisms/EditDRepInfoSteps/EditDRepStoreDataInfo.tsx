@@ -7,7 +7,6 @@ import {
   useTranslation,
   useEditDRepInfoForm,
 } from "@hooks";
-import { openInNewTab } from "@utils";
 
 import { BgCard, ControlledField } from "..";
 
@@ -27,7 +26,7 @@ export const EditDRepStoreDataInfo = ({
   const isContinueDisabled = !watch("storeData");
 
   // TODO: Add link about store data when available
-  const openLink = () => openInNewTab("https://sancho.network/get-started");
+  const link = "https://sancho.network/get-started";
 
   return (
     <BgCard
@@ -40,7 +39,8 @@ export const EditDRepStoreDataInfo = ({
         {t("editMetadata.storeDataTitle")}
       </Typography>
       <Link
-        onClick={openLink}
+        href={link}
+        target="_blank"
         sx={{
           cursor: "pointer",
           fontSize: 16,

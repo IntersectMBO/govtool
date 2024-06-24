@@ -77,6 +77,7 @@ export const useEditDRepInfoForm = (
 
   // Navigation
   const backToForm = useCallback(() => {
+    window.scrollTo(0, 0);
     setStep?.(1);
     closeModal();
   }, [setStep]);

@@ -385,7 +385,7 @@ export const en = {
       },
     },
     proposalDiscussion: {
-      title: "Proposal Discussion",
+      title: "Proposals",
       proposeAGovernanceAction: "Propose a Governance Action",
     },
     govActions: {

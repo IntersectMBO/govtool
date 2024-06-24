@@ -132,6 +132,7 @@ changes.
 - Changed documents to prepare for open source [Issue 737](https://github.com/IntersectMBO/govtool/issues/737)
 - Changed copy on maintenance page [Issue 753](https://github.com/IntersectMBO/govtool/issues/753)
 - Update link to docs [Issue 1246](https://github.com/IntersectMBO/govtool/issues/1246)
+- Change label of Proposal Discussion nav item [Issue 1349](https://github.com/IntersectMBO/govtool/issues/1349)
 
 ### Removed
 

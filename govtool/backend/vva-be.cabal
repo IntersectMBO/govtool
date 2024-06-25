@@ -70,6 +70,7 @@ executable vva-be
 
     hs-source-dirs:   app
     default-language: Haskell2010
+    ghc-options: -threaded
 
 library
   hs-source-dirs: src
@@ -118,3 +119,4 @@ library
                  , VVA.Types
                  , VVA.Network
                  , VVA.Metadata
+  ghc-options: -threaded

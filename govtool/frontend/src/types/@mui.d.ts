@@ -6,12 +6,14 @@ import {
 
 declare module "@mui/material/styles" {
   type BreakpointOverrides = {
-    xxs: true;
-    xs: true;
-    sm: true;
-    md: true;
-    lg: true;
-    xl: true;
+    values: {
+      xxs: number;
+      xs: number;
+      sm: number;
+      md: number;
+      lg: number;
+      xl: number;
+    };
   };
   interface PaletteOptions extends MuiPalette {
     accentOrange: string;

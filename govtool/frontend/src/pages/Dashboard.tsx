@@ -12,7 +12,7 @@ import { checkIsWalletConnected } from "@utils";
 export const Dashboard = () => {
   const { isEnabled, stakeKey } = useCardano();
   const { isMobile } = useScreenDimension();
-  const { pathname, hash } = useLocation();
+  const { pathname } = useLocation();
   const divRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { t } = useTranslation();

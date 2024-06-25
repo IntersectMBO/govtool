@@ -10,6 +10,7 @@
     "host" : "localhost",
     "cachedurationseconds": 20,
     "sentrydsn": "https://username:password@senty.host/id",
+    "sentryenv": "development",
     "metadatavalidationhost": "localhost",
     "metadatavalidationport": 3001,
     "metadatavalidationmaxconcurrentrequests": 10

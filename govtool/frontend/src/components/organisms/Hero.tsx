@@ -7,7 +7,8 @@ import { Button, Typography } from "@atoms";
 import { IMAGES, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { openInNewTab } from "@utils";
+
+const VOTING_POWER = "https://docs.sanchogov.tools/faqs/what-is-voting-power";
 
 export const Hero = () => {
   const { isEnabled } = useCardano();
@@ -32,9 +33,6 @@ export const Hero = () => {
     if (screenWidth <= 1728) return screenWidth / 20;
     return screenWidth / 11;
   }, [screenWidth]);
-
-  const onClickVotingPower = () =>
-    openInNewTab("https://docs.sanchogov.tools/faqs/what-is-voting-power");
 
   return (
     <Box
@@ -69,7 +67,8 @@ export const Hero = () => {
             components={[
               <Link
                 data-testid="voting-power-link"
-                onClick={onClickVotingPower}
+                href={VOTING_POWER}
+                target="_blank"
                 sx={{
                   cursor: "pointer",
                 }}

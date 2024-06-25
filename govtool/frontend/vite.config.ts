@@ -6,6 +6,7 @@ import {
 } from "vite";
 import { defineConfig as defineVitestConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
 // https://vitejs.dev/config/
 const viteConfig = defineViteConfig({
@@ -24,6 +25,14 @@ const viteConfig = defineViteConfig({
       },
     },
     react(),
+    viteStaticCopy({
+      targets: [
+        {
+          src: "src/robots.txt",
+          dest: "",
+        },
+      ],
+    }),
   ],
   cacheDir: ".vite",
   optimizeDeps: {

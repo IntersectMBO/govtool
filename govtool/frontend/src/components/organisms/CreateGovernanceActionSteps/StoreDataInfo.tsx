@@ -8,7 +8,6 @@ import {
   useTranslation,
 } from "@hooks";
 import { BgCard, ControlledField } from "@organisms";
-import { openInNewTab } from "@utils";
 
 type StoreDataInfoProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -20,7 +19,7 @@ export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
   const { isMobile } = useScreenDimension();
 
   // TODO: change link when available
-  const openLink = () => openInNewTab("https://docs.sanchogov.tools");
+  const link = "https://docs.sanchogov.tools";
 
   const isContinueDisabled = !watch("storeData");
 
@@ -40,7 +39,8 @@ export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
       </Typography>
       <Link
         data-testid="storing-information-link"
-        onClick={openLink}
+        href={link}
+        target="_blank"
         sx={{
           cursor: "pointer",
           fontSize: 16,

@@ -4,7 +4,6 @@ import { Box, Link } from "@mui/material";
 import { Spacer, Typography } from "@atoms";
 import { useScreenDimension, useTranslation, useVoteContextForm } from "@hooks";
 import { ControlledField, VoteContextWrapper } from "@organisms";
-import { openInNewTab } from "@utils";
 
 type StoreDataInfoProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -17,7 +16,7 @@ export const VoteContextTerms = ({ setStep, onCancel }: StoreDataInfoProps) => {
   const { isMobile } = useScreenDimension();
 
   // TODO: change link when available
-  const openLink = () => openInNewTab("https://docs.sanchogov.tools");
+  const link = "https://docs.sanchogov.tools";
 
   const isContinueDisabled = !watch("terms");
 
@@ -31,7 +30,8 @@ export const VoteContextTerms = ({ setStep, onCancel }: StoreDataInfoProps) => {
         {t("createGovernanceAction.storeDataTitle")}
       </Typography>
       <Link
-        onClick={openLink}
+        href={link}
+        target="_blank"
         sx={{
           cursor: "pointer",
           fontSize: 16,

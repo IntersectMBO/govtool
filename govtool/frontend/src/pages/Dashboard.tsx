@@ -12,7 +12,7 @@ import { checkIsWalletConnected } from "@utils";
 export const Dashboard = () => {
   const { isEnabled, stakeKey } = useCardano();
   const { isMobile } = useScreenDimension();
-  const { pathname, hash } = useLocation();
+  const { pathname } = useLocation();
   const divRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -37,9 +37,7 @@ export const Dashboard = () => {
       if (window.location.pathname === PATHS.dashboard) {
         navigate(PATHS.home);
       } else {
-        navigate(
-          window.location.pathname.replace("connected/", "") + hash ?? "",
-        );
+        navigate(window.location.pathname.replace("connected/", ""));
       }
     }
   }, [isEnabled, stakeKey]);

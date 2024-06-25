@@ -5,7 +5,6 @@ import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import { useModal } from "@context";
 import type { WalletOption } from "@molecules";
 import { WalletOptionButton } from "@molecules";
-import { openInNewTab } from "@utils";
 import { useTranslation } from "@hooks";
 import { To } from "react-router-dom";
 
@@ -105,11 +104,8 @@ export const ChooseWalletModal = forwardRef<HTMLDivElement>((_, ref) => {
           <Link
             fontSize={11}
             fontWeight={500}
-            onClick={() =>
-              openInNewTab(
-                "https://docs.sanchogov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet",
-              )
-            }
+            href="https://docs.sanchogov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet"
+            target="_blank"
             sx={{ cursor: "pointer" }}
           >
             {t("here")}

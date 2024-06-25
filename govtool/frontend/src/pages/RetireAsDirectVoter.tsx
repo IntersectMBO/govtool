@@ -14,7 +14,7 @@ import {
 } from "@hooks";
 import { LinkWithIcon } from "@molecules";
 import { BgCard, DashboardTopNav, Footer } from "@organisms";
-import { checkIsWalletConnected, correctAdaFormat, openInNewTab } from "@utils";
+import { checkIsWalletConnected, correctAdaFormat } from "@utils";
 
 export const RetireAsDirectVoter = () => {
   const navigate = useNavigate();
@@ -125,9 +125,10 @@ export const RetireAsDirectVoter = () => {
               values={{ deposit: correctAdaFormat(voter?.deposit) }}
               components={[
                 <Link
-                  onClick={() => openInNewTab("https://sancho.network/")}
-                  sx={{ cursor: "pointer", textDecoration: "none" }}
                   key="0"
+                  href="https://sancho.network/"
+                  sx={{ cursor: "pointer", textDecoration: "none" }}
+                  target="_blank"
                 />,
               ]}
             />

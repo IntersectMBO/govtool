@@ -55,7 +55,6 @@ import {
   generateAnchor,
   getItemFromLocalStorage,
   getPubDRepID,
-  openInNewTab,
   PROTOCOL_PARAMS_KEY,
   removeItemFromLocalStorage,
   SANCHO_INFO_KEY,
@@ -966,7 +965,8 @@ function useCardano() {
                     i18nKey="system.testnetDescription"
                     components={[
                       <Link
-                        onClick={() => openInNewTab("https://sancho.network/")}
+                        href="https://sancho.network/"
+                        target="_blank"
                         sx={{ cursor: "pointer" }}
                       />,
                     ]}

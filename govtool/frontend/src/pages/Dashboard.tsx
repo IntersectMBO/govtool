@@ -37,9 +37,7 @@ export const Dashboard = () => {
       if (window.location.pathname === PATHS.dashboard) {
         navigate(PATHS.home);
       } else {
-        navigate(
-          window.location.pathname.replace("connected/", "") + hash ?? "",
-        );
+        navigate(window.location.pathname.replace("connected/", ""));
       }
     }
   }, [isEnabled, stakeKey]);

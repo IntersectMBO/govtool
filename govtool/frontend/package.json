@@ -96,8 +96,8 @@
     "jsdom": "^23.0.1",
     "storybook": "^7.4.5",
     "typescript": "^5.0.2",
-    "vite": "^4.3.9",
-    "vite-plugin-sitemap": "^0.6.2",
+    "vite": "^5.3.1",
+    "vite-plugin-static-copy": "^1.0.5",
     "vitest": "^1.1.0"
   },
   "optionalDependencies": {

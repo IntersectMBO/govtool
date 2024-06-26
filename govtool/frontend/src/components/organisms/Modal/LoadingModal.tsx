@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { Typography } from "@mui/material";
 
 import { Loader, ModalContents, ModalHeader, ModalWrapper } from "@atoms";
@@ -10,7 +11,7 @@ export interface LoadingModalState {
   dataTestId: string;
 }
 
-export const LoadingModal = () => {
+export const LoadingModal = forwardRef<HTMLDivElement>((_, ref) => {
   const { state } = useModal<LoadingModalState>();
   const { isMobile } = useScreenDimension();
 
@@ -18,6 +19,7 @@ export const LoadingModal = () => {
     <ModalWrapper
       dataTestId={state ? state.dataTestId : "loading-modal"}
       hideCloseButton
+      ref={ref}
     >
       <Loader size={100} />
       <ModalHeader sx={{ marginTop: "34px", px: isMobile ? 0 : 3 }}>
@@ -33,4 +35,4 @@ export const LoadingModal = () => {
       </ModalContents>
     </ModalWrapper>
   );
-};
+});

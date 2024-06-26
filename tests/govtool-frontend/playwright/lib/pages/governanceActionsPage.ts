@@ -3,6 +3,7 @@ import { Locator, Page, expect } from "@playwright/test";
 import { FilterOption, IProposal } from "@types";
 import environments from "lib/constants/environments";
 import GovernanceActionDetailsPage from "./governanceActionDetailsPage";
+import { getEnumKeyByValue } from "@helpers/enum";
 
 const MAX_SLIDES_DISPLAY_PER_TYPE = 6;
 
@@ -135,8 +136,13 @@ export default class GovernanceActionsPage {
     // Frontend validation
     for (let dIdx = 0; dIdx <= proposalsByType.length - 1; dIdx++) {
       const proposals = proposalsByType[0] as IProposal[];
+      const filterOptionKey = getEnumKeyByValue(
+        FilterOption,
+        proposals[0].type
+      );
+
       const slides = await this.page
-        .locator(`[data-testid="govaction-${proposals[0].type}-card"]`)
+        .locator(`[data-testid="govaction-${filterOptionKey}-card"]`)
         .all();
 
       const actualSlidesInDisplay =

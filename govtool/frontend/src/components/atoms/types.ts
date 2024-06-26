@@ -21,7 +21,7 @@ export type LoadingButtonProps = ButtonProps & {
 
 export type TypographyProps = Pick<
   MUITypographyProps,
-  "color" | "lineHeight" | "sx"
+  "color" | "lineHeight" | "sx" | "component"
 > & {
   children?: React.ReactNode;
   fontSize?: number;

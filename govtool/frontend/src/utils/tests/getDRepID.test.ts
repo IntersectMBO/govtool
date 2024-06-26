@@ -43,15 +43,18 @@ describe("getPubDRepID function", () => {
   });
 
   it("returns undefined values for dRepKey, dRepID, and dRepIDBech32 when walletApi throws an error", async () => {
-    mockGetPubDRepKey.mockRejectedValueOnce(
-      new Error("Failed to get PubDRepKey"),
-    );
+    const failedToGetPubDRepKeyError = new Error("Failed to get PubDRepKey");
+    mockGetPubDRepKey.mockRejectedValueOnce(failedToGetPubDRepKeyError);
+
+    const consoleErrorSpy = vi.spyOn(console, "error");
     const result = await getPubDRepID(mockWalletApi);
+
     expect(result).toEqual({
       dRepKey: undefined,
       dRepID: undefined,
       dRepIDBech32: undefined,
     });
-    expect(mockGetPubDRepKey).toHaveBeenCalled();
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(failedToGetPubDRepKeyError);
   });
 });

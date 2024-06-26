@@ -1,3 +1,4 @@
+import { DialogContent } from "@mui/material";
 import MuiModal from "@mui/material/Modal";
 import type { ComponentProps } from "react";
 
@@ -11,6 +12,6 @@ interface Props {
 
 export const Modal = ({ open, children, handleClose }: Props) => (
   <MuiModal open={open} onClose={handleClose} disableAutoFocus>
-    {children}
+    <DialogContent>{children}</DialogContent>
   </MuiModal>
 );

@@ -80,6 +80,7 @@ $(target_config_dir)/backend-config.json: $(config_dir)/templates/backend-config
 		-e "s|<DBSYNC_POSTGRES_USER>|$${DBSYNC_POSTGRES_USER}|" \
 		-e "s|<DBSYNC_POSTGRES_PASSWORD>|$${DBSYNC_POSTGRES_PASSWORD}|" \
 		-e "s|<SENTRY_DSN>|$${SENTRY_DSN_BACKEND}|" \
+		-e "s|<SENTRY_ENV>|$(env)|" \
 		$< > $@
 
 $(target_config_dir)/%.yml: $(template_config_dir)/%.yml $(target_config_dir)/

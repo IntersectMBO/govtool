@@ -3,7 +3,7 @@ import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 import { Background, Button, Link, Typography } from "@atoms";
 import { ICONS, IMAGES, NAV_ITEMS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { useModal } from "@context";
+import { useFeatureFlag, useModal } from "@context";
 import { openInNewTab } from "@utils";
 
 import { DrawerMobileProps } from "./types";
@@ -16,6 +16,7 @@ export const DrawerMobile = ({
   isDrawerOpen,
   setIsDrawerOpen,
 }: DrawerMobileProps) => {
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { t } = useTranslation();
@@ -73,19 +74,28 @@ export const DrawerMobile = ({
           ) : null}
           <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
             <Grid container direction="column" mt={6} rowGap={4}>
-              {NAV_ITEMS.map((navItem) => (
-                <Grid item key={navItem.label}>
-                  <Link
-                    {...navItem}
-                    isConnectWallet={isConnectButton}
-                    onClick={() => {
-                      if (navItem.newTabLink) openInNewTab(navItem.newTabLink);
-                      setIsDrawerOpen(false);
-                    }}
-                    size="big"
-                  />
-                </Grid>
-              ))}
+              {NAV_ITEMS.map((navItem) => {
+                if (
+                  !isProposalDiscussionForumEnabled &&
+                  navItem.dataTestId === "proposed-governance-actions-link"
+                ) {
+                  return null;
+                }
+                return (
+                  <Grid item key={navItem.label}>
+                    <Link
+                      {...navItem}
+                      isConnectWallet={isConnectButton}
+                      onClick={() => {
+                        if (navItem.newTabLink)
+                          openInNewTab(navItem.newTabLink);
+                        setIsDrawerOpen(false);
+                      }}
+                      size="big"
+                    />
+                  </Grid>
+                );
+              })}
             </Grid>
           </Box>
         </Box>

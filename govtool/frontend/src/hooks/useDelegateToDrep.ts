@@ -44,6 +44,7 @@ export const useDelegateTodRep = () => {
           error,
           dataTestId: "delegate-transaction-error-modal",
         });
+        Sentry.setTag("hook", "useDelegateTodRep");
         Sentry.captureException(error);
       } finally {
         setIsDelegating(null);

@@ -5,9 +5,11 @@ import DRepForm from "../forms/dRepForm";
 export default class DRepRegistrationPage extends DRepForm {
   readonly registerBtn = this.page.getByTestId("register-button");
   readonly confirmBtn = this.page.getByTestId("confirm-modal-button");
+
   readonly registrationSuccessModal = this.page.getByTestId(
     "governance-action-submitted-modal"
   );
+  readonly metadataErrorModal = this.page.getByTestId("modal");
 
   constructor(private readonly page: Page) {
     super(page);

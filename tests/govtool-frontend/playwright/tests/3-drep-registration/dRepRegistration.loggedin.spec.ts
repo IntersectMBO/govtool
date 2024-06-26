@@ -121,7 +121,9 @@ test.describe("Validation of dRep Registration Form", () => {
       metadataAnchorGreaterThan128Bytes
     );
 
-    await expect(page.getByTestId("invalid-url-error")).toBeVisible();
+    await expect(
+      page.getByTestId("url-must-be-less-than-128-bytes-error")
+    ).toBeVisible();
   });
 });
 
@@ -154,7 +156,7 @@ test("3O. Should reject invalid dRep registration metadata", async ({
   await dRepRegistrationPage.metadataUrlInput.fill(invalidMetadataAnchor);
   await dRepRegistrationPage.registerBtn.click();
 
-  await expect(
-    page.getByTestId("registration-transaction-error-modal")
-  ).not.toHaveText(/utxo balance insufficient/i);
+  await expect(dRepRegistrationPage.metadataErrorModal).toHaveText(
+    /your external data does not/i
+  );
 });

@@ -85,6 +85,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
                 variant="title2"
                 fontWeight={600}
                 sx={{ display: "inline" }}
+                component="span"
               >
                 {` ${t("inProgress")}`}
               </Typography>

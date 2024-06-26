@@ -66,11 +66,7 @@ test("2N. Should show DRep information on details page", async ({
 
   await dRepRegistrationPage.confirmBtn.click();
 
-  const dRepDirectory = new DRepDirectoryPage(dRepPage);
-  await dRepDirectory.goto();
-
-  await dRepDirectory.searchInput.fill(wallet.dRepId);
-  await dRepPage.getByTestId(`${wallet.dRepId}-view-details-button`).click();
+  await dRepPage.getByTestId("view-drep-details-button").click();
 
   // Verification
   await expect(dRepPage.getByTestId("copy-drep-id-button")).toHaveText(

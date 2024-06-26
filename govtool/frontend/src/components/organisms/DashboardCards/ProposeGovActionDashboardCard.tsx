@@ -37,7 +37,7 @@ export const ProposeGovActionDashboardCard = ({
 
     navigate(
       isProposalDiscussionForumEnabled
-        ? `${PATHS.connectedProposalPillar.replace("/*", "")}${
+        ? `${PATHS.proposalPillar.replace("/*", "")}${
             PDF_PATHS.proposalDiscussion
           }`
         : PATHS.createGovernanceAction,

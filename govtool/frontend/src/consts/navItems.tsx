@@ -24,6 +24,13 @@ export const NAV_ITEMS = [
     newTabLink: null,
   },
   {
+    dataTestId: "proposed-governance-actions-link",
+    navTo:
+      PATHS.proposalPillar.replace("/*", "") + PDF_PATHS.proposalDiscussion,
+    label: i18n.t("proposalDiscussion.title"),
+    newTabLink: null,
+  },
+  {
     dataTestId: "guides-link",
     navTo: "",
     label: i18n.t("menu.guides"),
@@ -64,7 +71,7 @@ export const CONNECTED_NAV_ITEMS = [
   {
     dataTestId: "proposal-discussion-link",
     label: i18n.t("proposalDiscussion.title"),
-    navTo: `${PATHS.proposalPillar.replace("/*", "")}${
+    navTo: `${PATHS.connectedProposalPillar.replace("/*", "")}${
       PDF_PATHS.proposalDiscussion
     }`,
     activeIcon: (

@@ -512,7 +512,8 @@ export const en = {
         },
         proposeAGovernanceAction: {
           description: "Submit your proposal for a Governance Action.",
-          firstButtonLabel: "Connect to Submit",
+          secondButtonLabel: "View Proposals",
+          firstButtonLabel: "Connect to Propose",
           title: "Propose a Governance Action",
         },
         registerAsDRep: {

@@ -97,7 +97,12 @@ storeMetadata ::
 storeMetadata metadataResults = do
     port <- getRedisPort
     host <- getRedisHost
-    conn <- liftIO $ Redis.checkedConnect $ Redis.defaultConnectInfo {Redis.connectHost = unpack host, Redis.connectPort = Redis.PortNumber $ fromIntegral port}
+    pass <- fmap Text.encodeUtf8 <$> getRedisPassword
+    conn <- liftIO $ Redis.checkedConnect $ Redis.defaultConnectInfo
+        { Redis.connectHost = unpack host
+        , Redis.connectPort = Redis.PortNumber $ fromIntegral port
+        , Redis.connectAuth = pass
+        }
     liftIO $ Redis.runRedis conn $ do
         forM metadataResults $ \(reddisId, metadataValidationResult) -> do
                 _ <- Redis.set (Text.encodeUtf8 reddisId) (toStrict $ encode metadataValidationResult)

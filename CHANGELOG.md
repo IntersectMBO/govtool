@@ -111,6 +111,7 @@ changes.
 
 ### Changed
 
+- `redis` config fields changed [Issue 1234](https://github.com/IntersectMBO/govtool/issues/1234)
 - `proposal.about` changed to `proposal.abstract`
 - `drep/info` now returns 4 different tx hashes instead of one latest tx hash [Issue 688](https://github.com/IntersectMBO/govtool/issues/688)
 - `proposal/list` allows user to search by tx hash [Issue 603](https://github.com/IntersectMBO/govtool/issues/603)

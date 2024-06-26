@@ -14,6 +14,9 @@
     "metadatavalidationhost": "localhost",
     "metadatavalidationport": 3001,
     "metadatavalidationmaxconcurrentrequests": 10,
-    "redishost": "localhost",
-    "redisport": 6379
+    "redisconfig" : {
+      "host"    : "localhost",
+      "port"    : 8094,
+      "password": null
+  }
 }

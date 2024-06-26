@@ -25,6 +25,7 @@ module VVA.Config
     , getServerPort
     , getRedisHost
     , getRedisPort
+    , getRedisPassword
     , vvaConfigToText
     , getMetadataValidationHost
     , getMetadataValidationPort
@@ -68,6 +69,14 @@ data DBConfig
 instance DefaultConfig DBConfig where
   configDef = DBConfig "localhost" "cexplorer" "postgres" "test" 9903
 
+data RedisInternalConfig
+  = RedisInternalConfig
+      { redisInternalConfigHost     :: Text
+      , redisInternalConfigPort     :: Int
+      , redisInternalConfigPassword :: Maybe Text
+      }
+  deriving (FromConfig, Generic, Show)
+
 -- | Internal, backend-dependent representation of configuration for DEX.  This
 -- data type should not be exported from this module.
 data VVAConfigInternal
@@ -90,10 +99,8 @@ data VVAConfigInternal
       , vVAConfigInternalMetadataValidationPort :: Int
         -- | Maximum number of concurrent metadata requests
       , vVAConfigInternalMetadataValidationMaxConcurrentRequests :: Int
-        -- | Redis host
-      , vVAConfigInternalRedisHost :: Text
-        -- | Redis port
-      , vVAConfigInternalRedisPort :: Int
+        -- | Redis config
+      , vVAConfigInternalRedisConfig :: RedisInternalConfig
       }
   deriving (FromConfig, Generic, Show)
 
@@ -109,9 +116,16 @@ instance DefaultConfig VVAConfigInternal where
         vVAConfigInternalMetadataValidationHost = "localhost",
         vVAConfigInternalMetadataValidationPort = 3001,
         vVAConfigInternalMetadataValidationMaxConcurrentRequests = 10,
-        vVAConfigInternalRedisHost = "localhost",
-        vVAConfigInternalRedisPort = 6379
+        vVAConfigInternalRedisConfig = RedisInternalConfig "localhost" 6379 Nothing
       }
+
+data RedisConfig
+  = RedisConfig
+      { redisHost :: Text
+      , redisPort :: Int
+      , redisPassword :: Maybe Text
+      }
+  deriving (Generic, Show, ToJSON)
 
 -- | DEX configuration.
 data VVAConfig
@@ -134,10 +148,8 @@ data VVAConfig
       , metadataValidationPort :: Int
         -- | Maximum number of concurrent metadata requests
       , metadataValidationMaxConcurrentRequests :: Int
-        -- | Redis host
-      , redisHost :: Text
-        -- | Redis port
-      , redisPort :: Int
+        -- | Redis config
+      , redisConfig :: RedisConfig
       }
   deriving (Generic, Show, ToJSON)
 
@@ -182,8 +194,11 @@ convertConfig VVAConfigInternal {..} =
       metadataValidationHost = vVAConfigInternalMetadataValidationHost,
       metadataValidationPort = vVAConfigInternalMetadataValidationPort,
       metadataValidationMaxConcurrentRequests = vVAConfigInternalMetadataValidationMaxConcurrentRequests,
-      redisHost = vVAConfigInternalRedisHost,
-      redisPort = vVAConfigInternalRedisPort
+      redisConfig = RedisConfig
+        { redisHost = redisInternalConfigHost $ vVAConfigInternalRedisConfig,
+          redisPort = redisInternalConfigPort $ vVAConfigInternalRedisConfig,
+          redisPassword = redisInternalConfigPassword $ vVAConfigInternalRedisConfig
+        }
     }
 
 -- | Load configuration from a file specified on the command line.  Load from
@@ -226,13 +241,18 @@ getServerHost = asks (serverHost . getter)
 getRedisHost ::
   (Has VVAConfig r, MonadReader r m) =>
   m Text
-getRedisHost = asks (redisHost . getter)
+getRedisHost = asks (redisHost . redisConfig . getter)
 
 -- | Access redis port
 getRedisPort ::
   (Has VVAConfig r, MonadReader r m) =>
   m Int
-getRedisPort = asks (redisPort . getter)
+getRedisPort = asks (redisPort . redisConfig .  getter)
+
+getRedisPassword ::
+  (Has VVAConfig r, MonadReader r m) =>
+  m (Maybe Text)
+getRedisPassword = asks (redisPassword . redisConfig . getter)
 
 -- | Access MetadataValidationService host
 getMetadataValidationHost ::

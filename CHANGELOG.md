@@ -65,6 +65,7 @@ changes.
 - Add PDF pillar [Issue 1090](https://github.com/IntersectMBO/govtool/issues/1090)
 - Replace govtool-wrapper governance action creation in favor of pdf-pillar [Issue 1284](https://github.com/IntersectMBO/govtool/issues/1284)
 - Add sentry environment config [Issue 1324](https://github.com/IntersectMBO/govtool/issues/1324)
+- Add proposal discussion pillar to home page [Issue 1431](https://github.com/IntersectMBO/govtool/issues/1431)
 
 ### Fixed
 

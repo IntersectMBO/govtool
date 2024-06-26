@@ -5,7 +5,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 
 import { Button, Link } from "@atoms";
 import { ICONS, IMAGES, PATHS, NAV_ITEMS } from "@consts";
-import { useCardano, useModal } from "@context";
+import { useCardano, useFeatureFlag, useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
@@ -14,6 +14,7 @@ import { DrawerMobile } from "./DrawerMobile";
 const POSITION_TO_BLUR = 50;
 
 export const TopNav = ({ isConnectButton = true }) => {
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const [windowScroll, setWindowScroll] = useState<number>(0);
   const { openModal } = useModal();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
@@ -98,20 +99,28 @@ export const TopNav = ({ isConnectButton = true }) => {
                 columnSpacing={screenWidth < 1024 ? 2 : 4}
                 container
               >
-                {NAV_ITEMS.map((navItem) => (
-                  <Grid item key={navItem.label}>
-                    <Link
-                      {...navItem}
-                      isConnectWallet={isConnectButton}
-                      onClick={() => {
-                        if (navItem.newTabLink) {
-                          openInNewTab(navItem.newTabLink);
-                        }
-                        setIsDrawerOpen(false);
-                      }}
-                    />
-                  </Grid>
-                ))}
+                {NAV_ITEMS.map((navItem) => {
+                  if (
+                    !isProposalDiscussionForumEnabled &&
+                    navItem.dataTestId === "proposed-governance-actions-link"
+                  ) {
+                    return null;
+                  }
+                  return (
+                    <Grid item key={navItem.label}>
+                      <Link
+                        {...navItem}
+                        isConnectWallet={isConnectButton}
+                        onClick={() => {
+                          if (navItem.newTabLink) {
+                            openInNewTab(navItem.newTabLink);
+                          }
+                          setIsDrawerOpen(false);
+                        }}
+                      />
+                    </Grid>
+                  );
+                })}
                 {isConnectButton ? (
                   <Grid item>
                     <Button

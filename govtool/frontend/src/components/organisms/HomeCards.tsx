@@ -2,13 +2,14 @@ import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 
-import { IMAGES, PATHS } from "@consts";
-import { useModal } from "@context";
+import { IMAGES, PATHS, PDF_PATHS } from "@consts";
+import { useFeatureFlag, useModal } from "@context";
 import { ActionCard } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
 export const HomeCards = () => {
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const navigate = useNavigate();
   const { openModal } = useModal();
   const { screenWidth } = useScreenDimension();
@@ -45,6 +46,16 @@ export const HomeCards = () => {
 
   const navigateToDRepDirecotry = useCallback(
     () => navigate(PATHS.dRepDirectory),
+    [navigate],
+  );
+
+  const navigateToProposalDiscussionPillar = useCallback(
+    () =>
+      navigate(
+        `${PATHS.connectedProposalPillar.replace("/*", "")}${
+          PDF_PATHS.proposalDiscussion
+        }`,
+      ),
     [navigate],
   );
 
@@ -141,8 +152,16 @@ export const HomeCards = () => {
         imageHeight={84}
         imageURL={IMAGES.proposeGovActionImage}
         imageWidth={84}
-        secondButtonAction={onClickLearnMoreAboutProposingGovAction}
-        secondButtonLabel={t("learnMore")}
+        secondButtonAction={
+          isProposalDiscussionForumEnabled
+            ? navigateToProposalDiscussionPillar
+            : onClickLearnMoreAboutProposingGovAction
+        }
+        secondButtonLabel={t(
+          isProposalDiscussionForumEnabled
+            ? "home.cards.proposeAGovernanceAction.secondButtonLabel"
+            : "learnMore",
+        )}
         title={t("home.cards.proposeAGovernanceAction.title")}
       />
       {/* PROPOSE GOV ACTION CARD  END */}

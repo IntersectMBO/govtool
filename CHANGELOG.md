@@ -65,9 +65,12 @@ changes.
 - Add PDF pillar [Issue 1090](https://github.com/IntersectMBO/govtool/issues/1090)
 - Replace govtool-wrapper governance action creation in favor of pdf-pillar [Issue 1284](https://github.com/IntersectMBO/govtool/issues/1284)
 - Add sentry environment config [Issue 1324](https://github.com/IntersectMBO/govtool/issues/1324)
+- Add proposal discussion pillar to home page [Issue 1431](https://github.com/IntersectMBO/govtool/issues/1431)
 
 ### Fixed
 
+- silenced `Thread killed by timeout manager` sentry log [Issue 1417](https://github.com/IntersectMBO/govtool/issues/1417)
+- silenced `Warp: Client closed connection prematurely` error [Issue 1422](https://github.com/IntersectMBO/govtool/issues/1422)
 - backend is now compiled with -threaded [Issue 1148](https://github.com/IntersectMBO/govtool/issues/1148)
 - drep/get-voting-power no longer throws 500 for non-existing dreps. Instead it returns 0 [Issue 1093](https://github.com/IntersectMBO/govtool/issues/1093)
 - proposal/list no longer throws 500 error when proposal's url is incorrect [Issue 1073](https://github.com/IntersectMBO/govtool/issues/1073)

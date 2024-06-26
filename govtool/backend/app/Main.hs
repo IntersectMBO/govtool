@@ -143,6 +143,7 @@ exceptionHandler :: VVAConfig -> Maybe Request -> SomeException -> IO ()
 exceptionHandler vvaConfig mRequest exception = do
   print mRequest
   print exception
+  guard (show exception /= "Thread killed by timeout manager")
   sentryService <-
     initRaven
       (sentryDSN vvaConfig)

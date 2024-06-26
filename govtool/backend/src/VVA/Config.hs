@@ -80,6 +80,8 @@ data VVAConfigInternal
       , vVaConfigInternalCacheDurationSeconds   :: Int
         -- | Sentry DSN
       , vVAConfigInternalSentrydsn              :: String
+        -- | Sentry environment
+      , vVAConfigInternalSentryEnv              :: String
         -- | Metadata validation service host
       , vVAConfigInternalMetadataValidationHost :: Text
         -- | Metadata validation service port
@@ -97,6 +99,7 @@ instance DefaultConfig VVAConfigInternal where
         vVAConfigInternalHost = "localhost",
         vVaConfigInternalCacheDurationSeconds = 20,
         vVAConfigInternalSentrydsn = "https://username:password@senty.host/id",
+        vVAConfigInternalSentryEnv = "development",
         vVAConfigInternalMetadataValidationHost = "localhost",
         vVAConfigInternalMetadataValidationPort = 3001,
         vVAConfigInternalMetadataValidationMaxConcurrentRequests = 10
@@ -115,6 +118,8 @@ data VVAConfig
       , cacheDurationSeconds   :: Int
         -- | Sentry DSN
       , sentryDSN              :: String
+        -- | Sentry environment
+      , sentryEnv              :: String
         -- | Metadata validation service host
       , metadataValidationHost :: Text
         -- | Metadata validation service port
@@ -161,6 +166,7 @@ convertConfig VVAConfigInternal {..} =
       serverHost = vVAConfigInternalHost,
       cacheDurationSeconds = vVaConfigInternalCacheDurationSeconds,
       sentryDSN = vVAConfigInternalSentrydsn,
+      sentryEnv = vVAConfigInternalSentryEnv,
       metadataValidationHost = vVAConfigInternalMetadataValidationHost,
       metadataValidationPort = vVAConfigInternalMetadataValidationPort,
       metadataValidationMaxConcurrentRequests = vVAConfigInternalMetadataValidationMaxConcurrentRequests

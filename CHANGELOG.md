@@ -10,6 +10,7 @@ changes.
 
 ## [Unreleased]
 
+- Added 'sentryenv' field in backend config file [Issue 1401](https://github.com/IntersectMBO/govtool/issues/1401)
 - Add wallet connector package [Issue 898](https://github.com/IntersectMBO/govtool/issues/898)
 - Change DRep without metadata name from "Sole Voter" to "Direct Voter" [Issue 880](https://github.com/IntersectMBO/govtool/issues/880)
 - Inicialize Usersnap into App [Issue 546](https://github.com/IntersectMBO/govtool/issues/546)

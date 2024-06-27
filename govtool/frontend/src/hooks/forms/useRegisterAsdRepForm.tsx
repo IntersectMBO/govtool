@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
-import { captureException } from "@sentry/react";
+import * as Sentry from "@sentry/react";
 import { NodeObject } from "jsonld";
 
 import {
@@ -136,7 +136,8 @@ export const useRegisterAsdRepForm = (
 
         return certBuilder;
       } catch (error) {
-        captureException(error);
+        Sentry.setTag("hook", "useRegisterAsdRepForm");
+        Sentry.captureException(error);
         throw error;
       }
     },
@@ -212,7 +213,8 @@ export const useRegisterAsdRepForm = (
             },
           });
         } else {
-          captureException(error);
+          Sentry.setTag("hook", "useRegisterAsdRepForm");
+          Sentry.captureException(error);
 
           openWalletErrorModal({
             error,

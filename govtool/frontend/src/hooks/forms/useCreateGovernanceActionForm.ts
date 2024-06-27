@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
-import { captureException } from "@sentry/react";
+import * as Sentry from "@sentry/react";
 import { useTranslation } from "react-i18next";
 import { NodeObject } from "jsonld";
 
@@ -156,7 +156,8 @@ export const useCreateGovernanceActionForm = (
             throw new Error(t("errors.invalidGovernanceActionType"));
         }
       } catch (error) {
-        captureException(error);
+        Sentry.setTag("hook", "useCreateGovernanceActionForm");
+        Sentry.captureException(error);
       }
     },
     [hash],
@@ -240,7 +241,7 @@ export const useCreateGovernanceActionForm = (
           openWalletErrorModal({
             error: isInsufficientBalance
               ? t("errors.insufficientBalanceDescription", {
-                  ada: correctAdaFormat(protocolParams.gov_action_deposit),
+                  ada: correctAdaFormat(protocolParams?.gov_action_deposit),
                 })
               : error,
             title: isInsufficientBalance
@@ -248,7 +249,8 @@ export const useCreateGovernanceActionForm = (
               : undefined,
             dataTestId: "create-governance-action-error-modal",
           });
-          captureException(error);
+          Sentry.setTag("hook", "useCreateGovernanceActionForm");
+          Sentry.captureException(error);
         }
       } finally {
         setIsLoading(false);

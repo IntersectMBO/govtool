@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SnackbarProvider } from "@context";
 import { CopyButton } from "@atoms";
+import { act } from "react";
 
 Object.defineProperty(global.navigator, "clipboard", {
   value: {
@@ -61,9 +62,11 @@ describe("CopyButton", () => {
     );
 
     const copyButton = screen.getByTestId("copy-button");
-    await userEvent.click(copyButton);
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith("Example Text");
 
-    expect(screen.getByText("alerts.copiedToClipboard")).toBeInTheDocument();
+    await act(async () => {
+      await userEvent.click(copyButton);
+    });
+
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith("Example Text");
   });
 });

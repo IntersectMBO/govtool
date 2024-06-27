@@ -1,0 +1,51 @@
+{
+  "data": [
+    {
+      "id": 139,
+      "attributes": {
+        "proposal_id": "128",
+        "comment_parent_id": null,
+        "user_id": "20",
+        "comment_text": "Hello",
+        "createdAt": "2024-06-14T13:38:35.830Z",
+        "updatedAt": "2024-06-14T13:38:35.830Z",
+        "user_govtool_username": "Anonymous",
+        "subcommens_number": 0
+      }
+    },
+    {
+      "id": 138,
+      "attributes": {
+        "proposal_id": "128",
+        "comment_parent_id": null,
+        "user_id": "20",
+        "comment_text": "Nice proposal",
+        "createdAt": "2024-06-14T13:38:31.279Z",
+        "updatedAt": "2024-06-14T13:38:31.279Z",
+        "user_govtool_username": "Anonymous",
+        "subcommens_number": 0
+      }
+    },
+    {
+      "id": 137,
+      "attributes": {
+        "proposal_id": "128",
+        "comment_parent_id": null,
+        "user_id": "20",
+        "comment_text": "Go Ahead",
+        "createdAt": "2024-06-14T13:38:27.286Z",
+        "updatedAt": "2024-06-14T13:38:27.286Z",
+        "user_govtool_username": "Anonymous",
+        "subcommens_number": 0
+      }
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pageSize": 25,
+      "pageCount": 1,
+      "total": 3
+    }
+  }
+}

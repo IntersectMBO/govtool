@@ -18,21 +18,11 @@ import { ContextProviders, UsersnapProvider } from "@context";
 import App from "./App.tsx";
 import { theme } from "./theme.ts";
 import "./i18n";
+import pkg from "../package.json";
+
+const { version } = pkg;
 
 const queryClient = new QueryClient();
-
-interface SentryEventDataLayer {
-  event: string;
-  sentryEventId: string;
-  sentryErrorMessage?: JSONValue;
-}
-
-// TODO: Move to types
-declare global {
-  interface Window {
-    dataLayer: SentryEventDataLayer[];
-  }
-}
 
 const tagManagerArgs = {
   gtmId: import.meta.env.VITE_GTM_ID,
@@ -42,6 +32,8 @@ TagManager.initialize(tagManagerArgs);
 
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_DSN,
+  environment: import.meta.env.VITE_APP_ENV,
+  release: version,
   integrations: [
     new Sentry.BrowserTracing({
       routingInstrumentation: Sentry.reactRouterV6Instrumentation(

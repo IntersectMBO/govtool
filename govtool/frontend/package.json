@@ -1,11 +1,11 @@
 {
-  "name": "voltaire-voting-app",
+  "name": "govtool",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.6",
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "build-storybook": "storybook build",
+    "build:storybook": "storybook build",
     "chromatic": "chromatic",
     "dev": "vite",
     "format": "prettier --write src",
@@ -28,15 +28,12 @@
     "@emurgo/cardano-serialization-lib-asmjs": "12.0.0-alpha.29",
     "@hookform/resolvers": "^3.3.1",
     "@intersect.mbo/intersectmbo.org-icons-set": "^1.0.8",
-    "@intersect.mbo/pdf-ui": "^0.1.3",
+    "@intersect.mbo/pdf-ui": "^0.2.1",
     "@mui/icons-material": "^5.14.3",
     "@mui/material": "^5.14.4",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/pluginutils": "^5.1.0",
     "@sentry/react": "^7.77.0",
-    "@types/jsonld": "^1.5.13",
-    "@types/react": "^18.2.12",
-    "@types/react-gtm-module": "^2.0.2",
     "@usersnap/browser": "^0.0.5",
     "axios": "^1.4.0",
     "bech32": "^2.0.0",
@@ -53,6 +50,7 @@
     "react-gtm-module": "^2.0.11",
     "react-hook-form": "^7.47.0",
     "react-i18next": "^14.0.1",
+    "react-markdown": "^9.0.1",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.13.0",
     "storybook-addon-manual-mocks": "^1.0.3",
@@ -77,7 +75,9 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/jsonld": "^1.5.13",
     "@types/node": "^20.4.8",
+    "@types/react": "^18.2.12",
     "@types/react-dom": "^18.0.11",
+    "@types/react-gtm-module": "^2.0.2",
     "@typescript-eslint/eslint-plugin": "^7.3.1",
     "@typescript-eslint/parser": "^7.3.1",
     "@vitejs/plugin-react": "^4.3.0",
@@ -106,5 +106,5 @@
     "typescript": "^5.0.2"
   },
   "readme": "ERROR: No README data found!",
-  "_id": "voltaire-voting-app@0.0.0"
+  "_id": "govtool@1.0.6"
 }

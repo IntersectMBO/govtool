@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, useWatch } from "react-hook-form";
+import * as Sentry from "@sentry/react";
 
 import { PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
@@ -72,6 +73,8 @@ export const useDelegateTodRepForm = () => {
           });
         }
       } catch (error) {
+        Sentry.setTag("hook", "useDelegateTodRepForm");
+        Sentry.captureException(error);
         openModal({
           type: "statusModal",
           state: {

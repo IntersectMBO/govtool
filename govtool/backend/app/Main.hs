@@ -143,6 +143,9 @@ exceptionHandler :: VVAConfig -> Maybe Request -> SomeException -> IO ()
 exceptionHandler vvaConfig mRequest exception = do
   print mRequest
   print exception
+  guard (show exception /= "Thread killed by timeout manager")
+  guard (show exception /= "Warp: Client closed connection prematurely")
+  let env = sentryEnv vvaConfig
   sentryService <-
     initRaven
       (sentryDSN vvaConfig)
@@ -154,7 +157,7 @@ exceptionHandler vvaConfig mRequest exception = do
     "vva.be"
     Error
     (formatMessage mRequest exception)
-    (recordUpdate mRequest exception)
+    (recordUpdate env mRequest exception)
 
 
 
@@ -162,12 +165,13 @@ formatMessage :: Maybe Request -> SomeException -> String
 formatMessage Nothing exception = "Exception before request could be parsed: " ++ show exception
 formatMessage (Just request) exception = "Exception " ++ show exception ++ " while handling request " ++ show request
 
-recordUpdate :: Maybe Request -> SomeException -> SentryRecord -> SentryRecord
-recordUpdate Nothing exception record = record
-recordUpdate (Just request) exception record =
+recordUpdate :: String -> Maybe Request -> SomeException -> SentryRecord -> SentryRecord
+recordUpdate env Nothing exception record = record { srEnvironment = Just env }
+recordUpdate env (Just request) exception record =
   record
     { srCulprit = Just $ unpack $ rawPathInfo request,
-      srServerName = unpack <$> requestHeaderHost request
+      srServerName = unpack <$> requestHeaderHost request,
+      srEnvironment = Just env
     }
 
 shouldDisplayException :: SomeException -> Bool

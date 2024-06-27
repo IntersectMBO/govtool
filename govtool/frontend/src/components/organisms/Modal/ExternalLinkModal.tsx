@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { Box, Button, Typography } from "@mui/material";
 
 import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
@@ -11,7 +12,7 @@ export interface ExternalLinkModalState {
   externalLink: string;
 }
 
-export const ExternalLinkModal = () => {
+export const ExternalLinkModal = forwardRef<HTMLDivElement>((_, ref) => {
   const { state, closeModal } = useModal<ExternalLinkModalState>();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -20,7 +21,7 @@ export const ExternalLinkModal = () => {
   } = theme;
 
   return (
-    <ModalWrapper dataTestId="external-link-modal">
+    <ModalWrapper dataTestId="external-link-modal" ref={ref}>
       <img
         alt="Status icon"
         src={IMAGES.warningYellowImage}
@@ -100,4 +101,4 @@ export const ExternalLinkModal = () => {
       </Box>
     </ModalWrapper>
   );
-};
+});

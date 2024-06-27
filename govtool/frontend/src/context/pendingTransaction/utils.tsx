@@ -70,13 +70,13 @@ export const refetchData = async (
       resourceId === AutomatedVotingOptionDelegationId.no_confidence ||
       resourceId === AutomatedVotingOptionDelegationId.abstain
     ) {
-      return data.dRepView;
+      return data?.dRepView;
     }
-    return data.dRepHash;
+    return data?.dRepHash;
   }
   if (type === "registerAsDrep" || type === "retireAsDrep")
-    return data.isRegisteredAsDRep;
+    return data?.isRegisteredAsDRep;
   if (type === "registerAsDirectVoter" || type === "retireAsDirectVoter")
-    return data.isRegisteredAsSoleVoter;
+    return data?.isRegisteredAsSoleVoter;
   return undefined;
 };

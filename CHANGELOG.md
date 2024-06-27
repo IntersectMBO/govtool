@@ -10,6 +10,7 @@ changes.
 
 ## [Unreleased]
 
+- Added 'sentryenv' field in backend config file [Issue 1401](https://github.com/IntersectMBO/govtool/issues/1401)
 - Add wallet connector package [Issue 898](https://github.com/IntersectMBO/govtool/issues/898)
 - Change DRep without metadata name from "Sole Voter" to "Direct Voter" [Issue 880](https://github.com/IntersectMBO/govtool/issues/880)
 - Inicialize Usersnap into App [Issue 546](https://github.com/IntersectMBO/govtool/issues/546)
@@ -63,9 +64,16 @@ changes.
 - Add eslint & prettier to frontend package [Issue 166](https://github.com/IntersectMBO/govtool/issues/166)
 - Add DRep list pagination [Issue 740](https://github.com/IntersectMBO/govtool/issues/740)
 - Add PDF pillar [Issue 1090](https://github.com/IntersectMBO/govtool/issues/1090)
+- Replace govtool-wrapper governance action creation in favor of pdf-pillar [Issue 1284](https://github.com/IntersectMBO/govtool/issues/1284)
+- Add sentry environment config [Issue 1324](https://github.com/IntersectMBO/govtool/issues/1324)
+- Add proposal discussion pillar to home page [Issue 1431](https://github.com/IntersectMBO/govtool/issues/1431)
 
 ### Fixed
 
+- silenced `Thread killed by timeout manager` sentry log [Issue 1417](https://github.com/IntersectMBO/govtool/issues/1417)
+- silenced `Warp: Client closed connection prematurely` error [Issue 1422](https://github.com/IntersectMBO/govtool/issues/1422)
+- backend is now compiled with -threaded [Issue 1148](https://github.com/IntersectMBO/govtool/issues/1148)
+- drep/get-voting-power no longer throws 500 for non-existing dreps. Instead it returns 0 [Issue 1093](https://github.com/IntersectMBO/govtool/issues/1093)
 - proposal/list no longer throws 500 error when proposal's url is incorrect [Issue 1073](https://github.com/IntersectMBO/govtool/issues/1073)
 - drep/list sql fix (now the drep type is correct) [Issue 957](https://github.com/IntersectMBO/govtool/issues/957)
 - drep/list sql fix (now the latest tx date is correct) [Issue 826](https://github.com/IntersectMBO/govtool/issues/826)
@@ -94,6 +102,10 @@ changes.
 - Remove wrongly appended `Yourself` filter on DRep Directory [Issue 1028](https://github.com/IntersectMBO/govtool/issues/1028)
 - Fix validation of uris in metadata [Issue 1011](https://github.com/IntersectMBO/govtool/issues/1011)
 - Fix wrong link to the GA Details once it is in progress [Issue 1252](https://github.com/IntersectMBO/govtool/issues/1252)
+- Fix validation of the GAs with missing references [Issue 1282](https://github.com/IntersectMBO/govtool/issues/1282)
+- Fix displaying the GA Markdowns [Issue 1244](https://github.com/IntersectMBO/govtool/issues/1244)
+- Fix app crash on voting on the GA without the connected wallet before [Issue 1313](https://github.com/IntersectMBO/govtool/issues/1313)
+- Fix the navigation to Home from Proposal pillar on disconnected wallet [Issue 1355](https://github.com/IntersectMBO/govtool/issues/1355)
 
 ### Changed
 
@@ -126,6 +138,7 @@ changes.
 - Changed documents to prepare for open source [Issue 737](https://github.com/IntersectMBO/govtool/issues/737)
 - Changed copy on maintenance page [Issue 753](https://github.com/IntersectMBO/govtool/issues/753)
 - Update link to docs [Issue 1246](https://github.com/IntersectMBO/govtool/issues/1246)
+- Change label of Proposal Discussion nav item [Issue 1349](https://github.com/IntersectMBO/govtool/issues/1349)
 
 ### Removed
 

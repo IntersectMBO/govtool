@@ -94,6 +94,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           textVariant="twoLines"
           dataTestId="governance-action-abstract"
           isSliderCard
+          isMarkdown
         />
         <GovernanceActionCardElement
           label={t("govActions.governanceActionType")}

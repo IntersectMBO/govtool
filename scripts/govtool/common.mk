@@ -34,10 +34,15 @@ check_defined = \
 __check_defined = \
     $(if $(value $1),, \
       $(error Undefined $1$(if $2, ($2))))
-
+			
+force_rebuild := $(shell echo $${FORCE_REBUILD:-false})
 # helper function for checking if image exists on ECR
 check_image_on_ecr = \
-	$(docker) manifest inspect "$(repo_url)/$1:$2" > /dev/null 2>&1
+  if [ "$(force_rebuild)" = "true" ]; then \
+    false; \
+  else \
+    $(docker) manifest inspect "$(repo_url)/$1:$2" > /dev/null 2>&1; \
+  fi
 
 .PHONY: check-env-defined
 check-env-defined:

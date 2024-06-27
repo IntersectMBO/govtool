@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { Box } from "@mui/material";
 
 import { ModalContents, ModalWrapper, Typography, VotePill } from "@atoms";
@@ -13,7 +14,7 @@ export interface VotingPowerModalState {
   vote?: string;
 }
 
-export const VotingPowerModal = () => {
+export const VotingPowerModal = forwardRef<HTMLDivElement>((_, ref) => {
   const { state } = useModal<VotingPowerModalState>();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -28,6 +29,7 @@ export const VotingPowerModal = () => {
     <ModalWrapper
       dataTestId="external-link-modal"
       sx={{ maxWidth: "372px", paddingBottom: 6 }}
+      ref={ref}
     >
       <ModalContents>
         <Box alignItems="center">
@@ -94,4 +96,4 @@ export const VotingPowerModal = () => {
       </ModalContents>
     </ModalWrapper>
   );
-};
+});

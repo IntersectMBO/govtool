@@ -62,6 +62,6 @@ function deploy-stack(){
       EXTENSION="${FILENAME##*.}"
       FILENAME_WITHOUT_EXT="${FILENAME%.*}"
       RENDERED_FILENAME="${FILENAME_WITHOUT_EXT}-rendered.${EXTENSION}"
-      envsubst < "$COMPOSE_FILE" > "$RENDERED_FILENAME"
+      ./scripts/envsubst.py < "$COMPOSE_FILE" > "$RENDERED_FILENAME"
       docker stack deploy -c "$RENDERED_FILENAME" ${STACK_NAME}
 }

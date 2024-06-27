@@ -9,12 +9,15 @@ import {
   adaHolder06Wallet,
   dRep01Wallet,
   dRep02Wallet,
+  proposal01Wallet,
   user01Wallet,
 } from "@constants/staticWallets";
+import { faker } from "@faker-js/faker";
 import { importWallet } from "@fixtures/importWallet";
 import { test as setup } from "@fixtures/walletExtension";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import LoginPage from "@pages/loginPage";
+import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 
 const dRep01AuthFile = ".auth/dRep01.json";
 const dRep02AuthFile = ".auth/dRep02.json";
@@ -27,6 +30,8 @@ const adaHolder05AuthFile = ".auth/adaHolder05.json";
 const adaHolder06AuthFile = ".auth/adaHolder06.json";
 
 const user01AuthFile = ".auth/user01.json";
+
+const proposal01AuthFile = ".auth/proposal01.json";
 
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
@@ -121,4 +126,18 @@ setup("Create AdaHolder 06 auth", async ({ page, context }) => {
   await loginPage.isLoggedIn();
 
   await context.storageState({ path: adaHolder06AuthFile });
+});
+
+setup("Create Proposal 01 auth", async ({ page, context }) => {
+  await importWallet(page, proposal01Wallet);
+
+  const loginPage = new LoginPage(page);
+  await loginPage.login();
+  await loginPage.isLoggedIn();
+
+  const proposalDiscussionPage = new ProposalDiscussionPage(page);
+  await proposalDiscussionPage.goto();
+  await proposalDiscussionPage.setUsername(faker.internet.userName());
+
+  await context.storageState({ path: proposal01AuthFile });
 });

@@ -46,10 +46,12 @@ getVotingPower ::
   Text ->
   m Integer
 getVotingPower drepId = withPool $ \conn -> do
-  [SQL.Only votingPower] <-
+  result <-
     liftIO
       (SQL.query @_ @(SQL.Only Scientific) conn getVotingPowerSql $ SQL.Only drepId)
-  return $ floor votingPower
+  case result of
+    [SQL.Only votingPower] -> return $ floor votingPower
+    [] -> return 0
 
 listDRepsSql :: SQL.Query
 listDRepsSql = sqlFrom $(embedFile "sql/list-dreps.sql")

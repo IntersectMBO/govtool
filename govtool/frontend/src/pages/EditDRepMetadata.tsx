@@ -24,6 +24,7 @@ import { checkIsWalletConnected } from "@utils";
 
 export const EditDRepMetadata = () => {
   const [step, setStep] = useState<number>(1);
+  const [loadUserData, setLoadUserData] = useState(true);
   const { isMobile } = useScreenDimension();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -95,6 +96,8 @@ export const EditDRepMetadata = () => {
               <EditDRepForm
                 onClickCancel={onClickBackToDashboard}
                 setStep={setStep}
+                loadUserData={loadUserData}
+                setLoadUserData={setLoadUserData}
               />
             )}
             {step === 2 && <EditDRepStoreDataInfo setStep={setStep} />}

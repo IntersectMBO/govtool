@@ -1,6 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import * as Sentry from "@sentry/react";
 
 import { PATHS } from "@consts";
 import { RegisterAsDirectVoterBoxContent } from "@organisms";
@@ -18,6 +19,10 @@ export const RegisterAsDirectVoterBox = () => {
   const { t } = useTranslation();
   const { voter } = useGetVoterInfo();
   const openWalletErrorModal = useWalletErrorModal();
+
+  useEffect(() => {
+    Sentry.setTag("component_name", "RegisterAsDirectVoterBox");
+  }, []);
 
   const onRegister = useCallback(async () => {
     setIsLoading(true);
@@ -49,6 +54,7 @@ export const RegisterAsDirectVoterBox = () => {
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
+      Sentry.captureException(error);
       openWalletErrorModal({
         error,
         buttonText: t("modals.common.goToDashboard"),

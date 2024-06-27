@@ -1,12 +1,16 @@
-import React, { Suspense } from "react";
+import React, { ComponentProps, Suspense } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import "@intersect.mbo/pdf-ui/style";
 import { useCardano, useGovernanceActions } from "@/context";
+import { useValidateMutation } from "@/hooks/mutations";
 
-const PDF = React.lazy(() => import("@intersect.mbo/pdf-ui/cjs"));
+const ProposalDiscussion = React.lazy(
+  () => import("@intersect.mbo/pdf-ui/cjs"),
+);
 
 export const PDFWrapper = () => {
-  const walletAPI = useCardano();
+  const { validateMetadata } = useValidateMutation();
+  const { walletApi, ...context } = useCardano();
   const { createGovernanceActionJsonLD, createHash } = useGovernanceActions();
 
   return (
@@ -14,6 +18,8 @@ export const PDFWrapper = () => {
       sx={{
         px: { xs: 2, sm: 5 },
         py: 3,
+        display: "flex",
+        flex: 1,
       }}
     >
       <Suspense
@@ -31,9 +37,19 @@ export const PDFWrapper = () => {
           </Box>
         }
       >
-        <PDF
-          walletAPI={{ ...walletAPI, createGovernanceActionJsonLD, createHash }}
+        <ProposalDiscussion
+          walletAPI={{
+            ...context,
+            ...walletApi,
+            createGovernanceActionJsonLD,
+            createHash,
+          }}
           pathname={window.location.pathname}
+          validateMetadata={
+            validateMetadata as ComponentProps<
+              typeof ProposalDiscussion
+            >["validateMetadata"]
+          }
         />
       </Suspense>
     </Box>

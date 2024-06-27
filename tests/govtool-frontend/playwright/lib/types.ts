@@ -97,3 +97,28 @@ export type ProtocolParams = {
   dRepDeposit: number;
   govActionDeposit: number;
 };
+
+type Comment = {
+  proposal_id: string;
+  comment_text: string;
+};
+
+export type StaticProposal = {
+  id: number;
+  comments?: Comment[];
+  title: string;
+};
+
+export type CommentResponse = {
+  id: number;
+  attributes: {
+    proposal_id: string;
+    comment_parent_id: null | string;
+    user_id: string;
+    comment_text: string;
+    createdAt: string;
+    updatedAt: string;
+    user_govtool_username: string;
+    subcommens_number: number;
+  };
+};

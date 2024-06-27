@@ -31,5 +31,4 @@ export const PATHS = {
 export const PDF_PATHS = {
   proposalDiscussion: "/proposal_discussion",
   proposalDiscussionProposal: "/proposal_discussion/:id",
-  proposalDiscussionCreateGovernanceAction: "/create-governance-action",
 };

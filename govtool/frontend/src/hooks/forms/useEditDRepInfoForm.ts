@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
-import { captureException } from "@sentry/react";
+import * as Sentry from "@sentry/react";
 import { NodeObject } from "jsonld";
 
 import {
@@ -77,6 +77,7 @@ export const useEditDRepInfoForm = (
 
   // Navigation
   const backToForm = useCallback(() => {
+    window.scrollTo(0, 0);
     setStep?.(1);
     closeModal();
   }, [setStep]);
@@ -177,7 +178,8 @@ export const useEditDRepInfoForm = (
             },
           });
         } else {
-          captureException(error);
+          Sentry.setTag("hook", "useEditDRepInfoForm");
+          Sentry.captureException(error);
 
           openWalletErrorModal({
             error,

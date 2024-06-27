@@ -1,7 +1,7 @@
+import math
 import sys
-import requests
 import json
-
+import time
 from lib.faucet_api import CardanoFaucet
 from lib.kuber_api import KuberApi
 
@@ -86,7 +86,8 @@ ada_wallets = [
 ]
 
 
-# create transaction using the main wallet to register 2 out of 4 wallets as drep, register other 2 wallets' stake keys create one proposal
+# Create transaction using the main wallet to register 2 out of 4 wallets as drep,
+# register other 2 wallets' stake keys create one proposal
 def main():
     kuber_json = {
         "selections": [
@@ -141,29 +142,26 @@ def main():
             }
         ],
     }
-    print(json.dumps(kuber_json, indent=2))
-    print("Submitting the above registration transaction..")
-    balance = kuber_api.get_balance(main_wallet["address"])
+
     protocol_params = kuber_api.get_protocol_params()
     total_locked = (
-            protocol_params["dRepDeposit"] * 2
-            + protocol_params["stakeAddressDeposit"] * 2
-            + protocol_params["govActionDeposit"]
+        protocol_params["dRepDeposit"] * 2
+        + protocol_params["stakeAddressDeposit"] * 2
+        + protocol_params["govActionDeposit"]
     )
-    if balance < (total_locked + 10 * 10000000000000):
-        print("Loading balance to the bootstrap wallet")
-        faucet = CardanoFaucet.from_env()
-        result = faucet.send_money(main_wallet["address"])
-        if "error" in result:
-            print(result)
-            raise Exception("Failed to load balance from faucet")
-        kuber_api.wait_for_txout(result["txin"], log=True)
+
+    # To make sure the balance is available with some extra change
+    min_required_balance = total_locked + 5 * 1000000
+    load_balance(main_wallet["address"], min_required_balance)
+
+    print(json.dumps(kuber_json, indent=2))
+    print("Submitting the above registration transaction..")
     response = kuber_api.build_tx(kuber_json, submit=True)
 
     if response.status_code == 200:
         print("Transaction submitted", response.text)
         data = response.json()
-        kuber_api.wait_for_txout(data["hash"] + '#0', log=True)
+        kuber_api.wait_for_txout(data["hash"] + "#0", log=True)
     else:
         print("Server Replied with Error [ StatusCode=", response.status_code, "]", response.reason, response.text)
         if ("DRepAlreadyRegistered" in response.text) or ("StakeKeyRegisteredDELEG" in response.text):
@@ -199,11 +197,46 @@ def main():
     if response.status_code == 200:
         print("Transaction submitted", response.text)
         data = response.json()
-        kuber_api.wait_for_txout(data["hash"] + '#0', log=True)
+        kuber_api.wait_for_txout(data["hash"] + "#0", log=True)
     else:
         if "AlreadyRegistered" in response.text:
             print("Server Replied with Error [ StatusCode=", response.status_code, "]", response.reason, response.text)
             print("")
         sys.exit(1)
+
+
+def load_balance(address, required_balance):
+    balance = kuber_api.get_balance(address)
+    print("Current Balance of Bootstrap Wallet: {} Ada".format(balance / 1e6))
+    print("Missing balance : " + str((required_balance - balance) / 1e6) + " Ada")
+    faucet = CardanoFaucet.from_env()
+
+    while balance < required_balance:
+        print("========== Requesting Faucet ==========")
+        result = faucet.send_money(address)
+        start_time = time.time()
+        if "error" in result:
+            error = result["error"]
+            if "tag" in error and error["tag"] == "FaucetWebErrorRateLimitExeeeded":
+                if "contents" in error and isinstance(error["contents"], list) and len(error["contents"]) > 0:
+                    waitTime = error["contents"][0]
+                    if isinstance(waitTime, (int, float)):
+                        wait_secs = math.ceil(waitTime) + 5
+                        print(result)
+                        print("Faucet Ratelimit: Waiting for " + str(wait_secs) + " secs")
+                        time.sleep(waitTime)
+                        continue
+            print(result)
+            raise Exception("Failed to load balance from faucet")
+        kuber_api.wait_for_txout(result["txid"] + "#0", log=True)
+        balance = kuber_api.get_balance(address)
+        print("New balance is  : " + str(balance / 1e6) + " Ada")
+        if balance < required_balance:
+            print("Missing balance : " + str((required_balance - balance) / 1e6) + " Ada")
+
+            print("Waiting for faucet rate limit of 60s ..")
+            time_diff = 65 - (time.time() - start_time)
+            if time_diff > 0:
+                time.sleep(time_diff)
 
 main()

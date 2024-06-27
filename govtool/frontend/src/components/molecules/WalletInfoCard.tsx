@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Button, Typography } from "@mui/material";
 
 import { PATHS, gray } from "@consts";
@@ -9,11 +9,16 @@ import { Card } from "./Card";
 export const WalletInfoCard = () => {
   const { address, disconnectWallet } = useCardano();
   const navigate = useNavigate();
+  const { pathname, hash } = useLocation();
   const { t } = useTranslation();
 
   const onClickDisconnect = async () => {
     await disconnectWallet();
-    navigate(PATHS.home);
+    navigate(
+      pathname.includes("/connected")
+        ? `${pathname.replace("/connected", "")}${hash ?? ""}`
+        : PATHS.home,
+    );
     window.location.reload();
   };
 

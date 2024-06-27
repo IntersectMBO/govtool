@@ -10,6 +10,7 @@ const meta = {
   parameters: {
     layout: "centered",
   },
+  args: { isShown: true },
   tags: ["autodocs"],
 } satisfies Meta<typeof VotingPowerChips>;
 

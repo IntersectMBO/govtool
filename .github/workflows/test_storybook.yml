@@ -27,7 +27,7 @@ jobs:
       - name: Install Playwright
         run: npx playwright install --with-deps
       - name: Build Storybook
-        run: NODE_OPTIONS="--max-old-space-size=8046" npm run build-storybook --quiet
+        run: NODE_OPTIONS="--max-old-space-size=8046" npm run build:storybook --quiet
       - name: Serve Storybook and run tests
         run: |
           npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \

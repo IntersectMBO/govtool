@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
+
 import { Modal, ScrollToTop } from "@atoms";
 import { PATHS, PDF_PATHS } from "@consts";
 import { useCardano, useFeatureFlag, useModal } from "@context";
@@ -27,6 +28,7 @@ import {
   RetireAsDrep,
   RetireAsDirectVoter,
   EditDRepMetadata,
+  ProposalDiscussionPillar,
 } from "@pages";
 import { SetupInterceptors } from "@services";
 import {
@@ -35,8 +37,6 @@ import {
   WALLET_LS_KEY,
   removeItemFromLocalStorage,
 } from "@utils";
-
-import { PDFWrapper } from "./components/organisms/PDFWrapper";
 
 export default () => {
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
@@ -80,6 +80,8 @@ export default () => {
     checkTheWalletIsActive();
   }, [checkTheWalletIsActive]);
 
+  // Proposal Discussion Pillar doesn't export pages or react router routes
+  // so we need to handle the routing here
   useEffect(() => {
     if (!isProposalDiscussionForumEnabled) return;
     if (
@@ -101,9 +103,6 @@ export default () => {
       <Routes>
         <Route path={PATHS.home} element={<Home />} />
         <Route path={PATHS.governanceActions} element={<GovernanceActions />} />
-        {isProposalDiscussionForumEnabled && !isEnabled && (
-          <Route path={PATHS.proposalPillar} element={<PDFWrapper />} />
-        )}
         <Route
           path={PATHS.governanceActionsCategory}
           element={<GovernanceActionsCategory />}
@@ -112,12 +111,18 @@ export default () => {
           path={PATHS.governanceActionsAction}
           element={<GovernanceActionDetails />}
         />
+        {isProposalDiscussionForumEnabled && !isEnabled && (
+          <Route
+            path={PATHS.proposalPillar}
+            element={<ProposalDiscussionPillar />}
+          />
+        )}
         <Route element={<Dashboard />}>
           <Route path={PATHS.dashboard} element={<DashboardCards />} />
           {isProposalDiscussionForumEnabled && (
             <Route
               path={PATHS.connectedProposalPillar}
-              element={<PDFWrapper />}
+              element={<ProposalDiscussionPillar />}
             />
           )}
           <Route

@@ -1,5 +1,5 @@
 import { FC, useCallback } from "react";
-import { To, useNavigate } from "react-router-dom";
+import { To, useNavigate, useLocation } from "react-router-dom";
 import { Box, CircularProgress, Typography } from "@mui/material";
 
 import { PATHS } from "@consts";
@@ -23,6 +23,7 @@ export const WalletOptionButton: FC<WalletOption> = ({
   cip95Available,
   pathToNavigate,
 }) => {
+  const { pathname, hash, state } = useLocation();
   const { enable, isEnableLoading } = useCardano();
   const {
     palette: { lightBlue },
@@ -33,7 +34,15 @@ export const WalletOptionButton: FC<WalletOption> = ({
     if (isEnableLoading) return;
     const result = await enable(name);
     if (result?.stakeKey) {
-      navigate(pathToNavigate ?? PATHS.dashboard);
+      navigate(
+        // eslint-disable-next-line no-unneeded-ternary
+        pathToNavigate
+          ? pathToNavigate
+          : pathname === "/"
+          ? "/dashboard"
+          : `connected${pathname}${hash ?? ""}`,
+        { state },
+      );
       return;
     }
     navigate(PATHS.stakeKeys);

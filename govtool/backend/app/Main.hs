@@ -103,7 +103,11 @@ startApp vvaConfig = do
                       ++ show vvaPort
                   )
             )
-          $ setOnException (exceptionHandler vvaConfig) defaultSettings
+          $ setOnException (exceptionHandler vvaConfig) 
+          $ setTimeout 30
+          $ setGracefulShutdownTimeout (Just 10)
+          defaultSettings
+          
   cacheEnv <- do
     let newCache = Cache.newCache (Just $ TimeSpec (fromIntegral (cacheDurationSeconds vvaConfig)) 0)
     proposalListCache <- newCache

@@ -39,6 +39,14 @@ export const TopNav = ({ isConnectButton = true }) => {
     setIsDrawerOpen(true);
   };
 
+  const onClickConnectButton = () => {
+    if (isEnabled && stakeKey) {
+      navigate(PATHS.dashboard);
+    } else {
+      openModal({ type: "chooseWallet" });
+    }
+  };
+
   return (
     <Box position="relative" py={isMobile ? 5 : 6}>
       <AppBar
@@ -125,13 +133,7 @@ export const TopNav = ({ isConnectButton = true }) => {
                   <Grid item>
                     <Button
                       data-testid="connect-wallet-button"
-                      onClick={() => {
-                        if (isEnabled && stakeKey) {
-                          navigate(PATHS.dashboard);
-                        } else {
-                          openModal({ type: "chooseWallet" });
-                        }
-                      }}
+                      onClick={onClickConnectButton}
                       size="extraLarge"
                       variant="contained"
                     >
@@ -147,9 +149,7 @@ export const TopNav = ({ isConnectButton = true }) => {
                 {isConnectButton ? (
                   <Button
                     data-testid="connect-wallet-button"
-                    onClick={() => {
-                      openModal({ type: "chooseWallet" });
-                    }}
+                    onClick={onClickConnectButton}
                     size="small"
                     sx={{
                       marginRight: screenWidth >= 768 ? 3 : 1,

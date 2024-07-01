@@ -33,6 +33,8 @@ export NGINX_BASIC_AUTH=<NGINX_BASIC_AUTH>
 # the IP addresses that bypass the basic auth
 export IP_ADDRESS_BYPASSING_BASIC_AUTH1=<IP_ADDRESS_BYPASSING_BASIC_AUTH1>
 export IP_ADDRESS_BYPASSING_BASIC_AUTH2=<IP_ADDRESS_BYPASSING_BASIC_AUTH2>
+# the Redis Password
+export REDIS_PASSWORD=<REDIS_PASSWORD>
 
 # the domain name for the target environment
 case "$ENVIRONMENT" in

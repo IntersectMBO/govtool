@@ -13,5 +13,10 @@
     "sentryenv": "<SENTRY_ENV>",
     "metadatavalidationhost": "http://metadata-validation",
     "metadatavalidationport": "3000",
-    "metadatavalidationmaxconcurrentrequests": 10
+    "metadatavalidationmaxconcurrentrequests": 10,
+    "redisconfig" : {
+        "host"    : "redis",
+        "port"    : 8094,
+        "password": "<REDIS_PASSWORD>"
+    }
 }

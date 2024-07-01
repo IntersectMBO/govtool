@@ -14,5 +14,16 @@
       "port"     : 5432
   },
   "port" : 8080,
-  "host" : "localhost"
+  "host" : "localhost",
+  "cachedurationseconds": 20,
+  "sentrydsn": "",
+  "sentryenv": "",
+  "metadatavalidationhost": "http://metadata-validation",
+  "metadatavalidationport": "3000",
+  "metadatavalidationmaxconcurrentrequests": 10,
+  "redisconfig" : {
+      "host"    : "http://redis",
+      "port"    : 8094,
+      "password": ""
+  }
 }

@@ -57,6 +57,7 @@ jobs:
       TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
       USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
       IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: ${{ inputs.isProposalDiscussionForumEnabled == 'enabled' }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

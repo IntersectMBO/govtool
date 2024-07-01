@@ -13,5 +13,10 @@
     "sentryenv": "dev",
     "metadatavalidationhost": "localhost",
     "metadatavalidationport": 3001,
-    "metadatavalidationmaxconcurrentrequests": 10
+    "metadatavalidationmaxconcurrentrequests": 10,
+    "redisconfig" : {
+      "host"    : "localhost",
+      "port"    : 8094,
+      "password": null
+  }
 }

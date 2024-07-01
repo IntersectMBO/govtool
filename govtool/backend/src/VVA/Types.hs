@@ -9,6 +9,8 @@
 
 module VVA.Types where
 
+import           GHC.Conc (TVar)
+import qualified Network.WebSockets.Connection as WS
 import           Data.Aeson.TH              (deriveJSON)
 import VVA.API.Utils (jsonOptions)
 import GHC.Generics (Generic)
@@ -24,6 +26,7 @@ import           Data.Has
 import           Data.Pool                  (Pool)
 import           Data.Text                  (Text)
 import           Data.Time                  (UTCTime)
+import           Data.Map                   (Map)
 
 import           Database.PostgreSQL.Simple (Connection)
 
@@ -205,6 +208,8 @@ data VotingAnchor
 
 type App m = (MonadReader AppEnv m, MonadIO m, MonadFail m, MonadError AppError m)
 
+type WebsocketTvar = TVar (Map Text (WS.Connection, UTCTime))
+
 data AppEnv
   = AppEnv
       { vvaConfig         :: VVAConfig
@@ -212,6 +217,7 @@ data AppEnv
       , vvaConnectionPool :: Pool Connection
       , vvaTlsManager     :: Manager
       , vvaMetadataQSem   :: QSem
+      , vvaWebSocketConnections :: WebsocketTvar
       }
 
 instance Has VVAConfig AppEnv where
@@ -233,3 +239,8 @@ instance Has Manager AppEnv where
 instance Has QSem AppEnv where
   getter AppEnv {vvaMetadataQSem} = vvaMetadataQSem
   modifier f a@AppEnv {vvaMetadataQSem} = a {vvaMetadataQSem = f vvaMetadataQSem}
+
+instance Has (TVar (Map Text (WS.Connection, UTCTime))) AppEnv where
+  getter AppEnv {vvaWebSocketConnections} = vvaWebSocketConnections
+  modifier f a@AppEnv {vvaWebSocketConnections} = a {vvaWebSocketConnections = f vvaWebSocketConnections}
+

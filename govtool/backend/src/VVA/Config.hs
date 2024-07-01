@@ -29,7 +29,6 @@ module VVA.Config
     , vvaConfigToText
     , getMetadataValidationHost
     , getMetadataValidationPort
-    , getWebsocketLifetimeSeconds
     ) where
 
 import           Conferer
@@ -102,8 +101,6 @@ data VVAConfigInternal
       , vVAConfigInternalMetadataValidationMaxConcurrentRequests :: Int
         -- | Redis config
       , vVAConfigInternalRedisConfig :: RedisInternalConfig
-        -- | WebSocket lifetime in seconds
-      , vVAConfigInternalWebsocketLifetimeSeconds :: Int
       }
   deriving (FromConfig, Generic, Show)
 
@@ -119,8 +116,7 @@ instance DefaultConfig VVAConfigInternal where
         vVAConfigInternalMetadataValidationHost = "localhost",
         vVAConfigInternalMetadataValidationPort = 3001,
         vVAConfigInternalMetadataValidationMaxConcurrentRequests = 10,
-        vVAConfigInternalRedisConfig = RedisInternalConfig "localhost" 6379 Nothing,
-        vVAConfigInternalWebsocketLifetimeSeconds = 60 * 1
+        vVAConfigInternalRedisConfig = RedisInternalConfig "localhost" 6379 Nothing
       }
 
 data RedisConfig
@@ -154,8 +150,6 @@ data VVAConfig
       , metadataValidationMaxConcurrentRequests :: Int
         -- | Redis config
       , redisConfig :: RedisConfig
-        -- | WebSocket lifetime in seconds
-      , websocketLifetimeSeconds :: Int
       }
   deriving (Generic, Show, ToJSON)
 
@@ -204,8 +198,7 @@ convertConfig VVAConfigInternal {..} =
         { redisHost = redisInternalConfigHost $ vVAConfigInternalRedisConfig,
           redisPort = redisInternalConfigPort $ vVAConfigInternalRedisConfig,
           redisPassword = redisInternalConfigPassword $ vVAConfigInternalRedisConfig
-        },
-      websocketLifetimeSeconds = vVAConfigInternalWebsocketLifetimeSeconds
+        }
     }
 
 -- | Load configuration from a file specified on the command line.  Load from
@@ -272,9 +265,3 @@ getMetadataValidationPort ::
   (Has VVAConfig r, MonadReader r m) =>
   m Int
 getMetadataValidationPort = asks (metadataValidationPort . getter)
-
--- | Access websocket lifetime in seconds
-getWebsocketLifetimeSeconds ::
-  (Has VVAConfig r, MonadReader r m) =>
-  m Int
-getWebsocketLifetimeSeconds = asks (websocketLifetimeSeconds . getter)

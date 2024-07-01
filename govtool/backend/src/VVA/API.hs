@@ -5,13 +5,9 @@
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TypeOperators     #-}
 {-# LANGUAGE ViewPatterns      #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 
 module VVA.API where
 
-import Control.Monad.Loops (iterateUntil)
-import qualified Network.WebSockets.Connection as WS
-import Servant.API.WebSocket (WebSocket)
 import Control.Concurrent.QSem (waitQSem, signalQSem)
 import Control.Concurrent.Async (mapConcurrently)
 import           Control.Exception    (throw, throwIO)
@@ -48,7 +44,6 @@ import           VVA.Types            (App, AppEnv (..),
                                        AppError (CriticalError, ValidationError, InternalError),
                                        CacheEnv (..))
 import qualified VVA.Metadata         as Metadata
-import Servant.OpenApi (HasOpenApi, toOpenApi)
 
 type VVAApi =
          "drep" :> "list"
@@ -83,8 +78,6 @@ type VVAApi =
     :<|> "network" :> "metrics" :> Get '[JSON] GetNetworkMetricsResponse
     :<|> "proposal" :> "metadata" :> "validate" :> ReqBody '[JSON] MetadataValidationParams :> Post '[JSON] MetadataValidationResponse
     :<|> "drep" :> "metadata" :> "validate" :> ReqBody '[JSON] MetadataValidationParams :> Post '[JSON] MetadataValidationResponse
-    :<|> "transaction" :> "watch" :> Capture "transactionId" HexText :> WebSocket
-
 server :: App m => ServerT VVAApi m
 server = drepList
     :<|> getVotingPower
@@ -100,21 +93,6 @@ server = drepList
     :<|> getNetworkMetrics
     :<|> getProposalMetadataValidationResponse
     :<|> getDRepMetadataValidationResponse
-    :<|> transactionWatch
-
-instance HasOpenApi WebSocket where
-  toOpenApi _ = mempty
-
-
-transactionWatch :: App m => HexText -> WS.Connection -> m ()
-transactionWatch (unHexText -> transactionId) c = do
-  tvar <- asks vvaWebSocketConnections
-  uuid <- Transaction.watchTransaction tvar transactionId c
-  liftIO $ iterateUntil (== ("ACK" :: Text)) $ Text.stripEnd <$> WS.receiveData c
-  Transaction.removeWebsocketConnection tvar uuid "Tx confirmed. Closing connection."
-  return ()
-
-
 
 
 mapDRepType :: Types.DRepType -> DRepType

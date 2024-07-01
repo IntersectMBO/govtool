@@ -58,6 +58,8 @@ startFetchProcess ::
 startFetchProcess = go 0
     where
         go latestKnownId = do
+            liftIO $ putStrLn "Fetching metadata..."
+
             anchors <- getNewVotingAnchors latestKnownId
             if null anchors
                 then do

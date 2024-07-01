@@ -50,12 +50,7 @@ export const HomeCards = () => {
   );
 
   const navigateToProposalDiscussionPillar = useCallback(
-    () =>
-      navigate(
-        `${PATHS.connectedProposalPillar.replace("/*", "")}${
-          PDF_PATHS.proposalDiscussion
-        }`,
-      ),
+    () => navigate(PDF_PATHS.proposalDiscussion),
     [navigate],
   );
 

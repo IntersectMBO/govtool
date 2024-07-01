@@ -204,7 +204,7 @@ convertConfig VVAConfigInternal {..} =
         { redisHost = redisInternalConfigHost $ vVAConfigInternalRedisConfig,
           redisPort = redisInternalConfigPort $ vVAConfigInternalRedisConfig,
           redisPassword = redisInternalConfigPassword $ vVAConfigInternalRedisConfig
-        }
+        },
       websocketLifetimeSeconds = vVAConfigInternalWebsocketLifetimeSeconds
     }
 

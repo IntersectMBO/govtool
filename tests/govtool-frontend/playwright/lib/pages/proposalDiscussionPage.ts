@@ -1,29 +1,28 @@
 import { faker } from "@faker-js/faker";
 import { generateWalletAddress } from "@helpers/cardano";
+import removeAllSpaces from "@helpers/removeAllSpaces";
 import { extractProposalIdFromUrl } from "@helpers/string";
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import { ProposalCreateRequest } from "@services/proposalDiscussion/types";
 import environments from "lib/constants/environments";
 import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
 
 export default class ProposalDiscussionPage {
   // Buttons
-  readonly proposalCreateBtn = this.page.getByRole("button", {
-    name: "Propose a Governance Action",
-  });
+  readonly proposalCreateBtn = this.page.getByTestId(
+    "propose-a-governance-action-button"
+  );
   readonly continueBtn = this.page.getByRole("button", { name: "Continue" }); // #BUG test-id missing
-  readonly filterBtn = this.page.locator("#filters-button"); // this.page.getByTestId("filters-button");
+  readonly filterBtn = this.page.getByTestId("filter-button"); // this.page.getByTestId("filters-button");
   readonly shareBtn = this.page
-    .locator(".MuiCardHeader-action > .MuiButtonBase-root")
-    .first(); //this.page.getByTestId("share-button");
-  readonly sortBtn = this.page.locator("button:nth-child(2)").first(); //this.page.getByTestId("sort-button");
+    .locator('[data-testid$="-share-button"]')
+    .first();
+  readonly sortBtn = this.page.getByTestId("sort-button");
   readonly searchInput = this.page.getByPlaceholder("Search..."); // this.page.getByTestId("search-input");
-  readonly showAllBtn = this.page
-    .getByRole("button", { name: "Show all" })
-    .first(); //this.page.getByTestId("show-all-button");
+  readonly showAllBtn = this.page.getByTestId("show-all-button").first(); //this.page.getByTestId("show-all-button");
   readonly showLessBtn = this.page.getByRole("button", { name: "Show less" });
-  readonly infoRadio = this.page.getByLabel("Info");
-  readonly treasuryRadio = this.page.getByLabel("Treasury");
+  readonly infoRadio = this.page.getByTestId("Info-radio-wrapper");
+  readonly treasuryRadio = this.page.getByTestId("Treasury-radio-wrapper");
 
   constructor(private readonly page: Page) {}
 
@@ -35,6 +34,7 @@ export default class ProposalDiscussionPage {
   }
 
   async closeUsernamePrompt() {
+    await this.page.waitForTimeout(5_000);
     await this.page
       .locator("div")
       .filter({ hasText: /^Hey, setup your username$/ })
@@ -43,16 +43,27 @@ export default class ProposalDiscussionPage {
   }
 
   async viewFirstProposal(): Promise<ProposalDiscussionDetailsPage> {
-    await this.page
-      .locator('[data-testid^="govaction-"][data-testid$="-view-detail"]')
-      .first()
-      .click();
+    await this.page.locator('[data-testid$="-view-details"]').first().click();
     return new ProposalDiscussionDetailsPage(this.page);
   }
 
   async getAllProposals() {
     await this.page.waitForTimeout(2_000);
-    return this.page.locator('[data-testid$="-card"]').all(); // BUG
+    const elements = this.page.locator('[data-testid^="proposal"]');
+    const dataTestIds = await elements.evaluateAll((elements) =>
+      elements
+        .filter((element) => {
+          const dataTestId = element.getAttribute("data-testid");
+          return /^proposal.*\d$/.test(dataTestId);
+        })
+        .map((element) => element.getAttribute("data-testid"))
+    );
+
+    return dataTestIds.map((dataTestId) =>
+      this.page.locator(`*[data-testid="${dataTestId}"]`)
+    );
+
+    // BUG should be -card on end of test id
   }
 
   async setUsername(name: string) {

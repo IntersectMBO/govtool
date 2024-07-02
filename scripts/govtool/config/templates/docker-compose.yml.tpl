@@ -228,15 +228,6 @@ services:
       - "traefik.http.routers.to-analytics-dashboard.entrypoints=websecure"
       - "traefik.http.routers.to-analytics-dashboard.tls.certresolver=myresolver"
       - "traefik.http.services.analytics-dashboard.loadbalancer.server.port=3000"
- 
-  redis:
-    image: docker.io/bitnami/redis:7.2
-    ports:
-      - '8094:8094'
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-    volumes:
-      - 'redis_data:/bitnami/redis/data'
 
   backend:
     image: <REPO_URL>/backend:${BACKEND_TAG}
@@ -311,4 +302,3 @@ volumes:
   node-db:
   node-ipc:
   loki-data:
-  redis_data:

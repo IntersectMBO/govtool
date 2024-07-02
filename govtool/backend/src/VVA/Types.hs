@@ -3,22 +3,16 @@
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NamedFieldPuns        #-}
-{-# LANGUAGE DeriveAnyClass        #-}
-{-# LANGUAGE TemplateHaskell       #-}
-{-# LANGUAGE DeriveGeneric         #-}
 
 module VVA.Types where
 
-import           Data.Aeson.TH              (deriveJSON)
-import VVA.API.Utils (jsonOptions)
-import GHC.Generics (Generic)
 import           Control.Exception
 import           Control.Monad.Except       (MonadError)
 import           Control.Monad.Fail         (MonadFail)
 import           Control.Monad.IO.Class     (MonadIO)
 import           Control.Monad.Reader       (MonadReader)
 
-import           Data.Aeson                 (Value, ToJSON, FromJSON)
+import           Data.Aeson                 (Value)
 import qualified Data.Cache                 as Cache
 import           Data.Has
 import           Data.Pool                  (Pool)
@@ -31,6 +25,38 @@ import           VVA.Cache
 import           VVA.Config
 import           Network.HTTP.Client (Manager)
 import           Control.Concurrent.QSem
+
+type App m = (MonadReader AppEnv m, MonadIO m, MonadFail m, MonadError AppError m)
+
+data AppEnv
+  = AppEnv
+      { vvaConfig         :: VVAConfig
+      , vvaCache          :: CacheEnv
+      , vvaConnectionPool :: Pool Connection
+      , vvaTlsManager     :: Manager
+      , vvaMetadataQSem   :: QSem
+      }
+
+instance Has VVAConfig AppEnv where
+  getter AppEnv {vvaConfig} = vvaConfig
+  modifier f a@AppEnv {vvaConfig} = a {vvaConfig = f vvaConfig}
+
+instance Has CacheEnv AppEnv where
+  getter AppEnv {vvaCache} = vvaCache
+  modifier f a@AppEnv {vvaCache} = a {vvaCache = f vvaCache}
+
+instance Has (Pool Connection) AppEnv where
+  getter AppEnv {vvaConnectionPool} = vvaConnectionPool
+  modifier f a@AppEnv {vvaConnectionPool} = a {vvaConnectionPool = f vvaConnectionPool}
+
+instance Has Manager AppEnv where
+  getter AppEnv {vvaTlsManager} = vvaTlsManager
+  modifier f a@AppEnv {vvaTlsManager} = a {vvaTlsManager = f vvaTlsManager}
+
+instance Has QSem AppEnv where
+  getter AppEnv {vvaMetadataQSem} = vvaMetadataQSem
+  modifier f a@AppEnv {vvaMetadataQSem} = a {vvaMetadataQSem = f vvaMetadataQSem}
+
 
 data AppError
   = ValidationError Text
@@ -122,10 +148,7 @@ data ProposalMetadata =
     , proposalMetadataRationale :: Text
     , proposalMetadataTitle :: Text
     , proposalMetadataReferences :: [Text]
-    } deriving (Show, Generic)
-
-deriveJSON (jsonOptions "proposalMetadata") ''ProposalMetadata
-
+    } deriving (Show)
 
 data DRepMetadata =
     DRepMetadata
@@ -133,10 +156,7 @@ data DRepMetadata =
     , dRepMetadataDRepName :: Text
     , dRepMetadataEmail :: Text
     , dRepMetadataReferences :: [Text]
-    } deriving (Show, Generic)
-
-deriveJSON (jsonOptions "dRepMetadata") ''DRepMetadata
-
+    } deriving (Show)
 
 data MetadataValidationResult a =
     MetadataValidationResult
@@ -145,7 +165,6 @@ data MetadataValidationResult a =
     , metadataValidationResultMetadata :: Maybe a
     } deriving (Show)
 
-deriveJSON (jsonOptions "metadataValidationResult") ''MetadataValidationResult
 
 
 
@@ -194,42 +213,3 @@ data MetadataValidationStatus
   | UrlNotFound
 
 
-data VotingAnchor
-  = VotingAnchor
-      { votingAnchorId       :: Integer
-      , votingAnchorUrl      :: Text
-      , votingAnchorHash     :: Text
-      , votingAnchorType     :: Text
-      }
-
-
-type App m = (MonadReader AppEnv m, MonadIO m, MonadFail m, MonadError AppError m)
-
-data AppEnv
-  = AppEnv
-      { vvaConfig         :: VVAConfig
-      , vvaCache          :: CacheEnv
-      , vvaConnectionPool :: Pool Connection
-      , vvaTlsManager     :: Manager
-      , vvaMetadataQSem   :: QSem
-      }
-
-instance Has VVAConfig AppEnv where
-  getter AppEnv {vvaConfig} = vvaConfig
-  modifier f a@AppEnv {vvaConfig} = a {vvaConfig = f vvaConfig}
-
-instance Has CacheEnv AppEnv where
-  getter AppEnv {vvaCache} = vvaCache
-  modifier f a@AppEnv {vvaCache} = a {vvaCache = f vvaCache}
-
-instance Has (Pool Connection) AppEnv where
-  getter AppEnv {vvaConnectionPool} = vvaConnectionPool
-  modifier f a@AppEnv {vvaConnectionPool} = a {vvaConnectionPool = f vvaConnectionPool}
-
-instance Has Manager AppEnv where
-  getter AppEnv {vvaTlsManager} = vvaTlsManager
-  modifier f a@AppEnv {vvaTlsManager} = a {vvaTlsManager = f vvaTlsManager}
-
-instance Has QSem AppEnv where
-  getter AppEnv {vvaMetadataQSem} = vvaMetadataQSem
-  modifier f a@AppEnv {vvaMetadataQSem} = a {vvaMetadataQSem = f vvaMetadataQSem}

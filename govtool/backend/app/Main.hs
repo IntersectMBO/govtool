@@ -8,7 +8,6 @@
 
 module Main where
 
-import           Control.Concurrent                     (forkIO)
 import           Control.Concurrent.QSem                (newQSem)
 import           Control.Exception                      (Exception,
                                                          SomeException,
@@ -71,7 +70,6 @@ import           VVA.API
 import           VVA.API.Types
 import           VVA.CommandLine
 import           VVA.Config
-import           VVA.Metadata (startFetchProcess)
 import           VVA.Types                              (AppEnv (..),
                                                          AppError (CriticalError, NotFoundError, ValidationError, InternalError),
                                                          CacheEnv (..))
@@ -138,13 +136,6 @@ startApp vvaConfig = do
   vvaTlsManager <- newManager tlsManagerSettings
   qsem <- newQSem (metadataValidationMaxConcurrentRequests vvaConfig)
   let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool, vvaTlsManager, vvaMetadataQSem=qsem}
-
-  _ <- forkIO $ do
-     result <- runReaderT (runExceptT startFetchProcess) appEnv
-     case result of
-        Left e -> throw e
-        Right _ -> return ()
-
   server' <- mkVVAServer appEnv
   runSettings settings server'
 

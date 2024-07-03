@@ -120,40 +120,36 @@ test.describe("Review fillup form", () => {
       page,
     }) => {
       const proposalSubmissionPage = new ProposalSubmissionPage(page);
-
       await proposalSubmissionPage.goto();
 
-      await page.getByTestId(`${type}-radio`).click();
       await proposalSubmissionPage.continueBtn.click();
+      await proposalSubmissionPage.addLinkBtn.click();
 
-      const randomBytes = new Uint8Array(10);
-      const bech32Address = bech32.encode("addr_test", randomBytes);
-
-      const formFields: ProposalCreateRequest =
+      const walletAddressBech32 =
+        ShelleyWallet.fromJson(proposal01Wallet).rewardAddressBech32(0);
+      const proposal: ProposalCreateRequest =
         proposalSubmissionPage.generateValidProposalFormFields(
           type,
           false,
-          bech32Address
+          walletAddressBech32
         );
-      await proposalSubmissionPage.validateForm(formFields);
-      proposalSubmissionPage.continueBtn.click();
 
-      await expect(page.getByText(formFields.prop_name)).toBeVisible();
-      await expect(page.getByText(formFields.prop_abstract)).toBeVisible();
-      await expect(page.getByText(formFields.prop_motivation)).toBeVisible();
-      await expect(page.getByText(formFields.prop_rationale)).toBeVisible();
+      await proposalSubmissionPage.fillupForm(proposal);
+      await proposalSubmissionPage.continueBtn.click();
+
+      await expect(page.getByText(proposal.prop_name)).toBeVisible();
+      await expect(page.getByText(proposal.prop_abstract)).toBeVisible();
+      await expect(page.getByText(proposal.prop_motivation)).toBeVisible();
+      await expect(page.getByText(proposal.prop_rationale)).toBeVisible();
       await expect(
-        page.getByText(formFields.proposal_links[0].prop_link)
-      ).toBeVisible();
-      await expect(
-        page.getByText(formFields.proposal_links[0].prop_link_text)
+        page.getByText(proposal.proposal_links[0].prop_link_text)
       ).toBeVisible();
 
       if (type === ProposalType.treasury) {
         await expect(
-          page.getByText(formFields.prop_receiving_address)
+          page.getByText(proposal.prop_receiving_address)
         ).toBeVisible();
-        await expect(page.getByText(formFields.prop_amount)).toBeVisible();
+        await expect(page.getByText(proposal.prop_amount)).toBeVisible();
       }
     });
   });

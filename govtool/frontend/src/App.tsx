@@ -80,23 +80,6 @@ export default () => {
     checkTheWalletIsActive();
   }, [checkTheWalletIsActive]);
 
-  // Proposal Discussion Pillar doesn't export pages or react router routes
-  // so we need to handle the routing here
-  useEffect(() => {
-    if (!isProposalDiscussionForumEnabled) return;
-    if (
-      window.location.pathname.includes(PDF_PATHS.proposalDiscussion) &&
-      !window.location.pathname.includes(PATHS.proposalPillar.replace("/*", ""))
-    ) {
-      navigate(
-        `${(isEnabled
-          ? PATHS.connectedProposalPillar
-          : PATHS.proposalPillar
-        ).replace("/*", "")}${window.location.pathname}`,
-      );
-    }
-  }, [window.location.pathname]);
-
   return (
     <>
       <ScrollToTop />
@@ -113,7 +96,7 @@ export default () => {
         />
         {isProposalDiscussionForumEnabled && !isEnabled && (
           <Route
-            path={PATHS.proposalPillar}
+            path={`${PDF_PATHS.proposalDiscussion}/*`}
             element={<ProposalDiscussionPillar />}
           />
         )}
@@ -121,7 +104,7 @@ export default () => {
           <Route path={PATHS.dashboard} element={<DashboardCards />} />
           {isProposalDiscussionForumEnabled && (
             <Route
-              path={PATHS.connectedProposalPillar}
+              path={`${PDF_PATHS.proposalDiscussion}/*`}
               element={<ProposalDiscussionPillar />}
             />
           )}

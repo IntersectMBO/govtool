@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Button, Typography } from "@mui/material";
 
-import { PATHS, gray } from "@consts";
+import { PDF_PATHS, PATHS, gray } from "@consts";
 import { useCardano } from "@context";
 import { useTranslation } from "@hooks";
 import { Card } from "./Card";
@@ -14,11 +14,18 @@ export const WalletInfoCard = () => {
 
   const onClickDisconnect = async () => {
     await disconnectWallet();
-    navigate(
-      pathname.includes("/connected")
-        ? `${pathname.replace("/connected", "")}${hash ?? ""}`
-        : PATHS.home,
+    const isProposalDiscussionForum = window.location.pathname.includes(
+      PDF_PATHS.proposalDiscussion.replace("/", ""),
     );
+
+    if (!isProposalDiscussionForum) {
+      navigate(
+        pathname.includes("/connected")
+          ? `${pathname.replace("/connected", "")}${hash ?? ""}`
+          : PATHS.home,
+      );
+    }
+
     window.location.reload();
   };
 

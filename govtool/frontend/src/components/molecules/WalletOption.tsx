@@ -2,7 +2,7 @@ import { FC, useCallback } from "react";
 import { To, useNavigate, useLocation } from "react-router-dom";
 import { Box, CircularProgress, Typography } from "@mui/material";
 
-import { PATHS } from "@consts";
+import { PATHS, PDF_PATHS } from "@consts";
 import { useCardano } from "@context";
 import { theme } from "@/theme";
 
@@ -32,8 +32,14 @@ export const WalletOptionButton: FC<WalletOption> = ({
 
   const enableByWalletName = useCallback(async () => {
     if (isEnableLoading) return;
+    const isProposalDiscussionForum = window.location.pathname.includes(
+      PDF_PATHS.proposalDiscussion.replace("/", ""),
+    );
+
     const result = await enable(name);
+
     if (result?.stakeKey) {
+      if (isProposalDiscussionForum) return;
       navigate(
         // eslint-disable-next-line no-unneeded-ternary
         pathToNavigate

@@ -192,7 +192,7 @@ export default class ProposalSubmissionPage {
   }
 
   async inValidateForm(governanceProposal: ProposalCreateRequest) {
-    await this.fillupForm(governanceProposal);
+    await this.fillupFormWithTypeSelected(governanceProposal);
 
     function convertTestIdToText(testId: string) {
       let text = testId.replace("-error", "");

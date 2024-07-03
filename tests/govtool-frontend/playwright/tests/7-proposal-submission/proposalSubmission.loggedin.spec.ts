@@ -62,11 +62,12 @@ test.describe("Reject invalid  data", () => {
       test.slow(); // Brute-force testing with 100 random data
 
       const proposalSubmissionPage = new ProposalSubmissionPage(page);
-
       await proposalSubmissionPage.goto();
 
-      await page.getByTestId(`${type}-radio`).click();
       await proposalSubmissionPage.continueBtn.click();
+      await proposalSubmissionPage.governanceActionType.click();
+      await page.getByRole("option", { name: type }).click();
+      await proposalSubmissionPage.addLinkBtn.click();
 
       const formFields: ProposalCreateRequest =
         proposalSubmissionPage.generateInValidProposalFormFields(

@@ -1,4 +1,4 @@
-import { user01Wallet } from "@constants/staticWallets";
+import { proposal01Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
@@ -6,10 +6,10 @@ import { ShelleyWallet } from "@helpers/crypto";
 import { invalid } from "@mock/index";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
-import { IProposalForm, ProposalType } from "@types";
+import { ProposalCreateRequest, ProposalType } from "@types";
 import { bech32 } from "bech32";
 
-test.use({ storageState: ".auth/user01.json", wallet: user01Wallet });
+test.use({ storageState: ".auth/proposal01.json", wallet: proposal01Wallet });
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
@@ -32,9 +32,10 @@ test.describe("Accept valid data", () => {
       for (let i = 0; i < 100; i++) {
         const randomBytes = new Uint8Array(10);
         const bech32Address = bech32.encode("addr_test", randomBytes);
-        const formFields: IProposalForm =
+        const formFields: ProposalCreateRequest =
           proposalSubmissionPage.generateValidProposalFormFields(
-            type,
+            type === ProposalType.info ? 0 : 1,
+            false,
             bech32Address
           );
         await proposalSubmissionPage.validateForm(formFields);
@@ -64,8 +65,10 @@ test.describe("Reject invalid  data", () => {
       await page.getByTestId(`${type}-radio`).click();
       await proposalSubmissionPage.continueBtn.click();
 
-      const formFields: IProposalForm =
-        proposalSubmissionPage.generateInValidProposalFormFields(type);
+      const formFields: ProposalCreateRequest =
+        proposalSubmissionPage.generateInValidProposalFormFields(
+          type === ProposalType.info ? 0 : 1
+        );
       for (let i = 0; i < 100; i++) {
         await proposalSubmissionPage.inValidateForm(formFields);
       }
@@ -89,9 +92,10 @@ test.describe("Proposal submission check", () => {
       const walletAddressBech32 =
         ShelleyWallet.fromJson(wallet).rewardAddressBech32(0);
 
-      const proposal: IProposalForm =
+      const proposal: ProposalCreateRequest =
         proposalSubmissionPage.generateValidProposalFormFields(
-          type,
+          type === ProposalType.info ? 0 : 1,
+          false,
           walletAddressBech32
         );
       await proposalSubmissionPage.register({ ...proposal });
@@ -119,25 +123,31 @@ test.describe("Review fillup form", () => {
       const randomBytes = new Uint8Array(10);
       const bech32Address = bech32.encode("addr_test", randomBytes);
 
-      const formFields: IProposalForm =
+      const formFields: ProposalCreateRequest =
         proposalSubmissionPage.generateValidProposalFormFields(
-          type,
+          type === ProposalType.info ? 0 : 1,
+          false,
           bech32Address
         );
       await proposalSubmissionPage.validateForm(formFields);
       proposalSubmissionPage.continueBtn.click();
 
-      await expect(page.getByText(formFields.title)).toBeVisible();
-      await expect(page.getByText(formFields.abstract)).toBeVisible();
-      await expect(page.getByText(formFields.motivation)).toBeVisible();
-      await expect(page.getByText(formFields.rationale)).toBeVisible();
+      await expect(page.getByText(formFields.prop_name)).toBeVisible();
+      await expect(page.getByText(formFields.prop_abstract)).toBeVisible();
+      await expect(page.getByText(formFields.prop_motivation)).toBeVisible();
+      await expect(page.getByText(formFields.prop_rationale)).toBeVisible();
       await expect(
-        page.getByText(formFields.extraContentLinks[0])
+        page.getByText(formFields.proposal_links[0].prop_link)
+      ).toBeVisible();
+      await expect(
+        page.getByText(formFields.proposal_links[0].prop_link_text)
       ).toBeVisible();
 
       if (type === ProposalType.treasury) {
-        await expect(page.getByText(formFields.receivingAddress)).toBeVisible();
-        await expect(page.getByText(formFields.amount)).toBeVisible();
+        await expect(
+          page.getByText(formFields.prop_receiving_address)
+        ).toBeVisible();
+        await expect(page.getByText(formFields.prop_amount)).toBeVisible();
       }
     });
   });
@@ -152,8 +162,8 @@ test("7L. Should reject invalid proposal metadata", async ({ page }) => {
   await page.getByTestId(`${ProposalType.info}-radio`).click();
   await proposalSubmissionPage.continueBtn.click();
 
-  const proposal: IProposalForm =
-    proposalSubmissionPage.generateValidProposalFormFields(ProposalType.info);
+  const proposal: ProposalCreateRequest =
+    proposalSubmissionPage.generateValidProposalFormFields(0);
 
   await proposalSubmissionPage.fillupForm(proposal);
   await proposalSubmissionPage.continueBtn.click();
@@ -184,9 +194,10 @@ test.describe("Edit proposal form", () => {
       const randomBytes = new Uint8Array(10);
       const bech32Address = bech32.encode("addr_test", randomBytes);
 
-      const formFields: IProposalForm =
+      const formFields: ProposalCreateRequest =
         proposalSubmissionPage.generateValidProposalFormFields(
-          type,
+          type === ProposalType.treasury ? 1 : 0,
+          false,
           bech32Address
         );
       await proposalSubmissionPage.validateForm(formFields);
@@ -201,16 +212,21 @@ test.describe("Edit proposal form", () => {
       await proposalSubmissionPage.continueBtn.click();
 
       await expect(page.getByText(newTitle)).toBeVisible();
-      await expect(page.getByText(formFields.abstract)).toBeVisible();
-      await expect(page.getByText(formFields.motivation)).toBeVisible();
-      await expect(page.getByText(formFields.rationale)).toBeVisible();
+      await expect(page.getByText(formFields.prop_abstract)).toBeVisible();
+      await expect(page.getByText(formFields.prop_motivation)).toBeVisible();
+      await expect(page.getByText(formFields.prop_rationale)).toBeVisible();
       await expect(
-        page.getByText(formFields.extraContentLinks[0])
+        page.getByText(formFields.proposal_links[0].prop_link)
+      ).toBeVisible();
+      await expect(
+        page.getByText(formFields.proposal_links[0].prop_link_text)
       ).toBeVisible();
 
       if (type === ProposalType.treasury) {
-        await expect(page.getByText(formFields.receivingAddress)).toBeVisible();
-        await expect(page.getByText(formFields.amount)).toBeVisible();
+        await expect(
+          page.getByText(formFields.prop_receiving_address)
+        ).toBeVisible();
+        await expect(page.getByText(formFields.prop_amount)).toBeVisible();
       }
     });
   });
@@ -227,8 +243,8 @@ test("7K_1. Should accept valid metadata anchor on proposal submission", async (
   await page.getByTestId(`${ProposalType.info}-radio`).click();
   await proposalSubmissionPage.continueBtn.click();
 
-  const proposal: IProposalForm =
-    proposalSubmissionPage.generateValidProposalFormFields(ProposalType.info);
+  const proposal: ProposalCreateRequest =
+    proposalSubmissionPage.generateValidProposalFormFields(0);
 
   await proposalSubmissionPage.fillupForm(proposal);
   await proposalSubmissionPage.continueBtn.click();
@@ -253,8 +269,8 @@ test("7K_2. Should reject invalid metadata anchor on proposal submission", async
   await page.getByTestId(`${ProposalType.info}-radio`).click();
   await proposalSubmissionPage.continueBtn.click();
 
-  const proposal: IProposalForm =
-    proposalSubmissionPage.generateValidProposalFormFields(ProposalType.info);
+  const proposal: ProposalCreateRequest =
+    proposalSubmissionPage.generateValidProposalFormFields(0);
 
   await proposalSubmissionPage.fillupForm(proposal);
   await proposalSubmissionPage.continueBtn.click();

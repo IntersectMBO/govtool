@@ -6,7 +6,7 @@ import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
-import { IProposalForm, ProposalType } from "@types";
+import { ProposalCreateRequest, ProposalType } from "@types";
 import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
@@ -31,8 +31,8 @@ test("7H. should submit a proposal", async ({ page, browser }, testInfo) => {
   await userPage.getByTestId(`${ProposalType.info}-radio`).click();
   await proposalSubmissionPage.continueBtn.click();
 
-  const proposal: IProposalForm =
-    proposalSubmissionPage.generateValidProposalFormFields(ProposalType.info);
+  const proposal: ProposalCreateRequest =
+    proposalSubmissionPage.generateValidProposalFormFields(0);
 
   await proposalSubmissionPage.register({ ...proposal });
 

@@ -3,6 +3,7 @@ import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import convertBufferToHex from "@helpers/convertBufferToHex";
 import { ShelleyWallet } from "@helpers/crypto";
+import { createNewPageWithWallet } from "@helpers/page";
 import LoginPage from "@pages/loginPage";
 import { expect } from "@playwright/test";
 
@@ -54,13 +55,16 @@ test("1D. Should reject wallet connection in mainnet", async ({ page }) => {
 });
 
 test("1E. Should hide incompatible wallets when connecting", async ({
-  page,
+  browser,
 }) => {
-  // Disabling cip95 support for wallet
-  await createWallet(page, { supportedExtensions: [] });
+  const wallet = (await ShelleyWallet.generate()).json();
+  const newPage = await createNewPageWithWallet(browser, {
+    wallet,
+    supportedExtensions: [],
+  });
 
-  await page.goto("/");
-  await page.getByTestId("connect-wallet-button").click();
+  await newPage.goto("/");
+  await newPage.getByTestId("connect-wallet-button").click();
 
-  await expect(page.getByTestId("demos-wallet-button")).not.toBeVisible();
+  await expect(newPage.getByTestId("demos-wallet-button")).not.toBeVisible();
 });

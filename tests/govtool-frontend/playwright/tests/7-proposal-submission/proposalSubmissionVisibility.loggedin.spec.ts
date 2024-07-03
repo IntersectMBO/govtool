@@ -1,4 +1,4 @@
-import { user01Wallet } from "@constants/staticWallets";
+import { proposal01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
@@ -9,9 +9,9 @@ test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
 });
 
-test.use({ storageState: ".auth/user01.json", wallet: user01Wallet });
+test.use({ storageState: ".auth/proposal01.json", wallet: proposal01Wallet });
 
-test("7B. Should access proposal submission page", async ({ page }) => {
+test("7B. Should access proposal creation page", async ({ page }) => {
   await page.goto("/");
   await page.getByTestId("propose-governance-actions-button").click();
 
@@ -20,12 +20,22 @@ test("7B. Should access proposal submission page", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("7C. Should list governance action types", async ({ page }) => {
+test("7C. Should list unfinished Draft ", async ({ page }) => {
   const proposalSubmissionPage = new ProposalSubmissionPage(page);
   await proposalSubmissionPage.goto();
 
-  await expect(proposalSubmissionPage.infoRadioButton).toBeVisible();
-  await expect(proposalSubmissionPage.treasuryRadioButton).toBeVisible();
+  await proposalSubmissionPage.continueBtn.click();
+  await proposalSubmissionPage.fillupForm(
+    proposalSubmissionPage.generateValidProposalFormFields(0, true)
+  );
+  await proposalSubmissionPage.saveDraftBtn.click();
+  await proposalSubmissionPage.closeDraftSuccessModalBtn.click();
+
+  await proposalSubmissionPage.proposalCreateBtn.click();
+
+  const getAllDrafts = await proposalSubmissionPage.getAllDrafts();
+
+  expect(getAllDrafts.length).toBeGreaterThan(0);
 });
 
 test.describe("Verify Proposal form", () => {

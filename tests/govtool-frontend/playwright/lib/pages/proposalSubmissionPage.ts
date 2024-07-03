@@ -148,6 +148,13 @@ export default class ProposalSubmissionPage {
     }
   }
 
+  async getAllDrafts() {
+    await this.page.waitForTimeout(2_000);
+    return this.page
+      .locator('[data-testid^="draft-"][data-testid$="-card"]')
+      .all();
+  }
+
   async validateForm(governanceProposal: ProposalCreateRequest) {
     await this.fillupForm(governanceProposal);
 

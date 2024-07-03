@@ -26,22 +26,25 @@ test.describe("Accept valid data", () => {
 
       await proposalSubmissionPage.goto();
 
-      await page.getByTestId(`${type}-radio`).click();
       await proposalSubmissionPage.continueBtn.click();
+      await proposalSubmissionPage.governanceActionType.click();
+      await page.getByRole("option", { name: type }).click();
+      await proposalSubmissionPage.addLinkBtn.click();
 
       for (let i = 0; i < 100; i++) {
-        const randomBytes = new Uint8Array(10);
-        const bech32Address = bech32.encode("addr_test", randomBytes);
+        const rewardAddressBech32 = (
+          await ShelleyWallet.generate()
+        ).rewardAddressBech32(0);
         const formFields: ProposalCreateRequest =
           proposalSubmissionPage.generateValidProposalFormFields(
             type === ProposalType.info ? 0 : 1,
             false,
-            bech32Address
+            rewardAddressBech32
           );
         await proposalSubmissionPage.validateForm(formFields);
       }
 
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < 6; i++) {
         await expect(proposalSubmissionPage.addLinkBtn).toBeVisible();
         await proposalSubmissionPage.addLinkBtn.click();
       }
@@ -69,6 +72,7 @@ test.describe("Reject invalid  data", () => {
         proposalSubmissionPage.generateInValidProposalFormFields(
           type === ProposalType.info ? 0 : 1
         );
+
       for (let i = 0; i < 100; i++) {
         await proposalSubmissionPage.inValidateForm(formFields);
       }

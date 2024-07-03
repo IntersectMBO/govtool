@@ -1,3 +1,4 @@
+import environments from "@constants/environments";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
@@ -8,9 +9,10 @@ import { expect } from "@playwright/test";
 const mockProposal = require("../../lib/_mock/proposal.json");
 const mockPoll = require("../../lib/_mock/proposalPoll.json");
 const mockComments = require("../../lib/_mock/proposalComments.json");
+const mockInfoProposedGA = require("../../lib/_mock/infoProposedGAs.json");
 
 test.beforeEach(() => {
-  setAllureEpic("Proposal Discussion Forum");
+  setAllureEpic("8. Proposal Discussion Forum");
 });
 
 test("8A. Should access proposed governance actions in disconnected state", async ({
@@ -19,7 +21,7 @@ test("8A. Should access proposed governance actions in disconnected state", asyn
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
 
-  await expect(page.getByText(/Proposed Governance Actions/i)).toHaveCount(2);
+  await expect(page.getByText(/Proposed Governance Actions/i)).toHaveCount(1);
 });
 
 test("8B. Should filter and sort the list of proposed governance actions.", async ({
@@ -55,12 +57,22 @@ test("8C. Should search the list of proposed governance actions.", async ({
 test("8D.Should show the view-all categorized proposed governance actions.", async ({
   page,
 }) => {
+  await page.route("**/api/proposals?**", async (route) => {
+    return route.fulfill({
+      body: JSON.stringify(mockInfoProposedGA),
+    });
+  });
+
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
 
   await proposalDiscussionPage.showAllBtn.click();
 
-  await expect(proposalDiscussionPage.showLessBtn).toBeVisible();
+  const proposalCards = await proposalDiscussionPage.getAllProposals();
+
+  for (const proposalCard of proposalCards) {
+    await expect(proposalCard.getByText("Info", { exact: true })).toBeVisible();
+  }
 });
 
 test("8H. Should disable proposal interaction on a disconnected state.", async ({
@@ -113,7 +125,7 @@ test.describe("Mocked proposal", () => {
     );
 
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
-    await proposalDiscussionDetailsPage.goto(10);
+    await proposalDiscussionDetailsPage.goto(mockProposal.data.id);
   });
 
   test("8E. Should share proposed governance action", async ({
@@ -122,12 +134,16 @@ test.describe("Mocked proposal", () => {
   }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
 
-    await page.getByTestId("share-button").click();
-    await expect(page.getByText("Copied to clipboard")).toBeVisible();
+    await page.locator("#share-button").click(); // BUG
+    await page.getByRole("button").click(); // BUG
+    await expect(page.getByText("Link copied")).toBeVisible(); // Bug
+
     const copiedTextDRepDirectory = await page.evaluate(() =>
       navigator.clipboard.readText()
     );
-    expect(copiedTextDRepDirectory).toEqual(mockProposal.data.id);
+    const expectedCopyUrl = `${environments.frontendUrl}/proposal_discussion/${mockProposal.data.id}`;
+
+    expect(copiedTextDRepDirectory).toEqual(expectedCopyUrl);
   });
 
   test("8I. Should disable poll voting functionality.", async () => {
@@ -138,8 +154,8 @@ test.describe("Mocked proposal", () => {
   });
 
   test("8F. Should display all comments with count indication.", async () => {
-    await expect(proposalDiscussionDetailsPage.commentsCount).toHaveText(
-      mockProposal.data.attributes.prop_comments_number
+    await expect(proposalDiscussionDetailsPage.commentCount).toHaveText(
+      mockProposal.data.attributes.prop_comments_number.toString()
     );
   });
 });

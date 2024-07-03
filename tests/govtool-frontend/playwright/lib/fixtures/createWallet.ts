@@ -1,6 +1,7 @@
 import {
   CardanoTestWallet,
   CardanoTestWalletConfig,
+  CardanoTestWalletJson,
 } from "@cardanoapi/cardano-test-wallet/types";
 import { ShelleyWallet } from "@helpers/crypto";
 import { Page } from "@playwright/test";
@@ -12,7 +13,7 @@ export default async function createWallet(
   const wallet = (await ShelleyWallet.generate()).json();
 
   const initScriptArgs: {
-    wallet: CardanoTestWallet;
+    wallet: CardanoTestWalletJson;
     config: CardanoTestWalletConfig;
   } = {
     wallet,
@@ -23,12 +24,12 @@ export default async function createWallet(
     window["cardanoTestWallet"] = {
       ...window["cardanoTestWallet"],
       wallet: wallet,
-    };
+    } as CardanoTestWallet;
     if (config) {
       window["cardanoTestWallet"]["config"] = {
         ...window["cardanoTestWallet"]["config"],
         ...config,
-      };
+      } as CardanoTestWallet;
     }
   }, initScriptArgs);
 }

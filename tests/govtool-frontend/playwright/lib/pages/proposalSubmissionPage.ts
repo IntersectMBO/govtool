@@ -103,15 +103,7 @@ export default class ProposalSubmissionPage {
     return downloadMetadata(download);
   }
 
-  async fillupForm(governanceProposal: ProposalCreateRequest) {
-    await this.governanceActionType.click();
-
-    if (governanceProposal.gov_action_type_id === 0) {
-      await this.infoBtn.click();
-    } else {
-      await this.treasuryBtn.click();
-    }
-
+  async fillupFormWithTypeSelected(governanceProposal: ProposalCreateRequest) {
     await this.fillCommonFields(governanceProposal);
 
     if (governanceProposal.gov_action_type_id === 1) {
@@ -121,6 +113,17 @@ export default class ProposalSubmissionPage {
     if (governanceProposal.proposal_links != null) {
       await this.fillProposalLinks(governanceProposal.proposal_links);
     }
+  }
+
+  async fillupForm(governanceProposal: ProposalCreateRequest) {
+    await this.governanceActionType.click();
+
+    if (governanceProposal.gov_action_type_id === 0) {
+      await this.infoBtn.click();
+    } else {
+      await this.treasuryBtn.click();
+    }
+    await this.fillupForm(governanceProposal);
   }
 
   async fillCommonFields(governanceProposal: ProposalCreateRequest) {
@@ -138,7 +141,6 @@ export default class ProposalSubmissionPage {
   }
 
   async fillProposalLinks(proposal_links: Array<ProposalLinksType>) {
-    await this.addLinkBtn.click();
     for (let i = 0; i < proposal_links.length; i++) {
       if (i > 0) {
         await this.addLinkBtn.click();
@@ -156,7 +158,7 @@ export default class ProposalSubmissionPage {
   }
 
   async validateForm(governanceProposal: ProposalCreateRequest) {
-    await this.fillupForm(governanceProposal);
+    await this.fillupFormWithTypeSelected(governanceProposal);
 
     for (const err of formErrors.proposalTitle) {
       await expect(this.page.getByTestId(err)).toBeHidden();
@@ -281,9 +283,9 @@ export default class ProposalSubmissionPage {
   ) {
     const proposal: ProposalCreateRequest = {
       prop_name: faker.lorem.sentence(6),
-      prop_abstract: faker.lorem.paragraph(2),
-      prop_motivation: faker.lorem.paragraphs(2),
-      prop_rationale: faker.lorem.paragraphs(2),
+      prop_abstract: faker.lorem.words(5),
+      prop_motivation: faker.lorem.words(5),
+      prop_rationale: faker.lorem.words(5),
 
       proposal_links: [
         {

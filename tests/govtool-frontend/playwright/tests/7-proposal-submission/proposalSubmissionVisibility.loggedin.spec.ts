@@ -46,8 +46,9 @@ test.describe("Verify Proposal form", () => {
       const proposalSubmissionPage = new ProposalSubmissionPage(page);
       await proposalSubmissionPage.goto();
 
-      await page.getByTestId(`${type}-radio`).click();
       await proposalSubmissionPage.continueBtn.click();
+      await proposalSubmissionPage.governanceActionType.click();
+      await page.getByRole("option", { name: type }).click();
 
       await expect(proposalSubmissionPage.titleInput).toBeVisible();
       await expect(proposalSubmissionPage.abstractInput).toBeVisible();

@@ -37,7 +37,7 @@ test.describe("Accept valid data", () => {
         ).rewardAddressBech32(0);
         const formFields: ProposalCreateRequest =
           proposalSubmissionPage.generateValidProposalFormFields(
-            type === ProposalType.info ? 0 : 1,
+            type,
             false,
             rewardAddressBech32
           );
@@ -70,9 +70,7 @@ test.describe("Reject invalid  data", () => {
       await proposalSubmissionPage.addLinkBtn.click();
 
       const formFields: ProposalCreateRequest =
-        proposalSubmissionPage.generateInValidProposalFormFields(
-          type === ProposalType.info ? 0 : 1
-        );
+        proposalSubmissionPage.generateInValidProposalFormFields(type);
 
       for (let i = 0; i < 100; i++) {
         await proposalSubmissionPage.inValidateForm(formFields);
@@ -99,7 +97,7 @@ test.describe("Proposal submission check", () => {
 
       const proposal: ProposalCreateRequest =
         proposalSubmissionPage.generateValidProposalFormFields(
-          type === ProposalType.info ? 0 : 1,
+          type,
           false,
           walletAddressBech32
         );
@@ -130,7 +128,7 @@ test.describe("Review fillup form", () => {
 
       const formFields: ProposalCreateRequest =
         proposalSubmissionPage.generateValidProposalFormFields(
-          type === ProposalType.info ? 0 : 1,
+          type,
           false,
           bech32Address
         );
@@ -168,7 +166,7 @@ test("7L. Should reject invalid proposal metadata", async ({ page }) => {
   await proposalSubmissionPage.continueBtn.click();
 
   const proposal: ProposalCreateRequest =
-    proposalSubmissionPage.generateValidProposalFormFields(0);
+    proposalSubmissionPage.generateValidProposalFormFields(ProposalType.info);
 
   await proposalSubmissionPage.fillupForm(proposal);
   await proposalSubmissionPage.continueBtn.click();
@@ -201,7 +199,7 @@ test.describe("Edit proposal form", () => {
 
       const formFields: ProposalCreateRequest =
         proposalSubmissionPage.generateValidProposalFormFields(
-          type === ProposalType.treasury ? 1 : 0,
+          type,
           false,
           bech32Address
         );
@@ -249,7 +247,7 @@ test("7K_1. Should accept valid metadata anchor on proposal submission", async (
   await proposalSubmissionPage.continueBtn.click();
 
   const proposal: ProposalCreateRequest =
-    proposalSubmissionPage.generateValidProposalFormFields(0);
+    proposalSubmissionPage.generateValidProposalFormFields(ProposalType.info);
 
   await proposalSubmissionPage.fillupForm(proposal);
   await proposalSubmissionPage.continueBtn.click();
@@ -275,7 +273,7 @@ test("7K_2. Should reject invalid metadata anchor on proposal submission", async
   await proposalSubmissionPage.continueBtn.click();
 
   const proposal: ProposalCreateRequest =
-    proposalSubmissionPage.generateValidProposalFormFields(0);
+    proposalSubmissionPage.generateValidProposalFormFields(ProposalType.info);
 
   await proposalSubmissionPage.fillupForm(proposal);
   await proposalSubmissionPage.continueBtn.click();

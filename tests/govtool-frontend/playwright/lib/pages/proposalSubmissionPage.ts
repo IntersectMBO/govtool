@@ -6,8 +6,7 @@ import { extractProposalIdFromUrl } from "@helpers/string";
 import { invalid } from "@mock/index";
 import { Download, Page, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
-import { ProposalCreateRequest, ProposalLinksType } from "@types";
-import environments from "lib/constants/environments";
+import { ProposalCreateRequest, ProposalLinksType, ProposalType } from "@types";
 import ProposalDiscussionPage from "./proposalDiscussionPage";
 const formErrors = {
   proposalTitle: ["max-80-characters-error", "this-field-is-required-error"],
@@ -277,7 +276,7 @@ export default class ProposalSubmissionPage {
   }
 
   generateValidProposalFormFields(
-    proposalType: number,
+    proposalType: ProposalType,
     is_draft?: boolean,
     receivingAddress?: string
   ) {
@@ -293,10 +292,10 @@ export default class ProposalSubmissionPage {
           prop_link_text: faker.internet.domainWord(),
         },
       ],
-      gov_action_type_id: proposalType,
+      gov_action_type_id: proposalType === ProposalType.info ? 0 : 1,
       is_draft: !!is_draft,
     };
-    if (proposalType === proposal.gov_action_type_id) {
+    if (proposalType === ProposalType.treasury) {
       (proposal.prop_receiving_address = receivingAddress),
         (proposal.prop_amount = faker.number
           .int({ min: 100, max: 1000 })
@@ -305,7 +304,7 @@ export default class ProposalSubmissionPage {
     return proposal;
   }
 
-  generateInValidProposalFormFields(govActionTypeId: number) {
+  generateInValidProposalFormFields(proposalType: ProposalType) {
     const proposal: ProposalCreateRequest = {
       prop_name: invalid.proposalTitle(),
       prop_abstract: invalid.paragraph(),
@@ -318,10 +317,10 @@ export default class ProposalSubmissionPage {
           prop_link_text: invalid.name(),
         },
       ],
-      gov_action_type_id: govActionTypeId,
+      gov_action_type_id: proposalType === ProposalType.info ? 0 : 1,
       is_draft: false,
     };
-    if (govActionTypeId === 1) {
+    if (proposalType === ProposalType.treasury) {
       (proposal.prop_receiving_address = faker.location.streetAddress()),
         (proposal.prop_amount = invalid.amount());
     }

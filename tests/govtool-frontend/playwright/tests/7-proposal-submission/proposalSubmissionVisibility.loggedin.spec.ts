@@ -27,7 +27,10 @@ test("7C. Should list unfinished Draft ", async ({ page }) => {
   await proposalSubmissionPage.continueBtn.click();
   await proposalSubmissionPage.addLinkBtn.click();
   await proposalSubmissionPage.fillupForm(
-    proposalSubmissionPage.generateValidProposalFormFields(0, true)
+    proposalSubmissionPage.generateValidProposalFormFields(
+      ProposalType.info,
+      true
+    )
   );
   await proposalSubmissionPage.saveDraftBtn.click();
   await proposalSubmissionPage.closeDraftSuccessModalBtn.click();

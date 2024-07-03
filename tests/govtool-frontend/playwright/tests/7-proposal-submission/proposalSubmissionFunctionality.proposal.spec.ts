@@ -32,7 +32,7 @@ test("7H. should submit a proposal", async ({ page, browser }, testInfo) => {
   await proposalSubmissionPage.continueBtn.click();
 
   const proposal: ProposalCreateRequest =
-    proposalSubmissionPage.generateValidProposalFormFields(0);
+    proposalSubmissionPage.generateValidProposalFormFields(ProposalType.info);
 
   await proposalSubmissionPage.register({ ...proposal });
 

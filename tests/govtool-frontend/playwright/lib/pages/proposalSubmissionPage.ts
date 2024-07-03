@@ -49,6 +49,7 @@ export default class ProposalSubmissionPage {
     "Governance Action Type *"
   ); // BUG missing test id
   readonly saveDraftBtn = this.page.getByTestId("save-draft-button");
+  readonly submitBtn = this.page.getByRole("button", { name: "Submit" }); // BUG missing test id
 
   // input fields
   readonly titleInput = this.page.getByLabel("Title *"); // BUG testid = title-input
@@ -122,7 +123,7 @@ export default class ProposalSubmissionPage {
     } else {
       await this.treasuryBtn.click();
     }
-    await this.fillupForm(governanceProposal);
+    await this.fillupFormWithTypeSelected(governanceProposal);
   }
 
   async fillCommonFields(governanceProposal: ProposalCreateRequest) {

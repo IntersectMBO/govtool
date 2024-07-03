@@ -79,34 +79,37 @@ test.describe("Reject invalid  data", () => {
   });
 });
 
-test.describe("Proposal submission check", () => {
+test.describe("Create a proposal with proper data", () => {
   Object.values(ProposalType).map((type: ProposalType, index) => {
-    test(`7G_${index + 1}. Should open wallet connection popup, when registered with proper ${type.toLowerCase()} data`, async ({
+    test(`7G_${index + 1}. Should create a proposal with proper ${type.toLowerCase()} data`, async ({
       page,
       wallet,
     }) => {
       const proposalSubmissionPage = new ProposalSubmissionPage(page);
-
       await proposalSubmissionPage.goto();
 
-      await page.getByTestId(`${type}-radio`).click();
       await proposalSubmissionPage.continueBtn.click();
+      await proposalSubmissionPage.addLinkBtn.click();
 
       const walletAddressBech32 =
         ShelleyWallet.fromJson(wallet).rewardAddressBech32(0);
-
       const proposal: ProposalCreateRequest =
         proposalSubmissionPage.generateValidProposalFormFields(
           type,
           false,
           walletAddressBech32
         );
-      await proposalSubmissionPage.register({ ...proposal });
-      await expect(
-        proposalSubmissionPage.registrationErrorModal.getByText(
-          "UTxO Balance Insufficient"
-        )
-      ).toBeVisible();
+
+      await proposalSubmissionPage.fillupForm(proposal);
+      await proposalSubmissionPage.continueBtn.click();
+      await proposalSubmissionPage.submitBtn.click();
+
+      await expect(page.getByTestId("submit-as-GA-button")).toBeVisible();
+      await expect(page.getByText(type, { exact: true })).toBeVisible();
+      await expect(page.getByText(proposal.prop_name)).toBeVisible();
+      await expect(page.getByText(proposal.prop_abstract)).toBeVisible();
+      await expect(page.getByText(proposal.prop_rationale)).toBeVisible();
+      await expect(page.getByText(proposal.prop_motivation)).toBeVisible();
     });
   });
 });

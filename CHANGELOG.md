@@ -11,6 +11,7 @@ changes.
 ## [Unreleased]
 
 - Added 'sentryenv' field in backend config file [Issue 1401](https://github.com/IntersectMBO/govtool/issues/1401)
+- Add websocket transaction status endpoint /transaction/watch/<TX-HASH> [Issue 1235](https://github.com/IntersectMBO/govtool/issues/1235)
 - Add wallet connector package [Issue 898](https://github.com/IntersectMBO/govtool/issues/898)
 - Change DRep without metadata name from "Sole Voter" to "Direct Voter" [Issue 880](https://github.com/IntersectMBO/govtool/issues/880)
 - Inicialize Usersnap into App [Issue 546](https://github.com/IntersectMBO/govtool/issues/546)
@@ -25,6 +26,8 @@ changes.
 
 ### Added
 
+- added `websocketlifetimeseconds` config field for webscoket connections, and watched transactions.  [Issue 1235](https://github.com/IntersectMBO/govtool/issues/1235)
+- added separate async process that fetches new voting_anchors, validates their metadata using metadata-validation service, and then stores it in Redis database [Issue 1234](https://github.com/IntersectMBO/govtool/issues/1234)
 - added `bio` `dRepName` `email` `references` `metadataValid` and `metadataStatus` fields to `drep/list`
 - added `metadatavalidationmaxconcurrentrequests` field to the backend config
 - added `metadata/validate` endpoint [Issue 876](https://github.com/IntersectMBO/govtool/issues/876)

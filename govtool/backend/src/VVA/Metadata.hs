@@ -31,8 +31,78 @@ import Network.HTTP.Client
 import Network.HTTP.Client.TLS
 import Data.Aeson (encode, object, (.=))
 
-validateMetadata
-    :: (Has VVAConfig r, Has Manager r, MonadReader r m, MonadIO m, MonadError AppError m)
+sqlFrom :: ByteString -> SQL.Query
+sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
+
+getVotingAnchorsSql :: SQL.Query
+getVotingAnchorsSql = sqlFrom $(embedFile "sql/get-voting-anchors.sql")
+
+getNewVotingAnchors ::
+    (Has ConnectionPool r, Has Manager r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m)
+    => Integer
+    -> m [VotingAnchor]
+getNewVotingAnchors lastId = do
+    anchors <- withPool $ \conn -> do
+        liftIO $ SQL.query conn getVotingAnchorsSql $ SQL.Only (lastId :: Integer)
+    return $ map (\(id, url, hash, type') -> VotingAnchor (floor @Scientific id) url hash type') anchors
+
+startFetchProcess ::
+    (Has ConnectionPool r, Has Manager r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m)
+    => m ()
+startFetchProcess = go 0
+    where
+        go latestKnownId = do
+            anchors <- getNewVotingAnchors latestKnownId
+            if null anchors
+                then do
+                    liftIO $ threadDelay (20 * 1000000)
+                    go latestKnownId
+                else do
+                    (drepMetadata, proposalMetadata) <- processAnchors anchors
+                    storeMetadata drepMetadata
+                    storeMetadata proposalMetadata
+
+                    let newId = maximum $ map votingAnchorId anchors
+
+                    liftIO $ putStrLn ("Stored " <> show (length anchors) <> " voting anchors")
+
+                    liftIO $ threadDelay (20 * 1000000)
+                    go newId
+
+
+processAnchors ::
+   (Has ConnectionPool r, Has Manager r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m)
+   => [VotingAnchor]
+   -> m ( [(Text, MetadataValidationResult DRepMetadata)]
+        , [(Text, MetadataValidationResult ProposalMetadata)]
+        )
+processAnchors anchors = do
+    let (drepAnchors, proposalAnchors) = partition ((== "other") . votingAnchorType) anchors
+    drepMetadata <- mapM (\(VotingAnchor id url hash _) -> (url<>"#"<>hash, ) <$> getDRepMetadataValidationResult' url hash) drepAnchors
+    proposalMetadata <- mapM (\(VotingAnchor id url hash _) -> (url<>"#"<>hash, ) <$> getProposalMetadataValidationResult' url hash) proposalAnchors
+    return (drepMetadata, proposalMetadata)
+
+storeMetadata ::
+    (Has ConnectionPool r, Has Manager r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m, ToJSON a)
+    => [(Text, MetadataValidationResult a)]
+    -> m ()
+storeMetadata metadataResults = do
+    port <- getRedisPort
+    host <- getRedisHost
+    pass <- fmap Text.encodeUtf8 <$> getRedisPassword
+    conn <- liftIO $ Redis.checkedConnect $ Redis.defaultConnectInfo
+        { Redis.connectHost = unpack host
+        , Redis.connectPort = Redis.PortNumber $ fromIntegral port
+        , Redis.connectAuth = pass
+        }
+    liftIO $ Redis.runRedis conn $ do
+        forM metadataResults $ \(reddisId, metadataValidationResult) -> do
+                _ <- Redis.set (Text.encodeUtf8 reddisId) (toStrict $ encode metadataValidationResult)
+                return ()
+    return ()
+
+fetchMetadataValidationResult ::
+    (Has ConnectionPool r, Has Manager r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m, FromJSON a)
     => Text
     -> Text
     -> Maybe Text

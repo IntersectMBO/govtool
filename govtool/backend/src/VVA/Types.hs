@@ -6,6 +6,11 @@
 
 module VVA.Types where
 
+import           GHC.Conc (TVar)
+import qualified Network.WebSockets.Connection as WS
+import           Data.Aeson.TH              (deriveJSON)
+import VVA.API.Utils (jsonOptions)
+import GHC.Generics (Generic)
 import           Control.Exception
 import           Control.Monad.Except       (MonadError)
 import           Control.Monad.Fail         (MonadFail)
@@ -18,6 +23,7 @@ import           Data.Has
 import           Data.Pool                  (Pool)
 import           Data.Text                  (Text)
 import           Data.Time                  (UTCTime)
+import           Data.Map                   (Map)
 
 import           Database.PostgreSQL.Simple (Connection)
 
@@ -212,4 +218,44 @@ data MetadataValidationStatus
   | IncorrectHash
   | UrlNotFound
 
+
+
+
+type App m = (MonadReader AppEnv m, MonadIO m, MonadFail m, MonadError AppError m)
+
+type WebsocketTvar = TVar (Map Text (WS.Connection, UTCTime))
+
+data AppEnv
+  = AppEnv
+      { vvaConfig         :: VVAConfig
+      , vvaCache          :: CacheEnv
+      , vvaConnectionPool :: Pool Connection
+      , vvaTlsManager     :: Manager
+      , vvaMetadataQSem   :: QSem
+      , vvaWebSocketConnections :: WebsocketTvar
+      }
+
+instance Has VVAConfig AppEnv where
+  getter AppEnv {vvaConfig} = vvaConfig
+  modifier f a@AppEnv {vvaConfig} = a {vvaConfig = f vvaConfig}
+
+instance Has CacheEnv AppEnv where
+  getter AppEnv {vvaCache} = vvaCache
+  modifier f a@AppEnv {vvaCache} = a {vvaCache = f vvaCache}
+
+instance Has (Pool Connection) AppEnv where
+  getter AppEnv {vvaConnectionPool} = vvaConnectionPool
+  modifier f a@AppEnv {vvaConnectionPool} = a {vvaConnectionPool = f vvaConnectionPool}
+
+instance Has Manager AppEnv where
+  getter AppEnv {vvaTlsManager} = vvaTlsManager
+  modifier f a@AppEnv {vvaTlsManager} = a {vvaTlsManager = f vvaTlsManager}
+
+instance Has QSem AppEnv where
+  getter AppEnv {vvaMetadataQSem} = vvaMetadataQSem
+  modifier f a@AppEnv {vvaMetadataQSem} = a {vvaMetadataQSem = f vvaMetadataQSem}
+
+instance Has (TVar (Map Text (WS.Connection, UTCTime))) AppEnv where
+  getter AppEnv {vvaWebSocketConnections} = vvaWebSocketConnections
+  modifier f a@AppEnv {vvaWebSocketConnections} = a {vvaWebSocketConnections = f vvaWebSocketConnections}
 

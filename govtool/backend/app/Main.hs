@@ -8,6 +8,8 @@
 
 module Main where
 
+import GHC.Conc (newTVarIO)
+import           Control.Concurrent                     (forkIO)
 import           Control.Concurrent.QSem                (newQSem)
 import           Control.Exception                      (Exception,
                                                          SomeException,
@@ -75,6 +77,7 @@ import           VVA.Types                              (AppEnv (..),
                                                          CacheEnv (..))
 import Network.HTTP.Client hiding (Proxy, Request)
 import Network.HTTP.Client.TLS
+import           VVA.Transaction (processTransactionStatuses, timeoutStaleWebsocketConnections)
 
 proxyAPI :: Proxy (VVAApi :<|> SwaggerAPI)
 proxyAPI = Proxy
@@ -135,7 +138,27 @@ startApp vvaConfig = do
   connectionPool <- createPool (connectPostgreSQL (encodeUtf8 (dbSyncConnectionString $ getter vvaConfig))) close 1 1 60
   vvaTlsManager <- newManager tlsManagerSettings
   qsem <- newQSem (metadataValidationMaxConcurrentRequests vvaConfig)
-  let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool, vvaTlsManager, vvaMetadataQSem=qsem}
+  websocketConnectionsTVar <- newTVarIO mempty
+  let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool, vvaTlsManager, vvaMetadataQSem=qsem, vvaWebSocketConnections=websocketConnectionsTVar}
+
+  _ <- forkIO $ do
+     result <- runReaderT (runExceptT startFetchProcess) appEnv
+     case result of
+        Left e -> throw e
+        Right _ -> return ()
+
+  _ <- forkIO $ do
+      result <- runReaderT (runExceptT $ processTransactionStatuses websocketConnectionsTVar) appEnv
+      case result of
+        Left e -> throw e
+        Right _ -> return ()
+
+  _ <- forkIO $ do
+      result <- runReaderT (runExceptT $ timeoutStaleWebsocketConnections websocketConnectionsTVar) appEnv
+      case result of
+        Left e -> throw e
+        Right _ -> return ()
+
   server' <- mkVVAServer appEnv
   runSettings settings server'
 

@@ -5,6 +5,7 @@ import { Locator, Page } from "@playwright/test";
 import environments from "lib/constants/environments";
 import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
 import { ProposalCreateRequest } from "@types";
+import { range } from "cypress/types/lodash";
 
 export default class ProposalDiscussionPage {
   // Buttons
@@ -27,13 +28,12 @@ export default class ProposalDiscussionPage {
   readonly verifyIdentityBtn = this.page.getByRole("button", {
     name: "Verify your identity",
   });
+  readonly addLinkBtn = this.page.getByRole("button", { name: "Add link" });
 
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto(
-      `${environments.frontendUrl}/connected/proposal_pillar/proposal_discussion`
-    );
+    await this.page.goto(`${environments.frontendUrl}/proposal_discussion`);
     await this.page.waitForTimeout(2_000);
   }
 
@@ -104,11 +104,11 @@ export default class ProposalDiscussionPage {
       prop_amount: faker.number.int({ min: 100, max: 1000 }).toString(),
       is_draft: false,
     };
-
     await this.proposalCreateBtn.click();
     await this.continueBtn.click();
 
     await this.fillForm(proposalRequest);
+
     await this.continueBtn.click();
     await this.page.getByRole("button", { name: "Submit" }).click();
 
@@ -126,10 +126,14 @@ export default class ProposalDiscussionPage {
     await this.page.getByPlaceholder("Summary...").fill(data.prop_abstract);
     await this.page.getByLabel("Motivation *").fill(data.prop_motivation);
     await this.page.getByLabel("Rationale *").fill(data.prop_rationale);
-    await this.page
-      .getByLabel("Receiving address *")
-      .fill(data.prop_receiving_address);
 
-    await this.page.getByPlaceholder("e.g.").fill(data.prop_amount);
+    for (const link of data.proposal_links) {
+      await this.addLinkBtn.click();
+
+      await this.page
+        .getByPlaceholder("https://website.com")
+        .fill(link.prop_link);
+      await this.page.getByPlaceholder("Text").fill(link.prop_link_text);
+    }
   }
 }

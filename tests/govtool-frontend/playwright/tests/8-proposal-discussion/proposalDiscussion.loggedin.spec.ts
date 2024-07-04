@@ -7,6 +7,11 @@ import { createNewPageWithWallet } from "@helpers/page";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { Page, expect } from "@playwright/test";
+import { setAllureEpic } from "@helpers/allure";
+
+test.beforeEach(async () => {
+  await setAllureEpic("8. Proposal Discussion Forum");
+});
 
 test.describe("Proposal created logged in state", () => {
   test.use({
@@ -27,7 +32,7 @@ test.describe("Proposal created logged in state", () => {
   }) => {
     await proposalDiscussionDetailsPage.likeBtn.click();
     await page.waitForTimeout(2_000);
-    await expect(page.getByText("10")).toBeVisible();
+    await expect(page.getByText("10", { exact: true })).toBeVisible();
 
     await proposalDiscussionDetailsPage.dislikeBtn.click();
     await page.waitForTimeout(2_000);

@@ -33,7 +33,9 @@ export default class ProposalDiscussionDetailsPage {
   readonly changeVoteBtn = this.page.getByRole("button", {
     name: "Change Vote",
   });
-
+  readonly verifyIdentityBtn = this.page.getByRole("button", {
+    name: "Verify your identity",
+  });
   // Indicators
   readonly likesCounts = this.page.getByTestId("likes-count");
   readonly dislikesCounts = this.page.getByTestId("dislikse-count");
@@ -52,7 +54,7 @@ export default class ProposalDiscussionDetailsPage {
 
   async goto(proposalId: number) {
     await this.page.goto(
-      `${environments.frontendUrl}/connected/proposal_pillar/proposal_discussion/${proposalId}`
+      `${environments.frontendUrl}/proposal_discussion/${proposalId}`
     );
   }
 
@@ -108,11 +110,7 @@ export default class ProposalDiscussionDetailsPage {
     await this.page.waitForTimeout(2_000);
 
     await this.page.locator("#menu-button").click();
-    await this.page.getByRole("menuitem", { name: "Delete Proposal" }).click();
-
-    // confirm deletion
-    await this.page
-      .getByRole("button", { name: "Yes, delete my proposal" })
-      .click();
+    await this.page.getByTestId("delete-proposal").click();
+    await this.page.getByTestId("delete-proposal-yes-button").click();
   }
 }

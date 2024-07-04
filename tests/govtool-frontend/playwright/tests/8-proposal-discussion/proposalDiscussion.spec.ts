@@ -11,8 +11,8 @@ const mockPoll = require("../../lib/_mock/proposalPoll.json");
 const mockComments = require("../../lib/_mock/proposalComments.json");
 const mockInfoProposedGA = require("../../lib/_mock/infoProposedGAs.json");
 
-test.beforeEach(() => {
-  setAllureEpic("8. Proposal Discussion Forum");
+test.beforeEach(async () => {
+  await setAllureEpic("8. Proposal Discussion Forum");
 });
 
 test("8A. Should access proposed governance actions in disconnected state", async ({

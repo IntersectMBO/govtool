@@ -2,10 +2,9 @@ import { faker } from "@faker-js/faker";
 import { generateWalletAddress } from "@helpers/cardano";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { expect, Locator, Page } from "@playwright/test";
+import { ProposalCreateRequest, ProposedGovAction } from "@types";
 import environments from "lib/constants/environments";
 import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
-import { ProposalCreateRequest, ProposedGovAction } from "@types";
-import { range } from "cypress/types/lodash";
 
 export default class ProposalDiscussionPage {
   // Buttons

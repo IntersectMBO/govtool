@@ -1,3 +1,4 @@
+import environments from "@constants/environments";
 import { faker } from "@faker-js/faker";
 import { ShelleyWallet } from "@helpers/crypto";
 import { expectWithInfo } from "@helpers/exceptionHandler";
@@ -7,7 +8,6 @@ import { invalid } from "@mock/index";
 import { Download, Page, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
 import { ProposalCreateRequest, ProposalLinksType, ProposalType } from "@types";
-import ProposalDiscussionPage from "./proposalDiscussionPage";
 const formErrors = {
   proposalTitle: ["max-80-characters-error", "this-field-is-required-error"],
   abstract: "this-field-is-required-error",
@@ -20,9 +20,8 @@ const formErrors = {
 
 export default class ProposalSubmissionPage {
   // modals
-  readonly registrationSuccessModal = this.page.getByTestId(
-    "governance-action-submitted-modal"
-  );
+  readonly registrationSuccessModal =
+    this.page.getByTestId("ga-submitted-modal");
   readonly registrationErrorModal = this.page.getByTestId(
     "create-governance-action-error-modal"
   );
@@ -68,24 +67,19 @@ export default class ProposalSubmissionPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    const proposalDiscussionpage = new ProposalDiscussionPage(this.page);
-    await proposalDiscussionpage.goto();
+    await this.page.goto(
+      `${environments.frontendUrl}/connected/proposal_pillar/proposal_discussion`
+    );
+
     await this.verifyIdentityBtn.click();
 
     await this.proposalCreateBtn.click();
   }
 
-  async register(governanceProposal: ProposalCreateRequest) {
-    await this.fillupForm(governanceProposal);
-
-    await this.continueBtn.click();
-    await this.continueBtn.click();
-    await this.page.getByRole("checkbox").click();
-    await this.continueBtn.click();
-
+  async fillUpValidMetadata() {
     this.page
       .getByRole("button", {
-        name: `${governanceProposal.gov_action_type_id}.jsonld`,
+        name: "data.jsonld",
       })
       .click(); // BUG test id = metadata-download-button
 
@@ -95,7 +89,26 @@ export default class ProposalSubmissionPage {
       dRepMetadata.data
     );
     await this.metadataUrlInput.fill(url);
+    await this.submitBtn.click();
+  }
+
+  async register() {
+    await this.page.click("input#submission-checkbox"); // BUG missing test id
     await this.continueBtn.click();
+
+    this.page
+      .getByRole("button", {
+        name: "data.jsonld",
+      })
+      .click(); // BUG test id = metadata-download-button
+
+    const dRepMetadata = await this.downloadVoteMetadata();
+    const url = await metadataBucketService.uploadMetadata(
+      dRepMetadata.name,
+      dRepMetadata.data
+    );
+    await this.metadataUrlInput.fill(url);
+    await this.submitBtn.click();
   }
 
   async downloadVoteMetadata() {

@@ -155,32 +155,6 @@ test.describe("Review fillup form", () => {
   });
 });
 
-test("7L. Should reject invalid proposal metadata", async ({ page }) => {
-  const invalidMetadataAnchor = "https://www.google.com";
-
-  const proposalSubmissionPage = new ProposalSubmissionPage(page);
-  await proposalSubmissionPage.goto();
-  ``;
-  await page.getByTestId(`${ProposalType.info}-radio`).click();
-  await proposalSubmissionPage.continueBtn.click();
-
-  const proposal: ProposalCreateRequest =
-    proposalSubmissionPage.generateValidProposalFormFields(ProposalType.info);
-
-  await proposalSubmissionPage.fillupForm(proposal);
-  await proposalSubmissionPage.continueBtn.click();
-  await proposalSubmissionPage.continueBtn.click();
-  await page.getByRole("checkbox").click();
-  await proposalSubmissionPage.continueBtn.click();
-
-  await proposalSubmissionPage.metadataUrlInput.fill(invalidMetadataAnchor);
-  await proposalSubmissionPage.continueBtn.click();
-
-  await expect(proposalSubmissionPage.registrationErrorModal).not.toHaveText(
-    /utxo balance insufficient/i
-  );
-});
-
 test.describe("Edit proposal form", () => {
   Object.values(ProposalType).map((type: ProposalType, index) => {
     test(`7J_${index + 1}. Should edit review submission in ${type.toLowerCase()} Proposal form`, async ({

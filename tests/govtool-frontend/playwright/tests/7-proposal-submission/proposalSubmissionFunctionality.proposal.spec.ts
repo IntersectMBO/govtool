@@ -16,12 +16,15 @@ import walletManager from "lib/walletManager";
 let proposalSubmissionPage: ProposalSubmissionPage;
 test.use({ storageState: ".auth/proposal01.json", wallet: proposal01Wallet });
 
-test.beforeEach(async ({ page, proposalId, browser }) => {
+test.beforeEach(async ({ page, proposalId }) => {
   await setAllureEpic("7. Proposal submission");
+
   const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
   await proposalDiscussionDetailsPage.goto(proposalId);
+
   await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
   await proposalDiscussionDetailsPage.submitAsGABtn.click();
+
   proposalSubmissionPage = new ProposalSubmissionPage(page);
   await page.click("input#submission-checkbox"); // BUG missing test id
   await page.getByRole("button", { name: "Continue" }).click();
@@ -87,4 +90,13 @@ test.describe("Metadata anchor validation", () => {
 
     await expect(page.getByTestId("invalid-url-error")).toBeVisible();
   });
+});
+
+test("7K. Should reject invalid proposal metadata", async ({ page }) => {
+  await proposalSubmissionPage.metadataUrlInput.fill(invalid.url());
+  await proposalSubmissionPage.submitBtn.click();
+
+  await expect(page.getByTestId("url-error-modal-title")).toHaveText(
+    /the url you entered cannot be found/i
+  );
 });

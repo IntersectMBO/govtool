@@ -73,10 +73,14 @@ export const UsersnapProvider = ({
   }, [usersnapApi]);
 
   useEffect(() => {
-    loadSpace(API_KEY).then((api) => {
-      api.init(initParams);
-      setUsersnapApi(api);
-    });
+    loadSpace(API_KEY)
+      .then((api) => {
+        api.init(initParams);
+        setUsersnapApi(api);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, [initParams]);
 
   const value = useMemo(() => ({ openFeedbackWindow }), [openFeedbackWindow]);

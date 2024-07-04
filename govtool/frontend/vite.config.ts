@@ -10,19 +10,6 @@ import react from "@vitejs/plugin-react";
 // https://vitejs.dev/config/
 const viteConfig = defineViteConfig({
   plugins: [
-    {
-      name: "jsx-in-js-transformer",
-      async transform(code, id) {
-        if (!id.match(/.*\.js$/)) return null;
-
-        // Use the exposed transform from vite, instead of directly
-        // transforming with esbuild
-        return transformWithEsbuild(code, id, {
-          loader: "jsx",
-          jsx: "automatic",
-        });
-      },
-    },
     react(),
   ],
   cacheDir: ".vite",

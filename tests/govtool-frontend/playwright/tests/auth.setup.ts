@@ -140,7 +140,7 @@ setup("Create Proposal 01 auth", async ({ page, context }) => {
   await proposalDiscussionPage.verifyIdentityBtn.click();
 
   await proposalDiscussionPage.setUsername(
-      faker.internet.userName().toLowerCase()
+    faker.internet.userName().toLowerCase()
   );
 
   await context.storageState({ path: proposal01AuthFile });

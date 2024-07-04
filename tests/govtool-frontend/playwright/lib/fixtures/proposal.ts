@@ -31,7 +31,6 @@ export const test = base.extend<TestOptions>({
     await use(proposalId);
 
     // cleanup
-    await proposalDetailsPage.goto(proposalId);
     await proposalDetailsPage.deleteProposal();
   },
 });

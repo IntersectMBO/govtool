@@ -8,7 +8,6 @@ import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage"
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
 import { ProposalCreateRequest, ProposalType } from "@types";
-import { bech32 } from "bech32";
 
 test.use({ storageState: ".auth/proposal01.json", wallet: proposal01Wallet });
 
@@ -156,64 +155,126 @@ test.describe("Review fillup form", () => {
   });
 });
 
-test.describe("Edit proposal form", () => {
-  Object.values(ProposalType).map((type: ProposalType, index) => {
-    test(`7J_${index + 1}. Should edit review submission in ${type.toLowerCase()} Proposal form`, async ({
-      page,
-    }) => {
-      const proposalSubmissionPage = new ProposalSubmissionPage(page);
+test.describe("Info Proposal Draft", () => {
+  let proposalSubmissionPage: ProposalSubmissionPage;
+  let proposalFormValue: ProposalCreateRequest;
+  test.beforeEach(async ({ page }) => {
+    proposalSubmissionPage = new ProposalSubmissionPage(page);
+    await proposalSubmissionPage.goto();
 
-      await proposalSubmissionPage.goto();
+    await proposalSubmissionPage.continueBtn.click();
+    await proposalSubmissionPage.addLinkBtn.click();
+    proposalFormValue = proposalSubmissionPage.generateValidProposalFormFields(
+      ProposalType.info,
+      true
+    );
+    await proposalSubmissionPage.fillupForm(proposalFormValue);
 
-      await page.getByTestId(`${type}-radio`).click();
-      await proposalSubmissionPage.continueBtn.click();
+    await proposalSubmissionPage.saveDraftBtn.click();
+    await proposalSubmissionPage.closeDraftSuccessModalBtn.click();
 
-      const randomBytes = new Uint8Array(10);
-      const bech32Address = bech32.encode("addr_test", randomBytes);
+    await proposalSubmissionPage.proposalCreateBtn.click();
+  });
 
-      const formFields: ProposalCreateRequest =
-        proposalSubmissionPage.generateValidProposalFormFields(
-          type,
-          false,
-          bech32Address
-        );
-      await proposalSubmissionPage.validateForm(formFields);
-      proposalSubmissionPage.continueBtn.click();
+  test("7L. Should save proposal as a draft", async () => {
+    const draftCard = proposalSubmissionPage.getFirstDraft();
+    const draftCardAllInnerText = await (await draftCard).allInnerTexts();
 
-      await proposalSubmissionPage.editSubmissionButton.click();
+    expect(draftCardAllInnerText.includes(proposalFormValue.prop_name));
+    expect(draftCardAllInnerText.includes(proposalFormValue.prop_abstract));
+  });
 
-      const newTitle = faker.person.firstName();
+  test("7M_1. Should edit a info proposal draft", async ({ page }) => {
+    const newTitle = faker.lorem.sentence(6);
 
-      await proposalSubmissionPage.titleInput.fill(newTitle);
+    await proposalSubmissionPage.viewFirstDraft();
+    await proposalSubmissionPage.titleInput.fill(newTitle);
+    await proposalSubmissionPage.continueBtn.click();
 
-      await proposalSubmissionPage.continueBtn.click();
+    await expect(page.getByText(newTitle)).toBeVisible();
+    await expect(page.getByText(proposalFormValue.prop_abstract)).toBeVisible();
+    await expect(
+      page.getByText(proposalFormValue.prop_motivation)
+    ).toBeVisible();
+    await expect(
+      page.getByText(proposalFormValue.prop_rationale)
+    ).toBeVisible();
+    await expect(
+      page.getByText(proposalFormValue.proposal_links[0].prop_link_text)
+    ).toBeVisible();
+  });
 
-      await expect(page.getByText(newTitle)).toBeVisible();
-      await expect(page.getByText(formFields.prop_abstract)).toBeVisible();
-      await expect(page.getByText(formFields.prop_motivation)).toBeVisible();
-      await expect(page.getByText(formFields.prop_rationale)).toBeVisible();
-      await expect(
-        page.getByText(formFields.proposal_links[0].prop_link)
-      ).toBeVisible();
-      await expect(
-        page.getByText(formFields.proposal_links[0].prop_link_text)
-      ).toBeVisible();
+  test("7N. Should submit a draft proposal", async ({ page }) => {
+    await proposalSubmissionPage.viewFirstDraft();
+    await proposalSubmissionPage.continueBtn.click();
+    await proposalSubmissionPage.submitBtn.click();
 
-      if (type === ProposalType.treasury) {
-        await expect(
-          page.getByText(formFields.prop_receiving_address)
-        ).toBeVisible();
-        await expect(page.getByText(formFields.prop_amount)).toBeVisible();
-      }
-    });
+    await expect(page.getByTestId("submit-as-GA-button")).toBeVisible();
+    await expect(
+      page.getByText(ProposalType.info, { exact: true })
+    ).toBeVisible();
+    await expect(page.getByText(proposalFormValue.prop_name)).toBeVisible();
+    await expect(page.getByText(proposalFormValue.prop_abstract)).toBeVisible();
+    await expect(
+      page.getByText(proposalFormValue.prop_rationale)
+    ).toBeVisible();
+    await expect(
+      page.getByText(proposalFormValue.prop_motivation)
+    ).toBeVisible();
+  });
+});
+
+test.describe("Treasury Proposal Draft", () => {
+  let proposalSubmissionPage: ProposalSubmissionPage;
+  let proposalFormValue: ProposalCreateRequest;
+
+  test.beforeEach(async ({ page }) => {
+    proposalSubmissionPage = new ProposalSubmissionPage(page);
+    await proposalSubmissionPage.goto();
+
+    await proposalSubmissionPage.continueBtn.click();
+    await proposalSubmissionPage.addLinkBtn.click();
+    proposalFormValue = proposalSubmissionPage.generateValidProposalFormFields(
+      ProposalType.treasury,
+      true,
+      ShelleyWallet.fromJson(proposal01Wallet).rewardAddressBech32(0)
+    );
+    await proposalSubmissionPage.fillupForm(proposalFormValue);
+
+    await proposalSubmissionPage.saveDraftBtn.click();
+    await proposalSubmissionPage.closeDraftSuccessModalBtn.click();
+
+    await proposalSubmissionPage.proposalCreateBtn.click();
+  });
+
+  test("7M_2. Should edit a treasury proposal draft", async ({ page }) => {
+    const newTitle = faker.lorem.sentence(6);
+
+    await proposalSubmissionPage.viewFirstDraft();
+    await proposalSubmissionPage.titleInput.fill(newTitle);
+    await proposalSubmissionPage.continueBtn.click();
+
+    await expect(page.getByText(newTitle)).toBeVisible();
+    await expect(page.getByText(proposalFormValue.prop_abstract)).toBeVisible();
+    await expect(
+      page.getByText(proposalFormValue.prop_motivation)
+    ).toBeVisible();
+    await expect(
+      page.getByText(proposalFormValue.prop_rationale)
+    ).toBeVisible();
+    await expect(
+      page.getByText(proposalFormValue.prop_receiving_address)
+    ).toBeVisible();
+    await expect(page.getByText(proposalFormValue.prop_amount)).toBeVisible();
+    await expect(
+      page.getByText(proposalFormValue.proposal_links[0].prop_link_text)
+    ).toBeVisible();
   });
 });
 
 test.describe("proposed as a governance action", () => {
   let proposalSubmissionPage: ProposalSubmissionPage;
   test.beforeEach(async ({ page, proposalId }) => {
-    await setAllureEpic("7. Proposal submission");
-
     const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
       page
     );
@@ -226,6 +287,7 @@ test.describe("proposed as a governance action", () => {
     await page.click("input#submission-checkbox"); // BUG missing test id
     await page.getByRole("button", { name: "Continue" }).click();
   });
+
   test.describe("Metadata anchor validation", () => {
     test("7J_1. Should accept valid metadata anchor on proposal submission", async ({
       page,

@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { generateWalletAddress } from "@helpers/cardano";
+import { ShelleyWallet } from "@helpers/crypto";
 import { expectWithInfo } from "@helpers/exceptionHandler";
 import { downloadMetadata } from "@helpers/metadata";
 import { extractProposalIdFromUrl } from "@helpers/string";
@@ -151,10 +151,25 @@ export default class ProposalSubmissionPage {
   }
 
   async getAllDrafts() {
-    await this.page.waitForTimeout(2_000);
+    this.page.waitForTimeout(2_000); // wait until draft is loaded
     return this.page
       .locator('[data-testid^="draft-"][data-testid$="-card"]')
       .all();
+  }
+
+  async getFirstDraft() {
+    this.page.waitForTimeout(2_000); // wait until draft is loaded
+    return this.page
+      .locator('[data-testid^="draft-"][data-testid$="-card"]')
+      .first();
+  }
+
+  async viewFirstDraft() {
+    this.page.waitForTimeout(2_000); // wait until draft is loaded
+    return this.page
+      .locator('[data-testid^="draft-"][data-testid$="-start-editing"]')
+      .first()
+      .click();
   }
 
   async validateForm(governanceProposal: ProposalCreateRequest) {

@@ -52,23 +52,6 @@ export type IDRepInfo = {
   extraContentLinks?: string[];
 };
 
-export type ProposalLinksType = {
-  prop_link: string;
-  prop_link_text: string;
-};
-
-export type ProposalCreateRequest = {
-  proposal_links: Array<ProposalLinksType>;
-  gov_action_type_id: number;
-  prop_name: string;
-  prop_abstract: string;
-  prop_motivation: string;
-  prop_rationale: string;
-  prop_receiving_address?: string;
-  prop_amount?: string;
-  is_draft: boolean;
-};
-
 export enum ProposalType {
   info = "Info",
   treasury = "Treasury",

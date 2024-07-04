@@ -1,13 +1,13 @@
 import environments from "@constants/environments";
 import { faker } from "@faker-js/faker";
-import { ShelleyWallet } from "@helpers/crypto";
+import { generateWalletAddress } from "@helpers/cardano";
 import { expectWithInfo } from "@helpers/exceptionHandler";
 import { downloadMetadata } from "@helpers/metadata";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { invalid } from "@mock/index";
 import { Download, Page, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
-import { ProposalCreateRequest, ProposalLinksType, ProposalType } from "@types";
+import { ProposalCreateRequest, ProposalLink, ProposalType } from "@types";
 const formErrors = {
   proposalTitle: ["max-80-characters-error", "this-field-is-required-error"],
   abstract: "this-field-is-required-error",
@@ -153,7 +153,7 @@ export default class ProposalSubmissionPage {
     await this.amountInput.fill(governanceProposal.prop_amount);
   }
 
-  async fillProposalLinks(proposal_links: Array<ProposalLinksType>) {
+  async fillProposalLinks(proposal_links: Array<ProposalLink>) {
     for (let i = 0; i < proposal_links.length; i++) {
       if (i > 0) {
         await this.addLinkBtn.click();

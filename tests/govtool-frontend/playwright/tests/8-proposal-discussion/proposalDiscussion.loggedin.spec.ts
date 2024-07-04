@@ -1,4 +1,8 @@
-import { proposal01Wallet, user01Wallet } from "@constants/staticWallets";
+import {
+  proposal01Wallet,
+  proposal02Wallet,
+  user01Wallet,
+} from "@constants/staticWallets";
 import { createTempUserAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
@@ -15,8 +19,8 @@ test.beforeEach(async () => {
 
 test.describe("Proposal created logged in state", () => {
   test.use({
-    storageState: ".auth/user01.json",
-    wallet: user01Wallet,
+    storageState: ".auth/proposal02.json",
+    wallet: proposal02Wallet,
   });
 
   let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
@@ -24,7 +28,6 @@ test.describe("Proposal created logged in state", () => {
   test.beforeEach(async ({ page, proposalId }) => {
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
     await proposalDiscussionDetailsPage.goto(proposalId);
-    await proposalDiscussionDetailsPage.closeUsernamePrompt();
   });
 
   test("8G. Should display the proper likes and dislikes count", async ({
@@ -54,13 +57,30 @@ test.describe("Proposal created logged in state", () => {
     );
   });
 
-  test("8M. Should comment anonymously if a username is not set", async ({
-    page,
+  test("8M. Should disable anonymous comment", async ({
+    browser,
+    proposalId,
   }) => {
+    const userWallet = (await ShelleyWallet.generate()).json();
+
+    const tempUserAuth = ".auth/tempUserAuth.json";
+    const userPage = await createNewPageWithWallet(browser, {
+      storageState: tempUserAuth,
+      wallet: userWallet,
+    });
+
+    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
+      userPage
+    );
+    await proposalDiscussionDetailsPage.goto(proposalId);
+    await proposalDiscussionDetailsPage.closeUsernamePrompt();
+
     const randComment = faker.lorem.paragraph(2);
     await proposalDiscussionDetailsPage.addComment(randComment);
 
-    await expect(page.getByText(randComment)).toBeVisible();
+    await expect(
+      userPage.getByText("Hey, setup your username", { exact: true })
+    ).toBeVisible();
   });
 
   test("8N. Should reply to comments", async ({ page }) => {

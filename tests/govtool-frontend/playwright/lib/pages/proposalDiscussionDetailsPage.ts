@@ -56,6 +56,8 @@ export default class ProposalDiscussionDetailsPage {
     await this.page.goto(
       `${environments.frontendUrl}/proposal_discussion/${proposalId}`
     );
+
+    await this.verifyIdentityBtn.click();
   }
 
   async closeUsernamePrompt() {
@@ -68,15 +70,13 @@ export default class ProposalDiscussionDetailsPage {
 
   async addComment(comment: string) {
     await this.commentInput.fill(comment);
-    await this.page
-      .getByRole("button", { name: "Comment", exact: true })
-      .click();
+    await this.page.getByTestId("comment-button").click();
   }
 
   async replyComment(reply: string) {
     await this.page.getByRole("button", { name: "Reply" }).click();
     await this.page.getByPlaceholder("Add comment").fill(reply);
-    await this.page.getByRole("button", { name: "Comment" }).nth(2).click();
+    await this.page.getByTestId("reply-comment-button").click();
   }
 
   async sortAndValidate(

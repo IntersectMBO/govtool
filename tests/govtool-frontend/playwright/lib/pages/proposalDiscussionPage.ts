@@ -35,6 +35,8 @@ export default class ProposalDiscussionPage {
   async goto() {
     await this.page.goto(`${environments.frontendUrl}/proposal_discussion`);
     await this.page.waitForTimeout(2_000);
+
+    await this.verifyIdentityBtn.click();
   }
 
   async closeUsernamePrompt() {

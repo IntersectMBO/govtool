@@ -2,7 +2,7 @@ import { proposal01Wallet } from "@constants/staticWallets";
 import { test as base } from "@fixtures/walletExtension";
 import { createNewPageWithWallet } from "@helpers/page";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
-import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
+import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 
 type TestOptions = {
   proposalId: number;
@@ -12,18 +12,18 @@ type TestOptions = {
 export const test = base.extend<TestOptions>({
   pollEnabled: [false, { option: true }],
 
-  proposalId: async ({ page, browser, pollEnabled }, use) => {
+  proposalId: async ({ browser, pollEnabled }, use) => {
     // setup
     const proposalPage = await createNewPageWithWallet(browser, {
       storageState: ".auth/proposal01.json",
       wallet: proposal01Wallet,
     });
 
-    const proposalDiscussionPage = new ProposalDiscussionPage(proposalPage);
-    await proposalDiscussionPage.goto();
-    await proposalDiscussionPage.verifyIdentityBtn.click();
+    const proposalCreationPage = new ProposalSubmissionPage(proposalPage);
+    await proposalCreationPage.goto();
 
-    const proposalId = await proposalDiscussionPage.createProposal();
+    const proposalId = await proposalCreationPage.createProposal();
+
     const proposalDetailsPage = new ProposalDiscussionDetailsPage(proposalPage);
 
     if (pollEnabled) {

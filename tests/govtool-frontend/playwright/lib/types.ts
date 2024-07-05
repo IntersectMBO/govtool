@@ -1,6 +1,6 @@
-import { CardanoTestWallet } from "@cardanoapi/cardano-test-wallet/types";
+import { CardanoTestWalletJson } from "@cardanoapi/cardano-test-wallet/types";
 
-export type StaticWallet = CardanoTestWallet & {
+export type StaticWallet = CardanoTestWalletJson & {
   dRepId: string;
   address: string;
 };
@@ -121,4 +121,22 @@ export type CommentResponse = {
     user_govtool_username: string;
     subcommens_number: number;
   };
+};
+
+
+export type ProposalLink = {
+  prop_link: string;
+  prop_link_text: string;
+};
+
+export type ProposalCreateRequest = {
+  proposal_links: Array<ProposalLink>;
+  gov_action_type_id: number;
+  prop_name: string;
+  prop_abstract: string;
+  prop_motivation: string;
+  prop_rationale: string;
+  prop_receiving_address?: string;
+  prop_amount?: string;
+  is_draft: boolean;
 };

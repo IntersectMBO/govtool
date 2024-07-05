@@ -6,6 +6,7 @@ import loadDemosExtension from "./loadExtension";
 type WalletExtensionTestOptions = {
   wallet?: StaticWallet;
   enableStakeSigning: boolean;
+  supportedExtensions: Record<string, number>[];
 };
 
 export const test = base.extend<WalletExtensionTestOptions>({
@@ -13,8 +14,13 @@ export const test = base.extend<WalletExtensionTestOptions>({
 
   enableStakeSigning: [true, { option: true }],
 
-  page: async ({ page, wallet, enableStakeSigning }, use) => {
-    await loadDemosExtension(page, enableStakeSigning);
+  supportedExtensions: [[{ cip: 95 }], { option: true }],
+
+  page: async (
+    { page, wallet, enableStakeSigning, supportedExtensions },
+    use
+  ) => {
+    await loadDemosExtension(page, enableStakeSigning, supportedExtensions);
 
     if (wallet) {
       await importWallet(page, wallet);

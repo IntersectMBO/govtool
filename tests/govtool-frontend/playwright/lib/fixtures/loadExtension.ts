@@ -1,4 +1,7 @@
-import { CardanoTestWalletConfig } from "@cardanoapi/cardano-test-wallet/types";
+import {
+  CardanoTestWallet,
+  CardanoTestWalletConfig,
+} from "@cardanoapi/cardano-test-wallet/types";
 import environments from "@constants/environments";
 import { Page } from "@playwright/test";
 
@@ -6,7 +9,8 @@ import path = require("path");
 
 export default async function loadDemosExtension(
   page: Page,
-  enableStakeSigning = false
+  enableStakeSigning?: boolean,
+  supportedExtensions?: Record<string, number>[]
 ) {
   const demosBundleScriptPath = path.resolve(
     __dirname,
@@ -17,12 +21,16 @@ export default async function loadDemosExtension(
     kuberApiUrl: environments.kuber.apiUrl,
     kuberApiKey: environments.kuber.apiKey,
   };
-  await page.addInitScript((walletConfig) => {
-    window["cardanoTestWallet"] = {
-      walletName: "demos",
-      config: walletConfig,
-    };
-  }, walletConfig);
+  await page.addInitScript(
+    ({ walletConfig, supportedExtensions }) => {
+      window["cardanoTestWallet"] = {
+        walletName: "demos",
+        supportedExtensions,
+        config: walletConfig,
+      } as CardanoTestWallet;
+    },
+    { walletConfig, supportedExtensions }
+  );
 
   await page.addInitScript({ path: demosBundleScriptPath });
 }

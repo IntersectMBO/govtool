@@ -273,7 +273,7 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.middlewares.frontend-csp.headers.contentSecurityPolicy=default-src 'self'; img-src *.usersnap.com https://www.googletagmanager.com 'self' data:; script-src *.usersnap.com 'self' https://www.googletagmanager.com https://browser.sentry-cdn.com; style-src *.usersnap.com *.googleapis.com 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src *.usersnap.com https://s3.eu-central-1.amazonaws.com/upload.usersnap.com 'self' *.ingest.sentry.io *.google-analytics.com *.api.pdf.gov.tools; font-src *.usersnap.com *.gstatic.com 'self' https://fonts.gstatic.com data:; worker-src blob:" 
+      - "traefik.http.middlewares.frontend-csp.headers.contentSecurityPolicy=default-src 'self'; img-src *.usersnap.com https://www.googletagmanager.com 'self' data:; script-src 'unsafe-inline' *.usersnap.com 'self' https://www.googletagmanager.com https://browser.sentry-cdn.com; style-src *.usersnap.com *.googleapis.com 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src *.usersnap.com https://s3.eu-central-1.amazonaws.com/upload.usersnap.com 'self' *.sentry.io *.google-analytics.com *.api.pdf.gov.tools; font-src *.usersnap.com *.gstatic.com 'self' https://fonts.gstatic.com data:; worker-src blob:"
       - "traefik.http.routers.to-frontend.rule=Host(`<DOMAIN>`)"
       - "traefik.http.routers.to-frontend.entrypoints=websecure"
       - "traefik.http.routers.to-frontend.tls.certresolver=myresolver"

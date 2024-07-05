@@ -2,9 +2,9 @@ import { faker } from "@faker-js/faker";
 import { generateWalletAddress } from "@helpers/cardano";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { Page } from "@playwright/test";
-import { ProposalCreateRequest } from "@services/proposalDiscussion/types";
 import environments from "lib/constants/environments";
 import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
+import {ProposalCreateRequest} from "@types";
 
 export default class ProposalDiscussionPage {
   // Buttons
@@ -24,6 +24,9 @@ export default class ProposalDiscussionPage {
   readonly showLessBtn = this.page.getByRole("button", { name: "Show less" });
   readonly infoRadio = this.page.getByLabel("Info");
   readonly treasuryRadio = this.page.getByLabel("Treasury");
+  readonly verifyIdentityBtn = this.page.getByRole("button", {
+    name: "Verify your identity",
+  });
 
   constructor(private readonly page: Page) {}
 

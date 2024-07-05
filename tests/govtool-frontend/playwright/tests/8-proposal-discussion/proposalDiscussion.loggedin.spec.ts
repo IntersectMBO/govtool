@@ -9,7 +9,6 @@ import { test } from "@fixtures/proposal";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
-import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { Page, expect } from "@playwright/test";
 import { setAllureEpic } from "@helpers/allure";
 
@@ -168,7 +167,6 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
     ).not.toBeVisible();
   });
 
-  // TODO: Fix this
   test("8R. Should disable voting after cancelling the poll with the current poll result.", async ({
     page,
   }) => {

@@ -4,7 +4,7 @@ import "@intersect.mbo/pdf-ui/style";
 import { useCardano, useGovernanceActions } from "@/context";
 import { useValidateMutation } from "@/hooks/mutations";
 import { useScreenDimension } from "@/hooks/useScreenDimension";
-import { TopNav } from "@/components/organisms";
+import { Footer, TopNav } from "@/components/organisms";
 
 const ProposalDiscussion = React.lazy(
   () => import("@intersect.mbo/pdf-ui/cjs"),
@@ -17,12 +17,19 @@ export const ProposalDiscussionPillar = () => {
   const { createGovernanceActionJsonLD, createHash } = useGovernanceActions();
 
   return (
-    <Box>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        flex: 1,
+        minHeight: !context.isEnabled ? "100vh" : "auto",
+      }}
+    >
       {!context.isEnabled && <TopNav />}
       <Box
         sx={{
           px: context.isEnabled ? { xs: 2, sm: 5 } : pagePadding,
-          my: 3,
+          py: 3,
           display: "flex",
           flex: 1,
         }}
@@ -33,7 +40,6 @@ export const ProposalDiscussionPillar = () => {
               sx={{
                 display: "flex",
                 flex: 1,
-                height: "100vw",
                 alignItems: "center",
                 justifyContent: "center",
               }}
@@ -58,6 +64,7 @@ export const ProposalDiscussionPillar = () => {
           />
         </Suspense>
       </Box>
+      {!context.isEnabled && <Footer />}
     </Box>
   );
 };

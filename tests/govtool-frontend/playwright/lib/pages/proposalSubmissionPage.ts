@@ -50,17 +50,20 @@ export default class ProposalSubmissionPage {
   ); // BUG missing test id
   readonly saveDraftBtn = this.page.getByTestId("save-draft-button");
   readonly submitBtn = this.page.getByRole("button", { name: "Submit" }); // BUG missing test id
+  readonly createNewProposalBtn = this.page.getByRole("button", {
+    name: "Create new Proposal",
+  });
 
   // input fields
   readonly titleInput = this.page.getByLabel("Title *"); // BUG testid = title-input
   readonly abstractInput = this.page.getByLabel("Abstract *"); // BUG testid = abstract-input
-  readonly metadataUrlInput = this.page.getByTestId("metadata-url-input");
+  readonly metadataUrlInput = this.page.getByPlaceholder("URL"); // BUG missing test id
   readonly motivationInput = this.page.getByLabel("Motivation *"); // BUG testid = motivation-input
   readonly rationaleInput = this.page.getByLabel("Rationale *"); // BUG testid = rationale-input
   readonly linkInput = this.page.getByLabel("Link #1 URL"); // BUG testid = link-input
   readonly linkText = this.page.getByLabel("Link #1 Text"); // BUG missing testid
   readonly receivingAddressInput = this.page.getByLabel("Receiving address *"); // BUG missing testid
-  readonly amountInput = this.page.getByPlaceholder("e.g."); // BUG missing testid
+  readonly amountInput = this.page.getByPlaceholder("e.g. 2000"); // BUG missing testid
   readonly closeDraftSuccessModalBtn = this.page.getByTestId(
     "delete-proposal-yes-button"
   ); //BUG Improper test ids
@@ -73,8 +76,15 @@ export default class ProposalSubmissionPage {
     );
 
     await this.verifyIdentityBtn.click();
-
     await this.proposalCreateBtn.click();
+
+    await this.page.waitForTimeout(2_000); // wait until the draft is loaded
+    const drafts = await this.getAllDrafts();
+    if (drafts.length > 0) {
+      await this.createNewProposalBtn.click();
+    } else {
+      await this.continueBtn.click();
+    }
   }
 
   async fillUpValidMetadata() {
@@ -146,21 +156,21 @@ export default class ProposalSubmissionPage {
   }
 
   async getAllDrafts() {
-    this.page.waitForTimeout(2_000); // wait until draft is loaded
+    await this.page.waitForTimeout(2_000); // wait until draft is loaded
     return this.page
       .locator('[data-testid^="draft-"][data-testid$="-card"]')
       .all();
   }
 
   async getFirstDraft() {
-    this.page.waitForTimeout(2_000); // wait until draft is loaded
+    await this.page.waitForTimeout(2_000); // wait until draft is loaded
     return this.page
       .locator('[data-testid^="draft-"][data-testid$="-card"]')
       .first();
   }
 
   async viewFirstDraft() {
-    this.page.waitForTimeout(2_000); // wait until draft is loaded
+    await this.page.waitForTimeout(2_000); // wait until draft is loaded
     return this.page
       .locator('[data-testid^="draft-"][data-testid$="-start-editing"]')
       .first()

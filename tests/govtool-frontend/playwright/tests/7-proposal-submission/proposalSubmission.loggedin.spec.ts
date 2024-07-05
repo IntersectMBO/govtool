@@ -26,7 +26,6 @@ test.describe("Accept valid data", () => {
 
       await proposalSubmissionPage.goto();
 
-      await proposalSubmissionPage.continueBtn.click();
       await proposalSubmissionPage.governanceActionType.click();
       await page.getByRole("option", { name: type }).click();
       await proposalSubmissionPage.addLinkBtn.click();
@@ -64,7 +63,6 @@ test.describe("Reject invalid  data", () => {
       const proposalSubmissionPage = new ProposalSubmissionPage(page);
       await proposalSubmissionPage.goto();
 
-      await proposalSubmissionPage.continueBtn.click();
       await proposalSubmissionPage.governanceActionType.click();
       await page.getByRole("option", { name: type }).click();
       await proposalSubmissionPage.addLinkBtn.click();
@@ -88,7 +86,6 @@ test.describe("Create a proposal with proper data", () => {
       const proposalSubmissionPage = new ProposalSubmissionPage(page);
       await proposalSubmissionPage.goto();
 
-      await proposalSubmissionPage.continueBtn.click();
       await proposalSubmissionPage.addLinkBtn.click();
 
       const walletAddressBech32 =
@@ -122,7 +119,6 @@ test.describe("Review fillup form", () => {
       const proposalSubmissionPage = new ProposalSubmissionPage(page);
       await proposalSubmissionPage.goto();
 
-      await proposalSubmissionPage.continueBtn.click();
       await proposalSubmissionPage.addLinkBtn.click();
 
       const walletAddressBech32 =
@@ -158,11 +154,11 @@ test.describe("Review fillup form", () => {
 test.describe("Info Proposal Draft", () => {
   let proposalSubmissionPage: ProposalSubmissionPage;
   let proposalFormValue: ProposalCreateRequest;
+
   test.beforeEach(async ({ page }) => {
     proposalSubmissionPage = new ProposalSubmissionPage(page);
     await proposalSubmissionPage.goto();
 
-    await proposalSubmissionPage.continueBtn.click();
     await proposalSubmissionPage.addLinkBtn.click();
     proposalFormValue = proposalSubmissionPage.generateValidProposalFormFields(
       ProposalType.info,
@@ -232,7 +228,6 @@ test.describe("Treasury Proposal Draft", () => {
     proposalSubmissionPage = new ProposalSubmissionPage(page);
     await proposalSubmissionPage.goto();
 
-    await proposalSubmissionPage.continueBtn.click();
     await proposalSubmissionPage.addLinkBtn.click();
     proposalFormValue = proposalSubmissionPage.generateValidProposalFormFields(
       ProposalType.treasury,

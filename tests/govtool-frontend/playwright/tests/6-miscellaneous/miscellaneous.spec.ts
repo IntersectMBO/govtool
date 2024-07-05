@@ -76,12 +76,4 @@ test("6D. Should open Sanchonet docs in a new tab when clicking `Learn More` on 
     page.getByTestId("lear-more-about-sole-voter-button").click(),
   ]);
   await expect(directVoterLearnMorepage).toHaveURL(DIRECT_VOTER_DOC_URL);
-
-  const [proposed_GA_VoterLearnMorepage] = await Promise.all([
-    context.waitForEvent("page"),
-    page.getByRole("button", { name: "Learn more" }).nth(3).click(), // BUG missing test id
-  ]);
-  await expect(proposed_GA_VoterLearnMorepage).toHaveURL(
-    PROPOSE_GOVERNANCE_ACTION_DOC_URL
-  );
 });

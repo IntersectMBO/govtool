@@ -34,6 +34,8 @@ export default class ProposalDiscussionDetailsPage {
   readonly verifyIdentityBtn = this.page.getByRole("button", {
     name: "Verify your identity",
   });
+  readonly submitAsGABtn = this.page.getByTestId("submit-as-GA-button");
+
   // Indicators
   readonly likesCounts = this.page.getByTestId("likes-count");
   readonly dislikesCounts = this.page.getByTestId("dislikse-count");

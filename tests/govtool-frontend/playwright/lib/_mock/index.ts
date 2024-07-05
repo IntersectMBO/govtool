@@ -30,6 +30,29 @@ export const invalid = {
     return " ";
   },
 
+  username: () => {
+    const choice = faker.number.int({ min: 1, max: 6 });
+    if (choice === 1) {
+      // Contains a space, which is invalid
+      return faker.lorem.word() + " " + faker.lorem.word();
+    } else if (choice === 2) {
+      // Exceeds 30 characters, which is invalid
+      return faker.lorem.words(31).replace(/\s+/g, "");
+    } else if (choice === 3) {
+      // Starts with a period, which is invalid
+      return "." + faker.internet.userName();
+    } else if (choice === 4) {
+      // Starts with an underscore, which is invalid
+      return "_" + faker.internet.userName();
+    } else if (choice === 5) {
+      // Contains an invalid character, such as a symbol
+      return faker.internet.userName() + "#";
+    } else if (choice === 6) {
+      // Contains a hyphen
+      return faker.internet.userName() + "-";
+    }
+  },
+
   email: () => {
     const choice = faker.number.int({ min: 1, max: 3 });
 
@@ -69,5 +92,31 @@ export const invalid = {
     }
     // empty invalid
     return " ";
+  },
+};
+
+export const valid = {
+  username: () => {
+    let username = faker.internet.userName().toLowerCase();
+
+    // Remove any invalid characters
+    username = username.replace(/[^a-z0-9._]/g, "");
+
+    // Ensure the username is between 1 and 30 characters
+    if (username.length > 30) {
+      username = username.substring(0, 30);
+    }
+
+    // Ensure the first character is not a period or underscore
+    if (username.startsWith(".") || username.startsWith("_")) {
+      username = "a" + username.substring(1);
+    }
+
+    // Ensure the username is not empty after the transformations
+    if (username.length === 0) {
+      username = "user" + faker.number.int({ min: 1, max: 9999 });
+    }
+
+    return username;
   },
 };

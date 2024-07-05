@@ -18,6 +18,7 @@ import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import EditDRepPage from "@pages/editDRepPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { expect } from "@playwright/test";
+import { valid as mockValid, invalid as mockInvalid } from "@mock/index";
 
 test.beforeEach(async () => {
   await setAllureEpic("6. Miscellaneous");
@@ -117,18 +118,54 @@ test.describe("Logged in user", () => {
 });
 
 test.describe("Temporary user", () => {
-  test("6J. Should add a username.", async ({ page, browser }) => {
+  let userPage: Page;
+
+  test.beforeEach(async ({ page, browser }) => {
     const wallet = (await ShelleyWallet.generate()).json();
     const tempUserAuth = await createTempUserAuth(page, wallet);
-    const userPage = await createNewPageWithWallet(browser, {
+    userPage = await createNewPageWithWallet(browser, {
       storageState: tempUserAuth,
       wallet,
     });
+  });
 
+  test("6J. Should add a username.", async () => {
     const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
     await proposalDiscussionPage.goto();
     await proposalDiscussionPage.setUsername(
       faker.internet.userName().toLowerCase()
     );
+  });
+
+  test("6K. Should accept valid username.", async () => {
+    const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
+    await proposalDiscussionPage.goto();
+
+    for (let i = 0; i < 100; i++) {
+      await userPage
+        .getByLabel("Username *")
+        .fill(mockValid.username().toLowerCase());
+
+      await expect(
+        userPage.getByText("Invalid username. Only lower")
+      ).not.toBeVisible();
+      await expect(userPage.getByTestId("proceed-button")).toBeEnabled();
+    }
+  });
+
+  test("6L. Should reject invalid username.", async () => {
+    const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
+    await proposalDiscussionPage.goto();
+
+    for (let i = 0; i < 100; i++) {
+      await userPage
+        .getByLabel("Username *")
+        .fill(mockInvalid.username().toLowerCase());
+
+      await expect(
+        userPage.getByText("Invalid username. Only lower")
+      ).toBeVisible();
+      await expect(userPage.getByTestId("proceed-button")).toBeDisabled();
+    }
   });
 });

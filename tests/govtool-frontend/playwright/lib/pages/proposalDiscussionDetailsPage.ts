@@ -27,9 +27,7 @@ export default class ProposalDiscussionDetailsPage {
   readonly pollYesBtn = this.page.getByRole("button", { name: "Yes" }); //BUG missing test id
   readonly pollNoBtn = this.page.getByRole("button", { name: "No" }); //BUG missing test id
   readonly showReplyBtn = this.page.getByTestId("show-more-reply");
-  readonly closePollYesBtn = this.page.getByRole("button", {
-    name: "Yes, close Poll",
-  }); // BUG missing test id
+  readonly closePollYesBtn = this.page.getByTestId("close-the-poll-button");
   readonly changeVoteBtn = this.page.getByRole("button", {
     name: "Change Vote",
   });

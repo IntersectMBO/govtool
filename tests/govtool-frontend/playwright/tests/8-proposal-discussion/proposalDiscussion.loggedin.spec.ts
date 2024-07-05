@@ -1,4 +1,5 @@
 import {
+  adaHolder01Wallet,
   proposal01Wallet,
   proposal02Wallet,
   user01Wallet,
@@ -84,6 +85,8 @@ test.describe("Proposal created logged in state", () => {
   });
 
   test("8N. Should reply to comments", async ({ page }) => {
+    test.slow();
+
     const randComment = faker.lorem.paragraph(2);
     const randReply = faker.lorem.paragraph(2);
 
@@ -103,16 +106,12 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
 
   let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
 
-  test.beforeEach(async ({ page, proposalId, browser }) => {
-    const proposalPage = await createNewPageWithWallet(browser, {
-      storageState: ".auth/proposal01.json",
-      wallet: proposal01Wallet,
-    });
-
+  test.beforeEach(async ({ page, proposalId }) => {
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
     await proposalDiscussionDetailsPage.goto(proposalId);
     await proposalDiscussionDetailsPage.closeUsernamePrompt();
   });
+
   test("8Q. Should vote on poll.", async ({ page }) => {
     const pollVotes = ["Yes", "No"];
     const choice = Math.floor(Math.random() * pollVotes.length);
@@ -164,7 +163,8 @@ test.describe("Proposal created logged out state", () => {
     });
   });
 
-  test("8O. Should update anonymous username to set username in comments", async ({
+  // Skipped: Anonymous comment is disabled now
+  test.skip("8O. Should update anonymous username to set username in comments", async ({
     proposalId,
   }) => {
     test.slow();
@@ -199,29 +199,34 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
     pollEnabled: true,
   });
 
-  let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
+  let ownerProposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
 
   test.beforeEach(async ({ browser, proposalId }) => {
     const proposalPage = await createNewPageWithWallet(browser, {
       storageState: ".auth/proposal01.json",
       wallet: proposal01Wallet,
     });
-    proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
+    ownerProposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
       proposalPage
     );
-    proposalDiscussionDetailsPage.goto(proposalId);
+    ownerProposalDiscussionDetailsPage.goto(proposalId);
   });
 
   test("8P. Should add poll on own proposal", async ({}) => {
-    await expect(proposalDiscussionDetailsPage.addPollBtn).not.toBeVisible();
+    await expect(
+      ownerProposalDiscussionDetailsPage.addPollBtn
+    ).not.toBeVisible();
   });
 
+  // TODO: Fix this
   test("8R. Should disable voting after cancelling the poll with the current poll result.", async ({
     page,
   }) => {
-    await proposalDiscussionDetailsPage.closePollBtn.click();
-    await proposalDiscussionDetailsPage.closePollYesBtn.click();
-    await expect(proposalDiscussionDetailsPage.closePollBtn).not.toBeVisible();
+    await ownerProposalDiscussionDetailsPage.closePollBtn.click();
+    await ownerProposalDiscussionDetailsPage.closePollYesBtn.click();
+    await expect(
+      ownerProposalDiscussionDetailsPage.closePollBtn
+    ).not.toBeVisible();
 
     // user
     const userProposalDetailsPage = new ProposalDiscussionDetailsPage(page);

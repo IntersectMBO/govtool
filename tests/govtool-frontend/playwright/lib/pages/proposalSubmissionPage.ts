@@ -1,6 +1,6 @@
 import environments from "@constants/environments";
 import { faker } from "@faker-js/faker";
-import { generateWalletAddress } from "@helpers/cardano";
+import { ShelleyWallet } from "@helpers/crypto";
 import { expectWithInfo } from "@helpers/exceptionHandler";
 import { downloadMetadata } from "@helpers/metadata";
 import { extractProposalIdFromUrl } from "@helpers/string";
@@ -8,6 +8,7 @@ import { invalid } from "@mock/index";
 import { Download, Page, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
 import { ProposalCreateRequest, ProposalLink, ProposalType } from "@types";
+
 const formErrors = {
   proposalTitle: ["max-80-characters-error", "this-field-is-required-error"],
   abstract: "this-field-is-required-error",
@@ -57,9 +58,9 @@ export default class ProposalSubmissionPage {
   readonly motivationInput = this.page.getByLabel("Motivation *"); // BUG testid = motivation-input
   readonly rationaleInput = this.page.getByLabel("Rationale *"); // BUG testid = rationale-input
   readonly linkInput = this.page.getByLabel("Link #1 URL"); // BUG testid = link-input
-  readonly linkText = this.page.getByLabel("Link #1 Text");
-  readonly receivingAddressInput = this.page.getByLabel("Receiving address *");
-  readonly amountInput = this.page.getByPlaceholder("e.g.");
+  readonly linkText = this.page.getByLabel("Link #1 Text"); // BUG missing testid
+  readonly receivingAddressInput = this.page.getByLabel("Receiving address *"); // BUG missing testid
+  readonly amountInput = this.page.getByPlaceholder("e.g."); // BUG missing testid
   readonly closeDraftSuccessModalBtn = this.page.getByTestId(
     "delete-proposal-yes-button"
   ); //BUG Improper test ids
@@ -77,25 +78,6 @@ export default class ProposalSubmissionPage {
   }
 
   async fillUpValidMetadata() {
-    this.page
-      .getByRole("button", {
-        name: "data.jsonld",
-      })
-      .click(); // BUG test id = metadata-download-button
-
-    const dRepMetadata = await this.downloadVoteMetadata();
-    const url = await metadataBucketService.uploadMetadata(
-      dRepMetadata.name,
-      dRepMetadata.data
-    );
-    await this.metadataUrlInput.fill(url);
-    await this.submitBtn.click();
-  }
-
-  async register() {
-    await this.page.click("input#submission-checkbox"); // BUG missing test id
-    await this.continueBtn.click();
-
     this.page
       .getByRole("button", {
         name: "data.jsonld",
@@ -251,6 +233,7 @@ export default class ProposalSubmissionPage {
       async () => expect(proposalTitleErrors.length).toEqual(1),
       `valid title: ${governanceProposal.prop_name}`
     );
+
     if (governanceProposal.gov_action_type_id === 1) {
       const receiverAddressErrors = await getErrorsByPattern(
         this.page,
@@ -324,6 +307,7 @@ export default class ProposalSubmissionPage {
       gov_action_type_id: proposalType === ProposalType.info ? 0 : 1,
       is_draft: !!is_draft,
     };
+
     if (proposalType === ProposalType.treasury) {
       (proposal.prop_receiving_address = receivingAddress),
         (proposal.prop_amount = faker.number
@@ -349,6 +333,7 @@ export default class ProposalSubmissionPage {
       gov_action_type_id: proposalType === ProposalType.info ? 0 : 1,
       is_draft: false,
     };
+
     if (proposalType === ProposalType.treasury) {
       (proposal.prop_receiving_address = faker.location.streetAddress()),
         (proposal.prop_amount = invalid.amount());
@@ -357,7 +342,10 @@ export default class ProposalSubmissionPage {
   }
 
   async createProposal(): Promise<number> {
-    const receivingAddr = generateWalletAddress();
+    const receivingAddr = (await ShelleyWallet.generate()).rewardAddressBech32(
+      0
+    );
+
     const proposalRequest: ProposalCreateRequest = {
       proposal_links: [
         {

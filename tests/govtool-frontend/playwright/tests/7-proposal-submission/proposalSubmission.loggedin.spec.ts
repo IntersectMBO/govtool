@@ -15,6 +15,15 @@ test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
 });
 
+test("7B. Should access proposal creation page", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("propose-governance-actions-button").click();
+
+  await expect(
+    page.getByText("Create a Governance Action", { exact: true })
+  ).toBeVisible();
+});
+
 test.describe("Accept valid data", () => {
   Object.values(ProposalType).map((type: ProposalType, index) => {
     test(`7E_${index + 1}. Should accept valid data in ${type.toLowerCase()} proposal form`, async ({
@@ -145,7 +154,9 @@ test.describe("Review fillup form", () => {
         await expect(
           page.getByText(proposal.prop_receiving_address)
         ).toBeVisible();
-        await expect(page.getByText(proposal.prop_amount)).toBeVisible();
+        await expect(
+          page.getByText(proposal.prop_amount, { exact: true })
+        ).toBeVisible();
       }
     });
   });
@@ -170,6 +181,12 @@ test.describe("Info Proposal Draft", () => {
     await proposalSubmissionPage.closeDraftSuccessModalBtn.click();
 
     await proposalSubmissionPage.proposalCreateBtn.click();
+  });
+
+  test("7C. Should list unfinished Draft ", async () => {
+    const getAllDrafts = await proposalSubmissionPage.getAllDrafts();
+
+    expect(getAllDrafts.length).toBeGreaterThan(0);
   });
 
   test("7L. Should save proposal as a draft", async () => {
@@ -217,6 +234,33 @@ test.describe("Info Proposal Draft", () => {
     await expect(
       page.getByText(proposalFormValue.prop_motivation)
     ).toBeVisible();
+  });
+});
+
+test.describe("Verify Proposal form", () => {
+  Object.values(ProposalType).map((type: ProposalType, index) => {
+    test(`7D_${index + 1}. Verify ${type.toLocaleLowerCase()} proposal form`, async ({
+      page,
+    }) => {
+      const proposalSubmissionPage = new ProposalSubmissionPage(page);
+      await proposalSubmissionPage.goto();
+
+      await proposalSubmissionPage.governanceActionType.click();
+      await page.getByRole("option", { name: type }).click();
+
+      await expect(proposalSubmissionPage.titleInput).toBeVisible();
+      await expect(proposalSubmissionPage.abstractInput).toBeVisible();
+      await expect(proposalSubmissionPage.motivationInput).toBeVisible();
+      await expect(proposalSubmissionPage.rationaleInput).toBeVisible();
+      await expect(proposalSubmissionPage.addLinkBtn).toBeVisible();
+      if (type === ProposalType.treasury) {
+        await expect(
+          proposalSubmissionPage.receivingAddressInput
+        ).toBeVisible();
+
+        await expect(proposalSubmissionPage.amountInput).toBeVisible();
+      }
+    });
   });
 });
 

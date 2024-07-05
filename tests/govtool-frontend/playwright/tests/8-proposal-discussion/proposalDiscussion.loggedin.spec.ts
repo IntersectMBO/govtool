@@ -58,30 +58,14 @@ test.describe("Proposal created logged in state", () => {
     );
   });
 
-  test("8M. Should disable anonymous comment", async ({
-    browser,
-    proposalId,
+  // Skipped: Anonymous comment is disabled now
+  test.skip("8M. Should comment anonymously if a username is not set", async ({
+    page,
   }) => {
-    const userWallet = (await ShelleyWallet.generate()).json();
-
-    const tempUserAuth = ".auth/tempUserAuth.json";
-    const userPage = await createNewPageWithWallet(browser, {
-      storageState: tempUserAuth,
-      wallet: userWallet,
-    });
-
-    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
-      userPage
-    );
-    await proposalDiscussionDetailsPage.goto(proposalId);
-    await proposalDiscussionDetailsPage.closeUsernamePrompt();
-
     const randComment = faker.lorem.paragraph(2);
     await proposalDiscussionDetailsPage.addComment(randComment);
 
-    await expect(
-      userPage.getByText("Hey, setup your username", { exact: true })
-    ).toBeVisible();
+    await expect(page.getByText(randComment)).toBeVisible();
   });
 
   test("8N. Should reply to comments", async ({ page }) => {

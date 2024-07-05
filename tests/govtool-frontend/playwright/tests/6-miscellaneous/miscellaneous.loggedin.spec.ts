@@ -109,12 +109,8 @@ test.describe("Logged in user", () => {
   }) => {
     await page.goto("/");
     await page.getByTestId("proposal-discussion-link").click();
-
-    await expect(
-      page.getByText(
-        "Hey, setup your usernameUsername cannot be changed in the Future. Some subtext"
-      )
-    ).toBeVisible(); //BUG Add modal testid instead should be username-modal
+    await page.getByRole("button", { name: "Verify your identity" }).click(); // BUG: Test id missing
+    await expect(page.getByText("Hey, setup your usernameBy")).toBeVisible(); //BUG Add modal testid instead should be username-modal
 
     await expect(page.getByLabel("Username *")).toBeVisible(); // BUG use testid instead
   });
@@ -131,6 +127,8 @@ test.describe("Temporary user", () => {
 
     const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
     await proposalDiscussionPage.goto();
-    await proposalDiscussionPage.setUsername(faker.internet.userName());
+    await proposalDiscussionPage.setUsername(
+      faker.internet.userName().toLowerCase()
+    );
   });
 });

@@ -63,7 +63,7 @@ export default class ProposalSubmissionPage {
   readonly linkInput = this.page.getByLabel("Link #1 URL"); // BUG testid = link-input
   readonly linkText = this.page.getByLabel("Link #1 Text"); // BUG missing testid
   readonly receivingAddressInput = this.page.getByLabel("Receiving address *"); // BUG missing testid
-  readonly amountInput = this.page.getByPlaceholder("e.g. 2000"); // BUG missing testid
+  readonly amountInput = this.page.getByTestId("amount-input");
   readonly closeDraftSuccessModalBtn = this.page.getByTestId(
     "delete-proposal-yes-button"
   ); //BUG Improper test ids
@@ -71,9 +71,7 @@ export default class ProposalSubmissionPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto(
-      `${environments.frontendUrl}/connected/proposal_pillar/proposal_discussion`
-    );
+    await this.page.goto(`${environments.frontendUrl}/proposal_discussion`);
 
     await this.verifyIdentityBtn.click();
     await this.proposalCreateBtn.click();

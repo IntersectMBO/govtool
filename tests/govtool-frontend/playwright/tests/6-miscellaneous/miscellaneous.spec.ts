@@ -100,3 +100,16 @@ test("6I. Should navigate between footer links", async ({ page, context }) => {
   ]);
   await expect(helpUrl).toHaveURL(HELP_DOC_URL);
 });
+
+test("6J. Should open feedback modal", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("feedback-footer-button").click();
+
+  await expect(page.getByLabel("Usersnap widget")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Report an issue Something" })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Idea or new feature Let us" })
+  ).toBeVisible();
+});

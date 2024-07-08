@@ -1,11 +1,12 @@
 import {
   DELEGATION_DOC_URL,
   DIRECT_VOTER_DOC_URL,
-  REGISTER_DREP_DOC_URL,
-  GOVERNANCE_ACTION_DOC_URL,
-  PROPOSE_GOVERNANCE_ACTION_DOC_URL,
   FAQS_DOC_URL,
   GUIDES_DOC_URL,
+  HELP_DOC_URL,
+  PRIVACY_POLICY,
+  REGISTER_DREP_DOC_URL,
+  TERMS_AND_CONDITIONS,
 } from "@constants/docsUrl";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
@@ -76,4 +77,26 @@ test("6D. Should open Sanchonet docs in a new tab when clicking `Learn More` on 
     page.getByTestId("lear-more-about-sole-voter-button").click(),
   ]);
   await expect(directVoterLearnMorepage).toHaveURL(DIRECT_VOTER_DOC_URL);
+});
+
+test("6I. Should navigate between footer links", async ({ page, context }) => {
+  await page.goto("/");
+
+  const [privacyPolicy] = await Promise.all([
+    context.waitForEvent("page"),
+    page.getByTestId("privacy-policy-footer-link").click(),
+  ]);
+  await expect(privacyPolicy).toHaveURL(PRIVACY_POLICY);
+
+  const [termsAndConditions] = await Promise.all([
+    context.waitForEvent("page"),
+    page.getByTestId("term-of-service-footer-link").click(),
+  ]);
+  await expect(termsAndConditions).toHaveURL(TERMS_AND_CONDITIONS);
+
+  const [helpUrl] = await Promise.all([
+    context.waitForEvent("page"),
+    page.getByTestId("help-footer-button").click(),
+  ]);
+  await expect(helpUrl).toHaveURL(HELP_DOC_URL);
 });

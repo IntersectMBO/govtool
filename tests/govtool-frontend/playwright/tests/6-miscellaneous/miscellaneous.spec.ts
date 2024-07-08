@@ -146,3 +146,25 @@ test("6P. Should verify feature form", async ({ page }) => {
   await expect(userSnapPage.recordBtn).toBeVisible();
   await expect(userSnapPage.submitBtn).toBeVisible();
 });
+
+test("6Q. Should report an issue ", async ({ page, context }) => {
+  // intercept usersnap submit api
+  await page.route(
+    "https://widget.usersnap.com/api/widget/xhrrpc?submit_feedback",
+    async (route) =>
+      route.fulfill({
+        status: 200,
+      })
+  );
+
+  const userSnapPage = new UserSnapPage(page);
+  await userSnapPage.goto();
+
+  await userSnapPage.reportABugBtn.click();
+
+  await userSnapPage.fillupBugForm();
+
+  await userSnapPage.submitBtn.click();
+
+  await expect(page.getByText("Feedback was not submitted,")).toBeVisible();
+});

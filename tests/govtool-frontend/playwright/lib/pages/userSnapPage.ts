@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { Page, expect } from "@playwright/test";
 export default class UserSnapPage {
   // buttons
@@ -34,5 +35,14 @@ export default class UserSnapPage {
   async goto() {
     await this.page.goto("/");
     await this.feedbackBtn.click();
+  }
+
+  async fillupBugForm() {
+    const attachmentInputSelector = "input[type=file]";
+    await this.feedbackInput.fill(faker.lorem.paragraph(2));
+    await this.page.setInputFiles(attachmentInputSelector, [
+      "./lib/_mock/mockAttachment.png",
+    ]);
+    await this.emailInput.fill(faker.internet.email());
   }
 }

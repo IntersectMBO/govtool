@@ -130,3 +130,24 @@ test("6K. Should verify a bug report form", async ({ page }) => {
   await expect(page.getByLabel("Record")).toBeVisible();
   await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
 });
+
+test("6L. Should verify feature form", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("feedback-footer-button").click();
+
+  await page
+    .getByRole("button", { name: "Idea or new feature Let us" })
+    .click();
+
+  await expect(
+    page.getByRole("heading", { name: "Idea or new feature" })
+  ).toBeVisible();
+  await expect(page.getByPlaceholder("Example: New navigation")).toBeVisible();
+  await expect(page.getByLabel("Please summarize your idea or")).toBeVisible();
+  await expect(page.getByLabel("Any additional details")).toBeVisible();
+  await expect(page.getByText("Drag & drop or Browse")).toBeVisible();
+  await expect(page.getByPlaceholder("someone@something.com")).toBeVisible();
+  await expect(page.getByLabel("Take screenshot")).toBeVisible();
+  await expect(page.getByLabel("Record")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
+});

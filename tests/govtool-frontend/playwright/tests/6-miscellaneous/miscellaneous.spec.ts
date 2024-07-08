@@ -11,6 +11,7 @@ import {
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { isMobile, openDrawer } from "@helpers/mobile";
+import UserSnapPage from "@pages/userSnapPage";
 import { expect } from "@playwright/test";
 import environments from "lib/constants/environments";
 
@@ -79,7 +80,7 @@ test("6D. Should open Sanchonet docs in a new tab when clicking `Learn More` on 
   await expect(directVoterLearnMorepage).toHaveURL(DIRECT_VOTER_DOC_URL);
 });
 
-test("6I. Should navigate between footer links", async ({ page, context }) => {
+test("6M. Should navigate between footer links", async ({ page, context }) => {
   await page.goto("/");
 
   const [privacyPolicy] = await Promise.all([
@@ -101,53 +102,47 @@ test("6I. Should navigate between footer links", async ({ page, context }) => {
   await expect(helpUrl).toHaveURL(HELP_DOC_URL);
 });
 
-test("6J. Should open feedback modal", async ({ page }) => {
-  await page.goto("/");
-  await page.getByTestId("feedback-footer-button").click();
+test("6N. Should open feedback modal", async ({ page }) => {
+  const userSnapPage = new UserSnapPage(page);
+  await userSnapPage.goto();
 
-  await expect(page.getByLabel("Usersnap widget")).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Report an issue Something" })
-  ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Idea or new feature Let us" })
-  ).toBeVisible();
+  await expect(userSnapPage.userSnapModal).toBeVisible();
+  await expect(userSnapPage.reportABugBtn).toBeVisible();
+  await expect(userSnapPage.ideaOrNewFeatureBtn).toBeVisible();
 });
 
-test("6K. Should verify a bug report form", async ({ page }) => {
-  await page.goto("/");
-  await page.getByTestId("feedback-footer-button").click();
+test("6O. Should verify a bug report form", async ({ page }) => {
+  const userSnapPage = new UserSnapPage(page);
+  await userSnapPage.goto();
 
-  await page.getByRole("button", { name: "Report an issue Something" }).click();
+  await userSnapPage.reportABugBtn.click();
 
   await expect(
     page.getByRole("heading", { name: "Report a bug" })
   ).toBeVisible();
-  await expect(page.getByPlaceholder("Your feedback")).toBeVisible();
-  await expect(page.getByText("Drag & drop or Browse")).toBeVisible();
-  await expect(page.getByPlaceholder("someone@something.com")).toBeVisible();
-  await expect(page.getByLabel("Take screenshot")).toBeVisible();
-  await expect(page.getByLabel("Record")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
+  await expect(userSnapPage.feedbackInput).toBeVisible();
+  await expect(userSnapPage.addAttachmentBtn).toBeVisible();
+  await expect(userSnapPage.emailInput).toBeVisible();
+  await expect(userSnapPage.takeScreenshotBtn).toBeVisible();
+  await expect(userSnapPage.recordBtn).toBeVisible();
+  await expect(userSnapPage.submitBtn).toBeVisible();
 });
 
-test("6L. Should verify feature form", async ({ page }) => {
-  await page.goto("/");
-  await page.getByTestId("feedback-footer-button").click();
+test("6P. Should verify feature form", async ({ page }) => {
+  const userSnapPage = new UserSnapPage(page);
+  await userSnapPage.goto();
 
-  await page
-    .getByRole("button", { name: "Idea or new feature Let us" })
-    .click();
+  await userSnapPage.ideaOrNewFeatureBtn.click();
 
   await expect(
     page.getByRole("heading", { name: "Idea or new feature" })
   ).toBeVisible();
-  await expect(page.getByPlaceholder("Example: New navigation")).toBeVisible();
-  await expect(page.getByLabel("Please summarize your idea or")).toBeVisible();
-  await expect(page.getByLabel("Any additional details")).toBeVisible();
-  await expect(page.getByText("Drag & drop or Browse")).toBeVisible();
-  await expect(page.getByPlaceholder("someone@something.com")).toBeVisible();
-  await expect(page.getByLabel("Take screenshot")).toBeVisible();
-  await expect(page.getByLabel("Record")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
+  await expect(userSnapPage.ideaOrNewFeatureInput).toBeVisible();
+  await expect(userSnapPage.summarizeIdeaInput).toBeVisible();
+  await expect(userSnapPage.additionalDetailsInput).toBeVisible();
+  await expect(userSnapPage.addAttachmentBtn).toBeVisible();
+  await expect(userSnapPage.emailInput).toBeVisible();
+  await expect(userSnapPage.takeScreenshotBtn).toBeVisible();
+  await expect(userSnapPage.recordBtn).toBeVisible();
+  await expect(userSnapPage.submitBtn).toBeVisible();
 });

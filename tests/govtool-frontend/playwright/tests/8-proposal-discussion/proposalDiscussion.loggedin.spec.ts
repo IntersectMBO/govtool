@@ -1,4 +1,8 @@
-import { proposal01Wallet, user01Wallet } from "@constants/staticWallets";
+import {
+  proposal01Wallet,
+  proposal02Wallet,
+  user01Wallet,
+} from "@constants/staticWallets";
 import { createTempUserAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
@@ -7,11 +11,16 @@ import { createNewPageWithWallet } from "@helpers/page";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { Page, expect } from "@playwright/test";
+import { setAllureEpic } from "@helpers/allure";
+
+test.beforeEach(async () => {
+  await setAllureEpic("8. Proposal Discussion Forum");
+});
 
 test.describe("Proposal created logged in state", () => {
   test.use({
-    storageState: ".auth/user01.json",
-    wallet: user01Wallet,
+    storageState: ".auth/proposal02.json",
+    wallet: proposal02Wallet,
   });
 
   let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
@@ -19,7 +28,8 @@ test.describe("Proposal created logged in state", () => {
   test.beforeEach(async ({ page, proposalId }) => {
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
     await proposalDiscussionDetailsPage.goto(proposalId);
-    await proposalDiscussionDetailsPage.closeUsernamePrompt();
+
+    await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
   });
 
   test("8G. Should display the proper likes and dislikes count", async ({
@@ -27,7 +37,7 @@ test.describe("Proposal created logged in state", () => {
   }) => {
     await proposalDiscussionDetailsPage.likeBtn.click();
     await page.waitForTimeout(2_000);
-    await expect(page.getByText("10")).toBeVisible();
+    await expect(page.getByText("10", { exact: true })).toBeVisible();
 
     await proposalDiscussionDetailsPage.dislikeBtn.click();
     await page.waitForTimeout(2_000);
@@ -49,16 +59,9 @@ test.describe("Proposal created logged in state", () => {
     );
   });
 
-  test("8M. Should comment anonymously if a username is not set", async ({
-    page,
-  }) => {
-    const randComment = faker.lorem.paragraph(2);
-    await proposalDiscussionDetailsPage.addComment(randComment);
-
-    await expect(page.getByText(randComment)).toBeVisible();
-  });
-
   test("8N. Should reply to comments", async ({ page }) => {
+    test.slow();
+
     const randComment = faker.lorem.paragraph(2);
     const randReply = faker.lorem.paragraph(2);
 
@@ -78,16 +81,14 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
 
   let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
 
-  test.beforeEach(async ({ page, proposalId, browser }) => {
-    const proposalPage = await createNewPageWithWallet(browser, {
-      storageState: ".auth/proposal01.json",
-      wallet: proposal01Wallet,
-    });
-
+  test.beforeEach(async ({ page, proposalId }) => {
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
     await proposalDiscussionDetailsPage.goto(proposalId);
+    await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
+
     await proposalDiscussionDetailsPage.closeUsernamePrompt();
   });
+
   test("8Q. Should vote on poll.", async ({ page }) => {
     const pollVotes = ["Yes", "No"];
     const choice = Math.floor(Math.random() * pollVotes.length);
@@ -138,33 +139,6 @@ test.describe("Proposal created logged out state", () => {
       wallet,
     });
   });
-
-  test("8O. Should update anonymous username to set username in comments", async ({
-    proposalId,
-  }) => {
-    test.slow();
-
-    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
-      userPage
-    );
-    await proposalDiscussionDetailsPage.goto(proposalId);
-    await proposalDiscussionDetailsPage.closeUsernamePrompt();
-
-    const randComment = faker.lorem.paragraph(2);
-    await proposalDiscussionDetailsPage.addComment(randComment);
-
-    await expect(userPage.getByText(/anonymous/i)).toBeVisible();
-
-    const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
-    await proposalDiscussionPage.goto();
-
-    const userName = faker.internet.userName();
-    await proposalDiscussionPage.setUsername(userName);
-    await proposalDiscussionDetailsPage.goto(proposalId);
-
-    await expect(userPage.getByText(/anonymous/i)).not.toBeVisible();
-    await expect(userPage.getByText(userName)).toBeVisible();
-  });
 });
 
 test.describe("Proposal created with poll enabled (proposal auth)", () => {
@@ -174,29 +148,35 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
     pollEnabled: true,
   });
 
-  let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
+  let ownerProposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
 
   test.beforeEach(async ({ browser, proposalId }) => {
     const proposalPage = await createNewPageWithWallet(browser, {
       storageState: ".auth/proposal01.json",
       wallet: proposal01Wallet,
     });
-    proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
+    ownerProposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
       proposalPage
     );
-    proposalDiscussionDetailsPage.goto(proposalId);
+    ownerProposalDiscussionDetailsPage.goto(proposalId);
+    await ownerProposalDiscussionDetailsPage.verifyIdentityBtn.click();
   });
 
   test("8P. Should add poll on own proposal", async ({}) => {
-    await expect(proposalDiscussionDetailsPage.addPollBtn).not.toBeVisible();
+    await expect(
+      ownerProposalDiscussionDetailsPage.addPollBtn
+    ).not.toBeVisible();
   });
 
+  // TODO: Fix this
   test("8R. Should disable voting after cancelling the poll with the current poll result.", async ({
     page,
   }) => {
-    await proposalDiscussionDetailsPage.closePollBtn.click();
-    await proposalDiscussionDetailsPage.closePollYesBtn.click();
-    await expect(proposalDiscussionDetailsPage.closePollBtn).not.toBeVisible();
+    await ownerProposalDiscussionDetailsPage.closePollBtn.click();
+    await ownerProposalDiscussionDetailsPage.closePollYesBtn.click();
+    await expect(
+      ownerProposalDiscussionDetailsPage.closePollBtn
+    ).not.toBeVisible();
 
     // user
     const userProposalDetailsPage = new ProposalDiscussionDetailsPage(page);

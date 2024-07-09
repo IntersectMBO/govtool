@@ -10,10 +10,7 @@ export default class ProposalDiscussionDetailsPage {
   readonly dislikeBtn = this.page.getByRole("button", {
     name: "proposal dislikes",
   });
-  readonly commentBtn = this.page.getByRole("button", {
-    name: "Comment",
-    exact: true,
-  }); // this.page.getByTestId("comment-button");
+  readonly commentBtn = this.page.getByTestId("comment-button");
   readonly addPollBtn = this.page.getByRole("button", { name: "Add Poll" }); // BUG missing test id
   readonly SubmitBtn = this.page.getByTestId("submit-button");
   readonly menuBtn = this.page.getByTestId("menu-button");
@@ -30,17 +27,17 @@ export default class ProposalDiscussionDetailsPage {
   readonly pollYesBtn = this.page.getByRole("button", { name: "Yes" }); //BUG missing test id
   readonly pollNoBtn = this.page.getByRole("button", { name: "No" }); //BUG missing test id
   readonly showReplyBtn = this.page.getByTestId("show-more-reply");
-  readonly closePollYesBtn = this.page.getByRole("button", {
-    name: "Yes, close Poll",
-  }); // BUG missing test id
+  readonly closePollYesBtn = this.page.getByTestId("close-the-poll-button");
   readonly changeVoteBtn = this.page.getByRole("button", {
     name: "Change Vote",
   });
-
+  readonly verifyIdentityBtn = this.page.getByRole("button", {
+    name: "Verify your identity",
+  });
   // Indicators
   readonly likesCounts = this.page.getByTestId("likes-count");
   readonly dislikesCounts = this.page.getByTestId("dislikse-count");
-  readonly commentsCount = this.page.getByTestId("comments-count");
+  readonly commentCount = this.page.getByTestId("comment-count");
 
   // Cards
   readonly pollVoteCard = this.page.getByTestId("poll-vote-card");
@@ -55,7 +52,7 @@ export default class ProposalDiscussionDetailsPage {
 
   async goto(proposalId: number) {
     await this.page.goto(
-      `${environments.frontendUrl}/connected/proposal_pillar/proposal_discussion/${proposalId}`
+      `${environments.frontendUrl}/proposal_discussion/${proposalId}`
     );
   }
 
@@ -69,15 +66,13 @@ export default class ProposalDiscussionDetailsPage {
 
   async addComment(comment: string) {
     await this.commentInput.fill(comment);
-    await this.page
-      .getByRole("button", { name: "Comment", exact: true })
-      .click();
+    await this.page.getByTestId("comment-button").click();
   }
 
   async replyComment(reply: string) {
     await this.page.getByRole("button", { name: "Reply" }).click();
     await this.page.getByPlaceholder("Add comment").fill(reply);
-    await this.page.getByRole("button", { name: "Comment" }).nth(2).click();
+    await this.page.getByTestId("reply-comment-button").click();
   }
 
   async sortAndValidate(
@@ -111,11 +106,7 @@ export default class ProposalDiscussionDetailsPage {
     await this.page.waitForTimeout(2_000);
 
     await this.page.locator("#menu-button").click();
-    await this.page.getByRole("menuitem", { name: "Delete Proposal" }).click();
-
-    // confirm deletion
-    await this.page
-      .getByRole("button", { name: "Yes, delete my proposal" })
-      .click();
+    await this.page.getByTestId("delete-proposal").click();
+    await this.page.getByTestId("delete-proposal-yes-button").click();
   }
 }

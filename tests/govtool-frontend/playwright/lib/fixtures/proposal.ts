@@ -21,6 +21,8 @@ export const test = base.extend<TestOptions>({
 
     const proposalDiscussionPage = new ProposalDiscussionPage(proposalPage);
     await proposalDiscussionPage.goto();
+    await proposalDiscussionPage.verifyIdentityBtn.click();
+
     const proposalId = await proposalDiscussionPage.createProposal();
     const proposalDetailsPage = new ProposalDiscussionDetailsPage(proposalPage);
 
@@ -31,7 +33,6 @@ export const test = base.extend<TestOptions>({
     await use(proposalId);
 
     // cleanup
-    await proposalDetailsPage.goto(proposalId);
     await proposalDetailsPage.deleteProposal();
   },
 });

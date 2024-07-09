@@ -123,7 +123,6 @@ export type CommentResponse = {
   };
 };
 
-
 export type ProposalLink = {
   prop_link: string;
   prop_link_text: string;
@@ -139,4 +138,13 @@ export type ProposalCreateRequest = {
   prop_receiving_address?: string;
   prop_amount?: string;
   is_draft: boolean;
+};
+
+export type ProposedGovAction = {
+  id: number;
+  attributes: {
+    gov_action_type_name: string;
+    createdAt: string;
+    updatedAt: string;
+  };
 };

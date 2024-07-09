@@ -4,7 +4,7 @@ import { extractProposalIdFromUrl } from "@helpers/string";
 import { expect, Locator, Page } from "@playwright/test";
 import environments from "lib/constants/environments";
 import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
-import { ProposalCreateRequest } from "@types";
+import { ProposalCreateRequest, ProposedGovAction } from "@types";
 import { range } from "cypress/types/lodash";
 
 export default class ProposalDiscussionPage {
@@ -158,6 +158,28 @@ export default class ProposalDiscussionPage {
         filters
       );
       expect(hasFilter).toBe(true);
+    }
+  }
+
+  async sortAndValidate(
+    option: "asc" | "desc",
+    validationFn: (p1: ProposedGovAction, p2: ProposedGovAction) => boolean
+  ) {
+    const responsePromise = this.page.waitForResponse((response) =>
+      response
+        .url()
+        .includes(`&sort[createdAt]=${option}&populate[0]=proposal_links`)
+    );
+
+    await this.sortBtn.click();
+    const response = await responsePromise;
+
+    let proposals: ProposedGovAction[] = (await response.json()).data;
+
+    // API validation
+    for (let i = 0; i <= proposals.length - 2; i++) {
+      const isValid = validationFn(proposals[i], proposals[i + 1]);
+      expect(isValid).toBe(true);
     }
   }
 

@@ -1,5 +1,4 @@
 import {
-  adaHolder01Wallet,
   proposal01Wallet,
   proposal02Wallet,
   user01Wallet,

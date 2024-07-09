@@ -147,7 +147,7 @@ test("6P. Should verify feature form", async ({ page }) => {
   await expect(userSnapPage.submitBtn).toBeVisible();
 });
 
-test("6Q. Should report an issue ", async ({ page, context }) => {
+test("6Q. Should report an issue ", async ({ page }) => {
   // intercept usersnap submit api
   await page.route(
     "https://widget.usersnap.com/api/widget/xhrrpc?submit_feedback",
@@ -163,6 +163,28 @@ test("6Q. Should report an issue ", async ({ page, context }) => {
   await userSnapPage.reportABugBtn.click();
 
   await userSnapPage.fillupBugForm();
+
+  await userSnapPage.submitBtn.click();
+
+  await expect(page.getByText("Feedback was not submitted,")).toBeVisible();
+});
+
+test("6R. Should submit an idea or new feature", async ({ page }) => {
+  // intercept usersnap submit api
+  await page.route(
+    "https://widget.usersnap.com/api/widget/xhrrpc?submit_feedback",
+    async (route) =>
+      route.fulfill({
+        status: 200,
+      })
+  );
+
+  const userSnapPage = new UserSnapPage(page);
+  await userSnapPage.goto();
+
+  await userSnapPage.ideaOrNewFeatureBtn.click();
+
+  await userSnapPage.fillupFeatureForm();
 
   await userSnapPage.submitBtn.click();
 

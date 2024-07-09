@@ -34,12 +34,26 @@ export default class UserSnapPage {
 
   async goto() {
     await this.page.goto("/");
+
+    await this.page.waitForTimeout(2_000); // wait until page load properly
+
     await this.feedbackBtn.click();
   }
 
   async fillupBugForm() {
-    const attachmentInputSelector = "input[type=file]";
     await this.feedbackInput.fill(faker.lorem.paragraph(2));
+    await this.fillCommonFields();
+  }
+
+  async fillupFeatureForm() {
+    await this.ideaOrNewFeatureInput.fill(faker.lorem.words(4));
+    await this.summarizeIdeaInput.fill(faker.lorem.paragraph(2));
+    await this.additionalDetailsInput.fill(faker.lorem.paragraph(2));
+    await this.fillCommonFields();
+  }
+
+  async fillCommonFields() {
+    const attachmentInputSelector = "input[type=file]";
     await this.page.setInputFiles(attachmentInputSelector, [
       "./lib/_mock/mockAttachment.png",
     ]);

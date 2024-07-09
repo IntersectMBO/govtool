@@ -38,6 +38,7 @@ validateMetadata
     -> Maybe Text
     -> m (Either Text Value)
 validateMetadata url hash standard = do
+    metadataEnabled <- getMetadataValidationEnabled
     metadataHost <- getMetadataValidationHost
     metadataPort <- getMetadataValidationPort
     manager <- asks getter
@@ -48,12 +49,15 @@ validateMetadata url hash standard = do
             , requestBody = RequestBodyLBS requestBody
             , requestHeaders = [("Content-Type", "application/json")]
             }
-    response <- liftIO $ try $ httpLbs request manager
-    case response of
-        Left (e :: HttpException) -> return $ Left (pack $ show e)
-        Right r -> case decode $ responseBody r of
-            Nothing -> throwError $ InternalError "Failed to validate metadata"
-            Just x -> return $ Right x
+    case metadataEnabled of
+      True -> do
+        response <- liftIO $ try $ httpLbs request manager
+        case response of
+            Left (e :: HttpException) -> return $ Left (pack $ show e)
+            Right r -> case decode $ responseBody r of
+                Nothing -> throwError $ InternalError "Failed to validate metadata"
+                Just x -> return $ Right x
+      False -> return $ Right "Metadata Disabled"
 
 getProposalMetadataValidationResult ::
     (Has ConnectionPool r, Has Manager r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>

@@ -155,7 +155,7 @@ export default class ProposalSubmissionPage {
 
   async getAllDrafts() {
     await this.page.waitForTimeout(2_000); // wait until draft is loaded
-    return this.page
+    return await this.page
       .locator('[data-testid^="draft-"][data-testid$="-card"]')
       .all();
   }
@@ -169,7 +169,7 @@ export default class ProposalSubmissionPage {
 
   async viewFirstDraft() {
     await this.page.waitForTimeout(2_000); // wait until draft is loaded
-    return this.page
+    return await this.page
       .locator('[data-testid^="draft-"][data-testid$="-start-editing"]')
       .first()
       .click();

@@ -336,7 +336,7 @@ test.describe("proposed as a governance action", () => {
         await proposalSubmissionPage.metadataUrlInput.fill(
           faker.internet.url()
         );
-        await expect(page.getByTestId("invalid-url-error")).toBeHidden();
+        await expect(page.getByText("Invalid URL")).toBeHidden(); // BUG missing test ids
       }
     });
 
@@ -346,7 +346,7 @@ test.describe("proposed as a governance action", () => {
       test.slow(); // Brute-force testing with 100 random data
       for (let i = 0; i < 100; i++) {
         await proposalSubmissionPage.metadataUrlInput.fill(invalid.url());
-        await expect(page.getByTestId("invalid-url-error")).toBeVisible();
+        await expect(page.getByText("Invalid URL")).toBeVisible(); // BUG missing test ids
       }
 
       const sentenceWithoutSpace = faker.lorem
@@ -359,12 +359,12 @@ test.describe("proposed as a governance action", () => {
         metadataAnchorGreaterThan128Bytes
       );
 
-      await expect(page.getByTestId("invalid-url-error")).toBeVisible();
+      await expect(page.getByText("Url must be less than 128")).toBeVisible(); // BUG missing test ids
     });
   });
 
   test("7K. Should reject invalid proposal metadata", async ({ page }) => {
-    await proposalSubmissionPage.metadataUrlInput.fill(invalid.url());
+    await proposalSubmissionPage.metadataUrlInput.fill(faker.internet.url());
     await proposalSubmissionPage.submitBtn.click();
 
     await expect(page.getByTestId("url-error-modal-title")).toHaveText(

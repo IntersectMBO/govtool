@@ -11,6 +11,13 @@ const mockPoll = require("../../lib/_mock/proposalPoll.json");
 const mockComments = require("../../lib/_mock/proposalComments.json");
 const mockInfoProposedGA = require("../../lib/_mock/infoProposedGAs.json");
 
+const PROPOSAL_FILTERS = [
+  "Info",
+  "Treasury",
+  "Submitted for vote ",
+  "Active proposal",
+];
+
 test.beforeEach(async () => {
   await setAllureEpic("8. Proposal Discussion Forum");
 });
@@ -24,18 +31,39 @@ test("8A. Should access proposed governance actions in disconnected state", asyn
   await expect(page.getByText(/Proposed Governance Actions/i)).toHaveCount(1);
 });
 
-test("8B. Should filter and sort the list of proposed governance actions.", async ({
-  page,
-}) => {
-  const proposalDiscussionPage = new ProposalDiscussionPage(page);
-  await proposalDiscussionPage.goto();
+test.describe("Filter and sort proposals", () => {
+  let proposalDiscussionPage: ProposalDiscussionPage;
 
-  await proposalDiscussionPage.filterBtn.click();
-  await proposalDiscussionPage.infoRadio.click();
+  test.beforeEach(async ({ page }) => {
+    proposalDiscussionPage = new ProposalDiscussionPage(page);
+    await proposalDiscussionPage.goto();
+  });
 
-  await expect(page.getByText("Treasury")).toHaveCount(1);
+  test("8B_1. Should filter the list of proposed governance actions.", async () => {
+    await proposalDiscussionPage.filterBtn.click();
 
-  await proposalDiscussionPage.treasuryRadio.click();
+    // Single filter
+    for (const filter of PROPOSAL_FILTERS) {
+      await proposalDiscussionPage.filterProposalByNames([filter]);
+      await proposalDiscussionPage.validateFilters([filter]);
+      await proposalDiscussionPage.unFilterProposalByNames([filter]);
+    }
+
+    // Multiple filters
+    const multipleFilters = [...PROPOSAL_FILTERS];
+    while (multipleFilters.length > 1) {
+      await proposalDiscussionPage.filterProposalByNames(multipleFilters);
+      await proposalDiscussionPage.validateFilters(multipleFilters);
+      await proposalDiscussionPage.unFilterProposalByNames(multipleFilters);
+      multipleFilters.pop();
+    }
+  });
+
+  test("8B_2. Should sort the list of proposed governance actions.", async ({
+    page,
+  }) => {
+    await proposalDiscussionPage.sortBtn.click();
+  });
 });
 
 test("8C. Should search the list of proposed governance actions.", async ({

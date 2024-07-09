@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { generateWalletAddress } from "@helpers/cardano";
 import { extractProposalIdFromUrl } from "@helpers/string";
-import { Locator, Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 import environments from "lib/constants/environments";
 import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
 import { ProposalCreateRequest } from "@types";
@@ -54,7 +54,7 @@ export default class ProposalDiscussionPage {
   }
 
   async getAllProposals() {
-    await this.page.waitForTimeout(2_000);
+    await this.page.waitForTimeout(4_000); // waits for proposals to render
     // BUG  Select all elements with data-testid attribute
     const elements = await this.page.$$("[data-testid]");
 
@@ -135,5 +135,41 @@ export default class ProposalDiscussionPage {
         .fill(link.prop_link);
       await this.page.getByPlaceholder("Text").fill(link.prop_link_text);
     }
+  }
+
+  async filterProposalByNames(names: string[]) {
+    for (const name of names) {
+      await this.page.getByLabel(name).click();
+    }
+  }
+
+  async unFilterProposalByNames(names: string[]) {
+    for (const name of names) {
+      await this.page.getByLabel(name).click();
+    }
+  }
+
+  async validateFilters(filters: string[]) {
+    const proposalCards = await this.getAllProposals();
+
+    for (const proposalCard of proposalCards) {
+      const hasFilter = await this._validateFiltersInProposalCard(
+        proposalCard,
+        filters
+      );
+      expect(hasFilter).toBe(true);
+    }
+  }
+
+  async _validateFiltersInProposalCard(
+    proposalCard: Locator,
+    filters: string[]
+  ): Promise<boolean> {
+    const proposalTypeTextContent = await proposalCard
+      .locator('[data-testid$="-type"]')
+      .textContent();
+    const govActionType = proposalTypeTextContent.split(":")[1];
+
+    return filters.includes(govActionType);
   }
 }

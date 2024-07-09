@@ -37,7 +37,7 @@ export const ProposeGovActionDashboardCard = ({
 
     navigate(
       isProposalDiscussionForumEnabled
-        ? PDF_PATHS.proposalDiscussion
+        ? PDF_PATHS.proposalDiscussionPropose
         : PATHS.createGovernanceAction,
     );
   }, [deposit, votingPower, isProposalDiscussionForumEnabled]);

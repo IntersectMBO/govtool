@@ -59,16 +59,6 @@ test.describe("Proposal created logged in state", () => {
     );
   });
 
-  // Skipped: Anonymous comment is disabled now
-  test.skip("8M. Should comment anonymously if a username is not set", async ({
-    page,
-  }) => {
-    const randComment = faker.lorem.paragraph(2);
-    await proposalDiscussionDetailsPage.addComment(randComment);
-
-    await expect(page.getByText(randComment)).toBeVisible();
-  });
-
   test("8N. Should reply to comments", async ({ page }) => {
     test.slow();
 
@@ -148,36 +138,6 @@ test.describe("Proposal created logged out state", () => {
       storageState: tempUserAuth,
       wallet,
     });
-  });
-
-  // Skipped: Anonymous comment is disabled now
-  test.skip("8O. Should update anonymous username to set username in comments", async ({
-    proposalId,
-  }) => {
-    test.slow();
-
-    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
-      userPage
-    );
-    await proposalDiscussionDetailsPage.goto(proposalId);
-    await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
-
-    await proposalDiscussionDetailsPage.closeUsernamePrompt();
-
-    const randComment = faker.lorem.paragraph(2);
-    await proposalDiscussionDetailsPage.addComment(randComment);
-
-    await expect(userPage.getByText(/anonymous/i)).toBeVisible();
-
-    const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
-    await proposalDiscussionPage.goto();
-
-    const userName = faker.internet.userName();
-    await proposalDiscussionPage.setUsername(userName);
-    await proposalDiscussionDetailsPage.goto(proposalId);
-
-    await expect(userPage.getByText(/anonymous/i)).not.toBeVisible();
-    await expect(userPage.getByText(userName)).toBeVisible();
   });
 });
 

@@ -139,6 +139,7 @@ setup("Create Proposal 01 auth", async ({ page, context }) => {
 
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
+  await proposalDiscussionPage.verifyIdentityBtn.click();
 
   await proposalDiscussionPage.setUsername(
     faker.internet.userName().toLowerCase()
@@ -156,6 +157,7 @@ setup("Create Proposal 02 auth", async ({ page, context }) => {
 
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
+  await proposalDiscussionPage.verifyIdentityBtn.click();
 
   await proposalDiscussionPage.setUsername(
     faker.internet.userName().toLowerCase()

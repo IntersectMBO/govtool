@@ -54,8 +54,6 @@ export default class ProposalDiscussionDetailsPage {
     await this.page.goto(
       `${environments.frontendUrl}/proposal_discussion/${proposalId}`
     );
-
-    await this.verifyIdentityBtn.click();
   }
 
   async closeUsernamePrompt() {

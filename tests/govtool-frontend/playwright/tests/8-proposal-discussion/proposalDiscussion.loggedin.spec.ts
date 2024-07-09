@@ -29,6 +29,8 @@ test.describe("Proposal created logged in state", () => {
   test.beforeEach(async ({ page, proposalId }) => {
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
     await proposalDiscussionDetailsPage.goto(proposalId);
+
+    await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
   });
 
   test("8G. Should display the proper likes and dislikes count", async ({
@@ -93,6 +95,8 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
   test.beforeEach(async ({ page, proposalId }) => {
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
     await proposalDiscussionDetailsPage.goto(proposalId);
+    await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
+
     await proposalDiscussionDetailsPage.closeUsernamePrompt();
   });
 
@@ -157,6 +161,8 @@ test.describe("Proposal created logged out state", () => {
       userPage
     );
     await proposalDiscussionDetailsPage.goto(proposalId);
+    await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
+
     await proposalDiscussionDetailsPage.closeUsernamePrompt();
 
     const randComment = faker.lorem.paragraph(2);
@@ -194,6 +200,7 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
       proposalPage
     );
     ownerProposalDiscussionDetailsPage.goto(proposalId);
+    await ownerProposalDiscussionDetailsPage.verifyIdentityBtn.click();
   });
 
   test("8P. Should add poll on own proposal", async ({}) => {

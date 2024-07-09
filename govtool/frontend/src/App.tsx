@@ -28,7 +28,6 @@ import {
   RetireAsDrep,
   RetireAsDirectVoter,
   EditDRepMetadata,
-  ProposalDiscussionPillar,
 } from "@pages";
 import { SetupInterceptors } from "@services";
 import {
@@ -39,8 +38,7 @@ import {
 } from "@utils";
 
 export default () => {
-  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
-  const { enable, isEnabled } = useCardano();
+  const { enable } = useCardano();
   const navigate = useNavigate();
   const { modal, openModal, modals } = useModal();
 
@@ -94,20 +92,8 @@ export default () => {
           path={PATHS.governanceActionsAction}
           element={<GovernanceActionDetails />}
         />
-        {isProposalDiscussionForumEnabled && !isEnabled && (
-          <Route
-            path={`${PDF_PATHS.proposalDiscussion}/*`}
-            element={<ProposalDiscussionPillar />}
-          />
-        )}
         <Route element={<Dashboard />}>
           <Route path={PATHS.dashboard} element={<DashboardCards />} />
-          {isProposalDiscussionForumEnabled && (
-            <Route
-              path={`${PDF_PATHS.proposalDiscussion}/*`}
-              element={<ProposalDiscussionPillar />}
-            />
-          )}
           <Route
             path={PATHS.dashboardGovernanceActions}
             element={<DashboardGovernanceActions />}

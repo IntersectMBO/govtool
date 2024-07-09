@@ -17,4 +17,3 @@ export * from "./RegisterAsDirectVoter";
 export * from "./RegisterAsdRep";
 export * from "./RetireAsDirectVoter";
 export * from "./RetireAsDrep";
-export * from "./ProposalDiscussion";

@@ -1,4 +1,3 @@
-import { IconAcademicCap } from "@intersect.mbo/intersectmbo.org-icons-set";
 import i18n from "@/i18n";
 import { theme } from "@/theme";
 
@@ -71,22 +70,6 @@ export const CONNECTED_NAV_ITEMS = [
     dataTestId: "proposal-discussion-link",
     label: i18n.t("proposalDiscussion.title"),
     navTo: PDF_PATHS.proposalDiscussion,
-    activeIcon: (
-      <IconAcademicCap
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill={theme.palette.accentOrange}
-      />
-    ),
-    icon: (
-      <IconAcademicCap
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill={theme.palette.lightOrange}
-      />
-    ),
     newTabLink: null,
   },
   {

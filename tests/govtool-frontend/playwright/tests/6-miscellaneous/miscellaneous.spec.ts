@@ -8,10 +8,10 @@ import {
   REGISTER_DREP_DOC_URL,
   TERMS_AND_CONDITIONS,
 } from "@constants/docsUrl";
+import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { isMobile, openDrawer } from "@helpers/mobile";
-import UserSnapPage from "@pages/userSnapPage";
 import { expect } from "@playwright/test";
 import environments from "lib/constants/environments";
 
@@ -102,91 +102,132 @@ test("6M. Should navigate between footer links", async ({ page, context }) => {
   await expect(helpUrl).toHaveURL(HELP_DOC_URL);
 });
 
-test("6N. Should open feedback modal", async ({ page }) => {
-  const userSnapPage = new UserSnapPage(page);
-  await userSnapPage.goto();
+test.describe("User Snap", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await page.waitForTimeout(2_000); // wait until page load properly
 
-  await expect(userSnapPage.userSnapModal).toBeVisible();
-  await expect(userSnapPage.reportABugBtn).toBeVisible();
-  await expect(userSnapPage.ideaOrNewFeatureBtn).toBeVisible();
-});
+    await page.getByTestId("feedback-footer-button").click();
+  });
 
-test("6O. Should verify a bug report form", async ({ page }) => {
-  const userSnapPage = new UserSnapPage(page);
-  await userSnapPage.goto();
-
-  await userSnapPage.reportABugBtn.click();
-
-  await expect(
-    page.getByRole("heading", { name: "Report a bug" })
-  ).toBeVisible();
-  await expect(userSnapPage.feedbackInput).toBeVisible();
-  await expect(userSnapPage.addAttachmentBtn).toBeVisible();
-  await expect(userSnapPage.emailInput).toBeVisible();
-  await expect(userSnapPage.takeScreenshotBtn).toBeVisible();
-  await expect(userSnapPage.recordBtn).toBeVisible();
-  await expect(userSnapPage.submitBtn).toBeVisible();
-});
-
-test("6P. Should verify feature form", async ({ page }) => {
-  const userSnapPage = new UserSnapPage(page);
-  await userSnapPage.goto();
-
-  await userSnapPage.ideaOrNewFeatureBtn.click();
-
-  await expect(
-    page.getByRole("heading", { name: "Idea or new feature" })
-  ).toBeVisible();
-  await expect(userSnapPage.ideaOrNewFeatureInput).toBeVisible();
-  await expect(userSnapPage.summarizeIdeaInput).toBeVisible();
-  await expect(userSnapPage.additionalDetailsInput).toBeVisible();
-  await expect(userSnapPage.addAttachmentBtn).toBeVisible();
-  await expect(userSnapPage.emailInput).toBeVisible();
-  await expect(userSnapPage.takeScreenshotBtn).toBeVisible();
-  await expect(userSnapPage.recordBtn).toBeVisible();
-  await expect(userSnapPage.submitBtn).toBeVisible();
-});
-
-test("6Q. Should report an issue ", async ({ page }) => {
-  // intercept usersnap submit api
-  await page.route(
-    "https://widget.usersnap.com/api/widget/xhrrpc?submit_feedback",
-    async (route) =>
-      route.fulfill({
-        status: 200,
+  test("6N. Should open feedback modal", async ({ page }) => {
+    await expect(page.getByLabel("Usersnap widget")).toBeVisible();
+    await expect(
+      page.getByRole("button", {
+        name: "Report an issue Something",
       })
-  );
-
-  const userSnapPage = new UserSnapPage(page);
-  await userSnapPage.goto();
-
-  await userSnapPage.reportABugBtn.click();
-
-  await userSnapPage.fillupBugForm();
-
-  await userSnapPage.submitBtn.click();
-
-  await expect(page.getByText("Feedback was not submitted,")).toBeVisible();
-});
-
-test("6R. Should submit an idea or new feature", async ({ page }) => {
-  // intercept usersnap submit api
-  await page.route(
-    "https://widget.usersnap.com/api/widget/xhrrpc?submit_feedback",
-    async (route) =>
-      route.fulfill({
-        status: 200,
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", {
+        name: "Idea or new feature Let us",
       })
-  );
+    ).toBeVisible();
+  });
 
-  const userSnapPage = new UserSnapPage(page);
-  await userSnapPage.goto();
+  test("6O. Should verify a bug report form", async ({ page }) => {
+    await page
+      .getByRole("button", {
+        name: "Report an issue Something",
+      })
+      .click();
 
-  await userSnapPage.ideaOrNewFeatureBtn.click();
+    await expect(
+      page.getByRole("heading", { name: "Report a bug" })
+    ).toBeVisible();
+    await expect(page.getByPlaceholder("Your feedback")).toBeVisible();
+    await expect(page.getByText("Drag & drop or Browse")).toBeVisible();
+    await expect(page.getByPlaceholder("someone@something.com")).toBeVisible();
+    await expect(page.getByLabel("Take screenshot")).toBeVisible();
+    await expect(page.getByLabel("Record")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
+  });
 
-  await userSnapPage.fillupFeatureForm();
+  test("6P. Should verify feature form", async ({ page }) => {
+    await page
+      .getByRole("button", {
+        name: "Idea or new feature Let us",
+      })
+      .click();
 
-  await userSnapPage.submitBtn.click();
+    await expect(
+      page.getByRole("heading", { name: "Idea or new feature" })
+    ).toBeVisible();
+    await expect(
+      page.getByPlaceholder("Example: New navigation")
+    ).toBeVisible();
+    await expect(page.getByLabel("Any additional details")).toBeVisible();
+    await expect(page.getByLabel("Any additional details")).toBeVisible();
+    await expect(page.getByText("Drag & drop or Browse")).toBeVisible();
+    await expect(page.getByPlaceholder("someone@something.com")).toBeVisible();
+    await expect(page.getByLabel("Take screenshot")).toBeVisible();
+    await expect(page.getByLabel("Record")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
+  });
 
-  await expect(page.getByText("Feedback was not submitted,")).toBeVisible();
+  test.describe("Feedback Tests", () => {
+    const attachmentInputSelector = "input[type=file]";
+    const feedbackApiUrl =
+      "https://widget.usersnap.com/api/widget/xhrrpc?submit_feedback";
+    const mockAttachmentPath = "./lib/_mock/mockAttachment.png";
+
+    test("6Q. Should report an issue", async ({ page }) => {
+      // Intercept Usersnap submit API
+      await page.route(feedbackApiUrl, async (route) =>
+        route.fulfill({
+          status: 200,
+        })
+      );
+
+      await page
+        .getByRole("button", {
+          name: "Report an issue Something",
+        })
+        .click();
+
+      await page
+        .getByPlaceholder("Your feedback")
+        .fill(faker.lorem.paragraph(2));
+      await page.setInputFiles(attachmentInputSelector, [mockAttachmentPath]);
+      await page
+        .getByPlaceholder("someone@something.com")
+        .fill(faker.internet.email());
+
+      await page.getByRole("button", { name: "Submit" }).click();
+
+      await expect(page.getByText("Feedback was not submitted,")).toBeVisible();
+    });
+
+    test("6R. Should submit an idea or new feature", async ({ page }) => {
+      // Intercept Usersnap submit API
+      await page.route(feedbackApiUrl, async (route) =>
+        route.fulfill({
+          status: 200,
+        })
+      );
+
+      await page
+        .getByRole("button", {
+          name: "Idea or new feature Let us",
+        })
+        .click();
+
+      await page
+        .getByPlaceholder("Example: New navigation")
+        .fill(faker.lorem.words(4));
+      await page
+        .getByLabel("Please summarize your idea or")
+        .fill(faker.lorem.paragraph(2));
+      await page
+        .getByLabel("Any additional details")
+        .fill(faker.lorem.paragraph(2));
+      await page.setInputFiles(attachmentInputSelector, [mockAttachmentPath]);
+      await page
+        .getByPlaceholder("someone@something.com")
+        .fill(faker.internet.email());
+
+      await page.getByRole("button", { name: "Submit" }).click();
+
+      await expect(page.getByText("Feedback was not submitted,")).toBeVisible();
+    });
+  });
 });

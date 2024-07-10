@@ -102,6 +102,7 @@ getDRepMetadataValidationResult url hash = do
             Right (Object r) -> case go r of
                 Nothing -> throwError $ InternalError "Failed to validate metadata"
                 Just x -> return x
+            Right "" -> return $ MetadataValidationResult True (Just "200") Nothing
     where
         go result = do
                 (Bool valid) <- lookup "valid" result

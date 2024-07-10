@@ -25,10 +25,10 @@
     "allure:serve": "npx allure serve",
     "test": "npx playwright test",
     "format": "prettier . --write",
-    "generate-wallets": "ts-node ./generate_wallets.ts 11"
+    "generate-wallets": "ts-node ./generate_wallets.ts 12"
   },
   "dependencies": {
-    "@cardanoapi/cardano-test-wallet": "^2.0.0",
+    "@cardanoapi/cardano-test-wallet": "^2.0.1",
     "@faker-js/faker": "^8.4.1",
     "@noble/curves": "^1.3.0",
     "@noble/ed25519": "^2.0.0",

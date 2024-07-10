@@ -127,8 +127,8 @@ data Proposal
       , proposalUrl            :: Text
       , proposalDocHash        :: Text
       , proposalTitle          :: Maybe Text
-      , proposalAbout          :: Maybe Text
-      , proposalMotivaiton     :: Maybe Text
+      , proposalAbstract       :: Maybe Text
+      , proposalMotivation     :: Maybe Text
       , proposalRationale      :: Maybe Text
       , proposalMetadata       :: Maybe Value
       , proposalReferences     :: Maybe Value

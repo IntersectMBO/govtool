@@ -24,6 +24,7 @@ module VVA.Config
     , getServerHost
     , getServerPort
     , vvaConfigToText
+    , getMetadataValidationEnabled
     , getMetadataValidationHost
     , getMetadataValidationPort
     ) where
@@ -82,6 +83,8 @@ data VVAConfigInternal
       , vVAConfigInternalSentrydsn              :: String
         -- | Sentry environment
       , vVAConfigInternalSentryEnv              :: String
+        -- | Metadata validation service enabled
+      , vVAConfigInternalMetadataValidationEnabled :: Bool
         -- | Metadata validation service host
       , vVAConfigInternalMetadataValidationHost :: Text
         -- | Metadata validation service port
@@ -100,6 +103,7 @@ instance DefaultConfig VVAConfigInternal where
         vVaConfigInternalCacheDurationSeconds = 20,
         vVAConfigInternalSentrydsn = "https://username:password@senty.host/id",
         vVAConfigInternalSentryEnv = "development",
+        vVAConfigInternalMetadataValidationEnabled = True,
         vVAConfigInternalMetadataValidationHost = "localhost",
         vVAConfigInternalMetadataValidationPort = 3001,
         vVAConfigInternalMetadataValidationMaxConcurrentRequests = 10
@@ -120,6 +124,8 @@ data VVAConfig
       , sentryDSN              :: String
         -- | Sentry environment
       , sentryEnv              :: String
+        -- | Metadata validation service enabled
+      , metadataValidationEnabled :: Bool
         -- | Metadata validation service host
       , metadataValidationHost :: Text
         -- | Metadata validation service port
@@ -167,6 +173,7 @@ convertConfig VVAConfigInternal {..} =
       cacheDurationSeconds = vVaConfigInternalCacheDurationSeconds,
       sentryDSN = vVAConfigInternalSentrydsn,
       sentryEnv = vVAConfigInternalSentryEnv,
+      metadataValidationEnabled = vVAConfigInternalMetadataValidationEnabled,
       metadataValidationHost = vVAConfigInternalMetadataValidationHost,
       metadataValidationPort = vVAConfigInternalMetadataValidationPort,
       metadataValidationMaxConcurrentRequests = vVAConfigInternalMetadataValidationMaxConcurrentRequests
@@ -207,6 +214,12 @@ getServerHost ::
   (Has VVAConfig r, MonadReader r m) =>
   m Text
 getServerHost = asks (serverHost . getter)
+
+-- | Access MetadataValidationService enabled
+getMetadataValidationEnabled ::
+  (Has VVAConfig r, MonadReader r m) =>
+  m Bool
+getMetadataValidationEnabled = asks (metadataValidationEnabled . getter)
 
 -- | Access MetadataValidationService host
 getMetadataValidationHost ::

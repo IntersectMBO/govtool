@@ -217,18 +217,30 @@ proposalToResponse Types.Proposal {..} Types.MetadataValidationResult{..} =
     proposalResponseCreatedEpochNo = proposalCreatedEpochNo,
     proposalResponseUrl = proposalUrl,
     proposalResponseMetadataHash = HexText proposalDocHash,
-    proposalResponseTitle = Types.proposalMetadataTitle <$> metadata,
-    proposalResponseAbstract = Types.proposalMetadataAbstract <$> metadata,
-    proposalResponseMotivation = Types.proposalMetadataMotivation <$> metadata,
-    proposalResponseRationale = Types.proposalMetadataRationale <$> metadata,
+    proposalResponseTitle = getTitle proposalTitle metadata,
+    proposalResponseAbstract = getAbstract proposalAbstract metadata,
+    proposalResponseMotivation = getMotivation proposalMotivation metadata,
+    proposalResponseRationale = getRationale proposalRationale metadata,
     proposalResponseMetadata = GovernanceActionMetadata <$> proposalMetadata,
-    proposalResponseReferences = maybe [] Types.proposalMetadataReferences metadata,
+    proposalResponseReferences = getReferences proposalReferences metadata,
     proposalResponseYesVotes = proposalYesVotes,
     proposalResponseNoVotes = proposalNoVotes,
     proposalResponseAbstainVotes = proposalAbstainVotes,
     proposalResponseMetadataStatus = metadataValidationResultStatus,
     proposalResponseMetadataValid = metadataValidationResultValid
   }
+  where
+   getTitle p Nothing = p
+   getTitle _ m = Types.proposalMetadataTitle <$> m
+   getAbstract p Nothing = p
+   getAbstract _ m = Types.proposalMetadataAbstract <$> m
+   getMotivation p Nothing = p
+   getMotivation _ m = Types.proposalMetadataMotivation <$> m
+   getRationale p Nothing = p
+   getRationale _ m = Types.proposalMetadataRationale <$> m
+   -- TODO: convert aeson references to [Text] from database
+   --getReferences p Nothing = p
+   getReferences _ m = maybe [] Types.proposalMetadataReferences m
 
 voteToResponse :: Types.Vote -> VoteParams
 voteToResponse Types.Vote {..} =

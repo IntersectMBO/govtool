@@ -73,6 +73,8 @@ export default class ProposalSubmissionPage {
   async goto() {
     await this.page.goto(`${environments.frontendUrl}/proposal_discussion`);
 
+    await this.page.waitForTimeout(2_000); // wait until page load properly
+
     await this.verifyIdentityBtn.click();
     await this.proposalCreateBtn.click();
 

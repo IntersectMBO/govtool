@@ -76,13 +76,7 @@ export default class ProposalSubmissionPage {
     await this.verifyIdentityBtn.click();
     await this.proposalCreateBtn.click();
 
-    await this.page.waitForTimeout(2_000); // wait until the draft is loaded
-    const drafts = await this.getAllDrafts();
-    if (drafts.length > 0) {
-      await this.createNewProposalBtn.click();
-    } else {
-      await this.continueBtn.click();
-    }
+    await this.continueBtn.click();
   }
 
   async fillUpValidMetadata() {

@@ -17,7 +17,7 @@ import { createNewPageWithWallet } from "@helpers/page";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import EditDRepPage from "@pages/editDRepPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
-import { expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 import { valid as mockValid, invalid as mockInvalid } from "@mock/index";
 
 test.beforeEach(async () => {
@@ -119,6 +119,7 @@ test.describe("Logged in user", () => {
 
 test.describe("Temporary user", () => {
   let userPage: Page;
+  let proposalDiscussionPage: ProposalDiscussionPage;
 
   test.beforeEach(async ({ page, browser }) => {
     const wallet = (await ShelleyWallet.generate()).json();
@@ -127,20 +128,19 @@ test.describe("Temporary user", () => {
       storageState: tempUserAuth,
       wallet,
     });
+
+    proposalDiscussionPage = new ProposalDiscussionPage(userPage);
+    await proposalDiscussionPage.goto();
+    await proposalDiscussionPage.verifyIdentityBtn.click();
   });
 
   test("6J. Should add a username.", async () => {
-    const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
-    await proposalDiscussionPage.goto();
     await proposalDiscussionPage.setUsername(
       faker.internet.userName().toLowerCase()
     );
   });
 
   test("6K. Should accept valid username.", async () => {
-    const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
-    await proposalDiscussionPage.goto();
-
     for (let i = 0; i < 100; i++) {
       await userPage
         .getByLabel("Username *")
@@ -154,9 +154,6 @@ test.describe("Temporary user", () => {
   });
 
   test("6L. Should reject invalid username.", async () => {
-    const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
-    await proposalDiscussionPage.goto();
-
     for (let i = 0; i < 100; i++) {
       await userPage
         .getByLabel("Username *")

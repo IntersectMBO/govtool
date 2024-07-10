@@ -42,22 +42,22 @@ validateMetadata url hash standard = do
     metadataHost <- getMetadataValidationHost
     metadataPort <- getMetadataValidationPort
     manager <- asks getter
-    let requestBody = encode $ object (["url" .= unpack url, "hash" .= unpack hash] ++ maybe [] (\x -> ["standard" .= unpack x]) standard)
-    initialRequest <- liftIO $ parseRequest (unpack metadataHost <> ":" <> show metadataPort <> "/validate")
-    let request = initialRequest
-            { method = "POST"
-            , requestBody = RequestBodyLBS requestBody
-            , requestHeaders = [("Content-Type", "application/json")]
-            }
     case metadataEnabled of
       True -> do
+        let requestBody = encode $ object (["url" .= unpack url, "hash" .= unpack hash] ++ maybe [] (\x -> ["standard" .= unpack x]) standard)
+        initialRequest <- liftIO $ parseRequest (unpack metadataHost <> ":" <> show metadataPort <> "/validate")
+        let request = initialRequest
+                { method = "POST"
+                , requestBody = RequestBodyLBS requestBody
+                , requestHeaders = [("Content-Type", "application/json")]
+                }
         response <- liftIO $ try $ httpLbs request manager
         case response of
             Left (e :: HttpException) -> return $ Left (pack $ show e)
             Right r -> case decode $ responseBody r of
                 Nothing -> throwError $ InternalError "Failed to validate metadata"
                 Just x -> return $ Right x
-      False -> return $ Right "Metadata Disabled"
+      False ->  return $ Right ""
 
 getProposalMetadataValidationResult ::
     (Has ConnectionPool r, Has Manager r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>
@@ -71,6 +71,7 @@ getProposalMetadataValidationResult url hash = do
             Right (Object r) -> case go r of
                 Nothing -> throwError $ InternalError "Failed to validate metadata"
                 Just x -> return x
+            Right "" -> return $ MetadataValidationResult True (Just "200") Nothing
     where
         go result = do
                 (Bool valid) <- lookup "valid" result

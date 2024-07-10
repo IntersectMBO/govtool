@@ -31,6 +31,7 @@ test("7H. Should submit a proposal as governance action", async ({
 
   const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
   await proposalDiscussionPage.goto();
+  await proposalDiscussionPage.verifyIdentityBtn.click();
 
   await proposalDiscussionPage.setUsername(
     faker.internet.userName().toLowerCase()

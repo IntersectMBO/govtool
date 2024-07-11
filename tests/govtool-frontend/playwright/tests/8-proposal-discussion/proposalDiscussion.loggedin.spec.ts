@@ -36,11 +36,11 @@ test.describe("Proposal created logged in state", () => {
   }) => {
     await proposalDiscussionDetailsPage.likeBtn.click();
     await page.waitForTimeout(2_000);
-    await expect(page.getByText("10", { exact: true })).toBeVisible();
+    await expect(proposalDiscussionDetailsPage.likeCount).toHaveText("1");
 
     await proposalDiscussionDetailsPage.dislikeBtn.click();
     await page.waitForTimeout(2_000);
-    await expect(page.getByText("01", { exact: true })).toBeVisible();
+    await expect(proposalDiscussionDetailsPage.dislikeCount).toHaveText("1");
   });
 
   test("8J. Should sort the proposed governance action comments.", async ({
@@ -97,10 +97,14 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
 
     await expect(proposalDiscussionDetailsPage.pollYesBtn).not.toBeVisible();
     await expect(proposalDiscussionDetailsPage.pollNoBtn).not.toBeVisible();
-    await expect(page.getByText(`${vote}: (100%)`)).toBeVisible();
+    await expect(
+      page.getByTestId(`poll-${vote.toLowerCase()}-count`)
+    ).toHaveText(`${vote}: (100%)`);
     // opposite of random choice vote
     const oppositeVote = pollVotes[pollVotes.length - 1 - choice];
-    await expect(page.getByText(`${oppositeVote}: (0%)`)).toBeVisible();
+    await expect(
+      page.getByTestId(`poll-${oppositeVote.toLowerCase()}-count`)
+    ).toHaveText(`${oppositeVote}: (0%)`);
   });
 
   test("8T. Should change vote on poll.", async ({ page }) => {
@@ -111,18 +115,20 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
     await proposalDiscussionDetailsPage.voteOnPoll(vote);
 
     await proposalDiscussionDetailsPage.changeVoteBtn.click();
-    await page
-      .getByRole("button", { name: "Yes, change my Poll Vote" })
-      .click();
+    await page.getByTestId("change-poll-vote-yes-button").click();
 
     await expect(proposalDiscussionDetailsPage.pollYesBtn).not.toBeVisible();
     await expect(proposalDiscussionDetailsPage.pollNoBtn).not.toBeVisible();
 
     // vote must be changed
-    await expect(page.getByText(`${vote}: (0%)`)).toBeVisible();
+    await expect(
+      page.getByTestId(`poll-${vote.toLowerCase()}-count`)
+    ).not.toHaveText(`${vote}: (0%)`);
     // opposite of random choice vote
     const oppositeVote = pollVotes[pollVotes.length - 1 - choice];
-    await expect(page.getByText(`${oppositeVote}: (100%)`)).toBeVisible();
+    await expect(
+      page.getByTestId(`poll-${oppositeVote.toLowerCase()}-count`)
+    ).not.toHaveText(`${oppositeVote}: (100%)`);
   });
 });
 

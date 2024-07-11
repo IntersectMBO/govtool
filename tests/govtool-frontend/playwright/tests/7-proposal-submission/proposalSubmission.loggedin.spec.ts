@@ -39,7 +39,7 @@ test.describe("Proposal created logged state", () => {
         await proposalSubmissionPage.goto();
 
         await proposalSubmissionPage.governanceActionType.click();
-        await page.getByRole("option", { name: type }).click();
+        await page.getByTestId(`${type.toLocaleLowerCase()}-button`).click();
         await proposalSubmissionPage.addLinkBtn.click();
 
         for (let i = 0; i < 100; i++) {
@@ -76,7 +76,7 @@ test.describe("Proposal created logged state", () => {
         await proposalSubmissionPage.goto();
 
         await proposalSubmissionPage.governanceActionType.click();
-        await page.getByRole("option", { name: type }).click();
+        await page.getByTestId(`${type.toLocaleLowerCase()}-button`).click();
         await proposalSubmissionPage.addLinkBtn.click();
 
         const formFields: ProposalCreateRequest =
@@ -114,11 +114,11 @@ test.describe("Proposal created logged state", () => {
         await proposalSubmissionPage.submitBtn.click();
 
         await expect(page.getByTestId("submit-as-GA-button")).toBeVisible();
-        await expect(page.getByText(type, { exact: true })).toBeVisible();
-        await expect(page.getByText(proposal.prop_name)).toBeVisible();
-        await expect(page.getByText(proposal.prop_abstract)).toBeVisible();
-        await expect(page.getByText(proposal.prop_rationale)).toBeVisible();
-        await expect(page.getByText(proposal.prop_motivation)).toBeVisible();
+        await expect(page.getByText(type, { exact: true })).toBeVisible(); // BUG missing test id
+        await expect(page.getByText(proposal.prop_name)).toBeVisible(); // BUG missing test id
+        await expect(page.getByText(proposal.prop_abstract)).toBeVisible(); // BUG missing test id
+        await expect(page.getByText(proposal.prop_rationale)).toBeVisible(); // BUG missing test id
+        await expect(page.getByText(proposal.prop_motivation)).toBeVisible(); // BUG missing test id
       });
     });
   });
@@ -145,21 +145,31 @@ test.describe("Proposal created logged state", () => {
         await proposalSubmissionPage.fillupForm(proposal);
         await proposalSubmissionPage.continueBtn.click();
 
-        await expect(page.getByText(proposal.prop_name)).toBeVisible();
-        await expect(page.getByText(proposal.prop_abstract)).toBeVisible();
-        await expect(page.getByText(proposal.prop_motivation)).toBeVisible();
-        await expect(page.getByText(proposal.prop_rationale)).toBeVisible();
         await expect(
-          page.getByText(proposal.proposal_links[0].prop_link_text)
-        ).toBeVisible();
-
+          page.getByTestId("governance-action-type-content")
+        ).toHaveText(type);
+        await expect(page.getByTestId("title-content")).toHaveText(
+          proposal.prop_name
+        );
+        await expect(page.getByTestId("abstract-content")).toHaveText(
+          proposal.prop_abstract
+        );
+        await expect(page.getByTestId("motivation-content")).toHaveText(
+          proposal.prop_motivation
+        );
+        await expect(page.getByTestId("rationale-content")).toHaveText(
+          proposal.prop_rationale
+        );
+        await expect(page.getByTestId("link-text-content")).toHaveText(
+          proposal.proposal_links[0].prop_link_text
+        );
         if (type === ProposalType.treasury) {
           await expect(
-            page.getByText(proposal.prop_receiving_address)
-          ).toBeVisible();
-          await expect(
-            page.getByText(proposal.prop_amount, { exact: true })
-          ).toBeVisible();
+            page.getByTestId("receiving-address-content")
+          ).toHaveText(proposal.prop_receiving_address);
+          await expect(page.getByTestId("amount-content")).toHaveText(
+            proposal.prop_amount
+          );
         }
       });
     });
@@ -204,8 +214,8 @@ test.describe("Proposal created logged state", () => {
       await proposalDiscussionDetailsPage.submitAsGABtn.click();
 
       proposalSubmissionPage = new ProposalSubmissionPage(page);
-      await page.click("input#submission-checkbox"); // BUG missing test id
-      await page.getByRole("button", { name: "Continue" }).click();
+      await page.getByTestId("agree-checkbox").click();
+      await proposalSubmissionPage.continueBtn.click();
     });
 
     test.describe("Metadata anchor validation", () => {
@@ -217,7 +227,7 @@ test.describe("Proposal created logged state", () => {
           await proposalSubmissionPage.metadataUrlInput.fill(
             faker.internet.url()
           );
-          await expect(page.getByText("Invalid URL")).toBeHidden(); // BUG missing test ids
+          await expect(page.getByTestId("url-input-error-text")).toBeHidden();
         }
       });
 
@@ -227,7 +237,7 @@ test.describe("Proposal created logged state", () => {
         test.slow(); // Brute-force testing with 100 random data
         for (let i = 0; i < 100; i++) {
           await proposalSubmissionPage.metadataUrlInput.fill(invalid.url());
-          await expect(page.getByText("Invalid URL")).toBeVisible(); // BUG missing test ids
+          await expect(page.getByTestId("url-input-error-text")).toBeVisible();
         }
 
         const sentenceWithoutSpace = faker.lorem
@@ -240,7 +250,7 @@ test.describe("Proposal created logged state", () => {
           metadataAnchorGreaterThan128Bytes
         );
 
-        await expect(page.getByText("Url must be less than 128")).toBeVisible(); // BUG missing test ids
+        await expect(page.getByTestId("url-input-error-text")).toBeVisible(); // BUG better to add different test id compare to invalid url testid
       });
     });
 
@@ -317,19 +327,22 @@ test.describe("Temporary proposal users", () => {
       await proposalSubmissionPage.titleInput.fill(newTitle);
       await proposalSubmissionPage.continueBtn.click();
 
-      await expect(userPage.getByText(newTitle)).toBeVisible();
       await expect(
-        userPage.getByText(proposalFormValue.prop_abstract)
-      ).toBeVisible();
-      await expect(
-        userPage.getByText(proposalFormValue.prop_motivation)
-      ).toBeVisible();
-      await expect(
-        userPage.getByText(proposalFormValue.prop_rationale)
-      ).toBeVisible();
-      await expect(
-        userPage.getByText(proposalFormValue.proposal_links[0].prop_link_text)
-      ).toBeVisible();
+        userPage.getByTestId("governance-action-type-content")
+      ).toHaveText(ProposalType.info);
+      await expect(userPage.getByTestId("title-content")).toHaveText(newTitle);
+      await expect(userPage.getByTestId("abstract-content")).toHaveText(
+        proposalFormValue.prop_abstract
+      );
+      await expect(userPage.getByTestId("motivation-content")).toHaveText(
+        proposalFormValue.prop_motivation
+      );
+      await expect(userPage.getByTestId("rationale-content")).toHaveText(
+        proposalFormValue.prop_rationale
+      );
+      await expect(userPage.getByTestId("link-text-content")).toHaveText(
+        proposalFormValue.proposal_links[0].prop_link_text
+      );
     });
 
     test("7N. Should submit a draft proposal", async ({}) => {
@@ -340,19 +353,19 @@ test.describe("Temporary proposal users", () => {
       await expect(userPage.getByTestId("submit-as-GA-button")).toBeVisible();
       await expect(
         userPage.getByText(ProposalType.info, { exact: true })
-      ).toBeVisible();
+      ).toBeVisible(); // BUG missing test id
       await expect(
         userPage.getByText(proposalFormValue.prop_name)
-      ).toBeVisible();
+      ).toBeVisible(); // BUG missing test id
       await expect(
         userPage.getByText(proposalFormValue.prop_abstract)
-      ).toBeVisible();
+      ).toBeVisible(); // BUG missing test id
       await expect(
         userPage.getByText(proposalFormValue.prop_rationale)
-      ).toBeVisible();
+      ).toBeVisible(); // BUG missing test id
       await expect(
         userPage.getByText(proposalFormValue.prop_motivation)
-      ).toBeVisible();
+      ).toBeVisible(); // BUG missing test id
     });
   });
 
@@ -386,25 +399,28 @@ test.describe("Temporary proposal users", () => {
       await proposalSubmissionPage.titleInput.fill(newTitle);
       await proposalSubmissionPage.continueBtn.click();
 
-      await expect(userPage.getByText(newTitle)).toBeVisible();
       await expect(
-        userPage.getByText(proposalFormValue.prop_abstract)
-      ).toBeVisible();
+        userPage.getByTestId("governance-action-type-content")
+      ).toHaveText(ProposalType.treasury);
+      await expect(userPage.getByTestId("title-content")).toHaveText(newTitle);
+      await expect(userPage.getByTestId("abstract-content")).toHaveText(
+        proposalFormValue.prop_abstract
+      );
+      await expect(userPage.getByTestId("motivation-content")).toHaveText(
+        proposalFormValue.prop_motivation
+      );
+      await expect(userPage.getByTestId("rationale-content")).toHaveText(
+        proposalFormValue.prop_rationale
+      );
       await expect(
-        userPage.getByText(proposalFormValue.prop_motivation)
-      ).toBeVisible();
-      await expect(
-        userPage.getByText(proposalFormValue.prop_rationale)
-      ).toBeVisible();
-      await expect(
-        userPage.getByText(proposalFormValue.prop_receiving_address)
-      ).toBeVisible();
-      await expect(
-        userPage.getByText(proposalFormValue.prop_amount)
-      ).toBeVisible();
-      await expect(
-        userPage.getByText(proposalFormValue.proposal_links[0].prop_link_text)
-      ).toBeVisible();
+        userPage.getByTestId("receiving-address-content")
+      ).toHaveText(proposalFormValue.prop_receiving_address);
+      await expect(userPage.getByTestId("amount-content")).toHaveText(
+        proposalFormValue.prop_amount
+      );
+      await expect(userPage.getByTestId("link-text-content")).toHaveText(
+        proposalFormValue.proposal_links[0].prop_link_text
+      );
     });
   });
 });

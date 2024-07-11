@@ -28,41 +28,41 @@ export default class ProposalSubmissionPage {
   );
 
   // buttons
-  readonly proposalCreateBtn = this.page.getByRole("button", {
-    name: "Propose a Governance Action",
-  });
+  readonly proposalCreateBtn = this.page.getByTestId(
+    "propose-a-governance-action-button"
+  );
   readonly registerBtn = this.page.getByTestId("register-button");
   readonly skipBtn = this.page.getByTestId("skip-button");
   readonly confirmBtn = this.page.getByTestId("confirm-modal-button");
 
-  readonly continueBtn = this.page.getByRole("button", { name: "Continue" }); //BUG testid = continue-button
-  readonly addLinkBtn = this.page.getByRole("button", { name: "Add link" }); // BUG testid= add-link-button
-  readonly infoBtn = this.page.getByRole("option", { name: "Info" }); // BUG missing test id
-  readonly treasuryBtn = this.page.getByRole("option", { name: "Treasury" }); // BUG missing test id
+  readonly continueBtn = this.page.getByTestId("continue-button");
+  readonly addLinkBtn = this.page.getByTestId("add-link-button");
+  readonly infoBtn = this.page.getByTestId("info-button");
+  readonly treasuryBtn = this.page.getByTestId("treasury-button");
   readonly editSubmissionButton = this.page.getByTestId(
     "edit-submission-button"
   );
   readonly verifyIdentityBtn = this.page.getByRole("button", {
     name: "Verify your identity",
-  });
+  }); // BUG missing test id
   readonly governanceActionType = this.page.getByLabel(
     "Governance Action Type *"
-  ); // BUG missing test id
+  );
   readonly saveDraftBtn = this.page.getByTestId("save-draft-button");
-  readonly submitBtn = this.page.getByRole("button", { name: "Submit" }); // BUG missing test id
-  readonly createNewProposalBtn = this.page.getByRole("button", {
-    name: "Create new Proposal",
-  });
+  readonly submitBtn = this.page.getByTestId("submit-button");
+  readonly createNewProposalBtn = this.page.getByTestId(
+    "create-new-proposal-button"
+  );
 
   // input fields
-  readonly titleInput = this.page.getByLabel("Title *"); // BUG testid = title-input
-  readonly abstractInput = this.page.getByLabel("Abstract *"); // BUG testid = abstract-input
-  readonly metadataUrlInput = this.page.getByPlaceholder("URL"); // BUG missing test id
-  readonly motivationInput = this.page.getByLabel("Motivation *"); // BUG testid = motivation-input
-  readonly rationaleInput = this.page.getByLabel("Rationale *"); // BUG testid = rationale-input
-  readonly linkInput = this.page.getByLabel("Link #1 URL"); // BUG testid = link-input
-  readonly linkText = this.page.getByLabel("Link #1 Text"); // BUG missing testid
-  readonly receivingAddressInput = this.page.getByLabel("Receiving address *"); // BUG missing testid
+  readonly titleInput = this.page.getByTestId("title-input");
+  readonly abstractInput = this.page.getByTestId("abstract-input");
+  readonly metadataUrlInput = this.page.getByTestId("url-input");
+  readonly motivationInput = this.page.getByTestId("motivation-input");
+  readonly rationaleInput = this.page.getByTestId("rationale-input");
+  readonly receivingAddressInput = this.page.getByTestId(
+    "receiving-address-input"
+  );
   readonly amountInput = this.page.getByTestId("amount-input");
   readonly closeDraftSuccessModalBtn = this.page.getByTestId(
     "delete-proposal-yes-button"
@@ -82,11 +82,7 @@ export default class ProposalSubmissionPage {
   }
 
   async fillUpValidMetadata() {
-    this.page
-      .getByRole("button", {
-        name: "data.jsonld",
-      })
-      .click(); // BUG test id = metadata-download-button
+    this.page.getByTestId("download-button").click();
 
     const dRepMetadata = await this.downloadVoteMetadata();
     const url = await metadataBucketService.uploadMetadata(
@@ -144,8 +140,12 @@ export default class ProposalSubmissionPage {
       if (i > 0) {
         await this.addLinkBtn.click();
       }
-      await this.linkInput.fill(proposal_links[i].prop_link);
-      await this.linkText.fill(proposal_links[i].prop_link_text);
+      await this.page
+        .getByTestId(`link-${i}-url-input`)
+        .fill(proposal_links[i].prop_link);
+      await this.page
+        .getByTestId(`link-${i}-text-input`)
+        .fill(proposal_links[i].prop_link_text);
     }
   }
 

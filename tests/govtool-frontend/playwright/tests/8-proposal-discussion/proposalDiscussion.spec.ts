@@ -109,7 +109,7 @@ test("8D.Should show the view-all categorized proposed governance actions.", asy
   const proposalCards = await proposalDiscussionPage.getAllProposals();
 
   for (const proposalCard of proposalCards) {
-    await expect(proposalCard.getByText("Info", { exact: true })).toBeVisible();
+    await expect(proposalCard.getByText("Info", { exact: true })).toBeVisible(); // BUG missing test id
   }
 });
 
@@ -172,9 +172,9 @@ test.describe("Mocked proposal", () => {
   }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
 
-    await page.locator("#share-button").click(); // BUG
-    await page.getByRole("button").click(); // BUG
-    await expect(page.getByText("Link copied")).toBeVisible(); // Bug
+    await page.getByTestId("share-button").click();
+    await page.getByRole("button").click(); // BUG missing test id copy button
+    await expect(page.getByText("Link copied")).toBeVisible(); // BUG missing test id link copied text
 
     const copiedTextDRepDirectory = await page.evaluate(() =>
       navigator.clipboard.readText()

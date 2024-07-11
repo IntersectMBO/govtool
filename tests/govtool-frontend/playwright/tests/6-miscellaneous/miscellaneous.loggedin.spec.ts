@@ -17,7 +17,8 @@ import { createNewPageWithWallet } from "@helpers/page";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import EditDRepPage from "@pages/editDRepPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
-import { expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
+import { valid as mockValid, invalid as mockInvalid } from "@mock/index";
 
 test.beforeEach(async () => {
   await setAllureEpic("6. Miscellaneous");
@@ -109,28 +110,59 @@ test.describe("Logged in user", () => {
   }) => {
     await page.goto("/");
     await page.getByTestId("proposal-discussion-link").click();
-
-    await expect(
-      page.getByText(
-        "Hey, setup your usernameUsername cannot be changed in the Future. Some subtext"
-      )
-    ).toBeVisible(); //BUG Add modal testid instead should be username-modal
+    await page.getByRole("button", { name: "Verify your identity" }).click(); // BUG: Test id missing
+    await expect(page.getByText("Hey, setup your usernameBy")).toBeVisible(); //BUG Add modal testid instead should be username-modal
 
     await expect(page.getByLabel("Username *")).toBeVisible(); // BUG use testid instead
   });
 });
 
 test.describe("Temporary user", () => {
-  test("6J. Should add a username.", async ({ page, browser }) => {
+  let userPage: Page;
+  let proposalDiscussionPage: ProposalDiscussionPage;
+
+  test.beforeEach(async ({ page, browser }) => {
     const wallet = (await ShelleyWallet.generate()).json();
     const tempUserAuth = await createTempUserAuth(page, wallet);
-    const userPage = await createNewPageWithWallet(browser, {
+    userPage = await createNewPageWithWallet(browser, {
       storageState: tempUserAuth,
       wallet,
     });
 
-    const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
+    proposalDiscussionPage = new ProposalDiscussionPage(userPage);
     await proposalDiscussionPage.goto();
-    await proposalDiscussionPage.setUsername(faker.internet.userName());
+    await proposalDiscussionPage.verifyIdentityBtn.click();
+  });
+
+  test("6J. Should add a username.", async () => {
+    await proposalDiscussionPage.setUsername(
+      faker.internet.userName().toLowerCase()
+    );
+  });
+
+  test("6K. Should accept valid username.", async () => {
+    for (let i = 0; i < 100; i++) {
+      await userPage
+        .getByLabel("Username *")
+        .fill(mockValid.username().toLowerCase());
+
+      await expect(
+        userPage.getByText("Invalid username. Only lower")
+      ).not.toBeVisible();
+      await expect(userPage.getByTestId("proceed-button")).toBeEnabled();
+    }
+  });
+
+  test("6L. Should reject invalid username.", async () => {
+    for (let i = 0; i < 100; i++) {
+      await userPage
+        .getByLabel("Username *")
+        .fill(mockInvalid.username().toLowerCase());
+
+      await expect(
+        userPage.getByText("Invalid username. Only lower")
+      ).toBeVisible();
+      await expect(userPage.getByTestId("proceed-button")).toBeDisabled();
+    }
   });
 });

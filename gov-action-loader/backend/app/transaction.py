@@ -160,38 +160,11 @@ def get_proposal_data_from_type(proposal_type, current_pParams):
 
 
 def filter_updatable_paramKeys(keys):
-    updatable_keys = set(
-        [
-            "maxBlockSize",
-            "maxBBSize",
-            "maxTxSize",
-            "maxBHSize",
-            "keyDeposit",
-            "poolDeposit",
-            "eMax",
-            "nOpt",
-            "a0",
-            "rho",
-            "tau",
-            "minPoolCost",
-            "coinsPerUTxOByte",
-            "costModels",
-            "prices",
-            "maxTxExUnits",
-            "maxBlockExUnits",
-            "maxValSize",
-            "collateralPercentage",
-            "maxCollateralInputs",
-            "poolVotingThresholds",
-            "dRepVotingThresholds",
-            "committeeMinSize",
-            "committeeMaxTermLength",
-            "govActionLifetime",
-            "govActionDeposit",
-            "dRepDeposit",
-            "dRepActivity",
-        ]
-    )
+    updatable_keys = {"maxBlockSize", "maxBBSize", "maxTxSize", "maxBHSize", "keyDeposit", "poolDeposit", "eMax",
+                      "nOpt", "a0", "rho", "tau", "minPoolCost", "coinsPerUTxOByte", "costModels", "prices",
+                      "maxTxExUnits", "maxBlockExUnits", "maxValSize", "collateralPercentage", "maxCollateralInputs",
+                      "poolVotingThresholds", "dRepVotingThresholds", "committeeMinSize", "committeeMaxTermLength",
+                      "govActionLifetime", "govActionDeposit", "dRepDeposit", "dRepActivity"}
     return [x for x in keys if x in updatable_keys]
 
 
@@ -230,15 +203,3 @@ async def submit_proposal_tx(wallet, proposal, proposal_numbers, client):
         "proposals": proposals,
     }
     return await submit_tx(tx, client)
-
-
-def get_txid_from_cli(tx: Dict[str, Any]):
-    try:
-        with open("tx.raw", "w") as file:
-            json.dump(tx, file)
-        tx_id_command = "cardano-cli transaction txid --tx-file tx.raw"
-        tx_id_raw = subprocess.check_output(["bash", "-c", tx_id_command])
-        tx_id = tx_id_raw.decode("utf-8").strip()
-        return tx_id
-    finally:
-        os.remove("tx.raw")

@@ -4,51 +4,41 @@ import { CommentResponse } from "@types";
 
 export default class ProposalDiscussionDetailsPage {
   // Buttons
-  readonly likeBtn = this.page.getByRole("button", {
-    name: "proposal likes",
-  });
-  readonly dislikeBtn = this.page.getByRole("button", {
-    name: "proposal dislikes",
-  });
+  readonly likeBtn = this.page.getByTestId("like-button");
+  readonly dislikeBtn = this.page.getByTestId("dislike-button");
   readonly commentBtn = this.page.getByTestId("comment-button");
-  readonly addPollBtn = this.page.getByRole("button", { name: "Add Poll" }); // BUG missing test id
+  readonly replyCommentBtn = this.page.getByTestId("reply-comment-button");
+  readonly addPollBtn = this.page.getByTestId("add-poll-button");
   readonly SubmitBtn = this.page.getByTestId("submit-button");
   readonly menuBtn = this.page.getByTestId("menu-button");
   readonly editProposalBtn = this.page.getByTestId("edit-proposal");
   readonly deleteProposalBtn = this.page.getByTestId("delete-proposal");
   readonly reviewVersionsBtn = this.page.getByTestId("review-versions");
-  readonly closePollBtn = this.page.getByRole("button", { name: "Close Poll" }); // BUG missing test id
-  readonly sortBtn = this.page
-    .locator("div")
-    .filter({ hasText: /^Comments$/ })
-    .getByRole("button"); // this.page.getByTestId("sort-button");
+  readonly closePollBtn = this.page.getByTestId("close-poll-button");
+  readonly sortBtn = this.page.getByTestId("sort-comments");
   readonly proposeGovernanceAction = this.page.getByTestId("propose-GA-button");
   readonly replyBtn = this.page.getByTestId("reply-button");
-  readonly pollYesBtn = this.page.getByRole("button", { name: "Yes" }); //BUG missing test id
-  readonly pollNoBtn = this.page.getByRole("button", { name: "No" }); //BUG missing test id
+  readonly pollYesBtn = this.page.getByTestId("poll-yes-button");
+  readonly pollNoBtn = this.page.getByTestId("poll-no-button");
   readonly showReplyBtn = this.page.getByTestId("show-more-reply");
   readonly closePollYesBtn = this.page.getByTestId("close-the-poll-button");
-  readonly changeVoteBtn = this.page.getByRole("button", {
-    name: "Change Vote",
-  });
+  readonly changeVoteBtn = this.page.getByTestId("change-vote-button");
   readonly verifyIdentityBtn = this.page.getByRole("button", {
     name: "Verify your identity",
-  });
+  }); // BUG
   readonly submitAsGABtn = this.page.getByTestId("submit-as-GA-button");
 
   // Indicators
-  readonly likesCounts = this.page.getByTestId("likes-count");
-  readonly dislikesCounts = this.page.getByTestId("dislikse-count");
+  readonly likeCount = this.likeBtn.getByTestId("like-count");
+  readonly dislikeCount = this.dislikeBtn.getByTestId("dislike-count");
   readonly commentCount = this.page.getByTestId("comment-count");
 
   // Cards
   readonly pollVoteCard = this.page.getByTestId("poll-vote-card");
   readonly pollResultCard = this.page.getByTestId("poll-result-card");
-  readonly commentCard =
-    this.proposeGovernanceAction.getByTestId("comment-card");
 
   //inputs
-  readonly commentInput = this.page.getByRole("textbox");
+  readonly commentInput = this.page.getByTestId("comment-input");
 
   constructor(private readonly page: Page) {}
 
@@ -68,13 +58,13 @@ export default class ProposalDiscussionDetailsPage {
 
   async addComment(comment: string) {
     await this.commentInput.fill(comment);
-    await this.page.getByTestId("comment-button").click();
+    await this.commentBtn.click();
   }
 
   async replyComment(reply: string) {
-    await this.page.getByRole("button", { name: "Reply" }).click();
-    await this.page.getByPlaceholder("Add comment").fill(reply);
-    await this.page.getByTestId("reply-comment-button").click();
+    await this.replyBtn.click();
+    await this.page.getByTestId("reply-input").fill(reply);
+    await this.replyCommentBtn.click();
   }
 
   async sortAndValidate(
@@ -101,13 +91,13 @@ export default class ProposalDiscussionDetailsPage {
   }
 
   async voteOnPoll(vote: string) {
-    await this.page.getByRole("button", { name: `${vote}` }).click();
+    await this.page.getByTestId(`poll-${vote.toLowerCase()}-button`).click();
   }
 
   async deleteProposal() {
     await this.page.waitForTimeout(2_000);
 
-    await this.page.locator("#menu-button").click();
+    await this.page.getByTestId("menu-button").click();
     await this.page.getByTestId("delete-proposal").click();
     await this.page.getByTestId("delete-proposal-yes-button").click();
   }

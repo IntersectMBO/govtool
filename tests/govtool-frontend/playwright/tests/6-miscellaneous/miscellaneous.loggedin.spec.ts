@@ -111,9 +111,9 @@ test.describe("Logged in user", () => {
     await page.goto("/");
     await page.getByTestId("proposal-discussion-link").click();
     await page.getByRole("button", { name: "Verify your identity" }).click(); // BUG: Test id missing
-    await expect(page.getByText("Hey, setup your usernameBy")).toBeVisible(); //BUG Add modal testid instead should be username-modal
 
-    await expect(page.getByLabel("Username *")).toBeVisible(); // BUG use testid instead
+    await expect(page.getByTestId("setup-username-modal")).toBeVisible();
+    await expect(page.getByTestId("username-input")).toBeVisible();
   });
 });
 
@@ -143,11 +143,11 @@ test.describe("Temporary user", () => {
   test("6K. Should accept valid username.", async () => {
     for (let i = 0; i < 100; i++) {
       await userPage
-        .getByLabel("Username *")
+        .getByTestId("username-input")
         .fill(mockValid.username().toLowerCase());
 
       await expect(
-        userPage.getByText("Invalid username. Only lower")
+        userPage.getByTestId("username-error-text")
       ).not.toBeVisible();
       await expect(userPage.getByTestId("proceed-button")).toBeEnabled();
     }
@@ -156,12 +156,10 @@ test.describe("Temporary user", () => {
   test("6L. Should reject invalid username.", async () => {
     for (let i = 0; i < 100; i++) {
       await userPage
-        .getByLabel("Username *")
+        .getByTestId("username-input")
         .fill(mockInvalid.username().toLowerCase());
 
-      await expect(
-        userPage.getByText("Invalid username. Only lower")
-      ).toBeVisible();
+      await expect(userPage.getByTestId("username-error-text")).toBeVisible();
       await expect(userPage.getByTestId("proceed-button")).toBeDisabled();
     }
   });

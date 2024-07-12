@@ -44,7 +44,7 @@ test("7H. Should submit a proposal as governance action", async ({
 
   await userPage.getByTestId("submit-as-GA-button").click();
 
-  await userPage.click("input#submission-checkbox"); // BUG missing test id
+  await userPage.getByTestId("agree-checkbox").click();
   proposalSubmissionPage.continueBtn.click();
 
   await proposalSubmissionPage.fillUpValidMetadata();

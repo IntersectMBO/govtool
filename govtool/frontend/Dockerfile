@@ -9,7 +9,7 @@ ARG NPMRC_TOKEN
 ARG VITE_USERSNAP_SPACE_API_KEY
 ARG VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED='false'
 
-ENV NODE_OPTIONS=--max_old_space_size=4096
+ENV NODE_OPTIONS=--max_old_space_size=8192
 WORKDIR /src
 
 # Set npm configuration settings using environment variables

@@ -1,40 +1,27 @@
 import path from "path";
-import {
-  defineConfig as defineViteConfig,
-  mergeConfig,
-  transformWithEsbuild,
-} from "vite";
+import { defineConfig as defineViteConfig, mergeConfig } from "vite";
 import { defineConfig as defineVitestConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
+import babel from "vite-plugin-babel";
 
 // https://vitejs.dev/config/
 const viteConfig = defineViteConfig({
   plugins: [
-    {
-      name: "jsx-in-js-transformer",
-      async transform(code, id) {
-        if (!id.match(/.*\.js$/)) return null;
-
-        // Use the exposed transform from vite, instead of directly
-        // transforming with esbuild
-        return transformWithEsbuild(code, id, {
-          loader: "jsx",
-          jsx: "automatic",
-        });
-      },
-    },
     react(),
+    // Transpile @intersect.mbo packages as they provides jsx in js which is not supported in vite.
+    babel({
+      include: [
+        "node_modules/@intersect.mbo/**/*.js",
+        "node_modules/@intersect.mbo/**/*.jsx",
+      ],
+      exclude: /node_modules\/@intersect\.mbo\/.*\/node_modules\/.*/, // Exclude nested node_modules
+      babelConfig: {
+        presets: ["@babel/preset-react"],
+      },
+    }),
   ],
   cacheDir: ".vite",
-  optimizeDeps: {
-    force: true,
-    include: ["@intersect.mbo/**/*"],
-    esbuildOptions: {
-      loader: {
-        ".js": "jsx",
-      },
-    },
-  },
+  // Required for the @intersect.mbo packages as they uses the .env from process which is not supported in vite.
   define: {
     "process.env": {},
   },

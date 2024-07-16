@@ -10,8 +10,8 @@ include config.mk
 .DEFAULT_GOAL := info
 
 # image tags
-cardano_node_image_tag := 8.11.0-sancho
-cardano_db_sync_image_tag := sancho-4-3-0-docker
+cardano_node_image_tag := 9.0.0-sancho
+cardano_db_sync_image_tag := sancho-5.1.0
 
 .PHONY: all
 all: deploy-stack notify

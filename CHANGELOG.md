@@ -107,6 +107,7 @@ changes.
 - Fix app crash on voting on the GA without the connected wallet before [Issue 1313](https://github.com/IntersectMBO/govtool/issues/1313)
 - Fix the navigation to Home from Proposal pillar on disconnected wallet [Issue 1355](https://github.com/IntersectMBO/govtool/issues/1355)
 - Fix navigation over Proposal discussion forum pillar [Issue 1436](https://github.com/IntersectMBO/govtool/issues/1436)
+- Fix building the frontend image [Issue 1583](https://github.com/IntersectMBO/govtool/issues/1583)
 
 ### Changed
 

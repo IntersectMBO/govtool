@@ -25,7 +25,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@emurgo/cardano-serialization-lib-asmjs": "12.0.0-alpha.29",
+    "@emurgo/cardano-serialization-lib-asmjs": "12.0.0-beta.2",
     "@hookform/resolvers": "^3.3.1",
     "@intersect.mbo/intersectmbo.org-icons-set": "^1.0.8",
     "@intersect.mbo/pdf-ui": "^0.2.9",

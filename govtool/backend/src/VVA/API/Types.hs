@@ -46,8 +46,7 @@ import           Database.PostgreSQL.Simple (Connection)
 import           GHC.Exts                   (toList)
 import           GHC.Generics
 
-import           Servant.API                (FromHttpApiData, parseQueryParam,
-                                             parseUrlPiece)
+import           Servant.API                (FromHttpApiData, parseQueryParam, parseUrlPiece)
 
 import           Text.Read                  (readMaybe)
 
@@ -112,26 +111,24 @@ instance ToSchema AnyValue where
         & example
           ?~ toJSON exampleAnyValue
 
-data MetadataValidationStatus
-  = IncorrectFormat
-  | IncorrectJSONLD
-  | IncorrectHash
-  | UrlNotFound
-  deriving (Show, Eq)
+data MetadataValidationStatus = IncorrectFormat | IncorrectJSONLD | IncorrectHash | UrlNotFound deriving
+    ( Eq
+    , Show
+    )
 
 instance ToJSON MetadataValidationStatus where
   toJSON IncorrectFormat = "INCORRECT_FORMTAT"
   toJSON IncorrectJSONLD = "INVALID_JSONLD"
-  toJSON IncorrectHash = "INVALID_HASH"
-  toJSON UrlNotFound = "URL_NOT_FOUND"
+  toJSON IncorrectHash   = "INVALID_HASH"
+  toJSON UrlNotFound     = "URL_NOT_FOUND"
 
 instance FromJSON MetadataValidationStatus where
   parseJSON (String s) = case s of
     "INCORRECT_FORMTAT" -> pure IncorrectFormat
-    "INVALID_JSONLD" -> pure IncorrectJSONLD
-    "INVALID_HASH" -> pure IncorrectHash
-    "URL_NOT_FOUND" -> pure UrlNotFound
-    _ -> fail "Invalid MetadataValidationStatus"
+    "INVALID_JSONLD"    -> pure IncorrectJSONLD
+    "INVALID_HASH"      -> pure IncorrectHash
+    "URL_NOT_FOUND"     -> pure UrlNotFound
+    _                   -> fail "Invalid MetadataValidationStatus"
   parseJSON _ = fail "Invalid MetadataValidationStatus"
 
 instance ToSchema MetadataValidationStatus where
@@ -168,7 +165,7 @@ instance ToSchema InternalMetadataValidationResponse where
 data MetadataValidationResponse
   = MetadataValidationResponse
       { metadataValidationResponseStatus :: Maybe Text
-      , metadataValidationResponseValid :: Bool
+      , metadataValidationResponseValid  :: Bool
       }
   deriving (Generic, Show)
 
@@ -189,7 +186,7 @@ instance ToSchema MetadataValidationResponse where
 
 data MetadataValidationParams
   = MetadataValidationParams
-      { metadataValidationParamsUrl :: Text
+      { metadataValidationParamsUrl  :: Text
       , metadataValidationParamsHash :: HexText
       }
   deriving (Generic, Show)
@@ -302,19 +299,11 @@ instance ToParamSchema GovernanceActionType where
       & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [GovernanceActionType])
 
 
-data DRepSortMode = VotingPower | RegistrationDate | Status
-   deriving
-    ( Bounded
-    , Enum
-    , Eq
-    , Generic
-    , Read
-    , Show
-    )
+data DRepSortMode = VotingPower | RegistrationDate | Status deriving (Bounded, Enum, Eq, Generic, Read, Show)
 
 instance FromJSON DRepSortMode where
   parseJSON (Aeson.String dRepSortMode) = pure $ fromJust $ readMaybe (Text.unpack dRepSortMode)
-  parseJSON _ = fail ""
+  parseJSON _                           = fail ""
 
 instance ToJSON DRepSortMode where
   toJSON x = Aeson.String $ Text.pack $ show x
@@ -769,7 +758,7 @@ instance ToSchema DRepHash where
           ?~ toJSON exampleDrepHash
 
 
-data DRepStatus = Active | Inactive | Retired deriving (Generic, Show, Eq, Ord, Enum, Bounded, Read)
+data DRepStatus = Active | Inactive | Retired deriving (Bounded, Enum, Eq, Generic, Ord, Read, Show)
 
 -- ToJSON instance for DRepStatus
 instance ToJSON DRepStatus where
@@ -925,9 +914,9 @@ instance ToSchema ListDRepsResponse where
 
 data DelegationResponse
   = DelegationResponse
-      { delegationResponseDRepHash       :: Maybe HexText
-      , delegationResponseDRepView       :: Text
-      , delegationResponseTxHash         :: HexText
+      { delegationResponseDRepHash :: Maybe HexText
+      , delegationResponseDRepView :: Text
+      , delegationResponseTxHash   :: HexText
       }
 deriveJSON (jsonOptions "delegationResponse") ''DelegationResponse
 

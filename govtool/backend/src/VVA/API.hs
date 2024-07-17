@@ -8,42 +8,42 @@
 
 module VVA.API where
 
-import Control.Concurrent.QSem (waitQSem, signalQSem)
-import Control.Concurrent.Async (mapConcurrently)
-import           Control.Exception    (throw, throwIO)
-import           Control.Monad.Except (throwError, runExceptT)
+import           Control.Concurrent.Async (mapConcurrently)
+import           Control.Concurrent.QSem  (signalQSem, waitQSem)
+import           Control.Exception        (throw, throwIO)
+import           Control.Monad.Except     (runExceptT, throwError)
 import           Control.Monad.Reader
-import           Data.Aeson           (Result(Error, Success), fromJSON)
-import           Data.Bool            (Bool)
-import           Data.List            (sortOn)
-import qualified Data.Map             as Map
-import           Data.Maybe           (Maybe (Nothing), fromMaybe, catMaybes)
-import           Data.Ord             (Down (..))
-import           Data.Text            hiding (drop, elem, filter, length, map,
-                                       null, take, any)
-import qualified Data.Text            as Text
 
-import           Numeric.Natural      (Natural)
+import           Data.Aeson               (Result (Error, Success), fromJSON)
+import           Data.Bool                (Bool)
+import           Data.List                (sortOn)
+import qualified Data.Map                 as Map
+import           Data.Maybe               (Maybe (Nothing), catMaybes, fromMaybe)
+import           Data.Ord                 (Down (..))
+import           Data.Text                hiding (any, drop, elem, filter, length, map, null, take)
+import qualified Data.Text                as Text
+
+import           Numeric.Natural          (Natural)
 
 import           Servant.API
 import           Servant.Server
 
-import           Text.Read            (readMaybe)
+import           Text.Read                (readMaybe)
 
-import qualified VVA.AdaHolder        as AdaHolder
+import qualified VVA.AdaHolder            as AdaHolder
 import           VVA.API.Types
-import           VVA.Cache            (cacheRequest)
+import           VVA.Cache                (cacheRequest)
 import           VVA.Config
-import qualified VVA.DRep             as DRep
-import qualified VVA.Epoch            as Epoch
-import           VVA.Network          as Network
-import qualified VVA.Proposal         as Proposal
-import qualified VVA.Transaction      as Transaction
-import qualified VVA.Types            as Types
-import           VVA.Types            (App, AppEnv (..),
-                                       AppError (CriticalError, ValidationError, InternalError),
-                                       CacheEnv (..))
-import qualified VVA.Metadata         as Metadata
+import qualified VVA.DRep                 as DRep
+import qualified VVA.Epoch                as Epoch
+import qualified VVA.Metadata             as Metadata
+import           VVA.Network              as Network
+import qualified VVA.Proposal             as Proposal
+import qualified VVA.Transaction          as Transaction
+import qualified VVA.Types                as Types
+import           VVA.Types                (App, AppEnv (..),
+                                           AppError (CriticalError, InternalError, ValidationError),
+                                           CacheEnv (..))
 
 type VVAApi =
          "drep" :> "list"
@@ -230,13 +230,13 @@ proposalToResponse Types.Proposal {..} Types.MetadataValidationResult{..} =
   }
   where
    getTitle p Nothing = p
-   getTitle _ m = Types.proposalMetadataTitle <$> m
+   getTitle _ m       = Types.proposalMetadataTitle <$> m
    getAbstract p Nothing = p
-   getAbstract _ m = Types.proposalMetadataAbstract <$> m
+   getAbstract _ m       = Types.proposalMetadataAbstract <$> m
    getMotivation p Nothing = p
-   getMotivation _ m = Types.proposalMetadataMotivation <$> m
+   getMotivation _ m       = Types.proposalMetadataMotivation <$> m
    getRationale p Nothing = p
-   getRationale _ m = Types.proposalMetadataRationale <$> m
+   getRationale _ m       = Types.proposalMetadataRationale <$> m
    -- TODO: convert aeson references to [Text] from database
    --getReferences p Nothing = p
    getReferences _ = maybe [] Types.proposalMetadataReferences

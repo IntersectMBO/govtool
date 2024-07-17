@@ -65,6 +65,7 @@ import           System.Log.Raven                       (initRaven, register,
 import           System.Log.Raven.Transport.HttpConduit (sendRecord)
 import           System.Log.Raven.Types                 (SentryLevel (Error),
                                                          SentryRecord (..))
+import           System.TimeManager                     (TimeoutThread (..))
 
 import           VVA.API
 import           VVA.API.Types
@@ -143,8 +144,14 @@ exceptionHandler :: VVAConfig -> Maybe Request -> SomeException -> IO ()
 exceptionHandler vvaConfig mRequest exception = do
   print mRequest
   print exception
-  guard (show exception /= "Thread killed by timeout manager")
-  guard (show exception /= "Warp: Client closed connection prematurely")
+  let isNotTimeoutThread x = case fromException x of
+        Just TimeoutThread -> False
+        _ -> True
+      isNotConnectionClosedByPeer x = case fromException x of
+        Just ConnectionClosedByPeer -> False
+        _ -> True
+  guard . isNotTimeoutThread $ exception
+  guard . isNotConnectionClosedByPeer $ exception
   let env = sentryEnv vvaConfig
   sentryService <-
     initRaven

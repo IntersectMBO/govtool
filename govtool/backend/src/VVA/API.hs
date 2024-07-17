@@ -170,11 +170,10 @@ drepList mSearchQuery statuses mSortMode mPage mPageSize = do
       drepRegistrationToDrep d
       <$> do
          waitQSem qsem
-         r <- (either throwIO return =<< (runExceptT
-                    $ flip runReaderT appEnv (validateDRepMetadata
+         r <- either throwIO return =<< runExceptT (runReaderT (validateDRepMetadata
                       (MetadataValidationParams
                         (fromMaybe "" dRepRegistrationUrl)
-                        $ HexText (fromMaybe "" dRepRegistrationDataHash)))))
+                        $ HexText (fromMaybe "" dRepRegistrationDataHash))) appEnv)
          signalQSem qsem
          return r)
     $ sortDReps $ filterDRepsByQuery $ filterDRepsByStatus dreps
@@ -240,7 +239,7 @@ proposalToResponse Types.Proposal {..} Types.MetadataValidationResult{..} =
    getRationale _ m = Types.proposalMetadataRationale <$> m
    -- TODO: convert aeson references to [Text] from database
    --getReferences p Nothing = p
-   getReferences _ m = maybe [] Types.proposalMetadataReferences m
+   getReferences _ = maybe [] Types.proposalMetadataReferences
 
 voteToResponse :: Types.Vote -> VoteParams
 voteToResponse Types.Vote {..} =
@@ -272,8 +271,7 @@ mapSortAndFilterProposals selectedTypes sortMode proposals = do
           (\proposal@Types.Proposal {proposalUrl, proposalDocHash} ->
                 do
                   waitQSem qsem
-                  r <- either throwIO return =<< (runExceptT
-                    $ flip runReaderT appEnv (proposalToResponse proposal <$> validateProposalMetadata (MetadataValidationParams proposalUrl $ HexText proposalDocHash)))
+                  r <- either throwIO return =<< runExceptT (runReaderT (proposalToResponse proposal <$> validateProposalMetadata (MetadataValidationParams proposalUrl $ HexText proposalDocHash)) appEnv)
                   signalQSem qsem
                   return r)
           proposals

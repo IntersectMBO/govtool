@@ -12,7 +12,8 @@ import           Control.Exception          (try, Exception)
 import           Data.Typeable              (Typeable)
 import           Data.Vector                (toList)
 import           Data.Aeson.KeyMap          (lookup)
-import           Data.Aeson                 (Value(..), decode, encode, object, (.=))
+import Data.Aeson
+    ( Value(..), decode, encode, object, (.=), encode, object, (.=) )
 import           Data.Maybe                 (fromJust)
 import           Data.ByteString            (ByteString)
 import           Data.FileEmbed             (embedFile)
@@ -29,7 +30,6 @@ import           VVA.Pool                   (ConnectionPool, withPool)
 import           VVA.Types
 import Network.HTTP.Client
 import Network.HTTP.Client.TLS
-import Data.Aeson (encode, object, (.=))
 
 validateMetadata
     :: (Has VVAConfig r, Has Manager r, MonadReader r m, MonadIO m, MonadError AppError m)
@@ -42,22 +42,20 @@ validateMetadata url hash standard = do
     metadataHost <- getMetadataValidationHost
     metadataPort <- getMetadataValidationPort
     manager <- asks getter
-    case metadataEnabled of
-      True -> do
-        let requestBody = encode $ object (["url" .= unpack url, "hash" .= unpack hash] ++ maybe [] (\x -> ["standard" .= unpack x]) standard)
-        initialRequest <- liftIO $ parseRequest (unpack metadataHost <> ":" <> show metadataPort <> "/validate")
-        let request = initialRequest
-                { method = "POST"
-                , requestBody = RequestBodyLBS requestBody
-                , requestHeaders = [("Content-Type", "application/json")]
-                }
-        response <- liftIO $ try $ httpLbs request manager
-        case response of
-            Left (e :: HttpException) -> return $ Left (pack $ show e)
-            Right r -> case decode $ responseBody r of
-                Nothing -> throwError $ InternalError "Failed to validate metadata"
-                Just x -> return $ Right x
-      False ->  return $ Right ""
+    (if metadataEnabled then (do
+      let requestBody = encode $ object (["url" .= unpack url, "hash" .= unpack hash] ++ maybe [] (\x -> ["standard" .= unpack x]) standard)
+      initialRequest <- liftIO $ parseRequest (unpack metadataHost <> ":" <> show metadataPort <> "/validate")
+      let request = initialRequest
+              { method = "POST"
+              , requestBody = RequestBodyLBS requestBody
+              , requestHeaders = [("Content-Type", "application/json")]
+              }
+      response <- liftIO $ try $ httpLbs request manager
+      case response of
+          Left (e :: HttpException) -> return $ Left (pack $ show e)
+          Right r -> case decode $ responseBody r of
+              Nothing -> throwError $ InternalError "Failed to validate metadata"
+              Just x -> return $ Right x) else return $ Right "")
 
 getProposalMetadataValidationResult ::
     (Has ConnectionPool r, Has Manager r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>

@@ -73,8 +73,8 @@ test.describe("Proposal created logged in state", () => {
 
 test.describe("Proposal created with poll enabled (user auth)", () => {
   test.use({
-    storageState: ".auth/user01.json",
-    wallet: user01Wallet,
+    storageState: ".auth/proposal02.json",
+    wallet: proposal02Wallet,
     pollEnabled: true,
   });
 
@@ -84,8 +84,6 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
     await proposalDiscussionDetailsPage.goto(proposalId);
     await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
-
-    await proposalDiscussionDetailsPage.closeUsernamePrompt();
   });
 
   test("8Q. Should vote on poll.", async ({ page }) => {

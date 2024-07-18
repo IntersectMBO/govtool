@@ -20,7 +20,7 @@ changes.
 
 ### Changed
 
--
+- Set Proposal Discussion Forum Pillar enabled by default [Issue 1501](https://github.com/IntersectMBO/govtool/issues/1501)
 
 ## [sancho-v1.0.9](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.9) 2024-07-16
 

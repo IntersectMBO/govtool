@@ -56,6 +56,7 @@ $(docker_compose_file): $(template_config_dir)/docker-compose.yml.tpl $(target_c
 		-e "s|<DOCKER_USER>|$(docker_user)|g" \
 		-e "s|<REPO_URL>|$(repo_url)|g" \
 		-e "s|<CSP_ALLOWED_HOSTS>|$${CSP_ALLOWED_HOSTS}|g" \
+		-e "s|<PDF_API_URL>|$${PDF_API_URL}|g" \
 		$< > $@
 
 $(cardano_config_files): $(target_config_dir)/cardano-node/

@@ -4,6 +4,8 @@
 , VITE_IS_DEV ? "true"
 , VITE_GTM_ID ? ""
 , VITE_SENTRY_DSN ? ""
+, VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED ? ""
+, VITE_PDF_API_URL ? ""
 , CARDANO_NETWORK ? "sanchonet"
 }:
 let
@@ -29,7 +31,7 @@ let
     name = "govtool-website";
     src = frontendSrc;
     buildInputs = [pkgs.yarn nodeModules];
-    inherit VITE_BASE_URL VITE_IS_DEV VITE_GTM_ID VITE_SENTRY_DSN VITE_NETWORK_FLAG;
+    inherit VITE_BASE_URL VITE_IS_DEV VITE_GTM_ID VITE_SENTRY_DSN VITE_NETWORK_FLAG VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED VITE_PDF_API_URL;
     buildPhase = ''
       ln -s ${nodeModules}/libexec/voltaire-voting-app/node_modules node_modules
       yarn build

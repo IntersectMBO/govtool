@@ -2,13 +2,13 @@
 
 module VVA.Pool where
 
-import           Control.Monad.IO.Class     (MonadIO, liftIO)
-import           Control.Monad.Reader       (MonadReader, asks)
+import Control.Monad.IO.Class     (MonadIO, liftIO)
+import Control.Monad.Reader       (MonadReader, asks)
 
-import           Data.Has                   (Has, getter)
-import           Data.Pool                  (Pool, putResource, takeResource)
+import Data.Has                   (Has, getter)
+import Data.Pool                  (Pool, putResource, takeResource)
 
-import           Database.PostgreSQL.Simple (Connection)
+import Database.PostgreSQL.Simple (Connection)
 
 type ConnectionPool = Pool Connection
 

@@ -30,10 +30,8 @@ import qualified Database.PostgreSQL.Simple as SQL
 import           VVA.Config
 import           VVA.Pool                   (ConnectionPool, withPool)
 import qualified VVA.Proposal               as Proposal
-import           VVA.Types                  (AppError, DRepInfo (..),
-                                             DRepRegistration (..),
-                                             DRepStatus (..), DRepType (..),
-                                             Proposal (..), Vote (..))
+import           VVA.Types                  (AppError, DRepInfo (..), DRepRegistration (..), DRepStatus (..),
+                                             DRepType (..), Proposal (..), Vote (..))
 
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
@@ -51,7 +49,7 @@ getVotingPower drepId = withPool $ \conn -> do
       (SQL.query @_ @(SQL.Only Scientific) conn getVotingPowerSql $ SQL.Only drepId)
   case result of
     [SQL.Only votingPower] -> return $ floor votingPower
-    [] -> return 0
+    []                     -> return 0
 
 listDRepsSql :: SQL.Query
 listDRepsSql = sqlFrom $(embedFile "sql/list-dreps.sql")
@@ -71,7 +69,7 @@ listDReps = withPool $ \conn -> do
                                     | d >= 0 && not isActive -> Inactive
     , let latestDeposit' = floor @Scientific latestDeposit :: Integer
     , let drepType | latestDeposit' >= 0 && isNothing url = SoleVoter
-                   | latestDeposit' >= 0 && not (isNothing url) = DRep
+                   | latestDeposit' >= 0 && isJust url = DRep
                    | latestDeposit' < 0 && not latestNonDeregisterVotingAnchorWasNotNull = SoleVoter
                    | latestDeposit' < 0 && latestNonDeregisterVotingAnchorWasNotNull = DRep
                    | Data.Maybe.isJust url = DRep

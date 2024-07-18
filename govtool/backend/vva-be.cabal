@@ -67,6 +67,7 @@ executable vva-be
                     , http-client
                     , http-client-tls
                     , raven-haskell >= 0.1.4.1
+                    , time-manager
 
     hs-source-dirs:   app
     default-language: Haskell2010

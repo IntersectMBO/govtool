@@ -4,7 +4,7 @@ module VVA.CommandLine
     , cmdParser
     ) where
 
-import           Options.Applicative
+import Options.Applicative
 
 data Command = StartApp | ShowConfig deriving (Show)
 

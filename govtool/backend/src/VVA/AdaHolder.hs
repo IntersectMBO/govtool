@@ -42,9 +42,9 @@ getCurrentDelegation ::
 getCurrentDelegation stakeKey = withPool $ \conn -> do
   result <- liftIO $ SQL.query conn getCurrentDelegationSql (SQL.Only stakeKey)
   case result of
-    []                    -> return Nothing
+    []                              -> return Nothing
     [(mDRepHash, dRepView, txHash)] -> return $ Just $ Delegation mDRepHash dRepView txHash
-    _                     -> error ("multiple delegations for stake key: " <> unpack stakeKey)
+    _                               -> error ("multiple delegations for stake key: " <> unpack stakeKey)
 
 getVotingPowerSql :: SQL.Query
 getVotingPowerSql = sqlFrom $(embedFile "sql/get-stake-key-voting-power.sql")

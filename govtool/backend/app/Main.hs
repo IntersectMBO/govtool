@@ -9,9 +9,7 @@
 module Main where
 
 import           Control.Concurrent.QSem                (newQSem)
-import           Control.Exception                      (Exception,
-                                                         SomeException,
-                                                         fromException, throw)
+import           Control.Exception                      (Exception, SomeException, fromException, throw)
 import           Control.Lens.Operators                 ((.~))
 import           Control.Monad
 import           Control.Monad.IO.Class
@@ -25,12 +23,8 @@ import qualified Data.Cache                             as Cache
 import           Data.Function                          ((&))
 import           Data.Has                               (getter)
 import           Data.Monoid                            (mempty)
-import           Data.OpenApi                           (OpenApi,
-                                                         Server (Server),
-                                                         _openApiServers,
-                                                         _serverDescription,
-                                                         _serverUrl,
-                                                         _serverVariables,
+import           Data.OpenApi                           (OpenApi, Server (Server), _openApiServers,
+                                                         _serverDescription, _serverUrl, _serverVariables,
                                                          servers)
 import           Data.Pool                              (createPool)
 import           Data.Proxy
@@ -42,9 +36,10 @@ import qualified Data.Text.IO                           as Text
 import qualified Data.Text.Lazy                         as LazyText
 import qualified Data.Text.Lazy.Encoding                as LazyText
 
-import           Database.PostgreSQL.Simple             (close,
-                                                         connectPostgreSQL)
+import           Database.PostgreSQL.Simple             (close, connectPostgreSQL)
 
+import           Network.HTTP.Client                    hiding (Proxy, Request)
+import           Network.HTTP.Client.TLS
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 import           Network.Wai.Middleware.Cors
@@ -55,26 +50,22 @@ import           Servant
 import           Servant.API.ContentTypes
 import           Servant.OpenApi                        (toOpenApi)
 import qualified Servant.Server                         as Servant
-import           Servant.Swagger.UI                     (SwaggerSchemaUI,
-                                                         swaggerSchemaUIServer)
+import           Servant.Swagger.UI                     (SwaggerSchemaUI, swaggerSchemaUIServer)
 
 import           System.Clock                           (TimeSpec (TimeSpec))
 import           System.IO                              (stderr)
-import           System.Log.Raven                       (initRaven, register,
-                                                         silentFallback)
+import           System.Log.Raven                       (initRaven, register, silentFallback)
 import           System.Log.Raven.Transport.HttpConduit (sendRecord)
-import           System.Log.Raven.Types                 (SentryLevel (Error),
-                                                         SentryRecord (..))
+import           System.Log.Raven.Types                 (SentryLevel (Error), SentryRecord (..))
+import           System.TimeManager                     (TimeoutThread (..))
 
 import           VVA.API
 import           VVA.API.Types
 import           VVA.CommandLine
 import           VVA.Config
 import           VVA.Types                              (AppEnv (..),
-                                                         AppError (CriticalError, NotFoundError, ValidationError, InternalError),
+                                                         AppError (CriticalError, InternalError, NotFoundError, ValidationError),
                                                          CacheEnv (..))
-import Network.HTTP.Client hiding (Proxy, Request)
-import Network.HTTP.Client.TLS
 
 proxyAPI :: Proxy (VVAApi :<|> SwaggerAPI)
 proxyAPI = Proxy
@@ -143,8 +134,14 @@ exceptionHandler :: VVAConfig -> Maybe Request -> SomeException -> IO ()
 exceptionHandler vvaConfig mRequest exception = do
   print mRequest
   print exception
-  guard (show exception /= "Thread killed by timeout manager")
-  guard (show exception /= "Warp: Client closed connection prematurely")
+  let isNotTimeoutThread x = case fromException x of
+        Just TimeoutThread -> False
+        _                  -> True
+      isNotConnectionClosedByPeer x = case fromException x of
+        Just ConnectionClosedByPeer -> False
+        _                           -> True
+  guard . isNotTimeoutThread $ exception
+  guard . isNotConnectionClosedByPeer $ exception
   let env = sentryEnv vvaConfig
   sentryService <-
     initRaven

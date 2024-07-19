@@ -232,7 +232,7 @@ services:
   redis:
     image: docker.io/bitnami/redis:7.2
     ports:
-      - '8094:6379'
+      - '6379:8094'
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     volumes:

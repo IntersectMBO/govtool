@@ -201,9 +201,9 @@ convertConfig VVAConfigInternal {..} =
       metadataValidationPort = vVAConfigInternalMetadataValidationPort,
       metadataValidationMaxConcurrentRequests = vVAConfigInternalMetadataValidationMaxConcurrentRequests,
       redisConfig = RedisConfig
-        { redisHost = redisInternalConfigHost $ vVAConfigInternalRedisConfig,
-          redisPort = redisInternalConfigPort $ vVAConfigInternalRedisConfig,
-          redisPassword = redisInternalConfigPassword $ vVAConfigInternalRedisConfig
+        { redisHost = redisInternalConfigHost vVAConfigInternalRedisConfig,
+          redisPort = redisInternalConfigPort vVAConfigInternalRedisConfig,
+          redisPassword = redisInternalConfigPassword vVAConfigInternalRedisConfig
         }
     }
 

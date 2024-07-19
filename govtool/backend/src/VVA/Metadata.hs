@@ -7,25 +7,26 @@
 
 module VVA.Metadata where
 
+import           Control.Concurrent         (threadDelay)
 import           Control.Exception          (Exception, try)
-import qualified Database.Redis as Redis
-import Control.Concurrent (threadDelay)
-import           Prelude hiding (lookup)
 import           Control.Monad.Except       (MonadError, throwError)
 import           Control.Monad.Reader
 
-import           Data.Aeson                 (Value (..), decode, encode, object, (.=))
+import           Data.Aeson                 ( Value(..), decode, encode, object, (.=), encode, object, (.=) )
 import           Data.Aeson.KeyMap          (lookup)
 import           Data.ByteString            (ByteString)
 import           Data.FileEmbed             (embedFile)
 import           Data.Has                   (Has, getter)
+import           Data.List                  (partition)
 import           Data.Maybe                 (fromJust)
+import           Data.Scientific
 import           Data.String                (fromString)
 import           Data.Text                  (Text, pack, unpack)
-import qualified Data.Text.Encoding         as Text
 import           Data.Time.Clock
-import           Data.List                  (partition)
+import qualified Data.Text.Encoding         as Text
+
 import qualified Database.PostgreSQL.Simple as SQL
+import qualified Database.Redis as Redis
 
 import           Network.HTTP.Client
 import           Network.HTTP.Client.TLS
@@ -35,10 +36,6 @@ import           Prelude                    hiding (lookup)
 import           VVA.Config
 import           VVA.Pool                   (ConnectionPool, withPool)
 import           VVA.Types
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
-import Data.Aeson (encode, object, (.=))
-import           Data.Scientific
 
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs

@@ -49,6 +49,7 @@ export const ProposalDiscussionPillar = () => {
           }
         >
           <ProposalDiscussion
+            pdfApiUrl={import.meta.env.VITE_PDF_API_URL}
             walletAPI={{
               ...context,
               ...walletApi,

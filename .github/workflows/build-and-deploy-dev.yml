@@ -8,7 +8,7 @@ on:
         description: "Enable proposal discussion forum"
         required: true
         type: choice
-        default: "disabled"
+        default: "enabled"
         options:
           - "enabled"
           - "disabled"

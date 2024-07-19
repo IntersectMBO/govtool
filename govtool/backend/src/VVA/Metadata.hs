@@ -12,7 +12,7 @@ import           Control.Exception          (Exception, try)
 import           Control.Monad.Except       (MonadError, throwError)
 import           Control.Monad.Reader
 
-import           Data.Aeson                 ( Value(..), decode, encode, object, (.=), encode, object, (.=) )
+import           Data.Aeson                 ( Value(..), decode, encode, object, (.=), FromJSON )
 import           Data.Aeson.KeyMap          (lookup)
 import           Data.ByteString            (ByteString)
 import           Data.FileEmbed             (embedFile)

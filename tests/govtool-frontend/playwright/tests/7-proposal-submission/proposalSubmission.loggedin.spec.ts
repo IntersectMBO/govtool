@@ -375,7 +375,8 @@ test.describe("Temporary proposal users", () => {
 
     test.beforeEach(async () => {
       proposalSubmissionPage = new ProposalSubmissionPage(userPage);
-      await proposalSubmissionPage.goto();
+      await proposalSubmissionPage.proposalCreateBtn.click();
+      await proposalSubmissionPage.continueBtn.click();
 
       await proposalSubmissionPage.addLinkBtn.click();
       proposalFormValue =

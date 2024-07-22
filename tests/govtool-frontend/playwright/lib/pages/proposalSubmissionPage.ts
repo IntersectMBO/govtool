@@ -150,21 +150,30 @@ export default class ProposalSubmissionPage {
   }
 
   async getAllDrafts() {
-    await this.page.waitForTimeout(2_000); // wait until draft is loaded
+    await expect(
+      this.page.locator('[data-testid^="draft-"][data-testid$="-card"]')
+    ).toBeVisible({ timeout: 10_000 }); // slow rendering
+
     return await this.page
       .locator('[data-testid^="draft-"][data-testid$="-card"]')
       .all();
   }
 
   async getFirstDraft() {
-    await this.page.waitForTimeout(2_000); // wait until draft is loaded
+    await expect(
+      this.page.locator('[data-testid^="draft-"][data-testid$="-card"]')
+    ).toBeVisible({ timeout: 10_000 }); // slow rendering
+
     return this.page
       .locator('[data-testid^="draft-"][data-testid$="-card"]')
       .first();
   }
 
   async viewFirstDraft() {
-    await this.page.waitForTimeout(2_000); // wait until draft is loaded
+    await expect(
+      this.page.locator('[data-testid^="draft-"][data-testid$="-card"]')
+    ).toBeVisible({ timeout: 10_000 }); // slow rendering
+
     return await this.page
       .locator('[data-testid^="draft-"][data-testid$="-start-editing"]')
       .first()

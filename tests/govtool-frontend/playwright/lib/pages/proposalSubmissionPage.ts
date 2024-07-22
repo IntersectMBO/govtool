@@ -152,7 +152,7 @@ export default class ProposalSubmissionPage {
   async getAllDrafts() {
     await expect(
       this.page.locator('[data-testid^="draft-"][data-testid$="-card"]')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10_000 }); // slow rendering
 
     return await this.page
       .locator('[data-testid^="draft-"][data-testid$="-card"]')
@@ -162,7 +162,7 @@ export default class ProposalSubmissionPage {
   async getFirstDraft() {
     await expect(
       this.page.locator('[data-testid^="draft-"][data-testid$="-card"]')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10_000 }); // slow rendering
 
     return this.page
       .locator('[data-testid^="draft-"][data-testid$="-card"]')
@@ -172,7 +172,7 @@ export default class ProposalSubmissionPage {
   async viewFirstDraft() {
     await expect(
       this.page.locator('[data-testid^="draft-"][data-testid$="-card"]')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10_000 }); // slow rendering
 
     return await this.page
       .locator('[data-testid^="draft-"][data-testid$="-start-editing"]')

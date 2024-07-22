@@ -118,8 +118,8 @@ treefmt.toml
 local/
 
 # used by haskell
-govtool/backend/dist-newstyle/
-govtool/backend/.stack-work/
+dist-newstyle/
+.stack-work/
 
 # target environment config dir
 scripts/govtool/config/target

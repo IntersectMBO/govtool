@@ -164,6 +164,10 @@ services:
     volumes:
       - db-sync-data:/var/lib/cexplorer
       - node-ipc:/node-ipc
+      - /home/<DOCKER_USER>/config/cardano-node:/configuration
+    command:
+      - "--config /configuration/db-sync-config.yaml"
+      - "--socket-path /node-ipc/node.socket"
     restart: always
     logging: *logging
 

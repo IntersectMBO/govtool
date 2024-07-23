@@ -16,6 +16,7 @@ changes.
 - Add PDF_API_URL to the frontend config [Issue 1575](https://github.com/IntersectMBO/govtool/issues/1575)
 - Provide DB-Sync Postgres envs to the backend config
 - Add redirects to cards on Home after user connects  [Issue 1442](https://github.com/IntersectMBO/govtool/issues/1442)
+- Add support for CIP-100 for context to Governance Action Vote [Issue 1582](https://github.com/IntersectMBO/govtool/issues/1582)
 
 ### Fixed
 

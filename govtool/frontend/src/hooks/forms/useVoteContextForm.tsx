@@ -2,9 +2,16 @@ import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
 import * as Sentry from "@sentry/react";
+import { NodeObject } from "jsonld";
 
-import { downloadTextFile } from "@utils";
+import {
+  canonizeJSON,
+  downloadJson,
+  generateJsonld,
+  generateMetadataBody,
+} from "@utils";
 import { MetadataValidationStatus } from "@models";
+import { CIP_100, CIP_100_CONTEXT } from "@/consts";
 
 import { useValidateMutation } from "../mutations";
 
@@ -21,6 +28,7 @@ export const useVoteContextForm = (
 ) => {
   const { validateMetadata } = useValidateMutation();
   const [hash, setHash] = useState<string | null>(null);
+  const [json, setJson] = useState<NodeObject | null>(null);
 
   const {
     control,
@@ -35,20 +43,29 @@ export const useVoteContextForm = (
 
   const generateMetadata = useCallback(async () => {
     const { voteContextText } = getValues();
+    const body = generateMetadataBody({
+      data: {
+        comment: voteContextText,
+      },
+      acceptedKeys: ["comment"],
+      standardReference: CIP_100,
+    });
+    const jsonld = await generateJsonld(body, CIP_100_CONTEXT, CIP_100);
 
-    const canonizedJsonHash = blake2bHex(voteContextText, undefined, 32);
+    const canonizedJson = await canonizeJSON(jsonld);
+    const canonizedJsonHash = blake2bHex(canonizedJson, undefined, 32);
 
     // That allows to validate metadata hash
     setHash(canonizedJsonHash);
+    setJson(jsonld);
 
-    return voteContextText;
+    return jsonld;
   }, [getValues]);
 
-  const onClickDownloadFile = useCallback(() => {
-    const { voteContextText } = getValues();
-    if (!voteContextText) return;
-    downloadTextFile(voteContextText, "Vote_Context");
-  }, [getValues]);
+  const onClickDownloadJson = () => {
+    if (!json) return;
+    downloadJson(json, "Vote_Context");
+  };
 
   const validateHash = useCallback(
     async (url: string, localHash: string | null) => {
@@ -102,7 +119,7 @@ export const useVoteContextForm = (
     generateMetadata,
     getValues,
     isValid,
-    onClickDownloadFile,
+    onClickDownloadJson,
     register,
     reset,
     setValue,

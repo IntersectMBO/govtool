@@ -1,9 +1,10 @@
 import {
   proposal01Wallet,
-  proposal02Wallet,
   proposal03Wallet,
   proposal04Wallet,
   proposal05Wallet,
+  proposal06Wallet,
+  proposal07Wallet,
 } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
@@ -270,8 +271,8 @@ test.describe("Proposal created logged state", () => {
 test.describe("Info Proposal Draft", () => {
   test("7C. Should list unfinished Draft ", async ({ browser }) => {
     const page = await createNewPageWithWallet(browser, {
-      storageState: ".auth/proposal01.json",
-      wallet: proposal01Wallet,
+      storageState: ".auth/proposal03.json",
+      wallet: proposal03Wallet,
     });
     const proposalSubmissionPage = new ProposalSubmissionPage(page);
 
@@ -283,8 +284,8 @@ test.describe("Info Proposal Draft", () => {
 
   test("7L. Should save proposal as a draft", async ({ browser }) => {
     const page = await createNewPageWithWallet(browser, {
-      storageState: ".auth/proposal02.json",
-      wallet: proposal02Wallet,
+      storageState: ".auth/proposal04.json",
+      wallet: proposal04Wallet,
     });
 
     const proposalSubmissionPage = new ProposalSubmissionPage(page);
@@ -300,8 +301,8 @@ test.describe("Info Proposal Draft", () => {
 
   test("7M_1. Should edit a info proposal draft", async ({ browser }) => {
     const page = await createNewPageWithWallet(browser, {
-      storageState: ".auth/proposal03.json",
-      wallet: proposal03Wallet,
+      storageState: ".auth/proposal05.json",
+      wallet: proposal05Wallet,
     });
 
     const proposalSubmissionPage = new ProposalSubmissionPage(page);
@@ -334,8 +335,8 @@ test.describe("Info Proposal Draft", () => {
 
   test("7N. Should submit a draft proposal", async ({ browser }) => {
     const page = await createNewPageWithWallet(browser, {
-      storageState: ".auth/proposal04.json",
-      wallet: proposal04Wallet,
+      storageState: ".auth/proposal06.json",
+      wallet: proposal06Wallet,
     });
 
     const proposalSubmissionPage = new ProposalSubmissionPage(page);
@@ -363,7 +364,7 @@ test.describe("Info Proposal Draft", () => {
 });
 
 test.describe("Treasury Proposal Draft", () => {
-  test.use({ storageState: ".auth/proposal05.json", wallet: proposal05Wallet });
+  test.use({ storageState: ".auth/proposal07.json", wallet: proposal07Wallet });
 
   test("7M_2. Should edit a treasury proposal draft", async ({ page }) => {
     const proposalSubmissionPage = new ProposalSubmissionPage(page);

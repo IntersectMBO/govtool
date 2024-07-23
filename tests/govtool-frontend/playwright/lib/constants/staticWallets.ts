@@ -22,6 +22,8 @@ export const proposal02Wallet: StaticWallet = staticWallets[11];
 export const proposal03Wallet: StaticWallet = staticWallets[12];
 export const proposal04Wallet: StaticWallet = staticWallets[13];
 export const proposal05Wallet: StaticWallet = staticWallets[14];
+export const proposal06Wallet: StaticWallet = staticWallets[15];
+export const proposal07Wallet: StaticWallet = staticWallets[16];
 
 export const adaHolderWallets = [
   adaHolder01Wallet,

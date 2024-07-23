@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix `InputSetEmptyUTxO` error
 
 ### Changed
 

@@ -26,9 +26,7 @@ test.describe("Proposal created logged state", () => {
     await page.goto("/");
     await page.getByTestId("propose-governance-actions-button").click();
 
-    await expect(
-      page.getByText("Create a Governance Action", { exact: true })
-    ).toBeVisible();
+    await expect(page.getByText(/proposal/i)).toHaveCount(2);
   });
 
   test.describe("Accept valid data", () => {

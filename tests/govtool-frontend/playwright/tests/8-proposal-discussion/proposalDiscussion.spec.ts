@@ -88,7 +88,9 @@ test("8C. Should search the list of proposed governance actions.", async ({
   const proposalCards = await proposalDiscussionPage.getAllProposals();
 
   for (const proposalCard of proposalCards) {
-    await expect(proposalCard.getByText(proposalName)).toBeVisible();
+    await expect(
+      proposalCard.locator('[data-testid^="proposal-"][data-testid$="-title"]')
+    ).toHaveText(proposalName);
   }
 });
 

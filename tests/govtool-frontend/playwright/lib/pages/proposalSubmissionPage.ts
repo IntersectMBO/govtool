@@ -1,4 +1,5 @@
 import environments from "@constants/environments";
+import { proposal04Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { ShelleyWallet } from "@helpers/crypto";
 import { expectWithInfo } from "@helpers/exceptionHandler";
@@ -375,5 +376,23 @@ export default class ProposalSubmissionPage {
 
     const currentPageUrl = this.page.url();
     return extractProposalIdFromUrl(currentPageUrl);
+  }
+
+  async createDraft(proposalType: ProposalType) {
+    await this.goto();
+    await this.addLinkBtn.click();
+
+    const proposalFormValue = this.generateValidProposalFormFields(
+      proposalType,
+      true,
+      ShelleyWallet.fromJson(proposal04Wallet).rewardAddressBech32(0)
+    );
+    await this.fillupForm(proposalFormValue);
+
+    await this.saveDraftBtn.click();
+    await this.closeDraftSuccessModalBtn.click();
+
+    await this.proposalCreateBtn.click();
+    return { proposalFormValue };
   }
 }

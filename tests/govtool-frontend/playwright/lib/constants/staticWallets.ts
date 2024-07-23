@@ -19,6 +19,9 @@ export const user01Wallet: StaticWallet = staticWallets[5];
 // Username is already set
 export const proposal01Wallet: StaticWallet = staticWallets[10];
 export const proposal02Wallet: StaticWallet = staticWallets[11];
+export const proposal03Wallet: StaticWallet = staticWallets[12];
+export const proposal04Wallet: StaticWallet = staticWallets[13];
+export const proposal05Wallet: StaticWallet = staticWallets[14];
 
 export const adaHolderWallets = [
   adaHolder01Wallet,

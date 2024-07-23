@@ -22,6 +22,7 @@ changes.
 
 - Fix querying metadata-validation service from haskell backend [Issue 1612](https://github.com/IntersectMBO/govtool/issues/1612)
 - Fix thread killed by timeout manager [Issue 1417](https://github.com/IntersectMBO/govtool/issues/1417)
+- Fix `InputSetEmptyUTxO` error
 
 ### Changed
 

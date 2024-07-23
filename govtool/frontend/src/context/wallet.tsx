@@ -40,6 +40,7 @@ import {
   GovernanceAction,
   TreasuryWithdrawals,
   TreasuryWithdrawalsAction,
+  ChangeConfig,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 import { Buffer } from "buffer";
 import { useNavigate } from "react-router-dom";
@@ -524,12 +525,21 @@ const CardanoProvider = (props: Props) => {
         const txUnspentOutputs = await getTxUnspentOutputs(utxos);
 
         // Use UTxO selection strategy 3
+        const changeConfig = ChangeConfig.new(shelleyChangeAddress);
         try {
-          txBuilder.add_inputs_from(txUnspentOutputs, 3);
+          txBuilder.add_inputs_from_and_change(
+            txUnspentOutputs,
+            3,
+            changeConfig,
+          );
         } catch (e) {
           console.error(e);
           // Use UTxO selection strategy 2 if strategy 3 fails
-          txBuilder.add_inputs_from(txUnspentOutputs, 2);
+          txBuilder.add_inputs_from_and_change(
+            txUnspentOutputs,
+            2,
+            changeConfig,
+          );
         }
 
         // Set change address, incase too much ADA provided for fee

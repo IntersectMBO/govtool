@@ -18,7 +18,7 @@ cardano_db_sync_image_tag := sancho-5.1.0
 all: deploy-stack notify
 
 .PHONY: deploy-stack
-deploy-stack: upload-config push-backend push-frontend push-status-service push-metadata-validation push-analytics-dashboard
+deploy-stack: upload-config push-backend push-frontend push-status-service push-metadata-validation push-analytics-dashboard push-custom-cardano-db-sync
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	export CARDANO_NETWORK=$(cardano_network); \

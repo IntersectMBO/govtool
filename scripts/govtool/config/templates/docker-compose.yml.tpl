@@ -146,12 +146,13 @@ services:
     logging: *logging
 
   cardano-db-sync:
-    image: ghcr.io/intersectmbo/cardano-db-sync:${CARDANO_DB_SYNC_TAG}
+    image: <REPO_URL>/custom-cardano-db-sync:latest
     environment:
       - NETWORK=${CARDANO_NETWORK}
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - RESTORE_RECREATE_DB=N
+      - DB_SYNC_ENABLE_FUTURE_GENESIS=Y
     depends_on:
       cardano-node:
         condition: service_healthy
@@ -164,6 +165,7 @@ services:
     volumes:
       - db-sync-data:/var/lib/cexplorer
       - node-ipc:/node-ipc
+      - /home/<DOCKER_USER>/config/cardano-node:/configuration
     restart: always
     logging: *logging
 

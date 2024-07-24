@@ -41,6 +41,11 @@ module "govtool-ecr-analytics-dashboard" {
   repo_name = "analytics-dashboard"
 }
 
+module "govtool-ecr-custom-cardano-db-sync" {
+  source    = "./modules/ecr"
+  repo_name = "custom-cardano-db-sync"
+}
+
 resource "aws_iam_policy" "cicd_ecr" {
   name = "CICD_ECR"
   policy = jsonencode({
@@ -57,7 +62,8 @@ resource "aws_iam_policy" "cicd_ecr" {
           module.govtool-ecr-frontend.repo_arn,
           module.govtool-ecr-status-service.repo_arn,
           module.govtool-ecr-metadata-validation.repo_arn,
-          module.govtool-ecr-analytics-dashboard.repo_arn
+          module.govtool-ecr-analytics-dashboard.repo_arn,
+          module.govtool-ecr-custom-cardano-db-sync.repo_arn
         ]
       },
       {
@@ -133,6 +139,10 @@ output "govtool-ecr-metadata-validation-url" {
 
 output "govtool-ecr-analytics-dashboard-url" {
   value = module.govtool-ecr-analytics-dashboard.repo_url
+}
+
+output "govtool-ecr-custom-cardano-db-sync-url" {
+  value = module.govtool-ecr-custom-cardano-db-sync.repo_url
 }
 
 output "govtool-dev-sanchonet-frontend-domain" {

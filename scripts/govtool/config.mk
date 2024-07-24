@@ -14,9 +14,10 @@ target_config_dir := $(config_dir)/target
 
 # files
 docker_compose_file := $(target_config_dir)/docker-compose.yml
-cardano_configs := alonzo-genesis byron-genesis conway-genesis db-sync-config shelley-genesis submit-api-config topology
+cardano_configs := alonzo-genesis byron-genesis conway-genesis shelley-genesis submit-api-config topology
 cardano_config_files := $(addprefix $(target_config_dir)/cardano-node/,$(addsuffix .json,$(cardano_configs)))
 outputs := cardano-node/config.json \
+  cardano-node/db-sync-config.json \
   dbsync-secrets/postgres_user \
   dbsync-secrets/postgres_db \
   dbsync-secrets/postgres_password \
@@ -66,6 +67,10 @@ $(cardano_config_files): $(target_config_dir)/cardano-node/
 $(target_config_dir)/cardano-node/config.json: $(target_config_dir)/cardano-node/
 	$(curl) -s "$(cardano_config_provider)/environments/$(cardano_network)/$(notdir $@)" -o $@
 	sed -i '/"hasPrometheus"/ { N; s/"127\.0\.0\.1"/"0.0.0.0"/ }' "$(target_config_dir)/cardano-node/config.json"
+
+$(target_config_dir)/cardano-node/db-sync-config.json: $(target_config_dir)/cardano-node/
+	$(curl) -s "$(cardano_config_provider)/environments/$(cardano_network)/$(notdir $@)" -o $@
+	sed -i '1a\  "EnableFutureGenesis" : true,' "$(target_config_dir)/cardano-node/db-sync-config.json"
 
 $(target_config_dir)/dbsync-secrets/postgres_user: $(target_config_dir)/dbsync-secrets/
 	echo "$${DBSYNC_POSTGRES_USER}" > $@

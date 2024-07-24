@@ -12,6 +12,7 @@ changes.
 
 ### Added
 
+- Add redirect to the connected DRep Directory page if a connected user enters a non-connected DRep Directory url [Issue 1117](https://github.com/IntersectMBO/govtool/issues/1117)
 - Add PDF_API_URL to the frontend config [Issue 1575](https://github.com/IntersectMBO/govtool/issues/1575)
 
 ### Fixed

@@ -38,7 +38,8 @@ test("7H. Should submit a proposal as governance action", async ({
   );
 
   const proposalSubmissionPage = new ProposalSubmissionPage(userPage);
-  await proposalSubmissionPage.goto();
+  await proposalSubmissionPage.proposalCreateBtn.click();
+  await proposalDiscussionPage.continueBtn.click();
 
   await proposalSubmissionPage.createProposal();
 

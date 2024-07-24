@@ -11,6 +11,11 @@ import {
   dRep02Wallet,
   proposal01Wallet,
   proposal02Wallet,
+  proposal03Wallet,
+  proposal04Wallet,
+  proposal05Wallet,
+  proposal06Wallet,
+  proposal07Wallet,
   user01Wallet,
 } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
@@ -34,6 +39,11 @@ const user01AuthFile = ".auth/user01.json";
 
 const proposal01AuthFile = ".auth/proposal01.json";
 const proposal02AuthFile = ".auth/proposal02.json";
+const proposal03AuthFile = ".auth/proposal03.json";
+const proposal04AuthFile = ".auth/proposal04.json";
+const proposal05AuthFile = ".auth/proposal05.json";
+const proposal06AuthFile = ".auth/proposal06.json";
+const proposal07AuthFile = ".auth/proposal07.json";
 
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
@@ -164,4 +174,94 @@ setup("Create Proposal 02 auth", async ({ page, context }) => {
   );
 
   await context.storageState({ path: proposal02AuthFile });
+});
+
+setup("Create Proposal 03 auth", async ({ page, context }) => {
+  await importWallet(page, proposal03Wallet);
+
+  const loginPage = new LoginPage(page);
+  await loginPage.login();
+  await loginPage.isLoggedIn();
+
+  const proposalDiscussionPage = new ProposalDiscussionPage(page);
+  await proposalDiscussionPage.goto();
+  await proposalDiscussionPage.verifyIdentityBtn.click();
+
+  await proposalDiscussionPage.setUsername(
+    faker.internet.userName().toLowerCase()
+  );
+
+  await context.storageState({ path: proposal03AuthFile });
+});
+
+setup("Create Proposal 04 auth", async ({ page, context }) => {
+  await importWallet(page, proposal04Wallet);
+
+  const loginPage = new LoginPage(page);
+  await loginPage.login();
+  await loginPage.isLoggedIn();
+
+  const proposalDiscussionPage = new ProposalDiscussionPage(page);
+  await proposalDiscussionPage.goto();
+  await proposalDiscussionPage.verifyIdentityBtn.click();
+
+  await proposalDiscussionPage.setUsername(
+    faker.internet.userName().toLowerCase()
+  );
+
+  await context.storageState({ path: proposal04AuthFile });
+});
+
+setup("Create Proposal 05 auth", async ({ page, context }) => {
+  await importWallet(page, proposal05Wallet);
+
+  const loginPage = new LoginPage(page);
+  await loginPage.login();
+  await loginPage.isLoggedIn();
+
+  const proposalDiscussionPage = new ProposalDiscussionPage(page);
+  await proposalDiscussionPage.goto();
+  await proposalDiscussionPage.verifyIdentityBtn.click();
+
+  await proposalDiscussionPage.setUsername(
+    faker.internet.userName().toLowerCase()
+  );
+
+  await context.storageState({ path: proposal05AuthFile });
+});
+
+setup("Create Proposal 06 auth", async ({ page, context }) => {
+  await importWallet(page, proposal06Wallet);
+
+  const loginPage = new LoginPage(page);
+  await loginPage.login();
+  await loginPage.isLoggedIn();
+
+  const proposalDiscussionPage = new ProposalDiscussionPage(page);
+  await proposalDiscussionPage.goto();
+  await proposalDiscussionPage.verifyIdentityBtn.click();
+
+  await proposalDiscussionPage.setUsername(
+    faker.internet.userName().toLowerCase()
+  );
+
+  await context.storageState({ path: proposal06AuthFile });
+});
+
+setup("Create Proposal 07 auth", async ({ page, context }) => {
+  await importWallet(page, proposal07Wallet);
+
+  const loginPage = new LoginPage(page);
+  await loginPage.login();
+  await loginPage.isLoggedIn();
+
+  const proposalDiscussionPage = new ProposalDiscussionPage(page);
+  await proposalDiscussionPage.goto();
+  await proposalDiscussionPage.verifyIdentityBtn.click();
+
+  await proposalDiscussionPage.setUsername(
+    faker.internet.userName().toLowerCase()
+  );
+
+  await context.storageState({ path: proposal07AuthFile });
 });

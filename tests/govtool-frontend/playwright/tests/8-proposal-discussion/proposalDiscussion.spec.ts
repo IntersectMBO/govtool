@@ -11,12 +11,9 @@ const mockPoll = require("../../lib/_mock/proposalPoll.json");
 const mockComments = require("../../lib/_mock/proposalComments.json");
 const mockInfoProposedGA = require("../../lib/_mock/infoProposedGAs.json");
 
-const PROPOSAL_FILTERS = [
-  "Info",
-  "Treasury",
-  "Submitted for vote ",
-  "Active proposal",
-];
+const PROPOSAL_TYPE_FILTERS = ["Info", "Treasury"];
+
+const PROPOSAL_STATUS_FILTER = ["Submitted for vote", "Active proposal"];
 
 test.beforeEach(async () => {
   await setAllureEpic("8. Proposal Discussion Forum");
@@ -44,21 +41,20 @@ test.describe("Filter and sort proposals", () => {
 
     await proposalDiscussionPage.filterBtn.click();
 
-    // Single filter
-    for (const filter of PROPOSAL_FILTERS) {
-      await proposalDiscussionPage.filterProposalByNames([filter]);
-      await proposalDiscussionPage.validateFilters([filter]);
-      await proposalDiscussionPage.unFilterProposalByNames([filter]);
-    }
+    // unselect active proposal
+    await proposalDiscussionPage.activeProposalWrapper.click();
 
-    // Multiple filters
-    const multipleFilters = [...PROPOSAL_FILTERS];
-    while (multipleFilters.length > 1) {
-      await proposalDiscussionPage.filterProposalByNames(multipleFilters);
-      await proposalDiscussionPage.validateFilters(multipleFilters);
-      await proposalDiscussionPage.unFilterProposalByNames(multipleFilters);
-      multipleFilters.pop();
-    }
+    // proposal type filter
+    await proposalDiscussionPage.applyAndValidateFilters(
+      PROPOSAL_TYPE_FILTERS,
+      proposalDiscussionPage._validateTypeFiltersInProposalCard
+    );
+
+    // proposal status filter
+    await proposalDiscussionPage.applyAndValidateFilters(
+      PROPOSAL_STATUS_FILTER,
+      proposalDiscussionPage._validateStatusFiltersInProposalCard
+    );
   });
 
   test("8B_2. Should sort the list of proposed governance actions.", async () => {
@@ -88,7 +84,9 @@ test("8C. Should search the list of proposed governance actions.", async ({
   const proposalCards = await proposalDiscussionPage.getAllProposals();
 
   for (const proposalCard of proposalCards) {
-    await expect(proposalCard.getByText(proposalName)).toBeVisible();
+    await expect(
+      proposalCard.locator('[data-testid^="proposal-"][data-testid$="-title"]')
+    ).toHaveText(proposalName);
   }
 });
 

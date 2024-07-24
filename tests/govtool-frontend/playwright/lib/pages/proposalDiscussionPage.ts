@@ -22,6 +22,9 @@ export default class ProposalDiscussionPage {
   readonly addLinkBtn = this.page.getByTestId("add-link-button");
   readonly infoRadio = this.page.getByTestId("Info-radio-wrapper");
   readonly treasuryRadio = this.page.getByTestId("Treasury-radio-wrapper");
+  readonly activeProposalWrapper = this.page.getByTestId(
+    "active-proposal-radio-wrapper"
+  );
 
   constructor(private readonly page: Page) {}
 
@@ -118,6 +121,27 @@ export default class ProposalDiscussionPage {
     }
   }
 
+  async applyAndValidateFilters(
+    filters: string[],
+    validateFunction: (proposalCard: any, filters: string[]) => Promise<boolean>
+  ) {
+    // single filter
+    for (const filter of filters) {
+      await this.filterProposalByNames([filter]);
+      await this.validateFilters(filters, validateFunction);
+      await this.unFilterProposalByNames([filter]);
+    }
+
+    // multiple filter
+    const multipleFilters = [...filters];
+    while (multipleFilters.length > 1) {
+      await this.filterProposalByNames(multipleFilters);
+      await this.validateFilters(multipleFilters, validateFunction);
+      await this.unFilterProposalByNames(multipleFilters);
+      multipleFilters.pop();
+    }
+  }
+
   async filterProposalByNames(names: string[]) {
     for (const name of names) {
       await this.page.getByLabel(name).click(); // test id is not in proper format for all filter type
@@ -130,14 +154,14 @@ export default class ProposalDiscussionPage {
     }
   }
 
-  async validateFilters(filters: string[]) {
+  async validateFilters(
+    filters: string[],
+    validateFunction: (proposalCard: any, filters: string[]) => Promise<boolean>
+  ) {
     const proposalCards = await this.getAllProposals();
 
     for (const proposalCard of proposalCards) {
-      const hasFilter = await this._validateFiltersInProposalCard(
-        proposalCard,
-        filters
-      );
+      const hasFilter = await validateFunction(proposalCard, filters);
       expect(hasFilter).toBe(true);
     }
   }
@@ -164,15 +188,27 @@ export default class ProposalDiscussionPage {
     }
   }
 
-  async _validateFiltersInProposalCard(
+  async _validateTypeFiltersInProposalCard(
     proposalCard: Locator,
     filters: string[]
   ): Promise<boolean> {
-    const proposalTypeTextContent = await proposalCard
-      .locator('[data-testid$="-type"]')
+    const govActionType = await proposalCard
+      .getByTestId("governance-action-type")
       .textContent();
-    const govActionType = proposalTypeTextContent.split(":")[1];
 
     return filters.includes(govActionType);
+  }
+
+  async _validateStatusFiltersInProposalCard(
+    proposalCard: Locator,
+    filters: string[]
+  ): Promise<boolean> {
+    const govActionType = await proposalCard
+      .locator('[data-test^="proposal-"][data-testid$="-status"]')
+      .textContent();
+
+    return filters
+      .map((filter) => filter.toLowerCase())
+      .includes(govActionType.toLowerCase());
   }
 }

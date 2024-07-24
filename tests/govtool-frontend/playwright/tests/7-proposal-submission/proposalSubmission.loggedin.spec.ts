@@ -117,11 +117,24 @@ test.describe("Proposal created logged state", () => {
         await proposalSubmissionPage.submitBtn.click();
 
         await expect(page.getByTestId("submit-as-GA-button")).toBeVisible();
-        await expect(page.getByText(type, { exact: true })).toBeVisible(); // BUG missing test id
-        await expect(page.getByText(proposal.prop_name)).toBeVisible(); // BUG missing test id
-        await expect(page.getByText(proposal.prop_abstract)).toBeVisible(); // BUG missing test id
-        await expect(page.getByText(proposal.prop_rationale)).toBeVisible(); // BUG missing test id
-        await expect(page.getByText(proposal.prop_motivation)).toBeVisible(); // BUG missing test id
+        await expect(page.getByTestId("title-content")).toHaveText(
+          proposal.prop_name
+        );
+        await expect(
+          page.getByTestId("governance-action-type-content")
+        ).toHaveText(type);
+        await expect(page.getByTestId("abstract-content")).toHaveText(
+          proposal.prop_abstract
+        );
+        await expect(page.getByTestId("motivation-content")).toHaveText(
+          proposal.prop_motivation
+        );
+        await expect(page.getByTestId("rationale-content")).toHaveText(
+          proposal.prop_rationale
+        );
+        await expect(page.getByTestId("link-0-text-content")).toHaveText(
+          proposal.proposal_links[0].prop_link_text
+        );
       });
     });
   });
@@ -163,7 +176,7 @@ test.describe("Proposal created logged state", () => {
         await expect(page.getByTestId("rationale-content")).toHaveText(
           proposal.prop_rationale
         );
-        await expect(page.getByTestId("link-text-content")).toHaveText(
+        await expect(page.getByTestId("link-0-text-content")).toHaveText(
           proposal.proposal_links[0].prop_link_text
         );
         if (type === ProposalType.treasury) {
@@ -349,17 +362,24 @@ test.describe("Info Proposal Draft", () => {
     await proposalSubmissionPage.submitBtn.click();
 
     await expect(page.getByTestId("submit-as-GA-button")).toBeVisible();
-    await expect(
-      page.getByText(ProposalType.info, { exact: true })
-    ).toBeVisible(); // BUG missing test id
-    await expect(page.getByText(proposalFormValue.prop_name)).toBeVisible(); // BUG missing test id
-    await expect(page.getByText(proposalFormValue.prop_abstract)).toBeVisible(); // BUG missing test id
-    await expect(
-      page.getByText(proposalFormValue.prop_rationale)
-    ).toBeVisible(); // BUG missing test id
-    await expect(
-      page.getByText(proposalFormValue.prop_motivation)
-    ).toBeVisible(); // BUG missing test id
+    await expect(page.getByTestId("title-content")).toHaveText(
+      proposalFormValue.prop_name
+    );
+    await expect(page.getByTestId("governance-action-type-content")).toHaveText(
+      ProposalType.info
+    );
+    await expect(page.getByTestId("abstract-content")).toHaveText(
+      proposalFormValue.prop_abstract
+    );
+    await expect(page.getByTestId("motivation-content")).toHaveText(
+      proposalFormValue.prop_motivation
+    );
+    await expect(page.getByTestId("rationale-content")).toHaveText(
+      proposalFormValue.prop_rationale
+    );
+    await expect(page.getByTestId("link-0-text-content")).toHaveText(
+      proposalFormValue.proposal_links[0].prop_link_text
+    );
   });
 });
 

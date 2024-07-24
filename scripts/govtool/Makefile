@@ -3,6 +3,7 @@ include frontend.mk
 include status-service.mk
 include metadata-validation.mk
 include analytics-dashboard.mk
+include custom-cardano-db-sync.mk
 include utils.mk
 include info.mk
 include config.mk

@@ -500,16 +500,11 @@ const CardanoProvider = (props: Props) => {
         // Add output of 1 ADA to the address of our wallet
         let outputValue = BigNum.from_str("1000000");
 
-        if (
-          (type === "retireAsDrep" ||
-            type === "retireAsDirectVoter" ||
-            (type === "delegate" && voter?.isRegisteredAsSoleVoter)) &&
-          voter?.deposit
-        ) {
-          outputValue = outputValue.checked_add(
-            BigNum.from_str(voter?.deposit?.toString()),
-          );
-        }
+        // Add the implicit inputs (from DRep retirements) to the output value
+        // to ensure that the total outputs is always 1 ADA larger than the total implicit inputs
+        // this prevents transactions being built with no UTxO inputs
+        if (!txBuilder.get_implicit_input().is_zero()) {
+          outputValue = outputValue.checked_add(txBuilder.get_implicit_input().coin())
 
         txBuilder.add_output(
           TransactionOutput.new(shelleyOutputAddress, Value.new(outputValue)),

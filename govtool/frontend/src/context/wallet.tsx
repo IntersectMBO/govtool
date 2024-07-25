@@ -542,9 +542,6 @@ const CardanoProvider = (props: Props) => {
           );
         }
 
-        // Set change address, incase too much ADA provided for fee
-        txBuilder.add_change_if_needed(shelleyChangeAddress);
-
         // Build transaction body
         const txBody = txBuilder.build();
 

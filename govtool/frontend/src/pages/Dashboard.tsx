@@ -33,7 +33,7 @@ export const Dashboard = () => {
   }, [pathname, divRef]);
 
   useEffect(() => {
-    if (checkIsWalletConnected()) {
+    if (!checkIsWalletConnected()) {
       if (window.location.pathname === PATHS.dashboard) {
         navigate(PATHS.home);
       } else {

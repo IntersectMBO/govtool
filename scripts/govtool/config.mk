@@ -85,6 +85,8 @@ $(target_config_dir)/backend-config.json: $(config_dir)/templates/backend-config
 	sed -e "s|<DBSYNC_POSTGRES_DB>|$${DBSYNC_POSTGRES_DB}|" \
 		-e "s|<DBSYNC_POSTGRES_USER>|$${DBSYNC_POSTGRES_USER}|" \
 		-e "s|<DBSYNC_POSTGRES_PASSWORD>|$${DBSYNC_POSTGRES_PASSWORD}|" \
+		-e "s|<DBSYNC_POSTGRES_HOST>|$${DBSYNC_POSTGRES_HOST}|" \
+		-e "s|<DBSYNC_POSTGRES_PORT>|$${DBSYNC_POSTGRES_PORT}|" \
 		-e "s|<SENTRY_DSN>|$${SENTRY_DSN_BACKEND}|" \
 		-e "s|<SENTRY_ENV>|$(env)|" \
 		$< > $@

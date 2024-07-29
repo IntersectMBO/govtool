@@ -6,20 +6,20 @@ import {
 } from "@/utils/localStorage";
 
 describe("checkIsWalletConnected function", () => {
-  it("returns false when wallet information is present in local storage", () => {
+  it("returns true when wallet information is present in local storage", () => {
     setItemToLocalStorage(`${WALLET_LS_KEY}_name`, "Nami");
     setItemToLocalStorage(`${WALLET_LS_KEY}_stake_key`, "teststakekey");
     const isConnected = checkIsWalletConnected();
 
-    expect(isConnected).toBe(false);
+    expect(isConnected).toBe(true);
   });
 
-  it("returns true when wallet information is missing in local storage", () => {
+  it("returns false when wallet information is missing in local storage", () => {
     removeItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
     removeItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`);
 
     const isConnected = checkIsWalletConnected();
 
-    expect(isConnected).toBe(true);
+    expect(isConnected).toBe(false);
   });
 });

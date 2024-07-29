@@ -26,6 +26,7 @@ jobs:
       PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
       APP_ENV: test
+      PDF_API_URL: ${{ secrets.PDF_API_URL}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

@@ -1,15 +1,20 @@
-import { proposal01Wallet } from "@constants/staticWallets";
-import { createTempUserAuth } from "@datafactory/createAuth";
+import {
+  proposal01Wallet,
+  proposal03Wallet,
+  proposal04Wallet,
+  proposal05Wallet,
+  proposal06Wallet,
+  proposal07Wallet,
+} from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
-import { invalid, valid } from "@mock/index";
+import { invalid } from "@mock/index";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
-import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
-import { Page, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { ProposalCreateRequest, ProposalType } from "@types";
 
 test.beforeEach(async () => {
@@ -22,9 +27,7 @@ test.describe("Proposal created logged state", () => {
     await page.goto("/");
     await page.getByTestId("propose-governance-actions-button").click();
 
-    await expect(
-      page.getByText("Create a Governance Action", { exact: true })
-    ).toBeVisible();
+    await expect(page.getByText(/proposals/i)).toHaveCount(2);
   });
 
   test.describe("Accept valid data", () => {
@@ -114,11 +117,24 @@ test.describe("Proposal created logged state", () => {
         await proposalSubmissionPage.submitBtn.click();
 
         await expect(page.getByTestId("submit-as-GA-button")).toBeVisible();
-        await expect(page.getByText(type, { exact: true })).toBeVisible(); // BUG missing test id
-        await expect(page.getByText(proposal.prop_name)).toBeVisible(); // BUG missing test id
-        await expect(page.getByText(proposal.prop_abstract)).toBeVisible(); // BUG missing test id
-        await expect(page.getByText(proposal.prop_rationale)).toBeVisible(); // BUG missing test id
-        await expect(page.getByText(proposal.prop_motivation)).toBeVisible(); // BUG missing test id
+        await expect(page.getByTestId("title-content")).toHaveText(
+          proposal.prop_name
+        );
+        await expect(
+          page.getByTestId("governance-action-type-content")
+        ).toHaveText(type);
+        await expect(page.getByTestId("abstract-content")).toHaveText(
+          proposal.prop_abstract
+        );
+        await expect(page.getByTestId("motivation-content")).toHaveText(
+          proposal.prop_motivation
+        );
+        await expect(page.getByTestId("rationale-content")).toHaveText(
+          proposal.prop_rationale
+        );
+        await expect(page.getByTestId("link-0-text-content")).toHaveText(
+          proposal.proposal_links[0].prop_link_text
+        );
       });
     });
   });
@@ -160,7 +176,7 @@ test.describe("Proposal created logged state", () => {
         await expect(page.getByTestId("rationale-content")).toHaveText(
           proposal.prop_rationale
         );
-        await expect(page.getByTestId("link-text-content")).toHaveText(
+        await expect(page.getByTestId("link-0-text-content")).toHaveText(
           proposal.proposal_links[0].prop_link_text
         );
         if (type === ProposalType.treasury) {
@@ -265,162 +281,145 @@ test.describe("Proposal created logged state", () => {
   });
 });
 
-test.describe("Temporary proposal users", () => {
-  let userPage: Page;
-  test.beforeEach(async ({ page, browser }) => {
-    const wallet = (await ShelleyWallet.generate()).json();
-    const tempUserAuth = await createTempUserAuth(page, wallet);
-
-    userPage = await createNewPageWithWallet(browser, {
-      storageState: tempUserAuth,
-      wallet,
+test.describe("Info Proposal Draft", () => {
+  test("7C. Should list unfinished Draft ", async ({ browser }) => {
+    const page = await createNewPageWithWallet(browser, {
+      storageState: ".auth/proposal03.json",
+      wallet: proposal03Wallet,
     });
+    const proposalSubmissionPage = new ProposalSubmissionPage(page);
 
-    const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
-    await proposalDiscussionPage.goto();
-    await proposalDiscussionPage.verifyIdentityBtn.click();
+    await proposalSubmissionPage.createDraft(ProposalType.info);
+    const getAllDrafts = await proposalSubmissionPage.getAllDrafts();
 
-    await proposalDiscussionPage.setUsername(valid.username());
+    expect(getAllDrafts.length).toBeGreaterThan(0);
   });
 
-  test.describe("Info Proposal Draft", () => {
-    let proposalSubmissionPage: ProposalSubmissionPage;
-    let proposalFormValue: ProposalCreateRequest;
-
-    test.beforeEach(async () => {
-      proposalSubmissionPage = new ProposalSubmissionPage(userPage);
-      await proposalSubmissionPage.proposalCreateBtn.click();
-      await proposalSubmissionPage.continueBtn.click();
-
-      await proposalSubmissionPage.addLinkBtn.click();
-      proposalFormValue =
-        proposalSubmissionPage.generateValidProposalFormFields(
-          ProposalType.info,
-          true
-        );
-      await proposalSubmissionPage.fillupForm(proposalFormValue);
-
-      await proposalSubmissionPage.saveDraftBtn.click();
-      await proposalSubmissionPage.closeDraftSuccessModalBtn.click();
-
-      await proposalSubmissionPage.proposalCreateBtn.click();
+  test("7L. Should save proposal as a draft", async ({ browser }) => {
+    const page = await createNewPageWithWallet(browser, {
+      storageState: ".auth/proposal04.json",
+      wallet: proposal04Wallet,
     });
 
-    test("7C. Should list unfinished Draft ", async () => {
-      const getAllDrafts = await proposalSubmissionPage.getAllDrafts();
+    const proposalSubmissionPage = new ProposalSubmissionPage(page);
+    const { proposalFormValue } = await proposalSubmissionPage.createDraft(
+      ProposalType.info
+    );
+    const draftCard = proposalSubmissionPage.getFirstDraft();
+    const draftCardAllInnerText = await (await draftCard).allInnerTexts();
 
-      expect(getAllDrafts.length).toBeGreaterThan(0);
-    });
-
-    test("7L. Should save proposal as a draft", async () => {
-      const draftCard = proposalSubmissionPage.getFirstDraft();
-      const draftCardAllInnerText = await (await draftCard).allInnerTexts();
-
-      expect(draftCardAllInnerText.includes(proposalFormValue.prop_name));
-      expect(draftCardAllInnerText.includes(proposalFormValue.prop_abstract));
-    });
-
-    test("7M_1. Should edit a info proposal draft", async ({}) => {
-      const newTitle = faker.lorem.sentence(6);
-
-      await proposalSubmissionPage.viewFirstDraft();
-      await proposalSubmissionPage.titleInput.fill(newTitle);
-      await proposalSubmissionPage.continueBtn.click();
-
-      await expect(
-        userPage.getByTestId("governance-action-type-content")
-      ).toHaveText(ProposalType.info);
-      await expect(userPage.getByTestId("title-content")).toHaveText(newTitle);
-      await expect(userPage.getByTestId("abstract-content")).toHaveText(
-        proposalFormValue.prop_abstract
-      );
-      await expect(userPage.getByTestId("motivation-content")).toHaveText(
-        proposalFormValue.prop_motivation
-      );
-      await expect(userPage.getByTestId("rationale-content")).toHaveText(
-        proposalFormValue.prop_rationale
-      );
-      await expect(userPage.getByTestId("link-text-content")).toHaveText(
-        proposalFormValue.proposal_links[0].prop_link_text
-      );
-    });
-
-    test("7N. Should submit a draft proposal", async ({}) => {
-      await proposalSubmissionPage.viewFirstDraft();
-      await proposalSubmissionPage.continueBtn.click();
-      await proposalSubmissionPage.submitBtn.click();
-
-      await expect(userPage.getByTestId("submit-as-GA-button")).toBeVisible();
-      await expect(
-        userPage.getByText(ProposalType.info, { exact: true })
-      ).toBeVisible(); // BUG missing test id
-      await expect(
-        userPage.getByText(proposalFormValue.prop_name)
-      ).toBeVisible(); // BUG missing test id
-      await expect(
-        userPage.getByText(proposalFormValue.prop_abstract)
-      ).toBeVisible(); // BUG missing test id
-      await expect(
-        userPage.getByText(proposalFormValue.prop_rationale)
-      ).toBeVisible(); // BUG missing test id
-      await expect(
-        userPage.getByText(proposalFormValue.prop_motivation)
-      ).toBeVisible(); // BUG missing test id
-    });
+    expect(draftCardAllInnerText.includes(proposalFormValue.prop_name));
+    expect(draftCardAllInnerText.includes(proposalFormValue.prop_abstract));
   });
 
-  test.describe("Treasury Proposal Draft", () => {
-    let proposalSubmissionPage: ProposalSubmissionPage;
-    let proposalFormValue: ProposalCreateRequest;
-
-    test.beforeEach(async () => {
-      proposalSubmissionPage = new ProposalSubmissionPage(userPage);
-      await proposalSubmissionPage.goto();
-
-      await proposalSubmissionPage.addLinkBtn.click();
-      proposalFormValue =
-        proposalSubmissionPage.generateValidProposalFormFields(
-          ProposalType.treasury,
-          true,
-          ShelleyWallet.fromJson(proposal01Wallet).rewardAddressBech32(0)
-        );
-      await proposalSubmissionPage.fillupForm(proposalFormValue);
-
-      await proposalSubmissionPage.saveDraftBtn.click();
-      await proposalSubmissionPage.closeDraftSuccessModalBtn.click();
-
-      await proposalSubmissionPage.proposalCreateBtn.click();
+  test("7M_1. Should edit a info proposal draft", async ({ browser }) => {
+    const page = await createNewPageWithWallet(browser, {
+      storageState: ".auth/proposal05.json",
+      wallet: proposal05Wallet,
     });
 
-    test("7M_2. Should edit a treasury proposal draft", async () => {
-      const newTitle = faker.lorem.sentence(6);
+    const proposalSubmissionPage = new ProposalSubmissionPage(page);
+    const { proposalFormValue } = await proposalSubmissionPage.createDraft(
+      ProposalType.info
+    );
+    const newTitle = faker.lorem.sentence(6);
 
-      await proposalSubmissionPage.viewFirstDraft();
-      await proposalSubmissionPage.titleInput.fill(newTitle);
-      await proposalSubmissionPage.continueBtn.click();
+    await proposalSubmissionPage.viewFirstDraft();
+    await proposalSubmissionPage.titleInput.fill(newTitle);
+    await proposalSubmissionPage.continueBtn.click();
 
-      await expect(
-        userPage.getByTestId("governance-action-type-content")
-      ).toHaveText(ProposalType.treasury);
-      await expect(userPage.getByTestId("title-content")).toHaveText(newTitle);
-      await expect(userPage.getByTestId("abstract-content")).toHaveText(
-        proposalFormValue.prop_abstract
-      );
-      await expect(userPage.getByTestId("motivation-content")).toHaveText(
-        proposalFormValue.prop_motivation
-      );
-      await expect(userPage.getByTestId("rationale-content")).toHaveText(
-        proposalFormValue.prop_rationale
-      );
-      await expect(
-        userPage.getByTestId("receiving-address-content")
-      ).toHaveText(proposalFormValue.prop_receiving_address);
-      await expect(userPage.getByTestId("amount-content")).toHaveText(
-        proposalFormValue.prop_amount
-      );
-      await expect(userPage.getByTestId("link-text-content")).toHaveText(
-        proposalFormValue.proposal_links[0].prop_link_text
-      );
+    await expect(page.getByTestId("governance-action-type-content")).toHaveText(
+      ProposalType.info
+    );
+    await expect(page.getByTestId("title-content")).toHaveText(newTitle);
+    await expect(page.getByTestId("abstract-content")).toHaveText(
+      proposalFormValue.prop_abstract
+    );
+    await expect(page.getByTestId("motivation-content")).toHaveText(
+      proposalFormValue.prop_motivation
+    );
+    await expect(page.getByTestId("rationale-content")).toHaveText(
+      proposalFormValue.prop_rationale
+    );
+    await expect(page.getByTestId("link-0-text-content")).toHaveText(
+      proposalFormValue.proposal_links[0].prop_link_text
+    );
+  });
+
+  test("7N. Should submit a draft proposal", async ({ browser }) => {
+    const page = await createNewPageWithWallet(browser, {
+      storageState: ".auth/proposal06.json",
+      wallet: proposal06Wallet,
     });
+
+    const proposalSubmissionPage = new ProposalSubmissionPage(page);
+    const { proposalFormValue } = await proposalSubmissionPage.createDraft(
+      ProposalType.info
+    );
+
+    await proposalSubmissionPage.viewFirstDraft();
+    await proposalSubmissionPage.continueBtn.click();
+    await proposalSubmissionPage.submitBtn.click();
+
+    await expect(page.getByTestId("submit-as-GA-button")).toBeVisible();
+    await expect(page.getByTestId("title-content")).toHaveText(
+      proposalFormValue.prop_name
+    );
+    await expect(page.getByTestId("governance-action-type-content")).toHaveText(
+      ProposalType.info
+    );
+    await expect(page.getByTestId("abstract-content")).toHaveText(
+      proposalFormValue.prop_abstract
+    );
+    await expect(page.getByTestId("motivation-content")).toHaveText(
+      proposalFormValue.prop_motivation
+    );
+    await expect(page.getByTestId("rationale-content")).toHaveText(
+      proposalFormValue.prop_rationale
+    );
+    await expect(page.getByTestId("link-0-text-content")).toHaveText(
+      proposalFormValue.proposal_links[0].prop_link_text
+    );
   });
 });
+
+test.describe("Treasury Proposal Draft", () => {
+  test.use({ storageState: ".auth/proposal07.json", wallet: proposal07Wallet });
+
+  test("7M_2. Should edit a treasury proposal draft", async ({ page }) => {
+    const proposalSubmissionPage = new ProposalSubmissionPage(page);
+    const { proposalFormValue } = await proposalSubmissionPage.createDraft(
+      ProposalType.treasury
+    );
+
+    const newTitle = faker.lorem.sentence(6);
+
+    await proposalSubmissionPage.viewFirstDraft();
+    await proposalSubmissionPage.titleInput.fill(newTitle);
+    await proposalSubmissionPage.continueBtn.click();
+
+    await expect(page.getByTestId("governance-action-type-content")).toHaveText(
+      ProposalType.treasury
+    );
+    await expect(page.getByTestId("title-content")).toHaveText(newTitle);
+    await expect(page.getByTestId("abstract-content")).toHaveText(
+      proposalFormValue.prop_abstract
+    );
+    await expect(page.getByTestId("motivation-content")).toHaveText(
+      proposalFormValue.prop_motivation
+    );
+    await expect(page.getByTestId("rationale-content")).toHaveText(
+      proposalFormValue.prop_rationale
+    );
+    await expect(page.getByTestId("receiving-address-content")).toHaveText(
+      proposalFormValue.prop_receiving_address
+    );
+    await expect(page.getByTestId("amount-content")).toHaveText(
+      proposalFormValue.prop_amount
+    );
+    await expect(page.getByTestId("link-0-text-content")).toHaveText(
+      proposalFormValue.proposal_links[0].prop_link_text
+    );
+  });
+});
+// });

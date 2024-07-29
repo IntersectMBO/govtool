@@ -146,12 +146,13 @@ services:
     logging: *logging
 
   cardano-db-sync:
-    image: ghcr.io/intersectmbo/cardano-db-sync:${CARDANO_DB_SYNC_TAG}
+    image: <REPO_URL>/custom-cardano-db-sync:latest
     environment:
       - NETWORK=${CARDANO_NETWORK}
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - RESTORE_RECREATE_DB=N
+      - DB_SYNC_ENABLE_FUTURE_GENESIS=Y
     depends_on:
       cardano-node:
         condition: service_healthy
@@ -164,6 +165,7 @@ services:
     volumes:
       - db-sync-data:/var/lib/cexplorer
       - node-ipc:/node-ipc
+      - /home/<DOCKER_USER>/config/cardano-node:/configuration
     restart: always
     logging: *logging
 
@@ -273,7 +275,7 @@ services:
     logging: *logging
     labels:
       - "traefik.enable=true"
-      - "traefik.http.middlewares.frontend-csp.headers.contentSecurityPolicy=default-src 'self'; img-src *.usersnap.com https://www.googletagmanager.com 'self' data:; script-src 'unsafe-inline' *.usersnap.com 'self' https://www.googletagmanager.com https://browser.sentry-cdn.com; style-src *.usersnap.com *.googleapis.com 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src *.usersnap.com https://s3.eu-central-1.amazonaws.com/upload.usersnap.com 'self' *.sentry.io *.google-analytics.com *.api.pdf.gov.tools; font-src *.usersnap.com *.gstatic.com 'self' https://fonts.gstatic.com data:; worker-src blob:"
+      - "traefik.http.middlewares.frontend-csp.headers.contentSecurityPolicy=default-src 'self'; img-src *.usersnap.com https://www.googletagmanager.com 'self' data:; script-src 'unsafe-inline' *.usersnap.com 'self' https://www.googletagmanager.com https://browser.sentry-cdn.com; style-src *.usersnap.com *.googleapis.com 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src *.usersnap.com https://s3.eu-central-1.amazonaws.com/upload.usersnap.com 'self' *.sentry.io *.google-analytics.com <PDF_API_URL>; font-src *.usersnap.com *.gstatic.com 'self' https://fonts.gstatic.com data:; worker-src blob:"
       - "traefik.http.routers.to-frontend.rule=Host(`<DOMAIN>`)"
       - "traefik.http.routers.to-frontend.entrypoints=websecure"
       - "traefik.http.routers.to-frontend.tls.certresolver=myresolver"

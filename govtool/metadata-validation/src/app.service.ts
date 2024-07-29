@@ -5,7 +5,7 @@ import * as blake from 'blakejs';
 
 import { ValidateMetadataDTO } from '@dto';
 import { LoggerMessage, MetadataValidationStatus } from '@enums';
-import { canonizeJSON, validateMetadataStandard, parseMetadata } from '@utils';
+import { validateMetadataStandard, parseMetadata } from '@utils';
 import { MetadataStandard, ValidateMetadataResult } from '@types';
 
 @Injectable()
@@ -40,17 +40,8 @@ export class AppService {
         metadata = parseMetadata(data.body, standard);
       }
 
-      let canonizedMetadata;
-      if (!noStandard) {
-        try {
-          canonizedMetadata = await canonizeJSON(data);
-        } catch (error) {
-          throw MetadataValidationStatus.INVALID_JSONLD;
-        }
-      }
-
       const hashedMetadata = blake.blake2bHex(
-        !standard ? data : canonizedMetadata,
+        !standard ? data : metadata,
         undefined,
         32,
       );

@@ -11,7 +11,7 @@ import { blake2bHex } from "blakejs";
 import * as Sentry from "@sentry/react";
 
 import { CIP_108, GOVERNANCE_ACTION_CONTEXT } from "@/consts";
-import { canonizeJSON, generateJsonld, generateMetadataBody } from "@/utils";
+import { generateJsonld, generateMetadataBody } from "@/utils";
 
 type GovActionMetadata = {
   title: string;
@@ -76,9 +76,8 @@ const GovernanceActionProvider = ({ children }: PropsWithChildren) => {
    */
   const createHash = useCallback(async (jsonLD: NodeObject) => {
     try {
-      const canonizedJson = await canonizeJSON(jsonLD);
-      const canonizedJsonHash = blake2bHex(canonizedJson, undefined, 32);
-      return canonizedJsonHash;
+      const jsonHash = blake2bHex(JSON.stringify(jsonLD), undefined, 32);
+      return jsonHash;
     } catch (error) {
       Sentry.captureException(error);
       console.error(error);

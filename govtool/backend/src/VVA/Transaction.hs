@@ -20,8 +20,7 @@ import qualified Database.PostgreSQL.Simple as SQL
 
 import           VVA.Config
 import           VVA.Pool                   (ConnectionPool, withPool)
-import           VVA.Types                  (AppError (..),
-                                             TransactionStatus (..))
+import           VVA.Types                  (AppError (..), TransactionStatus (..))
 
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs

@@ -45,38 +45,38 @@ validateMetadata
 validateMetadata url hash standard = do
     metadataEnabled <- getMetadataValidationEnabled
     if not metadataEnabled
-      then return $ MetadataValidationResult True (Just "Metadata validation disabled") Nothing
-    else do
-    metadataHost <- getMetadataValidationHost
-    metadataPort <- getMetadataValidationPort
+        then return $ MetadataValidationResult True (Just "Metadata validation disabled") Nothing
+            else do
+                metadataHost <- getMetadataValidationHost
+                metadataPort <- getMetadataValidationPort
 
-    let timeout = responseTimeoutMicro 1000
-    manager <- liftIO $ newManager $ tlsManagerSettings { managerResponseTimeout = timeout }
+                let timeout = responseTimeoutMicro 1000
+                manager <- liftIO $ newManager $ tlsManagerSettings { managerResponseTimeout = timeout }
 
-    let requestBody = encode $ object $
-            ["url" .= url, "hash" .= hash] ++ maybe [] (\x -> ["standard" .= x]) standard
-        requestUrl = unpack metadataHost ++ ":" ++ show metadataPort ++ "/validate"
+                let requestBody = encode $ object $
+                        ["url" .= url, "hash" .= hash] ++ maybe [] (\x -> ["standard" .= x]) standard
+                    requestUrl = unpack metadataHost ++ ":" ++ show metadataPort ++ "/validate"
 
-    parsedRequestResult <- liftIO $ try $ parseRequest requestUrl
-    case parsedRequestResult of
-        Left (e :: SomeException) -> do
-            logException url e
-            return $ MetadataValidationResult False (Just "VALIDATION_FAILED") Nothing
-        Right initialRequest -> do
-            let request = initialRequest
-                    { method = "POST"
-                    , requestBody = RequestBodyLBS requestBody
-                    , requestHeaders = [("Content-Type", "application/json")]
-                    }
+                parsedRequestResult <- liftIO $ try $ parseRequest requestUrl
+                case parsedRequestResult of
+                    Left (e :: SomeException) -> do
+                        logException url e
+                        return $ MetadataValidationResult False (Just "VALIDATION_FAILED") Nothing
+                    Right initialRequest -> do
+                        let request = initialRequest
+                                { method = "POST"
+                                , requestBody = RequestBodyLBS requestBody
+                                , requestHeaders = [("Content-Type", "application/json")]
+                                }
 
-            responseResult <- liftIO $ try $ httpLbs request manager
-            case responseResult of
-                Left (e :: SomeException) -> do
-                    logException url e
-                    return $ MetadataValidationResult False (Just "VALIDATION_FAILED") Nothing
-                Right response -> case decode (responseBody response) of
-                    Nothing -> return $ MetadataValidationResult False (Just "VALIDATION_FAILED") Nothing
-                    Just x  -> return $ MetadataValidationResult True (Just "VALIDATION_SUCCESS") (Just x)
+                        responseResult <- liftIO $ try $ httpLbs request manager
+                        case responseResult of
+                            Left (e :: SomeException) -> do
+                                logException url e
+                                return $ MetadataValidationResult False (Just "VALIDATION_FAILED") Nothing
+                            Right response -> case decode (responseBody response) of
+                                Nothing -> return $ MetadataValidationResult False (Just "VALIDATION_FAILED") Nothing
+                                Just x  -> return $ MetadataValidationResult True (Just "VALIDATION_SUCCESS") (Just x)
 
 getProposalMetadataValidationResult ::
     (Has ConnectionPool r, Has Manager r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>

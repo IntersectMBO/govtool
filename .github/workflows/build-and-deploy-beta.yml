@@ -36,9 +36,11 @@ jobs:
       run:
         working-directory: ./scripts/govtool
     env:
-      DBSYNC_POSTGRES_DB: "cexplorer"
-      DBSYNC_POSTGRES_PASSWORD: "pSa8JCpQOACMUdGb"
-      DBSYNC_POSTGRES_USER: "postgres"
+      DBSYNC_POSTGRES_DB: ${{ secrets.DBSYNC_POSTGRES_DB || 'cexplorer' }}
+      DBSYNC_POSTGRES_PASSWORD: ${{ secrets.DBSYNC_POSTGRES_PASSWORD || 'pSa8JCpQOACMUdGb' }}
+      DBSYNC_POSTGRES_USER: ${{ secrets.DBSYNC_POSTGRES_USER || 'postgres' }}
+      DBSYNC_POSTGRES_HOST: ${{ secrets.DBSYNC_POSTGRES_HOST || 'postgres' }}
+      DBSYNC_POSTGRES_PORT: ${{ secrets.DBSYNC_POSTGRES_PORT || '5432' }}
       GA_CLIENT_EMAIL: ${{ secrets.GA_CLIENT_EMAIL }}
       GA_PRIVATE_KEY: ${{ secrets.GA_PRIVATE_KEY }}
       GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}

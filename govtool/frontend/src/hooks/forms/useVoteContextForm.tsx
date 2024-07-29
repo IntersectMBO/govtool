@@ -4,12 +4,7 @@ import { blake2bHex } from "blakejs";
 import * as Sentry from "@sentry/react";
 import { NodeObject } from "jsonld";
 
-import {
-  canonizeJSON,
-  downloadJson,
-  generateJsonld,
-  generateMetadataBody,
-} from "@utils";
+import { downloadJson, generateJsonld, generateMetadataBody } from "@utils";
 import { MetadataValidationStatus } from "@models";
 import { CIP_100, CIP_100_CONTEXT } from "@/consts";
 
@@ -52,11 +47,10 @@ export const useVoteContextForm = (
     });
     const jsonld = await generateJsonld(body, CIP_100_CONTEXT, CIP_100);
 
-    const canonizedJson = await canonizeJSON(jsonld);
-    const canonizedJsonHash = blake2bHex(canonizedJson, undefined, 32);
+    const jsonHash = blake2bHex(JSON.stringify(jsonld), undefined, 32);
 
     // That allows to validate metadata hash
-    setHash(canonizedJsonHash);
+    setHash(jsonHash);
     setJson(jsonld);
 
     return jsonld;

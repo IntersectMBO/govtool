@@ -37,6 +37,7 @@ import {
   WALLET_LS_KEY,
   removeItemFromLocalStorage,
 } from "@utils";
+import { PublicRoute } from "./pages/PublicRoute";
 
 export default () => {
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
@@ -131,7 +132,13 @@ export default () => {
             />
           </Route>
         </Route>
-        <Route element={<DRepDirectory />}>
+        <Route
+          element={
+            <PublicRoute>
+              <DRepDirectory />
+            </PublicRoute>
+          }
+        >
           <Route
             path={PATHS.dRepDirectory}
             element={<DRepDirectoryContent />}

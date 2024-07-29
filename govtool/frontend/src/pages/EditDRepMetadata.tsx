@@ -56,7 +56,7 @@ export const EditDRepMetadata = () => {
     });
 
   useEffect(() => {
-    if (checkIsWalletConnected()) {
+    if (!checkIsWalletConnected()) {
       navigate(PATHS.home);
       return;
     }

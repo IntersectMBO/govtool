@@ -10,9 +10,7 @@ import { checkIsWalletConnected } from "@utils";
 export const DRepDirectory = () => {
   const { t } = useTranslation();
 
-  const isConnected = !checkIsWalletConnected();
-
-  if (isConnected) {
+  if (checkIsWalletConnected()) {
     return (
       <PagePaddingBox
         sx={{ display: "flex", flex: 1, flexDirection: "column", py: 2 }}

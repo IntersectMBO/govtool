@@ -168,9 +168,7 @@ data MetadataValidationResult a
       , metadataValidationResultMetadata :: Maybe a
       }
   deriving (Show)
-
-
-
+  
 
 data CacheEnv
   = CacheEnv

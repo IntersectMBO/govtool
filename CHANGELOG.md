@@ -22,6 +22,7 @@ changes.
 
 - Change link to propose a governace action docs [Issue 1132](https://github.com/IntersectMBO/govtool/issues/1132)
 - Change link to docs regarding DReps [Issue 1130](https://github.com/IntersectMBO/govtool/issues/1130)
+- Change link to view governance actions docs [Issue 1131](https://github.com/IntersectMBO/govtool/issues/1131)
 
 ## [sancho-v1.0.11](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.11) 2024-07-30
 

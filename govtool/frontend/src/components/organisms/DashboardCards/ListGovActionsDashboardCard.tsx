@@ -23,7 +23,7 @@ export const ListGovActionsDashboardCards = () => {
           dataTestId: "learn-more-governance-actions-button",
           onClick: () =>
             openInNewTab(
-              "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/governance-actions-view-and-vote",
+              "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/governance-actions",
             ),
           variant: "outlined",
         },

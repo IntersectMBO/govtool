@@ -1,9 +1,9 @@
 module VVA.API.Utils where
 
-import           Data.Aeson (Options (..), defaultOptions)
-import           Data.Char
+import Data.Aeson (Options (..), defaultOptions)
+import Data.Char
 
-import           Foreign    (pooledMalloc)
+import Foreign    (pooledMalloc)
 
 -- | Apply function to first element in the list.
 applyFirst :: (a -> a) -> [a] -> [a]

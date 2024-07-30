@@ -2,45 +2,29 @@ import { useNavigate } from "react-router-dom";
 
 import { IMAGES, PATHS, PDF_PATHS } from "@consts";
 import { PendingTransaction, useFeatureFlag } from "@context";
-import { useTranslation, useWalletErrorModal } from "@hooks";
+import { useTranslation } from "@hooks";
 import { DashboardActionCard } from "@molecules";
-import { correctAdaFormat, openInNewTab } from "@utils";
+import { openInNewTab } from "@utils";
 import { useCallback } from "react";
 
 type ProposeGovActionDashboardCardProps = {
   createGovActionTx: PendingTransaction["createGovAction"];
-  deposit: number;
-  votingPower: number;
 };
 
 export const ProposeGovActionDashboardCard = ({
   createGovActionTx,
-  deposit,
-  votingPower,
 }: ProposeGovActionDashboardCardProps) => {
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const openWalletErrorModal = useWalletErrorModal();
 
   const onClickPropose = useCallback(() => {
-    if (votingPower <= deposit) {
-      openWalletErrorModal({
-        error: t("errors.insufficientBalanceDescription", {
-          ada: correctAdaFormat(deposit),
-        }),
-        title: t("errors.insufficientBalanceTitle"),
-        dataTestId: "insufficient-balance-error-modal",
-      });
-      return;
-    }
-
     navigate(
       isProposalDiscussionForumEnabled
         ? PDF_PATHS.proposalDiscussionPropose
         : PATHS.createGovernanceAction,
     );
-  }, [deposit, votingPower, isProposalDiscussionForumEnabled]);
+  }, [isProposalDiscussionForumEnabled]);
 
   return (
     <DashboardActionCard

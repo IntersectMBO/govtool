@@ -10,21 +10,63 @@ changes.
 
 ## [Unreleased]
 
-- Added 'sentryenv' field in backend config file [Issue 1401](https://github.com/IntersectMBO/govtool/issues/1401)
-- Add wallet connector package [Issue 898](https://github.com/IntersectMBO/govtool/issues/898)
-- Change DRep without metadata name from "Sole Voter" to "Direct Voter" [Issue 880](https://github.com/IntersectMBO/govtool/issues/880)
-- Inicialize Usersnap into App [Issue 546](https://github.com/IntersectMBO/govtool/issues/546)
-- Integrate frontend with metadata validation service [Issue 617](https://github.com/IntersectMBO/govtool/issues/617)
-- Implement a loading modal for the validation of the metadata [Issue 646](https://github.com/IntersectMBO/govtool/issues/646)
-- Fix displaying modals to not block signing transactions [Issue 710](https://github.com/IntersectMBO/govtool/issues/710)
-- Change style of url button to trim the file name [Issue 655](https://github.com/IntersectMBO/govtool/issues/655)
-- Change regex for parsing urls to match urls without protocol [Issue 655](https://github.com/IntersectMBO/govtool/issues/655)
-- Integrate ga displaying metadata validation with the validation service [Issue 712](https://github.com/IntersectMBO/govtool/issues/712)
-- Correct text of the governance action type [Issue 651](https://github.com/IntersectMBO/govtool/issues/651)
-- Enable coverage tests report
+### Added
+
+-
+
+### Fixed
+
+-
+
+### Changed
+
+-
+
+## [sancho-v1.0.11](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.11) 2024-07-30
 
 ### Added
 
+-
+
+### Fixed
+
+- Fix unbound variable in the resync cardano node github workflow [Issue 1624](https://github.com/IntersectMBO/govtool/issues/1624)
+
+### Changed
+
+- bump @intersect.mbo/pdf-ui to v0.3.2
+
+## [sancho-v1.0.10](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.10) 2024-07-29
+
+### Added
+
+- Add redirect to the connected DRep Directory page if a connected user enters a non-connected DRep Directory url [Issue 1117](https://github.com/IntersectMBO/govtool/issues/1117)
+- Add PDF_API_URL to the frontend config [Issue 1575](https://github.com/IntersectMBO/govtool/issues/1575)
+- Provide DB-Sync Postgres envs to the backend config
+- Add redirects to cards on Home after user connects [Issue 1442](https://github.com/IntersectMBO/govtool/issues/1442)
+- Add support for CIP-100 for context to Governance Action Vote [Issue 1582](https://github.com/IntersectMBO/govtool/issues/1582)
+
+### Fixed
+
+- Fix querying metadata-validation service from haskell backend [Issue 1612](https://github.com/IntersectMBO/govtool/issues/1612)
+- Fix thread killed by timeout manager [Issue 1417](https://github.com/IntersectMBO/govtool/issues/1417)
+- Changed use new CSL UTxO selection to take into account change
+
+### Changed
+
+- Set Proposal Discussion Forum Pillar enabled by default [Issue 1501](https://github.com/IntersectMBO/govtool/issues/1501)
+- bump @intersect.mbo/pdf-ui to v0.3.1
+
+## [sancho-v1.0.9](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.9) 2024-07-16
+
+### Added
+
+- Added 'sentryenv' field in backend config file [Issue 1401](https://github.com/IntersectMBO/govtool/issues/1401)
+- Add wallet connector package [Issue 898](https://github.com/IntersectMBO/govtool/issues/898)
+- Initialize Usersnap into App [Issue 546](https://github.com/IntersectMBO/govtool/issues/546)
+- Integrate frontend with metadata validation service [Issue 617](https://github.com/IntersectMBO/govtool/issues/617)
+- Implement a loading modal for the validation of the metadata [Issue 646](https://github.com/IntersectMBO/govtool/issues/646)
+- Integrate ga displaying metadata validation with the validation service [Issue 712](https://github.com/IntersectMBO/govtool/issues/712)
 - added `bio` `dRepName` `email` `references` `metadataValid` and `metadataStatus` fields to `drep/list`
 - added `metadatavalidationmaxconcurrentrequests` field to the backend config
 - added `metadata/validate` endpoint [Issue 876](https://github.com/IntersectMBO/govtool/issues/876)
@@ -67,6 +109,7 @@ changes.
 - Replace govtool-wrapper governance action creation in favor of pdf-pillar [Issue 1284](https://github.com/IntersectMBO/govtool/issues/1284)
 - Add sentry environment config [Issue 1324](https://github.com/IntersectMBO/govtool/issues/1324)
 - Add proposal discussion pillar to home page [Issue 1431](https://github.com/IntersectMBO/govtool/issues/1431)
+- Enable coverage tests report
 
 ### Fixed
 
@@ -107,6 +150,9 @@ changes.
 - Fix app crash on voting on the GA without the connected wallet before [Issue 1313](https://github.com/IntersectMBO/govtool/issues/1313)
 - Fix the navigation to Home from Proposal pillar on disconnected wallet [Issue 1355](https://github.com/IntersectMBO/govtool/issues/1355)
 - Fix navigation over Proposal discussion forum pillar [Issue 1436](https://github.com/IntersectMBO/govtool/issues/1436)
+- Fix building the frontend image [Issue 1583](https://github.com/IntersectMBO/govtool/issues/1583)
+- Correct text of the governance action type [Issue 651](https://github.com/IntersectMBO/govtool/issues/651)
+- Fix displaying modals to not block signing transactions [Issue 710](https://github.com/IntersectMBO/govtool/issues/710)
 
 ### Changed
 
@@ -140,6 +186,9 @@ changes.
 - Changed copy on maintenance page [Issue 753](https://github.com/IntersectMBO/govtool/issues/753)
 - Update link to docs [Issue 1246](https://github.com/IntersectMBO/govtool/issues/1246)
 - Change label of Proposal Discussion nav item [Issue 1349](https://github.com/IntersectMBO/govtool/issues/1349)
+- Change DRep without metadata name from "Sole Voter" to "Direct Voter" [Issue 880](https://github.com/IntersectMBO/govtool/issues/880)
+- Change style of url button to trim the file name [Issue 655](https://github.com/IntersectMBO/govtool/issues/655)
+- Change regex for parsing urls to match urls without protocol [Issue 655](https://github.com/IntersectMBO/govtool/issues/655)
 
 ### Removed
 

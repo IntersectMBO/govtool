@@ -3,6 +3,7 @@ include frontend.mk
 include status-service.mk
 include metadata-validation.mk
 include analytics-dashboard.mk
+include custom-cardano-db-sync.mk
 include utils.mk
 include info.mk
 include config.mk
@@ -10,14 +11,14 @@ include config.mk
 .DEFAULT_GOAL := info
 
 # image tags
-cardano_node_image_tag := 8.11.0-sancho
-cardano_db_sync_image_tag := sancho-4-3-0-docker
+cardano_node_image_tag := 9.0.0-sancho
+cardano_db_sync_image_tag := sancho-5.1.0
 
 .PHONY: all
 all: deploy-stack notify
 
 .PHONY: deploy-stack
-deploy-stack: upload-config push-backend push-frontend push-status-service push-metadata-validation push-analytics-dashboard
+deploy-stack: upload-config push-backend push-frontend push-status-service push-metadata-validation push-analytics-dashboard push-custom-cardano-db-sync
 	@:$(call check_defined, cardano_network)
 	@:$(call check_defined, env)
 	export CARDANO_NETWORK=$(cardano_network); \

@@ -55,10 +55,10 @@ SELECT
     /* created date */
     voting_anchor.url,
     encode(voting_anchor.data_hash, 'hex'),
-    off_chain_vote_data.title,
-    off_chain_vote_data.abstract,
-    off_chain_vote_data.motivation,
-    off_chain_vote_data.rationale,
+    off_chain_vote_gov_action_data.title,
+    off_chain_vote_gov_action_data.abstract,
+    off_chain_vote_gov_action_data.motivation,
+    off_chain_vote_gov_action_data.rationale,
     off_chain_vote_data.json,
     off_chain_vote_data.json#>'{body, references}' as references,
     coalesce(Sum(ldd.amount) FILTER (WHERE voting_procedure.vote::text = 'Yes'), 0) +(
@@ -88,6 +88,7 @@ FROM
     JOIN block AS creator_block ON creator_block.id = creator_tx.block_id
     LEFT JOIN voting_anchor ON voting_anchor.id = gov_action_proposal.voting_anchor_id
     LEFT JOIN off_chain_vote_data ON off_chain_vote_data.voting_anchor_id = voting_anchor.id
+    LEFT JOIN off_chain_vote_gov_action_data ON off_chain_vote_gov_action_data.off_chain_vote_data_id = off_chain_vote_data.id
     LEFT JOIN voting_procedure ON voting_procedure.gov_action_proposal_id = gov_action_proposal.id
     LEFT JOIN LatestDrepDistr ldd ON ldd.hash_id = voting_procedure.drep_voter
         AND ldd.rn = 1
@@ -107,10 +108,10 @@ GROUP BY
         stake_address.view,
         treasury_withdrawal.amount,
         creator_block.epoch_no,
-        off_chain_vote_data.title,
-        off_chain_vote_data.abstract,
-        off_chain_vote_data.motivation,
-        off_chain_vote_data.rationale,
+        off_chain_vote_gov_action_data.title,
+        off_chain_vote_gov_action_data.abstract,
+        off_chain_vote_gov_action_data.motivation,
+        off_chain_vote_gov_action_data.rationale,
         off_chain_vote_data.json,
         gov_action_proposal.index,
         creator_tx.hash,

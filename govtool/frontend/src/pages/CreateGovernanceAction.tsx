@@ -37,7 +37,7 @@ export const CreateGovernanceAction = () => {
   });
 
   useEffect(() => {
-    if (checkIsWalletConnected()) {
+    if (!checkIsWalletConnected()) {
       navigate(PATHS.home);
     }
   }, []);

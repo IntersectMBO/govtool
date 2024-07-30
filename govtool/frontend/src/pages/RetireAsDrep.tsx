@@ -15,7 +15,7 @@ export const RetireAsDrep = () => {
   const { isMobile } = useScreenDimension();
 
   useEffect(() => {
-    if (checkIsWalletConnected()) {
+    if (!checkIsWalletConnected()) {
       navigate(PATHS.home);
     }
   }, []);

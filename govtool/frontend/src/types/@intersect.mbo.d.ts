@@ -6,6 +6,7 @@ enum MetadataValidationStatus {
 }
 
 type ProposalDiscussionProps = {
+  pdfApiUrl: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   walletAPI: any;
   pathname: string;

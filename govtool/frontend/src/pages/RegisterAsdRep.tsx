@@ -55,7 +55,7 @@ export const RegisterAsdRep = () => {
     });
 
   useEffect(() => {
-    if (checkIsWalletConnected()) {
+    if (!checkIsWalletConnected()) {
       navigate(PATHS.home);
     }
   }, []);

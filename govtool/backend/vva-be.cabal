@@ -1,6 +1,6 @@
 cabal-version:      3.6
 name:               vva-be
-version:            0.1.0.0
+version:            1.0.11
 
 -- A short (one-line) description of the package.
 -- synopsis:
@@ -20,7 +20,6 @@ maintainer:         michaljankun@gmail.com
 -- copyright:
 -- category:
 extra-source-files:
-  CHANGELOG.md
   sql/get-voting-power.sql
   sql/list-dreps.sql
   sql/get-delegates.sql
@@ -67,6 +66,7 @@ executable vva-be
                     , http-client
                     , http-client-tls
                     , raven-haskell >= 0.1.4.1
+                    , time-manager
 
     hs-source-dirs:   app
     default-language: Haskell2010

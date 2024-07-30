@@ -8,26 +8,23 @@ import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
 
 export default class ProposalDiscussionPage {
   // Buttons
-  readonly proposalCreateBtn = this.page.getByRole("button", {
-    name: "Propose a Governance Action",
-  });
-  readonly continueBtn = this.page.getByRole("button", { name: "Continue" }); // #BUG test-id missing
-  readonly filterBtn = this.page.locator("#filters-button"); // this.page.getByTestId("filters-button");
-  readonly shareBtn = this.page
-    .locator(".MuiCardHeader-action > .MuiButtonBase-root")
-    .first(); //this.page.getByTestId("share-button");
-  readonly sortBtn = this.page.locator("button:nth-child(2)").first(); //this.page.getByTestId("sort-button");
-  readonly searchInput = this.page.getByPlaceholder("Search..."); // this.page.getByTestId("search-input");
-  readonly showAllBtn = this.page
-    .getByRole("button", { name: "Show all" })
-    .first(); //this.page.getByTestId("show-all-button");
-  readonly showLessBtn = this.page.getByRole("button", { name: "Show less" });
-  readonly infoRadio = this.page.getByLabel("Info");
-  readonly treasuryRadio = this.page.getByLabel("Treasury");
+  readonly proposalCreateBtn = this.page.getByTestId(
+    "propose-a-governance-action-button"
+  );
+  readonly continueBtn = this.page.getByTestId("continue-button");
+  readonly filterBtn = this.page.getByTestId("filter-button");
+  readonly sortBtn = this.page.getByTestId("sort-button");
+  readonly searchInput = this.page.getByTestId("search-input");
+  readonly showAllBtn = this.page.getByTestId("show-all-button").first(); //this.page.getByTestId("show-all-button");
   readonly verifyIdentityBtn = this.page.getByRole("button", {
     name: "Verify your identity",
-  });
-  readonly addLinkBtn = this.page.getByRole("button", { name: "Add link" });
+  }); // BUG
+  readonly addLinkBtn = this.page.getByTestId("add-link-button");
+  readonly infoRadio = this.page.getByTestId("Info-radio-wrapper");
+  readonly treasuryRadio = this.page.getByTestId("Treasury-radio-wrapper");
+  readonly activeProposalWrapper = this.page.getByTestId(
+    "active-proposal-radio-wrapper"
+  );
 
   constructor(private readonly page: Page) {}
 
@@ -37,6 +34,7 @@ export default class ProposalDiscussionPage {
   }
 
   async closeUsernamePrompt() {
+    await this.page.waitForTimeout(5_000);
     await this.page
       .locator("div")
       .filter({ hasText: /^Hey, setup your username$/ })
@@ -54,35 +52,20 @@ export default class ProposalDiscussionPage {
 
   async getAllProposals() {
     await this.page.waitForTimeout(4_000); // waits for proposals to render
-    // BUG  Select all elements with data-testid attribute
-    const elements = await this.page.$$("[data-testid]");
 
-    // Regex pattern to match IDs starting with "proposal" and ending with numbers
-    const pattern = /^proposal-\d+$/;
-
-    // Extract the data-testid attributes
-    const proposalCards: Locator[] = [];
-    for (const element of elements) {
-      const dataTestId = await element.getAttribute("data-testid");
-      if (pattern.test(dataTestId)) {
-        proposalCards.push(this.page.getByTestId(dataTestId));
-      }
-    }
-
-    return proposalCards;
-    // BUG return this.page.locator('[data-testid$="-card"]').all();
+    return this.page
+      .locator('[data-testid^="proposal-"][data-testid$="-card"]')
+      .all();
   }
 
   async setUsername(name: string) {
-    await this.page.getByLabel("Username *").fill(name);
+    await this.page.getByTestId("username-input").fill(name);
 
-    const proceedBtn = this.page.getByRole("button", {
-      name: "Proceed with this username",
-    });
+    const proceedBtn = this.page.getByTestId("proceed-button");
     await proceedBtn.click();
     await proceedBtn.click();
 
-    await this.page.getByRole("button", { name: "Close" }).click();
+    await this.page.getByTestId("close-button").click();
   }
 
   async createProposal(): Promise<number> {
@@ -109,7 +92,7 @@ export default class ProposalDiscussionPage {
     await this.fillForm(proposalRequest);
 
     await this.continueBtn.click();
-    await this.page.getByRole("button", { name: "Submit" }).click();
+    await this.page.getByTestId("submit-button").click();
 
     // Wait for redirection to `proposal-discussion-details` page
     await this.page.waitForTimeout(2_000);
@@ -119,43 +102,66 @@ export default class ProposalDiscussionPage {
   }
 
   private async fillForm(data: ProposalCreateRequest) {
-    await this.page.getByLabel("Governance Action Type *").click();
-    await this.page.getByRole("option", { name: "Info" }).click();
-    await this.page.getByLabel("Title *").fill(data.prop_name);
-    await this.page.getByPlaceholder("Summary...").fill(data.prop_abstract);
-    await this.page.getByLabel("Motivation *").fill(data.prop_motivation);
-    await this.page.getByLabel("Rationale *").fill(data.prop_rationale);
+    await this.page.getByTestId("governance-action-type").click();
+    await this.page.getByTestId("info-button").click();
+    await this.page.getByTestId("title-input").fill(data.prop_name);
+    await this.page.getByTestId("abstract-input").fill(data.prop_abstract);
+    await this.page.getByTestId("motivation-input").fill(data.prop_motivation);
+    await this.page.getByTestId("rationale-input").fill(data.prop_rationale);
 
-    for (const link of data.proposal_links) {
+    for (let index = 0; index < data.proposal_links.length; index++) {
       await this.addLinkBtn.click();
 
       await this.page
-        .getByPlaceholder("https://website.com")
-        .fill(link.prop_link);
-      await this.page.getByPlaceholder("Text").fill(link.prop_link_text);
+        .getByTestId(`link-${index}-url-input`)
+        .fill(data.proposal_links[index].prop_link);
+      await this.page
+        .getByTestId(`link-${index}-text-input`)
+        .fill(data.proposal_links[index].prop_link_text);
+    }
+  }
+
+  async applyAndValidateFilters(
+    filters: string[],
+    validateFunction: (proposalCard: any, filters: string[]) => Promise<boolean>
+  ) {
+    // single filter
+    for (const filter of filters) {
+      await this.filterProposalByNames([filter]);
+      await this.validateFilters(filters, validateFunction);
+      await this.unFilterProposalByNames([filter]);
+    }
+
+    // multiple filter
+    const multipleFilters = [...filters];
+    while (multipleFilters.length > 1) {
+      await this.filterProposalByNames(multipleFilters);
+      await this.validateFilters(multipleFilters, validateFunction);
+      await this.unFilterProposalByNames(multipleFilters);
+      multipleFilters.pop();
     }
   }
 
   async filterProposalByNames(names: string[]) {
     for (const name of names) {
-      await this.page.getByLabel(name).click();
+      await this.page.getByLabel(name).click(); // test id is not in proper format for all filter type
     }
   }
 
   async unFilterProposalByNames(names: string[]) {
     for (const name of names) {
-      await this.page.getByLabel(name).click();
+      await this.page.getByLabel(name).click(); // test id is not in proper format for all filter type
     }
   }
 
-  async validateFilters(filters: string[]) {
+  async validateFilters(
+    filters: string[],
+    validateFunction: (proposalCard: any, filters: string[]) => Promise<boolean>
+  ) {
     const proposalCards = await this.getAllProposals();
 
     for (const proposalCard of proposalCards) {
-      const hasFilter = await this._validateFiltersInProposalCard(
-        proposalCard,
-        filters
-      );
+      const hasFilter = await validateFunction(proposalCard, filters);
       expect(hasFilter).toBe(true);
     }
   }
@@ -182,15 +188,27 @@ export default class ProposalDiscussionPage {
     }
   }
 
-  async _validateFiltersInProposalCard(
+  async _validateTypeFiltersInProposalCard(
     proposalCard: Locator,
     filters: string[]
   ): Promise<boolean> {
-    const proposalTypeTextContent = await proposalCard
-      .locator('[data-testid$="-type"]')
+    const govActionType = await proposalCard
+      .getByTestId("governance-action-type")
       .textContent();
-    const govActionType = proposalTypeTextContent.split(":")[1];
 
     return filters.includes(govActionType);
+  }
+
+  async _validateStatusFiltersInProposalCard(
+    proposalCard: Locator,
+    filters: string[]
+  ): Promise<boolean> {
+    const govActionType = await proposalCard
+      .locator('[data-test^="proposal-"][data-testid$="-status"]')
+      .textContent();
+
+    return filters
+      .map((filter) => filter.toLowerCase())
+      .includes(govActionType.toLowerCase());
   }
 }

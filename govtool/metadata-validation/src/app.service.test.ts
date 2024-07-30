@@ -7,7 +7,7 @@ import { AppService } from './app.service';
 import { ValidateMetadataDTO } from '@dto';
 import { MetadataValidationStatus } from '@enums';
 import { MetadataStandard } from '@types';
-import { canonizeJSON, validateMetadataStandard, parseMetadata } from '@utils';
+import { validateMetadataStandard, parseMetadata } from '@utils';
 import { AxiosResponse, AxiosRequestHeaders } from 'axios';
 
 jest.mock('@utils');
@@ -42,7 +42,6 @@ describe('AppService', () => {
       body: 'testBody',
       headers: {},
     };
-    const canonizedMetadata = 'canonizedMetadata';
     const parsedMetadata = { parsed: 'metadata' };
     const response: AxiosResponse = {
       data,
@@ -57,7 +56,6 @@ describe('AppService', () => {
     jest.spyOn(httpService, 'get').mockReturnValueOnce(of(response));
     (validateMetadataStandard as jest.Mock).mockResolvedValueOnce(undefined);
     (parseMetadata as jest.Mock).mockReturnValueOnce(parsedMetadata);
-    (canonizeJSON as jest.Mock).mockResolvedValueOnce(canonizedMetadata);
     jest.spyOn(blake, 'blake2bHex').mockReturnValueOnce(hash);
 
     const result = await service.validateMetadata(validateMetadataDTO);
@@ -69,7 +67,6 @@ describe('AppService', () => {
     });
     expect(validateMetadataStandard).toHaveBeenCalledWith(data, standard);
     expect(parseMetadata).toHaveBeenCalledWith(data.body, standard);
-    expect(canonizeJSON).toHaveBeenCalledWith(data);
   });
 
   it('should handle URL_NOT_FOUND error', async () => {
@@ -100,7 +97,6 @@ describe('AppService', () => {
     const data = {
       body: 'testBody',
     };
-    const canonizedMetadata = 'canonizedMetadata';
     const parsedMetadata = { parsed: 'metadata' };
 
     const response: AxiosResponse = {
@@ -116,7 +112,6 @@ describe('AppService', () => {
     jest.spyOn(httpService, 'get').mockReturnValueOnce(of(response));
     (validateMetadataStandard as jest.Mock).mockResolvedValueOnce(undefined);
     (parseMetadata as jest.Mock).mockReturnValueOnce(parsedMetadata);
-    (canonizeJSON as jest.Mock).mockResolvedValueOnce(canonizedMetadata);
     jest.spyOn(blake, 'blake2bHex').mockReturnValueOnce('differentHash');
 
     const result = await service.validateMetadata(validateMetadataDTO);
@@ -151,7 +146,6 @@ describe('AppService', () => {
     jest.spyOn(httpService, 'get').mockReturnValueOnce(of(response));
     (validateMetadataStandard as jest.Mock).mockResolvedValueOnce(undefined);
     (parseMetadata as jest.Mock).mockReturnValueOnce(parsedMetadata);
-    (canonizeJSON as jest.Mock).mockRejectedValueOnce(new Error());
 
     const result = await service.validateMetadata(validateMetadataDTO);
 

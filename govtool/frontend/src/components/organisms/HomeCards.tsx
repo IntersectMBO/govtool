@@ -44,7 +44,7 @@ export const HomeCards = () => {
 
   const onClickLearnMoreAboutProposingGovAction = () =>
     openInNewTab(
-      "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/propose-a-governance-action",
+      "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/governance-actions/propose-a-governance-action",
     );
 
   const navigateToGovActions = useCallback(

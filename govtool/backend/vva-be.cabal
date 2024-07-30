@@ -20,7 +20,6 @@ maintainer:         michaljankun@gmail.com
 -- copyright:
 -- category:
 extra-source-files:
-  CHANGELOG.md
   sql/get-voting-power.sql
   sql/list-dreps.sql
   sql/get-delegates.sql

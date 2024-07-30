@@ -60,6 +60,8 @@ jobs:
       NEXT_PUBLIC_API_URL: "https://participation.sanchogov.tools"
       NEXT_PUBLIC_GA4_PROPERTY_ID: ${{ secrets.NEXT_PUBLIC_GA4_PROPERTY_ID }}
       DEV_NGINX_BASIC_AUTH: ${{ secrets.DEV_NGINX_BASIC_AUTH }}
+      TEST_NGINX_BASIC_AUTH: ${{ secrets.TEST_NGINX_BASIC_AUTH }}
+      STAGING_NGINX_BASIC_AUTH: ${{ secrets.STAGING_NGINX_BASIC_AUTH }}
       PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN_FRONTEND }}
       SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}

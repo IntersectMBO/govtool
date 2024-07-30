@@ -20,7 +20,7 @@ changes.
 
 ### Changed
 
--
+- bump @intersect.mbo/pdf-ui to v0.3.2
 
 ## [sancho-v1.0.10](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.10) 2024-07-29
 

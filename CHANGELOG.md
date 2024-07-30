@@ -16,6 +16,20 @@ changes.
 
 ### Fixed
 
+-
+
+### Changed
+
+-
+
+## [sancho-v1.0.11](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.11) 2024-07-30
+
+### Added
+
+-
+
+### Fixed
+
 - Fix unbound variable in the resync cardano node github workflow [Issue 1624](https://github.com/IntersectMBO/govtool/issues/1624)
 
 ### Changed

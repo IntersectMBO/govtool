@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix unbound variable in the resync cardano node github workflow [Issue 1624](https://github.com/IntersectMBO/govtool/issues/1624)
 
 ### Changed
 

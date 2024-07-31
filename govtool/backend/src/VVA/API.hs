@@ -445,6 +445,7 @@ getNetworkMetrics = do
     , getNetworkMetricsResponseTotalRegisteredDReps = networkMetricsTotalRegisteredDReps
     , getNetworkMetricsResponseAlwaysAbstainVotingPower = networkMetricsAlwaysAbstainVotingPower
     , getNetworkMetricsResponseAlwaysNoConfidenceVotingPower = networkMetricsAlwaysNoConfidenceVotingPower
+    , getNetworkMetricsResponseNetworkName = networkMetricsNetworkName
     }
 
 validateProposalMetadata :: App m => MetadataValidationParams -> m (Types.MetadataValidationResult Types.ProposalMetadata)

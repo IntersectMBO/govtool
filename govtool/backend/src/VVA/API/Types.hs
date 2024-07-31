@@ -454,7 +454,6 @@ data ProposalResponse
       , proposalResponseAbstract       :: Maybe Text
       , proposalResponseMotivation     :: Maybe Text
       , proposalResponseRationale      :: Maybe Text
-      , proposalResponseReferences     :: [Text]
       , proposalResponseYesVotes       :: Integer
       , proposalResponseNoVotes        :: Integer
       , proposalResponseAbstainVotes   :: Integer
@@ -479,7 +478,6 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"abstract\": \"Proposal About\","
                   <> "\"motivation\": \"Proposal Motivation\","
                   <> "\"rationale\": \"Proposal Rationale\","
-                  <> "\"references\": [\"google.com\"],"
                   <> "\"yesVotes\": 0,"
                   <> "\"noVotes\": 0,"
                   <> "\"abstainVotes\": 0}"

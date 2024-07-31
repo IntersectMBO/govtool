@@ -3,7 +3,7 @@
         "host"     : "localhost",
         "dbname"   : "cexplorer",
         "user"     : "postgres",
-        "password" : "v8hlDV0yMAHHlIurYupj",
+        "password" : "postgres",
         "port"     : 5432
       },
     "port" : 9999,

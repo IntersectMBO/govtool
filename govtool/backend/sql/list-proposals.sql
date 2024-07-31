@@ -59,8 +59,6 @@ SELECT
     off_chain_vote_gov_action_data.abstract,
     off_chain_vote_gov_action_data.motivation,
     off_chain_vote_gov_action_data.rationale,
-    off_chain_vote_data.json,
-    off_chain_vote_data.json#>'{body, references}' as references,
     coalesce(Sum(ldd.amount) FILTER (WHERE voting_procedure.vote::text = 'Yes'), 0) +(
         CASE WHEN gov_action_proposal.type = 'NoConfidence' THEN
             always_no_confidence_voting_power.amount

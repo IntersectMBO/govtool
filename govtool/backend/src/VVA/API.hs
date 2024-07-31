@@ -13,14 +13,16 @@ import           Control.Exception        (throw, throwIO)
 import           Control.Monad.Except     (runExceptT, throwError)
 import           Control.Monad.Reader
 
-import           Data.Aeson               (Result (Error, Success), fromJSON, Value)
+import           Data.Aeson               (Value(..), Array, decode, encode, FromJSON, ToJSON)
 import           Data.Bool                (Bool)
 import           Data.List                (sortOn)
 import qualified Data.Map                 as Map
-import           Data.Maybe               (Maybe (Nothing), catMaybes, fromMaybe)
+import           Data.Maybe               (Maybe (Nothing), catMaybes, fromMaybe, mapMaybe)
 import           Data.Ord                 (Down (..))
 import           Data.Text                hiding (any, drop, elem, filter, length, map, null, take)
 import qualified Data.Text                as Text
+import qualified Data.Vector as V
+
 
 import           Numeric.Natural          (Natural)
 
@@ -177,12 +179,6 @@ getVotingPower (unHexText -> dRepId) = do
   CacheEnv {dRepVotingPowerCache} <- asks vvaCache
   cacheRequest dRepVotingPowerCache dRepId $ DRep.getVotingPower dRepId
 
-decodeReferences :: Maybe Value -> Maybe [Text]
-decodeReferences Nothing = Nothing
-decodeReferences (Just val) = case fromJSON val of
-    Success texts -> Just texts
-    Error _ -> Nothing
-
 proposalToResponse :: Types.Proposal -> ProposalResponse
 proposalToResponse Types.Proposal {..} =
   ProposalResponse
@@ -201,7 +197,6 @@ proposalToResponse Types.Proposal {..} =
     proposalResponseAbstract =  proposalAbstract,
     proposalResponseMotivation =  proposalMotivation,
     proposalResponseRationale = proposalRationale,
-    proposalResponseReferences = fromMaybe [] (decodeReferences proposalReferences),
     proposalResponseYesVotes = proposalYesVotes,
     proposalResponseNoVotes = proposalNoVotes,
     proposalResponseAbstainVotes = proposalAbstainVotes

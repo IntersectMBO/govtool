@@ -125,7 +125,6 @@ data Proposal
       , proposalAbstract       :: Maybe Text
       , proposalMotivation     :: Maybe Text
       , proposalRationale      :: Maybe Text
-      , proposalReferences     :: Maybe Value
       , proposalYesVotes       :: Integer
       , proposalNoVotes        :: Integer
       , proposalAbstainVotes   :: Integer

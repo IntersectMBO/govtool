@@ -27,6 +27,7 @@ changes.
 ### Added
 
 - Add network name to GET /network/metrics [Issue 1644](https://github.com/IntersectMBO/govtool/issues/1644)
+- Add network metrics model to frontend service
 
 ### Fixed
 

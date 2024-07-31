@@ -198,6 +198,7 @@ data NetworkMetrics
       , networkMetricsTotalRegisteredDReps          :: Integer
       , networkMetricsAlwaysAbstainVotingPower      :: Integer
       , networkMetricsAlwaysNoConfidenceVotingPower :: Integer
+      , networkMetricsNetworkName                   :: Text
       }
 
 data Delegation

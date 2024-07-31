@@ -71,7 +71,8 @@ SELECT
     total_drep_votes.count,
     total_registered_dreps.count,
     always_abstain_voting_power.amount,
-    always_no_confidence_voting_power.amount
+    always_no_confidence_voting_power.amount,
+    network_name
 FROM
     current_epoch
     CROSS JOIN current_block
@@ -82,3 +83,4 @@ FROM
     CROSS JOIN total_registered_dreps
     CROSS JOIN always_abstain_voting_power
     CROSS JOIN always_no_confidence_voting_power
+    CROSS JOIN meta;

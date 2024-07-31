@@ -9,12 +9,11 @@
 module VVA.API where
 
 import           Control.Concurrent.Async (mapConcurrently)
-import           Control.Concurrent.QSem  (signalQSem, waitQSem)
 import           Control.Exception        (throw, throwIO)
 import           Control.Monad.Except     (runExceptT, throwError)
 import           Control.Monad.Reader
 
-import           Data.Aeson               (Result (Error, Success), fromJSON)
+import           Data.Aeson               (Result (Error, Success), fromJSON, Value)
 import           Data.Bool                (Bool)
 import           Data.List                (sortOn)
 import qualified Data.Map                 as Map
@@ -36,7 +35,6 @@ import           VVA.Cache                (cacheRequest)
 import           VVA.Config
 import qualified VVA.DRep                 as DRep
 import qualified VVA.Epoch                as Epoch
-import qualified VVA.Metadata             as Metadata
 import           VVA.Network              as Network
 import qualified VVA.Proposal             as Proposal
 import qualified VVA.Transaction          as Transaction
@@ -76,8 +74,6 @@ type VVAApi =
     :<|> "transaction" :> "status" :> Capture "transactionId" HexText :> Get '[JSON] GetTransactionStatusResponse
     :<|> "throw500" :> Get '[JSON] ()
     :<|> "network" :> "metrics" :> Get '[JSON] GetNetworkMetricsResponse
-    :<|> "proposal" :> "metadata" :> "validate" :> ReqBody '[JSON] MetadataValidationParams :> Post '[JSON] MetadataValidationResponse
-    :<|> "drep" :> "metadata" :> "validate" :> ReqBody '[JSON] MetadataValidationParams :> Post '[JSON] MetadataValidationResponse
 server :: App m => ServerT VVAApi m
 server = drepList
     :<|> getVotingPower
@@ -91,8 +87,6 @@ server = drepList
     :<|> getTransactionStatus
     :<|> throw500
     :<|> getNetworkMetrics
-    :<|> getProposalMetadataValidationResponse
-    :<|> getDRepMetadataValidationResponse
 
 
 mapDRepType :: Types.DRepType -> DRepType
@@ -104,10 +98,9 @@ mapDRepStatus Types.Retired  = Retired
 mapDRepStatus Types.Active   = Active
 mapDRepStatus Types.Inactive = Inactive
 
-drepRegistrationToDrep :: Types.DRepRegistration -> Types.MetadataValidationResult Types.DRepMetadata -> DRep
-drepRegistrationToDrep Types.DRepRegistration {..} Types.MetadataValidationResult{..} =
-  let metadata = metadataValidationResultMetadata
-  in DRep
+drepRegistrationToDrep :: Types.DRepRegistration -> DRep
+drepRegistrationToDrep Types.DRepRegistration {..} =
+  DRep
     { dRepDrepId = DRepHash dRepRegistrationDRepHash,
       dRepView = dRepRegistrationView,
       dRepUrl = dRepRegistrationUrl,
@@ -117,13 +110,7 @@ drepRegistrationToDrep Types.DRepRegistration {..} Types.MetadataValidationResul
       dRepStatus = mapDRepStatus dRepRegistrationStatus,
       dRepType = mapDRepType dRepRegistrationType,
       dRepLatestTxHash = HexText <$> dRepRegistrationLatestTxHash,
-      dRepLatestRegistrationDate = dRepRegistrationLatestRegistrationDate,
-      dRepBio = Types.dRepMetadataBio <$> metadata,
-      dRepDRepName = Types.dRepMetadataDRepName <$> metadata,
-      dRepEmail = Types.dRepMetadataEmail <$> metadata,
-      dRepReferences = maybe [] Types.dRepMetadataReferences metadata,
-      dRepMetadataStatus = metadataValidationResultStatus,
-      dRepMetadataValid = metadataValidationResultValid
+      dRepLatestRegistrationDate = dRepRegistrationLatestRegistrationDate
     }
 
 delegationToResponse :: Types.Delegation -> DelegationResponse
@@ -163,21 +150,12 @@ drepList mSearchQuery statuses mSortMode mPage mPageSize = do
           dRepRegistrationStatus
 
   appEnv <- ask
-  qsem <- asks vvaMetadataQSem
 
   allValidDReps <- liftIO $ mapConcurrently
-    (\d@Types.DRepRegistration{..} ->
-      drepRegistrationToDrep d
-      <$> do
-         waitQSem qsem
-         r <- either throwIO return =<< runExceptT (runReaderT (validateDRepMetadata
-                      (MetadataValidationParams
-                        (fromMaybe "" dRepRegistrationUrl)
-                        $ HexText (fromMaybe "" dRepRegistrationDataHash))) appEnv)
-         signalQSem qsem
-         return r)
+    (\d@Types.DRepRegistration{..} -> do
+        let drep = drepRegistrationToDrep d
+        return drep)
     $ sortDReps $ filterDRepsByQuery $ filterDRepsByStatus dreps
-
 
   let page = (fromIntegral $ fromMaybe 0 mPage) :: Int
       pageSize = (fromIntegral $ fromMaybe 10 mPageSize) :: Int
@@ -199,11 +177,14 @@ getVotingPower (unHexText -> dRepId) = do
   CacheEnv {dRepVotingPowerCache} <- asks vvaCache
   cacheRequest dRepVotingPowerCache dRepId $ DRep.getVotingPower dRepId
 
+decodeReferences :: Maybe Value -> Maybe [Text]
+decodeReferences Nothing = Nothing
+decodeReferences (Just val) = case fromJSON val of
+    Success texts -> Just texts
+    Error _ -> Nothing
 
-proposalToResponse :: Types.Proposal -> Types.MetadataValidationResult Types.ProposalMetadata -> ProposalResponse
-proposalToResponse Types.Proposal {..} Types.MetadataValidationResult{..} =
-  let metadata = metadataValidationResultMetadata
-  in
+proposalToResponse :: Types.Proposal -> ProposalResponse
+proposalToResponse Types.Proposal {..} =
   ProposalResponse
   { proposalResponseId = pack $ show proposalId,
     proposalResponseTxHash = HexText proposalTxHash,
@@ -216,30 +197,15 @@ proposalToResponse Types.Proposal {..} Types.MetadataValidationResult{..} =
     proposalResponseCreatedEpochNo = proposalCreatedEpochNo,
     proposalResponseUrl = proposalUrl,
     proposalResponseMetadataHash = HexText proposalDocHash,
-    proposalResponseTitle = getTitle proposalTitle metadata,
-    proposalResponseAbstract = getAbstract proposalAbstract metadata,
-    proposalResponseMotivation = getMotivation proposalMotivation metadata,
-    proposalResponseRationale = getRationale proposalRationale metadata,
-    proposalResponseMetadata = GovernanceActionMetadata <$> proposalMetadata,
-    proposalResponseReferences = getReferences proposalReferences metadata,
+    proposalResponseTitle =  proposalTitle,
+    proposalResponseAbstract =  proposalAbstract,
+    proposalResponseMotivation =  proposalMotivation,
+    proposalResponseRationale = proposalRationale,
+    proposalResponseReferences = fromMaybe [] (decodeReferences proposalReferences),
     proposalResponseYesVotes = proposalYesVotes,
     proposalResponseNoVotes = proposalNoVotes,
-    proposalResponseAbstainVotes = proposalAbstainVotes,
-    proposalResponseMetadataStatus = metadataValidationResultStatus,
-    proposalResponseMetadataValid = metadataValidationResultValid
+    proposalResponseAbstainVotes = proposalAbstainVotes
   }
-  where
-   getTitle p Nothing = p
-   getTitle _ m       = Types.proposalMetadataTitle <$> m
-   getAbstract p Nothing = p
-   getAbstract _ m       = Types.proposalMetadataAbstract <$> m
-   getMotivation p Nothing = p
-   getMotivation _ m       = Types.proposalMetadataMotivation <$> m
-   getRationale p Nothing = p
-   getRationale _ m       = Types.proposalMetadataRationale <$> m
-   -- TODO: convert aeson references to [Text] from database
-   --getReferences p Nothing = p
-   getReferences _ = maybe [] Types.proposalMetadataReferences
 
 voteToResponse :: Types.Vote -> VoteParams
 voteToResponse Types.Vote {..} =
@@ -254,7 +220,6 @@ voteToResponse Types.Vote {..} =
     voteParamsTxHash = HexText voteTxHash
   }
 
-
 mapSortAndFilterProposals
   :: App m
   => [GovernanceActionType]
@@ -262,19 +227,7 @@ mapSortAndFilterProposals
   -> [Types.Proposal]
   -> m [ProposalResponse]
 mapSortAndFilterProposals selectedTypes sortMode proposals = do
-
-  appEnv <- ask
-  qsem <- asks vvaMetadataQSem
-
-  mappedProposals <-
-    liftIO $ mapConcurrently
-          (\proposal@Types.Proposal {proposalUrl, proposalDocHash} ->
-                do
-                  waitQSem qsem
-                  r <- either throwIO return =<< runExceptT (runReaderT (proposalToResponse proposal <$> validateProposalMetadata (MetadataValidationParams proposalUrl $ HexText proposalDocHash)) appEnv)
-                  signalQSem qsem
-                  return r)
-          proposals
+  let mappedProposals = map proposalToResponse proposals
   let filteredProposals =
         if null selectedTypes
           then mappedProposals
@@ -398,8 +351,7 @@ getProposal g@(GovActionId govActionTxHash govActionIndex) mDrepId' = do
   let mDrepId = unHexText <$> mDrepId'
   CacheEnv {getProposalCache} <- asks vvaCache
   proposal@Types.Proposal {proposalUrl, proposalDocHash} <- cacheRequest getProposalCache (unHexText govActionTxHash, govActionIndex) (Proposal.getProposal (unHexText govActionTxHash) govActionIndex)
-  proposalMetadataValidationResult <- validateProposalMetadata $ MetadataValidationParams proposalUrl $ HexText proposalDocHash
-  let proposalResponse = proposalToResponse proposal proposalMetadataValidationResult
+  let proposalResponse = proposalToResponse proposal
   voteResponse <- case mDrepId of
     Nothing -> return Nothing
     Just drepId -> do
@@ -447,35 +399,3 @@ getNetworkMetrics = do
     , getNetworkMetricsResponseAlwaysNoConfidenceVotingPower = networkMetricsAlwaysNoConfidenceVotingPower
     , getNetworkMetricsResponseNetworkName = networkMetricsNetworkName
     }
-
-validateProposalMetadata :: App m => MetadataValidationParams -> m (Types.MetadataValidationResult Types.ProposalMetadata)
-validateProposalMetadata MetadataValidationParams {..} = do
-  CacheEnv {proposalMetadataValidationCache} <- asks vvaCache
-  cacheRequest proposalMetadataValidationCache (metadataValidationParamsUrl, unHexText metadataValidationParamsHash)
-      $ Metadata.getProposalMetadataValidationResult metadataValidationParamsUrl (unHexText metadataValidationParamsHash)
-
-getProposalMetadataValidationResponse :: App m => MetadataValidationParams -> m MetadataValidationResponse
-getProposalMetadataValidationResponse params = do
-  result <- validateProposalMetadata params
-  case result of
-    Types.MetadataValidationResult {..} -> do
-      return $ MetadataValidationResponse
-        { metadataValidationResponseValid = metadataValidationResultValid
-        , metadataValidationResponseStatus = metadataValidationResultStatus
-        }
-
-validateDRepMetadata :: App m => MetadataValidationParams -> m (Types.MetadataValidationResult Types.DRepMetadata)
-validateDRepMetadata MetadataValidationParams {..} = do
-  CacheEnv {dRepMetadataValidationCache} <- asks vvaCache
-  cacheRequest dRepMetadataValidationCache (metadataValidationParamsUrl, unHexText metadataValidationParamsHash)
-      $ Metadata.getDRepMetadataValidationResult metadataValidationParamsUrl (unHexText metadataValidationParamsHash)
-
-getDRepMetadataValidationResponse :: App m => MetadataValidationParams -> m MetadataValidationResponse
-getDRepMetadataValidationResponse params = do
-  result <- validateDRepMetadata params
-  case result of
-    Types.MetadataValidationResult {..} -> do
-      return $ MetadataValidationResponse
-        { metadataValidationResponseValid = metadataValidationResultValid
-        , metadataValidationResponseStatus = metadataValidationResultStatus
-        }

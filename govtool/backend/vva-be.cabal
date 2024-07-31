@@ -118,5 +118,4 @@ library
                  , VVA.Pool
                  , VVA.Types
                  , VVA.Network
-                 , VVA.Metadata
   ghc-options: -threaded

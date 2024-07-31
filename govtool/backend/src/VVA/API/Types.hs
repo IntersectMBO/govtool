@@ -454,13 +454,10 @@ data ProposalResponse
       , proposalResponseAbstract       :: Maybe Text
       , proposalResponseMotivation     :: Maybe Text
       , proposalResponseRationale      :: Maybe Text
-      , proposalResponseMetadata       :: Maybe GovernanceActionMetadata
       , proposalResponseReferences     :: [Text]
       , proposalResponseYesVotes       :: Integer
       , proposalResponseNoVotes        :: Integer
       , proposalResponseAbstainVotes   :: Integer
-      , proposalResponseMetadataStatus :: Maybe Text
-      , proposalResponseMetadataValid  :: Bool
       }
   deriving (Generic, Show)
 
@@ -482,13 +479,10 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"abstract\": \"Proposal About\","
                   <> "\"motivation\": \"Proposal Motivation\","
                   <> "\"rationale\": \"Proposal Rationale\","
-                  <> "\"metadata\": {\"key\": \"value\"},"
                   <> "\"references\": [\"google.com\"],"
                   <> "\"yesVotes\": 0,"
                   <> "\"noVotes\": 0,"
-                  <> "\"abstainVotes\": 0,"
-                  <> "\"metadataStatus\": \"URL_NOT_FOUND\","
-                  <> "\"metadataValid\": true}"
+                  <> "\"abstainVotes\": 0}"
 
 instance ToSchema ProposalResponse where
   declareNamedSchema proxy = do
@@ -831,12 +825,6 @@ data DRep
       , dRepType                   :: DRepType
       , dRepLatestTxHash           :: Maybe HexText
       , dRepLatestRegistrationDate :: UTCTime
-      , dRepBio                    :: Maybe Text
-      , dRepDRepName               :: Maybe Text
-      , dRepEmail                  :: Maybe Text
-      , dRepReferences             :: [Text]
-      , dRepMetadataStatus         :: Maybe Text
-      , dRepMetadataValid          :: Bool
       }
   deriving (Generic, Show)
 
@@ -854,13 +842,7 @@ exampleDrep =
   <> "\"status\": \"Active\","
   <> "\"type\": \"DRep\","
   <> "\"latestTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
-  <> "\"latestRegistrationDate\": \"1970-01-01T00:00:00Z\","
-  <> "\"bio\": \"DRep Bio\","
-  <> "\"dRepName\": \"DRep Name\","
-  <> "\"email\": \"google@gmail.com\","
-  <> "\"references\": [\"google.com\"],"
-  <> "\"metadataStatus\": \"URL_NOT_FOUND\","
-  <> "\"metadataValid\": true}"
+  <> "\"latestRegistrationDate\": \"1970-01-01T00:00:00Z\"}"
 
 -- ToSchema instance for DRep
 instance ToSchema DRep where

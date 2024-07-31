@@ -48,11 +48,10 @@ SELECT
             null
         end
     ) as description,
-    epoch_utils.last_epoch_end_time + epoch_utils.epoch_duration *(gov_action_proposal.expiration - epoch_utils.last_epoch_no),
+    epoch_utils.last_epoch_end_time + epoch_utils.epoch_duration * (gov_action_proposal.expiration - epoch_utils.last_epoch_no),
     gov_action_proposal.expiration,
     creator_block.time,
     creator_block.epoch_no,
-    /* created date */
     voting_anchor.url,
     encode(voting_anchor.data_hash, 'hex'),
     off_chain_vote_gov_action_data.title,
@@ -78,7 +77,6 @@ FROM
     on gov_action_proposal.id = treasury_withdrawal.gov_action_proposal_id
     LEFT JOIN stake_address
     on stake_address.id = treasury_withdrawal.stake_address_id
-
     CROSS JOIN EpochUtils AS epoch_utils
     CROSS JOIN always_no_confidence_voting_power
     CROSS JOIN always_abstain_voting_power
@@ -110,7 +108,6 @@ GROUP BY
         off_chain_vote_gov_action_data.abstract,
         off_chain_vote_gov_action_data.motivation,
         off_chain_vote_gov_action_data.rationale,
-        off_chain_vote_data.json,
         gov_action_proposal.index,
         creator_tx.hash,
         creator_block.time,

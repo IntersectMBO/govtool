@@ -37,8 +37,6 @@ import qualified Data.Text.Lazy.Encoding                as LazyText
 
 import           Database.PostgreSQL.Simple             (close, connectPostgreSQL)
 
-import           Network.HTTP.Client                    hiding (Proxy, Request)
-import           Network.HTTP.Client.TLS
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 import           Network.Wai.Middleware.Cors
@@ -120,8 +118,7 @@ startApp vvaConfig = do
       , networkMetricsCache
       }
   connectionPool <- createPool (connectPostgreSQL (encodeUtf8 (dbSyncConnectionString $ getter vvaConfig))) close 1 1 60
-  vvaTlsManager <- newManager tlsManagerSettings
-  let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool, vvaTlsManager }
+  let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool }
   server' <- mkVVAServer appEnv
   runSettings settings server'
 

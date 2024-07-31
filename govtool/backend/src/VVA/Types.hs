@@ -22,8 +22,6 @@ import           Data.Time                  (UTCTime)
 
 import           Database.PostgreSQL.Simple (Connection)
 
-import           Network.HTTP.Client        (Manager)
-
 import           VVA.Cache
 import           VVA.Config
 
@@ -34,7 +32,6 @@ data AppEnv
       { vvaConfig         :: VVAConfig
       , vvaCache          :: CacheEnv
       , vvaConnectionPool :: Pool Connection
-      , vvaTlsManager     :: Manager
       }
 
 instance Has VVAConfig AppEnv where
@@ -48,10 +45,6 @@ instance Has CacheEnv AppEnv where
 instance Has (Pool Connection) AppEnv where
   getter AppEnv {vvaConnectionPool} = vvaConnectionPool
   modifier f a@AppEnv {vvaConnectionPool} = a {vvaConnectionPool = f vvaConnectionPool}
-
-instance Has Manager AppEnv where
-  getter AppEnv {vvaTlsManager} = vvaTlsManager
-  modifier f a@AppEnv {vvaTlsManager} = a {vvaTlsManager = f vvaTlsManager}
 
 data AppError
   = ValidationError Text

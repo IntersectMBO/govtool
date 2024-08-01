@@ -37,11 +37,7 @@ export const getProposals = async ({
     elements: await Promise.all(
       response.data.elements.map(async (proposal) => {
         if (proposal.metadataStatus || proposal.metadataValid) {
-          return {
-            ...proposal,
-            metadataStatus: proposal.metadataStatus,
-            metadataValid: proposal.metadataValid,
-          };
+          return proposal;
         }
         if (proposal.url && proposal.metadataHash) {
           const validationResponse = await postValidate({

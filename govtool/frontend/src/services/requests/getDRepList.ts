@@ -40,11 +40,7 @@ export const getDRepList = async ({
     elements: await Promise.all(
       response.data.elements.map(async (drep) => {
         if (drep.metadataStatus || drep.metadataValid) {
-          return {
-            ...drep,
-            metadataStatus: drep.metadataStatus,
-            metadataValid: drep.metadataValid,
-          };
+          return drep;
         }
         if (drep.url && drep.metadataHash) {
           const validationResponse = await postValidate({

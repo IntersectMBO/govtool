@@ -50,12 +50,12 @@ test("7H. Should submit a proposal as governance action", async ({
 
   await proposalSubmissionPage.fillUpValidMetadata();
 
-  await expect(proposalSubmissionPage.registrationSuccessModal).toBeVisible({
-    timeout: 10_000,
-  });
-  await expect(page.getByTestId("ga-submitted-modal-title")).toHaveText(
-    /governance action submitted!/i
+  await expect(userPage.getByTestId("ga-submitted-modal-title")).toHaveText(
+    /governance action submitted!/i,
+    {
+      timeout: 10_000,
+    }
   );
 
-  await waitForTxConfirmation(page);
+  await waitForTxConfirmation(userPage);
 });

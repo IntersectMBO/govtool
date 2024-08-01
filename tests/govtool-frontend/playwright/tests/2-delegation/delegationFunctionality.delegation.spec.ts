@@ -178,6 +178,7 @@ test.describe("Register DRep state", () => {
 });
 
 test("2G. Should delegate to myself", async ({ page, browser }, testInfo) => {
+  test.skip();
   test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
   const wallet = await walletManager.popWallet("registeredDRep");

@@ -1,6 +1,6 @@
 cabal-version:      3.6
 name:               vva-be
-version:            1.0.11
+version:            1.0.12
 
 -- A short (one-line) description of the package.
 -- synopsis:
@@ -118,5 +118,4 @@ library
                  , VVA.Pool
                  , VVA.Types
                  , VVA.Network
-                 , VVA.Metadata
   ghc-options: -threaded

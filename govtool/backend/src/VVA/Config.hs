@@ -21,9 +21,6 @@ module VVA.Config
     , loadVVAConfig
       -- * Data type conversions
     , getDbSyncConnectionString
-    , getMetadataValidationEnabled
-    , getMetadataValidationHost
-    , getMetadataValidationPort
     , getServerHost
     , getServerPort
     , vvaConfigToText
@@ -82,14 +79,6 @@ data VVAConfigInternal
       , vVAConfigInternalSentrydsn                               :: String
         -- | Sentry environment
       , vVAConfigInternalSentryEnv                               :: String
-        -- | Metadata validation service enabled
-      , vVAConfigInternalMetadataValidationEnabled               :: Bool
-        -- | Metadata validation service host
-      , vVAConfigInternalMetadataValidationHost                  :: Text
-        -- | Metadata validation service port
-      , vVAConfigInternalMetadataValidationPort                  :: Int
-        -- | Maximum number of concurrent metadata requests
-      , vVAConfigInternalMetadataValidationMaxConcurrentRequests :: Int
       }
   deriving (FromConfig, Generic, Show)
 
@@ -101,11 +90,7 @@ instance DefaultConfig VVAConfigInternal where
         vVAConfigInternalHost = "localhost",
         vVaConfigInternalCacheDurationSeconds = 20,
         vVAConfigInternalSentrydsn = "https://username:password@senty.host/id",
-        vVAConfigInternalSentryEnv = "development",
-        vVAConfigInternalMetadataValidationEnabled = True,
-        vVAConfigInternalMetadataValidationHost = "localhost",
-        vVAConfigInternalMetadataValidationPort = 3001,
-        vVAConfigInternalMetadataValidationMaxConcurrentRequests = 10
+        vVAConfigInternalSentryEnv = "development"
       }
 
 -- | DEX configuration.
@@ -123,14 +108,6 @@ data VVAConfig
       , sentryDSN                               :: String
         -- | Sentry environment
       , sentryEnv                               :: String
-        -- | Metadata validation service enabled
-      , metadataValidationEnabled               :: Bool
-        -- | Metadata validation service host
-      , metadataValidationHost                  :: Text
-        -- | Metadata validation service port
-      , metadataValidationPort                  :: Int
-        -- | Maximum number of concurrent metadata requests
-      , metadataValidationMaxConcurrentRequests :: Int
       }
   deriving (Generic, Show, ToJSON)
 
@@ -171,11 +148,7 @@ convertConfig VVAConfigInternal {..} =
       serverHost = vVAConfigInternalHost,
       cacheDurationSeconds = vVaConfigInternalCacheDurationSeconds,
       sentryDSN = vVAConfigInternalSentrydsn,
-      sentryEnv = vVAConfigInternalSentryEnv,
-      metadataValidationEnabled = vVAConfigInternalMetadataValidationEnabled,
-      metadataValidationHost = vVAConfigInternalMetadataValidationHost,
-      metadataValidationPort = vVAConfigInternalMetadataValidationPort,
-      metadataValidationMaxConcurrentRequests = vVAConfigInternalMetadataValidationMaxConcurrentRequests
+      sentryEnv = vVAConfigInternalSentryEnv
     }
 
 -- | Load configuration from a file specified on the command line.  Load from
@@ -213,21 +186,3 @@ getServerHost ::
   (Has VVAConfig r, MonadReader r m) =>
   m Text
 getServerHost = asks (serverHost . getter)
-
--- | Access MetadataValidationService enabled
-getMetadataValidationEnabled ::
-  (Has VVAConfig r, MonadReader r m) =>
-  m Bool
-getMetadataValidationEnabled = asks (metadataValidationEnabled . getter)
-
--- | Access MetadataValidationService host
-getMetadataValidationHost ::
-  (Has VVAConfig r, MonadReader r m) =>
-  m Text
-getMetadataValidationHost = asks (metadataValidationHost . getter)
-
--- | Access MetadataValidationService port
-getMetadataValidationPort ::
-  (Has VVAConfig r, MonadReader r m) =>
-  m Int
-getMetadataValidationPort = asks (metadataValidationPort . getter)

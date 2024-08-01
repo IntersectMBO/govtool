@@ -37,7 +37,7 @@ export const DRepDashboardCard = ({
     dataTestId: "register-learn-more-button",
     onClick: () =>
       openInNewTab(
-        "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
+        "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/dreps",
       ),
   };
 
@@ -114,7 +114,16 @@ export const DRepDashboardCard = ({
           onClick: () => navigate(PATHS.registerAsdRep),
           variant: "contained",
         },
-        learnMoreButton,
+        voter.wasRegisteredAsDRep
+          ? {
+              children: t("learnMore"),
+              dataTestId: "register-learn-more-button",
+              onClick: () =>
+                openInNewTab(
+                  "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/dreps/retire-as-a-drep",
+                ),
+            }
+          : learnMoreButton,
       ];
 
     // was registered

@@ -22,9 +22,7 @@ export const parseMetadata = (
           );
         }
       }
-      Logger.debug(LoggerMessage.PARSED_METADATA_BODY, parsedMetadata, {
-        standard,
-      });
+
       return parsedMetadata;
 
     case MetadataStandard.CIPQQQ:
@@ -38,9 +36,6 @@ export const parseMetadata = (
           );
         }
       }
-      Logger.debug(LoggerMessage.PARSED_METADATA_BODY, parsedMetadata, {
-        standard,
-      });
       return parsedMetadata;
     default:
       Logger.warn(LoggerMessage.CANNOT_PARSE_METADATA_BODY, { standard });

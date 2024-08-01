@@ -258,7 +258,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
               <MoreInfoLink label={email} navTo={email} isEmail />
             </DRepDetailsInfoItem>
           )}
-          {references.length > 0 && !metadataStatus && (
+          {references?.length > 0 && !metadataStatus && (
             <DRepDetailsInfoItem label={t("moreInformation")}>
               <Box
                 alignItems="flex-start"

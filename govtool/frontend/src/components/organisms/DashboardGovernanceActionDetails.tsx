@@ -33,7 +33,6 @@ export const DashboardGovernanceActionDetails = () => {
   const fullProposalId = proposalId + hash;
 
   const { data, isLoading } = useGetProposalQuery(fullProposalId ?? "", !state);
-
   const shortenedGovActionId = getShortenedGovActionId(
     state ? state.txHash : data?.proposal.txHash ?? "",
     state ? state.index : data?.proposal.index ?? "",

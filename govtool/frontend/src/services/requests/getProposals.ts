@@ -1,4 +1,6 @@
-import { InfinityProposals } from "@models";
+import { InfinityProposals, MetadataStandard } from "@models";
+
+import { postValidate } from "./metadataValidation";
 import { API } from "../API";
 
 export type GetProposalsArguments = {
@@ -19,7 +21,7 @@ export const getProposals = async ({
   searchPhrase = "",
   sorting = "",
 }: GetProposalsArguments): Promise<InfinityProposals> => {
-  const response = await API.get("/proposal/list", {
+  const response = await API.get<InfinityProposals>("/proposal/list", {
     params: {
       page,
       pageSize,
@@ -29,5 +31,39 @@ export const getProposals = async ({
       ...(dRepID && { drepId: dRepID }),
     },
   });
-  return response.data;
+
+  const validatedResponse = {
+    ...response.data,
+    elements: await Promise.all(
+      response.data.elements.map(async (proposal) => {
+        if (proposal.metadataStatus || proposal.metadataValid) {
+          return {
+            ...proposal,
+            metadataStatus: proposal.metadataStatus,
+            metadataValid: proposal.metadataValid,
+          };
+        }
+        if (proposal.url && proposal.metadataHash) {
+          const validationResponse = await postValidate({
+            url: proposal.url,
+            hash: proposal.metadataHash,
+            standard: MetadataStandard.CIP108,
+          });
+          return {
+            ...proposal,
+            abstract: validationResponse.metadata?.abstract,
+            motivation: validationResponse.metadata?.motivation,
+            title: validationResponse.metadata?.title,
+            rationale: validationResponse.metadata?.rationale,
+            references: validationResponse.metadata?.references,
+            metadataStatus: validationResponse.status || null,
+            metadataValid: validationResponse.valid,
+          };
+        }
+
+        return proposal;
+      }),
+    ),
+  };
+  return validatedResponse;
 };

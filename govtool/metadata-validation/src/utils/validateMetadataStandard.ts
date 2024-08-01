@@ -16,7 +16,10 @@ export const validateMetadataStandard = async (
   try {
     await cipStandardSchema[standard]?.validateAsync(data);
   } catch (error) {
-    Logger.error(LoggerMessage.METADATA_VALIDATION_ERROR, error);
+    Logger.error(
+      LoggerMessage.METADATA_VALIDATION_ERROR,
+      MetadataValidationStatus.INCORRECT_FORMAT,
+    );
     throw MetadataValidationStatus.INCORRECT_FORMAT;
   }
 };

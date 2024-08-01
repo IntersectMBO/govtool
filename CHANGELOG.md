@@ -12,6 +12,20 @@ changes.
 
 ### Added
 
+-
+
+### Fixed
+
+-
+
+### Changed
+
+-
+
+## [sancho-v1.0.12](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.12) 2024-08-01
+
+### Added
+
 - Add network name to GET /network/metrics [Issue 1644](https://github.com/IntersectMBO/govtool/issues/1644)
 
 ### Fixed

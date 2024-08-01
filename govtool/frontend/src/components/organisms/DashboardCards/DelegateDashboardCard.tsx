@@ -55,7 +55,7 @@ export const DelegateDashboardCard = ({
     dataTestId: "delegate-learn-more-button",
     onClick: () =>
       openInNewTab(
-        "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power",
+        "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/delegating",
       ),
     sx: { backgroundColor: "arcticWhite" },
   };
@@ -156,20 +156,22 @@ export const DelegateDashboardCard = ({
         (!delegateTx &&
           currentDelegation &&
           currentDelegation?.dRepHash !== dRepID)) ? (
-            <DelegationAction
-              drepName={
-                isDRepListFetching
-                  ? "Loading..."
-                  : myDRepDelegationData?.metadataStatus
-                  ? getMetadataDataMissingStatusTranslation(
-                      myDRepDelegationData.metadataStatus,
-                    )
-                  : myDRepDelegationData?.dRepName ?? ""
-              }
-              dRepId={displayedDelegationId}
-              onCardClick={navigateToDRepDetails}
-              sx={{ mt: 1.5 }}
-            />
+        // That rule is wrongly reporting an error on those lines
+        // eslint-disable-next-line react/jsx-indent
+        <DelegationAction
+          drepName={
+            isDRepListFetching
+              ? "Loading..."
+              : myDRepDelegationData?.metadataStatus
+              ? getMetadataDataMissingStatusTranslation(
+                  myDRepDelegationData.metadataStatus,
+                )
+              : myDRepDelegationData?.dRepName ?? ""
+          }
+          dRepId={displayedDelegationId}
+          onCardClick={navigateToDRepDetails}
+          sx={{ mt: 1.5 }}
+        />
       ) : null}
     </DashboardActionCard>
   );

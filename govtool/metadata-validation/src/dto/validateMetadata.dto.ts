@@ -6,6 +6,4 @@ export class ValidateMetadataDTO {
   url: string;
 
   standard?: MetadataStandard;
-
-  noStandard?: boolean;
 }

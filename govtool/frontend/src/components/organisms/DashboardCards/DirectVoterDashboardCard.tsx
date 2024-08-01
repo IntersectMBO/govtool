@@ -93,7 +93,14 @@ export const DirectVoterDashboardCard = ({
             onClick: () => navigate(PATHS.registerAsDirectVoter),
             variant: "contained",
           },
-          learnMoreButton,
+          {
+            children: t("learnMore"),
+            dataTestId: "learn-more-button",
+            onClick: () =>
+              openInNewTab(
+                "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/dreps/retire-as-a-drep",
+              ),
+          },
         ],
         description: (
           <Trans

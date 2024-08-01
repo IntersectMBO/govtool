@@ -148,12 +148,8 @@ test.describe("Register DRep state", () => {
     await expect(
       dRepPage.getByTestId("register-as-sole-voter-button")
     ).not.toBeVisible();
-
-    // Checks in dRep directory
-    await dRepPage.getByTestId("drep-directory-link").click();
-    await expect(dRepPage.getByText("Direct Voter")).toBeVisible();
     await expect(
-      dRepPage.getByTestId(`${dRepId}-copy-id-button`)
+      dRepPage.getByTestId("retire-as-sole-voter-button")
     ).toBeVisible();
   });
 

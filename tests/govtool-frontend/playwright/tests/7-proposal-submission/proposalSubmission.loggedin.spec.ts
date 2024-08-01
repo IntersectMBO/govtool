@@ -82,10 +82,9 @@ test.describe("Proposal created logged state", () => {
         await page.getByTestId(`${type.toLocaleLowerCase()}-button`).click();
         await proposalSubmissionPage.addLinkBtn.click();
 
-        const formFields: ProposalCreateRequest =
-          proposalSubmissionPage.generateInValidProposalFormFields(type);
-
         for (let i = 0; i < 100; i++) {
+          const formFields: ProposalCreateRequest =
+            proposalSubmissionPage.generateInValidProposalFormFields(type);
           await proposalSubmissionPage.inValidateForm(formFields);
         }
       });

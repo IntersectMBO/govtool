@@ -1,8 +1,10 @@
+from typing import List
+from lib.assertions import assert_data_type
 from models.TestData import Drep, VoteonProposal, Vote, Proposal, DrepInfo
 import allure
 
 
-def validate_drep_list(drep_list: [Drep]) -> bool:
+def validate_drep_list(drep_list: List[Drep]) -> bool:
     for item in drep_list:
         if not isinstance(item, dict):
             return False
@@ -13,7 +15,7 @@ def validate_drep_list(drep_list: [Drep]) -> bool:
     return True
 
 
-def validate_voteonproposal_list(voteonproposal_list: [VoteonProposal]) -> bool:
+def validate_voteonproposal_list(voteonproposal_list: List[VoteonProposal]) -> bool:
     for item in voteonproposal_list:
         if not isinstance(item, dict):
             return False
@@ -40,10 +42,7 @@ def validate_voteonproposal_list(voteonproposal_list: [VoteonProposal]) -> bool:
 
 
 def validate_drep_info(drep):
-    for key, val in DrepInfo.__annotations__.items():
-        assert isinstance(
-            drep[key], DrepInfo.__annotations__[key]
-        ), f"drepInfo.{key} should be of type {DrepInfo.__annotations__[key]} got {type(drep[key])}"
+    assert_data_type(DrepInfo,drep)
 
 
 @allure.story("Drep")

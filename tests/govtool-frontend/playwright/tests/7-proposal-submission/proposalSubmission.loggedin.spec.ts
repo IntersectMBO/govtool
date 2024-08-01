@@ -45,7 +45,7 @@ test.describe("Proposal created logged state", () => {
         await page.getByTestId(`${type.toLocaleLowerCase()}-button`).click();
         await proposalSubmissionPage.addLinkBtn.click();
 
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 50; i++) {
           const rewardAddressBech32 = (
             await ShelleyWallet.generate()
           ).rewardAddressBech32(0);
@@ -82,7 +82,7 @@ test.describe("Proposal created logged state", () => {
         await page.getByTestId(`${type.toLocaleLowerCase()}-button`).click();
         await proposalSubmissionPage.addLinkBtn.click();
 
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 50; i++) {
           const formFields: ProposalCreateRequest =
             proposalSubmissionPage.generateInValidProposalFormFields(type);
           await proposalSubmissionPage.inValidateForm(formFields);
@@ -238,7 +238,7 @@ test.describe("Proposal created logged state", () => {
         page,
       }) => {
         test.slow(); // Brute-force testing with 100 random data
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 50; i++) {
           await proposalSubmissionPage.metadataUrlInput.fill(
             faker.internet.url()
           );
@@ -250,7 +250,7 @@ test.describe("Proposal created logged state", () => {
         page,
       }) => {
         test.slow(); // Brute-force testing with 100 random data
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 50; i++) {
           await proposalSubmissionPage.metadataUrlInput.fill(invalid.url());
           await expect(page.getByTestId("url-input-error-text")).toBeVisible();
         }

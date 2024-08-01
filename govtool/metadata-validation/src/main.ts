@@ -7,14 +7,13 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: true,
-    logger: ['debug', 'error', 'log'],
+    logger: ['error', 'log'],
   });
 
   const config = new DocumentBuilder()
-    .setTitle('Submission Tool')
-    .setDescription('The Submission Tool API description')
-    .setVersion('1.0')
-    .addTag('submission')
+    .setTitle('Metadata Validation Tool')
+    .setDescription('The Metadata Validation Tool API description')
+    .setVersion('1.0.11')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

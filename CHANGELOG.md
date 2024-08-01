@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix displaying Governance Action & DRep metadatas
 
 ### Changed
 
@@ -24,6 +24,7 @@ changes.
 - Change link to docs regarding DReps [Issue 1130](https://github.com/IntersectMBO/govtool/issues/1130)
 - Change link to view governance actions docs [Issue 1131](https://github.com/IntersectMBO/govtool/issues/1131)
 - Make all the frontend build arguments mandatory [Issue 1642](https://github.com/IntersectMBO/govtool/issues/1642), [Issue 1643](https://github.com/IntersectMBO/govtool/issues/1643)
+- Breaking! Remove usage of metadata validation service in Haskell Backend
 
 ## [sancho-v1.0.11](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.11) 2024-07-30
 

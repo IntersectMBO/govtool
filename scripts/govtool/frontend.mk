@@ -17,6 +17,7 @@ build-frontend: docker-login
 	$(docker) build --tag "$(repo_url)/frontend:$(frontend_image_tag)" \
 		--build-arg VITE_APP_ENV="$(env)" \
 		--build-arg VITE_BASE_URL="https://$(domain)/api" \
+		--build-arg VITE_METADATA_API_URL="https://$(domain)/metadata-validation" \
 		--build-arg VITE_GTM_ID="$${GTM_ID}" \
 		--build-arg VITE_NETWORK_FLAG="$$NETWORK_FLAG" \
 		--build-arg VITE_SENTRY_DSN="$${SENTRY_DSN}" \

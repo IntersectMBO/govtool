@@ -22,8 +22,6 @@ import           Data.Time                  (UTCTime)
 
 import           Database.PostgreSQL.Simple (Connection)
 
-import           Network.HTTP.Client        (Manager)
-
 import           VVA.Cache
 import           VVA.Config
 
@@ -34,8 +32,6 @@ data AppEnv
       { vvaConfig         :: VVAConfig
       , vvaCache          :: CacheEnv
       , vvaConnectionPool :: Pool Connection
-      , vvaTlsManager     :: Manager
-      , vvaMetadataQSem   :: QSem
       }
 
 instance Has VVAConfig AppEnv where
@@ -49,15 +45,6 @@ instance Has CacheEnv AppEnv where
 instance Has (Pool Connection) AppEnv where
   getter AppEnv {vvaConnectionPool} = vvaConnectionPool
   modifier f a@AppEnv {vvaConnectionPool} = a {vvaConnectionPool = f vvaConnectionPool}
-
-instance Has Manager AppEnv where
-  getter AppEnv {vvaTlsManager} = vvaTlsManager
-  modifier f a@AppEnv {vvaTlsManager} = a {vvaTlsManager = f vvaTlsManager}
-
-instance Has QSem AppEnv where
-  getter AppEnv {vvaMetadataQSem} = vvaMetadataQSem
-  modifier f a@AppEnv {vvaMetadataQSem} = a {vvaMetadataQSem = f vvaMetadataQSem}
-
 
 data AppError
   = ValidationError Text
@@ -131,8 +118,6 @@ data Proposal
       , proposalAbstract       :: Maybe Text
       , proposalMotivation     :: Maybe Text
       , proposalRationale      :: Maybe Text
-      , proposalMetadata       :: Maybe Value
-      , proposalReferences     :: Maybe Value
       , proposalYesVotes       :: Integer
       , proposalNoVotes        :: Integer
       , proposalAbstainVotes   :: Integer
@@ -140,35 +125,6 @@ data Proposal
   deriving (Show)
 
 data TransactionStatus = TransactionConfirmed | TransactionUnconfirmed
-
-
-data ProposalMetadata
-  = ProposalMetadata
-      { proposalMetadataAbstract   :: Text
-      , proposalMetadataMotivation :: Text
-      , proposalMetadataRationale  :: Text
-      , proposalMetadataTitle      :: Text
-      , proposalMetadataReferences :: [Text]
-      }
-  deriving (Show)
-
-data DRepMetadata
-  = DRepMetadata
-      { dRepMetadataBio        :: Text
-      , dRepMetadataDRepName   :: Text
-      , dRepMetadataEmail      :: Text
-      , dRepMetadataReferences :: [Text]
-      }
-  deriving (Show)
-
-data MetadataValidationResult a
-  = MetadataValidationResult
-      { metadataValidationResultValid    :: Bool
-      , metadataValidationResultStatus   :: Maybe Text
-      , metadataValidationResultMetadata :: Maybe a
-      }
-  deriving (Show)
-  
 
 data CacheEnv
   = CacheEnv
@@ -182,8 +138,6 @@ data CacheEnv
       , dRepVotingPowerCache :: Cache.Cache Text Integer
       , dRepListCache :: Cache.Cache () [DRepRegistration]
       , networkMetricsCache :: Cache.Cache () NetworkMetrics
-      , proposalMetadataValidationCache :: Cache.Cache (Text, Text) (MetadataValidationResult ProposalMetadata)
-      , dRepMetadataValidationCache :: Cache.Cache (Text, Text) (MetadataValidationResult DRepMetadata)
       }
 
 data NetworkMetrics
@@ -207,8 +161,3 @@ data Delegation
       , delegationDRepView :: Text
       , delegationTxHash   :: Text
       }
-
-
-data MetadataValidationStatus = IncorrectFormat | IncorrectJSONLD | IncorrectHash | UrlNotFound
-
-

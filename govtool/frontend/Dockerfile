@@ -2,6 +2,7 @@ FROM node:18-alpine as builder
 
 ARG VITE_APP_ENV='beta'
 ARG VITE_BASE_URL
+ARG METADATA_API_URL
 ARG VITE_GTM_ID
 ARG VITE_NETWORK_FLAG=0
 ARG VITE_SENTRY_DSN
@@ -14,6 +15,7 @@ ARG VITE_PDF_API_URL
 RUN \
   : "${VITE_APP_ENV:?Build argument VITE_APP_ENV is not set}" && \
   : "${VITE_BASE_URL:?Build argument VITE_BASE_URL is not set}" && \
+  : "${METADATA_API_URL:?Build argument METADATA_API_URL is not set}" && \
   : "${VITE_GTM_ID:?Build argument VITE_GTM_ID is not set}" && \
   : "${VITE_NETWORK_FLAG:?Build argument VITE_NETWORK_FLAG is not set}" && \
   : "${VITE_SENTRY_DSN:?Build argument VITE_SENTRY_DSN is not set}" && \

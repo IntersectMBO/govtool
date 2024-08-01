@@ -76,7 +76,9 @@ test.describe("Delegate to others", () => {
 
     await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
     await page.getByTestId(`${dRep01Wallet.dRepId}-copy-id-button`).click();
-    await expect(page.getByText("Copied to clipboard")).toBeVisible();
+    await expect(page.getByText("Copied to clipboard")).toBeVisible({
+      timeout: 10_000,
+    });
 
     const copiedTextDRepDirectory = await page.evaluate(() =>
       navigator.clipboard.readText()

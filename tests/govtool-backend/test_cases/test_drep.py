@@ -42,7 +42,7 @@ def validate_voteonproposal_list(voteonproposal_list: List[VoteonProposal]) -> b
 
 
 def validate_drep_info(drep):
-    assert_data_type(DrepInfo,drep)
+    assert_data_type(DrepInfo, drep)
 
 
 @allure.story("Drep")

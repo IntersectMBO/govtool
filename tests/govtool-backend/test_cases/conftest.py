@@ -19,8 +19,8 @@ from config import METRICS_API_SECRET
 
 @pytest.fixture(scope="session")
 def govtool_api():
-    base_url: (str| None) = os.environ.get("BASE_URL")
-    metrics_url: (str| None) = os.environ.get("METRICS_URL")
+    base_url: str | None = os.environ.get("BASE_URL")
+    metrics_url: str | None = os.environ.get("METRICS_URL")
 
     if base_url is not None:
         base_url = base_url[:-1] if base_url.endswith("/") else base_url

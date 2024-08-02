@@ -5,11 +5,11 @@ from models.TestData import EpochParam, NetworkMetrics, TxStatus
 
 
 def validate_epoch_param(epoch_param):
-    assert_data_type(EpochParam,epoch_param)
+    assert_data_type(EpochParam, epoch_param)
 
 
 def validate_network_metrics(network_metrics):
-    assert_data_type(NetworkMetrics,network_metrics)
+    assert_data_type(NetworkMetrics, network_metrics)
 
 
 @allure.story("Misc")

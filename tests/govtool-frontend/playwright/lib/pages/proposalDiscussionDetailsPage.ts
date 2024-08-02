@@ -23,9 +23,7 @@ export default class ProposalDiscussionDetailsPage {
   readonly showReplyBtn = this.page.getByTestId("show-more-reply");
   readonly closePollYesBtn = this.page.getByTestId("close-the-poll-button");
   readonly changeVoteBtn = this.page.getByTestId("change-vote-button");
-  readonly verifyIdentityBtn = this.page.getByRole("button", {
-    name: "Verify your identity",
-  }); // BUG
+  readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
   readonly submitAsGABtn = this.page.getByTestId("submit-as-GA-button");
 
   // Indicators

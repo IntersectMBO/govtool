@@ -5,6 +5,7 @@ import { expect, Locator, Page } from "@playwright/test";
 import { ProposalCreateRequest, ProposedGovAction } from "@types";
 import environments from "lib/constants/environments";
 import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
+import { isMobile } from "@helpers/mobile";
 
 export default class ProposalDiscussionPage {
   // Buttons
@@ -28,6 +29,15 @@ export default class ProposalDiscussionPage {
 
   async goto() {
     await this.page.goto(`${environments.frontendUrl}/proposal_discussion`);
+    // Temporary fix for blank proposals issue in proposal view during disconnected state
+    // This code handles the blank proposals error, which is causing failing tests.
+    // It will be removed once the underlying issue is resolved.
+    await this.page.getByTestId("logo-button").click();
+    if (isMobile(this.page)) {
+      await this.page.getByTestId("open-drawer-button").click();
+    }
+    await this.page.getByText("Proposals", { exact: true }).click();
+
     await this.page.waitForTimeout(2_000);
   }
 

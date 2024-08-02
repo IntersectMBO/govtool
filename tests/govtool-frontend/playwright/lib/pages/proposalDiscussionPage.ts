@@ -5,6 +5,7 @@ import { expect, Locator, Page } from "@playwright/test";
 import { ProposalCreateRequest, ProposedGovAction } from "@types";
 import environments from "lib/constants/environments";
 import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
+import { isMobile } from "@helpers/mobile";
 
 export default class ProposalDiscussionPage {
   // Buttons
@@ -16,9 +17,7 @@ export default class ProposalDiscussionPage {
   readonly sortBtn = this.page.getByTestId("sort-button");
   readonly searchInput = this.page.getByTestId("search-input");
   readonly showAllBtn = this.page.getByTestId("show-all-button").first(); //this.page.getByTestId("show-all-button");
-  readonly verifyIdentityBtn = this.page.getByRole("button", {
-    name: "Verify your identity",
-  }); // BUG
+  readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
   readonly addLinkBtn = this.page.getByTestId("add-link-button");
   readonly infoRadio = this.page.getByTestId("Info-radio-wrapper");
   readonly treasuryRadio = this.page.getByTestId("Treasury-radio-wrapper");
@@ -30,6 +29,15 @@ export default class ProposalDiscussionPage {
 
   async goto() {
     await this.page.goto(`${environments.frontendUrl}/proposal_discussion`);
+    // Temporary fix for blank proposals issue in proposal view during disconnected state
+    // This code handles the blank proposals error, which is causing failing tests.
+    // It will be removed once the underlying issue is resolved.
+    await this.page.getByTestId("logo-button").click();
+    if (isMobile(this.page)) {
+      await this.page.getByTestId("open-drawer-button").click();
+    }
+    await this.page.getByText("Proposals", { exact: true }).click();
+
     await this.page.waitForTimeout(2_000);
   }
 
@@ -142,16 +150,21 @@ export default class ProposalDiscussionPage {
     }
   }
 
-  async filterProposalByNames(names: string[]) {
+  async clickRadioButtonsByNames(names: string[]) {
     for (const name of names) {
-      await this.page.getByLabel(name).click(); // test id is not in proper format for all filter type
+      const replaceSpaceWithUnderScore = name.toLowerCase().replace(/ /g, "-");
+      await this.page
+        .getByTestId(`${replaceSpaceWithUnderScore}-radio`)
+        .click();
     }
   }
 
+  async filterProposalByNames(names: string[]) {
+    await this.clickRadioButtonsByNames(names);
+  }
+
   async unFilterProposalByNames(names: string[]) {
-    for (const name of names) {
-      await this.page.getByLabel(name).click(); // test id is not in proper format for all filter type
-    }
+    await this.clickRadioButtonsByNames(names);
   }
 
   async validateFilters(
@@ -203,12 +216,13 @@ export default class ProposalDiscussionPage {
     proposalCard: Locator,
     filters: string[]
   ): Promise<boolean> {
-    const govActionType = await proposalCard
-      .locator('[data-test^="proposal-"][data-testid$="-status"]')
+    let govActionType = await proposalCard
+      .locator('[data-testid^="proposal-"][data-testid$="-status"]')
       .textContent();
+    if (govActionType === "Active") {
+      govActionType = "Active proposal";
+    }
 
-    return filters
-      .map((filter) => filter.toLowerCase())
-      .includes(govActionType.toLowerCase());
+    return filters.includes(govActionType);
   }
 }

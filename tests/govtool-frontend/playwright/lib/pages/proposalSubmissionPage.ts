@@ -6,18 +6,18 @@ import { expectWithInfo } from "@helpers/exceptionHandler";
 import { downloadMetadata } from "@helpers/metadata";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { invalid } from "@mock/index";
-import { Download, Page, expect } from "@playwright/test";
+import { Download, Locator, Page, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
 import { ProposalCreateRequest, ProposalLink, ProposalType } from "@types";
 
 const formErrors = {
-  proposalTitle: ["max-80-characters-error", "this-field-is-required-error"],
-  abstract: "this-field-is-required-error",
-  motivation: "this-field-is-required-error",
-  Rationale: "this-field-is-required-error",
-  receivingAddress: "invalid-bech32-address-error",
-  amount: ["only-number-is-allowed-error", "this-field-is-required-error"],
-  link: "invalid-url-error",
+  proposalTitle: "title-input-error",
+  abstract: "abstract-helper-error",
+  motivation: "motivation-helper-error",
+  rationale: "rationale-helper-error",
+  receivingAddress: "receiving-address-text-error",
+  amount: "amount-text-error",
+  link: "link-0-url-input-error",
 };
 
 export default class ProposalSubmissionPage {
@@ -43,9 +43,7 @@ export default class ProposalSubmissionPage {
   readonly editSubmissionButton = this.page.getByTestId(
     "edit-submission-button"
   );
-  readonly verifyIdentityBtn = this.page.getByRole("button", {
-    name: "Verify your identity",
-  }); // BUG missing test id
+  readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
   readonly governanceActionType = this.page.getByLabel(
     "Governance Action Type *"
   );
@@ -65,9 +63,7 @@ export default class ProposalSubmissionPage {
     "receiving-address-input"
   );
   readonly amountInput = this.page.getByTestId("amount-input");
-  readonly closeDraftSuccessModalBtn = this.page.getByTestId(
-    "delete-proposal-yes-button"
-  ); //BUG Improper test ids
+  readonly closeDraftSuccessModalBtn = this.page.getByTestId("close-button");
 
   constructor(private readonly page: Page) {}
 
@@ -215,88 +211,54 @@ export default class ProposalSubmissionPage {
     await expect(this.continueBtn).toBeEnabled();
   }
 
+  async assertFieldValidation(
+    input: Locator,
+    errorField: string,
+    value: string,
+    logMessage: string
+  ) {
+    if (value === " ") {
+      await expect(this.page.getByTestId(errorField)).toBeVisible();
+    } else {
+      expectWithInfo(
+        async () => expect(await input.textContent()).not.toEqual(value),
+        `${logMessage}: ${value}`
+      );
+    }
+  }
+
   async inValidateForm(governanceProposal: ProposalCreateRequest) {
     await this.fillupFormWithTypeSelected(governanceProposal);
+    await expect(this.page.getByTestId(formErrors.proposalTitle)).toBeVisible();
 
-    function convertTestIdToText(testId: string) {
-      let text = testId.replace("-error", "");
-      text = text.replace(/-/g, " ");
-      return text[0].toUpperCase() + text.substring(1);
-    }
-
-    // Helper function to generate regex pattern from form errors
-    function generateRegexPattern(errors: string[]) {
-      return new RegExp(errors.map(convertTestIdToText).join("|"));
-    }
-
-    // Helper function to get errors based on regex pattern
-    async function getErrorsByPattern(page: Page, regexPattern: RegExp) {
-      return await page
-        .locator('[data-testid$="-error"]')
-        .filter({ hasText: regexPattern })
-        .all();
-    }
-
-    const proposalTitlePattern = generateRegexPattern(formErrors.proposalTitle);
-    const proposalTitleErrors = await getErrorsByPattern(
-      this.page,
-      proposalTitlePattern
+    await this.assertFieldValidation(
+      this.abstractInput,
+      formErrors.abstract,
+      governanceProposal.prop_abstract,
+      "valid abstract"
+    );
+    await this.assertFieldValidation(
+      this.motivationInput,
+      formErrors.motivation,
+      governanceProposal.prop_motivation,
+      "valid motivation"
+    );
+    await this.assertFieldValidation(
+      this.rationaleInput,
+      formErrors.rationale,
+      governanceProposal.prop_rationale,
+      "valid rationale"
     );
 
-    expectWithInfo(
-      async () => expect(proposalTitleErrors.length).toEqual(1),
-      `valid title: ${governanceProposal.prop_name}`
-    );
+    await expect(this.page.getByTestId(formErrors.link)).toBeVisible();
 
     if (governanceProposal.gov_action_type_id === 1) {
-      const receiverAddressErrors = await getErrorsByPattern(
-        this.page,
-        new RegExp(convertTestIdToText(formErrors.receivingAddress))
-      );
+      await expect(
+        this.page.getByTestId(formErrors.receivingAddress)
+      ).toBeVisible();
 
-      expectWithInfo(
-        async () => expect(receiverAddressErrors.length).toEqual(1),
-        `valid address: ${governanceProposal.prop_receiving_address}`
-      );
-
-      const amountPattern = generateRegexPattern(formErrors.amount);
-      const amountErrors = await getErrorsByPattern(this.page, amountPattern);
-
-      expectWithInfo(
-        async () => expect(amountErrors.length).toEqual(1),
-        `valid amount: ${governanceProposal.prop_amount}`
-      );
+      await expect(this.page.getByTestId(formErrors.amount)).toBeVisible();
     }
-
-    expectWithInfo(
-      async () =>
-        expect(await this.abstractInput.textContent()).not.toEqual(
-          governanceProposal.prop_abstract
-        ),
-      `valid abstract: ${governanceProposal.prop_abstract}`
-    );
-
-    expectWithInfo(
-      async () =>
-        expect(await this.abstractInput.textContent()).not.toEqual(
-          governanceProposal.prop_motivation
-        ),
-      `valid motivation: ${governanceProposal.prop_motivation}`
-    );
-
-    expectWithInfo(
-      async () =>
-        expect(await this.abstractInput.textContent()).not.toEqual(
-          governanceProposal.prop_rationale
-        ),
-      `valid rationale: ${governanceProposal.prop_rationale}`
-    );
-
-    expectWithInfo(
-      async () =>
-        await expect(this.page.getByTestId(formErrors.link)).toBeVisible(),
-      `valid link: ${governanceProposal.proposal_links[0].prop_link}`
-    );
 
     await expect(this.continueBtn).toBeDisabled();
   }

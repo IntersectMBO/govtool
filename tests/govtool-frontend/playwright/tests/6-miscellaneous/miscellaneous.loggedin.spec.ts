@@ -9,16 +9,15 @@ import {
 } from "@constants/docsUrl";
 import { user01Wallet } from "@constants/staticWallets";
 import { createTempUserAuth } from "@datafactory/createAuth";
-import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
+import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import EditDRepPage from "@pages/editDRepPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
-import { expect, Page } from "@playwright/test";
-import { valid as mockValid, invalid as mockInvalid } from "@mock/index";
+import { Page, expect } from "@playwright/test";
 
 test.beforeEach(async () => {
   await setAllureEpic("6. Miscellaneous");
@@ -110,7 +109,7 @@ test.describe("Logged in user", () => {
   }) => {
     await page.goto("/");
     await page.getByTestId("proposal-discussion-link").click();
-    await page.getByRole("button", { name: "Verify your identity" }).click(); // BUG: Test id missing
+    await page.getByTestId("verify-identity-button").click();
 
     await expect(page.getByTestId("setup-username-modal")).toBeVisible();
     await expect(page.getByTestId("username-input")).toBeVisible();
@@ -135,9 +134,7 @@ test.describe("Temporary user", () => {
   });
 
   test("6J. Should add a username.", async () => {
-    await proposalDiscussionPage.setUsername(
-      faker.internet.userName().toLowerCase()
-    );
+    await proposalDiscussionPage.setUsername(mockValid.username());
   });
 
   test("6K. Should accept valid username.", async () => {

@@ -29,7 +29,7 @@ export const HomeCards = () => {
 
   const onClickLearnMoreAboutDelegation = () =>
     openInNewTab(
-      "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power",
+      "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/delegating",
     );
 
   const onClickLearnMoreAboutDRepRegistration = () =>

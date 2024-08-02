@@ -19,7 +19,8 @@ test.describe("Validation of edit dRep Form", () => {
     const editDRepPage = new EditDRepPage(page);
     await editDRepPage.goto();
 
-    await editDRepPage.addLinkBtn.click();
+    // wait until wallet alert close
+    await page.waitForTimeout(5_000);
 
     for (let i = 0; i < 100; i++) {
       await editDRepPage.validateForm(

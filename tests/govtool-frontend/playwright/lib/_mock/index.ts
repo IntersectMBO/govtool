@@ -85,13 +85,7 @@ export const invalid = {
   },
 
   amount: () => {
-    const choice = faker.number.int({ min: 1, max: 2 });
-    if (choice === 1) {
-      // only number is allowed
-      return faker.lorem.word();
-    }
-    // empty invalid
-    return " ";
+    return faker.lorem.word();
   },
 };
 

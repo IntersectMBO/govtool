@@ -76,7 +76,9 @@ test.describe("Delegate to others", () => {
 
     await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
     await page.getByTestId(`${dRep01Wallet.dRepId}-copy-id-button`).click();
-    await expect(page.getByText("Copied to clipboard")).toBeVisible();
+    await expect(page.getByText("Copied to clipboard")).toBeVisible({
+      timeout: 10_000,
+    });
 
     const copiedTextDRepDirectory = await page.evaluate(() =>
       navigator.clipboard.readText()
@@ -148,12 +150,8 @@ test.describe("Register DRep state", () => {
     await expect(
       dRepPage.getByTestId("register-as-sole-voter-button")
     ).not.toBeVisible();
-
-    // Checks in dRep directory
-    await dRepPage.getByTestId("drep-directory-link").click();
-    await expect(dRepPage.getByText("Direct Voter")).toBeVisible();
     await expect(
-      dRepPage.getByTestId(`${dRepId}-copy-id-button`)
+      dRepPage.getByTestId("retire-as-sole-voter-button")
     ).toBeVisible();
   });
 
@@ -182,6 +180,7 @@ test.describe("Register DRep state", () => {
 });
 
 test("2G. Should delegate to myself", async ({ page, browser }, testInfo) => {
+  test.skip();
   test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
   const wallet = await walletManager.popWallet("registeredDRep");

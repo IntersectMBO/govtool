@@ -72,12 +72,16 @@ test("2N. Should show DRep information on details page", async ({
   await expect(dRepPage.getByTestId("copy-drep-id-button")).toHaveText(
     wallet.dRepId
   );
-  await expect(dRepPage.getByText("Active", { exact: true })).toBeVisible();
-  await expect(dRepPage.locator("dl").getByText("₳ 0")).toBeVisible();
-  await expect(dRepPage.getByText(email, { exact: true })).toBeVisible();
+  await expect(dRepPage.getByTestId("Active-pill")).toHaveText("Active");
+  await expect(dRepPage.getByTestId("voting-power")).toHaveText("₳ 0");
+  await expect(
+    dRepPage.getByTestId(`${email.toLowerCase()}-link`)
+  ).toBeVisible();
 
   for (const link of links) {
-    await expect(dRepPage.getByText(link, { exact: true })).toBeVisible();
+    await expect(
+      dRepPage.getByTestId(`${link.toLowerCase()}-link`)
+    ).toBeVisible();
   }
   await expect(dRepPage.getByText(bio, { exact: true })).toBeVisible();
 });

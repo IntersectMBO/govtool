@@ -24,8 +24,6 @@ module VVA.Config
     , getServerHost
     , getServerPort
     , vvaConfigToText
-    , getMetadataValidationHost
-    , getMetadataValidationPort
     ) where
 
 import           Conferer
@@ -45,8 +43,7 @@ import           Data.Text.Encoding       (decodeUtf8, encodeUtf8)
 
 import           GHC.Generics
 
-import           VVA.CommandLine          (CommandLineConfig (..),
-                                           clcConfigPath)
+import           VVA.CommandLine          (CommandLineConfig (..), clcConfigPath)
 -- | PostgreSQL database access information.
 data DBConfig
   = DBConfig
@@ -71,23 +68,17 @@ instance DefaultConfig DBConfig where
 data VVAConfigInternal
   = VVAConfigInternal
       { -- | db-sync database access.
-        vVAConfigInternalDbsyncconfig           :: DBConfig
+        vVAConfigInternalDbsyncconfig                            :: DBConfig
         -- | Server port.
-      , vVAConfigInternalPort                   :: Int
+      , vVAConfigInternalPort                                    :: Int
         -- | Server host.
-      , vVAConfigInternalHost                   :: Text
+      , vVAConfigInternalHost                                    :: Text
         -- | Request cache duration
-      , vVaConfigInternalCacheDurationSeconds   :: Int
+      , vVaConfigInternalCacheDurationSeconds                    :: Int
         -- | Sentry DSN
-      , vVAConfigInternalSentrydsn              :: String
+      , vVAConfigInternalSentrydsn                               :: String
         -- | Sentry environment
-      , vVAConfigInternalSentryEnv              :: String
-        -- | Metadata validation service host
-      , vVAConfigInternalMetadataValidationHost :: Text
-        -- | Metadata validation service port
-      , vVAConfigInternalMetadataValidationPort :: Int
-        -- | Maximum number of concurrent metadata requests
-      , vVAConfigInternalMetadataValidationMaxConcurrentRequests :: Int
+      , vVAConfigInternalSentryEnv                               :: String
       }
   deriving (FromConfig, Generic, Show)
 
@@ -99,33 +90,24 @@ instance DefaultConfig VVAConfigInternal where
         vVAConfigInternalHost = "localhost",
         vVaConfigInternalCacheDurationSeconds = 20,
         vVAConfigInternalSentrydsn = "https://username:password@senty.host/id",
-        vVAConfigInternalSentryEnv = "development",
-        vVAConfigInternalMetadataValidationHost = "localhost",
-        vVAConfigInternalMetadataValidationPort = 3001,
-        vVAConfigInternalMetadataValidationMaxConcurrentRequests = 10
+        vVAConfigInternalSentryEnv = "development"
       }
 
 -- | DEX configuration.
 data VVAConfig
   = VVAConfig
       { -- | db-sync database credentials.
-        dbSyncConnectionString :: Text
+        dbSyncConnectionString                  :: Text
         -- | Server port.
-      , serverPort             :: Int
+      , serverPort                              :: Int
         -- | Server host.
-      , serverHost             :: Text
+      , serverHost                              :: Text
         -- | Request cache duration
-      , cacheDurationSeconds   :: Int
+      , cacheDurationSeconds                    :: Int
         -- | Sentry DSN
-      , sentryDSN              :: String
+      , sentryDSN                               :: String
         -- | Sentry environment
-      , sentryEnv              :: String
-        -- | Metadata validation service host
-      , metadataValidationHost :: Text
-        -- | Metadata validation service port
-      , metadataValidationPort :: Int
-        -- | Maximum number of concurrent metadata requests
-      , metadataValidationMaxConcurrentRequests :: Int
+      , sentryEnv                               :: String
       }
   deriving (Generic, Show, ToJSON)
 
@@ -166,10 +148,7 @@ convertConfig VVAConfigInternal {..} =
       serverHost = vVAConfigInternalHost,
       cacheDurationSeconds = vVaConfigInternalCacheDurationSeconds,
       sentryDSN = vVAConfigInternalSentrydsn,
-      sentryEnv = vVAConfigInternalSentryEnv,
-      metadataValidationHost = vVAConfigInternalMetadataValidationHost,
-      metadataValidationPort = vVAConfigInternalMetadataValidationPort,
-      metadataValidationMaxConcurrentRequests = vVAConfigInternalMetadataValidationMaxConcurrentRequests
+      sentryEnv = vVAConfigInternalSentryEnv
     }
 
 -- | Load configuration from a file specified on the command line.  Load from
@@ -207,15 +186,3 @@ getServerHost ::
   (Has VVAConfig r, MonadReader r m) =>
   m Text
 getServerHost = asks (serverHost . getter)
-
--- | Access MetadataValidationService host
-getMetadataValidationHost ::
-  (Has VVAConfig r, MonadReader r m) =>
-  m Text
-getMetadataValidationHost = asks (metadataValidationHost . getter)
-
--- | Access MetadataValidationService port
-getMetadataValidationPort ::
-  (Has VVAConfig r, MonadReader r m) =>
-  m Int
-getMetadataValidationPort = asks (metadataValidationPort . getter)

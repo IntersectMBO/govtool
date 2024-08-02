@@ -48,19 +48,16 @@ SELECT
             null
         end
     ) as description,
-    epoch_utils.last_epoch_end_time + epoch_utils.epoch_duration *(gov_action_proposal.expiration - epoch_utils.last_epoch_no),
+    epoch_utils.last_epoch_end_time + epoch_utils.epoch_duration * (gov_action_proposal.expiration - epoch_utils.last_epoch_no),
     gov_action_proposal.expiration,
     creator_block.time,
     creator_block.epoch_no,
-    /* created date */
     voting_anchor.url,
     encode(voting_anchor.data_hash, 'hex'),
-    off_chain_vote_data.title,
-    off_chain_vote_data.abstract,
-    off_chain_vote_data.motivation,
-    off_chain_vote_data.rationale,
-    off_chain_vote_data.json,
-    off_chain_vote_data.json#>'{body, references}' as references,
+    off_chain_vote_gov_action_data.title,
+    off_chain_vote_gov_action_data.abstract,
+    off_chain_vote_gov_action_data.motivation,
+    off_chain_vote_gov_action_data.rationale,
     coalesce(Sum(ldd.amount) FILTER (WHERE voting_procedure.vote::text = 'Yes'), 0) +(
         CASE WHEN gov_action_proposal.type = 'NoConfidence' THEN
             always_no_confidence_voting_power.amount
@@ -80,7 +77,6 @@ FROM
     on gov_action_proposal.id = treasury_withdrawal.gov_action_proposal_id
     LEFT JOIN stake_address
     on stake_address.id = treasury_withdrawal.stake_address_id
-
     CROSS JOIN EpochUtils AS epoch_utils
     CROSS JOIN always_no_confidence_voting_power
     CROSS JOIN always_abstain_voting_power
@@ -88,6 +84,7 @@ FROM
     JOIN block AS creator_block ON creator_block.id = creator_tx.block_id
     LEFT JOIN voting_anchor ON voting_anchor.id = gov_action_proposal.voting_anchor_id
     LEFT JOIN off_chain_vote_data ON off_chain_vote_data.voting_anchor_id = voting_anchor.id
+    LEFT JOIN off_chain_vote_gov_action_data ON off_chain_vote_gov_action_data.off_chain_vote_data_id = off_chain_vote_data.id
     LEFT JOIN voting_procedure ON voting_procedure.gov_action_proposal_id = gov_action_proposal.id
     LEFT JOIN LatestDrepDistr ldd ON ldd.hash_id = voting_procedure.drep_voter
         AND ldd.rn = 1
@@ -107,11 +104,10 @@ GROUP BY
         stake_address.view,
         treasury_withdrawal.amount,
         creator_block.epoch_no,
-        off_chain_vote_data.title,
-        off_chain_vote_data.abstract,
-        off_chain_vote_data.motivation,
-        off_chain_vote_data.rationale,
-        off_chain_vote_data.json,
+        off_chain_vote_gov_action_data.title,
+        off_chain_vote_gov_action_data.abstract,
+        off_chain_vote_gov_action_data.motivation,
+        off_chain_vote_gov_action_data.rationale,
         gov_action_proposal.index,
         creator_tx.hash,
         creator_block.time,

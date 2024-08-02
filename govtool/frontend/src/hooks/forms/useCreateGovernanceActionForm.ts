@@ -14,7 +14,6 @@ import {
 } from "@consts";
 import { useCardano, useModal } from "@context";
 import {
-  canonizeJSON,
   correctAdaFormat,
   downloadJson,
   generateJsonld,
@@ -109,11 +108,10 @@ export const useCreateGovernanceActionForm = (
 
     const jsonld = await generateJsonld(body, GOVERNANCE_ACTION_CONTEXT);
 
-    const canonizedJson = await canonizeJSON(jsonld);
-    const canonizedJsonHash = blake2bHex(canonizedJson, undefined, 32);
+    const jsonHash = blake2bHex(JSON.stringify(jsonld), undefined, 32);
 
     // That allows to validate metadata hash
-    setHash(canonizedJsonHash);
+    setHash(jsonHash);
     setJson(jsonld);
 
     return jsonld;

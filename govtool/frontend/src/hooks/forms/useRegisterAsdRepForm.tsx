@@ -15,7 +15,6 @@ import {
 import { useCardano, useModal } from "@context";
 import { MetadataStandard, MetadataValidationStatus } from "@models";
 import {
-  canonizeJSON,
   downloadJson,
   ellipsizeText,
   generateJsonld,
@@ -106,10 +105,9 @@ export const useRegisterAsdRepForm = (
 
     const jsonld = await generateJsonld(body, DREP_CONTEXT, CIP_QQQ);
 
-    const canonizedJson = await canonizeJSON(jsonld);
-    const canonizedJsonHash = blake2bHex(canonizedJson, undefined, 32);
+    const jsonHash = blake2bHex(JSON.stringify(jsonld), undefined, 32);
 
-    setHash(canonizedJsonHash);
+    setHash(jsonHash);
     setJson(jsonld);
 
     return jsonld;

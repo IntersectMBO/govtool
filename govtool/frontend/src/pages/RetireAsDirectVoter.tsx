@@ -81,7 +81,7 @@ export const RetireAsDirectVoter = () => {
   );
 
   useEffect(() => {
-    if (checkIsWalletConnected()) {
+    if (!checkIsWalletConnected()) {
       navigate(PATHS.home);
     }
   }, []);

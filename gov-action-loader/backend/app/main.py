@@ -14,7 +14,7 @@ from app.models import MultipleProposal
 from app.settings import settings
 from app.transaction import (get_base_proposal_for_multiple,
                              get_default_transaction,
-                             get_proposal_data_from_type, get_txid_from_cli,
+                             get_proposal_data_from_type,
                              main_wallet, submit_proposal_tx)
 
 app = FastAPI()
@@ -106,7 +106,7 @@ async def submit_multiple_proposals(
     else:
         raise HTTPException(
             status_code=400,
-            detail="No of proposals greater than 100 not supported yet.",
+            detail="No of proposals greater than "+str(maximum_supported_proposals)+" not supported yet.",
         )
 
 
@@ -134,7 +134,7 @@ async def submit_single_proposal(
     if kuber_response.status_code == 200:
         tx = kuber_response.json()
         tx["type"] = "Witnessed Tx ConwayEra"
-        tx_id = get_txid_from_cli(tx)
+        tx_id = tx['hash']
         return tx | {"txId": tx_id}
     else:
         print(kuber_response.text)

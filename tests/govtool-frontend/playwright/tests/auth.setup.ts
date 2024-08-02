@@ -10,14 +10,17 @@ import {
   dRep01Wallet,
   dRep02Wallet,
   proposal01Wallet,
+  proposal02Wallet,
+  proposal03Wallet,
+  proposal04Wallet,
+  proposal05Wallet,
+  proposal06Wallet,
+  proposal07Wallet,
   user01Wallet,
 } from "@constants/staticWallets";
-import { faker } from "@faker-js/faker";
-import { importWallet } from "@fixtures/importWallet";
 import { test as setup } from "@fixtures/walletExtension";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
-import LoginPage from "@pages/loginPage";
-import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
+import { createAuth, createAuthWithUserName } from "@helpers/auth";
 
 const dRep01AuthFile = ".auth/dRep01.json";
 const dRep02AuthFile = ".auth/dRep02.json";
@@ -32,6 +35,12 @@ const adaHolder06AuthFile = ".auth/adaHolder06.json";
 const user01AuthFile = ".auth/user01.json";
 
 const proposal01AuthFile = ".auth/proposal01.json";
+const proposal02AuthFile = ".auth/proposal02.json";
+const proposal03AuthFile = ".auth/proposal03.json";
+const proposal04AuthFile = ".auth/proposal04.json";
+const proposal05AuthFile = ".auth/proposal05.json";
+const proposal06AuthFile = ".auth/proposal06.json";
+const proposal07AuthFile = ".auth/proposal07.json";
 
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
@@ -39,109 +48,145 @@ setup.beforeEach(async () => {
 });
 
 setup("Create DRep 01 auth", async ({ page, context }) => {
-  await importWallet(page, dRep01Wallet);
-
-  const loginPage = new LoginPage(page);
-  await loginPage.login();
-  await loginPage.isLoggedIn();
-
-  await context.storageState({ path: dRep01AuthFile });
+  await createAuth({
+    page,
+    context,
+    wallet: dRep01Wallet,
+    auth: dRep01AuthFile,
+  });
 });
 
 setup("Create DRep 02 auth", async ({ page, context }) => {
-  await importWallet(page, dRep02Wallet);
-
-  const loginPage = new LoginPage(page);
-  await loginPage.login();
-  await loginPage.isLoggedIn();
-
-  await context.storageState({ path: dRep02AuthFile });
+  await createAuth({
+    page,
+    context,
+    wallet: dRep02Wallet,
+    auth: dRep02AuthFile,
+  });
 });
 
 setup("Create User 01 auth", async ({ page, context }) => {
-  await importWallet(page, user01Wallet);
-
-  const loginPage = new LoginPage(page);
-  await loginPage.login();
-  await loginPage.isLoggedIn();
-
-  await context.storageState({ path: user01AuthFile });
+  await createAuth({
+    page,
+    context,
+    wallet: user01Wallet,
+    auth: user01AuthFile,
+  });
 });
 
 setup("Create AdaHolder 01 auth", async ({ page, context }) => {
-  await importWallet(page, adaHolder01Wallet);
-
-  const loginPage = new LoginPage(page);
-  await loginPage.login();
-  await loginPage.isLoggedIn();
-
-  await context.storageState({ path: adaHolder01AuthFile });
+  await createAuth({
+    page,
+    context,
+    wallet: adaHolder01Wallet,
+    auth: adaHolder01AuthFile,
+  });
 });
 
 setup("Create AdaHolder 02 auth", async ({ page, context }) => {
-  await importWallet(page, adaHolder02Wallet);
-
-  const loginPage = new LoginPage(page);
-  await loginPage.login();
-  await loginPage.isLoggedIn();
-
-  await context.storageState({ path: adaHolder02AuthFile });
+  await createAuth({
+    page,
+    context,
+    wallet: adaHolder02Wallet,
+    auth: adaHolder02AuthFile,
+  });
 });
 
 setup("Create AdaHolder 03 auth", async ({ page, context }) => {
-  await importWallet(page, adaHolder03Wallet);
-
-  const loginPage = new LoginPage(page);
-  await loginPage.login();
-  await loginPage.isLoggedIn();
-
-  await context.storageState({ path: adaHolder03AuthFile });
+  await createAuth({
+    page,
+    context,
+    wallet: adaHolder03Wallet,
+    auth: adaHolder03AuthFile,
+  });
 });
 
 setup("Create AdaHolder 04 auth", async ({ page, context }) => {
-  await importWallet(page, adaHolder04Wallet);
-
-  const loginPage = new LoginPage(page);
-  await loginPage.login();
-  await loginPage.isLoggedIn();
-
-  await context.storageState({ path: adaHolder04AuthFile });
+  await createAuth({
+    page,
+    context,
+    wallet: adaHolder04Wallet,
+    auth: adaHolder04AuthFile,
+  });
 });
 
 setup("Create AdaHolder 05 auth", async ({ page, context }) => {
-  await importWallet(page, adaHolder05Wallet);
-
-  const loginPage = new LoginPage(page);
-  await loginPage.login();
-  await loginPage.isLoggedIn();
-
-  await context.storageState({ path: adaHolder05AuthFile });
+  await createAuth({
+    page,
+    context,
+    wallet: adaHolder05Wallet,
+    auth: adaHolder05AuthFile,
+  });
 });
 
 setup("Create AdaHolder 06 auth", async ({ page, context }) => {
-  await importWallet(page, adaHolder06Wallet);
-
-  const loginPage = new LoginPage(page);
-  await loginPage.login();
-  await loginPage.isLoggedIn();
-
-  await context.storageState({ path: adaHolder06AuthFile });
+  await createAuth({
+    page,
+    context,
+    wallet: adaHolder06Wallet,
+    auth: adaHolder06AuthFile,
+  });
 });
 
 setup("Create Proposal 01 auth", async ({ page, context }) => {
-  await importWallet(page, proposal01Wallet);
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: proposal01Wallet,
+    auth: proposal01AuthFile,
+  });
+});
 
-  const loginPage = new LoginPage(page);
-  await loginPage.login();
-  await loginPage.isLoggedIn();
+setup("Create Proposal 02 auth", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: proposal02Wallet,
+    auth: proposal02AuthFile,
+  });
+});
 
-  const proposalDiscussionPage = new ProposalDiscussionPage(page);
-  await proposalDiscussionPage.goto();
-  await proposalDiscussionPage.verifyIdentityBtn.click();
+setup("Create Proposal 03 auth", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: proposal03Wallet,
+    auth: proposal03AuthFile,
+  });
+});
 
-  await proposalDiscussionPage.setUsername(
-      faker.internet.userName().toLowerCase()
-  );
+setup("Create Proposal 04 auth", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: proposal04Wallet,
+    auth: proposal04AuthFile,
+  });
+});
 
-  await context.storageState({ path: proposal01AuthFile });
+setup("Create Proposal 05 auth", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: proposal05Wallet,
+    auth: proposal05AuthFile,
+  });
+});
+
+setup("Create Proposal 06 auth", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: proposal06Wallet,
+    auth: proposal06AuthFile,
+  });
+});
+
+setup("Create Proposal 07 auth", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: proposal07Wallet,
+    auth: proposal07AuthFile,
+  });
 });

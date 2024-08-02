@@ -5,6 +5,7 @@ import {
   AutomatedVotingOptionCurrentDelegation,
   AutomatedVotingOptionDelegationId,
 } from "@/types/automatedVotingOptions";
+import { CurrentDelegation, VoterInfo } from "@/models";
 
 export const getDesiredResult = (
   type: TransactionType,
@@ -61,11 +62,9 @@ export const refetchData = async (
   if (queryKey === undefined) return;
 
   await queryClient.invalidateQueries(queryKey);
-  // TODO add better type for query data
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const data = await queryClient.getQueryData<any>(queryKey);
 
   if (type === "delegate") {
+    const data = await queryClient.getQueryData<CurrentDelegation>(queryKey);
     if (
       resourceId === AutomatedVotingOptionDelegationId.no_confidence ||
       resourceId === AutomatedVotingOptionDelegationId.abstain
@@ -74,6 +73,9 @@ export const refetchData = async (
     }
     return data?.dRepHash;
   }
+
+  const data = await queryClient.getQueryData<VoterInfo>(queryKey);
+
   if (type === "registerAsDrep" || type === "retireAsDrep")
     return data?.isRegisteredAsDRep;
   if (type === "registerAsDirectVoter" || type === "retireAsDirectVoter")

@@ -6,6 +6,7 @@
 
 module VVA.Types where
 
+import           Control.Concurrent.QSem
 import           Control.Exception
 import           Control.Monad.Except       (MonadError)
 import           Control.Monad.Fail         (MonadFail)
@@ -23,8 +24,6 @@ import           Database.PostgreSQL.Simple (Connection)
 
 import           VVA.Cache
 import           VVA.Config
-import           Network.HTTP.Client (Manager)
-import           Control.Concurrent.QSem
 
 type App m = (MonadReader AppEnv m, MonadIO m, MonadFail m, MonadError AppError m)
 
@@ -33,8 +32,6 @@ data AppEnv
       { vvaConfig         :: VVAConfig
       , vvaCache          :: CacheEnv
       , vvaConnectionPool :: Pool Connection
-      , vvaTlsManager     :: Manager
-      , vvaMetadataQSem   :: QSem
       }
 
 instance Has VVAConfig AppEnv where
@@ -48,15 +45,6 @@ instance Has CacheEnv AppEnv where
 instance Has (Pool Connection) AppEnv where
   getter AppEnv {vvaConnectionPool} = vvaConnectionPool
   modifier f a@AppEnv {vvaConnectionPool} = a {vvaConnectionPool = f vvaConnectionPool}
-
-instance Has Manager AppEnv where
-  getter AppEnv {vvaTlsManager} = vvaTlsManager
-  modifier f a@AppEnv {vvaTlsManager} = a {vvaTlsManager = f vvaTlsManager}
-
-instance Has QSem AppEnv where
-  getter AppEnv {vvaMetadataQSem} = vvaMetadataQSem
-  modifier f a@AppEnv {vvaMetadataQSem} = a {vvaMetadataQSem = f vvaMetadataQSem}
-
 
 data AppError
   = ValidationError Text
@@ -127,11 +115,9 @@ data Proposal
       , proposalUrl            :: Text
       , proposalDocHash        :: Text
       , proposalTitle          :: Maybe Text
-      , proposalAbout          :: Maybe Text
-      , proposalMotivaiton     :: Maybe Text
+      , proposalAbstract       :: Maybe Text
+      , proposalMotivation     :: Maybe Text
       , proposalRationale      :: Maybe Text
-      , proposalMetadata       :: Maybe Value
-      , proposalReferences     :: Maybe Value
       , proposalYesVotes       :: Integer
       , proposalNoVotes        :: Integer
       , proposalAbstainVotes   :: Integer
@@ -140,48 +126,18 @@ data Proposal
 
 data TransactionStatus = TransactionConfirmed | TransactionUnconfirmed
 
-
-data ProposalMetadata =
-    ProposalMetadata
-    { proposalMetadataAbstract :: Text
-    , proposalMetadataMotivation :: Text
-    , proposalMetadataRationale :: Text
-    , proposalMetadataTitle :: Text
-    , proposalMetadataReferences :: [Text]
-    } deriving (Show)
-
-data DRepMetadata =
-    DRepMetadata
-    { dRepMetadataBio :: Text
-    , dRepMetadataDRepName :: Text
-    , dRepMetadataEmail :: Text
-    , dRepMetadataReferences :: [Text]
-    } deriving (Show)
-
-data MetadataValidationResult a =
-    MetadataValidationResult
-    { metadataValidationResultValid :: Bool
-    , metadataValidationResultStatus :: Maybe Text
-    , metadataValidationResultMetadata :: Maybe a
-    } deriving (Show)
-
-
-
-
 data CacheEnv
   = CacheEnv
-      { proposalListCache                  :: Cache.Cache () [Proposal]
-      , getProposalCache                   :: Cache.Cache (Text, Integer) Proposal
-      , currentEpochCache                  :: Cache.Cache () (Maybe Value)
-      , adaHolderVotingPowerCache          :: Cache.Cache Text Integer
+      { proposalListCache :: Cache.Cache () [Proposal]
+      , getProposalCache :: Cache.Cache (Text, Integer) Proposal
+      , currentEpochCache :: Cache.Cache () (Maybe Value)
+      , adaHolderVotingPowerCache :: Cache.Cache Text Integer
       , adaHolderGetCurrentDelegationCache :: Cache.Cache Text (Maybe Delegation)
-      , dRepGetVotesCache                  :: Cache.Cache Text ([Vote], [Proposal])
-      , dRepInfoCache                      :: Cache.Cache Text DRepInfo
-      , dRepVotingPowerCache               :: Cache.Cache Text Integer
-      , dRepListCache                      :: Cache.Cache () [DRepRegistration]
-      , networkMetricsCache                :: Cache.Cache () NetworkMetrics
-      , proposalMetadataValidationCache            :: Cache.Cache (Text, Text) (MetadataValidationResult ProposalMetadata)
-      , dRepMetadataValidationCache                :: Cache.Cache (Text, Text) (MetadataValidationResult DRepMetadata)
+      , dRepGetVotesCache :: Cache.Cache Text ([Vote], [Proposal])
+      , dRepInfoCache :: Cache.Cache Text DRepInfo
+      , dRepVotingPowerCache :: Cache.Cache Text Integer
+      , dRepListCache :: Cache.Cache () [DRepRegistration]
+      , networkMetricsCache :: Cache.Cache () NetworkMetrics
       }
 
 data NetworkMetrics
@@ -196,6 +152,7 @@ data NetworkMetrics
       , networkMetricsTotalRegisteredDReps          :: Integer
       , networkMetricsAlwaysAbstainVotingPower      :: Integer
       , networkMetricsAlwaysNoConfidenceVotingPower :: Integer
+      , networkMetricsNetworkName                   :: Text
       }
 
 data Delegation
@@ -204,12 +161,3 @@ data Delegation
       , delegationDRepView :: Text
       , delegationTxHash   :: Text
       }
-
-
-data MetadataValidationStatus
-  = IncorrectFormat
-  | IncorrectJSONLD
-  | IncorrectHash
-  | UrlNotFound
-
-

@@ -1,3 +1,4 @@
+import environments from "@constants/environments";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
@@ -8,9 +9,14 @@ import { expect } from "@playwright/test";
 const mockProposal = require("../../lib/_mock/proposal.json");
 const mockPoll = require("../../lib/_mock/proposalPoll.json");
 const mockComments = require("../../lib/_mock/proposalComments.json");
+const mockInfoProposedGA = require("../../lib/_mock/infoProposedGAs.json");
 
-test.beforeEach(() => {
-  setAllureEpic("Proposal Discussion Forum");
+const PROPOSAL_TYPE_FILTERS = ["Info", "Treasury"];
+
+const PROPOSAL_STATUS_FILTER = ["Submitted for vote", "Active proposal"];
+
+test.beforeEach(async () => {
+  await setAllureEpic("8. Proposal Discussion Forum");
 });
 
 test("8A. Should access proposed governance actions in disconnected state", async ({
@@ -19,21 +25,51 @@ test("8A. Should access proposed governance actions in disconnected state", asyn
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
 
-  await expect(page.getByText(/Proposed Governance Actions/i)).toHaveCount(2);
+  await expect(page.getByText(/Proposed Governance Actions/i)).toHaveCount(1);
 });
 
-test("8B. Should filter and sort the list of proposed governance actions.", async ({
-  page,
-}) => {
-  const proposalDiscussionPage = new ProposalDiscussionPage(page);
-  await proposalDiscussionPage.goto();
+test.describe("Filter and sort proposals", () => {
+  let proposalDiscussionPage: ProposalDiscussionPage;
 
-  await proposalDiscussionPage.filterBtn.click();
-  await proposalDiscussionPage.infoRadio.click();
+  test.beforeEach(async ({ page }) => {
+    proposalDiscussionPage = new ProposalDiscussionPage(page);
+    await proposalDiscussionPage.goto();
+  });
 
-  await expect(page.getByText("Treasury")).toHaveCount(1);
+  test("8B_1. Should filter the list of proposed governance actions.", async () => {
+    test.slow();
 
-  await proposalDiscussionPage.treasuryRadio.click();
+    await proposalDiscussionPage.filterBtn.click();
+
+    // unselect active proposal
+    await proposalDiscussionPage.activeProposalWrapper.click();
+
+    // proposal type filter
+    await proposalDiscussionPage.applyAndValidateFilters(
+      PROPOSAL_TYPE_FILTERS,
+      proposalDiscussionPage._validateTypeFiltersInProposalCard
+    );
+
+    // proposal status filter
+    await proposalDiscussionPage.applyAndValidateFilters(
+      PROPOSAL_STATUS_FILTER,
+      proposalDiscussionPage._validateStatusFiltersInProposalCard
+    );
+  });
+
+  test("8B_2. Should sort the list of proposed governance actions.", async () => {
+    await proposalDiscussionPage.sortBtn.click();
+
+    await proposalDiscussionPage.sortAndValidate(
+      "asc",
+      (p1, p2) => p1.attributes.createdAt <= p2.attributes.createdAt
+    );
+
+    await proposalDiscussionPage.sortAndValidate(
+      "desc",
+      (p1, p2) => p1.attributes.createdAt >= p2.attributes.createdAt
+    );
+  });
 });
 
 test("8C. Should search the list of proposed governance actions.", async ({
@@ -48,19 +84,33 @@ test("8C. Should search the list of proposed governance actions.", async ({
   const proposalCards = await proposalDiscussionPage.getAllProposals();
 
   for (const proposalCard of proposalCards) {
-    await expect(proposalCard.getByText(proposalName)).toBeVisible();
+    await expect(
+      proposalCard.locator('[data-testid^="proposal-"][data-testid$="-title"]')
+    ).toHaveText(proposalName);
   }
 });
 
 test("8D.Should show the view-all categorized proposed governance actions.", async ({
   page,
 }) => {
+  await page.route("**/api/proposals?**", async (route) => {
+    return route.fulfill({
+      body: JSON.stringify(mockInfoProposedGA),
+    });
+  });
+
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
 
   await proposalDiscussionPage.showAllBtn.click();
 
-  await expect(proposalDiscussionPage.showLessBtn).toBeVisible();
+  const proposalCards = await proposalDiscussionPage.getAllProposals();
+
+  for (const proposalCard of proposalCards) {
+    await expect(
+      proposalCard.getByTestId("governance-action-type")
+    ).toBeVisible();
+  }
 });
 
 test("8H. Should disable proposal interaction on a disconnected state.", async ({
@@ -113,7 +163,7 @@ test.describe("Mocked proposal", () => {
     );
 
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
-    await proposalDiscussionDetailsPage.goto(10);
+    await proposalDiscussionDetailsPage.goto(mockProposal.data.id);
   });
 
   test("8E. Should share proposed governance action", async ({
@@ -123,11 +173,15 @@ test.describe("Mocked proposal", () => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
 
     await page.getByTestId("share-button").click();
-    await expect(page.getByText("Copied to clipboard")).toBeVisible();
+    await page.getByTestId("copy-link").click();
+    await expect(page.getByTestId("copy-link-text")).toBeVisible();
+
     const copiedTextDRepDirectory = await page.evaluate(() =>
       navigator.clipboard.readText()
     );
-    expect(copiedTextDRepDirectory).toEqual(mockProposal.data.id);
+    const expectedCopyUrl = `${environments.frontendUrl}/proposal_discussion/${mockProposal.data.id}`;
+
+    expect(copiedTextDRepDirectory).toEqual(expectedCopyUrl);
   });
 
   test("8I. Should disable poll voting functionality.", async () => {
@@ -138,8 +192,8 @@ test.describe("Mocked proposal", () => {
   });
 
   test("8F. Should display all comments with count indication.", async () => {
-    await expect(proposalDiscussionDetailsPage.commentsCount).toHaveText(
-      mockProposal.data.attributes.prop_comments_number
+    await expect(proposalDiscussionDetailsPage.commentCount).toHaveText(
+      mockProposal.data.attributes.prop_comments_number.toString()
     );
   });
 });

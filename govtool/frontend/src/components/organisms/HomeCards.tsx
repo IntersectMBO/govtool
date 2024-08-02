@@ -15,18 +15,26 @@ export const HomeCards = () => {
   const { screenWidth } = useScreenDimension();
   const { t } = useTranslation();
 
-  const openWalletModal = useCallback(() => {
-    openModal({ type: "chooseWallet" });
-  }, [openModal]);
+  const openWalletModal = useCallback(
+    (pathToNavigate: string) => {
+      openModal({
+        type: "chooseWallet",
+        state: {
+          pathToNavigate,
+        },
+      });
+    },
+    [openModal],
+  );
 
   const onClickLearnMoreAboutDelegation = () =>
     openInNewTab(
-      "https://docs.sanchogov.tools/faqs/ways-to-use-your-voting-power",
+      "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/delegating",
     );
 
   const onClickLearnMoreAboutDRepRegistration = () =>
     openInNewTab(
-      "https://docs.sanchogov.tools/faqs/what-does-it-mean-to-register-as-a-drep",
+      "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/dreps",
     );
 
   const onClickLearnMoreAboutDirectVoterRegistration = () =>
@@ -36,7 +44,7 @@ export const HomeCards = () => {
 
   const onClickLearnMoreAboutProposingGovAction = () =>
     openInNewTab(
-      "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/propose-a-governance-action",
+      "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/governance-actions/propose-a-governance-action",
     );
 
   const navigateToGovActions = useCallback(
@@ -97,7 +105,7 @@ export const HomeCards = () => {
         dataTestIdFirstButton="register-connect-wallet-button"
         dataTestIdSecondButton="register-learn-more-button"
         description={t("home.cards.registerAsDRep.description")}
-        firstButtonAction={openWalletModal}
+        firstButtonAction={() => openWalletModal(PATHS.registerAsdRep)}
         firstButtonLabel={t("home.cards.registerAsDRep.firstButtonLabel")}
         imageHeight={80}
         imageURL={IMAGES.govActionRegisterImage}
@@ -107,12 +115,12 @@ export const HomeCards = () => {
         title={t("home.cards.registerAsDRep.title")}
       />
       {/* REGISTER AS DREP CARD END */}
-      {/* REGISTER AS SOLE VOTER CARD */}
+      {/* REGISTER AS DIRECT VOTER CARD */}
       <ActionCard
         dataTestIdFirstButton="register-as-sole-voter-button"
         dataTestIdSecondButton="lear-more-about-sole-voter-button"
         description={t("home.cards.registerAsDirectVoter.description")}
-        firstButtonAction={openWalletModal}
+        firstButtonAction={() => openWalletModal(PATHS.registerAsDirectVoter)}
         firstButtonLabel={t(
           "home.cards.registerAsDirectVoter.firstButtonLabel",
         )}
@@ -123,7 +131,7 @@ export const HomeCards = () => {
         secondButtonLabel={t("learnMore")}
         title={t("home.cards.registerAsDirectVoter.title")}
       />
-      {/* REGISTER AS SOLE VOTER CARD END */}
+      {/* REGISTER AS DIRECT VOTER CARD END */}
       {/* GOV ACTIONS CARD */}
       <ActionCard
         dataTestIdFirstButton="move-to-governance-actions-button"
@@ -140,7 +148,7 @@ export const HomeCards = () => {
       <ActionCard
         dataTestIdFirstButton="propose-a-governance-action-button"
         description={t("home.cards.proposeAGovernanceAction.description")}
-        firstButtonAction={openWalletModal}
+        firstButtonAction={() => openWalletModal(PATHS.createGovernanceAction)}
         firstButtonLabel={t(
           "home.cards.proposeAGovernanceAction.firstButtonLabel",
         )}

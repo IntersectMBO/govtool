@@ -13,12 +13,7 @@ import {
   storageInformationErrorModals,
 } from "@consts";
 import { useCardano, useModal } from "@context";
-import {
-  canonizeJSON,
-  downloadJson,
-  generateJsonld,
-  generateMetadataBody,
-} from "@utils";
+import { downloadJson, generateJsonld, generateMetadataBody } from "@utils";
 import { MetadataStandard, MetadataValidationStatus } from "@models";
 import { useWalletErrorModal } from "@hooks";
 import { useValidateMutation } from "../mutations";
@@ -97,10 +92,9 @@ export const useEditDRepInfoForm = (
 
     const jsonld = await generateJsonld(body, DREP_CONTEXT, CIP_QQQ);
 
-    const canonizedJson = await canonizeJSON(jsonld);
-    const canonizedJsonHash = blake2bHex(canonizedJson, undefined, 32);
+    const jsonHash = blake2bHex(JSON.stringify(jsonld), undefined, 32);
 
-    setHash(canonizedJsonHash);
+    setHash(jsonHash);
     setJson(jsonld);
 
     return jsonld;

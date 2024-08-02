@@ -14,9 +14,10 @@ target_config_dir := $(config_dir)/target
 
 # files
 docker_compose_file := $(target_config_dir)/docker-compose.yml
-cardano_configs := alonzo-genesis byron-genesis conway-genesis db-sync-config shelley-genesis submit-api-config topology
+cardano_configs := alonzo-genesis byron-genesis conway-genesis shelley-genesis submit-api-config topology
 cardano_config_files := $(addprefix $(target_config_dir)/cardano-node/,$(addsuffix .json,$(cardano_configs)))
 outputs := cardano-node/config.json \
+  cardano-node/db-sync-config.json \
   dbsync-secrets/postgres_user \
   dbsync-secrets/postgres_db \
   dbsync-secrets/postgres_password \
@@ -56,6 +57,7 @@ $(docker_compose_file): $(template_config_dir)/docker-compose.yml.tpl $(target_c
 		-e "s|<DOCKER_USER>|$(docker_user)|g" \
 		-e "s|<REPO_URL>|$(repo_url)|g" \
 		-e "s|<CSP_ALLOWED_HOSTS>|$${CSP_ALLOWED_HOSTS}|g" \
+		-e "s|<PDF_API_URL>|$${PDF_API_URL}|g" \
 		$< > $@
 
 $(cardano_config_files): $(target_config_dir)/cardano-node/
@@ -65,6 +67,10 @@ $(cardano_config_files): $(target_config_dir)/cardano-node/
 $(target_config_dir)/cardano-node/config.json: $(target_config_dir)/cardano-node/
 	$(curl) -s "$(cardano_config_provider)/environments/$(cardano_network)/$(notdir $@)" -o $@
 	sed -i '/"hasPrometheus"/ { N; s/"127\.0\.0\.1"/"0.0.0.0"/ }' "$(target_config_dir)/cardano-node/config.json"
+
+$(target_config_dir)/cardano-node/db-sync-config.json: $(target_config_dir)/cardano-node/
+	$(curl) -s "$(cardano_config_provider)/environments/$(cardano_network)/$(notdir $@)" -o $@
+	sed -i '1a\  "EnableFutureGenesis" : true,' "$(target_config_dir)/cardano-node/db-sync-config.json"
 
 $(target_config_dir)/dbsync-secrets/postgres_user: $(target_config_dir)/dbsync-secrets/
 	echo "$${DBSYNC_POSTGRES_USER}" > $@
@@ -79,6 +85,8 @@ $(target_config_dir)/backend-config.json: $(config_dir)/templates/backend-config
 	sed -e "s|<DBSYNC_POSTGRES_DB>|$${DBSYNC_POSTGRES_DB}|" \
 		-e "s|<DBSYNC_POSTGRES_USER>|$${DBSYNC_POSTGRES_USER}|" \
 		-e "s|<DBSYNC_POSTGRES_PASSWORD>|$${DBSYNC_POSTGRES_PASSWORD}|" \
+		-e "s|<DBSYNC_POSTGRES_HOST>|$${DBSYNC_POSTGRES_HOST}|" \
+		-e "s|<DBSYNC_POSTGRES_PORT>|$${DBSYNC_POSTGRES_PORT}|" \
 		-e "s|<SENTRY_DSN>|$${SENTRY_DSN_BACKEND}|" \
 		-e "s|<SENTRY_ENV>|$(env)|" \
 		$< > $@

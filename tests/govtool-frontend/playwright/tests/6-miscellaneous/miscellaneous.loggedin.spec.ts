@@ -9,15 +9,15 @@ import {
 } from "@constants/docsUrl";
 import { user01Wallet } from "@constants/staticWallets";
 import { createTempUserAuth } from "@datafactory/createAuth";
-import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
+import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import EditDRepPage from "@pages/editDRepPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
-import { expect } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 
 test.beforeEach(async () => {
   await setAllureEpic("6. Miscellaneous");
@@ -109,28 +109,55 @@ test.describe("Logged in user", () => {
   }) => {
     await page.goto("/");
     await page.getByTestId("proposal-discussion-link").click();
+    await page.getByTestId("verify-identity-button").click();
 
-    await expect(
-      page.getByText(
-        "Hey, setup your usernameUsername cannot be changed in the Future. Some subtext"
-      )
-    ).toBeVisible(); //BUG Add modal testid instead should be username-modal
-
-    await expect(page.getByLabel("Username *")).toBeVisible(); // BUG use testid instead
+    await expect(page.getByTestId("setup-username-modal")).toBeVisible();
+    await expect(page.getByTestId("username-input")).toBeVisible();
   });
 });
 
 test.describe("Temporary user", () => {
-  test("6J. Should add a username.", async ({ page, browser }) => {
+  let userPage: Page;
+  let proposalDiscussionPage: ProposalDiscussionPage;
+
+  test.beforeEach(async ({ page, browser }) => {
     const wallet = (await ShelleyWallet.generate()).json();
     const tempUserAuth = await createTempUserAuth(page, wallet);
-    const userPage = await createNewPageWithWallet(browser, {
+    userPage = await createNewPageWithWallet(browser, {
       storageState: tempUserAuth,
       wallet,
     });
 
-    const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
+    proposalDiscussionPage = new ProposalDiscussionPage(userPage);
     await proposalDiscussionPage.goto();
-    await proposalDiscussionPage.setUsername(faker.internet.userName());
+    await proposalDiscussionPage.verifyIdentityBtn.click();
+  });
+
+  test("6J. Should add a username.", async () => {
+    await proposalDiscussionPage.setUsername(mockValid.username());
+  });
+
+  test("6K. Should accept valid username.", async () => {
+    for (let i = 0; i < 100; i++) {
+      await userPage
+        .getByTestId("username-input")
+        .fill(mockValid.username().toLowerCase());
+
+      await expect(
+        userPage.getByTestId("username-error-text")
+      ).not.toBeVisible();
+      await expect(userPage.getByTestId("proceed-button")).toBeEnabled();
+    }
+  });
+
+  test("6L. Should reject invalid username.", async () => {
+    for (let i = 0; i < 100; i++) {
+      await userPage
+        .getByTestId("username-input")
+        .fill(mockInvalid.username().toLowerCase());
+
+      await expect(userPage.getByTestId("username-error-text")).toBeVisible();
+      await expect(userPage.getByTestId("proceed-button")).toBeDisabled();
+    }
   });
 });

@@ -171,8 +171,8 @@ test.describe("Mocked proposal", () => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
 
     await page.getByTestId("share-button").click();
-    await page.getByRole("button").click(); // BUG missing test id copy button
-    await expect(page.getByText("Link copied")).toBeVisible(); // BUG missing test id link copied text
+    await page.getByTestId("copy-link").click();
+    await expect(page.getByTestId("copy-link-text")).toBeVisible();
 
     const copiedTextDRepDirectory = await page.evaluate(() =>
       navigator.clipboard.readText()

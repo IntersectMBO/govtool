@@ -107,7 +107,9 @@ test("8D.Should show the view-all categorized proposed governance actions.", asy
   const proposalCards = await proposalDiscussionPage.getAllProposals();
 
   for (const proposalCard of proposalCards) {
-    await expect(proposalCard.getByText("Info", { exact: true })).toBeVisible(); // BUG missing test id
+    await expect(
+      proposalCard.getByTestId("governance-action-type")
+    ).toBeVisible();
   }
 });
 

@@ -1,5 +1,5 @@
-import { faker } from "@faker-js/faker";
 import { importWallet } from "@fixtures/importWallet";
+import { valid as mockValid } from "@mock/index";
 import LoginPage from "@pages/loginPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { BrowserContext, Page } from "@playwright/test";
@@ -43,9 +43,7 @@ export async function createAuthWithUserName({
   await proposalDiscussionPage.goto();
   await proposalDiscussionPage.verifyIdentityBtn.click();
 
-  await proposalDiscussionPage.setUsername(
-    faker.internet.userName().toLowerCase()
-  );
+  await proposalDiscussionPage.setUsername(mockValid.username());
 
   await context.storageState({ path: auth });
 }

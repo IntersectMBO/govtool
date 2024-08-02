@@ -9,6 +9,7 @@ import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
 import walletManager from "lib/walletManager";
+import { valid as mockValid } from "@mock/index";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
@@ -33,9 +34,7 @@ test("7H. Should submit a proposal as governance action", async ({
   await proposalDiscussionPage.goto();
   await proposalDiscussionPage.verifyIdentityBtn.click();
 
-  await proposalDiscussionPage.setUsername(
-    faker.internet.userName().toLowerCase()
-  );
+  await proposalDiscussionPage.setUsername(mockValid.username());
 
   const proposalSubmissionPage = new ProposalSubmissionPage(userPage);
   await proposalSubmissionPage.proposalCreateBtn.click();

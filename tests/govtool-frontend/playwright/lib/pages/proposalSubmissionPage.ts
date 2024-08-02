@@ -6,7 +6,7 @@ import { expectWithInfo } from "@helpers/exceptionHandler";
 import { downloadMetadata } from "@helpers/metadata";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { invalid } from "@mock/index";
-import { Download, Page, expect } from "@playwright/test";
+import { Download, Locator, Page, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
 import { ProposalCreateRequest, ProposalLink, ProposalType } from "@types";
 
@@ -211,43 +211,44 @@ export default class ProposalSubmissionPage {
     await expect(this.continueBtn).toBeEnabled();
   }
 
+  async assertFieldValidation(
+    input: Locator,
+    errorField: string,
+    value: string,
+    logMessage: string
+  ) {
+    if (value === " ") {
+      await expect(this.page.getByTestId(errorField)).toBeVisible();
+    } else {
+      expectWithInfo(
+        async () => expect(await input.textContent()).not.toEqual(value),
+        `${logMessage}: ${value}`
+      );
+    }
+  }
+
   async inValidateForm(governanceProposal: ProposalCreateRequest) {
     await this.fillupFormWithTypeSelected(governanceProposal);
     await expect(this.page.getByTestId(formErrors.proposalTitle)).toBeVisible();
-    if (governanceProposal.prop_abstract === " ") {
-      await expect(this.page.getByTestId(formErrors.abstract)).toBeVisible();
-    } else {
-      expectWithInfo(
-        async () =>
-          expect(await this.abstractInput.textContent()).not.toEqual(
-            governanceProposal.prop_abstract
-          ),
-        `valid abstract: ${governanceProposal.prop_abstract}`
-      );
-    }
 
-    if (governanceProposal.prop_motivation === " ") {
-      await expect(this.page.getByTestId(formErrors.motivation)).toBeVisible();
-    } else {
-      expectWithInfo(
-        async () =>
-          expect(await this.motivationInput.textContent()).not.toEqual(
-            governanceProposal.prop_motivation
-          ),
-        `valid motivation: ${governanceProposal.prop_motivation}`
-      );
-    }
-    if (governanceProposal.prop_rationale === " ") {
-      await expect(this.page.getByTestId(formErrors.rationale)).toBeVisible();
-    } else {
-      expectWithInfo(
-        async () =>
-          expect(await this.rationaleInput.textContent()).not.toEqual(
-            governanceProposal.prop_rationale
-          ),
-        `valid rationale: ${governanceProposal.prop_rationale}`
-      );
-    }
+    await this.assertFieldValidation(
+      this.abstractInput,
+      formErrors.abstract,
+      governanceProposal.prop_abstract,
+      "valid abstract"
+    );
+    await this.assertFieldValidation(
+      this.motivationInput,
+      formErrors.motivation,
+      governanceProposal.prop_motivation,
+      "valid motivation"
+    );
+    await this.assertFieldValidation(
+      this.rationaleInput,
+      formErrors.rationale,
+      governanceProposal.prop_rationale,
+      "valid rationale"
+    );
 
     await expect(this.page.getByTestId(formErrors.link)).toBeVisible();
 

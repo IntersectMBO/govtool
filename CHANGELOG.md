@@ -37,6 +37,7 @@ changes.
 - Change link to propose a governace action docs [Issue 1132](https://github.com/IntersectMBO/govtool/issues/1132)
 - Change link to docs regarding DReps [Issue 1130](https://github.com/IntersectMBO/govtool/issues/1130)
 - Change link to view governance actions docs [Issue 1131](https://github.com/IntersectMBO/govtool/issues/1131)
+- Change link to delegate voting power docs, [Issue 1654](https://github.com/IntersectMBO/govtool/issues/1654)
 - Make all the frontend build arguments mandatory [Issue 1642](https://github.com/IntersectMBO/govtool/issues/1642), [Issue 1643](https://github.com/IntersectMBO/govtool/issues/1643)
 - Breaking! Remove usage of metadata validation service in Haskell Backend
 

@@ -39,6 +39,7 @@ changes.
 - Change link to view governance actions docs [Issue 1131](https://github.com/IntersectMBO/govtool/issues/1131)
 - Make all the frontend build arguments mandatory [Issue 1642](https://github.com/IntersectMBO/govtool/issues/1642), [Issue 1643](https://github.com/IntersectMBO/govtool/issues/1643)
 - Breaking! Remove usage of metadata validation service in Haskell Backend
+- Bump @intersect.mbo/pdf-ui to v0.3.3
 
 ## [sancho-v1.0.11](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.11) 2024-07-30
 

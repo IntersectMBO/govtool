@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Incorrect copy on DRep votes + other minor copy spelling mistakes
 
 ### Changed
 

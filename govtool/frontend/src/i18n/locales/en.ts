@@ -310,11 +310,11 @@ export const en = {
       dRep: {
         description: {
           notVerifiable:
-            "GovTool uses external sources for DRep data, and these sources are maintianed by the DReps themselves. This error means that the data stored by the DRep does not match the data supplied by the DRep when they originally registered",
+            "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that the data stored by the DRep does not match the data supplied by the DRep when they originally registered",
           dataMissing:
-            "GovTool uses external sources for DRep data, and these sources are maintianed by the DReps themselves. This error means that GovTool cannot locate the data on the URL specified when the DRep was originally registered.",
+            "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that GovTool cannot locate the data on the URL specified when the DRep was originally registered.",
           incorrectFormat:
-            "GovTool uses external sources for DRep data, and these sources are maintianed by the DReps themselves. This error means that the data stored by the DRep does not match the format defined by the DRep spec.",
+            "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that the data stored by the DRep does not match the format defined by the DRep spec.",
         },
         message: {
           notVerifiable:
@@ -440,15 +440,15 @@ export const en = {
       voteSubmitted: "Vote submitted",
       voteTransaction: "Vote transaction",
       votes: "Votes:",
-      votesSubmitted: "Votes submitted",
+      votesSubmitted: "DRep votes submitted",
       votesSubmittedOnChain:
-        "Votes submitted on-chain by DReps, SPOs and Constitutional Committee members.",
+        "Votes submitted on-chain by DReps and predefined voting options.",
       youCanProvideContext:
         "You can provide context about your vote. This information will be viewable by other users.",
       youHaventVotedYet:
         "You haven't voted on any Governance Actions yet. Check the 'To vote on' section to vote on Governance Actions.",
       withCategoryNotExist: {
-        partOne: "Governnance actions with category",
+        partOne: "Governance actions with category",
         optional: "and search phrase",
         partTwo: "don't exist.",
       },

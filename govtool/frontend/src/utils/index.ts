@@ -20,6 +20,8 @@ export * from "./getProposalTypeLabel";
 export * from "./isValidFormat";
 export * from "./jsonUtils";
 export * from "./localStorage";
+export * from "./mapDtoToDrep";
+export * from "./mapDtoToProposal";
 export * from "./numberValidation";
 export * from "./openInNewTab";
 export * from "./removeDuplicatedProposals";

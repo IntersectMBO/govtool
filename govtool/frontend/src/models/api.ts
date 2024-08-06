@@ -39,15 +39,19 @@ export enum DRepListSort {
   Status = "Status",
 }
 
-export interface DRepData {
-  drepId: string;
-  view: string;
-  url: string;
-  metadataHash: string;
+export interface DrepDataDTO {
   deposit: number;
-  votingPower: number;
+  drepId: string;
+  latestTxHash?: string;
+  metadataHash?: string;
   status: DRepStatus;
   type: "DRep" | "SoleVoter";
+  url?: string;
+  view: string;
+  votingPower?: number;
+}
+
+export interface DRepData extends DrepDataDTO {
   bio: string | null;
   dRepName: string | null;
   email: string | null;
@@ -55,21 +59,8 @@ export interface DRepData {
   metadataStatus: MetadataValidationStatus | null;
   metadataValid: boolean;
 }
-export type InfinityDRepData = {
-  elements: DRepData[];
-  page: number;
-  pageSize: number;
-  total: number;
-};
 
 export type Vote = "yes" | "no" | "abstain";
-
-export type InfinityProposals = {
-  elements: ProposalData[];
-  page: number;
-  pageSize: number;
-  total: number;
-};
 
 type ProposalVote = {
   date: string;
@@ -82,30 +73,39 @@ type ProposalVote = {
   vote: Vote;
 };
 
-export type ProposalData = {
+export type ProposalDataDTO = {
   abstainVotes: number;
   createdDate: string;
   createdEpochNo: number;
+  details?: ActionDetailsType;
   expiryDate: string;
   expiryEpochNo: number;
   id: string;
   index: number;
-  metadataValid: boolean;
+  metadataHash: string;
   noVotes: number;
   txHash: string;
   type: string;
+  url: string;
   yesVotes: number;
   abstract?: string;
-  details?: ActionDetailsType;
-  metadataHash?: string;
-  metadataStatus: MetadataValidationStatus | null;
   motivation?: string;
   rationale?: string;
   references?: string[];
   title?: string;
-  url?: string;
 };
-export interface VotedProposal {
+
+export type ProposalData = ProposalDataDTO & {
+  metadataStatus: MetadataValidationStatus | null;
+  metadataValid: boolean;
+}
+
+export type VotedProposalDTO = {
+  vote: ProposalVote;
+  proposal: ProposalDataDTO;
+}
+
+export type VotedProposal = {
   vote: ProposalVote;
   proposal: ProposalData;
 }
@@ -115,3 +115,10 @@ export type CurrentDelegation = {
   dRepView: string | null;
   txHash: string | null;
 } | null;
+
+export type Infinite<T> = {
+  elements: T[];
+  page: number;
+  pageSize: number;
+  total: number;
+}

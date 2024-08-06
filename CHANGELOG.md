@@ -21,6 +21,7 @@ changes.
 - Remove incorrect @value property to fix validating the metadata body [Issue 1687](https://github.com/IntersectMBO/govtool/issues/1687)
 - Fix PDF not enabled in default deployments
 - Fix displaying incorrect connected to Voltaire GovTool network
+- Runtime error at /edit_drep when metadata incorrect [Issue 1675](https://github.com/IntersectMBO/govtool/issues/1675)
 
 ### Changed
 

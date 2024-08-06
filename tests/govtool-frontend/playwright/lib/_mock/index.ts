@@ -91,7 +91,8 @@ export const invalid = {
 
 export const valid = {
   username: () => {
-    let username = faker.internet.userName().toLowerCase();
+    let timeStamp = Date.now();
+    let username = `${faker.internet.userName().toLowerCase()}_${timeStamp}`;
 
     // Remove any invalid characters
     username = username.replace(/[^a-z0-9._]/g, "");

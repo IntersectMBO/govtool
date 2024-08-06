@@ -5,7 +5,6 @@ import metadataBucketService from "@services/metadataBucketService";
 const blake = require("blakejs");
 
 import * as fs from "fs";
-import path = require("path");
 
 export async function downloadMetadata(download: Download): Promise<{
   name: string;
@@ -20,14 +19,11 @@ export async function downloadMetadata(download: Download): Promise<{
 
 function calculateMetadataHash() {
   try {
-    // Get the JSON data as a string
     const data = JSON.stringify(mockValid.metadata());
 
-    // Convert the string to a buffer
     const buffer = Buffer.from(data, "utf8");
     const hexDigest = blake.blake2bHex(buffer, null, 32);
 
-    // Parse the JSON data
     const jsonData = JSON.parse(data);
     return { hexDigest, jsonData };
   } catch (error) {

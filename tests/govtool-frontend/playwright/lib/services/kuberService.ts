@@ -186,17 +186,17 @@ const kuberService = {
     return kuber.signAndSubmitTx(req);
   },
 
-  multipleDRepRegistration: (metadatasAndWallets: WalletAndAnchorType[]) => {
+  multipleDRepRegistration: (metadataAndWallets: WalletAndAnchorType[]) => {
     const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
     const req = {
-      certificates: metadatasAndWallets.map((metadataAndWallet) =>
+      certificates: metadataAndWallets.map((metadataAndWallet) =>
         Kuber.generateCert(
           "registerdrep",
           metadataAndWallet.wallet.stake.pkh,
           metadataAndWallet
         )
       ),
-      selections: metadatasAndWallets.map((metadata) => {
+      selections: metadataAndWallets.map((metadata) => {
         return {
           type: "PaymentSigningKeyShelley_ed25519",
           description: "Stake Signing Key",

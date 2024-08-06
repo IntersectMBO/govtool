@@ -40,9 +40,9 @@ setup("Register DRep of static wallets", async () => {
       return { ...(await uploadMetadataAndGetJsonHash()), wallet: dRepWallet };
     });
 
-    const metadatasAndDRepWallets = await Promise.all(metadataPromises);
+    const metadataAndDRepWallets = await Promise.all(metadataPromises);
     const res = await kuberService.multipleDRepRegistration(
-      metadatasAndDRepWallets
+      metadataAndDRepWallets
     );
 
     await pollTransaction(res.txId, res.lockInfo);

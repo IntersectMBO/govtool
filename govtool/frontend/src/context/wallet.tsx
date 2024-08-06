@@ -618,7 +618,7 @@ const CardanoProvider = (props: Props) => {
           stakeCred = Credential.from_keyhash(stakeKeyHash);
         } else {
           stakeCred = Credential.from_keyhash(stakeKeyHash);
-          const stakeKeyRegCert = StakeRegistration.new(stakeCred);
+          const stakeKeyRegCert = StakeRegistration.new_with_coin(stakeCred, BigNum.from_str(`${epochParams.key_deposit}`));
           certBuilder.add(Certificate.new_stake_registration(stakeKeyRegCert));
         }
 

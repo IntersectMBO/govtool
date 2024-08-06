@@ -17,7 +17,6 @@ import {
 } from "@hooks";
 import { Footer, TopNav, GovernanceActionDetailsCard } from "@organisms";
 import {
-  formatDisplayDate,
   getProposalTypeLabel,
   WALLET_LS_KEY,
   getItemFromLocalStorage,
@@ -131,9 +130,7 @@ export const GovernanceActionDetails = () => {
                     state ? state.abstainVotes : data.proposal.abstainVotes
                   }
                   createdDate={
-                    state
-                      ? formatDisplayDate(state.createdDate)
-                      : formatDisplayDate(data.proposal.createdDate)
+                    state ? state.createdDate : data.proposal.createdDate
                   }
                   createdEpochNo={
                     state ? state.createdEpochNo : data.proposal.createdEpochNo
@@ -142,9 +139,7 @@ export const GovernanceActionDetails = () => {
                     state ? state.metadataStatus : data?.proposal.metadataStatus
                   }
                   expiryDate={
-                    state
-                      ? formatDisplayDate(state.expiryDate)
-                      : formatDisplayDate(data.proposal.expiryDate)
+                    state ? state.expiryDate : data.proposal.expiryDate
                   }
                   expiryEpochNo={
                     state ? state.expiryEpochNo : data.proposal.expiryEpochNo

@@ -42,6 +42,7 @@ export enum DRepListSort {
 export interface DrepDataDTO {
   deposit: number;
   drepId: string;
+  latestRegistrationDate: string;
   latestTxHash?: string;
   metadataHash?: string;
   status: DRepStatus;
@@ -78,8 +79,8 @@ export type ProposalDataDTO = {
   createdDate: string;
   createdEpochNo: number;
   details?: ActionDetailsType;
-  expiryDate: string;
-  expiryEpochNo: number;
+  expiryDate?: string;
+  expiryEpochNo?: number;
   id: string;
   index: number;
   metadataHash: string;

@@ -495,8 +495,8 @@ export const en = {
     hero: {
       connectWallet: "Connect your wallet",
       description:
-        "Anyone with a wallet containing ADA can participate in governance on Sanchonet.\n\nYour ADA balance entitles you to an equal amount of Voting Power.\n\nFor more info see the guide entry for <0>Voting Power</0>.",
-      headline: "SanchoNet \n Governance Tool",
+        "Anyone with a wallet containing ADA can participate in governance on Voltaire.\n\nYour ADA balance entitles you to an equal amount of Voting Power.\n\nFor more info see the guide entry for <0>Voting Power</0>.",
+      headline: "Voltaire \n Governance Tool",
     },
     home: {
       cards: {
@@ -713,9 +713,9 @@ export const en = {
       retireDirectVoter: "Retire as a Direct Voter",
     },
     system: {
-      testnetDescription:
-        "The SanchoNet GovTool is currently in beta and it connects to <0>SanchoNet</0>.\n\n Please note, this tool uses ‘Test ada’ <strong>NOT real ada</strong>. All governance actions and related terms pertain to SanchoNet.",
-      testnetTitle: "This tool is connected to SanchoNet",
+      description:
+        "The Voltaire GovTool is a tool that allows you to participate in the governance of the Cardano network. You can propose, vote on, and delegate your voting power to other users.",
+      title: "This tool is connected to {{networkName}}",
     },
     tooltips: {
       delegateTodRep: {

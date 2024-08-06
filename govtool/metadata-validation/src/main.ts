@@ -25,6 +25,7 @@ async function bootstrap() {
       exceptionFactory: () => ({ status: 200, valid: false }),
     }),
   );
+  console.log({ PORT: process.env.PORT });
   await app.listen(process.env.PORT);
 }
 bootstrap();

@@ -139,9 +139,7 @@ test.describe("Temporary user", () => {
 
   test("6K. Should accept valid username.", async () => {
     for (let i = 0; i < 100; i++) {
-      await userPage
-        .getByTestId("username-input")
-        .fill(mockValid.username().toLowerCase());
+      await userPage.getByTestId("username-input").fill(mockValid.username());
 
       await expect(
         userPage.getByTestId("username-error-text")
@@ -152,9 +150,7 @@ test.describe("Temporary user", () => {
 
   test("6L. Should reject invalid username.", async () => {
     for (let i = 0; i < 100; i++) {
-      await userPage
-        .getByTestId("username-input")
-        .fill(mockInvalid.username().toLowerCase());
+      await userPage.getByTestId("username-input").fill(mockInvalid.username());
 
       await expect(userPage.getByTestId("username-error-text")).toBeVisible();
       await expect(userPage.getByTestId("proceed-button")).toBeDisabled();

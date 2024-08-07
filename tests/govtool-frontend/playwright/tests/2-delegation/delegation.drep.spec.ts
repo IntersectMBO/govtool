@@ -4,6 +4,7 @@ import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import { createNewPageWithWallet } from "@helpers/page";
@@ -16,6 +17,7 @@ import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
+  await skipIfNotHardFork();
 });
 
 test("2C. Should open wallet connection popup on delegate in disconnected state", async ({

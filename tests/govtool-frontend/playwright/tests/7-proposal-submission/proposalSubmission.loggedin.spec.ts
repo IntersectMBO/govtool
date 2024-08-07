@@ -9,6 +9,7 @@ import {
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
 import { invalid, valid as mockValid } from "@mock/index";
@@ -19,6 +20,7 @@ import { ProposalCreateRequest, ProposalType } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
+  await skipIfNotHardFork();
 });
 
 test.describe("Proposal created logged state", () => {

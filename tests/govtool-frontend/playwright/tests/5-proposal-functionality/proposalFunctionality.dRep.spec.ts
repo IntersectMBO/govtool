@@ -4,6 +4,7 @@ import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
@@ -16,6 +17,7 @@ const invalidInfinityProposals = require("../../lib/_mock/invalidInfinityProposa
 
 test.beforeEach(async () => {
   await setAllureEpic("5. Proposal functionality");
+  await skipIfNotHardFork();
 });
 
 test.describe("Proposal checks", () => {

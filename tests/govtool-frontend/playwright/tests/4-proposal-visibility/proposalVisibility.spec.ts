@@ -1,11 +1,12 @@
 import { setAllureEpic } from "@helpers/allure";
-import { lovelaceToAda } from "@helpers/cardano";
+import { lovelaceToAda, skipIfNotHardFork } from "@helpers/cardano";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect, test } from "@playwright/test";
 import { FilterOption, IProposal } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
+  await skipIfNotHardFork();
 });
 
 test("4A_2. Should access Governance Actions page without connecting wallet", async ({

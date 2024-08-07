@@ -2,6 +2,7 @@ import environments from "@constants/environments";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { expect } from "@playwright/test";
@@ -17,6 +18,7 @@ const PROPOSAL_STATUS_FILTER = ["Submitted for vote", "Active proposal"];
 
 test.beforeEach(async () => {
   await setAllureEpic("8. Proposal Discussion Forum");
+  await skipIfNotHardFork();
 });
 
 test("8A. Should access proposed governance actions in disconnected state", async ({

@@ -4,7 +4,7 @@ import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { lovelaceToAda } from "@helpers/cardano";
+import { lovelaceToAda, skipIfNotHardFork } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
@@ -13,6 +13,7 @@ import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
+  await skipIfNotHardFork();
 });
 
 test.describe("Logged in DRep", () => {

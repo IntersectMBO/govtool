@@ -18,5 +18,5 @@ config/govtool/*                                                            @pla
 infra/terraform/*                                                           @placek @adgud
 
 # Testing
-tests/*                                                                     @IntersectMBO/govtool-test
-gov-action-loader/*                                                         @IntersectMBO/govtool-test
+tests/*                                                                     @spannercode @mesudip @kneerose
+gov-action-loader/*                                                         @spannercode @mesudip @kneerose

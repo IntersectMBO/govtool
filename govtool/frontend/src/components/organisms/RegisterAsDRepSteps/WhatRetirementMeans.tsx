@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import * as Sentry from "@sentry/react";
 
 import { Typography } from "@atoms";
-import { useCardano, useModal } from "@context";
+import { useCardano, useModal, useAppContext } from "@context";
 import {
   useGetVoterInfo,
   useScreenDimension,
@@ -17,6 +17,7 @@ export const WhatRetirementMeans = ({
 }: {
   onClickCancel: () => void;
 }) => {
+  const { cExplorerBaseUrl } = useAppContext();
   const {
     isPendingTransaction,
     buildDRepRetirementCert,
@@ -60,7 +61,7 @@ export const WhatRetirementMeans = ({
           state: {
             buttonText: t("modals.common.goToDashboard"),
             dataTestId: "retirement-transaction-submitted-modal",
-            link: `https://sancho.cexplorer.io/tx/${result}`,
+            link: `${cExplorerBaseUrl}/tx/${result}`,
             message: t("modals.retirement.message"),
             onSubmit,
             status: "success",

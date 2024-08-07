@@ -4,6 +4,7 @@ import { Button, Typography, VotePill } from "@atoms";
 import { openInNewTab } from "@utils";
 import { useTranslation } from "@hooks";
 import { Vote } from "@models";
+import { useAppContext } from "@context";
 
 type Props = {
   voteTxHash: string;
@@ -12,6 +13,7 @@ type Props = {
 
 export const GovernanceActionCardMyVote = ({ voteTxHash, vote }: Props) => {
   const { t } = useTranslation();
+  const { cExplorerBaseUrl } = useAppContext();
 
   return (
     <Box data-testid="my-vote" mb="20px">
@@ -41,9 +43,7 @@ export const GovernanceActionCardMyVote = ({ voteTxHash, vote }: Props) => {
           <VotePill vote={vote} />
         </Box>
         <Button
-          onClick={() =>
-            openInNewTab(`https://sancho.cexplorer.io/tx/${voteTxHash}`)
-          }
+          onClick={() => openInNewTab(`${cExplorerBaseUrl}/tx/${voteTxHash}`)}
           variant="text"
           size="small"
           sx={{

@@ -5,6 +5,8 @@ import { LockInterceptor, LockInterceptorInfo } from "lib/lockInterceptor";
 import { Logger } from "../../../cypress/lib/logger/logger";
 import convertBufferToHex from "./convertBufferToHex";
 import { ShelleyWallet } from "./crypto";
+import { uploadMetadataAndGetJsonHash } from "./metadata";
+import { WalletAndAnchorType } from "@types";
 
 /**
  * Polls the transaction status until it's resolved or times out.
@@ -112,9 +114,15 @@ export async function transferAdaForWallet(
 }
 
 export async function registerDRepForWallet(wallet: ShelleyWallet) {
+  const dataHashAndUrl = await uploadMetadataAndGetJsonHash();
+  const metadataAnchorAndWallet: WalletAndAnchorType = {
+    ...dataHashAndUrl,
+    wallet: wallet.json(),
+  };
   const registrationRes = await kuberService.dRepRegistration(
     convertBufferToHex(wallet.stakeKey.private),
-    convertBufferToHex(wallet.stakeKey.pkh)
+    convertBufferToHex(wallet.stakeKey.pkh),
+    metadataAnchorAndWallet
   );
   await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
 }

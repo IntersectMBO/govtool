@@ -5,7 +5,7 @@ import { Box, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
 import { PATHS } from "@consts";
-import { useCardano, useModal } from "@context";
+import { useCardano, useModal, useAppContext } from "@context";
 import {
   useGetVoterInfo,
   useScreenDimension,
@@ -17,6 +17,7 @@ import { BgCard, DashboardTopNav, Footer } from "@organisms";
 import { checkIsWalletConnected, correctAdaFormat, openInNewTab } from "@utils";
 
 export const RetireAsDirectVoter = () => {
+  const { cExplorerBaseUrl } = useAppContext();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
@@ -47,7 +48,7 @@ export const RetireAsDirectVoter = () => {
             status: "success",
             title: t("modals.retirement.title"),
             message: t("modals.retirement.message"),
-            link: `https://sancho.cexplorer.io/tx/${result}`,
+            link: `${cExplorerBaseUrl}/tx/${result}`,
             buttonText: t("modals.common.goToDashboard"),
             dataTestId: "retirement-transaction-submitted-modal",
             onSubmit: () => {

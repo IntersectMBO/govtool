@@ -4,10 +4,10 @@
 * @Ryun1 @MSzalowski
 
 # Frontend assets templates
-govtool/frontend/*                                                          @MSzalowski @Sworzen1 @JanJaroszczak
-*.tsx                                                                       @MSzalowski @Sworzen1 @JanJaroszczak
-*.ts                                                                        @MSzalowski @Sworzen1 @JanJaroszczak
-*.css                                                                       @MSzalowski @Sworzen1 @JanJaroszczak
+govtool/frontend/*                                                          @MSzalowski @jdyczka
+*.tsx                                                                       @MSzalowski @jdyczka
+*.ts                                                                        @MSzalowski @jdyczka
+*.css                                                                       @MSzalowski @jdyczka
 
 # Backend
 govtool/backend/*                                                           @MSzalowski @jankun4

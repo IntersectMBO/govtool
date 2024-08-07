@@ -1,5 +1,6 @@
 import environments from "@constants/environments";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { pollTransaction } from "@helpers/transaction";
 import { test as setup } from "@playwright/test";
@@ -11,6 +12,7 @@ const PROPOSAL_SUBMISSIONS_WALLETS_COUNT = 1;
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("proposal");
+  await skipIfNotHardFork();
 });
 
 async function generateWallets(num: number) {

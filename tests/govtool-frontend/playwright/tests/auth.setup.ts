@@ -21,6 +21,7 @@ import {
 import { test as setup } from "@fixtures/walletExtension";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import { createAuth, createAuthWithUserName } from "@helpers/auth";
+import { skipIfNotHardFork } from "@helpers/cardano";
 
 const dRep01AuthFile = ".auth/dRep01.json";
 const dRep02AuthFile = ".auth/dRep02.json";
@@ -45,6 +46,7 @@ const proposal07AuthFile = ".auth/proposal07.json";
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Authentication");
+  await skipIfNotHardFork();
 });
 
 setup("Create DRep 01 auth", async ({ page, context }) => {

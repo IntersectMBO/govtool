@@ -94,6 +94,7 @@ export type IDRep = {
 export type ProtocolParams = {
   dRepDeposit: number;
   govActionDeposit: number;
+  protocolVersion: ProtocolVersionType;
 };
 
 type Comment = {
@@ -151,4 +152,9 @@ export type WalletAndAnchorType = {
   url: string;
   dataHash: string;
   wallet: StaticWallet;
+};
+
+export type ProtocolVersionType = {
+  major: number;
+  minor: number;
 };

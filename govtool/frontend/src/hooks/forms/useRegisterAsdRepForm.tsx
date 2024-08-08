@@ -12,7 +12,7 @@ import {
   PATHS,
   storageInformationErrorModals,
 } from "@consts";
-import { useCardano, useModal } from "@context";
+import { useCardano, useModal, useAppContext } from "@context";
 import { MetadataStandard, MetadataValidationStatus } from "@models";
 import {
   downloadJson,
@@ -64,6 +64,7 @@ export const useRegisterAsdRepForm = (
   const navigate = useNavigate();
   const { closeModal, openModal } = useModal();
   const openWalletErrorModal = useWalletErrorModal();
+  const { cExplorerBaseUrl } = useAppContext();
 
   // Queries
   const { validateMetadata } = useValidateMutation();
@@ -162,7 +163,7 @@ export const useRegisterAsdRepForm = (
     openModal({
       type: "statusModal",
       state: {
-        link: `https://sancho.cexplorer.io/tx/${link}`,
+        link: `${cExplorerBaseUrl}/tx/${link}`,
         status: "success",
         title: t("modals.registration.title"),
         message: t("modals.registration.message"),

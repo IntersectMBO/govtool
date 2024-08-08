@@ -59,21 +59,22 @@ import {
   openInNewTab,
   PROTOCOL_PARAMS_KEY,
   removeItemFromLocalStorage,
-  SANCHO_INFO_KEY,
+  NETWORK_INFO_KEY,
   setItemToLocalStorage,
   WALLET_LS_KEY,
 } from "@utils";
 import { getEpochParams } from "@services";
 import { useTranslation } from "@hooks";
+import { AutomatedVotingOptionDelegationId } from "@/types/automatedVotingOptions";
+
 import { getUtxos } from "./getUtxos";
-import { useModal, useSnackbar } from ".";
+import { useAppContext, useModal, useSnackbar } from ".";
 import {
   PendingTransaction,
   TransactionStateWithResource,
   TransactionStateWithoutResource,
   usePendingTransaction,
 } from "./pendingTransaction";
-import { AutomatedVotingOptionDelegationId } from "@/types/automatedVotingOptions";
 
 interface Props {
   children: React.ReactNode;
@@ -940,6 +941,8 @@ const CardanoProvider = (props: Props) => {
 };
 
 function useCardano() {
+  const { networkName } = useAppContext();
+
   const context = useContext(CardanoContext);
   const { openModal, closeModal } = useModal<StatusModalState>();
   const { addSuccessAlert } = useSnackbar();
@@ -954,8 +957,9 @@ function useCardano() {
     async (walletName: string) => {
       try {
         const isSanchoInfoShown = getItemFromLocalStorage(
-          `${SANCHO_INFO_KEY}_${walletName}`,
+          `${NETWORK_INFO_KEY}_${walletName}`,
         );
+
         const result = await context.enable(walletName);
         if (!result.error) {
           closeModal();
@@ -967,23 +971,28 @@ function useCardano() {
               type: "statusModal",
               state: {
                 status: "info",
-                dataTestId: "info-about-sancho-net-modal",
+                dataTestId: "info-about-network-modal",
                 message: (
                   <Trans
-                    i18nKey="system.testnetDescription"
+                    i18nKey="system.description"
                     components={[
                       <Link
                         onClick={() => openInNewTab("https://sancho.network/")}
                         sx={{ cursor: "pointer" }}
                       />,
                     ]}
+                    values={{
+                      networkName,
+                    }}
                   />
                 ),
-                title: t("system.testnetTitle"),
+                title: t("system.title", {
+                  networkName,
+                }),
                 buttonText: t("ok"),
               },
             });
-            setItemToLocalStorage(`${SANCHO_INFO_KEY}_${walletName}`, true);
+            setItemToLocalStorage(`${NETWORK_INFO_KEY}_${walletName}`, true);
           }
           return result;
         }

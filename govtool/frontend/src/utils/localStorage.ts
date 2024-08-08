@@ -1,6 +1,6 @@
 export const PENDING_TRANSACTION_KEY = "pending_transaction";
 export const PROTOCOL_PARAMS_KEY = "protocol_params";
-export const SANCHO_INFO_KEY = "sancho_info";
+export const NETWORK_INFO_KEY = "network_info";
 export const WALLET_LS_KEY = "wallet_data";
 
 export function getItemFromLocalStorage(key: string) {

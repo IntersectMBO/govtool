@@ -5,7 +5,7 @@ import { Box, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
 import { PATHS } from "@consts";
-import { useCardano, useModal } from "@context";
+import { useAppContext, useCardano, useModal } from "@context";
 import {
   useGetVoterInfo,
   useScreenDimension,
@@ -23,6 +23,7 @@ import {
 } from "@utils";
 
 export const RegisterAsDirectVoter = () => {
+  const { cExplorerBaseUrl } = useAppContext();
   const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -59,7 +60,7 @@ export const RegisterAsDirectVoter = () => {
             status: "success",
             title: t("modals.registration.title"),
             message: t("modals.registration.message"),
-            link: `https://sancho.cexplorer.io/tx/${result}`,
+            link: `${cExplorerBaseUrl}/tx/${result}`,
             buttonText: t("modals.common.goToDashboard"),
             onSubmit: () => {
               navigate(PATHS.dashboard);

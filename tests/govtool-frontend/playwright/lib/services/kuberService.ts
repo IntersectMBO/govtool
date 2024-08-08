@@ -1,5 +1,10 @@
 import { faucetWallet } from "@constants/staticWallets";
-import { KuberValue, ProtocolParams, StaticWallet } from "@types";
+import {
+  KuberValue,
+  ProtocolParams,
+  StaticWallet,
+  WalletAndAnchorType,
+} from "@types";
 import * as blake from "blakejs";
 import environments from "lib/constants/environments";
 import { LockInterceptor, LockInterceptorInfo } from "lib/lockInterceptor";
@@ -37,7 +42,11 @@ class Kuber {
     this.version = version;
   }
 
-  static generateCert(type: CertificateType, key: string) {
+  static generateCert(
+    type: CertificateType,
+    key: string,
+    metadata?: WalletAndAnchorType
+  ) {
     if (type === "registerstake" || type === "deregisterdrep") {
       return {
         type: type,
@@ -48,9 +57,8 @@ class Kuber {
         type: "registerdrep",
         key: key,
         anchor: {
-          url: "https://bit.ly/3zCH2HL",
-          dataHash:
-            "1111111111111111111111111111111111111111111111111111111111111111",
+          url: metadata?.url || "",
+          dataHash: metadata?.dataHash || "",
         },
       };
     }
@@ -178,27 +186,36 @@ const kuberService = {
     return kuber.signAndSubmitTx(req);
   },
 
-  multipleDRepRegistration: (wallets: StaticWallet[]) => {
+  multipleDRepRegistration: (metadataAndWallets: WalletAndAnchorType[]) => {
     const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
     const req = {
-      certificates: wallets.map((wallet) =>
-        Kuber.generateCert("registerdrep", wallet.stake.pkh)
+      certificates: metadataAndWallets.map((metadataAndWallet) =>
+        Kuber.generateCert(
+          "registerdrep",
+          metadataAndWallet.wallet.stake.pkh,
+          metadataAndWallet
+        )
       ),
-      selections: wallets.map((wallet) => {
+      selections: metadataAndWallets.map((metadata) => {
         return {
           type: "PaymentSigningKeyShelley_ed25519",
           description: "Stake Signing Key",
-          cborHex: `5820${wallet.stake.private}`,
+          cborHex: `5820${metadata.wallet.stake.private}`,
         };
       }),
     };
     return kuber.signAndSubmitTx(req);
   },
 
-  dRepRegistration: (stakeSigningKey: string, pkh: string) => {
+  dRepRegistration: (
+    stakeSigningKey: string,
+    pkh: string,
+    metadata: WalletAndAnchorType
+  ) => {
     const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
+
     const req = {
-      certificates: [Kuber.generateCert("registerdrep", pkh)],
+      certificates: [Kuber.generateCert("registerdrep", pkh, metadata)],
       selections: [
         {
           type: "PaymentSigningKeyShelley_ed25519",

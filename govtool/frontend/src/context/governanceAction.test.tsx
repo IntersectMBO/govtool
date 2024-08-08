@@ -7,29 +7,17 @@ import {
 } from "./governanceAction";
 
 const resultMetadataBody = {
-  abstract: {
-    "@value": "Test",
-  },
-  motivation: {
-    "@value": "Test",
-  },
-  rationale: {
-    "@value": "Test",
-  },
+  abstract: "Test",
+  motivation: "Test",
+  rationale: "Test",
   references: [
     {
       "@type": "Other",
-      label: {
-        "@value": "Test",
-      },
-      uri: {
-        "@value": "http://example.com",
-      },
+      label: "Test",
+      uri: "http://example.com",
     },
   ],
-  title: {
-    "@value": "Test",
-  },
+  title: "Test",
 };
 
 describe("GovernanceActionProvider", () => {
@@ -92,7 +80,7 @@ describe("GovernanceActionProvider", () => {
           const hash = await createHash(jsonld!);
           expect(hash).toBeDefined();
           expect(hash).toBe(
-            "b84e9890a34d6e59a983cf8f695214162893de5fc5310b12b75f4fe3dab0d7ab",
+            "bbdbbe163d1b8e4d6c10180df515cc7d58109412d90a42e898fc66850b3fc98c",
           );
         };
         test();

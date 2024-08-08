@@ -52,6 +52,7 @@ export const EditDRepStorageInformation = ({
     <BgCard
       actionButtonLabel={t("submit")}
       backButtonLabel={t("back")}
+      actionButtonDataTestId="submit-button"
       isActionButtonDisabled={isActionButtonDisabled}
       onClickActionButton={editDRepInfo}
       onClickBackButton={onClickBack}
@@ -84,6 +85,7 @@ export const EditDRepStorageInformation = ({
         <Step
           component={
             <Button
+              data-testid="metadata-download-button"
               onClick={onClickDownloadJson}
               size="extraLarge"
               startIcon={<img alt="download" src={ICONS.download} />}

@@ -28,7 +28,7 @@ export const DirectVoterDashboardCard = ({
   // learn more button
   const learnMoreButton: LoadingButtonProps = {
     children: t("learnMore"),
-    dataTestId: "learn-more-button",
+    dataTestId: "direct-voter-learn-more-button",
     onClick: () =>
       openInNewTab(
         "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/direct-voting",
@@ -135,6 +135,10 @@ export const DirectVoterDashboardCard = ({
   })();
 
   return (
-    <DashboardActionCard imageURL={IMAGES.directVoterImage} {...cardProps} />
+    <DashboardActionCard
+      imageURL={IMAGES.directVoterImage}
+      type="direct-voter"
+      {...cardProps}
+    />
   );
 };

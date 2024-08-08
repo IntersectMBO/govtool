@@ -310,11 +310,11 @@ export const en = {
       dRep: {
         description: {
           notVerifiable:
-            "GovTool uses external sources for DRep data, and these sources are maintianed by the DReps themselves. This error means that the data stored by the DRep does not match the data supplied by the DRep when they originally registered",
+            "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that the data stored by the DRep does not match the data supplied by the DRep when they originally registered",
           dataMissing:
-            "GovTool uses external sources for DRep data, and these sources are maintianed by the DReps themselves. This error means that GovTool cannot locate the data on the URL specified when the DRep was originally registered.",
+            "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that GovTool cannot locate the data on the URL specified when the DRep was originally registered.",
           incorrectFormat:
-            "GovTool uses external sources for DRep data, and these sources are maintianed by the DReps themselves. This error means that the data stored by the DRep does not match the format defined by the DRep spec.",
+            "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that the data stored by the DRep does not match the format defined by the DRep spec.",
         },
         message: {
           notVerifiable:
@@ -440,15 +440,15 @@ export const en = {
       voteSubmitted: "Vote submitted",
       voteTransaction: "Vote transaction",
       votes: "Votes:",
-      votesSubmitted: "Votes submitted",
+      votesSubmitted: "DRep votes submitted",
       votesSubmittedOnChain:
-        "Votes submitted on-chain by DReps, SPOs and Constitutional Committee members.",
+        "Votes submitted on-chain by DReps and predefined voting options.",
       youCanProvideContext:
         "You can provide context about your vote. This information will be viewable by other users.",
       youHaventVotedYet:
         "You haven't voted on any Governance Actions yet. Check the 'To vote on' section to vote on Governance Actions.",
       withCategoryNotExist: {
-        partOne: "Governnance actions with category",
+        partOne: "Governance actions with category",
         optional: "and search phrase",
         partTwo: "don't exist.",
       },
@@ -495,8 +495,8 @@ export const en = {
     hero: {
       connectWallet: "Connect your wallet",
       description:
-        "Anyone with a wallet containing ADA can participate in governance on Sanchonet.\n\nYour ADA balance entitles you to an equal amount of Voting Power.\n\nFor more info see the guide entry for <0>Voting Power</0>.",
-      headline: "SanchoNet \n Governance Tool",
+        "Anyone with a wallet containing ADA can participate in governance on Voltaire.\n\nYour ADA balance entitles you to an equal amount of Voting Power.\n\nFor more info see the guide entry for <0>Voting Power</0>.",
+      headline: "Voltaire \n Governance Tool",
     },
     home: {
       cards: {
@@ -713,9 +713,9 @@ export const en = {
       retireDirectVoter: "Retire as a Direct Voter",
     },
     system: {
-      testnetDescription:
-        "The SanchoNet GovTool is currently in beta and it connects to <0>SanchoNet</0>.\n\n Please note, this tool uses ‘Test ada’ <strong>NOT real ada</strong>. All governance actions and related terms pertain to SanchoNet.",
-      testnetTitle: "This tool is connected to SanchoNet",
+      description:
+        "The Voltaire GovTool is a tool that allows you to participate in the governance of the Cardano network. You can propose, vote on, and delegate your voting power to other users.",
+      title: "This tool is connected to {{networkName}}",
     },
     tooltips: {
       delegateTodRep: {

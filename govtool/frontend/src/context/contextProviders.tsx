@@ -1,3 +1,4 @@
+import { AppContextProvider } from "./appContext";
 import { CardanoProvider, useCardano } from "./wallet";
 import { ModalProvider, useModal } from "./modal";
 import { SnackbarProvider, useSnackbar } from "./snackbar";
@@ -10,17 +11,19 @@ interface Props {
 }
 
 const ContextProviders = ({ children }: Props) => (
-  <GovernanceActionProvider>
-    <FeatureFlagProvider>
-      <ModalProvider>
-        <SnackbarProvider>
-          <DataActionsBarProvider>
-            <CardanoProvider>{children}</CardanoProvider>
-          </DataActionsBarProvider>
-        </SnackbarProvider>
-      </ModalProvider>
-    </FeatureFlagProvider>
-  </GovernanceActionProvider>
+  <AppContextProvider>
+    <GovernanceActionProvider>
+      <FeatureFlagProvider>
+        <ModalProvider>
+          <SnackbarProvider>
+            <DataActionsBarProvider>
+              <CardanoProvider>{children}</CardanoProvider>
+            </DataActionsBarProvider>
+          </SnackbarProvider>
+        </ModalProvider>
+      </FeatureFlagProvider>
+    </GovernanceActionProvider>
+  </AppContextProvider>
 );
 
 export { ContextProviders, useCardano, useModal, useSnackbar };

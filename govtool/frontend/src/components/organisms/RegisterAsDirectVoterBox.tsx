@@ -6,10 +6,11 @@ import * as Sentry from "@sentry/react";
 import { PATHS } from "@consts";
 import { RegisterAsDirectVoterBoxContent } from "@organisms";
 import { CenteredBoxBottomButtons } from "@molecules";
-import { useCardano, useModal } from "@context";
+import { useAppContext, useCardano, useModal } from "@context";
 import { useGetVoterInfo, useWalletErrorModal } from "@hooks";
 
 export const RegisterAsDirectVoterBox = () => {
+  const { cExplorerBaseUrl } = useAppContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { buildSignSubmitConwayCertTx, buildDRepRegCert, buildDRepUpdateCert } =
@@ -42,7 +43,7 @@ export const RegisterAsDirectVoterBox = () => {
             status: "success",
             title: t("modals.registration.title"),
             message: t("modals.registration.message"),
-            link: `https://sancho.cexplorer.io/tx/${result}`,
+            link: `${cExplorerBaseUrl}/tx/${result}`,
             buttonText: t("modals.common.goToDashboard"),
             onSubmit: () => {
               navigate(PATHS.dashboard);

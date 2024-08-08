@@ -1,5 +1,19 @@
 import { MetadataValidationStatus } from "@models";
 
+export type NetworkMetrics = {
+  currentTime: string;
+  currentEpoch: number;
+  currentBlock: number;
+  uniqueDelegators: number;
+  totalDelegations: number;
+  totalGovernanceActions: number;
+  totalDRepVotes: number;
+  totalRegisteredDReps: number;
+  alwaysAbstainVotingPower: number;
+  alwaysNoConfidenceVotingPower: number;
+  networkName: string;
+};
+
 export interface VoterInfo {
   isRegisteredAsDRep: boolean;
   wasRegisteredAsDRep: boolean;

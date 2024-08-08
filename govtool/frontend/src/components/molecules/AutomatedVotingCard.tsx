@@ -2,7 +2,7 @@ import { Box, Divider } from "@mui/material";
 
 import { Button, Typography } from "@atoms";
 import { primaryBlue } from "@consts";
-import { useModal } from "@context";
+import { useAppContext, useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab, testIdFromLabel } from "@utils";
 
@@ -22,13 +22,14 @@ export const AutomatedVotingCard = ({
   votingPower,
   transactionId,
 }: AutomatedVotingCardProps) => {
+  const { cExplorerBaseUrl } = useAppContext();
   const { isMobile, screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { t } = useTranslation();
   const testIdLabel = testIdFromLabel(title);
 
   const onClickShowTransaction = () =>
-    openInNewTab(`https://sancho.cexplorer.io/tx/${transactionId}`);
+    openInNewTab(`${cExplorerBaseUrl}/tx/${transactionId}`);
 
   return (
     <Card

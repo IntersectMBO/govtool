@@ -4,6 +4,7 @@ import { FC, ReactNode } from "react";
 import { Button, LoadingButtonProps, Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
+import { useAppContext } from "@context";
 
 import { Card } from "./Card";
 
@@ -25,6 +26,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
   ...props
 }) => {
   const { t } = useTranslation();
+  const { cExplorerBaseUrl } = useAppContext();
   const {
     buttons,
     children,
@@ -41,7 +43,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
   const { screenWidth } = useScreenDimension();
 
   const onClickShowTransaction = () =>
-    openInNewTab(`https://sancho.cexplorer.io/tx/${transactionId}`);
+    openInNewTab(`${cExplorerBaseUrl}/tx/${transactionId}`);
 
   return (
     <Card

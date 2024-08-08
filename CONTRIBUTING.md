@@ -3,6 +3,7 @@
 ⚠️ This is a work in progress document, more instruction on how-to contribute to come!
 
 Contributing todo:
+
 - [ ] Align with latest OSC policies
 - [ ] Refactor to reflect reality
 - [ ] Make more friendly to open source contributors
@@ -21,9 +22,9 @@ This document contains guidelines to help you get started and how to make sure y
   - [Ask for Help](#ask-for-help)
   - [Roles and Responsibilities](#roles-and-responsibilities)
   - [I Want To Contribute](#i-want-to-contribute)
-      - [Before Submitting a Bug Report](#before-submitting-a-bug-report)
-      - [How Do I Submit a Good Bug Report?](#how-do-i-submit-a-good-bug-report)
-      - [Your First Code Contribution](#your-first-code-contribution)
+    - [Before Submitting a Bug Report](#before-submitting-a-bug-report)
+    - [How Do I Submit a Good Bug Report?](#how-do-i-submit-a-good-bug-report)
+    - [Your First Code Contribution](#your-first-code-contribution)
   - [Working Conventions](#working-conventions)
     - [Pull Requests](#pull-requests)
     - [Branch Naming](#branch-naming)
@@ -38,8 +39,6 @@ This document contains guidelines to help you get started and how to make sure y
       - [CSS in Javascript](#css-in-javascript)
       - [CSS / SASS](#css--sass)
       - [Haskell](#haskell)
-  - [Bumping Node, DB-Sync, SanchoNet Versions](#bumping-node-db-sync-sanchonet-versions)
-    - [Steps to upgrade](#steps-to-upgrade)
   - [Development Processes](#development-processes)
     - [Developer workflow](#developer-workflow)
     - [QA Workflow](#qa-workflow)
@@ -90,7 +89,7 @@ We use GitHub issues to track bugs and errors. If you run into an issue with the
   (Since we can't be sure at this point whether it is a bug or not, we ask you not to talk about a bug yet and not to label the issue.)
 - Explain the behavior you would expect and the actual behavior.
 - Please provide as much context as possible.
-  Describe the *reproduction steps* that someone else can follow to recreate the issue on their own.
+  Describe the _reproduction steps_ that someone else can follow to recreate the issue on their own.
   This usually includes your code.
   For good bug reports you should isolate the problem and create a reduced test case.
 - Provide the information you collected in the previous section.
@@ -117,6 +116,7 @@ TODO
 Thank you for contributing your changes by opening a pull requests!
 
 To get something merged we usually require:
+
 - Follow the Pull Request template
 - Description of the changes - if your commit messages are great, this is less important
 - Quality of changes is ensured - through new or updated automated tests
@@ -133,6 +133,7 @@ Please reuse the branch naming for the pull request naming.
 - Using the related issue number after the prefix is required.
 
 Examples:
+
 - `feat/123-added-ability-for-dreps-to-change-drep-id`
 - `fix/312-fixed-drep-ids-being-reversed`
 - `chore/567-bumped-cardano-node-version-to-9`
@@ -151,6 +152,7 @@ Also, include any relevant meta-information, such as issue numbers.
 If a commit completely addresses a issue, you can put that in the headline if you want, but it’s fine to just put it in the body.
 
 Here are seven rules for great git commit messages:
+
 1. Separate subject from body with a blank line
 2. Limit the subject line to 50 characters (soft limit)
 3. Capitalize the subject line
@@ -190,6 +192,7 @@ Releases that aren't stable will be released as pre-releases and will append a -
 ### Changelog
 
 During development, on every PR;
+
 - Make sure `CHANGELOG.md` is kept up-to-date with high-level, technical, but user-focused list of changes according to [keepachangelog](https://keepachangelog.com/en/1.0.0/).
 - Bump `UNRELEASED` version in `CHANGELOG.md` according to [semver](https://semver.org/).
 
@@ -210,25 +213,6 @@ Please see [CSS / SASS Style Guide](./docs/style-guides/css-sass/).
 #### Haskell
 
 Please see [stylish-haskell configuration](./govtool/backend/.stylish-haskell.yaml).
-
-## Bumping Node, DB-Sync, SanchoNet Versions
-
-- SanchoNet periodically has to be respun, where all data is erased.
-- This is normally to allow for the nodes to be upgraded to a new version, where the old chain may not be compatible with newer node implementation.
-- So to go along with each respin GovTool's Node needs to upgraded to a newer version and it's local database must be dropped.
-- New versions of DB-Sync are usually released alongside new Node versions, to ensure compatibility.
-- Some new versions of DB-Sync will include revisions to the DB schema, if this is the case then we also need to upgrade the BE interface to work.
-
-### Steps to upgrade
-
-1. Coordinate and align with DB-Sync/Node teams to anticipate SanchoNet respins and version releases. Once network has been respun upgrade.
-- Often a new node version is released a few days ahead of a Sanchonet respin, DB-Sync is normally a couple of days post node release.
-2. Change the versions in the [docker-compose file](./src/docker-compose.sanchonet.yml), here the DB-Sync and Node docker versions can be incremented. Merge this change, following standard working conventions.
-- IF the DB-Sync schema changed, then BE changes will have to be merged also.
-3. Then the upgrade can be deployed using normal workflows, ensure to tick `resync_cardano_node_and_db` option of the workflow. This will wipe the existing Node and Db-Sync's data, to let the upgraded versions fully resync.
-4. Wait for resync, depending on the size SanchoNet resycing will likely take over an hour.
-5. Check successful resync, using the BE you are able to check transaction status. You can use the SanchoNet faucet to send transactions, then check faucet Tx id via GovTool BE. If GovTool sees the Tx then GovTool BE is on the same network as the faucet which is ideal.
-
 
 ## Development Processes
 

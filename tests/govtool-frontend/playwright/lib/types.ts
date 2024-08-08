@@ -137,3 +137,9 @@ export type ProposedGovAction = {
     updatedAt: string;
   };
 };
+
+export type WalletAndAnchorType = {
+  url: string;
+  dataHash: string;
+  wallet: StaticWallet;
+};

@@ -3,15 +3,14 @@
 </p>
 
 <p align="center">
-  <big><strong>Monorepo containing SanchoNet GovTool and supporting utilities</strong></big>
+  <big><strong>Monorepo containing Voltaire GovTool and supporting utilities</strong></big>
 </p>
 
 <div align="center">
 
 [![npm](https://img.shields.io/npm/v/npm.svg?style=flat-square)](https://www.npmjs.com/package/npm) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=intersect-govtool&metric=ncloc)](https://sonarcloud.io/summary/overall?id=intersect-govtool) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=intersect-govtool&metric=coverage)](https://sonarcloud.io/summary/overall?id=intersect-govtool) [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=intersect-govtool&metric=sqale_index)](https://sonarcloud.io/summary/overall?id=intersect-govtool) 
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=intersect-govtool&metric=ncloc)](https://sonarcloud.io/summary/overall?id=intersect-govtool) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=intersect-govtool&metric=coverage)](https://sonarcloud.io/summary/overall?id=intersect-govtool) [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=intersect-govtool&metric=sqale_index)](https://sonarcloud.io/summary/overall?id=intersect-govtool)
 
 </div>
 
@@ -19,8 +18,8 @@
 
 ## 🌄 Purpose
 
-The SanchoNet GovTool enables ada holders to experience some of the governance features described in [CIP-1694](https://github.com/cardano-foundation/CIPs/blob/master/CIP-1694/README.md) and to test governance features on [SanchoNet](https://sancho.network/) through a guided and straightforward experience.
-The SanchoNet GovTool is currently open for beta testing and can be accessed at [sanchogov.tools](https://sanchogov.tools/).
+The Voltaire GovTool enables ada holders to experience some of the governance features described in [CIP-1694](https://github.com/cardano-foundation/CIPs/blob/master/CIP-1694/README.md) and to test governance features.
+The Voltaire GovTool is currently open for preview testing and can be accessed at [preview.gov.tools](https://preview.gov.tools/).
 
 Learn more; [docs.sanchogov.tools](https://docs.sanchogov.tools/).
 

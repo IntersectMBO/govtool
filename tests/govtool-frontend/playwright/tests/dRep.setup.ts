@@ -2,6 +2,7 @@ import environments from "@constants/environments";
 import { dRepWallets } from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
+import { uploadMetadataAndGetJsonHash } from "@helpers/metadata";
 import { pollTransaction } from "@helpers/transaction";
 import { expect, test as setup } from "@playwright/test";
 import kuberService from "@services/kuberService";
@@ -34,7 +35,15 @@ setup("Register DRep of static wallets", async () => {
   setup.setTimeout(environments.txTimeOut);
 
   try {
-    const res = await kuberService.multipleDRepRegistration(dRepWallets);
+    // Submit metadata to obtain a URL and generate hash value.
+    const metadataPromises = dRepWallets.map(async (dRepWallet) => {
+      return { ...(await uploadMetadataAndGetJsonHash()), wallet: dRepWallet };
+    });
+
+    const metadataAndDRepWallets = await Promise.all(metadataPromises);
+    const res = await kuberService.multipleDRepRegistration(
+      metadataAndDRepWallets
+    );
 
     await pollTransaction(res.txId, res.lockInfo);
   } catch (err) {
@@ -64,9 +73,16 @@ setup("Setup temporary DRep wallets", async () => {
   ]);
   await pollTransaction(initializeRes.txId, initializeRes.lockInfo);
 
+  // Submit metadata to obtain a URL and generate hash value.
+  const metadataPromises = dRepWallets.map(async (dRepWallet) => {
+    return { ...(await uploadMetadataAndGetJsonHash()), wallet: dRepWallet };
+  });
+
+  const metadatasAndDRepWallets = await Promise.all(metadataPromises);
   // register dRep
-  const registrationRes =
-    await kuberService.multipleDRepRegistration(dRepWallets);
+  const registrationRes = await kuberService.multipleDRepRegistration(
+    metadatasAndDRepWallets
+  );
   await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
 
   // transfer 600 ADA for dRep registration

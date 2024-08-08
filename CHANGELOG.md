@@ -18,6 +18,9 @@ changes.
 ### Fixed
 
 - Incorrect copy on DRep votes + other minor copy spelling mistakes
+- Remove incorrect @value property to fix validating the metadata body [Issue 1687](https://github.com/IntersectMBO/govtool/issues/1687)
+- Fix PDF not enabled in default deployments
+- Fix displaying incorrect connected to Voltaire GovTool network
 
 ### Changed
 

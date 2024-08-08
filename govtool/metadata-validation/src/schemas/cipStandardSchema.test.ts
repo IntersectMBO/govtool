@@ -4,7 +4,6 @@ import { cipStandardSchema } from './cipStandardSchema';
 
 const validCIP108Data = {
   '@context': {
-    '@language': 'en',
     CIP100:
       'https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#',
     CIP108:
@@ -38,7 +37,6 @@ const validCIP108Data = {
 
 const validCIPQQQData = {
   '@context': {
-    '@language': 'en',
     CIP100:
       'https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#',
     CIPQQQ:

@@ -48,7 +48,7 @@ import { Link } from "@mui/material";
 import * as Sentry from "@sentry/react";
 import { Trans } from "react-i18next";
 
-import { PATHS, NETWORK_NAMES } from "@consts";
+import { PATHS } from "@consts";
 import { CardanoApiWallet, Protocol, VoterInfo } from "@models";
 import type { StatusModalState } from "@organisms";
 import {
@@ -64,11 +64,11 @@ import {
   WALLET_LS_KEY,
 } from "@utils";
 import { getEpochParams } from "@services";
-import { useGetNetworkMetrics, useTranslation } from "@hooks";
+import { useTranslation } from "@hooks";
 import { AutomatedVotingOptionDelegationId } from "@/types/automatedVotingOptions";
 
 import { getUtxos } from "./getUtxos";
-import { useModal, useSnackbar } from ".";
+import { useAppContext, useModal, useSnackbar } from ".";
 import {
   PendingTransaction,
   TransactionStateWithResource,
@@ -941,11 +941,7 @@ const CardanoProvider = (props: Props) => {
 };
 
 function useCardano() {
-  const { networkMetrics } = useGetNetworkMetrics();
-  const networkName =
-    NETWORK_NAMES[
-      (networkMetrics?.networkName as keyof typeof NETWORK_NAMES) || "preview"
-    ];
+  const { networkName } = useAppContext();
 
   const context = useContext(CardanoContext);
   const { openModal, closeModal } = useModal<StatusModalState>();

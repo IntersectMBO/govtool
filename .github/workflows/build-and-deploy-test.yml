@@ -61,7 +61,7 @@ jobs:
       SENTRY_IGNORE_API_RESOLUTION_ERROR: "1"
       TRAEFIK_LE_EMAIL: "admin+govtool@binarapps.com"
       USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
-      IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: ${{github.event_name == 'push' && 'false' || inputs.isProposalDiscussionForumEnabled == 'enabled'}}
+      IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: ${{github.event_name == 'push' && 'true' || inputs.isProposalDiscussionForumEnabled == 'enabled'}}
       PDF_API_URL: ${{ secrets.PDF_API_URL}}
     steps:
       - name: Checkout code

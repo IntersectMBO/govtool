@@ -9,6 +9,7 @@ type CardProps = PropsWithChildren & {
   elevation?: number;
   dataTestId?: string;
   label?: string;
+  labelDataTestId?: string;
   sx?: SxProps<Theme>;
   variant?: "default" | "error" | "primary" | "success" | "warning";
   onCardClick?: () => void;
@@ -44,6 +45,7 @@ export const Card = ({
   children,
   elevation = 3,
   label,
+  labelDataTestId = "card-label",
   sx,
   onCardClick,
 }: CardProps) => {
@@ -66,6 +68,7 @@ export const Card = ({
     >
       {label && (
         <Chip
+          data-testid={labelDataTestId}
           color={variant}
           label={label}
           sx={{

@@ -19,26 +19,30 @@ export type DashboardActionCardProps = {
   state?: "active" | "inProgress" | "default";
   title?: ReactNode;
   transactionId?: string | null;
+  type:
+    | "delegate"
+    | "d-rep"
+    | "direct-voter"
+    | "list-gov-actions"
+    | "propose-gov-action";
   isSpaceBetweenButtons?: boolean;
 };
 
 export const DashboardActionCard: FC<DashboardActionCardProps> = ({
-  ...props
+  buttons,
+  children,
+  description,
+  imageURL,
+  isLoading = false,
+  isInProgressOnCard = true,
+  state = "default",
+  title,
+  type,
+  transactionId,
+  isSpaceBetweenButtons,
 }) => {
   const { t } = useTranslation();
   const { cExplorerBaseUrl } = useAppContext();
-  const {
-    buttons,
-    children,
-    description,
-    imageURL,
-    isLoading = false,
-    isInProgressOnCard = true,
-    state = "default",
-    title,
-    transactionId,
-    isSpaceBetweenButtons,
-  } = props;
 
   const { screenWidth } = useScreenDimension();
 
@@ -50,6 +54,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
       {...(state === "inProgress" && {
         border: true,
         label: t("inProgress"),
+        labelDataTestId: `${type}-in-progress`,
         variant: "warning",
       })}
       sx={{

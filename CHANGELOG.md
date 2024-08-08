@@ -21,6 +21,7 @@ changes.
 - Remove incorrect @value property to fix validating the metadata body [Issue 1687](https://github.com/IntersectMBO/govtool/issues/1687)
 - Fix PDF not enabled in default deployments
 - Fix displaying incorrect connected to Voltaire GovTool network
+- Add missing data-testid attributes [Issue 1050](https://github.com/IntersectMBO/govtool/issues/1050)
 
 ### Changed
 

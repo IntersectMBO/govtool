@@ -20,7 +20,7 @@ export const ListGovActionsDashboardCards = () => {
         },
         {
           children: t("learnMore"),
-          dataTestId: "learn-more-governance-actions-button",
+          dataTestId: "list-gov-actions-learn-more-button",
           onClick: () =>
             openInNewTab(
               "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/governance-actions",
@@ -31,6 +31,7 @@ export const ListGovActionsDashboardCards = () => {
       description={t("dashboard.cards.govActions.description")}
       imageURL={IMAGES.govActionListImage}
       title={t("dashboard.cards.govActions.title")}
+      type="list-gov-actions"
     />
   );
 };

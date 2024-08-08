@@ -8,6 +8,9 @@ import { IMAGES } from "@/consts";
 const meta = {
   title: "Example/DashboardCard",
   component: DashboardActionCard,
+  args: {
+    type: "d-rep",
+  },
   parameters: {
     layout: "centered",
   },

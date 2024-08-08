@@ -119,16 +119,14 @@ export default class DRepDirectoryPage {
     // API validation
     for (let i = 0; i <= dRepList.length - 2; i++) {
       const isValid = validationFn(dRepList[i], dRepList[i + 1]);
-      expect(isValid, "API Sorting validation failed").toBe(true);
+      expect(isValid).toBe(true);
     }
 
     // Frontend validation
     const dRepListFE = await this.getAllListedDRepIds();
 
     for (let i = 0; i <= dRepListFE.length - 1; i++) {
-      expect(dRepListFE[i], "Frontend validation failed").toHaveText(
-        dRepList[i].view
-      );
+      await expect(dRepListFE[i]).toHaveText(dRepList[i].view);
     }
   }
   getDRepCard(dRepId: string) {

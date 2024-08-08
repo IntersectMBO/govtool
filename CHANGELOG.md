@@ -25,6 +25,7 @@ changes.
 - Fix displaying incorrect connected to Voltaire GovTool network
 - Runtime error at /edit_drep when metadata incorrect [Issue 1675](https://github.com/IntersectMBO/govtool/issues/1675)
 - Restrict access to registration routes when user s already registered and to retirement routes when the use is not registered [Issue 1183](https://github.com/IntersectMBO/govtool/issues/1183)
+- Add missing data-testid attributes [Issue 1050](https://github.com/IntersectMBO/govtool/issues/1050)
 
 ### Changed
 

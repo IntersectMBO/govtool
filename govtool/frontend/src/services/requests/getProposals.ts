@@ -1,7 +1,7 @@
-import { InfinityProposals, MetadataStandard } from "@models";
+import { Infinite, ProposalData, ProposalDataDTO } from "@models";
 
-import { postValidate } from "./metadataValidation";
 import { API } from "../API";
+import { mapDtoToProposal } from "@/utils";
 
 export type GetProposalsArguments = {
   dRepID?: string;
@@ -20,8 +20,8 @@ export const getProposals = async ({
   pageSize = 7,
   searchPhrase = "",
   sorting = "",
-}: GetProposalsArguments): Promise<InfinityProposals> => {
-  const response = await API.get<InfinityProposals>("/proposal/list", {
+}: GetProposalsArguments): Promise<Infinite<ProposalData>> => {
+  const response = await API.get<Infinite<ProposalDataDTO>>("/proposal/list", {
     params: {
       page,
       pageSize,
@@ -35,31 +35,9 @@ export const getProposals = async ({
   const validatedResponse = {
     ...response.data,
     elements: await Promise.all(
-      response.data.elements.map(async (proposal) => {
-        if (proposal.metadataStatus || proposal.metadataValid) {
-          return proposal;
-        }
-        if (proposal.url && proposal.metadataHash) {
-          const validationResponse = await postValidate({
-            url: proposal.url,
-            hash: proposal.metadataHash,
-            standard: MetadataStandard.CIP108,
-          });
-          return {
-            ...proposal,
-            abstract: validationResponse.metadata?.abstract,
-            motivation: validationResponse.metadata?.motivation,
-            title: validationResponse.metadata?.title,
-            rationale: validationResponse.metadata?.rationale,
-            references: validationResponse.metadata?.references,
-            metadataStatus: validationResponse.status || null,
-            metadataValid: validationResponse.valid,
-          };
-        }
-
-        return proposal;
-      }),
+      response.data.elements.map((proposalDTO) => mapDtoToProposal(proposalDTO)),
     ),
   };
+
   return validatedResponse;
 };

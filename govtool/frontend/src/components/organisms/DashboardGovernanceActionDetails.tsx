@@ -14,11 +14,7 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import {
-  formatDisplayDate,
-  getShortenedGovActionId,
-  getProposalTypeLabel,
-} from "@utils";
+import { getShortenedGovActionId, getProposalTypeLabel } from "@utils";
 import { GovernanceActionDetailsCard } from "@organisms";
 import { Breadcrumbs } from "@molecules";
 
@@ -104,22 +100,14 @@ export const DashboardGovernanceActionDetails = () => {
             abstainVotes={
               state ? state.abstainVotes : data.proposal.abstainVotes
             }
-            createdDate={
-              state
-                ? formatDisplayDate(state.createdDate)
-                : formatDisplayDate(data.proposal.createdDate)
-            }
+            createdDate={state ? state.createdDate : data.proposal.createdDate}
             createdEpochNo={
               state ? state.createdEpochNo : data.proposal.createdEpochNo
             }
             isDataMissing={
               state ? state.metadataStatus : data?.proposal.metadataStatus
             }
-            expiryDate={
-              state
-                ? formatDisplayDate(state.expiryDate)
-                : formatDisplayDate(data?.proposal.expiryDate)
-            }
+            expiryDate={state ? state.expiryDate : data?.proposal.expiryDate}
             expiryEpochNo={
               state ? state.expiryEpochNo : data.proposal.expiryEpochNo
             }

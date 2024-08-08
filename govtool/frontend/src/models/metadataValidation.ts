@@ -11,11 +11,10 @@ export enum MetadataStandard {
   CIPQQQ = "CIPQQQ",
 }
 
-export type ValidateMetadataResult = {
+export type ValidateMetadataResult<MetadataType> = {
   status?: MetadataValidationStatus;
   valid: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  metadata?: any;
+  metadata?: MetadataType;
 };
 
 export type MetadataValidationDTO = {
@@ -23,3 +22,18 @@ export type MetadataValidationDTO = {
   hash: string;
   standard?: MetadataStandard;
 };
+
+export type DRepMetadata = {
+  bio?: string;
+  dRepName?: string;
+  email?: string;
+  references?: string[];
+};
+
+export type ProposalMetadata = {
+  abstract?: string;
+  motivation?: string;
+  rationale?: string;
+  references?: string[];
+  title?: string;
+}

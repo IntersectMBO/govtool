@@ -3,7 +3,7 @@ import { GovernanceActionDetailsCard } from "@organisms";
 import { expect, jest } from "@storybook/jest";
 import type { Meta, StoryObj } from "@storybook/react";
 import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
-import { getProposalTypeNoEmptySpaces } from "@/utils";
+import { formatDisplayDate, getProposalTypeNoEmptySpaces } from "@/utils";
 
 const meta = {
   title: "Example/GovernanceActionDetailsCard",
@@ -46,7 +46,7 @@ async function assertGovActionDetails(
   canvas: ReturnType<typeof within>,
   args: React.ComponentProps<typeof GovernanceActionDetailsCard>,
 ) {
-  const todayDate = new Date().toLocaleDateString();
+  const todayDate = formatDisplayDate(new Date());
   await expect(canvas.getAllByText(todayDate)).toHaveLength(2);
   await expect(
     canvas.getByTestId(`${getProposalTypeNoEmptySpaces(args.type)}-type`),

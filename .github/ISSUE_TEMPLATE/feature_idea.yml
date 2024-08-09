@@ -1,44 +1,87 @@
-name: Feature idea
+name: 💡 Feature idea
 description: Idea or request for some feature on the GovTool roadmap
-labels: [':thought_balloon: idea']
+title: "💡 "
+projects: ["IntersectMBO/projects/30", "IntersectMBO/projects/34"]
 body:
   - type: markdown
     attributes:
-      value:
       value: |
-        **Thank you for contributing to our project!** :green_heart:
-
-        Instead of opening this issue, consider [starting a new idea discussion](https://github.com/IntersectMBO/govtool/discussions/new?category=ideas).
-        That way, we can discuss & refine your idea together, before we adopt it as a feature into the roadmap.
-
-  - type: textarea
-    id: why
+        ## 🌟 **Thank you for contributing to GovTool!**
+  - type: markdown
     attributes:
-      label: Why
-      description: Why do we need or want this feature
-      placeholder: |
-        Give context and describe the problem, challenge or opportunity you see
+      value: |
+        Before submitting a new issue consider [starting a new discussion](https://github.com/IntersectMBO/govtool/discussions/new?category=ideas).
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: What part of GovTool does this feature affect?
+      options:
+        - Proposal Pillar
+        - Voting Pillar
+        - Delegation Pillar
+        - Wrapper
+        - Other
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: design-needed
+    attributes:
+      label: Is there new design needed?
+      description: Will this feature require new or edit to existing frontend designs?
+      options:
+        - 'Yes'
+        - 'No'
+        - Not sure
     validations:
       required: true
 
   - type: textarea
     id: what
     attributes:
-      label: What
-      description: What is this feature roughly about
+      label: What?
+      description: What is this feature?
       placeholder: |
-        For example describe a new API endpoint, a change in messaging formats,
+        For example describe a new API endpoint, a change in wording,
         a new configuration option, ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why?
+      description: Why do we need or want this feature?
+      placeholder: |
+        Give context and describe the problem the idea solves
     validations:
       required: true
 
   - type: textarea
     id: how
     attributes:
-      label: How
-      description: How could we realize this feature
+      label: How?
+      description: How can we realize this feature?
       placeholder: |
         Which technical solutions, libraries or systems should be used, which
         components need to change, steps how to implement this, ...
     validations:
       required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: (Optional) User Story with acceptance criteria
+      description: See GovTool examples [here](https://github.com/IntersectMBO/cardano-test-plans/blob/main/userStoryInventoryChangHF.md#2g-delegate-to-self-for-registered-dreps).
+      placeholder: |
+        As a [ada holder | DRep | Direct voter], I want [some goal] so that [some reason].
+    validations:
+      required: false

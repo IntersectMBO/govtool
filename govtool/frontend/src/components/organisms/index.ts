@@ -1,5 +1,4 @@
 export * from "./AutomatedVotingOptions";
-export * from "./BgCard";
 export * from "./ChooseStakeKeyPanel";
 export * from "./ControlledField";
 export * from "./CreateGovernanceActionSteps";

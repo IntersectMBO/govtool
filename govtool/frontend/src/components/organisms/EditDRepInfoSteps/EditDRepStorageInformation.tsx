@@ -9,8 +9,8 @@ import {
   useTranslation,
   useScreenDimension,
 } from "@hooks";
-import { Step } from "@molecules";
-import { BgCard, ControlledField } from "@organisms";
+import { CenteredBoxBottomButtons, Step } from "@molecules";
+import { ControlledField } from "@organisms";
 import { ellipsizeText, openInNewTab } from "@utils";
 
 type StorageInformationProps = {
@@ -49,14 +49,7 @@ export const EditDRepStorageInformation = ({
   }, []);
 
   return (
-    <BgCard
-      actionButtonLabel={t("submit")}
-      backButtonLabel={t("back")}
-      isActionButtonDisabled={isActionButtonDisabled}
-      onClickActionButton={editDRepInfo}
-      onClickBackButton={onClickBack}
-      isLoadingActionButton={isEditDRepMetadataLoading}
-    >
+    <>
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("editMetadata.storingInformationTitle")}
       </Typography>
@@ -126,6 +119,14 @@ export const EditDRepStorageInformation = ({
           stepNumber={3}
         />
       </Box>
-    </BgCard>
+      <CenteredBoxBottomButtons
+        onActionButton={editDRepInfo}
+        actionButtonText={t("submit")}
+        actionButtonDataTestId="submit-button"
+        disableActionButton={isActionButtonDisabled}
+        isLoadingActionButton={isEditDRepMetadataLoading}
+        onBackButton={onClickBack}
+      />
+    </>
   );
 };

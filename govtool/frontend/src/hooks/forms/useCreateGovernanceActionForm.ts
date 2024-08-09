@@ -133,9 +133,9 @@ export const useCreateGovernanceActionForm = (
       };
       try {
         switch (govActionType) {
-          case GovernanceActionType.Info:
+          case GovernanceActionType.InfoAction:
             return await buildNewInfoGovernanceAction(commonGovActionDetails);
-          case GovernanceActionType.Treasury: {
+          case GovernanceActionType.TreasuryWithdrawals: {
             if (
               data.amount === undefined ||
               data.receivingAddress === undefined

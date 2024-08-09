@@ -8,6 +8,7 @@ import {
 } from "@molecules";
 import { GovernanceActionDetailsCardData } from "@organisms";
 import { MetadataValidationStatus } from "@models";
+import { GovernanceActionType } from "@/types/governanceAction";
 
 type GovernanceActionDetailsCardProps = {
   abstainVotes: number;
@@ -16,7 +17,8 @@ type GovernanceActionDetailsCardProps = {
   expiryDate: string;
   expiryEpochNo: number;
   noVotes: number;
-  type: string;
+  type: GovernanceActionType;
+  label: string;
   details?: ActionDetailsType;
   url: string;
   title?: string;
@@ -43,9 +45,10 @@ export const GovernanceActionDetailsCard = ({
   expiryDate,
   expiryEpochNo,
   noVotes,
-  type,
   details,
   url,
+  type,
+  label,
   title,
   links,
   abstract,
@@ -109,7 +112,7 @@ export const GovernanceActionDetailsCard = ({
         motivation={motivation}
         rationale={rationale}
         title={title}
-        type={type}
+        label={label}
         url={url}
       />
       <GovernanceActionDetailsCardVotes
@@ -127,6 +130,7 @@ export const GovernanceActionDetailsCard = ({
         isDashboard={isDashboard}
         isOneColumn={isOneColumn}
         isInProgress={isInProgress}
+        type={type}
       />
     </Box>
   );

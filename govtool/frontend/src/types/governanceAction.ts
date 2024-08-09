@@ -2,8 +2,13 @@ import { RegisterOptions } from "react-hook-form";
 import { en } from "@/i18n/locales/en";
 
 export enum GovernanceActionType {
-  Info = "Info",
-  Treasury = "Treasury",
+  ParameterChange = "ParameterChange",
+  HardForkInitiation = "HardForkInitiation",
+  TreasuryWithdrawals = "TreasuryWithdrawals",
+  NoConfidence = "NoConfidence",
+  NewCommittee = "NewCommittee",
+  NewConstitution = "NewConstitution",
+  InfoAction = "InfoAction",
 }
 
 export enum GovernanceActionField {
@@ -41,6 +46,6 @@ export type GovernanceActionFieldSchemas =
   | InfoGovernanceActionFieldSchema & TreasuryGovernanceActionFieldSchema;
 
 export type GovernanceActionFields = Record<
-  GovernanceActionType,
+  GovernanceActionType.InfoAction | GovernanceActionType.TreasuryWithdrawals,
   GovernanceActionFieldSchemas
 >;

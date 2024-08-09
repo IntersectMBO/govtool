@@ -1,28 +1,30 @@
 import { FC, PropsWithChildren } from "react";
-import { Box, Link } from "@mui/material";
+import { Box } from "@mui/material";
 
-import { Background, Typography } from "@atoms";
-import { ICONS } from "@consts";
+import { Background } from "@atoms";
+import { PATHS } from "@consts";
 import { DashboardTopNav, Footer } from "@organisms";
-import { useScreenDimension } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { useNavigate } from "react-router-dom";
 import { theme } from "@/theme";
+import { LinkWithIcon } from "./LinkWithIcon";
 
 interface Props {
   pageTitle: string;
-  backButtonText: string;
-  backButtonPath: string;
-  isVotingPowerHidden?: boolean;
+  onClickBackToDashboard?: () => void;
+  showVotingPower?: boolean;
+  hideBox?: boolean;
 }
 export const CenteredBoxPageWrapper: FC<PropsWithChildren<Props>> = ({
   pageTitle,
-  backButtonText,
-  backButtonPath,
-  isVotingPowerHidden,
+  onClickBackToDashboard,
+  showVotingPower,
+  hideBox,
   children,
 }) => {
-  const { isMobile, screenWidth, pagePadding } = useScreenDimension();
+  const { isMobile } = useScreenDimension();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const {
     palette: { boxShadow2 },
   } = theme;
@@ -30,57 +32,39 @@ export const CenteredBoxPageWrapper: FC<PropsWithChildren<Props>> = ({
   return (
     <Background isReverted>
       <Box display="flex" minHeight="100vh" flexDirection="column">
-        <DashboardTopNav
-          title={pageTitle}
-          isVotingPowerHidden={isVotingPowerHidden}
-        />
+        <DashboardTopNav title={pageTitle} hideVotingPower={!showVotingPower} />
         <Box
+          flex={1}
+          px={isMobile ? 2 : 5}
+          py={isMobile ? 3 : 1.5}
           display="flex"
-          justifyContent="center"
           flexDirection="column"
-          height={isMobile ? "100%" : "auto"}
+          gap={isMobile ? 0 : 1.5}
         >
-          <Link
-            data-testid="back-button"
-            sx={{
-              cursor: "pointer",
-              display: "flex",
-              textDecoration: "none",
-              my: 3,
-              marginLeft: isMobile ? 2 : "40px",
-            }}
-            onClick={() => navigate(backButtonPath)}
-          >
-            <img
-              src={ICONS.arrowLeftThinIcon}
-              alt="arrow"
-              style={{ marginRight: "4px" }}
-            />
-            <Typography
-              variant="body2"
-              color="primary"
-              sx={{
-                fontWeight: 400,
-                paddingTop: "1px",
-              }}
-            >
-              {backButtonText}
-            </Typography>
-          </Link>
-          <Box display="flex" justifyContent="center">
+          <LinkWithIcon
+            label={t("backToDashboard")}
+            onClick={
+              onClickBackToDashboard ?? (() => navigate(PATHS.dashboard))
+            }
+          />
+          {hideBox ? (
+            <Box flex={1}>{children}</Box>
+          ) : (
             <Box
-              width={screenWidth < 768 ? "auto" : "52vw"}
-              boxShadow={isMobile ? "" : `2px 2px 20px 0px ${boxShadow2}`}
-              px={pagePadding}
-              py={isMobile ? 3 : 8}
+              alignSelf="center"
               borderRadius="20px"
+              boxShadow={isMobile ? "" : `2px 2px 20px 0px ${boxShadow2}`}
+              mb={isMobile ? 2 : 1.5}
+              px={isMobile ? 2 : 18.75}
+              py={isMobile ? 6 : 8}
               height="auto"
+              maxWidth={isMobile ? "none" : 600}
+              display="flex"
+              flexDirection="column"
             >
-              <Box display="flex" flexDirection="column">
-                {children}
-              </Box>
+              {children}
             </Box>
-          </Box>
+          )}
         </Box>
         {/* FIXME: Footer should be on top of the layout.
         Should not be rerendered across the pages */}

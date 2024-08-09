@@ -3,13 +3,12 @@ import { Trans } from "react-i18next";
 
 import { Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
+import { CenteredBoxBottomButtons } from "@molecules";
 import {
   correctAdaFormat,
   getItemFromLocalStorage,
   PROTOCOL_PARAMS_KEY,
 } from "@utils";
-
-import { BgCard } from "..";
 
 type WhatGovernanceActionIsAboutProps = {
   onClickCancel: () => void;
@@ -28,12 +27,7 @@ export const WhatGovernanceActionIsAbout = ({
   const onClickContinue = useCallback(() => setStep(2), []);
 
   return (
-    <BgCard
-      actionButtonLabel={t("continue")}
-      backButtonLabel={t("cancel")}
-      onClickActionButton={onClickContinue}
-      onClickBackButton={onClickCancel}
-    >
+    <>
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("createGovernanceAction.creatingAGovernanceAction")}
       </Typography>
@@ -54,6 +48,11 @@ export const WhatGovernanceActionIsAbout = ({
           }}
         />
       </Typography>
-    </BgCard>
+      <CenteredBoxBottomButtons
+        onActionButton={onClickContinue}
+        onBackButton={onClickCancel}
+        backButtonText={t("cancel")}
+      />
+    </>
   );
 };

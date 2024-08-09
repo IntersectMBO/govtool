@@ -13,14 +13,14 @@ import { useCardano } from "@context";
 
 type DashboardTopNavProps = {
   title: string;
-  isVotingPowerHidden?: boolean;
+  hideVotingPower?: boolean;
 };
 
 const POSITION_TO_BLUR = 50;
 
 export const DashboardTopNav = ({
   title,
-  isVotingPowerHidden,
+  hideVotingPower,
 }: DashboardTopNavProps) => {
   const [windowScroll, setWindowScroll] = useState<number>(0);
   const { isMobile } = useScreenDimension();
@@ -84,7 +84,7 @@ export const DashboardTopNav = ({
           ) : null}
         </Box>
         <Box display="flex">
-          {!isVotingPowerHidden && (
+          {!hideVotingPower && (
             <VotingPowerChips
               isLoading={
                 dRepVotingPower === undefined || !!isEnableLoading || !voter

@@ -13,8 +13,9 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
+import { CenteredBoxBottomButtons } from "@molecules";
 
-import { BgCard, ControlledField } from "..";
+import { ControlledField } from "..";
 
 const MAX_NUMBER_OF_LINKS = 7;
 
@@ -116,14 +117,7 @@ export const EditDRepForm = ({
   );
 
   return (
-    <BgCard
-      actionButtonLabel={t("continue")}
-      backButtonLabel={t("cancel")}
-      onClickActionButton={onClickContinue}
-      onClickBackButton={onClickCancel}
-      isActionButtonDisabled={isContinueButtonDisabled}
-      sx={{ pb: isMobile ? undefined : 6, pt: isMobile ? 4 : 8 }}
-    >
+    <>
       <Box textAlign="center">
         <InfoText label={t("editMetadata.required")} />
         <Typography sx={{ mt: 0.5, mb: isMobile ? 3 : 4 }} variant="headline4">
@@ -199,6 +193,12 @@ export const EditDRepForm = ({
         </Button>
       ) : null}
       <Spacer y={isMobile ? 4 : 6} />
-    </BgCard>
+      <CenteredBoxBottomButtons
+        onActionButton={onClickContinue}
+        disableActionButton={isContinueButtonDisabled}
+        onBackButton={onClickCancel}
+        backButtonText={t("cancel")}
+      />
+    </>
   );
 };

@@ -1,5 +1,4 @@
 export * from "./AutomatedVotingOptions";
-export * from "./BgCard";
 export * from "./ChooseStakeKeyPanel";
 export * from "./ControlledField";
 export * from "./CreateGovernanceActionSteps";
@@ -22,8 +21,7 @@ export * from "./GovernanceActionsToVote";
 export * from "./Hero";
 export * from "./HomeCards";
 export * from "./RegisterAsDRepSteps";
-export * from "./RegisterAsDirectVoterBox";
-export * from "./RegisterAsDirectVoterBoxContent";
 export * from "./Slider";
 export * from "./TopNav";
 export * from "./VoteContext";
+export * from "./WrongRouteInfo";

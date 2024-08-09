@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { Box, Link } from "@mui/material";
 
 import { Spacer, Typography } from "@atoms";
+import { CenteredBoxBottomButtons } from "@molecules";
 import {
   useScreenDimension,
   useTranslation,
@@ -9,7 +10,7 @@ import {
 } from "@hooks";
 import { openInNewTab } from "@utils";
 
-import { BgCard, ControlledField } from "..";
+import { ControlledField } from "..";
 
 export const DRepStoreDataInfo = ({
   setStep,
@@ -30,12 +31,7 @@ export const DRepStoreDataInfo = ({
   const openLink = () => openInNewTab("https://sancho.network/get-started");
 
   return (
-    <BgCard
-      actionButtonLabel={t("register")}
-      isActionButtonDisabled={isContinueDisabled}
-      onClickActionButton={onClickContinue}
-      onClickBackButton={onClickBackButton}
-    >
+    <>
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("registration.storeDataTitle")}
       </Typography>
@@ -60,6 +56,13 @@ export const DRepStoreDataInfo = ({
       />
       <Spacer y={isMobile ? 4 : 12.5} />
       <Box display="flex" flex={1} />
-    </BgCard>
+      <CenteredBoxBottomButtons
+        onActionButton={onClickContinue}
+        actionButtonText={t("register")}
+        actionButtonDataTestId="register-button"
+        disableActionButton={isContinueDisabled}
+        onBackButton={onClickBackButton}
+      />
+    </>
   );
 };

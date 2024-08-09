@@ -1,73 +1,68 @@
-import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 
 import { Button } from "@atoms";
+import { PATHS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 
 interface Props {
-  onBackButton: () => void;
-  onActionButton: () => void;
-  isLoading?: boolean;
-  backButtonText?: string;
   actionButtonText?: string;
+  actionButtonDataTestId?: string;
+  onActionButton: () => void;
+  isLoadingActionButton?: boolean;
+  disableActionButton?: boolean;
+  backButtonText?: string;
+  onBackButton?: () => void;
 }
 
 export const CenteredBoxBottomButtons = ({
+  actionButtonText,
+  actionButtonDataTestId,
+  backButtonText,
+  isLoadingActionButton,
+  disableActionButton,
   onBackButton,
   onActionButton,
-  isLoading,
-  backButtonText,
-  actionButtonText,
 }: Props) => {
   const { isMobile } = useScreenDimension();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const renderBackButton = useMemo(
-    () => (
+  const navigateToDashboard = () => navigate(PATHS.dashboard);
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: isMobile ? "column-reverse" : "row",
+        gap: isMobile ? 3 : 0,
+        justifyContent: "space-between",
+      }}
+    >
       <Button
         data-testid="back-button"
-        onClick={onBackButton}
+        onClick={onBackButton ?? navigateToDashboard}
         size="extraLarge"
         sx={{
           px: 6,
         }}
         variant="outlined"
       >
-        {backButtonText ?? t("cancel")}
+        {backButtonText ?? t("back")}
       </Button>
-    ),
-    [isMobile],
-  );
-
-  const renderActionButton = useMemo(
-    () => (
       <Button
-        data-testid="register-button"
-        isLoading={isLoading}
+        data-testid={actionButtonDataTestId ?? "continue-button"}
+        disabled={disableActionButton || isLoadingActionButton}
+        isLoading={isLoadingActionButton}
         onClick={onActionButton}
+        size="extraLarge"
         sx={{
           px: 6,
-          height: 48,
-          fontSize: 16,
         }}
         variant="contained"
       >
         {actionButtonText ?? t("continue")}
       </Button>
-    ),
-    [isLoading, isMobile],
-  );
-
-  return (
-    <Box
-      display="flex"
-      flexDirection={isMobile ? "column-reverse" : "row"}
-      justifyContent="space-around"
-      mt={6}
-    >
-      {renderBackButton}
-      <Box px={2} py={isMobile ? 1.5 : 0} />
-      {renderActionButton}
     </Box>
   );
 };

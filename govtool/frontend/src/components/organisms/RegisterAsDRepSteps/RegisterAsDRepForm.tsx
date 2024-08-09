@@ -11,8 +11,9 @@ import {
   useTranslation,
 } from "@hooks";
 import { VoterInfo } from "@models";
+import { CenteredBoxBottomButtons } from "@molecules";
 
-import { BgCard, ControlledField } from "..";
+import { ControlledField } from "..";
 
 const MAX_NUMBER_OF_LINKS = 7;
 
@@ -77,16 +78,7 @@ export const RegisterAsDRepForm = ({
   );
 
   return (
-    <BgCard
-      actionButtonLabel={t("continue")}
-      backButtonLabel={voter?.wasRegisteredAsDRep ? t("cancel") : t("back")}
-      onClickActionButton={onClickContinue}
-      onClickBackButton={
-        voter?.wasRegisteredAsDRep ? onClickCancel : onClickBack
-      }
-      isActionButtonDisabled={isContinueButtonDisabled}
-      sx={{ pb: isMobile ? undefined : 6, pt: isMobile ? 4 : 8 }}
-    >
+    <>
       <Box textAlign="center">
         <InfoText label={t("registration.required")} />
         <Typography sx={{ mt: 0.5, mb: isMobile ? 3 : 4 }} variant="headline4">
@@ -162,6 +154,12 @@ export const RegisterAsDRepForm = ({
         </Button>
       ) : null}
       <Spacer y={isMobile ? 4 : 6} />
-    </BgCard>
+      <CenteredBoxBottomButtons
+        onActionButton={onClickContinue}
+        disableActionButton={isContinueButtonDisabled}
+        onBackButton={voter?.wasRegisteredAsDRep ? onClickCancel : onClickBack}
+        backButtonText={voter?.wasRegisteredAsDRep ? t("cancel") : t("back")}
+      />
+    </>
   );
 };

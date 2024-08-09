@@ -9,8 +9,7 @@ import {
   useTranslation,
   useWalletErrorModal,
 } from "@hooks";
-
-import { BgCard } from "..";
+import { CenteredBoxBottomButtons } from "@molecules";
 
 export const WhatRetirementMeans = ({
   onClickCancel,
@@ -90,15 +89,7 @@ export const WhatRetirementMeans = ({
   ]);
 
   return (
-    <BgCard
-      actionButtonLabel={t("retirement.continue")}
-      actionButtonDataTestId="continue-retirement-button"
-      backButtonLabel={t("cancel")}
-      isLoadingActionButton={isRetirementLoading}
-      onClickActionButton={retireAsDrep}
-      onClickBackButton={onClickCancel}
-      sx={{ pb: isMobile ? undefined : 5, pt: isMobile ? 4 : 8 }}
-    >
+    <>
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("retirement.whatRetirementMeansTitle")}
       </Typography>
@@ -114,6 +105,14 @@ export const WhatRetirementMeans = ({
       >
         {t("retirement.whatRetirementMeansDescription")}
       </Typography>
-    </BgCard>
+      <CenteredBoxBottomButtons
+        actionButtonText={t("retirement.continue")}
+        actionButtonDataTestId="continue-retirement-button"
+        backButtonText={t("cancel")}
+        isLoadingActionButton={isRetirementLoading}
+        onActionButton={retireAsDrep}
+        onBackButton={onClickCancel}
+      />
+    </>
   );
 };

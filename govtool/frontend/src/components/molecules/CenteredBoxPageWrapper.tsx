@@ -48,17 +48,27 @@ export const CenteredBoxPageWrapper: FC<PropsWithChildren<Props>> = ({
             }
           />
           {hideBox ? (
-            <Box flex={1}>{children}</Box>
+            <Box
+              flex={1}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+            >
+              {children}
+            </Box>
           ) : (
             <Box
               alignSelf="center"
               borderRadius="20px"
               boxShadow={isMobile ? "" : `2px 2px 20px 0px ${boxShadow2}`}
+              boxSizing="border-box"
               mb={isMobile ? 2 : 1.5}
               px={isMobile ? 2 : 18.75}
               py={isMobile ? 6 : 8}
               height="auto"
-              maxWidth={isMobile ? "none" : 600}
+              width="100%"
+              maxWidth={isMobile ? "none" : 900}
               display="flex"
               flexDirection="column"
             >

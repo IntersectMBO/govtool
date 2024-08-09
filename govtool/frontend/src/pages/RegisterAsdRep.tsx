@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FormProvider, useForm } from "react-hook-form";
-import { Box, CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 
 import { PATHS } from "@consts";
-import { useModal } from "@context";
+import { useCardano, useModal } from "@context";
 import {
   useTranslation,
   defaultRegisterAsDRepValues,
@@ -16,6 +16,7 @@ import {
   DRepStoreDataInfo,
   RegisterAsDRepForm,
   RolesAndResponsibilities,
+  WrongRouteInfo,
 } from "@organisms";
 import { checkIsWalletConnected } from "@utils";
 
@@ -25,6 +26,7 @@ export const RegisterAsdRep = () => {
   const { t } = useTranslation();
   const { closeModal, openModal } = useModal();
   const { voter } = useGetVoterInfo();
+  const { dRepIDBech32 } = useCardano();
 
   const methods = useForm({
     mode: "onChange",
@@ -64,17 +66,24 @@ export const RegisterAsdRep = () => {
   if (!voter)
     return (
       <CenteredBoxPageWrapper pageTitle={pageTitle} hideBox>
-        <Box
-          sx={{
-            alignItems: "center",
-            display: "flex",
-            flex: 1,
-            height: "100vh",
-            justifyContent: "center",
-          }}
-        >
-          <CircularProgress />
-        </Box>
+        <CircularProgress />
+      </CenteredBoxPageWrapper>
+    );
+
+  if (voter.isRegisteredAsDRep)
+    return (
+      <CenteredBoxPageWrapper pageTitle={pageTitle}>
+        <WrongRouteInfo
+          title={t(`registration.alreadyRegistered.title`)}
+          description={t(`registration.alreadyRegistered.description`)}
+          primaryButtonText={t("registration.alreadyRegistered.viewDetails")}
+          onPrimaryButton={() =>
+            navigate(
+              PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRepIDBech32),
+              { state: { enteredFromWithinApp: true } },
+            )
+          }
+        />
       </CenteredBoxPageWrapper>
     );
 

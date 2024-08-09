@@ -4,6 +4,7 @@ import { expect, jest } from "@storybook/jest";
 import type { Meta, StoryObj } from "@storybook/react";
 import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
 import { formatDisplayDate, getProposalTypeNoEmptySpaces } from "@/utils";
+import { GovernanceActionType } from "@/types/governanceAction";
 
 const meta = {
   title: "Example/GovernanceActionDetailsCard",
@@ -23,7 +24,8 @@ const commonArgs = {
   createdDate: new Date().toLocaleDateString(),
   expiryDate: new Date().toLocaleDateString(),
   noVotes: 1000000,
-  type: "Gov Type",
+  label: "Info Action",
+  type: GovernanceActionType.InfoAction,
   url: "https://exampleurl.com",
   yesVotes: 1000000,
   createdEpochNo: 302,

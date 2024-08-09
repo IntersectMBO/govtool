@@ -14,6 +14,7 @@ changes.
 
 - Unsancho GovTool [Issue 1637](https://github.com/IntersectMBO/govtool/issues/1637)
 - Add network metrics model to frontend service
+- Make voting on governance actions enabled based on protocol version [Issue 1703](https://github.com/IntersectMBO/govtool/issues/1703)
 
 ### Fixed
 
@@ -25,7 +26,7 @@ changes.
 
 ### Changed
 
-- Changed stake key registration to use the newer Conway type of certificate 
+- Changed stake key registration to use the newer Conway type of certificate
 
 ## [sancho-v1.0.12](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.12) 2024-08-01
 

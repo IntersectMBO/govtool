@@ -4,16 +4,26 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useState,
 } from "react";
 import * as Sentry from "@sentry/react";
 
 import { NETWORK_NAMES, CEXPLORER_BASE_URLS } from "@/consts";
-import { useGetNetworkMetrics } from "@/hooks";
+import { useGetNetworkMetrics, useGetEpochParams } from "@/hooks";
+import {
+  NETWORK_METRICS_KEY,
+  PROTOCOL_PARAMS_KEY,
+  setItemToLocalStorage,
+} from "@/utils";
+import { EpochParams, NetworkMetrics } from "@/models";
 
 type AppContextType = {
+  isAppInitializing: boolean;
   networkName: string;
   network: string;
   cExplorerBaseUrl: string;
+  epochParams?: EpochParams;
+  networkMetrics?: NetworkMetrics;
 };
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -27,11 +37,36 @@ const AppContextProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     Sentry.setTag("component_name", "AppContextProvider");
   }, []);
+  const { fetchEpochParams, epochParams } = useGetEpochParams();
+  const { fetchNetworkMetrics, networkMetrics } = useGetNetworkMetrics();
 
-  const { networkMetrics } = useGetNetworkMetrics();
+  const [isAppInitializing, setIsAppInitializing] = useState(true);
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const { data: epochParamsData } = await fetchEpochParams();
+        if (epochParamsData) {
+          setItemToLocalStorage(PROTOCOL_PARAMS_KEY, epochParamsData);
+        }
+
+        const { data: networkMetricsData } = await fetchNetworkMetrics();
+        if (networkMetricsData) {
+          setItemToLocalStorage(NETWORK_METRICS_KEY, networkMetricsData);
+        }
+
+        setIsAppInitializing(false);
+      } catch (error) {
+        Sentry.captureException(error);
+      }
+    };
+
+    init();
+  }, []);
 
   const value = useMemo(
     () => ({
+      isAppInitializing,
       networkName:
         NETWORK_NAMES[
           (networkMetrics?.networkName as keyof typeof NETWORK_NAMES) ||
@@ -43,8 +78,10 @@ const AppContextProvider = ({ children }: PropsWithChildren) => {
           (networkMetrics?.networkName as keyof typeof NETWORK_NAMES) ||
             "preview"
         ],
+      epochParams,
+      networkMetrics,
     }),
-    [networkMetrics],
+    [isAppInitializing],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

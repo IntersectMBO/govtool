@@ -26,3 +26,4 @@ export * from "./RegisterAsDirectVoterBoxContent";
 export * from "./Slider";
 export * from "./TopNav";
 export * from "./VoteContext";
+export * from "./WrongRouteInfo";

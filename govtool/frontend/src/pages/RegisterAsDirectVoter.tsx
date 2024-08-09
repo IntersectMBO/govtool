@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
-import { Link } from "@mui/material";
+import { CircularProgress, Link } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { PATHS } from "@consts";
@@ -20,6 +20,7 @@ import {
   getItemFromLocalStorage,
   openInNewTab,
 } from "@utils";
+import { WrongRouteInfo } from "@organisms";
 
 export const RegisterAsDirectVoter = () => {
   const { cExplorerBaseUrl } = useAppContext();
@@ -94,8 +95,27 @@ export const RegisterAsDirectVoter = () => {
     }
   }, []);
 
+  const pageTitle = t("directVoter.becomeDirectVoter");
+
+  if (!voter)
+    return (
+      <CenteredBoxPageWrapper pageTitle={pageTitle} hideBox>
+        <CircularProgress />
+      </CenteredBoxPageWrapper>
+    );
+
+  if (voter?.isRegisteredAsSoleVoter)
+    return (
+      <CenteredBoxPageWrapper pageTitle={pageTitle}>
+        <WrongRouteInfo
+          title={t(`directVoter.alreadyRegistered.title`)}
+          description={t(`directVoter.alreadyRegistered.description`)}
+        />
+      </CenteredBoxPageWrapper>
+    );
+
   return (
-    <CenteredBoxPageWrapper pageTitle={t("directVoter.becomeDirectVoter")}>
+    <CenteredBoxPageWrapper pageTitle={pageTitle}>
       <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
         {t("directVoter.registerHeading")}
       </Typography>

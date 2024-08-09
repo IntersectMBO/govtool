@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
-import { Link } from "@mui/material";
+import { CircularProgress, Link } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { PATHS } from "@consts";
@@ -14,6 +14,7 @@ import {
 } from "@hooks";
 import { CenteredBoxBottomButtons, CenteredBoxPageWrapper } from "@molecules";
 import { checkIsWalletConnected, correctAdaFormat, openInNewTab } from "@utils";
+import { WrongRouteInfo } from "@organisms";
 
 export const RetireAsDirectVoter = () => {
   const { cExplorerBaseUrl } = useAppContext();
@@ -81,11 +82,27 @@ export const RetireAsDirectVoter = () => {
     }
   }, []);
 
+  const pageTitle = t("directVoter.retireDirectVoter");
+
+  if (!voter)
+    return (
+      <CenteredBoxPageWrapper pageTitle={pageTitle} showVotingPower hideBox>
+        <CircularProgress />
+      </CenteredBoxPageWrapper>
+    );
+
+  if (!voter.isRegisteredAsSoleVoter)
+    return (
+      <CenteredBoxPageWrapper pageTitle={pageTitle} showVotingPower>
+        <WrongRouteInfo
+          title={t("directVoter.notDirectVoter.title")}
+          description={t("directVoter.notDirectVoter.description")}
+        />
+      </CenteredBoxPageWrapper>
+    );
+
   return (
-    <CenteredBoxPageWrapper
-      pageTitle={t("directVoter.retireDirectVoter")}
-      showVotingPower
-    >
+    <CenteredBoxPageWrapper pageTitle={pageTitle} showVotingPower>
       <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
         {t("directVoter.retirementHeading")}
       </Typography>

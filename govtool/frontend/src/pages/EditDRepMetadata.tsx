@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FormProvider, useForm } from "react-hook-form";
-import { Box, CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 
 import { PATHS } from "@consts";
 import { useModal } from "@context";
@@ -65,17 +65,7 @@ export const EditDRepMetadata = () => {
       showVotingPower
     >
       {!voter || !voter.isRegisteredAsDRep ? (
-        <Box
-          sx={{
-            display: "flex",
-            flex: 1,
-            height: "100%",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <CircularProgress />
-        </Box>
+        <CircularProgress />
       ) : (
         <FormProvider {...methods}>
           {step === 1 && (

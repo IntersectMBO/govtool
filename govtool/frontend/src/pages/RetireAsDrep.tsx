@@ -2,14 +2,16 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { PATHS } from "@consts";
-import { WhatRetirementMeans } from "@organisms";
-import { useTranslation } from "@hooks";
+import { WhatRetirementMeans, WrongRouteInfo } from "@organisms";
+import { useGetVoterInfo, useTranslation } from "@hooks";
 import { CenteredBoxPageWrapper } from "@molecules";
 import { checkIsWalletConnected } from "@utils";
+import { CircularProgress } from "@mui/material";
 
 export const RetireAsDrep = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { voter } = useGetVoterInfo();
 
   useEffect(() => {
     if (!checkIsWalletConnected()) {
@@ -19,12 +21,25 @@ export const RetireAsDrep = () => {
 
   const onClickBackToDashboard = () => navigate(PATHS.dashboard);
 
+  const pageTitle = t("retirement.retireAsDrep");
+
+  if (!voter)
+    return (
+      <CenteredBoxPageWrapper pageTitle={pageTitle} hideBox>
+        <CircularProgress />
+      </CenteredBoxPageWrapper>
+    );
+
   return (
-    <CenteredBoxPageWrapper
-      pageTitle={t("retirement.retireAsDrep")}
-      onClickBackToDashboard={onClickBackToDashboard}
-    >
-      <WhatRetirementMeans onClickCancel={onClickBackToDashboard} />
+    <CenteredBoxPageWrapper pageTitle={pageTitle}>
+      {!voter.isRegisteredAsDRep ? (
+        <WrongRouteInfo
+          title={t("retirement.notADRep.title")}
+          description={t("retirement.notADRep.description")}
+        />
+      ) : (
+        <WhatRetirementMeans onClickCancel={onClickBackToDashboard} />
+      )}
     </CenteredBoxPageWrapper>
   );
 };

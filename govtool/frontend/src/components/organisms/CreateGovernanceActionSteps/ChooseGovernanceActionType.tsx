@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { ActionRadio, Spacer, Typography } from "@atoms";
-import { GovernanceActionTootlip } from "@consts";
+import { GovernanceActionTooltip } from "@consts";
 import {
   useCreateGovernanceActionForm,
   useScreenDimension,
@@ -49,7 +49,9 @@ export const ChooseGovernanceActionType = ({
               value={type}
               tooltipTitle={type}
               tooltipText={
-                GovernanceActionTootlip[type as GovernanceActionType]
+                GovernanceActionTooltip[
+                  type as keyof typeof GovernanceActionTooltip
+                ]
               }
             />
             {index + 1 < governanceActionTypes.length ? <Spacer y={2} /> : null}

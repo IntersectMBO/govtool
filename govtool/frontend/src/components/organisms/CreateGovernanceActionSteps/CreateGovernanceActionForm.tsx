@@ -7,7 +7,10 @@ import { GOVERNANCE_ACTION_FIELDS, Placeholders } from "@consts";
 import { useCreateGovernanceActionForm, useTranslation } from "@hooks";
 import { Field } from "@molecules";
 import { URL_REGEX, testIdFromLabel } from "@/utils";
-import { GovernanceActionField } from "@/types/governanceAction";
+import {
+  GovernanceActionField,
+  GovernanceActionType,
+} from "@/types/governanceAction";
 
 import { BgCard } from "../BgCard";
 import { ControlledField } from "../ControlledField";
@@ -40,7 +43,13 @@ export const CreateGovernanceActionForm = ({
   const isContinueButtonDisabled =
     // TODO: Provide better typing for GOVERNANCE_ACTION_FIELDS
     // to get rid of explicit type assertion
-    Object.keys(GOVERNANCE_ACTION_FIELDS[type!]).some(
+    Object.keys(
+      GOVERNANCE_ACTION_FIELDS[
+        type! as
+          | GovernanceActionType.InfoAction
+          | GovernanceActionType.TreasuryWithdrawals
+      ],
+    ).some(
       (field) => !watch(field as unknown as Parameters<typeof watch>[0]),
     ) || isError;
 
@@ -54,7 +63,13 @@ export const CreateGovernanceActionForm = ({
   };
 
   const renderGovernanceActionField = () =>
-    Object.entries(GOVERNANCE_ACTION_FIELDS[type!]).map(([key, field]) => {
+    Object.entries(
+      GOVERNANCE_ACTION_FIELDS[
+        type! as
+          | GovernanceActionType.InfoAction
+          | GovernanceActionType.TreasuryWithdrawals
+      ],
+    ).map(([key, field]) => {
       const fieldProps = {
         helpfulText: field.tipI18nKey ? t(field.tipI18nKey) : undefined,
         key,

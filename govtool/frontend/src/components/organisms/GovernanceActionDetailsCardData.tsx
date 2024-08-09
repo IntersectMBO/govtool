@@ -30,7 +30,7 @@ type GovernanceActionDetailsCardDataProps = {
   motivation?: string;
   rationale?: string;
   title?: string;
-  type: string;
+  label: string;
   url: string;
 };
 
@@ -51,7 +51,7 @@ export const GovernanceActionDetailsCardData = ({
   motivation,
   rationale,
   title,
-  type,
+  label,
   url,
 }: GovernanceActionDetailsCardDataProps) => {
   const { t } = useTranslation();
@@ -89,9 +89,9 @@ export const GovernanceActionDetailsCardData = ({
       />
       <GovernanceActionCardElement
         label={t("govActions.governanceActionType")}
-        text={type}
+        text={label}
         textVariant="pill"
-        dataTestId={`${getProposalTypeNoEmptySpaces(type)}-type`}
+        dataTestId={`${getProposalTypeNoEmptySpaces(label)}-type`}
       />
       <GovernanceActionsDatesBox
         createdDate={createdDate}
@@ -134,12 +134,12 @@ export const GovernanceActionDetailsCardData = ({
       />
       {details &&
         Object.keys(details).length !== 0 &&
-        Object.entries(details).map(([label, content]) => (
+        Object.entries(details).map(([detailLabel, content]) => (
           <GovernanceActionCardElement
-            isCopyButton={label.toLowerCase().includes("address")}
-            label={label}
+            isCopyButton={detailLabel.toLowerCase().includes("address")}
+            label={detailLabel}
             text={content}
-            dataTestId={testIdFromLabel(label)}
+            dataTestId={testIdFromLabel(detailLabel)}
           />
         ))}
       <GovernanceActionDetailsCardLinks links={links} />

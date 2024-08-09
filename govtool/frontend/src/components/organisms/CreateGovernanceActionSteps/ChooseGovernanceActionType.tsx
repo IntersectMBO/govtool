@@ -1,12 +1,12 @@
 import { Dispatch, SetStateAction } from "react";
 import { ActionRadio, Spacer, Typography } from "@atoms";
-import { GovernanceActionTooltip } from "@/consts";
 import { CenteredBoxBottomButtons } from "@molecules";
 import {
   useCreateGovernanceActionForm,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
+import { GovernanceActionTooltip } from "@/consts";
 import { GovernanceActionType } from "@/types/governanceAction";
 
 type ChooseGovernanceActionTypeProps = {

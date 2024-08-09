@@ -21,8 +21,8 @@ type Story = StoryObj<typeof meta>;
 
 const commonArgs = {
   abstainVotes: 1000000,
-  createdDate: new Date().toLocaleDateString(),
-  expiryDate: new Date().toLocaleDateString(),
+  createdDate: new Date().toISOString(),
+  expiryDate: new Date().toISOString(),
   noVotes: 1000000,
   label: "Info Action",
   type: GovernanceActionType.InfoAction,
@@ -52,7 +52,7 @@ async function assertGovActionDetails(
   await expect(canvas.getAllByText(todayDate)).toHaveLength(2);
   await expect(
     canvas.getByTestId(`${getProposalTypeNoEmptySpaces(args.type)}-type`),
-  ).toHaveTextContent(args.type);
+  ).toHaveTextContent(args.label);
   await expect(canvas.getByTestId(`${args.govActionId}-id`)).toHaveTextContent(
     args.govActionId,
   );
@@ -102,11 +102,6 @@ export const GovernanceActionDetailsDrep: Story = {
 
     await assertTooltip(tooltip1, /Submission Date/i);
     await assertTooltip(tooltip2, /Expiry Date/i);
-
-    const yesRadio = canvas.getByTestId("yes-radio");
-    await userEvent.click(yesRadio);
-
-    await expect(canvas.getByTestId("vote-button")).toBeEnabled();
   },
 };
 

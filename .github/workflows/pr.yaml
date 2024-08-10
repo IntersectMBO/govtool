@@ -25,7 +25,7 @@ jobs:
             qovery_container_name: govtool-analytics-dashboard
           - workdir: ./govtool/backend
             name: govtool-backend
-            dockerfile: ./govtool/backend/Dockerfile
+            dockerfile: ./govtool/backend/Dockerfile.qovery
             image: ghcr.io/${{ github.repository }}-govtool-backend
             qovery_container_name: govtool-backend
           - workdir: ./govtool/frontend

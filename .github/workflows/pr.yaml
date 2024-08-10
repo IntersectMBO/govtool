@@ -128,8 +128,8 @@ jobs:
           file: ${{ matrix.dockerfile }}
           tags: ${{ steps.image_lowercase.outputs.lowercase }}
           load: true
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+          # cache-from: type=local,src=/tmp/.buildx-cache
+          # cache-to: type=local,dest=/tmp/.buildx-cache
           
       - name: Scan Docker image with Dockle
         id: dockle
@@ -141,7 +141,7 @@ jobs:
             tar zxvf dockle_0.4.14_Linux-64bit.tar.gz
             sudo mv dockle /usr/local/bin
             docker images
-            docker image prune -f
+            docker image prune -af --filter "until=1h"
             docker save ${{ steps.image_lowercase.outputs.lowercase }} -o image.tar
             dockle --input image.tar --exit-level fatal --format json --output ${{ matrix.workdir }}/dockle_scan_output.json --input image.tar
             echo " dockle exited w/ $?"

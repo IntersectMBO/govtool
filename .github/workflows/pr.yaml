@@ -32,7 +32,7 @@ jobs:
           #   name: govtool-frontend
           #   dockerfile: ./govtool/frontend/Dockerfile
           #   image: ghcr.io/${{ github.repository }}-govtool-frontend
-            qovery_container_name: govtool-frontend
+          #   qovery_container_name: govtool-frontend
           - workdir: ./govtool/metadata-validation
             name: govtool-metadata-validation
             dockerfile: ./govtool/metadata-validation/Dockerfile

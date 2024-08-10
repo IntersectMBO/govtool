@@ -1,0 +1,193 @@
+name: Check,Build,Deploy
+
+on:
+  push:
+    branches:
+      - develop
+      - test
+      - staging
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  packages: write
+
+env:
+  ENVIRONMENT: ${{ (github.ref_name == 'main' && 'prod-govtool') || (github.ref_name == 'staging' && 'pre-prod-govtool') || (github.ref_name == 'test' && 'qa-govtool') || (github.ref_name == 'develop' && 'dev-govtool') }}
+
+jobs:
+  check-build-deploy:
+    strategy:
+      matrix:
+        include:
+          - workdir: ./govtool/analytics-dashboard
+            name: govtool-analytics-dashboard
+            dockerfile: ./govtool/analytics-dashboard/Dockerfile
+            image: ghcr.io/${{ github.repository }}-govtool-analytics-dashboard
+            qovery_container_name: govtool-analytics-dashboard
+          - workdir: ./govtool/backend
+            name: govtool-backend
+            dockerfile: ./govtool/backend/Dockerfile
+            image: ghcr.io/${{ github.repository }}-govtool-backend
+            qovery_container_name: govtool-backend
+          - workdir: ./govtool/frontend
+            name: govtool-frontend
+            dockerfile: ./govtool/frontend/Dockerfile
+            image: ghcr.io/${{ github.repository }}-govtool-frontend
+            qovery_container_name: govtool-frontend
+          - workdir: ./govtool/metadata-validation
+            name: govtool-metadata-validation
+            dockerfile: ./govtool/metadata-validation/Dockerfile
+            image: ghcr.io/${{ github.repository }}-govtool-metadata-validation
+            qovery_container_name: govtool-metadata-validation
+          - workdir: ./govtool/status-service
+            name: govtool-status-service
+            dockerfile: ./govtool/status-service/Dockerfile
+            image: ghcr.io/${{ github.repository }}-govtool-status-service
+            qovery_container_name: govtool-status-service
+          - workdir: ./gov-action-loader/backend
+            name: gov-action-loader-backend
+            dockerfile: ./gov-action-loader/backend/Dockerfile
+            image: ghcr.io/${{ github.repository }}-gov-action-loader-backend
+            qovery_container_name: gov-action-loader-backend
+          - workdir: ./gov-action-loader/frontend
+            name: gov-action-loader-frontend
+            dockerfile: ./gov-action-loader/frontend/Dockerfile
+            image: ghcr.io/${{ github.repository }}-gov-action-loader-frontend
+            qovery_container_name: gov-action-loader-frontend
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set TAG Environment Variable
+        id: set_tag
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "TAG=${{ github.sha }}" >> $GITHUB_ENV
+          else
+            echo "TAG=${{ github.ref_name }}-${{ github.sha }}" >> $GITHUB_ENV
+          fi
+
+      - name: Lint Dockerfile
+        id: hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          failure-threshold: error
+          format: json
+          dockerfile: ${{ matrix.dockerfile }}
+          # output-file: hadolint_output.json
+
+      - name: Save Hadolint output
+        id: save_hadolint_output
+        if: always()
+        run: cd ${{ matrix.workdir }} && echo "$HADOLINT_RESULTS" | jq '.' > hadolint_output.json
+
+      - name: Print Dockerfile lint output
+        run: |
+          cd ${{ matrix.workdir }}
+          echo "-----HADOLINT RESULT-----"
+          echo "Outcome: ${{ steps.hadolint.outcome }}"
+          echo "-----DETAILS--------"
+          cat hadolint_output.json
+          echo "--------------------"
+
+      - name: Code lint
+        id: code_lint
+        run: |
+          cd ${{ matrix.workdir }}
+          if [ ! -f lint.sh ]; then
+            echo "lint skipped" | tee code_lint_output.txt
+            exit 0
+          fi
+          set -o pipefail
+          sudo chmod +x lint.sh && ./lint.sh 2>&1 | tee code_lint_output.txt
+
+
+      - name: Unit tests
+        id: unit_tests
+        run: |
+          cd ${{ matrix.workdir }}
+          if [ ! -f unit-test.sh ]; then
+            echo "unit tests skipped" | tee code_lint_output.txt
+            exit 0
+          fi
+          set -o pipefail
+          sudo chmod +x unit-test.sh && ./unit-test.sh 2>&1 | tee unit_test_output.txt
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - id: image_lowercase
+        uses: ASzc/change-string-case-action@v6
+        with:
+          string: ${{ matrix.image }}
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.workdir }}
+          file: ${{ matrix.dockerfile }}
+          tags: ${{ steps.image_lowercase.outputs.lowercase }}:${{ env.TAG }}
+          load: true
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Scan Docker image with Dockle
+        id: dockle
+        run: |
+            wget https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
+            tar zxvf dockle_0.4.14_Linux-64bit.tar.gz
+            sudo mv dockle /usr/local/bin
+
+            dockle --exit-level fatal --format json --output ${{ matrix.workdir }}/dockle_scan_output.json ${{ steps.image_lowercase.outputs.lowercase }}:${{ env.TAG }}
+            echo " dockle exited w/ $?"
+            cat ${{ matrix.workdir }}/dockle_scan_output.json
+
+            echo "outcome=success" >> $GITHUB_OUTPUT
+
+      - name: Push Docker image to GHCR
+        run: |
+          docker push ${{ steps.image_lowercase.outputs.lowercase }}:${{ env.TAG }}
+
+      - name: Deploy with Qovery
+        env:
+          QOVERY_CLI_ACCESS_TOKEN: ${{secrets.QOVERY_CLI_ACCESS_TOKEN }}
+        run: |
+
+          echo "Deploying on $ENVIRONMENT"
+          echo "Organization - ${{ vars.ORGANIZATION }}"
+          echo "Project - ${{ vars.PROJECT }}"
+
+          # Download and install Qovery CLI
+          curl -s https://get.qovery.com | bash
+
+          qovery container list \
+          --organization ${{ vars.ORGANIZATION }} \
+          --project ${{ vars.PROJECT }} \
+          --environment $ENVIRONMENT
+
+          qovery container deploy \
+            --organization ${{ vars.ORGANIZATION }} \
+            --project ${{ vars.PROJECT }} \
+            --environment $ENVIRONMENT \
+            --container ${{ matrix.qovery_container_name }} \
+            --tag ${{ env.TAG }} \
+            --watch

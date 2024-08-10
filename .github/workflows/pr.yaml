@@ -141,6 +141,7 @@ jobs:
             tar zxvf dockle_0.4.14_Linux-64bit.tar.gz
             sudo mv dockle /usr/local/bin
             docker images
+            docker image prune -f
             docker save ${{ steps.image_lowercase.outputs.lowercase }} -o image.tar
             dockle --input image.tar --exit-level fatal --format json --output ${{ matrix.workdir }}/dockle_scan_output.json --input image.tar
             echo " dockle exited w/ $?"

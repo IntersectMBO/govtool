@@ -133,6 +133,8 @@ jobs:
           
       - name: Scan Docker image with Dockle
         id: dockle
+        env:
+          DOCKLE_HOST: "unix:///var/run/docker.sock"
         run: |
             wget https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
             tar zxvf dockle_0.4.14_Linux-64bit.tar.gz

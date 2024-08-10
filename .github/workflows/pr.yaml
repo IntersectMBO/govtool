@@ -136,11 +136,13 @@ jobs:
         env:
           DOCKLE_HOST: "unix:///var/run/docker.sock"
         run: |
+            set -ex
             wget https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
             tar zxvf dockle_0.4.14_Linux-64bit.tar.gz
             sudo mv dockle /usr/local/bin
-
-            dockle --exit-level fatal --format json --output ${{ matrix.workdir }}/dockle_scan_output.json ${{ steps.image_lowercase.outputs.lowercase }}
+            docker images
+            docker save ${{ steps.image_lowercase.outputs.lowercase }} -o image.tar
+            dockle --input image.tar --exit-level fatal --format json --output ${{ matrix.workdir }}/dockle_scan_output.json --input image.tar
             echo " dockle exited w/ $?"
             cat ${{ matrix.workdir }}/dockle_scan_output.json
 

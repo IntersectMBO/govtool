@@ -36,6 +36,17 @@ jobs:
             dockerfile: ./govtool/frontend/Dockerfile
             image: ghcr.io/${{ github.repository }}-govtool-frontend
             qovery_container_name: govtool-frontend
+            build_args: |
+              VITE_APP_ENV=${{ vars.VITE_APP_ENV }}
+              VITE_BASE_URL=${{ vars.VITE_BASE_URL }}
+              VITE_METADATA_API_URL=${{ vars.VITE_METADATA_API_URL }}
+              VITE_GTM_ID=${{ vars.VITE_GTM_ID }}
+              VITE_NETWORK_FLAG=${{ vars.VITE_NETWORK_FLAG }}
+              VITE_SENTRY_DSN=${{ vars.VITE_SENTRY_DSN }}
+              NPMRC_TOKEN=${{ vars.NPMRC_TOKEN }}
+              VITE_USERSNAP_SPACE_API_KEY=${{ vars.VITE_USERSNAP_SPACE_API_KEY }}
+              VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED=${{ vars.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED }}
+              VITE_PDF_API_URL=${{ vars.VITE_PDF_API_URL }}
           - workdir: ./govtool/metadata-validation
             name: govtool-metadata-validation
             dockerfile: ./govtool/metadata-validation/Dockerfile
@@ -142,6 +153,7 @@ jobs:
           load: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+          build-args: ${{ matrix.build_args || '' }}
 
       - name: Login to GHCR
         uses: docker/login-action@v2

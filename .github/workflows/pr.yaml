@@ -28,10 +28,10 @@ jobs:
             dockerfile: ./govtool/backend/Dockerfile.qovery
             image: ghcr.io/${{ github.repository }}-govtool-backend
             qovery_container_name: govtool-backend
-          - workdir: ./govtool/frontend
-            name: govtool-frontend
-            dockerfile: ./govtool/frontend/Dockerfile
-            image: ghcr.io/${{ github.repository }}-govtool-frontend
+          # - workdir: ./govtool/frontend
+          #   name: govtool-frontend
+          #   dockerfile: ./govtool/frontend/Dockerfile
+          #   image: ghcr.io/${{ github.repository }}-govtool-frontend
             qovery_container_name: govtool-frontend
           - workdir: ./govtool/metadata-validation
             name: govtool-metadata-validation

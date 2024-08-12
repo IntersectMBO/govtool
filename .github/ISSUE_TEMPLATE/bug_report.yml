@@ -2,7 +2,7 @@ name: 🐛 Bug report
 description: You found a bug!
 title: '🐛 '
 labels: ["🐛 Bug"]
-projects: ["IntersectMBO/projects/30", "IntersectMBO/projects/34"]
+projects: ["IntersectMBO/30", "IntersectMBO/34"]
 body:
   - type: markdown
     attributes:

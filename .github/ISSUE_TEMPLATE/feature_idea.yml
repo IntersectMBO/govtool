@@ -2,7 +2,7 @@ name: 💡 Feature idea
 description: Idea or request for some feature on the GovTool roadmap
 title: "💡 "
 labels: ["💡 Feature idea"]
-projects: ["IntersectMBO/projects/30", "IntersectMBO/projects/34"]
+projects: ["IntersectMBO/30", "IntersectMBO/34"]
 body:
   - type: markdown
     attributes:

@@ -25,7 +25,8 @@ changes.
 
 ### Changed
 
-- Changed stake key registration to use the newer Conway type of certificate 
+- Changed stake key registration to use the newer Conway type of certificate
+- Changed and improved issue templates and added accompanying workflows
 
 ## [sancho-v1.0.12](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.12) 2024-08-01
 

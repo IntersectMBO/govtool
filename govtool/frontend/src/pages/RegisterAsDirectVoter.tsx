@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
-import { Box, Link } from "@mui/material";
+import { CircularProgress, Link } from "@mui/material";
 
-import { Background, Typography } from "@atoms";
+import { Typography } from "@atoms";
 import { PATHS } from "@consts";
 import { useAppContext, useCardano, useModal } from "@context";
 import {
@@ -12,8 +12,7 @@ import {
   useTranslation,
   useWalletErrorModal,
 } from "@hooks";
-import { LinkWithIcon } from "@molecules";
-import { BgCard, DashboardTopNav, Footer } from "@organisms";
+import { CenteredBoxBottomButtons, CenteredBoxPageWrapper } from "@molecules";
 import {
   PROTOCOL_PARAMS_KEY,
   checkIsWalletConnected,
@@ -21,6 +20,7 @@ import {
   getItemFromLocalStorage,
   openInNewTab,
 } from "@utils";
+import { WrongRouteInfo } from "@organisms";
 
 export const RegisterAsDirectVoter = () => {
   const { cExplorerBaseUrl } = useAppContext();
@@ -89,69 +89,63 @@ export const RegisterAsDirectVoter = () => {
     voter?.isRegisteredAsDRep,
   ]);
 
-  const navigateToDashboard = useCallback(
-    () => navigate(PATHS.dashboard),
-    [navigate],
-  );
-
   useEffect(() => {
     if (!checkIsWalletConnected()) {
       navigate(PATHS.home);
     }
   }, []);
 
+  const pageTitle = t("directVoter.becomeDirectVoter");
+
+  if (!voter)
+    return (
+      <CenteredBoxPageWrapper pageTitle={pageTitle} hideBox>
+        <CircularProgress />
+      </CenteredBoxPageWrapper>
+    );
+
+  if (voter?.isRegisteredAsSoleVoter)
+    return (
+      <CenteredBoxPageWrapper pageTitle={pageTitle}>
+        <WrongRouteInfo
+          title={t(`directVoter.alreadyRegistered.title`)}
+          description={t(`directVoter.alreadyRegistered.description`)}
+        />
+      </CenteredBoxPageWrapper>
+    );
+
   return (
-    <Background isReverted>
-      <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+    <CenteredBoxPageWrapper pageTitle={pageTitle}>
+      <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
+        {t("directVoter.registerHeading")}
+      </Typography>
+      <Typography
+        fontWeight={400}
+        sx={{
+          mb: 7,
+          mt: isMobile ? 4 : 10,
+          textAlign: "center",
+          whiteSpace: "pre-line",
+        }}
+        variant="body1"
       >
-        <DashboardTopNav
-          isVotingPowerHidden
-          title={t("directVoter.becomeDirectVoter")}
+        <Trans
+          i18nKey="directVoter.registerDescription"
+          values={{ deposit: correctAdaFormat(epochParams.drep_deposit) }}
+          components={[
+            <Link
+              onClick={() => openInNewTab("https://sancho.network/")}
+              sx={{ cursor: "pointer" }}
+              key="0"
+            />,
+          ]}
         />
-        <LinkWithIcon
-          label={t("backToDashboard")}
-          onClick={navigateToDashboard}
-          sx={{
-            mb: isMobile ? 0 : 1.5,
-            ml: isMobile ? 2 : 5,
-            mt: isMobile ? 3 : 1.5,
-          }}
-        />
-        <BgCard
-          actionButtonLabel={t("continue")}
-          backButtonLabel={t("cancel")}
-          onClickActionButton={onRegister}
-          isLoadingActionButton={isLoading}
-        >
-          <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
-            {t("directVoter.registerHeading")}
-          </Typography>
-          <Typography
-            fontWeight={400}
-            sx={{
-              mb: 7,
-              mt: isMobile ? 4 : 10,
-              textAlign: "center",
-              whiteSpace: "pre-line",
-            }}
-            variant="body1"
-          >
-            <Trans
-              i18nKey="directVoter.registerDescription"
-              values={{ deposit: correctAdaFormat(epochParams.drep_deposit) }}
-              components={[
-                <Link
-                  onClick={() => openInNewTab("https://sancho.network/")}
-                  sx={{ cursor: "pointer" }}
-                  key="0"
-                />,
-              ]}
-            />
-          </Typography>
-        </BgCard>
-        <Footer />
-      </Box>
-    </Background>
+      </Typography>
+      <CenteredBoxBottomButtons
+        onActionButton={onRegister}
+        isLoadingActionButton={isLoading}
+        backButtonText={t("cancel")}
+      />
+    </CenteredBoxPageWrapper>
   );
 };

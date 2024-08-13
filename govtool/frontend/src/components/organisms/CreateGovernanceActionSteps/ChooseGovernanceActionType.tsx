@@ -1,14 +1,13 @@
 import { Dispatch, SetStateAction } from "react";
 import { ActionRadio, Spacer, Typography } from "@atoms";
-import { GovernanceActionTooltip } from "@consts";
+import { CenteredBoxBottomButtons } from "@molecules";
 import {
   useCreateGovernanceActionForm,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
+import { GovernanceActionTooltip } from "@/consts";
 import { GovernanceActionType } from "@/types/governanceAction";
-
-import { BgCard } from "../BgCard";
 
 type ChooseGovernanceActionTypeProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -61,18 +60,19 @@ export const ChooseGovernanceActionType = ({
     );
 
   return (
-    <BgCard
-      actionButtonLabel={t("continue")}
-      isActionButtonDisabled={isContinueButtonDisabled}
-      onClickActionButton={onClickContinue}
-      onClickBackButton={onClickBack}
-    >
+    <>
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("createGovernanceAction.chooseGATypeTitle")}
       </Typography>
       <Spacer y={isMobile ? 4.25 : 7.5} />
       {renderGovernanceActionTypes()}
       <Spacer y={isMobile ? 6 : 7.5} />
-    </BgCard>
+      <CenteredBoxBottomButtons
+        disableActionButton={isContinueButtonDisabled}
+        onActionButton={onClickContinue}
+        onBackButton={onClickBack}
+        backButtonText={t("cancel")}
+      />
+    </>
   );
 };

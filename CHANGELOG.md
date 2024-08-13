@@ -15,6 +15,7 @@ changes.
 - Unsancho GovTool [Issue 1637](https://github.com/IntersectMBO/govtool/issues/1637)
 - Add network metrics model to frontend service
 - Added workflows to add labels to issues
+- Make voting on governance actions enabled based on protocol version [Issue 1703](https://github.com/IntersectMBO/govtool/issues/1703)
 
 ### Fixed
 

@@ -39,10 +39,10 @@ export const AutomatedVotingOptions = ({
   txHash,
 }: AutomatedVotingOptionsProps) => {
   const { t } = useTranslation();
+  // TODO: Get network metrics from useAppContext
+  const { networkMetrics, fetchNetworkMetrics } = useGetNetworkMetrics();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  const { networkMetrics } = useGetNetworkMetrics();
 
   const isDelegatedToAbstain =
     currentDelegation ===
@@ -54,6 +54,10 @@ export const AutomatedVotingOptions = ({
     AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence;
   const isDelegationToNoConfidenceInProgress =
     delegationInProgress === AutomatedVotingOptionDelegationId.no_confidence;
+
+  useEffect(() => {
+    fetchNetworkMetrics();
+  }, []);
 
   useEffect(() => {
     const shouldBeSetOpen =

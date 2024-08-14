@@ -149,6 +149,7 @@ export const DelegateDashboardCard = ({
           ? delegateTx?.transactionHash ?? currentDelegation?.txHash
           : undefined
       }
+      type="delegate"
       {...cardProps}
     >
       {displayedDelegationId &&

@@ -51,7 +51,7 @@ export const ProposeGovActionDashboardCard = ({
         // common
         {
           children: t("learnMore"),
-          dataTestId: "learn-more-button",
+          dataTestId: "propose-gov-action-learn-more-button",
           onClick: () =>
             openInNewTab(
               "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/governance-actions/propose-a-governance-action",
@@ -64,6 +64,7 @@ export const ProposeGovActionDashboardCard = ({
       transactionId={createGovActionTx?.transactionHash}
       state={createGovActionTx ? "inProgress" : "default"}
       title={t("dashboard.cards.proposeGovernanceAction.title")}
+      type="propose-gov-action"
     />
   );
 };

@@ -77,6 +77,7 @@ export const EditDRepStorageInformation = ({
         <Step
           component={
             <Button
+              data-testid="metadata-download-button"
               onClick={onClickDownloadJson}
               size="extraLarge"
               startIcon={<img alt="download" src={ICONS.download} />}

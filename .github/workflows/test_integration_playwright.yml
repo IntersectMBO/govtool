@@ -106,8 +106,8 @@ jobs:
         id: register-project
         if: ${{success()}}
         run: |
-          chmod +x ./tests/scripts/register_report.sh
-          ./tests/scripts/register_report.sh
+          chmod +x .github/scripts/register_report.sh
+          .github/scripts/register_report.sh
       - if: steps.register-project.outputs.project_exists != 'true'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
@@ -119,8 +119,8 @@ jobs:
       - name: Generate report details
         id: report-details
         run: |
-          chmod +x ./tests/scripts/generate_report_details.sh
-          ./tests/scripts/generate_report_details.sh
+          chmod +x .github/scripts/generate_report_details.sh
+          .github/scripts/generate_report_details.sh
 
       - name: Build report
         uses: simple-elf/allure-report-action@master
@@ -137,8 +137,8 @@ jobs:
 
       - name: Generate Latest Report
         run: |
-          chmod +x ./tests/scripts/generate_latest_report_redirect.sh
-          ./tests/scripts/generate_latest_report_redirect.sh ${{steps.report-details.outputs.report_number}}
+          chmod +x .github/scripts/generate_latest_report_redirect.sh
+          .github/scripts/generate_latest_report_redirect.sh ${{steps.report-details.outputs.report_number}}
 
       - name: Deploy report to Github Pages
         uses: JamesIves/github-pages-deploy-action@v4

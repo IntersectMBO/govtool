@@ -27,6 +27,7 @@ jobs:
           host: ${{ secrets.TEST_STACK_SERVER_IP }}
           username: ec2-user
           key: ${{ secrets.TEST_STACK_SSH_KEY }}
+          command_timeout: 100m ## Haskell container build takes a lot of time.
           script: |
             REPO_URL="https://github.com/${{ github.repository }}"
             DEST_DIR="$HOME/Documents/govtool"

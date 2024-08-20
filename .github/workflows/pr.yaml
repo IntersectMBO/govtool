@@ -1,0 +1,223 @@
+name: Lint,Test,Security Checks
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - test
+      - staging
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+  packages: write
+
+jobs:
+  static-checks:
+    strategy:
+      matrix:
+        include:
+          - workdir: ./govtool/analytics-dashboard
+            name: govtool-analytics-dashboard
+            dockerfile: ./govtool/analytics-dashboard/Dockerfile
+            image: ghcr.io/${{ github.repository }}-govtool-analytics-dashboard
+            qovery_container_name: govtool-analytics-dashboard
+          - workdir: ./govtool/backend
+            name: govtool-backend
+            dockerfile: ./govtool/backend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-govtool-backend
+            qovery_container_name: govtool-backend
+          - workdir: ./govtool/frontend
+            name: govtool-frontend
+            dockerfile: ./govtool/frontend/Dockerfile
+            image: ghcr.io/${{ github.repository }}-govtool-frontend
+            qovery_container_name: govtool-frontend
+            build_args: |
+              VITE_APP_ENV=${{ vars.VITE_APP_ENV }}
+              VITE_BASE_URL=${{ vars.VITE_BASE_URL }}
+              VITE_METADATA_API_URL=${{ vars.VITE_METADATA_API_URL }}
+              VITE_GTM_ID=${{ vars.VITE_GTM_ID }}
+              VITE_NETWORK_FLAG=${{ vars.VITE_NETWORK_FLAG }}
+              VITE_SENTRY_DSN=${{ vars.VITE_SENTRY_DSN }}
+              NPMRC_TOKEN=${{ vars.NPMRC_TOKEN }}
+              VITE_USERSNAP_SPACE_API_KEY=${{ vars.VITE_USERSNAP_SPACE_API_KEY }}
+              VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED=${{ vars.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED }}
+              VITE_PDF_API_URL=${{ vars.VITE_PDF_API_URL }}
+          - workdir: ./govtool/metadata-validation
+            name: govtool-metadata-validation
+            dockerfile: ./govtool/metadata-validation/Dockerfile
+            image: ghcr.io/${{ github.repository }}-govtool-metadata-validation
+            qovery_container_name: govtool-metadata-validation
+          - workdir: ./govtool/status-service
+            name: govtool-status-service
+            dockerfile: ./govtool/status-service/Dockerfile
+            image: ghcr.io/${{ github.repository }}-govtool-status-service
+            qovery_container_name: govtool-status-service
+          - workdir: ./gov-action-loader/backend
+            name: gov-action-loader-backend
+            dockerfile: ./gov-action-loader/backend/Dockerfile
+            image: ghcr.io/${{ github.repository }}-gov-action-loader-backend
+            qovery_container_name: gov-action-loader-backend
+          - workdir: ./gov-action-loader/frontend
+            name: gov-action-loader-frontend
+            dockerfile: ./gov-action-loader/frontend/Dockerfile
+            image: ghcr.io/${{ github.repository }}-gov-action-loader-frontend
+            qovery_container_name: gov-action-loader-frontend
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Lint Dockerfile
+        id: hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          failure-threshold: error
+          format: json
+          dockerfile: ${{ matrix.dockerfile }}
+          # output-file: hadolint_output.json
+
+      - name: Save Hadolint output
+        id: save_hadolint_output
+        if: always()
+        run: cd ${{ matrix.workdir }} && echo "$HADOLINT_RESULTS" | jq '.' > hadolint_output.json
+
+      - name: Print Dockerfile lint output
+        run: |
+          cd ${{ matrix.workdir }}
+          echo "-----HADOLINT RESULT-----"
+          echo "Outcome: ${{ steps.hadolint.outcome }}"
+          echo "-----DETAILS--------"
+          cat hadolint_output.json
+          echo "--------------------"
+
+      - name: Code lint
+        id: code_lint
+        run: |
+          cd ${{ matrix.workdir }}
+          if [ ! -f lint.sh ]; then
+            echo "lint skipped" | tee code_lint_output.txt
+            exit 0
+          fi
+          set -o pipefail
+          sudo chmod +x lint.sh && ./lint.sh 2>&1 | tee code_lint_output.txt
+
+
+      - name: Unit tests
+        id: unit_tests
+        run: |
+          cd ${{ matrix.workdir }}
+          if [ ! -f unit-test.sh ]; then
+            echo "unit tests skipped" | tee code_lint_output.txt
+            exit 0
+          fi
+          set -o pipefail
+          sudo chmod +x unit-test.sh && ./unit-test.sh 2>&1 | tee unit_test_output.txt
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - id: image_lowercase
+        uses: ASzc/change-string-case-action@v6
+        with:
+          string: ${{ matrix.image }}:${{ github.sha }}
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.workdir }}
+          file: ${{ matrix.dockerfile }}
+          tags: ${{ steps.image_lowercase.outputs.lowercase }}
+          load: true
+          # cache-from: type=local,src=/tmp/.buildx-cache
+          # cache-to: type=local,dest=/tmp/.buildx-cache
+          build-args: ${{ matrix.build_args || '' }}
+          
+      - name: Scan Docker image with Dockle
+        id: dockle
+        run: |
+            set -ex
+            wget https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
+            tar zxvf dockle_0.4.14_Linux-64bit.tar.gz
+            sudo mv dockle /usr/local/bin
+            docker images
+            docker image prune -af --filter "until=1h"
+            docker save ${{ steps.image_lowercase.outputs.lowercase }} -o image.tar || :
+            touch ${{ matrix.workdir }}/dockle_scan_output.json
+            dockle --input image.tar --exit-level fatal --format json --output ${{ matrix.workdir }}/dockle_scan_output.json || :
+            rm -rf image.tar
+            echo " dockle exited w/ $?"
+            cat ${{ matrix.workdir }}/dockle_scan_output.json
+
+            echo "outcome=success" >> $GITHUB_OUTPUT
+
+      - name: Create PR comment
+        if: always()
+        uses: actions/github-script@v6
+        env:
+          HADOLINT_RESULT: ${{ steps.hadolint.outcome }}
+          CODE_LINT_RESULT: ${{ steps.code_lint.outcome }}
+          UNIT_TEST_RESULT: ${{ steps.unit_tests.outcome }}
+          DOCKLE_RESULT: ${{ steps.dockle.outcome }}
+        with:
+          script: |
+            const fs = require('fs');
+
+            const hadolintResult = fs.existsSync('${{ matrix.workdir }}/hadolint_output.json') ? fs.readFileSync('${{ matrix.workdir }}/hadolint_output.json', 'utf8') : 'No output';
+            const codeLintResult = fs.existsSync('${{ matrix.workdir }}/code_lint_output.txt') ? fs.readFileSync('${{ matrix.workdir }}/code_lint_output.txt', 'utf8') : 'No output';
+            const unitTestResult = fs.existsSync('${{ matrix.workdir }}/unit_test_output.txt') ? fs.readFileSync('${{ matrix.workdir }}/unit_test_output.txt', 'utf8') : 'No output';
+            const dockleScanResult = fs.existsSync('${{ matrix.workdir }}/dockle_scan_output.json') ? fs.readFileSync('${{ matrix.workdir }}/dockle_scan_output.json', 'utf8') : 'No output';
+
+            let commentBody = '';
+
+            if (process.env.HADOLINT_RESULT !== 'success') {
+              commentBody = `
+              :x: Dockerfile Lint (Hadolint) failed
+              \`\`\`json
+              ${hadolintResult}
+              \`\`\`
+                            `;
+                          } else if (process.env.CODE_LINT_RESULT !== 'success') {
+                            commentBody = `
+              :x: Code Lint failed
+              \`\`\`
+              ${codeLintResult}
+              \`\`\`
+                            `;
+                          } else if (process.env.UNIT_TEST_RESULT !== 'success') {
+                            commentBody = `
+              :x: Unit Tests failed
+              \`\`\`
+              ${unitTestResult}
+              \`\`\`
+                            `;
+                          } else if (process.env.DOCKLE_RESULT !== 'success') {
+                            commentBody = `
+              :x: Docker Image Scan (Dockle) failed
+              \`\`\`json
+              ${dockleScanResult}
+              \`\`\`
+                            `;
+                          } else {
+                            commentBody = ':white_check_mark: All checks succeeded';
+                          }
+
+                          const { owner, repo } = context.repo;
+                          const issue_number = context.issue.number;
+
+                          await github.rest.issues.createComment({
+                            owner,
+                            repo,
+                            issue_number,
+                            body: commentBody
+                          });

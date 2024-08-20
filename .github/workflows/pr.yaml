@@ -18,11 +18,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - workdir: ./govtool/analytics-dashboard
-            name: govtool-analytics-dashboard
-            dockerfile: ./govtool/analytics-dashboard/Dockerfile
-            image: ghcr.io/${{ github.repository }}-govtool-analytics-dashboard
-            qovery_container_name: govtool-analytics-dashboard
           - workdir: ./govtool/backend
             name: govtool-backend
             dockerfile: ./govtool/backend/Dockerfile.qovery
@@ -49,21 +44,6 @@ jobs:
             dockerfile: ./govtool/metadata-validation/Dockerfile
             image: ghcr.io/${{ github.repository }}-govtool-metadata-validation
             qovery_container_name: govtool-metadata-validation
-          - workdir: ./govtool/status-service
-            name: govtool-status-service
-            dockerfile: ./govtool/status-service/Dockerfile
-            image: ghcr.io/${{ github.repository }}-govtool-status-service
-            qovery_container_name: govtool-status-service
-          - workdir: ./gov-action-loader/backend
-            name: gov-action-loader-backend
-            dockerfile: ./gov-action-loader/backend/Dockerfile
-            image: ghcr.io/${{ github.repository }}-gov-action-loader-backend
-            qovery_container_name: gov-action-loader-backend
-          - workdir: ./gov-action-loader/frontend
-            name: gov-action-loader-frontend
-            dockerfile: ./gov-action-loader/frontend/Dockerfile
-            image: ghcr.io/${{ github.repository }}-gov-action-loader-frontend
-            qovery_container_name: gov-action-loader-frontend
 
     runs-on: ubuntu-latest
     steps:

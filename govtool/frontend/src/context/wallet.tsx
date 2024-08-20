@@ -63,7 +63,6 @@ import {
   setItemToLocalStorage,
   WALLET_LS_KEY,
 } from "@utils";
-import { getEpochParams } from "@services";
 import { useTranslation } from "@hooks";
 import { AutomatedVotingOptionDelegationId } from "@/types/automatedVotingOptions";
 
@@ -365,9 +364,6 @@ const CardanoProvider = (props: Props) => {
           setDRepIDBech32(dRepIDs?.dRepIDBech32 || "");
           setItemToLocalStorage(`${WALLET_LS_KEY}_name`, walletName);
 
-          const protocol = await getEpochParams();
-          setItemToLocalStorage(PROTOCOL_PARAMS_KEY, protocol);
-
           return { status: t("ok"), stakeKey: stakeKeySet };
         } catch (e) {
           Sentry.setTag("wallet-action", "enable");
@@ -618,7 +614,10 @@ const CardanoProvider = (props: Props) => {
           stakeCred = Credential.from_keyhash(stakeKeyHash);
         } else {
           stakeCred = Credential.from_keyhash(stakeKeyHash);
-          const stakeKeyRegCert = StakeRegistration.new(stakeCred);
+          const stakeKeyRegCert = StakeRegistration.new_with_coin(
+            stakeCred,
+            BigNum.from_str(`${epochParams.key_deposit}`),
+          );
           certBuilder.add(Certificate.new_stake_registration(stakeKeyRegCert));
         }
 

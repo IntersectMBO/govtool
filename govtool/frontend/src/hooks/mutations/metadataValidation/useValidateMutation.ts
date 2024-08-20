@@ -4,9 +4,9 @@ import { postValidate } from "@services";
 import { MUTATION_KEYS } from "@consts";
 import { MetadataValidationDTO } from "@models";
 
-export const useValidateMutation = () => {
+export const useValidateMutation = <MetadataType>() => {
   const { data, isLoading, mutateAsync } = useMutation({
-    mutationFn: (body: MetadataValidationDTO) => postValidate(body),
+    mutationFn: (body: MetadataValidationDTO) => postValidate<MetadataType>(body),
     mutationKey: [MUTATION_KEYS.postValidateKey],
   });
 

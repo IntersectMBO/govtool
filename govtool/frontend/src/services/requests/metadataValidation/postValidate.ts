@@ -9,8 +9,8 @@ const METADATA_API = axios.create({
   timeout: TIMEOUT_IN_SECONDS,
 });
 
-export const postValidate = async (body: MetadataValidationDTO) => {
-  const response = await METADATA_API.post<ValidateMetadataResult>(
+export const postValidate = async <MetadataType>(body: MetadataValidationDTO) => {
+  const response = await METADATA_API.post<ValidateMetadataResult<MetadataType>>(
     `/validate`,
     body,
   );

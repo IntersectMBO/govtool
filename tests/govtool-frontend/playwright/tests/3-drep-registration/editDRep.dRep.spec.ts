@@ -47,7 +47,7 @@ test.describe("Validation of edit dRep Form", () => {
     const editDRepPage = new EditDRepPage(page);
     await editDRepPage.goto();
 
-    await editDRepPage.addLinkBtn.click();
+    await page.waitForTimeout(3_000); // wait until dRep information load properly
 
     for (let i = 0; i < 100; i++) {
       await editDRepPage.inValidateForm(

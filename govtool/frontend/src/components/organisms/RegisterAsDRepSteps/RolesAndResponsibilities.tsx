@@ -4,6 +4,7 @@ import { Link } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
+import { CenteredBoxBottomButtons } from "@molecules";
 import {
   correctAdaFormat,
   getItemFromLocalStorage,
@@ -11,13 +12,9 @@ import {
   PROTOCOL_PARAMS_KEY,
 } from "@utils";
 
-import { BgCard } from "..";
-
 export const RolesAndResponsibilities = ({
-  onClickCancel,
   setStep,
 }: {
-  onClickCancel: () => void;
   setStep: Dispatch<SetStateAction<number>>;
 }) => {
   const { t } = useTranslation();
@@ -31,13 +28,7 @@ export const RolesAndResponsibilities = ({
     openInNewTab("https://sancho.network/roles/drep");
 
   return (
-    <BgCard
-      actionButtonLabel={t("continue")}
-      backButtonLabel={t("cancel")}
-      onClickActionButton={onClickContinue}
-      onClickBackButton={onClickCancel}
-      sx={{ pb: isMobile ? undefined : 5, pt: isMobile ? 4 : 8 }}
-    >
+    <>
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("registration.rolesAndResponsibilitiesTitle")}
       </Typography>
@@ -63,6 +54,10 @@ export const RolesAndResponsibilities = ({
           values={{ deposit: correctAdaFormat(deposit.drep_deposit) }}
         />
       </Typography>
-    </BgCard>
+      <CenteredBoxBottomButtons
+        onActionButton={onClickContinue}
+        backButtonText={t("cancel")}
+      />
+    </>
   );
 };

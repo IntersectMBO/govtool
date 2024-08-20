@@ -137,8 +137,8 @@ scripts/govtool/dev-postgres_user
 scripts/govtool/dev-postgres_password
 
 # nodejs/yarn
-
 node_modules
+.yarn
 
 # sonar scanner
 .scannerwork/

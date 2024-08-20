@@ -14,6 +14,8 @@ changes.
 
 - Unsancho GovTool [Issue 1637](https://github.com/IntersectMBO/govtool/issues/1637)
 - Add network metrics model to frontend service
+- Added workflows to add labels to issues
+- Make voting on governance actions enabled based on protocol version [Issue 1703](https://github.com/IntersectMBO/govtool/issues/1703)
 
 ### Fixed
 
@@ -21,10 +23,15 @@ changes.
 - Remove incorrect @value property to fix validating the metadata body [Issue 1687](https://github.com/IntersectMBO/govtool/issues/1687)
 - Fix PDF not enabled in default deployments
 - Fix displaying incorrect connected to Voltaire GovTool network
+- Runtime error at /edit_drep when metadata incorrect [Issue 1675](https://github.com/IntersectMBO/govtool/issues/1675)
+- Restrict access to registration routes when user s already registered and to retirement routes when the use is not registered [Issue 1183](https://github.com/IntersectMBO/govtool/issues/1183)
+- Add missing data-testid attributes [Issue 1050](https://github.com/IntersectMBO/govtool/issues/1050)
 
 ### Changed
 
--
+- Changed stake key registration to use the newer Conway type of certificate
+- Changed and improved issue templates
+- Changed wording and image in base README
 
 ## [sancho-v1.0.12](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.12) 2024-08-01
 

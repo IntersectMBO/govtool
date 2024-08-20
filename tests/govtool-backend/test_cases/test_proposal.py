@@ -9,7 +9,7 @@ def validate_proposal(proposal: Proposal) -> bool:
         assert key in proposal, f"Expected Proposal.{key} to be present"
         assert isinstance(
             proposal[key], Proposal.__annotations__[key]
-        ), f"drepInfo.{key} should be of type {Proposal.__annotations__[key]} got {type(proposal[key])}"
+        ), f"proposal.{key} should be of type {Proposal.__annotations__[key]} got {type(proposal[key])}"
     return True
 
 

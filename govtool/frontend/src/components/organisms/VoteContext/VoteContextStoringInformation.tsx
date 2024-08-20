@@ -78,6 +78,7 @@ export const VoteContextStoringInformation = ({
         <Step
           component={
             <Button
+              data-testid="metadata-download-button"
               onClick={onClickDownloadJson}
               size="extraLarge"
               startIcon={<img alt="download" src={ICONS.download} />}
@@ -127,6 +128,7 @@ export const VoteContextStoringInformation = ({
           component={
             <ControlledField.Input
               {...{ control, errors }}
+              dataTestId="metadata-url-input"
               name="storingURL"
               layoutStyles={{ mt: 1.5 }}
               placeholder={t(

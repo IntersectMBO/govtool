@@ -3,7 +3,8 @@ import { GovernanceActionDetailsCard } from "@organisms";
 import { expect, jest } from "@storybook/jest";
 import type { Meta, StoryObj } from "@storybook/react";
 import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
-import { getProposalTypeNoEmptySpaces } from "@/utils";
+import { formatDisplayDate, getProposalTypeNoEmptySpaces } from "@/utils";
+import { GovernanceActionType } from "@/types/governanceAction";
 
 const meta = {
   title: "Example/GovernanceActionDetailsCard",
@@ -20,10 +21,11 @@ type Story = StoryObj<typeof meta>;
 
 const commonArgs = {
   abstainVotes: 1000000,
-  createdDate: new Date().toLocaleDateString(),
-  expiryDate: new Date().toLocaleDateString(),
+  createdDate: new Date().toISOString(),
+  expiryDate: new Date().toISOString(),
   noVotes: 1000000,
-  type: "Gov Type",
+  label: "Info Action",
+  type: GovernanceActionType.InfoAction,
   url: "https://exampleurl.com",
   yesVotes: 1000000,
   createdEpochNo: 302,
@@ -46,11 +48,11 @@ async function assertGovActionDetails(
   canvas: ReturnType<typeof within>,
   args: React.ComponentProps<typeof GovernanceActionDetailsCard>,
 ) {
-  const todayDate = new Date().toLocaleDateString();
+  const todayDate = formatDisplayDate(new Date());
   await expect(canvas.getAllByText(todayDate)).toHaveLength(2);
   await expect(
     canvas.getByTestId(`${getProposalTypeNoEmptySpaces(args.type)}-type`),
-  ).toHaveTextContent(args.type);
+  ).toHaveTextContent(args.label);
   await expect(canvas.getByTestId(`${args.govActionId}-id`)).toHaveTextContent(
     args.govActionId,
   );
@@ -100,11 +102,6 @@ export const GovernanceActionDetailsDrep: Story = {
 
     await assertTooltip(tooltip1, /Submission Date/i);
     await assertTooltip(tooltip2, /Expiry Date/i);
-
-    const yesRadio = canvas.getByTestId("yes-radio");
-    await userEvent.click(yesRadio);
-
-    await expect(canvas.getByTestId("vote-button")).toBeEnabled();
   },
 };
 

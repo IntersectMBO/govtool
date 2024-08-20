@@ -11,7 +11,6 @@ import {
 
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
-  formatDisplayDate,
   getFullGovActionId,
   getProposalTypeLabel,
   getProposalTypeNoEmptySpaces,
@@ -104,8 +103,8 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           isSliderCard
         />
         <GovernanceActionsDatesBox
-          createdDate={formatDisplayDate(createdDate)}
-          expiryDate={formatDisplayDate(expiryDate)}
+          createdDate={createdDate}
+          expiryDate={expiryDate}
           expiryEpochNo={expiryEpochNo}
           createdEpochNo={createdEpochNo}
           isSliderCard

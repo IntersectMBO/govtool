@@ -1,4 +1,4 @@
-import { Page, expect } from "@playwright/test";
+import { Locator, Page, expect } from "@playwright/test";
 import { IDRep } from "@types";
 import environments from "lib/constants/environments";
 import { withTxConfirmation } from "lib/transaction.decorator";
@@ -78,19 +78,27 @@ export default class DRepDirectoryPage {
       (filter) => !filters.includes(filter)
     );
 
+    const dRepList = await this.getAllListedDReps();
+
     for (const filter of excludedFilters) {
-      await expect(
-        this.page.getByText(filter, { exact: true }),
-        `Expected "${filter}" to be excluded, but it's included`
-      ).toHaveCount(1);
+      await expect(this.page.getByTestId(`${filter}-checkbox`)).toHaveCount(1);
     }
 
-    for (const filter of filters) {
-      expect(
-        (await this.page.getByText(filter, { exact: true }).all(),
-        `Expected to find "${filter}"`).length
-      ).toBeGreaterThanOrEqual(0);
+    for (const dRep of dRepList) {
+      const hasFilter = await this._validateTypeFiltersInDRep(dRep, filters);
+      expect(hasFilter).toBe(true);
     }
+  }
+
+  async _validateTypeFiltersInDRep(
+    dRepCard: Locator,
+    filters: string[]
+  ): Promise<boolean> {
+    const dRepType = await dRepCard
+      .locator('[data-testid$="-pill"]')
+      .textContent();
+
+    return filters.includes(dRepType);
   }
 
   async sortDRep(option: string) {}
@@ -111,16 +119,14 @@ export default class DRepDirectoryPage {
     // API validation
     for (let i = 0; i <= dRepList.length - 2; i++) {
       const isValid = validationFn(dRepList[i], dRepList[i + 1]);
-      expect(isValid, "API Sorting validation failed").toBe(true);
+      expect(isValid).toBe(true);
     }
 
     // Frontend validation
     const dRepListFE = await this.getAllListedDRepIds();
 
     for (let i = 0; i <= dRepListFE.length - 1; i++) {
-      expect(dRepListFE[i], "Frontend validation failed").toHaveText(
-        dRepList[i].view
-      );
+      await expect(dRepListFE[i]).toHaveText(dRepList[i].view);
     }
   }
   getDRepCard(dRepId: string) {

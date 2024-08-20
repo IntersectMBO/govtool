@@ -110,7 +110,7 @@ jobs:
           load: true
           # cache-from: type=local,src=/tmp/.buildx-cache
           # cache-to: type=local,dest=/tmp/.buildx-cache
-          build_args: |
+          build-args: |
             VITE_APP_ENV=${{ secrets.VITE_APP_ENV }}
             VITE_BASE_URL=${{ secrets.VITE_BASE_URL }}
             VITE_METADATA_API_URL=${{ secrets.VITE_METADATA_API_URL }}

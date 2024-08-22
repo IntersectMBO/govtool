@@ -12,3 +12,15 @@ export * from "./placeholders";
 export * from "./queryKeys";
 
 export const DRAWER_WIDTH = 268;
+export const NETWORK_NAMES = {
+  sanchonet: "SanchoNet",
+  preview: "Preview",
+  testnet: "TestNet",
+  mainnet: "MainNet",
+};
+export const CEXPLORER_BASE_URLS = {
+  sanchonet: "https://sancho.cexplorer.io",
+  preview: "https://preview.cexplorer.io",
+  testnet: "https://testnet.cexplorer.io",
+  mainnet: "https://cexplorer.io",
+};

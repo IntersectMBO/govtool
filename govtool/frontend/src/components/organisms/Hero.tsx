@@ -34,7 +34,7 @@ export const Hero = () => {
   }, [screenWidth]);
 
   const onClickVotingPower = () =>
-    openInNewTab("https://docs.sanchogov.tools/faqs/what-is-voting-power");
+    openInNewTab("https://docs.gov.tools/faqs/what-is-voting-power");
 
   return (
     <Box

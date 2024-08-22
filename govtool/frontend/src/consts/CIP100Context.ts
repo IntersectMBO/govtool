@@ -1,5 +1,4 @@
 export const CIP_100_CONTEXT = {
-  "@language": "en-us",
   CIP100:
     "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#",
   hashAlgorithm: "CIP100:hashAlgorithm",

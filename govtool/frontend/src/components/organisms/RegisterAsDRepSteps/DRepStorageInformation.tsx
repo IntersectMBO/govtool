@@ -9,8 +9,8 @@ import {
   useTranslation,
   useScreenDimension,
 } from "@hooks";
-import { Step } from "@molecules";
-import { BgCard, ControlledField } from "@organisms";
+import { CenteredBoxBottomButtons, Step } from "@molecules";
+import { ControlledField } from "@organisms";
 import { openInNewTab, ellipsizeText } from "@utils";
 
 type StorageInformationProps = {
@@ -36,9 +36,7 @@ export const DRepStorageInformation = ({
   const fileName = getValues("dRepName");
 
   const openGuideAboutStoringInformation = () =>
-    openInNewTab(
-      "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor",
-    );
+    openInNewTab("https://docs.gov.tools/faqs/how-to-create-a-metadata-anchor");
 
   const isActionButtonDisabled = !watch("storingURL") || !!errors.storingURL;
 
@@ -49,15 +47,7 @@ export const DRepStorageInformation = ({
   }, []);
 
   return (
-    <BgCard
-      actionButtonLabel={t("submit")}
-      actionButtonDataTestId="register-button"
-      backButtonLabel={t("back")}
-      isActionButtonDisabled={isActionButtonDisabled}
-      isLoadingActionButton={isRegistrationAsDRepLoading}
-      onClickActionButton={registerAsDrep}
-      onClickBackButton={onClickBack}
-    >
+    <>
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("registration.storingInformationTitle")}
       </Typography>
@@ -129,6 +119,14 @@ export const DRepStorageInformation = ({
           stepNumber={3}
         />
       </Box>
-    </BgCard>
+      <CenteredBoxBottomButtons
+        onActionButton={registerAsDrep}
+        actionButtonText={t("submit")}
+        actionButtonDataTestId="submit-button"
+        disableActionButton={isActionButtonDisabled}
+        isLoadingActionButton={isRegistrationAsDRepLoading}
+        onBackButton={onClickBack}
+      />
+    </>
   );
 };

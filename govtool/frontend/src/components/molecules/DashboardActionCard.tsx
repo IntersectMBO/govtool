@@ -4,6 +4,7 @@ import { FC, ReactNode } from "react";
 import { Button, LoadingButtonProps, Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
+import { useAppContext } from "@context";
 
 import { Card } from "./Card";
 
@@ -18,36 +19,42 @@ export type DashboardActionCardProps = {
   state?: "active" | "inProgress" | "default";
   title?: ReactNode;
   transactionId?: string | null;
+  type:
+    | "delegate"
+    | "d-rep"
+    | "direct-voter"
+    | "list-gov-actions"
+    | "propose-gov-action";
   isSpaceBetweenButtons?: boolean;
 };
 
 export const DashboardActionCard: FC<DashboardActionCardProps> = ({
-  ...props
+  buttons,
+  children,
+  description,
+  imageURL,
+  isLoading = false,
+  isInProgressOnCard = true,
+  state = "default",
+  title,
+  type,
+  transactionId,
+  isSpaceBetweenButtons,
 }) => {
   const { t } = useTranslation();
-  const {
-    buttons,
-    children,
-    description,
-    imageURL,
-    isLoading = false,
-    isInProgressOnCard = true,
-    state = "default",
-    title,
-    transactionId,
-    isSpaceBetweenButtons,
-  } = props;
+  const { cExplorerBaseUrl } = useAppContext();
 
   const { screenWidth } = useScreenDimension();
 
   const onClickShowTransaction = () =>
-    openInNewTab(`https://sancho.cexplorer.io/tx/${transactionId}`);
+    openInNewTab(`${cExplorerBaseUrl}/tx/${transactionId}`);
 
   return (
     <Card
       {...(state === "inProgress" && {
         border: true,
         label: t("inProgress"),
+        labelDataTestId: `${type}-in-progress`,
         variant: "warning",
       })}
       sx={{

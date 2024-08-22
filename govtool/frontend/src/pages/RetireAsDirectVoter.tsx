@@ -1,22 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
-import { Box, Link } from "@mui/material";
+import { CircularProgress, Link } from "@mui/material";
 
-import { Background, Typography } from "@atoms";
+import { Typography } from "@atoms";
 import { PATHS } from "@consts";
-import { useCardano, useModal } from "@context";
+import { useCardano, useModal, useAppContext } from "@context";
 import {
   useGetVoterInfo,
   useScreenDimension,
   useTranslation,
   useWalletErrorModal,
 } from "@hooks";
-import { LinkWithIcon } from "@molecules";
-import { BgCard, DashboardTopNav, Footer } from "@organisms";
+import { CenteredBoxBottomButtons, CenteredBoxPageWrapper } from "@molecules";
 import { checkIsWalletConnected, correctAdaFormat, openInNewTab } from "@utils";
+import { WrongRouteInfo } from "@organisms";
 
 export const RetireAsDirectVoter = () => {
+  const { cExplorerBaseUrl } = useAppContext();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
@@ -47,7 +48,7 @@ export const RetireAsDirectVoter = () => {
             status: "success",
             title: t("modals.retirement.title"),
             message: t("modals.retirement.message"),
-            link: `https://sancho.cexplorer.io/tx/${result}`,
+            link: `${cExplorerBaseUrl}/tx/${result}`,
             buttonText: t("modals.common.goToDashboard"),
             dataTestId: "retirement-transaction-submitted-modal",
             onSubmit: () => {
@@ -75,66 +76,63 @@ export const RetireAsDirectVoter = () => {
     voter?.deposit,
   ]);
 
-  const navigateToDashboard = useCallback(
-    () => navigate(PATHS.dashboard),
-    [navigate],
-  );
-
   useEffect(() => {
     if (!checkIsWalletConnected()) {
       navigate(PATHS.home);
     }
   }, []);
 
-  return (
-    <Background isReverted>
-      <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
-      >
-        <DashboardTopNav title={t("directVoter.retireDirectVoter")} />
-        <LinkWithIcon
-          label={t("backToDashboard")}
-          onClick={navigateToDashboard}
-          sx={{
-            mb: isMobile ? 0 : 1.5,
-            ml: isMobile ? 2 : 5,
-            mt: isMobile ? 3 : 1.5,
-          }}
+  const pageTitle = t("directVoter.retireDirectVoter");
+
+  if (!voter)
+    return (
+      <CenteredBoxPageWrapper pageTitle={pageTitle} showVotingPower hideBox>
+        <CircularProgress />
+      </CenteredBoxPageWrapper>
+    );
+
+  if (!voter.isRegisteredAsSoleVoter)
+    return (
+      <CenteredBoxPageWrapper pageTitle={pageTitle} showVotingPower>
+        <WrongRouteInfo
+          title={t("directVoter.notDirectVoter.title")}
+          description={t("directVoter.notDirectVoter.description")}
         />
-        <BgCard
-          actionButtonLabel={t("continue")}
-          backButtonLabel={t("cancel")}
-          onClickActionButton={onRetire}
-          isLoadingActionButton={isLoading}
-        >
-          <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
-            {t("directVoter.retirementHeading")}
-          </Typography>
-          <Typography
-            fontWeight={400}
-            sx={{
-              mb: 7,
-              mt: isMobile ? 4 : 10,
-              textAlign: "center",
-              whiteSpace: "pre-line",
-            }}
-            variant="body1"
-          >
-            <Trans
-              i18nKey="directVoter.retirementDescription"
-              values={{ deposit: correctAdaFormat(voter?.deposit) }}
-              components={[
-                <Link
-                  onClick={() => openInNewTab("https://sancho.network/")}
-                  sx={{ cursor: "pointer", textDecoration: "none" }}
-                  key="0"
-                />,
-              ]}
-            />
-          </Typography>
-        </BgCard>
-        <Footer />
-      </Box>
-    </Background>
+      </CenteredBoxPageWrapper>
+    );
+
+  return (
+    <CenteredBoxPageWrapper pageTitle={pageTitle} showVotingPower>
+      <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
+        {t("directVoter.retirementHeading")}
+      </Typography>
+      <Typography
+        fontWeight={400}
+        sx={{
+          mb: 7,
+          mt: isMobile ? 4 : 10,
+          textAlign: "center",
+          whiteSpace: "pre-line",
+        }}
+        variant="body1"
+      >
+        <Trans
+          i18nKey="directVoter.retirementDescription"
+          values={{ deposit: correctAdaFormat(voter?.deposit) }}
+          components={[
+            <Link
+              onClick={() => openInNewTab("https://sancho.network/")}
+              sx={{ cursor: "pointer", textDecoration: "none" }}
+              key="0"
+            />,
+          ]}
+        />
+      </Typography>
+      <CenteredBoxBottomButtons
+        onActionButton={onRetire}
+        isLoadingActionButton={isLoading}
+        backButtonText={t("cancel")}
+      />
+    </CenteredBoxPageWrapper>
   );
 };

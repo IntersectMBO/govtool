@@ -14,14 +14,12 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import {
-  formatDisplayDate,
-  getShortenedGovActionId,
-  getProposalTypeLabel,
-} from "@utils";
+import { getShortenedGovActionId, getProposalTypeLabel } from "@utils";
 import { GovernanceActionDetailsCard } from "@organisms";
 import { Breadcrumbs } from "@molecules";
 
+// TODO: Refactor: GovernanceActionDetals and DashboardGovernanceActionDetails are almost identical
+// and should be unified
 export const DashboardGovernanceActionDetails = () => {
   const { voter } = useGetVoterInfo();
   const { pendingTransaction, isEnableLoading } = useCardano();
@@ -37,7 +35,13 @@ export const DashboardGovernanceActionDetails = () => {
     state ? state.txHash : data?.proposal.txHash ?? "",
     state ? state.index : data?.proposal.index ?? "",
   );
+
+  // TODO: Refactor me
   const title = state ? state?.title : data?.proposal?.title;
+  const label = state
+    ? getProposalTypeLabel(state.type)
+    : getProposalTypeLabel(data.proposal.type);
+  const type = state ? state.type : data.proposal.type;
 
   return (
     <Box
@@ -104,22 +108,14 @@ export const DashboardGovernanceActionDetails = () => {
             abstainVotes={
               state ? state.abstainVotes : data.proposal.abstainVotes
             }
-            createdDate={
-              state
-                ? formatDisplayDate(state.createdDate)
-                : formatDisplayDate(data.proposal.createdDate)
-            }
+            createdDate={state ? state.createdDate : data.proposal.createdDate}
             createdEpochNo={
               state ? state.createdEpochNo : data.proposal.createdEpochNo
             }
             isDataMissing={
               state ? state.metadataStatus : data?.proposal.metadataStatus
             }
-            expiryDate={
-              state
-                ? formatDisplayDate(state.expiryDate)
-                : formatDisplayDate(data?.proposal.expiryDate)
-            }
+            expiryDate={state ? state.expiryDate : data?.proposal.expiryDate}
             expiryEpochNo={
               state ? state.expiryEpochNo : data.proposal.expiryEpochNo
             }
@@ -127,14 +123,11 @@ export const DashboardGovernanceActionDetails = () => {
               voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
             }
             noVotes={state ? state.noVotes : data.proposal.noVotes}
-            type={
-              state
-                ? getProposalTypeLabel(state.type)
-                : getProposalTypeLabel(data.proposal.type)
-            }
+            type={type}
+            label={label}
+            title={title}
             details={state ? state.details : data.proposal.details}
             url={state ? state.url : data.proposal.url}
-            title={title}
             links={state ? state?.references : data.proposal?.references}
             abstract={state ? state?.abstract : data.proposal?.abstract}
             motivation={state ? state?.motivation : data.proposal?.motivation}

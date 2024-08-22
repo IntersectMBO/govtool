@@ -17,7 +17,7 @@ export const VoteContextTerms = ({ setStep, onCancel }: StoreDataInfoProps) => {
   const { isMobile } = useScreenDimension();
 
   // TODO: change link when available
-  const openLink = () => openInNewTab("https://docs.sanchogov.tools");
+  const openLink = () => openInNewTab("https://docs.gov.tools");
 
   const isContinueDisabled = !watch("terms");
 

@@ -35,14 +35,14 @@ export const Footer = () => {
   const { openFeedbackWindow } = useUsersnapApi();
 
   const onClickHelp = () =>
-    openInNewTab("https://docs.sanchogov.tools/support/get-help-in-discord");
+    openInNewTab("https://docs.gov.tools/support/get-help-in-discord");
 
   const onClickPrivacyPolicy = () =>
-    openInNewTab("https://docs.sanchogov.tools/legal/privacy-policy");
+    openInNewTab("https://docs.gov.tools/legal/privacy-policy");
 
   // TODO: change term of service link
   const onClickTermOfService = () =>
-    openInNewTab("https://docs.sanchogov.tools/legal/terms-and-conditions");
+    openInNewTab("https://docs.gov.tools/legal/terms-and-conditions");
 
   const onClickFeedback = () => openFeedbackWindow();
 

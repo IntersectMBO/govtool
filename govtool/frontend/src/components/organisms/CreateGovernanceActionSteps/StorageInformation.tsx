@@ -9,8 +9,8 @@ import {
   useTranslation,
   useScreenDimension,
 } from "@hooks";
-import { Step } from "@molecules";
-import { BgCard, ControlledField } from "@organisms";
+import { CenteredBoxBottomButtons, Step } from "@molecules";
+import { ControlledField } from "@organisms";
 import {
   URL_REGEX,
   ellipsizeText,
@@ -39,9 +39,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
   const fileName = getValues("governance_action_type") as string;
 
   const openGuideAboutStoringInformation = () =>
-    openInNewTab(
-      "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor",
-    );
+    openInNewTab("https://docs.gov.tools/faqs/how-to-create-a-metadata-anchor");
 
   const isActionButtonDisabled = !watch("storingURL") || !!errors.storingURL;
 
@@ -52,14 +50,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
   }, []);
 
   return (
-    <BgCard
-      actionButtonLabel={t("continue")}
-      backButtonLabel={t("back")}
-      isActionButtonDisabled={isActionButtonDisabled}
-      onClickActionButton={createGovernanceAction}
-      onClickBackButton={onClickBack}
-      isLoadingActionButton={isLoading}
-    >
+    <>
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("createGovernanceAction.storingInformationTitle")}
       </Typography>
@@ -144,6 +135,13 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
           stepNumber={3}
         />
       </Box>
-    </BgCard>
+      <CenteredBoxBottomButtons
+        onActionButton={createGovernanceAction}
+        disableActionButton={isActionButtonDisabled}
+        isLoadingActionButton={isLoading}
+        onBackButton={onClickBack}
+        backButtonText={t("cancel")}
+      />
+    </>
   );
 };

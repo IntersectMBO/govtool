@@ -28,10 +28,10 @@ export const DirectVoterDashboardCard = ({
   // learn more button
   const learnMoreButton: LoadingButtonProps = {
     children: t("learnMore"),
-    dataTestId: "learn-more-button",
+    dataTestId: "direct-voter-learn-more-button",
     onClick: () =>
       openInNewTab(
-        "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/direct-voting",
+        "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/direct-voting",
       ),
   };
 
@@ -98,7 +98,7 @@ export const DirectVoterDashboardCard = ({
             dataTestId: "learn-more-button",
             onClick: () =>
               openInNewTab(
-                "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/dreps/retire-as-a-drep",
+                "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/dreps/retire-as-a-drep",
               ),
           },
         ],
@@ -135,6 +135,10 @@ export const DirectVoterDashboardCard = ({
   })();
 
   return (
-    <DashboardActionCard imageURL={IMAGES.directVoterImage} {...cardProps} />
+    <DashboardActionCard
+      imageURL={IMAGES.directVoterImage}
+      type="direct-voter"
+      {...cardProps}
+    />
   );
 };

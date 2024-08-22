@@ -22,7 +22,7 @@ const urlCannotBeFound = {
   status: "warning",
   title: I18n.t("modals.urlCannotBeFound.title"),
   message: I18n.t("modals.urlCannotBeFound.message"),
-  link: "https://docs.sanchogov.tools",
+  link: "https://docs.gov.tools",
   linkText: I18n.t("modals.urlCannotBeFound.linkText"),
   buttonText: I18n.t("modals.urlCannotBeFound.buttonText"),
   cancelText: I18n.t("modals.urlCannotBeFound.cancelRegistrationText"),

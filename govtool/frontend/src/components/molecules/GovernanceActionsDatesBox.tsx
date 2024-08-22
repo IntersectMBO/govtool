@@ -4,11 +4,12 @@ import { Trans } from "react-i18next";
 
 import { Tooltip, Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
+import { formatDisplayDate } from "@/utils";
 
 type GovernanceActionsDatesBoxProps = {
   createdDate: string;
-  expiryDate: string;
-  expiryEpochNo: number;
+  expiryDate: string | undefined;
+  expiryEpochNo: number | undefined;
   createdEpochNo: number;
   isSliderCard?: boolean;
 };
@@ -58,7 +59,10 @@ export const GovernanceActionsDatesBox = ({
         >
           <Trans
             i18nKey="govActions.submittedDateWithEpoch"
-            values={{ date: createdDate, epoch: createdEpochNo }}
+            values={{
+              date: formatDisplayDate(createdDate),
+              epoch: createdEpochNo,
+            }}
             components={[
               <span style={{ fontWeight: 600 }} key="0" />,
               <span style={{ fontWeight: 400 }} key="1" />,
@@ -100,7 +104,10 @@ export const GovernanceActionsDatesBox = ({
         >
           <Trans
             i18nKey="govActions.expiresDateWithEpoch"
-            values={{ date: expiryDate, epoch: expiryEpochNo }}
+            values={{
+              date: expiryDate ? formatDisplayDate(expiryDate) : "-",
+              epoch: expiryEpochNo ?? "-",
+            }}
             components={[
               <span style={{ fontWeight: 600 }} key="0" />,
               <span style={{ fontWeight: 400 }} key="1" />,

@@ -5,7 +5,6 @@ import { Button } from "@atoms";
 import { PATHS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
-  formatDisplayDate,
   getFullGovActionId,
   getProposalTypeLabel,
   getProposalTypeNoEmptySpaces,
@@ -94,8 +93,8 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           isSliderCard
         />
         <GovernanceActionsDatesBox
-          createdDate={formatDisplayDate(createdDate)}
-          expiryDate={formatDisplayDate(expiryDate)}
+          createdDate={createdDate}
+          expiryDate={expiryDate}
           expiryEpochNo={expiryEpochNo}
           createdEpochNo={createdEpochNo}
           isSliderCard

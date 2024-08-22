@@ -1,0 +1,54 @@
+name: Add labels to 🐛 Bug report issues
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  apply-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if issue is a "🐛 Bug report"
+        id: check_is_bug_report
+        run: |
+          echo "## Checking if issue is a 'Feature idea'..."
+          if [[ "${{ github.event.issue.title }}" == "🐛 "* ]]; then
+            echo "is_bug_report=true" >> $GITHUB_ENV
+          else
+            echo "is_bug_report=false" >> $GITHUB_ENV
+          fi
+
+      - name: Apply label based on feature area
+        if: ${{ env.is_bug_report == 'true' }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const areaMap = {
+              "Proposal Pillar": "📜 Proposal Pillar",
+              "Voting Pillar": "🗳️ Voting Pillar",
+              "Delegation Pillar": "♟️ Delegation Pillar",
+              "Wrapper": "🎁 Wrapper",
+              "Other": "Other area",
+              "Not sure": "❓Unknown area",
+            };
+
+            const issueBody = context.payload.issue.body;
+
+            // Match the Area selected under the "### Area" header
+            const areaMatch = issueBody.match(/### Area\s*\n\s*(.*)\s*\n/);
+            const area = areaMatch ? areaMatch[1].trim() : null;
+
+            const labelToAdd = areaMap[area];
+
+            if (labelToAdd) {
+              await github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: [labelToAdd],
+              });
+            }

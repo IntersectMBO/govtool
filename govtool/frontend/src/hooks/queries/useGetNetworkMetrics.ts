@@ -2,16 +2,13 @@ import { useQuery } from "react-query";
 
 import { getNetworkMetrics } from "@services";
 import { QUERY_KEYS } from "@consts";
-import { useCardano } from "@/context";
 
 export const useGetNetworkMetrics = () => {
-  const { isEnabled } = useCardano();
-
-  const { data } = useQuery({
+  const { data: networkMetrics, refetch: fetchNetworkMetrics } = useQuery({
     queryKey: QUERY_KEYS.useGetNetworkMetricsKey,
     queryFn: () => getNetworkMetrics(),
-    enabled: isEnabled,
+    enabled: false,
   });
 
-  return { networkMetrics: data };
+  return { networkMetrics, fetchNetworkMetrics };
 };

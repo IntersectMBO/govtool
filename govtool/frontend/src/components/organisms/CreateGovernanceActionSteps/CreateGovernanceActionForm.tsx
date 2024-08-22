@@ -5,11 +5,13 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { Button, InfoText, Spacer, Typography } from "@atoms";
 import { GOVERNANCE_ACTION_FIELDS, Placeholders } from "@consts";
 import { useCreateGovernanceActionForm, useTranslation } from "@hooks";
-import { Field } from "@molecules";
+import { CenteredBoxBottomButtons, Field } from "@molecules";
 import { URL_REGEX, testIdFromLabel } from "@/utils";
-import { GovernanceActionField } from "@/types/governanceAction";
+import {
+  GovernanceActionField,
+  GovernanceActionType,
+} from "@/types/governanceAction";
 
-import { BgCard } from "../BgCard";
 import { ControlledField } from "../ControlledField";
 
 const MAX_NUMBER_OF_LINKS = 8;
@@ -40,7 +42,13 @@ export const CreateGovernanceActionForm = ({
   const isContinueButtonDisabled =
     // TODO: Provide better typing for GOVERNANCE_ACTION_FIELDS
     // to get rid of explicit type assertion
-    Object.keys(GOVERNANCE_ACTION_FIELDS[type!]).some(
+    Object.keys(
+      GOVERNANCE_ACTION_FIELDS[
+        type! as
+          | GovernanceActionType.InfoAction
+          | GovernanceActionType.TreasuryWithdrawals
+      ],
+    ).some(
       (field) => !watch(field as unknown as Parameters<typeof watch>[0]),
     ) || isError;
 
@@ -54,7 +62,13 @@ export const CreateGovernanceActionForm = ({
   };
 
   const renderGovernanceActionField = () =>
-    Object.entries(GOVERNANCE_ACTION_FIELDS[type!]).map(([key, field]) => {
+    Object.entries(
+      GOVERNANCE_ACTION_FIELDS[
+        type! as
+          | GovernanceActionType.InfoAction
+          | GovernanceActionType.TreasuryWithdrawals
+      ],
+    ).map(([key, field]) => {
       const fieldProps = {
         helpfulText: field.tipI18nKey ? t(field.tipI18nKey) : undefined,
         key,
@@ -120,12 +134,7 @@ export const CreateGovernanceActionForm = ({
   );
 
   return (
-    <BgCard
-      actionButtonLabel={t("continue")}
-      isActionButtonDisabled={isContinueButtonDisabled}
-      onClickActionButton={onClickContinue}
-      onClickBackButton={onClickBack}
-    >
+    <>
       <InfoText label={t("required")} sx={{ mb: 0.75, textAlign: "center" }} />
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("createGovernanceAction.formTitle")}
@@ -156,6 +165,12 @@ export const CreateGovernanceActionForm = ({
         </Button>
       ) : null}
       <Spacer y={3} />
-    </BgCard>
+      <CenteredBoxBottomButtons
+        disableActionButton={isContinueButtonDisabled}
+        onActionButton={onClickContinue}
+        onBackButton={onClickBack}
+        backButtonText={t("cancel")}
+      />
+    </>
   );
 };

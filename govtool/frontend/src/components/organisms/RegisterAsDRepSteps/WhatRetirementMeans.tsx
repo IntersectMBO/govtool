@@ -2,21 +2,21 @@ import { useCallback, useEffect, useState } from "react";
 import * as Sentry from "@sentry/react";
 
 import { Typography } from "@atoms";
-import { useCardano, useModal } from "@context";
+import { useCardano, useModal, useAppContext } from "@context";
 import {
   useGetVoterInfo,
   useScreenDimension,
   useTranslation,
   useWalletErrorModal,
 } from "@hooks";
-
-import { BgCard } from "..";
+import { CenteredBoxBottomButtons } from "@molecules";
 
 export const WhatRetirementMeans = ({
   onClickCancel,
 }: {
   onClickCancel: () => void;
 }) => {
+  const { cExplorerBaseUrl } = useAppContext();
   const {
     isPendingTransaction,
     buildDRepRetirementCert,
@@ -60,7 +60,7 @@ export const WhatRetirementMeans = ({
           state: {
             buttonText: t("modals.common.goToDashboard"),
             dataTestId: "retirement-transaction-submitted-modal",
-            link: `https://sancho.cexplorer.io/tx/${result}`,
+            link: `${cExplorerBaseUrl}/tx/${result}`,
             message: t("modals.retirement.message"),
             onSubmit,
             status: "success",
@@ -89,15 +89,7 @@ export const WhatRetirementMeans = ({
   ]);
 
   return (
-    <BgCard
-      actionButtonLabel={t("retirement.continue")}
-      actionButtonDataTestId="continue-retirement-button"
-      backButtonLabel={t("cancel")}
-      isLoadingActionButton={isRetirementLoading}
-      onClickActionButton={retireAsDrep}
-      onClickBackButton={onClickCancel}
-      sx={{ pb: isMobile ? undefined : 5, pt: isMobile ? 4 : 8 }}
-    >
+    <>
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("retirement.whatRetirementMeansTitle")}
       </Typography>
@@ -113,6 +105,14 @@ export const WhatRetirementMeans = ({
       >
         {t("retirement.whatRetirementMeansDescription")}
       </Typography>
-    </BgCard>
+      <CenteredBoxBottomButtons
+        actionButtonText={t("retirement.continue")}
+        actionButtonDataTestId="continue-retirement-button"
+        backButtonText={t("cancel")}
+        isLoadingActionButton={isRetirementLoading}
+        onActionButton={retireAsDrep}
+        onBackButton={onClickCancel}
+      />
+    </>
   );
 };

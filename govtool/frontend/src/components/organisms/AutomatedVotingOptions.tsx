@@ -39,10 +39,10 @@ export const AutomatedVotingOptions = ({
   txHash,
 }: AutomatedVotingOptionsProps) => {
   const { t } = useTranslation();
+  // TODO: Get network metrics from useAppContext
+  const { networkMetrics, fetchNetworkMetrics } = useGetNetworkMetrics();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  const { networkMetrics } = useGetNetworkMetrics();
 
   const isDelegatedToAbstain =
     currentDelegation ===
@@ -54,6 +54,10 @@ export const AutomatedVotingOptions = ({
     AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence;
   const isDelegationToNoConfidenceInProgress =
     delegationInProgress === AutomatedVotingOptionDelegationId.no_confidence;
+
+  useEffect(() => {
+    fetchNetworkMetrics();
+  }, []);
 
   useEffect(() => {
     const shouldBeSetOpen =
@@ -116,7 +120,7 @@ export const AutomatedVotingOptions = ({
             }
             onClickInfo={() =>
               openInNewTab(
-                "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/delegating-overview/abstain-from-every-vote",
+                "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/delegating-overview/abstain-from-every-vote",
               )
             }
             title={
@@ -159,7 +163,7 @@ export const AutomatedVotingOptions = ({
             }
             onClickInfo={() =>
               openInNewTab(
-                "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/delegating-overview/signal-no-confidence-on-every-vote",
+                "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/delegating-overview/signal-no-confidence-on-every-vote",
               )
             }
             title={

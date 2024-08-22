@@ -32,12 +32,7 @@ export class AppService {
         await validateMetadataStandard(data, standard);
         metadata = parseMetadata(data.body, standard);
       }
-
-      const hashedMetadata = blake.blake2bHex(
-        !standard ? data : metadata,
-        undefined,
-        32,
-      );
+      const hashedMetadata = blake.blake2bHex(data, undefined, 32);
 
       if (hashedMetadata !== hash) {
         throw MetadataValidationStatus.INVALID_HASH;

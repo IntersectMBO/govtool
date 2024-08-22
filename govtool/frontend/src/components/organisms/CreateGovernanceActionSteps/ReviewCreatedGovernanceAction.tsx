@@ -8,11 +8,10 @@ import {
   useCreateGovernanceActionForm,
   useTranslation,
 } from "@hooks";
-import { LinkWithIcon } from "@molecules";
+import { CenteredBoxBottomButtons, LinkWithIcon } from "@molecules";
 import { openInNewTab, testIdFromLabel } from "@utils";
 
 import { Dispatch, SetStateAction } from "react";
-import { BgCard } from "../BgCard";
 
 type ReviewCreatedGovernanceActionProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -101,11 +100,7 @@ export const ReviewCreatedGovernanceAction = ({
   };
 
   return (
-    <BgCard
-      actionButtonLabel={t("continue")}
-      onClickActionButton={onClickContinue}
-      onClickBackButton={onClickBackButton}
-    >
+    <>
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("createGovernanceAction.reviewSubmission")}
       </Typography>
@@ -128,6 +123,11 @@ export const ReviewCreatedGovernanceAction = ({
       {renderReviewFields()}
       {renderLinks()}
       <Spacer y={6} />
-    </BgCard>
+      <CenteredBoxBottomButtons
+        onActionButton={onClickContinue}
+        onBackButton={onClickBackButton}
+        backButtonText={t("cancel")}
+      />
+    </>
   );
 };

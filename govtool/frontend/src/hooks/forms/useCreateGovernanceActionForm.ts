@@ -12,7 +12,7 @@ import {
   PATHS,
   storageInformationErrorModals,
 } from "@consts";
-import { useCardano, useModal } from "@context";
+import { useCardano, useModal, useAppContext } from "@context";
 import {
   correctAdaFormat,
   downloadJson,
@@ -66,6 +66,7 @@ export const useCreateGovernanceActionForm = (
   const navigate = useNavigate();
   const { openModal, closeModal } = useModal();
   const openWalletErrorModal = useWalletErrorModal();
+  const { cExplorerBaseUrl } = useAppContext();
 
   // Queries
   const { validateMetadata } = useValidateMutation();
@@ -132,9 +133,9 @@ export const useCreateGovernanceActionForm = (
       };
       try {
         switch (govActionType) {
-          case GovernanceActionType.Info:
+          case GovernanceActionType.InfoAction:
             return await buildNewInfoGovernanceAction(commonGovActionDetails);
-          case GovernanceActionType.Treasury: {
+          case GovernanceActionType.TreasuryWithdrawals: {
             if (
               data.amount === undefined ||
               data.receivingAddress === undefined
@@ -165,7 +166,7 @@ export const useCreateGovernanceActionForm = (
     openModal({
       type: "statusModal",
       state: {
-        link: `https://sancho.cexplorer.io/tx/${link}`,
+        link: `${cExplorerBaseUrl}/tx/${link}`,
         status: "success",
         title: t(
           "createGovernanceAction.modals.submitTransactionSuccess.title",

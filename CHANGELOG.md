@@ -13,6 +13,7 @@ changes.
 ### Added
 
 - Add support for displaying protocol parameters governance actions [Issue 1600](https://github.com/IntersectMBO/govtool/issues/1600)
+- Add SPO and CC committee total votes to gov actions [Issue 1704](https://github.com/IntersectMBO/govtool/issues/1704)
 
 ### Fixed
 

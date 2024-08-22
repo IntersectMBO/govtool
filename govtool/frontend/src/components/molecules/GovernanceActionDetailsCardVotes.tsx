@@ -8,9 +8,15 @@ import { GovernanceActionType } from "@/types/governanceAction";
 
 type GovernanceActionCardVotesProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
-  abstainVotes: number;
-  noVotes: number;
-  yesVotes: number;
+  dRepYesVotes: number;
+  dRepNoVotes: number;
+  dRepAbstainVotes: number;
+  poolYesVotes: number;
+  poolNoVotes: number;
+  poolAbstainVotes: number;
+  ccYesVotes: number;
+  ccNoVotes: number;
+  ccAbstainVotes: number;
   isOneColumn: boolean;
   expiryDate: string;
   expiryEpochNo: number;
@@ -26,9 +32,15 @@ type GovernanceActionCardVotesProps = {
 
 export const GovernanceActionDetailsCardVotes = ({
   setIsVoteSubmitted,
-  abstainVotes,
-  noVotes,
-  yesVotes,
+  dRepAbstainVotes,
+  dRepNoVotes,
+  dRepYesVotes,
+  poolAbstainVotes,
+  poolNoVotes,
+  poolYesVotes,
+  ccAbstainVotes,
+  ccNoVotes,
+  ccYesVotes,
   isOneColumn,
   expiryDate,
   expiryEpochNo,
@@ -64,16 +76,22 @@ export const GovernanceActionDetailsCardVotes = ({
           voteUrlFromEP={voteUrlFromEP}
           voteDateFromEP={voteDateFromEP}
           voteEpochNoFromEP={voteEpochNoFromEP}
-          yesVotes={yesVotes}
-          noVotes={noVotes}
-          abstainVotes={abstainVotes}
+          dRepAbstainVotes={dRepAbstainVotes}
+          dRepNoVotes={dRepNoVotes}
+          dRepYesVotes={dRepYesVotes}
           isInProgress={isInProgress}
         />
       ) : (
         <VotesSubmitted
-          yesVotes={yesVotes}
-          noVotes={noVotes}
-          abstainVotes={abstainVotes}
+          dRepAbstainVotes={dRepAbstainVotes}
+          dRepNoVotes={dRepNoVotes}
+          dRepYesVotes={dRepYesVotes}
+          poolAbstainVotes={poolAbstainVotes}
+          poolNoVotes={poolNoVotes}
+          poolYesVotes={poolYesVotes}
+          ccAbstainVotes={ccAbstainVotes}
+          ccNoVotes={ccNoVotes}
+          ccYesVotes={ccYesVotes}
         />
       )}
     </Box>

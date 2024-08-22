@@ -138,6 +138,30 @@ export const GovernanceActionDetails = () => {
                       ? state.dRepAbstainVotes
                       : data.proposal.dRepAbstainVotes
                   }
+                  dRepNoVotes={
+                    state ? state.dRepNoVotes : data.proposal.dRepNoVotes
+                  }
+                  dRepYesVotes={
+                    state ? state.dRepYesVotes : data.proposal.dRepYesVotes
+                  }
+                  poolAbstainVotes={
+                    state
+                      ? state.poolAbstainVotes
+                      : data.proposal.poolAbstainVotes
+                  }
+                  poolNoVotes={
+                    state ? state.poolNoVotes : data.proposal.poolNoVotes
+                  }
+                  poolYesVotes={
+                    state ? state.poolYesVotes : data.proposal.poolYesVotes
+                  }
+                  ccAbstainVotes={
+                    state ? state.ccAbstainVotes : data.proposal.ccAbstainVotes
+                  }
+                  ccNoVotes={state ? state.ccNoVotes : data.proposal.ccNoVotes}
+                  ccYesVotes={
+                    state ? state.ccYesVotes : data.proposal.ccYesVotes
+                  }
                   createdDate={
                     state ? state.createdDate : data.proposal.createdDate
                   }
@@ -153,9 +177,6 @@ export const GovernanceActionDetails = () => {
                   expiryEpochNo={
                     state ? state.expiryEpochNo : data.proposal.expiryEpochNo
                   }
-                  dRepNoVotes={
-                    state ? state.dRepNoVotes : data.proposal.dRepNoVotes
-                  }
                   type={type}
                   label={label}
                   title={title}
@@ -169,9 +190,6 @@ export const GovernanceActionDetails = () => {
                     state ? state?.rationale : data.proposal?.rationale
                   }
                   links={state ? state?.references : data.proposal?.references}
-                  dRepYesVotes={
-                    state ? state.dRepYesVotes : data.proposal.dRepYesVotes
-                  }
                   govActionId={fullProposalId}
                   protocolParams={
                     state ? state.protocolParams : data.proposal.protocolParams

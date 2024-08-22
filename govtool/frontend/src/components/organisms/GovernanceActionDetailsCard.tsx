@@ -11,61 +11,73 @@ import { EpochParams, MetadataValidationStatus } from "@models";
 import { GovernanceActionType } from "@/types/governanceAction";
 
 type GovernanceActionDetailsCardProps = {
+  abstract?: string;
+  ccAbstainVotes: number;
+  ccNoVotes: number;
+  ccYesVotes: number;
   createdDate: string;
   createdEpochNo: number;
-  expiryDate: string;
-  expiryEpochNo: number;
-  type: GovernanceActionType;
-  label: string;
-  details?: ActionDetailsType;
-  url: string;
-  title?: string;
-  abstract?: string;
-  motivation?: string;
-  rationale?: string;
-  links?: string[];
-  govActionId: string;
-  isDataMissing: null | MetadataValidationStatus;
-  isDashboard?: boolean;
-  isVoter?: boolean;
-  voteFromEP?: string;
-  voteUrlFromEP?: string;
-  voteDateFromEP?: string;
-  voteEpochNoFromEP?: number;
-  isInProgress?: boolean;
-  protocolParams: EpochParams | null;
   dRepAbstainVotes: number;
   dRepNoVotes: number;
   dRepYesVotes: number;
+  details?: ActionDetailsType;
+  expiryDate: string;
+  expiryEpochNo: number;
+  govActionId: string;
+  isDashboard?: boolean;
+  isDataMissing: null | MetadataValidationStatus;
+  isInProgress?: boolean;
+  isVoter?: boolean;
+  label: string;
+  links?: string[];
+  motivation?: string;
+  poolAbstainVotes: number;
+  poolNoVotes: number;
+  poolYesVotes: number;
+  protocolParams: EpochParams | null;
+  rationale?: string;
+  title?: string;
+  type: GovernanceActionType;
+  url: string;
+  voteDateFromEP?: string;
+  voteEpochNoFromEP?: number;
+  voteFromEP?: string;
+  voteUrlFromEP?: string;
 };
 
 export const GovernanceActionDetailsCard = ({
-  dRepAbstainVotes,
+  abstract,
+  ccAbstainVotes,
+  ccNoVotes,
+  ccYesVotes,
   createdDate,
   createdEpochNo,
+  dRepAbstainVotes,
+  dRepNoVotes,
+  dRepYesVotes,
+  details,
   expiryDate,
   expiryEpochNo,
-  dRepNoVotes,
-  details,
-  url,
-  type,
-  label,
-  title,
-  links,
-  abstract,
-  motivation,
-  rationale,
-  dRepYesVotes,
+  govActionId,
   isDashboard,
+  isDataMissing,
+  isInProgress,
   isVoter,
-  voteFromEP,
-  voteUrlFromEP,
+  label,
+  links,
+  motivation,
+  poolAbstainVotes,
+  poolNoVotes,
+  poolYesVotes,
+  protocolParams,
+  rationale,
+  title,
+  type,
+  url,
   voteDateFromEP,
   voteEpochNoFromEP,
-  govActionId,
-  isInProgress,
-  isDataMissing,
-  protocolParams,
+  voteFromEP,
+  voteUrlFromEP,
 }: GovernanceActionDetailsCardProps) => {
   const [isVoteSubmitted, setIsVoteSubmitted] = useState<boolean>(false);
   const { screenWidth, isMobile } = useScreenDimension();
@@ -121,9 +133,15 @@ export const GovernanceActionDetailsCard = ({
       />
       <GovernanceActionDetailsCardVotes
         setIsVoteSubmitted={setIsVoteSubmitted}
-        abstainVotes={dRepAbstainVotes}
-        noVotes={dRepNoVotes}
-        yesVotes={dRepYesVotes}
+        dRepAbstainVotes={dRepAbstainVotes}
+        dRepNoVotes={dRepNoVotes}
+        dRepYesVotes={dRepYesVotes}
+        poolAbstainVotes={poolAbstainVotes}
+        poolNoVotes={poolNoVotes}
+        poolYesVotes={poolYesVotes}
+        ccAbstainVotes={ccAbstainVotes}
+        ccNoVotes={ccNoVotes}
+        ccYesVotes={ccYesVotes}
         expiryDate={expiryDate}
         expiryEpochNo={expiryEpochNo}
         isVoter={isVoter}

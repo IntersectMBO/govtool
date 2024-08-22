@@ -17,8 +17,12 @@ import {
 } from "@/utils";
 import { EpochParams, NetworkMetrics } from "@/models";
 
+const BOOTSTRAPPING_PHASE_MAJOR = 9;
+
 type AppContextType = {
   isAppInitializing: boolean;
+  isMainnet: boolean;
+  isInBootstrapPhase: boolean;
   networkName: string;
   network: string;
   cExplorerBaseUrl: string;
@@ -67,6 +71,9 @@ const AppContextProvider = ({ children }: PropsWithChildren) => {
   const value = useMemo(
     () => ({
       isAppInitializing,
+      isMainnet: networkMetrics?.networkName === "mainnet",
+      isInBootstrapPhase:
+        epochParams?.protocol_major === BOOTSTRAPPING_PHASE_MAJOR,
       networkName:
         NETWORK_NAMES[
           (networkMetrics?.networkName as keyof typeof NETWORK_NAMES) ||

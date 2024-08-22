@@ -69,7 +69,7 @@ export const GovernanceActionDetails = () => {
           display="flex"
           flex={1}
           flexDirection="row"
-          mt={2}
+          pt={2}
           px={pagePadding}
         >
           <Box display="flex" flex={1} flexDirection="column" width="100%">

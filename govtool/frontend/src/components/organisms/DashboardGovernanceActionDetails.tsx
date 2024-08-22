@@ -106,7 +106,7 @@ export const DashboardGovernanceActionDetails = () => {
         ) : data || state ? (
           <GovernanceActionDetailsCard
             abstainVotes={
-              state ? state.abstainVotes : data.proposal.abstainVotes
+              state ? state.abstainVotes : data.proposal.dRepAbstainVotes
             }
             createdDate={state ? state.createdDate : data.proposal.createdDate}
             createdEpochNo={
@@ -122,7 +122,7 @@ export const DashboardGovernanceActionDetails = () => {
             isVoter={
               voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
             }
-            noVotes={state ? state.noVotes : data.proposal.noVotes}
+            noVotes={state ? state.noVotes : data.proposal.dRepNoVotes}
             type={type}
             label={label}
             title={title}
@@ -132,7 +132,7 @@ export const DashboardGovernanceActionDetails = () => {
             abstract={state ? state?.abstract : data.proposal?.abstract}
             motivation={state ? state?.motivation : data.proposal?.motivation}
             rationale={state ? state?.rationale : data.proposal?.rationale}
-            yesVotes={state ? state.yesVotes : data.proposal.yesVotes}
+            yesVotes={state ? state.yesVotes : data.proposal.dRepYesVotes}
             voteFromEP={data?.vote?.vote}
             voteUrlFromEP={data?.vote?.url}
             voteDateFromEP={data?.vote?.date}
@@ -143,6 +143,9 @@ export const DashboardGovernanceActionDetails = () => {
               fullProposalId.replace("#", "")
             }
             isDashboard
+            protocolParams={
+              state ? state.protocolParams : data.proposal.protocolParams
+            }
           />
         ) : (
           <Box mt={4} display="flex" flexWrap="wrap">

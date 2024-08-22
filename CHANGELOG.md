@@ -12,7 +12,7 @@ changes.
 
 ### Added
 
--
+- Add support for displaying protocol parameters governance actions [Issue 1600](https://github.com/IntersectMBO/govtool/issues/1600)
 
 ### Fixed
 

@@ -7,7 +7,7 @@ import {
   GovernanceActionDetailsCardVotes,
 } from "@molecules";
 import { GovernanceActionDetailsCardData } from "@organisms";
-import { MetadataValidationStatus } from "@models";
+import { EpochParams, MetadataValidationStatus } from "@models";
 import { GovernanceActionType } from "@/types/governanceAction";
 
 type GovernanceActionDetailsCardProps = {
@@ -36,6 +36,7 @@ type GovernanceActionDetailsCardProps = {
   voteDateFromEP?: string;
   voteEpochNoFromEP?: number;
   isInProgress?: boolean;
+  protocolParams: EpochParams | null;
 };
 
 export const GovernanceActionDetailsCard = ({
@@ -64,6 +65,7 @@ export const GovernanceActionDetailsCard = ({
   govActionId,
   isInProgress,
   isDataMissing,
+  protocolParams,
 }: GovernanceActionDetailsCardProps) => {
   const [isVoteSubmitted, setIsVoteSubmitted] = useState<boolean>(false);
   const { screenWidth, isMobile } = useScreenDimension();
@@ -114,6 +116,8 @@ export const GovernanceActionDetailsCard = ({
         title={title}
         label={label}
         url={url}
+        type={type}
+        protocolParams={protocolParams}
       />
       <GovernanceActionDetailsCardVotes
         setIsVoteSubmitted={setIsVoteSubmitted}

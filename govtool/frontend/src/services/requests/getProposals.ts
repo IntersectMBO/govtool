@@ -35,7 +35,9 @@ export const getProposals = async ({
   const validatedResponse = {
     ...response.data,
     elements: await Promise.all(
-      response.data.elements.map((proposalDTO) => mapDtoToProposal(proposalDTO)),
+      response.data.elements.map((proposalDTO) =>
+        mapDtoToProposal(proposalDTO),
+      ),
     ),
   };
 

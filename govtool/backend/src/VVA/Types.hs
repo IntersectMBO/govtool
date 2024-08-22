@@ -3,6 +3,7 @@
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NamedFieldPuns        #-}
+{-# LANGUAGE TypeApplications      #-}
 
 module VVA.Types where
 
@@ -18,9 +19,11 @@ import qualified Data.Cache                 as Cache
 import           Data.Has
 import           Data.Pool                  (Pool)
 import           Data.Text                  (Text)
-import           Data.Time                  (UTCTime)
+import           Data.Time                  (UTCTime, LocalTime)
+import           Data.Scientific
 
 import           Database.PostgreSQL.Simple (Connection)
+import           Database.PostgreSQL.Simple.FromRow
 
 import           VVA.Cache
 import           VVA.Config
@@ -103,27 +106,63 @@ data DRepRegistration
 
 data Proposal
   = Proposal
-      { proposalId             :: Integer
-      , proposalTxHash         :: Text
-      , proposalIndex          :: Integer
-      , proposalType           :: Text
-      , proposalDetails        :: Maybe Value
-      , proposalExpiryDate     :: Maybe UTCTime
-      , proposalExpiryEpochNo  :: Maybe Integer
-      , proposalCreatedDate    :: UTCTime
-      , proposalCreatedEpochNo :: Integer
-      , proposalUrl            :: Text
-      , proposalDocHash        :: Text
-      , proposalTitle          :: Maybe Text
-      , proposalAbstract       :: Maybe Text
-      , proposalMotivation     :: Maybe Text
-      , proposalRationale      :: Maybe Text
-      , proposalYesVotes       :: Integer
-      , proposalNoVotes        :: Integer
-      , proposalAbstainVotes   :: Integer
+      { proposalId                 :: Integer
+      , proposalTxHash             :: Text
+      , proposalIndex              :: Integer
+      , proposalType               :: Text
+      , proposalDetails            :: Maybe Value
+      , proposalExpiryDate         :: Maybe LocalTime
+      , proposalExpiryEpochNo      :: Maybe Integer
+      , proposalCreatedDate        :: LocalTime
+      , proposalCreatedEpochNo     :: Integer
+      , proposalUrl                :: Text
+      , proposalDocHash            :: Text
+      , proposalProtocolParams     :: Maybe Value
+      , proposalTitle              :: Maybe Text
+      , proposalAbstract           :: Maybe Text
+      , proposalMotivation         :: Maybe Text
+      , proposalRationale          :: Maybe Text
+      , proposalDRepYesVotes       :: Integer
+      , proposalDRepNoVotes        :: Integer
+      , proposalDRepAbstainVotes   :: Integer
+      , proposalPoolYesVotes       :: Integer
+      , proposalPoolNoVotes        :: Integer
+      , proposalPoolAbstainVotes   :: Integer
+      , proposalCcYesVotes         :: Integer
+      , proposalCcNoVotes          :: Integer
+      , proposalCcAbstainVotes     :: Integer
       }
   deriving (Show)
 
+instance FromRow Proposal where
+  fromRow =
+    Proposal
+      <$> field
+      <*> field
+      <*> (floor @Scientific <$> field)
+      <*> field
+      <*> field
+      <*> field
+      <*> field
+      <*> field
+      <*> field
+      <*> field
+      <*> field
+      <*> field
+      <*> field
+      <*> field
+      <*> field
+      <*> field
+      <*> (floor @Scientific <$> field)
+      <*> (floor @Scientific <$> field)
+      <*> (floor @Scientific <$> field)
+      <*> (floor @Scientific <$> field)
+      <*> (floor @Scientific <$> field)
+      <*> (floor @Scientific <$> field)
+      <*> (floor @Scientific <$> field)
+      <*> (floor @Scientific <$> field)
+      <*> (floor @Scientific <$> field)
+      
 data TransactionStatus = TransactionConfirmed | TransactionUnconfirmed
 
 data CacheEnv

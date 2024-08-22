@@ -160,6 +160,7 @@ jobs:
           docker push ${{ steps.image_lowercase.outputs.lowercase }}:${{ env.TAG }}
 
       - name: Deploy with Qovery
+        if: github.ref == 'refs/heads/develop'
         env:
           QOVERY_CLI_ACCESS_TOKEN: ${{secrets.QOVERY_CLI_ACCESS_TOKEN }}
         run: |

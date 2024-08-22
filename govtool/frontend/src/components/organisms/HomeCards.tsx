@@ -29,22 +29,22 @@ export const HomeCards = () => {
 
   const onClickLearnMoreAboutDelegation = () =>
     openInNewTab(
-      "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/delegating",
+      "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/delegating",
     );
 
   const onClickLearnMoreAboutDRepRegistration = () =>
     openInNewTab(
-      "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/dreps",
+      "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/dreps",
     );
 
   const onClickLearnMoreAboutDirectVoterRegistration = () =>
     openInNewTab(
-      "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/direct-voting",
+      "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/direct-voting",
     );
 
   const onClickLearnMoreAboutProposingGovAction = () =>
     openInNewTab(
-      "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/governance-actions/propose-a-governance-action",
+      "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/governance-actions/propose-a-governance-action",
     );
 
   const navigateToGovActions = useCallback(

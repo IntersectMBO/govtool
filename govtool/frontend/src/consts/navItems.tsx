@@ -33,13 +33,13 @@ export const NAV_ITEMS = [
     dataTestId: "guides-link",
     navTo: "",
     label: i18n.t("menu.guides"),
-    newTabLink: "https://docs.sanchogov.tools/about/what-is-sanchonet-govtool",
+    newTabLink: "https://docs.gov.tools/about/what-is-sanchonet-govtool",
   },
   {
     dataTestId: "faqs-link",
     navTo: "",
     label: i18n.t("menu.faqs"),
-    newTabLink: "https://docs.sanchogov.tools/faqs",
+    newTabLink: "https://docs.gov.tools/faqs",
   },
 ];
 
@@ -95,7 +95,7 @@ export const CONNECTED_NAV_ITEMS = [
     navTo: "",
     activeIcon: ICONS.guidesActiveIcon,
     icon: ICONS.guidesIcon,
-    newTabLink: "https://docs.sanchogov.tools/about/what-is-sanchonet-govtool",
+    newTabLink: "https://docs.gov.tools/about/what-is-sanchonet-govtool",
   },
   {
     dataTestId: "faqs-link",
@@ -103,6 +103,6 @@ export const CONNECTED_NAV_ITEMS = [
     navTo: "",
     activeIcon: ICONS.faqsActiveIcon,
     icon: ICONS.faqsIcon,
-    newTabLink: "https://docs.sanchogov.tools/faqs",
+    newTabLink: "https://docs.gov.tools/faqs",
   },
 ];

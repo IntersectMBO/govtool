@@ -11,12 +11,10 @@ import { EpochParams, MetadataValidationStatus } from "@models";
 import { GovernanceActionType } from "@/types/governanceAction";
 
 type GovernanceActionDetailsCardProps = {
-  abstainVotes: number;
   createdDate: string;
   createdEpochNo: number;
   expiryDate: string;
   expiryEpochNo: number;
-  noVotes: number;
   type: GovernanceActionType;
   label: string;
   details?: ActionDetailsType;
@@ -25,7 +23,6 @@ type GovernanceActionDetailsCardProps = {
   abstract?: string;
   motivation?: string;
   rationale?: string;
-  yesVotes: number;
   links?: string[];
   govActionId: string;
   isDataMissing: null | MetadataValidationStatus;
@@ -37,15 +34,18 @@ type GovernanceActionDetailsCardProps = {
   voteEpochNoFromEP?: number;
   isInProgress?: boolean;
   protocolParams: EpochParams | null;
+  dRepAbstainVotes: number;
+  dRepNoVotes: number;
+  dRepYesVotes: number;
 };
 
 export const GovernanceActionDetailsCard = ({
-  abstainVotes,
+  dRepAbstainVotes,
   createdDate,
   createdEpochNo,
   expiryDate,
   expiryEpochNo,
-  noVotes,
+  dRepNoVotes,
   details,
   url,
   type,
@@ -55,7 +55,7 @@ export const GovernanceActionDetailsCard = ({
   abstract,
   motivation,
   rationale,
-  yesVotes,
+  dRepYesVotes,
   isDashboard,
   isVoter,
   voteFromEP,
@@ -121,9 +121,9 @@ export const GovernanceActionDetailsCard = ({
       />
       <GovernanceActionDetailsCardVotes
         setIsVoteSubmitted={setIsVoteSubmitted}
-        abstainVotes={abstainVotes}
-        noVotes={noVotes}
-        yesVotes={yesVotes}
+        abstainVotes={dRepAbstainVotes}
+        noVotes={dRepNoVotes}
+        yesVotes={dRepYesVotes}
         expiryDate={expiryDate}
         expiryEpochNo={expiryEpochNo}
         isVoter={isVoter}

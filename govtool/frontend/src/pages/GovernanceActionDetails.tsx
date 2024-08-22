@@ -133,8 +133,10 @@ export const GovernanceActionDetails = () => {
             ) : data || state ? (
               <Box data-testid="governance-action-details">
                 <GovernanceActionDetailsCard
-                  abstainVotes={
-                    state ? state.abstainVotes : data.proposal.dRepAbstainVotes
+                  dRepAbstainVotes={
+                    state
+                      ? state.dRepAbstainVotes
+                      : data.proposal.dRepAbstainVotes
                   }
                   createdDate={
                     state ? state.createdDate : data.proposal.createdDate
@@ -151,7 +153,9 @@ export const GovernanceActionDetails = () => {
                   expiryEpochNo={
                     state ? state.expiryEpochNo : data.proposal.expiryEpochNo
                   }
-                  noVotes={state ? state.noVotes : data.proposal.dRepNoVotes}
+                  dRepNoVotes={
+                    state ? state.dRepNoVotes : data.proposal.dRepNoVotes
+                  }
                   type={type}
                   label={label}
                   title={title}
@@ -165,7 +169,9 @@ export const GovernanceActionDetails = () => {
                     state ? state?.rationale : data.proposal?.rationale
                   }
                   links={state ? state?.references : data.proposal?.references}
-                  yesVotes={state ? state.yesVotes : data.proposal.dRepYesVotes}
+                  dRepYesVotes={
+                    state ? state.dRepYesVotes : data.proposal.dRepYesVotes
+                  }
                   govActionId={fullProposalId}
                   protocolParams={
                     state ? state.protocolParams : data.proposal.protocolParams

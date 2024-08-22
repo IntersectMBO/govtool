@@ -105,8 +105,8 @@ export const DashboardGovernanceActionDetails = () => {
           </Box>
         ) : data || state ? (
           <GovernanceActionDetailsCard
-            abstainVotes={
-              state ? state.abstainVotes : data.proposal.dRepAbstainVotes
+            dRepAbstainVotes={
+              state ? state.dRepAbstainVotes : data.proposal.dRepAbstainVotes
             }
             createdDate={state ? state.createdDate : data.proposal.createdDate}
             createdEpochNo={
@@ -122,7 +122,7 @@ export const DashboardGovernanceActionDetails = () => {
             isVoter={
               voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
             }
-            noVotes={state ? state.noVotes : data.proposal.dRepNoVotes}
+            dRepNoVotes={state ? state.dRepNoVotes : data.proposal.dRepNoVotes}
             type={type}
             label={label}
             title={title}
@@ -132,7 +132,9 @@ export const DashboardGovernanceActionDetails = () => {
             abstract={state ? state?.abstract : data.proposal?.abstract}
             motivation={state ? state?.motivation : data.proposal?.motivation}
             rationale={state ? state?.rationale : data.proposal?.rationale}
-            yesVotes={state ? state.yesVotes : data.proposal.dRepYesVotes}
+            dRepYesVotes={
+              state ? state.dRepYesVotes : data.proposal.dRepYesVotes
+            }
             voteFromEP={data?.vote?.vote}
             voteUrlFromEP={data?.vote?.url}
             voteDateFromEP={data?.vote?.date}

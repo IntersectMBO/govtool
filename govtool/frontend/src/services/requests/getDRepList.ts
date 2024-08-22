@@ -1,11 +1,12 @@
 import {
-  type InfinityDRepData,
+  type Infinite,
   type DRepStatus,
   type DRepListSort,
-  MetadataStandard,
+  DRepData,
+  DrepDataDTO,
 } from "@models";
 import { API } from "../API";
-import { postValidate } from "./metadataValidation";
+import { mapDtoToDrep } from "@/utils";
 
 export type GetDRepListArguments = {
   filters?: string[];
@@ -23,8 +24,8 @@ export const getDRepList = async ({
   pageSize = 10,
   searchPhrase = "",
   status = [],
-}: GetDRepListArguments): Promise<InfinityDRepData> => {
-  const response = await API.get<InfinityDRepData>("/drep/list", {
+}: GetDRepListArguments): Promise<Infinite<DRepData>> => {
+  const response = await API.get<Infinite<DrepDataDTO>>("/drep/list", {
     params: {
       page,
       pageSize,
@@ -38,28 +39,7 @@ export const getDRepList = async ({
   const validatedResponse = {
     ...response.data,
     elements: await Promise.all(
-      response.data.elements.map(async (drep) => {
-        if (drep.metadataStatus || drep.metadataValid) {
-          return drep;
-        }
-        if (drep.url && drep.metadataHash) {
-          const validationResponse = await postValidate({
-            url: drep.url,
-            hash: drep.metadataHash,
-            standard: MetadataStandard.CIPQQQ,
-          });
-          return {
-            ...drep,
-            bio: validationResponse.metadata?.bio,
-            dRepName: validationResponse.metadata?.dRepName,
-            email: validationResponse.metadata?.email,
-            references: validationResponse.metadata?.references,
-            metadataStatus: validationResponse.status || null,
-            metadataValid: validationResponse.valid,
-          };
-        }
-        return drep;
-      }),
+      response.data.elements.map(async (drep) => mapDtoToDrep(drep)),
     ),
   };
 

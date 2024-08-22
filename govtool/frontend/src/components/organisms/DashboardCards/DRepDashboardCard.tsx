@@ -34,10 +34,10 @@ export const DRepDashboardCard = ({
 
   const learnMoreButton = {
     children: t("learnMore"),
-    dataTestId: "register-learn-more-button",
+    dataTestId: "d-rep-learn-more-button",
     onClick: () =>
       openInNewTab(
-        "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/dreps",
+        "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/dreps",
       ),
   };
 
@@ -120,7 +120,7 @@ export const DRepDashboardCard = ({
               dataTestId: "register-learn-more-button",
               onClick: () =>
                 openInNewTab(
-                  "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/dreps/retire-as-a-drep",
+                  "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/dreps/retire-as-a-drep",
                 ),
             }
           : learnMoreButton,
@@ -149,6 +149,7 @@ export const DRepDashboardCard = ({
   return (
     <DashboardActionCard
       imageURL={IMAGES.govActionRegisterImage}
+      type="d-rep"
       {...cardProps}
     >
       {voter?.isRegisteredAsDRep && !pendingTransaction?.retireAsDrep && (

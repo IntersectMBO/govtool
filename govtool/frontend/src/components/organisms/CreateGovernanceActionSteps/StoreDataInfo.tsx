@@ -7,7 +7,8 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import { BgCard, ControlledField } from "@organisms";
+import { CenteredBoxBottomButtons } from "@molecules";
+import { ControlledField } from "@organisms";
 import { openInNewTab } from "@utils";
 
 type StoreDataInfoProps = {
@@ -20,7 +21,7 @@ export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
   const { isMobile } = useScreenDimension();
 
   // TODO: change link when available
-  const openLink = () => openInNewTab("https://docs.sanchogov.tools");
+  const openLink = () => openInNewTab("https://docs.gov.tools");
 
   const isContinueDisabled = !watch("storeData");
 
@@ -29,12 +30,7 @@ export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
   const onClickBack = () => setStep(4);
 
   return (
-    <BgCard
-      actionButtonLabel={t("continue")}
-      isActionButtonDisabled={isContinueDisabled}
-      onClickActionButton={onClickContinue}
-      onClickBackButton={onClickBack}
-    >
+    <>
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("createGovernanceAction.storeDataTitle")}
       </Typography>
@@ -61,6 +57,12 @@ export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
       />
       <Spacer y={isMobile ? 4 : 12.5} />
       <Box display="flex" flex={1} />
-    </BgCard>
+      <CenteredBoxBottomButtons
+        onActionButton={onClickContinue}
+        disableActionButton={isContinueDisabled}
+        onBackButton={onClickBack}
+        backButtonText={t("cancel")}
+      />
+    </>
   );
 };

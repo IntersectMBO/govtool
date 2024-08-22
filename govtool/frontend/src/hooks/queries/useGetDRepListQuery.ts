@@ -3,7 +3,7 @@ import { UseInfiniteQueryOptions, useInfiniteQuery } from "react-query";
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { GetDRepListArguments, getDRepList } from "@services";
-import { InfinityDRepData } from "@/models";
+import { DRepData, Infinite } from "@/models";
 
 export const useGetDRepListInfiniteQuery = (
   {
@@ -13,7 +13,7 @@ export const useGetDRepListInfiniteQuery = (
     sorting,
     status,
   }: GetDRepListArguments,
-  options?: UseInfiniteQueryOptions<InfinityDRepData>,
+  options?: UseInfiniteQueryOptions<Infinite<DRepData>>,
 ) => {
   const { pendingTransaction } = useCardano();
 

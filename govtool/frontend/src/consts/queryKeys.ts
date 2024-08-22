@@ -1,14 +1,15 @@
 export const QUERY_KEYS = {
   getAdaHolderCurrentDelegationKey: "getAdaHolderCurrentDelegationKey",
   getAdaHolderVotingPowerKey: "getAdaHolderVotingPowerKey",
+  useGetDRepInfoKey: "useGetDRepInfoKey",
   useGetDRepListInfiniteKey: "useGetDRepListInfiniteKey",
   useGetDRepVotesKey: "useGetDRepVotesKey",
   useGetDRepVotingPowerKey: "useGetDRepVotingPowerKey",
+  useGetEpochParamsKey: "useGetEpochParamsKey",
   useGetNetworkMetricsKey: "useGetNetworkMetricsKey",
   useGetProposalKey: "useGetProposalKey",
-  useGetProposalsKey: "useGetProposalsKey",
   useGetProposalsInfiniteKey: "useGetProposalsInfiniteKey",
-  useGetDRepInfoKey: "useGetDRepInfoKey",
+  useGetProposalsKey: "useGetProposalsKey",
   useGetVoteContextFromFile: "useGetVoteContextFromFile",
 };
 

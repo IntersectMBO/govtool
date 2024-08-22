@@ -13,12 +13,12 @@ export const parseMetadata = (
     case MetadataStandard.CIP108:
       for (const [key, value] of Object.entries(metadata)) {
         if (CIP_108_VALUE_KEYS.includes(key)) {
-          parsedMetadata[key] = value['@value'];
+          parsedMetadata[key] = value;
         }
 
         if (key === 'references') {
           parsedMetadata[key] = (Array.isArray(value) ? value : [])?.map(
-            (reference) => reference?.uri['@value'],
+            (reference) => reference?.uri,
           );
         }
       }
@@ -26,13 +26,14 @@ export const parseMetadata = (
       return parsedMetadata;
 
     case MetadataStandard.CIPQQQ:
+      console.log({ metadataRaw: metadata });
       for (const [key, value] of Object.entries(metadata)) {
         if (CIP_QQQ_VALUE_KEYS.includes(key)) {
-          parsedMetadata[key] = value['@value'];
+          parsedMetadata[key] = value;
         }
         if (key === 'references') {
           parsedMetadata[key] = (Array.isArray(value) ? value : [])?.map(
-            (reference) => reference?.uri['@value'],
+            (reference) => reference?.uri,
           );
         }
       }

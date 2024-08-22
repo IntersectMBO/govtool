@@ -3,6 +3,8 @@ import { Box } from "@mui/material";
 
 import { useScreenDimension } from "@hooks";
 import { VoteActionForm, VotesSubmitted } from "@molecules";
+import { useFeatureFlag } from "@/context";
+import { GovernanceActionType } from "@/types/governanceAction";
 
 type GovernanceActionCardVotesProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
@@ -19,6 +21,7 @@ type GovernanceActionCardVotesProps = {
   voteEpochNoFromEP?: number;
   isDashboard?: boolean;
   isInProgress?: boolean;
+  type: GovernanceActionType;
 };
 
 export const GovernanceActionDetailsCardVotes = ({
@@ -36,7 +39,9 @@ export const GovernanceActionDetailsCardVotes = ({
   voteEpochNoFromEP,
   isDashboard,
   isInProgress,
+  type,
 }: GovernanceActionCardVotesProps) => {
+  const { isVotingOnGovernanceActionEnabled } = useFeatureFlag();
   const { screenWidth } = useScreenDimension();
 
   const isModifiedPadding =
@@ -50,7 +55,7 @@ export const GovernanceActionDetailsCardVotes = ({
         p: `40px ${isModifiedPadding ? "24px" : "80px"}`,
       }}
     >
-      {isVoter ? (
+      {isVoter && isVotingOnGovernanceActionEnabled(type) ? (
         <VoteActionForm
           setIsVoteSubmitted={setIsVoteSubmitted}
           expiryDate={expiryDate}

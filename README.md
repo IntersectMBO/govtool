@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="750" src=".github/images/sanchonet-govtool-header.png"/>
+  <img width="750" src=".github/images/voltaire-govtool-header.png"/>
 </p>
 
 <p align="center">
@@ -18,18 +18,32 @@
 
 ## 🌄 Purpose
 
-The Voltaire GovTool enables ada holders to experience some of the governance features described in [CIP-1694](https://github.com/cardano-foundation/CIPs/blob/master/CIP-1694/README.md) and to test governance features.
-The Voltaire GovTool is currently open for preview testing and can be accessed at [preview.gov.tools](https://preview.gov.tools/).
+The Voltaire GovTool enables ada holders to experience the governance features described in [CIP-1694](https://github.com/cardano-foundation/CIPs/blob/master/CIP-1694/README.md).
 
-Learn more; [docs.sanchogov.tools](https://docs.sanchogov.tools/).
+### Instances
+
+#### Mainnet
+
+- _Coming soon_
+
+#### SanchoNet
+
+- [sanchogov.tools](https://sanchogov.tools/)
+
+#### Preview Testnet
+
+- [preview.gov.tools](https://preview.gov.tools/)
+
+### Documentation
+
+Learn more; [docs.gov.tools](https://docs.gov.tools/).
 
 ## 📍 Navigation
 
-- [GovTool Backend](./govtool/backend/README.md)
-- [GovTool Frontend](./govtool/frontend/README.md)
-- [GovTool Infrastructure](./infra/terraform/README.md)
-- [GovTool deployment process](./scripts/govtool/README.md)
-- [Documentation](./docs/)
+- [Backend](./govtool/backend/README.md)
+- [Frontend](./govtool/frontend/README.md)
+- [Infrastructure](./infra/terraform/README.md)
+- [In repo documentation](./docs/)
 - [Tests](./tests/)
 
 ### Utilities
@@ -49,7 +63,5 @@ Frontend is able to connect to Cardano wallets over the [CIP-30](https://github.
 ## 🤝 Contributing
 
 Thanks for considering contributing and helping us on creating GovTool! 😎
-
-⚠️ We are in the process of improving our contributing documentation, improvements to come.
 
 Please checkout our [Contributing Documentation](./CONTRIBUTING.md).

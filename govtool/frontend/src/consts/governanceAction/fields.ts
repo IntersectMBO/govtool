@@ -7,9 +7,9 @@ import {
   SharedGovernanceActionFieldSchema,
 } from "@/types/governanceAction";
 
-export const GovernanceActionTootlip = {
-  Info: I18n.t("govActions.tooltips.info"),
-  Treasury: I18n.t("govActions.tooltips.treasury"),
+export const GovernanceActionTooltip = {
+  InfoAction: I18n.t("govActions.tooltips.info"),
+  TreasuryWithdrawals: I18n.t("govActions.tooltips.treasury"),
 };
 
 export const CIP_100 =
@@ -96,8 +96,8 @@ export const sharedGovernanceActionFields: SharedGovernanceActionFieldSchema = {
 };
 
 export const GOVERNANCE_ACTION_FIELDS: GovernanceActionFields = {
-  [GovernanceActionType.Info]: sharedGovernanceActionFields,
-  [GovernanceActionType.Treasury]: {
+  [GovernanceActionType.InfoAction]: sharedGovernanceActionFields,
+  [GovernanceActionType.TreasuryWithdrawals]: {
     ...sharedGovernanceActionFields,
     receivingAddress: {
       component: GovernanceActionField.Input,

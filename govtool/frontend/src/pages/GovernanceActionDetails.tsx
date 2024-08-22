@@ -17,7 +17,6 @@ import {
 } from "@hooks";
 import { Footer, TopNav, GovernanceActionDetailsCard } from "@organisms";
 import {
-  formatDisplayDate,
   getProposalTypeLabel,
   WALLET_LS_KEY,
   getItemFromLocalStorage,
@@ -25,6 +24,8 @@ import {
 } from "@utils";
 import { Breadcrumbs } from "@molecules";
 
+// TODO: Refactor: GovernanceActionDetals and DashboardGovernanceActionDetails are almost identical
+// and should be unified
 export const GovernanceActionDetails = () => {
   const { state, hash } = useLocation();
   const navigate = useNavigate();
@@ -41,7 +42,12 @@ export const GovernanceActionDetails = () => {
     state ? state.index : data?.proposal.index ?? "",
   );
 
+  // TODO: Refactor me
   const title = state ? state?.title : data?.proposal?.title;
+  const label = state
+    ? getProposalTypeLabel(state.type)
+    : getProposalTypeLabel(data.proposal.type);
+  const type = state ? state.type : data.proposal.type;
 
   useEffect(() => {
     if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
@@ -131,9 +137,7 @@ export const GovernanceActionDetails = () => {
                     state ? state.abstainVotes : data.proposal.abstainVotes
                   }
                   createdDate={
-                    state
-                      ? formatDisplayDate(state.createdDate)
-                      : formatDisplayDate(data.proposal.createdDate)
+                    state ? state.createdDate : data.proposal.createdDate
                   }
                   createdEpochNo={
                     state ? state.createdEpochNo : data.proposal.createdEpochNo
@@ -142,22 +146,17 @@ export const GovernanceActionDetails = () => {
                     state ? state.metadataStatus : data?.proposal.metadataStatus
                   }
                   expiryDate={
-                    state
-                      ? formatDisplayDate(state.expiryDate)
-                      : formatDisplayDate(data.proposal.expiryDate)
+                    state ? state.expiryDate : data.proposal.expiryDate
                   }
                   expiryEpochNo={
                     state ? state.expiryEpochNo : data.proposal.expiryEpochNo
                   }
                   noVotes={state ? state.noVotes : data.proposal.noVotes}
-                  type={
-                    state
-                      ? getProposalTypeLabel(state.type)
-                      : getProposalTypeLabel(data.proposal.type)
-                  }
+                  type={type}
+                  label={label}
+                  title={title}
                   details={state ? state.details : data.proposal.details}
                   url={state ? state.url : data.proposal.url}
-                  title={title}
                   abstract={state ? state?.abstract : data.proposal?.abstract}
                   motivation={
                     state ? state?.motivation : data.proposal?.motivation

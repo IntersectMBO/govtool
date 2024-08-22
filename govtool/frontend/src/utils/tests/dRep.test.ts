@@ -1,10 +1,10 @@
 import { isSameDRep } from "..";
 
-import { DRepStatus } from "@/models";
+import { DRepData, DRepStatus } from "@/models";
 
 type TDRepType = "DRep" | "SoleVoter";
 
-const EXAMPLE_DREP = {
+const EXAMPLE_DREP: DRepData = {
   drepId: "drep123",
   view: "view123",
   url: "url",
@@ -19,6 +19,7 @@ const EXAMPLE_DREP = {
   references: [],
   metadataStatus: null,
   metadataValid: true,
+  latestRegistrationDate: "2024-07-10",
 };
 
 describe("isSameDRep function", () => {

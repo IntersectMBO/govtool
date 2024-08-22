@@ -22,7 +22,7 @@ export const DrawerMobile = ({
   const { t } = useTranslation();
 
   const onClickHelp = () =>
-    openInNewTab("https://docs.sanchogov.tools/support/get-help-in-discord");
+    openInNewTab("https://docs.gov.tools/support/get-help-in-discord");
 
   return (
     <SwipeableDrawer

@@ -107,7 +107,7 @@ export const ChooseWalletModal = forwardRef<HTMLDivElement>((_, ref) => {
             fontWeight={500}
             onClick={() =>
               openInNewTab(
-                "https://docs.sanchogov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet",
+                "https://docs.gov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet",
               )
             }
             sx={{ cursor: "pointer" }}

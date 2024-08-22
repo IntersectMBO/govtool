@@ -24,7 +24,7 @@ The Voltaire GovTool enables ada holders to experience the governance features d
 
 #### Mainnet
 
-- *Coming soon*
+- _Coming soon_
 
 #### SanchoNet
 

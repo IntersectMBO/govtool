@@ -36,9 +36,7 @@ export const EditDRepStorageInformation = ({
   const fileName = getValues("dRepName");
 
   const openGuideAboutStoringInformation = () =>
-    openInNewTab(
-      "https://docs.sanchogov.tools/faqs/how-to-create-a-metadata-anchor",
-    );
+    openInNewTab("https://docs.gov.tools/faqs/how-to-create-a-metadata-anchor");
 
   const isActionButtonDisabled = !watch("storingURL") || !!errors.storingURL;
 

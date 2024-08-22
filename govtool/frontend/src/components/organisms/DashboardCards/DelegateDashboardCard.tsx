@@ -55,7 +55,7 @@ export const DelegateDashboardCard = ({
     dataTestId: "delegate-learn-more-button",
     onClick: () =>
       openInNewTab(
-        "https://docs.sanchogov.tools/how-to-use-the-govtool/using-govtool/delegating",
+        "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/delegating",
       ),
     sx: { backgroundColor: "arcticWhite" },
   };

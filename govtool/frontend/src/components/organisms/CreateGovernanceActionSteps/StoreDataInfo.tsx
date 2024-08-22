@@ -21,7 +21,7 @@ export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
   const { isMobile } = useScreenDimension();
 
   // TODO: change link when available
-  const openLink = () => openInNewTab("https://docs.sanchogov.tools");
+  const openLink = () => openInNewTab("https://docs.gov.tools");
 
   const isContinueDisabled = !watch("storeData");
 

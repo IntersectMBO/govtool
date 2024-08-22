@@ -81,7 +81,7 @@ export const DataMissingInfoBox = ({
         onClick={() =>
           // TODO: Add the correct link
           openInNewTab(
-            "https://docs.sanchogov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet",
+            "https://docs.gov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet",
           )
         }
         sx={{

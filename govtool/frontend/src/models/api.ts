@@ -133,7 +133,6 @@ type ProposalVote = {
 };
 
 export type ProposalDataDTO = {
-  abstainVotes: number;
   createdDate: string;
   createdEpochNo: number;
   details?: ActionDetailsType;
@@ -142,16 +141,24 @@ export type ProposalDataDTO = {
   id: string;
   index: number;
   metadataHash: string;
-  noVotes: number;
   txHash: string;
   type: string;
   url: string;
-  yesVotes: number;
+  dRepYesVotes: number;
+  dRepNoVotes: number;
+  dRepAbstainVotes: number;
+  ccYesVotes: number;
+  ccNoVotes: number;
+  ccAbstainVotes: number;
+  poolYesVotes: number;
+  poolNoVotes: number;
+  poolAbstainVotes: number;
   abstract?: string;
   motivation?: string;
   rationale?: string;
   references?: string[];
   title?: string;
+  protocolParams: EpochParams | null;
 };
 
 export type ProposalData = ProposalDataDTO & {

@@ -46,6 +46,7 @@
     "keen-slider": "^6.8.5",
     "patch-package": "^8.0.0",
     "react": "^18.2.0",
+    "react-diff-viewer": "^3.1.1",
     "react-dom": "^18.2.0",
     "react-gtm-module": "^2.0.11",
     "react-hook-form": "^7.47.0",

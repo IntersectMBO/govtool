@@ -1,4 +1,7 @@
-import { Box } from "@mui/material";
+import { useMemo, useState } from "react";
+import { Box, Tabs, Tab, styled } from "@mui/material";
+import { useLocation } from "react-router-dom";
+import ReactDiffViewer from "react-diff-viewer";
 
 import { ExternalModalButton } from "@atoms";
 import {
@@ -9,9 +12,43 @@ import {
   GovernanceActionsDatesBox,
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { getProposalTypeNoEmptySpaces, testIdFromLabel } from "@utils";
-import { MetadataValidationStatus } from "@models";
-import { useLocation } from "react-router-dom";
+import {
+  getProposalTypeNoEmptySpaces,
+  testIdFromLabel,
+  replaceNullValues,
+} from "@utils";
+import { EpochParams, MetadataValidationStatus } from "@models";
+import { GovernanceActionType } from "@/types/governanceAction";
+import { useAppContext } from "@/context";
+
+type TabPanelProps = {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+};
+
+const CustomTabPanel = ({ children, value, index }: TabPanelProps) =>
+  value === index && (
+    <Box sx={value === index && index === 1 ? { overflow: "scroll" } : {}}>
+      {children}
+    </Box>
+  );
+
+type StyledTabProps = {
+  label: string;
+};
+
+const StyledTab = styled((props: StyledTabProps) => (
+  <Tab disableRipple {...props} />
+))(() => ({
+  textTransform: "none",
+  fontWeight: 600,
+  fontSize: 16,
+  color: "rgba(36, 34, 50, 0.5)",
+  "&.Mui-selected": {
+    color: "rgba(38, 37, 45, 1)",
+  },
+}));
 
 type GovernanceActionDetailsCardDataProps = {
   abstract?: string;
@@ -32,6 +69,8 @@ type GovernanceActionDetailsCardDataProps = {
   title?: string;
   label: string;
   url: string;
+  type: GovernanceActionType;
+  protocolParams: EpochParams | null;
 };
 
 export const GovernanceActionDetailsCardData = ({
@@ -53,12 +92,23 @@ export const GovernanceActionDetailsCardData = ({
   title,
   label,
   url,
+  type,
+  protocolParams,
 }: GovernanceActionDetailsCardDataProps) => {
+  const { epochParams } = useAppContext();
   const { t } = useTranslation();
   const { screenWidth } = useScreenDimension();
+  const { isMobile } = useScreenDimension();
+  const showTabs =
+    type === GovernanceActionType.ParameterChange &&
+    !!protocolParams &&
+    !!epochParams &&
+    !isDataMissing;
 
   const isModifiedPadding =
     (isDashboard && screenWidth < 1168) ?? screenWidth < 900;
+
+  const [tab, setTab] = useState<number>(0);
 
   const { pathname, hash } = useLocation();
 
@@ -67,6 +117,39 @@ export const GovernanceActionDetailsCardData = ({
   }${window.location.port ? `:${window.location.port}` : ""}${pathname}${
     hash ?? ""
   }`;
+
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setTab(newValue);
+  };
+
+  const reasoningTabContent = useMemo(
+    () => (
+      <>
+        <GovernanceActionCardElement
+          label={t("govActions.abstract")}
+          text={abstract}
+          textVariant="longText"
+          dataTestId="abstract"
+          isMarkdown
+        />
+        <GovernanceActionCardElement
+          label={t("govActions.motivation")}
+          text={motivation}
+          textVariant="longText"
+          dataTestId="motivation"
+          isMarkdown
+        />
+        <GovernanceActionCardElement
+          label={t("govActions.rationale")}
+          text={rationale}
+          textVariant="longText"
+          dataTestId="rationale"
+          isMarkdown
+        />
+      </>
+    ),
+    [abstract, motivation, rationale],
+  );
 
   return (
     <Box
@@ -111,27 +194,58 @@ export const GovernanceActionDetailsCardData = ({
         isCopyButton
         dataTestId={`${govActionId}-id`}
       />
-      <GovernanceActionCardElement
-        label={t("govActions.abstract")}
-        text={abstract}
-        textVariant="longText"
-        dataTestId="abstract"
-        isMarkdown
-      />
-      <GovernanceActionCardElement
-        label={t("govActions.motivation")}
-        text={motivation}
-        textVariant="longText"
-        dataTestId="motivation"
-        isMarkdown
-      />
-      <GovernanceActionCardElement
-        label={t("govActions.rationale")}
-        text={rationale}
-        textVariant="longText"
-        dataTestId="rationale"
-        isMarkdown
-      />
+
+      {showTabs && protocolParams ? (
+        <>
+          <Tabs
+            sx={{
+              marginY: 4,
+              display: "flex",
+              fontSize: 16,
+              fontWeight: 500,
+            }}
+            value={tab}
+            indicatorColor="secondary"
+            onChange={handleChange}
+            aria-label="basic tabs example"
+          >
+            <StyledTab
+              data-testid="reasoning-tab"
+              label="Reasoning"
+              sx={{
+                textTransform: "none",
+                width: !isMobile ? "auto" : "50%",
+              }}
+            />
+            <StyledTab
+              data-testid="parameters-tab"
+              label="Parameters"
+              sx={{
+                textTransform: "none",
+                width: !isMobile ? "auto" : "50%",
+              }}
+            />
+          </Tabs>
+
+          <CustomTabPanel value={tab} index={0}>
+            {reasoningTabContent}
+          </CustomTabPanel>
+          <CustomTabPanel value={tab} index={1}>
+            <ReactDiffViewer
+              oldValue={JSON.stringify(epochParams, null, 2)}
+              newValue={JSON.stringify(
+                replaceNullValues(epochParams, protocolParams),
+                null,
+                2,
+              )}
+              showDiffOnly
+            />
+          </CustomTabPanel>
+        </>
+      ) : (
+        reasoningTabContent
+      )}
+
       {details &&
         Object.keys(details).length !== 0 &&
         Object.entries(details).map(([detailLabel, content]) => (

@@ -7,16 +7,14 @@ import {
   GovernanceActionDetailsCardVotes,
 } from "@molecules";
 import { GovernanceActionDetailsCardData } from "@organisms";
-import { MetadataValidationStatus } from "@models";
+import { EpochParams, MetadataValidationStatus } from "@models";
 import { GovernanceActionType } from "@/types/governanceAction";
 
 type GovernanceActionDetailsCardProps = {
-  abstainVotes: number;
   createdDate: string;
   createdEpochNo: number;
   expiryDate: string;
   expiryEpochNo: number;
-  noVotes: number;
   type: GovernanceActionType;
   label: string;
   details?: ActionDetailsType;
@@ -25,7 +23,6 @@ type GovernanceActionDetailsCardProps = {
   abstract?: string;
   motivation?: string;
   rationale?: string;
-  yesVotes: number;
   links?: string[];
   govActionId: string;
   isDataMissing: null | MetadataValidationStatus;
@@ -36,15 +33,19 @@ type GovernanceActionDetailsCardProps = {
   voteDateFromEP?: string;
   voteEpochNoFromEP?: number;
   isInProgress?: boolean;
+  protocolParams: EpochParams | null;
+  dRepAbstainVotes: number;
+  dRepNoVotes: number;
+  dRepYesVotes: number;
 };
 
 export const GovernanceActionDetailsCard = ({
-  abstainVotes,
+  dRepAbstainVotes,
   createdDate,
   createdEpochNo,
   expiryDate,
   expiryEpochNo,
-  noVotes,
+  dRepNoVotes,
   details,
   url,
   type,
@@ -54,7 +55,7 @@ export const GovernanceActionDetailsCard = ({
   abstract,
   motivation,
   rationale,
-  yesVotes,
+  dRepYesVotes,
   isDashboard,
   isVoter,
   voteFromEP,
@@ -64,6 +65,7 @@ export const GovernanceActionDetailsCard = ({
   govActionId,
   isInProgress,
   isDataMissing,
+  protocolParams,
 }: GovernanceActionDetailsCardProps) => {
   const [isVoteSubmitted, setIsVoteSubmitted] = useState<boolean>(false);
   const { screenWidth, isMobile } = useScreenDimension();
@@ -114,12 +116,14 @@ export const GovernanceActionDetailsCard = ({
         title={title}
         label={label}
         url={url}
+        type={type}
+        protocolParams={protocolParams}
       />
       <GovernanceActionDetailsCardVotes
         setIsVoteSubmitted={setIsVoteSubmitted}
-        abstainVotes={abstainVotes}
-        noVotes={noVotes}
-        yesVotes={yesVotes}
+        abstainVotes={dRepAbstainVotes}
+        noVotes={dRepNoVotes}
+        yesVotes={dRepYesVotes}
         expiryDate={expiryDate}
         expiryEpochNo={expiryEpochNo}
         isVoter={isVoter}

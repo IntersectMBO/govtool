@@ -32,6 +32,16 @@ const commonArgs = {
   type: "exampleType",
   metadataValid: true,
   metadataStatus: null,
+  dRepYesVotes: 1,
+  dRepNoVotes: 0,
+  dRepAbstainVotes: 0,
+  ccYesVotes: 0,
+  ccNoVotes: 0,
+  ccAbstainVotes: 0,
+  poolYesVotes: 0,
+  poolNoVotes: 0,
+  poolAbstainVotes: 0,
+  protocolParams: null,
 };
 
 export const GovernanceActionCardComponent: Story = {

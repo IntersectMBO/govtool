@@ -414,6 +414,45 @@ instance ToSchema GovernanceActionMetadata where
           ?~ toJSON
                 ("{\"some_key\": \"some value\", \"some_key2\": [1,2,3]}" :: Text)
 
+newtype GetCurrentEpochParamsResponse
+  = GetCurrentEpochParamsResponse { getCurrentEpochParamsResponse :: Maybe Value }
+  deriving newtype (Show)
+
+instance FromJSON GetCurrentEpochParamsResponse where
+  parseJSON = pure . GetCurrentEpochParamsResponse . Just
+
+instance ToJSON GetCurrentEpochParamsResponse where
+  toJSON (GetCurrentEpochParamsResponse Nothing)       = Null
+  toJSON (GetCurrentEpochParamsResponse (Just params)) = toJSON params
+
+exampleGetCurrentEpochParamsResponse :: Text
+exampleGetCurrentEpochParamsResponse =
+  "{ \"id\":90,\"epoch_no\":90,\"min_fee_a\":44,\"min_fee_b\":155381,\"max_block_size\":90112,\"max_tx_size\":16384,\"max_bh_size\":1100,\"key_deposit\":2000000,\"pool_deposit\":500000000,\"max_epoch\":18,\"optimal_pool_count\":5\r\n00,\"influence\":0.3,\"monetary_expand_rate\":0.003,\"treasury_growth_rate\":0.2,\"decentralisation\":0,\"protocol_major\":8,\"protocol_minor\":0,\"min_utxo_value\":0,\"min_pool_cost\":340000000,\"nonce\":\"\\\\x664c2d0eedc1c\r\n9ee7fc8b4f242c8d13ba17fd31454c84357fa8f1ac62f682cf9\",\"cost_model_id\":2,\"price_mem\":0.0577,\"price_step\":7.21e-05,\"max_tx_ex_mem\":14000000,\"max_tx_ex_steps\":10000000000,\"max_block_ex_mem\":62000000,\"max_bloc\r\nk_ex_steps\":20000000000,\"max_val_size\":5000,\"collateral_percent\":150,\"max_collateral_inputs\":3,\"block_id\":387943,\"extra_entropy\":null,\"coins_per_utxo_size\":4310}"
+
+instance ToSchema GetCurrentEpochParamsResponse where
+    declareNamedSchema _ = pure $ NamedSchema (Just "GetCurrentEpochParamsResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "Protocol parameters encoded as JSON"
+        & example
+          ?~ toJSON exampleGetCurrentEpochParamsResponse
+
+
+newtype ProtocolParams
+  = ProtocolParams { getProtocolParams :: Value }
+  deriving newtype (Show)
+
+instance FromJSON ProtocolParams where
+  parseJSON = pure . ProtocolParams
+
+instance ToJSON ProtocolParams where
+  toJSON (ProtocolParams params) = toJSON params
+
+instance ToSchema ProtocolParams where
+    declareNamedSchema _ = pure $ NamedSchema (Just "ProtocolParams") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "Protocol parameters encoded as JSON"
+        & example
+          ?~ toJSON exampleGetCurrentEpochParamsResponse
 
 
 newtype GovernanceActionReferences
@@ -435,28 +474,33 @@ instance ToSchema GovernanceActionReferences where
           ?~ toJSON
                 ("[{\"uri\": \"google.com\", \"@type\": \"Other\", \"label\": \"example label\"}]" :: Text)
 
-
-
 data ProposalResponse
   = ProposalResponse
-      { proposalResponseId             :: Text
-      , proposalResponseTxHash         :: HexText
-      , proposalResponseIndex          :: Integer
-      , proposalResponseType           :: GovernanceActionType
-      , proposalResponseDetails        :: Maybe GovernanceActionDetails
-      , proposalResponseExpiryDate     :: Maybe UTCTime
-      , proposalResponseExpiryEpochNo  :: Maybe Integer
-      , proposalResponseCreatedDate    :: UTCTime
-      , proposalResponseCreatedEpochNo :: Integer
-      , proposalResponseUrl            :: Text
-      , proposalResponseMetadataHash   :: HexText
-      , proposalResponseTitle          :: Maybe Text
-      , proposalResponseAbstract       :: Maybe Text
-      , proposalResponseMotivation     :: Maybe Text
-      , proposalResponseRationale      :: Maybe Text
-      , proposalResponseYesVotes       :: Integer
-      , proposalResponseNoVotes        :: Integer
-      , proposalResponseAbstainVotes   :: Integer
+      { proposalResponseId                 :: Text
+      , proposalResponseTxHash             :: HexText
+      , proposalResponseIndex              :: Integer
+      , proposalResponseType               :: GovernanceActionType
+      , proposalResponseDetails            :: Maybe GovernanceActionDetails
+      , proposalResponseExpiryDate         :: Maybe UTCTime
+      , proposalResponseExpiryEpochNo      :: Maybe Integer
+      , proposalResponseCreatedDate        :: UTCTime
+      , proposalResponseCreatedEpochNo     :: Integer
+      , proposalResponseUrl                :: Text
+      , proposalResponseMetadataHash       :: HexText
+      , proposalResponseProtocolParams     :: Maybe ProtocolParams
+      , proposalResponseTitle              :: Maybe Text
+      , proposalResponseAbstract           :: Maybe Text
+      , proposalResponseMotivation         :: Maybe Text
+      , proposalResponseRationale          :: Maybe Text
+      , proposalResponseDRepYesVotes       :: Integer
+      , proposalResponseDRepNoVotes        :: Integer
+      , proposalResponseDRepAbstainVotes   :: Integer
+      , proposalResponsePoolYesVotes       :: Integer
+      , proposalResponsePoolNoVotes        :: Integer
+      , proposalResponsePoolAbstainVotes   :: Integer
+      , proposalResponseCcYesVotes         :: Integer
+      , proposalResponseCcNoVotes          :: Integer
+      , proposalResponseCcAbstainVotes     :: Integer
       }
   deriving (Generic, Show)
 
@@ -474,13 +518,20 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"createdEpochNo\": 0,"
                   <> "\"url\": \"https://proposal.metadata.xyz\","
                   <> "\"metadataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
+                  <> "\"protocolParams\": " <> exampleGetCurrentEpochParamsResponse <> ","
                   <> "\"title\": \"Proposal Title\","
                   <> "\"abstract\": \"Proposal About\","
                   <> "\"motivation\": \"Proposal Motivation\","
                   <> "\"rationale\": \"Proposal Rationale\","
-                  <> "\"yesVotes\": 0,"
-                  <> "\"noVotes\": 0,"
-                  <> "\"abstainVotes\": 0}"
+                  <> "\"dRepYesVotes\": 0,"
+                  <> "\"dRepNoVotes\": 0,"
+                  <> "\"dRepAbstainVotes\": 0,"
+                  <> "\"poolYesVotes\": 0,"
+                  <> "\"poolNoVotes\": 0,"
+                  <> "\"poolAbstainVotes\": 0,"
+                  <> "\"cCYesVotes\": 0,"
+                  <> "\"cCNoVotes\": 0,"
+                  <> "\"cCAbstainVotes\": 0}"
 
 instance ToSchema ProposalResponse where
   declareNamedSchema proxy = do
@@ -678,29 +729,6 @@ instance ToSchema GetProposalResponse where
           & description ?~ "GetProposal Response"
           & example
             ?~ toJSON exampleGetProposalResponse
-
-
-newtype GetCurrentEpochParamsResponse
-  = GetCurrentEpochParamsResponse { getCurrentEpochParamsResponse :: Maybe Value }
-  deriving newtype (Show)
-
-instance FromJSON GetCurrentEpochParamsResponse where
-  parseJSON = pure . GetCurrentEpochParamsResponse . Just
-
-instance ToJSON GetCurrentEpochParamsResponse where
-  toJSON (GetCurrentEpochParamsResponse Nothing)       = Null
-  toJSON (GetCurrentEpochParamsResponse (Just params)) = toJSON params
-
-exampleGetCurrentEpochParamsResponse :: Text
-exampleGetCurrentEpochParamsResponse =
-  "{ \"id\":90,\"epoch_no\":90,\"min_fee_a\":44,\"min_fee_b\":155381,\"max_block_size\":90112,\"max_tx_size\":16384,\"max_bh_size\":1100,\"key_deposit\":2000000,\"pool_deposit\":500000000,\"max_epoch\":18,\"optimal_pool_count\":5\r\n00,\"influence\":0.3,\"monetary_expand_rate\":0.003,\"treasury_growth_rate\":0.2,\"decentralisation\":0,\"protocol_major\":8,\"protocol_minor\":0,\"min_utxo_value\":0,\"min_pool_cost\":340000000,\"nonce\":\"\\\\x664c2d0eedc1c\r\n9ee7fc8b4f242c8d13ba17fd31454c84357fa8f1ac62f682cf9\",\"cost_model_id\":2,\"price_mem\":0.0577,\"price_step\":7.21e-05,\"max_tx_ex_mem\":14000000,\"max_tx_ex_steps\":10000000000,\"max_block_ex_mem\":62000000,\"max_bloc\r\nk_ex_steps\":20000000000,\"max_val_size\":5000,\"collateral_percent\":150,\"max_collateral_inputs\":3,\"block_id\":387943,\"extra_entropy\":null,\"coins_per_utxo_size\":4310}"
-
-instance ToSchema GetCurrentEpochParamsResponse where
-    declareNamedSchema _ = pure $ NamedSchema (Just "GetCurrentEpochParamsResponse") $ mempty
-        & type_ ?~ OpenApiObject
-        & description ?~ "Protocol parameters encoded as JSON"
-        & example
-          ?~ toJSON exampleGetCurrentEpochParamsResponse
 
 newtype GetTransactionStatusResponse
   = GetTransactionStatusResponse { getTransactionstatusResponseTransactionConfirmed :: Bool }

@@ -17,37 +17,39 @@ import {
 } from "@hooks";
 import { Footer, TopNav, GovernanceActionDetailsCard } from "@organisms";
 import {
-  getProposalTypeLabel,
   WALLET_LS_KEY,
+  getFullGovActionId,
   getItemFromLocalStorage,
   getShortenedGovActionId,
 } from "@utils";
 import { Breadcrumbs } from "@molecules";
+import { ProposalData } from "@/models";
+
+type GovernanceActionDetailsState = {
+  proposal?: ProposalData;
+  openedFromCategoryPage?: boolean;
+};
 
 // TODO: Refactor: GovernanceActionDetals and DashboardGovernanceActionDetails are almost identical
 // and should be unified
 export const GovernanceActionDetails = () => {
-  const { state, hash } = useLocation();
+  const { state: untypedState, hash } = useLocation();
+  const state = untypedState as GovernanceActionDetailsState | null;
+  const index = hash.slice(1);
   const navigate = useNavigate();
   const { pagePadding, isMobile } = useScreenDimension();
   const { isEnabled } = useCardano();
   const { t } = useTranslation();
-  const { proposalId } = useParams();
-  const fullProposalId = proposalId + hash;
+  const { proposalId: txHash } = useParams();
 
-  const { data, isLoading } = useGetProposalQuery(fullProposalId ?? "", !state);
+  const fullProposalId = txHash && getFullGovActionId(txHash, index);
+  const shortenedGovActionId = txHash && getShortenedGovActionId(txHash, index);
 
-  const shortenedGovActionId = getShortenedGovActionId(
-    state ? state.txHash : data?.proposal.txHash ?? "",
-    state ? state.index : data?.proposal.index ?? "",
+  const { data, isLoading } = useGetProposalQuery(
+    fullProposalId ?? "",
+    !state?.proposal,
   );
-
-  // TODO: Refactor me
-  const title = state ? state?.title : data?.proposal?.title;
-  const label = state
-    ? getProposalTypeLabel(state.type)
-    : getProposalTypeLabel(data.proposal.type);
-  const type = state ? state.type : data.proposal.type;
+  const proposal = (data ?? state)?.proposal;
 
   useEffect(() => {
     if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
@@ -91,10 +93,8 @@ export const GovernanceActionDetails = () => {
             <Breadcrumbs
               elementOne={t("govActions.title")}
               elementOnePath={PATHS.governanceActions}
-              elementTwo={title}
-              isDataMissing={
-                state ? state.metadataStatus : data?.proposal.metadataStatus
-              }
+              elementTwo={proposal?.title ?? ""}
+              isDataMissing={proposal?.metadataStatus ?? null}
             />
             <Link
               sx={{
@@ -106,7 +106,7 @@ export const GovernanceActionDetails = () => {
                 navigate(
                   state && state.openedFromCategoryPage
                     ? generatePath(PATHS.governanceActionsCategory, {
-                        category: state.type,
+                        category: state?.proposal?.type,
                       })
                     : PATHS.governanceActions,
                 )
@@ -130,74 +130,11 @@ export const GovernanceActionDetails = () => {
               >
                 <CircularProgress />
               </Box>
-            ) : data || state ? (
+            ) : proposal ? (
               <Box data-testid="governance-action-details">
                 <GovernanceActionDetailsCard
-                  dRepAbstainVotes={
-                    state
-                      ? state.dRepAbstainVotes
-                      : data.proposal.dRepAbstainVotes
-                  }
-                  dRepNoVotes={
-                    state ? state.dRepNoVotes : data.proposal.dRepNoVotes
-                  }
-                  dRepYesVotes={
-                    state ? state.dRepYesVotes : data.proposal.dRepYesVotes
-                  }
-                  poolAbstainVotes={
-                    state
-                      ? state.poolAbstainVotes
-                      : data.proposal.poolAbstainVotes
-                  }
-                  poolNoVotes={
-                    state ? state.poolNoVotes : data.proposal.poolNoVotes
-                  }
-                  poolYesVotes={
-                    state ? state.poolYesVotes : data.proposal.poolYesVotes
-                  }
-                  ccAbstainVotes={
-                    state ? state.ccAbstainVotes : data.proposal.ccAbstainVotes
-                  }
-                  ccNoVotes={state ? state.ccNoVotes : data.proposal.ccNoVotes}
-                  ccYesVotes={
-                    state ? state.ccYesVotes : data.proposal.ccYesVotes
-                  }
-                  createdDate={
-                    state ? state.createdDate : data.proposal.createdDate
-                  }
-                  createdEpochNo={
-                    state ? state.createdEpochNo : data.proposal.createdEpochNo
-                  }
-                  isDataMissing={
-                    state ? state.metadataStatus : data?.proposal.metadataStatus
-                  }
-                  expiryDate={
-                    state ? state.expiryDate : data.proposal.expiryDate
-                  }
-                  expiryEpochNo={
-                    state ? state.expiryEpochNo : data.proposal.expiryEpochNo
-                  }
-                  type={type}
-                  label={label}
-                  title={title}
-                  details={state ? state.details : data.proposal.details}
-                  url={state ? state.url : data.proposal.url}
-                  abstract={state ? state?.abstract : data.proposal?.abstract}
-                  motivation={
-                    state ? state?.motivation : data.proposal?.motivation
-                  }
-                  rationale={
-                    state ? state?.rationale : data.proposal?.rationale
-                  }
-                  links={state ? state?.references : data.proposal?.references}
-                  govActionId={fullProposalId}
-                  prevGovActionId={
-                    (state ?? data.proposal).prevGovActionId +
-                      (state ?? data.proposal).prevGovActionTxHash || null
-                  }
-                  protocolParams={
-                    state ? state.protocolParams : data.proposal.protocolParams
-                  }
+                  isDataMissing={proposal.metadataStatus}
+                  proposal={proposal}
                 />
               </Box>
             ) : (

@@ -1,12 +1,13 @@
 import { ProposalData } from "@models";
 import { removeDuplicatedProposals } from "..";
+import { GovernanceActionType } from "@/types/governanceAction";
 
 const uniqueProposals: ProposalData[] = [
   {
     id: "1322",
     txHash: "2bca7756ba6c998518c1bccbcdd5165e32d3c8e0bfdf930d34359c98354e85a0",
     index: 0,
-    type: "InfoAction",
+    type: GovernanceActionType.InfoAction,
     details: {
       description: "Info about InfoAction 1",
       additionalInfo: "Additional information for InfoAction 1",
@@ -41,7 +42,7 @@ const uniqueProposals: ProposalData[] = [
     id: "1338",
     txHash: "5e37f4d48182c4d8ff8e8ee7472c066501459b7bc8aaf6ca2f93a522ae12b0ea",
     index: 0,
-    type: "InfoAction",
+    type: GovernanceActionType.InfoAction,
     details: {
       description: "Info about InfoAction 2",
       additionalInfo: "Additional information for InfoAction 2",
@@ -76,7 +77,7 @@ const uniqueProposals: ProposalData[] = [
     id: "1335",
     txHash: "e88ddff921de8b7f6079a1c25a301c034de6b3ec8a906ad75463f0f5b3597672",
     index: 0,
-    type: "InfoAction",
+    type: GovernanceActionType.InfoAction,
     details: {
       description: "Info about InfoAction 3",
       additionalInfo: "Additional information for InfoAction 3",

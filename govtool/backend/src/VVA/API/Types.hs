@@ -476,31 +476,33 @@ instance ToSchema GovernanceActionReferences where
 
 data ProposalResponse
   = ProposalResponse
-      { proposalResponseId                 :: Text
-      , proposalResponseTxHash             :: HexText
-      , proposalResponseIndex              :: Integer
-      , proposalResponseType               :: GovernanceActionType
-      , proposalResponseDetails            :: Maybe GovernanceActionDetails
-      , proposalResponseExpiryDate         :: Maybe UTCTime
-      , proposalResponseExpiryEpochNo      :: Maybe Integer
-      , proposalResponseCreatedDate        :: UTCTime
-      , proposalResponseCreatedEpochNo     :: Integer
-      , proposalResponseUrl                :: Text
-      , proposalResponseMetadataHash       :: HexText
-      , proposalResponseProtocolParams     :: Maybe ProtocolParams
-      , proposalResponseTitle              :: Maybe Text
-      , proposalResponseAbstract           :: Maybe Text
-      , proposalResponseMotivation         :: Maybe Text
-      , proposalResponseRationale          :: Maybe Text
-      , proposalResponseDRepYesVotes       :: Integer
-      , proposalResponseDRepNoVotes        :: Integer
-      , proposalResponseDRepAbstainVotes   :: Integer
-      , proposalResponsePoolYesVotes       :: Integer
-      , proposalResponsePoolNoVotes        :: Integer
-      , proposalResponsePoolAbstainVotes   :: Integer
-      , proposalResponseCcYesVotes         :: Integer
-      , proposalResponseCcNoVotes          :: Integer
-      , proposalResponseCcAbstainVotes     :: Integer
+      { proposalResponseId                  :: Text
+      , proposalResponseTxHash              :: HexText
+      , proposalResponseIndex               :: Integer
+      , proposalResponseType                :: GovernanceActionType
+      , proposalResponseDetails             :: Maybe GovernanceActionDetails
+      , proposalResponseExpiryDate          :: Maybe UTCTime
+      , proposalResponseExpiryEpochNo       :: Maybe Integer
+      , proposalResponseCreatedDate         :: UTCTime
+      , proposalResponseCreatedEpochNo      :: Integer
+      , proposalResponseUrl                 :: Text
+      , proposalResponseMetadataHash        :: HexText
+      , proposalResponseProtocolParams      :: Maybe ProtocolParams
+      , proposalResponseTitle               :: Maybe Text
+      , proposalResponseAbstract            :: Maybe Text
+      , proposalResponseMotivation          :: Maybe Text
+      , proposalResponseRationale           :: Maybe Text
+      , proposalResponseDRepYesVotes        :: Integer
+      , proposalResponseDRepNoVotes         :: Integer
+      , proposalResponseDRepAbstainVotes    :: Integer
+      , proposalResponsePoolYesVotes        :: Integer
+      , proposalResponsePoolNoVotes         :: Integer
+      , proposalResponsePoolAbstainVotes    :: Integer
+      , proposalResponseCcYesVotes          :: Integer
+      , proposalResponseCcNoVotes           :: Integer
+      , proposalResponseCcAbstainVotes      :: Integer
+      , proposalResponsePrevGovActionIndex  :: Maybe Integer
+      , proposalResponsePrevGovActionTxHash :: Maybe HexText
       }
   deriving (Generic, Show)
 
@@ -531,7 +533,9 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"poolAbstainVotes\": 0,"
                   <> "\"cCYesVotes\": 0,"
                   <> "\"cCNoVotes\": 0,"
-                  <> "\"cCAbstainVotes\": 0}"
+                  <> "\"cCAbstainVotes\": 0,"
+                  <> "\"prevGovActionIndex\": 0,"
+                  <> "\"prevGovActionTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
 
 instance ToSchema ProposalResponse where
   declareNamedSchema proxy = do

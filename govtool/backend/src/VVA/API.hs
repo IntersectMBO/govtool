@@ -208,7 +208,9 @@ proposalToResponse timeZone Types.Proposal {..} =
     proposalResponsePoolAbstainVotes = proposalPoolAbstainVotes,
     proposalResponseCcYesVotes = proposalCcYesVotes,
     proposalResponseCcNoVotes = proposalCcNoVotes,
-    proposalResponseCcAbstainVotes = proposalCcAbstainVotes
+    proposalResponseCcAbstainVotes = proposalCcAbstainVotes,
+    proposalResponsePrevGovActionIndex = proposalPrevGovActionIndex,
+    proposalResponsePrevGovActionTxHash = HexText <$> proposalPrevGovActionTxHash
   }
 
 voteToResponse :: Types.Vote -> VoteParams

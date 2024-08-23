@@ -408,6 +408,9 @@ export const en = {
       expiryDate: "Expiry date:",
       filterTitle: "Governance Action Type",
       forGovAction: "for this Governance Action",
+      dReps: "DReps",
+      sPos: "SPOs",
+      ccCommittee: "CC Committee",
       governanceActionId: "Governance Action ID:",
       governanceActionType: "Governance Action Type:",
       goToVote: "Go to Vote",
@@ -437,7 +440,7 @@ export const en = {
       voteContextFileName: "Vote_Context.jsonld",
       votedOnByMe: "Voted on by me",
       voteOnGovActions: "Vote on Governance Action",
-      voteSubmitted: "Vote submitted",
+      voteSubmitted: "Votes submitted",
       voteTransaction: "Vote transaction",
       votes: "Votes:",
       votesSubmitted: "DRep votes submitted",
@@ -655,7 +658,8 @@ export const en = {
       addInformationTitle: "Add Information",
       alreadyRegistered: {
         title: "You already are a DRep",
-        description: "Looks like you have already successfully completed your registration and you currently are a DRep.\n\nYou can view your details in the DRep Directory.",
+        description:
+          "Looks like you have already successfully completed your registration and you currently are a DRep.\n\nYou can view your details in the DRep Directory.",
         viewDetails: "View your DRep details",
       },
       becomeADRep: "Become a DRep",
@@ -699,7 +703,8 @@ export const en = {
     retirement: {
       notADRep: {
         title: "You are not a DRep",
-        description: "Looks like you cannot retire, because currently you are not a DRep.",
+        description:
+          "Looks like you cannot retire, because currently you are not a DRep.",
       },
       continue: "Continue to Retirement",
       retireAsDrep: "Retire as a Drep",
@@ -714,12 +719,14 @@ export const en = {
     directVoter: {
       alreadyRegistered: {
         title: "You already are a Direct Voter",
-        description: "Looks like you have already successfully completed your registration and you currently are a Direct Voter.",
+        description:
+          "Looks like you have already successfully completed your registration and you currently are a Direct Voter.",
       },
       becomeDirectVoter: "Become a Direct Voter",
       notDirectVoter: {
         title: "You are not a Direct Voter",
-        description: "Looks like you cannot retire, because currently you are not a Direct Voter.",
+        description:
+          "Looks like you cannot retire, because currently you are not a Direct Voter.",
       },
       registerDescription:
         "A Direct Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of ADA in their connected wallet. <0>Learn More</0> about Direct Voter.\n\nBecoming a Direct Voter will require a refundable deposit of <strong>₳{{deposit}}</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",

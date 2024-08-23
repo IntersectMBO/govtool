@@ -3,15 +3,31 @@ import { Box, Typography } from "@mui/material";
 import { IMAGES } from "@consts";
 import { VotePill } from "@atoms";
 import { useTranslation } from "@hooks";
-import { correctAdaFormat } from "@/utils/adaFormat";
+import { correctAdaFormat } from "@utils";
 
 type Props = {
-  yesVotes: number;
-  noVotes: number;
-  abstainVotes: number;
+  dRepYesVotes: number;
+  dRepNoVotes: number;
+  dRepAbstainVotes: number;
+  poolYesVotes: number;
+  poolNoVotes: number;
+  poolAbstainVotes: number;
+  ccYesVotes: number;
+  ccNoVotes: number;
+  ccAbstainVotes: number;
 };
 
-export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
+export const VotesSubmitted = ({
+  dRepAbstainVotes,
+  dRepNoVotes,
+  dRepYesVotes,
+  poolAbstainVotes,
+  poolNoVotes,
+  poolYesVotes,
+  ccAbstainVotes,
+  ccNoVotes,
+  ccYesVotes,
+}: Props) => {
   const { t } = useTranslation();
 
   return (
@@ -42,13 +58,10 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
           fontSize: "22px",
           fontWeight: "500",
           lineHeight: "28px",
-          mb: 1,
+          mb: 3,
         }}
       >
         {t("govActions.forGovAction")}
-      </Typography>
-      <Typography color="textGray" fontSize="14px" sx={{ mb: 3 }}>
-        {t("govActions.votesSubmittedOnChain")}
       </Typography>
       <Box
         sx={{
@@ -57,6 +70,15 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
           gap: "12px",
         }}
       >
+        <Typography
+          sx={{
+            fontSize: "18px",
+            fontWeight: "600",
+            lineHeight: "24px",
+          }}
+        >
+          {t("govActions.dReps")}
+        </Typography>
         <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
           <VotePill vote="yes" maxWidth={82} />
           <Typography
@@ -66,7 +88,7 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
               wordBreak: "break-all",
             }}
           >
-            ₳ {correctAdaFormat(yesVotes)}
+            ₳ {correctAdaFormat(dRepYesVotes)}
           </Typography>
         </Box>
         <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
@@ -77,7 +99,7 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
               wordBreak: "break-all",
             }}
           >
-            ₳ {correctAdaFormat(abstainVotes)}
+            ₳ {correctAdaFormat(dRepAbstainVotes)}
           </Typography>
         </Box>
         <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
@@ -88,8 +110,118 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
               wordBreak: "break-all",
             }}
           >
-            ₳ {correctAdaFormat(noVotes)}
+            ₳ {correctAdaFormat(dRepNoVotes)}
           </Typography>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+            mt: "24px",
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: "18px",
+              fontWeight: "600",
+              lineHeight: "24px",
+            }}
+          >
+            {t("govActions.sPos")}
+          </Typography>
+          <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
+            <VotePill vote="yes" maxWidth={82} />
+            <Typography
+              fontSize="16px"
+              sx={{
+                marginLeft: "12px",
+                wordBreak: "break-all",
+              }}
+            >
+              ₳ {correctAdaFormat(poolYesVotes)}
+            </Typography>
+          </Box>
+          <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
+            <VotePill vote="abstain" maxWidth={82} />
+            <Typography
+              sx={{
+                marginLeft: "12px",
+                wordBreak: "break-all",
+              }}
+            >
+              ₳ {correctAdaFormat(poolAbstainVotes)}
+            </Typography>
+          </Box>
+          <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
+            <VotePill vote="no" maxWidth={82} />
+            <Typography
+              sx={{
+                marginLeft: "12px",
+                wordBreak: "break-all",
+              }}
+            >
+              ₳ {correctAdaFormat(poolNoVotes)}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "12px",
+              mt: "24px",
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: "18px",
+                fontWeight: "600",
+                lineHeight: "24px",
+              }}
+            >
+              {t("govActions.ccCommittee")}
+            </Typography>
+            <Box
+              sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}
+            >
+              <VotePill vote="yes" maxWidth={82} />
+              <Typography
+                fontSize="16px"
+                sx={{
+                  marginLeft: "12px",
+                  wordBreak: "break-all",
+                }}
+              >
+                ₳ {correctAdaFormat(ccYesVotes)}
+              </Typography>
+            </Box>
+            <Box
+              sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}
+            >
+              <VotePill vote="abstain" maxWidth={82} />
+              <Typography
+                sx={{
+                  marginLeft: "12px",
+                  wordBreak: "break-all",
+                }}
+              >
+                ₳ {correctAdaFormat(ccAbstainVotes)}
+              </Typography>
+            </Box>
+            <Box
+              sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}
+            >
+              <VotePill vote="no" maxWidth={82} />
+              <Typography
+                sx={{
+                  marginLeft: "12px",
+                  wordBreak: "break-all",
+                }}
+              >
+                ₳ {correctAdaFormat(ccNoVotes)}
+              </Typography>
+            </Box>
+          </Box>
         </Box>
       </Box>
     </Box>

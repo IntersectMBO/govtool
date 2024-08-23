@@ -30,6 +30,8 @@ changes.
 - Add network metrics model to frontend service
 - Added workflows to add labels to issues
 - Make voting on governance actions enabled based on protocol version [Issue 1703](https://github.com/IntersectMBO/govtool/issues/1703)
+- Add banner informing about network [Issue 1702](https://github.com/IntersectMBO/govtool/issues/1702)
+- Add banner informing about bootstrapping phase [Issue 1708](https://github.com/IntersectMBO/govtool/issues/1708)
 
 ### Fixed
 

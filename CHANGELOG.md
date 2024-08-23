@@ -16,6 +16,7 @@ changes.
 - Add SPO and CC committee total votes to gov actions [Issue 1704](https://github.com/IntersectMBO/govtool/issues/1704)
 - Add support for hard fork initiation governance action details [Issue 1600](https://github.com/IntersectMBO/govtool/issues/1600)
 - Add support for hard fork initiation previous governance action data [Issue 1600](https://github.com/IntersectMBO/govtool/issues/1600)
+- Add support for CIP-119 on the backend and metadata validation [Issue 1758](https://github.com/IntersectMBO/govtool/issues/1758)
 
 ### Fixed
 

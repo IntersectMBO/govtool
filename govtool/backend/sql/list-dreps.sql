@@ -29,7 +29,14 @@ SELECT
   encode(dr_voting_anchor.tx_hash, 'hex') AS tx_hash,
   newestRegister.time AS last_register_time,
   COALESCE(latestDeposit.deposit, 0),
-  non_deregister_voting_anchor.url IS NOT NULL AS has_non_deregister_voting_anchor
+  non_deregister_voting_anchor.url IS NOT NULL AS has_non_deregister_voting_anchor,
+  off_chain_vote_drep_data.payment_address,
+  off_chain_vote_drep_data.given_name,
+  off_chain_vote_drep_data.objectives,
+  off_chain_vote_drep_data.motivations,
+  off_chain_vote_drep_data.qualifications,
+  off_chain_vote_drep_data.image_url,
+  off_chain_vote_drep_data.image_hash
 FROM
   drep_hash dh
   JOIN (
@@ -89,6 +96,8 @@ FROM
     AND DRepDistr.rn = 1
   LEFT JOIN voting_anchor va ON va.id = dr_voting_anchor.voting_anchor_id
   LEFT JOIN voting_anchor non_deregister_voting_anchor on non_deregister_voting_anchor.id = dr_non_deregister_voting_anchor.voting_anchor_id
+  LEFT JOIN off_chain_vote_data ON off_chain_vote_data.voting_anchor_id = va.id
+  LEFT JOIN off_chain_vote_drep_data on off_chain_vote_drep_data.off_chain_vote_data_id = off_chain_vote_data.id 
   CROSS JOIN DRepActivity
   LEFT JOIN voting_procedure AS voting_procedure ON voting_procedure.drep_voter = dh.id
   LEFT JOIN tx AS tx ON tx.id = voting_procedure.tx_id
@@ -128,4 +137,11 @@ GROUP BY
   dr_voting_anchor.tx_hash,
   newestRegister.time,
   latestDeposit.deposit,
-  non_deregister_voting_anchor.url
+  non_deregister_voting_anchor.url,
+  off_chain_vote_drep_data.payment_address,
+  off_chain_vote_drep_data.given_name,
+  off_chain_vote_drep_data.objectives,
+  off_chain_vote_drep_data.motivations,
+  off_chain_vote_drep_data.qualifications,
+  off_chain_vote_drep_data.image_url,
+  off_chain_vote_drep_data.image_hash

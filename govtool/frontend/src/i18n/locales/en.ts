@@ -414,6 +414,11 @@ export const en = {
       governanceActionId: "Governance Action ID:",
       governanceActionType: "Governance Action Type:",
       goToVote: "Go to Vote",
+      hardforkDetails: {
+        currentVersion: "Current version",
+        proposedVersion: "Proposed version",
+        previousGAId: "Previous Governance Action ID",
+      },
       motivation: "Motivation",
       myVote: "My Vote:",
       noResultsForTheSearch: "No results for the search.",

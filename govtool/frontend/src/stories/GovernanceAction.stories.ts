@@ -42,6 +42,8 @@ const commonArgs = {
   poolNoVotes: 0,
   poolAbstainVotes: 0,
   protocolParams: null,
+  prevGovActionIndex: null,
+  prevGovActionTxHash: null,
 };
 
 export const GovernanceActionCardComponent: Story = {

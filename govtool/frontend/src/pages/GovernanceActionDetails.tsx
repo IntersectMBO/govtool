@@ -191,6 +191,10 @@ export const GovernanceActionDetails = () => {
                   }
                   links={state ? state?.references : data.proposal?.references}
                   govActionId={fullProposalId}
+                  prevGovActionId={
+                    (state ?? data.proposal).prevGovActionId +
+                      (state ?? data.proposal).prevGovActionTxHash || null
+                  }
                   protocolParams={
                     state ? state.protocolParams : data.proposal.protocolParams
                   }

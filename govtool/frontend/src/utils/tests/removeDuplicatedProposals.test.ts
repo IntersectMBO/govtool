@@ -1,7 +1,7 @@
 import { ProposalData } from "@models";
 import { removeDuplicatedProposals } from "..";
 
-const uniqueProposals = [
+const uniqueProposals: ProposalData[] = [
   {
     id: "1322",
     txHash: "2bca7756ba6c998518c1bccbcdd5165e32d3c8e0bfdf930d34359c98354e85a0",
@@ -28,12 +28,14 @@ const uniqueProposals = [
     ccNoVotes: 0,
     ccAbstainVotes: 4324,
     title: "Proposal 1322 Title",
-    about: "This is about Proposal 1322",
+    abstract: "This is about Proposal 1322",
     metadataStatus: null,
     metadataValid: false,
     motivation: "Motivation behind Proposal 1322",
     rationale: "Rationale for Proposal 1322",
     protocolParams: null,
+    prevGovActionIndex: null,
+    prevGovActionTxHash: null,
   },
   {
     id: "1338",
@@ -61,12 +63,14 @@ const uniqueProposals = [
     ccNoVotes: 0,
     ccAbstainVotes: 4324,
     title: "Proposal 1338 Title",
-    about: "This is about Proposal 1338",
+    abstract: "This is about Proposal 1338",
     metadataStatus: null,
     metadataValid: false,
     motivation: "Motivation behind Proposal 1338",
     rationale: "Rationale for Proposal 1338",
     protocolParams: null,
+    prevGovActionIndex: null,
+    prevGovActionTxHash: null,
   },
   {
     id: "1335",
@@ -94,12 +98,14 @@ const uniqueProposals = [
     ccNoVotes: 0,
     ccAbstainVotes: 4324,
     title: "Proposal 1335 Title",
-    about: "This is about Proposal 1335",
+    abstract: "This is about Proposal 1335",
     metadataStatus: null,
     metadataValid: false,
     motivation: "Motivation behind Proposal 1335",
     rationale: "Rationale for Proposal 1335",
     protocolParams: null,
+    prevGovActionIndex: null,
+    prevGovActionTxHash: null,
   },
 ];
 

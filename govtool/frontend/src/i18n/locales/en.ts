@@ -410,7 +410,7 @@ export const en = {
       forGovAction: "for this Governance Action",
       dReps: "DReps",
       sPos: "SPOs",
-      ccCommittee: "CC Committee",
+      ccCommittee: "Constitutional Committee",
       governanceActionId: "Governance Action ID:",
       governanceActionType: "Governance Action Type:",
       goToVote: "Go to Vote",

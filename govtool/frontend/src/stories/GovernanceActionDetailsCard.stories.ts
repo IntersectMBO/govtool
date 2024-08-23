@@ -42,6 +42,7 @@ const commonArgs = {
   ccNoVotes: 0,
   ccAbstainVotes: 2,
   protocolParams: null,
+  prevGovActionId: null,
 };
 
 async function assertTooltip(tooltip: HTMLElement, expectedText: RegExp) {

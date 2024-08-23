@@ -153,6 +153,8 @@ export type ProposalDataDTO = {
   poolYesVotes: number;
   poolNoVotes: number;
   poolAbstainVotes: number;
+  prevGovActionIndex: number | null;
+  prevGovActionTxHash: string | null;
   abstract?: string;
   motivation?: string;
   rationale?: string;

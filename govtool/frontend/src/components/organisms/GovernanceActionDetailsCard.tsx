@@ -24,6 +24,7 @@ type GovernanceActionDetailsCardProps = {
   expiryDate: string;
   expiryEpochNo: number;
   govActionId: string;
+  prevGovActionId: string | null;
   isDashboard?: boolean;
   isDataMissing: null | MetadataValidationStatus;
   isInProgress?: boolean;
@@ -59,6 +60,7 @@ export const GovernanceActionDetailsCard = ({
   expiryDate,
   expiryEpochNo,
   govActionId,
+  prevGovActionId,
   isDashboard,
   isDataMissing,
   isInProgress,
@@ -117,6 +119,7 @@ export const GovernanceActionDetailsCard = ({
         expiryDate={expiryDate}
         expiryEpochNo={expiryEpochNo}
         govActionId={govActionId}
+        prevGovActionId={prevGovActionId}
         isDashboard={isDashboard}
         isDataMissing={isDataMissing}
         isInProgress={isInProgress}

@@ -152,6 +152,10 @@ export const DashboardGovernanceActionDetails = () => {
             voteDateFromEP={data?.vote?.date}
             voteEpochNoFromEP={data?.vote?.epochNo}
             govActionId={fullProposalId}
+            prevGovActionId={
+              (state ?? data.proposal).prevGovActionId +
+                (state ?? data.proposal).prevGovActionTxHash || null
+            }
             isInProgress={
               pendingTransaction.vote?.resourceId ===
               fullProposalId.replace("#", "")

@@ -3,7 +3,7 @@ import { Box, Tabs, Tab, styled } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import ReactDiffViewer from "react-diff-viewer";
 
-import { ExternalModalButton } from "@atoms";
+import { CopyButton, ExternalModalButton, Typography } from "@atoms";
 import {
   GovernanceActionCardElement,
   GovernanceActionDetailsCardLinks,
@@ -28,22 +28,21 @@ type TabPanelProps = {
 };
 
 const CustomTabPanel = ({ children, value, index }: TabPanelProps) =>
-  value === index && (
-    <Box sx={value === index && index === 1 ? { overflow: "scroll" } : {}}>
-      {children}
-    </Box>
-  );
+  value === index && <Box sx={{ overflow: "auto" }}>{children}</Box>;
 
 type StyledTabProps = {
   label: string;
+  isMobile: boolean;
 };
 
 const StyledTab = styled((props: StyledTabProps) => (
   <Tab disableRipple {...props} />
-))(() => ({
+))(({ isMobile }) => ({
   textTransform: "none",
   fontWeight: 600,
   fontSize: 16,
+  width: !isMobile ? "auto" : "50%",
+
   color: "rgba(36, 34, 50, 0.5)",
   "&.Mui-selected": {
     color: "rgba(38, 37, 45, 1)",
@@ -58,6 +57,7 @@ type GovernanceActionDetailsCardDataProps = {
   expiryDate: string;
   expiryEpochNo: number;
   govActionId: string;
+  prevGovActionId: string | null;
   isDashboard?: boolean;
   isDataMissing: MetadataValidationStatus | null;
   isInProgress?: boolean;
@@ -81,6 +81,7 @@ export const GovernanceActionDetailsCardData = ({
   expiryDate,
   expiryEpochNo,
   govActionId,
+  prevGovActionId,
   isDashboard,
   isDataMissing,
   isInProgress,
@@ -99,16 +100,11 @@ export const GovernanceActionDetailsCardData = ({
   const { t } = useTranslation();
   const { screenWidth } = useScreenDimension();
   const { isMobile } = useScreenDimension();
-  const showTabs =
-    type === GovernanceActionType.ParameterChange &&
-    !!protocolParams &&
-    !!epochParams &&
-    !isDataMissing;
 
   const isModifiedPadding =
     (isDashboard && screenWidth < 1168) ?? screenWidth < 900;
 
-  const [tab, setTab] = useState<number>(0);
+  const [selectedTab, setSelectedTab] = useState<number>(0);
 
   const { pathname, hash } = useLocation();
 
@@ -119,36 +115,66 @@ export const GovernanceActionDetailsCardData = ({
   }`;
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setTab(newValue);
+    setSelectedTab(newValue);
   };
 
-  const reasoningTabContent = useMemo(
-    () => (
-      <>
-        <GovernanceActionCardElement
-          label={t("govActions.abstract")}
-          text={abstract}
-          textVariant="longText"
-          dataTestId="abstract"
-          isMarkdown
-        />
-        <GovernanceActionCardElement
-          label={t("govActions.motivation")}
-          text={motivation}
-          textVariant="longText"
-          dataTestId="motivation"
-          isMarkdown
-        />
-        <GovernanceActionCardElement
-          label={t("govActions.rationale")}
-          text={rationale}
-          textVariant="longText"
-          dataTestId="rationale"
-          isMarkdown
-        />
-      </>
-    ),
-    [abstract, motivation, rationale],
+  const tabs = useMemo(
+    () =>
+      [
+        {
+          label: "Reasoning",
+          dataTestId: "reasoning-tab",
+          content: (
+            <ReasoningTabContent
+              abstract={abstract}
+              motivation={motivation}
+              rationale={rationale}
+            />
+          ),
+          visible: !!abstract || !!motivation || !!rationale,
+        },
+        {
+          label: "Parameters",
+          dataTestId: "parameters-tab",
+          content: (
+            <ReactDiffViewer
+              oldValue={JSON.stringify(epochParams, null, 2)}
+              newValue={JSON.stringify(
+                replaceNullValues(epochParams, protocolParams),
+                null,
+                2,
+              )}
+              showDiffOnly
+            />
+          ),
+          visible:
+            type === GovernanceActionType.ParameterChange &&
+            !!protocolParams &&
+            !!epochParams &&
+            !isDataMissing,
+        },
+        {
+          label: "Details",
+          dataTestId: "hardfork-details-tab",
+          content: (
+            <HardforkDetailsTabContent
+              details={details}
+              prevGovActionId={prevGovActionId}
+            />
+          ),
+          visible:
+            type === GovernanceActionType.HardForkInitiation && !!details,
+        },
+      ].filter((tab) => tab.visible),
+    [
+      abstract,
+      motivation,
+      rationale,
+      epochParams,
+      protocolParams,
+      type,
+      isDataMissing,
+    ],
   );
 
   return (
@@ -195,7 +221,9 @@ export const GovernanceActionDetailsCardData = ({
         dataTestId={`${govActionId}-id`}
       />
 
-      {showTabs && protocolParams ? (
+      {tabs.length === 1 ? (
+        tabs[0].content
+      ) : (
         <>
           <Tabs
             sx={{
@@ -204,46 +232,27 @@ export const GovernanceActionDetailsCardData = ({
               fontSize: 16,
               fontWeight: 500,
             }}
-            value={tab}
+            value={selectedTab}
             indicatorColor="secondary"
             onChange={handleChange}
             aria-label="basic tabs example"
           >
-            <StyledTab
-              data-testid="reasoning-tab"
-              label="Reasoning"
-              sx={{
-                textTransform: "none",
-                width: !isMobile ? "auto" : "50%",
-              }}
-            />
-            <StyledTab
-              data-testid="parameters-tab"
-              label="Parameters"
-              sx={{
-                textTransform: "none",
-                width: !isMobile ? "auto" : "50%",
-              }}
-            />
+            {tabs.map((tab) => (
+              <StyledTab
+                key={tab.label}
+                data-testid={tab.dataTestId}
+                label={tab.label}
+                isMobile={isMobile}
+              />
+            ))}
           </Tabs>
 
-          <CustomTabPanel value={tab} index={0}>
-            {reasoningTabContent}
-          </CustomTabPanel>
-          <CustomTabPanel value={tab} index={1}>
-            <ReactDiffViewer
-              oldValue={JSON.stringify(epochParams, null, 2)}
-              newValue={JSON.stringify(
-                replaceNullValues(epochParams, protocolParams),
-                null,
-                2,
-              )}
-              showDiffOnly
-            />
-          </CustomTabPanel>
+          {tabs.map((tab, index) => (
+            <CustomTabPanel key={tab.label} value={selectedTab} index={index}>
+              {tab.content}
+            </CustomTabPanel>
+          ))}
         </>
-      ) : (
-        reasoningTabContent
       )}
 
       {details &&
@@ -257,6 +266,102 @@ export const GovernanceActionDetailsCardData = ({
           />
         ))}
       <GovernanceActionDetailsCardLinks links={links} />
+    </Box>
+  );
+};
+
+const ReasoningTabContent = ({
+  abstract,
+  motivation,
+  rationale,
+}: Pick<
+  GovernanceActionDetailsCardDataProps,
+  "abstract" | "motivation" | "rationale"
+>) => {
+  const { t } = useTranslation();
+
+  return (
+    <>
+      <GovernanceActionCardElement
+        label={t("govActions.abstract")}
+        text={abstract}
+        textVariant="longText"
+        dataTestId="abstract"
+        isMarkdown
+      />
+      <GovernanceActionCardElement
+        label={t("govActions.motivation")}
+        text={motivation}
+        textVariant="longText"
+        dataTestId="motivation"
+        isMarkdown
+      />
+      <GovernanceActionCardElement
+        label={t("govActions.rationale")}
+        text={rationale}
+        textVariant="longText"
+        dataTestId="rationale"
+        isMarkdown
+      />
+    </>
+  );
+};
+
+const HardforkDetailsTabContent = ({
+  details,
+  prevGovActionId,
+}: Pick<
+  GovernanceActionDetailsCardDataProps,
+  "details" | "prevGovActionId"
+>) => {
+  const { epochParams } = useAppContext();
+  const { t } = useTranslation();
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+        <Typography variant="body2">
+          {t("govActions.hardforkDetails.currentVersion")}
+        </Typography>
+        <Typography variant="body2">
+          {epochParams
+            ? `${epochParams.protocol_major}.${epochParams.protocol_minor}`
+            : "-"}
+        </Typography>
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+        <Typography variant="body2">
+          {t("govActions.hardforkDetails.proposedVersion")}
+        </Typography>
+        <Typography variant="body2">
+          {details ? `${details.major}.${details.minor}` : "-"}
+        </Typography>
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+        <Typography variant="body2">
+          {t("govActions.hardforkDetails.previousGAId")}
+        </Typography>
+        {prevGovActionId ? (
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: 400,
+                maxWidth: 283,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                color: "primaryBlue",
+              }}
+            >
+              {prevGovActionId}
+            </Typography>
+            <CopyButton text={prevGovActionId} variant="blueThin" />
+          </Box>
+        ) : (
+          <Typography variant="body2">-</Typography>
+        )}
+      </Box>
     </Box>
   );
 };

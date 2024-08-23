@@ -47,8 +47,8 @@ SELECT
 
             when gov_action_proposal.type::text = 'HardForkInitiation' then
             json_build_object(
-                'major', (description->'contents'->1->>'major')::int, 
-                'minor', (description->'contents'->1->>'minor')::int
+                'major', (gov_action_proposal.description->'contents'->1->>'major')::int, 
+                'minor', (gov_action_proposal.description->'contents'->1->>'minor')::int
             )
         else
             null
@@ -83,7 +83,9 @@ SELECT
     coalesce(Sum(ldd_pool.amount) FILTER (WHERE voting_procedure.vote::text = 'Abstain'), 0),
     coalesce(Sum(ldd_cc.amount) FILTER (WHERE voting_procedure.vote::text = 'Yes'), 0), 
     coalesce(Sum(ldd_cc.amount) FILTER (WHERE voting_procedure.vote::text = 'No'), 0),
-    coalesce(Sum(ldd_cc.amount) FILTER (WHERE voting_procedure.vote::text = 'Abstain'), 0)
+    coalesce(Sum(ldd_cc.amount) FILTER (WHERE voting_procedure.vote::text = 'Abstain'), 0),
+    prev_gov_action.index as prev_gov_action_index,
+    encode(prev_gov_action_tx.hash, 'hex') as prev_gov_action_tx_hash
 FROM
     gov_action_proposal
     LEFT JOIN treasury_withdrawal
@@ -106,6 +108,8 @@ FROM
         AND ldd_pool.rn = 1
     LEFT JOIN LatestDrepDistr ldd_cc ON ldd_cc.hash_id = voting_procedure.committee_voter
         AND ldd_cc.rn = 1
+    LEFT JOIN gov_action_proposal AS prev_gov_action ON gov_action_proposal.prev_gov_action_proposal = prev_gov_action.id
+    LEFT JOIN tx AS prev_gov_action_tx ON prev_gov_action.tx_id = prev_gov_action_tx.id
 WHERE (NOT ?
     OR (concat(encode(creator_tx.hash, 'hex'), '#', gov_action_proposal.index) IN ?))
 AND gov_action_proposal.expiration >(
@@ -136,4 +140,6 @@ GROUP BY
         voting_anchor.url,
         voting_anchor.data_hash,
         always_no_confidence_voting_power.amount,
-        always_abstain_voting_power.amount)
+        always_abstain_voting_power.amount,
+        prev_gov_action.index,
+        prev_gov_action_tx.hash)

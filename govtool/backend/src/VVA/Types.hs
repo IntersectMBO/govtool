@@ -106,31 +106,33 @@ data DRepRegistration
 
 data Proposal
   = Proposal
-      { proposalId                 :: Integer
-      , proposalTxHash             :: Text
-      , proposalIndex              :: Integer
-      , proposalType               :: Text
-      , proposalDetails            :: Maybe Value
-      , proposalExpiryDate         :: Maybe LocalTime
-      , proposalExpiryEpochNo      :: Maybe Integer
-      , proposalCreatedDate        :: LocalTime
-      , proposalCreatedEpochNo     :: Integer
-      , proposalUrl                :: Text
-      , proposalDocHash            :: Text
-      , proposalProtocolParams     :: Maybe Value
-      , proposalTitle              :: Maybe Text
-      , proposalAbstract           :: Maybe Text
-      , proposalMotivation         :: Maybe Text
-      , proposalRationale          :: Maybe Text
-      , proposalDRepYesVotes       :: Integer
-      , proposalDRepNoVotes        :: Integer
-      , proposalDRepAbstainVotes   :: Integer
-      , proposalPoolYesVotes       :: Integer
-      , proposalPoolNoVotes        :: Integer
-      , proposalPoolAbstainVotes   :: Integer
-      , proposalCcYesVotes         :: Integer
-      , proposalCcNoVotes          :: Integer
-      , proposalCcAbstainVotes     :: Integer
+      { proposalId                  :: Integer
+      , proposalTxHash              :: Text
+      , proposalIndex               :: Integer
+      , proposalType                :: Text
+      , proposalDetails             :: Maybe Value
+      , proposalExpiryDate          :: Maybe LocalTime
+      , proposalExpiryEpochNo       :: Maybe Integer
+      , proposalCreatedDate         :: LocalTime
+      , proposalCreatedEpochNo      :: Integer
+      , proposalUrl                 :: Text
+      , proposalDocHash             :: Text
+      , proposalProtocolParams      :: Maybe Value
+      , proposalTitle               :: Maybe Text
+      , proposalAbstract            :: Maybe Text
+      , proposalMotivation          :: Maybe Text
+      , proposalRationale           :: Maybe Text
+      , proposalDRepYesVotes        :: Integer
+      , proposalDRepNoVotes         :: Integer
+      , proposalDRepAbstainVotes    :: Integer
+      , proposalPoolYesVotes        :: Integer
+      , proposalPoolNoVotes         :: Integer
+      , proposalPoolAbstainVotes    :: Integer
+      , proposalCcYesVotes          :: Integer
+      , proposalCcNoVotes           :: Integer
+      , proposalCcAbstainVotes      :: Integer
+      , proposalPrevGovActionIndex  :: Maybe Integer
+      , proposalPrevGovActionTxHash :: Maybe Text
       }
   deriving (Show)
 
@@ -162,6 +164,8 @@ instance FromRow Proposal where
       <*> (floor @Scientific <$> field)
       <*> (floor @Scientific <$> field)
       <*> (floor @Scientific <$> field)
+      <*> field
+      <*> field
       
 data TransactionStatus = TransactionConfirmed | TransactionUnconfirmed
 

@@ -3,7 +3,14 @@ import { LoggerMessage } from '@/enums';
 import { MetadataStandard } from '@/types';
 
 const CIP_108_VALUE_KEYS = ['abstract', 'motivation', 'rationale', 'title'];
-const CIP_QQQ_VALUE_KEYS = ['bio', 'dRepName', 'email', 'references'];
+const CIP_119_VALUE_KEYS = [
+  'paymentAddress',
+  'givenName',
+  'image',
+  'objectives',
+  'motivations',
+  'qualifications',
+];
 export const parseMetadata = (
   metadata: any,
   standard = MetadataStandard.CIP108,
@@ -25,10 +32,10 @@ export const parseMetadata = (
 
       return parsedMetadata;
 
-    case MetadataStandard.CIPQQQ:
+    case MetadataStandard.CIP119:
       console.log({ metadataRaw: metadata });
       for (const [key, value] of Object.entries(metadata)) {
-        if (CIP_QQQ_VALUE_KEYS.includes(key)) {
+        if (CIP_119_VALUE_KEYS.includes(key)) {
           parsedMetadata[key] = value;
         }
         if (key === 'references') {

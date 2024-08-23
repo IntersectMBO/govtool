@@ -38,35 +38,52 @@ SELECT
     encode(creator_tx.hash, 'hex') AS tx_hash,
     gov_action_proposal.index,
     gov_action_proposal.type::text,
-    CASE 
-        WHEN gov_action_proposal.type = 'TreasuryWithdrawals' THEN
+    (
+        case when gov_action_proposal.type = 'TreasuryWithdrawals' then
             json_build_object('Reward Address', stake_address.view, 'Amount', treasury_withdrawal.amount)
-        WHEN gov_action_proposal.type::text = 'InfoAction' THEN
+
+            when gov_action_proposal.type::text = 'InfoAction' then
             json_build_object()
-        ELSE
-            NULL
-    END AS description,
+
+            when gov_action_proposal.type::text = 'HardForkInitiation' then
+            json_build_object(
+                'major', (description->'contents'->1->>'major')::int, 
+                'minor', (description->'contents'->1->>'minor')::int
+            )
+        else
+            null
+        end
+    ) as description,
     epoch_utils.last_epoch_end_time + epoch_utils.epoch_duration * (gov_action_proposal.expiration - epoch_utils.last_epoch_no) AS expiry_date,
     gov_action_proposal.expiration AS expiry_epoch_no,
     creator_block.time AS created_date,
     creator_block.epoch_no AS created_epoch_no,
     voting_anchor.url,
     encode(voting_anchor.data_hash, 'hex') AS metadata_hash,
+    ROW_TO_JSON(proposal_params),
     off_chain_vote_gov_action_data.title,
     off_chain_vote_gov_action_data.abstract,
     off_chain_vote_gov_action_data.motivation,
     off_chain_vote_gov_action_data.rationale,
-    coalesce(Sum(ldd.amount) FILTER (WHERE voting_procedure.vote::text = 'Yes'), 0) +
-        CASE 
-            WHEN gov_action_proposal.type = 'NoConfidence' THEN always_no_confidence_voting_power.amount
-            ELSE 0
-        END AS yes_votes,
-    coalesce(Sum(ldd.amount) FILTER (WHERE voting_procedure.vote::text = 'No'), 0) +
-        CASE 
-            WHEN gov_action_proposal.type = 'NoConfidence' THEN 0
-            ELSE always_no_confidence_voting_power.amount
-        END AS no_votes,
-    coalesce(Sum(ldd.amount) FILTER (WHERE voting_procedure.vote::text = 'Abstain'), 0) + always_abstain_voting_power.amount AS abstain_votes
+    coalesce(Sum(ldd_drep.amount) FILTER (WHERE voting_procedure.vote::text = 'Yes'), 0) +(
+        CASE WHEN gov_action_proposal.type = 'NoConfidence' THEN
+            always_no_confidence_voting_power.amount
+        ELSE
+            0
+        END) "yes_votes",
+    coalesce(Sum(ldd_drep.amount) FILTER (WHERE voting_procedure.vote::text = 'No'), 0) +(
+        CASE WHEN gov_action_proposal.type = 'NoConfidence' THEN
+            0
+        ELSE
+            always_no_confidence_voting_power.amount
+        END) "no_votes",
+    coalesce(Sum(ldd_drep.amount) FILTER (WHERE voting_procedure.vote::text = 'Abstain'), 0) + always_abstain_voting_power.amount "abstain_votes",
+    coalesce(Sum(ldd_pool.amount) FILTER (WHERE voting_procedure.vote::text = 'Yes'), 0), 
+    coalesce(Sum(ldd_pool.amount) FILTER (WHERE voting_procedure.vote::text = 'No'), 0),
+    coalesce(Sum(ldd_pool.amount) FILTER (WHERE voting_procedure.vote::text = 'Abstain'), 0),
+    coalesce(Sum(ldd_cc.amount) FILTER (WHERE voting_procedure.vote::text = 'Yes'), 0), 
+    coalesce(Sum(ldd_cc.amount) FILTER (WHERE voting_procedure.vote::text = 'No'), 0),
+    coalesce(Sum(ldd_cc.amount) FILTER (WHERE voting_procedure.vote::text = 'Abstain'), 0)
 FROM
     gov_action_proposal
     LEFT JOIN treasury_withdrawal ON gov_action_proposal.id = treasury_withdrawal.gov_action_proposal_id
@@ -78,9 +95,15 @@ FROM
     JOIN tx AS creator_tx ON creator_tx.id = gov_action_proposal.tx_id
     JOIN block AS creator_block ON creator_block.id = creator_tx.block_id
     LEFT JOIN voting_anchor ON voting_anchor.id = gov_action_proposal.voting_anchor_id
+    LEFT JOIN param_proposal as proposal_params ON gov_action_proposal.param_proposal = proposal_params.id
     LEFT JOIN off_chain_vote_data ON off_chain_vote_data.voting_anchor_id = voting_anchor.id
     LEFT JOIN voting_procedure ON voting_procedure.gov_action_proposal_id = gov_action_proposal.id
-    LEFT JOIN LatestDrepDistr ldd ON ldd.hash_id = voting_procedure.drep_voter AND ldd.rn = 1
+    LEFT JOIN LatestDrepDistr ldd_drep ON ldd_drep.hash_id = voting_procedure.drep_voter
+        AND ldd_drep.rn = 1
+    LEFT JOIN LatestDrepDistr ldd_pool ON ldd_pool.hash_id = voting_procedure.pool_voter
+        AND ldd_pool.rn = 1
+    LEFT JOIN LatestDrepDistr ldd_cc ON ldd_cc.hash_id = voting_procedure.committee_voter
+        AND ldd_cc.rn = 1
 WHERE (NOT ?
     OR (concat(encode(creator_tx.hash, 'hex'), '#', gov_action_proposal.index) IN ?))
 AND gov_action_proposal.expiration > (

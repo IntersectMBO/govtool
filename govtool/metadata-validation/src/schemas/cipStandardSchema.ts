@@ -60,6 +60,7 @@ export const cipStandardSchema: StandardSpecification = {
       objectives: Joi.string().max(1000).allow(''),
       motivations: Joi.string().max(1000).allow(''),
       qualifications: Joi.string().max(1000).allow(''),
+      doNotList: Joi.boolean(),
       references: Joi.array()
         .items(
           Joi.object({

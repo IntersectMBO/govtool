@@ -58,6 +58,7 @@ const validCIP119Data = {
     objectives: 'Sample Objectives',
     motivations: 'Sample Motivations',
     qualifications: 'Sample Qualifications',
+    doNotList: false,
     references: [
       {
         '@type': 'ReferenceType',

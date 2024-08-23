@@ -10,6 +10,7 @@ const CIP_119_VALUE_KEYS = [
   'objectives',
   'motivations',
   'qualifications',
+  'doNotList',
 ];
 export const parseMetadata = (
   metadata: any,

@@ -44,6 +44,12 @@ SELECT
 
             when gov_action_proposal.type::text = 'InfoAction' then
             json_build_object()
+
+            when gov_action_proposal.type::text = 'HardForkInitiation' then
+            json_build_object(
+                'major', (description->'contents'->1->>'major')::int, 
+                'minor', (description->'contents'->1->>'minor')::int
+            )
         else
             null
         end

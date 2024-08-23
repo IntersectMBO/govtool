@@ -956,7 +956,7 @@ export default {
           break
         case 'Info':
           break
-        case 'Withdrawl':
+        case 'Withdrawal':
           proposal_data['withdraw'] = this.treasuryWithdrawalAddresses.reduce((obj, key, index) => {
             obj[key] = parseInt(this.treasuryAmounts[index])
             return obj

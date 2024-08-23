@@ -115,6 +115,13 @@ def change_pp_value(random_parameter):
     return random_parameter
 
 
+def get_gov_script():
+    with open("app/data/gov-script.plutus", "r") as script_file:
+        script_str = script_file.read()
+        script_json = json.loads(script_str)
+        return script_json
+
+
 def get_proposal_data_from_type(proposal_type, current_pParams):
     match proposal_type:
         case "constitution":
@@ -126,7 +133,10 @@ def get_proposal_data_from_type(proposal_type, current_pParams):
             }
         case "withdrawal":
             number_of_addresses = random.randint(1, 5)
-            return {"withdraw": generate_withdraw(number_of_addresses)}
+            return {
+                "script": get_gov_script(),
+                "withdraw": generate_withdraw(number_of_addresses),
+            }
         case "no-confidence":
             return {"noconfidence": True}
         case "update-committee":
@@ -146,7 +156,10 @@ def get_proposal_data_from_type(proposal_type, current_pParams):
             keys = pParams.keys()
             rand_key = random.choice(filter_updatable_paramKeys(list(keys)))
             # recurse into the innermost element of that key and change it by +-1, all protocol parameter value is either float or int
-            return {"parameterupdate": {rand_key: change_pp_value(pParams[rand_key])}}
+            return {
+                "script": get_gov_script(),
+                "parameterupdate": {rand_key: change_pp_value(pParams[rand_key])},
+            }
         # added_proposal =
         case "info":
             return {}
@@ -160,11 +173,36 @@ def get_proposal_data_from_type(proposal_type, current_pParams):
 
 
 def filter_updatable_paramKeys(keys):
-    updatable_keys = {"maxBlockSize", "maxBBSize", "maxTxSize", "maxBHSize", "keyDeposit", "poolDeposit", "eMax",
-                      "nOpt", "a0", "rho", "tau", "minPoolCost", "coinsPerUTxOByte", "costModels", "prices",
-                      "maxTxExUnits", "maxBlockExUnits", "maxValSize", "collateralPercentage", "maxCollateralInputs",
-                      "poolVotingThresholds", "dRepVotingThresholds", "committeeMinSize", "committeeMaxTermLength",
-                      "govActionLifetime", "govActionDeposit", "dRepDeposit", "dRepActivity"}
+    updatable_keys = {
+        "maxBlockSize",
+        "maxBBSize",
+        "maxTxSize",
+        "maxBHSize",
+        "keyDeposit",
+        "poolDeposit",
+        "eMax",
+        "nOpt",
+        "a0",
+        "rho",
+        "tau",
+        "minPoolCost",
+        "coinsPerUTxOByte",
+        "costModels",
+        "prices",
+        "maxTxExUnits",
+        "maxBlockExUnits",
+        "maxValSize",
+        "collateralPercentage",
+        "maxCollateralInputs",
+        "poolVotingThresholds",
+        "dRepVotingThresholds",
+        "committeeMinSize",
+        "committeeMaxTermLength",
+        "govActionLifetime",
+        "govActionDeposit",
+        "dRepDeposit",
+        "dRepActivity",
+    }
     return [x for x in keys if x in updatable_keys]
 
 

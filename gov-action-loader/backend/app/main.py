@@ -15,7 +15,9 @@ from app.settings import settings
 from app.transaction import (get_base_proposal_for_multiple,
                              get_default_transaction,
                              get_proposal_data_from_type,
-                             main_wallet, submit_proposal_tx)
+                             main_wallet, submit_proposal_tx,
+                             get_gov_script
+                             )
 
 app = FastAPI()
 add_cors(app)
@@ -125,6 +127,9 @@ async def submit_single_proposal(
     combined_proposal = default_proposal_data | proposal
     default_transaction["proposals"][0] = combined_proposal
 
+    if "withdraw" in combined_proposal or "parameterupdate" in combined_proposal:
+            combined_proposal["script"] = get_gov_script()
+
     tx_url = settings.kuber_api_url + "/api/v1/tx?submit=true"
     kuber_response = await client.post(
         tx_url,
@@ -140,23 +145,4 @@ async def submit_single_proposal(
         print(kuber_response.text)
         raise HTTPException(
             status_code=kuber_response.status_code, detail=kuber_response.text
-        )
-
-
-@app.get("/api/blockfrost/transaction/{tx_hash}")
-async def get_transaction_from_blockfrost(
-    tx_hash: str,
-    client: httpx.AsyncClient = Depends(get_client),
-):
-    tx_url = settings.blockfrost_api_url + "/txs/" + tx_hash
-    tx_response = await client.get(
-        tx_url,
-        headers={"project_id": settings.blockfrost_project_id},
-    )
-    if tx_response.status_code == 200:
-        return tx_response.json()
-    else:
-        print(tx_response.text)
-        raise HTTPException(
-            status_code=tx_response.status_code, detail=tx_response.json()
         )

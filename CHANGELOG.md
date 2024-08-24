@@ -24,6 +24,7 @@ changes.
 ### Changed
 
 - Bump @intersect.mbo/pdf-ui to v0.3.7
+- Decrease level of wallet related sentry reports [Issue 1699](https://github.com/IntersectMBO/govtool/issues/1699)
 
 ## [sancho-v1.0.13](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.13) 2024-08-22
 

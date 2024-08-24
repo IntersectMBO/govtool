@@ -348,7 +348,7 @@ export const en = {
     footer: {
       copyright: "© 2024 Intersect MBO",
       privacyPolicy: "Privacy policy",
-      termOfService: "Term of service",
+      termOfService: "Terms and Conditions",
     },
     forms: {
       link: "Link",
@@ -745,7 +745,8 @@ export const en = {
       description:
         "The Voltaire GovTool is a tool that allows you to participate in the governance of the Cardano network. You can propose, vote on, and delegate your voting power to other users.",
       title: "This tool is connected to {{networkName}}",
-      bootstrappingWarning: "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>"
+      bootstrappingWarning:
+        "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>",
     },
     tooltips: {
       delegateTodRep: {

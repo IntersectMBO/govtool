@@ -34,17 +34,17 @@ export const HomeCards = () => {
 
   const onClickLearnMoreAboutDRepRegistration = () =>
     openInNewTab(
-      "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/dreps",
+      "https://docs.gov.tools/using-govtool/govtool-functions/dreps/register-as-a-drep",
     );
 
   const onClickLearnMoreAboutDirectVoterRegistration = () =>
     openInNewTab(
-      "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/direct-voting",
+      "https://docs.gov.tools/using-govtool/govtool-functions/direct-voting",
     );
 
   const onClickLearnMoreAboutProposingGovAction = () =>
     openInNewTab(
-      "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/governance-actions/propose-a-governance-action",
+      "https://docs.gov.tools/using-govtool/govtool-functions/governance-actions/governance-actions/propose-a-governance-action",
     );
 
   const navigateToGovActions = useCallback(

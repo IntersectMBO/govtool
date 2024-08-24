@@ -31,7 +31,7 @@ export const DirectVoterDashboardCard = ({
     dataTestId: "direct-voter-learn-more-button",
     onClick: () =>
       openInNewTab(
-        "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/direct-voting",
+        "https://docs.gov.tools/using-govtool/govtool-functions/direct-voting",
       ),
   };
 
@@ -98,7 +98,7 @@ export const DirectVoterDashboardCard = ({
             dataTestId: "learn-more-button",
             onClick: () =>
               openInNewTab(
-                "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/dreps/retire-as-a-drep",
+                "https://docs.gov.tools/using-govtool/govtool-functions/direct-voting",
               ),
           },
         ],

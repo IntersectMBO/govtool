@@ -54,7 +54,7 @@ export const ProposeGovActionDashboardCard = ({
           dataTestId: "propose-gov-action-learn-more-button",
           onClick: () =>
             openInNewTab(
-              "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/governance-actions/propose-a-governance-action",
+              "https://docs.gov.tools/using-govtool/govtool-functions/governance-actions/view-governance-actions/propose-a-governance-action",
             ),
         },
       ]}

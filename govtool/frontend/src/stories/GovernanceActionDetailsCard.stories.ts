@@ -22,7 +22,7 @@ type Story = StoryObj<typeof meta>;
 const commonArgs = {
   isDataMissing: null,
   proposal: {
-    id: '1',
+    id: "1",
     index: 1,
     txHash: "exampleTxHash",
     createdDate: new Date().toISOString(),
@@ -68,8 +68,10 @@ async function assertGovActionDetails(
   const todayDate = formatDisplayDate(new Date());
   await expect(canvas.getAllByText(todayDate)).toHaveLength(2);
   await expect(
-    canvas.getByTestId(`${getProposalTypeNoEmptySpaces(args.proposal.type)}-type`),
-  ).toHaveTextContent(args.proposal.type);
+    canvas.getByTestId(
+      `${getProposalTypeNoEmptySpaces(args.proposal.type)}-type`,
+    ),
+  ).toHaveTextContent("Info Action");
   await expect(canvas.getByTestId(`${govActionId}-id`)).toHaveTextContent(
     govActionId,
   );
@@ -80,10 +82,10 @@ export const GovernanceActionDetailsCardComponent: Story = {
     ...commonArgs,
     proposal: {
       ...commonArgs.proposal,
-    abstract: "Example about section",
-    rationale: "Example rationale section",
-    motivation: "Example motivation section",
-    }
+      abstract: "Example about section",
+      rationale: "Example rationale section",
+      motivation: "Example motivation section",
+    },
   },
 
   play: async ({ canvasElement, args }) => {
@@ -97,9 +99,9 @@ export const GovernanceActionDetailsCardComponent: Story = {
     await assertTooltip(tooltip1, /Submission Date/i);
     await assertTooltip(tooltip2, /Expiry Date/i);
 
-    await expect(canvas.getByText(/Yes/i)).toBeInTheDocument();
-    await expect(canvas.getByText(/Abstain/i)).toBeInTheDocument();
-    await expect(canvas.getByText(/No/i)).toBeInTheDocument();
+    await expect(canvas.getAllByText(/Yes/i)).toHaveLength(3);
+    await expect(canvas.getAllByText(/Abstain/i)).toHaveLength(3);
+    await expect(canvas.getAllByText(/No/i)).toHaveLength(3);
   },
 };
 

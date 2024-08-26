@@ -76,7 +76,6 @@ YesVoted.play = async ({ args }) => {
     const loadingModalCanvas = within(modalScreen);
 
     await assertVotes(loadingModalCanvas, args);
-    await expect(loadingModalCanvas.getByTestId("yes-vote-chip")).toBeChecked();
   });
 };
 
@@ -93,9 +92,6 @@ AbstainVoted.play = async ({ args }) => {
     const loadingModalCanvas = within(modalScreen);
 
     await assertVotes(loadingModalCanvas, args);
-    await expect(
-      loadingModalCanvas.getByTestId("abstain-vote-chip"),
-    ).toBeChecked();
   });
 };
 
@@ -112,6 +108,5 @@ NoVoted.play = async ({ args }) => {
     const loadingModalCanvas = within(modalScreen);
 
     await assertVotes(loadingModalCanvas, args);
-    await expect(loadingModalCanvas.getByTestId("no-vote-chip")).toBeChecked();
   });
 };

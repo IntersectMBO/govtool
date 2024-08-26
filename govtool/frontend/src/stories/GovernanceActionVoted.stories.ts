@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { GovernanceVotedOnCard } from "@molecules";
 import { userEvent, waitFor, within, screen } from "@storybook/testing-library";
 import { expect } from "@storybook/jest";
-import { formatDisplayDate } from "@/utils";
+import { formatDisplayDate, getProposalTypeNoEmptySpaces } from "@/utils";
 import { GovernanceActionType } from "@/types/governanceAction";
 
 const meta = {
@@ -20,9 +20,13 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 async function checkGovActionVisibility(canvas: ReturnType<typeof within>) {
-  expect(canvas.getByTestId(GovernanceActionType.InfoAction)).toBeInTheDocument();
+  expect(
+    canvas.getByTestId(
+      `${getProposalTypeNoEmptySpaces(GovernanceActionType.InfoAction)}-type`,
+    ),
+  ).toBeInTheDocument();
   expect(canvas.getByTestId("exampleHash#1-id")).toBeInTheDocument();
-  expect(canvas.getByText(/vote submitted/i)).toBeInTheDocument();
+  expect(canvas.getByText(/Votes submitted/i)).toBeInTheDocument();
 
   expect(
     canvas.getByText(formatDisplayDate("1970-01-01T00:00:00Z")),

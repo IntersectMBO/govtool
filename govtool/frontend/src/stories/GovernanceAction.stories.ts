@@ -2,7 +2,7 @@ import { MetadataValidationStatus } from "@models";
 import { expect, jest } from "@storybook/jest";
 import type { Meta, StoryObj } from "@storybook/react";
 import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
-import { formatDisplayDate } from "@utils";
+import { formatDisplayDate, getProposalTypeNoEmptySpaces } from "@utils";
 import { GovernanceActionCard } from "@/components/molecules";
 import { GovernanceActionType } from "@/types/governanceAction";
 
@@ -52,7 +52,11 @@ export const GovernanceActionCardComponent: Story = {
 
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    expect(canvas.getByTestId(GovernanceActionType.InfoAction)).toBeInTheDocument();
+    expect(
+      canvas.getByTestId(
+        `${getProposalTypeNoEmptySpaces(GovernanceActionType.InfoAction)}-type`,
+      ),
+    ).toBeInTheDocument();
     expect(canvas.getByTestId("sad78afdsf7jasd98d#2-id")).toBeInTheDocument();
     expect(
       canvas.getByText(formatDisplayDate("1970-01-01T00:00:00Z")),

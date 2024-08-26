@@ -3,7 +3,7 @@ import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
-import { invalid as mockInvalid } from "@mock/index";
+import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
 
@@ -94,7 +94,7 @@ test.describe("Validation of dRep Registration Form", () => {
     await dRepRegistrationPage.registerBtn.click();
 
     for (let i = 0; i < 100; i++) {
-      await dRepRegistrationPage.metadataUrlInput.fill(faker.internet.url());
+      await dRepRegistrationPage.metadataUrlInput.fill(mockValid.url());
       await expect(page.getByTestId("invalid-url-error")).toBeHidden();
     }
   });

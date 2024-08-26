@@ -100,6 +100,7 @@ jobs:
         uses: ASzc/change-string-case-action@v6
         with:
           string: ${{ matrix.image }}:${{ github.sha }}
+          
 
       - name: Build Docker image
         uses: docker/build-push-action@v5

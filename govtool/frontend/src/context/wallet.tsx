@@ -651,14 +651,14 @@ const CardanoProvider = (props: Props) => {
           // Create cert object using one Ada as the deposit
           dRepRegCert = DrepRegistration.new_with_anchor(
             dRepCred,
-            BigNum.from_str(`${epochParams.drep_deposit}`),
+            BigNum.from_str(`${epochParams?.drep_deposit}`),
             anchor,
           );
         } else {
           console.error(t("errors.notUsingAnchor"));
           dRepRegCert = DrepRegistration.new(
             dRepCred,
-            BigNum.from_str(`${epochParams.drep_deposit}`),
+            BigNum.from_str(`${epochParams?.drep_deposit}`),
           );
         }
         return Certificate.new_drep_registration(dRepRegCert);

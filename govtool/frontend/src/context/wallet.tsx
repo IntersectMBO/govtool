@@ -272,7 +272,7 @@ const CardanoProvider = (props: Props) => {
             throw new Error(t("errors.walletNoCIP90FunctionsEnabled"));
           }
           const network = await enabledApi.getNetworkId();
-          console.log({ network, NETWORK });
+
           if (network !== NETWORK) {
             throw new Error(
               t("errors.tryingConnectTo", {

@@ -12,7 +12,7 @@ include config.mk
 
 # image tags
 cardano_node_image_tag := 9.0.0-sancho
-cardano_db_sync_image_tag := sancho-5.1.0
+cardano_db_sync_image_tag := 13.3.0.0
 
 .PHONY: all
 all: deploy-stack notify

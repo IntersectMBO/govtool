@@ -17,6 +17,7 @@ changes.
 - Add support for hard fork initiation governance action details [Issue 1600](https://github.com/IntersectMBO/govtool/issues/1600)
 - Add support for hard fork initiation previous governance action data [Issue 1600](https://github.com/IntersectMBO/govtool/issues/1600)
 - Add support for CIP-119 on the backend and metadata validation [Issue 1758](https://github.com/IntersectMBO/govtool/issues/1758)
+- Add support for CIP-119 on the frontend [Issue 1760](https://github.com/IntersectMBO/govtool/issues/1758)
 
 ### Fixed
 

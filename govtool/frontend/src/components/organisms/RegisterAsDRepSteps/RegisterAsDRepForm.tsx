@@ -46,7 +46,7 @@ export const RegisterAsDRepForm = ({
 
   const removeLink = useCallback((index: number) => remove(index), [remove]);
 
-  const isContinueButtonDisabled = !watch("dRepName") || isError;
+  const isContinueButtonDisabled = !watch("givenName") || isError;
 
   const renderLinks = useCallback(
     () =>
@@ -91,11 +91,9 @@ export const RegisterAsDRepForm = ({
       <ControlledField.Input
         {...{ control, errors }}
         dataTestId="name-input"
-        helpfulText={t("forms.registerAsDRep.dRepNameHelpfulText")}
-        label={t("forms.registerAsDRep.dRepName")}
-        name="dRepName"
-        rules={Rules.DREP_NAME}
-        placeholder={t("forms.registerAsDRep.dRepNamePlaceholder")}
+        label={t("forms.dRepData.givenName")}
+        name="givenName"
+        rules={Rules.GIVEN_NAME}
       />
       <Spacer y={isMobile ? 5 : 6} />
       <Box textAlign="center">
@@ -107,53 +105,72 @@ export const RegisterAsDRepForm = ({
           {t("registration.aboutYouDescription")}
         </Typography>
       </Box>
-      <ControlledField.Input
-        {...{ control, errors }}
-        label={t("forms.registerAsDRep.email")}
-        name="email"
-        placeholder={t("forms.registerAsDRep.emailPlaceholder")}
-        rules={Rules.EMAIL}
-      />
-      <Spacer y={3} />
-      <ControlledField.TextArea
-        {...{ control, errors }}
-        data-testid="bio-input"
-        label={t("forms.registerAsDRep.bio")}
-        name="bio"
-        placeholder={t("forms.registerAsDRep.bioPlaceholder")}
-        helpfulText={t("forms.registerAsDRep.bioHelpfulText")}
-        rules={Rules.BIO}
-      />
-      <Spacer y={4} />
-      <p
-        style={{
-          fontFamily: "Poppins",
-          fontSize: 16,
-          fontWeight: 600,
-          textAlign: "center",
-          margin: 0,
-        }}
-      >
-        {t("registration.linksDescription")}
-        <span style={{ fontSize: 16, fontWeight: 400 }}>
-          {t("registration.maximumLinks", {
-            numberOfLinks: MAX_NUMBER_OF_LINKS,
-          })}
-        </span>
-      </p>
-      <Spacer y={3} />
-      {renderLinks()}
-      {references?.length < MAX_NUMBER_OF_LINKS ? (
-        <Button
-          data-testid="add-link-button"
-          onClick={addLink}
-          size="extraLarge"
-          variant="text"
-        >
-          {t("addLink")}
-        </Button>
-      ) : null}
-      <Spacer y={isMobile ? 4 : 6} />
+      <Box textAlign="center">
+        <InfoText label={t("editMetadata.optional")} />
+        <Typography sx={{ mt: 0.5, mb: isMobile ? 3 : 4 }} variant="headline4">
+          {t("editMetadata.aboutYou")}
+        </Typography>
+        <Typography fontWeight={400} sx={{ mb: 4 }} variant="body1">
+          {t("editMetadata.aboutYouDescription")}
+        </Typography>
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <ControlledField.TextArea
+          {...{ control, errors }}
+          data-testid="objectives-input"
+          label={t("forms.dRepData.objectives")}
+          name="objectives"
+          placeholder={t("forms.dRepData.objectivesPlaceholder")}
+          helpfulText={t("forms.dRepData.objectivesHelpfulText")}
+          rules={Rules.OBJECTIVES}
+        />
+        <ControlledField.TextArea
+          {...{ control, errors }}
+          data-testid="motivations-input"
+          label={t("forms.dRepData.motivations")}
+          name="motivations"
+          placeholder={t("forms.dRepData.motivationsPlaceholder")}
+          helpfulText={t("forms.dRepData.motivationsHelpfulText")}
+          rules={Rules.MOTIVATIONS}
+        />
+        <ControlledField.TextArea
+          {...{ control, errors }}
+          data-testid="qualifications-input"
+          label={t("forms.dRepData.qualifications")}
+          name="qualifications"
+          placeholder={t("forms.dRepData.qualificationsPlaceholder")}
+          helpfulText={t("forms.dRepData.qualificationsHelpfulText")}
+          rules={Rules.QUALIFICATIONS}
+        />
+        <ControlledField.Input
+          {...{ control, errors }}
+          label={t("forms.dRepData.paymentAddress")}
+          name="paymentAddress"
+          placeholder={t("forms.dRepData.paymentAddressPlaceholder")}
+          rules={Rules.PAYMENT_ADDRESS}
+        />
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Typography sx={{ my: 2 }}>
+            {t("editMetadata.linksDescription")}
+            <span style={{ fontWeight: 400 }}>
+              {t("editMetadata.maximumLinks", {
+                numberOfLinks: MAX_NUMBER_OF_LINKS,
+              })}
+            </span>
+          </Typography>
+          {renderLinks()}
+          {references?.length < MAX_NUMBER_OF_LINKS ? (
+            <Button
+              data-testid="add-link-button"
+              onClick={addLink}
+              size="extraLarge"
+              variant="text"
+            >
+              {t("addLink")}
+            </Button>
+          ) : null}
+        </Box>
+      </Box>
       <CenteredBoxBottomButtons
         onActionButton={onClickContinue}
         disableActionButton={isContinueButtonDisabled}

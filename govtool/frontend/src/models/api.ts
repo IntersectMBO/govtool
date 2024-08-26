@@ -112,10 +112,13 @@ export type DrepDataDTO = {
 };
 
 export type DRepData = DrepDataDTO & {
-  bio: string | null;
-  dRepName: string | null;
-  email: string | null;
+  paymentAddress: string | null;
+  givenName: string;
+  objectives: string | null;
+  motivations: string | null;
+  qualifications: string | null;
   references: string[];
+  doNotList: boolean;
   metadataStatus: MetadataValidationStatus | null;
   metadataValid: boolean;
 };

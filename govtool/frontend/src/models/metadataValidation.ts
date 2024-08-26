@@ -8,7 +8,7 @@ export enum MetadataValidationStatus {
 
 export enum MetadataStandard {
   CIP108 = "CIP108",
-  CIPQQQ = "CIPQQQ",
+  CIP119 = "CIP119",
 }
 
 export type ValidateMetadataResult<MetadataType> = {
@@ -24,10 +24,13 @@ export type MetadataValidationDTO = {
 };
 
 export type DRepMetadata = {
-  bio?: string;
-  dRepName?: string;
-  email?: string;
+  paymentAddress?: string;
+  givenName?: string;
+  objectives?: string;
+  motivations?: string;
+  qualifications?: string;
   references?: string[];
+  doNotList?: boolean;
 };
 
 export type ProposalMetadata = {

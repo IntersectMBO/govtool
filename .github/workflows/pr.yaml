@@ -107,9 +107,10 @@ jobs:
           context: ${{ matrix.workdir }}
           file: ${{ matrix.dockerfile }}
           tags: ${{ steps.image_lowercase.outputs.lowercase }}
-          load: true
-          # cache-from: type=local,src=/tmp/.buildx-cache
-          # cache-to: type=local,dest=/tmp/.buildx-cache
+          outputs: type=docker,dest=/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar
+          load: false
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
           build-args: |
             VITE_APP_ENV=${{ secrets.VITE_APP_ENV }}
             VITE_BASE_URL=${{ secrets.VITE_BASE_URL }}
@@ -129,12 +130,8 @@ jobs:
             wget https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
             tar zxvf dockle_0.4.14_Linux-64bit.tar.gz
             sudo mv dockle /usr/local/bin
-            docker images
-            docker image prune -af --filter "until=1h"
-            docker save ${{ steps.image_lowercase.outputs.lowercase }} -o image.tar || :
-            touch ${{ matrix.workdir }}/dockle_scan_output.json
-            dockle --input image.tar --exit-level fatal --format json --output ${{ matrix.workdir }}/dockle_scan_output.json || :
-            rm -rf image.tar
+            dockle --exit-level fatal --format json --input '/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar' --output ${{ matrix.workdir }}/dockle_scan_output.json
+            rm -rf '/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar'
             echo " dockle exited w/ $?"
             cat ${{ matrix.workdir }}/dockle_scan_output.json
 

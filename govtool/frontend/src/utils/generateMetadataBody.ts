@@ -1,6 +1,6 @@
-import { CIP_100, CIP_108, CIP_QQQ } from "@/consts";
+import { CIP_100, CIP_108, CIP_119 } from "@/consts";
 
-type StandardReference = typeof CIP_100 | typeof CIP_108 | typeof CIP_QQQ;
+type StandardReference = typeof CIP_100 | typeof CIP_108 | typeof CIP_119;
 
 type MetadataConfig = {
   data: Record<string, unknown>;

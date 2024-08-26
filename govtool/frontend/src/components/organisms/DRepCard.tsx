@@ -23,7 +23,7 @@ type DRepCardProps = {
 };
 
 export const DRepCard = ({
-  dRep: { status, type, view, votingPower, dRepName, metadataStatus },
+  dRep: { status, type, view, votingPower, givenName, metadataStatus },
   isConnected,
   isDelegationLoading,
   isInProgress,
@@ -104,7 +104,7 @@ export const DRepCard = ({
               >
                 {metadataStatus
                   ? getMetadataDataMissingStatusTranslation(metadataStatus)
-                  : ellipsizeText(dRepName ?? "", 25)}
+                  : ellipsizeText(givenName ?? "", 25)}
               </Typography>
               <ButtonBase
                 data-testid={`${view}-copy-id-button`}

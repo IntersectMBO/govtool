@@ -33,7 +33,7 @@ export const DRepStorageInformation = ({
   } = useRegisterAsdRepForm(setStep);
   const { screenWidth } = useScreenDimension();
 
-  const fileName = getValues("dRepName");
+  const fileName = getValues("givenName").replace(/\s/g, "");
 
   const openGuideAboutStoringInformation = () =>
     openInNewTab("https://docs.gov.tools/faqs/how-to-create-a-metadata-anchor");

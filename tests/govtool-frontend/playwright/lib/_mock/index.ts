@@ -114,6 +114,20 @@ export const valid = {
 
     return username;
   },
+
+  url: () => {
+    const choice = faker.number.int({ min: 1, max: 2 });
+    // Generate a random CID using a UUID
+    const prefix = "Qm";
+    const randomBase58 = faker.string.alphanumeric(44); // 44 characters to follow the Qm prefix
+    const randomCID = prefix + randomBase58;
+
+    if (choice === 1) {
+      return faker.internet.url();
+    }
+    return `ipfs://${randomCID}`;
+  },
+
   metadata: (paymentAddress: string) => ({
     "@context": {
       CIP100:

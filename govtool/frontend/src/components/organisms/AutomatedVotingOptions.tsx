@@ -120,7 +120,7 @@ export const AutomatedVotingOptions = ({
             }
             onClickInfo={() =>
               openInNewTab(
-                "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/delegating-overview/abstain-from-every-vote",
+                "https://docs.gov.tools/using-govtool/govtool-functions/delegating/abstain-from-every-vote",
               )
             }
             title={
@@ -163,7 +163,7 @@ export const AutomatedVotingOptions = ({
             }
             onClickInfo={() =>
               openInNewTab(
-                "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/delegating-overview/signal-no-confidence-on-every-vote",
+                "https://docs.gov.tools/using-govtool/govtool-functions/delegating/signal-no-confidence-on-every-vote",
               )
             }
             title={

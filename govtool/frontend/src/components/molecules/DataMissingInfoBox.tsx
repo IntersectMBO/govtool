@@ -79,9 +79,8 @@ export const DataMissingInfoBox = ({
       </Typography>
       <Link
         onClick={() =>
-          // TODO: Add the correct link
           openInNewTab(
-            "https://docs.gov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet",
+            "https://docs.gov.tools/using-govtool/govtool-functions/dreps/drep-error-conditions",
           )
         }
         sx={{

@@ -23,7 +23,7 @@ export const ListGovActionsDashboardCards = () => {
           dataTestId: "list-gov-actions-learn-more-button",
           onClick: () =>
             openInNewTab(
-              "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/governance-actions",
+              "https://docs.gov.tools/using-govtool/govtool-functions/governance-actions/view-governance-actions",
             ),
           variant: "outlined",
         },

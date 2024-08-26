@@ -25,7 +25,9 @@ export const RolesAndResponsibilities = ({
   const onClickContinue = () => setStep(2);
 
   const openLearnMoreAboutDrep = () =>
-    openInNewTab("https://sancho.network/roles/drep");
+    openInNewTab(
+      "https://docs.gov.tools/using-govtool/govtool-functions/dreps",
+    );
 
   return (
     <>

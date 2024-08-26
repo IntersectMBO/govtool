@@ -256,6 +256,7 @@ export const GovernanceActionDetailsCardData = ({
       )}
 
       {details &&
+        type !== GovernanceActionType.HardForkInitiation &&
         Object.keys(details).length !== 0 &&
         Object.entries(details).map(([detailLabel, content]) => (
           <GovernanceActionCardElement
@@ -312,7 +313,7 @@ const HardforkDetailsTabContent = ({
   const { t } = useTranslation();
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 3, pb: 3 }}>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
         <Typography variant="body2">
           {t("govActions.hardforkDetails.currentVersion")}

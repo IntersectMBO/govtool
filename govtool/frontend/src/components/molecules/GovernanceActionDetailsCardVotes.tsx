@@ -4,22 +4,11 @@ import { Box } from "@mui/material";
 import { useScreenDimension } from "@hooks";
 import { VoteActionForm, VotesSubmitted } from "@molecules";
 import { useFeatureFlag } from "@/context";
-import { GovernanceActionType } from "@/types/governanceAction";
+import { ProposalData } from "@/models";
 
 type GovernanceActionCardVotesProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
-  dRepYesVotes: number;
-  dRepNoVotes: number;
-  dRepAbstainVotes: number;
-  poolYesVotes: number;
-  poolNoVotes: number;
-  poolAbstainVotes: number;
-  ccYesVotes: number;
-  ccNoVotes: number;
-  ccAbstainVotes: number;
   isOneColumn: boolean;
-  expiryDate: string;
-  expiryEpochNo: number;
   isVoter?: boolean;
   voteFromEP?: string;
   voteUrlFromEP?: string;
@@ -27,23 +16,12 @@ type GovernanceActionCardVotesProps = {
   voteEpochNoFromEP?: number;
   isDashboard?: boolean;
   isInProgress?: boolean;
-  type: GovernanceActionType;
+  proposal: ProposalData;
 };
 
 export const GovernanceActionDetailsCardVotes = ({
   setIsVoteSubmitted,
-  dRepAbstainVotes,
-  dRepNoVotes,
-  dRepYesVotes,
-  poolAbstainVotes,
-  poolNoVotes,
-  poolYesVotes,
-  ccAbstainVotes,
-  ccNoVotes,
-  ccYesVotes,
   isOneColumn,
-  expiryDate,
-  expiryEpochNo,
   isVoter,
   voteFromEP,
   voteUrlFromEP,
@@ -51,7 +29,20 @@ export const GovernanceActionDetailsCardVotes = ({
   voteEpochNoFromEP,
   isDashboard,
   isInProgress,
-  type,
+  proposal: {
+    dRepAbstainVotes,
+    dRepNoVotes,
+    dRepYesVotes,
+    poolAbstainVotes,
+    poolNoVotes,
+    poolYesVotes,
+    ccAbstainVotes,
+    ccNoVotes,
+    ccYesVotes,
+    expiryDate,
+    expiryEpochNo,
+    type,
+  },
 }: GovernanceActionCardVotesProps) => {
   const { isVotingOnGovernanceActionEnabled } = useFeatureFlag();
   const { screenWidth } = useScreenDimension();

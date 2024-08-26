@@ -132,11 +132,8 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
               ),
               {
                 state: {
-                  ...proposal,
-                  vote: vote.vote.toLowerCase(),
-                  voteUrl: vote.url,
-                  voteDate: vote.date,
-                  voteEpochNo: vote.epochNo,
+                  proposal,
+                  vote,
                 },
               },
             )

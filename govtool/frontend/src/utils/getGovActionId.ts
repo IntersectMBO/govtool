@@ -1,4 +1,4 @@
-export const getShortenedGovActionId = (txHash: string, index: number) => {
+export const getShortenedGovActionId = (txHash: string, index: number | string) => {
   if (txHash.length <= 6) {
     return `${txHash}#${index}`;
   }
@@ -9,5 +9,5 @@ export const getShortenedGovActionId = (txHash: string, index: number) => {
   return `${firstPart}...${lastPart}#${index}`;
 };
 
-export const getFullGovActionId = (txHash: string, index: number) =>
+export const getFullGovActionId = (txHash: string, index: number | string) =>
   `${txHash}#${index}`;

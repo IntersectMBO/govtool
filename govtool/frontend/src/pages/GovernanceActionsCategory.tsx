@@ -151,7 +151,7 @@ export const GovernanceActionsCategory = () => {
                             ),
                             {
                               state: {
-                                ...item,
+                                proposal: item,
                                 openedFromCategoryPage: true,
                               },
                             },

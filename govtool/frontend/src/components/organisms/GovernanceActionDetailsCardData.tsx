@@ -16,8 +16,9 @@ import {
   getProposalTypeNoEmptySpaces,
   testIdFromLabel,
   replaceNullValues,
+  getProposalTypeLabel,
 } from "@utils";
-import { EpochParams, MetadataValidationStatus } from "@models";
+import { MetadataValidationStatus, ProposalData } from "@models";
 import { GovernanceActionType } from "@/types/governanceAction";
 import { useAppContext } from "@/context";
 
@@ -50,51 +51,39 @@ const StyledTab = styled((props: StyledTabProps) => (
 }));
 
 type GovernanceActionDetailsCardDataProps = {
-  abstract?: string;
-  createdDate: string;
-  createdEpochNo: number;
-  details?: ActionDetailsType;
-  expiryDate: string;
-  expiryEpochNo: number;
-  govActionId: string;
-  prevGovActionId: string | null;
   isDashboard?: boolean;
   isDataMissing: MetadataValidationStatus | null;
   isInProgress?: boolean;
   isOneColumn: boolean;
   isSubmitted?: boolean;
-  links?: string[];
-  motivation?: string;
-  rationale?: string;
-  title?: string;
-  label: string;
-  url: string;
-  type: GovernanceActionType;
-  protocolParams: EpochParams | null;
+  proposal: ProposalData;
 };
 
 export const GovernanceActionDetailsCardData = ({
-  abstract,
-  createdDate,
-  createdEpochNo,
-  details,
-  expiryDate,
-  expiryEpochNo,
-  govActionId,
-  prevGovActionId,
   isDashboard,
   isDataMissing,
   isInProgress,
   isOneColumn,
   isSubmitted,
-  links,
-  motivation,
-  rationale,
-  title,
-  label,
-  url,
-  type,
-  protocolParams,
+  proposal: {
+    abstract,
+    createdDate,
+    createdEpochNo,
+    details,
+    expiryDate,
+    expiryEpochNo,
+    index,
+    motivation,
+    prevGovActionIndex,
+    prevGovActionTxHash,
+    rationale,
+    references,
+    title,
+    txHash,
+    url,
+    type,
+    protocolParams,
+  },
 }: GovernanceActionDetailsCardDataProps) => {
   const { epochParams } = useAppContext();
   const { t } = useTranslation();
@@ -117,6 +106,13 @@ export const GovernanceActionDetailsCardData = ({
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
+
+  const label = getProposalTypeLabel(type);
+  const govActionId = `${index}${txHash}`;
+  const prevGovActionId =
+    prevGovActionIndex && prevGovActionTxHash
+      ? `${prevGovActionIndex}${prevGovActionTxHash}`
+      : null;
 
   const tabs = useMemo(
     () =>
@@ -247,8 +243,12 @@ export const GovernanceActionDetailsCardData = ({
             ))}
           </Tabs>
 
-          {tabs.map((tab, index) => (
-            <CustomTabPanel key={tab.label} value={selectedTab} index={index}>
+          {tabs.map((tab, tabIndex) => (
+            <CustomTabPanel
+              key={tab.label}
+              value={selectedTab}
+              index={tabIndex}
+            >
               {tab.content}
             </CustomTabPanel>
           ))}
@@ -265,7 +265,7 @@ export const GovernanceActionDetailsCardData = ({
             dataTestId={testIdFromLabel(detailLabel)}
           />
         ))}
-      <GovernanceActionDetailsCardLinks links={links} />
+      <GovernanceActionDetailsCardLinks links={references} />
     </Box>
   );
 };
@@ -274,10 +274,7 @@ const ReasoningTabContent = ({
   abstract,
   motivation,
   rationale,
-}: Pick<
-  GovernanceActionDetailsCardDataProps,
-  "abstract" | "motivation" | "rationale"
->) => {
+}: Pick<ProposalData, "abstract" | "motivation" | "rationale">) => {
   const { t } = useTranslation();
 
   return (
@@ -310,10 +307,7 @@ const ReasoningTabContent = ({
 const HardforkDetailsTabContent = ({
   details,
   prevGovActionId,
-}: Pick<
-  GovernanceActionDetailsCardDataProps,
-  "details" | "prevGovActionId"
->) => {
+}: Pick<ProposalData, "details"> & { prevGovActionId: string | null }) => {
   const { epochParams } = useAppContext();
   const { t } = useTranslation();
 

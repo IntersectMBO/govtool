@@ -19,7 +19,7 @@ changes.
 
 ### Fixed
 
--
+- Fix typescript bug leading to runtime error when entering Governance Action details page via direct link [Issue 1801](https://github.com/IntersectMBO/govtool/issues/1801)
 
 ### Changed
 

@@ -17,8 +17,8 @@ import { formatDisplayDate } from "@utils";
 
 type VoteActionFormProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
-  expiryDate: string;
-  expiryEpochNo: number;
+  expiryDate: string | undefined;
+  expiryEpochNo: number | undefined;
   voteFromEP?: string;
   voteUrlFromEP?: string;
   voteDateFromEP?: string;

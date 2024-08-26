@@ -1,4 +1,5 @@
 import { MetadataValidationStatus } from "@models";
+import { GovernanceActionType } from "@/types/governanceAction";
 
 export type EpochParams = {
   block_id: number;
@@ -121,7 +122,7 @@ export type DRepData = DrepDataDTO & {
 
 export type Vote = "yes" | "no" | "abstain";
 
-type ProposalVote = {
+export type ProposalVote = {
   date: string;
   drepId: string;
   epochNo: number;
@@ -142,7 +143,7 @@ export type ProposalDataDTO = {
   index: number;
   metadataHash: string;
   txHash: string;
-  type: string;
+  type: GovernanceActionType;
   url: string;
   dRepYesVotes: number;
   dRepNoVotes: number;

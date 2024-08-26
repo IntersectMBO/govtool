@@ -12,6 +12,20 @@ changes.
 
 ### Added
 
+-
+
+### Fixed
+
+-
+
+### Changed
+
+-
+
+## [sancho-v1.0.14](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.14) 2024-08-26
+
+### Added
+
 - Add support for displaying protocol parameters governance actions [Issue 1601](https://github.com/IntersectMBO/govtool/issues/1601)
 - Add SPO and CC committee total votes to gov actions [Issue 1704](https://github.com/IntersectMBO/govtool/issues/1704)
 - Add support for hard fork initiation governance action details [Issue 1600](https://github.com/IntersectMBO/govtool/issues/1600)

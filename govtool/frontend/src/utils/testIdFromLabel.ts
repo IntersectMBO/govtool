@@ -1,2 +1,2 @@
-export const testIdFromLabel = (label: string) =>
-  label.trim().replace(/ /g, "-").toLocaleLowerCase();
+export const testIdFromLabel = (label?: string) =>
+  label?.trim().replace(/ /g, "-").toLocaleLowerCase();

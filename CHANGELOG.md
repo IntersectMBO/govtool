@@ -21,6 +21,7 @@ changes.
 ### Fixed
 
 - Fix typescript bug leading to runtime error when entering Governance Action details page via direct link [Issue 1801](https://github.com/IntersectMBO/govtool/issues/1801)
+- Fix reading trim of null object [Issue 1733](https://github.com/IntersectMBO/govtool/issues/1733)
 
 ### Changed
 

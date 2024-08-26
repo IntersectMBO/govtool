@@ -41,6 +41,17 @@ import {
   TreasuryWithdrawals,
   TreasuryWithdrawalsAction,
   ChangeConfig,
+  PlutusScript,
+  ProtocolParamUpdate,
+  ParameterChangeAction,
+  Costmdls,
+  DrepVotingThresholds,
+  ExUnitPrices,
+  UnitInterval,
+  ExUnits,
+  PoolVotingThresholds,
+  ProtocolVersion,
+  HardForkInitiationAction,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 import { Buffer } from "buffer";
 import { useNavigate } from "react-router-dom";
@@ -48,7 +59,7 @@ import { Link } from "@mui/material";
 import * as Sentry from "@sentry/react";
 import { Trans } from "react-i18next";
 
-import { PATHS } from "@consts";
+import { PATHS, GUARDRAIL_SCRIPT } from "@consts";
 import { CardanoApiWallet, Protocol, VoterInfo } from "@models";
 import type { StatusModalState } from "@organisms";
 import {
@@ -62,6 +73,7 @@ import {
   NETWORK_INFO_KEY,
   setItemToLocalStorage,
   WALLET_LS_KEY,
+  setProtocolParameterUpdate,
 } from "@utils";
 import { useTranslation } from "@hooks";
 import { AutomatedVotingOptionDelegationId } from "@/types/automatedVotingOptions";
@@ -95,6 +107,56 @@ type TreasuryProps = {
   hash: string;
   receivingAddress: string;
   url: string;
+};
+
+type ProtocolParamsUpdate = {
+  adaPerUtxo: string;
+  collateralPercentage: number;
+  committeeTermLimit: number;
+  costModels: Costmdls;
+  drepDeposit: string;
+  drepInactivityPeriod: number;
+  drepVotingThresholds: DrepVotingThresholds;
+  executionCosts: ExUnitPrices;
+  expansionRate: UnitInterval;
+  governanceActionDeposit: string;
+  governanceActionValidityPeriod: number;
+  keyDeposit: string;
+  maxBlockBodySize: number;
+  maxBlockExUnits: ExUnits;
+  maxBlockHeaderSize: number;
+  maxCollateralInputs: number;
+  maxEpoch: number;
+  maxTxExUnits: ExUnits;
+  maxTxSize: number;
+  maxValueSize: number;
+  minCommitteeSize: number;
+  minPoolCost: string;
+  minFeeA: string;
+  minFeeB: string;
+  nOpt: number;
+  poolDeposit: string;
+  poolPledgeInfluence: UnitInterval;
+  poolVotingThresholds: PoolVotingThresholds;
+  refScriptCoinsPerByte: UnitInterval;
+  treasuryGrowthRate: UnitInterval;
+};
+
+type ProtocolParameterChangeProps = {
+  prevGovernanceActionHash: string;
+  prevGovernanceActionIndex: number;
+  url: string;
+  hash: string;
+  protocolParamsUpdate: Partial<ProtocolParamsUpdate>;
+};
+
+type HardForkInitiationProps = {
+  prevGovernanceActionHash: string;
+  prevGovernanceActionIndex: number;
+  url: string;
+  hash: string;
+  major: number;
+  minor: number;
 };
 
 type BuildSignSubmitConwayCertTxArgs = {
@@ -150,6 +212,12 @@ interface CardanoContextType {
   ) => Promise<VotingProposalBuilder | undefined>;
   buildTreasuryGovernanceAction: (
     treasuryProps: TreasuryProps,
+  ) => Promise<VotingProposalBuilder | undefined>;
+  buildProtocolParameterChangeGovernanceAction: (
+    protocolParamsProps: ProtocolParameterChangeProps,
+  ) => Promise<VotingProposalBuilder | undefined>;
+  buildHardForkGovernanceAction: (
+    hardForkInitiationProps: HardForkInitiationProps,
   ) => Promise<VotingProposalBuilder | undefined>;
 }
 
@@ -829,8 +897,13 @@ const CardanoProvider = (props: Props) => {
         const myWithdrawal = BigNum.from_str(amount);
         const withdrawals = TreasuryWithdrawals.new();
         withdrawals.insert(treasuryTarget, myWithdrawal);
-        // Create new treasury withdrawal gov act
-        const treasuryAction = TreasuryWithdrawalsAction.new(withdrawals);
+        const guardrailScript = PlutusScript.from_bytes_v3(
+          Buffer.from(GUARDRAIL_SCRIPT, "hex"),
+        );
+        const treasuryAction = TreasuryWithdrawalsAction.new_with_policy_hash(
+          withdrawals,
+          guardrailScript.hash(),
+        );
         const treasuryGovAct =
           GovernanceAction.new_treasury_withdrawals_action(treasuryAction);
         // Create an anchor
@@ -856,6 +929,133 @@ const CardanoProvider = (props: Props) => {
     [epochParams, getRewardAddress],
   );
 
+  const buildProtocolParameterChangeGovernanceAction = useCallback(
+    async ({
+      prevGovernanceActionHash,
+      prevGovernanceActionIndex,
+      url,
+      hash,
+      protocolParamsUpdate,
+    }: ProtocolParameterChangeProps) => {
+      const govActionBuilder = VotingProposalBuilder.new();
+
+      try {
+        const protocolParameterUpdate = ProtocolParamUpdate.new();
+
+        // eslint-disable-next-line no-restricted-syntax
+        for (const [key, value] of Object.entries(protocolParamsUpdate)) {
+          setProtocolParameterUpdate(protocolParameterUpdate, key, value);
+        }
+
+        const guardrailScript = PlutusScript.from_bytes_v3(
+          Buffer.from(GUARDRAIL_SCRIPT, "hex"),
+        );
+        let protocolParamChangeAction;
+        if (prevGovernanceActionHash && prevGovernanceActionIndex) {
+          const prevGovernanceActionId = GovernanceActionId.new(
+            TransactionHash.from_hex(prevGovernanceActionHash),
+            prevGovernanceActionIndex,
+          );
+          protocolParamChangeAction =
+            ParameterChangeAction.new_with_policy_hash_and_action_id(
+              prevGovernanceActionId,
+              protocolParameterUpdate,
+              guardrailScript.hash(),
+            );
+        } else {
+          protocolParamChangeAction =
+            ParameterChangeAction.new_with_policy_hash(
+              protocolParameterUpdate,
+              guardrailScript.hash(),
+            );
+        }
+
+        const protocolParamChangeGovAct =
+          GovernanceAction.new_parameter_change_action(
+            protocolParamChangeAction,
+          );
+
+        // Create an anchor
+        const anchor = generateAnchor(url, hash);
+
+        const rewardAddr = await getRewardAddress();
+
+        if (!rewardAddr) throw new Error("Can not get reward address");
+        // Create voting proposal
+        const votingProposal = VotingProposal.new(
+          protocolParamChangeGovAct,
+          anchor,
+          rewardAddr,
+          BigNum.from_str(epochParams?.gov_action_deposit.toString()),
+        );
+        govActionBuilder.add(votingProposal);
+
+        return govActionBuilder;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [],
+  );
+
+  const buildHardForkGovernanceAction = useCallback(
+    async ({
+      prevGovernanceActionHash,
+      prevGovernanceActionIndex,
+      url,
+      hash,
+      major,
+      minor,
+    }: HardForkInitiationProps) => {
+      const govActionBuilder = VotingProposalBuilder.new();
+      try {
+        const newProtocolVersion = ProtocolVersion.new(major, minor);
+
+        let hardForkInitiationAction;
+        if (prevGovernanceActionHash && prevGovernanceActionIndex) {
+          const prevGovernanceActionId = GovernanceActionId.new(
+            TransactionHash.from_hex(prevGovernanceActionHash),
+            prevGovernanceActionIndex,
+          );
+          hardForkInitiationAction =
+            HardForkInitiationAction.new_with_action_id(
+              prevGovernanceActionId,
+              newProtocolVersion,
+            );
+        } else {
+          hardForkInitiationAction =
+            HardForkInitiationAction.new(newProtocolVersion);
+        }
+
+        const hardForkInitiationGovAct =
+          GovernanceAction.new_hard_fork_initiation_action(
+            hardForkInitiationAction,
+          );
+
+        // Create an anchor
+        const anchor = generateAnchor(url, hash);
+
+        const rewardAddr = await getRewardAddress();
+
+        if (!rewardAddr) throw new Error("Can not get reward address");
+
+        // Create voting proposal
+        const votingProposal = VotingProposal.new(
+          hardForkInitiationGovAct,
+          anchor,
+          rewardAddr,
+          BigNum.from_str(epochParams?.gov_action_deposit.toString()),
+        );
+        govActionBuilder.add(votingProposal);
+
+        return govActionBuilder;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [],
+  );
+
   const value = useMemo(
     () => ({
       address,
@@ -865,6 +1065,8 @@ const CardanoProvider = (props: Props) => {
       buildNewInfoGovernanceAction,
       buildSignSubmitConwayCertTx,
       buildTreasuryGovernanceAction,
+      buildProtocolParameterChangeGovernanceAction,
+      buildHardForkGovernanceAction,
       buildVote,
       buildVoteDelegationCert,
       disconnectWallet,
@@ -892,6 +1094,8 @@ const CardanoProvider = (props: Props) => {
       buildNewInfoGovernanceAction,
       buildSignSubmitConwayCertTx,
       buildTreasuryGovernanceAction,
+      buildProtocolParameterChangeGovernanceAction,
+      buildHardForkGovernanceAction,
       buildVote,
       buildVoteDelegationCert,
       disconnectWallet,

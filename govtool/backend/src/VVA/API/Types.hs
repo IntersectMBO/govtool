@@ -111,103 +111,6 @@ instance ToSchema AnyValue where
         & example
           ?~ toJSON exampleAnyValue
 
-data MetadataValidationStatus = IncorrectFormat | IncorrectJSONLD | IncorrectHash | UrlNotFound deriving
-    ( Eq
-    , Show
-    )
-
-instance ToJSON MetadataValidationStatus where
-  toJSON IncorrectFormat = "INCORRECT_FORMTAT"
-  toJSON IncorrectJSONLD = "INVALID_JSONLD"
-  toJSON IncorrectHash   = "INVALID_HASH"
-  toJSON UrlNotFound     = "URL_NOT_FOUND"
-
-instance FromJSON MetadataValidationStatus where
-  parseJSON (String s) = case s of
-    "INCORRECT_FORMTAT" -> pure IncorrectFormat
-    "INVALID_JSONLD"    -> pure IncorrectJSONLD
-    "INVALID_HASH"      -> pure IncorrectHash
-    "URL_NOT_FOUND"     -> pure UrlNotFound
-    _                   -> fail "Invalid MetadataValidationStatus"
-  parseJSON _ = fail "Invalid MetadataValidationStatus"
-
-instance ToSchema MetadataValidationStatus where
-    declareNamedSchema _ = pure $ NamedSchema (Just "MetadataValidationStatus") $ mempty
-        & type_ ?~ OpenApiString
-        & description ?~ "Metadata Validation Status"
-        & enum_ ?~ map toJSON [IncorrectFormat, IncorrectJSONLD, IncorrectHash, UrlNotFound]
-
-
-
-data InternalMetadataValidationResponse
-  = InternalMetadataValidationResponse
-      { internalMetadataValidationResponseStatus :: Maybe MetadataValidationStatus
-      , internalMmetadataValidationResponseValid :: Bool
-      }
-  deriving (Generic, Show)
-
-deriveJSON (jsonOptions "internalMetadataValidationResponse") ''InternalMetadataValidationResponse
-
-instance ToSchema InternalMetadataValidationResponse where
-    declareNamedSchema _ = do
-      NamedSchema name_ schema_ <-
-        genericDeclareNamedSchema
-        ( fromAesonOptions $ jsonOptions "internalMetadataValidationResponse" )
-        (Proxy :: Proxy InternalMetadataValidationResponse)
-      return $
-        NamedSchema name_ $
-          schema_
-            & description ?~ "Metadata Validation Response"
-            & example
-              ?~ toJSON ("{\"status\": \"INCORRECT_FORMTAT\", \"valid\":false, \"raw\":{\"some\":\"key\"}}" :: Text)
-
-
-data MetadataValidationResponse
-  = MetadataValidationResponse
-      { metadataValidationResponseStatus :: Maybe Text
-      , metadataValidationResponseValid  :: Bool
-      }
-  deriving (Generic, Show)
-
-deriveJSON (jsonOptions "metadataValidationResponse") ''MetadataValidationResponse
-
-instance ToSchema MetadataValidationResponse where
-    declareNamedSchema _ = do
-      NamedSchema name_ schema_ <-
-        genericDeclareNamedSchema
-        ( fromAesonOptions $ jsonOptions "metadataValidationResponse" )
-        (Proxy :: Proxy MetadataValidationResponse)
-      return $
-        NamedSchema name_ $
-          schema_
-            & description ?~ "Metadata Validation Response"
-            & example
-              ?~ toJSON ("{\"status\": \"INCORRECT_FORMTAT\", \"valid\":false}" :: Text)
-
-data MetadataValidationParams
-  = MetadataValidationParams
-      { metadataValidationParamsUrl  :: Text
-      , metadataValidationParamsHash :: HexText
-      }
-  deriving (Generic, Show)
-
-deriveJSON (jsonOptions "metadataValidationParams") ''MetadataValidationParams
-
-instance ToSchema MetadataValidationParams where
-    declareNamedSchema proxy = do
-      NamedSchema name_ schema_ <-
-        genericDeclareNamedSchema
-        ( fromAesonOptions $ jsonOptions "metadataValidationParams" )
-        proxy
-      return $
-        NamedSchema name_ $
-          schema_
-            & description ?~ "Metadata Validation Params"
-            & example
-              ?~ toJSON ("{\"url\": \"https://metadata.xyz\", \"hash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\"}" :: Text)
-
-
-
 data GovActionId
   = GovActionId
       { govActionIdTxHash :: HexText
@@ -670,6 +573,13 @@ data DRepInfoResponse
       , dRepInfoResponseDRepRetireTxHash         :: Maybe HexText
       , dRepInfoResponseSoleVoterRegisterTxHash  :: Maybe HexText
       , dRepInfoResponseSoleVoterRetireTxHash    :: Maybe HexText
+      , dRepInfoResponsePaymentAddress           :: Maybe Text
+      , dRepInfoResponseGivenName                :: Maybe Text
+      , dRepInfoResponseObjectives               :: Maybe Text
+      , dRepInfoResponseMotivations              :: Maybe Text
+      , dRepInfoResponseQualifications           :: Maybe Text
+      , dRepInfoResponseImageUrl                 :: Maybe Text
+      , dRepInfoResponseImageHash                :: Maybe HexText
       }
   deriving (Generic, Show)
 
@@ -688,7 +598,14 @@ exampleDRepInfoResponse =
   <> "\"dRepRegisterTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
   <> "\"dRepRetireTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
   <> "\"soleVoterRegisterTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
-  <> "\"soleVoterRetireTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
+  <> "\"soleVoterRetireTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
+  <> "\"paymentAddress\": \"addr1qy49kr45ue0wq78d34dpg79syx3yekxryjadv9ykzczhjwm09pmyt6f6xvq5x9yah2vrxyg0np44ynm6n7hzafl2rqxs4v6nn3\","
+  <> "\"givenName\": \"John Doe\","
+  <> "\"objectives\": \"Objectives of the DRep\","
+  <> "\"motivations\": \"Motivations of the DRep\","
+  <> "\"qualifications\": \"Qualifications of the DRep\","
+  <> "\"imageUrl\": \"https://drep.image.xyz\","
+  <> "\"imageHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\"}"
 
 instance ToSchema DRepInfoResponse where
   declareNamedSchema proxy = do
@@ -703,7 +620,6 @@ instance ToSchema DRepInfoResponse where
           & example
             ?~ toJSON exampleDRepInfoResponse
 
-
 data GetProposalResponse
   = GetProposalResponse
       { getProposalResponseVote     :: Maybe VoteParams
@@ -715,7 +631,6 @@ exampleGetProposalResponse :: Text
 exampleGetProposalResponse =
     "{\"vote\": " <> exampleVoteParams <> ","
   <> "\"proposal\": " <> exampleProposalResponse <> "}"
-
 
 deriveJSON (jsonOptions "getProposalResponse") ''GetProposalResponse
 
@@ -816,8 +731,6 @@ instance ToParamSchema DRepStatus where
       & type_ ?~ OpenApiString
       & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [DRepStatus])
 
-
-
 data DRepType = NormalDRep | SoleVoter
 
 instance Show DRepType where
@@ -855,6 +768,13 @@ data DRep
       , dRepType                   :: DRepType
       , dRepLatestTxHash           :: Maybe HexText
       , dRepLatestRegistrationDate :: UTCTime
+      , dRepPaymentAddress         :: Maybe Text
+      , dRepGivenName              :: Maybe Text
+      , dRepObjectives             :: Maybe Text
+      , dRepMotivations            :: Maybe Text
+      , dRepQualifications         :: Maybe Text
+      , dRepImageUrl               :: Maybe Text
+      , dRepImageHash              :: Maybe HexText
       }
   deriving (Generic, Show)
 
@@ -872,7 +792,15 @@ exampleDrep =
   <> "\"status\": \"Active\","
   <> "\"type\": \"DRep\","
   <> "\"latestTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
-  <> "\"latestRegistrationDate\": \"1970-01-01T00:00:00Z\"}"
+  <> "\"latestRegistrationDate\": \"1970-01-01T00:00:00Z\","
+  <> "\"paymentAddress\": \"addr1qy49kr45ue0wq78d34dpg79syx3yekxryjadv9ykzczhjwm09pmyt6f6xvq5x9yah2vrxyg0np44ynm6n7hzafl2rqxs4v6nn3\","
+  <> "\"givenName\": \"John Doe\","
+  <> "\"objectives\": \"Some Objectives\","
+  <> "\"motivations\": \"Some Motivations\","
+  <> "\"qualifications\": \"Some Qualifications\","
+  <> "\"qualifications\": \"Some Qualifications\","
+  <> "\"imageUrl\": \"https://image.url\","
+  <> "\"imageHash\": \"9198b1b204273ba5c67a13310b5a806034160f6a063768297e161d9b759cad61\"}"
 
 -- ToSchema instance for DRep
 instance ToSchema DRep where

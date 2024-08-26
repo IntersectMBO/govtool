@@ -114,7 +114,14 @@ drepRegistrationToDrep Types.DRepRegistration {..} =
       dRepStatus = mapDRepStatus dRepRegistrationStatus,
       dRepType = mapDRepType dRepRegistrationType,
       dRepLatestTxHash = HexText <$> dRepRegistrationLatestTxHash,
-      dRepLatestRegistrationDate = dRepRegistrationLatestRegistrationDate
+      dRepLatestRegistrationDate = dRepRegistrationLatestRegistrationDate,
+      dRepPaymentAddress = dRepRegistrationPaymentAddress,
+      dRepGivenName = dRepRegistrationGivenName,
+      dRepObjectives = dRepRegistrationObjectives,
+      dRepMotivations = dRepRegistrationMotivations,
+      dRepQualifications = dRepRegistrationQualifications,
+      dRepImageUrl = dRepRegistrationImageUrl,
+      dRepImageHash = HexText <$> dRepRegistrationImageHash
     }
 
 delegationToResponse :: Types.Delegation -> DelegationResponse
@@ -286,6 +293,13 @@ drepInfo (unHexText -> dRepId) = do
     , dRepInfoResponseDRepRetireTxHash = HexText <$> dRepInfoDRepRetireTx
     , dRepInfoResponseSoleVoterRegisterTxHash = HexText <$> dRepInfoSoleVoterRegisterTx
     , dRepInfoResponseSoleVoterRetireTxHash = HexText <$> dRepInfoSoleVoterRetireTx
+    , dRepInfoResponsePaymentAddress = dRepInfoPaymentAddress
+    , dRepInfoResponseGivenName = dRepInfoGivenName
+    , dRepInfoResponseObjectives = dRepInfoObjectives
+    , dRepInfoResponseMotivations = dRepInfoMotivations
+    , dRepInfoResponseQualifications = dRepInfoQualifications
+    , dRepInfoResponseImageUrl = dRepInfoImageUrl
+    , dRepInfoResponseImageHash = HexText <$> dRepInfoImageHash
     }
 
 getCurrentDelegation :: App m => HexText -> m (Maybe DelegationResponse)

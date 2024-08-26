@@ -84,6 +84,13 @@ data DRepInfo
       , dRepInfoDRepRetireTx             :: Maybe Text
       , dRepInfoSoleVoterRegisterTx      :: Maybe Text
       , dRepInfoSoleVoterRetireTx        :: Maybe Text
+      , dRepInfoPaymentAddress           :: Maybe Text
+      , dRepInfoGivenName                :: Maybe Text
+      , dRepInfoObjectives               :: Maybe Text
+      , dRepInfoMotivations              :: Maybe Text
+      , dRepInfoQualifications           :: Maybe Text
+      , dRepInfoImageUrl                 :: Maybe Text
+      , dRepInfoImageHash                :: Maybe Text
       }
 
 data DRepStatus = Active | Inactive | Retired deriving (Eq, Ord)
@@ -102,6 +109,13 @@ data DRepRegistration
       , dRepRegistrationType                   :: DRepType
       , dRepRegistrationLatestTxHash           :: Maybe Text
       , dRepRegistrationLatestRegistrationDate :: UTCTime
+      , dRepRegistrationPaymentAddress         :: Maybe Text
+      , dRepRegistrationGivenName              :: Maybe Text
+      , dRepRegistrationObjectives             :: Maybe Text
+      , dRepRegistrationMotivations            :: Maybe Text
+      , dRepRegistrationQualifications         :: Maybe Text
+      , dRepRegistrationImageUrl               :: Maybe Text
+      , dRepRegistrationImageHash              :: Maybe Text
       }
 
 data Proposal

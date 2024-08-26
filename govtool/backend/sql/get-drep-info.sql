@@ -176,7 +176,14 @@ SELECT
     DRepRegister.tx_hash,
     DRepRetire.tx_hash,
     SoleVoterRegister.tx_hash,
-    SoleVoterRetire.tx_hash
+    SoleVoterRetire.tx_hash,
+    off_chain_vote_drep_data.payment_address,
+    off_chain_vote_drep_data.given_name,
+    off_chain_vote_drep_data.objectives,
+    off_chain_vote_drep_data.motivations,
+    off_chain_vote_drep_data.qualifications,
+    off_chain_vote_drep_data.image_url,
+    off_chain_vote_drep_data.image_hash
 FROM
     IsRegisteredAsDRep
     CROSS JOIN IsRegisteredAsSoleVoter
@@ -189,3 +196,6 @@ FROM
     CROSS JOIN DRepRetire
     CROSS JOIN SoleVoterRegister
     CROSS JOIN SoleVoterRetire
+    CROSS JOIN LatestRegistrationEntry
+    LEFT JOIN off_chain_vote_data ON off_chain_vote_data.voting_anchor_id = LatestRegistrationEntry.voting_anchor_id
+    LEFT JOIN off_chain_vote_drep_data ON off_chain_vote_drep_data.off_chain_vote_data_id = off_chain_vote_data.id

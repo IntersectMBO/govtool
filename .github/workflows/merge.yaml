@@ -20,6 +20,7 @@ jobs:
   check-build-deploy:
     environment:  ${{ (github.ref_name == 'main' && 'prod-govtool') || (github.ref_name == 'staging' && 'pre-prod-govtool') || (github.ref_name == 'test' && 'qa-govtool') || (github.ref_name == 'develop' && 'dev-govtool') }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - workdir: ./govtool/backend

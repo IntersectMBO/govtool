@@ -64,53 +64,7 @@ getProposals ::
   (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>
   Maybe [Text] ->
   m [Proposal]
-getProposals mProposalIds = withPool $ \conn -> do
-  proposalResults <- liftIO $ case mProposalIds of
+getProposals mProposalIds = withPool $ \conn ->
+  liftIO $ case mProposalIds of
     Nothing          -> SQL.query @(Bool, SQL.In [Text]) conn listProposalsSql (False, SQL.In [])
     Just proposalIds -> SQL.query conn listProposalsSql (True, SQL.In proposalIds)
-
-  timeZone <- liftIO getCurrentTimeZone
-  return $ map
-            ( \( id'
-               , txHash'
-               , index'
-               , type'
-               , details'
-               , expiryDate'
-               , expiryEpochNo'
-               , createdDate'
-               , createdEpochNo'
-               , url'
-               , docHash'
-               , title'
-               , about'
-               , motivation'
-               , rationale'
-               , yesVotes'
-               , noVotes'
-               , abstainVotes'
-               ) ->
-              let eDate = localTimeToUTC timeZone <$> expiryDate'
-                  cDate = localTimeToUTC timeZone createdDate'
-              in
-                Proposal
-                  id'
-                  txHash'
-                  (floor @Scientific index')
-                  type'
-                  details'
-                  eDate
-                  expiryEpochNo'
-                  cDate
-                  createdEpochNo'
-                  url'
-                  docHash'
-                  title'
-                  about'
-                  motivation'
-                  rationale'
-                  (floor @Scientific yesVotes')
-                  (floor @Scientific noVotes')
-                  (floor @Scientific abstainVotes')
-            )
-            proposalResults

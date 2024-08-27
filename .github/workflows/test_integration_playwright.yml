@@ -34,7 +34,7 @@ jobs:
           cache-dependency-path: "./tests/govtool-frontend/playwright/package-lock.json"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --force
 
       - name: Cache Playwright browsers
         id: cache-playwright-browsers

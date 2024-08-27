@@ -62,8 +62,7 @@ export const GovernanceActions = () => {
             display: "flex",
             flex: 1,
             flexDirection: "column",
-            mt: isMobile ? 3.25 : 6.25,
-            overflow: "hidden",
+            pt: isMobile ? 3.25 : 6.25,
           }}
         >
           <Typography

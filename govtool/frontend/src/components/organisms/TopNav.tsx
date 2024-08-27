@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { AppBar, Box, Grid, IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -15,7 +15,8 @@ const POSITION_TO_BLUR = 50;
 
 export const TopNav = ({ isConnectButton = true }) => {
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
-  const [windowScroll, setWindowScroll] = useState<number>(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [shouldBlur, setShouldBlur] = useState<boolean>(false);
   const { openModal } = useModal();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const { screenWidth, isMobile } = useScreenDimension();
@@ -25,7 +26,14 @@ export const TopNav = ({ isConnectButton = true }) => {
 
   useEffect(() => {
     const onScroll = () => {
-      setWindowScroll(window.scrollY);
+      if (!containerRef.current || !containerRef.current.nextElementSibling)
+        return;
+
+      const currentShouldBlur =
+        containerRef.current.nextElementSibling.getBoundingClientRect().top <
+        POSITION_TO_BLUR;
+
+      setShouldBlur(currentShouldBlur);
     };
 
     window.addEventListener("scroll", onScroll, {
@@ -48,146 +56,144 @@ export const TopNav = ({ isConnectButton = true }) => {
   };
 
   return (
-    <Box position="relative" py={isMobile ? 5 : 6}>
-      <AppBar
-        color="transparent"
+    <AppBar
+      ref={containerRef}
+      color="transparent"
+      sx={{
+        alignItems: "center",
+        backdropFilter: shouldBlur ? "blur(10px)" : "none",
+        backgroundColor: shouldBlur
+          ? "rgba(256, 256, 256, 0.7)"
+          : isMobile
+          ? "white"
+          : "transparent",
+        borderBottom: isMobile ? 1 : 0,
+        borderColor: "lightblue",
+        borderRadius: 0,
+        boxShadow: 0,
+        justifyContent: "center",
+        flexDirection: "row",
+        position: "sticky",
+        top: 0,
+        px: isMobile ? 2 : 5,
+        py: 3,
+        zIndex: 100,
+      }}
+    >
+      <Box
         sx={{
           alignItems: "center",
-          backdropFilter:
-            windowScroll > POSITION_TO_BLUR ? "blur(10px)" : "none",
-          backgroundColor:
-            windowScroll > POSITION_TO_BLUR
-              ? "rgba(256, 256, 256, 0.7)"
-              : isMobile
-              ? "white"
-              : "transparent",
-          borderBottom: isMobile ? 1 : 0,
-          borderColor: "lightblue",
-          borderRadius: 0,
-          boxShadow: 0,
-          justifyContent: "center",
+          display: "flex",
           flex: 1,
-          flexDirection: "row",
-          position: "fixed",
-          px: isMobile ? 2 : 5,
-          py: 3,
+          justifyContent: "space-between",
+          maxWidth: 1290,
         }}
       >
-        <Box
-          sx={{
-            alignItems: "center",
-            display: "flex",
-            flex: 1,
-            justifyContent: "space-between",
-            maxWidth: 1290,
-          }}
+        <NavLink
+          data-testid="logo-button"
+          onClick={() => (isConnectButton ? {} : disconnectWallet())}
+          to={PATHS.home}
         >
-          <NavLink
-            data-testid="logo-button"
-            onClick={() => (isConnectButton ? {} : disconnectWallet())}
-            to={PATHS.home}
+          <img
+            alt="app-logo"
+            height={isMobile ? 25 : 35}
+            src={IMAGES.appLogo}
+          />
+        </NavLink>
+        {screenWidth >= 1024 ? (
+          <nav
+            style={{
+              alignItems: "center",
+              display: "flex",
+              justifyContent: "end",
+            }}
           >
-            <img
-              alt="app-logo"
-              height={isMobile ? 25 : 35}
-              src={IMAGES.appLogo}
-            />
-          </NavLink>
-          {screenWidth >= 1024 ? (
-            <nav
-              style={{
-                alignItems: "center",
-                display: "flex",
-                justifyContent: "end",
-              }}
+            <Grid
+              alignItems="center"
+              columns={5}
+              columnSpacing={screenWidth < 1024 ? 2 : 4}
+              container
             >
-              <Grid
-                alignItems="center"
-                columns={5}
-                columnSpacing={screenWidth < 1024 ? 2 : 4}
-                container
-              >
-                {NAV_ITEMS.map((navItem) => {
-                  if (
-                    !isProposalDiscussionForumEnabled &&
-                    navItem.dataTestId === "proposed-governance-actions-link"
-                  ) {
-                    return null;
-                  }
-                  return (
-                    <Grid item key={navItem.label}>
-                      <Link
-                        {...navItem}
-                        isConnectWallet={isConnectButton}
-                        onClick={() => {
-                          if (navItem.newTabLink) {
-                            openInNewTab(navItem.newTabLink);
-                          }
-                          setIsDrawerOpen(false);
-                        }}
-                      />
-                    </Grid>
-                  );
-                })}
-                {isConnectButton ? (
-                  <Grid item>
-                    <Button
-                      data-testid="connect-wallet-button"
-                      onClick={onClickConnectButton}
-                      size="extraLarge"
-                      variant="contained"
-                    >
-                      {t("wallet.connectWallet")}
-                    </Button>
+              {NAV_ITEMS.map((navItem) => {
+                if (
+                  !isProposalDiscussionForumEnabled &&
+                  navItem.dataTestId === "proposed-governance-actions-link"
+                ) {
+                  return null;
+                }
+                return (
+                  <Grid item key={navItem.label}>
+                    <Link
+                      {...navItem}
+                      isConnectWallet={isConnectButton}
+                      onClick={() => {
+                        if (navItem.newTabLink) {
+                          openInNewTab(navItem.newTabLink);
+                        }
+                        setIsDrawerOpen(false);
+                      }}
+                    />
                   </Grid>
-                ) : null}
-              </Grid>
-            </nav>
-          ) : (
-            <>
-              <Box sx={{ alignItems: "center", display: "flex" }}>
-                {isConnectButton ? (
+                );
+              })}
+              {isConnectButton ? (
+                <Grid item>
                   <Button
                     data-testid="connect-wallet-button"
                     onClick={onClickConnectButton}
-                    size="small"
-                    sx={{
-                      marginRight: screenWidth >= 768 ? 3 : 1,
-                      flex: 1,
-                    }}
+                    size="extraLarge"
                     variant="contained"
                   >
-                    {t("wallet.connect")}
+                    {t("wallet.connectWallet")}
                   </Button>
-                ) : null}
-                {screenWidth >= 768 ? (
-                  <IconButton
-                    data-testid="open-drawer-button"
-                    onClick={openDrawer}
-                    sx={{
-                      bgcolor: "#FBFBFF",
-                    }}
-                  >
-                    <MenuIcon color="primary" />
-                  </IconButton>
-                ) : (
-                  <img
-                    alt="drawer-icon"
-                    src={ICONS.drawerIcon}
-                    onClick={openDrawer}
-                    data-testid="open-drawer-button"
-                  />
-                )}
-              </Box>
-              <DrawerMobile
-                isConnectButton={isConnectButton}
-                isDrawerOpen={isDrawerOpen}
-                setIsDrawerOpen={setIsDrawerOpen}
-              />
-            </>
-          )}
-        </Box>
-      </AppBar>
-    </Box>
+                </Grid>
+              ) : null}
+            </Grid>
+          </nav>
+        ) : (
+          <>
+            <Box sx={{ alignItems: "center", display: "flex" }}>
+              {isConnectButton ? (
+                <Button
+                  data-testid="connect-wallet-button"
+                  onClick={onClickConnectButton}
+                  size="small"
+                  sx={{
+                    marginRight: screenWidth >= 768 ? 3 : 1,
+                    flex: 1,
+                  }}
+                  variant="contained"
+                >
+                  {t("wallet.connect")}
+                </Button>
+              ) : null}
+              {screenWidth >= 768 ? (
+                <IconButton
+                  data-testid="open-drawer-button"
+                  onClick={openDrawer}
+                  sx={{
+                    bgcolor: "#FBFBFF",
+                  }}
+                >
+                  <MenuIcon color="primary" />
+                </IconButton>
+              ) : (
+                <img
+                  alt="drawer-icon"
+                  src={ICONS.drawerIcon}
+                  onClick={openDrawer}
+                  data-testid="open-drawer-button"
+                />
+              )}
+            </Box>
+            <DrawerMobile
+              isConnectButton={isConnectButton}
+              isDrawerOpen={isDrawerOpen}
+              setIsDrawerOpen={setIsDrawerOpen}
+            />
+          </>
+        )}
+      </Box>
+    </AppBar>
   );
 };

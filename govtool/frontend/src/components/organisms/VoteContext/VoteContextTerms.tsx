@@ -16,8 +16,10 @@ export const VoteContextTerms = ({ setStep, onCancel }: StoreDataInfoProps) => {
   const { control, errors, watch } = useVoteContextForm();
   const { isMobile } = useScreenDimension();
 
-  // TODO: change link when available
-  const openLink = () => openInNewTab("https://docs.gov.tools");
+  const openLink = () =>
+    openInNewTab(
+      "https://docs.gov.tools/using-govtool/govtool-functions/storing-information-offline",
+    );
 
   const isContinueDisabled = !watch("terms");
 

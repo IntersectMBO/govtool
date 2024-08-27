@@ -13,13 +13,16 @@ const EXAMPLE_DREP: DRepData = {
   votingPower: 10000,
   status: DRepStatus.Active,
   type: "DRep" as TDRepType,
-  bio: null,
-  dRepName: null,
-  email: null,
+  givenName: "name",
   references: [],
   metadataStatus: null,
   metadataValid: true,
   latestRegistrationDate: "2024-07-10",
+  paymentAddress: null,
+  objectives: null,
+  motivations: null,
+  qualifications: null,
+  doNotList: false,
 };
 
 describe("isSameDRep function", () => {

@@ -348,7 +348,7 @@ export const en = {
     footer: {
       copyright: "© 2024 Intersect MBO",
       privacyPolicy: "Privacy policy",
-      termOfService: "Term of service",
+      termOfService: "Terms and Conditions",
     },
     forms: {
       link: "Link",
@@ -357,31 +357,31 @@ export const en = {
         typeTip:
           "To change the Governance Action Type go back to the previous page.",
       },
-      editMetadata: {
-        bio: "Bio",
-        bioHelpfulText: "Some sentence about yourself",
-        bioPlaceholder: "Enter your Bio ...",
-        dRepName: "DRep Name",
-        dRepNameHelpfulText:
-          "This is name that will be shown on your DRep profile",
-        dRepNamePlaceholder: "ex. JohnDRep",
-        email: "Email",
-        emailPlaceholder: "john.smith@email.com",
+      dRepData: {
+        givenName: "Given Name",
+        objectives: "Objectives",
+        objectivesPlaceholder: "Tell others what you want to achieve...",
+        objectivesHelpfulText:
+          "A short description of your beliefs and goals as a DRep",
+        motivations: "Motivations",
+        motivationsPlaceholder: "Describe what motivates you...",
+        motivationsHelpfulText:
+          "A short description of why you want to be a DRep, what personal and professional experiences you have had that have driven you to register",
+        qualifications: "Qualifications",
+        qualificationsPlaceholder: "List your qualifications...",
+        qualificationsHelpfulText:
+          "Key qualifications you hold that are relevant to your role as a DRep",
+        paymentAddress: "Payment Address",
+        paymentAddressPlaceholder:
+          "addr1vpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5eg0yu80w",
+        doNotList: "Do not list",
+        doNotListHelpfulText:
+          "Check this box if you do not want to show up in Govtool DRep Directory or in similar tools",
       },
       errors: {
         tooLongUrl: "Url must be less than 128 bytes",
         mustBeStakeAddress: "It must be reward address in bech32 format",
-      },
-      registerAsDRep: {
-        bio: "Bio",
-        bioHelpfulText: "Some sentence about yourself",
-        bioPlaceholder: "Enter your Bio ...",
-        dRepName: "DRep Name",
-        dRepNameHelpfulText:
-          "This is name that will be shown on your DRep profile",
-        dRepNamePlaceholder: "ex. JohnDRep",
-        email: "Email",
-        emailPlaceholder: "john.smith@email.com",
+        mustBeReceivingAddress: "Invalid payment address",
       },
     },
     proposalDiscussion: {
@@ -408,9 +408,17 @@ export const en = {
       expiryDate: "Expiry date:",
       filterTitle: "Governance Action Type",
       forGovAction: "for this Governance Action",
+      dReps: "DReps",
+      sPos: "SPOs",
+      ccCommittee: "Constitutional Committee",
       governanceActionId: "Governance Action ID:",
       governanceActionType: "Governance Action Type:",
       goToVote: "Go to Vote",
+      hardforkDetails: {
+        currentVersion: "Current version",
+        proposedVersion: "Proposed version",
+        previousGAId: "Previous Governance Action ID",
+      },
       motivation: "Motivation",
       myVote: "My Vote:",
       noResultsForTheSearch: "No results for the search.",
@@ -437,7 +445,7 @@ export const en = {
       voteContextFileName: "Vote_Context.jsonld",
       votedOnByMe: "Voted on by me",
       voteOnGovActions: "Vote on Governance Action",
-      voteSubmitted: "Vote submitted",
+      voteSubmitted: "Votes submitted",
       voteTransaction: "Vote transaction",
       votes: "Votes:",
       votesSubmitted: "DRep votes submitted",
@@ -638,9 +646,7 @@ export const en = {
       storingInformationURLPlaceholder: "URL",
       fields: {
         validations: {
-          email: "Invalid email address",
           maxLength: "Max {{maxLength}} characters",
-          nickname: "Nickname can not contain whitespaces",
           required: "This field is required",
           url: "Invalid URL",
         },
@@ -655,7 +661,8 @@ export const en = {
       addInformationTitle: "Add Information",
       alreadyRegistered: {
         title: "You already are a DRep",
-        description: "Looks like you have already successfully completed your registration and you currently are a DRep.\n\nYou can view your details in the DRep Directory.",
+        description:
+          "Looks like you have already successfully completed your registration and you currently are a DRep.\n\nYou can view your details in the DRep Directory.",
         viewDetails: "View your DRep details",
       },
       becomeADRep: "Become a DRep",
@@ -688,9 +695,7 @@ export const en = {
       storingInformationURLPlaceholder: "URL",
       fields: {
         validations: {
-          email: "Invalid email address",
           maxLength: "Max {{maxLength}} characters",
-          nickname: "Nickname can not contain whitespaces",
           required: "This field is required",
           url: "Invalid URL",
         },
@@ -699,7 +704,8 @@ export const en = {
     retirement: {
       notADRep: {
         title: "You are not a DRep",
-        description: "Looks like you cannot retire, because currently you are not a DRep.",
+        description:
+          "Looks like you cannot retire, because currently you are not a DRep.",
       },
       continue: "Continue to Retirement",
       retireAsDrep: "Retire as a Drep",
@@ -714,12 +720,14 @@ export const en = {
     directVoter: {
       alreadyRegistered: {
         title: "You already are a Direct Voter",
-        description: "Looks like you have already successfully completed your registration and you currently are a Direct Voter.",
+        description:
+          "Looks like you have already successfully completed your registration and you currently are a Direct Voter.",
       },
       becomeDirectVoter: "Become a Direct Voter",
       notDirectVoter: {
         title: "You are not a Direct Voter",
-        description: "Looks like you cannot retire, because currently you are not a Direct Voter.",
+        description:
+          "Looks like you cannot retire, because currently you are not a Direct Voter.",
       },
       registerDescription:
         "A Direct Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of ADA in their connected wallet. <0>Learn More</0> about Direct Voter.\n\nBecoming a Direct Voter will require a refundable deposit of <strong>₳{{deposit}}</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
@@ -733,6 +741,8 @@ export const en = {
       description:
         "The Voltaire GovTool is a tool that allows you to participate in the governance of the Cardano network. You can propose, vote on, and delegate your voting power to other users.",
       title: "This tool is connected to {{networkName}}",
+      bootstrappingWarning:
+        "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>",
     },
     tooltips: {
       delegateTodRep: {

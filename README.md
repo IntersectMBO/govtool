@@ -48,7 +48,7 @@ Learn more; [docs.gov.tools](https://docs.gov.tools/).
 
 ### Utilities
 
-- [Governance Action Loader](./governance-action-loader/)
+- [Governance Action Loader](./gov-action-loader/)
 
 ### Backend
 

@@ -17,16 +17,16 @@ import { formatDisplayDate } from "@utils";
 
 type VoteActionFormProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
-  expiryDate: string;
-  expiryEpochNo: number;
+  expiryDate: string | undefined;
+  expiryEpochNo: number | undefined;
   voteFromEP?: string;
   voteUrlFromEP?: string;
   voteDateFromEP?: string;
   voteEpochNoFromEP?: number;
-  yesVotes: number;
-  noVotes: number;
-  abstainVotes: number;
   isInProgress?: boolean;
+  dRepYesVotes: number;
+  dRepNoVotes: number;
+  dRepAbstainVotes: number;
 };
 
 export const VoteActionForm = ({
@@ -37,9 +37,9 @@ export const VoteActionForm = ({
   voteUrlFromEP,
   voteDateFromEP,
   voteEpochNoFromEP,
-  yesVotes,
-  noVotes,
-  abstainVotes,
+  dRepAbstainVotes,
+  dRepNoVotes,
+  dRepYesVotes,
   isInProgress,
 }: VoteActionFormProps) => {
   const [voteContextHash, setVoteContextHash] = useState<string | undefined>();
@@ -235,9 +235,9 @@ export const VoteActionForm = ({
               openModal({
                 type: "votingPower",
                 state: {
-                  yesVotes,
-                  noVotes,
-                  abstainVotes,
+                  dRepYesVotes,
+                  dRepNoVotes,
+                  dRepAbstainVotes,
                   vote: state && state.vote ? state.vote : voteFromEP,
                 },
               });

@@ -40,7 +40,6 @@ export const Footer = () => {
   const onClickPrivacyPolicy = () =>
     openInNewTab("https://docs.gov.tools/legal/privacy-policy");
 
-  // TODO: change term of service link
   const onClickTermOfService = () =>
     openInNewTab("https://docs.gov.tools/legal/terms-and-conditions");
 

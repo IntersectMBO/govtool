@@ -61,7 +61,7 @@ export const EditDRepForm = ({
 
   const removeLink = useCallback((index: number) => remove(index), [remove]);
 
-  const isContinueButtonDisabled = !watch("dRepName") || isError;
+  const isContinueButtonDisabled = !watch("givenName") || isError;
 
   useEffect(() => {
     if (loadUserData) {
@@ -78,7 +78,7 @@ export const EditDRepForm = ({
           : {
               ...yourselfDRepList?.[0],
               references: yourselfDRepList?.[0].references.length
-                ? yourselfDRepList?.[0].references.map((uri: string) => ({
+                ? yourselfDRepList?.[0].references.map((uri) => ({
                     uri,
                   }))
                 : [{ uri: "" }],
@@ -130,11 +130,9 @@ export const EditDRepForm = ({
       <ControlledField.Input
         {...{ control, errors }}
         dataTestId="name-input"
-        helpfulText={t("forms.editMetadata.dRepNameHelpfulText")}
-        label={t("forms.editMetadata.dRepName")}
-        name="dRepName"
-        rules={Rules.DREP_NAME}
-        placeholder={t("forms.editMetadata.dRepNamePlaceholder")}
+        label={t("forms.dRepData.givenName")}
+        name="givenName"
+        rules={Rules.GIVEN_NAME}
       />
       <Spacer y={isMobile ? 5 : 6} />
       <Box textAlign="center">
@@ -146,59 +144,72 @@ export const EditDRepForm = ({
           {t("editMetadata.aboutYouDescription")}
         </Typography>
       </Box>
-      <ControlledField.Input
-        {...{ control, errors }}
-        label={t("forms.editMetadata.email")}
-        name="email"
-        placeholder={t("forms.editMetadata.emailPlaceholder")}
-        rules={Rules.EMAIL}
-      />
-      <Spacer y={3} />
-      <ControlledField.TextArea
-        {...{ control, errors }}
-        data-testid="bio-input"
-        label={t("forms.editMetadata.bio")}
-        name="bio"
-        placeholder={t("forms.editMetadata.bioPlaceholder")}
-        helpfulText={t("forms.editMetadata.bioHelpfulText")}
-        rules={Rules.BIO}
-      />
-      <Spacer y={4} />
-      <p
-        style={{
-          fontFamily: "Poppins",
-          fontSize: 16,
-          fontWeight: 600,
-          textAlign: "center",
-          margin: 0,
-        }}
-      >
-        {t("editMetadata.linksDescription")}
-        <span style={{ fontSize: 16, fontWeight: 400 }}>
-          {t("editMetadata.maximumLinks", {
-            numberOfLinks: MAX_NUMBER_OF_LINKS,
-          })}
-        </span>
-      </p>
-      <Spacer y={3} />
-      {renderLinks()}
-      {references?.length < MAX_NUMBER_OF_LINKS ? (
-        <Button
-          data-testid="add-link-button"
-          onClick={addLink}
-          size="extraLarge"
-          variant="text"
-        >
-          {t("addLink")}
-        </Button>
-      ) : null}
-      <Spacer y={isMobile ? 4 : 6} />
-      <CenteredBoxBottomButtons
-        onActionButton={onClickContinue}
-        disableActionButton={isContinueButtonDisabled}
-        onBackButton={onClickCancel}
-        backButtonText={t("cancel")}
-      />
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <ControlledField.TextArea
+          {...{ control, errors }}
+          data-testid="objectives-input"
+          label={t("forms.dRepData.objectives")}
+          name="objectives"
+          placeholder={t("forms.dRepData.objectivesPlaceholder")}
+          helpfulText={t("forms.dRepData.objectivesHelpfulText")}
+          rules={Rules.OBJECTIVES}
+          maxLength={Rules.OBJECTIVES.maxLength.value}
+        />
+        <ControlledField.TextArea
+          {...{ control, errors }}
+          data-testid="motivations-input"
+          label={t("forms.dRepData.motivations")}
+          name="motivations"
+          placeholder={t("forms.dRepData.motivationsPlaceholder")}
+          helpfulText={t("forms.dRepData.motivationsHelpfulText")}
+          rules={Rules.MOTIVATIONS}
+          maxLength={Rules.MOTIVATIONS.maxLength.value}
+        />
+        <ControlledField.TextArea
+          {...{ control, errors }}
+          data-testid="qualifications-input"
+          label={t("forms.dRepData.qualifications")}
+          name="qualifications"
+          placeholder={t("forms.dRepData.qualificationsPlaceholder")}
+          helpfulText={t("forms.dRepData.qualificationsHelpfulText")}
+          rules={Rules.QUALIFICATIONS}
+          maxLength={Rules.QUALIFICATIONS.maxLength.value}
+        />
+        <ControlledField.Input
+          {...{ control, errors }}
+          label={t("forms.dRepData.paymentAddress")}
+          name="paymentAddress"
+          placeholder={t("forms.dRepData.paymentAddressPlaceholder")}
+          rules={Rules.PAYMENT_ADDRESS}
+        />
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Typography sx={{ my: 2 }}>
+            {t("editMetadata.linksDescription")}
+            <span style={{ fontWeight: 400 }}>
+              {t("editMetadata.maximumLinks", {
+                numberOfLinks: MAX_NUMBER_OF_LINKS,
+              })}
+            </span>
+          </Typography>
+          {renderLinks()}
+          {references?.length < MAX_NUMBER_OF_LINKS ? (
+            <Button
+              data-testid="add-link-button"
+              onClick={addLink}
+              size="extraLarge"
+              variant="text"
+            >
+              {t("addLink")}
+            </Button>
+          ) : null}
+        </Box>
+        <CenteredBoxBottomButtons
+          onActionButton={onClickContinue}
+          disableActionButton={isContinueButtonDisabled}
+          onBackButton={onClickCancel}
+          backButtonText={t("cancel")}
+        />
+      </Box>
     </>
   );
 };

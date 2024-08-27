@@ -22,6 +22,30 @@ changes.
 
 -
 
+## [sancho-v1.0.14](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.14) 2024-08-26
+
+### Added
+
+- Add support for displaying protocol parameters governance actions [Issue 1601](https://github.com/IntersectMBO/govtool/issues/1601)
+- Add SPO and CC committee total votes to gov actions [Issue 1704](https://github.com/IntersectMBO/govtool/issues/1704)
+- Add support for hard fork initiation governance action details [Issue 1600](https://github.com/IntersectMBO/govtool/issues/1600)
+- Add support for hard fork initiation previous governance action data [Issue 1600](https://github.com/IntersectMBO/govtool/issues/1600)
+- Add support for CIP-119 on the backend and metadata validation [Issue 1758](https://github.com/IntersectMBO/govtool/issues/1758)
+- Add support for CIP-119 on the frontend [Issue 1760](https://github.com/IntersectMBO/govtool/issues/1758)
+- Add support for HF Initiation and Protocol Parameter Change governance action builders [Issue 1600](https://github.com/IntersectMBO/govtool/issues/1600) & [Issue 1601](https://github.com/IntersectMBO/govtool/issues/1601)
+
+### Fixed
+
+- Fix typescript bug leading to runtime error when entering Governance Action details page via direct link [Issue 1801](https://github.com/IntersectMBO/govtool/issues/1801)
+- Fix accessing missing epochParams drep_deposit [Issue 1733](https://github.com/IntersectMBO/govtool/issues/1733)
+
+### Changed
+
+- Bump @intersect.mbo/pdf-ui to v0.3.7
+- Decrease level of wallet related sentry reports [Issue 1699](https://github.com/IntersectMBO/govtool/issues/1699)
+- Bump cardano-db-sync to 13.3.0.0 [Issue 1809](https://github.com/IntersectMBO/govtool/issues/1809)
+- Update Gitbook links [Issue 1774](https://github.com/IntersectMBO/govtool/issues/1774)
+
 ## [sancho-v1.0.13](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.13) 2024-08-22
 
 ### Added
@@ -30,6 +54,8 @@ changes.
 - Add network metrics model to frontend service
 - Added workflows to add labels to issues
 - Make voting on governance actions enabled based on protocol version [Issue 1703](https://github.com/IntersectMBO/govtool/issues/1703)
+- Add banner informing about network [Issue 1702](https://github.com/IntersectMBO/govtool/issues/1702)
+- Add banner informing about bootstrapping phase [Issue 1708](https://github.com/IntersectMBO/govtool/issues/1708)
 
 ### Fixed
 

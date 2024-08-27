@@ -34,11 +34,12 @@ body:
       label: Domain
       description: Which GovTool instance were you connected to?
       options:
+        - gov.tools
+        - preview.gov.tools
         - sanchogov.tools
         - dev-sanchogov.tools
         - test-sanchogov.tools
         - stage-sanchogov.tools
-        - preview.gov.tools
         - Custom setup
     validations:
       required: true

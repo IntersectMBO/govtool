@@ -20,8 +20,8 @@ export const Home = () => {
 
   return (
     <Background>
+      <TopNav />
       <Box overflow="hidden">
-        <TopNav />
         <Hero />
         <HomeCards />
         {/* FIXME: Footer should be on top of the layout.

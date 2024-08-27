@@ -111,103 +111,6 @@ instance ToSchema AnyValue where
         & example
           ?~ toJSON exampleAnyValue
 
-data MetadataValidationStatus = IncorrectFormat | IncorrectJSONLD | IncorrectHash | UrlNotFound deriving
-    ( Eq
-    , Show
-    )
-
-instance ToJSON MetadataValidationStatus where
-  toJSON IncorrectFormat = "INCORRECT_FORMTAT"
-  toJSON IncorrectJSONLD = "INVALID_JSONLD"
-  toJSON IncorrectHash   = "INVALID_HASH"
-  toJSON UrlNotFound     = "URL_NOT_FOUND"
-
-instance FromJSON MetadataValidationStatus where
-  parseJSON (String s) = case s of
-    "INCORRECT_FORMTAT" -> pure IncorrectFormat
-    "INVALID_JSONLD"    -> pure IncorrectJSONLD
-    "INVALID_HASH"      -> pure IncorrectHash
-    "URL_NOT_FOUND"     -> pure UrlNotFound
-    _                   -> fail "Invalid MetadataValidationStatus"
-  parseJSON _ = fail "Invalid MetadataValidationStatus"
-
-instance ToSchema MetadataValidationStatus where
-    declareNamedSchema _ = pure $ NamedSchema (Just "MetadataValidationStatus") $ mempty
-        & type_ ?~ OpenApiString
-        & description ?~ "Metadata Validation Status"
-        & enum_ ?~ map toJSON [IncorrectFormat, IncorrectJSONLD, IncorrectHash, UrlNotFound]
-
-
-
-data InternalMetadataValidationResponse
-  = InternalMetadataValidationResponse
-      { internalMetadataValidationResponseStatus :: Maybe MetadataValidationStatus
-      , internalMmetadataValidationResponseValid :: Bool
-      }
-  deriving (Generic, Show)
-
-deriveJSON (jsonOptions "internalMetadataValidationResponse") ''InternalMetadataValidationResponse
-
-instance ToSchema InternalMetadataValidationResponse where
-    declareNamedSchema _ = do
-      NamedSchema name_ schema_ <-
-        genericDeclareNamedSchema
-        ( fromAesonOptions $ jsonOptions "internalMetadataValidationResponse" )
-        (Proxy :: Proxy InternalMetadataValidationResponse)
-      return $
-        NamedSchema name_ $
-          schema_
-            & description ?~ "Metadata Validation Response"
-            & example
-              ?~ toJSON ("{\"status\": \"INCORRECT_FORMTAT\", \"valid\":false, \"raw\":{\"some\":\"key\"}}" :: Text)
-
-
-data MetadataValidationResponse
-  = MetadataValidationResponse
-      { metadataValidationResponseStatus :: Maybe Text
-      , metadataValidationResponseValid  :: Bool
-      }
-  deriving (Generic, Show)
-
-deriveJSON (jsonOptions "metadataValidationResponse") ''MetadataValidationResponse
-
-instance ToSchema MetadataValidationResponse where
-    declareNamedSchema _ = do
-      NamedSchema name_ schema_ <-
-        genericDeclareNamedSchema
-        ( fromAesonOptions $ jsonOptions "metadataValidationResponse" )
-        (Proxy :: Proxy MetadataValidationResponse)
-      return $
-        NamedSchema name_ $
-          schema_
-            & description ?~ "Metadata Validation Response"
-            & example
-              ?~ toJSON ("{\"status\": \"INCORRECT_FORMTAT\", \"valid\":false}" :: Text)
-
-data MetadataValidationParams
-  = MetadataValidationParams
-      { metadataValidationParamsUrl  :: Text
-      , metadataValidationParamsHash :: HexText
-      }
-  deriving (Generic, Show)
-
-deriveJSON (jsonOptions "metadataValidationParams") ''MetadataValidationParams
-
-instance ToSchema MetadataValidationParams where
-    declareNamedSchema proxy = do
-      NamedSchema name_ schema_ <-
-        genericDeclareNamedSchema
-        ( fromAesonOptions $ jsonOptions "metadataValidationParams" )
-        proxy
-      return $
-        NamedSchema name_ $
-          schema_
-            & description ?~ "Metadata Validation Params"
-            & example
-              ?~ toJSON ("{\"url\": \"https://metadata.xyz\", \"hash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\"}" :: Text)
-
-
-
 data GovActionId
   = GovActionId
       { govActionIdTxHash :: HexText
@@ -414,6 +317,45 @@ instance ToSchema GovernanceActionMetadata where
           ?~ toJSON
                 ("{\"some_key\": \"some value\", \"some_key2\": [1,2,3]}" :: Text)
 
+newtype GetCurrentEpochParamsResponse
+  = GetCurrentEpochParamsResponse { getCurrentEpochParamsResponse :: Maybe Value }
+  deriving newtype (Show)
+
+instance FromJSON GetCurrentEpochParamsResponse where
+  parseJSON = pure . GetCurrentEpochParamsResponse . Just
+
+instance ToJSON GetCurrentEpochParamsResponse where
+  toJSON (GetCurrentEpochParamsResponse Nothing)       = Null
+  toJSON (GetCurrentEpochParamsResponse (Just params)) = toJSON params
+
+exampleGetCurrentEpochParamsResponse :: Text
+exampleGetCurrentEpochParamsResponse =
+  "{ \"id\":90,\"epoch_no\":90,\"min_fee_a\":44,\"min_fee_b\":155381,\"max_block_size\":90112,\"max_tx_size\":16384,\"max_bh_size\":1100,\"key_deposit\":2000000,\"pool_deposit\":500000000,\"max_epoch\":18,\"optimal_pool_count\":5\r\n00,\"influence\":0.3,\"monetary_expand_rate\":0.003,\"treasury_growth_rate\":0.2,\"decentralisation\":0,\"protocol_major\":8,\"protocol_minor\":0,\"min_utxo_value\":0,\"min_pool_cost\":340000000,\"nonce\":\"\\\\x664c2d0eedc1c\r\n9ee7fc8b4f242c8d13ba17fd31454c84357fa8f1ac62f682cf9\",\"cost_model_id\":2,\"price_mem\":0.0577,\"price_step\":7.21e-05,\"max_tx_ex_mem\":14000000,\"max_tx_ex_steps\":10000000000,\"max_block_ex_mem\":62000000,\"max_bloc\r\nk_ex_steps\":20000000000,\"max_val_size\":5000,\"collateral_percent\":150,\"max_collateral_inputs\":3,\"block_id\":387943,\"extra_entropy\":null,\"coins_per_utxo_size\":4310}"
+
+instance ToSchema GetCurrentEpochParamsResponse where
+    declareNamedSchema _ = pure $ NamedSchema (Just "GetCurrentEpochParamsResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "Protocol parameters encoded as JSON"
+        & example
+          ?~ toJSON exampleGetCurrentEpochParamsResponse
+
+
+newtype ProtocolParams
+  = ProtocolParams { getProtocolParams :: Value }
+  deriving newtype (Show)
+
+instance FromJSON ProtocolParams where
+  parseJSON = pure . ProtocolParams
+
+instance ToJSON ProtocolParams where
+  toJSON (ProtocolParams params) = toJSON params
+
+instance ToSchema ProtocolParams where
+    declareNamedSchema _ = pure $ NamedSchema (Just "ProtocolParams") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "Protocol parameters encoded as JSON"
+        & example
+          ?~ toJSON exampleGetCurrentEpochParamsResponse
 
 
 newtype GovernanceActionReferences
@@ -435,28 +377,35 @@ instance ToSchema GovernanceActionReferences where
           ?~ toJSON
                 ("[{\"uri\": \"google.com\", \"@type\": \"Other\", \"label\": \"example label\"}]" :: Text)
 
-
-
 data ProposalResponse
   = ProposalResponse
-      { proposalResponseId             :: Text
-      , proposalResponseTxHash         :: HexText
-      , proposalResponseIndex          :: Integer
-      , proposalResponseType           :: GovernanceActionType
-      , proposalResponseDetails        :: Maybe GovernanceActionDetails
-      , proposalResponseExpiryDate     :: Maybe UTCTime
-      , proposalResponseExpiryEpochNo  :: Maybe Integer
-      , proposalResponseCreatedDate    :: UTCTime
-      , proposalResponseCreatedEpochNo :: Integer
-      , proposalResponseUrl            :: Text
-      , proposalResponseMetadataHash   :: HexText
-      , proposalResponseTitle          :: Maybe Text
-      , proposalResponseAbstract       :: Maybe Text
-      , proposalResponseMotivation     :: Maybe Text
-      , proposalResponseRationale      :: Maybe Text
-      , proposalResponseYesVotes       :: Integer
-      , proposalResponseNoVotes        :: Integer
-      , proposalResponseAbstainVotes   :: Integer
+      { proposalResponseId                  :: Text
+      , proposalResponseTxHash              :: HexText
+      , proposalResponseIndex               :: Integer
+      , proposalResponseType                :: GovernanceActionType
+      , proposalResponseDetails             :: Maybe GovernanceActionDetails
+      , proposalResponseExpiryDate          :: Maybe UTCTime
+      , proposalResponseExpiryEpochNo       :: Maybe Integer
+      , proposalResponseCreatedDate         :: UTCTime
+      , proposalResponseCreatedEpochNo      :: Integer
+      , proposalResponseUrl                 :: Text
+      , proposalResponseMetadataHash        :: HexText
+      , proposalResponseProtocolParams      :: Maybe ProtocolParams
+      , proposalResponseTitle               :: Maybe Text
+      , proposalResponseAbstract            :: Maybe Text
+      , proposalResponseMotivation          :: Maybe Text
+      , proposalResponseRationale           :: Maybe Text
+      , proposalResponseDRepYesVotes        :: Integer
+      , proposalResponseDRepNoVotes         :: Integer
+      , proposalResponseDRepAbstainVotes    :: Integer
+      , proposalResponsePoolYesVotes        :: Integer
+      , proposalResponsePoolNoVotes         :: Integer
+      , proposalResponsePoolAbstainVotes    :: Integer
+      , proposalResponseCcYesVotes          :: Integer
+      , proposalResponseCcNoVotes           :: Integer
+      , proposalResponseCcAbstainVotes      :: Integer
+      , proposalResponsePrevGovActionIndex  :: Maybe Integer
+      , proposalResponsePrevGovActionTxHash :: Maybe HexText
       }
   deriving (Generic, Show)
 
@@ -474,13 +423,22 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"createdEpochNo\": 0,"
                   <> "\"url\": \"https://proposal.metadata.xyz\","
                   <> "\"metadataHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
+                  <> "\"protocolParams\": " <> exampleGetCurrentEpochParamsResponse <> ","
                   <> "\"title\": \"Proposal Title\","
                   <> "\"abstract\": \"Proposal About\","
                   <> "\"motivation\": \"Proposal Motivation\","
                   <> "\"rationale\": \"Proposal Rationale\","
-                  <> "\"yesVotes\": 0,"
-                  <> "\"noVotes\": 0,"
-                  <> "\"abstainVotes\": 0}"
+                  <> "\"dRepYesVotes\": 0,"
+                  <> "\"dRepNoVotes\": 0,"
+                  <> "\"dRepAbstainVotes\": 0,"
+                  <> "\"poolYesVotes\": 0,"
+                  <> "\"poolNoVotes\": 0,"
+                  <> "\"poolAbstainVotes\": 0,"
+                  <> "\"cCYesVotes\": 0,"
+                  <> "\"cCNoVotes\": 0,"
+                  <> "\"cCAbstainVotes\": 0,"
+                  <> "\"prevGovActionIndex\": 0,"
+                  <> "\"prevGovActionTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
 
 instance ToSchema ProposalResponse where
   declareNamedSchema proxy = do
@@ -615,6 +573,13 @@ data DRepInfoResponse
       , dRepInfoResponseDRepRetireTxHash         :: Maybe HexText
       , dRepInfoResponseSoleVoterRegisterTxHash  :: Maybe HexText
       , dRepInfoResponseSoleVoterRetireTxHash    :: Maybe HexText
+      , dRepInfoResponsePaymentAddress           :: Maybe Text
+      , dRepInfoResponseGivenName                :: Maybe Text
+      , dRepInfoResponseObjectives               :: Maybe Text
+      , dRepInfoResponseMotivations              :: Maybe Text
+      , dRepInfoResponseQualifications           :: Maybe Text
+      , dRepInfoResponseImageUrl                 :: Maybe Text
+      , dRepInfoResponseImageHash                :: Maybe HexText
       }
   deriving (Generic, Show)
 
@@ -633,7 +598,14 @@ exampleDRepInfoResponse =
   <> "\"dRepRegisterTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
   <> "\"dRepRetireTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
   <> "\"soleVoterRegisterTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
-  <> "\"soleVoterRetireTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
+  <> "\"soleVoterRetireTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
+  <> "\"paymentAddress\": \"addr1qy49kr45ue0wq78d34dpg79syx3yekxryjadv9ykzczhjwm09pmyt6f6xvq5x9yah2vrxyg0np44ynm6n7hzafl2rqxs4v6nn3\","
+  <> "\"givenName\": \"John Doe\","
+  <> "\"objectives\": \"Objectives of the DRep\","
+  <> "\"motivations\": \"Motivations of the DRep\","
+  <> "\"qualifications\": \"Qualifications of the DRep\","
+  <> "\"imageUrl\": \"https://drep.image.xyz\","
+  <> "\"imageHash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\"}"
 
 instance ToSchema DRepInfoResponse where
   declareNamedSchema proxy = do
@@ -648,7 +620,6 @@ instance ToSchema DRepInfoResponse where
           & example
             ?~ toJSON exampleDRepInfoResponse
 
-
 data GetProposalResponse
   = GetProposalResponse
       { getProposalResponseVote     :: Maybe VoteParams
@@ -660,7 +631,6 @@ exampleGetProposalResponse :: Text
 exampleGetProposalResponse =
     "{\"vote\": " <> exampleVoteParams <> ","
   <> "\"proposal\": " <> exampleProposalResponse <> "}"
-
 
 deriveJSON (jsonOptions "getProposalResponse") ''GetProposalResponse
 
@@ -678,29 +648,6 @@ instance ToSchema GetProposalResponse where
           & description ?~ "GetProposal Response"
           & example
             ?~ toJSON exampleGetProposalResponse
-
-
-newtype GetCurrentEpochParamsResponse
-  = GetCurrentEpochParamsResponse { getCurrentEpochParamsResponse :: Maybe Value }
-  deriving newtype (Show)
-
-instance FromJSON GetCurrentEpochParamsResponse where
-  parseJSON = pure . GetCurrentEpochParamsResponse . Just
-
-instance ToJSON GetCurrentEpochParamsResponse where
-  toJSON (GetCurrentEpochParamsResponse Nothing)       = Null
-  toJSON (GetCurrentEpochParamsResponse (Just params)) = toJSON params
-
-exampleGetCurrentEpochParamsResponse :: Text
-exampleGetCurrentEpochParamsResponse =
-  "{ \"id\":90,\"epoch_no\":90,\"min_fee_a\":44,\"min_fee_b\":155381,\"max_block_size\":90112,\"max_tx_size\":16384,\"max_bh_size\":1100,\"key_deposit\":2000000,\"pool_deposit\":500000000,\"max_epoch\":18,\"optimal_pool_count\":5\r\n00,\"influence\":0.3,\"monetary_expand_rate\":0.003,\"treasury_growth_rate\":0.2,\"decentralisation\":0,\"protocol_major\":8,\"protocol_minor\":0,\"min_utxo_value\":0,\"min_pool_cost\":340000000,\"nonce\":\"\\\\x664c2d0eedc1c\r\n9ee7fc8b4f242c8d13ba17fd31454c84357fa8f1ac62f682cf9\",\"cost_model_id\":2,\"price_mem\":0.0577,\"price_step\":7.21e-05,\"max_tx_ex_mem\":14000000,\"max_tx_ex_steps\":10000000000,\"max_block_ex_mem\":62000000,\"max_bloc\r\nk_ex_steps\":20000000000,\"max_val_size\":5000,\"collateral_percent\":150,\"max_collateral_inputs\":3,\"block_id\":387943,\"extra_entropy\":null,\"coins_per_utxo_size\":4310}"
-
-instance ToSchema GetCurrentEpochParamsResponse where
-    declareNamedSchema _ = pure $ NamedSchema (Just "GetCurrentEpochParamsResponse") $ mempty
-        & type_ ?~ OpenApiObject
-        & description ?~ "Protocol parameters encoded as JSON"
-        & example
-          ?~ toJSON exampleGetCurrentEpochParamsResponse
 
 newtype GetTransactionStatusResponse
   = GetTransactionStatusResponse { getTransactionstatusResponseTransactionConfirmed :: Bool }
@@ -784,8 +731,6 @@ instance ToParamSchema DRepStatus where
       & type_ ?~ OpenApiString
       & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [DRepStatus])
 
-
-
 data DRepType = NormalDRep | SoleVoter
 
 instance Show DRepType where
@@ -823,6 +768,13 @@ data DRep
       , dRepType                   :: DRepType
       , dRepLatestTxHash           :: Maybe HexText
       , dRepLatestRegistrationDate :: UTCTime
+      , dRepPaymentAddress         :: Maybe Text
+      , dRepGivenName              :: Maybe Text
+      , dRepObjectives             :: Maybe Text
+      , dRepMotivations            :: Maybe Text
+      , dRepQualifications         :: Maybe Text
+      , dRepImageUrl               :: Maybe Text
+      , dRepImageHash              :: Maybe HexText
       }
   deriving (Generic, Show)
 
@@ -840,7 +792,15 @@ exampleDrep =
   <> "\"status\": \"Active\","
   <> "\"type\": \"DRep\","
   <> "\"latestTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
-  <> "\"latestRegistrationDate\": \"1970-01-01T00:00:00Z\"}"
+  <> "\"latestRegistrationDate\": \"1970-01-01T00:00:00Z\","
+  <> "\"paymentAddress\": \"addr1qy49kr45ue0wq78d34dpg79syx3yekxryjadv9ykzczhjwm09pmyt6f6xvq5x9yah2vrxyg0np44ynm6n7hzafl2rqxs4v6nn3\","
+  <> "\"givenName\": \"John Doe\","
+  <> "\"objectives\": \"Some Objectives\","
+  <> "\"motivations\": \"Some Motivations\","
+  <> "\"qualifications\": \"Some Qualifications\","
+  <> "\"qualifications\": \"Some Qualifications\","
+  <> "\"imageUrl\": \"https://image.url\","
+  <> "\"imageHash\": \"9198b1b204273ba5c67a13310b5a806034160f6a063768297e161d9b759cad61\"}"
 
 -- ToSchema instance for DRep
 instance ToSchema DRep where

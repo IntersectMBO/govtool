@@ -148,7 +148,7 @@ export const DashboardGovernanceActionsCategory = () => {
                       }),
                       {
                         state: {
-                          ...item,
+                          proposal: item,
                           openedFromCategoryPage: true,
                         },
                       },

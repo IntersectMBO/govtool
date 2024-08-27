@@ -2,8 +2,9 @@ import { MetadataValidationStatus } from "@models";
 import { expect, jest } from "@storybook/jest";
 import type { Meta, StoryObj } from "@storybook/react";
 import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
-import { formatDisplayDate } from "@utils";
+import { formatDisplayDate, getProposalTypeNoEmptySpaces } from "@utils";
 import { GovernanceActionCard } from "@/components/molecules";
+import { GovernanceActionType } from "@/types/governanceAction";
 
 const meta = {
   title: "Example/GovernanceActionCard",
@@ -29,9 +30,21 @@ const commonArgs = {
   onClick: jest.fn(),
   title: "Example title",
   txHash: "sad78afdsf7jasd98d",
-  type: "exampleType",
+  type: GovernanceActionType.InfoAction,
   metadataValid: true,
   metadataStatus: null,
+  dRepYesVotes: 1,
+  dRepNoVotes: 0,
+  dRepAbstainVotes: 0,
+  ccYesVotes: 0,
+  ccNoVotes: 0,
+  ccAbstainVotes: 0,
+  poolYesVotes: 0,
+  poolNoVotes: 0,
+  poolAbstainVotes: 0,
+  protocolParams: null,
+  prevGovActionIndex: null,
+  prevGovActionTxHash: null,
 };
 
 export const GovernanceActionCardComponent: Story = {
@@ -39,7 +52,11 @@ export const GovernanceActionCardComponent: Story = {
 
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    expect(canvas.getByTestId("exampleType-type")).toBeInTheDocument();
+    expect(
+      canvas.getByTestId(
+        `${getProposalTypeNoEmptySpaces(GovernanceActionType.InfoAction)}-type`,
+      ),
+    ).toBeInTheDocument();
     expect(canvas.getByTestId("sad78afdsf7jasd98d#2-id")).toBeInTheDocument();
     expect(
       canvas.getByText(formatDisplayDate("1970-01-01T00:00:00Z")),

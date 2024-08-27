@@ -8,7 +8,7 @@ RUN npm config set @intersect.mbo:registry "https://registry.npmjs.org/" --locat
     && npm config set //registry.npmjs.org/:_authToken ${NPMRC_TOKEN} --location=global
 
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm install --force
 
 FROM node:18-alpine as builder
 ARG NPMRC_TOKEN

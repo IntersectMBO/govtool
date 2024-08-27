@@ -4,16 +4,11 @@ import { Box } from "@mui/material";
 import { useScreenDimension } from "@hooks";
 import { VoteActionForm, VotesSubmitted } from "@molecules";
 import { useFeatureFlag } from "@/context";
-import { GovernanceActionType } from "@/types/governanceAction";
+import { ProposalData } from "@/models";
 
 type GovernanceActionCardVotesProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
-  abstainVotes: number;
-  noVotes: number;
-  yesVotes: number;
   isOneColumn: boolean;
-  expiryDate: string;
-  expiryEpochNo: number;
   isVoter?: boolean;
   voteFromEP?: string;
   voteUrlFromEP?: string;
@@ -21,17 +16,12 @@ type GovernanceActionCardVotesProps = {
   voteEpochNoFromEP?: number;
   isDashboard?: boolean;
   isInProgress?: boolean;
-  type: GovernanceActionType;
+  proposal: ProposalData;
 };
 
 export const GovernanceActionDetailsCardVotes = ({
   setIsVoteSubmitted,
-  abstainVotes,
-  noVotes,
-  yesVotes,
   isOneColumn,
-  expiryDate,
-  expiryEpochNo,
   isVoter,
   voteFromEP,
   voteUrlFromEP,
@@ -39,7 +29,20 @@ export const GovernanceActionDetailsCardVotes = ({
   voteEpochNoFromEP,
   isDashboard,
   isInProgress,
-  type,
+  proposal: {
+    dRepAbstainVotes,
+    dRepNoVotes,
+    dRepYesVotes,
+    poolAbstainVotes,
+    poolNoVotes,
+    poolYesVotes,
+    ccAbstainVotes,
+    ccNoVotes,
+    ccYesVotes,
+    expiryDate,
+    expiryEpochNo,
+    type,
+  },
 }: GovernanceActionCardVotesProps) => {
   const { isVotingOnGovernanceActionEnabled } = useFeatureFlag();
   const { screenWidth } = useScreenDimension();
@@ -64,16 +67,22 @@ export const GovernanceActionDetailsCardVotes = ({
           voteUrlFromEP={voteUrlFromEP}
           voteDateFromEP={voteDateFromEP}
           voteEpochNoFromEP={voteEpochNoFromEP}
-          yesVotes={yesVotes}
-          noVotes={noVotes}
-          abstainVotes={abstainVotes}
+          dRepAbstainVotes={dRepAbstainVotes}
+          dRepNoVotes={dRepNoVotes}
+          dRepYesVotes={dRepYesVotes}
           isInProgress={isInProgress}
         />
       ) : (
         <VotesSubmitted
-          yesVotes={yesVotes}
-          noVotes={noVotes}
-          abstainVotes={abstainVotes}
+          dRepAbstainVotes={dRepAbstainVotes}
+          dRepNoVotes={dRepNoVotes}
+          dRepYesVotes={dRepYesVotes}
+          poolAbstainVotes={poolAbstainVotes}
+          poolNoVotes={poolNoVotes}
+          poolYesVotes={poolYesVotes}
+          ccAbstainVotes={ccAbstainVotes}
+          ccNoVotes={ccNoVotes}
+          ccYesVotes={ccYesVotes}
         />
       )}
     </Box>

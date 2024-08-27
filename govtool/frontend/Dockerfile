@@ -32,7 +32,7 @@ RUN npm config set @intersect.mbo:registry "https://registry.npmjs.org/" --locat
 RUN npm config set //registry.npmjs.org/:_authToken ${NPMRC_TOKEN} --location=global
 
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm install --force
 COPY . .
 RUN npm run build
 

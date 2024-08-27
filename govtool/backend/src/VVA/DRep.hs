@@ -61,8 +61,26 @@ listDReps = withPool $ \conn -> do
   results <- liftIO $ SQL.query_ conn listDRepsSql
   timeZone <- liftIO getCurrentTimeZone
   return
-    [ DRepRegistration drepHash drepView url dataHash (floor @Scientific deposit) votingPower status drepType txHash (localTimeToUTC timeZone date)
-    | (drepHash, drepView, url, dataHash, deposit, votingPower, isActive, txHash, date, latestDeposit, latestNonDeregisterVotingAnchorWasNotNull) <- results
+    [ DRepRegistration drepHash drepView url dataHash (floor @Scientific deposit) votingPower status drepType txHash (localTimeToUTC timeZone date) paymentAddress givenName objectives motivations qualifications imageUrl imageHash
+    | ( drepHash
+        , drepView
+        , url
+        , dataHash
+        , deposit
+        , votingPower
+        , isActive
+        , txHash
+        , date
+        , latestDeposit
+        , latestNonDeregisterVotingAnchorWasNotNull
+        , paymentAddress
+        , givenName
+        , objectives
+        , motivations
+        , qualifications
+        , imageUrl
+        , imageHash
+      ) <- results
     , let status = case (isActive, deposit) of
                       (_, d)        | d < 0 -> Retired
                       (isActive, d) | d >= 0 && isActive -> Active
@@ -125,6 +143,13 @@ getDRepInfo drepId = withPool $ \conn -> do
       , drepRetireTx
       , soleVoterRegisterTx
       , soleVoterRetireTx
+      , paymentAddress
+      , givenName
+      , objectives
+      , motivations
+      , qualifications
+      , imageUrl
+      , imageHash
       )] ->
       return $ DRepInfo
         { dRepInfoIsRegisteredAsDRep = fromMaybe False isRegisteredAsDRep
@@ -139,5 +164,12 @@ getDRepInfo drepId = withPool $ \conn -> do
         , dRepInfoDRepRetireTx = drepRetireTx
         , dRepInfoSoleVoterRegisterTx = soleVoterRegisterTx
         , dRepInfoSoleVoterRetireTx = soleVoterRetireTx
+        , dRepInfoPaymentAddress = paymentAddress
+        , dRepInfoGivenName = givenName
+        , dRepInfoObjectives = objectives
+        , dRepInfoMotivations = motivations
+        , dRepInfoQualifications = qualifications
+        , dRepInfoImageUrl = imageUrl
+        , dRepInfoImageHash = imageHash
         }
-    [] -> return $ DRepInfo False False False False Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+    [] -> return $ DRepInfo False False False False Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing

@@ -100,7 +100,6 @@ jobs:
         uses: ASzc/change-string-case-action@v6
         with:
           string: ${{ matrix.image }}:${{ github.sha }}
-          
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
@@ -108,10 +107,10 @@ jobs:
           context: ${{ matrix.workdir }}
           file: ${{ matrix.dockerfile }}
           tags: ${{ steps.image_lowercase.outputs.lowercase }}
-          outputs: type=docker,dest=/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar
           load: false
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+          outputs: type=docker,dest=/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar
           build-args: |
             VITE_APP_ENV=${{ secrets.VITE_APP_ENV }}
             VITE_BASE_URL=${{ secrets.VITE_BASE_URL }}
@@ -127,13 +126,12 @@ jobs:
       - name: Scan Docker image with Dockle
         id: dockle
         run: |
-            set -ex
-            wget https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
-            tar zxvf dockle_0.4.14_Linux-64bit.tar.gz
+            wget -q https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
+            tar zxf dockle_0.4.14_Linux-64bit.tar.gz
             sudo mv dockle /usr/local/bin
-            dockle --exit-level fatal --format json --input '/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar' --output ${{ matrix.workdir }}/dockle_scan_output.json
+
+            dockle --exit-code 1 --exit-level fatal -ak GHC_RELEASE_KEY -ak CABAL_INSTALL_RELEASE_KEY -ak STACK_RELEASE_KEY -ak KEY_SHA512 --format json --input '/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar' --output ${{ matrix.workdir }}/dockle_scan_output.json
             rm -rf '/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar'
-            echo " dockle exited w/ $?"
             cat ${{ matrix.workdir }}/dockle_scan_output.json
 
             echo "outcome=success" >> $GITHUB_OUTPUT

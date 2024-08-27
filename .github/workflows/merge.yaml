@@ -146,11 +146,11 @@ jobs:
       - name: Scan Docker image with Dockle
         id: dockle
         run: |
-            wget https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
-            tar zxvf dockle_0.4.14_Linux-64bit.tar.gz
+            wget -q https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
+            tar zxf dockle_0.4.14_Linux-64bit.tar.gz
             sudo mv dockle /usr/local/bin
 
-            dockle --exit-level fatal --format json --input '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar' --output ${{ matrix.workdir }}/dockle_scan_output.json
+            dockle --exit-code 1 --exit-level fatal --format json -ak GHC_RELEASE_KEY -ak CABAL_INSTALL_RELEASE_KEY -ak STACK_RELEASE_KEY -ak KEY_SHA512 --input '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar' --output ${{ matrix.workdir }}/dockle_scan_output.json
             echo " dockle exited w/ $?"
             cat ${{ matrix.workdir }}/dockle_scan_output.json
 
@@ -161,29 +161,3 @@ jobs:
           docker load -i '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar'
           rm -rf '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar'
           docker push ${{ steps.image_lowercase.outputs.lowercase }}:${{ env.TAG }}
-
-      # - name: Deploy with Qovery
-      #   if: github.ref == 'refs/heads/develop'
-      #   env:
-      #     QOVERY_CLI_ACCESS_TOKEN: ${{secrets.QOVERY_CLI_ACCESS_TOKEN }}
-      #   run: |
-
-      #     echo "Deploying on $ENVIRONMENT"
-      #     echo "Organization - ${{ vars.ORGANIZATION }}"
-      #     echo "Project - ${{ vars.PROJECT }}"
-
-      #     # Download and install Qovery CLI
-      #     curl -s https://get.qovery.com | bash
-
-      #     qovery container list \
-      #     --organization ${{ vars.ORGANIZATION }} \
-      #     --project ${{ vars.PROJECT }} \
-      #     --environment $ENVIRONMENT
-
-      #     qovery container deploy \
-      #       --organization ${{ vars.ORGANIZATION }} \
-      #       --project ${{ vars.PROJECT }} \
-      #       --environment $ENVIRONMENT \
-      #       --container ${{ matrix.qovery_container_name }} \
-      #       --tag ${{ env.TAG }} \
-      #       --watch

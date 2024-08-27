@@ -1,9 +1,5 @@
 import i18n from "@/i18n";
-import {
-  PAYMENT_ADDRESS_REGEX,
-  URL_REGEX,
-  isValidURLLength,
-} from "@/utils";
+import { URL_REGEX, isReceivingAddress, isValidURLLength } from "@/utils";
 
 export const Rules = {
   GIVEN_NAME: {
@@ -52,10 +48,7 @@ export const Rules = {
     },
   },
   PAYMENT_ADDRESS: {
-    pattern: {
-      value: PAYMENT_ADDRESS_REGEX,
-      message: i18n.t("registration.fields.validations.paymentAddress"),
-    }
+    validate: isReceivingAddress,
   },
   QUALIFICATIONS: {
     maxLength: {

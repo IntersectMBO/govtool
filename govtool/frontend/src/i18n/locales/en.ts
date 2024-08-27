@@ -361,21 +361,27 @@ export const en = {
         givenName: "Given Name",
         objectives: "Objectives",
         objectivesPlaceholder: "Tell others what you want to achieve...",
-        objectivesHelpfulText: "A short description of your beliefs and goals as a DRep",
+        objectivesHelpfulText:
+          "A short description of your beliefs and goals as a DRep",
         motivations: "Motivations",
         motivationsPlaceholder: "Describe what motivates you...",
-        motivationsHelpfulText: "A short description of why you want to be a DRep, what personal and professional experiences you have had that have driven you to register",
+        motivationsHelpfulText:
+          "A short description of why you want to be a DRep, what personal and professional experiences you have had that have driven you to register",
         qualifications: "Qualifications",
         qualificationsPlaceholder: "List your qualifications...",
-        qualificationsHelpfulText: "Key qualifications you hold that are relevant to your role as a DRep",
+        qualificationsHelpfulText:
+          "Key qualifications you hold that are relevant to your role as a DRep",
         paymentAddress: "Payment Address",
-        paymentAddressPlaceholder: "addr1vpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5eg0yu80w",
+        paymentAddressPlaceholder:
+          "addr1vpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5eg0yu80w",
         doNotList: "Do not list",
-        doNotListHelpfulText: "Check this box if you do not want to show up in Govtool DRep Directory or in similar tools",
+        doNotListHelpfulText:
+          "Check this box if you do not want to show up in Govtool DRep Directory or in similar tools",
       },
       errors: {
         tooLongUrl: "Url must be less than 128 bytes",
         mustBeStakeAddress: "It must be reward address in bech32 format",
+        mustBeReceivingAddress: "Invalid payment address",
       },
     },
     proposalDiscussion: {
@@ -692,7 +698,6 @@ export const en = {
           maxLength: "Max {{maxLength}} characters",
           required: "This field is required",
           url: "Invalid URL",
-          paymentAddress: "Invalid payment address",
         },
       },
     },

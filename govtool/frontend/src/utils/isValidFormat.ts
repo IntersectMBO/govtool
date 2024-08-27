@@ -38,3 +38,14 @@ export async function isRewardAddress(address: string) {
     return i18n.t("forms.errors.mustBeStakeAddress");
   }
 }
+
+export async function isReceivingAddress(address: string) {
+  try {
+    const receivingAddress = Address.from_bech32(address);
+    return receivingAddress
+      ? true
+      : i18n.t("forms.errors.mustBeReceivingAddress");
+  } catch (e) {
+    return i18n.t("forms.errors.mustBeReceivingAddress");
+  }
+}

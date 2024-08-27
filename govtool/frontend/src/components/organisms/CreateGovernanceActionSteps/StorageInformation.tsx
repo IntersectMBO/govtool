@@ -39,7 +39,9 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
   const fileName = getValues("governance_action_type") as string;
 
   const openGuideAboutStoringInformation = () =>
-    openInNewTab("https://docs.gov.tools/faqs/how-to-create-a-metadata-anchor");
+    openInNewTab(
+      "https://docs.gov.tools/using-govtool/govtool-functions/storing-information-offline",
+    );
 
   const isActionButtonDisabled = !watch("storingURL") || !!errors.storingURL;
 

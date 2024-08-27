@@ -38,6 +38,7 @@ import {
   removeItemFromLocalStorage,
 } from "@utils";
 import { PublicRoute } from "./pages/PublicRoute";
+import { TopBanners } from "./components/organisms/TopBanners";
 
 export default () => {
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
@@ -84,6 +85,7 @@ export default () => {
   return (
     <>
       <ScrollToTop />
+      <TopBanners />
       <Routes>
         <Route path={PATHS.home} element={<Home />} />
         <Route path={PATHS.governanceActions} element={<GovernanceActions />} />

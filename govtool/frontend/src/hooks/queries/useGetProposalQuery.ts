@@ -17,7 +17,7 @@ export const useGetProposalQuery = (proposalId: string, enabled?: boolean) => {
   );
 
   return {
-    data: data!,
+    data,
     isLoading,
     refetch,
     isFetching: isRefetching,

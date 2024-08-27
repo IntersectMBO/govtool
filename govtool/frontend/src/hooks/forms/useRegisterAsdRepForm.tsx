@@ -7,7 +7,7 @@ import * as Sentry from "@sentry/react";
 import { NodeObject } from "jsonld";
 
 import {
-  CIP_QQQ,
+  CIP_119,
   DREP_CONTEXT,
   PATHS,
   storageInformationErrorModals,
@@ -25,18 +25,22 @@ import { useGetVoterInfo, useWalletErrorModal } from "@hooks";
 import { useValidateMutation } from "../mutations";
 
 export type RegisterAsDRepValues = {
-  bio?: string;
-  dRepName: string;
-  email?: string;
+  givenName: string;
+  objectives: string;
+  motivations: string;
+  qualifications: string;
+  paymentAddress: string;
   references?: Array<{ uri: string }>;
   storeData?: boolean;
   storingURL: string;
 };
 
 export const defaultRegisterAsDRepValues: RegisterAsDRepValues = {
-  bio: "",
-  dRepName: "",
-  email: "",
+  givenName: "",
+  objectives: "",
+  motivations: "",
+  qualifications: "",
+  paymentAddress: "",
   references: [{ uri: "" }],
   storeData: false,
   storingURL: "",
@@ -81,7 +85,7 @@ export const useRegisterAsdRepForm = (
     watch,
   } = useFormContext<RegisterAsDRepValues>();
 
-  const dRepName = watch("dRepName");
+  const givenName = watch("givenName");
   const isError = Object.keys(errors).length > 0;
 
   // Navigation
@@ -100,11 +104,18 @@ export const useRegisterAsdRepForm = (
   const generateMetadata = useCallback(async () => {
     const body = generateMetadataBody({
       data: getValues(),
-      acceptedKeys: ["dRepName", "bio", "email"],
-      standardReference: CIP_QQQ,
+      acceptedKeys: [
+        "givenName",
+        "objectives",
+        "motivations",
+        "qualifications",
+        "paymentAddress",
+        "references",
+      ],
+      standardReference: CIP_119,
     });
 
-    const jsonld = await generateJsonld(body, DREP_CONTEXT, CIP_QQQ);
+    const jsonld = await generateJsonld(body, DREP_CONTEXT, CIP_119);
 
     const jsonHash = blake2bHex(JSON.stringify(jsonld), undefined, 32);
 
@@ -117,7 +128,7 @@ export const useRegisterAsdRepForm = (
   const onClickDownloadJson = async () => {
     if (!json) return;
 
-    downloadJson(json, ellipsizeText(dRepName, 16, ""));
+    downloadJson(json, ellipsizeText(givenName, 16, ""));
   };
 
   const createRegistrationCert = useCallback(
@@ -185,7 +196,7 @@ export const useRegisterAsdRepForm = (
         const { status } = await validateMetadata({
           url: data.storingURL,
           hash,
-          standard: MetadataStandard.CIPQQQ,
+          standard: MetadataStandard.CIP119,
         });
 
         if (status) {

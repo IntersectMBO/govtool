@@ -83,10 +83,12 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
     );
 
   const {
-    bio,
-    dRepName,
-    email,
+    givenName,
     metadataStatus,
+    motivations,
+    objectives,
+    paymentAddress,
+    qualifications,
     references,
     status,
     url,
@@ -103,7 +105,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
 
   const navigateToEditDRep = () => {
     navigate(PATHS.editDrepMetadata, {
-      state: { dRepName, email, bio, references },
+      state: dRep,
     });
   };
 
@@ -219,7 +221,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
         )}
         <Box component="dl" gap={2} m={0}>
           <DataMissingHeader
-            title={dRepName ?? undefined}
+            title={givenName ?? undefined}
             isDataMissing={metadataStatus}
             shareLink={!isMe ? window.location.href : undefined}
             titleStyle={{ wordBreak: "break-word", whiteSpace: "wrap" }}
@@ -239,7 +241,7 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
             />
           )}
           <DRepDetailsInfoItem label={t("drepId")}>
-            <DRepId>{view}</DRepId>
+            <CopyableText value={view} />
           </DRepDetailsInfoItem>
           <DRepDetailsInfoItem label={t("status")}>
             <StatusPill status={status} />
@@ -253,11 +255,9 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
               {correctAdaFormat(votingPower)}
             </Typography>
           </DRepDetailsInfoItem>
-          {email && !metadataStatus && (
-            <DRepDetailsInfoItem label={t("email")}>
-              <MoreInfoLink label={email} navTo={email} isEmail />
-            </DRepDetailsInfoItem>
-          )}
+          <DRepDetailsInfoItem label={t("forms.dRepData.paymentAddress")}>
+            {paymentAddress && <CopyableText value={paymentAddress} />}
+          </DRepDetailsInfoItem>
           {references?.length > 0 && !metadataStatus && (
             <DRepDetailsInfoItem label={t("moreInformation")}>
               <Box
@@ -266,8 +266,8 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
                 flexDirection="column"
                 gap={1.5}
               >
-                {references.map((link) => (
-                  <MoreInfoLink key={link} label={link} navTo={link} />
+                {references.map((uri) => (
+                  <MoreInfoLink key={uri} label={uri} navTo={uri} />
                 ))}
               </Box>
             </DRepDetailsInfoItem>
@@ -319,16 +319,15 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
             </Button>
           )}
         </Box>
-        {bio && !metadataStatus && (
-          <>
-            <Typography variant="title2" sx={{ mb: 1.5, mt: 5.75 }}>
-              {t("about")}
-            </Typography>
-            <Typography fontWeight={400} sx={{ maxWidth: 608 }} variant="body1">
-              {bio}
-            </Typography>
-          </>
-        )}
+        <DRepDetailsDescriptionItem label={t("forms.dRepData.objectives")}>
+          {objectives}
+        </DRepDetailsDescriptionItem>
+        <DRepDetailsDescriptionItem label={t("forms.dRepData.motivations")}>
+          {motivations}
+        </DRepDetailsDescriptionItem>
+        <DRepDetailsDescriptionItem label={t("forms.dRepData.qualifications")}>
+          {qualifications}
+        </DRepDetailsDescriptionItem>
       </Card>
     </>
   );
@@ -344,24 +343,43 @@ type DrepDetailsInfoItemProps = PropsWithChildren & {
   label: string;
 };
 
-const DRepDetailsInfoItem = ({ children, label }: DrepDetailsInfoItemProps) => (
-  <>
-    <Box component="dt" sx={{ mb: 0.5, "&:not(:first-of-type)": { mt: 2 } }}>
-      <Typography color="neutralGray" fontWeight={600} variant="body2">
+const DRepDetailsInfoItem = ({ children, label }: DrepDetailsInfoItemProps) => {
+  if (!children) return null;
+  return (
+    <>
+      <Box component="dt" sx={{ mb: 0.5, "&:not(:first-of-type)": { mt: 2 } }}>
+        <Typography color="neutralGray" fontWeight={600} variant="body2">
+          {label}
+        </Typography>
+      </Box>
+      <Box component="dd" m={0}>
+        {children}
+      </Box>
+    </>
+  );
+};
+
+const DRepDetailsDescriptionItem = ({
+  children,
+  label,
+}: DrepDetailsInfoItemProps) => {
+  if (!children) return null;
+  return (
+    <>
+      <Typography variant="title2" sx={{ mb: 1.5, mt: 5.75 }}>
         {label}
       </Typography>
-    </Box>
-    <Box component="dd" m={0}>
-      {children}
-    </Box>
-  </>
-);
+      <Typography fontWeight={400} sx={{ maxWidth: 608 }} variant="body1">
+        {children}
+      </Typography>
+    </>
+  );
+};
 
-const DRepId = ({ children }: PropsWithChildren) => (
+const CopyableText = ({ value }: { value: string }) => (
   <ButtonBase
     onClick={(e) => {
-      if (!children) return;
-      navigator.clipboard.writeText(children?.toString());
+      navigator.clipboard.writeText(value.toString());
       e.stopPropagation();
     }}
     data-testid="copy-drep-id-button"
@@ -375,7 +393,7 @@ const DRepId = ({ children }: PropsWithChildren) => (
     }}
   >
     <Typography color="primary" fontWeight={500} sx={ellipsisStyles}>
-      {children}
+      {value}
     </Typography>
     <img alt="" src={ICONS.copyBlueIcon} />
   </ButtonBase>

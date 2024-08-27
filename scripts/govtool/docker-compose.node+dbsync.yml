@@ -65,7 +65,7 @@ services:
       retries: 10
 
   cardano-db-sync:
-    image: ghcr.io/intersectmbo/cardano-db-sync:sancho-5.1.0
+    image: ghcr.io/intersectmbo/cardano-db-sync:13.3.0.0
     environment:
       - NETWORK=sanchonet
       - POSTGRES_HOST=postgres

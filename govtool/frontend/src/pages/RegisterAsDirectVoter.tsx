@@ -131,7 +131,7 @@ export const RegisterAsDirectVoter = () => {
       >
         <Trans
           i18nKey="directVoter.registerDescription"
-          values={{ deposit: correctAdaFormat(epochParams.drep_deposit) }}
+          values={{ deposit: correctAdaFormat(epochParams?.drep_deposit) }}
           components={[
             <Link
               onClick={() => openInNewTab("https://sancho.network/")}

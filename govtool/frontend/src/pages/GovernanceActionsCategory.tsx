@@ -85,7 +85,7 @@ export const GovernanceActionsCategory = () => {
         <TopNav />
         <Box
           flex={1}
-          mt={isMobile ? 3.25 : 6.25}
+          pt={isMobile ? 3.25 : 6.25}
           overflow="hidden"
           display="flex"
           flexDirection="column"
@@ -151,7 +151,7 @@ export const GovernanceActionsCategory = () => {
                             ),
                             {
                               state: {
-                                ...item,
+                                proposal: item,
                                 openedFromCategoryPage: true,
                               },
                             },

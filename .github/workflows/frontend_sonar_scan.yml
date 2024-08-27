@@ -12,35 +12,35 @@ jobs:
     runs-on: ubuntu-latest
     permissions: read-all
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
 
-    - name: Cache dependencies
-      uses: actions/cache@v2
-      with:
-        path: govtool/frontend/node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: govtool/frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version-file: "govtool/frontend/.nvmrc"
-        registry-url: "https://registry.npmjs.org/"
-        scope: "@intersect.mbo"
-    - name: 🧪 Test
-      working-directory: govtool/frontend
-      env:
-        NODE_OPTIONS: "--max_old_space_size=6144"
-        NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
-      run: |
-        npm ci
-        npm run test:coverage
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "govtool/frontend/.nvmrc"
+          registry-url: "https://registry.npmjs.org/"
+          scope: "@intersect.mbo"
+      - name: 🧪 Test
+        working-directory: govtool/frontend
+        env:
+          NODE_OPTIONS: "--max_old_space_size=6144"
+          NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
+        run: |
+          npm ci --force
+          npm run test:coverage
 
-    - uses: sonarsource/sonarqube-scan-action@master
-      if: always()
-      with:
-        projectBaseDir: govtool/frontend
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: https://sonarcloud.io
+      - uses: sonarsource/sonarqube-scan-action@master
+        if: always()
+        with:
+          projectBaseDir: govtool/frontend
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io

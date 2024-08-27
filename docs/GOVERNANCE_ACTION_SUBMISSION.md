@@ -15,7 +15,15 @@ For creating the Governance Action, you need to consume 2 utility methods provid
 ### Types
 
 ```typescript
-import { VotingProposalBuilder } from "@emurgo/cardano-serialization-lib-nodejs";
+import {
+  VotingProposalBuilder,
+  Costmdls,
+  DrepVotingThresholds,
+  ExUnitPrices,
+  UnitInterval,
+  ExUnits,
+  PoolVotingThresholds,
+} from "@emurgo/cardano-serialization-lib-nodejs";
 
 interface GovernanceAction {
   title: string;
@@ -35,6 +43,48 @@ interface TreasuryProps {
   hash: string;
   receivingAddress: string;
   url: string;
+}
+
+type ProtocolParamsUpdate = {
+  adaPerUtxo: string;
+  collateralPercentage: number;
+  committeeTermLimit: number;
+  costModels: Costmdls;
+  drepDeposit: string;
+  drepInactivityPeriod: number;
+  drepVotingThresholds: DrepVotingThresholds;
+  executionCosts: ExUnitPrices;
+  expansionRate: UnitInterval;
+  governanceActionDeposit: string;
+  governanceActionValidityPeriod: number;
+  keyDeposit: string;
+  maxBlockBodySize: number;
+  maxBlockExUnits: ExUnits;
+  maxBlockHeaderSize: number;
+  maxCollateralInputs: number;
+  maxEpoch: number;
+  maxTxExUnits: ExUnits;
+  maxTxSize: number;
+  maxValueSize: number;
+  minCommitteeSize: number;
+  minPoolCost: string;
+  minFeeA: string;
+  minFeeB: string;
+  nOpt: number;
+  poolDeposit: string;
+  poolPledgeInfluence: UnitInterval;
+  poolVotingThresholds: PoolVotingThresholds;
+  refScriptCoinsPerByte: UnitInterval;
+  treasuryGrowthRate: UnitInterval;
+};
+
+interface ProtocolParameterChangeProps {
+  prevGovernanceActionHash: string;
+  prevGovernanceActionIndex: number;
+  url: string;
+  hash: string;
+
+  protocolParamsUpdate: Partial<ProtocolParamsUpdate>;
 }
 
 const createGovernanceActionJsonLD: (
@@ -111,10 +161,14 @@ Example:
 
 ```typescript
 // When used within a CardanoProvider
-const { buildSignSubmitConwayCertTx, buildNewInfoGovernanceAction } =
-  useCardano();
+const {
+  buildSignSubmitConwayCertTx,
+  buildNewInfoGovernanceAction,
+  buildProtocolParameterChangeGovernanceAction,
+  buildHardForkInitiationGovernanceAction,
+} = useCardano();
 
-// hash of the generated Governance Action metadata, url of the metadata
+// Info Governance Action
 const govActionBuilder = await buildNewInfoGovernanceAction({ hash, url });
 
 // sign and submit the transaction
@@ -123,7 +177,7 @@ await buildSignSubmitConwayCertTx({
   type: "createGovAction",
 });
 
-// or if you want to use the Treasury Governance Action
+// Treasury Governance Action
 const { buildTreasuryGovernanceAction } = useCardano();
 
 // hash of the generated Governance Action metadata, url of the metadata, amount of the transaction, receiving address is the stake key address
@@ -132,6 +186,31 @@ const govActionBuilder = await buildTreasuryGovernanceAction({
   url,
   amount,
   receivingAddress,
+});
+
+// Protocol Parameter Change Governance Action
+const { buildProtocolParameterChangeGovernanceAction } = useCardano();
+
+// hash of the previous Governance Action, index of the previous Governance Action, url of the metadata, hash of the metadata, and the updated protocol parameters
+const govActionBuilder = await buildProtocolParameterChangeGovernanceAction({
+  prevGovernanceActionHash,
+  prevGovernanceActionIndex,
+  url,
+  hash,
+  protocolParamsUpdate,
+});
+
+// Hard Fork Initiation Governance Action
+const { buildHardForkInitiationGovernanceAction } = useCardano();
+
+// hash of the previous Governance Action, index of the previous Governance Action, url of the metadata, hash of the metadata, and the major and minor numbers of the hard fork initiation
+const govActionBuilder = await buildHardForkInitiationGovernanceAction({
+  prevGovernanceActionHash,
+  prevGovernanceActionIndex,
+  url,
+  hash,
+  major,
+  minor,
 });
 
 // sign and submit the transaction

@@ -14,34 +14,39 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import { getShortenedGovActionId, getProposalTypeLabel } from "@utils";
+import { getFullGovActionId, getShortenedGovActionId } from "@utils";
 import { GovernanceActionDetailsCard } from "@organisms";
 import { Breadcrumbs } from "@molecules";
+import { ProposalData, ProposalVote } from "@/models";
+
+type DashboardGovernanceActionDetailsState = {
+  proposal?: ProposalData;
+  vote?: ProposalVote;
+  openedFromCategoryPage?: boolean;
+};
 
 // TODO: Refactor: GovernanceActionDetals and DashboardGovernanceActionDetails are almost identical
 // and should be unified
 export const DashboardGovernanceActionDetails = () => {
   const { voter } = useGetVoterInfo();
   const { pendingTransaction, isEnableLoading } = useCardano();
-  const { state, hash } = useLocation();
+  const { state: untypedState, hash } = useLocation();
+  const state = untypedState as DashboardGovernanceActionDetailsState | null;
+  const index = hash.slice(1);
   const navigate = useNavigate();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
-  const { proposalId } = useParams();
-  const fullProposalId = proposalId + hash;
+  const { proposalId: txHash } = useParams();
 
-  const { data, isLoading } = useGetProposalQuery(fullProposalId ?? "", !state);
-  const shortenedGovActionId = getShortenedGovActionId(
-    state ? state.txHash : data?.proposal.txHash ?? "",
-    state ? state.index : data?.proposal.index ?? "",
+  const fullProposalId = txHash && getFullGovActionId(txHash, +index);
+  const shortenedGovActionId =
+    txHash && getShortenedGovActionId(txHash, +index);
+
+  const { data, isLoading } = useGetProposalQuery(
+    fullProposalId ?? "",
+    !state?.proposal || !state?.vote,
   );
-
-  // TODO: Refactor me
-  const title = state ? state?.title : data?.proposal?.title;
-  const label = state
-    ? getProposalTypeLabel(state.type)
-    : getProposalTypeLabel(data.proposal.type);
-  const type = state ? state.type : data.proposal.type;
+  const proposal = (data ?? state)?.proposal;
 
   return (
     <Box
@@ -55,10 +60,8 @@ export const DashboardGovernanceActionDetails = () => {
       <Breadcrumbs
         elementOne={t("govActions.title")}
         elementOnePath={PATHS.dashboardGovernanceActions}
-        elementTwo={title}
-        isDataMissing={
-          state ? state.metadataStatus : data?.proposal.metadataStatus
-        }
+        elementTwo={proposal?.title ?? ""}
+        isDataMissing={proposal?.metadataStatus ?? null}
       />
       <Link
         data-testid="back-to-list-link"
@@ -71,7 +74,7 @@ export const DashboardGovernanceActionDetails = () => {
           navigate(
             state && state.openedFromCategoryPage
               ? generatePath(PATHS.dashboardGovernanceActionsCategory, {
-                  category: state.type,
+                  category: state?.proposal?.type,
                 })
               : PATHS.dashboardGovernanceActions,
             {
@@ -103,44 +106,20 @@ export const DashboardGovernanceActionDetails = () => {
           >
             <CircularProgress />
           </Box>
-        ) : data || state ? (
+        ) : proposal ? (
           <GovernanceActionDetailsCard
-            abstainVotes={
-              state ? state.abstainVotes : data.proposal.abstainVotes
-            }
-            createdDate={state ? state.createdDate : data.proposal.createdDate}
-            createdEpochNo={
-              state ? state.createdEpochNo : data.proposal.createdEpochNo
-            }
-            isDataMissing={
-              state ? state.metadataStatus : data?.proposal.metadataStatus
-            }
-            expiryDate={state ? state.expiryDate : data?.proposal.expiryDate}
-            expiryEpochNo={
-              state ? state.expiryEpochNo : data.proposal.expiryEpochNo
-            }
+            proposal={proposal}
             isVoter={
               voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
             }
-            noVotes={state ? state.noVotes : data.proposal.noVotes}
-            type={type}
-            label={label}
-            title={title}
-            details={state ? state.details : data.proposal.details}
-            url={state ? state.url : data.proposal.url}
-            links={state ? state?.references : data.proposal?.references}
-            abstract={state ? state?.abstract : data.proposal?.abstract}
-            motivation={state ? state?.motivation : data.proposal?.motivation}
-            rationale={state ? state?.rationale : data.proposal?.rationale}
-            yesVotes={state ? state.yesVotes : data.proposal.yesVotes}
             voteFromEP={data?.vote?.vote}
             voteUrlFromEP={data?.vote?.url}
             voteDateFromEP={data?.vote?.date}
             voteEpochNoFromEP={data?.vote?.epochNo}
-            govActionId={fullProposalId}
+            isDataMissing={proposal.metadataStatus ?? null}
             isInProgress={
               pendingTransaction.vote?.resourceId ===
-              fullProposalId.replace("#", "")
+              fullProposalId?.replace("#", "")
             }
             isDashboard
           />

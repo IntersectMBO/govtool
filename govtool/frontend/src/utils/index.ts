@@ -25,5 +25,7 @@ export * from "./mapDtoToProposal";
 export * from "./numberValidation";
 export * from "./openInNewTab";
 export * from "./removeDuplicatedProposals";
+export * from "./replaceNullValues";
+export * from "./setProtocolParameterUpdate";
 export * from "./testIdFromLabel";
 export * from "./wait";

@@ -75,7 +75,7 @@ export const GovernanceActionsToVote = ({
                               ),
                           {
                             state: {
-                              ...action,
+                              proposal: action,
                             },
                           },
                         );

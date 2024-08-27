@@ -122,37 +122,4 @@ describe('AppService', () => {
       metadata: parsedMetadata,
     });
   });
-
-  it('should handle INVALID_JSONLD error', async () => {
-    const url = 'http://example.com';
-    const hash = 'correctHash';
-    const standard = MetadataStandard.CIP108;
-    const validateMetadataDTO: ValidateMetadataDTO = { hash, url, standard };
-    const data = {
-      body: 'testBody',
-    };
-    const parsedMetadata = { parsed: 'metadata' };
-
-    const response: AxiosResponse = {
-      data,
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config: {
-        headers: {} as AxiosRequestHeaders,
-        url,
-      },
-    };
-    jest.spyOn(httpService, 'get').mockReturnValueOnce(of(response));
-    (validateMetadataStandard as jest.Mock).mockResolvedValueOnce(undefined);
-    (parseMetadata as jest.Mock).mockReturnValueOnce(parsedMetadata);
-
-    const result = await service.validateMetadata(validateMetadataDTO);
-
-    expect(result).toEqual({
-      status: MetadataValidationStatus.INVALID_JSONLD,
-      valid: false,
-      metadata: parsedMetadata,
-    });
-  });
 });

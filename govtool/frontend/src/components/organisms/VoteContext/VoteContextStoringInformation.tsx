@@ -35,7 +35,9 @@ export const VoteContextStoringInformation = ({
   } = useVoteContextForm(setSavedHash, setStep, setErrorMessage);
 
   const openGuideAboutStoringInformation = () =>
-    openInNewTab("https://docs.gov.tools/faqs/how-to-create-a-metadata-anchor");
+    openInNewTab(
+      "https://docs.gov.tools/using-govtool/govtool-functions/storing-information-offline",
+    );
 
   const isContinueDisabled = !watch("storingURL");
 

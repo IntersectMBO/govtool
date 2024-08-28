@@ -17,6 +17,8 @@ const formErrors = {
 export default class DRepForm {
   readonly continueBtn = this.form.getByTestId("continue-button");
   readonly addLinkBtn = this.form.getByTestId("add-link-button");
+  readonly registerBtn = this.form.getByTestId("register-button");
+  readonly submitBtn = this.form.getByTestId("submit-button");
   readonly metadataDownloadBtn = this.form.getByTestId(
     "metadata-download-button"
   );
@@ -27,6 +29,10 @@ export default class DRepForm {
   readonly bioInput = this.form.getByTestId("bio-input");
   readonly linkInput = this.form.getByTestId("link-1-input");
   readonly metadataUrlInput = this.form.getByTestId("metadata-url-input");
+  readonly objectivesInput = this.form.getByTestId("objectives-input");
+  readonly motivationsInput = this.form.getByTestId("motivations-input");
+  readonly qualificationsInput = this.form.getByTestId("qualifications-input");
+  readonly paymentAddressInput = this.form.getByTestId("payment-address-input");
 
   constructor(private readonly form: Page) {}
 
@@ -38,12 +44,19 @@ export default class DRepForm {
   async registerWithoutTxConfirmation(dRepInfo: IDRepInfo) {
     await this.nameInput.fill(dRepInfo.name);
 
-    if (dRepInfo.email != null) {
-      await this.emailInput.fill(dRepInfo.email);
+    if (dRepInfo.objectives != null) {
+      await this.objectivesInput.fill(dRepInfo.objectives);
     }
-    if (dRepInfo.bio != null) {
-      await this.bioInput.fill(dRepInfo.bio);
+    if (dRepInfo.motivations != null) {
+      await this.motivationsInput.fill(dRepInfo.motivations);
     }
+    if (dRepInfo.qualifications != null) {
+      await this.qualificationsInput.fill(dRepInfo.qualifications);
+    }
+    if (dRepInfo.paymentAddress != null) {
+      await this.paymentAddressInput.fill(dRepInfo.paymentAddress);
+    }
+
     if (dRepInfo.extraContentLinks != null) {
       for (let i = 0; i < dRepInfo.extraContentLinks.length; i++) {
         if (i > 0) {
@@ -54,7 +67,7 @@ export default class DRepForm {
     }
     await this.continueBtn.click();
     await this.form.getByRole("checkbox").click();
-    await this.continueBtn.click();
+    await this.registerBtn.click();
 
     this.metadataDownloadBtn.click();
     const dRepMetadata = await this.downloadVoteMetadata();
@@ -64,7 +77,7 @@ export default class DRepForm {
     );
 
     await this.metadataUrlInput.fill(url);
-    await this.form.getByTestId("register-button").click();
+    await this.submitBtn.click();
   }
 
   async downloadVoteMetadata() {

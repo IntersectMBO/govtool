@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Delete duplicate text on DRep registration form [Issue 1847](https://github.com/IntersectMBO/govtool/issues/1847)
 
 ### Changed
 

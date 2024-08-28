@@ -53,14 +53,18 @@ test("2N. Should show DRep information on details page", async ({
   await dRepRegistrationPage.goto();
 
   const name = faker.person.firstName();
-  const email = faker.internet.email({ firstName: name });
-  const bio = faker.person.bio();
+  const objectives = faker.lorem.paragraph(2);
+  const motivations = faker.lorem.paragraph(2);
+  const qualifications = faker.lorem.paragraph(2);
+  const paymentAddress = ShelleyWallet.fromJson(wallet).rewardAddressBech32(0);
   const links = [faker.internet.url()];
 
   await dRepRegistrationPage.register({
     name,
-    email,
-    bio,
+    objectives,
+    motivations,
+    qualifications,
+    paymentAddress,
     extraContentLinks: links,
   });
 
@@ -69,13 +73,19 @@ test("2N. Should show DRep information on details page", async ({
   await dRepPage.getByTestId("view-drep-details-button").click();
 
   // Verification
-  await expect(dRepPage.getByTestId("copy-drep-id-button")).toHaveText(
+  await expect(dRepPage.getByTestId("copy-drep-id-button").first()).toHaveText(
     wallet.dRepId
+  );
+  await expect(dRepPage.getByTestId("copy-drep-id-button").last()).toHaveText(
+    paymentAddress
   );
   await expect(dRepPage.getByTestId("Active-pill")).toHaveText("Active");
   await expect(dRepPage.getByTestId("voting-power")).toHaveText("₳ 0");
+
+  await expect(dRepPage.getByText(objectives, { exact: true })).toBeVisible();
+  await expect(dRepPage.getByText(motivations, { exact: true })).toBeVisible();
   await expect(
-    dRepPage.getByTestId(`${email.toLowerCase()}-link`)
+    dRepPage.getByText(qualifications, { exact: true })
   ).toBeVisible();
 
   for (const link of links) {
@@ -83,7 +93,6 @@ test("2N. Should show DRep information on details page", async ({
       dRepPage.getByTestId(`${link.toLowerCase()}-link`)
     ).toBeVisible();
   }
-  await expect(dRepPage.getByText(bio, { exact: true })).toBeVisible();
 });
 
 test("2P. Should enable sharing of DRep details", async ({ page, context }) => {

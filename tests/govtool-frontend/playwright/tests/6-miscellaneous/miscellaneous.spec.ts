@@ -261,3 +261,28 @@ test("6S. Should Warn users that they are in bootstrapping phase via banner", as
   ]);
   await expect(bootstrap).toHaveURL(BOOTSTRAP_DOC_URL);
 });
+
+test("6T. Should display proper network name", async ({ page }) => {
+  await page.route("**/api/network/metrics", async (route) => {
+    // Fetch the original response from the server
+    const response = await route.fetch();
+    const json = await response.json();
+
+    const networkNames = ["sanchonet", "preview"];
+    // update network name
+    json["networkName"] =
+      networkNames[Math.floor(Math.random() * networkNames.length)];
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(json),
+    });
+  });
+  const responsePromise = page.waitForResponse("**/api/network/metrics");
+  await page.goto("/");
+
+  const response = await responsePromise;
+  const responseBody = await response.json();
+
+  await expect(page.getByText(responseBody["networkName"])).toBeVisible();
+});

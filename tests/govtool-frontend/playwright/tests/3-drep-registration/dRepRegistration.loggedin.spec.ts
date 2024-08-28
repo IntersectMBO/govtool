@@ -2,6 +2,7 @@ import { user01Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { ShelleyWallet } from "@helpers/crypto";
 import { invalid as mockInvalid } from "@mock/index";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
@@ -43,12 +44,14 @@ test.describe("Validation of dRep Registration Form", () => {
     await dRepRegistrationPage.goto();
 
     for (let i = 0; i < 100; i++) {
-      await dRepRegistrationPage.validateForm(
-        faker.internet.displayName(),
-        faker.internet.email(),
-        faker.lorem.paragraph(),
-        faker.internet.url()
-      );
+      await dRepRegistrationPage.validateForm({
+        name: faker.internet.displayName(),
+        objectives: faker.lorem.paragraph(2),
+        motivations: faker.lorem.paragraph(2),
+        qualifications: faker.lorem.paragraph(2),
+        paymentAddress: (await ShelleyWallet.generate()).addressBech32(0),
+        extraContentLinks: [faker.internet.url()],
+      });
     }
 
     for (let i = 0; i < 6; i++) {

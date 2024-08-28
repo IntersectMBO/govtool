@@ -12,6 +12,7 @@ const formErrors = {
   ],
   email: "invalid-email-address-error",
   link: "invalid-url-error",
+  paymentAddress: "invalid-payment-address-error",
 };
 
 export default class DRepForm {
@@ -85,21 +86,31 @@ export default class DRepForm {
     return downloadMetadata(download);
   }
 
-  async validateForm(name: string, email: string, bio: string, link: string) {
-    await this.nameInput.fill(name);
-    await this.emailInput.fill(email);
-    await this.bioInput.fill(bio);
-    await this.linkInput.fill(link);
+  async validateForm(dRepInfo: IDRepInfo) {
+    await this.nameInput.fill(dRepInfo.name);
+    await this.objectivesInput.fill(dRepInfo.objectives);
+    await this.motivationsInput.fill(dRepInfo.motivations);
+    await this.qualificationsInput.fill(dRepInfo.qualifications);
+    await this.paymentAddressInput.fill(dRepInfo.paymentAddress);
+    await this.linkInput.fill(dRepInfo.extraContentLinks[0]);
 
     for (const err of formErrors.dRepName) {
       await expect(this.form.getByTestId(err)).toBeHidden();
     }
 
-    await expect(this.form.getByTestId(formErrors.email)).toBeHidden();
+    expect(await this.objectivesInput.textContent()).toEqual(
+      dRepInfo.objectives
+    );
 
-    expect(await this.bioInput.textContent()).toEqual(bio);
+    expect(await this.motivationsInput.textContent()).toEqual(
+      dRepInfo.motivations
+    );
+    expect(await this.qualificationsInput.textContent()).toEqual(
+      dRepInfo.qualifications
+    );
 
     await expect(this.form.getByTestId(formErrors.link)).toBeHidden();
+    await expect(this.form.getByTestId(formErrors.paymentAddress)).toBeHidden();
 
     await expect(this.continueBtn).toBeEnabled();
   }

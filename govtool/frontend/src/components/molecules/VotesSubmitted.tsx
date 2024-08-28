@@ -17,6 +17,27 @@ type Props = {
   ccAbstainVotes: number;
 };
 
+const Vote = ({
+  vote,
+  value,
+}: {
+  vote: "yes" | "no" | "abstain";
+  value: string | number;
+}) => (
+  <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
+    <VotePill vote={vote} maxWidth={82} />
+    <Typography
+      fontSize="16px"
+      sx={{
+        marginLeft: "12px",
+        wordBreak: "break-all",
+      }}
+    >
+      {value}
+    </Typography>
+  </Box>
+);
+
 export const VotesSubmitted = ({
   dRepAbstainVotes,
   dRepNoVotes,
@@ -79,40 +100,12 @@ export const VotesSubmitted = ({
         >
           {t("govActions.dReps")}
         </Typography>
-        <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
-          <VotePill vote="yes" maxWidth={82} />
-          <Typography
-            fontSize="16px"
-            sx={{
-              marginLeft: "12px",
-              wordBreak: "break-all",
-            }}
-          >
-            ₳ {correctAdaFormat(dRepYesVotes)}
-          </Typography>
-        </Box>
-        <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
-          <VotePill vote="abstain" maxWidth={82} />
-          <Typography
-            sx={{
-              marginLeft: "12px",
-              wordBreak: "break-all",
-            }}
-          >
-            ₳ {correctAdaFormat(dRepAbstainVotes)}
-          </Typography>
-        </Box>
-        <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
-          <VotePill vote="no" maxWidth={82} />
-          <Typography
-            sx={{
-              marginLeft: "12px",
-              wordBreak: "break-all",
-            }}
-          >
-            ₳ {correctAdaFormat(dRepNoVotes)}
-          </Typography>
-        </Box>
+        <Vote vote="yes" value={`₳ ${correctAdaFormat(dRepYesVotes)}`} />
+        <Vote
+          vote="abstain"
+          value={`₳ ${correctAdaFormat(dRepAbstainVotes)}`}
+        />
+        <Vote vote="no" value={`₳ ${correctAdaFormat(dRepNoVotes)}`} />
         <Box
           sx={{
             display: "flex",
@@ -130,40 +123,9 @@ export const VotesSubmitted = ({
           >
             {t("govActions.sPos")}
           </Typography>
-          <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
-            <VotePill vote="yes" maxWidth={82} />
-            <Typography
-              fontSize="16px"
-              sx={{
-                marginLeft: "12px",
-                wordBreak: "break-all",
-              }}
-            >
-              ₳ {correctAdaFormat(poolYesVotes)}
-            </Typography>
-          </Box>
-          <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
-            <VotePill vote="abstain" maxWidth={82} />
-            <Typography
-              sx={{
-                marginLeft: "12px",
-                wordBreak: "break-all",
-              }}
-            >
-              ₳ {correctAdaFormat(poolAbstainVotes)}
-            </Typography>
-          </Box>
-          <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
-            <VotePill vote="no" maxWidth={82} />
-            <Typography
-              sx={{
-                marginLeft: "12px",
-                wordBreak: "break-all",
-              }}
-            >
-              ₳ {correctAdaFormat(poolNoVotes)}
-            </Typography>
-          </Box>
+          <Vote vote="yes" value={poolYesVotes} />
+          <Vote vote="abstain" value={poolAbstainVotes} />
+          <Vote vote="no" value={poolNoVotes} />
           <Box
             sx={{
               display: "flex",
@@ -181,46 +143,9 @@ export const VotesSubmitted = ({
             >
               {t("govActions.ccCommittee")}
             </Typography>
-            <Box
-              sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}
-            >
-              <VotePill vote="yes" maxWidth={82} />
-              <Typography
-                fontSize="16px"
-                sx={{
-                  marginLeft: "12px",
-                  wordBreak: "break-all",
-                }}
-              >
-                ₳ {correctAdaFormat(ccYesVotes)}
-              </Typography>
-            </Box>
-            <Box
-              sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}
-            >
-              <VotePill vote="abstain" maxWidth={82} />
-              <Typography
-                sx={{
-                  marginLeft: "12px",
-                  wordBreak: "break-all",
-                }}
-              >
-                ₳ {correctAdaFormat(ccAbstainVotes)}
-              </Typography>
-            </Box>
-            <Box
-              sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}
-            >
-              <VotePill vote="no" maxWidth={82} />
-              <Typography
-                sx={{
-                  marginLeft: "12px",
-                  wordBreak: "break-all",
-                }}
-              >
-                ₳ {correctAdaFormat(ccNoVotes)}
-              </Typography>
-            </Box>
+            <Vote vote="yes" value={ccYesVotes} />
+            <Vote vote="abstain" value={ccAbstainVotes} />
+            <Vote vote="no" value={ccNoVotes} />
           </Box>
         </Box>
       </Box>

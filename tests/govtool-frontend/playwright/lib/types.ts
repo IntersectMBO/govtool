@@ -47,8 +47,10 @@ export type IVotedProposal = {
 
 export type IDRepInfo = {
   name: string;
-  email?: string;
-  bio?: string;
+  objectives?: string;
+  motivations?: string;
+  qualifications?: string;
+  paymentAddress?: string;
   extraContentLinks?: string[];
 };
 

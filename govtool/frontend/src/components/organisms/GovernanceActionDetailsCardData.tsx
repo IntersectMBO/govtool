@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { Box, Tabs, Tab, styled } from "@mui/material";
 import { useLocation } from "react-router-dom";
-import ReactDiffViewer from "react-diff-viewer";
 
 import { CopyButton, ExternalModalButton, Typography } from "@atoms";
 import {
@@ -10,6 +9,7 @@ import {
   DataMissingInfoBox,
   DataMissingHeader,
   GovernanceActionsDatesBox,
+  GovernanceActionDetailsDiffView,
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
@@ -90,6 +90,8 @@ export const GovernanceActionDetailsCardData = ({
   const { screenWidth } = useScreenDimension();
   const { isMobile } = useScreenDimension();
 
+  const nonNullProtocolParams = replaceNullValues(epochParams, protocolParams);
+
   const isModifiedPadding =
     (isDashboard && screenWidth < 1168) ?? screenWidth < 900;
 
@@ -133,14 +135,9 @@ export const GovernanceActionDetailsCardData = ({
           label: "Parameters",
           dataTestId: "parameters-tab",
           content: (
-            <ReactDiffViewer
-              oldValue={JSON.stringify(epochParams, null, 2)}
-              newValue={JSON.stringify(
-                replaceNullValues(epochParams, protocolParams),
-                null,
-                2,
-              )}
-              showDiffOnly
+            <GovernanceActionDetailsDiffView
+              oldJson={epochParams}
+              newJson={nonNullProtocolParams}
             />
           ),
           visible:

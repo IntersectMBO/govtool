@@ -29,7 +29,7 @@ jobs:
           registry-url: "https://registry.npmjs.org/"
           node-version-file: "./govtool/frontend/.nvmrc"
           scope: "@intersect.mbo"
-      - run: npm ci --force
+      - run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 
@@ -57,7 +57,7 @@ jobs:
           registry-url: "https://registry.npmjs.org/"
           node-version-file: "./govtool/frontend/.nvmrc"
           scope: "@intersect.mbo"
-      - run: npm ci --force
+      - run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 
@@ -83,7 +83,7 @@ jobs:
           registry-url: "https://registry.npmjs.org/"
           node-version-file: "./govtool/frontend/.nvmrc"
           scope: "@intersect.mbo"
-      - run: npm ci --force
+      - run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 

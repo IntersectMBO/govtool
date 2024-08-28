@@ -20,7 +20,7 @@ changes.
 
 ### Changed
 
--
+- Replace diff library to avoid usage of `--force` in package installation
 
 ## [sancho-v1.0.14](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.14) 2024-08-26
 

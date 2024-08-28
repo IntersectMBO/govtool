@@ -22,7 +22,7 @@ cd govtool/frontend
 Install dependencies
 
 ```bash
-npm install --force
+npm install
 ```
 
 or (recommended)
@@ -91,7 +91,7 @@ To automatically set correct node version:
 1. Install modules
 
 ```bash
-npm install --force
+npm install
 ```
 
 or (recommended)

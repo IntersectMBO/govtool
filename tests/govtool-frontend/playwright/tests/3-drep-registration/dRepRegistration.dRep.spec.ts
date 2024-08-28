@@ -31,13 +31,13 @@ test.describe("Logged in DReps", () => {
       page.getByTestId("dRep-id-display-card-dashboard")
     ).toContainText(dRep01Wallet.dRepId);
 
-    await page.goto(`${environments.frontendUrl}/governance_actions`);
-    await page
-      .locator('[data-testid^="govaction-"][data-testid$="-view-detail"]')
-      .first()
-      .click();
+    const governanceActionsPage = new GovernanceActionsPage(page);
 
-    await expect(page.getByTestId("vote-button")).toBeVisible();
+    await governanceActionsPage.goto();
+    const governanceActionDetailsPage =
+      await governanceActionsPage.viewFirstInfoProposal();
+
+    await expect(governanceActionDetailsPage.voteBtn).toBeVisible();
   });
 
   test("3H. Should Update DRep data", async ({ page }, testInfo) => {

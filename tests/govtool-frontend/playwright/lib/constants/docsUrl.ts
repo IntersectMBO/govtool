@@ -12,3 +12,4 @@ export const GUIDES_DOC_URL = `${environments.docsUrl}`;
 export const PRIVACY_POLICY = `${environments.docsUrl}/legal/privacy-policy`;
 export const TERMS_AND_CONDITIONS = `${environments.docsUrl}/legal/terms-and-conditions`;
 export const HELP_DOC_URL = `${environments.docsUrl}/support/get-help-in-discord`;
+export const BOOTSTRAP_DOC_URL = `${environments.docsUrl}/about/bootstrapping-phase`;

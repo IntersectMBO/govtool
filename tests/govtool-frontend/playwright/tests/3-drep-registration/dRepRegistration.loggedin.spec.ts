@@ -27,9 +27,10 @@ test("3D. Verify DRep registration form", async ({ page }) => {
   await dRepRegistrationPage.goto();
 
   await expect(dRepRegistrationPage.nameInput).toBeVisible();
-  await expect(dRepRegistrationPage.emailInput).toBeVisible();
-  await expect(dRepRegistrationPage.bioInput).toBeVisible();
-  await expect(dRepRegistrationPage.linkInput).toBeVisible();
+  await expect(dRepRegistrationPage.objectivesInput).toBeVisible();
+  await expect(dRepRegistrationPage.motivationsInput).toBeVisible();
+  await expect(dRepRegistrationPage.qualificationsInput).toBeVisible();
+  await expect(dRepRegistrationPage.paymentAddressInput).toBeVisible();
   await expect(dRepRegistrationPage.addLinkBtn).toBeVisible();
   await expect(dRepRegistrationPage.continueBtn).toBeVisible();
 });

@@ -115,11 +115,13 @@ export default class DRepForm {
     await expect(this.continueBtn).toBeEnabled();
   }
 
-  async inValidateForm(name: string, email: string, bio: string, link: string) {
-    await this.nameInput.fill(name);
-    await this.emailInput.fill(email);
-    await this.bioInput.fill(bio);
-    await this.linkInput.fill(link);
+  async inValidateForm(dRepInfo: IDRepInfo) {
+    await this.nameInput.fill(dRepInfo.name);
+    await this.objectivesInput.fill(dRepInfo.objectives);
+    await this.motivationsInput.fill(dRepInfo.motivations);
+    await this.qualificationsInput.fill(dRepInfo.qualifications);
+    await this.paymentAddressInput.fill(dRepInfo.paymentAddress);
+    await this.linkInput.fill(dRepInfo.extraContentLinks[0]);
 
     function convertTestIdToText(testId: string) {
       let text = testId.replace("-error", "");
@@ -140,9 +142,19 @@ export default class DRepForm {
 
     expect(nameErrors.length).toEqual(1);
 
-    await expect(this.form.getByTestId(formErrors.email)).toBeVisible();
+    await expect(
+      this.form.getByTestId(formErrors.paymentAddress)
+    ).toBeVisible();
 
-    expect(await this.bioInput.textContent()).not.toEqual(bio);
+    expect(await this.objectivesInput.textContent()).not.toEqual(
+      dRepInfo.objectives
+    );
+    expect(await this.motivationsInput.textContent()).not.toEqual(
+      dRepInfo.qualifications
+    );
+    expect(await this.qualificationsInput.textContent()).not.toEqual(
+      dRepInfo.qualifications
+    );
 
     await expect(this.form.getByTestId(formErrors.link)).toBeVisible();
 

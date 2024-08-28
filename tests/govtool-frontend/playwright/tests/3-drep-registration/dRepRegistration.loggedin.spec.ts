@@ -69,12 +69,14 @@ test.describe("Validation of dRep Registration Form", () => {
     await dRepRegistrationPage.goto();
 
     for (let i = 0; i < 100; i++) {
-      await dRepRegistrationPage.inValidateForm(
-        mockInvalid.name(),
-        mockInvalid.email(),
-        faker.lorem.paragraph(40),
-        mockInvalid.url()
-      );
+      await dRepRegistrationPage.inValidateForm({
+        name: mockInvalid.name(),
+        objectives: faker.lorem.paragraph(40),
+        motivations: faker.lorem.paragraph(40),
+        qualifications: faker.lorem.paragraph(40),
+        paymentAddress: faker.string.alphanumeric(45),
+        extraContentLinks: [mockInvalid.url()],
+      });
     }
   });
 

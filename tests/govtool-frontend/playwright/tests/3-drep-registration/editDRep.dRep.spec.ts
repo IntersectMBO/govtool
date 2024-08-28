@@ -70,7 +70,7 @@ test.describe("Validation of edit dRep Form", () => {
 
     await editDRepPage.continueBtn.click();
     await page.getByRole("checkbox").click();
-    await editDRepPage.continueBtn.click();
+    await editDRepPage.registerBtn.click();
 
     for (let i = 0; i < 100; i++) {
       await editDRepPage.metadataUrlInput.fill(faker.internet.url());
@@ -89,7 +89,7 @@ test.describe("Validation of edit dRep Form", () => {
 
     await editDRepPage.continueBtn.click();
     await page.getByRole("checkbox").click();
-    await editDRepPage.continueBtn.click();
+    await editDRepPage.registerBtn.click();
 
     for (let i = 0; i < 100; i++) {
       await editDRepPage.metadataUrlInput.fill(mockInvalid.url());
@@ -119,11 +119,11 @@ test("3P. Should reject invalid edit dRep metadata", async ({ page }) => {
 
   await editDRepPage.continueBtn.click();
   await page.getByRole("checkbox").click();
-  await editDRepPage.continueBtn.click();
+  await editDRepPage.registerBtn.click();
 
   const invalidMetadataAnchor = "https://www.google.com";
   await editDRepPage.metadataUrlInput.fill(invalidMetadataAnchor);
-  await editDRepPage.continueBtn.click();
+  await editDRepPage.submitBtn.click();
 
   await expect(page.getByTestId("modal")).toHaveText(
     /your external data does not/i

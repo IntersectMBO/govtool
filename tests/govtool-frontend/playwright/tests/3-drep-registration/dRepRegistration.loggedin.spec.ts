@@ -91,7 +91,7 @@ test.describe("Validation of dRep Registration Form", () => {
 
     await dRepRegistrationPage.continueBtn.click();
     await page.getByRole("checkbox").click();
-    await dRepRegistrationPage.continueBtn.click();
+    await dRepRegistrationPage.registerBtn.click();
 
     for (let i = 0; i < 100; i++) {
       await dRepRegistrationPage.metadataUrlInput.fill(faker.internet.url());
@@ -156,11 +156,11 @@ test("3O. Should reject invalid dRep registration metadata", async ({
 
   await dRepRegistrationPage.continueBtn.click();
   await page.getByRole("checkbox").click();
-  await dRepRegistrationPage.continueBtn.click();
+  await dRepRegistrationPage.registerBtn.click();
 
   const invalidMetadataAnchor = "https://www.google.com";
   await dRepRegistrationPage.metadataUrlInput.fill(invalidMetadataAnchor);
-  await dRepRegistrationPage.registerBtn.click();
+  await dRepRegistrationPage.submitBtn.click();
 
   await expect(dRepRegistrationPage.metadataErrorModal).toHaveText(
     /your external data does not/i

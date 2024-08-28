@@ -16,6 +16,7 @@ check_env
 # Build images
 ./build-images.sh
 function update-service(){
+  echo '> docker' service update --image "$2" "$1"
   docker service update --image "$2" "$1"
 }
 

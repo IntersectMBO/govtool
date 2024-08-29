@@ -1,5 +1,5 @@
 export const IMAGES = {
-  appLogo: "/images/VoltaireLogo.svg",
+  appLogo: "/images/CardanoLogo.svg",
   appLogoWithoutText: "/images/AppLogoWithoutText.png",
   bgBlue: "/images/BGBlue.png",
   bgOrange: "/images/BGOrange.png",

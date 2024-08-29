@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <big><strong>Monorepo containing Voltaire GovTool and supporting utilities</strong></big>
+  <big><strong>Monorepo containing Cardano GovTool and supporting utilities</strong></big>
 </p>
 
 <div align="center">
@@ -18,7 +18,7 @@
 
 ## 🌄 Purpose
 
-The Voltaire GovTool enables ada holders to experience the governance features described in [CIP-1694](https://github.com/cardano-foundation/CIPs/blob/master/CIP-1694/README.md).
+The Cardano GovTool enables ada holders to experience the governance features described in [CIP-1694](https://github.com/cardano-foundation/CIPs/blob/master/CIP-1694/README.md).
 
 ### Instances
 

@@ -54,4 +54,23 @@ describe("filterOutNullParams", () => {
 
     expect(result).toBeNull();
   });
+
+  it("shouldn't filter out 0", () => {
+    const originalObject = {
+      key1: "value1",
+      key2: 0,
+      key3: "value3",
+      key4: undefined,
+    };
+
+    const expectedObject = {
+      key1: "value1",
+      key2: 0,
+      key3: "value3",
+    };
+
+    const result = filterOutNullParams(originalObject);
+
+    expect(result).toEqual(expectedObject);
+  });
 });

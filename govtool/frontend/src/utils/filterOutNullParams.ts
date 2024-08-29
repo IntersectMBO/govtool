@@ -15,7 +15,11 @@ export const filterOutNullParams = (
 
   const finalObject = Object.entries(originalObject).reduce(
     (acc: Record<string, unknown>, [key, value]) => {
-      if (value && !filterOutKeys?.includes(key)) {
+      if (
+        value !== null &&
+        value !== undefined &&
+        !filterOutKeys?.includes(key)
+      ) {
         acc[key] = value;
       }
       return acc;

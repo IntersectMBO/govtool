@@ -25,6 +25,7 @@ changes.
 - Replace diff library to avoid usage of `--force` in package installation
 - Bump @intersect.mbo/pdf-ui to v0.3.8
 - Change logo to Cardano GovTool [Issue 1851](https://github.com/IntersectMBO/govtool/issues/1851)
+- Change copy to Cardano GovTool [Issue 1852](https://github.com/IntersectMBO/govtool/issues/1852)
 
 ## [sancho-v1.0.14](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.14) 2024-08-26
 

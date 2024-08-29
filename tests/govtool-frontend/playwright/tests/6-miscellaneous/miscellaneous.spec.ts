@@ -69,13 +69,13 @@ test("6D. Should open Sanchonet docs in a new tab when clicking `Learn More` on 
 
   const [registerLearnMorepage] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByTestId("register-learn-more-button").click(),
+    page.getByTestId("d-rep-learn-more-button").click(),
   ]);
   await expect(registerLearnMorepage).toHaveURL(REGISTER_DREP_DOC_URL);
 
   const [directVoterLearnMorepage] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByTestId("lear-more-about-sole-voter-button").click(),
+    page.getByTestId("direct-voter-learn-more-button").click(),
   ]);
   await expect(directVoterLearnMorepage).toHaveURL(DIRECT_VOTER_DOC_URL);
 });
@@ -91,7 +91,7 @@ test("6M. Should navigate between footer links", async ({ page, context }) => {
 
   const [termsAndConditions] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByTestId("term-of-service-footer-link").click(),
+    page.getByTestId("terms-and-conditions-footer-link").click(),
   ]);
   await expect(termsAndConditions).toHaveURL(TERMS_AND_CONDITIONS);
 

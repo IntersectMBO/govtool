@@ -16,29 +16,19 @@ export const filterUpdatableProtocolParams = (
     return null;
   }
 
-  const validKeys: string[] = Object.entries(referenceObject).reduce(
-    (acc: string[], [key, value]) => {
-      if (
-        !filterOutKeys?.includes(key) &&
-        originalObject.hasOwnProperty(key) &&
-        value
-      ) {
-        acc.push(key);
-      }
-      return acc;
-    },
-    [],
-  );
+  const finalObject = Object.entries(referenceObject).reduce<
+    Record<string, unknown>
+  >((acc, [key, referenceValue]) => {
+    const isValid =
+      !filterOutKeys?.includes(key) &&
+      originalObject.hasOwnProperty(key) &&
+      referenceValue !== undefined &&
+      referenceValue !== null;
 
-  const finalObject = Object.entries(originalObject).reduce(
-    (acc: Record<string, unknown>, [key, value]) => {
-      if (validKeys.includes(key)) {
-        acc[key] = value;
-      }
-      return acc;
-    },
-    {},
-  );
+    if (isValid) acc[key] = originalObject[key];
+
+    return acc;
+  }, {});
 
   return finalObject;
 };

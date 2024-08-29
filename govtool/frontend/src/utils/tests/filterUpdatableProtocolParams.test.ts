@@ -50,6 +50,33 @@ describe("filterUpdatableProtocolParams", () => {
     expect(result).toEqual(expectedOutput);
   });
 
+  it("should not filter out 0 value from the reference object", () => {
+    const originalParams = {
+      id: 1,
+      name: "John Doe",
+      age: 30,
+      email: "",
+      nonce: "abc123",
+    };
+
+    const updateParams = {
+      id: 234,
+      name: "Jane Doe",
+      age: 0,
+      address: undefined,
+    };
+
+    const expectedOutput = {
+      name: "John Doe",
+      age: 30,
+    };
+
+    const result = filterUpdatableProtocolParams(originalParams, updateParams, [
+      "id",
+    ]);
+    expect(result).toEqual(expectedOutput);
+  });
+
   it("should return null if original object is not provided", () => {
     const updateParams = {
       name: "Jane Doe",

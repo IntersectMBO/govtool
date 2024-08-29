@@ -4,8 +4,8 @@ import "react-diff-view/style/index.css";
 import "./react-diff-view.overrides.css";
 
 type Props = {
-  oldJson?: JSON | Record<string, unknown>;
-  newJson?: JSON | Record<string, unknown>;
+  oldJson?: JSON | Record<string, unknown> | null;
+  newJson?: JSON | Record<string, unknown> | null;
 };
 
 export const GovernanceActionDetailsDiffView = ({

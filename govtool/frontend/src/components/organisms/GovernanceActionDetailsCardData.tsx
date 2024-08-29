@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { Box, Tabs, Tab, styled } from "@mui/material";
 import { useLocation } from "react-router-dom";
-import ReactDiffViewer from "react-diff-viewer";
 
 import { CopyButton, ExternalModalButton, Typography } from "@atoms";
 import {
@@ -10,13 +9,15 @@ import {
   DataMissingInfoBox,
   DataMissingHeader,
   GovernanceActionsDatesBox,
+  GovernanceActionDetailsDiffView,
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
   getProposalTypeNoEmptySpaces,
   testIdFromLabel,
-  replaceNullValues,
   getProposalTypeLabel,
+  filterUpdatableProtocolParams,
+  filterOutNullParams,
 } from "@utils";
 import { MetadataValidationStatus, ProposalData } from "@models";
 import { GovernanceActionType } from "@/types/governanceAction";
@@ -90,6 +91,22 @@ export const GovernanceActionDetailsCardData = ({
   const { screenWidth } = useScreenDimension();
   const { isMobile } = useScreenDimension();
 
+  const updatableProtocolParams = useMemo(
+    () =>
+      filterUpdatableProtocolParams(epochParams, protocolParams, [
+        "id",
+        "registered_tx_id",
+        "key",
+      ]),
+    [epochParams, protocolParams],
+  );
+
+  const nonNullProtocolParams = useMemo(
+    () =>
+      filterOutNullParams(protocolParams, ["id", "registered_tx_id", "key"]),
+    [updatableProtocolParams, protocolParams],
+  );
+
   const isModifiedPadding =
     (isDashboard && screenWidth < 1168) ?? screenWidth < 900;
 
@@ -133,14 +150,9 @@ export const GovernanceActionDetailsCardData = ({
           label: "Parameters",
           dataTestId: "parameters-tab",
           content: (
-            <ReactDiffViewer
-              oldValue={JSON.stringify(epochParams, null, 2)}
-              newValue={JSON.stringify(
-                replaceNullValues(epochParams, protocolParams),
-                null,
-                2,
-              )}
-              showDiffOnly
+            <GovernanceActionDetailsDiffView
+              oldJson={updatableProtocolParams}
+              newJson={nonNullProtocolParams}
             />
           ),
           visible:

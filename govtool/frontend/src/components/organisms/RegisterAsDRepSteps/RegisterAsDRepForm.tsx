@@ -97,15 +97,6 @@ export const RegisterAsDRepForm = ({
       />
       <Spacer y={isMobile ? 5 : 6} />
       <Box textAlign="center">
-        <InfoText label={t("registration.optional")} />
-        <Typography sx={{ mt: 0.5, mb: isMobile ? 3 : 4 }} variant="headline4">
-          {t("registration.aboutYou")}
-        </Typography>
-        <Typography fontWeight={400} sx={{ mb: 4 }} variant="body1">
-          {t("registration.aboutYouDescription")}
-        </Typography>
-      </Box>
-      <Box textAlign="center">
         <InfoText label={t("editMetadata.optional")} />
         <Typography sx={{ mt: 0.5, mb: isMobile ? 3 : 4 }} variant="headline4">
           {t("editMetadata.aboutYou")}

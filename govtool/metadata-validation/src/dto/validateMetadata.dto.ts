@@ -1,3 +1,5 @@
+import { IsEnum } from 'class-validator';
+
 import { MetadataStandard } from '@types';
 
 export class ValidateMetadataDTO {
@@ -5,5 +7,6 @@ export class ValidateMetadataDTO {
 
   url: string;
 
+  @IsEnum(MetadataStandard, { message: 'Invalid metadata standard' })
   standard?: MetadataStandard;
 }

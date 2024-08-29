@@ -17,7 +17,7 @@ interface Props {
 export const BaseWrapper = styled("div")<Pick<Props, "variant">>`
   box-shadow: 1px 2px 11px 0px #00123d5e;
   max-height: 90vh;
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   display: flex;

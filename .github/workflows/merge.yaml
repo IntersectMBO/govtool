@@ -20,6 +20,7 @@ jobs:
   check-build-deploy:
     environment:  ${{ (github.ref_name == 'main' && 'prod-govtool') || (github.ref_name == 'staging' && 'pre-prod-govtool') || (github.ref_name == 'test' && 'qa-govtool') || (github.ref_name == 'develop' && 'dev-govtool') }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - workdir: ./govtool/backend
@@ -120,9 +121,10 @@ jobs:
           context: ${{ matrix.workdir }}
           file: ${{ matrix.dockerfile }}
           tags: ${{ steps.image_lowercase.outputs.lowercase }}:${{ env.TAG }}
-          load: true
+          load: false
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+          outputs: type=docker,dest=/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar
           build-args: |
             VITE_APP_ENV=${{ secrets.VITE_APP_ENV }}
             VITE_BASE_URL=${{ secrets.VITE_BASE_URL }}
@@ -145,11 +147,11 @@ jobs:
       - name: Scan Docker image with Dockle
         id: dockle
         run: |
-            wget https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
-            tar zxvf dockle_0.4.14_Linux-64bit.tar.gz
+            wget -q https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
+            tar zxf dockle_0.4.14_Linux-64bit.tar.gz
             sudo mv dockle /usr/local/bin
 
-            dockle --exit-level fatal --format json --output ${{ matrix.workdir }}/dockle_scan_output.json ${{ steps.image_lowercase.outputs.lowercase }}:${{ env.TAG }}
+            dockle --exit-code 1 --exit-level fatal --format json -ak GHC_RELEASE_KEY -ak CABAL_INSTALL_RELEASE_KEY -ak STACK_RELEASE_KEY -ak KEY_SHA512 --input '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar' --output ${{ matrix.workdir }}/dockle_scan_output.json
             echo " dockle exited w/ $?"
             cat ${{ matrix.workdir }}/dockle_scan_output.json
 
@@ -157,30 +159,6 @@ jobs:
 
       - name: Push Docker image to GHCR
         run: |
+          docker load -i '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar'
+          rm -rf '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar'
           docker push ${{ steps.image_lowercase.outputs.lowercase }}:${{ env.TAG }}
-
-      - name: Deploy with Qovery
-        if: github.ref == 'refs/heads/develop'
-        env:
-          QOVERY_CLI_ACCESS_TOKEN: ${{secrets.QOVERY_CLI_ACCESS_TOKEN }}
-        run: |
-
-          echo "Deploying on $ENVIRONMENT"
-          echo "Organization - ${{ vars.ORGANIZATION }}"
-          echo "Project - ${{ vars.PROJECT }}"
-
-          # Download and install Qovery CLI
-          curl -s https://get.qovery.com | bash
-
-          qovery container list \
-          --organization ${{ vars.ORGANIZATION }} \
-          --project ${{ vars.PROJECT }} \
-          --environment $ENVIRONMENT
-
-          qovery container deploy \
-            --organization ${{ vars.ORGANIZATION }} \
-            --project ${{ vars.PROJECT }} \
-            --environment $ENVIRONMENT \
-            --container ${{ matrix.qovery_container_name }} \
-            --tag ${{ env.TAG }} \
-            --watch

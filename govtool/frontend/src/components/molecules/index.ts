@@ -25,6 +25,7 @@ export * from "./GovernanceActionCardStatePill";
 export * from "./GovernanceActionDetailsCardLinks";
 export * from "./GovernanceActionDetailsCardOnChainData";
 export * from "./GovernanceActionDetailsCardVotes";
+export * from "./GovernanceActionDetailsDiffView";
 export * from "./GovernanceActionsDatesBox";
 export * from "./GovernanceVotedOnCard";
 export * from "./LinkWithIcon";

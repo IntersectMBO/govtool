@@ -169,8 +169,8 @@ test.describe("Temporary DReps", () => {
       .getByTestId("confirm-modal-button")
       .click();
 
-    await expect(
-      dRepPage.locator("span").filter({ hasText: /^In Progress$/ })
-    ).toBeVisible(); // BUG add proper testId for dRep registration card
+    await expect(dRepPage.getByTestId("alert-warning")).toHaveText(
+      /in progress/i
+    );
   });
 });

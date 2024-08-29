@@ -15,8 +15,9 @@ import { useScreenDimension, useTranslation } from "@hooks";
 import {
   getProposalTypeNoEmptySpaces,
   testIdFromLabel,
-  replaceNullValues,
   getProposalTypeLabel,
+  filterUpdatableProtocolParams,
+  filterOutNullParams,
 } from "@utils";
 import { MetadataValidationStatus, ProposalData } from "@models";
 import { GovernanceActionType } from "@/types/governanceAction";
@@ -90,7 +91,21 @@ export const GovernanceActionDetailsCardData = ({
   const { screenWidth } = useScreenDimension();
   const { isMobile } = useScreenDimension();
 
-  const nonNullProtocolParams = replaceNullValues(epochParams, protocolParams);
+  const updatableProtocolParams = useMemo(
+    () =>
+      filterUpdatableProtocolParams(epochParams, protocolParams, [
+        "id",
+        "registered_tx_id",
+        "key",
+      ]),
+    [epochParams, protocolParams],
+  );
+
+  const nonNullProtocolParams = useMemo(
+    () =>
+      filterOutNullParams(protocolParams, ["id", "registered_tx_id", "key"]),
+    [updatableProtocolParams, protocolParams],
+  );
 
   const isModifiedPadding =
     (isDashboard && screenWidth < 1168) ?? screenWidth < 900;
@@ -136,7 +151,7 @@ export const GovernanceActionDetailsCardData = ({
           dataTestId: "parameters-tab",
           content: (
             <GovernanceActionDetailsDiffView
-              oldJson={epochParams}
+              oldJson={updatableProtocolParams}
               newJson={nonNullProtocolParams}
             />
           ),

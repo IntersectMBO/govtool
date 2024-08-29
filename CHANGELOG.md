@@ -19,6 +19,7 @@ changes.
 - Delete duplicate text on DRep registration form [Issue 1847](https://github.com/IntersectMBO/govtool/issues/1847)
 - Fix modal content invisible on ios [Issue 1842](https://github.com/IntersectMBO/govtool/issues/1842)
 - Fix counting votes by CC committee members and SPOs [Issue 1838](https://github.com/IntersectMBO/govtool/issues/1838)
+- Fix displaying non relevant data in protocol parameter change Governance Action [Issue 1601](https://github.com/IntersectMBO/govtool/issues/1601)
 
 ### Changed
 

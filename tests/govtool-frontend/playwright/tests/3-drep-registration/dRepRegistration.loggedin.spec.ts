@@ -110,7 +110,7 @@ test.describe("Validation of dRep Registration Form", () => {
 
     await dRepRegistrationPage.continueBtn.click();
     await page.getByRole("checkbox").click();
-    await dRepRegistrationPage.continueBtn.click();
+    await dRepRegistrationPage.registerBtn.click();
 
     for (let i = 0; i < 100; i++) {
       await dRepRegistrationPage.metadataUrlInput.fill(mockInvalid.url());

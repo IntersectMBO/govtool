@@ -21,6 +21,7 @@ changes.
 - Fix counting votes by CC committee members and SPOs [Issue 1838](https://github.com/IntersectMBO/govtool/issues/1838)
 - Fix displaying non relevant data in protocol parameter change Governance Action [Issue 1601](https://github.com/IntersectMBO/govtool/issues/1601)
 - Fix voting on info actions in bootstrapping phase [Issue 1876](https://github.com/IntersectMBO/govtool/issues/1876)
+- Fix missing DRep name whitespace validation [Issue 1873](https://github.com/IntersectMBO/govtool/issues/1873)
 
 ### Changed
 

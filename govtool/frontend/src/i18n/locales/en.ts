@@ -698,6 +698,7 @@ export const en = {
           maxLength: "Max {{maxLength}} characters",
           required: "This field is required",
           url: "Invalid URL",
+          noSpaces: "No spaces allowed",
         },
       },
     },

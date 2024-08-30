@@ -379,6 +379,8 @@ export const en = {
         doNotList: "Do not list",
         doNotListHelpfulText:
           "Check this box if you do not want to show up in Govtool DRep Directory or in similar tools",
+        links: "Links",
+        identity: "Identity",
       },
       errors: {
         tooLongUrl: "Url must be less than 128 bytes",

@@ -12,6 +12,7 @@ export * from "./DashboardTopNav";
 export * from "./Drawer";
 export * from "./DrawerMobile";
 export * from "./DRepCard";
+export * from "./DRepDetailsCard";
 export * from "./EditDRepInfoSteps";
 export * from "./Modal";
 export * from "./Footer";

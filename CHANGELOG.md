@@ -39,6 +39,7 @@ changes.
 - Change home page hero copy [Issue 1903](https://github.com/IntersectMBO/govtool/issues/1903)
 - Bump cardano-node to 9.1.1 [Issue 1895](https://github.com/IntersectMBO/govtool/issues/1895)
 - Bump cardano-db-sync 13.5.0.1 [Issue 1906](https://github.com/IntersectMBO/govtool/issues/1906)
+- Adjust CIP119 support to match final designs [Issue 1850](https://github.com/IntersectMBO/govtool/issues/1850)
 
 ## [sancho-v1.0.14](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.14) 2024-08-26
 

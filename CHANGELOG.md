@@ -12,7 +12,7 @@ changes.
 
 ### Added
 
--
+- Add missing test DRep Details test IDs [Issue 1863](https://github.com/IntersectMBO/govtool/issues/1863)
 
 ### Fixed
 

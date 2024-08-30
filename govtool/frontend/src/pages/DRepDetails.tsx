@@ -240,13 +240,16 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
               url={url}
             />
           )}
-          <DRepDetailsInfoItem label={t("drepId")}>
-            <CopyableText value={view} />
+          <DRepDetailsInfoItem label={t("drepId")} dataTestId="drep-id">
+            <CopyableText value={view} dataTestId="copy-drep-id-button" />
           </DRepDetailsInfoItem>
-          <DRepDetailsInfoItem label={t("status")}>
+          <DRepDetailsInfoItem label={t("status")} dataTestId="drep-status">
             <StatusPill status={status} />
           </DRepDetailsInfoItem>
-          <DRepDetailsInfoItem label={t("votingPower")}>
+          <DRepDetailsInfoItem
+            label={t("votingPower")}
+            dataTestId="drep-voting-power"
+          >
             <Typography
               data-testid="voting-power"
               sx={{ display: "flex", flexDirection: "row", mt: 0.5 }}
@@ -255,11 +258,22 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
               {correctAdaFormat(votingPower)}
             </Typography>
           </DRepDetailsInfoItem>
-          <DRepDetailsInfoItem label={t("forms.dRepData.paymentAddress")}>
-            {paymentAddress && <CopyableText value={paymentAddress} />}
+          <DRepDetailsInfoItem
+            label={t("forms.dRepData.paymentAddress")}
+            dataTestId="payment-address"
+          >
+            {paymentAddress && (
+              <CopyableText
+                value={paymentAddress}
+                dataTestId="copy-payment-address-button"
+              />
+            )}
           </DRepDetailsInfoItem>
           {references?.length > 0 && !metadataStatus && (
-            <DRepDetailsInfoItem label={t("moreInformation")}>
+            <DRepDetailsInfoItem
+              label={t("moreInformation")}
+              dataTestId="more-information"
+            >
               <Box
                 alignItems="flex-start"
                 display="flex"
@@ -319,13 +333,22 @@ export const DRepDetails = ({ isConnected }: DRepDetailsProps) => {
             </Button>
           )}
         </Box>
-        <DRepDetailsDescriptionItem label={t("forms.dRepData.objectives")}>
+        <DRepDetailsDescriptionItem
+          label={t("forms.dRepData.objectives")}
+          dataTestId="objectives"
+        >
           {objectives}
         </DRepDetailsDescriptionItem>
-        <DRepDetailsDescriptionItem label={t("forms.dRepData.motivations")}>
+        <DRepDetailsDescriptionItem
+          label={t("forms.dRepData.motivations")}
+          dataTestId="motivations"
+        >
           {motivations}
         </DRepDetailsDescriptionItem>
-        <DRepDetailsDescriptionItem label={t("forms.dRepData.qualifications")}>
+        <DRepDetailsDescriptionItem
+          label={t("forms.dRepData.qualifications")}
+          dataTestId="qualifications"
+        >
           {qualifications}
         </DRepDetailsDescriptionItem>
       </Card>
@@ -341,18 +364,34 @@ const ellipsisStyles = {
 
 type DrepDetailsInfoItemProps = PropsWithChildren & {
   label: string;
+  dataTestId: string;
 };
 
-const DRepDetailsInfoItem = ({ children, label }: DrepDetailsInfoItemProps) => {
+const dataTestIdInfoItemCategoryPrefix = "info-item";
+
+const DRepDetailsInfoItem = ({
+  children,
+  label,
+  dataTestId,
+}: DrepDetailsInfoItemProps) => {
   if (!children) return null;
   return (
     <>
       <Box component="dt" sx={{ mb: 0.5, "&:not(:first-of-type)": { mt: 2 } }}>
-        <Typography color="neutralGray" fontWeight={600} variant="body2">
+        <Typography
+          color="neutralGray"
+          fontWeight={600}
+          variant="body2"
+          data-testid={`${dataTestId}-${dataTestIdInfoItemCategoryPrefix}-title`}
+        >
           {label}
         </Typography>
       </Box>
-      <Box component="dd" m={0}>
+      <Box
+        component="dd"
+        m={0}
+        data-testid={`${dataTestId}-${dataTestIdInfoItemCategoryPrefix}-description`}
+      >
         {children}
       </Box>
     </>
@@ -362,27 +401,42 @@ const DRepDetailsInfoItem = ({ children, label }: DrepDetailsInfoItemProps) => {
 const DRepDetailsDescriptionItem = ({
   children,
   label,
+  dataTestId,
 }: DrepDetailsInfoItemProps) => {
   if (!children) return null;
   return (
     <>
-      <Typography variant="title2" sx={{ mb: 1.5, mt: 5.75 }}>
+      <Typography
+        variant="title2"
+        sx={{ mb: 1.5, mt: 5.75 }}
+        data-testid={`${dataTestId}-title`}
+      >
         {label}
       </Typography>
-      <Typography fontWeight={400} sx={{ maxWidth: 608 }} variant="body1">
+      <Typography
+        fontWeight={400}
+        sx={{ maxWidth: 608 }}
+        variant="body1"
+        data-testid={`${dataTestId}-description`}
+      >
         {children}
       </Typography>
     </>
   );
 };
 
-const CopyableText = ({ value }: { value: string }) => (
+type CopyableTextProps = {
+  value: string;
+  dataTestId: string;
+};
+
+const CopyableText = ({ value, dataTestId }: CopyableTextProps) => (
   <ButtonBase
     onClick={(e) => {
       navigator.clipboard.writeText(value.toString());
       e.stopPropagation();
     }}
-    data-testid="copy-drep-id-button"
+    data-testid={dataTestId}
     sx={{
       gap: 1,
       maxWidth: "100%",

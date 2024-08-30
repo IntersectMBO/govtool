@@ -50,7 +50,7 @@ const FeatureFlagProvider = ({ children }: PropsWithChildren) => {
    */
   const isVotingOnGovernanceActionEnabled = useCallback(
     (governanceActionType: GovernanceActionType) =>
-      (epochParams?.protocol_major || 0) >
+      (epochParams?.protocol_major || 0) >=
       govActionVotingEnabledSinceProtocolVersion[governanceActionType],
     [isAppInitializing],
   );

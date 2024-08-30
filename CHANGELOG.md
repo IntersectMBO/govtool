@@ -22,6 +22,7 @@ changes.
 - Fix displaying non relevant data in protocol parameter change Governance Action [Issue 1601](https://github.com/IntersectMBO/govtool/issues/1601)
 - Fix voting on info actions in bootstrapping phase [Issue 1876](https://github.com/IntersectMBO/govtool/issues/1876)
 - Fix missing DRep name whitespace validation [Issue 1873](https://github.com/IntersectMBO/govtool/issues/1873)
+- Fix displaying wrongly formatted Governance Action ID [Issue 1866](https://github.com/IntersectMBO/govtool/issues/1866k)
 
 ### Changed
 

@@ -27,7 +27,7 @@ export const GovernanceActionDetailsCardLinks = ({
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            mb: 2,
+            my: 2,
           }}
           data-testid="supporting-links"
         >

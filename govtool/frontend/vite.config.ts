@@ -81,20 +81,20 @@ const vitestConfig = defineVitestConfig({
       junit: "./junit-report.xml",
       json: "./json-report.json",
     },
-    // coverage: {
-    //   include: [
-    //     "src/components/**/*",
-    //     "src/consts/**/*",
-    //     "src/context/**/*",
-    //     "src/hooks/**/*",
-    //     "src/services/**/*",
-    //     "src/utils/**/*",
-    //   ],
-    //   provider: "v8",
-    //   reporter: ["json-summary", "lcov"],
-    //   reportOnFailure: true,
-    //   enabled: true,
-    // },
+    coverage: {
+      include: [
+        "src/components/**/*",
+        "src/consts/**/*",
+        "src/context/**/*",
+        "src/hooks/**/*",
+        "src/services/**/*",
+        "src/utils/**/*",
+      ],
+      provider: "v8",
+      reporter: ["json-summary", "lcov"],
+      reportOnFailure: true,
+      enabled: true,
+    },
   },
 });
 

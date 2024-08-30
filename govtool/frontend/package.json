@@ -13,7 +13,7 @@
     "postinstall": "patch-package",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "test": "vitest",
+    "test": "NODE_OPTIONS=--max_old_space_size=8192 vitest",
     "test:coverage": "vitest --coverage",
     "test:make-badges": "npx istanbul-badges-readme --readmeDir='../../'",
     "test:verbose": "vitest --reporter=verbose",
@@ -109,5 +109,6 @@
     "typescript": "^5.0.2"
   },
   "readme": "ERROR: No README data found!",
-  "_id": "govtool@1.0.6"
+  "_id": "govtool@1.0.6",
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

@@ -3,7 +3,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
-import { version } from '../package.json';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -14,7 +13,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Metadata Validation Tool')
     .setDescription('The Metadata Validation Tool API description')
-    .setVersion(version)
+    .setVersion('1.0.14')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

@@ -17,7 +17,6 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "resolveJsonModule": true,
     "paths": {
       "@/*": ["src/*"],
       "@dto": ["src/dto"],

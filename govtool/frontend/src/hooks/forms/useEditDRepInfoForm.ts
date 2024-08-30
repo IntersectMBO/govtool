@@ -68,7 +68,6 @@ export const useEditDRepInfoForm = (
     handleSubmit,
     formState: { errors, isValid },
     register,
-    resetField,
     reset,
     watch,
   } = useFormContext<EditDRepInfoValues>();
@@ -91,7 +90,14 @@ export const useEditDRepInfoForm = (
   const generateMetadata = useCallback(async () => {
     const body = generateMetadataBody({
       data: getValues(),
-      acceptedKeys: ["givenName", "objectives", "motivations", "qualifications", "paymentAddress", "references"],
+      acceptedKeys: [
+        "givenName",
+        "objectives",
+        "motivations",
+        "qualifications",
+        "paymentAddress",
+        "references",
+      ],
       standardReference: CIP_119,
     });
 
@@ -204,7 +210,6 @@ export const useEditDRepInfoForm = (
     onClickDownloadJson,
     register,
     editDRepInfo: handleSubmit(onSubmit),
-    resetField,
     watch,
     reset,
   };

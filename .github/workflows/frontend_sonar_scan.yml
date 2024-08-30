@@ -34,7 +34,7 @@ jobs:
           NODE_OPTIONS: "--max_old_space_size=6144"
           NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
         run: |
-          npm ci --force
+          npm ci
           npm run test:coverage
 
       - uses: sonarsource/sonarqube-scan-action@master

@@ -503,8 +503,8 @@ export const en = {
     hero: {
       connectWallet: "Connect your wallet",
       description:
-        "Anyone with a wallet containing ADA can participate in governance on Voltaire.\n\nYour ADA balance entitles you to an equal amount of Voting Power.\n\nFor more info see the guide entry for <0>Voting Power</0>.",
-      headline: "Voltaire \n Governance Tool",
+        "Anyone with a wallet containing ADA can participate in governance on Cardano.\n\nYour ADA balance entitles you to an equal amount of Voting Power.\n\nFor more info see the guide entry for <0>Voting Power</0>.",
+      headline: "Cardano \n Governance Tool",
     },
     home: {
       cards: {
@@ -576,7 +576,7 @@ export const en = {
         beCareful: "Be Careful!",
         continueTo: "Continue to external link",
         description:
-          "Exercise caution and verify the website's authenticity before sharing personal information. To proceed, click 'Continue'. To stay on Voltaire, click 'Cancel'.",
+          "Exercise caution and verify the website's authenticity before sharing personal information. To proceed, click 'Continue'. To stay on Cardano, click 'Cancel'.",
         safety: "External Link Safety",
         thisIs: "This is an external link:",
         youAreAboutToOpen: "You are about to open an external link to:",
@@ -739,7 +739,7 @@ export const en = {
     },
     system: {
       description:
-        "The Voltaire GovTool is a tool that allows you to participate in the governance of the Cardano network. You can propose, vote on, and delegate your voting power to other users.",
+        "The Cardano GovTool is a tool that allows you to participate in the governance of the Cardano network. You can propose, vote on, and delegate your voting power to other users.",
       title: "This tool is connected to {{networkName}}",
       bootstrappingWarning:
         "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>",

@@ -5,13 +5,11 @@ import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
-import { downloadMetadata } from "@helpers/metadata";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
-import { Download, expect } from "@playwright/test";
-import metadataBucketService from "@services/metadataBucketService";
+import { expect } from "@playwright/test";
 import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
@@ -169,7 +167,7 @@ test.describe("Temporary DReps", () => {
       .getByTestId("confirm-modal-button")
       .click();
 
-    await expect(dRepPage.getByTestId("alert-warning")).toHaveText(
+    await expect(dRepPage.getByTestId("d-rep-in-progress")).toHaveText(
       /in progress/i
     );
   });

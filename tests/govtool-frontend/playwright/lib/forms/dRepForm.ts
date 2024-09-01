@@ -8,7 +8,7 @@ const formErrors = {
   dRepName: [
     "max-80-characters-error",
     "this-field-is-required-error",
-    "nickname-can-not-contain-whitespaces-error",
+    "no-spaces-allowed-error",
   ],
   email: "invalid-email-address-error",
   link: "invalid-url-error",

@@ -73,20 +73,24 @@ test("2N. Should show DRep information on details page", async ({
   await dRepPage.getByTestId("view-drep-details-button").click();
 
   // Verification
-  await expect(dRepPage.getByTestId("copy-drep-id-button").first()).toHaveText(
+  await expect(dRepPage.getByTestId("copy-drep-id-button")).toHaveText(
     wallet.dRepId
   );
-  await expect(dRepPage.getByTestId("copy-drep-id-button").last()).toHaveText(
+  await expect(dRepPage.getByTestId("copy-payment-address-button")).toHaveText(
     paymentAddress
   );
   await expect(dRepPage.getByTestId("Active-pill")).toHaveText("Active");
   await expect(dRepPage.getByTestId("voting-power")).toHaveText("₳ 0");
 
-  await expect(dRepPage.getByText(objectives, { exact: true })).toBeVisible();
-  await expect(dRepPage.getByText(motivations, { exact: true })).toBeVisible();
-  await expect(
-    dRepPage.getByText(qualifications, { exact: true })
-  ).toBeVisible();
+  await expect(dRepPage.getByTestId("objectives-description")).toHaveText(
+    objectives
+  );
+  await expect(dRepPage.getByTestId("motivations-description")).toHaveText(
+    motivations
+  );
+  await expect(dRepPage.getByTestId("qualifications-description")).toHaveText(
+    qualifications
+  );
 
   for (const link of links) {
     await expect(
@@ -143,7 +147,9 @@ test.describe("Insufficient funds", () => {
     await expect(delegateBtn).toBeVisible();
     await page.getByTestId(`${dRep01Wallet.dRepId}-delegate-button`).click();
 
-    await expect(dRepDirectoryPage.delegationErrorModal).toBeVisible();
+    await expect(dRepDirectoryPage.delegationErrorModal).toBeVisible({
+      timeout: 10_000,
+    });
   });
 });
 

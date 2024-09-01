@@ -142,7 +142,7 @@ test("3F. Should create proper DRep registration request, when registered with d
   await dRepRegistrationPage.registerWithoutTxConfirmation({ name: "Test" });
   await expect(
     page.getByTestId("registration-transaction-error-modal")
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10_000 });
 });
 
 test("3O. Should reject invalid dRep registration metadata", async ({

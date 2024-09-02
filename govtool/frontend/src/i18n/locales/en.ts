@@ -414,6 +414,10 @@ export const en = {
       governanceActionId: "Governance Action ID:",
       governanceActionType: "Governance Action Type:",
       goToVote: "Go to Vote",
+      protocolParamsDetails: {
+        existing: "Existing",
+        proposed: "Proposed",
+      },
       hardforkDetails: {
         currentVersion: "Current version",
         proposedVersion: "Proposed version",

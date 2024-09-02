@@ -159,8 +159,7 @@ export const GovernanceActionDetailsCardData = ({
           visible:
             type === GovernanceActionType.ParameterChange &&
             !!protocolParams &&
-            !!epochParams &&
-            !isDataMissing,
+            !!epochParams,
         },
         {
           label: "Details",

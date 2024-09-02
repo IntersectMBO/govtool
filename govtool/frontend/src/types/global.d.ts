@@ -61,6 +61,6 @@ declare global {
   type Reference = {
     "@type": string;
     label: string;
-    url: string;
+    uri: string;
   };
 }

@@ -182,7 +182,7 @@ export const DRepDetailsCard = ({
           />
           {linkReferences?.length > 0 && (
             <DRepDetailsInfoItem
-              label={t("forms.dRepData.links")}
+              label={t("forms.dRepData.referenceTypes.link.title")}
               dataTestId="references-link"
             >
               <ReferencesGroup references={linkReferences} />
@@ -190,7 +190,7 @@ export const DRepDetailsCard = ({
           )}
           {identityReferences?.length > 0 && (
             <DRepDetailsInfoItem
-              label={t("forms.dRepData.identity")}
+              label={t("forms.dRepData.referenceTypes.identity.title")}
               dataTestId="references-identity"
             >
               <ReferencesGroup references={identityReferences} />
@@ -290,35 +290,27 @@ const CopyableText = ({ value, dataTestId }: CopyableTextProps) => (
 
 type ReferenceItem = {
   label: string;
-  url: string;
+  uri: string;
 };
 
 const ReferencesGroup = ({ references }: { references: ReferenceItem[] }) => (
   <Box display="flex" flexDirection="column" gap={3}>
-    {references.map(({ label, url }) => (
-      <ReferencesLink key={url} label={label} url={url} />
+    {references.map(({ label, uri }) => (
+      <ReferencesLink key={uri} label={label} uri={uri} />
     ))}
   </Box>
 );
 
-const ReferencesLink = ({ label, url }: ReferenceItem) => (
+const ReferencesLink = ({ label, uri }: ReferenceItem) => (
   <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
     <Typography fontWeight={400}>{label}</Typography>
     <Link
       data-testid={`${testIdFromLabel(label)}-link`}
-      href={url}
+      href={uri}
       target="_blank"
       sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 1,
-        maxWidth: "100%",
-        cursor: "pointer",
-        textDecoration: "none",
-        "&:hover": {
-          opacity: 0.6,
-          transition: "opacity 0.3s",
-        },
+        overflow: "hidden",
+        textOverflow: "ellipsis",
       }}
     >
       <Typography
@@ -329,7 +321,7 @@ const ReferencesLink = ({ label, url }: ReferenceItem) => (
           textOverflow: "ellipsis",
         }}
       >
-        {url}
+        {uri}
       </Typography>
       <img alt="link" height={16} src={ICONS.externalLinkIcon} width={16} />
     </Link>

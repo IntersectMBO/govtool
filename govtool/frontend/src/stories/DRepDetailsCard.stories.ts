@@ -28,23 +28,23 @@ const meta = {
       references: [{
         "@type": "Link",
         label: "Link Reference",
-        url: "https://example.com/",
+        uri: "https://example.com/",
       }, {
         "@type": "Link",
         label: "Another Link Reference",
-        url: "https://example.com/",
+        uri: "https://example.com/",
       }, {
         "@type": "Identity",
         label: "Identity Reference",
-        url: "https://example.com/",
+        uri: "https://example.com/",
       }, {
         "@type": "GovernanceMetadata",
         label: "GovernanceMetadata Reference",
-        url: "https://example.com/",
+        uri: "https://example.com/",
       }, {
         "@type": "Other",
         label: "Other Reference",
-        url: "https://example.com/",
+        uri: "https://example.com/",
       }],
       doNotList: false,
       metadataStatus: null,

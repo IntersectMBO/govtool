@@ -30,6 +30,7 @@ export type TextAreaFieldProps = TextAreaProps & {
   errorStyles?: MUITypographyProps;
   helpfulText?: string;
   helpfulTextStyle?: MUITypographyProps;
+  hideLabel?: boolean;
   label?: string;
   labelStyles?: TypographyProps;
   layoutStyles?: BoxProps;

@@ -14,8 +14,8 @@ export const DREP_CONTEXT = {
         "@container": "@set" as const,
         "@context": {
           GovernanceMetadata: "CIP100:GovernanceMetadataReference",
-          Identity: "CIP100:IdentityReference",
-          Link: "CIP100:LinkReference",
+          Identity: "CIP119:IdentityReference",
+          Link: "CIP119:LinkReference",
           Other: "CIP100:OtherReference",
           label: "CIP100:reference-label",
           uri: "CIP100:reference-uri",

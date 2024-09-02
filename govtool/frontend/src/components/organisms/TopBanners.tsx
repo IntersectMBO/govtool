@@ -16,6 +16,7 @@ export const TopBanners = () => {
             py: 0.5,
             textAlign: "center",
           }}
+          data-testid="system-network-name"
         >
           <Typography variant="caption" fontWeight={600} color="primary">
             {networkName}
@@ -32,6 +33,7 @@ export const TopBanners = () => {
             py: 1,
             textAlign: "center",
           }}
+          data-testid="system-bootstrapping-warning"
         >
           <Typography variant="caption" fontWeight={600} color="common.white">
             <Trans
@@ -42,6 +44,7 @@ export const TopBanners = () => {
                     href="https://docs.gov.tools/about/bootstrapping-phase"
                     target="_blank"
                     color="common.white"
+                    data-testid="system-bootstrapping-warning-link"
                   />
                 ),
               }}

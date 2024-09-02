@@ -130,7 +130,12 @@ export const DRepDashboardCard = ({
     if (voter?.wasRegisteredAsDRep) {
       return {
         buttons: wasRegisteredOrNotRegisteredButtons,
-        description: (
+        description: voter?.givenName ? (
+          <Trans
+            i18nKey="dashboard.cards.drep.notRegisteredWasRegisteredDescriptionWithGivenName"
+            values={{ name: voter?.givenName }}
+          />
+        ) : (
           <Trans i18nKey="dashboard.cards.drep.notRegisteredWasRegisteredDescription" />
         ),
         transactionId: voter?.dRepRetireTxHash,

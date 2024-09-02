@@ -31,6 +31,7 @@ changes.
 - Bump @intersect.mbo/pdf-ui to v0.3.8
 - Change logo to Cardano GovTool [Issue 1851](https://github.com/IntersectMBO/govtool/issues/1851)
 - Change copy to Cardano GovTool [Issue 1852](https://github.com/IntersectMBO/govtool/issues/1852)
+- Replace mocked MrDRep label in DRep retired card with given name if exists, or make the description more neutral if the given name is not provided [Issue 1887](https://github.com/IntersectMBO/govtool/issues/1887)
 
 ## [sancho-v1.0.14](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.14) 2024-08-26
 

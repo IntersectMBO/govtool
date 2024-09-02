@@ -69,8 +69,10 @@ export const en = {
           notRegisteredDescription:
             "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
           notRegisteredTitle: "Become a DRep",
+          notRegisteredWasRegisteredDescriptionWithGivenName:
+            "You are now retired and your listing in the DRep directory as <strong>{{givenName}}</strong> has been marked as <strong><i>retired</i></strong>. You cannot vote on Governance Actions as <strong>{{givenName}}</strong>.\n\nYou can always re-register as a DRep, in which case you will have the same DRep ID as you had initially.",
           notRegisteredWasRegisteredDescription:
-            "You are now retired and your listing in the DRep directory as <strong>MrDRep</strong> has been marked as <strong><i>retired</i></strong>. You cannot vote on Governance Actions as <strong>MrDRep</strong>.\n\nYou can always re-register as a DRep, in which case you will have the same DRep ID as you had initially.",
+            "You are now retired and your listing in the DRep directory has been marked as <strong><i>retired</i></strong>. You cannot vote on Governance Actions.\n\nYou can always re-register as a DRep, in which case you will have the same DRep ID as you had initially.",
           notRegisteredWasRegisteredTitle: "You Have Retired as a DRep.",
           register: "Register",
           registerAgain: "Register Again as a dRep",

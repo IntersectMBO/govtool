@@ -81,7 +81,6 @@ export const useRegisterAsdRepForm = (
     handleSubmit,
     formState: { errors, isValid },
     register,
-    resetField,
     watch,
   } = useFormContext<RegisterAsDRepValues>();
 
@@ -250,7 +249,6 @@ export const useRegisterAsdRepForm = (
     onClickDownloadJson,
     register,
     registerAsDrep: handleSubmit(onSubmit),
-    resetField,
     watch,
   };
 };

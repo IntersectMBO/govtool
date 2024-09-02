@@ -23,6 +23,7 @@ changes.
 - Fix voting on info actions in bootstrapping phase [Issue 1876](https://github.com/IntersectMBO/govtool/issues/1876)
 - Fix missing DRep name whitespace validation [Issue 1873](https://github.com/IntersectMBO/govtool/issues/1873)
 - Fix displaying wrongly formatted Governance Action ID [Issue 1866](https://github.com/IntersectMBO/govtool/issues/1866k)
+- Make payment address optional in DRep registration and edit form [Issue 1871](https://github.com/IntersectMBO/govtool/issues/1871)
 
 ### Changed
 

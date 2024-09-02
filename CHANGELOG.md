@@ -26,7 +26,7 @@ changes.
 - Make payment address optional in DRep registration and edit form [Issue 1871](https://github.com/IntersectMBO/govtool/issues/1871)
 - Fix displaying wrongly formatted Governance Action ID [Issue 1866](https://github.com/IntersectMBO/govtool/issues/1866)
 - Fix displaying the proper Governance Action Details on renavigating between pages
-- Fix displaying protocol params Governance Action details when metadat validation fails [Issue 1889](https://github.com/IntersectMBO/govtool/issues/1889)
+- Fix displaying protocol params Governance Action details when metadata validation fails [Issue 1889](https://github.com/IntersectMBO/govtool/issues/1889)
 
 ### Changed
 

@@ -20,6 +20,8 @@ export type InputFieldProps = InputProps & {
 export type CheckboxFieldProps = CheckboxProps & {
   errorMessage?: string;
   errorStyles?: MUITypographyProps;
+  helpfulText?: string;
+  helpfulTextStyle?: MUITypographyProps;
   label?: string;
   labelStyles?: TypographyProps;
   layoutStyles?: BoxProps;

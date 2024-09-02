@@ -20,6 +20,7 @@ import { DRepDataFormValues } from "@/types/dRep";
 import { useValidateMutation } from "../mutations";
 
 export const defaultEditDRepInfoValues: DRepDataFormValues = {
+  doNotList: false,
   givenName: "",
   objectives: "",
   motivations: "",
@@ -92,6 +93,7 @@ export const useEditDRepInfoForm = (
         "qualifications",
         "paymentAddress",
         "references",
+        "doNotList",
       ],
       standardReference: CIP_119,
     });

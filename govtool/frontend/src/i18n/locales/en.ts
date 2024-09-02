@@ -374,9 +374,9 @@ export const en = {
         paymentAddress: "Payment Address",
         paymentAddressHelpfulText:
           "An address for DReps to receive payments. Only one address can be entered.",
-        doNotList: "Do not list",
+        doNotList: "Do Not List",
         doNotListHelpfulText:
-          "Check this box if you do not want to show up in Govtool DRep Directory or in similar tools",
+          "Check this box if you do not want to be listed in DRep directories/compilations. If you tick this, you will not have a listing in the DRep listing on GovTool.",
         referenceTypes: {
           link: {
             title: "Links",

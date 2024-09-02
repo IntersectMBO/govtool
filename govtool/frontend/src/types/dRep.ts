@@ -1,4 +1,5 @@
 export type DRepDataFormValues = {
+  doNotList: boolean;
   givenName: string;
   objectives: string;
   motivations: string;

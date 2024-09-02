@@ -26,6 +26,7 @@ import { DRepDataFormValues } from "@/types/dRep";
 import { useValidateMutation } from "../mutations";
 
 export const defaultRegisterAsDRepValues: DRepDataFormValues = {
+  doNotList: false,
   givenName: "",
   objectives: "",
   motivations: "",

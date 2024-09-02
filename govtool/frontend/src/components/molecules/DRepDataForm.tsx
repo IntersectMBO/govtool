@@ -141,6 +141,15 @@ export const DRepDataForm = ({ control, errors, register }: Props) => {
           name="paymentAddress"
           rules={Rules.PAYMENT_ADDRESS}
         />
+        <ControlledField.Checkbox
+          {...{ control, errors }}
+          label={t("forms.dRepData.doNotList")}
+          labelStyles={{ fontSize: 16, fontWeight: 500 }}
+          helpfulText={t("forms.dRepData.doNotListHelpfulText")}
+          layoutStyles={{ ml: -1.5 }}
+          name="doNotList"
+          size="large"
+        />
       </Box>
     </div>
   );

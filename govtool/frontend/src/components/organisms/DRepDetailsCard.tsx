@@ -44,14 +44,20 @@ export const DRepDetailsCard = ({
   const isMyDrep = variant === "myDRep";
   const isMyDrepInProgress = variant === "myDRepInProgress";
 
-  const linkReferences = references?.map((uri) => ({
-    label: "Link label",
-    url: uri,
-  }));
-  const identityReferences = references?.map((uri) => ({
-    label: "Identity label",
-    url: uri,
-  }));
+  const groupedReferences = references?.reduce<Record<string, Reference[]>>(
+    (acc, reference) => {
+      const type = reference["@type"];
+      if (!acc[type]) {
+        acc[type] = [];
+      }
+      acc[type].push(reference);
+      return acc;
+    },
+    {},
+  );
+
+  const linkReferences = groupedReferences?.Link;
+  const identityReferences = groupedReferences?.Identity;
 
   return (
     <Card

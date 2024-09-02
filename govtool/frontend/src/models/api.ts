@@ -126,7 +126,7 @@ export type DRepData = DrepDataDTO & {
   objectives: string | null;
   motivations: string | null;
   qualifications: string | null;
-  references: string[];
+  references: Reference[];
   doNotList: boolean;
   metadataStatus: MetadataValidationStatus | null;
   metadataValid: boolean;

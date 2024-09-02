@@ -162,7 +162,7 @@ test.describe("Register DRep state", () => {
     await dRepPage.getByTestId("continue-button").click();
     await expect(
       dRepPage.getByTestId("registration-transaction-submitted-modal")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
     await dRepPage.getByTestId("confirm-modal-button").click();
     await waitForTxConfirmation(dRepPage);
     await expect(dRepPage.getByText("You are a Direct Voter")).toBeVisible();

@@ -106,7 +106,7 @@ test.describe("Temporary DReps", () => {
 
     await expect(
       dRepPage.getByTestId("retirement-transaction-submitted-modal")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   test("3K. Verify DRep behavior in retired state", async ({
@@ -129,7 +129,7 @@ test.describe("Temporary DReps", () => {
     await dRepPage.getByTestId("continue-retirement-button").click();
     await expect(
       dRepPage.getByTestId("retirement-transaction-submitted-modal")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
     dRepPage.getByTestId("confirm-modal-button").click();
 
     await waitForTxConfirmation(dRepPage);

@@ -8,15 +8,18 @@ const formErrors = {
   dRepName: [
     "max-80-characters-error",
     "this-field-is-required-error",
-    "nickname-can-not-contain-whitespaces-error",
+    "no-spaces-allowed-error",
   ],
   email: "invalid-email-address-error",
   link: "invalid-url-error",
+  paymentAddress: "invalid-payment-address-error",
 };
 
 export default class DRepForm {
   readonly continueBtn = this.form.getByTestId("continue-button");
   readonly addLinkBtn = this.form.getByTestId("add-link-button");
+  readonly registerBtn = this.form.getByTestId("register-button");
+  readonly submitBtn = this.form.getByTestId("submit-button");
   readonly metadataDownloadBtn = this.form.getByTestId(
     "metadata-download-button"
   );
@@ -27,6 +30,10 @@ export default class DRepForm {
   readonly bioInput = this.form.getByTestId("bio-input");
   readonly linkInput = this.form.getByTestId("link-1-input");
   readonly metadataUrlInput = this.form.getByTestId("metadata-url-input");
+  readonly objectivesInput = this.form.getByTestId("objectives-input");
+  readonly motivationsInput = this.form.getByTestId("motivations-input");
+  readonly qualificationsInput = this.form.getByTestId("qualifications-input");
+  readonly paymentAddressInput = this.form.getByTestId("payment-address-input");
 
   constructor(private readonly form: Page) {}
 
@@ -38,12 +45,19 @@ export default class DRepForm {
   async registerWithoutTxConfirmation(dRepInfo: IDRepInfo) {
     await this.nameInput.fill(dRepInfo.name);
 
-    if (dRepInfo.email != null) {
-      await this.emailInput.fill(dRepInfo.email);
+    if (dRepInfo.objectives != null) {
+      await this.objectivesInput.fill(dRepInfo.objectives);
     }
-    if (dRepInfo.bio != null) {
-      await this.bioInput.fill(dRepInfo.bio);
+    if (dRepInfo.motivations != null) {
+      await this.motivationsInput.fill(dRepInfo.motivations);
     }
+    if (dRepInfo.qualifications != null) {
+      await this.qualificationsInput.fill(dRepInfo.qualifications);
+    }
+    if (dRepInfo.paymentAddress != null) {
+      await this.paymentAddressInput.fill(dRepInfo.paymentAddress);
+    }
+
     if (dRepInfo.extraContentLinks != null) {
       for (let i = 0; i < dRepInfo.extraContentLinks.length; i++) {
         if (i > 0) {
@@ -54,7 +68,7 @@ export default class DRepForm {
     }
     await this.continueBtn.click();
     await this.form.getByRole("checkbox").click();
-    await this.continueBtn.click();
+    await this.registerBtn.click();
 
     this.metadataDownloadBtn.click();
     const dRepMetadata = await this.downloadVoteMetadata();
@@ -64,7 +78,7 @@ export default class DRepForm {
     );
 
     await this.metadataUrlInput.fill(url);
-    await this.form.getByTestId("register-button").click();
+    await this.submitBtn.click();
   }
 
   async downloadVoteMetadata() {
@@ -72,30 +86,42 @@ export default class DRepForm {
     return downloadMetadata(download);
   }
 
-  async validateForm(name: string, email: string, bio: string, link: string) {
-    await this.nameInput.fill(name);
-    await this.emailInput.fill(email);
-    await this.bioInput.fill(bio);
-    await this.linkInput.fill(link);
+  async validateForm(dRepInfo: IDRepInfo) {
+    await this.nameInput.fill(dRepInfo.name);
+    await this.objectivesInput.fill(dRepInfo.objectives);
+    await this.motivationsInput.fill(dRepInfo.motivations);
+    await this.qualificationsInput.fill(dRepInfo.qualifications);
+    await this.paymentAddressInput.fill(dRepInfo.paymentAddress);
+    await this.linkInput.fill(dRepInfo.extraContentLinks[0]);
 
     for (const err of formErrors.dRepName) {
       await expect(this.form.getByTestId(err)).toBeHidden();
     }
 
-    await expect(this.form.getByTestId(formErrors.email)).toBeHidden();
+    expect(await this.objectivesInput.textContent()).toEqual(
+      dRepInfo.objectives
+    );
 
-    expect(await this.bioInput.textContent()).toEqual(bio);
+    expect(await this.motivationsInput.textContent()).toEqual(
+      dRepInfo.motivations
+    );
+    expect(await this.qualificationsInput.textContent()).toEqual(
+      dRepInfo.qualifications
+    );
 
     await expect(this.form.getByTestId(formErrors.link)).toBeHidden();
+    await expect(this.form.getByTestId(formErrors.paymentAddress)).toBeHidden();
 
     await expect(this.continueBtn).toBeEnabled();
   }
 
-  async inValidateForm(name: string, email: string, bio: string, link: string) {
-    await this.nameInput.fill(name);
-    await this.emailInput.fill(email);
-    await this.bioInput.fill(bio);
-    await this.linkInput.fill(link);
+  async inValidateForm(dRepInfo: IDRepInfo) {
+    await this.nameInput.fill(dRepInfo.name);
+    await this.objectivesInput.fill(dRepInfo.objectives);
+    await this.motivationsInput.fill(dRepInfo.motivations);
+    await this.qualificationsInput.fill(dRepInfo.qualifications);
+    await this.paymentAddressInput.fill(dRepInfo.paymentAddress);
+    await this.linkInput.fill(dRepInfo.extraContentLinks[0]);
 
     function convertTestIdToText(testId: string) {
       let text = testId.replace("-error", "");
@@ -116,9 +142,19 @@ export default class DRepForm {
 
     expect(nameErrors.length).toEqual(1);
 
-    await expect(this.form.getByTestId(formErrors.email)).toBeVisible();
+    await expect(
+      this.form.getByTestId(formErrors.paymentAddress)
+    ).toBeVisible();
 
-    expect(await this.bioInput.textContent()).not.toEqual(bio);
+    expect(await this.objectivesInput.textContent()).not.toEqual(
+      dRepInfo.objectives
+    );
+    expect(await this.motivationsInput.textContent()).not.toEqual(
+      dRepInfo.qualifications
+    );
+    expect(await this.qualificationsInput.textContent()).not.toEqual(
+      dRepInfo.qualifications
+    );
 
     await expect(this.form.getByTestId(formErrors.link)).toBeVisible();
 

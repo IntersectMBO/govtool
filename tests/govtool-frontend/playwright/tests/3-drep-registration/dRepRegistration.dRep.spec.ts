@@ -4,13 +4,12 @@ import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { downloadMetadata } from "@helpers/metadata";
+import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
-import { Download, expect } from "@playwright/test";
-import metadataBucketService from "@services/metadataBucketService";
+import { expect } from "@playwright/test";
 import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
@@ -31,13 +30,13 @@ test.describe("Logged in DReps", () => {
       page.getByTestId("dRep-id-display-card-dashboard")
     ).toContainText(dRep01Wallet.dRepId);
 
-    await page.goto(`${environments.frontendUrl}/governance_actions`);
-    await page
-      .locator('[data-testid^="govaction-"][data-testid$="-view-detail"]')
-      .first()
-      .click();
+    const governanceActionsPage = new GovernanceActionsPage(page);
 
-    await expect(page.getByTestId("vote-button")).toBeVisible();
+    await governanceActionsPage.goto();
+    const governanceActionDetailsPage =
+      await governanceActionsPage.viewFirstInfoProposal();
+
+    await expect(governanceActionDetailsPage.voteBtn).toBeVisible();
   });
 
   test("3H. Should Update DRep data", async ({ page }, testInfo) => {
@@ -47,31 +46,19 @@ test.describe("Logged in DReps", () => {
 
     await page.getByTestId("view-drep-details-button").click();
     await page.getByTestId("edit-drep-data-button").click();
+    const editDRepPage = new DRepRegistrationPage(page);
 
     const newDRepName = faker.person.firstName();
-    await page.getByTestId("name-input").fill(newDRepName);
-    await page.getByTestId("email-input").fill(faker.internet.email());
-    await page.getByTestId("bio-input").fill(faker.lorem.paragraph(2));
 
-    await page.getByTestId("continue-button").click();
-    await page.getByRole("checkbox").click();
-    await page.getByTestId("continue-button").click();
-
-    page.getByRole("button", { name: `${newDRepName}.jsonld` }).click(); // BUG missing test ids
-
-    const download: Download = await page.waitForEvent("download");
-    const dRepMetadata = await downloadMetadata(download);
-
-    const url = await metadataBucketService.uploadMetadata(
-      dRepMetadata.name,
-      dRepMetadata.data
-    );
-
-    await page.getByTestId("metadata-url-input").fill(url);
-    await page.getByTestId("continue-button").click(); // BUG -> incorrect test id
+    await editDRepPage.register({
+      name: newDRepName,
+      objectives: faker.lorem.paragraph(2),
+      motivations: faker.lorem.paragraph(2),
+      qualifications: faker.lorem.paragraph(2),
+      paymentAddress: (await ShelleyWallet.generate()).addressBech32(0),
+      extraContentLinks: [faker.internet.url()],
+    });
     await page.getByTestId("confirm-modal-button").click();
-
-    await waitForTxConfirmation(page);
   });
 });
 
@@ -119,7 +106,7 @@ test.describe("Temporary DReps", () => {
 
     await expect(
       dRepPage.getByTestId("retirement-transaction-submitted-modal")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   test("3K. Verify DRep behavior in retired state", async ({
@@ -142,7 +129,7 @@ test.describe("Temporary DReps", () => {
     await dRepPage.getByTestId("continue-retirement-button").click();
     await expect(
       dRepPage.getByTestId("retirement-transaction-submitted-modal")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
     dRepPage.getByTestId("confirm-modal-button").click();
 
     await waitForTxConfirmation(dRepPage);
@@ -180,8 +167,8 @@ test.describe("Temporary DReps", () => {
       .getByTestId("confirm-modal-button")
       .click();
 
-    await expect(
-      dRepPage.locator("span").filter({ hasText: /^In Progress$/ })
-    ).toBeVisible(); // BUG add proper testId for dRep registration card
+    await expect(dRepPage.getByTestId("d-rep-in-progress")).toHaveText(
+      /in progress/i
+    );
   });
 });

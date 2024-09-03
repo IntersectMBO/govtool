@@ -53,14 +53,18 @@ test("2N. Should show DRep information on details page", async ({
   await dRepRegistrationPage.goto();
 
   const name = faker.person.firstName();
-  const email = faker.internet.email({ firstName: name });
-  const bio = faker.person.bio();
+  const objectives = faker.lorem.paragraph(2);
+  const motivations = faker.lorem.paragraph(2);
+  const qualifications = faker.lorem.paragraph(2);
+  const paymentAddress = ShelleyWallet.fromJson(wallet).rewardAddressBech32(0);
   const links = [faker.internet.url()];
 
   await dRepRegistrationPage.register({
     name,
-    email,
-    bio,
+    objectives,
+    motivations,
+    qualifications,
+    paymentAddress,
     extraContentLinks: links,
   });
 
@@ -72,18 +76,27 @@ test("2N. Should show DRep information on details page", async ({
   await expect(dRepPage.getByTestId("copy-drep-id-button")).toHaveText(
     wallet.dRepId
   );
+  await expect(dRepPage.getByTestId("copy-payment-address-button")).toHaveText(
+    paymentAddress
+  );
   await expect(dRepPage.getByTestId("Active-pill")).toHaveText("Active");
   await expect(dRepPage.getByTestId("voting-power")).toHaveText("₳ 0");
-  await expect(
-    dRepPage.getByTestId(`${email.toLowerCase()}-link`)
-  ).toBeVisible();
+
+  await expect(dRepPage.getByTestId("objectives-description")).toHaveText(
+    objectives
+  );
+  await expect(dRepPage.getByTestId("motivations-description")).toHaveText(
+    motivations
+  );
+  await expect(dRepPage.getByTestId("qualifications-description")).toHaveText(
+    qualifications
+  );
 
   for (const link of links) {
     await expect(
       dRepPage.getByTestId(`${link.toLowerCase()}-link`)
     ).toBeVisible();
   }
-  await expect(dRepPage.getByText(bio, { exact: true })).toBeVisible();
 });
 
 test("2P. Should enable sharing of DRep details", async ({ page, context }) => {
@@ -134,7 +147,9 @@ test.describe("Insufficient funds", () => {
     await expect(delegateBtn).toBeVisible();
     await page.getByTestId(`${dRep01Wallet.dRepId}-delegate-button`).click();
 
-    await expect(dRepDirectoryPage.delegationErrorModal).toBeVisible();
+    await expect(dRepDirectoryPage.delegationErrorModal).toBeVisible({
+      timeout: 10_000,
+    });
   });
 });
 

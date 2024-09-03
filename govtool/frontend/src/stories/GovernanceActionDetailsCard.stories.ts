@@ -3,7 +3,11 @@ import { GovernanceActionDetailsCard } from "@organisms";
 import { expect, jest } from "@storybook/jest";
 import type { Meta, StoryObj } from "@storybook/react";
 import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
-import { formatDisplayDate, getProposalTypeNoEmptySpaces } from "@/utils";
+import {
+  formatDisplayDate,
+  getFullGovActionId,
+  getProposalTypeNoEmptySpaces,
+} from "@/utils";
 import { GovernanceActionType } from "@/types/governanceAction";
 
 const meta = {
@@ -50,7 +54,10 @@ const commonArgs = {
   } satisfies ProposalData,
 };
 
-const govActionId = commonArgs.proposal.index + commonArgs.proposal.txHash;
+const govActionId = getFullGovActionId(
+  commonArgs.proposal.txHash,
+  commonArgs.proposal.index,
+);
 
 async function assertTooltip(tooltip: HTMLElement, expectedText: RegExp) {
   await userEvent.hover(tooltip);

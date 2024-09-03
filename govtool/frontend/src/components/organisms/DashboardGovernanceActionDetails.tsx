@@ -47,6 +47,7 @@ export const DashboardGovernanceActionDetails = () => {
     !state?.proposal || !state?.vote,
   );
   const proposal = (data ?? state)?.proposal;
+  const vote = (data ?? state)?.vote;
 
   return (
     <Box
@@ -79,7 +80,7 @@ export const DashboardGovernanceActionDetails = () => {
               : PATHS.dashboardGovernanceActions,
             {
               state: {
-                isVotedListOnLoad: !!(state && state.vote),
+                isVotedListOnLoad: !!vote,
               },
             },
           )
@@ -109,13 +110,10 @@ export const DashboardGovernanceActionDetails = () => {
         ) : proposal ? (
           <GovernanceActionDetailsCard
             proposal={proposal}
+            vote={vote}
             isVoter={
               voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
             }
-            voteFromEP={data?.vote?.vote}
-            voteUrlFromEP={data?.vote?.url}
-            voteDateFromEP={data?.vote?.date}
-            voteEpochNoFromEP={data?.vote?.epochNo}
             isDataMissing={proposal.metadataStatus ?? null}
             isInProgress={
               pendingTransaction.vote?.resourceId ===

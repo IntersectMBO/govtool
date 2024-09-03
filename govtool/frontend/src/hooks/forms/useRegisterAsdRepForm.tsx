@@ -109,10 +109,9 @@ export const useRegisterAsdRepForm = (
       ],
       standardReference: CIP_119,
     });
-
     const jsonld = await generateJsonld(body, DREP_CONTEXT, CIP_119);
 
-    const jsonHash = blake2bHex(JSON.stringify(jsonld), undefined, 32);
+    const jsonHash = blake2bHex(JSON.stringify(jsonld, null, 2), undefined, 32);
 
     setHash(jsonHash);
     setJson(jsonld);

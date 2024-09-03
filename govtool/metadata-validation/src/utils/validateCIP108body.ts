@@ -1,15 +1,6 @@
-import * as Joi from 'joi';
-
 import { MetadataValidationStatus } from '@/enums';
 
 import { getFieldValue } from './getFieldValue';
-
-const CIP108FieldRules = {
-  title: Joi.string().allow('').max(80),
-  abstract: Joi.string().allow('').max(2500),
-  motivation: Joi.string().allow(''),
-  rationale: Joi.string().allow(''),
-};
 
 /**
  * Validates the body of a CIP108 standard.
@@ -23,15 +14,12 @@ export const validateCIP108body = (body: Record<string, unknown>) => {
   const abstract = getFieldValue(body, 'abstract');
   const motivation = getFieldValue(body, 'motivation');
   const rationale = getFieldValue(body, 'rationale');
-
-  try {
-    CIP108FieldRules.title.validate(title);
-    CIP108FieldRules.abstract.validate(abstract);
-    CIP108FieldRules.motivation.validate(motivation);
-    CIP108FieldRules.rationale.validate(rationale);
-
-    return true;
-  } catch (error) {
+  if (!title || !abstract || !motivation || !rationale) {
     throw MetadataValidationStatus.INCORRECT_FORMAT;
   }
+  if (String(title).length > 80 || String(abstract).length > 2500) {
+    throw MetadataValidationStatus.INCORRECT_FORMAT;
+  }
+
+  return true;
 };

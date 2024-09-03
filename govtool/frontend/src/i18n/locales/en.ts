@@ -507,9 +507,9 @@ export const en = {
       },
     },
     hero: {
-      connectWallet: "Connect your wallet",
+      connectWallet: "Connect your wallet to start",
       description:
-        "Anyone with a wallet containing ADA can participate in governance on Cardano.\n\nYour ADA balance entitles you to an equal amount of Voting Power.\n\nFor more info see the guide entry for <0>Voting Power</0>.",
+        "Cardano Governance lets ADA holders have a say in the network's future.\n\nYou can vote directly, find someone to represent you, or become a representative for others.\n\nYou can also propose changes in the network yourself, put these up for discussion and eventually, a vote.\n\n<0>Learn more about governance</0> in the guide, or have a look around the app and see Cardano Governance in action.",
       headline: "Cardano \n Governance Tool",
     },
     home: {

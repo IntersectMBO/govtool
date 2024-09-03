@@ -1,16 +1,17 @@
 import asyncio
 import json
 import math
-from typing import Any, Dict
+from typing import Any, Dict, Literal
 
 import httpx
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Header
 
 from app.cors import add_cors
 from app.funds import (check_balance_and_fund_wallets, get_ada_balance,
                        get_protocol_params)
 from app.http_utils import get_client
 from app.models import MultipleProposal
+from app.network import get_api_url
 from app.settings import settings
 from app.transaction import (get_base_proposal_for_multiple,
                              get_default_transaction,
@@ -27,13 +28,14 @@ add_cors(app)
 async def submit_multiple_proposals(
     multi_proposal: MultipleProposal,
     client: httpx.AsyncClient = Depends(get_client),
+    network: str = Header(...)
 ):
     required_proposals = multi_proposal.no_of_proposals
     base_proposal = get_base_proposal_for_multiple()
 
     supported_proposals_in_single_tx = 50
     maximum_supported_proposals = 10000
-    pparams = await get_protocol_params(client)
+    pparams = await get_protocol_params(client, network)
 
     if required_proposals <= supported_proposals_in_single_tx:
         tx = await submit_proposal_tx(
@@ -42,6 +44,7 @@ async def submit_multiple_proposals(
             | get_proposal_data_from_type(multi_proposal.proposal_type, pparams),
             required_proposals,
             client,
+            network
         )
         return [{"proposal_count": required_proposals, "tx_hash": tx}]
     elif required_proposals <= maximum_supported_proposals:
@@ -75,6 +78,7 @@ async def submit_multiple_proposals(
             supported_proposals_in_single_tx,
             per_proposal_deposit,
             client,
+            network
         )
 
         proposals_numbers_in_last_tx = (
@@ -95,6 +99,7 @@ async def submit_multiple_proposals(
                     if wallet != required_wallets[-1]
                     else proposals_numbers_in_last_tx,
                     client,
+                    network
                 )
                 for wallet in required_wallets
             ]
@@ -113,14 +118,16 @@ async def submit_multiple_proposals(
 
 
 @app.get("/api/balance")
-async def getWalletBalance(client: httpx.AsyncClient = Depends(get_client)):
-    return await get_ada_balance(main_wallet["address"], client)
+async def getWalletBalance(client: httpx.AsyncClient = Depends(get_client),
+                           network: str = Header(...)):
+    return await get_ada_balance(main_wallet["address"], client,  network)
 
 
 @app.post("/api/load/single")
 async def submit_single_proposal(
     proposal: Dict[str, Any],
     client: httpx.AsyncClient = Depends(get_client),
+    network: str = Header(...)
 ):
     default_transaction = get_default_transaction()
     default_proposal_data = default_transaction["proposals"][0]
@@ -129,8 +136,7 @@ async def submit_single_proposal(
 
     if "withdraw" in combined_proposal or "parameterupdate" in combined_proposal:
             combined_proposal["script"] = get_gov_script()
-
-    tx_url = settings.kuber_api_url + "/api/v1/tx?submit=true"
+    tx_url = get_api_url(network) + "/api/v1/tx?submit=true"
     kuber_response = await client.post(
         tx_url,
         json=default_transaction,

@@ -10,6 +10,7 @@ from typing import Any, Dict
 
 from fastapi import HTTPException
 
+from app.network import get_api_url
 from app.settings import settings
 
 main_wallet = {
@@ -206,9 +207,9 @@ def filter_updatable_paramKeys(keys):
     return [x for x in keys if x in updatable_keys]
 
 
-async def submit_tx(tx, client, submit=True):
+async def submit_tx(tx, client, network, submit=True):
     submit_query = "?submit=true" if submit else ""
-    tx_url = settings.kuber_api_url + "/api/v1/tx" + submit_query
+    tx_url = get_api_url(network) + "/api/v1/tx" + submit_query
     response = await client.post(
         tx_url,
         json=tx,
@@ -225,7 +226,7 @@ async def submit_tx(tx, client, submit=True):
         raise HTTPException(status_code=response.status_code, detail=response.text)
 
 
-async def submit_proposal_tx(wallet, proposal, proposal_numbers, client):
+async def submit_proposal_tx(wallet, proposal, proposal_numbers, client, network):
     proposals = [
         {
             **proposal,
@@ -240,4 +241,4 @@ async def submit_proposal_tx(wallet, proposal, proposal_numbers, client):
         "selections": [wallet["address"], wallet["skey"]],
         "proposals": proposals,
     }
-    return await submit_tx(tx, client)
+    return await submit_tx(tx, client, network)

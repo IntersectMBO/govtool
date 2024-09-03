@@ -36,8 +36,7 @@ describe('AppService', () => {
   it('should validate metadata correctly', async () => {
     const url = 'http://example.com';
     const hash = 'correctHash';
-    const standard = MetadataStandard.CIP108;
-    const validateMetadataDTO: ValidateMetadataDTO = { hash, url, standard };
+    const validateMetadataDTO: ValidateMetadataDTO = { hash, url };
     const data = {
       body: 'testBody',
       headers: {},
@@ -65,8 +64,14 @@ describe('AppService', () => {
       valid: true,
       metadata: parsedMetadata,
     });
-    expect(validateMetadataStandard).toHaveBeenCalledWith(data, standard);
-    expect(parseMetadata).toHaveBeenCalledWith(data.body, standard);
+    expect(validateMetadataStandard).toHaveBeenCalledWith(
+      data,
+      MetadataStandard.CIP108,
+    );
+    expect(parseMetadata).toHaveBeenCalledWith(
+      data.body,
+      MetadataStandard.CIP108,
+    );
   });
 
   it('should handle URL_NOT_FOUND error', async () => {
@@ -92,8 +97,7 @@ describe('AppService', () => {
   it('should handle INVALID_HASH error', async () => {
     const url = 'http://example.com';
     const hash = 'incorrectHash';
-    const standard = MetadataStandard.CIP108;
-    const validateMetadataDTO: ValidateMetadataDTO = { hash, url, standard };
+    const validateMetadataDTO: ValidateMetadataDTO = { hash, url };
     const data = {
       body: 'testBody',
     };

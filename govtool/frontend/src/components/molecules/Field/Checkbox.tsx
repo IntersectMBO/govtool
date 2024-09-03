@@ -1,6 +1,11 @@
 import { Box } from "@mui/material";
 
-import { Checkbox as CheckboxBase, FormErrorMessage, Typography } from "@atoms";
+import {
+  Checkbox as CheckboxBase,
+  FormErrorMessage,
+  FormHelpfulText,
+  Typography,
+} from "@atoms";
 
 import { useCallback } from "react";
 import { CheckboxFieldProps } from "./types";
@@ -8,6 +13,8 @@ import { CheckboxFieldProps } from "./types";
 export const Checkbox = ({
   errorMessage,
   errorStyles,
+  helpfulText,
+  helpfulTextStyle,
   label,
   labelStyles,
   layoutStyles,
@@ -26,8 +33,9 @@ export const Checkbox = ({
         sx={{
           alignItems: "center",
           cursor: "pointer",
-          display: "flex",
-          flexDirection: "row",
+          display: "grid",
+          gridTemplateColumns: "auto 1fr",
+          gridTemplateAreas: '"checkbox label" ". helpfulText"',
           width: "fit-content",
         }}
       >
@@ -41,6 +49,11 @@ export const Checkbox = ({
             {label}
           </Typography>
         )}
+        <FormHelpfulText
+          helpfulText={helpfulText}
+          helpfulTextStyle={helpfulTextStyle}
+          sx={{ gridArea: "helpfulText" }}
+        />
       </Box>
       <FormErrorMessage errorMessage={errorMessage} errorStyles={errorStyles} />
     </Box>

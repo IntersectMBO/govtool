@@ -7,17 +7,14 @@ import {
   GovernanceActionDetailsCardVotes,
 } from "@molecules";
 import { GovernanceActionDetailsCardData } from "@organisms";
-import { MetadataValidationStatus, ProposalData } from "@models";
+import { MetadataValidationStatus, ProposalData, ProposalVote } from "@models";
 
 type GovernanceActionDetailsCardProps = {
   isDashboard?: boolean;
   isDataMissing: null | MetadataValidationStatus;
   isInProgress?: boolean;
   isVoter?: boolean;
-  voteDateFromEP?: string;
-  voteEpochNoFromEP?: number;
-  voteFromEP?: string;
-  voteUrlFromEP?: string;
+  vote?: ProposalVote;
   proposal: ProposalData;
 };
 
@@ -26,10 +23,7 @@ export const GovernanceActionDetailsCard = ({
   isDataMissing,
   isInProgress,
   isVoter,
-  voteDateFromEP,
-  voteEpochNoFromEP,
-  voteFromEP,
-  voteUrlFromEP,
+  vote,
   proposal,
 }: GovernanceActionDetailsCardProps) => {
   const [isVoteSubmitted, setIsVoteSubmitted] = useState<boolean>(false);
@@ -73,10 +67,7 @@ export const GovernanceActionDetailsCard = ({
       <GovernanceActionDetailsCardVotes
         setIsVoteSubmitted={setIsVoteSubmitted}
         isVoter={isVoter}
-        voteFromEP={voteFromEP}
-        voteUrlFromEP={voteUrlFromEP}
-        voteDateFromEP={voteDateFromEP}
-        voteEpochNoFromEP={voteEpochNoFromEP}
+        vote={vote}
         isDashboard={isDashboard}
         isOneColumn={isOneColumn}
         isInProgress={isInProgress}

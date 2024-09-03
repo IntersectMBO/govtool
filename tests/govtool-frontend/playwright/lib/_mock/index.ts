@@ -114,37 +114,56 @@ export const valid = {
 
     return username;
   },
-  metadata: () => ({
+
+  url: () => {
+    const choice = faker.number.int({ min: 1, max: 2 });
+    // Generate a random CID using a UUID
+    const prefix = "Qm";
+    const randomBase58 = faker.string.alphanumeric(44); // 44 characters to follow the Qm prefix
+    const randomCID = prefix + randomBase58;
+
+    if (choice === 1) {
+      return faker.internet.url();
+    }
+    return `ipfs://${randomCID}`;
+  },
+
+  metadata: (paymentAddress: string) => ({
     "@context": {
-      "@language": "en-us",
       CIP100:
         "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#",
-      CIPQQQ:
-        "https://github.com/cardano-foundation/CIPs/blob/master/CIP-QQQ/README.md#",
+      CIP119:
+        "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0119/README.md#",
       hashAlgorithm: "CIP100:hashAlgorithm",
       body: {
-        "@id": "CIPQQQ:body",
+        "@id": "CIP119:body",
         "@context": {
           references: {
-            "@id": "CIPQQQ:references",
+            "@id": "CIP119:references",
             "@container": "@set",
             "@context": {
               GovernanceMetadata: "CIP100:GovernanceMetadataReference",
+              Identity: "CIP100:IdentityReference",
+              Link: "CIP100:LinkReference",
               Other: "CIP100:OtherReference",
               label: "CIP100:reference-label",
               uri: "CIP100:reference-uri",
               referenceHash: {
-                "@id": "CIPQQQ:referenceHash",
+                "@id": "CIP119:referenceHash",
                 "@context": {
-                  hashDigest: "CIPQQQ:hashDigest",
+                  hashDigest: "CIP119:hashDigest",
                   hashAlgorithm: "CIP100:hashAlgorithm",
                 },
               },
             },
           },
-          dRepName: "CIPQQQ:dRepName",
-          bio: "CIPQQQ:bio",
-          email: "CIPQQQ:email",
+          paymentAddress: "CIP119:paymentAddress",
+          givenName: "CIP119:givenName",
+          image: "CIP119:image",
+          objectives: "CIP119:objectives",
+          motivations: "CIP119:motivations",
+          qualifications: "CIP119:qualifications",
+          doNotList: "CIP119:doNotList",
         },
       },
       authors: {
@@ -164,28 +183,18 @@ export const valid = {
       },
     },
     authors: [],
-    hashAlgorithm: {
-      "@value": "blake2b-256",
-    },
+    hashAlgorithm: "blake2b-256",
     body: {
-      bio: {
-        "@value": faker.lorem.sentences(),
-      },
-      dRepName: {
-        "@value": faker.person.firstName(),
-      },
-      email: {
-        "@value": faker.internet.email(),
-      },
+      givenName: faker.person.firstName(),
+      motivations: faker.lorem.paragraph(2),
+      objectives: faker.lorem.paragraph(2),
+      paymentAddress: paymentAddress,
+      qualifications: faker.lorem.paragraph(2),
       references: [
         {
           "@type": "Other",
-          label: {
-            "@value": "Label",
-          },
-          uri: {
-            "@value": faker.internet.url(),
-          },
+          label: "Label",
+          uri: faker.internet.url(),
         },
       ],
     },

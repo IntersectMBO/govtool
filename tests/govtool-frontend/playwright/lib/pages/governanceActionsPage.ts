@@ -47,6 +47,17 @@ export default class GovernanceActionsPage {
     return new GovernanceActionDetailsPage(this.page);
   }
 
+  async viewFirstInfoProposal(): Promise<GovernanceActionDetailsPage> {
+    const treasuryWithdrawFirstCard = this.page
+      .getByTestId("govaction-InfoAction-card")
+      .first();
+    await treasuryWithdrawFirstCard
+      .locator('[data-testid^="govaction-"][data-testid$="-view-detail"]')
+      .first()
+      .click();
+    return new GovernanceActionDetailsPage(this.page);
+  }
+
   async viewVotedProposal(
     proposal: IProposal
   ): Promise<GovernanceActionDetailsPage> {

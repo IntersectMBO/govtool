@@ -1,4 +1,4 @@
-import { DRepData, DRepMetadata, DrepDataDTO, MetadataStandard } from "@/models";
+import { DRepData, DRepMetadata, DrepDataDTO } from "@/models";
 import { postValidate } from "@/services";
 
 export const mapDtoToDrep = async (dto: DrepDataDTO): Promise<DRepData> => {
@@ -17,10 +17,9 @@ export const mapDtoToDrep = async (dto: DrepDataDTO): Promise<DRepData> => {
 
   if (dto.metadataHash && dto.url) {
     const validationResponse = await postValidate<DRepMetadata>({
-        url: dto.url,
-        hash: dto.metadataHash,
-        standard: MetadataStandard.CIP119,
-      });
+      url: dto.url,
+      hash: dto.metadataHash,
+    });
     return {
       ...dto,
       ...emptyMetadata,

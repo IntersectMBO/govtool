@@ -74,15 +74,24 @@ export type NetworkMetrics = {
 };
 
 export type VoterInfo = {
-  isRegisteredAsDRep: boolean;
-  wasRegisteredAsDRep: boolean;
-  isRegisteredAsSoleVoter: boolean;
-  wasRegisteredAsSoleVoter: boolean;
-  deposit: number;
   dRepRegisterTxHash: string | null;
   dRepRetireTxHash: string | null;
+  deposit: number;
+  givenName: string | null;
+  imageHash: string | null;
+  imageUrl: string | null;
+  isRegisteredAsDRep: boolean;
+  isRegisteredAsSoleVoter: boolean;
+  motivations: string | null;
+  objectives: string | null;
+  paymentAddress: string | null;
+  qualifications: string | null;
   soleVoterRegisterTxHash: string | null;
   soleVoterRetireTxHash: string | null;
+  url: string | null;
+  votingPower: number | null;
+  wasRegisteredAsDRep: boolean;
+  wasRegisteredAsSoleVoter: boolean;
 };
 
 export enum DRepStatus {
@@ -117,7 +126,7 @@ export type DRepData = DrepDataDTO & {
   objectives: string | null;
   motivations: string | null;
   qualifications: string | null;
-  references: string[];
+  references: Reference[];
   doNotList: boolean;
   metadataStatus: MetadataValidationStatus | null;
   metadataValid: boolean;

@@ -17,6 +17,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
       errorStyles,
       helpfulText,
       helpfulTextStyle,
+      hideLabel,
       label,
       labelStyles,
       layoutStyles,
@@ -69,7 +70,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
         {label && (
           <Typography
             fontWeight={400}
-            sx={{ mb: 0.5 }}
+            sx={{ mb: 0.5, ...(hideLabel && { fontSize: 0, lineHeight: 0 }) }}
             variant="body2"
             {...labelStyles}
           >

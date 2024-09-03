@@ -5,6 +5,7 @@ import { FormHelpfulTextProps } from "./types";
 export const FormHelpfulText = ({
   helpfulText,
   helpfulTextStyle,
+  sx,
 }: FormHelpfulTextProps) =>
   helpfulText && (
     <Typography
@@ -12,7 +13,7 @@ export const FormHelpfulText = ({
       data-testid={`${helpfulText.replace(/\s+/g, "-").toLowerCase()}-error`}
       fontSize={12}
       fontWeight={400}
-      sx={{ mt: 0.5 }}
+      sx={{ mt: 0.5, ...sx }}
       {...helpfulTextStyle}
     >
       {helpfulText}

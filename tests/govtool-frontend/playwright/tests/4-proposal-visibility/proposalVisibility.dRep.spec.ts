@@ -103,17 +103,56 @@ test.describe("Check vote count", () => {
     await expect(
       page
         .getByText("yes₳")
-        .getByText(`₳ ${lovelaceToAda(proposalToCheck.yesVotes)}`)
+        .first()
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.dRepYesVotes)}`)
     ).toBeVisible();
     await expect(
       page
         .getByText("abstain₳")
-        .getByText(`₳ ${lovelaceToAda(proposalToCheck.abstainVotes)}`)
+        .first()
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.dRepAbstainVotes)}`)
     ).toBeVisible();
     await expect(
       page
         .getByText("no₳")
-        .getByText(`₳ ${lovelaceToAda(proposalToCheck.noVotes)}`)
+        .first()
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.dRepNoVotes)}`)
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText("yes₳")
+        .nth(1)
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.poolYesVotes)}`)
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText("abstain₳")
+        .nth(1)
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.poolAbstainVotes)}`)
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText("no₳")
+        .nth(1)
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.poolNoVotes)}`)
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText("yes₳")
+        .nth(2)
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.ccYesVotes)}`)
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText("abstain₳")
+        .nth(2)
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.ccAbstainVotes)}`)
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText("no₳")
+        .nth(2)
+        .getByText(`₳ ${lovelaceToAda(proposalToCheck.ccNoVotes)}`)
     ).toBeVisible();
   });
 });

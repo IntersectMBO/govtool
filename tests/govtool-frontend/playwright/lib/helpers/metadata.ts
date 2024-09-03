@@ -5,6 +5,7 @@ import metadataBucketService from "@services/metadataBucketService";
 const blake = require("blakejs");
 
 import * as fs from "fs";
+import { ShelleyWallet } from "./crypto";
 
 export async function downloadMetadata(download: Download): Promise<{
   name: string;
@@ -17,9 +18,10 @@ export async function downloadMetadata(download: Download): Promise<{
   return { name: download.suggestedFilename(), data: jsonData };
 }
 
-function calculateMetadataHash() {
+async function calculateMetadataHash() {
   try {
-    const data = JSON.stringify(mockValid.metadata());
+    const paymentAddress = (await ShelleyWallet.generate()).addressBech32(0);
+    const data = JSON.stringify(mockValid.metadata(paymentAddress));
 
     const buffer = Buffer.from(data, "utf8");
     const hexDigest = blake.blake2bHex(buffer, null, 32);
@@ -32,7 +34,7 @@ function calculateMetadataHash() {
 }
 
 export async function uploadMetadataAndGetJsonHash() {
-  const { hexDigest: dataHash, jsonData } = calculateMetadataHash();
+  const { hexDigest: dataHash, jsonData } = await calculateMetadataHash();
   const url = await metadataBucketService.uploadMetadata(
     faker.person.firstName(),
     jsonData

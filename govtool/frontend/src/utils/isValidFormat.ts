@@ -39,8 +39,11 @@ export async function isRewardAddress(address: string) {
   }
 }
 
-export async function isReceivingAddress(address: string) {
+export async function isReceivingAddress(address?: string) {
   try {
+    if (!address) {
+      return true;
+    }
     const receivingAddress = Address.from_bech32(address);
     return receivingAddress
       ? true

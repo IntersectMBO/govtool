@@ -4,18 +4,15 @@ import { Box } from "@mui/material";
 import { useScreenDimension } from "@hooks";
 import { VoteActionForm, VotesSubmitted } from "@molecules";
 import { useFeatureFlag } from "@/context";
-import { ProposalData } from "@/models";
+import { ProposalData, ProposalVote } from "@/models";
 
 type GovernanceActionCardVotesProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
   isOneColumn: boolean;
-  isVoter?: boolean;
-  voteFromEP?: string;
-  voteUrlFromEP?: string;
-  voteDateFromEP?: string;
-  voteEpochNoFromEP?: number;
   isDashboard?: boolean;
   isInProgress?: boolean;
+  isVoter?: boolean;
+  vote?: ProposalVote;
   proposal: ProposalData;
 };
 
@@ -23,10 +20,7 @@ export const GovernanceActionDetailsCardVotes = ({
   setIsVoteSubmitted,
   isOneColumn,
   isVoter,
-  voteFromEP,
-  voteUrlFromEP,
-  voteDateFromEP,
-  voteEpochNoFromEP,
+  vote,
   isDashboard,
   isInProgress,
   proposal: {
@@ -63,10 +57,7 @@ export const GovernanceActionDetailsCardVotes = ({
           setIsVoteSubmitted={setIsVoteSubmitted}
           expiryDate={expiryDate}
           expiryEpochNo={expiryEpochNo}
-          voteFromEP={voteFromEP ? voteFromEP.toLowerCase() : undefined}
-          voteUrlFromEP={voteUrlFromEP}
-          voteDateFromEP={voteDateFromEP}
-          voteEpochNoFromEP={voteEpochNoFromEP}
+          previousVote={vote}
           dRepAbstainVotes={dRepAbstainVotes}
           dRepNoVotes={dRepNoVotes}
           dRepYesVotes={dRepYesVotes}

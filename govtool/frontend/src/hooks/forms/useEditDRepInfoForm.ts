@@ -14,28 +14,20 @@ import {
 } from "@consts";
 import { useCardano, useModal, useAppContext } from "@context";
 import { downloadJson, generateJsonld, generateMetadataBody } from "@utils";
-import { MetadataStandard, MetadataValidationStatus } from "@models";
+import { MetadataValidationStatus } from "@models";
 import { useWalletErrorModal } from "@hooks";
+import { DRepDataFormValues } from "@/types/dRep";
 import { useValidateMutation } from "../mutations";
 
-export type EditDRepInfoValues = {
-  givenName: string;
-  objectives: string;
-  motivations: string;
-  qualifications: string;
-  paymentAddress: string;
-  references?: Array<{ uri: string }>;
-  storeData?: boolean;
-  storingURL: string;
-};
-
-export const defaultEditDRepInfoValues: EditDRepInfoValues = {
+export const defaultEditDRepInfoValues: DRepDataFormValues = {
+  doNotList: false,
   givenName: "",
   objectives: "",
   motivations: "",
   qualifications: "",
   paymentAddress: "",
-  references: [{ uri: "" }],
+  linkReferences: [{ "@type": "Link", uri: "", label: "" }],
+  identityReferences: [{ "@type": "Identity", uri: "", label: "" }],
   storeData: false,
   storingURL: "",
 };
@@ -68,10 +60,9 @@ export const useEditDRepInfoForm = (
     handleSubmit,
     formState: { errors, isValid },
     register,
-    resetField,
     reset,
     watch,
-  } = useFormContext<EditDRepInfoValues>();
+  } = useFormContext<DRepDataFormValues>();
   const givenName = watch("givenName");
   const isError = Object.keys(errors).length > 0;
 
@@ -89,15 +80,27 @@ export const useEditDRepInfoForm = (
 
   // Business Logic
   const generateMetadata = useCallback(async () => {
+    const { linkReferences, identityReferences, ...rest } = getValues();
     const body = generateMetadataBody({
-      data: getValues(),
-      acceptedKeys: ["givenName", "objectives", "motivations", "qualifications", "paymentAddress", "references"],
+      data: {
+        ...rest,
+        references: [...(linkReferences ?? []), ...(identityReferences ?? [])],
+      },
+      acceptedKeys: [
+        "givenName",
+        "objectives",
+        "motivations",
+        "qualifications",
+        "paymentAddress",
+        "references",
+        "doNotList",
+      ],
       standardReference: CIP_119,
     });
 
     const jsonld = await generateJsonld(body, DREP_CONTEXT, CIP_119);
 
-    const jsonHash = blake2bHex(JSON.stringify(jsonld), undefined, 32);
+    const jsonHash = blake2bHex(JSON.stringify(jsonld, null, 2), undefined, 32);
 
     setHash(jsonHash);
     setJson(jsonld);
@@ -137,7 +140,7 @@ export const useEditDRepInfoForm = (
   }, []);
 
   const onSubmit = useCallback(
-    async (data: EditDRepInfoValues) => {
+    async (data: DRepDataFormValues) => {
       const url = data.storingURL;
 
       try {
@@ -149,7 +152,6 @@ export const useEditDRepInfoForm = (
         const { status } = await validateMetadata({
           url,
           hash,
-          standard: MetadataStandard.CIP119,
         });
 
         if (status) {
@@ -204,7 +206,6 @@ export const useEditDRepInfoForm = (
     onClickDownloadJson,
     register,
     editDRepInfo: handleSubmit(onSubmit),
-    resetField,
     watch,
     reset,
   };

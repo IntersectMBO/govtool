@@ -6,11 +6,6 @@ export enum MetadataValidationStatus {
   INCORRECT_FORMAT = "INCORRECT_FORMAT",
 }
 
-export enum MetadataStandard {
-  CIP108 = "CIP108",
-  CIP119 = "CIP119",
-}
-
 export type ValidateMetadataResult<MetadataType> = {
   status?: MetadataValidationStatus;
   valid: boolean;
@@ -20,7 +15,6 @@ export type ValidateMetadataResult<MetadataType> = {
 export type MetadataValidationDTO = {
   url: string;
   hash: string;
-  standard?: MetadataStandard;
 };
 
 export type DRepMetadata = {
@@ -29,7 +23,7 @@ export type DRepMetadata = {
   objectives?: string;
   motivations?: string;
   qualifications?: string;
-  references?: string[];
+  references?: Reference[];
   doNotList?: boolean;
 };
 
@@ -39,4 +33,4 @@ export type ProposalMetadata = {
   rationale?: string;
   references?: string[];
   title?: string;
-}
+};

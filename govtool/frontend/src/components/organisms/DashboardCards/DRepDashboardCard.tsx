@@ -59,7 +59,15 @@ export const DRepDashboardCard = ({
           title: t("dashboard.cards.drep.dRepRegistration"),
         }),
         ...(pendingTransaction.retireAsDrep && {
-          description: (
+          description: voter?.givenName ? (
+            <Trans
+              i18nKey="dashboard.cards.drep.retirementInProgressWithGivenName"
+              values={{
+                deposit: correctAdaFormat(voter?.deposit),
+                name: voter?.givenName,
+              }}
+            />
+          ) : (
             <Trans
               i18nKey="dashboard.cards.drep.retirementInProgress"
               values={{ deposit: correctAdaFormat(voter?.deposit) }}
@@ -130,7 +138,12 @@ export const DRepDashboardCard = ({
     if (voter?.wasRegisteredAsDRep) {
       return {
         buttons: wasRegisteredOrNotRegisteredButtons,
-        description: (
+        description: voter?.givenName ? (
+          <Trans
+            i18nKey="dashboard.cards.drep.notRegisteredWasRegisteredDescriptionWithGivenName"
+            values={{ name: voter?.givenName }}
+          />
+        ) : (
           <Trans i18nKey="dashboard.cards.drep.notRegisteredWasRegisteredDescription" />
         ),
         transactionId: voter?.dRepRetireTxHash,

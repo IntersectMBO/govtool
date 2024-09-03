@@ -18,6 +18,7 @@ import {
   getProposalTypeLabel,
   filterUpdatableProtocolParams,
   filterOutNullParams,
+  getFullGovActionId,
 } from "@utils";
 import { MetadataValidationStatus, ProposalData } from "@models";
 import { GovernanceActionType } from "@/types/governanceAction";
@@ -125,10 +126,10 @@ export const GovernanceActionDetailsCardData = ({
   };
 
   const label = getProposalTypeLabel(type);
-  const govActionId = `${index}${txHash}`;
+  const govActionId = getFullGovActionId(txHash, index);
   const prevGovActionId =
     prevGovActionIndex && prevGovActionTxHash
-      ? `${prevGovActionIndex}${prevGovActionTxHash}`
+      ? getFullGovActionId(prevGovActionTxHash, prevGovActionIndex)
       : null;
 
   const tabs = useMemo(
@@ -144,7 +145,8 @@ export const GovernanceActionDetailsCardData = ({
               rationale={rationale}
             />
           ),
-          visible: !!abstract || !!motivation || !!rationale,
+          visible:
+            !isDataMissing && (!!abstract || !!motivation || !!rationale),
         },
         {
           label: "Parameters",
@@ -158,8 +160,7 @@ export const GovernanceActionDetailsCardData = ({
           visible:
             type === GovernanceActionType.ParameterChange &&
             !!protocolParams &&
-            !!epochParams &&
-            !isDataMissing,
+            !!epochParams,
         },
         {
           label: "Details",

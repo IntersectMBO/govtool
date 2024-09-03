@@ -22,7 +22,7 @@ import {
   PROTOCOL_PARAMS_KEY,
 } from "@utils";
 import { useWalletErrorModal } from "@hooks";
-import { MetadataStandard, MetadataValidationStatus } from "@models";
+import { MetadataValidationStatus } from "@models";
 import {
   GovernanceActionFieldSchemas,
   GovernanceActionType,
@@ -109,7 +109,7 @@ export const useCreateGovernanceActionForm = (
 
     const jsonld = await generateJsonld(body, GOVERNANCE_ACTION_CONTEXT);
 
-    const jsonHash = blake2bHex(JSON.stringify(jsonld), undefined, 32);
+    const jsonHash = blake2bHex(JSON.stringify(jsonld, null, 2), undefined, 32);
 
     // That allows to validate metadata hash
     setHash(jsonHash);
@@ -201,7 +201,6 @@ export const useCreateGovernanceActionForm = (
         const { status } = await validateMetadata({
           url: data.storingURL,
           hash,
-          standard: MetadataStandard.CIP108,
         });
 
         if (status) {

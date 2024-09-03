@@ -26,10 +26,17 @@ export interface IProposal {
   motivation: string | null;
   rationale: string | null;
   metadata: any;
-  references: any;
-  yesVotes: number;
-  noVotes: number;
-  abstainVotes: number;
+  dRepYesVotes: number;
+  dRepNoVotes: number;
+  dRepAbstainVotes: number;
+  poolYesVotes: number;
+  poolNoVotes: number;
+  poolAbstainVotes: number;
+  ccYesVotes: number;
+  ccNoVotes: number;
+  ccAbstainVotes: number;
+  prevGovActionIndex: null | number;
+  prevGovActionTxHash: null | string;
 }
 
 export type IVote = {
@@ -47,8 +54,10 @@ export type IVotedProposal = {
 
 export type IDRepInfo = {
   name: string;
-  email?: string;
-  bio?: string;
+  objectives?: string;
+  motivations?: string;
+  qualifications?: string;
+  paymentAddress?: string;
   extraContentLinks?: string[];
 };
 

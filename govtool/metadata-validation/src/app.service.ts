@@ -7,7 +7,7 @@ import * as jsonld from 'jsonld';
 
 import { ValidateMetadataDTO } from '@dto';
 import { LoggerMessage, MetadataValidationStatus } from '@enums';
-import { validateMetadataStandard, parseMetadata } from '@utils';
+import { validateMetadataStandard, parseMetadata, getStandard } from '@utils';
 import { ValidateMetadataResult } from '@types';
 
 const axiosConfig: AxiosRequestConfig = {
@@ -23,7 +23,6 @@ export class AppService {
   async validateMetadata({
     hash,
     url,
-    standard,
   }: ValidateMetadataDTO): Promise<ValidateMetadataResult> {
     let status: MetadataValidationStatus;
     let metadata: Record<string, unknown>;
@@ -38,9 +37,15 @@ export class AppService {
         ),
       );
 
+      if (!data?.body) {
+        throw MetadataValidationStatus.INCORRECT_FORMAT;
+      }
+
+      const standard = getStandard(data);
+
       if (standard) {
-        await validateMetadataStandard(data, standard);
-        metadata = parseMetadata(data.body, standard);
+        await validateMetadataStandard(data.body, standard);
+        metadata = parseMetadata(data.body);
       }
 
       const hashedMetadata = blake.blake2bHex(

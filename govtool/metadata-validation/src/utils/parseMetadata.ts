@@ -10,6 +10,7 @@ const CIP_119_VALUE_KEYS = [
   'objectives',
   'motivations',
   'qualifications',
+  'references',
   'doNotList',
 ];
 export const parseMetadata = (
@@ -38,11 +39,6 @@ export const parseMetadata = (
       for (const [key, value] of Object.entries(metadata)) {
         if (CIP_119_VALUE_KEYS.includes(key)) {
           parsedMetadata[key] = value;
-        }
-        if (key === 'references') {
-          parsedMetadata[key] = (Array.isArray(value) ? value : [])?.map(
-            (reference) => reference?.uri,
-          );
         }
       }
       return parsedMetadata;

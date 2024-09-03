@@ -29,7 +29,7 @@ export type DRepMetadata = {
   objectives?: string;
   motivations?: string;
   qualifications?: string;
-  references?: string[];
+  references?: Reference[];
   doNotList?: boolean;
 };
 

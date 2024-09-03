@@ -13,6 +13,7 @@ export * from "./DataMissingHeader";
 export * from "./DataMissingInfoBox";
 export * from "./DelegationAction";
 export * from "./DRepInfoCard";
+export * from "./DRepDataForm";
 export * from "./EmptyStateDrepDirectory";
 export * from "./EmptyStateGovernanceActionsCategory";
 export * from "./Field";

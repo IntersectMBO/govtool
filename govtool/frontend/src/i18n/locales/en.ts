@@ -360,26 +360,41 @@ export const en = {
           "To change the Governance Action Type go back to the previous page.",
       },
       dRepData: {
-        givenName: "Given Name",
+        givenName: "DRep Name",
+        givenNameHelpfulText: "This is the name that will be shown on your DRep profile",
         objectives: "Objectives",
-        objectivesPlaceholder: "Tell others what you want to achieve...",
         objectivesHelpfulText:
-          "A short description of your beliefs and goals as a DRep",
+          "What you believe and what you want to achieve as a DRep.",
         motivations: "Motivations",
-        motivationsPlaceholder: "Describe what motivates you...",
         motivationsHelpfulText:
-          "A short description of why you want to be a DRep, what personal and professional experiences you have had that have driven you to register",
+          "Why do you want to be a DRep, what personal and professional experiences do you want to share.",
         qualifications: "Qualifications",
-        qualificationsPlaceholder: "List your qualifications...",
         qualificationsHelpfulText:
-          "Key qualifications you hold that are relevant to your role as a DRep",
+          "List any qualifications that are relevant to your role as a DRep",
         paymentAddress: "Payment Address",
-        paymentAddressPlaceholder:
-          "addr1vpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5eg0yu80w",
-        doNotList: "Do not list",
+        paymentAddressHelpfulText:
+          "An address for DReps to receive payments. Only one address can be entered.",
+        doNotList: "Do Not List",
         doNotListHelpfulText:
-          "Check this box if you do not want to show up in Govtool DRep Directory or in similar tools",
-      },
+          "Check this box if you do not want to be listed in DRep directories/compilations. If you tick this, you will not have a listing in the DRep listing on GovTool.",
+        referenceTypes: {
+          link: {
+            title: "Links",
+            description:
+              "Links to social media or any other web URL that gives a fuller picture of who you are, what you stand for, and why.",
+          },
+          identity: {
+            title: "Identity",
+            description:
+              "Identity links are a way to prove you are who you say you are. Ideally, you will provide a link to a place that shows your DRep ID clearly. The limit is 8 links in total.",
+          },
+        },
+        references: "References",
+        referenceDescription: "Description",
+        referenceDescriptionHelpfulText:
+          "Limit: 80 characters",
+        referenceURL: "URL",
+        },
       errors: {
         tooLongUrl: "Url must be less than 128 bytes",
         mustBeStakeAddress: "It must be reward address in bech32 format",
@@ -625,18 +640,16 @@ export const en = {
           "GovTool will read the URL that you supplied and make a check to see if it’s identical with the information that you entered on the form.",
       },
     },
-    editMetadata: {
-      pageTitle: "Edit DRep Info",
+    dRepData: {
       aboutYou: "About You",
-      aboutYouDescription:
-        "Some extra info about you to provide context to delegators.",
-      dRepName: "DRep Name",
+      dRepName: "Name",
       dRepNameDescription:
         "This is the name that will be displayed in the DRep Directory and it will be used also by delegators to find your profile.",
-      linksDescription: "Links to extra content or social media contacts ",
-      maximumLinks: "(maximum of {{numberOfLinks}} entries)",
       optional: "optional",
       required: "required",
+    },
+    editMetadata: {
+      pageTitle: "Edit DRep Info",
       storeDataCheckboxLabel:
         "I agree to store correctly this information and to maintain them over the years",
       storeDataLink: "Learn more about storing information",
@@ -659,9 +672,6 @@ export const en = {
       },
     },
     registration: {
-      aboutYou: "About You",
-      aboutYouDescription:
-        "Some extra info about you to provide context to delegators.",
       addInformationDescription:
         "You can include extra information about yourself by adding a URL and its hash.",
       addInformationTitle: "Add Information",
@@ -674,15 +684,8 @@ export const en = {
       becomeADRep: "Become a DRep",
       descriptionStepTwo:
         "By clicking register you create your DRep ID within your wallet and become a DRep.\n\nOnce the registration has completed your DRep ID will be shown on your dashboard. You will be able to share your DRep ID so that other ada holders can delegate their voting power to you.",
-      dRepName: "DRep Name",
-      dRepNameDescription:
-        "This is the name that will be displayed in the DRep Directory and it will be used also by delegators to find your profile.",
       headingStepTwo: "Confirm DRep registration",
-      linksDescription: "Links to extra content or social media contacts ",
-      maximumLinks: "(maximum of {{numberOfLinks}} entries)",
-      optional: "optional",
       register: "Register",
-      required: "required",
       rolesAndResponsibilitiesDescription:
         "DReps are fundamental users that govern the Cardano network. This is an important role which requires work and dedication to fulfil.\n\nA DRep is expected to actively participate in governance and act as a representative of other Cardano members in  governance matters. Therefore, DReps will be expected to keep abreast of Governance Actions so they can make informed and wise decisions.\n<0>Learn More</0> about DRep.\n\nPlease register as a DRep if you have time to dedicate to making Cardano a better and more well-governed place.\n\nBecoming a DRep will require a refundable deposit of ₳<strong>{{deposit}}</strong>.\n\nYou will be refunded your deposit when you retire.",
       rolesAndResponsibilitiesTitle: "Roles & Responsibilities",

@@ -35,7 +35,6 @@ export const parseMetadata = (
       return parsedMetadata;
 
     case MetadataStandard.CIP119:
-      console.log({ metadataRaw: metadata });
       for (const [key, value] of Object.entries(metadata)) {
         if (CIP_119_VALUE_KEYS.includes(key)) {
           parsedMetadata[key] = value;

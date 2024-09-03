@@ -3,6 +3,7 @@ import { catchError, firstValueFrom, timeout } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import * as blake from 'blakejs';
 import { AxiosRequestConfig } from 'axios';
+import * as jsonld from 'jsonld';
 
 import { ValidateMetadataDTO } from '@dto';
 import { LoggerMessage, MetadataValidationStatus } from '@enums';
@@ -49,7 +50,21 @@ export class AppService {
       );
 
       if (hashedMetadata !== hash) {
-        throw MetadataValidationStatus.INVALID_HASH;
+        // Optional support for the canonized data hash
+        // Validate canonized data hash
+        const canonizedMetadata = await jsonld.canonize(data, {
+          safe: false,
+        });
+
+        const hashedCanonizedMetadata = blake.blake2bHex(
+          canonizedMetadata,
+          undefined,
+          32,
+        );
+
+        if (hashedCanonizedMetadata !== hash) {
+          throw MetadataValidationStatus.INVALID_HASH;
+        }
       }
     } catch (error) {
       Logger.error(LoggerMessage.METADATA_VALIDATION_ERROR, error);

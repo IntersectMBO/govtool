@@ -136,7 +136,6 @@ test.describe("User Snap", () => {
     ).toBeVisible();
     await expect(page.getByPlaceholder("Your feedback")).toBeVisible();
     await expect(page.getByText("Drag & drop or Browse")).toBeVisible();
-    await expect(page.getByPlaceholder("someone@something.com")).toBeVisible();
     await expect(page.getByLabel("Take screenshot")).toBeVisible();
     await expect(page.getByLabel("Record")).toBeVisible();
     await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
@@ -155,10 +154,14 @@ test.describe("User Snap", () => {
     await expect(
       page.getByPlaceholder("Example: New navigation")
     ).toBeVisible();
-    await expect(page.getByLabel("Any additional details")).toBeVisible();
+    await expect(
+      page.getByPlaceholder("Example: New navigation")
+    ).toBeVisible();
     await expect(page.getByLabel("Any additional details")).toBeVisible();
     await expect(page.getByText("Drag & drop or Browse")).toBeVisible();
-    await expect(page.getByPlaceholder("someone@something.com")).toBeVisible();
+    await expect(
+      page.getByLabel("Please summarize your idea or")
+    ).toBeVisible();
     await expect(page.getByLabel("Take screenshot")).toBeVisible();
     await expect(page.getByLabel("Record")).toBeVisible();
     await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
@@ -188,9 +191,6 @@ test.describe("User Snap", () => {
         .getByPlaceholder("Your feedback")
         .fill(faker.lorem.paragraph(2));
       await page.setInputFiles(attachmentInputSelector, [mockAttachmentPath]);
-      await page
-        .getByPlaceholder("someone@something.com")
-        .fill(faker.internet.email());
 
       await page.getByRole("button", { name: "Submit" }).click();
 
@@ -221,9 +221,6 @@ test.describe("User Snap", () => {
         .getByLabel("Any additional details")
         .fill(faker.lorem.paragraph(2));
       await page.setInputFiles(attachmentInputSelector, [mockAttachmentPath]);
-      await page
-        .getByPlaceholder("someone@something.com")
-        .fill(faker.internet.email());
 
       await page.getByRole("button", { name: "Submit" }).click();
 

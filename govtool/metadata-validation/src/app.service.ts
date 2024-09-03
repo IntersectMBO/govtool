@@ -38,7 +38,12 @@ export class AppService {
         ),
       );
 
-      const parsedData = JSON.parse(rawData);
+      let parsedData;
+      try {
+        parsedData = JSON.parse(rawData);
+      } catch (error) {
+        throw MetadataValidationStatus.INCORRECT_FORMAT;
+      }
 
       if (!parsedData?.body) {
         throw MetadataValidationStatus.INCORRECT_FORMAT;

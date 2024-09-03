@@ -85,7 +85,9 @@ export const en = {
           reRegister: "Re-register as a DRep",
           retire: "Retire as a DRep",
           retirementInProgress:
-            "You are being retired as <strong>MrDRep</strong>. You will receive a refund of <strong>{{deposit}} ADA</strong> when the transaction  completes.",
+            "You are being retired. You will receive a refund of <strong>{{deposit}} ADA</strong> when the transaction  completes.",
+          retirementInProgressWithGivenName:
+            "You are being retired as <strong>{{givenName}}</strong>. You will receive a refund of <strong>{{deposit}} ADA</strong> when the transaction  completes.",
           viewDetails: "View your DRep details",
           youAreRegistered: "You are Registered as a DRep",
           yourDRepId: "Your DRep ID",
@@ -361,7 +363,8 @@ export const en = {
       },
       dRepData: {
         givenName: "DRep Name",
-        givenNameHelpfulText: "This is the name that will be shown on your DRep profile",
+        givenNameHelpfulText:
+          "This is the name that will be shown on your DRep profile",
         objectives: "Objectives",
         objectivesHelpfulText:
           "What you believe and what you want to achieve as a DRep.",
@@ -391,10 +394,9 @@ export const en = {
         },
         references: "References",
         referenceDescription: "Description",
-        referenceDescriptionHelpfulText:
-          "Limit: 80 characters",
+        referenceDescriptionHelpfulText: "Limit: 80 characters",
         referenceURL: "URL",
-        },
+      },
       errors: {
         tooLongUrl: "Url must be less than 128 bytes",
         mustBeStakeAddress: "It must be reward address in bech32 format",

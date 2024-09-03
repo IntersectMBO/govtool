@@ -37,6 +37,8 @@ changes.
 - Change copy to Cardano GovTool [Issue 1852](https://github.com/IntersectMBO/govtool/issues/1852)
 - Replace mocked MrDRep label in DRep retired card with given name if exists, or make the description more neutral if the given name is not provided [Issue 1887](https://github.com/IntersectMBO/govtool/issues/1887)
 - Change home page hero copy [Issue 1903](https://github.com/IntersectMBO/govtool/issues/1903)
+- Bump cardano-node to 9.1.1 [Issue 1895](https://github.com/IntersectMBO/govtool/issues/1895)
+- Bump cardano-db-sync 13.5.0.1 [Issue 1906](https://github.com/IntersectMBO/govtool/issues/1906)
 
 ## [sancho-v1.0.14](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.14) 2024-08-26
 

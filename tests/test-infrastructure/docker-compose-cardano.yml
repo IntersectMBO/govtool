@@ -84,7 +84,7 @@ services:
         condition: on-failure
         delay: 15s
   kuber:
-    image: dquadrant/kuber:4c3c5230db9a9b8ac84487fbc11ccd28b0cd5917-amd64
+    image: dquadrant/kuber:3.1.0
     environment:
       CARDANO_NODE_SOCKET_PATH: /ipc/node.socket
       VIRTUAL_HOST: https://kuber-${BASE_DOMAIN}

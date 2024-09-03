@@ -14,7 +14,7 @@ import {
 } from "@consts";
 import { useCardano, useModal, useAppContext } from "@context";
 import { downloadJson, generateJsonld, generateMetadataBody } from "@utils";
-import { MetadataStandard, MetadataValidationStatus } from "@models";
+import { MetadataValidationStatus } from "@models";
 import { useWalletErrorModal } from "@hooks";
 import { DRepDataFormValues } from "@/types/dRep";
 import { useValidateMutation } from "../mutations";
@@ -152,7 +152,6 @@ export const useEditDRepInfoForm = (
         const { status } = await validateMetadata({
           url,
           hash,
-          standard: MetadataStandard.CIP119,
         });
 
         if (status) {

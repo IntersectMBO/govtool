@@ -102,7 +102,7 @@ test("4C_2. Should sort Governance Action Type on governance actions page", asyn
 
   await govActionsPage.sortAndValidate(
     SortOption.HighestYesVotes,
-    (p1, p2) => p1.yesVotes >= p2.yesVotes
+    (p1, p2) => p1.dRepYesVotes >= p2.dRepYesVotes
   );
 });
 

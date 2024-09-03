@@ -145,7 +145,8 @@ export const GovernanceActionDetailsCardData = ({
               rationale={rationale}
             />
           ),
-          visible: !!abstract || !!motivation || !!rationale,
+          visible:
+            !isDataMissing && (!!abstract || !!motivation || !!rationale),
         },
         {
           label: "Parameters",

@@ -12,6 +12,24 @@ changes.
 
 ### Added
 
+-
+
+### Fixed
+
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [sancho-v1.0.15](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.15) 2024-09-03
+
+### Added
+
 - Add missing test DRep Details test IDs [Issue 1863](https://github.com/IntersectMBO/govtool/issues/1863)
 - Add missing system banners test IDs [Issue 1839](https://github.com/IntersectMBO/govtool/issues/1839)
 

@@ -78,12 +78,11 @@ export default {
       },
       timeoutId: null,
       fetchInterval: 7000,
-      loading: false
+      loading: true
     }
   },
   methods: {
     async updateBalance() {
-      this.loading = true;
       try {
         const response = await getBalance(this.selectedNetwork)
         if (response.data?.address) {
@@ -94,8 +93,8 @@ export default {
       } catch (error) {
         console.error('Error updating balance:', error)
       } finally {
-        this.loading = false;
         this.timeoutId = setTimeout(this.updateBalance, this.fetchInterval)
+        this.loading = false;
       }
     },
   },
@@ -104,7 +103,9 @@ export default {
       if (this.timeoutId) {
         clearTimeout(this.timeoutId)
       }
+      this.loading = true;
       this.updateBalance()
+
     },
   },
 }

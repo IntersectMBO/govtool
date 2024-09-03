@@ -135,6 +135,7 @@ async def submit_single_proposal(
     default_transaction["proposals"][0] = combined_proposal
 
     if "withdraw" in combined_proposal or "parameterupdate" in combined_proposal:
+        if combined_proposal["script"]["cborHex"] == "":
             combined_proposal["script"] = get_gov_script()
     tx_url = get_api_url(network) + "/api/v1/tx?submit=true"
     kuber_response = await client.post(

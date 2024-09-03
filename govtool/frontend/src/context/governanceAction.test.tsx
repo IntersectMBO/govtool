@@ -80,7 +80,7 @@ describe("GovernanceActionProvider", () => {
           const hash = await createHash(jsonld!);
           expect(hash).toBeDefined();
           expect(hash).toBe(
-            "bbdbbe163d1b8e4d6c10180df515cc7d58109412d90a42e898fc66850b3fc98c",
+            "72b37e2f5e64e7de57b85558ba00885c848f700fbb37fbed3197e603873fa976",
           );
         };
         test();

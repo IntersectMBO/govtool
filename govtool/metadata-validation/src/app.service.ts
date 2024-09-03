@@ -14,6 +14,7 @@ const axiosConfig: AxiosRequestConfig = {
   timeout: 5000,
   maxContentLength: 10 * 1024 * 1024, // Max content length 10MB
   maxBodyLength: 10 * 1024 * 1024, // Max body length 10MB
+  responseType: 'text',
 };
 
 @Injectable()
@@ -28,7 +29,7 @@ export class AppService {
     let metadata: Record<string, unknown>;
 
     try {
-      const { data } = await firstValueFrom(
+      const { data: rawData } = await firstValueFrom(
         this.httpService.get(url, axiosConfig).pipe(
           timeout(5000),
           catchError(() => {
@@ -37,38 +38,49 @@ export class AppService {
         ),
       );
 
-      if (!data?.body) {
+      let parsedData;
+      try {
+        parsedData = JSON.parse(rawData);
+      } catch (error) {
         throw MetadataValidationStatus.INCORRECT_FORMAT;
       }
 
-      const standard = getStandard(data);
-
-      if (standard) {
-        await validateMetadataStandard(data.body, standard);
-        metadata = parseMetadata(data.body);
+      if (!parsedData?.body) {
+        throw MetadataValidationStatus.INCORRECT_FORMAT;
       }
 
-      const hashedMetadata = blake.blake2bHex(
-        JSON.stringify(data),
-        undefined,
-        32,
-      );
+      const standard = getStandard(parsedData);
+
+      if (standard) {
+        await validateMetadataStandard(parsedData.body, standard);
+        metadata = parseMetadata(parsedData.body);
+      }
+
+      const hashedMetadata = blake.blake2bHex(rawData, undefined, 32);
 
       if (hashedMetadata !== hash) {
-        // Optional support for the canonized data hash
-        // Validate canonized data hash
-        const canonizedMetadata = await jsonld.canonize(data, {
-          safe: false,
-        });
-
-        const hashedCanonizedMetadata = blake.blake2bHex(
-          canonizedMetadata,
+        // Optionally validate on a parsed metadata
+        const hashedParsedMetadata = blake.blake2bHex(
+          JSON.stringify(parsedData),
           undefined,
           32,
         );
+        if (hashedParsedMetadata !== hash) {
+          // Optional support for the canonized data hash
+          // Validate canonized data hash
+          const canonizedMetadata = await jsonld.canonize(JSON.parse(rawData), {
+            safe: false,
+          });
 
-        if (hashedCanonizedMetadata !== hash) {
-          throw MetadataValidationStatus.INVALID_HASH;
+          const hashedCanonizedMetadata = blake.blake2bHex(
+            canonizedMetadata,
+            undefined,
+            32,
+          );
+
+          if (hashedCanonizedMetadata !== hash) {
+            throw MetadataValidationStatus.INVALID_HASH;
+          }
         }
       }
     } catch (error) {

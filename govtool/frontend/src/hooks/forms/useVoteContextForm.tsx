@@ -47,7 +47,7 @@ export const useVoteContextForm = (
     });
     const jsonld = await generateJsonld(body, CIP_100_CONTEXT, CIP_100);
 
-    const jsonHash = blake2bHex(JSON.stringify(jsonld), undefined, 32);
+    const jsonHash = blake2bHex(JSON.stringify(jsonld, null, 2), undefined, 32);
 
     // That allows to validate metadata hash
     setHash(jsonHash);

@@ -264,6 +264,12 @@ import config from '../config'
             type="number"></v-text-field>
           <v-text-field class="protocolField" label="DRep Activity" v-model="DRepActivity" variant="outlined"
             type="number"></v-text-field>
+          <v-tooltip text="Required" location="top">
+            <template v-slot:activator="{ props }">
+              <span class="text-h6 mb-2">Guardrail Script</span>
+            </template>
+          </v-tooltip>
+          <v-text-field label="CBOR Hex" v-model="guardrailScript" variant="outlined"></v-text-field>
         </div>
 
         <!-- Submit button -->

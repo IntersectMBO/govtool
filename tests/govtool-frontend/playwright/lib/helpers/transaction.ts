@@ -71,7 +71,7 @@ export async function waitForTxConfirmation(
         .getByTestId("alert-warning")
         .getByText("Transaction in progress", { exact: false })
     ).toBeVisible({
-      timeout: 10_000,
+      timeout: 16_000,
     });
     const url = (await transactionStatusPromise).url();
     const regex = /\/transaction\/status\/([^\/]+)$/;

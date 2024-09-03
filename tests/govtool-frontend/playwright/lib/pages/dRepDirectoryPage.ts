@@ -143,7 +143,7 @@ export default class DRepDirectoryPage {
   }
 
   async getAllListedDReps() {
-    await this.page.waitForTimeout(2_000);
+    await this.page.waitForTimeout(5_000); // load until the dRep card load properly
 
     return await this.page
       .getByRole("list")

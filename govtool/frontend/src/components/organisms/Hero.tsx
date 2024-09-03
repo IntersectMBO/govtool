@@ -33,8 +33,7 @@ export const Hero = () => {
     return screenWidth / 11;
   }, [screenWidth]);
 
-  const onClickVotingPower = () =>
-    openInNewTab("https://docs.gov.tools/faqs/what-is-voting-power");
+  const onClickVotingPower = () => openInNewTab("https://docs.gov.tools");
 
   return (
     <Box
@@ -58,7 +57,7 @@ export const Hero = () => {
         <Typography
           fontWeight={400}
           sx={{
-            maxWidth: 630,
+            maxWidth: 725,
             my: 4,
             whiteSpace: "pre-line",
           }}

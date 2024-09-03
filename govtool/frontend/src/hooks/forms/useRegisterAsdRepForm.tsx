@@ -22,26 +22,18 @@ import {
 } from "@utils";
 
 import { useGetVoterInfo, useWalletErrorModal } from "@hooks";
+import { DRepDataFormValues } from "@/types/dRep";
 import { useValidateMutation } from "../mutations";
 
-export type RegisterAsDRepValues = {
-  givenName: string;
-  objectives: string;
-  motivations: string;
-  qualifications: string;
-  paymentAddress: string;
-  references?: Array<{ uri: string }>;
-  storeData?: boolean;
-  storingURL: string;
-};
-
-export const defaultRegisterAsDRepValues: RegisterAsDRepValues = {
+export const defaultRegisterAsDRepValues: DRepDataFormValues = {
+  doNotList: false,
   givenName: "",
   objectives: "",
   motivations: "",
   qualifications: "",
   paymentAddress: "",
-  references: [{ uri: "" }],
+  linkReferences: [{ "@type": "Link", uri: "", label: "" }],
+  identityReferences: [{ "@type": "Identity", uri: "", label: "" }],
   storeData: false,
   storingURL: "",
 };
@@ -81,9 +73,8 @@ export const useRegisterAsdRepForm = (
     handleSubmit,
     formState: { errors, isValid },
     register,
-    resetField,
     watch,
-  } = useFormContext<RegisterAsDRepValues>();
+  } = useFormContext<DRepDataFormValues>();
 
   const givenName = watch("givenName");
   const isError = Object.keys(errors).length > 0;
@@ -102,8 +93,12 @@ export const useRegisterAsdRepForm = (
 
   // Business Logic
   const generateMetadata = useCallback(async () => {
+    const { linkReferences, identityReferences, ...rest } = getValues();
     const body = generateMetadataBody({
-      data: getValues(),
+      data: {
+        ...rest,
+        references: [...(linkReferences ?? []), ...(identityReferences ?? [])],
+      },
       acceptedKeys: [
         "givenName",
         "objectives",
@@ -132,15 +127,15 @@ export const useRegisterAsdRepForm = (
   };
 
   const createRegistrationCert = useCallback(
-    async (data: RegisterAsDRepValues) => {
+    async (data: DRepDataFormValues) => {
       if (!hash) return;
-      const url = data.storingURL;
+      const uri = data.storingURL;
       try {
         const certBuilder = await buildVoteDelegationCert(dRepID);
 
         const registerCert = voter?.isRegisteredAsSoleVoter
-          ? await buildDRepUpdateCert(url, hash)
-          : await buildDRepRegCert(url, hash);
+          ? await buildDRepUpdateCert(uri, hash)
+          : await buildDRepRegCert(uri, hash);
 
         certBuilder.add(registerCert);
 
@@ -186,7 +181,7 @@ export const useRegisterAsdRepForm = (
   }, []);
 
   const onSubmit = useCallback(
-    async (data: RegisterAsDRepValues) => {
+    async (data: DRepDataFormValues) => {
       try {
         if (!hash) throw MetadataValidationStatus.INVALID_HASH;
 
@@ -250,7 +245,6 @@ export const useRegisterAsdRepForm = (
     onClickDownloadJson,
     register,
     registerAsDrep: handleSubmit(onSubmit),
-    resetField,
     watch,
   };
 };

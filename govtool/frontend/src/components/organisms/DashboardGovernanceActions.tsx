@@ -134,7 +134,7 @@ export const DashboardGovernanceActions = () => {
                 value={content}
                 indicatorColor="secondary"
                 onChange={handleChange}
-                aria-label="basic tabs example"
+                aria-label="Governance Actions tabs"
               >
                 <StyledTab
                   data-testid="to-vote-tab"

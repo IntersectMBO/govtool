@@ -13,6 +13,7 @@ changes.
 ### Added
 
 - Add missing test DRep Details test IDs [Issue 1863](https://github.com/IntersectMBO/govtool/issues/1863)
+- Add missing system banners test IDs [Issue 1839](https://github.com/IntersectMBO/govtool/issues/1839)
 
 ### Fixed
 
@@ -23,6 +24,10 @@ changes.
 - Fix voting on info actions in bootstrapping phase [Issue 1876](https://github.com/IntersectMBO/govtool/issues/1876)
 - Fix missing DRep name whitespace validation [Issue 1873](https://github.com/IntersectMBO/govtool/issues/1873)
 - Fix displaying wrongly formatted Governance Action ID [Issue 1866](https://github.com/IntersectMBO/govtool/issues/1866k)
+- Make payment address optional in DRep registration and edit form [Issue 1871](https://github.com/IntersectMBO/govtool/issues/1871)
+- Fix displaying wrongly formatted Governance Action ID [Issue 1866](https://github.com/IntersectMBO/govtool/issues/1866)
+- Fix displaying the proper Governance Action Details on renavigating between pages
+- Fix displaying protocol params Governance Action details when metadata validation fails [Issue 1889](https://github.com/IntersectMBO/govtool/issues/1889)
 
 ### Changed
 
@@ -30,6 +35,11 @@ changes.
 - Bump @intersect.mbo/pdf-ui to v0.3.8
 - Change logo to Cardano GovTool [Issue 1851](https://github.com/IntersectMBO/govtool/issues/1851)
 - Change copy to Cardano GovTool [Issue 1852](https://github.com/IntersectMBO/govtool/issues/1852)
+- Replace mocked MrDRep label in DRep retired card with given name if exists, or make the description more neutral if the given name is not provided [Issue 1887](https://github.com/IntersectMBO/govtool/issues/1887)
+- Change home page hero copy [Issue 1903](https://github.com/IntersectMBO/govtool/issues/1903)
+- Bump cardano-node to 9.1.1 [Issue 1895](https://github.com/IntersectMBO/govtool/issues/1895)
+- Bump cardano-db-sync 13.5.0.1 [Issue 1906](https://github.com/IntersectMBO/govtool/issues/1906)
+- Adjust CIP119 support to match final designs [Issue 1850](https://github.com/IntersectMBO/govtool/issues/1850)
 
 ## [sancho-v1.0.14](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.14) 2024-08-26
 

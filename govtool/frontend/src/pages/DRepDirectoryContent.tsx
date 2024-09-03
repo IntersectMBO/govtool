@@ -98,12 +98,12 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   const ada = correctAdaFormat(votingPower);
 
-  const dRepsWithoutYourself = dRepList?.filter(
-    (dRep) => !isSameDRep(dRep, myDRepId),
+  const listedDRepsWithoutYourself = dRepList?.filter(
+    (dRep) => !dRep.doNotList && !isSameDRep(dRep, myDRepId),
   );
   const dRepListToDisplay = yourselfDRep
-    ? [yourselfDRep, ...dRepsWithoutYourself]
-    : dRepList;
+    ? [yourselfDRep, ...listedDRepsWithoutYourself]
+    : listedDRepsWithoutYourself;
 
   const inProgressDelegationDRepData = dRepListToDisplay.find(
     (dRep) =>

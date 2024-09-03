@@ -11,7 +11,7 @@ import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
-import { invalid } from "@mock/index";
+import { invalid, valid as mockValid } from "@mock/index";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
@@ -239,9 +239,7 @@ test.describe("Proposal created logged state", () => {
       }) => {
         test.slow(); // Brute-force testing with 100 random data
         for (let i = 0; i < 50; i++) {
-          await proposalSubmissionPage.metadataUrlInput.fill(
-            faker.internet.url()
-          );
+          await proposalSubmissionPage.metadataUrlInput.fill(mockValid.url());
           await expect(page.getByTestId("url-input-error-text")).toBeHidden();
         }
       });

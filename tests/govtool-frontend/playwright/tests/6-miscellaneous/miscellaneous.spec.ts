@@ -234,7 +234,7 @@ test("6S. Should Warn users that they are in bootstrapping phase via banner", as
   page,
   context,
 }) => {
-  await page.route("**/api/epoch/params", async (route) => {
+  await page.route("**/epoch/params", async (route) => {
     // Fetch the original response from the server
     const response = await route.fetch();
     const json = await response.json();
@@ -248,22 +248,22 @@ test("6S. Should Warn users that they are in bootstrapping phase via banner", as
     });
   });
 
-  const responsePromise = page.waitForResponse("**/api/epoch/params");
+  const responsePromise = page.waitForResponse("**/epoch/params");
   await page.goto("/");
 
   await responsePromise;
 
-  await expect(page.getByText("Govtool is in the")).toBeVisible();
+  await expect(page.getByTestId("system-bootstrapping-warning")).toBeVisible();
 
   const [bootstrap] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByRole("link", { name: "Learn more" }).click(),
+    page.getByTestId("system-bootstrapping-warning-link").click(),
   ]);
   await expect(bootstrap).toHaveURL(BOOTSTRAP_DOC_URL);
 });
 
 test("6T. Should display proper network name", async ({ page }) => {
-  await page.route("**/api/network/metrics", async (route) => {
+  await page.route("**/network/metrics", async (route) => {
     // Fetch the original response from the server
     const response = await route.fetch();
     const json = await response.json();
@@ -278,11 +278,11 @@ test("6T. Should display proper network name", async ({ page }) => {
       body: JSON.stringify(json),
     });
   });
-  const responsePromise = page.waitForResponse("**/api/network/metrics");
+  const responsePromise = page.waitForResponse("**/network/metrics");
   await page.goto("/");
 
   const response = await responsePromise;
   const responseBody = await response.json();
 
-  await expect(page.getByText(responseBody["networkName"])).toBeVisible();
+  await expect((await page.getByTestId("system-network-name").innerText()).toLowerCase()).toBe(responseBody["networkName"].toLowerCase())
 });

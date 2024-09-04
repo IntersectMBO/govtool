@@ -4,7 +4,7 @@ describe("correctAdaFormat", () => {
   const LOVELACE = 1000000;
   const DECIMALS = 6;
 
-  it("converts lovelace to ADA for a given number", () => {
+  it("converts lovelace to ada for a given number", () => {
     const lovelace = 15000000;
     const expectedAda = 15;
     expect(correctAdaFormat(lovelace)).toBe(expectedAda);

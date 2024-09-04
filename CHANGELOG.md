@@ -26,6 +26,22 @@ changes.
 
 -
 
+## [sancho-v1.0.16](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.16) 2024-09-04
+
+### Fixed
+
+- Fix incorrect documentation link for "Learn More" button on proposal [Issue 1877](https://github.com/IntersectMBO/govtool/issues/1877)
+- Fix getVotes sql to query time from vote tx instead of govAaction tx [Issue 1925](https://github.com/IntersectMBO/govtool/issues/1925)
+- Map references from validation service to format expected by FE [Issue 1924](https://github.com/IntersectMBO/govtool/issues/1924)
+
+### Changed
+
+- Change the spelling of ADA to Ada or ada [Issue 1916](https://github.com/IntersectMBO/govtool/issues/1916)
+
+### Removed
+
+-
+
 ## [sancho-v1.0.15](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.15) 2024-09-03
 
 ### Added

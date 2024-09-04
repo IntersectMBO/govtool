@@ -41,8 +41,6 @@ test.describe("Filter and sort proposals", () => {
   test("8B_1. Should filter the list of proposed governance actions.", async () => {
     test.slow();
 
-    await proposalDiscussionPage.filterBtn.click();
-
     // unselect active proposal
     await proposalDiscussionPage.activeProposalWrapper.click();
 

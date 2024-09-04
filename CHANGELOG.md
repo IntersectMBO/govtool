@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Fix incorrect documentation link for "Learn More" button on proposal [Issue 1877](https://github.com/IntersectMBO/govtool/issues/1877)
+- Fix getVotes sql to query time from vote tx instead of govAaction tx [Issue 1925](https://github.com/IntersectMBO/govtool/issues/1925)
 
 ### Changed
 

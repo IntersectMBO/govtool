@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix incorrect documentation link for "Learn More" button on proposal [Issue 1877](https://github.com/IntersectMBO/govtool/issues/1877)
 
 ### Changed
 

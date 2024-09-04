@@ -91,12 +91,16 @@ def generate_quorom():
     return {"numerator": numerator, "denominator": denomintor}
 
 
-def generate_hardfork():
-    majorProtocolNum = random.randint(1, 9)
-    minorProtocolNum = random.randint(1, 9)
+def generate_hardfork(current_pParams):
+    protocol_version = [current_pParams["protocolVersion"]["major"], 
+                        current_pParams["protocolVersion"]["minor"]]
+
+    # Randomly select an index (0 for major, 1 for minor) and increment it
+    protocol_version[random.randint(0, 1)] += 1
+
     return {
         "hardfork": {
-            "protocolVersion": {"major": majorProtocolNum, "minor": minorProtocolNum}
+            "protocolVersion": {"major": protocol_version[0], "minor": protocol_version[1]}
         }
     }
 
@@ -149,7 +153,7 @@ def get_proposal_data_from_type(proposal_type, current_pParams):
                 }
             }
         case "hardfork":
-            return generate_hardfork()
+            return generate_hardfork(current_pParams)
         case "update-parameters":
             # read current protocol parameters from json
             # get one of the keys of the pp

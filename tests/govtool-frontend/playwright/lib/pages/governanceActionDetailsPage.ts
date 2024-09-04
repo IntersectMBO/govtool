@@ -80,6 +80,6 @@ export default class GovernanceActionDetailsPage {
   @withTxConfirmation
   async reVote() {
     await this.noVoteRadio.click();
-    await this.changeVoteBtn.click();
+    await this.voteBtn.click();
   }
 }

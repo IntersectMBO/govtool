@@ -142,7 +142,9 @@ export default class GovernanceActionsPage {
       }
     });
 
-    await this.page.waitForTimeout(4_000); // wait for proposals to render
+    await expect(
+      this.page.getByRole("progressbar").getByRole("img")
+    ).toBeHidden({ timeout: 10_000 });
 
     // Frontend validation
     for (let dIdx = 0; dIdx <= proposalsByType.length - 1; dIdx++) {

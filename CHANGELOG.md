@@ -20,7 +20,7 @@ changes.
 
 ### Changed
 
--
+- Change the spelling of ADA to Ada or ada [Issue 1916](https://github.com/IntersectMBO/govtool/issues/1916)
 
 ### Removed
 

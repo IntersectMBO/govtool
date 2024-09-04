@@ -552,7 +552,7 @@ const CardanoProvider = (props: Props) => {
           walletState.changeAddress,
         );
 
-        // Add output of 1 ADA to the address of our wallet
+        // Add output of 1 ada to the address of our wallet
         let outputValue = BigNum.from_str("1000000");
 
         if (

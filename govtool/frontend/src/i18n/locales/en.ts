@@ -67,7 +67,7 @@ export const en = {
           metadataUpdateInProgress:
             "The update DRep metadata is ongoing. This may take several minutes.",
           notRegisteredDescription:
-            "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
+            "Accept delegated voting power from other Ada holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
           notRegisteredTitle: "Become a DRep",
           notRegisteredWasRegisteredDescriptionWithGivenName:
             "You are now retired and your listing in the DRep directory as <strong>{{givenName}}</strong> has been marked as <strong><i>retired</i></strong>. You cannot vote on Governance Actions as <strong>{{givenName}}</strong>.\n\nYou can always re-register as a DRep, in which case you will have the same DRep ID as you had initially.",
@@ -85,9 +85,9 @@ export const en = {
           reRegister: "Re-register as a DRep",
           retire: "Retire as a DRep",
           retirementInProgress:
-            "You are being retired. You will receive a refund of <strong>{{deposit}} ADA</strong> when the transaction  completes.",
+            "You are being retired. You will receive a refund of <strong>{{deposit}} ada</strong> when the transaction  completes.",
           retirementInProgressWithGivenName:
-            "You are being retired as <strong>{{givenName}}</strong>. You will receive a refund of <strong>{{deposit}} ADA</strong> when the transaction  completes.",
+            "You are being retired as <strong>{{givenName}}</strong>. You will receive a refund of <strong>{{deposit}} ada</strong> when the transaction  completes.",
           viewDetails: "View your DRep details",
           youAreRegistered: "You are Registered as a DRep",
           yourDRepId: "Your DRep ID",
@@ -294,7 +294,7 @@ export const en = {
       checkIsWalletConnected: "Check if the wallet is connected.",
       dRepIdNotFound: "DrepId not found",
       insufficientBalanceDescription:
-        "To submit a Governance Action, you will be required to post a refundable balance of ₳{{ada}}. You do not currently have enough ADA in your wallet to continue.",
+        "To submit a Governance Action, you will be required to post a refundable balance of ₳{{ada}}. You do not currently have enough ada in your wallet to continue.",
       insufficientBalanceTitle: "Insufficient Balance",
       invalidGovernanceActionType: "Invalid Governance Action Type",
       invalidTreasuryGovernanceActionType: "Invalid Treasury Governance Action",
@@ -526,7 +526,7 @@ export const en = {
     hero: {
       connectWallet: "Connect your wallet to start",
       description:
-        "Cardano Governance lets ADA holders have a say in the network's future.\n\nYou can vote directly, find someone to represent you, or become a representative for others.\n\nYou can also propose changes in the network yourself, put these up for discussion and eventually, a vote.\n\n<0>Learn more about governance</0> in the guide, or have a look around the app and see Cardano Governance in action.",
+        "Cardano Governance lets Ada holders have a say in the network's future.\n\nYou can vote directly, find someone to represent you, or become a representative for others.\n\nYou can also propose changes in the network yourself, put these up for discussion and eventually, a vote.\n\n<0>Learn more about governance</0> in the guide, or have a look around the app and see Cardano Governance in action.",
       headline: "Cardano \n Governance Tool",
     },
     home: {
@@ -549,7 +549,7 @@ export const en = {
         },
         registerAsDRep: {
           description:
-            "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
+            "Accept delegated voting power from other Ada holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
           firstButtonLabel: "Connect to Register",
           title: "Become a DRep",
         },
@@ -723,7 +723,7 @@ export const en = {
       retireAsDrep: "Retire as a Drep",
       whatRetirementMeansTitle: "What Retirement Means",
       whatRetirementMeansDescription:
-        "By retiring you are giving up your voting rights. Voting Power that is delegated to you will remain in place.\n\nADA Holders that have delegated to be able to see that you are retired in the DRep directory. They will be able to re-delegate their Voting Power to another DRep.\n\nYou can still participate in Governance by proposing Governance Actions, by delegating your personal Voting Power to another DRep, or by coming out of retirement, and assuming your previous role as a DRep.\n\nIf you come out of retirement, your DRep ID will be the same as it was before retirement, and your Voting Power will consist of your own ADA balance and what delegated power that remains associated\nto your DRep ID.",
+        "By retiring you are giving up your voting rights. Voting Power that is delegated to you will remain in place.\n\nADA Holders that have delegated to be able to see that you are retired in the DRep directory. They will be able to re-delegate their Voting Power to another DRep.\n\nYou can still participate in Governance by proposing Governance Actions, by delegating your personal Voting Power to another DRep, or by coming out of retirement, and assuming your previous role as a DRep.\n\nIf you come out of retirement, your DRep ID will be the same as it was before retirement, and your Voting Power will consist of your own Ada balance and what delegated power that remains associated\nto your DRep ID.",
     },
     slider: {
       showAll: "Show All",
@@ -742,10 +742,10 @@ export const en = {
           "Looks like you cannot retire, because currently you are not a Direct Voter.",
       },
       registerDescription:
-        "A Direct Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of ADA in their connected wallet. <0>Learn More</0> about Direct Voter.\n\nBecoming a Direct Voter will require a refundable deposit of <strong>₳{{deposit}}</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
+        "A Direct Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of Ada in their connected wallet. <0>Learn More</0> about Direct Voter.\n\nBecoming a Direct Voter will require a refundable deposit of <strong>₳{{deposit}}</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
       registerHeading: "What this Means",
       retirementDescription:
-        "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of {{deposit}} ADA will be refunded.\n\nYou can at any time in the future re-register to become a Direct Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\nThese options are listed in our Guides here: <0>Voting options and Roles</0>",
+        "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of {{deposit}} ada will be refunded.\n\nYou can at any time in the future re-register to become a Direct Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\nThese options are listed in our Guides here: <0>Voting options and Roles</0>",
       retirementHeading: "What Retirement Means",
       retireDirectVoter: "Retire as a Direct Voter",
     },

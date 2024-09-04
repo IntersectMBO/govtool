@@ -31,6 +31,6 @@ export type ProposalMetadata = {
   abstract?: string;
   motivation?: string;
   rationale?: string;
-  references?: string[];
+  references?: Reference[];
   title?: string;
 };

@@ -16,7 +16,7 @@ export const mapDtoToProposal = async (
       abstract: validationResponse.metadata?.abstract,
       motivation: validationResponse.metadata?.motivation,
       rationale: validationResponse.metadata?.rationale,
-      references: validationResponse.metadata?.references,
+      references: validationResponse.metadata?.references?.map(({ uri }) => uri),
       metadataStatus: validationResponse.status || null,
       metadataValid: validationResponse.valid,
     };

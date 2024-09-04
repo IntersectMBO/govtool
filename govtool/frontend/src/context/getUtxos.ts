@@ -31,7 +31,7 @@ export const getUtxos = async (
 
       const txindx = input.index();
       const output = utxo.output();
-      const amount = output.amount().coin().to_str(); // ADA amount in lovelace
+      const amount = output.amount().coin().to_str(); // Ada amount in lovelace
       const multiasset = output.amount().multiasset();
       let multiAssetStr = "";
 

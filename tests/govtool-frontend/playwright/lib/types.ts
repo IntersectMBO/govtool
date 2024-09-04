@@ -76,6 +76,10 @@ export enum FilterOption {
   UpdatetotheConstitution = "NewConstitution",
 }
 
+export enum BootstrapFilterOption {
+  InfoAction = "InfoAction",
+}
+
 export type DRepStatus = "Active" | "Inactive" | "Retired";
 
 export type IDRep = {

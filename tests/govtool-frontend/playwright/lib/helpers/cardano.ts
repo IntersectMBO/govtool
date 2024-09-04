@@ -1,6 +1,6 @@
 import test, { expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
-import { ProtocolParams } from "@types";
+import { ProposalType, ProtocolParams } from "@types";
 import { allure } from "allure-playwright";
 import { bech32 } from "bech32";
 
@@ -19,6 +19,21 @@ export async function getProtocolParamsMajorVersion() {
   const protocolParameter: ProtocolParams =
     await kuberService.queryProtocolParams();
   return protocolParameter.protocolVersion.major;
+}
+
+export async function isBootStrapingPhase() {
+  const protocolParameterMajorVersion = await getProtocolParamsMajorVersion();
+  return protocolParameterMajorVersion === 9;
+}
+
+export async function isTreasuryAndBootStraping(type: ProposalType) {
+  const isBootStraping = await isBootStrapingPhase();
+  if (type === ProposalType.treasury && isBootStraping) {
+    await allure.description(
+      "This Features will be available only after hardfork."
+    );
+    test.skip();
+  }
 }
 
 export async function skipIfNotHardFork() {

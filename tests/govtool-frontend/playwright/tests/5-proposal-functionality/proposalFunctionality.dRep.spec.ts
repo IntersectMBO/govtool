@@ -4,7 +4,7 @@ import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
+import { isBootStrapingPhase, skipIfNotHardFork } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
@@ -29,7 +29,9 @@ test.describe("Proposal checks", () => {
     const govActionsPage = new GovernanceActionsPage(page);
     await govActionsPage.goto();
 
-    govActionDetailsPage = await govActionsPage.viewFirstProposal();
+    govActionDetailsPage = (await isBootStrapingPhase())
+      ? await govActionsPage.viewFirstInfoProposal()
+      : await govActionsPage.viewFirstProposal();
   });
 
   test("5A. Should show relevant details about governance action as DRep", async () => {
@@ -155,7 +157,9 @@ test.describe("Perform voting", () => {
     const govActionsPage = new GovernanceActionsPage(dRepPage);
     await govActionsPage.goto();
 
-    govActionDetailsPage = await govActionsPage.viewFirstProposal();
+    govActionDetailsPage = (await isBootStrapingPhase())
+      ? await govActionsPage.viewFirstInfoProposal()
+      : await govActionsPage.viewFirstProposal();
   });
 
   test("5E. Should re-vote with new data on a already voted governance action", async ({}, testInfo) => {

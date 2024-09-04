@@ -4,11 +4,15 @@ import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { lovelaceToAda, skipIfNotHardFork } from "@helpers/cardano";
+import {
+  isBootStrapingPhase,
+  lovelaceToAda,
+  skipIfNotHardFork,
+} from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
-import { FilterOption, IProposal } from "@types";
+import { BootstrapFilterOption, FilterOption, IProposal } from "@types";
 import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
@@ -75,9 +79,12 @@ test.describe("Check vote count", () => {
   test("4G. Should display correct vote counts on governance details page for DRep", async ({
     page,
   }) => {
-    const responsesPromise = Object.keys(FilterOption).map((filterKey) =>
+    const voteWhiteListOption = (await isBootStrapingPhase())
+      ? BootstrapFilterOption
+      : FilterOption;
+    const responsesPromise = Object.keys(voteWhiteListOption).map((filterKey) =>
       page.waitForResponse((response) =>
-        response.url().includes(`&type[]=${FilterOption[filterKey]}`)
+        response.url().includes(`&type[]=${voteWhiteListOption[filterKey]}`)
       )
     );
 

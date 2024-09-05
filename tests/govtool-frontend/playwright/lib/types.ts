@@ -59,6 +59,7 @@ export type IDRepInfo = {
   qualifications?: string;
   paymentAddress?: string;
   extraContentLinks?: string[];
+  donNotList?:boolean;
 };
 
 export enum ProposalType {

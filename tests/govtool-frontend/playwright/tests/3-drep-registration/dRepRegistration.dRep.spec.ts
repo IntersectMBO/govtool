@@ -12,6 +12,7 @@ import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
 import walletManager from "lib/walletManager";
+import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
@@ -88,6 +89,41 @@ test.describe("Temporary DReps", () => {
     await expect(
       dRepRegistrationPage.registrationSuccessModal.getByText("this link")
     ).toBeVisible();
+  });
+
+  test("3Q Should not list dRep in the dRep directory when 'doNotList' is checked during registration", async ({
+    page,
+    browser,
+  }, testInfo) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+
+    const wallet = await walletManager.popWallet("registerDRep");
+
+    const tempDRepAuth = await createTempDRepAuth(page, wallet);
+    const dRepPage = await createNewPageWithWallet(browser, {
+      storageState: tempDRepAuth,
+      wallet,
+      enableStakeSigning: true,
+    });
+
+    const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);
+    await dRepRegistrationPage.goto();
+    await dRepRegistrationPage.register({
+      name: faker.person.firstName(),
+      donNotList: true,
+    });
+
+    await dRepRegistrationPage.confirmBtn.click();
+
+    await expect(dRepPage.getByTestId("d-rep-in-progress")).not.toBeVisible();
+
+    // connected state
+    const dRepDirectoryPage = new DRepDirectoryPage(page);
+    await dRepDirectoryPage.verifyDRepInList(wallet.dRepId);
+
+    // disconnected state
+    await page.getByTestId("disconnect-button").click();
+    await dRepDirectoryPage.verifyDRepInList(wallet.dRepId);
   });
 
   test("3J. Should verify retire as DRep", async ({ page, browser }) => {

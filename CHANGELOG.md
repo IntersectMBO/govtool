@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Handle CIP-119 doNotList field [Issue 1940](https://github.com/IntersectMBO/govtool/issues/1940)
 
 ### Changed
 

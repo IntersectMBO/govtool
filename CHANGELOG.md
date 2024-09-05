@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Make testIds for link and identity references in drep form unique [Issue 1928](https://github.com/IntersectMBO/govtool/issues/1928)
 
 ### Changed
 

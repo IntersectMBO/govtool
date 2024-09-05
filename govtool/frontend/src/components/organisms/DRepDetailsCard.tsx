@@ -311,6 +311,9 @@ const ReferencesLink = ({ label, uri }: ReferenceItem) => (
       sx={{
         overflow: "hidden",
         textOverflow: "ellipsis",
+        display: "flex",
+        gap: 1,
+        alignItems: "center",
       }}
     >
       <Typography

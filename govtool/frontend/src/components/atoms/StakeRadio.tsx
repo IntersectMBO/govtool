@@ -2,13 +2,8 @@ import { Dispatch, FC, SetStateAction } from "react";
 import { Box, IconButton, Typography } from "@mui/material";
 
 import { ICONS } from "@consts";
-import {
-  useGetAdaHolderVotingPowerQuery,
-  useScreenDimension,
-  useTranslation,
-} from "@hooks";
+import { useScreenDimension } from "@hooks";
 import { theme } from "@/theme";
-import { correctAdaFormat } from "@/utils/adaFormat";
 
 type StakeRadioProps = {
   isChecked?: boolean;
@@ -23,9 +18,9 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
     palette: { boxShadow1 },
   } = theme;
   const { isMobile } = useScreenDimension();
-  const { powerIsLoading, votingPower } =
-    useGetAdaHolderVotingPowerQuery(stakeKey);
-  const { t } = useTranslation();
+  // const { powerIsLoading, votingPower } =
+  //   useGetAdaHolderVotingPowerQuery(stakeKey);
+  // const { t } = useTranslation();
 
   return (
     <Box
@@ -68,7 +63,8 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
             />
           </IconButton>
         </Box>
-        <Box alignItems="center" display="flex">
+        {/* TODO uncomment when voting power value s correct */}
+        {/* <Box alignItems="center" display="flex">
           <Typography color={isChecked ? "white" : "#8E908E"} variant="body2">
             {t("votingPower")}
             :
@@ -86,7 +82,7 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
               ₳ {correctAdaFormat(votingPower) ?? 0}
             </Typography>
           )}
-        </Box>
+        </Box> */}
       </Box>
     </Box>
   );

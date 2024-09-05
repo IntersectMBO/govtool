@@ -1,4 +1,4 @@
-import { Box, Divider } from "@mui/material";
+import { Box } from "@mui/material";
 
 import { Button, Typography } from "@atoms";
 import { primaryBlue } from "@consts";
@@ -19,7 +19,6 @@ export const AutomatedVotingCard = ({
   onClickDelegate,
   onClickInfo,
   title,
-  votingPower,
   transactionId,
 }: AutomatedVotingCardProps) => {
   const { cExplorerBaseUrl } = useAppContext();
@@ -84,7 +83,8 @@ export const AutomatedVotingCard = ({
       </Box>
       {!inProgress && !isSelected && (
         <>
-          <Divider
+          {/* TODO uncomment when voting power value s correct */}
+          {/* <Divider
             flexItem
             orientation={screenWidth < 1024 ? "horizontal" : "vertical"}
             sx={{ ml: screenWidth < 1024 ? 0 : 1 }}
@@ -113,7 +113,7 @@ export const AutomatedVotingCard = ({
             orientation={screenWidth < 1024 ? "horizontal" : "vertical"}
             sx={{ mr: screenWidth < 1024 ? 0 : 1 }}
             variant={screenWidth < 1024 ? "fullWidth" : "middle"}
-          />
+          /> */}
           <Box
             sx={{
               display: "flex",

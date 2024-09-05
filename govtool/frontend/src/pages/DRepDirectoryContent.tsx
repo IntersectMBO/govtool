@@ -208,27 +208,19 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           }}
         >
           {dRepList?.length === 0 && <EmptyStateDrepDirectory />}
-          {dRepListToDisplay?.map((dRep) => {
-            if (
-              isSameDRep(dRep, myDrep?.view) ||
-              isSameDRep(dRep, inProgressDelegation)
-            ) {
-              return null;
-            }
-            return (
-              <Box key={dRep.drepId} component="li" sx={{ listStyle: "none" }}>
-                <DRepCard
-                  dRep={dRep}
-                  isConnected={!!isConnected}
-                  isDelegationLoading={
-                    isDelegating === dRep.view || isDelegating === dRep.drepId
-                  }
-                  isMe={isSameDRep(dRep, myDRepId)}
-                  onDelegate={() => delegate(dRep.drepId)}
-                />
-              </Box>
-            );
-          })}
+          {dRepListToDisplay?.map((dRep) => (
+            <Box key={dRep.drepId} component="li" sx={{ listStyle: "none" }}>
+              <DRepCard
+                dRep={dRep}
+                isConnected={!!isConnected}
+                isDelegationLoading={
+                  isDelegating === dRep.view || isDelegating === dRep.drepId
+                }
+                isMe={isSameDRep(dRep, myDRepId)}
+                onDelegate={() => delegate(dRep.drepId)}
+              />
+            </Box>
+          ))}
         </Box>
       </>
       {dRepListHasNextPage && dRepList.length >= 10 && (

@@ -4,10 +4,15 @@ import { bech32 } from "bech32";
 
 import { CardanoApiWallet } from "@models";
 
-export const formHexToBech32 = (dRepID?: string) => {
+export const formHexToBech32 = (dRepID?: string, isScript?: boolean) => {
   if (!dRepID) return;
   const words = bech32.toWords(Buffer.from(dRepID, "hex"));
-  const dRepIDBech32 = bech32.encode("drep", words);
+  let dRepIDBech32;
+  if (isScript){
+    dRepIDBech32 = bech32.encode("drep_script", words);
+  } else {
+    dRepIDBech32 = bech32.encode("drep", words);
+  }
   return dRepIDBech32;
 };
 

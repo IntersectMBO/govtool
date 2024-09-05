@@ -682,8 +682,10 @@ const CardanoProvider = (props: Props) => {
           targetDRep = DRep.new_always_abstain();
         } else if (target === AutomatedVotingOptionDelegationId.no_confidence) {
           targetDRep = DRep.new_always_no_confidence();
-        } else if (target.includes("drep")) {
+        } else if (target.includes("drep1")) {
           targetDRep = DRep.new_key_hash(Ed25519KeyHash.from_bech32(target));
+        } else if (target.includes("drep_script1")) {
+          targetDRep = DRep.new_script_hash(Ed25519KeyHash.from_bech32(target));
         } else {
           targetDRep = DRep.new_key_hash(Ed25519KeyHash.from_hex(target));
         }

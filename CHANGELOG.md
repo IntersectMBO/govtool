@@ -20,7 +20,7 @@ changes.
 
 ### Changed
 
--
+- Make displaying own DRep in DRep directory available [Issue 1934](https://github.com/IntersectMBO/govtool/issues/1934)
 
 ### Removed
 

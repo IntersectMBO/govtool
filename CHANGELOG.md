@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Make testIds for link and identity references in drep form unique [Issue 1928](https://github.com/IntersectMBO/govtool/issues/1928)
+- Fix saving the Do Not List checkbox value on DRep registration [Issue 1940](https://github.com/IntersectMBO/govtool/issues/1940)
 
 ### Changed
 

@@ -232,6 +232,7 @@ const ReferencesSection = ({
             label={t("forms.dRepData.referenceDescription")}
             name={`${fieldName}.${index}.label`}
             helpfulText={t("forms.dRepData.referenceDescriptionHelpfulText")}
+            dataTestId={`${type}-reference-description-${index + 1}-input`}
             rules={Rules.LINK_DESCRIPTION}
           />
           <ControlledField.Input
@@ -250,13 +251,14 @@ const ReferencesSection = ({
             label={t("forms.dRepData.referenceURL")}
             layoutStyles={{ mb: 3 }}
             name={`${fieldName}.${index}.uri`}
+            dataTestId={`${type}-reference-url-${index + 1}-input`}
             rules={Rules.LINK_URL}
           />
         </Fragment>
       ))}
       {references?.length < MAX_NUMBER_OF_LINKS ? (
         <Button
-          data-testid="add-link-button"
+          data-testid={`add-${type}-reference-button`}
           onClick={addLink}
           size="extraLarge"
           variant="text"

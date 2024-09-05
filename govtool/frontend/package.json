@@ -1,7 +1,7 @@
 {
   "name": "@govtool/frontend",
   "private": true,
-  "version": "1.0.16",
+  "version": "1.0.17",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -109,5 +109,5 @@
     "typescript": "^5.0.2"
   },
   "readme": "ERROR: No README data found!",
-  "_id": "govtool@1.0.16"
+  "_id": "govtool@1.0.17"
 }

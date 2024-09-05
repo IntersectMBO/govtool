@@ -26,6 +26,25 @@ changes.
 
 -
 
+## [sancho-v1.0.17](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.17) 2024-09-05
+
+### Added
+
+-
+
+### Fixed
+
+- Make testIds for link and identity references in drep form unique [Issue 1928](https://github.com/IntersectMBO/govtool/issues/1928)
+- Fix saving the Do Not List checkbox value on DRep registration [Issue 1940](https://github.com/IntersectMBO/govtool/issues/1940)
+
+### Changed
+
+- Make displaying own DRep in DRep directory available [Issue 1934](https://github.com/IntersectMBO/govtool/issues/1934)
+
+### Removed
+
+-
+
 ## [sancho-v1.0.16](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.16) 2024-09-04
 
 ### Fixed

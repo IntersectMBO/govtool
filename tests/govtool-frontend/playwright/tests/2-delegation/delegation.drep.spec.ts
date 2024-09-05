@@ -84,20 +84,20 @@ test("2N. Should show DRep information on details page", async ({
   await expect(dRepPage.getByTestId("Active-pill")).toHaveText("Active");
   await expect(dRepPage.getByTestId("voting-power")).toHaveText("₳ 0");
 
-  await expect(dRepPage.getByTestId("objectives-description")).toHaveText(
+  await expect(dRepPage.getByTestId("objectives-info-item-description")).toHaveText(
     objectives
   );
-  await expect(dRepPage.getByTestId("motivations-description")).toHaveText(
+  await expect(dRepPage.getByTestId("motivations-info-item-description")).toHaveText(
     motivations
   );
-  await expect(dRepPage.getByTestId("qualifications-description")).toHaveText(
+  await expect(dRepPage.getByTestId("qualifications-info-item-description")).toHaveText(
     qualifications
   );
 
   for (const link of links) {
     await expect(
-      dRepPage.getByTestId(`${link.toLowerCase()}-link`)
-    ).toBeVisible();
+      dRepPage.getByTestId(`label-link`)
+    ).toHaveText(link);
   }
 });
 

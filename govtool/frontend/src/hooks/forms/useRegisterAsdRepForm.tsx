@@ -106,6 +106,7 @@ export const useRegisterAsdRepForm = (
         "qualifications",
         "paymentAddress",
         "references",
+        "doNotList",
       ],
       standardReference: CIP_119,
     });

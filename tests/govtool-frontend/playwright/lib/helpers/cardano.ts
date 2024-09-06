@@ -26,7 +26,7 @@ export async function isBootStrapingPhase() {
   return protocolParameterMajorVersion === 9;
 }
 
-export async function isTreasuryAndBootStraping(type: ProposalType) {
+export async function skipIfTreasuryAndBootstrapping(type: ProposalType) {
   const isBootStraping = await isBootStrapingPhase();
   if (type === ProposalType.treasury && isBootStraping) {
     await allure.description(

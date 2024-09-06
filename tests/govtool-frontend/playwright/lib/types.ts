@@ -67,7 +67,7 @@ export enum ProposalType {
   treasury = "Treasury",
 }
 
-export enum FilterOption {
+export enum GrovernanceActionType {
   ProtocolParameterChange = "ParameterChange",
   InfoAction = "InfoAction",
   TreasuryWithdrawal = "TreasuryWithdrawals",
@@ -77,7 +77,7 @@ export enum FilterOption {
   UpdatetotheConstitution = "NewConstitution",
 }
 
-export enum BootstrapFilterOption {
+export enum BootstrapGovernanceActionType {
   InfoAction = "InfoAction",
 }
 

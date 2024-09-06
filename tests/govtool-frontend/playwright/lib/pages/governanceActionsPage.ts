@@ -1,6 +1,6 @@
 import removeAllSpaces from "@helpers/removeAllSpaces";
 import { Locator, Page, expect } from "@playwright/test";
-import { FilterOption, IProposal } from "@types";
+import { GrovernanceActionType, IProposal } from "@types";
 import environments from "lib/constants/environments";
 import GovernanceActionDetailsPage from "./governanceActionDetailsPage";
 import { getEnumKeyByValue } from "@helpers/enum";
@@ -47,11 +47,11 @@ export default class GovernanceActionsPage {
     return new GovernanceActionDetailsPage(this.page);
   }
 
-  async viewFirstInfoProposal(): Promise<GovernanceActionDetailsPage> {
-    const treasuryWithdrawFirstCard = this.page
-      .getByTestId("govaction-InfoAction-card")
+  async viewFirstProposalByGovernanceAction(governanceAction:GrovernanceActionType): Promise<GovernanceActionDetailsPage>  {
+    const proposalCard = this.page
+      .getByTestId(`govaction-${governanceAction}-card`)
       .first();
-    await treasuryWithdrawFirstCard
+    await proposalCard
       .locator('[data-testid^="govaction-"][data-testid$="-view-detail"]')
       .first()
       .click();
@@ -108,14 +108,14 @@ export default class GovernanceActionsPage {
   async sortAndValidate(
     sortOption: string,
     validationFn: (p1: IProposal, p2: IProposal) => boolean,
-    filterKeys = Object.keys(FilterOption)
+    filterKeys = Object.keys(GrovernanceActionType)
   ) {
     const responsesPromise = Promise.all(
       filterKeys.map((filterKey) =>
         this.page.waitForResponse((response) =>
           response
             .url()
-            .includes(`&type[]=${FilterOption[filterKey]}&sort=${sortOption}`)
+            .includes(`&type[]=${GrovernanceActionType[filterKey]}&sort=${sortOption}`)
         )
       )
     );
@@ -150,7 +150,7 @@ export default class GovernanceActionsPage {
     for (let dIdx = 0; dIdx <= proposalsByType.length - 1; dIdx++) {
       const proposals = proposalsByType[0] as IProposal[];
       const filterOptionKey = getEnumKeyByValue(
-        FilterOption,
+        GrovernanceActionType,
         proposals[0].type
       );
 

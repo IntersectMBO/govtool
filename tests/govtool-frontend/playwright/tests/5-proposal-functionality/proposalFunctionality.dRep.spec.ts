@@ -11,6 +11,7 @@ import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
+import { BootstrapGovernanceActionType, GrovernanceActionType } from "@types";
 import walletManager from "lib/walletManager";
 
 const invalidInfinityProposals = require("../../lib/_mock/invalidInfinityProposals.json");
@@ -30,7 +31,7 @@ test.describe("Proposal checks", () => {
     await govActionsPage.goto();
 
     govActionDetailsPage = (await isBootStrapingPhase())
-      ? await govActionsPage.viewFirstInfoProposal()
+      ? await govActionsPage.viewFirstProposalByGovernanceAction(GrovernanceActionType.InfoAction)
       : await govActionsPage.viewFirstProposal();
   });
 
@@ -158,7 +159,7 @@ test.describe("Perform voting", () => {
     await govActionsPage.goto();
 
     govActionDetailsPage = (await isBootStrapingPhase())
-      ? await govActionsPage.viewFirstInfoProposal()
+      ? await govActionsPage.viewFirstProposalByGovernanceAction(GrovernanceActionType.InfoAction)
       : await govActionsPage.viewFirstProposal();
   });
 

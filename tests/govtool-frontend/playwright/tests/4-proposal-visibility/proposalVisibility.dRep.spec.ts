@@ -12,7 +12,7 @@ import {
 import { createNewPageWithWallet } from "@helpers/page";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
-import { BootstrapFilterOption, FilterOption, IProposal } from "@types";
+import { BootstrapGovernanceActionType, GrovernanceActionType, IProposal } from "@types";
 import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
@@ -80,8 +80,8 @@ test.describe("Check vote count", () => {
     page,
   }) => {
     const voteWhiteListOption = (await isBootStrapingPhase())
-      ? BootstrapFilterOption
-      : FilterOption;
+      ? BootstrapGovernanceActionType
+      : GrovernanceActionType;
     const responsesPromise = Object.keys(voteWhiteListOption).map((filterKey) =>
       page.waitForResponse((response) =>
         response.url().includes(`&type[]=${voteWhiteListOption[filterKey]}`)

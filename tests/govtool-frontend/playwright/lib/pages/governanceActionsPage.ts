@@ -47,15 +47,28 @@ export default class GovernanceActionsPage {
     return new GovernanceActionDetailsPage(this.page);
   }
 
-  async viewFirstProposalByGovernanceAction(governanceAction:GrovernanceActionType): Promise<GovernanceActionDetailsPage>  {
+  async viewFirstProposalByGovernanceAction(
+    governanceAction: GrovernanceActionType
+  ): Promise<GovernanceActionDetailsPage> {
     const proposalCard = this.page
       .getByTestId(`govaction-${governanceAction}-card`)
       .first();
-    await proposalCard
-      .locator('[data-testid^="govaction-"][data-testid$="-view-detail"]')
-      .first()
-      .click();
-    return new GovernanceActionDetailsPage(this.page);
+
+    const isVisible = await proposalCard.isVisible();
+
+    if (isVisible) {
+      await proposalCard
+        .locator('[data-testid^="govaction-"][data-testid$="-view-detail"]')
+        .first()
+        .click();
+
+      return new GovernanceActionDetailsPage(this.page);
+    } else {
+      console.warn(
+        `Governance action details page for "${governanceAction}" was not found.`
+      );
+      return null;
+    }
   }
 
   async viewVotedProposal(
@@ -115,7 +128,9 @@ export default class GovernanceActionsPage {
         this.page.waitForResponse((response) =>
           response
             .url()
-            .includes(`&type[]=${GrovernanceActionType[filterKey]}&sort=${sortOption}`)
+            .includes(
+              `&type[]=${GrovernanceActionType[filterKey]}&sort=${sortOption}`
+            )
         )
       )
     );

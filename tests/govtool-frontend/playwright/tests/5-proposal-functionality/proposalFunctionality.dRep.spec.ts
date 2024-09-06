@@ -31,7 +31,9 @@ test.describe("Proposal checks", () => {
     await govActionsPage.goto();
 
     govActionDetailsPage = (await isBootStrapingPhase())
-      ? await govActionsPage.viewFirstProposalByGovernanceAction(GrovernanceActionType.InfoAction)
+      ? await govActionsPage.viewFirstProposalByGovernanceAction(
+          GrovernanceActionType.InfoAction
+        )
       : await govActionsPage.viewFirstProposal();
   });
 
@@ -159,7 +161,9 @@ test.describe("Perform voting", () => {
     await govActionsPage.goto();
 
     govActionDetailsPage = (await isBootStrapingPhase())
-      ? await govActionsPage.viewFirstProposalByGovernanceAction(GrovernanceActionType.InfoAction)
+      ? await govActionsPage.viewFirstProposalByGovernanceAction(
+          GrovernanceActionType.InfoAction
+        )
       : await govActionsPage.viewFirstProposal();
   });
 
@@ -241,5 +245,56 @@ test.describe("Check voting power", () => {
 
     const balance = await kuberService.getBalance(wallet.address);
     expect(balance, "Retirement deposit not returned").toBeGreaterThan(500);
+  });
+});
+
+test.describe("Bootstrap phase", () => {
+  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
+  test("5L. Should restrict dRep votes to Info Governance actions During Bootstrapping Phase", async ({
+    page,
+    context,
+  }) => {
+    const voteBlacklistOptions = Object.keys(GrovernanceActionType).filter(
+      (option) => option !== BootstrapGovernanceActionType.InfoAction
+    );
+
+    const govActionsPage = new GovernanceActionsPage(page);
+    await govActionsPage.goto();
+
+    const protocolParameter = await page.evaluate(() => {
+      return localStorage.getItem("protocol_params");
+    });
+    const parsedProtocolParameter = JSON.parse(protocolParameter);
+    // update protocol_major version
+    parsedProtocolParameter["protocol_major"] = 9;
+
+    const updatedProtocolParameterString = JSON.stringify(
+      parsedProtocolParameter
+    );
+    // add updated protocol parameter
+    await context.addInitScript(`
+    localStorage.setItem('protocol_params', '${updatedProtocolParameterString}');
+  `);
+
+    for (const voteBlacklistOption of voteBlacklistOptions) {
+      const governanceActionDetailsPage =
+        await govActionsPage.viewFirstProposalByGovernanceAction(
+          voteBlacklistOption as GrovernanceActionType
+        );
+
+      if (governanceActionDetailsPage !== null) {
+        await expect(page.getByText("yes₳").first()).toBeVisible();
+        await expect(page.getByText("abstain₳").first()).toBeVisible();
+        await expect(page.getByText("no₳").first()).toBeVisible();
+
+        await expect(
+          governanceActionDetailsPage.yesVoteRadio
+        ).not.toBeVisible();
+        await expect(governanceActionDetailsPage.contextBtn).not.toBeVisible();
+        await expect(governanceActionDetailsPage.voteBtn).not.toBeVisible();
+
+        await governanceActionDetailsPage.backBtn.click();
+      }
+    }
   });
 });

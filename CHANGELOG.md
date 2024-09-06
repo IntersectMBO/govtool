@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fixed terms and conditions link [Issue 1968](https://github.com/IntersectMBO/govtool/issues/1968)
 
 ### Changed
 

@@ -38,7 +38,9 @@ test.describe("Logged in DReps", () => {
 
     await governanceActionsPage.goto();
     const governanceActionDetailsPage =
-      await governanceActionsPage.viewFirstProposalByGovernanceAction(GrovernanceActionType.InfoAction);
+      await governanceActionsPage.viewFirstProposalByGovernanceAction(
+        GrovernanceActionType.InfoAction
+      );
 
     await expect(governanceActionDetailsPage.voteBtn).toBeVisible();
   });
@@ -60,7 +62,18 @@ test.describe("Logged in DReps", () => {
       motivations: faker.lorem.paragraph(2),
       qualifications: faker.lorem.paragraph(2),
       paymentAddress: (await ShelleyWallet.generate()).addressBech32(0),
-      extraContentLinks: [faker.internet.url()],
+      linksReferenceLinks: [
+        {
+          url: faker.internet.url(),
+          description: faker.internet.displayName(),
+        },
+      ],
+      identityReferenceLinks: [
+        {
+          url: faker.internet.url(),
+          description: faker.internet.displayName(),
+        },
+      ],
     });
     await page.getByTestId("confirm-modal-button").click();
   });

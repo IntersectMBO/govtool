@@ -58,8 +58,14 @@ export type IDRepInfo = {
   motivations?: string;
   qualifications?: string;
   paymentAddress?: string;
-  extraContentLinks?: string[];
-  donNotList?:boolean;
+  identityReferenceLinks?: LinkType[];
+  linksReferenceLinks?: LinkType[];
+  donNotList?: boolean;
+};
+
+export type LinkType = {
+  url: string;
+  description: string;
 };
 
 export enum ProposalType {

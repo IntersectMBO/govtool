@@ -13,6 +13,7 @@ import DRepDetailsPage from "@pages/dRepDetailsPage";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
+import { LinkType } from "@types";
 import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
@@ -59,7 +60,19 @@ test("2N. Should show DRep information on details page", async ({
   const motivations = faker.lorem.paragraph(2);
   const qualifications = faker.lorem.paragraph(2);
   const paymentAddress = ShelleyWallet.fromJson(wallet).rewardAddressBech32(0);
-  const links = [faker.internet.url()];
+  const linksReferenceLinks: LinkType[] = [
+    {
+      url: faker.internet.url(),
+      description: faker.internet.displayName(),
+    },
+  ];
+
+  const identityReferenceLinks: LinkType[] = [
+    {
+      url: faker.internet.url(),
+      description: faker.internet.displayName(),
+    },
+  ];
 
   await dRepRegistrationPage.register({
     name,
@@ -67,7 +80,8 @@ test("2N. Should show DRep information on details page", async ({
     motivations,
     qualifications,
     paymentAddress,
-    extraContentLinks: links,
+    linksReferenceLinks,
+    identityReferenceLinks,
   });
 
   await dRepRegistrationPage.confirmBtn.click();
@@ -84,20 +98,26 @@ test("2N. Should show DRep information on details page", async ({
   await expect(dRepPage.getByTestId("Active-pill")).toHaveText("Active");
   await expect(dRepPage.getByTestId("voting-power")).toHaveText("₳ 0");
 
-  await expect(dRepPage.getByTestId("objectives-info-item-description")).toHaveText(
-    objectives
-  );
-  await expect(dRepPage.getByTestId("motivations-info-item-description")).toHaveText(
-    motivations
-  );
-  await expect(dRepPage.getByTestId("qualifications-info-item-description")).toHaveText(
-    qualifications
-  );
+  await expect(
+    dRepPage.getByTestId("objectives-info-item-description")
+  ).toHaveText(objectives);
+  await expect(
+    dRepPage.getByTestId("motivations-info-item-description")
+  ).toHaveText(motivations);
+  await expect(
+    dRepPage.getByTestId("qualifications-info-item-description")
+  ).toHaveText(qualifications);
 
-  for (const link of links) {
+  for (const link of linksReferenceLinks) {
     await expect(
-      dRepPage.getByTestId(`label-link`)
-    ).toHaveText(link);
+      dRepPage.getByTestId(`${link.description.toLowerCase()}-link`)
+    ).toHaveText(link.url);
+  }
+
+  for (const link of identityReferenceLinks) {
+    await expect(
+      dRepPage.getByTestId(`${link.description.toLowerCase()}-link`)
+    ).toHaveText(link.url);
   }
 });
 

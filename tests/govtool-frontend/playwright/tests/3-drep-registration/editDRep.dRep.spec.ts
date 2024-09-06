@@ -32,16 +32,33 @@ test.describe("Validation of edit dRep Form", () => {
         motivations: faker.lorem.paragraph(2),
         qualifications: faker.lorem.paragraph(2),
         paymentAddress: (await ShelleyWallet.generate()).addressBech32(0),
-        extraContentLinks: [faker.internet.url()],
+        linksReferenceLinks: [
+          {
+            url: faker.internet.url(),
+            description: faker.internet.displayName(),
+          },
+        ],
+        identityReferenceLinks: [
+          {
+            url: faker.internet.url(),
+            description: faker.internet.displayName(),
+          },
+        ],
       });
     }
 
     for (let i = 0; i < 6; i++) {
-      await expect(editDRepPage.addLinkBtn).toBeVisible();
-      await editDRepPage.addLinkBtn.click();
+      await expect(editDRepPage.addLinkReferenceBtn).toBeVisible();
+      await editDRepPage.addLinkReferenceBtn.click();
     }
 
-    await expect(editDRepPage.addLinkBtn).toBeHidden();
+    for (let i = 0; i < 6; i++) {
+      await expect(editDRepPage.addIdentityReferenceBtn).toBeVisible();
+      await editDRepPage.addIdentityReferenceBtn.click();
+    }
+
+    await expect(editDRepPage.addLinkReferenceBtn).toBeHidden();
+    await expect(editDRepPage.addIdentityReferenceBtn).toBeHidden();
   });
 
   test("3M_2. Should reject invalid data in edit dRep form", async ({
@@ -61,7 +78,18 @@ test.describe("Validation of edit dRep Form", () => {
         motivations: faker.lorem.paragraph(40),
         qualifications: faker.lorem.paragraph(40),
         paymentAddress: faker.string.alphanumeric(45),
-        extraContentLinks: [mockInvalid.url()],
+        linksReferenceLinks: [
+          {
+            url: mockInvalid.url(),
+            description: faker.lorem.paragraph(40),
+          },
+        ],
+        identityReferenceLinks: [
+          {
+            url: mockInvalid.url(),
+            description: faker.lorem.paragraph(40),
+          },
+        ],
       });
     }
   });

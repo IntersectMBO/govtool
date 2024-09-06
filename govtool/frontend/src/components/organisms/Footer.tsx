@@ -41,7 +41,7 @@ export const Footer = () => {
     openInNewTab("https://docs.gov.tools/legal/privacy-policy");
 
   const onClickTermOfService = () =>
-    openInNewTab("https://docs.gov.tools/legal/terms-and-conditions");
+    openInNewTab("https://docs.intersectmbo.org/legal/policies-and-conditions/terms-of-use");
 
   const onClickFeedback = () => openFeedbackWindow();
 

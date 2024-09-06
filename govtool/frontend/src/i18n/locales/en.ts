@@ -350,7 +350,7 @@ export const en = {
     footer: {
       copyright: "© 2024 Intersect MBO",
       privacyPolicy: "Privacy policy",
-      termOfService: "Terms and Conditions",
+      termOfService: "Terms of Use",
     },
     forms: {
       link: "Link",

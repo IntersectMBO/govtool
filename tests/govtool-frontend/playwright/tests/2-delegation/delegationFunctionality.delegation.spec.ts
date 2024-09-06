@@ -309,7 +309,7 @@ test.describe("Delegated ADA visibility", () => {
     await dRepDirectoryPage.delegateToDRep(dRep01Wallet.dRepId);
 
     const adaHolderVotingPower = await kuberService.getBalance(
-      adaHolder05Wallet.address
+      adaHolder06Wallet.address
     );
     await expect(
       page.getByText(`You have delegated ₳ ${adaHolderVotingPower}`)

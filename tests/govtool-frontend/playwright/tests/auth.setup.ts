@@ -20,7 +20,11 @@ import {
 } from "@constants/staticWallets";
 import { test as setup } from "@fixtures/walletExtension";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
-import { createAuth, createAuthWithUserName } from "@helpers/auth";
+import {
+  createAuth,
+  createAuthWithMultipleStake,
+  createAuthWithUserName,
+} from "@helpers/auth";
 import { skipIfNotHardFork } from "@helpers/cardano";
 
 const dRep01AuthFile = ".auth/dRep01.json";
@@ -122,7 +126,7 @@ setup("Create AdaHolder 05 auth", async ({ page, context }) => {
 });
 
 setup("Create AdaHolder 06 auth", async ({ page, context }) => {
-  await createAuth({
+  await createAuthWithMultipleStake({
     page,
     context,
     wallet: adaHolder06Wallet,

@@ -162,3 +162,11 @@ jobs:
           docker load -i '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar'
           rm -rf '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar'
           docker push ${{ steps.image_lowercase.outputs.lowercase }}:${{ env.TAG }}
+
+      - name: Add tag as a PR comment
+        uses: ubie-oss/comment-to-merged-pr-action@v0.3.3
+        id: comment-to-merged-pr
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          message: |-
+            This PR is in the tag: ${{ env.TAG }} , for ${{ matrix.name }} service

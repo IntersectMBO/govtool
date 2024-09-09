@@ -1,6 +1,7 @@
 import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import { isMobile } from "@helpers/mobile";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { expect } from "@playwright/test";
@@ -9,6 +10,7 @@ test.use({ storageState: ".auth/user01.json", wallet: user01Wallet });
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
+  await skipIfNotHardFork();
 });
 
 test("2B. Should access DRep Directory page", async ({ page }) => {

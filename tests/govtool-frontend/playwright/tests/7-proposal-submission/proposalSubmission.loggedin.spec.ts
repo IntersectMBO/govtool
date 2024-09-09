@@ -9,6 +9,7 @@ import {
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfTreasuryAndBootstrapping, skipIfNotHardFork } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
 import { invalid, valid as mockValid } from "@mock/index";
@@ -19,6 +20,7 @@ import { ProposalCreateRequest, ProposalType } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
+  await skipIfNotHardFork();
 });
 
 test.describe("Proposal created logged state", () => {
@@ -35,6 +37,8 @@ test.describe("Proposal created logged state", () => {
       test(`7E_${index + 1}. Should accept valid data in ${type.toLowerCase()} proposal form`, async ({
         page,
       }) => {
+        await skipIfTreasuryAndBootstrapping(type);
+
         test.slow(); // Brute-force testing with 100 random data
 
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
@@ -73,6 +77,8 @@ test.describe("Proposal created logged state", () => {
       test(`7F_${index + 1}. Should reject invalid data in ${type.toLowerCase()} Proposal form`, async ({
         page,
       }) => {
+        await skipIfTreasuryAndBootstrapping(type);
+
         test.slow(); // Brute-force testing with 100 random data
 
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
@@ -97,6 +103,8 @@ test.describe("Proposal created logged state", () => {
         page,
         wallet,
       }) => {
+        await skipIfTreasuryAndBootstrapping(type);
+
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
         await proposalSubmissionPage.goto();
 
@@ -143,6 +151,8 @@ test.describe("Proposal created logged state", () => {
       test(`7I_${index + 1}. Should valid review submission in ${type.toLowerCase()} Proposal form`, async ({
         page,
       }) => {
+        await skipIfTreasuryAndBootstrapping(type);
+
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
         await proposalSubmissionPage.goto();
 
@@ -195,6 +205,8 @@ test.describe("Proposal created logged state", () => {
       test(`7D_${index + 1}. Verify ${type.toLocaleLowerCase()} proposal form`, async ({
         page,
       }) => {
+        await skipIfTreasuryAndBootstrapping(type);
+
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
         await proposalSubmissionPage.goto();
 
@@ -384,6 +396,8 @@ test.describe("Treasury Proposal Draft", () => {
   test.use({ storageState: ".auth/proposal07.json", wallet: proposal07Wallet });
 
   test("7M_2. Should edit a treasury proposal draft", async ({ page }) => {
+    await skipIfTreasuryAndBootstrapping(ProposalType.treasury);
+
     const proposalSubmissionPage = new ProposalSubmissionPage(page);
     const { proposalFormValue } = await proposalSubmissionPage.createDraft(
       ProposalType.treasury
@@ -419,4 +433,3 @@ test.describe("Treasury Proposal Draft", () => {
     );
   });
 });
-// });

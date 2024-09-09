@@ -4,6 +4,7 @@ import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
 
@@ -14,6 +15,7 @@ test.use({
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
+  await skipIfNotHardFork();
 });
 
 test("3B. Should access DRep registration page", async ({ page }) => {
@@ -32,7 +34,20 @@ test("3D. Verify DRep registration form", async ({ page }) => {
   await expect(dRepRegistrationPage.motivationsInput).toBeVisible();
   await expect(dRepRegistrationPage.qualificationsInput).toBeVisible();
   await expect(dRepRegistrationPage.paymentAddressInput).toBeVisible();
-  await expect(dRepRegistrationPage.addLinkBtn).toBeVisible();
+  await expect(dRepRegistrationPage.addIdentityReferenceBtn).toBeVisible();
+  await expect(dRepRegistrationPage.addLinkReferenceBtn).toBeVisible();
+  await expect(
+    dRepRegistrationPage.linkRefrenceFirstDescriptionInput
+  ).toBeVisible();
+  await expect(dRepRegistrationPage.linkRefrenceFirstUrlInput).toBeVisible();
+  await expect(
+    dRepRegistrationPage.identityReferenceFirstDescriptionInput
+  ).toBeVisible();
+  await expect(
+    dRepRegistrationPage.identityReferenceFirstUrlInput
+  ).toBeVisible();
+  await expect(dRepRegistrationPage.doNotListCheckBox).toBeVisible();
+
   await expect(dRepRegistrationPage.continueBtn).toBeVisible();
 });
 
@@ -50,16 +65,33 @@ test.describe("Validation of dRep Registration Form", () => {
         motivations: faker.lorem.paragraph(2),
         qualifications: faker.lorem.paragraph(2),
         paymentAddress: (await ShelleyWallet.generate()).addressBech32(0),
-        extraContentLinks: [faker.internet.url()],
+        linksReferenceLinks: [
+          {
+            url: faker.internet.url(),
+            description: faker.internet.displayName(),
+          },
+        ],
+        identityReferenceLinks: [
+          {
+            url: faker.internet.url(),
+            description: faker.internet.displayName(),
+          },
+        ],
       });
     }
 
     for (let i = 0; i < 6; i++) {
-      await expect(dRepRegistrationPage.addLinkBtn).toBeVisible();
-      await dRepRegistrationPage.addLinkBtn.click();
+      await expect(dRepRegistrationPage.addLinkReferenceBtn).toBeVisible();
+      await dRepRegistrationPage.addLinkReferenceBtn.click();
     }
 
-    await expect(dRepRegistrationPage.addLinkBtn).toBeHidden();
+    for (let i = 0; i < 6; i++) {
+      await expect(dRepRegistrationPage.addIdentityReferenceBtn).toBeVisible();
+      await dRepRegistrationPage.addIdentityReferenceBtn.click();
+    }
+
+    await expect(dRepRegistrationPage.addLinkReferenceBtn).toBeHidden();
+    await expect(dRepRegistrationPage.addIdentityReferenceBtn).toBeHidden();
   });
 
   test("3E_2. Should reject invalid data in DRep form", async ({ page }) => {
@@ -75,7 +107,18 @@ test.describe("Validation of dRep Registration Form", () => {
         motivations: faker.lorem.paragraph(40),
         qualifications: faker.lorem.paragraph(40),
         paymentAddress: faker.string.alphanumeric(45),
-        extraContentLinks: [mockInvalid.url()],
+        linksReferenceLinks: [
+          {
+            url: mockInvalid.url(),
+            description: faker.lorem.paragraph(20),
+          },
+        ],
+        identityReferenceLinks: [
+          {
+            url: mockInvalid.url(),
+            description: faker.lorem.paragraph(20),
+          },
+        ],
       });
     }
   });

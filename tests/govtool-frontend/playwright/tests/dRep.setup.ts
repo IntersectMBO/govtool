@@ -1,6 +1,7 @@
 import environments from "@constants/environments";
 import { dRepWallets } from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { uploadMetadataAndGetJsonHash } from "@helpers/metadata";
 import { pollTransaction } from "@helpers/transaction";
@@ -8,7 +9,7 @@ import { expect, test as setup } from "@playwright/test";
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 
-const REGISTER_DREP_WALLETS_COUNT = 5;
+const REGISTER_DREP_WALLETS_COUNT = 6;
 const DREP_WALLETS_COUNT = 9;
 
 let dRepDeposit: number;
@@ -21,6 +22,7 @@ setup.beforeAll(async () => {
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Register DRep");
+  await skipIfNotHardFork();
 });
 
 async function generateWallets(num: number) {

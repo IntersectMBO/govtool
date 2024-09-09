@@ -22,6 +22,7 @@ import           Data.Ord                 (Down (..))
 import           Data.Text                hiding (any, drop, elem, filter, length, map, null, take)
 import qualified Data.Text                as Text
 import qualified Data.Vector as V
+import           Data.Time.LocalTime      (TimeZone, getCurrentTimeZone)
 
 
 import           Numeric.Natural          (Natural)
@@ -44,6 +45,7 @@ import qualified VVA.Types                as Types
 import           VVA.Types                (App, AppEnv (..),
                                            AppError (CriticalError, InternalError, ValidationError),
                                            CacheEnv (..))
+import Data.Time (TimeZone, localTimeToUTC)
 
 type VVAApi =
          "drep" :> "list"
@@ -112,7 +114,14 @@ drepRegistrationToDrep Types.DRepRegistration {..} =
       dRepStatus = mapDRepStatus dRepRegistrationStatus,
       dRepType = mapDRepType dRepRegistrationType,
       dRepLatestTxHash = HexText <$> dRepRegistrationLatestTxHash,
-      dRepLatestRegistrationDate = dRepRegistrationLatestRegistrationDate
+      dRepLatestRegistrationDate = dRepRegistrationLatestRegistrationDate,
+      dRepPaymentAddress = dRepRegistrationPaymentAddress,
+      dRepGivenName = dRepRegistrationGivenName,
+      dRepObjectives = dRepRegistrationObjectives,
+      dRepMotivations = dRepRegistrationMotivations,
+      dRepQualifications = dRepRegistrationQualifications,
+      dRepImageUrl = dRepRegistrationImageUrl,
+      dRepImageHash = HexText <$> dRepRegistrationImageHash
     }
 
 delegationToResponse :: Types.Delegation -> DelegationResponse
@@ -179,27 +188,36 @@ getVotingPower (unHexText -> dRepId) = do
   CacheEnv {dRepVotingPowerCache} <- asks vvaCache
   cacheRequest dRepVotingPowerCache dRepId $ DRep.getVotingPower dRepId
 
-proposalToResponse :: Types.Proposal -> ProposalResponse
-proposalToResponse Types.Proposal {..} =
+proposalToResponse :: TimeZone -> Types.Proposal -> ProposalResponse
+proposalToResponse timeZone Types.Proposal {..} =
   ProposalResponse
   { proposalResponseId = pack $ show proposalId,
     proposalResponseTxHash = HexText proposalTxHash,
     proposalResponseIndex = proposalIndex,
     proposalResponseType = fromMaybe InfoAction $ readMaybe $ unpack proposalType,
     proposalResponseDetails = GovernanceActionDetails <$> proposalDetails,
-    proposalResponseExpiryDate = proposalExpiryDate,
+    proposalResponseExpiryDate = localTimeToUTC timeZone <$> proposalExpiryDate,
     proposalResponseExpiryEpochNo = proposalExpiryEpochNo,
-    proposalResponseCreatedDate = proposalCreatedDate,
+    proposalResponseCreatedDate = localTimeToUTC timeZone proposalCreatedDate,
     proposalResponseCreatedEpochNo = proposalCreatedEpochNo,
     proposalResponseUrl = proposalUrl,
     proposalResponseMetadataHash = HexText proposalDocHash,
+    proposalResponseProtocolParams = ProtocolParams <$> proposalProtocolParams,
     proposalResponseTitle =  proposalTitle,
     proposalResponseAbstract =  proposalAbstract,
     proposalResponseMotivation =  proposalMotivation,
     proposalResponseRationale = proposalRationale,
-    proposalResponseYesVotes = proposalYesVotes,
-    proposalResponseNoVotes = proposalNoVotes,
-    proposalResponseAbstainVotes = proposalAbstainVotes
+    proposalResponseDRepYesVotes = proposalDRepYesVotes,
+    proposalResponseDRepNoVotes = proposalDRepNoVotes,
+    proposalResponseDRepAbstainVotes = proposalDRepAbstainVotes,
+    proposalResponsePoolYesVotes = proposalPoolYesVotes,
+    proposalResponsePoolNoVotes = proposalPoolNoVotes,
+    proposalResponsePoolAbstainVotes = proposalPoolAbstainVotes,
+    proposalResponseCcYesVotes = proposalCcYesVotes,
+    proposalResponseCcNoVotes = proposalCcNoVotes,
+    proposalResponseCcAbstainVotes = proposalCcAbstainVotes,
+    proposalResponsePrevGovActionIndex = proposalPrevGovActionIndex,
+    proposalResponsePrevGovActionTxHash = HexText <$> proposalPrevGovActionTxHash
   }
 
 voteToResponse :: Types.Vote -> VoteParams
@@ -222,7 +240,9 @@ mapSortAndFilterProposals
   -> [Types.Proposal]
   -> m [ProposalResponse]
 mapSortAndFilterProposals selectedTypes sortMode proposals = do
-  let mappedProposals = map proposalToResponse proposals
+  timeZone <- liftIO getCurrentTimeZone
+
+  let mappedProposals = map (proposalToResponse timeZone) proposals
   let filteredProposals =
         if null selectedTypes
           then mappedProposals
@@ -232,11 +252,14 @@ mapSortAndFilterProposals selectedTypes sortMode proposals = do
                   proposalResponseType `elem` selectedTypes
               )
               mappedProposals
+
+  let totalYesVotes (ProposalResponse{..}) = proposalResponseDRepYesVotes + proposalResponsePoolYesVotes + proposalResponseCcYesVotes
+
   let sortedProposals = case sortMode of
         Nothing              -> filteredProposals
         Just NewestCreated   -> sortOn (Down . proposalResponseCreatedDate) filteredProposals
         Just SoonestToExpire -> sortOn proposalResponseExpiryDate filteredProposals
-        Just MostYesVotes    -> sortOn (Down . proposalResponseYesVotes) filteredProposals
+        Just MostYesVotes    -> sortOn (Down . totalYesVotes) filteredProposals
   return sortedProposals
 
 getVotes :: App m => HexText -> [GovernanceActionType] -> Maybe GovernanceActionSortMode -> Maybe Text -> m [VoteResponse]
@@ -270,6 +293,13 @@ drepInfo (unHexText -> dRepId) = do
     , dRepInfoResponseDRepRetireTxHash = HexText <$> dRepInfoDRepRetireTx
     , dRepInfoResponseSoleVoterRegisterTxHash = HexText <$> dRepInfoSoleVoterRegisterTx
     , dRepInfoResponseSoleVoterRetireTxHash = HexText <$> dRepInfoSoleVoterRetireTx
+    , dRepInfoResponsePaymentAddress = dRepInfoPaymentAddress
+    , dRepInfoResponseGivenName = dRepInfoGivenName
+    , dRepInfoResponseObjectives = dRepInfoObjectives
+    , dRepInfoResponseMotivations = dRepInfoMotivations
+    , dRepInfoResponseQualifications = dRepInfoQualifications
+    , dRepInfoResponseImageUrl = dRepInfoImageUrl
+    , dRepInfoResponseImageHash = HexText <$> dRepInfoImageHash
     }
 
 getCurrentDelegation :: App m => HexText -> m (Maybe DelegationResponse)
@@ -346,7 +376,10 @@ getProposal g@(GovActionId govActionTxHash govActionIndex) mDrepId' = do
   let mDrepId = unHexText <$> mDrepId'
   CacheEnv {getProposalCache} <- asks vvaCache
   proposal@Types.Proposal {proposalUrl, proposalDocHash} <- cacheRequest getProposalCache (unHexText govActionTxHash, govActionIndex) (Proposal.getProposal (unHexText govActionTxHash) govActionIndex)
-  let proposalResponse = proposalToResponse proposal
+  
+  timeZone <- liftIO getCurrentTimeZone
+  
+  let proposalResponse = proposalToResponse timeZone proposal
   voteResponse <- case mDrepId of
     Nothing -> return Nothing
     Just drepId -> do

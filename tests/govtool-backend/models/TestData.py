@@ -29,13 +29,15 @@ class Proposal(TypedDict):
     abstract: Optional[str]
     motivation: Optional[str]
     rationale: Optional[str]
-    metadata: Optional[dict]
-    references: Optional[list]
-    yesVotes: int
-    noVotes: int
-    abstainVotes: int
-    metadataStatus: str
-    metadataValid: bool
+    dRepYesVotes: int
+    dRepNoVotes: int
+    dRepAbstainVotes: int
+    ccYesVotes: int
+    ccNoVotes: int
+    ccAbstainVotes: int
+    poolYesVotes: int
+    poolNoVotes: int
+    poolAbstainVotes: int
 
 
 class Drep(TypedDict):

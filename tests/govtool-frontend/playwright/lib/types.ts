@@ -26,10 +26,17 @@ export interface IProposal {
   motivation: string | null;
   rationale: string | null;
   metadata: any;
-  references: any;
-  yesVotes: number;
-  noVotes: number;
-  abstainVotes: number;
+  dRepYesVotes: number;
+  dRepNoVotes: number;
+  dRepAbstainVotes: number;
+  poolYesVotes: number;
+  poolNoVotes: number;
+  poolAbstainVotes: number;
+  ccYesVotes: number;
+  ccNoVotes: number;
+  ccAbstainVotes: number;
+  prevGovActionIndex: null | number;
+  prevGovActionTxHash: null | string;
 }
 
 export type IVote = {
@@ -47,9 +54,18 @@ export type IVotedProposal = {
 
 export type IDRepInfo = {
   name: string;
-  email?: string;
-  bio?: string;
-  extraContentLinks?: string[];
+  objectives?: string;
+  motivations?: string;
+  qualifications?: string;
+  paymentAddress?: string;
+  identityReferenceLinks?: LinkType[];
+  linksReferenceLinks?: LinkType[];
+  donNotList?: boolean;
+};
+
+export type LinkType = {
+  url: string;
+  description: string;
 };
 
 export enum ProposalType {
@@ -57,7 +73,7 @@ export enum ProposalType {
   treasury = "Treasury",
 }
 
-export enum FilterOption {
+export enum GrovernanceActionType {
   ProtocolParameterChange = "ParameterChange",
   InfoAction = "InfoAction",
   TreasuryWithdrawal = "TreasuryWithdrawals",
@@ -65,6 +81,10 @@ export enum FilterOption {
   NoConfidence = "NoConfidence",
   NewCommittee = "NewCommittee",
   UpdatetotheConstitution = "NewConstitution",
+}
+
+export enum BootstrapGovernanceActionType {
+  InfoAction = "InfoAction",
 }
 
 export type DRepStatus = "Active" | "Inactive" | "Retired";
@@ -85,6 +105,7 @@ export type IDRep = {
 export type ProtocolParams = {
   dRepDeposit: number;
   govActionDeposit: number;
+  protocolVersion: ProtocolVersionType;
 };
 
 type Comment = {
@@ -142,4 +163,9 @@ export type WalletAndAnchorType = {
   url: string;
   dataHash: string;
   wallet: StaticWallet;
+};
+
+export type ProtocolVersionType = {
+  major: number;
+  minor: number;
 };

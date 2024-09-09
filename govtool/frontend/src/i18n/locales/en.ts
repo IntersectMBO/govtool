@@ -67,10 +67,12 @@ export const en = {
           metadataUpdateInProgress:
             "The update DRep metadata is ongoing. This may take several minutes.",
           notRegisteredDescription:
-            "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
+            "Accept delegated voting power from other Ada holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
           notRegisteredTitle: "Become a DRep",
+          notRegisteredWasRegisteredDescriptionWithGivenName:
+            "You are now retired and your listing in the DRep directory as <strong>{{givenName}}</strong> has been marked as <strong><i>retired</i></strong>. You cannot vote on Governance Actions as <strong>{{givenName}}</strong>.\n\nYou can always re-register as a DRep, in which case you will have the same DRep ID as you had initially.",
           notRegisteredWasRegisteredDescription:
-            "You are now retired and your listing in the DRep directory as <strong>MrDRep</strong> has been marked as <strong><i>retired</i></strong>. You cannot vote on Governance Actions as <strong>MrDRep</strong>.\n\nYou can always re-register as a DRep, in which case you will have the same DRep ID as you had initially.",
+            "You are now retired and your listing in the DRep directory has been marked as <strong><i>retired</i></strong>. You cannot vote on Governance Actions.\n\nYou can always re-register as a DRep, in which case you will have the same DRep ID as you had initially.",
           notRegisteredWasRegisteredTitle: "You Have Retired as a DRep.",
           register: "Register",
           registerAgain: "Register Again as a dRep",
@@ -83,7 +85,9 @@ export const en = {
           reRegister: "Re-register as a DRep",
           retire: "Retire as a DRep",
           retirementInProgress:
-            "You are being retired as <strong>MrDRep</strong>. You will receive a refund of <strong>{{deposit}} ADA</strong> when the transaction  completes.",
+            "You are being retired. You will receive a refund of <strong>{{deposit}} ada</strong> when the transaction  completes.",
+          retirementInProgressWithGivenName:
+            "You are being retired as <strong>{{givenName}}</strong>. You will receive a refund of <strong>{{deposit}} ada</strong> when the transaction  completes.",
           viewDetails: "View your DRep details",
           youAreRegistered: "You are Registered as a DRep",
           yourDRepId: "Your DRep ID",
@@ -101,7 +105,7 @@ export const en = {
         },
         directVoter: {
           isRegisteredDescription:
-            "Your Voting Power of ₳<strong>{{votingPower}}</strong> can be used to vote.",
+            "Your Voting Power can be used to vote.",
           register: "Register",
           registerDescription:
             "Register to Vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>.",
@@ -116,7 +120,7 @@ export const en = {
           retirementInProgress:
             "The retirement process is ongoing. This may take several minutes.",
           wasRegisteredDescription:
-            "You cannot vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>. until you re-register.",
+            "You cannot vote on Governance Actions using your own voting power until you re-register.",
           youAreDirectVoterTitle: "You are a Direct Voter",
         },
         delegation: {
@@ -125,18 +129,18 @@ export const en = {
           noDelegationDescription: "Find a DRep to vote on your behalf.",
           noDelegationActionButton: "View DRep Directory",
           dRepDelegationTitle:
-            "Your Voting Power of <strong>₳{{ada}}</strong>\nis Delegated to:",
+            "Your Voting Power is delegated to:",
           noConfidenceDelegationTitle:
-            "You have delegated <strong>₳{{ada}}</strong>\nto “No Confidence”",
+            "You have delegated your voting power to “No Confidence”",
           abstainDelegationTitle:
-            "You have delegated <strong>₳{{ada}}</strong>\nto “Abstain”",
+            "You have delegated your voting power to “Abstain”",
           abstainDescription:
             "You have selected to apply your Voting Power to Abstain on every vote.",
           noDescription:
             "You have selected to apply your Voting Power to No Confidence on every vote.",
           inProgress: {
             title: "Delegation",
-            dRep: "Your voting power of ₳<strong>{{ada}}</strong> is being delegated to:",
+            dRep: "Your voting power is being delegated to:",
             abstain:
               "You have selected to apply your Voting Power to Abstain on every vote.",
             no: "You have selected to apply your Voting Power to No Confidence on every vote.",
@@ -250,9 +254,9 @@ export const en = {
       abstainCardDefaultTitle: "Abstain from Every Vote",
       automatedVotingOptions: "Automated Voting Options",
       editBtn: "Edit DRep data",
-      delegatedToAbstainTitle: "You have delegated ₳{{ada}} to “Abstain”",
+      delegatedToAbstainTitle: "You have delegated your voting power to “Abstain”",
       delegatedToNoConfidenceTitle:
-        "You have delegated ₳{{ada}} to “No Confidence”",
+        "You have delegated your voting power to “No Confidence”",
       delegatedToAbstainDescription:
         "You have selected to apply your Voting Power to Abstain on every vote.",
       delegatedToNoConfidenceDescription:
@@ -262,10 +266,8 @@ export const en = {
       filterTitle: "DRep Status",
       goToDRepDirectory: "Go to DRep Directory",
       meAsDRep: "This DRep ID is connected to your wallet",
-      myDelegation: "You have delegated <strong>₳ {{ada}}</strong> to:",
-      myDelegationToYourself:
-        "You have delegated <strong>₳ {{ada}}</strong> to yourself:",
-      myDRep: "You have delegated ₳{{ada}} to this DRep.",
+      myDelegation: "You have delegated your voting power to:",
+      myDRep: "You have delegated your voting power to this DRep.",
       listTitle: "Find a DRep",
       noConfidenceDefaultDescription:
         "Select this to signal no confidence in the current constitutional committee by voting NO on every proposal and voting YES to no confidence proposals",
@@ -290,7 +292,7 @@ export const en = {
       checkIsWalletConnected: "Check if the wallet is connected.",
       dRepIdNotFound: "DrepId not found",
       insufficientBalanceDescription:
-        "To submit a Governance Action, you will be required to post a refundable balance of ₳{{ada}}. You do not currently have enough ADA in your wallet to continue.",
+        "To submit a Governance Action, you will be required to post a refundable balance of ₳{{ada}}. You do not currently have enough ada in your wallet to continue.",
       insufficientBalanceTitle: "Insufficient Balance",
       invalidGovernanceActionType: "Invalid Governance Action Type",
       invalidTreasuryGovernanceActionType: "Invalid Treasury Governance Action",
@@ -348,7 +350,7 @@ export const en = {
     footer: {
       copyright: "© 2024 Intersect MBO",
       privacyPolicy: "Privacy policy",
-      termOfService: "Term of service",
+      termOfService: "Terms and Conditions",
     },
     forms: {
       link: "Link",
@@ -357,31 +359,46 @@ export const en = {
         typeTip:
           "To change the Governance Action Type go back to the previous page.",
       },
-      editMetadata: {
-        bio: "Bio",
-        bioHelpfulText: "Some sentence about yourself",
-        bioPlaceholder: "Enter your Bio ...",
-        dRepName: "DRep Name",
-        dRepNameHelpfulText:
-          "This is name that will be shown on your DRep profile",
-        dRepNamePlaceholder: "ex. JohnDRep",
-        email: "Email",
-        emailPlaceholder: "john.smith@email.com",
+      dRepData: {
+        givenName: "DRep Name",
+        givenNameHelpfulText:
+          "This is the name that will be shown on your DRep profile",
+        objectives: "Objectives",
+        objectivesHelpfulText:
+          "What you believe and what you want to achieve as a DRep.",
+        motivations: "Motivations",
+        motivationsHelpfulText:
+          "Why do you want to be a DRep, what personal and professional experiences do you want to share.",
+        qualifications: "Qualifications",
+        qualificationsHelpfulText:
+          "List any qualifications that are relevant to your role as a DRep",
+        paymentAddress: "Payment Address",
+        paymentAddressHelpfulText:
+          "An address for DReps to receive payments. Only one address can be entered.",
+        doNotList: "Do Not List",
+        doNotListHelpfulText:
+          "Check this box if you do not want to be listed in DRep directories/compilations. If you tick this, you will not have a listing in the DRep listing on GovTool.",
+        referenceTypes: {
+          link: {
+            title: "Links",
+            description:
+              "Links to social media or any other web URL that gives a fuller picture of who you are, what you stand for, and why.",
+          },
+          identity: {
+            title: "Identity",
+            description:
+              "Identity links are a way to prove you are who you say you are. Ideally, you will provide a link to a place that shows your DRep ID clearly. The limit is 8 links in total.",
+          },
+        },
+        references: "References",
+        referenceDescription: "Description",
+        referenceDescriptionHelpfulText: "Limit: 80 characters",
+        referenceURL: "URL",
       },
       errors: {
         tooLongUrl: "Url must be less than 128 bytes",
         mustBeStakeAddress: "It must be reward address in bech32 format",
-      },
-      registerAsDRep: {
-        bio: "Bio",
-        bioHelpfulText: "Some sentence about yourself",
-        bioPlaceholder: "Enter your Bio ...",
-        dRepName: "DRep Name",
-        dRepNameHelpfulText:
-          "This is name that will be shown on your DRep profile",
-        dRepNamePlaceholder: "ex. JohnDRep",
-        email: "Email",
-        emailPlaceholder: "john.smith@email.com",
+        mustBeReceivingAddress: "Invalid payment address",
       },
     },
     proposalDiscussion: {
@@ -408,9 +425,21 @@ export const en = {
       expiryDate: "Expiry date:",
       filterTitle: "Governance Action Type",
       forGovAction: "for this Governance Action",
+      dReps: "DReps",
+      sPos: "SPOs",
+      ccCommittee: "Constitutional Committee",
       governanceActionId: "Governance Action ID:",
       governanceActionType: "Governance Action Type:",
       goToVote: "Go to Vote",
+      protocolParamsDetails: {
+        existing: "Existing",
+        proposed: "Proposed",
+      },
+      hardforkDetails: {
+        currentVersion: "Current version",
+        proposedVersion: "Proposed version",
+        previousGAId: "Previous Governance Action ID",
+      },
       motivation: "Motivation",
       myVote: "My Vote:",
       noResultsForTheSearch: "No results for the search.",
@@ -437,7 +466,7 @@ export const en = {
       voteContextFileName: "Vote_Context.jsonld",
       votedOnByMe: "Voted on by me",
       voteOnGovActions: "Vote on Governance Action",
-      voteSubmitted: "Vote submitted",
+      voteSubmitted: "Votes submitted",
       voteTransaction: "Vote transaction",
       votes: "Votes:",
       votesSubmitted: "DRep votes submitted",
@@ -493,10 +522,10 @@ export const en = {
       },
     },
     hero: {
-      connectWallet: "Connect your wallet",
+      connectWallet: "Connect your wallet to start",
       description:
-        "Anyone with a wallet containing ADA can participate in governance on Voltaire.\n\nYour ADA balance entitles you to an equal amount of Voting Power.\n\nFor more info see the guide entry for <0>Voting Power</0>.",
-      headline: "Voltaire \n Governance Tool",
+        "Cardano Governance lets Ada holders have a say in the network's future.\n\nYou can vote directly, find someone to represent you, or become a representative for others.\n\nYou can also propose changes in the network yourself, put these up for discussion and eventually, a vote.\n\n<0>Learn more about governance</0> in the guide, or have a look around the app and see Cardano Governance in action.",
+      headline: "Cardano \n Governance Tool",
     },
     home: {
       cards: {
@@ -518,7 +547,7 @@ export const en = {
         },
         registerAsDRep: {
           description:
-            "Accept delegated voting power from other ADA holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
+            "Accept delegated voting power from other Ada holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
           firstButtonLabel: "Connect to Register",
           title: "Become a DRep",
         },
@@ -568,7 +597,7 @@ export const en = {
         beCareful: "Be Careful!",
         continueTo: "Continue to external link",
         description:
-          "Exercise caution and verify the website's authenticity before sharing personal information. To proceed, click 'Continue'. To stay on Voltaire, click 'Cancel'.",
+          "Exercise caution and verify the website's authenticity before sharing personal information. To proceed, click 'Continue'. To stay on Cardano, click 'Cancel'.",
         safety: "External Link Safety",
         thisIs: "This is an external link:",
         youAreAboutToOpen: "You are about to open an external link to:",
@@ -611,18 +640,16 @@ export const en = {
           "GovTool will read the URL that you supplied and make a check to see if it’s identical with the information that you entered on the form.",
       },
     },
-    editMetadata: {
-      pageTitle: "Edit DRep Info",
+    dRepData: {
       aboutYou: "About You",
-      aboutYouDescription:
-        "Some extra info about you to provide context to delegators.",
-      dRepName: "DRep Name",
+      dRepName: "Name",
       dRepNameDescription:
         "This is the name that will be displayed in the DRep Directory and it will be used also by delegators to find your profile.",
-      linksDescription: "Links to extra content or social media contacts ",
-      maximumLinks: "(maximum of {{numberOfLinks}} entries)",
       optional: "optional",
       required: "required",
+    },
+    editMetadata: {
+      pageTitle: "Edit DRep Info",
       storeDataCheckboxLabel:
         "I agree to store correctly this information and to maintain them over the years",
       storeDataLink: "Learn more about storing information",
@@ -638,38 +665,27 @@ export const en = {
       storingInformationURLPlaceholder: "URL",
       fields: {
         validations: {
-          email: "Invalid email address",
           maxLength: "Max {{maxLength}} characters",
-          nickname: "Nickname can not contain whitespaces",
           required: "This field is required",
           url: "Invalid URL",
         },
       },
     },
     registration: {
-      aboutYou: "About You",
-      aboutYouDescription:
-        "Some extra info about you to provide context to delegators.",
       addInformationDescription:
         "You can include extra information about yourself by adding a URL and its hash.",
       addInformationTitle: "Add Information",
       alreadyRegistered: {
         title: "You already are a DRep",
-        description: "Looks like you have already successfully completed your registration and you currently are a DRep.\n\nYou can view your details in the DRep Directory.",
+        description:
+          "Looks like you have already successfully completed your registration and you currently are a DRep.\n\nYou can view your details in the DRep Directory.",
         viewDetails: "View your DRep details",
       },
       becomeADRep: "Become a DRep",
       descriptionStepTwo:
         "By clicking register you create your DRep ID within your wallet and become a DRep.\n\nOnce the registration has completed your DRep ID will be shown on your dashboard. You will be able to share your DRep ID so that other ada holders can delegate their voting power to you.",
-      dRepName: "DRep Name",
-      dRepNameDescription:
-        "This is the name that will be displayed in the DRep Directory and it will be used also by delegators to find your profile.",
       headingStepTwo: "Confirm DRep registration",
-      linksDescription: "Links to extra content or social media contacts ",
-      maximumLinks: "(maximum of {{numberOfLinks}} entries)",
-      optional: "optional",
       register: "Register",
-      required: "required",
       rolesAndResponsibilitiesDescription:
         "DReps are fundamental users that govern the Cardano network. This is an important role which requires work and dedication to fulfil.\n\nA DRep is expected to actively participate in governance and act as a representative of other Cardano members in  governance matters. Therefore, DReps will be expected to keep abreast of Governance Actions so they can make informed and wise decisions.\n<0>Learn More</0> about DRep.\n\nPlease register as a DRep if you have time to dedicate to making Cardano a better and more well-governed place.\n\nBecoming a DRep will require a refundable deposit of ₳<strong>{{deposit}}</strong>.\n\nYou will be refunded your deposit when you retire.",
       rolesAndResponsibilitiesTitle: "Roles & Responsibilities",
@@ -688,24 +704,24 @@ export const en = {
       storingInformationURLPlaceholder: "URL",
       fields: {
         validations: {
-          email: "Invalid email address",
           maxLength: "Max {{maxLength}} characters",
-          nickname: "Nickname can not contain whitespaces",
           required: "This field is required",
           url: "Invalid URL",
+          noSpaces: "No spaces allowed",
         },
       },
     },
     retirement: {
       notADRep: {
         title: "You are not a DRep",
-        description: "Looks like you cannot retire, because currently you are not a DRep.",
+        description:
+          "Looks like you cannot retire, because currently you are not a DRep.",
       },
       continue: "Continue to Retirement",
       retireAsDrep: "Retire as a Drep",
       whatRetirementMeansTitle: "What Retirement Means",
       whatRetirementMeansDescription:
-        "By retiring you are giving up your voting rights. Voting Power that is delegated to you will remain in place.\n\nADA Holders that have delegated to be able to see that you are retired in the DRep directory. They will be able to re-delegate their Voting Power to another DRep.\n\nYou can still participate in Governance by proposing Governance Actions, by delegating your personal Voting Power to another DRep, or by coming out of retirement, and assuming your previous role as a DRep.\n\nIf you come out of retirement, your DRep ID will be the same as it was before retirement, and your Voting Power will consist of your own ADA balance and what delegated power that remains associated\nto your DRep ID.",
+        "By retiring you are giving up your voting rights. Voting Power that is delegated to you will remain in place.\n\nADA Holders that have delegated to be able to see that you are retired in the DRep directory. They will be able to re-delegate their Voting Power to another DRep.\n\nYou can still participate in Governance by proposing Governance Actions, by delegating your personal Voting Power to another DRep, or by coming out of retirement, and assuming your previous role as a DRep.\n\nIf you come out of retirement, your DRep ID will be the same as it was before retirement, and your Voting Power will consist of your own Ada balance and what delegated power that remains associated\nto your DRep ID.",
     },
     slider: {
       showAll: "Show All",
@@ -714,25 +730,29 @@ export const en = {
     directVoter: {
       alreadyRegistered: {
         title: "You already are a Direct Voter",
-        description: "Looks like you have already successfully completed your registration and you currently are a Direct Voter.",
+        description:
+          "Looks like you have already successfully completed your registration and you currently are a Direct Voter.",
       },
       becomeDirectVoter: "Become a Direct Voter",
       notDirectVoter: {
         title: "You are not a Direct Voter",
-        description: "Looks like you cannot retire, because currently you are not a Direct Voter.",
+        description:
+          "Looks like you cannot retire, because currently you are not a Direct Voter.",
       },
       registerDescription:
-        "A Direct Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of ADA in their connected wallet. <0>Learn More</0> about Direct Voter.\n\nBecoming a Direct Voter will require a refundable deposit of <strong>₳{{deposit}}</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
+        "A Direct Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of Ada in their connected wallet. <0>Learn More</0> about Direct Voter.\n\nBecoming a Direct Voter will require a refundable deposit equal to your voting power.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
       registerHeading: "What this Means",
       retirementDescription:
-        "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of {{deposit}} ADA will be refunded.\n\nYou can at any time in the future re-register to become a Direct Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\nThese options are listed in our Guides here: <0>Voting options and Roles</0>",
+        "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of {{deposit}} ada will be refunded.\n\nYou can at any time in the future re-register to become a Direct Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\nThese options are listed in our Guides here: <0>Voting options and Roles</0>",
       retirementHeading: "What Retirement Means",
       retireDirectVoter: "Retire as a Direct Voter",
     },
     system: {
       description:
-        "The Voltaire GovTool is a tool that allows you to participate in the governance of the Cardano network. You can propose, vote on, and delegate your voting power to other users.",
+        "The Cardano GovTool is a tool that allows you to participate in the governance of the Cardano network. You can propose, vote on, and delegate your voting power to other users.",
       title: "This tool is connected to {{networkName}}",
+      bootstrappingWarning:
+        "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>",
     },
     tooltips: {
       delegateTodRep: {

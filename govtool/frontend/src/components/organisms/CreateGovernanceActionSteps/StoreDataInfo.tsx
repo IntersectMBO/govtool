@@ -20,8 +20,10 @@ export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
   const { control, errors, watch } = useCreateGovernanceActionForm();
   const { isMobile } = useScreenDimension();
 
-  // TODO: change link when available
-  const openLink = () => openInNewTab("https://docs.gov.tools");
+  const openLink = () =>
+    openInNewTab(
+      "https://docs.gov.tools/using-govtool/govtool-functions/storing-information-offline",
+    );
 
   const isContinueDisabled = !watch("storeData");
 

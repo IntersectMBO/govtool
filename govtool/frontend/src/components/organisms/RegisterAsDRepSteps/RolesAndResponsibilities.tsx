@@ -20,12 +20,14 @@ export const RolesAndResponsibilities = ({
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
 
-  const deposit = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
+  const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
   const onClickContinue = () => setStep(2);
 
   const openLearnMoreAboutDrep = () =>
-    openInNewTab("https://sancho.network/roles/drep");
+    openInNewTab(
+      "https://docs.gov.tools/using-govtool/govtool-functions/dreps",
+    );
 
   return (
     <>
@@ -51,7 +53,7 @@ export const RolesAndResponsibilities = ({
             />,
           ]}
           i18nKey="registration.rolesAndResponsibilitiesDescription"
-          values={{ deposit: correctAdaFormat(deposit.drep_deposit) }}
+          values={{ deposit: correctAdaFormat(epochParams?.drep_deposit) }}
         />
       </Typography>
       <CenteredBoxBottomButtons

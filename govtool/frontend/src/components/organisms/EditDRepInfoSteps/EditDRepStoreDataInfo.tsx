@@ -27,8 +27,10 @@ export const EditDRepStoreDataInfo = ({
 
   const isContinueDisabled = !watch("storeData");
 
-  // TODO: Add link about store data when available
-  const openLink = () => openInNewTab("https://sancho.network/get-started");
+  const openLink = () =>
+    openInNewTab(
+      "https://docs.gov.tools/using-govtool/govtool-functions/storing-information-offline",
+    );
 
   return (
     <>

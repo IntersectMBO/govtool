@@ -2,12 +2,15 @@ import { dRep02Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { invalid as mockInvalid } from "@mock/index";
+import { ShelleyWallet } from "@helpers/crypto";
+import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import EditDRepPage from "@pages/editDRepPage";
 import { expect } from "@playwright/test";
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
+  await skipIfNotHardFork();
 });
 
 test.use({ wallet: dRep02Wallet, storageState: ".auth/dRep02.json" });
@@ -23,20 +26,39 @@ test.describe("Validation of edit dRep Form", () => {
     await page.waitForTimeout(5_000);
 
     for (let i = 0; i < 100; i++) {
-      await editDRepPage.validateForm(
-        faker.internet.displayName(),
-        faker.internet.email(),
-        faker.lorem.paragraph(),
-        faker.internet.url()
-      );
+      await editDRepPage.validateForm({
+        name: faker.internet.displayName(),
+        objectives: faker.lorem.paragraph(2),
+        motivations: faker.lorem.paragraph(2),
+        qualifications: faker.lorem.paragraph(2),
+        paymentAddress: (await ShelleyWallet.generate()).addressBech32(0),
+        linksReferenceLinks: [
+          {
+            url: faker.internet.url(),
+            description: faker.internet.displayName(),
+          },
+        ],
+        identityReferenceLinks: [
+          {
+            url: faker.internet.url(),
+            description: faker.internet.displayName(),
+          },
+        ],
+      });
     }
 
     for (let i = 0; i < 6; i++) {
-      await expect(editDRepPage.addLinkBtn).toBeVisible();
-      await editDRepPage.addLinkBtn.click();
+      await expect(editDRepPage.addLinkReferenceBtn).toBeVisible();
+      await editDRepPage.addLinkReferenceBtn.click();
     }
 
-    await expect(editDRepPage.addLinkBtn).toBeHidden();
+    for (let i = 0; i < 6; i++) {
+      await expect(editDRepPage.addIdentityReferenceBtn).toBeVisible();
+      await editDRepPage.addIdentityReferenceBtn.click();
+    }
+
+    await expect(editDRepPage.addLinkReferenceBtn).toBeHidden();
+    await expect(editDRepPage.addIdentityReferenceBtn).toBeHidden();
   });
 
   test("3M_2. Should reject invalid data in edit dRep form", async ({
@@ -50,12 +72,25 @@ test.describe("Validation of edit dRep Form", () => {
     await page.waitForTimeout(3_000); // wait until dRep information load properly
 
     for (let i = 0; i < 100; i++) {
-      await editDRepPage.inValidateForm(
-        mockInvalid.name(),
-        mockInvalid.email(),
-        faker.lorem.paragraph(40),
-        mockInvalid.url()
-      );
+      await editDRepPage.inValidateForm({
+        name: mockInvalid.name(),
+        objectives: faker.lorem.paragraph(40),
+        motivations: faker.lorem.paragraph(40),
+        qualifications: faker.lorem.paragraph(40),
+        paymentAddress: faker.string.alphanumeric(45),
+        linksReferenceLinks: [
+          {
+            url: mockInvalid.url(),
+            description: faker.lorem.paragraph(40),
+          },
+        ],
+        identityReferenceLinks: [
+          {
+            url: mockInvalid.url(),
+            description: faker.lorem.paragraph(40),
+          },
+        ],
+      });
     }
   });
 
@@ -70,10 +105,10 @@ test.describe("Validation of edit dRep Form", () => {
 
     await editDRepPage.continueBtn.click();
     await page.getByRole("checkbox").click();
-    await editDRepPage.continueBtn.click();
+    await editDRepPage.registerBtn.click();
 
     for (let i = 0; i < 100; i++) {
-      await editDRepPage.metadataUrlInput.fill(faker.internet.url());
+      await editDRepPage.metadataUrlInput.fill(mockValid.url());
       await expect(page.getByTestId("invalid-url-error")).toBeHidden();
     }
   });
@@ -89,7 +124,7 @@ test.describe("Validation of edit dRep Form", () => {
 
     await editDRepPage.continueBtn.click();
     await page.getByRole("checkbox").click();
-    await editDRepPage.continueBtn.click();
+    await editDRepPage.registerBtn.click();
 
     for (let i = 0; i < 100; i++) {
       await editDRepPage.metadataUrlInput.fill(mockInvalid.url());
@@ -119,11 +154,11 @@ test("3P. Should reject invalid edit dRep metadata", async ({ page }) => {
 
   await editDRepPage.continueBtn.click();
   await page.getByRole("checkbox").click();
-  await editDRepPage.continueBtn.click();
+  await editDRepPage.registerBtn.click();
 
   const invalidMetadataAnchor = "https://www.google.com";
   await editDRepPage.metadataUrlInput.fill(invalidMetadataAnchor);
-  await editDRepPage.continueBtn.click();
+  await editDRepPage.submitBtn.click();
 
   await expect(page.getByTestId("modal")).toHaveText(
     /your external data does not/i

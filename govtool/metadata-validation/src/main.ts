@@ -13,18 +13,14 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Metadata Validation Tool')
     .setDescription('The Metadata Validation Tool API description')
-    .setVersion('1.0.13')
+    .setVersion('1.0.17')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      // Do not throw error on missing fields
-      exceptionFactory: () => ({ status: 200, valid: false }),
-    }),
-  );
+  app.useGlobalPipes(new ValidationPipe());
+
   await app.listen(process.env.PORT);
 }
 bootstrap();

@@ -11,8 +11,8 @@ include config.mk
 .DEFAULT_GOAL := info
 
 # image tags
-cardano_node_image_tag := 9.0.0-sancho
-cardano_db_sync_image_tag := sancho-5.1.0
+cardano_node_image_tag := 9.1.1
+cardano_db_sync_image_tag := 13.5.0.1
 
 .PHONY: all
 all: deploy-stack notify

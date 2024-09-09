@@ -1,28 +1,11 @@
 import i18n from "@/i18n";
-import {
-  EMAIL_REGEX,
-  NICKNAME_REGEX,
-  URL_REGEX,
-  isValidURLLength,
-} from "@/utils";
+import { URL_REGEX, isReceivingAddress, isValidURLLength } from "@/utils";
 
 export const Rules = {
-  BIO: {
-    maxLength: {
-      value: 500,
-      message: i18n.t("registration.fields.validations.maxLength", {
-        maxLength: 500,
-      }),
-    },
-  },
-  DREP_NAME: {
+  GIVEN_NAME: {
     required: {
       value: true,
       message: i18n.t("registration.fields.validations.required"),
-    },
-    pattern: {
-      value: NICKNAME_REGEX,
-      message: i18n.t("registration.fields.validations.nickname"),
     },
     maxLength: {
       value: 80,
@@ -30,14 +13,20 @@ export const Rules = {
         maxLength: 80,
       }),
     },
-  },
-  EMAIL: {
     pattern: {
-      value: EMAIL_REGEX,
-      message: i18n.t("registration.fields.validations.email"),
+      value: /^[^\s]+$/,
+      message: i18n.t("registration.fields.validations.noSpaces"),
     },
   },
-  LINK: {
+  LINK_DESCRIPTION: {
+    maxLength: {
+      value: 80,
+      message: i18n.t("registration.fields.validations.maxLength", {
+        maxLength: 80,
+      }),
+    },
+  },
+  LINK_URL: {
     pattern: {
       value: URL_REGEX,
       message: i18n.t("registration.fields.validations.url"),
@@ -53,5 +42,32 @@ export const Rules = {
       message: i18n.t("registration.fields.validations.url"),
     },
     validate: isValidURLLength,
+  },
+  MOTIVATIONS: {
+    maxLength: {
+      value: 1000,
+      message: i18n.t("registration.fields.validations.maxLength", {
+        maxLength: 1000,
+      }),
+    },
+  },
+  OBJECTIVES: {
+    maxLength: {
+      value: 1000,
+      message: i18n.t("registration.fields.validations.maxLength", {
+        maxLength: 1000,
+      }),
+    },
+  },
+  PAYMENT_ADDRESS: {
+    validate: isReceivingAddress,
+  },
+  QUALIFICATIONS: {
+    maxLength: {
+      value: 1000,
+      message: i18n.t("registration.fields.validations.maxLength", {
+        maxLength: 1000,
+      }),
+    },
   },
 };

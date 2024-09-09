@@ -36,8 +36,7 @@ describe('AppService', () => {
   it('should validate metadata correctly', async () => {
     const url = 'http://example.com';
     const hash = 'correctHash';
-    const standard = MetadataStandard.CIP108;
-    const validateMetadataDTO: ValidateMetadataDTO = { hash, url, standard };
+    const validateMetadataDTO: ValidateMetadataDTO = { hash, url };
     const data = {
       body: 'testBody',
       headers: {},
@@ -65,8 +64,14 @@ describe('AppService', () => {
       valid: true,
       metadata: parsedMetadata,
     });
-    expect(validateMetadataStandard).toHaveBeenCalledWith(data, standard);
-    expect(parseMetadata).toHaveBeenCalledWith(data.body, standard);
+    expect(validateMetadataStandard).toHaveBeenCalledWith(
+      data,
+      MetadataStandard.CIP108,
+    );
+    expect(parseMetadata).toHaveBeenCalledWith(
+      data.body,
+      MetadataStandard.CIP108,
+    );
   });
 
   it('should handle URL_NOT_FOUND error', async () => {
@@ -92,8 +97,7 @@ describe('AppService', () => {
   it('should handle INVALID_HASH error', async () => {
     const url = 'http://example.com';
     const hash = 'incorrectHash';
-    const standard = MetadataStandard.CIP108;
-    const validateMetadataDTO: ValidateMetadataDTO = { hash, url, standard };
+    const validateMetadataDTO: ValidateMetadataDTO = { hash, url };
     const data = {
       body: 'testBody',
     };
@@ -118,39 +122,6 @@ describe('AppService', () => {
 
     expect(result).toEqual({
       status: MetadataValidationStatus.INVALID_HASH,
-      valid: false,
-      metadata: parsedMetadata,
-    });
-  });
-
-  it('should handle INVALID_JSONLD error', async () => {
-    const url = 'http://example.com';
-    const hash = 'correctHash';
-    const standard = MetadataStandard.CIP108;
-    const validateMetadataDTO: ValidateMetadataDTO = { hash, url, standard };
-    const data = {
-      body: 'testBody',
-    };
-    const parsedMetadata = { parsed: 'metadata' };
-
-    const response: AxiosResponse = {
-      data,
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config: {
-        headers: {} as AxiosRequestHeaders,
-        url,
-      },
-    };
-    jest.spyOn(httpService, 'get').mockReturnValueOnce(of(response));
-    (validateMetadataStandard as jest.Mock).mockResolvedValueOnce(undefined);
-    (parseMetadata as jest.Mock).mockReturnValueOnce(parsedMetadata);
-
-    const result = await service.validateMetadata(validateMetadataDTO);
-
-    expect(result).toEqual({
-      status: MetadataValidationStatus.INVALID_JSONLD,
       valid: false,
       metadata: parsedMetadata,
     });

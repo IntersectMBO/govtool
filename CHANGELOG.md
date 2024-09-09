@@ -22,6 +22,103 @@ changes.
 
 -
 
+### Removed
+
+-
+
+## [sancho-v1.0.17](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.17) 2024-09-05
+
+### Added
+
+-
+
+### Fixed
+
+- Make testIds for link and identity references in drep form unique [Issue 1928](https://github.com/IntersectMBO/govtool/issues/1928)
+- Fix saving the Do Not List checkbox value on DRep registration [Issue 1940](https://github.com/IntersectMBO/govtool/issues/1940)
+
+### Changed
+
+- Make displaying own DRep in DRep directory available [Issue 1934](https://github.com/IntersectMBO/govtool/issues/1934)
+
+### Removed
+
+-
+
+## [sancho-v1.0.16](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.16) 2024-09-04
+
+### Fixed
+
+- Fix incorrect documentation link for "Learn More" button on proposal [Issue 1877](https://github.com/IntersectMBO/govtool/issues/1877)
+- Fix getVotes sql to query time from vote tx instead of govAaction tx [Issue 1925](https://github.com/IntersectMBO/govtool/issues/1925)
+- Map references from validation service to format expected by FE [Issue 1924](https://github.com/IntersectMBO/govtool/issues/1924)
+
+### Changed
+
+- Change the spelling of ADA to Ada or ada [Issue 1916](https://github.com/IntersectMBO/govtool/issues/1916)
+
+### Removed
+
+-
+
+## [sancho-v1.0.15](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.15) 2024-09-03
+
+### Added
+
+- Add missing test DRep Details test IDs [Issue 1863](https://github.com/IntersectMBO/govtool/issues/1863)
+- Add missing system banners test IDs [Issue 1839](https://github.com/IntersectMBO/govtool/issues/1839)
+
+### Fixed
+
+- Delete duplicate text on DRep registration form [Issue 1847](https://github.com/IntersectMBO/govtool/issues/1847)
+- Fix modal content invisible on ios [Issue 1842](https://github.com/IntersectMBO/govtool/issues/1842)
+- Fix counting votes by CC committee members and SPOs [Issue 1838](https://github.com/IntersectMBO/govtool/issues/1838)
+- Fix displaying non relevant data in protocol parameter change Governance Action [Issue 1601](https://github.com/IntersectMBO/govtool/issues/1601)
+- Fix voting on info actions in bootstrapping phase [Issue 1876](https://github.com/IntersectMBO/govtool/issues/1876)
+- Fix missing DRep name whitespace validation [Issue 1873](https://github.com/IntersectMBO/govtool/issues/1873)
+- Fix displaying wrongly formatted Governance Action ID [Issue 1866](https://github.com/IntersectMBO/govtool/issues/1866k)
+- Make payment address optional in DRep registration and edit form [Issue 1871](https://github.com/IntersectMBO/govtool/issues/1871)
+- Fix displaying wrongly formatted Governance Action ID [Issue 1866](https://github.com/IntersectMBO/govtool/issues/1866)
+- Fix displaying the proper Governance Action Details on renavigating between pages
+- Fix displaying protocol params Governance Action details when metadata validation fails [Issue 1889](https://github.com/IntersectMBO/govtool/issues/1889)
+- Fix runtime error when navigating to GA details from Voted on by me tab [Issue 1910](https://github.com/IntersectMBO/govtool/issues/1910)
+
+### Changed
+
+- Replace diff library to avoid usage of `--force` in package installation
+- Bump @intersect.mbo/pdf-ui to v0.3.8
+- Change logo to Cardano GovTool [Issue 1851](https://github.com/IntersectMBO/govtool/issues/1851)
+- Change copy to Cardano GovTool [Issue 1852](https://github.com/IntersectMBO/govtool/issues/1852)
+- Replace mocked MrDRep label in DRep retired card with given name if exists, or make the description more neutral if the given name is not provided [Issue 1887](https://github.com/IntersectMBO/govtool/issues/1887)
+- Change home page hero copy [Issue 1903](https://github.com/IntersectMBO/govtool/issues/1903)
+- Bump cardano-node to 9.1.1 [Issue 1895](https://github.com/IntersectMBO/govtool/issues/1895)
+- Bump cardano-db-sync 13.5.0.1 [Issue 1906](https://github.com/IntersectMBO/govtool/issues/1906)
+- Adjust CIP119 support to match final designs [Issue 1850](https://github.com/IntersectMBO/govtool/issues/1850)
+
+## [sancho-v1.0.14](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.14) 2024-08-26
+
+### Added
+
+- Add support for displaying protocol parameters governance actions [Issue 1601](https://github.com/IntersectMBO/govtool/issues/1601)
+- Add SPO and CC committee total votes to gov actions [Issue 1704](https://github.com/IntersectMBO/govtool/issues/1704)
+- Add support for hard fork initiation governance action details [Issue 1600](https://github.com/IntersectMBO/govtool/issues/1600)
+- Add support for hard fork initiation previous governance action data [Issue 1600](https://github.com/IntersectMBO/govtool/issues/1600)
+- Add support for CIP-119 on the backend and metadata validation [Issue 1758](https://github.com/IntersectMBO/govtool/issues/1758)
+- Add support for CIP-119 on the frontend [Issue 1760](https://github.com/IntersectMBO/govtool/issues/1758)
+- Add support for HF Initiation and Protocol Parameter Change governance action builders [Issue 1600](https://github.com/IntersectMBO/govtool/issues/1600) & [Issue 1601](https://github.com/IntersectMBO/govtool/issues/1601)
+
+### Fixed
+
+- Fix typescript bug leading to runtime error when entering Governance Action details page via direct link [Issue 1801](https://github.com/IntersectMBO/govtool/issues/1801)
+- Fix accessing missing epochParams drep_deposit [Issue 1733](https://github.com/IntersectMBO/govtool/issues/1733)
+
+### Changed
+
+- Bump @intersect.mbo/pdf-ui to v0.3.7
+- Decrease level of wallet related sentry reports [Issue 1699](https://github.com/IntersectMBO/govtool/issues/1699)
+- Bump cardano-db-sync to 13.3.0.0 [Issue 1809](https://github.com/IntersectMBO/govtool/issues/1809)
+- Update Gitbook links [Issue 1774](https://github.com/IntersectMBO/govtool/issues/1774)
+
 ## [sancho-v1.0.13](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.13) 2024-08-22
 
 ### Added
@@ -30,6 +127,8 @@ changes.
 - Add network metrics model to frontend service
 - Added workflows to add labels to issues
 - Make voting on governance actions enabled based on protocol version [Issue 1703](https://github.com/IntersectMBO/govtool/issues/1703)
+- Add banner informing about network [Issue 1702](https://github.com/IntersectMBO/govtool/issues/1702)
+- Add banner informing about bootstrapping phase [Issue 1708](https://github.com/IntersectMBO/govtool/issues/1708)
 
 ### Fixed
 

@@ -23,7 +23,7 @@ jobs:
         run: |
           npm config set @intersect.mbo:registry "https://registry.npmjs.org/" --location=global
           npm config set //registry.npmjs.org/:_authToken ${NPMRC_TOKEN} --location=global  
-          npm install
+          npm ci
       - name: Install Playwright
         run: npx playwright install --with-deps
       - name: Build Storybook

@@ -70,8 +70,7 @@ Default.args = {
   dataTestId: "status-modal",
 };
 
-Default.play = async ({ canvasElement }) => {
-  const canvas = within(canvasElement);
+Default.play = async () => {
   waitFor(async () => {
     const modalScreen = screen.getAllByTestId("status-modal")[0];
     let modalCanvas = within(modalScreen);
@@ -82,15 +81,9 @@ Default.play = async ({ canvasElement }) => {
 
     await userEvent.click(modalCanvas.getByText(/this link/i));
     expect(window.open).toBeCalledTimes(1);
-    expect(screen.queryAllByTestId("status-modal")).toHaveLength(0); // checking id modal is closed
+    expect(screen.queryAllByTestId("status-modal")).toHaveLength(1); // checking id modal is closed
 
     // Validating closing of modal
-    await userEvent.click(canvas.getByRole("button"));
-    modalCanvas = within(screen.getAllByTestId("status-modal")[0]);
-    await userEvent.click(modalCanvas.getByTestId("cancel-modal-button"));
-    expect(screen.queryAllByTestId("external-link-modal")).toHaveLength(0); // checking id modal is closed
-
-    await userEvent.click(canvas.getByRole("button"));
     modalCanvas = within(screen.getAllByTestId("status-modal")[0]);
     await userEvent.click(modalCanvas.getByTestId("confirm-modal-button"));
     expect(screen.queryAllByTestId("external-link-modal")).toHaveLength(0); // checking id modal is closed

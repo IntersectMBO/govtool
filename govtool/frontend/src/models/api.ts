@@ -1,4 +1,5 @@
 import { MetadataValidationStatus } from "@models";
+import { GovernanceActionType } from "@/types/governanceAction";
 
 export type EpochParams = {
   block_id: number;
@@ -73,15 +74,24 @@ export type NetworkMetrics = {
 };
 
 export type VoterInfo = {
-  isRegisteredAsDRep: boolean;
-  wasRegisteredAsDRep: boolean;
-  isRegisteredAsSoleVoter: boolean;
-  wasRegisteredAsSoleVoter: boolean;
-  deposit: number;
   dRepRegisterTxHash: string | null;
   dRepRetireTxHash: string | null;
+  deposit: number;
+  givenName: string | null;
+  imageHash: string | null;
+  imageUrl: string | null;
+  isRegisteredAsDRep: boolean;
+  isRegisteredAsSoleVoter: boolean;
+  motivations: string | null;
+  objectives: string | null;
+  paymentAddress: string | null;
+  qualifications: string | null;
   soleVoterRegisterTxHash: string | null;
   soleVoterRetireTxHash: string | null;
+  url: string | null;
+  votingPower: number | null;
+  wasRegisteredAsDRep: boolean;
+  wasRegisteredAsSoleVoter: boolean;
 };
 
 export enum DRepStatus {
@@ -111,17 +121,20 @@ export type DrepDataDTO = {
 };
 
 export type DRepData = DrepDataDTO & {
-  bio: string | null;
-  dRepName: string | null;
-  email: string | null;
-  references: string[];
+  paymentAddress: string | null;
+  givenName: string;
+  objectives: string | null;
+  motivations: string | null;
+  qualifications: string | null;
+  references: Reference[];
+  doNotList: boolean;
   metadataStatus: MetadataValidationStatus | null;
   metadataValid: boolean;
 };
 
 export type Vote = "yes" | "no" | "abstain";
 
-type ProposalVote = {
+export type ProposalVote = {
   date: string;
   drepId: string;
   epochNo: number;
@@ -133,7 +146,6 @@ type ProposalVote = {
 };
 
 export type ProposalDataDTO = {
-  abstainVotes: number;
   createdDate: string;
   createdEpochNo: number;
   details?: ActionDetailsType;
@@ -142,16 +154,26 @@ export type ProposalDataDTO = {
   id: string;
   index: number;
   metadataHash: string;
-  noVotes: number;
   txHash: string;
-  type: string;
+  type: GovernanceActionType;
   url: string;
-  yesVotes: number;
+  dRepYesVotes: number;
+  dRepNoVotes: number;
+  dRepAbstainVotes: number;
+  ccYesVotes: number;
+  ccNoVotes: number;
+  ccAbstainVotes: number;
+  poolYesVotes: number;
+  poolNoVotes: number;
+  poolAbstainVotes: number;
+  prevGovActionIndex: number | null;
+  prevGovActionTxHash: string | null;
   abstract?: string;
   motivation?: string;
   rationale?: string;
   references?: string[];
   title?: string;
+  protocolParams: EpochParams | null;
 };
 
 export type ProposalData = ProposalDataDTO & {

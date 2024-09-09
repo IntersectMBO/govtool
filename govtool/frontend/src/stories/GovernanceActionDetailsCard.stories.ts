@@ -1,9 +1,13 @@
-import { MetadataValidationStatus } from "@models";
+import { MetadataValidationStatus, ProposalData } from "@models";
 import { GovernanceActionDetailsCard } from "@organisms";
 import { expect, jest } from "@storybook/jest";
 import type { Meta, StoryObj } from "@storybook/react";
 import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
-import { formatDisplayDate, getProposalTypeNoEmptySpaces } from "@/utils";
+import {
+  formatDisplayDate,
+  getFullGovActionId,
+  getProposalTypeNoEmptySpaces,
+} from "@/utils";
 import { GovernanceActionType } from "@/types/governanceAction";
 
 const meta = {
@@ -20,20 +24,40 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const commonArgs = {
-  abstainVotes: 1000000,
-  createdDate: new Date().toISOString(),
-  expiryDate: new Date().toISOString(),
-  noVotes: 1000000,
-  label: "Info Action",
-  type: GovernanceActionType.InfoAction,
-  url: "https://exampleurl.com",
-  yesVotes: 1000000,
-  createdEpochNo: 302,
-  expiryEpochNo: 350,
-  govActionId: "exampleId1232312312312",
   isDataMissing: null,
-  title: "Example title",
+  proposal: {
+    id: "1",
+    index: 1,
+    txHash: "exampleTxHash",
+    createdDate: new Date().toISOString(),
+    createdEpochNo: 1000000,
+    expiryEpochNo: 1000001,
+    expiryDate: new Date().toISOString(),
+    type: GovernanceActionType.InfoAction,
+    url: "https://exampleurl.com",
+    title: "Example title",
+    dRepYesVotes: 1000000,
+    dRepNoVotes: 302,
+    dRepAbstainVotes: 350,
+    poolYesVotes: 1,
+    poolNoVotes: 0,
+    poolAbstainVotes: 2,
+    ccYesVotes: 1,
+    ccNoVotes: 0,
+    ccAbstainVotes: 2,
+    protocolParams: null,
+    prevGovActionIndex: null,
+    prevGovActionTxHash: null,
+    metadataHash: "exampleMetadataHash",
+    metadataStatus: null,
+    metadataValid: true,
+  } satisfies ProposalData,
 };
+
+const govActionId = getFullGovActionId(
+  commonArgs.proposal.txHash,
+  commonArgs.proposal.index,
+);
 
 async function assertTooltip(tooltip: HTMLElement, expectedText: RegExp) {
   await userEvent.hover(tooltip);
@@ -51,25 +75,30 @@ async function assertGovActionDetails(
   const todayDate = formatDisplayDate(new Date());
   await expect(canvas.getAllByText(todayDate)).toHaveLength(2);
   await expect(
-    canvas.getByTestId(`${getProposalTypeNoEmptySpaces(args.type)}-type`),
-  ).toHaveTextContent(args.label);
-  await expect(canvas.getByTestId(`${args.govActionId}-id`)).toHaveTextContent(
-    args.govActionId,
+    canvas.getByTestId(
+      `${getProposalTypeNoEmptySpaces(args.proposal.type)}-type`,
+    ),
+  ).toHaveTextContent("Info Action");
+  await expect(canvas.getByTestId(`${govActionId}-id`)).toHaveTextContent(
+    govActionId,
   );
 }
 
 export const GovernanceActionDetailsCardComponent: Story = {
   args: {
     ...commonArgs,
-    abstract: "Example about section",
-    rationale: "Example rationale section",
-    motivation: "Example motivation section",
+    proposal: {
+      ...commonArgs.proposal,
+      abstract: "Example about section",
+      rationale: "Example rationale section",
+      motivation: "Example motivation section",
+    },
   },
 
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
 
-    await expect(canvas.getByText(args.title!)).toBeInTheDocument();
+    await expect(canvas.getByText(args.proposal.title!)).toBeInTheDocument();
 
     await assertGovActionDetails(canvas, args);
     const [tooltip1, tooltip2] = canvas.getAllByTestId("InfoOutlinedIcon");
@@ -77,9 +106,9 @@ export const GovernanceActionDetailsCardComponent: Story = {
     await assertTooltip(tooltip1, /Submission Date/i);
     await assertTooltip(tooltip2, /Expiry Date/i);
 
-    await expect(canvas.getByText(/Yes/i)).toBeInTheDocument();
-    await expect(canvas.getByText(/Abstain/i)).toBeInTheDocument();
-    await expect(canvas.getByText(/No/i)).toBeInTheDocument();
+    await expect(canvas.getAllByText(/Yes/i)).toHaveLength(3);
+    await expect(canvas.getAllByText(/Abstain/i)).toHaveLength(3);
+    await expect(canvas.getAllByText(/No/i)).toHaveLength(3);
   },
 };
 
@@ -88,14 +117,17 @@ export const GovernanceActionDetailsDrep: Story = {
     ...commonArgs,
     isDashboard: true,
     isVoter: true,
-    abstract: "Example about section",
-    rationale: "Example rationale section",
-    motivation: "Example motivation section",
+    proposal: {
+      ...commonArgs.proposal,
+      abstract: "Example about section",
+      rationale: "Example rationale section",
+      motivation: "Example motivation section",
+    },
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
 
-    await expect(canvas.getByText(args.title!)).toBeInTheDocument();
+    await expect(canvas.getByText(args.proposal.title!)).toBeInTheDocument();
 
     await assertGovActionDetails(canvas, args);
     const [tooltip1, tooltip2] = canvas.getAllByTestId("InfoOutlinedIcon");

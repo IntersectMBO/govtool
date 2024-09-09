@@ -11,6 +11,7 @@ import { user01Wallet } from "@constants/staticWallets";
 import { createTempUserAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
@@ -21,6 +22,7 @@ import { Page, expect } from "@playwright/test";
 
 test.beforeEach(async () => {
   await setAllureEpic("6. Miscellaneous");
+  await skipIfNotHardFork();
 });
 
 test.describe("Logged in user", () => {
@@ -43,30 +45,26 @@ test.describe("Logged in user", () => {
 
     const [registerLearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
-      page.getByTestId("register-learn-more-button").click(),
+      page.getByTestId("d-rep-learn-more-button").click(),
     ]);
     await expect(registerLearnMorepage).toHaveURL(REGISTER_DREP_DOC_URL);
 
     const [directVoterLearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
-      page.getByTestId("learn-more-button").first().click(), // BUG should be unique test id
+      page.getByTestId("direct-voter-learn-more-button").first().click(),
     ]);
     await expect(directVoterLearnMorepage).toHaveURL(DIRECT_VOTER_DOC_URL);
 
     const [GA_LearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
-      page.getByTestId("learn-more-governance-actions-button").click(),
+      page.getByTestId("list-gov-actions-learn-more-button").click(),
     ]);
     await expect(GA_LearnMorepage).toHaveURL(GOVERNANCE_ACTION_DOC_URL);
 
     const [proposed_GA_VoterLearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
-      page
-        .locator("div")
-        .filter({ hasText: /^ProposeLearn more$/ })
-        .getByTestId("learn-more-button")
-        .click(),
-    ]); // BUG should be unique test id
+      page.getByTestId("propose-gov-action-learn-more-button").click(),
+    ]);
     await expect(proposed_GA_VoterLearnMorepage).toHaveURL(
       PROPOSE_GOVERNANCE_ACTION_DOC_URL
     );

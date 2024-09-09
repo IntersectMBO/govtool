@@ -7,13 +7,13 @@ import * as Sentry from "@sentry/react";
 import { NodeObject } from "jsonld";
 
 import {
-  CIP_QQQ,
+  CIP_119,
   DREP_CONTEXT,
   PATHS,
   storageInformationErrorModals,
 } from "@consts";
 import { useCardano, useModal, useAppContext } from "@context";
-import { MetadataStandard, MetadataValidationStatus } from "@models";
+import { MetadataValidationStatus } from "@models";
 import {
   downloadJson,
   ellipsizeText,
@@ -22,22 +22,18 @@ import {
 } from "@utils";
 
 import { useGetVoterInfo, useWalletErrorModal } from "@hooks";
+import { DRepDataFormValues } from "@/types/dRep";
 import { useValidateMutation } from "../mutations";
 
-export type RegisterAsDRepValues = {
-  bio?: string;
-  dRepName: string;
-  email?: string;
-  references?: Array<{ uri: string }>;
-  storeData?: boolean;
-  storingURL: string;
-};
-
-export const defaultRegisterAsDRepValues: RegisterAsDRepValues = {
-  bio: "",
-  dRepName: "",
-  email: "",
-  references: [{ uri: "" }],
+export const defaultRegisterAsDRepValues: DRepDataFormValues = {
+  doNotList: false,
+  givenName: "",
+  objectives: "",
+  motivations: "",
+  qualifications: "",
+  paymentAddress: "",
+  linkReferences: [{ "@type": "Link", uri: "", label: "" }],
+  identityReferences: [{ "@type": "Identity", uri: "", label: "" }],
   storeData: false,
   storingURL: "",
 };
@@ -77,11 +73,10 @@ export const useRegisterAsdRepForm = (
     handleSubmit,
     formState: { errors, isValid },
     register,
-    resetField,
     watch,
-  } = useFormContext<RegisterAsDRepValues>();
+  } = useFormContext<DRepDataFormValues>();
 
-  const dRepName = watch("dRepName");
+  const givenName = watch("givenName");
   const isError = Object.keys(errors).length > 0;
 
   // Navigation
@@ -98,15 +93,26 @@ export const useRegisterAsdRepForm = (
 
   // Business Logic
   const generateMetadata = useCallback(async () => {
+    const { linkReferences, identityReferences, ...rest } = getValues();
     const body = generateMetadataBody({
-      data: getValues(),
-      acceptedKeys: ["dRepName", "bio", "email"],
-      standardReference: CIP_QQQ,
+      data: {
+        ...rest,
+        references: [...(linkReferences ?? []), ...(identityReferences ?? [])],
+      },
+      acceptedKeys: [
+        "givenName",
+        "objectives",
+        "motivations",
+        "qualifications",
+        "paymentAddress",
+        "references",
+        "doNotList",
+      ],
+      standardReference: CIP_119,
     });
+    const jsonld = await generateJsonld(body, DREP_CONTEXT, CIP_119);
 
-    const jsonld = await generateJsonld(body, DREP_CONTEXT, CIP_QQQ);
-
-    const jsonHash = blake2bHex(JSON.stringify(jsonld), undefined, 32);
+    const jsonHash = blake2bHex(JSON.stringify(jsonld, null, 2), undefined, 32);
 
     setHash(jsonHash);
     setJson(jsonld);
@@ -117,19 +123,19 @@ export const useRegisterAsdRepForm = (
   const onClickDownloadJson = async () => {
     if (!json) return;
 
-    downloadJson(json, ellipsizeText(dRepName, 16, ""));
+    downloadJson(json, ellipsizeText(givenName, 16, ""));
   };
 
   const createRegistrationCert = useCallback(
-    async (data: RegisterAsDRepValues) => {
+    async (data: DRepDataFormValues) => {
       if (!hash) return;
-      const url = data.storingURL;
+      const uri = data.storingURL;
       try {
         const certBuilder = await buildVoteDelegationCert(dRepID);
 
         const registerCert = voter?.isRegisteredAsSoleVoter
-          ? await buildDRepUpdateCert(url, hash)
-          : await buildDRepRegCert(url, hash);
+          ? await buildDRepUpdateCert(uri, hash)
+          : await buildDRepRegCert(uri, hash);
 
         certBuilder.add(registerCert);
 
@@ -175,7 +181,7 @@ export const useRegisterAsdRepForm = (
   }, []);
 
   const onSubmit = useCallback(
-    async (data: RegisterAsDRepValues) => {
+    async (data: DRepDataFormValues) => {
       try {
         if (!hash) throw MetadataValidationStatus.INVALID_HASH;
 
@@ -185,7 +191,6 @@ export const useRegisterAsdRepForm = (
         const { status } = await validateMetadata({
           url: data.storingURL,
           hash,
-          standard: MetadataStandard.CIPQQQ,
         });
 
         if (status) {
@@ -239,7 +244,6 @@ export const useRegisterAsdRepForm = (
     onClickDownloadJson,
     register,
     registerAsDrep: handleSubmit(onSubmit),
-    resetField,
     watch,
   };
 };

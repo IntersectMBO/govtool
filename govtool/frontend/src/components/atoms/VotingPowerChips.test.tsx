@@ -22,7 +22,7 @@ describe("VotingPowerChips", () => {
     expect(screen.getByRole("progressbar")).toBeInTheDocument();
   });
 
-  it("displays formatted ADA amount when data is available and not loading", () => {
+  it("displays formatted Ada amount when data is available and not loading", () => {
     mockUseScreenDimension.mockReturnValue({
       isMobile: false,
       screenWidth: 1024,

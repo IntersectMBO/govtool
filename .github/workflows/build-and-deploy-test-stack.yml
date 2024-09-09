@@ -15,39 +15,64 @@ jobs:
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
-    env:
-      GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
-      GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
-      GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
-      SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
-      GTM_ID: ${{ secrets.GTM_ID }}
-      NPMRC_TOKEN: ${{ secrets.NPMRC_TOKEN }}
-      SENTRY_DSN_FRONTEND: ${{ secrets.SENTRY_DSN_FRONTEND }}
-      PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
-      APP_ENV: test
-      PDF_API_URL: ${{ secrets.PDF_API_URL}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup SSH agent
-        uses: webfactory/ssh-agent@v0.8.0
+      - name: Set up SSH and deploy
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          ssh-private-key: ${{ secrets.TEST_STACK_SSH_KEY }}
-
-      - name: Run Ansible playbook
-        uses: dawidd6/action-ansible-playbook@v2
-        with:
-          playbook: playbook.yml
-          directory: ./tests/test-infrastructure
+          host: ${{ secrets.TEST_STACK_SERVER_IP }}
+          username: ec2-user
           key: ${{ secrets.TEST_STACK_SSH_KEY }}
-          inventory: |
-            [test_server]
-            ${{ secrets.TEST_STACK_SERVER_IP }} ansible_user=ec2-user
-          options: |
-            --verbose
+          command_timeout: 100m ## Haskell container build takes a lot of time.
+          script: |
+            REPO_URL="https://github.com/${{ github.repository }}"
+            DEST_DIR="$HOME/Documents/govtool"
+
+            # Create parent directory if it does not exist
+            mkdir -p "$(dirname "$DEST_DIR")"
+
+            # Check if $DEST_DIR exists
+            if [ -d "$DEST_DIR" ]; then
+              if [ -d "$DEST_DIR/.git" ]; then
+                cd $DEST_DIR || exit
+                echo "Updating repository..."
+                git fetch --all
+                git checkout --force "$GOVTOOL_TAG"
+              else
+                echo "Not a git repository. Re-cloning..."
+                rm -rf "$DEST_DIR"
+                git clone "$REPO_URL" "$DEST_DIR"
+                cd "$DEST_DIR" || exit
+                git checkout --force "$GOVTOOL_TAG"
+              fi
+            else
+              echo "Directory does not exist. Cloning repository..."
+              git clone "$REPO_URL" "$DEST_DIR"
+              cd "$DEST_DIR" || exit
+              git checkout --force "$GOVTOOL_TAG"
+            fi
+
+            # Execute the build-and-deploy.sh script
+            cd $DEST_DIR/tests/test-infrastructure
+            ./build-and-deploy.sh update-images
+            docker system prune
+            (docker image ls -q | xargs docker image rm --force ) || echo "Images cleaned-up"
+          envs: GOVTOOL_TAG, GRAFANA_ADMIN_PASSWORD, GRAFANA_SLACK_RECIPIENT, GRAFANA_SLACK_OAUTH_TOKEN, SENTRY_DSN_BACKEND, GTM_ID, NPMRC_TOKEN, SENTRY_DSN_FRONTEND, PIPELINE_URL, USERSNAP_SPACE_API_KEY, APP_ENV, PDF_API_URL
         env:
           GOVTOOL_TAG: ${{ github.sha }}
+          GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+          GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
+          GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
+          SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
+          GTM_ID: ${{ secrets.GTM_ID }}
+          NPMRC_TOKEN: ${{ secrets.NPMRC_TOKEN }}
+          SENTRY_DSN_FRONTEND: ${{ secrets.SENTRY_DSN_FRONTEND }}
+          PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
+          APP_ENV: test
+          PDF_API_URL: ${{ secrets.PDF_API_URL }}
+          KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}

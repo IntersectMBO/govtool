@@ -1,3 +1,7 @@
+import test, { expect } from "@playwright/test";
+import kuberService from "@services/kuberService";
+import { ProposalType, ProtocolParams } from "@types";
+import { allure } from "allure-playwright";
 import { bech32 } from "bech32";
 
 export function lovelaceToAda(lovelace: number) {
@@ -9,4 +13,35 @@ export function lovelaceToAda(lovelace: number) {
 export function generateWalletAddress() {
   const randomBytes = new Uint8Array(10);
   return bech32.encode("addr_test", randomBytes);
+}
+
+export async function getProtocolParamsMajorVersion() {
+  const protocolParameter: ProtocolParams =
+    await kuberService.queryProtocolParams();
+  return protocolParameter.protocolVersion.major;
+}
+
+export async function isBootStrapingPhase() {
+  const protocolParameterMajorVersion = await getProtocolParamsMajorVersion();
+  return protocolParameterMajorVersion === 9;
+}
+
+export async function skipIfTreasuryAndBootstrapping(type: ProposalType) {
+  const isBootStraping = await isBootStrapingPhase();
+  if (type === ProposalType.treasury && isBootStraping) {
+    await allure.description(
+      "This Features will be available only after hardfork."
+    );
+    test.skip();
+  }
+}
+
+export async function skipIfNotHardFork() {
+  const currentProtocolVersion = await getProtocolParamsMajorVersion();
+  if (currentProtocolVersion < 9) {
+    await allure.description(
+      "Govtool Features will be available after hardfork."
+    );
+    test.skip();
+  }
 }

@@ -1,6 +1,7 @@
 import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import removeAllSpaces from "@helpers/removeAllSpaces";
@@ -29,6 +30,7 @@ test.use({ storageState: ".auth/user01.json", wallet: user01Wallet });
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
+  await skipIfNotHardFork();
 });
 
 test("4A_1. Should access Governance Actions page with connecting wallet", async ({
@@ -102,7 +104,7 @@ test("4C_2. Should sort Governance Action Type on governance actions page", asyn
 
   await govActionsPage.sortAndValidate(
     SortOption.HighestYesVotes,
-    (p1, p2) => p1.yesVotes >= p2.yesVotes
+    (p1, p2) => p1.dRepYesVotes >= p2.dRepYesVotes
   );
 });
 

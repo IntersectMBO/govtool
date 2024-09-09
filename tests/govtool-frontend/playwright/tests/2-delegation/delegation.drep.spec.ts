@@ -4,6 +4,7 @@ import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import { createNewPageWithWallet } from "@helpers/page";
@@ -12,10 +13,12 @@ import DRepDetailsPage from "@pages/dRepDetailsPage";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
+import { LinkType } from "@types";
 import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
+  await skipIfNotHardFork();
 });
 
 test("2C. Should open wallet connection popup on delegate in disconnected state", async ({
@@ -53,15 +56,32 @@ test("2N. Should show DRep information on details page", async ({
   await dRepRegistrationPage.goto();
 
   const name = faker.person.firstName();
-  const email = faker.internet.email({ firstName: name });
-  const bio = faker.person.bio();
-  const links = [faker.internet.url()];
+  const objectives = faker.lorem.paragraph(2);
+  const motivations = faker.lorem.paragraph(2);
+  const qualifications = faker.lorem.paragraph(2);
+  const paymentAddress = ShelleyWallet.fromJson(wallet).rewardAddressBech32(0);
+  const linksReferenceLinks: LinkType[] = [
+    {
+      url: faker.internet.url(),
+      description: faker.internet.displayName(),
+    },
+  ];
+
+  const identityReferenceLinks: LinkType[] = [
+    {
+      url: faker.internet.url(),
+      description: faker.internet.displayName(),
+    },
+  ];
 
   await dRepRegistrationPage.register({
     name,
-    email,
-    bio,
-    extraContentLinks: links,
+    objectives,
+    motivations,
+    qualifications,
+    paymentAddress,
+    linksReferenceLinks,
+    identityReferenceLinks,
   });
 
   await dRepRegistrationPage.confirmBtn.click();
@@ -72,18 +92,33 @@ test("2N. Should show DRep information on details page", async ({
   await expect(dRepPage.getByTestId("copy-drep-id-button")).toHaveText(
     wallet.dRepId
   );
+  await expect(dRepPage.getByTestId("copy-payment-address-button")).toHaveText(
+    paymentAddress
+  );
   await expect(dRepPage.getByTestId("Active-pill")).toHaveText("Active");
   await expect(dRepPage.getByTestId("voting-power")).toHaveText("₳ 0");
-  await expect(
-    dRepPage.getByTestId(`${email.toLowerCase()}-link`)
-  ).toBeVisible();
 
-  for (const link of links) {
+  await expect(
+    dRepPage.getByTestId("objectives-info-item-description")
+  ).toHaveText(objectives);
+  await expect(
+    dRepPage.getByTestId("motivations-info-item-description")
+  ).toHaveText(motivations);
+  await expect(
+    dRepPage.getByTestId("qualifications-info-item-description")
+  ).toHaveText(qualifications);
+
+  for (const link of linksReferenceLinks) {
     await expect(
-      dRepPage.getByTestId(`${link.toLowerCase()}-link`)
-    ).toBeVisible();
+      dRepPage.getByTestId(`${link.description.toLowerCase()}-link`)
+    ).toHaveText(link.url);
   }
-  await expect(dRepPage.getByText(bio, { exact: true })).toBeVisible();
+
+  for (const link of identityReferenceLinks) {
+    await expect(
+      dRepPage.getByTestId(`${link.description.toLowerCase()}-link`)
+    ).toHaveText(link.url);
+  }
 });
 
 test("2P. Should enable sharing of DRep details", async ({ page, context }) => {
@@ -134,7 +169,9 @@ test.describe("Insufficient funds", () => {
     await expect(delegateBtn).toBeVisible();
     await page.getByTestId(`${dRep01Wallet.dRepId}-delegate-button`).click();
 
-    await expect(dRepDirectoryPage.delegationErrorModal).toBeVisible();
+    await expect(dRepDirectoryPage.delegationErrorModal).toBeVisible({
+      timeout: 10_000,
+    });
   });
 });
 

@@ -11,6 +11,6 @@ on gov_action_tx.id = gov_action_proposal.tx_id
 join tx as vote_tx
 on vote_tx.id = voting_procedure.tx_id
 join block
-on block.id = gov_action_tx.block_id
+on block.id = vote_tx.block_id
 where drep_hash.raw = decode(?, 'hex')
 order by voting_procedure.gov_action_proposal_id, voting_procedure.drep_voter, voting_procedure.id desc

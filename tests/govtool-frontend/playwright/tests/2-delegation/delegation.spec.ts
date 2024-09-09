@@ -1,10 +1,12 @@
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { expect, test } from "@playwright/test";
 import { DRepStatus } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
+  await skipIfNotHardFork();
 });
 
 test("2K_2. Should sort DReps", async ({ page }) => {

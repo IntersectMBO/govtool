@@ -1,34 +1,40 @@
-export const CIP_QQQ =
-  "https://github.com/cardano-foundation/CIPs/blob/master/CIP-QQQ/README.md#";
+export const CIP_119 =
+  "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0119/README.md#";
 
 export const DREP_CONTEXT = {
   CIP100:
     "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#",
-  CIPQQQ: CIP_QQQ,
+  CIP119: CIP_119,
   hashAlgorithm: "CIP100:hashAlgorithm",
   body: {
-    "@id": "CIPQQQ:body",
+    "@id": "CIP119:body",
     "@context": {
       references: {
-        "@id": "CIPQQQ:references",
+        "@id": "CIP119:references",
         "@container": "@set" as const,
         "@context": {
           GovernanceMetadata: "CIP100:GovernanceMetadataReference",
+          Identity: "CIP119:IdentityReference",
+          Link: "CIP119:LinkReference",
           Other: "CIP100:OtherReference",
           label: "CIP100:reference-label",
           uri: "CIP100:reference-uri",
           referenceHash: {
-            "@id": "CIPQQQ:referenceHash",
+            "@id": "CIP119:referenceHash",
             "@context": {
-              hashDigest: "CIPQQQ:hashDigest",
+              hashDigest: "CIP119:hashDigest",
               hashAlgorithm: "CIP100:hashAlgorithm",
             },
           },
         },
       },
-      dRepName: "CIPQQQ:dRepName",
-      bio: "CIPQQQ:bio",
-      email: "CIPQQQ:email",
+      paymentAddress: "CIP119:paymentAddress",
+      givenName: "CIP119:givenName",
+      image: "CIP119:image",
+      objectives: "CIP119:objectives",
+      motivations: "CIP119:motivations",
+      qualifications: "CIP119:qualifications",
+      doNotList: "CIP119:doNotList",
     },
   },
   authors: {

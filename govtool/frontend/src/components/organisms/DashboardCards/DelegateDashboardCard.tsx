@@ -167,7 +167,7 @@ export const DelegateDashboardCard = ({
               ? getMetadataDataMissingStatusTranslation(
                   myDRepDelegationData.metadataStatus,
                 )
-              : myDRepDelegationData?.dRepName ?? ""
+              : myDRepDelegationData?.givenName ?? ""
           }
           dRepId={displayedDelegationId}
           onCardClick={navigateToDRepDetails}

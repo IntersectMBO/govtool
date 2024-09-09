@@ -76,7 +76,11 @@ const GovernanceActionProvider = ({ children }: PropsWithChildren) => {
    */
   const createHash = useCallback(async (jsonLD: NodeObject) => {
     try {
-      const jsonHash = blake2bHex(JSON.stringify(jsonLD), undefined, 32);
+      const jsonHash = blake2bHex(
+        JSON.stringify(jsonLD, null, 2),
+        undefined,
+        32,
+      );
       return jsonHash;
     } catch (error) {
       Sentry.captureException(error);

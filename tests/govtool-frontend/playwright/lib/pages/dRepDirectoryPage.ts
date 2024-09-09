@@ -143,11 +143,23 @@ export default class DRepDirectoryPage {
   }
 
   async getAllListedDReps() {
-    await this.page.waitForTimeout(2_000);
+    await this.page.waitForTimeout(5_000); // load until the dRep card load properly
 
     return await this.page
       .getByRole("list")
       .locator('[data-testid$="-drep-card"]')
       .all();
+  }
+
+  async verifyDRepInList(dRepId: string) {
+    await this.goto();
+
+    await this.searchInput.fill(dRepId);
+
+    await this.page.waitForTimeout(5_000); // wait until the dRep list render properly
+
+    await expect(
+      this.page.getByTestId(`${dRepId}-drep-card`)
+    ).not.toBeVisible();
   }
 }

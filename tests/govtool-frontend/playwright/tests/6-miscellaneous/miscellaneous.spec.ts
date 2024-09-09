@@ -1,4 +1,5 @@
 import {
+  BOOTSTRAP_DOC_URL,
   DELEGATION_DOC_URL,
   DIRECT_VOTER_DOC_URL,
   FAQS_DOC_URL,
@@ -69,13 +70,13 @@ test("6D. Should open Sanchonet docs in a new tab when clicking `Learn More` on 
 
   const [registerLearnMorepage] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByTestId("register-learn-more-button").click(),
+    page.getByTestId("d-rep-learn-more-button").click(),
   ]);
   await expect(registerLearnMorepage).toHaveURL(REGISTER_DREP_DOC_URL);
 
   const [directVoterLearnMorepage] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByTestId("lear-more-about-sole-voter-button").click(),
+    page.getByTestId("direct-voter-learn-more-button").click(),
   ]);
   await expect(directVoterLearnMorepage).toHaveURL(DIRECT_VOTER_DOC_URL);
 });
@@ -91,7 +92,7 @@ test("6M. Should navigate between footer links", async ({ page, context }) => {
 
   const [termsAndConditions] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByTestId("term-of-service-footer-link").click(),
+    page.getByTestId("terms-and-conditions-footer-link").click(),
   ]);
   await expect(termsAndConditions).toHaveURL(TERMS_AND_CONDITIONS);
 
@@ -136,7 +137,6 @@ test.describe("User Snap", () => {
     ).toBeVisible();
     await expect(page.getByPlaceholder("Your feedback")).toBeVisible();
     await expect(page.getByText("Drag & drop or Browse")).toBeVisible();
-    await expect(page.getByPlaceholder("someone@something.com")).toBeVisible();
     await expect(page.getByLabel("Take screenshot")).toBeVisible();
     await expect(page.getByLabel("Record")).toBeVisible();
     await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
@@ -155,10 +155,14 @@ test.describe("User Snap", () => {
     await expect(
       page.getByPlaceholder("Example: New navigation")
     ).toBeVisible();
-    await expect(page.getByLabel("Any additional details")).toBeVisible();
+    await expect(
+      page.getByPlaceholder("Example: New navigation")
+    ).toBeVisible();
     await expect(page.getByLabel("Any additional details")).toBeVisible();
     await expect(page.getByText("Drag & drop or Browse")).toBeVisible();
-    await expect(page.getByPlaceholder("someone@something.com")).toBeVisible();
+    await expect(
+      page.getByLabel("Please summarize your idea or")
+    ).toBeVisible();
     await expect(page.getByLabel("Take screenshot")).toBeVisible();
     await expect(page.getByLabel("Record")).toBeVisible();
     await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
@@ -188,9 +192,6 @@ test.describe("User Snap", () => {
         .getByPlaceholder("Your feedback")
         .fill(faker.lorem.paragraph(2));
       await page.setInputFiles(attachmentInputSelector, [mockAttachmentPath]);
-      await page
-        .getByPlaceholder("someone@something.com")
-        .fill(faker.internet.email());
 
       await page.getByRole("button", { name: "Submit" }).click();
 
@@ -221,13 +222,67 @@ test.describe("User Snap", () => {
         .getByLabel("Any additional details")
         .fill(faker.lorem.paragraph(2));
       await page.setInputFiles(attachmentInputSelector, [mockAttachmentPath]);
-      await page
-        .getByPlaceholder("someone@something.com")
-        .fill(faker.internet.email());
 
       await page.getByRole("button", { name: "Submit" }).click();
 
       await expect(page.getByText("Feedback was not submitted,")).toBeVisible();
     });
   });
+});
+
+test("6S. Should Warn users that they are in bootstrapping phase via banner", async ({
+  page,
+  context,
+}) => {
+  await page.route("**/epoch/params", async (route) => {
+    // Fetch the original response from the server
+    const response = await route.fetch();
+    const json = await response.json();
+
+    // update protocol major version
+    json["protocol_major"] = 9;
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(json),
+    });
+  });
+
+  const responsePromise = page.waitForResponse("**/epoch/params");
+  await page.goto("/");
+
+  await responsePromise;
+
+  await expect(page.getByTestId("system-bootstrapping-warning")).toBeVisible();
+
+  const [bootstrap] = await Promise.all([
+    context.waitForEvent("page"),
+    page.getByTestId("system-bootstrapping-warning-link").click(),
+  ]);
+  await expect(bootstrap).toHaveURL(BOOTSTRAP_DOC_URL);
+});
+
+test("6T. Should display proper network name", async ({ page }) => {
+  await page.route("**/network/metrics", async (route) => {
+    // Fetch the original response from the server
+    const response = await route.fetch();
+    const json = await response.json();
+
+    const networkNames = ["sanchonet", "preview"];
+    // update network name
+    json["networkName"] =
+      networkNames[Math.floor(Math.random() * networkNames.length)];
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(json),
+    });
+  });
+  const responsePromise = page.waitForResponse("**/network/metrics");
+  await page.goto("/");
+
+  const response = await responsePromise;
+  const responseBody = await response.json();
+
+  await expect((await page.getByTestId("system-network-name").innerText()).toLowerCase()).toBe(responseBody["networkName"].toLowerCase())
 });

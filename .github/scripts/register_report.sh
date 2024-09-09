@@ -8,8 +8,8 @@ cp -r gh-pages/* "$PROJECT_DIR" || true
 
 if grep -q "$REPORT_NAME" "$PROJECT_DIR/$PROJECT_FILE"; then
   echo "Project already exists"
-  echo "::set-output name=project_exists::true"
+  echo "project_exists=true">> $GITHUB_OUTPUT
 else
   echo "$REPORT_NAME" >> "$PROJECT_DIR/$PROJECT_FILE"
-  echo "::set-output name=project_exists::false" 
+  echo "project_exists=false">> $GITHUB_OUTPUT
 fi

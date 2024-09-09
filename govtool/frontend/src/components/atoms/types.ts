@@ -64,6 +64,7 @@ export type FormErrorMessageProps = {
 export type FormHelpfulTextProps = {
   helpfulText?: string;
   helpfulTextStyle?: MUITypographyProps;
+  sx?: SxProps;
 };
 
 export type TextAreaProps = TextareaAutosizeProps & {

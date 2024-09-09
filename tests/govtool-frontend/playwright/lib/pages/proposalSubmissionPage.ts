@@ -1,6 +1,7 @@
 import environments from "@constants/environments";
 import { proposal04Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
+import { isBootStrapingPhase } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { expectWithInfo } from "@helpers/exceptionHandler";
 import { downloadMetadata } from "@helpers/metadata";
@@ -325,7 +326,9 @@ export default class ProposalSubmissionPage {
 
     const proposalRequest: ProposalCreateRequest =
       this.generateValidProposalFormFields(
-        ProposalType.treasury,
+        (await isBootStrapingPhase())
+          ? ProposalType.info
+          : ProposalType.treasury,
         false,
         receivingAddr
       );

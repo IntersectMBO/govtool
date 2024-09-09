@@ -8,7 +8,7 @@ export const useGetProposalQuery = (proposalId: string, enabled?: boolean) => {
   const { dRepID } = useCardano();
 
   const { data, isLoading, refetch, isRefetching } = useQuery(
-    [QUERY_KEYS.useGetProposalKey, dRepID],
+    [QUERY_KEYS.useGetProposalKey, dRepID, proposalId],
     () => getProposal(proposalId, dRepID),
     {
       staleTime: Infinity,
@@ -17,7 +17,7 @@ export const useGetProposalQuery = (proposalId: string, enabled?: boolean) => {
   );
 
   return {
-    data: data!,
+    data,
     isLoading,
     refetch,
     isFetching: isRefetching,

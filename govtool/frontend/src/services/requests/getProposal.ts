@@ -12,8 +12,8 @@ export const getProposal = async (
     `/proposal/get/${encodedHash}?drepId=${drepId}`,
   );
 
-    return {
-      ...data,
-      proposal: await mapDtoToProposal(data.proposal),
-    };
+  return {
+    ...data,
+    proposal: await mapDtoToProposal(data.proposal),
+  };
 };

@@ -4,18 +4,21 @@ import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { isBootStrapingPhase, skipIfNotHardFork } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
+import { BootstrapGovernanceActionType, GrovernanceActionType } from "@types";
 import walletManager from "lib/walletManager";
 
 const invalidInfinityProposals = require("../../lib/_mock/invalidInfinityProposals.json");
 
 test.beforeEach(async () => {
   await setAllureEpic("5. Proposal functionality");
+  await skipIfNotHardFork();
 });
 
 test.describe("Proposal checks", () => {
@@ -27,7 +30,11 @@ test.describe("Proposal checks", () => {
     const govActionsPage = new GovernanceActionsPage(page);
     await govActionsPage.goto();
 
-    govActionDetailsPage = await govActionsPage.viewFirstProposal();
+    govActionDetailsPage = (await isBootStrapingPhase())
+      ? await govActionsPage.viewFirstProposalByGovernanceAction(
+          GrovernanceActionType.InfoAction
+        )
+      : await govActionsPage.viewFirstProposal();
   });
 
   test("5A. Should show relevant details about governance action as DRep", async () => {
@@ -153,7 +160,11 @@ test.describe("Perform voting", () => {
     const govActionsPage = new GovernanceActionsPage(dRepPage);
     await govActionsPage.goto();
 
-    govActionDetailsPage = await govActionsPage.viewFirstProposal();
+    govActionDetailsPage = (await isBootStrapingPhase())
+      ? await govActionsPage.viewFirstProposalByGovernanceAction(
+          GrovernanceActionType.InfoAction
+        )
+      : await govActionsPage.viewFirstProposal();
   });
 
   test("5E. Should re-vote with new data on a already voted governance action", async ({}, testInfo) => {
@@ -228,11 +239,62 @@ test.describe("Check voting power", () => {
     await dRepPage.getByTestId("continue-retirement-button").click();
     await expect(
       dRepPage.getByTestId("retirement-transaction-submitted-modal")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
     dRepPage.getByTestId("confirm-modal-button").click();
     await waitForTxConfirmation(dRepPage);
 
     const balance = await kuberService.getBalance(wallet.address);
     expect(balance, "Retirement deposit not returned").toBeGreaterThan(500);
+  });
+});
+
+test.describe("Bootstrap phase", () => {
+  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
+  test("5L. Should restrict dRep votes to Info Governance actions During Bootstrapping Phase", async ({
+    page,
+    context,
+  }) => {
+    const voteBlacklistOptions = Object.keys(GrovernanceActionType).filter(
+      (option) => option !== BootstrapGovernanceActionType.InfoAction
+    );
+
+    const govActionsPage = new GovernanceActionsPage(page);
+    await govActionsPage.goto();
+
+    const protocolParameter = await page.evaluate(() => {
+      return localStorage.getItem("protocol_params");
+    });
+    const parsedProtocolParameter = JSON.parse(protocolParameter);
+    // update protocol_major version
+    parsedProtocolParameter["protocol_major"] = 9;
+
+    const updatedProtocolParameterString = JSON.stringify(
+      parsedProtocolParameter
+    );
+    // add updated protocol parameter
+    await context.addInitScript(`
+    localStorage.setItem('protocol_params', '${updatedProtocolParameterString}');
+  `);
+
+    for (const voteBlacklistOption of voteBlacklistOptions) {
+      const governanceActionDetailsPage =
+        await govActionsPage.viewFirstProposalByGovernanceAction(
+          voteBlacklistOption as GrovernanceActionType
+        );
+
+      if (governanceActionDetailsPage !== null) {
+        await expect(page.getByText("yes₳").first()).toBeVisible();
+        await expect(page.getByText("abstain₳").first()).toBeVisible();
+        await expect(page.getByText("no₳").first()).toBeVisible();
+
+        await expect(
+          governanceActionDetailsPage.yesVoteRadio
+        ).not.toBeVisible();
+        await expect(governanceActionDetailsPage.contextBtn).not.toBeVisible();
+        await expect(governanceActionDetailsPage.voteBtn).not.toBeVisible();
+
+        await governanceActionDetailsPage.backBtn.click();
+      }
+    }
   });
 });

@@ -12,6 +12,7 @@ import {
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
@@ -22,6 +23,7 @@ import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
+  await skipIfNotHardFork();
 });
 
 test.describe("Delegate to others", () => {
@@ -141,7 +143,7 @@ test.describe("Register DRep state", () => {
     await dRepPage.getByTestId("continue-button").click();
     await expect(
       dRepPage.getByTestId("registration-transaction-submitted-modal")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
     await dRepPage.getByTestId("confirm-modal-button").click();
     await waitForTxConfirmation(dRepPage);
 
@@ -162,7 +164,7 @@ test.describe("Register DRep state", () => {
     await dRepPage.getByTestId("continue-button").click();
     await expect(
       dRepPage.getByTestId("registration-transaction-submitted-modal")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
     await dRepPage.getByTestId("confirm-modal-button").click();
     await waitForTxConfirmation(dRepPage);
     await expect(dRepPage.getByText("You are a Direct Voter")).toBeVisible();
@@ -224,14 +226,16 @@ test.describe("Multiple delegations", () => {
     await dRepDirectoryPage.searchInput.fill(dRep01Wallet.dRepId);
 
     await page.getByTestId(`${dRep01Wallet.dRepId}-delegate-button`).click();
+    await expect(page.getByTestId("alert-warning")).toHaveText(/in progress/i, {
+      timeout: 15_000,
+    });
 
-    await page.waitForTimeout(2_000);
     await dRepDirectoryPage.searchInput.fill(dRep02Wallet.dRepId);
     await page.getByTestId(`${dRep02Wallet.dRepId}-delegate-button`).click();
 
-    await expect(
-      page.getByTestId("transaction-inprogress-modal")
-    ).toBeVisible();
+    await expect(page.getByTestId("transaction-inprogress-modal")).toBeVisible({
+      timeout: 15_000,
+    });
   });
 });
 
@@ -305,7 +309,7 @@ test.describe("Delegated ADA visibility", () => {
     await dRepDirectoryPage.delegateToDRep(dRep01Wallet.dRepId);
 
     const adaHolderVotingPower = await kuberService.getBalance(
-      adaHolder05Wallet.address
+      adaHolder06Wallet.address
     );
     await expect(
       page.getByText(`You have delegated ₳ ${adaHolderVotingPower}`)

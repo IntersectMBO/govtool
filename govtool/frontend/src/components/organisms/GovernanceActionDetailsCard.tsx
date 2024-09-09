@@ -7,63 +7,24 @@ import {
   GovernanceActionDetailsCardVotes,
 } from "@molecules";
 import { GovernanceActionDetailsCardData } from "@organisms";
-import { MetadataValidationStatus } from "@models";
-import { GovernanceActionType } from "@/types/governanceAction";
+import { MetadataValidationStatus, ProposalData, ProposalVote } from "@models";
 
 type GovernanceActionDetailsCardProps = {
-  abstainVotes: number;
-  createdDate: string;
-  createdEpochNo: number;
-  expiryDate: string;
-  expiryEpochNo: number;
-  noVotes: number;
-  type: GovernanceActionType;
-  label: string;
-  details?: ActionDetailsType;
-  url: string;
-  title?: string;
-  abstract?: string;
-  motivation?: string;
-  rationale?: string;
-  yesVotes: number;
-  links?: string[];
-  govActionId: string;
-  isDataMissing: null | MetadataValidationStatus;
   isDashboard?: boolean;
-  isVoter?: boolean;
-  voteFromEP?: string;
-  voteUrlFromEP?: string;
-  voteDateFromEP?: string;
-  voteEpochNoFromEP?: number;
+  isDataMissing: null | MetadataValidationStatus;
   isInProgress?: boolean;
+  isVoter?: boolean;
+  vote?: ProposalVote;
+  proposal: ProposalData;
 };
 
 export const GovernanceActionDetailsCard = ({
-  abstainVotes,
-  createdDate,
-  createdEpochNo,
-  expiryDate,
-  expiryEpochNo,
-  noVotes,
-  details,
-  url,
-  type,
-  label,
-  title,
-  links,
-  abstract,
-  motivation,
-  rationale,
-  yesVotes,
   isDashboard,
-  isVoter,
-  voteFromEP,
-  voteUrlFromEP,
-  voteDateFromEP,
-  voteEpochNoFromEP,
-  govActionId,
-  isInProgress,
   isDataMissing,
+  isInProgress,
+  isVoter,
+  vote,
+  proposal,
 }: GovernanceActionDetailsCardProps) => {
   const [isVoteSubmitted, setIsVoteSubmitted] = useState<boolean>(false);
   const { screenWidth, isMobile } = useScreenDimension();
@@ -96,41 +57,21 @@ export const GovernanceActionDetailsCard = ({
         />
       )}
       <GovernanceActionDetailsCardData
-        abstract={abstract}
-        createdDate={createdDate}
-        createdEpochNo={createdEpochNo}
-        details={details}
-        expiryDate={expiryDate}
-        expiryEpochNo={expiryEpochNo}
-        govActionId={govActionId}
         isDashboard={isDashboard}
         isDataMissing={isDataMissing}
         isInProgress={isInProgress}
         isOneColumn={isOneColumn}
         isSubmitted={isVoteSubmitted}
-        links={links}
-        motivation={motivation}
-        rationale={rationale}
-        title={title}
-        label={label}
-        url={url}
+        proposal={proposal}
       />
       <GovernanceActionDetailsCardVotes
         setIsVoteSubmitted={setIsVoteSubmitted}
-        abstainVotes={abstainVotes}
-        noVotes={noVotes}
-        yesVotes={yesVotes}
-        expiryDate={expiryDate}
-        expiryEpochNo={expiryEpochNo}
         isVoter={isVoter}
-        voteFromEP={voteFromEP}
-        voteUrlFromEP={voteUrlFromEP}
-        voteDateFromEP={voteDateFromEP}
-        voteEpochNoFromEP={voteEpochNoFromEP}
+        vote={vote}
         isDashboard={isDashboard}
         isOneColumn={isOneColumn}
         isInProgress={isInProgress}
-        type={type}
+        proposal={proposal}
       />
     </Box>
   );

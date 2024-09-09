@@ -1,6 +1,6 @@
-import { CIP_100, CIP_108, CIP_QQQ } from "@/consts";
+import { CIP_100, CIP_108, CIP_119 } from "@/consts";
 
-type StandardReference = typeof CIP_100 | typeof CIP_108 | typeof CIP_QQQ;
+type StandardReference = typeof CIP_100 | typeof CIP_108 | typeof CIP_119;
 
 type MetadataConfig = {
   data: Record<string, unknown>;
@@ -26,10 +26,10 @@ export const generateMetadataBody = ({
 
   const references = data?.references
     ? // uri should not be optional. It is just not yet supported on govtool
-      (data.references as Array<{ uri?: string; label: string }>)
+      (data.references as Array<Partial<Reference>>)
         .filter((link) => link.uri)
         .map((link) => ({
-          "@type": "Other",
+          "@type": link["@type"] ?? "Other",
           [`${CIP_100}reference-label`]: link.label || "Label",
           [`${CIP_100}reference-uri`]: link.uri,
         }))

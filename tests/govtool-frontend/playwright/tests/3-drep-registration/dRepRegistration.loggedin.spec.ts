@@ -2,7 +2,9 @@ import { user01Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { invalid as mockInvalid } from "@mock/index";
+import { ShelleyWallet } from "@helpers/crypto";
+import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
 
@@ -13,6 +15,7 @@ test.use({
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
+  await skipIfNotHardFork();
 });
 
 test("3B. Should access DRep registration page", async ({ page }) => {
@@ -27,10 +30,24 @@ test("3D. Verify DRep registration form", async ({ page }) => {
   await dRepRegistrationPage.goto();
 
   await expect(dRepRegistrationPage.nameInput).toBeVisible();
-  await expect(dRepRegistrationPage.emailInput).toBeVisible();
-  await expect(dRepRegistrationPage.bioInput).toBeVisible();
-  await expect(dRepRegistrationPage.linkInput).toBeVisible();
-  await expect(dRepRegistrationPage.addLinkBtn).toBeVisible();
+  await expect(dRepRegistrationPage.objectivesInput).toBeVisible();
+  await expect(dRepRegistrationPage.motivationsInput).toBeVisible();
+  await expect(dRepRegistrationPage.qualificationsInput).toBeVisible();
+  await expect(dRepRegistrationPage.paymentAddressInput).toBeVisible();
+  await expect(dRepRegistrationPage.addIdentityReferenceBtn).toBeVisible();
+  await expect(dRepRegistrationPage.addLinkReferenceBtn).toBeVisible();
+  await expect(
+    dRepRegistrationPage.linkRefrenceFirstDescriptionInput
+  ).toBeVisible();
+  await expect(dRepRegistrationPage.linkRefrenceFirstUrlInput).toBeVisible();
+  await expect(
+    dRepRegistrationPage.identityReferenceFirstDescriptionInput
+  ).toBeVisible();
+  await expect(
+    dRepRegistrationPage.identityReferenceFirstUrlInput
+  ).toBeVisible();
+  await expect(dRepRegistrationPage.doNotListCheckBox).toBeVisible();
+
   await expect(dRepRegistrationPage.continueBtn).toBeVisible();
 });
 
@@ -42,20 +59,39 @@ test.describe("Validation of dRep Registration Form", () => {
     await dRepRegistrationPage.goto();
 
     for (let i = 0; i < 100; i++) {
-      await dRepRegistrationPage.validateForm(
-        faker.internet.displayName(),
-        faker.internet.email(),
-        faker.lorem.paragraph(),
-        faker.internet.url()
-      );
+      await dRepRegistrationPage.validateForm({
+        name: faker.internet.displayName(),
+        objectives: faker.lorem.paragraph(2),
+        motivations: faker.lorem.paragraph(2),
+        qualifications: faker.lorem.paragraph(2),
+        paymentAddress: (await ShelleyWallet.generate()).addressBech32(0),
+        linksReferenceLinks: [
+          {
+            url: faker.internet.url(),
+            description: faker.internet.displayName(),
+          },
+        ],
+        identityReferenceLinks: [
+          {
+            url: faker.internet.url(),
+            description: faker.internet.displayName(),
+          },
+        ],
+      });
     }
 
     for (let i = 0; i < 6; i++) {
-      await expect(dRepRegistrationPage.addLinkBtn).toBeVisible();
-      await dRepRegistrationPage.addLinkBtn.click();
+      await expect(dRepRegistrationPage.addLinkReferenceBtn).toBeVisible();
+      await dRepRegistrationPage.addLinkReferenceBtn.click();
     }
 
-    await expect(dRepRegistrationPage.addLinkBtn).toBeHidden();
+    for (let i = 0; i < 6; i++) {
+      await expect(dRepRegistrationPage.addIdentityReferenceBtn).toBeVisible();
+      await dRepRegistrationPage.addIdentityReferenceBtn.click();
+    }
+
+    await expect(dRepRegistrationPage.addLinkReferenceBtn).toBeHidden();
+    await expect(dRepRegistrationPage.addIdentityReferenceBtn).toBeHidden();
   });
 
   test("3E_2. Should reject invalid data in DRep form", async ({ page }) => {
@@ -65,12 +101,25 @@ test.describe("Validation of dRep Registration Form", () => {
     await dRepRegistrationPage.goto();
 
     for (let i = 0; i < 100; i++) {
-      await dRepRegistrationPage.inValidateForm(
-        mockInvalid.name(),
-        mockInvalid.email(),
-        faker.lorem.paragraph(40),
-        mockInvalid.url()
-      );
+      await dRepRegistrationPage.inValidateForm({
+        name: mockInvalid.name(),
+        objectives: faker.lorem.paragraph(40),
+        motivations: faker.lorem.paragraph(40),
+        qualifications: faker.lorem.paragraph(40),
+        paymentAddress: faker.string.alphanumeric(45),
+        linksReferenceLinks: [
+          {
+            url: mockInvalid.url(),
+            description: faker.lorem.paragraph(20),
+          },
+        ],
+        identityReferenceLinks: [
+          {
+            url: mockInvalid.url(),
+            description: faker.lorem.paragraph(20),
+          },
+        ],
+      });
     }
   });
 
@@ -85,10 +134,10 @@ test.describe("Validation of dRep Registration Form", () => {
 
     await dRepRegistrationPage.continueBtn.click();
     await page.getByRole("checkbox").click();
-    await dRepRegistrationPage.continueBtn.click();
+    await dRepRegistrationPage.registerBtn.click();
 
     for (let i = 0; i < 100; i++) {
-      await dRepRegistrationPage.metadataUrlInput.fill(faker.internet.url());
+      await dRepRegistrationPage.metadataUrlInput.fill(mockValid.url());
       await expect(page.getByTestId("invalid-url-error")).toBeHidden();
     }
   });
@@ -104,7 +153,7 @@ test.describe("Validation of dRep Registration Form", () => {
 
     await dRepRegistrationPage.continueBtn.click();
     await page.getByRole("checkbox").click();
-    await dRepRegistrationPage.continueBtn.click();
+    await dRepRegistrationPage.registerBtn.click();
 
     for (let i = 0; i < 100; i++) {
       await dRepRegistrationPage.metadataUrlInput.fill(mockInvalid.url());
@@ -136,7 +185,7 @@ test("3F. Should create proper DRep registration request, when registered with d
   await dRepRegistrationPage.registerWithoutTxConfirmation({ name: "Test" });
   await expect(
     page.getByTestId("registration-transaction-error-modal")
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10_000 });
 });
 
 test("3O. Should reject invalid dRep registration metadata", async ({
@@ -150,11 +199,11 @@ test("3O. Should reject invalid dRep registration metadata", async ({
 
   await dRepRegistrationPage.continueBtn.click();
   await page.getByRole("checkbox").click();
-  await dRepRegistrationPage.continueBtn.click();
+  await dRepRegistrationPage.registerBtn.click();
 
   const invalidMetadataAnchor = "https://www.google.com";
   await dRepRegistrationPage.metadataUrlInput.fill(invalidMetadataAnchor);
-  await dRepRegistrationPage.registerBtn.click();
+  await dRepRegistrationPage.submitBtn.click();
 
   await expect(dRepRegistrationPage.metadataErrorModal).toHaveText(
     /your external data does not/i

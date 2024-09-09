@@ -8,7 +8,7 @@ const metadataBucketService = {
     try {
       const res = await fetch(`${environments.metadataBucketUrl}/${name}`, {
         method: "PUT",
-        body: JSON.stringify(data),
+        body: JSON.stringify(data, null, 2),
       });
       Logger.success(`Uploaded ${name} metadata to bucket`);
       return `${environments.metadataBucketUrl}/${name}`;

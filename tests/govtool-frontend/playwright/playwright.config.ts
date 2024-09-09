@@ -90,7 +90,7 @@ export default defineConfig({
       name: "dRep",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.dRep.spec.ts",
-      dependencies: environments.ci ? ["auth setup", "dRep setup"] : [],
+      dependencies: environments.ci ? ["auth setup", "dRep setup","wallet bootstrap"] : [],
     },
     {
       name: "delegation",

@@ -3,15 +3,52 @@ import { Box, Typography } from "@mui/material";
 import { IMAGES } from "@consts";
 import { VotePill } from "@atoms";
 import { useTranslation } from "@hooks";
-import { correctAdaFormat } from "@/utils/adaFormat";
+import { correctAdaFormat } from "@utils";
 
 type Props = {
-  yesVotes: number;
-  noVotes: number;
-  abstainVotes: number;
+  dRepYesVotes: number;
+  dRepNoVotes: number;
+  dRepAbstainVotes: number;
+  poolYesVotes: number;
+  poolNoVotes: number;
+  poolAbstainVotes: number;
+  ccYesVotes: number;
+  ccNoVotes: number;
+  ccAbstainVotes: number;
 };
 
-export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
+const Vote = ({
+  vote,
+  value,
+}: {
+  vote: "yes" | "no" | "abstain";
+  value: string | number;
+}) => (
+  <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
+    <VotePill vote={vote} maxWidth={82} />
+    <Typography
+      fontSize="16px"
+      sx={{
+        marginLeft: "12px",
+        wordBreak: "break-all",
+      }}
+    >
+      {value}
+    </Typography>
+  </Box>
+);
+
+export const VotesSubmitted = ({
+  dRepAbstainVotes,
+  dRepNoVotes,
+  dRepYesVotes,
+  poolAbstainVotes,
+  poolNoVotes,
+  poolYesVotes,
+  ccAbstainVotes,
+  ccNoVotes,
+  ccYesVotes,
+}: Props) => {
   const { t } = useTranslation();
 
   return (
@@ -42,13 +79,10 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
           fontSize: "22px",
           fontWeight: "500",
           lineHeight: "28px",
-          mb: 1,
+          mb: 3,
         }}
       >
         {t("govActions.forGovAction")}
-      </Typography>
-      <Typography color="textGray" fontSize="14px" sx={{ mb: 3 }}>
-        {t("govActions.votesSubmittedOnChain")}
       </Typography>
       <Box
         sx={{
@@ -57,39 +91,62 @@ export const VotesSubmitted = ({ yesVotes, noVotes, abstainVotes }: Props) => {
           gap: "12px",
         }}
       >
-        <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
-          <VotePill vote="yes" maxWidth={82} />
-          <Typography
-            fontSize="16px"
-            sx={{
-              marginLeft: "12px",
-              wordBreak: "break-all",
-            }}
-          >
-            ₳ {correctAdaFormat(yesVotes)}
-          </Typography>
-        </Box>
-        <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
-          <VotePill vote="abstain" maxWidth={82} />
-          <Typography
-            sx={{
-              marginLeft: "12px",
-              wordBreak: "break-all",
-            }}
-          >
-            ₳ {correctAdaFormat(abstainVotes)}
-          </Typography>
-        </Box>
-        <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap" }}>
-          <VotePill vote="no" maxWidth={82} />
+        <Typography
+          sx={{
+            fontSize: "18px",
+            fontWeight: "600",
+            lineHeight: "24px",
+          }}
+        >
+          {t("govActions.dReps")}
+        </Typography>
+        <Vote vote="yes" value={`₳ ${correctAdaFormat(dRepYesVotes)}`} />
+        <Vote
+          vote="abstain"
+          value={`₳ ${correctAdaFormat(dRepAbstainVotes)}`}
+        />
+        <Vote vote="no" value={`₳ ${correctAdaFormat(dRepNoVotes)}`} />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+            mt: "24px",
+          }}
+        >
           <Typography
             sx={{
-              marginLeft: "12px",
-              wordBreak: "break-all",
+              fontSize: "18px",
+              fontWeight: "600",
+              lineHeight: "24px",
             }}
           >
-            ₳ {correctAdaFormat(noVotes)}
+            {t("govActions.sPos")}
           </Typography>
+          <Vote vote="yes" value={poolYesVotes} />
+          <Vote vote="abstain" value={poolAbstainVotes} />
+          <Vote vote="no" value={poolNoVotes} />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "12px",
+              mt: "24px",
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: "18px",
+                fontWeight: "600",
+                lineHeight: "24px",
+              }}
+            >
+              {t("govActions.ccCommittee")}
+            </Typography>
+            <Vote vote="yes" value={ccYesVotes} />
+            <Vote vote="abstain" value={ccAbstainVotes} />
+            <Vote vote="no" value={ccNoVotes} />
+          </Box>
         </Box>
       </Box>
     </Box>

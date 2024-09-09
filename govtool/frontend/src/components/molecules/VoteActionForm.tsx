@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo, Dispatch, SetStateAction } from "react";
-import { useLocation } from "react-router-dom";
 import { Box } from "@mui/material";
 import { Trans } from "react-i18next";
 
@@ -14,32 +13,27 @@ import {
   useGetVoteContextTextFromFile,
 } from "@hooks";
 import { formatDisplayDate } from "@utils";
+import { ProposalVote } from "@/models";
 
 type VoteActionFormProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
-  expiryDate: string;
-  expiryEpochNo: number;
-  voteFromEP?: string;
-  voteUrlFromEP?: string;
-  voteDateFromEP?: string;
-  voteEpochNoFromEP?: number;
-  yesVotes: number;
-  noVotes: number;
-  abstainVotes: number;
+  expiryDate: string | undefined;
+  expiryEpochNo: number | undefined;
   isInProgress?: boolean;
+  previousVote?: ProposalVote;
+  dRepYesVotes: number;
+  dRepNoVotes: number;
+  dRepAbstainVotes: number;
 };
 
 export const VoteActionForm = ({
   setIsVoteSubmitted,
   expiryDate,
   expiryEpochNo,
-  voteFromEP,
-  voteUrlFromEP,
-  voteDateFromEP,
-  voteEpochNoFromEP,
-  yesVotes,
-  noVotes,
-  abstainVotes,
+  previousVote,
+  dRepAbstainVotes,
+  dRepNoVotes,
+  dRepYesVotes,
   isInProgress,
 }: VoteActionFormProps) => {
   const [voteContextHash, setVoteContextHash] = useState<string | undefined>();
@@ -50,13 +44,9 @@ export const VoteActionForm = ({
   const { voter } = useGetVoterInfo();
   const { voteContextText } = useGetVoteContextTextFromFile(voteContextUrl);
 
-  const { state } = useLocation();
   const { isMobile, screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { t } = useTranslation();
-
-  const voteDate = state ? state.voteDate : voteDateFromEP;
-  const voteEpochNo = state ? state.voteEpochNo : voteEpochNoFromEP;
 
   const {
     areFormErrors,
@@ -66,7 +56,8 @@ export const VoteActionForm = ({
     registerInput,
     setValue,
     vote,
-  } = useVoteActionForm(voteContextHash, voteContextUrl);
+    canVote,
+  } = useVoteActionForm({ previousVote, voteContextHash, voteContextUrl });
 
   const setVoteContextData = (url: string, hash: string) => {
     setVoteContextUrl(url);
@@ -74,28 +65,23 @@ export const VoteActionForm = ({
   };
 
   useEffect(() => {
-    if (state && state.vote) {
-      setValue("vote", state.vote);
-      setIsVoteSubmitted(true);
-    } else if (voteFromEP) {
-      setValue("vote", voteFromEP);
+    if (previousVote?.vote) {
+      setValue("vote", previousVote.vote);
       setIsVoteSubmitted(true);
     }
-  }, [state, voteFromEP, setValue]);
+  }, [previousVote?.vote, setValue, setIsVoteSubmitted]);
 
   useEffect(() => {
-    if (state && state.voteUrl) {
-      setVoteContextUrl(state.voteUrl);
-    } else if (voteUrlFromEP) {
-      setVoteContextUrl(voteUrlFromEP);
+    if (previousVote?.url) {
+      setVoteContextUrl(previousVote.url);
     }
-  }, [voteUrlFromEP, state]);
+  }, [previousVote?.url, setVoteContextUrl]);
 
   const renderCancelButton = useMemo(
     () => (
       <Button
         data-testid="cancel-button"
-        onClick={() => setValue("vote", state.vote)}
+        onClick={() => setValue("vote", previousVote?.vote ?? "")}
         variant="outlined"
         size="extraLarge"
         sx={{
@@ -105,7 +91,7 @@ export const VoteActionForm = ({
         {t("cancel")}
       </Button>
     ),
-    [state],
+    [previousVote?.vote, setValue],
   );
 
   const renderChangeVoteButton = useMemo(
@@ -113,11 +99,7 @@ export const VoteActionForm = ({
       <Button
         data-testid="change-vote"
         onClick={confirmVote}
-        disabled={
-          (!areFormErrors && voteFromEP === vote) ||
-          areFormErrors ||
-          voteFromEP === vote
-        }
+        disabled={!canVote}
         isLoading={isVoteLoading}
         variant="contained"
         sx={{
@@ -143,7 +125,7 @@ export const VoteActionForm = ({
       }}
     >
       <Box flex={1} display="flex" flexDirection="column" alignItems="center">
-        {voteDate ? (
+        {previousVote?.date ? (
           <>
             <Typography
               variant="body1"
@@ -157,9 +139,9 @@ export const VoteActionForm = ({
               <Trans
                 i18nKey="govActions.castVote"
                 values={{
-                  vote: vote?.toLocaleUpperCase(),
-                  date: formatDisplayDate(voteDate),
-                  epoch: voteEpochNo,
+                  vote: previousVote?.vote.toLocaleUpperCase(),
+                  date: formatDisplayDate(previousVote.date),
+                  epoch: previousVote.epochNo,
                 }}
                 components={[<span style={{ fontWeight: 600 }} key="0" />]}
               />
@@ -235,10 +217,10 @@ export const VoteActionForm = ({
               openModal({
                 type: "votingPower",
                 state: {
-                  yesVotes,
-                  noVotes,
-                  abstainVotes,
-                  vote: state && state.vote ? state.vote : voteFromEP,
+                  dRepYesVotes,
+                  dRepNoVotes,
+                  dRepAbstainVotes,
+                  vote: previousVote?.vote,
                 },
               });
             }}
@@ -355,14 +337,13 @@ export const VoteActionForm = ({
           mb: 2,
           mt: 3,
           textAlign: "center",
-          visibility: state?.vote || voteFromEP ? "visible" : "hidden",
+          visibility: previousVote?.vote ? "visible" : "hidden",
         }}
         variant="caption"
       >
         {t("govActions.selectDifferentOption")}
       </Typography>
-      {(state?.vote && state?.vote !== vote) ||
-      (voteFromEP && voteFromEP !== vote) ? (
+      {previousVote?.vote && previousVote?.vote !== vote ? (
         <Box
           display="flex"
           flexDirection={isMobile ? "column" : "row"}
@@ -377,10 +358,7 @@ export const VoteActionForm = ({
           data-testid="vote-button"
           variant="contained"
           disabled={
-            !vote ||
-            state?.vote === vote ||
-            (areFormErrors && isDirty) ||
-            voteFromEP === vote
+            !vote || previousVote?.vote === vote || (areFormErrors && isDirty)
           }
           isLoading={isVoteLoading}
           onClick={confirmVote}

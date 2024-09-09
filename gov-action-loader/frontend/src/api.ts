@@ -1,7 +1,9 @@
 import axios from 'axios'
 import config from './config'
-
 axios.defaults.headers.common['Content-Type'] = 'application/json'
+
+let NETWORK: string = ''
+
 
 export async function submitMultipleProposals(proposalType: string, noOfProposals: number) {
   const loadMultipleUrl = config.dataLoaderApi + '/api/load/multiple'
@@ -9,16 +11,18 @@ export async function submitMultipleProposals(proposalType: string, noOfProposal
     proposal_type: proposalType,
     no_of_proposals: noOfProposals,
   }
-  return await axios.post(loadMultipleUrl, data)
+  return await axios.post(loadMultipleUrl, data, {headers:{network: NETWORK}})
 }
 
-export async function getBalance() {
+export async function getBalance(selectedNetwork: string) {
   const loadSingleUrl = config.dataLoaderApi + '/api/balance'
-  return await axios.get(loadSingleUrl)
+  NETWORK = selectedNetwork
+  return await axios.get(loadSingleUrl, {headers:{network: selectedNetwork}})
 }
 export async function submitSingleProposal(data?: any) {
   const loadSingleUrl = config.dataLoaderApi + '/api/load/single'
-  return await axios.post(loadSingleUrl, data)
+  console.log("data: ", data);
+  return await axios.post(loadSingleUrl, data, {headers:{network: NETWORK}})
 }
 
 function generateRandomId(length: number) {
@@ -61,7 +65,7 @@ export async function submitSingleProposalMock(action: String, data?: any) {
         url: data['anchor'].url,
       }
       break
-    case 'Withdrawl':
+    case 'Withdrawal':
       let withdrawAddress = Object.keys(data['withdraw'])[0]
 
       payload = {
@@ -116,5 +120,5 @@ export async function submitSingleProposalMock(action: String, data?: any) {
       break
   }
   console.log(payload)
-  return await axios.post(singleProposalendpoint, payload)
+  return await axios.post(singleProposalendpoint, payload, {headers:{network: NETWORK}})
 }

@@ -10,6 +10,7 @@ from typing import Any, Dict
 
 from fastapi import HTTPException
 
+from app.network import get_api_url
 from app.settings import settings
 
 main_wallet = {
@@ -90,12 +91,16 @@ def generate_quorom():
     return {"numerator": numerator, "denominator": denomintor}
 
 
-def generate_hardfork():
-    majorProtocolNum = random.randint(1, 9)
-    minorProtocolNum = random.randint(1, 9)
+def generate_hardfork(current_pParams):
+    protocol_version = [current_pParams["protocolVersion"]["major"], 
+                        current_pParams["protocolVersion"]["minor"]]
+
+    # Randomly select an index (0 for major, 1 for minor) and increment it
+    protocol_version[random.randint(0, 1)] += 1
+
     return {
         "hardfork": {
-            "protocolVersion": {"major": majorProtocolNum, "minor": minorProtocolNum}
+            "protocolVersion": {"major": protocol_version[0], "minor": protocol_version[1]}
         }
     }
 
@@ -115,6 +120,13 @@ def change_pp_value(random_parameter):
     return random_parameter
 
 
+def get_gov_script():
+    with open("app/data/gov-script.plutus", "r") as script_file:
+        script_str = script_file.read()
+        script_json = json.loads(script_str)
+        return script_json
+
+
 def get_proposal_data_from_type(proposal_type, current_pParams):
     match proposal_type:
         case "constitution":
@@ -126,7 +138,10 @@ def get_proposal_data_from_type(proposal_type, current_pParams):
             }
         case "withdrawal":
             number_of_addresses = random.randint(1, 5)
-            return {"withdraw": generate_withdraw(number_of_addresses)}
+            return {
+                "script": get_gov_script(),
+                "withdraw": generate_withdraw(number_of_addresses),
+            }
         case "no-confidence":
             return {"noconfidence": True}
         case "update-committee":
@@ -138,7 +153,7 @@ def get_proposal_data_from_type(proposal_type, current_pParams):
                 }
             }
         case "hardfork":
-            return generate_hardfork()
+            return generate_hardfork(current_pParams)
         case "update-parameters":
             # read current protocol parameters from json
             # get one of the keys of the pp
@@ -146,7 +161,10 @@ def get_proposal_data_from_type(proposal_type, current_pParams):
             keys = pParams.keys()
             rand_key = random.choice(filter_updatable_paramKeys(list(keys)))
             # recurse into the innermost element of that key and change it by +-1, all protocol parameter value is either float or int
-            return {"parameterupdate": {rand_key: change_pp_value(pParams[rand_key])}}
+            return {
+                "script": get_gov_script(),
+                "parameterupdate": {rand_key: change_pp_value(pParams[rand_key])},
+            }
         # added_proposal =
         case "info":
             return {}
@@ -160,17 +178,42 @@ def get_proposal_data_from_type(proposal_type, current_pParams):
 
 
 def filter_updatable_paramKeys(keys):
-    updatable_keys = {"maxBlockSize", "maxBBSize", "maxTxSize", "maxBHSize", "keyDeposit", "poolDeposit", "eMax",
-                      "nOpt", "a0", "rho", "tau", "minPoolCost", "coinsPerUTxOByte", "costModels", "prices",
-                      "maxTxExUnits", "maxBlockExUnits", "maxValSize", "collateralPercentage", "maxCollateralInputs",
-                      "poolVotingThresholds", "dRepVotingThresholds", "committeeMinSize", "committeeMaxTermLength",
-                      "govActionLifetime", "govActionDeposit", "dRepDeposit", "dRepActivity"}
+    updatable_keys = {
+        "maxBlockSize",
+        "maxBBSize",
+        "maxTxSize",
+        "maxBHSize",
+        "keyDeposit",
+        "poolDeposit",
+        "eMax",
+        "nOpt",
+        "a0",
+        "rho",
+        "tau",
+        "minPoolCost",
+        "coinsPerUTxOByte",
+        "costModels",
+        "prices",
+        "maxTxExUnits",
+        "maxBlockExUnits",
+        "maxValSize",
+        "collateralPercentage",
+        "maxCollateralInputs",
+        "poolVotingThresholds",
+        "dRepVotingThresholds",
+        "committeeMinSize",
+        "committeeMaxTermLength",
+        "govActionLifetime",
+        "govActionDeposit",
+        "dRepDeposit",
+        "dRepActivity",
+    }
     return [x for x in keys if x in updatable_keys]
 
 
-async def submit_tx(tx, client, submit=True):
+async def submit_tx(tx, client, network, submit=True):
     submit_query = "?submit=true" if submit else ""
-    tx_url = settings.kuber_api_url + "/api/v1/tx" + submit_query
+    tx_url = get_api_url(network) + "/api/v1/tx" + submit_query
     response = await client.post(
         tx_url,
         json=tx,
@@ -187,7 +230,7 @@ async def submit_tx(tx, client, submit=True):
         raise HTTPException(status_code=response.status_code, detail=response.text)
 
 
-async def submit_proposal_tx(wallet, proposal, proposal_numbers, client):
+async def submit_proposal_tx(wallet, proposal, proposal_numbers, client, network):
     proposals = [
         {
             **proposal,
@@ -202,4 +245,4 @@ async def submit_proposal_tx(wallet, proposal, proposal_numbers, client):
         "selections": [wallet["address"], wallet["skey"]],
         "proposals": proposals,
     }
-    return await submit_tx(tx, client)
+    return await submit_tx(tx, client, network)

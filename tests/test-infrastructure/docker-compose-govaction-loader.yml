@@ -35,8 +35,10 @@ services:
       context: ../../gov-action-loader/backend
       dockerfile: Dockerfile
     environment:
-      KUBER_API_URL: "http://kuber:8081"
-      KUBER_API_KEY: ""
+      KUBER_API_URL_SANCHO: "http://kuber:8081"
+      KUBER_API_URL_PREPROD: "https://preprod.kuber.cardanoapi.io"
+      KUBER_API_URL_PREVIEW: "https://preview.kuber.cardanoapi.io"
+      KUBER_API_KEY: ${KUBER_API_KEY}
       VIRTUAL_HOST: https://governance-${BASE_DOMAIN}/api/ -> /api/
     networks:
       - default

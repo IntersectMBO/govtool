@@ -5,7 +5,12 @@ const path = require("path");
 
 const baseFilePath = path.resolve(__dirname, "./_mock");
 
-export type Purpose = "registerDRep" | "registeredDRep" | "proposalSubmission";
+export type Purpose =
+  | "registerDRep"
+  | "registeredDRep"
+  | "proposalSubmission"
+  | "registerDRepCopy"
+  | "registeredDRepCopy";
 
 /**
  * WalletManager class is responsible for managing a list of temporary wallets.
@@ -52,6 +57,14 @@ class WalletManager {
       )
     );
     return JSON.parse(data);
+  }
+
+  async removeCopyWallet(walletToRemove: StaticWallet, purpose: Purpose) {
+    const currentWallets = await this.readWallets(purpose);
+    const updatedWallets = currentWallets.filter(
+      (wallet) => wallet.address !== walletToRemove.address
+    );
+    await this.writeWallets(updatedWallets, purpose);
   }
 
   async popWallet(purpose: Purpose): Promise<StaticWallet> {

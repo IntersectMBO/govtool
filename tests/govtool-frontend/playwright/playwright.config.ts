@@ -92,6 +92,7 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.dRep.spec.ts",
       dependencies: environments.ci ? ["auth setup", "dRep setup","wallet bootstrap"] : [],
+      teardown: environments.ci && "cleanup dRep"
     },
     {
       name: "delegation",
@@ -128,6 +129,10 @@ export default defineConfig({
     {
       name: "cleanup delegation",
       testMatch: "delegation.teardown.ts",
+    },
+    {
+      name: "cleanup dRep",
+      testMatch: "dRep.teardown.ts",
     },
     {
       name: "cleanup faucet",

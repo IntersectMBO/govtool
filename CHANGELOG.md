@@ -25,6 +25,7 @@ changes.
 ### Changed
 
 - Bump @intersect.mbo/pdf-ui to v0.3.9
+- Changed misleading text for direct voter registration [Issue 1976](https://github.com/IntersectMBO/govtool/issues/1976)
 
 ### Removed
 

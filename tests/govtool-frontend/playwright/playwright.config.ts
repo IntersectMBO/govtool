@@ -50,6 +50,7 @@ export default defineConfig({
     {
       name: "faucet setup",
       testMatch: "**/faucet.setup.ts",
+      teardown: environments.ci && "cleanup faucet" 
     },
     {
       name: "dRep setup",
@@ -127,6 +128,10 @@ export default defineConfig({
     {
       name: "cleanup delegation",
       testMatch: "delegation.teardown.ts",
+    },
+    {
+      name: "cleanup faucet",
+      testMatch: "faucet.teardown.ts",
     },
   ],
 });

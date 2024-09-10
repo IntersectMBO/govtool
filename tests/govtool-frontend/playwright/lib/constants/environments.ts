@@ -17,6 +17,7 @@ const environments = {
       process.env.FAUCET_API_URL ||
       "https://faucet.sanchonet.world.dev.cardano.org",
     apiKey: process.env.FAUCET_API_KEY || "",
+    address: process.env.FAUCET_ADDRESS || "addr_test1vz0ua2vyk7r4vufmpqh5v44awg8xff26hxlwyrt3uc67maqtql3kl",
   },
   kuber: {
     apiUrl: process.env.KUBER_API_URL || "https://kuber-govtool.cardanoapi.io",

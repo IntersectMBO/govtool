@@ -104,16 +104,28 @@ test.describe("Change delegation", () => {
     const dRepDirectoryPage = new DRepDirectoryPage(page);
     await dRepDirectoryPage.goto();
     await dRepDirectoryPage.delegateToDRep(dRepIdFirst);
-    await expect(page.getByTestId(`${dRepIdFirst}-copy-id-button`)).toHaveText(
-      dRepIdFirst,
-      { timeout: 20_000 }
-    ); // verify delegation
 
+    // verify delegation
+    await expect(
+      page.getByTestId(`${dRepIdFirst}-delegated-card`)
+    ).toBeVisible();
+
+    await expect(
+      page
+        .getByTestId(`${dRepIdFirst}-delegated-card`)
+        .getByTestId(`${dRepIdFirst}-copy-id-button`)
+    ).toHaveText(dRepIdFirst, { timeout: 20_000 });
+
+    // verify delegation
     await dRepDirectoryPage.delegateToDRep(dRepIdSecond);
-    await expect(page.getByTestId(`${dRepIdSecond}-copy-id-button`)).toHaveText(
-      dRepIdSecond,
-      { timeout: 20_000 }
-    ); // verify delegation
+    await expect(
+      page.getByTestId(`${dRepIdSecond}-delegated-card`)
+    ).toBeVisible();
+    await expect(
+      page
+        .getByTestId(`${dRepIdSecond}-delegated-card`)
+        .getByTestId(`${dRepIdSecond}-copy-id-button`)
+    ).toHaveText(dRepIdSecond, { timeout: 20_000 });
   });
 });
 

@@ -20,7 +20,7 @@ changes.
 
 ### Changed
 
--
+- Change base repo README header image to have correct branding and reflect mainnet launch.
 
 ### Removed
 

@@ -14,6 +14,7 @@ import {
 } from "@hooks";
 import { formatDisplayDate } from "@utils";
 import { ProposalVote } from "@/models";
+import { VoteContextModalState, VotingPowerModalState } from "../organisms";
 
 type VoteActionFormProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
@@ -59,9 +60,9 @@ export const VoteActionForm = ({
     canVote,
   } = useVoteActionForm({ previousVote, voteContextHash, voteContextUrl });
 
-  const setVoteContextData = (url: string, hash: string) => {
+  const setVoteContextData = (url: string, hash: string | null) => {
     setVoteContextUrl(url);
-    setVoteContextHash(hash);
+    setVoteContextHash(hash ?? undefined);
   };
 
   useEffect(() => {
@@ -217,11 +218,11 @@ export const VoteActionForm = ({
               openModal({
                 type: "votingPower",
                 state: {
-                  dRepYesVotes,
-                  dRepNoVotes,
-                  dRepAbstainVotes,
+                  yesVotes: dRepYesVotes,
+                  noVotes: dRepNoVotes,
+                  abstainVotes: dRepAbstainVotes,
                   vote: previousVote?.vote,
-                },
+                } satisfies VotingPowerModalState,
               });
             }}
           >
@@ -309,7 +310,7 @@ export const VoteActionForm = ({
               type: "voteContext",
               state: {
                 onSubmit: setVoteContextData,
-              },
+              } satisfies VoteContextModalState,
             });
           }}
           sx={{

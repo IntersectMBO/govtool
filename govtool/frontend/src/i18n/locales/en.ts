@@ -742,7 +742,7 @@ export const en = {
           "Looks like you cannot retire, because currently you are not a Direct Voter.",
       },
       registerDescription:
-        "A Direct Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of Ada in their connected wallet. <0>Learn More</0> about Direct Voter.\n\nBecoming a Direct Voter will require a refundable deposit of <strong>₳{{deposit}}</strong>.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
+        "A Direct Voter is someone that can vote on any Governance Action with their own Voting Power. They do not wish to campaign for delegations from others or be shown via the DRep Directory. <0>Learn More</0> about Direct Voter.\n\nDirect Voters are not explicitly supported by the protocol but are instead an abstraction over the on-chain DReps. Direct Voters are not expected to link and host metadata.\n\nBecoming a Direct Voter will require a refundable deposit of ₳<strong>{{deposit}}</strong>. Your deposit will be refunded if you retire. You can decide to become a DRep at anytime if you are a Direct Voter you will not need to pay another deposit.",
       registerHeading: "What this Means",
       retirementDescription:
         "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of {{deposit}} ada will be refunded.\n\nYou can at any time in the future re-register to become a Direct Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\nThese options are listed in our Guides here: <0>Voting options and Roles</0>",

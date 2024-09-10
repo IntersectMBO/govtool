@@ -48,10 +48,15 @@ test.describe("Delegate to others", () => {
 
     // Verify dRepId in dRep directory
     await expect(
-      page.getByTestId(`${dRepId}-delegate-button')`)
+      page.getByTestId(`${dRepId}-delegate-button`)
     ).not.toBeVisible();
 
-    await expect(page.getByTestId(`${dRepId}-copy-id-button`)).toHaveCount(1, {
+    await expect(page.getByTestId(`${dRepId}-delegated-card`)).toBeVisible();
+    await expect(
+      page
+        .getByTestId(`${dRepId}-delegated-card`)
+        .getByTestId(`${dRepId}-copy-id-button`)
+    ).toHaveCount(1, {
       timeout: 20_000,
     });
 

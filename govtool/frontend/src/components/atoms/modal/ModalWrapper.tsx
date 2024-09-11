@@ -32,6 +32,8 @@ export const BaseWrapper = styled("div")<Pick<Props, "variant">>`
         width: 80vw;
         max-width: 510px;
         padding: 52px 24px 34px 24px;
+        max-height: 80vh;
+        overflow: auto;
       `;
     }
     if (variant === "popup") {

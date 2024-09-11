@@ -267,6 +267,8 @@ export const en = {
       goToDRepDirectory: "Go to DRep Directory",
       meAsDRep: "This DRep ID is connected to your wallet",
       myDelegation: "You have delegated your voting power to:",
+      myDelegationToYourself:
+        "You have delegated your voting power to yourself:",
       myDRep: "You have delegated your voting power to this DRep.",
       listTitle: "Find a DRep",
       noConfidenceDefaultDescription:

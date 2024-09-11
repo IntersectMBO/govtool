@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Fixed terms and conditions link [Issue 1968](https://github.com/IntersectMBO/govtool/issues/1968)
+- Hide Delegate button in DRep list and details if user has already delegated to this DRep [Issue 1982](https://github.com/IntersectMBO/govtool/issues/1982)
 
 ### Changed
 

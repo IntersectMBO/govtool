@@ -217,6 +217,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
                   isDelegating === dRep.view || isDelegating === dRep.drepId
                 }
                 isMe={isSameDRep(dRep, myDRepId)}
+                isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
                 onDelegate={() => delegate(dRep.drepId)}
               />
             </Box>

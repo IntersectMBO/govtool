@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
 
@@ -31,20 +30,6 @@ export const DRepDetails = ({ isConnected = false }: DRepDetailsProps) => {
     searchPhrase: dRepParam,
   });
   const dRep = dRepData?.[0];
-
-  const dRepCardVariant = useMemo(() => {
-    if (!dRep) return "default";
-    if (isSameDRep(dRep, myDRepId)) return "meAsDRep";
-    if (isSameDRep(dRep, currentDelegation?.dRepView)) return "myDRep";
-    if (isSameDRep(dRep, pendingTransaction.delegate?.resourceId))
-      return "myDRepInProgress";
-    return "default";
-  }, [
-    currentDelegation,
-    dRep,
-    myDRepId,
-    pendingTransaction.delegate?.resourceId,
-  ]);
 
   if (isDRepListLoading)
     return (
@@ -99,7 +84,12 @@ export const DRepDetails = ({ isConnected = false }: DRepDetailsProps) => {
       <DRepDetailsCard
         isConnected={isConnected}
         dRepData={dRep}
-        variant={dRepCardVariant}
+        isMe={isSameDRep(dRep, myDRepId)}
+        isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
+        isMyDrepInProgress={isSameDRep(
+          dRep,
+          pendingTransaction.delegate?.resourceId,
+        )}
       />
     </>
   );

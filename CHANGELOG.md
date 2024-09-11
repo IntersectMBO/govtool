@@ -12,7 +12,7 @@ changes.
 
 ### Added
 
--
+- Add script for Matomo Analytics [Issue 1817](https://github.com/IntersectMBO/govtool/issues/1817)
 
 ### Fixed
 

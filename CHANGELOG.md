@@ -19,6 +19,7 @@ changes.
 - Correctly show all kinds of votes in the modal showing vote numbers [Issue 1941](https://github.com/IntersectMBO/govtool/issues/1941)
 - Fixed terms and conditions link [Issue 1968](https://github.com/IntersectMBO/govtool/issues/1968)
 - Hide Delegate button in DRep list and details if user has already delegated to this DRep [Issue 1982](https://github.com/IntersectMBO/govtool/issues/1982)
+- Fix condition for disabling voting on different GA types [Issue 2008](https://github.com/IntersectMBO/govtool/issues/2008)
 
 ### Changed
 

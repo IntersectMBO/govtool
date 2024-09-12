@@ -205,7 +205,7 @@ export const en = {
         "Download your file, save it to your chosen location, and enter the URL of that location in step 3",
       storingInformationStep1Label: "Download this file",
       storingInformationStep2Label:
-        "Save this file in a location that provides a public URL (ex. github)",
+        "Save this file in a location that provides a public URL (e.g. github)",
       storingInformationStep2Link: "Read full guide",
       storingInformationStep3Label: "Paste the URL here",
       storingInformationTitle: "Information Storage Steps",
@@ -660,7 +660,7 @@ export const en = {
         "Download your file, save it to your chosen location, and enter the URL of that location in step 3",
       storingInformationStep1Label: "Download this file",
       storingInformationStep2Label:
-        "Save this file in a location that provides a public URL (ex. github)",
+        "Save this file in a location that provides a public URL (e.g. github)",
       storingInformationStep2Link: "Read full guide",
       storingInformationStep3Label: "Paste the URL here",
       storingInformationTitle: "Information Storage Steps",
@@ -699,7 +699,7 @@ export const en = {
         "Download your file, save it to your chosen location, and enter the URL of that location in step 3",
       storingInformationStep1Label: "Download this file",
       storingInformationStep2Label:
-        "Save this file in a location that provides a public URL (ex. github)",
+        "Save this file in a location that provides a public URL (e.g. github)",
       storingInformationStep2Link: "Read full guide",
       storingInformationStep3Label: "Paste the URL here",
       storingInformationTitle: "Information Storage Steps",

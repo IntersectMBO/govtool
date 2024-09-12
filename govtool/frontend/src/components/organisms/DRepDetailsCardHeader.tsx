@@ -15,12 +15,14 @@ import { DRepData } from "@/models";
 
 type DRepDetailsProps = {
   dRepData: DRepData;
-  variant?: "default" | "meAsDRep" | "myDRep" | "myDRepInProgress";
+  isMe?: boolean;
+  isMyDrep?: boolean;
 };
 
 export const DRepDetailsCardHeader = ({
   dRepData,
-  variant,
+  isMe,
+  isMyDrep,
 }: DRepDetailsProps) => {
   const { stakeKey } = useCardano();
   const { t } = useTranslation();
@@ -36,9 +38,6 @@ export const DRepDetailsCardHeader = ({
       state: dRepData,
     });
   };
-
-  const isMe = variant === "meAsDRep";
-  const isMyDrep = variant === "myDRep";
 
   return (
     <div>
@@ -60,7 +59,9 @@ export const DRepDetailsCardHeader = ({
             color="primary"
             label={
               isMe
-                ? t("dRepDirectory.meAsDRep")
+                ? isMyDrep
+                  ? t("dRepDirectory.myDelegationToYourself")
+                  : t("dRepDirectory.meAsDRep")
                 : t("dRepDirectory.myDRep", {
                     ada: correctDRepDirectoryFormat(myVotingPower),
                   })

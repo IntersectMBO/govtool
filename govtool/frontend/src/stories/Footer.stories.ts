@@ -27,7 +27,7 @@ export const FooterComponent: Story = {
     await expect(window.open).toHaveBeenCalledTimes(1);
 
     await userEvent.click(
-      canvas.getByTestId("terms-and-conditions-footer-link"),
+      canvas.getByTestId("terms-of-use-footer-link"),
     );
     await expect(window.open).toHaveBeenCalledTimes(2);
 

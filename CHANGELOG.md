@@ -12,14 +12,20 @@ changes.
 
 ### Added
 
--
+- Add script for Matomo Analytics [Issue 1817](https://github.com/IntersectMBO/govtool/issues/1817)
 
 ### Fixed
 
--
+- Correctly show all kinds of votes in the modal showing vote numbers [Issue 1941](https://github.com/IntersectMBO/govtool/issues/1941)
+- Fixed terms and conditions link [Issue 1968](https://github.com/IntersectMBO/govtool/issues/1968)
+- Hide Delegate button in DRep list and details if user has already delegated to this DRep [Issue 1982](https://github.com/IntersectMBO/govtool/issues/1982)
+- Fix condition for disabling voting on different GA types [Issue 2008](https://github.com/IntersectMBO/govtool/issues/2008)
+- Fix incorrect copy (ex. github) to (e.g. github) [Issue 1748](https://github.com/IntersectMBO/govtool/issues/1748)
 
 ### Changed
 
+- Bump @intersect.mbo/pdf-ui to v0.3.9
+- Changed misleading text for direct voter registration [Issue 1976](https://github.com/IntersectMBO/govtool/issues/1976)
 - Change base repo README header image to have correct branding and reflect mainnet launch.
 
 ### Removed

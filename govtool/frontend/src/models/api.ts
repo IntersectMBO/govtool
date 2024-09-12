@@ -145,6 +145,18 @@ export type ProposalVote = {
   vote: Vote;
 };
 
+export type SubmittedVotesData = {
+  dRepYesVotes: number;
+  dRepNoVotes: number;
+  dRepAbstainVotes: number;
+  ccYesVotes: number;
+  ccNoVotes: number;
+  ccAbstainVotes: number;
+  poolYesVotes: number;
+  poolNoVotes: number;
+  poolAbstainVotes: number;
+};
+
 export type ProposalDataDTO = {
   createdDate: string;
   createdEpochNo: number;
@@ -157,15 +169,6 @@ export type ProposalDataDTO = {
   txHash: string;
   type: GovernanceActionType;
   url: string;
-  dRepYesVotes: number;
-  dRepNoVotes: number;
-  dRepAbstainVotes: number;
-  ccYesVotes: number;
-  ccNoVotes: number;
-  ccAbstainVotes: number;
-  poolYesVotes: number;
-  poolNoVotes: number;
-  poolAbstainVotes: number;
   prevGovActionIndex: number | null;
   prevGovActionTxHash: string | null;
   abstract?: string;
@@ -174,7 +177,7 @@ export type ProposalDataDTO = {
   references?: string[];
   title?: string;
   protocolParams: EpochParams | null;
-};
+} & SubmittedVotesData;
 
 export type ProposalData = ProposalDataDTO & {
   metadataStatus: MetadataValidationStatus | null;

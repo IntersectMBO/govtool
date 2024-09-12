@@ -19,6 +19,7 @@ type DRepCardProps = {
   isDelegationLoading?: boolean;
   isInProgress?: boolean;
   isMe?: boolean;
+  isMyDrep?: boolean;
   onDelegate?: () => void;
 };
 
@@ -28,6 +29,7 @@ export const DRepCard = ({
   isDelegationLoading,
   isInProgress,
   isMe,
+  isMyDrep,
   onDelegate,
 }: DRepCardProps) => {
   const navigate = useNavigate();
@@ -209,6 +211,7 @@ export const DRepCard = ({
           {status === "Active" &&
             isConnected &&
             onDelegate &&
+            !isMyDrep &&
             !isInProgress && (
               <Button
                 data-testid={`${view}-delegate-button`}

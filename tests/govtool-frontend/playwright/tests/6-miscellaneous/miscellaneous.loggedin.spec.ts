@@ -11,6 +11,7 @@ import { user01Wallet } from "@constants/staticWallets";
 import { createTempUserAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
@@ -21,6 +22,7 @@ import { Page, expect } from "@playwright/test";
 
 test.beforeEach(async () => {
   await setAllureEpic("6. Miscellaneous");
+  await skipIfNotHardFork();
 });
 
 test.describe("Logged in user", () => {

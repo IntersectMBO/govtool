@@ -5,15 +5,19 @@ import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
 import walletManager from "lib/walletManager";
+import DRepDirectoryPage from "@pages/dRepDirectoryPage";
+import { GrovernanceActionType } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
+  await skipIfNotHardFork();
 });
 
 test.describe("Logged in DReps", () => {
@@ -34,7 +38,9 @@ test.describe("Logged in DReps", () => {
 
     await governanceActionsPage.goto();
     const governanceActionDetailsPage =
-      await governanceActionsPage.viewFirstInfoProposal();
+      await governanceActionsPage.viewFirstProposalByGovernanceAction(
+        GrovernanceActionType.InfoAction
+      );
 
     await expect(governanceActionDetailsPage.voteBtn).toBeVisible();
   });
@@ -56,7 +62,18 @@ test.describe("Logged in DReps", () => {
       motivations: faker.lorem.paragraph(2),
       qualifications: faker.lorem.paragraph(2),
       paymentAddress: (await ShelleyWallet.generate()).addressBech32(0),
-      extraContentLinks: [faker.internet.url()],
+      linksReferenceLinks: [
+        {
+          url: faker.internet.url(),
+          description: faker.internet.displayName(),
+        },
+      ],
+      identityReferenceLinks: [
+        {
+          url: faker.internet.url(),
+          description: faker.internet.displayName(),
+        },
+      ],
     });
     await page.getByTestId("confirm-modal-button").click();
   });
@@ -86,6 +103,41 @@ test.describe("Temporary DReps", () => {
     await expect(
       dRepRegistrationPage.registrationSuccessModal.getByText("this link")
     ).toBeVisible();
+  });
+
+  test("3Q Should not list dRep in the dRep directory when 'doNotList' is checked during registration", async ({
+    page,
+    browser,
+  }, testInfo) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+
+    const wallet = await walletManager.popWallet("registerDRep");
+
+    const tempDRepAuth = await createTempDRepAuth(page, wallet);
+    const dRepPage = await createNewPageWithWallet(browser, {
+      storageState: tempDRepAuth,
+      wallet,
+      enableStakeSigning: true,
+    });
+
+    const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);
+    await dRepRegistrationPage.goto();
+    await dRepRegistrationPage.register({
+      name: faker.person.firstName(),
+      donNotList: true,
+    });
+
+    await dRepRegistrationPage.confirmBtn.click();
+
+    await expect(dRepPage.getByTestId("d-rep-in-progress")).not.toBeVisible();
+
+    // connected state
+    const dRepDirectoryPage = new DRepDirectoryPage(page);
+    await dRepDirectoryPage.verifyDRepInList(wallet.dRepId);
+
+    // disconnected state
+    await page.getByTestId("disconnect-button").click();
+    await dRepDirectoryPage.verifyDRepInList(wallet.dRepId);
   });
 
   test("3J. Should verify retire as DRep", async ({ page, browser }) => {

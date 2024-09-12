@@ -6,6 +6,7 @@ import { withTxConfirmation } from "lib/transaction.decorator";
 
 export default class GovernanceActionDetailsPage {
   readonly voteBtn = this.page.getByTestId("vote-button");
+  readonly backBtn = this.page.getByTestId("back-to-list-link");
   readonly changeVoteBtn = this.page.getByTestId("change-vote");
   readonly yesVoteRadio = this.page.getByTestId("yes-radio");
   readonly noVoteRadio = this.page.getByTestId("no-radio");
@@ -80,6 +81,6 @@ export default class GovernanceActionDetailsPage {
   @withTxConfirmation
   async reVote() {
     await this.noVoteRadio.click();
-    await this.changeVoteBtn.click();
+    await this.voteBtn.click();
   }
 }

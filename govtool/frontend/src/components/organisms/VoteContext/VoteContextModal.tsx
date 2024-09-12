@@ -11,7 +11,7 @@ import {
 } from "@organisms";
 import { VoteContextFormValues } from "@hooks";
 
-type VoteContextModalState = {
+export type VoteContextModalState = {
   onSubmit: (url: string, hash: string | null, voteContextText: string) => void;
 };
 

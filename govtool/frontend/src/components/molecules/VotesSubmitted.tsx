@@ -4,17 +4,10 @@ import { IMAGES } from "@consts";
 import { VotePill } from "@atoms";
 import { useTranslation } from "@hooks";
 import { correctAdaFormat } from "@utils";
+import { SubmittedVotesData } from "@models";
 
 type Props = {
-  dRepYesVotes: number;
-  dRepNoVotes: number;
-  dRepAbstainVotes: number;
-  poolYesVotes: number;
-  poolNoVotes: number;
-  poolAbstainVotes: number;
-  ccYesVotes: number;
-  ccNoVotes: number;
-  ccAbstainVotes: number;
+  votes: SubmittedVotesData;
 };
 
 const Vote = ({
@@ -39,15 +32,17 @@ const Vote = ({
 );
 
 export const VotesSubmitted = ({
-  dRepAbstainVotes,
-  dRepNoVotes,
-  dRepYesVotes,
-  poolAbstainVotes,
-  poolNoVotes,
-  poolYesVotes,
-  ccAbstainVotes,
-  ccNoVotes,
-  ccYesVotes,
+  votes: {
+    dRepYesVotes,
+    dRepAbstainVotes,
+    dRepNoVotes,
+    poolYesVotes,
+    poolAbstainVotes,
+    poolNoVotes,
+    ccYesVotes,
+    ccAbstainVotes,
+    ccNoVotes,
+  },
 }: Props) => {
   const { t } = useTranslation();
 

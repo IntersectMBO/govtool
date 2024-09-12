@@ -13,13 +13,17 @@ import { DRepDetailsCardHeader } from "./DRepDetailsCardHeader";
 type DRepDetailsProps = {
   dRepData: DRepData;
   isConnected: boolean;
-  variant?: "default" | "meAsDRep" | "myDRep" | "myDRepInProgress";
+  isMe?: boolean;
+  isMyDrep?: boolean;
+  isMyDrepInProgress?: boolean;
 };
 
 export const DRepDetailsCard = ({
   dRepData,
   isConnected,
-  variant,
+  isMe,
+  isMyDrep,
+  isMyDrepInProgress,
 }: DRepDetailsProps) => {
   const { pendingTransaction } = useCardano();
   const { t } = useTranslation();
@@ -39,10 +43,6 @@ export const DRepDetailsCard = ({
     view,
     votingPower,
   } = dRepData;
-
-  const isMe = variant === "meAsDRep";
-  const isMyDrep = variant === "myDRep";
-  const isMyDrepInProgress = variant === "myDRepInProgress";
 
   const groupedReferences = references?.reduce<Record<string, Reference[]>>(
     (acc, reference) => {
@@ -85,7 +85,11 @@ export const DRepDetailsCard = ({
           gap: 2,
         }}
       >
-        <DRepDetailsCardHeader dRepData={dRepData} variant={variant} />
+        <DRepDetailsCardHeader
+          dRepData={dRepData}
+          isMe={isMe}
+          isMyDrep={isMyDrep}
+        />
         {/* ERROR MESSAGES */}
         {metadataStatus && (
           <DataMissingInfoBox

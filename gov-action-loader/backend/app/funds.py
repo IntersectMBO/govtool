@@ -2,13 +2,15 @@ import asyncio
 
 from fastapi import HTTPException
 
+from app.network import get_api_url
 from app.settings import settings
 from app.transaction import (default_proposal_deposit_ada, main_wallet,
                              submit_tx)
 
 
-async def get_ada_balance(address, client):
-    utxo_url = settings.kuber_api_url + "/api/v3/utxo"
+async def get_ada_balance(address, client, network):
+
+    utxo_url = get_api_url(network) + "/api/v3/utxo"
     kuber_response = await client.get(
         utxo_url,
         params={"address": address},
@@ -25,8 +27,8 @@ async def get_ada_balance(address, client):
         )
 
 
-async def get_protocol_params(client):
-    pParamsQuery = settings.kuber_api_url + "/api/v3/protocol-params"
+async def get_protocol_params(client, network):
+    pParamsQuery = get_api_url(network) + "/api/v3/protocol-params"
     kuber_response = await client.get(
         pParamsQuery,
         headers={"api-key": settings.kuber_api_key},
@@ -41,7 +43,7 @@ async def get_protocol_params(client):
 
 
 async def check_balance_and_fund_wallets(
-    wallets, supported_proposals_in_single_tx, per_proposal_deposit, client
+    wallets, supported_proposals_in_single_tx, per_proposal_deposit, client, network
 ):
     wallets_with_balance = await asyncio.gather(
         *[get_ada_balance(wallet["address"], client) for wallet in wallets]
@@ -82,7 +84,7 @@ async def check_balance_and_fund_wallets(
                 for wallet in low_balance_wallets
             ],
         }
-        tx = await submit_tx(fund_from_main_tx, client)
+        tx = await submit_tx(fund_from_main_tx, client, network)
         raise HTTPException(
             status_code=412,
             detail="This action required multiple transaction and wallet setup  TX:"

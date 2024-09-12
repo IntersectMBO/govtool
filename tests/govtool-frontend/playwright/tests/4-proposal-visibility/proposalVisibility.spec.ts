@@ -1,11 +1,12 @@
 import { setAllureEpic } from "@helpers/allure";
-import { lovelaceToAda } from "@helpers/cardano";
+import { lovelaceToAda, skipIfNotHardFork } from "@helpers/cardano";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect, test } from "@playwright/test";
-import { FilterOption, IProposal } from "@types";
+import { GrovernanceActionType, IProposal } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
+  await skipIfNotHardFork();
 });
 
 test("4A_2. Should access Governance Actions page without connecting wallet", async ({
@@ -30,9 +31,9 @@ test("4B_2. Should restrict voting for users who are not registered as DReps (wi
 test("4K. Should display correct vote counts on governance details page for disconnect state", async ({
   page,
 }) => {
-  const responsesPromise = Object.keys(FilterOption).map((filterKey) =>
+  const responsesPromise = Object.keys(GrovernanceActionType).map((filterKey) =>
     page.waitForResponse((response) =>
-      response.url().includes(`&type[]=${FilterOption[filterKey]}`)
+      response.url().includes(`&type[]=${GrovernanceActionType[filterKey]}`)
     )
   );
 

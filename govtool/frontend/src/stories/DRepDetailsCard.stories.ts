@@ -60,38 +60,42 @@ type Story = StoryObj<typeof meta>;
 
 export const MeAsDRep: Story = {
   args: {
-    variant: "meAsDRep",
+    isMe: true,
+    isMyDrep: false,
+  },
+};
+
+export const MeAsDRepDelegatedToMyself: Story = {
+  args: {
+    isMe: true,
+    isMyDrep: true,
   },
 };
 
 export const MyDRep: Story = {
   args: {
-    variant: "myDRep",
+    isMyDrep: true,
   },
 };
 
 export const MyDRepInProgress: Story = {
   args: {
-    variant: "myDRepInProgress",
+    isMyDrepInProgress: true,
   },
 };
 
 export const OtherDRep: Story = {
-  args: {
-    variant: "default",
-  },
+  args: {},
 };
 
 export const UserNotConnected: Story = {
   args: {
     isConnected: false,
-    variant: "default",
   },
 };
 
 export const InvalidData: Story = {
   args: {
-    variant: "default",
     dRepData: {
       ...meta.args.dRepData,
       metadataStatus: MetadataValidationStatus.INCORRECT_FORMAT,

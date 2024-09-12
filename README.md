@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="750" src=".github/images/voltaire-govtool-header.png"/>
+  <img width="750" src=".github/images/cardano-govtool-header.png"/>
 </p>
 
 <p align="center">
@@ -24,7 +24,7 @@ The Cardano GovTool enables ada holders to experience the governance features de
 
 #### Mainnet
 
-- _Coming soon_
+- [gov.tools](https://gov.tools/)
 
 #### SanchoNet
 

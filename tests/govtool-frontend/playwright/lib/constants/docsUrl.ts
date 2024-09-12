@@ -10,5 +10,6 @@ export const SIGNAL_NO_CONFIDENCE_VOTE_DOC_URL = `${environments.docsUrl}/using-
 export const FAQS_DOC_URL = `${environments.docsUrl}/faqs`;
 export const GUIDES_DOC_URL = `${environments.docsUrl}`;
 export const PRIVACY_POLICY = `${environments.docsUrl}/legal/privacy-policy`;
-export const TERMS_AND_CONDITIONS = `${environments.docsUrl}/legal/terms-and-conditions`;
+export const TERMS_AND_CONDITIONS = `https://docs.intersectmbo.org/legal/policies-and-conditions/terms-of-use`;
 export const HELP_DOC_URL = `${environments.docsUrl}/support/get-help-in-discord`;
+export const BOOTSTRAP_DOC_URL = `${environments.docsUrl}/about/bootstrapping-phase`;

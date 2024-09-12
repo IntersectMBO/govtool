@@ -23,20 +23,7 @@ export const GovernanceActionDetailsCardVotes = ({
   vote,
   isDashboard,
   isInProgress,
-  proposal: {
-    dRepAbstainVotes,
-    dRepNoVotes,
-    dRepYesVotes,
-    poolAbstainVotes,
-    poolNoVotes,
-    poolYesVotes,
-    ccAbstainVotes,
-    ccNoVotes,
-    ccYesVotes,
-    expiryDate,
-    expiryEpochNo,
-    type,
-  },
+  proposal,
 }: GovernanceActionCardVotesProps) => {
   const { isVotingOnGovernanceActionEnabled } = useFeatureFlag();
   const { screenWidth } = useScreenDimension();
@@ -52,29 +39,15 @@ export const GovernanceActionDetailsCardVotes = ({
         p: `40px ${isModifiedPadding ? "24px" : "80px"}`,
       }}
     >
-      {isVoter && isVotingOnGovernanceActionEnabled(type) ? (
+      {isVoter && isVotingOnGovernanceActionEnabled(proposal.type) ? (
         <VoteActionForm
           setIsVoteSubmitted={setIsVoteSubmitted}
-          expiryDate={expiryDate}
-          expiryEpochNo={expiryEpochNo}
+          proposal={proposal}
           previousVote={vote}
-          dRepAbstainVotes={dRepAbstainVotes}
-          dRepNoVotes={dRepNoVotes}
-          dRepYesVotes={dRepYesVotes}
           isInProgress={isInProgress}
         />
       ) : (
-        <VotesSubmitted
-          dRepAbstainVotes={dRepAbstainVotes}
-          dRepNoVotes={dRepNoVotes}
-          dRepYesVotes={dRepYesVotes}
-          poolAbstainVotes={poolAbstainVotes}
-          poolNoVotes={poolNoVotes}
-          poolYesVotes={poolYesVotes}
-          ccAbstainVotes={ccAbstainVotes}
-          ccNoVotes={ccNoVotes}
-          ccYesVotes={ccYesVotes}
-        />
+        <VotesSubmitted votes={proposal} />
       )}
     </Box>
   );

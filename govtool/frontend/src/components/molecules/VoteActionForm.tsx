@@ -13,29 +13,22 @@ import {
   useGetVoteContextTextFromFile,
 } from "@hooks";
 import { formatDisplayDate } from "@utils";
-import { ProposalVote } from "@/models";
-import { VoteContextModalState, VotingPowerModalState } from "../organisms";
+import { ProposalData, ProposalVote } from "@/models";
+import { VoteContextModalState, SubmittedVotesModalState } from "../organisms";
 
 type VoteActionFormProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
-  expiryDate: string | undefined;
-  expiryEpochNo: number | undefined;
   isInProgress?: boolean;
   previousVote?: ProposalVote;
-  dRepYesVotes: number;
-  dRepNoVotes: number;
-  dRepAbstainVotes: number;
+  proposal: ProposalData;
 };
 
 export const VoteActionForm = ({
   setIsVoteSubmitted,
-  expiryDate,
-  expiryEpochNo,
   previousVote,
-  dRepAbstainVotes,
-  dRepNoVotes,
-  dRepYesVotes,
   isInProgress,
+  proposal,
+  proposal: { expiryDate, expiryEpochNo },
 }: VoteActionFormProps) => {
   const [voteContextHash, setVoteContextHash] = useState<string | undefined>();
   const [voteContextUrl, setVoteContextUrl] = useState<string | undefined>();
@@ -216,13 +209,11 @@ export const VoteActionForm = ({
             }}
             onClick={() => {
               openModal({
-                type: "votingPower",
+                type: "submittedVotes",
                 state: {
-                  yesVotes: dRepYesVotes,
-                  noVotes: dRepNoVotes,
-                  abstainVotes: dRepAbstainVotes,
+                  ...proposal,
                   vote: previousVote?.vote,
-                } satisfies VotingPowerModalState,
+                } satisfies SubmittedVotesModalState,
               });
             }}
           >

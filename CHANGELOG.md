@@ -16,6 +16,7 @@ changes.
 
 ### Fixed
 
+- Correctly show all kinds of votes in the modal showing vote numbers [Issue 1941](https://github.com/IntersectMBO/govtool/issues/1941)
 - Fixed terms and conditions link [Issue 1968](https://github.com/IntersectMBO/govtool/issues/1968)
 - Hide Delegate button in DRep list and details if user has already delegated to this DRep [Issue 1982](https://github.com/IntersectMBO/govtool/issues/1982)
 
@@ -37,7 +38,6 @@ changes.
 
 - Make testIds for link and identity references in drep form unique [Issue 1928](https://github.com/IntersectMBO/govtool/issues/1928)
 - Fix saving the Do Not List checkbox value on DRep registration [Issue 1940](https://github.com/IntersectMBO/govtool/issues/1940)
-- Fix passing DRep votes to the modal showing vote numbers [Issue 1941](https://github.com/IntersectMBO/govtool/issues/1941)
 
 ### Changed
 

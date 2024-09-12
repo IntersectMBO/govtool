@@ -3,24 +3,24 @@ import { Meta, StoryFn } from "@storybook/react";
 
 import { Modal } from "@atoms";
 import { useModal } from "@context";
-import { StatusModal, VotingPowerModalState } from "@organisms";
+import { StatusModal, SubmittedVotesModalState } from "@organisms";
 import { screen, waitFor, within } from "@storybook/testing-library";
 import { callAll, correctAdaFormat } from "@utils";
 import { useEffect } from "react";
 
 const meta = {
-  title: "Example/Modals/VotingPowerModal",
+  title: "Example/Modals/SubmittedVotesModal",
   component: StatusModal,
 } satisfies Meta<typeof StatusModal>;
 
 export default meta;
 
-const Template: StoryFn<VotingPowerModalState> = (args) => {
+const Template: StoryFn<SubmittedVotesModalState> = (args) => {
   const { openModal, modal, modals } = useModal();
 
   const open = () => {
     openModal({
-      type: "votingPower",
+      type: "submittedVotes",
       state: {
         ...args,
       },
@@ -52,22 +52,22 @@ const Template: StoryFn<VotingPowerModalState> = (args) => {
 
 async function assertVotes(
   canvas: ReturnType<typeof within>,
-  args: VotingPowerModalState,
+  args: SubmittedVotesModalState,
 ) {
-  const yesVotesText = `₳ ${correctAdaFormat(args.yesVotes)}`;
-  const noVotesText = `₳ ${correctAdaFormat(args.noVotes)}`;
-  const abstainVotesText = `₳ ${correctAdaFormat(args.abstainVotes)}`;
+  const dRepYesVotesText = `₳ ${correctAdaFormat(args.dRepYesVotes)}`;
+  const dRepNoVotesText = `₳ ${correctAdaFormat(args.dRepNoVotes)}`;
+  const dRepAbstainVotesText = `₳ ${correctAdaFormat(args.dRepAbstainVotes)}`;
 
-  await expect(canvas.getByText(yesVotesText)).toBeVisible();
-  await expect(canvas.getByText(noVotesText)).toBeVisible();
-  await expect(canvas.getByText(abstainVotesText)).toBeVisible();
+  await expect(canvas.getByText(dRepYesVotesText)).toBeVisible();
+  await expect(canvas.getByText(dRepNoVotesText)).toBeVisible();
+  await expect(canvas.getByText(dRepAbstainVotesText)).toBeVisible();
 }
 
 export const YesVoted = Template.bind({});
 YesVoted.args = {
-  yesVotes: 1000000000000,
-  noVotes: 10000000000,
-  abstainVotes: 324000000,
+  dRepYesVotes: 1000000000000,
+  dRepNoVotes: 10000000000,
+  dRepAbstainVotes: 324000000,
   vote: "yes",
 };
 YesVoted.play = async ({ args }) => {
@@ -81,14 +81,14 @@ YesVoted.play = async ({ args }) => {
 
 export const AbstainVoted = Template.bind({});
 AbstainVoted.args = {
-  yesVotes: 1000000000000,
-  noVotes: 10000000000,
-  abstainVotes: 324000000,
+  dRepYesVotes: 1000000000000,
+  dRepNoVotes: 10000000000,
+  dRepAbstainVotes: 324000000,
   vote: "abstain",
 };
 AbstainVoted.play = async ({ args }) => {
   waitFor(async () => {
-    const modalScreen = screen.getAllByTestId("external-link-modal")[0];
+    const modalScreen = screen.getAllByTestId("submitted-votes-modal")[0];
     const loadingModalCanvas = within(modalScreen);
 
     await assertVotes(loadingModalCanvas, args);
@@ -97,14 +97,14 @@ AbstainVoted.play = async ({ args }) => {
 
 export const NoVoted = Template.bind({});
 NoVoted.args = {
-  yesVotes: 1000000000000,
-  noVotes: 10000000000,
-  abstainVotes: 324000000,
+  dRepYesVotes: 1000000000000,
+  dRepNoVotes: 10000000000,
+  dRepAbstainVotes: 324000000,
   vote: "no",
 };
 NoVoted.play = async ({ args }) => {
   waitFor(async () => {
-    const modalScreen = screen.getAllByTestId("external-link-modal")[0];
+    const modalScreen = screen.getAllByTestId("submitted-votes-modal")[0];
     const loadingModalCanvas = within(modalScreen);
 
     await assertVotes(loadingModalCanvas, args);

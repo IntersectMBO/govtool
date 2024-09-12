@@ -20,7 +20,7 @@ changes.
 
 ### Changed
 
--
+- Bump @intersect.mbo/pdf-ui to v0.3.9
 
 ### Removed
 

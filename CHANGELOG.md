@@ -12,6 +12,24 @@ changes.
 
 ### Added
 
+-
+
+### Fixed
+
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [sancho-v1.0.18](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.18) 2024-09-12
+
+### Added
+
 - Add script for Matomo Analytics [Issue 1817](https://github.com/IntersectMBO/govtool/issues/1817)
 
 ### Fixed
@@ -27,10 +45,6 @@ changes.
 - Bump @intersect.mbo/pdf-ui to v0.3.9
 - Changed misleading text for direct voter registration [Issue 1976](https://github.com/IntersectMBO/govtool/issues/1976)
 - Change base repo README header image to have correct branding and reflect mainnet launch.
-
-### Removed
-
--
 
 ## [sancho-v1.0.17](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.17) 2024-09-05
 

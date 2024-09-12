@@ -6,7 +6,7 @@ import {
   ExternalLinkModal,
   StatusModal,
   VoteContextModal,
-  VotingPowerModal,
+  SubmittedVotesModal,
   LoadingModal,
 } from "@organisms";
 import { basicReducer, callAll, BasicReducer } from "@utils";
@@ -28,7 +28,7 @@ export type ModalType =
   | "chooseWallet"
   | "statusModal"
   | "externalLink"
-  | "votingPower"
+  | "submittedVotes"
   | "voteContext";
 
 const modals: Record<ModalType, ContextModal> = {
@@ -47,8 +47,8 @@ const modals: Record<ModalType, ContextModal> = {
   externalLink: {
     component: <ExternalLinkModal />,
   },
-  votingPower: {
-    component: <VotingPowerModal />,
+  submittedVotes: {
+    component: <SubmittedVotesModal />,
   },
   voteContext: {
     component: <VoteContextModal />,

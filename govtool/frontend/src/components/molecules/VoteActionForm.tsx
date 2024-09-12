@@ -13,28 +13,22 @@ import {
   useGetVoteContextTextFromFile,
 } from "@hooks";
 import { formatDisplayDate } from "@utils";
-import { ProposalVote } from "@/models";
+import { ProposalData, ProposalVote } from "@/models";
+import { VoteContextModalState, SubmittedVotesModalState } from "../organisms";
 
 type VoteActionFormProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
-  expiryDate: string | undefined;
-  expiryEpochNo: number | undefined;
   isInProgress?: boolean;
   previousVote?: ProposalVote;
-  dRepYesVotes: number;
-  dRepNoVotes: number;
-  dRepAbstainVotes: number;
+  proposal: ProposalData;
 };
 
 export const VoteActionForm = ({
   setIsVoteSubmitted,
-  expiryDate,
-  expiryEpochNo,
   previousVote,
-  dRepAbstainVotes,
-  dRepNoVotes,
-  dRepYesVotes,
   isInProgress,
+  proposal,
+  proposal: { expiryDate, expiryEpochNo },
 }: VoteActionFormProps) => {
   const [voteContextHash, setVoteContextHash] = useState<string | undefined>();
   const [voteContextUrl, setVoteContextUrl] = useState<string | undefined>();
@@ -59,9 +53,9 @@ export const VoteActionForm = ({
     canVote,
   } = useVoteActionForm({ previousVote, voteContextHash, voteContextUrl });
 
-  const setVoteContextData = (url: string, hash: string) => {
+  const setVoteContextData = (url: string, hash: string | null) => {
     setVoteContextUrl(url);
-    setVoteContextHash(hash);
+    setVoteContextHash(hash ?? undefined);
   };
 
   useEffect(() => {
@@ -215,13 +209,11 @@ export const VoteActionForm = ({
             }}
             onClick={() => {
               openModal({
-                type: "votingPower",
+                type: "submittedVotes",
                 state: {
-                  dRepYesVotes,
-                  dRepNoVotes,
-                  dRepAbstainVotes,
+                  ...proposal,
                   vote: previousVote?.vote,
-                },
+                } satisfies SubmittedVotesModalState,
               });
             }}
           >
@@ -309,7 +301,7 @@ export const VoteActionForm = ({
               type: "voteContext",
               state: {
                 onSubmit: setVoteContextData,
-              },
+              } satisfies VoteContextModalState,
             });
           }}
           sx={{

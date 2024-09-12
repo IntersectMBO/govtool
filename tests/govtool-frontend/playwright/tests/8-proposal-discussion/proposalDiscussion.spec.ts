@@ -2,6 +2,7 @@ import environments from "@constants/environments";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
+import { isBootStrapingPhase, skipIfNotHardFork } from "@helpers/cardano";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { expect } from "@playwright/test";
@@ -12,11 +13,13 @@ const mockComments = require("../../lib/_mock/proposalComments.json");
 const mockInfoProposedGA = require("../../lib/_mock/infoProposedGAs.json");
 
 const PROPOSAL_TYPE_FILTERS = ["Info", "Treasury"];
+const BOOTSTRAP_PROPOSAL_TYPE_FILTERS = ["Info"];
 
 const PROPOSAL_STATUS_FILTER = ["Submitted for vote", "Active proposal"];
 
 test.beforeEach(async () => {
   await setAllureEpic("8. Proposal Discussion Forum");
+  await skipIfNotHardFork();
 });
 
 test("8A. Should access proposed governance actions in disconnected state", async ({
@@ -43,10 +46,11 @@ test.describe("Filter and sort proposals", () => {
 
     // unselect active proposal
     await proposalDiscussionPage.activeProposalWrapper.click();
+    const isBootStraping = await isBootStrapingPhase();
 
     // proposal type filter
     await proposalDiscussionPage.applyAndValidateFilters(
-      PROPOSAL_TYPE_FILTERS,
+      isBootStraping ? BOOTSTRAP_PROPOSAL_TYPE_FILTERS : PROPOSAL_TYPE_FILTERS,
       proposalDiscussionPage._validateTypeFiltersInProposalCard
     );
 
@@ -58,8 +62,6 @@ test.describe("Filter and sort proposals", () => {
   });
 
   test("8B_2. Should sort the list of proposed governance actions.", async () => {
-    await proposalDiscussionPage.sortBtn.click();
-
     await proposalDiscussionPage.sortAndValidate(
       "asc",
       (p1, p2) => p1.attributes.createdAt <= p2.attributes.createdAt

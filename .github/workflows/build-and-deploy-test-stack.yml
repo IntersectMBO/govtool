@@ -75,3 +75,4 @@ jobs:
           USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
           APP_ENV: test
           PDF_API_URL: ${{ secrets.PDF_API_URL }}
+          KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}

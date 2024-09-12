@@ -10,9 +10,11 @@ import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
 import walletManager from "lib/walletManager";
 import { valid as mockValid } from "@mock/index";
+import { skipIfNotHardFork } from "@helpers/cardano";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
+  await skipIfNotHardFork();
 });
 
 test("7H. Should submit a proposal as governance action", async ({

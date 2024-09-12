@@ -12,6 +12,7 @@ import {
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
@@ -22,6 +23,7 @@ import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
+  await skipIfNotHardFork();
 });
 
 test.describe("Delegate to others", () => {
@@ -307,7 +309,7 @@ test.describe("Delegated ADA visibility", () => {
     await dRepDirectoryPage.delegateToDRep(dRep01Wallet.dRepId);
 
     const adaHolderVotingPower = await kuberService.getBalance(
-      adaHolder05Wallet.address
+      adaHolder06Wallet.address
     );
     await expect(
       page.getByText(`You have delegated ₳ ${adaHolderVotingPower}`)

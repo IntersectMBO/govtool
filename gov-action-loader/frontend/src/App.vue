@@ -7,7 +7,8 @@
         <!-- <v-container> -->
         <v-row>
           <v-col cols="12" sm="6" offset-sm="3">
-            <v-select v-model="selectedNetwork" :items="networkOptions" label="Select Network" outlined dense></v-select>
+            <v-select v-model="selectedNetwork" :items="networkOptions" label="Select Network" outlined
+              dense></v-select>
           </v-col>
         </v-row>
         <!-- </v-container> -->
@@ -18,13 +19,19 @@
           <v-tab value="multiple">Bulk Load</v-tab>
         </v-tabs>
       </div>
-      <div v-if="selectedNetwork == 'Sanchonet' && walletInfo.address" class="bg-light text-center mb-4">
+      <div class="bg-light text-center mb-4">
         <v-tooltip text="This address pays the deposits and transaction fee" location="top">
           <template v-slot:activator="{ props }">
             <span v-bind="props" class="text-h6 mb-2">{{ walletInfo.address }}</span>
           </template>
         </v-tooltip>
-        <div class="mt-1">
+        <!-- Display loading message if loading is true -->
+        <div v-if="loading" class="mt-1">
+          <strong>Loading Balance ...</strong>
+        </div>
+
+        <!-- Display balance if loading is false -->
+        <div v-else class="mt-1">
           <strong>{{ walletInfo.balance }} Ada</strong>
         </div>
       </div>
@@ -53,21 +60,7 @@ export default {
     SpecificLoad,
   },
   mounted() {
-    const fetchInterval = 7000
-    const updateBalance = async () => {
-      getBalance()
-        .then((response) => {
-          if (response.data?.address) {
-            this.walletInfo.address = response.data.address
-            this.walletInfo.balance = response.data.totalValue
-          }
-          console.log('Wallet balance', response)
-        })
-        .finally(() => {
-          this.timoutId = setTimeout(updateBalance, fetchInterval)
-        })
-    }
-    Promise.resolve(updateBalance())
+    this.updateBalance()
   },
   unmounted() {
     if (this.timeoutId) {
@@ -78,13 +71,42 @@ export default {
     return {
       tab: null,
       selectedNetwork: 'Sanchonet', // Default selection
-      networkOptions: ['Mock Database', 'Sanchonet'],
+      networkOptions: ['Sanchonet', 'Preview', 'Preprod'],
       walletInfo: {
         address: null,
         balance: null,
       },
       timeoutId: null,
+      fetchInterval: 7000,
+      loading: true
     }
+  },
+  methods: {
+    async updateBalance() {
+      try {
+        const response = await getBalance(this.selectedNetwork)
+        if (response.data?.address) {
+          this.walletInfo.address = response.data.address
+          this.walletInfo.balance = response.data.totalValue
+        }
+        console.log('Wallet balance', response)
+      } catch (error) {
+        console.error('Error updating balance:', error)
+      } finally {
+        this.timeoutId = setTimeout(this.updateBalance, this.fetchInterval)
+        this.loading = false;
+      }
+    },
+  },
+  watch: {
+    selectedNetwork() {
+      if (this.timeoutId) {
+        clearTimeout(this.timeoutId)
+      }
+      this.loading = true;
+      this.updateBalance()
+
+    },
   },
 }
 </script>

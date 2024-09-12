@@ -12,17 +12,13 @@ import config from '../config'
       <!-- Form for action loader -->
       <div class="mt-8">
         <!-- Governance Action selector -->
-        <v-select
-          v-model="selectedAction"
-          label="Governance Action To Load"
-          :items="actionTypes"
-          variant="outlined"
-          v-on:update:model-value="onActionChanged"
-        ></v-select>
+        <v-select v-model="selectedAction" label="Governance Action To Load" :items="actionTypes" variant="outlined"
+          v-on:update:model-value="onActionChanged"></v-select>
 
         <div v-if="selectedAction !== ''">
-          <div class="mb-3 mt-3" v-if="selectedAction !== 'Info' && selectedAction !== 'Withdrawl'">
-            <div><span class="text-h6 mb-2">Previous Gov Action ID</span><span class="text-caption"> (optional)</span></div>
+          <div class="mb-3 mt-3" v-if="selectedAction !== 'Info' && selectedAction !== 'Withdrawal'">
+            <div><span class="text-h6 mb-2">Previous Gov Action ID</span><span class="text-caption"> (optional)</span>
+            </div>
 
             <v-text-field label="txHash#index" v-model="prevGovId" variant="outlined"></v-text-field>
           </div>
@@ -30,13 +26,8 @@ import config from '../config'
           <div><span class="text-h6">Proposal deposit</span><span class="text-caption"> (optional)</span></div>
 
           <div class="mb-3 mt-2">
-            <v-text-field
-              style="width: 300px"
-              label="Ada amount"
-              v-model="deposit"
-              variant="outlined"
-              type="number"
-            ></v-text-field>
+            <v-text-field style="width: 300px" label="Ada amount" v-model="deposit" variant="outlined"
+              type="number"></v-text-field>
           </div>
 
           <div>
@@ -61,10 +52,11 @@ import config from '../config'
             </template>
           </v-tooltip>
           <v-text-field label="Constitution URL *" v-model="constitutionUrl" variant="outlined"></v-text-field>
-          <v-text-field label="Constitution Data Hash *" v-model="constitutionDataHash" variant="outlined"></v-text-field>
+          <v-text-field label="Constitution Data Hash *" v-model="constitutionDataHash"
+            variant="outlined"></v-text-field>
         </div>
 
-        <!-- Withdrawl section -->
+        <!-- Withdrawal section -->
         <div v-if="selectedAction == 'Withdrawal'">
           <v-tooltip text="Required" location="top">
             <template v-slot:activator="{ props }">
@@ -73,21 +65,19 @@ import config from '../config'
             </template>
           </v-tooltip>
           <div class="d-flex mt-2" v-for="(_, index) in treasuryWithdrawalAddresses" :key="index">
-            <v-text-field
-              class="stake"
-              label="Withdraw Stake Address"
-              v-model="treasuryWithdrawalAddresses[index]"
-              variant="outlined"
-            ></v-text-field>
-            <v-text-field
-              class="ml-6 number"
-              label="Withdraw Amount (Lovelace)"
-              v-model="treasuryAmounts[index]"
-              variant="outlined"
-              type="number"
-            ></v-text-field>
-            <v-btn color="red-lighten-5" variant="flat" class="mt-2 ml-6" @click="deleteTreasuryWithdrawal(index)">-</v-btn>
+            <v-text-field class="stake" label="Withdraw Stake Address*" v-model="treasuryWithdrawalAddresses[index]"
+              variant="outlined"></v-text-field>
+            <v-text-field class="ml-6 number" label="Withdraw Amount (Lovelace)*" v-model="treasuryAmounts[index]"
+              variant="outlined" type="number"></v-text-field>
+            <v-btn color="red-lighten-5" variant="flat" class="mt-2 ml-6"
+              @click="deleteTreasuryWithdrawal(index)">-</v-btn>
           </div>
+          <v-tooltip text="Required" location="top">
+            <template v-slot:activator="{ props }">
+              <span class="text-h6 mb-2">Guardrail Script</span>
+            </template>
+          </v-tooltip>
+          <v-text-field label="CBOR Hex" v-model="guardrailScript" variant="outlined"></v-text-field>
           <div class="d-flex justify-center">
             <v-btn color="blue-lighten-5" variant="flat" @click="addTreasuryWithdrawal">+</v-btn>
           </div>
@@ -101,38 +91,20 @@ import config from '../config'
               <span v-bind="props" class="text-red">*</span>
             </template>
           </v-tooltip>
-          <v-text-field
-            class="q-number"
-            label="Numerator"
-            v-model="quorumNumerator"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field
-            class="q-number"
-            label="Denominator"
-            v-model="quorumDenominator"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
+          <v-text-field class="q-number" label="Numerator" v-model="quorumNumerator" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="q-number" label="Denominator" v-model="quorumDenominator" variant="outlined"
+            type="number"></v-text-field>
 
           <div class="text-h6 mb-2 mt-5">Add To Committee</div>
 
           <div class="d-flex mt-2" v-for="(_, index) in addCommitteeFields" :key="index">
-            <v-text-field
-              class="stake"
-              label="Stake Address / Key Hash *"
-              v-model="addCommitteeFields[index]"
-              variant="outlined"
-            ></v-text-field>
-            <v-text-field
-              class="ml-6"
-              label="Active Epoch *"
-              v-model="addCommitteeEpochFields[index]"
-              variant="outlined"
-              type="number"
-            ></v-text-field>
-            <v-btn color="red-lighten-5" variant="flat" class="mt-2 ml-6" @click="deleteAddCommitteeField(index)">-</v-btn>
+            <v-text-field class="stake" label="Stake Address / Key Hash *" v-model="addCommitteeFields[index]"
+              variant="outlined"></v-text-field>
+            <v-text-field class="ml-6" label="Active Epoch *" v-model="addCommitteeEpochFields[index]"
+              variant="outlined" type="number"></v-text-field>
+            <v-btn color="red-lighten-5" variant="flat" class="mt-2 ml-6"
+              @click="deleteAddCommitteeField(index)">-</v-btn>
           </div>
           <div class="d-flex justify-center">
             <v-btn color="blue-lighten-5" variant="flat" @click="addAddCommitteeField">+</v-btn>
@@ -144,12 +116,10 @@ import config from '../config'
           <div class="text-h6 mb-2 mt-5">Remove From Committee</div>
 
           <div class="d-flex" v-for="(_, index) in removeCommitteeFields" :key="index">
-            <v-text-field
-              label="Stake Address / Key Hash *"
-              v-model="removeCommitteeFields[index]"
-              variant="outlined"
-            ></v-text-field>
-            <v-btn color="red-lighten-5" variant="flat" class="mt-2 ml-6" @click="deleteRemoveCommitteeField(index)">-</v-btn>
+            <v-text-field label="Stake Address / Key Hash *" v-model="removeCommitteeFields[index]"
+              variant="outlined"></v-text-field>
+            <v-btn color="red-lighten-5" variant="flat" class="mt-2 ml-6"
+              @click="deleteRemoveCommitteeField(index)">-</v-btn>
           </div>
           <div class="d-flex justify-center">
             <v-btn color="blue-lighten-5" variant="flat" @click="addRemoveCommitteeField">+</v-btn>
@@ -164,20 +134,10 @@ import config from '../config'
               <span v-bind="props" class="text-red">*</span>
             </template>
           </v-tooltip>
-          <v-text-field
-            class="protocolField"
-            label="Major version"
-            v-model="majorProtocol"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field
-            class="protocolField"
-            label="Minor version"
-            v-model="minorProtocol"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
+          <v-text-field class="protocolField" label="Major version" v-model="majorProtocol" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="protocolField" label="Minor version" v-model="minorProtocol" variant="outlined"
+            type="number"></v-text-field>
         </div>
 
         <!-- Update Parameters Section -->
@@ -188,75 +148,35 @@ import config from '../config'
               <span v-bind="props" class="text-red">*</span>
             </template>
           </v-tooltip>
-          <v-text-field
-            class="protocolField"
-            label="Max Block Size"
-            v-model="maxblocksize"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field class="protocolField" label="Min Fee A" v-model="minFeeA" variant="outlined" type="number"></v-text-field>
-          <v-text-field
-            class="protocolField"
-            label="Max BB Size"
-            v-model="MaxBBSize"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field
-            class="protocolField"
-            label="Max Tx Size"
-            v-model="MaxTxSize"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field
-            class="protocolField"
-            label="Max BH Size"
-            v-model="MaxBHSize"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field
-            class="protocolField"
-            label="Key Deposit"
-            v-model="KeyDeposit"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field
-            class="protocolField"
-            label="Pool Deposit"
-            v-model="PoolDeposit"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field class="protocolField" label="EMax" v-model="EMax" variant="outlined" type="number"></v-text-field>
-          <v-text-field class="protocolField" label="NOpt" v-model="NOpt" variant="outlined" type="number"></v-text-field>
+          <v-text-field class="protocolField" label="Max Block Size" v-model="maxblocksize" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="protocolField" label="Min Fee A" v-model="minFeeA" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="protocolField" label="Max BB Size" v-model="MaxBBSize" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="protocolField" label="Max Tx Size" v-model="MaxTxSize" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="protocolField" label="Max BH Size" v-model="MaxBHSize" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="protocolField" label="Key Deposit" v-model="KeyDeposit" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="protocolField" label="Pool Deposit" v-model="PoolDeposit" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="protocolField" label="EMax" v-model="EMax" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="protocolField" label="NOpt" v-model="NOpt" variant="outlined"
+            type="number"></v-text-field>
           <v-text-field class="protocolField" label="A0" v-model="A0" variant="outlined" type="number"></v-text-field>
           <v-text-field class="protocolField" label="Rho" v-model="Rho" variant="outlined" type="number"></v-text-field>
           <v-text-field class="protocolField" label="Tau" v-model="Tau" variant="outlined" type="number"></v-text-field>
-          <v-text-field
-            class="protocolField"
-            label="Min Pool Cost"
-            v-model="MinPoolCost"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field
-            class="w-1/2 protocolField"
-            label="Coins Per UTxO Byte"
-            v-model="CoinsPerUTxOByte"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
+          <v-text-field class="protocolField" label="Min Pool Cost" v-model="MinPoolCost" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="w-1/2 protocolField" label="Coins Per UTxO Byte" v-model="CoinsPerUTxOByte"
+            variant="outlined" type="number"></v-text-field>
           <v-row align-content="space-between" justify="space-between">
             <v-col cols="12" sm="6">
-              <v-textarea
-                label="Cost Models {PlutusV1:...,PlutusV2...}(Json)"
-                v-model="CostModels"
-                variant="outlined"
-              ></v-textarea>
+              <v-textarea label="Cost Models {PlutusV1:...,PlutusV2...}(Json)" v-model="CostModels"
+                variant="outlined"></v-textarea>
             </v-col>
             <v-col cols="12" sm="5">
               <v-textarea label="Cost Models Example" v-model="CostModelsExample" readonly @focus="selectText" />
@@ -289,47 +209,31 @@ import config from '../config'
           </v-row>
           <v-row align-content="space-between" justify="space-between">
             <v-col cols="12" sm="6">
-              <v-textarea label="Max Block Ex Units {memory:...}(Json)" v-model="MaxBlockExUnits" variant="outlined"></v-textarea>
+              <v-textarea label="Max Block Ex Units {memory:...}(Json)" v-model="MaxBlockExUnits"
+                variant="outlined"></v-textarea>
             </v-col>
             <v-col cols="12" sm="5">
-              <v-textarea label="Max Block Ex Units Example" v-model="MaxBlockExUnitsExample" readonly @focus="selectText" />
+              <v-textarea label="Max Block Ex Units Example" v-model="MaxBlockExUnitsExample" readonly
+                @focus="selectText" />
             </v-col>
             <v-col cols="12" sm="1">
               <v-btn @click="copyExample('maxBlockExUnits')">Copy</v-btn>
             </v-col>
           </v-row>
-          <v-text-field
-            class="protocolField"
-            label="Max Val Size"
-            v-model="MaxValSize"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field
-            class="protocolField"
-            label="Collateral Percentage"
-            v-model="CollateralPercentage"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field
-            class="protocolField"
-            label="Max Collateral Inputs"
-            v-model="MaxCollateralInputs"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
+          <v-text-field class="protocolField" label="Max Val Size" v-model="MaxValSize" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="protocolField" label="Collateral Percentage" v-model="CollateralPercentage"
+            variant="outlined" type="number"></v-text-field>
+          <v-text-field class="protocolField" label="Max Collateral Inputs" v-model="MaxCollateralInputs"
+            variant="outlined" type="number"></v-text-field>
           <v-row align-content="space-between" justify="space-between">
             <v-col cols="12" sm="6">
-              <v-textarea label="Pool Voting Thresholds (Json)" v-model="PoolVotingThresholds" variant="outlined"></v-textarea>
+              <v-textarea label="Pool Voting Thresholds (Json)" v-model="PoolVotingThresholds"
+                variant="outlined"></v-textarea>
             </v-col>
             <v-col cols="12" sm="5">
-              <v-textarea
-                label="Pool Voting Thresholds Example"
-                v-model="PoolVotingThresholdsExample"
-                readonly
-                @focus="selectText"
-              />
+              <v-textarea label="Pool Voting Thresholds Example" v-model="PoolVotingThresholdsExample" readonly
+                @focus="selectText" />
             </v-col>
             <v-col cols="12" sm="1">
               <v-btn @click="copyExample('poolVotingThresholds')">Copy</v-btn>
@@ -337,66 +241,40 @@ import config from '../config'
           </v-row>
           <v-row align-content="space-between" justify="space-between">
             <v-col cols="12" sm="6">
-              <v-textarea label="DRep Voting Thresholds (Json)" v-model="DRepVotingThresholds" variant="outlined"></v-textarea>
+              <v-textarea label="DRep Voting Thresholds (Json)" v-model="DRepVotingThresholds"
+                variant="outlined"></v-textarea>
             </v-col>
             <v-col cols="12" sm="5">
-              <v-textarea
-                label="DRep Voting Thresholds Example"
-                v-model="DRepVotingThresholdsExample"
-                readonly
-                @focus="selectText"
-              />
+              <v-textarea label="DRep Voting Thresholds Example" v-model="DRepVotingThresholdsExample" readonly
+                @focus="selectText" />
             </v-col>
             <v-col cols="12" sm="1">
               <v-btn @click="copyExample('drepVotingThresholds')">Copy</v-btn>
             </v-col>
           </v-row>
-          <v-text-field
-            class="protocolField"
-            label="Committee Min Size"
-            v-model="CommitteeMinSize"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field
-            class="protocolField"
-            label="Committee Max Term Length"
-            v-model="CommitteeMaxTermLength"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field
-            class="protocolField"
-            label="Gov Action Life Time"
-            v-model="GovActionLifetime"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field
-            class="protocolField"
-            label="Gov Action Deposit"
-            v-model="GovActionDeposit"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field
-            class="protocolField"
-            label="DRep Deposit"
-            v-model="DRepDeposit"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
-          <v-text-field
-            class="protocolField"
-            label="DRep Activity"
-            v-model="DRepActivity"
-            variant="outlined"
-            type="number"
-          ></v-text-field>
+          <v-text-field class="protocolField" label="Committee Min Size" v-model="CommitteeMinSize" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="protocolField" label="Committee Max Term Length" v-model="CommitteeMaxTermLength"
+            variant="outlined" type="number"></v-text-field>
+          <v-text-field class="protocolField" label="Gov Action Life Time" v-model="GovActionLifetime"
+            variant="outlined" type="number"></v-text-field>
+          <v-text-field class="protocolField" label="Gov Action Deposit" v-model="GovActionDeposit" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="protocolField" label="DRep Deposit" v-model="DRepDeposit" variant="outlined"
+            type="number"></v-text-field>
+          <v-text-field class="protocolField" label="DRep Activity" v-model="DRepActivity" variant="outlined"
+            type="number"></v-text-field>
+          <v-tooltip text="Required" location="top">
+            <template v-slot:activator="{ props }">
+              <span class="text-h6 mb-2">Guardrail Script</span>
+            </template>
+          </v-tooltip>
+          <v-text-field label="CBOR Hex" v-model="guardrailScript" variant="outlined"></v-text-field>
         </div>
 
         <!-- Submit button -->
-        <v-btn class="mt-10" size="large" color="green" rounded="sm" @click="submitForm" :disabled="!selectedAction || loading">
+        <v-btn class="mt-10" size="large" color="green" rounded="sm" @click="submitForm"
+          :disabled="!selectedAction || loading">
           <span v-if="loading">Submitting...</span>
           <span v-else>Submit</span>
         </v-btn>
@@ -416,7 +294,8 @@ import config from '../config'
           <div>Transaction submitted successfully.</div>
           <div>
             Proposal ID :
-            <a target="_blank" :href="config.vvaWebappUrl + '/governance_actions/' + txid + '%230'">{{ txid + '#0' }}</a>
+            <a target="_blank" :href="config.vvaWebappUrl + '/governance_actions/' + txid + '%230'">{{ txid + '#0'
+              }}</a>
           </div>
         </div>
       </div>
@@ -433,6 +312,11 @@ export default {
   props: {
     selectedNetwork: String,
   },
+  // watch: {
+  //   selectedNetwork(newValue) {
+  //     setNetwork(newValue);
+  //   }
+  // },
   data() {
     return {
       // Data related to governance action form
@@ -455,6 +339,8 @@ export default {
       quorumDenominator: '',
       majorProtocol: '',
       minorProtocol: '',
+
+      guardrailScript: '',
 
       maxblocksize: null,
       minFeeA: null,
@@ -956,11 +842,17 @@ export default {
           break
         case 'Info':
           break
-        case 'Withdrawl':
+        case 'Withdrawal':
           proposal_data['withdraw'] = this.treasuryWithdrawalAddresses.reduce((obj, key, index) => {
             obj[key] = parseInt(this.treasuryAmounts[index])
             return obj
           }, {})
+          proposal_data['script'] =
+          {
+            type: "PlutusScriptV3",
+            description: "",
+            cborHex: this.guardrailScript
+          }
           break
         case 'No Confidence':
           proposal_data['noconfidence'] = true
@@ -1015,8 +907,8 @@ export default {
             ...(this.CommitteeMinSize != null ? { CommitteeMinSize: parseInt(this.CommitteeMinSize) } : {}),
             ...(this.CommitteeMaxTermLength != null
               ? {
-                  CommitteeMaxTermLength: parseInt(this.CommitteeMaxTermLength),
-                }
+                CommitteeMaxTermLength: parseInt(this.CommitteeMaxTermLength),
+              }
               : {}),
             ...(this.GovActionLifetime != null ? { GovActionLifetime: parseInt(this.GovActionLifetime) } : {}),
             ...(this.GovActionDeposit != null ? { GovActionDeposit: parseInt(this.GovActionDeposit) } : {}),
@@ -1025,12 +917,8 @@ export default {
           }
           break
       }
-      if (this.selectedNetwork == 'Mock Database') {
-        console.log('Mock database')
-        this.submitProposalToMock(this.selectedAction, proposal_data)
-      } else {
-        this.submitProposalViaKuber(proposal_data)
-      }
+
+      this.submitProposalViaKuber(proposal_data)
     },
     submitProposalViaKuber(proposal_data) {
       this.loading = true

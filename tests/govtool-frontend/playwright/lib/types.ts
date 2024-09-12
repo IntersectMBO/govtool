@@ -58,7 +58,14 @@ export type IDRepInfo = {
   motivations?: string;
   qualifications?: string;
   paymentAddress?: string;
-  extraContentLinks?: string[];
+  identityReferenceLinks?: LinkType[];
+  linksReferenceLinks?: LinkType[];
+  donNotList?: boolean;
+};
+
+export type LinkType = {
+  url: string;
+  description: string;
 };
 
 export enum ProposalType {
@@ -66,7 +73,7 @@ export enum ProposalType {
   treasury = "Treasury",
 }
 
-export enum FilterOption {
+export enum GrovernanceActionType {
   ProtocolParameterChange = "ParameterChange",
   InfoAction = "InfoAction",
   TreasuryWithdrawal = "TreasuryWithdrawals",
@@ -74,6 +81,10 @@ export enum FilterOption {
   NoConfidence = "NoConfidence",
   NewCommittee = "NewCommittee",
   UpdatetotheConstitution = "NewConstitution",
+}
+
+export enum BootstrapGovernanceActionType {
+  InfoAction = "InfoAction",
 }
 
 export type DRepStatus = "Active" | "Inactive" | "Retired";
@@ -94,6 +105,7 @@ export type IDRep = {
 export type ProtocolParams = {
   dRepDeposit: number;
   govActionDeposit: number;
+  protocolVersion: ProtocolVersionType;
 };
 
 type Comment = {
@@ -151,4 +163,9 @@ export type WalletAndAnchorType = {
   url: string;
   dataHash: string;
   wallet: StaticWallet;
+};
+
+export type ProtocolVersionType = {
+  major: number;
+  minor: number;
 };

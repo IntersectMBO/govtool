@@ -105,10 +105,10 @@ export const en = {
         },
         directVoter: {
           isRegisteredDescription:
-            "Your Voting Power can be used to vote.",
+            "Your Voting Power of ₳<strong>{{votingPower}}</strong> can be used to vote.",
           register: "Register",
           registerDescription:
-            "Register to Vote on Governance Actions using your own voting power of ₳<strong>{{votingPower}}</strong>.",
+            "Register to Vote on Governance Actions using your own Voting Power of ₳<strong>{{votingPower}}</strong>.",
           registerTitle: "Become a Direct Voter",
           reRegister: "Re-register",
           registration: "Direct Voter Registration",
@@ -120,7 +120,7 @@ export const en = {
           retirementInProgress:
             "The retirement process is ongoing. This may take several minutes.",
           wasRegisteredDescription:
-            "You cannot vote on Governance Actions using your own voting power until you re-register.",
+            "You cannot vote on Governance Actions using your own Voting Power of ₳<strong>{{votingPower}}</strong> until you re-register.",
           youAreDirectVoterTitle: "You are a Direct Voter",
         },
         delegation: {
@@ -129,18 +129,18 @@ export const en = {
           noDelegationDescription: "Find a DRep to vote on your behalf.",
           noDelegationActionButton: "View DRep Directory",
           dRepDelegationTitle:
-            "Your Voting Power is delegated to:",
+            "Your Voting Power of <strong>₳{{ada}}</strong>\nis Delegated to:",
           noConfidenceDelegationTitle:
-            "You have delegated your voting power to “No Confidence”",
+            "You have delegated your Voting Power <strong>₳{{ada}}</strong>\nto “No Confidence”",
           abstainDelegationTitle:
-            "You have delegated your voting power to “Abstain”",
+            "You have delegated your Voting Power <strong>₳{{ada}}</strong>\nto “Abstain”",
           abstainDescription:
             "You have selected to apply your Voting Power to Abstain on every vote.",
           noDescription:
             "You have selected to apply your Voting Power to No Confidence on every vote.",
           inProgress: {
             title: "Delegation",
-            dRep: "Your voting power is being delegated to:",
+            dRep: "Your Voting Power of ₳<strong>{{ada}}</strong> is being delegated to:",
             abstain:
               "You have selected to apply your Voting Power to Abstain on every vote.",
             no: "You have selected to apply your Voting Power to No Confidence on every vote.",
@@ -205,7 +205,7 @@ export const en = {
         "Download your file, save it to your chosen location, and enter the URL of that location in step 3",
       storingInformationStep1Label: "Download this file",
       storingInformationStep2Label:
-        "Save this file in a location that provides a public URL (ex. github)",
+        "Save this file in a location that provides a public URL (e.g. github)",
       storingInformationStep2Link: "Read full guide",
       storingInformationStep3Label: "Paste the URL here",
       storingInformationTitle: "Information Storage Steps",
@@ -254,9 +254,9 @@ export const en = {
       abstainCardDefaultTitle: "Abstain from Every Vote",
       automatedVotingOptions: "Automated Voting Options",
       editBtn: "Edit DRep data",
-      delegatedToAbstainTitle: "You have delegated your voting power to “Abstain”",
+      delegatedToAbstainTitle: "You have delegated ₳{{ada}} to “Abstain”",
       delegatedToNoConfidenceTitle:
-        "You have delegated your voting power to “No Confidence”",
+        "You have delegated ₳{{ada}} to “No Confidence”",
       delegatedToAbstainDescription:
         "You have selected to apply your Voting Power to Abstain on every vote.",
       delegatedToNoConfidenceDescription:
@@ -266,8 +266,10 @@ export const en = {
       filterTitle: "DRep Status",
       goToDRepDirectory: "Go to DRep Directory",
       meAsDRep: "This DRep ID is connected to your wallet",
-      myDelegation: "You have delegated your voting power to:",
-      myDRep: "You have delegated your voting power to this DRep.",
+      myDelegation: "You have delegated <strong>₳ {{ada}}</strong> to:",
+      myDelegationToYourself:
+        "You have delegated <strong>₳ {{ada}}</strong> to yourself:",
+      myDRep: "You have delegated ₳{{ada}} to this DRep.",
       listTitle: "Find a DRep",
       noConfidenceDefaultDescription:
         "Select this to signal no confidence in the current constitutional committee by voting NO on every proposal and voting YES to no confidence proposals",
@@ -350,7 +352,7 @@ export const en = {
     footer: {
       copyright: "© 2024 Intersect MBO",
       privacyPolicy: "Privacy policy",
-      termOfService: "Terms and Conditions",
+      termOfService: "Terms of Use",
     },
     forms: {
       link: "Link",
@@ -658,7 +660,7 @@ export const en = {
         "Download your file, save it to your chosen location, and enter the URL of that location in step 3",
       storingInformationStep1Label: "Download this file",
       storingInformationStep2Label:
-        "Save this file in a location that provides a public URL (ex. github)",
+        "Save this file in a location that provides a public URL (e.g. github)",
       storingInformationStep2Link: "Read full guide",
       storingInformationStep3Label: "Paste the URL here",
       storingInformationTitle: "Information Storage Steps",
@@ -697,7 +699,7 @@ export const en = {
         "Download your file, save it to your chosen location, and enter the URL of that location in step 3",
       storingInformationStep1Label: "Download this file",
       storingInformationStep2Label:
-        "Save this file in a location that provides a public URL (ex. github)",
+        "Save this file in a location that provides a public URL (e.g. github)",
       storingInformationStep2Link: "Read full guide",
       storingInformationStep3Label: "Paste the URL here",
       storingInformationTitle: "Information Storage Steps",
@@ -740,7 +742,7 @@ export const en = {
           "Looks like you cannot retire, because currently you are not a Direct Voter.",
       },
       registerDescription:
-        "A Direct Voter is someone that can vote on any Governance Action with their own Voting Power, which is equal to the balance of Ada in their connected wallet. <0>Learn More</0> about Direct Voter.\n\nBecoming a Direct Voter will require a refundable deposit equal to your voting power.\n\nYour deposit will be refunded if you either retire or delegate your voting power to someone else (a DRep)",
+        "A Direct Voter is someone that can vote on any Governance Action with their own Voting Power. They do not wish to campaign for delegations from others or be shown via the DRep Directory. <0>Learn More</0> about Direct Voter.\n\nDirect Voters are not explicitly supported by the protocol but are instead an abstraction over the on-chain DReps. Direct Voters are not expected to link and host metadata.\n\nBecoming a Direct Voter will require a refundable deposit of ₳<strong>{{deposit}}</strong>. Your deposit will be refunded if you retire. You can decide to become a DRep at anytime if you are a Direct Voter you will not need to pay another deposit.",
       registerHeading: "What this Means",
       retirementDescription:
         "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of {{deposit}} ada will be refunded.\n\nYou can at any time in the future re-register to become a Direct Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\nThese options are listed in our Guides here: <0>Voting options and Roles</0>",

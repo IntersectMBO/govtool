@@ -46,7 +46,7 @@ const readFullGuideMock = jest.fn();
 export const WithIconButton: StoryObj<typeof Step> = {
   args: {
     label:
-      "Save this file in a location that provides a public URL (ex. github)",
+      "Save this file in a location that provides a public URL (e.g. github)",
     stepNumber: 2,
     component: (
       <Button
@@ -82,7 +82,7 @@ export const WithIconButton: StoryObj<typeof Step> = {
 export const WithInput: StoryObj<typeof Step> = {
   args: {
     label:
-      "Save this file in a location that provides a public URL (ex. github)",
+      "Save this file in a location that provides a public URL (e.g. github)",
     stepNumber: 2,
     component: (
       <Field.Input dataTestId="url-input" name="storingURL" placeholder="URL" />

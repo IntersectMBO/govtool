@@ -47,8 +47,7 @@ export default class LoginPage {
     // Handle multiple stake keys
     if (stakeKeys.length > 1) {
       await this.page
-        .getByTestId(`${rewardAddresses[0]}-radio`)
-        .getByText("Voting power:")
+      .getByTestId(`${rewardAddresses[0]}-radio`).locator('div').first()
         .click({ force: true });
       await this.page.getByTestId("select-button").click();
     }

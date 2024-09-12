@@ -1,8 +1,10 @@
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import { expect, test } from "@playwright/test";
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
+  await skipIfNotHardFork();
 });
 
 test("3C. Should open wallet connection popup on DRep registration in disconnected state", async ({

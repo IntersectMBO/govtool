@@ -10,16 +10,6 @@ import { GovernanceActionType } from "@/types/governanceAction";
 
 import { useAppContext } from "./appContext";
 
-const govActionVotingEnabledSinceProtocolVersion = {
-  [GovernanceActionType.InfoAction]: 9,
-  // TODO: Add minimum protocol versions for the following actions
-  [GovernanceActionType.HardForkInitiation]: Number.MAX_SAFE_INTEGER,
-  [GovernanceActionType.NewCommittee]: Number.MAX_SAFE_INTEGER,
-  [GovernanceActionType.NewConstitution]: Number.MAX_SAFE_INTEGER,
-  [GovernanceActionType.NoConfidence]: Number.MAX_SAFE_INTEGER,
-  [GovernanceActionType.ParameterChange]: Number.MAX_SAFE_INTEGER,
-  [GovernanceActionType.TreasuryWithdrawals]: Number.MAX_SAFE_INTEGER,
-};
 /**
  * The feature flag context type.
  */
@@ -41,7 +31,7 @@ const FeatureFlagContext = createContext<FeatureFlagContextType>({
  * @param children - The child components to render.
  */
 const FeatureFlagProvider = ({ children }: PropsWithChildren) => {
-  const { epochParams, isAppInitializing } = useAppContext();
+  const { isAppInitializing, isInBootstrapPhase } = useAppContext();
 
   /**
    * Determines if voting on a governance action is enabled based on the protocol version.
@@ -50,9 +40,9 @@ const FeatureFlagProvider = ({ children }: PropsWithChildren) => {
    */
   const isVotingOnGovernanceActionEnabled = useCallback(
     (governanceActionType: GovernanceActionType) =>
-      (epochParams?.protocol_major || 0) >=
-      govActionVotingEnabledSinceProtocolVersion[governanceActionType],
-    [isAppInitializing],
+      governanceActionType === GovernanceActionType.InfoAction ||
+      !isInBootstrapPhase,
+    [isAppInitializing, isInBootstrapPhase],
   );
 
   const value = useMemo(

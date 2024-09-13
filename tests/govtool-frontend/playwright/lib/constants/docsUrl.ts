@@ -11,5 +11,5 @@ export const FAQS_DOC_URL = `${environments.docsUrl}/faqs`;
 export const GUIDES_DOC_URL = `${environments.docsUrl}`;
 export const PRIVACY_POLICY = `https://docs.intersectmbo.org/legal/policies-and-conditions/privacy-policy`;
 export const TERMS_AND_CONDITIONS = `https://docs.intersectmbo.org/legal/policies-and-conditions/terms-of-use`;
-export const HELP_DOC_URL = `${environments.docsUrl}/support/get-help-in-discord`;
+export const HELP_DOC_URL = `${environments.docsUrl}/support`;
 export const BOOTSTRAP_DOC_URL = `${environments.docsUrl}/about/bootstrapping-phase`;

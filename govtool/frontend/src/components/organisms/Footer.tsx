@@ -35,10 +35,10 @@ export const Footer = () => {
   const { openFeedbackWindow } = useUsersnapApi();
 
   const onClickHelp = () =>
-    openInNewTab("https://docs.gov.tools/support/get-help-in-discord");
+    openInNewTab("https://docs.gov.tools/support");
 
   const onClickPrivacyPolicy = () =>
-    openInNewTab("https://docs.gov.tools/legal/privacy-policy");
+    openInNewTab("https://docs.intersectmbo.org/legal/policies-and-conditions/privacy-policy");
 
   const onClickTermOfService = () =>
     openInNewTab("https://docs.intersectmbo.org/legal/policies-and-conditions/terms-of-use");

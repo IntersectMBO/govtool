@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix private policy link and get support link
 
 ### Changed
 

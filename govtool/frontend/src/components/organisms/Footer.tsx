@@ -38,7 +38,7 @@ export const Footer = () => {
     openInNewTab("https://docs.gov.tools/support/get-help-in-discord");
 
   const onClickPrivacyPolicy = () =>
-    openInNewTab("https://docs.gov.tools/legal/privacy-policy");
+    openInNewTab("https://docs.intersectmbo.org/legal/policies-and-conditions/privacy-policy");
 
   const onClickTermOfService = () =>
     openInNewTab("https://docs.intersectmbo.org/legal/policies-and-conditions/terms-of-use");

@@ -268,8 +268,8 @@ export const en = {
       meAsDRep: "This DRep ID is connected to your wallet",
       myDelegation: "You have delegated <strong>₳ {{ada}}</strong> to:",
       myDelegationToYourself:
-        "You have delegated <strong>₳ {{ada}}</strong> to yourself:",
-      myDRep: "You have delegated ₳{{ada}} to this DRep.",
+        "You have delegated <strong>₳ {{ada}}</strong> to yourself",
+      myDRep: "You have delegated <strong>₳ {{ada}}</strong> to this DRep",
       listTitle: "Find a DRep",
       noConfidenceDefaultDescription:
         "Select this to signal no confidence in the current constitutional committee by voting NO on every proposal and voting YES to no confidence proposals",

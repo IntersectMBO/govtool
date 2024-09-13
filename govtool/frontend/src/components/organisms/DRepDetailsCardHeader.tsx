@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Trans } from "react-i18next";
 import { Box, Chip } from "@mui/material";
 
 import { Button } from "@atoms";
@@ -58,13 +59,18 @@ export const DRepDetailsCardHeader = ({
           <Chip
             color="primary"
             label={
-              isMe
-                ? isMyDrep
-                  ? t("dRepDirectory.myDelegationToYourself")
-                  : t("dRepDirectory.meAsDRep")
-                : t("dRepDirectory.myDRep", {
-                    ada: correctDRepDirectoryFormat(myVotingPower),
-                  })
+              <Trans
+                i18nKey={
+                  isMe
+                    ? isMyDrep
+                      ? "dRepDirectory.myDelegationToYourself"
+                      : "dRepDirectory.meAsDRep"
+                    : "dRepDirectory.myDRep"
+                }
+                values={{
+                  ada: correctDRepDirectoryFormat(myVotingPower),
+                }}
+              />
             }
             sx={{
               boxShadow: (theme) => theme.shadows[2],

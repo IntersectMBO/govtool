@@ -20,6 +20,7 @@ changes.
 
 ### Changed
 
+- Bump cardano-db-sync 13.5.0.2 [Issue 1945](https://github.com/IntersectMBO/govtool/issues/1945)
 -
 
 ### Removed

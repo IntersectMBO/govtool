@@ -5,6 +5,7 @@ import { pollTransaction } from "@helpers/transaction";
 import { test as cleanup, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
 import { StaticWallet } from "@types";
+import walletManager from "lib/walletManager";
 
 cleanup.describe.configure({ timeout: environments.txTimeOut });
 cleanup.beforeEach(async () => {
@@ -12,10 +13,12 @@ cleanup.beforeEach(async () => {
   await setAllureStory("Cleanup");
 });
 
-const registerDRep: StaticWallet[] = require("../lib/_mock/registerDRepCopyWallets.json");
-const registeredDRep: StaticWallet[] = require("../lib/_mock/registeredDRepCopyWallets.json");
-
 cleanup("DRep de-registration", async () => {
+  const registerDRep: StaticWallet[] =
+    await walletManager.readWallets("registerDRepCopy");
+  const registeredDRep: StaticWallet[] =
+    await walletManager.readWallets("registeredDRepCopy");
+
   const registeredDRepWallets = [
     ...dRepWallets,
     ...registerDRep,

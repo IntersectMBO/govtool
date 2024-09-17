@@ -42,7 +42,7 @@ class WalletManager {
     );
   }
 
-  private async readWallets(purpose: Purpose): Promise<StaticWallet[]> {
+  async readWallets(purpose: Purpose): Promise<StaticWallet[]> {
     const data: string = await new Promise((resolve, reject) =>
       fs.readFile(
         `${baseFilePath}/${purpose}Wallets.json`,

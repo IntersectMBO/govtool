@@ -40,6 +40,7 @@ changes.
 - Hide Delegate button in DRep list and details if user has already delegated to this DRep [Issue 1982](https://github.com/IntersectMBO/govtool/issues/1982)
 - Fix condition for disabling voting on different GA types [Issue 2008](https://github.com/IntersectMBO/govtool/issues/2008)
 - Fix incorrect copy (ex. github) to (e.g. github) [Issue 1748](https://github.com/IntersectMBO/govtool/issues/1748)
+- Fix broken translation in DRep Details [Issue 2036](https://github.com/IntersectMBO/govtool/issues/2036)
 
 ### Changed
 

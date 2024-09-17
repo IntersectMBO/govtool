@@ -225,6 +225,7 @@ test.describe("Check voting power", () => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     const wallet = await walletManager.popWallet("registeredDRep");
+    await walletManager.removeCopyWallet(wallet,"registeredDRepCopy");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { Box, CircularProgress } from "@mui/material";
 
@@ -44,7 +44,12 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const { dRepID: myDRepId, pendingTransaction, stakeKey } = useCardano();
   const { t } = useTranslation();
   const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
-  const { chosenFilters, chosenSorting } = dataActionsBarProps;
+  const { chosenFilters, chosenSorting, setChosenSorting } =
+    dataActionsBarProps;
+
+  useEffect(() => {
+    setChosenSorting(DRepListSort.Random);
+  }, [setChosenSorting]);
 
   const { delegate, isDelegating } = useDelegateTodRep();
 
@@ -62,9 +67,12 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   );
   const myDrep = myDRepList?.[0];
 
-  const { dRepData: yourselfDRepList } = useGetDRepListInfiniteQuery({
-    searchPhrase: myDRepId,
-  });
+  const { dRepData: yourselfDRepList } = useGetDRepListInfiniteQuery(
+    {
+      searchPhrase: myDRepId,
+    },
+    { enabled: !!myDRepId },
+  );
 
   const yourselfDRep =
     !!isConnected &&
@@ -84,6 +92,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       status: chosenFilters as DRepStatus[],
     },
     {
+      enabled: !!chosenSorting,
       keepPreviousData: true,
     },
   );

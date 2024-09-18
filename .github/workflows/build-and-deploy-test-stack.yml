@@ -59,9 +59,8 @@ jobs:
             # Execute the build-and-deploy.sh script
             cd $DEST_DIR/tests/test-infrastructure
             ./build-and-deploy.sh update-images
-            docker system prune
-            (docker image ls -q | xargs docker image rm --force ) || echo "Images cleaned-up"
-          envs: GOVTOOL_TAG, GRAFANA_ADMIN_PASSWORD, GRAFANA_SLACK_RECIPIENT, GRAFANA_SLACK_OAUTH_TOKEN, SENTRY_DSN_BACKEND, GTM_ID, NPMRC_TOKEN, SENTRY_DSN_FRONTEND, PIPELINE_URL, USERSNAP_SPACE_API_KEY, APP_ENV, PDF_API_URL
+            yes | docker system prune -f
+          envs: GOVTOOL_TAG, GRAFANA_ADMIN_PASSWORD, GRAFANA_SLACK_RECIPIENT, GRAFANA_SLACK_OAUTH_TOKEN, SENTRY_DSN_BACKEND, GTM_ID, NPMRC_TOKEN, SENTRY_DSN_FRONTEND, PIPELINE_URL, USERSNAP_SPACE_API_KEY, APP_ENV, PDF_API_URL, KUBER_API_KEY
         env:
           GOVTOOL_TAG: ${{ github.sha }}
           GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
@@ -75,4 +74,4 @@ jobs:
           USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
           APP_ENV: test
           PDF_API_URL: ${{ secrets.PDF_API_URL }}
-          KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}
+          KUBER_API_KEY: ${{ secrets.KUBER_API_KEY }}

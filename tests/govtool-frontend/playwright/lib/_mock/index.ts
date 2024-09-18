@@ -1,4 +1,5 @@
 import { faker } from "@faker-js/faker";
+import { generateExactLengthText } from "@helpers/string";
 
 export const invalid = {
   url: () => {
@@ -74,11 +75,10 @@ export const invalid = {
     return " ";
   },
 
-  paragraph: () => {
+  paragraph: (maxCharacter: number) => {
     const choice = faker.number.int({ min: 1, max: 2 });
     if (choice === 1) {
-      // maximum 500 words
-      return faker.lorem.paragraphs(40);
+      return generateExactLengthText(maxCharacter);
     }
     // empty invalid
     return " ";

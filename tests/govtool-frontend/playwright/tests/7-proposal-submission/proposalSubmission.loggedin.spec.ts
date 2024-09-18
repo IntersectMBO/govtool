@@ -39,7 +39,7 @@ test.describe("Proposal created logged state", () => {
       }) => {
         await skipIfTreasuryAndBootstrapping(type);
 
-        test.slow(); // Brute-force testing with 100 random data
+        test.slow(); // Brute-force testing with 50 random data
 
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
 
@@ -79,7 +79,7 @@ test.describe("Proposal created logged state", () => {
       }) => {
         await skipIfTreasuryAndBootstrapping(type);
 
-        test.slow(); // Brute-force testing with 100 random data
+        test.slow(); // Brute-force testing with 50 random data
 
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
         await proposalSubmissionPage.goto();

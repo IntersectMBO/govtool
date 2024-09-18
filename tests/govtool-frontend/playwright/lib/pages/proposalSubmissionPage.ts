@@ -297,9 +297,9 @@ export default class ProposalSubmissionPage {
   generateInValidProposalFormFields(proposalType: ProposalType) {
     const proposal: ProposalCreateRequest = {
       prop_name: invalid.proposalTitle(),
-      prop_abstract: invalid.paragraph(),
-      prop_motivation: invalid.paragraph(),
-      prop_rationale: invalid.paragraph(),
+      prop_abstract: invalid.paragraph(2510),
+      prop_motivation: invalid.paragraph(12020),
+      prop_rationale: invalid.paragraph(12020),
 
       proposal_links: [
         {

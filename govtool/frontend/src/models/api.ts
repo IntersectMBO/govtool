@@ -102,6 +102,7 @@ export enum DRepStatus {
 }
 
 export enum DRepListSort {
+  Random = "Random",
   VotingPower = "VotingPower",
   RegistrationDate = "RegistrationDate",
   Status = "Status",

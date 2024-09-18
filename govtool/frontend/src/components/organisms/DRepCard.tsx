@@ -118,6 +118,7 @@ export const DRepCard = ({
                 sx={{
                   gap: 1,
                   width: "250px",
+                  maxWidth: "100%",
                   "&:hover": {
                     opacity: 0.6,
                     transition: "opacity 0.3s",

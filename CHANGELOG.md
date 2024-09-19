@@ -22,6 +22,7 @@ changes.
 
 - Bump cardano-db-sync 13.5.0.2 [Issue 1945](https://github.com/IntersectMBO/govtool/issues/1945)
 - Add Mainnet link to network banner [Issue 2002](https://github.com/IntersectMBO/govtool/issues/2002)
+- Bump CSL version to 12.1.0
 
 ### Removed
 

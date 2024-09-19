@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Fix private policy link and get support link
+- Fixed poor UTxO management when building transactions [Issue 2059](https://github.com/IntersectMBO/govtool/issues/2059)
 
 ### Changed
 

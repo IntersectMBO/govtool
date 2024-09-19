@@ -24,11 +24,9 @@ import {
   TransactionBuilder,
   TransactionBuilderConfigBuilder,
   TransactionHash,
-  TransactionOutput,
   TransactionUnspentOutput,
   TransactionUnspentOutputs,
   TransactionWitnessSet,
-  Value,
   VoteDelegation,
   Voter,
   VotingBuilder,
@@ -45,7 +43,7 @@ import {
   ProtocolParamUpdate,
   ParameterChangeAction,
   Costmdls,
-  DrepVotingThresholds,
+  DRepVotingThresholds,
   ExUnitPrices,
   UnitInterval,
   ExUnits,
@@ -116,7 +114,7 @@ type ProtocolParamsUpdate = {
   costModels: Costmdls;
   drepDeposit: string;
   drepInactivityPeriod: number;
-  drepVotingThresholds: DrepVotingThresholds;
+  drepVotingThresholds: DRepVotingThresholds;
   executionCosts: ExUnitPrices;
   expansionRate: UnitInterval;
   governanceActionDeposit: string;
@@ -646,7 +644,7 @@ const CardanoProvider = (props: Props) => {
           stakeCred = Credential.from_keyhash(stakeKeyHash);
         } else {
           stakeCred = Credential.from_keyhash(stakeKeyHash);
-          const stakeKeyRegCert = StakeRegistration.new_with_coin(
+          const stakeKeyRegCert = StakeRegistration.new_with_explicit_deposit(
             stakeCred,
             BigNum.from_str(`${epochParams.key_deposit}`),
           );
@@ -776,7 +774,9 @@ const CardanoProvider = (props: Props) => {
         // Get wallet's DRep key
         const dRepKeyHash = Ed25519KeyHash.from_hex(dRepID);
         // Vote things
-        const voter = Voter.new_drep(Credential.from_keyhash(dRepKeyHash));
+        const voter = Voter.new_drep_credential(
+          Credential.from_keyhash(dRepKeyHash),
+        );
         const govActionId = GovernanceActionId.new(
           // placeholder
           TransactionHash.from_hex(txHash),

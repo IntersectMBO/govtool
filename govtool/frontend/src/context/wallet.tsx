@@ -508,7 +508,6 @@ const CardanoProvider = (props: Props) => {
       resourceId,
       type,
       votingBuilder,
-      voter,
     }: BuildSignSubmitConwayCertTxArgs) => {
       await checkIsMaintenanceOn();
       const isPendingTx = isPendingTransaction();
@@ -545,29 +544,8 @@ const CardanoProvider = (props: Props) => {
           !walletApi
         )
           throw new Error(t("errors.checkIsWalletConnected"));
-        const shelleyOutputAddress = Address.from_bech32(
-          walletState.usedAddress,
-        );
         const shelleyChangeAddress = Address.from_bech32(
           walletState.changeAddress,
-        );
-
-        // Add output of 1 ada to the address of our wallet
-        let outputValue = BigNum.from_str("1000000");
-
-        if (
-          (type === "retireAsDrep" ||
-            type === "retireAsDirectVoter" ||
-            (type === "delegate" && voter?.isRegisteredAsSoleVoter)) &&
-          voter?.deposit
-        ) {
-          outputValue = outputValue.checked_add(
-            BigNum.from_str(voter?.deposit?.toString()),
-          );
-        }
-
-        txBuilder.add_output(
-          TransactionOutput.new(shelleyOutputAddress, Value.new(outputValue)),
         );
 
         const utxos = await getUtxos(walletApi);
@@ -577,9 +555,8 @@ const CardanoProvider = (props: Props) => {
         }
         // Find the available UTXOs in the wallet and use them as Inputs for the transaction
         const txUnspentOutputs = await getTxUnspentOutputs(utxos);
-
-        // Use UTxO selection strategy 3
         const changeConfig = ChangeConfig.new(shelleyChangeAddress);
+        // Use UTxO selection strategy 3
         try {
           txBuilder.add_inputs_from_and_change(
             txUnspentOutputs,

@@ -12,9 +12,9 @@ import {
   CertificatesBuilder,
   Credential,
   DRep,
-  DrepDeregistration,
-  DrepRegistration,
-  DrepUpdate,
+  DRepDeregistration,
+  DRepRegistration,
+  DRepUpdate,
   Ed25519KeyHash,
   GovernanceActionId,
   LinearFee,
@@ -694,14 +694,14 @@ const CardanoProvider = (props: Props) => {
         if (cip95MetadataURL && cip95MetadataHash) {
           const anchor = generateAnchor(cip95MetadataURL, cip95MetadataHash);
           // Create cert object using one Ada as the deposit
-          dRepRegCert = DrepRegistration.new_with_anchor(
+          dRepRegCert = DRepRegistration.new_with_anchor(
             dRepCred,
             BigNum.from_str(`${epochParams?.drep_deposit}`),
             anchor,
           );
         } else {
           console.error(t("errors.notUsingAnchor"));
-          dRepRegCert = DrepRegistration.new(
+          dRepRegCert = DRepRegistration.new(
             dRepCred,
             BigNum.from_str(`${epochParams?.drep_deposit}`),
           );
@@ -730,9 +730,9 @@ const CardanoProvider = (props: Props) => {
         if (cip95MetadataURL && cip95MetadataHash) {
           const anchor = generateAnchor(cip95MetadataURL, cip95MetadataHash);
           // Create cert object using one Ada as the deposit
-          dRepUpdateCert = DrepUpdate.new_with_anchor(dRepCred, anchor);
+          dRepUpdateCert = DRepUpdate.new_with_anchor(dRepCred, anchor);
         } else {
-          dRepUpdateCert = DrepUpdate.new(dRepCred);
+          dRepUpdateCert = DRepUpdate.new(dRepCred);
         }
         return Certificate.new_drep_update(dRepUpdateCert);
       } catch (e) {
@@ -750,7 +750,7 @@ const CardanoProvider = (props: Props) => {
         const dRepKeyHash = Ed25519KeyHash.from_hex(dRepID);
         const dRepCred = Credential.from_keyhash(dRepKeyHash);
 
-        const dRepRetirementCert = DrepDeregistration.new(
+        const dRepRetirementCert = DRepDeregistration.new(
           dRepCred,
           BigNum.from_str(voterDeposit),
         );

@@ -25,7 +25,6 @@ type DataActionsBarProps = {
   setFiltersOpen?: Dispatch<SetStateAction<boolean>>;
   setSearchText: Dispatch<SetStateAction<string>>;
   setSortOpen: Dispatch<SetStateAction<boolean>>;
-  sortingActive: boolean;
   sortOpen: boolean;
   sortOptions?: {
     key: string;
@@ -50,7 +49,6 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
     setFiltersOpen,
     setSearchText,
     setSortOpen,
-    sortingActive,
     sortOpen,
     sortOptions = [],
   } = props;
@@ -94,8 +92,8 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
           filtersOpen={filtersOpen}
           isFiltering={isFiltering}
           setFiltersOpen={setFiltersOpen}
+          chosenSorting={chosenSorting}
           setSortOpen={setSortOpen}
-          sortingActive={sortingActive}
           sortOpen={sortOpen}
         >
           {filtersOpen && (

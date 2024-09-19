@@ -1,9 +1,15 @@
 import { Box, Link, Typography } from "@mui/material";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { useAppContext } from "@/context";
 
 export const TopBanners = () => {
-  const { isMainnet, networkName, isInBootstrapPhase } = useAppContext();
+  const { isMainnet, networkName, isInBootstrapPhase, isAppInitializing } =
+    useAppContext();
+  const { t } = useTranslation();
+
+  if (isAppInitializing) {
+    return null;
+  }
 
   return (
     <Box position="relative">
@@ -14,13 +20,26 @@ export const TopBanners = () => {
             backgroundColor: "#BBE3F0",
             px: 2,
             py: 0.5,
-            textAlign: "center",
+            display: "flex",
+            justifyContent: "center",
+            gap: 1,
           }}
           data-testid="system-network-name"
         >
           <Typography variant="caption" fontWeight={600} color="primary">
-            {networkName}
+            {`${t("network")}: ${networkName}`}
           </Typography>
+          <Typography variant="caption" fontWeight={600} color="primary">
+            |
+          </Typography>
+          <Link
+            variant="caption"
+            fontWeight={600}
+            color="primary"
+            href="https://gov.tools/"
+          >
+            {t("goToMainnet")}
+          </Link>
         </Box>
       )}
 

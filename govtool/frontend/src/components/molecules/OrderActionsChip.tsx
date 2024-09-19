@@ -10,9 +10,9 @@ type Props = {
   filtersOpen?: boolean;
   setFiltersOpen?: Dispatch<SetStateAction<boolean>>;
   chosenFiltersLength?: number;
+  chosenSorting: string;
   sortOpen: boolean;
   setSortOpen: Dispatch<SetStateAction<boolean>>;
-  sortingActive: boolean;
   children?: React.ReactNode;
   isFiltering?: boolean;
 };
@@ -29,9 +29,9 @@ export const OrderActionsChip = (props: Props) => {
     filtersOpen,
     setFiltersOpen = () => {},
     chosenFiltersLength = 0,
+    chosenSorting,
     sortOpen,
     setSortOpen,
-    sortingActive,
     isFiltering = true,
     children,
   } = props;
@@ -163,30 +163,11 @@ export const OrderActionsChip = (props: Props) => {
             sx={{
               color: sortOpen ? "white" : "primaryBlue",
               fontWeight: 500,
+              whiteSpace: "nowrap",
             }}
           >
-            {t("sort")}
+            {chosenSorting ? `${t("sortBy")}: ${chosenSorting}` : t("sort")}
           </Typography>
-        )}
-        {!sortOpen && sortingActive && (
-          <Box
-            sx={{
-              alignItems: "center",
-              background: secondary.main,
-              borderRadius: "100%",
-              color: "white",
-              display: "flex",
-              fontSize: "12px",
-              height: "16px",
-              justifyContent: "center",
-              position: "absolute",
-              right: "-3px",
-              top: "0",
-              width: "16px",
-            }}
-          >
-            <img alt="sorting active" src={ICONS.sortActiveIcon} />
-          </Box>
         )}
       </Box>
       {children}

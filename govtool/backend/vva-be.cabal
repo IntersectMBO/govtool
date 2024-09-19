@@ -103,6 +103,7 @@ library
                , http-client-tls
                , vector
                , async
+               , random
 
   exposed-modules: VVA.Config
                  , VVA.CommandLine

@@ -26,7 +26,29 @@ changes.
 
 -
 
-## [sancho-v1.0.18](https://github.com/IntersectMBO/govtool/releases/tag/sancho-v1.0.18) 2024-09-12
+## [v1.0.19](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.19) 2024-09-19
+
+### Added
+
+-
+
+### Fixed
+
+- Fix private policy link and get support link
+- Fixed poor UTxO management when building transactions [Issue 2059](https://github.com/IntersectMBO/govtool/issues/2059)
+
+### Changed
+
+- Bump cardano-db-sync 13.5.0.2 [Issue 1945](https://github.com/IntersectMBO/govtool/issues/1945)
+- Add Mainnet link to network banner [Issue 2002](https://github.com/IntersectMBO/govtool/issues/2002)
+- Bump CSL version to 12.1.0
+- Add random sorting as default sorting for DRep list [Issue 2013](https://github.com/IntersectMBO/govtool/issues/2013)
+
+### Removed
+
+-
+
+## [v1.0.18](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.18) 2024-09-12
 
 ### Added
 
@@ -39,6 +61,7 @@ changes.
 - Hide Delegate button in DRep list and details if user has already delegated to this DRep [Issue 1982](https://github.com/IntersectMBO/govtool/issues/1982)
 - Fix condition for disabling voting on different GA types [Issue 2008](https://github.com/IntersectMBO/govtool/issues/2008)
 - Fix incorrect copy (ex. github) to (e.g. github) [Issue 1748](https://github.com/IntersectMBO/govtool/issues/1748)
+- Fix broken translation in DRep Details [Issue 2036](https://github.com/IntersectMBO/govtool/issues/2036)
 
 ### Changed
 

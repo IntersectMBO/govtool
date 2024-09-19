@@ -12,9 +12,9 @@ import {
   CertificatesBuilder,
   Credential,
   DRep,
-  DrepDeregistration,
-  DrepRegistration,
-  DrepUpdate,
+  DRepDeregistration,
+  DRepRegistration,
+  DRepUpdate,
   Ed25519KeyHash,
   GovernanceActionId,
   LinearFee,
@@ -24,11 +24,9 @@ import {
   TransactionBuilder,
   TransactionBuilderConfigBuilder,
   TransactionHash,
-  TransactionOutput,
   TransactionUnspentOutput,
   TransactionUnspentOutputs,
   TransactionWitnessSet,
-  Value,
   VoteDelegation,
   Voter,
   VotingBuilder,
@@ -45,7 +43,7 @@ import {
   ProtocolParamUpdate,
   ParameterChangeAction,
   Costmdls,
-  DrepVotingThresholds,
+  DRepVotingThresholds,
   ExUnitPrices,
   UnitInterval,
   ExUnits,
@@ -116,7 +114,7 @@ type ProtocolParamsUpdate = {
   costModels: Costmdls;
   drepDeposit: string;
   drepInactivityPeriod: number;
-  drepVotingThresholds: DrepVotingThresholds;
+  drepVotingThresholds: DRepVotingThresholds;
   executionCosts: ExUnitPrices;
   expansionRate: UnitInterval;
   governanceActionDeposit: string;
@@ -508,7 +506,6 @@ const CardanoProvider = (props: Props) => {
       resourceId,
       type,
       votingBuilder,
-      voter,
     }: BuildSignSubmitConwayCertTxArgs) => {
       await checkIsMaintenanceOn();
       const isPendingTx = isPendingTransaction();
@@ -545,29 +542,8 @@ const CardanoProvider = (props: Props) => {
           !walletApi
         )
           throw new Error(t("errors.checkIsWalletConnected"));
-        const shelleyOutputAddress = Address.from_bech32(
-          walletState.usedAddress,
-        );
         const shelleyChangeAddress = Address.from_bech32(
           walletState.changeAddress,
-        );
-
-        // Add output of 1 ada to the address of our wallet
-        let outputValue = BigNum.from_str("1000000");
-
-        if (
-          (type === "retireAsDrep" ||
-            type === "retireAsDirectVoter" ||
-            (type === "delegate" && voter?.isRegisteredAsSoleVoter)) &&
-          voter?.deposit
-        ) {
-          outputValue = outputValue.checked_add(
-            BigNum.from_str(voter?.deposit?.toString()),
-          );
-        }
-
-        txBuilder.add_output(
-          TransactionOutput.new(shelleyOutputAddress, Value.new(outputValue)),
         );
 
         const utxos = await getUtxos(walletApi);
@@ -577,9 +553,8 @@ const CardanoProvider = (props: Props) => {
         }
         // Find the available UTXOs in the wallet and use them as Inputs for the transaction
         const txUnspentOutputs = await getTxUnspentOutputs(utxos);
-
-        // Use UTxO selection strategy 3
         const changeConfig = ChangeConfig.new(shelleyChangeAddress);
+        // Use UTxO selection strategy 3
         try {
           txBuilder.add_inputs_from_and_change(
             txUnspentOutputs,
@@ -669,7 +644,7 @@ const CardanoProvider = (props: Props) => {
           stakeCred = Credential.from_keyhash(stakeKeyHash);
         } else {
           stakeCred = Credential.from_keyhash(stakeKeyHash);
-          const stakeKeyRegCert = StakeRegistration.new_with_coin(
+          const stakeKeyRegCert = StakeRegistration.new_with_explicit_deposit(
             stakeCred,
             BigNum.from_str(`${epochParams.key_deposit}`),
           );
@@ -717,14 +692,14 @@ const CardanoProvider = (props: Props) => {
         if (cip95MetadataURL && cip95MetadataHash) {
           const anchor = generateAnchor(cip95MetadataURL, cip95MetadataHash);
           // Create cert object using one Ada as the deposit
-          dRepRegCert = DrepRegistration.new_with_anchor(
+          dRepRegCert = DRepRegistration.new_with_anchor(
             dRepCred,
             BigNum.from_str(`${epochParams?.drep_deposit}`),
             anchor,
           );
         } else {
           console.error(t("errors.notUsingAnchor"));
-          dRepRegCert = DrepRegistration.new(
+          dRepRegCert = DRepRegistration.new(
             dRepCred,
             BigNum.from_str(`${epochParams?.drep_deposit}`),
           );
@@ -753,9 +728,9 @@ const CardanoProvider = (props: Props) => {
         if (cip95MetadataURL && cip95MetadataHash) {
           const anchor = generateAnchor(cip95MetadataURL, cip95MetadataHash);
           // Create cert object using one Ada as the deposit
-          dRepUpdateCert = DrepUpdate.new_with_anchor(dRepCred, anchor);
+          dRepUpdateCert = DRepUpdate.new_with_anchor(dRepCred, anchor);
         } else {
-          dRepUpdateCert = DrepUpdate.new(dRepCred);
+          dRepUpdateCert = DRepUpdate.new(dRepCred);
         }
         return Certificate.new_drep_update(dRepUpdateCert);
       } catch (e) {
@@ -773,7 +748,7 @@ const CardanoProvider = (props: Props) => {
         const dRepKeyHash = Ed25519KeyHash.from_hex(dRepID);
         const dRepCred = Credential.from_keyhash(dRepKeyHash);
 
-        const dRepRetirementCert = DrepDeregistration.new(
+        const dRepRetirementCert = DRepDeregistration.new(
           dRepCred,
           BigNum.from_str(voterDeposit),
         );
@@ -799,7 +774,9 @@ const CardanoProvider = (props: Props) => {
         // Get wallet's DRep key
         const dRepKeyHash = Ed25519KeyHash.from_hex(dRepID);
         // Vote things
-        const voter = Voter.new_drep(Credential.from_keyhash(dRepKeyHash));
+        const voter = Voter.new_drep_credential(
+          Credential.from_keyhash(dRepKeyHash),
+        );
         const govActionId = GovernanceActionId.new(
           // placeholder
           TransactionHash.from_hex(txHash),

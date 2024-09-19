@@ -35,7 +35,7 @@ Frontend is a React application using Vite as a built tool to enhance developmen
     Direct voter uses following CSL services:
   - TransactionBuilder - to build the transaction
   - CertificatesBuilder - to build the delegation certificate
-  - DrepRegistration - to build the DRep registration certificate
+  - DRepRegistration - to build the DRep registration certificate
 
 - **DRep** - DRep is a Decentralized Representative which has a metadata and can delegate ADA to other DReps. DRep registration and delegation are separate processes. DReps are visible in the DRep directory.
 
@@ -46,9 +46,9 @@ Frontend is a React application using Vite as a built tool to enhance developmen
     DRep uses following CSL services:
   - TransactionBuilder - to build the transaction
   - CertificatesBuilder - to build the DRep registration certificate
-  - DrepRegistration - to build the DRep registration certificate
-  - DrepDeregistration - to build the DRep deregistration certificate
-  - DrepUpdate - to build the DRep update certificate
+  - DRepRegistration - to build the DRep registration certificate
+  - DRepDeregistration - to build the DRep deregistration certificate
+  - DRepUpdate - to build the DRep update certificate
 
 **Note**
 

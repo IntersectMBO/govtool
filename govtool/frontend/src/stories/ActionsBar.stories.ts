@@ -27,7 +27,6 @@ export const ActionsBarComponent: Story = {
   args: {
     chosenSorting: "",
     searchText: "",
-    sortingActive: false,
     sortOpen: false,
     filterOptions: GOVERNANCE_ACTIONS_FILTERS,
     isFiltering: true,
@@ -65,7 +64,6 @@ export const ActionsBarFiltersOpen: Story = {
   args: {
     chosenSorting: "",
     searchText: "",
-    sortingActive: false,
     sortOpen: false,
     chosenFilters: [],
     closeFilters: () => {},
@@ -89,7 +87,6 @@ export const ActionsBarSortsOpen: Story = {
   args: {
     chosenSorting: "",
     searchText: "",
-    sortingActive: false,
     sortOpen: true,
     setChosenSorting: jest.fn(),
   },
@@ -106,7 +103,6 @@ export const ActionsBarWithoutFilters: Story = {
   args: {
     chosenSorting: "",
     searchText: "",
-    sortingActive: false,
     sortOpen: false,
     isFiltering: false,
   },

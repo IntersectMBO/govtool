@@ -29,6 +29,7 @@ import           Numeric.Natural          (Natural)
 
 import           Servant.API
 import           Servant.Server
+import           System.Random            (randomRIO)
 
 import           Text.Read                (readMaybe)
 
@@ -151,8 +152,11 @@ drepList mSearchQuery statuses mSortMode mPage mPageSize = do
         _  -> filter $ \Types.DRepRegistration {..} ->
           mapDRepStatus dRepRegistrationStatus `elem` statuses
 
+  randomizedOrderList <- mapM (\_ -> randomRIO (0, 1 :: Double)) dreps
+
   let sortDReps = case mSortMode of
         Nothing -> id
+        Just Random -> fmap snd . sortOn fst . Prelude.zip randomizedOrderList
         Just VotingPower -> sortOn $ \Types.DRepRegistration {..} ->
           Down dRepRegistrationVotingPower
         Just RegistrationDate -> sortOn $ \Types.DRepRegistration {..} ->

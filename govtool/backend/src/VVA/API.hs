@@ -116,6 +116,7 @@ drepRegistrationToDrep Types.DRepRegistration {..} =
       dRepType = mapDRepType dRepRegistrationType,
       dRepLatestTxHash = HexText <$> dRepRegistrationLatestTxHash,
       dRepLatestRegistrationDate = dRepRegistrationLatestRegistrationDate,
+      dRepMetadataError = dRepRegistrationMetadataError,
       dRepPaymentAddress = dRepRegistrationPaymentAddress,
       dRepGivenName = dRepRegistrationGivenName,
       dRepObjectives = dRepRegistrationObjectives,

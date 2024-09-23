@@ -109,6 +109,7 @@ data DRepRegistration
       , dRepRegistrationType                   :: DRepType
       , dRepRegistrationLatestTxHash           :: Maybe Text
       , dRepRegistrationLatestRegistrationDate :: UTCTime
+      , dRepRegistrationMetadataError          :: Maybe Text
       , dRepRegistrationPaymentAddress         :: Maybe Text
       , dRepRegistrationGivenName              :: Maybe Text
       , dRepRegistrationObjectives             :: Maybe Text

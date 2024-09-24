@@ -255,27 +255,26 @@ test.describe("Bootstrap phase", () => {
     page,
     context,
   }) => {
+    await page.route("**/epoch/params", async (route) => {
+      // Fetch the original response from the server
+      const response = await route.fetch();
+      const json = await response.json();
+
+      // update protocol major version
+      json["protocol_major"] = 9;
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(json),
+      });
+    });
+
     const voteBlacklistOptions = Object.keys(GrovernanceActionType).filter(
       (option) => option !== BootstrapGovernanceActionType.InfoAction
     );
 
     const govActionsPage = new GovernanceActionsPage(page);
     await govActionsPage.goto();
-
-    const protocolParameter = await page.evaluate(() => {
-      return localStorage.getItem("protocol_params");
-    });
-    const parsedProtocolParameter = JSON.parse(protocolParameter);
-    // update protocol_major version
-    parsedProtocolParameter["protocol_major"] = 9;
-
-    const updatedProtocolParameterString = JSON.stringify(
-      parsedProtocolParameter
-    );
-    // add updated protocol parameter
-    await context.addInitScript(`
-    localStorage.setItem('protocol_params', '${updatedProtocolParameterString}');
-  `);
 
     for (const voteBlacklistOption of voteBlacklistOptions) {
       const governanceActionDetailsPage =

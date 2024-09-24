@@ -147,6 +147,7 @@ test.describe("Temporary DReps", () => {
     test.slow(); // Due to queue in pop wallets
 
     const wallet = await walletManager.popWallet("registeredDRep");
+    await walletManager.removeCopyWallet(wallet, "registeredDRepCopy");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {
@@ -171,6 +172,7 @@ test.describe("Temporary DReps", () => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     const wallet = await walletManager.popWallet("registeredDRep");
+    await walletManager.removeCopyWallet(wallet, "registeredDRepCopy");
 
     const dRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {

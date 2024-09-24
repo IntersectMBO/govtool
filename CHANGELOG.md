@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Add missing testIds for submitted votes [Issue 1875](https://github.com/IntersectMBO/govtool/issues/1875)
 
 ### Changed
 

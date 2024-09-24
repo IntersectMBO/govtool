@@ -23,7 +23,7 @@ test.beforeEach(async () => {
 test.describe("Logged in DReps", () => {
   test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
 
-  test("3A. Should show dRepId on dashboard after connecting registered dRep Wallet", async ({
+  test("3A. Should show dRepId on dashboard and enable voting on governance actions after connecting registered dRep Wallet", async ({
     page,
   }) => {
     await page.goto("/");
@@ -37,6 +37,9 @@ test.describe("Logged in DReps", () => {
     const governanceActionsPage = new GovernanceActionsPage(page);
 
     await governanceActionsPage.goto();
+    
+    await expect(page.getByText(/info action/i).first()).toBeVisible();
+
     const governanceActionDetailsPage =
       await governanceActionsPage.viewFirstProposalByGovernanceAction(
         GrovernanceActionType.InfoAction

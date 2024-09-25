@@ -20,7 +20,7 @@ changes.
 
 ### Changed
 
--
+- Change constitutional committee vote totals to be constitutional for yes and unconstitutional for no [Issue 2062](https://github.com/IntersectMBO/govtool/issues/2062)
 
 ### Removed
 

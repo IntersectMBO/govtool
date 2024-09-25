@@ -88,8 +88,10 @@ export const VotesSubmitted = ({
   );
 };
 
+type VoterType = "ccCommittee" | "dReps" | "sPos";
+
 type VotesGroupProps = {
-  type: "ccCommittee" | "dReps" | "sPos";
+  type: VoterType;
   yesVotes: number;
   noVotes: number;
   abstainVotes: number;
@@ -127,8 +129,8 @@ const VotesGroup = ({
 };
 
 type VoteProps = {
-  type: "ccCommittee" | "dReps" | "sPos";
-  vote: "yes" | "no" | "abstain";
+  type: VoterType;
+  vote: VoteType;
   value: number;
 };
 const Vote = ({ type, vote, value }: VoteProps) => (
@@ -140,7 +142,7 @@ const Vote = ({ type, vote, value }: VoteProps) => (
       columnGap: 1.5,
     }}
   >
-    <VotePill vote={vote} maxWidth={82} />
+    <VotePill vote={vote} width={115} isCC={type === "ccCommittee"} />
     <Typography
       data-testid={`submitted-votes-${type}-${vote}`}
       sx={{

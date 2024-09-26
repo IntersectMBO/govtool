@@ -225,7 +225,7 @@ test.describe("Check voting power", () => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     const wallet = await walletManager.popWallet("registeredDRep");
-    await walletManager.removeCopyWallet(wallet,"registeredDRepCopy");
+    await walletManager.removeCopyWallet(wallet, "registeredDRepCopy");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
@@ -276,6 +276,11 @@ test.describe("Bootstrap phase", () => {
     const govActionsPage = new GovernanceActionsPage(page);
     await govActionsPage.goto();
 
+    // wait until the loading button is hidden
+    await expect(
+      page.getByRole("progressbar").getByRole("img")
+    ).not.toBeVisible({ timeout: 10_000 });
+
     for (const voteBlacklistOption of voteBlacklistOptions) {
       const governanceActionDetailsPage =
         await govActionsPage.viewFirstProposalByGovernanceAction(
@@ -283,9 +288,30 @@ test.describe("Bootstrap phase", () => {
         );
 
       if (governanceActionDetailsPage !== null) {
-        await expect(page.getByText("yes₳").first()).toBeVisible();
-        await expect(page.getByText("abstain₳").first()).toBeVisible();
-        await expect(page.getByText("no₳").first()).toBeVisible();
+        // dRep vote
+        await expect(governanceActionDetailsPage.dRepYesVotes).toBeVisible();
+        await expect(
+          governanceActionDetailsPage.dRepAbstainVotes
+        ).toBeVisible();
+        await expect(governanceActionDetailsPage.dRepNoVotes).toBeVisible();
+
+        // sPos vote
+        await expect(governanceActionDetailsPage.sPosYesVotes).toBeVisible();
+        await expect(
+          governanceActionDetailsPage.sPosAbstainVotes
+        ).toBeVisible();
+        await expect(governanceActionDetailsPage.sPosNoVotes).toBeVisible();
+
+        // ccCommittee vote
+        await expect(
+          governanceActionDetailsPage.ccCommitteeYesVotes
+        ).toBeVisible();
+        await expect(
+          governanceActionDetailsPage.ccCommitteeAbstainVotes
+        ).toBeVisible();
+        await expect(
+          governanceActionDetailsPage.ccCommitteeNoVotes
+        ).toBeVisible();
 
         await expect(
           governanceActionDetailsPage.yesVoteRadio

@@ -61,9 +61,10 @@ listDReps = withPool $ \conn -> do
   results <- liftIO $ SQL.query_ conn listDRepsSql
   timeZone <- liftIO getCurrentTimeZone
   return
-    [ DRepRegistration drepHash drepView url dataHash (floor @Scientific deposit) votingPower status drepType txHash (localTimeToUTC timeZone date) paymentAddress givenName objectives motivations qualifications imageUrl imageHash
+    [ DRepRegistration drepHash drepView hashScript url dataHash (floor @Scientific deposit) votingPower status drepType txHash (localTimeToUTC timeZone date) paymentAddress givenName objectives motivations qualifications imageUrl imageHash
     | ( drepHash
         , drepView
+        , hashScript
         , url
         , dataHash
         , deposit

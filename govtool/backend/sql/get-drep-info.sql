@@ -2,6 +2,14 @@ WITH DRepId AS (
     SELECT
         decode(?, 'hex') AS raw
 ),
+IsScriptHash AS (
+    SELECT
+        drep_hash.has_script AS value
+    FROM
+        drep_hash
+    WHERE
+        drep_hash.raw = DRepId.raw
+),
 AllRegistrationEntries AS (
     SELECT
         drep_registration.voting_anchor_id AS voting_anchor_id,
@@ -165,6 +173,7 @@ SoleVoterRetire AS (
     LIMIT 1
 )
 SELECT
+    IsScriptHash.value,
     IsRegisteredAsDRep.value,
     WasRegisteredAsDRep.value,
     IsRegisteredAsSoleVoter.value,
@@ -185,6 +194,7 @@ SELECT
     off_chain_vote_drep_data.image_url,
     off_chain_vote_drep_data.image_hash
 FROM
+    IsScriptHash
     IsRegisteredAsDRep
     CROSS JOIN IsRegisteredAsSoleVoter
     CROSS JOIN WasRegisteredAsDRep

@@ -2,21 +2,28 @@ import { setAllureEpic } from "@helpers/allure";
 import { skipIfNotHardFork } from "@helpers/cardano";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { expect, test } from "@playwright/test";
-import { DRepStatus } from "@types";
+import { DRepStatus, IDRep } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
   await skipIfNotHardFork();
 });
 
+enum SortOption {
+  Random = "Random",
+  RegistrationDate = "RegistrationDate",
+  VotingPower = "VotingPower",
+  Status = "Status",
+}
+
+const statusRank: Record<DRepStatus, number> = {
+  Active: 1,
+  Inactive: 2,
+  Retired: 3,
+};
+
 test("2K_2. Should sort DReps", async ({ page }) => {
   test.slow();
-
-  enum SortOption {
-    RegistrationDate = "RegistrationDate",
-    VotingPower = "VotingPower",
-    Status = "Status",
-  }
 
   const dRepDirectory = new DRepDirectoryPage(page);
   await dRepDirectory.goto();
@@ -33,10 +40,9 @@ test("2K_2. Should sort DReps", async ({ page }) => {
     (d1, d2) => d1.votingPower >= d2.votingPower
   );
 
-  await dRepDirectory.sortAndValidate(
-    SortOption.Status,
-    (d1, d2) => d1.status >= d2.status
-  );
+  await dRepDirectory.sortAndValidate(SortOption.Status, (d1, d2) => {
+    return statusRank[d1.status] <= statusRank[d2.status];
+  });
 });
 
 test("2O. Should load more DReps on show more", async ({ page }) => {

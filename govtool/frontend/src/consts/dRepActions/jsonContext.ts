@@ -2,6 +2,7 @@ export const CIP_119 =
   "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0119/README.md#";
 
 export const DREP_CONTEXT = {
+  "@language": "en-us",
   CIP100:
     "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#",
   CIP119: CIP_119,

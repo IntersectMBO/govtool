@@ -72,15 +72,17 @@ import config from '../config'
             <v-btn color="red-lighten-5" variant="flat" class="mt-2 ml-6"
               @click="deleteTreasuryWithdrawal(index)">-</v-btn>
           </div>
+          <div class="d-flex justify-center mb-2">
+            <v-btn color="blue-lighten-5" variant="flat" @click="addTreasuryWithdrawal">+</v-btn>
+          </div>
+
           <v-tooltip text="Required" location="top">
             <template v-slot:activator="{ props }">
               <span class="text-h6 mb-2">Guardrail Script</span>
             </template>
           </v-tooltip>
           <v-text-field label="CBOR Hex" v-model="guardrailScript" variant="outlined"></v-text-field>
-          <div class="d-flex justify-center">
-            <v-btn color="blue-lighten-5" variant="flat" @click="addTreasuryWithdrawal">+</v-btn>
-          </div>
+
         </div>
 
         <!-- Add Committee section -->
@@ -914,6 +916,12 @@ export default {
             ...(this.GovActionDeposit != null ? { GovActionDeposit: parseInt(this.GovActionDeposit) } : {}),
             ...(this.DRepDeposit != null ? { DRepDeposit: parseInt(this.DRepDeposit) } : {}),
             ...(this.DRepActivity != null ? { DRepActivity: parseInt(this.DRepActivity) } : {}),
+          }
+          proposal_data['script'] =
+          {
+            type: "PlutusScriptV3",
+            description: "",
+            cborHex: this.guardrailScript
           }
           break
       }

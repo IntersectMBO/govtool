@@ -284,5 +284,7 @@ test("6T. Should display proper network name", async ({ page }) => {
   const response = await responsePromise;
   const responseBody = await response.json();
 
-  await expect((await page.getByTestId("system-network-name").innerText()).toLowerCase()).toBe(responseBody["networkName"].toLowerCase())
+  await expect(page.getByTestId("system-network-name")).toHaveText(
+    new RegExp(responseBody["networkName"], "i")
+  );
 });

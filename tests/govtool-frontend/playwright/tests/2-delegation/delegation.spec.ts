@@ -40,9 +40,10 @@ test("2K_2. Should sort DReps", async ({ page }) => {
     (d1, d2) => d1.votingPower >= d2.votingPower
   );
 
-  await dRepDirectory.sortAndValidate(SortOption.Status, (d1, d2) => {
-    return statusRank[d1.status] <= statusRank[d2.status];
-  });
+  await dRepDirectory.sortAndValidate(
+    SortOption.Status,
+    (d1, d2) => statusRank[d1.status] <= statusRank[d2.status]
+  );
 });
 
 test("2K_3. Should sort DReps randomly", async ({ page }) => {

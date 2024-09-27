@@ -225,7 +225,7 @@ test.describe("Check voting power", () => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     const wallet = await walletManager.popWallet("registeredDRep");
-    await walletManager.removeCopyWallet(wallet,"registeredDRepCopy");
+    await walletManager.removeCopyWallet(wallet, "registeredDRepCopy");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
@@ -255,6 +255,20 @@ test.describe("Bootstrap phase", () => {
     page,
     context,
   }) => {
+    await page.route("**/epoch/params", async (route) => {
+      // Fetch the original response from the server
+      const response = await route.fetch();
+      const json = await response.json();
+
+      // update protocol major version
+      json["protocol_major"] = 9;
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(json),
+      });
+    });
+
     const voteBlacklistOptions = Object.keys(GrovernanceActionType).filter(
       (option) => option !== BootstrapGovernanceActionType.InfoAction
     );
@@ -262,20 +276,10 @@ test.describe("Bootstrap phase", () => {
     const govActionsPage = new GovernanceActionsPage(page);
     await govActionsPage.goto();
 
-    const protocolParameter = await page.evaluate(() => {
-      return localStorage.getItem("protocol_params");
-    });
-    const parsedProtocolParameter = JSON.parse(protocolParameter);
-    // update protocol_major version
-    parsedProtocolParameter["protocol_major"] = 9;
-
-    const updatedProtocolParameterString = JSON.stringify(
-      parsedProtocolParameter
-    );
-    // add updated protocol parameter
-    await context.addInitScript(`
-    localStorage.setItem('protocol_params', '${updatedProtocolParameterString}');
-  `);
+    // wait until the loading button is hidden
+    await expect(
+      page.getByRole("progressbar").getByRole("img")
+    ).not.toBeVisible({ timeout: 10_000 });
 
     for (const voteBlacklistOption of voteBlacklistOptions) {
       const governanceActionDetailsPage =
@@ -284,9 +288,30 @@ test.describe("Bootstrap phase", () => {
         );
 
       if (governanceActionDetailsPage !== null) {
-        await expect(page.getByText("yes₳").first()).toBeVisible();
-        await expect(page.getByText("abstain₳").first()).toBeVisible();
-        await expect(page.getByText("no₳").first()).toBeVisible();
+        // dRep vote
+        await expect(governanceActionDetailsPage.dRepYesVotes).toBeVisible();
+        await expect(
+          governanceActionDetailsPage.dRepAbstainVotes
+        ).toBeVisible();
+        await expect(governanceActionDetailsPage.dRepNoVotes).toBeVisible();
+
+        // sPos vote
+        await expect(governanceActionDetailsPage.sPosYesVotes).toBeVisible();
+        await expect(
+          governanceActionDetailsPage.sPosAbstainVotes
+        ).toBeVisible();
+        await expect(governanceActionDetailsPage.sPosNoVotes).toBeVisible();
+
+        // ccCommittee vote
+        await expect(
+          governanceActionDetailsPage.ccCommitteeYesVotes
+        ).toBeVisible();
+        await expect(
+          governanceActionDetailsPage.ccCommitteeAbstainVotes
+        ).toBeVisible();
+        await expect(
+          governanceActionDetailsPage.ccCommitteeNoVotes
+        ).toBeVisible();
 
         await expect(
           governanceActionDetailsPage.yesVoteRadio

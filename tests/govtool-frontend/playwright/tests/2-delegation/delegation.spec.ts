@@ -45,6 +45,37 @@ test("2K_2. Should sort DReps", async ({ page }) => {
   });
 });
 
+test("2K_3. Should sort DReps randomly", async ({ page }) => {
+  const dRepDirectory = new DRepDirectoryPage(page);
+  await dRepDirectory.goto();
+
+  await dRepDirectory.sortBtn.click();
+
+  await page.getByTestId(`${SortOption.RegistrationDate}-radio`).click();
+
+  const dRepList1: IDRep[] = await dRepDirectory.getDRepsResponseFromApi(
+    SortOption.Random
+  );
+
+  await page.getByTestId(`${SortOption.RegistrationDate}-radio`).click();
+
+  const dRepList2: IDRep[] = await dRepDirectory.getDRepsResponseFromApi(
+    SortOption.Random
+  );
+
+  // Extract dRepIds from both lists
+  const dRepIdsList1 = dRepList1.map((dRep) => dRep.drepId);
+  const dRepIdsList2 = dRepList2.map((dRep) => dRep.drepId);
+
+  expect(dRepList1.length).toEqual(dRepList2.length);
+
+  const isOrderDifferent = dRepIdsList1.some(
+    (id, index) => id !== dRepIdsList2[index]
+  );
+
+  expect(isOrderDifferent).toBe(true);
+});
+
 test("2O. Should load more DReps on show more", async ({ page }) => {
   const dRepDirectory = new DRepDirectoryPage(page);
   await dRepDirectory.goto();

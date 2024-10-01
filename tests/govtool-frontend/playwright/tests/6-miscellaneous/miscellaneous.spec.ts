@@ -92,7 +92,7 @@ test("6M. Should navigate between footer links", async ({ page, context }) => {
 
   const [termsAndConditions] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByTestId("terms-and-conditions-footer-link").click(),
+    page.getByTestId("terms-of-use-footer-link").click(),
   ]);
   await expect(termsAndConditions).toHaveURL(TERMS_AND_CONDITIONS);
 

@@ -12,7 +12,7 @@ changes.
 
 ### Added
 
--
+- Add useful external links to home page and dashboard [Issue 1995](https://github.com/IntersectMBO/govtool/issues/1995)
 
 ### Fixed
 

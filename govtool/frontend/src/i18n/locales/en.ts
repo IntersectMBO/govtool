@@ -830,6 +830,19 @@ export const en = {
       unconstitutional: "Unconstitutional",
       yes: "Yes",
     },
+    usefulLinks: {
+      title: "Useful links",
+      ccPortal: {
+        title: "Check the Constitutional Committee Portal",
+        description: "See Interim Cardano Constitution and Constitutional committee votes rationales",
+        link: "CC Portal",
+      },
+      intersectWebsite: {
+        title: "Intersect website",
+        description: "Intersect is a member-based organization for the Cardano ecosystem — putting the community at the center of Cardano’s development",
+        link: "Intersect website",
+      },
+    },
     about: "About",
     addLink: "+ Add link",
     back: "Back",

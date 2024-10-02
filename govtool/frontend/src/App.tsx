@@ -6,7 +6,6 @@ import { PATHS, PDF_PATHS } from "@consts";
 import { useCardano, useFeatureFlag, useModal } from "@context";
 import { useWalletConnectionListener } from "@hooks";
 import {
-  DashboardCards,
   DashboardGovernanceActions,
   DashboardGovernanceActionDetails,
 } from "@organisms";
@@ -39,6 +38,7 @@ import {
 } from "@utils";
 import { PublicRoute } from "./pages/PublicRoute";
 import { TopBanners } from "./components/organisms/TopBanners";
+import { DashboardHome } from "./pages/DashboardHome";
 
 export default () => {
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
@@ -104,7 +104,7 @@ export default () => {
           />
         )}
         <Route element={<Dashboard />}>
-          <Route path={PATHS.dashboard} element={<DashboardCards />} />
+          <Route path={PATHS.dashboard} element={<DashboardHome />} />
           {isProposalDiscussionForumEnabled && (
             <Route
               path={`${PDF_PATHS.proposalDiscussion}/*`}

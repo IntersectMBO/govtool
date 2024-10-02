@@ -18,6 +18,7 @@ changes.
 
 - Add missing testIds for submitted votes [Issue 1875](https://github.com/IntersectMBO/govtool/issues/1875)
 - Provide workaround for iOS for downloading metadata on iOS [Issue 1989](https://github.com/IntersectMBO/govtool/issues/1989)
+- Fix infinite loading in DRep Directory [Issue 2090](https://github.com/IntersectMBO/govtool/issues/2090)
 
 ### Changed
 

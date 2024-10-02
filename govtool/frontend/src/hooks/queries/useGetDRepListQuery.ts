@@ -33,11 +33,11 @@ export const useGetDRepListInfiniteQuery = (
         pendingTransaction.registerAsDrep ||
         pendingTransaction.retireAsDirectVoter ||
         pendingTransaction.retireAsDrep
-      )?.transactionHash,
-      filters,
-      searchPhrase,
-      sorting,
-      status,
+      )?.transactionHash ?? 'noPendingTransaction',
+      filters.length ? filters : "",
+      searchPhrase ?? "",
+      sorting ?? "",
+      status?.length ? status : "",
     ],
     async ({ pageParam = 0 }) =>
       getDRepList({

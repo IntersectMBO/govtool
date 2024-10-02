@@ -48,8 +48,8 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     dataActionsBarProps;
 
   useEffect(() => {
-    setChosenSorting(DRepListSort.Random);
-  }, [setChosenSorting]);
+    if (!chosenSorting) setChosenSorting(DRepListSort.Random);
+  }, [chosenSorting, setChosenSorting]);
 
   const { delegate, isDelegating } = useDelegateTodRep();
 

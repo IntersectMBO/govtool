@@ -5,14 +5,13 @@ import { Box } from "@mui/material";
 import { IMAGES, PATHS, PDF_PATHS } from "@consts";
 import { useFeatureFlag, useModal } from "@context";
 import { ActionCard } from "@molecules";
-import { useScreenDimension, useTranslation } from "@hooks";
+import { useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
 export const HomeCards = () => {
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const navigate = useNavigate();
   const { openModal } = useModal();
-  const { screenWidth } = useScreenDimension();
   const { t } = useTranslation();
 
   const openWalletModal = useCallback(
@@ -66,23 +65,8 @@ export const HomeCards = () => {
     <Box
       columnGap={4.625}
       display="grid"
-      gridTemplateColumns={
-        screenWidth < 2560
-          ? "repeat(1, minmax(300px, 866px))"
-          : "repeat(2, minmax(300px, 866px))"
-      }
+      gridTemplateColumns="repeat(auto-fill, minmax(300px, 866px))"
       justifyContent="center"
-      mb={screenWidth < 640 ? 10 : 17}
-      mt={screenWidth < 640 ? 10 : 14.5}
-      px={
-        screenWidth < 640
-          ? 2
-          : screenWidth < 1024
-          ? 5
-          : screenWidth < 1440
-          ? 10
-          : 34
-      }
       rowGap={4.625}
     >
       {/* DELEGATE CARD */}

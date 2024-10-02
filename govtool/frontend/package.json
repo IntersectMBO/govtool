@@ -28,7 +28,7 @@
     "@emurgo/cardano-serialization-lib-asmjs": "^12.1.0",
     "@hookform/resolvers": "^3.3.1",
     "@intersect.mbo/intersectmbo.org-icons-set": "^1.0.8",
-    "@intersect.mbo/pdf-ui": "^0.3.9",
+    "@intersect.mbo/pdf-ui": "^0.4.0",
     "@mui/icons-material": "^5.14.3",
     "@mui/material": "^5.14.4",
     "@rollup/plugin-babel": "^6.0.4",

@@ -61,7 +61,7 @@ export class AppService {
       if (hashedMetadata !== hash) {
         // Optionally validate on a parsed metadata
         const hashedParsedMetadata = blake.blake2bHex(
-          JSON.stringify(parsedData),
+          JSON.stringify(parsedData, null, 2),
           undefined,
           32,
         );

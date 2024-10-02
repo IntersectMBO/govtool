@@ -23,7 +23,7 @@ test.beforeEach(async () => {
 test.describe("Logged in DReps", () => {
   test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
 
-  test("3A. Should show dRepId on dashboard after connecting registered dRep Wallet", async ({
+  test("3A. Should show dRepId on dashboard and enable voting on governance actions after connecting registered dRep Wallet", async ({
     page,
   }) => {
     await page.goto("/");
@@ -37,6 +37,9 @@ test.describe("Logged in DReps", () => {
     const governanceActionsPage = new GovernanceActionsPage(page);
 
     await governanceActionsPage.goto();
+    
+    await expect(page.getByText(/info action/i).first()).toBeVisible();
+
     const governanceActionDetailsPage =
       await governanceActionsPage.viewFirstProposalByGovernanceAction(
         GrovernanceActionType.InfoAction
@@ -144,6 +147,7 @@ test.describe("Temporary DReps", () => {
     test.slow(); // Due to queue in pop wallets
 
     const wallet = await walletManager.popWallet("registeredDRep");
+    await walletManager.removeCopyWallet(wallet, "registeredDRepCopy");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {
@@ -168,6 +172,7 @@ test.describe("Temporary DReps", () => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     const wallet = await walletManager.popWallet("registeredDRep");
+    await walletManager.removeCopyWallet(wallet, "registeredDRepCopy");
 
     const dRepAuth = await createTempDRepAuth(page, wallet);
     const dRepPage = await createNewPageWithWallet(browser, {

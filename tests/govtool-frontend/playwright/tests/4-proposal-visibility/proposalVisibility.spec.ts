@@ -52,60 +52,39 @@ test("4K. Should display correct vote counts on governance details page for disc
   expect(proposals.length, "No proposals found!").toBeGreaterThan(0);
 
   const proposalToCheck = proposals[0];
-  await governanceActionsPage.viewProposal(proposalToCheck);
+  const govActionDetailsPage =
+    await governanceActionsPage.viewProposal(proposalToCheck);
 
-  await expect(
-    page
-      .getByText("yes₳")
-      .first()
-      .getByText(`₳ ${lovelaceToAda(proposalToCheck.dRepYesVotes)}`)
-  ).toBeVisible();
-  await expect(
-    page
-      .getByText("abstain₳")
-      .first()
-      .getByText(`₳ ${lovelaceToAda(proposalToCheck.dRepAbstainVotes)}`)
-  ).toBeVisible();
-  await expect(
-    page
-      .getByText("no₳")
-      .first()
-      .getByText(`₳ ${lovelaceToAda(proposalToCheck.dRepNoVotes)}`)
-  ).toBeVisible();
-  await expect(
-    page
-      .getByText("yes₳")
-      .nth(1)
-      .getByText(`₳ ${lovelaceToAda(proposalToCheck.poolYesVotes)}`)
-  ).toBeVisible();
-  await expect(
-    page
-      .getByText("abstain₳")
-      .nth(1)
-      .getByText(`₳ ${lovelaceToAda(proposalToCheck.poolAbstainVotes)}`)
-  ).toBeVisible();
-  await expect(
-    page
-      .getByText("no₳")
-      .nth(1)
-      .getByText(`₳ ${lovelaceToAda(proposalToCheck.poolNoVotes)}`)
-  ).toBeVisible();
-  await expect(
-    page
-      .getByText("yes₳")
-      .nth(2)
-      .getByText(`₳ ${lovelaceToAda(proposalToCheck.ccYesVotes)}`)
-  ).toBeVisible();
-  await expect(
-    page
-      .getByText("abstain₳")
-      .nth(2)
-      .getByText(`₳ ${lovelaceToAda(proposalToCheck.ccAbstainVotes)}`)
-  ).toBeVisible();
-  await expect(
-    page
-      .getByText("no₳")
-      .nth(2)
-      .getByText(`₳ ${lovelaceToAda(proposalToCheck.ccNoVotes)}`)
-  ).toBeVisible();
+  // check dRep votes
+  await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
+    `₳ ${lovelaceToAda(proposalToCheck.dRepYesVotes)}`
+  );
+  await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
+    `₳ ${lovelaceToAda(proposalToCheck.dRepAbstainVotes)}`
+  );
+  await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
+    `₳ ${lovelaceToAda(proposalToCheck.dRepNoVotes)}`
+  );
+
+  // check sPos votes
+  await expect(govActionDetailsPage.sPosYesVotes).toHaveText(
+    `₳ ${lovelaceToAda(proposalToCheck.poolYesVotes)}`
+  );
+  await expect(govActionDetailsPage.sPosAbstainVotes).toHaveText(
+    `₳ ${lovelaceToAda(proposalToCheck.poolAbstainVotes)}`
+  );
+  await expect(govActionDetailsPage.sPosNoVotes).toHaveText(
+    `₳ ${lovelaceToAda(proposalToCheck.poolNoVotes)}`
+  );
+
+  // check ccCommittee votes
+  await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
+    `${proposalToCheck.ccYesVotes}`
+  );
+  await expect(govActionDetailsPage.ccCommitteeAbstainVotes).toHaveText(
+    `${proposalToCheck.ccAbstainVotes}`
+  );
+  await expect(govActionDetailsPage.ccCommitteeNoVotes).toHaveText(
+    `${proposalToCheck.ccNoVotes}`
+  );
 });

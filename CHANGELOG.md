@@ -26,6 +26,28 @@ changes.
 
 -
 
+## [v1.0.20](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.20) 2024-10-03
+
+### Added
+
+- Add useful external links to home page and dashboard [Issue 1995](https://github.com/IntersectMBO/govtool/issues/1995)
+
+### Fixed
+
+- Add missing testIds for submitted votes [Issue 1875](https://github.com/IntersectMBO/govtool/issues/1875)
+- Provide workaround for iOS for downloading metadata on iOS [Issue 1989](https://github.com/IntersectMBO/govtool/issues/1989)
+- Fix infinite loading in DRep Directory [Issue 2090](https://github.com/IntersectMBO/govtool/issues/2090)
+
+### Changed
+
+- Change constitutional committee vote totals to be constitutional for yes and unconstitutional for no [Issue 2062](https://github.com/IntersectMBO/govtool/issues/2062)
+- Bump @intersect.mbo/pdf-ui to v0.4.0
+- Include @language property in generated jsonld files [Issue 1856](https://github.com/IntersectMBO/govtool/issues/1856)
+
+### Removed
+
+-
+
 ## [v1.0.19](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.19) 2024-09-19
 
 ### Added

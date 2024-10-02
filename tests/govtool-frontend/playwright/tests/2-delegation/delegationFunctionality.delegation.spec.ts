@@ -140,6 +140,7 @@ test.describe("Register DRep state", () => {
 
   test.beforeEach(async ({ page, browser }) => {
     wallet = await walletManager.popWallet("registerDRep");
+    await walletManager.removeCopyWallet(wallet, "registerDRepCopy");
 
     const dRepAuth = await createTempDRepAuth(page, wallet);
     dRepPage = await createNewPageWithWallet(browser, {

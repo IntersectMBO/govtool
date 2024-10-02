@@ -1,6 +1,6 @@
 import environments from "./environments";
 
-export const DELEGATION_DOC_URL = `${environments.docsUrl}/using-govtool/govtool-functions/delegating`;
+export const DELEGATION_DOC_URL = `${environments.docsUrl}/about/what-is-cardano-govtool/govtool-functions/delegating`;
 export const REGISTER_DREP_DOC_URL = `${environments.docsUrl}/using-govtool/govtool-functions/dreps/register-as-a-drep`;
 export const DIRECT_VOTER_DOC_URL = `${environments.docsUrl}/using-govtool/govtool-functions/direct-voting`;
 export const GOVERNANCE_ACTION_DOC_URL = `${environments.docsUrl}/using-govtool/govtool-functions/governance-actions/view-governance-actions`;

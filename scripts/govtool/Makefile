@@ -11,7 +11,7 @@ include config.mk
 .DEFAULT_GOAL := info
 
 # image tags
-cardano_node_image_tag := 9.1.1
+cardano_node_image_tag := 9.2.1
 cardano_db_sync_image_tag := 13.5.0.2
 
 .PHONY: all

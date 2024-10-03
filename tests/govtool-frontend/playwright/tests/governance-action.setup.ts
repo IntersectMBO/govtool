@@ -36,7 +36,7 @@ setup("Setup temporary proposal wallets", async () => {
   ]);
   await pollTransaction(initializeRes.txId, initializeRes.lockInfo);
 
-  // transfer 51_000 ADA for dRep registration
+  // transfer 51_000 ADA for proposal submission
   const amountOutputs = proposalSubmissionsWallets.map((wallet) => {
     return { address: wallet.address, value: `${51_000}A` };
   });

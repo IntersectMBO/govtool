@@ -25,7 +25,7 @@ export const VotePillYes: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByText(/yes/i)).toBeInTheDocument();
+    await expect(canvas.getByText(/Yes/i)).toBeInTheDocument();
   },
 };
 
@@ -35,7 +35,7 @@ export const VotePillNo: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByText(/no/i)).toBeInTheDocument();
+    await expect(canvas.getByText(/No/i)).toBeInTheDocument();
   },
 };
 
@@ -45,6 +45,6 @@ export const VotePillAbstain: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByText(/abstain/i)).toBeInTheDocument();
+    await expect(canvas.getByText(/Abstain/i)).toBeInTheDocument();
   },
 };

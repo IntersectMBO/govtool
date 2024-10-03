@@ -33,6 +33,28 @@ export default class GovernanceActionDetailsPage {
   readonly contextInput = this.page.getByTestId("provide-context-input");
   readonly cancelModalBtn = this.page.getByTestId("cancel-modal-button");
 
+  readonly dRepYesVotes = this.page.getByTestId("submitted-votes-dReps-yes");
+  readonly dRepNoVotes = this.page.getByTestId("submitted-votes-dReps-no");
+  readonly dRepAbstainVotes = this.page.getByTestId(
+    "submitted-votes-dReps-abstain"
+  );
+
+  readonly sPosYesVotes = this.page.getByTestId("submitted-votes-sPos-yes");
+  readonly sPosNoVotes = this.page.getByTestId("submitted-votes-sPos-no");
+  readonly sPosAbstainVotes = this.page.getByTestId(
+    "submitted-votes-sPos-abstain"
+  );
+
+  readonly ccCommitteeYesVotes = this.page.getByTestId(
+    "submitted-votes-sPos-no"
+  );
+  readonly ccCommitteeNoVotes = this.page.getByTestId(
+    "submitted-votes-ccCommittee-no"
+  );
+  readonly ccCommitteeAbstainVotes = this.page.getByTestId(
+    "submitted-votes-ccCommittee-abstain"
+  );
+
   constructor(private readonly page: Page) {}
 
   get currentPage(): Page {

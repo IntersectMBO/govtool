@@ -3,16 +3,60 @@
 # process by ensuring it only needs to compile against these dependencies. This
 # is a common practice in Haskell projects, as it can significantly reduce the
 # time it takes to build the project.
+#
+# The reason why we do not use the official haskell image is that the official
+# image does not include the necessary dependencies for the project, which are
+# unobtainable from the official image.
 
-FROM haskell:9.2.7-buster
+FROM ubuntu:24.04
+
+# Set the working directory
 WORKDIR /src
 
+# Set noninteractive mode
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update package list and install dependencies
 RUN apt-get update && \
-    apt-get install -y wget lsb-release && \
-    sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' && \
+    apt-get install -y \
+      software-properties-common \
+      wget \
+      gnupg \
+      curl \
+      build-essential \
+      libncurses-dev \
+      libgmp-dev \
+      liblzma-dev \
+      pkg-config \
+      zlib1g-dev \
+      xz-utils
+
+# Install PostgreSQL 14
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' && \
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
     apt-get update && \
     apt-get install -y postgresql-14 libpq-dev
 
+# Download and install GHC 9.2.7
+RUN wget https://downloads.haskell.org/~ghc/9.2.7/ghc-9.2.7-x86_64-deb10-linux.tar.xz && \
+    tar -xf ghc-9.2.7-x86_64-deb10-linux.tar.xz && \
+    cd ghc-9.2.7 && \
+    ./configure && \
+    make install && \
+    cd .. && \
+    rm -rf ghc-9.2.7 ghc-9.2.7-x86_64-deb10-linux.tar.xz
+
+# Install Cabal
+RUN wget https://downloads.haskell.org/~cabal/cabal-install-3.6.2.0/cabal-install-3.6.2.0-x86_64-linux-deb10.tar.xz && \
+    tar -xf cabal-install-3.6.2.0-x86_64-linux-deb10.tar.xz && \
+    mv cabal /usr/local/bin/ && \
+    rm cabal-install-3.6.2.0-x86_64-linux-deb10.tar.xz
+
+# Copy the project files into the container
 COPY . .
-RUN cabal update && cabal configure && cabal install --only-dependencies && rm -rf /src/*
+
+# Install the project dependencies
+RUN cabal update && \
+    cabal configure && \
+    cabal install --only-dependencies && \
+    rm -rf /src/*

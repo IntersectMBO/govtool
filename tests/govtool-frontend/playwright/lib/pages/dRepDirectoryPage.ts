@@ -103,10 +103,7 @@ export default class DRepDirectoryPage {
 
   async sortDRep(option: string) {}
 
-  async sortAndValidate(
-    option: string,
-    validationFn: (p1: IDRep, p2: IDRep) => boolean
-  ) {
+  async getDRepsResponseFromApi(option: string): Promise<IDRep[]> {
     const responsePromise = this.page.waitForResponse((response) =>
       response.url().includes(`&sort=${option}`)
     );
@@ -114,7 +111,14 @@ export default class DRepDirectoryPage {
     await this.page.getByTestId(`${option}-radio`).click();
     const response = await responsePromise;
 
-    const dRepList: IDRep[] = (await response.json()).elements;
+    return (await response.json()).elements;
+  }
+
+  async sortAndValidate(
+    option: string,
+    validationFn: (p1: IDRep, p2: IDRep) => boolean
+  ) {
+    const dRepList = await this.getDRepsResponseFromApi(option);
 
     // API validation
     for (let i = 0; i <= dRepList.length - 2; i++) {

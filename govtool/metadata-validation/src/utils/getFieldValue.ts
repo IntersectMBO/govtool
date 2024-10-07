@@ -9,12 +9,13 @@ export const getFieldValue = (
   body: Record<string, unknown>,
   field: string,
 ): unknown => {
-  if (body[field] && body[field]['@value']) {
-    return body[field]['@value'];
+  const fieldValue = body[field];
+  if (fieldValue.hasOwnProperty('@value')) {
+    return fieldValue['@value'];
   }
 
-  if (body[field]) {
-    return body[field];
+  if (fieldValue) {
+    return fieldValue;
   }
 
   return undefined;

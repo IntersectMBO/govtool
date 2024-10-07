@@ -97,4 +97,6 @@ setup("Setup temporary DRep wallets", async () => {
   // save to file
   await walletManager.writeWallets(dRepWallets, "registeredDRep");
   await walletManager.writeWallets(registerDRepWallets, "registerDRep");
+  await walletManager.writeWallets(dRepWallets, "registeredDRepCopy");
+  await walletManager.writeWallets(registerDRepWallets, "registerDRepCopy");
 });

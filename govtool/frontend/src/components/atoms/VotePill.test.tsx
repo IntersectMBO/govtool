@@ -5,7 +5,7 @@ import { VotePill } from "@atoms";
 describe("VotePill", () => {
   it('renders the VotePill component with "yes" vote correctly', () => {
     const { getByText } = render(<VotePill vote="yes" />);
-    const voteText = getByText("yes");
+    const voteText = getByText("Yes");
     expect(voteText).toBeInTheDocument();
     expect(voteText.parentNode).toHaveStyle({
       borderColor: "#C0E4BA",
@@ -15,7 +15,7 @@ describe("VotePill", () => {
 
   it('renders the VotePill component with "no" vote correctly', () => {
     const { getByText } = render(<VotePill vote="no" />);
-    const voteText = getByText("no");
+    const voteText = getByText("No");
     expect(voteText).toBeInTheDocument();
     expect(voteText.parentNode).toHaveStyle({
       borderColor: "#EDACAC",
@@ -25,7 +25,7 @@ describe("VotePill", () => {
 
   it('renders the VotePill component with "abstain" vote correctly', () => {
     const { getByText } = render(<VotePill vote="abstain" />);
-    const voteText = getByText("abstain");
+    const voteText = getByText("Abstain");
     expect(voteText).toBeInTheDocument();
     expect(voteText.parentNode).toHaveStyle({
       borderColor: "#99ADDE",

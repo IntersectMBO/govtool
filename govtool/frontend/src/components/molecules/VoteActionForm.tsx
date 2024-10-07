@@ -170,7 +170,7 @@ export const VoteActionForm = ({
             name="vote"
             register={registerInput}
             setValue={setValue}
-            title={t("yes")}
+            title={t("votes.yes")}
             value="yes"
             disabled={isInProgress}
           />
@@ -180,7 +180,7 @@ export const VoteActionForm = ({
             name="vote"
             register={registerInput}
             setValue={setValue}
-            title={t("no")}
+            title={t("votes.no")}
             value="no"
             disabled={isInProgress}
           />
@@ -190,7 +190,7 @@ export const VoteActionForm = ({
             name="vote"
             register={registerInput}
             setValue={setValue}
-            title={t("abstain")}
+            title={t("votes.abstain")}
             value="abstain"
             disabled={isInProgress}
           />

@@ -768,6 +768,7 @@ data DRep
       , dRepType                   :: DRepType
       , dRepLatestTxHash           :: Maybe HexText
       , dRepLatestRegistrationDate :: UTCTime
+      , dRepMetadataError          :: Maybe Text
       , dRepPaymentAddress         :: Maybe Text
       , dRepGivenName              :: Maybe Text
       , dRepObjectives             :: Maybe Text

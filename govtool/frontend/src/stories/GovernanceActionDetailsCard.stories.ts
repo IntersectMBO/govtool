@@ -106,9 +106,9 @@ export const GovernanceActionDetailsCardComponent: Story = {
     await assertTooltip(tooltip1, /Submission Date/i);
     await assertTooltip(tooltip2, /Expiry Date/i);
 
-    await expect(canvas.getAllByText(/Yes/i)).toHaveLength(3);
-    await expect(canvas.getAllByText(/Abstain/i)).toHaveLength(3);
-    await expect(canvas.getAllByText(/No/i)).toHaveLength(3);
+    await expect(canvas.getAllByText(/yes/i)).toHaveLength(2);
+    await expect(canvas.getAllByText(/abstain/i)).toHaveLength(3);
+    await expect(canvas.getAllByText(/no/i)).toHaveLength(2);
   },
 };
 

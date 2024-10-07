@@ -13,7 +13,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Metadata Validation Tool')
     .setDescription('The Metadata Validation Tool API description')
-    .setVersion('1.0.19')
+    .setVersion('1.0.20')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

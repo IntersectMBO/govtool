@@ -32,7 +32,7 @@ export const DashboardCards = () => {
           alignItems: "center",
           display: "flex",
           flex: 1,
-          height: "100vh",
+          minHeight: "calc(100vh - 175px)",
           justifyContent: "center",
         }}
       >
@@ -42,49 +42,45 @@ export const DashboardCards = () => {
   }
 
   return (
-    <Box flex={1}>
-      <Box
-        sx={{
-          columnGap: 3,
-          display: "grid",
-          gridTemplateColumns:
-            screenWidth < 1280
-              ? "repeat(1, minmax(300px, 530px))"
-              : screenWidth >= 1728
-              ? "repeat(3, minmax(300px, 570px))"
-              : "repeat(2, minmax(300px, 530px))",
-          justifyContent: screenWidth < 1024 ? "center" : "flex-start",
-          px: screenWidth < 640 ? 2 : 5,
-          py: 3,
-          rowGap: 3,
-        }}
-      >
-        <DelegateDashboardCard
-          currentDelegation={currentDelegation}
-          delegateTx={pendingTransaction.delegate}
-          dRepID={dRepID}
-          voter={voter}
-          votingPower={votingPower}
-        />
+    <Box
+      sx={{
+        columnGap: 3,
+        display: "grid",
+        gridTemplateColumns:
+          screenWidth < 1280
+            ? "repeat(1, minmax(300px, 530px))"
+            : screenWidth >= 1728
+            ? "repeat(3, minmax(300px, 570px))"
+            : "repeat(2, minmax(300px, 530px))",
+        justifyContent: screenWidth < 1024 ? "center" : "flex-start",
+        rowGap: 3,
+      }}
+    >
+      <DelegateDashboardCard
+        currentDelegation={currentDelegation}
+        delegateTx={pendingTransaction.delegate}
+        dRepID={dRepID}
+        voter={voter}
+        votingPower={votingPower}
+      />
 
-        <DRepDashboardCard
-          dRepIDBech32={dRepIDBech32}
-          pendingTransaction={pendingTransaction}
-          voter={voter}
-        />
+      <DRepDashboardCard
+        dRepIDBech32={dRepIDBech32}
+        pendingTransaction={pendingTransaction}
+        voter={voter}
+      />
 
-        <DirectVoterDashboardCard
-          pendingTransaction={pendingTransaction}
-          voter={voter}
-          votingPower={votingPower}
-        />
+      <DirectVoterDashboardCard
+        pendingTransaction={pendingTransaction}
+        voter={voter}
+        votingPower={votingPower}
+      />
 
-        <ListGovActionsDashboardCards />
+      <ListGovActionsDashboardCards />
 
-        <ProposeGovActionDashboardCard
-          createGovActionTx={pendingTransaction.createGovAction}
-        />
-      </Box>
+      <ProposeGovActionDashboardCard
+        createGovActionTx={pendingTransaction.createGovAction}
+      />
     </Box>
   );
 };

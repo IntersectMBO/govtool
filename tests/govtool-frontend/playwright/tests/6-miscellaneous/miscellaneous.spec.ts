@@ -92,7 +92,7 @@ test("6M. Should navigate between footer links", async ({ page, context }) => {
 
   const [termsAndConditions] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByTestId("terms-and-conditions-footer-link").click(),
+    page.getByTestId("terms-of-use-footer-link").click(),
   ]);
   await expect(termsAndConditions).toHaveURL(TERMS_AND_CONDITIONS);
 
@@ -284,5 +284,7 @@ test("6T. Should display proper network name", async ({ page }) => {
   const response = await responsePromise;
   const responseBody = await response.json();
 
-  await expect((await page.getByTestId("system-network-name").innerText()).toLowerCase()).toBe(responseBody["networkName"].toLowerCase())
+  await expect(page.getByTestId("system-network-name")).toHaveText(
+    new RegExp(responseBody["networkName"], "i")
+  );
 });

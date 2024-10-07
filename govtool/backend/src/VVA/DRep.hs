@@ -61,7 +61,7 @@ listDReps = withPool $ \conn -> do
   results <- liftIO $ SQL.query_ conn listDRepsSql
   timeZone <- liftIO getCurrentTimeZone
   return
-    [ DRepRegistration drepHash drepView url dataHash (floor @Scientific deposit) votingPower status drepType txHash (localTimeToUTC timeZone date) paymentAddress givenName objectives motivations qualifications imageUrl imageHash
+    [ DRepRegistration drepHash drepView url dataHash (floor @Scientific deposit) votingPower status drepType txHash (localTimeToUTC timeZone date) metadataError paymentAddress givenName objectives motivations qualifications imageUrl imageHash
     | ( drepHash
         , drepView
         , url
@@ -73,6 +73,7 @@ listDReps = withPool $ \conn -> do
         , date
         , latestDeposit
         , latestNonDeregisterVotingAnchorWasNotNull
+        , metadataError
         , paymentAddress
         , givenName
         , objectives

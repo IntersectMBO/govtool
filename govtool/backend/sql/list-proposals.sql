@@ -78,9 +78,9 @@ SELECT
             always_no_confidence_voting_power.amount
         END) "no_votes",
     coalesce(Sum(ldd_drep.amount) FILTER (WHERE voting_procedure.vote::text = 'Abstain'), 0) + always_abstain_voting_power.amount "abstain_votes",
-    coalesce(vp_by_pool.poolYesVotes, 0),
-    coalesce(vp_by_pool.poolNoVotes, 0),
-    coalesce(vp_by_pool.poolAbstainVotes, 0),
+    coalesce(Sum(ldd_pool.amount) FILTER (WHERE voting_procedure.vote::text = 'Yes'), 0),
+    coalesce(Sum(ldd_pool.amount) FILTER (WHERE voting_procedure.vote::text = 'No'), 0),
+    coalesce(Sum(ldd_pool.amount) FILTER (WHERE voting_procedure.vote::text = 'Abstain'), 0),
     coalesce(vp_by_cc.ccYesVotes, 0),
     coalesce(vp_by_cc.ccNoVotes, 0),
     coalesce(vp_by_cc.ccAbstainVotes, 0),
@@ -104,21 +104,8 @@ FROM
     LEFT JOIN voting_procedure ON voting_procedure.gov_action_proposal_id = gov_action_proposal.id
     LEFT JOIN LatestDrepDistr ldd_drep ON ldd_drep.hash_id = voting_procedure.drep_voter
         AND ldd_drep.rn = 1
-    LEFT JOIN 
-    (
-        SELECT 
-            gov_action_proposal_id,
-            SUM(CASE WHEN vote = 'Yes' THEN 1 ELSE 0 END) AS poolYesVotes,
-            SUM(CASE WHEN vote = 'No' THEN 1 ELSE 0 END) AS poolNoVotes,
-            SUM(CASE WHEN vote = 'Abstain' THEN 1 ELSE 0 END) AS poolAbstainVotes
-        FROM 
-            voting_procedure
-        WHERE 
-            pool_voter IS NOT NULL
-        GROUP BY 
-            gov_action_proposal_id
-    ) vp_by_pool
-    ON gov_action_proposal.id = vp_by_pool.gov_action_proposal_id
+    LEFT JOIN LatestDrepDistr ldd_pool ON ldd_pool.hash_id = voting_procedure.pool_voter
+        AND ldd_pool.rn = 1
     LEFT JOIN 
     (
         SELECT 
@@ -159,9 +146,6 @@ GROUP BY
         off_chain_vote_gov_action_data.abstract,
         off_chain_vote_gov_action_data.motivation,
         off_chain_vote_gov_action_data.rationale,
-        vp_by_pool.poolYesVotes,
-        vp_by_pool.poolNoVotes,
-        vp_by_pool.poolAbstainVotes,
         vp_by_cc.ccYesVotes,
         vp_by_cc.ccNoVotes,
         vp_by_cc.ccAbstainVotes,

@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix displaying the SPO Votes [Issue 2085](https://github.com/IntersectMBO/govtool/issues/2085)
 
 ### Changed
 

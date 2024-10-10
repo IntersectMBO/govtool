@@ -54,7 +54,16 @@ SELECT
             null
         end
     ) as description,
-    epoch_utils.last_epoch_end_time + epoch_utils.epoch_duration * (gov_action_proposal.expiration - epoch_utils.last_epoch_no),
+    CASE
+        WHEN meta.network_name::text = 'mainnet' THEN
+            epoch_utils.last_epoch_end_time + 
+            epoch_utils.epoch_duration * (gov_action_proposal.expiration - epoch_utils.last_epoch_no)::bigint + 
+            INTERVAL '5 days'
+        ELSE
+            epoch_utils.last_epoch_end_time + 
+            epoch_utils.epoch_duration * (gov_action_proposal.expiration - epoch_utils.last_epoch_no)::bigint + 
+            INTERVAL '1 day'
+    END AS expiry_date,
     gov_action_proposal.expiration,
     creator_block.time,
     creator_block.epoch_no,
@@ -95,6 +104,7 @@ FROM
     CROSS JOIN EpochUtils AS epoch_utils
     CROSS JOIN always_no_confidence_voting_power
     CROSS JOIN always_abstain_voting_power
+    CROSS JOIN meta
     JOIN tx AS creator_tx ON creator_tx.id = gov_action_proposal.tx_id
     JOIN block AS creator_block ON creator_block.id = creator_tx.block_id
     LEFT JOIN voting_anchor ON voting_anchor.id = gov_action_proposal.voting_anchor_id
@@ -161,4 +171,5 @@ GROUP BY
         always_no_confidence_voting_power.amount,
         always_abstain_voting_power.amount,
         prev_gov_action.index,
-        prev_gov_action_tx.hash)
+        prev_gov_action_tx.hash,
+        meta.network_name)

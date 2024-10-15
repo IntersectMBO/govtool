@@ -16,6 +16,24 @@ changes.
 
 ### Fixed
 
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v1.0.21](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.21) 2024-10-15
+
+### Added
+
+-
+
+### Fixed
+
 - Fix counting epoch boundaries for Governance Actions [Issue 2125](https://github.com/IntersectMBO/govtool/issues/2125)
 - Fix displaying the SPO Votes [Issue 2085](https://github.com/IntersectMBO/govtool/issues/2085)
 - Fix counting ada holder voting power [Issue 2000](https://github.com/IntersectMBO/govtool/issues/2000)

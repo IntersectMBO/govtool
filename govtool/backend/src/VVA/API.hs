@@ -106,7 +106,8 @@ mapDRepStatus Types.Inactive = Inactive
 drepRegistrationToDrep :: Types.DRepRegistration -> DRep
 drepRegistrationToDrep Types.DRepRegistration {..} =
   DRep
-    { dRepDrepId = DRepHash dRepRegistrationDRepHash,
+    { dRepIsScriptBased = dRepRegistrationIsScriptBased,
+      dRepDrepId = DRepHash dRepRegistrationDRepHash,
       dRepView = dRepRegistrationView,
       dRepUrl = dRepRegistrationUrl,
       dRepMetadataHash = dRepRegistrationDataHash,
@@ -286,7 +287,8 @@ drepInfo (unHexText -> dRepId) = do
   CacheEnv {dRepInfoCache} <- asks vvaCache
   Types.DRepInfo {..} <- cacheRequest dRepInfoCache dRepId $ DRep.getDRepInfo dRepId
   return $ DRepInfoResponse
-    { dRepInfoResponseIsRegisteredAsDRep = dRepInfoIsRegisteredAsDRep
+    { dRepInfoResponseIsScriptBased = dRepInfoIsScriptBased
+    , dRepInfoResponseIsRegisteredAsDRep = dRepInfoIsRegisteredAsDRep
     , dRepInfoResponseWasRegisteredAsDRep = dRepInfoWasRegisteredAsDRep
     , dRepInfoResponseIsRegisteredAsSoleVoter = dRepInfoIsRegisteredAsSoleVoter
     , dRepInfoResponseWasRegisteredAsSoleVoter = dRepInfoWasRegisteredAsSoleVoter

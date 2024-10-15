@@ -16,7 +16,8 @@ changes.
 
 ### Fixed
 
--
+- Fix counting epoch boundaries for Governance Actions [Issue 2125](https://github.com/IntersectMBO/govtool/issues/2125)
+- Fix displaying the SPO Votes [Issue 2085](https://github.com/IntersectMBO/govtool/issues/2085)
 
 ### Changed
 

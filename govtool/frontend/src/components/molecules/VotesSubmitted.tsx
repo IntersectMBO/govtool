@@ -150,7 +150,7 @@ const Vote = ({ type, vote, value }: VoteProps) => (
         wordBreak: "break-all",
       }}
     >
-      {type !== "ccCommittee" ? value : `₳ ${correctAdaFormat(value)}`}
+      {type !== "ccCommittee" ? `₳ ${correctAdaFormat(value)}` : value}
     </Typography>
   </Box>
 );

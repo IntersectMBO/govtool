@@ -21,6 +21,7 @@ DRepActivity AS (
 SELECT
   encode(dh.raw, 'hex'),
   dh.view,
+  dh.has_script,
   va.url,
   encode(va.data_hash, 'hex'),
   dr_deposit.deposit,
@@ -137,6 +138,7 @@ GROUP BY
   dh.raw,
   second_to_newest_drep_registration.voting_anchor_id,
   dh.view,
+  dh.has_script,
   va.url,
   va.data_hash,
   dr_deposit.deposit,

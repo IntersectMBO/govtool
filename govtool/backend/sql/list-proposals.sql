@@ -5,13 +5,12 @@ WITH LatestDrepDistr AS (
     FROM
         drep_distr
 ),
-EpochUtils AS (
+LatestEpoch AS (
     SELECT
-        (Max(end_time) - Min(end_time)) /(Max(NO) - Min(NO)) AS epoch_duration,
-        Max(NO) AS last_epoch_no,
-        Max(end_time) AS last_epoch_end_time
+        start_time,
+        no
     FROM
-        epoch
+        epoch ORDER BY no DESC LIMIT 1
 ),
 always_no_confidence_voting_power AS (
     SELECT
@@ -56,13 +55,9 @@ SELECT
     ) as description,
     CASE
         WHEN meta.network_name::text = 'mainnet' THEN
-            epoch_utils.last_epoch_end_time + 
-            epoch_utils.epoch_duration * (gov_action_proposal.expiration - epoch_utils.last_epoch_no)::bigint + 
-            INTERVAL '5 days'
+            latest_epoch.start_time + (gov_action_proposal.expiration - latest_epoch.no)::bigint * INTERVAL '5 days' + INTERVAL '5 days' 
         ELSE
-            epoch_utils.last_epoch_end_time + 
-            epoch_utils.epoch_duration * (gov_action_proposal.expiration - epoch_utils.last_epoch_no)::bigint + 
-            INTERVAL '1 day'
+            latest_epoch.start_time + (gov_action_proposal.expiration - latest_epoch.no)::bigint * INTERVAL '1 day' + INTERVAL '1 day' 
     END AS expiry_date,
     gov_action_proposal.expiration,
     creator_block.time,
@@ -101,7 +96,7 @@ FROM
     on gov_action_proposal.id = treasury_withdrawal.gov_action_proposal_id
     LEFT JOIN stake_address
     on stake_address.id = treasury_withdrawal.stake_address_id
-    CROSS JOIN EpochUtils AS epoch_utils
+    CROSS JOIN LatestEpoch AS latest_epoch
     CROSS JOIN always_no_confidence_voting_power
     CROSS JOIN always_abstain_voting_power
     CROSS JOIN meta
@@ -162,9 +157,8 @@ GROUP BY
         gov_action_proposal.index,
         creator_tx.hash,
         creator_block.time,
-        epoch_utils.epoch_duration,
-        epoch_utils.last_epoch_no,
-        epoch_utils.last_epoch_end_time,
+        latest_epoch.start_time,
+        latest_epoch.no,
         proposal_params,
         voting_anchor.url,
         voting_anchor.data_hash,

@@ -46,7 +46,7 @@ export default class GovernanceActionDetailsPage {
   );
 
   readonly ccCommitteeYesVotes = this.page.getByTestId(
-    "submitted-votes-sPos-no"
+    "submitted-votes-ccCommittee-yes"
   );
   readonly ccCommitteeNoVotes = this.page.getByTestId(
     "submitted-votes-ccCommittee-no"

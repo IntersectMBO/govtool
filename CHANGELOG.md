@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Eliminate duplicate DReps in the DRep Directory [Issue 2171](https://github.com/IntersectMBO/govtool/issues/2171)
 
 ### Changed
 

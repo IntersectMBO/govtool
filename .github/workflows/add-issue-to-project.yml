@@ -1,0 +1,30 @@
+name: Add Issue to Projects
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-to-projects:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install GitHub CLI
+        run: sudo apt-get install gh
+
+      - name: Authenticate GitHub CLI with default token
+        run: gh auth login --with-token <<< "$GITHUB_TOKEN"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add issue to GovTool Project
+        run: gh project item-add IntersectMBO/30 --content-type Issue --content-id ${{ github.event.issue.node_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add issue to Community Backlog Project
+        run: gh project item-add IntersectMBO/34 --content-type Issue --content-id ${{ github.event.issue.node_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

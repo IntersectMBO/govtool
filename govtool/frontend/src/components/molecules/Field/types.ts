@@ -8,8 +8,10 @@ import {
 } from "@atoms";
 
 export type InputFieldProps = InputProps & {
+  errorDataTestId?: string;
   errorMessage?: string;
   errorStyles?: MUITypographyProps;
+  helpfulTextDataTestId?: string;
   helpfulText?: string;
   helpfulTextStyle?: MUITypographyProps;
   label?: string;

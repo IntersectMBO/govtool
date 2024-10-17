@@ -233,6 +233,10 @@ const ReferencesSection = ({
             name={`${fieldName}.${index}.label`}
             helpfulText={t("forms.dRepData.referenceDescriptionHelpfulText")}
             dataTestId={`${type}-reference-description-${index + 1}-input`}
+            errorDataTestId={`${type}-reference-description-${index + 1}-error`}
+            helpfulTextDataTestId={`${type}-reference-description-${
+              index + 1
+            }-hint`}
             rules={Rules.LINK_DESCRIPTION}
           />
           <ControlledField.Input
@@ -252,6 +256,8 @@ const ReferencesSection = ({
             layoutStyles={{ mb: 3 }}
             name={`${fieldName}.${index}.uri`}
             dataTestId={`${type}-reference-url-${index + 1}-input`}
+            errorDataTestId={`${type}-reference-url-${index + 1}-error`}
+            helpfulTextDataTestId={`${type}-reference-url-${index + 1}-hint`}
             rules={Rules.LINK_URL}
           />
         </Fragment>

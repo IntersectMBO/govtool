@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix duplicate testIds for reference errors and hints in DRep metadata form [Issue 1965](https://github.com/IntersectMBO/govtool/issues/1965)
 
 ### Changed
 

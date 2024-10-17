@@ -55,9 +55,9 @@ SELECT
     ) as description,
     CASE
         WHEN meta.network_name::text = 'mainnet' THEN
-            latest_epoch.start_time + (gov_action_proposal.expiration - latest_epoch.no)::bigint * INTERVAL '5 days' + INTERVAL '5 days' 
+            latest_epoch.start_time + (gov_action_proposal.expiration - latest_epoch.no)::bigint * INTERVAL '5 days' 
         ELSE
-            latest_epoch.start_time + (gov_action_proposal.expiration - latest_epoch.no)::bigint * INTERVAL '1 day' + INTERVAL '1 day' 
+            latest_epoch.start_time + (gov_action_proposal.expiration - latest_epoch.no)::bigint * INTERVAL '1 day' 
     END AS expiry_date,
     gov_action_proposal.expiration,
     creator_block.time,

@@ -27,7 +27,7 @@ export const GovernanceActionsToVote = ({
 }: GovernanceActionsToVoteProps) => {
   const { pendingTransaction } = useCardano();
   const navigate = useNavigate();
-  const { isMobile } = useScreenDimension();
+  const { isMobile, pagePadding } = useScreenDimension();
   const { t } = useTranslation();
 
   return (
@@ -39,7 +39,15 @@ export const GovernanceActionsToVote = ({
       ) : (
         <>
           {proposals?.map((item, index) => (
-            <Box key={item.title} pb={2.5}>
+            <Box
+              key={item.title}
+              sx={{
+                mx: -pagePadding,
+                px: pagePadding,
+                pb: 2.5,
+                overflow: "hidden",
+              }}
+            >
               <Slider
                 data={item.actions.slice(0, 6).map((action) => (
                   <div

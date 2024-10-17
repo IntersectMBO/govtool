@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix unwanted horizontal page scroll on Governance Actions page [Issue 1897](https://github.com/IntersectMBO/govtool/issues/1897)
 
 ### Changed
 

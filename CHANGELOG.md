@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Fix unwanted horizontal page scroll on Governance Actions page [Issue 1897](https://github.com/IntersectMBO/govtool/issues/1897)
+- Fix duplicate testIds for reference errors and hints in DRep metadata form [Issue 1965](https://github.com/IntersectMBO/govtool/issues/1965)
 
 ### Changed
 

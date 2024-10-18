@@ -13,7 +13,6 @@ import {
 } from "@molecules";
 import {
   correctAdaFormat,
-  formHexToBech32,
   getMetadataDataMissingStatusTranslation,
   openInNewTab,
 } from "@utils";
@@ -236,9 +235,7 @@ const getDisplayedDelegationId = ({
   ];
   if (delegateTo) {
     if (!restrictedNames.includes(delegateTo)) {
-      return delegateTo.includes("drep")
-        ? delegateTo
-        : formHexToBech32(delegateTo);
+      return delegateTo;
     }
     return undefined;
   }

@@ -30,10 +30,17 @@ let
   staticSite = pkgs.stdenv.mkDerivation {
     name = "govtool-website";
     src = frontendSrc;
-    buildInputs = [pkgs.yarn nodeModules];
+    buildInputs = [(pkgs.yarn.override { nodejs = pkgs.nodejs_18;}) nodeModules];
     inherit VITE_BASE_URL VITE_IS_DEV VITE_GTM_ID VITE_SENTRY_DSN VITE_NETWORK_FLAG VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED VITE_PDF_API_URL;
     buildPhase = ''
-      ln -s ${nodeModules}/libexec/voltaire-voting-app/node_modules node_modules
+      cp -R ${nodeModules}/libexec/@govtool/frontend/node_modules node_modules
+
+      # Yarn links a vite transitive dependency version to
+      # `node_modules/.bin` rather than the dev declared vite version which then breaks
+      # the build if we don't do this.
+      chmod +w node_modules/.bin
+      ln -sf ../vite/bin/vite.js node_modules/.bin/vite
+
       yarn build
     '';
     installPhase = ''
@@ -75,7 +82,7 @@ let
       warn "This is a frontend development shell." 4
       warn "Read the ${./README.md} to get more info about this module." 8
       rm -rf ./node_modules
-      ln -s ${nodeModules.out}/libexec/voltaire-voting-app/node_modules ./node_modules
+      ln -s ${nodeModules.out}/libexec/@govtool/frontend/node_modules ./node_modules
     '';
   };
 in staticSite // { inherit nodeModules devShell staticSite webserver; }

@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> { }, incl }:
+{ pkgs ? import <nixpkgs> { }, incl, returnShellEnv ? null }:
 let
   inherit (pkgs.lib.trivial) pipe;
   inherit (pkgs) haskell;
@@ -21,17 +21,16 @@ let
 
   modifier = drv: pipe drv [ appendLibraries appendTools ];
 
-  project = ghcPackages.developPackage {
+  project = ghcPackages.developPackage ({
     root = incl ./. [
       ./vva-be.cabal
       ./app
       ./src
-      ./CHANGELOG.md
       ./sql
     ];
     modifier = modifier;
     overrides = self: super: { openapi3 = useBroken super.openapi3; };
-  };
+  } // pkgs.lib.optionalAttrs (returnShellEnv != null) { inherit returnShellEnv; });
 in project.overrideAttrs (oldAttrs: {
   shellHook = ''
     function warn() { tput setaf $2; echo "$1"; tput sgr0; }

@@ -26,7 +26,6 @@ let
       ./vva-be.cabal
       ./app
       ./src
-      ./CHANGELOG.md
       ./sql
     ];
     modifier = modifier;

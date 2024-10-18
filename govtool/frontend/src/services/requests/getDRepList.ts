@@ -1,3 +1,5 @@
+import { bech32 } from "bech32";
+
 import {
   type Infinite,
   type DRepStatus,
@@ -22,9 +24,19 @@ export const getDRepList = async ({
   filters = [],
   page = 0,
   pageSize = 10,
-  searchPhrase = "",
+  searchPhrase: rawSearchPhrase = "",
   status = [],
 }: GetDRepListArguments): Promise<Infinite<DRepData>> => {
+  // DBSync contains wrong representation of DRep view for script based DReps,
+  // but it's still used by BE
+  const searchPhrase = (() => {
+    if (rawSearchPhrase.startsWith("drep_script")) {
+      const { words } = bech32.decode(rawSearchPhrase);
+      return bech32.encode("drep", words);
+    }
+    return rawSearchPhrase;
+  })();
+
   const response = await API.get<Infinite<DrepDataDTO>>("/drep/list", {
     params: {
       page,
@@ -39,7 +51,8 @@ export const getDRepList = async ({
   const validatedResponse = {
     ...response.data,
     elements: await Promise.all(
-      response.data.elements.map(async (drep) => mapDtoToDrep(drep)),
+      response.data.elements
+      .map(async (drep) => mapDtoToDrep(drep)),
     ),
   };
 

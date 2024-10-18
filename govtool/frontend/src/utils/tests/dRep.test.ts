@@ -23,6 +23,7 @@ const EXAMPLE_DREP: DRepData = {
   motivations: null,
   qualifications: null,
   doNotList: false,
+  isScriptBased: false,
 };
 
 describe("isSameDRep function", () => {

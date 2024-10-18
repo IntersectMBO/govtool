@@ -1,5 +1,6 @@
 import { DRepData, DRepMetadata, DrepDataDTO } from "@/models";
 import { postValidate } from "@/services";
+import { fixViewForScriptBasedDRep } from "./dRep";
 
 export const mapDtoToDrep = async (dto: DrepDataDTO): Promise<DRepData> => {
   const emptyMetadata = {
@@ -15,6 +16,9 @@ export const mapDtoToDrep = async (dto: DrepDataDTO): Promise<DRepData> => {
     metadataValid: true,
   };
 
+  // DBSync contains wrong representation of DRep view for script based DReps
+  const view = fixViewForScriptBasedDRep(dto.view, dto.isScriptBased);
+
   if (dto.metadataHash && dto.url) {
     const validationResponse = await postValidate<DRepMetadata>({
       url: dto.url,
@@ -26,11 +30,13 @@ export const mapDtoToDrep = async (dto: DrepDataDTO): Promise<DRepData> => {
       ...validationResponse.metadata,
       metadataStatus: validationResponse.status || null,
       metadataValid: validationResponse.valid,
+      view,
     };
   }
 
   return {
     ...dto,
     ...emptyMetadata,
+    view,
   };
 };

@@ -13,7 +13,7 @@ import {
 } from "@hooks";
 import { DataActionsBar, EmptyStateDrepDirectory } from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
-import { correctAdaFormat, formHexToBech32, isSameDRep } from "@utils";
+import { correctAdaFormat, isSameDRep } from "@utils";
 import { DRepListSort, DRepStatus } from "@models";
 import {
   AutomatedVotingOptionCurrentDelegation,
@@ -59,9 +59,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   const { dRepData: myDRepList } = useGetDRepListInfiniteQuery(
     {
-      searchPhrase: currentDelegation?.dRepView?.startsWith("drep")
-        ? currentDelegation.dRepView
-        : formHexToBech32(currentDelegation?.dRepHash ?? ""),
+      searchPhrase: currentDelegation?.dRepView ?? "",
     },
     { enabled: !!inProgressDelegation || !!currentDelegation },
   );

@@ -4,6 +4,7 @@ select
     else encode(drep_hash.raw,'hex')
   end as drep_raw,
   drep_hash.view as drep_view,
+  drep_hash.has_script,
   encode(tx.hash, 'hex')
 from delegation_vote
 join tx on tx.id = delegation_vote.tx_id

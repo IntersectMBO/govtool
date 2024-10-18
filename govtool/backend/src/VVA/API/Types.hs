@@ -561,7 +561,8 @@ instance ToSchema VoteResponse where
 
 data DRepInfoResponse
   = DRepInfoResponse
-      { dRepInfoResponseIsRegisteredAsDRep       :: Bool
+      { dRepInfoResponseIsScriptBased            :: Bool
+      , dRepInfoResponseIsRegisteredAsDRep       :: Bool
       , dRepInfoResponseWasRegisteredAsDRep      :: Bool
       , dRepInfoResponseIsRegisteredAsSoleVoter  :: Bool
       , dRepInfoResponseWasRegisteredAsSoleVoter :: Bool
@@ -758,7 +759,8 @@ instance ToSchema DRepType where
 
 data DRep
   = DRep
-      { dRepDrepId                 :: DRepHash
+      { dRepIsScriptBased          :: Bool
+      , dRepDrepId                 :: DRepHash
       , dRepView                   :: Text
       , dRepUrl                    :: Maybe Text
       , dRepMetadataHash           :: Maybe Text
@@ -855,9 +857,10 @@ instance ToSchema ListDRepsResponse where
 
 data DelegationResponse
   = DelegationResponse
-      { delegationResponseDRepHash :: Maybe HexText
-      , delegationResponseDRepView :: Text
-      , delegationResponseTxHash   :: HexText
+      { delegationResponseDRepHash          :: Maybe HexText
+      , delegationResponseDRepView          :: Text
+      , delegationResponseIsDRepScriptBased :: Bool
+      , delegationResponseTxHash            :: HexText
       }
 deriveJSON (jsonOptions "delegationResponse") ''DelegationResponse
 

@@ -111,6 +111,7 @@ export enum DRepListSort {
 export type DrepDataDTO = {
   deposit: number;
   drepId: string;
+  isScriptBased: boolean;
   latestRegistrationDate: string;
   latestTxHash?: string;
   metadataHash?: string;
@@ -198,6 +199,7 @@ export type VotedProposal = {
 export type CurrentDelegation = {
   dRepHash: string | null;
   dRepView: string | null;
+  isDRepScriptBased: boolean;
   txHash: string | null;
 } | null;
 

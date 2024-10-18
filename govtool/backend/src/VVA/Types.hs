@@ -72,7 +72,8 @@ data Vote
 
 data DRepInfo
   = DRepInfo
-      { dRepInfoIsRegisteredAsDRep       :: Bool
+      { dRepInfoIsScriptBased            :: Bool
+      , dRepInfoIsRegisteredAsDRep       :: Bool
       , dRepInfoWasRegisteredAsDRep      :: Bool
       , dRepInfoIsRegisteredAsSoleVoter  :: Bool
       , dRepInfoWasRegisteredAsSoleVoter :: Bool
@@ -101,6 +102,7 @@ data DRepRegistration
   = DRepRegistration
       { dRepRegistrationDRepHash               :: Text
       , dRepRegistrationView                   :: Text
+      , dRepRegistrationIsScriptBased          :: Bool
       , dRepRegistrationUrl                    :: Maybe Text
       , dRepRegistrationDataHash               :: Maybe Text
       , dRepRegistrationDeposit                :: Integer
@@ -215,7 +217,8 @@ data NetworkMetrics
 
 data Delegation
   = Delegation
-      { delegationDRepHash :: Maybe Text
-      , delegationDRepView :: Text
-      , delegationTxHash   :: Text
+      { delegationDRepHash          :: Maybe Text
+      , delegationDRepView          :: Text
+      , delegationIsDRepScriptBased :: Bool
+      , delegationTxHash            :: Text
       }

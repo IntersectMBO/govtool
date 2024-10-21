@@ -61,9 +61,10 @@ listDReps = withPool $ \conn -> do
   results <- liftIO $ SQL.query_ conn listDRepsSql
   timeZone <- liftIO getCurrentTimeZone
   return
-    [ DRepRegistration drepHash drepView url dataHash (floor @Scientific deposit) votingPower status drepType txHash (localTimeToUTC timeZone date) metadataError paymentAddress givenName objectives motivations qualifications imageUrl imageHash
+    [ DRepRegistration drepHash drepView isScriptBased url dataHash (floor @Scientific deposit) votingPower status drepType txHash (localTimeToUTC timeZone date) metadataError paymentAddress givenName objectives motivations qualifications imageUrl imageHash
     | ( drepHash
         , drepView
+        , isScriptBased
         , url
         , dataHash
         , deposit
@@ -132,7 +133,8 @@ getDRepInfo
 getDRepInfo drepId = withPool $ \conn -> do
   result <- liftIO $ SQL.query conn getDRepInfoSql (SQL.Only drepId)
   case result of
-    [ ( isRegisteredAsDRep
+    [ ( isScriptBased
+      , isRegisteredAsDRep
       , wasRegisteredAsDRep
       , isRegisteredAsSoleVoter
       , wasRegisteredAsSoleVoter
@@ -153,7 +155,8 @@ getDRepInfo drepId = withPool $ \conn -> do
       , imageHash
       )] ->
       return $ DRepInfo
-        { dRepInfoIsRegisteredAsDRep = fromMaybe False isRegisteredAsDRep
+        { dRepInfoIsScriptBased = isScriptBased
+        , dRepInfoIsRegisteredAsDRep = fromMaybe False isRegisteredAsDRep
         , dRepInfoWasRegisteredAsDRep = fromMaybe False wasRegisteredAsDRep
         , dRepInfoIsRegisteredAsSoleVoter = fromMaybe False isRegisteredAsSoleVoter
         , dRepInfoWasRegisteredAsSoleVoter = fromMaybe False wasRegisteredAsSoleVoter
@@ -173,4 +176,4 @@ getDRepInfo drepId = withPool $ \conn -> do
         , dRepInfoImageUrl = imageUrl
         , dRepInfoImageHash = imageHash
         }
-    [] -> return $ DRepInfo False False False False Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+    [] -> return $ DRepInfo False False False False False Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing

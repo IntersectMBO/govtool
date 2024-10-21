@@ -1,5 +1,6 @@
 export * from "./useGetAdaHolderCurrentDelegationQuery";
 export * from "./useGetAdaHolderVotingPowerQuery";
+export * from "./useGetDrepDetailsQuery";
 export * from "./useGetDRepListQuery";
 export * from "./useGetDRepVotesQuery";
 export * from "./useGetDRepVotingPowerQuery";

@@ -35,14 +35,17 @@ LatestRegistrationEntry AS (
     LIMIT 1
 ),
 IsScriptHash AS (
-    SELECT
-        drep_hash.has_script AS value
-    FROM
-        drep_hash
-        CROSS JOIN DRepId
-    WHERE
-        drep_hash.raw = DRepId.raw
-),
+    SELECT EXISTS(
+        SELECT
+            drep_hash.has_script
+        FROM
+            drep_hash
+            CROSS JOIN DRepId
+        WHERE
+            drep_hash.raw = DRepId.raw
+        AND
+            drep_hash.has_script = true
+) AS has_script),
 IsRegisteredAsDRep AS (
     SELECT
         (LatestRegistrationEntry.deposit IS NULL
@@ -174,7 +177,7 @@ SoleVoterRetire AS (
     LIMIT 1
 )
 SELECT
-    IsScriptHash.value,
+    IsScriptHash.has_script,
     IsRegisteredAsDRep.value,
     WasRegisteredAsDRep.value,
     IsRegisteredAsSoleVoter.value,

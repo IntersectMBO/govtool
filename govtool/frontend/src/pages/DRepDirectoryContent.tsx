@@ -9,6 +9,7 @@ import {
   useDelegateTodRep,
   useGetAdaHolderCurrentDelegationQuery,
   useGetAdaHolderVotingPowerQuery,
+  useGetDRepDetailsQuery,
   useGetDRepListInfiniteQuery,
 } from "@hooks";
 import { DataActionsBar, EmptyStateDrepDirectory } from "@molecules";
@@ -57,26 +58,15 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const inProgressDelegation = pendingTransaction.delegate?.resourceId;
 
-  const { dRepData: myDRepList } = useGetDRepListInfiniteQuery(
-    {
-      searchPhrase: currentDelegation?.dRepView ?? "",
-    },
-    { enabled: !!inProgressDelegation || !!currentDelegation },
-  );
-  const myDrep = myDRepList?.[0];
+  const { dRep: myDrep } = useGetDRepDetailsQuery(currentDelegation?.dRepView, {
+    enabled: !!inProgressDelegation || !!currentDelegation,
+  });
 
-  const { dRepData: yourselfDRepList } = useGetDRepListInfiniteQuery(
-    {
-      searchPhrase: myDRepId,
-    },
-    { enabled: !!myDRepId },
-  );
-
-  const yourselfDRep =
-    !!isConnected &&
-    (debouncedSearchText === myDRepId || debouncedSearchText === "")
-      ? yourselfDRepList?.[0]
-      : undefined;
+  const { dRep: yourselfDRep } = useGetDRepDetailsQuery(myDRepId, {
+    enabled: !!inProgressDelegation || !!currentDelegation,
+  });
+  const showYourselfDRep =
+    debouncedSearchText === myDRepId || debouncedSearchText === "";
 
   const {
     dRepData: dRepList,
@@ -108,9 +98,10 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const listedDRepsWithoutYourself = dRepList?.filter(
     (dRep) => !dRep.doNotList && !isSameDRep(dRep, myDRepId),
   );
-  const dRepListToDisplay = yourselfDRep
-    ? [yourselfDRep, ...listedDRepsWithoutYourself]
-    : listedDRepsWithoutYourself;
+  const dRepListToDisplay =
+    yourselfDRep && showYourselfDRep
+      ? [yourselfDRep, ...listedDRepsWithoutYourself]
+      : listedDRepsWithoutYourself;
 
   const inProgressDelegationDRepData = dRepListToDisplay.find(
     (dRep) =>

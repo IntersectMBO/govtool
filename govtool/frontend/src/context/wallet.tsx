@@ -179,7 +179,6 @@ interface CardanoContextType {
   isEnabled: boolean;
   pubDRepKey: string;
   dRepID: string;
-  dRepIDBech32: string;
   isMainnet: boolean;
   stakeKey?: string;
   setStakeKey: (key: string) => void;
@@ -245,7 +244,6 @@ const CardanoProvider = (props: Props) => {
   const [address, setAddress] = useState<string | undefined>(undefined);
   const [pubDRepKey, setPubDRepKey] = useState<string>("");
   const [dRepID, setDRepID] = useState<string>("");
-  const [dRepIDBech32, setDRepIDBech32] = useState<string>("");
   const [stakeKey, setStakeKey] = useState<string | undefined>(undefined);
   const [stakeKeys, setStakeKeys] = useState<string[]>([]);
   const [isMainnet, setIsMainnet] = useState<boolean>(false);
@@ -419,7 +417,6 @@ const CardanoProvider = (props: Props) => {
           const dRepIDs = await getPubDRepID(enabledApi);
           setPubDRepKey(dRepIDs?.dRepKey || "");
           setDRepID(dRepIDs?.dRepID || "");
-          setDRepIDBech32(dRepIDs?.dRepIDBech32 || "");
           setItemToLocalStorage(`${WALLET_LS_KEY}_name`, walletName);
 
           return { status: t("ok"), stakeKey: stakeKeySet };
@@ -1052,7 +1049,6 @@ const CardanoProvider = (props: Props) => {
       disconnectWallet,
       getChangeAddress,
       dRepID,
-      dRepIDBech32,
       enable,
       error,
       isEnabled,
@@ -1081,7 +1077,6 @@ const CardanoProvider = (props: Props) => {
       disconnectWallet,
       getChangeAddress,
       dRepID,
-      dRepIDBech32,
       enable,
       error,
       isEnabled,

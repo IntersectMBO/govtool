@@ -4,7 +4,7 @@ import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
 import { PendingTransaction } from "@context";
-import { useGetDRepListInfiniteQuery, useTranslation } from "@hooks";
+import { useGetDRepDetailsQuery, useTranslation } from "@hooks";
 import { CurrentDelegation, VoterInfo } from "@models";
 import {
   DashboardActionCard,
@@ -38,16 +38,9 @@ export const DelegateDashboardCard = ({
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const { dRepData, isDRepListFetching } = useGetDRepListInfiniteQuery(
-    {
-      searchPhrase: delegateTx?.resourceId ?? currentDelegation?.dRepHash ?? "",
-    },
-    {
-      enabled: !!currentDelegation?.dRepHash || !!delegateTx?.resourceId,
-    },
+  const { dRep: myDRepDelegationData, isLoading } = useGetDRepDetailsQuery(
+    delegateTx?.resourceId ?? currentDelegation?.dRepHash,
   );
-
-  const myDRepDelegationData = dRepData?.[0];
 
   const learnMoreButton = {
     children: t("learnMore"),
@@ -160,7 +153,7 @@ export const DelegateDashboardCard = ({
         // eslint-disable-next-line react/jsx-indent
         <DelegationAction
           drepName={
-            isDRepListFetching
+            isLoading
               ? "Loading..."
               : myDRepDelegationData?.metadataStatus
               ? getMetadataDataMissingStatusTranslation(

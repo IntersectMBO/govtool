@@ -50,6 +50,7 @@ import {
   PoolVotingThresholds,
   ProtocolVersion,
   HardForkInitiationAction,
+  ScriptHash,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 import { Buffer } from "buffer";
 import { useNavigate } from "react-router-dom";
@@ -660,7 +661,7 @@ const CardanoProvider = (props: Props) => {
         } else if (target.includes("drep1")) {
           targetDRep = DRep.new_key_hash(Ed25519KeyHash.from_bech32(target));
         } else if (target.includes("drep_script1")) {
-          targetDRep = DRep.new_script_hash(Ed25519KeyHash.from_bech32(target));
+          targetDRep = DRep.new_script_hash(ScriptHash.from_hex(target));
         } else {
           targetDRep = DRep.new_key_hash(Ed25519KeyHash.from_hex(target));
         }

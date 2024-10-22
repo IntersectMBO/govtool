@@ -23,7 +23,7 @@ changes.
 
 ### Changed
 
--
+- Bump to use Cardano Node `10.0.0-pre`
 
 ### Removed
 

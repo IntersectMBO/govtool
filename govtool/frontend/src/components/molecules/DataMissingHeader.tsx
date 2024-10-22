@@ -36,9 +36,7 @@ export const DataMissingHeader = ({
     >
       <Typography
         sx={{
-          overflow: "hidden",
           textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
           fontWeight: 600,
           ...(isDataMissing && { color: "errorRed" }),
           ...titleStyle,

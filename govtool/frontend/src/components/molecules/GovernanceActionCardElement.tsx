@@ -108,7 +108,7 @@ export const GovernanceActionCardElement = ({
           <Box
             sx={{
               display: "flex",
-              alignItems: "center",
+              alignItems: isMarkdown ? "unset" : "center",
               overflow: "hidden",
               flexDirection: isMarkdown ? "column" : "row",
             }}

@@ -2,11 +2,11 @@ import environments from "@constants/environments";
 import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
 import { LockInterceptor, LockInterceptorInfo } from "lib/lockInterceptor";
-import { Logger } from "../../../cypress/lib/logger/logger";
 import convertBufferToHex from "./convertBufferToHex";
 import { ShelleyWallet } from "./crypto";
 import { uploadMetadataAndGetJsonHash } from "./metadata";
 import { WalletAndAnchorType } from "@types";
+import { Logger } from "@helpers/logger";
 
 /**
  * Polls the transaction status until it's resolved or times out.

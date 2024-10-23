@@ -24,6 +24,7 @@ changes.
 ### Changed
 
 - Bump to use Cardano Node `10.0.0-pre`
+- Changed copy for no DRep found via search
 
 ### Removed
 

@@ -275,7 +275,7 @@ export const en = {
         "Select this to signal no confidence in the current constitutional committee by voting NO on every proposal and voting YES to no confidence proposals",
       noConfidenceDefaultTitle: "Signal No Confidence on Every Vote",
       noResultsForTheSearchTitle: "No DReps found",
-      noResultsForTheSearchDescription: "Please try a different search",
+      noResultsForTheSearchDescription: "If you can't find the DRep you were looking for either they are not registered or they didn't submit metadata in their registration",
       title: "DRep Directory",
       votingPower: "Voting Power",
     },

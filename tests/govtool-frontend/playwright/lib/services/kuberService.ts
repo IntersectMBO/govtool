@@ -10,7 +10,7 @@ import environments from "lib/constants/environments";
 import { LockInterceptor, LockInterceptorInfo } from "lib/lockInterceptor";
 import fetch, { BodyInit, RequestInit } from "node-fetch";
 import { cborxDecoder, cborxEncoder } from "../helpers/cborEncodeDecode";
-import { Logger } from "./../../../cypress/lib/logger/logger";
+import { Logger } from "@helpers/logger";
 
 type CertificateType = "registerstake" | "registerdrep" | "deregisterdrep";
 

@@ -3,7 +3,7 @@ import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
 import { PendingTransaction } from "@context";
-import { useTranslation } from "@hooks";
+import { useGetDRepDetailsQuery, useTranslation } from "@hooks";
 import { VoterInfo } from "@models";
 import {
   CopyableInfo,
@@ -13,18 +13,20 @@ import {
 import { correctAdaFormat, openInNewTab } from "@utils";
 
 type DRepDashboardCardProps = {
-  dRepIDBech32: string;
+  dRepID: string;
   pendingTransaction: PendingTransaction;
   voter: VoterInfo;
 };
 
 export const DRepDashboardCard = ({
-  dRepIDBech32,
+  dRepID,
   pendingTransaction,
   voter,
 }: DRepDashboardCardProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const { dRep } = useGetDRepDetailsQuery(dRepID);
 
   const inProgress = !!(
     pendingTransaction.registerAsDrep ||
@@ -42,10 +44,10 @@ export const DRepDashboardCard = ({
   };
 
   const navigateToDrepDirectory = () =>
-    navigate(
-      PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRepIDBech32),
-      { state: { enteredFromWithinApp: true } },
-    );
+    dRep &&
+    navigate(PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRep.view), {
+      state: { enteredFromWithinApp: true },
+    });
 
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress
@@ -165,14 +167,16 @@ export const DRepDashboardCard = ({
       type="d-rep"
       {...cardProps}
     >
-      {voter?.isRegisteredAsDRep && !pendingTransaction?.retireAsDrep && (
-        <CopyableInfo
-          dataTestId="dRep-id-display-card-dashboard"
-          label={t("dashboard.cards.drep.yourDRepId")}
-          sx={{ mt: 1 }}
-          value={dRepIDBech32}
-        />
-      )}
+      {voter?.isRegisteredAsDRep &&
+        !pendingTransaction?.retireAsDrep &&
+        dRep && (
+          <CopyableInfo
+            dataTestId="dRep-id-display-card-dashboard"
+            label={t("dashboard.cards.drep.yourDRepId")}
+            sx={{ mt: 1 }}
+            value={dRep.view}
+          />
+        )}
     </DashboardActionCard>
   );
 };

@@ -57,11 +57,13 @@ export type CheckboxProps = Omit<MUICheckboxProps, "onChange" | "value"> & {
 };
 
 export type FormErrorMessageProps = {
+  dataTestId?: string;
   errorMessage?: string;
   errorStyles?: MUITypographyProps;
 };
 
 export type FormHelpfulTextProps = {
+  dataTestId?: string;
   helpfulText?: string;
   helpfulTextStyle?: MUITypographyProps;
   sx?: SxProps;

@@ -5,7 +5,7 @@ import { PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
   useGetAdaHolderCurrentDelegationQuery,
-  useGetDRepListInfiniteQuery,
+  useGetDRepDetailsQuery,
   useTranslation,
 } from "@hooks";
 import { EmptyStateDrepDirectory, LinkWithIcon } from "@molecules";
@@ -26,12 +26,9 @@ export const DRepDetails = ({ isConnected = false }: DRepDetailsProps) => {
 
   const displayBackButton = location.state?.enteredFromWithinApp || false;
 
-  const { dRepData, isDRepListLoading } = useGetDRepListInfiniteQuery({
-    searchPhrase: dRepParam,
-  });
-  const dRep = dRepData?.[0];
+  const { dRep, isLoading } = useGetDRepDetailsQuery(dRepParam);
 
-  if (isDRepListLoading)
+  if (isLoading)
     return (
       <Box
         sx={{

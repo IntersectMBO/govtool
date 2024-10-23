@@ -54,7 +54,7 @@ SELECT
         end
     ) as description,
     CASE
-        WHEN meta.network_name::text = 'mainnet' THEN
+        WHEN meta.network_name::text = 'mainnet' OR meta.network_name::text = 'preprod' THEN
             latest_epoch.start_time + (gov_action_proposal.expiration - latest_epoch.no)::bigint * INTERVAL '5 days' 
         ELSE
             latest_epoch.start_time + (gov_action_proposal.expiration - latest_epoch.no)::bigint * INTERVAL '1 day' 

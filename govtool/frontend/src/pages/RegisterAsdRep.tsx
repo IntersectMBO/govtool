@@ -9,6 +9,7 @@ import {
   useTranslation,
   defaultRegisterAsDRepValues,
   useGetVoterInfo,
+  useGetDRepDetailsQuery,
 } from "@hooks";
 import { CenteredBoxPageWrapper } from "@molecules";
 import {
@@ -21,12 +22,13 @@ import {
 import { checkIsWalletConnected } from "@utils";
 
 export const RegisterAsdRep = () => {
+  const { dRepID } = useCardano();
   const [step, setStep] = useState<number>(1);
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { closeModal, openModal } = useModal();
   const { voter } = useGetVoterInfo();
-  const { dRepIDBech32 } = useCardano();
+  const { dRep } = useGetDRepDetailsQuery(dRepID);
 
   const methods = useForm({
     mode: "onChange",
@@ -78,8 +80,9 @@ export const RegisterAsdRep = () => {
           description={t(`registration.alreadyRegistered.description`)}
           primaryButtonText={t("registration.alreadyRegistered.viewDetails")}
           onPrimaryButton={() =>
+            dRep &&
             navigate(
-              PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRepIDBech32),
+              PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRep.view),
               { state: { enteredFromWithinApp: true } },
             )
           }

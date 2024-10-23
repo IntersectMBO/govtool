@@ -5,10 +5,16 @@ import { CopyButton } from "@atoms";
 import { useTranslation } from "@hooks";
 import { Card } from "./Card";
 import { gray } from "@/consts";
+import { useGetDRepDetailsQuery } from "@/hooks";
 
 export const DRepInfoCard = () => {
-  const { dRepIDBech32 } = useCardano();
+  const { dRepID } = useCardano();
+  const { dRep } = useGetDRepDetailsQuery(dRepID);
   const { t } = useTranslation();
+
+  if (!dRep) {
+    return null;
+  }
 
   return (
     <Card border elevation={0} sx={{ p: 1.5 }}>
@@ -16,7 +22,7 @@ export const DRepInfoCard = () => {
         <Typography color={gray.c300} fontSize={12} fontWeight={500}>
           {t("myDRepId")}
         </Typography>
-        <CopyButton text={dRepIDBech32} variant="blue" />
+        <CopyButton text={dRep.view} variant="blue" />
       </Box>
       <Box display="flex" flexDirection="row" mt={0.5} alignItems="center">
         <Typography
@@ -27,7 +33,7 @@ export const DRepInfoCard = () => {
           fontSize={14}
           fontWeight={500}
         >
-          {dRepIDBech32}
+          {dRep.view}
         </Typography>
       </Box>
     </Card>

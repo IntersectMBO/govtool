@@ -14,8 +14,10 @@ import { InputFieldProps } from "./types";
 export const Input = forwardRef<HTMLInputElement, InputFieldProps>(
   (
     {
+      errorDataTestId,
       errorMessage,
       errorStyles,
+      helpfulTextDataTestId,
       helpfulText,
       helpfulTextStyle,
       label,
@@ -71,10 +73,12 @@ export const Input = forwardRef<HTMLInputElement, InputFieldProps>(
           ref={inputRef}
         />
         <FormHelpfulText
+          dataTestId={helpfulTextDataTestId}
           helpfulText={helpfulText}
           helpfulTextStyle={helpfulTextStyle}
         />
         <FormErrorMessage
+          dataTestId={errorDataTestId}
           errorMessage={errorMessage}
           errorStyles={errorStyles}
         />

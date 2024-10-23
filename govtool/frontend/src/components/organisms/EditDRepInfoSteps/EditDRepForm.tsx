@@ -5,7 +5,7 @@ import { Box } from "@mui/material";
 import { useCardano } from "@context";
 import {
   useEditDRepInfoForm,
-  useGetDRepListInfiniteQuery,
+  useGetDRepDetailsQuery,
   useTranslation,
 } from "@hooks";
 import { CenteredBoxBottomButtons, DRepDataForm } from "@molecules";
@@ -27,12 +27,9 @@ export const EditDRepForm = ({
   const { dRepID } = useCardano();
   const { control, errors, isError, register, watch, reset } =
     useEditDRepInfoForm();
-  const { dRepData: yourselfDRepList } = useGetDRepListInfiniteQuery(
-    {
-      searchPhrase: dRepID,
-    },
-    { enabled: !state },
-  );
+  const { dRep: yourselfDRep } = useGetDRepDetailsQuery(dRepID, {
+    enabled: !state,
+  });
 
   const onClickContinue = () => {
     setStep(2);
@@ -43,7 +40,7 @@ export const EditDRepForm = ({
 
   useEffect(() => {
     if (loadUserData) {
-      const data: DRepData = state ?? yourselfDRepList?.[0];
+      const data: DRepData = state ?? yourselfDRep;
       const groupedReferences = data?.references?.reduce<
         Record<string, Reference[]>
       >((acc, reference) => {
@@ -66,7 +63,7 @@ export const EditDRepForm = ({
         ],
       });
     }
-  }, [yourselfDRepList?.[0], loadUserData]);
+  }, [yourselfDRep, loadUserData]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 8 }}>

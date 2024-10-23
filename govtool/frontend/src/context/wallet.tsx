@@ -50,6 +50,7 @@ import {
   PoolVotingThresholds,
   ProtocolVersion,
   HardForkInitiationAction,
+  ScriptHash,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 import { Buffer } from "buffer";
 import { useNavigate } from "react-router-dom";
@@ -178,7 +179,6 @@ interface CardanoContextType {
   isEnabled: boolean;
   pubDRepKey: string;
   dRepID: string;
-  dRepIDBech32: string;
   isMainnet: boolean;
   stakeKey?: string;
   setStakeKey: (key: string) => void;
@@ -244,7 +244,6 @@ const CardanoProvider = (props: Props) => {
   const [address, setAddress] = useState<string | undefined>(undefined);
   const [pubDRepKey, setPubDRepKey] = useState<string>("");
   const [dRepID, setDRepID] = useState<string>("");
-  const [dRepIDBech32, setDRepIDBech32] = useState<string>("");
   const [stakeKey, setStakeKey] = useState<string | undefined>(undefined);
   const [stakeKeys, setStakeKeys] = useState<string[]>([]);
   const [isMainnet, setIsMainnet] = useState<boolean>(false);
@@ -418,7 +417,6 @@ const CardanoProvider = (props: Props) => {
           const dRepIDs = await getPubDRepID(enabledApi);
           setPubDRepKey(dRepIDs?.dRepKey || "");
           setDRepID(dRepIDs?.dRepID || "");
-          setDRepIDBech32(dRepIDs?.dRepIDBech32 || "");
           setItemToLocalStorage(`${WALLET_LS_KEY}_name`, walletName);
 
           return { status: t("ok"), stakeKey: stakeKeySet };
@@ -657,8 +655,10 @@ const CardanoProvider = (props: Props) => {
           targetDRep = DRep.new_always_abstain();
         } else if (target === AutomatedVotingOptionDelegationId.no_confidence) {
           targetDRep = DRep.new_always_no_confidence();
-        } else if (target.includes("drep")) {
+        } else if (target.includes("drep1")) {
           targetDRep = DRep.new_key_hash(Ed25519KeyHash.from_bech32(target));
+        } else if (target.includes("drep_script1")) {
+          targetDRep = DRep.new_script_hash(ScriptHash.from_hex(target));
         } else {
           targetDRep = DRep.new_key_hash(Ed25519KeyHash.from_hex(target));
         }
@@ -1049,7 +1049,6 @@ const CardanoProvider = (props: Props) => {
       disconnectWallet,
       getChangeAddress,
       dRepID,
-      dRepIDBech32,
       enable,
       error,
       isEnabled,
@@ -1078,7 +1077,6 @@ const CardanoProvider = (props: Props) => {
       disconnectWallet,
       getChangeAddress,
       dRepID,
-      dRepIDBech32,
       enable,
       error,
       isEnabled,

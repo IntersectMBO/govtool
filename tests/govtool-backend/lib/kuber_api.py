@@ -52,6 +52,9 @@ class KuberApi:
     def get_protocol_params(self):
         return self.__get("api/v3/protocol-params").json()
 
+    def get_query_system_start(self):
+        return self.__get("api/v3/genesis-params").json()
+
     def wait_for_txout(self, txin: str, timeout=400, log: bool = False):
         end = time.time() + timeout
         while time.time() < end:

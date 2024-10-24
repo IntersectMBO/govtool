@@ -140,7 +140,7 @@ delegationToResponse Types.Delegation {..} =
 drepList :: App m => Maybe Text -> [DRepStatus] -> Maybe DRepSortMode -> Maybe Natural -> Maybe Natural -> m ListDRepsResponse
 drepList mSearchQuery statuses mSortMode mPage mPageSize = do
   CacheEnv {dRepListCache} <- asks vvaCache
-  dreps <- cacheRequest dRepListCache () DRep.listDReps
+  dreps <- cacheRequest dRepListCache () (DRep.listDReps mSearchQuery)
 
   let filterDRepsByQuery = case mSearchQuery of
         Nothing -> filter $ \Types.DRepRegistration {..} -> dRepRegistrationType == Types.DRep

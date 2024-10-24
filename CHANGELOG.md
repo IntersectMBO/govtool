@@ -21,6 +21,7 @@ changes.
 - Eliminate duplicate DReps in the DRep Directory [Issue 2171](https://github.com/IntersectMBO/govtool/issues/2171)
 - Handle script based DReps [Issue 1951](https://github.com/IntersectMBO/govtool/issues/1951)
 - Fix searching for metadata in proposal list
+- Fix searching for metadata in DRep list [Issue 1893](https://github.com/IntersectMBO/govtool/issues/1893)
 
 ### Changed
 

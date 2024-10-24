@@ -138,11 +138,7 @@ WHERE
   (
     COALESCE(?, '') = '' OR
     dh.view ILIKE ? OR
-    off_chain_vote_drep_data.payment_address ILIKE ? OR
     off_chain_vote_drep_data.given_name ILIKE ? OR
-    off_chain_vote_drep_data.objectives ILIKE ? OR
-    off_chain_vote_drep_data.motivations ILIKE ? OR
-    off_chain_vote_drep_data.qualifications ILIKE ?
   )
 GROUP BY
   dh.raw,

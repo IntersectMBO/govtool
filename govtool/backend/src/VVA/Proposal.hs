@@ -69,7 +69,7 @@ getProposals ::
   (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>
   Maybe [Text] -> m [Proposal]
 getProposals mSearchTerms = withPool $ \conn -> do
-  let searchParam = fromMaybe "" (fmap head mSearchTerms)
+  let searchParam = maybe "" head mSearchTerms
   liftIO $ SQL.query conn listProposalsSql 
     ( searchParam
     , "%" <> searchParam <> "%"

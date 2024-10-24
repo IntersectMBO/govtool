@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import TagManager from "react-gtm-module";
 import { ThemeProvider } from "@emotion/react";
-import { CssBaseline } from "@mui/material";
 import * as Sentry from "@sentry/react";
 
 import { ContextProviders, UsersnapProvider } from "@context";
@@ -52,7 +51,6 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
         <UsersnapProvider>
           <BrowserRouter>
             <ContextProviders>

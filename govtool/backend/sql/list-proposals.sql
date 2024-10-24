@@ -141,8 +141,13 @@ FROM
         AND ldd_cc.rn = 1
     LEFT JOIN gov_action_proposal AS prev_gov_action ON gov_action_proposal.prev_gov_action_proposal = prev_gov_action.id
     LEFT JOIN tx AS prev_gov_action_tx ON prev_gov_action.tx_id = prev_gov_action_tx.id
-WHERE (NOT ?
-    OR (concat(encode(creator_tx.hash, 'hex'), '#', gov_action_proposal.index) IN ?))
+WHERE
+  (COALESCE(?, '') = '' OR
+   off_chain_vote_gov_action_data.title ILIKE ? OR
+   off_chain_vote_gov_action_data.abstract ILIKE ? OR
+   off_chain_vote_gov_action_data.motivation ILIKE ? OR
+   off_chain_vote_gov_action_data.rationale ILIKE ? OR
+   concat(encode(creator_tx.hash, 'hex'), '#', gov_action_proposal.index) ILIKE ?)
 AND gov_action_proposal.expiration >(
     SELECT
         Max(NO)

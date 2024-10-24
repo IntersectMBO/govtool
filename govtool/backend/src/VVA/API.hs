@@ -357,20 +357,20 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
       map (voteParamsProposalId . voteResponseVote)
         <$> getVotes drepId [] Nothing Nothing
 
-
   CacheEnv {proposalListCache} <- asks vvaCache
-  mappedAndSortedProposals <- do
-    proposals <- cacheRequest proposalListCache () Proposal.listProposals
-    mappedSortedAndFilteredProposals <- mapSortAndFilterProposals selectedTypes sortMode proposals
-    return $ filter
-      ( \p@ProposalResponse {proposalResponseId} ->
-          proposalResponseId `notElem` proposalsToRemove
-          && isProposalSearchedFor mSearchQuery p
-      ) mappedSortedAndFilteredProposals
 
-  let total = length mappedAndSortedProposals :: Int
+  proposals <- cacheRequest proposalListCache () (Proposal.listProposals mSearchQuery)
 
-  let elements = take pageSize $ drop (page * pageSize) mappedAndSortedProposals
+  mappedSortedAndFilteredProposals <- mapSortAndFilterProposals selectedTypes sortMode proposals
+  let filteredProposals = filter
+        ( \p@ProposalResponse {proposalResponseId} ->
+            proposalResponseId `notElem` proposalsToRemove
+            && isProposalSearchedFor mSearchQuery p
+        ) mappedSortedAndFilteredProposals
+
+  let total = length filteredProposals :: Int
+
+  let elements = take pageSize $ drop (page * pageSize) filteredProposals
 
   return $ ListProposalsResponse
     { listProposalsResponsePage = fromIntegral page

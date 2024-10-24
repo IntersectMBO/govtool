@@ -28,10 +28,9 @@ import qualified Data.Text.IO               as Text
 import           Data.Time
 
 import qualified Database.PostgreSQL.Simple as SQL
-
-import qualified GHC.Generics               as SQL
-
-import           Text.Read                  (readMaybe)
+import qualified Database.PostgreSQL.Simple.Types as PG
+import           Database.PostgreSQL.Simple.ToField (ToField(..))
+import           Database.PostgreSQL.Simple.ToRow (ToRow(..))
 
 import           VVA.Config
 import           VVA.Pool                   (ConnectionPool, withPool)
@@ -43,10 +42,15 @@ sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
 listProposalsSql :: SQL.Query
 listProposalsSql = sqlFrom $(embedFile "sql/list-proposals.sql")
 
+newtype TextArray = TextArray [Text]
+
+instance ToRow TextArray where
+  toRow (TextArray texts) = map toField texts
+
 listProposals ::
   (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>
-  m [Proposal]
-listProposals = getProposals Nothing
+  Maybe Text -> m [Proposal]
+listProposals mSearch = getProposals (fmap (:[]) mSearch)
 
 getProposal ::
   (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>
@@ -54,17 +58,23 @@ getProposal ::
   Integer ->
   m Proposal
 getProposal txHash index = do
-  result <- getProposals (Just [txHash <> "#" <> pack (show index)])
+  let proposalId = txHash <> "#" <> pack (show index)
+  result <- getProposals (Just [proposalId])
   case result of
-    [] -> throwError $ NotFoundError ("Proposal with id: " <> txHash <> "#" <> pack (show index) <> " not found")
+    [] -> throwError $ NotFoundError ("Proposal with id: " <> proposalId <> " not found")
     [a] -> return a
-    _ -> throwError $ CriticalError ("Multiple proposal found for id: " <> txHash <> "#" <> pack (show index) <> ". This should never happen")
+    _ -> throwError $ CriticalError ("Multiple proposals found for id: " <> proposalId <> ". This should never happen")
 
 getProposals ::
   (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>
-  Maybe [Text] ->
-  m [Proposal]
-getProposals mProposalIds = withPool $ \conn ->
-  liftIO $ case mProposalIds of
-    Nothing          -> SQL.query @(Bool, SQL.In [Text]) conn listProposalsSql (False, SQL.In [])
-    Just proposalIds -> SQL.query conn listProposalsSql (True, SQL.In proposalIds)
+  Maybe [Text] -> m [Proposal]
+getProposals mSearchTerms = withPool $ \conn -> do
+  let searchParam = fromMaybe "" (fmap head mSearchTerms)
+  liftIO $ SQL.query conn listProposalsSql 
+    ( searchParam
+    , "%" <> searchParam <> "%"
+    , "%" <> searchParam <> "%"
+    , "%" <> searchParam <> "%"
+    , "%" <> searchParam <> "%"
+    , "%" <> searchParam <> "%"
+    )

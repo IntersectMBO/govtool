@@ -134,6 +134,16 @@ FROM
     AND dr_first_register.rn = 1
   LEFT JOIN tx AS tx_first_register ON tx_first_register.id = dr_first_register.tx_id
   LEFT JOIN block AS block_first_register ON block_first_register.id = tx_first_register.block_id
+WHERE
+  (
+    COALESCE(?, '') = '' OR
+    dh.view ILIKE ? OR
+    off_chain_vote_drep_data.payment_address ILIKE ? OR
+    off_chain_vote_drep_data.given_name ILIKE ? OR
+    off_chain_vote_drep_data.objectives ILIKE ? OR
+    off_chain_vote_drep_data.motivations ILIKE ? OR
+    off_chain_vote_drep_data.qualifications ILIKE ?
+  )
 GROUP BY
   dh.raw,
   second_to_newest_drep_registration.voting_anchor_id,

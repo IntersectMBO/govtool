@@ -111,6 +111,8 @@ export const GovernanceActionCardElement = ({
               alignItems: isMarkdown ? "unset" : "center",
               overflow: "hidden",
               flexDirection: isMarkdown ? "column" : "row",
+              // Workaround for not setting the font in markdown
+              fontFamily: "Poppins, Arial",
             }}
           >
             {isMarkdown ? (

@@ -8,7 +8,7 @@
 export const filterOutNullParams = (
   originalObject?: Record<string, unknown> | undefined | null,
   filterOutKeys?: string[],
-) => {
+): Record<string, unknown> | null => {
   if (!originalObject) {
     return null;
   }
@@ -20,12 +20,27 @@ export const filterOutNullParams = (
         value !== undefined &&
         !filterOutKeys?.includes(key)
       ) {
-        acc[key] = value;
+        if (
+          typeof value === "object" &&
+          !Array.isArray(value) &&
+          value !== null
+        ) {
+          // Recursively filter the nested object
+          const nestedFiltered = filterOutNullParams(
+            value as Record<string, unknown>,
+            filterOutKeys,
+          );
+          if (nestedFiltered && Object.keys(nestedFiltered).length > 0) {
+            acc[key] = nestedFiltered;
+          }
+        } else {
+          acc[key] = value;
+        }
       }
       return acc;
     },
     {},
   );
 
-  return finalObject;
+  return Object.keys(finalObject).length > 0 ? finalObject : null;
 };

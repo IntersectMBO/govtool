@@ -64,7 +64,16 @@ SELECT
     creator_block.epoch_no,
     voting_anchor.url,
     encode(voting_anchor.data_hash, 'hex'),
-    ROW_TO_JSON(proposal_params),
+    jsonb_set(
+        ROW_TO_JSON(proposal_params)::jsonb,
+        '{cost_model}', 
+        CASE
+            WHEN cost_model.id IS NOT NULL THEN
+                ROW_TO_JSON(cost_model)::jsonb
+            ELSE
+                'null'::jsonb
+        END
+    ) AS proposal_params,
     off_chain_vote_gov_action_data.title,
     off_chain_vote_gov_action_data.abstract,
     off_chain_vote_gov_action_data.motivation,
@@ -104,6 +113,7 @@ FROM
     JOIN block AS creator_block ON creator_block.id = creator_tx.block_id
     LEFT JOIN voting_anchor ON voting_anchor.id = gov_action_proposal.voting_anchor_id
     LEFT JOIN param_proposal as proposal_params ON gov_action_proposal.param_proposal = proposal_params.id
+    LEFT JOIN cost_model AS cost_model ON proposal_params.cost_model_id = cost_model.id
     LEFT JOIN off_chain_vote_data ON off_chain_vote_data.voting_anchor_id = voting_anchor.id
     LEFT JOIN off_chain_vote_gov_action_data ON off_chain_vote_gov_action_data.off_chain_vote_data_id = off_chain_vote_data.id
     LEFT JOIN voting_procedure ON voting_procedure.gov_action_proposal_id = gov_action_proposal.id

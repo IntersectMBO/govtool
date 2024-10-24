@@ -38,6 +38,7 @@ changes.
 - Fix duplicate testIds for reference errors and hints in DRep metadata form [Issue 1965](https://github.com/IntersectMBO/govtool/issues/1965)
 - Eliminate duplicate DReps in the DRep Directory [Issue 2171](https://github.com/IntersectMBO/govtool/issues/2171)
 - Handle script based DReps [Issue 1951](https://github.com/IntersectMBO/govtool/issues/1951)
+- Fix displaying protocol parameter cost models [Issue 2191](https://github.com/IntersectMBO/govtool/issues/2191)
 
 ### Changed
 

@@ -32,13 +32,15 @@ export const VotePill = ({
       minWidth="50px"
       maxWidth={maxWidth ? `${maxWidth}px` : "auto"}
       width={width ? `${width}px` : "auto"}
-      maxHeight="14px"
     >
       <Typography
         textTransform="uppercase"
         fontSize={12}
         fontWeight={400}
         lineHeight="16px"
+        whiteSpace="nowrap"
+        textOverflow="ellipsis"
+        overflow="hidden"
       >
         {t(
           `votes.${

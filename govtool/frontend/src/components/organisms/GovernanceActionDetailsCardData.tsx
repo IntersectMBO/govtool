@@ -19,6 +19,7 @@ import {
   filterUpdatableProtocolParams,
   filterOutNullParams,
   getFullGovActionId,
+  mapArrayToObjectByKeys,
 } from "@utils";
 import { MetadataValidationStatus, ProposalData } from "@models";
 import { GovernanceActionType } from "@/types/governanceAction";
@@ -92,20 +93,34 @@ export const GovernanceActionDetailsCardData = ({
   const { screenWidth } = useScreenDimension();
   const { isMobile } = useScreenDimension();
 
+  const mappedArraysToObjectsProtocolParams = useMemo(
+    () =>
+      mapArrayToObjectByKeys(protocolParams, [
+        "PlutusV1",
+        "PlutusV2",
+        "PlutusV3",
+      ]),
+    [protocolParams],
+  );
+
   const updatableProtocolParams = useMemo(
     () =>
-      filterUpdatableProtocolParams(epochParams, protocolParams, [
-        "id",
-        "registered_tx_id",
-        "key",
-      ]),
-    [epochParams, protocolParams],
+      filterUpdatableProtocolParams(
+        epochParams,
+        mappedArraysToObjectsProtocolParams,
+        ["id", "registered_tx_id", "key"],
+      ),
+    [epochParams, mappedArraysToObjectsProtocolParams],
   );
 
   const nonNullProtocolParams = useMemo(
     () =>
-      filterOutNullParams(protocolParams, ["id", "registered_tx_id", "key"]),
-    [updatableProtocolParams, protocolParams],
+      filterOutNullParams(mappedArraysToObjectsProtocolParams, [
+        "id",
+        "registered_tx_id",
+        "key",
+      ]),
+    [updatableProtocolParams, mappedArraysToObjectsProtocolParams],
   );
 
   const isModifiedPadding =

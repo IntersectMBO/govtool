@@ -33,6 +33,7 @@ export const VotingPowerChips = ({
           height: isMobile ? 16 : 24,
           px: 2,
           py: isMobile ? 1 : 1.5,
+          maxHeight: "14px",
         }}
       >
         {!isMobile && (

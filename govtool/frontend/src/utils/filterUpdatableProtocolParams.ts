@@ -19,16 +19,36 @@ export const filterUpdatableProtocolParams = (
   const finalObject = Object.entries(referenceObject).reduce<
     Record<string, unknown>
   >((acc, [key, referenceValue]) => {
+    const originalValue = originalObject[key];
+
     const isValid =
       !filterOutKeys?.includes(key) &&
       originalObject.hasOwnProperty(key) &&
       referenceValue !== undefined &&
       referenceValue !== null;
 
-    if (isValid) acc[key] = originalObject[key];
+    if (isValid) {
+      if (
+        typeof originalValue === "object" &&
+        originalValue !== null &&
+        typeof referenceValue === "object" &&
+        referenceValue !== null
+      ) {
+        const nestedFiltered = filterUpdatableProtocolParams(
+          originalValue as Record<string, unknown>,
+          referenceValue as Record<string, unknown>,
+          filterOutKeys,
+        );
+        if (nestedFiltered && Object.keys(nestedFiltered).length > 0) {
+          acc[key] = nestedFiltered;
+        }
+      } else {
+        acc[key] = originalValue;
+      }
+    }
 
     return acc;
   }, {});
 
-  return finalObject;
+  return Object.keys(finalObject).length > 0 ? finalObject : null;
 };

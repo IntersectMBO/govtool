@@ -1,21 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { catchError, firstValueFrom, timeout } from 'rxjs';
+import { catchError, finalize, firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import * as blake from 'blakejs';
-import { AxiosRequestConfig } from 'axios';
 import * as jsonld from 'jsonld';
 
 import { ValidateMetadataDTO } from '@dto';
 import { LoggerMessage, MetadataValidationStatus } from '@enums';
 import { validateMetadataStandard, parseMetadata, getStandard } from '@utils';
 import { ValidateMetadataResult } from '@types';
-
-const axiosConfig: AxiosRequestConfig = {
-  timeout: 5000,
-  maxContentLength: 10 * 1024 * 1024, // Max content length 10MB
-  maxBodyLength: 10 * 1024 * 1024, // Max body length 10MB
-  responseType: 'text',
-};
 
 @Injectable()
 export class AppService {
@@ -30,9 +22,10 @@ export class AppService {
 
     try {
       const { data: rawData } = await firstValueFrom(
-        this.httpService.get(url, axiosConfig).pipe(
-          timeout(5000),
-          catchError(() => {
+        this.httpService.get(url).pipe(
+          finalize(() => Logger.log(`Fetching ${url} completed`)),
+          catchError((error) => {
+            Logger.error(error, JSON.stringify(error));
             throw MetadataValidationStatus.URL_NOT_FOUND;
           }),
         ),

@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Fix validating metadata against the CIP standard [Issue 2233](https://github.com/IntersectMBO/govtool/issues/2233)
+- Fix counting the CC votes [Issue 2247](https://github.com/IntersectMBO/govtool/issues/2247)
 
 ### Changed
 

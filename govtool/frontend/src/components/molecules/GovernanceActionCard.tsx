@@ -87,14 +87,16 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           title={title}
           isDataMissing={metadataStatus}
         />
-        <GovernanceActionCardElement
-          label={t("govActions.abstract")}
-          text={abstract}
-          textVariant="twoLines"
-          dataTestId="governance-action-abstract"
-          isSliderCard
-          isMarkdown
-        />
+        {!metadataStatus && (
+          <GovernanceActionCardElement
+            label={t("govActions.abstract")}
+            text={abstract}
+            textVariant="twoLines"
+            dataTestId="governance-action-abstract"
+            isSliderCard
+            isMarkdown
+          />
+        )}
         <GovernanceActionCardElement
           label={t("govActions.governanceActionType")}
           text={getProposalTypeLabel(type)}

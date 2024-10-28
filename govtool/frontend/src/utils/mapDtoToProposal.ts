@@ -1,4 +1,9 @@
-import { ProposalData, ProposalDataDTO, ProposalMetadata } from "@/models";
+import {
+  MetadataStandard,
+  ProposalData,
+  ProposalDataDTO,
+  ProposalMetadata,
+} from "@/models";
 import { postValidate } from "@/services";
 
 export const mapDtoToProposal = async (
@@ -8,15 +13,18 @@ export const mapDtoToProposal = async (
     const validationResponse = await postValidate<ProposalMetadata>({
       url: dto.url,
       hash: dto.metadataHash,
+      standard: MetadataStandard.CIP108,
     });
 
     return {
       ...dto,
-      title: validationResponse.metadata?.title,
-      abstract: validationResponse.metadata?.abstract,
-      motivation: validationResponse.metadata?.motivation,
-      rationale: validationResponse.metadata?.rationale,
-      references: validationResponse.metadata?.references?.map(({ uri }) => uri),
+      title: dto.title || validationResponse.metadata?.title,
+      abstract: dto.abstract || validationResponse.metadata?.abstract,
+      motivation: dto.motivation || validationResponse.metadata?.motivation,
+      rationale: dto.rationale || validationResponse.metadata?.rationale,
+      references: validationResponse.metadata?.references?.map(
+        ({ uri }) => uri,
+      ),
       metadataStatus: validationResponse.status || null,
       metadataValid: validationResponse.valid,
     };

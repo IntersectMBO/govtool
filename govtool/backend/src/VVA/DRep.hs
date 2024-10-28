@@ -47,10 +47,6 @@ listDReps mSearchQuery = withPool $ \conn -> do
     ( searchParam 
     , "%" <> searchParam <> "%"
     , "%" <> searchParam <> "%"
-    , "%" <> searchParam <> "%"
-    , "%" <> searchParam <> "%"
-    , "%" <> searchParam <> "%"
-    , "%" <> searchParam <> "%"
     )
   timeZone <- liftIO getCurrentTimeZone
   return

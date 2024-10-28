@@ -2,20 +2,27 @@ import { faker } from "@faker-js/faker";
 import { generateExactLengthText } from "@helpers/string";
 
 export const invalid = {
-  url: () => {
-    const invalidSchemes = ["ftp", "unsupported", "unknown-scheme"];
-    const invalidCharacters = "<>@!#$%^&*()";
-    const invalidTlds = [".invalid", ".example", ".test"];
+  url: (isSupportedGreaterThan128Words = true) => {
+    const choice = isSupportedGreaterThan128Words
+      ? 1
+      : faker.number.int({ min: 1, max: 2 });
+    if (choice === 1) {
+      const invalidSchemes = ["ftp", "unsupported", "unknown-scheme"];
+      const invalidCharacters = "<>@!#$%^&*()";
+      const invalidTlds = [".invalid", ".example", ".test"];
 
-    const scheme =
-      invalidSchemes[Math.floor(Math.random() * invalidSchemes.length)];
-    const invalidChar =
-      invalidCharacters[Math.floor(Math.random() * invalidCharacters.length)];
-    const invalidTld =
-      invalidTlds[Math.floor(Math.random() * invalidTlds.length)];
+      const scheme =
+        invalidSchemes[Math.floor(Math.random() * invalidSchemes.length)];
+      const invalidChar =
+        invalidCharacters[Math.floor(Math.random() * invalidCharacters.length)];
+      const invalidTld =
+        invalidTlds[Math.floor(Math.random() * invalidTlds.length)];
 
-    const randomDomain = `example${invalidChar}domain${invalidTld}`;
-    return `${scheme}://${randomDomain}`;
+      const randomDomain = `example${invalidChar}domain${invalidTld}`;
+      return `${scheme}://${randomDomain}`;
+    }
+    // max 128 words invalid
+    return faker.internet.url() + faker.lorem.paragraphs(2).replace(/\s+/g, "");
   },
 
   name: () => {

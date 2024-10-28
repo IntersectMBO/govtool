@@ -129,14 +129,19 @@ FROM
             SUM(CASE WHEN vote = 'No' THEN 1 ELSE 0 END) AS ccNoVotes,
             SUM(CASE WHEN vote = 'Abstain' THEN 1 ELSE 0 END) AS ccAbstainVotes
         FROM 
-            voting_procedure
+            voting_procedure AS vp
         WHERE 
-            committee_voter IS NOT NULL
+            vp.committee_voter IS NOT NULL
+            AND (vp.tx_id, vp.committee_voter, vp.gov_action_proposal_id) IN (
+                SELECT MAX(tx_id), committee_voter, gov_action_proposal_id
+                FROM voting_procedure
+                WHERE committee_voter IS NOT NULL
+                GROUP BY committee_voter, gov_action_proposal_id
+            )
         GROUP BY 
             gov_action_proposal_id
     ) vp_by_cc
     ON gov_action_proposal.id = vp_by_cc.gov_action_proposal_id
-    
     LEFT JOIN LatestDrepDistr ldd_cc ON ldd_cc.hash_id = voting_procedure.committee_voter
         AND ldd_cc.rn = 1
     LEFT JOIN gov_action_proposal AS prev_gov_action ON gov_action_proposal.prev_gov_action_proposal = prev_gov_action.id

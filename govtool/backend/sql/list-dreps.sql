@@ -138,7 +138,7 @@ WHERE
   (
     COALESCE(?, '') = '' OR
     dh.view ILIKE ? OR
-    off_chain_vote_drep_data.given_name ILIKE ? OR
+    off_chain_vote_drep_data.given_name ILIKE ?
   )
 GROUP BY
   dh.raw,

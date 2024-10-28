@@ -12,6 +12,7 @@ import {
 import { createNewPageWithWallet } from "@helpers/page";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
+import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import {
   BootstrapGovernanceActionType,
   GrovernanceActionType,
@@ -40,6 +41,50 @@ test.describe("Logged in DRep", () => {
     await expect(page.getByTestId("voting-power-chips-value")).toHaveText(
       `₳ ${lovelaceToAda(votingPower)}`
     );
+  });
+
+  test.describe("vote context metadata anchor validation", () => {
+    test.beforeEach(async ({ page }) => {
+      const govActionsPage = new GovernanceActionsPage(page);
+      await govActionsPage.goto();
+
+      const govActionDetailsPage = (await isBootStrapingPhase())
+        ? await govActionsPage.viewFirstProposalByGovernanceAction(
+            GrovernanceActionType.InfoAction
+          )
+        : await govActionsPage.viewFirstProposal();
+
+      await govActionDetailsPage.contextBtn.click();
+      await govActionDetailsPage.contextInput.fill(faker.lorem.sentence(200));
+      await govActionDetailsPage.confirmModalBtn.click();
+      await page.getByRole("checkbox").click();
+      await govActionDetailsPage.confirmModalBtn.click();
+    });
+
+    test("4N. Should accept valid metadata anchor on vote context", async ({
+      page,
+    }) => {
+      for (let i = 0; i < 100; i++) {
+        await page.getByPlaceholder("URL").fill(mockValid.url());
+        await expect(page.getByTestId("invalid-url-error")).toBeHidden();
+      }
+    });
+
+    test("4O. Should reject invalid metadata anchor on vote context", async ({
+      page,
+    }) => {
+      for (let i = 0; i < 100; i++) {
+        const invalidUrl = mockInvalid.url(false);
+        await page.getByPlaceholder("URL").fill(invalidUrl);
+        if (invalidUrl.length <= 128) {
+          await expect(page.getByTestId("invalid-url-error")).toBeVisible();
+        } else {
+          await expect(
+            page.getByTestId("url-must-be-less-than-128-bytes-error")
+          ).toBeVisible();
+        }
+      }
+    });
   });
 });
 

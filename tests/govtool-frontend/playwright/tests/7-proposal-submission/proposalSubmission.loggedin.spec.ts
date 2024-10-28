@@ -261,7 +261,7 @@ test.describe("Proposal created logged state", () => {
       }) => {
         test.slow(); // Brute-force testing with 100 random data
         for (let i = 0; i < 50; i++) {
-          await proposalSubmissionPage.metadataUrlInput.fill(invalid.url());
+          await proposalSubmissionPage.metadataUrlInput.fill(invalid.url(false));
           await expect(page.getByTestId("url-input-error-text")).toBeVisible();
         }
 

@@ -156,7 +156,7 @@ test.describe("Validation of dRep Registration Form", () => {
     await dRepRegistrationPage.registerBtn.click();
 
     for (let i = 0; i < 100; i++) {
-      const invalidUrl = mockInvalid.url();
+      const invalidUrl = mockInvalid.url(false);
 
       await dRepRegistrationPage.metadataUrlInput.fill(invalidUrl);
       if (invalidUrl.length <= 128) {

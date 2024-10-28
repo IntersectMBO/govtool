@@ -127,7 +127,7 @@ test.describe("Validation of edit dRep Form", () => {
     await editDRepPage.registerBtn.click();
 
     for (let i = 0; i < 100; i++) {
-      const invalidUrl = mockInvalid.url();
+      const invalidUrl = mockInvalid.url(false);
       await editDRepPage.metadataUrlInput.fill(invalidUrl);
       if (invalidUrl.length <= 128) {
         await expect(page.getByTestId("invalid-url-error")).toBeVisible();

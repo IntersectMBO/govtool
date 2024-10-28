@@ -2,8 +2,10 @@ import { faker } from "@faker-js/faker";
 import { generateExactLengthText } from "@helpers/string";
 
 export const invalid = {
-  url: () => {
-    const choice = faker.number.int({ min: 1, max: 2 });
+  url: (isSupportedGreaterThan128Words = true) => {
+    const choice = isSupportedGreaterThan128Words
+      ? 1
+      : faker.number.int({ min: 1, max: 2 });
     if (choice === 1) {
       const invalidSchemes = ["ftp", "unsupported", "unknown-scheme"];
       const invalidCharacters = "<>@!#$%^&*()";

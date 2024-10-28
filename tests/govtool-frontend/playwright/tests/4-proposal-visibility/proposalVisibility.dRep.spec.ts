@@ -19,6 +19,7 @@ import {
   IProposal,
 } from "@types";
 import walletManager from "lib/walletManager";
+import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
@@ -44,11 +45,12 @@ test.describe("Logged in DRep", () => {
   });
 
   test.describe("vote context metadata anchor validation", () => {
+    let govActionDetailsPage: GovernanceActionDetailsPage;
     test.beforeEach(async ({ page }) => {
       const govActionsPage = new GovernanceActionsPage(page);
       await govActionsPage.goto();
 
-      const govActionDetailsPage = (await isBootStrapingPhase())
+      govActionDetailsPage = (await isBootStrapingPhase())
         ? await govActionsPage.viewFirstProposalByGovernanceAction(
             GrovernanceActionType.InfoAction
           )
@@ -65,7 +67,7 @@ test.describe("Logged in DRep", () => {
       page,
     }) => {
       for (let i = 0; i < 100; i++) {
-        await page.getByPlaceholder("URL").fill(mockValid.url());
+        await govActionDetailsPage.metadataUrlInput.fill(mockValid.url());
         await expect(page.getByTestId("invalid-url-error")).toBeHidden();
       }
     });
@@ -75,7 +77,7 @@ test.describe("Logged in DRep", () => {
     }) => {
       for (let i = 0; i < 100; i++) {
         const invalidUrl = mockInvalid.url(false);
-        await page.getByPlaceholder("URL").fill(invalidUrl);
+        await  govActionDetailsPage.metadataUrlInput.fill(invalidUrl);
         if (invalidUrl.length <= 128) {
           await expect(page.getByTestId("invalid-url-error")).toBeVisible();
         } else {

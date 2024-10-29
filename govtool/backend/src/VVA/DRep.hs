@@ -107,17 +107,23 @@ getVotes ::
   m ([Vote], [Proposal])
 getVotes drepId selectedProposals = withPool $ \conn -> do
   results <- liftIO $ SQL.query conn getVotesSql (SQL.Only drepId)
-  let proposalsToSelect = if null selectedProposals
-                          then [ govActionId | (_, govActionId, _, _, _, _, _, _, _) <- results]
-                          else selectedProposals
-  proposals <- Proposal.getProposals (Just proposalsToSelect)
-  let proposalMap = M.fromList $ map (\x -> (proposalId x, x)) proposals
-  timeZone <- liftIO getCurrentTimeZone
-  return
-    ([ Vote proposalId' drepId' vote' url' docHash' epochNo' (localTimeToUTC timeZone date') voteTxHash'
-      | (proposalId', govActionId', drepId', vote', url', docHash', epochNo', date', voteTxHash') <- results
-      , govActionId' `elem` proposalsToSelect
-    ], proposals)
+  
+  if null results
+    then return ([], [])
+    else do
+      let proposalsToSelect = if null selectedProposals
+                              then [ govActionId | (_, govActionId, _, _, _, _, _, _, _) <- results]
+                              else selectedProposals
+      proposals <- if null proposalsToSelect
+                      then return []
+                      else Proposal.getProposals (Just proposalsToSelect)
+      let proposalMap = M.fromList $ map (\x -> (proposalId x, x)) proposals
+      timeZone <- liftIO getCurrentTimeZone
+      let votes = [ Vote proposalId' drepId' vote' url' docHash' epochNo' (localTimeToUTC timeZone date') voteTxHash'
+                    | (proposalId', govActionId', drepId', vote', url', docHash', epochNo', date', voteTxHash') <- results
+                    , govActionId' `elem` proposalsToSelect
+                  ]
+      return (votes, proposals)
 
 getDRepInfoSql :: SQL.Query
 getDRepInfoSql = sqlFrom $(embedFile "sql/get-drep-info.sql")

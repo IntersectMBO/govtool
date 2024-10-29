@@ -12,7 +12,14 @@ const formErrors = {
   ],
   linkDescription: "max-80-characters-error",
   email: "invalid-email-address-error",
-  link: "invalid-url-error",
+  links: {
+    url:"link-reference-description-1-error",
+    description: "link-reference-description-1-error",
+  },
+  identity: {
+    url: "identity-reference-url-1-error",
+    description: "identity-reference-description-1-error",
+  },
   paymentAddress: "invalid-payment-address-error",
 };
 
@@ -165,7 +172,8 @@ export default class DRepForm {
       dRepInfo.qualifications
     );
 
-    await expect(this.form.getByTestId(formErrors.link)).toBeHidden();
+    await expect(this.form.getByTestId(formErrors.links.url)).toBeHidden();
+    await expect(this.form.getByTestId(formErrors.identity.url)).toBeHidden();
     await expect(this.form.getByTestId(formErrors.paymentAddress)).toBeHidden();
     await expect(this.continueBtn).toBeEnabled();
   }
@@ -190,7 +198,7 @@ export default class DRepForm {
       })
       .all();
 
-    expect(nameErrors.length).toBeGreaterThanOrEqual(1); // BUG duplicate test ids
+    expect(nameErrors.length).toBeGreaterThanOrEqual(1);
 
     await expect(
       this.form.getByTestId(formErrors.paymentAddress)
@@ -206,14 +214,14 @@ export default class DRepForm {
       dRepInfo.qualifications
     );
 
-    await expect(this.form.getByTestId(formErrors.link).first()).toBeVisible(); // BUG duplicate test ids
+    await expect(this.form.getByTestId(formErrors.links.url)).toBeVisible();
     await expect(
-      this.form.getByTestId(formErrors.linkDescription).first()
-    ).toBeVisible(); // BUG duplicate test ids
-    await expect(this.form.getByTestId(formErrors.link).last()).toBeVisible(); // BUG duplicate test ids
+      this.form.getByTestId(formErrors.links.description)
+    ).toBeVisible();
+    await expect(this.form.getByTestId(formErrors.identity.url)).toBeVisible();
     await expect(
-      this.form.getByTestId(formErrors.linkDescription).last()
-    ).toBeVisible(); // BUG duplicate test ids
+      this.form.getByTestId(formErrors.identity.description)
+    ).toBeVisible();
 
     await expect(this.continueBtn).toBeDisabled();
   }

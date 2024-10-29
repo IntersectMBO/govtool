@@ -26,7 +26,6 @@ import qualified Data.Text.Encoding         as Text
 import           Data.Time
 
 import qualified Database.PostgreSQL.Simple as SQL
-
 import           VVA.Config
 import           VVA.Pool                   (ConnectionPool, withPool)
 import qualified VVA.Proposal               as Proposal
@@ -36,29 +35,19 @@ import           VVA.Types                  (AppError, DRepInfo (..), DRepRegist
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
 
-getVotingPowerSql :: SQL.Query
-getVotingPowerSql = sqlFrom $(embedFile "sql/get-voting-power.sql")
-
-getVotingPower ::
-  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m) =>
-  Text ->
-  m Integer
-getVotingPower drepId = withPool $ \conn -> do
-  result <-
-    liftIO
-      (SQL.query @_ @(SQL.Only Scientific) conn getVotingPowerSql $ SQL.Only drepId)
-  case result of
-    [SQL.Only votingPower] -> return $ floor votingPower
-    []                     -> return 0
-
 listDRepsSql :: SQL.Query
 listDRepsSql = sqlFrom $(embedFile "sql/list-dreps.sql")
 
 listDReps ::
   (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m) =>
-  m [DRepRegistration]
-listDReps = withPool $ \conn -> do
-  results <- liftIO $ SQL.query_ conn listDRepsSql
+  Maybe Text -> m [DRepRegistration]
+listDReps mSearchQuery = withPool $ \conn -> do
+  let searchParam = fromMaybe "" mSearchQuery
+  results <- liftIO $ SQL.query conn listDRepsSql
+    ( searchParam 
+    , "%" <> searchParam <> "%"
+    , "%" <> searchParam <> "%"
+    )
   timeZone <- liftIO getCurrentTimeZone
   return
     [ DRepRegistration drepHash drepView isScriptBased url dataHash (floor @Scientific deposit) votingPower status drepType txHash (localTimeToUTC timeZone date) metadataError paymentAddress givenName objectives motivations qualifications imageUrl imageHash
@@ -95,6 +84,19 @@ listDReps = withPool $ \conn -> do
                    | Data.Maybe.isJust url = DRep
     ]
 
+getVotingPowerSql :: SQL.Query
+getVotingPowerSql = sqlFrom $(embedFile "sql/get-voting-power.sql")
+
+getVotingPower ::
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m) =>
+  Text ->
+  m Integer
+getVotingPower drepId = withPool $ \conn -> do
+  result <- liftIO (SQL.query @_ @(SQL.Only Scientific) conn getVotingPowerSql $ SQL.Only drepId)
+  case result of
+    [SQL.Only votingPower] -> return $ floor votingPower
+    []                     -> return 0
+
 getVotesSql :: SQL.Query
 getVotesSql = sqlFrom $(embedFile "sql/get-votes.sql")
 
@@ -105,17 +107,23 @@ getVotes ::
   m ([Vote], [Proposal])
 getVotes drepId selectedProposals = withPool $ \conn -> do
   results <- liftIO $ SQL.query conn getVotesSql (SQL.Only drepId)
-  let proposalsToSelect = if null selectedProposals
-                          then [ govActionId | (_, govActionId, _, _, _, _, _, _, _) <- results]
-                          else selectedProposals
-  proposals <- Proposal.getProposals (Just proposalsToSelect)
-  let proposalMap = M.fromList $ map (\x -> (proposalId x, x)) proposals
-  timeZone <- liftIO getCurrentTimeZone
-  return
-    ([ Vote proposalId' drepId' vote' url' docHash' epochNo' (localTimeToUTC timeZone date') voteTxHash'
-      | (proposalId', govActionId', drepId', vote', url', docHash', epochNo', date', voteTxHash') <- results
-      , govActionId' `elem` proposalsToSelect
-    ], proposals)
+  
+  if null results
+    then return ([], [])
+    else do
+      let proposalsToSelect = if null selectedProposals
+                              then [ govActionId | (_, govActionId, _, _, _, _, _, _, _) <- results]
+                              else selectedProposals
+      proposals <- if null proposalsToSelect
+                      then return []
+                      else Proposal.getProposals (Just proposalsToSelect)
+      let proposalMap = M.fromList $ map (\x -> (proposalId x, x)) proposals
+      timeZone <- liftIO getCurrentTimeZone
+      let votes = [ Vote proposalId' drepId' vote' url' docHash' epochNo' (localTimeToUTC timeZone date') voteTxHash'
+                    | (proposalId', govActionId', drepId', vote', url', docHash', epochNo', date', voteTxHash') <- results
+                    , govActionId' `elem` proposalsToSelect
+                  ]
+      return (votes, proposals)
 
 getDRepInfoSql :: SQL.Query
 getDRepInfoSql = sqlFrom $(embedFile "sql/get-drep-info.sql")

@@ -140,7 +140,7 @@ delegationToResponse Types.Delegation {..} =
 drepList :: App m => Maybe Text -> [DRepStatus] -> Maybe DRepSortMode -> Maybe Natural -> Maybe Natural -> m ListDRepsResponse
 drepList mSearchQuery statuses mSortMode mPage mPageSize = do
   CacheEnv {dRepListCache} <- asks vvaCache
-  dreps <- cacheRequest dRepListCache () DRep.listDReps
+  dreps <- cacheRequest dRepListCache () (DRep.listDReps mSearchQuery)
 
   let filterDRepsByQuery = case mSearchQuery of
         Nothing -> filter $ \Types.DRepRegistration {..} -> dRepRegistrationType == Types.DRep
@@ -357,20 +357,20 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
       map (voteParamsProposalId . voteResponseVote)
         <$> getVotes drepId [] Nothing Nothing
 
-
   CacheEnv {proposalListCache} <- asks vvaCache
-  mappedAndSortedProposals <- do
-    proposals <- cacheRequest proposalListCache () Proposal.listProposals
-    mappedSortedAndFilteredProposals <- mapSortAndFilterProposals selectedTypes sortMode proposals
-    return $ filter
-      ( \p@ProposalResponse {proposalResponseId} ->
-          proposalResponseId `notElem` proposalsToRemove
-          && isProposalSearchedFor mSearchQuery p
-      ) mappedSortedAndFilteredProposals
 
-  let total = length mappedAndSortedProposals :: Int
+  proposals <- cacheRequest proposalListCache () (Proposal.listProposals mSearchQuery)
 
-  let elements = take pageSize $ drop (page * pageSize) mappedAndSortedProposals
+  mappedSortedAndFilteredProposals <- mapSortAndFilterProposals selectedTypes sortMode proposals
+  let filteredProposals = filter
+        ( \p@ProposalResponse {proposalResponseId} ->
+            proposalResponseId `notElem` proposalsToRemove
+            && isProposalSearchedFor mSearchQuery p
+        ) mappedSortedAndFilteredProposals
+
+  let total = length filteredProposals :: Int
+
+  let elements = take pageSize $ drop (page * pageSize) filteredProposals
 
   return $ ListProposalsResponse
     { listProposalsResponsePage = fromIntegral page

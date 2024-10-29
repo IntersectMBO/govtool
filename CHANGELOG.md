@@ -26,6 +26,25 @@ changes.
 
 -
 
+## [v1.0.23](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.23) 2024-10-29
+
+### Added
+
+- Add searching for DRep and Proposal metadatas [Issue 1893](https://github.com/IntersectMBO/govtool/issues/1783)
+
+### Fixed
+
+- Fix validating metadata against the CIP standard [Issue 2233](https://github.com/IntersectMBO/govtool/issues/2233)
+- Fix counting the CC votes [Issue 2247](https://github.com/IntersectMBO/govtool/issues/2247)
+
+### Changed
+
+-
+
+### Removed
+
+-
+
 ## [v1.0.22](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.22) 2024-10-24
 
 ### Added
@@ -43,6 +62,7 @@ changes.
 ### Changed
 
 - Bump to use Cardano Node `10.0.0-pre`
+- Changed copy for no DRep found via search
 
 ### Removed
 

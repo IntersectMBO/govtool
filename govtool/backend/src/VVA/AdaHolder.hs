@@ -29,9 +29,6 @@ import           VVA.Types
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
 
-listDRepsSql :: SQL.Query
-listDRepsSql = sqlFrom $(embedFile "sql/list-dreps.sql")
-
 getCurrentDelegationSql :: SQL.Query
 getCurrentDelegationSql = sqlFrom $(embedFile "sql/get-current-delegation.sql")
 

@@ -21,6 +21,9 @@ export default class GovernanceActionDetailsPage {
   readonly governanceActionId = this.page.getByText("Governance Action ID:");
 
   readonly contextBtn = this.page.getByTestId("provide-context-button");
+  readonly metadataDownloadBtn = this.page.getByTestId(
+    "metadata-download-button"
+  );
   readonly viewOtherDetailsLink = this.page.getByTestId(
     "view-other-details-button"
   );
@@ -31,6 +34,7 @@ export default class GovernanceActionDetailsPage {
   readonly externalLinkModal = this.page.getByTestId("external-link-modal");
 
   readonly contextInput = this.page.getByTestId("provide-context-input");
+  readonly metadataUrlInput = this.page.getByTestId("metadata-url-input");
   readonly cancelModalBtn = this.page.getByTestId("cancel-modal-button");
 
   readonly dRepYesVotes = this.page.getByTestId("submitted-votes-dReps-yes");
@@ -78,16 +82,14 @@ export default class GovernanceActionDetailsPage {
       await this.page.getByRole("checkbox").click();
       await this.confirmModalBtn.click();
 
-      this.page
-        .getByRole("button", { name: "download Vote_Context.jsonld" })
-        .click(); // BUG missing test id
+      this.metadataDownloadBtn.click();
       const voteMetadata = await this.downloadVoteMetadata();
       const url = await metadataBucketService.uploadMetadata(
         voteMetadata.name,
         voteMetadata.data
       );
 
-      await this.page.getByPlaceholder("URL").fill(url); // Bug showing data-testid="undefinedinput" on url
+      await this.metadataUrlInput.fill(url);
       await this.confirmModalBtn.click();
       await this.page.getByTestId("go-to-vote-modal-button").click();
     }

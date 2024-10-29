@@ -16,9 +16,11 @@ export class AppService {
   async validateMetadata({
     hash,
     url,
+    standard: paramStandard,
   }: ValidateMetadataDTO): Promise<ValidateMetadataResult> {
     let status: MetadataValidationStatus;
     let metadata: Record<string, unknown>;
+    let standard = paramStandard;
 
     try {
       const { data: rawData } = await firstValueFrom(
@@ -42,7 +44,9 @@ export class AppService {
         throw MetadataValidationStatus.INCORRECT_FORMAT;
       }
 
-      const standard = getStandard(parsedData);
+      if (!standard) {
+        standard = getStandard(parsedData);
+      }
 
       if (standard) {
         await validateMetadataStandard(parsedData.body, standard);

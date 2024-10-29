@@ -127,8 +127,15 @@ test.describe("Validation of edit dRep Form", () => {
     await editDRepPage.registerBtn.click();
 
     for (let i = 0; i < 100; i++) {
-      await editDRepPage.metadataUrlInput.fill(mockInvalid.url());
-      await expect(page.getByTestId("invalid-url-error")).toBeVisible();
+      const invalidUrl = mockInvalid.url(false);
+      await editDRepPage.metadataUrlInput.fill(invalidUrl);
+      if (invalidUrl.length <= 128) {
+        await expect(page.getByTestId("invalid-url-error")).toBeVisible();
+      } else {
+        await expect(
+          page.getByTestId("url-must-be-less-than-128-bytes-error")
+        ).toBeVisible();
+      }
     }
 
     const sentenceWithoutSpace = faker.lorem

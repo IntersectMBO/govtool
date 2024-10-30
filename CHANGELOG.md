@@ -21,6 +21,7 @@ changes.
 ### Changed
 
 - Bumped Cardano node version to `10.1.0-pre`.
+- Bumped Cardano DB Sync version to `13.6.0.0-pre`.
 
 ### Removed
 

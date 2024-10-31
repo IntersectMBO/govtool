@@ -16,6 +16,24 @@ changes.
 
 ### Fixed
 
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v1.0.24](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.24) 2024-10-31
+
+### Added
+
+-
+
+### Fixed
+
 - Fix infinite DRep list loading [Issue 2285](https://github.com/IntersectMBO/govtool/issues/2285)
 
 ### Changed

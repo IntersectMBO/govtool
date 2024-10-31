@@ -75,7 +75,9 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
 
   useEffect(() => {
     if (
-      (userMovedToDifferentAppArea && !userOpenedGADetailsFromCategoryPage) ||
+      (!pathname.includes("drep_directory") &&
+        userMovedToDifferentAppArea &&
+        !userOpenedGADetailsFromCategoryPage) ||
       userMovedFromGAListToCategoryPage
     ) {
       resetState();
@@ -116,7 +118,7 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
   );
 
   return (
-    <DataActionsBarContext.Provider value={contextValue}>
+    <DataActionsBarContext.Provider value={contextValue} key={pathname}>
       {children}
     </DataActionsBarContext.Provider>
   );

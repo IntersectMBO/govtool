@@ -140,15 +140,21 @@ delegationToResponse Types.Delegation {..} =
 drepList :: App m => Maybe Text -> [DRepStatus] -> Maybe DRepSortMode -> Maybe Natural -> Maybe Natural -> m ListDRepsResponse
 drepList mSearchQuery statuses mSortMode mPage mPageSize = do
   CacheEnv {dRepListCache} <- asks vvaCache
-  dreps <- cacheRequest dRepListCache () (DRep.listDReps mSearchQuery)
+  dreps <- cacheRequest dRepListCache (fromMaybe "" mSearchQuery) (DRep.listDReps mSearchQuery)
 
   let filterDRepsByQuery = case mSearchQuery of
-        Nothing -> filter $ \Types.DRepRegistration {..} -> dRepRegistrationType == Types.DRep
+        Nothing -> filter $ \Types.DRepRegistration {..} ->
+          dRepRegistrationType == Types.DRep
         Just query -> filter $ \Types.DRepRegistration {..} ->
-          case dRepRegistrationType of
-            Types.SoleVoter -> query == dRepRegistrationView || query == dRepRegistrationDRepHash
-            Types.DRep      ->  query `isInfixOf` dRepRegistrationView
-                                || query `isInfixOf` dRepRegistrationDRepHash
+          let searchLower = Text.toLower query
+              viewLower = Text.toLower dRepRegistrationView
+              hashLower = Text.toLower dRepRegistrationDRepHash
+              nameLower = maybe "" Text.toLower dRepRegistrationGivenName
+          in  case dRepRegistrationType of
+                Types.SoleVoter -> searchLower == viewLower || searchLower == hashLower
+                Types.DRep      -> searchLower `isInfixOf` viewLower
+                                  || searchLower `isInfixOf` hashLower
+                                  || searchLower `isInfixOf` nameLower
 
   let filterDRepsByStatus = case statuses of
         [] -> id

@@ -16,7 +16,8 @@ changes.
 
 ### Fixed
 
--
+- Fix searching by DRep Given name
+- Fix displaying the wallet connected modal
 
 ### Changed
 

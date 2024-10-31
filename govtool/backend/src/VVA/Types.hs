@@ -196,7 +196,7 @@ data CacheEnv
       , dRepGetVotesCache :: Cache.Cache Text ([Vote], [Proposal])
       , dRepInfoCache :: Cache.Cache Text DRepInfo
       , dRepVotingPowerCache :: Cache.Cache Text Integer
-      , dRepListCache :: Cache.Cache () [DRepRegistration]
+      , dRepListCache :: Cache.Cache Text [DRepRegistration]
       , networkMetricsCache :: Cache.Cache () NetworkMetrics
       }
 

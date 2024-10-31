@@ -118,7 +118,7 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
   );
 
   return (
-    <DataActionsBarContext.Provider value={contextValue} key={pathname}>
+    <DataActionsBarContext.Provider value={contextValue}>
       {children}
     </DataActionsBarContext.Provider>
   );

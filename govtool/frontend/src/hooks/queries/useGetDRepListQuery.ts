@@ -33,7 +33,7 @@ export const useGetDRepListInfiniteQuery = (
         pendingTransaction.registerAsDrep ||
         pendingTransaction.retireAsDirectVoter ||
         pendingTransaction.retireAsDrep
-      )?.transactionHash ?? 'noPendingTransaction',
+      )?.transactionHash ?? "noPendingTransaction",
       filters.length ? filters : "",
       searchPhrase ?? "",
       sorting ?? "",

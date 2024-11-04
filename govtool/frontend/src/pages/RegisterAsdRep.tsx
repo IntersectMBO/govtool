@@ -79,13 +79,14 @@ export const RegisterAsdRep = () => {
           title={t(`registration.alreadyRegistered.title`)}
           description={t(`registration.alreadyRegistered.description`)}
           primaryButtonText={t("registration.alreadyRegistered.viewDetails")}
-          onPrimaryButton={() =>
-            dRep &&
-            navigate(
-              PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRep.view),
-              { state: { enteredFromWithinApp: true } },
-            )
-          }
+          onPrimaryButton={() => {
+            if (dRep) {
+              navigate(
+                PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRep.view),
+                { state: { enteredFromWithinApp: true } },
+              );
+            }
+          }}
         />
       </CenteredBoxPageWrapper>
     );

@@ -18,6 +18,7 @@ changes.
 
 - Fix searching by DRep Given name
 - Fix displaying the wallet connected modal
+- Fix navigating to DRep details [Issue 2307](https://github.com/IntersectMBO/govtool/issues/2307)
 
 ### Changed
 

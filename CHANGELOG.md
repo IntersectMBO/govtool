@@ -16,6 +16,24 @@ changes.
 
 ### Fixed
 
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v1.0.25](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.25) 2024-11-04
+
+### Added
+
+-
+
+### Fixed
+
 - Fix searching by DRep Given name
 - Fix displaying the wallet connected modal
 - Fix navigating to DRep details [Issue 2307](https://github.com/IntersectMBO/govtool/issues/2307)

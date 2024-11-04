@@ -45,6 +45,9 @@ listDReps mSearchQuery = withPool $ \conn -> do
   let searchParam = fromMaybe "" mSearchQuery
   results <- liftIO $ SQL.query conn listDRepsSql
     ( searchParam 
+    , searchParam
+    , searchParam
+    , searchParam
     , "%" <> searchParam <> "%"
     , "%" <> searchParam <> "%"
     )

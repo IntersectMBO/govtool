@@ -6,7 +6,7 @@ export const useGetDRepDetailsQuery = (
 ) => {
   const { dRepData, isDRepListLoading } = useGetDRepListInfiniteQuery(
     { searchPhrase: dRepId ?? undefined },
-    { enabled: options?.enabled && !!dRepId },
+    { enabled: options?.enabled || !!dRepId },
   );
 
   return { dRep: dRepData?.[0], isLoading: isDRepListLoading };

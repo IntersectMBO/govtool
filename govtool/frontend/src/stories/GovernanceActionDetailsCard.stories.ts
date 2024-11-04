@@ -108,7 +108,7 @@ export const GovernanceActionDetailsCardComponent: Story = {
 
     await expect(canvas.getAllByText(/yes/i)).toHaveLength(2);
     await expect(canvas.getAllByText(/abstain/i)).toHaveLength(3);
-    await expect(canvas.getAllByText(/no/i)).toHaveLength(2);
+    await expect(canvas.getAllByText(/no/i)).toHaveLength(4);
   },
 };
 

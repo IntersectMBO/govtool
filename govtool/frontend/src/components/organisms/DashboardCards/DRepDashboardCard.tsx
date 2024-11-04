@@ -43,11 +43,13 @@ export const DRepDashboardCard = ({
       ),
   };
 
-  const navigateToDrepDirectory = () =>
-    dRep &&
-    navigate(PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRep.view), {
-      state: { enteredFromWithinApp: true },
-    });
+  const navigateToDrepDirectory = () => {
+    if (dRep) {
+      navigate(PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRep.view), {
+        state: { enteredFromWithinApp: true },
+      });
+    }
+  };
 
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress

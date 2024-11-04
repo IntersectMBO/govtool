@@ -51,8 +51,7 @@ export const getDRepList = async ({
   const validatedResponse = {
     ...response.data,
     elements: await Promise.all(
-      response.data.elements
-      .map(async (drep) => mapDtoToDrep(drep)),
+      response.data.elements.map(async (drep) => mapDtoToDrep(drep)),
     ),
   };
 

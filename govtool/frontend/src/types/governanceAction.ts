@@ -1,5 +1,5 @@
 import { RegisterOptions } from "react-hook-form";
-import { en } from "@/i18n/locales/en";
+import en from "@/i18n/locales/en.json";
 
 export enum GovernanceActionType {
   ParameterChange = "ParameterChange",
@@ -18,9 +18,9 @@ export enum GovernanceActionField {
 
 export type FieldSchema = {
   component: GovernanceActionField | [GovernanceActionField];
-  labelI18nKey: NestedKeys<(typeof en)["translation"]>;
-  placeholderI18nKey: NestedKeys<(typeof en)["translation"]>;
-  tipI18nKey?: NestedKeys<(typeof en)["translation"]>;
+  labelI18nKey: NestedKeys<typeof en>;
+  placeholderI18nKey: NestedKeys<typeof en>;
+  tipI18nKey?: NestedKeys<typeof en>;
   rules: Omit<RegisterOptions, "valueAsNumber" | "valueAsDate" | "setValueAs">;
 };
 

@@ -20,7 +20,7 @@ changes.
 
 ### Changed
 
--
+- Change multilanguage support to use json file [Issue 2325](https://github.com/IntersectMBO/govtool/issues/2325)
 
 ### Removed
 

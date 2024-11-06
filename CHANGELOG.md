@@ -12,7 +12,7 @@ changes.
 
 ### Added
 
--
+- add support for CIP-129 governance identifiers [Issue 2183](https://github.com/IntersectMBO/govtool/issues/2183)
 
 ### Fixed
 

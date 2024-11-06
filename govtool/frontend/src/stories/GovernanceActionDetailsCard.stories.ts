@@ -4,6 +4,7 @@ import { expect, jest } from "@storybook/jest";
 import type { Meta, StoryObj } from "@storybook/react";
 import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
 import {
+  encodeCIP129Identifier,
   formatDisplayDate,
   getFullGovActionId,
   getProposalTypeNoEmptySpaces,
@@ -59,6 +60,12 @@ const govActionId = getFullGovActionId(
   commonArgs.proposal.index,
 );
 
+const cip129GovActionId = encodeCIP129Identifier(
+  commonArgs.proposal.txHash,
+  commonArgs.proposal.index.toString(16).padStart(2, "0"),
+  "gov_action",
+);
+
 async function assertTooltip(tooltip: HTMLElement, expectedText: RegExp) {
   await userEvent.hover(tooltip);
   await waitFor(async () => {
@@ -81,6 +88,9 @@ async function assertGovActionDetails(
   ).toHaveTextContent("Info Action");
   await expect(canvas.getByTestId(`${govActionId}-id`)).toHaveTextContent(
     govActionId,
+  );
+  await expect(canvas.getByTestId(`${cip129GovActionId}-id`)).toHaveTextContent(
+    cip129GovActionId,
   );
 }
 

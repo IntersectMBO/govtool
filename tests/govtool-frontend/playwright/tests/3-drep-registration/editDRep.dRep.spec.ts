@@ -27,7 +27,7 @@ test.describe("Validation of edit dRep Form", () => {
 
     for (let i = 0; i < 100; i++) {
       await editDRepPage.validateForm({
-        name: faker.internet.displayName(),
+        name: mockValid.name(),
         objectives: faker.lorem.paragraph(2),
         motivations: faker.lorem.paragraph(2),
         qualifications: faker.lorem.paragraph(2),

@@ -249,12 +249,14 @@ export const GovernanceActionDetailsCardData = ({
         text={govActionId}
         isCopyButton
         dataTestId={`${govActionId}-id`}
+        textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
       />
       <GovernanceActionCardElement
         label={t("govActions.cip129GovernanceActionId")}
         text={cip129GovernanceActionId}
         dataTestId={`${cip129GovernanceActionId}-id`}
         isCopyButton
+        textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
       />
 
       {tabs.length === 1 ? (

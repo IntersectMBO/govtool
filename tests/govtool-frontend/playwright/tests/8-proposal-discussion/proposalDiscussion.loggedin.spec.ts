@@ -12,6 +12,7 @@ import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage"
 import { Page, expect } from "@playwright/test";
 import { setAllureEpic } from "@helpers/allure";
 import { skipIfNotHardFork } from "@helpers/cardano";
+import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 
 test.beforeEach(async () => {
   await setAllureEpic("8. Proposal Discussion Forum");
@@ -154,9 +155,10 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
   });
 
   let ownerProposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
+  let proposalPage: Page;
 
   test.beforeEach(async ({ browser, proposalId }) => {
-    const proposalPage = await createNewPageWithWallet(browser, {
+    proposalPage = await createNewPageWithWallet(browser, {
       storageState: ".auth/proposal01.json",
       wallet: proposal01Wallet,
     });
@@ -186,5 +188,37 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
     const userProposalDetailsPage = new ProposalDiscussionDetailsPage(page);
     await expect(userProposalDetailsPage.pollYesBtn).not.toBeVisible();
     await expect(userProposalDetailsPage.pollNoBtn).not.toBeVisible();
+  });
+
+  test("8U. Should navigate to the edit proposal page when 'goto data edit screen' is selected if data does not match the anchor URL", async () => {
+    const invalidMetadataAnchorUrl = "https://www.google.com";
+    await ownerProposalDiscussionDetailsPage.submitAsGABtn.click();
+
+    const proposalSubmissionPage = new ProposalSubmissionPage(proposalPage);
+    await proposalPage.getByTestId("agree-checkbox").click();
+    await proposalSubmissionPage.continueBtn.click();
+    await proposalSubmissionPage.metadataUrlInput.fill(
+      invalidMetadataAnchorUrl
+    );
+    await proposalSubmissionPage.submitBtn.click();
+
+    await expect(
+      proposalPage.getByTestId("data-not-match-modal")
+    ).toBeVisible();
+    await expect(
+      proposalPage.getByTestId("data-not-match-modal-go-to-data-button")
+    ).toBeVisible();
+
+    await proposalPage
+      .getByTestId("data-not-match-modal-go-to-data-button")
+      .click();
+
+    await expect(
+      proposalPage.getByTestId("governance-action-type")
+    ).toBeVisible();
+    await expect(proposalPage.getByTestId("title-input")).toBeVisible();
+    await expect(proposalPage.getByTestId("abstract-input")).toBeVisible();
+    await expect(proposalPage.getByTestId("motivation-input")).toBeVisible();
+    await expect(proposalPage.getByTestId("rationale-input")).toBeVisible();
   });
 });

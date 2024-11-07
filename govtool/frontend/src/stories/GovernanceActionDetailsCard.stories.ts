@@ -52,6 +52,13 @@ const commonArgs = {
     metadataHash: "exampleMetadataHash",
     metadataStatus: null,
     metadataValid: true,
+    references: [
+      {
+        "@type": "Reference",
+        uri: "https://exampleurl.com",
+        label: "Example label",
+      },
+    ],
   } satisfies ProposalData,
 };
 
@@ -109,6 +116,15 @@ export const GovernanceActionDetailsCardComponent: Story = {
     const canvas = within(canvasElement);
 
     await expect(canvas.getByText(args.proposal.title!)).toBeInTheDocument();
+
+    if (args.proposal.references?.[0]) {
+      await expect(
+        canvas.getByText(args.proposal.references[0].label),
+      ).toBeInTheDocument();
+      await expect(
+        canvas.getByText(args.proposal.references[0].uri),
+      ).toBeInTheDocument();
+    }
 
     await assertGovActionDetails(canvas, args);
     const [tooltip1, tooltip2] = canvas.getAllByTestId("InfoOutlinedIcon");

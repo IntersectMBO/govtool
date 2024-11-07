@@ -17,7 +17,7 @@ changes.
 
 ### Fixed
 
--
+- Fix certificates order where vote delegation cert is before the DRep registration cert [Issue 2333](https://github.com/IntersectMBO/govtool/issues/2333)
 
 ### Changed
 

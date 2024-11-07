@@ -33,7 +33,7 @@ export const EditDRepStorageInformation = ({
   } = useEditDRepInfoForm(setStep);
   const { screenWidth } = useScreenDimension();
 
-  const fileName = getValues("givenName").replace(/\s/g, "");
+  const fileName = getValues("givenName");
   const openGuideAboutStoringInformation = () =>
     openInNewTab(
       "https://docs.gov.tools/using-govtool/govtool-functions/storing-information-offline",

@@ -176,7 +176,7 @@ export type ProposalDataDTO = {
   abstract?: string;
   motivation?: string;
   rationale?: string;
-  references?: string[];
+  references?: Reference[];
   title?: string;
   protocolParams: EpochParams | null;
 } & SubmittedVotesData;

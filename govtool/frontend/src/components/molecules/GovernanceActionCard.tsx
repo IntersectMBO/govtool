@@ -11,6 +11,7 @@ import {
 
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
+  encodeCIP129Identifier,
   getFullGovActionId,
   getProposalTypeLabel,
   getProposalTypeNoEmptySpaces,
@@ -53,6 +54,11 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
   const { t } = useTranslation();
 
   const govActionId = getFullGovActionId(txHash, index);
+  const cip129GovernanceActionId = encodeCIP129Identifier(
+    txHash,
+    index.toString(16).padStart(2, "0"),
+    "gov_action",
+  );
 
   return (
     <Box
@@ -113,8 +119,15 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
         />
         <GovernanceActionCardElement
           label={t("govActions.governanceActionId")}
-          text={getFullGovActionId(txHash, index)}
-          dataTestId={`${getFullGovActionId(txHash, index)}-id`}
+          text={govActionId}
+          dataTestId={`${govActionId}-id`}
+          isCopyButton
+          isSliderCard
+        />
+        <GovernanceActionCardElement
+          label={t("govActions.cip129GovernanceActionId")}
+          text={cip129GovernanceActionId}
+          dataTestId={`${cip129GovernanceActionId}-id`}
           isCopyButton
           isSliderCard
         />

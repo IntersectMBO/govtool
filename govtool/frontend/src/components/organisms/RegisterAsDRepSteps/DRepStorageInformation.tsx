@@ -33,7 +33,7 @@ export const DRepStorageInformation = ({
   } = useRegisterAsdRepForm(setStep);
   const { screenWidth } = useScreenDimension();
 
-  const fileName = getValues("givenName").replace(/\s/g, "");
+  const fileName = getValues("givenName");
 
   const openGuideAboutStoringInformation = () =>
     openInNewTab(

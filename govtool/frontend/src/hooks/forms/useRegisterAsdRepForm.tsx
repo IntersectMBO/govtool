@@ -5,6 +5,7 @@ import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
 import * as Sentry from "@sentry/react";
 import { NodeObject } from "jsonld";
+import { CertificatesBuilder } from "@emurgo/cardano-serialization-lib-asmjs";
 
 import {
   CIP_119,
@@ -53,6 +54,8 @@ export const useRegisterAsdRepForm = (
     buildSignSubmitConwayCertTx,
     buildVoteDelegationCert,
     dRepID,
+    registeredStakeKeysListState,
+    buildStakeKeyRegCert,
   } = useCardano();
 
   // App Management
@@ -131,13 +134,21 @@ export const useRegisterAsdRepForm = (
       if (!hash) return;
       const uri = data.storingURL;
       try {
-        const certBuilder = await buildVoteDelegationCert(dRepID);
+        const certBuilder = CertificatesBuilder.new();
 
         const registerCert = voter?.isRegisteredAsSoleVoter
           ? await buildDRepUpdateCert(uri, hash)
           : await buildDRepRegCert(uri, hash);
 
         certBuilder.add(registerCert);
+
+        if (!registeredStakeKeysListState.length) {
+          const stakeKeyRegCert = await buildStakeKeyRegCert();
+          certBuilder.add(stakeKeyRegCert);
+        }
+
+        const voteDelegationCert = await buildVoteDelegationCert(dRepID);
+        certBuilder.add(voteDelegationCert);
 
         return certBuilder;
       } catch (error) {

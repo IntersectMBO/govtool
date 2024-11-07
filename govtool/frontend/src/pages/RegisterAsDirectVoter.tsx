@@ -21,6 +21,7 @@ import {
   openInNewTab,
 } from "@utils";
 import { WrongRouteInfo } from "@organisms";
+import { CertificatesBuilder } from "@emurgo/cardano-serialization-lib-asmjs";
 
 export const RegisterAsDirectVoter = () => {
   const { cExplorerBaseUrl } = useAppContext();
@@ -32,11 +33,13 @@ export const RegisterAsDirectVoter = () => {
   const { voter } = useGetVoterInfo();
   const openWalletErrorModal = useWalletErrorModal();
   const {
+    buildStakeKeyRegCert,
     buildSignSubmitConwayCertTx,
     buildDRepRegCert,
     buildDRepUpdateCert,
     buildVoteDelegationCert,
     dRepID,
+    registeredStakeKeysListState,
   } = useCardano();
   const { openModal, closeModal } = useModal();
 
@@ -44,11 +47,21 @@ export const RegisterAsDirectVoter = () => {
     setIsLoading(true);
 
     try {
-      const certBuilder = await buildVoteDelegationCert(dRepID);
+      const certBuilder = CertificatesBuilder.new();
+
       const registerCert = voter?.isRegisteredAsDRep
         ? await buildDRepUpdateCert()
         : await buildDRepRegCert();
       certBuilder.add(registerCert);
+
+      if (!registeredStakeKeysListState.length) {
+        const stakeKeyRegCert = await buildStakeKeyRegCert();
+        certBuilder.add(stakeKeyRegCert);
+      }
+
+      const voteDelegationCert = await buildVoteDelegationCert(dRepID);
+      certBuilder.add(voteDelegationCert);
+
       const result = await buildSignSubmitConwayCertTx({
         certBuilder,
         type: "registerAsDirectVoter",

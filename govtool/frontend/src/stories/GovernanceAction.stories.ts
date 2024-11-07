@@ -2,7 +2,11 @@ import { MetadataValidationStatus } from "@models";
 import { expect, jest } from "@storybook/jest";
 import type { Meta, StoryObj } from "@storybook/react";
 import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
-import { formatDisplayDate, getProposalTypeNoEmptySpaces } from "@utils";
+import {
+  encodeCIP129Identifier,
+  formatDisplayDate,
+  getProposalTypeNoEmptySpaces,
+} from "@utils";
 import { GovernanceActionCard } from "@/components/molecules";
 import { GovernanceActionType } from "@/types/governanceAction";
 
@@ -47,6 +51,12 @@ const commonArgs = {
   prevGovActionTxHash: null,
 };
 
+const cip129GovActionId = encodeCIP129Identifier(
+  commonArgs.txHash,
+  commonArgs.index.toString(16).padStart(2, "0"),
+  "gov_action",
+);
+
 export const GovernanceActionCardComponent: Story = {
   args: commonArgs,
 
@@ -58,6 +68,7 @@ export const GovernanceActionCardComponent: Story = {
       ),
     ).toBeInTheDocument();
     expect(canvas.getByTestId("sad78afdsf7jasd98d#2-id")).toBeInTheDocument();
+    expect(canvas.getByTestId(`${cip129GovActionId}-id`)).toBeInTheDocument();
     expect(
       canvas.getByText(formatDisplayDate("1970-01-01T00:00:00Z")),
     ).toBeInTheDocument();
@@ -79,7 +90,7 @@ export const GovernanceActionCardComponent: Story = {
     await userEvent.click(
       canvas.getByTestId("govaction-sad78afdsf7jasd98d#2-view-detail"),
     );
-    await expect(args.onClick).toHaveBeenCalled();
+    await await expect(args.onClick).toHaveBeenCalled();
   },
 };
 

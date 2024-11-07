@@ -25,7 +25,9 @@ export const getProposals = async ({
     params: {
       page,
       pageSize,
-      ...(searchPhrase && { search: searchPhrase }),
+      ...(searchPhrase && {
+        search: searchPhrase,
+      }),
       ...(filters.length && { type: filters }),
       ...(sorting && { sort: sorting }),
       ...(dRepID && { drepId: dRepID }),

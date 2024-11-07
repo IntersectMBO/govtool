@@ -60,7 +60,7 @@ test.describe("Validation of dRep Registration Form", () => {
 
     for (let i = 0; i < 100; i++) {
       await dRepRegistrationPage.validateForm({
-        name: faker.internet.displayName(),
+        name: mockValid.name(),
         objectives: faker.lorem.paragraph(2),
         motivations: faker.lorem.paragraph(2),
         qualifications: faker.lorem.paragraph(2),

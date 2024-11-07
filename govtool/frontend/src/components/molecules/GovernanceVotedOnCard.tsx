@@ -5,6 +5,7 @@ import { Button } from "@atoms";
 import { PATHS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
+  encodeCIP129Identifier,
   getFullGovActionId,
   getProposalTypeLabel,
   getProposalTypeNoEmptySpaces,
@@ -42,6 +43,13 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
 
   const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
+
+  const govActionId = getFullGovActionId(txHash, index);
+  const cip129GovernanceActionId = encodeCIP129Identifier(
+    txHash,
+    index.toString(16).padStart(2, "0"),
+    "gov_action",
+  );
 
   return (
     <Box
@@ -101,8 +109,15 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         />
         <GovernanceActionCardElement
           label={t("govActions.governanceActionId")}
-          text={getFullGovActionId(txHash, index)}
-          dataTestId={`${getFullGovActionId(txHash, index)}-id`}
+          text={govActionId}
+          dataTestId={`${govActionId}-id`}
+          isCopyButton
+          isSliderCard
+        />
+        <GovernanceActionCardElement
+          label={t("govActions.cip129GovernanceActionId")}
+          text={cip129GovernanceActionId}
+          dataTestId={`${cip129GovernanceActionId}-id`}
           isCopyButton
           isSliderCard
         />
@@ -120,15 +135,12 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
       >
         <Button
           disabled={inProgress}
-          data-testid={`govaction-${getFullGovActionId(
-            txHash,
-            index,
-          )}-change-your-vote`}
+          data-testid={`govaction-${govActionId}-change-your-vote`}
           onClick={() =>
             navigate(
               PATHS.dashboardGovernanceActionsAction.replace(
                 ":proposalId",
-                getFullGovActionId(txHash, index),
+                govActionId,
               ),
               {
                 state: {

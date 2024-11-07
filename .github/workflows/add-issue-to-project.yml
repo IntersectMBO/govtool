@@ -14,11 +14,6 @@ jobs:
       - name: Install GitHub CLI
         run: sudo apt-get install gh
 
-      - name: Authenticate GitHub CLI with default token
-        run: gh auth login --with-token <<< "$GITHUB_TOKEN"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Add issue to GovTool Project
         run: gh project item-add IntersectMBO/30 --content-type Issue --content-id ${{ github.event.issue.node_id }}
         env:

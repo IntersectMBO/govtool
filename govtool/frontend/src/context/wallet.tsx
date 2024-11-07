@@ -184,6 +184,7 @@ interface CardanoContextType {
   setStakeKey: (key: string) => void;
   stakeKeys: string[];
   walletApi?: CardanoApiWallet;
+  registeredStakeKeysListState: string[];
   buildSignSubmitConwayCertTx: ({
     certBuilder,
     govActionBuilder,
@@ -192,8 +193,9 @@ interface CardanoContextType {
     votingBuilder,
     voter,
   }: BuildSignSubmitConwayCertTxArgs) => Promise<string>;
+  buildStakeKeyRegCert: () => Promise<Certificate>;
   buildDRepRegCert: (url?: string, hash?: string) => Promise<Certificate>;
-  buildVoteDelegationCert: (vote: string) => Promise<CertificatesBuilder>;
+  buildVoteDelegationCert: (vote: string) => Promise<Certificate>;
   buildDRepUpdateCert: (url?: string, hash?: string) => Promise<Certificate>;
   buildDRepRetirementCert: (voterDeposit: string) => Promise<Certificate>;
   buildVote: (
@@ -626,28 +628,34 @@ const CardanoProvider = (props: Props) => {
     [isPendingTransaction, stakeKey, updateTransaction, walletApi, walletState],
   );
 
+  const buildStakeKeyRegCert = useCallback(async (): Promise<Certificate> => {
+    try {
+      if (!stakeKey) {
+        throw new Error(t("errors.noStakeKeySelected"));
+      }
+      const stakeKeyHash = Ed25519KeyHash.from_hex(stakeKey.substring(2));
+      const stakeCred = Credential.from_keyhash(stakeKeyHash);
+      const stakeKeyRegCert = StakeRegistration.new_with_explicit_deposit(
+        stakeCred,
+        BigNum.from_str(`${epochParams.key_deposit}`),
+      );
+      return Certificate.new_stake_registration(stakeKeyRegCert);
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }, [epochParams]);
+
   const buildVoteDelegationCert = useCallback(
-    async (target: string): Promise<CertificatesBuilder> => {
+    async (target: string): Promise<Certificate> => {
       try {
         // Build Vote Delegation Certificate
-        const certBuilder = CertificatesBuilder.new();
-        let stakeCred;
         if (!stakeKey) {
           throw new Error(t("errors.noStakeKeySelected"));
         }
         // Remove network tag from stake key hash
         const stakeKeyHash = Ed25519KeyHash.from_hex(stakeKey.substring(2));
-        // if chosen stake key is registered use it, else register it
-        if (registeredStakeKeysListState.length > 0) {
-          stakeCred = Credential.from_keyhash(stakeKeyHash);
-        } else {
-          stakeCred = Credential.from_keyhash(stakeKeyHash);
-          const stakeKeyRegCert = StakeRegistration.new_with_explicit_deposit(
-            stakeCred,
-            BigNum.from_str(`${epochParams.key_deposit}`),
-          );
-          certBuilder.add(Certificate.new_stake_registration(stakeKeyRegCert));
-        }
+        const stakeCred = Credential.from_keyhash(stakeKeyHash);
 
         // Create correct DRep
         let targetDRep;
@@ -665,9 +673,7 @@ const CardanoProvider = (props: Props) => {
         // Create cert object
         const voteDelegationCert = VoteDelegation.new(stakeCred, targetDRep);
         // add cert to tbuilder
-        certBuilder.add(Certificate.new_vote_delegation(voteDelegationCert));
-
-        return certBuilder;
+        return Certificate.new_vote_delegation(voteDelegationCert);
       } catch (e) {
         console.error(e);
         throw e;
@@ -1039,24 +1045,26 @@ const CardanoProvider = (props: Props) => {
       buildDRepRegCert,
       buildDRepRetirementCert,
       buildDRepUpdateCert,
-      buildNewInfoGovernanceAction,
-      buildSignSubmitConwayCertTx,
-      buildTreasuryGovernanceAction,
-      buildProtocolParameterChangeGovernanceAction,
       buildHardForkGovernanceAction,
+      buildNewInfoGovernanceAction,
+      buildProtocolParameterChangeGovernanceAction,
+      buildSignSubmitConwayCertTx,
+      buildStakeKeyRegCert,
+      buildTreasuryGovernanceAction,
       buildVote,
       buildVoteDelegationCert,
-      disconnectWallet,
-      getChangeAddress,
       dRepID,
+      disconnectWallet,
       enable,
       error,
-      isEnabled,
+      getChangeAddress,
       isEnableLoading,
+      isEnabled,
       isMainnet,
       isPendingTransaction,
       pendingTransaction,
       pubDRepKey,
+      registeredStakeKeysListState,
       setStakeKey,
       stakeKey,
       stakeKeys,
@@ -1067,24 +1075,26 @@ const CardanoProvider = (props: Props) => {
       buildDRepRegCert,
       buildDRepRetirementCert,
       buildDRepUpdateCert,
-      buildNewInfoGovernanceAction,
-      buildSignSubmitConwayCertTx,
-      buildTreasuryGovernanceAction,
-      buildProtocolParameterChangeGovernanceAction,
       buildHardForkGovernanceAction,
+      buildNewInfoGovernanceAction,
+      buildProtocolParameterChangeGovernanceAction,
+      buildSignSubmitConwayCertTx,
+      buildStakeKeyRegCert,
+      buildTreasuryGovernanceAction,
       buildVote,
       buildVoteDelegationCert,
-      disconnectWallet,
-      getChangeAddress,
       dRepID,
+      disconnectWallet,
       enable,
       error,
-      isEnabled,
+      getChangeAddress,
       isEnableLoading,
+      isEnabled,
       isMainnet,
       isPendingTransaction,
       pendingTransaction,
       pubDRepKey,
+      registeredStakeKeysListState,
       setStakeKey,
       stakeKey,
       stakeKeys,

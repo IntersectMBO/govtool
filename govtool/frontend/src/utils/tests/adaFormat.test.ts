@@ -1,9 +1,14 @@
-import { correctAdaFormat, correctDRepDirectoryFormat } from "..";
+import { vi, beforeAll, afterAll } from "vitest";
+
+import {
+  correctAdaFormat,
+  correctVoteAdaFormat,
+  correctDRepDirectoryFormat,
+} from "..";
 
 describe("correctAdaFormat", () => {
   const LOVELACE = 1000000;
   const DECIMALS = 6;
-
   it("converts lovelace to ada for a given number", () => {
     const lovelace = 15000000;
     const expectedAda = 15;
@@ -32,6 +37,49 @@ describe("correctAdaFormat", () => {
   it("returns 0 for zero lovelace value", () => {
     const lovelace = 0;
     expect(correctAdaFormat(lovelace)).toBe(0);
+  });
+});
+
+describe("correctVoteAdaFormat", () => {
+  beforeAll(() => {
+    vi.spyOn(Intl, "NumberFormat").mockImplementation(
+      ((_locales?: string | string[], options?: Intl.NumberFormatOptions) =>
+        new Intl.NumberFormat(
+          "en-US",
+          options,
+        )) as unknown as typeof Intl.NumberFormat,
+    );
+  });
+
+  afterAll(() => {
+    vi.restoreAllMocks();
+  });
+  test("Correctly formats lovelace value to ada format", () => {
+    const lovelace = 123456789012345;
+    const expectedResult = "123,456,789.012";
+
+    const result = correctVoteAdaFormat(lovelace, "en-US");
+
+    // Normalize spaces in both result and expectedResult for comparison
+    expect(result.replace(/\s/g, " ")).toBe(expectedResult);
+  });
+
+  test("Returns 0 for undefined lovelace value", () => {
+    const lovelace = undefined;
+    const expectedResult = "0,000";
+    expect(correctVoteAdaFormat(lovelace, "en-US")).toBe(expectedResult);
+  });
+
+  test("Returns 0 for zero lovelace value", () => {
+    const lovelace = 0;
+    const expectedResult = "0,000";
+    expect(correctVoteAdaFormat(lovelace, "en-US")).toBe(expectedResult);
+  });
+
+  test("Returns 0 for small lovelace value", () => {
+    const lovelace = 123;
+    const expectedResult = "0.000";
+    expect(correctVoteAdaFormat(lovelace, "en-US")).toBe(expectedResult);
   });
 });
 

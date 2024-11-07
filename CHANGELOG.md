@@ -23,6 +23,7 @@ changes.
 - Change multilanguage support to use json file [Issue 2325](https://github.com/IntersectMBO/govtool/issues/2325)
 - Display full Governance Action IDs on desktop
 - Support space on given name [Issue 2276](https://github.com/IntersectMBO/govtool/issues/2276)
+- Display ADA in 'en-US' format [Issue 2305](https://github.com/IntersectMBO/govtool/issues/2305)
 
 ### Removed
 

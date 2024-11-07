@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import { IMAGES } from "@consts";
 import { Typography, VotePill } from "@atoms";
 import { useTranslation } from "@hooks";
-import { correctAdaFormat } from "@utils";
+import { correctVoteAdaFormat } from "@utils";
 import { SubmittedVotesData } from "@models";
 
 type Props = {
@@ -148,9 +148,11 @@ const Vote = ({ type, vote, value }: VoteProps) => (
       sx={{
         fontSize: 16,
         wordBreak: "break-all",
+        lineHeight: "24px",
+        fontWeight: "500",
       }}
     >
-      {type !== "ccCommittee" ? `₳ ${correctAdaFormat(value)}` : value}
+      {type !== "ccCommittee" ? `₳ ${correctVoteAdaFormat(value)}` : value}
     </Typography>
   </Box>
 );

@@ -12,6 +12,24 @@ changes.
 
 ### Added
 
+-
+
+### Fixed
+
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v1.0.26](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.26) 2024-11-07
+
+### Added
+
 - add support for CIP-129 governance identifiers [Issue 2183](https://github.com/IntersectMBO/govtool/issues/2183)
 - Add label to supporting links in Governance Action details [Issue 2305](https://github.com/IntersectMBO/govtool/issues/2305)
 

@@ -13,10 +13,6 @@ export const Rules = {
         maxLength: 80,
       }),
     },
-    pattern: {
-      value: /^[^\s]+$/,
-      message: i18n.t("registration.fields.validations.noSpaces"),
-    },
   },
   LINK_DESCRIPTION: {
     maxLength: {

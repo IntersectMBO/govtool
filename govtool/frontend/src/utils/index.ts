@@ -31,3 +31,4 @@ export * from "./removeDuplicatedProposals";
 export * from "./setProtocolParameterUpdate";
 export * from "./testIdFromLabel";
 export * from "./wait";
+export * from "./cip129identifier";

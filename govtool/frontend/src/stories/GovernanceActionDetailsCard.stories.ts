@@ -4,6 +4,7 @@ import { expect, jest } from "@storybook/jest";
 import type { Meta, StoryObj } from "@storybook/react";
 import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
 import {
+  encodeCIP129Identifier,
   formatDisplayDate,
   getFullGovActionId,
   getProposalTypeNoEmptySpaces,
@@ -51,12 +52,25 @@ const commonArgs = {
     metadataHash: "exampleMetadataHash",
     metadataStatus: null,
     metadataValid: true,
+    references: [
+      {
+        "@type": "Reference",
+        uri: "https://exampleurl.com",
+        label: "Example label",
+      },
+    ],
   } satisfies ProposalData,
 };
 
 const govActionId = getFullGovActionId(
   commonArgs.proposal.txHash,
   commonArgs.proposal.index,
+);
+
+const cip129GovActionId = encodeCIP129Identifier(
+  commonArgs.proposal.txHash,
+  commonArgs.proposal.index.toString(16).padStart(2, "0"),
+  "gov_action",
 );
 
 async function assertTooltip(tooltip: HTMLElement, expectedText: RegExp) {
@@ -82,6 +96,9 @@ async function assertGovActionDetails(
   await expect(canvas.getByTestId(`${govActionId}-id`)).toHaveTextContent(
     govActionId,
   );
+  await expect(canvas.getByTestId(`${cip129GovActionId}-id`)).toHaveTextContent(
+    cip129GovActionId,
+  );
 }
 
 export const GovernanceActionDetailsCardComponent: Story = {
@@ -99,6 +116,15 @@ export const GovernanceActionDetailsCardComponent: Story = {
     const canvas = within(canvasElement);
 
     await expect(canvas.getByText(args.proposal.title!)).toBeInTheDocument();
+
+    if (args.proposal.references?.[0]) {
+      await expect(
+        canvas.getByText(args.proposal.references[0].label),
+      ).toBeInTheDocument();
+      await expect(
+        canvas.getByText(args.proposal.references[0].uri),
+      ).toBeInTheDocument();
+    }
 
     await assertGovActionDetails(canvas, args);
     const [tooltip1, tooltip2] = canvas.getAllByTestId("InfoOutlinedIcon");

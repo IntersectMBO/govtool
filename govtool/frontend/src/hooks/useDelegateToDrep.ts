@@ -3,12 +3,15 @@ import * as Sentry from "@sentry/react";
 
 import { useCardano, useSnackbar } from "@context";
 import { useGetVoterInfo, useTranslation, useWalletErrorModal } from "@hooks";
+import { CertificatesBuilder } from "@emurgo/cardano-serialization-lib-asmjs";
 
 export const useDelegateTodRep = () => {
   const {
     buildSignSubmitConwayCertTx,
     buildVoteDelegationCert,
     buildDRepRetirementCert,
+    buildStakeKeyRegCert,
+    registeredStakeKeysListState,
   } = useCardano();
   const { t } = useTranslation();
   const { addSuccessAlert, addErrorAlert } = useSnackbar();
@@ -25,14 +28,23 @@ export const useDelegateTodRep = () => {
         if (voter?.isRegisteredAsSoleVoter && !voter?.deposit) {
           throw new Error(t("errors.appCannotGetDeposit"));
         }
+        const certBuilder = CertificatesBuilder.new();
 
-        const certBuilder = await buildVoteDelegationCert(dRepId);
         if (voter?.isRegisteredAsSoleVoter) {
           const retirementCert = await buildDRepRetirementCert(
             voter?.deposit?.toString(),
           );
           certBuilder.add(retirementCert);
         }
+
+        if (!registeredStakeKeysListState.length) {
+          const stakeKeyRegCert = await buildStakeKeyRegCert();
+          certBuilder.add(stakeKeyRegCert);
+        }
+
+        const voteDelegationCert = await buildVoteDelegationCert(dRepId);
+        certBuilder.add(voteDelegationCert);
+
         await buildSignSubmitConwayCertTx({
           certBuilder,
           type: "delegate",

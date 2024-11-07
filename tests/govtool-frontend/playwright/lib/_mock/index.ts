@@ -26,11 +26,8 @@ export const invalid = {
   },
 
   name: () => {
-    const choice = faker.number.int({ min: 1, max: 3 });
+    const choice = faker.number.int({ min: 1, max: 2 });
     if (choice === 1) {
-      // space invalid
-      return faker.lorem.word() + " " + faker.lorem.word();
-    } else if (choice === 2) {
       // maximum 80 words invalid
       return faker.lorem.paragraphs().replace(/\s+/g, "");
     }
@@ -97,6 +94,13 @@ export const invalid = {
 };
 
 export const valid = {
+  name: () => {
+    const choice = faker.number.int({ min: 1, max: 2 });
+    if (choice === 1) {
+      return faker.internet.displayName();
+    }
+    return faker.lorem.word() + " " + faker.lorem.word();
+  },
   username: () => {
     let timeStamp = Date.now();
     let username = `${faker.internet.userName().toLowerCase()}_${timeStamp}`;

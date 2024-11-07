@@ -26,6 +26,28 @@ changes.
 
 -
 
+## [v1.0.26](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.26) 2024-11-07
+
+### Added
+
+- add support for CIP-129 governance identifiers [Issue 2183](https://github.com/IntersectMBO/govtool/issues/2183)
+- Add label to supporting links in Governance Action details [Issue 2305](https://github.com/IntersectMBO/govtool/issues/2305)
+
+### Fixed
+
+- Fix certificates order where vote delegation cert is before the DRep registration cert [Issue 2333](https://github.com/IntersectMBO/govtool/issues/2333)
+
+### Changed
+
+- Change multilanguage support to use json file [Issue 2325](https://github.com/IntersectMBO/govtool/issues/2325)
+- Display full Governance Action IDs on desktop
+- Support space on given name [Issue 2276](https://github.com/IntersectMBO/govtool/issues/2276)
+- Display ADA in 'en-US' format [Issue 2305](https://github.com/IntersectMBO/govtool/issues/2305)
+
+### Removed
+
+-
+
 ## [v1.0.25](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.25) 2024-11-04
 
 ### Added

@@ -20,6 +20,7 @@ import {
   filterOutNullParams,
   getFullGovActionId,
   mapArrayToObjectByKeys,
+  encodeCIP129Identifier,
 } from "@utils";
 import { MetadataValidationStatus, ProposalData } from "@models";
 import { GovernanceActionType } from "@/types/governanceAction";
@@ -142,6 +143,11 @@ export const GovernanceActionDetailsCardData = ({
 
   const label = getProposalTypeLabel(type);
   const govActionId = getFullGovActionId(txHash, index);
+  const cip129GovernanceActionId = encodeCIP129Identifier(
+    txHash,
+    index.toString(16).padStart(2, "0"),
+    "gov_action",
+  );
   const prevGovActionId =
     prevGovActionIndex && prevGovActionTxHash
       ? getFullGovActionId(prevGovActionTxHash, prevGovActionIndex)
@@ -243,6 +249,14 @@ export const GovernanceActionDetailsCardData = ({
         text={govActionId}
         isCopyButton
         dataTestId={`${govActionId}-id`}
+        textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
+      />
+      <GovernanceActionCardElement
+        label={t("govActions.cip129GovernanceActionId")}
+        text={cip129GovernanceActionId}
+        dataTestId={`${cip129GovernanceActionId}-id`}
+        isCopyButton
+        textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
       />
 
       {tabs.length === 1 ? (

@@ -12,7 +12,7 @@ changes.
 
 ### Added
 
--
+- add support for CIP-129 governance identifiers [Issue 2183](https://github.com/IntersectMBO/govtool/issues/2183)
 
 ### Fixed
 
@@ -21,6 +21,7 @@ changes.
 ### Changed
 
 - Change multilanguage support to use json file [Issue 2325](https://github.com/IntersectMBO/govtool/issues/2325)
+- Display full Governance Action IDs on desktop
 
 ### Removed
 

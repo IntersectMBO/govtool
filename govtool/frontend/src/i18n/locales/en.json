@@ -361,6 +361,7 @@
     "sPos": "SPOs",
     "ccCommittee": "Constitutional Committee",
     "governanceActionId": "Governance Action ID:",
+    "cip129GovernanceActionId": "(CIP-129) Governance Action ID:",
     "governanceActionType": "Governance Action Type:",
     "goToVote": "Go to Vote",
     "protocolParamsDetails": {

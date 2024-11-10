@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix submitting treasury governance action [Issue 1845](https://github.com/IntersectMBO/govtool/issues/1845)
 
 ### Changed
 

@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/add-to-project@v1.0.2
         with:
-          project-url: https://github.com/users/IntersectMBO/projects/30
+          project-url: https://github.com/orgs/IntersectMBO/projects/30
           github-token: ${{ secrets.ADD_ISSUE_TO_PROJECT_PAT }}
 
   add-to-community-backlog-project:
@@ -20,5 +20,5 @@ jobs:
     steps:
       - uses: actions/add-to-project@v1.0.2
         with:
-          project-url: https://github.com/users/IntersectMBO/projects/34
+          project-url: https://github.com/orgs/IntersectMBO/projects/34
           github-token: ${{ secrets.ADD_ISSUE_TO_PROJECT_PAT }}

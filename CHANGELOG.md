@@ -12,7 +12,7 @@ changes.
 
 ### Added
 
--
+- Handle displaying votes based on bootstrap phase, full governance and security groups [Issue 2316](https://github.com/IntersectMBO/govtool/issues/2316)
 
 ### Fixed
 

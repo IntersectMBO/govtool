@@ -26,8 +26,8 @@ changes.
 
 ### Changed
 
-- Bumped Cardano node version to `10.1.0-pre`.
-- Bumped Cardano DB Sync version to `13.6.0.0-pre`.
+- Bumped Cardano node version to `10.1.2`.
+- Bumped Cardano DB Sync version to `13.6.0.1`.
 - Make calculation of a DRep voting power on the backend [Issue 1960](https://github.com/IntersectMBO/govtool/issues/1960)
 
 ### Removed

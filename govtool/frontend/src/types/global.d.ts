@@ -22,7 +22,7 @@ declare global {
   };
 
   type ActionDetailsType = {
-    [key: string]: string | number;
+    [key: string]: JSONValue;
   };
 
   interface ActionVotedOnType extends ActionTypeToDsiplay {

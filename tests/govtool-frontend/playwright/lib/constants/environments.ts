@@ -5,6 +5,7 @@ const CARDANO_API_METADATA_HOST_URL =
   process.env.CARDANOAPI_METADATA_URL ||
   "https://metadata-govtool.cardanoapi.io";
 const SERVER_HOST_URL = process.env.HOST_URL || "http://localhost:8080";
+const NETWORK = process.env.NETWORK || "preview";
 
 const environments = {
   frontendUrl: SERVER_HOST_URL,
@@ -14,13 +15,20 @@ const environments = {
   networkId: parseInt(process.env.NETWORK_ID) || 0,
   faucet: {
     apiUrl:
-      process.env.FAUCET_API_URL ||
-      "https://faucet.sanchonet.world.dev.cardano.org",
+      process.env.FAUCET_API_URL.replace("sanchonet", NETWORK) ||
+      "https://faucet.sanchonet.world.dev.cardano.org".replace(
+        "sanchonet",
+        NETWORK
+      ),
     apiKey: process.env.FAUCET_API_KEY || "",
-    address: process.env.FAUCET_ADDRESS || "addr_test1vz0ua2vyk7r4vufmpqh5v44awg8xff26hxlwyrt3uc67maqtql3kl",
+    address:
+      process.env.FAUCET_ADDRESS ||
+      "addr_test1vz0ua2vyk7r4vufmpqh5v44awg8xff26hxlwyrt3uc67maqtql3kl",
   },
   kuber: {
-    apiUrl: process.env.KUBER_API_URL || "https://kuber-govtool.cardanoapi.io",
+    apiUrl:
+      process.env.KUBER_API_URL.replace("sanchonet", NETWORK) ||
+      "https://sanchonet.kuber.cardanoapi.io".replace("sanchonet", NETWORK),
     apiKey: process.env.KUBER_API_KEY || "",
   },
   txTimeOut: parseInt(process.env.TX_TIMEOUT) || 240000,

@@ -14,6 +14,7 @@ on:
           - "sanchogov.tools"
           - "staging.govtool.byron.network"
           - "govtool.cardanoapi.io"
+          - "preview.gov.tools"
 
   workflow_run:
     workflows: ["Build and deploy GovTool to TEST server"]
@@ -79,6 +80,8 @@ jobs:
       KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}
       TEST_WORKERS: ${{vars.TEST_WORKERS}}
       CI: ${{vars.CI}}
+      NETWORK: ${{vars.NETWORK}}
+      FAUCET_ADDRESS: ${{vars.FAUCET_ADDRESS}}
       CARDANOAPI_METADATA_URL: ${{vars.CARDANOAPI_METADATA_URL}}
 
   publish-report:

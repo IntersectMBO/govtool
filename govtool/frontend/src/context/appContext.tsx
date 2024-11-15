@@ -23,6 +23,7 @@ type AppContextType = {
   isAppInitializing: boolean;
   isMainnet: boolean;
   isInBootstrapPhase: boolean;
+  isFullGovernance: boolean;
   networkName: string;
   network: string;
   cExplorerBaseUrl: string;
@@ -74,6 +75,7 @@ const AppContextProvider = ({ children }: PropsWithChildren) => {
       isMainnet: networkMetrics?.networkName === "mainnet",
       isInBootstrapPhase:
         epochParams?.protocol_major === BOOTSTRAPPING_PHASE_MAJOR,
+      isFullGovernance: Number(epochParams?.protocol_major) >= 10,
       networkName:
         NETWORK_NAMES[
           (networkMetrics?.networkName as keyof typeof NETWORK_NAMES) ||

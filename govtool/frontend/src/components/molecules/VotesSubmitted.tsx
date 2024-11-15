@@ -1,10 +1,12 @@
+import { useCallback } from "react";
 import { Box } from "@mui/material";
 
-import { IMAGES } from "@consts";
+import { IMAGES, SECURITY_RELEVANT_PARAMS_MAP } from "@consts";
 import { Typography, VotePill } from "@atoms";
 import { useTranslation } from "@hooks";
 import { correctVoteAdaFormat } from "@utils";
 import { SubmittedVotesData } from "@models";
+import { useFeatureFlag } from "@/context";
 
 type Props = {
   votes: SubmittedVotesData;
@@ -21,8 +23,24 @@ export const VotesSubmitted = ({
     ccYesVotes,
     ccAbstainVotes,
     ccNoVotes,
+    type,
+    protocolParams,
   },
 }: Props) => {
+  const isSecurityGroup = useCallback(
+    () =>
+      Object.values(SECURITY_RELEVANT_PARAMS_MAP).some(
+        (paramKey) =>
+          protocolParams?.[paramKey as keyof typeof protocolParams] !== null,
+      ),
+    [protocolParams],
+  );
+
+  const {
+    areDRepVoteTotalsDisplayed,
+    areSPOVoteTotalsDisplayed,
+    areCCVoteTotalsDisplayed,
+  } = useFeatureFlag();
   const { t } = useTranslation();
 
   return (
@@ -65,24 +83,30 @@ export const VotesSubmitted = ({
           gap: 4.5,
         }}
       >
-        <VotesGroup
-          type="dReps"
-          yesVotes={dRepYesVotes}
-          noVotes={dRepNoVotes}
-          abstainVotes={dRepAbstainVotes}
-        />
-        <VotesGroup
-          type="sPos"
-          yesVotes={poolYesVotes}
-          noVotes={poolNoVotes}
-          abstainVotes={poolAbstainVotes}
-        />
-        <VotesGroup
-          type="ccCommittee"
-          yesVotes={ccYesVotes}
-          noVotes={ccNoVotes}
-          abstainVotes={ccAbstainVotes}
-        />
+        {areDRepVoteTotalsDisplayed(type, isSecurityGroup()) && (
+          <VotesGroup
+            type="dReps"
+            yesVotes={dRepYesVotes}
+            noVotes={dRepNoVotes}
+            abstainVotes={dRepAbstainVotes}
+          />
+        )}
+        {areSPOVoteTotalsDisplayed(type, isSecurityGroup()) && (
+          <VotesGroup
+            type="sPos"
+            yesVotes={poolYesVotes}
+            noVotes={poolNoVotes}
+            abstainVotes={poolAbstainVotes}
+          />
+        )}
+        {areCCVoteTotalsDisplayed(type) && (
+          <VotesGroup
+            type="ccCommittee"
+            yesVotes={ccYesVotes}
+            noVotes={ccNoVotes}
+            abstainVotes={ccAbstainVotes}
+          />
+        )}
       </Box>
     </Box>
   );
@@ -111,6 +135,7 @@ const VotesGroup = ({
         flexDirection: "column",
         gap: "12px",
       }}
+      data-testid={`submitted-votes-${type}`}
     >
       <Typography
         sx={{

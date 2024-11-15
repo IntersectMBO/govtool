@@ -157,6 +157,8 @@ export type SubmittedVotesData = {
   poolYesVotes: number;
   poolNoVotes: number;
   poolAbstainVotes: number;
+  type: GovernanceActionType;
+  protocolParams: EpochParams | null;
 };
 
 export type ProposalDataDTO = {

@@ -187,6 +187,8 @@ services:
     image: <REPO_URL>/metadata-validation:${METADATA_VALIDATION_TAG}
     environment:
       - PORT=3000
+      - IPFS_GATEWAY=${IPFS_GATEWAY}
+      - IPFS_PROJECT_ID=${IPFS_PROJECT_ID}
     logging: *logging
     restart: always
     healthcheck:

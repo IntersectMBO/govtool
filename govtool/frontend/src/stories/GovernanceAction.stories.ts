@@ -51,11 +51,11 @@ const commonArgs = {
   prevGovActionTxHash: null,
 };
 
-const cip129GovActionId = encodeCIP129Identifier(
-  commonArgs.txHash,
-  commonArgs.index.toString(16).padStart(2, "0"),
-  "gov_action",
-);
+const cip129GovActionId = encodeCIP129Identifier({
+  txID: commonArgs.txHash,
+  index: commonArgs.index.toString(16).padStart(2, "0"),
+  bech32Prefix: "gov_action",
+});
 
 export const GovernanceActionCardComponent: Story = {
   args: commonArgs,

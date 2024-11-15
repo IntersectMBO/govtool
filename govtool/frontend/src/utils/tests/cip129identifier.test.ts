@@ -10,7 +10,7 @@ const bech32Prefix = "gov_action";
 describe("CIP-129 Governance Identifier", () => {
   describe("encodeCIP129Identifier", () => {
     it("should encode a CIP129 identifier correctly", () => {
-      const result = encodeCIP129Identifier(txID, index, bech32Prefix);
+      const result = encodeCIP129Identifier({ txID, index, bech32Prefix });
       expect(result).toBe(
         "gov_action1pef00xwlwzemwnjh60ru386agjmdalanhze6wx9tlxa5r5e782fqqt7spu6",
       );
@@ -20,7 +20,7 @@ describe("CIP-129 Governance Identifier", () => {
   describe("decodeCIP129Identifier", () => {
     it("should decode a CIP129 identifier correctly", () => {
       const result = decodeCIP129Identifier(
-        encodeCIP129Identifier(txID, index, bech32Prefix),
+        encodeCIP129Identifier({ txID, index, bech32Prefix }),
       );
       expect(result).toEqual({
         txID,

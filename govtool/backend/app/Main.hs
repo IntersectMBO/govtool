@@ -82,7 +82,7 @@ startApp vvaConfig = do
       settings =
         setPort vvaPort
           $ setHost vvaHost
-          $ setTimeout 60 -- 60 seconds timeout
+          $ setTimeout 120 -- 120 seconds timeout
           $ setBeforeMainLoop
             ( Text.hPutStrLn stderr $
                 Text.pack
@@ -117,7 +117,7 @@ startApp vvaConfig = do
       , dRepListCache
       , networkMetricsCache
       }
-  connectionPool <- createPool (connectPostgreSQL (encodeUtf8 (dbSyncConnectionString $ getter vvaConfig))) close 1 1 60
+  connectionPool <- createPool (connectPostgreSQL (encodeUtf8 (dbSyncConnectionString $ getter vvaConfig))) close 10 10 120
   let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool }
   server' <- mkVVAServer appEnv
   runSettings settings server'

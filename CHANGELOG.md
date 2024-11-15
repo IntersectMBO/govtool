@@ -13,6 +13,9 @@ changes.
 ### Added
 
 - Handle displaying votes based on bootstrap phase, full governance and security groups [Issue 2316](https://github.com/IntersectMBO/govtool/issues/2316)
+- Add support for displaying Motion of No Confidence Governance Action [Issue 1597](https://github.com/IntersectMBO/govtool/issues/1597)
+- Add support for displaying Update committee/threshold Governance Action [Issue 1598](https://github.com/IntersectMBO/govtool/issues/1598)
+- Add support for displaying New Constitution and/or Guardrails Script Governance Action [Issue 1599](https://github.com/IntersectMBO/govtool/issues/1598)
 
 ### Fixed
 

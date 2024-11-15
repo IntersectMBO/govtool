@@ -67,11 +67,11 @@ const govActionId = getFullGovActionId(
   commonArgs.proposal.index,
 );
 
-const cip129GovActionId = encodeCIP129Identifier(
-  commonArgs.proposal.txHash,
-  commonArgs.proposal.index.toString(16).padStart(2, "0"),
-  "gov_action",
-);
+const cip129GovActionId = encodeCIP129Identifier({
+  txID: commonArgs.proposal.txHash,
+  index: commonArgs.proposal.index.toString(16).padStart(2, "0"),
+  bech32Prefix: "gov_action",
+});
 
 async function assertTooltip(tooltip: HTMLElement, expectedText: RegExp) {
   await userEvent.hover(tooltip);

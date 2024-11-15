@@ -72,7 +72,7 @@ import * as Sentry from "@sentry/react";
 import { Trans } from "react-i18next";
 
 import { PATHS, COMPILED_GUARDRAIL_SCRIPTS } from "@consts";
-import { CardanoApiWallet, Protocol, VoterInfo } from "@models";
+import { CardanoApiWallet, VoterInfo } from "@models";
 import type { StatusModalState } from "@organisms";
 import {
   checkIsMaintenanceOn,
@@ -483,26 +483,22 @@ const CardanoProvider = (props: Props) => {
 
   // Create transaction builder
   const initTransactionBuilder = useCallback(async () => {
-    const protocolParams = getItemFromLocalStorage(
-      PROTOCOL_PARAMS_KEY,
-    ) as Protocol;
-
-    if (protocolParams) {
+    if (epochParams) {
       const txBuilder = TransactionBuilder.new(
         TransactionBuilderConfigBuilder.new()
           .fee_algo(
             LinearFee.new(
-              BigNum.from_str(String(protocolParams.min_fee_a)),
-              BigNum.from_str(String(protocolParams.min_fee_b)),
+              BigNum.from_str(String(epochParams.min_fee_a)),
+              BigNum.from_str(String(epochParams.min_fee_b)),
             ),
           )
-          .pool_deposit(BigNum.from_str(String(protocolParams.pool_deposit)))
-          .key_deposit(BigNum.from_str(String(protocolParams.key_deposit)))
+          .pool_deposit(BigNum.from_str(String(epochParams.pool_deposit)))
+          .key_deposit(BigNum.from_str(String(epochParams.key_deposit)))
           .coins_per_utxo_byte(
-            BigNum.from_str(String(protocolParams.coins_per_utxo_size)),
+            BigNum.from_str(String(epochParams.coins_per_utxo_size)),
           )
-          .max_value_size(protocolParams.max_val_size)
-          .max_tx_size(protocolParams.max_tx_size)
+          .max_value_size(epochParams.max_val_size)
+          .max_tx_size(epochParams.max_tx_size)
           .prefer_pure_change(true)
           .ex_unit_prices(
             ExUnitPrices.new(
@@ -520,7 +516,7 @@ const CardanoProvider = (props: Props) => {
       );
       return txBuilder;
     }
-  }, []);
+  }, [epochParams]);
 
   const getTxUnspentOutputs = async (utxos: Utxos) => {
     const txOutputs = TransactionUnspentOutputs.new();
@@ -755,7 +751,7 @@ const CardanoProvider = (props: Props) => {
       console.error(e);
       throw e;
     }
-  }, [epochParams.key_deposit, stakeKey, t]);
+  }, [epochParams?.key_deposit, stakeKey, t]);
 
   const buildVoteDelegationCert = useCallback(
     async (target: string): Promise<Certificate> => {

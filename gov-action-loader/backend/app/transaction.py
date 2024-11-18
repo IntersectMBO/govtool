@@ -78,7 +78,7 @@ def generate_withdraw(number):
 
 
 def generate_update(number):
-    stake_addresses = [generate_raw_address() for _ in range(number)]
+    stake_addresses = ["e02fe0d8c1b1c600249e8b9663e18790425e9589ac17cb5ee952d54bee"]
     current_epoch = int((int(time.time()) - 1506635071) / (5 * 24 * 60 * 60))
     maximum_epoch = 10000
     epochs = [random.randint(current_epoch + 2, maximum_epoch) for _ in range(number)]

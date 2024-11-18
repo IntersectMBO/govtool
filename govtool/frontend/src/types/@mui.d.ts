@@ -19,6 +19,7 @@ declare module "@mui/material/styles" {
     arcticWhite: string;
     boxShadow1: string;
     boxShadow2: string;
+    darkPurple: string;
     errorRed: string;
     highlightBlue: string;
     inputRed: string;

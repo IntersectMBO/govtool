@@ -41,8 +41,7 @@ interface InfoProps {
 interface TreasuryProps {
   amount: string;
   hash: string;
-  receivingAddress: string;
-  url: string;
+  withdrawals: { receivingAddress: string; amount: string }[];
 }
 
 type ProtocolParamsUpdate = {
@@ -184,8 +183,7 @@ const { buildTreasuryGovernanceAction } = useCardano();
 const govActionBuilder = await buildTreasuryGovernanceAction({
   hash,
   url,
-  amount,
-  receivingAddress,
+  withdrawals: [{ amount, receivingAddress }],
 });
 
 // Protocol Parameter Change Governance Action

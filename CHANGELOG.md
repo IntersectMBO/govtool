@@ -12,6 +12,24 @@ changes.
 
 ### Added
 
+-
+
+### Fixed
+
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v1.0.27](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.27) 2024-11-18
+
+### Added
+
 - Handle displaying votes based on bootstrap phase, full governance and security groups [Issue 2316](https://github.com/IntersectMBO/govtool/issues/2316)
 - Add support for displaying Motion of No Confidence Governance Action [Issue 1597](https://github.com/IntersectMBO/govtool/issues/1597)
 - Add support for displaying Update committee/threshold Governance Action [Issue 1598](https://github.com/IntersectMBO/govtool/issues/1598)

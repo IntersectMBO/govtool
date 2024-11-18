@@ -39,8 +39,8 @@ def get_base_proposal():
 def get_base_proposal_for_multiple():
     base_proposal = get_base_proposal()
     base_proposal["anchor"] = {
-        "url": "http://bit.ly/3QFMhii",
-        "dataHash": "1111111111111111111111111111111111111111111111111111111111111112",
+        "url": "https://metadata-govtool.cardanoapi.io/data/gov-action-loader",
+        "dataHash": "bcb2fadedbe928519ff000051d8e78ffcabadba0f92b91334cee3e8786491462",
     }
     base_proposal["deposit"] = default_proposal_deposit_ada * 1000000
     return base_proposal
@@ -69,7 +69,7 @@ def generate_bytes(length):
 
 
 def generate_withdraw(number):
-    stake_addresses = [generate_raw_address() for _ in range(number)]
+    stake_addresses = ["e02fe0d8c1b1c600249e8b9663e18790425e9589ac17cb5ee952d54bee"]
     amounts = [
         random.choice([10000000, 20000000, 30000000, 40000000, 50000000])
         for _ in range(number)

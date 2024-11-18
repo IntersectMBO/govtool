@@ -1,5 +1,8 @@
 FROM node:lts-hydrogen
 
+ARG IPFS_GATEWAY
+ARG IPFS_PROJECT_ID
+
 WORKDIR /dist
 
 COPY package*.json ./

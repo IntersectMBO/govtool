@@ -16,6 +16,7 @@ changes.
 - Add support for displaying Motion of No Confidence Governance Action [Issue 1597](https://github.com/IntersectMBO/govtool/issues/1597)
 - Add support for displaying Update committee/threshold Governance Action [Issue 1598](https://github.com/IntersectMBO/govtool/issues/1598)
 - Add support for displaying New Constitution and/or Guardrails Script Governance Action [Issue 1599](https://github.com/IntersectMBO/govtool/issues/1598)
+- Add support for ipfs in metadata validation service [Issue 1616](https://github.com/IntersectMBO/govtool/issues/1616)
 
 ### Fixed
 

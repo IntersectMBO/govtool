@@ -115,10 +115,9 @@ type InfoProps = {
 };
 
 type TreasuryProps = {
-  amount: string;
   hash: string;
-  receivingAddress: string;
   url: string;
+  withdrawals: { receivingAddress: string; amount: string }[];
 };
 
 type ProtocolParamsUpdate = {
@@ -1011,23 +1010,40 @@ const CardanoProvider = (props: Props) => {
 
   // treasury action
   const buildTreasuryGovernanceAction = useCallback(
-    async ({ amount, hash, receivingAddress, url }: TreasuryProps) => {
+    async ({ hash, url, withdrawals }: TreasuryProps) => {
       const govActionBuilder = VotingProposalBuilder.new();
       try {
-        const treasuryTarget = RewardAddress.from_address(
-          Address.from_bech32(receivingAddress),
-        );
+        const mappedWithdrawals: {
+          treasuryTarget: RewardAddress;
+          amount: BigNum;
+        }[] = [];
 
-        if (!treasuryTarget) throw new Error("Can not get tresasury target");
+        withdrawals.forEach((withdrawal) => {
+          const treasuryTarget = RewardAddress.from_address(
+            Address.from_bech32(withdrawal.receivingAddress),
+          );
 
-        const myWithdrawal = BigNum.from_str(amount);
-        const withdrawals = TreasuryWithdrawals.new();
-        withdrawals.insert(treasuryTarget, myWithdrawal);
+          if (!treasuryTarget)
+            throw new Error(
+              `Can not get tresasury target for address: ${withdrawal.receivingAddress}`,
+            );
+
+          const amount = BigNum.from_str(withdrawal.amount);
+          mappedWithdrawals.push({ treasuryTarget, amount });
+        });
+
+        const treasuryWithdrawals = TreasuryWithdrawals.new();
+        mappedWithdrawals.forEach((withdrawal) => {
+          treasuryWithdrawals.insert(
+            withdrawal.treasuryTarget,
+            withdrawal.amount,
+          );
+        });
         const guardrailPlutusScript = PlutusScript.from_bytes_v3(
           Buffer.from(guardrailScript, "hex"),
         );
         const treasuryAction = TreasuryWithdrawalsAction.new_with_policy_hash(
-          withdrawals,
+          treasuryWithdrawals,
           guardrailPlutusScript.hash(),
         );
         isGuardrailScriptUsed.current = true;

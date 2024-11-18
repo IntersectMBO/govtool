@@ -145,8 +145,12 @@ export const useCreateGovernanceActionForm = (
 
             const treasuryActionDetails = {
               ...commonGovActionDetails,
-              amount: data.amount,
-              receivingAddress: data.receivingAddress,
+              withdrawals: [
+                {
+                  amount: data.amount,
+                  receivingAddress: data.receivingAddress,
+                },
+              ],
             };
 
             return await buildTreasuryGovernanceAction(treasuryActionDetails);

@@ -10,6 +10,7 @@ import {
   GovernanceActionsDatesBox,
   GovernanceActionDetailsDiffView,
   GovernanceActionNewCommitteeDetailsTabContent,
+  GovernanceActionCardTreasuryWithdrawalElement,
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
@@ -20,7 +21,6 @@ import {
   getFullGovActionId,
   mapArrayToObjectByKeys,
   encodeCIP129Identifier,
-  testIdFromLabel,
 } from "@utils";
 import {
   MetadataValidationStatus,
@@ -297,16 +297,14 @@ export const GovernanceActionDetailsCardData = ({
           ))}
         </>
       )}
-
       {details &&
         type === GovernanceActionType.TreasuryWithdrawals &&
-        Object.keys(details).length !== 0 &&
-        Object.entries(details).map(([detailLabel, content]) => (
-          <GovernanceActionCardElement
-            isCopyButton={detailLabel.toLowerCase().includes("address")}
-            label={detailLabel}
-            text={content as string}
-            dataTestId={testIdFromLabel(detailLabel)}
+        Array.isArray(details) &&
+        details.map((withdrawal) => (
+          <GovernanceActionCardTreasuryWithdrawalElement
+            key={withdrawal.receivingAddress}
+            receivingAddress={withdrawal.receivingAddress}
+            amount={withdrawal.amount}
           />
         ))}
       {details?.anchor && type === GovernanceActionType.NewConstitution && (

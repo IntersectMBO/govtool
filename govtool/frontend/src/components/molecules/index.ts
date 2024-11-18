@@ -23,6 +23,7 @@ export * from "./GovernanceActionCardElement";
 export * from "./GovernanceActionCardHeader";
 export * from "./GovernanceActionCardMyVote";
 export * from "./GovernanceActionCardStatePill";
+export * from "./GovernanceActionCardTreasuryWithdrawalElement";
 export * from "./GovernanceActionDetailsCardLinks";
 export * from "./GovernanceActionDetailsCardOnChainData";
 export * from "./GovernanceActionDetailsCardVotes";

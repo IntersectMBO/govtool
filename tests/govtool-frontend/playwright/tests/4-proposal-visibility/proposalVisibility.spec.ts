@@ -1,5 +1,6 @@
+import { correctVoteAdaFormat } from "@helpers/adaFormat";
 import { setAllureEpic } from "@helpers/allure";
-import { lovelaceToAda, skipIfNotHardFork } from "@helpers/cardano";
+import { skipIfNotHardFork } from "@helpers/cardano";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect, test } from "@playwright/test";
 import { GrovernanceActionType, IProposal } from "@types";
@@ -57,24 +58,24 @@ test("4K. Should display correct vote counts on governance details page for disc
 
   // check dRep votes
   await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
-    `₳ ${lovelaceToAda(proposalToCheck.dRepYesVotes)}`
+    `₳ ${correctVoteAdaFormat(proposalToCheck.dRepYesVotes)}`
   );
   await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
-    `₳ ${lovelaceToAda(proposalToCheck.dRepAbstainVotes)}`
+    `₳ ${correctVoteAdaFormat(proposalToCheck.dRepAbstainVotes)}`
   );
   await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
-    `₳ ${lovelaceToAda(proposalToCheck.dRepNoVotes)}`
+    `₳ ${correctVoteAdaFormat(proposalToCheck.dRepNoVotes)}`
   );
 
   // check sPos votes
   await expect(govActionDetailsPage.sPosYesVotes).toHaveText(
-    `₳ ${lovelaceToAda(proposalToCheck.poolYesVotes)}`
+    `₳ ${correctVoteAdaFormat(proposalToCheck.poolYesVotes)}`
   );
   await expect(govActionDetailsPage.sPosAbstainVotes).toHaveText(
-    `₳ ${lovelaceToAda(proposalToCheck.poolAbstainVotes)}`
+    `₳ ${correctVoteAdaFormat(proposalToCheck.poolAbstainVotes)}`
   );
   await expect(govActionDetailsPage.sPosNoVotes).toHaveText(
-    `₳ ${lovelaceToAda(proposalToCheck.poolNoVotes)}`
+    `₳ ${correctVoteAdaFormat(proposalToCheck.poolNoVotes)}`
   );
 
   // check ccCommittee votes

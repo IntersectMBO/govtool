@@ -8,6 +8,8 @@ services:
     container_name: metadata-validation
     environment:
       - PORT=${PORT}
+      - IPFS_GATEWAY=${IPFS_GATEWAY}
+      - IPFS_PROJECT_ID=${IPFS_PROJECT_ID}
     ports:
       - ${PORT}:${PORT}
     volumes:

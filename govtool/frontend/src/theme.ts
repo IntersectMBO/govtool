@@ -137,6 +137,7 @@ export const theme = createTheme({
     arcticWhite: "#FBFBFF",
     boxShadow1: "rgba(0, 18, 61, 0.37)",
     boxShadow2: "rgba(47, 98, 220, 0.2)",
+    darkPurple: "rgba(36, 34, 50, 1)",
     errorRed: "#9E2323",
     fadedPurple: "#716E88",
     highlightBlue: "#C2EFF299",

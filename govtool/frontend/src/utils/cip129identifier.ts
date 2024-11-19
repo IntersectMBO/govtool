@@ -8,12 +8,16 @@ import { Buffer } from "buffer";
  * @param bech32Prefix - The bech32 prefix.
  * @returns The generated CIP129 identifier.
  */
-export const encodeCIP129Identifier = (
-  txID: string,
-  index: string,
-  bech32Prefix: string,
-) => {
-  const govActionBytes = Buffer.from(txID + index, "hex");
+export const encodeCIP129Identifier = ({
+  txID,
+  index,
+  bech32Prefix,
+}: {
+  txID: string;
+  index?: string;
+  bech32Prefix: string;
+}) => {
+  const govActionBytes = Buffer.from(index ? txID + index : txID, "hex");
   const words = bech32.toWords(govActionBytes);
   return bech32.encode(bech32Prefix, words);
 };

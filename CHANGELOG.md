@@ -26,6 +26,32 @@ changes.
 
 -
 
+## [v1.0.27](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.27) 2024-11-18
+
+### Added
+
+- Handle displaying votes based on bootstrap phase, full governance and security groups [Issue 2316](https://github.com/IntersectMBO/govtool/issues/2316)
+- Add support for displaying Motion of No Confidence Governance Action [Issue 1597](https://github.com/IntersectMBO/govtool/issues/1597)
+- Add support for displaying Update committee/threshold Governance Action [Issue 1598](https://github.com/IntersectMBO/govtool/issues/1598)
+- Add support for displaying New Constitution and/or Guardrails Script Governance Action [Issue 1599](https://github.com/IntersectMBO/govtool/issues/1598)
+- Add support for ipfs in metadata validation service [Issue 1616](https://github.com/IntersectMBO/govtool/issues/1616)
+- Add support for displaying array of treasury withdrawals [Issue 1602](https://github.com/IntersectMBO/govtool/issues/1602)
+
+### Fixed
+
+- Fix submitting treasury governance action [Issue 1845](https://github.com/IntersectMBO/govtool/issues/1845)
+- Fix failing github action workflow [Issue 2277](https://github.com/IntersectMBO/govtool/issues/2277)
+
+### Changed
+
+- Bumped Cardano node version to `10.1.2`.
+- Bumped Cardano DB Sync version to `13.6.0.1`.
+- Make calculation of a DRep voting power on the backend [Issue 1960](https://github.com/IntersectMBO/govtool/issues/1960)
+
+### Removed
+
+-
+
 ## [v1.0.26](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.26) 2024-11-07
 
 ### Added

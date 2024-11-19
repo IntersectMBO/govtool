@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Box } from "@mui/material";
 
 import { Typography } from "@atoms";
@@ -65,7 +66,7 @@ export const GovernanceActionDetailsCardOnChainData = ({
               ml: 0.5,
             }}
           >
-            {content}
+            {content as ReactNode}
           </Typography>
         </Box>
       ))}

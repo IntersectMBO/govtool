@@ -5,9 +5,11 @@ import { useScreenDimension } from "@hooks";
 import {
   GovernanceActionCardStatePill,
   GovernanceActionDetailsCardVotes,
+  Share,
 } from "@molecules";
 import { GovernanceActionDetailsCardData } from "@organisms";
 import { MetadataValidationStatus, ProposalData, ProposalVote } from "@models";
+import { useLocation } from "react-router-dom";
 
 type GovernanceActionDetailsCardProps = {
   isDashboard?: boolean;
@@ -29,7 +31,14 @@ export const GovernanceActionDetailsCard = ({
   const [isVoteSubmitted, setIsVoteSubmitted] = useState<boolean>(false);
   const { screenWidth, isMobile } = useScreenDimension();
 
-  const isOneColumn = (isDashboard && screenWidth < 1036) ?? isMobile;
+  const isOneColumn = (isDashboard && screenWidth < 1645) ?? isMobile;
+  const { pathname, hash } = useLocation();
+
+  const govActionLinkToShare = `${window.location.protocol}//${
+    window.location.hostname
+  }${window.location.port ? `:${window.location.port}` : ""}${pathname}${
+    hash ?? ""
+  }`;
 
   return (
     <Box
@@ -73,6 +82,9 @@ export const GovernanceActionDetailsCard = ({
         isInProgress={isInProgress}
         proposal={proposal}
       />
+      <Box position="absolute" right={40} top={40}>
+        <Share link={govActionLinkToShare} />
+      </Box>
     </Box>
   );
 };

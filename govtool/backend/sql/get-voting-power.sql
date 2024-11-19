@@ -1,7 +1,6 @@
-select coalesce(drep_distr.amount, 0) as amount
-from drep_hash
-left join drep_distr
-on drep_hash.id = drep_distr.hash_id
-where drep_hash.raw = decode(?,'hex')
-order by epoch_no desc
-limit 1
+select sum(uv.value) as amount
+from utxo_view uv
+join delegation_vote dv on uv.stake_address_id = dv.addr_id
+join drep_hash dh on dv.drep_hash_id = dh.id
+where dh.raw = decode(?,'hex')
+and dv.cert_index != 0

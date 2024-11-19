@@ -2,7 +2,7 @@
   description = "GovTool and utilities monorepo.";
   inputs = {
     default_nixpkgs.url = "github:nixos/nixpkgs/c9ece0059f42e0ab53ac870104ca4049df41b133";
-    node_nixpkgs.url = "github:nixos/nixpkgs/9957cd48326fe8dbd52fdc50dd2502307f188b0d";
+    node_nixpkgs.url = "github:nixos/nixpkgs/23aa9e2f958310c69a94d21f6523240841a02d58";
     flake-utils.url = "github:numtide/flake-utils";
     nix-inclusive.url = "github:input-output-hk/nix-inclusive";
   };

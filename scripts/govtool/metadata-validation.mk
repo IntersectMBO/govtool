@@ -13,6 +13,8 @@ metadata_validation_image_tag := $(shell git log -n 1 --format="%H" -- $(root_di
 build-metadata-validation: docker-login
 	$(call check_image_on_ecr,metadata-validation,$(metadata_validation_image_tag)) || \
 	$(docker) build --tag "$(repo_url)/metadata-validation:$(metadata_validation_image_tag)" \
+		--build-arg IPFS_GATEWAY="$${IPFS_GATEWAY}" \
+		--build-arg IPFS_PROJECT_ID="$${IPFS_PROJECT_ID}" \
 		$(root_dir)/govtool/metadata-validation
 
 .PHONY: push-metadata-validation

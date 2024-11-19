@@ -31,6 +31,74 @@ always_abstain_voting_power AS (
         LEFT JOIN drep_distr ON drep_hash.id = drep_distr.hash_id
     WHERE
         drep_hash.view = 'drep_always_abstain' ORDER BY epoch_no DESC LIMIT 1), 0) AS amount
+),
+committee_data AS (
+    SELECT DISTINCT ON (ch.raw)
+        encode(ch.raw, 'hex') AS hash,
+        cm.expiration_epoch,
+        ch.has_script
+    FROM
+        committee_member cm
+    JOIN 
+        committee_hash ch ON cm.committee_hash_id = ch.id
+    ORDER BY ch.raw, cm.expiration_epoch DESC
+),
+parsed_description AS (
+    SELECT
+        gov_action_proposal.id,
+        description->'tag' AS tag,
+        description->'contents'->1 AS members_to_be_removed,
+        description->'contents'->2 AS members,
+        description->'contents'->3 AS threshold
+    FROM
+        gov_action_proposal
+    WHERE
+        gov_action_proposal.type = 'NewCommittee'
+),
+members_to_be_removed AS (
+    SELECT
+        id,
+        json_agg(value->>'keyHash') AS members_to_be_removed
+    FROM
+        parsed_description,
+        json_array_elements(members_to_be_removed::json) AS value
+    GROUP BY
+        id
+),
+processed_current_members AS (
+    SELECT
+        pd.id,
+        json_agg(
+            json_build_object(
+                'hash', regexp_replace(kv.key, '^keyHash-', ''),
+                'newExpirationEpoch', kv.value::int
+            )
+        ) AS current_members
+    FROM
+        parsed_description pd,
+        jsonb_each_text(pd.members) AS kv(key, value)
+    GROUP BY
+        pd.id
+),
+enriched_current_members AS (
+    SELECT
+        pcm.id,
+        json_agg(
+            json_build_object(
+                'hash', cm.hash,
+                'expirationEpoch', cm.expiration_epoch,
+                'hasScript', cm.has_script,
+                'newExpirationEpoch', (member->>'newExpirationEpoch')::int
+            )
+        ) AS enriched_members
+    FROM
+        processed_current_members pcm
+    LEFT JOIN
+        json_array_elements(pcm.current_members) AS member ON true
+    LEFT JOIN
+        committee_data cm ON cm.hash = encode(decode(member->>'hash', 'hex'), 'hex')
+    GROUP BY
+        pcm.id
 )
 SELECT
     gov_action_proposal.id,
@@ -39,15 +107,54 @@ SELECT
     gov_action_proposal.type::text,
     (
         case when gov_action_proposal.type = 'TreasuryWithdrawals' then
-            json_build_object('Reward Address', stake_address.view, 'Amount', treasury_withdrawal.amount)
-
+            (
+                select json_agg(
+                    jsonb_build_object(
+                        'receivingAddress', stake_address.view,
+                        'amount', treasury_withdrawal.amount
+                    )
+                )
+                from treasury_withdrawal
+                left join stake_address
+                    on stake_address.id = treasury_withdrawal.stake_address_id
+                where treasury_withdrawal.gov_action_proposal_id = gov_action_proposal.id
+            )
             when gov_action_proposal.type::text = 'InfoAction' then
-            json_build_object()
+            json_build_object('data', gov_action_proposal.description)
 
             when gov_action_proposal.type::text = 'HardForkInitiation' then
             json_build_object(
                 'major', (gov_action_proposal.description->'contents'->1->>'major')::int, 
                 'minor', (gov_action_proposal.description->'contents'->1->>'minor')::int
+            )
+
+            when gov_action_proposal.type::text = 'NoConfidence' then
+            json_build_object('data', gov_action_proposal.description->'contents')
+    
+            when gov_action_proposal.type::text = 'ParameterChange' then
+            json_build_object('data', gov_action_proposal.description->'contents')
+
+            when gov_action_proposal.type::text = 'NewConstitution' then
+            json_build_object(
+                'anchor', gov_action_proposal.description->'contents'->1->'anchor'
+            )
+            when gov_action_proposal.type::text = 'NewCommittee' then
+            (
+                SELECT
+                    json_build_object(
+                        'tag', pd.tag,
+                        'members', em.enriched_members,
+                        'membersToBeRemoved', mtr.members_to_be_removed,
+                        'threshold', pd.threshold::float
+                    )
+                FROM
+                    parsed_description pd
+                JOIN
+                    members_to_be_removed mtr ON pd.id = mtr.id
+                JOIN
+                    enriched_current_members em ON pd.id = em.id
+                WHERE
+                    pd.id = gov_action_proposal.id
             )
         else
             null
@@ -164,8 +271,6 @@ AND gov_action_proposal.expired_epoch IS NULL
 AND gov_action_proposal.dropped_epoch IS NULL
 GROUP BY
     (gov_action_proposal.id,
-        stake_address.view,
-        treasury_withdrawal.amount,
         creator_block.epoch_no,
         off_chain_vote_gov_action_data.title,
         off_chain_vote_gov_action_data.abstract,

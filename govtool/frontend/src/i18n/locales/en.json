@@ -343,6 +343,7 @@
   "govActions": {
     "about": "About",
     "abstract": "Abstract",
+    "amount": "Amount:",
     "backToGovActions": "Back to Governance Actions",
     "castVote": "<0>You voted {{vote}} on this proposal</0>\non {{date}} (Epoch {{epoch}})",
     "castVoteDeadline": "You can change your vote up to {{date}} (Epoch {{epoch}})",
@@ -364,10 +365,16 @@
     "cip129GovernanceActionId": "(CIP-129) Governance Action ID:",
     "governanceActionType": "Governance Action Type:",
     "goToVote": "Go to Vote",
+    "membersToBeRemovedFromTheCommittee": "Members to be removed from the Committee",
+    "membersToBeAddedToTheCommittee": "Members to be added to the Committee",
+    "changeToTermsOfExistingMembers": "Change to terms of existing members",
+    "changeToTermsEpochs": "To {{epochTo}} epoch {{epochFrom}} epoch",
+    "newThresholdValue": "New threshold value",
     "protocolParamsDetails": {
       "existing": "Existing",
       "proposed": "Proposed"
     },
+    "receivingAddress": "Receiving Address:",
     "hardforkDetails": {
       "currentVersion": "Current version",
       "proposedVersion": "Proposed version",
@@ -388,6 +395,7 @@
     "submissionDate": "Submission date:",
     "submittedDateWithEpoch": "Submitted: <0>{{date}}</0> <1>(Epoch {{epoch}})</1>",
     "supportingLinks": "Supporting links",
+    "threshold": "THRESHOLD",
     "title": "Governance Actions",
     "toVote": "To vote",
     "viewDetails": "View Details",

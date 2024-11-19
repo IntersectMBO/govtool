@@ -123,9 +123,6 @@ export const DRepDetailsCardHeader = ({
       <DataMissingHeader
         title={givenName ?? undefined}
         isDataMissing={metadataStatus}
-        shareLink={
-          !isMe || screenWidth < 1020 ? window.location.href : undefined
-        }
         titleStyle={{ wordBreak: "break-word", whiteSpace: "wrap" }}
       />
     </div>

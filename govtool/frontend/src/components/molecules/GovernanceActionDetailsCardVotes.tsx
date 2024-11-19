@@ -1,10 +1,11 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useCallback } from "react";
 import { Box } from "@mui/material";
 
 import { useScreenDimension } from "@hooks";
 import { VoteActionForm, VotesSubmitted } from "@molecules";
 import { useFeatureFlag } from "@/context";
 import { ProposalData, ProposalVote } from "@/models";
+import { SECURITY_RELEVANT_PARAMS_MAP } from "@/consts";
 
 type GovernanceActionCardVotesProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
@@ -25,9 +26,18 @@ export const GovernanceActionDetailsCardVotes = ({
   isInProgress,
   proposal,
 }: GovernanceActionCardVotesProps) => {
-  const { isVotingOnGovernanceActionEnabled } = useFeatureFlag();
+  const { areDRepVoteTotalsDisplayed } = useFeatureFlag();
   const { screenWidth } = useScreenDimension();
-
+  const isSecurityGroup = useCallback(
+    () =>
+      Object.values(SECURITY_RELEVANT_PARAMS_MAP).some(
+        (paramKey) =>
+          proposal.protocolParams?.[
+            paramKey as keyof typeof proposal.protocolParams
+          ] !== null,
+      ),
+    [proposal.protocolParams],
+  );
   const isModifiedPadding =
     (isDashboard && screenWidth < 1368) ?? screenWidth < 1100;
 
@@ -39,7 +49,8 @@ export const GovernanceActionDetailsCardVotes = ({
         p: `40px ${isModifiedPadding ? "24px" : "80px"}`,
       }}
     >
-      {isVoter && isVotingOnGovernanceActionEnabled(proposal.type) ? (
+      {isVoter &&
+      areDRepVoteTotalsDisplayed(proposal.type, isSecurityGroup()) ? (
         <VoteActionForm
           setIsVoteSubmitted={setIsVoteSubmitted}
           proposal={proposal}

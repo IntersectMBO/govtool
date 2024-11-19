@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import {
@@ -51,6 +52,18 @@ import {
   ProtocolVersion,
   HardForkInitiationAction,
   ScriptHash,
+  PlutusScripts,
+  Redeemers,
+  Redeemer,
+  RedeemerTag,
+  PlutusData,
+  PlutusMap,
+  PlutusWitness,
+  PlutusScriptSource,
+  Int,
+  CostModel,
+  Language,
+  TxInputsBuilder,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 import { Buffer } from "buffer";
 import { useNavigate } from "react-router-dom";
@@ -58,8 +71,8 @@ import { Link } from "@mui/material";
 import * as Sentry from "@sentry/react";
 import { Trans } from "react-i18next";
 
-import { PATHS, GUARDRAIL_SCRIPT } from "@consts";
-import { CardanoApiWallet, Protocol, VoterInfo } from "@models";
+import { PATHS, COMPILED_GUARDRAIL_SCRIPTS } from "@consts";
+import { CardanoApiWallet, VoterInfo } from "@models";
 import type { StatusModalState } from "@organisms";
 import {
   checkIsMaintenanceOn,
@@ -102,10 +115,9 @@ type InfoProps = {
 };
 
 type TreasuryProps = {
-  amount: string;
   hash: string;
-  receivingAddress: string;
   url: string;
+  withdrawals: { receivingAddress: string; amount: string }[];
 };
 
 type ProtocolParamsUpdate = {
@@ -238,7 +250,15 @@ const CardanoContext = createContext<CardanoContextType>(
 CardanoContext.displayName = "CardanoContext";
 
 const CardanoProvider = (props: Props) => {
+  const { network: networkKey } = useAppContext();
+  const guardrailScript =
+    COMPILED_GUARDRAIL_SCRIPTS[
+      networkKey as keyof typeof COMPILED_GUARDRAIL_SCRIPTS
+    ];
+
   const [isEnabled, setIsEnabled] = useState(false);
+  const isGuardrailScriptUsed = useRef(false);
+  const redeemers = useRef<Redeemer[]>([]);
   const [isEnableLoading, setIsEnableLoading] = useState<string | null>(null);
   const [walletApi, setWalletApi] = useState<CardanoApiWallet | undefined>(
     undefined,
@@ -265,7 +285,7 @@ const CardanoProvider = (props: Props) => {
   const { isPendingTransaction, updateTransaction, pendingTransaction } =
     usePendingTransaction({ isEnabled, stakeKey });
 
-  const getChangeAddress = async (enabledApi: CardanoApiWallet) => {
+  const getChangeAddress = useCallback(async (enabledApi: CardanoApiWallet) => {
     try {
       const raw = await enabledApi.getChangeAddress();
       const changeAddress = Address.from_bytes(
@@ -278,7 +298,7 @@ const CardanoProvider = (props: Props) => {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, []);
 
   const getUsedAddresses = async (enabledApi: CardanoApiWallet) => {
     try {
@@ -442,7 +462,7 @@ const CardanoProvider = (props: Props) => {
       // eslint-disable-next-line no-throw-literal
       throw { status: "ERROR", error: t("errors.somethingWentWrong") };
     },
-    [isEnabled, stakeKeys],
+    [getChangeAddress, isEnabled, t],
   );
 
   const disconnectWallet = useCallback(async () => {
@@ -462,32 +482,40 @@ const CardanoProvider = (props: Props) => {
 
   // Create transaction builder
   const initTransactionBuilder = useCallback(async () => {
-    const protocolParams = getItemFromLocalStorage(
-      PROTOCOL_PARAMS_KEY,
-    ) as Protocol;
-
-    if (protocolParams) {
+    if (epochParams) {
       const txBuilder = TransactionBuilder.new(
         TransactionBuilderConfigBuilder.new()
           .fee_algo(
             LinearFee.new(
-              BigNum.from_str(String(protocolParams.min_fee_a)),
-              BigNum.from_str(String(protocolParams.min_fee_b)),
+              BigNum.from_str(String(epochParams.min_fee_a)),
+              BigNum.from_str(String(epochParams.min_fee_b)),
             ),
           )
-          .pool_deposit(BigNum.from_str(String(protocolParams.pool_deposit)))
-          .key_deposit(BigNum.from_str(String(protocolParams.key_deposit)))
+          .pool_deposit(BigNum.from_str(String(epochParams.pool_deposit)))
+          .key_deposit(BigNum.from_str(String(epochParams.key_deposit)))
           .coins_per_utxo_byte(
-            BigNum.from_str(String(protocolParams.coins_per_utxo_size)),
+            BigNum.from_str(String(epochParams.coins_per_utxo_size)),
           )
-          .max_value_size(protocolParams.max_val_size)
-          .max_tx_size(protocolParams.max_tx_size)
+          .max_value_size(epochParams.max_val_size)
+          .max_tx_size(epochParams.max_tx_size)
           .prefer_pure_change(true)
+          .ex_unit_prices(
+            ExUnitPrices.new(
+              UnitInterval.new(
+                BigNum.from_str("577"),
+                BigNum.from_str("10000"),
+              ),
+              UnitInterval.new(
+                BigNum.from_str("721"),
+                BigNum.from_str("10000000"),
+              ),
+            ),
+          )
           .build(),
       );
       return txBuilder;
     }
-  }, []);
+  }, [epochParams]);
 
   const getTxUnspentOutputs = async (utxos: Utxos) => {
     const txOutputs = TransactionUnspentOutputs.new();
@@ -513,6 +541,7 @@ const CardanoProvider = (props: Props) => {
 
       try {
         const txBuilder = await initTransactionBuilder();
+        const transactionWitnessSet = TransactionWitnessSet.new();
 
         if (!txBuilder) {
           throw new Error(t("errors.appCannotCreateTransaction"));
@@ -536,6 +565,48 @@ const CardanoProvider = (props: Props) => {
           txBuilder.set_voting_proposal_builder(govActionBuilder);
         }
 
+        if (isGuardrailScriptUsed.current) {
+          try {
+            const scripts = PlutusScripts.new();
+            scripts.add(
+              PlutusScript.from_bytes_v3(Buffer.from(guardrailScript, "hex")),
+            );
+            transactionWitnessSet.set_plutus_scripts(scripts);
+
+            const newRedeemers = Redeemers.new();
+            redeemers.current.forEach((redeemer) => {
+              newRedeemers.add(redeemer);
+            });
+            transactionWitnessSet.set_redeemers(newRedeemers);
+
+            const costModels = Costmdls.new();
+
+            const addCostModels = (
+              language: "v1" | "v2" | "v3",
+              model: "PlutusV1" | "PlutusV2" | "PlutusV3",
+            ) => {
+              const costModel = CostModel.new();
+              (
+                epochParams?.cost_model?.costs?.[model] as number[] | undefined
+              )?.forEach((val, index) =>
+                costModel.set(index, Int.new_i32(val)),
+              );
+              costModels.insert(
+                Language[`new_plutus_${language}`](),
+                costModel,
+              );
+            };
+
+            addCostModels("v1", "PlutusV1");
+            addCostModels("v2", "PlutusV2");
+            addCostModels("v3", "PlutusV3");
+
+            txBuilder.calc_script_data_hash(costModels);
+          } catch (e) {
+            console.error(e);
+          }
+        }
+
         if (
           !walletState.changeAddress ||
           !walletState.usedAddress ||
@@ -553,6 +624,32 @@ const CardanoProvider = (props: Props) => {
         }
         // Find the available UTXOs in the wallet and use them as Inputs for the transaction
         const txUnspentOutputs = await getTxUnspentOutputs(utxos);
+
+        if (isGuardrailScriptUsed.current) {
+          const txInputsBuilder = TxInputsBuilder.new();
+          const probableCollaterals = utxos
+            .filter((utxo) => !utxo.multiAssetStr)
+            .map((utxo) => ({
+              ...utxo,
+              amount: BigInt(utxo.amount),
+            }))
+            .sort((a, b) => (a.amount > b.amount ? -1 : 1));
+
+          if (probableCollaterals.length) {
+            const unspentOutput =
+              probableCollaterals[0].TransactionUnspentOutput;
+            const output = unspentOutput.output();
+            txInputsBuilder.add_regular_input(
+              output.address(),
+              unspentOutput.input(),
+              output.amount(),
+            );
+            txBuilder.set_collateral(txInputsBuilder);
+          } else {
+            throw new Error(t("errors.setCollateral"));
+          }
+        }
+
         const changeConfig = ChangeConfig.new(shelleyChangeAddress);
         // Use UTxO selection strategy 3
         try {
@@ -575,11 +672,7 @@ const CardanoProvider = (props: Props) => {
         const txBody = txBuilder.build();
 
         // Make a full transaction, passing in empty witness set
-        const transactionWitnessSet = TransactionWitnessSet.new();
-        const tx = Transaction.new(
-          txBody,
-          TransactionWitnessSet.from_bytes(transactionWitnessSet.to_bytes()),
-        );
+        const tx = Transaction.new(txBody, transactionWitnessSet);
         // Ask wallet to to provide signature (witnesses) for the transaction
         let txVkeyWitnesses;
 
@@ -587,7 +680,7 @@ const CardanoProvider = (props: Props) => {
 
         // Create witness set object using the witnesses provided by the wallet
         txVkeyWitnesses = TransactionWitnessSet.from_bytes(
-          Buffer.from(txVkeyWitnesses, "hex"),
+          Buffer.from(await walletApi.signTx(tx.to_hex(), true), "hex"),
         );
         const vkeys = txVkeyWitnesses.vkeys();
 
@@ -608,6 +701,8 @@ const CardanoProvider = (props: Props) => {
           resourceId,
         });
 
+        isGuardrailScriptUsed.current = false;
+
         // eslint-disable-next-line no-console
         console.log(signedTx.to_hex(), "signed tx cbor");
         return resultHash;
@@ -625,7 +720,18 @@ const CardanoProvider = (props: Props) => {
         throw error?.info ?? error;
       }
     },
-    [isPendingTransaction, stakeKey, updateTransaction, walletApi, walletState],
+    [
+      isPendingTransaction,
+      initTransactionBuilder,
+      walletState.changeAddress,
+      walletState.usedAddress,
+      walletApi,
+      t,
+      updateTransaction,
+      guardrailScript,
+      epochParams?.cost_model?.costs,
+      disconnectWallet,
+    ],
   );
 
   const buildStakeKeyRegCert = useCallback(async (): Promise<Certificate> => {
@@ -644,7 +750,7 @@ const CardanoProvider = (props: Props) => {
       console.error(e);
       throw e;
     }
-  }, [epochParams]);
+  }, [epochParams?.key_deposit, stakeKey, t]);
 
   const buildVoteDelegationCert = useCallback(
     async (target: string): Promise<Certificate> => {
@@ -679,7 +785,7 @@ const CardanoProvider = (props: Props) => {
         throw e;
       }
     },
-    [stakeKey, registeredStakeKeysListState],
+    [stakeKey, t],
   );
 
   // conway alpha
@@ -716,7 +822,7 @@ const CardanoProvider = (props: Props) => {
         throw e;
       }
     },
-    [epochParams, dRepID],
+    [dRepID, epochParams?.drep_deposit, t],
   );
 
   const buildDRepUpdateCert = useCallback(
@@ -835,6 +941,42 @@ const CardanoProvider = (props: Props) => {
     return RewardAddress.from_address(Address.from_bech32(bech32Address));
   }, [walletApi]);
 
+  const addVotingProposalToBuilder = useCallback(
+    (
+      govActionBuilder: VotingProposalBuilder,
+      votingProposal: VotingProposal,
+      plutusScript: PlutusScript,
+    ) => {
+      let redeemer: Redeemer;
+      if (isGuardrailScriptUsed.current) {
+        const redeemerTag = RedeemerTag.new_voting_proposal();
+        const plutusData = PlutusData.new_map(PlutusMap.new());
+        const exUnits = ExUnits.new(
+          BigNum.from_str("402468"),
+          BigNum.from_str("89488792"),
+        );
+        redeemer = Redeemer.new(
+          redeemerTag,
+          BigNum.from_str("0"),
+          plutusData,
+          exUnits,
+        );
+
+        const witness = PlutusWitness.new_with_ref_without_datum(
+          PlutusScriptSource.new(plutusScript),
+          redeemer,
+        );
+        redeemers.current.push(redeemer);
+        govActionBuilder.add_with_plutus_witness(votingProposal, witness);
+      } else {
+        govActionBuilder.add(votingProposal);
+      }
+
+      return govActionBuilder;
+    },
+    [],
+  );
+
   // info action
   const buildNewInfoGovernanceAction = useCallback(
     async ({ hash, url }: InfoProps) => {
@@ -868,25 +1010,44 @@ const CardanoProvider = (props: Props) => {
 
   // treasury action
   const buildTreasuryGovernanceAction = useCallback(
-    async ({ amount, hash, receivingAddress, url }: TreasuryProps) => {
+    async ({ hash, url, withdrawals }: TreasuryProps) => {
       const govActionBuilder = VotingProposalBuilder.new();
       try {
-        const treasuryTarget = RewardAddress.from_address(
-          Address.from_bech32(receivingAddress),
-        );
+        const mappedWithdrawals: {
+          treasuryTarget: RewardAddress;
+          amount: BigNum;
+        }[] = [];
 
-        if (!treasuryTarget) throw new Error("Can not get tresasury target");
+        withdrawals.forEach((withdrawal) => {
+          const treasuryTarget = RewardAddress.from_address(
+            Address.from_bech32(withdrawal.receivingAddress),
+          );
 
-        const myWithdrawal = BigNum.from_str(amount);
-        const withdrawals = TreasuryWithdrawals.new();
-        withdrawals.insert(treasuryTarget, myWithdrawal);
-        const guardrailScript = PlutusScript.from_bytes_v3(
-          Buffer.from(GUARDRAIL_SCRIPT, "hex"),
+          if (!treasuryTarget)
+            throw new Error(
+              `Can not get tresasury target for address: ${withdrawal.receivingAddress}`,
+            );
+
+          const amount = BigNum.from_str(withdrawal.amount);
+          mappedWithdrawals.push({ treasuryTarget, amount });
+        });
+
+        const treasuryWithdrawals = TreasuryWithdrawals.new();
+        mappedWithdrawals.forEach((withdrawal) => {
+          treasuryWithdrawals.insert(
+            withdrawal.treasuryTarget,
+            withdrawal.amount,
+          );
+        });
+        const guardrailPlutusScript = PlutusScript.from_bytes_v3(
+          Buffer.from(guardrailScript, "hex"),
         );
         const treasuryAction = TreasuryWithdrawalsAction.new_with_policy_hash(
-          withdrawals,
-          guardrailScript.hash(),
+          treasuryWithdrawals,
+          guardrailPlutusScript.hash(),
         );
+        isGuardrailScriptUsed.current = true;
+
         const treasuryGovAct =
           GovernanceAction.new_treasury_withdrawals_action(treasuryAction);
         // Create an anchor
@@ -902,14 +1063,24 @@ const CardanoProvider = (props: Props) => {
           rewardAddr,
           BigNum.from_str(epochParams?.gov_action_deposit.toString()),
         );
-        govActionBuilder.add(votingProposal);
+
+        addVotingProposalToBuilder(
+          govActionBuilder,
+          votingProposal,
+          guardrailPlutusScript,
+        );
 
         return govActionBuilder;
       } catch (err) {
         console.error(err);
       }
     },
-    [epochParams, getRewardAddress],
+    [
+      addVotingProposalToBuilder,
+      epochParams?.gov_action_deposit,
+      getRewardAddress,
+      guardrailScript,
+    ],
   );
 
   const buildProtocolParameterChangeGovernanceAction = useCallback(
@@ -930,8 +1101,8 @@ const CardanoProvider = (props: Props) => {
           setProtocolParameterUpdate(protocolParameterUpdate, key, value);
         }
 
-        const guardrailScript = PlutusScript.from_bytes_v3(
-          Buffer.from(GUARDRAIL_SCRIPT, "hex"),
+        const guardrailPlutusScript = PlutusScript.from_bytes_v3(
+          Buffer.from(guardrailScript, "hex"),
         );
         let protocolParamChangeAction;
         if (prevGovernanceActionHash && prevGovernanceActionIndex) {
@@ -943,13 +1114,13 @@ const CardanoProvider = (props: Props) => {
             ParameterChangeAction.new_with_policy_hash_and_action_id(
               prevGovernanceActionId,
               protocolParameterUpdate,
-              guardrailScript.hash(),
+              guardrailPlutusScript.hash(),
             );
         } else {
           protocolParamChangeAction =
             ParameterChangeAction.new_with_policy_hash(
               protocolParameterUpdate,
-              guardrailScript.hash(),
+              guardrailPlutusScript.hash(),
             );
         }
 
@@ -971,14 +1142,23 @@ const CardanoProvider = (props: Props) => {
           rewardAddr,
           BigNum.from_str(epochParams?.gov_action_deposit.toString()),
         );
-        govActionBuilder.add(votingProposal);
+        addVotingProposalToBuilder(
+          govActionBuilder,
+          votingProposal,
+          guardrailPlutusScript,
+        );
 
         return govActionBuilder;
       } catch (err) {
         console.error(err);
       }
     },
-    [],
+    [
+      addVotingProposalToBuilder,
+      epochParams?.gov_action_deposit,
+      getRewardAddress,
+      guardrailScript,
+    ],
   );
 
   const buildHardForkGovernanceAction = useCallback(
@@ -1036,7 +1216,7 @@ const CardanoProvider = (props: Props) => {
         console.error(err);
       }
     },
-    [],
+    [epochParams?.gov_action_deposit, getRewardAddress],
   );
 
   const value = useMemo(
@@ -1181,7 +1361,7 @@ function useCardano() {
         throw e;
       }
     },
-    [context, openModal, context.isEnabled],
+    [context, closeModal, addSuccessAlert, t, openModal, networkName, navigate],
   );
 
   const disconnectWallet = useCallback(async () => {

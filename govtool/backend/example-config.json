@@ -1,14 +1,14 @@
 {
-    "dbsyncconfig" : {
-        "host"     : "localhost",
-        "dbname"   : "cexplorer",
-        "user"     : "postgres",
-        "password" : "postgres",
-        "port"     : 5432
-      },
-    "port" : 9999,
-    "host" : "localhost",
-    "cachedurationseconds": 20,
-    "sentrydsn": "https://username:password@senty.host/id",
-    "sentryenv": "dev"
+  "dbsyncconfig" : {
+      "host"     : "localhost",
+      "dbname"   : "cexplorer",
+      "user"     : "postgres",
+      "password" : "postgres",
+      "port"     : 5432
+    },
+  "port" : 9999,
+  "host" : "localhost",
+  "cachedurationseconds": 20,
+  "sentrydsn": "https://username:password@senty.host/id",
+  "sentryenv": "dev"
 }

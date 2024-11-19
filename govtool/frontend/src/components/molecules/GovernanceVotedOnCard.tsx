@@ -45,11 +45,11 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
   const { t } = useTranslation();
 
   const govActionId = getFullGovActionId(txHash, index);
-  const cip129GovernanceActionId = encodeCIP129Identifier(
-    txHash,
-    index.toString(16).padStart(2, "0"),
-    "gov_action",
-  );
+  const cip129GovernanceActionId = encodeCIP129Identifier({
+    txID: txHash,
+    index: index.toString(16).padStart(2, "0"),
+    bech32Prefix: "gov_action",
+  });
 
   return (
     <Box

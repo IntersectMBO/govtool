@@ -26,7 +26,7 @@ changes.
 
 -
 
-## [v1.0.27](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.27) 2024-11-18
+## [v1.0.27](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.27) 2024-11-19
 
 ### Added
 

@@ -4,7 +4,6 @@ import { Typography } from "@atoms";
 import { ICONS } from "@consts";
 import { useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { LinkWithIcon } from "@molecules";
 
 export const GovernanceActionDetailsCardLinks = ({
   links,
@@ -42,29 +41,56 @@ export const GovernanceActionDetailsCardLinks = ({
           }}
         >
           {links.map(({ uri, label }) => (
-            <Box flexDirection="column">
+            <Box flexDirection={isMobile ? "column" : "row"} display="flex">
               {label && (
                 <Typography
                   data-testid={`${label}-${uri}-label`}
-                  sx={{ fontWeight: "500" }}
+                  sx={{
+                    fontWeight: 400,
+                    flex: 1,
+                    fontSize: 16,
+                    lineHeight: "24px",
+                    mr: 8,
+                    overflow: "hidden",
+                    width: "auto",
+                    whiteSpace: "nowrap",
+                  }}
                 >
                   {label}
                 </Typography>
               )}
-              <LinkWithIcon
-                key={uri}
-                label={uri}
-                onClick={() => {
-                  openModal({
-                    type: "externalLink",
-                    state: {
-                      externalLink: uri,
-                    },
-                  });
+              <Typography
+                sx={{
+                  fontSize: 16,
+                  fontWeight: 400,
+                  maxWidth: "283px",
+                  lineHeight: "24px",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  color: "primaryBlue",
                 }}
-                icon={<img alt="link" src={ICONS.link} />}
-                cutWithEllipsis
-              />
+              >
+                {uri}
+              </Typography>
+              {label && (
+                <Box ml={1}>
+                  <img
+                    data-testid="link-button"
+                    alt="link"
+                    src={ICONS.externalLinkIcon}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      openModal({
+                        type: "externalLink",
+                        state: {
+                          externalLink: uri,
+                        },
+                      });
+                    }}
+                  />
+                </Box>
+              )}
             </Box>
           ))}
         </Box>

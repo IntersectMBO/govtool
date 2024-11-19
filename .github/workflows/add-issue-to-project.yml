@@ -1,30 +1,24 @@
-name: Add Issue to Projects
+name: Add all issues created to projects
 
 on:
   issues:
     types: [opened]
 
 jobs:
-  add-to-projects:
+  add-to-govtool-all-project:
+    name: Add issue to GovTool all project
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/orgs/IntersectMBO/projects/30
+          github-token: ${{ secrets.ADD_ISSUE_TO_PROJECT_PAT }}
 
-      - name: Install GitHub CLI
-        run: sudo apt-get install gh
-
-      - name: Authenticate GitHub CLI with default token
-        run: gh auth login --with-token <<< "$GITHUB_TOKEN"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Add issue to GovTool Project
-        run: gh project item-add IntersectMBO/30 --content-type Issue --content-id ${{ github.event.issue.node_id }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Add issue to Community Backlog Project
-        run: gh project item-add IntersectMBO/34 --content-type Issue --content-id ${{ github.event.issue.node_id }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  add-to-community-backlog-project:
+    name: Add issue to governance tools community backlog project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/orgs/IntersectMBO/projects/34
+          github-token: ${{ secrets.ADD_ISSUE_TO_PROJECT_PAT }}

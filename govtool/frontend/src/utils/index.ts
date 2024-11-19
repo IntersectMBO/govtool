@@ -32,3 +32,4 @@ export * from "./setProtocolParameterUpdate";
 export * from "./testIdFromLabel";
 export * from "./wait";
 export * from "./cip129identifier";
+export * from "./getGovActionVotingThresholdKey";

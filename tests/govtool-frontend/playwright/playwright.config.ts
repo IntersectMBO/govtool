@@ -17,7 +17,7 @@ export default defineConfig({
   /**TODO: Remove this timeout *
    * It has been intentionally used to slow loading of govtool.
    */
-  timeout: 90_000,
+  timeout: process.env.NETWORK === "preview" ? 180_000 : 90_000,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!environments.ci,
   /* Retry on CI only */
@@ -50,7 +50,7 @@ export default defineConfig({
     {
       name: "faucet setup",
       testMatch: "**/faucet.setup.ts",
-      teardown: environments.ci && "cleanup faucet" 
+      teardown: environments.ci && "cleanup faucet",
     },
     {
       name: "dRep setup",
@@ -91,8 +91,10 @@ export default defineConfig({
       name: "dRep",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.dRep.spec.ts",
-      dependencies: environments.ci ? ["auth setup", "dRep setup","wallet bootstrap"] : [],
-      teardown: environments.ci && "cleanup dRep"
+      dependencies: environments.ci
+        ? ["auth setup", "dRep setup", "wallet bootstrap"]
+        : [],
+      teardown: environments.ci && "cleanup dRep",
     },
     {
       name: "delegation",

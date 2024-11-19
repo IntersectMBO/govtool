@@ -22,15 +22,30 @@ export class AppService {
     let metadata: Record<string, unknown>;
     let standard = paramStandard;
 
+    const isIPFS = url.startsWith('ipfs://');
+    if (isIPFS) {
+      url = `${process.env.IPFS_GATEWAY}/${url.slice(7)}`;
+    }
+
     try {
       const { data: rawData } = await firstValueFrom(
-        this.httpService.get(url).pipe(
-          finalize(() => Logger.log(`Fetching ${url} completed`)),
-          catchError((error) => {
-            Logger.error(error, JSON.stringify(error));
-            throw MetadataValidationStatus.URL_NOT_FOUND;
-          }),
-        ),
+        this.httpService
+          .get(url, {
+            headers: {
+              'Content-Type': 'application/json',
+              ...(isIPFS &&
+                process.env.IPFS_PROJECT_ID && {
+                  project_id: process.env.IPFS_PROJECT_ID,
+                }),
+            },
+          })
+          .pipe(
+            finalize(() => Logger.log(`Fetching ${url} completed`)),
+            catchError((error) => {
+              Logger.error(error, JSON.stringify(error));
+              throw MetadataValidationStatus.URL_NOT_FOUND;
+            }),
+          ),
       );
 
       let parsedData;

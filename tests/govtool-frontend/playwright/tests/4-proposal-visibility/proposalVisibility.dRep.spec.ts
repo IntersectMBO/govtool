@@ -20,6 +20,7 @@ import {
 } from "@types";
 import walletManager from "lib/walletManager";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
+import { correctVoteAdaFormat } from "@helpers/adaFormat";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
@@ -77,7 +78,7 @@ test.describe("Logged in DRep", () => {
     }) => {
       for (let i = 0; i < 100; i++) {
         const invalidUrl = mockInvalid.url(false);
-        await  govActionDetailsPage.metadataUrlInput.fill(invalidUrl);
+        await govActionDetailsPage.metadataUrlInput.fill(invalidUrl);
         if (invalidUrl.length <= 128) {
           await expect(page.getByTestId("invalid-url-error")).toBeVisible();
         } else {
@@ -161,24 +162,24 @@ test.describe("Check vote count", () => {
 
     // check dRep votes
     await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
-      `₳ ${lovelaceToAda(proposalToCheck.dRepYesVotes)}`
+      `₳ ${correctVoteAdaFormat(proposalToCheck.dRepYesVotes)}`
     );
     await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
-      `₳ ${lovelaceToAda(proposalToCheck.dRepAbstainVotes)}`
+      `₳ ${correctVoteAdaFormat(proposalToCheck.dRepAbstainVotes)}`
     );
     await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
-      `₳ ${lovelaceToAda(proposalToCheck.dRepNoVotes)}`
+      `₳ ${correctVoteAdaFormat(proposalToCheck.dRepNoVotes)}`
     );
 
     // check sPos votes
     await expect(govActionDetailsPage.sPosYesVotes).toHaveText(
-      `₳ ${lovelaceToAda(proposalToCheck.poolYesVotes)}`
+      `₳ ${correctVoteAdaFormat(proposalToCheck.poolYesVotes)}`
     );
     await expect(govActionDetailsPage.sPosAbstainVotes).toHaveText(
-      `₳ ${lovelaceToAda(proposalToCheck.poolAbstainVotes)}`
+      `₳ ${correctVoteAdaFormat(proposalToCheck.poolAbstainVotes)}`
     );
     await expect(govActionDetailsPage.sPosNoVotes).toHaveText(
-      `₳ ${lovelaceToAda(proposalToCheck.poolNoVotes)}`
+      `₳ ${correctVoteAdaFormat(proposalToCheck.poolNoVotes)}`
     );
 
     // check ccCommittee votes

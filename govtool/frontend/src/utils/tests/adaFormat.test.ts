@@ -66,19 +66,19 @@ describe("correctVoteAdaFormat", () => {
 
   test("Returns 0 for undefined lovelace value", () => {
     const lovelace = undefined;
-    const expectedResult = "0,000";
+    const expectedResult = "0";
     expect(correctVoteAdaFormat(lovelace, "en-US")).toBe(expectedResult);
   });
 
   test("Returns 0 for zero lovelace value", () => {
     const lovelace = 0;
-    const expectedResult = "0,000";
+    const expectedResult = "0";
     expect(correctVoteAdaFormat(lovelace, "en-US")).toBe(expectedResult);
   });
 
   test("Returns 0 for small lovelace value", () => {
     const lovelace = 123;
-    const expectedResult = "0.000";
+    const expectedResult = "0";
     expect(correctVoteAdaFormat(lovelace, "en-US")).toBe(expectedResult);
   });
 });

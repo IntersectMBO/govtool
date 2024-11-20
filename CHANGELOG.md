@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix listing voted-on governance actions [Issue 2379](https://github.com/IntersectMBO/govtool/issues/2379)
 
 ### Changed
 

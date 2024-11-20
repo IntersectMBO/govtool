@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Fix listing voted-on governance actions [Issue 2379](https://github.com/IntersectMBO/govtool/issues/2379)
+- Fix wronly displayed markdown on slider card [Issue 2263](https://github.com/IntersectMBO/govtool/issues/2316)
 
 ### Changed
 

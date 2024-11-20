@@ -20,7 +20,7 @@ changes.
 
 ### Changed
 
--
+- Bump CSL version to 13.1.0 [Issue 2169](https://github.com/IntersectMBO/govtool/issues/2169)
 
 ### Removed
 

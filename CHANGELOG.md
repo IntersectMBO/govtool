@@ -23,6 +23,7 @@ changes.
 ### Changed
 
 - Bump CSL version to 13.1.0 [Issue 2169](https://github.com/IntersectMBO/govtool/issues/2169)
+- Display supporting links below labels than in same row [Issue 2391](https://github.com/IntersectMBO/govtool/issues/2391)
 
 ### Removed
 

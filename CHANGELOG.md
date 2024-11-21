@@ -19,6 +19,7 @@ changes.
 - Fix listing voted-on governance actions [Issue 2379](https://github.com/IntersectMBO/govtool/issues/2379)
 - Fix wronly displayed markdown on slider card [Issue 2263](https://github.com/IntersectMBO/govtool/issues/2316)
 - fix ada quantities format to avoid thousands when the total is 0 [Issue 2372](https://github.com/IntersectMBO/govtool/issues/2382)
+- fix inconsistent display of delegated DRep card during delegation [Issue 2332](https://github.com/IntersectMBO/govtool/issues/2332)
 
 ### Changed
 

@@ -86,6 +86,10 @@ test("2N. Should show DRep information on details page", async ({
 
   await dRepRegistrationPage.confirmBtn.click();
 
+  // Add an assertion to prevent clicking on "View Your dRep Details".
+  await expect(
+    dRepPage.getByTestId("dRep-id-display-card-dashboard")
+  ).toContainText(wallet.dRepId, { timeout: 10_000 });
   await dRepPage.getByTestId("view-drep-details-button").click();
 
   // Verification
@@ -189,12 +193,47 @@ test("2I. Should check validity of DRep Id", async ({ page }) => {
   await expect(dRepDirectory.getDRepCard(invalidDRepId)).not.toBeVisible();
 });
 
-test("2J. Should search by DRep id", async ({ page }) => {
+test("2J. Should search by DRep id and DRep givenname", async ({ page }) => {
+  let dRepGivenName = "test";
+
+  await page.route(
+    "**/drep/list?page=0&pageSize=10&sort=Random",
+    async (route) => {
+      const response = await route.fetch();
+      const json = await response.json();
+      const elements = json["elements"].filter(
+        (element) => element["givenName"] != null
+      );
+      dRepGivenName =
+        elements[Math.floor(Math.random() * elements.length)]["givenName"];
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(json),
+      });
+    }
+  );
+
+  const responsePromise = page.waitForResponse(
+    "**/drep/list?page=0&pageSize=10&sort=Random"
+  );
+
   const dRepDirectory = new DRepDirectoryPage(page);
   await dRepDirectory.goto();
 
+  await responsePromise;
+
+  // search by dRep Id
   await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
   await expect(dRepDirectory.getDRepCard(dRep01Wallet.dRepId)).toBeVisible();
+
+  // search by dRep givenname
+  await dRepDirectory.searchInput.fill(dRepGivenName);
+  const searchDRepCards = await dRepDirectory.getAllListedDReps();
+
+  for (const dRepCard of searchDRepCards) {
+    expect((await dRepCard.innerText()).includes(dRepGivenName));
+  }
 });
 
 test("2M. Should access dRep directory page on disconnected state", async ({

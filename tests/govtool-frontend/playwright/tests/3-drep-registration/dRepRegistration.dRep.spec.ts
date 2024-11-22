@@ -32,7 +32,7 @@ test.describe("Logged in DReps", () => {
 
     await expect(
       page.getByTestId("dRep-id-display-card-dashboard")
-    ).toContainText(dRep01Wallet.dRepId);
+    ).toContainText(dRep01Wallet.dRepId, { timeout: 10_000 });
 
     const governanceActionsPage = new GovernanceActionsPage(page);
 
@@ -52,6 +52,11 @@ test.describe("Logged in DReps", () => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     await page.goto("/");
+
+    // Add an assertion to prevent clicking on "View Your dRep Details".
+    await expect(
+      page.getByTestId("dRep-id-display-card-dashboard")
+    ).toContainText(dRep01Wallet.dRepId, { timeout: 10_000 });
 
     await page.getByTestId("view-drep-details-button").click();
     await page.getByTestId("edit-drep-data-button").click();

@@ -21,6 +21,7 @@ export interface IProposal {
   createdEpochNo: number;
   url: string;
   metadataHash: string;
+  protocolParams: EpochParams | null;
   title: string | null;
   about: string | null;
   motivation: string | null;
@@ -81,6 +82,13 @@ export enum GrovernanceActionType {
   NoConfidence = "NoConfidence",
   NewCommittee = "NewCommittee",
   UpdatetotheConstitution = "NewConstitution",
+}
+
+export enum FullGovernanceDRepVoteActionsType {
+  ProtocolParameterChange = "ParameterChange",
+  InfoAction = "InfoAction",
+  TreasuryWithdrawal = "TreasuryWithdrawals",
+  HardFork = "HardForkInitiation",
 }
 
 export enum BootstrapGovernanceActionType {
@@ -168,4 +176,62 @@ export type WalletAndAnchorType = {
 export type ProtocolVersionType = {
   major: number;
   minor: number;
+};
+
+export type EpochParams = {
+  block_id: number | null;
+  coins_per_utxo_size: number | null;
+  collateral_percent: number | null;
+  committee_max_term_length: number | null;
+  committee_min_size: number | null;
+  cost_model_id: number | null;
+  decentralisation: number | null;
+  drep_activity: number | null;
+  drep_deposit: number | null;
+  dvt_committee_no_confidence: number | null;
+  dvt_committee_normal: number | null;
+  dvt_hard_fork_initiation: number | null;
+  dvt_motion_no_confidence: number | null;
+  dvt_p_p_economic_group: number | null;
+  dvt_p_p_gov_group: number | null;
+  dvt_p_p_network_group: number | null;
+  dvt_p_p_technical_group: number | null;
+  dvt_treasury_withdrawal: number | null;
+  dvt_update_to_constitution: number | null;
+  epoch_no: number | null;
+  extra_entropy: null;
+  gov_action_deposit: number | null;
+  gov_action_lifetime: number | null;
+  id: number;
+  influence: number | null;
+  key_deposit: number | null;
+  max_bh_size: number | null;
+  max_block_ex_mem: number | null;
+  max_block_ex_steps: number | null;
+  max_block_size: number | null;
+  max_collateral_inputs: number | null;
+  max_epoch: number | null;
+  max_tx_ex_mem: number | null;
+  max_tx_ex_steps: number | null;
+  max_tx_size: number | null;
+  max_val_size: number | null;
+  min_fee_a: number | null;
+  min_fee_b: number | null;
+  min_fee_ref_script_cost_per_byte: number | null;
+  min_pool_cost: number | null;
+  min_utxo_value: number | null;
+  monetary_expand_rate: number | null;
+  nonce: string | null;
+  optimal_pool_count: number | null;
+  pool_deposit: number | null;
+  price_mem: number | null;
+  price_step: number | null;
+  protocol_major: number | null;
+  protocol_minor: number | null;
+  pvt_committee_no_confidence: number | null;
+  pvt_committee_normal: number | null;
+  pvt_hard_fork_initiation: number | null;
+  pvt_motion_no_confidence: number | null;
+  pvtpp_security_group: number | null;
+  treasury_growth_rate: number | null;
 };

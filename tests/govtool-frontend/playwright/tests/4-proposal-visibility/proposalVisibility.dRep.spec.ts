@@ -15,12 +15,18 @@ import { Page, expect } from "@playwright/test";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import {
   BootstrapGovernanceActionType,
+  FullGovernanceDRepVoteActionsType,
   GrovernanceActionType,
   IProposal,
 } from "@types";
 import walletManager from "lib/walletManager";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import { correctVoteAdaFormat } from "@helpers/adaFormat";
+import {
+  areCCVoteTotalsDisplayed,
+  areDRepVoteTotalsDisplayed,
+  areSPOVoteTotalsDisplayed,
+} from "@helpers/featureFlag";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
@@ -130,10 +136,11 @@ test.describe("Check vote count", () => {
 
   test("4G. Should display correct vote counts on governance details page for DRep", async ({
     page,
+    browser,
   }) => {
     const voteWhiteListOption = (await isBootStrapingPhase())
       ? BootstrapGovernanceActionType
-      : GrovernanceActionType;
+      : FullGovernanceDRepVoteActionsType;
     const responsesPromise = Object.keys(voteWhiteListOption).map((filterKey) =>
       page.waitForResponse((response) =>
         response.url().includes(`&type[]=${voteWhiteListOption[filterKey]}`)
@@ -153,44 +160,68 @@ test.describe("Check vote count", () => {
       )
     ).flat();
 
+    const uniqueProposalTypes = Array.from(
+      new Map(proposals.map((proposal) => [proposal.type, proposal])).values()
+    );
+
     expect(proposals.length, "No proposals found!").toBeGreaterThan(0);
 
-    const proposalToCheck = proposals[0];
-    const govActionDetailsPage =
-      await governanceActionsPage.viewProposal(proposalToCheck);
-    await govActionDetailsPage.showVotesBtn.click();
+    await Promise.all(
+      uniqueProposalTypes.map(async (proposalToCheck) => {
+        const dRepPage = await createNewPageWithWallet(browser, {
+          storageState: ".auth/dRep01.json",
+          wallet: dRep01Wallet,
+        });
+        const govActionDetailsPage = new GovernanceActionDetailsPage(dRepPage);
+        await govActionDetailsPage.goto(
+          `${proposalToCheck.txHash}#${proposalToCheck.index}`
+        );
 
-    // check dRep votes
-    await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
-      `₳ ${correctVoteAdaFormat(proposalToCheck.dRepYesVotes)}`
-    );
-    await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
-      `₳ ${correctVoteAdaFormat(proposalToCheck.dRepAbstainVotes)}`
-    );
-    await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
-      `₳ ${correctVoteAdaFormat(proposalToCheck.dRepNoVotes)}`
-    );
+        await govActionDetailsPage.showVotesBtn.click();
 
-    // check sPos votes
-    await expect(govActionDetailsPage.sPosYesVotes).toHaveText(
-      `₳ ${correctVoteAdaFormat(proposalToCheck.poolYesVotes)}`
-    );
-    await expect(govActionDetailsPage.sPosAbstainVotes).toHaveText(
-      `₳ ${correctVoteAdaFormat(proposalToCheck.poolAbstainVotes)}`
-    );
-    await expect(govActionDetailsPage.sPosNoVotes).toHaveText(
-      `₳ ${correctVoteAdaFormat(proposalToCheck.poolNoVotes)}`
-    );
+        // check dRep votes
+        if (areDRepVoteTotalsDisplayed(proposalToCheck)) {
+          await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
+            `₳ ${correctVoteAdaFormat(proposalToCheck.dRepYesVotes)}`
+          );
+          await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
+            `₳ ${correctVoteAdaFormat(proposalToCheck.dRepAbstainVotes)}`
+          );
+          await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
+            `₳ ${correctVoteAdaFormat(proposalToCheck.dRepNoVotes)}`
+          );
+        }
 
-    // check ccCommittee votes
-    await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
-      `${proposalToCheck.ccYesVotes}`
-    );
-    await expect(govActionDetailsPage.ccCommitteeAbstainVotes).toHaveText(
-      `${proposalToCheck.ccAbstainVotes}`
-    );
-    await expect(govActionDetailsPage.ccCommitteeNoVotes).toHaveText(
-      `${proposalToCheck.ccNoVotes}`
+        // check sPos votes
+        if (areSPOVoteTotalsDisplayed(proposalToCheck)) {
+          await expect(govActionDetailsPage.sPosYesVotes).toHaveText(
+            `₳ ${correctVoteAdaFormat(proposalToCheck.poolYesVotes)}`
+          );
+          await expect(govActionDetailsPage.sPosAbstainVotes).toHaveText(
+            `₳ ${correctVoteAdaFormat(proposalToCheck.poolAbstainVotes)}`
+          );
+          await expect(govActionDetailsPage.sPosNoVotes).toHaveText(
+            `₳ ${correctVoteAdaFormat(proposalToCheck.poolNoVotes)}`
+          );
+        }
+
+        // check ccCommittee votes
+        if (
+          areCCVoteTotalsDisplayed(
+            proposalToCheck.type as GrovernanceActionType
+          )
+        ) {
+          await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
+            `${proposalToCheck.ccYesVotes}`
+          );
+          await expect(govActionDetailsPage.ccCommitteeAbstainVotes).toHaveText(
+            `${proposalToCheck.ccAbstainVotes}`
+          );
+          await expect(govActionDetailsPage.ccCommitteeNoVotes).toHaveText(
+            `${proposalToCheck.ccNoVotes}`
+          );
+        }
+      })
     );
   });
 });

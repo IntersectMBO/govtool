@@ -5,6 +5,7 @@ import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { isBootStrapingPhase, skipIfNotHardFork } from "@helpers/cardano";
+import { encodeCIP129Identifier } from "@helpers/encodeDecode";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
@@ -25,11 +26,13 @@ test.describe("Proposal checks", () => {
   test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
 
   let govActionDetailsPage: GovernanceActionDetailsPage;
+  let currentPage: Page;
 
   test.beforeEach(async ({ page }) => {
     const govActionsPage = new GovernanceActionsPage(page);
     await govActionsPage.goto();
 
+    currentPage = page;
     govActionDetailsPage = (await isBootStrapingPhase())
       ? await govActionsPage.viewFirstProposalByGovernanceAction(
           GrovernanceActionType.InfoAction
@@ -38,9 +41,27 @@ test.describe("Proposal checks", () => {
   });
 
   test("5A. Should show relevant details about governance action as DRep", async () => {
+    const governanceActionIdWithIndex = currentPage.url().split("/").pop();
+    const governanceActionId = governanceActionIdWithIndex.substring(0, 64);
+
+    const cip129GovActionId = encodeCIP129Identifier({
+      txID: governanceActionId,
+      index: governanceActionIdWithIndex
+        .replace(`${governanceActionId}#`, "")
+        .toString()
+        .padStart(2, "0"),
+      bech32Prefix: "gov_action",
+    });
+
     await expect(govActionDetailsPage.governanceActionType).toBeVisible();
     await expect(govActionDetailsPage.submittedDate).toBeVisible();
     await expect(govActionDetailsPage.expiryDate).toBeVisible();
+    await expect(
+      currentPage.getByTestId(`${governanceActionIdWithIndex}-id`)
+    ).toBeVisible();
+    await expect(
+      currentPage.getByTestId(`${cip129GovActionId}-id`)
+    ).toBeVisible();
 
     await expect(govActionDetailsPage.contextBtn).toBeVisible();
     await expect(govActionDetailsPage.showVotesBtn).toBeVisible();

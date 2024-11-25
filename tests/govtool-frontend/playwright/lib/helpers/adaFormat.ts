@@ -7,9 +7,8 @@ export const correctVoteAdaFormat = (
   if (lovelace) {
     const ada = lovelace / LOVELACE;
     return ada.toLocaleString(locale, {
-      minimumFractionDigits: 3,
       maximumFractionDigits: 3,
     });
   }
-  return "0,000";
+  return "0";
 };

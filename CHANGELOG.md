@@ -12,7 +12,7 @@ changes.
 
 ### Added
 
--
+- Add more useful metrics to the backend GET /network/metrics endpoint [Issue 2010](https://github.com/IntersectMBO/govtool/issues/2010)
 
 ### Fixed
 

@@ -180,7 +180,7 @@ test.describe("Check vote count", () => {
         await govActionDetailsPage.showVotesBtn.click();
 
         // check dRep votes
-        if (areDRepVoteTotalsDisplayed(proposalToCheck)) {
+        if (await areDRepVoteTotalsDisplayed(proposalToCheck)) {
           await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
             `₳ ${correctVoteAdaFormat(proposalToCheck.dRepYesVotes)}`
           );
@@ -193,7 +193,7 @@ test.describe("Check vote count", () => {
         }
 
         // check sPos votes
-        if (areSPOVoteTotalsDisplayed(proposalToCheck)) {
+        if (await areSPOVoteTotalsDisplayed(proposalToCheck)) {
           await expect(govActionDetailsPage.sPosYesVotes).toHaveText(
             `₳ ${correctVoteAdaFormat(proposalToCheck.poolYesVotes)}`
           );

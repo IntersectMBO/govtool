@@ -22,7 +22,9 @@ export const DrawerMobile = ({
   const { t } = useTranslation();
 
   const onClickHelp = () =>
-    openInNewTab("https://docs.gov.tools/support/");
+    openInNewTab(
+      "https://docs.gov.tools/using-govtool/support#for-support-you-can-reach-the-team-on-the-intersect-discord-server-at",
+    );
 
   return (
     <SwipeableDrawer

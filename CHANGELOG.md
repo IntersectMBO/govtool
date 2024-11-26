@@ -12,6 +12,24 @@ changes.
 
 ### Added
 
+-
+
+### Fixed
+
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v1.0.28](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.28) 2024-11-26
+
+### Added
+
 - Add more useful metrics to the backend GET /network/metrics endpoint [Issue 2010](https://github.com/IntersectMBO/govtool/issues/2010)
 
 ### Fixed
@@ -28,6 +46,7 @@ changes.
 - Bump CSL version to 13.1.0 [Issue 2169](https://github.com/IntersectMBO/govtool/issues/2169)
 - Display supporting links below labels than in same row [Issue 2391](https://github.com/IntersectMBO/govtool/issues/2391)
 - change link to support page [Issue 2292](https://github.com/IntersectMBO/govtool/issues/2292)
+- Bump @intersect.mbo/pdf-ui to v0.5.0
 
 ### Removed
 

@@ -26,6 +26,32 @@ changes.
 
 -
 
+## [v1.0.28](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.28) 2024-11-26
+
+### Added
+
+- Add more useful metrics to the backend GET /network/metrics endpoint [Issue 2010](https://github.com/IntersectMBO/govtool/issues/2010)
+
+### Fixed
+
+- Fix ada holder voting power calculation
+- Fix wrong statuses on past DRep info
+- Fix listing voted-on governance actions [Issue 2379](https://github.com/IntersectMBO/govtool/issues/2379)
+- Fix wronly displayed markdown on slider card [Issue 2263](https://github.com/IntersectMBO/govtool/issues/2316)
+- fix ada quantities format to avoid thousands when the total is 0 [Issue 2372](https://github.com/IntersectMBO/govtool/issues/2382)
+- fix inconsistent display of delegated DRep card during delegation [Issue 2332](https://github.com/IntersectMBO/govtool/issues/2332)
+
+### Changed
+
+- Bump CSL version to 13.1.0 [Issue 2169](https://github.com/IntersectMBO/govtool/issues/2169)
+- Display supporting links below labels than in same row [Issue 2391](https://github.com/IntersectMBO/govtool/issues/2391)
+- change link to support page [Issue 2292](https://github.com/IntersectMBO/govtool/issues/2292)
+- Bump @intersect.mbo/pdf-ui to v0.5.0
+
+### Removed
+
+-
+
 ## [v1.0.27](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.27) 2024-11-19
 
 ### Added

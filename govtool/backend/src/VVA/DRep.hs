@@ -117,15 +117,21 @@ getVotes drepId selectedProposals = withPool $ \conn -> do
       let proposalsToSelect = if null selectedProposals
                               then [ govActionId | (_, govActionId, _, _, _, _, _, _, _) <- results]
                               else selectedProposals
-      proposals <- if null proposalsToSelect
-                      then return []
-                      else Proposal.getProposals (Just proposalsToSelect)
+      
+      allProposals <- mapM (Proposal.getProposals . Just . (:[])) proposalsToSelect
+      
+      let proposals = concat allProposals
+
       let proposalMap = M.fromList $ map (\x -> (proposalId x, x)) proposals
+
       timeZone <- liftIO getCurrentTimeZone
-      let votes = [ Vote proposalId' drepId' vote' url' docHash' epochNo' (localTimeToUTC timeZone date') voteTxHash'
-                    | (proposalId', govActionId', drepId', vote', url', docHash', epochNo', date', voteTxHash') <- results
-                    , govActionId' `elem` proposalsToSelect
-                  ]
+
+      let votes = 
+            [ Vote proposalId' drepId' vote' url' docHash' epochNo' (localTimeToUTC timeZone date') voteTxHash'
+            | (proposalId', govActionId', drepId', vote', url', docHash', epochNo', date', voteTxHash') <- results
+            , govActionId' `elem` proposalsToSelect
+            ]
+
       return (votes, proposals)
 
 getDRepInfoSql :: SQL.Query

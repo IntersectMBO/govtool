@@ -878,17 +878,22 @@ instance ToSchema DelegationResponse where
 
 data GetNetworkMetricsResponse
   = GetNetworkMetricsResponse
-      { getNetworkMetricsResponseCurrentTime                   :: UTCTime
-      , getNetworkMetricsResponseCurrentEpoch                  :: Integer
-      , getNetworkMetricsResponseCurrentBlock                  :: Integer
-      , getNetworkMetricsResponseUniqueDelegators              :: Integer
-      , getNetworkMetricsResponseTotalDelegations              :: Integer
-      , getNetworkMetricsResponseTotalGovernanceActions        :: Integer
-      , getNetworkMetricsResponseTotalDRepVotes                :: Integer
-      , getNetworkMetricsResponseTotalRegisteredDReps          :: Integer
-      , getNetworkMetricsResponseAlwaysAbstainVotingPower      :: Integer
-      , getNetworkMetricsResponseAlwaysNoConfidenceVotingPower :: Integer
-      , getNetworkMetricsResponseNetworkName                   :: Text
+      { getNetworkMetricsResponseCurrentTime                     :: UTCTime
+      , getNetworkMetricsResponseCurrentEpoch                    :: Integer
+      , getNetworkMetricsResponseCurrentBlock                    :: Integer
+      , getNetworkMetricsResponseUniqueDelegators                :: Integer
+      , getNetworkMetricsResponseTotalDelegations                :: Integer
+      , getNetworkMetricsResponseTotalGovernanceActions          :: Integer
+      , getNetworkMetricsResponseTotalDRepVotes                  :: Integer
+      , getNetworkMetricsResponseTotalRegisteredDReps            :: Integer
+      , getNetworkMetricsResponseTotalStakeControlledByDReps     :: Integer
+      , getNetworkMetricsResponseTotalActiveDReps                :: Integer
+      , getNetworkMetricsResponseTotalInactiveDReps              :: Integer
+      , getNetworkMetricsResponseTotalActiveCIP119CompliantDReps :: Integer
+      , getNetworkMetricsResponseTotalRegisteredDirectVoters     :: Integer
+      , getNetworkMetricsResponseAlwaysAbstainVotingPower        :: Integer
+      , getNetworkMetricsResponseAlwaysNoConfidenceVotingPower   :: Integer
+      , getNetworkMetricsResponseNetworkName                     :: Text
       }
 
 deriveJSON (jsonOptions "getNetworkMetricsResponse") ''GetNetworkMetricsResponse
@@ -903,6 +908,11 @@ exampleGetNetworkMetricsResponse =
  <> "\"totalGovernanceActions\": 0,"
  <> "\"totalDRepVotes\": 0,"
  <> "\"totalRegisteredDReps\": 0,"
+ <> "\"totalStakeControlledByDReps\": 0,"
+ <> "\"totalActiveDReps\": 0,"
+ <> "\"totalInactiveDReps\": 0,"
+ <> "\"totalActiveCIP119CompliantDReps\": 0,"
+ <> "\"totalRegisteredDirectVoters\": 0,"
  <> "\"alwaysAbstainVotingPower\": 0,"
  <> "\"alwaysNoConfidenceVotingPower\": 0,"
  <> "\"networkName\": \"Mainnet\"}"

@@ -1,0 +1,14 @@
+{
+  "payment": {
+    "private": "7c0ea07b5eb00a808de0735aa8e093ad0f257c293efbe3c5a44948eeeff38baf",
+    "public": "13904f75a8080b61cdfee163c3c22a05b3fa8f4aaa42df084a02f425548f0122",
+    "pkh": "a37077973e85242b117341ccf59d2fb78affe3a05944b089c22583d6"
+  },
+  "stake": {
+    "private": "61aa83ca64d9f785dc53d15567e420221534da3ce7d88bfcad4ea42bc3962141",
+    "public": "c2277f37f2fece309bad0d6ec1506e48b2a91f0ff4e7dcaad176891d6364aee3",
+    "pkh": "4e641f833be7026d9948ff6ab61791123166a1c84f58fd472a6b33a5"
+  },
+  "dRepId": "drep1fejplqemuupxmx2gla4tv9u3zgckdgwgfav063e2dve622apcpr",
+  "address": "addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd"
+}

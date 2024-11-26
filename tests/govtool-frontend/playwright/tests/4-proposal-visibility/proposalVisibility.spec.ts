@@ -1,6 +1,12 @@
 import { correctVoteAdaFormat } from "@helpers/adaFormat";
 import { setAllureEpic } from "@helpers/allure";
 import { skipIfNotHardFork } from "@helpers/cardano";
+import {
+  areCCVoteTotalsDisplayed,
+  areDRepVoteTotalsDisplayed,
+  areSPOVoteTotalsDisplayed,
+} from "@helpers/featureFlag";
+import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect, test } from "@playwright/test";
 import { GrovernanceActionType, IProposal } from "@types";
@@ -31,6 +37,7 @@ test("4B_2. Should restrict voting for users who are not registered as DReps (wi
 
 test("4K. Should display correct vote counts on governance details page for disconnect state", async ({
   page,
+  browser,
 }) => {
   const responsesPromise = Object.keys(GrovernanceActionType).map((filterKey) =>
     page.waitForResponse((response) =>
@@ -52,40 +59,57 @@ test("4K. Should display correct vote counts on governance details page for disc
 
   expect(proposals.length, "No proposals found!").toBeGreaterThan(0);
 
-  const proposalToCheck = proposals[0];
-  const govActionDetailsPage =
-    await governanceActionsPage.viewProposal(proposalToCheck);
-
-  // check dRep votes
-  await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
-    `₳ ${correctVoteAdaFormat(proposalToCheck.dRepYesVotes)}`
-  );
-  await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
-    `₳ ${correctVoteAdaFormat(proposalToCheck.dRepAbstainVotes)}`
-  );
-  await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
-    `₳ ${correctVoteAdaFormat(proposalToCheck.dRepNoVotes)}`
+  const uniqueProposalTypes = Array.from(
+    new Map(proposals.map((proposal) => [proposal.type, proposal])).values()
   );
 
-  // check sPos votes
-  await expect(govActionDetailsPage.sPosYesVotes).toHaveText(
-    `₳ ${correctVoteAdaFormat(proposalToCheck.poolYesVotes)}`
-  );
-  await expect(govActionDetailsPage.sPosAbstainVotes).toHaveText(
-    `₳ ${correctVoteAdaFormat(proposalToCheck.poolAbstainVotes)}`
-  );
-  await expect(govActionDetailsPage.sPosNoVotes).toHaveText(
-    `₳ ${correctVoteAdaFormat(proposalToCheck.poolNoVotes)}`
-  );
+  await Promise.all(
+    uniqueProposalTypes.map(async (proposalToCheck) => {
+      const newPage = await browser.newPage();
+      const govActionDetailsPage = new GovernanceActionDetailsPage(newPage);
+      await govActionDetailsPage.goto(
+        `${proposalToCheck.txHash}#${proposalToCheck.index}`
+      );
 
-  // check ccCommittee votes
-  await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
-    `${proposalToCheck.ccYesVotes}`
-  );
-  await expect(govActionDetailsPage.ccCommitteeAbstainVotes).toHaveText(
-    `${proposalToCheck.ccAbstainVotes}`
-  );
-  await expect(govActionDetailsPage.ccCommitteeNoVotes).toHaveText(
-    `${proposalToCheck.ccNoVotes}`
+      // check dRep votes
+      if (await areDRepVoteTotalsDisplayed(proposalToCheck)) {
+        await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
+          `₳ ${correctVoteAdaFormat(proposalToCheck.dRepYesVotes)}`
+        );
+        await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
+          `₳ ${correctVoteAdaFormat(proposalToCheck.dRepAbstainVotes)}`
+        );
+        await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
+          `₳ ${correctVoteAdaFormat(proposalToCheck.dRepNoVotes)}`
+        );
+      }
+      // check sPos votes
+      if (await areSPOVoteTotalsDisplayed(proposalToCheck)) {
+        await expect(govActionDetailsPage.sPosYesVotes).toHaveText(
+          `₳ ${correctVoteAdaFormat(proposalToCheck.poolYesVotes)}`
+        );
+        await expect(govActionDetailsPage.sPosAbstainVotes).toHaveText(
+          `₳ ${correctVoteAdaFormat(proposalToCheck.poolAbstainVotes)}`
+        );
+        await expect(govActionDetailsPage.sPosNoVotes).toHaveText(
+          `₳ ${correctVoteAdaFormat(proposalToCheck.poolNoVotes)}`
+        );
+      }
+
+      // check ccCommittee votes
+      if (
+        areCCVoteTotalsDisplayed(proposalToCheck.type as GrovernanceActionType)
+      ) {
+        await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
+          `${proposalToCheck.ccYesVotes}`
+        );
+        await expect(govActionDetailsPage.ccCommitteeAbstainVotes).toHaveText(
+          `${proposalToCheck.ccAbstainVotes}`
+        );
+        await expect(govActionDetailsPage.ccCommitteeNoVotes).toHaveText(
+          `${proposalToCheck.ccNoVotes}`
+        );
+      }
+    })
   );
 });

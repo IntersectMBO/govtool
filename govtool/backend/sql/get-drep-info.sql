@@ -87,6 +87,7 @@ WasRegisteredAsDRep AS (
                     CROSS JOIN DRepId
                 WHERE
                     drep_hash.raw = DRepId.raw
+                    AND drep_registration.deposit >= 0
                     AND drep_registration.voting_anchor_id IS NOT NULL)) AS value
 ),
 WasRegisteredAsSoleVoter AS (
@@ -100,6 +101,7 @@ WasRegisteredAsSoleVoter AS (
                     CROSS JOIN DRepId
                 WHERE
                     drep_hash.raw = DRepId.raw
+                    AND drep_registration.deposit >= 0
                     AND drep_registration.voting_anchor_id IS NULL)) AS value
 ),
 CurrentMetadata AS (

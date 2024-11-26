@@ -10,9 +10,11 @@ export const GovernanceActionDetailsCardLinks = ({
 }: {
   links?: Reference[];
 }) => {
-  const { isMobile } = useScreenDimension();
+  const { screenWidth } = useScreenDimension();
   const { t } = useTranslation();
   const { openModal } = useModal();
+
+  const isOneLine = screenWidth < 1600;
 
   return (
     !!links?.length && (
@@ -32,42 +34,37 @@ export const GovernanceActionDetailsCardLinks = ({
         >
           {t("govActions.supportingLinks")}
         </Typography>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: isMobile ? undefined : "1fr 1fr",
-            columnGap: 2,
-            rowGap: 2,
-          }}
-        >
-          {links.map(({ uri, label }) => (
-            <Box flexDirection={isMobile ? "column" : "row"} display="flex">
-              {label && (
-                <Typography
-                  data-testid={`${label}-${uri}-label`}
-                  sx={{
-                    fontWeight: 400,
-                    flex: 1,
-                    fontSize: 16,
-                    lineHeight: "24px",
-                    mr: 8,
-                    overflow: "hidden",
-                    width: "auto",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {label}
-                </Typography>
-              )}
+        {links.map(({ uri, label }) => (
+          <Box display="flex" flexDirection="column" overflow="hidden">
+            {label && (
+              <Typography
+                data-testid={`${label}-${uri}-label`}
+                sx={{
+                  fontWeight: 400,
+                  flex: 1,
+                  fontSize: 16,
+                  lineHeight: "24px",
+                  mr: 8,
+                  overflow: "hidden",
+                  width: "auto",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {label}
+              </Typography>
+            )}
+            <Box display="flex" flexDirection="row">
               <Typography
                 sx={{
                   fontSize: 16,
                   fontWeight: 400,
-                  maxWidth: "283px",
+                  maxWidth: isOneLine ? "283px" : "auto",
                   lineHeight: "24px",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
+                  ...(isOneLine && {
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }),
                   color: "primaryBlue",
                 }}
               >
@@ -92,8 +89,8 @@ export const GovernanceActionDetailsCardLinks = ({
                 </Box>
               )}
             </Box>
-          ))}
-        </Box>
+          </Box>
+        ))}
       </>
     )
   );

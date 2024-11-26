@@ -35,13 +35,19 @@ export const Footer = () => {
   const { openFeedbackWindow } = useUsersnapApi();
 
   const onClickHelp = () =>
-    openInNewTab("https://docs.gov.tools/support");
+    openInNewTab(
+      "https://docs.gov.tools/using-govtool/support#for-support-you-can-reach-the-team-on-the-intersect-discord-server-at",
+    );
 
   const onClickPrivacyPolicy = () =>
-    openInNewTab("https://docs.intersectmbo.org/legal/policies-and-conditions/privacy-policy");
+    openInNewTab(
+      "https://docs.intersectmbo.org/legal/policies-and-conditions/privacy-policy",
+    );
 
   const onClickTermOfService = () =>
-    openInNewTab("https://docs.intersectmbo.org/legal/policies-and-conditions/terms-of-use");
+    openInNewTab(
+      "https://docs.intersectmbo.org/legal/policies-and-conditions/terms-of-use",
+    );
 
   const onClickFeedback = () => openFeedbackWindow();
 

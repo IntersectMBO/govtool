@@ -202,17 +202,22 @@ data CacheEnv
 
 data NetworkMetrics
   = NetworkMetrics
-      { networkMetricsCurrentTime                   :: UTCTime
-      , networkMetricsCurrentEpoch                  :: Integer
-      , networkMetricsCurrentBlock                  :: Integer
-      , networkMetricsUniqueDelegators              :: Integer
-      , networkMetricsTotalDelegations              :: Integer
-      , networkMetricsTotalGovernanceActions        :: Integer
-      , networkMetricsTotalDRepVotes                :: Integer
-      , networkMetricsTotalRegisteredDReps          :: Integer
-      , networkMetricsAlwaysAbstainVotingPower      :: Integer
-      , networkMetricsAlwaysNoConfidenceVotingPower :: Integer
-      , networkMetricsNetworkName                   :: Text
+      { networkMetricsCurrentTime                           :: UTCTime
+      , networkMetricsCurrentEpoch                          :: Integer
+      , networkMetricsCurrentBlock                          :: Integer
+      , networkMetricsUniqueDelegators                      :: Integer
+      , networkMetricsTotalDelegations                      :: Integer
+      , networkMetricsTotalGovernanceActions                :: Integer
+      , networkMetricsTotalDRepVotes                        :: Integer
+      , networkMetricsTotalRegisteredDReps                  :: Integer
+      , networkMetricsTotalStakeControlledByDReps           :: Integer
+      , networkMetricsTotalActiveDReps                      :: Integer
+      , networkMetricsTotalInactiveDReps                    :: Integer
+      , networkMetricsTotalActiveCIP119CompliantDReps       :: Integer
+      , networkMetricsTotalRegisteredDirectVoters           :: Integer
+      , networkMetricsAlwaysAbstainVotingPower              :: Integer
+      , networkMetricsAlwaysNoConfidenceVotingPower         :: Integer
+      , networkMetricsNetworkName                           :: Text
       }
 
 data Delegation

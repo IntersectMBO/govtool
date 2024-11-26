@@ -4,6 +4,7 @@ export * from "./useDebounce";
 export * from "./useDelegateToDrep";
 export * from "./useFetchNextPageDetector";
 export * from "./useOutsideClick";
+export * from "./usePrevious";
 export * from "./useSaveScrollPosition";
 export * from "./useScreenDimension";
 export * from "./useSlider";

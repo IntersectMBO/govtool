@@ -3,6 +3,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Markdown from "react-markdown";
 
 import { Typography, Tooltip, CopyButton, TooltipProps } from "@atoms";
+import { removeMarkdown } from "@/utils";
 
 type BaseProps = {
   label: string;
@@ -115,7 +116,7 @@ export const GovernanceActionCardElement = ({
               fontFamily: "Poppins, Arial",
             }}
           >
-            {isMarkdown ? (
+            {!isSliderCard && isMarkdown ? (
               <Markdown
                 components={{
                   // eslint-disable-next-line
@@ -162,7 +163,7 @@ export const GovernanceActionCardElement = ({
                   }),
                 }}
               >
-                {text}
+                {isMarkdown ? removeMarkdown(text) : text}
               </Typography>
             )}
             {isCopyButton && (

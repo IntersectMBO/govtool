@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { Box, CircularProgress } from "@mui/material";
 
@@ -15,11 +15,12 @@ import {
 import { DataActionsBar, EmptyStateDrepDirectory } from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
 import { correctAdaFormat, isSameDRep } from "@utils";
-import { DRepListSort, DRepStatus } from "@models";
+import { DRepData, DRepListSort, DRepStatus } from "@models";
 import {
   AutomatedVotingOptionCurrentDelegation,
   AutomatedVotingOptionDelegationId,
 } from "@/types/automatedVotingOptions";
+import usePrevious from "@/hooks/usePrevious";
 
 interface DRepDirectoryContentProps {
   isConnected?: boolean;
@@ -48,6 +49,9 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const { chosenFilters, chosenSorting, setChosenSorting } =
     dataActionsBarProps;
 
+  const [inProgressDelegationDRepData, setInProgressDelegationDRepData] =
+    useState<DRepData | undefined>(undefined);
+
   useEffect(() => {
     if (!chosenSorting) setChosenSorting(DRepListSort.Random);
   }, [chosenSorting, setChosenSorting]);
@@ -57,6 +61,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const { votingPower } = useGetAdaHolderVotingPowerQuery(stakeKey);
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const inProgressDelegation = pendingTransaction.delegate?.resourceId;
+  const prevInProgressDelegation = usePrevious(inProgressDelegation);
 
   const { dRep: myDrep } = useGetDRepDetailsQuery(currentDelegation?.dRepView, {
     enabled: !!inProgressDelegation || !!currentDelegation,
@@ -85,6 +90,12 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     },
   );
 
+  useEffect(() => {
+    if (!inProgressDelegation && prevInProgressDelegation) {
+      setInProgressDelegationDRepData(undefined);
+    }
+  }, [prevInProgressDelegation, inProgressDelegation]);
+
   if (
     (stakeKey && votingPower === undefined) ||
     !dRepList ||
@@ -102,12 +113,6 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     yourselfDRep && showYourselfDRep
       ? [yourselfDRep, ...listedDRepsWithoutYourself]
       : listedDRepsWithoutYourself;
-
-  const inProgressDelegationDRepData = dRepListToDisplay.find(
-    (dRep) =>
-      dRep.drepId === inProgressDelegation ||
-      dRep.view === inProgressDelegation,
-  );
 
   const isAnAutomatedVotingOptionChosen =
     currentDelegation?.dRepView &&
@@ -216,7 +221,10 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
                 }
                 isMe={isSameDRep(dRep, myDRepId)}
                 isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
-                onDelegate={() => delegate(dRep.drepId)}
+                onDelegate={() => {
+                  setInProgressDelegationDRepData(dRep);
+                  delegate(dRep.drepId);
+                }}
               />
             </Box>
           ))}

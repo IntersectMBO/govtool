@@ -68,6 +68,11 @@ export type NetworkMetrics = {
   totalGovernanceActions: number;
   totalDRepVotes: number;
   totalRegisteredDReps: number;
+  totalStakeControlledByDReps: number;
+  totalActiveDReps: number;
+  totalInactiveDReps: number;
+  totalActiveCIP119CompliantDReps: number;
+  totalRegisteredDirectVoters: number;
   alwaysAbstainVotingPower: number;
   alwaysNoConfidenceVotingPower: number;
   networkName: string;

@@ -42,6 +42,11 @@ networkMetrics = withPool $ \conn -> do
      , total_gov_action_proposals
      , total_drep_votes
      , total_registered_dreps
+     , total_stake_controlled_by_dreps
+     , total_active_dreps
+     , total_inactive_dreps
+     , total_active_cip119_compliant_dreps
+     , total_registered_direct_voters
      , always_abstain_voting_power
      , always_no_confidence_voting_power
      , network_name
@@ -54,6 +59,11 @@ networkMetrics = withPool $ \conn -> do
             total_gov_action_proposals
             total_drep_votes
             total_registered_dreps
+            total_stake_controlled_by_dreps
+            total_active_dreps
+            total_inactive_dreps
+            total_active_cip119_compliant_dreps
+            total_registered_direct_voters
             always_abstain_voting_power
             always_no_confidence_voting_power
             network_name

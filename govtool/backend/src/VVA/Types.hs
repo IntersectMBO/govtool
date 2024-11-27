@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE ConstraintKinds       #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
@@ -14,7 +15,7 @@ import           Control.Monad.Fail         (MonadFail)
 import           Control.Monad.IO.Class     (MonadIO)
 import           Control.Monad.Reader       (MonadReader)
 
-import           Data.Aeson                 (Value)
+import           Data.Aeson                 (Value, ToJSON (..), object, (.=))
 import qualified Data.Cache                 as Cache
 import           Data.Has
 import           Data.Pool                  (Pool)
@@ -184,7 +185,20 @@ instance FromRow Proposal where
       <*> field
       <*> field
       
-data TransactionStatus = TransactionConfirmed | TransactionUnconfirmed
+data TransactionStatus = TransactionStatus
+  { transactionConfirmed         :: Bool
+  , votingProcedure :: Maybe Value
+  }
+
+instance FromRow TransactionStatus where
+  fromRow = TransactionStatus <$> field <*> field
+
+instance ToJSON TransactionStatus where
+  toJSON TransactionStatus {transactionConfirmed, votingProcedure} =
+    object
+      [ "transactionConfirmed" .= transactionConfirmed
+      , "votingProcedure" .= votingProcedure
+      ]
 
 data CacheEnv
   = CacheEnv

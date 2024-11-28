@@ -7,11 +7,9 @@ import { waitForTxConfirmation } from "@helpers/transaction";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
-
-import { valid as mockValid } from "@mock/index";
 import { skipIfNotHardFork } from "@helpers/cardano";
-import { proposalSubmissionWallet } from "@constants/staticWallets";
 import { ProposalType } from "@types";
+import { proposalFaucetWallet } from "@constants/proposalFaucetWallet";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
@@ -25,14 +23,11 @@ Object.values(ProposalType).forEach((proposalType, index) => {
   }, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
-    const tempUserAuth = await createTempUserAuth(
-      page,
-      proposalSubmissionWallet
-    );
+    const tempUserAuth = await createTempUserAuth(page, proposalFaucetWallet);
 
     const userPage = await createNewPageWithWallet(browser, {
       storageState: tempUserAuth,
-      wallet: proposalSubmissionWallet,
+      wallet: proposalFaucetWallet,
     });
 
     const proposalDiscussionPage = new ProposalDiscussionPage(userPage);

@@ -16,9 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version-file: "govtool/frontend/.nvmrc"
       - name: Install dependencies
         run: |
           npm config set @intersect.mbo:registry "https://registry.npmjs.org/" --location=global
@@ -27,7 +27,7 @@ jobs:
       - name: Install Playwright
         run: npx playwright install --with-deps
       - name: Build Storybook
-        run: NODE_OPTIONS="--max-old-space-size=8046" npm run build:storybook --quiet
+        run: npm run build:storybook --quiet
       - name: Serve Storybook and run tests
         run: |
           npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \

@@ -1,8 +1,7 @@
-import { expect } from "@storybook/jest";
+import { expect, within } from "@storybook/test";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Card } from "@molecules";
-import { within } from "@storybook/testing-library";
 
 const meta = {
   title: "Example/Card",

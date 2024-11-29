@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { expect, within } from "@storybook/test";
 
 import { ActionCard } from "@molecules";
-import { within } from "@storybook/testing-library";
-import { expect } from "@storybook/jest";
 import { IMAGES } from "@/consts";
 
 const meta = {

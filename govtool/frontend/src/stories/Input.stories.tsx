@@ -1,8 +1,7 @@
 import type { Meta, StoryFn } from "@storybook/react";
 
 import { Field } from "@molecules";
-import { expect } from "@storybook/jest";
-import { userEvent, within } from "@storybook/testing-library";
+import { expect, userEvent, within } from "@storybook/test";
 import { ComponentProps } from "react";
 
 const meta = {

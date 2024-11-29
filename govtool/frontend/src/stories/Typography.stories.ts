@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { expect, within } from "@storybook/test";
 
 import { Typography } from "@atoms";
-import { within } from "@storybook/testing-library";
-import { expect } from "@storybook/jest";
 
 const meta = {
   title: "Example/Typography",

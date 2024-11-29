@@ -1,10 +1,9 @@
-import { Button } from "@atoms";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import { expect, jest } from "@storybook/jest";
+import { expect, userEvent, within, fn } from "@storybook/test";
 import { Meta, StoryObj } from "@storybook/react";
 
+import { Button } from "@atoms";
 import { Field, Step } from "@molecules";
-import { userEvent, within } from "@storybook/testing-library";
 
 const meta: Meta<typeof Step> = {
   title: "Example/Step",
@@ -16,7 +15,7 @@ const meta: Meta<typeof Step> = {
 
 export default meta;
 
-const infoMock = jest.fn();
+const infoMock = fn();
 export const WithButton: StoryObj<typeof Step> = {
   args: {
     label: "Download this file",
@@ -42,7 +41,7 @@ export const WithButton: StoryObj<typeof Step> = {
   },
 };
 
-const readFullGuideMock = jest.fn();
+const readFullGuideMock = fn();
 export const WithIconButton: StoryObj<typeof Step> = {
   args: {
     label:

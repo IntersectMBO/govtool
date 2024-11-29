@@ -1,7 +1,6 @@
 import { Drawer } from "@organisms";
-import { expect, jest } from "@storybook/jest";
+import { expect, userEvent, within, fn } from "@storybook/test";
 import type { Meta, StoryObj } from "@storybook/react";
-import { userEvent, within } from "@storybook/testing-library";
 
 const meta = {
   title: "Example/Drawer",
@@ -15,7 +14,7 @@ type Story = StoryObj<typeof meta>;
 export const DrawerComponent: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    window.open = jest.fn();
+    window.open = fn();
 
     await userEvent.click(canvas.getByTestId("logo-button"));
     const dashboardLink = canvas.getByTestId("dashboard-link");

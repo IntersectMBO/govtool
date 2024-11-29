@@ -13,7 +13,7 @@ import           Control.Exception        (throw, throwIO)
 import           Control.Monad.Except     (runExceptT, throwError)
 import           Control.Monad.Reader
 
-import           Data.Aeson               (Value(..), Array, decode, encode, FromJSON, ToJSON)
+import           Data.Aeson               (Value(..), Array, decode, encode, FromJSON, ToJSON, toJSON)
 import           Data.Bool                (Bool)
 import           Data.List                (sortOn)
 import qualified Data.Map                 as Map
@@ -416,11 +416,11 @@ getCurrentEpochParams = do
 
 getTransactionStatus :: App m => HexText -> m GetTransactionStatusResponse
 getTransactionStatus (unHexText -> transactionId) = do
-  x <- Transaction.getTransactionStatus transactionId
-  case x of
-    Types.TransactionConfirmed   -> return $ GetTransactionStatusResponse True
-    Types.TransactionUnconfirmed -> return $ GetTransactionStatusResponse False
-
+  status <- Transaction.getTransactionStatus transactionId
+  return $ GetTransactionStatusResponse $ case status of
+    Just value -> Just $ toJSON value
+    Nothing    -> Nothing
+    
 throw500 :: App m => m ()
 throw500 = throwError $ CriticalError "intentional system break for testing purposes"
 

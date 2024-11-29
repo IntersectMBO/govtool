@@ -59,6 +59,25 @@ export type EpochParams = {
   treasury_growth_rate: number | null;
 };
 
+export type TransactionStatus = {
+  transactionConfirmed: boolean;
+  votingProcedure:
+    | {
+        committee_voter: number | null;
+        drep_voter: number | null;
+        gov_action_proposal_id: number;
+        id: number;
+        index: number;
+        invalid: boolean | null;
+        pool_voter: number | null;
+        tx_id: number;
+        vote: Vote;
+        voter_role: "DRep" | "Pool" | "Committee";
+        voting_anchor_id: number | null;
+      }[]
+    | [];
+};
+
 export type NetworkMetrics = {
   currentTime: string;
   currentEpoch: number;

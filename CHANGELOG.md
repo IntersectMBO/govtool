@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Fix fetching voting power of newly registerd DRep [Issue 2407](https://github.com/IntersectMBO/govtool/issues/2407)
+- Fix inconsistent voting status [Issue 1713](https://github.com/IntersectMBO/govtool/issues/1713)
 
 ### Changed
 

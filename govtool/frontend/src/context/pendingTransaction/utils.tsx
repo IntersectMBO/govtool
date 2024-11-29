@@ -28,6 +28,10 @@ export const getDesiredResult = (
     case "retireAsDirectVoter":
       // is registered
       return false;
+
+    case "vote":
+      return true;
+
     default:
       return undefined;
   }
@@ -44,6 +48,11 @@ export const getQueryKey = (
     case "retireAsDirectVoter":
       return [QUERY_KEYS.useGetDRepInfoKey, transaction?.transactionHash];
     case "delegate":
+      return [
+        QUERY_KEYS.getAdaHolderCurrentDelegationKey,
+        transaction?.transactionHash,
+      ];
+    case "vote":
       return [
         QUERY_KEYS.getAdaHolderCurrentDelegationKey,
         transaction?.transactionHash,
@@ -74,11 +83,14 @@ export const refetchData = async (
     return data?.dRepHash;
   }
 
-  const data = await queryClient.getQueryData<VoterInfo>(queryKey);
+  const data = await queryClient.getQueryData(queryKey);
 
   if (type === "registerAsDrep" || type === "retireAsDrep")
-    return data?.isRegisteredAsDRep;
+    return (data as VoterInfo)?.isRegisteredAsDRep;
   if (type === "registerAsDirectVoter" || type === "retireAsDirectVoter")
-    return data?.isRegisteredAsSoleVoter;
+    return (data as VoterInfo)?.isRegisteredAsSoleVoter;
+  if (type === "vote") {
+    return true;
+  }
   return undefined;
 };

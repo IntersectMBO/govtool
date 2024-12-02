@@ -10,7 +10,7 @@ const NETWORK = process.env.NETWORK || "preview";
 const environments = {
   frontendUrl: SERVER_HOST_URL,
   apiUrl: `${SERVER_HOST_URL}/api`,
-  docsUrl: process.env.DOCS_URL || "https://docs.gov.tools",
+  docsUrl: process.env.DOCS_URL || "https://docs.gov.tools/cardano-govtool",
   pdfUrl: process.env.PDF_URL || "https://dev.api.pdf.gov.tools",
   networkId: parseInt(process.env.NETWORK_ID) || 0,
   faucet: {

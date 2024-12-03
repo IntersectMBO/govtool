@@ -12,7 +12,7 @@ changes.
 
 ### Added
 
--
+- Add support for displaying CIP-119 DRep images [Issue 1806](https://github.com/IntersectMBO/govtool/issues/1806)
 
 ### Fixed
 

@@ -24,6 +24,8 @@ const EXAMPLE_DREP: DRepData = {
   qualifications: null,
   doNotList: false,
   isScriptBased: false,
+  imageUrl: null,
+  image: null,
 };
 
 describe("isSameDRep function", () => {

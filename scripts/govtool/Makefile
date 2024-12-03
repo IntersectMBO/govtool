@@ -12,7 +12,7 @@ include config.mk
 
 # image tags
 cardano_node_image_tag := 10.1.2
-cardano_db_sync_image_tag := 13.6.0.1
+cardano_db_sync_image_tag := 13.6.0.4
 
 .PHONY: all
 all: deploy-stack notify

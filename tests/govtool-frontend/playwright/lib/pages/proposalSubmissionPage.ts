@@ -318,7 +318,9 @@ export default class ProposalSubmissionPage {
     return proposal;
   }
 
-  async createProposal(): Promise<number> {
+  async createProposal(
+    proposalType: ProposalType = ProposalType.treasury
+  ): Promise<number> {
     await this.addLinkBtn.click();
     const receivingAddr = (await ShelleyWallet.generate()).rewardAddressBech32(
       0
@@ -326,9 +328,7 @@ export default class ProposalSubmissionPage {
 
     const proposalRequest: ProposalCreateRequest =
       this.generateValidProposalFormFields(
-        (await isBootStrapingPhase())
-          ? ProposalType.info
-          : ProposalType.treasury,
+        (await isBootStrapingPhase()) ? ProposalType.info : proposalType,
         false,
         receivingAddr
       );

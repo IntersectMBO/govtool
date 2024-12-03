@@ -21,7 +21,7 @@ export async function downloadMetadata(download: Download): Promise<{
 async function calculateMetadataHash() {
   try {
     const paymentAddress = (await ShelleyWallet.generate()).addressBech32(0);
-    const data = JSON.stringify(mockValid.metadata(paymentAddress));
+    const data = JSON.stringify(mockValid.metadata(paymentAddress), null, 2);
 
     const buffer = Buffer.from(data, "utf8");
     const hexDigest = blake.blake2bHex(buffer, null, 32);

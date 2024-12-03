@@ -651,29 +651,26 @@ instance ToSchema GetProposalResponse where
             ?~ toJSON exampleGetProposalResponse
 
 newtype GetTransactionStatusResponse
-  = GetTransactionStatusResponse { getTransactionstatusResponseTransactionConfirmed :: Bool }
-  deriving (Generic, Show)
+  = GetTransactionStatusResponse { getTransactionStatusResponse :: Maybe Value }
+  deriving newtype (Show)
 
+instance FromJSON GetTransactionStatusResponse where
+  parseJSON = pure . GetTransactionStatusResponse . Just
 
-deriveJSON (jsonOptions "getTransactionstatusResponse") ''GetTransactionStatusResponse
+instance ToJSON GetTransactionStatusResponse where
+  toJSON (GetTransactionStatusResponse Nothing)       = Null
+  toJSON (GetTransactionStatusResponse (Just status)) = toJSON status
 
 exampleGetTransactionStatusResponse :: Text
-exampleGetTransactionStatusResponse = "{ \"transactionConfirmed\": True }"
+exampleGetTransactionStatusResponse =
+  "{ \"transactionConfirmed\": True, \"votingProcedure\": {\"vote\": \"yes\"}}"
 
 instance ToSchema GetTransactionStatusResponse where
-  declareNamedSchema proxy = do
-    NamedSchema name_ schema_ <-
-      genericDeclareNamedSchema
-        ( fromAesonOptions $
-            jsonOptions "getTransactionstatusResponse"
-        )
-        proxy
-    return $
-      NamedSchema name_ $
-        schema_
-          & description ?~ "GetTransactionStatus Response"
-          & example
-            ?~ toJSON exampleGetTransactionStatusResponse
+    declareNamedSchema _ = pure $ NamedSchema (Just "GetTransactionStatusResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "Transaction status encoded as JSON"
+        & example
+          ?~ toJSON exampleGetTransactionStatusResponse
 
 newtype DRepHash
   = DRepHash Text
@@ -923,4 +920,3 @@ instance ToSchema GetNetworkMetricsResponse where
         & description ?~ "GetNetworkMetricsResponse"
         & example
           ?~ toJSON exampleGetNetworkMetricsResponse
-

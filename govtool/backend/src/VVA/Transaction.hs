@@ -15,6 +15,8 @@ import           Data.Has                   (Has)
 import           Data.String                (fromString)
 import           Data.Text                  (Text, pack, unpack)
 import qualified Data.Text.Encoding         as Text
+import qualified Data.Text.IO               as Text
+import           Data.Maybe                 (fromMaybe)
 
 import qualified Database.PostgreSQL.Simple as SQL
 
@@ -31,10 +33,10 @@ getTransactionStatusSql = sqlFrom $(embedFile "sql/get-transaction-status.sql")
 getTransactionStatus ::
   (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m)
   => Text
-  -> m TransactionStatus
+  -> m (Maybe TransactionStatus)
 getTransactionStatus transactionId = withPool $ \conn -> do
-  result <- liftIO $ SQL.query conn getTransactionStatusSql (SQL.Only transactionId)
+  result <- liftIO $ SQL.query conn getTransactionStatusSql (transactionId, transactionId)
   case result of
-    [SQL.Only True] -> return TransactionConfirmed
-    [SQL.Only False] -> return TransactionUnconfirmed
-    x -> throwError $ CriticalError ("Expected exactly one result from get-transaction-status.sql but got " <> pack (show (length x)) <> " of them. This should never happen")
+    [(transactionConfirmed, votingProcedure)] -> do
+      return $ Just $ TransactionStatus transactionConfirmed votingProcedure
+    _ -> return Nothing

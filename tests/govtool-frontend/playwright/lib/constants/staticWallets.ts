@@ -1,6 +1,5 @@
 const staticWallets: StaticWallet[] = require("../_mock/wallets.json");
 import { StaticWallet } from "@types";
-
 export const faucetWallet = staticWallets[0];
 
 export const dRep01Wallet = staticWallets[1];

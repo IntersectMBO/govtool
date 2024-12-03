@@ -1,16 +1,12 @@
 import environments from "@constants/environments";
 
-const blockfrostApiUrl =
-  "https://cardano-" + environments.network + ".blockfrost.io/api";
-const blockfrostApiKey = environments.blockfrostApiKey;
-
 export async function blockfrostSubmitTransaction(cborSignedTx: Buffer) {
-  const url = `${blockfrostApiUrl}/v0/tx/submit`;
+  const url = `${environments.blockfrostApiUrl}/v0/tx/submit`;
   const res = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/cbor",
-      project_id: blockfrostApiKey,
+      project_id: environments.blockfrostApiKey,
     },
     body: cborSignedTx,
   });

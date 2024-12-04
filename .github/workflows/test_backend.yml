@@ -39,6 +39,7 @@ jobs:
           BASE_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io/api' }}
           FAUCET_API_KEY: ${{ secrets.FAUCET_API_KEY }}
           KUBER_API_URL: ${{ vars.KUBER_API_URL }}
+          KUBER_API_KEY: ${{ secrets.KUBER_API_KEY }}
 
       - name: Upload report
         if: always()

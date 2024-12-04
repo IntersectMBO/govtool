@@ -53,7 +53,7 @@ import           System.Clock                           (TimeSpec (TimeSpec))
 import           System.IO                              (stderr)
 import           System.Log.Raven                       (initRaven, register, silentFallback)
 import           System.Log.Raven.Transport.HttpConduit (sendRecord)
-import           System.Log.Raven.Types                 (SentryLevel (Error), SentryRecord (..))
+import           System.Log.Raven.Types                 (SentryLevel (Error), SentryRecord (..), SentryService)
 import           System.TimeManager                     (TimeoutThread (..))
 
 import           VVA.API
@@ -71,12 +71,18 @@ main :: IO ()
 main = do
   commandLineConfig <- execParser cmdParser
   vvaConfig <- loadVVAConfig (clcConfigPath commandLineConfig)
+  sentryService <-
+    initRaven
+      (sentryDSN vvaConfig)
+      id
+      sendRecord
+      silentFallback
   case clcCommand commandLineConfig of
-    StartApp   -> startApp vvaConfig
+    StartApp   -> startApp vvaConfig sentryService
     ShowConfig -> Text.putStrLn $ vvaConfigToText vvaConfig
 
-startApp :: VVAConfig -> IO ()
-startApp vvaConfig = do
+startApp :: VVAConfig -> SentryService -> IO ()
+startApp vvaConfig sentryService = do
   let vvaPort = serverPort vvaConfig
       vvaHost = fromString (Text.unpack (serverHost vvaConfig))
       settings =
@@ -92,7 +98,7 @@ startApp vvaConfig = do
                       ++ show vvaPort
                   )
             )
-          $ setOnException (exceptionHandler vvaConfig) defaultSettings
+          $ setOnException (exceptionHandler vvaConfig sentryService) defaultSettings
   cacheEnv <- do
     let newCache = Cache.newCache (Just $ TimeSpec (fromIntegral (cacheDurationSeconds vvaConfig)) 0)
     proposalListCache <- newCache
@@ -122,8 +128,8 @@ startApp vvaConfig = do
   server' <- mkVVAServer appEnv
   runSettings settings server'
 
-exceptionHandler :: VVAConfig -> Maybe Request -> SomeException -> IO ()
-exceptionHandler vvaConfig mRequest exception = do
+exceptionHandler :: VVAConfig -> SentryService -> Maybe Request -> SomeException -> IO ()
+exceptionHandler vvaConfig sentryService mRequest exception = do
   print mRequest
   print exception
   let isNotTimeoutThread x = case fromException x of
@@ -135,12 +141,6 @@ exceptionHandler vvaConfig mRequest exception = do
   guard . isNotTimeoutThread $ exception
   guard . isNotConnectionClosedByPeer $ exception
   let env = sentryEnv vvaConfig
-  sentryService <-
-    initRaven
-      (sentryDSN vvaConfig)
-      id
-      sendRecord
-      silentFallback
   register
     sentryService
     "vva.be"

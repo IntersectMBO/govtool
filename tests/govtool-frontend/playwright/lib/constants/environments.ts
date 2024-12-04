@@ -35,6 +35,14 @@ const environments = {
   metadataBucketUrl: `${CARDANO_API_METADATA_HOST_URL}/data`,
   lockInterceptorUrl: `${CARDANO_API_METADATA_HOST_URL}/lock`,
   ci: process.env.CI,
+  proposalFaucet: {
+    payment: {
+      private: process.env.PROPOSAL_FAUCET_PAYMENT_PRIVATE,
+    },
+    stake: {
+      private: process.env.PROPOSAL_FAUCET_STAKE_PRIVATE,
+    },
+  },
 };
 
 export default environments;

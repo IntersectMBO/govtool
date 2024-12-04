@@ -403,7 +403,6 @@ const CardanoProvider = (props: Props) => {
                 .to_hex();
             });
           } else {
-            console.warn(t("warnings.usingUnregisteredStakeKeys"));
             stakeKeysList = unregisteredStakeKeysList.map((key) => {
               const stakeKeyHash = PublicKey.from_hex(key).hash();
               const stakeCredential = Credential.from_keyhash(stakeKeyHash);

@@ -78,7 +78,10 @@ export const usePendingTransaction = ({
         setTransaction(null);
       };
 
-      if (status.transactionConfirmed) {
+      if (
+        status.transactionConfirmed &&
+        (type === "vote" ? status.votingProcedure.length > 0 : true)
+      ) {
         clearInterval(interval);
 
         if (isEnabled) {

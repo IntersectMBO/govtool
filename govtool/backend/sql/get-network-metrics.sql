@@ -175,7 +175,7 @@ SELECT
     total_gov_action_proposals.count as total_gov_action_proposals,
     total_drep_votes.count as total_drep_votes,
     total_registered_dreps.unique_registrations as total_registered_dreps,
-    total_stake_controlled_by_dreps.total as total_stake_controlled_by_dreps,
+    COALESCE(total_stake_controlled_by_dreps.total, 0) as total_stake_controlled_by_dreps,
     total_active_dreps.unique_active_drep_registrations as total_active_dreps,
     total_inactive_dreps.total_inactive_dreps as total_inactive_dreps,
     total_active_cip119_compliant_dreps.unique_active_cip119_compliant_drep_registrations as total_active_cip119_compliant_dreps,

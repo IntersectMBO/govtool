@@ -9,7 +9,7 @@ import * as blake from "blakejs";
 import environments from "lib/constants/environments";
 import { LockInterceptor, LockInterceptorInfo } from "lib/lockInterceptor";
 import fetch, { BodyInit, RequestInit } from "node-fetch";
-import { cborxDecoder, cborxEncoder } from "../helpers/cborEncodeDecode";
+import { cborxDecoder, cborxEncoder } from "../helpers/encodeDecode";
 import { Logger } from "@helpers/logger";
 
 type CertificateType = "registerstake" | "registerdrep" | "deregisterdrep";

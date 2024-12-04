@@ -38,7 +38,7 @@ export const Dashboard = () => {
         navigate(PATHS.home);
       } else {
         navigate(
-          window.location.pathname.replace("connected/", "") + hash ?? "",
+          window.location.pathname.replace("connected/", "") + hash || "",
         );
       }
     }

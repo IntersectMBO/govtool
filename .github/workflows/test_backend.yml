@@ -33,6 +33,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          if [[ "${{ env.NETWORK }}" == "preprod" ]]; then
+            export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_PREPROD }}"
+          elif [[ "${{ env.NETWORK }}" == "sanchonet" ]]; then
+            export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_SANCHONET }}"
+          else
+            export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_PREVIEW }}"
+          fi
           python ./setup.py
           python -m pytest --alluredir allure-results
         env:

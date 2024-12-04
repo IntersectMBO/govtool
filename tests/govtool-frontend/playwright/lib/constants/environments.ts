@@ -9,6 +9,8 @@ const NETWORK = process.env.NETWORK || "preview";
 
 const environments = {
   frontendUrl: SERVER_HOST_URL,
+  blockfrostApiKey: process.env.BLOCKFROST_API_KEY,
+  blockfrostApiUrl: "https://cardano-" + NETWORK + ".blockfrost.io/api",
   apiUrl: `${SERVER_HOST_URL}/api`,
   docsUrl: process.env.DOCS_URL || "https://docs.gov.tools",
   pdfUrl: process.env.PDF_URL || "https://dev.api.pdf.gov.tools",

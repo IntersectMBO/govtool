@@ -37,7 +37,7 @@ test.describe("Proposal checks", () => {
       ? await govActionsPage.viewFirstProposalByGovernanceAction(
           GrovernanceActionType.InfoAction
         )
-      : await govActionsPage.viewFirstProposal();
+      : await govActionsPage.viewFirstDRepVoteEnabledGovernanceAction();
   });
 
   test("5A. Should show relevant details about governance action as DRep", async () => {
@@ -185,7 +185,7 @@ test.describe("Perform voting", () => {
       ? await govActionsPage.viewFirstProposalByGovernanceAction(
           GrovernanceActionType.InfoAction
         )
-      : await govActionsPage.viewFirstProposal();
+      : await govActionsPage.viewFirstDRepVoteEnabledGovernanceAction();
   });
 
   test("5E. Should re-vote with new data on a already voted governance action", async ({}, testInfo) => {

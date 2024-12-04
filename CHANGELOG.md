@@ -24,6 +24,7 @@ changes.
 ### Changed
 
 - Bump cardano-db-sync to 13.6.0.4 [Issue 2411](https://github.com/IntersectMBO/govtool/issues/2411)
+- Bump @intersect.mbo/pdf-ui to v0.5.3
 
 ### Removed
 

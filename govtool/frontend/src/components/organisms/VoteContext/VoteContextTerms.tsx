@@ -5,6 +5,7 @@ import { Spacer, Typography } from "@atoms";
 import { useScreenDimension, useTranslation, useVoteContextForm } from "@hooks";
 import { ControlledField, VoteContextWrapper } from "@organisms";
 import { openInNewTab } from "@utils";
+import { LINKS } from "@/consts/links";
 
 type StoreDataInfoProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -16,10 +17,7 @@ export const VoteContextTerms = ({ setStep, onCancel }: StoreDataInfoProps) => {
   const { control, errors, watch } = useVoteContextForm();
   const { isMobile } = useScreenDimension();
 
-  const openLink = () =>
-    openInNewTab(
-      "https://docs.gov.tools/using-govtool/govtool-functions/storing-information-offline",
-    );
+  const openLink = () => openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);
 
   const isContinueDisabled = !watch("terms");
 

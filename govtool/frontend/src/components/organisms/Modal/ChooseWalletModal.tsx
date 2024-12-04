@@ -8,6 +8,7 @@ import { WalletOptionButton } from "@molecules";
 import { openInNewTab } from "@utils";
 import { useTranslation } from "@hooks";
 import { To } from "react-router-dom";
+import { LINKS } from "@/consts/links";
 
 type ChooseWalletModalState = {
   pathToNavigate?: To;
@@ -105,11 +106,7 @@ export const ChooseWalletModal = forwardRef<HTMLDivElement>((_, ref) => {
           <Link
             fontSize={11}
             fontWeight={500}
-            onClick={() =>
-              openInNewTab(
-                "https://docs.gov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet",
-              )
-            }
+            onClick={() => openInNewTab(LINKS.COMPATIBLE_WALLETS)}
             sx={{ cursor: "pointer" }}
           >
             {t("here")}

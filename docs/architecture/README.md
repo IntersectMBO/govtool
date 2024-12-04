@@ -23,7 +23,7 @@ utility backend that serves validation of the governance actions metadata.
 
 # Description
 
-Frontend is a React application using Vite as a built tool to enhance development speed and optimize production builds. Frontend interacts with the backend service via REST API and with the Cardano blockchain via cardano-serialization-lib and connected supported wallets (for the list of compatible wallets go [here](https://docs.gov.tools/how-to-use-the-govtool/getting-started/get-a-compatible-wallet)).
+Frontend is a React application using Vite as a built tool to enhance development speed and optimize production builds. Frontend interacts with the backend service via REST API and with the Cardano blockchain via cardano-serialization-lib and connected supported wallets (for the list of compatible wallets go [here](https://docs.gov.tools/cardano-govtool/using-govtool/getting-started/compatible-wallets)).
 
 # Components
 

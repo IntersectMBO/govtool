@@ -10,6 +10,7 @@ import {
 import { CenteredBoxBottomButtons } from "@molecules";
 import { ControlledField } from "@organisms";
 import { openInNewTab } from "@utils";
+import { LINKS } from "@/consts/links";
 
 type StoreDataInfoProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -20,10 +21,7 @@ export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
   const { control, errors, watch } = useCreateGovernanceActionForm();
   const { isMobile } = useScreenDimension();
 
-  const openLink = () =>
-    openInNewTab(
-      "https://docs.gov.tools/using-govtool/govtool-functions/storing-information-offline",
-    );
+  const openLink = () => openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);
 
   const isContinueDisabled = !watch("storeData");
 

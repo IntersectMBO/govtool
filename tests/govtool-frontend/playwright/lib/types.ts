@@ -74,7 +74,7 @@ export enum ProposalType {
   treasury = "Treasury",
 }
 
-export enum GrovernanceActionType {
+export enum GovernanceActionType {
   ProtocolParameterChange = "ParameterChange",
   InfoAction = "InfoAction",
   TreasuryWithdrawal = "TreasuryWithdrawals",

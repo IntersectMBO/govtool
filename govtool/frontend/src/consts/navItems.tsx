@@ -3,6 +3,7 @@ import i18n from "@/i18n";
 import { theme } from "@/theme";
 
 import { ICONS } from "./icons";
+import { LINKS } from "./links";
 import { PATHS, PDF_PATHS } from "./paths";
 
 export const NAV_ITEMS = [
@@ -33,13 +34,13 @@ export const NAV_ITEMS = [
     dataTestId: "guides-link",
     navTo: "",
     label: i18n.t("menu.guides"),
-    newTabLink: "https://docs.gov.tools/",
+    newTabLink: LINKS.USING_GOVTOOL,
   },
   {
     dataTestId: "faqs-link",
     navTo: "",
     label: i18n.t("menu.faqs"),
-    newTabLink: "https://docs.gov.tools/faqs",
+    newTabLink: LINKS.FAQS,
   },
 ];
 
@@ -95,7 +96,7 @@ export const CONNECTED_NAV_ITEMS = [
     navTo: "",
     activeIcon: ICONS.guidesActiveIcon,
     icon: ICONS.guidesIcon,
-    newTabLink: "https://docs.gov.tools/",
+    newTabLink: LINKS.USING_GOVTOOL,
   },
   {
     dataTestId: "faqs-link",
@@ -103,6 +104,6 @@ export const CONNECTED_NAV_ITEMS = [
     navTo: "",
     activeIcon: ICONS.faqsActiveIcon,
     icon: ICONS.faqsIcon,
-    newTabLink: "https://docs.gov.tools/faqs",
+    newTabLink: LINKS.FAQS,
   },
 ];

@@ -6,11 +6,12 @@ import {
   WalletAndAnchorType,
 } from "@types";
 import * as blake from "blakejs";
-import environments from "lib/constants/environments";
+import environments from "@constants/environments";
 import { LockInterceptor, LockInterceptorInfo } from "lib/lockInterceptor";
 import fetch, { BodyInit, RequestInit } from "node-fetch";
-import { cborxDecoder, cborxEncoder } from "../helpers/encodeDecode";
+import { cborxEncoder } from "@helpers/encodeDecode";
 import { Logger } from "@helpers/logger";
+import { blockfrostSubmitTransaction } from "@services/blockfrostService";
 
 type CertificateType = "registerstake" | "registerdrep" | "deregisterdrep";
 
@@ -99,20 +100,17 @@ class Kuber {
       `Submitting tx: ${JSON.stringify({ lock_id: lockId, tx: signedTx })}`
     );
 
-    const res = (await callKuber(
-      `/api/${this.version}/tx?submit=true`,
+    const response = (await callKuber(
+      `/api/${this.version}/tx?submit=false`,
       "POST",
       JSON.stringify(signedTx)
     )) as any;
-    let decodedTx = cborxDecoder.decode(Buffer.from(res.cborHex, "hex"));
-    const submittedTxBody = Uint8Array.from(cborxEncoder.encode(decodedTx[0]));
-    const submittedTxHash = Buffer.from(
-      blake.blake2b(submittedTxBody, undefined, 32)
-    ).toString("hex");
+    const cborSignedTx = Buffer.from(response.cborHex, "hex");
 
+    const submittedTxHash = await blockfrostSubmitTransaction(cborSignedTx);
     Logger.success(`Tx submitted: ${submittedTxHash}`);
     return {
-      cbor: res.cborHex,
+      cbor: response.cborHex,
       txId: submittedTxHash,
     };
   }

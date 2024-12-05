@@ -9,26 +9,21 @@ const NETWORK = process.env.NETWORK || "preview";
 
 const environments = {
   frontendUrl: SERVER_HOST_URL,
+  blockfrostApiKey: process.env.BLOCKFROST_API_KEY,
+  blockfrostApiUrl: "https://cardano-" + NETWORK + ".blockfrost.io/api",
   apiUrl: `${SERVER_HOST_URL}/api`,
-  docsUrl: process.env.DOCS_URL || "https://docs.gov.tools",
+  docsUrl: process.env.DOCS_URL || "https://docs.gov.tools/cardano-govtool",
   pdfUrl: process.env.PDF_URL || "https://dev.api.pdf.gov.tools",
   networkId: parseInt(process.env.NETWORK_ID) || 0,
   faucet: {
-    apiUrl:
-      process.env.FAUCET_API_URL.replace("sanchonet", NETWORK) ||
-      "https://faucet.sanchonet.world.dev.cardano.org".replace(
-        "sanchonet",
-        NETWORK
-      ),
+    apiUrl:`https://faucet.${NETWORK}.world.dev.cardano.org`,
     apiKey: process.env.FAUCET_API_KEY || "",
     address:
       process.env.FAUCET_ADDRESS ||
       "addr_test1vz0ua2vyk7r4vufmpqh5v44awg8xff26hxlwyrt3uc67maqtql3kl",
   },
   kuber: {
-    apiUrl:
-      process.env.KUBER_API_URL.replace("sanchonet", NETWORK) ||
-      "https://sanchonet.kuber.cardanoapi.io".replace("sanchonet", NETWORK),
+    apiUrl: `https://${NETWORK}.kuber.cardanoapi.io`,
     apiKey: process.env.KUBER_API_KEY || "",
   },
   txTimeOut: parseInt(process.env.TX_TIMEOUT) || 240000,

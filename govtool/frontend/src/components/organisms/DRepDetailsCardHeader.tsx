@@ -32,7 +32,7 @@ export const DRepDetailsCardHeader = ({
   const { votingPower: myVotingPower } =
     useGetAdaHolderVotingPowerQuery(stakeKey);
 
-  const { givenName, metadataStatus } = dRepData;
+  const { givenName, metadataStatus, image } = dRepData;
 
   const navigateToEditDRep = () => {
     navigate(PATHS.editDrepMetadata, {
@@ -121,7 +121,9 @@ export const DRepDetailsCardHeader = ({
         </Box>
       )}
       <DataMissingHeader
+        isDRep
         title={givenName ?? undefined}
+        image={image}
         isDataMissing={metadataStatus}
         titleStyle={{ wordBreak: "break-word", whiteSpace: "wrap" }}
       />

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Box, ButtonBase, Divider } from "@mui/material";
+import { Box, ButtonBase, Divider, Avatar } from "@mui/material";
 
 import { Button, StatusPill, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
@@ -24,7 +24,7 @@ type DRepCardProps = {
 };
 
 export const DRepCard = ({
-  dRep: { status, type, view, votingPower, givenName, metadataStatus },
+  dRep: { status, type, view, votingPower, givenName, metadataStatus, image },
   isConnected,
   isDelegationLoading,
   isInProgress,
@@ -100,36 +100,47 @@ export const DRepCard = ({
               containerType: "inline-size",
             }}
           >
-            <Box minWidth={0} display="flex" flexDirection="column">
-              <Typography
-                sx={{ ellipsisStyles, color: metadataStatus && "errorRed" }}
-              >
-                {metadataStatus
-                  ? getMetadataDataMissingStatusTranslation(metadataStatus)
-                  : ellipsizeText(givenName ?? "", 25)}
-              </Typography>
-              <ButtonBase
-                data-testid={`${view}-copy-id-button`}
-                onClick={(e) => {
-                  navigator.clipboard.writeText(view);
-                  addSuccessAlert(t("alerts.copiedToClipboard"));
-                  e.stopPropagation();
-                }}
-                sx={{
-                  gap: 1,
-                  width: "250px",
-                  maxWidth: "100%",
-                  "&:hover": {
-                    opacity: 0.6,
-                    transition: "opacity 0.3s",
-                  },
-                }}
-              >
-                <Typography color="primary" variant="body2" sx={ellipsisStyles}>
-                  {view}
+            <Box flexDirection="row" minWidth={0} display="flex">
+              <Avatar
+                alt="drep-image"
+                src={image || ICONS.defaultDRepIcon}
+                data-testid="drep-image"
+              />
+              <Box ml={3}>
+                <Typography
+                  sx={{ ellipsisStyles, color: metadataStatus && "errorRed" }}
+                >
+                  {metadataStatus
+                    ? getMetadataDataMissingStatusTranslation(metadataStatus)
+                    : ellipsizeText(givenName ?? "", 25)}
                 </Typography>
-                <img alt="" src={ICONS.copyBlueIcon} />
-              </ButtonBase>
+                <ButtonBase
+                  data-testid={`${view}-copy-id-button`}
+                  onClick={(e) => {
+                    navigator.clipboard.writeText(view);
+                    addSuccessAlert(t("alerts.copiedToClipboard"));
+                    e.stopPropagation();
+                  }}
+                  sx={{
+                    gap: 1,
+                    width: "250px",
+                    maxWidth: "100%",
+                    "&:hover": {
+                      opacity: 0.6,
+                      transition: "opacity 0.3s",
+                    },
+                  }}
+                >
+                  <Typography
+                    color="primary"
+                    variant="body2"
+                    sx={ellipsisStyles}
+                  >
+                    {view}
+                  </Typography>
+                  <img alt="" src={ICONS.copyBlueIcon} />
+                </ButtonBase>
+              </Box>
             </Box>
 
             <Box sx={{ display: "flex", flex: { xl: 1 }, gap: 3 }}>

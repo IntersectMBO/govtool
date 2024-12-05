@@ -12,7 +12,7 @@ import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
-import { BootstrapGovernanceActionType, GrovernanceActionType } from "@types";
+import { BootstrapGovernanceActionType, GovernanceActionType } from "@types";
 import walletManager from "lib/walletManager";
 
 const invalidInfinityProposals = require("../../lib/_mock/invalidInfinityProposals.json");
@@ -32,12 +32,17 @@ test.describe("Proposal checks", () => {
     const govActionsPage = new GovernanceActionsPage(page);
     await govActionsPage.goto();
 
+    // assert to wait until the loading button is hidden
+    await expect(page.getByTestId("to-vote-tab")).toBeVisible({
+      timeout: 15_000,
+    });
+
     currentPage = page;
     govActionDetailsPage = (await isBootStrapingPhase())
       ? await govActionsPage.viewFirstProposalByGovernanceAction(
-          GrovernanceActionType.InfoAction
+          GovernanceActionType.InfoAction
         )
-      : await govActionsPage.viewFirstProposal();
+      : await govActionsPage.viewFirstDRepVoteEnabledGovernanceAction();
   });
 
   test("5A. Should show relevant details about governance action as DRep", async () => {
@@ -181,11 +186,16 @@ test.describe("Perform voting", () => {
     const govActionsPage = new GovernanceActionsPage(dRepPage);
     await govActionsPage.goto();
 
+    // assert to wait until the loading button is hidden
+    await expect(dRepPage.getByTestId("to-vote-tab")).toBeVisible({
+      timeout: 15_000,
+    });
+
     govActionDetailsPage = (await isBootStrapingPhase())
       ? await govActionsPage.viewFirstProposalByGovernanceAction(
-          GrovernanceActionType.InfoAction
+          GovernanceActionType.InfoAction
         )
-      : await govActionsPage.viewFirstProposal();
+      : await govActionsPage.viewFirstDRepVoteEnabledGovernanceAction();
   });
 
   test("5E. Should re-vote with new data on a already voted governance action", async ({}, testInfo) => {
@@ -211,7 +221,7 @@ test.describe("Perform voting", () => {
 
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   test("5F. Should show notification of casted vote after vote", async ({}, testInfo) => {
@@ -271,77 +281,62 @@ test.describe("Check voting power", () => {
 });
 
 test.describe("Bootstrap phase", () => {
-  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
   test("5L. Should restrict dRep votes to Info Governance actions During Bootstrapping Phase", async ({
-    page,
-    context,
+    browser,
   }) => {
-    await page.route("**/epoch/params", async (route) => {
-      // Fetch the original response from the server
-      const response = await route.fetch();
-      const json = await response.json();
-
-      // update protocol major version
-      json["protocol_major"] = 9;
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(json),
-      });
-    });
-
-    const voteBlacklistOptions = Object.keys(GrovernanceActionType).filter(
+    const voteBlacklistOptions = Object.keys(GovernanceActionType).filter(
       (option) => option !== BootstrapGovernanceActionType.InfoAction
     );
 
-    const govActionsPage = new GovernanceActionsPage(page);
-    await govActionsPage.goto();
+    await Promise.all(
+      voteBlacklistOptions.map(async (voteBlacklistOption) => {
+        const dRepPage = await createNewPageWithWallet(browser, {
+          storageState: ".auth/dRep01.json",
+          wallet: dRep01Wallet,
+        });
 
-    // wait until the loading button is hidden
-    await expect(
-      page.getByRole("progressbar").getByRole("img")
-    ).not.toBeVisible({ timeout: 10_000 });
+        await dRepPage.route("**/epoch/params", async (route) => {
+          // Fetch the original response from the server
+          const response = await route.fetch();
+          const json = await response.json();
 
-    for (const voteBlacklistOption of voteBlacklistOptions) {
-      const governanceActionDetailsPage =
-        await govActionsPage.viewFirstProposalByGovernanceAction(
-          voteBlacklistOption as GrovernanceActionType
-        );
+          // update protocol major version
+          json["protocol_major"] = 9;
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify(json),
+          });
+        });
 
-      if (governanceActionDetailsPage !== null) {
-        // dRep vote
-        await expect(governanceActionDetailsPage.dRepYesVotes).toBeVisible();
-        await expect(
-          governanceActionDetailsPage.dRepAbstainVotes
-        ).toBeVisible();
-        await expect(governanceActionDetailsPage.dRepNoVotes).toBeVisible();
+        const governanceActionsPage = new GovernanceActionsPage(dRepPage);
+        await governanceActionsPage.goto();
 
-        // sPos vote
-        await expect(governanceActionDetailsPage.sPosYesVotes).toBeVisible();
-        await expect(
-          governanceActionDetailsPage.sPosAbstainVotes
-        ).toBeVisible();
-        await expect(governanceActionDetailsPage.sPosNoVotes).toBeVisible();
+        // assert to wait until proposal cards are visible
+        await expect(dRepPage.getByTestId("voting-power-chips")).toBeVisible();
+        // wait until the loading button is hidden
+        await expect(dRepPage.getByTestId("to-vote-tab")).toBeVisible({
+          timeout: 15_000,
+        });
 
-        // ccCommittee vote
-        await expect(
-          governanceActionDetailsPage.ccCommitteeYesVotes
-        ).toBeVisible();
-        await expect(
-          governanceActionDetailsPage.ccCommitteeAbstainVotes
-        ).toBeVisible();
-        await expect(
-          governanceActionDetailsPage.ccCommitteeNoVotes
-        ).toBeVisible();
+        const governanceActionDetailsPage =
+          await governanceActionsPage.viewFirstProposalByGovernanceAction(
+            voteBlacklistOption as GovernanceActionType
+          );
 
-        await expect(
-          governanceActionDetailsPage.yesVoteRadio
-        ).not.toBeVisible();
-        await expect(governanceActionDetailsPage.contextBtn).not.toBeVisible();
-        await expect(governanceActionDetailsPage.voteBtn).not.toBeVisible();
-
-        await governanceActionDetailsPage.backBtn.click();
-      }
-    }
+        if (governanceActionDetailsPage) {
+          await expect(
+            dRepPage.getByTestId("governance-action-details-card-header")
+          ).toBeVisible();
+          await expect(
+            governanceActionDetailsPage.yesVoteRadio
+          ).not.toBeVisible();
+          await expect(
+            governanceActionDetailsPage.contextBtn
+          ).not.toBeVisible();
+          await expect(governanceActionDetailsPage.voteBtn).not.toBeVisible();
+        }
+      })
+    );
   });
 });

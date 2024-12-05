@@ -144,6 +144,9 @@ export type DrepDataDTO = {
   url?: string;
   view: string;
   votingPower?: number;
+  imageUrl: string | null;
+  // either base64 for IPFS image or URL for regular image
+  image: string | null;
 };
 
 export type DRepData = DrepDataDTO & {
@@ -156,6 +159,9 @@ export type DRepData = DrepDataDTO & {
   doNotList: boolean;
   metadataStatus: MetadataValidationStatus | null;
   metadataValid: boolean;
+  imageUrl: string | null;
+  // either base64 for IPFS image or URL for regular image
+  image: string | null;
 };
 
 export type Vote = "yes" | "no" | "abstain";

@@ -74,6 +74,12 @@ export enum ProposalType {
   treasury = "Treasury",
 }
 
+export enum BootstrapGovernanceActionType {
+  ProtocolParameterChange = "ParameterChange",
+  InfoAction = "InfoAction",
+  HardFork = "HardForkInitiation",
+}
+
 export enum GovernanceActionType {
   ProtocolParameterChange = "ParameterChange",
   InfoAction = "InfoAction",
@@ -91,7 +97,7 @@ export enum FullGovernanceDRepVoteActionsType {
   HardFork = "HardForkInitiation",
 }
 
-export enum BootstrapGovernanceActionType {
+export enum BootstrapDRepVoteEnabledGovernanceActionType {
   InfoAction = "InfoAction",
 }
 

@@ -14,7 +14,7 @@ import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import {
-  BootstrapGovernanceActionType,
+  BootstrapDRepVoteEnabledGovernanceActionType,
   FullGovernanceDRepVoteActionsType,
   GovernanceActionType,
   IProposal,
@@ -144,7 +144,7 @@ test.describe("Check vote count", () => {
     browser,
   }) => {
     const voteWhiteListOption = (await isBootStrapingPhase())
-      ? BootstrapGovernanceActionType
+      ? BootstrapDRepVoteEnabledGovernanceActionType
       : FullGovernanceDRepVoteActionsType;
     const responsesPromise = Object.keys(voteWhiteListOption).map((filterKey) =>
       page.waitForResponse((response) =>

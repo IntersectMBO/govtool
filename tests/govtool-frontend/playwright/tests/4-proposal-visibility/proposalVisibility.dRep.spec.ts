@@ -57,6 +57,11 @@ test.describe("Logged in DRep", () => {
       const govActionsPage = new GovernanceActionsPage(page);
       await govActionsPage.goto();
 
+      // assert to wait until the loading button is hidden
+      await expect(page.getByTestId("to-vote-tab")).toBeVisible({
+        timeout: 15_000,
+      });
+
       govActionDetailsPage = (await isBootStrapingPhase())
         ? await govActionsPage.viewFirstProposalByGovernanceAction(
             GovernanceActionType.InfoAction

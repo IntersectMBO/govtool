@@ -32,6 +32,11 @@ test.describe("Proposal checks", () => {
     const govActionsPage = new GovernanceActionsPage(page);
     await govActionsPage.goto();
 
+    // assert to wait until the loading button is hidden
+    await expect(page.getByTestId("to-vote-tab")).toBeVisible({
+      timeout: 15_000,
+    });
+
     currentPage = page;
     govActionDetailsPage = (await isBootStrapingPhase())
       ? await govActionsPage.viewFirstProposalByGovernanceAction(
@@ -181,6 +186,11 @@ test.describe("Perform voting", () => {
     const govActionsPage = new GovernanceActionsPage(dRepPage);
     await govActionsPage.goto();
 
+    // assert to wait until the loading button is hidden
+    await expect(dRepPage.getByTestId("to-vote-tab")).toBeVisible({
+      timeout: 15_000,
+    });
+
     govActionDetailsPage = (await isBootStrapingPhase())
       ? await govActionsPage.viewFirstProposalByGovernanceAction(
           GovernanceActionType.InfoAction
@@ -211,7 +221,7 @@ test.describe("Perform voting", () => {
 
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   test("5F. Should show notification of casted vote after vote", async ({}, testInfo) => {

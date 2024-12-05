@@ -8,6 +8,7 @@ import { useTranslation } from "@hooks";
 import { VoterInfo } from "@models";
 import { DashboardActionCard, DashboardActionCardProps } from "@molecules";
 import { correctAdaFormat, openInNewTab } from "@utils";
+import { LINKS } from "@/consts/links";
 
 type DirectVoterDashboardCardProps = {
   pendingTransaction: PendingTransaction;
@@ -29,10 +30,7 @@ export const DirectVoterDashboardCard = ({
   const learnMoreButton: LoadingButtonProps = {
     children: t("learnMore"),
     dataTestId: "direct-voter-learn-more-button",
-    onClick: () =>
-      openInNewTab(
-        "https://docs.gov.tools/using-govtool/govtool-functions/direct-voting",
-      ),
+    onClick: () => openInNewTab(LINKS.DIRECT_VOTING),
   };
 
   const cardProps: Partial<DashboardActionCardProps> = (() => {
@@ -96,10 +94,7 @@ export const DirectVoterDashboardCard = ({
           {
             children: t("learnMore"),
             dataTestId: "learn-more-button",
-            onClick: () =>
-              openInNewTab(
-                "https://docs.gov.tools/using-govtool/govtool-functions/direct-voting",
-              ),
+            onClick: () => openInNewTab(LINKS.DIRECT_VOTING),
           },
         ],
         description: (

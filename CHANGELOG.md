@@ -20,6 +20,7 @@ changes.
 - Fix inconsistent voting status [Issue 1713](https://github.com/IntersectMBO/govtool/issues/1713)
 - Fix removing a child (link) when is not registed in DOM [Issue 2398](https://github.com/IntersectMBO/govtool/issues/2398)
 - Fix blank screen on DRep delegation when UTXos are missing [Issue 2408](https://github.com/IntersectMBO/govtool/issues/2408)
+- Fix broken guides links [Issue 2417](https://github.com/IntersectMBO/govtool/issues/2417)
 
 ### Changed
 

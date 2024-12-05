@@ -7,6 +7,7 @@ import { useFeatureFlag, useModal } from "@context";
 import { ActionCard } from "@molecules";
 import { useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
+import { LINKS } from "@/consts/links";
 
 export const HomeCards = () => {
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
@@ -26,25 +27,16 @@ export const HomeCards = () => {
     [openModal],
   );
 
-  const onClickLearnMoreAboutDelegation = () =>
-    openInNewTab(
-      "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/delegating",
-    );
+  const onClickLearnMoreAboutDelegation = () => openInNewTab(LINKS.DELEGATING);
 
   const onClickLearnMoreAboutDRepRegistration = () =>
-    openInNewTab(
-      "https://docs.gov.tools/using-govtool/govtool-functions/dreps/register-as-a-drep",
-    );
+    openInNewTab(LINKS.REGISTER_AS_A_DREP);
 
   const onClickLearnMoreAboutDirectVoterRegistration = () =>
-    openInNewTab(
-      "https://docs.gov.tools/using-govtool/govtool-functions/direct-voting",
-    );
+    openInNewTab(LINKS.DIRECT_VOTING);
 
   const onClickLearnMoreAboutProposingGovAction = () =>
-    openInNewTab(
-      "https://docs.gov.tools/using-govtool/govtool-functions/governance-actions/governance-actions/propose-a-governance-action",
-    );
+    openInNewTab(LINKS.PROPOSE_A_GOVERNANCE_ACTION);
 
   const navigateToGovActions = useCallback(
     () => navigate(PATHS.governanceActions),

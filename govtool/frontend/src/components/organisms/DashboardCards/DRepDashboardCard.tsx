@@ -11,6 +11,7 @@ import {
   DashboardActionCardProps,
 } from "@molecules";
 import { correctAdaFormat, openInNewTab } from "@utils";
+import { LINKS } from "@/consts/links";
 
 type DRepDashboardCardProps = {
   dRepID: string;
@@ -37,10 +38,7 @@ export const DRepDashboardCard = ({
   const learnMoreButton = {
     children: t("learnMore"),
     dataTestId: "d-rep-learn-more-button",
-    onClick: () =>
-      openInNewTab(
-        "https://docs.gov.tools/using-govtool/govtool-functions/dreps/register-as-a-drep",
-      ),
+    onClick: () => openInNewTab(LINKS.REGISTER_AS_A_DREP),
   };
 
   const navigateToDrepDirectory = () => {
@@ -130,10 +128,7 @@ export const DRepDashboardCard = ({
           ? {
               children: t("learnMore"),
               dataTestId: "register-learn-more-button",
-              onClick: () =>
-                openInNewTab(
-                  "https://docs.gov.tools/using-govtool/govtool-functions/dreps/retire-as-a-drep",
-                ),
+              onClick: () => openInNewTab(LINKS.RETIRE_AS_A_DREP),
             }
           : learnMoreButton,
       ];

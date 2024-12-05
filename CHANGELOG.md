@@ -16,12 +16,35 @@ changes.
 
 ### Fixed
 
-- Fix fetching voting power of newly registerd DRep [Issue 2407](https://github.com/IntersectMBO/govtool/issues/2407)
-- Fix inconsistent voting status [Issue 1713](https://github.com/IntersectMBO/govtool/issues/1713)
+-
 
 ### Changed
 
 -
+
+### Removed
+
+-
+
+## [v1.0.29](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.29) 2024-12-05
+
+### Added
+
+- Add support for displaying CIP-119 DRep images [Issue 1806](https://github.com/IntersectMBO/govtool/issues/1806)
+
+### Fixed
+
+- Fix fetching voting power of newly registerd DRep [Issue 2407](https://github.com/IntersectMBO/govtool/issues/2407)
+- Fix inconsistent voting status [Issue 1713](https://github.com/IntersectMBO/govtool/issues/1713)
+- Fix removing a child (link) when is not registed in DOM [Issue 2398](https://github.com/IntersectMBO/govtool/issues/2398)
+- Fix blank screen on DRep delegation when UTXos are missing [Issue 2408](https://github.com/IntersectMBO/govtool/issues/2408)
+- Fix broken guides links [Issue 2417](https://github.com/IntersectMBO/govtool/issues/2417)
+
+### Changed
+
+- Bump cardano-db-sync to 13.6.0.4 [Issue 2411](https://github.com/IntersectMBO/govtool/issues/2411)
+- Bump @intersect.mbo/pdf-ui to v0.5.3
+- Bump @intersect.mbo/pdf-ui to v0.5.4
 
 ### Removed
 

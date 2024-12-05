@@ -16,6 +16,7 @@ import {
   AutomatedVotingOptionCurrentDelegation,
   AutomatedVotingOptionDelegationId,
 } from "@/types/automatedVotingOptions";
+import { LINKS } from "@/consts/links";
 
 type AutomatedVotingOptionsProps = {
   currentDelegation?: string | null;
@@ -118,11 +119,7 @@ export const AutomatedVotingOptions = ({
             onClickDelegate={() =>
               delegate(AutomatedVotingOptionDelegationId.abstain)
             }
-            onClickInfo={() =>
-              openInNewTab(
-                "https://docs.gov.tools/using-govtool/govtool-functions/delegating/abstain-from-every-vote",
-              )
-            }
+            onClickInfo={() => openInNewTab(LINKS.ABSTAIN_FROM_EVERY_VOTE)}
             title={
               isDelegatedToAbstain
                 ? t("dRepDirectory.delegatedToAbstainTitle", {
@@ -162,9 +159,7 @@ export const AutomatedVotingOptions = ({
               delegate(AutomatedVotingOptionDelegationId.no_confidence)
             }
             onClickInfo={() =>
-              openInNewTab(
-                "https://docs.gov.tools/using-govtool/govtool-functions/delegating/signal-no-confidence-on-every-vote",
-              )
+              openInNewTab(LINKS.SIGNAL_NO_CONFIDENCE_ON_EVERY_VOTE)
             }
             title={
               isDelegatedToNoConfidence

@@ -8,6 +8,7 @@ import { useTranslation, useScreenDimension, useVoteContextForm } from "@hooks";
 import { Step } from "@molecules";
 import { ControlledField, VoteContextWrapper } from "@organisms";
 import { URL_REGEX, openInNewTab } from "@utils";
+import { LINKS } from "@/consts/links";
 
 type VoteContextStoringInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -35,9 +36,7 @@ export const VoteContextStoringInformation = ({
   } = useVoteContextForm(setSavedHash, setStep, setErrorMessage);
 
   const openGuideAboutStoringInformation = () =>
-    openInNewTab(
-      "https://docs.gov.tools/using-govtool/govtool-functions/storing-information-offline",
-    );
+    openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);
 
   const isContinueDisabled = !watch("storingURL");
 

@@ -18,13 +18,14 @@ class Proposal(TypedDict):
     txHash: str
     index: int
     type: str
-    details: Optional[dict]
+    details: Optional[dict] | Optional[list]
     expiryDate: str
     expiryEpochNo: int
     createdDate: str
     createdEpochNo: int
     url: str
     metadataHash: str
+    protocolParams: Optional[dict]
     title: Optional[str]
     abstract: Optional[str]
     motivation: Optional[str]
@@ -38,6 +39,8 @@ class Proposal(TypedDict):
     poolYesVotes: int
     poolNoVotes: int
     poolAbstainVotes: int
+    prevGovActionIndex: Optional[int]
+    prevGovActionTxHash: Optional[str]
 
 
 class Drep(TypedDict):

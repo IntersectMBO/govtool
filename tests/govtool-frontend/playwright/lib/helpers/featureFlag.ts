@@ -1,4 +1,4 @@
-import { GrovernanceActionType, IProposal } from "@types";
+import { GovernanceActionType, IProposal } from "@types";
 import { isBootStrapingPhase } from "./cardano";
 import { SECURITY_RELEVANT_PARAMS_MAP } from "@constants/index";
 
@@ -12,17 +12,17 @@ export const areDRepVoteTotalsDisplayed = async (proposal: IProposal) => {
   );
   if (isInBootstrapPhase) {
     return !(
-      proposal.type === GrovernanceActionType.HardFork ||
-      (proposal.type === GrovernanceActionType.ProtocolParameterChange &&
+      proposal.type === GovernanceActionType.HardFork ||
+      (proposal.type === GovernanceActionType.ProtocolParameterChange &&
         !isSecurityGroup)
     );
   }
 
   return ![
-    GrovernanceActionType.NoConfidence,
-    GrovernanceActionType.NewCommittee,
-    GrovernanceActionType.UpdatetotheConstitution,
-  ].includes(proposal.type as GrovernanceActionType);
+    GovernanceActionType.NoConfidence,
+    GovernanceActionType.NewCommittee,
+    GovernanceActionType.UpdatetotheConstitution,
+  ].includes(proposal.type as GovernanceActionType);
 };
 
 export const areSPOVoteTotalsDisplayed = async (proposal: IProposal) => {
@@ -34,22 +34,22 @@ export const areSPOVoteTotalsDisplayed = async (proposal: IProposal) => {
       ] !== null
   );
   if (isInBootstrapPhase) {
-    return proposal.type !== GrovernanceActionType.ProtocolParameterChange;
+    return proposal.type !== GovernanceActionType.ProtocolParameterChange;
   }
 
   return !(
-    proposal.type === GrovernanceActionType.UpdatetotheConstitution ||
-    proposal.type === GrovernanceActionType.TreasuryWithdrawal ||
-    (proposal.type === GrovernanceActionType.ProtocolParameterChange &&
+    proposal.type === GovernanceActionType.UpdatetotheConstitution ||
+    proposal.type === GovernanceActionType.TreasuryWithdrawal ||
+    (proposal.type === GovernanceActionType.ProtocolParameterChange &&
       !isSecurityGroup)
   );
 };
 
-export const areCCVoteTotalsDisplayed = async (
-  governanceActionType: GrovernanceActionType
+export const areCCVoteTotalsDisplayed = (
+  governanceActionType: GovernanceActionType
 ) => {
   return ![
-    GrovernanceActionType.NoConfidence,
-    GrovernanceActionType.NewCommittee,
+    GovernanceActionType.NoConfidence,
+    GovernanceActionType.NewCommittee,
   ].includes(governanceActionType);
 };

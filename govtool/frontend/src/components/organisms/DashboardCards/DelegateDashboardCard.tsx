@@ -20,6 +20,7 @@ import {
   AutomatedVotingOptionCurrentDelegation,
   AutomatedVotingOptionDelegationId,
 } from "@/types/automatedVotingOptions";
+import { LINKS } from "@/consts/links";
 
 type DelegateDashboardCardProps = {
   currentDelegation: CurrentDelegation;
@@ -45,10 +46,7 @@ export const DelegateDashboardCard = ({
   const learnMoreButton = {
     children: t("learnMore"),
     dataTestId: "delegate-learn-more-button",
-    onClick: () =>
-      openInNewTab(
-        "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/delegating",
-      ),
+    onClick: () => openInNewTab(LINKS.DELEGATING),
     sx: { backgroundColor: "arcticWhite" },
   };
 

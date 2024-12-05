@@ -9,7 +9,10 @@ import {
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfTreasuryAndBootstrapping, skipIfNotHardFork } from "@helpers/cardano";
+import {
+  skipIfTreasuryAndBootstrapping,
+  skipIfNotHardFork,
+} from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
 import { invalid, valid as mockValid } from "@mock/index";
@@ -261,7 +264,9 @@ test.describe("Proposal created logged state", () => {
       }) => {
         test.slow(); // Brute-force testing with 100 random data
         for (let i = 0; i < 50; i++) {
-          await proposalSubmissionPage.metadataUrlInput.fill(invalid.url(false));
+          await proposalSubmissionPage.metadataUrlInput.fill(
+            invalid.url(false)
+          );
           await expect(page.getByTestId("url-input-error-text")).toBeVisible();
         }
 

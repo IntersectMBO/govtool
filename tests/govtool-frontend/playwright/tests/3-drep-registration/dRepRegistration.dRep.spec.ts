@@ -13,7 +13,7 @@ import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
 import walletManager from "lib/walletManager";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
-import { GrovernanceActionType } from "@types";
+import { GovernanceActionType } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
@@ -37,12 +37,12 @@ test.describe("Logged in DReps", () => {
     const governanceActionsPage = new GovernanceActionsPage(page);
 
     await governanceActionsPage.goto();
-    
+
     await expect(page.getByText(/info action/i).first()).toBeVisible();
 
     const governanceActionDetailsPage =
       await governanceActionsPage.viewFirstProposalByGovernanceAction(
-        GrovernanceActionType.InfoAction
+        GovernanceActionType.InfoAction
       );
 
     await expect(governanceActionDetailsPage.voteBtn).toBeVisible();

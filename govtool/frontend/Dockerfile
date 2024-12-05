@@ -10,6 +10,8 @@ ARG NPMRC_TOKEN
 ARG VITE_USERSNAP_SPACE_API_KEY
 ARG VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED='true'
 ARG VITE_PDF_API_URL
+ARG VITE_IPFS_GATEWAY
+ARG VITE_IPFS_PROJECT_ID
 
 # Ensure all required build arguments are set
 RUN \
@@ -21,7 +23,9 @@ RUN \
   : "${VITE_SENTRY_DSN:?Build argument VITE_SENTRY_DSN is not set}" && \
   : "${NPMRC_TOKEN:?Build argument NPMRC_TOKEN is not set}" && \
   : "${VITE_USERSNAP_SPACE_API_KEY:?Build argument VITE_USERSNAP_SPACE_API_KEY is not set}" && \
-  : "${VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED:?Build argument VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED is not set}"
+  : "${VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED:?Build argument VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED is not set}" && \
+  : "${VITE_IPFS_GATEWAY:?Build argument VITE_IPFS_GATEWAY is not set}" && \
+  : "${VITE_IPFS_PROJECT_ID:?Build argument VITE_IPFS_PROJECT_ID is not set}"
 
 ENV NODE_OPTIONS=--max_old_space_size=8192
 

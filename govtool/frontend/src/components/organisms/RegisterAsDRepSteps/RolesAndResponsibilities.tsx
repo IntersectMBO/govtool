@@ -11,6 +11,7 @@ import {
   openInNewTab,
   PROTOCOL_PARAMS_KEY,
 } from "@utils";
+import { LINKS } from "@/consts/links";
 
 export const RolesAndResponsibilities = ({
   setStep,
@@ -24,10 +25,7 @@ export const RolesAndResponsibilities = ({
 
   const onClickContinue = () => setStep(2);
 
-  const openLearnMoreAboutDrep = () =>
-    openInNewTab(
-      "https://docs.gov.tools/using-govtool/govtool-functions/dreps",
-    );
+  const openLearnMoreAboutDrep = () => openInNewTab(LINKS.DREPS);
 
   return (
     <>

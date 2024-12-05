@@ -13,6 +13,7 @@ export const ICONS = {
   copyWhiteIcon: "/icons/CopyWhite.svg",
   dashboardActiveIcon: "/icons/DashboardActive.svg",
   dashboardIcon: "/icons/Dashboard.svg",
+  defaultDRepIcon: "/icons/DefaultDRep.svg",
   download: "/icons/Download.svg",
   drawerIcon: "/icons/DrawerIcon.svg",
   dRepDirectoryActiveIcon: "/icons/DRepDirectoryActive.svg",

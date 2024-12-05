@@ -20,6 +20,8 @@ export default async function loadDemosExtension(
     enableStakeSigning,
     kuberApiUrl: environments.kuber.apiUrl,
     kuberApiKey: environments.kuber.apiKey,
+    blockfrostApiKey: environments.blockfrostApiKey,
+    blockfrostApiUrl: environments.blockfrostApiUrl,
   };
   await page.addInitScript(
     ({ walletConfig, supportedExtensions }) => {

@@ -1,3 +1,4 @@
+from config import FAUCET_API_URL,FACUET_API_KEY
 import os
 from typing import TypedDict
 
@@ -21,8 +22,8 @@ class CardanoFaucet:
 
     @staticmethod
     def from_env():
-        api_key = os.getenv("FAUCET_API_KEY")
-        base_url = os.getenv("FAUCET_API_URL", "https://faucet.sanchonet.world.dev.cardano.org")
+        api_key = FACUET_API_KEY
+        base_url = FAUCET_API_URL
         if not api_key:
             raise ValueError("FAUCET_API_KEY environment variable not set.")
         return CardanoFaucet(api_key, base_url)

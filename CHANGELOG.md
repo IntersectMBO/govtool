@@ -12,6 +12,24 @@ changes.
 
 ### Added
 
+-
+
+### Fixed
+
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v1.0.29](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.29) 2024-12-05
+
+### Added
+
 - Add support for displaying CIP-119 DRep images [Issue 1806](https://github.com/IntersectMBO/govtool/issues/1806)
 
 ### Fixed

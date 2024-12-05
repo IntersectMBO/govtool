@@ -45,7 +45,7 @@ export const areSPOVoteTotalsDisplayed = async (proposal: IProposal) => {
   );
 };
 
-export const areCCVoteTotalsDisplayed = async (
+export const areCCVoteTotalsDisplayed = (
   governanceActionType: GrovernanceActionType
 ) => {
   return ![

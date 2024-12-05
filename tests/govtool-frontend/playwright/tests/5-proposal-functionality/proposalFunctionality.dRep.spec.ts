@@ -12,7 +12,7 @@ import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
-import { BootstrapGovernanceActionType, GrovernanceActionType } from "@types";
+import { BootstrapGovernanceActionType, GovernanceActionType } from "@types";
 import walletManager from "lib/walletManager";
 
 const invalidInfinityProposals = require("../../lib/_mock/invalidInfinityProposals.json");
@@ -35,7 +35,7 @@ test.describe("Proposal checks", () => {
     currentPage = page;
     govActionDetailsPage = (await isBootStrapingPhase())
       ? await govActionsPage.viewFirstProposalByGovernanceAction(
-          GrovernanceActionType.InfoAction
+          GovernanceActionType.InfoAction
         )
       : await govActionsPage.viewFirstDRepVoteEnabledGovernanceAction();
   });
@@ -183,7 +183,7 @@ test.describe("Perform voting", () => {
 
     govActionDetailsPage = (await isBootStrapingPhase())
       ? await govActionsPage.viewFirstProposalByGovernanceAction(
-          GrovernanceActionType.InfoAction
+          GovernanceActionType.InfoAction
         )
       : await govActionsPage.viewFirstDRepVoteEnabledGovernanceAction();
   });
@@ -274,7 +274,7 @@ test.describe("Bootstrap phase", () => {
   test("5L. Should restrict dRep votes to Info Governance actions During Bootstrapping Phase", async ({
     browser,
   }) => {
-    const voteBlacklistOptions = Object.keys(GrovernanceActionType).filter(
+    const voteBlacklistOptions = Object.keys(GovernanceActionType).filter(
       (option) => option !== BootstrapGovernanceActionType.InfoAction
     );
 
@@ -311,7 +311,7 @@ test.describe("Bootstrap phase", () => {
 
         const governanceActionDetailsPage =
           await governanceActionsPage.viewFirstProposalByGovernanceAction(
-            voteBlacklistOption as GrovernanceActionType
+            voteBlacklistOption as GovernanceActionType
           );
 
         if (governanceActionDetailsPage) {

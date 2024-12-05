@@ -16,7 +16,7 @@ import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import {
   BootstrapGovernanceActionType,
   FullGovernanceDRepVoteActionsType,
-  GrovernanceActionType,
+  GovernanceActionType,
   IProposal,
 } from "@types";
 import walletManager from "lib/walletManager";
@@ -59,7 +59,7 @@ test.describe("Logged in DRep", () => {
 
       govActionDetailsPage = (await isBootStrapingPhase())
         ? await govActionsPage.viewFirstProposalByGovernanceAction(
-            GrovernanceActionType.InfoAction
+            GovernanceActionType.InfoAction
           )
         : await govActionsPage.viewFirstDRepVoteEnabledGovernanceAction();
 
@@ -207,9 +207,7 @@ test.describe("Check vote count", () => {
 
         // check ccCommittee votes
         if (
-          areCCVoteTotalsDisplayed(
-            proposalToCheck.type as GrovernanceActionType
-          )
+          areCCVoteTotalsDisplayed(proposalToCheck.type as GovernanceActionType)
         ) {
           await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
             `${proposalToCheck.ccYesVotes}`

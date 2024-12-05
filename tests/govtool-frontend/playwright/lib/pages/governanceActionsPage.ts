@@ -2,7 +2,7 @@ import removeAllSpaces from "@helpers/removeAllSpaces";
 import { Locator, Page, expect } from "@playwright/test";
 import {
   FullGovernanceDRepVoteActionsType,
-  GrovernanceActionType,
+  GovernanceActionType,
   IProposal,
 } from "@types";
 import environments from "lib/constants/environments";
@@ -56,7 +56,7 @@ export default class GovernanceActionsPage {
       FullGovernanceDRepVoteActionsType
     )) {
       const result = await this.viewFirstProposalByGovernanceAction(
-        governanceAction as GrovernanceActionType
+        governanceAction as GovernanceActionType
       );
       if (result) {
         return result;
@@ -66,7 +66,7 @@ export default class GovernanceActionsPage {
   }
 
   async viewFirstProposalByGovernanceAction(
-    governanceAction: GrovernanceActionType
+    governanceAction: GovernanceActionType
   ): Promise<GovernanceActionDetailsPage> {
     const proposalCard = this.page
       .getByTestId(`govaction-${governanceAction}-card`)
@@ -139,7 +139,7 @@ export default class GovernanceActionsPage {
   async sortAndValidate(
     sortOption: string,
     validationFn: (p1: IProposal, p2: IProposal) => boolean,
-    filterKeys = Object.keys(GrovernanceActionType)
+    filterKeys = Object.keys(GovernanceActionType)
   ) {
     const responsesPromise = Promise.all(
       filterKeys.map((filterKey) =>
@@ -147,7 +147,7 @@ export default class GovernanceActionsPage {
           response
             .url()
             .includes(
-              `&type[]=${GrovernanceActionType[filterKey]}&sort=${sortOption}`
+              `&type[]=${GovernanceActionType[filterKey]}&sort=${sortOption}`
             )
         )
       )
@@ -183,7 +183,7 @@ export default class GovernanceActionsPage {
     for (let dIdx = 0; dIdx <= proposalsByType.length - 1; dIdx++) {
       const proposals = proposalsByType[0] as IProposal[];
       const filterOptionKey = getEnumKeyByValue(
-        GrovernanceActionType,
+        GovernanceActionType,
         proposals[0].type
       );
 

@@ -7,6 +7,7 @@ import { useFeatureFlag, useModal } from "@context";
 import { openInNewTab } from "@utils";
 
 import { DrawerMobileProps } from "./types";
+import { LINKS } from "@/consts/links";
 
 const DRAWER_PADDING = 2;
 const CALCULATED_DRAWER_PADDING = DRAWER_PADDING * 8 * 2;
@@ -21,10 +22,7 @@ export const DrawerMobile = ({
   const { openModal } = useModal();
   const { t } = useTranslation();
 
-  const onClickHelp = () =>
-    openInNewTab(
-      "https://docs.gov.tools/using-govtool/support#for-support-you-can-reach-the-team-on-the-intersect-discord-server-at",
-    );
+  const onClickHelp = () => openInNewTab(LINKS.SUPPORT);
 
   return (
     <SwipeableDrawer

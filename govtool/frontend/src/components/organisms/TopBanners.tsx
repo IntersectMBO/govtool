@@ -1,6 +1,7 @@
 import { Box, Link, Typography } from "@mui/material";
 import { Trans, useTranslation } from "react-i18next";
 import { useAppContext } from "@/context";
+import { LINKS } from "@/consts/links";
 
 export const TopBanners = () => {
   const { isMainnet, networkName, isInBootstrapPhase, isAppInitializing } =
@@ -60,7 +61,7 @@ export const TopBanners = () => {
               components={{
                 docs: (
                   <Link
-                    href="https://docs.gov.tools/about/bootstrapping-phase"
+                    href={LINKS.BOOTSTRAPPING_PHASE}
                     target="_blank"
                     color="common.white"
                     data-testid="system-bootstrapping-warning-link"

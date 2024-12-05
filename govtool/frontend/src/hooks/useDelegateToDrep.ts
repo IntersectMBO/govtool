@@ -52,8 +52,12 @@ export const useDelegateTodRep = () => {
           voter,
         });
       } catch (error) {
+        console.error({ error });
         openWalletErrorModal({
-          error,
+          error:
+            typeof error === "string"
+              ? error
+              : (error as { message: string | null })?.message,
           dataTestId: "delegate-transaction-error-modal",
         });
         Sentry.setTag("hook", "useDelegateTodRep");

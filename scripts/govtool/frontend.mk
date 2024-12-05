@@ -25,6 +25,8 @@ build-frontend: docker-login
 		--build-arg VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED="$${IS_PROPOSAL_DISCUSSION_FORUM_ENABLED}" \
 		--build-arg NPMRC_TOKEN="$${NPMRC_TOKEN}" \
 		--build-arg VITE_PDF_API_URL="$${PDF_API_URL}" \
+		--build-arg VITE_IPFS_GATEWAY="$${IPFS_GATEWAY}" \
+		--build-arg VITE_IPFS_PROJECT_ID="$${IPFS_PROJECT_ID}" \
 		$(root_dir)/govtool/frontend
 
 .PHONY: push-frontend

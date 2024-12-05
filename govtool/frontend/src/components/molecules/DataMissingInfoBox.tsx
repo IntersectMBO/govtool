@@ -4,6 +4,7 @@ import { Typography } from "@atoms";
 import { useTranslation } from "@hooks";
 import { MetadataValidationStatus } from "@models";
 import { openInNewTab } from "@utils";
+import { LINKS } from "@/consts/links";
 
 export const DataMissingInfoBox = ({
   isDataMissing,
@@ -78,11 +79,7 @@ export const DataMissingInfoBox = ({
         {gaMetadataErrorDescription}
       </Typography>
       <Link
-        onClick={() =>
-          openInNewTab(
-            "https://docs.gov.tools/using-govtool/govtool-functions/dreps/drep-error-conditions",
-          )
-        }
+        onClick={() => openInNewTab(LINKS.DREP_ERROR_CONDITIONS)}
         sx={{
           fontFamily: "Poppins",
           fontSize: "16px",

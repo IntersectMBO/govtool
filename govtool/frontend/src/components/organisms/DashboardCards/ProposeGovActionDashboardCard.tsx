@@ -6,6 +6,7 @@ import { useTranslation } from "@hooks";
 import { DashboardActionCard } from "@molecules";
 import { openInNewTab } from "@utils";
 import { useCallback } from "react";
+import { LINKS } from "@/consts/links";
 
 type ProposeGovActionDashboardCardProps = {
   createGovActionTx: PendingTransaction["createGovAction"];
@@ -52,10 +53,7 @@ export const ProposeGovActionDashboardCard = ({
         {
           children: t("learnMore"),
           dataTestId: "propose-gov-action-learn-more-button",
-          onClick: () =>
-            openInNewTab(
-              "https://docs.gov.tools/using-govtool/govtool-functions/governance-actions/propose-a-governance-action",
-            ),
+          onClick: () => openInNewTab(LINKS.PROPOSE_A_GOVERNANCE_ACTION),
         },
       ]}
       description={t("dashboard.cards.proposeGovernanceAction.description")}

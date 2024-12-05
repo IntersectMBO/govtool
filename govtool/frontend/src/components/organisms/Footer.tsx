@@ -5,6 +5,7 @@ import { ICONS } from "@consts";
 import { useUsersnapApi } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab, testIdFromLabel } from "@utils";
+import { LINKS } from "@/consts/links";
 
 type FooterLinkProps = {
   label: string;
@@ -34,10 +35,7 @@ export const Footer = () => {
   const { t } = useTranslation();
   const { openFeedbackWindow } = useUsersnapApi();
 
-  const onClickHelp = () =>
-    openInNewTab(
-      "https://docs.gov.tools/using-govtool/support#for-support-you-can-reach-the-team-on-the-intersect-discord-server-at",
-    );
+  const onClickHelp = () => openInNewTab(LINKS.SUPPORT);
 
   const onClickPrivacyPolicy = () =>
     openInNewTab(

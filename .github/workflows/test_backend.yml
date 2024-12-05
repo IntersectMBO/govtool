@@ -33,12 +33,26 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          if [[ "${{ env.NETWORK }}" == "preprod" ]]; then
+            export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_PREPROD }}"
+          elif [[ "${{ env.NETWORK }}" == "sanchonet" ]]; then
+            export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_SANCHONET }}"
+          else
+            export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_PREVIEW }}"
+          fi
           python ./setup.py
           python -m pytest --alluredir allure-results
+          if [[ "${{ env.NETWORK }}" == "preprod" ]]; then
+            echo "FAUCET_API_KEY=${{ secrets.FAUCET_API_KEY_PREPROD }}" >> $GITHUB_ENV
+          elif [[ "${{ env.NETWORK }}" == "sanchonet" ]]; then
+            echo "FAUCET_API_KEY=${{ secrets.FAUCET_API_KEY_SANCHONET }}" >> $GITHUB_ENV
+          else
+            echo "FAUCET_API_KEY=${{ secrets.FAUCET_API_KEY_PREVIEW }}" >> $GITHUB_ENV
+          fi
         env:
           BASE_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io/api' }}
-          FAUCET_API_KEY: ${{ secrets.FAUCET_API_KEY }}
-          KUBER_API_URL: https://kuber-govtool.cardanoapi.io
+          NETWORK: ${{ vars.NETWORK }}
+          KUBER_API_KEY: ${{ secrets.KUBER_API_KEY }}
 
       - name: Upload report
         if: always()

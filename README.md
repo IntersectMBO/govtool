@@ -36,7 +36,7 @@ The Cardano GovTool enables ada holders to experience the governance features de
 
 ### Documentation
 
-Learn more; [docs.gov.tools](https://docs.gov.tools/).
+Learn more; [docs.gov.tools](https://docs.gov.tools/cardano-govtool/using-govtool).
 
 ## 📍 Navigation
 

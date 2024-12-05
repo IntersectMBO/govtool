@@ -9,5 +9,6 @@
   "port" : 8080,
   "host" : "0.0.0.0",
   "cachedurationseconds": 20,
-  "sentrydsn": "${SENTRY_DSN_BACKEND:-https://username:password@senty.host/id}"
+  "sentrydsn": "${SENTRY_DSN_BACKEND:-https://username:password@senty.host/id}",
+  "sentryenv": "test"
 }

@@ -9,7 +9,7 @@ import {
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect, test } from "@playwright/test";
-import { GrovernanceActionType, IProposal } from "@types";
+import { GovernanceActionType, IProposal } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
@@ -39,9 +39,9 @@ test("4K. Should display correct vote counts on governance details page for disc
   page,
   browser,
 }) => {
-  const responsesPromise = Object.keys(GrovernanceActionType).map((filterKey) =>
+  const responsesPromise = Object.keys(GovernanceActionType).map((filterKey) =>
     page.waitForResponse((response) =>
-      response.url().includes(`&type[]=${GrovernanceActionType[filterKey]}`)
+      response.url().includes(`&type[]=${GovernanceActionType[filterKey]}`)
     )
   );
 
@@ -98,7 +98,7 @@ test("4K. Should display correct vote counts on governance details page for disc
 
       // check ccCommittee votes
       if (
-        areCCVoteTotalsDisplayed(proposalToCheck.type as GrovernanceActionType)
+        areCCVoteTotalsDisplayed(proposalToCheck.type as GovernanceActionType)
       ) {
         await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
           `${proposalToCheck.ccYesVotes}`

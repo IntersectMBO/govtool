@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix sentry reports on multiple reloads of Governance Actions [Issue 2446](https://github.com/IntersectMBO/govtool/issues/2446)
 
 ### Changed
 

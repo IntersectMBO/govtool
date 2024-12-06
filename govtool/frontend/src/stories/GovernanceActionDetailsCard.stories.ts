@@ -1,8 +1,9 @@
 import { MetadataValidationStatus, ProposalData } from "@models";
 import { GovernanceActionDetailsCard } from "@organisms";
-import { expect, jest } from "@storybook/jest";
+import { expect, screen, userEvent, waitFor, within } from "@storybook/test";
 import type { Meta, StoryObj } from "@storybook/react";
-import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
+import { vi } from "vitest";
+
 import {
   encodeCIP129Identifier,
   formatDisplayDate,
@@ -169,7 +170,7 @@ export const GovernanceActionDetailsDataMissing: Story = {
     isDataMissing: MetadataValidationStatus.URL_NOT_FOUND,
   },
   play: async ({ canvasElement, args }) => {
-    window.open = jest.fn();
+    window.open = vi.fn();
     const canvas = within(canvasElement);
 
     await expect(canvas.getByText("Data Missing")).toBeVisible();
@@ -195,7 +196,7 @@ export const GovernanceActionDetailsIncorrectFormat: Story = {
     isDataMissing: MetadataValidationStatus.INVALID_JSONLD,
   },
   play: async ({ canvasElement, args }) => {
-    window.open = jest.fn();
+    window.open = vi.fn();
     const canvas = within(canvasElement);
 
     await expect(canvas.getByText("Data Formatted Incorrectly")).toBeVisible();
@@ -221,7 +222,7 @@ export const GovernanceActionDetailsNotVerifiable: Story = {
     isDataMissing: MetadataValidationStatus.INVALID_HASH,
   },
   play: async ({ canvasElement, args }) => {
-    window.open = jest.fn();
+    window.open = vi.fn();
     const canvas = within(canvasElement);
 
     await expect(canvas.getByText("Data Not Verifiable")).toBeVisible();

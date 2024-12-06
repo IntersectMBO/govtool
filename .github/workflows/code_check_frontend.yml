@@ -34,8 +34,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 
       - name: 🧪 Test
-        env:
-          NODE_OPTIONS: "--max_old_space_size=8192"
         run: |
           npm run test
 

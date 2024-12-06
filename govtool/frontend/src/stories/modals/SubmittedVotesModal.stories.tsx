@@ -1,12 +1,11 @@
-import { expect } from "@storybook/jest";
+import { useEffect } from "react";
+import { expect, screen, waitFor, within } from "@storybook/test";
 import { Meta, StoryFn } from "@storybook/react";
 
 import { Modal } from "@atoms";
 import { useModal } from "@context";
 import { StatusModal, SubmittedVotesModalState } from "@organisms";
-import { screen, waitFor, within } from "@storybook/testing-library";
 import { callAll, correctAdaFormat } from "@utils";
-import { useEffect } from "react";
 
 const meta = {
   title: "Example/Modals/SubmittedVotesModal",

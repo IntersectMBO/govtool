@@ -1,14 +1,15 @@
+import { expect, userEvent, within } from "@storybook/test";
+import { Meta, StoryObj } from "@storybook/react";
+import { vi } from "vitest";
+
 import { ICONS } from "@consts";
 import { LinkWithIcon } from "@molecules";
-import { expect, jest } from "@storybook/jest";
-import { Meta, StoryObj } from "@storybook/react";
-import { userEvent, within } from "@storybook/testing-library";
 
 const meta: Meta<typeof LinkWithIcon> = {
   title: "Example/LinkWithIcon",
   component: LinkWithIcon,
   args: {
-    onClick: jest.fn(),
+    onClick: vi.fn(),
   },
 
   parameters: {

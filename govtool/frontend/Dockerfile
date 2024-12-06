@@ -27,8 +27,6 @@ RUN \
   : "${VITE_IPFS_GATEWAY:?Build argument VITE_IPFS_GATEWAY is not set}" && \
   : "${VITE_IPFS_PROJECT_ID:?Build argument VITE_IPFS_PROJECT_ID is not set}"
 
-ENV NODE_OPTIONS=--max_old_space_size=8192
-
 WORKDIR /src
 
 # Set npm configuration settings using environment variables
@@ -36,6 +34,8 @@ RUN npm config set @intersect.mbo:registry "https://registry.npmjs.org/" --locat
 RUN npm config set //registry.npmjs.org/:_authToken ${NPMRC_TOKEN} --location=global
 
 COPY package.json package-lock.json ./
+COPY patches ./patches
+
 RUN npm install
 COPY . .
 RUN npm run build

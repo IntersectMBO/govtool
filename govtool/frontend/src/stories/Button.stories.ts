@@ -1,6 +1,6 @@
-import { expect, jest } from "@storybook/jest";
+import { expect, userEvent, within } from "@storybook/test";
 import type { Meta, StoryObj } from "@storybook/react";
-import { userEvent, within } from "@storybook/testing-library";
+import { vi } from "vitest";
 
 import { Button } from "@atoms";
 
@@ -8,7 +8,7 @@ const meta = {
   title: "Example/Button",
   component: Button,
   args: {
-    onClick: jest.fn(),
+    onClick: vi.fn(),
   },
   parameters: {
     layout: "centered",

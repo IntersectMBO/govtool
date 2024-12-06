@@ -8,11 +8,12 @@ RUN npm config set @intersect.mbo:registry "https://registry.npmjs.org/" --locat
     && npm config set //registry.npmjs.org/:_authToken ${NPMRC_TOKEN} --location=global
 
 COPY package.json package-lock.json ./
+COPY patches ./patches
+
 RUN npm install
 
 FROM node:18-alpine as builder
 ARG NPMRC_TOKEN
-ENV NODE_OPTIONS=--max_old_space_size=8192
 WORKDIR /src
 
 COPY --from=deps /src/node_modules ./node_modules

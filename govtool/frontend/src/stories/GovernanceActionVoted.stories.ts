@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { expect, userEvent, waitFor, within, screen } from "@storybook/test";
 
 import { GovernanceVotedOnCard } from "@molecules";
-import { userEvent, waitFor, within, screen } from "@storybook/testing-library";
-import { expect } from "@storybook/jest";
 import { formatDisplayDate, getProposalTypeNoEmptySpaces } from "@/utils";
 import { GovernanceActionType } from "@/types/governanceAction";
 

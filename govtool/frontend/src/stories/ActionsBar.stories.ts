@@ -2,9 +2,9 @@ import {
   GOVERNANCE_ACTIONS_FILTERS,
   GOVERNANCE_ACTIONS_SORTING,
 } from "@consts";
-import { expect, jest } from "@storybook/jest";
+import { expect, userEvent, within } from "@storybook/test";
+import { vi } from "vitest";
 import type { Meta, StoryObj } from "@storybook/react";
-import { userEvent, within } from "@storybook/testing-library";
 import { DataActionsBar } from "@/components/molecules";
 
 const meta = {
@@ -30,9 +30,11 @@ export const ActionsBarComponent: Story = {
     sortOpen: false,
     filterOptions: GOVERNANCE_ACTIONS_FILTERS,
     isFiltering: true,
-    setFiltersOpen: jest.fn(),
-    setSortOpen: jest.fn(),
-    setSearchText: jest.fn(),
+    setFiltersOpen: vi.fn(),
+    setSortOpen: vi.fn(),
+    setSearchText: vi.fn(),
+    closeSorts: vi.fn(),
+    setChosenSorting: vi.fn(),
   },
   play: async ({ args, canvasElement, step }) => {
     const { setFiltersOpen, setSortOpen, setSearchText } = args;
@@ -69,7 +71,11 @@ export const ActionsBarFiltersOpen: Story = {
     closeFilters: () => {},
     filtersOpen: true,
     setFiltersOpen: () => {},
-    setChosenFilters: jest.fn(),
+    setChosenFilters: vi.fn(),
+    closeSorts: vi.fn(),
+    setSearchText: vi.fn(),
+    setChosenSorting: vi.fn(),
+    setSortOpen: vi.fn(),
   },
 
   play: async ({ args, canvasElement }) => {
@@ -88,7 +94,10 @@ export const ActionsBarSortsOpen: Story = {
     chosenSorting: "",
     searchText: "",
     sortOpen: true,
-    setChosenSorting: jest.fn(),
+    setChosenSorting: vi.fn(),
+    setSortOpen: vi.fn(),
+    setSearchText: vi.fn(),
+    closeSorts: vi.fn(),
   },
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
@@ -105,6 +114,10 @@ export const ActionsBarWithoutFilters: Story = {
     searchText: "",
     sortOpen: false,
     isFiltering: false,
+    setChosenSorting: vi.fn(),
+    setSortOpen: vi.fn(),
+    setSearchText: vi.fn(),
+    closeSorts: vi.fn(),
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

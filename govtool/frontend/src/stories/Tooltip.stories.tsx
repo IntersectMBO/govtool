@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Box, Typography } from "@mui/material";
-import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
-import { expect } from "@storybook/jest";
+import { expect, screen, userEvent, waitFor, within } from "@storybook/test";
+
 import { Tooltip } from "@/components/atoms";
 
 const defaultChildren = (

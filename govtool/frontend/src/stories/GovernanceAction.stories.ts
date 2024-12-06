@@ -1,7 +1,8 @@
 import { MetadataValidationStatus } from "@models";
-import { expect, jest } from "@storybook/jest";
+import { expect, screen, userEvent, waitFor, within } from "@storybook/test";
 import type { Meta, StoryObj } from "@storybook/react";
-import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
+import { vi } from "vitest";
+
 import {
   encodeCIP129Identifier,
   formatDisplayDate,
@@ -31,7 +32,7 @@ const commonArgs = {
   expiryEpochNo: 420,
   index: 2,
   inProgress: false,
-  onClick: jest.fn(),
+  onClick: vi.fn(),
   title: "Example title",
   txHash: "sad78afdsf7jasd98d",
   type: GovernanceActionType.InfoAction,

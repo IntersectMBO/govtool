@@ -1,9 +1,8 @@
-import { expect } from "@storybook/jest";
+import { ComponentProps, useState } from "react";
+import { expect, userEvent, within } from "@storybook/test";
 import type { Meta, StoryFn } from "@storybook/react";
 
 import { Field } from "@molecules";
-import { userEvent, within } from "@storybook/testing-library";
-import { ComponentProps, useState } from "react";
 
 const meta: Meta<typeof Field.TextArea> = {
   title: "Example/TextArea",

@@ -674,12 +674,9 @@ const CardanoProvider = (props: Props) => {
         // Make a full transaction, passing in empty witness set
         const tx = Transaction.new(txBody, transactionWitnessSet);
         // Ask wallet to to provide signature (witnesses) for the transaction
-        let txVkeyWitnesses;
-
-        txVkeyWitnesses = await walletApi.signTx(tx.to_hex(), true);
 
         // Create witness set object using the witnesses provided by the wallet
-        txVkeyWitnesses = TransactionWitnessSet.from_bytes(
+        const txVkeyWitnesses = TransactionWitnessSet.from_bytes(
           Buffer.from(await walletApi.signTx(tx.to_hex(), true), "hex"),
         );
         const vkeys = txVkeyWitnesses.vkeys();

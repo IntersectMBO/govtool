@@ -18,6 +18,7 @@ changes.
 
 - Fix vulnerabilities in dependencies [Issue 2192](https://github.com/IntersectMBO/govtool/issues/2192)
 - Optimize resources usage in frontend service build [Issue 2192](https://github.com/IntersectMBO/govtool/issues/2192)
+- Fix sentry reports on multiple reloads of Governance Actions [Issue 2446](https://github.com/IntersectMBO/govtool/issues/2446)
 
 ### Changed
 

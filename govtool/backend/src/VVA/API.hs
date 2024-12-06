@@ -13,7 +13,7 @@ import           Control.Exception        (throw, throwIO)
 import           Control.Monad.Except     (runExceptT, throwError)
 import           Control.Monad.Reader
 
-import           Data.Aeson               (Value(..), Array, decode, encode, FromJSON, ToJSON, toJSON)
+import           Data.Aeson               (Value(..), Array, decode, encode, ToJSON, toJSON)
 import           Data.Bool                (Bool)
 import           Data.List                (sortOn)
 import qualified Data.Map                 as Map

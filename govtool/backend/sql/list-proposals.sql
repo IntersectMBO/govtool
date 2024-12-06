@@ -105,7 +105,7 @@ SELECT
     encode(creator_tx.hash, 'hex'),
     gov_action_proposal.index,
     gov_action_proposal.type::text,
-    (
+    COALESCE(
         case when gov_action_proposal.type = 'TreasuryWithdrawals' then
             (
                 select json_agg(
@@ -159,7 +159,7 @@ SELECT
         else
             null
         end
-    ) as description,
+    , '{}'::json) as description,
     CASE
         WHEN meta.network_name::text = 'mainnet' OR meta.network_name::text = 'preprod' THEN
             latest_epoch.start_time + (gov_action_proposal.expiration - latest_epoch.no)::bigint * INTERVAL '5 days' 

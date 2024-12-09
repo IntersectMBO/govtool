@@ -65,6 +65,19 @@ test.describe("Proposal created logged state", () => {
           await proposalSubmissionPage.validateForm(formFields);
         }
 
+        if (type === ProposalType.treasury) {
+          for (let i = 0; i < 9; i++) {
+            await expect(
+              proposalSubmissionPage.addWithdrawalAddressBtn
+            ).toBeVisible();
+            await proposalSubmissionPage.addWithdrawalAddressBtn.click();
+          }
+        }
+
+        await expect(
+          proposalSubmissionPage.addWithdrawalAddressBtn
+        ).toBeHidden();
+
         for (let i = 0; i < 6; i++) {
           await expect(proposalSubmissionPage.addLinkBtn).toBeVisible();
           await proposalSubmissionPage.addLinkBtn.click();

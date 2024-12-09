@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, MockedFunction } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { FeatureFlagProvider, useFeatureFlag } from "./featureFlag";
 import { GovernanceActionType } from "@/types/governanceAction";
@@ -6,9 +6,7 @@ import { useAppContext } from "./appContext";
 
 vi.mock("./appContext");
 
-const mockUseAppContext = useAppContext as jest.MockedFunction<
-  typeof useAppContext
->;
+const mockUseAppContext = useAppContext as MockedFunction<typeof useAppContext>;
 
 const mockUseAppContextReturnValue = {
   cExplorerBaseUrl: "http://mock.cexplorer",

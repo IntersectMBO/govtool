@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { expect, within } from "@storybook/test";
 
 import { StatusPill } from "@atoms";
-import { expect } from "@storybook/jest";
-import { within } from "@storybook/testing-library";
 import { DRepStatus } from "@/models";
 
 const meta = {

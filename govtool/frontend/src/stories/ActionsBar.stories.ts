@@ -2,9 +2,8 @@ import {
   GOVERNANCE_ACTIONS_FILTERS,
   GOVERNANCE_ACTIONS_SORTING,
 } from "@consts";
-import { expect, jest } from "@storybook/jest";
+import { expect, userEvent, within, fn } from "@storybook/test";
 import type { Meta, StoryObj } from "@storybook/react";
-import { userEvent, within } from "@storybook/testing-library";
 import { DataActionsBar } from "@/components/molecules";
 
 const meta = {
@@ -30,9 +29,11 @@ export const ActionsBarComponent: Story = {
     sortOpen: false,
     filterOptions: GOVERNANCE_ACTIONS_FILTERS,
     isFiltering: true,
-    setFiltersOpen: jest.fn(),
-    setSortOpen: jest.fn(),
-    setSearchText: jest.fn(),
+    setFiltersOpen: fn(),
+    setSortOpen: fn(),
+    setSearchText: fn(),
+    closeSorts: fn(),
+    setChosenSorting: fn(),
   },
   play: async ({ args, canvasElement, step }) => {
     const { setFiltersOpen, setSortOpen, setSearchText } = args;
@@ -69,7 +70,11 @@ export const ActionsBarFiltersOpen: Story = {
     closeFilters: () => {},
     filtersOpen: true,
     setFiltersOpen: () => {},
-    setChosenFilters: jest.fn(),
+    setChosenFilters: fn(),
+    closeSorts: fn(),
+    setSearchText: fn(),
+    setChosenSorting: fn(),
+    setSortOpen: fn(),
   },
 
   play: async ({ args, canvasElement }) => {
@@ -88,7 +93,10 @@ export const ActionsBarSortsOpen: Story = {
     chosenSorting: "",
     searchText: "",
     sortOpen: true,
-    setChosenSorting: jest.fn(),
+    setChosenSorting: fn(),
+    setSortOpen: fn(),
+    setSearchText: fn(),
+    closeSorts: fn(),
   },
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
@@ -105,6 +113,10 @@ export const ActionsBarWithoutFilters: Story = {
     searchText: "",
     sortOpen: false,
     isFiltering: false,
+    setChosenSorting: fn(),
+    setSortOpen: fn(),
+    setSearchText: fn(),
+    closeSorts: fn(),
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { expect, jest } from "@storybook/jest";
-import { userEvent, within } from "@storybook/testing-library";
+import { expect, userEvent, within, fn } from "@storybook/test";
+
 import { Footer } from "@/components/organisms";
 
 const meta = {
@@ -17,7 +17,7 @@ export const FooterComponent: Story = {
   args: {},
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    window.open = jest.fn();
+    window.open = fn();
 
     const nowDate = new Date();
     await expect(
@@ -26,9 +26,7 @@ export const FooterComponent: Story = {
     await userEvent.click(canvas.getByTestId("privacy-policy-footer-link"));
     await expect(window.open).toHaveBeenCalledTimes(1);
 
-    await userEvent.click(
-      canvas.getByTestId("terms-of-use-footer-link"),
-    );
+    await userEvent.click(canvas.getByTestId("terms-of-use-footer-link"));
     await expect(window.open).toHaveBeenCalledTimes(2);
 
     await userEvent.click(canvas.getByTestId("help-footer-button"));

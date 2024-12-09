@@ -1,7 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { expect, jest } from "@storybook/jest";
-import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
+import {
+  expect,
+  screen,
+  userEvent,
+  waitFor,
+  within,
+  fn,
+} from "@storybook/test";
 
 import { ActionRadio } from "@atoms";
 
@@ -10,7 +16,7 @@ const meta = {
   component: ActionRadio,
   args: {
     dataTestId: "radio",
-    onChange: jest.fn(),
+    onChange: fn(),
   },
   parameters: {
     layout: "centered",

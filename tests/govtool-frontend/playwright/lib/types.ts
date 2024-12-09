@@ -97,10 +97,6 @@ export enum FullGovernanceDRepVoteActionsType {
   HardFork = "HardForkInitiation",
 }
 
-export enum BootstrapDRepVoteEnabledGovernanceActionType {
-  InfoAction = "InfoAction",
-}
-
 export type DRepStatus = "Active" | "Inactive" | "Retired";
 
 export type IDRep = {

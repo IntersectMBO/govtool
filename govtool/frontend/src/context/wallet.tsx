@@ -557,6 +557,14 @@ const CardanoProvider = (props: Props) => {
           }
         }
 
+        // register stake key if it is not registered
+        if (!certBuilder && !registeredStakeKeysListState.length) {
+          const stakeKeyRegCertBuilder = CertificatesBuilder.new();
+          const stakeKeyRegCert = await buildStakeKeyRegCert();
+          stakeKeyRegCertBuilder.add(stakeKeyRegCert);
+          txBuilder.set_certs_builder(stakeKeyRegCertBuilder);
+        }
+
         if (votingBuilder) {
           txBuilder.set_voting_builder(votingBuilder);
         }
@@ -728,6 +736,8 @@ const CardanoProvider = (props: Props) => {
       guardrailScript,
       epochParams?.cost_model?.costs,
       disconnectWallet,
+      registeredStakeKeysListState,
+      stakeKey,
     ],
   );
 

@@ -12,7 +12,7 @@ changes.
 
 ### Added
 
--
+- Add stake key registration certificate to voting and gov action proposal if not registered [Issue 2490](https://github.com/IntersectMBO/govtool/issues/2490)
 
 ### Fixed
 

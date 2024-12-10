@@ -1,256 +1,321 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="139" failures="0" errors="0" time="38.308">
-    <testsuite name="src/context/governanceAction.test.tsx" timestamp="2024-09-25T09:21:06.726Z" hostname="jd.local" tests="3" failures="0" errors="0" skipped="0" time="0.023">
-        <testcase classname="src/context/governanceAction.test.tsx" name="GovernanceActionProvider &gt; renders correctly" time="0.013">
+<testsuites name="vitest tests" tests="174" failures="0" errors="0" time="28.438">
+    <testsuite name="src/context/featureFlag.test.tsx" timestamp="2024-11-29T15:10:06.417Z" hostname="michal-szalowski-MS-7E26" tests="12" failures="0" errors="0" skipped="0" time="0.022">
+        <testcase classname="src/context/featureFlag.test.tsx" name="FeatureFlagProvider &gt; should enable proposal discussion forum based on environment variable" time="0.009">
         </testcase>
-        <testcase classname="src/context/governanceAction.test.tsx" name="GovernanceActionProvider &gt; creates governance action JSON-LD" time="0.003">
+        <testcase classname="src/context/featureFlag.test.tsx" name="FeatureFlagProvider &gt; should disable proposal discussion forum if environment variable is false" time="0.001">
         </testcase>
-        <testcase classname="src/context/governanceAction.test.tsx" name="GovernanceActionProvider &gt; creates governance action jsonld and hash" time="0.002">
+        <testcase classname="src/context/featureFlag.test.tsx" name="FeatureFlagProvider &gt; isVotingOnGovernanceActionEnabled &gt; should return true for InfoAction regardless of bootstrap phase" time="0.001">
         </testcase>
-    </testsuite>
-    <testsuite name="src/components/molecules/governanceActionCardElement.test.tsx" timestamp="2024-09-25T09:21:06.727Z" hostname="jd.local" tests="1" failures="0" errors="0" skipped="0" time="0.032">
-        <testcase classname="src/components/molecules/governanceActionCardElement.test.tsx" name="GovernanceActionCardElement &gt; renders markdown content correctly" time="0.031">
+        <testcase classname="src/context/featureFlag.test.tsx" name="FeatureFlagProvider &gt; isVotingOnGovernanceActionEnabled &gt; should return false for other actions in bootstrap phase" time="0">
         </testcase>
-    </testsuite>
-    <testsuite name="src/components/atoms/ActionRadio.test.tsx" timestamp="2024-09-25T09:21:06.727Z" hostname="jd.local" tests="4" failures="0" errors="0" skipped="0" time="0.459">
-        <testcase classname="src/components/atoms/ActionRadio.test.tsx" name="ActionRadio &gt; should execute onChange with the correct value on click" time="0.023">
+        <testcase classname="src/context/featureFlag.test.tsx" name="FeatureFlagProvider &gt; areDRepVoteTotalsDisplayed &gt; should hide DRep vote totals for HardForkInitiation in bootstrap phase" time="0.001">
         </testcase>
-        <testcase classname="src/components/atoms/ActionRadio.test.tsx" name="ActionRadio &gt; should change styles based on isChecked change" time="0.096">
+        <testcase classname="src/context/featureFlag.test.tsx" name="FeatureFlagProvider &gt; areDRepVoteTotalsDisplayed &gt; should display DRep vote totals for ParameterChange when isSecurityGroup is true in bootstrap phase" time="0.001">
         </testcase>
-        <testcase classname="src/components/atoms/ActionRadio.test.tsx" name="ActionRadio &gt; should display correct title and optional subtitle" time="0.005">
+        <testcase classname="src/context/featureFlag.test.tsx" name="FeatureFlagProvider &gt; areDRepVoteTotalsDisplayed &gt; should hide DRep vote totals for MotionNoConfidence in full governance" time="0">
         </testcase>
-        <testcase classname="src/components/atoms/ActionRadio.test.tsx" name="ActionRadio &gt; should display tooltip text when InfoOutlinedIcon is hovered over" time="0.333">
+        <testcase classname="src/context/featureFlag.test.tsx" name="FeatureFlagProvider &gt; areSPOVoteTotalsDisplayed &gt; should hide SPO vote totals for ParameterChange in bootstrap phase" time="0.001">
         </testcase>
-    </testsuite>
-    <testsuite name="src/components/atoms/CopyButton.test.tsx" timestamp="2024-09-25T09:21:06.727Z" hostname="jd.local" tests="5" failures="0" errors="0" skipped="0" time="0.251">
-        <testcase classname="src/components/atoms/CopyButton.test.tsx" name="CopyButton &gt; renders correctly with the default icon" time="0.092">
+        <testcase classname="src/context/featureFlag.test.tsx" name="FeatureFlagProvider &gt; areSPOVoteTotalsDisplayed &gt; should display SPO vote totals for ParameterChange when isSecurityGroup is true in bootstrap phase" time="0.001">
         </testcase>
-        <testcase classname="src/components/atoms/CopyButton.test.tsx" name="CopyButton &gt; renders the blue icon when variant is &apos;blue&apos;" time="0.058">
+        <testcase classname="src/context/featureFlag.test.tsx" name="FeatureFlagProvider &gt; areSPOVoteTotalsDisplayed &gt; should hide SPO vote totals for TreasuryWithdrawals in full governance" time="0.001">
         </testcase>
-        <testcase classname="src/components/atoms/CopyButton.test.tsx" name="CopyButton &gt; renders the blue thin icon when variant is &apos;blueThin&apos;" time="0.016">
+        <testcase classname="src/context/featureFlag.test.tsx" name="FeatureFlagProvider &gt; areCCVoteTotalsDisplayed &gt; should hide CC vote totals for MotionNoConfidence in full governance" time="0.001">
         </testcase>
-        <testcase classname="src/components/atoms/CopyButton.test.tsx" name="CopyButton &gt; renders the white icon when isChecked prop is true" time="0.019">
-        </testcase>
-        <testcase classname="src/components/atoms/CopyButton.test.tsx" name="CopyButton &gt; copies text to clipboard and shows success alert on click" time="0.065">
+        <testcase classname="src/context/featureFlag.test.tsx" name="FeatureFlagProvider &gt; areCCVoteTotalsDisplayed &gt; should show CC vote totals for other actions in bootstrap phase" time="0.003">
         </testcase>
     </testsuite>
-    <testsuite name="src/components/atoms/DrawerLink.test.tsx" timestamp="2024-09-25T09:21:06.728Z" hostname="jd.local" tests="5" failures="0" errors="0" skipped="0" time="0.225">
-        <testcase classname="src/components/atoms/DrawerLink.test.tsx" name="DrawerLink &gt; renders correctly with mandatory props" time="0.124">
+    <testsuite name="src/context/governanceAction.test.tsx" timestamp="2024-11-29T15:10:06.429Z" hostname="michal-szalowski-MS-7E26" tests="3" failures="0" errors="0" skipped="0" time="0.032">
+        <testcase classname="src/context/governanceAction.test.tsx" name="GovernanceActionProvider &gt; renders correctly" time="0.019">
         </testcase>
-        <testcase classname="src/components/atoms/DrawerLink.test.tsx" name="DrawerLink &gt; applies active styles correctly when active" time="0.044">
+        <testcase classname="src/context/governanceAction.test.tsx" name="GovernanceActionProvider &gt; creates governance action JSON-LD" time="0.004">
         </testcase>
-        <testcase classname="src/components/atoms/DrawerLink.test.tsx" name="DrawerLink &gt; does not apply active styles when not active" time="0.021">
-        </testcase>
-        <testcase classname="src/components/atoms/DrawerLink.test.tsx" name="DrawerLink &gt; renders with an icon and activeIcon" time="0.006">
-        </testcase>
-        <testcase classname="src/components/atoms/DrawerLink.test.tsx" name="DrawerLink &gt; executes onClick callback when clicked" time="0.028">
+        <testcase classname="src/context/governanceAction.test.tsx" name="GovernanceActionProvider &gt; creates governance action jsonld and hash" time="0.004">
         </testcase>
     </testsuite>
-    <testsuite name="src/components/atoms/VotePill.test.tsx" timestamp="2024-09-25T09:21:06.728Z" hostname="jd.local" tests="5" failures="0" errors="0" skipped="0" time="0.154">
-        <testcase classname="src/components/atoms/VotePill.test.tsx" name="VotePill &gt; renders the VotePill component with &quot;yes&quot; vote correctly" time="0.073">
+    <testsuite name="src/hooks/usePrevious.test.ts" timestamp="2024-11-29T15:10:06.432Z" hostname="michal-szalowski-MS-7E26" tests="3" failures="0" errors="0" skipped="0" time="0.012">
+        <testcase classname="src/hooks/usePrevious.test.ts" name="usePrevious hook &gt; should return undefined on the initial render" time="0.008">
         </testcase>
-        <testcase classname="src/components/atoms/VotePill.test.tsx" name="VotePill &gt; renders the VotePill component with &quot;no&quot; vote correctly" time="0.025">
+        <testcase classname="src/hooks/usePrevious.test.ts" name="usePrevious hook &gt; should return the previous value after the state changes" time="0.002">
         </testcase>
-        <testcase classname="src/components/atoms/VotePill.test.tsx" name="VotePill &gt; renders the VotePill component with &quot;abstain&quot; vote correctly" time="0.02">
-        </testcase>
-        <testcase classname="src/components/atoms/VotePill.test.tsx" name="VotePill &gt; handles custom width and maxWidth props correctly" time="0.019">
-        </testcase>
-        <testcase classname="src/components/atoms/VotePill.test.tsx" name="VotePill &gt; defaults width and maxWidth when not provided" time="0.011">
+        <testcase classname="src/hooks/usePrevious.test.ts" name="usePrevious hook &gt; should handle non-primitive values like objects" time="0.001">
         </testcase>
     </testsuite>
-    <testsuite name="src/components/atoms/VotingPowerChips.test.tsx" timestamp="2024-09-25T09:21:06.729Z" hostname="jd.local" tests="3" failures="0" errors="0" skipped="0" time="0.43">
-        <testcase classname="src/components/atoms/VotingPowerChips.test.tsx" name="VotingPowerChips &gt; renders loading spinner when data is loading" time="0.121">
+    <testsuite name="src/components/atoms/ActionRadio.test.tsx" timestamp="2024-11-29T15:10:06.434Z" hostname="michal-szalowski-MS-7E26" tests="4" failures="0" errors="0" skipped="0" time="0.367">
+        <testcase classname="src/components/atoms/ActionRadio.test.tsx" name="ActionRadio &gt; should execute onChange with the correct value on click" time="0.027">
         </testcase>
-        <testcase classname="src/components/atoms/VotingPowerChips.test.tsx" name="VotingPowerChips &gt; displays formatted Ada amount when data is available and not loading" time="0.011">
+        <testcase classname="src/components/atoms/ActionRadio.test.tsx" name="ActionRadio &gt; should change styles based on isChecked change" time="0.066">
         </testcase>
-        <testcase classname="src/components/atoms/VotingPowerChips.test.tsx" name="VotingPowerChips &gt; displays the tooltip correctly for non-mobile DRep registered users" time="0.296">
+        <testcase classname="src/components/atoms/ActionRadio.test.tsx" name="ActionRadio &gt; should display correct title and optional subtitle" time="0.007">
+        </testcase>
+        <testcase classname="src/components/atoms/ActionRadio.test.tsx" name="ActionRadio &gt; should display tooltip text when InfoOutlinedIcon is hovered over" time="0.266">
         </testcase>
     </testsuite>
-    <testsuite name="src/consts/dRepDirectory/filters.test.ts" timestamp="2024-09-25T09:21:06.729Z" hostname="jd.local" tests="1" failures="0" errors="0" skipped="0" time="0.002">
+    <testsuite name="src/components/atoms/CopyButton.test.tsx" timestamp="2024-11-29T15:10:06.436Z" hostname="michal-szalowski-MS-7E26" tests="5" failures="0" errors="0" skipped="0" time="0.165">
+        <testcase classname="src/components/atoms/CopyButton.test.tsx" name="CopyButton &gt; renders correctly with the default icon" time="0.045">
+        </testcase>
+        <testcase classname="src/components/atoms/CopyButton.test.tsx" name="CopyButton &gt; renders the blue icon when variant is &apos;blue&apos;" time="0.023">
+        </testcase>
+        <testcase classname="src/components/atoms/CopyButton.test.tsx" name="CopyButton &gt; renders the blue thin icon when variant is &apos;blueThin&apos;" time="0.015">
+        </testcase>
+        <testcase classname="src/components/atoms/CopyButton.test.tsx" name="CopyButton &gt; renders the white icon when isChecked prop is true" time="0.012">
+        </testcase>
+        <testcase classname="src/components/atoms/CopyButton.test.tsx" name="CopyButton &gt; copies text to clipboard and shows success alert on click" time="0.069">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/components/atoms/DrawerLink.test.tsx" timestamp="2024-11-29T15:10:06.439Z" hostname="michal-szalowski-MS-7E26" tests="5" failures="0" errors="0" skipped="0" time="0.201">
+        <testcase classname="src/components/atoms/DrawerLink.test.tsx" name="DrawerLink &gt; renders correctly with mandatory props" time="0.096">
+            <system-err>
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/components/atoms/DrawerLink.test.tsx" name="DrawerLink &gt; applies active styles correctly when active" time="0.042">
+        </testcase>
+        <testcase classname="src/components/atoms/DrawerLink.test.tsx" name="DrawerLink &gt; does not apply active styles when not active" time="0.027">
+        </testcase>
+        <testcase classname="src/components/atoms/DrawerLink.test.tsx" name="DrawerLink &gt; renders with an icon and activeIcon" time="0.004">
+        </testcase>
+        <testcase classname="src/components/atoms/DrawerLink.test.tsx" name="DrawerLink &gt; executes onClick callback when clicked" time="0.031">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/components/atoms/VotePill.test.tsx" timestamp="2024-11-29T15:10:06.443Z" hostname="michal-szalowski-MS-7E26" tests="5" failures="0" errors="0" skipped="0" time="0.135">
+        <testcase classname="src/components/atoms/VotePill.test.tsx" name="VotePill &gt; renders the VotePill component with &quot;yes&quot; vote correctly" time="0.062">
+        </testcase>
+        <testcase classname="src/components/atoms/VotePill.test.tsx" name="VotePill &gt; renders the VotePill component with &quot;no&quot; vote correctly" time="0.019">
+        </testcase>
+        <testcase classname="src/components/atoms/VotePill.test.tsx" name="VotePill &gt; renders the VotePill component with &quot;abstain&quot; vote correctly" time="0.022">
+        </testcase>
+        <testcase classname="src/components/atoms/VotePill.test.tsx" name="VotePill &gt; handles custom width and maxWidth props correctly" time="0.014">
+        </testcase>
+        <testcase classname="src/components/atoms/VotePill.test.tsx" name="VotePill &gt; defaults width and maxWidth when not provided" time="0.015">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/components/atoms/VotingPowerChips.test.tsx" timestamp="2024-11-29T15:10:06.451Z" hostname="michal-szalowski-MS-7E26" tests="3" failures="0" errors="0" skipped="0" time="0.309">
+        <testcase classname="src/components/atoms/VotingPowerChips.test.tsx" name="VotingPowerChips &gt; renders loading spinner when data is loading" time="0.089">
+        </testcase>
+        <testcase classname="src/components/atoms/VotingPowerChips.test.tsx" name="VotingPowerChips &gt; displays formatted Ada amount when data is available and not loading" time="0.008">
+        </testcase>
+        <testcase classname="src/components/atoms/VotingPowerChips.test.tsx" name="VotingPowerChips &gt; displays the tooltip correctly for non-mobile DRep registered users" time="0.21">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/components/molecules/governanceActionCardElement.test.tsx" timestamp="2024-11-29T15:10:06.454Z" hostname="michal-szalowski-MS-7E26" tests="1" failures="0" errors="0" skipped="0" time="0.04">
+        <testcase classname="src/components/molecules/governanceActionCardElement.test.tsx" name="GovernanceActionCardElement &gt; renders markdown content correctly" time="0.038">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/consts/dRepDirectory/filters.test.ts" timestamp="2024-11-29T15:10:06.455Z" hostname="michal-szalowski-MS-7E26" tests="1" failures="0" errors="0" skipped="0" time="0.002">
         <testcase classname="src/consts/dRepDirectory/filters.test.ts" name="DREP_DIRECTORY_FILTERS &gt; should exclude &apos;Yourself&apos; from filters" time="0.001">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/adaFormat.test.ts" timestamp="2024-09-25T09:21:06.729Z" hostname="jd.local" tests="8" failures="0" errors="0" skipped="0" time="0.016">
-        <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctAdaFormat &gt; converts lovelace to ada for a given number" time="0">
+    <testsuite name="src/utils/tests/adaFormat.test.ts" timestamp="2024-11-29T15:10:06.456Z" hostname="michal-szalowski-MS-7E26" tests="12" failures="0" errors="0" skipped="0" time="0.014">
+        <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctAdaFormat &gt; converts lovelace to ada for a given number" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctAdaFormat &gt; returns 0 for undefined lovelace value" time="0">
         </testcase>
         <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctAdaFormat &gt; handles large lovelace values correctly" time="0">
         </testcase>
-        <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctAdaFormat &gt; handles small lovelace values with correct rounding" time="0">
+        <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctAdaFormat &gt; handles small lovelace values with correct rounding" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctAdaFormat &gt; returns 0 for zero lovelace value" time="0">
         </testcase>
-        <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctDRepDirectoryFormat &gt; Correctly formats lovelace value to directory format" time="0.013">
+        <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctVoteAdaFormat &gt; Correctly formats lovelace value to ada format" time="0.011">
         </testcase>
-        <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctDRepDirectoryFormat &gt; Returns 0 for numbers smaller than one million" time="0.001">
+        <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctVoteAdaFormat &gt; Returns 0 for undefined lovelace value" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctVoteAdaFormat &gt; Returns 0 for zero lovelace value" time="0.001">
+        </testcase>
+        <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctVoteAdaFormat &gt; Returns 0 for small lovelace value" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctDRepDirectoryFormat &gt; Correctly formats lovelace value to directory format" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctDRepDirectoryFormat &gt; Returns 0 for numbers smaller than one million" time="0">
         </testcase>
         <testcase classname="src/utils/tests/adaFormat.test.ts" name="correctDRepDirectoryFormat &gt; Returns result without comma" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/areObjectsTheSame.test.ts" timestamp="2024-09-25T09:21:06.730Z" hostname="jd.local" tests="3" failures="0" errors="0" skipped="0" time="0.002">
+    <testsuite name="src/utils/tests/areObjectsTheSame.test.ts" timestamp="2024-11-29T15:10:06.462Z" hostname="michal-szalowski-MS-7E26" tests="3" failures="0" errors="0" skipped="0" time="0.002">
         <testcase classname="src/utils/tests/areObjectsTheSame.test.ts" name="areObjectsTheSame &gt; should return false when objects have different lengths" time="0.001">
         </testcase>
-        <testcase classname="src/utils/tests/areObjectsTheSame.test.ts" name="areObjectsTheSame &gt; should return false when objects have different properties" time="0">
+        <testcase classname="src/utils/tests/areObjectsTheSame.test.ts" name="areObjectsTheSame &gt; should return false when objects have different properties" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/areObjectsTheSame.test.ts" name="areObjectsTheSame &gt; should return true when objects are the same" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/basicReducer.test.ts" timestamp="2024-09-25T09:21:06.730Z" hostname="jd.local" tests="2" failures="0" errors="0" skipped="0" time="0.001">
+    <testsuite name="src/utils/tests/basicReducer.test.ts" timestamp="2024-11-29T15:10:06.464Z" hostname="michal-szalowski-MS-7E26" tests="2" failures="0" errors="0" skipped="0" time="0.002">
         <testcase classname="src/utils/tests/basicReducer.test.ts" name="basicReducer &gt; should merge the previous state with the new state" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/basicReducer.test.ts" name="basicReducer &gt; should not modify the previous state if the new state is empty" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/bech32Validation.test.ts" timestamp="2024-09-25T09:21:06.730Z" hostname="jd.local" tests="2" failures="0" errors="0" skipped="0" time="0.002">
+    <testsuite name="src/utils/tests/bech32Validation.test.ts" timestamp="2024-11-29T15:10:06.471Z" hostname="michal-szalowski-MS-7E26" tests="2" failures="0" errors="0" skipped="0" time="0.001">
         <testcase classname="src/utils/tests/bech32Validation.test.ts" name="bech32 validation &gt; should return true for valid bech32 value" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/bech32Validation.test.ts" name="bech32 validation &gt; should return an error message for invalid bech32 value" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/callAll.test.ts" timestamp="2024-09-25T09:21:06.730Z" hostname="jd.local" tests="2" failures="0" errors="0" skipped="0" time="0.003">
+    <testsuite name="src/utils/tests/callAll.test.ts" timestamp="2024-11-29T15:10:06.472Z" hostname="michal-szalowski-MS-7E26" tests="2" failures="0" errors="0" skipped="0" time="0.003">
         <testcase classname="src/utils/tests/callAll.test.ts" name="callAll &gt; should call all functions with provided arguments" time="0.002">
         </testcase>
         <testcase classname="src/utils/tests/callAll.test.ts" name="callAll &gt; should not throw an error if any function is undefined" time="0.001">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/canonizeJSON.test.ts" timestamp="2024-09-25T09:21:06.730Z" hostname="jd.local" tests="1" failures="0" errors="0" skipped="0" time="0.007">
-        <testcase classname="src/utils/tests/canonizeJSON.test.ts" name="canonizeJSON &gt; should correctly canonize a jsonld object to the expected output" time="0.006">
+    <testsuite name="src/utils/tests/canonizeJSON.test.ts" timestamp="2024-11-29T15:10:06.474Z" hostname="michal-szalowski-MS-7E26" tests="1" failures="0" errors="0" skipped="0" time="0.007">
+        <testcase classname="src/utils/tests/canonizeJSON.test.ts" name="canonizeJSON &gt; should correctly canonize a jsonld object to the expected output" time="0.005">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/checkIsMaintenanceOn.test.ts" timestamp="2024-09-25T09:21:06.731Z" hostname="jd.local" tests="4" failures="0" errors="0" skipped="0" time="0.003">
+    <testsuite name="src/utils/tests/checkIsMaintenanceOn.test.ts" timestamp="2024-11-29T15:10:06.475Z" hostname="michal-szalowski-MS-7E26" tests="4" failures="0" errors="0" skipped="0" time="0.003">
         <testcase classname="src/utils/tests/checkIsMaintenanceOn.test.ts" name="checkIsMaintenanceOn function &gt; does nothing in development mode" time="0.001">
         </testcase>
-        <testcase classname="src/utils/tests/checkIsMaintenanceOn.test.ts" name="checkIsMaintenanceOn function &gt; reloads the page if maintenance mode is active" time="0">
+        <testcase classname="src/utils/tests/checkIsMaintenanceOn.test.ts" name="checkIsMaintenanceOn function &gt; reloads the page if maintenance mode is active" time="0.001">
         </testcase>
-        <testcase classname="src/utils/tests/checkIsMaintenanceOn.test.ts" name="checkIsMaintenanceOn function &gt; does not reload the page if maintenance mode is not active" time="0.001">
+        <testcase classname="src/utils/tests/checkIsMaintenanceOn.test.ts" name="checkIsMaintenanceOn function &gt; does not reload the page if maintenance mode is not active" time="0">
         </testcase>
-        <testcase classname="src/utils/tests/checkIsMaintenanceOn.test.ts" name="checkIsMaintenanceOn function &gt; throws an error if the request fails" time="0">
+        <testcase classname="src/utils/tests/checkIsMaintenanceOn.test.ts" name="checkIsMaintenanceOn function &gt; throws an error if the request fails" time="0.001">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/checkIsWalletConnected.test.ts" timestamp="2024-09-25T09:21:06.731Z" hostname="jd.local" tests="2" failures="0" errors="0" skipped="0" time="0.005">
-        <testcase classname="src/utils/tests/checkIsWalletConnected.test.ts" name="checkIsWalletConnected function &gt; returns true when wallet information is present in local storage" time="0.003">
+    <testsuite name="src/utils/tests/checkIsWalletConnected.test.ts" timestamp="2024-11-29T15:10:06.477Z" hostname="michal-szalowski-MS-7E26" tests="2" failures="0" errors="0" skipped="0" time="0.003">
+        <testcase classname="src/utils/tests/checkIsWalletConnected.test.ts" name="checkIsWalletConnected function &gt; returns true when wallet information is present in local storage" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/checkIsWalletConnected.test.ts" name="checkIsWalletConnected function &gt; returns false when wallet information is missing in local storage" time="0.001">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/dRep.test.ts" timestamp="2024-09-25T09:21:06.731Z" hostname="jd.local" tests="4" failures="0" errors="0" skipped="0" time="0.002">
-        <testcase classname="src/utils/tests/dRep.test.ts" name="isSameDRep function &gt; returns false if dRepIdOrView is undefined" time="0">
+    <testsuite name="src/utils/tests/cip129identifier.test.ts" timestamp="2024-11-29T15:10:06.479Z" hostname="michal-szalowski-MS-7E26" tests="2" failures="0" errors="0" skipped="0" time="0.003">
+        <testcase classname="src/utils/tests/cip129identifier.test.ts" name="CIP-129 Governance Identifier &gt; encodeCIP129Identifier &gt; should encode a CIP129 identifier correctly" time="0.001">
         </testcase>
-        <testcase classname="src/utils/tests/dRep.test.ts" name="isSameDRep function &gt; returns true if drepId matches dRepIdOrView" time="0.001">
+        <testcase classname="src/utils/tests/cip129identifier.test.ts" name="CIP-129 Governance Identifier &gt; decodeCIP129Identifier &gt; should decode a CIP129 identifier correctly" time="0.001">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/utils/tests/dRep.test.ts" timestamp="2024-11-29T15:10:06.480Z" hostname="michal-szalowski-MS-7E26" tests="4" failures="0" errors="0" skipped="0" time="0.001">
+        <testcase classname="src/utils/tests/dRep.test.ts" name="isSameDRep function &gt; returns false if dRepIdOrView is undefined" time="0.001">
+        </testcase>
+        <testcase classname="src/utils/tests/dRep.test.ts" name="isSameDRep function &gt; returns true if drepId matches dRepIdOrView" time="0">
         </testcase>
         <testcase classname="src/utils/tests/dRep.test.ts" name="isSameDRep function &gt; returns true if view matches dRepIdOrView" time="0">
         </testcase>
         <testcase classname="src/utils/tests/dRep.test.ts" name="isSameDRep function &gt; returns false if neither drepId nor view matches dRepIdOrView" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/ellipsizeText.test.ts" timestamp="2024-09-25T09:21:06.731Z" hostname="jd.local" tests="2" failures="0" errors="0" skipped="0" time="0.002">
+    <testsuite name="src/utils/tests/ellipsizeText.test.ts" timestamp="2024-11-29T15:10:06.483Z" hostname="michal-szalowski-MS-7E26" tests="2" failures="0" errors="0" skipped="0" time="0.001">
         <testcase classname="src/utils/tests/ellipsizeText.test.ts" name="ellipsizeText &gt; should return the original text if it is shorter than or equal to maxLength" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/ellipsizeText.test.ts" name="ellipsizeText &gt; should return the ellipsized text if it is longer than maxLength" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/filterOutNullParams.test.ts" timestamp="2024-09-25T09:21:06.732Z" hostname="jd.local" tests="5" failures="0" errors="0" skipped="0" time="0.002">
+    <testsuite name="src/utils/tests/filterOutNullParams.test.ts" timestamp="2024-11-29T15:10:06.484Z" hostname="michal-szalowski-MS-7E26" tests="5" failures="0" errors="0" skipped="0" time="0.004">
         <testcase classname="src/utils/tests/filterOutNullParams.test.ts" name="filterOutNullParams &gt; should filter out null parameters" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/filterOutNullParams.test.ts" name="filterOutNullParams &gt; should exclude keys from filtering process" time="0">
         </testcase>
-        <testcase classname="src/utils/tests/filterOutNullParams.test.ts" name="filterOutNullParams &gt; should return null if originalObject is null" time="0">
+        <testcase classname="src/utils/tests/filterOutNullParams.test.ts" name="filterOutNullParams &gt; should return null if originalObject is null" time="0.002">
         </testcase>
         <testcase classname="src/utils/tests/filterOutNullParams.test.ts" name="filterOutNullParams &gt; should return null if originalObject is undefined" time="0">
         </testcase>
         <testcase classname="src/utils/tests/filterOutNullParams.test.ts" name="filterOutNullParams &gt; shouldn&apos;t filter out 0" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/filterUpdatableProtocolParams.test.ts" timestamp="2024-09-25T09:21:06.732Z" hostname="jd.local" tests="5" failures="0" errors="0" skipped="0" time="0.002">
+    <testsuite name="src/utils/tests/filterUpdatableProtocolParams.test.ts" timestamp="2024-11-29T15:10:06.492Z" hostname="michal-szalowski-MS-7E26" tests="5" failures="0" errors="0" skipped="0" time="0.003">
         <testcase classname="src/utils/tests/filterUpdatableProtocolParams.test.ts" name="filterUpdatableProtocolParams &gt; should return only existing in reference object properties" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/filterUpdatableProtocolParams.test.ts" name="filterUpdatableProtocolParams &gt; should return only existing in reference object properties and filter out keys" time="0">
         </testcase>
-        <testcase classname="src/utils/tests/filterUpdatableProtocolParams.test.ts" name="filterUpdatableProtocolParams &gt; should not filter out 0 value from the reference object" time="0">
+        <testcase classname="src/utils/tests/filterUpdatableProtocolParams.test.ts" name="filterUpdatableProtocolParams &gt; should not filter out 0 value from the reference object" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/filterUpdatableProtocolParams.test.ts" name="filterUpdatableProtocolParams &gt; should return null if original object is not provided" time="0">
         </testcase>
         <testcase classname="src/utils/tests/filterUpdatableProtocolParams.test.ts" name="filterUpdatableProtocolParams &gt; should return null if update object is not provided" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/formatDate.test.ts" timestamp="2024-09-25T09:21:06.732Z" hostname="jd.local" tests="3" failures="0" errors="0" skipped="0" time="0.002">
-        <testcase classname="src/utils/tests/formatDate.test.ts" name="formatDisplayDate &gt; formats a date object correctly" time="0.001">
+    <testsuite name="src/utils/tests/formatDate.test.ts" timestamp="2024-11-29T15:10:06.495Z" hostname="michal-szalowski-MS-7E26" tests="3" failures="0" errors="0" skipped="0" time="0.002">
+        <testcase classname="src/utils/tests/formatDate.test.ts" name="formatDisplayDate &gt; formats a date object correctly" time="0.002">
         </testcase>
         <testcase classname="src/utils/tests/formatDate.test.ts" name="formatDisplayDate &gt; formats a date string correctly" time="0">
         </testcase>
-        <testcase classname="src/utils/tests/formatDate.test.ts" name="formatDisplayDate &gt; handles custom format strings" time="0.001">
+        <testcase classname="src/utils/tests/formatDate.test.ts" name="formatDisplayDate &gt; handles custom format strings" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/generateAnchor.test.ts" timestamp="2024-09-25T09:21:06.733Z" hostname="jd.local" tests="1" failures="0" errors="0" skipped="0" time="0.003">
-        <testcase classname="src/utils/tests/generateAnchor.test.ts" name="generateAnchor function &gt; generates an anchor with the provided URL and hash" time="0.002">
+    <testsuite name="src/utils/tests/generateAnchor.test.ts" timestamp="2024-11-29T15:10:06.497Z" hostname="michal-szalowski-MS-7E26" tests="1" failures="0" errors="0" skipped="0" time="0.004">
+        <testcase classname="src/utils/tests/generateAnchor.test.ts" name="generateAnchor function &gt; generates an anchor with the provided URL and hash" time="0.004">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/generateMetadataBody.test.ts" timestamp="2024-09-25T09:21:06.733Z" hostname="jd.local" tests="3" failures="0" errors="0" skipped="0" time="0.002">
-        <testcase classname="src/utils/tests/generateMetadataBody.test.ts" name="generateMetadataBody &gt; generates metadata body with filtered data" time="0.001">
+    <testsuite name="src/utils/tests/generateMetadataBody.test.ts" timestamp="2024-11-29T15:10:06.498Z" hostname="michal-szalowski-MS-7E26" tests="3" failures="0" errors="0" skipped="0" time="0.002">
+        <testcase classname="src/utils/tests/generateMetadataBody.test.ts" name="generateMetadataBody &gt; generates metadata body with filtered data" time="0.002">
         </testcase>
         <testcase classname="src/utils/tests/generateMetadataBody.test.ts" name="generateMetadataBody &gt; generates metadata body with filtered data and references" time="0">
         </testcase>
-        <testcase classname="src/utils/tests/generateMetadataBody.test.ts" name="generateMetadataBody &gt; generates metadata body with empty data" time="0.001">
+        <testcase classname="src/utils/tests/generateMetadataBody.test.ts" name="generateMetadataBody &gt; generates metadata body with empty data" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/getDRepID.test.ts" timestamp="2024-09-25T09:21:06.733Z" hostname="jd.local" tests="4" failures="0" errors="0" skipped="0" time="0.011">
-        <testcase classname="src/utils/tests/getDRepID.test.ts" name="formHexToBech32 function &gt; returns correct dRep bech32 format" time="0.003">
+    <testsuite name="src/utils/tests/getDRepID.test.ts" timestamp="2024-11-29T15:10:06.499Z" hostname="michal-szalowski-MS-7E26" tests="2" failures="0" errors="0" skipped="0" time="0.006">
+        <testcase classname="src/utils/tests/getDRepID.test.ts" name="getPubDRepID function &gt; returns the dRepKey and dRepID when walletApi returns a valid response" time="0.002">
         </testcase>
-        <testcase classname="src/utils/tests/getDRepID.test.ts" name="formHexToBech32 function &gt; expected undefined when no argument" time="0">
-        </testcase>
-        <testcase classname="src/utils/tests/getDRepID.test.ts" name="getPubDRepID function &gt; returns the dRepKey, dRepID, and dRepIDBech32 when walletApi returns a valid response" time="0.002">
-        </testcase>
-        <testcase classname="src/utils/tests/getDRepID.test.ts" name="getPubDRepID function &gt; returns undefined values for dRepKey, dRepID, and dRepIDBech32 when walletApi throws an error" time="0.005">
+        <testcase classname="src/utils/tests/getDRepID.test.ts" name="getPubDRepID function &gt; returns undefined values for dRepKey and dRepID when walletApi throws an error" time="0.004">
             <system-err>
 Error: Failed to get PubDRepKey
-    at [90m/Users/asiadyczka/Desktop/govtool/govtool/frontend/[39msrc/utils/tests/getDRepID.test.ts:46:40
-    at [90mfile:///Users/asiadyczka/Desktop/govtool/govtool/frontend/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:135:14
-    at [90mfile:///Users/asiadyczka/Desktop/govtool/govtool/frontend/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:60:26
-    at runTest [90m(file:///Users/asiadyczka/Desktop/govtool/govtool/frontend/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:781:17[90m)[39m
+    at [90m/home/michal-szalowski/Projects/IntersectMBO/govtool/govtool/frontend/[39msrc/utils/tests/getDRepID.test.ts:30:40
+    at [90mfile:///home/michal-szalowski/Projects/IntersectMBO/govtool/govtool/frontend/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:135:14
+    at [90mfile:///home/michal-szalowski/Projects/IntersectMBO/govtool/govtool/frontend/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:60:26
+    at runTest [90m(file:///home/michal-szalowski/Projects/IntersectMBO/govtool/govtool/frontend/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:781:17[90m)[39m
 [90m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
-    at runSuite [90m(file:///Users/asiadyczka/Desktop/govtool/govtool/frontend/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:909:15[90m)[39m
-    at runSuite [90m(file:///Users/asiadyczka/Desktop/govtool/govtool/frontend/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:909:15[90m)[39m
-    at runFiles [90m(file:///Users/asiadyczka/Desktop/govtool/govtool/frontend/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:958:5[90m)[39m
-    at startTests [90m(file:///Users/asiadyczka/Desktop/govtool/govtool/frontend/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:967:3[90m)[39m
-    at [90mfile:///Users/asiadyczka/Desktop/govtool/govtool/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:116:7
+    at runSuite [90m(file:///home/michal-szalowski/Projects/IntersectMBO/govtool/govtool/frontend/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:909:15[90m)[39m
+    at runSuite [90m(file:///home/michal-szalowski/Projects/IntersectMBO/govtool/govtool/frontend/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:909:15[90m)[39m
+    at runFiles [90m(file:///home/michal-szalowski/Projects/IntersectMBO/govtool/govtool/frontend/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:958:5[90m)[39m
+    at startTests [90m(file:///home/michal-szalowski/Projects/IntersectMBO/govtool/govtool/frontend/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:967:3[90m)[39m
+    at [90mfile:///home/michal-szalowski/Projects/IntersectMBO/govtool/govtool/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:116:7
 
             </system-err>
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/getGovActionId.test.ts" timestamp="2024-09-25T09:21:06.734Z" hostname="jd.local" tests="5" failures="0" errors="0" skipped="0" time="0.001">
+    <testsuite name="src/utils/tests/getGovActionId.test.ts" timestamp="2024-11-29T15:10:06.501Z" hostname="michal-szalowski-MS-7E26" tests="5" failures="0" errors="0" skipped="0" time="0.002">
         <testcase classname="src/utils/tests/getGovActionId.test.ts" name="getShortenedGovActionId &gt; should return the correct shortened id for long hashes" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/getGovActionId.test.ts" name="getShortenedGovActionId &gt; should handle hashes shorter than 6 characters correctly" time="0">
         </testcase>
-        <testcase classname="src/utils/tests/getGovActionId.test.ts" name="getShortenedGovActionId &gt; should handle hashes exactly 6 characters long by not shortening" time="0">
+        <testcase classname="src/utils/tests/getGovActionId.test.ts" name="getShortenedGovActionId &gt; should handle hashes exactly 6 characters long by not shortening" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/getGovActionId.test.ts" name="getShortenedGovActionId &gt; should handle an empty string for txHash correctly" time="0">
         </testcase>
         <testcase classname="src/utils/tests/getGovActionId.test.ts" name="getFullGovActionId &gt; should return the full id with index" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/getLengthInBytes.test.ts" timestamp="2024-09-25T09:21:06.734Z" hostname="jd.local" tests="4" failures="0" errors="0" skipped="0" time="0.004">
-        <testcase classname="src/utils/tests/getLengthInBytes.test.ts" name="getLengthInBytes &gt; returns correct byte length for ASCII characters" time="0.002">
+    <testsuite name="src/utils/tests/getGovActionVotingThresholdKey.test.ts" timestamp="2024-11-29T15:10:06.509Z" hostname="michal-szalowski-MS-7E26" tests="7" failures="0" errors="0" skipped="0" time="0.003">
+        <testcase classname="src/utils/tests/getGovActionVotingThresholdKey.test.ts" name="getGovActionVotingThresholdKey &gt; should return the correct voting threshold key for NewCommittee and dReps voter type" time="0.001">
         </testcase>
-        <testcase classname="src/utils/tests/getLengthInBytes.test.ts" name="getLengthInBytes &gt; returns correct byte length for multibyte characters" time="0.001">
+        <testcase classname="src/utils/tests/getGovActionVotingThresholdKey.test.ts" name="getGovActionVotingThresholdKey &gt; should return the correct voting threshold key for NewCommittee and sPos voter type" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/getGovActionVotingThresholdKey.test.ts" name="getGovActionVotingThresholdKey &gt; should return undefined for NewCommittee and ccCommittee voter type" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/getGovActionVotingThresholdKey.test.ts" name="getGovActionVotingThresholdKey &gt; should return the correct voting threshold key for HardForkInitiation and dReps voter type" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/getGovActionVotingThresholdKey.test.ts" name="getGovActionVotingThresholdKey &gt; should return the correct voting threshold key for HardForkInitiation and sPos voter type" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/getGovActionVotingThresholdKey.test.ts" name="getGovActionVotingThresholdKey &gt; should return undefined for unknown governance action type" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/getGovActionVotingThresholdKey.test.ts" name="getGovActionVotingThresholdKey &gt; should return undefined for ParameterChange and sPos voter type" time="0">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/utils/tests/getLengthInBytes.test.ts" timestamp="2024-11-29T15:10:06.512Z" hostname="michal-szalowski-MS-7E26" tests="4" failures="0" errors="0" skipped="0" time="0.002">
+        <testcase classname="src/utils/tests/getLengthInBytes.test.ts" name="getLengthInBytes &gt; returns correct byte length for ASCII characters" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/getLengthInBytes.test.ts" name="getLengthInBytes &gt; returns correct byte length for multibyte characters" time="0">
         </testcase>
         <testcase classname="src/utils/tests/getLengthInBytes.test.ts" name="getLengthInBytes &gt; returns correct byte length for mixed characters" time="0">
         </testcase>
         <testcase classname="src/utils/tests/getLengthInBytes.test.ts" name="getLengthInBytes &gt; returns 0 for an empty string" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/getMetadataDataMissingStatusTranslation.test.ts" timestamp="2024-09-25T09:21:06.734Z" hostname="jd.local" tests="4" failures="0" errors="0" skipped="0" time="0.004">
+    <testsuite name="src/utils/tests/getMetadataDataMissingStatusTranslation.test.ts" timestamp="2024-11-29T15:10:06.515Z" hostname="michal-szalowski-MS-7E26" tests="4" failures="0" errors="0" skipped="0" time="0.003">
         <testcase classname="src/utils/tests/getMetadataDataMissingStatusTranslation.test.ts" name="getMetadataDataMissingStatusTranslation &gt; should return the correct translation for URL_NOT_FOUND status" time="0.002">
         </testcase>
         <testcase classname="src/utils/tests/getMetadataDataMissingStatusTranslation.test.ts" name="getMetadataDataMissingStatusTranslation &gt; should return the correct translation for INVALID_JSONLD status" time="0">
         </testcase>
-        <testcase classname="src/utils/tests/getMetadataDataMissingStatusTranslation.test.ts" name="getMetadataDataMissingStatusTranslation &gt; should return the correct translation for INVALID_HASH status" time="0">
+        <testcase classname="src/utils/tests/getMetadataDataMissingStatusTranslation.test.ts" name="getMetadataDataMissingStatusTranslation &gt; should return the correct translation for INVALID_HASH status" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/getMetadataDataMissingStatusTranslation.test.ts" name="getMetadataDataMissingStatusTranslation &gt; should return the default translation for unknown status" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/getProposalTypeLabel.test.ts" timestamp="2024-09-25T09:21:06.735Z" hostname="jd.local" tests="4" failures="0" errors="0" skipped="0" time="0.001">
+    <testsuite name="src/utils/tests/getProposalTypeLabel.test.ts" timestamp="2024-11-29T15:10:06.517Z" hostname="michal-szalowski-MS-7E26" tests="4" failures="0" errors="0" skipped="0" time="0.001">
         <testcase classname="src/utils/tests/getProposalTypeLabel.test.ts" name="getProposalTypeLabel &gt; returns correct label for a known type" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/getProposalTypeLabel.test.ts" name="getProposalTypeLabel &gt; returns correct label for another known type" time="0">
@@ -260,22 +325,22 @@ Error: Failed to get PubDRepKey
         <testcase classname="src/utils/tests/getProposalTypeLabel.test.ts" name="getProposalTypeLabel &gt; returns the type itself when given an empty string" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/getProposalTypeNoEmptySpaces.test.ts" timestamp="2024-09-25T09:21:06.735Z" hostname="jd.local" tests="4" failures="0" errors="0" skipped="0" time="0.002">
-        <testcase classname="src/utils/tests/getProposalTypeNoEmptySpaces.test.ts" name="getProposalTypeNoEmptySpaces &gt; returns correct label with no spaces for a known type" time="0">
+    <testsuite name="src/utils/tests/getProposalTypeNoEmptySpaces.test.ts" timestamp="2024-11-29T15:10:06.519Z" hostname="michal-szalowski-MS-7E26" tests="4" failures="0" errors="0" skipped="0" time="0.001">
+        <testcase classname="src/utils/tests/getProposalTypeNoEmptySpaces.test.ts" name="getProposalTypeNoEmptySpaces &gt; returns correct label with no spaces for a known type" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/getProposalTypeNoEmptySpaces.test.ts" name="getProposalTypeNoEmptySpaces &gt; returns correct label with no spaces for another known type" time="0">
         </testcase>
-        <testcase classname="src/utils/tests/getProposalTypeNoEmptySpaces.test.ts" name="getProposalTypeNoEmptySpaces &gt; returns the type itself with no spaces removed when no matching key is found" time="0.001">
+        <testcase classname="src/utils/tests/getProposalTypeNoEmptySpaces.test.ts" name="getProposalTypeNoEmptySpaces &gt; returns the type itself with no spaces removed when no matching key is found" time="0">
         </testcase>
         <testcase classname="src/utils/tests/getProposalTypeNoEmptySpaces.test.ts" name="getProposalTypeNoEmptySpaces &gt; returns an empty string when given an empty string" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/isValidFormat.test.ts" timestamp="2024-09-25T09:21:06.735Z" hostname="jd.local" tests="16" failures="0" errors="0" skipped="0" time="0.01">
+    <testsuite name="src/utils/tests/isValidFormat.test.ts" timestamp="2024-11-29T15:10:06.526Z" hostname="michal-szalowski-MS-7E26" tests="16" failures="0" errors="0" skipped="0" time="0.01">
         <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isValidURLFormat &gt; returns true for valid HTTP URLs" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isValidURLFormat &gt; returns true for valid HTTPS URLs" time="0">
         </testcase>
-        <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isValidURLFormat &gt; returns true for valid URL without protocol" time="0">
+        <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isValidURLFormat &gt; returns true for valid URL without protocol" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isValidURLFormat &gt; returns true for valid HTTPS URLs with IP" time="0">
         </testcase>
@@ -291,32 +356,32 @@ Error: Failed to get PubDRepKey
         </testcase>
         <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isValidHashFormat &gt; returns true for valid hexadecimal strings" time="0">
         </testcase>
-        <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isValidHashFormat &gt; returns false for non-hexadecimal strings" time="0">
+        <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isValidHashFormat &gt; returns false for non-hexadecimal strings" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isValidHashFormat &gt; returns false for hexadecimal strings with spaces" time="0">
         </testcase>
         <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isValidHashFormat &gt; returns false for empty string" time="0">
         </testcase>
-        <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isRewardAddress &gt; returns true for stake address" time="0.005">
+        <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isRewardAddress &gt; returns true for stake address" time="0.004">
         </testcase>
-        <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isRewardAddress &gt; returns error for empty string" time="0.001">
+        <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isRewardAddress &gt; returns error for empty string" time="0">
         </testcase>
         <testcase classname="src/utils/tests/isValidFormat.test.ts" name="isRewardAddress &gt; returns error for another bech32 string" time="0.002">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/jsonUtils.test.ts" timestamp="2024-09-25T09:21:06.736Z" hostname="jd.local" tests="2" failures="0" errors="0" skipped="0" time="0.003">
-        <testcase classname="src/utils/tests/jsonUtils.test.ts" name="downloadJson &gt; downloads JSON with default file name" time="0.002">
+    <testsuite name="src/utils/tests/jsonUtils.test.ts" timestamp="2024-11-29T15:10:06.534Z" hostname="michal-szalowski-MS-7E26" tests="2" failures="0" errors="0" skipped="0" time="0.007">
+        <testcase classname="src/utils/tests/jsonUtils.test.ts" name="downloadJson &gt; downloads JSON with default file name" time="0.005">
         </testcase>
-        <testcase classname="src/utils/tests/jsonUtils.test.ts" name="downloadJson &gt; downloads JSON with custom file name" time="0">
-        </testcase>
-    </testsuite>
-    <testsuite name="src/utils/tests/localStorage.test.ts" timestamp="2024-09-25T09:21:06.736Z" hostname="jd.local" tests="2" failures="0" errors="0" skipped="0" time="0.002">
-        <testcase classname="src/utils/tests/localStorage.test.ts" name="localStorage util &gt; returns correctly value after set item to localstorage" time="0.001">
-        </testcase>
-        <testcase classname="src/utils/tests/localStorage.test.ts" name="localStorage util &gt; returns null after remove item from localstorage" time="0">
+        <testcase classname="src/utils/tests/jsonUtils.test.ts" name="downloadJson &gt; downloads JSON with custom file name" time="0.001">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/numberValidation.test.ts" timestamp="2024-09-25T09:21:06.737Z" hostname="jd.local" tests="3" failures="0" errors="0" skipped="0" time="0.002">
+    <testsuite name="src/utils/tests/localStorage.test.ts" timestamp="2024-11-29T15:10:06.535Z" hostname="michal-szalowski-MS-7E26" tests="2" failures="0" errors="0" skipped="0" time="0.002">
+        <testcase classname="src/utils/tests/localStorage.test.ts" name="localStorage util &gt; returns correctly value after set item to localstorage" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/localStorage.test.ts" name="localStorage util &gt; returns null after remove item from localstorage" time="0.001">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/utils/tests/numberValidation.test.ts" timestamp="2024-11-29T15:10:06.536Z" hostname="michal-szalowski-MS-7E26" tests="3" failures="0" errors="0" skipped="0" time="0.002">
         <testcase classname="src/utils/tests/numberValidation.test.ts" name="numberValidation function &gt; returns an error message when the input is not a valid number" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/numberValidation.test.ts" name="numberValidation function &gt; returns an error message when the input is negative" time="0">
@@ -324,22 +389,42 @@ Error: Failed to get PubDRepKey
         <testcase classname="src/utils/tests/numberValidation.test.ts" name="numberValidation function &gt; returns true when the input is a valid positive number" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/openInNewTab.test.ts" timestamp="2024-09-25T09:21:06.737Z" hostname="jd.local" tests="2" failures="0" errors="0" skipped="0" time="0.003">
-        <testcase classname="src/utils/tests/openInNewTab.test.ts" name="openInNewTab function &gt; opens a new tab with the provided URL" time="0.002">
+    <testsuite name="src/utils/tests/openInNewTab.test.ts" timestamp="2024-11-29T15:10:06.538Z" hostname="michal-szalowski-MS-7E26" tests="2" failures="0" errors="0" skipped="0" time="0.003">
+        <testcase classname="src/utils/tests/openInNewTab.test.ts" name="openInNewTab function &gt; opens a new tab with the provided URL" time="0.001">
         </testcase>
-        <testcase classname="src/utils/tests/openInNewTab.test.ts" name="openInNewTab function &gt; sets opener to null if new window is opened" time="0.001">
+        <testcase classname="src/utils/tests/openInNewTab.test.ts" name="openInNewTab function &gt; sets opener to null if new window is opened" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/removeDuplicatedProposals.test.ts" timestamp="2024-09-25T09:21:06.737Z" hostname="jd.local" tests="3" failures="0" errors="0" skipped="0" time="0.002">
-        <testcase classname="src/utils/tests/removeDuplicatedProposals.test.ts" name="remove duplicated proposals &gt; returns all proposals when all are unique" time="0">
+    <testsuite name="src/utils/tests/removeDuplicatedProposals.test.ts" timestamp="2024-11-29T15:10:06.544Z" hostname="michal-szalowski-MS-7E26" tests="3" failures="0" errors="0" skipped="0" time="0.002">
+        <testcase classname="src/utils/tests/removeDuplicatedProposals.test.ts" name="remove duplicated proposals &gt; returns all proposals when all are unique" time="0.001">
         </testcase>
         <testcase classname="src/utils/tests/removeDuplicatedProposals.test.ts" name="remove duplicated proposals &gt; removes duplicate proposals based on txHash and index" time="0">
         </testcase>
         <testcase classname="src/utils/tests/removeDuplicatedProposals.test.ts" name="remove duplicated proposals &gt; returns empty array if input is empty" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/setProtocolParameterUpdate.test.ts" timestamp="2024-09-25T09:21:06.737Z" hostname="jd.local" tests="4" failures="0" errors="0" skipped="0" time="0.003">
-        <testcase classname="src/utils/tests/setProtocolParameterUpdate.test.ts" name="setProtocolParameterUpdate &gt; should call the corresponding setter function if the value is not undefined" time="0.002">
+    <testsuite name="src/utils/tests/removeMarkdown.test.ts" timestamp="2024-11-29T15:10:06.546Z" hostname="michal-szalowski-MS-7E26" tests="9" failures="0" errors="0" skipped="0" time="0.003">
+        <testcase classname="src/utils/tests/removeMarkdown.test.ts" name="removeMarkdown &gt; should remove bold markdown" time="0.001">
+        </testcase>
+        <testcase classname="src/utils/tests/removeMarkdown.test.ts" name="removeMarkdown &gt; should remove italic markdown" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/removeMarkdown.test.ts" name="removeMarkdown &gt; should remove strikethrough markdown" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/removeMarkdown.test.ts" name="removeMarkdown &gt; should remove image markdown" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/removeMarkdown.test.ts" name="removeMarkdown &gt; should remove link markdown" time="0.001">
+        </testcase>
+        <testcase classname="src/utils/tests/removeMarkdown.test.ts" name="removeMarkdown &gt; should remove inline code markdown" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/removeMarkdown.test.ts" name="removeMarkdown &gt; should remove blockquote markdown" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/removeMarkdown.test.ts" name="removeMarkdown &gt; should remove heading markdown" time="0">
+        </testcase>
+        <testcase classname="src/utils/tests/removeMarkdown.test.ts" name="removeMarkdown &gt; should remove multiple newlines" time="0">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/utils/tests/setProtocolParameterUpdate.test.ts" timestamp="2024-11-29T15:10:06.550Z" hostname="michal-szalowski-MS-7E26" tests="4" failures="0" errors="0" skipped="0" time="0.004">
+        <testcase classname="src/utils/tests/setProtocolParameterUpdate.test.ts" name="setProtocolParameterUpdate &gt; should call the corresponding setter function if the value is not undefined" time="0.003">
         </testcase>
         <testcase classname="src/utils/tests/setProtocolParameterUpdate.test.ts" name="setProtocolParameterUpdate &gt; should not call any setter function if the value is undefined" time="0">
         </testcase>
@@ -348,8 +433,8 @@ Error: Failed to get PubDRepKey
         <testcase classname="src/utils/tests/setProtocolParameterUpdate.test.ts" name="setProtocolParameterUpdate &gt; should not call any setter function if the corresponding setter does not exist" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/testIdFromLabel.test.ts" timestamp="2024-09-25T09:21:06.738Z" hostname="jd.local" tests="6" failures="0" errors="0" skipped="0" time="0.002">
-        <testcase classname="src/utils/tests/testIdFromLabel.test.ts" name="testIdFromLabel function &gt; replaces spaces with dashes and converts the label to lowercase" time="0.001">
+    <testsuite name="src/utils/tests/testIdFromLabel.test.ts" timestamp="2024-11-29T15:10:06.552Z" hostname="michal-szalowski-MS-7E26" tests="6" failures="0" errors="0" skipped="0" time="0.002">
+        <testcase classname="src/utils/tests/testIdFromLabel.test.ts" name="testIdFromLabel function &gt; replaces spaces with dashes and converts the label to lowercase" time="0">
         </testcase>
         <testcase classname="src/utils/tests/testIdFromLabel.test.ts" name="testIdFromLabel function &gt; handles labels with multiple spaces" time="0">
         </testcase>
@@ -362,10 +447,10 @@ Error: Failed to get PubDRepKey
         <testcase classname="src/utils/tests/testIdFromLabel.test.ts" name="testIdFromLabel function &gt; handles labels with all spaces" time="0">
         </testcase>
     </testsuite>
-    <testsuite name="src/utils/tests/wait.test.ts" timestamp="2024-09-25T09:21:06.738Z" hostname="jd.local" tests="2" failures="0" errors="0" skipped="0" time="7.005">
-        <testcase classname="src/utils/tests/wait.test.ts" name="wait function &gt; resolves after the specified time" time="2.001">
+    <testsuite name="src/utils/tests/wait.test.ts" timestamp="2024-11-29T15:10:06.556Z" hostname="michal-szalowski-MS-7E26" tests="2" failures="0" errors="0" skipped="0" time="7.005">
+        <testcase classname="src/utils/tests/wait.test.ts" name="wait function &gt; resolves after the specified time" time="2.003">
         </testcase>
-        <testcase classname="src/utils/tests/wait.test.ts" name="wait function &gt; resolves after the default time if no time is specified" time="5.002">
+        <testcase classname="src/utils/tests/wait.test.ts" name="wait function &gt; resolves after the default time if no time is specified" time="5.001">
         </testcase>
     </testsuite>
 </testsuites>

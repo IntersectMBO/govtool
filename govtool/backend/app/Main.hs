@@ -8,7 +8,7 @@
 
 module Main where
 
-import           Control.Exception                      (Exception, SomeException, fromException, throw)
+import           Control.Exception                      (IOException, Exception, SomeException, fromException, throw)
 import           Control.Lens.Operators                 ((.~))
 import           Control.Monad
 import           Control.Monad.IO.Class
@@ -21,6 +21,7 @@ import           Data.ByteString.Char8                  (unpack)
 import qualified Data.Cache                             as Cache
 import           Data.Function                          ((&))
 import           Data.Has                               (getter)
+import           Data.List                              (isInfixOf)
 import           Data.Monoid                            (mempty)
 import           Data.OpenApi                           (OpenApi, Server (Server), _openApiServers,
                                                          _serverDescription, _serverUrl, _serverVariables,
@@ -88,7 +89,8 @@ startApp vvaConfig sentryService = do
       settings =
         setPort vvaPort
           $ setHost vvaHost
-          $ setTimeout 120 -- 120 seconds timeout
+          $ setTimeout 300-- 300 seconds timeout
+          $ setGracefulShutdownTimeout (Just 60) -- Allow 60 seconds for cleanup
           $ setBeforeMainLoop
             ( Text.hPutStrLn stderr $
                 Text.pack
@@ -130,25 +132,39 @@ startApp vvaConfig sentryService = do
 
 exceptionHandler :: VVAConfig -> SentryService -> Maybe Request -> SomeException -> IO ()
 exceptionHandler vvaConfig sentryService mRequest exception = do
-  print mRequest
   print exception
+  -- These are not considered application errors
+  -- They represent the client closing the connection prematurely
+  -- or the timeout thread being killed by WARP
   let isNotTimeoutThread x = case fromException x of
         Just TimeoutThread -> False
         _                  -> True
       isNotConnectionClosedByPeer x = case fromException x of
         Just ConnectionClosedByPeer -> False
         _                           -> True
-  guard . isNotTimeoutThread $ exception
-  guard . isNotConnectionClosedByPeer $ exception
+      isNotClientClosedConnection x =
+        case fromException x of
+          Just ioe -> not ("Warp: Client closed connection prematurely" `isInfixOf` show (ioe :: IOException))
+          Nothing  -> True
+      isNotThreadKilledByTimeoutManager x =
+          "Thread killed by timeout manager" `notElem` lines (show x)
+      shouldSkipError =
+        isNotTimeoutThread exception &&
+        isNotConnectionClosedByPeer exception &&
+        isNotClientClosedConnection exception &&
+        isNotThreadKilledByTimeoutManager exception
+
+  guard shouldSkipError
+
   let env = sentryEnv vvaConfig
-  register
-    sentryService
-    "vva.be"
-    Error
-    (formatMessage mRequest exception)
-    (recordUpdate env mRequest exception)
-
-
+  case mRequest of
+    Nothing -> return ()
+    Just _  -> register
+      sentryService
+      "vva.be"
+      Error
+      (formatMessage mRequest exception)
+      (recordUpdate env mRequest exception)
 
 formatMessage :: Maybe Request -> SomeException -> String
 formatMessage Nothing exception = "Exception before request could be parsed: " ++ show exception

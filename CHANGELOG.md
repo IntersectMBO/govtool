@@ -12,6 +12,24 @@ changes.
 
 ### Added
 
+-
+
+### Fixed
+
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v1.0.30](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.30) 2024-12-10
+
+### Added
+
 - Add stake key registration certificate to voting and gov action proposal if not registered [Issue 2490](https://github.com/IntersectMBO/govtool/issues/2490)
 
 ### Fixed

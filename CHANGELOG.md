@@ -26,6 +26,24 @@ changes.
 
 -
 
+## [v1.0.31](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.31)
+
+### Added
+
+-
+
+### Fixed
+
+- Fix storing url missing length validation [Issue 2044](https://github.com/IntersectMBO/govtool/issues/2044)
+
+### Changed
+
+-
+
+### Removed
+
+-
+
 ## [v1.0.30](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.30) 2024-12-10
 
 ### Added

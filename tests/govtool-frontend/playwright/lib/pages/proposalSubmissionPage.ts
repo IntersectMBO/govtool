@@ -16,8 +16,8 @@ const formErrors = {
   abstract: "abstract-helper-error",
   motivation: "motivation-helper-error",
   rationale: "rationale-helper-error",
-  receivingAddress: "receiving-address-text-error",
-  amount: "amount-text-error",
+  receivingAddress: "receiving-address-0-text-error",
+  amount: "amount-0-text-error",
   link: "link-0-url-input-error",
 };
 
@@ -39,6 +39,9 @@ export default class ProposalSubmissionPage {
 
   readonly continueBtn = this.page.getByTestId("continue-button");
   readonly addLinkBtn = this.page.getByTestId("add-link-button");
+  readonly addWithdrawalAddressBtn = this.page.getByTestId(
+    "add-withdrawal-link-button"
+  );
   readonly infoBtn = this.page.getByTestId("info-button");
   readonly treasuryBtn = this.page.getByTestId("treasury-button");
   readonly editSubmissionButton = this.page.getByTestId(
@@ -61,10 +64,27 @@ export default class ProposalSubmissionPage {
   readonly motivationInput = this.page.getByTestId("motivation-input");
   readonly rationaleInput = this.page.getByTestId("rationale-input");
   readonly receivingAddressInput = this.page.getByTestId(
-    "receiving-address-input"
+    "receiving-address-0-text-input"
   );
-  readonly amountInput = this.page.getByTestId("amount-input");
+  readonly amountInput = this.page.getByTestId("amount-0-text-input");
   readonly closeDraftSuccessModalBtn = this.page.getByTestId("close-button");
+  readonly linkTextInput = this.page.getByTestId("link-0-text-input");
+  readonly linkUrlInput = this.page.getByTestId("link-0-url-input");
+
+  // content
+  readonly governanceActionTypeContent = this.page.getByTestId(
+    "governance-action-type-content"
+  );
+  readonly titleContent = this.page.getByTestId("title-content");
+  readonly abstractContent = this.page.getByTestId("abstract-content");
+  readonly motivationContent = this.page.getByTestId("motivation-content");
+  readonly rationaleContent = this.page.getByTestId("rationale-content");
+  readonly receivingAddressContent = this.page.getByTestId(
+    "receiving-address-0-content"
+  );
+  readonly amountContent = this.page.getByTestId("amount-0-content");
+  readonly linkTextContent = this.page.getByTestId("link-0-text-content");
+  readonly linkUrlContent = this.page.getByTestId("link-0-url-content");
 
   constructor(private readonly page: Page) {}
 

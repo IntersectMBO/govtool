@@ -1,7 +1,7 @@
-import { TopNav } from "@organisms";
-import { expect, jest } from "@storybook/jest";
+import { expect, userEvent, within, fn } from "@storybook/test";
 import type { Meta, StoryObj } from "@storybook/react";
-import { userEvent, within } from "@storybook/testing-library";
+
+import { TopNav } from "@organisms";
 
 const meta = {
   title: "Example/TopNav",
@@ -13,7 +13,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const performCommonActions = async (canvas: ReturnType<typeof within>) => {
-  window.open = jest.fn();
+  window.open = fn();
 
   await userEvent.click(canvas.getByTestId("logo-button"));
   const governanceActionsLink = canvas.getByTestId("governance-actions-link");

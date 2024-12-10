@@ -26,6 +26,26 @@ changes.
 
 -
 
+## [v1.0.30](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.30) 2024-12-10
+
+### Added
+
+- Add stake key registration certificate to voting and gov action proposal if not registered [Issue 2490](https://github.com/IntersectMBO/govtool/issues/2490)
+
+### Fixed
+
+- Fix vulnerabilities in dependencies [Issue 2192](https://github.com/IntersectMBO/govtool/issues/2192)
+- Optimize resources usage in frontend service build [Issue 2192](https://github.com/IntersectMBO/govtool/issues/2192)
+- Fix sentry reports on multiple reloads of Governance Actions [Issue 2446](https://github.com/IntersectMBO/govtool/issues/2446)
+
+### Changed
+
+-
+
+### Removed
+
+-
+
 ## [v1.0.29](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.29) 2024-12-05
 
 ### Added

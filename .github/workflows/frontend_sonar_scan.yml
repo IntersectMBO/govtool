@@ -31,7 +31,6 @@ jobs:
       - name: 🧪 Test
         working-directory: govtool/frontend
         env:
-          NODE_OPTIONS: "--max_old_space_size=6144"
           NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
         run: |
           npm ci

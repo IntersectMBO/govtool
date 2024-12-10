@@ -1,13 +1,14 @@
-{-# LANGUAGE FlexibleContexts  #-}
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE TypeApplications  #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE LambdaCase          #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE TemplateHaskell     #-}
+{-# LANGUAGE TypeApplications    #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module VVA.Proposal where
 
-import           Control.Exception          (throw)
+import           Control.Exception          (throw, SomeException, try)
 import           Control.Monad.Except       (MonadError, throwError)
 import           Control.Monad.Reader
 
@@ -70,11 +71,17 @@ getProposals ::
   Maybe [Text] -> m [Proposal]
 getProposals mSearchTerms = withPool $ \conn -> do
   let searchParam = maybe "" head mSearchTerms
-  liftIO $ SQL.query conn listProposalsSql 
-    ( searchParam
-    , "%" <> searchParam <> "%"
-    , "%" <> searchParam <> "%"
-    , "%" <> searchParam <> "%"
-    , "%" <> searchParam <> "%"
-    , "%" <> searchParam <> "%"
-    )
+  liftIO $ do
+    result <- try $ SQL.query conn listProposalsSql 
+      ( searchParam
+      , "%" <> searchParam <> "%"
+      , "%" <> searchParam <> "%"
+      , "%" <> searchParam <> "%"
+      , "%" <> searchParam <> "%"
+      , "%" <> searchParam <> "%"
+      )
+    case result of
+      Left (e :: SomeException) -> do
+        return []
+      Right rows -> do
+        return rows

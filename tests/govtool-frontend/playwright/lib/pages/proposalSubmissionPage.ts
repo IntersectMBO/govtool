@@ -68,6 +68,9 @@ export default class ProposalSubmissionPage {
   );
   readonly amountInput = this.page.getByTestId("amount-0-text-input");
   readonly closeDraftSuccessModalBtn = this.page.getByTestId("close-button");
+  readonly linkTextInput = this.page.getByTestId("link-0-text-input");
+  readonly linkUrlInput = this.page.getByTestId("link-0-url-input");
+  
 
   constructor(private readonly page: Page) {}
 

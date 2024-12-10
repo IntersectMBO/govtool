@@ -330,13 +330,45 @@ test.describe("Info Proposal Draft", () => {
 
     const proposalSubmissionPage = new ProposalSubmissionPage(page);
     const { proposalFormValue } = await proposalSubmissionPage.createDraft(
-      ProposalType.info
+      ProposalType.treasury
     );
     const draftCard = proposalSubmissionPage.getFirstDraft();
     const draftCardAllInnerText = await (await draftCard).allInnerTexts();
 
     expect(draftCardAllInnerText.includes(proposalFormValue.prop_name));
     expect(draftCardAllInnerText.includes(proposalFormValue.prop_abstract));
+
+    (await draftCard)
+      .locator('[data-testid^="draft-"][data-testid$="-start-editing"]')
+      .click();
+
+    await expect(proposalSubmissionPage.governanceActionType).toHaveText(
+      ProposalType.treasury
+    );
+    await expect(proposalSubmissionPage.titleInput).toHaveValue(
+      proposalFormValue.prop_name
+    );
+    await expect(proposalSubmissionPage.abstractInput).toHaveValue(
+      proposalFormValue.prop_abstract
+    );
+    await expect(proposalSubmissionPage.motivationInput).toHaveValue(
+      proposalFormValue.prop_motivation
+    );
+    await expect(proposalSubmissionPage.rationaleInput).toHaveValue(
+      proposalFormValue.prop_rationale
+    );
+    await expect(proposalSubmissionPage.receivingAddressInput).toHaveValue(
+      proposalFormValue.prop_receiving_address
+    );
+    await expect(proposalSubmissionPage.amountInput).toHaveValue(
+      proposalFormValue.prop_amount
+    );
+    await expect(proposalSubmissionPage.linkUrlInput).toHaveValue(
+      proposalFormValue.proposal_links[0].prop_link
+    );
+    await expect(proposalSubmissionPage.linkTextInput).toHaveValue(
+      proposalFormValue.proposal_links[0].prop_link_text
+    );
   });
 
   test("7M_1. Should edit a info proposal draft", async ({ browser }) => {

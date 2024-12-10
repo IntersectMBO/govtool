@@ -26,6 +26,25 @@ changes.
 
 -
 
+## [v2.0.0](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.0) 2024-12-10
+
+### Added
+
+-
+
+### Fixed
+
+-
+
+### Changed
+
+- Bump @intersect.mbo/pdf-ui to v0.5.5
+- Change limit of active db connections
+
+### Removed
+
+-
+
 ## [v1.0.30](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.30) 2024-12-10
 
 ### Added

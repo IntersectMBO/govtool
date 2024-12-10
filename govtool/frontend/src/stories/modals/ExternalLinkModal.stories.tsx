@@ -1,12 +1,19 @@
 import { useEffect } from "react";
 import { Meta, StoryFn } from "@storybook/react";
+import {
+  expect,
+  userEvent,
+  within,
+  screen,
+  waitFor,
+  fn,
+} from "@storybook/test";
 
 import { Modal } from "@atoms";
 import { ExternalLinkModal, ExternalLinkModalState } from "@organisms";
-import { userEvent, within, screen, waitFor } from "@storybook/testing-library";
-import { expect, jest } from "@storybook/jest";
-import { useModal } from "../../context/modal";
 import { callAll } from "@/utils";
+
+import { useModal } from "../../context/modal";
 
 const meta = {
   title: "Example/Modals/ExternalLinkModal",
@@ -59,7 +66,7 @@ Default.play = async ({ canvasElement }) => {
   waitFor(async () => {
     const modalScreen = screen.getAllByTestId("external-link-modal")[0];
     let modalCanvas = within(modalScreen);
-    window.open = jest.fn();
+    window.open = fn();
 
     expect(modalCanvas.getByText(/Be Careful!/i)).toBeInTheDocument();
     expect(

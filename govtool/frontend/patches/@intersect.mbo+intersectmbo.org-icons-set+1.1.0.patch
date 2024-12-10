@@ -1,0 +1,1012 @@
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAcademicCap.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAcademicCap.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAcademicCap.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAcademicCap.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAdjustments.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAdjustments.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAdjustments.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAdjustments.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAngellist.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAngellist.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAngellist.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAngellist.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAnnotation.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAnnotation.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAnnotation.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAnnotation.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconApple.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconApple.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconApple.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconApple.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArchive.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArchive.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArchive.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArchive.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleDown.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleDown.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleDown.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleDown.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleLeft.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleLeft.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleLeft.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleLeft.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleRight.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleRight.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleRight.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleRight.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleUp.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleUp.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleUp.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowCircleUp.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowDown.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowDown.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowDown.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowDown.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowLeft.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowLeft.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowLeft.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowLeft.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowDown.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowDown.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowDown.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowDown.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowLeft.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowLeft.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowLeft.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowLeft.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowRight.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowRight.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowRight.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowRight.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowUp.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowUp.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowUp.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowNarrowUp.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowRight.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowRight.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowRight.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowRight.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowTriangleDown.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowTriangleDown.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowTriangleDown.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowTriangleDown.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowTriangleUp.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowTriangleUp.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowTriangleUp.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowTriangleUp.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowUp.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowUp.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowUp.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowUp.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrow_triangle_left.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrow_triangle_left.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrow_triangle_left.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrow_triangle_left.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrow_triangle_right.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrow_triangle_right.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrow_triangle_right.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrow_triangle_right.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowsExpand.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowsExpand.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowsExpand.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconArrowsExpand.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAtSymbol.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAtSymbol.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAtSymbol.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconAtSymbol.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBackspace.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBackspace.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBackspace.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBackspace.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBadgeCheck.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBadgeCheck.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBadgeCheck.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBadgeCheck.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBan.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBan.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBan.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBan.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBeaker.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBeaker.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBeaker.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBeaker.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBell.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBell.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBell.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBell.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBookOpen.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBookOpen.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBookOpen.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBookOpen.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBookmark.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBookmark.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBookmark.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBookmark.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBookmarkAlt.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBookmarkAlt.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBookmarkAlt.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBookmarkAlt.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBriefcase.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBriefcase.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBriefcase.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconBriefcase.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCake.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCake.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCake.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCake.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCalculator.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCalculator.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCalculator.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCalculator.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCalendar.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCalendar.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCalendar.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCalendar.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCamera.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCamera.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCamera.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCamera.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCash.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCash.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCash.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCash.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChartBar.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChartBar.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChartBar.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChartBar.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChartPie.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChartPie.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChartPie.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChartPie.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChartSquareBar.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChartSquareBar.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChartSquareBar.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChartSquareBar.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChat.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChat.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChat.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChat.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChatAlt.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChatAlt.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChatAlt.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChatAlt.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChatAlt2.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChatAlt2.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChatAlt2.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChatAlt2.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheck.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheck.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheck.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheck.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheckCircle.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheckCircle.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheckCircle.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheckCircle.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronDown.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronDown.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronDown.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronDown.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronLeft.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronLeft.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronLeft.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronLeft.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronRight.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronRight.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronRight.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronRight.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronUp.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronUp.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronUp.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCheveronUp.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleDown.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleDown.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleDown.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleDown.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleLeft.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleLeft.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleLeft.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleLeft.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleRight.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleRight.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleRight.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleRight.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleUp.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleUp.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleUp.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChevronDoubleUp.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChip.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChip.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChip.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconChip.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboard.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboard.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboard.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboard.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboardCheck.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboardCheck.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboardCheck.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboardCheck.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboardCopy.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboardCopy.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboardCopy.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboardCopy.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboardList.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboardList.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboardList.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClipboardList.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClock.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClock.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClock.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClock.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCloud.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCloud.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCloud.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCloud.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCloudDownload.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCloudDownload.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCloudDownload.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCloudDownload.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCloudUpload.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCloudUpload.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCloudUpload.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCloudUpload.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClubhouse.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClubhouse.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClubhouse.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconClubhouse.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCode.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCode.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCode.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCode.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCogGear.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCogGear.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCogGear.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCogGear.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCollection.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCollection.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCollection.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCollection.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconColorSwatch.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconColorSwatch.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconColorSwatch.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconColorSwatch.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCookie.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCookie.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCookie.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCookie.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCreditCard.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCreditCard.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCreditCard.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCreditCard.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCrypto.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCrypto.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCrypto.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCrypto.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCube.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCube.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCube.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCube.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCubeTransparent.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCubeTransparent.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCubeTransparent.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCubeTransparent.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyBangladeshi.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyBangladeshi.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyBangladeshi.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyBangladeshi.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyDollar.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyDollar.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyDollar.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyDollar.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyEuro.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyEuro.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyEuro.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyEuro.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyPound.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyPound.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyPound.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyPound.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyRupee.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyRupee.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyRupee.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyRupee.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyYen.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyYen.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyYen.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCurrencyYen.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCursorClick.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCursorClick.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCursorClick.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconCursorClick.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDatabase.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDatabase.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDatabase.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDatabase.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDesktopComputer.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDesktopComputer.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDesktopComputer.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDesktopComputer.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDeviceMobile.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDeviceMobile.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDeviceMobile.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDeviceMobile.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDeviceTablet.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDeviceTablet.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDeviceTablet.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDeviceTablet.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDiscord.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDiscord.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDiscord.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDiscord.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocument.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocument.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocument.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocument.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentAdd.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentAdd.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentAdd.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentAdd.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentRemove.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentRemove.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentRemove.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentRemove.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentReport.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentReport.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentReport.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentReport.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentSearch.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentSearch.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentSearch.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentSearch.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentText.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentText.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentText.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDocumentText.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDotsCircleHorizontal.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDotsCircleHorizontal.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDotsCircleHorizontal.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDotsCircleHorizontal.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDotsHorizontal.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDotsHorizontal.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDotsHorizontal.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDotsHorizontal.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDotsVertical.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDotsVertical.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDotsVertical.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDotsVertical.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDownload.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDownload.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDownload.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDownload.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDribbble.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDribbble.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDribbble.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDribbble.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDuplicate.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDuplicate.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDuplicate.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconDuplicate.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEmojiHappy.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEmojiHappy.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEmojiHappy.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEmojiHappy.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEmojiSad.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEmojiSad.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEmojiSad.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEmojiSad.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconExclamation.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconExclamation.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconExclamation.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconExclamation.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconExclamationCircle.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconExclamationCircle.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconExclamationCircle.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconExclamationCircle.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconExternalLink.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconExternalLink.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconExternalLink.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconExternalLink.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEye.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEye.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEye.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEye.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEyeOff.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEyeOff.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEyeOff.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconEyeOff.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFacebook.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFacebook.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFacebook.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFacebook.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFastForward.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFastForward.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFastForward.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFastForward.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFigma.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFigma.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFigma.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFigma.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFilm.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFilm.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFilm.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFilm.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFilter.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFilter.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFilter.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFilter.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFingerPrint.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFingerPrint.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFingerPrint.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFingerPrint.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFire.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFire.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFire.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFire.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFlag.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFlag.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFlag.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFlag.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolder.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolder.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolder.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolder.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderAdd.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderAdd.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderAdd.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderAdd.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderDownload.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderDownload.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderDownload.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderDownload.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderOpen.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderOpen.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderOpen.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderOpen.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderRemove.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderRemove.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderRemove.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFolderRemove.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFund.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFund.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFund.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconFund.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGift.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGift.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGift.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGift.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGithub.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGithub.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGithub.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGithub.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGlobe.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGlobe.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGlobe.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGlobe.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGlobeAlt.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGlobeAlt.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGlobeAlt.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGlobeAlt.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGoogle.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGoogle.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGoogle.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconGoogle.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHand.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHand.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHand.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHand.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHashtag.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHashtag.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHashtag.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHashtag.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHeart.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHeart.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHeart.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHeart.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHome.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHome.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHome.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconHome.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconIconUserRemove.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconIconUserRemove.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconIconUserRemove.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconIconUserRemove.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconIdentification.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconIdentification.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconIdentification.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconIdentification.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInbox.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInbox.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInbox.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInbox.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInboxIn.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInboxIn.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInboxIn.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInboxIn.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInformationCircle.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInformationCircle.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInformationCircle.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInformationCircle.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInstagram.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInstagram.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInstagram.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconInstagram.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconKey.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconKey.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconKey.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconKey.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLibrary.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLibrary.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLibrary.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLibrary.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLightBulb.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLightBulb.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLightBulb.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLightBulb.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLightningBolt.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLightningBolt.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLightningBolt.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLightningBolt.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLink.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLink.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLink.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLink.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLinkedin.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLinkedin.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLinkedin.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLinkedin.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLocationMarker.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLocationMarker.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLocationMarker.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLocationMarker.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLockClosed.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLockClosed.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLockClosed.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLockClosed.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLockOpen.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLockOpen.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLockOpen.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLockOpen.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLogout.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLogout.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLogout.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLogout.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLogout1.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLogout1.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLogout1.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconLogout1.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMail.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMail.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMail.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMail.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMailOpen.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMailOpen.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMailOpen.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMailOpen.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMap.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMap.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMap.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMap.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenu.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenu.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenu.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenu.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt1.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt1.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt1.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt1.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt2.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt2.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt2.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt2.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt3.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt3.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt3.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt3.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt4.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt4.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt4.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMenuAlt4.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMicrophone.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMicrophone.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMicrophone.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMicrophone.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMinus.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMinus.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMinus.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMinus.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMinusCircle.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMinusCircle.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMinusCircle.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMinusCircle.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMoon.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMoon.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMoon.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMoon.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMusicNote.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMusicNote.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMusicNote.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconMusicNote.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconNewspaper.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconNewspaper.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconNewspaper.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconNewspaper.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconOfficeBuilding.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconOfficeBuilding.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconOfficeBuilding.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconOfficeBuilding.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPaperAirplane.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPaperAirplane.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPaperAirplane.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPaperAirplane.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPaperClip.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPaperClip.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPaperClip.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPaperClip.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPause.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPause.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPause.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPause.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPencil.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPencil.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPencil.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPencil.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPencilAlt.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPencilAlt.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPencilAlt.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPencilAlt.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhone.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhone.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhone.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhone.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhoneIncoming.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhoneIncoming.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhoneIncoming.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhoneIncoming.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhoneMissedCall.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhoneMissedCall.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhoneMissedCall.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhoneMissedCall.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhoneOutgoing.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhoneOutgoing.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhoneOutgoing.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhoneOutgoing.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhotograph.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhotograph.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhotograph.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPhotograph.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPinterest.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPinterest.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPinterest.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPinterest.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPlay.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPlay.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPlay.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPlay.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPlus.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPlus.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPlus.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPlus.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPlusCircle.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPlusCircle.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPlusCircle.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPlusCircle.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPresentationChartBar.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPresentationChartBar.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPresentationChartBar.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPresentationChartBar.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPresentationChartLine.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPresentationChartLine.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPresentationChartLine.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPresentationChartLine.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPrinter.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPrinter.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPrinter.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPrinter.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPuzzle.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPuzzle.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPuzzle.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPuzzle.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconQrcode.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconQrcode.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconQrcode.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconQrcode.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconQuestionMarkCircle.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconQuestionMarkCircle.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconQuestionMarkCircle.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconQuestionMarkCircle.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReceiptRefund.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReceiptRefund.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReceiptRefund.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReceiptRefund.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReceiptTax.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReceiptTax.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReceiptTax.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReceiptTax.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReddit.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReddit.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReddit.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReddit.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconRefresh.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconRefresh.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconRefresh.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconRefresh.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReply.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReply.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReply.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconReply.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconRewind.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconRewind.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconRewind.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconRewind.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconRss.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconRss.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconRss.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconRss.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSave.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSave.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSave.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSave.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSaveAs.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSaveAs.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSaveAs.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSaveAs.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconScale.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconScale.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconScale.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconScale.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconScissors.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconScissors.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconScissors.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconScissors.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSearch.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSearch.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSearch.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSearch.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSearchCircle.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSearchCircle.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSearchCircle.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSearchCircle.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSelector.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSelector.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSelector.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSelector.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconServer.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconServer.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconServer.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconServer.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShare.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShare.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShare.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShare.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShieldCheck.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShieldCheck.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShieldCheck.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShieldCheck.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShieldExclamation.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShieldExclamation.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShieldExclamation.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShieldExclamation.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShoppingBag.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShoppingBag.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShoppingBag.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShoppingBag.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShoppingCart.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShoppingCart.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShoppingCart.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconShoppingCart.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSignal.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSignal.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSignal.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSignal.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSmViewGridAdd.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSmViewGridAdd.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSmViewGridAdd.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSmViewGridAdd.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSnapchat.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSnapchat.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSnapchat.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSnapchat.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSort.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSort.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSort.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSort.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSortAscending.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSortAscending.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSortAscending.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSortAscending.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSortDescending.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSortDescending.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSortDescending.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSortDescending.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSparkles.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSparkles.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSparkles.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSparkles.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSpeakerphone.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSpeakerphone.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSpeakerphone.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSpeakerphone.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStar.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStar.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStar.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStar.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStatusOffline.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStatusOffline.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStatusOffline.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStatusOffline.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStatusOnline.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStatusOnline.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStatusOnline.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStatusOnline.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStop.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStop.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStop.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconStop.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSun.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSun.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSun.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSun.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSupport.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSupport.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSupport.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSupport.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSwitchHorizontal.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSwitchHorizontal.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSwitchHorizontal.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSwitchHorizontal.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSwitchVertical.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSwitchVertical.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSwitchVertical.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconSwitchVertical.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTable.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTable.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTable.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTable.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTag.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTag.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTag.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTag.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTelegram.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTelegram.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTelegram.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTelegram.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTemplate.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTemplate.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTemplate.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTemplate.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTerminal.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTerminal.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTerminal.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTerminal.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconThumbDown.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconThumbDown.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconThumbDown.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconThumbDown.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconThumbUp.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconThumbUp.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconThumbUp.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconThumbUp.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconThumblr.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconThumblr.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconThumblr.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconThumblr.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTicket.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTicket.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTicket.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTicket.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTiktok.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTiktok.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTiktok.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTiktok.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTranslate.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTranslate.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTranslate.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTranslate.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTrash.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTrash.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTrash.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTrash.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTrendingDown.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTrendingDown.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTrendingDown.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTrendingDown.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTrendingUp.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTrendingUp.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTrendingUp.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTrendingUp.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTruck.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTruck.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTruck.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTruck.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTwitter.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTwitter.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTwitter.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconTwitter.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUpload.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUpload.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUpload.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUpload.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUser.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUser.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUser.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUser.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUserAdd.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUserAdd.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUserAdd.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUserAdd.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUserCircle.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUserCircle.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUserCircle.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUserCircle.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUserGroup.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUserGroup.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUserGroup.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUserGroup.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUsers.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUsers.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUsers.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconUsers.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVariable.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVariable.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVariable.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVariable.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVideoCamera.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVideoCamera.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVideoCamera.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVideoCamera.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconViewBoards.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconViewBoards.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconViewBoards.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconViewBoards.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconViewGrid.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconViewGrid.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconViewGrid.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconViewGrid.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconViewList.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconViewList.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconViewList.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconViewList.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVolumeOff.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVolumeOff.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVolumeOff.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVolumeOff.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVolumeUp.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVolumeUp.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVolumeUp.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVolumeUp.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVote.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVote.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVote.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconVote.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconWallet.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconWallet.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconWallet.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconWallet.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconWifi.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconWifi.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconWifi.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconWifi.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconX.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconX.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconX.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconX.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconXCircle.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconXCircle.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconXCircle.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconXCircle.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconXTwitter.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconXTwitter.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconXTwitter.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconXTwitter.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconYoutube.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconYoutube.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconYoutube.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconYoutube.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconZoomIn.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconZoomIn.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconZoomIn.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconZoomIn.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconZoomOut.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconZoomOut.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconZoomOut.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconZoomOut.jsx

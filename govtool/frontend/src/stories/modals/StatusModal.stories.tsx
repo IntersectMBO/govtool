@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { Meta, StoryFn } from "@storybook/react";
-import { expect } from "@storybook/jest";
-import { within, waitFor, screen, userEvent } from "@storybook/testing-library";
+import { expect, within, waitFor, screen, userEvent } from "@storybook/test";
 
 import { Modal } from "@atoms";
 import { StatusModal, StatusModalState } from "@organisms";
 import { callAll } from "@utils";
+
 import { useModal } from "../../context/modal";
 
 const meta = {

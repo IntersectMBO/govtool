@@ -1,9 +1,8 @@
-import { expect } from "@storybook/jest";
+import { ComponentProps } from "react";
+import { expect, within } from "@storybook/test";
 import type { Meta, StoryFn } from "@storybook/react";
 
 import { Field } from "@molecules";
-import { within } from "@storybook/testing-library";
-import { ComponentProps } from "react";
 
 const meta = {
   title: "Example/Checkbox",

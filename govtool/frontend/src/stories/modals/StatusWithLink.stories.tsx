@@ -1,11 +1,18 @@
 import { useEffect } from "react";
 import type { Meta, StoryFn } from "@storybook/react";
-import { expect, jest } from "@storybook/jest";
-import { userEvent, waitFor, within, screen } from "@storybook/testing-library";
+import {
+  expect,
+  userEvent,
+  waitFor,
+  within,
+  screen,
+  fn,
+} from "@storybook/test";
 
 import { Modal } from "@atoms";
 import { StatusModal, StatusModalState } from "@organisms";
 import { callAll } from "@utils";
+
 import { useModal } from "../../context/modal";
 
 const meta = {
@@ -74,7 +81,7 @@ Default.play = async () => {
   waitFor(async () => {
     const modalScreen = screen.getAllByTestId("status-modal")[0];
     let modalCanvas = within(modalScreen);
-    window.open = jest.fn();
+    window.open = fn();
 
     expect(modalCanvas.getByText("Success")).toBeInTheDocument();
     expect(modalCanvas.getByText("Example text")).toBeInTheDocument();

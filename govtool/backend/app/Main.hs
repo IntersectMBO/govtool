@@ -125,7 +125,7 @@ startApp vvaConfig sentryService = do
       , dRepListCache
       , networkMetricsCache
       }
-  connectionPool <- createPool (connectPostgreSQL (encodeUtf8 (dbSyncConnectionString $ getter vvaConfig))) close 10 10 120
+  connectionPool <- createPool (connectPostgreSQL (encodeUtf8 (dbSyncConnectionString $ getter vvaConfig))) close 1 10 60
   let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool }
   server' <- mkVVAServer appEnv
   runSettings settings server'

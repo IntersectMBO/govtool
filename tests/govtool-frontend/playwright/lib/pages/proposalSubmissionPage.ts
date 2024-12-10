@@ -70,7 +70,21 @@ export default class ProposalSubmissionPage {
   readonly closeDraftSuccessModalBtn = this.page.getByTestId("close-button");
   readonly linkTextInput = this.page.getByTestId("link-0-text-input");
   readonly linkUrlInput = this.page.getByTestId("link-0-url-input");
-  
+
+  // content
+  readonly governanceActionTypeContent = this.page.getByTestId(
+    "governance-action-type-content"
+  );
+  readonly titleContent = this.page.getByTestId("title-content");
+  readonly abstractContent = this.page.getByTestId("abstract-content");
+  readonly motivationContent = this.page.getByTestId("motivation-content");
+  readonly rationaleContent = this.page.getByTestId("rationale-content");
+  readonly receivingAddressContent = this.page.getByTestId(
+    "receiving-address-0-content"
+  );
+  readonly amountContent = this.page.getByTestId("amount-0-content");
+  readonly linkTextContent = this.page.getByTestId("link-0-text-content");
+  readonly linkUrlContent = this.page.getByTestId("link-0-url-content");
 
   constructor(private readonly page: Page) {}
 

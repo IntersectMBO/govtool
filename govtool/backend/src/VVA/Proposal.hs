@@ -82,6 +82,6 @@ getProposals mSearchTerms = withPool $ \conn -> do
       )
     case result of
       Left (e :: SomeException) -> do
+        putStrLn $ "Error fetching proposals: " <> show e
         return []
-      Right rows -> do
-        return rows
+      Right rows -> return rows

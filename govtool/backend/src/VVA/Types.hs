@@ -122,69 +122,69 @@ data DRepRegistration
       , dRepRegistrationImageHash              :: Maybe Text
       }
 
-data Proposal
+data Proposal 
   = Proposal
-      { proposalId                  :: Integer
-      , proposalTxHash              :: Text
-      , proposalIndex               :: Integer
-      , proposalType                :: Text
-      , proposalDetails             :: Maybe Value
-      , proposalExpiryDate          :: Maybe LocalTime
-      , proposalExpiryEpochNo       :: Maybe Integer
-      , proposalCreatedDate         :: LocalTime
-      , proposalCreatedEpochNo      :: Integer
-      , proposalUrl                 :: Text
-      , proposalDocHash             :: Text
-      , proposalProtocolParams      :: Maybe Value
-      , proposalTitle               :: Maybe Text
-      , proposalAbstract            :: Maybe Text
-      , proposalMotivation          :: Maybe Text
-      , proposalRationale           :: Maybe Text
-      , proposalDRepYesVotes        :: Integer
-      , proposalDRepNoVotes         :: Integer
-      , proposalDRepAbstainVotes    :: Integer
-      , proposalPoolYesVotes        :: Integer
-      , proposalPoolNoVotes         :: Integer
-      , proposalPoolAbstainVotes    :: Integer
-      , proposalCcYesVotes          :: Integer
-      , proposalCcNoVotes           :: Integer
-      , proposalCcAbstainVotes      :: Integer
-      , proposalPrevGovActionIndex  :: Maybe Integer
-      , proposalPrevGovActionTxHash :: Maybe Text
+      { proposalId                    :: Integer
+      , proposalTxHash                :: Text
+      , proposalIndex                 :: Integer
+      , proposalType                  :: Text
+      , proposalDetails               :: Maybe Value
+      , proposalExpiryDate            :: Maybe LocalTime
+      , proposalExpiryEpochNo         :: Maybe Integer
+      , proposalCreatedDate           :: LocalTime
+      , proposalCreatedEpochNo        :: Integer
+      , proposalUrl                   :: Text
+      , proposalDocHash               :: Text
+      , proposalProtocolParams        :: Maybe Value
+      , proposalTitle                 :: Maybe Text
+      , proposalAbstract              :: Maybe Text
+      , proposalMotivation            :: Maybe Text
+      , proposalRationale             :: Maybe Text
+      , proposalDRepYesVotes          :: Integer
+      , proposalDRepNoVotes           :: Integer
+      , proposalDRepAbstainVotes      :: Integer
+      , proposalPoolYesVotes          :: Integer
+      , proposalPoolNoVotes           :: Integer
+      , proposalPoolAbstainVotes      :: Integer
+      , proposalCcYesVotes            :: Integer
+      , proposalCcNoVotes             :: Integer
+      , proposalCcAbstainVotes        :: Integer
+      , proposalPrevGovActionIndex    :: Maybe Integer
+      , proposalPrevGovActionTxHash   :: Maybe Text
       }
   deriving (Show)
 
 instance FromRow Proposal where
   fromRow =
     Proposal
-      <$> field
-      <*> field
-      <*> (floor @Scientific <$> field)
-      <*> field
-      <*> field
-      <*> field
-      <*> field
-      <*> field
-      <*> field
-      <*> field
-      <*> field
-      <*> field
-      <*> field
-      <*> field
-      <*> field
-      <*> field
-      <*> (floor @Scientific <$> field)
-      <*> (floor @Scientific <$> field)
-      <*> (floor @Scientific <$> field)
-      <*> (floor @Scientific <$> field)
-      <*> (floor @Scientific <$> field)
-      <*> (floor @Scientific <$> field)
-      <*> (floor @Scientific <$> field)
-      <*> (floor @Scientific <$> field)
-      <*> (floor @Scientific <$> field)
-      <*> field
-      <*> field
-      
+      <$> field -- proposalId
+      <*> field -- proposalTxHash
+      <*> (floor @Scientific <$> field) -- proposalIndex
+      <*> field -- proposalType
+      <*> field -- proposalDetails
+      <*> field -- proposalExpiryDate
+      <*> field -- proposalExpiryEpochNo
+      <*> field -- proposalCreatedDate
+      <*> field -- proposalCreatedEpochNo
+      <*> field -- proposalUrl
+      <*> field -- proposalDocHash
+      <*> field -- proposalProtocolParams
+      <*> field -- proposalTitle
+      <*> field -- proposalAbstract
+      <*> field -- proposalMotivation
+      <*> field -- proposalRationale
+      <*> (floor @Scientific <$> field) -- proposalDRepYesVotes
+      <*> (floor @Scientific <$> field) -- proposalDRepNoVotes
+      <*> (floor @Scientific <$> field) -- proposalDRepAbstainVotes
+      <*> (floor @Scientific <$> field) -- proposalPoolYesVotes
+      <*> (floor @Scientific <$> field) -- proposalPoolNoVotes
+      <*> (floor @Scientific <$> field) -- proposalPoolAbstainVotes
+      <*> (floor @Scientific <$> field) -- proposalCcYesVotes
+      <*> (floor @Scientific <$> field) -- proposalCcNoVotes
+      <*> (floor @Scientific <$> field) -- proposalCcAbstainVotes
+      <*> field -- prevGovActionIndex
+      <*> field -- prevGovActionTxHash
+
 data TransactionStatus = TransactionStatus
   { transactionConfirmed         :: Bool
   , votingProcedure :: Maybe Value

@@ -274,17 +274,7 @@ newtype GovernanceActionDetails
   deriving newtype (Show)
 
 instance FromJSON GovernanceActionDetails where
-  parseJSON v@(Aeson.Object o) = do
-    let kvpList = map snd $ Aeson.toList o
-    forM_ kvpList $ \case
-      (Aeson.Object _) -> fail "GovernanceActionDetails cannot have nested objects"
-      (Aeson.Array a) -> forM_ (toList a) $ \case
-        (Aeson.Object _) -> fail "GovernanceActionDetails cannot have nested objects"
-        (Aeson.Array _)  ->  fail "GovernanceActionDetails cannot have nested arrays"
-        _                -> pure ()
-      _ -> pure ()
-    return $ GovernanceActionDetails v
-  parseJSON _ = fail "GovernanceActionDetails has to be an object"
+  parseJSON v = return $ GovernanceActionDetails v
 
 instance ToJSON GovernanceActionDetails where
   toJSON (GovernanceActionDetails g) = g
@@ -292,11 +282,13 @@ instance ToJSON GovernanceActionDetails where
 instance ToSchema GovernanceActionDetails where
     declareNamedSchema _ = pure $ NamedSchema (Just "GovernanceActionDetails") $ mempty
         & type_ ?~ OpenApiObject
-        & description ?~ "A simple JSON value, with object type values, and no nested arrays"
-        & example
-          ?~ toJSON
-                ("{\"some_key\": \"some value\", \"some_key2\": [1,2,3]}" :: Text)
-
+        & description ?~ "A JSON value that can include nested objects and arrays"
+        & example ?~ toJSON
+            (Aeson.object
+              [ "some_key" .= ("some value" :: String)
+              , "nested_key" .= Aeson.object ["inner_key" .= (1 :: Int)]
+              , "array_key" .= [1, 2, 3 :: Int]
+              ])
 
 newtype GovernanceActionMetadata
   = GovernanceActionMetadata Value
@@ -439,6 +431,11 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"cCAbstainVotes\": 0,"
                   <> "\"prevGovActionIndex\": 0,"
                   <> "\"prevGovActionTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
+
+instance ToSchema Value where
+  declareNamedSchema _ = pure $ NamedSchema (Just "Value") $ mempty
+    & type_ ?~ OpenApiObject
+    & description ?~ "Arbitrary JSON value"
 
 instance ToSchema ProposalResponse where
   declareNamedSchema proxy = do

@@ -12,6 +12,24 @@ changes.
 
 ### Added
 
+-
+
+### Fixed
+
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v2.0.1](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.1) 2024-12-13
+
+### Added
+
 - Integrate matomo analytics
 
 ### Fixed

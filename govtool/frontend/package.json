@@ -1,7 +1,7 @@
 {
   "name": "@govtool/frontend",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -113,5 +113,5 @@
     "nth-check": "^2.0.1",
     "postcss": "^8.4.31"
   },
-  "_id": "govtool@2.0.0"
+  "_id": "govtool@2.0.1"
 }

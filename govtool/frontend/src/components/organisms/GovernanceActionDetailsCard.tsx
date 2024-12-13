@@ -31,7 +31,7 @@ export const GovernanceActionDetailsCard = ({
   const [isVoteSubmitted, setIsVoteSubmitted] = useState<boolean>(false);
   const { screenWidth, isMobile } = useScreenDimension();
 
-  const isOneColumn = (isDashboard && screenWidth < 1645) ?? isMobile;
+  const isOneColumn = (isDashboard && screenWidth < 1036) ?? isMobile;
   const { pathname, hash } = useLocation();
 
   const govActionLinkToShare = `${window.location.protocol}//${

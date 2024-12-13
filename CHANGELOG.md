@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Fix mzero parsing error on fetching the /proposal/list [Issue 2446](https://github.com/IntersectMBO/govtool/issues/2446)
+- Fix scaling gov action votes on lower resolutions
 
 ### Changed
 

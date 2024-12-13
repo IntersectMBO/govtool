@@ -260,7 +260,7 @@ export const GovernanceActionDetailsCardData = ({
         textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
       />
 
-      {tabs.length === 1 ? (
+      {tabs?.length === 1 ? (
         tabs[0].content
       ) : (
         <>

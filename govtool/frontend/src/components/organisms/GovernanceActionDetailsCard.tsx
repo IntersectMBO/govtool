@@ -16,7 +16,7 @@ type GovernanceActionDetailsCardProps = {
   isDataMissing: null | MetadataValidationStatus;
   isInProgress?: boolean;
   isVoter?: boolean;
-  vote?: ProposalVote;
+  vote?: ProposalVote | null;
   proposal: ProposalData;
 };
 

@@ -31,7 +31,7 @@ export const useVoteActionFormController = () => {
 };
 
 type Props = {
-  previousVote?: ProposalVote;
+  previousVote?: ProposalVote | null;
   voteContextHash?: string;
   voteContextUrl?: string;
 };

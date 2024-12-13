@@ -12,7 +12,7 @@ changes.
 
 ### Added
 
--
+- Integrate matomo analytics
 
 ### Fixed
 

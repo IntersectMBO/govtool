@@ -34,8 +34,13 @@ export const GovernanceActionDetailsCardLinks = ({
         >
           {t("govActions.supportingLinks")}
         </Typography>
-        {links.map(({ uri, label }) => (
-          <Box display="flex" flexDirection="column" overflow="hidden">
+        {links?.map(({ uri, label }) => (
+          <Box
+            key={`${label}-${uri}-label`}
+            display="flex"
+            flexDirection="column"
+            overflow="hidden"
+          >
             {label && (
               <Typography
                 data-testid={`${label}-${uri}-label`}

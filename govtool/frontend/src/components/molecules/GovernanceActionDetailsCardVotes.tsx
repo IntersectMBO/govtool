@@ -13,7 +13,7 @@ type GovernanceActionCardVotesProps = {
   isDashboard?: boolean;
   isInProgress?: boolean;
   isVoter?: boolean;
-  vote?: ProposalVote;
+  vote?: ProposalVote | null;
   proposal: ProposalData;
 };
 

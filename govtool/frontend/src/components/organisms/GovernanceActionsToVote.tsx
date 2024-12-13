@@ -32,7 +32,7 @@ export const GovernanceActionsToVote = ({
 
   return (
     <>
-      {!proposals.length ? (
+      {!proposals?.length ? (
         <Typography fontWeight={300} sx={{ py: 4 }}>
           {t("govActions.noResultsForTheSearch")}
         </Typography>
@@ -91,10 +91,10 @@ export const GovernanceActionsToVote = ({
                     />
                   </div>
                 ))}
-                dataLength={item.actions.slice(0, 6).length}
+                dataLength={item.actions.slice(0, 6)?.length}
                 filters={filters}
                 navigateKey={item.title}
-                notSlicedDataLength={item.actions.length}
+                notSlicedDataLength={item.actions?.length}
                 onDashboard={onDashboard}
                 searchPhrase={searchPhrase}
                 sorting={sorting}

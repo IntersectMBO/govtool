@@ -39,8 +39,10 @@ import {
 import { PublicRoute } from "./pages/PublicRoute";
 import { TopBanners } from "./components/organisms/TopBanners";
 import { DashboardHome } from "./pages/DashboardHome";
+import { useMatomo } from "./hooks/useMatomo";
 
 export default () => {
+  useMatomo();
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { enable, isEnabled } = useCardano();
   const navigate = useNavigate();

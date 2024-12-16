@@ -224,12 +224,12 @@ export type NewConstitutionAnchor = {
 };
 
 export type VotedProposalDTO = {
-  vote: ProposalVote;
+  vote: ProposalVote | null;
   proposal: ProposalDataDTO;
 };
 
 export type VotedProposal = {
-  vote: ProposalVote;
+  vote: ProposalVote | null;
   proposal: ProposalData;
 };
 

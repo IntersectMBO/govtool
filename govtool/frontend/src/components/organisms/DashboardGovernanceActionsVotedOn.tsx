@@ -42,7 +42,7 @@ export const DashboardGovernanceActionsVotedOn = ({
               .includes(searchPhrase.toLowerCase()),
           ),
         }))
-        .filter((entry) => entry.actions.length > 0);
+        .filter((entry) => entry.actions?.length > 0);
     }
     return data;
   }, [data, searchPhrase, pendingTransaction.vote]);
@@ -70,12 +70,12 @@ export const DashboardGovernanceActionsVotedOn = ({
                 title={getProposalTypeLabel(item.title)}
                 navigateKey={item.title}
                 searchPhrase={searchPhrase}
-                dataLength={item.actions.slice(0, 6).length}
+                dataLength={item.actions.slice(0, 6)?.length}
                 onDashboard
                 data={item.actions.map((action) => (
                   <div
                     className="keen-slider__slide"
-                    key={`${action?.proposal.id}${action.vote.vote}`}
+                    key={`${action?.proposal.id}${action.vote?.vote}`}
                     style={{ overflow: "visible", width: "auto" }}
                   >
                     <GovernanceVotedOnCard

@@ -16,7 +16,28 @@ changes.
 
 ### Fixed
 
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v2.0.1](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.1) 2024-12-16
+
+### Added
+
+- Integrate matomo analytics
+
+### Fixed
+
 - Fix mzero parsing error on fetching the /proposal/list [Issue 2446](https://github.com/IntersectMBO/govtool/issues/2446)
+- Fix scaling gov action votes on lower resolutions
+- Fix storing url missing length validation [Issue 2044](https://github.com/IntersectMBO/govtool/issues/2044)
+- Fix governance action details page crash on missing data [Issue 2511](https://github.com/IntersectMBO/govtool/issues/2511)
 
 ### Changed
 

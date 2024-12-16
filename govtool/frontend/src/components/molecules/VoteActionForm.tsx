@@ -19,7 +19,7 @@ import { VoteContextModalState, SubmittedVotesModalState } from "../organisms";
 type VoteActionFormProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
   isInProgress?: boolean;
-  previousVote?: ProposalVote;
+  previousVote?: ProposalVote | null;
   proposal: ProposalData;
 };
 

@@ -7,7 +7,7 @@ import { ICONS } from "@consts";
 import { useTranslation, useScreenDimension, useVoteContextForm } from "@hooks";
 import { Step } from "@molecules";
 import { ControlledField, VoteContextWrapper } from "@organisms";
-import { URL_REGEX, openInNewTab } from "@utils";
+import { URL_REGEX, isValidURLLength, openInNewTab } from "@utils";
 import { LINKS } from "@/consts/links";
 
 type VoteContextStoringInformationProps = {
@@ -144,6 +144,7 @@ export const VoteContextStoringInformation = ({
                   value: URL_REGEX,
                   message: t("createGovernanceAction.fields.validations.url"),
                 },
+                validate: isValidURLLength,
               }}
             />
           }

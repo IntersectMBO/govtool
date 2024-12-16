@@ -124,7 +124,7 @@ describe("FeatureFlagProvider", () => {
       ).toBe(true);
     });
 
-    it("should hide DRep vote totals for MotionNoConfidence in full governance", () => {
+    it("should show DRep vote totals for MotionNoConfidence in full governance", () => {
       mockUseAppContext.mockReturnValue({
         ...mockUseAppContextReturnValue,
         isAppInitializing: false,
@@ -140,7 +140,7 @@ describe("FeatureFlagProvider", () => {
         result.current.areDRepVoteTotalsDisplayed(
           GovernanceActionType.NoConfidence,
         ),
-      ).toBe(false);
+      ).toBe(true);
     });
   });
 

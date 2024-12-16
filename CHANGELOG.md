@@ -38,6 +38,7 @@ changes.
 - Fix scaling gov action votes on lower resolutions
 - Fix storing url missing length validation [Issue 2044](https://github.com/IntersectMBO/govtool/issues/2044)
 - Fix governance action details page crash on missing data [Issue 2511](https://github.com/IntersectMBO/govtool/issues/2511)
+- Fix wrong voting conditions for drep
 
 ### Changed
 

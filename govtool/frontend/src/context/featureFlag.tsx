@@ -77,16 +77,10 @@ const FeatureFlagProvider = ({ children }: PropsWithChildren) => {
             !isSecurityGroup)
         );
       }
-      if (isFullGovernance) {
-        return ![
-          GovernanceActionType.NoConfidence,
-          GovernanceActionType.NewCommittee,
-          GovernanceActionType.NewConstitution,
-        ].includes(governanceActionType);
-      }
+
       return true;
     },
-    [isAppInitializing, isInBootstrapPhase, isFullGovernance],
+    [isAppInitializing, isInBootstrapPhase],
   );
 
   /**

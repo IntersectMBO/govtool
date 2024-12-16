@@ -8,7 +8,7 @@ import { useEffect } from "react";
 export const useMatomo = () => {
   useEffect(() => {
     const env = import.meta.env.VITE_APP_ENV;
-    if (env !== "prodction" || env !== "staging") {
+    if (env !== "production" || env !== "staging") {
       return;
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

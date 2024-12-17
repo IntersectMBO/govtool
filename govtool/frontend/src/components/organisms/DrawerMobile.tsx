@@ -1,7 +1,8 @@
+import { NavLink } from "react-router-dom";
 import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 
 import { Background, Button, Link, Typography } from "@atoms";
-import { ICONS, IMAGES, NAV_ITEMS } from "@consts";
+import { ICONS, IMAGES, NAV_ITEMS, PATHS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { useFeatureFlag, useModal } from "@context";
 import { openInNewTab } from "@utils";
@@ -48,7 +49,13 @@ export const DrawerMobile = ({
               width: screenWidth - CALCULATED_DRAWER_PADDING,
             }}
           >
-            <img alt="app-logo" height={25} src={IMAGES.appLogo} />
+            <NavLink
+              data-testid="logo-button"
+              style={{ display: "flex", justifyContent: "center" }}
+              to={PATHS.dashboard}
+            >
+              <img alt="app-logo" height={25} src={IMAGES.appLogo} />
+            </NavLink>
             <IconButton
               sx={{ padding: 0 }}
               onClick={() => setIsDrawerOpen(false)}

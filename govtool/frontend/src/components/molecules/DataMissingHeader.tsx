@@ -33,11 +33,11 @@ export const DataMissingHeader = ({
     <Box
       sx={{
         flexDirection: {
-          sm: "column",
-          lg: "row",
+          xxs: "column",
+          md: "row",
         },
         alignItems: {
-          lg: "center",
+          md: "center",
         },
         display: "flex",
       }}
@@ -52,8 +52,8 @@ export const DataMissingHeader = ({
       )}
       <Typography
         sx={{
-          ...(isDRep && { ml: { lg: 3 } }),
-          ...(isDRep && { mt: { sm: 2, lg: 0 } }),
+          ...(isDRep && { ml: { md: 3 } }),
+          ...(isDRep && { mt: { xxs: 2, md: 0 } }),
           textOverflow: "ellipsis",
           fontWeight: 600,
           ...(isDataMissing && { color: "errorRed" }),

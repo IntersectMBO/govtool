@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Move matomo initalization out of the react code
 
 ### Changed
 

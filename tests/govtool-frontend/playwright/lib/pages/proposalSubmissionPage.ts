@@ -9,7 +9,12 @@ import { extractProposalIdFromUrl } from "@helpers/string";
 import { invalid } from "@mock/index";
 import { Download, Locator, Page, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
-import { ProposalCreateRequest, ProposalLink, ProposalType } from "@types";
+import {
+  ProposalCreateRequest,
+  ProposalLink,
+  ProposalType,
+  StaticWallet,
+} from "@types";
 
 const formErrors = {
   proposalTitle: "title-input-error",
@@ -339,12 +344,11 @@ export default class ProposalSubmissionPage {
   }
 
   async createProposal(
+    wallet: StaticWallet,
     proposalType: ProposalType = ProposalType.treasury
   ): Promise<number> {
     await this.addLinkBtn.click();
-    const receivingAddr = (await ShelleyWallet.generate()).rewardAddressBech32(
-      0
-    );
+    const receivingAddr = ShelleyWallet.fromJson(wallet).rewardAddressBech32(0);
 
     const proposalRequest: ProposalCreateRequest =
       this.generateValidProposalFormFields(

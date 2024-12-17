@@ -25,18 +25,27 @@
   </head>
   <body>
     <script>
-      var _paq = window._paq = window._paq || [];
+      var isMainnet = window.location.hostname == "gov.tools";
+      var isPreview = window.location.hostname == "preview.gov.tools";
+
+      var _paq = (window._paq = window._paq || []);
       /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-      _paq.push(['trackPageView']);
-      _paq.push(['enableLinkTracking']);
-      (function() {
-        var u="//p80-zca17e2b0-z1743beba-gtw.z937eb260.rustrocks.fr/";
-        _paq.push(['setTrackerUrl', u+'matomo.php']);
-        _paq.push(['setSiteId', '1']);
-        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-        g.async=true;
-        g.src=u+'matomo.js';
-        s.parentNode.insertBefore(g,s);
+      _paq.push(["trackPageView"]);
+      _paq.push(["enableLinkTracking"]);
+      (function () {
+        if (!isPreview && !isMainnet) {
+          return;
+        }
+
+        var u = "//analytics.gov.tools/";
+        _paq.push(["setTrackerUrl", u + "matomo.php"]);
+        _paq.push(["setSiteId", isMainnet ? "1" : "2"]);
+        var d = document,
+          g = d.createElement("script"),
+          s = d.getElementsByTagName("script")[0];
+        g.async = true;
+        g.src = u + "matomo.js";
+        s.parentNode.insertBefore(g, s);
       })();
     </script>
     <div id="root"></div>

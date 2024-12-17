@@ -22,7 +22,8 @@ export const test = base.extend<TestOptions>({
     const proposalCreationPage = new ProposalSubmissionPage(proposalPage);
     await proposalCreationPage.goto();
 
-    const proposalId = await proposalCreationPage.createProposal();
+    const proposalId =
+      await proposalCreationPage.createProposal(proposal01Wallet);
 
     const proposalDetailsPage = new ProposalDiscussionDetailsPage(proposalPage);
 

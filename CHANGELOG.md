@@ -18,6 +18,7 @@ changes.
 
 - Move matomo initalization out of the react code
 - Fix some non-ipfs related errors while fetching the DRep images [Issue 2546](https://github.com/IntersectMBO/govtool/issues/2546)
+- Remaining mobile responsiveness issue [Issue 2493](https://github.com/IntersectMBO/govtool/issues/2493)
 
 ### Changed
 

@@ -14,7 +14,7 @@ import {
 } from "@hooks";
 import { DataActionsBar, EmptyStateDrepDirectory } from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
-import { correctAdaFormat, isSameDRep } from "@utils";
+import { correctAdaFormat, isSameDRep, uniqBy } from "@utils";
 import { DRepData, DRepListSort, DRepStatus } from "@models";
 import {
   AutomatedVotingOptionCurrentDelegation,
@@ -106,8 +106,9 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   const ada = correctAdaFormat(votingPower);
 
-  const listedDRepsWithoutYourself = dRepList?.filter(
-    (dRep) => !dRep.doNotList && !isSameDRep(dRep, myDRepId),
+  const listedDRepsWithoutYourself = uniqBy(
+    dRepList?.filter((dRep) => !dRep.doNotList && !isSameDRep(dRep, myDRepId)),
+    "view",
   );
   const dRepListToDisplay =
     yourselfDRep && showYourselfDRep
@@ -212,7 +213,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
         >
           {dRepList?.length === 0 && <EmptyStateDrepDirectory />}
           {dRepListToDisplay?.map((dRep) => (
-            <Box key={dRep.drepId} component="li" sx={{ listStyle: "none" }}>
+            <Box key={dRep.view} component="li" sx={{ listStyle: "none" }}>
               <DRepCard
                 dRep={dRep}
                 isConnected={!!isConnected}

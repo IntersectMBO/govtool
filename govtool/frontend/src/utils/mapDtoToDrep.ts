@@ -7,6 +7,10 @@ import {
 import { postValidate } from "@/services";
 import { fixViewForScriptBasedDRep } from "./dRep";
 
+const imageFetchDefaultOptions: RequestInit = {
+  mode: "no-cors",
+};
+
 export const mapDtoToDrep = async (dto: DrepDataDTO): Promise<DRepData> => {
   const emptyMetadata = {
     paymentAddress: null,
@@ -34,9 +38,13 @@ export const mapDtoToDrep = async (dto: DrepDataDTO): Promise<DRepData> => {
         : dto.imageUrl,
       isIPFSImage
         ? {
+            ...imageFetchDefaultOptions,
             headers: { project_id: import.meta.env.VITE_IPFS_PROJECT_ID },
           }
-        : {},
+        : // set request mode no-cors
+          {
+            ...imageFetchDefaultOptions,
+          },
     )
       .then(async (res) => {
         const blob = await res.blob();
@@ -46,8 +54,10 @@ export const mapDtoToDrep = async (dto: DrepDataDTO): Promise<DRepData> => {
           base64Image = reader.result;
         };
       })
-      .catch((e) => {
-        console.error("Fetching the DRep image failed, reason: ", e);
+      .catch((error) => {
+        if (import.meta.env.VITE_IS_DEV) {
+          console.error("Error fetching image", error);
+        }
       });
   }
 

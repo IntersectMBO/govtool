@@ -63,7 +63,7 @@ test.describe("Logged in DRep", () => {
         ? await govActionsPage.viewFirstProposalByGovernanceAction(
             GovernanceActionType.InfoAction
           )
-        : await govActionsPage.viewFirstDRepVoteEnabledGovernanceAction();
+        : await govActionsPage.viewFirstProposal();
 
       await govActionDetailsPage.contextBtn.click();
       await govActionDetailsPage.contextInput.fill(faker.lorem.sentence(200));

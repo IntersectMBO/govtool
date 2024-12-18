@@ -1,7 +1,6 @@
 import removeAllSpaces from "@helpers/removeAllSpaces";
 import { Locator, Page, expect } from "@playwright/test";
 import {
-  FullGovernanceDRepVoteActionsType,
   GovernanceActionType,
   IProposal,
 } from "@types";
@@ -53,7 +52,7 @@ export default class GovernanceActionsPage {
 
   async viewFirstDRepVoteEnabledGovernanceAction(): Promise<GovernanceActionDetailsPage> {
     for (const governanceAction of Object.keys(
-      FullGovernanceDRepVoteActionsType
+      GovernanceActionType
     )) {
       const result = await this.viewFirstProposalByGovernanceAction(
         governanceAction as GovernanceActionType

@@ -6,7 +6,7 @@ export async function fetchFirstActiveDRepDetails(page: Page) {
   let dRepId: string;
   let dRepDirectoryPage: DRepDirectoryPage;
   await page.route(
-    "**/drep/list?page=0&pageSize=10&sort=Random",
+    "**/drep/list?page=0&pageSize=10&sort=Random&**",
     async (route) => {
       const response = await route.fetch();
       const json = await response.json();
@@ -25,15 +25,15 @@ export async function fetchFirstActiveDRepDetails(page: Page) {
   );
 
   const responsePromise = page.waitForResponse(
-    "**/drep/list?page=0&pageSize=10&sort=Random"
+    "**/drep/list?page=0&pageSize=10&sort=Random&**"
   );
 
   dRepDirectoryPage = new DRepDirectoryPage(page);
   await dRepDirectoryPage.goto();
   await dRepDirectoryPage.filterBtn.click();
   await page.getByTestId("Active-checkbox").click();
-  await dRepDirectoryPage.searchInput.click();
-
   await responsePromise;
+
+  await dRepDirectoryPage.searchInput.click();
   return { dRepGivenName, dRepId, dRepDirectoryPage };
 }

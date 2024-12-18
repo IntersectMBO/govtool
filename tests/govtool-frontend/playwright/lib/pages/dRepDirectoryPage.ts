@@ -147,7 +147,8 @@ export default class DRepDirectoryPage {
   }
 
   async getAllListedDReps() {
-    await this.page.waitForTimeout(5_000); // load until the dRep card load properly
+    // add assertion to wait until the search input is visible
+    await expect(this.searchInput).toBeVisible({ timeout: 10_000 });
 
     return await this.page
       .getByRole("list")

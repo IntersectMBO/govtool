@@ -1,9 +1,6 @@
 import removeAllSpaces from "@helpers/removeAllSpaces";
 import { Locator, Page, expect } from "@playwright/test";
-import {
-  GovernanceActionType,
-  IProposal,
-} from "@types";
+import { GovernanceActionType, IProposal } from "@types";
 import environments from "lib/constants/environments";
 import GovernanceActionDetailsPage from "./governanceActionDetailsPage";
 import { getEnumKeyByValue } from "@helpers/enum";
@@ -48,20 +45,6 @@ export default class GovernanceActionsPage {
       .first()
       .click();
     return new GovernanceActionDetailsPage(this.page);
-  }
-
-  async viewFirstDRepVoteEnabledGovernanceAction(): Promise<GovernanceActionDetailsPage> {
-    for (const governanceAction of Object.keys(
-      GovernanceActionType
-    )) {
-      const result = await this.viewFirstProposalByGovernanceAction(
-        governanceAction as GovernanceActionType
-      );
-      if (result) {
-        return result;
-      }
-    }
-    return null;
   }
 
   async viewFirstProposalByGovernanceAction(

@@ -14,11 +14,7 @@ import { createNewPageWithWallet } from "@helpers/page";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
-import {
-  FullGovernanceDRepVoteActionsType,
-  GovernanceActionType,
-  IProposal,
-} from "@types";
+import { GovernanceActionType, IProposal } from "@types";
 import walletManager from "lib/walletManager";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import { correctVoteAdaFormat } from "@helpers/adaFormat";
@@ -146,7 +142,7 @@ test.describe("Check vote count", () => {
   }) => {
     const voteWhiteListOption = (await isBootStrapingPhase())
       ? { InfoAction: "InfoAction" }
-      : FullGovernanceDRepVoteActionsType;
+      : GovernanceActionType;
     const responsesPromise = Object.keys(voteWhiteListOption).map((filterKey) =>
       page.waitForResponse((response) =>
         response.url().includes(`&type[]=${voteWhiteListOption[filterKey]}`)

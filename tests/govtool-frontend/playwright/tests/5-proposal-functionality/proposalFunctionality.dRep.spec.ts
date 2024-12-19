@@ -12,10 +12,7 @@ import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
-import {
-  BootstrapGovernanceActionType,
-  GovernanceActionType,
-} from "@types";
+import { BootstrapGovernanceActionType, GovernanceActionType } from "@types";
 import walletManager from "lib/walletManager";
 
 const invalidInfinityProposals = require("../../lib/_mock/invalidInfinityProposals.json");
@@ -45,7 +42,7 @@ test.describe("Proposal checks", () => {
       ? await govActionsPage.viewFirstProposalByGovernanceAction(
           GovernanceActionType.InfoAction
         )
-      : await govActionsPage.viewFirstDRepVoteEnabledGovernanceAction();
+      : await govActionsPage.viewFirstProposal();
   });
 
   test("5A. Should show relevant details about governance action as DRep", async () => {
@@ -198,7 +195,7 @@ test.describe("Perform voting", () => {
       ? await govActionsPage.viewFirstProposalByGovernanceAction(
           GovernanceActionType.InfoAction
         )
-      : await govActionsPage.viewFirstDRepVoteEnabledGovernanceAction();
+      : await govActionsPage.viewFirstProposal();
   });
 
   test("5E. Should re-vote with new data on a already voted governance action", async ({}, testInfo) => {
@@ -287,9 +284,9 @@ test.describe("Bootstrap phase", () => {
   test("5L. Should restrict dRep votes to Info Governance actions During Bootstrapping Phase", async ({
     browser,
   }) => {
-    const voteBlacklistOptions = Object.keys(BootstrapGovernanceActionType).filter(
-      (option) => option !== GovernanceActionType.InfoAction
-    );
+    const voteBlacklistOptions = Object.keys(
+      BootstrapGovernanceActionType
+    ).filter((option) => option !== GovernanceActionType.InfoAction);
 
     await Promise.all(
       voteBlacklistOptions.map(async (voteBlacklistOption) => {

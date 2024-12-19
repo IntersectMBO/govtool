@@ -137,13 +137,11 @@ test("2M. Should access dRep directory page on disconnected state", async ({
 });
 
 test.describe("DRep dependent tests", () => {
-  let dRepGivenName = "test";
   let dRepId = "drep1ef7uslcjhjqrn4vv2y39c3yn345gzjsg7yufn76zye3v6fkz23q";
   let dRepDirectoryPage: DRepDirectoryPage;
 
   test.beforeEach(async ({ page }) => {
-    ({ dRepDirectoryPage, dRepId, dRepGivenName } =
-      await fetchFirstActiveDRepDetails(page));
+    ({ dRepDirectoryPage, dRepId } = await fetchFirstActiveDRepDetails(page));
   });
 
   test("2P. Should enable sharing of DRep details", async ({
@@ -184,5 +182,19 @@ test.describe("DRep dependent tests", () => {
     await page.getByTestId("search-input").fill(dRepId);
     await page.getByTestId(`${dRepId}-connect-to-delegate-button`).click();
     await expect(page.getByTestId("connect-your-wallet-modal")).toBeVisible();
+  });
+
+  test("2L. Should copy DRepId", async ({ page, context }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+
+    await dRepDirectoryPage.searchInput.fill(dRepId);
+    await page.getByTestId(`${dRepId}-copy-id-button`).click();
+    await expect(page.getByText("Copied to clipboard")).toBeVisible({
+      timeout: 10_000,
+    });
+    const copiedTextDRepDirectory = await page.evaluate(() =>
+      navigator.clipboard.readText()
+    );
+    expect(copiedTextDRepDirectory).toEqual(dRepId);
   });
 });

@@ -74,24 +74,6 @@ test.describe("Delegate to others", () => {
       page.getByTestId("delegate-to-another-drep-button")
     ).toBeVisible();
   });
-
-  test("2L. Should copy delegated DRepId", async ({ page, context }) => {
-    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-
-    const dRepDirectory = new DRepDirectoryPage(page);
-    await dRepDirectory.goto();
-
-    await dRepDirectory.searchInput.fill(dRep01Wallet.dRepId);
-    await page.getByTestId(`${dRep01Wallet.dRepId}-copy-id-button`).click();
-    await expect(page.getByText("Copied to clipboard")).toBeVisible({
-      timeout: 10_000,
-    });
-
-    const copiedTextDRepDirectory = await page.evaluate(() =>
-      navigator.clipboard.readText()
-    );
-    expect(copiedTextDRepDirectory).toEqual(dRep01Wallet.dRepId);
-  });
 });
 
 test.describe("Change delegation", () => {

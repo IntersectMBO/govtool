@@ -12,6 +12,24 @@ changes.
 
 ### Added
 
+-
+
+### Fixed
+
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v2.0.2](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.2) 2024-12-19
+
+### Added
+
 - Add preprod adjustments [Issue 2547](https://github.com/IntersectMBO/govtool/issues/2547)
 
 ### Fixed

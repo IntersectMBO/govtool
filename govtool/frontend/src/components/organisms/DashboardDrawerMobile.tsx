@@ -1,7 +1,8 @@
 import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
+import { NavLink } from "react-router-dom";
 
 import { Background, Link } from "@atoms";
-import { CONNECTED_NAV_ITEMS, ICONS } from "@consts";
+import { CONNECTED_NAV_ITEMS, ICONS, PATHS } from "@consts";
 import { DRepInfoCard, WalletInfoCard } from "@molecules";
 import { useGetVoterInfo, useScreenDimension } from "@hooks";
 import { openInNewTab } from "@utils";
@@ -57,7 +58,13 @@ export const DashboardDrawerMobile = ({
                 width: screenWidth - CALCULATED_DRAWER_PADDING,
               }}
             >
-              <img alt="app-logo" src={ICONS.appLogoIcon} height={25} />
+              <NavLink
+                data-testid="logo-button"
+                style={{ display: "flex", justifyContent: "center" }}
+                to={PATHS.dashboard}
+              >
+                <img alt="app-logo" src={ICONS.appLogoIcon} height={25} />
+              </NavLink>
               <IconButton
                 data-testid="close-drawer-button"
                 onClick={closeDrawer}

@@ -56,6 +56,10 @@ export const DataMissingInfoBox = ({
       sx={{
         mb: 4,
         pr: 6,
+        maxWidth: {
+          xxs: "295px",
+          md: "100%",
+        },
         ...sx,
       }}
     >

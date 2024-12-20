@@ -106,7 +106,15 @@ export const DRepCard = ({
                 src={image || ICONS.defaultDRepIcon}
                 data-testid="drep-image"
               />
-              <Box ml={3}>
+              <Box
+                sx={{
+                  marginLeft: {
+                    xxs: 1,
+                    xs: 2,
+                    sm: 3,
+                  },
+                }}
+              >
                 <Typography
                   sx={{ ellipsisStyles, color: metadataStatus && "errorRed" }}
                 >
@@ -124,7 +132,10 @@ export const DRepCard = ({
                   sx={{
                     gap: 1,
                     width: "250px",
-                    maxWidth: "100%",
+                    maxWidth: {
+                      xxs: "200px",
+                      xs: "100%",
+                    },
                     "&:hover": {
                       opacity: 0.6,
                       transition: "opacity 0.3s",
@@ -195,11 +206,14 @@ export const DRepCard = ({
         <Box
           display="flex"
           gap={2.5}
-          minWidth={isConnected ? 233 : 310}
           sx={{
             "@container root (min-width: 480px)": {
               justifyContent: "flex-end",
               alignItems: "center",
+            },
+            minWidth: {
+              xxs: "233px",
+              xs: isConnected ? "233px" : "310px",
             },
           }}
         >
@@ -251,4 +265,5 @@ const ellipsisStyles = {
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
+  maxWidth: { xxs: "200px", xs: "100%" },
 } as const;

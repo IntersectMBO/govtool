@@ -71,7 +71,7 @@ import { Link } from "@mui/material";
 import * as Sentry from "@sentry/react";
 import { Trans } from "react-i18next";
 
-import { PATHS, COMPILED_GUARDRAIL_SCRIPTS } from "@consts";
+import { PATHS, COMPILED_GUARDRAIL_SCRIPT } from "@consts";
 import { CardanoApiWallet, VoterInfo } from "@models";
 import type { StatusModalState } from "@organisms";
 import {
@@ -250,12 +250,6 @@ const CardanoContext = createContext<CardanoContextType>(
 CardanoContext.displayName = "CardanoContext";
 
 const CardanoProvider = (props: Props) => {
-  const { network: networkKey } = useAppContext();
-  const guardrailScript =
-    COMPILED_GUARDRAIL_SCRIPTS[
-      networkKey as keyof typeof COMPILED_GUARDRAIL_SCRIPTS
-    ];
-
   const [isEnabled, setIsEnabled] = useState(false);
   const isGuardrailScriptUsed = useRef(false);
   const redeemers = useRef<Redeemer[]>([]);
@@ -576,7 +570,9 @@ const CardanoProvider = (props: Props) => {
           try {
             const scripts = PlutusScripts.new();
             scripts.add(
-              PlutusScript.from_bytes_v3(Buffer.from(guardrailScript, "hex")),
+              PlutusScript.from_bytes_v3(
+                Buffer.from(COMPILED_GUARDRAIL_SCRIPT, "hex"),
+              ),
             );
             transactionWitnessSet.set_plutus_scripts(scripts);
 
@@ -732,7 +728,6 @@ const CardanoProvider = (props: Props) => {
       walletApi,
       t,
       updateTransaction,
-      guardrailScript,
       epochParams?.cost_model?.costs,
       disconnectWallet,
       registeredStakeKeysListState,
@@ -1046,7 +1041,7 @@ const CardanoProvider = (props: Props) => {
           );
         });
         const guardrailPlutusScript = PlutusScript.from_bytes_v3(
-          Buffer.from(guardrailScript, "hex"),
+          Buffer.from(COMPILED_GUARDRAIL_SCRIPT, "hex"),
         );
         const treasuryAction = TreasuryWithdrawalsAction.new_with_policy_hash(
           treasuryWithdrawals,
@@ -1085,7 +1080,6 @@ const CardanoProvider = (props: Props) => {
       addVotingProposalToBuilder,
       epochParams?.gov_action_deposit,
       getRewardAddress,
-      guardrailScript,
     ],
   );
 
@@ -1108,7 +1102,7 @@ const CardanoProvider = (props: Props) => {
         }
 
         const guardrailPlutusScript = PlutusScript.from_bytes_v3(
-          Buffer.from(guardrailScript, "hex"),
+          Buffer.from(COMPILED_GUARDRAIL_SCRIPT, "hex"),
         );
         let protocolParamChangeAction;
         if (prevGovernanceActionHash && prevGovernanceActionIndex) {
@@ -1163,7 +1157,6 @@ const CardanoProvider = (props: Props) => {
       addVotingProposalToBuilder,
       epochParams?.gov_action_deposit,
       getRewardAddress,
-      guardrailScript,
     ],
   );
 

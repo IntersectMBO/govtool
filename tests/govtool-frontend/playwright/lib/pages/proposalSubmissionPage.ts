@@ -184,7 +184,7 @@ export default class ProposalSubmissionPage {
 
   async getFirstDraft() {
     await expect(
-      this.page.locator('[data-testid^="draft-"][data-testid$="-card"]')
+      this.page.locator('[data-testid^="draft-"][data-testid$="-card"]').first()
     ).toBeVisible({ timeout: 10_000 }); // slow rendering
 
     return this.page

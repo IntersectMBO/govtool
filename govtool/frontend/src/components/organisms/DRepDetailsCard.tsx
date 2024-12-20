@@ -239,8 +239,19 @@ const DRepDetailsInfoItem = ({
   if (!children && !text) return null;
   const dataTestIdInfoItemCategoryPrefix = "info-item";
   return (
-    <div>
-      <Box sx={{ mb: 0.5 }}>
+    <Box
+      sx={{
+        maxWidth: {
+          xxs: "295px",
+          md: "100%",
+        },
+      }}
+    >
+      <Box
+        sx={{
+          mb: 0.5,
+        }}
+      >
         <Typography
           color="neutralGray"
           fontWeight={600}
@@ -260,7 +271,7 @@ const DRepDetailsInfoItem = ({
         )}
         {children}
       </div>
-    </div>
+    </Box>
   );
 };
 
@@ -306,7 +317,17 @@ const ReferencesGroup = ({ references }: { references: ReferenceItem[] }) => (
 );
 
 const ReferencesLink = ({ label, uri }: ReferenceItem) => (
-  <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+  <Box
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      gap: 0.5,
+      maxWidth: {
+        xxs: "295px",
+        md: "100%",
+      },
+    }}
+  >
     <Typography fontWeight={400}>{label}</Typography>
     <Link
       data-testid={`${testIdFromLabel(label)}-link`}

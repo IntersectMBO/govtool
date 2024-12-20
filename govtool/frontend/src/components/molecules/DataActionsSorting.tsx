@@ -41,7 +41,10 @@ export const DataActionsSorting = ({
         boxShadow: "1px 2px 11px 0px #00123D5E",
         borderRadius: "10px",
         padding: "12px 0px",
-        width: "315px",
+        width: {
+          xxs: "250px",
+          md: "415px",
+        },
         zIndex: "1",
         right: "3px",
         top: "53px",

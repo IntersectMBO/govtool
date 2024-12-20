@@ -38,7 +38,10 @@ Object.values(ProposalType).forEach((proposalType, index) => {
     await proposalSubmissionPage.proposalCreateBtn.click();
     await proposalDiscussionPage.continueBtn.click();
 
-    await proposalSubmissionPage.createProposal(proposalType);
+    await proposalSubmissionPage.createProposal(
+      proposalFaucetWallet,
+      proposalType
+    );
 
     await userPage.getByTestId("submit-as-GA-button").click();
 

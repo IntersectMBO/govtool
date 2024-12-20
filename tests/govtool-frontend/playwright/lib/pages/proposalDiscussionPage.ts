@@ -76,39 +76,6 @@ export default class ProposalDiscussionPage {
     await this.page.getByTestId("close-button").click();
   }
 
-  async createProposal(): Promise<number> {
-    const receivingAddr = generateWalletAddress();
-    const proposalRequest: ProposalCreateRequest = {
-      proposal_links: [
-        {
-          prop_link: faker.internet.url(),
-          prop_link_text: faker.internet.displayName(),
-        },
-      ],
-      gov_action_type_id: 1,
-      prop_name: faker.company.name(),
-      prop_abstract: faker.lorem.paragraph(2),
-      prop_motivation: faker.lorem.paragraph(2),
-      prop_rationale: faker.lorem.paragraph(2),
-      prop_receiving_address: receivingAddr,
-      prop_amount: faker.number.int({ min: 100, max: 1000 }).toString(),
-      is_draft: false,
-    };
-    await this.proposalCreateBtn.click();
-    await this.continueBtn.click();
-
-    await this.fillForm(proposalRequest);
-
-    await this.continueBtn.click();
-    await this.page.getByTestId("submit-button").click();
-
-    // Wait for redirection to `proposal-discussion-details` page
-    await this.page.waitForTimeout(2_000);
-
-    const currentPageUrl = this.page.url();
-    return extractProposalIdFromUrl(currentPageUrl);
-  }
-
   private async fillForm(data: ProposalCreateRequest) {
     await this.page.getByTestId("governance-action-type").click();
     await this.page.getByTestId("info-button").click();

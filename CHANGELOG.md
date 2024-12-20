@@ -20,7 +20,7 @@ changes.
 
 ### Changed
 
--
+- Split New committee on-chain details into tabs
 
 ### Removed
 

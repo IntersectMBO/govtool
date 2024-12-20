@@ -89,13 +89,14 @@ test.describe("DRep dependent tests", () => {
     page,
   }) => {
     await dRepDirectoryPage.searchInput.fill(dRepId);
-    const delegateBtn = page.getByTestId(`${dRepId}-delegate-button`);
-    await expect(delegateBtn).toBeVisible();
     await page.getByTestId(`${dRepId}-delegate-button`).click();
 
     await expect(dRepDirectoryPage.delegationErrorModal).toBeVisible({
       timeout: 10_000,
     });
+    await expect(dRepDirectoryPage.delegationErrorModal).toHaveText(
+      /UTxO Balance Insufficient/
+    );
   });
 
   test("2I. Should check validity of DRep Id", async () => {

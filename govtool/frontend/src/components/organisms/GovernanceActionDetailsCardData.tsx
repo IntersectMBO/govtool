@@ -198,7 +198,7 @@ export const GovernanceActionDetailsCardData = ({
           visible: type === GovernanceActionType.NewCommittee && !!details,
         },
         {
-          label: "Parameters",
+          label: "Details",
           dataTestId: "parameters-tab",
           content: (
             <GovernanceActionNewConstitutionDetailsTabContent

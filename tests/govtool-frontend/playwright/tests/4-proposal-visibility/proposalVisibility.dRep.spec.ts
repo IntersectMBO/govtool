@@ -30,6 +30,7 @@ import {
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
   await skipIfNotHardFork();
+  test.skip(environments.networkId === 1);
 });
 
 test.describe("Logged in DRep", () => {

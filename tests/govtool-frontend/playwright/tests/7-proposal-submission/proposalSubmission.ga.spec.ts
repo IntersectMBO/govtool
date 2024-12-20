@@ -14,6 +14,7 @@ import { proposalFaucetWallet } from "@constants/proposalFaucetWallet";
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
   await skipIfNotHardFork();
+  test.skip(environments.networkId === 1);
 });
 
 Object.values(ProposalType).forEach((proposalType, index) => {

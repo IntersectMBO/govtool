@@ -18,6 +18,7 @@ import { GovernanceActionType } from "@types";
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
   await skipIfNotHardFork();
+  test.skip(environments.networkId === 1);
 });
 
 test.describe("Logged in DReps", () => {

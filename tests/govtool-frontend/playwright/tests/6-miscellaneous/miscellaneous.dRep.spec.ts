@@ -8,6 +8,7 @@ import { expect } from "@playwright/test";
 test.beforeEach(async () => {
   await setAllureEpic("6. Miscellaneous");
   await skipIfNotHardFork();
+  test.skip(environments.networkId === 1);
 });
 
 test.use({

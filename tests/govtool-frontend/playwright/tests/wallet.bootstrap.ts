@@ -10,6 +10,7 @@ setup.describe.configure({ mode: "serial", timeout: environments.txTimeOut });
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Wallet bootstrap");
+  setup.skip(environments.networkId === 1);
 });
 
 setup("Initialize static wallets", async () => {

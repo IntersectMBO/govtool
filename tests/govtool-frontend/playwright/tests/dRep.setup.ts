@@ -23,6 +23,7 @@ setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Register DRep");
   await skipIfNotHardFork();
+  setup.skip(environments.networkId === 1);
 });
 
 async function generateWallets(num: number) {

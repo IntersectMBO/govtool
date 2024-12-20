@@ -14,6 +14,7 @@ import walletManager from "lib/walletManager";
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
   await skipIfNotHardFork();
+  test.skip(environments.networkId === 1);
 });
 
 test("2N. Should show DRep information on details page", async ({

@@ -11,6 +11,7 @@ setup.describe.configure({ timeout: environments.txTimeOut });
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Faucet");
+  setup.skip(environments.networkId === 1);
 });
 
 setup("Faucet setup", async () => {

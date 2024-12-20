@@ -11,6 +11,7 @@ cleanup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Cleanup");
   await skipIfNotHardFork();
+  cleanup.skip(environments.networkId === 1);
 });
 cleanup(`Abstain delegation`, async () => {
   const stakePrivKeys = adaHolderWallets.map((wallet) => wallet.stake.private);

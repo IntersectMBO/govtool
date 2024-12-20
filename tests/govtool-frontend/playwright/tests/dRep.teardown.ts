@@ -11,6 +11,7 @@ cleanup.describe.configure({ timeout: environments.txTimeOut });
 cleanup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Cleanup");
+  cleanup.skip(environments.networkId === 1);
 });
 
 cleanup("DRep de-registration", async () => {

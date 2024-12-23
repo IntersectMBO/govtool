@@ -26,7 +26,7 @@ changes.
 
 -
 
-## [v2.0.2](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.2) 2024-12-20
+## [v2.0.2](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.2) 2024-12-23
 
 ### Added
 
@@ -37,6 +37,7 @@ changes.
 - Move matomo initalization out of the react code
 - Fix some non-ipfs related errors while fetching the DRep images [Issue 2546](https://github.com/IntersectMBO/govtool/issues/2546)
 - Remaining mobile responsiveness issue [Issue 2493](https://github.com/IntersectMBO/govtool/issues/2493)
+- Fix searching by CIP-129 identifiers [Issue 2571](https://github.com/IntersectMBO/govtool/issues/2571)
 
 ### Changed
 

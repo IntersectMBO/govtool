@@ -26,7 +26,7 @@ SELECT
   encode(va.data_hash, 'hex'),
   dr_deposit.deposit,
   DRepDistr.amount,
-(DRepActivity.epoch_no - Max(coalesce(block.epoch_no, block_first_register.epoch_no))) <= DRepActivity.drep_activity AS active,
+  (DRepActivity.epoch_no - Max(coalesce(block.epoch_no, block_first_register.epoch_no))) <= DRepActivity.drep_activity AS active,
   encode(dr_voting_anchor.tx_hash, 'hex') AS tx_hash,
   newestRegister.time AS last_register_time,
   COALESCE(latestDeposit.deposit, 0),

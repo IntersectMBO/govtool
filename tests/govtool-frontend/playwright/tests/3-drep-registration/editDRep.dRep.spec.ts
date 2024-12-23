@@ -4,7 +4,7 @@ import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
-import { skipIfNotHardFork } from "@helpers/cardano";
+import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
 import EditDRepPage from "@pages/editDRepPage";
 import { expect } from "@playwright/test";
 import environments from "@constants/environments";
@@ -12,7 +12,7 @@ import environments from "@constants/environments";
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
   await skipIfNotHardFork();
-  test.skip(environments.networkId === 1);
+  await skipIfMainnet();
 });
 
 test.use({ wallet: dRep02Wallet, storageState: ".auth/dRep02.json" });

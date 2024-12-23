@@ -7,6 +7,7 @@ import { setAllureEpic } from "@helpers/allure";
 import {
   isBootStrapingPhase,
   lovelaceToAda,
+  skipIfMainnet,
   skipIfNotHardFork,
 } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
@@ -30,7 +31,7 @@ import {
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
   await skipIfNotHardFork();
-  test.skip(environments.networkId === 1);
+  await skipIfMainnet();
 });
 
 test.describe("Logged in DRep", () => {

@@ -4,7 +4,11 @@ import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { isBootStrapingPhase, skipIfNotHardFork } from "@helpers/cardano";
+import {
+  isBootStrapingPhase,
+  skipIfMainnet,
+  skipIfNotHardFork,
+} from "@helpers/cardano";
 import { encodeCIP129Identifier } from "@helpers/encodeDecode";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
@@ -18,7 +22,7 @@ import walletManager from "lib/walletManager";
 test.beforeEach(async () => {
   await setAllureEpic("5. Proposal functionality");
   await skipIfNotHardFork();
-  test.skip(environments.networkId === 1);
+  await skipIfMainnet();
 });
 
 test.describe("Proposal checks", () => {

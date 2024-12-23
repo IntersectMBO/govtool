@@ -1,5 +1,6 @@
 import { adaHolderWallets, dRepWallets } from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
+import { skipIfMainnet } from "@helpers/cardano";
 import { pollTransaction } from "@helpers/transaction";
 import { expect, test as setup } from "@playwright/test";
 import kuberService from "@services/kuberService";
@@ -10,7 +11,7 @@ setup.describe.configure({ mode: "serial", timeout: environments.txTimeOut });
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Wallet bootstrap");
-  setup.skip(environments.networkId === 1);
+  await skipIfMainnet();
 });
 
 setup("Initialize static wallets", async () => {

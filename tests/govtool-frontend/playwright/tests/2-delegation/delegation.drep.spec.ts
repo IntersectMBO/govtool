@@ -3,7 +3,7 @@ import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
+import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
@@ -14,7 +14,7 @@ import walletManager from "lib/walletManager";
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
   await skipIfNotHardFork();
-  test.skip(environments.networkId === 1);
+  await skipIfMainnet();
 });
 
 test("2N. Should show DRep information on details page", async ({

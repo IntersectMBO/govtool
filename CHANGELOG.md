@@ -20,7 +20,7 @@ changes.
 
 ### Changed
 
--
+- Split New constitution on-chain details into tabs
 
 ### Removed
 

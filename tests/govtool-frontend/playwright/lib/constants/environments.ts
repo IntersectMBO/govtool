@@ -14,9 +14,9 @@ const environments = {
   apiUrl: `${SERVER_HOST_URL}/api`,
   docsUrl: process.env.DOCS_URL || "https://docs.gov.tools/cardano-govtool",
   pdfUrl: process.env.PDF_URL || "https://dev.api.pdf.gov.tools",
-  networkId: parseInt(process.env.NETWORK_ID) || 0,
+  networkId: NETWORK === "mainnet" ? 1 : 0,
   faucet: {
-    apiUrl:`https://faucet.${NETWORK}.world.dev.cardano.org`,
+    apiUrl: `https://faucet.${NETWORK}.world.dev.cardano.org`,
     apiKey: process.env.FAUCET_API_KEY || "",
     address:
       process.env.FAUCET_ADDRESS ||

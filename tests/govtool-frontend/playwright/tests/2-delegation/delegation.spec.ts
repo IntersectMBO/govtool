@@ -137,7 +137,7 @@ test("2M. Should access dRep directory page on disconnected state", async ({
 });
 
 test.describe("DRep dependent tests", () => {
-  let dRepId = "drep1ef7uslcjhjqrn4vv2y39c3yn345gzjsg7yufn76zye3v6fkz23q";
+  let dRepId: string;
   let dRepDirectoryPage: DRepDirectoryPage;
 
   test.beforeEach(async ({ page }) => {

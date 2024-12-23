@@ -76,8 +76,8 @@ test("2X_2. Should include info button and voting power on the Signal-No-Confide
 });
 
 test.describe("DRep dependent tests", () => {
-  let dRepGivenName = "test";
-  let dRepId = "drep1ef7uslcjhjqrn4vv2y39c3yn345gzjsg7yufn76zye3v6fkz23q";
+  let dRepGivenName: string;
+  let dRepId: string;
   let dRepDirectoryPage: DRepDirectoryPage;
 
   test.beforeEach(async ({ page }) => {

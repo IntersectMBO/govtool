@@ -141,6 +141,8 @@ test.describe("Proposal created logged state", () => {
         await proposalSubmissionPage.submitBtn.click();
 
         await expect(page.getByTestId("submit-as-GA-button")).toBeVisible();
+        const proposalDetailsPage = new ProposalDiscussionDetailsPage(page);
+
         await expect(proposalSubmissionPage.titleContent).toHaveText(
           proposal.prop_name
         );
@@ -159,6 +161,9 @@ test.describe("Proposal created logged state", () => {
         await expect(proposalSubmissionPage.linkTextContent).toHaveText(
           proposal.proposal_links[0].prop_link_text
         );
+
+        // cleanup
+        await proposalDetailsPage.deleteProposal();
       });
     });
   });
@@ -428,6 +433,9 @@ test.describe("Info Proposal Draft", () => {
     await proposalSubmissionPage.submitBtn.click();
 
     await expect(page.getByTestId("submit-as-GA-button")).toBeVisible();
+    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
+      page
+    );
     await expect(proposalSubmissionPage.titleContent).toHaveText(
       proposalFormValue.prop_name
     );
@@ -446,6 +454,9 @@ test.describe("Info Proposal Draft", () => {
     await expect(proposalSubmissionPage.linkTextContent).toHaveText(
       proposalFormValue.proposal_links[0].prop_link_text
     );
+
+    //cleanup
+    proposalDiscussionDetailsPage.deleteProposal();
   });
 });
 

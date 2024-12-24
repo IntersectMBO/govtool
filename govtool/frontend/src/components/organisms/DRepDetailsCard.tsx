@@ -6,7 +6,11 @@ import { ICONS, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { useDelegateTodRep, useScreenDimension, useTranslation } from "@hooks";
 import { Card, DataMissingInfoBox } from "@molecules";
-import { correctAdaFormat, testIdFromLabel } from "@utils";
+import {
+  correctAdaFormat,
+  encodeCIP129Identifier,
+  testIdFromLabel,
+} from "@utils";
 import { DRepData } from "@/models";
 import { DRepDetailsCardHeader } from "./DRepDetailsCardHeader";
 
@@ -41,6 +45,7 @@ export const DRepDetailsCard = ({
     status,
     url,
     view,
+    drepId,
     votingPower,
   } = dRepData;
 
@@ -108,6 +113,18 @@ export const DRepDetailsCard = ({
         {/* ERROR MESSAGES END */}
         <DRepDetailsInfoItem label={t("drepId")} dataTestId="drep-id">
           <CopyableText value={view} dataTestId="copy-drep-id-button" />
+        </DRepDetailsInfoItem>
+        <DRepDetailsInfoItem
+          label={t("cip129DrepId")}
+          dataTestId="cip-129-drep-id"
+        >
+          <CopyableText
+            value={encodeCIP129Identifier({
+              txID: `22${drepId}`,
+              bech32Prefix: "drep",
+            })}
+            dataTestId="copy-cip-129-drep-id-button"
+          />
         </DRepDetailsInfoItem>
         <DRepDetailsInfoItem label={t("status")} dataTestId="drep-status">
           <StatusPill status={status} />

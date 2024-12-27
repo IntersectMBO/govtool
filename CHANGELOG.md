@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Fix calculating DRep live voting power [Issue 2460](https://github.com/IntersectMBO/govtool/issues/2460)
+- Fix link and description validation [Issue 2403](https://github.com/IntersectMBO/govtool/issues/2403)
 
 ### Changed
 

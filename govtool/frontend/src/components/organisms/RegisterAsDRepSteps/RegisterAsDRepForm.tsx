@@ -25,7 +25,12 @@ export const RegisterAsDRepForm = ({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <DRepDataForm control={control} errors={errors} register={register} />
+      <DRepDataForm
+        control={control}
+        errors={errors}
+        register={register}
+        watch={watch}
+      />
       <CenteredBoxBottomButtons
         onActionButton={onClickContinue}
         disableActionButton={isContinueButtonDisabled}

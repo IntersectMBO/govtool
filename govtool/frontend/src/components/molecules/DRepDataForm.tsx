@@ -3,6 +3,7 @@ import {
   Control,
   FieldErrors,
   UseFormRegister,
+  UseFormWatch,
   useFieldArray,
 } from "react-hook-form";
 import { Box } from "@mui/material";
@@ -20,9 +21,10 @@ type Props = {
   control: Control<DRepDataFormValues>;
   errors: FieldErrors<DRepDataFormValues>;
   register: UseFormRegister<DRepDataFormValues>;
+  watch: UseFormWatch<DRepDataFormValues>;
 };
 
-export const DRepDataForm = ({ control, errors, register }: Props) => {
+export const DRepDataForm = ({ control, errors, register, watch }: Props) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
 
@@ -111,12 +113,14 @@ export const DRepDataForm = ({ control, errors, register }: Props) => {
             control={control}
             errors={errors}
             register={register}
+            watch={watch}
           />
           <ReferencesSection
             type="identity"
             control={control}
             errors={errors}
             register={register}
+            watch={watch}
           />
         </Box>
         <div>
@@ -176,6 +180,7 @@ type ReferencesSectionProps = {
   control: Control<DRepDataFormValues>;
   errors: FieldErrors<DRepDataFormValues>;
   register: UseFormRegister<DRepDataFormValues>;
+  watch: UseFormWatch<DRepDataFormValues>;
 };
 
 const ReferencesSection = ({
@@ -183,6 +188,7 @@ const ReferencesSection = ({
   control,
   errors,
   register,
+  watch,
 }: ReferencesSectionProps) => {
   const { fieldName, jsonldType } = (() => {
     // eslint-disable-next-line default-case
@@ -237,7 +243,16 @@ const ReferencesSection = ({
             helpfulTextDataTestId={`${type}-reference-description-${
               index + 1
             }-hint`}
-            rules={Rules.LINK_DESCRIPTION}
+            rules={{
+              ...Rules.LINK_DESCRIPTION,
+              validate: (value) => {
+                const isLink = watch(`${fieldName}.${index}.uri`);
+                if (!value && Boolean(isLink)) {
+                  return t("dRepData.required");
+                }
+                return true;
+              },
+            }}
           />
           <ControlledField.Input
             {...register(`${fieldName}.${index}.uri`)}
@@ -258,7 +273,16 @@ const ReferencesSection = ({
             dataTestId={`${type}-reference-url-${index + 1}-input`}
             errorDataTestId={`${type}-reference-url-${index + 1}-error`}
             helpfulTextDataTestId={`${type}-reference-url-${index + 1}-hint`}
-            rules={Rules.LINK_URL}
+            rules={{
+              ...Rules.LINK_URL,
+              validate: (value) => {
+                const isDescription = watch(`${fieldName}.${index}.label`);
+                if (!value && Boolean(isDescription)) {
+                  return t("dRepData.required");
+                }
+                return true;
+              },
+            }}
           />
         </Fragment>
       ))}

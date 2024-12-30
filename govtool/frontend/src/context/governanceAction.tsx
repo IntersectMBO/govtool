@@ -10,7 +10,7 @@ import { NodeObject } from "jsonld";
 import { blake2bHex } from "blakejs";
 import * as Sentry from "@sentry/react";
 
-import { CIP_108, GOVERNANCE_ACTION_CONTEXT } from "@/consts";
+import { GOVERNANCE_ACTION_CONTEXT } from "@/consts";
 import { generateJsonld, generateMetadataBody } from "@/utils";
 
 type GovActionMetadata = {
@@ -53,7 +53,6 @@ const GovernanceActionProvider = ({ children }: PropsWithChildren) => {
         const metadataBody = generateMetadataBody({
           data: govActionMetadata,
           acceptedKeys: ["title", "abstract", "motivation", "rationale"],
-          standardReference: CIP_108,
         });
 
         const jsonLD = await generateJsonld(

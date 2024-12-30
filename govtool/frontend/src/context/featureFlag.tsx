@@ -127,6 +127,7 @@ const FeatureFlagProvider = ({ children }: PropsWithChildren) => {
     () => ({
       isProposalDiscussionForumEnabled:
         import.meta.env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === "true" ||
+        import.meta.env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === true ||
         false,
       isVotingOnGovernanceActionEnabled,
       areDRepVoteTotalsDisplayed,

@@ -20,6 +20,7 @@ changes.
 - Fix link and description validation [Issue 2403](https://github.com/IntersectMBO/govtool/issues/2403)
 - Revert to drep_distr for providing active voting power
 - Add rewards amount in the ada holder voting power
+- Fix nested @value in jsonld metadatas [Issue 2509](https://github.com/IntersectMBO/govtool/issues/2509)
 
 ### Changed
 

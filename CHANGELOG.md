@@ -16,6 +16,24 @@ changes.
 
 ### Fixed
 
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v2.0.3](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.3) 2024-12-30
+
+### Added
+
+-
+
+### Fixed
+
 - Fix calculating DRep live voting power [Issue 2460](https://github.com/IntersectMBO/govtool/issues/2460)
 - Fix link and description validation [Issue 2403](https://github.com/IntersectMBO/govtool/issues/2403)
 - Revert to drep_distr for providing active voting power

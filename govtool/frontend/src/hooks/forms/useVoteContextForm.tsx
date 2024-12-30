@@ -6,7 +6,7 @@ import { NodeObject } from "jsonld";
 
 import { downloadJson, generateJsonld, generateMetadataBody } from "@utils";
 import { MetadataValidationStatus } from "@models";
-import { CIP_100, CIP_100_CONTEXT } from "@/consts";
+import { CIP_100_CONTEXT } from "@/consts";
 
 import { useValidateMutation } from "../mutations";
 
@@ -43,9 +43,8 @@ export const useVoteContextForm = (
         comment: voteContextText,
       },
       acceptedKeys: ["comment"],
-      standardReference: CIP_100,
     });
-    const jsonld = await generateJsonld(body, CIP_100_CONTEXT, CIP_100);
+    const jsonld = await generateJsonld(body, CIP_100_CONTEXT);
 
     const jsonHash = blake2bHex(JSON.stringify(jsonld, null, 2), undefined, 32);
 

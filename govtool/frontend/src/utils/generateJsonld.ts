@@ -1,7 +1,5 @@
 import * as jsonld from "jsonld";
 
-import { CIP_100, CIP_108 } from "@/consts";
-
 /**
  * Generates a JSON-LD document by compacting the given body and context.
  *
@@ -17,12 +15,11 @@ export const generateJsonld = async <
 >(
   body: T,
   context: C,
-  bodyCip: string = CIP_108,
 ) => {
   const doc = {
-    [`${bodyCip}body`]: body,
-    [`${CIP_100}hashAlgorithm`]: "blake2b-256",
-    [`${CIP_100}authors`]: [],
+    "@context": context,
+    hashAlgorithm: "blake2b-256",
+    body,
   };
 
   const json = await jsonld.compact(doc, context);

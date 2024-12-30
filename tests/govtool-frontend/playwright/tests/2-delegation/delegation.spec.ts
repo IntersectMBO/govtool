@@ -1,5 +1,8 @@
+import environments from "@constants/environments";
 import { setAllureEpic } from "@helpers/allure";
 import { skipIfNotHardFork } from "@helpers/cardano";
+import { fetchFirstActiveDRepDetails } from "@helpers/dRep";
+import DRepDetailsPage from "@pages/dRepDetailsPage";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { expect, test } from "@playwright/test";
 import { DRepStatus, IDRep } from "@types";
@@ -121,4 +124,77 @@ test("2K_1. Should filter DReps", async ({ page }) => {
     await dRepDirectory.unFilterDReps(multipleFilterOptionNames);
     multipleFilterOptionNames.pop();
   }
+});
+
+test("2M. Should access dRep directory page on disconnected state", async ({
+  page,
+}) => {
+  const dRepDirectoryPage = new DRepDirectoryPage(page);
+  await dRepDirectoryPage.goto();
+
+  const dRepCards = await dRepDirectoryPage.getAllListedDReps();
+  expect(dRepCards.length).toBeGreaterThan(1);
+});
+
+test.describe("DRep dependent tests", () => {
+  let dRepId: string;
+  let dRepDirectoryPage: DRepDirectoryPage;
+
+  test.beforeEach(async ({ page }) => {
+    ({ dRepDirectoryPage, dRepId } = await fetchFirstActiveDRepDetails(page));
+  });
+
+  test("2P. Should enable sharing of DRep details", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+
+    const dRepDetailsPage = new DRepDetailsPage(page);
+    await dRepDetailsPage.goto(dRepId);
+
+    await dRepDetailsPage.shareLink();
+    await expect(page.getByText("Copied to clipboard")).toBeVisible();
+
+    const copiedText = await page.evaluate(() =>
+      navigator.clipboard.readText()
+    );
+    expect(copiedText).toEqual(
+      `${environments.frontendUrl}/drep_directory/${dRepId}`
+    );
+  });
+
+  test("2Q. Should include DRep status and voting power on the DRep card", async ({
+    page,
+  }) => {
+    await dRepDirectoryPage.searchInput.fill(dRepId);
+    const dRepCard = dRepDirectoryPage.getDRepCard(dRepId);
+
+    await expect(dRepCard.getByTestId(`${dRepId}-voting-power`)).toBeVisible();
+    await expect(
+      dRepCard.locator(`[data-testid^="${dRepId}-"][data-testid$="-pill"]`)
+    ).toBeVisible();
+  });
+
+  test("2C. Should open wallet connection popup on delegate in disconnected state", async ({
+    page,
+  }) => {
+    await page.getByTestId("search-input").fill(dRepId);
+    await page.getByTestId(`${dRepId}-connect-to-delegate-button`).click();
+    await expect(page.getByTestId("connect-your-wallet-modal")).toBeVisible();
+  });
+
+  test("2L. Should copy DRepId", async ({ page, context }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+
+    await dRepDirectoryPage.searchInput.fill(dRepId);
+    await page.getByTestId(`${dRepId}-copy-id-button`).click();
+    await expect(page.getByText("Copied to clipboard")).toBeVisible({
+      timeout: 10_000,
+    });
+    const copiedTextDRepDirectory = await page.evaluate(() =>
+      navigator.clipboard.readText()
+    );
+    expect(copiedTextDRepDirectory).toEqual(dRepId);
+  });
 });

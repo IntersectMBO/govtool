@@ -10,6 +10,7 @@ import { Card } from "@molecules";
 import {
   correctDRepDirectoryFormat,
   ellipsizeText,
+  encodeCIP129Identifier,
   getMetadataDataMissingStatusTranslation,
 } from "@utils";
 
@@ -24,7 +25,16 @@ type DRepCardProps = {
 };
 
 export const DRepCard = ({
-  dRep: { status, type, view, votingPower, givenName, metadataStatus, image },
+  dRep: {
+    status,
+    type,
+    view,
+    votingPower,
+    givenName,
+    metadataStatus,
+    image,
+    drepId,
+  },
   isConnected,
   isDelegationLoading,
   isInProgress,
@@ -47,6 +57,11 @@ export const DRepCard = ({
         ),
       },
     });
+
+  const cip129Identifier = encodeCIP129Identifier({
+    txID: `22${drepId}`,
+    bech32Prefix: "drep",
+  });
 
   return (
     <Card
@@ -122,35 +137,76 @@ export const DRepCard = ({
                     ? getMetadataDataMissingStatusTranslation(metadataStatus)
                     : ellipsizeText(givenName ?? "", 25)}
                 </Typography>
-                <ButtonBase
-                  data-testid={`${view}-copy-id-button`}
-                  onClick={(e) => {
-                    navigator.clipboard.writeText(view);
-                    addSuccessAlert(t("alerts.copiedToClipboard"));
-                    e.stopPropagation();
-                  }}
+                <Box
                   sx={{
-                    gap: 1,
-                    width: "250px",
-                    maxWidth: {
-                      xxs: "200px",
-                      xs: "100%",
-                    },
-                    "&:hover": {
-                      opacity: 0.6,
-                      transition: "opacity 0.3s",
-                    },
+                    display: "flex",
+                    flexDirection: "column",
                   }}
                 >
-                  <Typography
-                    color="primary"
-                    variant="body2"
-                    sx={ellipsisStyles}
+                  <ButtonBase
+                    data-testid={`${view}-copy-id-button`}
+                    onClick={(e) => {
+                      navigator.clipboard.writeText(view);
+                      addSuccessAlert(t("alerts.copiedToClipboard"));
+                      e.stopPropagation();
+                    }}
+                    sx={{
+                      gap: 1,
+                      width: "250px",
+                      maxWidth: {
+                        xxs: "200px",
+                        xs: "100%",
+                      },
+                      "&:hover": {
+                        opacity: 0.6,
+                        transition: "opacity 0.3s",
+                      },
+                    }}
                   >
-                    {view}
-                  </Typography>
-                  <img alt="" src={ICONS.copyBlueIcon} />
-                </ButtonBase>
+                    <Typography
+                      color="primary"
+                      variant="body2"
+                      sx={ellipsisStyles}
+                    >
+                      {view}
+                    </Typography>
+                    <img alt="" src={ICONS.copyBlueIcon} />
+                  </ButtonBase>
+                  <ButtonBase
+                    data-testid={`${cip129Identifier}-copy-id-button`}
+                    onClick={(e) => {
+                      navigator.clipboard.writeText(cip129Identifier);
+                      addSuccessAlert(t("alerts.copiedToClipboard"));
+                      e.stopPropagation();
+                    }}
+                    sx={{
+                      gap: 1,
+                      width: "250px",
+                      maxWidth: {
+                        xxs: "200px",
+                        xs: "100%",
+                      },
+                      "&:hover": {
+                        opacity: 0.6,
+                        transition: "opacity 0.3s",
+                      },
+                      display: "flex",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Typography variant="body2" sx={ellipsisStyles}>
+                      (CIP-129){" "}
+                      <Typography
+                        color="primary"
+                        variant="body2"
+                        component="span"
+                      >
+                        {cip129Identifier}
+                      </Typography>
+                    </Typography>
+                    <img alt="" src={ICONS.copyBlueIcon} />
+                  </ButtonBase>
+                </Box>
               </Box>
             </Box>
 

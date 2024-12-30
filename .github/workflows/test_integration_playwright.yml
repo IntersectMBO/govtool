@@ -15,6 +15,7 @@ on:
           - "staging.govtool.byron.network"
           - "govtool.cardanoapi.io"
           - "preview.gov.tools"
+          - "gov.tools"
 
   workflow_run:
     workflows: ["Build and deploy GovTool to TEST server"]
@@ -54,18 +55,27 @@ jobs:
           mkdir -p ./lib/_mock
           chmod +w ./lib/_mock
           npm run generate-wallets
-          if [[ "${{ env.NETWORK }}" == "preprod" ]]; then
+
+          # Set network variables based on deployment input and environment
+          if [[ "${{inputs.deployment}}" == "gov.tools" ]]; then
+             export NETWORK='mainnet'
+          else
+             export NETWORK="${{ vars.NETWORK }}"
+          fi
+
+          # Set API keys based on the network
+          if [[ "${{ vars.NETWORK }}" == "preprod" ]]; then
             export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_PREPROD }}"
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_PREPROD }}"
-          elif [[ "${{ env.NETWORK }}" == "sanchonet" ]]; then
+          elif [[ "${{ vars.NETWORK }}" == "sanchonet" ]]; then
             export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_SANCHONET }}"
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_SANCHONET }}"
           else
             export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_PREVIEW }}"
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_PREVIEW }}"
           fi
+
           npm test
-         
 
       - name: Upload report
         uses: actions/upload-artifact@v3
@@ -88,7 +98,6 @@ jobs:
       KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}
       TEST_WORKERS: ${{vars.TEST_WORKERS}}
       CI: ${{vars.CI}}
-      NETWORK: ${{vars.NETWORK}}
       FAUCET_ADDRESS: ${{vars.FAUCET_ADDRESS}}
       CARDANOAPI_METADATA_URL: ${{vars.CARDANOAPI_METADATA_URL}}
       PROPOSAL_FAUCET_PAYMENT_PRIVATE: ${{secrets.PROPOSAL_FAUCET_PAYMENT_PRIVATE}}

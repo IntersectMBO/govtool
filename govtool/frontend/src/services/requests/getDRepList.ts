@@ -8,7 +8,11 @@ import {
   DrepDataDTO,
 } from "@models";
 import { API } from "../API";
-import { mapDtoToDrep } from "@/utils";
+import {
+  decodeCIP129Identifier,
+  encodeCIP129Identifier,
+  mapDtoToDrep,
+} from "@/utils";
 
 export type GetDRepListArguments = {
   filters?: string[];
@@ -33,6 +37,22 @@ export const getDRepList = async ({
     if (rawSearchPhrase.startsWith("drep_script")) {
       const { words } = bech32.decode(rawSearchPhrase);
       return bech32.encode("drep", words);
+    }
+    if (rawSearchPhrase.startsWith("drep")) {
+      const decodedIdentifier = decodeCIP129Identifier(rawSearchPhrase);
+      if (decodedIdentifier) {
+        const isCIP129Identifier = decodedIdentifier.txID.startsWith("22");
+        if (isCIP129Identifier) {
+          return encodeCIP129Identifier({
+            txID: decodedIdentifier.txID.slice(2),
+            bech32Prefix: "drep",
+          });
+        }
+        return encodeCIP129Identifier({
+          txID: decodedIdentifier.txID,
+          bech32Prefix: "drep",
+        });
+      }
     }
     return rawSearchPhrase;
   })();

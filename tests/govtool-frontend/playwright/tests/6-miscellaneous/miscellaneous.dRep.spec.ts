@@ -2,12 +2,13 @@ import environments from "@constants/environments";
 import { dRep01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
+import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
 import { expect } from "@playwright/test";
 
 test.beforeEach(async () => {
   await setAllureEpic("6. Miscellaneous");
   await skipIfNotHardFork();
+  await skipIfMainnet();
 });
 
 test.use({

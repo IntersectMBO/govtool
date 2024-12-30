@@ -26,7 +26,29 @@ changes.
 
 -
 
-## [v2.0.2](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.2) 2024-12-20
+## [v2.0.3](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.3) 2024-12-30
+
+### Added
+
+-
+
+### Fixed
+
+- Fix calculating DRep live voting power [Issue 2460](https://github.com/IntersectMBO/govtool/issues/2460)
+- Fix link and description validation [Issue 2403](https://github.com/IntersectMBO/govtool/issues/2403)
+- Revert to drep_distr for providing active voting power
+- Add rewards amount in the ada holder voting power
+- Fix nested @value in jsonld metadatas [Issue 2509](https://github.com/IntersectMBO/govtool/issues/2509)
+
+### Changed
+
+- Split New constitution on-chain details into tabs
+
+### Removed
+
+-
+
+## [v2.0.2](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.2) 2024-12-23
 
 ### Added
 
@@ -37,6 +59,7 @@ changes.
 - Move matomo initalization out of the react code
 - Fix some non-ipfs related errors while fetching the DRep images [Issue 2546](https://github.com/IntersectMBO/govtool/issues/2546)
 - Remaining mobile responsiveness issue [Issue 2493](https://github.com/IntersectMBO/govtool/issues/2493)
+- Fix searching by CIP-129 identifiers [Issue 2571](https://github.com/IntersectMBO/govtool/issues/2571)
 
 ### Changed
 

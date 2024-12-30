@@ -13,6 +13,8 @@ ARG VITE_PDF_API_URL
 ARG VITE_IPFS_GATEWAY
 ARG VITE_IPFS_PROJECT_ID
 
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 # Ensure all required build arguments are set
 RUN \
   : "${VITE_APP_ENV:?Build argument VITE_APP_ENV is not set}" && \

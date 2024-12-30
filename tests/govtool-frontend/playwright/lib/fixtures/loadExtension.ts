@@ -19,6 +19,7 @@ export default async function loadDemosExtension(
   let walletConfig: CardanoTestWalletConfig = {
     enableStakeSigning,
     kuberApiUrl: environments.kuber.apiUrl,
+    networkId: environments.networkId,
     kuberApiKey: environments.kuber.apiKey,
     blockfrostApiKey: environments.blockfrostApiKey,
     blockfrostApiUrl: environments.blockfrostApiUrl,

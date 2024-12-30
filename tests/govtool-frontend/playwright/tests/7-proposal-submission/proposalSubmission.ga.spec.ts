@@ -7,13 +7,14 @@ import { waitForTxConfirmation } from "@helpers/transaction";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
-import { skipIfNotHardFork } from "@helpers/cardano";
+import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
 import { ProposalType } from "@types";
 import { proposalFaucetWallet } from "@constants/proposalFaucetWallet";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
   await skipIfNotHardFork();
+  await skipIfMainnet();
 });
 
 Object.values(ProposalType).forEach((proposalType, index) => {

@@ -21,7 +21,7 @@ export const GovernanceActionNewCommitteeDetailsTabContent = ({
     .filter((member) => member.newExpirationEpoch === undefined)
     .map((member) => ({
       cip129Identifier: encodeCIP129Identifier({
-        txID: member.hash,
+        txID: (member.hasScript ? "02" : "13") + member.hash,
         bech32Prefix: member.hasScript ? "cc_hot" : "cc_cold",
       }),
       expirationEpoch: member.expirationEpoch,
@@ -31,7 +31,7 @@ export const GovernanceActionNewCommitteeDetailsTabContent = ({
     .filter((member) => member.newExpirationEpoch !== undefined)
     .map((member) => ({
       cip129Identifier: encodeCIP129Identifier({
-        txID: member.hash,
+        txID: (member.hasScript ? "02" : "13") + member.hash,
         bech32Prefix: member.hasScript ? "cc_hot" : "cc_cold",
       }),
       expirationEpoch: member.expirationEpoch,

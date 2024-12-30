@@ -2,7 +2,10 @@ import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { skipIfNotHardFork } from "@helpers/cardano";
+import { ShelleyWallet } from "@helpers/crypto";
+import { fetchFirstActiveDRepDetails } from "@helpers/dRep";
 import { isMobile } from "@helpers/mobile";
+import extractDRepFromWallet from "@helpers/shellyWallet";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { expect } from "@playwright/test";
 
@@ -70,4 +73,56 @@ test("2X_2. Should include info button and voting power on the Signal-No-Confide
   ).toBeVisible();
 
   await expect(dRepDirectoryPage.signalNoConfidenceInfoButton).toBeVisible();
+});
+
+test.describe("DRep dependent tests", () => {
+  let dRepGivenName: string;
+  let dRepId: string;
+  let dRepDirectoryPage: DRepDirectoryPage;
+
+  test.beforeEach(async ({ page }) => {
+    ({ dRepDirectoryPage, dRepId, dRepGivenName } =
+      await fetchFirstActiveDRepDetails(page));
+  });
+
+  test("2T. Should show warning message on delegation when insufficient funds", async ({
+    page,
+  }) => {
+    await dRepDirectoryPage.searchInput.fill(dRepId);
+    await page.getByTestId(`${dRepId}-delegate-button`).click();
+
+    await expect(dRepDirectoryPage.delegationErrorModal).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(dRepDirectoryPage.delegationErrorModal).toHaveText(
+      /UTxO Balance Insufficient/
+    );
+  });
+
+  test("2I. Should check validity of DRep Id", async () => {
+    await dRepDirectoryPage.searchInput.fill(dRepId);
+    await expect(dRepDirectoryPage.getDRepCard(dRepId)).toBeVisible();
+
+    const wallet = await ShelleyWallet.generate();
+    const invalidDRepId = extractDRepFromWallet(wallet);
+
+    await dRepDirectoryPage.searchInput.fill(invalidDRepId);
+    await expect(
+      dRepDirectoryPage.getDRepCard(invalidDRepId)
+    ).not.toBeVisible();
+  });
+
+  test("2J. Should search by DRep id and DRep givenname", async () => {
+    // search by dRep Id
+    await dRepDirectoryPage.searchInput.fill(dRepId);
+    await expect(dRepDirectoryPage.getDRepCard(dRepId)).toBeVisible();
+
+    // search by dRep givenname
+    await dRepDirectoryPage.searchInput.fill(dRepGivenName);
+    const searchDRepCards = await dRepDirectoryPage.getAllListedDReps();
+
+    for (const dRepCard of searchDRepCards) {
+      expect((await dRepCard.innerText()).includes(dRepGivenName));
+    }
+  });
 });

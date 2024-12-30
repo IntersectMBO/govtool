@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 import { NodeObject } from "jsonld";
 
 import {
-  CIP_108,
   GOVERNANCE_ACTION_CONTEXT,
   PATHS,
   storageInformationErrorModals,
@@ -104,7 +103,6 @@ export const useCreateGovernanceActionForm = (
     const body = generateMetadataBody({
       data: getValues(),
       acceptedKeys: ["title", "motivation", "abstract", "rationale"],
-      standardReference: CIP_108,
     });
 
     const jsonld = await generateJsonld(body, GOVERNANCE_ACTION_CONTEXT);

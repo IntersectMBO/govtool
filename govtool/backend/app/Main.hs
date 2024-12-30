@@ -26,7 +26,7 @@ import           Data.Monoid                            (mempty)
 import           Data.OpenApi                           (OpenApi, Server (Server), _openApiServers,
                                                          _serverDescription, _serverUrl, _serverVariables,
                                                          servers)
-import           Data.Pool                              (createPool)
+import           Data.Pool                              (createPool, Pool)
 import           Data.Proxy
 import           Data.String                            (fromString)
 import           Data.String.Conversions                (cs)
@@ -36,7 +36,7 @@ import qualified Data.Text.IO                           as Text
 import qualified Data.Text.Lazy                         as LazyText
 import qualified Data.Text.Lazy.Encoding                as LazyText
 
-import           Database.PostgreSQL.Simple             (close, connectPostgreSQL)
+import           Database.PostgreSQL.Simple             (close, connectPostgreSQL, Connection)
 
 import           Network.Wai
 import           Network.Wai.Handler.Warp
@@ -64,6 +64,15 @@ import           VVA.Config
 import           VVA.Types                              (AppEnv (..),
                                                          AppError (CriticalError, InternalError, NotFoundError, ValidationError),
                                                          CacheEnv (..))
+
+-- Function to create a connection pool with optimized settings
+createOptimizedConnectionPool :: BS.ByteString -> IO (Pool Connection)
+createOptimizedConnectionPool connectionString = createPool
+  (connectPostgreSQL connectionString) -- Connection creation function
+  close                                -- Connection destruction function
+  1                                    -- Number of stripes (sub-pools)
+  60                                   -- Idle timeout (seconds)
+  50                                   -- Maximum number of connections per stripe
 
 proxyAPI :: Proxy (VVAApi :<|> SwaggerAPI)
 proxyAPI = Proxy
@@ -125,7 +134,10 @@ startApp vvaConfig sentryService = do
       , dRepListCache
       , networkMetricsCache
       }
-  connectionPool <- createPool (connectPostgreSQL (encodeUtf8 (dbSyncConnectionString $ getter vvaConfig))) close 1 10 60
+
+  let connectionString = encodeUtf8 (dbSyncConnectionString $ getter vvaConfig)
+  connectionPool <- createOptimizedConnectionPool connectionString
+
   let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool }
   server' <- mkVVAServer appEnv
   runSettings settings server'

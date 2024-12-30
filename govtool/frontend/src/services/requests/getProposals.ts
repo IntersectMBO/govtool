@@ -1,7 +1,11 @@
 import { Infinite, ProposalData, ProposalDataDTO } from "@models";
 
 import { API } from "../API";
-import { mapDtoToProposal } from "@/utils";
+import {
+  decodeCIP129Identifier,
+  getFullGovActionId,
+  mapDtoToProposal,
+} from "@/utils";
 
 export type GetProposalsArguments = {
   dRepID?: string;
@@ -18,9 +22,17 @@ export const getProposals = async ({
   page = 0,
   // It allows fetch proposals and if we have 7 items, display 6 cards and "view all" button
   pageSize = 7,
-  searchPhrase = "",
+  searchPhrase: rawSearchPhrase = "",
   sorting = "",
 }: GetProposalsArguments): Promise<Infinite<ProposalData>> => {
+  const searchPhrase = (() => {
+    if (rawSearchPhrase.startsWith("gov_action")) {
+      const { txID } = decodeCIP129Identifier(rawSearchPhrase);
+      return getFullGovActionId(txID, 0);
+    }
+
+    return rawSearchPhrase;
+  })();
   const response = await API.get<Infinite<ProposalDataDTO>>("/proposal/list", {
     params: {
       page,

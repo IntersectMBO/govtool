@@ -5,7 +5,7 @@ import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
-import { skipIfNotHardFork } from "@helpers/cardano";
+import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
@@ -18,6 +18,7 @@ import { GovernanceActionType } from "@types";
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
   await skipIfNotHardFork();
+  await skipIfMainnet();
 });
 
 test.describe("Logged in DReps", () => {

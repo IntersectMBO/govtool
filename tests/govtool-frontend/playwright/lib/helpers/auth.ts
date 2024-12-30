@@ -45,7 +45,7 @@ export async function createAuthWithUserName({
 
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
-  await proposalDiscussionPage.verifyIdentityBtn.click();
+  await proposalDiscussionPage.verifyIdentityBtn.click({ timeout: 15_000 });
 
   await proposalDiscussionPage.setUsername(mockValid.username());
 

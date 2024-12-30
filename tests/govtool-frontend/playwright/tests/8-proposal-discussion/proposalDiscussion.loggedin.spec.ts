@@ -3,10 +3,8 @@ import {
   proposal02Wallet,
   user01Wallet,
 } from "@constants/staticWallets";
-import { createTempUserAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
-import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import { Page, expect } from "@playwright/test";
@@ -130,20 +128,6 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
     await expect(
       page.getByTestId(`poll-${oppositeVote.toLowerCase()}-count`)
     ).not.toHaveText(`${oppositeVote}: (100%)`);
-  });
-});
-
-test.describe("Proposal created logged out state", () => {
-  let userPage: Page;
-
-  test.beforeEach(async ({ page, browser }) => {
-    const wallet = (await ShelleyWallet.generate()).json();
-    const tempUserAuth = await createTempUserAuth(page, wallet);
-
-    userPage = await createNewPageWithWallet(browser, {
-      storageState: tempUserAuth,
-      wallet,
-    });
   });
 });
 

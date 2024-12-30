@@ -7,12 +7,7 @@ import * as Sentry from "@sentry/react";
 import { NodeObject } from "jsonld";
 import { CertificatesBuilder } from "@emurgo/cardano-serialization-lib-asmjs";
 
-import {
-  CIP_119,
-  DREP_CONTEXT,
-  PATHS,
-  storageInformationErrorModals,
-} from "@consts";
+import { DREP_CONTEXT, PATHS, storageInformationErrorModals } from "@consts";
 import { useCardano, useModal, useAppContext } from "@context";
 import { MetadataValidationStatus } from "@models";
 import {
@@ -108,12 +103,11 @@ export const useRegisterAsdRepForm = (
         "motivations",
         "qualifications",
         "paymentAddress",
-        "references",
         "doNotList",
       ],
-      standardReference: CIP_119,
     });
-    const jsonld = await generateJsonld(body, DREP_CONTEXT, CIP_119);
+
+    const jsonld = await generateJsonld(body, DREP_CONTEXT);
 
     const jsonHash = blake2bHex(JSON.stringify(jsonld, null, 2), undefined, 32);
 

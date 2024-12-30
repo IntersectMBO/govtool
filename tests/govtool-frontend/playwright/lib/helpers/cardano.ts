@@ -1,4 +1,5 @@
-import test, { expect } from "@playwright/test";
+import environments from "@constants/environments";
+import test from "@playwright/test";
 import kuberService from "@services/kuberService";
 import { ProposalType, ProtocolParams } from "@types";
 import { allure } from "allure-playwright";
@@ -41,6 +42,15 @@ export async function skipIfNotHardFork() {
   if (currentProtocolVersion < 9) {
     await allure.description(
       "Govtool Features will be available after hardfork."
+    );
+    test.skip();
+  }
+}
+
+export async function skipIfMainnet() {
+  if (environments.networkId === 1) {
+    await allure.description(
+      "Ada spendable features are not available on mainnet."
     );
     test.skip();
   }

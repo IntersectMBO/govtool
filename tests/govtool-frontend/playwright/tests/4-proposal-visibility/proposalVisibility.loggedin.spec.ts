@@ -131,10 +131,28 @@ test("4C_3. Should filter and sort Governance Action Type on governance actions 
 });
 
 test("4L. Should search governance actions", async ({ page }) => {
-  const governanceActionTitle = "TreasuryTitle";
-  const governanceActionPage = new GovernanceActionsPage(page);
+  let governanceActionTitle = "TreasuryTitle";
+  await page.route("**/proposal/list?**", async (route) => {
+    const response = await route.fetch();
+    const data = await response.json();
+    const elementsWithTitle = data["elements"].filter(
+      (element) => element["title"]
+    );
+    if (elementsWithTitle.length !== 0) {
+      governanceActionTitle = elementsWithTitle[0]["title"];
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(data),
+    });
+  });
+  const responsePromise = page.waitForResponse("**/proposal/list?**");
 
+  const governanceActionPage = new GovernanceActionsPage(page);
   await governanceActionPage.goto();
+
+  await responsePromise;
 
   await governanceActionPage.searchInput.fill(governanceActionTitle);
 

@@ -11,6 +11,7 @@ import {
   GovernanceActionDetailsDiffView,
   GovernanceActionNewCommitteeDetailsTabContent,
   GovernanceActionCardTreasuryWithdrawalElement,
+  GovernanceActionNewConstitutionDetailsTabContent,
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
@@ -22,11 +23,7 @@ import {
   mapArrayToObjectByKeys,
   encodeCIP129Identifier,
 } from "@utils";
-import {
-  MetadataValidationStatus,
-  NewConstitutionAnchor,
-  ProposalData,
-} from "@models";
+import { MetadataValidationStatus, ProposalData } from "@models";
 import { GovernanceActionType } from "@/types/governanceAction";
 import { useAppContext } from "@/context";
 
@@ -200,6 +197,19 @@ export const GovernanceActionDetailsCardData = ({
           ),
           visible: type === GovernanceActionType.NewCommittee && !!details,
         },
+        {
+          label: "Details",
+          dataTestId: "parameters-tab",
+          content: (
+            <GovernanceActionNewConstitutionDetailsTabContent
+              details={details}
+            />
+          ),
+          visible:
+            type === GovernanceActionType.NewConstitution &&
+            !!details &&
+            !!details?.anchor,
+        },
       ].filter((tab) => tab.visible),
     [
       abstract,
@@ -307,26 +317,6 @@ export const GovernanceActionDetailsCardData = ({
             amount={withdrawal.amount}
           />
         ))}
-      {details?.anchor && type === GovernanceActionType.NewConstitution && (
-        <>
-          <GovernanceActionCardElement
-            isCopyButton
-            label="Data Hash"
-            text={
-              (details?.anchor as NewConstitutionAnchor)?.dataHash as string
-            }
-            dataTestId="new-constitution-data-hash"
-            textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
-          />
-          <GovernanceActionCardElement
-            isCopyButton
-            label="URL"
-            text={(details?.anchor as NewConstitutionAnchor)?.url as string}
-            dataTestId="new-constitution-url"
-            textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
-          />
-        </>
-      )}
       <GovernanceActionDetailsCardLinks links={references} />
     </Box>
   );

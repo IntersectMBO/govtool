@@ -12,6 +12,7 @@ import { setAllureEpic } from "@helpers/allure";
 import {
   skipIfTreasuryAndBootstrapping,
   skipIfNotHardFork,
+  isBootStrapingPhase,
 } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
@@ -140,6 +141,8 @@ test.describe("Proposal created logged state", () => {
         await proposalSubmissionPage.submitBtn.click();
 
         await expect(page.getByTestId("submit-as-GA-button")).toBeVisible();
+        const proposalDetailsPage = new ProposalDiscussionDetailsPage(page);
+
         await expect(proposalSubmissionPage.titleContent).toHaveText(
           proposal.prop_name
         );
@@ -158,6 +161,9 @@ test.describe("Proposal created logged state", () => {
         await expect(proposalSubmissionPage.linkTextContent).toHaveText(
           proposal.proposal_links[0].prop_link_text
         );
+
+        // cleanup
+        await proposalDetailsPage.deleteProposal();
       });
     });
   });
@@ -329,9 +335,11 @@ test.describe("Info Proposal Draft", () => {
     });
 
     const proposalSubmissionPage = new ProposalSubmissionPage(page);
-    const { proposalFormValue } = await proposalSubmissionPage.createDraft(
-      ProposalType.treasury
-    );
+    const createProposalType = (await isBootStrapingPhase())
+      ? ProposalType.info
+      : ProposalType.treasury;
+    const { proposalFormValue } =
+      await proposalSubmissionPage.createDraft(createProposalType);
     const draftCard = proposalSubmissionPage.getFirstDraft();
     const draftCardAllInnerText = await (await draftCard).allInnerTexts();
 
@@ -343,7 +351,7 @@ test.describe("Info Proposal Draft", () => {
       .click();
 
     await expect(proposalSubmissionPage.governanceActionType).toHaveText(
-      ProposalType.treasury
+      createProposalType
     );
     await expect(proposalSubmissionPage.titleInput).toHaveValue(
       proposalFormValue.prop_name
@@ -357,12 +365,16 @@ test.describe("Info Proposal Draft", () => {
     await expect(proposalSubmissionPage.rationaleInput).toHaveValue(
       proposalFormValue.prop_rationale
     );
-    await expect(proposalSubmissionPage.receivingAddressInput).toHaveValue(
-      proposalFormValue.prop_receiving_address
-    );
-    await expect(proposalSubmissionPage.amountInput).toHaveValue(
-      proposalFormValue.prop_amount
-    );
+
+    if (createProposalType === ProposalType.treasury) {
+      await expect(proposalSubmissionPage.receivingAddressInput).toHaveValue(
+        proposalFormValue.prop_receiving_address
+      );
+      await expect(proposalSubmissionPage.amountInput).toHaveValue(
+        proposalFormValue.prop_amount
+      );
+    }
+
     await expect(proposalSubmissionPage.linkUrlInput).toHaveValue(
       proposalFormValue.proposal_links[0].prop_link
     );
@@ -421,6 +433,9 @@ test.describe("Info Proposal Draft", () => {
     await proposalSubmissionPage.submitBtn.click();
 
     await expect(page.getByTestId("submit-as-GA-button")).toBeVisible();
+    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
+      page
+    );
     await expect(proposalSubmissionPage.titleContent).toHaveText(
       proposalFormValue.prop_name
     );
@@ -439,6 +454,9 @@ test.describe("Info Proposal Draft", () => {
     await expect(proposalSubmissionPage.linkTextContent).toHaveText(
       proposalFormValue.proposal_links[0].prop_link_text
     );
+
+    //cleanup
+    proposalDiscussionDetailsPage.deleteProposal();
   });
 });
 

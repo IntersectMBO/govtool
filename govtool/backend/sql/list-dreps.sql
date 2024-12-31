@@ -18,7 +18,7 @@ DRepActivity AS (
     epoch_no DESC
   LIMIT 1
 )
-SELECT
+SELECT DISTINCT ON (dh.raw)
   encode(dh.raw, 'hex'),
   dh.view,
   dh.has_script,
@@ -26,7 +26,7 @@ SELECT
   encode(va.data_hash, 'hex'),
   dr_deposit.deposit,
   DRepDistr.amount,
-  (DRepActivity.epoch_no - COALESCE(block.epoch_no, block_first_register.epoch_no)) <= DRepActivity.drep_activity AS active,
+  (DRepActivity.epoch_no - newestRegister.epoch_no) <= DRepActivity.drep_activity AS active,
   encode(dr_voting_anchor.tx_hash, 'hex') AS tx_hash,
   newestRegister.time AS last_register_time,
   COALESCE(latestDeposit.deposit, 0),
@@ -72,7 +72,7 @@ FROM
       drep_registration dr
       JOIN tx ON tx.id = dr.tx_id
     WHERE
-      dr.deposit IS NOT NULL AND dr.deposit >= 0
+      COALESCE(dr.deposit, 0) >= 0
   ) AS dr_voting_anchor ON dr_voting_anchor.drep_hash_id = dh.id AND dr_voting_anchor.rn = 1
   LEFT JOIN (
     SELECT
@@ -122,6 +122,7 @@ FROM
   LEFT JOIN block ON block.id = tx.block_id
   LEFT JOIN (
     SELECT
+      block.epoch_no,
       block.time,
       dr.drep_hash_id,
       ROW_NUMBER() OVER (PARTITION BY dr.drep_hash_id ORDER BY dr.tx_id DESC) AS rn
@@ -130,7 +131,7 @@ FROM
       JOIN tx ON tx.id = dr.tx_id
       JOIN block ON block.id = tx.block_id
     WHERE
-      NOT (dr.deposit < 0)
+      COALESCE(dr.deposit, 0) >= 0
   ) AS newestRegister ON newestRegister.drep_hash_id = dh.id AND newestRegister.rn = 1
   LEFT JOIN (
     SELECT
@@ -164,6 +165,7 @@ GROUP BY
   DRepActivity.drep_activity,
   dr_voting_anchor.tx_hash,
   newestRegister.time,
+  newestRegister.epoch_no,
   latestDeposit.deposit,
   non_deregister_voting_anchor.url,
   fetch_error.message,

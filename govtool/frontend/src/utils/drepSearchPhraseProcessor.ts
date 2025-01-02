@@ -4,7 +4,7 @@ import { decodeCIP129Identifier } from "./cip129identifier";
  * Processes the search phrase for dRep and returns the dRep ID.
  * If the phrase starts with "drep_script" or "drep",
  * it decodes the CIP129 identifier and extracts the transaction ID.
- * If the transaction ID starts with "22" or "23", it returns the ID without the prefix.
+ * If the DRep ID starts with "22" or "23", it returns the ID without the prefix.
  * If any error occurs during processing, it returns the original phrase.
  *
  * @param phrase - The search phrase to be processed.

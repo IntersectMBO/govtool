@@ -114,7 +114,7 @@ yarn dev
 
 #### Using Nix and Direnv
 
-1. Get [Nix](https://nixos.org/download).
+1. Get [Nix](https://nixos.org/download) (And/Or) Get [GHCUP](https://www.haskell.org/ghcup/).
 
 2. Get [direnv](https://direnv.net/).
 

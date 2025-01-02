@@ -6,6 +6,8 @@ const blake = require("blakejs");
 
 import * as fs from "fs";
 import { ShelleyWallet } from "./crypto";
+import { calculateImageSHA256 } from "./dRep";
+import { imageObject } from "@types";
 
 export async function downloadMetadata(download: Download): Promise<{
   name: string;
@@ -21,7 +23,18 @@ export async function downloadMetadata(download: Download): Promise<{
 async function calculateMetadataHash() {
   try {
     const paymentAddress = (await ShelleyWallet.generate()).addressBech32(0);
-    const data = JSON.stringify(mockValid.metadata(paymentAddress), null, 2);
+    const imageUrl = faker.image.avatarGitHub();
+    const imageSHA256 = (await calculateImageSHA256(imageUrl)) || "";
+    const imageObject: imageObject = {
+      "@type": "ImageObject",
+      contentUrl: imageUrl,
+      sha256: imageSHA256,
+    };
+    const data = JSON.stringify(
+      mockValid.metadata(paymentAddress, imageObject),
+      null,
+      2
+    );
 
     const buffer = Buffer.from(data, "utf8");
     const hexDigest = blake.blake2bHex(buffer, null, 32);

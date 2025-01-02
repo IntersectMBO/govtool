@@ -11,6 +11,7 @@ export GOVTOOL_TAG
 
 . ./scripts/deploy-stack.sh
 
+load_env
 check_env
 
 # Build images

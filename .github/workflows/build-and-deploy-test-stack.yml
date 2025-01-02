@@ -87,10 +87,6 @@ jobs:
             IPFS_PROJECT_ID=${{ secrets.IPFS_PROJECT_ID }}
             EOF
 
-            # Source the .env file
-            echo "Sourcing .env file..."
-            source "$ENV_FILE"
-
             # Execute the build-and-deploy.sh script
             ./build-and-deploy.sh update-images
             yes | docker system prune -f || echo "Ignoring system prune error"

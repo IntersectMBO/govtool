@@ -22,7 +22,7 @@ services:
     environment:
       APP_ENV: ${APP_ENV:-test}
       VIRTUAL_HOST: https://${BASE_DOMAIN}/api/ -> :8080/
-      VIRTUAL_HOST_2: https://${BASE_DOMAIN}/swagger -> :8080/swagger
+      VIRTUAL_HOST_2: https://${BASE_DOMAIN}/swagger -> :8080
     networks:
       - frontend
       - postgres
@@ -65,7 +65,7 @@ services:
     build:
       context: ../../govtool/metadata-validation
     environment:
-      VIRTUAL_HOST: https://${BASE_DOMAIN}/metadata-validation/ -> :3000
+      VIRTUAL_HOST: https://${BASE_DOMAIN}/metadata-validation/ -> :3000/
       PORT: "3000"
     networks:
       - frontend

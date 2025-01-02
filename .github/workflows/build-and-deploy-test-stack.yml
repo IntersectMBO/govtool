@@ -57,24 +57,40 @@ jobs:
               git checkout --force "$GOVTOOL_TAG"
             fi
 
-            # Execute the build-and-deploy.sh script
             cd $DEST_DIR/tests/test-infrastructure
+
+            # Create a backup of the .env file if it exists
+            ENV_FILE="$DEST_DIR/.env"
+            if [ -f "$ENV_FILE" ]; then
+              TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+              BACKUP_FILE="${ENV_FILE}_backup_$TIMESTAMP"
+              echo "Backing up existing .env file to $BACKUP_FILE..."
+              cp "$ENV_FILE" "$BACKUP_FILE"
+            fi
+
+            echo "Writing environment variables to .env file..."
+            cat <<EOF > "$ENV_FILE"
+            GOVTOOL_TAG=${{ github.sha }}
+            GRAFANA_ADMIN_PASSWORD=${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+            GRAFANA_SLACK_RECIPIENT=${{ secrets.GRAFANA_SLACK_RECIPIENT }}
+            GRAFANA_SLACK_OAUTH_TOKEN=${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
+            SENTRY_DSN_BACKEND=${{ secrets.SENTRY_DSN_BACKEND }}
+            GTM_ID=${{ secrets.GTM_ID }}
+            NPMRC_TOKEN=${{ secrets.NPMRC_TOKEN }}
+            SENTRY_DSN_FRONTEND=${{ secrets.SENTRY_DSN_FRONTEND }}
+            PIPELINE_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            USERSNAP_SPACE_API_KEY=${{ secrets.USERSNAP_SPACE_API_KEY }}
+            APP_ENV=test
+            PDF_API_URL=${{ secrets.PDF_API_URL }}
+            KUBER_API_KEY=${{ secrets.KUBER_API_KEY }}
+            IPFS_GATEWAY=${{ secrets.IPFS_GATEWAY }}
+            IPFS_PROJECT_ID=${{ secrets.IPFS_PROJECT_ID }}
+            EOF
+
+            # Source the .env file
+            echo "Sourcing .env file..."
+            source "$ENV_FILE"
+
+            # Execute the build-and-deploy.sh script
             ./build-and-deploy.sh update-images
-            yes | docker system prune -f || echo "Ignoring system prune eror"
-          envs: GOVTOOL_TAG, GRAFANA_ADMIN_PASSWORD, GRAFANA_SLACK_RECIPIENT, GRAFANA_SLACK_OAUTH_TOKEN, SENTRY_DSN_BACKEND, GTM_ID, NPMRC_TOKEN, SENTRY_DSN_FRONTEND, PIPELINE_URL, USERSNAP_SPACE_API_KEY, APP_ENV, PDF_API_URL, KUBER_API_KEY, IPFS_GATEWAY, IPFS_PROJECT_ID
-        env:
-          GOVTOOL_TAG: ${{ github.sha }}
-          GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
-          GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
-          GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
-          SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
-          GTM_ID: ${{ secrets.GTM_ID }}
-          NPMRC_TOKEN: ${{ secrets.NPMRC_TOKEN }}
-          SENTRY_DSN_FRONTEND: ${{ secrets.SENTRY_DSN_FRONTEND }}
-          PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
-          APP_ENV: test
-          PDF_API_URL: ${{ secrets.PDF_API_URL }}
-          KUBER_API_KEY: ${{ secrets.KUBER_API_KEY }}
-          IPFS_GATEWAY: $${{secrets.IPFS_GATEWAY}}
-          IPFS_PROJECT_ID: $${{secrets.IPFS_PROJECT_ID}}
+            yes | docker system prune -f || echo "Ignoring system prune error"

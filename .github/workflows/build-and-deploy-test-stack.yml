@@ -42,25 +42,25 @@ jobs:
                 cd $DEST_DIR || exit
                 echo "Updating repository..."
                 git fetch --all
-                git checkout --force "$GOVTOOL_TAG"
+                git checkout --force "${{ github.sha }}"
               else
                 echo "Not a git repository. Re-cloning..."
                 rm -rf "$DEST_DIR"
                 git clone "$REPO_URL" "$DEST_DIR"
                 cd "$DEST_DIR" || exit
-                git checkout --force "$GOVTOOL_TAG"
+                git checkout --force "${{ github.sha }}"
               fi
             else
               echo "Directory does not exist. Cloning repository..."
               git clone "$REPO_URL" "$DEST_DIR"
               cd "$DEST_DIR" || exit
-              git checkout --force "$GOVTOOL_TAG"
+              git checkout --force "${{ github.sha }}"
             fi
 
             cd $DEST_DIR/tests/test-infrastructure
 
             # Create a backup of the .env file if it exists
-            ENV_FILE="$DEST_DIR/.env"
+            ENV_FILE=".env"
             if [ -f "$ENV_FILE" ]; then
               TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
               BACKUP_FILE="${ENV_FILE}_backup_$TIMESTAMP"

@@ -37,3 +37,26 @@ export async function fetchFirstActiveDRepDetails(page: Page) {
   await dRepDirectoryPage.searchInput.click();
   return { dRepGivenName, dRepId, dRepDirectoryPage };
 }
+
+export async function calculateImageSHA256(imageUrl: string) {
+  const toHex = (buffer: ArrayBuffer) => {
+    return Array.from(new Uint8Array(buffer))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+  };
+  try {
+    if (imageUrl == "") {
+      return "";
+    }
+    const response = await fetch(imageUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.statusText}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+    return toHex(hashBuffer);
+  } catch (error) {
+    console.error("Error calculating SHA256:", error);
+    return null;
+  }
+}

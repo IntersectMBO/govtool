@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { generateExactLengthText } from "@helpers/string";
+import { imageObject } from "@types";
 
 export const invalid = {
   url: (isSupportedGreaterThan128Words = true) => {
@@ -139,8 +140,9 @@ export const valid = {
     return `ipfs://${randomCID}`;
   },
 
-  metadata: (paymentAddress: string) => ({
+  metadata: (paymentAddress: string, imageObject: imageObject) => ({
     "@context": {
+      "@language": "en-us",
       CIP100:
         "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#",
       CIP119:
@@ -170,7 +172,12 @@ export const valid = {
           },
           paymentAddress: "CIP119:paymentAddress",
           givenName: "CIP119:givenName",
-          image: "CIP119:image",
+          image: {
+            "@id": "CIP119:image",
+            "@context": {
+              ImageObject: "https://schema.org/ImageObject",
+            },
+          },
           objectives: "CIP119:objectives",
           motivations: "CIP119:motivations",
           qualifications: "CIP119:qualifications",
@@ -197,6 +204,7 @@ export const valid = {
     hashAlgorithm: "blake2b-256",
     body: {
       givenName: faker.person.firstName(),
+      image: imageObject,
       motivations: faker.lorem.paragraph(2),
       objectives: faker.lorem.paragraph(2),
       paymentAddress: paymentAddress,

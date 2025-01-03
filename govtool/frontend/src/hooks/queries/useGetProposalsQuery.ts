@@ -10,6 +10,7 @@ export const useGetProposalsQuery = ({
   filters = [],
   searchPhrase,
   sorting,
+  enabled,
 }: GetProposalsArguments) => {
   const { dRepID, pendingTransaction } = useCardano();
   const { voter } = useGetVoterInfo();
@@ -42,6 +43,9 @@ export const useGetProposalsQuery = ({
       pendingTransaction.vote?.transactionHash,
     ],
     fetchProposals,
+    {
+      enabled,
+    },
   );
 
   const proposals = Object.values(groupByType(data) ?? []);

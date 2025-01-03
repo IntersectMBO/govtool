@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix CIP-129 DRep view identifier for script based DReps [Issue 2583](https://github.com/IntersectMBO/govtool/issues/2583)
 
 ### Changed
 

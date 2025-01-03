@@ -3,7 +3,7 @@
 Installed on your machine:
 
 1. Node.js >= 18 ([official website](https://nodejs.org/en))
-2. npm or yarn (recommended) - for package management
+2. npm - for package management
 
 Clone the project
 
@@ -25,22 +25,10 @@ Install dependencies
 npm install
 ```
 
-or (recommended)
-
-```bash
-yarn install
-```
-
 Start the server
 
 ```bash
 npm run dev
-```
-
-or (recommended)
-
-```bash
-yarn dev
 ```
 
 ## Developing
@@ -94,22 +82,10 @@ To automatically set correct node version:
 npm install
 ```
 
-or (recommended)
-
-```bash
-yarn install
-```
-
 2. Launch Server
 
 ```bash
 npm run dev
-```
-
-or (recommended)
-
-```bash
-yarn dev
 ```
 
 #### Using Nix and Direnv
@@ -135,10 +111,10 @@ direnv allow
 5. Run project
 
 ```sh
-yarn dev
+npm run dev
 ```
 
-_To update the yarn.lock file after changes are made, run `nix develop .#js` for a developer shell with correct yarn/nodejs versions_
+_To update the package-lock.json file after changes are made, run `nix develop .#js` for a developer shell with correct nodejs version_
 
 ## After development
 
@@ -152,7 +128,7 @@ We distinguish two types of users:
 #### without a connected wallet who can:
 
 1. See the governance actions along with their details and the number of votes
-<!-- 2. See the list of DReps. -->
+2. See the list of DReps.
 
 #### with connected wallet who can:
 
@@ -162,4 +138,4 @@ We distinguish two types of users:
 4.  Register as DRrep or Direct Voter.
 5.  Vote for the Governance Actions of his or her choice (if the user is registered).
 6.  Create their own Governance Action.
-<!-- 7. See the list of DReps from which they can submit their vote. -->
+7.  See the list of DReps from which they can submit their vote.

@@ -63,7 +63,7 @@ export const Footer = () => {
         }}
       >
         <Typography fontWeight={500} variant="caption">
-          {t("footer.copyright")}
+          {t("footer.copyright", { year: new Date().getFullYear() })}
         </Typography>
         <Box
           sx={{

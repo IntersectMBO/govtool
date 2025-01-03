@@ -14,6 +14,7 @@ export type GetProposalsArguments = {
   pageSize?: number;
   sorting?: string;
   searchPhrase?: string;
+  enabled?: boolean;
 };
 
 export const getProposals = async ({

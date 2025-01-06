@@ -20,7 +20,7 @@ changes.
 
 ### Changed
 
--
+- Reduce CSL version to 12.1.1 [Issue 2600](https://github.com/IntersectMBO/govtool/issues/2600)
 
 ### Removed
 

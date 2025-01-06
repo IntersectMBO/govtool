@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Fix CIP-129 DRep view identifier for script based DReps [Issue 2583](https://github.com/IntersectMBO/govtool/issues/2583)
+- Fix fetching metadata from IPFS gateway
 - Fix bad request on passing the random sorting to GA list request [Issue 2535](https://github.com/IntersectMBO/govtool/issues/2535)
 - Fix wrong drep activity conditions
 

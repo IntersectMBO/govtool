@@ -35,7 +35,7 @@
           frontend = frontend.devShell;
           # shell with js dependencies only if yarn.lock is broken and needs fixed
           js = defaultPkgs.mkShell {
-            buildInputs = [ nodePkgs.nodejs_18 nodePkgs.yarn ];
+            buildInputs = [ nodePkgs.nodejs_20 nodePkgs.yarn ];
           };
         };
       });

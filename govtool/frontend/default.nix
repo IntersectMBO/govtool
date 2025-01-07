@@ -1,11 +1,16 @@
 { pkgs ? import <nixpkgs> {}
 , incl
-, VITE_BASE_URL ? "http://localhost"
+, VITE_BASE_URL ? "http://localhost:9999"
 , VITE_IS_DEV ? "true"
 , VITE_GTM_ID ? ""
 , VITE_SENTRY_DSN ? ""
 , VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED ? ""
 , VITE_PDF_API_URL ? ""
+, VITE_APP_ENV ? "development"
+, VITE_METADATA_API_URL ? "http://localhost:3000"
+, VITE_USERSNAP_SPACE_API_KEY ? ""
+, VITE_IPFS_GATEWAY ? "https://ipfs.io/ipfs"
+, VITE_IPFS_PROJECT_ID ? ""
 , CARDANO_NETWORK ? "sanchonet"
 }:
 let
@@ -25,12 +30,12 @@ let
     src = frontendSrc;
     packageJSON = ./package.json;
     yarnLock = ./yarn.lock;
-    nodejs = pkgs.nodejs_18;
+    nodejs = pkgs.nodejs_20;
   };
   staticSite = pkgs.stdenv.mkDerivation {
     name = "govtool-website";
     src = frontendSrc;
-    buildInputs = [(pkgs.yarn.override { nodejs = pkgs.nodejs_18;}) nodeModules];
+    buildInputs = [(pkgs.yarn.override { nodejs = pkgs.nodejs_20;}) nodeModules];
     inherit VITE_BASE_URL VITE_IS_DEV VITE_GTM_ID VITE_SENTRY_DSN VITE_NETWORK_FLAG VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED VITE_PDF_API_URL;
     buildPhase = ''
       cp -R ${nodeModules}/libexec/@govtool/frontend/node_modules node_modules
@@ -73,7 +78,7 @@ let
     ${pkgs.nginx}/bin/nginx -c ${nginxConfig} -e /dev/stderr
   '';
   devShell = pkgs.mkShell {
-    buildInputs = [pkgs.nodejs_18 pkgs.yarn];
+    buildInputs = [pkgs.nodejs_20 pkgs.yarn];
     shellHook = ''
       function warn() { tput setaf $2; echo "$1"; tput sgr0; }
 

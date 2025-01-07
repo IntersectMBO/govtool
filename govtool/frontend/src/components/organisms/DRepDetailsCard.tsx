@@ -47,6 +47,7 @@ export const DRepDetailsCard = ({
     view,
     drepId,
     votingPower,
+    isScriptBased,
   } = dRepData;
 
   const groupedReferences = references?.reduce<Record<string, Reference[]>>(
@@ -120,8 +121,8 @@ export const DRepDetailsCard = ({
         >
           <CopyableText
             value={encodeCIP129Identifier({
-              txID: `22${drepId}`,
-              bech32Prefix: "drep",
+              txID: `${isScriptBased ? "23" : "22"}${drepId}`,
+              bech32Prefix: isScriptBased ? "drep_script" : "drep",
             })}
             dataTestId="copy-cip-129-drep-id-button"
           />

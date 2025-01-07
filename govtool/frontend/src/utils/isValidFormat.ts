@@ -1,5 +1,6 @@
 import {
   Address,
+  DRep,
   RewardAddress,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 import i18n from "@/i18n";
@@ -51,4 +52,14 @@ export async function isReceivingAddress(address?: string) {
   } catch (e) {
     return i18n.t("forms.errors.mustBeReceivingAddress");
   }
+}
+
+export async function isDRepView(view?: string) {
+  if (!view) {
+    return true;
+  }
+  if (DRep.from_bech32(view)) {
+    return true;
+  }
+  return i18n.t("forms.errors.mustBeDRepView");
 }

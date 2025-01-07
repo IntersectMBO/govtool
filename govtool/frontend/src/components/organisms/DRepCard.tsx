@@ -34,6 +34,7 @@ export const DRepCard = ({
     metadataStatus,
     image,
     drepId,
+    isScriptBased,
   },
   isConnected,
   isDelegationLoading,
@@ -59,8 +60,8 @@ export const DRepCard = ({
     });
 
   const cip129Identifier = encodeCIP129Identifier({
-    txID: `22${drepId}`,
-    bech32Prefix: "drep",
+    txID: `${isScriptBased ? "23" : "22"}${drepId}`,
+    bech32Prefix: isScriptBased ? "drep_script" : "drep",
   });
 
   return (

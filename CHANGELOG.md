@@ -26,6 +26,27 @@ changes.
 
 -
 
+## [v2.0.4](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.4) 2025-01-07
+
+### Added
+
+-
+
+### Fixed
+
+- Fix CIP-129 DRep view identifier for script based DReps [Issue 2583](https://github.com/IntersectMBO/govtool/issues/2583)
+- Fix fetching metadata from IPFS gateway
+- Fix bad request on passing the random sorting to GA list request [Issue 2535](https://github.com/IntersectMBO/govtool/issues/2535)
+- Fix wrong drep activity conditions
+
+### Changed
+
+- Reduce CSL version to 12.1.1 [Issue 2600](https://github.com/IntersectMBO/govtool/issues/2600)
+
+### Removed
+
+-
+
 ## [v2.0.3](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.3) 2024-12-30
 
 ### Added

@@ -17,6 +17,24 @@ DRepActivity AS (
   ORDER BY
     epoch_no DESC
   LIMIT 1
+),
+LatestVotingProcedure AS (
+  SELECT
+    vp.*,
+    ROW_NUMBER() OVER (PARTITION BY drep_voter ORDER BY tx_id DESC) AS rn
+  FROM
+    voting_procedure vp
+),
+LatestVoteEpoch AS (
+  SELECT
+    block.epoch_no,
+    lvp.drep_voter as drep_id
+  FROM
+    LatestVotingProcedure lvp
+    JOIN tx ON tx.id = lvp.tx_id
+    JOIN block ON block.id = tx.block_id
+  WHERE
+    lvp.rn = 1
 )
 SELECT DISTINCT ON (dh.raw)
   encode(dh.raw, 'hex'),
@@ -26,7 +44,7 @@ SELECT DISTINCT ON (dh.raw)
   encode(va.data_hash, 'hex'),
   dr_deposit.deposit,
   DRepDistr.amount,
-  (DRepActivity.epoch_no - newestRegister.epoch_no) <= DRepActivity.drep_activity AS active,
+  (DRepActivity.epoch_no - GREATEST(MAX(COALESCE(block.epoch_no, block_first_register.epoch_no)), lve.epoch_no)) <= DRepActivity.drep_activity AS active,
   encode(dr_voting_anchor.tx_hash, 'hex') AS tx_hash,
   newestRegister.time AS last_register_time,
   COALESCE(latestDeposit.deposit, 0),
@@ -143,6 +161,7 @@ FROM
   ) AS dr_first_register ON dr_first_register.drep_hash_id = dh.id AND dr_first_register.rn = 1
   LEFT JOIN tx AS tx_first_register ON tx_first_register.id = dr_first_register.tx_id
   LEFT JOIN block AS block_first_register ON block_first_register.id = tx_first_register.block_id
+  LEFT JOIN LatestVoteEpoch lve ON lve.drep_id = dh.id
 WHERE
   (
     COALESCE(?, '') = '' OR
@@ -163,6 +182,7 @@ GROUP BY
   DRepDistr.amount,
   DRepActivity.epoch_no,
   DRepActivity.drep_activity,
+  lve.epoch_no,
   dr_voting_anchor.tx_hash,
   newestRegister.time,
   newestRegister.epoch_no,

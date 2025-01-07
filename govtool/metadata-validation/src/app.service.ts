@@ -32,6 +32,8 @@ export class AppService {
         this.httpService
           .get(url, {
             headers: {
+              // Required to not being blocked by APIs that require a User-Agent
+              'User-Agent': 'GovTool/Metadata-Validation-Tool',
               'Content-Type': 'application/json',
               ...(isIPFS &&
                 process.env.IPFS_PROJECT_ID && {

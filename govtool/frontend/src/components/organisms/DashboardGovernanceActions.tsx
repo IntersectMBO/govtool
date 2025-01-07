@@ -67,7 +67,8 @@ const StyledTab = styled((props: StyledTabProps) => (
 }));
 
 export const DashboardGovernanceActions = () => {
-  const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
+  const { debouncedSearchText, isAdjusting, ...dataActionsBarProps } =
+    useDataActionsBar();
   const { chosenFilters, chosenSorting } = dataActionsBarProps;
   const { voter } = useGetVoterInfo();
   const { isMobile } = useScreenDimension();
@@ -81,6 +82,7 @@ export const DashboardGovernanceActions = () => {
     filters: queryFilters,
     sorting: chosenSorting,
     searchPhrase: debouncedSearchText,
+    enabled: !isAdjusting,
   });
 
   const { state } = useLocation();

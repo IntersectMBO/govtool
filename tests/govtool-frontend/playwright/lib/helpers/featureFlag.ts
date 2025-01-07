@@ -18,11 +18,7 @@ export const areDRepVoteTotalsDisplayed = async (proposal: IProposal) => {
     );
   }
 
-  return ![
-    GovernanceActionType.NoConfidence,
-    GovernanceActionType.NewCommittee,
-    GovernanceActionType.UpdatetotheConstitution,
-  ].includes(proposal.type as GovernanceActionType);
+  return true;
 };
 
 export const areSPOVoteTotalsDisplayed = async (proposal: IProposal) => {

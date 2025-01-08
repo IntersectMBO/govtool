@@ -135,9 +135,6 @@ export default class DRepDirectoryPage {
       convertDRepToCIP129(dRep.drepId)
     );
 
-    console.log(cip129DRepListApi);
-    console.log(cip129DRepListFE);
-
     for (let i = 0; i <= cip105DRepListFE.length - 1; i++) {
       await expect(cip105DRepListFE[i]).toHaveText(dRepList[i].view);
       await expect(cip129DRepListFE[i]).toHaveText(

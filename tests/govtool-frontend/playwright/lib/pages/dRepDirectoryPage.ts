@@ -132,7 +132,7 @@ export default class DRepDirectoryPage {
     const cip129DRepListFE = await this.getAllListedCIP129DRepIds();
 
     const cip129DRepListApi = dRepList.map((dRep) =>
-      convertDRepToCIP129(dRep.drepId)
+      convertDRepToCIP129(dRep.drepId, dRep.isScriptBased)
     );
 
     for (let i = 0; i <= cip105DRepListFE.length - 1; i++) {

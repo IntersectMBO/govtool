@@ -95,6 +95,29 @@ export const DashboardDrawerMobile = ({
                       }}
                       isConnectWallet
                     />
+                    {navItem.childNavItems && (
+                      <Grid
+                        container
+                        direction="column"
+                        rowGap={4}
+                        mt={3}
+                        px={3}
+                      >
+                        {navItem.childNavItems.map((childItem) => (
+                          <Link
+                            key={childItem.label}
+                            {...childItem}
+                            size="big"
+                            onClick={() => {
+                              // eslint-disable-next-line no-unused-expressions
+                              childItem.newTabLink && openInNewTab(childItem.newTabLink);
+                              setIsDrawerOpen(false);
+                            }}
+                            isConnectWallet
+                          />
+                        ))}
+                      </Grid>
+                    )}
                   </Grid>
                 );
               })}

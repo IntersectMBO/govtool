@@ -19,12 +19,18 @@ export const Dashboard = () => {
 
   const getPageTitle = (path: string) => {
     if (path === PATHS.dashboard) return t("dashboard.title");
-    return (
-      Object.values(CONNECTED_NAV_ITEMS).find(({ navTo }) =>
-        pathname.startsWith(navTo),
-      )?.label ?? ""
-    );
+    return findNavItem(CONNECTED_NAV_ITEMS, path) ?? "";
   };
+  
+  const findNavItem = (items: NavItem[], targetPath: string): string | null => (
+    items.reduce<string | null>((result, item) => (
+      result ?? (
+        targetPath === item.navTo 
+          ? item.label 
+          : (item.childNavItems ? findNavItem(item.childNavItems, targetPath) : null)
+      )
+    ), null)
+  );
 
   useEffect(() => {
     if (divRef.current && pathname !== PATHS.dashboardGovernanceActions) {

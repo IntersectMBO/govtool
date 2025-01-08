@@ -2,7 +2,7 @@ import { useCallback, useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 
 import { Modal, ScrollToTop } from "@atoms";
-import { PATHS, PDF_PATHS } from "@consts";
+import { PATHS, PDF_PATHS, OUTCOMES_PATHS, USER_PATHS } from "@consts";
 import { useCardano, useFeatureFlag, useModal } from "@context";
 import { useWalletConnectionListener } from "@hooks";
 import {
@@ -39,6 +39,7 @@ import {
 import { PublicRoute } from "./pages/PublicRoute";
 import { TopBanners } from "./components/organisms/TopBanners";
 import { DashboardHome } from "./pages/DashboardHome";
+import { GovernanceActionOutComesPillar } from "./pages/GovernanceActionOutComes";
 
 export default () => {
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
@@ -111,6 +112,14 @@ export default () => {
               element={<ProposalDiscussionPillar />}
             />
           )}
+          <Route
+            path={`${OUTCOMES_PATHS.governanceActionsOutcomes}/*`}
+            element={<GovernanceActionOutComesPillar />}
+          />
+          <Route
+            path={USER_PATHS.governanceActionsVotedByMe}
+            element={<GovernanceActionOutComesPillar />}
+          />
           <Route
             path={PATHS.dashboardGovernanceActions}
             element={<DashboardGovernanceActions />}

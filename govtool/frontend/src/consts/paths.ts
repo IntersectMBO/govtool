@@ -31,3 +31,12 @@ export const PDF_PATHS = {
   proposalDiscussionProposal: "/proposal_discussion/:id",
   proposalDiscussionPropose: "/proposal_discussion/propose",
 };
+
+export const USER_PATHS = {
+  governanceActionsVotedByMe: "/my/votes_and_favorites",
+};
+
+export const OUTCOMES_PATHS = {
+  governanceActionsOutcomes: "/outcomes",
+  governanceActionsLiveVoting: "/connected/governance_actions",
+};

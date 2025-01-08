@@ -64,6 +64,30 @@ export const Drawer = () => {
                     : undefined
                 }
               />
+              {navItem.childNavItems && (
+                <Grid
+                  columns={1}
+                  container
+                  display="flex"
+                  flex={1}
+                  flexDirection="column"
+                  mt={2}
+                  px={3}
+                  rowGap={2}
+                >
+                  {navItem.childNavItems.map((childItem) => (
+                    <DrawerLink
+                      key={childItem.label}
+                      {...childItem}
+                      onClick={
+                        childItem.newTabLink
+                          ? () => openInNewTab(childItem.newTabLink!)
+                          : undefined
+                      }
+                    />
+                  ))}
+                </Grid>
+              )}
             </Grid>
           );
         })}

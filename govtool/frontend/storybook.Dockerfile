@@ -16,6 +16,8 @@ FROM node:18-alpine as builder
 ARG NPMRC_TOKEN
 WORKDIR /src
 
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 COPY --from=deps /src/node_modules ./node_modules
 COPY . .
 

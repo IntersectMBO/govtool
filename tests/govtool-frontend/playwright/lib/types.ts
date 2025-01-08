@@ -237,3 +237,9 @@ export type EpochParams = {
   pvtpp_security_group: number | null;
   treasury_growth_rate: number | null;
 };
+
+export interface imageObject {
+  "@type": "ImageObject";
+  contentUrl: string;
+  sha256: string;
+}

@@ -292,7 +292,7 @@
     }
   },
   "footer": {
-    "copyright": "© 2024 Intersect MBO",
+    "copyright": "© {{year}} Intersect MBO",
     "privacyPolicy": "Privacy policy",
     "termOfService": "Terms of Use"
   },

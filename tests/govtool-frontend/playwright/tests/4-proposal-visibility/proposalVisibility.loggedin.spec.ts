@@ -131,15 +131,15 @@ test("4C_3. Should filter and sort Governance Action Type on governance actions 
 });
 
 test("4L. Should search governance actions", async ({ page }) => {
-  let governanceActionTitle = "TreasuryTitle";
+  let governanceActionId: string;
   await page.route("**/proposal/list?**", async (route) => {
     const response = await route.fetch();
     const data = await response.json();
-    const elementsWithTitle = data["elements"].filter(
-      (element) => element["title"]
+    const elementsWithIds = data["elements"].map(
+      (element) => element["txHash"] + "#" + element["index"]
     );
-    if (elementsWithTitle.length !== 0) {
-      governanceActionTitle = elementsWithTitle[0]["title"];
+    if (elementsWithIds.length !== 0) {
+      governanceActionId = elementsWithIds[0];
     }
     await route.fulfill({
       status: 200,
@@ -154,14 +154,14 @@ test("4L. Should search governance actions", async ({ page }) => {
 
   await responsePromise;
 
-  await governanceActionPage.searchInput.fill(governanceActionTitle);
+  await governanceActionPage.searchInput.fill(governanceActionId);
 
   const proposalCards = await governanceActionPage.getAllProposals();
 
   for (const proposalCard of proposalCards) {
-    expect(
-      (await proposalCard.textContent()).includes(`${governanceActionTitle}`)
-    ).toBeTruthy();
+    await expect(
+      proposalCard.getByTestId(`${governanceActionId}-id`)
+    ).toBeVisible();
   }
 });
 

@@ -1,3 +1,4 @@
+import { convertDRepToCIP129 } from "@helpers/dRep";
 import { Locator, Page, expect } from "@playwright/test";
 import { IDRep } from "@types";
 import environments from "lib/constants/environments";
@@ -127,23 +128,42 @@ export default class DRepDirectoryPage {
     }
 
     // Frontend validation
-    const dRepListFE = await this.getAllListedDRepIds();
+    const cip105DRepListFE = await this.getAllListedCIP105DRepIds();
+    const cip129DRepListFE = await this.getAllListedCIP129DRepIds();
 
-    for (let i = 0; i <= dRepListFE.length - 1; i++) {
-      await expect(dRepListFE[i]).toHaveText(dRepList[i].view);
+    const cip129DRepListApi = dRepList.map((dRep) =>
+      convertDRepToCIP129(dRep.drepId, dRep.isScriptBased)
+    );
+
+    for (let i = 0; i <= cip105DRepListFE.length - 1; i++) {
+      await expect(cip105DRepListFE[i]).toHaveText(dRepList[i].view);
+      await expect(cip129DRepListFE[i]).toHaveText(
+        `(CIP-129) ${cip129DRepListApi[i]}`
+      );
     }
   }
   getDRepCard(dRepId: string) {
     return this.page.getByTestId(`${dRepId}-drep-card`);
   }
 
-  async getAllListedDRepIds() {
+  async getAllListedCIP105DRepIds() {
     await this.page.waitForTimeout(2_000);
 
-    return await this.page
-      .getByRole("list")
-      .locator('[data-testid$="-copy-id-button"]')
-      .all();
+    const dRepCards = await this.getAllListedDReps();
+
+    return dRepCards.map((dRep) =>
+      dRep.locator('[data-testid$="-copy-id-button"]').first()
+    );
+  }
+
+  async getAllListedCIP129DRepIds() {
+    await this.page.waitForTimeout(2_000);
+
+    const dRepCards = await this.getAllListedDReps();
+
+    return dRepCards.map((dRep) =>
+      dRep.locator('[data-testid$="-copy-id-button"]').last()
+    );
   }
 
   async getAllListedDReps() {

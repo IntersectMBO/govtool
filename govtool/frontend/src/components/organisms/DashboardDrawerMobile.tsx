@@ -18,7 +18,7 @@ export const DashboardDrawerMobile = ({
   isDrawerOpen,
   setIsDrawerOpen,
 }: DashboardDrawerMobileProps) => {
-  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
+  const { isProposalDiscussionForumEnabled, isGovernanceOutcomesPillarEnabled } = useFeatureFlag();
   const { screenWidth } = useScreenDimension();
   const { voter } = useGetVoterInfo();
 
@@ -75,22 +75,15 @@ export const DashboardDrawerMobile = ({
             </Box>
             <Grid container direction="column" rowGap={4} mt={6}>
               {CONNECTED_NAV_ITEMS.map((navItem) => {
-                if (
-                  !isProposalDiscussionForumEnabled &&
-                  navItem.dataTestId === "proposal-discussion-link"
-                ) {
-                  return null;
-                }
-
                 return (
                   <Grid item>
                     <Link
                       {...navItem}
                       size="big"
                       onClick={() => {
-                        // TODO: Refine if it is needed to remove this eslint-disable
-                        // eslint-disable-next-line no-unused-expressions
-                        navItem.newTabLink && openInNewTab(navItem.newTabLink);
+                        if (navItem.newTabLink) {
+                          openInNewTab(navItem.newTabLink);
+                        }
                         setIsDrawerOpen(false);
                       }}
                       isConnectWallet
@@ -101,21 +94,39 @@ export const DashboardDrawerMobile = ({
                         direction="column"
                         rowGap={4}
                         mt={3}
-                        px={3}
+                        pl={3}
                       >
-                        {navItem.childNavItems.map((childItem) => (
-                          <Link
-                            key={childItem.label}
-                            {...childItem}
-                            size="big"
-                            onClick={() => {
-                              // eslint-disable-next-line no-unused-expressions
-                              childItem.newTabLink && openInNewTab(childItem.newTabLink);
-                              setIsDrawerOpen(false);
-                            }}
-                            isConnectWallet
-                          />
-                        ))}
+                        {navItem.childNavItems.map((childItem) => {
+                          if (
+                            !isProposalDiscussionForumEnabled &&
+                            childItem.dataTestId === "proposal-discussion-link"
+                          ) {
+                            return null;
+                          }
+
+                          if (
+                            !isGovernanceOutcomesPillarEnabled &&
+                            (childItem.dataTestId === "governance-actions-voted-by-me-link" ||
+                              childItem.dataTestId === "governance-actions-outcomes-link")
+                          ) {
+                            return null;
+                          }
+
+                          return (
+                            <Link
+                              key={childItem.label}
+                              {...childItem}
+                              size="big"
+                              onClick={() => {
+                                if (childItem.newTabLink) {
+                                  openInNewTab(childItem.newTabLink);
+                                }
+                                setIsDrawerOpen(false);
+                              }}
+                              isConnectWallet
+                            />
+                          );
+                        })}
                       </Grid>
                     )}
                   </Grid>

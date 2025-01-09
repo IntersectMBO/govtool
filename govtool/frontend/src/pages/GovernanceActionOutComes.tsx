@@ -40,7 +40,7 @@ export const GovernanceActionOutComesPillar = () => {
             </Box>
           }
         >
-          <Outcomes description="This is a test for the outcomes package........" />
+          <Outcomes description="" />
         </Suspense>
       </Box>
       {!context.isEnabled && <Footer />}

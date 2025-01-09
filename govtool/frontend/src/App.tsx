@@ -42,7 +42,10 @@ import { DashboardHome } from "./pages/DashboardHome";
 import { GovernanceActionOutComesPillar } from "./pages/GovernanceActionOutComes";
 
 export default () => {
-  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
+  const {
+    isProposalDiscussionForumEnabled,
+    isGovernanceOutcomesPillarEnabled,
+  } = useFeatureFlag();
   const { enable, isEnabled } = useCardano();
   const navigate = useNavigate();
   const { modal, openModal, modals } = useModal();
@@ -112,14 +115,18 @@ export default () => {
               element={<ProposalDiscussionPillar />}
             />
           )}
-          <Route
-            path={`${OUTCOMES_PATHS.governanceActionsOutcomes}/*`}
-            element={<GovernanceActionOutComesPillar />}
-          />
-          <Route
-            path={USER_PATHS.governanceActionsVotedByMe}
-            element={<GovernanceActionOutComesPillar />}
-          />
+          {isGovernanceOutcomesPillarEnabled && (
+            <>
+              <Route
+                path={`${OUTCOMES_PATHS.governanceActionsOutcomes}/*`}
+                element={<GovernanceActionOutComesPillar />}
+              />
+              <Route
+                path={USER_PATHS.governanceActionsVotedByMe}
+                element={<GovernanceActionOutComesPillar />}
+              />
+            </>
+          )}
           <Route
             path={PATHS.dashboardGovernanceActions}
             element={<DashboardGovernanceActions />}

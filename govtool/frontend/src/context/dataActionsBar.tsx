@@ -8,6 +8,7 @@ import React, {
   useEffect,
   useMemo,
   FC,
+  useRef,
 } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -41,7 +42,7 @@ interface ProviderProps {
 }
 
 const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
-  const [isAdjusting, setIsAdjusting] = useState<boolean>(true);
+  const isAdjusting = useRef<boolean>(false);
   const [searchText, setSearchText] = useState<string>("");
   const debouncedSearchText = useDebounce(searchText, 300);
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
@@ -64,11 +65,12 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     setSearchText("");
     setChosenFilters([]);
     setChosenSorting("");
-    setIsAdjusting(false);
+    isAdjusting.current = false;
   }, []);
 
   const userMovedToDifferentAppArea =
-    pathname !== lastPath && !pathname.startsWith(lastPath);
+    pathname !== lastPath &&
+    (!pathname.startsWith(lastPath) || lastPath === "");
   const userOpenedGADetailsFromCategoryPage =
     lastPath.includes("governance_actions/category") &&
     pathname.includes("governance_actions/");
@@ -77,7 +79,8 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     pathname.includes("governance_actions/category");
 
   useEffect(() => {
-    setIsAdjusting(true);
+    isAdjusting.current = true;
+
     if (
       (!pathname.includes("drep_directory") &&
         userMovedToDifferentAppArea &&
@@ -94,7 +97,7 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
 
   const contextValue = useMemo(
     () => ({
-      isAdjusting,
+      isAdjusting: isAdjusting.current,
       chosenFilters,
       chosenFiltersLength: chosenFilters.length,
       chosenSorting,
@@ -111,7 +114,6 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
       sortOpen,
     }),
     [
-      isAdjusting,
       chosenFilters,
       chosenSorting,
       debouncedSearchText,
@@ -120,6 +122,7 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
       sortOpen,
       closeFilters,
       closeSorts,
+      pathname,
     ],
   );
 

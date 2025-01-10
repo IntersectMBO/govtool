@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Fix counting submitted votes [Issue 2609](https://github.com/IntersectMBO/govtool/issues/2609)
+- Fix opening relative paths in external links
 
 ### Changed
 

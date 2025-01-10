@@ -1,5 +1,6 @@
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { Page } from "@playwright/test";
+import { bech32 } from "bech32";
 
 export async function fetchFirstActiveDRepDetails(page: Page) {
   let dRepGivenName: string;
@@ -59,4 +60,45 @@ export async function calculateImageSHA256(imageUrl: string) {
     console.error("Error calculating SHA256:", error);
     return null;
   }
+}
+
+export function fromHex(prefix: string, hex: string) {
+  return bech32.encode(prefix, bech32.toWords(Buffer.from(hex, "hex")));
+}
+
+export function tohex(drepId: string) {
+  return Buffer.from(
+    bech32.fromWords(bech32.decode(drepId, 100).words)
+  ).toString("hex");
+}
+
+export function convertDRepToCIP129(drepId: string, script = false): string {
+  const hexPattern = /^[0-9a-fA-F]+$/;
+  let cip129DRep: string;
+  let cip129DrepHex: string;
+  const prefix = script ? "23" : "22";
+  const addPrefix = (hex: string) => {
+    if (hex.length === 56) {
+      return prefix + hex;
+    } else if (hex.length === 58) {
+      return hex;
+    } else {
+      throw new Error("Invalid DRep hex length");
+    }
+  };
+  const drepIdFromHex = (hex: string) => {
+    return fromHex("drep", hex);
+  };
+  if (hexPattern.test(drepId)) {
+    cip129DrepHex = addPrefix(drepId);
+  } else {
+    try {
+      const decodedHex = tohex(drepId);
+      cip129DrepHex = addPrefix(decodedHex);
+    } catch (error: any) {
+      throw new Error("Invalid DRep Bech32 format");
+    }
+  }
+  cip129DRep = drepIdFromHex(cip129DrepHex);
+  return cip129DRep;
 }

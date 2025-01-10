@@ -83,6 +83,16 @@ total_stake_controlled_by_dreps AS (
         SUM(dd.amount)::bigint AS total
     FROM
         drep_distr dd
+    WHERE
+        dd.epoch_no = (SELECT no FROM current_epoch)
+),
+total_stake_controlled_by_spos AS (
+    SELECT
+        SUM(ps.stake)::bigint AS total
+    FROM
+        pool_stat ps
+    WHERE
+        ps.epoch_no = (SELECT no FROM current_epoch)
 ),
 total_registered_direct_voters AS (
     SELECT 
@@ -176,6 +186,7 @@ SELECT
     total_drep_votes.count as total_drep_votes,
     total_registered_dreps.unique_registrations as total_registered_dreps,
     COALESCE(total_stake_controlled_by_dreps.total, 0) as total_stake_controlled_by_dreps,
+    COALESCE(total_stake_controlled_by_spos.total, 0) as total_stake_controlled_by_spos,
     total_active_dreps.unique_active_drep_registrations as total_active_dreps,
     total_inactive_dreps.total_inactive_dreps as total_inactive_dreps,
     total_active_cip119_compliant_dreps.unique_active_cip119_compliant_drep_registrations as total_active_cip119_compliant_dreps,
@@ -192,6 +203,7 @@ FROM
     CROSS JOIN total_drep_votes
     CROSS JOIN total_registered_dreps
     CROSS JOIN total_stake_controlled_by_dreps
+    CROSS JOIN total_stake_controlled_by_spos
     CROSS JOIN total_active_dreps
     CROSS JOIN total_inactive_dreps
     CROSS JOIN total_active_cip119_compliant_dreps
@@ -208,6 +220,7 @@ GROUP BY
     total_drep_votes.count,
     total_registered_dreps.unique_registrations,
     total_stake_controlled_by_dreps.total,
+    total_stake_controlled_by_spos.total,
     total_active_dreps.unique_active_drep_registrations,
     total_inactive_dreps.total_inactive_dreps,
     total_active_cip119_compliant_dreps.unique_active_cip119_compliant_drep_registrations,

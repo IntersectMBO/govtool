@@ -100,6 +100,7 @@ export enum FullGovernanceDRepVoteActionsType {
 export type DRepStatus = "Active" | "Inactive" | "Retired";
 
 export type IDRep = {
+  isScriptBased: boolean;
   drepId: string;
   view: string;
   url: string;

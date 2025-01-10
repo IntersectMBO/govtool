@@ -42,51 +42,36 @@ export const VotesSubmitted = ({
     areCCVoteTotalsDisplayed,
   } = useFeatureFlag();
   const { t } = useTranslation();
-  const { networkMetrics, epochParams } = useAppContext();
-  const totalDRepStake =
-    dRepYesVotes +
-    dRepAbstainVotes +
-    dRepNoVotes +
-    (networkMetrics?.alwaysAbstainVotingPower || 0) +
-    (networkMetrics?.alwaysNoConfidenceVotingPower || 0);
-  const totalPoolStake = poolYesVotes + poolAbstainVotes + poolNoVotes;
-  const totalCCStake = ccYesVotes + ccAbstainVotes + ccNoVotes;
+  const { epochParams } = useAppContext();
 
-  const dRepNegativeVotesPercentage = totalDRepStake
-    ? ((dRepAbstainVotes +
-        dRepNoVotes +
-        (networkMetrics?.alwaysAbstainVotingPower || 0) +
-        (networkMetrics?.alwaysNoConfidenceVotingPower || 0)) /
-        totalDRepStake) *
-      100
-    : undefined;
-  const dRepNoVotesPercentage = totalDRepStake
-    ? (dRepNoVotes / totalDRepStake) * 100
-    : undefined;
-  const dRepYesVotesPercentage = dRepNegativeVotesPercentage
-    ? 100 - dRepNegativeVotesPercentage
+  const dRepYesVotesPercentage =
+    dRepYesVotes + dRepNoVotes
+      ? (dRepYesVotes / (dRepYesVotes + dRepNoVotes)) * 100
+      : undefined;
+  const dRepNoVotesPercentage = dRepYesVotesPercentage
+    ? 100 - dRepYesVotesPercentage
+    : dRepNoVotes
+    ? 100
     : undefined;
 
-  // TODO: add abstain votes to the calculation
-  const poolNegativeVotesPercentage = totalPoolStake
-    ? ((poolAbstainVotes + poolNoVotes) / totalPoolStake) * 100
-    : undefined;
-  const poolNoVotesPercentage = totalPoolStake
-    ? (poolNoVotes / totalPoolStake) * 100
-    : undefined;
-  const poolYesVotesPercentage = poolNegativeVotesPercentage
-    ? 100 - poolNegativeVotesPercentage
+  const poolYesVotesPercentage =
+    poolYesVotes + poolNoVotes
+      ? (poolYesVotes / (poolYesVotes + poolNoVotes)) * 100
+      : undefined;
+  const poolNoVotesPercentage = poolYesVotesPercentage
+    ? 100 - poolYesVotesPercentage
+    : poolNoVotes
+    ? 100
     : undefined;
 
-  // TODO: add abstain votes to the calculation
-  const ccNegativeVotesPercentage = totalCCStake
-    ? (ccAbstainVotes + ccNoVotes) / totalCCStake
-    : undefined;
-  const ccNoVotesPercentage = totalCCStake
-    ? ccNoVotes / totalCCStake
-    : undefined;
-  const ccYesVotesPercentage = ccNegativeVotesPercentage
-    ? 100 - ccNegativeVotesPercentage
+  const ccYesVotesPercentage =
+    ccYesVotes + ccNoVotes
+      ? (ccYesVotes / (ccYesVotes + ccNoVotes)) * 100
+      : undefined;
+  const ccNoVotesPercentage = ccYesVotesPercentage
+    ? 100 - ccYesVotesPercentage
+    : ccNoVotes
+    ? 100
     : undefined;
 
   return (

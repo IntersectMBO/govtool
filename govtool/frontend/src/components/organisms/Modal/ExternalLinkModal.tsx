@@ -70,7 +70,9 @@ export const ExternalLinkModal = forwardRef<HTMLDivElement>((_, ref) => {
         <Button
           data-testid="continue-modal-button"
           onClick={() => {
-            openInNewTab(state?.externalLink || "#");
+            if (state?.externalLink) {
+              openInNewTab(state?.externalLink);
+            }
             closeModal();
           }}
           sx={{

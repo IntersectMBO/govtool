@@ -881,6 +881,7 @@ data GetNetworkMetricsResponse
       , getNetworkMetricsResponseTotalDRepVotes                  :: Integer
       , getNetworkMetricsResponseTotalRegisteredDReps            :: Integer
       , getNetworkMetricsResponseTotalStakeControlledByDReps     :: Integer
+      , getNetworkMetricsResponseTotalStakeControlledBySPOs      :: Integer
       , getNetworkMetricsResponseTotalActiveDReps                :: Integer
       , getNetworkMetricsResponseTotalInactiveDReps              :: Integer
       , getNetworkMetricsResponseTotalActiveCIP119CompliantDReps :: Integer
@@ -894,22 +895,23 @@ deriveJSON (jsonOptions "getNetworkMetricsResponse") ''GetNetworkMetricsResponse
 
 exampleGetNetworkMetricsResponse :: Text
 exampleGetNetworkMetricsResponse =
-   "{\"currentTime\": \"1970-01-01T00:00:00Z\","
- <> "\"currentEpoch\": 0,"
- <> "\"currentBlock\": 0,"
- <> "\"uniqueDelegators\": 0,"
- <> "\"totalDelegations\": 0,"
- <> "\"totalGovernanceActions\": 0,"
- <> "\"totalDRepVotes\": 0,"
- <> "\"totalRegisteredDReps\": 0,"
- <> "\"totalStakeControlledByDReps\": 0,"
- <> "\"totalActiveDReps\": 0,"
- <> "\"totalInactiveDReps\": 0,"
- <> "\"totalActiveCIP119CompliantDReps\": 0,"
- <> "\"totalRegisteredDirectVoters\": 0,"
- <> "\"alwaysAbstainVotingPower\": 0,"
- <> "\"alwaysNoConfidenceVotingPower\": 0,"
- <> "\"networkName\": \"Mainnet\"}"
+  "{\"currentTime\": \"1970-01-01T00:00:00Z\","
+  <> "\"currentEpoch\": 0,"
+  <> "\"currentBlock\": 0,"
+  <> "\"uniqueDelegators\": 0,"
+  <> "\"totalDelegations\": 0,"
+  <> "\"totalGovernanceActions\": 0,"
+  <> "\"totalDRepVotes\": 0,"
+  <> "\"totalRegisteredDReps\": 0,"
+  <> "\"totalStakeControlledByDReps\": 0,"
+  <> "\"totalStakeControlledBySPOs\": 0,"
+  <> "\"totalActiveDReps\": 0,"
+  <> "\"totalInactiveDReps\": 0,"
+  <> "\"totalActiveCIP119CompliantDReps\": 0,"
+  <> "\"totalRegisteredDirectVoters\": 0,"
+  <> "\"alwaysAbstainVotingPower\": 0,"
+  <> "\"alwaysNoConfidenceVotingPower\": 0,"
+  <> "\"networkName\": \"Mainnet\"}"
 
 instance ToSchema GetNetworkMetricsResponse where
     declareNamedSchema _ = pure $ NamedSchema (Just "GetNetworkMetricsResponse") $ mempty

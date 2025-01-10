@@ -23,7 +23,8 @@ const defaultCategories = GOVERNANCE_ACTIONS_FILTERS.map(
 );
 
 export const GovernanceActions = () => {
-  const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
+  const { debouncedSearchText, isAdjusting, ...dataActionsBarProps } =
+    useDataActionsBar();
   const { chosenFilters, chosenSorting } = dataActionsBarProps;
   const { isMobile, pagePadding } = useScreenDimension();
   const { isEnabled } = useCardano();
@@ -37,6 +38,7 @@ export const GovernanceActions = () => {
     filters: queryFilters,
     sorting: chosenSorting,
     searchPhrase: debouncedSearchText,
+    enabled: !isAdjusting,
   });
 
   useEffect(() => {

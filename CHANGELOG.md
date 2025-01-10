@@ -16,6 +16,24 @@ changes.
 
 ### Fixed
 
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v2.0.5](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.5) 2025-01-10
+
+### Added
+
+-
+
+### Fixed
+
 - Fix counting submitted votes [Issue 2609](https://github.com/IntersectMBO/govtool/issues/2609)
 - Fix opening relative paths in external links
 - Fix passing random sorting to governance actions on disconnected wallet

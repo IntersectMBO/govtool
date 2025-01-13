@@ -84,10 +84,10 @@ test("2O. Should load more DReps on show more", async ({ page }) => {
   const dRepDirectory = new DRepDirectoryPage(page);
   await dRepDirectory.goto();
 
-  const dRepIdsBefore = await dRepDirectory.getAllListedDRepIds();
+  const dRepIdsBefore = await dRepDirectory.getAllListedCIP105DRepIds();
   await dRepDirectory.showMoreBtn.click();
 
-  const dRepIdsAfter = await dRepDirectory.getAllListedDRepIds();
+  const dRepIdsAfter = await dRepDirectory.getAllListedCIP105DRepIds();
   expect(dRepIdsAfter.length).toBeGreaterThanOrEqual(dRepIdsBefore.length);
 
   if (dRepIdsAfter.length > dRepIdsBefore.length) {

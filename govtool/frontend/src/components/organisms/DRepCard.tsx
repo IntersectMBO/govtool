@@ -11,6 +11,7 @@ import {
   correctDRepDirectoryFormat,
   ellipsizeText,
   encodeCIP129Identifier,
+  getBase64ImageDetails,
   getMetadataDataMissingStatusTranslation,
 } from "@utils";
 
@@ -63,6 +64,8 @@ export const DRepCard = ({
     txID: `${isScriptBased ? "23" : "22"}${drepId}`,
     bech32Prefix: isScriptBased ? "drep_script" : "drep",
   });
+
+  const base64Image = getBase64ImageDetails(image ?? "");
 
   return (
     <Card
@@ -119,7 +122,11 @@ export const DRepCard = ({
             <Box flexDirection="row" minWidth={0} display="flex">
               <Avatar
                 alt="drep-image"
-                src={image || ICONS.defaultDRepIcon}
+                src={
+                  (base64Image.isValidBase64Image
+                    ? `${base64Image.base64Prefix}${image}`
+                    : image) || ICONS.defaultDRepIcon
+                }
                 data-testid="drep-image"
               />
               <Box

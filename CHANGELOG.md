@@ -18,6 +18,7 @@ changes.
 ### Fixed
 
 - Fix searching by full DRep IDs on wrong prefix cut [Issue 2639](https://github.com/IntersectMBO/govtool/issues/2639)
+- Trim whitespace from search bar input [Issue 2472](https://github.com/IntersectMBO/govtool/issues/2472)
 
 ### Changed
 

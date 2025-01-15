@@ -144,17 +144,17 @@ drepList mSearchQuery statuses mSortMode mPage mPageSize = do
 
   let filterDRepsByQuery = case mSearchQuery of
         Nothing -> filter $ \Types.DRepRegistration {..} ->
-          dRepRegistrationType == Types.DRep
+          dRepRegistrationType /= Types.SoleVoter
         Just query -> filter $ \Types.DRepRegistration {..} ->
           let searchLower = Text.toLower query
               viewLower = Text.toLower dRepRegistrationView
               hashLower = Text.toLower dRepRegistrationDRepHash
-              nameLower = maybe "" Text.toLower dRepRegistrationGivenName
-          in  case dRepRegistrationType of
-                Types.SoleVoter -> searchLower == viewLower || searchLower == hashLower
-                Types.DRep      -> searchLower `isInfixOf` viewLower
-                                  || searchLower `isInfixOf` hashLower
-                                  || searchLower `isInfixOf` nameLower
+          in case dRepRegistrationType of
+              Types.SoleVoter -> 
+                searchLower == viewLower || searchLower == hashLower
+              Types.DRep -> 
+                True
+
 
   let filterDRepsByStatus = case statuses of
         [] -> id
@@ -187,7 +187,6 @@ drepList mSearchQuery statuses mSortMode mPage mPageSize = do
       total = length allValidDReps :: Int
 
   let elements = take pageSize $ drop (page * pageSize) allValidDReps
-
   return $ ListDRepsResponse
     { listDRepsResponsePage = fromIntegral page
     , listDRepsResponsePageSize = fromIntegral pageSize

@@ -13,10 +13,11 @@ changes.
 ### Added
 
 - Add support for base64 encoded images [Issue 2633](https://github.com/IntersectMBO/govtool/issues/2633)
+- Add searching for metadata [Issue 2634](https://github.com/IntersectMBO/govtool/issues/2634)
 
 ### Fixed
 
--
+- Fix searching by full DRep IDs on wrong prefix cut [Issue 2639](https://github.com/IntersectMBO/govtool/issues/2639)
 
 ### Changed
 

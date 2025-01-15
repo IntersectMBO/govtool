@@ -298,7 +298,7 @@ export const DRepCard = ({
               {t("viewDetails")}
             </Button>
           )}
-          {status === "Active" &&
+          {["Active", "Inactive"].includes(status) &&
             isConnected &&
             onDelegate &&
             !isMyDrep &&
@@ -311,7 +311,7 @@ export const DRepCard = ({
                 {t("delegate")}
               </Button>
             )}
-          {status === "Active" && !isConnected && (
+          {["Active", "Inactive"].includes(status) && !isConnected && (
             <Button
               data-testid={`${view}-connect-to-delegate-button`}
               onClick={openChooseWalletModal}

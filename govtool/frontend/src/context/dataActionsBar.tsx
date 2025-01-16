@@ -44,7 +44,7 @@ interface ProviderProps {
 const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
   const isAdjusting = useRef<boolean>(false);
   const [searchText, setSearchText] = useState<string>("");
-  const debouncedSearchText = useDebounce(searchText, 300);
+  const debouncedSearchText = useDebounce(searchText.trim(), 300);
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
   const [chosenFilters, setChosenFilters] = useState<string[]>([]);
   const [sortOpen, setSortOpen] = useState<boolean>(false);

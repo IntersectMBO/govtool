@@ -22,7 +22,7 @@ export const dRepSearchPhraseProcessor = async (phrase: string) => {
 
       drepIDPhrase = txID;
     }
-    if (drepIDPhrase.startsWith("22") || drepIDPhrase.startsWith("23")) {
+    if (drepIDPhrase.length === 58) {
       return drepIDPhrase.slice(2);
     }
 

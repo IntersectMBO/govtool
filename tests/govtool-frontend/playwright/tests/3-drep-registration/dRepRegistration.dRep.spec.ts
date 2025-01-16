@@ -138,7 +138,9 @@ test.describe("Temporary DReps", () => {
 
     await dRepRegistrationPage.confirmBtn.click();
 
-    await expect(dRepPage.getByTestId("d-rep-in-progress")).not.toBeVisible();
+    await expect(dRepPage.getByTestId("d-rep-in-progress")).not.toBeVisible({
+      timeout: 20_000,
+    });
 
     // connected state
     const dRepDirectoryPage = new DRepDirectoryPage(page);

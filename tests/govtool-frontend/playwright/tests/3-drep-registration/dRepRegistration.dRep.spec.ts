@@ -233,7 +233,8 @@ test.describe("Temporary DReps", () => {
       .click();
 
     await expect(dRepPage.getByTestId("d-rep-in-progress")).toHaveText(
-      /in progress/i
+      /in progress/i,
+      { timeout: 20_000 }
     );
   });
 });

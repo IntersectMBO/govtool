@@ -12,6 +12,24 @@ changes.
 
 ### Added
 
+-
+
+### Fixed
+
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v2.0.6](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.6) 2025-01-16
+
+### Added
+
 - Add support for base64 encoded images [Issue 2633](https://github.com/IntersectMBO/govtool/issues/2633)
 - Add searching for metadata [Issue 2634](https://github.com/IntersectMBO/govtool/issues/2634)
 - Allow delegation to inactive DRep [Issue 2589](https://github.com/IntersectMBO/govtool/issues/2589)

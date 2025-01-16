@@ -44,13 +44,18 @@ listDReps ::
 listDReps mSearchQuery = withPool $ \conn -> do
   let searchParam = fromMaybe "" mSearchQuery
   results <- liftIO $ SQL.query conn listDRepsSql
-    ( searchParam 
-    , searchParam
-    , searchParam
-    , searchParam
-    , "%" <> searchParam <> "%"
-    , "%" <> searchParam <> "%"
+    ( searchParam -- COALESCE(?, '')
+    , searchParam -- LENGTH(?)
+    , searchParam -- AND ?
+    , searchParam -- decode(?, 'hex')
+    , "%" <> searchParam <> "%" -- dh.view
+    , "%" <> searchParam <> "%" -- given_name
+    , "%" <> searchParam <> "%" -- payment_address
+    , "%" <> searchParam <> "%" -- objectives
+    , "%" <> searchParam <> "%" -- motivations
+    , "%" <> searchParam <> "%" -- qualifications
     )
+
   timeZone <- liftIO getCurrentTimeZone
   return
     [ DRepRegistration drepHash drepView isScriptBased url dataHash (floor @Scientific deposit) votingPower status drepType txHash (localTimeToUTC timeZone date) metadataError paymentAddress givenName objectives motivations qualifications imageUrl imageHash

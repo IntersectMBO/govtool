@@ -36,3 +36,4 @@ export * from "./setProtocolParameterUpdate";
 export * from "./testIdFromLabel";
 export * from "./uniqBy";
 export * from "./wait";
+export * from "./getBase64ImageDetails";

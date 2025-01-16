@@ -167,7 +167,11 @@ WHERE
     COALESCE(?, '') = '' OR
     (CASE WHEN LENGTH(?) % 2 = 0 AND ? ~ '^[0-9a-fA-F]+$' THEN dh.raw = decode(?, 'hex') ELSE false END) OR
     dh.view ILIKE ? OR
-    off_chain_vote_drep_data.given_name ILIKE ?
+    off_chain_vote_drep_data.given_name ILIKE ? OR
+    off_chain_vote_drep_data.payment_address ILIKE ? OR
+    off_chain_vote_drep_data.objectives ILIKE ? OR
+    off_chain_vote_drep_data.motivations ILIKE ? OR
+    off_chain_vote_drep_data.qualifications ILIKE ?
   )
 GROUP BY
   block_first_register.epoch_no,

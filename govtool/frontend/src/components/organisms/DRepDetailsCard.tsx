@@ -146,7 +146,7 @@ export const DRepDetailsCard = ({
       {/* BASIC INFO END */}
 
       {/* BUTTONS */}
-      {isConnected && status === "Active" && !isMyDrep && (
+      {isConnected && ["Active", "Inactive"].includes(status) && !isMyDrep && (
         <Button
           data-testid="delegate-button"
           disabled={!!pendingTransaction?.delegate}
@@ -161,7 +161,7 @@ export const DRepDetailsCard = ({
           {t("delegate")}
         </Button>
       )}
-      {!isConnected && status === "Active" && (
+      {!isConnected && ["Active", "Inactive"].includes(status) && (
         <Button
           data-testid="connect-to-delegate-button"
           onClick={() =>

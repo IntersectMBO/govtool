@@ -95,9 +95,9 @@ data DRepInfo
       , dRepInfoImageHash                :: Maybe Text
       }
 
-data DRepStatus = Active | Inactive | Retired deriving (Eq, Ord)
+data DRepStatus = Active | Inactive | Retired deriving (Show, Eq, Ord)
 
-data DRepType = DRep | SoleVoter deriving (Eq)
+data DRepType = DRep | SoleVoter deriving (Show, Eq)
 
 data DRepRegistration
   = DRepRegistration
@@ -121,6 +121,7 @@ data DRepRegistration
       , dRepRegistrationImageUrl               :: Maybe Text
       , dRepRegistrationImageHash              :: Maybe Text
       }
+  deriving (Show)
 
 data Proposal 
   = Proposal

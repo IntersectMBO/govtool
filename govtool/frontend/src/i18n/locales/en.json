@@ -455,6 +455,18 @@
         "title": "Info Action",
         "label": "Info Action"
       }
+    },
+    "liveVoting": {
+      "title": "Live Voting",
+      "label": "Live Voting"
+    },
+    "outcomes": {
+      "title": "Outcomes",
+      "label": "Outcomes"
+    },
+    "votedByMe": {
+      "title": "Voted by me",
+      "label": "Voted by me"
     }
   },
   "hero": {

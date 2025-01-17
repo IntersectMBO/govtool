@@ -9,7 +9,7 @@ import { WalletInfoCard, DRepInfoCard } from "@molecules";
 import { openInNewTab } from "@utils";
 
 export const Drawer = () => {
-  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
+  const { isProposalDiscussionForumEnabled, isGovernanceOutcomesPillarEnabled } = useFeatureFlag();
   const { voter } = useGetVoterInfo();
 
   return (
@@ -47,13 +47,6 @@ export const Drawer = () => {
         rowGap={2}
       >
         {CONNECTED_NAV_ITEMS.map((navItem) => {
-          if (
-            !isProposalDiscussionForumEnabled &&
-            navItem.dataTestId === "proposal-discussion-link"
-          ) {
-            return null;
-          }
-
           return (
             <Grid item key={navItem.label}>
               <DrawerLink
@@ -64,6 +57,47 @@ export const Drawer = () => {
                     : undefined
                 }
               />
+              {navItem.childNavItems && (
+                <Grid
+                  columns={1}
+                  container
+                  display="flex"
+                  flex={1}
+                  flexDirection="column"
+                  mt={2}
+                  pl={3}
+                  rowGap={2}
+                >
+                  {navItem.childNavItems.map((childItem) => {
+                    if (
+                      !isProposalDiscussionForumEnabled &&
+                      childItem.dataTestId === "proposal-discussion-link"
+                    ) {
+                      return null;
+                    }
+
+                    if (
+                      !isGovernanceOutcomesPillarEnabled &&
+                      (childItem.dataTestId === "governance-actions-voted-by-me-link" ||
+                        childItem.dataTestId === "governance-actions-outcomes-link")
+                    ) {
+                      return null;
+                    }
+
+                    return (
+                      <DrawerLink
+                        key={childItem.label}
+                        {...childItem}
+                        onClick={
+                          childItem.newTabLink
+                            ? () => openInNewTab(childItem.newTabLink!)
+                            : undefined
+                        }
+                      />
+                    );
+                  })}
+                </Grid>
+              )}
             </Grid>
           );
         })}

@@ -70,7 +70,7 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
 
   const userMovedToDifferentAppArea =
     pathname !== lastPath &&
-    (!pathname.startsWith(lastPath) || lastPath === "");
+    (!pathname.startsWith(lastPath) || lastPath === "" || lastPath === "/");
   const userOpenedGADetailsFromCategoryPage =
     lastPath.includes("governance_actions/category") &&
     pathname.includes("governance_actions/");

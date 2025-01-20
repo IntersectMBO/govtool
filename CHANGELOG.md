@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Fix calculating DRep activity
+- Fix fetching Governance Actions being navigated from dashboard
 
 ### Changed
 

@@ -20,7 +20,7 @@ changes.
 
 ### Changed
 
--
+- Bump cardano-node to 10.1.4
 
 ### Removed
 

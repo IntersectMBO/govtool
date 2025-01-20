@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix calculating DRep activity
 
 ### Changed
 

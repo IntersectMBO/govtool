@@ -45,6 +45,11 @@
             <artifactId>bcprov-jdk18on</artifactId>
             <version>1.78</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+            <version>1.0.2</version>
+        </dependency>
     </dependencies>
 
     <build>

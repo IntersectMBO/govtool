@@ -3,7 +3,11 @@ package org.cardano.govtool;
 import org.bouncycastle.crypto.digests.Blake2bDigest;
 import org.bouncycastle.util.encoders.Hex;
 
+import com.github.javafaker.Faker;
+
 public class Utils {
+
+    static Faker faker = new Faker();
     private static byte[] blake2b(byte[] data, int digestSize) {
         Blake2bDigest blake2bDigest = new Blake2bDigest(null, digestSize, null, null);
         blake2bDigest.update(data, 0, data.length);
@@ -34,5 +38,25 @@ public class Utils {
         byte[] bytes = new byte[29];
         byte[] stakeKey = blake2b(bytes, 29);
         return Hex.toHexString(stakeKey);
+    }
+
+    public static String generateRandomDescription(){
+        return faker.lorem().sentence();
+    }
+
+    public static String generateRandomTitle(){
+        return faker.name().title();
+    }
+
+    public static String generateRandomLink(){
+        return faker.internet().url();
+    }
+
+    public static int generateRandomAmount(){
+        return faker.number().randomDigitNotZero();
+    }
+
+    public static boolean generateRandomBool(){
+        return faker.bool().bool();
     }
 }

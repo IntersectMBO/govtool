@@ -21,12 +21,12 @@ export const Dashboard = () => {
     if (path === PATHS.dashboard) return t("dashboard.title");
     return findNavItem(CONNECTED_NAV_ITEMS, path) ?? "";
   };
-  
+
   const findNavItem = (items: NavItem[], targetPath: string): string | null => (
     items.reduce<string | null>((result, item) => (
       result ?? (
-        targetPath === item.navTo 
-          ? item.label 
+        targetPath === item.navTo
+          ? item.label
           : (item.childNavItems ? findNavItem(item.childNavItems, targetPath) : null)
       )
     ), null)

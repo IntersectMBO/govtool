@@ -46,29 +46,28 @@ export const Drawer = () => {
         px={3}
         rowGap={2}
       >
-        {CONNECTED_NAV_ITEMS.map((navItem) => {
-          return (
-            <Grid item key={navItem.label}>
-              <DrawerLink
-                {...navItem}
-                onClick={
+        {CONNECTED_NAV_ITEMS.map((navItem) => (
+          <Grid item key={navItem.label}>
+            <DrawerLink
+              {...navItem}
+              onClick={
                   navItem.newTabLink
                     ? () => openInNewTab(navItem.newTabLink)
                     : undefined
                 }
-              />
-              {navItem.childNavItems && (
-                <Grid
-                  columns={1}
-                  container
-                  display="flex"
-                  flex={1}
-                  flexDirection="column"
-                  mt={2}
-                  pl={3}
-                  rowGap={2}
-                >
-                  {navItem.childNavItems.map((childItem) => {
+            />
+            {navItem.childNavItems && (
+            <Grid
+              columns={1}
+              container
+              display="flex"
+              flex={1}
+              flexDirection="column"
+              mt={2}
+              pl={3}
+              rowGap={2}
+            >
+              {navItem.childNavItems.map((childItem) => {
                     if (
                       !isProposalDiscussionForumEnabled &&
                       childItem.dataTestId === "proposal-discussion-link"
@@ -96,11 +95,10 @@ export const Drawer = () => {
                       />
                     );
                   })}
-                </Grid>
-              )}
             </Grid>
-          );
-        })}
+              )}
+          </Grid>
+          ))}
       </Grid>
       <Box p={2}>
         {voter?.isRegisteredAsDRep && <DRepInfoCard />}

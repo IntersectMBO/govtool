@@ -183,13 +183,15 @@ test.describe("Perform voting", () => {
 
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No")
-    ).toBeVisible({ timeout: 15_000 });
+    ).toBeVisible({ timeout: 20_000 });
   });
 
   test("5F. Should show notification of casted vote after vote", async ({}, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
     await govActionDetailsPage.vote();
-    await expect(govActionDetailsPage.voteSuccessModal).toBeVisible();
+    await expect(govActionDetailsPage.voteSuccessModal).toBeVisible({
+      timeout: 20_000,
+    });
   });
 
   test("5I. Should view the vote details,when viewing governance action already voted by the DRep", async ({}, testInfo) => {

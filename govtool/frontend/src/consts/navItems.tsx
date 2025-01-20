@@ -4,7 +4,7 @@ import { theme } from "@/theme";
 
 import { ICONS } from "./icons";
 import { LINKS } from "./links";
-import { PATHS, PDF_PATHS } from "./paths";
+import { PATHS, PDF_PATHS, OUTCOMES_PATHS, USER_PATHS } from "./paths";
 
 export const NAV_ITEMS = [
   {
@@ -59,6 +59,7 @@ export const CONNECTED_NAV_ITEMS = [
     navTo: PATHS.dashboardDRepDirectory,
     activeIcon: ICONS.dRepDirectoryActiveIcon,
     icon: ICONS.dRepDirectoryIcon,
+    newTabLink: null,
   },
   {
     dataTestId: "governance-actions-link",
@@ -67,28 +68,54 @@ export const CONNECTED_NAV_ITEMS = [
     activeIcon: ICONS.governanceActionsActiveIcon,
     icon: ICONS.governanceActionsIcon,
     newTabLink: null,
-  },
-  {
-    dataTestId: "proposal-discussion-link",
-    label: i18n.t("proposalDiscussion.title"),
-    navTo: PDF_PATHS.proposalDiscussion,
-    activeIcon: (
-      <IconAcademicCap
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill={theme.palette.accentOrange}
-      />
-    ),
-    icon: (
-      <IconAcademicCap
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill={theme.palette.lightOrange}
-      />
-    ),
-    newTabLink: null,
+    childNavItems: [
+      {
+        dataTestId: "proposal-discussion-link",
+        label: i18n.t("proposalDiscussion.title"),
+        navTo: PDF_PATHS.proposalDiscussion,
+        activeIcon: (
+          <IconAcademicCap
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill={theme.palette.accentOrange}
+          />
+        ),
+        icon: (
+          <IconAcademicCap
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill={theme.palette.lightOrange}
+          />
+        ),
+        newTabLink: null,
+      },
+      {
+        dataTestId: "governance-actions-live-voting-link",
+        label: i18n.t("govActions.liveVoting.title"),
+        navTo: OUTCOMES_PATHS.governanceActionsLiveVoting,
+        activeIcon: ICONS.governanceActionsActiveIcon,
+        icon: ICONS.governanceActionsIcon,
+        newTabLink: null,
+      },
+      {
+        dataTestId: "governance-actions-outcomes-link",
+        label: i18n.t("govActions.outcomes.title"),
+        navTo: OUTCOMES_PATHS.governanceActionsOutcomes,
+        activeIcon: ICONS.governanceActionsActiveIcon,
+        icon: ICONS.governanceActionsIcon,
+        newTabLink: null,
+      },
+      {
+        dataTestId: "governance-actions-voted-by-me-link",
+        label: i18n.t("govActions.votedByMe.title"),
+        navTo: USER_PATHS.governanceActionsVotedByMe,
+        activeIcon: ICONS.governanceActionsActiveIcon,
+        icon: ICONS.governanceActionsIcon,
+        newTabLink: null,
+      },
+    ],
   },
   {
     dataTestId: "guides-link",

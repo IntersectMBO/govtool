@@ -1,9 +1,9 @@
-import { Footer, TopNav } from "@/components/organisms";
-import { useCardano } from "@/context";
-import { useScreenDimension } from "@/hooks";
 import Outcomes from "@intersect.mbo/govtool-outcomes-pillar-ui";
 import { Box, CircularProgress } from "@mui/material";
 import { Suspense } from "react";
+import { Footer, TopNav } from "@/components/organisms";
+import { useCardano } from "@/context";
+import { useScreenDimension } from "@/hooks";
 
 export const GovernanceActionOutComesPillar = () => {
   const { pagePadding } = useScreenDimension();

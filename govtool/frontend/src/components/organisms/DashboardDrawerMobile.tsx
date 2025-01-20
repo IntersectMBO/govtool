@@ -74,29 +74,28 @@ export const DashboardDrawerMobile = ({
               </IconButton>
             </Box>
             <Grid container direction="column" rowGap={4} mt={6}>
-              {CONNECTED_NAV_ITEMS.map((navItem) => {
-                return (
-                  <Grid item>
-                    <Link
-                      {...navItem}
-                      size="big"
-                      onClick={() => {
+              {CONNECTED_NAV_ITEMS.map((navItem) => (
+                <Grid item>
+                  <Link
+                    {...navItem}
+                    size="big"
+                    onClick={() => {
                         if (navItem.newTabLink) {
                           openInNewTab(navItem.newTabLink);
                         }
                         setIsDrawerOpen(false);
                       }}
-                      isConnectWallet
-                    />
-                    {navItem.childNavItems && (
-                      <Grid
-                        container
-                        direction="column"
-                        rowGap={4}
-                        mt={3}
-                        pl={3}
-                      >
-                        {navItem.childNavItems.map((childItem) => {
+                    isConnectWallet
+                  />
+                  {navItem.childNavItems && (
+                  <Grid
+                    container
+                    direction="column"
+                    rowGap={4}
+                    mt={3}
+                    pl={3}
+                  >
+                    {navItem.childNavItems.map((childItem) => {
                           if (
                             !isProposalDiscussionForumEnabled &&
                             childItem.dataTestId === "proposal-discussion-link"
@@ -127,11 +126,10 @@ export const DashboardDrawerMobile = ({
                             />
                           );
                         })}
-                      </Grid>
-                    )}
                   </Grid>
-                );
-              })}
+                    )}
+                </Grid>
+                ))}
             </Grid>
           </Box>
           {(voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter) && (

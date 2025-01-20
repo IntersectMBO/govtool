@@ -63,4 +63,14 @@ declare global {
     label: string;
     uri: string;
   };
+
+  interface NavItem {
+    dataTestId: string;
+    label: string;
+    navTo: string;
+    activeIcon: JSX.Element | string;
+    icon: JSX.Element | string;
+    newTabLink: string | null;
+    childNavItems?: NavItem[];
+  }
 }

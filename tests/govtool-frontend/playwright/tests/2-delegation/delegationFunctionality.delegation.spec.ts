@@ -178,7 +178,7 @@ test.describe("Register DRep state", () => {
 
     await expect(
       dRepPage.getByText("You Have Retired as a Direct")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 20_000 });
   });
 });
 

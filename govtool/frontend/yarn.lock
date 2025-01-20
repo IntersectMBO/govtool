@@ -1488,15 +1488,23 @@
   resolved "https://registry.npmjs.org/@inquirer/type/-/type-3.0.1.tgz"
   integrity sha512-+ksJMIy92sOAiAccGpcKZUc3bYO07cADnscIxHBknEm3uNts3movSmBofc1908BNy5edKscxYeAdaX1NXkHS6A==
 
+"@intersect.mbo/govtool-outcomes-pillar-ui@^1.0.0-beta.1":
+  version "1.0.7"
+  resolved "https://registry.npmjs.org/@intersect.mbo/govtool-outcomes-pillar-ui/-/govtool-outcomes-pillar-ui-1.0.7.tgz"
+  integrity sha512-I214XRhLfrQUWmfy8XfoCZDjtz7kWB2qf5/Fh5Jh/QfJ95H+AkO4R3jWvCAwN3apjKy5nhgWchCgD09464EovQ==
+  dependencies:
+    rollup-plugin-livereload "^2.0.5"
+    rollup-plugin-serve "^1.1.1"
+
 "@intersect.mbo/intersectmbo.org-icons-set@^1.0.8":
   version "1.1.0"
   resolved "https://registry.npmjs.org/@intersect.mbo/intersectmbo.org-icons-set/-/intersectmbo.org-icons-set-1.1.0.tgz"
   integrity sha512-sjKEtnK9eLYH/8kCD0YRQCms3byFA/tnSsei9NHTZbBYX9sBpeX6ErfR0sKYjOSxQOxl4FumX9D0X+vHIqxo8g==
 
-"@intersect.mbo/pdf-ui@^0.5.6":
-  version "0.5.6"
-  resolved "https://registry.npmjs.org/@intersect.mbo/pdf-ui/-/pdf-ui-0.5.6.tgz"
-  integrity sha512-YmHZlXrAfC9fNGxshEeWNNobA6M5c6m2YrKkYro0TqyMdrpigoEN70fIrBwmO001UTvaZgBYBJ3gbiNy/f8zgg==
+"@intersect.mbo/pdf-ui@^0.5.7":
+  version "0.5.7"
+  resolved "https://registry.npmjs.org/@intersect.mbo/pdf-ui/-/pdf-ui-0.5.7.tgz"
+  integrity sha512-EvZdzO1mqGikiuabioX+bkGi7XqG+QuCRhWjRw2nwGom1WmqdBN6Bt04BdwIOBtjCK0yP1KaMMjXDDepvb5txg==
   dependencies:
     "@emurgo/cardano-serialization-lib-asmjs" "^12.0.0-beta.2"
     "@fontsource/poppins" "^5.0.14"
@@ -4983,7 +4991,7 @@ check-types@^11.2.3:
   resolved "https://registry.npmjs.org/check-types/-/check-types-11.2.3.tgz"
   integrity sha512-+67P1GkJRaxQD6PKK0Et9DhwQB+vGg3PM5+aavopCpZT1lj9jeqfvpgTLAWErNj8qApkkmXlu/Ug74kmhagkXg==
 
-chokidar@^3.4.2, chokidar@^3.5.3, chokidar@^3.6.0:
+chokidar@^3.4.2, chokidar@^3.5.0, chokidar@^3.5.3, chokidar@^3.6.0:
   version "3.6.0"
   resolved "https://registry.npmjs.org/chokidar/-/chokidar-3.6.0.tgz"
   integrity sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==
@@ -9566,6 +9574,21 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.npmjs.org/lines-and-columns/-/lines-and-columns-1.2.4.tgz"
   integrity sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==
 
+livereload-js@^3.3.1:
+  version "3.4.1"
+  resolved "https://registry.npmjs.org/livereload-js/-/livereload-js-3.4.1.tgz"
+  integrity sha512-5MP0uUeVCec89ZbNOT/i97Mc+q3SxXmiUGhRFOTmhrGPn//uWVQdCvcLJDy64MSBR5MidFdOR7B9viumoavy6g==
+
+livereload@^0.9.1:
+  version "0.9.3"
+  resolved "https://registry.npmjs.org/livereload/-/livereload-0.9.3.tgz"
+  integrity sha512-q7Z71n3i4X0R9xthAryBdNGVGAO2R5X+/xXpmKeuPMrteg+W2U8VusTKV3YiJbXZwKsOlFlHe+go6uSNjfxrZw==
+  dependencies:
+    chokidar "^3.5.0"
+    livereload-js "^3.3.1"
+    opts ">= 1.2.0"
+    ws "^7.4.3"
+
 loader-runner@^4.2.0:
   version "4.3.0"
   resolved "https://registry.npmjs.org/loader-runner/-/loader-runner-4.3.0.tgz"
@@ -10419,6 +10442,11 @@ mime-types@^2.1.12, mime-types@^2.1.27, mime-types@^2.1.31, mime-types@~2.1.17, 
   dependencies:
     mime-db "1.52.0"
 
+mime@^2:
+  version "2.6.0"
+  resolved "https://registry.npmjs.org/mime/-/mime-2.6.0.tgz"
+  integrity sha512-USPkMeET31rOMiarsBNIHZKLGgvKc/LrjofAnBlOttf5ajRvqiRA8QsenbcooctK6d6Ts6aqZXBA+XbkKthiQg==
+
 mime@1.6.0:
   version "1.6.0"
   resolved "https://registry.npmjs.org/mime/-/mime-1.6.0.tgz"
@@ -10896,6 +10924,11 @@ open@^8.4.0:
     is-docker "^2.1.1"
     is-wsl "^2.2.0"
 
+opener@1:
+  version "1.5.2"
+  resolved "https://registry.npmjs.org/opener/-/opener-1.5.2.tgz"
+  integrity sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==
+
 optionator@^0.8.1:
   version "0.8.3"
   resolved "https://registry.npmjs.org/optionator/-/optionator-0.8.3.tgz"
@@ -10919,6 +10952,11 @@ optionator@^0.9.3:
     prelude-ls "^1.2.1"
     type-check "^0.4.0"
     word-wrap "^1.2.5"
+
+"opts@>= 1.2.0":
+  version "2.0.2"
+  resolved "https://registry.npmjs.org/opts/-/opts-2.0.2.tgz"
+  integrity sha512-k41FwbcLnlgnFh69f4qdUfvDQ+5vaSDnVPFI/y5XuhKRq97EnVVneO9F1ESVCdiVu4fCS2L8usX3mU331hB7pg==
 
 os-homedir@^1.0.1:
   version "1.0.2"
@@ -12620,6 +12658,21 @@ rimraf@^3.0.0, rimraf@^3.0.2, rimraf@3.0.2:
   integrity sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==
   dependencies:
     glob "^7.1.3"
+
+rollup-plugin-livereload@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.npmjs.org/rollup-plugin-livereload/-/rollup-plugin-livereload-2.0.5.tgz"
+  integrity sha512-vqQZ/UQowTW7VoiKEM5ouNW90wE5/GZLfdWuR0ELxyKOJUIaj+uismPZZaICU4DnWPVjnpCDDxEqwU7pcKY/PA==
+  dependencies:
+    livereload "^0.9.1"
+
+rollup-plugin-serve@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.npmjs.org/rollup-plugin-serve/-/rollup-plugin-serve-1.1.1.tgz"
+  integrity sha512-H0VarZRtFR0lfiiC9/P8jzCDvtFf1liOX4oSdIeeYqUCKrmFA7vNiQ0rg2D+TuoP7leaa/LBR8XBts5viF6lnw==
+  dependencies:
+    mime "^2"
+    opener "1"
 
 rollup-plugin-terser@^7.0.0:
   version "7.0.2"
@@ -15090,6 +15143,11 @@ write-file-atomic@^4.0.2:
   dependencies:
     imurmurhash "^0.1.4"
     signal-exit "^3.0.7"
+
+ws@^7.4.3:
+  version "7.5.10"
+  resolved "https://registry.npmjs.org/ws/-/ws-7.5.10.tgz"
+  integrity sha512-+dbF1tHwZpXcbOJdVOkzLDxZP1ailvSxM6ZweXTegylPny803bFhA+vqBYw4s31NSAk4S2Qz+AKXK9a4wkdjcQ==
 
 ws@^7.4.6:
   version "7.5.10"

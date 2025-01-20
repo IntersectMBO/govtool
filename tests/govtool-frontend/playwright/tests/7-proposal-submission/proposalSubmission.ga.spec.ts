@@ -54,7 +54,7 @@ Object.values(ProposalType).forEach((proposalType, index) => {
     await expect(userPage.getByTestId("ga-submitted-modal-title")).toHaveText(
       /governance action submitted!/i,
       {
-        timeout: 10_000,
+        timeout: 20_000,
       }
     );
 

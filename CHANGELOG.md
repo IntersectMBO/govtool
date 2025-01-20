@@ -16,6 +16,24 @@ changes.
 
 ### Fixed
 
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v2.0.7](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.7) 2025-01-20
+
+### Added
+
+-
+
+### Fixed
+
 - Fix calculating DRep activity
 - Fix fetching Governance Actions being navigated from dashboard
 

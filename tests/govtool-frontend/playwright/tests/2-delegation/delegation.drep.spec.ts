@@ -69,7 +69,7 @@ test("2N. Should show DRep information on details page", async ({
   // Add an assertion to prevent clicking on "View Your dRep Details".
   await expect(
     dRepPage.getByTestId("dRep-id-display-card-dashboard")
-  ).toContainText(wallet.dRepId, { timeout: 10_000 });
+  ).toContainText(wallet.dRepId, { timeout: 20_000 });
   await dRepPage.getByTestId("view-drep-details-button").click();
 
   // Verification

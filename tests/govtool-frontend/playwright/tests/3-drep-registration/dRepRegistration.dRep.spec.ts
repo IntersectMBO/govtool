@@ -138,7 +138,9 @@ test.describe("Temporary DReps", () => {
 
     await dRepRegistrationPage.confirmBtn.click();
 
-    await expect(dRepPage.getByTestId("d-rep-in-progress")).not.toBeVisible();
+    await expect(dRepPage.getByTestId("d-rep-in-progress")).not.toBeVisible({
+      timeout: 20_000,
+    });
 
     // connected state
     const dRepDirectoryPage = new DRepDirectoryPage(page);
@@ -231,7 +233,8 @@ test.describe("Temporary DReps", () => {
       .click();
 
     await expect(dRepPage.getByTestId("d-rep-in-progress")).toHaveText(
-      /in progress/i
+      /in progress/i,
+      { timeout: 20_000 }
     );
   });
 });

@@ -26,6 +26,7 @@ public class PageVisits {
             "TreasuryWithdrawals",
             "InfoAction"
     );
+    public static List<String> proposalCreationType =  Arrays.asList("InfoAction","TreasuryWithdrawals");
     public static ObjectMapper objectMapper=new ObjectMapper();
     public static HttpRequestActionBuilder listAndSelectDreps(int min, int max){
         return http("get_dReps").get("/drep/list?page=0&size=10")
@@ -53,6 +54,23 @@ public class PageVisits {
 
         ).toList());
     }
+
+    public static ChainBuilder visitProposalDiscussionPage(){
+        return exec(proposalCreationType.stream().map(pType ->exec(requestProposalDiscussion(pType))
+        ).toList());   
+    }
+
+   
+
+    public static HttpRequestActionBuilder requestProposalDiscussion(String type){
+        return http("list proposal Discussion type "+ type)
+                .get("/proposals")
+                .queryParam("filters[$and][0][gov_action_type_id]",proposalCreationType.indexOf(type) + 1)
+                .check(status().is(200));
+    }
+
+    
+
     public static HttpRequestActionBuilder requestProposal(String type){
         return http("list proposal type "+type)
                 .get("/proposal/list")

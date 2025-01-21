@@ -21,6 +21,7 @@ changes.
 ### Changed
 
 - Bump cardano-node to 10.1.4
+- Make CIP-129 governance identifiers the default ones
 
 ### Removed
 

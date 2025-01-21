@@ -12,6 +12,7 @@ type BaseProps = {
   isSliderCard?: boolean;
   tooltipProps?: Omit<TooltipProps, "children">;
   marginBottom?: number;
+  isSemiTransparent?: boolean;
 };
 
 type PillVariantProps = BaseProps & {
@@ -39,6 +40,7 @@ export const GovernanceActionCardElement = ({
   tooltipProps,
   marginBottom,
   isMarkdown = false,
+  isSemiTransparent = false,
 }: GovernanceActionCardElementProps) => {
   if (!text) {
     return null;
@@ -160,6 +162,9 @@ export const GovernanceActionCardElement = ({
                   }),
                   ...(isCopyButton && {
                     color: "primaryBlue",
+                  }),
+                  ...(isSemiTransparent && {
+                    opacity: 0.75,
                   }),
                 }}
               >

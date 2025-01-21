@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
-- Fix calculating stake key balance [Issue 2653](https://github.com/IntersectMBO/govtool/issues/2653)
+- Fix usage of trim on missing label
 
 ### Changed
 

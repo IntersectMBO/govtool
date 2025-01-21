@@ -112,13 +112,7 @@ export const DRepDetailsCard = ({
           />
         )}
         {/* ERROR MESSAGES END */}
-        <DRepDetailsInfoItem label={t("drepId")} dataTestId="drep-id">
-          <CopyableText value={view} dataTestId="copy-drep-id-button" />
-        </DRepDetailsInfoItem>
-        <DRepDetailsInfoItem
-          label={t("cip129DrepId")}
-          dataTestId="cip-129-drep-id"
-        >
+        <DRepDetailsInfoItem label={t("drepId")} dataTestId="cip-129-drep-id">
           <CopyableText
             value={encodeCIP129Identifier({
               txID: `${isScriptBased ? "23" : "22"}${drepId}`,
@@ -127,6 +121,18 @@ export const DRepDetailsCard = ({
             dataTestId="copy-cip-129-drep-id-button"
           />
         </DRepDetailsInfoItem>
+
+        <DRepDetailsInfoItem
+          label={t("cip105DRepId")}
+          dataTestId="cip-105-drep-id"
+        >
+          <CopyableText
+            isSemiTransparent
+            value={view}
+            dataTestId="copy-drep-id-button"
+          />
+        </DRepDetailsInfoItem>
+
         <DRepDetailsInfoItem label={t("status")} dataTestId="drep-status">
           <StatusPill status={status} />
         </DRepDetailsInfoItem>
@@ -296,9 +302,14 @@ const DRepDetailsInfoItem = ({
 type CopyableTextProps = {
   value: string;
   dataTestId: string;
+  isSemiTransparent?: boolean;
 };
 
-const CopyableText = ({ value, dataTestId }: CopyableTextProps) => (
+const CopyableText = ({
+  value,
+  dataTestId,
+  isSemiTransparent,
+}: CopyableTextProps) => (
   <ButtonBase
     onClick={(e) => {
       navigator.clipboard.writeText(value.toString());
@@ -314,7 +325,11 @@ const CopyableText = ({ value, dataTestId }: CopyableTextProps) => (
       },
     }}
   >
-    <Typography color="primary" fontWeight={500} sx={ellipsisStyles}>
+    <Typography
+      color="primary"
+      fontWeight={500}
+      sx={{ ...ellipsisStyles, opacity: isSemiTransparent ? 0.75 : 1 }}
+    >
       {value}
     </Typography>
     <img alt="" src={ICONS.copyBlueIcon} />

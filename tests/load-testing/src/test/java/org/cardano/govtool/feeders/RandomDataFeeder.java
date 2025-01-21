@@ -57,4 +57,7 @@ public class RandomDataFeeder {
 
     public static Iterator<Map<String, Object>> proposalReceivingAddress = generateIterator("proposalReceivingAddress", Utils::generateStakeKey);
 
+    public static Iterator<Map<String, Object>> randomJwt = generateIterator("jwt", Utils::extractJWT);
+    public static Iterator<Map<String, Object>> randomBech32StakeAddress = generateIterator("stakeAddress", Utils::extractBech32StakeAddress);
+
 }

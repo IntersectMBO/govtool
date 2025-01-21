@@ -3,3 +3,4 @@
 /gatling
 .idea
 .gitlab-ci.yml
+/src/test/resources/auth.json

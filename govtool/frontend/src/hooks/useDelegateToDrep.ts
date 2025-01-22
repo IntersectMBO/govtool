@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import * as Sentry from "@sentry/react";
 
 import { useCardano, useSnackbar } from "@context";
 import { useGetVoterInfo, useTranslation, useWalletErrorModal } from "@hooks";
@@ -60,8 +59,6 @@ export const useDelegateTodRep = () => {
               : (error as { message: string | null })?.message,
           dataTestId: "delegate-transaction-error-modal",
         });
-        Sentry.setTag("hook", "useDelegateTodRep");
-        Sentry.captureException(error);
       } finally {
         setIsDelegating(null);
       }

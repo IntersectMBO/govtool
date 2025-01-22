@@ -585,8 +585,9 @@ deriveJSON (jsonOptions "dRepInfoResponse") ''DRepInfoResponse
 
 exampleDRepInfoResponse :: Text
 exampleDRepInfoResponse =
-    "{\"isRegisteredAsDRep\": false,"
-  <> "\"wasRegisteredAsDRep\": true,"
+    "{\"isScriptBased\": false,"
+  <> "\"isRegisteredAsDRep\": true,"
+  <> "\"wasRegisteredAsDRep\": false,"
   <> "\"isRegisteredAsSoleVoter\": true,"
   <> "\"wasRegisteredAsSoleVoter\": true,"
   <> "\"deposit\": 2000000,"

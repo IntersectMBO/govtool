@@ -12,7 +12,7 @@ changes.
 
 ### Added
 
--
+- Add share DRep button to every DRep instead of only our own [Issue 2686](https://github.com/IntersectMBO/govtool/issues/2686)
 
 ### Fixed
 

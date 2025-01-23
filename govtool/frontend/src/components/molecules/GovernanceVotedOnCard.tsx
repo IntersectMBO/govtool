@@ -108,18 +108,19 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           isSliderCard
         />
         <GovernanceActionCardElement
-          label={t("govActions.governanceActionId")}
-          text={govActionId}
-          dataTestId={`${govActionId}-id`}
-          isCopyButton
-          isSliderCard
-        />
-        <GovernanceActionCardElement
           label={t("govActions.cip129GovernanceActionId")}
           text={cip129GovernanceActionId}
           dataTestId={`${cip129GovernanceActionId}-id`}
           isCopyButton
           isSliderCard
+        />
+        <GovernanceActionCardElement
+          label={t("govActions.governanceActionId")}
+          text={govActionId}
+          dataTestId={`${govActionId}-id`}
+          isCopyButton
+          isSliderCard
+          isSemiTransparent
         />
         {vote && (
           <GovernanceActionCardMyVote

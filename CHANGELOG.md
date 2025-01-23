@@ -26,6 +26,29 @@ changes.
 
 -
 
+## [v2.0.8](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.8) 2025-01-23
+
+### Added
+
+- Add share DRep button to every DRep instead of only our own [Issue 2686](https://github.com/IntersectMBO/govtool/issues/2686)
+- Show metadata anchor in Governance Action Details [Issue 2178](https://github.com/IntersectMBO/govtool/issues/2178)
+- Handle unexpected drep info query result [Issue 2676](https://github.com/IntersectMBO/govtool/issues/2676)
+
+### Fixed
+
+- Fix usage of trim on missing label
+- Fix blank screen when registering as a DRep [Issue 2408](https://github.com/IntersectMBO/govtool/issues/2408)
+
+### Changed
+
+- Bump cardano-node to 10.1.4
+- Make CIP-129 governance identifiers the default ones
+
+### Removed
+
+- Remove logging to sentry for DRep registration transaction [Issue 2681](https://github.com/IntersectMBO/govtool/issues/2681)
+- Remove logging to sentry when delegation transaction fails [Issue 2682](https://github.com/IntersectMBO/govtool/issues/2682)
+
 ## [v2.0.7](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.7) 2025-01-20
 
 ### Added

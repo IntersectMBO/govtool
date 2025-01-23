@@ -12,7 +12,7 @@ export const GovernanceActionNewConstitutionDetailsTabContent = ({
   return (
     <Box>
       <GovernanceActionCardElement
-        isCopyButton
+        isLinkButton
         label="New constitution link"
         text={(details?.anchor as NewConstitutionAnchor)?.url as string}
         dataTestId="new-constitution-url"

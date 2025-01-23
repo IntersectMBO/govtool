@@ -42,7 +42,7 @@ const commonArgs = {
     expiryEpochNo: 1000001,
     expiryDate: new Date().toISOString(),
     type: GovernanceActionType.InfoAction,
-    url: "https://exampleurl.com",
+    url: "https://exampleMetadataUrl.com",
     title: "Example title",
     dRepYesVotes: 1000000,
     dRepNoVotes: 302,
@@ -105,6 +105,13 @@ async function assertGovActionDetails(
   );
   await expect(canvas.getByTestId(`${cip129GovActionId}-id`)).toHaveTextContent(
     cip129GovActionId,
+  );
+
+  await expect(canvas.getByTestId("anchor-url")).toHaveTextContent(
+    args.proposal.url,
+  );
+  await expect(canvas.getByTestId("anchor-hash")).toHaveTextContent(
+    args.proposal.metadataHash,
   );
 }
 

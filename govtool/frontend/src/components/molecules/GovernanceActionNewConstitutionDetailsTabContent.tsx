@@ -13,16 +13,16 @@ export const GovernanceActionNewConstitutionDetailsTabContent = ({
     <Box>
       <GovernanceActionCardElement
         isCopyButton
-        label="New constitution hash"
-        text={(details?.anchor as NewConstitutionAnchor)?.dataHash as string}
-        dataTestId="new-constitution-data-hash"
+        label="New constitution link"
+        text={(details?.anchor as NewConstitutionAnchor)?.url as string}
+        dataTestId="new-constitution-url"
         textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
       />
       <GovernanceActionCardElement
         isCopyButton
-        label="New constitution link"
-        text={(details?.anchor as NewConstitutionAnchor)?.url as string}
-        dataTestId="new-constitution-url"
+        label="New constitution hash"
+        text={(details?.anchor as NewConstitutionAnchor)?.dataHash as string}
+        dataTestId="new-constitution-data-hash"
         textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
       />
     </Box>

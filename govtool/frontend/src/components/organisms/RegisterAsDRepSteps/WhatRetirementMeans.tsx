@@ -72,7 +72,7 @@ export const WhatRetirementMeans = ({
     } catch (error: any) {
       Sentry.captureException(error);
       openWalletErrorModal({
-        error,
+        error: error?.message ? error.message : JSON.stringify(error),
         onSumbit: onClickCancel,
         buttonText: t("modals.common.goToDashboard"),
         dataTestId: "retirement-transaction-error-modal",

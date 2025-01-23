@@ -176,7 +176,7 @@ export const useEditDRepInfoForm = (
           Sentry.captureException(error);
 
           openWalletErrorModal({
-            error,
+            error: error?.message ? error.message : JSON.stringify(error),
             onSumbit: () => backToDashboard(),
             dataTestId: "edit-drep-transaction-error-modal",
           });

@@ -88,6 +88,7 @@ export const GovernanceActionDetailsCardData = ({
     url,
     type,
     protocolParams,
+    metadataHash,
   },
 }: GovernanceActionDetailsCardDataProps) => {
   const { epochParams } = useAppContext();
@@ -318,6 +319,21 @@ export const GovernanceActionDetailsCardData = ({
             amount={withdrawal.amount}
           />
         ))}
+      <GovernanceActionCardElement
+        label={t("govActions.anchorURL")}
+        text={url}
+        textVariant="longText"
+        dataTestId="anchor-url"
+        isLinkButton
+      />
+      <GovernanceActionCardElement
+        label={t("govActions.anchorHash")}
+        text={metadataHash}
+        textVariant="longText"
+        dataTestId="anchor-hash"
+        isCopyButton
+      />
+
       <GovernanceActionDetailsCardLinks links={references} />
     </Box>
   );

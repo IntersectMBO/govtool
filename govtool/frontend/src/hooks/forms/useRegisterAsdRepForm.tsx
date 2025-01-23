@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
-import * as Sentry from "@sentry/react";
 import { NodeObject } from "jsonld";
 import { CertificatesBuilder } from "@emurgo/cardano-serialization-lib-asmjs";
 
@@ -127,29 +126,23 @@ export const useRegisterAsdRepForm = (
     async (data: DRepDataFormValues) => {
       if (!hash) return;
       const uri = data.storingURL;
-      try {
-        const certBuilder = CertificatesBuilder.new();
+      const certBuilder = CertificatesBuilder.new();
 
-        const registerCert = voter?.isRegisteredAsSoleVoter
-          ? await buildDRepUpdateCert(uri, hash)
-          : await buildDRepRegCert(uri, hash);
+      const registerCert = voter?.isRegisteredAsSoleVoter
+        ? await buildDRepUpdateCert(uri, hash)
+        : await buildDRepRegCert(uri, hash);
 
-        certBuilder.add(registerCert);
+      certBuilder.add(registerCert);
 
-        if (!registeredStakeKeysListState.length) {
-          const stakeKeyRegCert = await buildStakeKeyRegCert();
-          certBuilder.add(stakeKeyRegCert);
-        }
-
-        const voteDelegationCert = await buildVoteDelegationCert(dRepID);
-        certBuilder.add(voteDelegationCert);
-
-        return certBuilder;
-      } catch (error) {
-        Sentry.setTag("hook", "useRegisterAsdRepForm");
-        Sentry.captureException(error);
-        throw error;
+      if (!registeredStakeKeysListState.length) {
+        const stakeKeyRegCert = await buildStakeKeyRegCert();
+        certBuilder.add(stakeKeyRegCert);
       }
+
+      const voteDelegationCert = await buildVoteDelegationCert(dRepID);
+      certBuilder.add(voteDelegationCert);
+
+      return certBuilder;
     },
     [
       buildDRepRegCert,
@@ -222,11 +215,8 @@ export const useRegisterAsdRepForm = (
             },
           });
         } else {
-          Sentry.setTag("hook", "useRegisterAsdRepForm");
-          Sentry.captureException(error);
-
           openWalletErrorModal({
-            error,
+            error: error?.message ? error.message : JSON.stringify(error),
             onSumbit: () => backToDashboard(),
             dataTestId: "registration-transaction-error-modal",
           });

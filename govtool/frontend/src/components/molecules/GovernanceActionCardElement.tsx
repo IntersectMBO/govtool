@@ -4,6 +4,8 @@ import Markdown from "react-markdown";
 
 import { Typography, Tooltip, CopyButton, TooltipProps } from "@atoms";
 import { removeMarkdown } from "@/utils";
+import { ICONS } from "@/consts";
+import { useModal } from "@/context";
 
 type BaseProps = {
   label: string;
@@ -12,16 +14,19 @@ type BaseProps = {
   isSliderCard?: boolean;
   tooltipProps?: Omit<TooltipProps, "children">;
   marginBottom?: number;
+  isSemiTransparent?: boolean;
 };
 
 type PillVariantProps = BaseProps & {
   textVariant: "pill";
   isCopyButton?: false;
+  isLinkButton?: false;
 };
 
 type OtherVariantsProps = BaseProps & {
   textVariant?: "oneLine" | "twoLines" | "longText";
   isCopyButton?: boolean;
+  isLinkButton?: boolean;
 };
 
 type GovernanceActionCardElementProps = (
@@ -36,10 +41,14 @@ export const GovernanceActionCardElement = ({
   isSliderCard,
   textVariant = "oneLine",
   isCopyButton,
+  isLinkButton,
   tooltipProps,
   marginBottom,
   isMarkdown = false,
+  isSemiTransparent = false,
 }: GovernanceActionCardElementProps) => {
+  const { openModal } = useModal();
+
   if (!text) {
     return null;
   }
@@ -158,8 +167,11 @@ export const GovernanceActionCardElement = ({
                     WebkitLineClamp: 2,
                     whiteSpace: "normal",
                   }),
-                  ...(isCopyButton && {
+                  ...((isCopyButton || isLinkButton) && {
                     color: "primaryBlue",
+                  }),
+                  ...(isSemiTransparent && {
+                    opacity: 0.75,
                   }),
                 }}
               >
@@ -169,6 +181,24 @@ export const GovernanceActionCardElement = ({
             {isCopyButton && (
               <Box ml={1}>
                 <CopyButton text={text.toString()} variant="blueThin" />
+              </Box>
+            )}
+            {isLinkButton && (
+              <Box ml={1}>
+                <img
+                  data-testid="link-button"
+                  alt="link"
+                  src={ICONS.externalLinkIcon}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    openModal({
+                      type: "externalLink",
+                      state: {
+                        externalLink: text.toString(),
+                      },
+                    });
+                  }}
+                />
               </Box>
             )}
           </Box>

@@ -199,3 +199,4 @@ getDRepInfo drepId = withPool $ \conn -> do
         , dRepInfoImageHash = imageHash
         }
     [] -> return $ DRepInfo False False False False False Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+    _ -> error "Unexpected result from database query in getDRepInfo"

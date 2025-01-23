@@ -20,7 +20,8 @@ changes.
 
 ### Changed
 
--
+- Change labelling of governance action metadata anchor
+- Change labelling and order of new constitution governance action details
 
 ### Removed
 

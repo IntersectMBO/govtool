@@ -216,7 +216,7 @@ export const useRegisterAsdRepForm = (
           });
         } else {
           openWalletErrorModal({
-            error,
+            error: error?.message ? error.message : JSON.stringify(error),
             onSumbit: () => backToDashboard(),
             dataTestId: "registration-transaction-error-modal",
           });

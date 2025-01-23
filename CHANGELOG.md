@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Fix usage of trim on missing label
+- Fix blank screen when registering as a DRep [Issue 2408](https://github.com/IntersectMBO/govtool/issues/2408)
 
 ### Changed
 

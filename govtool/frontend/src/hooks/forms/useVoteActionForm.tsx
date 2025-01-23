@@ -3,7 +3,6 @@ import { useForm, useWatch } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import * as Sentry from "@sentry/react";
 
 import { PATHS } from "@consts";
 import { useCardano, useSnackbar } from "@context";
@@ -106,8 +105,6 @@ export const useVoteActionForm = ({
           });
         }
       } catch (error) {
-        Sentry.setTag("hook", "useVoteActionForm");
-        Sentry.captureException(error);
         openWalletErrorModal({
           error,
           dataTestId: "vote-transaction-error-modal",

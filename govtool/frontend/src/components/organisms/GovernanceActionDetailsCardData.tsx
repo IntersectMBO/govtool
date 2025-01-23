@@ -88,6 +88,7 @@ export const GovernanceActionDetailsCardData = ({
     url,
     type,
     protocolParams,
+    metadataHash,
   },
 }: GovernanceActionDetailsCardDataProps) => {
   const { epochParams } = useAppContext();
@@ -256,18 +257,19 @@ export const GovernanceActionDetailsCardData = ({
         />
       )}
       <GovernanceActionCardElement
-        label={t("govActions.governanceActionId")}
-        text={govActionId}
-        isCopyButton
-        dataTestId={`${govActionId}-id`}
-        textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
-      />
-      <GovernanceActionCardElement
         label={t("govActions.cip129GovernanceActionId")}
         text={cip129GovernanceActionId}
         dataTestId={`${cip129GovernanceActionId}-id`}
         isCopyButton
         textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
+      />
+      <GovernanceActionCardElement
+        label={t("govActions.governanceActionId")}
+        text={govActionId}
+        isCopyButton
+        dataTestId={`${govActionId}-id`}
+        textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
+        isSemiTransparent
       />
 
       {tabs?.length === 1 ? (
@@ -317,6 +319,21 @@ export const GovernanceActionDetailsCardData = ({
             amount={withdrawal.amount}
           />
         ))}
+      <GovernanceActionCardElement
+        label={t("govActions.anchorURL")}
+        text={url}
+        textVariant="longText"
+        dataTestId="anchor-url"
+        isLinkButton
+      />
+      <GovernanceActionCardElement
+        label={t("govActions.anchorHash")}
+        text={metadataHash}
+        textVariant="longText"
+        dataTestId="anchor-hash"
+        isCopyButton
+      />
+
       <GovernanceActionDetailsCardLinks links={references} />
     </Box>
   );

@@ -10,7 +10,7 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import { DataMissingHeader, Share } from "@molecules";
+import { DataMissingHeader } from "@molecules";
 import { correctDRepDirectoryFormat } from "@utils";
 import { DRepData } from "@/models";
 
@@ -115,7 +115,6 @@ export const DRepDetailsCardHeader = ({
                   style={{ marginLeft: "4px" }}
                 />
               </Button>
-              {screenWidth >= 1020 && <Share link={window.location.href} />}
             </Box>
           )}
         </Box>

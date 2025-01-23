@@ -152,35 +152,6 @@ export const DRepCard = ({
                   }}
                 >
                   <ButtonBase
-                    data-testid={`${view}-copy-id-button`}
-                    onClick={(e) => {
-                      navigator.clipboard.writeText(view);
-                      addSuccessAlert(t("alerts.copiedToClipboard"));
-                      e.stopPropagation();
-                    }}
-                    sx={{
-                      gap: 1,
-                      width: "250px",
-                      maxWidth: {
-                        xxs: "200px",
-                        xs: "100%",
-                      },
-                      "&:hover": {
-                        opacity: 0.6,
-                        transition: "opacity 0.3s",
-                      },
-                    }}
-                  >
-                    <Typography
-                      color="primary"
-                      variant="body2"
-                      sx={ellipsisStyles}
-                    >
-                      {view}
-                    </Typography>
-                    <img alt="" src={ICONS.copyBlueIcon} />
-                  </ButtonBase>
-                  <ButtonBase
                     data-testid={`${cip129Identifier}-copy-id-button`}
                     onClick={(e) => {
                       navigator.clipboard.writeText(cip129Identifier);
@@ -202,14 +173,43 @@ export const DRepCard = ({
                       flexDirection: "row",
                     }}
                   >
+                    <Typography
+                      color="primary"
+                      variant="body2"
+                      sx={ellipsisStyles}
+                    >
+                      {cip129Identifier}
+                    </Typography>
+                    <img alt="" src={ICONS.copyBlueIcon} />
+                  </ButtonBase>
+                  <ButtonBase
+                    data-testid={`${view}-copy-id-button`}
+                    onClick={(e) => {
+                      navigator.clipboard.writeText(view);
+                      addSuccessAlert(t("alerts.copiedToClipboard"));
+                      e.stopPropagation();
+                    }}
+                    sx={{
+                      gap: 1,
+                      width: "250px",
+                      maxWidth: {
+                        xxs: "200px",
+                        xs: "100%",
+                      },
+                      "&:hover": {
+                        opacity: 0.6,
+                        transition: "opacity 0.3s",
+                      },
+                    }}
+                  >
                     <Typography variant="body2" sx={ellipsisStyles}>
-                      (CIP-129){" "}
+                      (CIP-105){" "}
                       <Typography
                         color="primary"
                         variant="body2"
                         component="span"
                       >
-                        {cip129Identifier}
+                        {view}
                       </Typography>
                     </Typography>
                     <img alt="" src={ICONS.copyBlueIcon} />

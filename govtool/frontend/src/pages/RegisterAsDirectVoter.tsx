@@ -86,7 +86,7 @@ export const RegisterAsDirectVoter = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       openWalletErrorModal({
-        error,
+        error: error?.message ? error.message : JSON.stringify(error),
         buttonText: t("modals.common.goToDashboard"),
         onSumbit: () => navigate(PATHS.dashboard),
         dataTestId: "registration-transaction-error-modal",

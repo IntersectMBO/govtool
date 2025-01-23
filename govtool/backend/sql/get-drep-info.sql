@@ -215,3 +215,4 @@ FROM
     CROSS JOIN IsScriptHash
     LEFT JOIN off_chain_vote_data ON off_chain_vote_data.voting_anchor_id = LatestRegistrationEntry.voting_anchor_id
     LEFT JOIN off_chain_vote_drep_data ON off_chain_vote_drep_data.off_chain_vote_data_id = off_chain_vote_data.id
+LIMIT 1

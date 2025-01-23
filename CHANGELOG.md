@@ -25,7 +25,7 @@ changes.
 
 ### Removed
 
--
+- Remove logging to sentry for DRep registration transaction [Issue 2681](https://github.com/IntersectMBO/govtool/issues/2681)
 
 ## [v2.0.7](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.7) 2025-01-20
 

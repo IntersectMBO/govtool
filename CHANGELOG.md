@@ -26,6 +26,25 @@ changes.
 
 -
 
+## [v2.0.9](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.9) 2025-01-24
+
+### Added
+
+-
+
+### Fixed
+
+- Fix opening IPFS links [Issue 2711](https://github.com/IntersectMBO/govtool/issues/2711)
+
+### Changed
+
+- Change labelling of governance action metadata anchor
+- Change labelling and order of new constitution governance action details
+
+### Removed
+
+-
+
 ## [v2.0.8](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.8) 2025-01-23
 
 ### Added

@@ -144,10 +144,6 @@ startApp vvaConfig sentryService = do
 
 exceptionHandler :: VVAConfig -> SentryService -> Maybe Request -> SomeException -> IO ()
 exceptionHandler vvaConfig sentryService mRequest exception = do
-  print exception
-  -- These are not considered application errors
-  -- They represent the client closing the connection prematurely
-  -- or the timeout thread being killed by WARP
   let isNotTimeoutThread x = case fromException x of
         Just TimeoutThread -> False
         _                  -> True
@@ -160,13 +156,18 @@ exceptionHandler vvaConfig sentryService mRequest exception = do
           Nothing  -> True
       isNotThreadKilledByTimeoutManager x =
           "Thread killed by timeout manager" `notElem` lines (show x)
-      shouldSkipError =
+      isNotUserErrorMzero x = case fromException x of
+        Just ioe -> not ("user error (mzero)" `isInfixOf` show (ioe :: IOException))
+        _        -> True
+
+      isGuardException =
         isNotTimeoutThread exception &&
         isNotConnectionClosedByPeer exception &&
         isNotClientClosedConnection exception &&
-        isNotThreadKilledByTimeoutManager exception
+        isNotThreadKilledByTimeoutManager exception &&
+        isNotUserErrorMzero exception
 
-  guard shouldSkipError
+  guard isGuardException
 
   let env = sentryEnv vvaConfig
   case mRequest of

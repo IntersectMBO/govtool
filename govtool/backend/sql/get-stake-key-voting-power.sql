@@ -30,7 +30,7 @@ Balance AS (
 )
 SELECT
   (COALESCE(rr.amount, 0) + COALESCE(r.amount, 0) + COALESCE(b.amount, 0)) AS total_balance,
-  b.addr_raw
+  b.addr_raw::text AS stake_address
 FROM
   Balance b
 LEFT JOIN

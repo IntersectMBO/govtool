@@ -51,7 +51,7 @@ getStakeKeyVotingPower ::
   Text ->
   m Integer
 getStakeKeyVotingPower stakeKey = withPool $ \conn -> do
-  result <- liftIO $ SQL.query @_ @(Scientific, Text) conn getVotingPowerSql (SQL.Only stakeKey)
+  result <- liftIO $ SQL.query @_ @(Scientific, ByteString) conn getVotingPowerSql (SQL.Only stakeKey)
   case result of
     [(votingPower,_)] -> return $ floor votingPower
     _ -> do

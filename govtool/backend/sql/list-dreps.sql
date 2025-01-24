@@ -67,19 +67,30 @@ FetchError AS (
 ),
 LatestExistingVotingAnchor AS (
   SELECT
-    dr.id AS drep_registration_id,
-    dr.drep_hash_id,
-    va.id AS voting_anchor_id,
-    va.url,
-    encode(va.data_hash, 'hex') AS metadata_hash
-  FROM
-    drep_registration dr
-  JOIN voting_anchor va ON dr.voting_anchor_id = va.id
-  JOIN off_chain_vote_data ocvd ON va.id = ocvd.voting_anchor_id
+    subquery.drep_registration_id,
+    subquery.drep_hash_id,
+    subquery.voting_anchor_id,
+    subquery.url,
+    subquery.metadata_hash,
+    subquery.ocvd_id
+  FROM (
+    SELECT
+      dr.id AS drep_registration_id,
+      dr.drep_hash_id,
+      va.id AS voting_anchor_id,
+      va.url,
+      encode(va.data_hash, 'hex') AS metadata_hash,
+      ocvd.id AS ocvd_id,
+      ROW_NUMBER() OVER (PARTITION BY dr.drep_hash_id ORDER BY dr.tx_id DESC) AS rn
+    FROM
+      drep_registration dr
+    JOIN voting_anchor va ON dr.voting_anchor_id = va.id
+    JOIN off_chain_vote_data ocvd ON va.id = ocvd.voting_anchor_id
+    WHERE
+      ocvd.voting_anchor_id IS NOT NULL
+  ) subquery
   WHERE
-    ocvd.voting_anchor_id IS NOT NULL
-  ORDER BY
-    dr.tx_id DESC
+    subquery.rn = 1
 ),
 HasNonDeregisterVotingAnchor AS (
   SELECT

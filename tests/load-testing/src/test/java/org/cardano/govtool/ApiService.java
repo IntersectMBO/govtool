@@ -44,20 +44,20 @@ public class ApiService {
             http("get_comments").get("/comments").queryParam("filters[$and][0][proposal_id]", "#{proposalDiscussionId}")
                     .headers(Utils.proposalDefaultHeaders("#{jwt}")));
 
-    public static ChainBuilder postComments = exec(http("post_comments").post("/comments")
+    public static ChainBuilder postComments = exec(http("add_comments_on_proposal").post("/comments")
             .body(StringBody(
                     "{\"data\":{\"proposal_id\":\"#{proposalDiscussionId}\",\"comment_text\":\"#{commentText}\"}}"))
             .headers(Utils.proposalDefaultHeaders("#{jwt}")));
 
-    public static ChainBuilder getActivePolls = exec(http("get_Active_polls").get("/polls")
+    public static ChainBuilder getActivePolls = exec(http("get_proposal_active_polls").get("/polls")
             .queryParam("filters[$and][0][proposal_id]", "#{proposalDiscussionId}")
             .queryParam("filters[$and][1][is_poll_active]", "true").headers(Utils.proposalDefaultHeaders("#{jwt}")));
 
-    public static ChainBuilder getInActivePolls = exec(http("get_Inactive_polls").get("/polls")
+    public static ChainBuilder getInActivePolls = exec(http("get_proposal_inactive_polls").get("/polls")
             .queryParam("filters[$and][0][proposal_id]", "#{proposalDiscussionId}")
             .queryParam("filters[$and][1][is_poll_active]", "false").headers(Utils.proposalDefaultHeaders("#{jwt}")));
 
-    public static ChainBuilder proposalVote = exec(http("proposal_vote").post("/proposal-votes")
+    public static ChainBuilder proposalVote = exec(http("like/dislike_on_proposals").post("/proposal-votes")
             .body(StringBody(
                     "{\"data\":{\"proposal_id\":\"#{proposalDiscussionId}\",\"vote_result\":#{proposalVote}}}"))
             .headers(Utils.proposalDefaultHeaders("#{jwt}")));

@@ -62,7 +62,7 @@ public class PageVisits {
     }
 
     public static HttpRequestActionBuilder requestProposalDiscussion(String type) {
-        return http("list proposal Discussion type " + type)
+        return http("list proposal Discussion " + type + " type")
                 .get("/proposals")
                 .header("authorization", "Bearer " + Utils.extractJWT())
                 .queryParam("filters[$and][0][gov_action_type_id]", proposalCreationType.indexOf(type) + 1)

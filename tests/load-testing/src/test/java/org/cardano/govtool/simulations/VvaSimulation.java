@@ -108,17 +108,18 @@ public class VvaSimulation extends Simulation {
                                 makeScenario("Drep Retirement",
                                                 exec(DRepAction.retireAsDRep), DREP_USER_RATI0 * 0.1, httpProtocol),
 
-                                makeScenario("ListProposalDiscussions", PageVisits.visitProposalDiscussionPage(), 0.1,
+                                makeScenario("List Proposal Discussions", PageVisits.visitProposalDiscussionPage(), 0.1,
                                                 pdfHttpProtocol),
-                                makeScenario("Comment on proposal", exec(ProposalAction.commentOnProposal), 0.2,
+                                makeScenario("Users Comment on proposal", exec(ProposalAction.commentOnProposal), 0.2,
                                                 pdfHttpProtocol),
-                                makeScenario("Proposal Active/InActive polls", exec(ProposalAction.getPolls), 0.2,
+                                makeScenario("Proposal Active/InActive polls status", exec(ProposalAction.getPolls),
+                                                0.2,
                                                 pdfHttpProtocol),
-                                makeScenario("proposal types", exec(ProposalAction.getGovernanceActionType), 0.1,
+                                makeScenario("List Proposal types", exec(ProposalAction.getGovernanceActionType), 0.1,
                                                 pdfHttpProtocol),
-                                makeScenario("Like/Dislike proposal", exec(ProposalAction.voteOnProposal), 0.2,
+                                makeScenario("Users Like/Dislike proposal", exec(ProposalAction.voteOnProposal), 0.2,
                                                 pdfHttpProtocol),
-                                makeScenario("Create proposal/draft", exec(ProposalAction.createProposal), 0.2,
+                                makeScenario("Users Create proposal/draft", exec(ProposalAction.createProposal), 0.2,
                                                 pdfHttpProtocol));
         }
 

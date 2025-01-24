@@ -34,7 +34,7 @@ export const mapDtoToDrep = async (dto: DrepDataDTO): Promise<DRepData> => {
   if (dto.imageUrl) {
     fetch(
       isIPFSImage
-        ? `${process.env.VITE_IPFS_GATEWAY}/${dto.imageUrl?.slice(7)}`
+        ? `${import.meta.env.VITE_IPFS_GATEWAY}/${dto.imageUrl?.slice(7)}`
         : dto.imageUrl,
       isIPFSImage
         ? {

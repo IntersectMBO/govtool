@@ -16,6 +16,24 @@ changes.
 
 ### Fixed
 
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v2.0.9](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.9) 2025-01-24
+
+### Added
+
+-
+
+### Fixed
+
 - Fix opening IPFS links [Issue 2711](https://github.com/IntersectMBO/govtool/issues/2711)
 
 ### Changed

@@ -3,6 +3,8 @@ export const openInNewTab = (url: string) => {
   const fullUrl =
     url.startsWith("http://") || url.startsWith("https://")
       ? url
+      : url.startsWith("ipfs")
+      ? `${process.env.VITE_IPFS_GATEWAY}/${url.slice(7)}`
       : `https://${url}`;
 
   const newWindow = window.open(fullUrl, "_blank", "noopener,noreferrer");

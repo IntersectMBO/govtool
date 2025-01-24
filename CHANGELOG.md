@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix opening IPFS links [Issue 2711](https://github.com/IntersectMBO/govtool/issues/2711)
 
 ### Changed
 

@@ -39,7 +39,9 @@ test("2N. Should show DRep information on details page", async ({
   const objectives = faker.lorem.paragraph(2);
   const motivations = faker.lorem.paragraph(2);
   const qualifications = faker.lorem.paragraph(2);
-  const paymentAddress = ShelleyWallet.fromJson(wallet).rewardAddressBech32(0);
+  const paymentAddress = ShelleyWallet.fromJson(wallet).addressBech32(
+    environments.networkId
+  );
   const linksReferenceLinks: LinkType[] = [
     {
       url: faker.internet.url(),

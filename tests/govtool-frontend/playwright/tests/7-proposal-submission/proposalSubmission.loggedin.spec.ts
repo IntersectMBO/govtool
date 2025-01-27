@@ -1,3 +1,4 @@
+import environments from "@constants/environments";
 import {
   proposal01Wallet,
   proposal03Wallet,
@@ -56,7 +57,7 @@ test.describe("Proposal created logged state", () => {
         for (let i = 0; i < 50; i++) {
           const rewardAddressBech32 = (
             await ShelleyWallet.generate()
-          ).rewardAddressBech32(0);
+          ).rewardAddressBech32(environments.networkId);
           const formFields: ProposalCreateRequest =
             proposalSubmissionPage.generateValidProposalFormFields(
               type,
@@ -127,8 +128,9 @@ test.describe("Proposal created logged state", () => {
 
         await proposalSubmissionPage.addLinkBtn.click();
 
-        const walletAddressBech32 =
-          ShelleyWallet.fromJson(wallet).rewardAddressBech32(0);
+        const walletAddressBech32 = ShelleyWallet.fromJson(
+          wallet
+        ).addressBech32(environments.networkId);
         const proposal: ProposalCreateRequest =
           proposalSubmissionPage.generateValidProposalFormFields(
             type,
@@ -180,8 +182,9 @@ test.describe("Proposal created logged state", () => {
 
         await proposalSubmissionPage.addLinkBtn.click();
 
-        const walletAddressBech32 =
-          ShelleyWallet.fromJson(proposal01Wallet).rewardAddressBech32(0);
+        const walletAddressBech32 = ShelleyWallet.fromJson(
+          proposal01Wallet
+        ).addressBech32(environments.networkId);
         const proposal: ProposalCreateRequest =
           proposalSubmissionPage.generateValidProposalFormFields(
             type,

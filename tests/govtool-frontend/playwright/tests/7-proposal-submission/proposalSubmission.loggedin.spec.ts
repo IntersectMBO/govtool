@@ -32,7 +32,7 @@ test.describe("Proposal created logged state", () => {
   test.use({ storageState: ".auth/proposal01.json", wallet: proposal01Wallet });
   test("7B. Should access proposal creation page", async ({ page }) => {
     await page.goto("/");
-    await page.getByTestId("propose-governance-actions-button").click();
+    await page.getByTestId("proposal-discussion-link").click();
 
     await expect(page.getByText(/proposals/i)).toHaveCount(2);
   });

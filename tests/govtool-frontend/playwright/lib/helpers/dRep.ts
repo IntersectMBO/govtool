@@ -1,5 +1,6 @@
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { Page } from "@playwright/test";
+import { IDRep } from "@types";
 import { bech32 } from "bech32";
 
 export async function fetchFirstActiveDRepDetails(page: Page) {
@@ -12,7 +13,7 @@ export async function fetchFirstActiveDRepDetails(page: Page) {
       const response = await route.fetch();
       const json = await response.json();
       const elements = json["elements"].filter(
-        (element) => element["givenName"] != null
+        (element: IDRep) => element.givenName != null && !element.isScriptBased
       );
       dRepGivenName =
         elements[Math.floor(Math.random() * elements.length)]["givenName"];

@@ -12,7 +12,7 @@ changes.
 
 ### Added
 
--
+- Add exception handler on stake key voting power query execution [Issue 2757](https://github.com/IntersectMBO/govtool/issues/2757)
 
 ### Fixed
 

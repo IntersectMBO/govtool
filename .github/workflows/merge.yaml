@@ -138,6 +138,8 @@ jobs:
             VITE_PDF_API_URL=${{ secrets.VITE_PDF_API_URL }}
             VITE_IPFS_GATEWAY=${{ secrets.IPFS_GATEWAY }}
             VITE_IPFS_PROJECT_ID=${{ secrets.IPFS_PROJECT_ID }}
+            IPFS_GATEWAY=${{ secrets.IPFS_GATEWAY }}
+            IPFS_PROJECT_ID=${{ secrets.IPFS_PROJECT_ID }}
 
       - name: Login to GHCR
         uses: docker/login-action@v2

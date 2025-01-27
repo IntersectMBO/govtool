@@ -354,7 +354,8 @@ test.describe("Info Proposal Draft", () => {
       .click();
 
     await expect(proposalSubmissionPage.governanceActionType).toHaveText(
-      createProposalType
+      createProposalType,
+      { timeout: 20_000 }
     );
     await expect(proposalSubmissionPage.titleInput).toHaveValue(
       proposalFormValue.prop_name

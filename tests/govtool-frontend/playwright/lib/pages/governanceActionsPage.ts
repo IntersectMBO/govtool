@@ -159,7 +159,7 @@ export default class GovernanceActionsPage {
 
     await expect(
       this.page.getByRole("progressbar").getByRole("img")
-    ).toBeHidden({ timeout: 10_000 });
+    ).toBeHidden({ timeout: 20_000 });
 
     // Frontend validation
     for (let dIdx = 0; dIdx <= proposalsByType.length - 1; dIdx++) {

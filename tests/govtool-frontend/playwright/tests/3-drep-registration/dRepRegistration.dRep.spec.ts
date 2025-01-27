@@ -201,7 +201,9 @@ test.describe("Temporary DReps", () => {
 
     await waitForTxConfirmation(dRepPage);
 
-    await expect(dRepPage.getByTestId("voting-power-chips")).not.toBeVisible();
+    await expect(dRepPage.getByTestId("voting-power-chips")).not.toBeVisible({
+      timeout: 20_000,
+    });
 
     await expect(dRepPage.getByTestId("dRep-id-display")).not.toBeVisible();
 

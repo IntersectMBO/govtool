@@ -9,13 +9,13 @@ on:
       deployment:
         required: true
         type: choice
-        default: "https://z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr"
+        default: "z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr"
         options:
           - "sanchogov.tools/api"
           - "staging.govtool.byron.network/api"
           - "govtool.cardanoapi.io/api"
-          - "https://z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr"
-          - "https://be.gov.tools"
+          - "z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr"
+          - "be.gov.tools"
       network:
         required: true
         type: choice

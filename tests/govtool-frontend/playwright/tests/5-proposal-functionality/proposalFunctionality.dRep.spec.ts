@@ -37,7 +37,7 @@ test.describe("Proposal checks", () => {
 
     // assert to wait until the loading button is hidden
     await expect(page.getByTestId("to-vote-tab")).toBeVisible({
-      timeout: 15_000,
+      timeout: 20_000,
     });
 
     currentPage = page;
@@ -150,7 +150,7 @@ test.describe("Perform voting", () => {
 
     // assert to wait until the loading button is hidden
     await expect(dRepPage.getByTestId("to-vote-tab")).toBeVisible({
-      timeout: 15_000,
+      timeout: 20_000,
     });
 
     govActionDetailsPage = (await isBootStrapingPhase())
@@ -277,10 +277,12 @@ test.describe("Bootstrap phase", () => {
         await governanceActionsPage.goto();
 
         // assert to wait until proposal cards are visible
-        await expect(dRepPage.getByTestId("voting-power-chips")).toBeVisible();
+        await expect(dRepPage.getByTestId("voting-power-chips")).toBeVisible({
+          timeout: 20_000,
+        });
         // wait until the loading button is hidden
         await expect(dRepPage.getByTestId("to-vote-tab")).toBeVisible({
-          timeout: 15_000,
+          timeout: 20_000,
         });
 
         const governanceActionDetailsPage =

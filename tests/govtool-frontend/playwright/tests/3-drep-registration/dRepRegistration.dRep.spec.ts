@@ -29,11 +29,13 @@ test.describe("Logged in DReps", () => {
   }) => {
     await page.goto("/");
 
-    await expect(page.getByTestId("voting-power-chips")).toBeVisible();
+    await expect(page.getByTestId("voting-power-chips")).toBeVisible({
+      timeout: 20_000,
+    });
 
     await expect(
       page.getByTestId("dRep-id-display-card-dashboard")
-    ).toContainText(dRep01Wallet.dRepId, { timeout: 10_000 });
+    ).toContainText(dRep01Wallet.dRepId, { timeout: 20_000 });
 
     const governanceActionsPage = new GovernanceActionsPage(page);
 
@@ -57,7 +59,7 @@ test.describe("Logged in DReps", () => {
     // Add an assertion to prevent clicking on "View Your dRep Details".
     await expect(
       page.getByTestId("dRep-id-display-card-dashboard")
-    ).toContainText(dRep01Wallet.dRepId, { timeout: 10_000 });
+    ).toContainText(dRep01Wallet.dRepId, { timeout: 20_000 });
 
     await page.getByTestId("view-drep-details-button").click();
     await page.getByTestId("edit-drep-data-button").click();

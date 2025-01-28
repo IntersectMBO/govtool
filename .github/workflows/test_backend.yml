@@ -15,6 +15,7 @@ on:
           - "staging.govtool.byron.network/api"
           - "govtool.cardanoapi.io/api"
           - "z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr"
+          - "dev-sanchonet.govtool.byron.network/api"
           - "be.gov.tools"
       network:
         required: true

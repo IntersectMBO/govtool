@@ -70,9 +70,9 @@ createOptimizedConnectionPool :: BS.ByteString -> IO (Pool Connection)
 createOptimizedConnectionPool connectionString = createPool
   (connectPostgreSQL connectionString) -- Connection creation function
   close                                -- Connection destruction function
-  1                                    -- Number of stripes (sub-pools)
-  60                                   -- Idle timeout (seconds)
-  50                                   -- Maximum number of connections per stripe
+  1                                   -- Idle timeout (seconds)
+  2                                    -- Number of stripes (sub-pools)
+  60                                   -- Maximum number of connections per stripe
 
 proxyAPI :: Proxy (VVAApi :<|> SwaggerAPI)
 proxyAPI = Proxy

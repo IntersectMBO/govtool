@@ -2,6 +2,7 @@ import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { Page } from "@playwright/test";
 import { IDRep } from "@types";
 import { bech32 } from "bech32";
+import * as crypto from "crypto";
 
 export async function fetchFirstActiveDRepDetails(page: Page) {
   let dRepGivenName: string;

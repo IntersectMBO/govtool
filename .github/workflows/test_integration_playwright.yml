@@ -101,7 +101,7 @@ jobs:
       API_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io' }}/api
       DOCS_URL: ${{ vars.DOCS_URL }}
       KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}
-      NETWORK: ${{ inputs.deployment || vars.NETWORK }}
+      NETWORK: ${{ inputs.network || vars.NETWORK }}
       TEST_WORKERS: ${{vars.TEST_WORKERS}}
       CI: ${{vars.CI}}
       FAUCET_ADDRESS: ${{vars.FAUCET_ADDRESS}}

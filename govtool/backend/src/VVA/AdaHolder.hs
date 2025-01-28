@@ -60,4 +60,9 @@ getStakeKeyVotingPower stakeKey = withPool $ \conn -> do
         Text.putStrLn ("couldn't fetch voting power for stake key: " <> stakeKey)
         return 0
       Right [(votingPower,_)] -> return $ floor votingPower
-      _ -> error ("multiple voting power entries for stake key: " <> unpack stakeKey)
+      Right [] -> do
+        Text.putStrLn ("No voting power found for stake key: " <> stakeKey)
+        return 0
+      Right _ -> do
+        Text.putStrLn ("Unexpected result for stake key: " <> stakeKey)
+        return 0

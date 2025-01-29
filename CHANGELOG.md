@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix displaying DRep with doNotList property as string
 
 ### Changed
 

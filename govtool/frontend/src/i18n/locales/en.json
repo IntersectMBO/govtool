@@ -382,6 +382,11 @@
       "proposedVersion": "Proposed version",
       "previousGAId": "Previous Governance Action ID"
     },
+    "newConstitution": {
+      "url": "New constitution link",
+      "hash": "New constitution hash",
+      "scriptHash": "New constitution script hash"
+    },
     "motivation": "Motivation",
     "myVote": "My Vote:",
     "noResultsForTheSearch": "No results for the search.",

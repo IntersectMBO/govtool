@@ -16,6 +16,7 @@ type DataMissingHeaderProps = {
   titleStyle?: SxProps;
   isDRep?: boolean;
   image?: string | null;
+  shareLink?: string;
 };
 
 export const DataMissingHeader = ({
@@ -24,6 +25,7 @@ export const DataMissingHeader = ({
   titleStyle,
   isDRep,
   image,
+  shareLink,
 }: DataMissingHeaderProps) => {
   const base64Image = getBase64ImageDetails(image ?? "");
   const { screenWidth } = useScreenDimension();
@@ -81,7 +83,9 @@ export const DataMissingHeader = ({
             title}
         </Typography>
       </Box>
-      {screenWidth >= 1020 && <Share link={window.location.href} />}
+      {screenWidth >= 1020 && (
+        <Share link={shareLink || window.location.href} />
+      )}
     </Box>
   );
 };

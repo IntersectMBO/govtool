@@ -13,6 +13,7 @@ changes.
 ### Added
 
 - Add exception handler on stake key voting power query execution [Issue 2757](https://github.com/IntersectMBO/govtool/issues/2757)
+- Add script hash to new consitution governance action [Issue 2745](https://github.com/IntersectMBO/govtool/issues/2745)
 
 ### Fixed
 

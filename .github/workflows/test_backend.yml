@@ -1,9 +1,6 @@
 name: Backend Test
 
 on:
-  push:
-    branches:
-      - test
   workflow_dispatch:
     inputs:
       deployment:
@@ -26,6 +23,9 @@ on:
           - "preview"
           - "mainnet"
           - "preprod"
+  workflow_run:
+    workflows: ["Build and deploy GovTool test stack"]
+    types: [completed]
 
 jobs:
   backend-tests:

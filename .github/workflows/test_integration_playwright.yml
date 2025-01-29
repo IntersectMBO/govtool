@@ -1,9 +1,6 @@
 name: Integration Test [Playwright]
 
 on:
-  push:
-    branches:
-      - test
   workflow_dispatch:
     inputs:
       deployment:
@@ -27,7 +24,7 @@ on:
           - "preprod"
 
   workflow_run:
-    workflows: ["Build and deploy GovTool to TEST server"]
+    workflows: ["Build and deploy GovTool test stack"]
     types: [completed]
 
 jobs:

@@ -175,7 +175,8 @@ SELECT
 
             WHEN gov_action_proposal.type::text = 'NewConstitution' THEN
             json_build_object(
-                'anchor', gov_action_proposal.description->'contents'->1->'anchor'
+                'anchor', gov_action_proposal.description->'contents'->1->'anchor',
+                'script', gov_action_proposal.description->'contents'->1->'script'
             )
             WHEN gov_action_proposal.type::text = 'NewCommittee' THEN
             (

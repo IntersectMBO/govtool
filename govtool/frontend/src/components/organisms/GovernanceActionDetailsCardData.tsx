@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Box, Tabs, Tab, styled } from "@mui/material";
+import { useLocation } from "react-router-dom";
 
 import { CopyButton, ExternalModalButton, Typography } from "@atoms";
 import {
@@ -95,6 +96,7 @@ export const GovernanceActionDetailsCardData = ({
   const { t } = useTranslation();
   const { screenWidth } = useScreenDimension();
   const { isMobile } = useScreenDimension();
+  const { pathname, hash } = useLocation();
 
   const mappedArraysToObjectsProtocolParams = useMemo(
     () =>
@@ -146,6 +148,12 @@ export const GovernanceActionDetailsCardData = ({
     prevGovActionIndex && prevGovActionTxHash
       ? getFullGovActionId(prevGovActionTxHash, prevGovActionIndex)
       : null;
+
+  const govActionLinkToShare = `${window.location.protocol}//${
+    window.location.hostname
+  }${window.location.port ? `:${window.location.port}` : ""}${pathname}${
+    hash ?? ""
+  }`;
 
   const tabs = useMemo(
     () =>
@@ -232,7 +240,11 @@ export const GovernanceActionDetailsCardData = ({
         overflow: "hidden",
       }}
     >
-      <DataMissingHeader isDataMissing={isDataMissing} title={title} />
+      <DataMissingHeader
+        isDataMissing={isDataMissing}
+        title={title}
+        shareLink={govActionLinkToShare}
+      />
       <DataMissingInfoBox
         isDataMissing={isDataMissing}
         isInProgress={isInProgress}
@@ -319,20 +331,25 @@ export const GovernanceActionDetailsCardData = ({
             amount={withdrawal.amount}
           />
         ))}
-      <GovernanceActionCardElement
-        label={t("govActions.anchorURL")}
-        text={url}
-        textVariant="longText"
-        dataTestId="anchor-url"
-        isLinkButton
-      />
-      <GovernanceActionCardElement
-        label={t("govActions.anchorHash")}
-        text={metadataHash}
-        textVariant="longText"
-        dataTestId="anchor-hash"
-        isCopyButton
-      />
+      {/* NewConstitution metadata hash and url is visible in details tab */}
+      {type !== GovernanceActionType.NewConstitution && (
+        <>
+          <GovernanceActionCardElement
+            label={t("govActions.anchorURL")}
+            text={url}
+            textVariant="longText"
+            dataTestId="anchor-url"
+            isLinkButton
+          />
+          <GovernanceActionCardElement
+            label={t("govActions.anchorHash")}
+            text={metadataHash}
+            textVariant="longText"
+            dataTestId="anchor-hash"
+            isCopyButton
+          />
+        </>
+      )}
 
       <GovernanceActionDetailsCardLinks links={references} />
     </Box>

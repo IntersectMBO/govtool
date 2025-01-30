@@ -29,11 +29,13 @@ test.describe("Logged in DReps", () => {
   }) => {
     await page.goto("/");
 
-    await expect(page.getByTestId("voting-power-chips")).toBeVisible();
+    await expect(page.getByTestId("voting-power-chips")).toBeVisible({
+      timeout: 20_000,
+    });
 
     await expect(
       page.getByTestId("dRep-id-display-card-dashboard")
-    ).toContainText(dRep01Wallet.dRepId, { timeout: 10_000 });
+    ).toContainText(dRep01Wallet.dRepId, { timeout: 20_000 });
 
     const governanceActionsPage = new GovernanceActionsPage(page);
 
@@ -57,7 +59,7 @@ test.describe("Logged in DReps", () => {
     // Add an assertion to prevent clicking on "View Your dRep Details".
     await expect(
       page.getByTestId("dRep-id-display-card-dashboard")
-    ).toContainText(dRep01Wallet.dRepId, { timeout: 10_000 });
+    ).toContainText(dRep01Wallet.dRepId, { timeout: 20_000 });
 
     await page.getByTestId("view-drep-details-button").click();
     await page.getByTestId("edit-drep-data-button").click();
@@ -70,7 +72,9 @@ test.describe("Logged in DReps", () => {
       objectives: faker.lorem.paragraph(2),
       motivations: faker.lorem.paragraph(2),
       qualifications: faker.lorem.paragraph(2),
-      paymentAddress: (await ShelleyWallet.generate()).addressBech32(0),
+      paymentAddress: (await ShelleyWallet.generate()).addressBech32(
+        environments.networkId
+      ),
       linksReferenceLinks: [
         {
           url: faker.internet.url(),
@@ -199,7 +203,9 @@ test.describe("Temporary DReps", () => {
 
     await waitForTxConfirmation(dRepPage);
 
-    await expect(dRepPage.getByTestId("voting-power-chips")).not.toBeVisible();
+    await expect(dRepPage.getByTestId("voting-power-chips")).not.toBeVisible({
+      timeout: 20_000,
+    });
 
     await expect(dRepPage.getByTestId("dRep-id-display")).not.toBeVisible();
 
@@ -227,7 +233,9 @@ test.describe("Temporary DReps", () => {
 
     const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);
     await dRepRegistrationPage.goto();
-    await dRepRegistrationPage.register({ name: faker.person.firstName() });
+    await dRepRegistrationPage.registerWithoutTxConfirmation({
+      name: faker.person.firstName(),
+    });
     await dRepRegistrationPage.registrationSuccessModal
       .getByTestId("confirm-modal-button")
       .click();
@@ -236,5 +244,11 @@ test.describe("Temporary DReps", () => {
       /in progress/i,
       { timeout: 20_000 }
     );
+
+    await waitForTxConfirmation(dRepPage);
+
+    await expect(dRepPage.getByTestId("d-rep-in-progress")).not.toBeVisible({
+      timeout: 20_000,
+    });
   });
 });

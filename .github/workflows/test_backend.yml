@@ -6,7 +6,7 @@ on:
       deployment:
         required: true
         type: choice
-        default: "z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr"
+        default: "govtool.cardanoapi.io/api"
         options:
           - "sanchogov.tools/api"
           - "staging.govtool.byron.network/api"

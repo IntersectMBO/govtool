@@ -6,7 +6,7 @@ on:
       deployment:
         required: true
         type: choice
-        default: "preview.gov.tools"
+        default: "govtool.cardanoapi.io"
         options:
           - "sanchogov.tools"
           - "staging.govtool.byron.network"

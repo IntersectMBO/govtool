@@ -7,6 +7,7 @@ import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import { skipIfNotHardFork } from "@helpers/cardano";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
+import environments from "@constants/environments";
 
 test.use({
   storageState: ".auth/user01.json",
@@ -64,7 +65,9 @@ test.describe("Validation of dRep Registration Form", () => {
         objectives: faker.lorem.paragraph(2),
         motivations: faker.lorem.paragraph(2),
         qualifications: faker.lorem.paragraph(2),
-        paymentAddress: (await ShelleyWallet.generate()).addressBech32(0),
+        paymentAddress: (await ShelleyWallet.generate()).addressBech32(
+          environments.networkId
+        ),
         linksReferenceLinks: [
           {
             url: faker.internet.url(),

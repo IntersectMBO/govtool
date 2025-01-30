@@ -14,7 +14,7 @@ import {
 } from "@hooks";
 import { DataActionsBar, EmptyStateDrepDirectory } from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
-import { correctAdaFormat, isSameDRep, uniqBy } from "@utils";
+import { correctAdaFormat, isSameDRep, uniqBy, parseBoolean } from "@utils";
 import { DRepData, DRepListSort, DRepStatus } from "@models";
 import {
   AutomatedVotingOptionCurrentDelegation,
@@ -107,9 +107,15 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const ada = correctAdaFormat(votingPower);
 
   const listedDRepsWithoutYourself = uniqBy(
-    dRepList?.filter((dRep) => !dRep.doNotList && !isSameDRep(dRep, myDRepId)),
+    dRepList?.filter(
+      (dRep) =>
+        (typeof dRep.doNotList === "string"
+          ? !parseBoolean(dRep.doNotList)
+          : !dRep.doNotList) && !isSameDRep(dRep, myDRepId),
+    ),
     "view",
   );
+
   const dRepListToDisplay =
     yourselfDRep && showYourselfDRep
       ? [yourselfDRep, ...listedDRepsWithoutYourself]

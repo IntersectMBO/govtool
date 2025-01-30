@@ -9,13 +9,22 @@ on:
       deployment:
         required: true
         type: choice
-        default: "govtool.cardanoapi.io"
+        default: "preview.gov.tools"
         options:
           - "sanchogov.tools"
           - "staging.govtool.byron.network"
           - "govtool.cardanoapi.io"
           - "preview.gov.tools"
           - "gov.tools"
+      network:
+        required: true
+        type: choice
+        default: "preview"
+        options:
+          - "sanchonet"
+          - "preview"
+          - "mainnet"
+          - "preprod"
 
   workflow_run:
     workflows: ["Build and deploy GovTool to TEST server"]
@@ -56,23 +65,19 @@ jobs:
           chmod +w ./lib/_mock
           npm run generate-wallets
 
-          # Set network variables based on deployment input and environment
-          if [[ "${{inputs.deployment}}" == "gov.tools" ]]; then
-             export NETWORK='mainnet'
-          else
-             export NETWORK="${{ vars.NETWORK }}"
-          fi
-
           # Set API keys based on the network
-          if [[ "${{ vars.NETWORK }}" == "preprod" ]]; then
+          if [[ "${{ env.NETWORK }}" == "preprod" ]]; then
             export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_PREPROD }}"
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_PREPROD }}"
-          elif [[ "${{ vars.NETWORK }}" == "sanchonet" ]]; then
+          elif [[ "${{ env.NETWORK }}" == "sanchonet" ]]; then
             export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_SANCHONET }}"
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_SANCHONET }}"
-          else
+          elif [[ "${{ env.NETWORK }}" == "preview" ]]; then
             export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_PREVIEW }}"
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_PREVIEW }}"
+          else
+            export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_PREVIEW }}"
+            export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_MAINNET }}"
           fi
 
           npm test
@@ -96,6 +101,7 @@ jobs:
       API_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io' }}/api
       DOCS_URL: ${{ vars.DOCS_URL }}
       KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}
+      NETWORK: ${{ inputs.network || vars.NETWORK }}
       TEST_WORKERS: ${{vars.TEST_WORKERS}}
       CI: ${{vars.CI}}
       FAUCET_ADDRESS: ${{vars.FAUCET_ADDRESS}}

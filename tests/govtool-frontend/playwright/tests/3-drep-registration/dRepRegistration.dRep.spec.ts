@@ -233,7 +233,9 @@ test.describe("Temporary DReps", () => {
 
     const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);
     await dRepRegistrationPage.goto();
-    await dRepRegistrationPage.register({ name: faker.person.firstName() });
+    await dRepRegistrationPage.registerWithoutTxConfirmation({
+      name: faker.person.firstName(),
+    });
     await dRepRegistrationPage.registrationSuccessModal
       .getByTestId("confirm-modal-button")
       .click();
@@ -242,5 +244,11 @@ test.describe("Temporary DReps", () => {
       /in progress/i,
       { timeout: 20_000 }
     );
+
+    await waitForTxConfirmation(dRepPage);
+
+    await expect(dRepPage.getByTestId("d-rep-in-progress")).not.toBeVisible({
+      timeout: 20_000,
+    });
   });
 });

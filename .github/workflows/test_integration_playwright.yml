@@ -30,6 +30,7 @@ on:
 jobs:
   integration-tests:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }} 
     defaults:
       run:
         working-directory: tests/govtool-frontend/playwright
@@ -108,7 +109,7 @@ jobs:
 
   publish-report:
     runs-on: ubuntu-latest
-    if: always()
+    if: always() && needs.integration-tests.result != 'skipped' 
     needs: integration-tests
     steps:
       - uses: actions/checkout@v4

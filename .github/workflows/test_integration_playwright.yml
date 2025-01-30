@@ -1,15 +1,12 @@
 name: Integration Test [Playwright]
 
 on:
-  push:
-    branches:
-      - test
   workflow_dispatch:
     inputs:
       deployment:
         required: true
         type: choice
-        default: "preview.gov.tools"
+        default: "govtool.cardanoapi.io"
         options:
           - "sanchogov.tools"
           - "staging.govtool.byron.network"
@@ -27,12 +24,13 @@ on:
           - "preprod"
 
   workflow_run:
-    workflows: ["Build and deploy GovTool to TEST server"]
+    workflows: ["Build and deploy GovTool test stack"]
     types: [completed]
 
 jobs:
   integration-tests:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }} 
     defaults:
       run:
         working-directory: tests/govtool-frontend/playwright
@@ -111,7 +109,7 @@ jobs:
 
   publish-report:
     runs-on: ubuntu-latest
-    if: always()
+    if: always() && needs.integration-tests.result != 'skipped' 
     needs: integration-tests
     steps:
       - uses: actions/checkout@v4

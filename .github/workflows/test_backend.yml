@@ -1,15 +1,12 @@
 name: Backend Test
 
 on:
-  push:
-    branches:
-      - test
   workflow_dispatch:
     inputs:
       deployment:
         required: true
         type: choice
-        default: "z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr"
+        default: "govtool.cardanoapi.io/api"
         options:
           - "sanchogov.tools/api"
           - "staging.govtool.byron.network/api"
@@ -26,10 +23,14 @@ on:
           - "preview"
           - "mainnet"
           - "preprod"
+  workflow_run:
+    workflows: ["Build and deploy GovTool test stack"]
+    types: [completed]
 
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }} 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -68,7 +69,7 @@ jobs:
 
   publish-report:
     runs-on: ubuntu-latest
-    if: always()
+    if: always() && needs.backend-tests.result != 'skipped'
     needs: backend-tests
     steps:
       - uses: actions/checkout@v4

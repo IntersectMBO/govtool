@@ -139,11 +139,14 @@ instance ToJSON GovActionId where
 instance FromHttpApiData GovActionId where
   parseUrlPiece t = case Text.splitOn "#" t of
       [hash, rest] -> do
-        index <- case readMaybe $ Text.unpack rest of
-          Just x -> pure x
-          _      -> Left (Text.tail rest <> " is not a number")
-        hexHash <- parseUrlPiece hash
-        Right $ GovActionId hexHash index
+        if Text.null rest
+          then Left "Missing index in hash#index format"
+          else do
+            index <- case readMaybe $ Text.unpack rest of
+              Just x -> pure x
+              _      -> Left (rest <> " is not a number")
+            hexHash <- parseUrlPiece hash
+            Right $ GovActionId hexHash index
       _ -> Left "Not a valid hash#index value"
 
 exampleGovActionId :: Text

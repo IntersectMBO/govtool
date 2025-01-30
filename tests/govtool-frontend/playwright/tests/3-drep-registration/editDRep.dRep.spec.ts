@@ -33,7 +33,9 @@ test.describe("Validation of edit dRep Form", () => {
         objectives: faker.lorem.paragraph(2),
         motivations: faker.lorem.paragraph(2),
         qualifications: faker.lorem.paragraph(2),
-        paymentAddress: (await ShelleyWallet.generate()).addressBech32(0),
+        paymentAddress: (await ShelleyWallet.generate()).addressBech32(
+          environments.networkId
+        ),
         linksReferenceLinks: [
           {
             url: faker.internet.url(),

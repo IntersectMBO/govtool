@@ -102,7 +102,7 @@ test.describe("Change delegation", () => {
       page
         .getByTestId(`${dRepIdFirst}-delegated-card`)
         .getByTestId(`${dRepIdFirst}-copy-id-button`)
-    ).toHaveText(dRepIdFirst, { timeout: 20_000 });
+    ).toHaveText(`(CIP-105) ${dRepIdFirst}`, { timeout: 20_000 });
 
     // verify delegation
     await dRepDirectoryPage.delegateToDRep(dRepIdSecond);
@@ -113,7 +113,7 @@ test.describe("Change delegation", () => {
       page
         .getByTestId(`${dRepIdSecond}-delegated-card`)
         .getByTestId(`${dRepIdSecond}-copy-id-button`)
-    ).toHaveText(dRepIdSecond, { timeout: 20_000 });
+    ).toHaveText(`(CIP-105) ${dRepIdSecond}`, { timeout: 20_000 });
   });
 });
 
@@ -149,7 +149,9 @@ test.describe("Register DRep state", () => {
     await waitForTxConfirmation(dRepPage);
 
     // Checks in dashboard
-    await expect(dRepPage.getByText("You are a Direct Voter")).toBeVisible();
+    await expect(dRepPage.getByText("You are a Direct Voter")).toBeVisible({
+      timeout: 20_000,
+    });
     await expect(
       dRepPage.getByTestId("register-as-sole-voter-button")
     ).not.toBeVisible();
@@ -168,7 +170,9 @@ test.describe("Register DRep state", () => {
     ).toBeVisible({ timeout: 15_000 });
     await dRepPage.getByTestId("confirm-modal-button").click();
     await waitForTxConfirmation(dRepPage);
-    await expect(dRepPage.getByText("You are a Direct Voter")).toBeVisible();
+    await expect(dRepPage.getByText("You are a Direct Voter")).toBeVisible({
+      timeout: 20_000,
+    });
 
     const dRepDirectoryPage = new DRepDirectoryPage(dRepPage);
     await dRepDirectoryPage.goto();
@@ -260,9 +264,9 @@ test.describe("Abstain delegation", () => {
 
     const balance = await kuberService.getBalance(adaHolder03Wallet.address);
 
-    await expect(
-      page.getByText(`You have delegated ₳${balance}`)
-    ).toBeVisible();
+    await expect(page.getByText(`You have delegated ₳${balance}`)).toBeVisible({
+      timeout: 20_000,
+    });
   });
 });
 
@@ -287,9 +291,9 @@ test.describe("No confidence delegation", () => {
     await waitForTxConfirmation(page);
 
     const balance = await kuberService.getBalance(adaHolder04Wallet.address);
-    await expect(
-      page.getByText(`You have delegated ₳${balance}`)
-    ).toBeVisible();
+    await expect(page.getByText(`You have delegated ₳${balance}`)).toBeVisible({
+      timeout: 20_000,
+    });
   });
 });
 
@@ -314,13 +318,13 @@ test.describe("Delegated ADA visibility", () => {
     );
     await expect(
       page.getByText(`You have delegated ₳ ${adaHolderVotingPower}`)
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 20_000 });
 
     await page.goto("/");
     await expect(
       page.getByText(
         `Your Voting Power of ₳${adaHolderVotingPower} is Delegated to`
       )
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 20_000 });
   });
 });

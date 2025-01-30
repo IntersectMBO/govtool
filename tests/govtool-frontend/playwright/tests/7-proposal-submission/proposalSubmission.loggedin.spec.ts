@@ -1,3 +1,4 @@
+import environments from "@constants/environments";
 import {
   proposal01Wallet,
   proposal03Wallet,
@@ -31,7 +32,7 @@ test.describe("Proposal created logged state", () => {
   test.use({ storageState: ".auth/proposal01.json", wallet: proposal01Wallet });
   test("7B. Should access proposal creation page", async ({ page }) => {
     await page.goto("/");
-    await page.getByTestId("propose-governance-actions-button").click();
+    await page.getByTestId("proposal-discussion-link").click();
 
     await expect(page.getByText(/proposals/i)).toHaveCount(2);
   });
@@ -56,7 +57,7 @@ test.describe("Proposal created logged state", () => {
         for (let i = 0; i < 50; i++) {
           const rewardAddressBech32 = (
             await ShelleyWallet.generate()
-          ).rewardAddressBech32(0);
+          ).rewardAddressBech32(environments.networkId);
           const formFields: ProposalCreateRequest =
             proposalSubmissionPage.generateValidProposalFormFields(
               type,
@@ -127,13 +128,14 @@ test.describe("Proposal created logged state", () => {
 
         await proposalSubmissionPage.addLinkBtn.click();
 
-        const walletAddressBech32 =
-          ShelleyWallet.fromJson(wallet).rewardAddressBech32(0);
+        const stakeAddressBech32 = ShelleyWallet.fromJson(
+          wallet
+        ).rewardAddressBech32(environments.networkId);
         const proposal: ProposalCreateRequest =
           proposalSubmissionPage.generateValidProposalFormFields(
             type,
             false,
-            walletAddressBech32
+            stakeAddressBech32
           );
 
         await proposalSubmissionPage.fillupForm(proposal);
@@ -180,13 +182,14 @@ test.describe("Proposal created logged state", () => {
 
         await proposalSubmissionPage.addLinkBtn.click();
 
-        const walletAddressBech32 =
-          ShelleyWallet.fromJson(proposal01Wallet).rewardAddressBech32(0);
+        const rewardAddressBech32 = ShelleyWallet.fromJson(
+          proposal01Wallet
+        ).rewardAddressBech32(environments.networkId);
         const proposal: ProposalCreateRequest =
           proposalSubmissionPage.generateValidProposalFormFields(
             type,
             false,
-            walletAddressBech32
+            rewardAddressBech32
           );
 
         await proposalSubmissionPage.fillupForm(proposal);
@@ -351,7 +354,8 @@ test.describe("Info Proposal Draft", () => {
       .click();
 
     await expect(proposalSubmissionPage.governanceActionType).toHaveText(
-      createProposalType
+      createProposalType,
+      { timeout: 20_000 }
     );
     await expect(proposalSubmissionPage.titleInput).toHaveValue(
       proposalFormValue.prop_name

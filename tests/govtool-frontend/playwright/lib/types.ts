@@ -110,6 +110,7 @@ export type IDRep = {
   status: DRepStatus;
   type: string;
   latestTxHash: string;
+  givenName: string | null;
   latestRegistrationDate: string;
 };
 

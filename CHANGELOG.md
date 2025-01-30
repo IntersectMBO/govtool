@@ -16,7 +16,8 @@ changes.
 
 ### Fixed
 
--
+- Fix displaying DRep with doNotList property as string
+- Handle exception when no index is provided to /proposal/get endpoint [Issue 1841](https://github.com/IntersectMBO/govtool/issues/1841)
 
 ### Changed
 

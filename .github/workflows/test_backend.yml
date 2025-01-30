@@ -1,9 +1,6 @@
 name: Backend Test
 
 on:
-  push:
-    branches:
-      - test
   workflow_dispatch:
     inputs:
       deployment:
@@ -14,10 +11,26 @@ on:
           - "sanchogov.tools/api"
           - "staging.govtool.byron.network/api"
           - "govtool.cardanoapi.io/api"
+          - "z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr"
+          - "dev-sanchonet.govtool.byron.network/api"
+          - "be.gov.tools"
+      network:
+        required: true
+        type: choice
+        default: "preview"
+        options:
+          - "sanchonet"
+          - "preview"
+          - "mainnet"
+          - "preprod"
+  workflow_run:
+    workflows: ["Build and deploy GovTool test stack"]
+    types: [completed]
 
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }} 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,16 +55,9 @@ jobs:
           fi
           python ./setup.py
           python -m pytest --alluredir allure-results
-          if [[ "${{ env.NETWORK }}" == "preprod" ]]; then
-            echo "FAUCET_API_KEY=${{ secrets.FAUCET_API_KEY_PREPROD }}" >> $GITHUB_ENV
-          elif [[ "${{ env.NETWORK }}" == "sanchonet" ]]; then
-            echo "FAUCET_API_KEY=${{ secrets.FAUCET_API_KEY_SANCHONET }}" >> $GITHUB_ENV
-          else
-            echo "FAUCET_API_KEY=${{ secrets.FAUCET_API_KEY_PREVIEW }}" >> $GITHUB_ENV
-          fi
         env:
           BASE_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io/api' }}
-          NETWORK: ${{ vars.NETWORK }}
+          NETWORK: ${{ inputs.network || vars.NETWORK }}
           KUBER_API_KEY: ${{ secrets.KUBER_API_KEY }}
 
       - name: Upload report
@@ -63,7 +69,7 @@ jobs:
 
   publish-report:
     runs-on: ubuntu-latest
-    if: always()
+    if: always() && needs.backend-tests.result != 'skipped'
     needs: backend-tests
     steps:
       - uses: actions/checkout@v4

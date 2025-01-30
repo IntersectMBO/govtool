@@ -8,6 +8,7 @@ import * as fs from "fs";
 import { ShelleyWallet } from "./crypto";
 import { calculateImageSHA256 } from "./dRep";
 import { imageObject } from "@types";
+import environments from "@constants/environments";
 
 export async function downloadMetadata(download: Download): Promise<{
   name: string;
@@ -22,7 +23,9 @@ export async function downloadMetadata(download: Download): Promise<{
 
 async function calculateMetadataHash() {
   try {
-    const paymentAddress = (await ShelleyWallet.generate()).addressBech32(0);
+    const paymentAddress = (await ShelleyWallet.generate()).addressBech32(
+      environments.networkId
+    );
     const imageUrl = faker.image.avatarGitHub();
     const imageSHA256 = (await calculateImageSHA256(imageUrl)) || "";
     const imageObject: imageObject = {

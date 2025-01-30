@@ -348,7 +348,9 @@ export default class ProposalSubmissionPage {
     proposalType: ProposalType = ProposalType.treasury
   ): Promise<number> {
     await this.addLinkBtn.click();
-    const receivingAddr = ShelleyWallet.fromJson(wallet).rewardAddressBech32(0);
+    const receivingAddr = ShelleyWallet.fromJson(wallet).rewardAddressBech32(
+      environments.networkId
+    );
 
     const proposalRequest: ProposalCreateRequest =
       this.generateValidProposalFormFields(
@@ -374,7 +376,9 @@ export default class ProposalSubmissionPage {
     const proposalFormValue = this.generateValidProposalFormFields(
       proposalType,
       true,
-      ShelleyWallet.fromJson(proposal04Wallet).rewardAddressBech32(0)
+      ShelleyWallet.fromJson(proposal04Wallet).rewardAddressBech32(
+        environments.networkId
+      )
     );
     await this.fillupForm(proposalFormValue);
 

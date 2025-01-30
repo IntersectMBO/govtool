@@ -178,7 +178,8 @@ test.describe("User Snap", () => {
       // Intercept Usersnap submit API
       await page.route(feedbackApiUrl, async (route) =>
         route.fulfill({
-          status: 200,
+          status: 403,
+          body: JSON.stringify({ error: "Blocked by test" }),
         })
       );
 
@@ -202,7 +203,8 @@ test.describe("User Snap", () => {
       // Intercept Usersnap submit API
       await page.route(feedbackApiUrl, async (route) =>
         route.fulfill({
-          status: 200,
+          status: 403,
+          body: JSON.stringify({ error: "Blocked by test" }),
         })
       );
 

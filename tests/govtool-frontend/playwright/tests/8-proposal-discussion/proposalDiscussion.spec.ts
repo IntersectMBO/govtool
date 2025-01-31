@@ -6,11 +6,13 @@ import { isBootStrapingPhase, skipIfNotHardFork } from "@helpers/cardano";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { expect } from "@playwright/test";
+import { ProposalType } from "@types";
 
 const mockProposal = require("../../lib/_mock/proposal.json");
 const mockPoll = require("../../lib/_mock/proposalPoll.json");
 const mockComments = require("../../lib/_mock/proposalComments.json");
 const mockInfoProposedGA = require("../../lib/_mock/infoProposedGAs.json");
+const mockTreasuryProposal = require("../../lib/_mock/treasuryProposedGAs.json");
 
 const PROPOSAL_TYPE_FILTERS = ["Info", "Treasury"];
 const BOOTSTRAP_PROPOSAL_TYPE_FILTERS = ["Info"];
@@ -92,27 +94,51 @@ test("8C. Should search the list of proposed governance actions.", async ({
   }
 });
 
-test("8D.Should show the view-all categorized proposed governance actions.", async ({
-  page,
+test("8D. Should show the view-all categorized proposed governance actions.", async ({
+  browser,
 }) => {
-  await page.route("**/api/proposals?**", async (route) => {
-    return route.fulfill({
-      body: JSON.stringify(mockInfoProposedGA),
-    });
-  });
+  await Promise.all(
+    Object.entries({
+      [ProposalType.info]: mockInfoProposedGA,
+      [ProposalType.treasury]: mockTreasuryProposal,
+    }).map(async ([proposalType, mockData]) => {
+      const govActionTypeId = proposalType === ProposalType.info ? 1 : 2;
+      const requestUrl = `**/api/proposals?filters[$and][0][gov_action_type_id]=${govActionTypeId}&**`;
+      let requestHandled = false;
 
-  const proposalDiscussionPage = new ProposalDiscussionPage(page);
-  await proposalDiscussionPage.goto();
+      const context = await browser.newContext();
+      const page = await context.newPage();
 
-  await proposalDiscussionPage.showAllBtn.click();
+      await page.route(requestUrl, async (route) => {
+        if (!requestHandled) {
+          requestHandled = true;
+          return route.fulfill({
+            body: JSON.stringify(mockData),
+          });
+        }
+        return route.continue();
+      });
 
-  const proposalCards = await proposalDiscussionPage.getAllProposals();
+      const proposalDiscussionPage = new ProposalDiscussionPage(page);
+      await proposalDiscussionPage.goto();
 
-  for (const proposalCard of proposalCards) {
-    await expect(
-      proposalCard.getByTestId("governance-action-type")
-    ).toBeVisible();
-  }
+      const showAllButton = page.getByTestId("show-all-button");
+
+      if (proposalType === ProposalType.treasury) {
+        await showAllButton.nth(1).click();
+      } else {
+        await showAllButton.first().click();
+      }
+
+      const proposalCards = await proposalDiscussionPage.getAllProposals();
+
+      for (const proposalCard of proposalCards) {
+        await expect(
+          proposalCard.getByTestId("governance-action-type")
+        ).toHaveText(proposalType, { timeout: 20_000 });
+      }
+    })
+  );
 });
 
 test("8H. Should disable proposal interaction on a disconnected state.", async ({

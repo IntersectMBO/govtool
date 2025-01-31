@@ -63,21 +63,17 @@ export const DashboardCards = () => {
         voter={voter}
         votingPower={votingPower}
       />
-
       <DRepDashboardCard
         dRepID={dRepID}
         pendingTransaction={pendingTransaction}
         voter={voter}
       />
-
       <DirectVoterDashboardCard
         pendingTransaction={pendingTransaction}
         voter={voter}
         votingPower={votingPower}
       />
-
       <ListGovActionsDashboardCards />
-
       <ProposeGovActionDashboardCard
         createGovActionTx={pendingTransaction.createGovAction}
       />

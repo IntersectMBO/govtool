@@ -4,7 +4,10 @@ import { Box } from "@mui/material";
 import { IMAGES, SECURITY_RELEVANT_PARAMS_MAP } from "@consts";
 import { Typography, VotePill } from "@atoms";
 import { useTranslation } from "@hooks";
-import { correctVoteAdaFormat, getGovActionVotingThresholdKey } from "@utils";
+import {
+  correctDRepDirectoryFormat,
+  getGovActionVotingThresholdKey,
+} from "@utils";
 import { SubmittedVotesData } from "@models";
 import { useFeatureFlag, useAppContext } from "@/context";
 
@@ -42,17 +45,28 @@ export const VotesSubmitted = ({
     areCCVoteTotalsDisplayed,
   } = useFeatureFlag();
   const { t } = useTranslation();
-  const { epochParams } = useAppContext();
+  const { epochParams, networkMetrics } = useAppContext();
 
-  const dRepYesVotesPercentage =
-    dRepYesVotes + dRepNoVotes
-      ? (dRepYesVotes / (dRepYesVotes + dRepNoVotes)) * 100
-      : undefined;
-  const dRepNoVotesPercentage = dRepYesVotesPercentage
-    ? 100 - dRepYesVotesPercentage
-    : dRepNoVotes
-    ? 100
+  const totalStakeControlledByDReps =
+    networkMetrics?.totalStakeControlledByDReps ?? 0;
+
+  const totalDRepVotes = totalStakeControlledByDReps
+    ? totalStakeControlledByDReps - dRepAbstainVotes
     : undefined;
+  const dRepYesVotesPercentage = totalDRepVotes
+    ? (dRepYesVotes / totalDRepVotes) * 100
+    : undefined;
+  const dRepNoVotesPercentage = totalDRepVotes
+    ? (dRepNoVotes / totalDRepVotes) * 100
+    : undefined;
+  const dRepNotVotedVotes = totalStakeControlledByDReps
+    ? totalStakeControlledByDReps -
+      dRepYesVotes -
+      dRepNoVotes -
+      dRepAbstainVotes
+    : undefined;
+  const dRepNotVotedVotesPercentage =
+    100 - (dRepYesVotesPercentage ?? 0) - (dRepNoVotesPercentage ?? 0);
 
   const poolYesVotesPercentage =
     poolYesVotes + poolNoVotes
@@ -123,6 +137,8 @@ export const VotesSubmitted = ({
             noVotes={dRepNoVotes}
             noVotesPercentage={dRepNoVotesPercentage}
             abstainVotes={dRepAbstainVotes}
+            notVotedVotes={dRepNotVotedVotes}
+            notVotedPercentage={dRepNotVotedVotesPercentage}
             threshold={(() => {
               const votingThresholdKey = getGovActionVotingThresholdKey({
                 govActionType: type,
@@ -174,6 +190,8 @@ type VotesGroupProps = {
   yesVotesPercentage?: number;
   noVotes: number;
   noVotesPercentage?: number;
+  notVotedVotes?: number;
+  notVotedPercentage?: number;
   abstainVotes: number;
   threshold?: number | null;
 };
@@ -184,6 +202,8 @@ const VotesGroup = ({
   yesVotesPercentage,
   noVotes,
   noVotesPercentage,
+  notVotedVotes,
+  notVotedPercentage,
   abstainVotes,
   threshold,
 }: VotesGroupProps) => {
@@ -219,7 +239,15 @@ const VotesGroup = ({
         percentage={noVotesPercentage}
         value={noVotes}
       />
-      {threshold !== undefined && (
+      {typeof notVotedVotes === "number" && (
+        <Vote
+          type={type}
+          vote="notVoted"
+          percentage={notVotedPercentage}
+          value={notVotedVotes}
+        />
+      )}
+      {threshold !== undefined && threshold !== null && (
         <Box
           display="flex"
           flexDirection="row"
@@ -246,7 +274,7 @@ const VotesGroup = ({
               color: "neutralGray",
             }}
           >
-            {threshold}
+            {threshold * 100}%
           </Typography>
         </Box>
       )}
@@ -285,7 +313,9 @@ const Vote = ({ type, vote, value, percentage }: VoteProps) => (
           fontWeight: "500",
         }}
       >
-        {type !== "ccCommittee" ? `₳ ${correctVoteAdaFormat(value)}` : value}
+        {type !== "ccCommittee"
+          ? `₳ ${correctDRepDirectoryFormat(value)}`
+          : value}
       </Typography>
       {vote !== "abstain" && typeof percentage === "number" && (
         <Typography

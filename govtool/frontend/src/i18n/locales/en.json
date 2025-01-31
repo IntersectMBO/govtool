@@ -736,7 +736,8 @@
     "constitutional": "Constitutional",
     "no": "No",
     "unconstitutional": "Unconstitutional",
-    "yes": "Yes"
+    "yes": "Yes",
+    "notVoted": "Not voted"
   },
   "usefulLinks": {
     "title": "Useful links",

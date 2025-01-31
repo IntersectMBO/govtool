@@ -10,7 +10,7 @@ declare global {
     dataLayer: SentryEventDataLayer[];
   }
 
-  type VoteType = "yes" | "no" | "abstain";
+  type VoteType = "yes" | "no" | "abstain" | "notVoted";
 
   type ActionTypeFromAPI = {
     id: string;

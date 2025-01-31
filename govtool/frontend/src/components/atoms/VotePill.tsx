@@ -3,32 +3,32 @@ import { Box, Typography } from "@mui/material";
 
 import { Vote } from "@models";
 
-const borderColorMap = {
+const borderColorMap: Record<string, string> = {
   yes: "#C0E4BA",
   no: "#EDACAC",
   abstain: "#99ADDE",
-  notVoted: "#EAE9F0",
+  notvoted: "#EAE9F0",
 };
 
-const bgColorMap = {
+const bgColorMap: Record<string, string> = {
   yes: "#F0F9EE",
   no: "#FBEBEB",
   abstain: "#E6EBF7",
-  notVoted: "#F5F5F8",
+  notvoted: "#F5F5F8",
 };
 
-const voteLabelKey = {
+const voteLabelKey: Record<string, string> = {
   yes: "votes.yes",
   no: "votes.no",
   abstain: "votes.abstain",
-  notVoted: "votes.notVoted",
+  notvoted: "votes.notVoted",
 };
 
-const ccVoteLabelKey = {
+const ccVoteLabelKey: Record<string, string> = {
   yes: "votes.constitutional",
   no: "votes.unconstitutional",
   abstain: "votes.abstain",
-  notVoted: "",
+  notvoted: "",
 };
 
 type VoteExtended = Vote | "notVoted";
@@ -45,10 +45,11 @@ export const VotePill = ({
   isCC?: boolean;
 }) => {
   const { t } = useTranslation();
+  const voteKey = vote.toLocaleLowerCase();
 
-  const bgColor = bgColorMap[vote];
-  const borderColor = borderColorMap[vote];
-  const labelKey = isCC ? ccVoteLabelKey[vote] : voteLabelKey[vote];
+  const bgColor = bgColorMap[voteKey];
+  const borderColor = borderColorMap[voteKey];
+  const labelKey = isCC ? ccVoteLabelKey[voteKey] : voteLabelKey[voteKey];
 
   return (
     <Box

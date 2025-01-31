@@ -102,16 +102,15 @@ test("8D. Should show the view-all categorized proposed governance actions.", as
       [ProposalType.info]: mockInfoProposedGA,
       [ProposalType.treasury]: mockTreasuryProposal,
     }).map(async ([proposalType, mockData]) => {
-      const govActionTypeId = proposalType === ProposalType.info ? 1 : 2;
-      const requestUrl = `**/api/proposals?filters[$and][0][gov_action_type_id]=${govActionTypeId}&**`;
-      let requestHandled = false;
+      const requestUrl = `**/api/proposals?**`;
+      let requestHandled = 0;
 
       const context = await browser.newContext();
       const page = await context.newPage();
 
       await page.route(requestUrl, async (route) => {
-        if (!requestHandled) {
-          requestHandled = true;
+        if (requestHandled < 2) {
+          requestHandled = requestHandled + 1;
           return route.fulfill({
             body: JSON.stringify(mockData),
           });
@@ -122,13 +121,12 @@ test("8D. Should show the view-all categorized proposed governance actions.", as
       const proposalDiscussionPage = new ProposalDiscussionPage(page);
       await proposalDiscussionPage.goto();
 
-      const showAllButton = page.getByTestId("show-all-button");
+      await proposalDiscussionPage.filterBtn.click();
+      await proposalDiscussionPage.filterProposalByNames([proposalType]);
+      // to close the filter menu
+      await proposalDiscussionPage.filterBtn.click({ force: true });
 
-      if (proposalType === ProposalType.treasury) {
-        await showAllButton.nth(1).click();
-      } else {
-        await showAllButton.first().click();
-      }
+      proposalDiscussionPage.showAllBtn.click();
 
       const proposalCards = await proposalDiscussionPage.getAllProposals();
 

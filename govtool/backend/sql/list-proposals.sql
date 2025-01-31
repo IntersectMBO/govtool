@@ -21,7 +21,7 @@ DRepVotingPower AS (
         SUM(CASE WHEN drep_hash.view = 'drep_always_abstain' THEN amount ELSE 0 END) AS abstain
     FROM
         drep_hash
-    LEFT JOIN drep_distr ON drep_hash.id = drep_distr.hash_id
+    LEFT JOIN drep_distr ON drep_hash.id = drep_distr.hash_id AND drep_distr.epoch_no = (SELECT MAX(no) FROM epoch)
     WHERE drep_hash.view IN ('drep_always_no_confidence', 'drep_always_abstain')
 ),
 CommitteeData AS (

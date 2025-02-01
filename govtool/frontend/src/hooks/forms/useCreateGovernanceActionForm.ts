@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
-import * as Sentry from "@sentry/react";
 import { useTranslation } from "react-i18next";
 import { NodeObject } from "jsonld";
 
@@ -129,36 +128,31 @@ export const useCreateGovernanceActionForm = (
         hash,
         url: data.storingURL,
       };
-      try {
-        switch (govActionType) {
-          case GovernanceActionType.InfoAction:
-            return await buildNewInfoGovernanceAction(commonGovActionDetails);
-          case GovernanceActionType.TreasuryWithdrawals: {
-            if (
-              data.amount === undefined ||
-              data.receivingAddress === undefined
-            ) {
-              throw new Error(t("errors.invalidTreasuryGovernanceActionType"));
-            }
-
-            const treasuryActionDetails = {
-              ...commonGovActionDetails,
-              withdrawals: [
-                {
-                  amount: data.amount,
-                  receivingAddress: data.receivingAddress,
-                },
-              ],
-            };
-
-            return await buildTreasuryGovernanceAction(treasuryActionDetails);
+      switch (govActionType) {
+        case GovernanceActionType.InfoAction:
+          return buildNewInfoGovernanceAction(commonGovActionDetails);
+        case GovernanceActionType.TreasuryWithdrawals: {
+          if (
+            data.amount === undefined ||
+            data.receivingAddress === undefined
+          ) {
+            throw new Error(t("errors.invalidTreasuryGovernanceActionType"));
           }
-          default:
-            throw new Error(t("errors.invalidGovernanceActionType"));
+
+          const treasuryActionDetails = {
+            ...commonGovActionDetails,
+            withdrawals: [
+              {
+                amount: data.amount,
+                receivingAddress: data.receivingAddress,
+              },
+            ],
+          };
+
+          return buildTreasuryGovernanceAction(treasuryActionDetails);
         }
-      } catch (error) {
-        Sentry.setTag("hook", "useCreateGovernanceActionForm");
-        Sentry.captureException(error);
+        default:
+          throw new Error(t("errors.invalidGovernanceActionType"));
       }
     },
     [hash],
@@ -249,8 +243,6 @@ export const useCreateGovernanceActionForm = (
               : undefined,
             dataTestId: "create-governance-action-error-modal",
           });
-          Sentry.setTag("hook", "useCreateGovernanceActionForm");
-          Sentry.captureException(error);
         }
       } finally {
         setIsLoading(false);

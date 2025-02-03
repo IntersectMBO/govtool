@@ -22,7 +22,7 @@ changes.
 
 ### Changed
 
--
+- Change votes representation on Governance Actions [Issue 2880](https://github.com/IntersectMBO/govtool/issues/2880)
 
 ### Removed
 

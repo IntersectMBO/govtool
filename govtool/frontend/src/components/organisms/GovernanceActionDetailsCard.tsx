@@ -29,7 +29,7 @@ export const GovernanceActionDetailsCard = ({
   const [isVoteSubmitted, setIsVoteSubmitted] = useState<boolean>(false);
   const { screenWidth, isMobile } = useScreenDimension();
 
-  const isOneColumn = (isDashboard && screenWidth < 1036) ?? isMobile;
+  const isOneColumn = (isDashboard && screenWidth < 1200) ?? isMobile;
 
   return (
     <Box

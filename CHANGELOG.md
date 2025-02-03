@@ -26,7 +26,7 @@ changes.
 
 ### Removed
 
--
+- Remove redundant sentry reports on handled wallet exceptions [Issue 2680](https://github.com/IntersectMBO/govtool/issues/2680)
 
 ## [v2.0.10](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.10) 2025-01-29
 

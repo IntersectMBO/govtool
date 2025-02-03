@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
-import * as Sentry from "@sentry/react";
 import { NodeObject } from "jsonld";
 
 import { DREP_CONTEXT, PATHS, storageInformationErrorModals } from "@consts";
@@ -172,9 +171,6 @@ export const useEditDRepInfoForm = (
             },
           });
         } else {
-          Sentry.setTag("hook", "useEditDRepInfoForm");
-          Sentry.captureException(error);
-
           openWalletErrorModal({
             error: error?.message ? error.message : JSON.stringify(error),
             onSumbit: () => backToDashboard(),

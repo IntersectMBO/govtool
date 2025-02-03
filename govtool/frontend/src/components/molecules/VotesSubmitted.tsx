@@ -5,8 +5,8 @@ import { IMAGES, SECURITY_RELEVANT_PARAMS_MAP } from "@consts";
 import { Typography, VotePill } from "@atoms";
 import { useTranslation } from "@hooks";
 import {
-  correctDRepDirectoryFormat,
   getGovActionVotingThresholdKey,
+  correctAdaFormatWithSuffix,
 } from "@utils";
 import { SubmittedVotesData } from "@models";
 import { useFeatureFlag, useAppContext } from "@/context";
@@ -254,13 +254,15 @@ const VotesGroup = ({
           flex={1}
           borderBottom={1}
           borderColor="neutralGray"
+          justifyContent="flex-end"
+          alignItems="center"
         >
           <Typography
             sx={{
-              marginRight: 3,
-              fontSize: 16,
-              lineHeight: "24px",
-              fontWeight: "500",
+              marginRight: 1,
+              fontSize: 12,
+              lineHeight: "16px",
+              fontWeight: "400",
               color: "rgba(36, 34, 50, 1)",
             }}
           >
@@ -268,9 +270,8 @@ const VotesGroup = ({
           </Typography>
           <Typography
             sx={{
-              fontSize: 16,
-              lineHeight: "24px",
-              fontWeight: "500",
+              fontSize: 12,
+              lineHeight: "16px",
               color: "neutralGray",
             }}
           >
@@ -314,13 +315,14 @@ const Vote = ({ type, vote, value, percentage }: VoteProps) => (
         }}
       >
         {type !== "ccCommittee"
-          ? `₳ ${correctDRepDirectoryFormat(value)}`
+          ? `₳ ${correctAdaFormatWithSuffix(value)}`
           : value}
       </Typography>
       {vote !== "abstain" && typeof percentage === "number" && (
         <Typography
           data-testid={`submitted-votes-${type}-${vote}-percentage`}
           sx={{
+            ml: 1,
             fontSize: 16,
             lineHeight: "24px",
             fontWeight: "500",

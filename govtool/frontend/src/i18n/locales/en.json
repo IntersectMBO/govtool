@@ -402,7 +402,7 @@
     "submissionDate": "Submission date:",
     "submittedDateWithEpoch": "Submitted: <0>{{date}}</0> <1>(Epoch {{epoch}})</1>",
     "supportingLinks": "Supporting links",
-    "threshold": "THRESHOLD",
+    "threshold": "Ratification Threshold",
     "title": "Governance Actions",
     "toVote": "To vote",
     "viewDetails": "View Details",

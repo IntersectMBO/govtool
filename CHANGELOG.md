@@ -85,6 +85,7 @@ changes.
 - Fix usage of trim on missing label
 - Fix blank screen when registering as a DRep [Issue 2408](https://github.com/IntersectMBO/govtool/issues/2408)
 - Fix type mismatch between sql and haskell code for stake key address
+- Handle missing api key exception [Issue 2683](https://github.com/IntersectMBO/govtool/issues/2683)
 
 ### Changed
 

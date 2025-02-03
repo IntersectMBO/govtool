@@ -4,6 +4,7 @@ import {
   correctAdaFormat,
   correctVoteAdaFormat,
   correctDRepDirectoryFormat,
+  correctAdaFormatWithSuffix,
 } from "..";
 
 describe("correctAdaFormat", () => {
@@ -100,5 +101,43 @@ describe("correctDRepDirectoryFormat", () => {
     const lovelace = undefined;
     const expectedResult = "0";
     expect(correctDRepDirectoryFormat(lovelace)).toBe(expectedResult);
+  });
+});
+
+describe("correctAdaFormatWithSuffix", () => {
+  test("Correctly formats lovelace value to ada format with suffix (T)", () => {
+    const lovelace = 123456789012345;
+    const expectedResult = "123.46M";
+    expect(correctAdaFormatWithSuffix(lovelace)).toBe(expectedResult);
+  });
+
+  test("Correctly formats lovelace value to ada format with suffix (B)", () => {
+    const lovelace = 123456789012;
+    const expectedResult = "123.46k";
+    expect(correctAdaFormatWithSuffix(lovelace)).toBe(expectedResult);
+  });
+
+  test("Correctly formats lovelace value to ada format with suffix (M)", () => {
+    const lovelace = 123456789;
+    const expectedResult = "123.46";
+    expect(correctAdaFormatWithSuffix(lovelace)).toBe(expectedResult);
+  });
+
+  test("Returns 0 for undefined lovelace value", () => {
+    const lovelace = undefined;
+    const expectedResult = "0";
+    expect(correctAdaFormatWithSuffix(lovelace)).toBe(expectedResult);
+  });
+
+  test("Returns 0 for zero lovelace value", () => {
+    const lovelace = 0;
+    const expectedResult = "0";
+    expect(correctAdaFormatWithSuffix(lovelace)).toBe(expectedResult);
+  });
+
+  test("Returns 0 for small lovelace value", () => {
+    const lovelace = 123;
+    const expectedResult = "0";
+    expect(correctAdaFormatWithSuffix(lovelace)).toBe(expectedResult);
   });
 });

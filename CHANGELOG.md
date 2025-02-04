@@ -23,6 +23,7 @@ changes.
 ### Changed
 
 - Change votes representation on Governance Actions [Issue 2880](https://github.com/IntersectMBO/govtool/issues/2880)
+- Change vote rationale character limit to 10000 [Issue 2891](https://github.com/IntersectMBO/govtool/issues/2891)
 
 ### Removed
 

@@ -394,6 +394,7 @@
     "optional": "(optional)",
     "provideContext": "Provide context",
     "provideContextAboutYourVote": "Provide context about your vote",
+    "additionalInformationAboutYourVote": "Additional information about your vote",
     "provideNewContextAboutYourVote": "Provide new context about your vote",
     "rationale": "Rationale",
     "seeExternalData": "See external data",

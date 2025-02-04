@@ -217,7 +217,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             flex: 1,
           }}
         >
-          {dRepList?.length === 0 && <EmptyStateDrepDirectory />}
+          {dRepListToDisplay?.length === 0 && <EmptyStateDrepDirectory />}
           {dRepListToDisplay?.map((dRep) => (
             <Box key={dRep.view} component="li" sx={{ listStyle: "none" }}>
               <DRepCard

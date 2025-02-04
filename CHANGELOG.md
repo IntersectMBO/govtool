@@ -19,6 +19,7 @@ changes.
 - Fix displaying DRep with doNotList property as string
 - Handle exception when no index is provided to /proposal/get endpoint [Issue 1841](https://github.com/IntersectMBO/govtool/issues/1841)
 - Fix displaying vote pill on voted on cards
+- Fix incorrect link to learn more about direct voters [Issue 2647](https://github.com/IntersectMBO/govtool/issues/2647)
 
 ### Changed
 

@@ -147,7 +147,7 @@ export const RegisterAsDirectVoter = () => {
           values={{ deposit: correctAdaFormat(epochParams?.drep_deposit) }}
           components={[
             <Link
-              onClick={() => openInNewTab("https://sancho.network/")}
+              onClick={() => openInNewTab("https://docs.gov.tools/cardano-govtool/faqs/direct-voter-vs-drep")}
               sx={{ cursor: "pointer" }}
               key="0"
             />,

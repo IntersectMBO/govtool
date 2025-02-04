@@ -20,6 +20,7 @@ changes.
 - Handle exception when no index is provided to /proposal/get endpoint [Issue 1841](https://github.com/IntersectMBO/govtool/issues/1841)
 - Fix displaying vote pill on voted on cards
 - Fix incorrect link to learn more about direct voters [Issue 2647](https://github.com/IntersectMBO/govtool/issues/2647)
+- Fix missing No DRep found message on DRep Directory [Issue 2889](https://github.com/IntersectMBO/govtool/issues/2889)
 
 ### Changed
 

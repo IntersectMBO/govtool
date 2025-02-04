@@ -66,7 +66,7 @@ export const DRepDashboardCard = ({
               i18nKey="dashboard.cards.drep.retirementInProgressWithGivenName"
               values={{
                 deposit: correctAdaFormat(voter?.deposit),
-                name: voter?.givenName,
+                givenName: voter?.givenName,
               }}
             />
           ) : (
@@ -140,7 +140,7 @@ export const DRepDashboardCard = ({
         description: voter?.givenName ? (
           <Trans
             i18nKey="dashboard.cards.drep.notRegisteredWasRegisteredDescriptionWithGivenName"
-            values={{ name: voter?.givenName }}
+            values={{ givenName: voter?.givenName ?? "DRep" }}
           />
         ) : (
           <Trans i18nKey="dashboard.cards.drep.notRegisteredWasRegisteredDescription" />

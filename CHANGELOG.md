@@ -16,13 +16,37 @@ changes.
 
 ### Fixed
 
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v2.0.11](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.11) 2025-02-04
+
+### Added
+
+-
+
+### Fixed
+
 - Fix displaying DRep with doNotList property as string
 - Handle exception when no index is provided to /proposal/get endpoint [Issue 1841](https://github.com/IntersectMBO/govtool/issues/1841)
 - Fix displaying vote pill on voted on cards
+- Fix incorrect link to learn more about direct voters [Issue 2647](https://github.com/IntersectMBO/govtool/issues/2647)
+- Fix missing No DRep found message on DRep Directory [Issue 2889](https://github.com/IntersectMBO/govtool/issues/2889)
+- Fix displaying givenName placeholder instead of actual value on DRep card [Issue 2888](https://github.com/IntersectMBO/govtool/issues/2888)
+- Fix executing insertBefore on undefined node [Issue 2878](https://github.com/IntersectMBO/govtool/issues/2878)
 
 ### Changed
 
 - Change votes representation on Governance Actions [Issue 2880](https://github.com/IntersectMBO/govtool/issues/2880)
+- Change vote rationale character limit to 10000 [Issue 2891](https://github.com/IntersectMBO/govtool/issues/2891)
+- Move ratification threshold label below the voter type [Issue 2893](https://github.com/IntersectMBO/govtool/issues/2893)
 
 ### Removed
 
@@ -79,6 +103,7 @@ changes.
 - Fix usage of trim on missing label
 - Fix blank screen when registering as a DRep [Issue 2408](https://github.com/IntersectMBO/govtool/issues/2408)
 - Fix type mismatch between sql and haskell code for stake key address
+- Handle missing api key exception [Issue 2683](https://github.com/IntersectMBO/govtool/issues/2683)
 
 ### Changed
 

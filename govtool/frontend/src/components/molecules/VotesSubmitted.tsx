@@ -227,15 +227,7 @@ const VotesGroup = ({
         {t(`govActions.${type}`)}
       </Typography>
       {threshold !== undefined && threshold !== null && (
-        <Box
-          display="flex"
-          flexDirection="row"
-          flex={1}
-          borderBottom={1}
-          borderColor="neutralGray"
-          justifyContent="flex-end"
-          alignItems="center"
-        >
+        <Box display="flex" flexDirection="row" flex={1} alignItems="center">
           <Typography
             sx={{
               marginRight: 1,

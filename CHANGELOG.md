@@ -29,6 +29,7 @@ changes.
 - Change votes representation on Governance Actions [Issue 2880](https://github.com/IntersectMBO/govtool/issues/2880)
 - Change vote rationale character limit to 10000 [Issue 2891](https://github.com/IntersectMBO/govtool/issues/2891)
 - Move ratification threshold label below the voter type [Issue 2893](https://github.com/IntersectMBO/govtool/issues/2893)
+- Move DRep list pagination directly to SQL [Issue 2724](https://github.com/IntersectMBO/govtool/issues/2724)
 
 ### Removed
 

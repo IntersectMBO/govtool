@@ -1,11 +1,11 @@
 {
   "dbsyncconfig" : {
-      "host"     : "localhost",
-      "dbname"   : "cexplorer",
-      "user"     : "postgres",
-      "password" : "postgres",
-      "port"     : 5432
-    },
+    "host"     : "localhost",
+    "dbname"   : "cexplorer",
+    "user"     : "postgres",
+    "password" : "postgres",
+    "port"     : 5432
+  },
   "port" : 9999,
   "host" : "localhost",
   "cachedurationseconds": 20,

@@ -10,6 +10,7 @@ type VoteContextTextProps = {
   setStep: Dispatch<SetStateAction<number>>;
   onCancel: () => void;
 };
+const MAX_LENGTH = 10000;
 
 export const VoteContextText = ({
   setStep,
@@ -31,9 +32,9 @@ export const VoteContextText = ({
         message: t("createGovernanceAction.fields.validations.required"),
       },
       maxLength: {
-        value: 500,
+        value: MAX_LENGTH,
         message: t("createGovernanceAction.fields.validations.maxLength", {
-          maxLength: 500,
+          maxLength: MAX_LENGTH,
         }),
       },
     },
@@ -64,13 +65,13 @@ export const VoteContextText = ({
         {t("govActions.provideContextAboutYourVote")}
       </Typography>
       <Typography variant="body1" sx={{ fontWeight: 400, mb: 2 }}>
-        {/* TODO: Update text when design is finalised */}
-        Additional information about your vote
+        {t("govActions.additionalInformationAboutYourVote")}
       </Typography>
       <ControlledField.TextArea
         {...{ control, errors }}
         {...fieldProps}
         isModifiedLayout
+        maxLength={MAX_LENGTH}
         data-testid="provide-context-input"
       />
     </VoteContextWrapper>

@@ -226,27 +226,6 @@ const VotesGroup = ({
       >
         {t(`govActions.${type}`)}
       </Typography>
-      <Vote
-        type={type}
-        vote="yes"
-        percentage={yesVotesPercentage}
-        value={yesVotes}
-      />
-      <Vote type={type} vote="abstain" value={abstainVotes} />
-      <Vote
-        type={type}
-        vote="no"
-        percentage={noVotesPercentage}
-        value={noVotes}
-      />
-      {typeof notVotedVotes === "number" && (
-        <Vote
-          type={type}
-          vote="notVoted"
-          percentage={notVotedPercentage}
-          value={notVotedVotes}
-        />
-      )}
       {threshold !== undefined && threshold !== null && (
         <Box
           display="flex"
@@ -278,6 +257,27 @@ const VotesGroup = ({
             {threshold * 100}%
           </Typography>
         </Box>
+      )}
+      <Vote
+        type={type}
+        vote="yes"
+        percentage={yesVotesPercentage}
+        value={yesVotes}
+      />
+      <Vote type={type} vote="abstain" value={abstainVotes} />
+      <Vote
+        type={type}
+        vote="no"
+        percentage={noVotesPercentage}
+        value={noVotes}
+      />
+      {typeof notVotedVotes === "number" && (
+        <Vote
+          type={type}
+          vote="notVoted"
+          percentage={notVotedPercentage}
+          value={notVotedVotes}
+        />
       )}
     </Box>
   );

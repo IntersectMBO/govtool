@@ -16,6 +16,24 @@ changes.
 
 ### Fixed
 
+-
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v2.0.11](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.11) 2025-02-04
+
+### Added
+
+-
+
+### Fixed
+
 - Fix displaying DRep with doNotList property as string
 - Handle exception when no index is provided to /proposal/get endpoint [Issue 1841](https://github.com/IntersectMBO/govtool/issues/1841)
 - Fix displaying vote pill on voted on cards

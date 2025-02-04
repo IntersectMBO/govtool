@@ -42,7 +42,11 @@
           s = d.getElementsByTagName("script")[0];
         g.async = true;
         g.src = u + "matomo.js";
-        s.parentNode.insertBefore(g, s);
+        if (s && s.parentNode) {
+          s.parentNode.insertBefore(g, s);
+        } else {
+          d.head.appendChild(g);
+        }
       })();
     </script>
     <div id="root"></div>

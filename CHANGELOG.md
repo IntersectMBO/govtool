@@ -22,6 +22,7 @@ changes.
 - Fix incorrect link to learn more about direct voters [Issue 2647](https://github.com/IntersectMBO/govtool/issues/2647)
 - Fix missing No DRep found message on DRep Directory [Issue 2889](https://github.com/IntersectMBO/govtool/issues/2889)
 - Fix displaying givenName placeholder instead of actual value on DRep card [Issue 2888](https://github.com/IntersectMBO/govtool/issues/2888)
+- Fix executing insertBefore on undefined node [Issue 2878](https://github.com/IntersectMBO/govtool/issues/2878)
 
 ### Changed
 

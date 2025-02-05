@@ -150,6 +150,10 @@ test.describe("Check vote count", () => {
       )
     );
 
+    const metricsResponsePromise = page.waitForResponse((response) =>
+      response.url().includes(`network/metrics`)
+    );
+
     const governanceActionsPage = new GovernanceActionsPage(page);
     await governanceActionsPage.goto();
 
@@ -180,6 +184,17 @@ test.describe("Check vote count", () => {
           `${proposalToCheck.txHash}#${proposalToCheck.index}`
         );
 
+        const metricsResponses = await Promise.resolve(metricsResponsePromise);
+        const totalStakeControlledByDReps = await metricsResponses
+          .json()
+          .then((data) => data.totalStakeControlledByDReps);
+
+        const dRepNotVoted =
+          totalStakeControlledByDReps -
+          proposalToCheck.dRepYesVotes -
+          proposalToCheck.dRepAbstainVotes -
+          proposalToCheck.dRepNoVotes;
+
         await govActionDetailsPage.showVotesBtn.click();
 
         // check dRep votes
@@ -192,6 +207,10 @@ test.describe("Check vote count", () => {
           );
           await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
             `₳ ${correctVoteAdaFormat(proposalToCheck.dRepNoVotes)}`
+          );
+
+          await expect(govActionDetailsPage.dRepNotVoted).toHaveText(
+            `₳ ${correctVoteAdaFormat(dRepNotVoted)}`
           );
         }
 

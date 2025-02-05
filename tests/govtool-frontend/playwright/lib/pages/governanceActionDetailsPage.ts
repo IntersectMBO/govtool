@@ -39,6 +39,9 @@ export default class GovernanceActionDetailsPage {
 
   readonly dRepYesVotes = this.page.getByTestId("submitted-votes-dReps-yes");
   readonly dRepNoVotes = this.page.getByTestId("submitted-votes-dReps-no");
+  readonly dRepNotVoted = this.page.getByTestId(
+    "submitted-votes-dReps-notVoted"
+  );
   readonly dRepAbstainVotes = this.page.getByTestId(
     "submitted-votes-dReps-abstain"
   );

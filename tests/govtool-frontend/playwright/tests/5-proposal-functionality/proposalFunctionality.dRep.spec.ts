@@ -96,13 +96,18 @@ test.describe("Proposal checks", () => {
   });
 
   test.describe("Validate provide context about vote", () => {
+    const characters =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     test("5D_1. Should accept valid data in provide context", async () => {
       await govActionDetailsPage.contextBtn.click();
 
       await expect(govActionDetailsPage.contextInput).toBeVisible();
 
       for (let i = 0; i < 100; i++) {
-        const randomContext = faker.lorem.paragraph(2);
+        const randomContext = faker.string.fromCharacters(characters, {
+          min: 1,
+          max: 9999,
+        });
         await govActionDetailsPage.contextInput.fill(randomContext);
         expect(await govActionDetailsPage.contextInput.textContent()).toEqual(
           randomContext
@@ -118,7 +123,7 @@ test.describe("Proposal checks", () => {
       await expect(govActionDetailsPage.contextInput).toBeVisible();
 
       for (let i = 0; i < 100; i++) {
-        const randomContext = faker.lorem.paragraph(40);
+        const randomContext = faker.string.fromCharacters(characters, 10001);
         await govActionDetailsPage.contextInput.fill(randomContext);
         expect(
           await govActionDetailsPage.contextInput.textContent()

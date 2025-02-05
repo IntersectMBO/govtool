@@ -21,6 +21,7 @@ changes.
 ### Changed
 
 - Change threshold visual representation in governance action votes
+- Resize governance action details columns
 
 ### Removed
 

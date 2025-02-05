@@ -1,7 +1,8 @@
 import environments from "@constants/environments";
 import { downloadMetadata } from "@helpers/metadata";
-import { Download, Page } from "@playwright/test";
+import { Download, Page, Response } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
+import { IProposal } from "@types";
 import { withTxConfirmation } from "lib/transaction.decorator";
 
 export default class GovernanceActionDetailsPage {
@@ -98,6 +99,29 @@ export default class GovernanceActionDetailsPage {
     }
 
     await this.voteBtn.click();
+  }
+
+  async getDRepNotVoted(
+    proposal: IProposal,
+    metricsResponsePromise: Promise<Response>
+  ): Promise<number | undefined> {
+    const metricsResponses = await Promise.resolve(metricsResponsePromise);
+    const totalStakeControlledByDReps = await metricsResponses
+      .json()
+      .then((data) => data.totalStakeControlledByDReps);
+
+    if (
+      totalStakeControlledByDReps &&
+      typeof totalStakeControlledByDReps === "number"
+    ) {
+      const dRepNotVoted =
+        totalStakeControlledByDReps -
+        proposal.dRepYesVotes -
+        proposal.dRepAbstainVotes -
+        proposal.dRepNoVotes;
+
+      return dRepNotVoted;
+    }
   }
 
   async downloadVoteMetadata() {

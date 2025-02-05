@@ -41,6 +41,33 @@ export type TreasuryGovernanceActionFieldSchema =
       receivingAddress: FieldSchema;
       amount: FieldSchema;
     }>;
+export type NoConfidenceActionFieldSchema = SharedGovernanceActionFieldSchema;
+export type NewCommitteeActionFieldSchema = SharedGovernanceActionFieldSchema &
+  Partial<{
+    prevGovernanceActionHash: FieldSchema;
+    prevGovernanceActionIndex: FieldSchema;
+    numerator: FieldSchema;
+    denominator: FieldSchema;
+    newCommitteeMembers: FieldSchema[];
+    removeCommitteeMembers: FieldSchema[];
+  }>;
+export type HardForkInitiationActionFieldSchema =
+  SharedGovernanceActionFieldSchema &
+    Partial<{
+      prevGovernanceActionHash: FieldSchema;
+      prevGovernanceActionIndex: FieldSchema;
+      major: FieldSchema;
+      minor: FieldSchema;
+    }>;
+export type NewConstitutionActionFieldSchema =
+  SharedGovernanceActionFieldSchema &
+    Partial<{
+      prevGovernanceActionHash: FieldSchema;
+      prevGovernanceActionIndex: FieldSchema;
+      constitutionUrl: FieldSchema;
+      constitutionHash: FieldSchema;
+      scriptHash: FieldSchema;
+    }>;
 
 export type GovernanceActionFieldSchemas =
   | InfoGovernanceActionFieldSchema & TreasuryGovernanceActionFieldSchema;

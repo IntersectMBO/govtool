@@ -14,7 +14,7 @@ import { DrawerMobile } from "./DrawerMobile";
 const POSITION_TO_BLUR = 50;
 
 export const TopNav = ({ isConnectButton = true }) => {
-  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
+  const { isProposalDiscussionForumEnabled, isGovernanceOutcomesPillarEnabled } = useFeatureFlag();
   const containerRef = useRef<HTMLDivElement>(null);
   const [shouldBlur, setShouldBlur] = useState<boolean>(false);
   const { openModal } = useModal();
@@ -118,6 +118,13 @@ export const TopNav = ({ isConnectButton = true }) => {
                 if (
                   !isProposalDiscussionForumEnabled &&
                   navItem.dataTestId === "proposed-governance-actions-link"
+                ) {
+                  return null;
+                }
+
+                if (
+                  !isGovernanceOutcomesPillarEnabled &&
+                  navItem.dataTestId === "governance-actions-outcomes-link"
                 ) {
                   return null;
                 }

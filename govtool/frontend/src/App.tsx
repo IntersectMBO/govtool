@@ -107,6 +107,18 @@ export default () => {
             element={<ProposalDiscussionPillar />}
           />
         )}
+        {isGovernanceOutcomesPillarEnabled && !isEnabled && (
+          <>
+            <Route
+              path={`${OUTCOMES_PATHS.governanceActionsOutcomes}/*`}
+              element={<GovernanceActionOutComesPillar />}
+            />
+            <Route
+              path={USER_PATHS.governanceActionsVotedByMe}
+              element={<GovernanceActionOutComesPillar />}
+            />
+          </>
+        )}
         <Route element={<Dashboard />}>
           <Route path={PATHS.dashboard} element={<DashboardHome />} />
           {isProposalDiscussionForumEnabled && (

@@ -100,24 +100,38 @@ RankedPoolVotes AS (
         voting_procedure vp
 ),
 PoolVotes AS (
-	SELECT
-		rpv.gov_action_proposal_id,
-		ps.epoch_no,
-		COUNT(DISTINCT CASE WHEN vote = 'Yes' THEN rpv.pool_voter ELSE 0 END) AS total_unique_votes,
-		COUNT(DISTINCT CASE WHEN vote = 'No' THEN rpv.pool_voter ELSE 0 END) AS total_unique_votes,
-		COUNT(DISTINCT CASE WHEN vote = 'Abstain' THEN rpv.pool_voter ELSE 0 END) AS total_unique_votes,
-		SUM(CASE WHEN rpv.vote = 'Yes' THEN ps.voting_power ELSE 0 END) AS poolYesVotes,
-		SUM(CASE WHEN rpv.vote = 'No' THEN ps.voting_power ELSE 0 END) AS poolNoVotes,
-		SUM(CASE WHEN rpv.vote = 'Abstain' THEN ps.voting_power ELSE 0 END) AS poolAbstainVotes
-	FROM 
-		RankedPoolVotes rpv
-	JOIN 
-		pool_stat ps
-	ON rpv.pool_voter = ps.pool_hash_id
-	WHERE
-		rpv.rn = 1 AND ps.epoch_no = (SELECT MAX(no) FROM epoch)
-	GROUP BY
-		rpv.gov_action_proposal_id, ps.epoch_no
+    SELECT
+        rpv.gov_action_proposal_id,
+        ps.epoch_no,
+        COUNT(DISTINCT CASE WHEN vote = 'Yes' THEN rpv.pool_voter ELSE 0 END) AS total_unique_votes,
+        COUNT(DISTINCT CASE WHEN vote = 'No' THEN rpv.pool_voter ELSE 0 END) AS total_unique_votes,
+        COUNT(DISTINCT CASE WHEN vote = 'Abstain' THEN rpv.pool_voter ELSE 0 END) AS total_unique_votes,
+        SUM(CASE WHEN rpv.vote = 'Yes' THEN ps.voting_power ELSE 0 END) AS poolYesVotes,
+        SUM(CASE WHEN rpv.vote = 'No' THEN ps.voting_power ELSE 0 END) AS poolNoVotes,
+        SUM(CASE WHEN rpv.vote = 'Abstain' THEN ps.voting_power ELSE 0 END) AS poolAbstainVotes
+    FROM 
+        RankedPoolVotes rpv
+    JOIN 
+        pool_stat ps
+        ON rpv.pool_voter = ps.pool_hash_id
+    WHERE
+        rpv.rn = 1 AND ps.epoch_no = (SELECT MAX(no) FROM epoch)
+    GROUP BY
+        rpv.gov_action_proposal_id, ps.epoch_no
+),
+RankedDRepVotes AS (
+    SELECT
+        *,
+        ROW_NUMBER() OVER (PARTITION BY vp.drep_voter ORDER BY vp.tx_id DESC) AS rn
+    FROM
+        voting_procedure vp
+),
+RankedDRepRegistration AS (
+    SELECT
+        *,
+        ROW_NUMBER() OVER (PARTITION BY dr.drep_hash_id ORDER BY dr.tx_id DESC) AS rn
+    FROM
+        drep_registration dr
 ),
 CommitteeVotes AS (
     SELECT 
@@ -225,19 +239,19 @@ SELECT
     off_chain_vote_gov_action_data.abstract,
     off_chain_vote_gov_action_data.motivation,
     off_chain_vote_gov_action_data.rationale,
-    COALESCE(SUM(ldd_drep.amount) FILTER (WHERE voting_procedure.vote::text = 'Yes'), 0) yes_votes,
-    COALESCE(SUM(ldd_drep.amount) FILTER (WHERE voting_procedure.vote::text = 'No'), 0) + (
-        CASE WHEN gov_action_proposal.type = 'NoConfidence' OR gov_action_proposal.type = 'HardForkInitiation' THEN
+    COALESCE(SUM(ldd_drep.amount) FILTER (WHERE rdv.vote::text = 'Yes'), 0) + (
+        CASE WHEN gov_action_proposal.type = 'NoConfidence' THEN
+            drep_voting_power.no_confidence
+        ELSE
+            0
+        END) yes_votes,
+    COALESCE(SUM(ldd_drep.amount) FILTER (WHERE rdv.vote::text = 'No'), 0) + (
+        CASE WHEN gov_action_proposal.type = 'NoConfidence' THEN
             0
         ELSE
             drep_voting_power.no_confidence
         END) no_votes,
-    COALESCE(SUM(ldd_drep.amount) FILTER (WHERE voting_procedure.vote::text = 'Abstain'), 0) + (
-        CASE WHEN gov_action_proposal.type = 'NoConfidence' OR gov_action_proposal.type = 'HardForkInitiation' THEN
-            0
-        ELSE
-            drep_voting_power.abstain
-        END) abstain_votes,
+    COALESCE(SUM(ldd_drep.amount) FILTER (WHERE rdv.vote::text = 'Abstain'), 0) + drep_voting_power.abstain abstain_votes,
 	COALESCE(ps.poolYesVotes, 0) pool_yes_votes,
 	COALESCE(ps.poolNoVotes, 0) pool_no_votes,
 	COALESCE(ps.poolAbstainVotes, 0) pool_abstain_votes,
@@ -260,8 +274,9 @@ FROM
     LEFT JOIN cost_model AS cost_model ON proposal_params.cost_model_id = cost_model.id
 	LEFT JOIN PoolVotes ps ON gov_action_proposal.id = ps.gov_action_proposal_id
     LEFT JOIN CommitteeVotes cv ON gov_action_proposal.id = cv.gov_action_proposal_id
-	LEFT JOIN voting_procedure ON voting_procedure.gov_action_proposal_id = gov_action_proposal.id
-	LEFT JOIN LatestDrepDistr ldd_drep ON ldd_drep.hash_id = voting_procedure.drep_voter
+    LEFT JOIN RankedDRepVotes rdv ON rdv.gov_action_proposal_id = gov_action_proposal.id AND rdv.rn = 1
+    LEFT JOIN RankedDRepRegistration rdr ON rdr.drep_hash_id = rdv.drep_voter AND COALESCE(rdr.deposit, 0) >= 0 AND rdr.rn = 1
+	LEFT JOIN LatestDrepDistr ldd_drep ON ldd_drep.hash_id = rdr.drep_hash_id
         AND ldd_drep.epoch_no = latest_epoch.no
     LEFT JOIN gov_action_proposal AS prev_gov_action ON gov_action_proposal.prev_gov_action_proposal = prev_gov_action.id
     LEFT JOIN tx AS prev_gov_action_tx ON prev_gov_action.tx_id = prev_gov_action_tx.id

@@ -884,6 +884,7 @@ data GetNetworkMetricsResponse
       , getNetworkMetricsResponseTotalGovernanceActions          :: Integer
       , getNetworkMetricsResponseTotalDRepVotes                  :: Integer
       , getNetworkMetricsResponseTotalRegisteredDReps            :: Integer
+      , getNetworkMetricsResponseTotalDRepDistr                  :: Integer
       , getNetworkMetricsResponseTotalStakeControlledByDReps     :: Integer
       , getNetworkMetricsResponseTotalStakeControlledBySPOs      :: Integer
       , getNetworkMetricsResponseTotalActiveDReps                :: Integer
@@ -907,6 +908,7 @@ exampleGetNetworkMetricsResponse =
   <> "\"totalGovernanceActions\": 0,"
   <> "\"totalDRepVotes\": 0,"
   <> "\"totalRegisteredDReps\": 0,"
+  <> "\"totalDRepDistr\": 0,"
   <> "\"totalStakeControlledByDReps\": 0,"
   <> "\"totalStakeControlledBySPOs\": 0,"
   <> "\"totalActiveDReps\": 0,"

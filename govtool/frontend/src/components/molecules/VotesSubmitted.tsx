@@ -63,7 +63,8 @@ export const VotesSubmitted = ({
     ? totalStakeControlledByDReps -
       dRepYesVotes -
       dRepNoVotes -
-      dRepAbstainVotes
+      dRepAbstainVotes +
+      (networkMetrics?.alwaysNoConfidenceVotingPower ?? 0)
     : undefined;
   const dRepNotVotedVotesPercentage =
     100 - (dRepYesVotesPercentage ?? 0) - (dRepNoVotesPercentage ?? 0);

@@ -23,7 +23,7 @@ export const SubmittedVotesModal = forwardRef<HTMLDivElement>((_, ref) => {
     >
       <ModalContents>
         <Box alignItems="center">
-          <VotesSubmitted votes={state} />
+          <VotesSubmitted type={state.type} votes={state} />
         </Box>
       </ModalContents>
     </ModalWrapper>

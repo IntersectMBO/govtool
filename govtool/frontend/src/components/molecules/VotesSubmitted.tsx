@@ -10,12 +10,15 @@ import {
 } from "@utils";
 import { SubmittedVotesData } from "@models";
 import { useFeatureFlag, useAppContext } from "@/context";
+import { GovernanceActionType } from "@/types/governanceAction";
 
 type Props = {
+  type: GovernanceActionType;
   votes: SubmittedVotesData;
 };
 
 export const VotesSubmitted = ({
+  type: govActionType,
   votes: {
     dRepYesVotes,
     dRepAbstainVotes,
@@ -50,21 +53,24 @@ export const VotesSubmitted = ({
   const totalStakeControlledByDReps =
     networkMetrics?.totalStakeControlledByDReps ?? 0;
 
-  const totalDRepVotes = totalStakeControlledByDReps
-    ? totalStakeControlledByDReps - dRepAbstainVotes
+  // TODO: Move this logic to backend
+  const dRepYesVotesPercentage = totalStakeControlledByDReps
+    ? (dRepYesVotes / totalStakeControlledByDReps) * 100
     : undefined;
-  const dRepYesVotesPercentage = totalDRepVotes
-    ? (dRepYesVotes / totalDRepVotes) * 100
-    : undefined;
-  const dRepNoVotesPercentage = totalDRepVotes
-    ? (dRepNoVotes / totalDRepVotes) * 100
+  const dRepNoVotesPercentage = totalStakeControlledByDReps
+    ? (dRepNoVotes / totalStakeControlledByDReps) * 100
     : undefined;
   const dRepNotVotedVotes = totalStakeControlledByDReps
     ? totalStakeControlledByDReps -
-      dRepYesVotes -
-      dRepNoVotes -
-      dRepAbstainVotes +
-      (networkMetrics?.alwaysNoConfidenceVotingPower ?? 0)
+      (dRepYesVotes -
+        (govActionType === GovernanceActionType.NoConfidence
+          ? networkMetrics?.alwaysNoConfidenceVotingPower ?? 0
+          : 0)) -
+      (dRepNoVotes -
+        (govActionType === GovernanceActionType.NoConfidence
+          ? 0
+          : networkMetrics?.alwaysNoConfidenceVotingPower ?? 0)) -
+      (dRepAbstainVotes - (networkMetrics?.alwaysAbstainVotingPower ?? 0))
     : undefined;
   const dRepNotVotedVotesPercentage =
     100 - (dRepYesVotesPercentage ?? 0) - (dRepNoVotesPercentage ?? 0);

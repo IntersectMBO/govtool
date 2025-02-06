@@ -196,7 +196,7 @@ SELECT
     TotalDRepVotes.count AS total_drep_votes,
     TotalRegisteredDReps.unique_registrations AS total_registered_dreps,
 	TotalDRepDistr.total_drep_distr,
-    COALESCE(TotalStakeControlledByActiveDReps.total, 0) + COALESCE(AlwaysAbstainVotingPower.amount, 0) + COALESCE(AlwaysNoConfidenceVotingPower.amount, 0) AS total_stake_controlled_dreps,
+    COALESCE(TotalStakeControlledByActiveDReps.total, 0) + COALESCE(AlwaysNoConfidenceVotingPower.amount, 0) AS total_stake_controlled_by_active_dreps,
     COALESCE(TotalStakeControlledBySPOs.total, 0) AS total_stake_controlled_by_spos,
     TotalActiveDReps.unique_active_drep_registrations AS total_active_dreps,
     TotalInactiveDReps.total_inactive_dreps AS total_inactive_dreps,

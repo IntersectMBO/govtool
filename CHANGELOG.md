@@ -25,7 +25,7 @@ changes.
 
 ### Removed
 
--
+- Remove abstain from total DRep votes calculation
 
 ## [v2.0.11](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.11) 2025-02-04
 

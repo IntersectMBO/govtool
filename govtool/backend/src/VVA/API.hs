@@ -436,6 +436,7 @@ getNetworkMetrics = do
     , getNetworkMetricsResponseTotalGovernanceActions = networkMetricsTotalGovernanceActions
     , getNetworkMetricsResponseTotalDRepVotes = networkMetricsTotalDRepVotes
     , getNetworkMetricsResponseTotalRegisteredDReps = networkMetricsTotalRegisteredDReps
+    , getNetworkMetricsResponseTotalDRepDistr = networkMetricsTotalDRepDistr
     , getNetworkMetricsResponseTotalStakeControlledByDReps = networkMetricsTotalStakeControlledByDReps
     , getNetworkMetricsResponseTotalStakeControlledBySPOs = networkMetricsTotalStakeControlledBySPOs
     , getNetworkMetricsResponseTotalActiveDReps = networkMetricsTotalActiveDReps

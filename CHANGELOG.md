@@ -16,7 +16,7 @@ changes.
 
 ### Fixed
 
--
+- Fix calculating votes counting for governance actions
 
 ### Changed
 

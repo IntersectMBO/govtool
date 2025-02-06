@@ -58,7 +58,7 @@ export const GovernanceActionDetailsCardVotes = ({
           isInProgress={isInProgress}
         />
       ) : (
-        <VotesSubmitted votes={proposal} />
+        <VotesSubmitted type={proposal.type} votes={proposal} />
       )}
     </Box>
   );

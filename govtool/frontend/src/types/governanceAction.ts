@@ -21,7 +21,7 @@ export type FieldSchema = {
   labelI18nKey: NestedKeys<typeof en>;
   placeholderI18nKey: NestedKeys<typeof en>;
   tipI18nKey?: NestedKeys<typeof en>;
-  rules: Omit<RegisterOptions, "valueAsNumber" | "valueAsDate" | "setValueAs">;
+  rules?: Omit<RegisterOptions, "valueAsNumber" | "valueAsDate" | "setValueAs">;
 };
 
 // Following properties are based on [CIP-108](https://github.com/Ryun1/CIPs/blob/governance-metadata-actions/CIP-0108/README.md)
@@ -34,45 +34,45 @@ export type SharedGovernanceActionFieldSchema = {
   rationale: FieldSchema;
 };
 
-export type InfoGovernanceActionFieldSchema = SharedGovernanceActionFieldSchema;
-export type TreasuryGovernanceActionFieldSchema =
-  SharedGovernanceActionFieldSchema &
-    Partial<{
-      receivingAddress: FieldSchema;
-      amount: FieldSchema;
-    }>;
-export type NoConfidenceActionFieldSchema = SharedGovernanceActionFieldSchema;
-export type NewCommitteeActionFieldSchema = SharedGovernanceActionFieldSchema &
-  Partial<{
-    prevGovernanceActionHash: FieldSchema;
-    prevGovernanceActionIndex: FieldSchema;
-    numerator: FieldSchema;
-    denominator: FieldSchema;
-    newCommitteeMembers: FieldSchema[];
-    removeCommitteeMembers: FieldSchema[];
-  }>;
-export type HardForkInitiationActionFieldSchema =
-  SharedGovernanceActionFieldSchema &
-    Partial<{
-      prevGovernanceActionHash: FieldSchema;
-      prevGovernanceActionIndex: FieldSchema;
-      major: FieldSchema;
-      minor: FieldSchema;
-    }>;
-export type NewConstitutionActionFieldSchema =
-  SharedGovernanceActionFieldSchema &
-    Partial<{
-      prevGovernanceActionHash: FieldSchema;
-      prevGovernanceActionIndex: FieldSchema;
-      constitutionUrl: FieldSchema;
-      constitutionHash: FieldSchema;
-      scriptHash: FieldSchema;
-    }>;
+export type TreasuryGovernanceActionFieldSchema = Partial<{
+  receivingAddress: FieldSchema;
+  amount: FieldSchema;
+}>;
+export type NewCommitteeActionFieldSchema = Partial<{
+  prevGovernanceActionHash: FieldSchema;
+  prevGovernanceActionIndex: FieldSchema;
+  numerator: FieldSchema;
+  denominator: FieldSchema;
+  newCommitteeHash: FieldSchema;
+  newCommitteeExpiryEpoch: FieldSchema;
+  removeCommitteeHash: FieldSchema;
+}>;
+export type HardForkInitiationActionFieldSchema = Partial<{
+  prevGovernanceActionHash: FieldSchema;
+  prevGovernanceActionIndex: FieldSchema;
+  major: FieldSchema;
+  minor: FieldSchema;
+}>;
+export type NewConstitutionActionFieldSchema = Partial<{
+  prevGovernanceActionHash: FieldSchema;
+  prevGovernanceActionIndex: FieldSchema;
+  constitutionUrl: FieldSchema;
+  constitutionHash: FieldSchema;
+  scriptHash: FieldSchema;
+}>;
 
 export type GovernanceActionFieldSchemas =
-  | InfoGovernanceActionFieldSchema & TreasuryGovernanceActionFieldSchema;
+  | SharedGovernanceActionFieldSchema &
+      TreasuryGovernanceActionFieldSchema &
+      NewCommitteeActionFieldSchema &
+      HardForkInitiationActionFieldSchema &
+      NewConstitutionActionFieldSchema;
 
 export type GovernanceActionFields = Record<
-  GovernanceActionType.InfoAction | GovernanceActionType.TreasuryWithdrawals,
+  | GovernanceActionType.InfoAction
+  | GovernanceActionType.TreasuryWithdrawals
+  | GovernanceActionType.NoConfidence
+  | GovernanceActionType.NewCommittee
+  | GovernanceActionType.NewConstitution,
   GovernanceActionFieldSchemas
 >;

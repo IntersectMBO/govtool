@@ -136,35 +136,35 @@ type ProtocolParameterChangeProps = {
 
 type HardForkInitiationProps = {
   prevGovernanceActionHash: string;
-  prevGovernanceActionIndex: number;
-  major: number;
-  minor: number;
+  prevGovernanceActionIndex: string;
+  major: string;
+  minor: string;
 } & VotingAnchor;
 
 type NewConstitutionProps = {
-  prevGovernanceActionHash: string;
-  prevGovernanceActionIndex: number;
+  prevGovernanceActionHash?: string;
+  prevGovernanceActionIndex?: string;
   constitutionUrl: string;
   constitutionHash: string;
-  scriptHash: string;
+  scriptHash?: string;
 } & VotingAnchor;
 
 type UpdateCommitteeProps = {
   prevGovernanceActionHash?: string;
-  prevGovernanceActionIndex?: number;
+  prevGovernanceActionIndex?: string;
   quorumThreshold: QuorumThreshold;
   newCommittee?: CommitteeToAdd[];
   removeCommittee?: string[];
 } & VotingAnchor;
 
 export type CommitteeToAdd = {
-  expiryEpoch: number;
+  expiryEpoch: string;
   committee: string;
 };
 
 export type QuorumThreshold = {
-  numerator: number;
-  denominator: number;
+  numerator: string;
+  denominator: string;
 };
 
 type ProtocolParamsUpdate = {
@@ -1060,7 +1060,7 @@ const CardanoProvider = (props: Props) => {
         if (prevGovernanceActionHash && prevGovernanceActionIndex) {
           const prevGovernanceActionId = GovernanceActionId.new(
             TransactionHash.from_hex(prevGovernanceActionHash),
-            prevGovernanceActionIndex,
+            Number(prevGovernanceActionIndex),
           );
           newConstitution = NewConstitutionAction.new_with_action_id(
             prevGovernanceActionId,
@@ -1112,14 +1112,13 @@ const CardanoProvider = (props: Props) => {
           BigNum.from_str(quorumThreshold.numerator.toString()),
           BigNum.from_str(quorumThreshold.denominator.toString()),
         );
-
         const committeeToAdd = Committee.new(threshold);
         if (newCommittee) {
           newCommittee.forEach(async (member) => {
             const credential = await buildCredentialFromBech32Key(
               member.committee,
             );
-            committeeToAdd.add_member(credential, member.expiryEpoch);
+            committeeToAdd.add_member(credential, Number(member.expiryEpoch));
           });
         }
         const committeeToRemoveCredentials = Credentials.new();
@@ -1134,7 +1133,7 @@ const CardanoProvider = (props: Props) => {
         if (prevGovernanceActionHash && prevGovernanceActionIndex) {
           const prevGovernanceActionId = GovernanceActionId.new(
             TransactionHash.from_hex(prevGovernanceActionHash),
-            prevGovernanceActionIndex,
+            Number(prevGovernanceActionIndex),
           );
           updateCommitteeAction = UpdateCommitteeAction.new_with_action_id(
             prevGovernanceActionId,
@@ -1393,13 +1392,16 @@ const CardanoProvider = (props: Props) => {
     }: HardForkInitiationProps) => {
       const govActionBuilder = VotingProposalBuilder.new();
       try {
-        const newProtocolVersion = ProtocolVersion.new(major, minor);
+        const newProtocolVersion = ProtocolVersion.new(
+          Number(major),
+          Number(minor),
+        );
 
         let hardForkInitiationAction;
         if (prevGovernanceActionHash && prevGovernanceActionIndex) {
           const prevGovernanceActionId = GovernanceActionId.new(
             TransactionHash.from_hex(prevGovernanceActionHash),
-            prevGovernanceActionIndex,
+            Number(prevGovernanceActionIndex),
           );
           hardForkInitiationAction =
             HardForkInitiationAction.new_with_action_id(

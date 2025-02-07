@@ -10,7 +10,7 @@ import {
   PATHS,
   storageInformationErrorModals,
 } from "@consts";
-import { useCardano, useModal, useAppContext } from "@context";
+import { useCardano, useModal, useAppContext, QuorumThreshold } from "@context";
 import {
   correctAdaFormat,
   downloadJson,
@@ -56,6 +56,9 @@ export const useCreateGovernanceActionForm = (
   const {
     buildNewInfoGovernanceAction,
     buildTreasuryGovernanceAction,
+    buildNoConfidenceGovernanceAction,
+    buildNewConstitutionGovernanceAction,
+    buildUpdateCommitteeGovernanceAction,
     buildSignSubmitConwayCertTx,
   } = useCardano();
 
@@ -131,6 +134,64 @@ export const useCreateGovernanceActionForm = (
       switch (govActionType) {
         case GovernanceActionType.InfoAction:
           return buildNewInfoGovernanceAction(commonGovActionDetails);
+        case GovernanceActionType.NoConfidence:
+          return buildNoConfidenceGovernanceAction(commonGovActionDetails);
+        case GovernanceActionType.NewConstitution: {
+          if (
+            data.constitutionUrl === undefined ||
+            data.constitutionHash === undefined
+          ) {
+            throw new Error(
+              t("errors.invalidNewCommitteeGovernanceActionType"),
+            );
+          }
+
+          return buildNewConstitutionGovernanceAction({
+            ...commonGovActionDetails,
+            constitutionUrl: data.constitutionUrl,
+            constitutionHash: data.constitutionHash,
+            scriptHash: data.scriptHash,
+            prevGovernanceActionHash: data.prevGovernanceActionHash,
+            prevGovernanceActionIndex: data.prevGovernanceActionIndex,
+          });
+        }
+        case GovernanceActionType.NewCommittee: {
+          if (
+            data.newCommitteeHash === undefined ||
+            data.newCommitteeExpiryEpoch === undefined
+          ) {
+            throw new Error(
+              t("errors.invalidUpdateCommitteeGovernanceActionType"),
+            );
+          }
+
+          let quorumThreshold: QuorumThreshold = {
+            numerator: "1",
+            denominator: "2",
+          };
+          if (data.numerator !== undefined && data.denominator !== undefined) {
+            quorumThreshold = {
+              numerator: data.numerator,
+              denominator: data.denominator,
+            };
+          }
+
+          return buildUpdateCommitteeGovernanceAction({
+            ...commonGovActionDetails,
+            newCommittee: [
+              {
+                committee: data.newCommitteeHash,
+                expiryEpoch: data.newCommitteeExpiryEpoch,
+              },
+            ],
+            removeCommittee: data.removeCommitteeHash
+              ? [data.removeCommitteeHash]
+              : [],
+            quorumThreshold,
+            prevGovernanceActionHash: data.prevGovernanceActionHash,
+            prevGovernanceActionIndex: data.prevGovernanceActionIndex,
+          });
+        }
         case GovernanceActionType.TreasuryWithdrawals: {
           if (
             data.amount === undefined ||

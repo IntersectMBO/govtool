@@ -251,7 +251,7 @@ SELECT
         ELSE
             drep_voting_power.no_confidence
         END) no_votes,
-    COALESCE(SUM(ldd_drep.amount) FILTER (WHERE rdv.vote::text = 'Abstain'), 0) + drep_voting_power.abstain abstain_votes,
+    COALESCE(SUM(ldd_drep.amount) FILTER (WHERE rdv.vote::text = 'Abstain'), 0) abstain_votes,
 	COALESCE(ps.poolYesVotes, 0) pool_yes_votes,
 	COALESCE(ps.poolNoVotes, 0) pool_no_votes,
 	COALESCE(ps.poolAbstainVotes, 0) pool_abstain_votes,

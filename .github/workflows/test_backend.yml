@@ -32,17 +32,21 @@ on:
     workflows: ["Build and deploy GovTool test stack"]
     types: [completed]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }} 
     outputs:
-      start_time: ${{ steps.run-tests.outputs.timestamp }}
-      status: ${{ steps.set-pending-status.outcome }}
+      start_time: ${{ steps.set-pending-status.outputs.timestamp }}
+      status: ${{ steps.run-tests.outcome }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Set pending commit status
         id: set-pending-status
         run: |

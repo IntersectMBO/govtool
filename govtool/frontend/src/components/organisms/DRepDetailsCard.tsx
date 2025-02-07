@@ -48,6 +48,7 @@ export const DRepDetailsCard = ({
     drepId,
     votingPower,
     isScriptBased,
+    metadataHash,
   } = dRepData;
 
   const groupedReferences = references?.reduce<Record<string, Reference[]>>(
@@ -235,6 +236,53 @@ export const DRepDetailsCard = ({
               />
             )}
           </DRepDetailsInfoItem>
+          {url && (
+            <DRepDetailsInfoItem
+              label={t("forms.dRepData.metadataUrl")}
+              dataTestId="metadata-url"
+            >
+              <Link
+                data-testid="metadata-url-link"
+                href={url}
+                target="_blank"
+                sx={{
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  display: "flex",
+                  gap: 1,
+                  alignItems: "center",
+                }}
+              >
+                <Typography
+                  color="primary"
+                  fontWeight={400}
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {url}
+                </Typography>
+                <img
+                  alt="link"
+                  height={16}
+                  src={ICONS.externalLinkIcon}
+                  width={16}
+                />
+              </Link>
+            </DRepDetailsInfoItem>
+          )}
+          {metadataHash && (
+            <DRepDetailsInfoItem
+              label={t("forms.dRepData.metadataHash")}
+              dataTestId="metadata-hash"
+            >
+              <CopyableText
+                value={metadataHash}
+                dataTestId="copy-metadata-hash"
+              />
+            </DRepDetailsInfoItem>
+          )}
         </>
       )}
       {/* CIP-119 DATA END */}

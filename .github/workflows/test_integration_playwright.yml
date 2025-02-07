@@ -1,5 +1,10 @@
 name: Integration Test [Playwright]
 
+permissions:
+  contents: read
+  checks: write
+  statuses: write
+
 on:
   workflow_dispatch:
     inputs:
@@ -26,15 +31,28 @@ on:
   workflow_run:
     workflows: ["Build and deploy GovTool test stack"]
     types: [completed]
+    
 
 jobs:
   integration-tests:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }} 
+    outputs:
+      start_time: ${{ steps.set-pending-status.outputs.timestamp }}
+      status: ${{ steps.run-test.outcome }}
     defaults:
       run:
         working-directory: tests/govtool-frontend/playwright
     steps:
+      - name: Set pending commit status
+        id: set-pending-status
+        run: |
+          echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
+          curl -X POST -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
+            -d "{\"state\": \"pending\", \"context\": \"Playwright Tests : ${{env.HOST_URL}}\", \"target_url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
+
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -58,6 +76,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run tests
+        id: run-test
         run: |
           mkdir -p ./lib/_mock
           chmod +w ./lib/_mock
@@ -95,7 +114,6 @@ jobs:
           path: tests/govtool-frontend/playwright/lock_logs.txt
 
     env:
-      HOST_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io' }}
       API_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io' }}/api
       DOCS_URL: ${{ vars.DOCS_URL }}
       KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}
@@ -111,6 +129,8 @@ jobs:
     runs-on: ubuntu-latest
     if: always() && needs.integration-tests.result != 'skipped' 
     needs: integration-tests
+    outputs:
+      report_number: ${{ steps.report-details.outputs.report_number }}
     steps:
       - uses: actions/checkout@v4
       - name: Download report
@@ -175,6 +195,28 @@ jobs:
           folder: build
           target-folder: ${{ env.REPORT_NAME }}
 
-    env:
-      REPORT_NAME: govtool-frontend
-      GH_PAGES: ${{vars.GH_PAGES}}
+  publish-status:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [integration-tests, publish-report]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download results
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+      - name: Set Commit Status
+        if: always()
+        run: |
+          chmod +x .github/scripts/set_commit_status.sh
+          .github/scripts/set_commit_status.sh
+        env:
+          START_TIME: ${{ needs.integration-tests.outputs.start_time }}
+          TEST_STATUS: ${{ needs.integration-tests.outputs.status }}
+          REPORT_NUMBER: ${{ needs.publish-report.outputs.report_number }}
+          GITHUB_TOKEN: ${{ github.token }}
+env:
+  HOST_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io' }}
+  REPORT_NAME: govtool-frontend
+  GH_PAGES: ${{vars.GH_PAGES}}

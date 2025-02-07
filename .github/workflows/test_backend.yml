@@ -40,6 +40,9 @@ jobs:
       start_time: ${{ steps.run-tests.outputs.timestamp }}
       status: ${{ steps.set-pending-status.outcome }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Set pending commit status
         id: set-pending-status
         run: |
@@ -49,8 +52,6 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
             -d "{\"state\": \"pending\", \"context\": \"Backend Tests : ${{env.BASE_URL}}\", \"target_url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
 
-      - name: Checkout code
-        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4

@@ -44,6 +44,7 @@ jobs:
       run:
         working-directory: tests/govtool-frontend/playwright
     steps:
+      - uses: actions/checkout@v4
       - name: Set pending commit status
         id: set-pending-status
         run: |
@@ -53,7 +54,6 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
             -d "{\"state\": \"pending\", \"context\": \"Playwright Tests : ${{env.HOST_URL}}\", \"target_url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
 
-      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "18"

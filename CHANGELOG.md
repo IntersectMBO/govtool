@@ -13,6 +13,7 @@ changes.
 ### Added
 
 - Add metadata url and hash to drep details [Issue 2911](https://github.com/IntersectMBO/govtool/issues/2911)
+- Add CC votes percentages, not voted and Ratification threshold
 
 ### Fixed
 

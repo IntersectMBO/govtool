@@ -4,7 +4,13 @@ import { theme } from "@/theme";
 
 import { ICONS } from "./icons";
 import { LINKS } from "./links";
-import { PATHS, PDF_PATHS, OUTCOMES_PATHS, USER_PATHS } from "./paths";
+import {
+  PATHS,
+  PDF_PATHS,
+  OUTCOMES_PATHS,
+  // TODO: This will be uncommented when the page has been bootstrapped in the outcomes Pillar
+  // USER_PATHS
+} from "./paths";
 
 export const NAV_ITEMS = [
   {
@@ -21,7 +27,13 @@ export const NAV_ITEMS = [
   {
     dataTestId: "governance-actions-link",
     navTo: PATHS.governanceActions,
-    label: i18n.t("govActions.title"),
+    label: i18n.t("govActions.navTitle"),
+    newTabLink: null,
+  },
+  {
+    dataTestId: "governance-actions-outcomes-link",
+    label: i18n.t("govActions.outcomes.title"),
+    navTo: OUTCOMES_PATHS.governanceActionsOutcomes,
     newTabLink: null,
   },
   {
@@ -107,14 +119,15 @@ export const CONNECTED_NAV_ITEMS = [
         icon: ICONS.governanceActionsIcon,
         newTabLink: null,
       },
-      {
-        dataTestId: "governance-actions-voted-by-me-link",
-        label: i18n.t("govActions.votedByMe.title"),
-        navTo: USER_PATHS.governanceActionsVotedByMe,
-        activeIcon: ICONS.governanceActionsActiveIcon,
-        icon: ICONS.governanceActionsIcon,
-        newTabLink: null,
-      },
+      // TODO: This will be uncommented when the page has been bootstrapped in the outcomes Pillar
+      // {
+      //   dataTestId: "governance-actions-voted-by-me-link",
+      //   label: i18n.t("govActions.votedByMe.title"),
+      //   navTo: USER_PATHS.governanceActionsVotedByMe,
+      //   activeIcon: ICONS.governanceActionsActiveIcon,
+      //   icon: ICONS.governanceActionsIcon,
+      //   newTabLink: null,
+      // },
     ],
   },
   {

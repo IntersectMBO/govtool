@@ -4,7 +4,13 @@ import { theme } from "@/theme";
 
 import { ICONS } from "./icons";
 import { LINKS } from "./links";
-import { PATHS, PDF_PATHS, OUTCOMES_PATHS, USER_PATHS } from "./paths";
+import {
+  PATHS,
+  PDF_PATHS,
+  OUTCOMES_PATHS,
+  // TODO: This will be uncommented when the page has been bootstrapped in the outcomes Pillar
+  // USER_PATHS
+} from "./paths";
 
 export const NAV_ITEMS = [
   {

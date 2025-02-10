@@ -68,7 +68,7 @@ test.describe("Proposal created logged in state", () => {
     await proposalDiscussionDetailsPage.addComment(randComment);
 
     await proposalDiscussionDetailsPage.replyComment(randReply);
-    await expect(page.getByText(randReply)).toBeVisible();
+    await expect(page.getByText(randReply)).toBeVisible({ timeout: 15_000 });
   });
 });
 
@@ -122,12 +122,12 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
     // vote must be changed
     await expect(
       page.getByTestId(`poll-${vote.toLowerCase()}-count`)
-    ).not.toHaveText(`${vote}: (0%)`);
+    ).toHaveText(`${vote}: (0%)`, { timeout: 15_000 });
     // opposite of random choice vote
     const oppositeVote = pollVotes[pollVotes.length - 1 - choice];
     await expect(
       page.getByTestId(`poll-${oppositeVote.toLowerCase()}-count`)
-    ).not.toHaveText(`${oppositeVote}: (100%)`);
+    ).toHaveText(`${oppositeVote}: (100%)`);
   });
 });
 

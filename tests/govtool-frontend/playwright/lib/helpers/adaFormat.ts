@@ -2,13 +2,21 @@ const LOVELACE = 1000000;
 
 export const correctVoteAdaFormat = (
   lovelace: number | undefined,
-  locale: string | undefined = undefined
+  precision = 2
 ) => {
   if (lovelace) {
     const ada = lovelace / LOVELACE;
-    return ada.toLocaleString(locale, {
-      maximumFractionDigits: 3,
-    });
+    if (ada < 1000)
+      return ada.toLocaleString("en-us", {
+        maximumFractionDigits: precision,
+      });
+    const suffixes = ["k", "M", "B", "T"];
+    const divisors = [1000, 1000000, 1000000000, 1000000000000];
+    for (let i = 0; i < suffixes.length; i++) {
+      if (ada < divisors[i] * 1000) {
+        return (ada / divisors[i]).toFixed(precision) + suffixes[i];
+      }
+    }
   }
   return "0";
 };

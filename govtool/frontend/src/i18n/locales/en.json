@@ -328,7 +328,9 @@
       "references": "References",
       "referenceDescription": "Description",
       "referenceDescriptionHelpfulText": "Limit: 80 characters",
-      "referenceURL": "URL"
+      "referenceURL": "URL",
+      "metadataUrl": "Metadata URL",
+      "metadataHash": "Metadata Hash"
     },
     "errors": {
       "tooLongUrl": "Url must be less than 128 bytes",

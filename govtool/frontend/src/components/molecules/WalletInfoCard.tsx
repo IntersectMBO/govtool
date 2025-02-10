@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Button, Typography } from "@mui/material";
 
-import { PDF_PATHS, PATHS, gray } from "@consts";
+import { PDF_PATHS, PATHS, gray, OUTCOMES_PATHS } from "@consts";
 import { useCardano } from "@context";
 import { useTranslation } from "@hooks";
 import { Card } from "./Card";
@@ -18,7 +18,11 @@ export const WalletInfoCard = () => {
       PDF_PATHS.proposalDiscussion.replace("/", ""),
     );
 
-    if (!isProposalDiscussionForum) {
+    const isGovernanceOutcomesPillar = window.location.pathname.includes(
+      OUTCOMES_PATHS.governanceActionsOutcomes.replace("/", ""),
+    );
+
+    if (!isProposalDiscussionForum && !isGovernanceOutcomesPillar) {
       navigate(
         pathname.includes("/connected")
           ? `${pathname.replace("/connected", "")}${hash ?? ""}`

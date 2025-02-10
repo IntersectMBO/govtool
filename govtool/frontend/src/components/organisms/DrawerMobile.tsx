@@ -18,7 +18,10 @@ export const DrawerMobile = ({
   isDrawerOpen,
   setIsDrawerOpen,
 }: DrawerMobileProps) => {
-  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
+  const {
+    isProposalDiscussionForumEnabled,
+    isGovernanceOutcomesPillarEnabled,
+  } = useFeatureFlag();
   const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { t } = useTranslation();
@@ -85,6 +88,13 @@ export const DrawerMobile = ({
                 if (
                   !isProposalDiscussionForumEnabled &&
                   navItem.dataTestId === "proposed-governance-actions-link"
+                ) {
+                  return null;
+                }
+
+                if (
+                  !isGovernanceOutcomesPillarEnabled &&
+                  navItem.dataTestId === "governance-actions-outcomes-link"
                 ) {
                   return null;
                 }

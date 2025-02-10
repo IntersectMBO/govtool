@@ -1,5 +1,10 @@
 name: Backend Test
 
+permissions:
+  contents: read
+  checks: write
+  statuses: write
+
 on:
   workflow_dispatch:
     inputs:
@@ -27,13 +32,30 @@ on:
     workflows: ["Build and deploy GovTool test stack"]
     types: [completed]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }} 
+    outputs:
+      start_time: ${{ steps.set-pending-status.outputs.timestamp }}
+      status: ${{ steps.run-tests.outcome }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set pending commit status
+        id: set-pending-status
+        run: |
+          echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
+          curl -X POST -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
+            -d "{\"state\": \"pending\", \"context\": \"Backend Tests : ${{env.BASE_URL}}\", \"target_url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
+
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -43,6 +65,7 @@ jobs:
 
       - name: Run Backend Test
         working-directory: tests/govtool-backend
+        id: run-tests
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -55,10 +78,6 @@ jobs:
           fi
           python ./setup.py
           python -m pytest --alluredir allure-results
-        env:
-          BASE_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io/api' }}
-          NETWORK: ${{ inputs.network || vars.NETWORK }}
-          KUBER_API_KEY: ${{ secrets.KUBER_API_KEY }}
 
       - name: Upload report
         if: always()
@@ -66,11 +85,16 @@ jobs:
         with:
           name: allure-results
           path: tests/govtool-backend/allure-results
+    env:
+      NETWORK: ${{ inputs.network || vars.NETWORK }}
+      KUBER_API_KEY: ${{ secrets.KUBER_API_KEY }}
 
   publish-report:
     runs-on: ubuntu-latest
     if: always() && needs.backend-tests.result != 'skipped'
     needs: backend-tests
+    outputs:
+      report_number: ${{ steps.report-details.outputs.report_number }}
     steps:
       - uses: actions/checkout@v4
       - name: Download results
@@ -134,6 +158,29 @@ jobs:
           folder: build
           target-folder: ${{ env.REPORT_NAME }}
 
-    env:
-      REPORT_NAME: govtool-backend
-      GH_PAGES: ${{vars.GH_PAGES}}
+  publish-status:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [backend-tests, publish-report]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download results
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+      - name: Set Commit Status
+        if: always()
+        run: |
+          chmod +x .github/scripts/set_commit_status.sh
+          .github/scripts/set_commit_status.sh
+        env:
+          START_TIME: ${{ needs.backend-tests.outputs.start_time }}
+          TEST_STATUS: ${{ needs.backend-tests.outputs.status }}
+          REPORT_NUMBER: ${{ needs.publish-report.outputs.report_number }}
+          GITHUB_TOKEN: ${{ github.token }}
+
+env:
+  BASE_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io/api' }}
+  REPORT_NAME: govtool-backend
+  GH_PAGES: ${{vars.GH_PAGES}}

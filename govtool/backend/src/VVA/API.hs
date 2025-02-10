@@ -451,4 +451,7 @@ getNetworkMetrics = do
     , getNetworkMetricsResponseAlwaysAbstainVotingPower = networkMetricsAlwaysAbstainVotingPower
     , getNetworkMetricsResponseAlwaysNoConfidenceVotingPower = networkMetricsAlwaysNoConfidenceVotingPower
     , getNetworkMetricsResponseNetworkName = networkMetricsNetworkName
+    , getNetworkMetricsResponseNoOfCommitteeMembers = networkMetricsNoOfCommitteeMembers
+    , getNetworkMetricsResponseQuorumNumerator = networkMetricsQuorumNumerator
+    , getNetworkMetricsResponseQuorumDenominator = networkMetricsQuorumDenominator
     }

@@ -28,7 +28,7 @@ const ccVoteLabelKey: Record<string, string> = {
   yes: "votes.constitutional",
   no: "votes.unconstitutional",
   abstain: "votes.abstain",
-  notvoted: "",
+  notvoted: "votes.notVoted",
 };
 
 type VoteExtended = Vote | "notVoted";

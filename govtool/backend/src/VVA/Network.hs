@@ -52,6 +52,9 @@ networkMetrics = withPool $ \conn -> do
      , always_abstain_voting_power
      , always_no_confidence_voting_power
      , network_name
+     , no_of_committee_members
+     , quorum_numerator
+     , quorum_denominator
      )] -> return $ NetworkMetrics
             current_time
             epoch_no
@@ -71,4 +74,7 @@ networkMetrics = withPool $ \conn -> do
             always_abstain_voting_power
             always_no_confidence_voting_power
             network_name
+            no_of_committee_members
+            quorum_numerator
+            quorum_denominator
     _ -> throwError $ CriticalError "Could not query the network metrics. This should never happen."

@@ -235,6 +235,9 @@ data NetworkMetrics
       , networkMetricsAlwaysAbstainVotingPower              :: Integer
       , networkMetricsAlwaysNoConfidenceVotingPower         :: Integer
       , networkMetricsNetworkName                           :: Text
+      , networkMetricsNoOfCommitteeMembers                  :: Integer
+      , networkMetricsQuorumNumerator                       :: Integer
+      , networkMetricsQuorumDenominator                     :: Integer
       }
 
 data Delegation

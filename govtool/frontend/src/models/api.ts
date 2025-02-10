@@ -97,6 +97,9 @@ export type NetworkMetrics = {
   alwaysAbstainVotingPower: number;
   alwaysNoConfidenceVotingPower: number;
   networkName: string;
+  noOfCommitteeMembers: number;
+  quorumNumerator: number;
+  quorumDenominator: number;
 };
 
 export type VoterInfo = {

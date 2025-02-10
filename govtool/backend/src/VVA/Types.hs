@@ -225,6 +225,7 @@ data NetworkMetrics
       , networkMetricsTotalGovernanceActions                :: Integer
       , networkMetricsTotalDRepVotes                        :: Integer
       , networkMetricsTotalRegisteredDReps                  :: Integer
+      , networkMetricsTotalDRepDistr                        :: Integer
       , networkMetricsTotalStakeControlledByDReps           :: Integer
       , networkMetricsTotalStakeControlledBySPOs            :: Integer
       , networkMetricsTotalActiveDReps                      :: Integer

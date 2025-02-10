@@ -12,19 +12,22 @@ changes.
 
 ### Added
 
--
+- Add metadata url and hash to drep details [Issue 2911](https://github.com/IntersectMBO/govtool/issues/2911)
 
 ### Fixed
 
--
+- Fix calculating votes counting for governance actions
+- Fix crashing backend on unhandled missing proposal from vote [Issue 2920](https://github.com/IntersectMBO/govtool/issues/2920)
+- Remove abstain votes (not auto abstain) from total DRep stake
 
 ### Changed
 
 - Change threshold visual representation in governance action votes
+- Resize governance action details columns
 
 ### Removed
 
--
+- Remove abstain from total DRep votes calculation
 
 ## [v2.0.11](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.11) 2025-02-04
 

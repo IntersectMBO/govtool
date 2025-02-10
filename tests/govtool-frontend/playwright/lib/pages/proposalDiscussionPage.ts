@@ -92,10 +92,11 @@ export default class ProposalDiscussionPage {
     filters: string[],
     validateFunction: (proposalCard: any, filters: string[]) => Promise<boolean>
   ) {
+    await this.page.waitForTimeout(4_000); // wait for the proposals to load
     // single filter
     for (const filter of filters) {
       await this.filterProposalByNames([filter]);
-      await this.validateFilters(filters, validateFunction);
+      await this.validateFilters([filter], validateFunction);
       await this.unFilterProposalByNames([filter]);
     }
 

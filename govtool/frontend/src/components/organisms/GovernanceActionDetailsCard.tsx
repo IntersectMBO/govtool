@@ -36,7 +36,7 @@ export const GovernanceActionDetailsCard = ({
       sx={{
         borderRadius: "20px",
         display: "grid",
-        gridTemplateColumns: isOneColumn ? undefined : "0.6fr 0.4fr",
+        gridTemplateColumns: isOneColumn ? undefined : "0.55fr 0.45fr",
         mt: "12px",
         width: "100%",
         position: "relative",

@@ -48,9 +48,9 @@ fi
 
 # Determine target URL based on environment
 case "$GH_PAGES" in
-  "intersectMBO/govtool-test-reports") TARGET_URL="https://intersectmbo.github.io/govtool-test-reports/${REPORT_NAME}/${REPORT_NUMBER}" ;;
+  "IntersectMBO/govtool-test-reports") TARGET_URL="https://intersectmbo.github.io/govtool-test-reports/${REPORT_NAME}/${REPORT_NUMBER}" ;;
   "cardanoapi/govtool-test-reports") TARGET_URL="https://cardanoapi.github.io/govtool-test-reports/${REPORT_NAME}/${REPORT_NUMBER}" ;;
-  *) TARGET_URL="https://cardanoapi.github.io/govtool-test-reports/${REPORT_NAME}/${REPORT_NUMBER}" ;;
+  *) TARGET_URL="https://intersectmbo.github.io/govtool-test-reports/${REPORT_NAME}/${REPORT_NUMBER}" ;;
 esac
 
 # Determine test result message

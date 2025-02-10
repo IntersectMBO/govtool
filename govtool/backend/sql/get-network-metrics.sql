@@ -186,6 +186,24 @@ AlwaysNoConfidenceVotingPower AS (
 ),
 TotalDRepDistr AS (
 	SELECT SUM(COALESCE(amount, 0))::bigint total_drep_distr FROM drep_distr where epoch_no = (SELECT no from CurrentEpoch)
+),
+CommitteeMembersCount AS (
+    SELECT COUNT(*) AS no_of_committee_members FROM committee_member
+),
+LatestGovAction AS (
+    SELECT gap.id, gap.enacted_epoch
+    FROM gov_action_proposal gap
+    JOIN CurrentEpoch ce ON gap.enacted_epoch < ce.no
+    ORDER BY gap.id DESC
+    LIMIT 1
+),
+CommitteeThreshold AS (
+    SELECT
+        c.*
+    FROM committee c
+    LEFT JOIN LatestGovAction lga ON c.gov_action_proposal_id = lga.id
+    WHERE (c.gov_action_proposal_id IS NOT NULL AND lga.id IS NOT NULL)
+        OR (c.gov_action_proposal_id IS NULL)
 )
 SELECT
     CurrentEpoch.no AS epoch_no,
@@ -204,7 +222,10 @@ SELECT
     TotalRegisteredDirectVoters.unique_direct_voters AS total_registered_direct_voters,
     AlwaysAbstainVotingPower.amount AS always_abstain_voting_power,
     AlwaysNoConfidenceVotingPower.amount AS always_no_confidence_voting_power,
-    meta.network_name
+    meta.network_name,
+    CommitteeMembersCount.no_of_committee_members,
+    CommitteeThreshold.quorum_numerator,
+    CommitteeThreshold.quorum_denominator
 FROM CurrentEpoch
 CROSS JOIN CurrentBlock
 CROSS JOIN UniqueDelegators
@@ -221,4 +242,6 @@ CROSS JOIN TotalActiveCIP119CompliantDReps
 CROSS JOIN TotalRegisteredDirectVoters
 CROSS JOIN AlwaysAbstainVotingPower
 CROSS JOIN AlwaysNoConfidenceVotingPower
+CROSS JOIN CommitteeMembersCount
+CROSS JOIN CommitteeThreshold
 CROSS JOIN meta;

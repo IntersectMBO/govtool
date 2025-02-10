@@ -50,6 +50,13 @@ export const VotesSubmitted = ({
   const { t } = useTranslation();
   const { epochParams, networkMetrics } = useAppContext();
 
+  const noOfCommitteeMembers = networkMetrics?.noOfCommitteeMembers ?? 0;
+  const ccThreshold = (
+    networkMetrics?.quorumDenominator
+      ? networkMetrics.quorumNumerator / networkMetrics.quorumDenominator
+      : 0
+  ).toPrecision(2);
+
   // Coming from be
   // Equal to: total active drep stake + auto no-confidence stake
   const totalStakeControlledByDReps =
@@ -96,15 +103,16 @@ export const VotesSubmitted = ({
     ? 100
     : undefined;
 
-  const ccYesVotesPercentage =
-    ccYesVotes + ccNoVotes
-      ? (ccYesVotes / (ccYesVotes + ccNoVotes)) * 100
-      : undefined;
-  const ccNoVotesPercentage = ccYesVotesPercentage
-    ? 100 - ccYesVotesPercentage
-    : ccNoVotes
-    ? 100
+  const ccYesVotesPercentage = noOfCommitteeMembers
+    ? (ccYesVotes / noOfCommitteeMembers) * 100
     : undefined;
+  const ccNoVotesPercentage = noOfCommitteeMembers
+    ? (ccNoVotes / noOfCommitteeMembers) * 100
+    : undefined;
+  const ccNotVotedVotes =
+    noOfCommitteeMembers - ccYesVotes - ccNoVotes - ccAbstainVotes;
+  const ccNotVotedVotesPercentage =
+    100 - (ccYesVotesPercentage ?? 0) - (ccNoVotesPercentage ?? 0);
 
   return (
     <Box
@@ -193,6 +201,9 @@ export const VotesSubmitted = ({
             abstainVotes={ccAbstainVotes}
             yesVotesPercentage={ccYesVotesPercentage}
             noVotesPercentage={ccNoVotesPercentage}
+            notVotedVotes={ccNotVotedVotes}
+            notVotedPercentage={ccNotVotedVotesPercentage}
+            threshold={Number(ccThreshold)}
           />
         )}
       </Box>

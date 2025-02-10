@@ -79,6 +79,8 @@ export default class DRepDirectoryPage {
       (filter) => !filters.includes(filter)
     );
 
+    await this.page.waitForTimeout(4_000); // wait for the dRep list to render properly
+
     const dRepList = await this.getAllListedDReps();
 
     for (const filter of excludedFilters) {

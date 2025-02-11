@@ -21,6 +21,26 @@ DRepDistr AS (
 CurrentEpoch AS (
     SELECT MAX(no) AS no FROM epoch
 ),
+CommitteeMembers AS (
+    SELECT DISTINCT ON (cm.committee_hash_id)
+        cr.id,
+        block.time,
+        encode(cold_key_hash.raw, 'hex') cold_key,
+        encode(hot_key_hash.raw, 'hex') hot_key
+    FROM committee_registration cr
+    JOIN tx ON tx.id = cr.tx_id
+    JOIN block ON block.id = tx.block_id
+    JOIN committee_hash cold_key_hash ON cr.cold_key_id = cold_key_hash.id
+    JOIN committee_hash hot_key_hash ON cr.hot_key_id = hot_key_hash.id
+    JOIN committee_member cm ON cm.committee_hash_id = cold_key_hash.id OR cm.committee_hash_id = hot_key_hash.id
+    LEFT JOIN committee_de_registration cdr ON cdr.cold_key_id = cold_key_hash.id
+    CROSS JOIN CurrentEpoch
+    WHERE
+        cdr.id IS NULL AND cm.expiration_epoch > CurrentEpoch.no 
+),
+NoOfCommitteeMembers AS (
+	SELECT COUNT(*) total FROM CommitteeMembers
+),
 ActiveDRepBoundaryEpoch AS (
     SELECT epoch_no - drep_activity AS epoch_no FROM DRepActivity
 ),
@@ -187,9 +207,6 @@ AlwaysNoConfidenceVotingPower AS (
 TotalDRepDistr AS (
 	SELECT SUM(COALESCE(amount, 0))::bigint total_drep_distr FROM drep_distr where epoch_no = (SELECT no from CurrentEpoch)
 ),
-CommitteeMembersCount AS (
-    SELECT COUNT(*) AS no_of_committee_members FROM committee_member
-),
 LatestGovAction AS (
     SELECT gap.id, gap.enacted_epoch
     FROM gov_action_proposal gap
@@ -223,7 +240,7 @@ SELECT
     AlwaysAbstainVotingPower.amount AS always_abstain_voting_power,
     AlwaysNoConfidenceVotingPower.amount AS always_no_confidence_voting_power,
     meta.network_name,
-    CommitteeMembersCount.no_of_committee_members,
+    NoOfCommitteeMembers.total no_of_committee_members,
     CommitteeThreshold.quorum_numerator,
     CommitteeThreshold.quorum_denominator
 FROM CurrentEpoch
@@ -242,6 +259,6 @@ CROSS JOIN TotalActiveCIP119CompliantDReps
 CROSS JOIN TotalRegisteredDirectVoters
 CROSS JOIN AlwaysAbstainVotingPower
 CROSS JOIN AlwaysNoConfidenceVotingPower
-CROSS JOIN CommitteeMembersCount
+CROSS JOIN NoOfCommitteeMembers
 CROSS JOIN CommitteeThreshold
 CROSS JOIN meta;

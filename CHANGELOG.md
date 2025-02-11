@@ -21,6 +21,7 @@ changes.
 - Fix calculating votes counting for governance actions
 - Fix crashing backend on unhandled missing proposal from vote [Issue 2920](https://github.com/IntersectMBO/govtool/issues/2920)
 - Remove abstain votes (not auto abstain) from total DRep stake
+- Fix counting committee members [Issue 2948](https://github.com/IntersectMBO/govtool/issues/2948)
 
 ### Changed
 

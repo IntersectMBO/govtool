@@ -40,6 +40,9 @@ export const GovernanceActionOutComesPillar = () => {
             </Box>
           }
         >
+          {/* TODO: Remove this comments when tsc issue is resolved */}
+          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+          {/* @ts-expect-error */}
           <Outcomes description="" />
         </Suspense>
       </Box>

@@ -13,7 +13,8 @@ import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { isMobile, openDrawer } from "@helpers/mobile";
-import { expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
+import { randomUUID } from "crypto";
 import environments from "lib/constants/environments";
 
 test.beforeEach(async () => {
@@ -172,17 +173,50 @@ test.describe("User Snap", () => {
     const attachmentInputSelector = "input[type=file]";
     const feedbackApiUrl =
       "https://widget.usersnap.com/api/widget/xhrrpc?submit_feedback";
+    const bucketUrl =
+      "https://s3.eu-central-1.amazonaws.com/upload.usersnap.com";
     const mockAttachmentPath = "./lib/_mock/mockAttachment.png";
+
+    const interceptBucket = async (page: Page) => {
+      await page.route(bucketUrl, async (route) =>
+        route.fulfill({
+          status: 204,
+        })
+      );
+    };
+
+    const interceptUsersnap = async (page: Page) => {
+      await page.route(feedbackApiUrl, async (route) =>
+        route.fulfill({
+          status: 200,
+          body: JSON.stringify({
+            status: true,
+            data: {
+              feedback: {
+                feedback_id: randomUUID(),
+                assignee_id: randomUUID(),
+                labels: [],
+              },
+              screen_recording_url: null,
+              attachment_urls: [
+                {
+                  url: bucketUrl,
+                  fields: {
+                    "Content-Type": "image/png",
+                    key: randomUUID(),
+                  },
+                },
+              ],
+            },
+          }),
+        })
+      );
+    };
 
     test("6Q. Should report an issue", async ({ page }) => {
       // Intercept Usersnap submit API
-      await page.route(feedbackApiUrl, async (route) =>
-        route.fulfill({
-          status: 403,
-          body: JSON.stringify({ error: "Blocked by test" }),
-        })
-      );
-
+      await interceptUsersnap(page);
+      await interceptBucket(page);
       await page
         .getByRole("button", {
           name: "Report an issue Something",
@@ -196,17 +230,13 @@ test.describe("User Snap", () => {
 
       await page.getByRole("button", { name: "Submit" }).click();
 
-      await expect(page.getByText("Feedback was not submitted,")).toBeVisible();
+      await expect(page.getByText("Thank you!")).toBeVisible();
     });
 
     test("6R. Should submit an idea or new feature", async ({ page }) => {
       // Intercept Usersnap submit API
-      await page.route(feedbackApiUrl, async (route) =>
-        route.fulfill({
-          status: 403,
-          body: JSON.stringify({ error: "Blocked by test" }),
-        })
-      );
+      await interceptUsersnap(page);
+      await interceptBucket(page);
 
       await page
         .getByRole("button", {
@@ -227,7 +257,7 @@ test.describe("User Snap", () => {
 
       await page.getByRole("button", { name: "Submit" }).click();
 
-      await expect(page.getByText("Feedback was not submitted,")).toBeVisible();
+      await expect(page.getByText("Thank you!")).toBeVisible();
     });
   });
 });

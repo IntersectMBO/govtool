@@ -326,7 +326,6 @@ const CardanoProvider = (props: Props) => {
       ).to_bech32();
       setWalletState((prev) => ({ ...prev, changeAddress }));
 
-      // return changeAddress for the usage of the pillars;
       return changeAddress;
     } catch (err) {
       console.error(err);

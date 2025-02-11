@@ -40,7 +40,6 @@ export const Step = ({
           {stepNumber}
         </Typography>
       </Box>
-
       <Box
         sx={{
           display: "flex",

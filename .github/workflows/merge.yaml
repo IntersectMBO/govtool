@@ -18,7 +18,7 @@ env:
 
 jobs:
   check-build-deploy:
-    environment:  ${{ (github.ref_name == 'main' && 'prod-govtool') || (github.ref_name == 'staging' && 'pre-prod-govtool') || (github.ref_name == 'test' && 'qa-govtool') || (github.ref_name == 'develop' && 'dev-govtool') }}
+    environment: ${{ (github.ref_name == 'main' && 'prod-govtool') || (github.ref_name == 'staging' && 'pre-prod-govtool') || (github.ref_name == 'test' && 'qa-govtool') || (github.ref_name == 'develop' && 'dev-govtool') }}
     strategy:
       fail-fast: false
       matrix:
@@ -87,7 +87,6 @@ jobs:
           set -o pipefail
           sudo chmod +x lint.sh && ./lint.sh 2>&1 | tee code_lint_output.txt
 
-
       - name: Unit tests
         id: unit_tests
         run: |
@@ -135,6 +134,7 @@ jobs:
             NPMRC_TOKEN=${{ secrets.NPMRC_TOKEN }}
             VITE_USERSNAP_SPACE_API_KEY=${{ secrets.VITE_USERSNAP_SPACE_API_KEY }}
             VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED=${{ secrets.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED }}
+            VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED=${{ secrets.VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED }}
             VITE_PDF_API_URL=${{ secrets.VITE_PDF_API_URL }}
             VITE_IPFS_GATEWAY=${{ secrets.IPFS_GATEWAY }}
             VITE_IPFS_PROJECT_ID=${{ secrets.IPFS_PROJECT_ID }}
@@ -151,15 +151,15 @@ jobs:
       - name: Scan Docker image with Dockle
         id: dockle
         run: |
-            wget -q https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
-            tar zxf dockle_0.4.14_Linux-64bit.tar.gz
-            sudo mv dockle /usr/local/bin
+          wget -q https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
+          tar zxf dockle_0.4.14_Linux-64bit.tar.gz
+          sudo mv dockle /usr/local/bin
 
-            dockle --exit-code 1 --exit-level fatal --format json -ak GHC_RELEASE_KEY -ak CABAL_INSTALL_RELEASE_KEY -ak STACK_RELEASE_KEY -ak KEY_SHA512 --input '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar' --output ${{ matrix.workdir }}/dockle_scan_output.json
-            echo " dockle exited w/ $?"
-            cat ${{ matrix.workdir }}/dockle_scan_output.json
+          dockle --exit-code 1 --exit-level fatal --format json -ak GHC_RELEASE_KEY -ak CABAL_INSTALL_RELEASE_KEY -ak STACK_RELEASE_KEY -ak KEY_SHA512 --input '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar' --output ${{ matrix.workdir }}/dockle_scan_output.json
+          echo " dockle exited w/ $?"
+          cat ${{ matrix.workdir }}/dockle_scan_output.json
 
-            echo "outcome=success" >> $GITHUB_OUTPUT
+          echo "outcome=success" >> $GITHUB_OUTPUT
 
       - name: Push Docker image to GHCR
         run: |

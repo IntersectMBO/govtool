@@ -26,6 +26,7 @@ changes.
 
 - Change threshold visual representation in governance action votes
 - Resize governance action details columns
+- Update @intersect.mbo/pdf-ui to v0.6.0
 
 ### Removed
 

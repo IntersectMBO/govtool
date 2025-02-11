@@ -47,6 +47,9 @@ export const CreateGovernanceActionForm = ({
         type! as
           | GovernanceActionType.InfoAction
           | GovernanceActionType.TreasuryWithdrawals
+          | GovernanceActionType.NewCommittee
+          | GovernanceActionType.NewConstitution
+          | GovernanceActionType.NoConfidence
       ],
     ).some(
       (field) => !watch(field as unknown as Parameters<typeof watch>[0]),
@@ -67,6 +70,9 @@ export const CreateGovernanceActionForm = ({
         type! as
           | GovernanceActionType.InfoAction
           | GovernanceActionType.TreasuryWithdrawals
+          | GovernanceActionType.NewCommittee
+          | GovernanceActionType.NewConstitution
+          | GovernanceActionType.NoConfidence
       ],
     ).map(([key, field]) => {
       const fieldProps = {

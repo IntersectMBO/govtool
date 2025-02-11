@@ -50,6 +50,7 @@ services:
         VITE_PDF_API_URL: ${PDF_API_URL}
         VITE_IPFS_GATEWAY: ${IPFS_GATEWAY}
         VITE_IPFS_PROJECT_ID: ${IPFS_PROJECT_ID}
+        VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: "true"
     environment:
       VIRTUAL_HOST: https://${BASE_DOMAIN}
     networks:

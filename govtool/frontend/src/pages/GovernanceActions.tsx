@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, CircularProgress, Divider } from "@mui/material";
 
-import { Background, ScrollToManage, Typography } from "@atoms";
+import { Background, Button, ScrollToManage, Typography } from "@atoms";
 import {
   GOVERNANCE_ACTIONS_FILTERS,
   GOVERNANCE_ACTIONS_SORTING,
@@ -96,7 +96,6 @@ export const GovernanceActions = () => {
               filtersTitle={t("govActions.filterTitle")}
               sortOptions={GOVERNANCE_ACTIONS_SORTING}
             />
-
             {!proposals || isProposalsLoading ? (
               <Box
                 sx={{

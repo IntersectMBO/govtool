@@ -33,16 +33,16 @@ interface GovernanceAction {
   references: [{ label: string; uri: string }];
 }
 
-interface InfoProps {
-  hash: string;
+type VotingAnchor = {
   url: string;
+  hash: string;
 }
 
-interface TreasuryProps {
-  amount: string;
-  hash: string;
+type InfoProps = VotingAnchor;
+
+type TreasuryProps {
   withdrawals: { receivingAddress: string; amount: string }[];
-}
+} & VotingAnchor;
 
 type ProtocolParamsUpdate = {
   adaPerUtxo: string;
@@ -77,14 +77,44 @@ type ProtocolParamsUpdate = {
   treasuryGrowthRate: UnitInterval;
 };
 
-interface ProtocolParameterChangeProps {
+type ProtocolParameterChangeProps {
   prevGovernanceActionHash: string;
   prevGovernanceActionIndex: number;
-  url: string;
-  hash: string;
-
   protocolParamsUpdate: Partial<ProtocolParamsUpdate>;
-}
+} & VotingAnchor;
+
+type HardForkInitiationProps = {
+  prevGovernanceActionHash: string;
+  prevGovernanceActionIndex: number;
+  major: number;
+  minor: number;
+} & VotingAnchor;
+
+type NewConstitutionProps = {
+  prevGovernanceActionHash: string;
+  prevGovernanceActionIndex: number;
+  constitutionUrl: string;
+  constitutionHash: string;
+  scriptHash: string;
+} & VotingAnchor;
+
+type UpdateCommitteeProps = {
+  prevGovernanceActionHash?: string;
+  prevGovernanceActionIndex?: number;
+  quorumThreshold: QuorumThreshold;
+  newCommittee?: CommitteeToAdd[];
+  removeCommittee?: string[];
+} & VotingAnchor;
+
+type CommitteeToAdd = {
+  expiryEpoch: number;
+  committee: string;
+};
+
+type QuorumThreshold = {
+  numerator: number;
+  denominator: number;
+};
 
 const createGovernanceActionJsonLD: (
   governanceAction: GovernanceAction
@@ -98,6 +128,22 @@ const buildNewInfoGovernanceAction: (
 
 const buildTreasuryGovernanceAction: (
   treasuryProps: TreasuryProps
+) => Promise<VotingProposalBuilder | undefined>;
+
+const buildProtocolParameterChangeGovernanceAction: (
+  protocolParameterChangeProps: ProtocolParameterChangeProps
+) => Promise<VotingProposalBuilder | undefined>;
+
+const buildHardForkInitiationGovernanceAction: (
+  hardForkInitiationProps: HardForkInitiationProps
+) => Promise<VotingProposalBuilder | undefined>;
+
+const buildNewConstitutionGovernanceAction: (
+  newConstitutionProps: NewConstitutionProps
+) => Promise<VotingProposalBuilder | undefined>;
+
+const buildUpdateCommitteeGovernanceAction: (
+  updateCommitteeProps: UpdateCommitteeProps
 ) => Promise<VotingProposalBuilder | undefined>;
 
 const buildSignSubmitConwayCertTx: (params: {
@@ -165,32 +211,28 @@ const {
   buildNewInfoGovernanceAction,
   buildProtocolParameterChangeGovernanceAction,
   buildHardForkInitiationGovernanceAction,
+  buildTreasuryGovernanceAction,
+  buildNewConstitutionGovernanceAction,
+  buildUpdateCommitteeGovernanceAction,
+  buildNoConfidenceGovernanceAction,
 } = useCardano();
 
 // Info Governance Action
-const govActionBuilder = await buildNewInfoGovernanceAction({ hash, url });
+let govActionBuilder = await buildNewInfoGovernanceAction({ hash, url });
 
-// sign and submit the transaction
-await buildSignSubmitConwayCertTx({
-  govActionBuilder,
-  type: "createGovAction",
-});
+// And for the other type of governance actions:
 
-// Treasury Governance Action
-const { buildTreasuryGovernanceAction } = useCardano();
+govActionBuilder = await buildNoConfidenceGovernanceAction({ hash, url });
 
 // hash of the generated Governance Action metadata, url of the metadata, amount of the transaction, receiving address is the stake key address
-const govActionBuilder = await buildTreasuryGovernanceAction({
+govActionBuilder = await buildTreasuryGovernanceAction({
   hash,
   url,
   withdrawals: [{ amount, receivingAddress }],
 });
 
-// Protocol Parameter Change Governance Action
-const { buildProtocolParameterChangeGovernanceAction } = useCardano();
-
 // hash of the previous Governance Action, index of the previous Governance Action, url of the metadata, hash of the metadata, and the updated protocol parameters
-const govActionBuilder = await buildProtocolParameterChangeGovernanceAction({
+govActionBuilder = await buildProtocolParameterChangeGovernanceAction({
   prevGovernanceActionHash,
   prevGovernanceActionIndex,
   url,
@@ -198,17 +240,32 @@ const govActionBuilder = await buildProtocolParameterChangeGovernanceAction({
   protocolParamsUpdate,
 });
 
-// Hard Fork Initiation Governance Action
-const { buildHardForkInitiationGovernanceAction } = useCardano();
-
 // hash of the previous Governance Action, index of the previous Governance Action, url of the metadata, hash of the metadata, and the major and minor numbers of the hard fork initiation
-const govActionBuilder = await buildHardForkInitiationGovernanceAction({
+govActionBuilder = await buildHardForkInitiationGovernanceAction({
   prevGovernanceActionHash,
   prevGovernanceActionIndex,
   url,
   hash,
   major,
   minor,
+});
+
+// hash of the previous Governance Action, index of the previous Governance Action, url of the metadata, hash of the metadata, and the constitution script hash
+govActionBuilder = await buildNewConstitutionGovernanceAction({
+  prevGovernanceActionHash,
+  prevGovernanceActionIndex,
+  constitutionUrl,
+  constitutionHash,
+  scriptHash,
+});
+
+// hash of the previous Governance Action, index of the previous Governance Action, url of the metadata, hash of the metadata, and the quorum threshold and the new committee members
+govActionBuilder = await buildUpdateCommitteeGovernanceAction({
+  prevGovernanceActionHash,
+  prevGovernanceActionIndex,
+  quorumThreshold,
+  newCommittee,
+  removeCommittee,
 });
 
 // sign and submit the transaction

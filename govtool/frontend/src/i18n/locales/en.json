@@ -154,6 +154,56 @@
         "title": {
           "label": "Title",
           "placeholder": "A name for this Action"
+        },
+        "denominator": {
+          "label": "Denominator",
+          "placeholder": "Denominator",
+          "tip": "Denominator of the threshold"
+        },
+        "numerator": {
+          "label": "Numerator",
+          "placeholder": "Numerator",
+          "tip": "Numerator of the threshold"
+        },
+        "members": {
+          "label": "New committee member",
+          "placeholder": "Members to be added",
+          "tip": "Bech32 address of the new member"
+        },
+        "expiryEpoch": {
+          "label": "Expiry Epoch",
+          "placeholder": "Expiry Epoch of the new Committee member",
+          "tip": "Epoch when the new committee will expire"
+        },
+        "remove": {
+          "label": "Remove committee member",
+          "placeholder": "Members to be removed",
+          "tip": "Bech32 address of the member to be removed"
+        },
+        "prevGovernanceActionIndex": {
+          "label": "Previous Governance Action ID",
+          "placeholder": "Previous Governance Action ID",
+          "tip": "Previous Governance Action ID"
+        },
+        "prevGovernanceActionHash": {
+          "label": "Previous Governance Action Hash",
+          "placeholder": "Previous Governance Action Hash",
+          "tip": "Previous Governance Action Hash"
+        },
+        "constitutionUrl": {
+          "label": "New Constitution URL",
+          "placeholder": "New Constitution URL",
+          "tip": "URL of the new constitution"
+        },
+        "constitutionHash": {
+          "label": "New Constitution Hash",
+          "placeholder": "New Constitution Hash",
+          "tip": "Hash of the new constitution"
+        },
+        "scriptHash": {
+          "label": "New Constitution Script Hash",
+          "placeholder": "New Constitution Script Hash",
+          "tip": "Script hash of the new constitution"
         }
       },
       "validations": {
@@ -407,6 +457,7 @@
     "supportingLinks": "Supporting links",
     "threshold": "Ratification Threshold",
     "title": "Governance Actions",
+    "navTitle": "Live Voting",
     "toVote": "To vote",
     "viewDetails": "View Details",
     "viewDetailsAndVote": "View Details and Vote",

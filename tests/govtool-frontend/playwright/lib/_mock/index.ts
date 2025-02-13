@@ -80,7 +80,7 @@ export const invalid = {
     return " ";
   },
 
-  constitutionUrl : () => {
+  constitutionUrl: () => {
     const choice = faker.number.int({ min: 1, max: 2 });
     if (choice === 1) {
       return invalid.url();

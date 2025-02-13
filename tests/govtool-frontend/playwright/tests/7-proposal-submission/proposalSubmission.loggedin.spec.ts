@@ -229,6 +229,18 @@ test.describe("Proposal created logged state", () => {
             proposal.prop_amount
           );
         }
+
+        if (type === ProposalType.updatesToTheConstitution) {
+          await expect(
+            proposalSubmissionPage.constitutionUrlContent
+          ).toHaveText(proposal.prop_constitution_url);
+          await expect(
+            proposalSubmissionPage.guardrailsScriptUrlContent
+          ).toHaveText(proposal.prop_guardrails_script_url);
+          await expect(
+            proposalSubmissionPage.guardrailsScriptHashContent
+          ).toHaveText(proposal.prop_guardrails_script_hash);
+        }
       });
     });
   });

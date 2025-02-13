@@ -172,6 +172,7 @@ export default class ProposalSubmissionPage {
       await this.treasuryBtn.click();
     } else {
       await this.updateTheConstitutionBtn.click();
+      await this.guardrailsScriptCheckbox.click();
     }
 
     await this.fillupFormWithTypeSelected(governanceProposal);

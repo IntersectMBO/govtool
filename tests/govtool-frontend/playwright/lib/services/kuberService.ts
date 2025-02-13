@@ -12,6 +12,7 @@ import fetch, { BodyInit, RequestInit } from "node-fetch";
 import { cborxEncoder } from "@helpers/encodeDecode";
 import { Logger } from "@helpers/logger";
 import { blockfrostSubmitTransaction } from "@services/blockfrostService";
+import { proposalFaucetWallet } from "@constants/proposalFaucetWallet";
 
 type CertificateType = "registerstake" | "registerdrep" | "deregisterdrep";
 
@@ -161,6 +162,25 @@ const kuberService = {
       certificates,
     });
   },
+  mergeUtXos: (wallets: StaticWallet[]) => {
+    const kuber = new Kuber(
+      proposalFaucetWallet.address,
+      proposalFaucetWallet.payment.private
+    );
+    const selections = wallets.map((wallet) => ({
+      type: "PaymentSigningKeyShelley_ed25519",
+      description: "Payment Signing Key",
+      cborHex: "5820" + wallet.payment.private,
+    }));
+
+    const inputs = wallets.map((wallet) => wallet.address);
+    return kuber.signAndSubmitTx({
+      inputs,
+      selections,
+      changeAddress: proposalFaucetWallet.address,
+    });
+  },
+
   transferADA: (receiverAddressList: string[], ADA = 20) => {
     const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
     const req = {

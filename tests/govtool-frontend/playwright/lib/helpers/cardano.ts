@@ -27,9 +27,9 @@ export async function isBootStrapingPhase() {
   return protocolParameterMajorVersion === 9;
 }
 
-export async function skipIfTreasuryAndBootstrapping(type: ProposalType) {
+export async function skipIfNotInfoAndBootstrapping(type: ProposalType) {
   const isBootStraping = await isBootStrapingPhase();
-  if (type === ProposalType.treasury && isBootStraping) {
+  if (type !== ProposalType.info && isBootStraping) {
     await allure.description(
       "This Features will be available only after hardfork."
     );

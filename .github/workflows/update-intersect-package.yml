@@ -1,0 +1,67 @@
+name: "Update @intersect.mbo Package"
+
+on:
+  workflow_dispatch:
+    inputs:
+      package_name:
+        description: "Select the @intersect.mbo package to update"
+        required: true
+        type: choice
+        options:
+          - "@intersect.mbo/govtool-outcomes-pillar-ui"
+          - "@intersect.mbo/intersectmbo.org-icons-set"
+          - "@intersect.mbo/pdf-ui"
+      new_version:
+        description: "Enter the new version (e.g., 1.1.0)"
+        required: true
+
+jobs:
+  update_package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          registry-url: "https://registry.npmjs.org/"
+          node-version-file: "./govtool/frontend/.nvmrc"
+          scope: "@intersect.mbo"
+
+      - name: Update package version in frontend
+        run: |
+          PACKAGE_NAME="${{ github.event.inputs.package_name }}"
+          NEW_VERSION="${{ github.event.inputs.new_version }}"
+          PACKAGE_JSON_PATH="govtool/frontend/package.json"
+
+          echo "Updating $PACKAGE_NAME to version $NEW_VERSION in $PACKAGE_JSON_PATH..."
+
+          jq --arg pkg "$PACKAGE_NAME" --arg ver "$NEW_VERSION" \
+              '.dependencies[$pkg] = $ver' "$PACKAGE_JSON_PATH" > package.tmp.json \
+              && mv package.tmp.json "$PACKAGE_JSON_PATH"
+
+      - name: Install dependencies in frontend
+        run: |
+          cd govtool/frontend
+          npm install
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: "chore/${{ github.event.inputs.package_name }}-${{ github.event.inputs.new_version }}"
+          title: "Update ${{ github.event.inputs.package_name }} to ${{ github.event.inputs.new_version }}"
+          body: |
+            This PR updates `${{ github.event.inputs.package_name }}` to version `${{ github.event.inputs.new_version }}`.
+
+
+            Workflow executed by `@${{ github.actor }}`.
+          labels: "dependencies"
+          sign-commits: true

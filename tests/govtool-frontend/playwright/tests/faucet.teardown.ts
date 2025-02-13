@@ -1,10 +1,12 @@
 import environments from "@constants/environments";
-import { faucetWallet } from "@constants/staticWallets";
+import { allStaticWallets } from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import { skipIfMainnet } from "@helpers/cardano";
 import { pollTransaction } from "@helpers/transaction";
 import { test as cleanup, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
+import { StaticWallet } from "@types";
+import walletManager from "lib/walletManager";
 
 cleanup.describe.configure({ timeout: environments.txTimeOut });
 cleanup.beforeEach(async () => {
@@ -14,16 +16,16 @@ cleanup.beforeEach(async () => {
 });
 
 cleanup("Refund faucet", async () => {
+  const registerDRepWallets: StaticWallet[] =
+    await walletManager.readWallets("registerDRepCopy");
+  const registeredDRepWallets: StaticWallet[] =
+    await walletManager.readWallets("registeredDRepCopy");
   try {
-    const faucetRemainingBalance = await kuberService.getBalance(
-      faucetWallet.address
-    );
-
-    const transferBalance = Math.floor(faucetRemainingBalance) - 3;
-    const { txId, lockInfo } = await kuberService.transferADA(
-      [environments.faucet.address],
-      transferBalance
-    );
+    const { txId, lockInfo } = await kuberService.mergeUtXos([
+      ...allStaticWallets,
+      ...registerDRepWallets,
+      ...registeredDRepWallets,
+    ]);
     await pollTransaction(txId, lockInfo);
   } catch (err) {
     console.log(err);

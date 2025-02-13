@@ -173,27 +173,14 @@ const kuberService = {
       cborHex: "5820" + wallet.payment.private,
     }));
 
-    selections.push({
-      type: "PaymentSigningKeyShelley_ed25519",
-      description: "Payment Signing Key",
-      cborHex: "5820" + proposalFaucetWallet.payment.private,
-    });
-
-    const inputs = [
-      proposalFaucetWallet.address,
-      ...wallets.map((wallet) => wallet.address),
-    ];
-    console.log({
-      inputs,
-      selections,
-      changeAddress: proposalFaucetWallet.address,
-    });
+    const inputs = wallets.map((wallet) => wallet.address);
     return kuber.signAndSubmitTx({
       inputs,
       selections,
       changeAddress: proposalFaucetWallet.address,
     });
   },
+
   transferADA: (receiverAddressList: string[], ADA = 20) => {
     const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
     const req = {

@@ -11,7 +11,7 @@ import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
 import {
-  skipIfTreasuryAndBootstrapping,
+  skipIfNotInfoAndBootstrapping,
   skipIfNotHardFork,
   isBootStrapingPhase,
 } from "@helpers/cardano";
@@ -42,7 +42,7 @@ test.describe("Proposal created logged state", () => {
       test(`7E_${index + 1}. Should accept valid data in ${type.toLowerCase()} proposal form`, async ({
         page,
       }) => {
-        await skipIfTreasuryAndBootstrapping(type);
+        await skipIfNotInfoAndBootstrapping(type);
 
         test.slow(); // Brute-force testing with 50 random data
 
@@ -99,7 +99,7 @@ test.describe("Proposal created logged state", () => {
       test(`7F_${index + 1}. Should reject invalid data in ${type.toLowerCase()} Proposal form`, async ({
         page,
       }) => {
-        await skipIfTreasuryAndBootstrapping(type);
+        await skipIfNotInfoAndBootstrapping(type);
 
         test.slow(); // Brute-force testing with 50 random data
 
@@ -129,7 +129,7 @@ test.describe("Proposal created logged state", () => {
         page,
         wallet,
       }) => {
-        await skipIfTreasuryAndBootstrapping(type);
+        await skipIfNotInfoAndBootstrapping(type);
 
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
         await proposalSubmissionPage.goto();
@@ -183,7 +183,7 @@ test.describe("Proposal created logged state", () => {
       test(`7I_${index + 1}. Should valid review submission in ${type.toLowerCase()} Proposal form`, async ({
         page,
       }) => {
-        await skipIfTreasuryAndBootstrapping(type);
+        await skipIfNotInfoAndBootstrapping(type);
 
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
         await proposalSubmissionPage.goto();
@@ -250,7 +250,7 @@ test.describe("Proposal created logged state", () => {
       test(`7D_${index + 1}. Verify ${type.toLocaleLowerCase()} proposal form`, async ({
         page,
       }) => {
-        await skipIfTreasuryAndBootstrapping(type);
+        await skipIfNotInfoAndBootstrapping(type);
 
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
         await proposalSubmissionPage.goto();
@@ -507,7 +507,7 @@ test.describe("Treasury Proposal Draft", () => {
   test.use({ storageState: ".auth/proposal07.json", wallet: proposal07Wallet });
 
   test("7M_2. Should edit a treasury proposal draft", async ({ page }) => {
-    await skipIfTreasuryAndBootstrapping(ProposalType.treasury);
+    await skipIfNotInfoAndBootstrapping(ProposalType.treasury);
 
     const proposalSubmissionPage = new ProposalSubmissionPage(page);
     const { proposalFormValue } = await proposalSubmissionPage.createDraft(

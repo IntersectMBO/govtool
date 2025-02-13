@@ -296,6 +296,7 @@ const CardanoProvider = (props: Props) => {
   const [walletApi, setWalletApi] = useState<CardanoApiWallet | undefined>(
     undefined,
   );
+
   const [address, setAddress] = useState<string | undefined>(undefined);
   const [pubDRepKey, setPubDRepKey] = useState<string>("");
   const [dRepID, setDRepID] = useState<string>("");
@@ -383,6 +384,7 @@ const CardanoProvider = (props: Props) => {
             });
           await getChangeAddress(enabledApi);
           await getUsedAddresses(enabledApi);
+
           setIsEnabled(true);
           setWalletApi(enabledApi);
           // Check if wallet has enabled the CIP-95 extension
@@ -474,6 +476,7 @@ const CardanoProvider = (props: Props) => {
 
           return { status: t("ok"), stakeKey: stakeKeySet };
         } catch (e) {
+          console.error({ e });
           console.error(e);
           setError(`${e}`);
           setAddress(undefined);
@@ -1087,7 +1090,7 @@ const CardanoProvider = (props: Props) => {
         console.error(e);
       }
     },
-    [],
+    [epochParams?.gov_action_deposit, getRewardAddress],
   );
 
   // update committee action
@@ -1163,7 +1166,11 @@ const CardanoProvider = (props: Props) => {
         console.error(e);
       }
     },
-    [],
+    [
+      buildCredentialFromBech32Key,
+      epochParams?.gov_action_deposit,
+      getRewardAddress,
+    ],
   );
 
   // info action
@@ -1226,7 +1233,7 @@ const CardanoProvider = (props: Props) => {
         console.error(err);
       }
     },
-    [],
+    [epochParams?.gov_action_deposit, getRewardAddress],
   );
 
   // treasury action

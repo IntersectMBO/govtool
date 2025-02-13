@@ -22,7 +22,7 @@ test("4A_2. Should access Governance Actions page without connecting wallet", as
   await page.goto("/");
   await page.getByTestId("move-to-governance-actions-button").click();
 
-  await expect(page.getByText(/Governance actions/i)).toHaveCount(2);
+  await expect(page.getByText(/Governance actions/i)).toHaveCount(1);
 });
 
 test("4B_2. Should restrict voting for users who are not registered as DReps (without wallet connected)", async ({

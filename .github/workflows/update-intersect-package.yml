@@ -54,7 +54,7 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          BRANCH_NAME="update-${{ github.event.inputs.package_name }}-${{ github.event.inputs.new_version }}"
+          BRANCH_NAME="chore/${{ github.event.inputs.package_name }}-${{ github.event.inputs.new_version }}"
           git checkout -b $BRANCH_NAME
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -66,7 +66,7 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.event.inputs.package_name }}-${{ github.event.inputs.new_version }}
+          branch: "chore/${{ github.event.inputs.package_name }}-${{ github.event.inputs.new_version }}"
           title: "Update ${{ github.event.inputs.package_name }} to ${{ github.event.inputs.new_version }}"
           body: |
             "This PR updates `${{ github.event.inputs.package_name }}` to version `${{ github.event.inputs.new_version }}`. 

@@ -58,6 +58,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: "chore/${{ github.event.inputs.package_name }}-${{ github.event.inputs.new_version }}"
           title: "Update ${{ github.event.inputs.package_name }} to ${{ github.event.inputs.new_version }}"
+          commit-message: "chore: update ${{ github.event.inputs.package_name }} to ${{ github.event.inputs.new_version }}"
           body: |
             This PR updates `${{ github.event.inputs.package_name }}` to version `${{ github.event.inputs.new_version }}`.
 

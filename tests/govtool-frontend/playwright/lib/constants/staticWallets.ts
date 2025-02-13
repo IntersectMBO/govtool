@@ -24,6 +24,7 @@ export const proposal04Wallet: StaticWallet = staticWallets[13];
 export const proposal05Wallet: StaticWallet = staticWallets[14];
 export const proposal06Wallet: StaticWallet = staticWallets[15];
 export const proposal07Wallet: StaticWallet = staticWallets[16];
+export const proposal08Wallet: StaticWallet = staticWallets[17];
 
 export const adaHolderWallets = [
   adaHolder01Wallet,
@@ -46,6 +47,7 @@ export const proposalWallets = [
   proposal05Wallet,
   proposal06Wallet,
   proposal07Wallet,
+  proposal08Wallet,
 ];
 
 export const allStaticWallets = [

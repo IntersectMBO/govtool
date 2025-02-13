@@ -6,6 +6,7 @@ import {
   proposal05Wallet,
   proposal06Wallet,
   proposal07Wallet,
+  proposal08Wallet,
 } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
@@ -539,6 +540,54 @@ test.describe("Treasury Proposal Draft", () => {
     await expect(proposalSubmissionPage.amountContent).toHaveText(
       proposalFormValue.prop_amount
     );
+    await expect(proposalSubmissionPage.linkTextContent).toHaveText(
+      proposalFormValue.proposal_links[0].prop_link_text
+    );
+  });
+});
+
+test.describe("Update the constitution Proposal Draft", () => {
+  test.use({ storageState: ".auth/proposal08.json", wallet: proposal08Wallet });
+
+  test("7M_3. Should edit update the constitution proposal draft", async ({
+    page,
+  }) => {
+    await skipIfNotInfoAndBootstrapping(ProposalType.updatesToTheConstitution);
+
+    const proposalSubmissionPage = new ProposalSubmissionPage(page);
+    const { proposalFormValue } = await proposalSubmissionPage.createDraft(
+      ProposalType.updatesToTheConstitution
+    );
+
+    const newTitle = faker.lorem.sentence(6);
+
+    await proposalSubmissionPage.viewFirstDraft();
+    await proposalSubmissionPage.titleInput.fill(newTitle);
+    await proposalSubmissionPage.continueBtn.click();
+
+    await expect(proposalSubmissionPage.governanceActionTypeContent).toHaveText(
+      ProposalType.updatesToTheConstitution
+    );
+    await expect(proposalSubmissionPage.titleContent).toHaveText(newTitle);
+    await expect(proposalSubmissionPage.abstractContent).toHaveText(
+      proposalFormValue.prop_abstract
+    );
+    await expect(proposalSubmissionPage.motivationContent).toHaveText(
+      proposalFormValue.prop_motivation
+    );
+    await expect(proposalSubmissionPage.rationaleContent).toHaveText(
+      proposalFormValue.prop_rationale
+    );
+    await expect(proposalSubmissionPage.constitutionUrlContent).toHaveText(
+      proposalFormValue.prop_constitution_url
+    );
+    await expect(proposalSubmissionPage.guardrailsScriptUrlContent).toHaveText(
+      proposalFormValue.prop_guardrails_script_url
+    );
+    await expect(proposalSubmissionPage.guardrailsScriptHashContent).toHaveText(
+      proposalFormValue.prop_guardrails_script_hash
+    );
+
     await expect(proposalSubmissionPage.linkTextContent).toHaveText(
       proposalFormValue.proposal_links[0].prop_link_text
     );

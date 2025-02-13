@@ -1,4 +1,9 @@
 import environments from "@constants/environments";
+import {
+  BOOTSTRAP_PROPOSAL_TYPE_FILTERS,
+  PROPOSAL_STATUS_FILTER,
+  PROPOSAL_TYPE_FILTERS,
+} from "@constants/index";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
@@ -13,11 +18,6 @@ const mockPoll = require("../../lib/_mock/proposalPoll.json");
 const mockComments = require("../../lib/_mock/proposalComments.json");
 const mockInfoProposedGA = require("../../lib/_mock/infoProposedGAs.json");
 const mockTreasuryProposal = require("../../lib/_mock/treasuryProposedGAs.json");
-
-const PROPOSAL_TYPE_FILTERS = ["Info", "Treasury"];
-const BOOTSTRAP_PROPOSAL_TYPE_FILTERS = ["Info"];
-
-const PROPOSAL_STATUS_FILTER = ["Submitted for vote", "Active proposal"];
 
 test.beforeEach(async () => {
   await setAllureEpic("8. Proposal Discussion Forum");

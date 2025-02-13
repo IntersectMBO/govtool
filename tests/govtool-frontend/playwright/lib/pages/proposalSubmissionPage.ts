@@ -47,8 +47,11 @@ export default class ProposalSubmissionPage {
   readonly addWithdrawalAddressBtn = this.page.getByTestId(
     "add-withdrawal-link-button"
   );
-  readonly infoBtn = this.page.getByTestId("info-button");
-  readonly treasuryBtn = this.page.getByTestId("treasury-button");
+  readonly infoBtn = this.page.getByTestId("info action-button");
+  readonly treasuryBtn = this.page.getByTestId("treasury requests-button");
+  readonly updateTheConstitutionBtn = this.page.getByTestId(
+    "updates to the constitution-button"
+  );
   readonly editSubmissionButton = this.page.getByTestId(
     "edit-submission-button"
   );

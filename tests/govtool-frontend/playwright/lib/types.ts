@@ -70,8 +70,8 @@ export type LinkType = {
 };
 
 export enum ProposalType {
-  info = "Info",
-  treasury = "Treasury",
+  info = "Info Action",
+  treasury = "Treasury requests",
 }
 
 export enum BootstrapGovernanceActionType {

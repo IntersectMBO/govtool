@@ -80,6 +80,15 @@ export const invalid = {
     return " ";
   },
 
+  constitutionUrl: () => {
+    const choice = faker.number.int({ min: 1, max: 2 });
+    if (choice === 1) {
+      return invalid.url();
+    }
+    // empty invalid
+    return " ";
+  },
+
   paragraph: (maxCharacter: number) => {
     const choice = faker.number.int({ min: 1, max: 2 });
     if (choice === 1) {

@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 import { isBootStrapingPhase } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { expectWithInfo } from "@helpers/exceptionHandler";
-import { downloadMetadata } from "@helpers/metadata";
+import { calculateHash, downloadMetadata } from "@helpers/metadata";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { invalid } from "@mock/index";
 import { Download, Locator, Page, expect } from "@playwright/test";
@@ -23,6 +23,8 @@ const formErrors = {
   rationale: "rationale-helper-error",
   receivingAddress: "receiving-address-0-text-error",
   amount: "amount-0-text-error",
+  constitutionalUrl: "prop=constitution-url-text-error", // BUG wrong test id
+  guardrailsScriptUrl: "prop-guardrails-script-url-input-error",
   link: "link-0-url-input-error",
 };
 
@@ -47,8 +49,11 @@ export default class ProposalSubmissionPage {
   readonly addWithdrawalAddressBtn = this.page.getByTestId(
     "add-withdrawal-link-button"
   );
-  readonly infoBtn = this.page.getByTestId("info-button");
-  readonly treasuryBtn = this.page.getByTestId("treasury-button");
+  readonly infoBtn = this.page.getByTestId("info action-button");
+  readonly treasuryBtn = this.page.getByTestId("treasury requests-button");
+  readonly updateTheConstitutionBtn = this.page.getByTestId(
+    "updates to the constitution-button"
+  );
   readonly editSubmissionButton = this.page.getByTestId(
     "edit-submission-button"
   );
@@ -61,6 +66,9 @@ export default class ProposalSubmissionPage {
   readonly createNewProposalBtn = this.page.getByTestId(
     "create-new-proposal-button"
   );
+  readonly guardrailsScriptCheckbox = this.page.getByLabel(
+    "Do you want to provide new"
+  ); // BUG missing test id
 
   // input fields
   readonly titleInput = this.page.getByTestId("title-input");
@@ -72,6 +80,15 @@ export default class ProposalSubmissionPage {
     "receiving-address-0-text-input"
   );
   readonly amountInput = this.page.getByTestId("amount-0-text-input");
+  readonly constitutionUrlInput = this.page.getByTestId(
+    "prop_constitution_url"
+  );
+  readonly guardrailsScriptUrlInput = this.page.getByTestId(
+    "prop-guardrails-script-url-input"
+  );
+  readonly guardrailsScriptHashInput = this.page.getByTestId(
+    "prop-guardrails-script-hash-input"
+  );
   readonly closeDraftSuccessModalBtn = this.page.getByTestId("close-button");
   readonly linkTextInput = this.page.getByTestId("link-0-text-input");
   readonly linkUrlInput = this.page.getByTestId("link-0-url-input");
@@ -88,6 +105,15 @@ export default class ProposalSubmissionPage {
     "receiving-address-0-content"
   );
   readonly amountContent = this.page.getByTestId("amount-0-content");
+  readonly constitutionUrlContent = this.page.getByTestId(
+    "new-constitution-url-content"
+  );
+  readonly guardrailsScriptUrlContent = this.page.getByTestId(
+    "guardrails-script-url-content"
+  );
+  readonly guardrailsScriptHashContent = this.page.getByTestId(
+    "guardrails-script-hash-content"
+  );
   readonly linkTextContent = this.page.getByTestId("link-0-text-content");
   readonly linkUrlContent = this.page.getByTestId("link-0-url-content");
 
@@ -128,6 +154,10 @@ export default class ProposalSubmissionPage {
       await this.fillTreasuryFields(governanceProposal);
     }
 
+    if (governanceProposal.gov_action_type_id === 2) {
+      await this.fillUpdateTheConstitutionFields(governanceProposal);
+    }
+
     if (governanceProposal.proposal_links != null) {
       await this.fillProposalLinks(governanceProposal.proposal_links);
     }
@@ -138,9 +168,13 @@ export default class ProposalSubmissionPage {
 
     if (governanceProposal.gov_action_type_id === 0) {
       await this.infoBtn.click();
-    } else {
+    } else if (governanceProposal.gov_action_type_id === 1) {
       await this.treasuryBtn.click();
+    } else {
+      await this.updateTheConstitutionBtn.click();
+      await this.guardrailsScriptCheckbox.click();
     }
+
     await this.fillupFormWithTypeSelected(governanceProposal);
   }
 
@@ -156,6 +190,21 @@ export default class ProposalSubmissionPage {
       governanceProposal.prop_receiving_address
     );
     await this.amountInput.fill(governanceProposal.prop_amount);
+  }
+
+  async fillUpdateTheConstitutionFields(
+    governanceProposal: ProposalCreateRequest
+  ) {
+    await this.constitutionUrlInput.fill(
+      governanceProposal.prop_constitution_url
+    );
+
+    await this.guardrailsScriptUrlInput.fill(
+      governanceProposal.prop_guardrails_script_url
+    );
+    await this.guardrailsScriptHashInput.fill(
+      governanceProposal.prop_guardrails_script_hash
+    );
   }
 
   async fillProposalLinks(proposal_links: Array<ProposalLink>) {
@@ -232,6 +281,16 @@ export default class ProposalSubmissionPage {
       }
     }
 
+    if (governanceProposal.gov_action_type_id === 2) {
+      await expect(
+        this.page.getByTestId(formErrors.constitutionalUrl)
+      ).toBeHidden();
+
+      await expect(
+        this.page.getByTestId(formErrors.guardrailsScriptUrl)
+      ).toBeHidden();
+    }
+
     await expect(this.page.getByTestId(formErrors.link)).toBeHidden();
 
     await expect(this.continueBtn).toBeEnabled();
@@ -286,6 +345,16 @@ export default class ProposalSubmissionPage {
       await expect(this.page.getByTestId(formErrors.amount)).toBeVisible();
     }
 
+    if (governanceProposal.gov_action_type_id === 2) {
+      await expect(
+        this.page.getByTestId(formErrors.constitutionalUrl)
+      ).toBeVisible();
+
+      await expect(
+        this.page.getByTestId(formErrors.guardrailsScriptUrl)
+      ).toBeVisible();
+    }
+
     await expect(this.continueBtn).toBeDisabled();
   }
 
@@ -306,7 +375,7 @@ export default class ProposalSubmissionPage {
           prop_link_text: faker.internet.domainWord(),
         },
       ],
-      gov_action_type_id: proposalType === ProposalType.info ? 0 : 1,
+      gov_action_type_id: Object.values(ProposalType).indexOf(proposalType),
       is_draft: !!is_draft,
     };
 
@@ -315,6 +384,13 @@ export default class ProposalSubmissionPage {
         (proposal.prop_amount = faker.number
           .int({ min: 100, max: 1000 })
           .toString());
+    }
+    if (proposalType === ProposalType.updatesToTheConstitution) {
+      proposal.prop_constitution_url = faker.internet.url();
+      proposal.prop_guardrails_script_url = faker.internet.url();
+      proposal.prop_guardrails_script_hash = calculateHash(
+        faker.lorem.paragraph()
+      );
     }
     return proposal;
   }
@@ -332,7 +408,7 @@ export default class ProposalSubmissionPage {
           prop_link_text: invalid.name(),
         },
       ],
-      gov_action_type_id: proposalType === ProposalType.info ? 0 : 1,
+      gov_action_type_id: Object.values(ProposalType).indexOf(proposalType),
       is_draft: false,
     };
 
@@ -340,12 +416,20 @@ export default class ProposalSubmissionPage {
       (proposal.prop_receiving_address = faker.location.streetAddress()),
         (proposal.prop_amount = invalid.amount());
     }
+
+    if (proposalType === ProposalType.updatesToTheConstitution) {
+      proposal.prop_constitution_url = invalid.constitutionUrl();
+      proposal.prop_guardrails_script_url = invalid.url();
+      proposal.prop_guardrails_script_hash = faker.string.alphanumeric(64);
+    }
     return proposal;
   }
 
   async createProposal(
     wallet: StaticWallet,
-    proposalType: ProposalType = ProposalType.treasury
+    proposalType: ProposalType = Object.values(ProposalType)[
+      Math.floor(Math.random() * Object.values(ProposalType).length)
+    ]
   ): Promise<number> {
     await this.addLinkBtn.click();
     const receivingAddr = ShelleyWallet.fromJson(wallet).rewardAddressBech32(

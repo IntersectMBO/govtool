@@ -6,12 +6,13 @@ import {
   proposal05Wallet,
   proposal06Wallet,
   proposal07Wallet,
+  proposal08Wallet,
 } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
 import {
-  skipIfTreasuryAndBootstrapping,
+  skipIfNotInfoAndBootstrapping,
   skipIfNotHardFork,
   isBootStrapingPhase,
 } from "@helpers/cardano";
@@ -42,7 +43,7 @@ test.describe("Proposal created logged state", () => {
       test(`7E_${index + 1}. Should accept valid data in ${type.toLowerCase()} proposal form`, async ({
         page,
       }) => {
-        await skipIfTreasuryAndBootstrapping(type);
+        await skipIfNotInfoAndBootstrapping(type);
 
         test.slow(); // Brute-force testing with 50 random data
 
@@ -53,6 +54,10 @@ test.describe("Proposal created logged state", () => {
         await proposalSubmissionPage.governanceActionType.click();
         await page.getByTestId(`${type.toLocaleLowerCase()}-button`).click();
         await proposalSubmissionPage.addLinkBtn.click();
+
+        if (type === ProposalType.updatesToTheConstitution) {
+          await proposalSubmissionPage.guardrailsScriptCheckbox.click();
+        }
 
         for (let i = 0; i < 50; i++) {
           const rewardAddressBech32 = (
@@ -95,7 +100,7 @@ test.describe("Proposal created logged state", () => {
       test(`7F_${index + 1}. Should reject invalid data in ${type.toLowerCase()} Proposal form`, async ({
         page,
       }) => {
-        await skipIfTreasuryAndBootstrapping(type);
+        await skipIfNotInfoAndBootstrapping(type);
 
         test.slow(); // Brute-force testing with 50 random data
 
@@ -105,6 +110,10 @@ test.describe("Proposal created logged state", () => {
         await proposalSubmissionPage.governanceActionType.click();
         await page.getByTestId(`${type.toLocaleLowerCase()}-button`).click();
         await proposalSubmissionPage.addLinkBtn.click();
+
+        if (type === ProposalType.updatesToTheConstitution) {
+          await proposalSubmissionPage.guardrailsScriptCheckbox.click();
+        }
 
         for (let i = 0; i < 50; i++) {
           const formFields: ProposalCreateRequest =
@@ -121,7 +130,7 @@ test.describe("Proposal created logged state", () => {
         page,
         wallet,
       }) => {
-        await skipIfTreasuryAndBootstrapping(type);
+        await skipIfNotInfoAndBootstrapping(type);
 
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
         await proposalSubmissionPage.goto();
@@ -175,7 +184,7 @@ test.describe("Proposal created logged state", () => {
       test(`7I_${index + 1}. Should valid review submission in ${type.toLowerCase()} Proposal form`, async ({
         page,
       }) => {
-        await skipIfTreasuryAndBootstrapping(type);
+        await skipIfNotInfoAndBootstrapping(type);
 
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
         await proposalSubmissionPage.goto();
@@ -221,6 +230,18 @@ test.describe("Proposal created logged state", () => {
             proposal.prop_amount
           );
         }
+
+        if (type === ProposalType.updatesToTheConstitution) {
+          await expect(
+            proposalSubmissionPage.constitutionUrlContent
+          ).toHaveText(proposal.prop_constitution_url);
+          await expect(
+            proposalSubmissionPage.guardrailsScriptUrlContent
+          ).toHaveText(proposal.prop_guardrails_script_url);
+          await expect(
+            proposalSubmissionPage.guardrailsScriptHashContent
+          ).toHaveText(proposal.prop_guardrails_script_hash);
+        }
       });
     });
   });
@@ -230,7 +251,7 @@ test.describe("Proposal created logged state", () => {
       test(`7D_${index + 1}. Verify ${type.toLocaleLowerCase()} proposal form`, async ({
         page,
       }) => {
-        await skipIfTreasuryAndBootstrapping(type);
+        await skipIfNotInfoAndBootstrapping(type);
 
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
         await proposalSubmissionPage.goto();
@@ -249,6 +270,25 @@ test.describe("Proposal created logged state", () => {
           ).toBeVisible();
 
           await expect(proposalSubmissionPage.amountInput).toBeVisible();
+        }
+
+        if (type === ProposalType.updatesToTheConstitution) {
+          await expect(
+            proposalSubmissionPage.constitutionUrlInput
+          ).toBeVisible();
+
+          await expect(
+            proposalSubmissionPage.guardrailsScriptCheckbox
+          ).toBeVisible();
+
+          await proposalSubmissionPage.guardrailsScriptCheckbox.click();
+
+          await expect(
+            proposalSubmissionPage.guardrailsScriptUrlInput
+          ).toBeVisible();
+          await expect(
+            proposalSubmissionPage.guardrailsScriptHashInput
+          ).toBeVisible();
         }
       });
     });
@@ -468,7 +508,7 @@ test.describe("Treasury Proposal Draft", () => {
   test.use({ storageState: ".auth/proposal07.json", wallet: proposal07Wallet });
 
   test("7M_2. Should edit a treasury proposal draft", async ({ page }) => {
-    await skipIfTreasuryAndBootstrapping(ProposalType.treasury);
+    await skipIfNotInfoAndBootstrapping(ProposalType.treasury);
 
     const proposalSubmissionPage = new ProposalSubmissionPage(page);
     const { proposalFormValue } = await proposalSubmissionPage.createDraft(
@@ -500,6 +540,54 @@ test.describe("Treasury Proposal Draft", () => {
     await expect(proposalSubmissionPage.amountContent).toHaveText(
       proposalFormValue.prop_amount
     );
+    await expect(proposalSubmissionPage.linkTextContent).toHaveText(
+      proposalFormValue.proposal_links[0].prop_link_text
+    );
+  });
+});
+
+test.describe("Update the constitution Proposal Draft", () => {
+  test.use({ storageState: ".auth/proposal08.json", wallet: proposal08Wallet });
+
+  test("7M_3. Should edit update the constitution proposal draft", async ({
+    page,
+  }) => {
+    await skipIfNotInfoAndBootstrapping(ProposalType.updatesToTheConstitution);
+
+    const proposalSubmissionPage = new ProposalSubmissionPage(page);
+    const { proposalFormValue } = await proposalSubmissionPage.createDraft(
+      ProposalType.updatesToTheConstitution
+    );
+
+    const newTitle = faker.lorem.sentence(6);
+
+    await proposalSubmissionPage.viewFirstDraft();
+    await proposalSubmissionPage.titleInput.fill(newTitle);
+    await proposalSubmissionPage.continueBtn.click();
+
+    await expect(proposalSubmissionPage.governanceActionTypeContent).toHaveText(
+      ProposalType.updatesToTheConstitution
+    );
+    await expect(proposalSubmissionPage.titleContent).toHaveText(newTitle);
+    await expect(proposalSubmissionPage.abstractContent).toHaveText(
+      proposalFormValue.prop_abstract
+    );
+    await expect(proposalSubmissionPage.motivationContent).toHaveText(
+      proposalFormValue.prop_motivation
+    );
+    await expect(proposalSubmissionPage.rationaleContent).toHaveText(
+      proposalFormValue.prop_rationale
+    );
+    await expect(proposalSubmissionPage.constitutionUrlContent).toHaveText(
+      proposalFormValue.prop_constitution_url
+    );
+    await expect(proposalSubmissionPage.guardrailsScriptUrlContent).toHaveText(
+      proposalFormValue.prop_guardrails_script_url
+    );
+    await expect(proposalSubmissionPage.guardrailsScriptHashContent).toHaveText(
+      proposalFormValue.prop_guardrails_script_hash
+    );
+
     await expect(proposalSubmissionPage.linkTextContent).toHaveText(
       proposalFormValue.proposal_links[0].prop_link_text
     );

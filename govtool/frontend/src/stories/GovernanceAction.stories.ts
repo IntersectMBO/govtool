@@ -97,7 +97,7 @@ export const GovernanceActionCardComponent: Story = {
     await userEvent.click(
       canvas.getByTestId("govaction-sad78afdsf7jasd98d#2-view-detail"),
     );
-    await await expect(args.onClick).toHaveBeenCalled();
+    await expect(args.onClick).toHaveBeenCalled();
   },
 };
 

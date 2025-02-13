@@ -41,7 +41,7 @@ export const Tooltip = ({
           fontWeight={400}
           color="rgb(170, 170, 170)"
         >
-          {paragraphOne && paragraphOne}
+          {paragraphOne && <>{paragraphOne}</>}
           {paragraphTwo && (
             <>
               <br /> <br />

@@ -41,6 +41,13 @@ export const CopyButton = ({ isChecked, text, variant }: Props) => {
       }}
       src={iconSrc}
       style={{ cursor: "pointer" }}
+      onKeyDown={(e) => {
+        if (e.ctrlKey && e.key === "c") {
+          navigator.clipboard.writeText(text);
+          addSuccessAlert(t("alerts.copiedToClipboard"));
+          e.stopPropagation();
+        }
+      }}
     />
   );
 };

@@ -18,7 +18,10 @@ export const DRepInfoCard = () => {
 
   return (
     <Card border elevation={0} sx={{ p: 1.5 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+      <Box
+        sx={{ display: "flex", justifyContent: "space-between" }}
+        tabIndex={0}
+      >
         <Typography color={gray.c300} fontSize={12} fontWeight={500}>
           {t("myDRepId")}
         </Typography>

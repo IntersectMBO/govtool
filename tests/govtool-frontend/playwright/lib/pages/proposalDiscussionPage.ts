@@ -1,11 +1,8 @@
-import { faker } from "@faker-js/faker";
-import { generateWalletAddress } from "@helpers/cardano";
-import { extractProposalIdFromUrl } from "@helpers/string";
 import { expect, Locator, Page } from "@playwright/test";
 import { ProposalCreateRequest, ProposedGovAction } from "@types";
 import environments from "lib/constants/environments";
 import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
-import { isMobile } from "@helpers/mobile";
+import { PROPOSAL_TYPE_FILTERS } from "@constants/index";
 
 export default class ProposalDiscussionPage {
   // Buttons
@@ -19,8 +16,10 @@ export default class ProposalDiscussionPage {
   readonly showAllBtn = this.page.getByTestId("show-all-button").first(); //this.page.getByTestId("show-all-button");
   readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
   readonly addLinkBtn = this.page.getByTestId("add-link-button");
-  readonly infoRadio = this.page.getByTestId("Info-radio-wrapper");
-  readonly treasuryRadio = this.page.getByTestId("Treasury-radio-wrapper");
+  readonly infoRadio = this.page.getByTestId("info action-radio-wrapper");
+  readonly treasuryRadio = this.page.getByTestId(
+    "treasury requests-radio-wrapper"
+  );
   readonly activeProposalWrapper = this.page.getByTestId(
     "active-proposal-radio-wrapper"
   );
@@ -112,10 +111,10 @@ export default class ProposalDiscussionPage {
 
   async clickRadioButtonsByNames(names: string[]) {
     for (const name of names) {
-      const replaceSpaceWithUnderScore = name.toLowerCase().replace(/ /g, "-");
-      await this.page
-        .getByTestId(`${replaceSpaceWithUnderScore}-radio`)
-        .click();
+      const testId = PROPOSAL_TYPE_FILTERS.includes(name)
+        ? name.toLowerCase()
+        : name.toLowerCase().replace(/ /g, "-");
+      await this.page.getByTestId(`${testId}-radio`).click();
     }
   }
 

@@ -270,6 +270,25 @@ test.describe("Proposal created logged state", () => {
 
           await expect(proposalSubmissionPage.amountInput).toBeVisible();
         }
+
+        if (type === ProposalType.updatesToTheConstitution) {
+          await expect(
+            proposalSubmissionPage.constitutionUrlInput
+          ).toBeVisible();
+
+          await expect(
+            proposalSubmissionPage.guardrailsScriptCheckbox
+          ).toBeVisible();
+
+          await proposalSubmissionPage.guardrailsScriptCheckbox.click();
+
+          await expect(
+            proposalSubmissionPage.guardrailsScriptUrlInput
+          ).toBeVisible();
+          await expect(
+            proposalSubmissionPage.guardrailsScriptHashInput
+          ).toBeVisible();
+        }
       });
     });
   });

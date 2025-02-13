@@ -427,7 +427,9 @@ export default class ProposalSubmissionPage {
 
   async createProposal(
     wallet: StaticWallet,
-    proposalType: ProposalType = ProposalType.treasury
+    proposalType: ProposalType = Object.values(ProposalType)[
+      Math.floor(Math.random() * Object.values(ProposalType).length)
+    ]
   ): Promise<number> {
     await this.addLinkBtn.click();
     const receivingAddr = ShelleyWallet.fromJson(wallet).rewardAddressBech32(

@@ -54,6 +54,10 @@ test.describe("Proposal created logged state", () => {
         await page.getByTestId(`${type.toLocaleLowerCase()}-button`).click();
         await proposalSubmissionPage.addLinkBtn.click();
 
+        if (type === ProposalType.updatesToTheConstitution) {
+          await proposalSubmissionPage.guardrailsScriptCheckbox.click();
+        }
+
         for (let i = 0; i < 50; i++) {
           const rewardAddressBech32 = (
             await ShelleyWallet.generate()
@@ -105,6 +109,10 @@ test.describe("Proposal created logged state", () => {
         await proposalSubmissionPage.governanceActionType.click();
         await page.getByTestId(`${type.toLocaleLowerCase()}-button`).click();
         await proposalSubmissionPage.addLinkBtn.click();
+
+        if (type === ProposalType.updatesToTheConstitution) {
+          await proposalSubmissionPage.guardrailsScriptCheckbox.click();
+        }
 
         for (let i = 0; i < 50; i++) {
           const formFields: ProposalCreateRequest =

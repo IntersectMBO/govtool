@@ -23,6 +23,8 @@ const formErrors = {
   rationale: "rationale-helper-error",
   receivingAddress: "receiving-address-0-text-error",
   amount: "amount-0-text-error",
+  constitutionalUrl: "prop=constitution-url-text-error", // BUG wrong test id
+  guardrailsScriptUrl: "prop-guardrails-script-url-input-error",
   link: "link-0-url-input-error",
 };
 
@@ -155,6 +157,10 @@ export default class ProposalSubmissionPage {
     if (governanceProposal.gov_action_type_id === 2) {
       await this.fillUpdateTheConstitutionFields(governanceProposal);
     }
+
+    if (governanceProposal.proposal_links != null) {
+      await this.fillProposalLinks(governanceProposal.proposal_links);
+    }
   }
 
   async fillupForm(governanceProposal: ProposalCreateRequest) {
@@ -167,9 +173,7 @@ export default class ProposalSubmissionPage {
     } else {
       await this.updateTheConstitutionBtn.click();
     }
-    if (governanceProposal.proposal_links != null) {
-      await this.fillProposalLinks(governanceProposal.proposal_links);
-    }
+
     await this.fillupFormWithTypeSelected(governanceProposal);
   }
 
@@ -193,8 +197,6 @@ export default class ProposalSubmissionPage {
     await this.constitutionUrlInput.fill(
       governanceProposal.prop_constitution_url
     );
-
-    await this.guardrailsScriptCheckbox.click();
 
     await this.guardrailsScriptUrlInput.fill(
       governanceProposal.prop_guardrails_script_url
@@ -278,6 +280,16 @@ export default class ProposalSubmissionPage {
       }
     }
 
+    if (governanceProposal.gov_action_type_id === 2) {
+      await expect(
+        this.page.getByTestId(formErrors.constitutionalUrl)
+      ).toBeHidden();
+
+      await expect(
+        this.page.getByTestId(formErrors.guardrailsScriptUrl)
+      ).toBeHidden();
+    }
+
     await expect(this.page.getByTestId(formErrors.link)).toBeHidden();
 
     await expect(this.continueBtn).toBeEnabled();
@@ -330,6 +342,16 @@ export default class ProposalSubmissionPage {
       ).toBeVisible();
 
       await expect(this.page.getByTestId(formErrors.amount)).toBeVisible();
+    }
+
+    if (governanceProposal.gov_action_type_id === 2) {
+      await expect(
+        this.page.getByTestId(formErrors.constitutionalUrl)
+      ).toBeVisible();
+
+      await expect(
+        this.page.getByTestId(formErrors.guardrailsScriptUrl)
+      ).toBeVisible();
     }
 
     await expect(this.continueBtn).toBeDisabled();
@@ -385,13 +407,19 @@ export default class ProposalSubmissionPage {
           prop_link_text: invalid.name(),
         },
       ],
-      gov_action_type_id: proposalType === ProposalType.info ? 0 : 1,
+      gov_action_type_id: Object.values(ProposalType).indexOf(proposalType),
       is_draft: false,
     };
 
     if (proposalType === ProposalType.treasury) {
       (proposal.prop_receiving_address = faker.location.streetAddress()),
         (proposal.prop_amount = invalid.amount());
+    }
+
+    if (proposalType === ProposalType.updatesToTheConstitution) {
+      proposal.prop_constitution_url = invalid.constitutionUrl();
+      proposal.prop_guardrails_script_url = invalid.url();
+      proposal.prop_guardrails_script_hash = faker.string.alphanumeric(64);
     }
     return proposal;
   }

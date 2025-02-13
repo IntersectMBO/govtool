@@ -28,11 +28,12 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
+          registry-url: "https://registry.npmjs.org/"
           node-version-file: "./govtool/frontend/.nvmrc"
-          cache: "npm"
+          scope: "@intersect.mbo"
 
       - name: Update package version in frontend
         run: |
@@ -48,25 +49,19 @@ jobs:
 
       - name: Install dependencies in frontend
         run: |
-          cd govtool/govtool/frontend
+          cd govtool/frontend
           npm install
-
-      - name: Commit and push changes
-        run: |
-          BRANCH_NAME="update-${{ github.event.inputs.package_name }}-${{ github.event.inputs.new_version }}"
-          git checkout -b $BRANCH_NAME
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add govtool/govtool/frontend/package.json govtool/govtool/frontend/package-lock.json
-          git commit -m "chore: update ${{ github.event.inputs.package_name }} to ${{ github.event.inputs.new_version }}"
-          git push origin $BRANCH_NAME
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.event.inputs.package_name }}-${{ github.event.inputs.new_version }}
+          branch: "chore/${{ github.event.inputs.package_name }}-${{ github.event.inputs.new_version }}"
           title: "Update ${{ github.event.inputs.package_name }} to ${{ github.event.inputs.new_version }}"
-          body: "This PR updates ${{ github.event.inputs.package_name }} to version ${{ github.event.inputs.new_version }}."
+          body: |
+            This PR updates `${{ github.event.inputs.package_name }}` to version `${{ github.event.inputs.new_version }}`.
+
+
+            Workflow executed by `@${{ github.actor }}`.
           labels: "dependencies"
           sign-commits: true

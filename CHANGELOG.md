@@ -17,6 +17,7 @@ changes.
 - Add support for submitting all 7 governance action types [Issue 2258](https://github.com/IntersectMBO/govtool/issues/2258)
 - Add workflow to automatically update any of the @intersect.mbo package [Issue 2968](https://github.com/IntersectMBO/govtool/issues/2968)
 - Add Propose Governance Action button in governance actions dashboard [Issue 1188](https://github.com/IntersectMBO/govtool/issues/1188)
+- Add click handlers to non-interactive elements [Issue 2929](https://github.com/IntersectMBO/govtool/issues/2929)
 
 ### Fixed
 

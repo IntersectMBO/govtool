@@ -70,8 +70,9 @@ export type LinkType = {
 };
 
 export enum ProposalType {
-  info = "Info",
-  treasury = "Treasury",
+  info = "Info Action",
+  treasury = "Treasury requests",
+  updatesToTheConstitution = "Updates to the Constitution",
 }
 
 export enum BootstrapGovernanceActionType {
@@ -159,6 +160,9 @@ export type ProposalCreateRequest = {
   prop_rationale: string;
   prop_receiving_address?: string;
   prop_amount?: string;
+  prop_constitution_url?: string;
+  prop_guardrails_script_url?: string;
+  prop_guardrails_script_hash?: string;
   is_draft: boolean;
 };
 

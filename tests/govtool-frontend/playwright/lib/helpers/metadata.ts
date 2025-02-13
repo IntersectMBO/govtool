@@ -21,6 +21,12 @@ export async function downloadMetadata(download: Download): Promise<{
   return { name: download.suggestedFilename(), data: jsonData };
 }
 
+export function calculateHash(data: string) {
+  const buffer = Buffer.from(data, "utf8");
+  const hexDigest = blake.blake2bHex(buffer, null, 32);
+  return hexDigest;
+}
+
 async function calculateMetadataHash() {
   try {
     const paymentAddress = (await ShelleyWallet.generate()).addressBech32(
@@ -39,8 +45,7 @@ async function calculateMetadataHash() {
       2
     );
 
-    const buffer = Buffer.from(data, "utf8");
-    const hexDigest = blake.blake2bHex(buffer, null, 32);
+    const hexDigest = calculateHash(data);
 
     const jsonData = JSON.parse(data);
     return { hexDigest, jsonData };

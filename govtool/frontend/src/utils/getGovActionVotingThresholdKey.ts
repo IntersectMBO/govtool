@@ -8,7 +8,7 @@ import {
 import { EpochParams } from "@/models";
 import { GovernanceActionType } from "@/types/governanceAction";
 
-type VotingThresholdKey = string | undefined;
+type VotingThresholdKey = keyof EpochParams | undefined;
 
 type GetGovActionVotingThresholdKeyOptions = {
   govActionType: GovernanceActionType;

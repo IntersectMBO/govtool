@@ -96,7 +96,6 @@ export const GovernanceActions = () => {
               filtersTitle={t("govActions.filterTitle")}
               sortOptions={GOVERNANCE_ACTIONS_SORTING}
             />
-
             {!proposals || isProposalsLoading ? (
               <Box
                 sx={{

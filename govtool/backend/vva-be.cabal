@@ -104,9 +104,11 @@ library
                , vector
                , async
                , random
+               , unordered-containers
 
   exposed-modules: VVA.Config
                  , VVA.CommandLine
+                 , VVA.Common.Types
                  , VVA.API
                  , VVA.API.Types
                  , VVA.API.Utils

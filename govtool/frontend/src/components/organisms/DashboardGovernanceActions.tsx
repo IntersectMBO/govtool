@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Box, CircularProgress, Tab, Tabs, styled } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import {
   GOVERNANCE_ACTIONS_FILTERS,
   GOVERNANCE_ACTIONS_SORTING,
+  PATHS,
+  PDF_PATHS,
 } from "@consts";
-import { useCardano, useDataActionsBar } from "@context";
+import { useCardano, useDataActionsBar, useFeatureFlag } from "@context";
 import {
   useGetProposalsQuery,
   useGetVoterInfo,
@@ -18,6 +20,7 @@ import {
   GovernanceActionsToVote,
   DashboardGovernanceActionsVotedOn,
 } from "@organisms";
+import { Button } from "@atoms";
 
 type TabPanelProps = {
   children?: React.ReactNode;
@@ -74,6 +77,8 @@ export const DashboardGovernanceActions = () => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
   const { isEnableLoading } = useCardano();
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
+  const navigate = useNavigate();
 
   const queryFilters =
     chosenFilters.length > 0 ? chosenFilters : defaultCategories;
@@ -93,6 +98,14 @@ export const DashboardGovernanceActions = () => {
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setContent(newValue);
   };
+
+  const onClickPropose = useCallback(() => {
+    navigate(
+      isProposalDiscussionForumEnabled
+        ? PDF_PATHS.proposalDiscussionPropose
+        : PATHS.createGovernanceAction,
+    );
+  }, [isProposalDiscussionForumEnabled]);
 
   useEffect(() => {
     window.history.replaceState({}, document.title);
@@ -126,36 +139,49 @@ export const DashboardGovernanceActions = () => {
         ) : (
           <>
             {(voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter) && (
-              <Tabs
-                sx={{
-                  marginTop: 3,
-                  display: "flex",
-                  fontSize: 16,
-                  fontWeight: 500,
-                }}
-                value={content}
-                indicatorColor="secondary"
-                onChange={handleChange}
-                aria-label="Governance Actions tabs"
-              >
-                <StyledTab
-                  data-testid="to-vote-tab"
-                  label={t("govActions.toVote")}
+              <Box display="flex" flexDirection="row" alignItems="center">
+                <Tabs
                   sx={{
-                    textTransform: "none",
-                    width: !isMobile ? "auto" : "50%",
+                    marginTop: 3,
+                    display: "flex",
+                    fontSize: 16,
+                    fontWeight: 500,
                   }}
-                />
-                <StyledTab
-                  data-testid="voted-tab"
-                  label={t("govActions.votedOnByMe")}
+                  value={content}
+                  indicatorColor="secondary"
+                  onChange={handleChange}
+                  aria-label="Governance Actions tabs"
+                >
+                  <StyledTab
+                    data-testid="to-vote-tab"
+                    label={t("govActions.toVote")}
+                    sx={{
+                      textTransform: "none",
+                      width: !isMobile ? "auto" : "50%",
+                    }}
+                  />
+                  <StyledTab
+                    data-testid="voted-tab"
+                    label={t("govActions.votedOnByMe")}
+                    sx={{
+                      textTransform: "none",
+                      width: !isMobile ? "auto" : "50%",
+                    }}
+                  />
+                </Tabs>
+                <Button
+                  data-testid="proposal-discussion-link"
+                  onClick={onClickPropose}
                   sx={{
-                    textTransform: "none",
-                    width: !isMobile ? "auto" : "50%",
+                    display: isMobile ? "none" : "block",
+                    ml: "auto",
                   }}
-                />
-              </Tabs>
+                >
+                  {t("govActions.propose")}
+                </Button>
+              </Box>
             )}
+
             <Box height={isMobile ? 24 : 60} />
             <CustomTabPanel value={content} index={0}>
               <GovernanceActionsToVote

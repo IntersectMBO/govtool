@@ -66,9 +66,9 @@ export default class ProposalSubmissionPage {
   readonly createNewProposalBtn = this.page.getByTestId(
     "create-new-proposal-button"
   );
-  readonly guardrailsScriptCheckbox = this.page.getByLabel(
-    "Do you want to provide new"
-  ); // BUG missing test id
+  readonly guardrailsScriptCheckbox = this.page.getByTestId(
+    "chb-prop-have-guardrails-script"
+  );
 
   // input fields
   readonly titleInput = this.page.getByTestId("title-input");

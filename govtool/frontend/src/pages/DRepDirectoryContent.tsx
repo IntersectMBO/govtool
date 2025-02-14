@@ -67,12 +67,6 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     enabled: !!inProgressDelegation || !!currentDelegation,
   });
 
-  const { dRep: yourselfDRep } = useGetDRepDetailsQuery(myDRepId, {
-    enabled: !!inProgressDelegation || !!currentDelegation,
-  });
-  const showYourselfDRep =
-    debouncedSearchText === myDRepId || debouncedSearchText === "";
-
   const {
     dRepData: dRepList,
     isPreviousData,
@@ -106,20 +100,15 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   const ada = correctAdaFormat(votingPower);
 
-  const listedDRepsWithoutYourself = uniqBy(
-    dRepList?.filter(
-      (dRep) =>
-        (typeof dRep.doNotList === "string"
-          ? !parseBoolean(dRep.doNotList)
-          : !dRep.doNotList) && !isSameDRep(dRep, myDRepId),
-    ),
+  const filteredDoNotListDReps = uniqBy(
+    dRepList?.filter((dRep) => {
+      if (typeof dRep.doNotList === "string") {
+        return !parseBoolean(dRep.doNotList);
+      }
+      return !dRep.doNotList;
+    }),
     "view",
   );
-
-  const dRepListToDisplay =
-    yourselfDRep && showYourselfDRep
-      ? [yourselfDRep, ...listedDRepsWithoutYourself]
-      : listedDRepsWithoutYourself;
 
   const isAnAutomatedVotingOptionChosen =
     currentDelegation?.dRepView &&
@@ -217,8 +206,8 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             flex: 1,
           }}
         >
-          {dRepListToDisplay?.length === 0 && <EmptyStateDrepDirectory />}
-          {dRepListToDisplay?.map((dRep) => (
+          {filteredDoNotListDReps?.length === 0 && <EmptyStateDrepDirectory />}
+          {filteredDoNotListDReps?.map((dRep) => (
             <Box key={dRep.view} component="li" sx={{ listStyle: "none" }}>
               <DRepCard
                 dRep={dRep}

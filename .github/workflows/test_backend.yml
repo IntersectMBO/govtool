@@ -53,7 +53,7 @@ jobs:
           echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
           curl -X POST -H "Authorization: Bearer ${{ github.token }}" \
             -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
+            https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.event.workflow_run.head_sha }} \
             -d "{\"state\": \"pending\", \"context\": \"Backend Tests : ${{env.BASE_URL}}\", \"target_url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
 
 

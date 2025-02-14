@@ -85,10 +85,13 @@ EnrichedCurrentMembers AS (
         ) AS enriched_members
     FROM
         ProcessedCurrentMembers pcm
-    LEFT JOIN
-        json_array_elements(pcm.current_members) AS member ON true
-    LEFT JOIN
-        CommitteeData cm ON cm.hash = encode(decode(member->>'hash', 'hex'), 'hex')
+    LEFT JOIN json_array_elements(pcm.current_members) AS member ON true
+    LEFT JOIN CommitteeData cm 
+        ON (CASE 
+            WHEN (member->>'hash') ~ '^[0-9a-fA-F]+$' 
+            THEN encode(decode(member->>'hash', 'hex'), 'hex') 
+            ELSE NULL 
+        END) = cm.hash
     GROUP BY
         pcm.id
 ),
@@ -199,7 +202,13 @@ SELECT
                         'tag', pd.tag,
                         'members', em.enriched_members,
                         'membersToBeRemoved', mtr.members_to_be_removed,
-                        'threshold', pd.threshold::float
+                        'threshold', 
+                            CASE 
+                                WHEN (pd.threshold->>'numerator') IS NOT NULL 
+                                AND (pd.threshold->>'denominator') IS NOT NULL 
+                                THEN (pd.threshold->>'numerator')::float / (pd.threshold->>'denominator')::float
+                                ELSE NULL 
+                            END
                     )
                 FROM
                     ParsedDescription pd

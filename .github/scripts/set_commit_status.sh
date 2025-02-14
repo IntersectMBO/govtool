@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Ensure required environment variables are set
-if [ -z "$GITHUB_REPOSITORY" ] || [ -z "$GITHUB_EVENT_WORKFLOW_RUN_HEAD_SHA" ] || [ -z "$GITHUB_TOKEN" ] || [ -z "$GITHUB_RUN_ID" ]; then
+if [ -z "$GITHUB_REPOSITORY" ] || [ -z "$COMMIT_SHA" ] || [ -z "$GITHUB_TOKEN" ] || [ -z "$GITHUB_RUN_ID" ]; then
   echo "Missing required environment variables!"
   exit 1
 fi
@@ -69,7 +69,7 @@ fi
 # Send commit status update to GitHub
 curl -X POST -H "Authorization: Bearer ${GITHUB_TOKEN}" \
   -H "Accept: application/vnd.github+json" \
-  https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_EVENT_WORKFLOW_RUN_HEAD_SHA} \
+  https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${COMMIT_SHA} \
   -d "{\"state\": \"${TEST_STATUS}\", \"context\": \"${CONTEXT}\", \"description\": \"${DESCRIPTION}\", \"target_url\": \"${TARGET_URL}\"}"
 
 echo "Commit status updated successfully!"

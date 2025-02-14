@@ -48,6 +48,8 @@ jobs:
         working-directory: tests/govtool-frontend/playwright
     steps:
       - uses: actions/checkout@v4
+        with:
+            ref: ${{ github.event.workflow_run.head_sha }}
       - name: Set pending commit status
         id: set-pending-status
         run: |

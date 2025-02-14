@@ -35,11 +35,11 @@ WithLabel.play = async ({ canvasElement }) => {
   expect(canvas.getByText("Label")).toBeVisible();
 };
 
-export const Error = Template.bind({});
-Error.args = {
+export const ErrorBase = Template.bind({});
+ErrorBase.args = {
   errorMessage: "Error message",
 };
-Error.play = async ({ canvasElement, args }) => {
+ErrorBase.play = async ({ canvasElement, args }) => {
   const canvas = within(canvasElement);
   const errorId = args.errorMessage!.toLowerCase().split(" ").join("-");
 

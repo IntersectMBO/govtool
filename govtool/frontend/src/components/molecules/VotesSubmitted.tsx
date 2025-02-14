@@ -165,14 +165,16 @@ export const VotesSubmitted = ({
             abstainVotes={totalAbstainVotes}
             notVotedVotes={dRepNotVotedVotes}
             notVotedPercentage={dRepNotVotedVotesPercentage}
-            threshold={(() => {
-              const votingThresholdKey = getGovActionVotingThresholdKey({
-                govActionType: type,
-                protocolParams,
-                voterType: "dReps",
-              });
-              return votingThresholdKey && epochParams?.[votingThresholdKey];
-            })()}
+            threshold={
+              (() => {
+                const votingThresholdKey = getGovActionVotingThresholdKey({
+                  govActionType: type,
+                  protocolParams,
+                  voterType: "dReps",
+                });
+                return votingThresholdKey && epochParams?.[votingThresholdKey];
+              })() as number
+            }
           />
         )}
         {areSPOVoteTotalsDisplayed(type, isSecurityGroup()) && (
@@ -183,14 +185,16 @@ export const VotesSubmitted = ({
             noVotes={poolNoVotes}
             noVotesPercentage={poolNoVotesPercentage}
             abstainVotes={poolAbstainVotes}
-            threshold={(() => {
-              const votingThresholdKey = getGovActionVotingThresholdKey({
-                govActionType: type,
-                protocolParams,
-                voterType: "sPos",
-              });
-              return votingThresholdKey && epochParams?.[votingThresholdKey];
-            })()}
+            threshold={
+              (() => {
+                const votingThresholdKey = getGovActionVotingThresholdKey({
+                  govActionType: type,
+                  protocolParams,
+                  voterType: "sPos",
+                });
+                return votingThresholdKey && epochParams?.[votingThresholdKey];
+              })() as number
+            }
           />
         )}
         {areCCVoteTotalsDisplayed(type) && (

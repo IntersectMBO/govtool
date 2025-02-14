@@ -1,10 +1,7 @@
 WITH DRepDistr AS (
-  SELECT
-    drep_distr.*,
-    ROW_NUMBER() OVER (PARTITION BY drep_hash.id ORDER BY drep_distr.epoch_no DESC) AS rn
-  FROM
-    drep_distr
-    JOIN drep_hash ON drep_hash.id = drep_distr.hash_id
+  SELECT DISTINCT ON (drep_distr.hash_id) drep_distr.*
+  FROM drep_distr
+  ORDER BY drep_distr.hash_id, drep_distr.epoch_no DESC
 ),
 DRepActivity AS (
   SELECT
@@ -19,11 +16,12 @@ DRepActivity AS (
   LIMIT 1
 ),
 LatestVotingProcedure AS (
-  SELECT
-    vp.*,
-    ROW_NUMBER() OVER (PARTITION BY drep_voter ORDER BY tx_id DESC) AS rn
+  SELECT DISTINCT ON (vp.drep_voter)
+    vp.*
   FROM
     voting_procedure vp
+  ORDER BY
+    vp.drep_voter, vp.tx_id DESC
 ),
 LatestVoteEpoch AS (
   SELECT
@@ -33,20 +31,19 @@ LatestVoteEpoch AS (
     LatestVotingProcedure lvp
     JOIN tx ON tx.id = lvp.tx_id
     JOIN block ON block.id = tx.block_id
-  WHERE
-    lvp.rn = 1
 ),
 RankedDRepRegistration AS (
-	SELECT
+  SELECT DISTINCT ON (dr.drep_hash_id)
       dr.id,
       dr.drep_hash_id,
       dr.deposit,
       dr.voting_anchor_id,
-      ROW_NUMBER() OVER (PARTITION BY dr.drep_hash_id ORDER BY dr.tx_id DESC) AS rn,
       encode(tx.hash, 'hex') AS tx_hash
-    FROM
+  FROM
       drep_registration dr
   JOIN tx ON tx.id = dr.tx_id
+  ORDER BY
+      dr.drep_hash_id, dr.tx_id DESC
 ),
 FetchError AS (
   SELECT
@@ -132,29 +129,31 @@ DRepData AS (
     off_chain_vote_drep_data.image_hash
   FROM
     drep_hash dh
-    JOIN RankedDRepRegistration ON RankedDRepRegistration.drep_hash_id = dh.id AND RankedDRepRegistration.rn = 1
+    JOIN RankedDRepRegistration ON RankedDRepRegistration.drep_hash_id = dh.id
     JOIN (
-      SELECT
+      SELECT DISTINCT ON (dr.drep_hash_id)
         dr.id,
         dr.drep_hash_id,
-        dr.deposit,
-        ROW_NUMBER() OVER (PARTITION BY dr.drep_hash_id ORDER BY dr.tx_id DESC) AS rn
+        dr.deposit
       FROM
         drep_registration dr
       WHERE
         dr.deposit IS NOT NULL
-      ) AS dr_deposit ON dr_deposit.drep_hash_id = dh.id AND dr_deposit.rn = 1
+      ORDER BY
+        dr.drep_hash_id, dr.tx_id DESC
+    ) AS dr_deposit ON dr_deposit.drep_hash_id = dh.id
     LEFT JOIN (
-      SELECT
+      SELECT DISTINCT ON (dr.drep_hash_id)
         dr.id,
         dr.drep_hash_id,
-        dr.deposit,
-        ROW_NUMBER() OVER (PARTITION BY dr.drep_hash_id ORDER BY dr.tx_id DESC) AS rn
+        dr.deposit
       FROM
         drep_registration dr
-    ) AS latestDeposit ON latestDeposit.drep_hash_id = dh.id AND latestDeposit.rn = 1	
+      ORDER BY
+        dr.drep_hash_id, dr.tx_id DESC
+    ) AS latestDeposit ON latestDeposit.drep_hash_id = dh.id
     LEFT JOIN LatestExistingVotingAnchor leva ON leva.drep_hash_id = dh.id
-    LEFT JOIN DRepDistr ON DRepDistr.hash_id = dh.id AND DRepDistr.rn = 1
+    LEFT JOIN DRepDistr ON DRepDistr.hash_id = dh.id
     LEFT JOIN FetchError fetch_error ON fetch_error.voting_anchor_id = leva.voting_anchor_id
     LEFT JOIN HasNonDeregisterVotingAnchor hndva ON hndva.drep_hash_id = dh.id
     LEFT JOIN off_chain_vote_data ocvd ON ocvd.voting_anchor_id = leva.voting_anchor_id
@@ -163,26 +162,28 @@ DRepData AS (
     LEFT JOIN tx voting_procedure_transaction ON voting_procedure_transaction.id = voting_procedure.tx_id
     LEFT JOIN block voting_procedure_block ON voting_procedure_block.id = voting_procedure_transaction.block_id
     LEFT JOIN (
-      SELECT
+      SELECT DISTINCT ON (dr.drep_hash_id)
         block.epoch_no,
         block.time,
-        dr.drep_hash_id,
-        ROW_NUMBER() OVER (PARTITION BY dr.drep_hash_id ORDER BY dr.tx_id DESC) AS rn
+        dr.drep_hash_id
       FROM
-      drep_registration dr
+        drep_registration dr
       JOIN tx ON tx.id = dr.tx_id
       JOIN block ON block.id = tx.block_id
       WHERE
         COALESCE(dr.deposit, 0) >= 0
-      ) AS newestRegister ON newestRegister.drep_hash_id = dh.id AND newestRegister.rn = 1
-      LEFT JOIN (
-      SELECT
+      ORDER BY
+        dr.drep_hash_id, dr.tx_id DESC
+    ) AS newestRegister ON newestRegister.drep_hash_id = dh.id
+    LEFT JOIN (
+      SELECT DISTINCT ON (dr.drep_hash_id)
         dr.tx_id,
-        dr.drep_hash_id,
-        ROW_NUMBER() OVER (PARTITION BY dr.drep_hash_id ORDER BY dr.tx_id ASC) AS rn
+        dr.drep_hash_id
       FROM
         drep_registration dr
-    ) AS dr_first_register ON dr_first_register.drep_hash_id = dh.id AND dr_first_register.rn = 1
+      ORDER BY
+        dr.drep_hash_id, dr.tx_id ASC
+    ) AS dr_first_register ON dr_first_register.drep_hash_id = dh.id
     LEFT JOIN tx AS tx_first_register ON tx_first_register.id = dr_first_register.tx_id
     LEFT JOIN block AS block_first_register ON block_first_register.id = tx_first_register.block_id
     LEFT JOIN LatestVoteEpoch lve ON lve.drep_id = dh.id

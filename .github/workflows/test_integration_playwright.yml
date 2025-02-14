@@ -48,13 +48,15 @@ jobs:
         working-directory: tests/govtool-frontend/playwright
     steps:
       - uses: actions/checkout@v4
+        with:
+            ref: ${{ env.COMMIT_SHA }}
       - name: Set pending commit status
         id: set-pending-status
         run: |
           echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
           curl -X POST -H "Authorization: Bearer ${{ github.token }}" \
             -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
+            https://api.github.com/repos/${{ github.repository }}/statuses/${{ env.COMMIT_SHA }} \
             -d "{\"state\": \"pending\", \"context\": \"Playwright Tests : ${{env.HOST_URL}}\", \"target_url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
 
       - uses: actions/setup-node@v4
@@ -223,3 +225,4 @@ env:
   HOST_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io' }}
   REPORT_NAME: govtool-frontend
   GH_PAGES: ${{vars.GH_PAGES}}
+  COMMIT_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}

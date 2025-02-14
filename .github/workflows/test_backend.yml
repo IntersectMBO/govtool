@@ -46,6 +46,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.COMMIT_SHA }}
 
       - name: Set pending commit status
         id: set-pending-status
@@ -53,7 +55,7 @@ jobs:
           echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
           curl -X POST -H "Authorization: Bearer ${{ github.token }}" \
             -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
+            https://api.github.com/repos/${{ github.repository }}/statuses/${{ env.COMMIT_SHA }} \
             -d "{\"state\": \"pending\", \"context\": \"Backend Tests : ${{env.BASE_URL}}\", \"target_url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
 
 
@@ -184,3 +186,4 @@ env:
   BASE_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io/api' }}
   REPORT_NAME: govtool-backend
   GH_PAGES: ${{vars.GH_PAGES}}
+  COMMIT_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}

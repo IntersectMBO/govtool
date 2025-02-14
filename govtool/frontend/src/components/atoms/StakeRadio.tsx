@@ -57,7 +57,7 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
           >
             {stakeKey}
           </Typography>
-          <IconButton color="primary">
+          <IconButton color="primary" tabIndex={0}>
             <img
               alt="copy"
               onClick={(e) => {
@@ -65,6 +65,12 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
                 e.stopPropagation();
               }}
               src={isChecked ? ICONS.copyWhiteIcon : ICONS.copyIcon}
+              onKeyDown={(e) => {
+                if (e.ctrlKey && e.key === "c") {
+                  navigator.clipboard.writeText(stakeKey);
+                  e.stopPropagation();
+                }
+              }}
             />
           </IconButton>
         </Box>

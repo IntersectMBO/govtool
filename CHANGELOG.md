@@ -18,6 +18,7 @@ changes.
 - Add workflow to automatically update any of the @intersect.mbo package [Issue 2968](https://github.com/IntersectMBO/govtool/issues/2968)
 - Add Propose Governance Action button in governance actions dashboard [Issue 1188](https://github.com/IntersectMBO/govtool/issues/1188)
 - Add click handlers to non-interactive elements [Issue 2929](https://github.com/IntersectMBO/govtool/issues/2929)
+- Allow searching for yourself in DRep Directory [Issue 2993](https://github.com/IntersectMBO/govtool/issues/2993)
 
 ### Fixed
 

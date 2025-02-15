@@ -22,7 +22,6 @@ RUN \
   : "${VITE_METADATA_API_URL:?Build argument VITE_METADATA_API_URL is not set}" && \
   : "${VITE_GTM_ID:?Build argument VITE_GTM_ID is not set}" && \
   : "${VITE_NETWORK_FLAG:?Build argument VITE_NETWORK_FLAG is not set}" && \
-  : "${VITE_SENTRY_DSN:?Build argument VITE_SENTRY_DSN is not set}" && \
   : "${NPMRC_TOKEN:?Build argument NPMRC_TOKEN is not set}" && \
   : "${VITE_USERSNAP_SPACE_API_KEY:?Build argument VITE_USERSNAP_SPACE_API_KEY is not set}" && \
   : "${VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED:?Build argument VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED is not set}" && \

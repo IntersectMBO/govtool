@@ -1,12 +1,16 @@
 import environments from "@constants/environments";
+import { guardrailsScript, guardrailsScriptHash } from "@constants/index";
 import { proposal04Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { isBootStrapingPhase } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { expectWithInfo } from "@helpers/exceptionHandler";
-import { calculateHash, downloadMetadata } from "@helpers/metadata";
+import {
+  downloadMetadata,
+  uploadScriptAndGenerateUrl,
+} from "@helpers/metadata";
 import { extractProposalIdFromUrl } from "@helpers/string";
-import { invalid } from "@mock/index";
+import { invalid, valid } from "@mock/index";
 import { Download, Locator, Page, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
 import {
@@ -66,9 +70,9 @@ export default class ProposalSubmissionPage {
   readonly createNewProposalBtn = this.page.getByTestId(
     "create-new-proposal-button"
   );
-  readonly guardrailsScriptCheckbox = this.page.getByLabel(
-    "Do you want to provide new"
-  ); // BUG missing test id
+  readonly guardrailsScriptCheckbox = this.page.getByTestId(
+    "chb-prop-have-guardrails-script"
+  );
 
   // input fields
   readonly titleInput = this.page.getByTestId("title-input");
@@ -172,7 +176,9 @@ export default class ProposalSubmissionPage {
       await this.treasuryBtn.click();
     } else {
       await this.updateTheConstitutionBtn.click();
-      await this.guardrailsScriptCheckbox.click();
+      if (governanceProposal.has_guardrails) {
+        await this.guardrailsScriptCheckbox.click();
+      }
     }
 
     await this.fillupFormWithTypeSelected(governanceProposal);
@@ -199,12 +205,14 @@ export default class ProposalSubmissionPage {
       governanceProposal.prop_constitution_url
     );
 
-    await this.guardrailsScriptUrlInput.fill(
-      governanceProposal.prop_guardrails_script_url
-    );
-    await this.guardrailsScriptHashInput.fill(
-      governanceProposal.prop_guardrails_script_hash
-    );
+    if (governanceProposal.has_guardrails) {
+      await this.guardrailsScriptUrlInput.fill(
+        governanceProposal.prop_guardrails_script_url
+      );
+      await this.guardrailsScriptHashInput.fill(
+        governanceProposal.prop_guardrails_script_hash
+      );
+    }
   }
 
   async fillProposalLinks(proposal_links: Array<ProposalLink>) {
@@ -358,11 +366,19 @@ export default class ProposalSubmissionPage {
     await expect(this.continueBtn).toBeDisabled();
   }
 
-  generateValidProposalFormFields(
-    proposalType: ProposalType,
-    is_draft?: boolean,
-    receivingAddress?: string
-  ) {
+  async generateValidProposalFormFields({
+    proposalType,
+    is_draft,
+    receivingAddress,
+    hasGuardrails = true,
+    forValidation = false,
+  }: {
+    proposalType: ProposalType;
+    is_draft?: boolean;
+    receivingAddress?: string;
+    hasGuardrails?: boolean;
+    forValidation?: boolean;
+  }) {
     const proposal: ProposalCreateRequest = {
       prop_name: faker.lorem.sentence(6),
       prop_abstract: faker.lorem.words(5),
@@ -376,6 +392,7 @@ export default class ProposalSubmissionPage {
         },
       ],
       gov_action_type_id: Object.values(ProposalType).indexOf(proposalType),
+      has_guardrails: hasGuardrails,
       is_draft: !!is_draft,
     };
 
@@ -386,16 +403,28 @@ export default class ProposalSubmissionPage {
           .toString());
     }
     if (proposalType === ProposalType.updatesToTheConstitution) {
-      proposal.prop_constitution_url = faker.internet.url();
-      proposal.prop_guardrails_script_url = faker.internet.url();
-      proposal.prop_guardrails_script_hash = calculateHash(
-        faker.lorem.paragraph()
-      );
+      proposal.prop_constitution_url = forValidation
+        ? valid.url()
+        : environments.metadataBucketUrl + "/data.jsonId";
+
+      if (hasGuardrails) {
+        if (!forValidation) {
+          const url = await uploadScriptAndGenerateUrl(guardrailsScript);
+          proposal.prop_guardrails_script_url = url;
+          proposal.prop_guardrails_script_hash = guardrailsScriptHash;
+        } else {
+          proposal.prop_guardrails_script_url = valid.url();
+          proposal.prop_guardrails_script_hash = faker.string.alphanumeric(64);
+        }
+      }
     }
     return proposal;
   }
 
-  generateInValidProposalFormFields(proposalType: ProposalType) {
+  generateInValidProposalFormFields(
+    proposalType: ProposalType,
+    hasGuardrails: boolean = true
+  ) {
     const proposal: ProposalCreateRequest = {
       prop_name: invalid.proposalTitle(),
       prop_abstract: invalid.paragraph(2510),
@@ -409,6 +438,7 @@ export default class ProposalSubmissionPage {
         },
       ],
       gov_action_type_id: Object.values(ProposalType).indexOf(proposalType),
+      has_guardrails: hasGuardrails,
       is_draft: false,
     };
 
@@ -437,11 +467,12 @@ export default class ProposalSubmissionPage {
     );
 
     const proposalRequest: ProposalCreateRequest =
-      this.generateValidProposalFormFields(
-        (await isBootStrapingPhase()) ? ProposalType.info : proposalType,
-        false,
-        receivingAddr
-      );
+      await this.generateValidProposalFormFields({
+        proposalType: (await isBootStrapingPhase())
+          ? ProposalType.info
+          : proposalType,
+        receivingAddress: receivingAddr,
+      });
     await this.fillupForm(proposalRequest);
     await this.continueBtn.click();
     await this.submitBtn.click();
@@ -457,13 +488,13 @@ export default class ProposalSubmissionPage {
     await this.goto();
     await this.addLinkBtn.click();
 
-    const proposalFormValue = this.generateValidProposalFormFields(
-      proposalType,
-      true,
-      ShelleyWallet.fromJson(proposal04Wallet).rewardAddressBech32(
-        environments.networkId
-      )
-    );
+    const proposalFormValue = await this.generateValidProposalFormFields({
+      proposalType: proposalType,
+      is_draft: true,
+      receivingAddress: ShelleyWallet.fromJson(
+        proposal04Wallet
+      ).rewardAddressBech32(environments.networkId),
+    });
     await this.fillupForm(proposalFormValue);
 
     await this.saveDraftBtn.click();

@@ -64,11 +64,11 @@ test.describe("Proposal created logged state", () => {
             await ShelleyWallet.generate()
           ).rewardAddressBech32(environments.networkId);
           const formFields: ProposalCreateRequest =
-            proposalSubmissionPage.generateValidProposalFormFields(
-              type,
-              false,
-              rewardAddressBech32
-            );
+            await proposalSubmissionPage.generateValidProposalFormFields({
+              proposalType: type,
+              receivingAddress: rewardAddressBech32,
+              forValidation: true,
+            });
           await proposalSubmissionPage.validateForm(formFields);
         }
 
@@ -141,11 +141,10 @@ test.describe("Proposal created logged state", () => {
           wallet
         ).rewardAddressBech32(environments.networkId);
         const proposal: ProposalCreateRequest =
-          proposalSubmissionPage.generateValidProposalFormFields(
-            type,
-            false,
-            stakeAddressBech32
-          );
+          await proposalSubmissionPage.generateValidProposalFormFields({
+            proposalType: type,
+            receivingAddress: stakeAddressBech32,
+          });
 
         await proposalSubmissionPage.fillupForm(proposal);
         await proposalSubmissionPage.continueBtn.click();
@@ -195,11 +194,10 @@ test.describe("Proposal created logged state", () => {
           proposal01Wallet
         ).rewardAddressBech32(environments.networkId);
         const proposal: ProposalCreateRequest =
-          proposalSubmissionPage.generateValidProposalFormFields(
-            type,
-            false,
-            rewardAddressBech32
-          );
+          await proposalSubmissionPage.generateValidProposalFormFields({
+            proposalType: type,
+            receivingAddress: rewardAddressBech32,
+          });
 
         await proposalSubmissionPage.fillupForm(proposal);
         await proposalSubmissionPage.continueBtn.click();

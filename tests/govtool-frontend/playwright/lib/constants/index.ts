@@ -19,3 +19,12 @@ export const PROPOSAL_TYPE_FILTERS = [
 export const BOOTSTRAP_PROPOSAL_TYPE_FILTERS = ["Info Action"];
 
 export const PROPOSAL_STATUS_FILTER = ["Submitted for vote", "Active proposal"];
+
+export const guardrailsScript = {
+  type: "PlutusScriptV3",
+  description: "",
+  cborHex: "46450101004981",
+};
+
+export const guardrailsScriptHash =
+  "914d97d63e2b7113465739faddd82362b1deaeedbcc4d01016c35c6e";

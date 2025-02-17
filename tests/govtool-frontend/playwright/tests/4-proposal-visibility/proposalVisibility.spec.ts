@@ -75,13 +75,19 @@ test("4K. Should display correct vote counts on governance details page for disc
         `${proposalToCheck.txHash}#${proposalToCheck.index}`
       );
 
+      const dRepTotalAbstainVote =
+        await govActionDetailsPage.getDRepTotalAbstainVoted(
+          proposalToCheck,
+          metricsResponsePromise
+        );
+
       // check dRep votes
       if (await areDRepVoteTotalsDisplayed(proposalToCheck)) {
         await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
           `₳ ${correctVoteAdaFormat(proposalToCheck.dRepYesVotes)}`
         );
         await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(proposalToCheck.dRepAbstainVotes)}`
+          `₳ ${correctVoteAdaFormat(dRepTotalAbstainVote)}`
         );
         await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
           `₳ ${correctVoteAdaFormat(proposalToCheck.dRepNoVotes)}`

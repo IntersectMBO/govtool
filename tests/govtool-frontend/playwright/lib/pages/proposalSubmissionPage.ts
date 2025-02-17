@@ -10,7 +10,7 @@ import {
   uploadScriptAndGenerateUrl,
 } from "@helpers/metadata";
 import { extractProposalIdFromUrl } from "@helpers/string";
-import { invalid } from "@mock/index";
+import { invalid, valid } from "@mock/index";
 import { Download, Locator, Page, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
 import {
@@ -366,12 +366,19 @@ export default class ProposalSubmissionPage {
     await expect(this.continueBtn).toBeDisabled();
   }
 
-  async generateValidProposalFormFields(
-    proposalType: ProposalType,
-    is_draft?: boolean,
-    receivingAddress?: string,
-    hasGuardrails: boolean = true
-  ) {
+  async generateValidProposalFormFields({
+    proposalType,
+    is_draft,
+    receivingAddress,
+    hasGuardrails = true,
+    forValidation = false,
+  }: {
+    proposalType: ProposalType;
+    is_draft?: boolean;
+    receivingAddress?: string;
+    hasGuardrails?: boolean;
+    forValidation?: boolean;
+  }) {
     const proposal: ProposalCreateRequest = {
       prop_name: faker.lorem.sentence(6),
       prop_abstract: faker.lorem.words(5),
@@ -396,19 +403,28 @@ export default class ProposalSubmissionPage {
           .toString());
     }
     if (proposalType === ProposalType.updatesToTheConstitution) {
-      proposal.prop_constitution_url =
-        environments.metadataBucketUrl + "/data.jsonId";
+      proposal.prop_constitution_url = forValidation
+        ? valid.url()
+        : environments.metadataBucketUrl + "/data.jsonId";
 
-      if (proposal.has_guardrails) {
-        const url = await uploadScriptAndGenerateUrl(guardrailsScript);
-        proposal.prop_guardrails_script_url = url;
-        proposal.prop_guardrails_script_hash = guardrailsScriptHash;
+      if (hasGuardrails) {
+        if (!forValidation) {
+          const url = await uploadScriptAndGenerateUrl(guardrailsScript);
+          proposal.prop_guardrails_script_url = url;
+          proposal.prop_guardrails_script_hash = guardrailsScriptHash;
+        } else {
+          proposal.prop_guardrails_script_url = valid.url();
+          proposal.prop_guardrails_script_hash = faker.string.alphanumeric(64);
+        }
       }
     }
     return proposal;
   }
 
-  generateInValidProposalFormFields(proposalType: ProposalType) {
+  generateInValidProposalFormFields(
+    proposalType: ProposalType,
+    hasGuardrails: boolean = true
+  ) {
     const proposal: ProposalCreateRequest = {
       prop_name: invalid.proposalTitle(),
       prop_abstract: invalid.paragraph(2510),
@@ -422,6 +438,7 @@ export default class ProposalSubmissionPage {
         },
       ],
       gov_action_type_id: Object.values(ProposalType).indexOf(proposalType),
+      has_guardrails: hasGuardrails,
       is_draft: false,
     };
 
@@ -450,11 +467,12 @@ export default class ProposalSubmissionPage {
     );
 
     const proposalRequest: ProposalCreateRequest =
-      await this.generateValidProposalFormFields(
-        (await isBootStrapingPhase()) ? ProposalType.info : proposalType,
-        false,
-        receivingAddr
-      );
+      await this.generateValidProposalFormFields({
+        proposalType: (await isBootStrapingPhase())
+          ? ProposalType.info
+          : proposalType,
+        receivingAddress: receivingAddr,
+      });
     await this.fillupForm(proposalRequest);
     await this.continueBtn.click();
     await this.submitBtn.click();
@@ -470,13 +488,13 @@ export default class ProposalSubmissionPage {
     await this.goto();
     await this.addLinkBtn.click();
 
-    const proposalFormValue = await this.generateValidProposalFormFields(
-      proposalType,
-      true,
-      ShelleyWallet.fromJson(proposal04Wallet).rewardAddressBech32(
-        environments.networkId
-      )
-    );
+    const proposalFormValue = await this.generateValidProposalFormFields({
+      proposalType: proposalType,
+      is_draft: true,
+      receivingAddress: ShelleyWallet.fromJson(
+        proposal04Wallet
+      ).rewardAddressBech32(environments.networkId),
+    });
     await this.fillupForm(proposalFormValue);
 
     await this.saveDraftBtn.click();

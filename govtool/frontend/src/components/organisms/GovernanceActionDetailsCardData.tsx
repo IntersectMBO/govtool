@@ -42,7 +42,8 @@ type StyledTabProps = {
   isMobile: boolean;
 };
 
-const StyledTab = styled((props: StyledTabProps) => (
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const StyledTab = styled(({ isMobile, ...props }: StyledTabProps) => (
   <Tab disableRipple {...props} />
 ))(({ isMobile }) => ({
   textTransform: "none",

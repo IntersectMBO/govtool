@@ -1,8 +1,7 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { ProposalCreateRequest, ProposedGovAction } from "@types";
+import { ProposalCreateRequest, ProposalType, ProposedGovAction } from "@types";
 import environments from "lib/constants/environments";
 import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
-import { PROPOSAL_TYPE_FILTERS } from "@constants/index";
 
 export default class ProposalDiscussionPage {
   // Buttons
@@ -111,7 +110,7 @@ export default class ProposalDiscussionPage {
 
   async clickRadioButtonsByNames(names: string[]) {
     for (const name of names) {
-      const testId = PROPOSAL_TYPE_FILTERS.includes(name)
+      const testId = Object.values(ProposalType).includes(name as ProposalType)
         ? name.toLowerCase()
         : name.toLowerCase().replace(/ /g, "-");
       await this.page.getByTestId(`${testId}-radio`).click();

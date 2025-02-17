@@ -1,10 +1,14 @@
 import environments from "@constants/environments";
+import { guardrailsScript, guardrailsScriptHash } from "@constants/index";
 import { proposal04Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { isBootStrapingPhase } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { expectWithInfo } from "@helpers/exceptionHandler";
-import { calculateHash, downloadMetadata } from "@helpers/metadata";
+import {
+  downloadMetadata,
+  uploadScriptAndGenerateUrl,
+} from "@helpers/metadata";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { invalid } from "@mock/index";
 import { Download, Locator, Page, expect } from "@playwright/test";
@@ -172,7 +176,9 @@ export default class ProposalSubmissionPage {
       await this.treasuryBtn.click();
     } else {
       await this.updateTheConstitutionBtn.click();
-      await this.guardrailsScriptCheckbox.click();
+      if (governanceProposal.has_guardrails) {
+        await this.guardrailsScriptCheckbox.click();
+      }
     }
 
     await this.fillupFormWithTypeSelected(governanceProposal);
@@ -199,12 +205,14 @@ export default class ProposalSubmissionPage {
       governanceProposal.prop_constitution_url
     );
 
-    await this.guardrailsScriptUrlInput.fill(
-      governanceProposal.prop_guardrails_script_url
-    );
-    await this.guardrailsScriptHashInput.fill(
-      governanceProposal.prop_guardrails_script_hash
-    );
+    if (governanceProposal.has_guardrails) {
+      await this.guardrailsScriptUrlInput.fill(
+        governanceProposal.prop_guardrails_script_url
+      );
+      await this.guardrailsScriptHashInput.fill(
+        governanceProposal.prop_guardrails_script_hash
+      );
+    }
   }
 
   async fillProposalLinks(proposal_links: Array<ProposalLink>) {
@@ -358,10 +366,11 @@ export default class ProposalSubmissionPage {
     await expect(this.continueBtn).toBeDisabled();
   }
 
-  generateValidProposalFormFields(
+  async generateValidProposalFormFields(
     proposalType: ProposalType,
     is_draft?: boolean,
-    receivingAddress?: string
+    receivingAddress?: string,
+    hasGuardrails: boolean = true
   ) {
     const proposal: ProposalCreateRequest = {
       prop_name: faker.lorem.sentence(6),
@@ -376,6 +385,7 @@ export default class ProposalSubmissionPage {
         },
       ],
       gov_action_type_id: Object.values(ProposalType).indexOf(proposalType),
+      has_guardrails: hasGuardrails,
       is_draft: !!is_draft,
     };
 
@@ -386,11 +396,14 @@ export default class ProposalSubmissionPage {
           .toString());
     }
     if (proposalType === ProposalType.updatesToTheConstitution) {
-      proposal.prop_constitution_url = faker.internet.url();
-      proposal.prop_guardrails_script_url = faker.internet.url();
-      proposal.prop_guardrails_script_hash = calculateHash(
-        faker.lorem.paragraph()
-      );
+      proposal.prop_constitution_url =
+        environments.metadataBucketUrl + "/data.jsonId";
+
+      if (proposal.has_guardrails) {
+        const url = await uploadScriptAndGenerateUrl(guardrailsScript);
+        proposal.prop_guardrails_script_url = url;
+        proposal.prop_guardrails_script_hash = guardrailsScriptHash;
+      }
     }
     return proposal;
   }
@@ -437,7 +450,7 @@ export default class ProposalSubmissionPage {
     );
 
     const proposalRequest: ProposalCreateRequest =
-      this.generateValidProposalFormFields(
+      await this.generateValidProposalFormFields(
         (await isBootStrapingPhase()) ? ProposalType.info : proposalType,
         false,
         receivingAddr
@@ -457,7 +470,7 @@ export default class ProposalSubmissionPage {
     await this.goto();
     await this.addLinkBtn.click();
 
-    const proposalFormValue = this.generateValidProposalFormFields(
+    const proposalFormValue = await this.generateValidProposalFormFields(
       proposalType,
       true,
       ShelleyWallet.fromJson(proposal04Wallet).rewardAddressBech32(

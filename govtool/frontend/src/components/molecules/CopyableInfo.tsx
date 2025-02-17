@@ -33,7 +33,7 @@ export const CopyableInfo = ({
     <Typography color={gray.c300} fontSize={12} fontWeight={500}>
       {label}
     </Typography>
-    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+    <Box sx={{ display: "flex", justifyContent: "space-between" }} tabIndex={0}>
       <Typography
         textOverflow="ellipsis"
         overflow="hidden"

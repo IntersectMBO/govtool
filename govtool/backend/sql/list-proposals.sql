@@ -123,18 +123,23 @@ PoolVotes AS (
         rpv.gov_action_proposal_id, ps.epoch_no
 ),
 RankedDRepVotes AS (
-    SELECT
-        *,
-        ROW_NUMBER() OVER (PARTITION BY vp.drep_voter ORDER BY vp.tx_id DESC) AS rn
-    FROM
+    SELECT DISTINCT ON (vp.drep_voter, vp.gov_action_proposal_id)
+        *
+    FROM 
         voting_procedure vp
+    ORDER BY 
+        vp.drep_voter,
+        vp.gov_action_proposal_id,
+        vp.tx_id DESC
 ),
 RankedDRepRegistration AS (
-    SELECT
-        *,
-        ROW_NUMBER() OVER (PARTITION BY dr.drep_hash_id ORDER BY dr.tx_id DESC) AS rn
-    FROM
+    SELECT DISTINCT ON (dr.drep_hash_id)
+        *
+    FROM 
         drep_registration dr
+    ORDER BY 
+        dr.drep_hash_id,
+        dr.tx_id DESC
 ),
 CommitteeVotes AS (
     SELECT 
@@ -283,8 +288,8 @@ FROM
     LEFT JOIN cost_model AS cost_model ON proposal_params.cost_model_id = cost_model.id
 	LEFT JOIN PoolVotes ps ON gov_action_proposal.id = ps.gov_action_proposal_id
     LEFT JOIN CommitteeVotes cv ON gov_action_proposal.id = cv.gov_action_proposal_id
-    LEFT JOIN RankedDRepVotes rdv ON rdv.gov_action_proposal_id = gov_action_proposal.id AND rdv.rn = 1
-    LEFT JOIN RankedDRepRegistration rdr ON rdr.drep_hash_id = rdv.drep_voter AND COALESCE(rdr.deposit, 0) >= 0 AND rdr.rn = 1
+    LEFT JOIN RankedDRepVotes rdv ON rdv.gov_action_proposal_id = gov_action_proposal.id
+    LEFT JOIN RankedDRepRegistration rdr ON rdr.drep_hash_id = rdv.drep_voter AND COALESCE(rdr.deposit, 0) >= 0
 	LEFT JOIN LatestDrepDistr ldd_drep ON ldd_drep.hash_id = rdr.drep_hash_id
         AND ldd_drep.epoch_no = latest_epoch.no
     LEFT JOIN gov_action_proposal AS prev_gov_action ON gov_action_proposal.prev_gov_action_proposal = prev_gov_action.id

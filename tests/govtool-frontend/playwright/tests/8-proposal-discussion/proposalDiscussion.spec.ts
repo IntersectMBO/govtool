@@ -103,7 +103,7 @@ test("8D. Should show the view-all categorized proposed governance actions.", as
       const proposalDiscussionPage = new ProposalDiscussionPage(page);
       await proposalDiscussionPage.goto();
 
-      page
+      await page
         .getByTestId(
           proposalType.toLowerCase().replace(/ /g, "-") + "-show-all-button"
         )

@@ -73,6 +73,7 @@ export enum ProposalType {
   info = "Info Action",
   treasury = "Treasury requests",
   updatesToTheConstitution = "Updates to the Constitution",
+  motionOfNoConfedence = "Motion of No Confidence",
 }
 
 export enum BootstrapGovernanceActionType {

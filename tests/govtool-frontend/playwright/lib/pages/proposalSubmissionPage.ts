@@ -58,6 +58,9 @@ export default class ProposalSubmissionPage {
   readonly updateTheConstitutionBtn = this.page.getByTestId(
     "updates to the constitution-button"
   );
+  readonly motionOfNoConfidenceBtn = this.page.getByTestId(
+    "motion of no confidence-button"
+  );
   readonly editSubmissionButton = this.page.getByTestId(
     "edit-submission-button"
   );
@@ -174,11 +177,13 @@ export default class ProposalSubmissionPage {
       await this.infoBtn.click();
     } else if (governanceProposal.gov_action_type_id === 1) {
       await this.treasuryBtn.click();
-    } else {
+    } else if (governanceProposal.gov_action_type_id === 2) {
       await this.updateTheConstitutionBtn.click();
       if (governanceProposal.has_guardrails) {
         await this.guardrailsScriptCheckbox.click();
       }
+    } else {
+      await this.motionOfNoConfidenceBtn.click();
     }
 
     await this.fillupFormWithTypeSelected(governanceProposal);

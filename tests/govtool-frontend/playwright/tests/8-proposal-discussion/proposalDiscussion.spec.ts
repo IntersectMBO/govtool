@@ -2,7 +2,6 @@ import environments from "@constants/environments";
 import {
   BOOTSTRAP_PROPOSAL_TYPE_FILTERS,
   PROPOSAL_STATUS_FILTER,
-  PROPOSAL_TYPE_FILTERS,
 } from "@constants/index";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
@@ -50,7 +49,9 @@ test.describe("Filter and sort proposals", () => {
 
     // proposal type filter
     await proposalDiscussionPage.applyAndValidateFilters(
-      isBootStraping ? BOOTSTRAP_PROPOSAL_TYPE_FILTERS : PROPOSAL_TYPE_FILTERS,
+      isBootStraping
+        ? BOOTSTRAP_PROPOSAL_TYPE_FILTERS
+        : Object.values(ProposalType),
       proposalDiscussionPage._validateTypeFiltersInProposalCard
     );
 

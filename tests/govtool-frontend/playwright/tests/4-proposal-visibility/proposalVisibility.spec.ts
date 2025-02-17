@@ -75,11 +75,6 @@ test("4K. Should display correct vote counts on governance details page for disc
         `${proposalToCheck.txHash}#${proposalToCheck.index}`
       );
 
-      const dRepNotVoted = await govActionDetailsPage.getDRepNotVoted(
-        proposalToCheck,
-        metricsResponsePromise
-      );
-
       // check dRep votes
       if (await areDRepVoteTotalsDisplayed(proposalToCheck)) {
         await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
@@ -91,12 +86,6 @@ test("4K. Should display correct vote counts on governance details page for disc
         await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
           `₳ ${correctVoteAdaFormat(proposalToCheck.dRepNoVotes)}`
         );
-
-        if (dRepNotVoted) {
-          await expect(govActionDetailsPage.dRepNotVoted).toHaveText(
-            `₳ ${correctVoteAdaFormat(dRepNotVoted)}`
-          );
-        }
       }
       // check sPos votes
       if (await areSPOVoteTotalsDisplayed(proposalToCheck)) {

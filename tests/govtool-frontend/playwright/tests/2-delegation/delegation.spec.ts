@@ -84,20 +84,28 @@ test("2O. Should load more DReps on show more", async ({ page }) => {
   const dRepDirectory = new DRepDirectoryPage(page);
   await dRepDirectory.goto();
 
-  const dRepIdsBefore = await dRepDirectory.getAllListedCIP105DRepIds();
+  const dRepListBefore = await dRepDirectory.getDRepListFromApi(
+    SortOption.Random
+  );
+
+  const isShowMoreVisible = dRepListBefore.length >= 10;
+  await expect(dRepDirectory.showMoreBtn).toBeVisible({
+    visible: isShowMoreVisible,
+  });
+
+  if (!isShowMoreVisible) return;
+
   await dRepDirectory.showMoreBtn.click();
+  const dRepListAfter = await dRepDirectory.getDRepListFromApi(
+    SortOption.Random,
+    1
+  );
 
-  const dRepIdsAfter = await dRepDirectory.getAllListedCIP105DRepIds();
-  expect(dRepIdsAfter.length).toBeGreaterThanOrEqual(dRepIdsBefore.length);
-
-  if (dRepIdsAfter.length > dRepIdsBefore.length) {
-    await expect(dRepDirectory.showMoreBtn).toBeVisible();
-    expect(true).toBeTruthy();
-  } else {
-    await expect(dRepDirectory.showMoreBtn).not.toBeVisible();
-  }
+  const isShowMoreStillVisible = dRepListAfter.length >= dRepListBefore.length;
+  await expect(dRepDirectory.showMoreBtn).toBeVisible({
+    visible: isShowMoreStillVisible,
+  });
 });
-
 test("2K_1. Should filter DReps", async ({ page }) => {
   const dRepFilterOptions: DRepStatus[] = ["Active", "Inactive", "Retired"];
 

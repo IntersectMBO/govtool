@@ -11,8 +11,15 @@ export async function waitedLoop(
   return false;
 }
 
-export async function functionWaitedAssert(fn, options) {
-  const { timeout = 60000, interval = 2000, message } = options;
+export async function functionWaitedAssert(
+  fn,
+  options: { timeout?: number; interval?: number; message?: string } = {
+    timeout: 6000,
+    interval: 2000,
+    message: null,
+  }
+) {
+  const { timeout, interval, message } = options;
   const startTime = Date.now();
 
   while (true) {

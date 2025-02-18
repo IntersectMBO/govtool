@@ -41,6 +41,8 @@ export default class DRepDirectoryPage {
     '[data-testid$="-delegate-button"]'
   );
 
+  readonly NoDRepText = this.page.getByText("No DReps found");
+
   constructor(private readonly page: Page) {}
 
   async goto() {

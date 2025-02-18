@@ -16,7 +16,14 @@ import pkg from "../package.json";
 
 const { version } = pkg;
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    },
+  },
+});
 
 const tagManagerArgs = {
   gtmId: import.meta.env.VITE_GTM_ID,

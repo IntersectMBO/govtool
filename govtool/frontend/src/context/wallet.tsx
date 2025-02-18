@@ -249,6 +249,7 @@ interface CardanoContextType {
   ) => Promise<VotingBuilder>;
   pendingTransaction: PendingTransaction;
   isPendingTransaction: () => boolean;
+  isStakeKeyRegistered: () => boolean;
   buildNewInfoGovernanceAction: (
     infoProps: InfoProps,
   ) => Promise<VotingProposalBuilder | undefined>;
@@ -346,6 +347,12 @@ const CardanoProvider = (props: Props) => {
       console.error(err);
     }
   };
+
+  /**
+   * Checks if there are any registered stake keys.
+   * @returns {boolean} True if there are registered stake keys, false otherwise.
+   */
+  const isStakeKeyRegistered = () => !!registeredStakeKeysListState.length;
 
   const enable = useCallback(
     async (walletName: string) => {
@@ -1474,6 +1481,7 @@ const CardanoProvider = (props: Props) => {
       isEnabled,
       isMainnet,
       isPendingTransaction,
+      isStakeKeyRegistered,
       pendingTransaction,
       pubDRepKey,
       registeredStakeKeysListState,
@@ -1507,6 +1515,7 @@ const CardanoProvider = (props: Props) => {
       isEnabled,
       isMainnet,
       isPendingTransaction,
+      isStakeKeyRegistered,
       pendingTransaction,
       pubDRepKey,
       registeredStakeKeysListState,

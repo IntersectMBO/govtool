@@ -21,6 +21,7 @@ changes.
 - Allow searching for yourself in DRep Directory [Issue 2993](https://github.com/IntersectMBO/govtool/issues/2993)
 - Add mathematical styling for governance actions [Issue 2984](https://github.com/IntersectMBO/govtool/issues/2984)
 - Add script to update GovTool version
+- Add `isStakeKeyRegistered` for the usage by pillars [Issue 2384](https://github.com/IntersectMBO/govtool/issues/2384)
 
 ### Fixed
 

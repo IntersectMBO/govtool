@@ -19,6 +19,7 @@ changes.
 - Add Propose Governance Action button in governance actions dashboard [Issue 1188](https://github.com/IntersectMBO/govtool/issues/1188)
 - Add click handlers to non-interactive elements [Issue 2929](https://github.com/IntersectMBO/govtool/issues/2929)
 - Allow searching for yourself in DRep Directory [Issue 2993](https://github.com/IntersectMBO/govtool/issues/2993)
+- Add mathematical styling for governance actions [Issue 2984](https://github.com/IntersectMBO/govtool/issues/2984)
 
 ### Fixed
 

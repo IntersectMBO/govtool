@@ -2,6 +2,10 @@ import { PropsWithChildren } from "react";
 import { Box } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Markdown from "react-markdown";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
+
 import { Typography, Tooltip, CopyButton, TooltipProps } from "@atoms";
 import { removeMarkdown } from "@/utils";
 import { ICONS } from "@/consts";
@@ -125,7 +129,13 @@ export const GovernanceActionCardElement = ({
   };
 
   const renderMarkdown = () => (
-    <Markdown components={markdownComponents}>{text.toString()}</Markdown>
+    <Markdown
+      components={markdownComponents}
+      remarkPlugins={[remarkMath]}
+      rehypePlugins={[rehypeKatex]}
+    >
+      {text.toString()}
+    </Markdown>
   );
 
   const renderCopyButton = () =>

@@ -78,9 +78,29 @@ test.describe("Filter and sort proposals", () => {
 test("8C. Should search the list of proposed governance actions.", async ({
   page,
 }) => {
-  const proposalName = "Labadie, Stehr and Rosenbaum";
+  let proposalName = "Labadie, Stehr and Rosenbaum";
+
+  await page.route("**/api/proposals?**", async (route) => {
+    const response = await route.fetch();
+    const json = await response.json();
+    if ("data" in json && json["data"].length > 0) {
+      proposalName =
+        json["data"][json["data"].length - 1]["attributes"]["content"][
+          "attributes"
+        ]["prop_name"];
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(json),
+    });
+  });
+
+  const responsePromise = page.waitForResponse("**/api/proposals?**");
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
+
+  await responsePromise;
 
   await proposalDiscussionPage.searchInput.fill(proposalName);
 

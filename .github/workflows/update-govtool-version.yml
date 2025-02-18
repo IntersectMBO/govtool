@@ -49,7 +49,7 @@ jobs:
 
       - name: Update Metadata Validation API Version
         run: |
-          sed -i -E "s/(\.setVersion\()[\"'][0-9]+\.[0-9]+\.[0-9]+[\"']/\1\"$VERSION\"/" govtool/metadata-validation/main.ts
+          sed -i -E "s/(\.setVersion\()[\"'][0-9]+\.[0-9]+\.[0-9]+[\"']/\1\"$VERSION\"/" govtool/metadata-validation/src/main.ts
           echo "✅ Updated API version in main.ts"
 
       - name: Update CHANGELOG.md

@@ -197,7 +197,7 @@ export default class DRepDirectoryPage {
     const responsePromise = this.page.waitForResponse((response) =>
       response
         .url()
-        .includes(`api/drep/list?page=${pageNumber}&pageSize=10&sort=${option}`)
+        .includes(`drep/list?page=${pageNumber}&pageSize=10&sort=${option}`)
     );
     const response = await responsePromise;
     const json = await response.json();

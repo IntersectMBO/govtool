@@ -94,6 +94,7 @@ module.exports = {
       },
     ],
     "react/require-default-props": "off",
+    "react/no-unstable-nested-components": "off",
 
     // TODO: This rule should be enabled in the future
     "react-hooks/exhaustive-deps": "off",

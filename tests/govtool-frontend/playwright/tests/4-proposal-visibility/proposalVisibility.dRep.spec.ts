@@ -184,10 +184,11 @@ test.describe("Check vote count", () => {
           `${proposalToCheck.txHash}#${proposalToCheck.index}`
         );
 
-        const dRepNotVoted = await govActionDetailsPage.getDRepNotVoted(
-          proposalToCheck,
-          metricsResponsePromise
-        );
+        const dRepTotalAbstainVote =
+          await govActionDetailsPage.getDRepTotalAbstainVoted(
+            proposalToCheck,
+            metricsResponsePromise
+          );
 
         await govActionDetailsPage.showVotesBtn.click();
 
@@ -197,17 +198,11 @@ test.describe("Check vote count", () => {
             `₳ ${correctVoteAdaFormat(proposalToCheck.dRepYesVotes)}`
           );
           await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
-            `₳ ${correctVoteAdaFormat(proposalToCheck.dRepAbstainVotes)}`
+            `₳ ${correctVoteAdaFormat(dRepTotalAbstainVote)}`
           );
           await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
             `₳ ${correctVoteAdaFormat(proposalToCheck.dRepNoVotes)}`
           );
-
-          if (dRepNotVoted) {
-            await expect(govActionDetailsPage.dRepNotVoted).toHaveText(
-              `₳ ${correctVoteAdaFormat(dRepNotVoted)}`
-            );
-          }
         }
 
         // check sPos votes

@@ -124,6 +124,28 @@ export default class GovernanceActionDetailsPage {
     }
   }
 
+  async getDRepTotalAbstainVoted(
+    proposal: IProposal,
+    metricsResponsePromise: Promise<Response>
+  ): Promise<number | undefined> {
+    const metricsResponses = await Promise.resolve(metricsResponsePromise);
+    const alwaysAbstainVotingPower = await metricsResponses
+      .json()
+      .then((data) => data.alwaysAbstainVotingPower);
+
+    if (
+      alwaysAbstainVotingPower &&
+      typeof alwaysAbstainVotingPower === "number"
+    ) {
+      const totalAbstainVoted =
+        alwaysAbstainVotingPower + proposal.dRepAbstainVotes;
+
+      return totalAbstainVoted;
+    } else {
+      return proposal.dRepAbstainVotes;
+    }
+  }
+
   async downloadVoteMetadata() {
     const download: Download = await this.page.waitForEvent("download");
     return downloadMetadata(download);

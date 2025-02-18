@@ -1,0 +1,102 @@
+name: Update GovTool Version and Changelog
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "New version (e.g., 1.0.0)"
+        required: true
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          registry-url: "https://registry.npmjs.org/"
+          node-version-file: "./govtool/frontend/.nvmrc"
+          scope: "@intersect.mbo"
+
+      - name: Set Version Variable
+        run: echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+
+      - name: Update package.json files and install dependencies
+        run: |
+          jq --arg v "$VERSION" '.version = $v' govtool/frontend/package.json > temp.json && mv temp.json govtool/frontend/package.json
+          jq --arg v "$VERSION" '.version = $v' govtool/metadata-validation/package.json > temp.json && mv temp.json govtool/metadata-validation/package.json
+
+          echo "Running npm install to update lock files..."
+          cd govtool/frontend && npm install && cd ../..
+          cd govtool/metadata-validation && npm install && cd ../..
+
+      - name: Update vva-be.cabal version (Preserve Spacing)
+        run: |
+          sed -i -E "s/^(version:[[:space:]]+)[0-9]+\.[0-9]+\.[0-9]+/\1$VERSION/" govtool/backend/vva-be.cabal
+          echo "✅ Updated version in vva-be.cabal while preserving spacing."
+
+      - name: Update Dockerfile Versions
+        run: |
+          sed -i -E "s/vva-be-[0-9]+\.[0-9]+\.[0-9]+/vva-be-$VERSION/g" govtool/backend/Dockerfile
+          sed -i -E "s/vva-be-[0-9]+\.[0-9]+\.[0-9]+/vva-be-$VERSION/g" govtool/backend/Dockerfile.qovery
+          echo "✅ Updated vva-be version in Dockerfiles."
+
+      - name: Update Metadata Validation API Version
+        run: |
+          sed -i -E "s/(\.setVersion\()[\"'][0-9]+\.[0-9]+\.[0-9]+[\"']/\1\"$VERSION\"/" govtool/metadata-validation/src/main.ts
+          echo "✅ Updated API version in main.ts"
+
+      - name: Update CHANGELOG.md
+        run: |
+          #!/bin/bash
+          VERSION="${{ github.event.inputs.version }}"
+          TODAY=$(date +%Y-%m-%d)
+          RELEASE_TAG="v$VERSION"
+          RELEASE_LINK="[v$VERSION](https://github.com/IntersectMBO/govtool/releases/tag/$RELEASE_TAG)"
+          TEMP_FILE=$(mktemp)
+
+          echo "Updating CHANGELOG.md with version $VERSION and date $TODAY..."
+
+          awk -v rl="$RELEASE_LINK" -v td="$TODAY" '
+          BEGIN { unreleased_found = 0; print_new_unreleased = 1 }
+          {
+            if ($1 == "##" && $2 == "[Unreleased]") {
+              unreleased_found = 1
+
+              # Print the new Unreleased section with required sub-sections
+              print "## [Unreleased]\n"
+              print "### Added\n"
+              print "### Fixed\n"
+              print "### Changed\n"
+              print "### Removed\n"
+
+              # Rename the old Unreleased section with a version and date
+              print "## " rl " " td "\n"
+              next
+            }
+            print
+          }' CHANGELOG.md > "$TEMP_FILE"
+
+          mv "$TEMP_FILE" CHANGELOG.md
+
+          echo "✅ CHANGELOG.md updated successfully!"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: "chore/update-govtool-to-v${{ github.event.inputs.version }}"
+          title: "Update GovTool to v${{ github.event.inputs.version }}"
+          commit-message: "chore: update GovTool to v${{ github.event.inputs.version }}"
+          body: |
+            This PR updates GovTool to version `${{ github.event.inputs.version }}`.
+
+
+            Workflow executed by `@${{ github.actor }}`.
+          sign-commits: true

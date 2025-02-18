@@ -2,7 +2,6 @@ import environments from "@constants/environments";
 import {
   BOOTSTRAP_PROPOSAL_TYPE_FILTERS,
   PROPOSAL_STATUS_FILTER,
-  PROPOSAL_TYPE_FILTERS,
 } from "@constants/index";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
@@ -16,8 +15,6 @@ import { ProposalType } from "@types";
 const mockProposal = require("../../lib/_mock/proposal.json");
 const mockPoll = require("../../lib/_mock/proposalPoll.json");
 const mockComments = require("../../lib/_mock/proposalComments.json");
-const mockInfoProposedGA = require("../../lib/_mock/infoProposedGAs.json");
-const mockTreasuryProposal = require("../../lib/_mock/treasuryProposedGAs.json");
 
 test.beforeEach(async () => {
   await setAllureEpic("8. Proposal Discussion Forum");
@@ -52,7 +49,9 @@ test.describe("Filter and sort proposals", () => {
 
     // proposal type filter
     await proposalDiscussionPage.applyAndValidateFilters(
-      isBootStraping ? BOOTSTRAP_PROPOSAL_TYPE_FILTERS : PROPOSAL_TYPE_FILTERS,
+      isBootStraping
+        ? BOOTSTRAP_PROPOSAL_TYPE_FILTERS
+        : Object.values(ProposalType),
       proposalDiscussionPage._validateTypeFiltersInProposalCard
     );
 
@@ -98,35 +97,18 @@ test("8D. Should show the view-all categorized proposed governance actions.", as
   browser,
 }) => {
   await Promise.all(
-    Object.entries({
-      [ProposalType.info]: mockInfoProposedGA,
-      [ProposalType.treasury]: mockTreasuryProposal,
-    }).map(async ([proposalType, mockData]) => {
-      const requestUrl = `**/api/proposals?**`;
-      let requestHandled = 0;
-
+    Object.values(ProposalType).map(async (proposalType: string) => {
       const context = await browser.newContext();
       const page = await context.newPage();
-
-      await page.route(requestUrl, async (route) => {
-        if (requestHandled < 2) {
-          requestHandled = requestHandled + 1;
-          return route.fulfill({
-            body: JSON.stringify(mockData),
-          });
-        }
-        return route.continue();
-      });
 
       const proposalDiscussionPage = new ProposalDiscussionPage(page);
       await proposalDiscussionPage.goto();
 
-      await proposalDiscussionPage.filterBtn.click();
-      await proposalDiscussionPage.filterProposalByNames([proposalType]);
-      // to close the filter menu
-      await proposalDiscussionPage.filterBtn.click({ force: true });
-
-      proposalDiscussionPage.showAllBtn.click();
+      await page
+        .getByTestId(
+          proposalType.toLowerCase().replace(/ /g, "-") + "-show-all-button"
+        )
+        .click();
 
       const proposalCards = await proposalDiscussionPage.getAllProposals();
 

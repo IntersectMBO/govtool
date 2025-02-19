@@ -10,6 +10,9 @@ import { expect } from "@playwright/test";
 import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
 import { ProposalType } from "@types";
 import { proposalFaucetWallet } from "@constants/proposalFaucetWallet";
+import walletManager from "lib/walletManager";
+import { failureWithConsoleMessages } from "@helpers/exceptionHandler";
+import { valid } from "@mock/index";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
@@ -24,16 +27,19 @@ Object.values(ProposalType).forEach((proposalType, index) => {
   }, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
-    const tempUserAuth = await createTempUserAuth(page, proposalFaucetWallet);
+    const wallet = await walletManager.popWallet("proposalSubmission");
+
+    const tempUserAuth = await createTempUserAuth(page, wallet);
 
     const userPage = await createNewPageWithWallet(browser, {
       storageState: tempUserAuth,
-      wallet: proposalFaucetWallet,
+      wallet: wallet,
     });
 
     const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
     await proposalDiscussionPage.goto();
     await proposalDiscussionPage.verifyIdentityBtn.click();
+    await proposalDiscussionPage.setUsername(valid.username());
 
     const proposalSubmissionPage = new ProposalSubmissionPage(userPage);
     await proposalSubmissionPage.proposalCreateBtn.click();
@@ -51,13 +57,15 @@ Object.values(ProposalType).forEach((proposalType, index) => {
 
     await proposalSubmissionPage.fillUpValidMetadata();
 
-    await expect(userPage.getByTestId("ga-submitted-modal-title")).toHaveText(
-      /governance action submitted!/i,
-      {
-        timeout: 20_000,
-      }
-    );
+    await failureWithConsoleMessages(userPage, async () => {
+      await expect(userPage.getByTestId("ga-submitted-modal-title")).toHaveText(
+        /governance action submitted!/i,
+        {
+          timeout: 20_000,
+        }
+      );
 
-    await waitForTxConfirmation(userPage);
+      await waitForTxConfirmation(userPage);
+    });
   });
 });

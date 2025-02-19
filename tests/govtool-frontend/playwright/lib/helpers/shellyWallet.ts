@@ -12,3 +12,11 @@ export default function extractDRepFromWallet(wallet: ShelleyWallet) {
   const dRepIdBech32 = bech32.encode("drep", words);
   return dRepIdBech32;
 }
+
+export async function generateWallets(num: number) {
+  return await Promise.all(
+    Array.from({ length: num }, () =>
+      ShelleyWallet.generate().then((wallet) => wallet.json())
+    )
+  );
+}

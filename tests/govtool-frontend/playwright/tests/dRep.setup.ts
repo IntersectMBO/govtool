@@ -2,8 +2,8 @@ import environments from "@constants/environments";
 import { dRepWallets } from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
-import { ShelleyWallet } from "@helpers/crypto";
 import { uploadMetadataAndGetJsonHash } from "@helpers/metadata";
+import { generateWallets } from "@helpers/shellyWallet";
 import { pollTransaction } from "@helpers/transaction";
 import { expect, test as setup } from "@playwright/test";
 import kuberService from "@services/kuberService";
@@ -25,14 +25,6 @@ setup.beforeEach(async () => {
   await skipIfNotHardFork();
   await skipIfMainnet();
 });
-
-async function generateWallets(num: number) {
-  return await Promise.all(
-    Array.from({ length: num }, () =>
-      ShelleyWallet.generate().then((wallet) => wallet.json())
-    )
-  );
-}
 
 setup("Register DRep of static wallets", async () => {
   setup.setTimeout(environments.txTimeOut);

@@ -19,7 +19,8 @@ test.use({
 test("6H. Should restrict dRep registration for dRep", async ({ page }) => {
   await page.goto(`${environments.frontendUrl}/register_drep`);
 
-  await page.waitForTimeout(2_000);
-
+  await expect(page.getByText("You already are a DRep")).toBeVisible({
+    timeout: 20_000,
+  });
   await expect(page.getByTestId("name-input")).not.toBeVisible();
 });

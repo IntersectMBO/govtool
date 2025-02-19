@@ -3,7 +3,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 import { Typography, Tooltip } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { correctAdaFormat } from "@utils";
+import { correctVoteAdaFormat } from "@utils";
 
 type VotingPowerChipsProps = {
   votingPower?: number;
@@ -68,7 +68,7 @@ export const VotingPowerChips = ({
             fontWeight={600}
             sx={{ whiteSpace: "nowrap" }}
           >
-            ₳ {correctAdaFormat(votingPower) ?? 0}
+            ₳ {correctVoteAdaFormat(votingPower) ?? 0}
           </Typography>
         )}
       </Box>

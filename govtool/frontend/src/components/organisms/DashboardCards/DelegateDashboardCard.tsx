@@ -12,7 +12,7 @@ import {
   DelegationAction,
 } from "@molecules";
 import {
-  correctAdaFormat,
+  correctVoteAdaFormat,
   getMetadataDataMissingStatusTranslation,
   openInNewTab,
 } from "@utils";
@@ -59,7 +59,7 @@ export const DelegateDashboardCard = ({
   const onClickDelegateToAnotherDRep = () =>
     navigate(PATHS.dashboardDRepDirectory);
 
-  const ada = correctAdaFormat(votingPower);
+  const ada = correctVoteAdaFormat(votingPower);
 
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress
@@ -168,7 +168,7 @@ export const DelegateDashboardCard = ({
   );
 };
 
-const getDelegationTitle = (currentDelegation: string | null, ada: number) => {
+const getDelegationTitle = (currentDelegation: string | null, ada: string) => {
   const key =
     currentDelegation ===
     AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence
@@ -193,7 +193,7 @@ const getDelegationDescription = (currentDelegation: string | null) => {
   return <Trans i18nKey={key} />;
 };
 
-const getProgressDescription = (delegateTo: string, ada: number) => {
+const getProgressDescription = (delegateTo: string, ada: string) => {
   const key = (() => {
     if (!delegateTo) return undefined;
     switch (delegateTo) {

@@ -1,5 +1,7 @@
 import environments from "@constants/environments";
 import { proposalFaucetWallet } from "@constants/proposalFaucetWallet";
+import { setAllureEpic, setAllureStory } from "@helpers/allure";
+import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
 import { generateWallets } from "@helpers/shellyWallet";
 import { pollTransaction } from "@helpers/transaction";
 import { test as setup } from "@playwright/test";
@@ -13,6 +15,13 @@ let govActionDeposit: number;
 setup.beforeAll(async () => {
   const res = await kuberService.queryProtocolParams();
   govActionDeposit = res.govActionDeposit;
+});
+
+setup.beforeEach(async () => {
+  await setAllureEpic("Setup");
+  await setAllureStory("Proposal");
+  await skipIfNotHardFork();
+  await skipIfMainnet();
 });
 
 setup("Setup temporary proposal wallets", async () => {

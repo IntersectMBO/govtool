@@ -2,9 +2,10 @@ import environments from "@constants/environments";
 import { setAllureEpic } from "@helpers/allure";
 import { skipIfNotHardFork } from "@helpers/cardano";
 import { fetchFirstActiveDRepDetails } from "@helpers/dRep";
+import { functionWaitedAssert } from "@helpers/waitedLoop";
 import DRepDetailsPage from "@pages/dRepDetailsPage";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
-import { expect, test } from "@playwright/test";
+import { expect, Locator, test } from "@playwright/test";
 import { DRepStatus, IDRep } from "@types";
 
 test.beforeEach(async () => {
@@ -81,16 +82,38 @@ test("2K_3. Should sort DReps randomly", async ({ page }) => {
 });
 
 test("2O. Should load more DReps on show more", async ({ page }) => {
+  const responsePromise = page.waitForResponse((response) =>
+    response
+      .url()
+      .includes(`drep/list?page=1&pageSize=10&sort=${SortOption.Random}`)
+  );
   const dRepDirectory = new DRepDirectoryPage(page);
   await dRepDirectory.goto();
 
-  const dRepIdsBefore = await dRepDirectory.getAllListedCIP105DRepIds();
-  await dRepDirectory.showMoreBtn.click();
+  let dRepIdsBefore: Locator[];
+  let dRepIdsAfter: Locator[];
 
-  const dRepIdsAfter = await dRepDirectory.getAllListedCIP105DRepIds();
-  expect(dRepIdsAfter.length).toBeGreaterThanOrEqual(dRepIdsBefore.length);
+  await functionWaitedAssert(
+    async () => {
+      dRepIdsBefore = await dRepDirectory.getAllListedCIP105DRepIds();
+      await dRepDirectory.showMoreBtn.click();
+    },
+    { message: "Show more button not visible" }
+  );
 
-  if (dRepIdsAfter.length > dRepIdsBefore.length) {
+  const response = await responsePromise;
+  const json = await response.json();
+  const dRepListAfter = json.elements;
+
+  await functionWaitedAssert(
+    async () => {
+      dRepIdsAfter = await dRepDirectory.getAllListedCIP105DRepIds();
+      expect(dRepIdsAfter.length).toBeGreaterThanOrEqual(dRepIdsBefore.length);
+    },
+    { message: "DReps not loaded after clicking show more" }
+  );
+
+  if (dRepListAfter.length >= dRepIdsBefore.length) {
     await expect(dRepDirectory.showMoreBtn).toBeVisible();
     expect(true).toBeTruthy();
   } else {

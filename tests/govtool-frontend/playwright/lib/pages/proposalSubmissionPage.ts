@@ -129,8 +129,6 @@ export default class ProposalSubmissionPage {
   async goto() {
     await this.page.goto(`${environments.frontendUrl}/proposal_discussion`);
 
-    await this.page.waitForTimeout(2_000); // wait until page load properly
-
     await this.verifyIdentityBtn.click();
     await this.proposalCreateBtn.click();
 
@@ -482,9 +480,7 @@ export default class ProposalSubmissionPage {
     await this.continueBtn.click();
     await this.submitBtn.click();
 
-    // Wait for redirection to `proposal-discussion-details` page
-    await this.page.waitForTimeout(2_000);
-
+    await expect(this.page.getByTestId("submit-as-GA-button")).toBeVisible();
     const currentPageUrl = this.page.url();
     return extractProposalIdFromUrl(currentPageUrl);
   }

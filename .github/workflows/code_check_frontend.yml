@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: govtool/frontend/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: govtool/frontend/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
@@ -70,7 +70,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: govtool/frontend/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}

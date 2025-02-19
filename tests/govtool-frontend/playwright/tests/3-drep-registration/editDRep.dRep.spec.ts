@@ -73,7 +73,7 @@ test.describe("Validation of edit dRep Form", () => {
     const editDRepPage = new EditDRepPage(page);
     await editDRepPage.goto();
 
-    await page.waitForTimeout(3_000); // wait until dRep information load properly
+    await expect(editDRepPage.nameInput).toBeVisible({ timeout: 20_000 }); // assert to wait for the page to load
 
     for (let i = 0; i < 100; i++) {
       await editDRepPage.inValidateForm({

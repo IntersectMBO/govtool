@@ -101,12 +101,16 @@ test.describe("DRep dependent tests", () => {
 
   test("2I. Should check validity of DRep Id", async () => {
     await dRepDirectoryPage.searchInput.fill(dRepId);
-    await expect(dRepDirectoryPage.getDRepCard(dRepId)).toBeVisible();
+    await expect(dRepDirectoryPage.getDRepCard(dRepId)).toBeVisible({
+      timeout: 20_000,
+    });
 
     const wallet = await ShelleyWallet.generate();
     const invalidDRepId = extractDRepFromWallet(wallet);
 
     await dRepDirectoryPage.searchInput.fill(invalidDRepId);
+
+    await expect(dRepDirectoryPage.NoDRepText).toBeVisible();
     await expect(
       dRepDirectoryPage.getDRepCard(invalidDRepId)
     ).not.toBeVisible();

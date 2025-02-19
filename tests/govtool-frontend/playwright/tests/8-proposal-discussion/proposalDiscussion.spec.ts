@@ -7,6 +7,7 @@ import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
 import { isBootStrapingPhase, skipIfNotHardFork } from "@helpers/cardano";
+import { functionWaitedAssert } from "@helpers/waitedLoop";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { expect } from "@playwright/test";
@@ -78,19 +79,49 @@ test.describe("Filter and sort proposals", () => {
 test("8C. Should search the list of proposed governance actions.", async ({
   page,
 }) => {
-  const proposalName = "Labadie, Stehr and Rosenbaum";
+  let proposalName = "Labadie, Stehr and Rosenbaum";
+  let proposalNameSet = false;
+
+  await page.route("**/api/proposals?**", async (route) => {
+    const response = await route.fetch();
+    const json = await response.json();
+    if (!proposalNameSet && "data" in json && json["data"].length > 0) {
+      const randomIndex = Math.floor(Math.random() * json["data"].length);
+      proposalName =
+        json["data"][randomIndex]["attributes"]["content"]["attributes"][
+          "prop_name"
+        ];
+      proposalNameSet = true;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(json),
+    });
+  });
+
+  const responsePromise = page.waitForResponse("**/api/proposals?**");
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
 
+  await responsePromise;
+
   await proposalDiscussionPage.searchInput.fill(proposalName);
 
-  const proposalCards = await proposalDiscussionPage.getAllProposals();
-
-  for (const proposalCard of proposalCards) {
-    await expect(
-      proposalCard.locator('[data-testid^="proposal-"][data-testid$="-title"]')
-    ).toHaveText(proposalName);
-  }
+  await functionWaitedAssert(
+    async () => {
+      const proposalCards = await proposalDiscussionPage.getAllProposals();
+      for (const proposalCard of proposalCards) {
+        const proposalTitle = await proposalCard
+          .locator('[data-testid^="proposal-"][data-testid$="-title"]')
+          .innerText();
+        expect(proposalTitle).toContain(proposalName);
+      }
+    },
+    {
+      message: `A proposal card does not contain the search term ${proposalName}`,
+    }
+  );
 });
 
 test("8D. Should show the view-all categorized proposed governance actions.", async ({

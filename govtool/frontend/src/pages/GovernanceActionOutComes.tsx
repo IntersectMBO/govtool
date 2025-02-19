@@ -1,9 +1,12 @@
-import Outcomes from "@intersect.mbo/govtool-outcomes-pillar-ui";
 import { Box, CircularProgress } from "@mui/material";
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import { Footer, TopNav } from "@/components/organisms";
 import { useCardano } from "@/context";
 import { useScreenDimension } from "@/hooks";
+
+const GovernanceActionsOutcomes = React.lazy(
+  () => import("@intersect.mbo/govtool-outcomes-pillar-ui/dist/esm"),
+);
 
 export const GovernanceActionOutComesPillar = () => {
   const { pagePadding } = useScreenDimension();
@@ -40,10 +43,7 @@ export const GovernanceActionOutComesPillar = () => {
             </Box>
           }
         >
-          {/* TODO: Remove this comments when tsc issue is resolved */}
-          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-          {/* @ts-expect-error */}
-          <Outcomes description="" />
+          <GovernanceActionsOutcomes />
         </Suspense>
       </Box>
       {!context.isEnabled && <Footer />}

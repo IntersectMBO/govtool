@@ -1490,7 +1490,7 @@
 
 "@intersect.mbo/govtool-outcomes-pillar-ui@1.2.0":
   version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@intersect.mbo/govtool-outcomes-pillar-ui/-/govtool-outcomes-pillar-ui-1.2.0.tgz#f4b74de7a56adaed342fa430dc277cd775ea3d62"
+  resolved "https://registry.npmjs.org/@intersect.mbo/govtool-outcomes-pillar-ui/-/govtool-outcomes-pillar-ui-1.2.0.tgz"
   integrity sha512-AzY2pOAExXCz7M6S2YeIglZ06Gdf0N9gWxJBRDQ2BuDsRC2arn4DwT2F+XHyOhM2AWSZeql0Dx86a0pZP7a1+w==
   dependencies:
     "@fontsource/poppins" "^5.0.14"

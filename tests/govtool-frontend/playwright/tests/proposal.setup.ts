@@ -36,9 +36,9 @@ setup("Setup temporary proposal wallets", async () => {
     proposalFaucetWallet.address,
     proposalFaucetWallet.payment.private
   );
-  await pollTransaction(transferRes.txId, transferRes.lockInfo);
-
   // save to file
   await walletManager.writeWallets(proposalWallets, "proposalSubmission");
   await walletManager.writeWallets(proposalWallets, "proposalSubmissionCopy");
+
+  await pollTransaction(transferRes.txId, transferRes.lockInfo);
 });

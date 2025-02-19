@@ -11,6 +11,7 @@ import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
 import { ProposalType } from "@types";
 import { proposalFaucetWallet } from "@constants/proposalFaucetWallet";
 import walletManager from "lib/walletManager";
+import { failureWithConsoleMessages } from "@helpers/exceptionHandler";
 import { valid } from "@mock/index";
 
 test.beforeEach(async () => {
@@ -56,13 +57,15 @@ Object.values(ProposalType).forEach((proposalType, index) => {
 
     await proposalSubmissionPage.fillUpValidMetadata();
 
-    await expect(userPage.getByTestId("ga-submitted-modal-title")).toHaveText(
-      /governance action submitted!/i,
-      {
-        timeout: 20_000,
-      }
-    );
+    await failureWithConsoleMessages(userPage, async () => {
+      await expect(userPage.getByTestId("ga-submitted-modal-title")).toHaveText(
+        /governance action submitted!/i,
+        {
+          timeout: 20_000,
+        }
+      );
 
-    await waitForTxConfirmation(userPage);
+      await waitForTxConfirmation(userPage);
+    });
   });
 });

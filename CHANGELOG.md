@@ -31,6 +31,7 @@ changes.
 - Remove abstain votes (not auto abstain) from total DRep stake
 - Fix counting committee members [Issue 2948](https://github.com/IntersectMBO/govtool/issues/2948)
 - Fix refetching DRep list on every enter [Issue 2994](https://github.com/IntersectMBO/govtool/issues/2994)
+- Fix displaying helper buttons on governance action card details [Issue 3022](https://github.com/IntersectMBO/govtool/issues/3022)
 
 ### Changed
 

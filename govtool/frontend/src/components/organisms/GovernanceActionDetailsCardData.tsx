@@ -338,14 +338,14 @@ export const GovernanceActionDetailsCardData = ({
           <GovernanceActionCardElement
             label={t("govActions.anchorURL")}
             text={url}
-            textVariant="longText"
+            textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
             dataTestId="anchor-url"
             isLinkButton
           />
           <GovernanceActionCardElement
             label={t("govActions.anchorHash")}
             text={metadataHash}
-            textVariant="longText"
+            textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
             dataTestId="anchor-hash"
             isCopyButton
           />

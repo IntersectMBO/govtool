@@ -190,19 +190,6 @@ export default class DRepDirectoryPage {
 
     return this.page.locator('[data-testid$="-drep-card"]').all();
   }
-  async getDRepListFromApi(
-    option: string,
-    pageNumber: number = 0
-  ): Promise<IDRep[]> {
-    const responsePromise = this.page.waitForResponse((response) =>
-      response
-        .url()
-        .includes(`drep/list?page=${pageNumber}&pageSize=10&sort=${option}`)
-    );
-    const response = await responsePromise;
-    const json = await response.json();
-    return json.elements;
-  }
 
   async verifyDRepInList(dRepId: string) {
     await this.goto();

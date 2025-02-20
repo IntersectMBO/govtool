@@ -5,17 +5,20 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NamedFieldPuns        #-}
 {-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE LambdaCase            #-}
 
 module VVA.Types where
 
 import           Control.Concurrent.QSem
 import           Control.Exception
 import           Control.Monad.Except       (MonadError)
+import           Control.Monad              (fail)
 import           Control.Monad.Fail         (MonadFail)
 import           Control.Monad.IO.Class     (MonadIO)
 import           Control.Monad.Reader       (MonadReader)
 
-import           Data.Aeson                 (Value, ToJSON (..), object, (.=))
+import qualified Data.Aeson                 as Aeson
+import           Data.Aeson                 (Value, ToJSON (..), FromJSON (..), object, (.=), (.:), (.:?), withObject)
 import qualified Data.Cache                 as Cache
 import           Data.Has
 import           Data.Pool                  (Pool)
@@ -25,9 +28,11 @@ import           Data.Scientific
 
 import           Database.PostgreSQL.Simple (Connection)
 import           Database.PostgreSQL.Simple.FromRow
+import           Database.PostgreSQL.Simple.ToField (ToField (..))
 
 import           VVA.Cache
 import           VVA.Config
+import           VVA.Common.Types (DRepSortMode, DRep)
 
 type App m = (MonadReader AppEnv m, MonadIO m, MonadFail m, MonadError AppError m)
 
@@ -97,7 +102,25 @@ data DRepInfo
 
 data DRepStatus = Active | Inactive | Retired deriving (Show, Eq, Ord)
 
+instance Aeson.FromJSON DRepStatus where
+  parseJSON = Aeson.withText "DRepStatus" $ \case
+    "Active"   -> pure Active
+    "Inactive" -> pure Inactive
+    "Retired"  -> pure Retired
+    _          -> fail "Invalid DRepStatus"
+    
+instance ToField DRepStatus where
+  toField Active   = toField ("Active" :: Text)
+  toField Inactive = toField ("Inactive" :: Text)
+  toField Retired  = toField ("Retired" :: Text)
+
 data DRepType = DRep | SoleVoter deriving (Show, Eq)
+
+instance Aeson.FromJSON DRepType where
+  parseJSON = Aeson.withText "DRepType" $ \case
+    "DRep"      -> pure DRep
+    "SoleVoter" -> pure SoleVoter
+    _           -> fail "Invalid DRepType"
 
 data DRepRegistration
   = DRepRegistration
@@ -122,6 +145,30 @@ data DRepRegistration
       , dRepRegistrationImageHash              :: Maybe Text
       }
   deriving (Show)
+
+-- That should map field names in SQL query
+instance FromJSON DRepRegistration where
+  parseJSON = withObject "DRepRegistration" $ \v ->
+    DRepRegistration
+      <$> v .: "drep_hash"
+      <*> v .: "view"
+      <*> v .: "has_script"
+      <*> v .:? "url"
+      <*> v .:? "metadata_hash"
+      <*> v .: "deposit"
+      <*> v .:? "amount"
+      <*> v .: "status"
+      <*> v .: "drep_type"
+      <*> v .:? "tx_hash"
+      <*> v .: "last_register_time"
+      <*> v .:? "fetch_error"
+      <*> v .:? "payment_address"
+      <*> v .:? "given_name"
+      <*> v .:? "objectives"
+      <*> v .:? "motivations"
+      <*> v .:? "qualifications"
+      <*> v .:? "image_url"
+      <*> v .:? "image_hash"
 
 data Proposal 
   = Proposal
@@ -211,7 +258,7 @@ data CacheEnv
       , dRepGetVotesCache :: Cache.Cache Text ([Vote], [Proposal])
       , dRepInfoCache :: Cache.Cache Text DRepInfo
       , dRepVotingPowerCache :: Cache.Cache Text Integer
-      , dRepListCache :: Cache.Cache Text [DRepRegistration]
+      , dRepListCache :: Cache.Cache Text (Int, [DRep])
       , networkMetricsCache :: Cache.Cache () NetworkMetrics
       }
 

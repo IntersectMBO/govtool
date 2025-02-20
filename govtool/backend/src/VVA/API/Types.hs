@@ -54,40 +54,7 @@ import           VVA.API.Utils
 import           VVA.Config
 import qualified VVA.Proposal               as Proposal
 import           VVA.Types                  (AppError (ValidationError))
-
-newtype HexText
-  = HexText { unHexText :: Text }
-  deriving newtype (Eq, Show)
-
-instance FromJSON HexText where
-  parseJSON (Aeson.String t) = do
-    if Text.length t `mod` 2 == 1 || Text.any (not . isHexDigit) t
-      then mzero
-      else pure $ HexText t
-
-instance ToJSON HexText where
-  toJSON (HexText t) = Aeson.String t
-
--- To use it in routes, we need to be able to parse it from Text:
-instance FromHttpApiData HexText where
-  parseUrlPiece txt
-    | Text.all isHexDigit txt && even (Text.length txt) = Right (HexText txt)
-    | otherwise            = Left "Not a valid hex value"
-
-
-instance ToParamSchema HexText where
-  toParamSchema _ = mempty
-    & type_ ?~ OpenApiString
-    & format ?~ "hex"
-
-instance ToSchema HexText where
-  declareNamedSchema _ = do
-    textSchema <- declareNamedSchema (Proxy :: Proxy Text)
-    return $ textSchema
-      & name ?~ "HexText"
-      & schema . type_ ?~ OpenApiString
-      & schema . format ?~ "hex"
-      & schema . example ?~ toJSON (HexText "a1b2c3")
+import           VVA.Common.Types 
 
 newtype AnyValue
   = AnyValue { unAnyValue :: Maybe Value }
@@ -203,37 +170,6 @@ instance ToParamSchema GovernanceActionType where
     mempty
       & type_ ?~ OpenApiString
       & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [GovernanceActionType])
-
-
-data DRepSortMode = Random | VotingPower | RegistrationDate | Status deriving (Bounded, Enum, Eq, Generic, Read, Show)
-
-instance FromJSON DRepSortMode where
-  parseJSON (Aeson.String dRepSortMode) = pure $ fromJust $ readMaybe (Text.unpack dRepSortMode)
-  parseJSON _                           = fail ""
-
-instance ToJSON DRepSortMode where
-  toJSON x = Aeson.String $ Text.pack $ show x
-
-instance ToSchema DRepSortMode where
-  declareNamedSchema proxy = do
-    NamedSchema name_ schema_ <- genericDeclareNamedSchema (fromAesonOptions defaultOptions) proxy
-    return $
-      NamedSchema name_ $
-        schema_
-          & description ?~ "DRep Sort Mode"
-          & example ?~ toJSON VotingPower
-
-instance FromHttpApiData DRepSortMode where
-  parseQueryParam t = case readMaybe $ Text.unpack t of
-    Just x  -> Right x
-    Nothing -> Left ("incorrect DRep sort mode: " <> t)
-
-instance ToParamSchema DRepSortMode where
-  toParamSchema _ =
-    mempty
-      & type_ ?~ OpenApiString
-      & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [DRepSortMode])
-
 
 data GovernanceActionSortMode = SoonestToExpire | NewestCreated | MostYesVotes deriving
     ( Bounded
@@ -673,115 +609,6 @@ instance ToSchema GetTransactionStatusResponse where
         & example
           ?~ toJSON exampleGetTransactionStatusResponse
 
-newtype DRepHash
-  = DRepHash Text
-  deriving (Generic, Show)
-
-instance FromJSON DRepHash where
-  parseJSON (Aeson.String s) = pure $ DRepHash s
-  parseJSON x                = fail ("expected DRepHash to be a string but got: " <> Char8.unpack (encode x))
-
-instance ToJSON DRepHash where
-  toJSON (DRepHash raw) = toJSON raw
-
-
-exampleDrepHash :: Text
-exampleDrepHash = "b4e4184bfedf920fec53cdc327de4da661ae427784c0ccca9e3c2f50"
-
-instance ToSchema DRepHash where
-    declareNamedSchema _ = pure $ NamedSchema (Just "DRepHash") $ mempty
-        & type_ ?~ OpenApiObject
-        & description ?~ "Hash of a DRep"
-        & example
-          ?~ toJSON exampleDrepHash
-
-
-data DRepStatus = Active | Inactive | Retired deriving (Bounded, Enum, Eq, Generic, Ord, Read, Show)
-
--- ToJSON instance for DRepStatus
-instance ToJSON DRepStatus where
-  toJSON Retired  = "Retired"
-  toJSON Active   = "Active"
-  toJSON Inactive = "Inactive"
-
--- FromJSON instance for DRepStatus
-instance FromJSON DRepStatus where
-  parseJSON = withText "DRepStatus" $ \case
-    "Retired"  -> pure Retired
-    "Active"   -> pure Active
-    "Inactive" -> pure Inactive
-    _          -> fail "Invalid DRepStatus"
-
--- ToSchema instance for DRepStatus
-instance ToSchema DRepStatus where
-    declareNamedSchema _ = pure $ NamedSchema (Just "DRepStatus") $ mempty
-        & type_ ?~ OpenApiString
-        & description ?~ "DRep Status"
-        & enum_ ?~ map toJSON [Retired, Active, Inactive]
-
-instance FromHttpApiData DRepStatus where
-  parseQueryParam t = case readMaybe $ Text.unpack t of
-    Just x  -> Right x
-    Nothing -> Left ("incorrect DRep status " <> t)
-
-instance ToParamSchema DRepStatus where
-  toParamSchema _ =
-    mempty
-      & type_ ?~ OpenApiString
-      & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [DRepStatus])
-
-data DRepType = NormalDRep | SoleVoter
-
-instance Show DRepType where
-  show NormalDRep = "DRep"
-  show SoleVoter  = "SoleVoter"
-
--- ToJSON instance for DRepType
-instance ToJSON DRepType where
-  toJSON NormalDRep = "DRep"
-  toJSON SoleVoter  = "SoleVoter"
-
--- FromJSON instance for DRepType
-instance FromJSON DRepType where
-  parseJSON = withText "DRepType" $ \case
-    "DRep"      -> pure NormalDRep
-    "SoleVoter" -> pure SoleVoter
-    _           -> fail "Invalid DRepType"
-
--- ToSchema instance for DRepType
-instance ToSchema DRepType where
-    declareNamedSchema _ = pure $ NamedSchema (Just "DRepType") $ mempty
-        & type_ ?~ OpenApiString
-        & description ?~ "DRep Type"
-        & enum_ ?~ map toJSON [NormalDRep, SoleVoter]
-
-data DRep
-  = DRep
-      { dRepIsScriptBased          :: Bool
-      , dRepDrepId                 :: DRepHash
-      , dRepView                   :: Text
-      , dRepUrl                    :: Maybe Text
-      , dRepMetadataHash           :: Maybe Text
-      , dRepDeposit                :: Integer
-      , dRepVotingPower            :: Maybe Integer
-      , dRepStatus                 :: DRepStatus
-      , dRepType                   :: DRepType
-      , dRepLatestTxHash           :: Maybe HexText
-      , dRepLatestRegistrationDate :: UTCTime
-      , dRepMetadataError          :: Maybe Text
-      , dRepPaymentAddress         :: Maybe Text
-      , dRepGivenName              :: Maybe Text
-      , dRepObjectives             :: Maybe Text
-      , dRepMotivations            :: Maybe Text
-      , dRepQualifications         :: Maybe Text
-      , dRepImageUrl               :: Maybe Text
-      , dRepImageHash              :: Maybe HexText
-      }
-  deriving (Generic, Show)
-
-
-deriveJSON (jsonOptions "dRep") ''DRep
-
 exampleDrep :: Text
 exampleDrep =
      "{\"drepId\": \"d3a62ffe9c214e1a6a9809f7ab2a104c117f85e1f171f8f839d94be5\","
@@ -802,21 +629,6 @@ exampleDrep =
   <> "\"qualifications\": \"Some Qualifications\","
   <> "\"imageUrl\": \"https://image.url\","
   <> "\"imageHash\": \"9198b1b204273ba5c67a13310b5a806034160f6a063768297e161d9b759cad61\"}"
-
--- ToSchema instance for DRep
-instance ToSchema DRep where
-    declareNamedSchema proxy = do
-      NamedSchema name_ schema_ <-
-        genericDeclareNamedSchema
-        ( fromAesonOptions $ jsonOptions "dRep" )
-        proxy
-      return $
-        NamedSchema name_ $
-          schema_
-            & description ?~ "DRep"
-            & example
-              ?~ toJSON exampleDrep
-
 
 exampleListDRepsResponse :: Text
 exampleListDRepsResponse =

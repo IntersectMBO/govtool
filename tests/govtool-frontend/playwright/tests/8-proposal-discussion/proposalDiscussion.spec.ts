@@ -109,6 +109,8 @@ test("8C. Should search the list of proposed governance actions.", async ({
 
   await proposalDiscussionPage.searchInput.fill(proposalName);
 
+  await page.waitForTimeout(2000);
+
   await functionWaitedAssert(
     async () => {
       const proposalCards = await proposalDiscussionPage.getAllProposals();

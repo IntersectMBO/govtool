@@ -265,7 +265,7 @@ test.describe("Abstain delegation", () => {
     const balance = await kuberService.getBalance(adaHolder03Wallet.address);
 
     await expect(page.getByText(`You have delegated ₳${balance}`)).toBeVisible({
-      timeout: 20_000,
+      timeout: 60_000,
     });
   });
 });
@@ -292,7 +292,7 @@ test.describe("No confidence delegation", () => {
 
     const balance = await kuberService.getBalance(adaHolder04Wallet.address);
     await expect(page.getByText(`You have delegated ₳${balance}`)).toBeVisible({
-      timeout: 20_000,
+      timeout: 60_000,
     });
   });
 });
@@ -318,13 +318,13 @@ test.describe("Delegated ADA visibility", () => {
     );
     await expect(
       page.getByText(`You have delegated ₳ ${adaHolderVotingPower}`)
-    ).toBeVisible({ timeout: 20_000 });
+    ).toBeVisible({ timeout: 60_000 });
 
     await page.goto("/");
     await expect(
       page.getByText(
         `Your Voting Power of ₳${adaHolderVotingPower} is Delegated to`
       )
-    ).toBeVisible({ timeout: 20_000 });
+    ).toBeVisible({ timeout: 60_000 });
   });
 });

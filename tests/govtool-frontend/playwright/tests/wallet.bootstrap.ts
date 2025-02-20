@@ -2,7 +2,8 @@ import { adaHolderWallets, dRepWallets } from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import { skipIfMainnet } from "@helpers/cardano";
 import { pollTransaction } from "@helpers/transaction";
-import { expect, test as setup } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test as setup } from "@fixtures/walletExtension";
 import kuberService from "@services/kuberService";
 import environments from "lib/constants/environments";
 

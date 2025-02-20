@@ -5,7 +5,9 @@ import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
 import { uploadMetadataAndGetJsonHash } from "@helpers/metadata";
 import { generateWallets } from "@helpers/shellyWallet";
 import { pollTransaction } from "@helpers/transaction";
-import { expect, test as setup } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test as setup } from "@fixtures/walletExtension";
+
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 

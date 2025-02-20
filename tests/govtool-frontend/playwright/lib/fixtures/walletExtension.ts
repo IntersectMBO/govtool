@@ -2,6 +2,7 @@ import { test as base } from "@playwright/test";
 import { StaticWallet } from "@types";
 import { importWallet } from "./importWallet";
 import loadDemosExtension from "./loadExtension";
+import { injectLogger } from "@helpers/page";
 
 type WalletExtensionTestOptions = {
   wallet?: StaticWallet;
@@ -25,6 +26,7 @@ export const test = base.extend<WalletExtensionTestOptions>({
     if (wallet) {
       await importWallet(page, wallet);
     }
+    injectLogger(page);
 
     await use(page);
   },

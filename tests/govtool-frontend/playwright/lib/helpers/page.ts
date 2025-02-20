@@ -1,8 +1,8 @@
-import { CardanoTestWallet } from "@cardanoapi/cardano-test-wallet/types";
 import { importWallet } from "@fixtures/importWallet";
 import loadDemosExtension from "@fixtures/loadExtension";
-import { Browser, Page } from "@playwright/test";
+import { Browser, ConsoleMessage, Page } from "@playwright/test";
 import { StaticWallet } from "@types";
+import { Logger } from "./logger";
 
 interface NewPageConfig {
   storageState?: string;
@@ -29,5 +29,20 @@ export async function createNewPageWithWallet(
   );
   await importWallet(newPage, wallet);
 
+  injectLogger(newPage);
+
   return newPage;
+}
+
+export function injectLogger(page: Page) {
+  // @ts-ignore
+  if (!page.isLoggerInjected) {
+    page.on("console", (msg: ConsoleMessage) => {
+      if (msg.type() === "error") {
+        Logger.fail(msg.text());
+      }
+    });
+    // @ts-ignore
+    page.isLoggerInjected = true;
+  }
 }

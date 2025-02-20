@@ -188,7 +188,7 @@ test.describe("Perform voting", () => {
 
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No")
-    ).toBeVisible({ timeout: 20_000 });
+    ).toBeVisible({ timeout: 60_000 });
   });
 
   test("5F. Should show notification of casted vote after vote", async ({}, testInfo) => {

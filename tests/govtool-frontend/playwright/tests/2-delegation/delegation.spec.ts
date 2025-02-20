@@ -5,7 +5,8 @@ import { fetchFirstActiveDRepDetails } from "@helpers/dRep";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import DRepDetailsPage from "@pages/dRepDetailsPage";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
-import { expect, Locator, test } from "@playwright/test";
+import { expect, Locator } from "@playwright/test";
+import { test } from "@fixtures/walletExtension";
 import { DRepStatus, IDRep } from "@types";
 
 test.beforeEach(async () => {

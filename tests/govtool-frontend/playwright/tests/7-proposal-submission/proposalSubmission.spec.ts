@@ -1,6 +1,7 @@
 import { setAllureEpic } from "@helpers/allure";
 import { skipIfNotHardFork } from "@helpers/cardano";
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test } from "@fixtures/walletExtension";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");

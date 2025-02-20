@@ -8,7 +8,7 @@ import {
   useTranslation,
 } from "@hooks";
 import { theme } from "@/theme";
-import { correctAdaFormat } from "@/utils";
+import { correctVoteAdaFormat } from "@/utils";
 
 type StakeRadioProps = {
   isChecked?: boolean;
@@ -88,7 +88,7 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
               fontWeight={600}
               marginLeft="4px"
             >
-              ₳ {correctAdaFormat(votingPower) ?? 0}
+              ₳ {correctVoteAdaFormat(votingPower) ?? 0}
             </Typography>
           )}
         </Box>

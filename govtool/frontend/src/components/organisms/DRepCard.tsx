@@ -8,7 +8,7 @@ import { useTranslation } from "@hooks";
 import { DRepData, DRepStatus } from "@models";
 import { Card } from "@molecules";
 import {
-  correctDRepDirectoryFormat,
+  correctVoteAdaFormat,
   ellipsizeText,
   encodeCIP129Identifier,
   getBase64ImageDetails,
@@ -232,7 +232,7 @@ export const DRepCard = ({
                   data-testid={`${view}-voting-power`}
                   sx={{ whiteSpace: "nowrap" }}
                 >
-                  ₳ {correctDRepDirectoryFormat(votingPower)}
+                  ₳ {correctVoteAdaFormat(votingPower)}
                 </Typography>
               </Box>
               <Divider

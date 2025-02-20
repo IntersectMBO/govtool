@@ -11,20 +11,3 @@ export async function expectWithInfo(
     throw new Error(errorMessage);
   }
 }
-
-export async function failureWithConsoleMessages(page: Page, fn: Function) {
-  const consoleMessages: string[] = [];
-  page.on("console", (msg) => {
-    if (msg.type() === "error") {
-      consoleMessages.push(msg.text());
-    }
-  });
-  try {
-    await fn();
-  } catch (error) {
-    Logger.fail(
-      `Failed: ${error.message}\nConsole messages: ${consoleMessages.join("\n")}`
-    );
-    throw error;
-  }
-}

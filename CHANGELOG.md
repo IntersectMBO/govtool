@@ -12,6 +12,17 @@ changes.
 
 ### Added
 
+### Fixed
+
+### Changed
+
+### Removed
+
+## [v2.0.12](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.12) 2025-02-18
+
+
+### Added
+
 - Add metadata url and hash to drep details [Issue 2911](https://github.com/IntersectMBO/govtool/issues/2911)
 - Add CC votes percentages, not voted and Ratification threshold
 - Add support for submitting all 7 governance action types [Issue 2258](https://github.com/IntersectMBO/govtool/issues/2258)

@@ -251,3 +251,23 @@ export interface imageObject {
   contentUrl: string;
   sha256: string;
 }
+
+export interface outcomeProposal {
+  id: string;
+  tx_hash: string;
+  index: string;
+  type: string;
+  yes_votes: string;
+  no_votes: string;
+  abstain_votes: string;
+  description: any;
+  expiry_date: string;
+  expiration: number;
+  time: string;
+  epoch_no: number;
+  url: string;
+  data_hash: string;
+  proposal_params: any;
+  title: string | null;
+  abstract: string | null;
+}

@@ -7,6 +7,7 @@ import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
 import { isBootStrapingPhase, skipIfNotHardFork } from "@helpers/cardano";
+import { injectLogger } from "@helpers/page";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
@@ -131,6 +132,7 @@ test("8D. Should show the view-all categorized proposed governance actions.", as
     Object.values(ProposalType).map(async (proposalType: string) => {
       const context = await browser.newContext();
       const page = await context.newPage();
+      injectLogger(page);
 
       const proposalDiscussionPage = new ProposalDiscussionPage(page);
       await proposalDiscussionPage.goto();

@@ -1,10 +1,17 @@
 import path from "path";
 import { defineConfig as defineViteConfig, mergeConfig } from "vite";
 import { defineConfig as defineVitestConfig } from "vitest/config";
+import compression from "vite-plugin-compression";
 import react from "@vitejs/plugin-react-swc";
 
 const viteConfig = defineViteConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    compression({
+      algorithm: "brotliCompress",
+      threshold: 1024 * 10,
+    }),
+  ],
   cacheDir: ".vite",
   define: {
     "process.env": {},

@@ -21,6 +21,8 @@ changes.
 - Allow searching for yourself in DRep Directory [Issue 2993](https://github.com/IntersectMBO/govtool/issues/2993)
 - Add mathematical styling for governance actions [Issue 2984](https://github.com/IntersectMBO/govtool/issues/2984)
 - Add script to update GovTool version
+- Add `isStakeKeyRegistered` for the usage by pillars [Issue 2384](https://github.com/IntersectMBO/govtool/issues/2384)
+- Add server side compression for large assets
 
 ### Fixed
 
@@ -29,12 +31,16 @@ changes.
 - Remove abstain votes (not auto abstain) from total DRep stake
 - Fix counting committee members [Issue 2948](https://github.com/IntersectMBO/govtool/issues/2948)
 - Fix refetching DRep list on every enter [Issue 2994](https://github.com/IntersectMBO/govtool/issues/2994)
+- Fix displaying helper buttons on governance action card details [Issue 3022](https://github.com/IntersectMBO/govtool/issues/3022)
 
 ### Changed
 
 - Change threshold visual representation in governance action votes
 - Resize governance action details columns
 - Update @intersect.mbo/pdf-ui to v0.6.0
+- Bump actions/cache to v4 across workflows
+- Unify ADA Format across the application [Issue 3031](https://github.com/IntersectMBO/govtool/issues/3031)
+- Change default filtering for DRep directory to show the active DReps [Issue 3035](https://github.com/IntersectMBO/govtool/issues/3035)
 
 ### Removed
 

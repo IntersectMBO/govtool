@@ -20,11 +20,14 @@ cleanup("Refund faucet", async () => {
     await walletManager.readWallets("registerDRepCopy");
   const registeredDRepWallets: StaticWallet[] =
     await walletManager.readWallets("registeredDRepCopy");
+  const proposalSubmissionWallets: StaticWallet[] =
+    await walletManager.readWallets("proposalSubmissionCopy");
   try {
     const { txId, lockInfo } = await kuberService.mergeUtXos([
       ...allStaticWallets,
       ...registerDRepWallets,
       ...registeredDRepWallets,
+      ...proposalSubmissionWallets,
     ]);
     await pollTransaction(txId, lockInfo);
   } catch (err) {

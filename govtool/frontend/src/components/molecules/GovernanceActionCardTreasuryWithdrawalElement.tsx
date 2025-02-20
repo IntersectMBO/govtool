@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { Typography, CopyButton } from "@atoms";
-import { correctAdaFormat } from "@utils";
+import { correctVoteAdaFormat } from "@utils";
 
 import { useScreenDimension } from "@/hooks";
 
@@ -94,7 +94,7 @@ export const GovernanceActionCardTreasuryWithdrawalElement = ({
             lineHeight: "20px",
           }}
         >
-          ₳ {correctAdaFormat(amount) ?? 0}
+          ₳ {correctVoteAdaFormat(amount) ?? 0}
         </Typography>
       </Box>
     </Box>

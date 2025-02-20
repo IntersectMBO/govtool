@@ -5,7 +5,7 @@ import { Meta, StoryFn } from "@storybook/react";
 import { Modal } from "@atoms";
 import { useModal } from "@context";
 import { StatusModal, SubmittedVotesModalState } from "@organisms";
-import { callAll, correctAdaFormat } from "@utils";
+import { callAll, correctAdaFormatWithSuffix } from "@utils";
 
 const meta = {
   title: "Example/Modals/SubmittedVotesModal",
@@ -53,9 +53,11 @@ async function assertVotes(
   canvas: ReturnType<typeof within>,
   args: SubmittedVotesModalState,
 ) {
-  const dRepYesVotesText = `₳ ${correctAdaFormat(args.dRepYesVotes)}`;
-  const dRepNoVotesText = `₳ ${correctAdaFormat(args.dRepNoVotes)}`;
-  const dRepAbstainVotesText = `₳ ${correctAdaFormat(args.dRepAbstainVotes)}`;
+  const dRepYesVotesText = `₳ ${correctAdaFormatWithSuffix(args.dRepYesVotes)}`;
+  const dRepNoVotesText = `₳ ${correctAdaFormatWithSuffix(args.dRepNoVotes)}`;
+  const dRepAbstainVotesText = `₳ ${correctAdaFormatWithSuffix(
+    args.dRepAbstainVotes,
+  )}`;
 
   await expect(canvas.getByText(dRepYesVotesText)).toBeVisible();
   await expect(canvas.getByText(dRepNoVotesText)).toBeVisible();

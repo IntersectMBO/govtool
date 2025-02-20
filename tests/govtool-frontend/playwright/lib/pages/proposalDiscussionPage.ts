@@ -2,6 +2,7 @@ import { expect, Locator, Page } from "@playwright/test";
 import { ProposalCreateRequest, ProposalType, ProposedGovAction } from "@types";
 import environments from "lib/constants/environments";
 import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
+import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
 
 export default class ProposalDiscussionPage {
   // Buttons
@@ -31,15 +32,6 @@ export default class ProposalDiscussionPage {
     await this.page.waitForTimeout(2_000);
   }
 
-  async closeUsernamePrompt() {
-    await this.page.waitForTimeout(5_000);
-    await this.page
-      .locator("div")
-      .filter({ hasText: /^Hey, setup your username$/ })
-      .getByRole("button")
-      .click();
-  }
-
   async viewFirstProposal(): Promise<ProposalDiscussionDetailsPage> {
     await this.page
       .locator('[data-testid^="proposal-"][data-testid$="-view-details"]')
@@ -49,7 +41,13 @@ export default class ProposalDiscussionPage {
   }
 
   async getAllProposals() {
-    await this.page.waitForTimeout(4_000); // waits for proposals to render
+    await waitedLoop(async () => {
+      return (
+        (await this.page
+          .locator('[data-testid^="proposal-"][data-testid$="-card"]')
+          .count()) > 0
+      );
+    });
 
     return this.page
       .locator('[data-testid^="proposal-"][data-testid$="-card"]')
@@ -129,12 +127,22 @@ export default class ProposalDiscussionPage {
     filters: string[],
     validateFunction: (proposalCard: any, filters: string[]) => Promise<boolean>
   ) {
-    const proposalCards = await this.getAllProposals();
+    let errorMessage = "";
+    await functionWaitedAssert(
+      async () => {
+        const proposalCards = await this.getAllProposals();
 
-    for (const proposalCard of proposalCards) {
-      const hasFilter = await validateFunction(proposalCard, filters);
-      expect(hasFilter).toBe(true);
-    }
+        for (const proposalCard of proposalCards) {
+          const type = await proposalCard
+            .getByTestId("governance-action-type")
+            .textContent();
+          const hasFilter = await validateFunction(proposalCard, filters);
+          errorMessage = `A governance action type ${type} does not contain on ${filters}`;
+          expect(hasFilter).toBe(true);
+        }
+      },
+      { message: errorMessage }
+    );
   }
 
   async sortAndValidate(

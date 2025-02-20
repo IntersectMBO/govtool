@@ -74,7 +74,6 @@ jobs:
           set -o pipefail
           sudo chmod +x lint.sh && ./lint.sh 2>&1 | tee code_lint_output.txt
 
-
       - name: Unit tests
         id: unit_tests
         run: |
@@ -90,7 +89,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Cache Docker layers
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
@@ -127,19 +126,19 @@ jobs:
             VITE_IPFS_PROJECT_ID=${{ secrets.IPFS_PROJECT_ID }}
             IPFS_GATEWAY=${{ secrets.IPFS_GATEWAY }}
             IPFS_PROJECT_ID=${{ secrets.IPFS_PROJECT_ID }}
-          
+
       - name: Scan Docker image with Dockle
         id: dockle
         run: |
-            wget -q https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
-            tar zxf dockle_0.4.14_Linux-64bit.tar.gz
-            sudo mv dockle /usr/local/bin
+          wget -q https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
+          tar zxf dockle_0.4.14_Linux-64bit.tar.gz
+          sudo mv dockle /usr/local/bin
 
-            dockle --exit-code 1 --exit-level fatal -ak GHC_RELEASE_KEY -ak CABAL_INSTALL_RELEASE_KEY -ak STACK_RELEASE_KEY -ak KEY_SHA512 --format json --input '/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar' --output ${{ matrix.workdir }}/dockle_scan_output.json
-            rm -rf '/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar'
-            cat ${{ matrix.workdir }}/dockle_scan_output.json
+          dockle --exit-code 1 --exit-level fatal -ak GHC_RELEASE_KEY -ak CABAL_INSTALL_RELEASE_KEY -ak STACK_RELEASE_KEY -ak KEY_SHA512 --format json --input '/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar' --output ${{ matrix.workdir }}/dockle_scan_output.json
+          rm -rf '/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar'
+          cat ${{ matrix.workdir }}/dockle_scan_output.json
 
-            echo "outcome=success" >> $GITHUB_OUTPUT
+          echo "outcome=success" >> $GITHUB_OUTPUT
 
       - name: Create PR comment
         if: always()

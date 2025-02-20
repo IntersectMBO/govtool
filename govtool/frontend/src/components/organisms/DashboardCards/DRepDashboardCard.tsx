@@ -10,7 +10,7 @@ import {
   DashboardActionCard,
   DashboardActionCardProps,
 } from "@molecules";
-import { correctAdaFormat, openInNewTab } from "@utils";
+import { correctVoteAdaFormat, openInNewTab } from "@utils";
 import { LINKS } from "@/consts/links";
 
 type DRepDashboardCardProps = {
@@ -65,14 +65,14 @@ export const DRepDashboardCard = ({
             <Trans
               i18nKey="dashboard.cards.drep.retirementInProgressWithGivenName"
               values={{
-                deposit: correctAdaFormat(voter?.deposit),
+                deposit: correctVoteAdaFormat(voter?.deposit),
                 givenName: voter?.givenName,
               }}
             />
           ) : (
             <Trans
               i18nKey="dashboard.cards.drep.retirementInProgress"
-              values={{ deposit: correctAdaFormat(voter?.deposit) }}
+              values={{ deposit: correctVoteAdaFormat(voter?.deposit) }}
             />
           ),
           transactionId: pendingTransaction?.retireAsDrep.transactionHash,

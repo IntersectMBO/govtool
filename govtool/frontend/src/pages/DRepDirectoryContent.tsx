@@ -14,7 +14,7 @@ import {
 } from "@hooks";
 import { DataActionsBar, EmptyStateDrepDirectory } from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
-import { correctAdaFormat, isSameDRep, uniqBy, parseBoolean } from "@utils";
+import { correctVoteAdaFormat, isSameDRep, uniqBy, parseBoolean } from "@utils";
 import { DRepData, DRepListSort, DRepStatus } from "@models";
 import {
   AutomatedVotingOptionCurrentDelegation,
@@ -46,7 +46,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const { dRepID: myDRepId, pendingTransaction, stakeKey } = useCardano();
   const { t } = useTranslation();
   const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
-  const { chosenFilters, chosenSorting, setChosenSorting } =
+  const { chosenFilters, chosenSorting, setChosenFilters, setChosenSorting } =
     dataActionsBarProps;
 
   const [inProgressDelegationDRepData, setInProgressDelegationDRepData] =
@@ -54,7 +54,8 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   useEffect(() => {
     if (!chosenSorting) setChosenSorting(DRepListSort.Random);
-  }, [chosenSorting, setChosenSorting]);
+    if (!chosenFilters.length) setChosenFilters([DRepStatus.Active]);
+  }, [chosenSorting, setChosenSorting, chosenFilters, setChosenFilters]);
 
   const { delegate, isDelegating } = useDelegateTodRep();
 
@@ -98,7 +99,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     return <Loader />;
   }
 
-  const ada = correctAdaFormat(votingPower);
+  const ada = correctVoteAdaFormat(votingPower);
 
   const filteredDoNotListDReps = uniqBy(
     dRepList?.filter((dRep) => {

@@ -40,6 +40,7 @@ changes.
 - Update @intersect.mbo/pdf-ui to v0.6.0
 - Bump actions/cache to v4 across workflows
 - Unify ADA Format across the application [Issue 3031](https://github.com/IntersectMBO/govtool/issues/3031)
+- Change default filtering for DRep directory to show the active DReps [Issue 3035](https://github.com/IntersectMBO/govtool/issues/3035)
 
 ### Removed
 

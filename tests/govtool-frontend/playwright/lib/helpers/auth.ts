@@ -3,11 +3,17 @@ import { valid as mockValid } from "@mock/index";
 import LoginPage from "@pages/loginPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { BrowserContext, Page } from "@playwright/test";
-import { StaticWallet } from "@types";
+import { ProposalType, StaticWallet } from "@types";
 import { ShelleyWallet } from "./crypto";
 import convertBufferToHex from "./convertBufferToHex";
 import { updateWalletConfig } from "@fixtures/createWallet";
-import { adaHolder05Wallet } from "@constants/staticWallets";
+import {
+  adaHolder05Wallet,
+  proposal05Wallet,
+  proposal07Wallet,
+  proposal08Wallet,
+  proposal09Wallet,
+} from "@constants/staticWallets";
 
 interface CreateUserProps {
   page: Page;
@@ -80,3 +86,28 @@ export async function createAuthWithMultipleStake({
 
   await context.storageState({ path: auth });
 }
+
+export const getDraftProposalWalletAndState = (proposalType: string) => {
+  switch (proposalType) {
+    case ProposalType.info:
+      return {
+        storageState: ".auth/proposal05.json",
+        wallet: proposal05Wallet,
+      };
+    case ProposalType.treasury:
+      return {
+        storageState: ".auth/proposal07.json",
+        wallet: proposal07Wallet,
+      };
+    case ProposalType.updatesToTheConstitution:
+      return {
+        storageState: ".auth/proposal08.json",
+        wallet: proposal08Wallet,
+      };
+    case ProposalType.motionOfNoConfedence:
+      return {
+        storageState: ".auth/proposal09.json",
+        wallet: proposal09Wallet,
+      };
+  }
+};

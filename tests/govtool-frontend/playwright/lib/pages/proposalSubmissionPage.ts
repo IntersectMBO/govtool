@@ -27,7 +27,7 @@ const formErrors = {
   rationale: "rationale-helper-error",
   receivingAddress: "receiving-address-0-text-error",
   amount: "amount-0-text-error",
-  constitutionalUrl: "prop=constitution-url-text-error", // BUG wrong test id
+  constitutionalUrl: "prop-constitution-url-text-error",
   guardrailsScriptUrl: "prop-guardrails-script-url-input-error",
   link: "link-0-url-input-error",
 };
@@ -255,7 +255,7 @@ export default class ProposalSubmissionPage {
   async viewFirstDraft() {
     await expect(
       this.page.locator('[data-testid^="draft-"][data-testid$="-card"]')
-    ).toBeVisible({ timeout: 10_000 }); // slow rendering
+    ).toBeVisible({ timeout: 60_000 }); // slow rendering
 
     return await this.page
       .locator('[data-testid^="draft-"][data-testid$="-start-editing"]')

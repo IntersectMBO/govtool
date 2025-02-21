@@ -4,17 +4,23 @@ import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
 import { generateWallets } from "@helpers/shellyWallet";
 import { pollTransaction } from "@helpers/transaction";
-import { test as setup } from "@playwright/test";
+import { test as setup } from "@fixtures/walletExtension";
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
+import { functionWaitedAssert } from "@helpers/waitedLoop";
 
 const PROPOSAL_WALLETS_COUNT = 4;
 
 let govActionDeposit: number;
 
 setup.beforeAll(async () => {
-  const res = await kuberService.queryProtocolParams();
-  govActionDeposit = res.govActionDeposit;
+  await functionWaitedAssert(
+    async () => {
+      const res = await kuberService.queryProtocolParams();
+      govActionDeposit = res.govActionDeposit;
+    },
+    { name: "queryProtocolParams" }
+  );
 });
 
 setup.beforeEach(async () => {

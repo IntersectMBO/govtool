@@ -127,22 +127,21 @@ export default class ProposalDiscussionPage {
     filters: string[],
     validateFunction: (proposalCard: any, filters: string[]) => Promise<boolean>
   ) {
-    let errorMessage = "";
-    await functionWaitedAssert(
-      async () => {
-        const proposalCards = await this.getAllProposals();
+    await functionWaitedAssert(async () => {
+      const proposalCards = await this.getAllProposals();
 
-        for (const proposalCard of proposalCards) {
-          const type = await proposalCard
-            .getByTestId("governance-action-type")
-            .textContent();
-          const hasFilter = await validateFunction(proposalCard, filters);
-          errorMessage = `A governance action type ${type} does not contain on ${filters}`;
-          expect(hasFilter).toBe(true);
+      for (const proposalCard of proposalCards) {
+        const type = await proposalCard
+          .getByTestId("governance-action-type")
+          .textContent();
+        const hasFilter = await validateFunction(proposalCard, filters);
+        if (!hasFilter) {
+          const errorMessage = `A governance action type ${type} does not contain on ${filters}`;
+          throw errorMessage;
         }
-      },
-      { message: errorMessage }
-    );
+        expect(hasFilter).toBe(true);
+      }
+    });
   }
 
   async sortAndValidate(

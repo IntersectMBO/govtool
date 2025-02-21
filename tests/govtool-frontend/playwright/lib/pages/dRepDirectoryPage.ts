@@ -68,6 +68,9 @@ export default class DRepDirectoryPage {
   async filterDReps(filterOptions: string[]) {
     for (const option of filterOptions) {
       await this.page.getByTestId(`${option}-checkbox`).click();
+      if (option !== "Active" && filterOptions.length === 1) {
+        await this.page.getByTestId(`Active-checkbox`).click();
+      }
     }
   }
 
@@ -78,35 +81,31 @@ export default class DRepDirectoryPage {
   }
 
   async validateFilters(filters: string[], filterOptions: string[]) {
-    let errorMessage = "";
-    await functionWaitedAssert(
-      async () => {
-        const excludedFilters = filterOptions.filter(
-          (filter) => !filters.includes(filter)
+    await functionWaitedAssert(async () => {
+      const excludedFilters = filterOptions.filter(
+        (filter) => !filters.includes(filter)
+      );
+
+      const dRepList = await this.getAllListedDReps();
+
+      for (const filter of excludedFilters) {
+        await expect(this.page.getByTestId(`${filter}-checkbox`)).toHaveCount(
+          1
         );
+      }
 
-        const dRepList = await this.getAllListedDReps();
-
-        for (const filter of excludedFilters) {
-          await expect(this.page.getByTestId(`${filter}-checkbox`)).toHaveCount(
-            1
-          );
+      for (const dRep of dRepList) {
+        const hasFilter = await this._validateTypeFiltersInDRep(dRep, filters);
+        const actualFilter = await dRep
+          .locator('[data-testid$="-pill"]')
+          .textContent();
+        if (!hasFilter) {
+          const errorMessage = `${actualFilter} pill does not match with any of the ${filters}`;
+          throw new Error(errorMessage);
         }
-
-        for (const dRep of dRepList) {
-          const hasFilter = await this._validateTypeFiltersInDRep(
-            dRep,
-            filters
-          );
-          const actualFilter = await dRep
-            .locator('[data-testid$="-pill"]')
-            .textContent();
-          errorMessage = `${actualFilter} does not match any of the ${filters}`;
-          expect(hasFilter).toBe(true);
-        }
-      },
-      { message: errorMessage }
-    );
+        expect(hasFilter).toBe(true);
+      }
+    });
   }
 
   async _validateTypeFiltersInDRep(

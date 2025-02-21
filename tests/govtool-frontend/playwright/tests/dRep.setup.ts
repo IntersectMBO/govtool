@@ -5,9 +5,12 @@ import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
 import { uploadMetadataAndGetJsonHash } from "@helpers/metadata";
 import { generateWallets } from "@helpers/shellyWallet";
 import { pollTransaction } from "@helpers/transaction";
-import { expect, test as setup } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test as setup } from "@fixtures/walletExtension";
+
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
+import { functionWaitedAssert } from "@helpers/waitedLoop";
 
 const REGISTER_DREP_WALLETS_COUNT = 6;
 const DREP_WALLETS_COUNT = 9;
@@ -15,8 +18,13 @@ const DREP_WALLETS_COUNT = 9;
 let dRepDeposit: number;
 
 setup.beforeAll(async () => {
-  const res = await kuberService.queryProtocolParams();
-  dRepDeposit = res.dRepDeposit;
+  await functionWaitedAssert(
+    async () => {
+      const res = await kuberService.queryProtocolParams();
+      dRepDeposit = res.dRepDeposit;
+    },
+    { name: "queryProtocolParams" }
+  );
 });
 
 setup.beforeEach(async () => {

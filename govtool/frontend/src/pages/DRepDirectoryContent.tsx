@@ -53,9 +53,12 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     useState<DRepData | undefined>(undefined);
 
   useEffect(() => {
+    setChosenFilters([DRepStatus.Active]);
+  }, []);
+
+  useEffect(() => {
     if (!chosenSorting) setChosenSorting(DRepListSort.Random);
-    if (!chosenFilters.length) setChosenFilters([DRepStatus.Active]);
-  }, [chosenSorting, setChosenSorting, chosenFilters, setChosenFilters]);
+  }, [chosenSorting, setChosenSorting]);
 
   const { delegate, isDelegating } = useDelegateTodRep();
 

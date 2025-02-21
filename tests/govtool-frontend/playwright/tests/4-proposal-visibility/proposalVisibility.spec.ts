@@ -8,8 +8,10 @@ import {
 } from "@helpers/featureFlag";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test } from "@fixtures/walletExtension";
 import { GovernanceActionType, IProposal } from "@types";
+import { injectLogger } from "@helpers/page";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
@@ -70,6 +72,7 @@ test("4K. Should display correct vote counts on governance details page for disc
   await Promise.all(
     uniqueProposalTypes.map(async (proposalToCheck) => {
       const newPage = await browser.newPage();
+      injectLogger(newPage);
       const govActionDetailsPage = new GovernanceActionDetailsPage(newPage);
       await govActionDetailsPage.goto(
         `${proposalToCheck.txHash}#${proposalToCheck.index}`

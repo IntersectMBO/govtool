@@ -26,8 +26,18 @@ type ProposalDiscussionProps = {
   >;
 };
 
+type GovernanceActionsOutcomesProps = {
+  apiUrl?: string;
+};
+
 declare module "@intersect.mbo/pdf-ui/cjs" {
   export default function ProposalDiscussion(
     props: ProposalDiscussionProps,
+  ): JSX.Element;
+}
+
+declare module "@intersect.mbo/govtool-outcomes-pillar-ui/dist/esm" {
+  export default function GovernanceActionsOutcomes(
+    props: GovernanceActionsOutcomesProps,
   ): JSX.Element;
 }

@@ -20,3 +20,12 @@ export const correctVoteAdaFormat = (
   }
   return "0";
 };
+
+export const correctDelegatedVoteAdaFormat = (ada: number | undefined) => {
+  if (ada) {
+    return ada.toLocaleString("en-us", {
+      maximumFractionDigits: 3,
+    });
+  }
+  return "0";
+};

@@ -68,9 +68,6 @@ export default class DRepDirectoryPage {
   async filterDReps(filterOptions: string[]) {
     for (const option of filterOptions) {
       await this.page.getByTestId(`${option}-checkbox`).click();
-      if (option !== "Active" && filterOptions.length === 1) {
-        await this.page.getByTestId(`Active-checkbox`).click();
-      }
     }
   }
 

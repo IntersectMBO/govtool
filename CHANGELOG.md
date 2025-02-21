@@ -34,6 +34,7 @@ changes.
 - Add script to update GovTool version
 - Add `isStakeKeyRegistered` for the usage by pillars [Issue 2384](https://github.com/IntersectMBO/govtool/issues/2384)
 - Add server side compression for large assets
+- Add outcomes
 
 ### Fixed
 

@@ -43,7 +43,9 @@ export const GovernanceActionOutComesPillar = () => {
             </Box>
           }
         >
-          <GovernanceActionsOutcomes />
+          <GovernanceActionsOutcomes
+            apiUrl={import.meta.env.VITE_OUTCOMES_API_URL}
+          />
         </Suspense>
       </Box>
       {!context.isEnabled && <Footer />}

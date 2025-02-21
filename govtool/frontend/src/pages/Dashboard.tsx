@@ -3,7 +3,12 @@ import { useLocation, Outlet, useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 
 import { Background, ScrollToManage } from "@atoms";
-import { CONNECTED_NAV_ITEMS, DRAWER_WIDTH, PATHS } from "@consts";
+import {
+  CONNECTED_NAV_ITEMS,
+  DRAWER_WIDTH,
+  OUTCOMES_PATHS,
+  PATHS,
+} from "@consts";
 import { useCardano } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { DashboardTopNav, Drawer, Footer } from "@organisms";
@@ -19,6 +24,16 @@ export const Dashboard = () => {
 
   const getPageTitle = (path: string) => {
     if (path === PATHS.dashboard) return t("dashboard.title");
+
+    if (path.startsWith(OUTCOMES_PATHS.governanceActionsOutcomes)) {
+      const outcomesNavItem = findNavItem(
+        CONNECTED_NAV_ITEMS,
+        OUTCOMES_PATHS.governanceActionsOutcomes,
+      );
+
+      return outcomesNavItem ?? "";
+    }
+
     return findNavItem(CONNECTED_NAV_ITEMS, path) ?? "";
   };
 

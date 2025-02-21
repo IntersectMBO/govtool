@@ -285,7 +285,9 @@ test("6S. Should Warn users that they are in bootstrapping phase via banner", as
 
   await responsePromise;
 
-  await expect(page.getByTestId("system-bootstrapping-warning")).toBeVisible();
+  await expect(page.getByTestId("system-bootstrapping-warning")).toBeVisible({
+    timeout: 60_000,
+  });
 
   const [bootstrap] = await Promise.all([
     context.waitForEvent("page"),

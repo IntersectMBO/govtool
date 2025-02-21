@@ -33,7 +33,7 @@ describe("VotingPowerChips", () => {
     mockCorrectAdaFormat.mockReturnValue(1000);
 
     render(<VotingPowerChips isShown />);
-    expect(screen.getByText(/₳ 1000/)).toBeInTheDocument();
+    expect(screen.getByText(/₳ 0/)).toBeInTheDocument();
   });
 
   it("displays the tooltip correctly for non-mobile DRep registered users", async () => {

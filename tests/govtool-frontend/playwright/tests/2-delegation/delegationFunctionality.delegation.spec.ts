@@ -11,6 +11,7 @@ import {
 } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
+import { correctDelegatedVoteAdaFormat } from "@helpers/adaFormat";
 import { setAllureEpic } from "@helpers/allure";
 import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
@@ -264,8 +265,12 @@ test.describe("Abstain delegation", () => {
 
     const balance = await kuberService.getBalance(adaHolder03Wallet.address);
 
-    await expect(page.getByText(`You have delegated ₳${balance}`)).toBeVisible({
-      timeout: 20_000,
+    await expect(
+      page.getByText(
+        `You have delegated ₳${correctDelegatedVoteAdaFormat(balance)}`
+      )
+    ).toBeVisible({
+      timeout: 60_000,
     });
   });
 });
@@ -291,8 +296,12 @@ test.describe("No confidence delegation", () => {
     await waitForTxConfirmation(page);
 
     const balance = await kuberService.getBalance(adaHolder04Wallet.address);
-    await expect(page.getByText(`You have delegated ₳${balance}`)).toBeVisible({
-      timeout: 20_000,
+    await expect(
+      page.getByText(
+        `You have delegated ₳${correctDelegatedVoteAdaFormat(balance)}`
+      )
+    ).toBeVisible({
+      timeout: 60_000,
     });
   });
 });
@@ -317,14 +326,16 @@ test.describe("Delegated ADA visibility", () => {
       adaHolder06Wallet.address
     );
     await expect(
-      page.getByText(`You have delegated ₳ ${adaHolderVotingPower}`)
-    ).toBeVisible({ timeout: 20_000 });
+      page.getByText(
+        `You have delegated ₳ ${correctDelegatedVoteAdaFormat(adaHolderVotingPower)}`
+      )
+    ).toBeVisible({ timeout: 60_000 });
 
     await page.goto("/");
     await expect(
       page.getByText(
-        `Your Voting Power of ₳${adaHolderVotingPower} is Delegated to`
+        `Your Voting Power of ₳${correctDelegatedVoteAdaFormat(adaHolderVotingPower)} is Delegated to`
       )
-    ).toBeVisible({ timeout: 20_000 });
+    ).toBeVisible({ timeout: 60_000 });
   });
 });

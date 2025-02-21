@@ -58,6 +58,11 @@ export default defineConfig({
       dependencies: environments.ci ? ["faucet setup"] : [],
     },
     {
+      name: "proposal setup",
+      testMatch: "**/proposal.setup.ts",
+      teardown: environments.ci && "cleanup faucet",
+    },
+    {
       name: "wallet bootstrap",
       testMatch: "**/wallet.bootstrap.ts",
       dependencies: environments.ci ? ["faucet setup"] : [],
@@ -72,6 +77,9 @@ export default defineConfig({
       name: "proposal submission",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.ga.spec.ts",
+      dependencies: environments.ci
+        ? ["proposal setup"]
+        : [],
     },
     {
       name: "loggedin (desktop)",

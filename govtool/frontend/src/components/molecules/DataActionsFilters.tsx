@@ -29,9 +29,6 @@ export const DataActionsFilters = ({
 }: Props) => {
   const handleFilterChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      // TODO: Refine if it is needed to remove this eslint-disable
-      // eslint-disable-next-line no-unused-expressions, no-sequences
-      e.target.name, e.target.checked;
       let filters = [...chosenFilters];
       if (e.target.checked) {
         filters.push(e.target.name);

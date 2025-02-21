@@ -92,7 +92,7 @@ export const DashboardGovernanceActions = () => {
 
   const { state } = useLocation();
   const [content, setContent] = useState<number>(
-    state && state.isVotedListOnLoad ? 1 : 0,
+    state?.isVotedListOnLoad ? 1 : 0,
   );
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {

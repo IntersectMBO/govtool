@@ -1,4 +1,5 @@
 import { convertDRepToCIP129 } from "@helpers/dRep";
+import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
 import { Locator, Page, expect } from "@playwright/test";
 import { IDRep } from "@types";
 import environments from "lib/constants/environments";
@@ -40,6 +41,8 @@ export default class DRepDirectoryPage {
     '[data-testid$="-delegate-button"]'
   );
 
+  readonly NoDRepText = this.page.getByText("No DReps found");
+
   constructor(private readonly page: Page) {}
 
   async goto() {
@@ -65,6 +68,9 @@ export default class DRepDirectoryPage {
   async filterDReps(filterOptions: string[]) {
     for (const option of filterOptions) {
       await this.page.getByTestId(`${option}-checkbox`).click();
+      if (option !== "Active" && filterOptions.length === 1) {
+        await this.page.getByTestId(`Active-checkbox`).click();
+      }
     }
   }
 
@@ -75,22 +81,31 @@ export default class DRepDirectoryPage {
   }
 
   async validateFilters(filters: string[], filterOptions: string[]) {
-    const excludedFilters = filterOptions.filter(
-      (filter) => !filters.includes(filter)
-    );
+    await functionWaitedAssert(async () => {
+      const excludedFilters = filterOptions.filter(
+        (filter) => !filters.includes(filter)
+      );
 
-    await this.page.waitForTimeout(4_000); // wait for the dRep list to render properly
+      const dRepList = await this.getAllListedDReps();
 
-    const dRepList = await this.getAllListedDReps();
+      for (const filter of excludedFilters) {
+        await expect(this.page.getByTestId(`${filter}-checkbox`)).toHaveCount(
+          1
+        );
+      }
 
-    for (const filter of excludedFilters) {
-      await expect(this.page.getByTestId(`${filter}-checkbox`)).toHaveCount(1);
-    }
-
-    for (const dRep of dRepList) {
-      const hasFilter = await this._validateTypeFiltersInDRep(dRep, filters);
-      expect(hasFilter).toBe(true);
-    }
+      for (const dRep of dRepList) {
+        const hasFilter = await this._validateTypeFiltersInDRep(dRep, filters);
+        const actualFilter = await dRep
+          .locator('[data-testid$="-pill"]')
+          .textContent();
+        if (!hasFilter) {
+          const errorMessage = `${actualFilter} pill does not match with any of the ${filters}`;
+          throw new Error(errorMessage);
+        }
+        expect(hasFilter).toBe(true);
+      }
+    });
   }
 
   async _validateTypeFiltersInDRep(
@@ -128,7 +143,6 @@ export default class DRepDirectoryPage {
       const isValid = validationFn(dRepList[i], dRepList[i + 1]);
       expect(isValid).toBe(true);
     }
-
     // Frontend validation
     const cip105DRepListFE = await this.getAllListedCIP105DRepIds();
     const cip129DRepListFE = await this.getAllListedCIP129DRepIds();
@@ -138,9 +152,9 @@ export default class DRepDirectoryPage {
     );
 
     for (let i = 0; i <= cip105DRepListFE.length - 1; i++) {
-      await expect(cip105DRepListFE[i]).toHaveText(dRepList[i].view);
-      await expect(cip129DRepListFE[i]).toHaveText(
-        `(CIP-129) ${cip129DRepListApi[i]}`
+      await expect(cip129DRepListFE[i]).toHaveText(cip129DRepListApi[i]);
+      await expect(cip105DRepListFE[i]).toHaveText(
+        `(CIP-105) ${dRepList[i].view}`
       );
     }
   }
@@ -149,18 +163,6 @@ export default class DRepDirectoryPage {
   }
 
   async getAllListedCIP105DRepIds() {
-    await this.page.waitForTimeout(2_000);
-
-    const dRepCards = await this.getAllListedDReps();
-
-    return dRepCards.map((dRep) =>
-      dRep.locator('[data-testid$="-copy-id-button"]').first()
-    );
-  }
-
-  async getAllListedCIP129DRepIds() {
-    await this.page.waitForTimeout(2_000);
-
     const dRepCards = await this.getAllListedDReps();
 
     return dRepCards.map((dRep) =>
@@ -168,16 +170,24 @@ export default class DRepDirectoryPage {
     );
   }
 
+  async getAllListedCIP129DRepIds() {
+    const dRepCards = await this.getAllListedDReps();
+
+    return dRepCards.map((dRep) =>
+      dRep.locator('[data-testid$="-copy-id-button"]').first()
+    );
+  }
+
   async getAllListedDReps() {
-    // wait for the dRep list to render properly
-    await this.page.waitForTimeout(3_000);
-    // add assertion to wait until the search input is visible
     await expect(this.searchInput).toBeVisible({ timeout: 10_000 });
 
-    return await this.page
-      .getByRole("list")
-      .locator('[data-testid$="-drep-card"]')
-      .all();
+    await waitedLoop(async () => {
+      return (
+        (await this.page.locator('[data-testid$="-drep-card"]').count()) > 0
+      );
+    });
+
+    return this.page.locator('[data-testid$="-drep-card"]').all();
   }
 
   async verifyDRepInList(dRepId: string) {
@@ -185,10 +195,8 @@ export default class DRepDirectoryPage {
 
     await this.searchInput.fill(dRepId);
 
-    await this.page.waitForTimeout(5_000); // wait until the dRep list render properly
-
-    await expect(
-      this.page.getByTestId(`${dRepId}-drep-card`)
-    ).not.toBeVisible();
+    await expect(this.page.getByText("No DReps found")).toBeVisible({
+      timeout: 20_000,
+    });
   }
 }

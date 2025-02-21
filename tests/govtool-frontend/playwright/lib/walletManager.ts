@@ -9,6 +9,7 @@ export type Purpose =
   | "registerDRep"
   | "registeredDRep"
   | "proposalSubmission"
+  | "proposalSubmissionCopy"
   | "registerDRepCopy"
   | "registeredDRepCopy";
 

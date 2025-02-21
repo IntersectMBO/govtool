@@ -63,12 +63,15 @@ test.describe("Proposal created logged in state", () => {
     test.slow();
 
     const randComment = faker.lorem.paragraph(2);
-    const randReply = faker.lorem.paragraph(2);
+    const randReply = faker.lorem.words(5);
 
     await proposalDiscussionDetailsPage.addComment(randComment);
 
     await proposalDiscussionDetailsPage.replyComment(randReply);
-    await expect(page.getByText(randReply)).toBeVisible({ timeout: 15_000 });
+    const replyRendered = await page
+      .locator(`[data-testid^="subcomment-"][data-testid$="-content"]`)
+      .textContent();
+    expect(replyRendered).toContain(randReply);
   });
 });
 

@@ -90,6 +90,16 @@ export const GovernanceActionDetailsCardLinks = ({
                         },
                       });
                     }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        openModal({
+                          type: "externalLink",
+                          state: {
+                            externalLink: uri,
+                          },
+                        });
+                      }
+                    }}
                   />
                 </Box>
               )}

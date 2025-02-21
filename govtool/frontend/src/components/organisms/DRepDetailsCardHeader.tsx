@@ -11,7 +11,7 @@ import {
   useTranslation,
 } from "@hooks";
 import { DataMissingHeader } from "@molecules";
-import { correctDRepDirectoryFormat } from "@utils";
+import { correctVoteAdaFormat } from "@utils";
 import { DRepData } from "@/models";
 
 type DRepDetailsProps = {
@@ -68,7 +68,7 @@ export const DRepDetailsCardHeader = ({
                     : "dRepDirectory.myDRep"
                 }
                 values={{
-                  ada: correctDRepDirectoryFormat(myVotingPower),
+                  ada: correctVoteAdaFormat(myVotingPower),
                 }}
               />
             }

@@ -62,3 +62,12 @@ export async function uploadMetadataAndGetJsonHash() {
   );
   return { dataHash, url };
 }
+
+export async function uploadScriptAndGenerateUrl(payload: Object) {
+  const data = JSON.stringify(payload);
+  const jsonData = JSON.parse(data);
+  return await metadataBucketService.uploadMetadata(
+    "guardrail-script",
+    jsonData
+  );
+}

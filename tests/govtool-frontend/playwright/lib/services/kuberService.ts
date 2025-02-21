@@ -137,8 +137,12 @@ const kuberService = {
     });
   },
   // register stake and outputs 20A
-  initializeWallets: (wallets: StaticWallet[]) => {
-    const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
+  initializeWallets: (
+    wallets: StaticWallet[],
+    faucetAddress: string = faucetWallet.address,
+    faucetStakeKey: string = faucetWallet.payment.private
+  ) => {
+    const kuber = new Kuber(faucetAddress, faucetStakeKey);
     const outputs = [];
     const stakes = [];
     const certificates = [];
@@ -195,9 +199,11 @@ const kuberService = {
   },
 
   multipleTransferADA: (
-    outputs: { address: string; value: string | number }[]
+    outputs: { address: string; value: string | number }[],
+    addr = faucetWallet.address,
+    signingKey = faucetWallet.payment.private
   ) => {
-    const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
+    const kuber = new Kuber(addr, signingKey);
     const req = {
       outputs,
     };

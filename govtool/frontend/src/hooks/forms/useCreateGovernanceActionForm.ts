@@ -12,7 +12,7 @@ import {
 } from "@consts";
 import { useCardano, useModal, useAppContext, QuorumThreshold } from "@context";
 import {
-  correctAdaFormat,
+  correctVoteAdaFormat,
   downloadJson,
   generateJsonld,
   generateMetadataBody,
@@ -296,7 +296,7 @@ export const useCreateGovernanceActionForm = (
           openWalletErrorModal({
             error: isInsufficientBalance
               ? t("errors.insufficientBalanceDescription", {
-                  ada: correctAdaFormat(protocolParams?.gov_action_deposit),
+                  ada: correctVoteAdaFormat(protocolParams?.gov_action_deposit),
                 })
               : error,
             title: isInsufficientBalance

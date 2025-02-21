@@ -42,7 +42,8 @@ type StyledTabProps = {
   isMobile: boolean;
 };
 
-const StyledTab = styled((props: StyledTabProps) => (
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const StyledTab = styled(({ isMobile, ...props }: StyledTabProps) => (
   <Tab disableRipple {...props} />
 ))(({ isMobile }) => ({
   textTransform: "none",
@@ -337,14 +338,14 @@ export const GovernanceActionDetailsCardData = ({
           <GovernanceActionCardElement
             label={t("govActions.anchorURL")}
             text={url}
-            textVariant="longText"
+            textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
             dataTestId="anchor-url"
             isLinkButton
           />
           <GovernanceActionCardElement
             label={t("govActions.anchorHash")}
             text={metadataHash}
-            textVariant="longText"
+            textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
             dataTestId="anchor-hash"
             isCopyButton
           />

@@ -4,6 +4,7 @@ import { GovernanceActionType, IProposal } from "@types";
 import environments from "lib/constants/environments";
 import GovernanceActionDetailsPage from "./governanceActionDetailsPage";
 import { getEnumKeyByValue } from "@helpers/enum";
+import { waitedLoop } from "@helpers/waitedLoop";
 
 const MAX_SLIDES_DISPLAY_PER_TYPE = 6;
 
@@ -94,8 +95,13 @@ export default class GovernanceActionsPage {
     }
   }
 
-  async getAllProposals() {
-    await this.page.waitForTimeout(4_000); // waits for proposals to render
+  async getAllProposals(): Promise<Locator[]> {
+    await waitedLoop(async () => {
+      return (
+        (await this.page.locator('[data-testid$="-card"]').count()) > 0 ||
+        this.page.getByText("No results for the search.")
+      );
+    });
     return this.page.locator('[data-testid$="-card"]').all();
   }
 

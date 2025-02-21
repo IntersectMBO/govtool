@@ -3,7 +3,7 @@ import { faucetWallet } from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import { skipIfMainnet } from "@helpers/cardano";
 import { pollTransaction } from "@helpers/transaction";
-import { test as setup } from "@playwright/test";
+import { test as setup } from "@fixtures/walletExtension";
 import { loadAmountFromFaucet } from "@services/faucetService";
 import kuberService from "@services/kuberService";
 

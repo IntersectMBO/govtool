@@ -6,7 +6,7 @@ import { Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { CenteredBoxBottomButtons } from "@molecules";
 import {
-  correctAdaFormat,
+  correctVoteAdaFormat,
   getItemFromLocalStorage,
   openInNewTab,
   PROTOCOL_PARAMS_KEY,
@@ -51,7 +51,7 @@ export const RolesAndResponsibilities = ({
             />,
           ]}
           i18nKey="registration.rolesAndResponsibilitiesDescription"
-          values={{ deposit: correctAdaFormat(epochParams?.drep_deposit) }}
+          values={{ deposit: correctVoteAdaFormat(epochParams?.drep_deposit) }}
         />
       </Typography>
       <CenteredBoxBottomButtons

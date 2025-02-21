@@ -5,6 +5,7 @@ import { skipIfNotHardFork } from "@helpers/cardano";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import removeAllSpaces from "@helpers/removeAllSpaces";
+import { functionWaitedAssert } from "@helpers/waitedLoop";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
 
@@ -156,13 +157,18 @@ test("4L. Should search governance actions", async ({ page }) => {
 
   await governanceActionPage.searchInput.fill(governanceActionId);
 
-  const proposalCards = await governanceActionPage.getAllProposals();
+  await functionWaitedAssert(
+    async () => {
+      const proposalCards = await governanceActionPage.getAllProposals();
 
-  for (const proposalCard of proposalCards) {
-    await expect(
-      proposalCard.getByTestId(`${governanceActionId}-id`)
-    ).toBeVisible();
-  }
+      for (const proposalCard of proposalCards) {
+        await expect(
+          proposalCard.getByTestId(`${governanceActionId}-id`)
+        ).toBeVisible();
+      }
+    },
+    { message: `${governanceActionId} not found` }
+  );
 });
 
 test("4M. Should show view-all categorized governance actions", async ({

@@ -73,6 +73,7 @@ export enum ProposalType {
   info = "Info Action",
   treasury = "Treasury requests",
   updatesToTheConstitution = "Updates to the Constitution",
+  motionOfNoConfedence = "Motion of No Confidence",
 }
 
 export enum BootstrapGovernanceActionType {
@@ -163,6 +164,7 @@ export type ProposalCreateRequest = {
   prop_constitution_url?: string;
   prop_guardrails_script_url?: string;
   prop_guardrails_script_hash?: string;
+  has_guardrails?: boolean;
   is_draft: boolean;
 };
 

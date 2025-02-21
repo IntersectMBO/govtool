@@ -7,7 +7,7 @@ import { PendingTransaction } from "@context";
 import { useTranslation } from "@hooks";
 import { VoterInfo } from "@models";
 import { DashboardActionCard, DashboardActionCardProps } from "@molecules";
-import { correctAdaFormat, openInNewTab } from "@utils";
+import { correctVoteAdaFormat, openInNewTab } from "@utils";
 import { LINKS } from "@/consts/links";
 
 type DirectVoterDashboardCardProps = {
@@ -24,7 +24,7 @@ export const DirectVoterDashboardCard = ({
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const ada = correctAdaFormat(votingPower);
+  const ada = correctVoteAdaFormat(votingPower);
 
   // learn more button
   const learnMoreButton: LoadingButtonProps = {

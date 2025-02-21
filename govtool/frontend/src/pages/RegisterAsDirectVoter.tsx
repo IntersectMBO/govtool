@@ -16,7 +16,7 @@ import { CenteredBoxBottomButtons, CenteredBoxPageWrapper } from "@molecules";
 import {
   PROTOCOL_PARAMS_KEY,
   checkIsWalletConnected,
-  correctAdaFormat,
+  correctVoteAdaFormat,
   getItemFromLocalStorage,
   openInNewTab,
 } from "@utils";
@@ -144,10 +144,14 @@ export const RegisterAsDirectVoter = () => {
       >
         <Trans
           i18nKey="directVoter.registerDescription"
-          values={{ deposit: correctAdaFormat(epochParams?.drep_deposit) }}
+          values={{ deposit: correctVoteAdaFormat(epochParams?.drep_deposit) }}
           components={[
             <Link
-              onClick={() => openInNewTab("https://docs.gov.tools/cardano-govtool/faqs/direct-voter-vs-drep")}
+              onClick={() =>
+                openInNewTab(
+                  "https://docs.gov.tools/cardano-govtool/faqs/direct-voter-vs-drep",
+                )
+              }
               sx={{ cursor: "pointer" }}
               key="0"
             />,

@@ -13,7 +13,11 @@ import {
   useWalletErrorModal,
 } from "@hooks";
 import { CenteredBoxBottomButtons, CenteredBoxPageWrapper } from "@molecules";
-import { checkIsWalletConnected, correctAdaFormat, openInNewTab } from "@utils";
+import {
+  checkIsWalletConnected,
+  correctVoteAdaFormat,
+  openInNewTab,
+} from "@utils";
 import { WrongRouteInfo } from "@organisms";
 
 export const RetireAsDirectVoter = () => {
@@ -118,10 +122,14 @@ export const RetireAsDirectVoter = () => {
       >
         <Trans
           i18nKey="directVoter.retirementDescription"
-          values={{ deposit: correctAdaFormat(voter?.deposit) }}
+          values={{ deposit: correctVoteAdaFormat(voter?.deposit) }}
           components={[
             <Link
-              onClick={() => openInNewTab("https://docs.gov.tools/cardano-govtool/faqs/direct-voter-vs-drep")}
+              onClick={() =>
+                openInNewTab(
+                  "https://docs.gov.tools/cardano-govtool/faqs/direct-voter-vs-drep",
+                )
+              }
               sx={{ cursor: "pointer", textDecoration: "none" }}
               key="0"
             />,

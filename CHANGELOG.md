@@ -12,11 +12,28 @@ changes.
 
 ### Added
 
+### Fixed
+
+### Changed
+
+### Removed
+
+## [v2.0.12](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.12) 2025-02-21
+
+
+### Added
+
 - Add metadata url and hash to drep details [Issue 2911](https://github.com/IntersectMBO/govtool/issues/2911)
 - Add CC votes percentages, not voted and Ratification threshold
 - Add support for submitting all 7 governance action types [Issue 2258](https://github.com/IntersectMBO/govtool/issues/2258)
 - Add workflow to automatically update any of the @intersect.mbo package [Issue 2968](https://github.com/IntersectMBO/govtool/issues/2968)
 - Add Propose Governance Action button in governance actions dashboard [Issue 1188](https://github.com/IntersectMBO/govtool/issues/1188)
+- Add click handlers to non-interactive elements [Issue 2929](https://github.com/IntersectMBO/govtool/issues/2929)
+- Allow searching for yourself in DRep Directory [Issue 2993](https://github.com/IntersectMBO/govtool/issues/2993)
+- Add mathematical styling for governance actions [Issue 2984](https://github.com/IntersectMBO/govtool/issues/2984)
+- Add script to update GovTool version
+- Add `isStakeKeyRegistered` for the usage by pillars [Issue 2384](https://github.com/IntersectMBO/govtool/issues/2384)
+- Add server side compression for large assets
 
 ### Fixed
 
@@ -24,12 +41,17 @@ changes.
 - Fix crashing backend on unhandled missing proposal from vote [Issue 2920](https://github.com/IntersectMBO/govtool/issues/2920)
 - Remove abstain votes (not auto abstain) from total DRep stake
 - Fix counting committee members [Issue 2948](https://github.com/IntersectMBO/govtool/issues/2948)
+- Fix refetching DRep list on every enter [Issue 2994](https://github.com/IntersectMBO/govtool/issues/2994)
+- Fix displaying helper buttons on governance action card details [Issue 3022](https://github.com/IntersectMBO/govtool/issues/3022)
 
 ### Changed
 
 - Change threshold visual representation in governance action votes
 - Resize governance action details columns
 - Update @intersect.mbo/pdf-ui to v0.6.0
+- Bump actions/cache to v4 across workflows
+- Unify ADA Format across the application [Issue 3031](https://github.com/IntersectMBO/govtool/issues/3031)
+- Change default filtering for DRep directory to show the active DReps [Issue 3035](https://github.com/IntersectMBO/govtool/issues/3035)
 
 ### Removed
 

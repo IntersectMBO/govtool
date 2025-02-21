@@ -14,7 +14,7 @@ import {
 } from "@hooks";
 import { DataActionsBar, EmptyStateDrepDirectory } from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
-import { correctAdaFormat, isSameDRep, uniqBy, parseBoolean } from "@utils";
+import { correctVoteAdaFormat, isSameDRep, uniqBy, parseBoolean } from "@utils";
 import { DRepData, DRepListSort, DRepStatus } from "@models";
 import {
   AutomatedVotingOptionCurrentDelegation,
@@ -46,11 +46,15 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const { dRepID: myDRepId, pendingTransaction, stakeKey } = useCardano();
   const { t } = useTranslation();
   const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
-  const { chosenFilters, chosenSorting, setChosenSorting } =
+  const { chosenFilters, chosenSorting, setChosenFilters, setChosenSorting } =
     dataActionsBarProps;
 
   const [inProgressDelegationDRepData, setInProgressDelegationDRepData] =
     useState<DRepData | undefined>(undefined);
+
+  useEffect(() => {
+    setChosenFilters([DRepStatus.Active]);
+  }, []);
 
   useEffect(() => {
     if (!chosenSorting) setChosenSorting(DRepListSort.Random);
@@ -66,12 +70,6 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const { dRep: myDrep } = useGetDRepDetailsQuery(currentDelegation?.dRepView, {
     enabled: !!inProgressDelegation || !!currentDelegation,
   });
-
-  const { dRep: yourselfDRep } = useGetDRepDetailsQuery(myDRepId, {
-    enabled: !!inProgressDelegation || !!currentDelegation,
-  });
-  const showYourselfDRep =
-    debouncedSearchText === myDRepId || debouncedSearchText === "";
 
   const {
     dRepData: dRepList,
@@ -104,22 +102,17 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     return <Loader />;
   }
 
-  const ada = correctAdaFormat(votingPower);
+  const ada = correctVoteAdaFormat(votingPower);
 
-  const listedDRepsWithoutYourself = uniqBy(
-    dRepList?.filter(
-      (dRep) =>
-        (typeof dRep.doNotList === "string"
-          ? !parseBoolean(dRep.doNotList)
-          : !dRep.doNotList) && !isSameDRep(dRep, myDRepId),
-    ),
+  const filteredDoNotListDReps = uniqBy(
+    dRepList?.filter((dRep) => {
+      if (typeof dRep.doNotList === "string") {
+        return !parseBoolean(dRep.doNotList);
+      }
+      return !dRep.doNotList;
+    }),
     "view",
   );
-
-  const dRepListToDisplay =
-    yourselfDRep && showYourselfDRep
-      ? [yourselfDRep, ...listedDRepsWithoutYourself]
-      : listedDRepsWithoutYourself;
 
   const isAnAutomatedVotingOptionChosen =
     currentDelegation?.dRepView &&
@@ -217,8 +210,8 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             flex: 1,
           }}
         >
-          {dRepListToDisplay?.length === 0 && <EmptyStateDrepDirectory />}
-          {dRepListToDisplay?.map((dRep) => (
+          {filteredDoNotListDReps?.length === 0 && <EmptyStateDrepDirectory />}
+          {filteredDoNotListDReps?.map((dRep) => (
             <Box key={dRep.view} component="li" sx={{ listStyle: "none" }}>
               <DRepCard
                 dRep={dRep}

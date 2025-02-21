@@ -17,6 +17,7 @@ import {
   proposal06Wallet,
   proposal07Wallet,
   proposal08Wallet,
+  proposal09Wallet,
   user01Wallet,
 } from "@constants/staticWallets";
 import { test as setup } from "@fixtures/walletExtension";
@@ -48,6 +49,7 @@ const proposal05AuthFile = ".auth/proposal05.json";
 const proposal06AuthFile = ".auth/proposal06.json";
 const proposal07AuthFile = ".auth/proposal07.json";
 const proposal08AuthFile = ".auth/proposal08.json";
+const proposal09AuthFile = ".auth/proposal09.json";
 
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
@@ -205,5 +207,14 @@ setup("Create Proposal 08 auth", async ({ page, context }) => {
     context,
     wallet: proposal08Wallet,
     auth: proposal08AuthFile,
+  });
+});
+
+setup("Create Proposal 09 auth", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: proposal09Wallet,
+    auth: proposal09AuthFile,
   });
 });

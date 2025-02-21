@@ -2,12 +2,13 @@ import environments from "@constants/environments";
 import {
   BOOTSTRAP_PROPOSAL_TYPE_FILTERS,
   PROPOSAL_STATUS_FILTER,
-  PROPOSAL_TYPE_FILTERS,
 } from "@constants/index";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
 import { isBootStrapingPhase, skipIfNotHardFork } from "@helpers/cardano";
+import { injectLogger } from "@helpers/page";
+import { functionWaitedAssert } from "@helpers/waitedLoop";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { expect } from "@playwright/test";
@@ -16,8 +17,6 @@ import { ProposalType } from "@types";
 const mockProposal = require("../../lib/_mock/proposal.json");
 const mockPoll = require("../../lib/_mock/proposalPoll.json");
 const mockComments = require("../../lib/_mock/proposalComments.json");
-const mockInfoProposedGA = require("../../lib/_mock/infoProposedGAs.json");
-const mockTreasuryProposal = require("../../lib/_mock/treasuryProposedGAs.json");
 
 test.beforeEach(async () => {
   await setAllureEpic("8. Proposal Discussion Forum");
@@ -52,7 +51,9 @@ test.describe("Filter and sort proposals", () => {
 
     // proposal type filter
     await proposalDiscussionPage.applyAndValidateFilters(
-      isBootStraping ? BOOTSTRAP_PROPOSAL_TYPE_FILTERS : PROPOSAL_TYPE_FILTERS,
+      isBootStraping
+        ? BOOTSTRAP_PROPOSAL_TYPE_FILTERS
+        : Object.values(ProposalType),
       proposalDiscussionPage._validateTypeFiltersInProposalCard
     );
 
@@ -79,54 +80,70 @@ test.describe("Filter and sort proposals", () => {
 test("8C. Should search the list of proposed governance actions.", async ({
   page,
 }) => {
-  const proposalName = "Labadie, Stehr and Rosenbaum";
+  let proposalName = "Labadie, Stehr and Rosenbaum";
+  let proposalNameSet = false;
+
+  await page.route("**/api/proposals?**", async (route) => {
+    const response = await route.fetch();
+    const json = await response.json();
+    if (!proposalNameSet && "data" in json && json["data"].length > 0) {
+      const randomIndex = Math.floor(Math.random() * json["data"].length);
+      proposalName =
+        json["data"][randomIndex]["attributes"]["content"]["attributes"][
+          "prop_name"
+        ];
+      proposalNameSet = true;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(json),
+    });
+  });
+
+  const responsePromise = page.waitForResponse("**/api/proposals?**");
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
 
+  await responsePromise;
+
   await proposalDiscussionPage.searchInput.fill(proposalName);
 
-  const proposalCards = await proposalDiscussionPage.getAllProposals();
+  await page.waitForTimeout(2000);
 
-  for (const proposalCard of proposalCards) {
-    await expect(
-      proposalCard.locator('[data-testid^="proposal-"][data-testid$="-title"]')
-    ).toHaveText(proposalName);
-  }
+  await functionWaitedAssert(
+    async () => {
+      const proposalCards = await proposalDiscussionPage.getAllProposals();
+      for (const proposalCard of proposalCards) {
+        const proposalTitle = await proposalCard
+          .locator('[data-testid^="proposal-"][data-testid$="-title"]')
+          .innerText();
+        expect(proposalTitle).toContain(proposalName);
+      }
+    },
+    {
+      message: `A proposal card does not contain the search term ${proposalName}`,
+    }
+  );
 });
 
 test("8D. Should show the view-all categorized proposed governance actions.", async ({
   browser,
 }) => {
   await Promise.all(
-    Object.entries({
-      [ProposalType.info]: mockInfoProposedGA,
-      [ProposalType.treasury]: mockTreasuryProposal,
-    }).map(async ([proposalType, mockData]) => {
-      const requestUrl = `**/api/proposals?**`;
-      let requestHandled = 0;
-
+    Object.values(ProposalType).map(async (proposalType: string) => {
       const context = await browser.newContext();
       const page = await context.newPage();
-
-      await page.route(requestUrl, async (route) => {
-        if (requestHandled < 2) {
-          requestHandled = requestHandled + 1;
-          return route.fulfill({
-            body: JSON.stringify(mockData),
-          });
-        }
-        return route.continue();
-      });
+      injectLogger(page);
 
       const proposalDiscussionPage = new ProposalDiscussionPage(page);
       await proposalDiscussionPage.goto();
 
-      await proposalDiscussionPage.filterBtn.click();
-      await proposalDiscussionPage.filterProposalByNames([proposalType]);
-      // to close the filter menu
-      await proposalDiscussionPage.filterBtn.click({ force: true });
-
-      proposalDiscussionPage.showAllBtn.click();
+      await page
+        .getByTestId(
+          proposalType.toLowerCase().replace(/ /g, "-") + "-show-all-button"
+        )
+        .click();
 
       const proposalCards = await proposalDiscussionPage.getAllProposals();
 

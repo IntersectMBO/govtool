@@ -75,6 +75,7 @@ jobs:
           USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}
           APP_ENV: test
           PDF_API_URL: ${{ secrets.PDF_API_URL }}
+          OUTCOMES_API_URL: ${{ secrets.OUTCOMES_API_URL }}
           KUBER_API_KEY: ${{ secrets.KUBER_API_KEY }}
           IPFS_GATEWAY: $${{secrets.IPFS_GATEWAY}}
           IPFS_PROJECT_ID: $${{secrets.IPFS_PROJECT_ID}}

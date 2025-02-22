@@ -1488,10 +1488,10 @@
   resolved "https://registry.npmjs.org/@inquirer/type/-/type-3.0.1.tgz"
   integrity sha512-+ksJMIy92sOAiAccGpcKZUc3bYO07cADnscIxHBknEm3uNts3movSmBofc1908BNy5edKscxYeAdaX1NXkHS6A==
 
-"@intersect.mbo/govtool-outcomes-pillar-ui@1.2.1":
-  version "1.2.1"
-  resolved "https://registry.npmjs.org/@intersect.mbo/govtool-outcomes-pillar-ui/-/govtool-outcomes-pillar-ui-1.2.1.tgz"
-  integrity sha512-LQShglbHzZY3NiqkLMSdFKrrHNGV/vqDkHy8fYtexX4OgH1+qDCMFArxvjCfHS6NNxUk8PdpOWkeVsW38ZCUpg==
+"@intersect.mbo/govtool-outcomes-pillar-ui@1.2.2":
+  version "1.2.2"
+  resolved "https://registry.npmjs.org/@intersect.mbo/govtool-outcomes-pillar-ui/-/govtool-outcomes-pillar-ui-1.2.2.tgz"
+  integrity sha512-ecUCLtzXm2SVmpU+3/EiaUBep2xJwFMvxXOEa2PfUxrJUhqmrpdjGJalW8ZpiKM3JTgaLUvh3pZYZ3uc8Y/q8Q==
   dependencies:
     "@fontsource/poppins" "^5.0.14"
     "@intersect.mbo/intersectmbo.org-icons-set" "^1.0.8"

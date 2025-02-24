@@ -140,20 +140,28 @@ export default class DRepDirectoryPage {
       const isValid = validationFn(dRepList[i], dRepList[i + 1]);
       expect(isValid).toBe(true);
     }
-    // Frontend validation
-    const cip105DRepListFE = await this.getAllListedCIP105DRepIds();
-    const cip129DRepListFE = await this.getAllListedCIP129DRepIds();
 
-    const cip129DRepListApi = dRepList.map((dRep) =>
-      convertDRepToCIP129(dRep.drepId, dRep.isScriptBased)
+    await functionWaitedAssert(
+      async () => {
+        // Frontend validation
+        const cip105DRepListFE = await this.getAllListedCIP105DRepIds();
+        const cip129DRepListFE = await this.getAllListedCIP129DRepIds();
+
+        const cip129DRepListApi = dRepList.map((dRep) =>
+          convertDRepToCIP129(dRep.drepId, dRep.isScriptBased)
+        );
+
+        for (let i = 0; i <= cip105DRepListFE.length - 1; i++) {
+          await expect(cip129DRepListFE[i], {
+            message: `Cip129 dRep Id from Api:${cip129DRepListApi[i]} is not equal to ${await cip129DRepListFE[i].textContent()} on sort ${option}`,
+          }).toHaveText(cip129DRepListApi[i]);
+          await expect(cip105DRepListFE[i], {
+            message: `Cip105 dRep Id from Api:${dRepList[i].view} is not equal to ${await cip105DRepListFE[i].textContent()}  on sort ${option}`,
+          }).toHaveText(`(CIP-105) ${dRepList[i].view}`);
+        }
+      },
+      { name: `frontend sort validation of ${option}` }
     );
-
-    for (let i = 0; i <= cip105DRepListFE.length - 1; i++) {
-      await expect(cip129DRepListFE[i]).toHaveText(cip129DRepListApi[i]);
-      await expect(cip105DRepListFE[i]).toHaveText(
-        `(CIP-105) ${dRepList[i].view}`
-      );
-    }
   }
   getDRepCard(dRepId: string) {
     return this.page.getByTestId(`${dRepId}-drep-card`);

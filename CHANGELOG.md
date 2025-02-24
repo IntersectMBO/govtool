@@ -16,10 +16,11 @@ changes.
 
 ### Changed
 
+- Change drep details and governance action header components to follow accessibility standards [Issue 3065](https://github.com/IntersectMBO/govtool/issues/3065)
+
 ### Removed
 
 ## [v2.0.12](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.12) 2025-02-21
-
 
 ### Added
 

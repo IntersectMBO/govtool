@@ -186,8 +186,16 @@ test.describe("Perform voting", () => {
     await govActionDetailsPage.reVote();
     await governanceActionsPage.votedTab.click();
 
+    const isNoVoteVisible = await govActionDetailsPage.currentPage
+      .getByTestId("my-vote")
+      .getByText("No")
+      .isVisible();
+
     await expect(
-      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No")
+      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No"),
+      {
+        message: !isNoVoteVisible && "No vote not visible",
+      }
     ).toBeVisible({ timeout: 60_000 });
   });
 

@@ -1,6 +1,6 @@
 import { StaticWallet } from "@types";
-import * as fs from "fs";
 import { LockInterceptor } from "./lockInterceptor";
+import { createFile, getFile } from "@helpers/file";
 const path = require("path");
 
 const baseFilePath = path.resolve(__dirname, "./_mock");
@@ -28,36 +28,11 @@ class WalletManager {
   }
 
   async writeWallets(wallets: StaticWallet[], purpose: Purpose) {
-    await new Promise<void>((resolve, reject) =>
-      fs.writeFile(
-        `${baseFilePath}/${purpose}Wallets.json`,
-        JSON.stringify(wallets, null, 2),
-        (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        }
-      )
-    );
+    await createFile(`${purpose}Wallets.json`, wallets);
   }
 
   async readWallets(purpose: Purpose): Promise<StaticWallet[]> {
-    const data: string = await new Promise((resolve, reject) =>
-      fs.readFile(
-        `${baseFilePath}/${purpose}Wallets.json`,
-        "utf8",
-        (err, data) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(data);
-          }
-        }
-      )
-    );
-    return JSON.parse(data);
+    return await getFile(`${purpose}Wallets.json`);
   }
 
   async removeCopyWallet(walletToRemove: StaticWallet, purpose: Purpose) {

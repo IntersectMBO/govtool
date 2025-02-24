@@ -199,8 +199,15 @@ export default class DRepDirectoryPage {
     await this.goto();
 
     await this.searchInput.fill(dRepId);
+    const isEmptyContainerVisible = await this.page
+      .getByText("No DReps found")
+      .isVisible();
 
-    await expect(this.page.getByText("No DReps found")).toBeVisible({
+    await expect(this.page.getByText("No DReps found"), {
+      message:
+        !isEmptyContainerVisible &&
+        `DRep with id ${dRepId} is found in the list`,
+    }).toBeVisible({
       timeout: 20_000,
     });
   }

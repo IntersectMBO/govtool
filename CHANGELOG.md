@@ -14,12 +14,14 @@ changes.
 
 ### Fixed
 
+- Fix responsive error on menu [Issue 3055](https://github.com/IntersectMBO/govtool/issues/3055)
+- Fix wrong placement of nav items in disconnected menu [Issue 3057](https://github.com/IntersectMBO/govtool/issues/3057)
+
 ### Changed
 
 ### Removed
 
 ## [v2.0.12](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.12) 2025-02-21
-
 
 ### Added
 

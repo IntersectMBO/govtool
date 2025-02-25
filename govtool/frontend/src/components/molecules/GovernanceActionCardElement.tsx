@@ -172,6 +172,7 @@ export const GovernanceActionCardElement = ({
     >
       <Box sx={{ display: "flex", alignItems: "center", mb: "4px" }}>
         <Typography
+          component="h2"
           sx={{
             fontSize: isSliderCard ? 12 : 14,
             fontWeight: isSliderCard ? 500 : 600,

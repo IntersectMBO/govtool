@@ -75,6 +75,7 @@ export const DataMissingHeader = ({
             ...titleStyle,
           }}
           variant="title2"
+          component="h1"
         >
           {(isDataMissing &&
             getMetadataDataMissingStatusTranslation(

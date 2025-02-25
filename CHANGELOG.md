@@ -14,12 +14,17 @@ changes.
 
 ### Fixed
 
+- Fix responsive error on menu [Issue 3055](https://github.com/IntersectMBO/govtool/issues/3055)
+- Fix wrong placement of nav items in disconnected menu [Issue 3057](https://github.com/IntersectMBO/govtool/issues/3057)
+- Fix missing subtraction withdrawals from ada holder balance [Issue 3061](https://github.com/IntersectMBO/govtool/issues/3061)
+
 ### Changed
+
+- Change drep details and governance action header components to follow accessibility standards [Issue 3065](https://github.com/IntersectMBO/govtool/issues/3065)
 
 ### Removed
 
 ## [v2.0.12](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.12) 2025-02-21
-
 
 ### Added
 
@@ -34,6 +39,7 @@ changes.
 - Add script to update GovTool version
 - Add `isStakeKeyRegistered` for the usage by pillars [Issue 2384](https://github.com/IntersectMBO/govtool/issues/2384)
 - Add server side compression for large assets
+- Add outcomes
 
 ### Fixed
 

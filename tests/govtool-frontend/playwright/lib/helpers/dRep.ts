@@ -33,8 +33,6 @@ export async function fetchFirstActiveDRepDetails(page: Page) {
 
   dRepDirectoryPage = new DRepDirectoryPage(page);
   await dRepDirectoryPage.goto();
-  await dRepDirectoryPage.filterBtn.click();
-  await page.getByTestId("Active-checkbox").click();
   await responsePromise;
 
   await dRepDirectoryPage.searchInput.click();

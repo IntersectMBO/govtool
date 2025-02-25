@@ -329,6 +329,7 @@ const DRepDetailsInfoItem = ({
           fontWeight={600}
           variant="body2"
           data-testid={`${dataTestId}-${dataTestIdInfoItemCategoryPrefix}-title`}
+          component="h2"
         >
           {label}
         </Typography>
@@ -409,7 +410,9 @@ const ReferencesLink = ({ label, uri }: ReferenceItem) => (
       },
     }}
   >
-    <Typography fontWeight={400}>{label}</Typography>
+    <Typography fontWeight={400} component="h2">
+      {label}
+    </Typography>
     <Link
       data-testid={`${testIdFromLabel(label)}-link`}
       href={uri}

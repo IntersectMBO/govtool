@@ -129,6 +129,7 @@ test("2K_1. Should filter DReps", async ({ page }) => {
   await dRepDirectory.goto();
 
   await dRepDirectory.filterBtn.click();
+  await page.getByTestId(`Active-checkbox`).click();
 
   // Single filter
   for (const option of dRepFilterOptions) {

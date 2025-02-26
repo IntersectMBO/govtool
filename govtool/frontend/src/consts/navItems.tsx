@@ -25,6 +25,12 @@ export const NAV_ITEMS = [
     label: i18n.t("dRepDirectory.title"),
   },
   {
+    dataTestId: "proposed-governance-actions-link",
+    navTo: PDF_PATHS.proposalDiscussion,
+    label: i18n.t("proposalDiscussion.title"),
+    newTabLink: null,
+  },
+  {
     dataTestId: "governance-actions-link",
     navTo: PATHS.governanceActions,
     label: i18n.t("govActions.navTitle"),
@@ -34,12 +40,6 @@ export const NAV_ITEMS = [
     dataTestId: "governance-actions-outcomes-link",
     label: i18n.t("govActions.outcomes.title"),
     navTo: OUTCOMES_PATHS.governanceActionsOutcomes,
-    newTabLink: null,
-  },
-  {
-    dataTestId: "proposed-governance-actions-link",
-    navTo: PDF_PATHS.proposalDiscussion,
-    label: i18n.t("proposalDiscussion.title"),
     newTabLink: null,
   },
   {

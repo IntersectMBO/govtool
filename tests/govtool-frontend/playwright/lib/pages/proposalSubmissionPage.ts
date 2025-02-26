@@ -235,7 +235,7 @@ export default class ProposalSubmissionPage {
   async getAllDrafts() {
     await expect(
       this.page.locator('[data-testid^="draft-"][data-testid$="-card"]')
-    ).toBeVisible({ timeout: 10_000 }); // slow rendering
+    ).toBeVisible({ timeout: 60_000 }); // slow rendering
 
     return await this.page
       .locator('[data-testid^="draft-"][data-testid$="-card"]')
@@ -245,7 +245,7 @@ export default class ProposalSubmissionPage {
   async getFirstDraft() {
     await expect(
       this.page.locator('[data-testid^="draft-"][data-testid$="-card"]').first()
-    ).toBeVisible({ timeout: 10_000 }); // slow rendering
+    ).toBeVisible({ timeout: 60_000 }); // slow rendering
 
     return this.page
       .locator('[data-testid^="draft-"][data-testid$="-card"]')
@@ -270,39 +270,80 @@ export default class ProposalSubmissionPage {
       await expect(this.page.getByTestId(err)).toBeHidden();
     }
 
-    expect(await this.abstractInput.textContent()).toEqual(
-      governanceProposal.prop_abstract
-    );
+    const abstractInputContent = await this.abstractInput.textContent();
+    const rationaleInputContent = await this.rationaleInput.textContent();
+    const motivationInputContent = await this.motivationInput.textContent();
+    const isLinkErrorVisible = await this.page
+      .getByTestId(formErrors.link)
+      .isVisible();
 
-    expect(await this.rationaleInput.textContent()).toEqual(
-      governanceProposal.prop_rationale
-    );
+    expect(await this.abstractInput.textContent(), {
+      message:
+        abstractInputContent !== governanceProposal.prop_abstract &&
+        `${governanceProposal.prop_abstract} is not equal to ${await this.abstractInput.textContent()}`,
+    }).toEqual(governanceProposal.prop_abstract);
 
-    expect(await this.motivationInput.textContent()).toEqual(
-      governanceProposal.prop_motivation
-    );
+    expect(await this.rationaleInput.textContent(), {
+      message:
+        rationaleInputContent !== governanceProposal.prop_rationale &&
+        `${governanceProposal.prop_rationale} is not equal to ${await this.rationaleInput.textContent()}`,
+    }).toEqual(governanceProposal.prop_rationale);
+
+    expect(await this.motivationInput.textContent(), {
+      message:
+        motivationInputContent !== governanceProposal.prop_motivation &&
+        `${governanceProposal.prop_motivation} is not equal to ${await this.motivationInput.textContent()}`,
+    }).toEqual(governanceProposal.prop_motivation);
 
     if (governanceProposal.gov_action_type_id === 1) {
-      await expect(
-        this.page.getByTestId(formErrors.receivingAddress)
-      ).toBeHidden();
+      const isReceivingAddressErrorVisible = await this.page
+        .getByTestId(formErrors.receivingAddress)
+        .isVisible();
+      const isAmountErrorVisible = await this.page
+        .getByTestId(formErrors.amount)
+        .isVisible();
+
+      await expect(this.page.getByTestId(formErrors.receivingAddress), {
+        message:
+          isReceivingAddressErrorVisible &&
+          `${governanceProposal.prop_receiving_address} is an invalid receiving address`,
+      }).toBeHidden();
 
       for (const err of formErrors.amount) {
-        await expect(this.page.getByTestId(err)).toBeHidden();
+        await expect(this.page.getByTestId(err), {
+          message:
+            isAmountErrorVisible &&
+            `${governanceProposal.prop_amount} is an invalid amount`,
+        }).toBeHidden();
       }
     }
 
     if (governanceProposal.gov_action_type_id === 2) {
-      await expect(
-        this.page.getByTestId(formErrors.constitutionalUrl)
-      ).toBeHidden();
+      const isConstitutionalUrlErrorVisible = await this.page
+        .getByTestId(formErrors.constitutionalUrl)
+        .isVisible();
+      const isGuardrailsScriptUrlErrorVisible = await this.page
+        .getByTestId(formErrors.guardrailsScriptUrl)
+        .isVisible();
 
-      await expect(
-        this.page.getByTestId(formErrors.guardrailsScriptUrl)
-      ).toBeHidden();
+      await expect(this.page.getByTestId(formErrors.constitutionalUrl), {
+        message:
+          isConstitutionalUrlErrorVisible &&
+          `${governanceProposal.prop_constitution_url} is an invalid constitution url`,
+      }).toBeHidden();
+
+      await expect(this.page.getByTestId(formErrors.guardrailsScriptUrl), {
+        message:
+          isGuardrailsScriptUrlErrorVisible &&
+          `${governanceProposal.prop_guardrails_script_url} is an invalid guardrails script url`,
+      }).toBeHidden();
     }
 
-    await expect(this.page.getByTestId(formErrors.link)).toBeHidden();
+    await expect(this.page.getByTestId(formErrors.link), {
+      message:
+        isLinkErrorVisible &&
+        `${governanceProposal.proposal_links[0].prop_link} is an invalid link`,
+    }).toBeHidden();
 
     await expect(this.continueBtn).toBeEnabled();
   }
@@ -313,8 +354,14 @@ export default class ProposalSubmissionPage {
     value: string,
     logMessage: string
   ) {
+    const isErrorFieldVisible = await this.page
+      .getByTestId(errorField)
+      .isVisible();
     if (value === " ") {
-      await expect(this.page.getByTestId(errorField)).toBeVisible();
+      await expect(this.page.getByTestId(errorField), {
+        message:
+          !isErrorFieldVisible && `Empty value is assumed as ${logMessage}`,
+      }).toBeVisible();
     } else {
       expectWithInfo(
         async () => expect(await input.textContent()).not.toEqual(value),
@@ -325,7 +372,18 @@ export default class ProposalSubmissionPage {
 
   async inValidateForm(governanceProposal: ProposalCreateRequest) {
     await this.fillupFormWithTypeSelected(governanceProposal);
-    await expect(this.page.getByTestId(formErrors.proposalTitle)).toBeVisible();
+    const isProposalTitleErrorVisible = await this.page
+      .getByTestId(formErrors.proposalTitle)
+      .isVisible();
+    const isLinkErrorVisible = await this.page
+      .getByTestId(formErrors.link)
+      .isVisible();
+
+    await expect(this.page.getByTestId(formErrors.proposalTitle), {
+      message:
+        !isProposalTitleErrorVisible &&
+        `${governanceProposal.prop_name} is a valid proposal title`,
+    }).toBeVisible();
 
     await this.assertFieldValidation(
       this.abstractInput,
@@ -346,24 +404,51 @@ export default class ProposalSubmissionPage {
       "valid rationale"
     );
 
-    await expect(this.page.getByTestId(formErrors.link)).toBeVisible();
+    await expect(this.page.getByTestId(formErrors.link), {
+      message:
+        !isLinkErrorVisible &&
+        `${governanceProposal.proposal_links[0].prop_link} is a valid link`,
+    }).toBeVisible();
 
     if (governanceProposal.gov_action_type_id === 1) {
-      await expect(
-        this.page.getByTestId(formErrors.receivingAddress)
-      ).toBeVisible();
+      const isReceivingAddressErrorVisible = await this.page
+        .getByTestId(formErrors.receivingAddress)
+        .isVisible();
+      const isAmountErrorVisible = await this.page
+        .getByTestId(formErrors.amount)
+        .isVisible();
 
-      await expect(this.page.getByTestId(formErrors.amount)).toBeVisible();
+      await expect(this.page.getByTestId(formErrors.receivingAddress), {
+        message:
+          !isReceivingAddressErrorVisible &&
+          `${governanceProposal.prop_receiving_address} is a valid receiving address`,
+      }).toBeVisible();
+
+      await expect(this.page.getByTestId(formErrors.amount), {
+        message:
+          !isAmountErrorVisible &&
+          `${governanceProposal.prop_amount} is a valid amount`,
+      }).toBeVisible();
     }
 
     if (governanceProposal.gov_action_type_id === 2) {
-      await expect(
-        this.page.getByTestId(formErrors.constitutionalUrl)
-      ).toBeVisible();
+      const isConstitutionalUrlErrorVisible = await this.page
+        .getByTestId(formErrors.constitutionalUrl)
+        .isVisible();
+      const isGuardrailsScriptUrlErrorVisible = await this.page
+        .getByTestId(formErrors.guardrailsScriptUrl)
+        .isVisible();
+      await expect(this.page.getByTestId(formErrors.constitutionalUrl), {
+        message:
+          !isConstitutionalUrlErrorVisible &&
+          `${governanceProposal.prop_constitution_url} is a valid constitution url`,
+      }).toBeVisible();
 
-      await expect(
-        this.page.getByTestId(formErrors.guardrailsScriptUrl)
-      ).toBeVisible();
+      await expect(this.page.getByTestId(formErrors.guardrailsScriptUrl), {
+        message:
+          !isGuardrailsScriptUrlErrorVisible &&
+          `${governanceProposal.prop_guardrails_script_url} is a valid guardrails script url`,
+      }).toBeVisible();
     }
 
     await expect(this.continueBtn).toBeDisabled();

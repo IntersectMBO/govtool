@@ -179,7 +179,7 @@ export const TopNav = ({ isConnectButton = true }) => {
             src={IMAGES.appLogo}
           />
         </NavLink>
-        {screenWidth >= 1024 ? renderDesktopNav() : renderMobileNav()}
+        {screenWidth >= 1145 ? renderDesktopNav() : renderMobileNav()}
       </Box>
     </AppBar>
   );

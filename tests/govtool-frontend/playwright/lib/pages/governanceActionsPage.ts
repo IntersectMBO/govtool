@@ -4,7 +4,7 @@ import { GovernanceActionType, IProposal } from "@types";
 import environments from "lib/constants/environments";
 import GovernanceActionDetailsPage from "./governanceActionDetailsPage";
 import { getEnumKeyByValue } from "@helpers/enum";
-import { waitedLoop } from "@helpers/waitedLoop";
+import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
 
 const MAX_SLIDES_DISPLAY_PER_TYPE = 6;
 
@@ -106,18 +106,20 @@ export default class GovernanceActionsPage {
   }
 
   async validateFilters(filters: string[]) {
-    const proposalCards = await this.getAllProposals();
+    await functionWaitedAssert(async () => {
+      const proposalCards = await this.getAllProposals();
 
-    for (const proposalCard of proposalCards) {
-      const hasFilter = await this._validateFiltersInProposalCard(
-        proposalCard,
-        filters
-      );
-      expect(
-        hasFilter,
-        "A proposal card does not contain any of the filters"
-      ).toBe(true);
-    }
+      for (const proposalCard of proposalCards) {
+        const hasFilter = await this._validateFiltersInProposalCard(
+          proposalCard,
+          filters
+        );
+        expect(
+          hasFilter,
+          `A proposal card does not contain any of the ${filters}`
+        ).toBe(true);
+      }
+    });
   }
 
   async sortProposal(option: string) {
@@ -167,29 +169,36 @@ export default class GovernanceActionsPage {
       this.page.getByRole("progressbar").getByRole("img")
     ).toBeHidden({ timeout: 20_000 });
 
-    // Frontend validation
-    for (let dIdx = 0; dIdx <= proposalsByType.length - 1; dIdx++) {
-      const proposals = proposalsByType[0] as IProposal[];
-      const filterOptionKey = getEnumKeyByValue(
-        GovernanceActionType,
-        proposals[0].type
-      );
+    await functionWaitedAssert(
+      async () => {
+        // Frontend validation
+        for (let dIdx = 0; dIdx <= proposalsByType.length - 1; dIdx++) {
+          const proposals = proposalsByType[0] as IProposal[];
+          const filterOptionKey = getEnumKeyByValue(
+            GovernanceActionType,
+            proposals[0].type
+          );
 
-      const slides = await this.page
-        .locator(`[data-testid="govaction-${filterOptionKey}-card"]`)
-        .all();
+          const slides = await this.page
+            .locator(`[data-testid="govaction-${filterOptionKey}-card"]`)
+            .all();
 
-      const actualSlidesInDisplay =
-        proposals.length > MAX_SLIDES_DISPLAY_PER_TYPE
-          ? MAX_SLIDES_DISPLAY_PER_TYPE
-          : proposals.length;
+          const actualSlidesInDisplay =
+            proposals.length > MAX_SLIDES_DISPLAY_PER_TYPE
+              ? MAX_SLIDES_DISPLAY_PER_TYPE
+              : proposals.length;
 
-      expect(slides).toHaveLength(actualSlidesInDisplay);
+          expect(slides).toHaveLength(actualSlidesInDisplay);
 
-      for (let i = 0; i <= slides.length - 1; i++) {
-        await expect(slides[i]).toContainText(`${proposals[i].txHash}`);
+          for (let i = 0; i <= slides.length - 1; i++) {
+            await expect(slides[i]).toContainText(`${proposals[i].txHash}`);
+          }
+        }
+      },
+      {
+        name: `frontend sort validation of ${sortOption} and filter ${filterKeys}`,
       }
-    }
+    );
   }
 
   async _validateFiltersInProposalCard(

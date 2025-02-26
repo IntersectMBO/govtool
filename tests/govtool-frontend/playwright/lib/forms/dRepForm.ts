@@ -13,7 +13,7 @@ const formErrors = {
   linkDescription: "max-80-characters-error",
   email: "invalid-email-address-error",
   links: {
-    url:"link-reference-description-1-error",
+    url: "link-reference-description-1-error",
     description: "link-reference-description-1-error",
   },
   identity: {
@@ -160,21 +160,52 @@ export default class DRepForm {
     for (const err of formErrors.dRepName) {
       await expect(this.form.getByTestId(err)).toBeHidden();
     }
+    const objectivesInputText = await this.objectivesInput.textContent();
+    const motivationsInputText = await this.motivationsInput.textContent();
+    const qualificationsInputText =
+      await this.qualificationsInput.textContent();
+    const isReferenceLinkErrorVisible = await this.form
+      .getByTestId(formErrors.links.url)
+      .isVisible();
+    const isIdentityLinkErrorVisible = await this.form
+      .getByTestId(formErrors.identity.url)
+      .isVisible();
+    const isPaymentAddressErrorVisible = await this.form
+      .getByTestId(formErrors.paymentAddress)
+      .isVisible();
 
-    expect(await this.objectivesInput.textContent()).toEqual(
-      dRepInfo.objectives
-    );
+    expect(await this.objectivesInput.textContent(), {
+      message:
+        objectivesInputText !== dRepInfo.objectives &&
+        `${dRepInfo.objectives} is not equal to ${await this.objectivesInput.textContent()}`,
+    }).toEqual(dRepInfo.objectives);
 
-    expect(await this.motivationsInput.textContent()).toEqual(
-      dRepInfo.motivations
-    );
-    expect(await this.qualificationsInput.textContent()).toEqual(
-      dRepInfo.qualifications
-    );
+    expect(await this.motivationsInput.textContent(), {
+      message:
+        motivationsInputText !== dRepInfo.motivations &&
+        `${dRepInfo.motivations} is not equal to ${await this.motivationsInput.textContent()}`,
+    }).toEqual(dRepInfo.motivations);
+    expect(await this.qualificationsInput.textContent(), {
+      message:
+        qualificationsInputText !== dRepInfo.qualifications &&
+        `${dRepInfo.qualifications} is not equal to ${await this.qualificationsInput.textContent()}`,
+    }).toEqual(dRepInfo.qualifications);
 
-    await expect(this.form.getByTestId(formErrors.links.url)).toBeHidden();
-    await expect(this.form.getByTestId(formErrors.identity.url)).toBeHidden();
-    await expect(this.form.getByTestId(formErrors.paymentAddress)).toBeHidden();
+    await expect(this.form.getByTestId(formErrors.links.url), {
+      message:
+        isReferenceLinkErrorVisible &&
+        `${dRepInfo.linksReferenceLinks[0].url} is an invalid url`,
+    }).toBeHidden();
+    await expect(this.form.getByTestId(formErrors.identity.url), {
+      message:
+        isIdentityLinkErrorVisible &&
+        `${dRepInfo.identityReferenceLinks[0].url} is an invalid url`,
+    }).toBeHidden();
+    await expect(this.form.getByTestId(formErrors.paymentAddress), {
+      message:
+        isPaymentAddressErrorVisible &&
+        `${dRepInfo.paymentAddress} is an invalid paymentAddress`,
+    }).toBeHidden();
     await expect(this.continueBtn).toBeEnabled();
   }
 
@@ -200,28 +231,68 @@ export default class DRepForm {
 
     expect(nameErrors.length).toBeGreaterThanOrEqual(1);
 
-    await expect(
-      this.form.getByTestId(formErrors.paymentAddress)
-    ).toBeVisible();
+    const objectivesInputText = await this.objectivesInput.textContent();
+    const motivationsInputText = await this.motivationsInput.textContent();
+    const qualificationsInputText =
+      await this.qualificationsInput.textContent();
+    const isReferenceLinkErrorVisible = await this.form
+      .getByTestId(formErrors.links.url)
+      .isVisible();
+    const isReferenceLinkDescriptionErrorVisible = await this.form
+      .getByTestId(formErrors.links.description)
+      .isVisible();
+    const isIdentityLinkErrorVisible = await this.form
+      .getByTestId(formErrors.identity.url)
+      .isVisible();
+    const isIdentityLinkDescriptionErrorVisible = await this.form
+      .getByTestId(formErrors.identity.description)
+      .isVisible();
+    const isPaymentAddressErrorVisible = await this.form
+      .getByTestId(formErrors.paymentAddress)
+      .isVisible();
 
-    expect(await this.objectivesInput.textContent()).not.toEqual(
-      dRepInfo.objectives
-    );
-    expect(await this.motivationsInput.textContent()).not.toEqual(
-      dRepInfo.qualifications
-    );
-    expect(await this.qualificationsInput.textContent()).not.toEqual(
-      dRepInfo.qualifications
-    );
+    await expect(this.form.getByTestId(formErrors.paymentAddress), {
+      message:
+        !isPaymentAddressErrorVisible &&
+        `${dRepInfo.paymentAddress} is a valid paymentAddress`,
+    }).toBeVisible();
 
-    await expect(this.form.getByTestId(formErrors.links.url)).toBeVisible();
-    await expect(
-      this.form.getByTestId(formErrors.links.description)
-    ).toBeVisible();
-    await expect(this.form.getByTestId(formErrors.identity.url)).toBeVisible();
-    await expect(
-      this.form.getByTestId(formErrors.identity.description)
-    ).toBeVisible();
+    expect(await this.objectivesInput.textContent(), {
+      message:
+        objectivesInputText === dRepInfo.objectives &&
+        `${dRepInfo.objectives} is equal to ${await this.objectivesInput.textContent()}`,
+    }).not.toEqual(dRepInfo.objectives);
+    expect(await this.motivationsInput.textContent(), {
+      message:
+        motivationsInputText === dRepInfo.motivations &&
+        `${dRepInfo.motivations} is equal to ${await this.motivationsInput.textContent()}`,
+    }).not.toEqual(dRepInfo.qualifications);
+    expect(await this.qualificationsInput.textContent(), {
+      message:
+        qualificationsInputText === dRepInfo.qualifications &&
+        `${dRepInfo.qualifications} is equal to ${await this.qualificationsInput.textContent()}`,
+    }).not.toEqual(dRepInfo.qualifications);
+
+    await expect(this.form.getByTestId(formErrors.links.url), {
+      message:
+        !isReferenceLinkErrorVisible &&
+        `${dRepInfo.linksReferenceLinks[0].url} is a valid url`,
+    }).toBeVisible();
+    await expect(this.form.getByTestId(formErrors.links.description), {
+      message:
+        !isReferenceLinkDescriptionErrorVisible &&
+        `${dRepInfo.linksReferenceLinks[0].description} is a valid description`,
+    }).toBeVisible();
+    await expect(this.form.getByTestId(formErrors.identity.url), {
+      message:
+        !isIdentityLinkErrorVisible &&
+        `${dRepInfo.identityReferenceLinks[0].url} is a valid url`,
+    }).toBeVisible();
+    await expect(this.form.getByTestId(formErrors.identity.description), {
+      message:
+        !isIdentityLinkDescriptionErrorVisible &&
+        `${dRepInfo.identityReferenceLinks[0].description} is a valid description`,
+    }).toBeVisible();
 
     await expect(this.continueBtn).toBeDisabled();
   }

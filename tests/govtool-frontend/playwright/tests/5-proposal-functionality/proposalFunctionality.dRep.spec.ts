@@ -178,6 +178,10 @@ test.describe("Perform voting", () => {
 
     await governanceActionsPage.votedTab.click();
 
+    await govActionDetailsPage.currentPage.evaluate(() =>
+      window.scrollTo(0, 500)
+    );
+
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")
     ).toBeVisible();
@@ -186,8 +190,25 @@ test.describe("Perform voting", () => {
     await govActionDetailsPage.reVote();
     await governanceActionsPage.votedTab.click();
 
+    const isNoVoteVisible = await govActionDetailsPage.currentPage
+      .getByTestId("my-vote")
+      .getByText("No")
+      .isVisible();
+
+    const textContent = await govActionDetailsPage.currentPage
+      .getByTestId("my-vote")
+      .textContent();
+
+    await govActionDetailsPage.currentPage.evaluate(() =>
+      window.scrollTo(0, 500)
+    );
     await expect(
-      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No")
+      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No"),
+      {
+        message:
+          !isNoVoteVisible &&
+          `"No" vote not visible, current vote status: ${textContent.match(/My Vote:(Yes|No)/)[1]}`,
+      }
     ).toBeVisible({ timeout: 60_000 });
   });
 

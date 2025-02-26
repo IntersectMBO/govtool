@@ -1,17 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { Trans } from "react-i18next";
-import { Box, Chip } from "@mui/material";
+import { Box } from "@mui/material";
 
 import { Button } from "@atoms";
 import { ICONS, PATHS } from "@consts";
-import { useCardano } from "@context";
-import {
-  useGetAdaHolderVotingPowerQuery,
-  useScreenDimension,
-  useTranslation,
-} from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { DataMissingHeader } from "@molecules";
-import { correctVoteAdaFormat } from "@utils";
 import { DRepData } from "@/models";
 
 type DRepDetailsProps = {
@@ -25,12 +18,9 @@ export const DRepDetailsCardHeader = ({
   isMe,
   isMyDrep,
 }: DRepDetailsProps) => {
-  const { stakeKey } = useCardano();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { screenWidth } = useScreenDimension();
-  const { votingPower: myVotingPower } =
-    useGetAdaHolderVotingPowerQuery(stakeKey);
 
   const { givenName, metadataStatus, image } = dRepData;
 
@@ -48,7 +38,7 @@ export const DRepDetailsCardHeader = ({
             alignSelf: "stretch",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
             mb: "18px",
             ...(screenWidth <= 1020 && {
               flexDirection: "column",
@@ -56,37 +46,6 @@ export const DRepDetailsCardHeader = ({
             }),
           }}
         >
-          <Chip
-            color="primary"
-            label={
-              <Trans
-                i18nKey={
-                  isMe
-                    ? isMyDrep
-                      ? "dRepDirectory.myDelegationToYourself"
-                      : "dRepDirectory.meAsDRep"
-                    : "dRepDirectory.myDRep"
-                }
-                values={{
-                  ada: correctVoteAdaFormat(myVotingPower),
-                }}
-              />
-            }
-            sx={{
-              boxShadow: (theme) => theme.shadows[2],
-              color: (theme) => theme.palette.text.primary,
-              px: 3,
-              py: 0.5,
-              ...(isMyDrep &&
-                !isMe && {
-                  width: "100%",
-                }),
-              ...(screenWidth <= 1020 && {
-                width: "100%",
-              }),
-            }}
-          />
-
           {isMe && (
             <Box
               sx={{

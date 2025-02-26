@@ -1488,27 +1488,26 @@
   resolved "https://registry.npmjs.org/@inquirer/type/-/type-3.0.1.tgz"
   integrity sha512-+ksJMIy92sOAiAccGpcKZUc3bYO07cADnscIxHBknEm3uNts3movSmBofc1908BNy5edKscxYeAdaX1NXkHS6A==
 
-"@intersect.mbo/govtool-outcomes-pillar-ui@1.2.0":
-  version "1.2.0"
-  resolved "https://registry.npmjs.org/@intersect.mbo/govtool-outcomes-pillar-ui/-/govtool-outcomes-pillar-ui-1.2.0.tgz"
-  integrity sha512-AzY2pOAExXCz7M6S2YeIglZ06Gdf0N9gWxJBRDQ2BuDsRC2arn4DwT2F+XHyOhM2AWSZeql0Dx86a0pZP7a1+w==
+"@intersect.mbo/govtool-outcomes-pillar-ui@1.2.3":
+  version "1.2.3"
+  resolved "https://registry.npmjs.org/@intersect.mbo/govtool-outcomes-pillar-ui/-/govtool-outcomes-pillar-ui-1.2.3.tgz"
+  integrity sha512-QWJuFaSs7WsjZBtpQasvW86URPNZvaUPPe5kKIl5/UhSlm5fCRrnwZySHDlqsFDl+6dffrtWMLo3g6LGTp4/rw==
   dependencies:
     "@fontsource/poppins" "^5.0.14"
     "@intersect.mbo/intersectmbo.org-icons-set" "^1.0.8"
     axios "^1.7.9"
     bech32 "^2.0.0"
     buffer "^6.0.3"
-    react-query "^3.39.3"
 
 "@intersect.mbo/intersectmbo.org-icons-set@^1.0.8", "@intersect.mbo/intersectmbo.org-icons-set@^1.1.0":
   version "1.1.0"
   resolved "https://registry.npmjs.org/@intersect.mbo/intersectmbo.org-icons-set/-/intersectmbo.org-icons-set-1.1.0.tgz"
   integrity sha512-sjKEtnK9eLYH/8kCD0YRQCms3byFA/tnSsei9NHTZbBYX9sBpeX6ErfR0sKYjOSxQOxl4FumX9D0X+vHIqxo8g==
 
-"@intersect.mbo/pdf-ui@0.6.2":
-  version "0.6.2"
-  resolved "https://registry.npmjs.org/@intersect.mbo/pdf-ui/-/pdf-ui-0.6.2.tgz"
-  integrity sha512-9AZW0gAbseXdFNwL8mNAVOnBKN7KIO4weJfEswRWuoz44vSG7fH6l6ZacdsKC4cacNrO8zVWwOqyaIBHRmd0uw==
+"@intersect.mbo/pdf-ui@0.6.4":
+  version "0.6.4"
+  resolved "https://registry.npmjs.org/@intersect.mbo/pdf-ui/-/pdf-ui-0.6.4.tgz"
+  integrity sha512-KWnbwn9VQwTuQ+POFX6VtA+e7zmotq/kBJmfXux5i2XPQz9PB1Ia/L6mPPr82Gf0x0R2MSU1nZLsSeSl6QE64A==
   dependencies:
     "@emurgo/cardano-serialization-lib-asmjs" "^12.0.0-beta.2"
     "@fontsource/poppins" "^5.0.14"

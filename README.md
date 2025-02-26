@@ -26,10 +26,6 @@ The Cardano GovTool enables ada holders to experience the governance features de
 
 - [gov.tools](https://gov.tools/)
 
-#### SanchoNet
-
-- [sanchogov.tools](https://sanchogov.tools/)
-
 #### Preview Testnet
 
 - [preview.gov.tools](https://preview.gov.tools/)
@@ -42,7 +38,6 @@ Learn more; [docs.gov.tools](https://docs.gov.tools/cardano-govtool/using-govtoo
 
 - [Backend](./govtool/backend/README.md)
 - [Frontend](./govtool/frontend/README.md)
-- [Infrastructure](./infra/terraform/README.md)
 - [In repo documentation](./docs/)
 - [Tests](./tests/)
 

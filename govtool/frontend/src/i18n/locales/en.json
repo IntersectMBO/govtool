@@ -90,7 +90,7 @@
       "directVoter": {
         "isRegisteredDescription": "Your Voting Power of ₳<strong>{{votingPower}}</strong> can be used to vote.",
         "register": "Register",
-        "registerDescription": "Register to Vote on Governance Actions using your own Voting Power of ₳<strong>{{votingPower}}</strong>.",
+        "registerDescription": "Register to Vote on Governance Actions.",
         "registerTitle": "Become a Direct Voter",
         "reRegister": "Re-register",
         "registration": "Direct Voter Registration",
@@ -99,7 +99,7 @@
         "wasDirectVoterTitle": "You Have Retired as a Direct Voter",
         "retirement": "Direct Voter Retirement",
         "retirementInProgress": "The retirement process is ongoing. This may take several minutes.",
-        "wasRegisteredDescription": "You cannot vote on Governance Actions using your own Voting Power of ₳<strong>{{votingPower}}</strong> until you re-register.",
+        "wasRegisteredDescription": "You cannot vote on Governance Actions until you re-register.",
         "youAreDirectVoterTitle": "You are a Direct Voter"
       },
       "delegation": {

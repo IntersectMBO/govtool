@@ -138,10 +138,7 @@ export const DRepDashboardCard = ({
       return {
         buttons: wasRegisteredOrNotRegisteredButtons,
         description: voter?.givenName ? (
-          <Trans
-            i18nKey="dashboard.cards.drep.notRegisteredWasRegisteredDescriptionWithGivenName"
-            values={{ givenName: voter?.givenName ?? "DRep" }}
-          />
+          <Trans i18nKey="dashboard.cards.drep.notRegisteredWasRegisteredDescriptionWithGivenName" />
         ) : (
           <Trans i18nKey="dashboard.cards.drep.notRegisteredWasRegisteredDescription" />
         ),

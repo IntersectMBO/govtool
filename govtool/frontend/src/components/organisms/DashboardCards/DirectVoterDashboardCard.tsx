@@ -98,10 +98,7 @@ export const DirectVoterDashboardCard = ({
           },
         ],
         description: (
-          <Trans
-            i18nKey="dashboard.cards.directVoter.wasRegisteredDescription"
-            values={{ votingPower: ada }}
-          />
+          <Trans i18nKey="dashboard.cards.directVoter.wasRegisteredDescription" />
         ),
         transactionId: voter?.soleVoterRetireTxHash,
         title: t("dashboard.cards.directVoter.wasDirectVoterTitle"),
@@ -120,10 +117,7 @@ export const DirectVoterDashboardCard = ({
         learnMoreButton,
       ],
       description: (
-        <Trans
-          i18nKey="dashboard.cards.directVoter.registerDescription"
-          values={{ votingPower: ada }}
-        />
+        <Trans i18nKey="dashboard.cards.directVoter.registerDescription" />
       ),
       title: t("dashboard.cards.directVoter.registerTitle"),
     };

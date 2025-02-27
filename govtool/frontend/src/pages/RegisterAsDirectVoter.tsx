@@ -13,12 +13,12 @@ import {
   useWalletErrorModal,
 } from "@hooks";
 import { CenteredBoxBottomButtons, CenteredBoxPageWrapper } from "@molecules";
-import { checkIsWalletConnected, openInNewTab } from "@utils";
+import { checkIsWalletConnected, correctAdaFormat, openInNewTab } from "@utils";
 import { WrongRouteInfo } from "@organisms";
 import { CertificatesBuilder } from "@emurgo/cardano-serialization-lib-asmjs";
 
 export const RegisterAsDirectVoter = () => {
-  const { cExplorerBaseUrl } = useAppContext();
+  const { cExplorerBaseUrl, epochParams } = useAppContext();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
@@ -148,6 +148,10 @@ export const RegisterAsDirectVoter = () => {
               key="0"
             />,
           ]}
+          values={{
+            deposit:
+              correctAdaFormat(epochParams?.drep_deposit ?? undefined) ?? 500,
+          }}
         />
       </Typography>
       <CenteredBoxBottomButtons

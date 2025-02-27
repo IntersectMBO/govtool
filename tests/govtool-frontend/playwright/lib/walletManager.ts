@@ -32,7 +32,7 @@ class WalletManager {
   }
 
   async readWallets(purpose: Purpose): Promise<StaticWallet[]> {
-    return await getFile(`${purpose}Wallets.json`);
+    return (await getFile(`${purpose}Wallets.json`)) ?? [];
   }
 
   async removeCopyWallet(walletToRemove: StaticWallet, purpose: Purpose) {

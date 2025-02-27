@@ -1,8 +1,9 @@
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
-import { Page } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 import { IDRep } from "@types";
 import { bech32 } from "bech32";
 import * as crypto from "crypto";
+import { functionWaitedAssert } from "./waitedLoop";
 
 export async function fetchFirstActiveDRepDetails(page: Page) {
   let dRepGivenName: string;
@@ -14,7 +15,10 @@ export async function fetchFirstActiveDRepDetails(page: Page) {
       const response = await route.fetch();
       const json = await response.json();
       const elements = json["elements"].filter(
-        (element: IDRep) => element.givenName != null && !element.isScriptBased
+        (element: IDRep) =>
+          element.givenName != null &&
+          !element.isScriptBased &&
+          element.status == "Active"
       );
       dRepGivenName =
         elements[Math.floor(Math.random() * elements.length)]["givenName"];
@@ -31,11 +35,23 @@ export async function fetchFirstActiveDRepDetails(page: Page) {
     "**/drep/list?page=0&pageSize=10&sort=Random&**"
   );
 
-  dRepDirectoryPage = new DRepDirectoryPage(page);
-  await dRepDirectoryPage.goto();
-  await responsePromise;
+  await functionWaitedAssert(
+    async () => {
+      dRepDirectoryPage = new DRepDirectoryPage(page);
+      await dRepDirectoryPage.goto();
+      await responsePromise;
 
-  await dRepDirectoryPage.searchInput.click();
+      await dRepDirectoryPage.searchInput.click();
+      await dRepDirectoryPage.searchInput.fill(dRepId);
+      await expect(page.getByTestId(`${dRepId}-copy-id-button`)).toBeVisible({
+        timeout: 20_000,
+      });
+    },
+    {
+      name: "because the selected dRep ID has the 'doNotList' flag set to true",
+      message: "DRep not found",
+    }
+  );
   return { dRepGivenName, dRepId, dRepDirectoryPage };
 }
 

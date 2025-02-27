@@ -14,6 +14,17 @@ changes.
 
 ### Fixed
 
+### Changed
+
+### Removed
+
+## [v2.0.13](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.13) 2025-02-27
+
+
+### Added
+
+### Fixed
+
 - Fix responsive error on menu [Issue 3055](https://github.com/IntersectMBO/govtool/issues/3055)
 - Fix wrong placement of nav items in disconnected menu [Issue 3057](https://github.com/IntersectMBO/govtool/issues/3057)
 - Fix missing subtraction withdrawals from ada holder balance [Issue 3061](https://github.com/IntersectMBO/govtool/issues/3061)

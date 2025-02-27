@@ -71,7 +71,7 @@ export const DashboardCards = () => {
       <DirectVoterDashboardCard
         pendingTransaction={pendingTransaction}
         voter={voter}
-        votingPower={votingPower}
+        votingPower={voter.votingPower}
       />
       <ListGovActionsDashboardCards />
       <ProposeGovActionDashboardCard

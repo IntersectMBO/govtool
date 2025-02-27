@@ -13,7 +13,7 @@ import { LINKS } from "@/consts/links";
 type DirectVoterDashboardCardProps = {
   pendingTransaction: PendingTransaction;
   voter: VoterInfo;
-  votingPower: number;
+  votingPower: number | null;
 };
 
 export const DirectVoterDashboardCard = ({
@@ -24,7 +24,7 @@ export const DirectVoterDashboardCard = ({
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const ada = correctVoteAdaFormat(votingPower);
+  const ada = correctVoteAdaFormat(votingPower ?? 0);
 
   // learn more button
   const learnMoreButton: LoadingButtonProps = {
@@ -69,11 +69,13 @@ export const DirectVoterDashboardCard = ({
           },
           { ...learnMoreButton, variant: "text" },
         ],
-        description: (
+        description: votingPower ? (
           <Trans
             i18nKey="dashboard.cards.directVoter.isRegisteredDescription"
             values={{ votingPower: ada }}
           />
+        ) : (
+          <Trans i18nKey="dashboard.cards.directVoter.isRegisteredDescriptionWithoutVotingPower" />
         ),
         state: "active",
         transactionId: voter?.soleVoterRegisterTxHash,

@@ -89,6 +89,7 @@
       },
       "directVoter": {
         "isRegisteredDescription": "Your Voting Power of ₳<strong>{{votingPower}}</strong> can be used to vote.",
+        "isRegisteredDescriptionWithoutVotingPower": "You can vote on Governance Actions.",
         "register": "Register",
         "registerDescription": "Register to Vote on Governance Actions.",
         "registerTitle": "Become a Direct Voter",

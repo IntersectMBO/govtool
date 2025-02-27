@@ -140,7 +140,7 @@ export default class ProposalSubmissionPage {
 
     const dRepMetadata = await this.downloadVoteMetadata();
     const url = await metadataBucketService.uploadMetadata(
-      dRepMetadata.name,
+      faker.lorem.word({ length: { min: 5, max: 10 } }),
       dRepMetadata.data
     );
     await this.metadataUrlInput.fill(url);

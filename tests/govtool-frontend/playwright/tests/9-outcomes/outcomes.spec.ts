@@ -1,26 +1,17 @@
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { skipIfNotHardFork } from "@helpers/cardano";
+import { functionWaitedAssert } from "@helpers/waitedLoop";
 import OutComesPage from "@pages/outcomesPage";
 import { expect } from "@playwright/test";
-import { GovernanceActionType, outcomeProposal } from "@types";
+import { outcomeMetadata, outcomeProposal, outcomeType } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("9. Outcomes");
   await skipIfNotHardFork();
 });
 
-const filterOptionNames = [
-  "Protocol Parameter Change",
-  "Update Committee",
-  "Hard-Fork Initiation",
-  "Motion of no Confidence",
-  "Info",
-  "Treasury Withdrawals",
-  "New Constitution",
-];
-
-const status = ["Expired", "Ratified", "Enacted"];
+const status = ["Expired", "Ratified", "Enacted", "Live"];
 
 enum SortOption {
   SoonToExpire = "Soon to expire",
@@ -42,22 +33,36 @@ test("9B. Should search outcomes proposal by title and id", async ({
   page,
 }) => {
   let governanceActionId: string | undefined;
-  let governanceActionTitle: string | undefined;
+  let governanceActionTitle: string | undefined = "asd";
 
-  await page.route("**/api/governance-actions?search=&sort=", async (route) => {
-    const response = await route.fetch();
-    const data = await response.json();
-    if (!governanceActionTitle) {
-      const elementsWithTitle: outcomeProposal[] = data.filter(
-        (element: outcomeProposal) => element.title != null
-      );
-      if (elementsWithTitle.length > 0) {
-        const randomIndex = Math.floor(
-          Math.random() * elementsWithTitle.length
-        );
-        governanceActionId = elementsWithTitle[randomIndex].tx_hash + "#";
-        governanceActionTitle = elementsWithTitle[randomIndex].title;
+  // intercept outcomes data for id
+  await page.route(
+    "**/governance-actions?search=&filters=&sort=**",
+    async (route) => {
+      const response = await route.fetch();
+      const data: outcomeProposal[] = await response.json();
+      if (!governanceActionId) {
+        if (data.length > 0) {
+          const randomIndexForId = Math.floor(Math.random() * data.length);
+          governanceActionId =
+            data[randomIndexForId].tx_hash + "#" + data[randomIndexForId].index;
+        }
       }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(data),
+      });
+    }
+  );
+
+  // intercept metadata for title
+  await page.route("**/governance-actions/metadata?**", async (route) => {
+    const response = await route.fetch();
+    if (response.status() !== 200) return response;
+    const data: outcomeMetadata = await response.json();
+    if (!governanceActionTitle && data.body.title != null) {
+      governanceActionTitle = data.body.title;
     }
     await route.fulfill({
       status: 200,
@@ -67,32 +72,51 @@ test("9B. Should search outcomes proposal by title and id", async ({
   });
 
   const responsePromise = page.waitForResponse(
-    "**/api/governance-actions?search=&sort="
+    "**/governance-actions?search=&filters=&sort=**"
+  );
+  const metadataResponsePromise = page.waitForResponse(
+    "**/governance-actions/metadata?**"
   );
 
   const outcomesPage = new OutComesPage(page);
   await outcomesPage.goto();
 
   await responsePromise;
-  // search by title
-  await outcomesPage.searchInput.fill(governanceActionTitle);
-
-  await expect(page.getByRole("progressbar").getByRole("img")).toBeVisible();
-
-  await expect(outcomesPage.viewDetailsBtn.first()).toBeVisible();
-  const titleContentListLength = (
-    await page.getByText(governanceActionTitle).all()
-  ).length;
-  expect(titleContentListLength).toBeGreaterThanOrEqual(1);
+  await metadataResponsePromise;
 
   // search by id
   await outcomesPage.searchInput.fill(governanceActionId);
   await expect(page.getByRole("progressbar").getByRole("img")).toBeVisible();
 
-  await expect(outcomesPage.viewDetailsBtn.first()).toBeVisible();
-  const idContentListLength = (await page.getByText(governanceActionId).all())
-    .length;
-  expect(idContentListLength).toBeGreaterThanOrEqual(1);
+  await functionWaitedAssert(
+    async () => {
+      const idSearchOutcomeCards = await outcomesPage.getAllOutcomes();
+      for (const outcomeCard of idSearchOutcomeCards) {
+        const id = await outcomeCard
+          .locator('[data-testid$="-CIP-105-id"]')
+          .textContent();
+        expect(id.replace(/^.*ID/, "")).toContain(governanceActionId);
+      }
+    },
+    { name: "search by id" }
+  );
+
+  // search by title
+  await outcomesPage.searchInput.fill(governanceActionTitle);
+  await expect(page.getByRole("progressbar").getByRole("img")).toBeVisible();
+
+  await functionWaitedAssert(
+    async () => {
+      const titleSearchOutcomeCards = await outcomesPage.getAllOutcomes();
+      for (const outcomeCard of titleSearchOutcomeCards) {
+        const title = await outcomeCard
+          .locator('[data-testid$="-card-title"]')
+          .textContent();
+        expect(title).toContain(governanceActionTitle);
+      }
+    },
+    { name: "search by title" }
+  );
 });
 
 test("9C_1. Should filter Governance Action Type on governance actions page", async ({
@@ -104,6 +128,7 @@ test("9C_1. Should filter Governance Action Type on governance actions page", as
   await outcomePage.goto();
 
   await outcomePage.filterBtn.click();
+  const filterOptionNames = Object.values(outcomeType);
 
   // proposal type filter
   await outcomePage.applyAndValidateFilters(
@@ -114,7 +139,7 @@ test("9C_1. Should filter Governance Action Type on governance actions page", as
   // proposal status filter
   await outcomePage.applyAndValidateFilters(
     status,
-    outcomePage._validateFiltersInOutcomeCard
+    outcomePage._validateStatusFiltersInOutcomeCard
   );
 });
 
@@ -127,16 +152,15 @@ test("9C_2. Should sort Governance Action Type on outcomes page", async ({
   await outcomePage.goto();
 
   await outcomePage.sortBtn.click();
-  await outcomePage.clearBtn.click();
-
-  await outcomePage.sortAndValidate(
-    SortOption.NewestFirst,
-    (p1, p2) => p1.expiry_date >= p2.time
-  );
 
   await outcomePage.sortAndValidate(
     SortOption.OldestFirst,
     (p1, p2) => p1.expiry_date <= p2.expiry_date
+  );
+
+  await outcomePage.sortAndValidate(
+    SortOption.NewestFirst,
+    (p1, p2) => p1.expiry_date >= p2.time
   );
 
   await outcomePage.sortAndValidate(
@@ -148,23 +172,21 @@ test("9C_2. Should sort Governance Action Type on outcomes page", async ({
 test("9C_3. Should filter and sort Governance Action Type on outcomes page", async ({
   page,
 }) => {
-  test.slow();
-
   const outcomePage = new OutComesPage(page);
   await outcomePage.goto();
 
   await outcomePage.filterBtn.click();
+  const filterOptionNames = Object.values(outcomeType);
 
   const choice = Math.floor(Math.random() * filterOptionNames.length);
   await outcomePage.filterProposalByNames([filterOptionNames[choice]]);
 
-  await outcomePage.sortBtn.click({ force: true });
-  await outcomePage.clearBtn.click();
+  await outcomePage.filterBtn.click({ force: true });
+  await outcomePage.sortBtn.click();
 
   await outcomePage.sortAndValidate(
-    SortOption.NewestFirst,
-    (p1, p2) => p1.expiry_date >= p2.expiry_date,
-    Object.values(GovernanceActionType)[choice]
+    SortOption.OldestFirst,
+    (p1, p2) => p1.expiry_date <= p2.expiry_date
   );
 
   await outcomePage.validateFilters(

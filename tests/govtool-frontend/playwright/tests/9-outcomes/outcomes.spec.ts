@@ -1,6 +1,7 @@
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { skipIfNotHardFork } from "@helpers/cardano";
+import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import OutComesPage from "@pages/outcomesPage";
 import { expect, Page } from "@playwright/test";
@@ -231,4 +232,21 @@ test("9C_3. Should filter and sort Governance Action Type on outcomes page", asy
     [filterOptionNames[choice]],
     outcomePage._validateFiltersInOutcomeCard
   );
+});
+
+test("9E. Should verify all of the displayed governance actions have expired", async ({
+  page,
+}) => {
+  const outcomePage = new OutComesPage(page);
+  await outcomePage.goto();
+
+  const proposalCards = await outcomePage.getAllOutcomes();
+
+  for (const proposalCard of proposalCards) {
+    const expiryDateEl = proposalCard.locator('[data-testid$="-Expired-date"]');
+    const expiryDateTxt = await expiryDateEl.innerText();
+    const expiryDate = extractExpiryDateFromText(expiryDateTxt, true);
+    const today = new Date();
+    expect(today >= expiryDate).toBeTruthy();
+  }
 });

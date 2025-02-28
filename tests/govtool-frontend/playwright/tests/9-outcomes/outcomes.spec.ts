@@ -3,7 +3,7 @@ import { setAllureEpic } from "@helpers/allure";
 import { skipIfNotHardFork } from "@helpers/cardano";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import OutComesPage from "@pages/outcomesPage";
-import { expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 import { outcomeMetadata, outcomeProposal, outcomeType } from "@types";
 
 test.beforeEach(async () => {
@@ -29,94 +29,132 @@ test("9A. Should access Outcomes page in disconnect state", async ({
   await expect(page.getByText(/outcomes/i)).toHaveCount(2);
 });
 
-test("9B. Should search outcomes proposal by title and id", async ({
-  page,
-}) => {
+test.describe("outcome details dependent test", () => {
   let governanceActionId: string | undefined;
-  let governanceActionTitle: string | undefined = "asd";
-
-  // intercept outcomes data for id
-  await page.route(
-    "**/governance-actions?search=&filters=&sort=**",
-    async (route) => {
-      const response = await route.fetch();
-      const data: outcomeProposal[] = await response.json();
-      if (!governanceActionId) {
-        if (data.length > 0) {
-          const randomIndexForId = Math.floor(Math.random() * data.length);
-          governanceActionId =
-            data[randomIndexForId].tx_hash + "#" + data[randomIndexForId].index;
+  let governanceActionTitle: string | undefined;
+  let currentPage: Page;
+  test.beforeEach(async ({ page }) => {
+    // intercept outcomes data for id
+    await page.route(
+      "**/governance-actions?search=&filters=&sort=**",
+      async (route) => {
+        const response = await route.fetch();
+        const data: outcomeProposal[] = await response.json();
+        if (!governanceActionId) {
+          if (data.length > 0) {
+            const randomIndexForId = Math.floor(Math.random() * data.length);
+            governanceActionId =
+              data[randomIndexForId].tx_hash +
+              "#" +
+              data[randomIndexForId].index;
+          }
         }
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(data),
+        });
       }
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(data),
-      });
-    }
-  );
+    );
 
-  // intercept metadata for title
-  await page.route("**/governance-actions/metadata?**", async (route) => {
-    const response = await route.fetch();
-    if (response.status() !== 200) return response;
-    const data: outcomeMetadata = await response.json();
-    if (!governanceActionTitle && data.body.title != null) {
-      governanceActionTitle = data.body.title;
-    }
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify(data),
+    // intercept metadata for title
+    await page.route("**/governance-actions/metadata?**", async (route) => {
+      try {
+        const response = await route.fetch();
+        if (response.status() !== 200) {
+          await route.continue();
+          return;
+        }
+        const data: outcomeMetadata = await response.json();
+        if (!governanceActionTitle && data.body.title != null) {
+          governanceActionTitle = data.body.title;
+        }
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(data),
+        });
+      } catch (error) {
+        return;
+      }
     });
+
+    const responsePromise = page.waitForResponse(
+      "**/governance-actions?search=&filters=&sort=**"
+    );
+    const metadataResponsePromise = page.waitForResponse(
+      "**/governance-actions/metadata?**"
+    );
+
+    const outcomesPage = new OutComesPage(page);
+    await outcomesPage.goto();
+
+    await responsePromise;
+    await metadataResponsePromise;
+    currentPage = page;
   });
 
-  const responsePromise = page.waitForResponse(
-    "**/governance-actions?search=&filters=&sort=**"
-  );
-  const metadataResponsePromise = page.waitForResponse(
-    "**/governance-actions/metadata?**"
-  );
+  test("9B. Should search outcomes proposal by title and id", async ({}) => {
+    const outcomesPage = new OutComesPage(currentPage);
+    // search by id
+    await outcomesPage.searchInput.fill(governanceActionId);
+    await expect(
+      currentPage.getByRole("progressbar").getByRole("img")
+    ).toBeVisible();
 
-  const outcomesPage = new OutComesPage(page);
-  await outcomesPage.goto();
+    await functionWaitedAssert(
+      async () => {
+        const idSearchOutcomeCards = await outcomesPage.getAllOutcomes();
+        for (const outcomeCard of idSearchOutcomeCards) {
+          const id = await outcomeCard
+            .locator('[data-testid$="-CIP-105-id"]')
+            .textContent();
+          expect(id.replace(/^.*ID/, "")).toContain(governanceActionId);
+        }
+      },
+      { name: "search by id" }
+    );
 
-  await responsePromise;
-  await metadataResponsePromise;
+    // search by title
+    await outcomesPage.searchInput.fill(governanceActionTitle);
+    await expect(
+      currentPage.getByRole("progressbar").getByRole("img")
+    ).toBeVisible();
 
-  // search by id
-  await outcomesPage.searchInput.fill(governanceActionId);
-  await expect(page.getByRole("progressbar").getByRole("img")).toBeVisible();
+    await functionWaitedAssert(
+      async () => {
+        const titleSearchOutcomeCards = await outcomesPage.getAllOutcomes();
+        for (const outcomeCard of titleSearchOutcomeCards) {
+          const title = await outcomeCard
+            .locator('[data-testid$="-card-title"]')
+            .textContent();
+          expect(title).toContain(governanceActionTitle);
+        }
+      },
+      { name: "search by title" }
+    );
+  });
 
-  await functionWaitedAssert(
-    async () => {
-      const idSearchOutcomeCards = await outcomesPage.getAllOutcomes();
-      for (const outcomeCard of idSearchOutcomeCards) {
-        const id = await outcomeCard
-          .locator('[data-testid$="-CIP-105-id"]')
-          .textContent();
-        expect(id.replace(/^.*ID/, "")).toContain(governanceActionId);
-      }
-    },
-    { name: "search by id" }
-  );
+  test("9D. Should copy governanceActionId", async ({ page, context }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    const outcomesPage = new OutComesPage(currentPage);
 
-  // search by title
-  await outcomesPage.searchInput.fill(governanceActionTitle);
-  await expect(page.getByRole("progressbar").getByRole("img")).toBeVisible();
-
-  await functionWaitedAssert(
-    async () => {
-      const titleSearchOutcomeCards = await outcomesPage.getAllOutcomes();
-      for (const outcomeCard of titleSearchOutcomeCards) {
-        const title = await outcomeCard
-          .locator('[data-testid$="-card-title"]')
-          .textContent();
-        expect(title).toContain(governanceActionTitle);
-      }
-    },
-    { name: "search by title" }
-  );
+    await outcomesPage.searchInput.fill(governanceActionId);
+    await expect(
+      currentPage.getByRole("progressbar").getByRole("img")
+    ).toBeVisible();
+    await page
+      .getByTestId(`${governanceActionId}-CIP-105-id`)
+      .getByTestId("copy-button")
+      .click();
+    await expect(page.getByText("Copied to clipboard")).toBeVisible({
+      timeout: 10_000,
+    });
+    const copiedTextDRepDirectory = await page.evaluate(() =>
+      navigator.clipboard.readText()
+    );
+    expect(copiedTextDRepDirectory).toEqual(governanceActionId);
+  });
 });
 
 test("9C_1. Should filter Governance Action Type on governance actions page", async ({

@@ -1,17 +1,14 @@
 import environments from "@constants/environments";
+import { outcomeStatusType } from "@constants/index";
 import { toCamelCase } from "@helpers/string";
 import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
 import { expect, Locator, Page } from "@playwright/test";
-import { outcomeProposal } from "@types";
+import { outcomeProposal, outcomeType } from "@types";
 
 export default class OutComesPage {
   // Buttons
-  readonly filterBtn = this.page.getByRole("button", { name: "Filter" }); // BUG missing test id
-  readonly sortBtn = this.page.getByRole("button", { name: "Sort:" }); // BUG missing test id
-  readonly viewDetailsBtn = this.page.getByRole("button", {
-    name: "View Details",
-  }); // BUG missing test id
-  readonly clearBtn = this.page.getByText("clear"); // BUG missing test id
+  readonly filterBtn = this.page.getByTestId("filters-button");
+  readonly sortBtn = this.page.getByTestId("sort-button");
   //inputs
   readonly searchInput = this.page.getByTestId("search-input");
 
@@ -24,11 +21,30 @@ export default class OutComesPage {
   async getAllOutcomes(): Promise<Locator[]> {
     await waitedLoop(async () => {
       return (
-        (await this.page.locator('[data-testid$="-card"]').count()) > 0 ||
-        this.page.getByText("No results for the search.")
+        (await this.page.locator('[data-testid$="-outcome-card"]').count()) >
+          0 ||
+        (await this.page.getByText("No results for the search.").isVisible())
       );
     });
-    return this.page.locator('[data-testid$="-card"]').all(); // BUG missing testid
+    return await this.page.locator('[data-testid$="-outcome-card"]').all();
+  }
+
+  async clickCheckboxByNames(names: string[]) {
+    const formattedNames = names.map((name) =>
+      name === "Info Action" ? "Info" : name
+    );
+    for (const name of formattedNames) {
+      const testId = name.toLowerCase().replace(/ /g, "-");
+      await this.page.getByTestId(`${testId}-checkbox`).click();
+    }
+  }
+
+  async filterProposalByNames(names: string[]) {
+    await this.clickCheckboxByNames(names);
+  }
+
+  async unFilterProposalByNames(names: string[]) {
+    await this.clickCheckboxByNames(names);
   }
 
   async applyAndValidateFilters(
@@ -53,37 +69,29 @@ export default class OutComesPage {
     }
   }
 
-  async filterProposalByNames(names: string[]) {
-    for (const name of names) {
-      await this.page.getByLabel(name).click();
-    }
-  }
-
-  async unFilterProposalByNames(names: string[]) {
-    for (const name of names) {
-      await this.page.getByLabel(name).click();
-    }
-  }
-
   async validateFilters(
     filters: string[],
     validateFunction: (proposalCard: any, filters: string[]) => Promise<boolean>
   ) {
-    let errorMessage = "";
     await functionWaitedAssert(
       async () => {
         const proposalCards = await this.getAllOutcomes();
-
         for (const proposalCard of proposalCards) {
           const type = await proposalCard
-            .getByTestId("governance-action-type")
+            .locator('[data-testid$="-type"]')
             .textContent();
+          const outcomeType = type.replace(/^.*Type/, "");
           const hasFilter = await validateFunction(proposalCard, filters);
-          errorMessage = `A governance action type ${type} does not contain on ${filters}`;
+          if (!hasFilter) {
+            const errorMessage = `A outcomne type ${outcomeType} does not contain on ${filters}`;
+            throw errorMessage;
+          }
           expect(hasFilter).toBe(true);
         }
       },
-      { message: errorMessage }
+      {
+        name: "validateFilters",
+      }
     );
   }
 
@@ -93,6 +101,11 @@ export default class OutComesPage {
       sortType = "Highest yes votes";
     }
     return toCamelCase(sortType);
+  }
+
+  getSortTestId(sortOption: string) {
+    const sortType = this.getSortType(sortOption);
+    return sortType.toLowerCase().replace(/[\s.]/g, "") + "-radio";
   }
 
   async sortAndValidate(
@@ -106,12 +119,12 @@ export default class OutComesPage {
         .url()
         .includes(
           filterKey
-            ? `&filters[]=${filterKey}&sort=${sortType}`
+            ? `&filters=${filterKey}&sort=${sortType}`
             : `&sort=${sortType}`
         )
     );
 
-    await this.page.getByLabel(sortOption).click();
+    await this.page.getByTestId(this.getSortTestId(sortOption)).click();
 
     const response = await responsePromise;
     const data = await response.json();
@@ -125,9 +138,6 @@ export default class OutComesPage {
         outcomeProposalList[i],
         outcomeProposalList[i + 1]
       );
-
-      console.log(isValid);
-
       expect(isValid).toBe(true);
     }
 
@@ -135,36 +145,57 @@ export default class OutComesPage {
       this.page.getByRole("progressbar").getByRole("img")
     ).toBeHidden({ timeout: 20_000 });
 
-    // TODO Frontend validation
-    const outcomeCards = await this.getAllOutcomes();
-    for (const outcomeCard of outcomeCards) {
-      const proposalTitle = await outcomeCard
-        .getByTestId("governance-action-card-title")
-        .textContent();
-      expect(proposalTitle).toContain(
-        outcomeProposalList[outcomeCards.indexOf(outcomeCard)].title
-      );
-    }
+    await functionWaitedAssert(
+      async () => {
+        const outcomeCards = await this.getAllOutcomes();
+        for (const [index, outcomeCard] of outcomeCards.entries()) {
+          const outcomeProposalFromAPI = outcomeProposalList[index];
+          const proposalTypeFromUI = await outcomeCard
+            .locator('[data-testid$="-type"]')
+            .textContent();
+          const proposalTypeFromApi = outcomeType[outcomeProposalFromAPI.type];
+
+          const cip105IdFromUI = await outcomeCard
+            .locator('[data-testid$="-CIP-105-id"]')
+            .textContent();
+          const cip105IdFromApi = `${outcomeProposalFromAPI.tx_hash}#${outcomeProposalFromAPI.index}`;
+
+          expect(proposalTypeFromUI.replace(/^.*Type/, "")).toContain(
+            proposalTypeFromApi
+          );
+
+          expect(cip105IdFromUI.replace(/^.*ID/, "")).toContain(
+            cip105IdFromApi
+          );
+        }
+      },
+      {
+        name: `frontend sort validation of ${sortOption} and filter ${filterKey}`,
+      }
+    );
   }
 
   async _validateFiltersInOutcomeCard(
     proposalCard: Locator,
     filters: string[]
   ): Promise<boolean> {
-    const govActionType = await proposalCard
-      .getByTestId("governance-action-type")
+    const type = await proposalCard
+      .locator('[data-testid$="-type"]')
       .textContent();
-
-    return filters.includes(govActionType);
+    const outcomeType = type.replace(/^.*Type/, "");
+    return filters.includes(outcomeType);
   }
 
   async _validateStatusFiltersInOutcomeCard(
     proposalCard: Locator,
     filters: string[]
   ): Promise<boolean> {
-    let govActionType = await proposalCard
+    const status = await proposalCard
       .locator('[data-testid$="-status"]')
       .textContent();
-    return filters.includes(govActionType);
+    const outcomeStatus = outcomeStatusType.filter((statusType) => {
+      return status.includes(statusType);
+    });
+    return outcomeStatus.some((status) => filters.includes(status));
   }
 }

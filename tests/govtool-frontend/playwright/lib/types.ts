@@ -92,6 +92,16 @@ export enum GovernanceActionType {
   UpdatetotheConstitution = "NewConstitution",
 }
 
+export enum outcomeType {
+  NewConstitution = "New Constitution",
+  NewCommittee = "Update Committee",
+  HardForkInitiation = "Hard-Fork Initiation",
+  NoConfidence = "Motion of no Confidence",
+  InfoAction = "Info Action",
+  TreasuryWithdrawals = "Treasury Withdrawals",
+  ParameterChange = "Protocol Parameter Change",
+}
+
 export enum FullGovernanceDRepVoteActionsType {
   ProtocolParameterChange = "ParameterChange",
   InfoAction = "InfoAction",
@@ -270,4 +280,17 @@ export interface outcomeProposal {
   proposal_params: any;
   title: string | null;
   abstract: string | null;
+}
+
+export interface outcomeMetadata {
+  authors: any[];
+  hashAlgorithm: string;
+  body: outcomeMetadataBody;
+}
+
+interface outcomeMetadataBody {
+  abstract: string;
+  motivation: "string";
+  rationale: string;
+  title: string;
 }

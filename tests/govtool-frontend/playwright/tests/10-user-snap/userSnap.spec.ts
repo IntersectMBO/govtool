@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { isMobile } from "@helpers/mobile";
 import { expect, Page } from "@playwright/test";
 import { randomUUID } from "crypto";
 
@@ -20,9 +21,7 @@ test("10A. Should open feedback modal", async ({ page }) => {
     })
   ).toBeVisible();
   await expect(
-    page.getByRole("button", {
-      name: "Idea or new feature Let us",
-    })
+    page.getByRole("button", { name: "Send an idea Let us know what" })
   ).toBeVisible();
 });
 
@@ -32,43 +31,69 @@ test("10B. Should verify a bug report form", async ({ page }) => {
       name: "Report an issue Something",
     })
     .click();
+  await expect(
+    page.getByRole("button", { name: "Close annotation" })
+  ).toBeVisible();
+
+  if (isMobile(page)) {
+    await expect(
+      page.getByRole("button", { name: "Add screenshot" })
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Close annotation" }).click();
+    await expect(page.getByLabel("Take screenshot")).toBeVisible();
+  }
 
   await expect(
     page.getByRole("heading", { name: "Report a bug" })
   ).toBeVisible();
-  await expect(page.getByPlaceholder("Your feedback")).toBeVisible();
-  await expect(page.getByText("Drag & drop or Browse")).toBeVisible();
-  await expect(page.getByLabel("Take screenshot")).toBeVisible();
+  await expect(page.getByPlaceholder("Add description")).toBeVisible();
   await expect(page.getByLabel("Record")).toBeVisible();
   await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
+
+  // check record action
+  await page.getByLabel("Record").click();
+  await expect(
+    page.getByRole("button", { name: "Cancel recording" })
+  ).toBeVisible();
 });
 
 test("10C. Should verify feature form", async ({ page }) => {
   await page
-    .getByRole("button", {
-      name: "Idea or new feature Let us",
-    })
+    .getByRole("button", { name: "Send an idea Let us know what" })
     .click();
 
   await expect(
-    page.getByRole("heading", { name: "Idea or new feature" })
+    page.getByRole("heading", { name: "Feature Request" })
   ).toBeVisible();
-  await expect(page.getByPlaceholder("Example: New navigation")).toBeVisible();
-  await expect(page.getByPlaceholder("Example: New navigation")).toBeVisible();
-  await expect(page.getByLabel("Any additional details")).toBeVisible();
-  await expect(page.getByText("Drag & drop or Browse")).toBeVisible();
-  await expect(page.getByLabel("Please summarize your idea or")).toBeVisible();
+  await expect(page.getByPlaceholder("Feature description")).toBeVisible();
+  await expect(page.getByPlaceholder("Please add some context")).toBeVisible();
   await expect(page.getByLabel("Take screenshot")).toBeVisible();
   await expect(page.getByLabel("Record")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Request Feature" })
+  ).toBeVisible();
+
+  // check screenshot action
+  await page.getByLabel("Take screenshot").click();
+  await expect(
+    page.getByRole("button", { name: "Close annotation" })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Add screenshot" })
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Close annotation" }).click();
+
+  // check record action
+  await page.getByLabel("Record").click();
+  await expect(
+    page.getByRole("button", { name: "Cancel recording" })
+  ).toBeVisible();
 });
 
-test.describe("Feedback Tests", () => {
-  const attachmentInputSelector = "input[type=file]";
+test.describe("Submit Usersnap", () => {
   const feedbackApiUrl =
     "https://widget.usersnap.com/api/widget/xhrrpc?submit_feedback";
   const bucketUrl = "https://s3.eu-central-1.amazonaws.com/upload.usersnap.com";
-  const mockAttachmentPath = "./lib/_mock/mockAttachment.png";
 
   const interceptBucket = async (page: Page) => {
     await page.route(bucketUrl, async (route) =>
@@ -116,8 +141,22 @@ test.describe("Feedback Tests", () => {
       })
       .click();
 
-    await page.getByPlaceholder("Your feedback").fill(faker.lorem.paragraph(2));
-    await page.setInputFiles(attachmentInputSelector, [mockAttachmentPath]);
+    if (isMobile(page)) {
+      await page.getByRole("button", { name: "Add screenshot" }).click();
+    } else {
+      // Draw rectangle
+      await page
+        .locator('[class^="jt-container-"] > svg')
+        .first()
+        .evaluate((element) => {
+          const rectangleSvg = `<g class="root-0-0-11 highlight" data-drawing="true" stroke-width="2" stroke="#fed200" x="147" y="16" width="1091" height="653"><rect width="1091" height="653" fill-opacity="0" x="147" y="16"></rect></g>`;
+          element.innerHTML = rectangleSvg;
+        });
+    }
+
+    await page
+      .getByPlaceholder("Add description")
+      .fill(faker.lorem.paragraph(2));
 
     await page.getByRole("button", { name: "Submit" }).click();
 
@@ -130,23 +169,21 @@ test.describe("Feedback Tests", () => {
     await interceptBucket(page);
 
     await page
-      .getByRole("button", {
-        name: "Idea or new feature Let us",
-      })
+      .getByRole("button", { name: "Send an idea Let us know what" })
       .click();
 
     await page
-      .getByPlaceholder("Example: New navigation")
+      .getByPlaceholder("Feature description")
       .fill(faker.lorem.words(4));
     await page
-      .getByLabel("Please summarize your idea or")
+      .getByPlaceholder("Please add some context")
       .fill(faker.lorem.paragraph(2));
-    await page
-      .getByLabel("Any additional details")
-      .fill(faker.lorem.paragraph(2));
-    await page.setInputFiles(attachmentInputSelector, [mockAttachmentPath]);
 
-    await page.getByRole("button", { name: "Submit" }).click();
+    // add screenshot
+    await page.getByLabel("Take screenshot").click();
+    await page.getByRole("button", { name: "Add screenshot" }).click();
+
+    await page.getByRole("button", { name: "Request Feature" }).click();
 
     await expect(page.getByText("Thank you!")).toBeVisible();
   });

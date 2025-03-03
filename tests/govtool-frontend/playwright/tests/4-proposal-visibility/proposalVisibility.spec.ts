@@ -110,9 +110,7 @@ test("4K. Should display correct vote counts on governance details page for disc
       }
 
       // check ccCommittee votes
-      if (
-        areCCVoteTotalsDisplayed(proposalToCheck.type as GovernanceActionType)
-      ) {
+      if (areCCVoteTotalsDisplayed(proposalToCheck)) {
         await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
           `${proposalToCheck.ccYesVotes}`
         );

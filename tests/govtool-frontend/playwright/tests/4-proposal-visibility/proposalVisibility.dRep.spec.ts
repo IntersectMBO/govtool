@@ -219,9 +219,7 @@ test.describe("Check vote count", () => {
         }
 
         // check ccCommittee votes
-        if (
-          areCCVoteTotalsDisplayed(proposalToCheck.type as GovernanceActionType)
-        ) {
+        if (areCCVoteTotalsDisplayed(proposalToCheck)) {
           await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
             `${proposalToCheck.ccYesVotes}`
           );

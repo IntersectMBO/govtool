@@ -124,7 +124,7 @@ jobs:
         with:
           context: ${{ matrix.workdir }}
           file: ${{ matrix.dockerfile }}
-          tags: ${{ steps.image_lowercase.outputs.lowercase }}:${{ env.TAG }}
+          tags: ${{ steps.image_lowercase.outputs.lowercase }}-${{ matrix.network }}:${{ env.TAG }}
           load: false
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache

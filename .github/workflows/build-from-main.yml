@@ -116,6 +116,9 @@ jobs:
         with:
           string: ${{ matrix.image }}
 
+      - name: Set ENVIRONMENT Variable
+        run: echo "ENVIRONMENT=${{ matrix.network }}" >> $GITHUB_ENV
+
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
@@ -150,9 +153,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set ENVIRONMENT Variable
-        run: echo "ENVIRONMENT=${{ matrix.network }}" >> $GITHUB_ENV
 
       - name: Scan Docker image with Dockle
         id: dockle

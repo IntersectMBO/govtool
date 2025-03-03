@@ -166,9 +166,9 @@ jobs:
 
       - name: Push Docker image to GHCR
         run: |
-          docker load -i '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar'
-          rm -rf '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar'
-          docker push ${{ steps.image_lowercase.outputs.lowercase }}:${{ env.TAG }}
+          docker load -i '/tmp/image-${{ matrix.name }}-${{ matrix.ntework}}-${{ env.ENVIRONMENT }}.tar'
+          rm -rf '/tmp/image-${{ matrix.name }}-${{ matrix.ntework}}-${{ env.ENVIRONMENT }}.tar'
+          docker push ${{ steps.image_lowercase.outputs.lowercase }}-${{ matrix.ntework}}:${{ env.TAG }}
 
       - name: Add tag as a PR comment
         uses: ubie-oss/comment-to-merged-pr-action@v0.3.3

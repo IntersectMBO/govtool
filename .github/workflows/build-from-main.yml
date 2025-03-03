@@ -46,11 +46,14 @@ jobs:
       - name: Set TAG Environment Variable
         id: set_tag
         run: |
+          SANITIZED_BRANCH=$(echo "${{ github.ref_name }}" | tr '/' '-')
           if [ "${{ github.ref_name }}" = "main" ]; then
             echo "TAG=${{ github.sha }}-${{ matrix.network }}" >> $GITHUB_ENV
           else
-            echo "TAG=${{ github.ref_name }}-${{ github.sha }}-${{ matrix.network }}" >> $GITHUB_ENV
+            echo "TAG=${SANITIZED_BRANCH}-${{ github.sha }}-${{ matrix.network }}" >> $GITHUB_ENV
           fi
+          echo "Generated TAG: $TAG"
+      
 
       - name: Lint Dockerfile
         id: hadolint

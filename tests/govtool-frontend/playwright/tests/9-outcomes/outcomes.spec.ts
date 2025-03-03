@@ -1,7 +1,14 @@
 import { test } from "@fixtures/walletExtension";
+import { correctVoteAdaFormat } from "@helpers/adaFormat";
 import { setAllureEpic } from "@helpers/allure";
 import { skipIfNotHardFork } from "@helpers/cardano";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
+import {
+  areCCVoteTotalsDisplayed,
+  areDRepVoteTotalsDisplayed,
+  areSPOVoteTotalsDisplayed,
+} from "@helpers/featureFlag";
+import { injectLogger } from "@helpers/page";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import OutComesPage from "@pages/outcomesPage";
 import { expect, Page } from "@playwright/test";
@@ -292,4 +299,95 @@ test("9F. Should load more Outcomes on show more", async ({ page }) => {
   } else {
     await expect(outcomePage.showMoreBtn).not.toBeVisible();
   }
+});
+
+test("9G. Should display correct vote counts on outcome details page", async ({
+  browser,
+}) => {
+  await Promise.all(
+    Object.keys(outcomeType).map(async (filterKey) => {
+      const page = await browser.newPage();
+      injectLogger(page);
+      const outcomeListResponsePromise = page.waitForResponse((response) =>
+        response
+          .url()
+          .includes(`governance-actions?search=&filters=${filterKey}`)
+      );
+      const outcomePage = new OutComesPage(page);
+      await outcomePage.goto(filterKey);
+
+      const outcomeListResponse = await outcomeListResponsePromise;
+      const proposals = await outcomeListResponse.json();
+
+      expect(
+        proposals.length,
+        proposals.length == 0 && "No proposals found!"
+      ).toBeGreaterThan(0);
+      const {
+        index: governanceActionIndex,
+        tx_hash: governanceTransactionHash,
+      } = proposals[0];
+
+      const govActionDetailsPage = await outcomePage.viewFirstOutcomes();
+
+      const outcomeResponse = await page.waitForResponse((response) =>
+        response
+          .url()
+          .includes(
+            `governance-actions/${governanceTransactionHash}?index=${governanceActionIndex}`
+          )
+      );
+      const proposalToCheck = (await outcomeResponse.json())[0];
+
+      const metricsResponse = await page.waitForResponse(
+        (response) =>
+          response.url().includes(`/network/metrics`) &&
+          !response.url().includes(`/misc/network/metrics`)
+      );
+
+      const dRepTotalAbstainVote =
+        await govActionDetailsPage.getDRepTotalAbstainVoted(
+          proposalToCheck,
+          metricsResponse
+        );
+
+      // check dRep votes
+      if (await areDRepVoteTotalsDisplayed(proposalToCheck)) {
+        await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
+          `₳ ${correctVoteAdaFormat(parseInt(proposalToCheck.yes_votes))}`
+        );
+        await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
+          `₳ ${correctVoteAdaFormat(dRepTotalAbstainVote)}`
+        );
+        await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
+          `₳ ${correctVoteAdaFormat(parseInt(proposalToCheck.no_votes))}`
+        );
+      }
+      // check sPos votes
+      if (await areSPOVoteTotalsDisplayed(proposalToCheck)) {
+        await expect(govActionDetailsPage.sPosYesVotes).toHaveText(
+          `₳ ${correctVoteAdaFormat(parseInt(proposalToCheck.pool_yes_votes))}`
+        );
+        await expect(govActionDetailsPage.sPosAbstainVotes).toHaveText(
+          `₳ ${correctVoteAdaFormat(parseInt(proposalToCheck.pool_abstain_votes))}`
+        );
+        await expect(govActionDetailsPage.sPosNoVotes).toHaveText(
+          `₳ ${correctVoteAdaFormat(parseInt(proposalToCheck.pool_no_votes))}`
+        );
+      }
+
+      // check ccCommittee votes
+      if (areCCVoteTotalsDisplayed(proposalToCheck)) {
+        await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
+          `${proposalToCheck.cc_yes_votes}`
+        );
+        await expect(govActionDetailsPage.ccCommitteeAbstainVotes).toHaveText(
+          `${proposalToCheck.cc_abstain_votes}`
+        );
+        await expect(govActionDetailsPage.ccCommitteeNoVotes).toHaveText(
+          `${proposalToCheck.cc_no_votes}`
+        );
+      }
+    })
+  );
 });

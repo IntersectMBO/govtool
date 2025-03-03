@@ -9,6 +9,8 @@ export default class OutComesPage {
   // Buttons
   readonly filterBtn = this.page.getByTestId("filters-button");
   readonly sortBtn = this.page.getByTestId("sort-button");
+  readonly showMoreBtn = this.page.getByTestId("show-more-button");
+
   //inputs
   readonly searchInput = this.page.getByTestId("search-input");
 
@@ -16,6 +18,20 @@ export default class OutComesPage {
 
   async goto() {
     await this.page.goto(`${environments.frontendUrl}/outcomes`);
+  }
+
+  async getAllListedCIP105GovernanceIds(): Promise<string[]> {
+    const dRepCards = await this.getAllOutcomes();
+    const dRepIds = [];
+
+    for (const dRep of dRepCards) {
+      const dRepIdTextContent = await dRep
+        .locator('[data-testid$="-CIP-105-id"]')
+        .textContent();
+      dRepIds.push(dRepIdTextContent.replace(/^.*ID/, ""));
+    }
+
+    return dRepIds;
   }
 
   async getAllOutcomes(): Promise<Locator[]> {

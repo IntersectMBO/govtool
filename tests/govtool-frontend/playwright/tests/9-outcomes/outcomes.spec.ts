@@ -250,3 +250,46 @@ test("9E. Should verify all of the displayed governance actions have expired", a
     expect(today >= expiryDate).toBeTruthy();
   }
 });
+
+test("9F. Should load more Outcomes on show more", async ({ page }) => {
+  const responsePromise = page.waitForResponse((response) =>
+    response
+      .url()
+      .includes(`governance-actions?search=&filters=&sort=newestFirst&page=2`)
+  );
+  const outcomePage = new OutComesPage(page);
+  await outcomePage.goto();
+
+  let governanceActionIdsBefore: String[];
+  let governanceActionIdsAfter: String[];
+
+  await functionWaitedAssert(
+    async () => {
+      governanceActionIdsBefore =
+        await outcomePage.getAllListedCIP105GovernanceIds();
+      await outcomePage.showMoreBtn.click();
+    },
+    { message: "Show more button not visible" }
+  );
+
+  const response = await responsePromise;
+  const governanceActionListAfter = await response.json();
+
+  await functionWaitedAssert(
+    async () => {
+      governanceActionIdsAfter =
+        await outcomePage.getAllListedCIP105GovernanceIds();
+      expect(governanceActionIdsAfter.length).toBeGreaterThan(
+        governanceActionIdsBefore.length
+      );
+    },
+    { message: "Outcomes not loaded after clicking show more" }
+  );
+
+  if (governanceActionListAfter.length >= governanceActionIdsBefore.length) {
+    await expect(outcomePage.showMoreBtn).toBeVisible();
+    expect(true).toBeTruthy();
+  } else {
+    await expect(outcomePage.showMoreBtn).not.toBeVisible();
+  }
+});

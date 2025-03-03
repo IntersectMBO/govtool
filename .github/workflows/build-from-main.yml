@@ -151,6 +151,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set ENVIRONMENT Variable
+        run: echo "ENVIRONMENT=${{ matrix.network }}" >> $GITHUB_ENV
+
       - name: Scan Docker image with Dockle
         id: dockle
         run: |
@@ -163,9 +166,6 @@ jobs:
           cat ${{ matrix.workdir }}/dockle_scan_output.json
 
           echo "outcome=success" >> $GITHUB_OUTPUT
-
-      - name: Set ENVIRONMENT Variable
-        run: echo "ENVIRONMENT=${{ matrix.network }}" >> $GITHUB_ENV
         
       - name: Push Docker image to GHCR
         run: |

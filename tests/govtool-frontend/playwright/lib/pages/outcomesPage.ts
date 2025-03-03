@@ -4,6 +4,7 @@ import { toCamelCase } from "@helpers/string";
 import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
 import { expect, Locator, Page } from "@playwright/test";
 import { outcomeProposal, outcomeType } from "@types";
+import OutcomeDetailsPage from "./outcomeDetailsPage";
 
 export default class OutComesPage {
   // Buttons
@@ -16,8 +17,12 @@ export default class OutComesPage {
 
   constructor(private readonly page: Page) {}
 
-  async goto() {
-    await this.page.goto(`${environments.frontendUrl}/outcomes`);
+  async goto(filter?: string): Promise<void> {
+    await this.page.goto(
+      filter
+        ? `${environments.frontendUrl}/outcomes?sort=newestFirst&type=${filter}`
+        : `${environments.frontendUrl}/outcomes?sort=newestFirst`
+    );
   }
 
   async getAllListedCIP105GovernanceIds(): Promise<string[]> {
@@ -32,6 +37,11 @@ export default class OutComesPage {
     }
 
     return dRepIds;
+  }
+
+  async viewFirstOutcomes(): Promise<OutcomeDetailsPage> {
+    await this.page.locator('[data-testid$="-view-details"]').first().click();
+    return new OutcomeDetailsPage(this.page);
   }
 
   async getAllOutcomes(): Promise<Locator[]> {

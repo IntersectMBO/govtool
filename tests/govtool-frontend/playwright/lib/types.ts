@@ -277,9 +277,17 @@ export interface outcomeProposal {
   epoch_no: number;
   url: string;
   data_hash: string;
-  proposal_params: any;
   title: string | null;
   abstract: string | null;
+  motivation?: string | null;
+  rationale?: string | null;
+  pool_yes_votes?: string;
+  pool_no_votes?: string;
+  pool_abstain_votes?: string;
+  cc_yes_votes?: string;
+  cc_no_votes?: string;
+  cc_abstain_votes?: string;
+  proposal_params: EpochParams | null;
 }
 
 export interface outcomeMetadata {

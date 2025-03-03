@@ -47,9 +47,9 @@ jobs:
         id: set_tag
         run: |
           if [ "${{ github.ref_name }}" = "main" ]; then
-            echo "TAG=${{ github.sha }}-${NETWORK}" >> $GITHUB_ENV
+            echo "TAG=${{ github.sha }}-${{ matrix.network }}" >> $GITHUB_ENV
           else
-            echo "TAG=${{ github.ref_name }}-${{ github.sha }}-${NETWORK}" >> $GITHUB_ENV
+            echo "TAG=${{ github.ref_name }}-${{ github.sha }}-${{ matrix.network }}" >> $GITHUB_ENV
           fi
 
       - name: Lint Dockerfile

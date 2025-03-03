@@ -166,6 +166,14 @@ jobs:
           cat ${{ matrix.workdir }}/dockle_scan_output.json
 
           echo "outcome=success" >> $GITHUB_OUTPUT
+
+      - name: Debug TAG Before Docker Push
+        run: |
+            echo "Lowercase Image: ${{ steps.image_lowercase.outputs.lowercase }}"
+            echo "Network: ${{ matrix.network }}"
+            echo "TAG: ${{ env.TAG }}"
+            echo "Final Docker Tag: ${{ steps.image_lowercase.outputs.lowercase }}-${{ matrix.network}}:${{ env.TAG }}"
+        
         
       - name: Push Docker image to GHCR
         run: |

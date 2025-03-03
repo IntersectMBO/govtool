@@ -1,7 +1,9 @@
 name: Check and Build Main
 
 on:
-  push
+  pull_request:
+    branches:
+      -main
 
 permissions:
   contents: write

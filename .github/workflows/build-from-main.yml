@@ -36,6 +36,27 @@ jobs:
             dockerfile: ./govtool/metadata-validation/Dockerfile
             image: ghcr.io/${{ github.repository }}-govtool-metadata-validation
             qovery_container_name: govtool-metadata-validation
+          - branch: main
+            network: pre-prod-govtool
+            workdir: ./govtool/backend
+            name: govtool-backend
+            dockerfile: ./govtool/backend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-govtool-backend
+            qovery_container_name: govtool-backend
+          - branch: main
+            network: pre-prod-govtool
+            workdir: ./govtool/frontend
+            name: govtool-frontend
+            dockerfile: ./govtool/frontend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-govtool-frontend
+            qovery_container_name: govtool-frontend
+          - branch: main
+            network: pre-prod-govtool
+            workdir: ./govtool/metadata-validation
+            name: govtool-metadata-validation
+            dockerfile: ./govtool/metadata-validation/Dockerfile
+            image: ghcr.io/${{ github.repository }}-govtool-metadata-validation
+            qovery_container_name: govtool-metadata-validation
         
 
     runs-on: ubuntu-latest
@@ -48,9 +69,9 @@ jobs:
         run: |
           SANITIZED_BRANCH=$(echo "${{ github.ref_name }}" | tr '/' '-')
           if [ "${{ github.ref_name }}" = "main" ]; then
-            echo "TAG=${{ github.sha }}-${{ matrix.network }}" >> $GITHUB_ENV
+            echo "TAG=${{ github.sha }}" >> $GITHUB_ENV
           else
-            echo "TAG=${SANITIZED_BRANCH}-${{ github.sha }}-${{ matrix.network }}" >> $GITHUB_ENV
+            echo "TAG=${SANITIZED_BRANCH}-${{ github.sha }}" >> $GITHUB_ENV
           fi
           echo "Generated TAG: $TAG"
       

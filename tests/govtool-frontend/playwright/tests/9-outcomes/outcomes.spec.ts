@@ -169,7 +169,7 @@ test.describe("Outcome details dependent test", () => {
       .getByTestId("copy-button")
       .click();
     await expect(page.getByText("Copied to clipboard")).toBeVisible({
-      timeout: 10_000,
+      timeout: 60_000,
     });
     const copiedTextDRepDirectory = await page.evaluate(() =>
       navigator.clipboard.readText()

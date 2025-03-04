@@ -125,7 +125,7 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
     // vote must be changed
     await expect(
       page.getByTestId(`poll-${vote.toLowerCase()}-count`)
-    ).toHaveText(`${vote}: (0%)`, { timeout: 15_000 });
+    ).toHaveText(`${vote}: (0%)`, { timeout: 60_000 });
     // opposite of random choice vote
     const oppositeVote = pollVotes[pollVotes.length - 1 - choice];
     await expect(

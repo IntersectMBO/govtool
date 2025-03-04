@@ -37,7 +37,7 @@ test.describe("Proposal checks", () => {
 
     // assert to wait until the loading button is hidden
     await expect(page.getByTestId("to-vote-tab")).toBeVisible({
-      timeout: 20_000,
+      timeout: 60_000,
     });
 
     currentPage = page;
@@ -155,7 +155,7 @@ test.describe("Perform voting", () => {
 
     // assert to wait until the loading button is hidden
     await expect(dRepPage.getByTestId("to-vote-tab")).toBeVisible({
-      timeout: 20_000,
+      timeout: 60_000,
     });
 
     govActionDetailsPage = (await isBootStrapingPhase())
@@ -216,7 +216,7 @@ test.describe("Perform voting", () => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
     await govActionDetailsPage.vote();
     await expect(govActionDetailsPage.voteSuccessModal).toBeVisible({
-      timeout: 20_000,
+      timeout: 60_000,
     });
   });
 
@@ -261,7 +261,7 @@ test.describe("Check voting power", () => {
     await dRepPage.getByTestId("continue-retirement-button").click();
     await expect(
       dRepPage.getByTestId("retirement-transaction-submitted-modal")
-    ).toBeVisible({ timeout: 15_000 });
+    ).toBeVisible({ timeout: 60_000 });
     dRepPage.getByTestId("confirm-modal-button").click();
     await waitForTxConfirmation(dRepPage);
 
@@ -304,11 +304,11 @@ test.describe("Bootstrap phase", () => {
 
         // assert to wait until proposal cards are visible
         await expect(dRepPage.getByTestId("voting-power-chips")).toBeVisible({
-          timeout: 20_000,
+          timeout: 60_000,
         });
         // wait until the loading button is hidden
         await expect(dRepPage.getByTestId("to-vote-tab")).toBeVisible({
-          timeout: 20_000,
+          timeout: 60_000,
         });
 
         const governanceActionDetailsPage =

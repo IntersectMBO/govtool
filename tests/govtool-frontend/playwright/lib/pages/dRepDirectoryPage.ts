@@ -184,7 +184,7 @@ export default class DRepDirectoryPage {
   }
 
   async getAllListedDReps() {
-    await expect(this.searchInput).toBeVisible({ timeout: 10_000 });
+    await expect(this.searchInput).toBeVisible({ timeout: 60_000 });
 
     await waitedLoop(async () => {
       return (

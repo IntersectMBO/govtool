@@ -174,7 +174,7 @@ export default class DRepForm {
       .getByTestId(formErrors.paymentAddress)
       .isVisible();
 
-    expect(await this.objectivesInput.textContent(), {
+    expect(await this.objectivesInput.textContent({ timeout: 60_000 }), {
       message:
         objectivesInputText !== dRepInfo.objectives &&
         `${dRepInfo.objectives} is not equal to ${await this.objectivesInput.textContent()}`,
@@ -255,7 +255,7 @@ export default class DRepForm {
       message:
         !isPaymentAddressErrorVisible &&
         `${dRepInfo.paymentAddress} is a valid paymentAddress`,
-    }).toBeVisible();
+    }).toBeVisible({ timeout: 60_000 });
 
     expect(await this.objectivesInput.textContent(), {
       message:

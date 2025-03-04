@@ -188,17 +188,19 @@ instance FromRow Proposal where
 
 data TransactionStatus = TransactionStatus
   { transactionConfirmed         :: Bool
-  , votingProcedure :: Maybe Value
+  , votingProcedure              :: Maybe Value
+  , drepRegistration             :: Maybe Value
   }
 
 instance FromRow TransactionStatus where
-  fromRow = TransactionStatus <$> field <*> field
+  fromRow = TransactionStatus <$> field <*> field <*> field
 
 instance ToJSON TransactionStatus where
-  toJSON TransactionStatus {transactionConfirmed, votingProcedure} =
+  toJSON TransactionStatus {transactionConfirmed, votingProcedure, drepRegistration} =
     object
       [ "transactionConfirmed" .= transactionConfirmed
       , "votingProcedure" .= votingProcedure
+      , "drepRegistration" .= drepRegistration
       ]
 
 data CacheEnv

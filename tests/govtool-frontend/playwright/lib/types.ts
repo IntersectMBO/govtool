@@ -92,6 +92,16 @@ export enum GovernanceActionType {
   UpdatetotheConstitution = "NewConstitution",
 }
 
+export enum outcomeType {
+  NewConstitution = "New Constitution",
+  NewCommittee = "Update Committee",
+  HardForkInitiation = "Hard-Fork Initiation",
+  NoConfidence = "Motion of no Confidence",
+  InfoAction = "Info Action",
+  TreasuryWithdrawals = "Treasury Withdrawals",
+  ParameterChange = "Protocol Parameter Change",
+}
+
 export enum FullGovernanceDRepVoteActionsType {
   ProtocolParameterChange = "ParameterChange",
   InfoAction = "InfoAction",
@@ -250,4 +260,45 @@ export interface imageObject {
   "@type": "ImageObject";
   contentUrl: string;
   sha256: string;
+}
+
+export interface outcomeProposal {
+  id: string;
+  tx_hash: string;
+  index: string;
+  type: string;
+  yes_votes: string;
+  no_votes: string;
+  abstain_votes: string;
+  description: any;
+  expiry_date: string;
+  expiration: number;
+  time: string;
+  epoch_no: number;
+  url: string;
+  data_hash: string;
+  title: string | null;
+  abstract: string | null;
+  motivation?: string | null;
+  rationale?: string | null;
+  pool_yes_votes?: string;
+  pool_no_votes?: string;
+  pool_abstain_votes?: string;
+  cc_yes_votes?: string;
+  cc_no_votes?: string;
+  cc_abstain_votes?: string;
+  proposal_params: EpochParams | null;
+}
+
+export interface outcomeMetadata {
+  authors: any[];
+  hashAlgorithm: string;
+  body: outcomeMetadataBody;
+}
+
+interface outcomeMetadataBody {
+  abstract: string;
+  motivation: "string";
+  rationale: string;
+  title: string;
 }

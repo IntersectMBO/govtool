@@ -1,12 +1,7 @@
 name: Check,Build,Deploy
 
 on:
-  push:
-    branches:
-      - develop
-      - test
-      - staging
-      - main
+  workflow_dispatch 
 
 permissions:
   contents: write

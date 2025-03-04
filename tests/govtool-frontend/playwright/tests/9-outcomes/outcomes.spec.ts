@@ -261,7 +261,7 @@ test("9E. Should verify all of the displayed governance actions have expired", a
   for (const proposalCard of proposalCards) {
     const expiryDateEl = proposalCard.locator('[data-testid$="-Expired-date"]');
     const expiryDateTxt = await expiryDateEl.innerText();
-    const expiryDate = extractExpiryDateFromText(expiryDateTxt, true);
+    const expiryDate = extractExpiryDateFromText(expiryDateTxt);
     const today = new Date();
     expect(today >= expiryDate).toBeTruthy();
   }

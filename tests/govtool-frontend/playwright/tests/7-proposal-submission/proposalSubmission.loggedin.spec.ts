@@ -302,7 +302,7 @@ test.describe("Proposal created logged state", () => {
     });
   });
 
-  test.describe("proposed as a governance action", () => {
+  test.describe("Proposed as a governance action", () => {
     let proposalSubmissionPage: ProposalSubmissionPage;
     test.beforeEach(async ({ page, proposalId }) => {
       const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(

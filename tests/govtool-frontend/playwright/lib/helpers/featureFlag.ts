@@ -1,51 +1,112 @@
-import { GovernanceActionType, IProposal } from "@types";
+import {
+  GovernanceActionType,
+  IProposal,
+  outcomeProposal,
+  outcomeType,
+} from "@types";
 import { isBootStrapingPhase } from "./cardano";
 import { SECURITY_RELEVANT_PARAMS_MAP } from "@constants/index";
 
-export const areDRepVoteTotalsDisplayed = async (proposal: IProposal) => {
+const getProposalType = (
+  type: keyof typeof outcomeType,
+  fallback: GovernanceActionType,
+  proposal: IProposal | outcomeProposal
+) =>
+  "proposal_params" in proposal
+    ? Object.keys(outcomeType).find(
+        (key) => outcomeType[key] === outcomeType[type]
+      )
+    : fallback;
+
+export const areDRepVoteTotalsDisplayed = async (
+  proposal: IProposal | outcomeProposal
+) => {
   const isInBootstrapPhase = await isBootStrapingPhase();
   const isSecurityGroup = Object.values(SECURITY_RELEVANT_PARAMS_MAP).some(
-    (paramKey) =>
-      proposal.protocolParams?.[
-        paramKey as keyof typeof proposal.protocolParams
-      ] !== null
+    (paramKey) => {
+      const params =
+        "protocolParams" in proposal
+          ? proposal.protocolParams
+          : proposal.proposal_params;
+      return params?.[paramKey as keyof typeof params] !== null;
+    }
   );
+
   if (isInBootstrapPhase) {
+    const HardForkInitiation = getProposalType(
+      "HardForkInitiation",
+      GovernanceActionType.HardFork,
+      proposal
+    );
+
+    const ProtocolParameterChange = getProposalType(
+      "ParameterChange",
+      GovernanceActionType.ProtocolParameterChange,
+      proposal
+    );
+
     return !(
-      proposal.type === GovernanceActionType.HardFork ||
-      (proposal.type === GovernanceActionType.ProtocolParameterChange &&
-        !isSecurityGroup)
+      proposal.type === HardForkInitiation ||
+      (proposal.type === ProtocolParameterChange && !isSecurityGroup)
     );
   }
 
   return true;
 };
 
-export const areSPOVoteTotalsDisplayed = async (proposal: IProposal) => {
+export const areSPOVoteTotalsDisplayed = async (
+  proposal: IProposal | outcomeProposal
+) => {
   const isInBootstrapPhase = await isBootStrapingPhase();
   const isSecurityGroup = Object.values(SECURITY_RELEVANT_PARAMS_MAP).some(
-    (paramKey) =>
-      proposal.protocolParams?.[
-        paramKey as keyof typeof proposal.protocolParams
-      ] !== null
+    (paramKey) => {
+      const params =
+        "protocolParams" in proposal
+          ? proposal.protocolParams
+          : proposal.proposal_params;
+      return params?.[paramKey as keyof typeof params] !== null;
+    }
   );
+
+  const ProtocolParameterChange = getProposalType(
+    "ParameterChange",
+    GovernanceActionType.ProtocolParameterChange,
+    proposal
+  );
+  const UpdatetotheConstitution = getProposalType(
+    "NewConstitution",
+    GovernanceActionType.UpdatetotheConstitution,
+    proposal
+  );
+  const TreasuryWithdrawal = getProposalType(
+    "TreasuryWithdrawals",
+    GovernanceActionType.TreasuryWithdrawal,
+    proposal
+  );
+
   if (isInBootstrapPhase) {
-    return proposal.type !== GovernanceActionType.ProtocolParameterChange;
+    return proposal.type !== ProtocolParameterChange;
   }
 
   return !(
-    proposal.type === GovernanceActionType.UpdatetotheConstitution ||
-    proposal.type === GovernanceActionType.TreasuryWithdrawal ||
-    (proposal.type === GovernanceActionType.ProtocolParameterChange &&
-      !isSecurityGroup)
+    proposal.type === UpdatetotheConstitution ||
+    proposal.type === TreasuryWithdrawal ||
+    (proposal.type === ProtocolParameterChange && !isSecurityGroup)
   );
 };
 
 export const areCCVoteTotalsDisplayed = (
-  governanceActionType: GovernanceActionType
+  proposal: IProposal | outcomeProposal
 ) => {
-  return ![
+  const NoConfidence = getProposalType(
+    "NoConfidence",
     GovernanceActionType.NoConfidence,
+    proposal
+  );
+  const NewCommittee = getProposalType(
+    "NewCommittee",
     GovernanceActionType.NewCommittee,
-  ].includes(governanceActionType);
+    proposal
+  );
+  return ![NewCommittee, NoConfidence].includes(proposal.type);
 };

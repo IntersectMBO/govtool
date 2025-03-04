@@ -8,6 +8,7 @@ import {
   areDRepVoteTotalsDisplayed,
   areSPOVoteTotalsDisplayed,
 } from "@helpers/featureFlag";
+import { isMobile } from "@helpers/mobile";
 import { injectLogger } from "@helpers/page";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import OutComesPage from "@pages/outcomesPage";
@@ -32,6 +33,9 @@ test("9A. Should access Outcomes page in disconnect state", async ({
 }) => {
   await page.goto("/");
 
+  if (isMobile(page)) {
+    await page.getByTestId("open-drawer-button").click();
+  }
   await page.getByTestId("governance-actions-outcomes-link").click();
 
   await expect(page.getByText(/outcomes/i)).toHaveCount(2);
@@ -219,15 +223,11 @@ test("9C_3. Should filter and sort Governance Action Type on outcomes page", asy
   page,
 }) => {
   const outcomePage = new OutComesPage(page);
-  await outcomePage.goto();
-
-  await outcomePage.filterBtn.click();
+  const filterOptionKeys = Object.keys(outcomeType);
   const filterOptionNames = Object.values(outcomeType);
 
-  const choice = Math.floor(Math.random() * filterOptionNames.length);
-  await outcomePage.filterProposalByNames([filterOptionNames[choice]]);
-
-  await outcomePage.filterBtn.click({ force: true });
+  const choice = Math.floor(Math.random() * filterOptionKeys.length);
+  await outcomePage.goto(filterOptionKeys[choice]);
   await outcomePage.sortBtn.click();
 
   await outcomePage.sortAndValidate(

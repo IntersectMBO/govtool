@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   check-build:
+    if: contains(fromJson('["main", "staging"]'), github.ref_name)
     environment: ${{ matrix.network }}
     strategy:
       fail-fast: false
@@ -151,11 +152,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Skip if Branch Doesn't Match
+      - name: Ensure Job Runs Only for Matching Branch
         if: github.ref_name != matrix.branch
         run: |
-          echo "Skipping ${{ matrix.name }} because branch ${{ github.ref_name }} does not match ${{ matrix.branch }}"
-          exit 0
+          echo "Branch mismatch, exiting..."
+          exit 1
 
       - name: Set TAG Environment Variable
         id: set_tag

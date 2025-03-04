@@ -236,7 +236,7 @@ test("9C_3. Should filter and sort Governance Action Type on outcomes page", asy
   const filterOptionNames = Object.values(outcomeType);
 
   const choice = Math.floor(Math.random() * filterOptionKeys.length);
-  await outcomePage.goto(filterOptionKeys[choice]);
+  await outcomePage.goto({ filter: filterOptionKeys[choice] });
   await outcomePage.sortBtn.click();
 
   await outcomePage.sortAndValidate(
@@ -323,7 +323,7 @@ test("9G. Should display correct vote counts on outcome details page", async ({
           .includes(`governance-actions?search=&filters=${filterKey}`)
       );
       const outcomePage = new OutComesPage(page);
-      await outcomePage.goto(filterKey);
+      await outcomePage.goto({ filter: filterKey });
 
       const outcomeListResponse = await outcomeListResponsePromise;
       const proposals = await outcomeListResponse.json();

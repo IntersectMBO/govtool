@@ -17,12 +17,14 @@ export default class OutComesPage {
 
   constructor(private readonly page: Page) {}
 
-  async goto(filter?: string): Promise<void> {
-    await this.page.goto(
-      filter
-        ? `${environments.frontendUrl}/outcomes?sort=newestFirst&type=${filter}`
-        : `${environments.frontendUrl}/outcomes?sort=newestFirst`
-    );
+  async goto(params: { filter?: string; sort?: string } = {}): Promise<void> {
+    const { filter, sort = "newestFirst" } = params;
+    const url = new URL(`${environments.frontendUrl}/outcomes`);
+    url.searchParams.append("sort", sort);
+    if (filter) {
+      url.searchParams.append("type", filter);
+    }
+    await this.page.goto(url.toString());
   }
 
   async getAllListedCIP105GovernanceIds(): Promise<string[]> {

@@ -163,9 +163,9 @@ jobs:
         run: |
           SANITIZED_BRANCH=$(echo "${{ github.ref_name }}" | tr '/' '-')
           if [ "${{ github.ref_name }}" = "main" ]; then
-            echo "TAG=${{ github.sha }}" >> $GITHUB_ENV
+            echo "TAG=${{ github.sha }}-${{ github.run_number }}" >> $GITHUB_ENV
           else
-            echo "TAG=${SANITIZED_BRANCH}-${{ github.sha }}" >> $GITHUB_ENV
+            echo "TAG=${SANITIZED_BRANCH}-${{ github.sha }}-${{ github.run_number }}" >> $GITHUB_ENV
           fi
           echo "Generated TAG: $TAG"
       

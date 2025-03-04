@@ -41,7 +41,7 @@ test("9A. Should access Outcomes page in disconnect state", async ({
   await expect(page.getByText(/outcomes/i)).toHaveCount(2);
 });
 
-test.describe("outcome details dependent test", () => {
+test.describe("Outcome details dependent test", () => {
   let governanceActionId: string | undefined;
   let governanceActionTitle: string | undefined;
   let currentPage: Page;

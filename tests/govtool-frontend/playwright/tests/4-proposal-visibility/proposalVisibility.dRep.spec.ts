@@ -49,7 +49,7 @@ test.describe("Logged in DRep", () => {
     );
   });
 
-  test.describe("vote context metadata anchor validation", () => {
+  test.describe("Vote context metadata anchor validation", () => {
     let govActionDetailsPage: GovernanceActionDetailsPage;
     test.beforeEach(async ({ page }) => {
       const govActionsPage = new GovernanceActionsPage(page);

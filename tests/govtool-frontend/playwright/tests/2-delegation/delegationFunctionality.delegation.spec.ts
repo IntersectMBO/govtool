@@ -188,7 +188,6 @@ test.describe("Register DRep state", () => {
 });
 
 test("2G. Should delegate to myself", async ({ page, browser }, testInfo) => {
-  test.skip();
   test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
   const wallet = await walletManager.popWallet("registeredDRep");
@@ -207,14 +206,13 @@ test("2G. Should delegate to myself", async ({ page, browser }, testInfo) => {
   await dRepDirectoryPage.delegateToDRep(dRepId);
 
   await expect(
-    dRepPage.getByTestId(`${dRepId}-delegate-button')`)
-  ).not.toBeVisible();
-  await expect(dRepPage.getByTestId(`${dRepId}-copy-id-button`)).toHaveCount(
-    1,
-    {
-      timeout: 60_000,
-    }
-  );
+    dRepDirectoryPage.currentPage.getByTestId(`${dRepId}-delegate-button`)
+  ).not.toBeVisible({ timeout: 60_000 });
+  await expect(
+    dRepDirectoryPage.currentPage.getByTestId(`${dRepId}-copy-id-button`)
+  ).toHaveCount(1, {
+    timeout: 60_000,
+  });
 });
 
 test.describe("Multiple delegations", () => {

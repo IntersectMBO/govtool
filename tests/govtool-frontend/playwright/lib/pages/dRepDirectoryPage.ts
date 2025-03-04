@@ -45,6 +45,10 @@ export default class DRepDirectoryPage {
 
   constructor(private readonly page: Page) {}
 
+  get currentPage(): Page {
+    return this.page;
+  }
+
   async goto() {
     await this.page.goto(
       `${environments.frontendUrl}/connected/drep_directory`

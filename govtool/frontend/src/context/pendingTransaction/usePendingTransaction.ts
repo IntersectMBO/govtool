@@ -12,9 +12,14 @@ import { StatusModalState } from "@organisms";
 import { useQueryClient } from "react-query";
 import { useModal, useSnackbar } from "..";
 import { TransactionState } from "./types";
-import { getDesiredResult, getQueryKey, refetchData } from "./utils";
+import {
+  getDesiredResult,
+  getQueryKey,
+  invalidateQuery,
+  refetchData,
+} from "./utils";
 
-const TIME_TO_EXPIRE_TRANSACTION = 3 * 60 * 1000; // 3 MINUTES
+const TIME_TO_EXPIRE_TRANSACTION = 5 * 60 * 1000; // 5 MINUTES
 const TRANSACTION_REFRESH_TIME = 15 * 1000; // 15 SECONDS
 const DB_SYNC_REFRESH_TIME = 3 * 1000; // 3 SECONDS
 const DB_SYNC_MAX_ATTEMPTS = 10;
@@ -80,7 +85,15 @@ export const usePendingTransaction = ({
 
       if (
         status.transactionConfirmed &&
-        (type === "vote" ? status.votingProcedure.length > 0 : true)
+        ((type === "vote" && status.votingProcedure.length > 0) ||
+          (type === "registerAsDrep" &&
+            status.drepRegistration[0]?.off_chain_vote_drep_data) ||
+          (type === "retireAsDrep" &&
+            status.drepRegistration[0]?.drep_registration) ||
+          (type === "registerAsDirectVoter" &&
+            status.drepRegistration[0]?.drep_registration) ||
+          (type === "retireAsDirectVoter" &&
+            status.drepRegistration[0]?.drep_registration))
       ) {
         clearInterval(interval);
 
@@ -101,6 +114,8 @@ export const usePendingTransaction = ({
             );
 
             if (desiredResult === data) {
+              // eslint-disable-next-line no-await-in-loop
+              await invalidateQuery(type, queryClient);
               addSuccessAlert(t(`alerts.${type}.success`));
               resetTransaction();
               isDBSyncUpdated = true;
@@ -155,7 +170,7 @@ export const usePendingTransaction = ({
     setTransaction(newTransaction);
     setItemToLocalStorage(`${PENDING_TRANSACTION_KEY}_${stakeKey}`, {
       ...newTransaction,
-      resourceId: newTransaction.resourceId || null,
+      resourceId: newTransaction.resourceId ?? null,
     });
   };
 

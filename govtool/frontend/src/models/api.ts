@@ -76,6 +76,33 @@ export type TransactionStatus = {
         voting_anchor_id: number | null;
       }[]
     | [];
+  drepRegistration:
+    | {
+        drep_registration:
+          | {
+              cert_index: number;
+              deposit: number;
+              drep_hash_id: number;
+              id: number;
+              tx_id: number;
+              voting_anchor_id: number;
+            }[]
+          | [];
+        off_chain_vote_drep_data:
+          | {
+              given_name: string;
+              id: number;
+              image_hash: string | null;
+              image_url: string | null;
+              motivations: string;
+              objectives: string;
+              off_chain_vote_data_id: number;
+              payment_address: string | null;
+              qualifications: string;
+            }[]
+          | [];
+      }[]
+    | [];
 };
 
 export enum Network {

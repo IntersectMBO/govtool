@@ -50,6 +50,8 @@ changes.
 
 ### Changed
 
+- Change transaction confirmation to be based on existing off chain data for drep registration [Issue 3080](https://github.com/IntersectMBO/govtool/issues/3080)
+
 ### Removed
 
 - Remove ratification threshold for Info Action for Consitutional Committee [Issue 3108](https://github.com/IntersectMBO/govtool/issues/3108)

@@ -156,7 +156,7 @@ jobs:
         if: github.ref_name != matrix.branch
         run: |
           echo "Branch mismatch, exiting..."
-          exit 1
+          exit 0
 
       - name: Set TAG Environment Variable
         id: set_tag

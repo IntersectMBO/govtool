@@ -20,6 +20,8 @@ changes.
 
 ### Removed
 
+- Remove ratification threshold for Info Action for Consitutional Committee [Issue 3108](https://github.com/IntersectMBO/govtool/issues/3108)
+
 ## [v2.0.13](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.13) 2025-02-27
 
 ### Added

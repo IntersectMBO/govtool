@@ -23,3 +23,11 @@ export const guardrailsScript = {
 
 export const guardrailsScriptHash =
   "914d97d63e2b7113465739faddd82362b1deaeedbcc4d01016c35c6e";
+
+export const outcomeStatusType = [
+  "Expired",
+  "Not Ratified",
+  "Ratified",
+  "Enacted",
+  "Live",
+];

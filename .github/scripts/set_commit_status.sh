@@ -9,7 +9,7 @@ fi
 # Retrieve necessary variables from workflow
 START_TIME=${START_TIME:-$(date +%s)}
 TEST_STATUS=${TEST_STATUS:-"failure"}
-REPORT_NUMBER=${REPORT_NUMBER:-1}
+REPORT_NUMBER=${REPORT_NUMBER:-0}
 REPORT_NAME=${REPORT_NAME:-"govtool-frontend"}
 HOST_URL=${HOST_URL:-"https://govtool.cardanoapi.io"}
 CONTEXT="Playwright Tests : $HOST_URL"
@@ -60,6 +60,12 @@ elif [[ "$TEST_STATUS" == "failure" && "$TOTAL" -ne 0 ]]; then
   DESCRIPTION="Tests failed in ${TEST_DURATION}: Passed ${PASSED}, Failed ${FAILED} out of ${TOTAL}"
 else
   DESCRIPTION="⚠️ Tests execution failed :$TEST_STATUS"
+  TEST_STATUS="error"
+  TARGET_URL="https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+fi
+
+if [[ "$REPORT_NUMBER" == 0 ]]; then
+  DESCRIPTION="⚠️ Test execution failed due to missing report number"
   TEST_STATUS="error"
   TARGET_URL="https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 fi

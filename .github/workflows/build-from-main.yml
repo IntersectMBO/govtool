@@ -1,9 +1,6 @@
 name: Check and Build Main
 
 on:
-  pull_request:
-    branches:
-      - main
   push:
     branches:
       - main
@@ -83,12 +80,81 @@ jobs:
             dockerfile: ./govtool/metadata-validation/Dockerfile
             image: ghcr.io/${{ github.repository }}-metadata-validation
             qovery_container_name: govtool-metadata-validation
+          - branch: staging
+            network: preview
+            workdir: ./govtool/backend
+            name: govtool-backend
+            dockerfile: ./govtool/backend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-backend
+            qovery_container_name: govtool-backend
+          - branch: staging
+            network: preview
+            workdir: ./govtool/frontend
+            name: govtool-frontend
+            dockerfile: ./govtool/frontend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-frontend
+            qovery_container_name: govtool-frontend
+          - branch: staging
+            network: preview
+            workdir: ./govtool/metadata-validation
+            name: govtool-metadata-validation
+            dockerfile: ./govtool/metadata-validation/Dockerfile
+            image: ghcr.io/${{ github.repository }}-metadata-validation
+            qovery_container_name: govtool-metadata-validation
+          - branch: staging
+            network: pre-prod
+            workdir: ./govtool/backend
+            name: govtool-backend
+            dockerfile: ./govtool/backend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-backend
+            qovery_container_name: govtool-backend
+          - branch: staging
+            network: pre-prod
+            workdir: ./govtool/frontend
+            name: govtool-frontend
+            dockerfile: ./govtool/frontend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-frontend
+            qovery_container_name: govtool-frontend
+          - branch: staging
+            network: pre-prod
+            workdir: ./govtool/metadata-validation
+            name: govtool-metadata-validation
+            dockerfile: ./govtool/metadata-validation/Dockerfile
+            image: ghcr.io/${{ github.repository }}-metadata-validation
+            qovery_container_name: govtool-metadata-validation
+          - branch: staging
+            network: prod
+            workdir: ./govtool/backend
+            name: govtool-backend
+            dockerfile: ./govtool/backend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-backend
+            qovery_container_name: govtool-backend
+          - branch: staging
+            network: prod
+            workdir: ./govtool/frontend
+            name: govtool-frontend
+            dockerfile: ./govtool/frontend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-frontend
+            qovery_container_name: govtool-frontend
+          - branch: staging
+            network: prod
+            workdir: ./govtool/metadata-validation
+            name: govtool-metadata-validation
+            dockerfile: ./govtool/metadata-validation/Dockerfile
+            image: ghcr.io/${{ github.repository }}-metadata-validation
+            qovery_container_name: govtool-metadata-validation
         
 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Skip if Branch Doesn't Match
+        if: github.ref_name != matrix.branch
+        run: |
+          echo "Skipping ${{ matrix.name }} because branch ${{ github.ref_name }} does not match ${{ matrix.branch }}"
+          exit 0
 
       - name: Set TAG Environment Variable
         id: set_tag

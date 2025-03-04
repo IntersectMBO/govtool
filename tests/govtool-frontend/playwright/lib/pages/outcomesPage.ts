@@ -49,7 +49,7 @@ export default class OutComesPage {
       return (
         (await this.page.locator('[data-testid$="-outcome-card"]').count()) >
           0 ||
-        (await this.page.getByText("No results for the search.").isVisible())
+        (await this.page.getByText("No governance actions found").isVisible())
       );
     });
     return await this.page.locator('[data-testid$="-outcome-card"]').all();

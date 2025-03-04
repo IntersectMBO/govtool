@@ -117,6 +117,10 @@ test.describe("outcome details dependent test", () => {
     await functionWaitedAssert(
       async () => {
         const idSearchOutcomeCards = await outcomesPage.getAllOutcomes();
+        expect(idSearchOutcomeCards.length, {
+          message:
+            idSearchOutcomeCards.length == 0 && "No governance actions found",
+        }).toBeGreaterThan(0);
         for (const outcomeCard of idSearchOutcomeCards) {
           const id = await outcomeCard
             .locator('[data-testid$="-CIP-105-id"]')
@@ -136,6 +140,11 @@ test.describe("outcome details dependent test", () => {
     await functionWaitedAssert(
       async () => {
         const titleSearchOutcomeCards = await outcomesPage.getAllOutcomes();
+        expect(titleSearchOutcomeCards.length, {
+          message:
+            titleSearchOutcomeCards.length == 0 &&
+            "No governance actions found",
+        }).toBeGreaterThan(0);
         for (const outcomeCard of titleSearchOutcomeCards) {
           const title = await outcomeCard
             .locator('[data-testid$="-card-title"]')

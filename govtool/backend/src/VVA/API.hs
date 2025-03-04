@@ -43,6 +43,7 @@ import           VVA.Network              as Network
 import qualified VVA.Proposal             as Proposal
 import qualified VVA.Transaction          as Transaction
 import qualified VVA.Types                as Types
+import           VVA.Common.Types
 import           VVA.Types                (App, AppEnv (..),
                                            AppError (CriticalError, InternalError, ValidationError),
                                            CacheEnv (..))
@@ -140,60 +141,24 @@ delegationToResponse Types.Delegation {..} =
 drepList :: App m => Maybe Text -> [DRepStatus] -> Maybe DRepSortMode -> Maybe Natural -> Maybe Natural -> m ListDRepsResponse
 drepList mSearchQuery statuses mSortMode mPage mPageSize = do
   CacheEnv {dRepListCache} <- asks vvaCache
-  dreps <- cacheRequest dRepListCache (fromMaybe "" mSearchQuery) (DRep.listDReps mSearchQuery)
 
-  let filterDRepsByQuery = case mSearchQuery of
-        Nothing -> filter $ \Types.DRepRegistration {..} ->
-          dRepRegistrationType /= Types.SoleVoter
-        Just query -> filter $ \Types.DRepRegistration {..} ->
-          let searchLower = Text.toLower query
-              viewLower = Text.toLower dRepRegistrationView
-              hashLower = Text.toLower dRepRegistrationDRepHash
-          in case dRepRegistrationType of
-              Types.SoleVoter -> 
-                searchLower == viewLower || searchLower == hashLower
-              Types.DRep -> 
-                True
+  let page = fromMaybe 0 mPage
+  let pageSize = fromMaybe 10 mPageSize
+  let offset = page * pageSize
+  let sortMode = fromMaybe VotingPower mSortMode
 
+  let cacheKey = pack (show (mSearchQuery, statuses, sortMode, page, pageSize))
 
-  let filterDRepsByStatus = case statuses of
-        [] -> id
-        _  -> filter $ \Types.DRepRegistration {..} ->
-          mapDRepStatus dRepRegistrationStatus `elem` statuses
+  (totalCount, cachedDReps) <- cacheRequest dRepListCache cacheKey $
+      DRep.listDReps mSearchQuery statuses (Just sortMode) (fromIntegral pageSize) (fromIntegral offset)
 
-  randomizedOrderList <- mapM (\_ -> randomRIO (0, 1 :: Double)) dreps
-
-  let sortDReps = case mSortMode of
-        Nothing -> id
-        Just Random -> fmap snd . sortOn fst . Prelude.zip randomizedOrderList
-        Just VotingPower -> sortOn $ \Types.DRepRegistration {..} ->
-          Down dRepRegistrationVotingPower
-        Just RegistrationDate -> sortOn $ \Types.DRepRegistration {..} ->
-          Down dRepRegistrationLatestRegistrationDate
-        Just Status -> sortOn $ \Types.DRepRegistration {..} ->
-          dRepRegistrationStatus
-
-  appEnv <- ask
-
-  allValidDReps <- liftIO $ mapConcurrently
-    (\d@Types.DRepRegistration{..} -> do
-        let drep = drepRegistrationToDrep d
-        return drep)
-    $ sortDReps $ filterDRepsByQuery $ filterDRepsByStatus dreps
-
-  let page = (fromIntegral $ fromMaybe 0 mPage) :: Int
-      pageSize = (fromIntegral $ fromMaybe 10 mPageSize) :: Int
-
-      total = length allValidDReps :: Int
-
-  let elements = take pageSize $ drop (page * pageSize) allValidDReps
-  return $ ListDRepsResponse
-    { listDRepsResponsePage = fromIntegral page
-    , listDRepsResponsePageSize = fromIntegral pageSize
-    , listDRepsResponseTotal = fromIntegral total
-    , listDRepsResponseElements = elements
-    }
-
+  let response = ListDRepsResponse
+        { listDRepsResponsePage = fromIntegral page
+        , listDRepsResponsePageSize = fromIntegral pageSize
+        , listDRepsResponseTotal = fromIntegral totalCount
+        , listDRepsResponseElements = cachedDReps
+        }
+  return response
 
 getVotingPower :: App m => HexText -> m Integer
 getVotingPower (unHexText -> dRepId) = do

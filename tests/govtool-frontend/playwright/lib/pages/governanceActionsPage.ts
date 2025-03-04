@@ -99,7 +99,7 @@ export default class GovernanceActionsPage {
     await waitedLoop(async () => {
       return (
         (await this.page.locator('[data-testid$="-card"]').count()) > 0 ||
-        this.page.getByText("No results for the search.")
+        (await this.page.getByText("No results for the search.").isVisible())
       );
     });
     return this.page.locator('[data-testid$="-card"]').all();

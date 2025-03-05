@@ -14,12 +14,13 @@ changes.
 
 ### Fixed
 
+- Fix calculating withdrawals when rewards records are empty for a given stake key [Issue 3134](https://github.com/IntersectMBO/govtool/issues/3134)
+
 ### Changed
 
 ### Removed
 
 ## [v2.0.13](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.13) 2025-02-27
-
 
 ### Added
 

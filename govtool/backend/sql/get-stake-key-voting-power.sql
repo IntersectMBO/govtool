@@ -38,7 +38,15 @@ Withdrawal AS (
     w.addr_id
 )
 SELECT
-  (COALESCE(rr.amount, 0) + COALESCE(r.amount, 0) + COALESCE(b.amount, 0) - COALESCE(w.withdrawal_amount, 0)) AS total_balance,
+  (COALESCE(rr.amount, 0) + COALESCE(r.amount, 0) + COALESCE(b.amount, 0) - 
+  -- records in rewards tables might be missing for some epochs
+  -- so we need to check if the sum of rewards is greater than the sum of withdrawals before subtracting
+    CASE 
+      WHEN COALESCE(rr.amount, 0) + COALESCE(r.amount, 0) > COALESCE(w.withdrawal_amount, 0) 
+      THEN COALESCE(w.withdrawal_amount, 0) 
+      ELSE 0 
+    END
+  ) AS total_balance,
   b.addr_raw::text AS stake_address
 FROM
   Balance b

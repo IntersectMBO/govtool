@@ -207,7 +207,11 @@ export const VotesSubmitted = ({
             noVotesPercentage={ccNoVotesPercentage}
             notVotedVotes={ccNotVotedVotes}
             notVotedPercentage={ccNotVotedVotesPercentage}
-            threshold={Number(ccThreshold)}
+            threshold={
+              type !== GovernanceActionType.InfoAction
+                ? Number(ccThreshold)
+                : null
+            }
           />
         )}
       </Box>

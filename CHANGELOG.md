@@ -18,8 +18,22 @@ changes.
 
 ### Removed
 
-## [v2.0.13](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.13) 2025-02-27
+## [v2.0.14](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.14) 2025-03-05
 
+
+### Added
+
+### Fixed
+
+- Fix calculating withdrawals when rewards records are empty for a given stake key [Issue 3134](https://github.com/IntersectMBO/govtool/issues/3134)
+
+### Changed
+
+### Removed
+
+- Remove ratification threshold for Info Action for Consitutional Committee [Issue 3108](https://github.com/IntersectMBO/govtool/issues/3108)
+
+## [v2.0.13](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.13) 2025-02-27
 
 ### Added
 

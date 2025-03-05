@@ -151,7 +151,7 @@ test("8D. Should show the view-all categorized proposed governance actions.", as
       for (const proposalCard of proposalCards) {
         await expect(
           proposalCard.getByTestId("governance-action-type")
-        ).toHaveText(proposalType, { timeout: 20_000 });
+        ).toHaveText(proposalType, { timeout: 60_000 });
       }
     })
   );

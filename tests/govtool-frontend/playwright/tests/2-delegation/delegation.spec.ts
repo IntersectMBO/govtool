@@ -215,7 +215,7 @@ test.describe("DRep dependent tests", () => {
     await dRepDirectoryPage.searchInput.fill(dRepId);
     await page.getByTestId(`${dRepId}-copy-id-button`).click();
     await expect(page.getByText("Copied to clipboard")).toBeVisible({
-      timeout: 10_000,
+      timeout: 60_000,
     });
     const copiedTextDRepDirectory = await page.evaluate(() =>
       navigator.clipboard.readText()

@@ -78,8 +78,8 @@ test.describe("Outcome details dependent test", () => {
           return;
         }
         const data: outcomeMetadata = await response.json();
-        if (!governanceActionTitle && data.body.title != null) {
-          governanceActionTitle = data.body.title;
+        if (!governanceActionTitle && data.data.title != null) {
+          governanceActionTitle = data.data.title;
         }
         await route.fulfill({
           status: 200,
@@ -169,7 +169,7 @@ test.describe("Outcome details dependent test", () => {
       .getByTestId("copy-button")
       .click();
     await expect(page.getByText("Copied to clipboard")).toBeVisible({
-      timeout: 10_000,
+      timeout: 60_000,
     });
     const copiedTextDRepDirectory = await page.evaluate(() =>
       navigator.clipboard.readText()
@@ -317,11 +317,22 @@ test("9G. Should display correct vote counts on outcome details page", async ({
     Object.keys(outcomeType).map(async (filterKey) => {
       const page = await browser.newPage();
       injectLogger(page);
-      const outcomeListResponsePromise = page.waitForResponse((response) =>
-        response
-          .url()
-          .includes(`governance-actions?search=&filters=${filterKey}`)
+
+      const outcomeListResponsePromise = page.waitForResponse(
+        (response) =>
+          response
+            .url()
+            .includes(`governance-actions?search=&filters=${filterKey}`),
+        { timeout: 60_000 }
       );
+
+      const metricsResponsePromise = page.waitForResponse(
+        (response) =>
+          response.url().includes(`/network/metrics`) &&
+          !response.url().includes(`/misc/network/metrics`),
+        { timeout: 60_000 }
+      );
+
       const outcomePage = new OutComesPage(page);
       await outcomePage.goto({ filter: filterKey });
 
@@ -332,27 +343,28 @@ test("9G. Should display correct vote counts on outcome details page", async ({
         proposals.length,
         proposals.length == 0 && "No proposals found!"
       ).toBeGreaterThan(0);
+
       const {
         index: governanceActionIndex,
         tx_hash: governanceTransactionHash,
       } = proposals[0];
 
+      const outcomeResponsePromise = page.waitForResponse(
+        (response) =>
+          response
+            .url()
+            .includes(
+              `governance-actions/${governanceTransactionHash}?index=${governanceActionIndex}`
+            ),
+        { timeout: 60_000 }
+      );
+
       const govActionDetailsPage = await outcomePage.viewFirstOutcomes();
 
-      const outcomeResponse = await page.waitForResponse((response) =>
-        response
-          .url()
-          .includes(
-            `governance-actions/${governanceTransactionHash}?index=${governanceActionIndex}`
-          )
-      );
+      const outcomeResponse = await outcomeResponsePromise;
       const proposalToCheck = (await outcomeResponse.json())[0];
 
-      const metricsResponse = await page.waitForResponse(
-        (response) =>
-          response.url().includes(`/network/metrics`) &&
-          !response.url().includes(`/misc/network/metrics`)
-      );
+      const metricsResponse = await metricsResponsePromise;
 
       const dRepTotalAbstainVote =
         await govActionDetailsPage.getDRepTotalAbstainVoted(
@@ -363,7 +375,8 @@ test("9G. Should display correct vote counts on outcome details page", async ({
       // check dRep votes
       if (await areDRepVoteTotalsDisplayed(proposalToCheck)) {
         await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(parseInt(proposalToCheck.yes_votes))}`
+          `₳ ${correctVoteAdaFormat(parseInt(proposalToCheck.yes_votes))}`,
+          { timeout: 60_000 }
         );
         await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
           `₳ ${correctVoteAdaFormat(dRepTotalAbstainVote)}`

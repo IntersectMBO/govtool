@@ -291,9 +291,9 @@ export interface outcomeProposal {
 }
 
 export interface outcomeMetadata {
-  authors: any[];
-  hashAlgorithm: string;
-  body: outcomeMetadataBody;
+  metadataStatus: string;
+  metadataValid: boolean;
+  data: outcomeMetadataBody;
 }
 
 interface outcomeMetadataBody {

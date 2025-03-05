@@ -78,8 +78,8 @@ test.describe("Outcome details dependent test", () => {
           return;
         }
         const data: outcomeMetadata = await response.json();
-        if (!governanceActionTitle && data.body.title != null) {
-          governanceActionTitle = data.body.title;
+        if (!governanceActionTitle && data.data.title != null) {
+          governanceActionTitle = data.data.title;
         }
         await route.fulfill({
           status: 200,

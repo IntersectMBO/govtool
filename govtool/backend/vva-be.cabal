@@ -1,6 +1,6 @@
 cabal-version:      3.6
 name:               vva-be
-version:            2.0.13
+version:            2.0.14
 
 -- A short (one-line) description of the package.
 -- synopsis:

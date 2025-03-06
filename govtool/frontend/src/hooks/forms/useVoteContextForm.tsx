@@ -37,7 +37,7 @@ export const useVoteContextForm = (
 
   const generateMetadata = useCallback(async () => {
     const { voteContextText } = getValues();
-    const body = generateMetadataBody({
+    const body = await generateMetadataBody({
       data: {
         comment: voteContextText,
       },

@@ -57,6 +57,7 @@ export const EditDRepForm = ({
         motivations: data?.motivations ?? "",
         qualifications: data?.qualifications ?? "",
         paymentAddress: data?.paymentAddress ?? "",
+        image: data?.image ?? "",
         linkReferences: groupedReferences?.Link ?? [getEmptyReference("Link")],
         identityReferences: groupedReferences?.Identity ?? [
           getEmptyReference("Identity"),

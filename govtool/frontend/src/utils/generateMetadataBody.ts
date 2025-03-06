@@ -1,3 +1,6 @@
+import { getImageSha } from "./getImageSha";
+import { URL_REGEX } from "./isValidFormat";
+
 type MetadataConfig = {
   data: Record<string, unknown>;
   acceptedKeys: string[];
@@ -10,7 +13,7 @@ type MetadataConfig = {
  * the data, accepted keys, and standard reference.
  * @returns {Object} - The generated metadata body.
  */
-export const generateMetadataBody = ({
+export const generateMetadataBody = async ({
   data,
   acceptedKeys,
 }: MetadataConfig) => {
@@ -24,14 +27,36 @@ export const generateMetadataBody = ({
         .filter((link) => link.uri)
         .map((link) => ({
           "@type": link["@type"] ?? "Other",
-          label: link.label || "Label",
+          label: link.label ?? "Label",
           uri: link.uri,
         }))
     : undefined;
 
+  const isUrl = (url?: unknown) => URL_REGEX.test(url as string);
+  let image;
+
+  if (isUrl(data?.image)) {
+    image = {
+      "@type": "ImageObject",
+      contentUrl: data.image,
+      sha256: await getImageSha(data.image as string),
+    };
+  } else {
+    image = data?.image
+      ? {
+          "@type": "ImageObject",
+          contentUrl: data.image,
+        }
+      : undefined;
+  }
+
   const body = Object.fromEntries(filteredData);
   if (references?.length) {
     body.references = references;
+  }
+
+  if (image) {
+    body.image = image;
   }
 
   return body;

@@ -12,6 +12,8 @@ changes.
 
 ### Added
 
+- Add image tag for DRep in GovTool metadata [3137](https://github.com/IntersectMBO/govtool/issues/3137)
+
 ### Fixed
 
 ### Changed

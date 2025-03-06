@@ -362,6 +362,8 @@
       "motivationsHelpfulText": "Why do you want to be a DRep, what personal and professional experiences do you want to share.",
       "qualifications": "Qualifications",
       "qualificationsHelpfulText": "List any qualifications that are relevant to your role as a DRep",
+      "image": "Image",
+      "imageHelpfulText": "A URL to an image or base64-encoded image that represents you. This could be an photo or a logo.",
       "paymentAddress": "Payment Address",
       "paymentAddressHelpfulText": "An address for DReps to receive payments. Only one address can be entered.",
       "doNotList": "Do Not List",
@@ -693,7 +695,8 @@
         "maxLength": "Max {{maxLength}} characters",
         "required": "This field is required",
         "url": "Invalid URL",
-        "noSpaces": "No spaces allowed"
+        "noSpaces": "No spaces allowed",
+        "image": "Invalid image URL or properly formatted base64-encoded image"
       }
     }
   },

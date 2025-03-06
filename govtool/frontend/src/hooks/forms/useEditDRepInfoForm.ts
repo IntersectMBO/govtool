@@ -19,6 +19,7 @@ export const defaultEditDRepInfoValues: DRepDataFormValues = {
   objectives: "",
   motivations: "",
   qualifications: "",
+  image: "",
   paymentAddress: "",
   linkReferences: [{ "@type": "Link", uri: "", label: "" }],
   identityReferences: [{ "@type": "Identity", uri: "", label: "" }],
@@ -75,7 +76,7 @@ export const useEditDRepInfoForm = (
   // Business Logic
   const generateMetadata = useCallback(async () => {
     const { linkReferences, identityReferences, ...rest } = getValues();
-    const body = generateMetadataBody({
+    const body = await generateMetadataBody({
       data: {
         ...rest,
         references: [...(linkReferences ?? []), ...(identityReferences ?? [])],
@@ -87,6 +88,7 @@ export const useEditDRepInfoForm = (
         "qualifications",
         "paymentAddress",
         "doNotList",
+        "image",
       ],
     });
 

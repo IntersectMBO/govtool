@@ -12,8 +12,9 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { Button, InfoText, Spacer, Typography } from "@atoms";
 import { Rules } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { ControlledField } from "../organisms";
 import { DRepDataFormValues } from "@/types/dRep";
+
+import { ControlledField } from "../organisms";
 
 const MAX_NUMBER_OF_LINKS = 7;
 
@@ -98,6 +99,18 @@ export const DRepDataForm = ({ control, errors, register, watch }: Props) => {
             name="qualifications"
             rules={Rules.QUALIFICATIONS}
             maxLength={Rules.QUALIFICATIONS.maxLength.value}
+          />
+        </div>
+        <div>
+          <FieldDescription
+            title={t("forms.dRepData.image")}
+            subtitle={t("forms.dRepData.imageHelpfulText")}
+          />
+          <ControlledField.Input
+            {...{ control, errors }}
+            data-testid="image-input"
+            name="image"
+            rules={Rules.IMAGE_URL}
           />
         </div>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 4, mt: 3 }}>

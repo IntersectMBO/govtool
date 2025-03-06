@@ -50,7 +50,7 @@ const GovernanceActionProvider = ({ children }: PropsWithChildren) => {
   const createGovernanceActionJsonLD = useCallback(
     async (govActionMetadata: GovActionMetadata) => {
       try {
-        const metadataBody = generateMetadataBody({
+        const metadataBody = await generateMetadataBody({
           data: govActionMetadata,
           acceptedKeys: ["title", "abstract", "motivation", "rationale"],
         });

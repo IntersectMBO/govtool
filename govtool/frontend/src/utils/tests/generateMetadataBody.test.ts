@@ -1,7 +1,7 @@
 import { generateMetadataBody } from "../generateMetadataBody";
 
 describe("generateMetadataBody", () => {
-  it("generates metadata body with filtered data", () => {
+  it("generates metadata body with filtered data", async () => {
     const data = {
       name: "John Doe",
       age: 30,
@@ -9,7 +9,7 @@ describe("generateMetadataBody", () => {
     };
     const acceptedKeys = ["name", "age"];
 
-    const result = generateMetadataBody({
+    const result = await generateMetadataBody({
       data,
       acceptedKeys,
     });
@@ -20,7 +20,7 @@ describe("generateMetadataBody", () => {
     });
   });
 
-  it("generates metadata body with filtered data and references", () => {
+  it("generates metadata body with filtered data and references", async () => {
     const data = {
       name: "John Doe",
       age: 30,
@@ -32,7 +32,7 @@ describe("generateMetadataBody", () => {
     };
     const acceptedKeys = ["name", "age"];
 
-    const result = generateMetadataBody({
+    const result = await generateMetadataBody({
       data,
       acceptedKeys,
     });
@@ -55,11 +55,11 @@ describe("generateMetadataBody", () => {
     });
   });
 
-  it("generates metadata body with empty data", () => {
+  it("generates metadata body with empty data", async () => {
     const data = {};
     const acceptedKeys = ["name", "age"];
 
-    const result = generateMetadataBody({
+    const result = await generateMetadataBody({
       data,
       acceptedKeys,
     });

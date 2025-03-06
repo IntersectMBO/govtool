@@ -1,3 +1,4 @@
+import { InvalidMetadata } from "@constants/index";
 import { test } from "@fixtures/walletExtension";
 import { correctVoteAdaFormat } from "@helpers/adaFormat";
 import { setAllureEpic } from "@helpers/allure";
@@ -14,6 +15,8 @@ import { functionWaitedAssert } from "@helpers/waitedLoop";
 import OutComesPage from "@pages/outcomesPage";
 import { expect, Page } from "@playwright/test";
 import { outcomeMetadata, outcomeProposal, outcomeType } from "@types";
+
+const invalidOutcomeProposals = require("../../lib/_mock/outcome.json");
 
 test.beforeEach(async () => {
   await setAllureEpic("9. Outcomes");
@@ -399,4 +402,31 @@ test("9G. Should display correct vote counts on outcome details page", async ({
       }
     })
   );
+});
+
+test.describe("Invalid Outcome Metadata", () => {
+  InvalidMetadata.forEach(({ type, reason, url, hash }, index) => {
+    test(`9H_${index + 1}: Should display "${type}" message in outcomes when ${reason}`, async ({
+      page,
+    }) => {
+      const outcomeResponse = {
+        ...invalidOutcomeProposals[0],
+        url,
+        data_hash: hash,
+      };
+
+      await page.route(/.*\/governance-actions\/[a-f0-9]{64}\?.*/, (route) =>
+        route.fulfill({ body: JSON.stringify([outcomeResponse]) })
+      );
+
+      const outcomePage = new OutComesPage(page);
+      await outcomePage.goto();
+      await outcomePage.viewFirstOutcomes();
+
+      await expect(page.getByRole("heading", { name: type })).toBeVisible({
+        timeout: 60_000,
+      });
+      await expect(page.getByText("Learn more")).toBeVisible();
+    });
+  });
 });

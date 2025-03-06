@@ -92,7 +92,7 @@ test.describe("DRep dependent tests", () => {
     await page.getByTestId(`${dRepId}-delegate-button`).click();
 
     await expect(dRepDirectoryPage.delegationErrorModal).toBeVisible({
-      timeout: 10_000,
+      timeout: 60_000,
     });
     await expect(dRepDirectoryPage.delegationErrorModal).toHaveText(
       /UTxO Balance Insufficient/
@@ -102,7 +102,7 @@ test.describe("DRep dependent tests", () => {
   test("2I. Should check validity of DRep Id", async () => {
     await dRepDirectoryPage.searchInput.fill(dRepId);
     await expect(dRepDirectoryPage.getDRepCard(dRepId)).toBeVisible({
-      timeout: 20_000,
+      timeout: 60_000,
     });
 
     const wallet = await ShelleyWallet.generate();

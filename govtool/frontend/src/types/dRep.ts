@@ -4,6 +4,7 @@ export type DRepDataFormValues = {
   objectives: string;
   motivations: string;
   qualifications: string;
+  image: string;
   paymentAddress: string;
   storeData?: boolean;
   storingURL: string;

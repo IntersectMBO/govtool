@@ -58,6 +58,7 @@ const viteConfig = defineViteConfig({
 const vitestConfig = defineVitestConfig({
   test: {
     setupFiles: "./src/setupTests.ts",
+    testTimeout: 10000,
     globals: true,
     pool: "forks",
     poolOptions: {

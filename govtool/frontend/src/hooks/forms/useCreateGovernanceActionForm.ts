@@ -102,7 +102,7 @@ export const useCreateGovernanceActionForm = (
       throw new Error("Governance action type is not defined");
     }
 
-    const body = generateMetadataBody({
+    const body = await generateMetadataBody({
       data: getValues(),
       acceptedKeys: ["title", "motivation", "abstract", "rationale"],
     });

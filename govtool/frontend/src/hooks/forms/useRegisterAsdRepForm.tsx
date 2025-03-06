@@ -27,6 +27,7 @@ export const defaultRegisterAsDRepValues: DRepDataFormValues = {
   motivations: "",
   qualifications: "",
   paymentAddress: "",
+  image: "",
   linkReferences: [{ "@type": "Link", uri: "", label: "" }],
   identityReferences: [{ "@type": "Identity", uri: "", label: "" }],
   storeData: false,
@@ -91,7 +92,7 @@ export const useRegisterAsdRepForm = (
   // Business Logic
   const generateMetadata = useCallback(async () => {
     const { linkReferences, identityReferences, ...rest } = getValues();
-    const body = generateMetadataBody({
+    const body = await generateMetadataBody({
       data: {
         ...rest,
         references: [...(linkReferences ?? []), ...(identityReferences ?? [])],
@@ -103,6 +104,7 @@ export const useRegisterAsdRepForm = (
         "qualifications",
         "paymentAddress",
         "doNotList",
+        "image",
       ],
     });
 

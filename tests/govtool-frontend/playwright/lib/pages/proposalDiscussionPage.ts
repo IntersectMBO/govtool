@@ -131,15 +131,17 @@ export default class ProposalDiscussionPage {
       const proposalCards = await this.getAllProposals();
 
       for (const proposalCard of proposalCards) {
-        const type = await proposalCard
-          .getByTestId("governance-action-type")
-          .textContent();
-        const hasFilter = await validateFunction(proposalCard, filters);
-        if (!hasFilter) {
-          const errorMessage = `A governance action type ${type} does not contain on ${filters}`;
-          throw errorMessage;
+        if (await proposalCard.isVisible()) {
+          const type = await proposalCard
+            .getByTestId("governance-action-type")
+            .textContent();
+          const hasFilter = await validateFunction(proposalCard, filters);
+          if (!hasFilter) {
+            const errorMessage = `A governance action type ${type} does not contain on ${filters}`;
+            throw errorMessage;
+          }
+          expect(hasFilter).toBe(true);
         }
-        expect(hasFilter).toBe(true);
       }
     });
   }

@@ -1,38 +1,84 @@
-name: Check,Build,Deploy
+name: Check and Build Main
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
 
 permissions:
   contents: write
   pull-requests: write
   packages: write
 
-env:
-  ENVIRONMENT: ${{ (github.ref_name == 'main' && 'prod-govtool') || (github.ref_name == 'staging' && 'pre-prod-govtool') || (github.ref_name == 'test' && 'qa-govtool') || (github.ref_name == 'develop' && 'dev-govtool') }}
-
 jobs:
-  check-build-deploy:
-    environment: ${{ (github.ref_name == 'main' && 'prod-govtool') || (github.ref_name == 'staging' && 'pre-prod-govtool') || (github.ref_name == 'test' && 'qa-govtool') || (github.ref_name == 'develop' && 'dev-govtool') }}
+  check-build:
+    environment: ${{ matrix.network }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - workdir: ./govtool/backend
+          - branch: main
+            network: prod-govtool
+            workdir: ./govtool/backend
             name: govtool-backend
             dockerfile: ./govtool/backend/Dockerfile.qovery
             image: ghcr.io/${{ github.repository }}-govtool-backend
             qovery_container_name: govtool-backend
-          - workdir: ./govtool/frontend
+          - branch: main
+            network: prod-govtool
+            workdir: ./govtool/frontend
             name: govtool-frontend
             dockerfile: ./govtool/frontend/Dockerfile.qovery
             image: ghcr.io/${{ github.repository }}-govtool-frontend
             qovery_container_name: govtool-frontend
-          - workdir: ./govtool/metadata-validation
+          - branch: main
+            network: prod-govtool
+            workdir: ./govtool/metadata-validation
             name: govtool-metadata-validation
             dockerfile: ./govtool/metadata-validation/Dockerfile
             image: ghcr.io/${{ github.repository }}-govtool-metadata-validation
             qovery_container_name: govtool-metadata-validation
+          - branch: main
+            network: pre-prod-govtool
+            workdir: ./govtool/backend
+            name: govtool-backend
+            dockerfile: ./govtool/backend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-govtool-backend
+            qovery_container_name: govtool-backend
+          - branch: main
+            network: pre-prod-govtool
+            workdir: ./govtool/frontend
+            name: govtool-frontend
+            dockerfile: ./govtool/frontend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-govtool-frontend
+            qovery_container_name: govtool-frontend
+          - branch: main
+            network: pre-prod-govtool
+            workdir: ./govtool/metadata-validation
+            name: govtool-metadata-validation
+            dockerfile: ./govtool/metadata-validation/Dockerfile
+            image: ghcr.io/${{ github.repository }}-govtool-metadata-validation
+            qovery_container_name: govtool-metadata-validation
+          - branch: main
+            network: preview-govtool
+            workdir: ./govtool/backend
+            name: govtool-backend
+            dockerfile: ./govtool/backend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-govtool-backend
+            qovery_container_name: govtool-backend
+          - branch: main
+            network: preview-govtool
+            workdir: ./govtool/frontend
+            name: govtool-frontend
+            dockerfile: ./govtool/frontend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-govtool-frontend
+            qovery_container_name: govtool-frontend
+          - branch: main
+            network: preview-govtool
+            workdir: ./govtool/metadata-validation
+            name: govtool-metadata-validation
+            dockerfile: ./govtool/metadata-validation/Dockerfile
+            image: ghcr.io/${{ github.repository }}-govtool-metadata-validation
+            qovery_container_name: govtool-metadata-validation
+        
 
     runs-on: ubuntu-latest
     steps:
@@ -43,9 +89,9 @@ jobs:
         id: set_tag
         run: |
           if [ "${{ github.ref_name }}" = "main" ]; then
-            echo "TAG=${{ github.sha }}" >> $GITHUB_ENV
+            echo "TAG=${{ github.sha }}-${NETWORK}" >> $GITHUB_ENV
           else
-            echo "TAG=${{ github.ref_name }}-${{ github.sha }}" >> $GITHUB_ENV
+            echo "TAG=${{ github.ref_name }}-${{ github.sha }}-${NETWORK}" >> $GITHUB_ENV
           fi
 
       - name: Lint Dockerfile
@@ -97,7 +143,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Cache Docker layers
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
@@ -130,8 +176,8 @@ jobs:
             VITE_USERSNAP_SPACE_API_KEY=${{ secrets.VITE_USERSNAP_SPACE_API_KEY }}
             VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED=${{ secrets.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED }}
             VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED=${{ secrets.VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED }}
+            VITE_OUTCOMES_API_URL=${{secrets.VITE_OUTCOMES_API_URL}}
             VITE_PDF_API_URL=${{ secrets.VITE_PDF_API_URL }}
-            VITE_OUTCOMES_API_URL=${{ secrets.VITE_OUTCOMES_API_URL }}
             VITE_IPFS_GATEWAY=${{ secrets.IPFS_GATEWAY }}
             VITE_IPFS_PROJECT_ID=${{ secrets.IPFS_PROJECT_ID }}
             IPFS_GATEWAY=${{ secrets.IPFS_GATEWAY }}

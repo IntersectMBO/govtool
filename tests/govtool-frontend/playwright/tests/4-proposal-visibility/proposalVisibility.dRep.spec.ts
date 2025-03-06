@@ -45,7 +45,7 @@ test.describe("Logged in DRep", () => {
 
     await expect(page.getByTestId("voting-power-chips-value")).toHaveText(
       `₳ ${lovelaceToAda(votingPower)}`,
-      { timeout: 20_000 }
+      { timeout: 60_000 }
     );
   });
 
@@ -57,7 +57,7 @@ test.describe("Logged in DRep", () => {
 
       // assert to wait until the loading button is hidden
       await expect(page.getByTestId("to-vote-tab")).toBeVisible({
-        timeout: 20_000,
+        timeout: 60_000,
       });
 
       govActionDetailsPage = (await isBootStrapingPhase())

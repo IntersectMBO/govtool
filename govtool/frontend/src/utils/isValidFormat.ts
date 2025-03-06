@@ -9,6 +9,8 @@ export const URL_REGEX =
   /^(?:(?:https?:\/\/)?(?:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})(?:\/[^\s]*)?)|(?:ipfs:\/\/(?:[a-zA-Z0-9]+(?:\/[a-zA-Z0-9._-]+)*))$|^$/;
 export const HASH_REGEX = /^[0-9A-Fa-f]+$/;
 export const PAYMENT_ADDRESS_REGEX = /addr1[a-z0-9]+/i;
+export const IMAGE_REGEX =
+  /^(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|bmp|webp|svg)(\?.*)?$|https?:\/\/[^\s]+$|data:image\/(?:png|jpeg|gif|bmp|webp|svg\+xml);base64,[A-Za-z0-9+/]+={0,2}$)/;
 
 export function isValidURLFormat(str: string) {
   if (!str.length) return false;

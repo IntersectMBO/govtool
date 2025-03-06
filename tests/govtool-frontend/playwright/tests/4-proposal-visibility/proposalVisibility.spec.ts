@@ -10,18 +10,19 @@ import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
 import { test } from "@fixtures/walletExtension";
-import { GovernanceActionType, IProposal } from "@types";
+import { GovernanceActionType, IProposal, PaginatedLiveProposal } from "@types";
 import { injectLogger } from "@helpers/page";
 import removeAllSpaces from "@helpers/removeAllSpaces";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
+import { InvalidMetadata } from "@constants/index";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
   await skipIfNotHardFork();
 });
 
-const infoTypeProposal = require("../../lib/_mock/infoTypeProposal.json");
+const infoTypeProposal: PaginatedLiveProposal = require("../../lib/_mock/infoTypeProposal.json");
 
 const filterOptionNames = [
   "Protocol Parameter Change",
@@ -297,4 +298,38 @@ test("4K. Should display correct vote counts on governance details page for disc
       }
     })
   );
+});
+
+test.describe("Invalid Live voting Metadata", () => {
+  InvalidMetadata.forEach(({ type, reason, url, hash }, index) => {
+    test(`4P_${index + 1}: Should display ${type} message in live voting when ${reason}`, async ({
+      page,
+    }) => {
+      const proposal: IProposal = {
+        ...infoTypeProposal.elements[0],
+        url,
+        metadataHash: hash,
+      };
+      const liveProposalResponse: PaginatedLiveProposal = {
+        ...infoTypeProposal,
+        elements: [proposal],
+      };
+
+      await page.route("**/proposal/list?**", async (route) =>
+        route.fulfill({
+          body: JSON.stringify(liveProposalResponse),
+        })
+      );
+
+      const governanceActionPage = new GovernanceActionsPage(page);
+      await governanceActionPage.goto();
+      await governanceActionPage.viewFirstProposal();
+
+      await expect(page.getByRole("heading", { name: type })).toBeVisible({
+        timeout: 60_000,
+      });
+      await expect(page.getByText("Learn more")).toBeVisible();
+      await expect(page.getByTestId("external-modal-button")).toBeVisible();
+    });
+  });
 });

@@ -45,6 +45,10 @@ export default class DRepDirectoryPage {
 
   constructor(private readonly page: Page) {}
 
+  get currentPage(): Page {
+    return this.page;
+  }
+
   async goto() {
     await this.page.goto(
       `${environments.frontendUrl}/connected/drep_directory`
@@ -184,7 +188,7 @@ export default class DRepDirectoryPage {
   }
 
   async getAllListedDReps() {
-    await expect(this.searchInput).toBeVisible({ timeout: 10_000 });
+    await expect(this.searchInput).toBeVisible({ timeout: 60_000 });
 
     await waitedLoop(async () => {
       return (

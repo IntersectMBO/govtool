@@ -38,9 +38,9 @@ export const outcomeStatusType = [
 export const InvalidMetadata: InvalidMetadataType[] = [
   {
     type: "Data Formatted Incorrectly",
-    reason: "metadata is not in the correct format.",
-    url: "https://bit.ly/3zCH2HL",
-    hash: "1111111111111111111111111111111111111111111111111111111111111111",
+    reason: "hash is valid but incorrect metadata format.",
+    url: "https://metadata-govtool.cardanoapi.io/data/Lolita",
+    hash: "62a37df07103f0a69690c8975700e06b7c3c3069cb3d105abec00e820e831dda",
   },
   {
     type: "Data Missing",
@@ -52,6 +52,12 @@ export const InvalidMetadata: InvalidMetadataType[] = [
     type: "Data Not Verifiable",
     reason: "metadata hash and URL do not match.",
     url: "https://metadata-govtool.cardanoapi.io/data/data.jsonld",
+    hash: "e71bf6171adda3754a87fff5c2d8d9e404eb3366428a5be13f7e76357a39004f",
+  },
+  {
+    type: "Data Not Verifiable",
+    reason: "metadata hash and URL do not match and is incorrect ga format",
+    url: "https://metadata-govtool.cardanoapi.io/data/Lolita",
     hash: "e71bf6171adda3754a87fff5c2d8d9e404eb3366428a5be13f7e76357a39004f",
   },
 ];

@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 
 export default class DRepDetailsPage {
   readonly copyIdBtn = this.page.getByTestId("copy-drep-id-button");
@@ -12,7 +12,22 @@ export default class DRepDetailsPage {
   }
 
   async shareLink() {
-    await this.shareBtn.click();
-    await this.page.getByTestId("copy-link-from-share-button").click();
+    const isShareButtonVisible = await this.page
+      .waitForSelector(`[data-testid="share-button"]`, { timeout: 60_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (isShareButtonVisible) {
+      await this.shareBtn.click();
+    } else {
+      expect(false, "Share button not found").toBeTruthy();
+    }
+
+    await this.page
+      .getByTestId("copy-link-from-share-button")
+      .click()
+      .catch(() => {
+        expect(false, "Copy link button not found").toBeTruthy();
+      });
   }
 }

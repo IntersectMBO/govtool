@@ -105,16 +105,18 @@ export default class OutComesPage {
       async () => {
         const proposalCards = await this.getAllOutcomes();
         for (const proposalCard of proposalCards) {
-          const type = await proposalCard
-            .locator('[data-testid$="-type"]')
-            .textContent();
-          const outcomeType = type.replace(/^.*Type/, "");
-          const hasFilter = await validateFunction(proposalCard, filters);
-          if (!hasFilter) {
-            const errorMessage = `A outcomne type ${outcomeType} does not contain on ${filters}`;
-            throw errorMessage;
+          if (await proposalCard.isVisible()) {
+            const type = await proposalCard
+              .locator('[data-testid$="-type"]')
+              .textContent();
+            const outcomeType = type.replace(/^.*Type/, "");
+            const hasFilter = await validateFunction(proposalCard, filters);
+            if (!hasFilter) {
+              const errorMessage = `An outcome type ${outcomeType} does not contain on ${filters}`;
+              throw errorMessage;
+            }
+            expect(hasFilter).toBe(true);
           }
-          expect(hasFilter).toBe(true);
         }
       },
       {

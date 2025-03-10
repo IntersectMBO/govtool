@@ -1,3 +1,4 @@
+import { adaHandleService } from "@/services/AdaHandle";
 import { decodeCIP129Identifier } from "./cip129identifier";
 
 /**
@@ -14,6 +15,12 @@ export const dRepSearchPhraseProcessor = async (phrase: string) => {
   let drepIDPhrase = phrase;
 
   try {
+    const adaHandleCIP105DRepId =
+      await adaHandleService.getAdaHandleCIP105DRepId(phrase);
+    if (adaHandleCIP105DRepId) {
+      return adaHandleCIP105DRepId;
+    }
+
     if (
       drepIDPhrase.startsWith("drep_script") ||
       drepIDPhrase.startsWith("drep")

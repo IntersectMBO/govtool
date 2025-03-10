@@ -15,7 +15,8 @@ import {
   PROTOCOL_PARAMS_KEY,
   setItemToLocalStorage,
 } from "@/utils";
-import { EpochParams, NetworkMetrics } from "@/models";
+import { EpochParams, NetworkMetrics, Network } from "@/models";
+import { adaHandleService } from "@/services/AdaHandle";
 
 const BOOTSTRAPPING_PHASE_MAJOR = 9;
 
@@ -25,7 +26,7 @@ type AppContextType = {
   isInBootstrapPhase: boolean;
   isFullGovernance: boolean;
   networkName: string;
-  network: string;
+  network: Network;
   cExplorerBaseUrl: string;
   epochParams?: EpochParams;
   networkMetrics?: NetworkMetrics;
@@ -58,6 +59,9 @@ const AppContextProvider = ({ children }: PropsWithChildren) => {
         const { data: networkMetricsData } = await fetchNetworkMetrics();
         if (networkMetricsData) {
           setItemToLocalStorage(NETWORK_METRICS_KEY, networkMetricsData);
+
+          // Initialize ada handle service
+          adaHandleService.initialize(networkMetricsData.networkName);
         }
 
         setIsAppInitializing(false);
@@ -81,7 +85,7 @@ const AppContextProvider = ({ children }: PropsWithChildren) => {
           (networkMetrics?.networkName as keyof typeof NETWORK_NAMES) ||
             "preview"
         ],
-      network: networkMetrics?.networkName || "preview",
+      network: networkMetrics?.networkName ?? Network.preview,
       cExplorerBaseUrl:
         CEXPLORER_BASE_URLS[
           (networkMetrics?.networkName as keyof typeof NETWORK_NAMES) ||

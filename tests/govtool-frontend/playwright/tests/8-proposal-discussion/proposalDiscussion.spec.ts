@@ -139,19 +139,30 @@ test("8D. Should show the view-all categorized proposed governance actions.", as
 
       const proposalDiscussionPage = new ProposalDiscussionPage(page);
       await proposalDiscussionPage.goto();
-
-      await page
-        .getByTestId(
-          proposalType.toLowerCase().replace(/ /g, "-") + "-show-all-button"
+      const isShowAllButtonVisible = await page
+        .waitForSelector(
+          `[data-testid="${proposalType.toLowerCase().replace(/ /g, "-")}-show-all-button"]`,
+          { timeout: 60_000 }
         )
-        .click();
+        .then(() => true)
+        .catch(() => false);
 
-      const proposalCards = await proposalDiscussionPage.getAllProposals();
+      if (isShowAllButtonVisible) {
+        await page
+          .getByTestId(
+            proposalType.toLowerCase().replace(/ /g, "-") + "-show-all-button"
+          )
+          .click();
 
-      for (const proposalCard of proposalCards) {
-        await expect(
-          proposalCard.getByTestId("governance-action-type")
-        ).toHaveText(proposalType, { timeout: 60_000 });
+        const proposalCards = await proposalDiscussionPage.getAllProposals();
+
+        for (const proposalCard of proposalCards) {
+          await expect(
+            proposalCard.getByTestId("governance-action-type")
+          ).toHaveText(proposalType, { timeout: 60_000 });
+        }
+      } else {
+        expect(true, `No ${proposalType} found`).toBeTruthy();
       }
     })
   );

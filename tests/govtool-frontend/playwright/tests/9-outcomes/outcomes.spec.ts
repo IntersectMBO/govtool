@@ -208,18 +208,18 @@ test("9C_2. Should sort Governance Action Type on outcomes page", async ({
   test.slow();
 
   const outcomePage = new OutComesPage(page);
-  await outcomePage.goto();
+  await outcomePage.goto({ sort: "oldestFirst" });
 
   await outcomePage.sortBtn.click();
 
   await outcomePage.sortAndValidate(
-    SortOption.OldestFirst,
-    (p1, p2) => p1.expiry_date <= p2.expiry_date
+    SortOption.NewestFirst,
+    (p1, p2) => p1.expiry_date >= p2.time
   );
 
   await outcomePage.sortAndValidate(
-    SortOption.NewestFirst,
-    (p1, p2) => p1.expiry_date >= p2.time
+    SortOption.OldestFirst,
+    (p1, p2) => p1.expiry_date <= p2.expiry_date
   );
 
   await outcomePage.sortAndValidate(

@@ -6,7 +6,12 @@
  */
 export const getImageSha = async (imageUrl: string) => {
   try {
-    const response = await fetch(imageUrl);
+    const response = await fetch(imageUrl, {
+      // Required to not being blocked by APIs that require a User-Agent
+      headers: {
+        "User-Agent": "GovTool/image-sha",
+      },
+    });
     if (!response.ok)
       throw new Error(`Failed to fetch image: ${response.statusText}`);
 

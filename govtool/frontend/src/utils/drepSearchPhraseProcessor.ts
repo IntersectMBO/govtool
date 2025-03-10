@@ -15,12 +15,6 @@ export const dRepSearchPhraseProcessor = async (phrase: string) => {
   let drepIDPhrase = phrase;
 
   try {
-    const adaHandleCIP105DRepId =
-      await adaHandleService.getAdaHandleCIP105DRepId(phrase);
-    if (adaHandleCIP105DRepId) {
-      return adaHandleCIP105DRepId;
-    }
-
     if (
       drepIDPhrase.startsWith("drep_script") ||
       drepIDPhrase.startsWith("drep")
@@ -31,6 +25,12 @@ export const dRepSearchPhraseProcessor = async (phrase: string) => {
     }
     if (drepIDPhrase.length === 58) {
       return drepIDPhrase.slice(2);
+    }
+
+    const adaHandleCIP105DRepId =
+      await adaHandleService.getAdaHandleCIP105DRepId(phrase);
+    if (adaHandleCIP105DRepId) {
+      return adaHandleCIP105DRepId;
     }
 
     return drepIDPhrase;

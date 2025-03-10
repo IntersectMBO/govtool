@@ -8,7 +8,7 @@ import { useTranslation } from "@hooks";
 import { DRepData, DRepStatus } from "@models";
 import { Card } from "@molecules";
 import {
-  correctVoteAdaFormat,
+  correctDRepDirectoryFormat,
   ellipsizeText,
   encodeCIP129Identifier,
   getBase64ImageDetails,
@@ -218,8 +218,21 @@ export const DRepCard = ({
               </Box>
             </Box>
 
-            <Box sx={{ display: "flex", flex: { xl: 1 }, gap: 3 }}>
-              <Box sx={{ width: { lg: "128px" } }}>
+            <Box
+              sx={{
+                display: "flex",
+                flex: { xl: 1 },
+                gap: 3,
+              }}
+            >
+              <Box
+                sx={{
+                  width: { lg: "128px" },
+                  display: "flex",
+                  alignItems: "flex-end",
+                  flexDirection: "column",
+                }}
+              >
                 <Typography
                   data-testid={`${view}-voting-power-label`}
                   variant="caption"
@@ -232,7 +245,7 @@ export const DRepCard = ({
                   data-testid={`${view}-voting-power`}
                   sx={{ whiteSpace: "nowrap" }}
                 >
-                  ₳ {correctVoteAdaFormat(votingPower)}
+                  ₳ {correctDRepDirectoryFormat(votingPower)}
                 </Typography>
               </Box>
               <Divider

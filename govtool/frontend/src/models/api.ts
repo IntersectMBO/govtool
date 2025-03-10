@@ -96,7 +96,7 @@ export type NetworkMetrics = {
   totalRegisteredDirectVoters: number;
   alwaysAbstainVotingPower: number;
   alwaysNoConfidenceVotingPower: number;
-  networkName: string;
+  networkName: "sanchonet" | "preview" | "testnet" | "preprod" | "mainnet";
   noOfCommitteeMembers: number;
   quorumNumerator: number;
   quorumDenominator: number;

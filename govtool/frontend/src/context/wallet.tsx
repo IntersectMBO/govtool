@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -104,6 +105,7 @@ import {
   TransactionStateWithoutResource,
   usePendingTransaction,
 } from "./pendingTransaction";
+import { useAdaHandleContext } from "./adaHandle";
 
 interface Props {
   children: React.ReactNode;

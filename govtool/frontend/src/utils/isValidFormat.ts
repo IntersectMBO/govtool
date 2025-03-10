@@ -4,6 +4,7 @@ import {
   RewardAddress,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 import i18n from "@/i18n";
+import { adaHandleService } from "@/services/AdaHandle";
 
 export const URL_REGEX =
   /^(?:(?:https?:\/\/)?(?:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})(?:\/[^\s]*)?)|(?:ipfs:\/\/(?:[a-zA-Z0-9]+(?:\/[a-zA-Z0-9._-]+)*))$|^$/;
@@ -47,6 +48,12 @@ export async function isReceivingAddress(address?: string) {
     if (!address) {
       return true;
     }
+    const isValidAdaHandle = await adaHandleService.isValidAdaHandle(address);
+
+    if (isValidAdaHandle) {
+      return true;
+    }
+
     const receivingAddress = Address.from_bech32(address);
     return receivingAddress
       ? true

@@ -12,6 +12,8 @@ changes.
 
 ### Added
 
+- Add support for ada handle in drep payment address [Issue 3155]()
+
 ### Fixed
 
 ### Changed

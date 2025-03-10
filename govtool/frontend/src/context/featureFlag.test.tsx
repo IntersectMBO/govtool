@@ -3,6 +3,7 @@ import { renderHook } from "@testing-library/react";
 import { FeatureFlagProvider, useFeatureFlag } from "./featureFlag";
 import { GovernanceActionType } from "@/types/governanceAction";
 import { useAppContext } from "./appContext";
+import { Network } from "@/models";
 
 vi.mock("./appContext");
 
@@ -13,7 +14,7 @@ const mockUseAppContextReturnValue = {
   isAppInitializing: false,
   isInBootstrapPhase: false,
   isFullGovernance: true,
-  network: "preview",
+  network: Network.preview,
   networkName: "preview",
   isMainnet: false,
 };

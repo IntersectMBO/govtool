@@ -48,16 +48,18 @@ export async function isReceivingAddress(address?: string) {
     if (!address) {
       return true;
     }
+
+    const receivingAddress = Address.from_bech32(address);
+    if (receivingAddress) {
+      return true;
+    }
     const isValidAdaHandle = await adaHandleService.isValidAdaHandle(address);
 
     if (isValidAdaHandle) {
       return true;
     }
 
-    const receivingAddress = Address.from_bech32(address);
-    return receivingAddress
-      ? true
-      : i18n.t("forms.errors.mustBeReceivingAddress");
+    return i18n.t("forms.errors.mustBeReceivingAddress");
   } catch (e) {
     return i18n.t("forms.errors.mustBeReceivingAddress");
   }

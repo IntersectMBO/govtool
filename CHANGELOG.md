@@ -12,7 +12,8 @@ changes.
 
 ### Added
 
-- Add support for ada handle in drep payment address [Issue 3155]()
+- Add support for ada handle in drep payment address [Issue 3155](https://github.com/IntersectMBO/govtool/issues/3155)
+- Improve numerical data formatting in drep directory [Issue 3148](https://github.com/IntersectMBO/govtool/issues/3148)
 
 ### Fixed
 

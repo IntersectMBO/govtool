@@ -7,7 +7,7 @@ import { useCardano, useModal } from "@context";
 import { useDelegateTodRep, useScreenDimension, useTranslation } from "@hooks";
 import { Card, DataMissingInfoBox } from "@molecules";
 import {
-  correctVoteAdaFormat,
+  correctDRepDirectoryFormat,
   encodeCIP129Identifier,
   testIdFromLabel,
 } from "@utils";
@@ -146,7 +146,7 @@ export const DRepDetailsCard = ({
             sx={{ display: "flex", flexDirection: "row", mt: 0.5 }}
           >
             {"₳ "}
-            {correctVoteAdaFormat(votingPower)}
+            {correctDRepDirectoryFormat(votingPower)}
           </Typography>
         </DRepDetailsInfoItem>
       </Box>

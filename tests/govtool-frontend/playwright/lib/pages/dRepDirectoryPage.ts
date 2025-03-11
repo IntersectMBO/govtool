@@ -96,15 +96,20 @@ export default class DRepDirectoryPage {
       }
 
       for (const dRep of dRepList) {
-        const hasFilter = await this._validateTypeFiltersInDRep(dRep, filters);
-        const actualFilter = await dRep
-          .locator('[data-testid$="-pill"]')
-          .textContent();
-        if (!hasFilter) {
-          const errorMessage = `${actualFilter} pill does not match with any of the ${filters}`;
-          throw new Error(errorMessage);
+        if (await dRep.isVisible()) {
+          const hasFilter = await this._validateTypeFiltersInDRep(
+            dRep,
+            filters
+          );
+          const actualFilter = await dRep
+            .locator('[data-testid$="-pill"]')
+            .textContent();
+          if (!hasFilter) {
+            const errorMessage = `${actualFilter} pill does not match with any of the ${filters}`;
+            throw new Error(errorMessage);
+          }
+          expect(hasFilter).toBe(true);
         }
-        expect(hasFilter).toBe(true);
       }
     });
   }

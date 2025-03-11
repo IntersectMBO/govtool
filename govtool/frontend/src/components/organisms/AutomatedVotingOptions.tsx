@@ -11,7 +11,7 @@ import { ICONS } from "@consts";
 import { PendingTransaction } from "@context";
 import { useGetNetworkMetrics, useTranslation } from "@hooks";
 import { AutomatedVotingCard } from "@molecules";
-import { correctVoteAdaFormat, openInNewTab } from "@/utils";
+import { correctDRepDirectoryFormat, openInNewTab } from "@/utils";
 import {
   AutomatedVotingOptionCurrentDelegation,
   AutomatedVotingOptionDelegationId,
@@ -129,7 +129,9 @@ export const AutomatedVotingOptions = ({
             }
             votingPower={
               networkMetrics
-                ? correctVoteAdaFormat(networkMetrics?.alwaysAbstainVotingPower)
+                ? correctDRepDirectoryFormat(
+                    networkMetrics?.alwaysAbstainVotingPower,
+                  )
                 : ""
             }
             transactionId={
@@ -170,7 +172,7 @@ export const AutomatedVotingOptions = ({
             }
             votingPower={
               networkMetrics
-                ? correctVoteAdaFormat(
+                ? correctDRepDirectoryFormat(
                     networkMetrics?.alwaysNoConfidenceVotingPower,
                   )
                 : ""

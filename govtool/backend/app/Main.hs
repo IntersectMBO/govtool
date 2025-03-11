@@ -144,6 +144,7 @@ startApp vvaConfig sentryService = do
 
 exceptionHandler :: VVAConfig -> SentryService -> Maybe Request -> SomeException -> IO ()
 exceptionHandler vvaConfig sentryService mRequest exception = do
+  print exception
   let isNotTimeoutThread x = case fromException x of
         Just TimeoutThread -> False
         _                  -> True

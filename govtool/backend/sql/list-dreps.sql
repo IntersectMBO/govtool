@@ -114,11 +114,8 @@ DRepData AS (
     leva.metadata_hash,
     COALESCE(dr_deposit.deposit, 0) as deposit,
     DRepDistr.amount,
-    (DRepActivity.epoch_no - GREATEST(COALESCE(voting_procedure_block.epoch_no, block_first_register.epoch_no), lve.epoch_no, newestRegister.epoch_no)) <= DRepActivity.drep_activity AS active,
     RankedDRepRegistration.tx_hash,
-    newestRegister.time AS last_register_time,
-    COALESCE(RankedDRepRegistration.deposit, 0) as latest_deposit,
-    hndva.value AS has_non_deregister_voting_anchor,
+    newestRegister.time AT TIME ZONE 'UTC' AS last_register_time,
     fetch_error.message AS fetch_error,
     off_chain_vote_drep_data.payment_address,
     off_chain_vote_drep_data.given_name,
@@ -126,7 +123,20 @@ DRepData AS (
     off_chain_vote_drep_data.motivations,
     off_chain_vote_drep_data.qualifications,
     off_chain_vote_drep_data.image_url,
-    off_chain_vote_drep_data.image_hash
+    off_chain_vote_drep_data.image_hash,
+    -- drep type
+    CASE
+      WHEN COALESCE(RankedDRepRegistration.deposit, 0) >= 0 AND leva.url IS NULL THEN 'SoleVoter'
+      WHEN COALESCE(RankedDRepRegistration.deposit, 0) >= 0 AND leva.url IS NOT NULL THEN 'DRep'
+      WHEN COALESCE(RankedDRepRegistration.deposit, 0) < 0 AND hndva.value = true THEN 'SoleVoter'
+      WHEN COALESCE(RankedDRepRegistration.deposit, 0) < 0 AND hndva.value = false THEN 'DRep'
+    END AS drep_type,
+    -- status
+    CASE
+      WHEN COALESCE(RankedDRepRegistration.deposit, 0) < 0 THEN 'Retired'
+      WHEN COALESCE(RankedDRepRegistration.deposit, 0) >= 0 AND (DRepActivity.epoch_no - GREATEST(COALESCE(voting_procedure_block.epoch_no, block_first_register.epoch_no), lve.epoch_no, newestRegister.epoch_no)) <= DRepActivity.drep_activity THEN 'Active'
+      WHEN COALESCE(RankedDRepRegistration.deposit, 0) >= 0 AND NOT (DRepActivity.epoch_no - GREATEST(COALESCE(voting_procedure_block.epoch_no, block_first_register.epoch_no), lve.epoch_no, newestRegister.epoch_no)) <= DRepActivity.drep_activity THEN 'Inactive'
+    END AS status
   FROM
     drep_hash dh
     JOIN RankedDRepRegistration ON RankedDRepRegistration.drep_hash_id = dh.id
@@ -196,15 +206,8 @@ DRepData AS (
     leva.metadata_hash,
     dr_deposit.deposit,
     DRepDistr.amount,
-    DRepActivity.epoch_no,
-    voting_procedure_block.epoch_no,
-    block_first_register.epoch_no,
-    lve.epoch_no, newestRegister.epoch_no,
-    DRepActivity.drep_activity,
     RankedDRepRegistration.tx_hash,
     newestRegister.time,
-    RankedDRepRegistration.deposit,
-    hndva.value,
     fetch_error.message,
     off_chain_vote_drep_data.payment_address,
     off_chain_vote_drep_data.given_name,
@@ -212,17 +215,48 @@ DRepData AS (
     off_chain_vote_drep_data.motivations,
     off_chain_vote_drep_data.qualifications,
     off_chain_vote_drep_data.image_url,
-    off_chain_vote_drep_data.image_hash
-)
-SELECT * FROM DRepData
-WHERE
+    off_chain_vote_drep_data.image_hash,
+    RankedDRepRegistration.deposit,
+    hndva.value,
+    DRepActivity.epoch_no,
+    DRepActivity.drep_activity,
+    voting_procedure_block.epoch_no,
+    block_first_register.epoch_no,
+    lve.epoch_no,
+    newestRegister.epoch_no
+),
+FilteredDRepData AS (
+  SELECT * FROM DRepData
+  WHERE
   (
-    COALESCE(?, '') = '' OR
-    (CASE WHEN LENGTH(?) % 2 = 0 AND ? ~ '^[0-9a-fA-F]+$' THEN drep_hash = ? ELSE false END) OR
-    view ILIKE ? OR
-    given_name ILIKE ? OR
-    payment_address ILIKE ? OR
-    objectives ILIKE ? OR
-    motivations ILIKE ? OR
-    qualifications ILIKE ?
+    COALESCE(?, '') = '' 
+    OR (
+      CASE 
+        WHEN LENGTH(?) % 2 = 0 AND ? ~ '^[0-9a-fA-F]+$' THEN drep_hash = ? 
+        ELSE false 
+      END
+    )
+    OR (
+      ? ILIKE ANY(ARRAY[view, given_name, payment_address, objectives, motivations, qualifications])
+    )
   )
+  AND (?::TEXT = '' OR status = ANY(?))
+  AND (drep_type != 'SoleVoter' OR (COALESCE(?, '') <> '' AND view ILIKE ?)) 
+)
+SELECT 
+  (SELECT COUNT(*) FROM FilteredDRepData) AS total,
+  COALESCE(jsonb_agg(elements), '[]'::jsonb) AS elements
+FROM (
+  SELECT *
+  FROM FilteredDRepData
+  ORDER BY 
+    CASE ? 
+      WHEN 'VotingPower' THEN amount::TEXT
+      WHEN 'RegistrationDate' THEN last_register_time::TEXT 
+      WHEN 'Status' THEN status::TEXT
+      ELSE NULL 
+    END DESC,
+    CASE WHEN ? = 'Random' THEN RANDOM() END
+  LIMIT ?
+  OFFSET ?
+) AS elements

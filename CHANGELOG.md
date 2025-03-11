@@ -14,12 +14,13 @@ changes.
 
 ### Fixed
 
+- hotfix for ada handle and payment address validation order [Issue 3155](https://github.com/IntersectMBO/govtool/issues/3155)
+
 ### Changed
 
 ### Removed
 
 ## [v2.0.15](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.15) 2025-03-11
-
 
 ### Added
 

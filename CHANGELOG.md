@@ -18,6 +18,20 @@ changes.
 
 ### Removed
 
+## [v2.0.15](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.15) 2025-03-11
+
+
+### Added
+
+- Add support for ada handle in drep payment address [Issue 3155](https://github.com/IntersectMBO/govtool/issues/3155)
+- Improve numerical data formatting in drep directory [Issue 3148](https://github.com/IntersectMBO/govtool/issues/3148)
+
+### Fixed
+
+### Changed
+
+### Removed
+
 ## [v2.0.14](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.14) 2025-03-06
 
 ### Added

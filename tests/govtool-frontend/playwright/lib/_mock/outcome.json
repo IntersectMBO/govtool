@@ -1,0 +1,41 @@
+[
+  {
+    "id": "320",
+    "tx_hash": "833382b22ebd07bb7dee60001cfdce78ede3b8397b1027daeb7996f61c072bde",
+    "index": "0",
+    "type": "InfoAction",
+    "description": {
+      "data": {
+        "tag": "InfoAction"
+      }
+    },
+    "expiry_date": "2025-02-27T00:01:04.000Z",
+    "expiration": 856,
+    "time": "2025-01-27T16:15:21.000Z",
+    "epoch_no": 825,
+    "url": "https://bit.ly/3zCH2HL",
+    "data_hash": "99a19b124ceb89bbd92354e8d11f913d1aec7280ce19ac4c1c6cc72f0ea91884",
+    "proposal_params": null,
+    "title": null,
+    "abstract": null,
+    "motivation": null,
+    "rationale": null,
+    "yes_votes": "0",
+    "no_votes": "14333625476330",
+    "abstain_votes": "0",
+    "pool_yes_votes": "0",
+    "pool_no_votes": "0",
+    "pool_abstain_votes": "0",
+    "cc_yes_votes": "0",
+    "cc_no_votes": "0",
+    "cc_abstain_votes": "0",
+    "prev_gov_action_index": null,
+    "prev_gov_action_tx_hash": null,
+    "status": {
+      "ratified_epoch": null,
+      "enacted_epoch": null,
+      "dropped_epoch": 857,
+      "expired_epoch": 856
+    }
+  }
+]

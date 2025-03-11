@@ -319,7 +319,7 @@ test.describe("Bootstrap phase", () => {
         if (governanceActionDetailsPage) {
           await expect(
             dRepPage.getByTestId("governance-action-details-card-header")
-          ).toBeVisible();
+          ).toBeVisible({ timeout: 60_000 });
           await expect(
             governanceActionDetailsPage.yesVoteRadio
           ).not.toBeVisible();

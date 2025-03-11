@@ -1,3 +1,4 @@
+import { InvalidMetadata } from "@constants/index";
 import { test } from "@fixtures/walletExtension";
 import { correctVoteAdaFormat } from "@helpers/adaFormat";
 import { setAllureEpic } from "@helpers/allure";
@@ -14,6 +15,8 @@ import { functionWaitedAssert } from "@helpers/waitedLoop";
 import OutComesPage from "@pages/outcomesPage";
 import { expect, Page } from "@playwright/test";
 import { outcomeMetadata, outcomeProposal, outcomeType } from "@types";
+
+const invalidOutcomeProposals = require("../../lib/_mock/outcome.json");
 
 test.beforeEach(async () => {
   await setAllureEpic("9. Outcomes");
@@ -208,18 +211,18 @@ test("9C_2. Should sort Governance Action Type on outcomes page", async ({
   test.slow();
 
   const outcomePage = new OutComesPage(page);
-  await outcomePage.goto();
+  await outcomePage.goto({ sort: "oldestFirst" });
 
   await outcomePage.sortBtn.click();
 
   await outcomePage.sortAndValidate(
-    SortOption.OldestFirst,
-    (p1, p2) => p1.expiry_date <= p2.expiry_date
+    SortOption.NewestFirst,
+    (p1, p2) => p1.expiry_date >= p2.time
   );
 
   await outcomePage.sortAndValidate(
-    SortOption.NewestFirst,
-    (p1, p2) => p1.expiry_date >= p2.time
+    SortOption.OldestFirst,
+    (p1, p2) => p1.expiry_date <= p2.expiry_date
   );
 
   await outcomePage.sortAndValidate(
@@ -412,4 +415,31 @@ test("9G. Should display correct vote counts on outcome details page", async ({
       }
     })
   );
+});
+
+test.describe("Invalid Outcome Metadata", () => {
+  InvalidMetadata.forEach(({ type, reason, url, hash }, index) => {
+    test(`9H_${index + 1}: Should display "${type}" message in outcomes when ${reason}`, async ({
+      page,
+    }) => {
+      const outcomeResponse = {
+        ...invalidOutcomeProposals[0],
+        url,
+        data_hash: hash,
+      };
+
+      await page.route(/.*\/governance-actions\/[a-f0-9]{64}\?.*/, (route) =>
+        route.fulfill({ body: JSON.stringify([outcomeResponse]) })
+      );
+
+      const outcomePage = new OutComesPage(page);
+      await outcomePage.goto();
+      await outcomePage.viewFirstOutcomes();
+
+      await expect(page.getByRole("heading", { name: type })).toBeVisible({
+        timeout: 60_000,
+      });
+      await expect(page.getByText("Learn more")).toBeVisible();
+    });
+  });
 });

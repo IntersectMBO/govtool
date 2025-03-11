@@ -78,6 +78,14 @@ export type TransactionStatus = {
     | [];
 };
 
+export enum Network {
+  samchonet = "sanchonet",
+  preview = "preview",
+  testnet = "testnet",
+  preprod = "preprod",
+  mainnet = "mainnet",
+}
+
 export type NetworkMetrics = {
   currentTime: string;
   currentEpoch: number;
@@ -96,7 +104,7 @@ export type NetworkMetrics = {
   totalRegisteredDirectVoters: number;
   alwaysAbstainVotingPower: number;
   alwaysNoConfidenceVotingPower: number;
-  networkName: string;
+  networkName: Network;
   noOfCommitteeMembers: number;
   quorumNumerator: number;
   quorumDenominator: number;

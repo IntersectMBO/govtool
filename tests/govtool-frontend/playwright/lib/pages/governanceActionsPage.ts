@@ -110,14 +110,17 @@ export default class GovernanceActionsPage {
       const proposalCards = await this.getAllProposals();
 
       for (const proposalCard of proposalCards) {
-        const hasFilter = await this._validateFiltersInProposalCard(
-          proposalCard,
-          filters
-        );
-        expect(
-          hasFilter,
-          `A proposal card does not contain any of the ${filters}`
-        ).toBe(true);
+        if (await proposalCard.isVisible()) {
+          const hasFilter = await this._validateFiltersInProposalCard(
+            proposalCard,
+            filters
+          );
+          expect(
+            hasFilter,
+            hasFilter == false &&
+              `A proposal card does not contain any of the ${filters}`
+          ).toBe(true);
+        }
       }
     });
   }

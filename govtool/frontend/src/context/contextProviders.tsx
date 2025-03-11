@@ -5,6 +5,7 @@ import { SnackbarProvider, useSnackbar } from "./snackbar";
 import { DataActionsBarProvider } from "./dataActionsBar";
 import { FeatureFlagProvider } from "./featureFlag";
 import { GovernanceActionProvider } from "./governanceAction";
+import { AdaHandleProvider } from "./adaHandle";
 
 interface Props {
   children: React.ReactNode;
@@ -14,13 +15,15 @@ const ContextProviders = ({ children }: Props) => (
   <AppContextProvider>
     <GovernanceActionProvider>
       <FeatureFlagProvider>
-        <ModalProvider>
-          <SnackbarProvider>
-            <DataActionsBarProvider>
-              <CardanoProvider>{children}</CardanoProvider>
-            </DataActionsBarProvider>
-          </SnackbarProvider>
-        </ModalProvider>
+        <AdaHandleProvider>
+          <ModalProvider>
+            <SnackbarProvider>
+              <DataActionsBarProvider>
+                <CardanoProvider>{children}</CardanoProvider>
+              </DataActionsBarProvider>
+            </SnackbarProvider>
+          </ModalProvider>
+        </AdaHandleProvider>
       </FeatureFlagProvider>
     </GovernanceActionProvider>
   </AppContextProvider>

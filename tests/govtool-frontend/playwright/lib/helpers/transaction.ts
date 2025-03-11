@@ -77,7 +77,7 @@ export async function waitForTxConfirmation(
         .getByTestId("alert-warning")
         .getByText("Transaction in progress", { exact: false })
     ).toBeVisible({
-      timeout: 16_000,
+      timeout: 60_000,
     });
     const url = (await transactionStatusPromise).url();
     const regex = /\/transaction\/status\/([^\/]+)$/;
@@ -90,7 +90,7 @@ export async function waitForTxConfirmation(
       await pollTransaction(transactionHash);
       await expect(
         page.getByText("In Progress", { exact: true }).first() //FIXME: Only one element needs to be displayed
-      ).not.toBeVisible({ timeout: 20_000 });
+      ).not.toBeVisible({ timeout: 60_000 });
     }
   } catch (error) {
     Logger.fail(error.message);

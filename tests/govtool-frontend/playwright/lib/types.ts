@@ -9,6 +9,13 @@ export type KuberValue = {
   [policyId: string]: Record<string, BigInt | number> | BigInt | number;
 };
 
+export interface PaginatedLiveProposal {
+  page: number;
+  pageSize: number;
+  total: number;
+  elements: IProposal[];
+}
+
 export interface IProposal {
   id: string;
   txHash: string;
@@ -301,4 +308,11 @@ interface outcomeMetadataBody {
   motivation: "string";
   rationale: string;
   title: string;
+}
+
+export interface InvalidMetadataType {
+  type: string;
+  reason: string;
+  url: string;
+  hash: string;
 }

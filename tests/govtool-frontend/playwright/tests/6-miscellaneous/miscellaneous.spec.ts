@@ -103,44 +103,6 @@ test("6M. Should navigate between footer links", async ({ page, context }) => {
   await expect(helpUrl).toHaveURL(HELP_DOC_URL);
 });
 
-test("6N. Should Warn users that they are in bootstrapping phase via banner", async ({
-  page,
-  context,
-}) => {
-  await allure.description(
-    "Skipping this test as bootstrapping is no longer applicable."
-  );
-  test.skip();
-  await page.route("**/epoch/params", async (route) => {
-    // Fetch the original response from the server
-    const response = await route.fetch();
-    const json = await response.json();
-
-    // update protocol major version
-    json["protocol_major"] = 9;
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify(json),
-    });
-  });
-
-  const responsePromise = page.waitForResponse("**/epoch/params");
-  await page.goto("/");
-
-  await responsePromise;
-
-  await expect(page.getByTestId("system-bootstrapping-warning")).toBeVisible({
-    timeout: 60_000,
-  });
-
-  const [bootstrap] = await Promise.all([
-    context.waitForEvent("page"),
-    page.getByTestId("system-bootstrapping-warning-link").click(),
-  ]);
-  await expect(bootstrap).toHaveURL(BOOTSTRAP_DOC_URL);
-});
-
 test("6O. Should display proper network name", async ({ page }) => {
   await page.route("**/network/metrics", async (route) => {
     // Fetch the original response from the server

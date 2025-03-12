@@ -189,6 +189,9 @@ test.describe("Perform voting", () => {
 
     govActionDetailsPage = await governanceActionsPage.viewFirstVotedProposal();
     await govActionDetailsPage.reVote();
+
+    await dRepPage.reload();
+
     await governanceActionsPage.votedTab.click();
 
     const isNoVoteVisible = await govActionDetailsPage.currentPage

@@ -17,6 +17,7 @@ import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
 import { BootstrapGovernanceActionType, GovernanceActionType } from "@types";
+import { allure } from "allure-playwright";
 import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
@@ -274,6 +275,10 @@ test.describe("Bootstrap phase", () => {
   test("5L. Should restrict dRep votes to Info Governance actions During Bootstrapping Phase", async ({
     browser,
   }) => {
+    await allure.description(
+      "Skipping this test as bootstrapping is no longer applicable."
+    );
+    test.skip();
     const voteBlacklistOptions = Object.keys(
       BootstrapGovernanceActionType
     ).filter((option) => option !== GovernanceActionType.InfoAction);

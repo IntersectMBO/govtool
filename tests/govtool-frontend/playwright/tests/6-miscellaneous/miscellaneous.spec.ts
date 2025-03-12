@@ -13,6 +13,7 @@ import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import { expect, Page } from "@playwright/test";
+import { allure } from "allure-playwright";
 import environments from "lib/constants/environments";
 
 test.beforeEach(async () => {
@@ -106,6 +107,10 @@ test("6N. Should Warn users that they are in bootstrapping phase via banner", as
   page,
   context,
 }) => {
+  await allure.description(
+    "Skipping this test as bootstrapping is no longer applicable."
+  );
+  test.skip();
   await page.route("**/epoch/params", async (route) => {
     // Fetch the original response from the server
     const response = await route.fetch();

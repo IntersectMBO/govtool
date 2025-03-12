@@ -59,6 +59,8 @@ test.describe("Validation of dRep Registration Form", () => {
     const dRepRegistrationPage = new DRepRegistrationPage(page);
     await dRepRegistrationPage.goto();
 
+    await expect(page.getByTestId("alert-success")).not.toBeVisible();
+
     for (let i = 0; i < 100; i++) {
       await dRepRegistrationPage.validateForm({
         name: mockValid.name(),
@@ -102,6 +104,7 @@ test.describe("Validation of dRep Registration Form", () => {
 
     const dRepRegistrationPage = new DRepRegistrationPage(page);
     await dRepRegistrationPage.goto();
+    await expect(page.getByTestId("alert-success")).not.toBeVisible();
 
     for (let i = 0; i < 100; i++) {
       await dRepRegistrationPage.inValidateForm({

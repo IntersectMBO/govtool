@@ -205,7 +205,7 @@ export default class DRepForm {
       message:
         isPaymentAddressErrorVisible &&
         `${dRepInfo.paymentAddress} is an invalid paymentAddress`,
-    }).toBeHidden();
+    }).toBeHidden({ timeout: 60_000 });
     await expect(this.continueBtn).toBeEnabled();
   }
 

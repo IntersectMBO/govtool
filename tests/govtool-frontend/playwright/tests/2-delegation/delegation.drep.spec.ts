@@ -56,6 +56,8 @@ test("2N. Should show DRep information on details page", async ({
     },
   ];
 
+  await expect(dRepPage.getByTestId("alert-success")).not.toBeVisible();
+
   await dRepRegistrationPage.register({
     name,
     objectives,

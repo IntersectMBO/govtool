@@ -12,11 +12,13 @@ changes.
 
 ### Added
 
+- Add support for preprod in matomo analytics [Issue 3173](https://github.com/IntersectMBO/govtool/issues/3173)
+
 ### Fixed
 
-- hotfix for ada handle and payment address validation order [Issue 3155](https://github.com/IntersectMBO/govtool/issues/3155)
-
 ### Changed
+
+- Exclude network total stake and info from network metrics [Issue 3189](https://github.com/IntersectMBO/govtool/issues/3189)
 
 ### Removed
 

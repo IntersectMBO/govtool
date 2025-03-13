@@ -9,7 +9,7 @@ import {
 import { Typography } from "@atoms";
 import { ICONS } from "@consts";
 import { PendingTransaction } from "@context";
-import { useGetNetworkMetrics, useTranslation } from "@hooks";
+import { useGetNetworkTotalStake, useTranslation } from "@hooks";
 import { AutomatedVotingCard } from "@molecules";
 import { correctDRepDirectoryFormat, openInNewTab } from "@/utils";
 import {
@@ -40,8 +40,8 @@ export const AutomatedVotingOptions = ({
   txHash,
 }: AutomatedVotingOptionsProps) => {
   const { t } = useTranslation();
-  // TODO: Get network metrics from useAppContext
-  const { networkMetrics, fetchNetworkMetrics } = useGetNetworkMetrics();
+  const { networkTotalStake, fetchNetworkTotalStake } =
+    useGetNetworkTotalStake();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -57,7 +57,7 @@ export const AutomatedVotingOptions = ({
     delegationInProgress === AutomatedVotingOptionDelegationId.no_confidence;
 
   useEffect(() => {
-    fetchNetworkMetrics();
+    fetchNetworkTotalStake();
   }, []);
 
   useEffect(() => {
@@ -128,9 +128,9 @@ export const AutomatedVotingOptions = ({
                 : t("dRepDirectory.abstainCardDefaultTitle")
             }
             votingPower={
-              networkMetrics
+              networkTotalStake
                 ? correctDRepDirectoryFormat(
-                    networkMetrics?.alwaysAbstainVotingPower,
+                    networkTotalStake?.alwaysAbstainVotingPower,
                   )
                 : ""
             }
@@ -171,9 +171,9 @@ export const AutomatedVotingOptions = ({
                 : t("dRepDirectory.noConfidenceDefaultTitle")
             }
             votingPower={
-              networkMetrics
+              networkTotalStake
                 ? correctDRepDirectoryFormat(
-                    networkMetrics?.alwaysNoConfidenceVotingPower,
+                    networkTotalStake?.alwaysNoConfidenceVotingPower,
                   )
                 : ""
             }

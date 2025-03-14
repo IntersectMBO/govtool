@@ -22,7 +22,6 @@ export const VoteContextText = ({
   const isContinueDisabled = !watch("voteContextText");
 
   const fieldProps = {
-    key: "voteContextText",
     layoutStyles: { mb: 3 },
     name: "voteContextText",
     placeholder: t("govActions.provideContext"),
@@ -70,6 +69,7 @@ export const VoteContextText = ({
       <ControlledField.TextArea
         {...{ control, errors }}
         {...fieldProps}
+        key="voteContextText"
         isModifiedLayout
         maxLength={MAX_LENGTH}
         data-testid="provide-context-input"

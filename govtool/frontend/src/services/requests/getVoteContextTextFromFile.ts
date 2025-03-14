@@ -7,8 +7,5 @@ export const getVoteContextTextFromFile = async (url: string | undefined) => {
 
   const response = await axios.get(url);
 
-  const voteContextText =
-    response.data.body["CIP108:voteContextText"]["@value"];
-
-  return voteContextText;
+  return response.data.body?.body?.comment ?? "";
 };

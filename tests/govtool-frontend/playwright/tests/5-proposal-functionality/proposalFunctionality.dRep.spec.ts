@@ -136,7 +136,6 @@ test.describe("Proposal checks", () => {
 
 test.describe("Perform voting", () => {
   let govActionDetailsPage: GovernanceActionDetailsPage;
-  let dRepPage: Page;
 
   test.beforeEach(async ({ page, browser }) => {
     test.slow(); // Due to queue in pop wallets
@@ -145,7 +144,7 @@ test.describe("Perform voting", () => {
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
-    dRepPage = await createNewPageWithWallet(browser, {
+    const dRepPage = await createNewPageWithWallet(browser, {
       storageState: tempDRepAuth,
       wallet,
       enableStakeSigning: true,
@@ -166,7 +165,7 @@ test.describe("Perform voting", () => {
       : await govActionsPage.viewFirstProposal();
   });
 
-  test("5E. Should re-vote with new data on a already voted governance action", async ({}, testInfo) => {
+  test("5E. Should re-vote with change vote on an already voted governance action", async ({}, testInfo) => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
     await govActionDetailsPage.vote();
@@ -175,7 +174,7 @@ test.describe("Perform voting", () => {
       govActionDetailsPage.currentPage
     );
 
-    await dRepPage.waitForTimeout(5_000);
+    await governanceActionsPage.currentPage.reload();
 
     await governanceActionsPage.votedTab.click();
 
@@ -190,7 +189,7 @@ test.describe("Perform voting", () => {
     govActionDetailsPage = await governanceActionsPage.viewFirstVotedProposal();
     await govActionDetailsPage.reVote();
 
-    await dRepPage.reload();
+    await govActionDetailsPage.currentPage.reload();
 
     await governanceActionsPage.votedTab.click();
 
@@ -224,6 +223,56 @@ test.describe("Perform voting", () => {
     });
   });
 
+  test("5L. Should update context on an already voted governance action without changing the vote", async ({}, testInfo) => {
+    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
+
+    await govActionDetailsPage.vote();
+
+    const governanceActionsPage = new GovernanceActionsPage(
+      govActionDetailsPage.currentPage
+    );
+
+    await governanceActionsPage.currentPage.reload();
+
+    await governanceActionsPage.votedTab.click();
+
+    await govActionDetailsPage.currentPage.evaluate(() =>
+      window.scrollTo(0, 500)
+    );
+
+    await expect(
+      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")
+    ).toBeVisible();
+
+    govActionDetailsPage = await governanceActionsPage.viewFirstVotedProposal();
+    await govActionDetailsPage.vote(faker.lorem.sentence(200), true);
+
+    await govActionDetailsPage.currentPage.reload();
+
+    await governanceActionsPage.votedTab.click();
+
+    const isYesVoteVisible = await govActionDetailsPage.currentPage
+      .getByTestId("my-vote")
+      .getByText("Yes")
+      .isVisible();
+
+    const textContent = await govActionDetailsPage.currentPage
+      .getByTestId("my-vote")
+      .textContent();
+
+    await govActionDetailsPage.currentPage.evaluate(() =>
+      window.scrollTo(0, 500)
+    );
+    await expect(
+      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No"),
+      {
+        message:
+          !isYesVoteVisible &&
+          `"Yes" vote not visible, current vote status: ${textContent.match(/My Vote:(Yes|No)/)[1]}`,
+      }
+    ).toBeVisible({ timeout: 60_000 });
+  });
+
   test("5I. Should view the vote details,when viewing governance action already voted by the DRep", async ({}, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
@@ -233,7 +282,7 @@ test.describe("Perform voting", () => {
       govActionDetailsPage.currentPage
     );
 
-    await dRepPage.waitForTimeout(5_000);
+    await governanceActionsPage.currentPage.waitForTimeout(5_000);
 
     await governanceActionsPage.votedTab.click();
     await expect(

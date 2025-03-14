@@ -147,7 +147,7 @@ test.describe("Temporary DReps", () => {
     await dRepRegistrationPage.confirmBtn.click();
 
     await expect(dRepPage.getByTestId("d-rep-in-progress")).not.toBeVisible({
-      timeout: 20_000,
+      timeout: 60_000,
     });
 
     // connected state

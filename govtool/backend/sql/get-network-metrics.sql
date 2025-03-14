@@ -110,23 +110,6 @@ TotalActiveCIP119CompliantDReps AS (
         AND lve.epoch_no >= (SELECT epoch_no FROM ActiveDRepBoundaryEpoch)
     )))
 ),
-TotalStakeControlledByActiveDReps AS (
-    SELECT
-        COALESCE(SUM(dd.amount), 0)::bigint AS total
-    FROM
-        drep_hash dh
-    LEFT JOIN DRepDistr dd ON dd.hash_id = dh.id AND dd.rn = 1
-    LEFT JOIN RankedDRepRegistration rd ON dd.hash_id = rd.drep_hash_id AND rd.rn = 1
-    LEFT JOIN LatestVoteEpoch lve ON lve.drep_id = dh.id
-    CROSS JOIN DRepActivity
-    WHERE
-        dd.epoch_no = (SELECT no FROM CurrentEpoch)
-        AND COALESCE(rd.deposit, 0) >= 0
-        AND ((DRepActivity.epoch_no - GREATEST(COALESCE(lve.epoch_no, 0), COALESCE(rd.epoch_no, 0))) <= DRepActivity.drep_activity)
-),
-CurrentBlock AS (
-    SELECT MAX(block_no) AS block_no FROM block
-),
 UniqueDelegators AS (
     SELECT COUNT(DISTINCT addr_id) AS count FROM delegation_vote
 ),
@@ -138,9 +121,6 @@ TotalGovActionProposals AS (
 ),
 TotalDRepVotes AS (
     SELECT COUNT(*) AS count FROM voting_procedure WHERE voter_role = 'DRep'
-),
-TotalStakeControlledBySPOs AS (
-    SELECT SUM(ps.stake)::bigint AS total FROM pool_stat ps WHERE ps.epoch_no = (SELECT no FROM CurrentEpoch)
 ),
 LatestExistingVotingAnchor AS (
     SELECT
@@ -192,18 +172,6 @@ TotalRegisteredDirectVoters AS (
     LEFT JOIN HasNonDeregisterVotingAnchor hndva ON hndva.drep_hash_id = rdr.drep_hash_id
     WHERE rdr.rn = 1 AND COALESCE(rdr.deposit, 0) >= 0 AND (leva.url IS NULL OR hndva.value = true)
 ),
-AlwaysAbstainVotingPower AS (
-    SELECT COALESCE((SELECT amount FROM drep_hash
-        LEFT JOIN drep_distr ON drep_hash.id = drep_distr.hash_id
-        WHERE drep_hash.view = 'drep_always_abstain'
-        ORDER BY epoch_no DESC LIMIT 1), 0) AS amount
-),
-AlwaysNoConfidenceVotingPower AS (
-    SELECT COALESCE((SELECT amount FROM drep_hash
-        LEFT JOIN drep_distr ON drep_hash.id = drep_distr.hash_id
-        WHERE drep_hash.view = 'drep_always_no_confidence'
-        ORDER BY epoch_no DESC LIMIT 1), 0) AS amount
-),
 TotalDRepDistr AS (
 	SELECT SUM(COALESCE(amount, 0))::bigint total_drep_distr FROM drep_distr where epoch_no = (SELECT no from CurrentEpoch)
 ),
@@ -223,42 +191,28 @@ CommitteeThreshold AS (
         OR (c.gov_action_proposal_id IS NULL)
 )
 SELECT
-    CurrentEpoch.no AS epoch_no,
-    CurrentBlock.block_no,
     UniqueDelegators.count AS unique_delegators,
     TotalDelegations.count AS total_delegations,
     TotalGovActionProposals.count AS total_gov_action_proposals,
     TotalDRepVotes.count AS total_drep_votes,
     TotalRegisteredDReps.unique_registrations AS total_registered_dreps,
 	TotalDRepDistr.total_drep_distr,
-    COALESCE(TotalStakeControlledByActiveDReps.total, 0) + COALESCE(AlwaysNoConfidenceVotingPower.amount, 0) AS total_stake_controlled_by_active_dreps,
-    COALESCE(TotalStakeControlledBySPOs.total, 0) AS total_stake_controlled_by_spos,
     TotalActiveDReps.unique_active_drep_registrations AS total_active_dreps,
     TotalInactiveDReps.total_inactive_dreps AS total_inactive_dreps,
     TotalActiveCIP119CompliantDReps.unique_active_cip119_compliant_drep_registrations AS total_active_cip119_compliant_dreps,
     TotalRegisteredDirectVoters.unique_direct_voters AS total_registered_direct_voters,
-    AlwaysAbstainVotingPower.amount AS always_abstain_voting_power,
-    AlwaysNoConfidenceVotingPower.amount AS always_no_confidence_voting_power,
-    meta.network_name,
     NoOfCommitteeMembers.total no_of_committee_members,
     CommitteeThreshold.quorum_numerator,
     CommitteeThreshold.quorum_denominator
-FROM CurrentEpoch
-CROSS JOIN CurrentBlock
-CROSS JOIN UniqueDelegators
+FROM UniqueDelegators
 CROSS JOIN TotalDRepDistr
 CROSS JOIN TotalDelegations
 CROSS JOIN TotalGovActionProposals
 CROSS JOIN TotalDRepVotes
 CROSS JOIN TotalRegisteredDReps
-CROSS JOIN TotalStakeControlledByActiveDReps
-CROSS JOIN TotalStakeControlledBySPOs
 CROSS JOIN TotalActiveDReps
 CROSS JOIN TotalInactiveDReps
 CROSS JOIN TotalActiveCIP119CompliantDReps
 CROSS JOIN TotalRegisteredDirectVoters
-CROSS JOIN AlwaysAbstainVotingPower
-CROSS JOIN AlwaysNoConfidenceVotingPower
 CROSS JOIN NoOfCommitteeMembers
 CROSS JOIN CommitteeThreshold
-CROSS JOIN meta;

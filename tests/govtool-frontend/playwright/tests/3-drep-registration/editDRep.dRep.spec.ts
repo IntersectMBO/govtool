@@ -25,7 +25,7 @@ test.describe("Validation of edit dRep Form", () => {
     await editDRepPage.goto();
 
     // wait until wallet alert close
-    await page.waitForTimeout(5_000);
+    await expect(page.getByTestId("alert-success")).not.toBeVisible();
 
     for (let i = 0; i < 100; i++) {
       await editDRepPage.validateForm({
@@ -73,7 +73,7 @@ test.describe("Validation of edit dRep Form", () => {
     const editDRepPage = new EditDRepPage(page);
     await editDRepPage.goto();
 
-    await expect(editDRepPage.nameInput).toBeVisible({ timeout: 60_000 }); // assert to wait for the page to load
+    await expect(page.getByTestId("alert-success")).not.toBeVisible();
 
     for (let i = 0; i < 100; i++) {
       await editDRepPage.inValidateForm({

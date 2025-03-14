@@ -24,19 +24,29 @@
     <script>
       var isMainnet = window.location.hostname == "gov.tools";
       var isPreview = window.location.hostname == "preview.gov.tools";
+      var isPreprod = window.location.hostname == "pre-prod.gov.tools";
+
+      var siteId;
+      if (isMainnet) {
+        siteId = "1";
+      } else if (isPreview) {
+        siteId = "2";
+      } else if (isPreprod) {
+        siteId = "4";
+      }
 
       var _paq = (window._paq = window._paq || []);
       /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
       _paq.push(["trackPageView"]);
       _paq.push(["enableLinkTracking"]);
       (function () {
-        if (!isPreview && !isMainnet) {
+        if (!siteId) {
           return;
         }
 
         var u = "//analytics.gov.tools/";
         _paq.push(["setTrackerUrl", u + "matomo.php"]);
-        _paq.push(["setSiteId", isMainnet ? "1" : "2"]);
+        _paq.push(["setSiteId", siteId]);
         var d = document,
           g = d.createElement("script"),
           s = d.getElementsByTagName("script")[0];

@@ -122,6 +122,8 @@ startApp vvaConfig sentryService = do
     dRepVotingPowerCache <- newCache
     dRepListCache <- newCache
     networkMetricsCache <- newCache
+    networkInfoCache <- newCache
+    networkTotalStakeCache <- newCache
     return $ CacheEnv
       { proposalListCache
       , getProposalCache
@@ -133,6 +135,8 @@ startApp vvaConfig sentryService = do
       , dRepVotingPowerCache
       , dRepListCache
       , networkMetricsCache
+      , networkInfoCache
+      , networkTotalStakeCache
       }
 
   let connectionString = encodeUtf8 (dbSyncConnectionString $ getter vvaConfig)
@@ -144,6 +148,7 @@ startApp vvaConfig sentryService = do
 
 exceptionHandler :: VVAConfig -> SentryService -> Maybe Request -> SomeException -> IO ()
 exceptionHandler vvaConfig sentryService mRequest exception = do
+  print exception
   let isNotTimeoutThread x = case fromException x of
         Just TimeoutThread -> False
         _                  -> True

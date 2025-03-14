@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   check-build:
-    if: contains(fromJson('["main", "staging"]'), github.ref_name)
+    if: contains(fromJson('["main", "staging", "develop"]'), github.ref_name)
     environment: ${{ matrix.network }}
     strategy:
       fail-fast: false
@@ -146,7 +146,27 @@ jobs:
             dockerfile: ./govtool/metadata-validation/Dockerfile
             image: ghcr.io/${{ github.repository }}-metadata-validation
             qovery_container_name: govtool-metadata-validation
-        
+          - branch: develop
+            network: dev-govtool
+            workdir: ./govtool/backend
+            name: govtool-backend
+            dockerfile: ./govtool/backend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-backend
+            qovery_container_name: govtool-backend
+          - branch: develop
+            network: dev-govtool
+            workdir: ./govtool/frontend
+            name: govtool-frontend
+            dockerfile: ./govtool/frontend/Dockerfile.qovery
+            image: ghcr.io/${{ github.repository }}-frontend
+            qovery_container_name: govtool-frontend
+          - branch: develop
+            network: dev-govtool
+            workdir: ./govtool/metadata-validation
+            name: govtool-metadata-validation
+            dockerfile: ./govtool/metadata-validation/Dockerfile
+            image: ghcr.io/${{ github.repository }}-metadata-validation
+            qovery_container_name: govtool-metadata-validation
 
     runs-on: ubuntu-latest
     steps:

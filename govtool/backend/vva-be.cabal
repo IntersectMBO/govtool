@@ -32,6 +32,8 @@ extra-source-files:
   sql/get-transaction-status.sql
   sql/get-stake-key-voting-power.sql
   sql/get-network-metrics.sql
+  sql/get-network-info.sql
+  sql/get-network-total-stake.sql
 executable vva-be
     main-is:          Main.hs
 

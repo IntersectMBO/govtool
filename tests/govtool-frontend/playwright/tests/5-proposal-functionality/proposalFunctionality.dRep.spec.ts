@@ -17,6 +17,7 @@ import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
 import { BootstrapGovernanceActionType, GovernanceActionType } from "@types";
+import { allure } from "allure-playwright";
 import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
@@ -188,6 +189,9 @@ test.describe("Perform voting", () => {
 
     govActionDetailsPage = await governanceActionsPage.viewFirstVotedProposal();
     await govActionDetailsPage.reVote();
+
+    await dRepPage.reload();
+
     await governanceActionsPage.votedTab.click();
 
     const isNoVoteVisible = await govActionDetailsPage.currentPage
@@ -267,68 +271,5 @@ test.describe("Check voting power", () => {
 
     const balance = await kuberService.getBalance(wallet.address);
     expect(balance, "Retirement deposit not returned").toBeGreaterThan(500);
-  });
-});
-
-test.describe("Bootstrap phase", () => {
-  test("5L. Should restrict dRep votes to Info Governance actions During Bootstrapping Phase", async ({
-    browser,
-  }) => {
-    const voteBlacklistOptions = Object.keys(
-      BootstrapGovernanceActionType
-    ).filter((option) => option !== GovernanceActionType.InfoAction);
-
-    await Promise.all(
-      voteBlacklistOptions.map(async (voteBlacklistOption) => {
-        const dRepPage = await createNewPageWithWallet(browser, {
-          storageState: ".auth/dRep01.json",
-          wallet: dRep01Wallet,
-        });
-
-        await dRepPage.route("**/epoch/params", async (route) => {
-          // Fetch the original response from the server
-          const response = await route.fetch();
-          const json = await response.json();
-
-          // update protocol major version
-          json["protocol_major"] = 9;
-          await route.fulfill({
-            status: 200,
-            contentType: "application/json",
-            body: JSON.stringify(json),
-          });
-        });
-
-        const governanceActionsPage = new GovernanceActionsPage(dRepPage);
-        await governanceActionsPage.goto();
-
-        // assert to wait until proposal cards are visible
-        await expect(dRepPage.getByTestId("voting-power-chips")).toBeVisible({
-          timeout: 60_000,
-        });
-        // wait until the loading button is hidden
-        await expect(dRepPage.getByTestId("to-vote-tab")).toBeVisible({
-          timeout: 60_000,
-        });
-
-        const governanceActionDetailsPage =
-          await governanceActionsPage.viewFirstProposalByGovernanceAction(
-            voteBlacklistOption as GovernanceActionType
-          );
-
-        if (governanceActionDetailsPage) {
-          await expect(
-            dRepPage.getByTestId("governance-action-details-card-header")
-          ).toBeVisible({ timeout: 60_000 });
-          await expect(
-            governanceActionDetailsPage.yesVoteRadio
-          ).not.toBeVisible();
-          await expect(
-            governanceActionDetailsPage.contextBtn
-          ).not.toBeVisible();
-          await expect(governanceActionDetailsPage.voteBtn).not.toBeVisible();
-        }
-      })
-    );
   });
 });

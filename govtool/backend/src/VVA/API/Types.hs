@@ -874,26 +874,66 @@ instance ToSchema DelegationResponse where
         & example
           ?~ toJSON exampleDelegationResponse
 
+data GetNetworkInfoResponse
+  = GetNetworkInfoResponse
+    { getNetworkInfoResponseCurrentTime                     :: UTCTime
+    , getNetworkInfoResponseEpochNo                         :: Integer
+    , getNetworkInfoResponseBlockNo                         :: Integer
+    , getNetworkInfoResponseNetworkName                     :: Text
+    }
+
+deriveJSON (jsonOptions "getNetworkInfoResponse") ''GetNetworkInfoResponse
+
+exampleGetNetworkInfoResponse :: Text
+exampleGetNetworkInfoResponse =
+  "{\"currentTime\": \"1970-01-01T00:00:00Z\","
+  <> "\"currentEpoch\": 0,"
+  <> "\"currentBlock\": 0,"
+  <> "\"networkName\": \"Mainnet\"}"
+
+instance ToSchema GetNetworkInfoResponse where
+    declareNamedSchema _ = pure $ NamedSchema (Just "GetNetworkInfoResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "GetNetworkInfoResponse"
+        & example
+          ?~ toJSON exampleGetNetworkInfoResponse
+
+data GetNetworkTotalStakeResponse
+  = GetNetworkTotalStakeResponse
+    { getNetworkTotalStakeResponseTotalStakeControlledByDReps   :: Integer
+    , getNetworkTotalStakeResponseTotalStakeControlledBySPOs    :: Integer
+    , getNetworkTotalStakeResponseAlwaysAbstainVotingPower      :: Integer
+    , getNetworkTotalStakeResponseAlwaysNoConfidenceVotingPower  :: Integer
+    }
+
+deriveJSON (jsonOptions "getNetworkTotalStakeResponse") ''GetNetworkTotalStakeResponse
+
+exampleGetNetworkTotalStakeResponse :: Text
+exampleGetNetworkTotalStakeResponse =
+  "{\"totalStakeControlledByDReps\": 0,"
+  <> "\"totalStakeControlledBySPOs\": 0,"
+  <> "\"alwaysAbstainVotingPower\": 0,"
+  <> "\"alwaysNoConfidenceVotingPower\": 0}"
+
+instance ToSchema GetNetworkTotalStakeResponse where
+    declareNamedSchema _ = pure $ NamedSchema (Just "GetNetworkTotalStakeResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "GetNetworkTotalStakeResponse"
+        & example
+          ?~ toJSON exampleGetNetworkTotalStakeResponse
+
 data GetNetworkMetricsResponse
   = GetNetworkMetricsResponse
-      { getNetworkMetricsResponseCurrentTime                     :: UTCTime
-      , getNetworkMetricsResponseCurrentEpoch                    :: Integer
-      , getNetworkMetricsResponseCurrentBlock                    :: Integer
-      , getNetworkMetricsResponseUniqueDelegators                :: Integer
+      { getNetworkMetricsResponseUniqueDelegators                :: Integer
       , getNetworkMetricsResponseTotalDelegations                :: Integer
       , getNetworkMetricsResponseTotalGovernanceActions          :: Integer
       , getNetworkMetricsResponseTotalDRepVotes                  :: Integer
       , getNetworkMetricsResponseTotalRegisteredDReps            :: Integer
       , getNetworkMetricsResponseTotalDRepDistr                  :: Integer
-      , getNetworkMetricsResponseTotalStakeControlledByDReps     :: Integer
-      , getNetworkMetricsResponseTotalStakeControlledBySPOs      :: Integer
       , getNetworkMetricsResponseTotalActiveDReps                :: Integer
       , getNetworkMetricsResponseTotalInactiveDReps              :: Integer
       , getNetworkMetricsResponseTotalActiveCIP119CompliantDReps :: Integer
       , getNetworkMetricsResponseTotalRegisteredDirectVoters     :: Integer
-      , getNetworkMetricsResponseAlwaysAbstainVotingPower        :: Integer
-      , getNetworkMetricsResponseAlwaysNoConfidenceVotingPower   :: Integer
-      , getNetworkMetricsResponseNetworkName                     :: Text
       , getNetworkMetricsResponseNoOfCommitteeMembers            :: Integer
       , getNetworkMetricsResponseQuorumNumerator                 :: Integer
       , getNetworkMetricsResponseQuorumDenominator               :: Integer
@@ -912,14 +952,10 @@ exampleGetNetworkMetricsResponse =
   <> "\"totalDRepVotes\": 0,"
   <> "\"totalRegisteredDReps\": 0,"
   <> "\"totalDRepDistr\": 0,"
-  <> "\"totalStakeControlledByDReps\": 0,"
-  <> "\"totalStakeControlledBySPOs\": 0,"
   <> "\"totalActiveDReps\": 0,"
   <> "\"totalInactiveDReps\": 0,"
   <> "\"totalActiveCIP119CompliantDReps\": 0,"
   <> "\"totalRegisteredDirectVoters\": 0,"
-  <> "\"alwaysAbstainVotingPower\": 0,"
-  <> "\"alwaysNoConfidenceVotingPower\": 0,"
   <> "\"networkName\": \"Mainnet\","
   <> "\"noOfCommitteeMembers\": 7,"
   <> "\"quorumNumerator\": 2,"

@@ -86,25 +86,31 @@ export enum Network {
   mainnet = "mainnet",
 }
 
-export type NetworkMetrics = {
+export type NetworkInfo = {
   currentTime: string;
   currentEpoch: number;
   currentBlock: number;
+  networkName: Network;
+};
+
+export type NetworkTotalStake = {
+  totalStakeControlledByDReps: number;
+  totalStakeControlledBySPOs: number;
+  alwaysAbstainVotingPower: number;
+  alwaysNoConfidenceVotingPower: number;
+};
+
+export type NetworkMetrics = {
   uniqueDelegators: number;
   totalDelegations: number;
   totalGovernanceActions: number;
   totalDRepVotes: number;
   totalRegisteredDReps: number;
   totalDRepDistr: number;
-  totalStakeControlledByDReps: number;
-  totalStakeControlledBySPOs: number;
   totalActiveDReps: number;
   totalInactiveDReps: number;
   totalActiveCIP119CompliantDReps: number;
   totalRegisteredDirectVoters: number;
-  alwaysAbstainVotingPower: number;
-  alwaysNoConfidenceVotingPower: number;
-  networkName: Network;
   noOfCommitteeMembers: number;
   quorumNumerator: number;
   quorumDenominator: number;

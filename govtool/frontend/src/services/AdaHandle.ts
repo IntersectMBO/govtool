@@ -1,4 +1,4 @@
-import { NetworkMetrics } from "@/models";
+import { NetworkInfo } from "@/models";
 import { HandleObject } from "@/models/adaHandle";
 
 export const ADAHANDLE_BASE_URL = {
@@ -38,7 +38,7 @@ class AdaHandleService {
    * Initialize the AdaHandleService with the base URL for a specific network.
    * @param network - The name of the network.
    */
-  initialize(network: NetworkMetrics["networkName"]): void {
+  initialize(network: NetworkInfo["networkName"]): void {
     if (this.adaHandleBaseUrl !== ADAHANDLE_BASE_URL[network]) {
       this.adaHandleBaseUrl = ADAHANDLE_BASE_URL[network];
     }

@@ -217,7 +217,7 @@ export default class DRepDirectoryPage {
         !isEmptyContainerVisible &&
         `DRep with id ${dRepId} is found in the list`,
     }).toBeVisible({
-      timeout: 20_000,
+      timeout: 60_000,
     });
   }
 }

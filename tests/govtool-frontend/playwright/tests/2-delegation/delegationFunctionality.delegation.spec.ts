@@ -11,7 +11,10 @@ import {
 } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
-import { correctDelegatedVoteAdaFormat } from "@helpers/adaFormat";
+import {
+  correctDelegatedVoteAdaFormat,
+  correctDRepDirectoryFormat,
+} from "@helpers/adaFormat";
 import { setAllureEpic } from "@helpers/allure";
 import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
@@ -265,7 +268,7 @@ test.describe("Abstain delegation", () => {
 
     await expect(
       page.getByText(
-        `You have delegated ₳${correctDelegatedVoteAdaFormat(balance)}`
+        `You have delegated ₳${correctDRepDirectoryFormat(balance)}`
       )
     ).toBeVisible({
       timeout: 60_000,
@@ -296,7 +299,7 @@ test.describe("No confidence delegation", () => {
     const balance = await kuberService.getBalance(adaHolder04Wallet.address);
     await expect(
       page.getByText(
-        `You have delegated ₳${correctDelegatedVoteAdaFormat(balance)}`
+        `You have delegated ₳${correctDRepDirectoryFormat(balance)}`
       )
     ).toBeVisible({
       timeout: 60_000,
@@ -325,7 +328,7 @@ test.describe("Delegated ADA visibility", () => {
     );
     await expect(
       page.getByText(
-        `You have delegated ₳ ${correctDelegatedVoteAdaFormat(adaHolderVotingPower)}`
+        `You have delegated ₳ ${correctDRepDirectoryFormat(adaHolderVotingPower)}`
       )
     ).toBeVisible({ timeout: 60_000 });
 

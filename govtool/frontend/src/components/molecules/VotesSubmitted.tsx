@@ -1,9 +1,13 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { Box } from "@mui/material";
 
 import { IMAGES, SECURITY_RELEVANT_PARAMS_MAP } from "@consts";
 import { Typography, VotePill } from "@atoms";
-import { useTranslation } from "@hooks";
+import {
+  useGetNetworkMetrics,
+  useGetNetworkTotalStake,
+  useTranslation,
+} from "@hooks";
 import {
   getGovActionVotingThresholdKey,
   correctAdaFormatWithSuffix,
@@ -48,7 +52,18 @@ export const VotesSubmitted = ({
     areCCVoteTotalsDisplayed,
   } = useFeatureFlag();
   const { t } = useTranslation();
-  const { epochParams, networkMetrics } = useAppContext();
+  const { networkTotalStake, fetchNetworkTotalStake } =
+    useGetNetworkTotalStake();
+  const { networkMetrics, fetchNetworkMetrics } = useGetNetworkMetrics();
+  const { epochParams } = useAppContext();
+
+  useEffect(() => {
+    const init = async () => {
+      await fetchNetworkTotalStake();
+      await fetchNetworkMetrics();
+    };
+    init();
+  }, []);
 
   const noOfCommitteeMembers = networkMetrics?.noOfCommitteeMembers ?? 0;
   const ccThreshold = (
@@ -60,13 +75,13 @@ export const VotesSubmitted = ({
   // Coming from be
   // Equal to: total active drep stake + auto no-confidence stake
   const totalStakeControlledByDReps =
-    (networkMetrics?.totalStakeControlledByDReps ?? 0) -
+    (networkTotalStake?.totalStakeControlledByDReps ?? 0) -
     // As this being voted for the action becomes part of the total active stake
     dRepAbstainVotes;
 
   // Governance action abstain votesa + auto abstain votes
   const totalAbstainVotes =
-    dRepAbstainVotes + (networkMetrics?.alwaysAbstainVotingPower ?? 0);
+    dRepAbstainVotes + (networkTotalStake?.alwaysAbstainVotingPower ?? 0);
 
   // TODO: Move this logic to backend
   const dRepYesVotesPercentage = totalStakeControlledByDReps
@@ -82,13 +97,13 @@ export const VotesSubmitted = ({
       (dRepYesVotes -
         // As this is already added on backend
         (govActionType === GovernanceActionType.NoConfidence
-          ? networkMetrics?.alwaysNoConfidenceVotingPower ?? 0
+          ? networkTotalStake?.alwaysNoConfidenceVotingPower ?? 0
           : 0)) -
       (dRepNoVotes -
         // As this is already added on backend
         (govActionType === GovernanceActionType.NoConfidence
           ? 0
-          : networkMetrics?.alwaysNoConfidenceVotingPower ?? 0))
+          : networkTotalStake?.alwaysNoConfidenceVotingPower ?? 0))
     : undefined;
   const dRepNotVotedVotesPercentage =
     100 - (dRepYesVotesPercentage ?? 0) - (dRepNoVotesPercentage ?? 0);

@@ -29,3 +29,10 @@ export const correctDelegatedVoteAdaFormat = (ada: number | undefined) => {
   }
   return "0";
 };
+
+export const correctDRepDirectoryFormat = (ada: number | undefined) => {
+  if (ada) {
+    return Number(ada.toFixed(0))?.toLocaleString("en-US");
+  }
+  return "0";
+};

@@ -7,6 +7,8 @@ export const QUERY_KEYS = {
   useGetDRepVotingPowerKey: "useGetDRepVotingPowerKey",
   useGetEpochParamsKey: "useGetEpochParamsKey",
   useGetNetworkMetricsKey: "useGetNetworkMetricsKey",
+  useGetNetworkTotalStakeKey: "useGetNetworkTotalStakeKey",
+  useGetNetworkInfoKey: "useGetNetworkInfoKey",
   useGetProposalKey: "useGetProposalKey",
   useGetProposalsInfiniteKey: "useGetProposalsInfiniteKey",
   useGetProposalsKey: "useGetProposalsKey",

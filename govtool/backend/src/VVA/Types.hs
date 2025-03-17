@@ -203,38 +203,48 @@ instance ToJSON TransactionStatus where
 
 data CacheEnv
   = CacheEnv
-      { proposalListCache :: Cache.Cache () [Proposal]
-      , getProposalCache :: Cache.Cache (Text, Integer) Proposal
-      , currentEpochCache :: Cache.Cache () (Maybe Value)
-      , adaHolderVotingPowerCache :: Cache.Cache Text Integer
-      , adaHolderGetCurrentDelegationCache :: Cache.Cache Text (Maybe Delegation)
-      , dRepGetVotesCache :: Cache.Cache Text ([Vote], [Proposal])
-      , dRepInfoCache :: Cache.Cache Text DRepInfo
-      , dRepVotingPowerCache :: Cache.Cache Text Integer
-      , dRepListCache :: Cache.Cache Text [DRepRegistration]
-      , networkMetricsCache :: Cache.Cache () NetworkMetrics
+      { proposalListCache                   :: Cache.Cache () [Proposal]
+      , getProposalCache                    :: Cache.Cache (Text, Integer) Proposal
+      , currentEpochCache                   :: Cache.Cache () (Maybe Value)
+      , adaHolderVotingPowerCache           :: Cache.Cache Text Integer
+      , adaHolderGetCurrentDelegationCache  :: Cache.Cache Text (Maybe Delegation)
+      , dRepGetVotesCache                   :: Cache.Cache Text ([Vote], [Proposal])
+      , dRepInfoCache                       :: Cache.Cache Text DRepInfo
+      , dRepVotingPowerCache                :: Cache.Cache Text Integer
+      , dRepListCache                       :: Cache.Cache Text [DRepRegistration]
+      , networkMetricsCache                 :: Cache.Cache () NetworkMetrics
+      , networkInfoCache                    :: Cache.Cache () NetworkInfo
+      , networkTotalStakeCache              :: Cache.Cache () NetworkTotalStake
+      }
+
+data NetworkInfo
+  = NetworkInfo
+      { networkInfoCurrentTime :: UTCTime
+      , networkInfoEpochNo     :: Integer
+      , networkInfoBlockNo     :: Integer
+      , networkInfoNetworkName :: Text
+      }
+
+data NetworkTotalStake
+  = NetworkTotalStake
+      { networkTotalStakeControlledByDReps        :: Integer
+      , networkTotalStakeControlledBySPOs         :: Integer
+      , networkTotalAlwaysAbstainVotingPower      :: Integer
+      , networkTotalAlwaysNoConfidenceVotingPower  :: Integer
       }
 
 data NetworkMetrics
   = NetworkMetrics
-      { networkMetricsCurrentTime                           :: UTCTime
-      , networkMetricsCurrentEpoch                          :: Integer
-      , networkMetricsCurrentBlock                          :: Integer
-      , networkMetricsUniqueDelegators                      :: Integer
+      { networkMetricsUniqueDelegators                      :: Integer
       , networkMetricsTotalDelegations                      :: Integer
       , networkMetricsTotalGovernanceActions                :: Integer
       , networkMetricsTotalDRepVotes                        :: Integer
       , networkMetricsTotalRegisteredDReps                  :: Integer
       , networkMetricsTotalDRepDistr                        :: Integer
-      , networkMetricsTotalStakeControlledByDReps           :: Integer
-      , networkMetricsTotalStakeControlledBySPOs            :: Integer
       , networkMetricsTotalActiveDReps                      :: Integer
       , networkMetricsTotalInactiveDReps                    :: Integer
       , networkMetricsTotalActiveCIP119CompliantDReps       :: Integer
       , networkMetricsTotalRegisteredDirectVoters           :: Integer
-      , networkMetricsAlwaysAbstainVotingPower              :: Integer
-      , networkMetricsAlwaysNoConfidenceVotingPower         :: Integer
-      , networkMetricsNetworkName                           :: Text
       , networkMetricsNoOfCommitteeMembers                  :: Integer
       , networkMetricsQuorumNumerator                       :: Integer
       , networkMetricsQuorumDenominator                     :: Integer

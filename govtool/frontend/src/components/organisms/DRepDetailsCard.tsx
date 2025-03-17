@@ -117,7 +117,7 @@ export const DRepDetailsCard = ({
           <CopyableText
             value={encodeCIP129Identifier({
               txID: `${isScriptBased ? "23" : "22"}${drepId}`,
-              bech32Prefix: isScriptBased ? "drep_script" : "drep",
+              bech32Prefix: "drep",
             })}
             dataTestId="copy-cip-129-drep-id-button"
           />

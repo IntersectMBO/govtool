@@ -5,6 +5,7 @@ import { useCardano, useGovernanceActions } from "@/context";
 import { useValidateMutation } from "@/hooks/mutations";
 import { useScreenDimension } from "@/hooks/useScreenDimension";
 import { Footer, TopNav } from "@/components/organisms";
+import { useGetVoterInfo } from "@/hooks";
 
 const ProposalDiscussion = React.lazy(
   () => import("@intersect.mbo/pdf-ui/cjs"),
@@ -14,6 +15,7 @@ export const ProposalDiscussionPillar = () => {
   const { pagePadding } = useScreenDimension();
   const { validateMetadata } = useValidateMutation();
   const { walletApi, ...context } = useCardano();
+  const { voter } = useGetVoterInfo();
   const { createGovernanceActionJsonLD, createHash } = useGovernanceActions();
 
   return (
@@ -55,6 +57,7 @@ export const ProposalDiscussionPillar = () => {
               ...walletApi,
               createGovernanceActionJsonLD,
               createHash,
+              voter,
             }}
             pathname={window.location.pathname}
             validateMetadata={

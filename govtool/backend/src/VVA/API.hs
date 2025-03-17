@@ -79,6 +79,9 @@ type VVAApi =
     :<|> "transaction" :> "status" :> Capture "transactionId" HexText :> Get '[JSON] GetTransactionStatusResponse
     :<|> "throw500" :> Get '[JSON] ()
     :<|> "network" :> "metrics" :> Get '[JSON] GetNetworkMetricsResponse
+    :<|> "network" :> "info" :> Get '[JSON] GetNetworkInfoResponse
+    :<|> "network" :> "total-stake" :> Get '[JSON] GetNetworkTotalStakeResponse
+
 server :: App m => ServerT VVAApi m
 server = drepList
     :<|> getVotingPower
@@ -92,7 +95,8 @@ server = drepList
     :<|> getTransactionStatus
     :<|> throw500
     :<|> getNetworkMetrics
-
+    :<|> getNetworkInfo
+    :<|> getNetworkTotalStake
 
 mapDRepType :: Types.DRepType -> DRepType
 mapDRepType Types.DRep      = NormalDRep
@@ -428,29 +432,43 @@ getTransactionStatus (unHexText -> transactionId) = do
 throw500 :: App m => m ()
 throw500 = throwError $ CriticalError "intentional system break for testing purposes"
 
+getNetworkInfo :: App m => m GetNetworkInfoResponse
+getNetworkInfo = do
+  CacheEnv {networkInfoCache} <- asks vvaCache
+  Types.NetworkInfo {..} <- Network.networkInfo
+  return $ GetNetworkInfoResponse
+    { getNetworkInfoResponseCurrentTime = networkInfoCurrentTime
+    , getNetworkInfoResponseEpochNo = networkInfoEpochNo
+    , getNetworkInfoResponseBlockNo = networkInfoBlockNo
+    , getNetworkInfoResponseNetworkName = networkInfoNetworkName
+    }
+
+getNetworkTotalStake :: App m => m GetNetworkTotalStakeResponse
+getNetworkTotalStake = do
+  CacheEnv {networkTotalStakeCache} <- asks vvaCache
+  Types.NetworkTotalStake {..} <- Network.networkTotalStake
+  return $ GetNetworkTotalStakeResponse
+    { getNetworkTotalStakeResponseTotalStakeControlledByDReps = networkTotalStakeControlledByDReps
+    , getNetworkTotalStakeResponseTotalStakeControlledBySPOs = networkTotalStakeControlledBySPOs
+    , getNetworkTotalStakeResponseAlwaysAbstainVotingPower = networkTotalAlwaysAbstainVotingPower
+    , getNetworkTotalStakeResponseAlwaysNoConfidenceVotingPower = networkTotalAlwaysNoConfidenceVotingPower
+    }
+
 getNetworkMetrics :: App m => m GetNetworkMetricsResponse
 getNetworkMetrics = do
   CacheEnv {networkMetricsCache} <- asks vvaCache
   Types.NetworkMetrics {..} <- Network.networkMetrics
   return $ GetNetworkMetricsResponse
-    { getNetworkMetricsResponseCurrentTime = networkMetricsCurrentTime
-    , getNetworkMetricsResponseCurrentEpoch = networkMetricsCurrentEpoch
-    , getNetworkMetricsResponseCurrentBlock = networkMetricsCurrentBlock
-    , getNetworkMetricsResponseUniqueDelegators = networkMetricsUniqueDelegators
+    { getNetworkMetricsResponseUniqueDelegators = networkMetricsUniqueDelegators
     , getNetworkMetricsResponseTotalDelegations = networkMetricsTotalDelegations
     , getNetworkMetricsResponseTotalGovernanceActions = networkMetricsTotalGovernanceActions
     , getNetworkMetricsResponseTotalDRepVotes = networkMetricsTotalDRepVotes
     , getNetworkMetricsResponseTotalRegisteredDReps = networkMetricsTotalRegisteredDReps
     , getNetworkMetricsResponseTotalDRepDistr = networkMetricsTotalDRepDistr
-    , getNetworkMetricsResponseTotalStakeControlledByDReps = networkMetricsTotalStakeControlledByDReps
-    , getNetworkMetricsResponseTotalStakeControlledBySPOs = networkMetricsTotalStakeControlledBySPOs
     , getNetworkMetricsResponseTotalActiveDReps = networkMetricsTotalActiveDReps
     , getNetworkMetricsResponseTotalInactiveDReps = networkMetricsTotalInactiveDReps
     , getNetworkMetricsResponseTotalActiveCIP119CompliantDReps = networkMetricsTotalActiveCIP119CompliantDReps
     , getNetworkMetricsResponseTotalRegisteredDirectVoters = networkMetricsTotalRegisteredDirectVoters
-    , getNetworkMetricsResponseAlwaysAbstainVotingPower = networkMetricsAlwaysAbstainVotingPower
-    , getNetworkMetricsResponseAlwaysNoConfidenceVotingPower = networkMetricsAlwaysNoConfidenceVotingPower
-    , getNetworkMetricsResponseNetworkName = networkMetricsNetworkName
     , getNetworkMetricsResponseNoOfCommitteeMembers = networkMetricsNoOfCommitteeMembers
     , getNetworkMetricsResponseQuorumNumerator = networkMetricsQuorumNumerator
     , getNetworkMetricsResponseQuorumDenominator = networkMetricsQuorumDenominator

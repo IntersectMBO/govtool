@@ -62,7 +62,7 @@ export const DRepCard = ({
 
   const cip129Identifier = encodeCIP129Identifier({
     txID: `${isScriptBased ? "23" : "22"}${drepId}`,
-    bech32Prefix: isScriptBased ? "drep_script" : "drep",
+    bech32Prefix: "drep",
   });
 
   const base64Image = getBase64ImageDetails(image ?? "");

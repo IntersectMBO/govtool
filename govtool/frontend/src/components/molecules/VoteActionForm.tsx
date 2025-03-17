@@ -45,7 +45,6 @@ export const VoteActionForm = ({
   const {
     areFormErrors,
     confirmVote,
-    isDirty,
     isVoteLoading,
     registerInput,
     setValue,
@@ -350,7 +349,11 @@ export const VoteActionForm = ({
           data-testid="vote-button"
           variant="contained"
           disabled={
-            !vote || previousVote?.vote === vote || (areFormErrors && isDirty)
+            !vote ||
+            areFormErrors ||
+            (previousVote?.vote === vote &&
+              (previousVote.metadataHash === voteContextHash ||
+                !voteContextHash))
           }
           isLoading={isVoteLoading}
           onClick={confirmVote}

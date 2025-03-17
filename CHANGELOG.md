@@ -18,10 +18,12 @@ changes.
 
 - hotfix for ada handle and payment address validation order [Issue 3155](https://github.com/IntersectMBO/govtool/issues/3155)
 - fix proposal list performance by pre-filtering active proposals [Issue 3190](https://github.com/IntersectMBO/govtool/issues/3190)
+- Fix wrong prefix of script based dreps in CIP-129 standard [Issue 3203](https://github.com/IntersectMBO/govtool/issues/3203)
 
 ### Changed
 
 - Exclude network total stake and info from network metrics [Issue 3189](https://github.com/IntersectMBO/govtool/issues/3189)
+- Change restriction level for re-voting on governance actions [Issue 3191](https://github.com/IntersectMBO/govtool/issues/3191)
 
 ### Removed
 

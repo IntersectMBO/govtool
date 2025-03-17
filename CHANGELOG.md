@@ -12,6 +12,17 @@ changes.
 
 ### Added
 
+### Fixed
+
+### Changed
+
+### Removed
+
+## [v2.0.16](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.16) 2025-03-17
+
+
+### Added
+
 - Add support for preprod in matomo analytics [Issue 3173](https://github.com/IntersectMBO/govtool/issues/3173)
 
 ### Fixed

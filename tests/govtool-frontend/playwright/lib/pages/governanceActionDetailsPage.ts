@@ -1,6 +1,6 @@
 import environments from "@constants/environments";
 import { downloadMetadata } from "@helpers/metadata";
-import { Download, Page, Response } from "@playwright/test";
+import { Download, expect, Page, Response } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
 import { IProposal } from "@types";
 import { withTxConfirmation } from "lib/transaction.decorator";
@@ -76,8 +76,10 @@ export default class GovernanceActionDetailsPage {
   }
 
   @withTxConfirmation
-  async vote(context?: string) {
-    await this.yesVoteRadio.click();
+  async vote(context?: string, isAlreadyVoted: boolean = false) {
+    if (!isAlreadyVoted) {
+      await this.yesVoteRadio.click();
+    }
 
     if (context) {
       await this.contextBtn.click();
@@ -97,6 +99,12 @@ export default class GovernanceActionDetailsPage {
       await this.confirmModalBtn.click();
       await this.page.getByTestId("go-to-vote-modal-button").click();
     }
+
+    const isVoteButtonEnabled = await this.voteBtn.isEnabled();
+
+    await expect(this.voteBtn, {
+      message: !isVoteButtonEnabled && "Vote button is not enabled",
+    }).toBeEnabled({ timeout: 60_000 });
 
     await this.voteBtn.click();
   }
@@ -126,10 +134,12 @@ export default class GovernanceActionDetailsPage {
 
   async getDRepTotalAbstainVoted(
     proposal: IProposal,
-    metricsResponsePromise: Promise<Response>
+    totalStakeResponsePromise: Promise<Response>
   ): Promise<number | undefined> {
-    const metricsResponses = await Promise.resolve(metricsResponsePromise);
-    const alwaysAbstainVotingPower = await metricsResponses
+    const totalStakeResponses = await Promise.resolve(
+      totalStakeResponsePromise
+    );
+    const alwaysAbstainVotingPower = await totalStakeResponses
       .json()
       .then((data) => data.alwaysAbstainVotingPower);
 
@@ -154,6 +164,6 @@ export default class GovernanceActionDetailsPage {
   @withTxConfirmation
   async reVote() {
     await this.noVoteRadio.click();
-    await this.voteBtn.click();
+    await this.changeVoteBtn.click();
   }
 }

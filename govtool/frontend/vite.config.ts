@@ -16,6 +16,17 @@ const viteConfig = defineViteConfig({
   define: {
     "process.env": {},
   },
+  build: {
+    chunkSizeWarningLimit: 512,
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        keep_infinity: true,
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+  },
   resolve: {
     alias: [
       { find: "@", replacement: path.resolve(__dirname, "./src") },

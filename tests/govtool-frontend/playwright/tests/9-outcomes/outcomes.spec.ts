@@ -330,9 +330,7 @@ test("9G. Should display correct vote counts on outcome details page", async ({
       );
 
       const metricsResponsePromise = page.waitForResponse(
-        (response) =>
-          response.url().includes(`/network/metrics`) &&
-          !response.url().includes(`/misc/network/metrics`),
+        (response) => response.url().includes(`/misc/network/metrics`),
         { timeout: 60_000 }
       );
 

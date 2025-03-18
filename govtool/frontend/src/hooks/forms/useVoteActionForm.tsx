@@ -69,8 +69,7 @@ export const useVoteActionForm = ({
     txHash !== null &&
     index !== undefined &&
     index !== null &&
-    !areFormErrors &&
-    previousVote?.vote !== vote;
+    !areFormErrors;
 
   const confirmVote = useCallback(
     async (values: VoteActionFormValues) => {

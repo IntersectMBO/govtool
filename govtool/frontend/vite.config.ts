@@ -16,6 +16,82 @@ const viteConfig = defineViteConfig({
   define: {
     "process.env": {},
   },
+  build: {
+    chunkSizeWarningLimit: 512,
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (id.includes("node_modules")) {
+            return id
+              .toString()
+              .split("node_modules/")[1]
+              .split("/")[0]
+              .toString();
+          }
+          if (id.includes("src/components/atoms")) {
+            return "atoms";
+          }
+          if (id.includes("src/components/molecules")) {
+            return "molecules";
+          }
+          if (id.includes("src/components/organisms")) {
+            return "organisms";
+          }
+          if (id.includes("src/consts")) {
+            return "context";
+          }
+          if (id.includes("src/context")) {
+            return "context";
+          }
+          if (id.includes("src/hooks")) {
+            return "hooks";
+          }
+          if (id.includes("src/pages")) {
+            return "consts";
+          }
+          if (id.includes("src/services")) {
+            return "consts";
+          }
+          if (id.includes("src/utils")) {
+            return "utils";
+          }
+
+          // Specific handling for the Emurgo library
+          if (id.includes("@emurgo/cardano-serialization-lib-asmjs")) {
+            if (
+              id.includes("Transaction") ||
+              id.includes("Address") ||
+              id.includes("Fee")
+            ) {
+              return "cardano-tx";
+            }
+            if (
+              id.includes("Voting") ||
+              id.includes("Governance") ||
+              id.includes("DRep")
+            ) {
+              return "cardano-voting";
+            }
+            if (id.includes("Plutus") || id.includes("Script")) {
+              return "cardano-scripts";
+            }
+            if (id.includes("Certificate") || id.includes("Credential")) {
+              return "cardano-certs";
+            }
+            return "cardano-core";
+          }
+        },
+      },
+    },
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        keep_infinity: true,
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+  },
   resolve: {
     alias: [
       { find: "@", replacement: path.resolve(__dirname, "./src") },

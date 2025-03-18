@@ -30,8 +30,19 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-FROM nginx:stable-alpine
+FROM fholzer/nginx-brotli:v1.23.4
+
 EXPOSE 80
+
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+RUN echo '\
+# Brotli configuration\n\
+brotli on;\n\
+brotli_comp_level 6;\n\
+brotli_static on;\n\
+brotli_types text/plain text/css application/javascript application/json image/svg+xml application/xml+rss text/javascript;\n\
+' > /etc/nginx/conf.d/brotli.conf
+
 COPY --from=builder /src/maintenance-page/index.html /usr/share/nginx/html/maintenance.html
 COPY --from=builder /src/dist /usr/share/nginx/html

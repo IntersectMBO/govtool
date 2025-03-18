@@ -13,7 +13,7 @@ import walletManager from "lib/walletManager";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 
 const REGISTER_DREP_WALLETS_COUNT = 6;
-const DREP_WALLETS_COUNT = 9;
+const DREP_WALLETS_COUNT = 10;
 
 let dRepDeposit: number;
 

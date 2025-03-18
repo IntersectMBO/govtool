@@ -116,8 +116,6 @@ test.describe("Temporary DReps", async () => {
   });
 
   test("4J. Should include metadata anchor in the vote transaction", async ({}, testInfo) => {
-    test.skip(); // Skipped: Vote context is not displayed in UI to validate
-
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     const govActionsPage = new GovernanceActionsPage(dRepPage);
@@ -130,6 +128,8 @@ test.describe("Temporary DReps", async () => {
 
     await govActionsPage.votedTab.click();
     await govActionsPage.viewFirstVotedProposal();
+
+    //  Vote context is not displayed in UI to validate
     expect(false, "No vote context displayed").toBe(true);
   });
 });

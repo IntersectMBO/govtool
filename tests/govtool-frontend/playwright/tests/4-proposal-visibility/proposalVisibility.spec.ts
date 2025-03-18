@@ -222,10 +222,6 @@ test("4K. Should display correct vote counts on governance details page for disc
     )
   );
 
-  const metricsResponsePromise = page.waitForResponse((response) =>
-    response.url().includes(`network/metrics`)
-  );
-
   const governanceActionsPage = new GovernanceActionsPage(page);
   await governanceActionsPage.goto();
   const responses = await Promise.all(responsesPromise);
@@ -248,6 +244,9 @@ test("4K. Should display correct vote counts on governance details page for disc
     uniqueProposalTypes.map(async (proposalToCheck) => {
       const newPage = await browser.newPage();
       injectLogger(newPage);
+      const totalStakeResponsePromise = newPage.waitForResponse((response) =>
+        response.url().includes(`network/total-stake`)
+      );
       const govActionDetailsPage = new GovernanceActionDetailsPage(newPage);
       await govActionDetailsPage.goto(
         `${proposalToCheck.txHash}#${proposalToCheck.index}`
@@ -256,7 +255,7 @@ test("4K. Should display correct vote counts on governance details page for disc
       const dRepTotalAbstainVote =
         await govActionDetailsPage.getDRepTotalAbstainVoted(
           proposalToCheck,
-          metricsResponsePromise
+          totalStakeResponsePromise
         );
 
       // check dRep votes

@@ -126,10 +126,12 @@ export default class GovernanceActionDetailsPage {
 
   async getDRepTotalAbstainVoted(
     proposal: IProposal,
-    metricsResponsePromise: Promise<Response>
+    totalStakeResponsePromise: Promise<Response>
   ): Promise<number | undefined> {
-    const metricsResponses = await Promise.resolve(metricsResponsePromise);
-    const alwaysAbstainVotingPower = await metricsResponses
+    const totalStakeResponses = await Promise.resolve(
+      totalStakeResponsePromise
+    );
+    const alwaysAbstainVotingPower = await totalStakeResponses
       .json()
       .then((data) => data.alwaysAbstainVotingPower);
 

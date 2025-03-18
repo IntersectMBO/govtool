@@ -104,7 +104,7 @@ test("6M. Should navigate between footer links", async ({ page, context }) => {
 });
 
 test("6O. Should display proper network name", async ({ page }) => {
-  await page.route("**/network/metrics", async (route) => {
+  await page.route("**/network/info", async (route) => {
     // Fetch the original response from the server
     const response = await route.fetch();
     const json = await response.json();
@@ -119,7 +119,7 @@ test("6O. Should display proper network name", async ({ page }) => {
       body: JSON.stringify(json),
     });
   });
-  const responsePromise = page.waitForResponse("**/network/metrics");
+  const responsePromise = page.waitForResponse("**/network/info");
   await page.goto("/");
 
   const response = await responsePromise;

@@ -14,6 +14,17 @@ changes.
 
 ### Fixed
 
+### Changed
+
+### Removed
+
+## [v2.0.17](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.17) 2025-03-18
+
+
+### Added
+
+### Fixed
+
 - allow casting same vote with a different rationale [Issue 3191](https://github.com/IntersectMBO/govtool/issues/3191)
 
 ### Changed

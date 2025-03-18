@@ -47,8 +47,11 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-FROM nginx:stable-alpine
+FROM fholzer/nginx-brotli:v1.23.4
+
 EXPOSE 80
+
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 COPY --from=builder /src/maintenance-page/index.html /usr/share/nginx/html/maintenance.html
 COPY --from=builder /src/dist /usr/share/nginx/html

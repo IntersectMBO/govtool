@@ -46,13 +46,11 @@ export default class OutcomeDetailsPage {
   ): Promise<number | undefined> {
     const alwaysAbstainVotingPower = await metricsResponses
       .json()
-      .then((res) => res.alwaysAbstainVotingPower);
-    if (
-      alwaysAbstainVotingPower &&
-      typeof alwaysAbstainVotingPower === "number"
-    ) {
+      .then((res) => res.always_abstain_voting_power);
+
+    if (alwaysAbstainVotingPower) {
       const totalAbstainVoted =
-        alwaysAbstainVotingPower + parseInt(proposal.abstain_votes);
+        parseInt(alwaysAbstainVotingPower) + parseInt(proposal.abstain_votes);
 
       return totalAbstainVoted;
     } else {

@@ -23,6 +23,10 @@ export default class GovernanceActionsPage {
     await this.page.waitForTimeout(2_000); // Waits to ensure the alert-success popup does not interfere
   }
 
+  get currentPage(): Page {
+    return this.page;
+  }
+
   async viewProposal(
     proposal: IProposal
   ): Promise<GovernanceActionDetailsPage> {

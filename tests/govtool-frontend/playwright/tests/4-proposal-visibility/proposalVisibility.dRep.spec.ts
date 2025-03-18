@@ -150,10 +150,6 @@ test.describe("Check vote count", () => {
       )
     );
 
-    const metricsResponsePromise = page.waitForResponse((response) =>
-      response.url().includes(`network/metrics`)
-    );
-
     const governanceActionsPage = new GovernanceActionsPage(page);
     await governanceActionsPage.goto();
 
@@ -179,18 +175,22 @@ test.describe("Check vote count", () => {
           storageState: ".auth/dRep01.json",
           wallet: dRep01Wallet,
         });
+
+        const totalStakeResponsePromise = dRepPage.waitForResponse((response) =>
+          response.url().includes(`network/total-stake`)
+        );
         const govActionDetailsPage = new GovernanceActionDetailsPage(dRepPage);
         await govActionDetailsPage.goto(
           `${proposalToCheck.txHash}#${proposalToCheck.index}`
         );
 
+        await govActionDetailsPage.showVotesBtn.click();
+
         const dRepTotalAbstainVote =
           await govActionDetailsPage.getDRepTotalAbstainVoted(
             proposalToCheck,
-            metricsResponsePromise
+            totalStakeResponsePromise
           );
-
-        await govActionDetailsPage.showVotesBtn.click();
 
         // check dRep votes
         if (await areDRepVoteTotalsDisplayed(proposalToCheck)) {

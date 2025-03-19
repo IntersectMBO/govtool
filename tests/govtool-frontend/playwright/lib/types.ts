@@ -118,6 +118,13 @@ export enum FullGovernanceDRepVoteActionsType {
 
 export type DRepStatus = "Active" | "Inactive" | "Retired";
 
+export interface PaginatedDRepResponse {
+  page: number;
+  pageSize: number;
+  total: number;
+  elements: IDRep[];
+}
+
 export type IDRep = {
   isScriptBased: boolean;
   drepId: string;

@@ -264,7 +264,7 @@ test.describe("Perform voting", () => {
       window.scrollTo(0, 500)
     );
     await expect(
-      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("No"),
+      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes"),
       {
         message:
           !isYesVoteVisible &&

@@ -12,6 +12,17 @@ changes.
 
 ### Added
 
+### Fixed
+
+### Changed
+
+### Removed
+
+## [v2.0.18](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.18) 2025-03-20
+
+
+### Added
+
 - Add redirection to outcomes when proposal is not found [Issue 3230](https://github.com/IntersectMBO/govtool/issues/3230)
 
 ### Fixed

@@ -14,12 +14,13 @@ changes.
 
 ### Fixed
 
+- Fix post-vote navigation to governance action list [Issue 3242](https://github.com/IntersectMBO/govtool/issues/3242)
+
 ### Changed
 
 ### Removed
 
 ## [v2.0.17](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.17) 2025-03-18
-
 
 ### Added
 

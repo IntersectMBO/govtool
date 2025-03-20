@@ -61,14 +61,15 @@ instance Exception AppError
 
 data Vote
   = Vote
-      { voteProposalId :: Integer
-      , voteDrepId     :: Text
-      , voteVote       :: Text
-      , voteUrl        :: Maybe Text
-      , voteDocHash    :: Maybe Text
-      , voteEpochNo    :: Integer
-      , voteDate       :: UTCTime
-      , voteTxHash     :: Text
+      { voteProposalId  :: Integer
+      , voteGovActionId :: Text
+      , voteDrepId      :: Text
+      , voteVote        :: Text
+      , voteUrl         :: Maybe Text
+      , voteDocHash     :: Maybe Text
+      , voteEpochNo     :: Integer
+      , voteDate        :: UTCTime
+      , voteTxHash      :: Text
       }
 
 data DRepInfo

@@ -12,6 +12,8 @@ changes.
 
 ### Added
 
+- Add redirection to outcomes when proposal is not found [Issue 3230](https://github.com/IntersectMBO/govtool/issues/3230)
+
 ### Fixed
 
 - Fix post-vote navigation to governance action list [Issue 3242](https://github.com/IntersectMBO/govtool/issues/3242)

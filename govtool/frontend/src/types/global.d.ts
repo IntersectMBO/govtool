@@ -14,6 +14,7 @@ declare global {
 
   type ActionTypeFromAPI = {
     id: string;
+    txHash: string;
     type: string;
     details: string;
     expiryDate: string;
@@ -36,7 +37,7 @@ declare global {
 
   type ToVoteDataType = {
     title: string;
-    actions: ActionTypeToDsiplay[];
+    actions: ProposalData[];
   }[];
 
   type NestedKeys<T> = T extends Record<string, unknown>

@@ -1,13 +1,13 @@
 import environments from "@constants/environments";
 import { setAllureEpic } from "@helpers/allure";
 import { skipIfNotHardFork } from "@helpers/cardano";
-import { fetchFirstActiveDRepDetails } from "@helpers/dRep";
+import { convertDRep, fetchFirstActiveDRepDetails } from "@helpers/dRep";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import DRepDetailsPage from "@pages/dRepDetailsPage";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { expect, Locator } from "@playwright/test";
 import { test } from "@fixtures/walletExtension";
-import { DRepStatus, IDRep } from "@types";
+import { DRepStatus, IDRep, PaginatedDRepResponse } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
@@ -26,6 +26,8 @@ const statusRank: Record<DRepStatus, number> = {
   Inactive: 2,
   Retired: 3,
 };
+
+const scripDRepId: PaginatedDRepResponse = require("../../lib/_mock/scriptDRep.json");
 
 test("2K_2. Should sort DReps", async ({ page }) => {
   test.slow();
@@ -221,5 +223,43 @@ test.describe("DRep dependent tests", () => {
       navigator.clipboard.readText()
     );
     expect(copiedTextDRepDirectory).toEqual(dRepId);
+  });
+});
+
+Object.values(["script drep", "drep"]).forEach((type, index) => {
+  test(`2Y_${index + 1}. Should correctly convert CIP-129/CIP-105 ${type}`, async ({
+    page,
+  }) => {
+    const dRepId = scripDRepId.elements[0]["drepId"];
+    const dRepResponse = {
+      ...scripDRepId,
+      elements: [{ ...scripDRepId.elements[0], isScriptBased: false }],
+    };
+    await page.route("**/drep/list?page=0&pageSize=10&**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(type === "drep" ? dRepResponse : scripDRepId),
+      });
+    });
+
+    const responsePromise = page.waitForResponse(
+      "**/drep/list?page=0&pageSize=10&**"
+    );
+
+    const { cip129, cip105 } = convertDRep(
+      dRepId,
+      type === "drep" ? false : true
+    );
+
+    await page.goto(`/drep_directory/${dRepId}`);
+    await responsePromise;
+
+    await expect(
+      page.getByTestId("cip-129-drep-id-info-item-description")
+    ).toHaveText(cip129, { timeout: 60_000 });
+    await expect(
+      page.getByTestId("cip-105-drep-id-info-item-description")
+    ).toHaveText(cip105);
   });
 });

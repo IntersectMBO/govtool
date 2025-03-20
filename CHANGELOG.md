@@ -18,8 +18,22 @@ changes.
 
 ### Removed
 
-## [v2.0.17](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.17) 2025-03-18
+## [v2.0.18](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.18) 2025-03-20
 
+
+### Added
+
+- Add redirection to outcomes when proposal is not found [Issue 3230](https://github.com/IntersectMBO/govtool/issues/3230)
+
+### Fixed
+
+- Fix post-vote navigation to governance action list [Issue 3242](https://github.com/IntersectMBO/govtool/issues/3242)
+
+### Changed
+
+### Removed
+
+## [v2.0.17](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.17) 2025-03-18
 
 ### Added
 

@@ -1,4 +1,4 @@
-import { convertDRepToCIP129 } from "@helpers/dRep";
+import { convertDRep } from "@helpers/dRep";
 import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
 import { Locator, Page, expect } from "@playwright/test";
 import { IDRep } from "@types";
@@ -156,8 +156,12 @@ export default class DRepDirectoryPage {
         const cip105DRepListFE = await this.getAllListedCIP105DRepIds();
         const cip129DRepListFE = await this.getAllListedCIP129DRepIds();
 
-        const cip129DRepListApi = dRepList.map((dRep) =>
-          convertDRepToCIP129(dRep.drepId, dRep.isScriptBased)
+        const cip129DRepListApi = dRepList.map(
+          (dRep) => convertDRep(dRep.drepId, dRep.isScriptBased).cip129
+        );
+
+        const cip105DRepListApi = dRepList.map(
+          (dRep) => convertDRep(dRep.drepId, dRep.isScriptBased).cip105
         );
 
         for (let i = 0; i <= cip105DRepListFE.length - 1; i++) {
@@ -165,8 +169,8 @@ export default class DRepDirectoryPage {
             message: `Cip129 dRep Id from Api:${cip129DRepListApi[i]} is not equal to ${await cip129DRepListFE[i].textContent()} on sort ${option}`,
           }).toHaveText(cip129DRepListApi[i]);
           await expect(cip105DRepListFE[i], {
-            message: `Cip105 dRep Id from Api:${dRepList[i].view} is not equal to ${await cip105DRepListFE[i].textContent()}  on sort ${option}`,
-          }).toHaveText(`(CIP-105) ${dRepList[i].view}`);
+            message: `Cip105 dRep Id from Api:${cip105DRepListApi} is not equal to ${await cip105DRepListFE[i].textContent()}  on sort ${option}`,
+          }).toHaveText(`(CIP-105) ${cip105DRepListApi[i]}`);
         }
       },
       { name: `frontend sort validation of ${option}` }

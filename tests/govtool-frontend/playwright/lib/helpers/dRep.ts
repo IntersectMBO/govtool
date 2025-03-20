@@ -88,10 +88,14 @@ export function tohex(drepId: string) {
   ).toString("hex");
 }
 
-export function convertDRepToCIP129(drepId: string, script = false): string {
+export function convertDRep(
+  drepId: string,
+  script = false
+): { cip129: string; cip105: string } {
   const hexPattern = /^[0-9a-fA-F]+$/;
   let cip129DRep: string;
   let cip129DrepHex: string;
+  let cip105DRep: string;
   const prefix = script ? "23" : "22";
   const addPrefix = (hex: string) => {
     if (hex.length === 56) {
@@ -102,8 +106,8 @@ export function convertDRepToCIP129(drepId: string, script = false): string {
       throw new Error("Invalid DRep hex length");
     }
   };
-  const drepIdFromHex = (hex: string) => {
-    return fromHex("drep", hex);
+  const drepIdFromHex = (prefix: string, hex: string) => {
+    return fromHex(prefix, hex);
   };
   if (hexPattern.test(drepId)) {
     cip129DrepHex = addPrefix(drepId);
@@ -115,6 +119,10 @@ export function convertDRepToCIP129(drepId: string, script = false): string {
       throw new Error("Invalid DRep Bech32 format");
     }
   }
-  cip129DRep = drepIdFromHex(cip129DrepHex);
-  return cip129DRep;
+  cip105DRep = drepIdFromHex(
+    cip129DrepHex.slice(0, 2) == "22" ? "drep" : "drep_script",
+    cip129DrepHex.slice(-56)
+  );
+  cip129DRep = drepIdFromHex("drep", cip129DrepHex);
+  return { cip129: cip129DRep, cip105: cip105DRep };
 }

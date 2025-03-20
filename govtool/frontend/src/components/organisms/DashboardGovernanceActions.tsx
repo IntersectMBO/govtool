@@ -10,6 +10,7 @@ import {
 } from "@consts";
 import { useCardano, useDataActionsBar, useFeatureFlag } from "@context";
 import {
+  useGetDRepVotesQuery,
   useGetProposalsQuery,
   useGetVoterInfo,
   useScreenDimension,
@@ -89,6 +90,31 @@ export const DashboardGovernanceActions = () => {
     searchPhrase: debouncedSearchText,
     enabled: !isAdjusting,
   });
+  const { data: votes, areDRepVotesLoading } = useGetDRepVotesQuery(
+    queryFilters,
+    chosenSorting,
+    debouncedSearchText,
+  );
+
+  // TODO: Black magic - that filtering should be done on the backend
+  const filteredProposals = proposals
+    ?.map((proposalCategory) => {
+      const filteredActions = proposalCategory.actions.filter((action) => {
+        const hasVote = votes?.some((voteCategory) =>
+          voteCategory.actions.some(
+            (voteAction) => voteAction.proposal.txHash === action.txHash,
+          ),
+        );
+
+        return !hasVote;
+      });
+
+      return {
+        ...proposalCategory,
+        actions: filteredActions,
+      };
+    })
+    .filter((category) => category.actions.length > 0);
 
   const { state } = useLocation();
   const [content, setContent] = useState<number>(
@@ -189,14 +215,14 @@ export const DashboardGovernanceActions = () => {
                 onDashboard
                 searchPhrase={debouncedSearchText}
                 sorting={chosenSorting}
-                proposals={proposals}
+                proposals={filteredProposals}
               />
             </CustomTabPanel>
             <CustomTabPanel value={content} index={1}>
               <DashboardGovernanceActionsVotedOn
-                filters={chosenFilters}
                 searchPhrase={debouncedSearchText}
-                sorting={chosenSorting}
+                votes={votes}
+                areDRepVotesLoading={areDRepVotesLoading}
               />
             </CustomTabPanel>
           </>

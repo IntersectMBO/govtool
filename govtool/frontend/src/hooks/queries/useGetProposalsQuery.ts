@@ -12,7 +12,7 @@ export const useGetProposalsQuery = ({
   sorting,
   enabled,
 }: GetProposalsArguments) => {
-  const { dRepID, pendingTransaction } = useCardano();
+  const { dRepID } = useCardano();
   const { voter } = useGetVoterInfo();
 
   const fetchProposals = async (): Promise<ProposalData[]> => {
@@ -34,17 +34,12 @@ export const useGetProposalsQuery = ({
   };
 
   const { data, isLoading } = useQuery(
-    [
-      QUERY_KEYS.useGetProposalsKey,
-      filters,
-      searchPhrase,
-      sorting,
-      dRepID,
-      pendingTransaction.vote?.transactionHash,
-    ],
+    [QUERY_KEYS.useGetProposalsKey, filters, searchPhrase, sorting, dRepID],
     fetchProposals,
     {
       enabled,
+      refetchOnWindowFocus: true,
+      keepPreviousData: true,
     },
   );
 

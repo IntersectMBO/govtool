@@ -283,18 +283,20 @@ getVotes (unHexText -> dRepId) selectedTypes sortMode mSearch = do
   CacheEnv {dRepGetVotesCache} <- asks vvaCache
   (votes, proposals) <- cacheRequest dRepGetVotesCache dRepId $ DRep.getVotes dRepId []
   
-  let voteMap = Map.fromList $ map (\vote@Types.Vote {..} -> (voteProposalId, vote)) votes
-
-  processedProposals <- filter (isProposalSearchedFor mSearch) <$> mapSortAndFilterProposals selectedTypes sortMode proposals
-
+  let voteMapByTxHash = Map.fromList $ 
+        map (\vote -> (pack $ Prelude.takeWhile (/= '#') (unpack $ Types.voteGovActionId vote), vote)) votes
+  
+  processedProposals <- filter (isProposalSearchedFor mSearch) <$> 
+                        mapSortAndFilterProposals selectedTypes sortMode proposals
+  
   return $
     [ VoteResponse
       { voteResponseVote = voteToResponse vote
       , voteResponseProposal = proposalResponse
       }
-    | proposalResponse@ProposalResponse{proposalResponseId} <- processedProposals
-    , let proposalIdInt = read (unpack proposalResponseId) :: Int
-    , Just vote <- [Map.lookup (toInteger proposalIdInt) voteMap]
+    | proposalResponse <- processedProposals
+    , let txHash = unHexText (proposalResponseTxHash proposalResponse)
+    , Just vote <- [Map.lookup txHash voteMapByTxHash]
     ]
 
 drepInfo :: App m => HexText -> m DRepInfoResponse

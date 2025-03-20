@@ -2,38 +2,34 @@ import { useMemo } from "react";
 import { Box, Typography, CircularProgress } from "@mui/material";
 
 import { useCardano } from "@context";
-import {
-  useGetDRepVotesQuery,
-  useScreenDimension,
-  useTranslation,
-} from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { GovernanceVotedOnCard } from "@molecules";
 import { Slider } from "@organisms";
 import { getFullGovActionId, getProposalTypeLabel } from "@utils";
+import { VotedProposal } from "@/models";
 
 type DashboardGovernanceActionsVotedOnProps = {
-  filters: string[];
   searchPhrase?: string;
-  sorting: string;
+  votes: {
+    title: string;
+    actions: VotedProposal[];
+  }[];
+  areDRepVotesLoading: boolean;
 };
 
 export const DashboardGovernanceActionsVotedOn = ({
-  filters,
   searchPhrase,
-  sorting,
+  votes,
+  areDRepVotesLoading,
 }: DashboardGovernanceActionsVotedOnProps) => {
-  const { data, areDRepVotesLoading } = useGetDRepVotesQuery(
-    filters,
-    sorting,
-    searchPhrase,
-  );
   const { isMobile } = useScreenDimension();
   const { pendingTransaction } = useCardano();
   const { t } = useTranslation();
 
+  // TODO: Filtering here is some kind of craziness. It should be done on the backend.
   const filteredData = useMemo(() => {
-    if (data.length && searchPhrase) {
-      return data
+    if (votes.length && searchPhrase) {
+      return votes
         .map((entry) => ({
           ...entry,
           actions: entry.actions.filter((action) =>
@@ -44,8 +40,8 @@ export const DashboardGovernanceActionsVotedOn = ({
         }))
         .filter((entry) => entry.actions?.length > 0);
     }
-    return data;
-  }, [data, searchPhrase, pendingTransaction.vote]);
+    return votes;
+  }, [votes, searchPhrase, pendingTransaction.vote]);
 
   return areDRepVotesLoading ? (
     <Box py={4} display="flex" justifyContent="center">
@@ -53,7 +49,7 @@ export const DashboardGovernanceActionsVotedOn = ({
     </Box>
   ) : (
     <>
-      {!data.length ? (
+      {!votes.length ? (
         <Typography py={4} fontWeight="300">
           {t("govActions.youHaventVotedYet")}
         </Typography>

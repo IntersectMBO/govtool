@@ -28,6 +28,8 @@ type ProposalDiscussionProps = {
 
 type GovernanceActionsOutcomesProps = {
   apiUrl?: string;
+  ipfsGateway?: string;
+  walletAPI?: any;
 };
 
 declare module "@intersect.mbo/pdf-ui/cjs" {

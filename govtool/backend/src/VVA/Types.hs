@@ -96,6 +96,14 @@ data DRepInfo
       , dRepInfoImageHash                :: Maybe Text
       }
 
+data DRepVotingPowerList
+  = DRepVotingPowerList
+      { drepView        :: Text
+      , drepHashRaw     :: Text
+      , drepVotingPower :: Integer
+      }
+  deriving (Show, Eq)
+
 data DRepStatus = Active | Inactive | Retired deriving (Show, Eq, Ord)
 
 data DRepType = DRep | SoleVoter deriving (Show, Eq)
@@ -216,6 +224,7 @@ data CacheEnv
       , networkMetricsCache                 :: Cache.Cache () NetworkMetrics
       , networkInfoCache                    :: Cache.Cache () NetworkInfo
       , networkTotalStakeCache              :: Cache.Cache () NetworkTotalStake
+      , dRepVotingPowerListCache            :: Cache.Cache Text [DRepVotingPowerList]
       }
 
 data NetworkInfo

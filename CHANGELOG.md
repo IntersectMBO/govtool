@@ -12,6 +12,8 @@ changes.
 
 ### Added
 
+- Add drep voting power list endpoint [Issue 3263](https://github.com/IntersectMBO/govtool/issues/3263)
+
 ### Fixed
 
 ### Changed
@@ -19,7 +21,6 @@ changes.
 ### Removed
 
 ## [v2.0.18](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.18) 2025-03-20
-
 
 ### Added
 

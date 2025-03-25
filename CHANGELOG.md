@@ -18,6 +18,8 @@ changes.
 
 ### Changed
 
+- Bump CSL to v14 [Issue 3037](https://github.com/IntersectMBO/govtool/issues/3037)
+
 ### Removed
 
 ## [v2.0.18](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.18) 2025-03-20

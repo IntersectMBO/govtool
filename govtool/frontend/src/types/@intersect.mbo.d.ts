@@ -29,6 +29,7 @@ type ProposalDiscussionProps = {
 type GovernanceActionsOutcomesProps = {
   apiUrl?: string;
   ipfsGateway?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   walletAPI?: any;
 };
 

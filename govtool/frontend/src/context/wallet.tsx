@@ -540,6 +540,7 @@ const CardanoProvider = (props: Props) => {
           .max_value_size(epochParams.max_val_size)
           .max_tx_size(epochParams.max_tx_size)
           .prefer_pure_change(true)
+          .do_not_burn_extra_change(true)
           .ex_unit_prices(
             ExUnitPrices.new(
               UnitInterval.new(

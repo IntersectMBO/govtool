@@ -627,6 +627,7 @@ data DRepVotingPowerListResponse
       { drepVotingPowerListResponseView        :: Text
       , drepVotingPowerListResponseHashRaw     :: HexText
       , drepVotingPowerListResponseVotingPower :: Integer
+      , drepVotingPowerListResponseGivenName   :: Maybe Text
       }
   deriving (Generic, Show)
 
@@ -636,7 +637,8 @@ exampleDRepVotingPowerListResponse :: Text
 exampleDRepVotingPowerListResponse =
     "{\"view\": \"drep1qq5n7k0r0ff6lf4qvndw9t7vmdqa9y3q9qtjq879rrk9vcjcdy8a4xf92mqsajf9u3nrsh3r6zrp29kuydmfq45fz88qpzmjkc\","
   <> "\"hashRaw\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
-  <> "\"votingPower\": 1000000}"
+  <> "\"votingPower\": 1000000,"
+  <> "\"givenName\": \"John Doe\"}"
 
 instance ToSchema DRepVotingPowerListResponse where
   declareNamedSchema proxy = do

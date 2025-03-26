@@ -5,7 +5,7 @@ import { useCardano, useGovernanceActions } from "@/context";
 import { useValidateMutation } from "@/hooks/mutations";
 import { useScreenDimension } from "@/hooks/useScreenDimension";
 import { Footer, TopNav } from "@/components/organisms";
-import { useGetVoterInfo } from "@/hooks";
+import { useGetDRepVotingPowerList, useGetVoterInfo } from "@/hooks";
 
 const ProposalDiscussion = React.lazy(
   () => import("@intersect.mbo/pdf-ui/cjs"),
@@ -17,6 +17,7 @@ export const ProposalDiscussionPillar = () => {
   const { walletApi, ...context } = useCardano();
   const { voter } = useGetVoterInfo();
   const { createGovernanceActionJsonLD, createHash } = useGovernanceActions();
+  const { fetchDRepVotingPowerList } = useGetDRepVotingPowerList();
 
   return (
     <Box
@@ -65,6 +66,7 @@ export const ProposalDiscussionPillar = () => {
                 typeof ProposalDiscussion
               >["validateMetadata"]
             }
+            fetchDRepVotingPowerList={fetchDRepVotingPowerList}
           />
         </Suspense>
       </Box>

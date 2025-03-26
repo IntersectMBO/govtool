@@ -346,6 +346,7 @@ drepVotingPowerList identifiers = do
         { drepVotingPowerListResponseView = drepView
         , drepVotingPowerListResponseHashRaw = HexText drepHashRaw
         , drepVotingPowerListResponseVotingPower = drepVotingPower
+        , drepVotingPowerListResponseGivenName = drepGivenName
         }
 
 getCurrentDelegation :: App m => HexText -> m (Maybe DelegationResponse)

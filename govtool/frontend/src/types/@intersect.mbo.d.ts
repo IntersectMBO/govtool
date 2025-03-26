@@ -24,6 +24,9 @@ type ProposalDiscussionProps = {
     | { status?: MetadataValidationStatus; metadata?: any; valid: boolean }
     | undefined
   >;
+  fetchDRepVotingPowerList: (
+    identifiers: string[],
+  ) => Promise<DRepVotingPowerListResponse>;
 };
 
 type GovernanceActionsOutcomesProps = {

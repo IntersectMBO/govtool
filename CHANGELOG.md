@@ -18,7 +18,7 @@ changes.
 
 ### Removed
 
-## [v2.0.18](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.18) 2025-03-25
+## [v2.0.18](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.18) 2025-03-26
 
 ### Added
 

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   useNavigate,
   useLocation,
@@ -5,8 +6,9 @@ import {
   generatePath,
 } from "react-router-dom";
 import { Box, CircularProgress, Link, Typography } from "@mui/material";
+import { AxiosError } from "axios";
 
-import { ICONS, PATHS } from "@consts";
+import { ICONS, OUTCOMES_PATHS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
   useGetProposalQuery,
@@ -42,12 +44,23 @@ export const DashboardGovernanceActionDetails = () => {
   const shortenedGovActionId =
     txHash && getShortenedGovActionId(txHash, +index);
 
-  const { data, isLoading } = useGetProposalQuery(
+  const { data, isLoading, error } = useGetProposalQuery(
     fullProposalId ?? "",
     !state?.proposal || !state?.vote,
   );
   const proposal = (data ?? state)?.proposal;
   const vote = (data ?? state)?.vote;
+
+  useEffect(() => {
+    const isProposalNotFound =
+      (error as AxiosError)?.response?.data ===
+      `Proposal with id: ${fullProposalId} not found`;
+    if (isProposalNotFound && fullProposalId) {
+      navigate(
+        OUTCOMES_PATHS.governanceActionOutcomes.replace(":id", fullProposalId),
+      );
+    }
+  }, [error]);
 
   return (
     <Box

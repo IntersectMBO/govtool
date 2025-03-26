@@ -61,14 +61,15 @@ instance Exception AppError
 
 data Vote
   = Vote
-      { voteProposalId :: Integer
-      , voteDrepId     :: Text
-      , voteVote       :: Text
-      , voteUrl        :: Maybe Text
-      , voteDocHash    :: Maybe Text
-      , voteEpochNo    :: Integer
-      , voteDate       :: UTCTime
-      , voteTxHash     :: Text
+      { voteProposalId  :: Integer
+      , voteGovActionId :: Text
+      , voteDrepId      :: Text
+      , voteVote        :: Text
+      , voteUrl         :: Maybe Text
+      , voteDocHash     :: Maybe Text
+      , voteEpochNo     :: Integer
+      , voteDate        :: UTCTime
+      , voteTxHash      :: Text
       }
 
 data DRepInfo
@@ -94,6 +95,15 @@ data DRepInfo
       , dRepInfoImageUrl                 :: Maybe Text
       , dRepInfoImageHash                :: Maybe Text
       }
+
+data DRepVotingPowerList
+  = DRepVotingPowerList
+      { drepView        :: Text
+      , drepHashRaw     :: Text
+      , drepVotingPower :: Integer
+      , drepGivenName   :: Maybe Text
+      }
+  deriving (Show, Eq)
 
 data DRepStatus = Active | Inactive | Retired deriving (Show, Eq, Ord)
 
@@ -215,6 +225,7 @@ data CacheEnv
       , networkMetricsCache                 :: Cache.Cache () NetworkMetrics
       , networkInfoCache                    :: Cache.Cache () NetworkInfo
       , networkTotalStakeCache              :: Cache.Cache () NetworkTotalStake
+      , dRepVotingPowerListCache            :: Cache.Cache Text [DRepVotingPowerList]
       }
 
 data NetworkInfo

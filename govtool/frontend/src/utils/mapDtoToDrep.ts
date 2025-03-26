@@ -32,6 +32,8 @@ export const mapDtoToDrep = async (dto: DrepDataDTO): Promise<DRepData> => {
   let base64Image = null;
   const isIPFSImage = dto.imageUrl?.startsWith("ipfs://") || false;
   if (dto.imageUrl) {
+    // eslint-disable-next-line no-console
+    console.debug("Fetching image", dto.imageUrl);
     fetch(
       isIPFSImage
         ? `${import.meta.env.VITE_IPFS_GATEWAY}/${dto.imageUrl?.slice(7)}`

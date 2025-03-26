@@ -13,6 +13,7 @@ export const QUERY_KEYS = {
   useGetProposalsInfiniteKey: "useGetProposalsInfiniteKey",
   useGetProposalsKey: "useGetProposalsKey",
   useGetVoteContextFromFile: "useGetVoteContextFromFile",
+  useGetDRepVotingPowerListKey: "useGetDRepVotingPowerListKey",
 };
 
 export const MUTATION_KEYS = {

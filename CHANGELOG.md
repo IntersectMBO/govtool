@@ -18,8 +18,26 @@ changes.
 
 ### Removed
 
-## [v2.0.17](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.17) 2025-03-18
+## [v2.0.18](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.18) 2025-03-26
 
+### Added
+
+- Add redirection to outcomes when proposal is not found [Issue 3230](https://github.com/IntersectMBO/govtool/issues/3230)
+- Add DRep voting power list endpoint [Issue 3263](https://github.com/IntersectMBO/govtool/issues/3263)
+- Add DRep given name to the voting power list endpoint [Issue 3273](https://github.com/IntersectMBO/govtool/issues/3273)
+- Add DRep voting power list query to PDF Pillar [Issue 3277](https://github.com/IntersectMBO/govtool/issues/3277)
+
+### Fixed
+
+- Fix post-vote navigation to governance action list [Issue 3242](https://github.com/IntersectMBO/govtool/issues/3242)
+
+### Changed
+
+- Bump CSL to v14 [Issue 3037](https://github.com/IntersectMBO/govtool/issues/3037)
+
+### Removed
+
+## [v2.0.17](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.17) 2025-03-18
 
 ### Added
 

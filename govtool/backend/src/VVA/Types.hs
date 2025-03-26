@@ -101,6 +101,7 @@ data DRepVotingPowerList
       { drepView        :: Text
       , drepHashRaw     :: Text
       , drepVotingPower :: Integer
+      , drepGivenName   :: Maybe Text
       }
   deriving (Show, Eq)
 

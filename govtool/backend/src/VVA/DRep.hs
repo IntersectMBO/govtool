@@ -222,7 +222,7 @@ getDRepsVotingPowerList identifiers = withPool $ \conn -> do
       return $ concat resultsPerIdentifier
   
   return
-    [ DRepVotingPowerList view hashRaw votingPower
-    | (view, hashRaw, votingPower') <- results
+    [ DRepVotingPowerList view hashRaw votingPower givenName
+    | (view, hashRaw, votingPower', givenName) <- results
     , let votingPower = floor @Scientific votingPower'
     ]

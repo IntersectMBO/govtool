@@ -265,3 +265,12 @@ export type Infinite<T> = {
   pageSize: number;
   total: number;
 };
+
+type DRepVotingPower = {
+  view: string;
+  hashRaw: string;
+  votingPower: number;
+  givenName: string | null;
+};
+
+export type DRepVotingPowerListResponse = DRepVotingPower[];

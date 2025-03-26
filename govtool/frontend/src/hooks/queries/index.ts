@@ -13,3 +13,4 @@ export * from "./useGetProposalsInfiniteQuery";
 export * from "./useGetProposalsQuery";
 export * from "./useGetVoteContextTextFromFile";
 export * from "./useGetVoterInfoQuery";
+export * from "./useGetDRepVotingPowerList";

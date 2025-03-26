@@ -162,7 +162,7 @@ jobs:
 
   publish-status:
     runs-on: ubuntu-latest
-    if: always()
+    if: always() && needs.backend-tests.result != 'skipped'
     needs: [backend-tests, publish-report]
     steps:
       - uses: actions/checkout@v4

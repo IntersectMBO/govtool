@@ -202,7 +202,7 @@ jobs:
 
   publish-status:
     runs-on: ubuntu-latest
-    if: always()
+    if: always() && needs.integration-tests.result != 'skipped'
     needs: [integration-tests, publish-report]
     steps:
       - uses: actions/checkout@v4

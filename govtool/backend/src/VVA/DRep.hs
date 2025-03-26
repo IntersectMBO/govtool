@@ -6,31 +6,33 @@
 
 module VVA.DRep where
 
-import           Control.Monad.Except       (MonadError)
+import           Control.Monad.Except               (MonadError)
 import           Control.Monad.Reader
 
 import           Crypto.Hash
 
-import           Data.ByteString            (ByteString)
-import qualified Data.ByteString.Base16     as Base16
-import qualified Data.ByteString.Char8      as C
-import           Data.FileEmbed             (embedFile)
-import           Data.Foldable              (Foldable (sum))
-import           Data.Has                   (Has)
-import qualified Data.Map                   as M
-import           Data.Maybe                 (fromMaybe, isJust, isNothing)
+import           Data.ByteString                    (ByteString)
+import qualified Data.ByteString.Base16             as Base16
+import qualified Data.ByteString.Char8              as C
+import           Data.FileEmbed                     (embedFile)
+import           Data.Foldable                      (Foldable (sum))
+import           Data.Has                           (Has)
+import qualified Data.Map                           as M
+import           Data.Maybe                         (fromMaybe, isJust, isNothing)
 import           Data.Scientific
-import           Data.String                (fromString)
-import           Data.Text                  (Text, pack, unpack)
-import qualified Data.Text.Encoding         as Text
+import           Data.String                        (fromString)
+import           Data.Text                          (Text, pack, unpack, intercalate)
+import qualified Data.Text.Encoding                 as Text
 import           Data.Time
 
-import qualified Database.PostgreSQL.Simple as SQL
+import qualified Database.PostgreSQL.Simple         as SQL
+import           Database.PostgreSQL.Simple.Types   (In(..))
+
 import           VVA.Config
-import           VVA.Pool                   (ConnectionPool, withPool)
-import qualified VVA.Proposal               as Proposal
-import           VVA.Types                  (AppError, DRepInfo (..), DRepRegistration (..), DRepStatus (..),
-                                             DRepType (..), Proposal (..), Vote (..))
+import           VVA.Pool                           (ConnectionPool, withPool)
+import qualified VVA.Proposal                       as Proposal
+import           VVA.Types                          (AppError, DRepInfo (..), DRepRegistration (..), DRepStatus (..),
+                                                     DRepType (..), Proposal (..), Vote (..), DRepVotingPowerList (..))
 
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
@@ -115,16 +117,14 @@ getVotes ::
   m ([Vote], [Proposal])
 getVotes drepId selectedProposals = withPool $ \conn -> do
   results <- liftIO $ SQL.query conn getVotesSql (SQL.Only drepId)
-  
+
   if null results
     then return ([], [])
     else do
       let proposalsToSelect = if null selectedProposals
                               then [ govActionId | (_, govActionId, _, _, _, _, _, _, _) <- results]
                               else selectedProposals
-      
       allProposals <- mapM (Proposal.getProposals . Just . (:[])) proposalsToSelect
-      
       let proposals = concat allProposals
 
       let proposalMap = M.fromList $ map (\x -> (proposalId x, x)) proposals
@@ -132,7 +132,7 @@ getVotes drepId selectedProposals = withPool $ \conn -> do
       timeZone <- liftIO getCurrentTimeZone
 
       let votes = 
-            [ Vote proposalId' drepId' vote' url' docHash' epochNo' (localTimeToUTC timeZone date') voteTxHash'
+            [ Vote proposalId' govActionId' drepId' vote' url' docHash' epochNo' (localTimeToUTC timeZone date') voteTxHash'
             | (proposalId', govActionId', drepId', vote', url', docHash', epochNo', date', voteTxHash') <- results
             , govActionId' `elem` proposalsToSelect
             ]
@@ -200,3 +200,29 @@ getDRepInfo drepId = withPool $ \conn -> do
         }
     [] -> return $ DRepInfo False False False False False Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
     _ -> error "Unexpected result from database query in getDRepInfo"
+
+getAllDRepsVotingPowerSql :: SQL.Query
+getAllDRepsVotingPowerSql = sqlFrom $(embedFile "sql/get-dreps-voting-power-list.sql")
+
+getFilteredDRepVotingPowerSql :: SQL.Query
+getFilteredDRepVotingPowerSql = sqlFrom $(embedFile "sql/get-filtered-dreps-voting-power.sql")
+
+getDRepsVotingPowerList ::
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m) =>
+  [Text] ->
+  m [DRepVotingPowerList]
+getDRepsVotingPowerList identifiers = withPool $ \conn -> do
+  results <- if null identifiers
+    then do
+      liftIO $ SQL.query_ conn getAllDRepsVotingPowerSql
+    else do
+      resultsPerIdentifier <- forM identifiers $ \identifier -> do
+        liftIO $ SQL.query conn getFilteredDRepVotingPowerSql (identifier, identifier)
+      
+      return $ concat resultsPerIdentifier
+  
+  return
+    [ DRepVotingPowerList view hashRaw votingPower givenName
+    | (view, hashRaw, votingPower', givenName) <- results
+    , let votingPower = floor @Scientific votingPower'
+    ]

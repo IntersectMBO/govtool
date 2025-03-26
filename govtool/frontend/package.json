@@ -1,7 +1,7 @@
 {
   "name": "@govtool/frontend",
   "private": true,
-  "version": "2.0.17",
+  "version": "2.0.18",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -25,9 +25,9 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@emurgo/cardano-serialization-lib-asmjs": "^12.1.1",
+    "@emurgo/cardano-serialization-lib-asmjs": "^14.1.1",
     "@hookform/resolvers": "^3.3.1",
-    "@intersect.mbo/govtool-outcomes-pillar-ui": "1.2.5",
+    "@intersect.mbo/govtool-outcomes-pillar-ui": "1.3.0",
     "@intersect.mbo/intersectmbo.org-icons-set": "^1.0.8",
     "@intersect.mbo/pdf-ui": "0.6.4",
     "@mui/icons-material": "^5.14.3",

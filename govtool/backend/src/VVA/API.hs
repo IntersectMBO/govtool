@@ -15,7 +15,7 @@ import           Control.Monad.Reader
 
 import           Data.Aeson               (Value(..), Array, decode, encode, ToJSON, toJSON)
 import           Data.Bool                (Bool)
-import           Data.List                (sortOn)
+import           Data.List                (sortOn, sort)
 import qualified Data.Map                 as Map
 import           Data.Maybe               (Maybe (Nothing), catMaybes, fromMaybe, mapMaybe)
 import           Data.Ord                 (Down (..))
@@ -64,6 +64,9 @@ type VVAApi =
                 :> QueryParam "search" Text
                 :> Get '[JSON] [VoteResponse]
     :<|> "drep" :> "info" :> Capture "drepId" HexText :> Get '[JSON] DRepInfoResponse
+    :<|> "drep" :> "voting-power-list"
+                :> QueryParams "identifiers" Text
+                :> Get '[JSON] [DRepVotingPowerListResponse]
     :<|> "ada-holder" :> "get-current-delegation" :> Capture "stakeKey" HexText :> Get '[JSON] (Maybe DelegationResponse)
     :<|> "ada-holder" :> "get-voting-power" :> Capture "stakeKey" HexText :> Get '[JSON] Integer
     :<|> "proposal" :> "list"
@@ -87,6 +90,7 @@ server = drepList
     :<|> getVotingPower
     :<|> getVotes
     :<|> drepInfo
+    :<|> drepVotingPowerList
     :<|> getCurrentDelegation
     :<|> getStakeKeyVotingPower
     :<|> listProposals
@@ -283,18 +287,20 @@ getVotes (unHexText -> dRepId) selectedTypes sortMode mSearch = do
   CacheEnv {dRepGetVotesCache} <- asks vvaCache
   (votes, proposals) <- cacheRequest dRepGetVotesCache dRepId $ DRep.getVotes dRepId []
   
-  let voteMap = Map.fromList $ map (\vote@Types.Vote {..} -> (voteProposalId, vote)) votes
-
-  processedProposals <- filter (isProposalSearchedFor mSearch) <$> mapSortAndFilterProposals selectedTypes sortMode proposals
-
+  let voteMapByTxHash = Map.fromList $ 
+        map (\vote -> (pack $ Prelude.takeWhile (/= '#') (unpack $ Types.voteGovActionId vote), vote)) votes
+  
+  processedProposals <- filter (isProposalSearchedFor mSearch) <$> 
+                        mapSortAndFilterProposals selectedTypes sortMode proposals
+  
   return $
     [ VoteResponse
       { voteResponseVote = voteToResponse vote
       , voteResponseProposal = proposalResponse
       }
-    | proposalResponse@ProposalResponse{proposalResponseId} <- processedProposals
-    , let proposalIdInt = read (unpack proposalResponseId) :: Int
-    , Just vote <- [Map.lookup (toInteger proposalIdInt) voteMap]
+    | proposalResponse <- processedProposals
+    , let txHash = unHexText (proposalResponseTxHash proposalResponse)
+    , Just vote <- [Map.lookup txHash voteMapByTxHash]
     ]
 
 drepInfo :: App m => HexText -> m DRepInfoResponse
@@ -323,6 +329,25 @@ drepInfo (unHexText -> dRepId) = do
     , dRepInfoResponseImageUrl = dRepInfoImageUrl
     , dRepInfoResponseImageHash = HexText <$> dRepInfoImageHash
     }
+
+drepVotingPowerList :: App m => [Text] -> m [DRepVotingPowerListResponse]
+drepVotingPowerList identifiers = do
+  CacheEnv {dRepVotingPowerListCache} <- asks vvaCache
+  
+  let cacheKey = Text.intercalate "," (sort identifiers)
+  
+  results <- cacheRequest dRepVotingPowerListCache cacheKey $ 
+    DRep.getDRepsVotingPowerList identifiers
+  
+  return $ map toDRepVotingPowerListResponse results
+  where
+    toDRepVotingPowerListResponse Types.DRepVotingPowerList{..} = 
+      DRepVotingPowerListResponse
+        { drepVotingPowerListResponseView = drepView
+        , drepVotingPowerListResponseHashRaw = HexText drepHashRaw
+        , drepVotingPowerListResponseVotingPower = drepVotingPower
+        , drepVotingPowerListResponseGivenName = drepGivenName
+        }
 
 getCurrentDelegation :: App m => HexText -> m (Maybe DelegationResponse)
 getCurrentDelegation (unHexText -> stakeKey) = do

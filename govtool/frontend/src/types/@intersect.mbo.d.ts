@@ -24,10 +24,16 @@ type ProposalDiscussionProps = {
     | { status?: MetadataValidationStatus; metadata?: any; valid: boolean }
     | undefined
   >;
+  fetchDRepVotingPowerList: (
+    identifiers: string[],
+  ) => Promise<DRepVotingPowerListResponse>;
 };
 
 type GovernanceActionsOutcomesProps = {
   apiUrl?: string;
+  ipfsGateway?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  walletAPI?: any;
 };
 
 declare module "@intersect.mbo/pdf-ui/cjs" {

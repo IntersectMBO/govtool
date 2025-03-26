@@ -124,6 +124,7 @@ startApp vvaConfig sentryService = do
     networkMetricsCache <- newCache
     networkInfoCache <- newCache
     networkTotalStakeCache <- newCache
+    dRepVotingPowerListCache <- newCache
     return $ CacheEnv
       { proposalListCache
       , getProposalCache
@@ -137,6 +138,7 @@ startApp vvaConfig sentryService = do
       , networkMetricsCache
       , networkInfoCache
       , networkTotalStakeCache
+      , dRepVotingPowerListCache
       }
 
   let connectionString = encodeUtf8 (dbSyncConnectionString $ getter vvaConfig)

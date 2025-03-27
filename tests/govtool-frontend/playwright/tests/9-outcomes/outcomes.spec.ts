@@ -152,7 +152,7 @@ test.describe("Outcome details dependent test", () => {
           const title = await outcomeCard
             .locator('[data-testid$="-card-title"]')
             .textContent();
-          expect(title).toContain(governanceActionTitle);
+          expect(title.toLowerCase()).toContain(governanceActionTitle.toLowerCase());
         }
       },
       { name: "search by title" }

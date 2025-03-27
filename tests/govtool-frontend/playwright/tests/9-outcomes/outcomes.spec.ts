@@ -152,7 +152,9 @@ test.describe("Outcome details dependent test", () => {
           const title = await outcomeCard
             .locator('[data-testid$="-card-title"]')
             .textContent();
-          expect(title.toLowerCase()).toContain(governanceActionTitle.toLowerCase());
+          expect(title.toLowerCase()).toContain(
+            governanceActionTitle.toLowerCase()
+          );
         }
       },
       { name: "search by title" }
@@ -434,10 +436,8 @@ test.describe("Invalid Outcome Metadata", () => {
       await outcomePage.goto();
       await outcomePage.viewFirstOutcomes();
 
-      await expect(page.getByRole("heading", { name: type })).toBeVisible({
-        timeout: 60_000,
-      });
-      await expect(page.getByText("Learn more")).toBeVisible();
+      await expect(outcomePage.title).toHaveText(type, { timeout: 60_000 });
+      await expect(outcomePage.metadataErrorLearnMoreBtn).toBeVisible();
     });
   });
 });

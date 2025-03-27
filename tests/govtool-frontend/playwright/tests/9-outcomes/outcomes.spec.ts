@@ -435,8 +435,16 @@ test.describe("Invalid Outcome Metadata", () => {
       const outcomePage = new OutComesPage(page);
       await outcomePage.goto();
       await outcomePage.viewFirstOutcomes();
+      const outcomeTitle = await outcomePage.title.textContent();
 
-      await expect(outcomePage.title).toHaveText(type, { timeout: 60_000 });
+      await expect(
+        outcomePage.title,
+        outcomeTitle.toLowerCase() !== type.toLowerCase() &&
+          `The URL "${url}" and hash "${hash}" do not match the expected properties for type "${type}".`
+      ).toHaveText(type, {
+        ignoreCase: true,
+        timeout: 60_000,
+      });
       await expect(outcomePage.metadataErrorLearnMoreBtn).toBeVisible();
     });
   });

@@ -36,6 +36,12 @@
       "enacted_epoch": null,
       "dropped_epoch": 857,
       "expired_epoch": 856
+    },
+    "status_times": {
+      "ratified_time": null,
+      "enacted_time": null,
+      "dropped_time": "2025-03-25T23:59:10",
+      "expired_time": "2025-03-24T23:58:49"
     }
   }
 ]

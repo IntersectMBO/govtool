@@ -324,9 +324,15 @@ test.describe("Invalid Live voting Metadata", () => {
       await governanceActionPage.goto();
       await governanceActionPage.viewFirstProposal();
 
-      await expect(page.getByRole("heading", { name: type })).toBeVisible({
-        timeout: 60_000,
-      });
+      const governanceActionTitle = await page
+        .getByTestId("governance-action-details-card-header")
+        .textContent();
+
+      await expect(
+        page.getByTestId("governance-action-details-card-header"),
+        governanceActionTitle.toLowerCase() !== type.toLowerCase() &&
+          `The URL "${url}" and hash "${hash}" do not match the expected properties for type "${type}".`
+      ).toHaveText(type, { timeout: 60_000, ignoreCase: true });
       await expect(page.getByText("Learn more")).toBeVisible();
       await expect(page.getByTestId("external-modal-button")).toBeVisible();
     });

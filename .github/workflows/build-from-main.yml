@@ -243,7 +243,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: ${{ runner.os }}-buildx-${{ github.sha }}-${{ github.run_number}}
           restore-keys: |
             ${{ runner.os }}-buildx-
 

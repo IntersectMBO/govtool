@@ -26,6 +26,12 @@ export const NAV_ITEMS = [
     label: i18n.t("dRepDirectory.title"),
   },
   {
+    dataTestId: "budget-discussion-link",
+    navTo: BUDGET_DISCUSSION_PATHS.budgetDiscussion,
+    label: i18n.t("budgetDiscussion.title"),
+    newTabLink: null,
+  },
+  {
     dataTestId: "proposed-governance-actions-link",
     navTo: PDF_PATHS.proposalDiscussion,
     label: i18n.t("proposalDiscussion.title"),

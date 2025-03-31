@@ -2,7 +2,13 @@ import { useCallback, useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 
 import { Modal, ScrollToTop } from "@atoms";
-import { PATHS, PDF_PATHS, OUTCOMES_PATHS, USER_PATHS } from "@consts";
+import {
+  PATHS,
+  PDF_PATHS,
+  OUTCOMES_PATHS,
+  USER_PATHS,
+  BUDGET_DISCUSSION_PATHS,
+} from "@consts";
 import { useCardano, useFeatureFlag, useModal } from "@context";
 import { useWalletConnectionListener } from "@hooks";
 import {
@@ -102,10 +108,16 @@ export default () => {
           element={<GovernanceActionDetails />}
         />
         {isProposalDiscussionForumEnabled && !isEnabled && (
-          <Route
-            path={`${PDF_PATHS.proposalDiscussion}/*`}
-            element={<ProposalDiscussionPillar />}
-          />
+          <>
+            <Route
+              path={`${PDF_PATHS.proposalDiscussion}/*`}
+              element={<ProposalDiscussionPillar />}
+            />
+            <Route
+              path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
+              element={<ProposalDiscussionPillar />}
+            />
+          </>
         )}
         {isGovernanceOutcomesPillarEnabled && !isEnabled && (
           <>
@@ -122,10 +134,16 @@ export default () => {
         <Route element={<Dashboard />}>
           <Route path={PATHS.dashboard} element={<DashboardHome />} />
           {isProposalDiscussionForumEnabled && (
-            <Route
-              path={`${PDF_PATHS.proposalDiscussion}/*`}
-              element={<ProposalDiscussionPillar />}
-            />
+            <>
+              <Route
+                path={`${PDF_PATHS.proposalDiscussion}/*`}
+                element={<ProposalDiscussionPillar />}
+              />
+              <Route
+                path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
+                element={<ProposalDiscussionPillar />}
+              />
+            </>
           )}
           {isGovernanceOutcomesPillarEnabled && (
             <>

@@ -18,6 +18,21 @@ changes.
 
 ### Removed
 
+## [v2.0.19](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.19) 2025-03-31
+
+
+### Added
+
+- Add budget discussion paths in the wrapper
+
+### Fixed
+
+- Fix missing redirect to outcomes on wallet disconnected state [Issue 3230](https://github.com/IntersectMBO/govtool/issues/3230)
+
+### Changed
+
+### Removed
+
 ## [v2.0.18](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.18) 2025-03-26
 
 ### Added

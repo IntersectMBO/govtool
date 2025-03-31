@@ -6,9 +6,10 @@ import {
   generatePath,
 } from "react-router-dom";
 import { Box, CircularProgress, Link } from "@mui/material";
+import { AxiosError } from "axios";
 
 import { Background, Typography } from "@atoms";
-import { ICONS, PATHS } from "@consts";
+import { ICONS, OUTCOMES_PATHS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
   useGetProposalQuery,
@@ -45,18 +46,28 @@ export const GovernanceActionDetails = () => {
   const fullProposalId = txHash && getFullGovActionId(txHash, index);
   const shortenedGovActionId = txHash && getShortenedGovActionId(txHash, index);
 
-  const { data, isLoading } = useGetProposalQuery(
+  const { data, isLoading, error } = useGetProposalQuery(
     fullProposalId ?? "",
     !state?.proposal,
   );
   const proposal = (data ?? state)?.proposal;
 
   useEffect(() => {
-    if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
+    const isProposalNotFound =
+      (error as AxiosError)?.response?.data ===
+      `Proposal with id: ${fullProposalId} not found`;
+    if (isProposalNotFound && fullProposalId) {
+      navigate(
+        OUTCOMES_PATHS.governanceActionOutcomes.replace(":id", fullProposalId),
+      );
+    } else if (
+      isEnabled &&
+      getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)
+    ) {
       const { pathname } = window.location;
       navigate(`/connected${pathname}`);
     }
-  }, [isEnabled]);
+  }, [isEnabled, error]);
 
   return (
     <Background opacity={0.7}>

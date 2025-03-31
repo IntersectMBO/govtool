@@ -152,7 +152,9 @@ test.describe("Outcome details dependent test", () => {
           const title = await outcomeCard
             .locator('[data-testid$="-card-title"]')
             .textContent();
-          expect(title).toContain(governanceActionTitle);
+          expect(title.toLowerCase()).toContain(
+            governanceActionTitle.toLowerCase()
+          );
         }
       },
       { name: "search by title" }
@@ -433,11 +435,17 @@ test.describe("Invalid Outcome Metadata", () => {
       const outcomePage = new OutComesPage(page);
       await outcomePage.goto();
       await outcomePage.viewFirstOutcomes();
+      const outcomeTitle = await outcomePage.title.textContent();
 
-      await expect(page.getByRole("heading", { name: type })).toBeVisible({
+      await expect(
+        outcomePage.title,
+        outcomeTitle.toLowerCase() !== type.toLowerCase() &&
+          `The URL "${url}" and hash "${hash}" do not match the expected properties for type "${type}".`
+      ).toHaveText(type, {
+        ignoreCase: true,
         timeout: 60_000,
       });
-      await expect(page.getByText("Learn more")).toBeVisible();
+      await expect(outcomePage.metadataErrorLearnMoreBtn).toBeVisible();
     });
   });
 });

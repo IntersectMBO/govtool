@@ -65,3 +65,8 @@ export async function skipIfMainnet() {
     test.skip();
   }
 }
+
+export async function skipTestForProposalBudget() {
+  await allure.description("Proposal budget features are not yet available.");
+  test.skip();
+}

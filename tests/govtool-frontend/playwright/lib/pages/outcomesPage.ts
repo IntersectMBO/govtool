@@ -11,9 +11,14 @@ export default class OutComesPage {
   readonly filterBtn = this.page.getByTestId("filters-button");
   readonly sortBtn = this.page.getByTestId("sort-button");
   readonly showMoreBtn = this.page.getByTestId("show-more-button");
+  readonly metadataErrorLearnMoreBtn = this.page.getByTestId(
+    "metadata-error-learn-more"
+  );
 
   //inputs
   readonly searchInput = this.page.getByTestId("search-input");
+
+  readonly title = this.page.getByTestId("single-action-title");
 
   constructor(private readonly page: Page) {}
 

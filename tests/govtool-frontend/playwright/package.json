@@ -25,6 +25,7 @@
     "allure:serve": "npx allure serve",
     "test": "npx playwright test",
     "format": "prettier . --write",
+    "test:outcomes": "npx playwright test outcomes.spec.ts --ui",
     "generate-wallets": "ts-node ./generate_wallets.ts 19"
   },
   "dependencies": {

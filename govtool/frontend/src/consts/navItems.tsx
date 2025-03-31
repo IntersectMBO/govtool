@@ -8,6 +8,7 @@ import {
   PATHS,
   PDF_PATHS,
   OUTCOMES_PATHS,
+  BUDGET_DISCUSSION_PATHS,
   // TODO: This will be uncommented when the page has been bootstrapped in the outcomes Pillar
   // USER_PATHS
 } from "./paths";
@@ -69,6 +70,14 @@ export const CONNECTED_NAV_ITEMS = [
     dataTestId: "drep-directory-link",
     label: i18n.t("dRepDirectory.title"),
     navTo: PATHS.dashboardDRepDirectory,
+    activeIcon: ICONS.dRepDirectoryActiveIcon,
+    icon: ICONS.dRepDirectoryIcon,
+    newTabLink: null,
+  },
+  {
+    dataTestId: "budget-discussion-link",
+    label: i18n.t("budgetDiscussion.title"),
+    navTo: BUDGET_DISCUSSION_PATHS.budgetDiscussion,
     activeIcon: ICONS.dRepDirectoryActiveIcon,
     icon: ICONS.dRepDirectoryIcon,
     newTabLink: null,

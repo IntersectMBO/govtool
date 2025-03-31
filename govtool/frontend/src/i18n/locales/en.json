@@ -395,6 +395,9 @@
     "title": "Proposals",
     "proposeAGovernanceAction": "Propose a Governance Action"
   },
+  "budgetDiscussion": {
+    "title": "Budget Discussion"
+  },
   "govActions": {
     "about": "About",
     "abstract": "Abstract",

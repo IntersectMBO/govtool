@@ -16,6 +16,8 @@ changes.
 
 ### Fixed
 
+- Fix missing redirect to outcomes on wallet disconnected state [Issue 3230](https://github.com/IntersectMBO/govtool/issues/3230)
+
 ### Changed
 
 ### Removed

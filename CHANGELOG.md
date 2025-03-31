@@ -12,6 +12,8 @@ changes.
 
 ### Added
 
+- Add budget discussion paths in the wrapper
+
 ### Fixed
 
 ### Changed

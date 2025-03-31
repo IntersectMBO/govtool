@@ -12,6 +12,17 @@ changes.
 
 ### Added
 
+### Fixed
+
+### Changed
+
+### Removed
+
+## [v2.0.19](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.19) 2025-03-31
+
+
+### Added
+
 - Add budget discussion paths in the wrapper
 
 ### Fixed

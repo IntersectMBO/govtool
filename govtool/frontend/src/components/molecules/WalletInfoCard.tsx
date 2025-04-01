@@ -1,7 +1,13 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Button, Typography } from "@mui/material";
 
-import { PDF_PATHS, PATHS, gray, OUTCOMES_PATHS } from "@consts";
+import {
+  PDF_PATHS,
+  PATHS,
+  gray,
+  OUTCOMES_PATHS,
+  BUDGET_DISCUSSION_PATHS,
+} from "@consts";
 import { useCardano } from "@context";
 import { useTranslation } from "@hooks";
 import { Card } from "./Card";
@@ -14,6 +20,11 @@ export const WalletInfoCard = () => {
 
   const onClickDisconnect = async () => {
     await disconnectWallet();
+
+    const isBudgetDiscussion = window.location.pathname.includes(
+      BUDGET_DISCUSSION_PATHS.budgetDiscussion.replace("/", ""),
+    );
+
     const isProposalDiscussionForum = window.location.pathname.includes(
       PDF_PATHS.proposalDiscussion.replace("/", ""),
     );
@@ -21,8 +32,11 @@ export const WalletInfoCard = () => {
     const isGovernanceOutcomesPillar = window.location.pathname.includes(
       OUTCOMES_PATHS.governanceActionsOutcomes.replace("/", ""),
     );
-
-    if (!isProposalDiscussionForum && !isGovernanceOutcomesPillar) {
+    if (
+      !isBudgetDiscussion &&
+      !isProposalDiscussionForum &&
+      !isGovernanceOutcomesPillar
+    ) {
       navigate(
         pathname.includes("/connected")
           ? `${pathname.replace("/connected", "")}${hash ?? ""}`

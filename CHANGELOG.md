@@ -15,6 +15,7 @@ changes.
 ### Fixed
 
 - Fix scroll on a drawer on smaller resolution
+- Fix incorrect routing on connecting wallet on budget discussion page
 
 ### Changed
 

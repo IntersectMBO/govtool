@@ -14,12 +14,16 @@ changes.
 
 ### Fixed
 
+- Fix scroll on a drawer on smaller resolution
+- Fix incorrect routing on connecting wallet on budget discussion page
+
 ### Changed
+
+- Change budget proposal nav item label
 
 ### Removed
 
 ## [v2.0.19](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.19) 2025-03-31
-
 
 ### Added
 

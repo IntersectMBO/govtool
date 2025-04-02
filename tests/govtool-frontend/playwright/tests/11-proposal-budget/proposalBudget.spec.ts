@@ -1,13 +1,20 @@
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { skipTestForProposalBudget } from "@helpers/cardano";
+import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
+import { expect } from "@playwright/test";
 
 test.beforeEach(async ({}) => {
   await setAllureEpic("11. Proposal Budget");
-  await skipTestForProposalBudget();
 });
 
-test("11A. Should access budget proposal page", async ({}) => {});
+test("11A. Should access budget proposal page in disconnect state", async ({ page }) => {
+  const budgetDiscussionPage = new BudgetDiscussionPage(page);
+  await budgetDiscussionPage.goto();
+
+  await expect(
+    budgetDiscussionPage.currentPage.getByText("/Budget Proposals/i")
+  ).toHaveCount(2);
+});
 
 test.describe("Budget proposal list manipulation", () => {
   test("11B_1. Should search for budget proposals by title", async ({}) => {});

@@ -1,5 +1,6 @@
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { functionWaitedAssert } from "@helpers/waitedLoop";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 import { expect } from "@playwright/test";
 
@@ -7,7 +8,9 @@ test.beforeEach(async ({}) => {
   await setAllureEpic("11. Proposal Budget");
 });
 
-test("11A. Should access budget proposal page in disconnect state", async ({ page }) => {
+test("11A. Should access budget proposal page in disconnect state", async ({
+  page,
+}) => {
   const budgetDiscussionPage = new BudgetDiscussionPage(page);
   await budgetDiscussionPage.goto();
 
@@ -17,7 +20,58 @@ test("11A. Should access budget proposal page in disconnect state", async ({ pag
 });
 
 test.describe("Budget proposal list manipulation", () => {
-  test("11B_1. Should search for budget proposals by title", async ({}) => {});
+  test("11B_1. Should search for budget proposals by title", async ({
+    page,
+  }) => {
+    let proposalName = "EchoFeed";
+    let proposalNameSet = false;
+
+    await page.route("**/api/bds?**", async (route) => {
+      const response = await route.fetch();
+      const json = await response.json();
+      if (!proposalNameSet && "data" in json && json["data"].length > 0) {
+        const randomIndex = Math.floor(Math.random() * json["data"].length);
+        proposalName =
+          json["data"][randomIndex]["attributes"]["bd_proposal_detail"]["data"][
+            "attributes"
+          ]["proposal_name"];
+        proposalNameSet = true;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(json),
+      });
+    });
+
+    const responsePromise = page.waitForResponse("**/api/bds?**");
+    const budgetDiscussionPage = new BudgetDiscussionPage(page);
+    await budgetDiscussionPage.goto();
+
+    await responsePromise;
+
+    await budgetDiscussionPage.searchInput.fill(proposalName);
+
+    await page.waitForTimeout(2000);
+
+    await functionWaitedAssert(
+      async () => {
+        const proposalCards = await budgetDiscussionPage.getAllProposals();
+        for (const proposalCard of proposalCards) {
+          await expect(proposalCard).toBeVisible();
+          const proposalTitle = await proposalCard
+            .getByTestId("budget-discussion-title")
+            .textContent();
+          expect(proposalTitle.toLowerCase()).toContain(
+            proposalName.toLowerCase()
+          );
+        }
+      },
+      {
+        message: `A proposal card does not contain the search term ${proposalName}`,
+      }
+    );
+  });
 
   test("11B_2. Should filter budget proposals by categories", async ({}) => {});
 

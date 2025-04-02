@@ -1,5 +1,6 @@
-import { waitedLoop } from "@helpers/waitedLoop";
-import { expect, Page } from "@playwright/test";
+import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
+import { expect, Locator, Page } from "@playwright/test";
+import { BudgetProposalType } from "@types";
 import environments from "lib/constants/environments";
 
 export default class BudgetDiscussionPage {
@@ -9,6 +10,7 @@ export default class BudgetDiscussionPage {
     "propose-a-budget-discussion-button"
   );
   readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
+  readonly filterBtn = this.page.getByTestId("filter-button");
 
   // input
   readonly searchInput = this.page.getByTestId("search-input");
@@ -38,5 +40,81 @@ export default class BudgetDiscussionPage {
     expect(true, "No budget proposals found.").toBeTruthy();
 
     return proposalCards;
+  }
+
+  async clickRadioButtonsByNames(names: string[]) {
+    for (const name of names) {
+      const budgetProposalValue = Object.values(BudgetProposalType).includes(
+        name as BudgetProposalType
+      );
+      if (budgetProposalValue) {
+        await this.page.getByLabel(name).click();
+      }
+    }
+  }
+
+  async filterProposalByNames(names: string[]) {
+    await this.clickRadioButtonsByNames(names);
+  }
+
+  async unFilterProposalByNames(names: string[]) {
+    await this.clickRadioButtonsByNames(names);
+  }
+
+  async applyAndValidateFilters(
+    filters: string[],
+    validateFunction: (proposalCard: any, filters: string[]) => Promise<boolean>
+  ) {
+    await this.page.waitForTimeout(4_000); // wait for the proposals to load
+    // single filter
+    for (const filter of filters) {
+      await this.filterProposalByNames([filter]);
+      await this.validateFilters([filter], validateFunction);
+      await this.unFilterProposalByNames([filter]);
+    }
+
+    // multiple filter
+    const multipleFilters = [...filters];
+    while (multipleFilters.length > 1) {
+      await this.filterProposalByNames(multipleFilters);
+      await this.validateFilters(multipleFilters, validateFunction);
+      await this.unFilterProposalByNames(multipleFilters);
+      multipleFilters.pop();
+    }
+  }
+
+  async validateFilters(
+    filters: string[],
+    validateFunction: (proposalCard: any, filters: string[]) => Promise<boolean>
+  ) {
+    await functionWaitedAssert(async () => {
+      const proposalCards = await this.getAllProposals();
+
+      for (const proposalCard of proposalCards) {
+        if (await proposalCard.isVisible()) {
+          const type = await proposalCard
+            .getByTestId("budget-proposal-type")
+            .textContent();
+          const hasFilter = await validateFunction(proposalCard, filters);
+
+          expect(
+            hasFilter,
+            !hasFilter &&
+              `A budget proposal type ${type} does not contain on ${filters}`
+          ).toBe(true);
+        }
+      }
+    });
+  }
+
+  async _validateTypeFiltersInProposalCard(
+    proposalCard: Locator,
+    filters: string[]
+  ): Promise<boolean> {
+    const govActionType = await proposalCard
+      .getByTestId("budget-proposal-type")
+      .textContent();
+
+    return filters.includes(govActionType);
   }
 }

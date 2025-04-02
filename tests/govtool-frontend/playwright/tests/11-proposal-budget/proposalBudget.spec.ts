@@ -3,6 +3,7 @@ import { setAllureEpic } from "@helpers/allure";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 import { expect } from "@playwright/test";
+import { BudgetProposalType } from "@types";
 
 test.beforeEach(async ({}) => {
   await setAllureEpic("11. Proposal Budget");
@@ -73,9 +74,27 @@ test.describe("Budget proposal list manipulation", () => {
     );
   });
 
-  test("11B_2. Should filter budget proposals by categories", async ({}) => {});
+  test.describe("Filter and sort budget proposals", () => {
+    let budgetDiscussionPage: BudgetDiscussionPage;
 
-  test("11B_3. Should sort budget proposals", async ({}) => {});
+    test.beforeEach(async ({ page }) => {
+      budgetDiscussionPage = new BudgetDiscussionPage(page);
+      await budgetDiscussionPage.goto();
+    });
+    
+    test("11B_2. Should filter budget proposals by categories", async () => {
+      test.slow();
+      await budgetDiscussionPage.filterBtn.click();
+
+      // proposal type filter
+      await budgetDiscussionPage.applyAndValidateFilters(
+        Object.values(BudgetProposalType),
+        budgetDiscussionPage._validateTypeFiltersInProposalCard
+      );
+    });
+
+    test("11B_3. Should sort budget proposals", async ({}) => {});
+  });
 });
 
 test("11C. Should show view-all categorized budget proposal", async ({}) => {});

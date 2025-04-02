@@ -323,3 +323,11 @@ export interface InvalidMetadataType {
   url: string;
   hash: string;
 }
+
+export enum BudgetProposalType {
+  Core = "Core",
+  Research = "Research",
+  GovernanceSupport = "Governance Support",
+  MarketingAndInnovation = "Marketing & Innovation",
+  NoCategory = "No Category",
+}

@@ -1,5 +1,6 @@
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { injectLogger } from "@helpers/page";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 import { expect } from "@playwright/test";
@@ -81,7 +82,7 @@ test.describe("Budget proposal list manipulation", () => {
       budgetDiscussionPage = new BudgetDiscussionPage(page);
       await budgetDiscussionPage.goto();
     });
-    
+
     test("11B_2. Should filter budget proposals by categories", async () => {
       test.slow();
       await budgetDiscussionPage.filterBtn.click();
@@ -98,7 +99,7 @@ test.describe("Budget proposal list manipulation", () => {
         "asc",
         (p1, p2) => p1.attributes.createdAt <= p2.attributes.createdAt
       );
-  
+
       await budgetDiscussionPage.sortAndValidate(
         "desc",
         (p1, p2) => p1.attributes.createdAt >= p2.attributes.createdAt
@@ -107,7 +108,45 @@ test.describe("Budget proposal list manipulation", () => {
   });
 });
 
-test("11C. Should show view-all categorized budget proposal", async ({}) => {});
+test("11C. Should show view-all categorized budget proposal", async ({
+  browser,
+}) => {
+  await Promise.all(
+    Object.values(BudgetProposalType).map(async (proposalType: string) => {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      injectLogger(page);
+
+      const budgetDiscussionPage = new BudgetDiscussionPage(page);
+      await budgetDiscussionPage.goto();
+      const isShowAllButtonVisible = await page
+        .waitForSelector(
+          `[data-testid="${proposalType.toLowerCase().replace(/ /g, "-")}-show-all-button"]`,
+          { timeout: 60_000 }
+        )
+        .then(() => true)
+        .catch(() => false);
+
+      if (isShowAllButtonVisible) {
+        await page
+          .getByTestId(
+            proposalType.toLowerCase().replace(/ /g, "-") + "-show-all-button"
+          )
+          .click();
+
+        const proposalCards = await budgetDiscussionPage.getAllProposals();
+
+        for (const proposalCard of proposalCards) {
+          await expect(
+            proposalCard.getByTestId("budget-discussion-type")
+          ).toHaveText(proposalType, { timeout: 60_000 });
+        }
+      } else {
+        expect(true, `No ${proposalType} found`).toBeTruthy();
+      }
+    })
+  );
+});
 
 test("11D. Should share budget proposal", async ({}) => {});
 

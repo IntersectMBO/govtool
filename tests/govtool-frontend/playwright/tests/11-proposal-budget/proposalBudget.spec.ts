@@ -93,7 +93,17 @@ test.describe("Budget proposal list manipulation", () => {
       );
     });
 
-    test("11B_3. Should sort budget proposals", async ({}) => {});
+    test("11B_3. Should sort budget proposals", async () => {
+      await budgetDiscussionPage.sortAndValidate(
+        "asc",
+        (p1, p2) => p1.attributes.createdAt <= p2.attributes.createdAt
+      );
+  
+      await budgetDiscussionPage.sortAndValidate(
+        "desc",
+        (p1, p2) => p1.attributes.createdAt >= p2.attributes.createdAt
+      );
+    });
   });
 });
 

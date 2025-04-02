@@ -1,6 +1,6 @@
 import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
 import { expect, Locator, Page } from "@playwright/test";
-import { BudgetProposalType } from "@types";
+import { BudgetProposalType, ProposedGovAction } from "@types";
 import environments from "lib/constants/environments";
 
 export default class BudgetDiscussionPage {
@@ -11,6 +11,7 @@ export default class BudgetDiscussionPage {
   );
   readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
   readonly filterBtn = this.page.getByTestId("filter-button");
+  readonly sortBtn = this.page.getByTestId("sort-button");
 
   // input
   readonly searchInput = this.page.getByTestId("search-input");
@@ -116,5 +117,31 @@ export default class BudgetDiscussionPage {
       .textContent();
 
     return filters.includes(govActionType);
+  }
+
+  async sortAndValidate(
+    option: "asc" | "desc",
+    validationFn: (p1: ProposedGovAction, p2: ProposedGovAction) => boolean
+  ) {
+    const responsePromise = this.page.waitForResponse((response) =>
+      response
+        .url()
+        .includes(`&sort[createdAt]=${option}&populate[0]=bd_costing`)
+    );
+
+    await this.sortBtn.click();
+    const response = await responsePromise;
+
+    let proposals: ProposedGovAction[] = (await response.json()).data;
+
+    // API validation
+    for (let i = 0; i <= proposals.length - 2; i++) {
+      console.log(
+        proposals[i].attributes.createdAt,
+        proposals[i + 1].attributes.createdAt
+      );
+      const isValid = validationFn(proposals[i], proposals[i + 1]);
+      expect(isValid).toBe(true);
+    }
   }
 }

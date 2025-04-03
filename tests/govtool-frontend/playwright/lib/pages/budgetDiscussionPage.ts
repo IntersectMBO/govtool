@@ -2,6 +2,7 @@ import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
 import { expect, Locator, Page } from "@playwright/test";
 import { BudgetProposalType, ProposedGovAction } from "@types";
 import environments from "lib/constants/environments";
+import BudgetDiscussionDetailsPage from "./budgetDiscussionDetailsPage";
 
 export default class BudgetDiscussionPage {
   // Buttons
@@ -26,6 +27,16 @@ export default class BudgetDiscussionPage {
     await this.page.goto(`${environments.frontendUrl}/budget_discussion`);
     // wait for the proposal cards to load
     await this.page.waitForTimeout(2_000);
+  }
+
+  async viewFirstProposal(): Promise<BudgetDiscussionDetailsPage> {
+    await this.page
+      .locator(
+        '[data-testid^="budget-discussion-"][data-testid$="-view-details"]'
+      )
+      .first()
+      .click();
+    return new BudgetDiscussionDetailsPage(this.page);
   }
 
   async getAllProposals() {

@@ -60,7 +60,7 @@ export default class BudgetDiscussionPage {
         name as BudgetProposalType
       );
       if (budgetProposalValue) {
-        await this.page.getByLabel(name).click();
+        await this.page.getByTestId(`${name.toLowerCase()}-radio`).click();
       }
     }
   }
@@ -147,10 +147,6 @@ export default class BudgetDiscussionPage {
 
     // API validation
     for (let i = 0; i <= proposals.length - 2; i++) {
-      console.log(
-        proposals[i].attributes.createdAt,
-        proposals[i + 1].attributes.createdAt
-      );
       const isValid = validationFn(proposals[i], proposals[i + 1]);
       expect(isValid).toBe(true);
     }

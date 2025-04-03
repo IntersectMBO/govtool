@@ -1,6 +1,8 @@
+import environments from "@constants/environments";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { injectLogger } from "@helpers/page";
+import { extractProposalIdFromUrl } from "@helpers/string";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 import { expect } from "@playwright/test";
@@ -148,7 +150,28 @@ test("11C. Should show view-all categorized budget proposal", async ({
   );
 });
 
-test("11D. Should share budget proposal", async ({}) => {});
+test("11D. Should share budget proposal", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  const budgetDiscussionPage = new BudgetDiscussionPage(page);
+  await budgetDiscussionPage.goto();
+
+  const budgetDiscussionDetailsPage =
+    await budgetDiscussionPage.viewFirstProposal();
+
+  const currentPageUrl = page.url();
+  const proposalId = extractProposalIdFromUrl(currentPageUrl);
+
+  await budgetDiscussionDetailsPage.shareBtn.click();
+  await budgetDiscussionDetailsPage.copyLinkBtn.click();
+  await expect(budgetDiscussionDetailsPage.copyLinkText).toBeVisible();
+
+  const copiedTextDRepDirectory = await page.evaluate(() =>
+    navigator.clipboard.readText()
+  );
+  const expectedCopyUrl = `${environments.frontendUrl}/budget_discussion/${proposalId}`;
+
+  expect(copiedTextDRepDirectory).toEqual(expectedCopyUrl);
+});
 
 test("11E. Should view comments with count indications on a budget proposal", async () => {});
 

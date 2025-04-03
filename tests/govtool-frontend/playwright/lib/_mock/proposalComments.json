@@ -9,6 +9,10 @@
         "comment_text": "Hello",
         "createdAt": "2024-06-14T13:38:35.830Z",
         "updatedAt": "2024-06-14T13:38:35.830Z",
+        "bd_proposal_id": null,
+        "comments_reports": {
+          "data": []
+        },
         "user_govtool_username": "Anonymous",
         "subcommens_number": 0
       }
@@ -22,6 +26,10 @@
         "comment_text": "Nice proposal",
         "createdAt": "2024-06-14T13:38:31.279Z",
         "updatedAt": "2024-06-14T13:38:31.279Z",
+        "bd_proposal_id": null,
+        "comments_reports": {
+          "data": []
+        },
         "user_govtool_username": "Anonymous",
         "subcommens_number": 0
       }
@@ -35,6 +43,10 @@
         "comment_text": "Go Ahead",
         "createdAt": "2024-06-14T13:38:27.286Z",
         "updatedAt": "2024-06-14T13:38:27.286Z",
+        "bd_proposal_id": null,
+        "comments_reports": {
+          "data": []
+        },
         "user_govtool_username": "Anonymous",
         "subcommens_number": 0
       }

@@ -56,11 +56,9 @@ async function calculateMetadataHash() {
 
 export async function uploadMetadataAndGetJsonHash() {
   const { hexDigest: dataHash, jsonData } = await calculateMetadataHash();
-  const url = await metadataBucketService.uploadMetadata(
-    faker.person.firstName(),
-    jsonData
-  );
-  return { dataHash, url };
+  const givenName = faker.person.firstName();
+  const url = await metadataBucketService.uploadMetadata(givenName, jsonData);
+  return { dataHash, url, givenName };
 }
 
 export async function uploadScriptAndGenerateUrl(payload: Object) {

@@ -1,12 +1,18 @@
 import environments from "@constants/environments";
+import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { injectLogger } from "@helpers/page";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
+import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 import { expect } from "@playwright/test";
-import { BudgetProposalType } from "@types";
+import { BudgetProposalType, CommentResponse } from "@types";
+
+const mockBudgetProposal = require("../../lib/_mock/budgetProposal.json");
+const mockPoll = require("../../lib/_mock/budgetProposalPoll.json");
+const mockComments = require("../../lib/_mock/budgetProposalComments.json");
 
 test.beforeEach(async ({}) => {
   await setAllureEpic("11. Proposal Budget");
@@ -173,11 +179,65 @@ test("11D. Should share budget proposal", async ({ page, context }) => {
   expect(copiedTextDRepDirectory).toEqual(expectedCopyUrl);
 });
 
-test("11E. Should view comments with count indications on a budget proposal", async () => {});
+test("11E. Should view comments with count indications on a budget proposal", async ({
+  page,
+}) => {
+  let responsePromise = page.waitForResponse((response) =>
+    response.url().includes(`/api/comments`)
+  );
 
-test.describe("Restricted access to interact budget proposal", () => {
-  test("11F_1. Should restrict users without wallets from commenting", async () => {});
-  test("11F_2. Should restrict users without wallets from voting", async () => {});
+  const budgetDiscussionPage = new BudgetDiscussionPage(page);
+  await budgetDiscussionPage.goto();
+
+  const budgetDiscussionDetailsPage =
+    await budgetDiscussionPage.viewFirstProposal();
+  const response = await responsePromise;
+
+  const comments: CommentResponse[] = (await response.json()).data;
+
+  await responsePromise;
+
+  await expect(budgetDiscussionDetailsPage.totalComments).toHaveText(
+    comments.length.toString()
+  );
 });
 
-test("11G. Should sort the budget proposal comments", async ({}) => {});
+test.describe("Restricted access to interact budget proposal", () => {
+  let budgetDiscussionDetailsPage: BudgetDiscussionDetailsPage;
+
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/bds/**", async (route) =>
+      route.fulfill({
+        body: JSON.stringify(mockBudgetProposal),
+      })
+    );
+
+    await page.route("**/api/bd-polls**", async (route) =>
+      route.fulfill({
+        body: JSON.stringify(mockPoll),
+      })
+    );
+
+    await page.route("**/api/comments**", async (route) =>
+      route.fulfill({
+        body: JSON.stringify(mockComments),
+      })
+    );
+
+    budgetDiscussionDetailsPage = new BudgetDiscussionDetailsPage(page);
+    await budgetDiscussionDetailsPage.goto(mockBudgetProposal.data.id);
+  });
+  test("11F_1. Should restrict users without wallets from commenting", async () => {
+    await budgetDiscussionDetailsPage.commentInput.fill(
+      faker.lorem.paragraph()
+    );
+
+    await expect(budgetDiscussionDetailsPage.commentBtn).toBeDisabled();
+  });
+  test("11F_2. Should restrict users without wallets from voting", async () => {
+    await expect(budgetDiscussionDetailsPage.pollVoteCard).not.toBeVisible();
+    await expect(budgetDiscussionDetailsPage.pollYesBtn).not.toBeVisible();
+
+    await expect(budgetDiscussionDetailsPage.pollNoBtn).not.toBeVisible();
+  });
+});

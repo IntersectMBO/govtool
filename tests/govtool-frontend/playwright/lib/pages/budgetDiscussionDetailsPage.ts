@@ -63,7 +63,6 @@ export default class BudgetDiscussionDetailsPage {
 
   async addComment(comment: string) {
     await this.commentInput.fill(comment);
-    ``;
     await this.commentBtn.click();
   }
 

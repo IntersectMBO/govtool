@@ -60,7 +60,7 @@ export default class BudgetDiscussionPage {
         name as BudgetDiscussionEnum
       );
       if (budgetProposalValue) {
-        await this.page.getByTestId(`${name.toLowerCase()}-radio`).click();
+        await this.page.getByLabel(name).click();
       }
     }
   }
@@ -105,7 +105,7 @@ export default class BudgetDiscussionPage {
       for (const proposalCard of proposalCards) {
         if (await proposalCard.isVisible()) {
           const type = await proposalCard
-            .getByTestId("budget-proposal-type")
+            .getByTestId("budget-discussion-type")
             .textContent();
           const hasFilter = await validateFunction(proposalCard, filters);
 
@@ -124,9 +124,12 @@ export default class BudgetDiscussionPage {
     filters: string[]
   ): Promise<boolean> {
     const govActionType = await proposalCard
-      .getByTestId("budget-proposal-type")
+      .getByTestId("budget-discussion-type")
       .textContent();
 
+    if (govActionType === "None of these") {
+      return filters.includes("No Category");
+    }
     return filters.includes(govActionType);
   }
 

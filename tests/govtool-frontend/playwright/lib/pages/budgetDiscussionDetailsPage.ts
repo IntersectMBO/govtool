@@ -72,4 +72,12 @@ export default class BudgetDiscussionDetailsPage {
     await this.replyInput.fill(reply);
     await this.replyCommentBtn.click();
   }
+
+  async deleteProposal() {
+    await this.page.waitForTimeout(2_000);
+
+    await this.page.getByTestId("menu-button").click();
+    await this.page.getByTestId("delete-proposal").click();
+    await this.page.getByTestId("delete-proposal-yes-button").click();
+  }
 }

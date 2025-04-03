@@ -235,6 +235,8 @@ test.describe("Restricted access to interact budget proposal", () => {
     await expect(budgetDiscussionDetailsPage.commentBtn).toBeDisabled();
   });
   test("11F_2. Should restrict users without wallets from voting", async () => {
+    // wait for the page to load
+    await budgetDiscussionDetailsPage.currentPage.waitForTimeout(5_000);
     await expect(budgetDiscussionDetailsPage.pollVoteCard).not.toBeVisible();
     await expect(budgetDiscussionDetailsPage.pollYesBtn).not.toBeVisible();
 

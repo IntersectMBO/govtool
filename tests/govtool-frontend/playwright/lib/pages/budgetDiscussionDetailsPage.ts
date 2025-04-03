@@ -33,4 +33,43 @@ export default class BudgetDiscussionDetailsPage {
       `${environments.frontendUrl}/budget_discussion/${proposalId}`
     );
   }
+
+  async sortAndValidate(
+    order: string,
+    validationFn: (date1: string, date2: string) => boolean
+  ) {
+    const responsePromise = this.page.waitForResponse((response) =>
+      response.url().includes(`&sort[createdAt]=${order}`)
+    );
+
+    await this.sortCommentsBtn.click();
+    const response = await responsePromise;
+
+    const comments: CommentResponse[] = (await response.json()).data;
+
+    // API validation
+    for (let i = 0; i < comments.length - 1; i++) {
+      const isValid = validationFn(
+        comments[i].attributes.updatedAt,
+        comments[i + 1].attributes.updatedAt
+      );
+      expect(isValid).toBe(true);
+    }
+  }
+
+  async addComment(comment: string) {
+    await this.commentInput.fill(comment);
+    ``;
+    await this.commentBtn.click();
+  }
+
+  async replyComment(reply: string) {
+    await this.page
+      .locator('[data-testid^="comment-"][data-testid$="-content-card"]')
+      .first()
+      .getByTestId("reply-button")
+      .click();
+    await this.replyInput.fill(reply);
+    await this.replyCommentBtn.click();
+  }
 }

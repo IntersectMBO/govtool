@@ -166,6 +166,9 @@ export type CommentResponse = {
     comment_text: string;
     createdAt: string;
     updatedAt: string;
+    bd_proposal_id: string | null;
+    drep_id: string | null;
+    comments_reports: any;
     user_govtool_username: string;
     subcommens_number: number;
   };

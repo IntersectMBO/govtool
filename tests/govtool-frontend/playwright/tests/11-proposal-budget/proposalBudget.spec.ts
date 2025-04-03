@@ -19,7 +19,7 @@ test("11A. Should access budget proposal page in disconnect state", async ({
   await budgetDiscussionPage.goto();
 
   await expect(
-    budgetDiscussionPage.currentPage.getByText("/Budget Proposals/i")
+    budgetDiscussionPage.currentPage.getByText(/Budget Proposals/i)
   ).toHaveCount(2);
 });
 

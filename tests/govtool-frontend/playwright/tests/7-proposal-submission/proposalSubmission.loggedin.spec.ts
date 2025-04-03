@@ -33,7 +33,7 @@ test.describe("Proposal created logged state", () => {
     await page.goto("/");
     await page.getByTestId("proposal-discussion-link").click();
 
-    await expect(page.getByText(/proposals/i)).toHaveCount(2);
+    await expect(page.getByText("Proposals", { exact: true })).toHaveCount(2);
   });
 
   test.describe("Accept valid data", () => {

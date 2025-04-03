@@ -16,9 +16,9 @@ export const useGetDRepVotingPowerList = () => {
     enabled: false,
   });
 
-  const fetchDRepVotingPowerList = async (identifiers: string[]) =>
+  const fetchDRepVotingPowerList = async (identifiers: string[] = []) =>
     queryClient.fetchQuery({
-      queryKey: [QUERY_KEYS.useGetDRepVotingPowerListKey],
+      queryKey: [QUERY_KEYS.useGetDRepVotingPowerListKey, ...identifiers],
       queryFn: () => getDRepVotingPowerList(identifiers),
     });
 

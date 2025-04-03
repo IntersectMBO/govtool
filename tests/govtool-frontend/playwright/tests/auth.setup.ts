@@ -7,6 +7,7 @@ import {
   adaHolder04Wallet,
   adaHolder05Wallet,
   adaHolder06Wallet,
+  budgetProposal01Wallet,
   dRep01Wallet,
   dRep02Wallet,
   proposal01Wallet,
@@ -50,6 +51,8 @@ const proposal06AuthFile = ".auth/proposal06.json";
 const proposal07AuthFile = ".auth/proposal07.json";
 const proposal08AuthFile = ".auth/proposal08.json";
 const proposal09AuthFile = ".auth/proposal09.json";
+
+const budgetProposal01AuthFile = ".auth/budgetProposal01.json";
 
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
@@ -216,5 +219,14 @@ setup("Create Proposal 09 auth", async ({ page, context }) => {
     context,
     wallet: proposal09Wallet,
     auth: proposal09AuthFile,
+  });
+});
+
+setup("Create Budget Proposal 01 auth", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: budgetProposal01Wallet,
+    auth: budgetProposal01AuthFile,
   });
 });

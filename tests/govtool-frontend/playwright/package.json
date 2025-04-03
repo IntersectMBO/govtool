@@ -26,7 +26,7 @@
     "test": "npx playwright test",
     "format": "prettier . --write",
     "test:outcomes": "npx playwright test outcomes.spec.ts --ui",
-    "generate-wallets": "ts-node ./generate_wallets.ts 19"
+    "generate-wallets": "ts-node ./generate_wallets.ts 20"
   },
   "dependencies": {
     "@cardanoapi/cardano-test-wallet": "^3.0.0",

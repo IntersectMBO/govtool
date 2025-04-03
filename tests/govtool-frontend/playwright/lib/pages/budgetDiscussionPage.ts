@@ -128,7 +128,7 @@ export default class BudgetDiscussionPage {
       .textContent();
 
     if (govActionType === "None of these") {
-      return filters.includes("No Category");
+      return filters.includes(BudgetDiscussionEnum.NoCategory);
     }
     return filters.includes(govActionType);
   }

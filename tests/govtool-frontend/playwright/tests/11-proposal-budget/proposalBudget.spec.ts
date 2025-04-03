@@ -145,9 +145,13 @@ test("11C. Should show view-all categorized budget proposal", async ({
         const proposalCards = await budgetDiscussionPage.getAllProposals();
 
         for (const proposalCard of proposalCards) {
+          const ExpectedProposalType =
+            proposalType === BudgetDiscussionEnum.NoCategory
+              ? "None of these"
+              : proposalType;
           await expect(
             proposalCard.getByTestId("budget-discussion-type")
-          ).toHaveText(proposalType, { timeout: 60_000 });
+          ).toHaveText(ExpectedProposalType, { timeout: 60_000 });
         }
       } else {
         expect(true, `No ${proposalType} found`).toBeTruthy();

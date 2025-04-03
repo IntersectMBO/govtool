@@ -1,13 +1,27 @@
+import { budgetProposal01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { skipTestForProposalBudget } from "@helpers/cardano";
+import BudgetDiscussionSubmissionPage from "@pages/budgetDiscussionSubmissionPage";
+import { expect } from "@playwright/test";
 
 test.beforeEach(async ({}) => {
   await setAllureEpic("12. Proposal Budget Submission");
-  await skipTestForProposalBudget();
 });
 
-test("12B. Should access proposal creation page in connected state", async ({}) => {});
+test.use({
+  storageState: ".auth/budgetProposal01.json",
+  wallet: budgetProposal01Wallet,
+});
+
+test("12B. Should access proposal creation page in connected state", async ({
+  page,
+}) => {
+  const budgetProposalSubmissionPage = new BudgetDiscussionSubmissionPage(page);
+  await budgetProposalSubmissionPage.goto();
+  await expect(
+    budgetProposalSubmissionPage.beneficiaryFullNameInput
+  ).toBeVisible();
+});
 
 test("12C. Should view draft proposal", async ({}) => {});
 

@@ -151,4 +151,14 @@ export default class BudgetDiscussionPage {
       expect(isValid).toBe(true);
     }
   }
+
+  async setUsername(name: string) {
+    await this.page.getByTestId("username-input").fill(name);
+
+    const proceedBtn = this.page.getByTestId("proceed-button");
+    await proceedBtn.click();
+    await proceedBtn.click();
+
+    await this.page.getByTestId("close-button").click();
+  }
 }

@@ -12,6 +12,10 @@ export default class BudgetDiscussionDetailsPage {
   readonly pollYesBtn = this.page.getByTestId("poll-yes-button");
   readonly pollNoBtn = this.page.getByTestId("poll-no-button");
   readonly sortCommentsBtn = this.page.getByTestId("sort-comments");
+  readonly changeVoteBtn = this.page.getByTestId("change-vote-button");
+  readonly changeVoteYesBtn = this.page.getByTestId(
+    "change-poll-vote-yes-button"
+  );
 
   // content
   readonly copyLinkText = this.page.getByTestId("copy-link-text");
@@ -71,6 +75,15 @@ export default class BudgetDiscussionDetailsPage {
       .click();
     await this.replyInput.fill(reply);
     await this.replyCommentBtn.click();
+  }
+
+  async voteOnPoll(vote: string) {
+    await this.page.getByTestId(`poll-${vote.toLowerCase()}-button`).click();
+  }
+
+  async changePollVote() {
+    await this.changeVoteBtn.click();
+    await this.changeVoteYesBtn.click();
   }
 
   async deleteProposal() {

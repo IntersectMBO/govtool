@@ -1,6 +1,6 @@
 import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
 import { expect, Locator, Page } from "@playwright/test";
-import { BudgetProposalType, ProposedGovAction } from "@types";
+import { BudgetDiscussionEnum, ProposedGovAction } from "@types";
 import environments from "lib/constants/environments";
 import BudgetDiscussionDetailsPage from "./budgetDiscussionDetailsPage";
 
@@ -56,8 +56,8 @@ export default class BudgetDiscussionPage {
 
   async clickRadioButtonsByNames(names: string[]) {
     for (const name of names) {
-      const budgetProposalValue = Object.values(BudgetProposalType).includes(
-        name as BudgetProposalType
+      const budgetProposalValue = Object.values(BudgetDiscussionEnum).includes(
+        name as BudgetDiscussionEnum
       );
       if (budgetProposalValue) {
         await this.page.getByTestId(`${name.toLowerCase()}-radio`).click();

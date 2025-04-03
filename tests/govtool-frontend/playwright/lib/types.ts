@@ -327,10 +327,193 @@ export interface InvalidMetadataType {
   hash: string;
 }
 
-export enum BudgetProposalType {
+export enum BudgetDiscussionEnum {
   Core = "Core",
   Research = "Research",
   GovernanceSupport = "Governance Support",
   MarketingAndInnovation = "Marketing & Innovation",
   NoCategory = "No Category",
+}
+
+export interface BudgetProposalContactInformationProps {
+  beneficiaryFullName: string;
+  beneficiaryEmail: string;
+  beneficiaryCountry: string;
+  beneficiaryNationality: string;
+  submissionLeadFullName: string;
+  submissionLeadEmail: string;
+}
+
+export type CompanyType = "Individual" | "Company" | "Group";
+export enum CompanyEnum {
+  Individual = "Individual",
+  Company = "Company",
+  Group = "Group",
+}
+
+export type ProposalChampionType =
+  | "Beneficiary listed above"
+  | "Submission lead listed above";
+export enum ProposalChampionEnum {
+  BeneficiaryListedAbove = "Beneficiary listed above",
+  SubmissionLeadListedAbove = "Submission lead listed above",
+}
+
+export interface BudgetProposalOwnershipProps {
+  companyType: CompanyType;
+  publicChampion: ProposalChampionType;
+  contactDetails: string;
+  groupName?: string;
+  groupType?: string;
+  groupKeyIdentity?: string;
+  companyName?: string;
+  companyDomainName?: string;
+  countryOfIncorportation?: string;
+}
+
+export type RoadmapNameType =
+  | "Scaling the L1 Engine"
+  | "Architectural Excellence"
+  | "Leios"
+  | "Incoming Liquidity"
+  | "L2 Expansion"
+  | "Programmable Assets"
+  | "Multiple Node Implementations"
+  | "SPO Incentive Improvements"
+  | "It doesn't align"
+  | "It supports the product roadmap"
+  | "Developer / User Experience";
+
+export enum RoadmapNameEnum {
+  ScalingTheL1Engine = "Scaling the L1 Engine",
+  ArchitecturalExcellence = "Architectural Excellence",
+  Leios = "Leios",
+  IncomingLiquidity = "Incoming Liquidity",
+  L2Expansion = "L2 Expansion",
+  ProgrammableAssets = "Programmable Assets",
+  MultipleNodeImplementations = "Multiple Node Implementations",
+  SPOIncentiveImprovements = "SPO Incentive Improvements",
+  NoAlignment = "It doesn't align",
+  SupportsProductRoadmap = "It supports the product roadmap",
+  DeveloperUserExperience = "Developer / User Experience",
+}
+
+export type BudgetDiscussionType =
+  | "Core"
+  | "Research"
+  | "Governance Support"
+  | "Marketing & Innovation"
+  | "None of these";
+
+export enum CommitteeAlignmentEnum {
+  TechnicalSteeringCommittee = "Technical Steering Committee",
+  ProductCommittee = "Product Committee",
+  OpenSourceCommittee = "Open Source Committee",
+  CivicsCommittee = "Civics Committee",
+  MembershipAndCommunityCommittee = "Membership & Community Committee",
+  BudgetCommittee = "Budget Committee",
+  MarketingCommittee = "Marketing Committee",
+  Unsure = "Unsure",
+  None = "None",
+}
+
+export type CommitteeAlignmentType =
+  | "Technical Steering Committee"
+  | "Product Committee"
+  | "Open Source Committee"
+  | "Civics Committee"
+  | "Membership & Community Committee"
+  | "Budget Committee"
+  | "Marketing Committee"
+  | "Unsure"
+  | "None";
+
+export enum LocationEnum {
+  Nepal = "Nepal",
+  Netherlands = "Netherlands",
+  UnitedStates = "United States",
+  UnitedKingdom = "United Kingdom",
+  Canada = "Canada",
+  Australia = "Australia",
+  Germany = "Germany",
+  France = "France",
+  Japan = "Japan",
+  SouthKorea = "South Korea",
+}
+
+export interface BudgetProposalProblemStatementAndBenefitProps {
+  problemStatement: string;
+  proposalBenefits: string;
+  roadmapName: RoadmapNameType;
+  productRoadmapDescription?: string;
+  budgetDiscussionType: BudgetDiscussionType;
+  committeeAlignmentType: CommitteeAlignmentType;
+  suplimentaryEndorsement: string;
+}
+
+export type ProposalContractingType =
+  | "Milestone Based Fixed Price"
+  | "Time and Materials"
+  | "Service Level Agreement"
+  | "Other"
+  | "Reimbursement"
+  | "Intersect Procurement Process";
+
+export enum ProposalContractingEnum {
+  MilestoneBasedFixedPrice = "Milestone Based Fixed Price",
+  TimeAndMaterials = "Time and Materials",
+  ServiceLevelAgreement = "Service Level Agreement",
+  Other = "Other",
+  Reimbursement = "Reimbursement",
+  IntersectProcurementProcess = "Intersect Procurement Process",
+}
+
+export interface BudgetProposalDetailsProps {
+  proposalName: string;
+  proposalDescription: string;
+  proposalKeyDependencies: string;
+  proposalMaintainAndSupport: string;
+  milestones: string;
+  teamSizeAndDuration: string;
+  previousExperience: string;
+  contracting: ProposalContractingType;
+  otherDescription?: string;
+}
+
+export type preferredCurrencyType =
+  | "United States Dollar"
+  | "Euro"
+  | "Japanese Yen"
+  | "Australian Dollar"
+  | "Nepalese Rupee";
+
+export enum PreferredCurrencyEnum {
+  UnitedStatesDollar = "United States Dollar",
+  Euro = "Euro",
+  JapaneseYen = "Japanese Yen",
+  AustralianDollar = "Australian Dollar",
+  NepaleseRupee = "Nepalese Rupee",
+}
+
+export interface BudgetCostingProps {
+  adaAmount: number;
+  usaToAdaCnversionRate: number;
+  preferredCurrency: preferredCurrencyType;
+  AmountInPreferredCurrency: number;
+  costBreakdown: string;
+}
+
+export interface AdministrationAndAuditingProps {
+  intersectAdministration: boolean;
+  venderDetails: string;
+}
+
+export interface BudgetProposalProps {
+  contactInformation: BudgetProposalContactInformationProps;
+  proposalOwnership: BudgetProposalOwnershipProps;
+  problemStatementAndBenefits: BudgetProposalProblemStatementAndBenefitProps;
+  proposalDetails: BudgetProposalDetailsProps;
+  costing: BudgetCostingProps;
+  furtherInformation: Array<ProposalLink>;
+  administrationAndAuditing: AdministrationAndAuditingProps;
 }

@@ -8,6 +8,7 @@ import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
 import { isBootStrapingPhase, skipIfNotHardFork } from "@helpers/cardano";
 import { injectLogger } from "@helpers/page";
+import { extractProposalIdFromUrl } from "@helpers/string";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
@@ -195,6 +196,31 @@ test("8S. Should restrict proposal creation on disconnected state", async ({
   await expect(proposalDiscussionPage.proposalCreateBtn).not.toBeVisible();
 });
 
+test("8E. Should share proposed governance action", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  const proposalDiscussionPage = new ProposalDiscussionPage(page);
+  await proposalDiscussionPage.goto();
+
+  await proposalDiscussionPage.viewFirstProposal();
+
+  const currentPageUrl = page.url();
+  const proposalId = extractProposalIdFromUrl(currentPageUrl);
+
+  await page.getByTestId("share-button").click();
+  await page.getByTestId("copy-link").click();
+  await expect(page.getByTestId("copy-link-text")).toBeVisible();
+
+  const copiedTextDRepDirectory = await page.evaluate(() =>
+    navigator.clipboard.readText()
+  );
+  const expectedCopyUrl = `${environments.frontendUrl}/proposal_discussion/${proposalId}`;
+
+  expect(copiedTextDRepDirectory).toEqual(expectedCopyUrl);
+});
+
 test.describe("Mocked proposal", () => {
   let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
 
@@ -219,24 +245,6 @@ test.describe("Mocked proposal", () => {
 
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
     await proposalDiscussionDetailsPage.goto(mockProposal.data.id);
-  });
-
-  test("8E. Should share proposed governance action", async ({
-    page,
-    context,
-  }) => {
-    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-
-    await page.getByTestId("share-button").click();
-    await page.getByTestId("copy-link").click();
-    await expect(page.getByTestId("copy-link-text")).toBeVisible();
-
-    const copiedTextDRepDirectory = await page.evaluate(() =>
-      navigator.clipboard.readText()
-    );
-    const expectedCopyUrl = `${environments.frontendUrl}/proposal_discussion/${mockProposal.data.id}`;
-
-    expect(copiedTextDRepDirectory).toEqual(expectedCopyUrl);
   });
 
   test("8I. Should disable poll voting functionality.", async () => {

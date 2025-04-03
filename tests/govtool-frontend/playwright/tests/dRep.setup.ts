@@ -80,10 +80,11 @@ setup("Setup temporary DRep wallets", async () => {
   // Submit metadata to obtain a URL and generate hash value.
   const metadataPromises = dRepWallets.map(async (dRepWallet) => {
     const metadataResponse = await uploadMetadataAndGetJsonHash();
+    const givenName = metadataResponse.givenName;
     const index = dRepWallets.indexOf(dRepWallet);
     dRepWallets[index] = {
       ...dRepWallet,
-      givenName: metadataResponse.givenName,
+      givenName,
     };
     return {
       ...metadataResponse,

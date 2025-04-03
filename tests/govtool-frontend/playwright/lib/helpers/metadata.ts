@@ -39,8 +39,9 @@ async function calculateMetadataHash() {
       contentUrl: imageUrl,
       sha256: imageSHA256,
     };
+    const givenName = faker.person.firstName();
     const data = JSON.stringify(
-      mockValid.metadata(paymentAddress, imageObject),
+      mockValid.metadata(paymentAddress, imageObject, givenName),
       null,
       2
     );
@@ -48,15 +49,18 @@ async function calculateMetadataHash() {
     const hexDigest = calculateHash(data);
 
     const jsonData = JSON.parse(data);
-    return { hexDigest, jsonData };
+    return { hexDigest, jsonData, givenName };
   } catch (error) {
     console.error("Error reading file:", error);
   }
 }
 
 export async function uploadMetadataAndGetJsonHash() {
-  const { hexDigest: dataHash, jsonData } = await calculateMetadataHash();
-  const givenName = faker.person.firstName();
+  const {
+    hexDigest: dataHash,
+    jsonData,
+    givenName,
+  } = await calculateMetadataHash();
   const url = await metadataBucketService.uploadMetadata(givenName, jsonData);
   return { dataHash, url, givenName };
 }

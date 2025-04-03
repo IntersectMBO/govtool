@@ -149,7 +149,11 @@ export const valid = {
     return `ipfs://${randomCID}`;
   },
 
-  metadata: (paymentAddress: string, imageObject: imageObject) => ({
+  metadata: (
+    paymentAddress: string,
+    imageObject: imageObject,
+    givenName: string
+  ) => ({
     "@context": {
       "@language": "en-us",
       CIP100:
@@ -212,7 +216,7 @@ export const valid = {
     authors: [],
     hashAlgorithm: "blake2b-256",
     body: {
-      givenName: faker.person.firstName(),
+      givenName: givenName,
       image: imageObject,
       motivations: faker.lorem.paragraph(2),
       objectives: faker.lorem.paragraph(2),

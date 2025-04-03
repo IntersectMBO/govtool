@@ -8,6 +8,7 @@ import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 import { expect, Page } from "@playwright/test";
 import walletManager from "lib/walletManager";
 import { valid as mockValid } from "@mock/index";
+import { StaticWallet } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("11. Proposal Budget");
@@ -15,10 +16,9 @@ test.beforeEach(async () => {
 
 test.describe("Budget proposal dRep behaviour", () => {
   let budgetDiscussionDetailsPage: BudgetDiscussionDetailsPage;
-  let dRepId: string;
+  let wallet: StaticWallet;
   test.beforeEach(async ({ browser, page }) => {
-    const wallet = await walletManager.popWallet("registeredDRep");
-    dRepId = wallet.dRepId;
+    wallet = await walletManager.popWallet("registeredDRep");
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
@@ -40,7 +40,7 @@ test.describe("Budget proposal dRep behaviour", () => {
   test("11K. Should allow registered DRep to vote on a proposal", async () => {
     const pollVotes = ["Yes", "No"];
     const choice = faker.helpers.arrayElement(pollVotes);
-    console.log(choice);
+
     await budgetDiscussionDetailsPage.voteOnPoll(choice);
 
     await expect(budgetDiscussionDetailsPage.pollYesBtn).not.toBeVisible();
@@ -62,7 +62,7 @@ test.describe("Budget proposal dRep behaviour", () => {
   test("11L. Should allow registered DRep to change vote on a proposal", async () => {
     const pollVotes = ["Yes", "No"];
     const choice = faker.helpers.arrayElement(pollVotes);
-    console.log(choice);
+
     await budgetDiscussionDetailsPage.voteOnPoll(choice);
     await budgetDiscussionDetailsPage.changePollVote();
 
@@ -83,5 +83,31 @@ test.describe("Budget proposal dRep behaviour", () => {
       )
     ).toHaveText(`${oppositeVote}: (100%)`);
   });
-  test("11M. Should display DRep tag, name and ID when a registered DRep comments on a proposal", async ({}) => {});
+
+  test("11M. Should display DRep tag, name and ID when a registered DRep comments on a proposal", async () => {
+    const comment = faker.lorem.paragraph(2);
+    await budgetDiscussionDetailsPage.addComment(comment);
+
+    await expect(
+      budgetDiscussionDetailsPage.currentPage
+        .locator('[data-testid^="comment-"][data-testid$="-content"]')
+        .first()
+    ).toHaveText(comment);
+
+    const dRepCommentedCard = budgetDiscussionDetailsPage.currentPage
+      .locator('[data-testid^="comment-"][data-testid$="-content-card"]')
+      .first();
+
+    await expect(
+      dRepCommentedCard.getByText("DRep", { exact: true })
+    ).toBeVisible();
+
+    await expect(dRepCommentedCard.getByTestId("given-name")).toHaveText(
+      wallet.givenName
+    );
+
+    await expect(dRepCommentedCard.getByTestId("drep-id")).toHaveText(
+      wallet.dRepId
+    );
+  });
 });

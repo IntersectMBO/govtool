@@ -8,7 +8,7 @@ import { functionWaitedAssert } from "@helpers/waitedLoop";
 import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 import { expect } from "@playwright/test";
-import { BudgetProposalType, CommentResponse } from "@types";
+import { BudgetDiscussionEnum, CommentResponse } from "@types";
 
 const mockBudgetProposal = require("../../lib/_mock/budgetProposal.json");
 const mockPoll = require("../../lib/_mock/budgetProposalPoll.json");
@@ -97,7 +97,7 @@ test.describe("Budget proposal list manipulation", () => {
 
       // proposal type filter
       await budgetDiscussionPage.applyAndValidateFilters(
-        Object.values(BudgetProposalType),
+        Object.values(BudgetDiscussionEnum),
         budgetDiscussionPage._validateTypeFiltersInProposalCard
       );
     });
@@ -120,7 +120,7 @@ test("11C. Should show view-all categorized budget proposal", async ({
   browser,
 }) => {
   await Promise.all(
-    Object.values(BudgetProposalType).map(async (proposalType: string) => {
+    Object.values(BudgetDiscussionEnum).map(async (proposalType: string) => {
       const context = await browser.newContext();
       const page = await context.newPage();
       injectLogger(page);

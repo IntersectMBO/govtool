@@ -1,19 +1,11 @@
-name: 💡 Feature idea
+name: Feature Suggestion
 description: Suggest a new feature or enhancement for GovTool.
-title: "💡 "
-labels: ["💡 Feature idea", "Needs UX Review"]
-projects: ["IntersectMBO/30", "IntersectMBO/34"]
+labels: ["Feature Request", "Needs UX Review"]
 body:
-  - type: markdown
-    attributes:
-      value: |
-        ## 🌟 **Thank you for contributing to GovTool!**
-  
   - type: markdown
     attributes:
       value:
         Please fill out the following details.
-  
   - type: textarea
     id: problem-statement
     attributes:
@@ -22,7 +14,6 @@ body:
       placeholder: "Example: Users would benefit from having X functionality, so they can do Y..."
     validations:
       required: true
-  
   - type: textarea
     id: user-impact
     attributes:
@@ -31,7 +22,6 @@ body:
       placeholder: "Example: This feature will help first-time users onboard faster..."
     validations:
       required: true
-  
   - type: textarea
     id: dependencies
     attributes:
@@ -40,27 +30,11 @@ body:
       placeholder: "Example: Add a button that says GO to the home page"
     validations:
       required: false
-  
   - type: textarea
     id: other-info
     attributes:
       label: "Anything else you might want to add?"
       description: "Free text box for any comments"
       placeholder: "I love GovTool, and so does my dog!"
-    validations:
-      required: false
-  
-  - type: markdown
-    attributes:
-      value: |
-        ---
-
-  - type: textarea
-    id: user-story
-    attributes:
-      label: (Optional) User Story with acceptance criteria
-      description: See GovTool examples [here](https://github.com/IntersectMBO/cardano-test-plans/blob/main/userStoryInventoryChangHF.md#2g-delegate-to-self-for-registered-dreps).
-      placeholder: |
-        As a [ada holder | DRep | Direct voter], I want [some goal] so that [some reason].
     validations:
       required: false

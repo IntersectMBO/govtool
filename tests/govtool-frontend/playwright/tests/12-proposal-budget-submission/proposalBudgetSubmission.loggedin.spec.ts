@@ -15,6 +15,7 @@ import {
   BudgetProposalProps,
   CompanyEnum,
 } from "@types";
+import { allure } from "allure-playwright";
 
 test.beforeEach(async () => {
   await setAllureEpic("12. Proposal Budget Submission");
@@ -204,24 +205,38 @@ test.describe("Budget proposal 01 wallet", () => {
       });
     });
 
-    test.describe("Budget proposal field validation", () => {
-      test("12E_1. Should accept valid data in “contact information” section", async ({}) => {});
-      test("12E_2. Should accept valid data in “proposal ownership” section", async ({}) => {});
-      test("12E_3. Should accept valid data in “problem statements and proposal benefits” section", async ({}) => {});
-      test("12E_4. Should accept valid data in “proposal details” section", async ({}) => {});
-      test("12E_5. Should accept valid data in “costing” section", async ({}) => {});
-      test("12E_6. Should accept valid data in “further information” section", async ({}) => {});
+    test("12G. Should validate and review submitted budget proposal", async () => {
+      const proposalInformations =
+        budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+      await budgetProposalSubmissionPage.fillupForm(proposalInformations);
 
-      test("12F_1. Should reject invalid data in “contact information” section", async ({}) => {});
-      test("12F_2. Should reject invalid data in “proposal ownership” section", async ({}) => {});
-      test("12F_3. Should reject invalid data in “problem statements and proposal benefits” section", async ({}) => {});
-      test("12E_4. Should accept invalid data in “proposal details” section", async ({}) => {});
-      test("12F_5. Should reject invalid data in “costing” section", async ({}) => {});
-      test("12F_6. Should reject invalid data in “further information” section", async ({}) => {});
+      await budgetProposalSubmissionPage.validateReviewBudgetProposal(
+        proposalInformations
+      );
     });
-
-    test("12G. Should validate and review submitted budget proposal", async ({}) => {});
   });
+});
+
+test.describe("Budget proposal field validation", () => {
+  test.beforeEach(async () => {
+    await allure.description(
+      "Field validation tests are pending implementation."
+    );
+    test.skip();
+  });
+  test("12E_1. Should accept valid data in “contact information” section", async ({}) => {});
+  test("12E_2. Should accept valid data in “proposal ownership” section", async ({}) => {});
+  test("12E_3. Should accept valid data in “problem statements and proposal benefits” section", async ({}) => {});
+  test("12E_4. Should accept valid data in “proposal details” section", async ({}) => {});
+  test("12E_5. Should accept valid data in “costing” section", async ({}) => {});
+  test("12E_6. Should accept valid data in “further information” section", async ({}) => {});
+
+  test("12F_1. Should reject invalid data in “contact information” section", async ({}) => {});
+  test("12F_2. Should reject invalid data in “proposal ownership” section", async ({}) => {});
+  test("12F_3. Should reject invalid data in “problem statements and proposal benefits” section", async ({}) => {});
+  test("12E_4. Should accept invalid data in “proposal details” section", async ({}) => {});
+  test("12F_5. Should reject invalid data in “costing” section", async ({}) => {});
+  test("12F_6. Should reject invalid data in “further information” section", async ({}) => {});
 });
 
 test("12C. Should save and view draft proposal", async ({ browser }) => {

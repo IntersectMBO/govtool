@@ -489,16 +489,16 @@ export type preferredCurrencyType =
   | "Nepalese Rupee";
 
 export enum PreferredCurrencyEnum {
-  UnitedStatesDollar = "United States Dollar",
-  Euro = "Euro",
-  JapaneseYen = "Japanese Yen",
-  AustralianDollar = "Australian Dollar",
-  NepaleseRupee = "Nepalese Rupee",
+  USD = "United States Dollar",
+  EUR = "Euro",
+  JPY = "Japanese Yen",
+  AUD = "Australian Dollar",
+  NPR = "Nepalese Rupee",
 }
 
 export interface BudgetCostingProps {
   adaAmount: number;
-  usaToAdaCnversionRate: number;
+  adaToUsdConversionRate: number;
   preferredCurrency: preferredCurrencyType;
   AmountInPreferredCurrency: number;
   costBreakdown: string;

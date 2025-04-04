@@ -74,7 +74,9 @@ export default class BudgetDiscussionSubmissionPage {
 
   // proposal-ownership
   readonly companyNameInput = this.page.getByLabel("Company Name *"); //BUG missing test Ids
-  readonly companyDomainName = this.page.getByLabel("Company Domain Name *"); //BUG missing test Ids
+  readonly companyDomainNameInput = this.page.getByLabel(
+    "Company Domain Name *"
+  ); //BUG missing test Ids
   readonly groupNameInput = this.page.getByLabel("Group Name *"); //BUG missing test Ids
   readonly groupTypeInput = this.page.getByLabel("Type of Group *"); //BUG missing test Ids
   readonly keyInformationOfGroupInput = this.page.getByLabel(
@@ -144,7 +146,9 @@ export default class BudgetDiscussionSubmissionPage {
   );
 
   readonly companyTypeSelect = this.page.getByTestId("beneficiary-type");
-  readonly publicChampion = this.page.getByTestId("proposal-public-champion");
+  readonly publicChampionSelect = this.page.getByTestId(
+    "proposal-public-champion"
+  );
 
   readonly roadmapNameSelect = this.page.getByTestId("roadmap-name");
   readonly budgetDiscussionTypeSelect = this.page.getByTestId(
@@ -167,6 +171,10 @@ export default class BudgetDiscussionSubmissionPage {
   readonly linkUrlContent = this.page.getByTestId("link-0-url-content");
 
   constructor(private readonly page: Page) {}
+
+  get currentPage(): Page {
+    return this.page;
+  }
 
   async goto() {
     await this.page.goto(`${environments.frontendUrl}/budget_discussion`);
@@ -215,7 +223,7 @@ export default class BudgetDiscussionSubmissionPage {
       .getByRole("option", { name: proposalOwnership.companyType })
       .click(); //BUG missing testId
 
-    await this.publicChampion.click();
+    await this.publicChampionSelect.click();
     await this.page
       .getByRole("option", { name: proposalOwnership.publicChampion })
       .click(); //BUG missing testId
@@ -231,7 +239,9 @@ export default class BudgetDiscussionSubmissionPage {
     }
     if (proposalOwnership.companyType === "Company") {
       await this.companyNameInput.fill(proposalOwnership.companyName);
-      await this.companyDomainName.fill(proposalOwnership.companyDomainName);
+      await this.companyDomainNameInput.fill(
+        proposalOwnership.companyDomainName
+      );
       await this.countryOfIncorporationBtn.click();
       await this.page
         .getByTestId(
@@ -349,35 +359,46 @@ export default class BudgetDiscussionSubmissionPage {
     await this.continueBtn.click();
   }
 
-  async fillupForm(budgetProposal: BudgetProposalProps) {
+  async fillupForm(budgetProposal: BudgetProposalProps, stage = 8) {
     await this.fillupContactInformationForm(budgetProposal.contactInformation);
 
-    await this.fillupProposalOwnershipForm(budgetProposal.proposalOwnership);
+    if (stage > 2) {
+      await this.fillupProposalOwnershipForm(budgetProposal.proposalOwnership);
+    }
 
-    await this.fillupProblemStatementAndBenefitsForm(
-      budgetProposal.problemStatementAndBenefits
-    );
-
-    await this.fillupProposalDetailsForm(budgetProposal.proposalDetails);
-    await this.fillupCostingForm(budgetProposal.costing);
-    await this.fillupFurtherInformation(budgetProposal.furtherInformation);
-
-    await this.intersectNamedAdministratorSelect.click();
-
-    await this.page
-      .getByTestId(
-        `${budgetProposal.administrationAndAuditing.intersectAdministration}-button`
-      )
-      .click();
-    if (!budgetProposal.administrationAndAuditing.intersectAdministration) {
-      await this.venderDetailsInput.fill(
-        budgetProposal.administrationAndAuditing.venderDetails
+    if (stage > 3) {
+      await this.fillupProblemStatementAndBenefitsForm(
+        budgetProposal.problemStatementAndBenefits
       );
     }
-    await this.continueBtn.click();
 
-    await this.submitCheckbox.click();
-    await this.continueBtn.click();
+    if (stage > 4) {
+      await this.fillupProposalDetailsForm(budgetProposal.proposalDetails);
+    }
+    if (stage > 5) {
+      await this.fillupCostingForm(budgetProposal.costing);
+    }
+    if (stage > 6) {
+      await this.fillupFurtherInformation(budgetProposal.furtherInformation);
+    }
+    if (stage > 7) {
+      await this.intersectNamedAdministratorSelect.click();
+
+      await this.page
+        .getByTestId(
+          `${budgetProposal.administrationAndAuditing.intersectAdministration}-button`
+        )
+        .click();
+      if (!budgetProposal.administrationAndAuditing.intersectAdministration) {
+        await this.venderDetailsInput.fill(
+          budgetProposal.administrationAndAuditing.venderDetails
+        );
+      }
+      await this.continueBtn.click();
+
+      await this.submitCheckbox.click();
+      await this.continueBtn.click();
+    }
   }
 
   async getAllDrafts() {

@@ -14,7 +14,7 @@ import { functionWaitedAssert } from "@helpers/waitedLoop";
 import { StaticWallet } from "@types";
 
 const REGISTER_DREP_WALLETS_COUNT = 6;
-const DREP_WALLETS_COUNT = 12;
+const DREP_WALLETS_COUNT = 9;
 
 let dRepDeposit: number;
 
@@ -41,7 +41,17 @@ setup("Register DRep of static wallets", async () => {
   try {
     // Submit metadata to obtain a URL and generate hash value.
     const metadataPromises = dRepWallets.map(async (dRepWallet) => {
-      return { ...(await uploadMetadataAndGetJsonHash()), wallet: dRepWallet };
+      const metadataResponse = await uploadMetadataAndGetJsonHash();
+      const givenName = metadataResponse.givenName;
+      const index = dRepWallets.indexOf(dRepWallet);
+      dRepWallets[index] = {
+        ...dRepWallet,
+        givenName,
+      };
+      return {
+        ...metadataResponse,
+        wallet: dRepWallet,
+      };
     });
 
     const metadataAndDRepWallets = await Promise.all(metadataPromises);

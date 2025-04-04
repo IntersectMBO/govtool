@@ -187,7 +187,7 @@ test("11E. Should view comments with count indications on a budget proposal", as
   page,
 }) => {
   let responsePromise = page.waitForResponse((response) =>
-    response.url().includes(`/api/comments`)
+    response.url().includes(`/api/bds/`)
   );
 
   const budgetDiscussionPage = new BudgetDiscussionPage(page);
@@ -197,13 +197,12 @@ test("11E. Should view comments with count indications on a budget proposal", as
     await budgetDiscussionPage.viewFirstProposal();
   const response = await responsePromise;
 
-  const comments: CommentResponse[] = (await response.json()).data;
-
-  await responsePromise;
+  const proposalResponse = await response.json();
 
   const actualTotalComments =
     await budgetDiscussionDetailsPage.totalComments.textContent();
-  const expectedTotalComments = comments.length.toString();
+  const expectedTotalComments =
+    proposalResponse.data.attributes.prop_comments_number.toString();
   const isEqual = actualTotalComments === expectedTotalComments;
 
   const currentPageUrl = budgetDiscussionDetailsPage.currentPage.url();

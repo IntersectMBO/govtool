@@ -1,13 +1,19 @@
 import {
   budgetProposal01Wallet,
   budgetProposal02Wallet,
+  budgetProposal03Wallet,
+  budgetProposal04Wallet,
 } from "@constants/staticWallets";
 import { test } from "@fixtures/budgetProposal";
 import { setAllureEpic } from "@helpers/allure";
 import { createNewPageWithWallet } from "@helpers/page";
+import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
 import BudgetDiscussionSubmissionPage from "@pages/budgetDiscussionSubmissionPage";
 import { expect } from "@playwright/test";
-import { BudgetProposalContactInformationProps } from "@types";
+import {
+  BudgetProposalContactInformationProps,
+  BudgetProposalProps,
+} from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("12. Proposal Budget Submission");
@@ -97,5 +103,48 @@ test("12C. Should save and view draft proposal", async ({ browser }) => {
   );
 });
 
-test("12H. Should submit a valid budget proposal", async ({}) => {});
-test("12I. Should submit a valid draft budget proposal", async ({}) => {});
+test("12H. Should submit a valid budget proposal", async ({ browser }) => {
+  const page = await createNewPageWithWallet(browser, {
+    storageState: ".auth/budgetProposal03.json",
+    wallet: budgetProposal03Wallet,
+  });
+  const budgetSubmissionPage = new BudgetDiscussionSubmissionPage(page);
+  await budgetSubmissionPage.goto();
+  const { proposalId, proposalDetails } =
+    await budgetSubmissionPage.createBudgetProposal();
+
+  const budgetDiscussionDetailsPage = new BudgetDiscussionDetailsPage(page);
+  await budgetDiscussionDetailsPage.goto(proposalId);
+
+  await budgetDiscussionDetailsPage.validateProposalDetails(proposalDetails);
+
+  await budgetDiscussionDetailsPage.deleteProposal();
+});
+
+test("12I. Should submit a valid draft budget proposal", async ({
+  browser,
+}) => {
+  test.slow();
+  const page = await createNewPageWithWallet(browser, {
+    storageState: ".auth/budgetProposal04.json",
+    wallet: budgetProposal04Wallet,
+  });
+
+  const budgetSubmissionPage = new BudgetDiscussionSubmissionPage(page);
+  await budgetSubmissionPage.goto();
+  const draftContact = (await budgetSubmissionPage.createDraftBudgetProposal(
+    true
+  )) as BudgetProposalProps;
+
+  await budgetSubmissionPage.viewLastDraft();
+
+  for (let i = 0; i < 8; i++) {
+    await budgetSubmissionPage.continueBtn.click();
+  }
+  await budgetSubmissionPage.submitBtn.click();
+
+  const budgetDiscussionDetailsPage = new BudgetDiscussionDetailsPage(page);
+  await budgetDiscussionDetailsPage.validateProposalDetails(draftContact);
+
+  await budgetDiscussionDetailsPage.deleteProposal();
+});

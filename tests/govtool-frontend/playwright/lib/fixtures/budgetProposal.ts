@@ -21,7 +21,8 @@ export const test = base.extend<TestOptions>({
     );
     await budgetProposalCreationPage.goto();
 
-    const proposalId = await budgetProposalCreationPage.createBudgetProposal();
+    const { proposalId } =
+      await budgetProposalCreationPage.createBudgetProposal();
 
     const budgetProposalDetailsPage = new BudgetDiscussionDetailsPage(
       budgetProposalPage

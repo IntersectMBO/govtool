@@ -545,7 +545,10 @@ export default class BudgetDiscussionSubmissionPage {
     return fillAllDetails ? budgetProposal : budgetProposal.contactInformation;
   }
 
-  async createBudgetProposal(): Promise<number> {
+  async createBudgetProposal(): Promise<{
+    proposalId: number;
+    proposalDetails: BudgetProposalProps;
+  }> {
     const budgetProposalRequest: BudgetProposalProps =
       this.generateValidBudgetProposalInformation();
 
@@ -558,6 +561,9 @@ export default class BudgetDiscussionSubmissionPage {
     });
 
     const currentPageUrl = this.page.url();
-    return extractProposalIdFromUrl(currentPageUrl);
+    return {
+      proposalId: extractProposalIdFromUrl(currentPageUrl),
+      proposalDetails: budgetProposalRequest,
+    };
   }
 }

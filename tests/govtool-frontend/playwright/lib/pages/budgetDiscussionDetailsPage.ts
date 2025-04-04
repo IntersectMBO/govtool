@@ -1,8 +1,5 @@
 import { expect, Page } from "@playwright/test";
-import {
-  BudgetProposalProps,
-  CommentResponse,
-} from "@types";
+import { BudgetProposalProps, CommentResponse } from "@types";
 import environments from "lib/constants/environments";
 
 export default class BudgetDiscussionDetailsPage {

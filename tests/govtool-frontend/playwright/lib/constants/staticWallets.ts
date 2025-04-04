@@ -30,6 +30,8 @@ export const proposal09Wallet: StaticWallet = staticWallets[19];
 
 export const budgetProposal01Wallet: StaticWallet = staticWallets[20];
 export const budgetProposal02Wallet: StaticWallet = staticWallets[21];
+export const budgetProposal03Wallet: StaticWallet = staticWallets[22];
+export const budgetProposal04Wallet: StaticWallet = staticWallets[23];
 
 export const adaHolderWallets = [
   adaHolder01Wallet,

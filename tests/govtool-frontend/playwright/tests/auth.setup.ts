@@ -9,6 +9,8 @@ import {
   adaHolder06Wallet,
   budgetProposal01Wallet,
   budgetProposal02Wallet,
+  budgetProposal03Wallet,
+  budgetProposal04Wallet,
   dRep01Wallet,
   dRep02Wallet,
   dRep03Wallet,
@@ -57,6 +59,8 @@ const proposal09AuthFile = ".auth/proposal09.json";
 
 const budgetProposal01AuthFile = ".auth/budgetProposal01.json";
 const budgetProposal02AuthFile = ".auth/budgetProposal02.json";
+const budgetProposal03AuthFile = ".auth/budgetProposal03.json";
+const budgetProposal04AuthFile = ".auth/budgetProposal04.json";
 
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
@@ -250,5 +254,23 @@ setup("Create Budget Proposal 02 auth", async ({ page, context }) => {
     context,
     wallet: budgetProposal02Wallet,
     auth: budgetProposal02AuthFile,
+  });
+});
+
+setup("Create Budget Proposal 03 auth", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: budgetProposal03Wallet,
+    auth: budgetProposal03AuthFile,
+  });
+});
+
+setup("Create Budget Proposal 04 auth", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: budgetProposal04Wallet,
+    auth: budgetProposal04AuthFile,
   });
 });

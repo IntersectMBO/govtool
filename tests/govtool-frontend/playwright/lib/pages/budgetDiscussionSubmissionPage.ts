@@ -39,11 +39,13 @@ export default class BudgetDiscussionSubmissionPage {
   readonly createBudgetProposalBtn = this.page.getByTestId(
     "propose-a-budget-discussion-button"
   );
+  readonly closeDraftBtn = this.page.getByTestId("close-button");
+  readonly cancelBtn = this.page.getByTestId("cancel-button");
 
   readonly continueBtn = this.page.getByTestId("continue-button");
   readonly addLinkBtn = this.page.getByTestId("add-link-button");
   readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
-  readonly saveDraftBtn = this.page.getByTestId("save-draft-button");
+  readonly saveDraftBtn = this.page.getByTestId("draft-button");
   readonly submitBtn = this.page.getByTestId("submit-button");
   readonly countryOfIncorporationBtn = this.page.getByTestId(
     "country-of-incorporation"
@@ -380,33 +382,36 @@ export default class BudgetDiscussionSubmissionPage {
 
   async getAllDrafts() {
     await expect(
-      this.page.locator('[data-testid^="draft-"][data-testid$="-card"]')
+      this.page
+        .locator('[data-testid^="draft-"][data-testid$="-proposal"]')
+        .first()
     ).toBeVisible({ timeout: 60_000 }); // slow rendering
 
     return await this.page
-      .locator('[data-testid^="draft-"][data-testid$="-card"]')
+      .locator('[data-testid^="draft-"][data-testid$="-proposal"]')
       .all();
   }
 
   async getFirstDraft() {
     await expect(
-      this.page.locator('[data-testid^="draft-"][data-testid$="-card"]').first()
+      this.page
+        .locator('[data-testid^="draft-"][data-testid$="-proposal"]')
+        .first()
     ).toBeVisible({ timeout: 60_000 }); // slow rendering
 
     return this.page
-      .locator('[data-testid^="draft-"][data-testid$="-card"]')
+      .locator('[data-testid^="draft-"][data-testid$="-proposal"]')
       .first();
   }
 
-  async viewFirstDraft() {
+  async viewLastDraft() {
     await expect(
-      this.page.locator('[data-testid^="draft-"][data-testid$="-card"]')
+      this.page
+        .locator('[data-testid^="draft-"][data-testid$="-proposal"]')
+        .last()
     ).toBeVisible({ timeout: 60_000 }); // slow rendering
 
-    return await this.page
-      .locator('[data-testid^="draft-"][data-testid$="-start-editing"]')
-      .first()
-      .click();
+    return await this.page.getByTestId("draft-start-editing").last().click();
   }
 
   generateValidBudgetProposalContactInformation(): BudgetProposalContactInformationProps {
@@ -519,6 +524,25 @@ export default class BudgetDiscussionSubmissionPage {
       furtherInformation: this.generateValidFurtherInformation(),
       administrationAndAuditing: this.generateAdministrationAndAuditing(),
     };
+  }
+
+  async createDraftBudgetProposal(fillAllDetails = false) {
+    const budgetProposal = this.generateValidBudgetProposalInformation();
+
+    if (fillAllDetails) {
+      await this.fillupForm(budgetProposal);
+    } else {
+      await this.fillupContactInformationForm(
+        budgetProposal.contactInformation
+      );
+    }
+
+    await this.saveDraftBtn.click();
+    await this.closeDraftBtn.click();
+    await this.cancelBtn.click();
+    await this.createBudgetProposalBtn.click();
+
+    return fillAllDetails ? budgetProposal : budgetProposal.contactInformation;
   }
 
   async createBudgetProposal(): Promise<number> {

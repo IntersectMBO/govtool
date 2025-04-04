@@ -16,6 +16,7 @@ export default class BudgetDiscussionDetailsPage {
   readonly changeVoteYesBtn = this.page.getByTestId(
     "change-poll-vote-yes-button"
   );
+  readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
 
   // content
   readonly copyLinkText = this.page.getByTestId("copy-link-text");
@@ -32,7 +33,7 @@ export default class BudgetDiscussionDetailsPage {
     return this.page;
   }
 
-  async goto(proposalId: string) {
+  async goto(proposalId: number) {
     await this.page.goto(
       `${environments.frontendUrl}/budget_discussion/${proposalId}`
     );

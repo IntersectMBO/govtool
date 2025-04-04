@@ -141,7 +141,7 @@ export default class BudgetDiscussionSubmissionPage {
     "beneficiary-nationality"
   );
 
-  readonly companyTypeSelect = this.page.getByTestId("beneficiary-nationality"); //BUG wrong test id
+  readonly companyTypeSelect = this.page.getByTestId("beneficiary-type");
   readonly publicChampion = this.page.getByTestId("proposal-public-champion");
 
   readonly roadmapNameSelect = this.page.getByTestId("roadmap-name");
@@ -190,7 +190,9 @@ export default class BudgetDiscussionSubmissionPage {
       .click();
     await this.beneficiaryNationalitySelect.click();
     await this.page
-      .getByRole("option", { name: contactInformation.beneficiaryNationality })
+      .getByTestId(
+        `${contactInformation.beneficiaryNationality.toLowerCase()}-button`
+      )
       .click();
 
     await this.submissionLeadFullNameInput.fill(
@@ -411,12 +413,12 @@ export default class BudgetDiscussionSubmissionPage {
     return {
       beneficiaryFullName: faker.person.fullName(),
       beneficiaryEmail: faker.internet.email(),
-      beneficiaryCountry: faker.helpers.arrayElement(
-        Object.values(LocationEnum)
-      ),
-      beneficiaryNationality: faker.helpers.arrayElement(
-        Object.values(LocationEnum)
-      ),
+      beneficiaryCountry: faker.helpers
+        .arrayElement(Object.values(LocationEnum))
+        .replace(/ /g, "-"),
+      beneficiaryNationality: faker.helpers
+        .arrayElement(Object.values(LocationEnum))
+        .replace(/ /g, "-"),
       submissionLeadFullName: faker.person.fullName(),
       submissionLeadEmail: faker.internet.email(),
     };
@@ -452,9 +454,9 @@ export default class BudgetDiscussionSubmissionPage {
       groupKeyIdentity: faker.lorem.paragraph(2),
       companyName: faker.company.name(),
       companyDomainName: faker.internet.domainName(),
-      countryOfIncorportation: faker.helpers.arrayElement(
-        Object.values(LocationEnum)
-      ),
+      countryOfIncorportation: faker.helpers
+        .arrayElement(Object.values(LocationEnum))
+        .replace(/ /g, "-"),
     };
   }
 
@@ -524,7 +526,7 @@ export default class BudgetDiscussionSubmissionPage {
       this.generateValidBudgetProposalInformation();
 
     await this.fillupForm(budgetProposalRequest);
-    await this.continueBtn.click(); // BUG incorrect test id -> submit-button
+    await this.submitBtn.click(); // BUG incorrect test id -> submit-button
 
     // assert to check if the proposal is created and navigated to details page
     await expect(this.page.getByTestId("review-version")).toBeVisible({

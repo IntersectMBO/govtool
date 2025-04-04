@@ -80,6 +80,7 @@ test.describe("Budget proposal dRep behaviour", () => {
     const comment = faker.lorem.paragraph(2);
     const budgetDiscussionPage = new BudgetDiscussionPage(page);
     await budgetDiscussionPage.goto();
+    await budgetDiscussionPage.verifyIdentityBtn.click();
     const budgetDiscussionDetailsPage =
       await budgetDiscussionPage.viewFirstProposal();
     await budgetDiscussionDetailsPage.addComment(comment);

@@ -201,9 +201,20 @@ test("11E. Should view comments with count indications on a budget proposal", as
 
   await responsePromise;
 
-  await expect(budgetDiscussionDetailsPage.totalComments).toHaveText(
-    comments.length.toString()
-  );
+  const actualTotalComments =
+    await budgetDiscussionDetailsPage.totalComments.textContent();
+  const expectedTotalComments = comments.length.toString();
+  const isEqual = actualTotalComments === expectedTotalComments;
+
+  const currentPageUrl = budgetDiscussionDetailsPage.currentPage.url();
+
+  const proposalId = extractProposalIdFromUrl(currentPageUrl);
+
+  await expect(
+    budgetDiscussionDetailsPage.totalComments,
+    !isEqual &&
+      `Total comments do not match in ${environments.frontendUrl}/budget_discussion/${proposalId}`
+  ).toHaveText(expectedTotalComments);
 });
 
 test.describe("Restricted access to interact budget proposal", () => {

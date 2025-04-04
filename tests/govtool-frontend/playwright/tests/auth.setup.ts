@@ -10,6 +10,7 @@ import {
   budgetProposal01Wallet,
   dRep01Wallet,
   dRep02Wallet,
+  dRep03Wallet,
   proposal01Wallet,
   proposal02Wallet,
   proposal03Wallet,
@@ -32,6 +33,7 @@ import { skipIfNotHardFork } from "@helpers/cardano";
 
 const dRep01AuthFile = ".auth/dRep01.json";
 const dRep02AuthFile = ".auth/dRep02.json";
+const dRep03AuthFile = ".auth/dRep03.json";
 
 const adaHolder01AuthFile = ".auth/adaHolder01.json";
 const adaHolder02AuthFile = ".auth/adaHolder02.json";
@@ -75,6 +77,15 @@ setup("Create DRep 02 auth", async ({ page, context }) => {
     context,
     wallet: dRep02Wallet,
     auth: dRep02AuthFile,
+  });
+});
+
+setup("Create DRep 03 auth with username", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: dRep03Wallet,
+    auth: dRep03AuthFile,
   });
 });
 

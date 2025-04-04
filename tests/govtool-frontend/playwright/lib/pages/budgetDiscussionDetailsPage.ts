@@ -199,7 +199,7 @@ export default class BudgetDiscussionDetailsPage {
       budgetProposal.costing.adaAmount.toString()
     );
     await expect(this.costingConversionRateContent).toHaveText(
-      budgetProposal.costing.usaToAdaCnversionRate.toString()
+      budgetProposal.costing.adaToUsdConversionRate.toString()
     );
     await expect(this.constingPreferedCurrencyContent).toHaveText(
       budgetProposal.costing.preferredCurrency
@@ -218,7 +218,7 @@ export default class BudgetDiscussionDetailsPage {
 
     // administration and auditing validation
     await expect(this.includeAsAuditorContent).toHaveText(
-      budgetProposal.administrationAndAuditing.intersectAdministration
+      budgetProposal.administrationAndAuditing.intersectAdministration === true
         ? "Yes"
         : "No"
     );

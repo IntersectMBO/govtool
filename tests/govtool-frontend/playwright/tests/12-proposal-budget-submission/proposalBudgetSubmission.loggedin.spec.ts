@@ -220,7 +220,15 @@ test.describe("Budget proposal 01 wallet", () => {
       test("12F_6. Should reject invalid data in “further information” section", async ({}) => {});
     });
 
-    test("12G. Should validate and review submitted budget proposal", async ({}) => {});
+    test("12G. Should validate and review submitted budget proposal", async () => {
+      const proposalInformations =
+        budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+      await budgetProposalSubmissionPage.fillupForm(proposalInformations);
+
+      await budgetProposalSubmissionPage.validateReviewBudgetProposal(
+        proposalInformations
+      );
+    });
   });
 });
 

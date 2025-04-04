@@ -170,6 +170,93 @@ export default class BudgetDiscussionSubmissionPage {
   readonly linkTextContent = this.page.getByTestId("link-0-text-content");
   readonly linkUrlContent = this.page.getByTestId("link-0-url-content");
 
+  // contact information
+  readonly beneficiaryFullNameContent = this.page.getByTestId(
+    "beneficiary-full-name-content"
+  );
+  readonly beneficiaryCountryOfResidenceContent = this.page.getByTestId(
+    "beneficiary-country-of-residence-content"
+  );
+
+  // proposal ownership
+  readonly companyTypeContent = this.page.getByTestId(
+    "submited-on-behalf-content"
+  );
+  readonly groupNameContent = this.page.getByTestId("group-name-content");
+  readonly groupTypeContent = this.page.getByTestId("group-type-content");
+  readonly groupKeyIdentityContent = this.page.getByTestId(
+    "group-identity-information-content"
+  );
+  readonly companyNameContent = this.page.getByTestId("company-name-content");
+  readonly companyDomainNameContent = this.page.getByTestId(
+    "company-domain-name-content"
+  );
+  readonly countryOfIncorporationContent = this.page.getByTestId(
+    "country-of-incorporation-content"
+  );
+  readonly providePreferredContent = this.page.getByTestId(
+    "provide-preferred-content"
+  );
+  readonly socialHandlesContent = this.page.getByTestId(
+    "social-handles-content"
+  );
+
+  // problem statements and benefits
+  readonly problemStatementContent = this.page.getByTestId(
+    "problem-statement-content"
+  );
+  readonly proposalBenefitsContent = this.page.getByTestId(
+    "proposal-benefit-content"
+  );
+  readonly roadmapContent = this.page.getByTestId("roadmap-content");
+  readonly budgetCategoryContent = this.page.getByTestId(
+    "budget-category-content"
+  );
+  readonly committeeContent = this.page.getByTestId("committee-content");
+  readonly endorsementContent = this.page.getByTestId("endorsement-content");
+
+  // proposal details
+  readonly proposalNameContent = this.page.getByTestId("proposal-name-content");
+  readonly proposalDescriptionContent = this.page.getByTestId(
+    "proposal-description-content"
+  );
+  readonly proposalKeyDependenciesContent = this.page.getByTestId(
+    "key-dependencies-content"
+  );
+  readonly proposalMaintainAndSupportContent = this.page.getByTestId(
+    "maintain-and-support-content"
+  );
+  readonly proposalDeliverablesContent = this.page.getByTestId(
+    "key-proposal-deliverables-content"
+  );
+  readonly resourcingDurationEstimatesContent = this.page.getByTestId(
+    "resourcing-duration-estimates-content"
+  );
+  readonly experienceContent = this.page.getByTestId("experience-content");
+  readonly contractingContent = this.page.getByTestId(
+    "contracting-type-name-content"
+  );
+
+  // costing
+  readonly adaAmountContent = this.page.getByTestId("ada-amount-content");
+  readonly adaToUsdConversionRateContent = this.page.getByTestId(
+    "usd-to-ada-conversion-rate-content"
+  ); // BUG typo
+  readonly preferredCurrencyContent = this.page.getByTestId(
+    "preferred-currency-content"
+  );
+  readonly preferredCurrencyAmountContent = this.page.getByTestId(
+    "amount-in-preferred-currency-content"
+  );
+  readonly costBreakdownContent = this.page.getByTestId(
+    "cost-breakdown-content"
+  );
+
+  // administration and auditing
+  readonly intersectAdministrationContent = this.page.getByTestId(
+    "intersect-named-administrator-content"
+  );
+
   constructor(private readonly page: Page) {}
 
   get currentPage(): Page {
@@ -195,13 +282,13 @@ export default class BudgetDiscussionSubmissionPage {
     await this.beneficiaryCountrySelect.click();
     await this.page
       .getByTestId(
-        `${contactInformation.beneficiaryCountry.toLowerCase()}-button`
+        `${contactInformation.beneficiaryCountry.toLowerCase().replace(/ /g, "-")}-button`
       )
       .click();
     await this.beneficiaryNationalitySelect.click();
     await this.page
       .getByTestId(
-        `${contactInformation.beneficiaryNationality.toLowerCase()}-button`
+        `${contactInformation.beneficiaryNationality.toLowerCase().replace(/ /g, "-")}-button`
       )
       .click();
 
@@ -245,7 +332,7 @@ export default class BudgetDiscussionSubmissionPage {
       await this.countryOfIncorporationBtn.click();
       await this.page
         .getByTestId(
-          `${proposalOwnership.countryOfIncorportation.toLowerCase()}-country-of-incorporation-button`
+          `${proposalOwnership.countryOfIncorportation.toLowerCase().replace(/ /g, "-")}-country-of-incorporation-button`
         )
         .click();
     }
@@ -330,7 +417,7 @@ export default class BudgetDiscussionSubmissionPage {
   async fillupCostingForm(costing: BudgetCostingProps) {
     await this.adaAmountInput.fill(costing.adaAmount.toString());
     await this.usaToAdaCnversionRateInput.fill(
-      costing.usaToAdaCnversionRate.toString()
+      costing.adaToUsdConversionRate.toString()
     );
     await this.preferredCurrencySelect.click();
     await this.page
@@ -439,12 +526,12 @@ export default class BudgetDiscussionSubmissionPage {
     return {
       beneficiaryFullName: faker.person.fullName(),
       beneficiaryEmail: faker.internet.email(),
-      beneficiaryCountry: faker.helpers
-        .arrayElement(Object.values(LocationEnum))
-        .replace(/ /g, "-"),
-      beneficiaryNationality: faker.helpers
-        .arrayElement(Object.values(LocationEnum))
-        .replace(/ /g, "-"),
+      beneficiaryCountry: faker.helpers.arrayElement(
+        Object.values(LocationEnum)
+      ),
+      beneficiaryNationality: faker.helpers.arrayElement(
+        Object.values(LocationEnum)
+      ),
       submissionLeadFullName: faker.person.fullName(),
       submissionLeadEmail: faker.internet.email(),
     };
@@ -480,9 +567,9 @@ export default class BudgetDiscussionSubmissionPage {
       groupKeyIdentity: faker.lorem.paragraph(2),
       companyName: faker.company.name(),
       companyDomainName: faker.internet.domainName(),
-      countryOfIncorportation: faker.helpers
-        .arrayElement(Object.values(LocationEnum))
-        .replace(/ /g, "-"),
+      countryOfIncorportation: faker.helpers.arrayElement(
+        Object.values(LocationEnum)
+      ),
     };
   }
 
@@ -505,7 +592,7 @@ export default class BudgetDiscussionSubmissionPage {
   generateValidCosting(): BudgetCostingProps {
     return {
       adaAmount: faker.number.int({ min: 100, max: 10000 }),
-      usaToAdaCnversionRate: faker.number.int({ min: 1, max: 100 }),
+      adaToUsdConversionRate: faker.number.int({ min: 1, max: 100 }),
       preferredCurrency: faker.helpers.arrayElement(
         Object.values(PreferredCurrencyEnum)
       ),
@@ -586,5 +673,165 @@ export default class BudgetDiscussionSubmissionPage {
       proposalId: extractProposalIdFromUrl(currentPageUrl),
       proposalDetails: budgetProposalRequest,
     };
+  }
+
+  async validateReviewBudgetProposal(
+    proposalInformations: BudgetProposalProps
+  ) {
+    // contact information
+    await expect(this.beneficiaryFullNameContent).toHaveText(
+      proposalInformations.contactInformation.beneficiaryFullName
+    );
+    await expect(this.beneficiaryCountryOfResidenceContent).toHaveText(
+      proposalInformations.contactInformation.beneficiaryCountry
+    );
+    //BUG missing testId
+    await expect(
+      this.currentPage.getByText(
+        proposalInformations.contactInformation.beneficiaryNationality,
+        { exact: true }
+      )
+    ).toBeVisible();
+    //BUG missing testId
+    await expect(
+      this.currentPage.getByText(
+        proposalInformations.contactInformation.submissionLeadEmail,
+        { exact: true }
+      )
+    ).toBeVisible();
+    //BUG missing testId
+    await expect(
+      this.currentPage.getByText(
+        proposalInformations.contactInformation.submissionLeadFullName,
+        { exact: true }
+      )
+    ).toBeVisible();
+
+    // proposal ownership
+    await expect(this.companyTypeContent).toHaveText(
+      proposalInformations.proposalOwnership.companyType
+    );
+    await expect(this.providePreferredContent).toHaveText(
+      proposalInformations.proposalOwnership.publicChampion
+    );
+    await expect(this.socialHandlesContent).toHaveText(
+      proposalInformations.proposalOwnership.contactDetails
+    );
+
+    if (
+      proposalInformations.proposalOwnership.companyType === CompanyEnum.Company
+    ) {
+      await expect(this.companyNameContent).toHaveText(
+        proposalInformations.proposalOwnership.companyName
+      );
+      await expect(this.companyDomainNameContent).toHaveText(
+        proposalInformations.proposalOwnership.companyDomainName
+      );
+      await expect(this.countryOfIncorporationContent).toHaveText(
+        proposalInformations.proposalOwnership.countryOfIncorportation
+      );
+    }
+    if (
+      proposalInformations.proposalOwnership.companyType === CompanyEnum.Group
+    ) {
+      await expect(this.groupNameContent).toHaveText(
+        proposalInformations.proposalOwnership.groupName
+      );
+      await expect(this.groupTypeContent).toHaveText(
+        proposalInformations.proposalOwnership.groupType
+      );
+      await expect(this.groupKeyIdentityContent).toHaveText(
+        proposalInformations.proposalOwnership.groupKeyIdentity
+      );
+    }
+
+    // problem statement and proposal benefits
+    await expect(this.problemStatementContent).toHaveText(
+      proposalInformations.problemStatementAndBenefits.problemStatement
+    );
+    await expect(this.proposalBenefitsContent).toHaveText(
+      proposalInformations.problemStatementAndBenefits.proposalBenefits
+    );
+    await expect(this.roadmapContent).toHaveText(
+      proposalInformations.problemStatementAndBenefits.roadmapName
+    );
+    await expect(this.budgetCategoryContent).toHaveText(
+      proposalInformations.problemStatementAndBenefits.budgetDiscussionType
+    );
+    await expect(this.committeeContent).toHaveText(
+      proposalInformations.problemStatementAndBenefits.committeeAlignmentType
+    );
+    await expect(this.endorsementContent).toHaveText(
+      proposalInformations.problemStatementAndBenefits.suplimentaryEndorsement
+    );
+
+    // proposal details
+    await expect(this.proposalNameContent).toHaveText(
+      proposalInformations.proposalDetails.proposalName
+    );
+    await expect(this.proposalDescriptionContent).toHaveText(
+      proposalInformations.proposalDetails.proposalDescription
+    );
+    await expect(this.proposalKeyDependenciesContent).toHaveText(
+      proposalInformations.proposalDetails.proposalKeyDependencies
+    );
+    await expect(this.proposalMaintainAndSupportContent).toHaveText(
+      proposalInformations.proposalDetails.proposalMaintainAndSupport
+    );
+    await expect(this.proposalDeliverablesContent).toHaveText(
+      proposalInformations.proposalDetails.milestones
+    );
+    await expect(this.resourcingDurationEstimatesContent).toHaveText(
+      proposalInformations.proposalDetails.teamSizeAndDuration
+    );
+    await expect(this.experienceContent).toHaveText(
+      proposalInformations.proposalDetails.previousExperience
+    );
+    await expect(this.contractingContent).toHaveText(
+      proposalInformations.proposalDetails.contracting
+    );
+
+    // costing
+    await expect(this.adaAmountContent).toHaveText(
+      proposalInformations.costing.adaAmount.toString()
+    );
+    await expect(this.adaToUsdConversionRateContent).toHaveText(
+      proposalInformations.costing.adaToUsdConversionRate.toString()
+    );
+
+    const preferredCurrencyShortForm = Object.keys(PreferredCurrencyEnum).find(
+      (key) =>
+        PreferredCurrencyEnum[key as keyof typeof PreferredCurrencyEnum] ===
+        proposalInformations.costing.preferredCurrency
+    );
+
+    await expect(this.preferredCurrencyContent).toHaveText(
+      preferredCurrencyShortForm
+    );
+    await expect(this.preferredCurrencyAmountContent).toHaveText(
+      proposalInformations.costing.AmountInPreferredCurrency.toString()
+    );
+    await expect(this.costBreakdownContent).toHaveText(
+      proposalInformations.costing.costBreakdown
+    );
+
+    // further information
+    for (let i = 0; i < proposalInformations.furtherInformation.length; i++) {
+      //BUG missing testId
+      await expect(
+        this.currentPage.getByRole("link", {
+          name: proposalInformations.furtherInformation[i].prop_link_text,
+          exact: true,
+        })
+      ).toBeVisible();
+    }
+
+    // administration and auditing
+    await expect(this.intersectAdministrationContent).toHaveText(
+      proposalInformations.administrationAndAuditing.intersectAdministration ===
+        true
+        ? "Yes"
+        : "No"
+    );
   }
 }

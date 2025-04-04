@@ -233,7 +233,7 @@ export default class BudgetDiscussionSubmissionPage {
       await this.countryOfIncorporationBtn.click();
       await this.page
         .getByTestId(
-          `${proposalOwnership.countryOfIncorportation.toLowerCase()}-button`
+          `${proposalOwnership.countryOfIncorportation.toLowerCase()}-country-of-incorporation-button`
         )
         .click();
     }
@@ -526,7 +526,7 @@ export default class BudgetDiscussionSubmissionPage {
       this.generateValidBudgetProposalInformation();
 
     await this.fillupForm(budgetProposalRequest);
-    await this.submitBtn.click(); // BUG incorrect test id -> submit-button
+    await this.submitBtn.click();
 
     // assert to check if the proposal is created and navigated to details page
     await expect(this.page.getByTestId("review-version")).toBeVisible({

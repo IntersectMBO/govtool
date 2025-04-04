@@ -3,7 +3,7 @@ import { test } from "@fixtures/budgetProposal";
 import { setAllureEpic } from "@helpers/allure";
 import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
 import { expect } from "@playwright/test";
-import { dRep01Wallet } from "@constants/staticWallets";
+import { dRep03Wallet } from "@constants/staticWallets";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 
 test.beforeEach(async () => {
@@ -12,8 +12,8 @@ test.beforeEach(async () => {
 
 test.describe("Budget proposal dRep behaviour", () => {
   test.use({
-    storageState: ".auth/dRep01.json",
-    wallet: dRep01Wallet,
+    storageState: ".auth/dRep03.json",
+    wallet: dRep03Wallet,
   });
 
   test.describe("Budget proposal voting", () => {
@@ -99,11 +99,11 @@ test.describe("Budget proposal dRep behaviour", () => {
     ).toBeVisible();
 
     await expect(dRepCommentedCard.getByTestId("given-name")).toHaveText(
-      dRep01Wallet.givenName
+      dRep03Wallet.givenName
     );
 
     await expect(dRepCommentedCard.getByTestId("drep-id")).toHaveText(
-      dRep01Wallet.dRepId
+      dRep03Wallet.dRepId
     );
   });
 });

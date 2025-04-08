@@ -12,10 +12,13 @@ changes.
 
 ### Added
 
+- Add uncontrolled image input to improve performance of large base64 encoded image strings
+
 ### Fixed
 
 - Fix scroll on a drawer on smaller resolution
 - Fix incorrect routing on connecting wallet on budget discussion page
+- Fix missing validation on failed image sha generation [Issue 3246](https://github.com/IntersectMBO/govtool/issues/3246)
 
 ### Changed
 

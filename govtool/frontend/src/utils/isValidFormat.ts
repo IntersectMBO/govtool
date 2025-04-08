@@ -5,6 +5,7 @@ import {
 } from "@emurgo/cardano-serialization-lib-asmjs";
 import i18n from "@/i18n";
 import { adaHandleService } from "@/services/AdaHandle";
+import { getImageSha } from "./getImageSha";
 
 export const URL_REGEX =
   /^(?:(?:https?:\/\/)?(?:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})(?:\/[^\s]*)?)|(?:ipfs:\/\/(?:[a-zA-Z0-9]+(?:\/[a-zA-Z0-9._-]+)*))$|^$/;
@@ -75,4 +76,16 @@ export async function isDRepView(view?: string) {
     return true;
   }
   return i18n.t("forms.errors.mustBeDRepView");
+}
+
+export async function isValidImageUrl(url: string) {
+  if (!url.length) return false;
+  try {
+    if (URL_REGEX.test(url)) {
+      await getImageSha(url);
+    }
+    return true;
+  } catch (error) {
+    return i18n.t("forms.errors.couldNotGenerateImageSha");
+  }
 }

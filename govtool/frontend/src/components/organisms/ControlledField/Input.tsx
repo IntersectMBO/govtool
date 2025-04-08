@@ -8,7 +8,6 @@ import { ControlledInputProps, RenderInputProps } from "./types";
 export const Input = forwardRef<HTMLInputElement, ControlledInputProps>(
   ({ control, name, errors, rules, ...props }, ref) => {
     const errorMessage = get(errors, name)?.message as string;
-
     const renderInput = useCallback(
       ({ field }: RenderInputProps) => (
         <Field.Input

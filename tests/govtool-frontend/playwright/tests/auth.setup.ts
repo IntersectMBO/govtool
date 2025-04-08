@@ -7,8 +7,13 @@ import {
   adaHolder04Wallet,
   adaHolder05Wallet,
   adaHolder06Wallet,
+  budgetProposal01Wallet,
+  budgetProposal02Wallet,
+  budgetProposal03Wallet,
+  budgetProposal04Wallet,
   dRep01Wallet,
   dRep02Wallet,
+  dRep03Wallet,
   proposal01Wallet,
   proposal02Wallet,
   proposal03Wallet,
@@ -31,6 +36,7 @@ import { skipIfNotHardFork } from "@helpers/cardano";
 
 const dRep01AuthFile = ".auth/dRep01.json";
 const dRep02AuthFile = ".auth/dRep02.json";
+const dRep03AuthFile = ".auth/dRep03.json";
 
 const adaHolder01AuthFile = ".auth/adaHolder01.json";
 const adaHolder02AuthFile = ".auth/adaHolder02.json";
@@ -50,6 +56,11 @@ const proposal06AuthFile = ".auth/proposal06.json";
 const proposal07AuthFile = ".auth/proposal07.json";
 const proposal08AuthFile = ".auth/proposal08.json";
 const proposal09AuthFile = ".auth/proposal09.json";
+
+const budgetProposal01AuthFile = ".auth/budgetProposal01.json";
+const budgetProposal02AuthFile = ".auth/budgetProposal02.json";
+const budgetProposal03AuthFile = ".auth/budgetProposal03.json";
+const budgetProposal04AuthFile = ".auth/budgetProposal04.json";
 
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
@@ -72,6 +83,15 @@ setup("Create DRep 02 auth", async ({ page, context }) => {
     context,
     wallet: dRep02Wallet,
     auth: dRep02AuthFile,
+  });
+});
+
+setup("Create DRep 03 auth with username", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: dRep03Wallet,
+    auth: dRep03AuthFile,
   });
 });
 
@@ -216,5 +236,41 @@ setup("Create Proposal 09 auth", async ({ page, context }) => {
     context,
     wallet: proposal09Wallet,
     auth: proposal09AuthFile,
+  });
+});
+
+setup("Create Budget Proposal 01 auth", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: budgetProposal01Wallet,
+    auth: budgetProposal01AuthFile,
+  });
+});
+
+setup("Create Budget Proposal 02 auth", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: budgetProposal02Wallet,
+    auth: budgetProposal02AuthFile,
+  });
+});
+
+setup("Create Budget Proposal 03 auth", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: budgetProposal03Wallet,
+    auth: budgetProposal03AuthFile,
+  });
+});
+
+setup("Create Budget Proposal 04 auth", async ({ page, context }) => {
+  await createAuthWithUserName({
+    page,
+    context,
+    wallet: budgetProposal04Wallet,
+    auth: budgetProposal04AuthFile,
   });
 });

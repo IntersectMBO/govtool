@@ -11,6 +11,7 @@ import { test as setup } from "@fixtures/walletExtension";
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
+import { StaticWallet } from "@types";
 
 const REGISTER_DREP_WALLETS_COUNT = 6;
 const DREP_WALLETS_COUNT = 10;
@@ -40,7 +41,17 @@ setup("Register DRep of static wallets", async () => {
   try {
     // Submit metadata to obtain a URL and generate hash value.
     const metadataPromises = dRepWallets.map(async (dRepWallet) => {
-      return { ...(await uploadMetadataAndGetJsonHash()), wallet: dRepWallet };
+      const metadataResponse = await uploadMetadataAndGetJsonHash();
+      const givenName = metadataResponse.givenName;
+      const index = dRepWallets.indexOf(dRepWallet);
+      dRepWallets[index] = {
+        ...dRepWallet,
+        givenName,
+      };
+      return {
+        ...metadataResponse,
+        wallet: dRepWallet,
+      };
     });
 
     const metadataAndDRepWallets = await Promise.all(metadataPromises);
@@ -64,7 +75,7 @@ setup("Register DRep of static wallets", async () => {
 setup("Setup temporary DRep wallets", async () => {
   setup.setTimeout(3 * environments.txTimeOut);
 
-  const dRepWallets = await generateWallets(DREP_WALLETS_COUNT);
+  const dRepWallets: StaticWallet[] = await generateWallets(DREP_WALLETS_COUNT);
   const registerDRepWallets = await generateWallets(
     REGISTER_DREP_WALLETS_COUNT
   );
@@ -78,7 +89,17 @@ setup("Setup temporary DRep wallets", async () => {
 
   // Submit metadata to obtain a URL and generate hash value.
   const metadataPromises = dRepWallets.map(async (dRepWallet) => {
-    return { ...(await uploadMetadataAndGetJsonHash()), wallet: dRepWallet };
+    const metadataResponse = await uploadMetadataAndGetJsonHash();
+    const givenName = metadataResponse.givenName;
+    const index = dRepWallets.indexOf(dRepWallet);
+    dRepWallets[index] = {
+      ...dRepWallet,
+      givenName,
+    };
+    return {
+      ...metadataResponse,
+      wallet: dRepWallet,
+    };
   });
 
   const metadatasAndDRepWallets = await Promise.all(metadataPromises);

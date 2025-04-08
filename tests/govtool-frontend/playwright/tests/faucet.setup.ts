@@ -6,6 +6,7 @@ import { pollTransaction } from "@helpers/transaction";
 import { test as setup } from "@fixtures/walletExtension";
 import { loadAmountFromFaucet } from "@services/faucetService";
 import kuberService from "@services/kuberService";
+import { functionWaitedAssert } from "@helpers/waitedLoop";
 
 setup.describe.configure({ timeout: environments.txTimeOut });
 
@@ -16,9 +17,15 @@ setup.beforeEach(async () => {
 });
 
 setup("Faucet setup", async () => {
-  const balance = await kuberService.getBalance(faucetWallet.address);
-  if (balance > 100_000) return;
+  let balance: number;
+  functionWaitedAssert(
+    async () => {
+      balance = await kuberService.getBalance(faucetWallet.address);
+    },
+    { message: "get balance" }
+  );
 
+  if (balance > 100_000) return;
   const res = await loadAmountFromFaucet(faucetWallet.address);
   await pollTransaction(res.txid);
 });

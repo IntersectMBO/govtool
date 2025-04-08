@@ -1512,10 +1512,10 @@
   resolved "https://registry.npmjs.org/@intersect.mbo/intersectmbo.org-icons-set/-/intersectmbo.org-icons-set-1.1.0.tgz"
   integrity sha512-sjKEtnK9eLYH/8kCD0YRQCms3byFA/tnSsei9NHTZbBYX9sBpeX6ErfR0sKYjOSxQOxl4FumX9D0X+vHIqxo8g==
 
-"@intersect.mbo/pdf-ui@0.7.0-beta-13":
-  version "0.7.0-beta-13"
-  resolved "https://registry.npmjs.org/@intersect.mbo/pdf-ui/-/pdf-ui-0.7.0-beta-13.tgz"
-  integrity sha512-X7iUviqzNiuQyaYp5bZ3XwUztU5wM/B1LiMYBNy+0uEQpKL/Dzsld4LxY+P81BQJMz9skPm1Wi8S/ob7frOGXQ==
+"@intersect.mbo/pdf-ui@0.7.0-beta-14":
+  version "0.7.0-beta-14"
+  resolved "https://registry.npmjs.org/@intersect.mbo/pdf-ui/-/pdf-ui-0.7.0-beta-14.tgz"
+  integrity sha512-ewj+AHa+bdhLf88WEWGLKCPvRu0LJ9qpUfHA5d5Qpzy+7vT7iAy+ejR6qJD0Nnm5x50QTMaAuv5jONP6gYy9wg==
   dependencies:
     "@emurgo/cardano-serialization-lib-asmjs" "^12.0.0-beta.2"
     "@fontsource/poppins" "^5.0.14"

@@ -3,6 +3,7 @@ import {
   IMAGE_REGEX,
   URL_REGEX,
   isReceivingAddress,
+  isValidImageUrl,
   isValidURLLength,
 } from "@/utils";
 
@@ -76,5 +77,6 @@ export const Rules = {
       value: IMAGE_REGEX,
       message: i18n.t("registration.fields.validations.image"),
     },
+    validate: isValidImageUrl,
   },
 };

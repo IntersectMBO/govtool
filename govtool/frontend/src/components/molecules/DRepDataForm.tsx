@@ -14,7 +14,7 @@ import { Rules } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { DRepDataFormValues } from "@/types/dRep";
 
-import { ControlledField } from "../organisms";
+import { ControlledField, UncontrolledImageInput } from "../organisms";
 
 const MAX_NUMBER_OF_LINKS = 7;
 
@@ -106,9 +106,9 @@ export const DRepDataForm = ({ control, errors, register, watch }: Props) => {
             title={t("forms.dRepData.image")}
             subtitle={t("forms.dRepData.imageHelpfulText")}
           />
-          <ControlledField.Input
-            {...{ control, errors }}
+          <UncontrolledImageInput
             data-testid="image-input"
+            control={control}
             name="image"
             rules={Rules.IMAGE_URL}
           />

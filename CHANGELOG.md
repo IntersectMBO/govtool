@@ -12,6 +12,8 @@ changes.
 
 ### Added
 
+- Add Proposal discussion context that manages username [Issue 3341](https://github.com/IntersectMBO/govtool/issues/3341)
+
 ### Fixed
 
 - Fix scroll on a drawer on smaller resolution

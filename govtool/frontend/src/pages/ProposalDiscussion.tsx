@@ -1,7 +1,11 @@
 import React, { ComponentProps, Suspense } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import "@intersect.mbo/pdf-ui/style";
-import { useCardano, useGovernanceActions } from "@/context";
+import {
+  useCardano,
+  useGovernanceActions,
+  useProposalDiscussion,
+} from "@/context";
 import { useValidateMutation } from "@/hooks/mutations";
 import { useScreenDimension } from "@/hooks/useScreenDimension";
 import { Footer, TopNav } from "@/components/organisms";
@@ -18,6 +22,7 @@ export const ProposalDiscussionPillar = () => {
   const { voter } = useGetVoterInfo();
   const { createGovernanceActionJsonLD, createHash } = useGovernanceActions();
   const { fetchDRepVotingPowerList } = useGetDRepVotingPowerList();
+  const { username, setUsername } = useProposalDiscussion();
 
   return (
     <Box
@@ -67,6 +72,8 @@ export const ProposalDiscussionPillar = () => {
               >["validateMetadata"]
             }
             fetchDRepVotingPowerList={fetchDRepVotingPowerList}
+            username={username}
+            setUsername={setUsername}
           />
         </Suspense>
       </Box>

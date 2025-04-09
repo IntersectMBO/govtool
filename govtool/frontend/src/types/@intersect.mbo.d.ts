@@ -27,6 +27,8 @@ type ProposalDiscussionProps = {
   fetchDRepVotingPowerList: (
     identifiers: string[],
   ) => Promise<DRepVotingPowerListResponse>;
+  username: string;
+  setUsername: (username: string) => void;
 };
 
 type GovernanceActionsOutcomesProps = {

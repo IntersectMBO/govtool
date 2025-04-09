@@ -13,6 +13,7 @@ changes.
 ### Added
 
 - Add Proposal discussion context that manages username [Issue 3341](https://github.com/IntersectMBO/govtool/issues/3341)
+- Add epochParams and ada holder balance to Proposal Discussion Pillar [Issue 2243](https://github.com/IntersectMBO/govtool/issues/2243)
 
 ### Fixed
 

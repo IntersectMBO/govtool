@@ -211,7 +211,10 @@ const kuberService = {
   },
 
   multipleDRepRegistration: (metadataAndWallets: WalletAndAnchorType[]) => {
-    const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
+    const kuber = new Kuber(
+      proposalFaucetWallet.address,
+      proposalFaucetWallet.payment.private
+    );
     const req = {
       certificates: metadataAndWallets.map((metadataAndWallet) =>
         Kuber.generateCert(

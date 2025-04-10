@@ -187,7 +187,7 @@ test("11E. Should view comments with count indications on a budget proposal", as
   page,
 }) => {
   let responsePromise = page.waitForResponse((response) =>
-    response.url().includes(`/api/comments`)
+    response.url().includes(`/api/bds/`)
   );
 
   const budgetDiscussionPage = new BudgetDiscussionPage(page);
@@ -197,13 +197,23 @@ test("11E. Should view comments with count indications on a budget proposal", as
     await budgetDiscussionPage.viewFirstProposal();
   const response = await responsePromise;
 
-  const comments: CommentResponse[] = (await response.json()).data;
+  const proposalResponse = await response.json();
 
-  await responsePromise;
+  const actualTotalComments =
+    await budgetDiscussionDetailsPage.totalComments.textContent();
+  const expectedTotalComments =
+    proposalResponse.data.attributes.prop_comments_number.toString();
+  const isEqual = actualTotalComments === expectedTotalComments;
 
-  await expect(budgetDiscussionDetailsPage.totalComments).toHaveText(
-    comments.length.toString()
-  );
+  const currentPageUrl = budgetDiscussionDetailsPage.currentPage.url();
+
+  const proposalId = extractProposalIdFromUrl(currentPageUrl);
+
+  await expect(
+    budgetDiscussionDetailsPage.totalComments,
+    !isEqual &&
+      `Total comments do not match in ${environments.frontendUrl}/budget_discussion/${proposalId}`
+  ).toHaveText(expectedTotalComments);
 });
 
 test.describe("Restricted access to interact budget proposal", () => {

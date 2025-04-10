@@ -40,6 +40,8 @@ declare module "@intersect.mbo/pdf-ui/cjs" {
     ipfsGateway?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     walletAPI?: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    i18n?: any;
   };
 
   export default function ProposalDiscussion(

@@ -2,7 +2,7 @@ import { Box, CircularProgress } from "@mui/material";
 import React, { Suspense } from "react";
 import { Footer, TopNav } from "@/components/organisms";
 import { useCardano } from "@/context";
-import { useScreenDimension } from "@/hooks";
+import { useScreenDimension, useTranslation } from "@/hooks";
 import { Background } from "@/components/atoms";
 
 const GovernanceActionsOutcomes = React.lazy(
@@ -12,6 +12,8 @@ const GovernanceActionsOutcomes = React.lazy(
 export const GovernanceActionOutComesPillar = () => {
   const { pagePadding } = useScreenDimension();
   const { walletApi, ...context } = useCardano();
+  const { i18n } = useTranslation();
+
   return (
     <Background>
       <Box
@@ -49,6 +51,7 @@ export const GovernanceActionOutComesPillar = () => {
               apiUrl={import.meta.env.VITE_OUTCOMES_API_URL}
               ipfsGateway={import.meta.env.VITE_IPFS_GATEWAY}
               walletAPI={{ ...context, ...walletApi }}
+              i18n={i18n}
             />
           </Suspense>
         </Box>

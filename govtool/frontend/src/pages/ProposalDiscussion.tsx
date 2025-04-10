@@ -1,23 +1,35 @@
 import React, { ComponentProps, Suspense } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import "@intersect.mbo/pdf-ui/style";
-import { useCardano, useGovernanceActions } from "@/context";
+import {
+  useAppContext,
+  useCardano,
+  useGovernanceActions,
+  useProposalDiscussion,
+} from "@/context";
 import { useValidateMutation } from "@/hooks/mutations";
 import { useScreenDimension } from "@/hooks/useScreenDimension";
 import { Footer, TopNav } from "@/components/organisms";
-import { useGetDRepVotingPowerList, useGetVoterInfo } from "@/hooks";
+import {
+  useGetAdaHolderVotingPowerQuery,
+  useGetDRepVotingPowerList,
+  useGetVoterInfo,
+} from "@/hooks";
 
 const ProposalDiscussion = React.lazy(
   () => import("@intersect.mbo/pdf-ui/cjs"),
 );
 
 export const ProposalDiscussionPillar = () => {
+  const { epochParams } = useAppContext();
   const { pagePadding } = useScreenDimension();
   const { validateMetadata } = useValidateMutation();
   const { walletApi, ...context } = useCardano();
   const { voter } = useGetVoterInfo();
   const { createGovernanceActionJsonLD, createHash } = useGovernanceActions();
   const { fetchDRepVotingPowerList } = useGetDRepVotingPowerList();
+  const { username, setUsername } = useProposalDiscussion();
+  const { votingPower } = useGetAdaHolderVotingPowerQuery(context.stakeKey);
 
   return (
     <Box
@@ -67,6 +79,10 @@ export const ProposalDiscussionPillar = () => {
               >["validateMetadata"]
             }
             fetchDRepVotingPowerList={fetchDRepVotingPowerList}
+            username={username}
+            setUsername={setUsername}
+            epochParams={epochParams}
+            votingPower={votingPower}
           />
         </Suspense>
       </Box>

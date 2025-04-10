@@ -49,7 +49,7 @@ test.describe("Budget proposal logged in state", () => {
   });
 
   test("11I. Should comments on any proposal", async ({}) => {
-    const comment = faker.lorem.paragraph(2);
+    const comment = faker.lorem.paragraph(1);
     await budgetDiscussionDetailsPage.addComment(comment);
     await expect(
       budgetDiscussionDetailsPage.currentPage
@@ -59,7 +59,7 @@ test.describe("Budget proposal logged in state", () => {
   });
 
   test("11J. Should reply to any comments", async ({}) => {
-    const randComment = faker.lorem.paragraph(2);
+    const randComment = faker.lorem.paragraph(1);
     const randReply = faker.lorem.words(5);
 
     await budgetDiscussionDetailsPage.addComment(randComment);

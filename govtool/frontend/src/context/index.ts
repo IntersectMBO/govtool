@@ -8,3 +8,4 @@ export * from "./usersnapContext";
 export * from "./wallet";
 export * from "./featureFlag";
 export * from "./governanceAction";
+export * from "./proposalDiscussion";

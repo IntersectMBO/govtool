@@ -1,5 +1,5 @@
-import { VotedProposal, VotedProposalDTO } from "@/models";
-import { decodeCIP129Identifier, mapDtoToProposal } from "@/utils";
+import { VotedProposal } from "@/models";
+import { decodeCIP129Identifier } from "@/utils";
 
 import { API } from "../API";
 
@@ -15,12 +15,9 @@ export const getProposal = async (
 
   const encodedHash = encodeURIComponent(proposalId);
 
-  const { data } = await API.get<VotedProposalDTO>(
+  const { data } = await API.get<VotedProposal>(
     `/proposal/get/${encodedHash}?drepId=${drepId}`,
   );
 
-  return {
-    ...data,
-    proposal: await mapDtoToProposal(data.proposal),
-  };
+  return data;
 };

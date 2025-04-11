@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Box, Tabs, Tab, styled } from "@mui/material";
+import { Box, Tabs, Tab, styled, Skeleton } from "@mui/material";
 import { useLocation } from "react-router-dom";
 
 import { CopyButton, ExternalModalButton, Typography } from "@atoms";
@@ -59,10 +59,11 @@ const StyledTab = styled(({ isMobile, ...props }: StyledTabProps) => (
 
 type GovernanceActionDetailsCardDataProps = {
   isDashboard?: boolean;
-  isDataMissing: MetadataValidationStatus | null;
+  isDataMissing?: MetadataValidationStatus;
   isInProgress?: boolean;
   isOneColumn: boolean;
   isSubmitted?: boolean;
+  isValidating?: boolean;
   proposal: ProposalData;
 };
 
@@ -72,6 +73,7 @@ export const GovernanceActionDetailsCardData = ({
   isInProgress,
   isOneColumn,
   isSubmitted,
+  isValidating,
   proposal: {
     abstract,
     createdDate,
@@ -243,11 +245,13 @@ export const GovernanceActionDetailsCardData = ({
     >
       <DataMissingHeader
         isDataMissing={isDataMissing}
+        isValidating={isValidating}
         title={title}
         shareLink={govActionLinkToShare}
       />
       <DataMissingInfoBox
         isDataMissing={isDataMissing}
+        isValidating={isValidating}
         isInProgress={isInProgress}
         isSubmitted={isSubmitted}
       />
@@ -256,25 +260,31 @@ export const GovernanceActionDetailsCardData = ({
         text={label}
         textVariant="pill"
         dataTestId={`${getProposalTypeNoEmptySpaces(label)}-type`}
+        isValidating={isValidating}
       />
       <GovernanceActionsDatesBox
         createdDate={createdDate}
         expiryDate={expiryDate}
         expiryEpochNo={expiryEpochNo}
         createdEpochNo={createdEpochNo}
+        isValidating={isValidating}
       />
-      {isDataMissing && (
-        <ExternalModalButton
-          url={url}
-          label={t("govActions.seeExternalData")}
-        />
-      )}
+      {isDataMissing &&
+        (isValidating ? (
+          <Skeleton height="24px" width="128px" variant="text" />
+        ) : (
+          <ExternalModalButton
+            url={url}
+            label={t("govActions.seeExternalData")}
+          />
+        ))}
       <GovernanceActionCardElement
         label={t("govActions.cip129GovernanceActionId")}
         text={cip129GovernanceActionId}
         dataTestId={`${cip129GovernanceActionId}-id`}
         isCopyButton
         textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
+        isValidating={isValidating}
       />
       <GovernanceActionCardElement
         label={t("govActions.governanceActionId")}
@@ -283,6 +293,7 @@ export const GovernanceActionDetailsCardData = ({
         dataTestId={`${govActionId}-id`}
         textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
         isSemiTransparent
+        isValidating={isValidating}
       />
 
       {tabs?.length === 1 ? (
@@ -322,7 +333,8 @@ export const GovernanceActionDetailsCardData = ({
           ))}
         </>
       )}
-      {details &&
+      {!isValidating &&
+        details &&
         type === GovernanceActionType.TreasuryWithdrawals &&
         Array.isArray(details) &&
         details.map((withdrawal) => (
@@ -333,7 +345,7 @@ export const GovernanceActionDetailsCardData = ({
           />
         ))}
       {/* NewConstitution metadata hash and url is visible in details tab */}
-      {type !== GovernanceActionType.NewConstitution && (
+      {!isValidating && type !== GovernanceActionType.NewConstitution && (
         <>
           <GovernanceActionCardElement
             label={t("govActions.anchorURL")}
@@ -341,6 +353,7 @@ export const GovernanceActionDetailsCardData = ({
             textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
             dataTestId="anchor-url"
             isLinkButton
+            isValidating={isValidating}
           />
           <GovernanceActionCardElement
             label={t("govActions.anchorHash")}
@@ -348,6 +361,7 @@ export const GovernanceActionDetailsCardData = ({
             textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
             dataTestId="anchor-hash"
             isCopyButton
+            isValidating={isValidating}
           />
         </>
       )}
@@ -361,7 +375,10 @@ const ReasoningTabContent = ({
   abstract,
   motivation,
   rationale,
-}: Pick<ProposalData, "abstract" | "motivation" | "rationale">) => {
+  isValidating,
+}: Pick<ProposalData, "abstract" | "motivation" | "rationale"> & {
+  isValidating?: boolean;
+}) => {
   const { t } = useTranslation();
 
   return (
@@ -372,6 +389,7 @@ const ReasoningTabContent = ({
         textVariant="longText"
         dataTestId="abstract"
         isMarkdown
+        isValidating={isValidating}
       />
       <GovernanceActionCardElement
         label={t("govActions.motivation")}
@@ -379,6 +397,7 @@ const ReasoningTabContent = ({
         textVariant="longText"
         dataTestId="motivation"
         isMarkdown
+        isValidating={isValidating}
       />
       <GovernanceActionCardElement
         label={t("govActions.rationale")}
@@ -386,6 +405,7 @@ const ReasoningTabContent = ({
         textVariant="longText"
         dataTestId="rationale"
         isMarkdown
+        isValidating={isValidating}
       />
     </>
   );
@@ -394,7 +414,9 @@ const ReasoningTabContent = ({
 const HardforkDetailsTabContent = ({
   details,
   prevGovActionId,
-}: Pick<ProposalData, "details"> & { prevGovActionId: string | null }) => {
+}: Pick<ProposalData, "details"> & {
+  prevGovActionId: string | null;
+}) => {
   const { epochParams } = useAppContext();
   const { t } = useTranslation();
 

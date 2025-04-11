@@ -19,6 +19,7 @@ export const generateJsonld = async <
   const doc = {
     "@context": context,
     hashAlgorithm: "blake2b-256",
+    authors: [],
     body,
   };
 

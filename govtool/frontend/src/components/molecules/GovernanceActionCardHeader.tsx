@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 import { Tooltip, Typography } from "@atoms";
@@ -8,12 +8,14 @@ import { MetadataValidationStatus } from "@/models";
 
 type GovernanceActionCardHeaderProps = {
   title?: string;
-  isDataMissing: MetadataValidationStatus | null;
+  isDataMissing?: MetadataValidationStatus;
+  isValidating?: boolean;
 };
 
 export const GovernanceActionCardHeader = ({
   title,
   isDataMissing,
+  isValidating,
 }: GovernanceActionCardHeaderProps) => {
   const { t } = useTranslation();
 
@@ -27,24 +29,28 @@ export const GovernanceActionCardHeader = ({
       }}
       data-testid="governance-action-card-header"
     >
-      <Typography
-        sx={{
-          fontSize: 18,
-          fontWeight: 600,
-          lineHeight: "24px",
-          display: "-webkit-box",
-          WebkitBoxOrient: "vertical",
-          WebkitLineClamp: 2,
-          wordBreak: "break-word",
-          ...(isDataMissing && { color: "errorRed" }),
-        }}
-      >
-        {(isDataMissing &&
-          getMetadataDataMissingStatusTranslation(
-            isDataMissing as MetadataValidationStatus,
-          )) ||
-          title}
-      </Typography>
+      {isValidating ? (
+        <Skeleton height="24px" width="100px" variant="rounded" />
+      ) : (
+        <Typography
+          sx={{
+            fontSize: 18,
+            fontWeight: 600,
+            lineHeight: "24px",
+            display: "-webkit-box",
+            WebkitBoxOrient: "vertical",
+            WebkitLineClamp: 2,
+            wordBreak: "break-word",
+            ...(isDataMissing && { color: "errorRed" }),
+          }}
+        >
+          {(isDataMissing &&
+            getMetadataDataMissingStatusTranslation(
+              isDataMissing as MetadataValidationStatus,
+            )) ||
+            title}
+        </Typography>
+      )}
       {isDataMissing && typeof isDataMissing === "string" && (
         <Tooltip
           heading={getMetadataDataMissingStatusTranslation(

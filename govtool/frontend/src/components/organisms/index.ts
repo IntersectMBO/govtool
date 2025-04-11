@@ -25,5 +25,7 @@ export * from "./RegisterAsDRepSteps";
 export * from "./Slider";
 export * from "./TopNav";
 export * from "./UncontrolledImageInput";
+export * from "./ValidatedGovernanceActionCard";
+export * from "./ValidatedGovernanceVotedOnCard";
 export * from "./VoteContext";
 export * from "./WrongRouteInfo";

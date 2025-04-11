@@ -1,11 +1,7 @@
-import { Infinite, ProposalData, ProposalDataDTO } from "@models";
+import { Infinite, ProposalData } from "@models";
 
 import { API } from "../API";
-import {
-  decodeCIP129Identifier,
-  getFullGovActionId,
-  mapDtoToProposal,
-} from "@/utils";
+import { decodeCIP129Identifier, getFullGovActionId } from "@/utils";
 
 export type GetProposalsArguments = {
   dRepID?: string;
@@ -34,7 +30,7 @@ export const getProposals = async ({
 
     return rawSearchPhrase;
   })();
-  const response = await API.get<Infinite<ProposalDataDTO>>("/proposal/list", {
+  const response = await API.get<Infinite<ProposalData>>("/proposal/list", {
     params: {
       page,
       pageSize,
@@ -47,14 +43,5 @@ export const getProposals = async ({
     },
   });
 
-  const validatedResponse = {
-    ...response.data,
-    elements: await Promise.all(
-      response.data.elements.map((proposalDTO) =>
-        mapDtoToProposal(proposalDTO),
-      ),
-    ),
-  };
-
-  return validatedResponse;
+  return response.data;
 };

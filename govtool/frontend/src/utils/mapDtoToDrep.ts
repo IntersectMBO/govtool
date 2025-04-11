@@ -1,10 +1,4 @@
-import {
-  DRepData,
-  DRepMetadata,
-  DrepDataDTO,
-  MetadataStandard,
-} from "@/models";
-import { postValidate } from "@/services";
+import { DRepData, DrepDataDTO } from "@/models";
 import { fixViewForScriptBasedDRep } from "./dRep";
 
 const imageFetchDefaultOptions: RequestInit = {
@@ -61,23 +55,6 @@ export const mapDtoToDrep = async (dto: DrepDataDTO): Promise<DRepData> => {
           console.error("Error fetching image", error);
         }
       });
-  }
-
-  if (dto.metadataHash && dto.url) {
-    const validationResponse = await postValidate<DRepMetadata>({
-      url: dto.url,
-      hash: dto.metadataHash,
-      standard: MetadataStandard.CIP119,
-    });
-    return {
-      ...dto,
-      ...emptyMetadata,
-      ...validationResponse.metadata,
-      metadataStatus: validationResponse.status || null,
-      metadataValid: validationResponse.valid,
-      image: isIPFSImage ? base64Image : dto.imageUrl,
-      view,
-    };
   }
 
   return {

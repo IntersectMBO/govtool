@@ -176,8 +176,6 @@ export type DRepData = DrepDataDTO & {
   qualifications: string | null;
   references: Reference[];
   doNotList: boolean;
-  metadataStatus: MetadataValidationStatus | null;
-  metadataValid: boolean;
   imageUrl: string | null;
   // either base64 for IPFS image or URL for regular image
   image: string | null;
@@ -210,7 +208,7 @@ export type SubmittedVotesData = {
   protocolParams: EpochParams | null;
 };
 
-export type ProposalDataDTO = {
+export type ProposalData = {
   createdDate: string;
   createdEpochNo: number;
   details?: ActionDetailsType;
@@ -232,19 +230,9 @@ export type ProposalDataDTO = {
   protocolParams: EpochParams | null;
 } & SubmittedVotesData;
 
-export type ProposalData = ProposalDataDTO & {
-  metadataStatus: MetadataValidationStatus | null;
-  metadataValid: boolean;
-};
-
 export type NewConstitutionAnchor = {
   dataHash: string;
   url: string;
-};
-
-export type VotedProposalDTO = {
-  vote: ProposalVote | null;
-  proposal: ProposalDataDTO;
 };
 
 export type VotedProposal = {

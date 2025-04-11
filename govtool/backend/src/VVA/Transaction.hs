@@ -35,8 +35,8 @@ getTransactionStatus ::
   => Text
   -> m (Maybe TransactionStatus)
 getTransactionStatus transactionId = withPool $ \conn -> do
-  result <- liftIO $ SQL.query conn getTransactionStatusSql (transactionId, transactionId)
+  result <- liftIO $ SQL.query conn getTransactionStatusSql (transactionId, transactionId, transactionId)
   case result of
-    [(transactionConfirmed, votingProcedure)] -> do
-      return $ Just $ TransactionStatus transactionConfirmed votingProcedure
+    [(transactionConfirmed, votingProcedure, drepRegistration)] -> do
+      return $ Just $ TransactionStatus transactionConfirmed votingProcedure drepRegistration
     _ -> return Nothing

@@ -11,6 +11,7 @@ import {
   BudgetProposalOwnershipProps,
   BudgetProposalProblemStatementAndBenefitProps,
   BudgetProposalProps,
+  BudgetProposalStageEnum,
   CommitteeAlignmentEnum,
   CompanyEnum,
   LocationEnum,
@@ -440,25 +441,28 @@ export default class BudgetDiscussionSubmissionPage {
     await this.continueBtn.click();
   }
 
-  async fillupForm(budgetProposal: BudgetProposalProps, stage = 7) {
+  async fillupForm(
+    budgetProposal: BudgetProposalProps,
+    stage: BudgetProposalStageEnum = BudgetProposalStageEnum.AdministrationAndAuditing
+  ) {
     await this.fillupProposalOwnershipForm(budgetProposal.proposalOwnership);
 
-    if (stage > 2) {
+    if (stage > BudgetProposalStageEnum.ProposalOwnership) {
       await this.fillupProblemStatementAndBenefitsForm(
         budgetProposal.problemStatementAndBenefits
       );
     }
 
-    if (stage > 3) {
+    if (stage > BudgetProposalStageEnum.ProblemStatementAndBenefits) {
       await this.fillupProposalDetailsForm(budgetProposal.proposalDetails);
     }
-    if (stage > 4) {
+    if (stage > BudgetProposalStageEnum.ProposalDetails) {
       await this.fillupCostingForm(budgetProposal.costing);
     }
-    if (stage > 5) {
+    if (stage > BudgetProposalStageEnum.Costing) {
       await this.fillupFurtherInformation(budgetProposal.furtherInformation);
     }
-    if (stage > 6) {
+    if (stage > BudgetProposalStageEnum.FurtherInformation) {
       await this.intersectNamedAdministratorSelect.click();
 
       await this.page

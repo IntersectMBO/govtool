@@ -13,6 +13,7 @@ import { expect } from "@playwright/test";
 import {
   BudgetProposalOwnershipProps,
   BudgetProposalProps,
+  BudgetProposalStageEnum,
   CompanyEnum,
 } from "@types";
 import { allure } from "allure-playwright";
@@ -115,7 +116,10 @@ test.describe("Budget proposal 01 wallet", () => {
       test("12D_3. Should verify all field of “proposal details” section", async () => {
         const proposalInformation =
           budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
-        await budgetProposalSubmissionPage.fillupForm(proposalInformation, 3);
+        await budgetProposalSubmissionPage.fillupForm(
+          proposalInformation,
+          BudgetProposalStageEnum.ProblemStatementAndBenefits
+        );
 
         await expect(
           budgetProposalSubmissionPage.proposalNameInput
@@ -143,7 +147,10 @@ test.describe("Budget proposal 01 wallet", () => {
       test("12D_4. Should verify all field of “costing” section", async () => {
         const proposalInformation =
           budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
-        await budgetProposalSubmissionPage.fillupForm(proposalInformation, 4);
+        await budgetProposalSubmissionPage.fillupForm(
+          proposalInformation,
+          BudgetProposalStageEnum.ProposalDetails
+        );
 
         await expect(budgetProposalSubmissionPage.adaAmountInput).toBeVisible();
         await expect(
@@ -163,7 +170,10 @@ test.describe("Budget proposal 01 wallet", () => {
       test("12D_5. Should verify all field of “further information” section", async () => {
         const proposalInformation =
           budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
-        await budgetProposalSubmissionPage.fillupForm(proposalInformation, 5);
+        await budgetProposalSubmissionPage.fillupForm(
+          proposalInformation,
+          BudgetProposalStageEnum.Costing
+        );
 
         await expect(budgetProposalSubmissionPage.linkTextInput).toBeVisible();
         await expect(budgetProposalSubmissionPage.linkUrlInput).toBeVisible();
@@ -173,7 +183,10 @@ test.describe("Budget proposal 01 wallet", () => {
       test("12D_6. Should verify all field of “administration and auditing” section", async () => {
         const proposalInformation =
           budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
-        await budgetProposalSubmissionPage.fillupForm(proposalInformation, 6);
+        await budgetProposalSubmissionPage.fillupForm(
+          proposalInformation,
+          BudgetProposalStageEnum.FurtherInformation
+        );
 
         await expect(
           budgetProposalSubmissionPage.intersectNamedAdministratorSelect

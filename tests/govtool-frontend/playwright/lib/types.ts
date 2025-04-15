@@ -508,3 +508,13 @@ export interface BudgetProposalProps {
   furtherInformation: Array<ProposalLink>;
   administrationAndAuditing: AdministrationAndAuditingProps;
 }
+
+export enum BudgetProposalStageEnum {
+  ProposalOwnership = 1,
+  ProblemStatementAndBenefits = 2,
+  ProposalDetails = 3,
+  Costing = 4,
+  FurtherInformation = 5,
+  AdministrationAndAuditing = 6,
+  Review = 7,
+}

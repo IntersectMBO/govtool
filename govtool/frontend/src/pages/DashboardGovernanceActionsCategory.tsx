@@ -8,7 +8,6 @@ import { useCardano, useDataActionsBar } from "@context";
 import {
   DataActionsBar,
   EmptyStateGovernanceActionsCategory,
-  GovernanceActionCard,
 } from "@molecules";
 import {
   useFetchNextPageDetector,
@@ -23,6 +22,7 @@ import {
   getProposalTypeLabel,
   removeDuplicatedProposals,
 } from "@utils";
+import { ValidatedGovernanceActionCard } from "@/components/organisms";
 
 export const DashboardGovernanceActionsCategory = () => {
   const { category } = useParams();
@@ -133,7 +133,7 @@ export const DashboardGovernanceActionsCategory = () => {
           >
             {mappedData.map((item) => (
               <Box pb={4.25} key={item.txHash + item.index}>
-                <GovernanceActionCard
+                <ValidatedGovernanceActionCard
                   {...item}
                   inProgress={
                     pendingTransaction.vote?.resourceId ===

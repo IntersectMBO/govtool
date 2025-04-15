@@ -11,18 +11,22 @@ type DRepDetailsProps = {
   dRepData: DRepData;
   isMe?: boolean;
   isMyDrep?: boolean;
+  isValidating?: boolean;
+  metadataStatus?: MetadataValidationStatus;
 };
 
 export const DRepDetailsCardHeader = ({
   dRepData,
   isMe,
   isMyDrep,
+  isValidating,
+  metadataStatus,
 }: DRepDetailsProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { screenWidth } = useScreenDimension();
 
-  const { givenName, metadataStatus, image } = dRepData;
+  const { givenName, image } = dRepData;
 
   const navigateToEditDRep = () => {
     navigate(PATHS.editDrepMetadata, {
@@ -84,6 +88,7 @@ export const DRepDetailsCardHeader = ({
         image={image}
         isDataMissing={metadataStatus}
         titleStyle={{ wordBreak: "break-word", whiteSpace: "wrap" }}
+        isValidating={isValidating}
       />
     </div>
   );

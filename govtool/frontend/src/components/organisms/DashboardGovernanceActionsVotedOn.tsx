@@ -3,8 +3,7 @@ import { Box, Typography, CircularProgress } from "@mui/material";
 
 import { useCardano } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { GovernanceVotedOnCard } from "@molecules";
-import { Slider } from "@organisms";
+import { Slider, ValidatedGovernanceVotedOnCard } from "@organisms";
 import { getFullGovActionId, getProposalTypeLabel } from "@utils";
 import { VotedProposal } from "@/models";
 
@@ -74,7 +73,7 @@ export const DashboardGovernanceActionsVotedOn = ({
                     key={`${action?.proposal.id}${action.vote?.vote}`}
                     style={{ overflow: "visible", width: "auto" }}
                   >
-                    <GovernanceVotedOnCard
+                    <ValidatedGovernanceVotedOnCard
                       votedProposal={action}
                       inProgress={
                         pendingTransaction.vote?.resourceId ===

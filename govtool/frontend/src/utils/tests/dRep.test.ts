@@ -15,8 +15,6 @@ const EXAMPLE_DREP: DRepData = {
   type: "DRep" as TDRepType,
   givenName: "name",
   references: [],
-  metadataStatus: null,
-  metadataValid: true,
   latestRegistrationDate: "2024-07-10",
   paymentAddress: null,
   objectives: null,

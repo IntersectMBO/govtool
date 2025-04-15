@@ -1,5 +1,5 @@
-import { PropsWithChildren } from "react";
-import { Box, ButtonBase, Link } from "@mui/material";
+import { PropsWithChildren, useEffect, useRef, useState } from "react";
+import { Box, ButtonBase, Link, Skeleton } from "@mui/material";
 
 import { Button, ExternalModalButton, StatusPill, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
@@ -11,8 +11,9 @@ import {
   encodeCIP129Identifier,
   testIdFromLabel,
 } from "@utils";
-import { DRepData } from "@/models";
+import { DRepData, MetadataStandard } from "@/models";
 import { DRepDetailsCardHeader } from "./DRepDetailsCardHeader";
+import { useValidateMutation } from "@/hooks/mutations";
 
 type DRepDetailsProps = {
   dRepData: DRepData;
@@ -36,7 +37,6 @@ export const DRepDetailsCard = ({
   const { delegate, isDelegating } = useDelegateTodRep();
 
   const {
-    metadataStatus,
     motivations,
     objectives,
     paymentAddress,
@@ -50,6 +50,26 @@ export const DRepDetailsCard = ({
     isScriptBased,
     metadataHash,
   } = dRepData;
+
+  const [isValidating, setIsValidating] = useState(false);
+  const metadataStatus = useRef<MetadataValidationStatus | undefined>();
+  const { validateMetadata } = useValidateMutation();
+
+  useEffect(() => {
+    const validate = async () => {
+      setIsValidating(true);
+
+      const { status: metadataValidationStatus } = await validateMetadata({
+        standard: MetadataStandard.CIP108,
+        url: url ?? "",
+        hash: metadataHash ?? "",
+      });
+
+      metadataStatus.current = metadataValidationStatus;
+      setIsValidating(false);
+    };
+    validate();
+  }, []);
 
   const groupedReferences = references?.reduce<Record<string, Reference[]>>(
     (acc, reference) => {
@@ -96,16 +116,19 @@ export const DRepDetailsCard = ({
           dRepData={dRepData}
           isMe={isMe}
           isMyDrep={isMyDrep}
+          isValidating={isValidating}
+          metadataStatus={metadataStatus.current}
         />
         {/* ERROR MESSAGES */}
-        {metadataStatus && (
+        {metadataStatus.current && (
           <DataMissingInfoBox
-            isDataMissing={metadataStatus}
+            isDataMissing={metadataStatus.current}
             isDrep
             sx={{ mb: 0 }}
+            isValidating={isValidating}
           />
         )}
-        {metadataStatus && !!url && (
+        {metadataStatus.current && !!url && (
           <ExternalModalButton
             label={t("govActions.seeExternalData")}
             sx={{ mb: 0, alignSelf: "flex-start" }}
@@ -113,7 +136,11 @@ export const DRepDetailsCard = ({
           />
         )}
         {/* ERROR MESSAGES END */}
-        <DRepDetailsInfoItem label={t("drepId")} dataTestId="cip-129-drep-id">
+        <DRepDetailsInfoItem
+          label={t("drepId")}
+          dataTestId="cip-129-drep-id"
+          isValidating={isValidating}
+        >
           <CopyableText
             value={encodeCIP129Identifier({
               txID: `${isScriptBased ? "23" : "22"}${drepId}`,
@@ -126,6 +153,7 @@ export const DRepDetailsCard = ({
         <DRepDetailsInfoItem
           label={t("cip105DRepId")}
           dataTestId="cip-105-drep-id"
+          isValidating={isValidating}
         >
           <CopyableText
             isSemiTransparent
@@ -134,12 +162,17 @@ export const DRepDetailsCard = ({
           />
         </DRepDetailsInfoItem>
 
-        <DRepDetailsInfoItem label={t("status")} dataTestId="drep-status">
+        <DRepDetailsInfoItem
+          label={t("status")}
+          dataTestId="drep-status"
+          isValidating={isValidating}
+        >
           <StatusPill status={status} />
         </DRepDetailsInfoItem>
         <DRepDetailsInfoItem
           label={t("votingPower")}
           dataTestId="drep-voting-power"
+          isValidating={isValidating}
         >
           <Typography
             data-testid="voting-power"
@@ -153,46 +186,51 @@ export const DRepDetailsCard = ({
       {/* BASIC INFO END */}
 
       {/* BUTTONS */}
-      {isConnected && ["Active", "Inactive"].includes(status) && !isMyDrep && (
-        <Button
-          data-testid="delegate-button"
-          disabled={!!pendingTransaction?.delegate}
-          isLoading={
-            isDelegating === dRepData.view || isDelegating === dRepData.drepId
-          }
-          onClick={() => delegate(dRepData.drepId)}
-          size="extraLarge"
-          sx={{ width: "100%", maxWidth: screenWidth < 1024 ? "100%" : 286 }}
-          variant="contained"
-        >
-          {t("delegate")}
-        </Button>
-      )}
-      {!isConnected && ["Active", "Inactive"].includes(status) && (
-        <Button
-          data-testid="connect-to-delegate-button"
-          onClick={() =>
-            openModal({
-              type: "chooseWallet",
-              state: {
-                pathToNavigate: PATHS.dashboardDRepDirectoryDRep.replace(
-                  ":dRepId",
-                  view,
-                ),
-              },
-            })
-          }
-          size="extraLarge"
-          sx={{ width: "100%", maxWidth: screenWidth < 1024 ? "100%" : 286 }}
-          variant="outlined"
-        >
-          {t("connectToDelegate")}
-        </Button>
-      )}
+      {!isValidating &&
+        isConnected &&
+        ["Active", "Inactive"].includes(status) &&
+        !isMyDrep && (
+          <Button
+            data-testid="delegate-button"
+            disabled={!!pendingTransaction?.delegate}
+            isLoading={
+              isDelegating === dRepData.view || isDelegating === dRepData.drepId
+            }
+            onClick={() => delegate(dRepData.drepId)}
+            size="extraLarge"
+            sx={{ width: "100%", maxWidth: screenWidth < 1024 ? "100%" : 286 }}
+            variant="contained"
+          >
+            {t("delegate")}
+          </Button>
+        )}
+      {!isValidating &&
+        !isConnected &&
+        ["Active", "Inactive"].includes(status) && (
+          <Button
+            data-testid="connect-to-delegate-button"
+            onClick={() =>
+              openModal({
+                type: "chooseWallet",
+                state: {
+                  pathToNavigate: PATHS.dashboardDRepDirectoryDRep.replace(
+                    ":dRepId",
+                    view,
+                  ),
+                },
+              })
+            }
+            size="extraLarge"
+            sx={{ width: "100%", maxWidth: screenWidth < 1024 ? "100%" : 286 }}
+            variant="outlined"
+          >
+            {t("connectToDelegate")}
+          </Button>
+        )}
       {/* BUTTONS END */}
 
       {/* CIP-119 DATA */}
-      {!metadataStatus && (
+      {!metadataStatus.current && (
         <>
           <DRepDetailsInfoItem
             label={t("forms.dRepData.objectives")}
@@ -300,6 +338,7 @@ type DrepDetailsInfoItemProps = PropsWithChildren & {
   label: string;
   text?: string | null;
   dataTestId: string;
+  isValidating?: boolean;
 };
 
 const DRepDetailsInfoItem = ({
@@ -307,6 +346,7 @@ const DRepDetailsInfoItem = ({
   label,
   text,
   dataTestId,
+  isValidating,
 }: DrepDetailsInfoItemProps) => {
   if (!children && !text) return null;
   const dataTestIdInfoItemCategoryPrefix = "info-item";
@@ -319,30 +359,49 @@ const DRepDetailsInfoItem = ({
         },
       }}
     >
-      <Box
-        sx={{
-          mb: 0.5,
-        }}
-      >
-        <Typography
-          color="neutralGray"
-          fontWeight={600}
-          variant="body2"
-          data-testid={`${dataTestId}-${dataTestIdInfoItemCategoryPrefix}-title`}
-          component="h2"
+      {isValidating ? (
+        <Skeleton sx={{ mb: 0.5 }} width="128px" height="20px" variant="text" />
+      ) : (
+        <Box
+          sx={{
+            mb: 0.5,
+          }}
         >
-          {label}
-        </Typography>
-      </Box>
+          <Typography
+            color="neutralGray"
+            fontWeight={600}
+            variant="body2"
+            data-testid={`${dataTestId}-${dataTestIdInfoItemCategoryPrefix}-title`}
+            component="h2"
+          >
+            {label}
+          </Typography>
+        </Box>
+      )}
       <div
         data-testid={`${dataTestId}-${dataTestIdInfoItemCategoryPrefix}-description`}
       >
-        {text && (
-          <Typography fontWeight={400} sx={{ maxWidth: 608 }} variant="body1">
-            {text}
-          </Typography>
+        {isValidating ? (
+          <Skeleton
+            variant="text"
+            width="100%"
+            height="20px"
+            sx={{ maxWidth: 608 }}
+          />
+        ) : (
+          <>
+            {text && (
+              <Typography
+                fontWeight={400}
+                sx={{ maxWidth: 608 }}
+                variant="body1"
+              >
+                {text}
+              </Typography>
+            )}
+            {children}
+          </>
         )}
-        {children}
       </div>
     </Box>
   );

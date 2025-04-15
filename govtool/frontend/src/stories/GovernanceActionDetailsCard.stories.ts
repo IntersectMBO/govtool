@@ -57,8 +57,6 @@ const commonArgs = {
     prevGovActionIndex: null,
     prevGovActionTxHash: null,
     metadataHash: "exampleMetadataHash",
-    metadataStatus: null,
-    metadataValid: true,
     references: [
       {
         "@type": "Reference",
@@ -118,6 +116,7 @@ async function assertGovActionDetails(
 export const GovernanceActionDetailsCardComponent: Story = {
   args: {
     ...commonArgs,
+    isDataMissing: undefined,
     proposal: {
       ...commonArgs.proposal,
       abstract: "Example about section",
@@ -159,6 +158,7 @@ export const GovernanceActionDetailsDrep: Story = {
     ...commonArgs,
     isDashboard: true,
     isVoter: true,
+    isDataMissing: undefined,
     proposal: {
       ...commonArgs.proposal,
       abstract: "Example about section",

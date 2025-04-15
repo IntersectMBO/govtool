@@ -4,6 +4,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Markdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+import remarkBreaks from "remark-breaks";
 import "katex/dist/katex.min.css";
 
 import { Typography, Tooltip, CopyButton, TooltipProps } from "@atoms";
@@ -117,6 +118,7 @@ export const GovernanceActionCardElement = ({
         fontWeight: 400,
         lineHeight: "24px",
         maxWidth: "auto",
+        whiteSpace: "pre-wrap",
       }}
     >
       {children}
@@ -133,7 +135,7 @@ export const GovernanceActionCardElement = ({
   const renderMarkdown = () => (
     <Markdown
       components={markdownComponents}
-      remarkPlugins={[remarkMath]}
+      remarkPlugins={[remarkMath, remarkBreaks]}
       rehypePlugins={[rehypeKatex]}
     >
       {text.toString()}

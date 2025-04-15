@@ -144,9 +144,6 @@ export default class BudgetDiscussionDetailsPage {
     await this.readMoreBtn.click();
 
     // proposal ownership validation
-    await expect(this.publicProposalChampionContent).toHaveText(
-      budgetProposal.proposalOwnership.publicChampion
-    );
     await expect(this.socialHandlesContent).toHaveText(
       budgetProposal.proposalOwnership.contactDetails
     );

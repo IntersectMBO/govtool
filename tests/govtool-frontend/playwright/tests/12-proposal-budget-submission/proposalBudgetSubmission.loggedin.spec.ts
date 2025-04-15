@@ -11,7 +11,7 @@ import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
 import BudgetDiscussionSubmissionPage from "@pages/budgetDiscussionSubmissionPage";
 import { expect } from "@playwright/test";
 import {
-  BudgetProposalContactInformationProps,
+  BudgetProposalOwnershipProps,
   BudgetProposalProps,
   CompanyEnum,
 } from "@types";
@@ -47,38 +47,12 @@ test.describe("Budget proposal 01 wallet", () => {
     });
 
     test.describe("Budget proposal field verification", () => {
-      test("12D_1. Should verify all field of “contact information” section", async () => {
-        await expect(
-          budgetProposalSubmissionPage.beneficiaryFullNameInput
-        ).toBeVisible();
-        await expect(
-          budgetProposalSubmissionPage.beneficiaryEmailInput
-        ).toBeVisible();
-        await expect(
-          budgetProposalSubmissionPage.beneficiaryCountrySelect
-        ).toBeVisible();
-        await expect(
-          budgetProposalSubmissionPage.beneficiaryNationalitySelect
-        ).toBeVisible();
-        await expect(
-          budgetProposalSubmissionPage.submissionLeadFullNameInput
-        ).toBeVisible();
-      });
-
-      test("12D_2. Should verify all field of “proposal ownership” section", async () => {
-        const proposalContactInformationContent =
-          budgetProposalSubmissionPage.generateValidBudgetProposalContactInformation();
-        await budgetProposalSubmissionPage.fillupContactInformationForm(
-          proposalContactInformationContent
-        );
-
+      test("12D_1. Should verify all field of “proposal ownership” section", async () => {
         // default field
         await expect(
           budgetProposalSubmissionPage.companyTypeSelect
         ).toBeVisible();
-        await expect(
-          budgetProposalSubmissionPage.publicChampionSelect
-        ).toBeVisible();
+
         await expect(
           budgetProposalSubmissionPage.contactDetailsInput
         ).toBeVisible();
@@ -111,10 +85,12 @@ test.describe("Budget proposal 01 wallet", () => {
         ).toBeVisible();
       });
 
-      test("12D_3. Should verify all field of “problem statements and proposal benefits” section", async () => {
-        const proposalInformation =
-          budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
-        await budgetProposalSubmissionPage.fillupForm(proposalInformation, 3);
+      test("12D_2. Should verify all field of “problem statements and proposal benefits” section", async () => {
+        const proposalOwnership =
+          budgetProposalSubmissionPage.generateValidProposalOwnerShip();
+        await budgetProposalSubmissionPage.fillupProposalOwnershipForm(
+          proposalOwnership
+        );
 
         await expect(
           budgetProposalSubmissionPage.problemStatementInput
@@ -136,10 +112,10 @@ test.describe("Budget proposal 01 wallet", () => {
         ).toBeVisible();
       });
 
-      test("12D_4. Should verify all field of “proposal details” section", async () => {
+      test("12D_3. Should verify all field of “proposal details” section", async () => {
         const proposalInformation =
           budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
-        await budgetProposalSubmissionPage.fillupForm(proposalInformation, 4);
+        await budgetProposalSubmissionPage.fillupForm(proposalInformation, 3);
 
         await expect(
           budgetProposalSubmissionPage.proposalNameInput
@@ -164,10 +140,10 @@ test.describe("Budget proposal 01 wallet", () => {
         ).toBeVisible();
       });
 
-      test("12D_5. Should verify all field of “costing” section", async () => {
+      test("12D_4. Should verify all field of “costing” section", async () => {
         const proposalInformation =
           budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
-        await budgetProposalSubmissionPage.fillupForm(proposalInformation, 5);
+        await budgetProposalSubmissionPage.fillupForm(proposalInformation, 4);
 
         await expect(budgetProposalSubmissionPage.adaAmountInput).toBeVisible();
         await expect(
@@ -184,20 +160,20 @@ test.describe("Budget proposal 01 wallet", () => {
         ).toBeVisible();
       });
 
-      test("12D_6. Should verify all field of “further information” section", async () => {
+      test("12D_5. Should verify all field of “further information” section", async () => {
         const proposalInformation =
           budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
-        await budgetProposalSubmissionPage.fillupForm(proposalInformation, 6);
+        await budgetProposalSubmissionPage.fillupForm(proposalInformation, 5);
 
         await expect(budgetProposalSubmissionPage.linkTextInput).toBeVisible();
         await expect(budgetProposalSubmissionPage.linkUrlInput).toBeVisible();
         await expect(budgetProposalSubmissionPage.addLinkBtn).toBeVisible();
       });
 
-      test("12D_7. Should verify all field of “administration and auditing” section", async () => {
+      test("12D_6. Should verify all field of “administration and auditing” section", async () => {
         const proposalInformation =
           budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
-        await budgetProposalSubmissionPage.fillupForm(proposalInformation, 7);
+        await budgetProposalSubmissionPage.fillupForm(proposalInformation, 6);
 
         await expect(
           budgetProposalSubmissionPage.intersectNamedAdministratorSelect
@@ -247,32 +223,44 @@ test("12C. Should save and view draft proposal", async ({ browser }) => {
 
   const budgetSubmissionPage = new BudgetDiscussionSubmissionPage(page);
   await budgetSubmissionPage.goto();
-  const draftContactInformationContent =
-    (await budgetSubmissionPage.createDraftBudgetProposal()) as BudgetProposalContactInformationProps;
+  const draftProposalOwnership =
+    (await budgetSubmissionPage.createDraftBudgetProposal()) as BudgetProposalOwnershipProps;
   const getAddDrafts = await budgetSubmissionPage.getAllDrafts();
 
   expect(getAddDrafts.length).toBeGreaterThan(0);
 
   await budgetSubmissionPage.viewLastDraft();
 
-  await expect(budgetSubmissionPage.beneficiaryFullNameInput).toHaveValue(
-    draftContactInformationContent.beneficiaryFullName
+  await expect(budgetSubmissionPage.companyTypeSelect).toHaveText(
+    draftProposalOwnership.companyType
   );
-  await expect(budgetSubmissionPage.beneficiaryEmailInput).toHaveValue(
-    draftContactInformationContent.beneficiaryEmail
+
+  await expect(budgetSubmissionPage.contactDetailsInput).toHaveValue(
+    draftProposalOwnership.contactDetails
   );
-  await expect(budgetSubmissionPage.beneficiaryCountrySelect).toHaveText(
-    draftContactInformationContent.beneficiaryCountry
-  );
-  await expect(budgetSubmissionPage.beneficiaryNationalitySelect).toHaveText(
-    draftContactInformationContent.beneficiaryNationality
-  );
-  await expect(budgetSubmissionPage.submissionLeadFullNameInput).toHaveValue(
-    draftContactInformationContent.submissionLeadFullName
-  );
-  await expect(budgetSubmissionPage.submissionLeadEmailInput).toHaveValue(
-    draftContactInformationContent.submissionLeadEmail
-  );
+
+  if (draftProposalOwnership.companyType === "Group") {
+    await expect(budgetSubmissionPage.groupNameInput).toHaveValue(
+      draftProposalOwnership.groupName
+    );
+    await expect(budgetSubmissionPage.groupTypeInput).toHaveValue(
+      draftProposalOwnership.groupType
+    );
+    await expect(budgetSubmissionPage.keyInformationOfGroupInput).toHaveValue(
+      draftProposalOwnership.groupKeyIdentity
+    );
+  }
+  if (draftProposalOwnership.companyType === "Company") {
+    await expect(budgetSubmissionPage.companyNameInput).toHaveValue(
+      draftProposalOwnership.companyName
+    );
+    await expect(budgetSubmissionPage.companyDomainNameInput).toHaveValue(
+      draftProposalOwnership.companyDomainName
+    );
+    await expect(budgetSubmissionPage.countryOfIncorporationBtn).toHaveText(
+      draftProposalOwnership.countryOfIncorportation
+    );
+  }
 });
 
 test("12H. Should submit a valid budget proposal", async ({ browser }) => {
@@ -310,7 +298,7 @@ test("12I. Should submit a valid draft budget proposal", async ({
 
   await budgetSubmissionPage.viewLastDraft();
 
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 7; i++) {
     await budgetSubmissionPage.continueBtn.click();
   }
   await budgetSubmissionPage.submitBtn.click();

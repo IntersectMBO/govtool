@@ -352,17 +352,8 @@ export enum CompanyEnum {
   Group = "Group",
 }
 
-export type ProposalChampionType =
-  | "Beneficiary listed above"
-  | "Submission lead listed above";
-export enum ProposalChampionEnum {
-  BeneficiaryListedAbove = "Beneficiary listed above",
-  SubmissionLeadListedAbove = "Submission lead listed above",
-}
-
 export interface BudgetProposalOwnershipProps {
   companyType: CompanyType;
-  publicChampion: ProposalChampionType;
   contactDetails: string;
   groupName?: string;
   groupType?: string;
@@ -510,7 +501,6 @@ export interface AdministrationAndAuditingProps {
 }
 
 export interface BudgetProposalProps {
-  contactInformation: BudgetProposalContactInformationProps;
   proposalOwnership: BudgetProposalOwnershipProps;
   problemStatementAndBenefits: BudgetProposalProblemStatementAndBenefitProps;
   proposalDetails: BudgetProposalDetailsProps;

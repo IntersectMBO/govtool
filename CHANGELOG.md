@@ -15,10 +15,13 @@ changes.
 - Add Proposal discussion context that manages username [Issue 3341](https://github.com/IntersectMBO/govtool/issues/3341)
 - Add epochParams and ada holder balance to Proposal Discussion Pillar [Issue 2243](https://github.com/IntersectMBO/govtool/issues/2243)
 
+- Add uncontrolled image input to improve performance of large base64 encoded image strings
+
 ### Fixed
 
 - Fix scroll on a drawer on smaller resolution
 - Fix incorrect routing on connecting wallet on budget discussion page
+- Fix missing validation on failed image sha generation [Issue 3246](https://github.com/IntersectMBO/govtool/issues/3246)
 
 ### Changed
 

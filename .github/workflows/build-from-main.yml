@@ -189,7 +189,6 @@ jobs:
             echo "TAG=${SANITIZED_BRANCH}-${{ github.sha }}-${{ github.run_number }}" >> $GITHUB_ENV
           fi
           echo "Generated TAG: $TAG"
-      
 
       - name: Lint Dockerfile
         id: hadolint
@@ -254,7 +253,7 @@ jobs:
 
       - name: Set ENVIRONMENT Variable
         run: echo "ENVIRONMENT=${{ matrix.network }}" >> $GITHUB_ENV
-      
+
       - name: Sanitize Network Name
         run: |
           CLEAN_NETWORK=$(echo "${{ matrix.network }}" | sed 's/-govtool$//')
@@ -274,10 +273,8 @@ jobs:
             VITE_APP_ENV=${{ secrets.VITE_APP_ENV }}
             VITE_BASE_URL=${{ secrets.VITE_BASE_URL }}
             VITE_METADATA_API_URL=${{ secrets.VITE_METADATA_API_URL }}
-            VITE_GTM_ID=${{ secrets.VITE_GTM_ID }}
             VITE_NETWORK_FLAG=${{ secrets.VITE_NETWORK_FLAG }}
             VITE_SENTRY_DSN=${{ secrets.VITE_SENTRY_DSN }}
-            NPMRC_TOKEN=${{ secrets.NPMRC_TOKEN }}
             VITE_USERSNAP_SPACE_API_KEY=${{ secrets.VITE_USERSNAP_SPACE_API_KEY }}
             VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED=${{ secrets.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED }}
             VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED=${{ secrets.VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED }}
@@ -310,11 +307,11 @@ jobs:
 
       - name: Debug TAG Before Docker Push
         run: |
-            echo "Lowercase Image: ${{ steps.image_lowercase.outputs.lowercase }}"
-            echo "Network: ${{ matrix.network }}"
-            echo "TAG: ${{ env.TAG }}"
-            echo "Final Docker Tag: ${{ steps.image_lowercase.outputs.lowercase }}-${{ matrix.network}}:${{ env.TAG }}"
-            
+          echo "Lowercase Image: ${{ steps.image_lowercase.outputs.lowercase }}"
+          echo "Network: ${{ matrix.network }}"
+          echo "TAG: ${{ env.TAG }}"
+          echo "Final Docker Tag: ${{ steps.image_lowercase.outputs.lowercase }}-${{ matrix.network}}:${{ env.TAG }}"
+
       - name: Push Docker image to GHCR
         run: |
           docker load -i '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar'

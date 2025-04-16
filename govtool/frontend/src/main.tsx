@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
-import TagManager from "react-gtm-module";
 import { ThemeProvider } from "@emotion/react";
 import * as Sentry from "@sentry/react";
 
@@ -24,12 +23,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-const tagManagerArgs = {
-  gtmId: import.meta.env.VITE_GTM_ID,
-};
-
-TagManager.initialize(tagManagerArgs);
 
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_DSN,

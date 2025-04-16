@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useNavigate,
   useLocation,
@@ -19,7 +19,8 @@ import {
 import { getFullGovActionId, getShortenedGovActionId } from "@utils";
 import { GovernanceActionDetailsCard } from "@organisms";
 import { Breadcrumbs } from "@molecules";
-import { ProposalData, ProposalVote } from "@/models";
+import { MetadataStandard, ProposalData, ProposalVote } from "@/models";
+import { useValidateMutation } from "@/hooks/mutations";
 
 type DashboardGovernanceActionDetailsState = {
   proposal?: ProposalData;
@@ -51,6 +52,26 @@ export const DashboardGovernanceActionDetails = () => {
   const proposal = (data ?? state)?.proposal;
   const vote = (data ?? state)?.vote;
 
+  const [isValidating, setIsValidating] = useState(false);
+  const metadataStatus = useRef<MetadataValidationStatus | undefined>();
+  const { validateMetadata } = useValidateMutation();
+
+  useEffect(() => {
+    const validate = async () => {
+      setIsValidating(true);
+
+      const { status } = await validateMetadata({
+        standard: MetadataStandard.CIP108,
+        url: proposal?.url ?? "",
+        hash: proposal?.metadataHash ?? "",
+      });
+
+      metadataStatus.current = status;
+      setIsValidating(false);
+    };
+    validate();
+  }, []);
+
   useEffect(() => {
     const isProposalNotFound =
       (error as AxiosError)?.response?.data ===
@@ -75,7 +96,7 @@ export const DashboardGovernanceActionDetails = () => {
         elementOne={t("govActions.title")}
         elementOnePath={PATHS.dashboardGovernanceActions}
         elementTwo={proposal?.title ?? ""}
-        isDataMissing={proposal?.metadataStatus ?? null}
+        isDataMissing={metadataStatus?.current ?? null}
       />
       <Link
         data-testid="back-to-list-link"
@@ -86,7 +107,7 @@ export const DashboardGovernanceActionDetails = () => {
         }}
         onClick={() =>
           navigate(
-            state && state.openedFromCategoryPage
+            state?.openedFromCategoryPage
               ? generatePath(PATHS.dashboardGovernanceActionsCategory, {
                   category: state?.proposal?.type,
                 })
@@ -127,12 +148,13 @@ export const DashboardGovernanceActionDetails = () => {
             isVoter={
               voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
             }
-            isDataMissing={proposal.metadataStatus ?? null}
+            isDataMissing={metadataStatus?.current}
             isInProgress={
               pendingTransaction.vote?.resourceId ===
               fullProposalId?.replace("#", "")
             }
             isDashboard
+            isValidating={isValidating}
           />
         ) : (
           <Box mt={4} display="flex" flexWrap="wrap">

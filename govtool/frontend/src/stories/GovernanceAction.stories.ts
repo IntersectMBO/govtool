@@ -1,4 +1,3 @@
-import { MetadataValidationStatus } from "@models";
 import {
   expect,
   screen,
@@ -16,6 +15,7 @@ import {
 } from "@utils";
 import { GovernanceActionCard } from "@/components/molecules";
 import { GovernanceActionType } from "@/types/governanceAction";
+import { MetadataValidationStatus } from "@/models";
 
 const meta = {
   title: "Example/GovernanceActionCard",
@@ -30,8 +30,8 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const commonArgs = {
-  about: "About this Governance Action",
+const commonArgs: Story["args"] = {
+  abstract: "About this Governance Action",
   createdDate: "1970-01-01T00:00:00Z",
   createdEpochNo: 302,
   expiryDate: "1970-02-01T00:00:00Z",
@@ -42,8 +42,6 @@ const commonArgs = {
   title: "Example title",
   txHash: "sad78afdsf7jasd98d",
   type: GovernanceActionType.InfoAction,
-  metadataValid: true,
-  metadataStatus: null,
   dRepYesVotes: 1,
   dRepNoVotes: 0,
   dRepAbstainVotes: 0,
@@ -56,6 +54,8 @@ const commonArgs = {
   protocolParams: null,
   prevGovActionIndex: null,
   prevGovActionTxHash: null,
+  metadataHash: "exampleMetadataHash",
+  url: "https://exampleMetadataUrl.com",
 };
 
 const cip129GovActionId = encodeCIP129Identifier({
@@ -102,10 +102,7 @@ export const GovernanceActionCardComponent: Story = {
 };
 
 export const GovernanceActionCardIsLoading: Story = {
-  args: {
-    ...commonArgs,
-    inProgress: true,
-  },
+  args: { ...commonArgs, inProgress: true },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByText(/in progress/i)).toBeVisible();
@@ -116,7 +113,6 @@ export const GovernanceActionCardDataMissing: Story = {
   args: {
     ...commonArgs,
     metadataStatus: MetadataValidationStatus.URL_NOT_FOUND,
-    metadataValid: false,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -135,8 +131,7 @@ export const GovernanceActionCardDataMissing: Story = {
 export const GovernanceActionCardIncorectFormat: Story = {
   args: {
     ...commonArgs,
-    metadataStatus: MetadataValidationStatus.INVALID_JSONLD,
-    metadataValid: false,
+    metadataStatus: MetadataValidationStatus.INCORRECT_FORMAT,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -158,7 +153,6 @@ export const GovernanceActionCardNotVerifiable: Story = {
   args: {
     ...commonArgs,
     metadataStatus: MetadataValidationStatus.INVALID_HASH,
-    metadataValid: false,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

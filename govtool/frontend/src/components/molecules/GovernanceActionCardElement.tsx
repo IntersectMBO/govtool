@@ -1,9 +1,10 @@
 import { PropsWithChildren } from "react";
-import { Box } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Markdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+import remarkBreaks from "remark-breaks";
 import "katex/dist/katex.min.css";
 
 import { Typography, Tooltip, CopyButton, TooltipProps } from "@atoms";
@@ -19,6 +20,7 @@ type BaseProps = {
   tooltipProps?: Omit<TooltipProps, "children">;
   marginBottom?: number;
   isSemiTransparent?: boolean;
+  isValidating?: boolean;
 };
 
 type VariantProps = BaseProps & {
@@ -40,6 +42,7 @@ export const GovernanceActionCardElement = ({
   marginBottom,
   isMarkdown = false,
   isSemiTransparent = false,
+  isValidating = false,
 }: VariantProps) => {
   const { openModal } = useModal();
 
@@ -115,6 +118,7 @@ export const GovernanceActionCardElement = ({
         fontWeight: 400,
         lineHeight: "24px",
         maxWidth: "auto",
+        whiteSpace: "pre-wrap",
       }}
     >
       {children}
@@ -131,7 +135,7 @@ export const GovernanceActionCardElement = ({
   const renderMarkdown = () => (
     <Markdown
       components={markdownComponents}
-      remarkPlugins={[remarkMath]}
+      remarkPlugins={[remarkMath, remarkBreaks]}
       rehypePlugins={[rehypeKatex]}
     >
       {text.toString()}
@@ -171,37 +175,45 @@ export const GovernanceActionCardElement = ({
       overflow={isSliderCard ? "hidden" : "visible"}
     >
       <Box sx={{ display: "flex", alignItems: "center", mb: "4px" }}>
-        <Typography
-          component="h2"
-          sx={{
-            fontSize: isSliderCard ? 12 : 14,
-            fontWeight: isSliderCard ? 500 : 600,
-            lineHeight: isSliderCard ? "16px" : "20px",
-            color: "neutralGray",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {label}
-        </Typography>
+        {isValidating ? (
+          <Skeleton height="16px" width="64px" variant="text" />
+        ) : (
+          <Typography
+            component="h2"
+            sx={{
+              fontSize: isSliderCard ? 12 : 14,
+              fontWeight: isSliderCard ? 500 : 600,
+              lineHeight: isSliderCard ? "16px" : "20px",
+              color: "neutralGray",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {label}
+          </Typography>
+        )}
         {renderTooltip()}
       </Box>
-      <Box
-        display="flex"
-        alignItems={isMarkdown ? "unset" : "center"}
-        overflow="hidden"
-        flexDirection={isMarkdown ? "column" : "row"}
-        fontFamily="Poppins, Arial"
-      >
-        {textVariant === "pill"
-          ? renderPillText()
-          : isMarkdown && !isSliderCard
-          ? renderMarkdown()
-          : renderStandardText()}
-        {renderCopyButton()}
-        {renderLinkButton()}
-      </Box>
+      {isValidating ? (
+        <Skeleton height="32px" width="100%" variant="text" />
+      ) : (
+        <Box
+          display="flex"
+          alignItems={isMarkdown ? "unset" : "center"}
+          overflow="hidden"
+          flexDirection={isMarkdown ? "column" : "row"}
+          fontFamily="Poppins, Arial"
+        >
+          {textVariant === "pill"
+            ? renderPillText()
+            : isMarkdown && !isSliderCard
+            ? renderMarkdown()
+            : renderStandardText()}
+          {renderCopyButton()}
+          {renderLinkButton()}
+        </Box>
+      )}
     </Box>
   );
 };

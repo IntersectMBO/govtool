@@ -1,5 +1,5 @@
 import environments from "@constants/environments";
-import { fa, faker } from "@faker-js/faker";
+import { faker } from "@faker-js/faker";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { Page, expect } from "@playwright/test";
 import {
@@ -11,11 +11,11 @@ import {
   BudgetProposalOwnershipProps,
   BudgetProposalProblemStatementAndBenefitProps,
   BudgetProposalProps,
+  BudgetProposalStageEnum,
   CommitteeAlignmentEnum,
   CompanyEnum,
   LocationEnum,
   PreferredCurrencyEnum,
-  ProposalChampionEnum,
   ProposalContractingEnum,
   ProposalLink,
   RoadmapNameEnum,
@@ -163,7 +163,7 @@ export default class BudgetDiscussionSubmissionPage {
     this.page.getByTestId("preferred-currency");
 
   readonly intersectNamedAdministratorSelect = this.page.getByTestId(
-    "itersect-named-administrator"
+    "intersect-named-administrator"
   );
 
   // content
@@ -310,11 +310,6 @@ export default class BudgetDiscussionSubmissionPage {
       .getByRole("option", { name: proposalOwnership.companyType })
       .click(); //BUG missing testId
 
-    await this.publicChampionSelect.click();
-    await this.page
-      .getByRole("option", { name: proposalOwnership.publicChampion })
-      .click(); //BUG missing testId
-
     await this.contactDetailsInput.fill(proposalOwnership.contactDetails);
 
     if (proposalOwnership.companyType === "Group") {
@@ -446,29 +441,28 @@ export default class BudgetDiscussionSubmissionPage {
     await this.continueBtn.click();
   }
 
-  async fillupForm(budgetProposal: BudgetProposalProps, stage = 8) {
-    await this.fillupContactInformationForm(budgetProposal.contactInformation);
+  async fillupForm(
+    budgetProposal: BudgetProposalProps,
+    stage: BudgetProposalStageEnum = BudgetProposalStageEnum.AdministrationAndAuditing
+  ) {
+    await this.fillupProposalOwnershipForm(budgetProposal.proposalOwnership);
 
-    if (stage > 2) {
-      await this.fillupProposalOwnershipForm(budgetProposal.proposalOwnership);
-    }
-
-    if (stage > 3) {
+    if (stage > BudgetProposalStageEnum.ProposalOwnership) {
       await this.fillupProblemStatementAndBenefitsForm(
         budgetProposal.problemStatementAndBenefits
       );
     }
 
-    if (stage > 4) {
+    if (stage > BudgetProposalStageEnum.ProblemStatementAndBenefits) {
       await this.fillupProposalDetailsForm(budgetProposal.proposalDetails);
     }
-    if (stage > 5) {
+    if (stage > BudgetProposalStageEnum.ProposalDetails) {
       await this.fillupCostingForm(budgetProposal.costing);
     }
-    if (stage > 6) {
+    if (stage > BudgetProposalStageEnum.Costing) {
       await this.fillupFurtherInformation(budgetProposal.furtherInformation);
     }
-    if (stage > 7) {
+    if (stage > BudgetProposalStageEnum.FurtherInformation) {
       await this.intersectNamedAdministratorSelect.click();
 
       await this.page
@@ -558,9 +552,6 @@ export default class BudgetDiscussionSubmissionPage {
   generateValidProposalOwnerShip(): BudgetProposalOwnershipProps {
     return {
       companyType: faker.helpers.arrayElement(Object.values(CompanyEnum)),
-      publicChampion: faker.helpers.arrayElement(
-        Object.values(ProposalChampionEnum)
-      ),
       contactDetails: faker.internet.email(),
       groupName: faker.company.name(),
       groupType: faker.company.buzzVerb(),
@@ -623,7 +614,6 @@ export default class BudgetDiscussionSubmissionPage {
 
   generateValidBudgetProposalInformation(): BudgetProposalProps {
     return {
-      contactInformation: this.generateValidBudgetProposalContactInformation(),
       proposalOwnership: this.generateValidProposalOwnerShip(),
       problemStatementAndBenefits:
         this.generateValidBudgetProposalProblemStatementAndBenefits(),
@@ -640,9 +630,7 @@ export default class BudgetDiscussionSubmissionPage {
     if (fillAllDetails) {
       await this.fillupForm(budgetProposal);
     } else {
-      await this.fillupContactInformationForm(
-        budgetProposal.contactInformation
-      );
+      await this.fillupProposalOwnershipForm(budgetProposal.proposalOwnership);
     }
 
     await this.saveDraftBtn.click();
@@ -650,7 +638,7 @@ export default class BudgetDiscussionSubmissionPage {
     await this.cancelBtn.click();
     await this.createBudgetProposalBtn.click();
 
-    return fillAllDetails ? budgetProposal : budgetProposal.contactInformation;
+    return fillAllDetails ? budgetProposal : budgetProposal.proposalOwnership;
   }
 
   async createBudgetProposal(): Promise<{
@@ -678,41 +666,9 @@ export default class BudgetDiscussionSubmissionPage {
   async validateReviewBudgetProposal(
     proposalInformations: BudgetProposalProps
   ) {
-    // contact information
-    await expect(this.beneficiaryFullNameContent).toHaveText(
-      proposalInformations.contactInformation.beneficiaryFullName
-    );
-    await expect(this.beneficiaryCountryOfResidenceContent).toHaveText(
-      proposalInformations.contactInformation.beneficiaryCountry
-    );
-    //BUG missing testId
-    await expect(
-      this.currentPage.getByText(
-        proposalInformations.contactInformation.beneficiaryNationality,
-        { exact: true }
-      )
-    ).toBeVisible();
-    //BUG missing testId
-    await expect(
-      this.currentPage.getByText(
-        proposalInformations.contactInformation.submissionLeadEmail,
-        { exact: true }
-      )
-    ).toBeVisible();
-    //BUG missing testId
-    await expect(
-      this.currentPage.getByText(
-        proposalInformations.contactInformation.submissionLeadFullName,
-        { exact: true }
-      )
-    ).toBeVisible();
-
     // proposal ownership
     await expect(this.companyTypeContent).toHaveText(
       proposalInformations.proposalOwnership.companyType
-    );
-    await expect(this.providePreferredContent).toHaveText(
-      proposalInformations.proposalOwnership.publicChampion
     );
     await expect(this.socialHandlesContent).toHaveText(
       proposalInformations.proposalOwnership.contactDetails

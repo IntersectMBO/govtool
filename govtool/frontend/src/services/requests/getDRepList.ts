@@ -3,7 +3,6 @@ import {
   type DRepStatus,
   type DRepListSort,
   DRepData,
-  DrepDataDTO,
 } from "@models";
 import { API } from "../API";
 import { dRepSearchPhraseProcessor, mapDtoToDrep } from "@/utils";
@@ -27,7 +26,7 @@ export const getDRepList = async ({
 }: GetDRepListArguments): Promise<Infinite<DRepData>> => {
   const searchPhrase = await dRepSearchPhraseProcessor(rawSearchPhrase);
 
-  const response = await API.get<Infinite<DrepDataDTO>>("/drep/list", {
+  const response = await API.get<Infinite<DRepData>>("/drep/list", {
     params: {
       page,
       pageSize,

@@ -1,11 +1,11 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
 import { PendingTransaction } from "@context";
 import { useGetDRepDetailsQuery, useTranslation } from "@hooks";
-import { CurrentDelegation, VoterInfo } from "@models";
+import { CurrentDelegation, MetadataStandard, VoterInfo } from "@models";
 import {
   DashboardActionCard,
   DashboardActionCardProps,
@@ -21,6 +21,7 @@ import {
   AutomatedVotingOptionDelegationId,
 } from "@/types/automatedVotingOptions";
 import { LINKS } from "@/consts/links";
+import { useValidateMutation } from "@/hooks/mutations";
 
 type DelegateDashboardCardProps = {
   currentDelegation: CurrentDelegation;
@@ -42,6 +43,22 @@ export const DelegateDashboardCard = ({
   const { dRep: myDRepDelegationData, isLoading } = useGetDRepDetailsQuery(
     delegateTx?.resourceId ?? currentDelegation?.dRepHash,
   );
+
+  const metadataStatus = useRef<MetadataValidationStatus | undefined>();
+  const { validateMetadata } = useValidateMutation();
+
+  useEffect(() => {
+    const validate = async () => {
+      const { status } = await validateMetadata({
+        standard: MetadataStandard.CIP119,
+        url: myDRepDelegationData?.url ?? "",
+        hash: myDRepDelegationData?.metadataHash ?? "",
+      });
+
+      metadataStatus.current = status;
+    };
+    validate();
+  }, []);
 
   const learnMoreButton = {
     children: t("learnMore"),
@@ -117,7 +134,7 @@ export const DelegateDashboardCard = ({
       navigate(
         PATHS.dashboardDRepDirectoryDRep.replace(
           ":dRepId",
-          displayedDelegationId || "",
+          displayedDelegationId ?? "",
         ),
         { state: { enteredFromWithinApp: true } },
       ),
@@ -153,10 +170,8 @@ export const DelegateDashboardCard = ({
           drepName={
             isLoading
               ? "Loading..."
-              : myDRepDelegationData?.metadataStatus
-              ? getMetadataDataMissingStatusTranslation(
-                  myDRepDelegationData.metadataStatus,
-                )
+              : metadataStatus.current
+              ? getMetadataDataMissingStatusTranslation(metadataStatus.current)
               : myDRepDelegationData?.givenName ?? ""
           }
           dRepId={displayedDelegationId}

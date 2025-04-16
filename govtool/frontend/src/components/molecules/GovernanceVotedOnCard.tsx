@@ -22,9 +22,16 @@ import { VotedProposal } from "@/models";
 type Props = {
   votedProposal: VotedProposal;
   inProgress?: boolean;
+  isValidating?: boolean;
+  metadataStatus?: MetadataValidationStatus;
 };
 
-export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
+export const GovernanceVotedOnCard = ({
+  votedProposal,
+  inProgress,
+  isValidating,
+  metadataStatus,
+}: Props) => {
   const navigate = useNavigate();
   const { proposal, vote } = votedProposal;
   const {
@@ -34,8 +41,6 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
     expiryDate,
     expiryEpochNo,
     index,
-    metadataStatus,
-    metadataValid,
     txHash,
     type,
     title,
@@ -62,13 +67,13 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         justifyContent: "space-between",
         boxShadow: "0px 4px 15px 0px #DDE3F5",
         borderRadius: "20px",
-        backgroundColor: !metadataValid
+        backgroundColor: !metadataStatus
           ? "rgba(251, 235, 235, 0.50)"
           : "rgba(255, 255, 255, 0.3)",
         // TODO: To decide if voted on cards can be actually in progress
         border: inProgress
           ? "1px solid #FFCBAD"
-          : !metadataValid
+          : !metadataStatus
           ? "1px solid #F6D5D5"
           : "1px solid #C0E4BA",
       }}
@@ -85,6 +90,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
         <GovernanceActionCardHeader
           title={title}
           isDataMissing={metadataStatus}
+          isValidating={isValidating}
         />
         <GovernanceActionCardElement
           label={t("govActions.abstract")}
@@ -92,6 +98,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           textVariant="twoLines"
           dataTestId="governance-action-abstract"
           isSliderCard
+          isValidating={isValidating}
         />
         <GovernanceActionCardElement
           label={t("govActions.governanceActionType")}
@@ -99,6 +106,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           textVariant="pill"
           dataTestId={`${getProposalTypeNoEmptySpaces(type)}-type`}
           isSliderCard
+          isValidating={isValidating}
         />
         <GovernanceActionsDatesBox
           createdDate={createdDate}
@@ -106,6 +114,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           expiryEpochNo={expiryEpochNo}
           createdEpochNo={createdEpochNo}
           isSliderCard
+          isValidating={isValidating}
         />
         <GovernanceActionCardElement
           label={t("govActions.cip129GovernanceActionId")}
@@ -113,6 +122,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           dataTestId={`${cip129GovernanceActionId}-id`}
           isCopyButton
           isSliderCard
+          isValidating={isValidating}
         />
         <GovernanceActionCardElement
           label={t("govActions.governanceActionId")}
@@ -121,6 +131,7 @@ export const GovernanceVotedOnCard = ({ votedProposal, inProgress }: Props) => {
           isCopyButton
           isSliderCard
           isSemiTransparent
+          isValidating={isValidating}
         />
         {vote && (
           <GovernanceActionCardMyVote

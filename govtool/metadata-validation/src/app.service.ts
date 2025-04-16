@@ -7,7 +7,7 @@ import * as jsonld from 'jsonld';
 import { ValidateMetadataDTO } from '@dto';
 import { LoggerMessage, MetadataValidationStatus } from '@enums';
 import { validateMetadataStandard, parseMetadata, getStandard } from '@utils';
-import { ValidateMetadataResult } from '@types';
+import { MetadataStandard, ValidateMetadataResult } from '@types';
 
 @Injectable()
 export class AppService {
@@ -54,6 +54,13 @@ export class AppService {
       try {
         parsedData = JSON.parse(rawData);
       } catch (error) {
+        throw MetadataValidationStatus.INCORRECT_FORMAT;
+      }
+
+      if (
+        standard === MetadataStandard.CIP108 &&
+        !Array.isArray(parsedData.authors)
+      ) {
         throw MetadataValidationStatus.INCORRECT_FORMAT;
       }
 

@@ -1,30 +1,11 @@
-import {
-  DRepData,
-  DRepMetadata,
-  DrepDataDTO,
-  MetadataStandard,
-} from "@/models";
-import { postValidate } from "@/services";
+import { DRepData } from "@/models";
 import { fixViewForScriptBasedDRep } from "./dRep";
 
 const imageFetchDefaultOptions: RequestInit = {
   mode: "no-cors",
 };
 
-export const mapDtoToDrep = async (dto: DrepDataDTO): Promise<DRepData> => {
-  const emptyMetadata = {
-    paymentAddress: null,
-    givenName: "",
-    imageUrl: null,
-    objectives: null,
-    motivations: null,
-    qualifications: null,
-    references: [],
-    doNotList: false,
-    metadataStatus: null,
-    metadataValid: true,
-  };
-
+export const mapDtoToDrep = async (dto: DRepData): Promise<DRepData> => {
   // DBSync contains wrong representation of DRep view for script based DReps
   const view = fixViewForScriptBasedDRep(dto.view, dto.isScriptBased);
 
@@ -62,27 +43,8 @@ export const mapDtoToDrep = async (dto: DrepDataDTO): Promise<DRepData> => {
         }
       });
   }
-
-  if (dto.metadataHash && dto.url) {
-    const validationResponse = await postValidate<DRepMetadata>({
-      url: dto.url,
-      hash: dto.metadataHash,
-      standard: MetadataStandard.CIP119,
-    });
-    return {
-      ...dto,
-      ...emptyMetadata,
-      ...validationResponse.metadata,
-      metadataStatus: validationResponse.status || null,
-      metadataValid: validationResponse.valid,
-      image: isIPFSImage ? base64Image : dto.imageUrl,
-      view,
-    };
-  }
-
   return {
     ...dto,
-    ...emptyMetadata,
     view,
     image: isIPFSImage ? base64Image : dto.imageUrl,
   };

@@ -1,6 +1,7 @@
 name: Check,Build,Deploy
 
-on: workflow_dispatch
+on:
+  workflow_dispatch
 
 permissions:
   contents: write
@@ -122,8 +123,10 @@ jobs:
             VITE_APP_ENV=${{ secrets.VITE_APP_ENV }}
             VITE_BASE_URL=${{ secrets.VITE_BASE_URL }}
             VITE_METADATA_API_URL=${{ secrets.VITE_METADATA_API_URL }}
+            VITE_GTM_ID=${{ secrets.VITE_GTM_ID }}
             VITE_NETWORK_FLAG=${{ secrets.VITE_NETWORK_FLAG }}
             VITE_SENTRY_DSN=${{ secrets.VITE_SENTRY_DSN }}
+            NPMRC_TOKEN=${{ secrets.NPMRC_TOKEN }}
             VITE_USERSNAP_SPACE_API_KEY=${{ secrets.VITE_USERSNAP_SPACE_API_KEY }}
             VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED=${{ secrets.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED }}
             VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED=${{ secrets.VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED }}

@@ -60,7 +60,7 @@ export const DRepDetailsCard = ({
       setIsValidating(true);
 
       const { status: metadataValidationStatus } = await validateMetadata({
-        standard: MetadataStandard.CIP108,
+        standard: MetadataStandard.CIP119,
         url: url ?? "",
         hash: metadataHash ?? "",
       });

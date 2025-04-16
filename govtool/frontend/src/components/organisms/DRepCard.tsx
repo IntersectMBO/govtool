@@ -173,7 +173,10 @@ export const DRepCard = ({
                   />
                 ) : (
                   <Typography
-                    sx={{ ellipsisStyles, color: metadataStatus && "errorRed" }}
+                    sx={{
+                      ellipsisStyles,
+                      color: metadataStatus.current && "errorRed",
+                    }}
                   >
                     {metadataStatus.current
                       ? getMetadataDataMissingStatusTranslation(

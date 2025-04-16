@@ -50,7 +50,7 @@ export const DelegateDashboardCard = ({
   useEffect(() => {
     const validate = async () => {
       const { status } = await validateMetadata({
-        standard: MetadataStandard.CIP108,
+        standard: MetadataStandard.CIP119,
         url: myDRepDelegationData?.url ?? "",
         hash: myDRepDelegationData?.metadataHash ?? "",
       });

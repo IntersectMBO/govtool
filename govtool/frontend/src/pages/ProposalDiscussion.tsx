@@ -6,6 +6,7 @@ import {
   useCardano,
   useGovernanceActions,
   useProposalDiscussion,
+  useSnackbar,
 } from "@/context";
 import { useValidateMutation } from "@/hooks/mutations";
 import { useScreenDimension } from "@/hooks/useScreenDimension";
@@ -30,6 +31,7 @@ export const ProposalDiscussionPillar = () => {
   const { fetchDRepVotingPowerList } = useGetDRepVotingPowerList();
   const { username, setUsername } = useProposalDiscussion();
   const { votingPower } = useGetAdaHolderVotingPowerQuery(context.stakeKey);
+  const snackbarContext = useSnackbar();
 
   return (
     <Box
@@ -83,6 +85,7 @@ export const ProposalDiscussionPillar = () => {
             setUsername={setUsername}
             epochParams={epochParams}
             votingPower={votingPower}
+            {...snackbarContext}
           />
         </Suspense>
       </Box>

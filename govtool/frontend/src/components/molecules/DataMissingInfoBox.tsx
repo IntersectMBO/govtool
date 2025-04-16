@@ -1,4 +1,4 @@
-import { Box, Link, SxProps } from "@mui/material";
+import { Box, Link, Skeleton, SxProps } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { useTranslation } from "@hooks";
@@ -9,12 +9,14 @@ import { LINKS } from "@/consts/links";
 export const DataMissingInfoBox = ({
   isDataMissing,
   isInProgress,
+  isValidating,
   isSubmitted,
   isDrep = false,
   sx,
 }: {
-  isDataMissing: MetadataValidationStatus | null;
+  isDataMissing?: MetadataValidationStatus;
   isInProgress?: boolean;
+  isValidating?: boolean;
   isSubmitted?: boolean;
   isDrep?: boolean;
   sx?: SxProps;
@@ -63,36 +65,58 @@ export const DataMissingInfoBox = ({
         ...sx,
       }}
     >
-      <Typography
-        sx={{
-          fontSize: "18px",
-          fontWeight: 500,
-          color: "errorRed",
-          mb: 0.5,
-        }}
-      >
-        {gaMetadataErrorMessage}
-      </Typography>
-      <Typography
-        sx={{
-          fontWeight: 400,
-          color: "errorRed",
-          mb: 0.5,
-        }}
-      >
-        {gaMetadataErrorDescription}
-      </Typography>
-      <Link
-        onClick={() => openInNewTab(LINKS.DREP_ERROR_CONDITIONS)}
-        sx={{
-          fontFamily: "Poppins",
-          fontSize: "16px",
-          lineHeight: "24px",
-          cursor: "pointer",
-        }}
-      >
-        {t("learnMore")}
-      </Link>
+      {isValidating ? (
+        <Skeleton
+          sx={{ mb: 0.5 }}
+          width="128px"
+          height="48px"
+          variant="rounded"
+        />
+      ) : (
+        <Typography
+          sx={{
+            fontSize: "18px",
+            fontWeight: 500,
+            color: "errorRed",
+            mb: 0.5,
+          }}
+        >
+          {gaMetadataErrorMessage}
+        </Typography>
+      )}
+      {isValidating ? (
+        <Skeleton
+          sx={{ mb: 0.5 }}
+          width="100%"
+          height="96px"
+          variant="rounded"
+        />
+      ) : (
+        <Typography
+          sx={{
+            fontWeight: 400,
+            color: "errorRed",
+            mb: 0.5,
+          }}
+        >
+          {gaMetadataErrorDescription}
+        </Typography>
+      )}
+      {isValidating ? (
+        <Skeleton width="128px" height="24px" variant="text" />
+      ) : (
+        <Link
+          onClick={() => openInNewTab(LINKS.DREP_ERROR_CONDITIONS)}
+          sx={{
+            fontFamily: "Poppins",
+            fontSize: "16px",
+            lineHeight: "24px",
+            cursor: "pointer",
+          }}
+        >
+          {t("learnMore")}
+        </Link>
+      )}
     </Box>
   ) : null;
 };

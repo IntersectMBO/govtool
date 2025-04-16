@@ -11,8 +11,9 @@ import { MetadataValidationStatus, ProposalData, ProposalVote } from "@models";
 
 type GovernanceActionDetailsCardProps = {
   isDashboard?: boolean;
-  isDataMissing: null | MetadataValidationStatus;
+  isDataMissing?: MetadataValidationStatus;
   isInProgress?: boolean;
+  isValidating?: boolean;
   isVoter?: boolean;
   vote?: ProposalVote | null;
   proposal: ProposalData;
@@ -23,6 +24,7 @@ export const GovernanceActionDetailsCard = ({
   isDataMissing,
   isInProgress,
   isVoter,
+  isValidating,
   vote,
   proposal,
 }: GovernanceActionDetailsCardProps) => {
@@ -63,6 +65,7 @@ export const GovernanceActionDetailsCard = ({
         isOneColumn={isOneColumn}
         isSubmitted={isVoteSubmitted}
         proposal={proposal}
+        isValidating={isValidating}
       />
       <GovernanceActionDetailsCardVotes
         setIsVoteSubmitted={setIsVoteSubmitted}

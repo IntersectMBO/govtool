@@ -8,9 +8,8 @@ import { useCardano, useDataActionsBar } from "@context";
 import {
   DataActionsBar,
   EmptyStateGovernanceActionsCategory,
-  GovernanceActionCard,
 } from "@molecules";
-import { Footer, TopNav } from "@organisms";
+import { Footer, TopNav, ValidatedGovernanceActionCard } from "@organisms";
 import {
   useGetProposalsInfiniteQuery,
   useFetchNextPageDetector,
@@ -139,7 +138,7 @@ export const GovernanceActionsCategory = () => {
                 >
                   {mappedData.map((item) => (
                     <Box pb={4.25} key={item.txHash + item.index}>
-                      <GovernanceActionCard
+                      <ValidatedGovernanceActionCard
                         {...item}
                         onClick={() => {
                           saveScrollPosition();

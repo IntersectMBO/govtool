@@ -3,8 +3,10 @@ FROM node:20.18.1-alpine as builder
 ARG VITE_APP_ENV='beta'
 ARG VITE_BASE_URL
 ARG VITE_METADATA_API_URL
+ARG VITE_GTM_ID
 ARG VITE_NETWORK_FLAG=0
 ARG VITE_SENTRY_DSN
+ARG NPMRC_TOKEN
 ARG VITE_USERSNAP_SPACE_API_KEY
 ARG VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED
 ARG VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED
@@ -16,6 +18,10 @@ ARG VITE_IPFS_PROJECT_ID
 WORKDIR /src
 
 ENV NODE_OPTIONS="--max-old-space-size=4096"
+
+# Set npm configuration settings using environment variables
+RUN npm config set @intersect.mbo:registry "https://registry.npmjs.org/" --location=global
+RUN npm config set //registry.npmjs.org/:_authToken ${NPMRC_TOKEN} --location=global
 
 COPY package.json package-lock.json ./
 COPY patches ./patches

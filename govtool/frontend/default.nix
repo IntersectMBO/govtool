@@ -2,6 +2,7 @@
 , incl
 , VITE_BASE_URL ? "http://localhost"
 , VITE_IS_DEV ? "true"
+, VITE_GTM_ID ? ""
 , VITE_SENTRY_DSN ? ""
 , VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED ? ""
 , VITE_PDF_API_URL ? ""
@@ -31,7 +32,7 @@ let
     name = "govtool-website";
     src = frontendSrc;
     buildInputs = [(pkgs.yarn.override { nodejs = pkgs.nodejs_18;}) nodeModules];
-    inherit VITE_BASE_URL VITE_IS_DEV VITE_SENTRY_DSN VITE_NETWORK_FLAG VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED VITE_PDF_API_URL;
+    inherit VITE_BASE_URL VITE_IS_DEV VITE_GTM_ID VITE_SENTRY_DSN VITE_NETWORK_FLAG VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED VITE_PDF_API_URL;
     buildPhase = ''
       cp -R ${nodeModules}/libexec/@govtool/frontend/node_modules node_modules
 

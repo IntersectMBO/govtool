@@ -14,7 +14,7 @@ env:
 jobs:
   deploy:
     name: Deploy app
-    environment: "preview-govtool"
+    environment: 'preview-govtool'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -62,13 +62,15 @@ jobs:
             cd $DEST_DIR/tests/test-infrastructure
             ./build-and-deploy.sh update-images
             yes | docker system prune -f || echo "Ignoring system prune eror"
-          envs: GOVTOOL_TAG, GRAFANA_ADMIN_PASSWORD, GRAFANA_SLACK_RECIPIENT, GRAFANA_SLACK_OAUTH_TOKEN, SENTRY_DSN_BACKEND, SENTRY_DSN_FRONTEND, PIPELINE_URL, USERSNAP_SPACE_API_KEY, APP_ENV, PDF_API_URL, KUBER_API_KEY, IPFS_GATEWAY, IPFS_PROJECT_ID, OUTCOMES_API_URL
+          envs: GOVTOOL_TAG, GRAFANA_ADMIN_PASSWORD, GRAFANA_SLACK_RECIPIENT, GRAFANA_SLACK_OAUTH_TOKEN, SENTRY_DSN_BACKEND, GTM_ID, NPMRC_TOKEN, SENTRY_DSN_FRONTEND, PIPELINE_URL, USERSNAP_SPACE_API_KEY, APP_ENV, PDF_API_URL, KUBER_API_KEY, IPFS_GATEWAY, IPFS_PROJECT_ID, OUTCOMES_API_URL
         env:
           GOVTOOL_TAG: ${{ github.sha }}
           GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
           GRAFANA_SLACK_RECIPIENT: ${{ secrets.GRAFANA_SLACK_RECIPIENT }}
           GRAFANA_SLACK_OAUTH_TOKEN: ${{ secrets.GRAFANA_SLACK_OAUTH_TOKEN }}
           SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}
+          GTM_ID: ${{ secrets.GTM_ID }}
+          NPMRC_TOKEN: ${{ secrets.NPMRC_TOKEN }}
           SENTRY_DSN_FRONTEND: ${{ secrets.SENTRY_DSN_FRONTEND }}
           PIPELINE_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           USERSNAP_SPACE_API_KEY: ${{ secrets.USERSNAP_SPACE_API_KEY }}

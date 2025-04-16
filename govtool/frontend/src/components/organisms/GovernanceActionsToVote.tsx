@@ -6,9 +6,8 @@ import { PATHS } from "@consts";
 import { useCardano } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { ProposalData } from "@models";
-import { GovernanceActionCard } from "@molecules";
 import { getProposalTypeTitle, getFullGovActionId } from "@utils";
-import { Slider } from "@organisms";
+import { Slider, ValidatedGovernanceActionCard } from "@organisms";
 
 type GovernanceActionsToVoteProps = {
   filters: string[];
@@ -58,7 +57,7 @@ export const GovernanceActionsToVote = ({
                       width: "auto",
                     }}
                   >
-                    <GovernanceActionCard
+                    <ValidatedGovernanceActionCard
                       {...action}
                       inProgress={
                         onDashboard &&

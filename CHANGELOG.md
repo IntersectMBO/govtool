@@ -12,23 +12,12 @@ changes.
 
 ### Added
 
-### Fixed
-
-### Changed
-
-### Removed
-
-## [v2.0.20](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.20) 2025-04-15
-
-
-### Added
-
 - Add Proposal discussion context that manages username [Issue 3341](https://github.com/IntersectMBO/govtool/issues/3341)
 - Add epochParams and ada holder balance to Proposal Discussion Pillar [Issue 2243](https://github.com/IntersectMBO/govtool/issues/2243)
 - Add skeleton element to the drep and governance action cards on validation [Issue 3247](https://github.com/IntersectMBO/govtool/issues/3247)
 - Add mock for the authors field in governance metadata [Issue 3307](https://github.com/IntersectMBO/govtool/issues/3307)
-
 - Add uncontrolled image input to improve performance of large base64 encoded image strings
+- Add snackbar to pdf
 
 ### Fixed
 

@@ -49,7 +49,9 @@ export const DashboardGovernanceActionDetails = () => {
     fullProposalId ?? "",
     !state?.proposal || !state?.vote,
   );
-  const proposal = (data ?? state)?.proposal;
+  const [extendedProposal, setExtendedProposal] = useState<ProposalData>(
+    (data ?? state)?.proposal as ProposalData,
+  );
   const vote = (data ?? state)?.vote;
 
   const [isValidating, setIsValidating] = useState(false);
@@ -60,11 +62,21 @@ export const DashboardGovernanceActionDetails = () => {
     const validate = async () => {
       setIsValidating(true);
 
-      const { status } = await validateMetadata({
+      const { status, metadata } = await validateMetadata({
         standard: MetadataStandard.CIP108,
-        url: proposal?.url ?? "",
-        hash: proposal?.metadataHash ?? "",
+        url: extendedProposal?.url ?? "",
+        hash: extendedProposal?.metadataHash ?? "",
       });
+
+      if (metadata) {
+        setExtendedProposal((prevProposal) => ({
+          ...(prevProposal || {}),
+          ...(metadata as Pick<
+            ProposalData,
+            "title" | "abstract" | "motivation" | "rationale"
+          >),
+        }));
+      }
 
       metadataStatus.current = status;
       setIsValidating(false);
@@ -95,7 +107,7 @@ export const DashboardGovernanceActionDetails = () => {
       <Breadcrumbs
         elementOne={t("govActions.title")}
         elementOnePath={PATHS.dashboardGovernanceActions}
-        elementTwo={proposal?.title ?? ""}
+        elementTwo={extendedProposal?.title ?? ""}
         isDataMissing={metadataStatus?.current ?? null}
       />
       <Link
@@ -141,9 +153,9 @@ export const DashboardGovernanceActionDetails = () => {
           >
             <CircularProgress />
           </Box>
-        ) : proposal ? (
+        ) : extendedProposal ? (
           <GovernanceActionDetailsCard
-            proposal={proposal}
+            proposal={extendedProposal}
             vote={vote}
             isVoter={
               voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter

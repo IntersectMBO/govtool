@@ -64,18 +64,6 @@ export default class BudgetDiscussionSubmissionPage {
   readonly linkTextInput = this.page.getByTestId("link-0-text-input");
   readonly linkUrlInput = this.page.getByTestId("link-0-url-input");
 
-  // contact-information
-  readonly beneficiaryFullNameInput = this.page.getByLabel(
-    "Beneficiary Full Name *"
-  ); //BUG missing test Ids
-  readonly beneficiaryEmailInput = this.page.getByLabel("Beneficiary e-mail *"); //BUG missing test Ids
-  readonly submissionLeadFullNameInput = this.page.getByLabel(
-    "Submission Lead Full Name *"
-  ); //BUG missing test Ids
-  readonly submissionLeadEmailInput = this.page.getByLabel(
-    "Submission Lead Email *"
-  ); //BUG missing test Ids
-
   // proposal-ownership
   readonly companyNameInput = this.page.getByLabel("Company Name *"); //BUG missing test Ids
   readonly companyDomainNameInput = this.page.getByLabel(
@@ -272,36 +260,6 @@ export default class BudgetDiscussionSubmissionPage {
 
     await this.verifyIdentityBtn.click();
     await this.createBudgetProposalBtn.click();
-
-    await this.continueBtn.click();
-  }
-
-  async fillupContactInformationForm(
-    contactInformation: BudgetProposalContactInformationProps
-  ) {
-    await this.beneficiaryFullNameInput.fill(
-      contactInformation.beneficiaryFullName
-    );
-    await this.beneficiaryEmailInput.fill(contactInformation.beneficiaryEmail);
-    await this.beneficiaryCountrySelect.click();
-    await this.page
-      .getByTestId(
-        `${contactInformation.beneficiaryCountry.toLowerCase().replace(/ /g, "-")}-button`
-      )
-      .click();
-    await this.beneficiaryNationalitySelect.click();
-    await this.page
-      .getByTestId(
-        `${contactInformation.beneficiaryNationality.toLowerCase().replace(/ /g, "-")}-button`
-      )
-      .click();
-
-    await this.submissionLeadFullNameInput.fill(
-      contactInformation.submissionLeadFullName
-    );
-    await this.submissionLeadEmailInput.fill(
-      contactInformation.submissionLeadEmail
-    );
 
     await this.continueBtn.click();
   }

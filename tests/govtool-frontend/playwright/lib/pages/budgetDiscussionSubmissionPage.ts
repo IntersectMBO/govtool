@@ -1,5 +1,6 @@
 import environments from "@constants/environments";
 import { faker } from "@faker-js/faker";
+import { correctProposalPillarsAdaFormat } from "@helpers/adaFormat";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { invalid, valid } from "@mock/index";
 import { Page, expect } from "@playwright/test";
@@ -415,7 +416,7 @@ export default class BudgetDiscussionSubmissionPage {
   async fillupCostingForm(costing: BudgetCostingProps) {
     await this.adaAmountInput.fill(costing.adaAmount.toString());
     await this.usaToAdaCnversionRateInput.fill(
-      costing.adaToUsdConversionRate.toString()
+      costing.usdToAdaConversionRate.toString()
     );
     await this.preferredCurrencySelect.click();
     await this.page
@@ -598,11 +599,11 @@ export default class BudgetDiscussionSubmissionPage {
   generateValidCosting(): BudgetCostingProps {
     return {
       adaAmount: faker.number.int({ min: 100, max: 10000 }),
-      adaToUsdConversionRate: faker.number.int({ min: 1, max: 100 }),
+      usdToAdaConversionRate: faker.number.int({ min: 1, max: 10 }),
       preferredCurrency: faker.helpers.arrayElement(
         Object.values(PreferredCurrencyEnum)
       ),
-      AmountInPreferredCurrency: faker.number.int({ min: 1, max: 100 }),
+      AmountInPreferredCurrency: faker.number.int({ min: 100, max: 10000 }),
       costBreakdown: faker.lorem.paragraph(2),
     };
   }
@@ -764,10 +765,10 @@ export default class BudgetDiscussionSubmissionPage {
 
     // costing
     await expect(this.adaAmountContent).toHaveText(
-      proposalInformations.costing.adaAmount.toString()
+      `₳ ${correctProposalPillarsAdaFormat(proposalInformations.costing.adaAmount)}`
     );
     await expect(this.adaToUsdConversionRateContent).toHaveText(
-      proposalInformations.costing.adaToUsdConversionRate.toString()
+      proposalInformations.costing.usdToAdaConversionRate.toString()
     );
 
     const preferredCurrencyShortForm = Object.keys(PreferredCurrencyEnum).find(
@@ -780,7 +781,9 @@ export default class BudgetDiscussionSubmissionPage {
       preferredCurrencyShortForm
     );
     await expect(this.preferredCurrencyAmountContent).toHaveText(
-      proposalInformations.costing.AmountInPreferredCurrency.toString()
+      correctProposalPillarsAdaFormat(
+        proposalInformations.costing.AmountInPreferredCurrency
+      )
     );
     await expect(this.costBreakdownContent).toHaveText(
       proposalInformations.costing.costBreakdown

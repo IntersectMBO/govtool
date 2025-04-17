@@ -489,7 +489,7 @@ export enum PreferredCurrencyEnum {
 
 export interface BudgetCostingProps {
   adaAmount: number;
-  adaToUsdConversionRate: number;
+  usdToAdaConversionRate: number;
   preferredCurrency: preferredCurrencyType;
   AmountInPreferredCurrency: number;
   costBreakdown: string;

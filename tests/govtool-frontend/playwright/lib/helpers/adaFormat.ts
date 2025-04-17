@@ -36,3 +36,12 @@ export const correctDRepDirectoryFormat = (ada: number | undefined) => {
   }
   return "0";
 };
+
+export const correctProposalPillarsAdaFormat = (ada: number | undefined) => {
+  if (ada) {
+    return ada.toLocaleString("en-us", {
+      maximumFractionDigits: 3,
+    });
+  }
+  return "0";
+};

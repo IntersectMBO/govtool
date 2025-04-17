@@ -16,7 +16,6 @@ import {
   BudgetProposalStageEnum,
   CompanyEnum,
 } from "@types";
-import { allure } from "allure-playwright";
 
 test.beforeEach(async () => {
   await setAllureEpic("12. Proposal Budget Submission");

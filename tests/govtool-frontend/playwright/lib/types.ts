@@ -518,3 +518,5 @@ export enum BudgetProposalStageEnum {
   AdministrationAndAuditing = 6,
   Review = 7,
 }
+
+export type VoterType = "DReps" | "SPOs" | "CC";

@@ -92,6 +92,7 @@ setup("Create DRep 03 auth with username", async ({ page, context }) => {
     context,
     wallet: dRep03Wallet,
     auth: dRep03AuthFile,
+    isDrep: true,
   });
 });
 

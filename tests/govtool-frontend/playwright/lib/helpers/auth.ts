@@ -20,6 +20,7 @@ interface CreateUserProps {
   context: BrowserContext;
   wallet: StaticWallet;
   auth: string;
+  isDrep?: boolean;
 }
 
 export async function createAuth({
@@ -42,6 +43,7 @@ export async function createAuthWithUserName({
   context,
   wallet,
   auth,
+  isDrep = false,
 }: CreateUserProps) {
   await importWallet(page, wallet);
 
@@ -52,6 +54,9 @@ export async function createAuthWithUserName({
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
   await proposalDiscussionPage.verifyIdentityBtn.click({ timeout: 15_000 });
+  if (isDrep) {
+    await proposalDiscussionPage.verifyIdentityBtn.click({ timeout: 15_000 });
+  }
 
   await proposalDiscussionPage.setUsername(mockValid.username());
 

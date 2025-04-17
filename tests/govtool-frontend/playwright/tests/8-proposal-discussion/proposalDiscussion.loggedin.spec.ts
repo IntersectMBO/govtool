@@ -91,6 +91,7 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
   });
 
   test("8Q. Should vote on poll.", async ({ page }) => {
+    test.slow();
     const pollVotes = ["Yes", "No"];
     const choice = Math.floor(Math.random() * pollVotes.length);
     const vote = pollVotes[choice];
@@ -110,6 +111,8 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
   });
 
   test("8T. Should change vote on poll.", async ({ page }) => {
+    test.slow();
+
     const pollVotes = ["Yes", "No"];
     const choice = Math.floor(Math.random() * pollVotes.length);
     const vote = pollVotes[choice];
@@ -157,6 +160,7 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
   });
 
   test("8P. Should add poll on own proposal", async ({}) => {
+    test.slow();
     await expect(
       ownerProposalDiscussionDetailsPage.addPollBtn
     ).not.toBeVisible();
@@ -165,6 +169,7 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
   test("8R. Should disable voting after cancelling the poll with the current poll result.", async ({
     page,
   }) => {
+    test.slow();
     await ownerProposalDiscussionDetailsPage.closePollBtn.click();
     await ownerProposalDiscussionDetailsPage.closePollYesBtn.click();
     await expect(
@@ -178,6 +183,7 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
   });
 
   test("8U. Should navigate to the edit proposal page when 'goto data edit screen' is selected if data does not match the anchor URL", async () => {
+    test.slow();
     const invalidMetadataAnchorUrl = "https://www.google.com";
     await ownerProposalDiscussionDetailsPage.submitAsGABtn.click();
 

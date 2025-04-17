@@ -1,6 +1,6 @@
 import environments from "@constants/environments";
 import { faker } from "@faker-js/faker";
-import { correctProposalPillarsAdaFormat } from "@helpers/adaFormat";
+import { formatWithThousandSeparator } from "@helpers/adaFormat";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { invalid, valid } from "@mock/index";
 import { Page, expect } from "@playwright/test";
@@ -765,7 +765,7 @@ export default class BudgetDiscussionSubmissionPage {
 
     // costing
     await expect(this.adaAmountContent).toHaveText(
-      `₳ ${correctProposalPillarsAdaFormat(proposalInformations.costing.adaAmount)}`
+      `₳ ${formatWithThousandSeparator(proposalInformations.costing.adaAmount)}`
     );
     await expect(this.adaToUsdConversionRateContent).toHaveText(
       proposalInformations.costing.usdToAdaConversionRate.toString()
@@ -781,7 +781,7 @@ export default class BudgetDiscussionSubmissionPage {
       preferredCurrencyShortForm
     );
     await expect(this.preferredCurrencyAmountContent).toHaveText(
-      correctProposalPillarsAdaFormat(
+      formatWithThousandSeparator(
         proposalInformations.costing.AmountInPreferredCurrency
       )
     );

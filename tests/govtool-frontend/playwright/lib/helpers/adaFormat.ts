@@ -37,9 +37,13 @@ export const correctDRepDirectoryFormat = (ada: number | undefined) => {
   return "0";
 };
 
-export const correctProposalPillarsAdaFormat = (ada: number | undefined) => {
-  if (ada) {
-    return ada.toLocaleString("en-us", {
+export const formatWithThousandSeparator = (
+  amount: number | undefined,
+  isAda: boolean = true
+) => {
+  const updatedAmount = !isAda ? Math.ceil(amount / LOVELACE) : amount;
+  if (updatedAmount) {
+    return updatedAmount.toLocaleString("en-us", {
       maximumFractionDigits: 3,
     });
   }

@@ -1,4 +1,4 @@
-import { correctProposalPillarsAdaFormat } from "@helpers/adaFormat";
+import { formatWithThousandSeparator } from "@helpers/adaFormat";
 import { expect, Page } from "@playwright/test";
 import { BudgetProposalProps, CommentResponse } from "@types";
 import environments from "lib/constants/environments";
@@ -194,7 +194,7 @@ export default class BudgetDiscussionDetailsPage {
 
     // costing validation
     await expect(this.costingAmountContent).toHaveText(
-      `₳ ${correctProposalPillarsAdaFormat(budgetProposal.costing.adaAmount)}`
+      `₳ ${formatWithThousandSeparator(budgetProposal.costing.adaAmount)}`
     );
     await expect(this.costingConversionRateContent).toHaveText(
       budgetProposal.costing.usdToAdaConversionRate.toString()
@@ -203,7 +203,7 @@ export default class BudgetDiscussionDetailsPage {
       budgetProposal.costing.preferredCurrency
     );
     await expect(this.costingPreferedCurrencyAmountContent).toHaveText(
-      correctProposalPillarsAdaFormat(
+      formatWithThousandSeparator(
         budgetProposal.costing.AmountInPreferredCurrency
       )
     );

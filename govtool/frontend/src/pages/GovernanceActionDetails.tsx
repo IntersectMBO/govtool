@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useNavigate,
   useLocation,
@@ -51,23 +51,34 @@ export const GovernanceActionDetails = () => {
     fullProposalId ?? "",
     !state?.proposal,
   );
-  const proposal = (data ?? state)?.proposal;
-
+  const [extendedProposal, setExtendedProposal] = useState<ProposalData>(
+    (data ?? state)?.proposal as ProposalData,
+  );
   const metadataStatus = useRef<MetadataValidationStatus | undefined>();
   const { validateMetadata } = useValidateMutation();
 
   useEffect(() => {
     const validate = async () => {
-      const { status } = await validateMetadata({
+      const { status, metadata } = await validateMetadata({
         standard: MetadataStandard.CIP108,
-        url: proposal?.url ?? "",
-        hash: proposal?.metadataHash ?? "",
+        url: extendedProposal?.url ?? "",
+        hash: extendedProposal?.metadataHash ?? "",
       });
 
       metadataStatus.current = status;
+
+      if (metadata) {
+        setExtendedProposal((prevProposal) => ({
+          ...(prevProposal || {}),
+          ...(metadata as Pick<
+            ProposalData,
+            "title" | "abstract" | "motivation" | "rationale"
+          >),
+        }));
+      }
     };
     validate();
-  }, [proposal?.url, proposal?.metadataHash]);
+  }, [extendedProposal?.url, extendedProposal?.metadataHash]);
 
   useEffect(() => {
     const isProposalNotFound =
@@ -121,7 +132,7 @@ export const GovernanceActionDetails = () => {
             <Breadcrumbs
               elementOne={t("govActions.title")}
               elementOnePath={PATHS.governanceActions}
-              elementTwo={proposal?.title ?? ""}
+              elementTwo={extendedProposal?.title ?? ""}
               isDataMissing={metadataStatus?.current ?? null}
             />
             <Link
@@ -158,11 +169,11 @@ export const GovernanceActionDetails = () => {
               >
                 <CircularProgress />
               </Box>
-            ) : proposal ? (
+            ) : extendedProposal ? (
               <Box data-testid="governance-action-details">
                 <GovernanceActionDetailsCard
                   isDataMissing={metadataStatus.current}
-                  proposal={proposal}
+                  proposal={extendedProposal}
                 />
               </Box>
             ) : (

@@ -1,5 +1,6 @@
 import environments from "@constants/environments";
 import { faker } from "@faker-js/faker";
+import { formatWithThousandSeparator } from "@helpers/adaFormat";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { invalid, valid } from "@mock/index";
 import { Page, expect } from "@playwright/test";
@@ -62,18 +63,6 @@ export default class BudgetDiscussionSubmissionPage {
   // input
   readonly linkTextInput = this.page.getByTestId("link-0-text-input");
   readonly linkUrlInput = this.page.getByTestId("link-0-url-input");
-
-  // contact-information
-  readonly beneficiaryFullNameInput = this.page.getByLabel(
-    "Beneficiary Full Name *"
-  ); //BUG missing test Ids
-  readonly beneficiaryEmailInput = this.page.getByLabel("Beneficiary e-mail *"); //BUG missing test Ids
-  readonly submissionLeadFullNameInput = this.page.getByLabel(
-    "Submission Lead Full Name *"
-  ); //BUG missing test Ids
-  readonly submissionLeadEmailInput = this.page.getByLabel(
-    "Submission Lead Email *"
-  ); //BUG missing test Ids
 
   // proposal-ownership
   readonly companyNameInput = this.page.getByLabel("Company Name *"); //BUG missing test Ids
@@ -275,36 +264,6 @@ export default class BudgetDiscussionSubmissionPage {
     await this.continueBtn.click();
   }
 
-  async fillupContactInformationForm(
-    contactInformation: BudgetProposalContactInformationProps
-  ) {
-    await this.beneficiaryFullNameInput.fill(
-      contactInformation.beneficiaryFullName
-    );
-    await this.beneficiaryEmailInput.fill(contactInformation.beneficiaryEmail);
-    await this.beneficiaryCountrySelect.click();
-    await this.page
-      .getByTestId(
-        `${contactInformation.beneficiaryCountry.toLowerCase().replace(/ /g, "-")}-button`
-      )
-      .click();
-    await this.beneficiaryNationalitySelect.click();
-    await this.page
-      .getByTestId(
-        `${contactInformation.beneficiaryNationality.toLowerCase().replace(/ /g, "-")}-button`
-      )
-      .click();
-
-    await this.submissionLeadFullNameInput.fill(
-      contactInformation.submissionLeadFullName
-    );
-    await this.submissionLeadEmailInput.fill(
-      contactInformation.submissionLeadEmail
-    );
-
-    await this.continueBtn.click();
-  }
-
   async fillupProposalOwnershipForm(
     proposalOwnership: BudgetProposalOwnershipProps
   ) {
@@ -415,7 +374,7 @@ export default class BudgetDiscussionSubmissionPage {
   async fillupCostingForm(costing: BudgetCostingProps) {
     await this.adaAmountInput.fill(costing.adaAmount.toString());
     await this.usaToAdaCnversionRateInput.fill(
-      costing.adaToUsdConversionRate.toString()
+      costing.usdToAdaConversionRate.toString()
     );
     await this.preferredCurrencySelect.click();
     await this.page
@@ -598,11 +557,11 @@ export default class BudgetDiscussionSubmissionPage {
   generateValidCosting(): BudgetCostingProps {
     return {
       adaAmount: faker.number.int({ min: 100, max: 10000 }),
-      adaToUsdConversionRate: faker.number.int({ min: 1, max: 100 }),
+      usdToAdaConversionRate: faker.number.int({ min: 1, max: 10 }),
       preferredCurrency: faker.helpers.arrayElement(
         Object.values(PreferredCurrencyEnum)
       ),
-      AmountInPreferredCurrency: faker.number.int({ min: 1, max: 100 }),
+      AmountInPreferredCurrency: faker.number.int({ min: 100, max: 10000 }),
       costBreakdown: faker.lorem.paragraph(2),
     };
   }
@@ -764,10 +723,10 @@ export default class BudgetDiscussionSubmissionPage {
 
     // costing
     await expect(this.adaAmountContent).toHaveText(
-      proposalInformations.costing.adaAmount.toString()
+      `₳ ${formatWithThousandSeparator(proposalInformations.costing.adaAmount)}`
     );
     await expect(this.adaToUsdConversionRateContent).toHaveText(
-      proposalInformations.costing.adaToUsdConversionRate.toString()
+      proposalInformations.costing.usdToAdaConversionRate.toString()
     );
 
     const preferredCurrencyShortForm = Object.keys(PreferredCurrencyEnum).find(
@@ -780,7 +739,9 @@ export default class BudgetDiscussionSubmissionPage {
       preferredCurrencyShortForm
     );
     await expect(this.preferredCurrencyAmountContent).toHaveText(
-      proposalInformations.costing.AmountInPreferredCurrency.toString()
+      formatWithThousandSeparator(
+        proposalInformations.costing.AmountInPreferredCurrency
+      )
     );
     await expect(this.costBreakdownContent).toHaveText(
       proposalInformations.costing.costBreakdown

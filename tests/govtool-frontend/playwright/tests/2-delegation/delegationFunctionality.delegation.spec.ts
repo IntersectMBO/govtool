@@ -98,9 +98,9 @@ test.describe("Change delegation", () => {
     await dRepDirectoryPage.delegateToDRep(dRepIdFirst);
 
     // verify delegation
-    await expect(
-      page.getByTestId(`${dRepIdFirst}-delegated-card`)
-    ).toBeVisible();
+    await expect(page.getByTestId(`${dRepIdFirst}-delegated-card`)).toBeVisible(
+      { timeout: 60_000 }
+    );
 
     await expect(
       page

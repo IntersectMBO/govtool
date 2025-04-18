@@ -219,7 +219,7 @@ const kuberService = {
       certificates: metadataAndWallets.map((metadataAndWallet) =>
         Kuber.generateCert(
           "registerdrep",
-          metadataAndWallet.wallet.stake.pkh,
+          metadataAndWallet.wallet.dRep.pkh,
           metadataAndWallet
         )
       ),
@@ -227,7 +227,7 @@ const kuberService = {
         return {
           type: "PaymentSigningKeyShelley_ed25519",
           description: "Stake Signing Key",
-          cborHex: `5820${metadata.wallet.stake.private}`,
+          cborHex: `5820${metadata.wallet.dRep.private}`,
         };
       }),
     };

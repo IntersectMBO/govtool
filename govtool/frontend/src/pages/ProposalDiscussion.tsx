@@ -11,11 +11,7 @@ import {
 import { useValidateMutation } from "@/hooks/mutations";
 import { useScreenDimension } from "@/hooks/useScreenDimension";
 import { Footer, TopNav } from "@/components/organisms";
-import {
-  useGetAdaHolderVotingPowerQuery,
-  useGetDRepVotingPowerList,
-  useGetVoterInfo,
-} from "@/hooks";
+import { useGetDRepVotingPowerList, useGetVoterInfo } from "@/hooks";
 
 const ProposalDiscussion = React.lazy(
   () => import("@intersect.mbo/pdf-ui/cjs"),
@@ -30,7 +26,6 @@ export const ProposalDiscussionPillar = () => {
   const { createGovernanceActionJsonLD, createHash } = useGovernanceActions();
   const { fetchDRepVotingPowerList } = useGetDRepVotingPowerList();
   const { username, setUsername } = useProposalDiscussion();
-  const { votingPower } = useGetAdaHolderVotingPowerQuery(context.stakeKey);
   const snackbarContext = useSnackbar();
 
   return (
@@ -84,7 +79,6 @@ export const ProposalDiscussionPillar = () => {
             username={username}
             setUsername={setUsername}
             epochParams={epochParams}
-            votingPower={votingPower}
             {...snackbarContext}
           />
         </Suspense>

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, ButtonBase, Divider, Avatar, Skeleton } from "@mui/material";
 
@@ -70,31 +70,35 @@ export const DRepCard = ({
 
   const base64Image = getBase64ImageDetails(image ?? "");
   const [isValidating, setIsValidating] = useState(false);
-  const metadataStatus = useRef<MetadataValidationStatus | undefined>();
+  const [metadataStatus, setMetadataStatus] = useState<
+    MetadataValidationStatus | undefined
+  >();
   const { validateMetadata } = useValidateMutation();
 
   useEffect(() => {
+    if (!url) return;
+
     const validate = async () => {
       setIsValidating(true);
 
       const { status: validationStatus } = await validateMetadata({
         standard: MetadataStandard.CIP119,
-        url: url ?? "",
+        url,
         hash: metadataHash ?? "",
       });
 
-      metadataStatus.current = validationStatus;
+      setMetadataStatus(validationStatus);
       setIsValidating(false);
     };
     validate();
-  }, []);
+  }, [url]);
 
   return (
     <Card
       {...(isMe && {
         variant: "primary",
       })}
-      {...(!!metadataStatus.current && {
+      {...(!!metadataStatus && {
         variant: "error",
       })}
       {...(isInProgress && {
@@ -175,13 +179,11 @@ export const DRepCard = ({
                   <Typography
                     sx={{
                       ellipsisStyles,
-                      color: metadataStatus.current && "errorRed",
+                      color: metadataStatus && "errorRed",
                     }}
                   >
-                    {metadataStatus.current
-                      ? getMetadataDataMissingStatusTranslation(
-                          metadataStatus.current,
-                        )
+                    {metadataStatus
+                      ? getMetadataDataMissingStatusTranslation(metadataStatus)
                       : ellipsizeText(givenName ?? "", 25)}
                   </Typography>
                 )}

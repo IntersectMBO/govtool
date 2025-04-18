@@ -459,6 +459,7 @@ test.describe("Proposal Draft", () => {
     test(`7M_${index + 1}. Should edit a ${proposalType.toLowerCase()} proposal draft`, async ({
       browser,
     }) => {
+      test.slow();
       const { storageState, wallet } =
         getDraftProposalWalletAndState(proposalType);
 
@@ -536,6 +537,8 @@ test.describe("Proposal Draft", () => {
       storageState: ".auth/proposal06.json",
       wallet: proposal06Wallet,
     });
+
+    test.slow();
 
     const proposalType =
       Object.values(ProposalType)[

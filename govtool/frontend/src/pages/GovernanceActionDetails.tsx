@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useNavigate,
   useLocation,
@@ -51,21 +51,32 @@ export const GovernanceActionDetails = () => {
     fullProposalId ?? "",
     !state?.proposal,
   );
+  // TODO: Refactor this mess with proposals and metadata validation
+  // once authors are existing in all CIP-108 metadata
   const [extendedProposal, setExtendedProposal] = useState<ProposalData>(
     (data ?? state)?.proposal as ProposalData,
   );
-  const metadataStatus = useRef<MetadataValidationStatus | undefined>();
+
+  useEffect(() => {
+    if (data?.proposal) {
+      setExtendedProposal(data.proposal);
+    }
+  }, [data?.proposal]);
+
+  const [metadataStatus, setMetadataStatus] = useState<
+    MetadataValidationStatus | undefined
+  >();
   const { validateMetadata } = useValidateMutation();
 
   useEffect(() => {
+    if (!extendedProposal?.url) return;
+
     const validate = async () => {
       const { status, metadata } = await validateMetadata({
         standard: MetadataStandard.CIP108,
-        url: extendedProposal?.url ?? "",
+        url: extendedProposal?.url,
         hash: extendedProposal?.metadataHash ?? "",
       });
-
-      metadataStatus.current = status;
 
       if (metadata) {
         setExtendedProposal((prevProposal) => ({
@@ -76,9 +87,10 @@ export const GovernanceActionDetails = () => {
           >),
         }));
       }
+      setMetadataStatus(status);
     };
     validate();
-  }, [extendedProposal?.url, extendedProposal?.metadataHash]);
+  }, [extendedProposal?.url]);
 
   useEffect(() => {
     const isProposalNotFound =
@@ -133,7 +145,7 @@ export const GovernanceActionDetails = () => {
               elementOne={t("govActions.title")}
               elementOnePath={PATHS.governanceActions}
               elementTwo={extendedProposal?.title ?? ""}
-              isDataMissing={metadataStatus?.current ?? null}
+              isDataMissing={metadataStatus ?? null}
             />
             <Link
               sx={{
@@ -172,7 +184,7 @@ export const GovernanceActionDetails = () => {
             ) : extendedProposal ? (
               <Box data-testid="governance-action-details">
                 <GovernanceActionDetailsCard
-                  isDataMissing={metadataStatus.current}
+                  isDataMissing={metadataStatus}
                   proposal={extendedProposal}
                 />
               </Box>

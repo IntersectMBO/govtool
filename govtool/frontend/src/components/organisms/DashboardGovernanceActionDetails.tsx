@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useNavigate,
   useLocation,
@@ -49,22 +49,34 @@ export const DashboardGovernanceActionDetails = () => {
     fullProposalId ?? "",
     !state?.proposal || !state?.vote,
   );
+  // TODO: Refactor this mess with proposals and metadata validation
+  // once authors are existing in all CIP-108 metadata
   const [extendedProposal, setExtendedProposal] = useState<ProposalData>(
     (data ?? state)?.proposal as ProposalData,
   );
+
+  useEffect(() => {
+    if (data?.proposal) {
+      setExtendedProposal(data.proposal);
+    }
+  }, [data?.proposal]);
   const vote = (data ?? state)?.vote;
 
-  const [isValidating, setIsValidating] = useState(false);
-  const metadataStatus = useRef<MetadataValidationStatus | undefined>();
+  const [isValidating, setIsValidating] = useState(true);
+  const [metadataStatus, setMetadataStatus] = useState<
+    MetadataValidationStatus | undefined
+  >();
   const { validateMetadata } = useValidateMutation();
 
   useEffect(() => {
+    if (!extendedProposal?.url) return;
+
     const validate = async () => {
       setIsValidating(true);
 
       const { status, metadata } = await validateMetadata({
         standard: MetadataStandard.CIP108,
-        url: extendedProposal?.url ?? "",
+        url: extendedProposal?.url,
         hash: extendedProposal?.metadataHash ?? "",
       });
 
@@ -78,11 +90,11 @@ export const DashboardGovernanceActionDetails = () => {
         }));
       }
 
-      metadataStatus.current = status;
+      setMetadataStatus(status);
       setIsValidating(false);
     };
     validate();
-  }, []);
+  }, [extendedProposal?.url]);
 
   useEffect(() => {
     const isProposalNotFound =
@@ -108,7 +120,7 @@ export const DashboardGovernanceActionDetails = () => {
         elementOne={t("govActions.title")}
         elementOnePath={PATHS.dashboardGovernanceActions}
         elementTwo={extendedProposal?.title ?? ""}
-        isDataMissing={metadataStatus?.current ?? null}
+        isDataMissing={metadataStatus ?? null}
       />
       <Link
         data-testid="back-to-list-link"
@@ -160,7 +172,7 @@ export const DashboardGovernanceActionDetails = () => {
             isVoter={
               voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
             }
-            isDataMissing={metadataStatus?.current}
+            isDataMissing={metadataStatus}
             isInProgress={
               pendingTransaction.vote?.resourceId ===
               fullProposalId?.replace("#", "")

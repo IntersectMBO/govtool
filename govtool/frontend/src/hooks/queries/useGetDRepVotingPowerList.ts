@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import { getDRepVotingPowerList } from "@/services";
 import { QUERY_KEYS } from "@/consts";
@@ -22,11 +23,16 @@ export const useGetDRepVotingPowerList = () => {
       queryFn: () => getDRepVotingPowerList(identifiers),
     });
 
-  return {
-    dRepVotingPowerList,
-    fetchDRepVotingPowerList,
-    isError,
-    error,
-    isLoading,
-  };
+  const contextValue = useMemo(
+    () => ({
+      dRepVotingPowerList,
+      fetchDRepVotingPowerList,
+      isError,
+      error,
+      isLoading,
+    }),
+    [dRepVotingPowerList, fetchDRepVotingPowerList],
+  );
+
+  return contextValue;
 };

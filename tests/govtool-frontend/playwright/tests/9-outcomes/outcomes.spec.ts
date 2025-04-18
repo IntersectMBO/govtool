@@ -1,6 +1,9 @@
 import { InvalidMetadata } from "@constants/index";
 import { test } from "@fixtures/walletExtension";
-import { correctVoteAdaFormat } from "@helpers/adaFormat";
+import {
+  correctVoteAdaFormat,
+  formatWithThousandSeparator,
+} from "@helpers/adaFormat";
 import { setAllureEpic } from "@helpers/allure";
 import { skipIfNotHardFork } from "@helpers/cardano";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
@@ -9,6 +12,7 @@ import {
   areDRepVoteTotalsDisplayed,
   areSPOVoteTotalsDisplayed,
 } from "@helpers/featureFlag";
+import { parseVotingPowerAndPercentage } from "@helpers/index";
 import { isMobile } from "@helpers/mobile";
 import { injectLogger } from "@helpers/page";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
@@ -332,7 +336,7 @@ test("9G. Should display correct vote counts on outcome details page", async ({
       );
 
       const metricsResponsePromise = page.waitForResponse(
-        (response) => response.url().includes(`/misc/network/metrics`),
+        (response) => response.url().includes(`/misc/network/metrics?epoch`),
         { timeout: 60_000 }
       );
 
@@ -369,48 +373,122 @@ test("9G. Should display correct vote counts on outcome details page", async ({
 
       const metricsResponse = await metricsResponsePromise;
 
-      const dRepTotalAbstainVote =
-        await govActionDetailsPage.getDRepTotalAbstainVoted(
-          proposalToCheck,
+      const { autoAbstain, noConfidence, sPosAutoAbstain, sPosNoConfidence } =
+        await govActionDetailsPage.getSposAndDRepAbstainNoConfidence(
           metricsResponse
         );
 
       // check dRep votes
       if (await areDRepVoteTotalsDisplayed(proposalToCheck)) {
-        await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(parseInt(proposalToCheck.yes_votes))}`,
-          { timeout: 60_000 }
+        await govActionDetailsPage.dRepExpandButton.click();
+
+        await expect(
+          govActionDetailsPage.dRepResultData.getByRole("row", {
+            name: "Yes",
+          })
+        ).toHaveText(
+          `Yes${formatWithThousandSeparator(proposalToCheck.yes_votes, false)}`,
+          {
+            timeout: 60_000,
+          }
+        ); //BUG missing testIds
+
+        await expect(
+          govActionDetailsPage.dRepResultData.getByRole("row", {
+            name: "Auto-Abstain",
+          })
+        ).toHaveText(`Auto-Abstain${autoAbstain}`); //BUG missing testIds
+        await expect(
+          govActionDetailsPage.dRepResultData.getByRole("row", {
+            name: "No Confidence",
+          })
+        ).toHaveText(`No Confidence${noConfidence}`); //BUG missing testIds
+        await expect(
+          govActionDetailsPage.dRepResultData.getByRole("row", {
+            name: "Explicit",
+          })
+        ).toHaveText(
+          `Explicit${formatWithThousandSeparator(proposalToCheck.abstain_votes, false)}`
         );
-        await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(dRepTotalAbstainVote)}`
-        );
-        await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(parseInt(proposalToCheck.no_votes))}`
-        );
+
+        await expect(
+          govActionDetailsPage.dRepResultData
+            .getByRole("row", {
+              name: "No",
+            })
+            .first()
+        ).toHaveText(
+          `No${formatWithThousandSeparator(proposalToCheck.no_votes, false)}`
+        ); //BUG missing testIds
       }
+
       // check sPos votes
       if (await areSPOVoteTotalsDisplayed(proposalToCheck)) {
-        await expect(govActionDetailsPage.sPosYesVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(parseInt(proposalToCheck.pool_yes_votes))}`
-        );
-        await expect(govActionDetailsPage.sPosAbstainVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(parseInt(proposalToCheck.pool_abstain_votes))}`
-        );
-        await expect(govActionDetailsPage.sPosNoVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(parseInt(proposalToCheck.pool_no_votes))}`
-        );
+        await govActionDetailsPage.sPosExpandButton.click();
+        const totalSposNoVotes =
+          parseInt(sPosNoConfidence.replace(/,/g, "")) +
+          proposalToCheck.pool_no_votes * 1000000;
+
+        await expect(
+          govActionDetailsPage.sPosResultData.getByRole("row", {
+            name: "Yes",
+          })
+        ).toHaveText(
+          `Yes${formatWithThousandSeparator(proposalToCheck.pool_yes_votes, false)}`,
+          {
+            timeout: 60_000,
+          }
+        ); //BUG missing testIds
+
+        await expect(
+          govActionDetailsPage.sPosResultData.getByRole("row", {
+            name: "Auto-Abstain",
+          })
+        ).toHaveText(`Auto-Abstain${sPosAutoAbstain}`); //BUG missing testIds
+        await expect(
+          govActionDetailsPage.sPosResultData.getByRole("row", {
+            name: "No Confidence",
+          })
+        ).toHaveText(`No Confidence${sPosNoConfidence}`); //BUG missing testIds
+        await expect(
+          govActionDetailsPage.sPosResultData.getByRole("row", {
+            name: "Explicit",
+          })
+        ).toHaveText(
+          `Explicit${formatWithThousandSeparator(Math.ceil(proposalToCheck.pool_abstain_votes) / 1000000)}`
+        ); //BUG missing testIds
+        await expect(
+          govActionDetailsPage.sPosResultData
+            .getByRole("row", {
+              name: "No",
+            })
+            .first()
+        ).toHaveText(`No${formatWithThousandSeparator(totalSposNoVotes)}`); //BUG missing testIds
       }
 
       // check ccCommittee votes
       if (areCCVoteTotalsDisplayed(proposalToCheck)) {
+        const ccYesVoteSubmittedText =
+          await govActionDetailsPage.ccCommitteeYesVotes.textContent();
+        const ccNoVoteSubmittedText =
+          await govActionDetailsPage.ccCommitteeYesVotes.textContent();
+        const { percentage: yesPercentage } = parseVotingPowerAndPercentage(
+          ccYesVoteSubmittedText
+        );
+        const { percentage: noPercentage } = parseVotingPowerAndPercentage(
+          ccNoVoteSubmittedText
+        );
         await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
-          `${proposalToCheck.cc_yes_votes}`
+          `${proposalToCheck.cc_yes_votes} - ${yesPercentage}`
         );
-        await expect(govActionDetailsPage.ccCommitteeAbstainVotes).toHaveText(
-          `${proposalToCheck.cc_abstain_votes}`
-        );
+        await expect(
+          govActionDetailsPage.cCResultData.getByRole("row", {
+            name: "Abstain Votes",
+          })
+        ).toHaveText(`Abstain Votes${proposalToCheck.pool_abstain_votes}`); //BUG missing testIds
+
         await expect(govActionDetailsPage.ccCommitteeNoVotes).toHaveText(
-          `${proposalToCheck.cc_no_votes}`
+          `${proposalToCheck.cc_no_votes} - ${noPercentage}`
         );
       }
     })

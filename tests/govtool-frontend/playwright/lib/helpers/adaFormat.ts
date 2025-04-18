@@ -36,3 +36,16 @@ export const correctDRepDirectoryFormat = (ada: number | undefined) => {
   }
   return "0";
 };
+
+export const formatWithThousandSeparator = (
+  amount: number | undefined,
+  isAda: boolean = true
+) => {
+  const updatedAmount = !isAda ? Math.ceil(amount / LOVELACE) : amount;
+  if (updatedAmount) {
+    return updatedAmount.toLocaleString("en-us", {
+      maximumFractionDigits: 3,
+    });
+  }
+  return "0";
+};

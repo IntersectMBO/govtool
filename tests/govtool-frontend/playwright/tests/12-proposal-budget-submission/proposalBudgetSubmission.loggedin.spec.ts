@@ -16,7 +16,6 @@ import {
   BudgetProposalStageEnum,
   CompanyEnum,
 } from "@types";
-import { allure } from "allure-playwright";
 
 test.beforeEach(async () => {
   await setAllureEpic("12. Proposal Budget Submission");
@@ -84,6 +83,8 @@ test.describe("Budget proposal 01 wallet", () => {
         await expect(
           budgetProposalSubmissionPage.keyInformationOfGroupInput
         ).toBeVisible();
+
+        await expect(budgetProposalSubmissionPage.continueBtn).toBeDisabled();
       });
 
       test("12D_2. Should verify all field of “problem statements and proposal benefits” section", async () => {
@@ -111,6 +112,7 @@ test.describe("Budget proposal 01 wallet", () => {
         await expect(
           budgetProposalSubmissionPage.suplimentaryEndorsementInput
         ).toBeVisible();
+        await expect(budgetProposalSubmissionPage.continueBtn).toBeDisabled();
       });
 
       test("12D_3. Should verify all field of “proposal details” section", async () => {
@@ -142,6 +144,7 @@ test.describe("Budget proposal 01 wallet", () => {
         await expect(
           budgetProposalSubmissionPage.contractingTypeSelect
         ).toBeVisible();
+        await expect(budgetProposalSubmissionPage.continueBtn).toBeDisabled();
       });
 
       test("12D_4. Should verify all field of “costing” section", async () => {
@@ -160,11 +163,12 @@ test.describe("Budget proposal 01 wallet", () => {
           budgetProposalSubmissionPage.preferredCurrencySelect
         ).toBeVisible();
         await expect(
-          budgetProposalSubmissionPage.preferredCurrencyAmountInput
+          budgetProposalSubmissionPage.preferredCurrencyInput
         ).toBeVisible();
         await expect(
           budgetProposalSubmissionPage.costBreakdownInput
         ).toBeVisible();
+        await expect(budgetProposalSubmissionPage.continueBtn).toBeDisabled();
       });
 
       test("12D_5. Should verify all field of “further information” section", async () => {
@@ -191,6 +195,7 @@ test.describe("Budget proposal 01 wallet", () => {
         await expect(
           budgetProposalSubmissionPage.intersectNamedAdministratorSelect
         ).toBeVisible();
+        await expect(budgetProposalSubmissionPage.continueBtn).toBeDisabled();
       });
     });
 
@@ -203,29 +208,80 @@ test.describe("Budget proposal 01 wallet", () => {
         proposalInformations
       );
     });
-  });
-});
+    test.describe("Budget proposal field validation", () => {
+      test("12E_1. Should accept valid data in “Costing” section", async () => {
+        test.slow(); // Brute-force testing with 50 random data
+        const proposalInformation =
+          budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+        await budgetProposalSubmissionPage.fillupForm(
+          proposalInformation,
+          BudgetProposalStageEnum.ProposalDetails
+        );
 
-test.describe("Budget proposal field validation", () => {
-  test.beforeEach(async () => {
-    await allure.description(
-      "Field validation tests are pending implementation."
-    );
-    test.skip();
-  });
-  test("12E_1. Should accept valid data in “contact information” section", async ({}) => {});
-  test("12E_2. Should accept valid data in “proposal ownership” section", async ({}) => {});
-  test("12E_3. Should accept valid data in “problem statements and proposal benefits” section", async ({}) => {});
-  test("12E_4. Should accept valid data in “proposal details” section", async ({}) => {});
-  test("12E_5. Should accept valid data in “costing” section", async ({}) => {});
-  test("12E_6. Should accept valid data in “further information” section", async ({}) => {});
+        for (let i = 0; i < 50; i++) {
+          await budgetProposalSubmissionPage.validateCostingSection();
+        }
 
-  test("12F_1. Should reject invalid data in “contact information” section", async ({}) => {});
-  test("12F_2. Should reject invalid data in “proposal ownership” section", async ({}) => {});
-  test("12F_3. Should reject invalid data in “problem statements and proposal benefits” section", async ({}) => {});
-  test("12E_4. Should accept invalid data in “proposal details” section", async ({}) => {});
-  test("12F_5. Should reject invalid data in “costing” section", async ({}) => {});
-  test("12F_6. Should reject invalid data in “further information” section", async ({}) => {});
+        await budgetProposalSubmissionPage.fillCostingSectionExceptAmountInputs();
+        await expect(budgetProposalSubmissionPage.continueBtn).toBeEnabled();
+      });
+
+      test("12E_2. Should accept valid data in “further information” section", async () => {
+        test.slow(); // Brute-force testing with 50 random data
+        const proposalInformation =
+          budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+        await budgetProposalSubmissionPage.fillupForm(
+          proposalInformation,
+          BudgetProposalStageEnum.Costing
+        );
+
+        for (let i = 0; i < 50; i++) {
+          await budgetProposalSubmissionPage.validateFurtherInformationSection();
+        }
+
+        for (let i = 0; i < 18; i++) {
+          await expect(budgetProposalSubmissionPage.addLinkBtn).toBeVisible();
+          await budgetProposalSubmissionPage.addLinkBtn.click();
+        }
+        await expect(budgetProposalSubmissionPage.addLinkBtn).toBeHidden();
+        await expect(budgetProposalSubmissionPage.continueBtn).toBeEnabled();
+      });
+
+      test("12F_1. Should reject valid data in “Costing” section", async () => {
+        test.slow(); // Brute-force testing with 50 random data
+        const proposalInformation =
+          budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+        await budgetProposalSubmissionPage.fillupForm(
+          proposalInformation,
+          BudgetProposalStageEnum.ProposalDetails
+        );
+
+        for (let i = 0; i < 50; i++) {
+          await budgetProposalSubmissionPage.validateCostingSection(false);
+        }
+
+        await budgetProposalSubmissionPage.fillCostingSectionExceptAmountInputs();
+        await expect(budgetProposalSubmissionPage.continueBtn).toBeDisabled();
+      });
+
+      test("12F_2. Should reject invalid data in “further information” section", async () => {
+        test.slow(); // Brute-force testing with 50 random data
+        const proposalInformation =
+          budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+        await budgetProposalSubmissionPage.fillupForm(
+          proposalInformation,
+          BudgetProposalStageEnum.Costing
+        );
+
+        for (let i = 0; i < 50; i++) {
+          await budgetProposalSubmissionPage.validateFurtherInformationSection(
+            false
+          );
+        }
+        await expect(budgetProposalSubmissionPage.continueBtn).toBeDisabled();
+      });
+    });
+  });
 });
 
 test("12C. Should save and view draft proposal", async ({ browser }) => {

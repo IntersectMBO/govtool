@@ -30,7 +30,6 @@ declare module "@intersect.mbo/pdf-ui/cjs" {
       identifiers: string[],
     ) => Promise<DRepVotingPowerListResponse>;
     epochParams?: EpochParams;
-    votingPower: number;
     username: string;
     setUsername: (username: string) => void;
   };

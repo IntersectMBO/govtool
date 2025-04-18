@@ -84,14 +84,17 @@ export class Ed25519Key {
 export class ShelleyWallet {
   paymentKey: Ed25519Key;
   stakeKey: Ed25519Key;
+  dRepKey: Ed25519Key;
 
-  public constructor(payment, stake) {
+  public constructor(payment, stake, dRep) {
     this.paymentKey = payment;
     this.stakeKey = stake;
+    this.dRepKey = dRep;
   }
 
   public static async generate() {
     const wallet = new ShelleyWallet(
+      await Ed25519Key.generate(),
       await Ed25519Key.generate(),
       await Ed25519Key.generate()
     );
@@ -145,6 +148,7 @@ export class ShelleyWallet {
     return {
       payment: this.paymentKey.json(),
       stake: this.stakeKey.json(),
+      dRep: this.dRepKey.json(),
       dRepId: this.dRepIdBech32(),
       address: this.addressBech32(environments.networkId),
     };
@@ -153,6 +157,7 @@ export class ShelleyWallet {
   public static fromJson(obj: {
     payment: object;
     stake: object;
+    dRep: object;
   }): ShelleyWallet {
     if (!obj || typeof obj !== "object") {
       throw new Error("ShelleyWallet.fromJson: The input must be an object.");
@@ -160,6 +165,7 @@ export class ShelleyWallet {
 
     const paymentKey = obj.payment;
     const stakeKey = obj.stake;
+    const dRepKey = obj.dRep;
 
     if (!paymentKey || typeof paymentKey !== "object") {
       throw new Error(
@@ -174,27 +180,9 @@ export class ShelleyWallet {
     }
     return new ShelleyWallet(
       Ed25519Key.fromJson(paymentKey),
-      Ed25519Key.fromJson(stakeKey)
+      Ed25519Key.fromJson(stakeKey),
+      Ed25519Key.fromJson(dRepKey)
     );
-  }
-
-  public static dummy(): ShelleyWallet {
-    return ShelleyWallet.fromJson({
-      payment: {
-        pkh: "595ac9bbf256bae584f56a4b671baa4b14a18c8098b8e571834bc12c",
-        private:
-          "5a1380cd79ecaee48d66c14f7d92ddfc866490a3b59d44520e60f16309c8a17d",
-        public:
-          "8d2f4d49118eb1156048b66dd6372cdb1f82da0f8e208d9f8ea4b388c79c09ad",
-      },
-      stake: {
-        pkh: "6706efab75778c2f08b9a5321ead8bfc982a5c08b51a0b2a713cac52",
-        private:
-          "24e8c012c7bef2f5823baef1c06dac253da860a43f0d1f43fc3c8349a4f719a1",
-        public:
-          "f7a1eaea2691ee80b6c0d6f27482145d7037055829b1b26224a5d8f0c2243f16",
-      },
-    });
   }
 }
 

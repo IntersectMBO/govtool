@@ -489,7 +489,7 @@ export enum PreferredCurrencyEnum {
 
 export interface BudgetCostingProps {
   adaAmount: number;
-  adaToUsdConversionRate: number;
+  usdToAdaConversionRate: number;
   preferredCurrency: preferredCurrencyType;
   AmountInPreferredCurrency: number;
   costBreakdown: string;
@@ -518,3 +518,5 @@ export enum BudgetProposalStageEnum {
   AdministrationAndAuditing = 6,
   Review = 7,
 }
+
+export type VoterType = "DReps" | "SPOs" | "CC";

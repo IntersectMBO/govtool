@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useRef, useState } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import { Box, ButtonBase, Link, Skeleton } from "@mui/material";
 
 import { Button, ExternalModalButton, StatusPill, Typography } from "@atoms";
@@ -52,24 +52,28 @@ export const DRepDetailsCard = ({
   } = dRepData;
 
   const [isValidating, setIsValidating] = useState(false);
-  const metadataStatus = useRef<MetadataValidationStatus | undefined>();
+  const [metadataStatus, setMetadataStatus] = useState<
+    MetadataValidationStatus | undefined
+  >();
   const { validateMetadata } = useValidateMutation();
 
   useEffect(() => {
+    if (!url) return;
+
     const validate = async () => {
       setIsValidating(true);
 
       const { status: metadataValidationStatus } = await validateMetadata({
         standard: MetadataStandard.CIP119,
-        url: url ?? "",
+        url,
         hash: metadataHash ?? "",
       });
 
-      metadataStatus.current = metadataValidationStatus;
+      setMetadataStatus(metadataValidationStatus);
       setIsValidating(false);
     };
     validate();
-  }, []);
+  }, [url]);
 
   const groupedReferences = references?.reduce<Record<string, Reference[]>>(
     (acc, reference) => {
@@ -117,18 +121,18 @@ export const DRepDetailsCard = ({
           isMe={isMe}
           isMyDrep={isMyDrep}
           isValidating={isValidating}
-          metadataStatus={metadataStatus.current}
+          metadataStatus={metadataStatus}
         />
         {/* ERROR MESSAGES */}
-        {metadataStatus.current && (
+        {metadataStatus && (
           <DataMissingInfoBox
-            isDataMissing={metadataStatus.current}
+            isDataMissing={metadataStatus}
             isDrep
             sx={{ mb: 0 }}
             isValidating={isValidating}
           />
         )}
-        {metadataStatus.current && !!url && (
+        {metadataStatus && !!url && (
           <ExternalModalButton
             label={t("govActions.seeExternalData")}
             sx={{ mb: 0, alignSelf: "flex-start" }}
@@ -230,7 +234,7 @@ export const DRepDetailsCard = ({
       {/* BUTTONS END */}
 
       {/* CIP-119 DATA */}
-      {!metadataStatus.current && (
+      {!metadataStatus && (
         <>
           <DRepDetailsInfoItem
             label={t("forms.dRepData.objectives")}

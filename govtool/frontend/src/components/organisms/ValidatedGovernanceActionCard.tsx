@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import { useValidateMutation } from "@/hooks/mutations";
 import { MetadataStandard, ProposalData } from "@/models";
@@ -19,23 +19,25 @@ type ActionTypeProps = Omit<
 };
 export const ValidatedGovernanceActionCard = (props: ActionTypeProps) => {
   const [isValidating, setIsValidating] = useState(false);
-  const metadataStatus = useRef<MetadataValidationStatus | undefined>();
+  const [metadataStatus, setMetadataStatus] = useState<
+    MetadataValidationStatus | undefined
+  >();
   const { validateMetadata } = useValidateMutation();
   const [extendedProposal, setExtendedProposal] = useState<ProposalData>(
     props as ProposalData,
   );
 
   useEffect(() => {
+    if (!props?.url) return;
+
     const validate = async () => {
       setIsValidating(true);
 
       const { status, metadata } = await validateMetadata({
         standard: MetadataStandard.CIP108,
-        url: props?.url ?? "",
+        url: props?.url,
         hash: props?.metadataHash ?? "",
       });
-
-      metadataStatus.current = status;
 
       if (metadata) {
         setExtendedProposal(
@@ -50,16 +52,17 @@ export const ValidatedGovernanceActionCard = (props: ActionTypeProps) => {
         );
       }
 
+      setMetadataStatus(status);
       setIsValidating(false);
     };
     validate();
-  }, [props?.url, props?.metadataHash]);
+  }, [props?.url]);
 
   return (
     <GovernanceActionCard
       {...extendedProposal}
       isValidating={isValidating}
-      metadataStatus={metadataStatus.current}
+      metadataStatus={metadataStatus}
     />
   );
 };

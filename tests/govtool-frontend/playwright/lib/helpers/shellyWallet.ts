@@ -4,9 +4,9 @@ import convertBufferToHex from "./convertBufferToHex";
 import { ShelleyWallet } from "./crypto";
 
 export default function extractDRepFromWallet(wallet: ShelleyWallet) {
-  const stakePubKey = convertBufferToHex(wallet.stakeKey.public);
+  const dRepPubKey = convertBufferToHex(wallet.dRepKey.public);
 
-  const dRepKeyBytes = Buffer.from(stakePubKey, "hex");
+  const dRepKeyBytes = Buffer.from(dRepPubKey, "hex");
   const dRepId = blake2bHex(dRepKeyBytes, undefined, 28);
   const words = bech32.toWords(Buffer.from(dRepId, "hex"));
   const dRepIdBech32 = bech32.encode("drep", words);

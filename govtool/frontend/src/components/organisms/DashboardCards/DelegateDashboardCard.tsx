@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
 
@@ -44,21 +44,25 @@ export const DelegateDashboardCard = ({
     delegateTx?.resourceId ?? currentDelegation?.dRepHash,
   );
 
-  const metadataStatus = useRef<MetadataValidationStatus | undefined>();
+  const [metadataStatus, setMetadataStatus] = useState<
+    MetadataValidationStatus | undefined
+  >();
   const { validateMetadata } = useValidateMutation();
 
   useEffect(() => {
+    if (!myDRepDelegationData?.url) return;
+
     const validate = async () => {
       const { status } = await validateMetadata({
         standard: MetadataStandard.CIP119,
-        url: myDRepDelegationData?.url ?? "",
+        url: myDRepDelegationData.url!,
         hash: myDRepDelegationData?.metadataHash ?? "",
       });
 
-      metadataStatus.current = status;
+      setMetadataStatus(status);
     };
     validate();
-  }, []);
+  }, [myDRepDelegationData?.url]);
 
   const learnMoreButton = {
     children: t("learnMore"),
@@ -170,8 +174,8 @@ export const DelegateDashboardCard = ({
           drepName={
             isLoading
               ? "Loading..."
-              : metadataStatus.current
-              ? getMetadataDataMissingStatusTranslation(metadataStatus.current)
+              : metadataStatus
+              ? getMetadataDataMissingStatusTranslation(metadataStatus)
               : myDRepDelegationData?.givenName ?? ""
           }
           dRepId={displayedDelegationId}

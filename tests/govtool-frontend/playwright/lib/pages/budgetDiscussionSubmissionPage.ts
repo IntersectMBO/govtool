@@ -1,6 +1,8 @@
 import environments from "@constants/environments";
 import { faker } from "@faker-js/faker";
+import { formatWithThousandSeparator } from "@helpers/adaFormat";
 import { extractProposalIdFromUrl } from "@helpers/string";
+import { invalid, valid } from "@mock/index";
 import { Page, expect } from "@playwright/test";
 import {
   AdministrationAndAuditingProps,
@@ -27,7 +29,9 @@ const formErrors = {
   motivation: "motivation-helper-error",
   rationale: "rationale-helper-error",
   receivingAddress: "receiving-address-0-text-error",
-  amount: "amount-0-text-error",
+  adaAmount: "ada-amount-error",
+  usdToAdaConversionError: "usd-to-ada-converson-error",
+  preferredCurrencyError: "preferred-currency-error",
   constitutionalUrl: "prop-constitution-url-text-error",
   guardrailsScriptUrl: "prop-guardrails-script-url-input-error",
   link: "link-0-url-input-error",
@@ -59,18 +63,6 @@ export default class BudgetDiscussionSubmissionPage {
   // input
   readonly linkTextInput = this.page.getByTestId("link-0-text-input");
   readonly linkUrlInput = this.page.getByTestId("link-0-url-input");
-
-  // contact-information
-  readonly beneficiaryFullNameInput = this.page.getByLabel(
-    "Beneficiary Full Name *"
-  ); //BUG missing test Ids
-  readonly beneficiaryEmailInput = this.page.getByLabel("Beneficiary e-mail *"); //BUG missing test Ids
-  readonly submissionLeadFullNameInput = this.page.getByLabel(
-    "Submission Lead Full Name *"
-  ); //BUG missing test Ids
-  readonly submissionLeadEmailInput = this.page.getByLabel(
-    "Submission Lead Email *"
-  ); //BUG missing test Ids
 
   // proposal-ownership
   readonly companyNameInput = this.page.getByLabel("Company Name *"); //BUG missing test Ids
@@ -131,7 +123,7 @@ export default class BudgetDiscussionSubmissionPage {
   readonly usaToAdaCnversionRateInput = this.page.getByLabel(
     "USD to ADA Conversion Rate *"
   ); //BUG missing test Ids
-  readonly preferredCurrencyAmountInput = this.page.getByLabel(
+  readonly preferredCurrencyInput = this.page.getByLabel(
     "Amount in preferred currency *"
   );
   readonly costBreakdownInput = this.page.getByTestId("cost-breakdown-input");
@@ -272,36 +264,6 @@ export default class BudgetDiscussionSubmissionPage {
     await this.continueBtn.click();
   }
 
-  async fillupContactInformationForm(
-    contactInformation: BudgetProposalContactInformationProps
-  ) {
-    await this.beneficiaryFullNameInput.fill(
-      contactInformation.beneficiaryFullName
-    );
-    await this.beneficiaryEmailInput.fill(contactInformation.beneficiaryEmail);
-    await this.beneficiaryCountrySelect.click();
-    await this.page
-      .getByTestId(
-        `${contactInformation.beneficiaryCountry.toLowerCase().replace(/ /g, "-")}-button`
-      )
-      .click();
-    await this.beneficiaryNationalitySelect.click();
-    await this.page
-      .getByTestId(
-        `${contactInformation.beneficiaryNationality.toLowerCase().replace(/ /g, "-")}-button`
-      )
-      .click();
-
-    await this.submissionLeadFullNameInput.fill(
-      contactInformation.submissionLeadFullName
-    );
-    await this.submissionLeadEmailInput.fill(
-      contactInformation.submissionLeadEmail
-    );
-
-    await this.continueBtn.click();
-  }
-
   async fillupProposalOwnershipForm(
     proposalOwnership: BudgetProposalOwnershipProps
   ) {
@@ -412,13 +374,13 @@ export default class BudgetDiscussionSubmissionPage {
   async fillupCostingForm(costing: BudgetCostingProps) {
     await this.adaAmountInput.fill(costing.adaAmount.toString());
     await this.usaToAdaCnversionRateInput.fill(
-      costing.adaToUsdConversionRate.toString()
+      costing.usdToAdaConversionRate.toString()
     );
     await this.preferredCurrencySelect.click();
     await this.page
       .getByTestId(`${costing.preferredCurrency.toLowerCase()}-button`)
       .click();
-    await this.preferredCurrencyAmountInput.fill(
+    await this.preferredCurrencyInput.fill(
       costing.AmountInPreferredCurrency.toString()
     );
     await this.costBreakdownInput.fill(costing.costBreakdown);
@@ -439,6 +401,18 @@ export default class BudgetDiscussionSubmissionPage {
         .fill(proposal_links[i].prop_link_text);
     }
     await this.continueBtn.click();
+  }
+
+  async fillCostingSectionExceptAmountInputs() {
+    const costing = this.generateValidCosting();
+    await this.preferredCurrencySelect.click();
+    await this.page
+      .getByTestId(`${costing.preferredCurrency.toLowerCase()}-button`)
+      .click();
+    await this.preferredCurrencyInput.fill(
+      costing.AmountInPreferredCurrency.toString()
+    );
+    await this.costBreakdownInput.fill(costing.costBreakdown.toString());
   }
 
   async fillupForm(
@@ -583,11 +557,11 @@ export default class BudgetDiscussionSubmissionPage {
   generateValidCosting(): BudgetCostingProps {
     return {
       adaAmount: faker.number.int({ min: 100, max: 10000 }),
-      adaToUsdConversionRate: faker.number.int({ min: 1, max: 100 }),
+      usdToAdaConversionRate: faker.number.int({ min: 1, max: 10 }),
       preferredCurrency: faker.helpers.arrayElement(
         Object.values(PreferredCurrencyEnum)
       ),
-      AmountInPreferredCurrency: faker.number.int({ min: 1, max: 100 }),
+      AmountInPreferredCurrency: faker.number.int({ min: 100, max: 10000 }),
       costBreakdown: faker.lorem.paragraph(2),
     };
   }
@@ -749,10 +723,10 @@ export default class BudgetDiscussionSubmissionPage {
 
     // costing
     await expect(this.adaAmountContent).toHaveText(
-      proposalInformations.costing.adaAmount.toString()
+      `₳ ${formatWithThousandSeparator(proposalInformations.costing.adaAmount)}`
     );
     await expect(this.adaToUsdConversionRateContent).toHaveText(
-      proposalInformations.costing.adaToUsdConversionRate.toString()
+      proposalInformations.costing.usdToAdaConversionRate.toString()
     );
 
     const preferredCurrencyShortForm = Object.keys(PreferredCurrencyEnum).find(
@@ -765,7 +739,9 @@ export default class BudgetDiscussionSubmissionPage {
       preferredCurrencyShortForm
     );
     await expect(this.preferredCurrencyAmountContent).toHaveText(
-      proposalInformations.costing.AmountInPreferredCurrency.toString()
+      formatWithThousandSeparator(
+        proposalInformations.costing.AmountInPreferredCurrency
+      )
     );
     await expect(this.costBreakdownContent).toHaveText(
       proposalInformations.costing.costBreakdown
@@ -789,5 +765,87 @@ export default class BudgetDiscussionSubmissionPage {
         ? "Yes"
         : "No"
     );
+  }
+
+  async validateCostingSection(isValid: boolean = true) {
+    const adaAmount = isValid
+      ? faker.number.int({ min: 100, max: 10000 })
+      : faker.lorem.paragraph(2);
+    const usdToAdaCnversionRate = isValid
+      ? faker.number.int({ min: 1, max: 100 })
+      : faker.lorem.paragraph(2);
+    const preferredCurrency = isValid
+      ? faker.number.int({ min: 100, max: 10000 })
+      : faker.lorem.paragraph(2);
+    await this.adaAmountInput.fill(adaAmount.toString());
+    await this.usaToAdaCnversionRateInput.fill(
+      usdToAdaCnversionRate.toString()
+    );
+    await this.preferredCurrencyInput.fill(preferredCurrency.toString());
+    const adaErrorElement = this.page.getByTestId(formErrors.adaAmount);
+    const usdToAdaConversionRateErrorElement = this.page.getByTestId(
+      formErrors.usdToAdaConversionError
+    );
+    const preferredCurrencyErrorElement = this.page.getByTestId(
+      formErrors.preferredCurrencyError
+    );
+    const isAdaAmountErrorVisible = await adaErrorElement.isVisible();
+    const isUsdToAdaConversionRateErrorVisible =
+      await usdToAdaConversionRateErrorElement.isVisible();
+    const isPreferredCurrencyErrorVisible =
+      await preferredCurrencyErrorElement.isVisible();
+
+    if (isValid) {
+      await expect(adaErrorElement, {
+        message: isAdaAmountErrorVisible && `${adaAmount} is an invalid amount`,
+      }).toBeHidden();
+      await expect(usdToAdaConversionRateErrorElement, {
+        message:
+          isUsdToAdaConversionRateErrorVisible &&
+          `${usdToAdaCnversionRate} is an invalid amount`,
+      }).toBeHidden();
+      await expect(preferredCurrencyErrorElement, {
+        message:
+          isPreferredCurrencyErrorVisible &&
+          `${preferredCurrency} is an invalid amount`,
+      }).toBeHidden();
+    } else {
+      await expect(adaErrorElement, {
+        message: !isAdaAmountErrorVisible && `${adaAmount} is a valid amount`,
+      }).toBeVisible();
+      await expect(usdToAdaConversionRateErrorElement, {
+        message:
+          !isUsdToAdaConversionRateErrorVisible &&
+          `${usdToAdaCnversionRate} is a valid amount`,
+      }).toBeVisible();
+      await expect(preferredCurrencyErrorElement, {
+        message:
+          !isPreferredCurrencyErrorVisible &&
+          `${preferredCurrency} is a valid amount`,
+      }).toBeVisible();
+    }
+  }
+
+  async validateFurtherInformationSection(isValid: boolean = true) {
+    const url = isValid ? valid.url() : invalid.url();
+    const linkText = isValid
+      ? faker.internet.displayName()
+      : faker.lorem.paragraph(40);
+
+    await this.linkTextInput.fill(linkText);
+    await this.linkUrlInput.fill(url);
+
+    const errorElement = this.page.getByTestId(formErrors.link);
+    const isErrorVisible = await errorElement.isVisible();
+
+    if (isValid) {
+      await expect(errorElement, {
+        message: isErrorVisible && `${url} is an invalid URL`,
+      }).toBeHidden();
+    } else {
+      await expect(errorElement, {
+        message: !isErrorVisible && `${url} is a valid URL`,
+      }).toBeVisible();
+    }
   }
 }

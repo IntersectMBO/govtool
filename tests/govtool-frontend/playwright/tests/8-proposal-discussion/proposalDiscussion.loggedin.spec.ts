@@ -26,6 +26,7 @@ test.describe("Proposal created logged in state", () => {
   let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
 
   test.beforeEach(async ({ page, proposalId }) => {
+    test.slow();
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
     await proposalDiscussionDetailsPage.goto(proposalId);
 
@@ -48,7 +49,7 @@ test.describe("Proposal created logged in state", () => {
     page,
   }) => {
     for (let i = 0; i < 4; i++) {
-      const comment = faker.lorem.paragraph(2);
+      const comment = faker.lorem.words(5);
       await proposalDiscussionDetailsPage.addComment(comment);
       await page.waitForTimeout(2_000);
     }
@@ -60,9 +61,7 @@ test.describe("Proposal created logged in state", () => {
   });
 
   test("8N. Should reply to comments", async ({ page }) => {
-    test.slow();
-
-    const randComment = faker.lorem.paragraph(2);
+    const randComment = faker.lorem.words(5);
     const randReply = faker.lorem.words(5);
 
     await proposalDiscussionDetailsPage.addComment(randComment);
@@ -85,6 +84,7 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
   let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
 
   test.beforeEach(async ({ page, proposalId }) => {
+    test.slow();
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
     await proposalDiscussionDetailsPage.goto(proposalId);
     await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
@@ -145,6 +145,7 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
   let proposalPage: Page;
 
   test.beforeEach(async ({ browser, proposalId }) => {
+    test.slow();
     proposalPage = await createNewPageWithWallet(browser, {
       storageState: ".auth/proposal01.json",
       wallet: proposal01Wallet,

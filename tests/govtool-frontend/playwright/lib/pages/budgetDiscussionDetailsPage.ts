@@ -1,3 +1,4 @@
+import { formatWithThousandSeparator } from "@helpers/adaFormat";
 import { expect, Page } from "@playwright/test";
 import { BudgetProposalProps, CommentResponse } from "@types";
 import environments from "lib/constants/environments";
@@ -193,16 +194,18 @@ export default class BudgetDiscussionDetailsPage {
 
     // costing validation
     await expect(this.costingAmountContent).toHaveText(
-      budgetProposal.costing.adaAmount.toString()
+      `₳ ${formatWithThousandSeparator(budgetProposal.costing.adaAmount)}`
     );
     await expect(this.costingConversionRateContent).toHaveText(
-      budgetProposal.costing.adaToUsdConversionRate.toString()
+      budgetProposal.costing.usdToAdaConversionRate.toString()
     );
     await expect(this.constingPreferedCurrencyContent).toHaveText(
       budgetProposal.costing.preferredCurrency
     );
     await expect(this.costingPreferedCurrencyAmountContent).toHaveText(
-      budgetProposal.costing.AmountInPreferredCurrency.toString()
+      formatWithThousandSeparator(
+        budgetProposal.costing.AmountInPreferredCurrency
+      )
     );
     await expect(this.costBreakdownContent).toHaveText(
       budgetProposal.costing.costBreakdown

@@ -229,6 +229,9 @@ export default class OutComesPage {
       .locator('[data-testid$="-status"]')
       .textContent();
     const outcomeStatus = outcomeStatusType.filter((statusType) => {
+      if (statusType === "Live") {
+        return "In Progress";
+      }
       return status.includes(statusType);
     });
     return outcomeStatus.some((status) => filters.includes(status));

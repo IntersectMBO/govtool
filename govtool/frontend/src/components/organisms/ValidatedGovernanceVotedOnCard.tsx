@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import { useValidateMutation } from "@/hooks/mutations";
 import { MetadataStandard, ProposalData, VotedProposal } from "@/models";
@@ -13,12 +13,16 @@ export const ValidatedGovernanceVotedOnCard = ({
   inProgress,
 }: Props) => {
   const [isValidating, setIsValidating] = useState(false);
-  const metadataStatus = useRef<MetadataValidationStatus | undefined>();
+  const [metadataStatus, setMetadataStatus] = useState<
+    MetadataValidationStatus | undefined
+  >();
   const { validateMetadata } = useValidateMutation();
   const [extendedVotedProposal, setExtendedVotedProposal] =
     useState<VotedProposal>(votedProposal);
 
   useEffect(() => {
+    if (!votedProposal.proposal.url) return;
+
     const validate = async () => {
       setIsValidating(true);
 
@@ -27,8 +31,6 @@ export const ValidatedGovernanceVotedOnCard = ({
         url: votedProposal.proposal.url,
         hash: votedProposal.proposal.metadataHash,
       });
-
-      metadataStatus.current = status;
 
       if (metadata) {
         setExtendedVotedProposal((prevProposal) => ({
@@ -42,17 +44,18 @@ export const ValidatedGovernanceVotedOnCard = ({
           },
         }));
       }
+      setMetadataStatus(status);
       setIsValidating(false);
     };
     validate();
-  }, []);
+  }, [votedProposal.proposal.url]);
 
   return (
     <GovernanceVotedOnCard
       votedProposal={extendedVotedProposal}
       inProgress={inProgress}
       isValidating={isValidating}
-      metadataStatus={metadataStatus.current}
+      metadataStatus={metadataStatus}
     />
   );
 };

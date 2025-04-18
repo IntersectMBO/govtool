@@ -26,6 +26,7 @@ test.describe("Proposal created logged in state", () => {
   let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
 
   test.beforeEach(async ({ page, proposalId }) => {
+    test.slow();
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
     await proposalDiscussionDetailsPage.goto(proposalId);
 
@@ -48,7 +49,7 @@ test.describe("Proposal created logged in state", () => {
     page,
   }) => {
     for (let i = 0; i < 4; i++) {
-      const comment = faker.lorem.paragraph(2);
+      const comment = faker.lorem.words(5);
       await proposalDiscussionDetailsPage.addComment(comment);
       await page.waitForTimeout(2_000);
     }
@@ -60,9 +61,7 @@ test.describe("Proposal created logged in state", () => {
   });
 
   test("8N. Should reply to comments", async ({ page }) => {
-    test.slow();
-
-    const randComment = faker.lorem.paragraph(2);
+    const randComment = faker.lorem.words(5);
     const randReply = faker.lorem.words(5);
 
     await proposalDiscussionDetailsPage.addComment(randComment);
@@ -85,13 +84,13 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
   let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
 
   test.beforeEach(async ({ page, proposalId }) => {
+    test.slow();
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
     await proposalDiscussionDetailsPage.goto(proposalId);
     await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
   });
 
   test("8Q. Should vote on poll.", async ({ page }) => {
-    test.slow();
     const pollVotes = ["Yes", "No"];
     const choice = Math.floor(Math.random() * pollVotes.length);
     const vote = pollVotes[choice];
@@ -111,8 +110,6 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
   });
 
   test("8T. Should change vote on poll.", async ({ page }) => {
-    test.slow();
-
     const pollVotes = ["Yes", "No"];
     const choice = Math.floor(Math.random() * pollVotes.length);
     const vote = pollVotes[choice];
@@ -148,6 +145,7 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
   let proposalPage: Page;
 
   test.beforeEach(async ({ browser, proposalId }) => {
+    test.slow();
     proposalPage = await createNewPageWithWallet(browser, {
       storageState: ".auth/proposal01.json",
       wallet: proposal01Wallet,
@@ -160,7 +158,6 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
   });
 
   test("8P. Should add poll on own proposal", async ({}) => {
-    test.slow();
     await expect(
       ownerProposalDiscussionDetailsPage.addPollBtn
     ).not.toBeVisible();
@@ -169,7 +166,6 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
   test("8R. Should disable voting after cancelling the poll with the current poll result.", async ({
     page,
   }) => {
-    test.slow();
     await ownerProposalDiscussionDetailsPage.closePollBtn.click();
     await ownerProposalDiscussionDetailsPage.closePollYesBtn.click();
     await expect(
@@ -183,7 +179,6 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
   });
 
   test("8U. Should navigate to the edit proposal page when 'goto data edit screen' is selected if data does not match the anchor URL", async () => {
-    test.slow();
     const invalidMetadataAnchorUrl = "https://www.google.com";
     await ownerProposalDiscussionDetailsPage.submitAsGABtn.click();
 

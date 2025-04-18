@@ -78,7 +78,7 @@ test.describe("Budget proposal dRep behaviour", () => {
   test("11M. Should display DRep tag, name and ID when a registered DRep comments on a proposal", async ({
     page,
   }) => {
-    const comment = faker.lorem.paragraph(2);
+    const comment = faker.lorem.words(5);
     const budgetDiscussionPage = new BudgetDiscussionPage(page);
     await budgetDiscussionPage.goto();
     await budgetDiscussionPage.verifyIdentityBtn.click();

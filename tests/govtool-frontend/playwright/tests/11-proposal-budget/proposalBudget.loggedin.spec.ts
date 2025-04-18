@@ -28,7 +28,7 @@ test.describe("Budget proposal logged in state", () => {
 
   test("11G. Should sort the budget proposal comments", async ({ page }) => {
     for (let i = 0; i < 4; i++) {
-      const comment = faker.lorem.paragraph(2);
+      const comment = faker.lorem.words(5);
       await budgetDiscussionDetailsPage.addComment(comment);
       await page.waitForTimeout(2_000);
     }
@@ -49,7 +49,7 @@ test.describe("Budget proposal logged in state", () => {
   });
 
   test("11I. Should comments on any proposal", async ({}) => {
-    const comment = faker.lorem.paragraph(1);
+    const comment = faker.lorem.words(5);
     await budgetDiscussionDetailsPage.addComment(comment);
     await expect(
       budgetDiscussionDetailsPage.currentPage
@@ -59,7 +59,7 @@ test.describe("Budget proposal logged in state", () => {
   });
 
   test("11J. Should reply to any comments", async ({}) => {
-    const randComment = faker.lorem.paragraph(1);
+    const randComment = faker.lorem.words(5);
     const randReply = faker.lorem.words(5);
 
     await budgetDiscussionDetailsPage.addComment(randComment);

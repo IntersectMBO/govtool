@@ -425,6 +425,9 @@ test("9G. Should display correct vote counts on outcome details page", async ({
       // check sPos votes
       if (await areSPOVoteTotalsDisplayed(proposalToCheck)) {
         await govActionDetailsPage.sPosExpandButton.click();
+        const totalSposNoVotes =
+          parseInt(sPosNoConfidence.replace(/,/g, "")) +
+          proposalToCheck.pool_no_votes * 1000000;
 
         await expect(
           govActionDetailsPage.sPosResultData.getByRole("row", {
@@ -460,9 +463,7 @@ test("9G. Should display correct vote counts on outcome details page", async ({
               name: "No",
             })
             .first()
-        ).toHaveText(
-          `No${formatWithThousandSeparator(proposalToCheck.pool_no_votes, false)}`
-        ); //BUG missing testIds
+        ).toHaveText(`No${formatWithThousandSeparator(totalSposNoVotes)}`); //BUG missing testIds
       }
 
       // check ccCommittee votes

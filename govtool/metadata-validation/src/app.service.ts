@@ -7,7 +7,7 @@ import * as jsonld from 'jsonld';
 import { ValidateMetadataDTO } from '@dto';
 import { LoggerMessage, MetadataValidationStatus } from '@enums';
 import { validateMetadataStandard, parseMetadata, getStandard } from '@utils';
-import { MetadataStandard, ValidateMetadataResult } from '@types';
+import { /* MetadataStandard, */ ValidateMetadataResult } from '@types';
 
 @Injectable()
 export class AppService {
@@ -57,12 +57,13 @@ export class AppService {
         throw MetadataValidationStatus.INCORRECT_FORMAT;
       }
 
-      if (
-        standard === MetadataStandard.CIP108 &&
-        !Array.isArray(parsedData.authors)
-      ) {
-        throw MetadataValidationStatus.INCORRECT_FORMAT;
-      }
+      // TODO: Uncomment this when gov action: 7f320409d9998712ff3a3cdf0c9439e1543f236a3d746766f78f1fdbe1e06bf8#0 expires
+      // if (
+      //   standard === MetadataStandard.CIP108 &&
+      //   !Array.isArray(parsedData.authors)
+      // ) {
+      //   throw MetadataValidationStatus.INCORRECT_FORMAT;
+      // }
 
       if (!parsedData?.body) {
         throw MetadataValidationStatus.INCORRECT_FORMAT;

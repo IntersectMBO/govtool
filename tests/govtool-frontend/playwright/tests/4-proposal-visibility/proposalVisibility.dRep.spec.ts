@@ -111,7 +111,7 @@ test.describe("Temporary DReps", async () => {
     dRepPage = await createNewPageWithWallet(browser, {
       storageState: tempDRepAuth,
       wallet,
-      enableStakeSigning: true,
+      enableDRepSigning: true,
     });
   });
 

@@ -8,6 +8,7 @@ interface NewPageConfig {
   storageState?: string;
   wallet: StaticWallet;
   enableStakeSigning?: boolean;
+  enableDRepSigning?: boolean;
   supportedExtensions?: Record<string, number>[];
 }
 
@@ -25,6 +26,7 @@ export async function createNewPageWithWallet(
   await loadDemosExtension(
     newPage,
     extensionConfig.enableStakeSigning,
+    extensionConfig.enableDRepSigning,
     extensionConfig.supportedExtensions
   );
   await importWallet(newPage, wallet);

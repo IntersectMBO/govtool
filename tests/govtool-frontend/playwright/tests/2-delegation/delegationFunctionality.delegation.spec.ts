@@ -134,6 +134,7 @@ test.describe("Register DRep state", () => {
       storageState: dRepAuth,
       wallet,
       enableStakeSigning: true,
+      enableDRepSigning: true,
     });
 
     await dRepPage.goto("/");
@@ -142,7 +143,6 @@ test.describe("Register DRep state", () => {
 
   test("2E. Should register as Direct voter", async ({}, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
-    const dRepId = wallet.dRepId;
 
     await dRepPage.getByTestId("register-as-sole-voter-button").click();
     await dRepPage.getByTestId("continue-button").click();

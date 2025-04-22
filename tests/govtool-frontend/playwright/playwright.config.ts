@@ -55,7 +55,24 @@ export default defineConfig({
     {
       name: "dRep setup",
       testMatch: "**/dRep.setup.ts",
-      dependencies: environments.ci ? ["faucet setup"] : [],
+      dependencies: environments.ci ? ["faucet setup", "wallet bootstrap"] : [],
+    },
+    {
+      name: "proposal budget dRep setup",
+      testMatch: "**/proposal-budget.dRep.setup.ts",
+    },
+    {
+      name: "dRep auth setup",
+      testMatch: "**/dRep.auth.setup.ts",
+      dependencies: environments.ci ? ["dRep setup"] : [],
+    },
+    {
+      name: "proposal discussion auth setup",
+      testMatch: "**/proposal-discussion.auth.setup.ts",
+    },
+    {
+      name: "proposal budget auth setup",
+      testMatch: "**/proposal-budget.auth.setup.ts",
     },
     {
       name: "proposal setup",
@@ -74,6 +91,23 @@ export default defineConfig({
       dependencies: environments.ci ? ["auth setup", "wallet bootstrap"] : [],
     },
     {
+      name: "proposal discussion",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: "**/*.pd.spec.ts",
+      dependencies: environments.ci
+        ? ["proposal discussion auth setup"]
+        : [],
+    },
+    {
+      name: "proposal budget",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: "**/*.pb.spec.ts",
+      dependencies: environments.ci
+        ? ["proposal budget auth setup"]
+        : [],
+      testIgnore: ["**/*.dRep.pb.spec.ts"],
+    },
+    {
       name: "proposal submission",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.ga.spec.ts",
@@ -85,14 +119,23 @@ export default defineConfig({
       name: "loggedin (desktop)",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.loggedin.spec.ts",
-      dependencies: environments.ci ? ["auth setup"] : [],
+      dependencies: environments.ci ? ["auth setup", "wallet bootstrap"] : [],
+    },
+    {
+      name: "proposal budget dRep",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: "**/*.dRep.pb.spec.ts",
+      dependencies: environments.ci
+        ? ["proposal budget auth setup","proposal budget dRep setup"]
+        : [],
+      teardown: environments.ci && "cleanup dRep",
     },
     {
       name: "dRep",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.dRep.spec.ts",
       dependencies: environments.ci
-        ? ["auth setup", "dRep setup", "wallet bootstrap"]
+        ? ["dRep setup", "dRep auth setup",  "wallet bootstrap"]
         : [],
       teardown: environments.ci && "cleanup dRep",
     },
@@ -114,6 +157,8 @@ export default defineConfig({
         "**/*.dRep.spec.ts",
         "**/*.tx.spec.ts",
         "**/*.ga.spec.ts",
+        "**/*.pd.spec.ts",
+        "**/*.pb.spec.ts",
       ],
     },
     {
@@ -125,6 +170,8 @@ export default defineConfig({
         "**/*.delegation.spec.ts",
         "**/*.tx.spec.ts",
         "**/*.ga.spec.ts",
+        "**/*.pd.spec.ts",
+        "**/*.pb.spec.ts",
         "**/walletConnect.spec.ts",
       ],
     },

@@ -5,6 +5,7 @@ import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
 import { expect } from "@playwright/test";
 import { dRep03Wallet } from "@constants/staticWallets";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
+import { dRep03AuthFile } from "@constants/auth";
 
 test.beforeEach(async () => {
   await setAllureEpic("11. Proposal Budget");
@@ -12,7 +13,7 @@ test.beforeEach(async () => {
 
 test.describe("Budget proposal dRep behaviour", () => {
   test.use({
-    storageState: ".auth/dRep03.json",
+    storageState: dRep03AuthFile,
     wallet: dRep03Wallet,
   });
 

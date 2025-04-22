@@ -1,3 +1,4 @@
+import { proposal05AuthFile, proposal06AuthFile } from "@constants/auth";
 import environments from "@constants/environments";
 import {
   proposal01Wallet,
@@ -534,7 +535,7 @@ test.describe("Proposal Draft", () => {
 
   test("7N. Should submit a draft proposal", async ({ browser }) => {
     const page = await createNewPageWithWallet(browser, {
-      storageState: ".auth/proposal06.json",
+      storageState: proposal06AuthFile,
       wallet: proposal06Wallet,
     });
 

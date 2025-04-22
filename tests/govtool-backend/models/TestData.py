@@ -128,13 +128,16 @@ class TxStatus(TypedDict):
 
 
 class NetworkMetrics(TypedDict):
-    currentTime: str
-    currentEpoch: int
-    currentBlock: int
     uniqueDelegators: int
     totalDelegations: int
     totalGovernanceActions: int
     totalDRepVotes: int
     totalRegisteredDReps: int
-    alwaysAbstainVotingPower: int
-    alwaysNoConfidenceVotingPower: int
+    totalDRepDistr: int
+    totalActiveDReps: int
+    totalInactiveDReps: int
+    totalActiveCIP119CompliantDReps: int
+    totalRegisteredDirectVoters: int
+    noOfCommitteeMembers: int
+    quorumNumerator: int
+    quorumDenominator: int

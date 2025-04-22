@@ -141,3 +141,15 @@ class NetworkMetrics(TypedDict):
     noOfCommitteeMembers: int
     quorumNumerator: int
     quorumDenominator: int
+
+class NetworkTotalStake(TypedDict):
+    totalStakeControlledByDReps: int
+    totalStakeControlledBySPOs: int
+    alwaysAbstainVotingPower: int
+    alwaysNoConfidenceVotingPower: int
+
+class NetworkInfo(TypedDict):
+    currentTime: str
+    epochNo: int
+    blockNo: int
+    networkName: str

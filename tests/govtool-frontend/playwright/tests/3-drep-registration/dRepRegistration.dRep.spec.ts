@@ -22,7 +22,12 @@ test.beforeEach(async () => {
 });
 
 test.describe("Logged in DReps", () => {
-  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
+  test.use({
+    storageState: ".auth/dRep01.json",
+    wallet: dRep01Wallet,
+    enableDRepSigning: true,
+    enableStakeSigning: false,
+  });
 
   test("3A. Should show dRepId on dashboard and enable voting on governance actions after connecting registered dRep Wallet", async ({
     page,
@@ -109,6 +114,7 @@ test.describe("Temporary DReps", () => {
     const dRepPage = await createNewPageWithWallet(browser, {
       storageState: tempDRepAuth,
       wallet,
+      enableDRepSigning: true,
       enableStakeSigning: true,
     });
 
@@ -135,6 +141,7 @@ test.describe("Temporary DReps", () => {
       storageState: tempDRepAuth,
       wallet,
       enableStakeSigning: true,
+      enableDRepSigning: true,
     });
 
     const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);
@@ -169,7 +176,7 @@ test.describe("Temporary DReps", () => {
     const dRepPage = await createNewPageWithWallet(browser, {
       storageState: tempDRepAuth,
       wallet,
-      enableStakeSigning: true,
+      enableDRepSigning: true,
     });
 
     await dRepPage.goto("/");
@@ -194,7 +201,7 @@ test.describe("Temporary DReps", () => {
     const dRepPage = await createNewPageWithWallet(browser, {
       storageState: dRepAuth,
       wallet,
-      enableStakeSigning: true,
+      enableDRepSigning: true,
     });
 
     await dRepPage.goto("/");
@@ -233,6 +240,7 @@ test.describe("Temporary DReps", () => {
       storageState: dRepAuth,
       wallet,
       enableStakeSigning: true,
+      enableDRepSigning: true,
     });
 
     const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);

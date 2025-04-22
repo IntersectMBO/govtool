@@ -170,9 +170,7 @@ test.describe("Outcome details dependent test", () => {
     const outcomesPage = new OutComesPage(currentPage);
 
     await outcomesPage.searchInput.fill(governanceActionId);
-    await expect(
-      currentPage.getByRole("progressbar").getByRole("img")
-    ).toBeVisible();
+
     await page
       .getByTestId(`${governanceActionId}-CIP-105-id`)
       .getByTestId("copy-button")

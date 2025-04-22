@@ -10,6 +10,7 @@ import path = require("path");
 export default async function loadDemosExtension(
   page: Page,
   enableStakeSigning?: boolean,
+  enableDRepSigning?: boolean,
   supportedExtensions?: Record<string, number>[]
 ) {
   const demosBundleScriptPath = path.resolve(
@@ -18,6 +19,7 @@ export default async function loadDemosExtension(
   );
   let walletConfig: CardanoTestWalletConfig = {
     enableStakeSigning,
+    enableDRepSigning,
     kuberApiUrl: environments.kuber.apiUrl,
     networkId: environments.networkId,
     kuberApiKey: environments.kuber.apiKey,

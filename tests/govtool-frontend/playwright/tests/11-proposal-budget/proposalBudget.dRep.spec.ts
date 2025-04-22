@@ -101,6 +101,15 @@ test.describe("Budget proposal dRep behaviour", () => {
       dRepCommentedCard.getByText("DRep", { exact: true })
     ).toBeVisible();
 
+    const isDRepGivenNameVisible = await dRepCommentedCard
+      .getByTestId("given-name")
+      .isVisible();
+
+    expect(
+      isDRepGivenNameVisible,
+      !isDRepGivenNameVisible && "Missing given-name testId"
+    ).toBeTruthy();
+
     await expect(dRepCommentedCard.getByTestId("given-name")).toHaveText(
       dRep03Wallet.givenName
     );

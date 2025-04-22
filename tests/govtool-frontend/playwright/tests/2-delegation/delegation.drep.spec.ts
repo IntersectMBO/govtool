@@ -30,6 +30,7 @@ test("2N. Should show DRep information on details page", async ({
     storageState: tempDRepAuth,
     wallet,
     enableStakeSigning: true,
+    enableDRepSigning: true,
   });
 
   const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);

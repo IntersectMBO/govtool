@@ -147,7 +147,7 @@ test.describe("Perform voting", () => {
     const dRepPage = await createNewPageWithWallet(browser, {
       storageState: tempDRepAuth,
       wallet,
-      enableStakeSigning: true,
+      enableDRepSigning: true,
     });
 
     const govActionsPage = new GovernanceActionsPage(dRepPage);
@@ -306,7 +306,7 @@ test.describe("Check voting power", () => {
     const dRepPage = await createNewPageWithWallet(browser, {
       storageState: tempDRepAuth,
       wallet,
-      enableStakeSigning: true,
+      enableDRepSigning: true,
     });
 
     await dRepPage.goto("/");

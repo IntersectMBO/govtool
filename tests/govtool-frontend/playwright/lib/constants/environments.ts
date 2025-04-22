@@ -37,6 +37,9 @@ const environments = {
     stake: {
       private: process.env.PROPOSAL_FAUCET_STAKE_PRIVATE,
     },
+    dRep: {
+      private: process.env.PROPOSAL_FAUCET_DREP_PRIVATE,
+    },
   },
 };
 

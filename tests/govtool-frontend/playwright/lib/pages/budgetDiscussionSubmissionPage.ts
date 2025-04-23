@@ -58,7 +58,7 @@ export default class BudgetDiscussionSubmissionPage {
   readonly agreeCheckbox = this.page.getByLabel(
     "I agree to the information in"
   ); //BUG missing test Ids
-  readonly submitCheckbox = this.page.getByLabel("I consent to the public"); //BUG missing test Ids
+  readonly submitCheckbox = this.page.getByTestId("submit-checkbox");
 
   // input
   readonly linkTextInput = this.page.getByTestId("link-0-text-input");
@@ -417,7 +417,7 @@ export default class BudgetDiscussionSubmissionPage {
 
   async fillupForm(
     budgetProposal: BudgetProposalProps,
-    stage: BudgetProposalStageEnum = BudgetProposalStageEnum.AdministrationAndAuditing
+    stage: BudgetProposalStageEnum = BudgetProposalStageEnum.Review
   ) {
     await this.fillupProposalOwnershipForm(budgetProposal.proposalOwnership);
 
@@ -450,9 +450,10 @@ export default class BudgetDiscussionSubmissionPage {
         );
       }
       await this.continueBtn.click();
-
-      await this.submitCheckbox.click();
-      await this.continueBtn.click();
+      if (stage > BudgetProposalStageEnum.AdministrationAndAuditing) {
+        await this.submitCheckbox.click();
+        await this.continueBtn.click();
+      }
     }
   }
 

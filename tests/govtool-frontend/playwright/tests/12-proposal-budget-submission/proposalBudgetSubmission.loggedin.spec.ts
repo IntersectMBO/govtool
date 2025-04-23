@@ -197,6 +197,19 @@ test.describe("Budget proposal 01 wallet", () => {
         ).toBeVisible();
         await expect(budgetProposalSubmissionPage.continueBtn).toBeDisabled();
       });
+
+      test("12D_7. Should verify all field of “Submit” section", async () => {
+        const proposalInformation =
+          budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+        await budgetProposalSubmissionPage.fillupForm(
+          proposalInformation,
+          BudgetProposalStageEnum.AdministrationAndAuditing
+        );
+
+        await expect(budgetProposalSubmissionPage.submitCheckbox).toBeVisible();
+        await expect(budgetProposalSubmissionPage.saveDraftBtn).toBeVisible();
+        await expect(budgetProposalSubmissionPage.continueBtn).toBeDisabled();
+      });
     });
 
     test("12G. Should validate and review submitted budget proposal", async () => {

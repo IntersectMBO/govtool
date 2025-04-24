@@ -370,6 +370,43 @@ test.describe("Budget proposal 01 wallet", () => {
           await expect(budgetProposalSubmissionPage.addLinkBtn).toBeHidden();
         });
       });
+
+      budgetProposalValidationReason.forEach(({ isValid, title }) => {
+        test(`12${isValid ? "E" : "F"}_6. Should ${title} in “Administration and Auditing” section`, async () => {
+          const proposalInformation =
+            budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+          await budgetProposalSubmissionPage.fillupForm(
+            proposalInformation,
+            BudgetProposalStageEnum.FurtherInformation
+          );
+          for (let i = 0; i < 25; i++) {
+            await budgetProposalSubmissionPage.validateAdministrationAndAuditingSection(
+              isValid
+            );
+          }
+        });
+      });
+
+      budgetProposalValidationReason.forEach(({ isValid, title }) => {
+        test(`12${isValid ? "E" : "F"}_7. Should ${title} in “Submit” section`, async () => {
+          const proposalInformation =
+            budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+          await budgetProposalSubmissionPage.fillupForm(
+            proposalInformation,
+            BudgetProposalStageEnum.AdministrationAndAuditing
+          );
+          if (isValid) {
+            await budgetProposalSubmissionPage.submitCheckbox.click();
+            await expect(
+              budgetProposalSubmissionPage.continueBtn
+            ).toBeEnabled();
+          } else {
+            await expect(
+              budgetProposalSubmissionPage.continueBtn
+            ).toBeDisabled();
+          }
+        });
+      });
     });
   });
 });

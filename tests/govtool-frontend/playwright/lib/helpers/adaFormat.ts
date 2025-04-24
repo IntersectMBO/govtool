@@ -52,7 +52,7 @@ export function formatWithThousandSeparator(
     numericValue = value;
   }
 
-  if (isAda) {
+  if (!isAda) {
     numericValue = Math.ceil(numericValue / LOVELACE);
   }
 

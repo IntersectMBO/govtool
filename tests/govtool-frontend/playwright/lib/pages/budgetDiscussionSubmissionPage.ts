@@ -419,17 +419,21 @@ export default class BudgetDiscussionSubmissionPage {
     await this.continueBtn.click();
   }
 
-  // async fillCostingSectionExceptAmountInputs() {
-  //   const costing = this.generateValidCosting();
-  //   await this.preferredCurrencySelect.click();
-  //   await this.page
-  //     .getByTestId(`${costing.preferredCurrency.toLowerCase()}-button`)
-  //     .click();
-  //   await this.preferredCurrencyInput.fill(
-  //     costing.AmountInPreferredCurrency.toString()
-  //   );
-  //   await this.costBreakdownInput.fill(costing.costBreakdown.toString());
-  // }
+  async fillupAdministrationAndAuditing(
+    administrationAndAuditing: AdministrationAndAuditingProps
+  ) {
+    await this.intersectNamedAdministratorSelect.click();
+    await this.page
+      .getByTestId(
+        `${administrationAndAuditing.intersectAdministration}-button`
+      )
+      .click();
+    if (!administrationAndAuditing.intersectAdministration) {
+      await this.venderDetailsInput.fill(
+        administrationAndAuditing.venderDetails
+      );
+    }
+  }
 
   async fillupForm(
     budgetProposal: BudgetProposalProps,
@@ -453,18 +457,9 @@ export default class BudgetDiscussionSubmissionPage {
       await this.fillupFurtherInformation(budgetProposal.furtherInformation);
     }
     if (stage > BudgetProposalStageEnum.FurtherInformation) {
-      await this.intersectNamedAdministratorSelect.click();
-
-      await this.page
-        .getByTestId(
-          `${budgetProposal.administrationAndAuditing.intersectAdministration}-button`
-        )
-        .click();
-      if (!budgetProposal.administrationAndAuditing.intersectAdministration) {
-        await this.venderDetailsInput.fill(
-          budgetProposal.administrationAndAuditing.venderDetails
-        );
-      }
+      this.fillupAdministrationAndAuditing(
+        budgetProposal.administrationAndAuditing
+      );
       await this.continueBtn.click();
       if (stage > BudgetProposalStageEnum.AdministrationAndAuditing) {
         await this.submitCheckbox.click();
@@ -1075,6 +1070,25 @@ export default class BudgetDiscussionSubmissionPage {
       await expect(errorElement, {
         message: !isErrorVisible && `${url} is a valid URL`,
       }).toBeVisible();
+      await expect(this.continueBtn).toBeDisabled();
+    }
+  }
+
+  async validateAdministrationAndAuditingSection(isValid: boolean = true) {
+    if (isValid) {
+      const validateAdministrationAndAuditingSection =
+        this.generateAdministrationAndAuditing();
+      await this.fillupAdministrationAndAuditing(
+        validateAdministrationAndAuditingSection
+      );
+      await expect(this.continueBtn).toBeEnabled();
+    } else {
+      // continue button will be disabled if type is not selected or if the type is "No" and the vender details is not filled
+      const isFalse = faker.datatype.boolean();
+      if (isFalse) {
+        await this.intersectNamedAdministratorSelect.click();
+        await this.page.getByTestId("false-button").click();
+      }
       await expect(this.continueBtn).toBeDisabled();
     }
   }

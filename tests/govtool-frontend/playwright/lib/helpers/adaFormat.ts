@@ -37,15 +37,26 @@ export const correctDRepDirectoryFormat = (ada: number | undefined) => {
   return "0";
 };
 
-export const formatWithThousandSeparator = (
-  amount: number | undefined,
-  isAda: boolean = true
-) => {
-  const updatedAmount = !isAda ? Math.ceil(amount / LOVELACE) : amount;
-  if (updatedAmount) {
-    return updatedAmount.toLocaleString("en-us", {
-      maximumFractionDigits: 3,
-    });
+export function formatWithThousandSeparator(
+  value: number | string,
+  isAda = true
+): string {
+  if (value === undefined || value === null) {
+    return "0";
   }
-  return "0";
-};
+
+  let numericValue: number;
+  if (typeof value === "string") {
+    numericValue = parseInt(value.replace(/,/g, ""));
+  } else {
+    numericValue = value;
+  }
+
+  if (isAda) {
+    numericValue = Math.ceil(numericValue / LOVELACE);
+  }
+
+  return numericValue.toLocaleString("en-US", {
+    maximumFractionDigits: 3,
+  });
+}

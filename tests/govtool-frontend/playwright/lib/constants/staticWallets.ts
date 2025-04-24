@@ -66,4 +66,5 @@ export const allStaticWallets = [
   ...proposalWallets,
   faucetWallet,
   proposalFaucetWallet,
+  ...budgetProposalDRepWallets
 ];

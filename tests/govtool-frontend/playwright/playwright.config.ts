@@ -60,6 +60,7 @@ export default defineConfig({
     {
       name: "proposal budget dRep setup",
       testMatch: "**/proposal-budget.dRep.setup.ts",
+      teardown: environments.ci && "cleanup faucet",
     },
     {
       name: "dRep auth setup",

@@ -23,6 +23,7 @@ import {
   areDRepVoteTotalsDisplayed,
   areSPOVoteTotalsDisplayed,
 } from "@helpers/featureFlag";
+import { dRep01AuthFile } from "@constants/auth";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
@@ -31,7 +32,7 @@ test.beforeEach(async () => {
 });
 
 test.describe("Logged in DRep", () => {
-  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
+  test.use({ storageState: dRep01AuthFile, wallet: dRep01Wallet });
 
   test("4E. Should display DRep's voting power in governance actions page", async ({
     page,
@@ -135,7 +136,7 @@ test.describe("Temporary DReps", async () => {
 });
 
 test.describe("Check vote count", () => {
-  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
+  test.use({ storageState: dRep01AuthFile, wallet: dRep01Wallet });
 
   test("4G. Should display correct vote counts on governance details page for DRep", async ({
     page,
@@ -172,7 +173,7 @@ test.describe("Check vote count", () => {
     await Promise.all(
       uniqueProposalTypes.map(async (proposalToCheck) => {
         const dRepPage = await createNewPageWithWallet(browser, {
-          storageState: ".auth/dRep01.json",
+          storageState: dRep01AuthFile,
           wallet: dRep01Wallet,
         });
 

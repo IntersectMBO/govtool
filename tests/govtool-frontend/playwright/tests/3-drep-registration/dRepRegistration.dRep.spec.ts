@@ -14,6 +14,7 @@ import { expect } from "@playwright/test";
 import walletManager from "lib/walletManager";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { GovernanceActionType } from "@types";
+import { dRep01AuthFile } from "@constants/auth";
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
@@ -23,7 +24,7 @@ test.beforeEach(async () => {
 
 test.describe("Logged in DReps", () => {
   test.use({
-    storageState: ".auth/dRep01.json",
+    storageState: dRep01AuthFile,
     wallet: dRep01Wallet,
     enableDRepSigning: true,
     enableStakeSigning: false,

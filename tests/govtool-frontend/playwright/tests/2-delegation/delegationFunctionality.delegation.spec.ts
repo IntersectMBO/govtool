@@ -1,3 +1,11 @@
+import {
+  adaHolder01AuthFile,
+  adaHolder02AuthFile,
+  adaHolder03AuthFile,
+  adaHolder04AuthFile,
+  adaHolder05AuthFile,
+  adaHolder06AuthFile,
+} from "@constants/auth";
 import environments from "@constants/environments";
 import {
   adaHolder01Wallet,
@@ -33,7 +41,7 @@ test.beforeEach(async () => {
 
 test.describe("Delegate to others", () => {
   test.use({
-    storageState: ".auth/adaHolder01.json",
+    storageState: adaHolder01AuthFile,
     wallet: adaHolder01Wallet,
   });
 
@@ -83,7 +91,7 @@ test.describe("Delegate to others", () => {
 
 test.describe("Change delegation", () => {
   test.use({
-    storageState: ".auth/adaHolder02.json",
+    storageState: adaHolder02AuthFile,
     wallet: adaHolder02Wallet,
   });
 
@@ -220,7 +228,7 @@ test("2G. Should delegate to myself", async ({ page, browser }, testInfo) => {
 
 test.describe("Multiple delegations", () => {
   test.use({
-    storageState: ".auth/adaHolder05.json",
+    storageState: adaHolder05AuthFile,
     wallet: adaHolder05Wallet,
   });
 
@@ -248,7 +256,7 @@ test.describe("Multiple delegations", () => {
 
 test.describe("Abstain delegation", () => {
   test.use({
-    storageState: ".auth/adaHolder03.json",
+    storageState: adaHolder03AuthFile,
     wallet: adaHolder03Wallet,
   });
 
@@ -278,7 +286,7 @@ test.describe("Abstain delegation", () => {
 
 test.describe("No confidence delegation", () => {
   test.use({
-    storageState: ".auth/adaHolder04.json",
+    storageState: adaHolder04AuthFile,
     wallet: adaHolder04Wallet,
   });
 
@@ -309,7 +317,7 @@ test.describe("No confidence delegation", () => {
 
 test.describe("Delegated ADA visibility", () => {
   test.use({
-    storageState: ".auth/adaHolder06.json",
+    storageState: adaHolder06AuthFile,
     wallet: adaHolder06Wallet,
   });
 

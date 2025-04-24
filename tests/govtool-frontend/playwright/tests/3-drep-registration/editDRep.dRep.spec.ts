@@ -8,6 +8,7 @@ import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
 import EditDRepPage from "@pages/editDRepPage";
 import { expect } from "@playwright/test";
 import environments from "@constants/environments";
+import { dRep02AuthFile } from "@constants/auth";
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
@@ -15,7 +16,7 @@ test.beforeEach(async () => {
   await skipIfMainnet();
 });
 
-test.use({ wallet: dRep02Wallet, storageState: ".auth/dRep02.json" });
+test.use({ wallet: dRep02Wallet, storageState: dRep02AuthFile });
 
 test.describe("Validation of edit dRep Form", () => {
   test("3M_1. Should accept valid data in edit dRep form", async ({ page }) => {

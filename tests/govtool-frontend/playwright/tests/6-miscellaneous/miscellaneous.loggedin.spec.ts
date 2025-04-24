@@ -1,3 +1,4 @@
+import { user01AuthFile } from "@constants/auth";
 import {
   ABSTAIN_VOTE_DOC_URL,
   DELEGATION_DOC_URL,
@@ -27,7 +28,7 @@ test.beforeEach(async () => {
 
 test.describe("Logged in user", () => {
   test.use({
-    storageState: ".auth/user01.json",
+    storageState: user01AuthFile,
     wallet: user01Wallet,
   });
 

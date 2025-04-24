@@ -1,3 +1,4 @@
+import { dRep01AuthFile } from "@constants/auth";
 import environments from "@constants/environments";
 import { dRep01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
@@ -12,7 +13,7 @@ test.beforeEach(async () => {
 });
 
 test.use({
-  storageState: ".auth/dRep01.json",
+  storageState: dRep01AuthFile,
   wallet: dRep01Wallet,
 });
 

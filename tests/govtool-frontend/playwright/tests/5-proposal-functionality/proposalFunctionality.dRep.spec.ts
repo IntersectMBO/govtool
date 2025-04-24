@@ -1,3 +1,4 @@
+import { dRep01AuthFile } from "@constants/auth";
 import environments from "@constants/environments";
 import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
@@ -27,7 +28,7 @@ test.beforeEach(async () => {
 });
 
 test.describe("Proposal checks", () => {
-  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
+  test.use({ storageState: dRep01AuthFile, wallet: dRep01Wallet });
 
   let govActionDetailsPage: GovernanceActionDetailsPage;
   let currentPage: Page;

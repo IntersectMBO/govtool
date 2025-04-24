@@ -8,9 +8,10 @@ import { skipIfNotHardFork } from "@helpers/cardano";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
 import environments from "@constants/environments";
+import { user01AuthFile } from "@constants/auth";
 
 test.use({
-  storageState: ".auth/user01.json",
+  storageState: user01AuthFile,
   wallet: user01Wallet,
 });
 

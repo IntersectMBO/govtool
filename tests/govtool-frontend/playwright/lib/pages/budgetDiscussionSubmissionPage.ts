@@ -1,9 +1,9 @@
 import environments from "@constants/environments";
 import { faker } from "@faker-js/faker";
 import { formatWithThousandSeparator } from "@helpers/adaFormat";
-import { extractProposalIdFromUrl } from "@helpers/string";
+import { extractProposalIdFromUrl, generateParagraph } from "@helpers/string";
 import { invalid, valid } from "@mock/index";
-import { Page, expect } from "@playwright/test";
+import { Locator, Page, expect } from "@playwright/test";
 import {
   AdministrationAndAuditingProps,
   BudgetCostingProps,
@@ -265,7 +265,8 @@ export default class BudgetDiscussionSubmissionPage {
   }
 
   async fillupProposalOwnershipForm(
-    proposalOwnership: BudgetProposalOwnershipProps
+    proposalOwnership: BudgetProposalOwnershipProps,
+    isNaviagted = true
   ) {
     await this.companyTypeSelect.click();
     await this.page
@@ -293,13 +294,16 @@ export default class BudgetDiscussionSubmissionPage {
         )
         .click();
     }
-    await this.agreeCheckbox.click();
 
-    await this.continueBtn.click();
+    if (isNaviagted) {
+      await this.agreeCheckbox.click();
+      await this.continueBtn.click();
+    }
   }
 
   async fillupProblemStatementAndBenefitsForm(
-    problemStatementAndBenefits: BudgetProposalProblemStatementAndBenefitProps
+    problemStatementAndBenefits: BudgetProposalProblemStatementAndBenefitProps,
+    isNaviagated = true
   ) {
     await this.problemStatementInput.fill(
       problemStatementAndBenefits.problemStatement
@@ -341,10 +345,14 @@ export default class BudgetDiscussionSubmissionPage {
       )
       .click();
 
-    await this.continueBtn.click();
+    if (isNaviagated) {
+      await this.continueBtn.click();
+    }
   }
 
-  async fillupProposalDetailsForm(proposalDetails: BudgetProposalDetailsProps) {
+  async fillupProposalDetailsFormWithoutContractingType(
+    proposalDetails: BudgetProposalDetailsProps
+  ) {
     await this.proposalNameInput.fill(proposalDetails.proposalName);
     await this.proposalDescriptionInput.fill(
       proposalDetails.proposalDescription
@@ -360,7 +368,10 @@ export default class BudgetDiscussionSubmissionPage {
       proposalDetails.teamSizeAndDuration
     );
     await this.previousExperienceInput.fill(proposalDetails.previousExperience);
+  }
 
+  async fillupProposalDetailsForm(proposalDetails: BudgetProposalDetailsProps) {
+    await this.fillupProposalDetailsFormWithoutContractingType(proposalDetails);
     await this.contractingTypeSelect.click();
     await this.page
       .getByTestId(`${proposalDetails.contracting.toLowerCase()}-button`)
@@ -368,22 +379,27 @@ export default class BudgetDiscussionSubmissionPage {
     if (proposalDetails.contracting === "Other") {
       await this.otherDescriptionInput.fill(proposalDetails.otherDescription);
     }
+
     await this.continueBtn.click();
   }
 
-  async fillupCostingForm(costing: BudgetCostingProps) {
+  async fillupCostingFormWithoutPreferredCurrency(costing: BudgetCostingProps) {
     await this.adaAmountInput.fill(costing.adaAmount.toString());
     await this.usaToAdaCnversionRateInput.fill(
       costing.usdToAdaConversionRate.toString()
     );
+    await this.costBreakdownInput.fill(costing.costBreakdown);
+    await this.preferredCurrencyInput.fill(
+      costing.AmountInPreferredCurrency.toString()
+    );
+  }
+
+  async fillupCostingForm(costing: BudgetCostingProps) {
+    await this.fillupCostingFormWithoutPreferredCurrency(costing);
     await this.preferredCurrencySelect.click();
     await this.page
       .getByTestId(`${costing.preferredCurrency.toLowerCase()}-button`)
       .click();
-    await this.preferredCurrencyInput.fill(
-      costing.AmountInPreferredCurrency.toString()
-    );
-    await this.costBreakdownInput.fill(costing.costBreakdown);
 
     await this.continueBtn.click();
   }
@@ -403,17 +419,17 @@ export default class BudgetDiscussionSubmissionPage {
     await this.continueBtn.click();
   }
 
-  async fillCostingSectionExceptAmountInputs() {
-    const costing = this.generateValidCosting();
-    await this.preferredCurrencySelect.click();
-    await this.page
-      .getByTestId(`${costing.preferredCurrency.toLowerCase()}-button`)
-      .click();
-    await this.preferredCurrencyInput.fill(
-      costing.AmountInPreferredCurrency.toString()
-    );
-    await this.costBreakdownInput.fill(costing.costBreakdown.toString());
-  }
+  // async fillCostingSectionExceptAmountInputs() {
+  //   const costing = this.generateValidCosting();
+  //   await this.preferredCurrencySelect.click();
+  //   await this.page
+  //     .getByTestId(`${costing.preferredCurrency.toLowerCase()}-button`)
+  //     .click();
+  //   await this.preferredCurrencyInput.fill(
+  //     costing.AmountInPreferredCurrency.toString()
+  //   );
+  //   await this.costBreakdownInput.fill(costing.costBreakdown.toString());
+  // }
 
   async fillupForm(
     budgetProposal: BudgetProposalProps,
@@ -538,6 +554,20 @@ export default class BudgetDiscussionSubmissionPage {
       ),
     };
   }
+  generateInvalidProposalOwnerShip(): BudgetProposalOwnershipProps {
+    return {
+      groupName: invalid.paragraph(50),
+      groupType: invalid.paragraph(50),
+      groupKeyIdentity: invalid.paragraph(50),
+      companyName: invalid.paragraph(50),
+      companyDomainName: invalid.paragraph(50),
+      companyType: faker.helpers.arrayElement(Object.values(CompanyEnum)),
+      contactDetails: faker.lorem.paragraph(2),
+      countryOfIncorportation: faker.helpers.arrayElement(
+        Object.values(LocationEnum)
+      ),
+    };
+  }
 
   generateValidBudgetProposalDetails(): BudgetProposalDetailsProps {
     return {
@@ -564,6 +594,18 @@ export default class BudgetDiscussionSubmissionPage {
       ),
       AmountInPreferredCurrency: faker.number.int({ min: 100, max: 10000 }),
       costBreakdown: faker.lorem.paragraph(2),
+    };
+  }
+
+  generateInValidCosting(): BudgetCostingProps {
+    return {
+      adaAmount: faker.lorem.paragraph(2),
+      usdToAdaConversionRate: faker.lorem.paragraph(2),
+      preferredCurrency: faker.helpers.arrayElement(
+        Object.values(PreferredCurrencyEnum)
+      ),
+      AmountInPreferredCurrency: faker.lorem.paragraph(2),
+      costBreakdown: invalid.paragraph(150001),
     };
   }
 
@@ -768,21 +810,200 @@ export default class BudgetDiscussionSubmissionPage {
     );
   }
 
-  async validateCostingSection(isValid: boolean = true) {
-    const adaAmount = isValid
-      ? faker.number.int({ min: 100, max: 10000 })
-      : faker.lorem.paragraph(2);
-    const usdToAdaCnversionRate = isValid
-      ? faker.number.int({ min: 1, max: 100 })
-      : faker.lorem.paragraph(2);
-    const preferredCurrency = isValid
-      ? faker.number.int({ min: 100, max: 10000 })
-      : faker.lorem.paragraph(2);
-    await this.adaAmountInput.fill(adaAmount.toString());
-    await this.usaToAdaCnversionRateInput.fill(
-      usdToAdaCnversionRate.toString()
+  async assertInputTextEquality(
+    actualLocator: Locator,
+    expected: string,
+    isValid: boolean = true
+  ) {
+    const actual = await actualLocator.inputValue();
+
+    if (isValid) {
+      expect(actual, {
+        message: actual !== expected && `${actual} is not equal to ${expected}`,
+      }).toEqual(expected);
+    } else {
+      expect(actual, {
+        message: actual === expected && `${actual} is equal to ${expected}`,
+      }).not.toEqual(expected);
+    }
+  }
+
+  async validateProposalOwnershipSection(
+    proposalOwnership: BudgetProposalOwnershipProps,
+    isValid: boolean = true
+  ) {
+    const companyTypeSelectContent = await this.companyTypeSelect.textContent();
+
+    if (isValid) {
+      if (proposalOwnership.companyType === "Company") {
+        const countryOfIncorporationBtnContent =
+          await this.countryOfIncorporationBtn.textContent();
+        await this.assertInputTextEquality(
+          this.companyDomainNameInput,
+          proposalOwnership.companyDomainName
+        );
+        await this.assertInputTextEquality(
+          this.companyNameInput,
+          proposalOwnership.companyName
+        );
+
+        expect(countryOfIncorporationBtnContent, {
+          message:
+            countryOfIncorporationBtnContent !==
+              proposalOwnership.countryOfIncorportation &&
+            `${countryOfIncorporationBtnContent} is not equal to ${proposalOwnership.countryOfIncorportation}`,
+        }).toEqual(proposalOwnership.countryOfIncorportation);
+      }
+      if (proposalOwnership.companyType === "Group") {
+        await this.assertInputTextEquality(
+          this.groupNameInput,
+          proposalOwnership.groupName
+        );
+        await this.assertInputTextEquality(
+          this.groupTypeInput,
+          proposalOwnership.groupType
+        );
+        await this.assertInputTextEquality(
+          this.keyInformationOfGroupInput,
+          proposalOwnership.groupKeyIdentity
+        );
+      }
+
+      expect(companyTypeSelectContent, {
+        message:
+          companyTypeSelectContent !== proposalOwnership.companyType &&
+          `${companyTypeSelectContent} is not equal to ${proposalOwnership.companyType}`,
+      }).toEqual(proposalOwnership.companyType);
+
+      await this.assertInputTextEquality(
+        this.contactDetailsInput,
+        proposalOwnership.contactDetails
+      );
+
+      await expect(this.continueBtn).toBeEnabled();
+    } else {
+      await expect(this.continueBtn).toBeDisabled();
+    }
+  }
+
+  async validateProblemStatementsAndProposalBenefitsSection(
+    isValid: boolean = true
+  ) {
+    const isFirst = Math.random() > 0.5;
+
+    const problemStatement = generateParagraph(isValid, isFirst);
+    const proposalBenefit = generateParagraph(isValid, !isFirst);
+    const suplimentaryEndorsement = isValid
+      ? faker.lorem.paragraph(2)
+      : faker.lorem.paragraph(15001);
+
+    await this.problemStatementInput.fill(problemStatement);
+    await this.suplimentaryEndorsementInput.fill(suplimentaryEndorsement);
+    await this.proposalBenefitInput.fill(proposalBenefit);
+
+    if (problemStatement.length !== 0) {
+      await this.assertInputTextEquality(
+        this.problemStatementInput,
+        problemStatement,
+        isValid
+      );
+    }
+
+    await this.assertInputTextEquality(
+      this.suplimentaryEndorsementInput,
+      suplimentaryEndorsement,
+      isValid
     );
-    await this.preferredCurrencyInput.fill(preferredCurrency.toString());
+
+    if (proposalBenefit.length !== 0) {
+      await this.assertInputTextEquality(
+        this.proposalBenefitInput,
+        proposalBenefit,
+        isValid
+      );
+    }
+    if (isValid) {
+      await expect(this.continueBtn).toBeEnabled();
+    } else {
+      await expect(this.continueBtn).toBeDisabled();
+    }
+  }
+
+  async validateProposalDetailsSection(isValid: boolean = true) {
+    const isFirst = Math.random() > 0.5;
+    const isSecond = Math.random() > 0.5;
+
+    const proposalName = isValid ? faker.lorem.paragraph(2) : "";
+    const proposalDescription = generateParagraph(isValid, isFirst);
+    const proposalKeyDependencies = generateParagraph(
+      isValid,
+      isFirst && isSecond
+    );
+    const proposalMaintainAndSupport = isValid ? faker.lorem.paragraph(2) : "";
+    const milestones = generateParagraph(isValid, !isFirst);
+    const teamSizeAndDuration = generateParagraph(
+      isValid,
+      !isFirst && isSecond
+    );
+    const previousExperience = isValid ? faker.lorem.paragraph(2) : "";
+
+    const fieldValues = {
+      proposalName,
+      proposalDescription,
+      proposalKeyDependencies,
+      proposalMaintainAndSupport,
+      milestones,
+      teamSizeAndDuration,
+      previousExperience,
+      contracting: faker.helpers.arrayElement(
+        Object.values(ProposalContractingEnum)
+      ),
+      otherDescription: faker.lorem.paragraph(2),
+    };
+
+    await this.fillupProposalDetailsFormWithoutContractingType(fieldValues);
+
+    if (proposalDescription.length !== 0) {
+      await this.assertInputTextEquality(
+        this.proposalDescriptionInput,
+        proposalDescription,
+        isValid
+      );
+    }
+    if (proposalKeyDependencies.length !== 0) {
+      await this.assertInputTextEquality(
+        this.proposalKeyDependenciesInput,
+        proposalKeyDependencies,
+        isValid
+      );
+    }
+
+    if (milestones.length !== 0) {
+      await this.assertInputTextEquality(
+        this.milestonesInput,
+        milestones,
+        isValid
+      );
+    }
+    if (teamSizeAndDuration.length !== 0) {
+      await this.assertInputTextEquality(
+        this.teamSizeAndDurationInput,
+        teamSizeAndDuration,
+        isValid
+      );
+    }
+    if (isValid) {
+      await expect(this.continueBtn).toBeEnabled();
+    } else {
+      await expect(this.continueBtn).toBeDisabled();
+    }
+  }
+
+  async validateCostingSection(
+    costingValue: BudgetCostingProps,
+    isValid: boolean = true
+  ) {
+    await this.fillupCostingFormWithoutPreferredCurrency(costingValue);
     const adaErrorElement = this.page.getByTestId(formErrors.adaAmount);
     const usdToAdaConversionRateErrorElement = this.page.getByTestId(
       formErrors.usdToAdaConversionError
@@ -798,32 +1019,38 @@ export default class BudgetDiscussionSubmissionPage {
 
     if (isValid) {
       await expect(adaErrorElement, {
-        message: isAdaAmountErrorVisible && `${adaAmount} is an invalid amount`,
+        message:
+          isAdaAmountErrorVisible &&
+          `${costingValue.adaAmount} is an invalid amount`,
       }).toBeHidden();
       await expect(usdToAdaConversionRateErrorElement, {
         message:
           isUsdToAdaConversionRateErrorVisible &&
-          `${usdToAdaCnversionRate} is an invalid amount`,
+          `${costingValue.usdToAdaConversionRate} is an invalid amount`,
       }).toBeHidden();
       await expect(preferredCurrencyErrorElement, {
         message:
           isPreferredCurrencyErrorVisible &&
-          `${preferredCurrency} is an invalid amount`,
+          `${costingValue.preferredCurrency} is an invalid amount`,
       }).toBeHidden();
+      await expect(this.continueBtn).toBeEnabled();
     } else {
       await expect(adaErrorElement, {
-        message: !isAdaAmountErrorVisible && `${adaAmount} is a valid amount`,
+        message:
+          !isAdaAmountErrorVisible &&
+          `${costingValue.adaAmount} is a valid amount`,
       }).toBeVisible();
       await expect(usdToAdaConversionRateErrorElement, {
         message:
           !isUsdToAdaConversionRateErrorVisible &&
-          `${usdToAdaCnversionRate} is a valid amount`,
+          `${costingValue.usdToAdaConversionRate} is a valid amount`,
       }).toBeVisible();
       await expect(preferredCurrencyErrorElement, {
         message:
           !isPreferredCurrencyErrorVisible &&
-          `${preferredCurrency} is a valid amount`,
+          `${costingValue.preferredCurrency} is a valid amount`,
       }).toBeVisible();
+      await expect(this.continueBtn).toBeDisabled();
     }
   }
 
@@ -843,10 +1070,12 @@ export default class BudgetDiscussionSubmissionPage {
       await expect(errorElement, {
         message: isErrorVisible && `${url} is an invalid URL`,
       }).toBeHidden();
+      await expect(this.continueBtn).toBeEnabled();
     } else {
       await expect(errorElement, {
         message: !isErrorVisible && `${url} is a valid URL`,
       }).toBeVisible();
+      await expect(this.continueBtn).toBeDisabled();
     }
   }
 }

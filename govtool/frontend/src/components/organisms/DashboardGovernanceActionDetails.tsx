@@ -40,7 +40,11 @@ export const DashboardGovernanceActionDetails = () => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
   const { proposalId: txHash } = useParams();
-
+  const [isValidating, setIsValidating] = useState(true);
+  const [metadataStatus, setMetadataStatus] = useState<
+    MetadataValidationStatus | undefined
+  >();
+  const [isMetadataValid, setIsMetadataValid] = useState<boolean | undefined>();
   const fullProposalId = txHash && getFullGovActionId(txHash, +index);
   const shortenedGovActionId =
     txHash && getShortenedGovActionId(txHash, +index);
@@ -56,16 +60,12 @@ export const DashboardGovernanceActionDetails = () => {
   );
 
   useEffect(() => {
-    if (data?.proposal) {
+    if (data?.proposal && typeof isMetadataValid !== "boolean") {
       setExtendedProposal(data.proposal);
     }
-  }, [data?.proposal]);
+  }, [data?.proposal, isMetadataValid]);
   const vote = (data ?? state)?.vote;
 
-  const [isValidating, setIsValidating] = useState(true);
-  const [metadataStatus, setMetadataStatus] = useState<
-    MetadataValidationStatus | undefined
-  >();
   const { validateMetadata } = useValidateMutation();
 
   useEffect(() => {
@@ -74,7 +74,7 @@ export const DashboardGovernanceActionDetails = () => {
     const validate = async () => {
       setIsValidating(true);
 
-      const { status, metadata } = await validateMetadata({
+      const { status, metadata, valid } = await validateMetadata({
         standard: MetadataStandard.CIP108,
         url: extendedProposal?.url,
         hash: extendedProposal?.metadataHash ?? "",
@@ -92,9 +92,10 @@ export const DashboardGovernanceActionDetails = () => {
 
       setMetadataStatus(status);
       setIsValidating(false);
+      setIsMetadataValid(valid);
     };
     validate();
-  }, [extendedProposal?.url]);
+  }, [extendedProposal?.url, extendedProposal?.metadataHash]);
 
   useEffect(() => {
     const isProposalNotFound =

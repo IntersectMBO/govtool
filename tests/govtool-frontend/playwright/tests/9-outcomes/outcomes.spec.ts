@@ -453,7 +453,7 @@ test("9G. Should display correct vote counts on outcome details page", async ({
             name: "Explicit",
           })
         ).toHaveText(
-          `Explicit${formatWithThousandSeparator(Math.ceil(proposalToCheck.pool_abstain_votes) / 1000000)}`
+          `Explicit${formatWithThousandSeparator(proposalToCheck.pool_abstain_votes, false)}`
         ); //BUG missing testIds
         await expect(
           govActionDetailsPage.sPosResultData

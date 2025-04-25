@@ -100,6 +100,15 @@ test.describe("Logged in DReps", () => {
     });
     await page.getByTestId("confirm-modal-button").click();
   });
+
+  test("3S. Should restrict dRep registration for dRep", async ({ page }) => {
+    await page.goto(`${environments.frontendUrl}/register_drep`);
+
+    await expect(page.getByText("You already are a DRep")).toBeVisible({
+      timeout: 60_000,
+    });
+    await expect(page.getByTestId("name-input")).not.toBeVisible();
+  });
 });
 
 test.describe("Temporary DReps", () => {

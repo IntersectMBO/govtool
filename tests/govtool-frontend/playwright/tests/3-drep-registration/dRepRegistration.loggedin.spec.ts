@@ -9,6 +9,7 @@ import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
 import environments from "@constants/environments";
 import { user01AuthFile } from "@constants/auth";
+import EditDRepPage from "@pages/editDRepPage";
 
 test.use({
   storageState: user01AuthFile,
@@ -223,4 +224,12 @@ test("3O. Should reject invalid dRep registration metadata", async ({
   await expect(dRepRegistrationPage.metadataErrorModal).toHaveText(
     /your external data does not/i
   );
+});
+
+test("3R. Should restrict edit dRep for non dRep", async ({ page }) => {
+  const editDrepPage = new EditDRepPage(page);
+  await editDrepPage.goto();
+
+  await page.waitForTimeout(2_000);
+  await expect(editDrepPage.nameInput).not.toBeVisible();
 });

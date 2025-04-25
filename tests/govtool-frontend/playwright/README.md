@@ -20,7 +20,7 @@ git clone https://github.com/IntersectMBO/govtool
 ### 2. Navigate to the Playwright Test Directory
 
 ```bash
-cd tests/govtool-frontend/playwright
+cd govtool/tests/govtool-frontend/playwright
 ```
 
 ### 3. Configure Environment Variables

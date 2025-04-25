@@ -44,8 +44,12 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "auth setup",
-      testMatch: "**/auth.setup.ts",
+      name: "adaholder auth setup",
+      testMatch: "**/adaholder.auth.setup.ts",
+    },
+    {
+      name: "user auth setup",
+      testMatch: "**/user.auth.setup.ts",
     },
     {
       name: "faucet setup",
@@ -89,7 +93,7 @@ export default defineConfig({
       name: "transaction",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.tx.spec.ts",
-      dependencies: environments.ci ? ["auth setup", "wallet bootstrap"] : [],
+      dependencies: environments.ci ? ["adaholder auth setup", "wallet bootstrap"] : [],
     },
     {
       name: "proposal discussion",
@@ -120,7 +124,7 @@ export default defineConfig({
       name: "loggedin (desktop)",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.loggedin.spec.ts",
-      dependencies: environments.ci ? ["auth setup", "wallet bootstrap"] : [],
+      dependencies: environments.ci ? ["user auth setup"] : [],
     },
     {
       name: "proposal budget dRep",
@@ -145,7 +149,7 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.delegation.spec.ts",
       dependencies: environments.ci
-        ? ["auth setup", "dRep setup", "wallet bootstrap"]
+        ? ["adaholder auth setup", "dRep setup", "wallet bootstrap"]
         : [],
       teardown: environments.ci && "cleanup delegation",
     },

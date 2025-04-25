@@ -1,5 +1,3 @@
-// Saves storage state to a file in the .auth directory
-
 import {
   adaHolder01AuthFile,
   adaHolder02AuthFile,
@@ -7,7 +5,6 @@ import {
   adaHolder04AuthFile,
   adaHolder05AuthFile,
   adaHolder06AuthFile,
-  user01AuthFile,
 } from "@constants/auth";
 import {
   adaHolder01Wallet,
@@ -16,7 +13,6 @@ import {
   adaHolder04Wallet,
   adaHolder05Wallet,
   adaHolder06Wallet,
-  user01Wallet,
 } from "@constants/staticWallets";
 import { test as setup } from "@fixtures/walletExtension";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
@@ -30,7 +26,6 @@ setup.beforeEach(async () => {
 });
 
 const authConfigs = [
-  { name: "User 01", wallet: user01Wallet, auth: user01AuthFile },
   {
     name: "AdaHolder 01",
     wallet: adaHolder01Wallet,

@@ -83,7 +83,7 @@ Each test suite can be run in **UI** or **Headless** mode.
 ---
 
 #### 1. **Delegation Pillars**
-- **Requirements**: Faucet API key  
+- **Requirements**: Faucet API key and Valid proposal faucet private keys 
 - **UI Mode**:
   ```bash
   npm run test:delegation-pillars
@@ -96,7 +96,7 @@ Each test suite can be run in **UI** or **Headless** mode.
 ---
 
 #### 2. **Voting Pillars**
-- **Requirements**: Faucet API key  
+- **Requirements**: Faucet API key and Valid proposal faucet private keys 
 - **UI Mode**:
   ```bash
   npm run test:voting-pillars

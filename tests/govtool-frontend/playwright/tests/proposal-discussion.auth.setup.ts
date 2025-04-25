@@ -31,83 +31,25 @@ setup.beforeEach(async () => {
   await skipIfNotHardFork();
 });
 
-setup("Create Proposal 01 auth", async ({ page, context }) => {
-  await createAuthWithUserName({
-    page,
-    context,
-    wallet: proposal01Wallet,
-    auth: proposal01AuthFile,
-  });
-});
+const proposalSetups = [
+  { name: "Proposal 01", wallet: proposal01Wallet, auth: proposal01AuthFile },
+  { name: "Proposal 02", wallet: proposal02Wallet, auth: proposal02AuthFile },
+  { name: "Proposal 03", wallet: proposal03Wallet, auth: proposal03AuthFile },
+  { name: "Proposal 04", wallet: proposal04Wallet, auth: proposal04AuthFile },
+  { name: "Proposal 05", wallet: proposal05Wallet, auth: proposal05AuthFile },
+  { name: "Proposal 06", wallet: proposal06Wallet, auth: proposal06AuthFile },
+  { name: "Proposal 07", wallet: proposal07Wallet, auth: proposal07AuthFile },
+  { name: "Proposal 08", wallet: proposal08Wallet, auth: proposal08AuthFile },
+  { name: "Proposal 09", wallet: proposal09Wallet, auth: proposal09AuthFile },
+];
 
-setup("Create Proposal 02 auth", async ({ page, context }) => {
-  await createAuthWithUserName({
-    page,
-    context,
-    wallet: proposal02Wallet,
-    auth: proposal02AuthFile,
+for (const { name, wallet, auth } of proposalSetups) {
+  setup(`Create ${name} auth`, async ({ page, context }) => {
+    await createAuthWithUserName({
+      page,
+      context,
+      wallet,
+      auth,
+    });
   });
-});
-
-setup("Create Proposal 03 auth", async ({ page, context }) => {
-  await createAuthWithUserName({
-    page,
-    context,
-    wallet: proposal03Wallet,
-    auth: proposal03AuthFile,
-  });
-});
-
-setup("Create Proposal 04 auth", async ({ page, context }) => {
-  await createAuthWithUserName({
-    page,
-    context,
-    wallet: proposal04Wallet,
-    auth: proposal04AuthFile,
-  });
-});
-
-setup("Create Proposal 05 auth", async ({ page, context }) => {
-  await createAuthWithUserName({
-    page,
-    context,
-    wallet: proposal05Wallet,
-    auth: proposal05AuthFile,
-  });
-});
-
-setup("Create Proposal 06 auth", async ({ page, context }) => {
-  await createAuthWithUserName({
-    page,
-    context,
-    wallet: proposal06Wallet,
-    auth: proposal06AuthFile,
-  });
-});
-
-setup("Create Proposal 07 auth", async ({ page, context }) => {
-  await createAuthWithUserName({
-    page,
-    context,
-    wallet: proposal07Wallet,
-    auth: proposal07AuthFile,
-  });
-});
-
-setup("Create Proposal 08 auth", async ({ page, context }) => {
-  await createAuthWithUserName({
-    page,
-    context,
-    wallet: proposal08Wallet,
-    auth: proposal08AuthFile,
-  });
-});
-
-setup("Create Proposal 09 auth", async ({ page, context }) => {
-  await createAuthWithUserName({
-    page,
-    context,
-    wallet: proposal09Wallet,
-    auth: proposal09AuthFile,
-  });
-});
+}

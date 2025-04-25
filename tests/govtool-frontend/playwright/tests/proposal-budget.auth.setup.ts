@@ -23,39 +23,37 @@ setup.beforeEach(async () => {
   await skipIfNotHardFork();
 });
 
-setup("Create Budget Proposal 01 auth", async ({ page, context }) => {
-  await createAuthWithUserName({
-    page,
-    context,
+const walletAuthPairs = [
+  {
     wallet: budgetProposal01Wallet,
     auth: budgetProposal01AuthFile,
-  });
-});
-
-setup("Create Budget Proposal 02 auth", async ({ page, context }) => {
-  await createAuthWithUserName({
-    page,
-    context,
+    name: "Budget Proposal 01",
+  },
+  {
     wallet: budgetProposal02Wallet,
     auth: budgetProposal02AuthFile,
-  });
-});
-
-setup("Create Budget Proposal 03 auth", async ({ page, context }) => {
-  await createAuthWithUserName({
-    page,
-    context,
+    name: "Budget Proposal 02",
+  },
+  {
     wallet: budgetProposal03Wallet,
     auth: budgetProposal03AuthFile,
-  });
-});
-
-setup("Create Budget Proposal 04 auth", async ({ page, context }) => {
-  await createAuthWithUserName({
-    page,
-    context,
+    name: "Budget Proposal 03",
+  },
+  {
     wallet: budgetProposal04Wallet,
     auth: budgetProposal04AuthFile,
+    name: "Budget Proposal 04",
+  },
+];
+
+walletAuthPairs.forEach(({ wallet, auth, name }) => {
+  setup(`Create ${name} auth`, async ({ page, context }) => {
+    await createAuthWithUserName({
+      page,
+      context,
+      wallet,
+      auth,
+    });
   });
 });
 

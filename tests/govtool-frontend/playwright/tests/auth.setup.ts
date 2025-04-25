@@ -29,59 +29,45 @@ setup.beforeEach(async () => {
   await skipIfNotHardFork();
 });
 
-setup("Create User 01 auth", async ({ page, context }) => {
-  await createAuth({
-    page,
-    context,
-    wallet: user01Wallet,
-    auth: user01AuthFile,
-  });
-});
-
-setup("Create AdaHolder 01 auth", async ({ page, context }) => {
-  await createAuth({
-    page,
-    context,
+const authConfigs = [
+  { name: "User 01", wallet: user01Wallet, auth: user01AuthFile },
+  {
+    name: "AdaHolder 01",
     wallet: adaHolder01Wallet,
     auth: adaHolder01AuthFile,
-  });
-});
-
-setup("Create AdaHolder 02 auth", async ({ page, context }) => {
-  await createAuth({
-    page,
-    context,
+  },
+  {
+    name: "AdaHolder 02",
     wallet: adaHolder02Wallet,
     auth: adaHolder02AuthFile,
-  });
-});
-
-setup("Create AdaHolder 03 auth", async ({ page, context }) => {
-  await createAuth({
-    page,
-    context,
+  },
+  {
+    name: "AdaHolder 03",
     wallet: adaHolder03Wallet,
     auth: adaHolder03AuthFile,
-  });
-});
-
-setup("Create AdaHolder 04 auth", async ({ page, context }) => {
-  await createAuth({
-    page,
-    context,
+  },
+  {
+    name: "AdaHolder 04",
     wallet: adaHolder04Wallet,
     auth: adaHolder04AuthFile,
-  });
-});
-
-setup("Create AdaHolder 05 auth", async ({ page, context }) => {
-  await createAuth({
-    page,
-    context,
+  },
+  {
+    name: "AdaHolder 05",
     wallet: adaHolder05Wallet,
     auth: adaHolder05AuthFile,
+  },
+];
+
+for (const config of authConfigs) {
+  setup(`Create ${config.name} auth`, async ({ page, context }) => {
+    await createAuth({
+      page,
+      context,
+      wallet: config.wallet,
+      auth: config.auth,
+    });
   });
-});
+}
 
 setup("Create AdaHolder 06 auth", async ({ page, context }) => {
   await createAuthWithMultipleStake({

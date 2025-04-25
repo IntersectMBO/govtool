@@ -11,20 +11,18 @@ setup.beforeEach(async () => {
   await skipIfNotHardFork();
 });
 
-setup("Create DRep 01 auth", async ({ page, context }) => {
-  await createAuth({
-    page,
-    context,
-    wallet: dRep01Wallet,
-    auth: dRep01AuthFile,
-  });
-});
+const drepAuthConfigs = [
+  { name: "DRep 01", wallet: dRep01Wallet, auth: dRep01AuthFile },
+  { name: "DRep 02", wallet: dRep02Wallet, auth: dRep02AuthFile },
+];
 
-setup("Create DRep 02 auth", async ({ page, context }) => {
-  await createAuth({
-    page,
-    context,
-    wallet: dRep02Wallet,
-    auth: dRep02AuthFile,
+for (const config of drepAuthConfigs) {
+  setup(`Create ${config.name} auth`, async ({ page, context }) => {
+    await createAuth({
+      page,
+      context,
+      wallet: config.wallet,
+      auth: config.auth,
+    });
   });
-});
+}

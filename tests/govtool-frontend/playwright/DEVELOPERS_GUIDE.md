@@ -7,8 +7,10 @@ This document serves as a guide for new developers participating in the project.
 ## **Directory Structure**
 
 ### `lib/`
+
 Contains the utility logic, helpers, mock datas and shared services, including:
-- _mock (mock data)
+
+- \_mock (mock data)
 - constants
 - datafactory
 - fixtures
@@ -53,54 +55,89 @@ This directory contains all automated test cases, organized by feature area:
    Tests related to proposal outcome visibility and validations.
 
 10. **`10-user-snap/`**  
-   Usersnap-related test cases.
+    Usersnap-related test cases.
 
 11. **`11-proposal-budget/`**  
-   Tests for proposal budget functionality and associated forms.
+    Tests for proposal budget functionality and associated forms.
 
 12. **`12-proposal-budget-submission/`**  
-   Proposal budget submission form validation, draft, visibility, and submission tests.
+    Proposal budget submission form validation, draft, visibility, and submission tests.
 
 ---
 
 ### Authentication & Setup Scripts
 
 13. **`auth.setup.ts`**  
-   Sets up authentication for users and adaHolder wallets.
+    Sets up authentication for users and adaHolder wallets.
 
 14. **`proposal-budget.auth.setup.ts`**  
-   Authentication setup for proposal budget wallets.
+    Authentication setup for proposal budget wallets.
 
 15. **`proposal-discussion.auth.setup.ts`**  
-   Authentication setup for proposal discussion wallets.
+    Authentication setup for proposal discussion wallets.
 
 16. **`dRep.auth.setup.ts`**  
-   Authentication setup for dRep wallets.
+    Authentication setup for dRep wallets.
 
 17. **`dRep.setup.ts`**  
-   Setup for temporary and static dRep wallet registration.
+    Setup for temporary and static dRep wallet registration.
 
 18. **`proposal-budget.dRep.setup.ts`**  
-   dRep wallet registration setup for proposal budget tests.
+    dRep wallet registration setup for proposal budget tests.
 
 19. **`proposal.setup.ts`**  
-   Setup for proposal submission wallets.
+    Setup for proposal submission wallets.
 
 20. **`wallet.bootstrap.ts`**  
-   Initializes adaHolder and dRep wallets with test funds for spendable ADA functionality.
+    Initializes adaHolder and dRep wallets with test funds for spendable ADA functionality.
 
 ---
 
 ### Teardown Scripts
 
 21. **`delegation.teardown.ts`**  
-   Resets delegation status (abstains delegation from delegated wallets).
+    Resets delegation status (abstains delegation from delegated wallets).
 
 22. **`faucet.setup.ts`**  
-   Funds the test faucet wallet.
+    Funds the test faucet wallet.
 
 23. **`faucet.teardown.ts`**  
-   Refunds all unspendable ADA from test wallets back to the proposal faucet.
+    Refunds all unspendable ADA from test wallets back to the proposal faucet.
 
 24. **`dRep.teardown.ts`**  
-   Handles deregistration of dRep wallets registered during tests or setup.
+    Handles deregistration of dRep wallets registered during tests or setup.
+
+---
+
+Sure! Here's a refined and clearer version of your note:
+
+---
+
+## 🖥️ Tip for VS Code Users: Running Individual Tests
+
+- Use the terminal to run specific test suites using the commands provided in the **README.md**.
+- Ensure all test files are recognized in the **Test Explorer**.
+
+![Test Runner Screenshot](image.png)
+
+- Use the **Play** ▶️ icon to run individual tests directly from the UI.
+
+---
+
+### 🎯 Running Individual Tests Without Wallet Dependency
+
+- Add **Playwright Test for VSCode** extension
+
+  ![Playwright Test Screenshot](image-1.png)
+
+1. **Remove** the `CI` environment variable.
+2. **Navigate** to the specific directory where your test is located to run it directly.
+
+   ![Directory Navigation Screenshot](image-2.png)
+
+> **Note:**
+>
+> - To run tests _without wallet dependency_, make sure the required wallet/auth setup has already been completed beforehand.
+> - To run tests _with wallet dependency_ and generate **Allure reports**, **do not** remove the `CI` environment variable.
+
+---

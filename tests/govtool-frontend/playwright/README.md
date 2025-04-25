@@ -49,6 +49,14 @@ npx playwright install
 
 ## 🧪 Running Tests
 
+## 🔑 Generate Test Wallets
+
+```bash
+npm run generate-wallets
+```
+
+⚠️ Run this command before each test run to avoid wallet conflicts during testing.
+
 ### 🔁 Run All Tests
 
 ```bash

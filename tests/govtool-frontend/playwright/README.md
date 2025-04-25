@@ -2,7 +2,7 @@
 
 ## ✅ Prerequisites
 
-Make sure the following are installed on your machine:
+Ensure the following tools are installed on your machine:
 
 - **Git**
 - **Node.js** & **npm**
@@ -25,15 +25,15 @@ cd tests/govtool-frontend/playwright
 
 ### 3. Configure Environment Variables
 
-- Copy the `.env.example` file to `.env`:
+- Copy the example file:
 
-```bash
-cp .env.example .env
-```
+  ```bash
+  cp .env.example .env
+  ```
 
-- Update the `.env` file with the appropriate values.
+- Update the `.env` file with the appropriate values for your environment.
 
-### 4. Install Dependencies
+### 4. Install Project Dependencies
 
 ```bash
 npm install
@@ -49,81 +49,187 @@ npx playwright install
 
 ## 🧪 Running Tests
 
-## 🔑 Generate Test Wallets
+### 🔑 Generate Test Wallets
+
+Before each test run, generate fresh test wallets to avoid conflicts:
 
 ```bash
 npm run generate-wallets
 ```
 
-⚠️ Run this command before each test run to avoid wallet conflicts during testing.
+---
 
 ### 🔁 Run All Tests
 
-```bash
-npm run test
-```
+- **Headless mode** (no UI):
+
+  ```bash
+  npm run test
+  ```
+
+- **UI mode**:
+
+  ```bash
+  npm run test:headless
+  ```
+
+---
 
 ### ▶️ Run Specific Test Suites
 
-1. **Delegation Pillars**
+Each test suite can be run in **UI** or **Headless** mode:
 
-   ```bash
-   npm run test:delegation-pillars
-   ```
+---
 
-2. **Voting Pillars**
+#### 1. **Delegation Pillars**
 
-   ```bash
-   npm run test:voting-pillars
-   ```
+- UI Mode:
 
-3. **Outcomes**
+  ```bash
+  npm run test:delegation-pillars
+  ```
 
-   ```bash
-   npm run test:outcomes
-   ```
+- Headless Mode:
 
-4. **Proposal Pillars**
+  ```bash
+  npm run test:headless:delegation-pillars
+  ```
 
-   ```bash
-   npm run test:proposal-pillars
-   ```
+---
 
-5. **Proposal Discussion**
+#### 2. **Voting Pillars**
 
-   ```bash
-   npm run test:proposal-discussion
-   ```
+- UI Mode:
 
-6. **Proposal Budget**
+  ```bash
+  npm run test:voting-pillars
+  ```
 
-   ```bash
-   npm run test:proposal-budget
-   ```
+- Headless Mode:
 
-7. **Wallet Connect**
+  ```bash
+  npm run test:headless:voting-pillars
+  ```
 
-   ```bash
-   npm run test:wallet-connect
-   ```
+---
 
-8. **Usersnap Integration**
+#### 3. **Outcomes**
 
-   ```bash
-   npm run test:usersnap
-   ```
+- UI Mode:
 
-9. **Miscellaneous Tests**
+  ```bash
+  npm run test:outcomes
+  ```
 
-   ```bash
-   npm run test:misc
-   ```
+- Headless Mode:
+
+  ```bash
+  npm run test:headless:outcomes
+  ```
+
+---
+
+#### 4. **Proposal Pillars**
+
+_Includes both Proposal Discussion and Budget Discussion_
+
+- UI Mode:
+
+  ```bash
+  npm run test:proposal-pillars
+  ```
+
+- Headless Mode:
+
+  ```bash
+  npm run test:headless:proposal-pillars
+  ```
+
+---
+
+#### 5. **Proposal Discussion**
+
+- UI Mode:
+
+  ```bash
+  npm run test:proposal-discussion
+  ```
+
+- Headless Mode:
+
+  ```bash
+  npm run test:headless:proposal-discussion
+  ```
+
+---
+
+#### 6. **Proposal Budget**
+
+- UI Mode:
+
+  ```bash
+  npm run test:proposal-budget
+  ```
+
+- Headless Mode:
+
+  ```bash
+  npm run test:headless:proposal-budget
+  ```
+
+---
+
+#### 7. **Wallet Connect**
+
+- UI Mode:
+
+  ```bash
+  npm run test:wallet-connect
+  ```
+
+- Headless Mode:
+
+  ```bash
+  npm run test:headless:wallet-connect
+  ```
+
+---
+
+#### 8. **Usersnap Integration**
+
+- UI Mode:
+
+  ```bash
+  npm run test:usersnap
+  ```
+
+- Headless Mode:
+
+  ```bash
+  npm run test:headless:usersnap
+  ```
+
+---
+
+#### 9. **Miscellaneous Tests**
+
+- UI Mode:
+
+  ```bash
+  npm run test:misc
+  ```
+
+- Headless Mode:
+
+  ```bash
+  npm run test:headless:misc
+  ```
 
 ---
 
 ## 📊 Visualize Allure Report
 
-To generate and view the Allure report:
+To generate and view an Allure test report:
 
 ```bash
 npm run allure:serve
@@ -131,18 +237,8 @@ npm run allure:serve
 
 ---
 
-## 🖥️ Tip for VS Code Users (Running Individual Tests)
-
-- Use the terminal to run any specific test suite using the commands above.
-- Make sure all test files are recognized in the **Test Explorer**.
-- Click the **Play** icon to run tests individually.
-
-![Test Runner Screenshot](image.png)
-
----
-
 ## 📚 Additional Resources
 
-For development and contribution guidelines, refer to:
+For contribution guidelines and development tips, refer to:
 
-**`DEVELOPERS_GUIDE.md`**
+📄 **`DEVELOPERS_GUIDE.md`**

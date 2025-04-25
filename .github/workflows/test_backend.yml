@@ -17,7 +17,7 @@ on:
           - "staging.govtool.byron.network/api"
           - "govtool.cardanoapi.io/api"
           - "z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr"
-          - "dev-sanchonet.govtool.byron.network/api"
+          - "z78acf3c2-z5575152b-gtw.z937eb260.rustrocks.fr"
           - "be.gov.tools"
       network:
         required: true
@@ -39,7 +39,7 @@ concurrency:
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }} 
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     outputs:
       start_time: ${{ steps.set-pending-status.outputs.timestamp }}
       status: ${{ steps.run-tests.outcome }}
@@ -57,7 +57,6 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             https://api.github.com/repos/${{ github.repository }}/statuses/${{ env.COMMIT_SHA }} \
             -d "{\"state\": \"pending\", \"context\": \"Backend Tests : ${{env.BASE_URL}}\", \"target_url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
-
 
       - name: Set up Python
         uses: actions/setup-python@v4

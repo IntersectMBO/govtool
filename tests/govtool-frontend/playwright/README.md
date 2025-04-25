@@ -60,6 +60,7 @@ npm run generate-wallets
 ---
 
 ### 🔁 Run All Tests
+- **Requirements**: Faucet API key and  Valid proposal faucet private keys
 
 - **Headless mode** (no UI):
 
@@ -77,20 +78,17 @@ npm run generate-wallets
 
 ### ▶️ Run Specific Test Suites
 
-Each test suite can be run in **UI** or **Headless** mode:
+Each test suite can be run in **UI** or **Headless** mode.
 
 ---
 
 #### 1. **Delegation Pillars**
-
-- UI Mode:
-
+- **Requirements**: Faucet API key  
+- **UI Mode**:
   ```bash
   npm run test:delegation-pillars
   ```
-
-- Headless Mode:
-
+- **Headless Mode**:
   ```bash
   npm run test:headless:delegation-pillars
   ```
@@ -98,15 +96,12 @@ Each test suite can be run in **UI** or **Headless** mode:
 ---
 
 #### 2. **Voting Pillars**
-
-- UI Mode:
-
+- **Requirements**: Faucet API key  
+- **UI Mode**:
   ```bash
   npm run test:voting-pillars
   ```
-
-- Headless Mode:
-
+- **Headless Mode**:
   ```bash
   npm run test:headless:voting-pillars
   ```
@@ -114,33 +109,25 @@ Each test suite can be run in **UI** or **Headless** mode:
 ---
 
 #### 3. **Outcomes**
-
-- UI Mode:
-
+- **UI Mode**:
   ```bash
   npm run test:outcomes
   ```
-
-- Headless Mode:
-
+- **Headless Mode**:
   ```bash
   npm run test:headless:outcomes
   ```
 
 ---
 
-#### 4. **Proposal Pillars**
-
-_Includes both Proposal Discussion and Budget Discussion_
-
-- UI Mode:
-
+#### 4. **Proposal Pillars**  
+_Includes both Proposal Discussion and Budget Discussion_  
+- **Requirements**: Valid proposal faucet private keys  
+- **UI Mode**:
   ```bash
   npm run test:proposal-pillars
   ```
-
-- Headless Mode:
-
+- **Headless Mode**:
   ```bash
   npm run test:headless:proposal-pillars
   ```
@@ -148,15 +135,12 @@ _Includes both Proposal Discussion and Budget Discussion_
 ---
 
 #### 5. **Proposal Discussion**
-
-- UI Mode:
-
+- **Requirements**: Valid proposal faucet private keys  
+- **UI Mode**:
   ```bash
   npm run test:proposal-discussion
   ```
-
-- Headless Mode:
-
+- **Headless Mode**:
   ```bash
   npm run test:headless:proposal-discussion
   ```
@@ -164,15 +148,12 @@ _Includes both Proposal Discussion and Budget Discussion_
 ---
 
 #### 6. **Proposal Budget**
-
-- UI Mode:
-
+- **Requirements**: Valid proposal faucet private keys  
+- **UI Mode**:
   ```bash
   npm run test:proposal-budget
   ```
-
-- Headless Mode:
-
+- **Headless Mode**:
   ```bash
   npm run test:headless:proposal-budget
   ```
@@ -180,15 +161,11 @@ _Includes both Proposal Discussion and Budget Discussion_
 ---
 
 #### 7. **Wallet Connect**
-
-- UI Mode:
-
+- **UI Mode**:
   ```bash
   npm run test:wallet-connect
   ```
-
-- Headless Mode:
-
+- **Headless Mode**:
   ```bash
   npm run test:headless:wallet-connect
   ```
@@ -196,15 +173,11 @@ _Includes both Proposal Discussion and Budget Discussion_
 ---
 
 #### 8. **Usersnap Integration**
-
-- UI Mode:
-
+- **UI Mode**:
   ```bash
   npm run test:usersnap
   ```
-
-- Headless Mode:
-
+- **Headless Mode**:
   ```bash
   npm run test:headless:usersnap
   ```
@@ -212,15 +185,11 @@ _Includes both Proposal Discussion and Budget Discussion_
 ---
 
 #### 9. **Miscellaneous Tests**
-
-- UI Mode:
-
+- **UI Mode**:
   ```bash
   npm run test:misc
   ```
-
-- Headless Mode:
-
+- **Headless Mode**:
   ```bash
   npm run test:headless:misc
   ```

@@ -6,9 +6,11 @@ import { expect } from "@playwright/test";
 import { dRep03Wallet } from "@constants/staticWallets";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 import { dRep03AuthFile } from "@constants/auth";
+import { skipIfMainnet } from "@helpers/cardano";
 
 test.beforeEach(async () => {
   await setAllureEpic("11. Proposal Budget");
+  await skipIfMainnet();
 });
 
 test.describe("Budget proposal dRep behaviour", () => {

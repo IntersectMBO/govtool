@@ -4,7 +4,7 @@ import {
   dRepWallets,
 } from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
-import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
+import { skipIfMainnet } from "@helpers/cardano";
 import { uploadMetadataAndGetJsonHash } from "@helpers/metadata";
 import { pollTransaction } from "@helpers/transaction";
 import { expect } from "@playwright/test";
@@ -15,7 +15,6 @@ import kuberService from "@services/kuberService";
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Register DRep");
-  await skipIfNotHardFork();
   await skipIfMainnet();
 });
 

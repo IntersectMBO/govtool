@@ -2,7 +2,6 @@ import { user01AuthFile } from "@constants/auth";
 import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
@@ -11,7 +10,6 @@ test.use({ storageState: user01AuthFile, wallet: user01Wallet });
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
-  await skipIfNotHardFork();
 });
 
 test("4A_1. Should access Governance Actions page with connecting wallet", async ({

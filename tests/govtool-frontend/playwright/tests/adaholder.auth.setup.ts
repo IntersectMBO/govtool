@@ -17,12 +17,10 @@ import {
 import { test as setup } from "@fixtures/walletExtension";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import { createAuth, createAuthWithMultipleStake } from "@helpers/auth";
-import { skipIfNotHardFork } from "@helpers/cardano";
 
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Authentication");
-  await skipIfNotHardFork();
 });
 
 const authConfigs = [

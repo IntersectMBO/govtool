@@ -17,7 +17,6 @@ import { setAllureEpic } from "@helpers/allure";
 import { getDraftProposalWalletAndState } from "@helpers/auth";
 import {
   skipIfNotInfoAndBootstrapping,
-  skipIfNotHardFork,
   isBootStrapingPhase,
 } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
@@ -30,7 +29,6 @@ import { ProposalCreateRequest, ProposalType } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
-  await skipIfNotHardFork();
 });
 
 test.describe("Proposal created logged state", () => {

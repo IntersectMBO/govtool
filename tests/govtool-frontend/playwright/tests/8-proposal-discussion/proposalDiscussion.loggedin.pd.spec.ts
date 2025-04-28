@@ -9,7 +9,6 @@ import { createNewPageWithWallet } from "@helpers/page";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import { Page, expect } from "@playwright/test";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import {
   proposal01AuthFile,
@@ -19,7 +18,6 @@ import {
 
 test.beforeEach(async () => {
   await setAllureEpic("8. Proposal Discussion Forum");
-  await skipIfNotHardFork();
 });
 
 test.describe("Proposal created logged in state", () => {

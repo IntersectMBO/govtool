@@ -24,7 +24,7 @@ import {
   correctDRepDirectoryFormat,
 } from "@helpers/adaFormat";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
+import { skipIfMainnet } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
@@ -35,7 +35,6 @@ import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
-  await skipIfNotHardFork();
   await skipIfMainnet();
 });
 

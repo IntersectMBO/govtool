@@ -1,11 +1,7 @@
 import { InvalidMetadata } from "@constants/index";
 import { test } from "@fixtures/walletExtension";
-import {
-  correctVoteAdaFormat,
-  formatWithThousandSeparator,
-} from "@helpers/adaFormat";
+import { formatWithThousandSeparator } from "@helpers/adaFormat";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import {
   areCCVoteTotalsDisplayed,
@@ -24,7 +20,6 @@ const invalidOutcomeProposals = require("../../lib/_mock/outcome.json");
 
 test.beforeEach(async () => {
   await setAllureEpic("9. Outcomes");
-  await skipIfNotHardFork();
 });
 
 const status = ["Expired", "Ratified", "Enacted", "Live"];

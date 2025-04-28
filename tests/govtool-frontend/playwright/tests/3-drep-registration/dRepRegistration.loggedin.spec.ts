@@ -4,7 +4,6 @@ import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
-import { skipIfNotHardFork } from "@helpers/cardano";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
 import environments from "@constants/environments";
@@ -18,7 +17,6 @@ test.use({
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
-  await skipIfNotHardFork();
 });
 
 test("3B. Should access DRep registration page", async ({ page }) => {

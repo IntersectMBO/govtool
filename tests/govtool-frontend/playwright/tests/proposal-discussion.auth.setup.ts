@@ -1,5 +1,4 @@
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
 import { test as setup } from "@fixtures/walletExtension";
 import { createAuthWithUserName } from "@helpers/auth";
 import {
@@ -28,7 +27,6 @@ import {
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Authentication");
-  await skipIfNotHardFork();
 });
 
 const proposalSetups = [

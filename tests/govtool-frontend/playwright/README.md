@@ -47,6 +47,39 @@ npx playwright install
 
 ---
 
+
+## 🌐 Environment Setup
+
+### HOST URL
+
+| Environment | URL |
+| :---------- | :-- |
+| Development | [https://p80-z78acf3c2-zded6a792-gtw.z937eb260.rustrocks.fr/](https://p80-z78acf3c2-zded6a792-gtw.z937eb260.rustrocks.fr/) |
+| QA          | [https://govtool.cardanoapi.io/](https://govtool.cardanoapi.io/) |
+| Preview     | [https://preview.gov.tools/](https://preview.gov.tools/) |
+| Pre-Prod    | [https://pre-prod.gov.tools/](https://pre-prod.gov.tools/) |
+| Mainnet     | [https://gov.tools/](https://gov.tools/) |
+
+---
+
+## 🔑 Generate API Keys
+
+### Blockfrost API Key
+
+- To generate a Blockfrost API key (Project ID):
+  1. Follow the instructions in the [Blockfrost documentation](https://blockfrost.dev/overview/getting-started).
+  2. The **Project ID** you create there serves as your **Blockfrost API Key**.
+
+### Kuber API Key
+
+- To generate a Kuber API Key:
+  1. Visit [Kuberide](https://kuberide.com/).
+  2. Log in using your Google or GitHub account.
+  3. Navigate to **API Keys**.
+  4. Click to **Generate API Key**.
+
+---
+
 ## 🧪 Running Tests
 
 ### 🔑 Generate Test Wallets
@@ -60,7 +93,7 @@ npm run generate-wallets
 ---
 
 ### 🔁 Run All Tests
-- **Requirements**: Faucet API key and  Valid proposal faucet private keys
+- **Requirements**: Faucet API key , valid proposal faucet private keys , valid Blockfrost and Kuber API keys
 
 - **Headless mode** (no UI):
 
@@ -83,7 +116,7 @@ Each test suite can be run in **UI** or **Headless** mode.
 ---
 
 #### 1. **Delegation Pillars**
-- **Requirements**: Faucet API key and Valid proposal faucet private keys 
+- **Requirements**: Faucet API key, valid proposal faucet private keys and valid Blockfrost and Kuber API keys 
 - **UI Mode**:
   ```bash
   npm run test:delegation-pillars
@@ -96,7 +129,7 @@ Each test suite can be run in **UI** or **Headless** mode.
 ---
 
 #### 2. **Voting Pillars**
-- **Requirements**: Faucet API key and Valid proposal faucet private keys 
+- **Requirements**: Faucet API key, valid proposal faucet private keys and valid Blockfrost and Kuber API keys
 - **UI Mode**:
   ```bash
   npm run test:voting-pillars
@@ -122,7 +155,7 @@ Each test suite can be run in **UI** or **Headless** mode.
 
 #### 4. **Proposal Pillars**  
 _Includes both Proposal Discussion and Budget Discussion_  
-- **Requirements**: Valid proposal faucet private keys  
+- **Requirements**: Valid proposal faucet private keys and valid Blockfrost and Kuber API keys 
 - **UI Mode**:
   ```bash
   npm run test:proposal-pillars
@@ -135,7 +168,7 @@ _Includes both Proposal Discussion and Budget Discussion_
 ---
 
 #### 5. **Proposal Discussion**
-- **Requirements**: Valid proposal faucet private keys  
+- **Requirements**: Valid proposal faucet private keys and valid Blockfrost and Kuber API keys
 - **UI Mode**:
   ```bash
   npm run test:proposal-discussion
@@ -148,7 +181,7 @@ _Includes both Proposal Discussion and Budget Discussion_
 ---
 
 #### 6. **Proposal Budget**
-- **Requirements**: Valid proposal faucet private keys  
+- **Requirements**: Valid proposal faucet private keys and valid Blockfrost and Kuber API keys
 - **UI Mode**:
   ```bash
   npm run test:proposal-budget

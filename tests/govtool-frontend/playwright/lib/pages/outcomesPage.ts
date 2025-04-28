@@ -2,9 +2,24 @@ import environments from "@constants/environments";
 import { outcomeStatusType } from "@constants/index";
 import { toCamelCase } from "@helpers/string";
 import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
-import { expect, Locator, Page } from "@playwright/test";
-import { outcomeProposal, outcomeType } from "@types";
+import { Browser, expect, Locator, Page } from "@playwright/test";
+import { outcomeMetadata, outcomeProposal, outcomeType } from "@types";
 import OutcomeDetailsPage from "./outcomeDetailsPage";
+import { isMobile } from "@helpers/mobile";
+import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
+import { createNewPageWithWallet, injectLogger } from "@helpers/page";
+import { createTempUserAuth } from "@datafactory/createAuth";
+import { user01Wallet } from "@constants/staticWallets";
+import { user01AuthFile } from "@constants/auth";
+
+const status = ["Expired", "Ratified", "Enacted", "Live"];
+
+enum SortOption {
+  SoonToExpire = "Soon to expire",
+  NewestFirst = "Newest first",
+  OldestFirst = "Oldest first",
+  HighestAmountYesVote = "Highest amount of yes votes",
+}
 
 export default class OutComesPage {
   // Buttons
@@ -235,5 +250,319 @@ export default class OutComesPage {
       return status.includes(statusType);
     });
     return outcomeStatus.some((status) => filters.includes(status));
+  }
+
+  async shouldAccessPage() {
+    await this.page.goto("/");
+
+    if (isMobile(this.page)) {
+      await this.page.getByTestId("open-drawer-button").click();
+    }
+    await this.page.getByTestId("governance-actions-outcomes-link").click();
+
+    await expect(this.page.getByText(/outcomes/i)).toHaveCount(2);
+  }
+
+  async filterOutcomes() {
+    await this.filterBtn.click();
+    const filterOptionNames = Object.values(outcomeType);
+
+    // proposal type filter
+    await this.applyAndValidateFilters(
+      filterOptionNames,
+      this._validateFiltersInOutcomeCard
+    );
+
+    // proposal status filter
+    await this.applyAndValidateFilters(
+      status,
+      this._validateStatusFiltersInOutcomeCard
+    );
+  }
+
+  async sortOutcomes() {
+    await this.sortBtn.click();
+
+    await this.sortAndValidate(
+      SortOption.NewestFirst,
+      (p1, p2) => p1.expiry_date >= p2.time
+    );
+
+    await this.sortAndValidate(
+      SortOption.OldestFirst,
+      (p1, p2) => p1.expiry_date <= p2.expiry_date
+    );
+
+    await this.sortAndValidate(
+      SortOption.HighestAmountYesVote,
+      (p1, p2) => parseInt(p1.yes_votes) >= parseInt(p2.yes_votes)
+    );
+  }
+
+  async filterAndSortOutcomes() {
+    const filterOptionKeys = Object.keys(outcomeType);
+    const filterOptionNames = Object.values(outcomeType);
+
+    const choice = Math.floor(Math.random() * filterOptionKeys.length);
+    await this.goto({ filter: filterOptionKeys[choice] });
+    await this.sortBtn.click();
+
+    await this.sortAndValidate(
+      SortOption.OldestFirst,
+      (p1, p2) => p1.expiry_date <= p2.expiry_date
+    );
+
+    await this.validateFilters(
+      [filterOptionNames[choice]],
+      this._validateFiltersInOutcomeCard
+    );
+  }
+
+  async verifyAllOutcomesAreExpired() {
+    const proposalCards = await this.getAllOutcomes();
+
+    for (const proposalCard of proposalCards) {
+      const expiryDateEl = proposalCard.locator(
+        '[data-testid$="-Expired-date"]'
+      );
+      const expiryDateTxt = await expiryDateEl.innerText();
+      const expiryDate = extractExpiryDateFromText(expiryDateTxt);
+      const today = new Date();
+      expect(today >= expiryDate).toBeTruthy();
+    }
+  }
+
+  async VerifyLoadMoreOutcomes() {
+    const responsePromise = this.page.waitForResponse((response) =>
+      response
+        .url()
+        .includes(`governance-actions?search=&filters=&sort=newestFirst&page=2`)
+    );
+    await this.goto();
+
+    let governanceActionIdsBefore: String[];
+    let governanceActionIdsAfter: String[];
+
+    await functionWaitedAssert(
+      async () => {
+        governanceActionIdsBefore =
+          await this.getAllListedCIP105GovernanceIds();
+        await this.showMoreBtn.click();
+      },
+      { message: "Show more button not visible" }
+    );
+
+    const response = await responsePromise;
+    const governanceActionListAfter = await response.json();
+
+    await functionWaitedAssert(
+      async () => {
+        governanceActionIdsAfter = await this.getAllListedCIP105GovernanceIds();
+        expect(governanceActionIdsAfter.length).toBeGreaterThan(
+          governanceActionIdsBefore.length
+        );
+      },
+      { message: "Outcomes not loaded after clicking show more" }
+    );
+
+    if (governanceActionListAfter.length >= governanceActionIdsBefore.length) {
+      await expect(this.showMoreBtn).toBeVisible();
+      expect(true).toBeTruthy();
+    } else {
+      await expect(this.showMoreBtn).not.toBeVisible();
+    }
+  }
+
+  async fetchOutcomeIdFromNetwork(governanceActionId: string) {
+    let updatedGovernanceActionId = governanceActionId;
+    await this.page.route(
+      "**/governance-actions?search=&filters=&sort=**",
+      async (route) => {
+        const response = await route.fetch();
+        const data: outcomeProposal[] = await response.json();
+        if (!governanceActionId) {
+          if (data.length > 0) {
+            const randomIndexForId = Math.floor(Math.random() * data.length);
+            updatedGovernanceActionId =
+              data[randomIndexForId].tx_hash +
+              "#" +
+              data[randomIndexForId].index;
+          }
+        }
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(data),
+        });
+      }
+    );
+
+    const responsePromise = this.page.waitForResponse(
+      "**/governance-actions?search=&filters=&sort=**"
+    );
+    await this.goto();
+    await responsePromise;
+    return updatedGovernanceActionId;
+  }
+
+  async fetchOutcomeTitleFromNetwork(governanceActionTitle: string) {
+    let updatedGovernanceActionTitle = governanceActionTitle;
+    await this.page.route(
+      "**/governance-actions/metadata?**",
+      async (route) => {
+        try {
+          const response = await route.fetch();
+          if (response.status() !== 200) {
+            await route.continue();
+            return;
+          }
+          const data: outcomeMetadata = await response.json();
+          if (!governanceActionTitle && data.data.title != null) {
+            updatedGovernanceActionTitle = data.data.title;
+          }
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify(data),
+          });
+        } catch (error) {
+          return;
+        }
+      }
+    );
+    await this.goto();
+    const metadataResponsePromise = this.page.waitForResponse(
+      "**/governance-actions/metadata?**"
+    );
+    await metadataResponsePromise;
+    return updatedGovernanceActionTitle;
+  }
+
+  async searchOutcomesById(governanceActionId: string) {
+    await this.searchInput.fill(governanceActionId);
+    await expect(
+      this.page.getByRole("progressbar").getByRole("img")
+    ).toBeVisible();
+
+    await functionWaitedAssert(
+      async () => {
+        const idSearchOutcomeCards = await this.getAllOutcomes();
+        expect(idSearchOutcomeCards.length, {
+          message:
+            idSearchOutcomeCards.length == 0 && "No governance actions found",
+        }).toBeGreaterThan(0);
+        for (const outcomeCard of idSearchOutcomeCards) {
+          const id = await outcomeCard
+            .locator('[data-testid$="-CIP-105-id"]')
+            .textContent();
+          expect(id.replace(/^.*ID/, "")).toContain(governanceActionId);
+        }
+      },
+      { name: "search by id" }
+    );
+  }
+
+  async searchOutcomesByTitle(governanceActionTitle: string) {
+    await this.searchInput.fill(governanceActionTitle);
+    await expect(
+      this.page.getByRole("progressbar").getByRole("img")
+    ).toBeVisible();
+
+    await functionWaitedAssert(
+      async () => {
+        const titleSearchOutcomeCards = await this.getAllOutcomes();
+        expect(titleSearchOutcomeCards.length, {
+          message:
+            titleSearchOutcomeCards.length == 0 &&
+            "No governance actions found",
+        }).toBeGreaterThan(0);
+        for (const outcomeCard of titleSearchOutcomeCards) {
+          const title = await outcomeCard
+            .locator('[data-testid$="-card-title"]')
+            .textContent();
+          expect(title.toLowerCase()).toContain(
+            governanceActionTitle.toLowerCase()
+          );
+        }
+      },
+      { name: "search by title" }
+    );
+  }
+
+  async shouldCopyGovernanceActionId(governanceActionId: string) {
+    await this.searchInput.fill(governanceActionId);
+
+    await this.page
+      .getByTestId(`${governanceActionId}-CIP-105-id`)
+      .getByTestId("copy-button")
+      .click();
+    await expect(this.page.getByText("Copied to clipboard")).toBeVisible({
+      timeout: 60_000,
+    });
+    const copiedTextDRepDirectory = await this.page.evaluate(() =>
+      navigator.clipboard.readText()
+    );
+    expect(copiedTextDRepDirectory).toEqual(governanceActionId);
+  }
+
+  async navigateToFilteredProposalDetail(
+    browser: Browser,
+    filterKey: string,
+    isLoggedIn: boolean
+  ) {
+    let page: Page;
+    if (!isLoggedIn) {
+      page = await browser.newPage();
+    } else {
+      page = await createNewPageWithWallet(browser, {
+        storageState: user01AuthFile,
+        wallet: user01Wallet,
+      });
+    }
+    injectLogger(page);
+
+    const outcomeListResponsePromise = page.waitForResponse(
+      (response) =>
+        response
+          .url()
+          .includes(`governance-actions?search=&filters=${filterKey}`),
+      { timeout: 60_000 }
+    );
+
+    const metricsResponsePromise = page.waitForResponse(
+      (response) => response.url().includes(`/misc/network/metrics?epoch`),
+      { timeout: 60_000 }
+    );
+
+    const outcomePage = new OutComesPage(page);
+    await outcomePage.goto({ filter: filterKey });
+
+    const outcomeListResponse = await outcomeListResponsePromise;
+    const proposals = await outcomeListResponse.json();
+
+    expect(
+      proposals.length,
+      proposals.length == 0 && "No proposals found!"
+    ).toBeGreaterThan(0);
+
+    const { index: governanceActionIndex, tx_hash: governanceTransactionHash } =
+      proposals[0];
+
+    const outcomeResponsePromise = page.waitForResponse(
+      (response) =>
+        response
+          .url()
+          .includes(
+            `governance-actions/${governanceTransactionHash}?index=${governanceActionIndex}`
+          ),
+      { timeout: 60_000 }
+    );
+
+    const govActionDetailsPage = await outcomePage.viewFirstOutcomes();
+    return {
+      govActionDetailsPage,
+      outcomeResponsePromise,
+      metricsResponsePromise,
+    };
   }
 }

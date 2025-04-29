@@ -6,6 +6,7 @@ import { allure } from "allure-playwright";
 import { bech32 } from "bech32";
 import { functionWaitedAssert } from "./waitedLoop";
 import { createFile, getFile } from "./file";
+import { faucetWallet } from "@constants/staticWallets";
 
 export function lovelaceToAda(lovelace: number) {
   if (lovelace === 0) return 0;
@@ -54,4 +55,36 @@ export async function skipIfMainnet() {
     );
     test.skip();
   }
+}
+
+export async function skipIfBalanceIsInsufficient(limit = 10) {
+  const balance = await getWalletBalance(faucetWallet.address);
+  if (balance <= limit) {
+    await allure.description("Not enough balance to perform this action.");
+    test.skip();
+  }
+}
+
+export async function getWalletBalance(address: string) {
+  let balance: number = 0;
+  const faucetWalletBalanceDetails =
+    (await getFile("faucetWalletBalance.json")) || {};
+  await functionWaitedAssert(
+    async () => {
+      balance = await kuberService.getBalance(address);
+      if (faucetWalletBalanceDetails["address"] === address) {
+        balance = faucetWalletBalanceDetails["balance"];
+      } else {
+        faucetWalletBalanceDetails["balance"] = balance;
+        faucetWalletBalanceDetails["address"] = faucetWallet.address;
+        await createFile(
+          "faucetWalletBalance.json",
+          faucetWalletBalanceDetails
+        );
+      }
+    },
+    { message: "get balance" }
+  );
+
+  return balance;
 }

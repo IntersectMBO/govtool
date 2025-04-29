@@ -1,7 +1,7 @@
 import allure
 
 from lib.assertions import assert_data_type
-from models.TestData import EpochParam, NetworkMetrics, TxStatus
+from models.TestData import EpochParam, NetworkInfo, NetworkMetrics, NetworkTotalStake, TxStatus
 
 
 def validate_epoch_param(epoch_param):
@@ -10,6 +10,12 @@ def validate_epoch_param(epoch_param):
 
 def validate_network_metrics(network_metrics):
     assert_data_type(NetworkMetrics, network_metrics)
+    
+def validate_network_total_stake(network_total_stake):
+    assert_data_type(NetworkTotalStake, network_total_stake)
+    
+def validate_network_info(network_info):
+    assert_data_type(NetworkInfo, network_info)
 
 
 @allure.story("Misc")
@@ -22,6 +28,16 @@ def test_get_epoch_param(govtool_api):
 def test_get_network_metrics(govtool_api):
     network_metrics = govtool_api.network_metrics().json()
     validate_network_metrics(network_metrics)
+    
+@allure.story("Misc")
+def test_get_network_total_stake(govtool_api):
+    network_total_stake = govtool_api.network_total_stake().json()
+    validate_network_total_stake(network_total_stake)
+    
+@allure.story("Misc")
+def test_get_network_info(govtool_api):
+    network_info = govtool_api.network_info().json()
+    validate_network_info(network_info)
 
 
 @allure.story("Misc")

@@ -1,9 +1,16 @@
 import {
+  budgetProposal01AuthFile,
+  budgetProposal02AuthFile,
+  budgetProposal03AuthFile,
+  budgetProposal04AuthFile,
+} from "@constants/auth";
+import {
   budgetProposal01Wallet,
   budgetProposal02Wallet,
   budgetProposal03Wallet,
   budgetProposal04Wallet,
 } from "@constants/staticWallets";
+import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/budgetProposal";
 import { setAllureEpic } from "@helpers/allure";
 import { createNewPageWithWallet } from "@helpers/page";
@@ -15,6 +22,8 @@ import {
   BudgetProposalProps,
   BudgetProposalStageEnum,
   CompanyEnum,
+  PreferredCurrencyEnum,
+  ProposalContractingEnum,
 } from "@types";
 
 test.beforeEach(async () => {
@@ -23,7 +32,7 @@ test.beforeEach(async () => {
 
 test.describe("Budget proposal 01 wallet", () => {
   test.use({
-    storageState: ".auth/budgetProposal01.json",
+    storageState: budgetProposal01AuthFile,
     wallet: budgetProposal01Wallet,
   });
 
@@ -197,6 +206,19 @@ test.describe("Budget proposal 01 wallet", () => {
         ).toBeVisible();
         await expect(budgetProposalSubmissionPage.continueBtn).toBeDisabled();
       });
+
+      test("12D_7. Should verify all field of “Submit” section", async () => {
+        const proposalInformation =
+          budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+        await budgetProposalSubmissionPage.fillupForm(
+          proposalInformation,
+          BudgetProposalStageEnum.AdministrationAndAuditing
+        );
+
+        await expect(budgetProposalSubmissionPage.submitCheckbox).toBeVisible();
+        await expect(budgetProposalSubmissionPage.saveDraftBtn).toBeVisible();
+        await expect(budgetProposalSubmissionPage.continueBtn).toBeDisabled();
+      });
     });
 
     test("12G. Should validate and review submitted budget proposal", async () => {
@@ -209,76 +231,187 @@ test.describe("Budget proposal 01 wallet", () => {
       );
     });
     test.describe("Budget proposal field validation", () => {
-      test("12E_1. Should accept valid data in “Costing” section", async () => {
-        test.slow(); // Brute-force testing with 50 random data
-        const proposalInformation =
-          budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
-        await budgetProposalSubmissionPage.fillupForm(
-          proposalInformation,
-          BudgetProposalStageEnum.ProposalDetails
-        );
+      const budgetProposalValidationReason = [
+        { title: "accept valid data", isValid: true },
+        { title: "reject invalid data", isValid: false },
+      ];
+      budgetProposalValidationReason.forEach(({ isValid, title }) => {
+        test(`12${isValid ? "E" : "F"}_1. Should ${title} in “Proposal Ownership” section`, async () => {
+          test.slow(); // Brute-force testing with 25 random data
 
-        for (let i = 0; i < 50; i++) {
-          await budgetProposalSubmissionPage.validateCostingSection();
-        }
+          if (isValid) {
+            await budgetProposalSubmissionPage.agreeCheckbox.click();
+          }
 
-        await budgetProposalSubmissionPage.fillCostingSectionExceptAmountInputs();
-        await expect(budgetProposalSubmissionPage.continueBtn).toBeEnabled();
+          for (let i = 0; i < 25; i++) {
+            const validProposalOwnership =
+              budgetProposalSubmissionPage.generateValidProposalOwnerShip();
+            const invalidProposalOwnerShip =
+              budgetProposalSubmissionPage.generateInvalidProposalOwnerShip();
+            const proposalOwnership = isValid
+              ? validProposalOwnership
+              : invalidProposalOwnerShip;
+            await budgetProposalSubmissionPage.fillupProposalOwnershipForm(
+              proposalOwnership,
+              false
+            );
+            await budgetProposalSubmissionPage.validateProposalOwnershipSection(
+              proposalOwnership,
+              isValid
+            );
+          }
+        });
       });
 
-      test("12E_2. Should accept valid data in “further information” section", async () => {
-        test.slow(); // Brute-force testing with 50 random data
-        const proposalInformation =
-          budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
-        await budgetProposalSubmissionPage.fillupForm(
-          proposalInformation,
-          BudgetProposalStageEnum.Costing
-        );
+      budgetProposalValidationReason.forEach(({ isValid, title }) => {
+        test(`12${isValid ? "E" : "F"}_2. Should ${title} in “problem statements and proposal benefits” section`, async () => {
+          test.slow(); // Brute-force testing with 25 random data
+          const proposalInformations =
+            budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+          await budgetProposalSubmissionPage.fillupForm(
+            proposalInformations,
+            BudgetProposalStageEnum.ProposalOwnership
+          );
 
-        for (let i = 0; i < 50; i++) {
-          await budgetProposalSubmissionPage.validateFurtherInformationSection();
-        }
-
-        for (let i = 0; i < 18; i++) {
-          await expect(budgetProposalSubmissionPage.addLinkBtn).toBeVisible();
-          await budgetProposalSubmissionPage.addLinkBtn.click();
-        }
-        await expect(budgetProposalSubmissionPage.addLinkBtn).toBeHidden();
-        await expect(budgetProposalSubmissionPage.continueBtn).toBeEnabled();
-      });
-
-      test("12F_1. Should reject valid data in “Costing” section", async () => {
-        test.slow(); // Brute-force testing with 50 random data
-        const proposalInformation =
-          budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
-        await budgetProposalSubmissionPage.fillupForm(
-          proposalInformation,
-          BudgetProposalStageEnum.ProposalDetails
-        );
-
-        for (let i = 0; i < 50; i++) {
-          await budgetProposalSubmissionPage.validateCostingSection(false);
-        }
-
-        await budgetProposalSubmissionPage.fillCostingSectionExceptAmountInputs();
-        await expect(budgetProposalSubmissionPage.continueBtn).toBeDisabled();
-      });
-
-      test("12F_2. Should reject invalid data in “further information” section", async () => {
-        test.slow(); // Brute-force testing with 50 random data
-        const proposalInformation =
-          budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
-        await budgetProposalSubmissionPage.fillupForm(
-          proposalInformation,
-          BudgetProposalStageEnum.Costing
-        );
-
-        for (let i = 0; i < 50; i++) {
-          await budgetProposalSubmissionPage.validateFurtherInformationSection(
+          const budgetProposalProblemStatementAndBenefits =
+            budgetProposalSubmissionPage.generateValidBudgetProposalProblemStatementAndBenefits();
+          await budgetProposalSubmissionPage.fillupProblemStatementAndBenefitsForm(
+            budgetProposalProblemStatementAndBenefits,
             false
           );
-        }
-        await expect(budgetProposalSubmissionPage.continueBtn).toBeDisabled();
+
+          for (let i = 0; i < 25; i++) {
+            await budgetProposalSubmissionPage.validateProblemStatementsAndProposalBenefitsSection(
+              isValid
+            );
+          }
+        });
+      });
+
+      budgetProposalValidationReason.forEach(({ isValid, title }) => {
+        test(`12${isValid ? "E" : "F"}_3. Should ${title} in “proposal details” section`, async () => {
+          test.slow(); // Brute-force testing with 25 random data
+          const proposalInformations =
+            budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+          await budgetProposalSubmissionPage.fillupForm(
+            proposalInformations,
+            BudgetProposalStageEnum.ProblemStatementAndBenefits
+          );
+
+          await budgetProposalSubmissionPage.contractingTypeSelect.click();
+          const contractingType = faker.helpers
+            .arrayElement(Object.values(ProposalContractingEnum))
+            .toLowerCase();
+          await budgetProposalSubmissionPage.currentPage
+            .getByTestId(`${contractingType}-button`)
+            .click();
+          if (contractingType === "Other") {
+            await budgetProposalSubmissionPage.otherDescriptionInput.fill(
+              faker.lorem.paragraph(2)
+            );
+          }
+
+          for (let i = 0; i < 25; i++) {
+            await budgetProposalSubmissionPage.validateProposalDetailsSection(
+              isValid
+            );
+          }
+        });
+      });
+
+      budgetProposalValidationReason.forEach(({ isValid, title }) => {
+        test(`12${isValid ? "E" : "F"}_4. Should ${title} in “Costing” section`, async () => {
+          test.slow(); // Brute-force testing with 25 random data
+          const proposalInformation =
+            budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+          await budgetProposalSubmissionPage.fillupForm(
+            proposalInformation,
+            BudgetProposalStageEnum.ProposalDetails
+          );
+
+          await budgetProposalSubmissionPage.preferredCurrencySelect.click();
+          await budgetProposalSubmissionPage.currentPage
+            .getByTestId(
+              `${faker.helpers
+                .arrayElement(Object.values(PreferredCurrencyEnum))
+                .toLowerCase()}-button`
+            )
+            .click();
+
+          for (let i = 0; i < 25; i++) {
+            const invalidCostingValues =
+              budgetProposalSubmissionPage.generateInValidCosting();
+            const validCostingValues =
+              budgetProposalSubmissionPage.generateValidCosting();
+            const costingValues = isValid
+              ? validCostingValues
+              : invalidCostingValues;
+            await budgetProposalSubmissionPage.validateCostingSection(
+              costingValues,
+              isValid
+            );
+          }
+        });
+      });
+
+      budgetProposalValidationReason.forEach(({ isValid, title }) => {
+        test(`12${isValid ? "E" : "F"}_5. Should ${title} in “further information” section`, async () => {
+          test.slow(); // Brute-force testing with 25 random data
+          const proposalInformation =
+            budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+          await budgetProposalSubmissionPage.fillupForm(
+            proposalInformation,
+            BudgetProposalStageEnum.Costing
+          );
+
+          for (let i = 0; i < 25; i++) {
+            await budgetProposalSubmissionPage.validateFurtherInformationSection(
+              isValid
+            );
+          }
+          for (let i = 0; i < 18; i++) {
+            await expect(budgetProposalSubmissionPage.addLinkBtn).toBeVisible();
+            await budgetProposalSubmissionPage.addLinkBtn.click();
+          }
+          await expect(budgetProposalSubmissionPage.addLinkBtn).toBeHidden();
+        });
+      });
+
+      budgetProposalValidationReason.forEach(({ isValid, title }) => {
+        test(`12${isValid ? "E" : "F"}_6. Should ${title} in “Administration and Auditing” section`, async () => {
+          const proposalInformation =
+            budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+          await budgetProposalSubmissionPage.fillupForm(
+            proposalInformation,
+            BudgetProposalStageEnum.FurtherInformation
+          );
+          for (let i = 0; i < 25; i++) {
+            await budgetProposalSubmissionPage.validateAdministrationAndAuditingSection(
+              isValid
+            );
+          }
+        });
+      });
+
+      budgetProposalValidationReason.forEach(({ isValid, title }) => {
+        test(`12${isValid ? "E" : "F"}_7. Should ${title} in “Submit” section`, async () => {
+          const proposalInformation =
+            budgetProposalSubmissionPage.generateValidBudgetProposalInformation();
+          await budgetProposalSubmissionPage.fillupForm(
+            proposalInformation,
+            BudgetProposalStageEnum.AdministrationAndAuditing
+          );
+          if (isValid) {
+            await budgetProposalSubmissionPage.submitCheckbox.click();
+            await expect(
+              budgetProposalSubmissionPage.continueBtn
+            ).toBeEnabled();
+          } else {
+            await expect(
+              budgetProposalSubmissionPage.continueBtn
+            ).toBeDisabled();
+          }
+        });
       });
     });
   });
@@ -286,7 +419,7 @@ test.describe("Budget proposal 01 wallet", () => {
 
 test("12C. Should save and view draft proposal", async ({ browser }) => {
   const page = await createNewPageWithWallet(browser, {
-    storageState: ".auth/budgetProposal02.json",
+    storageState: budgetProposal02AuthFile,
     wallet: budgetProposal02Wallet,
   });
 
@@ -334,7 +467,7 @@ test("12C. Should save and view draft proposal", async ({ browser }) => {
 
 test("12H. Should submit a valid budget proposal", async ({ browser }) => {
   const page = await createNewPageWithWallet(browser, {
-    storageState: ".auth/budgetProposal03.json",
+    storageState: budgetProposal03AuthFile,
     wallet: budgetProposal03Wallet,
   });
   const budgetSubmissionPage = new BudgetDiscussionSubmissionPage(page);
@@ -355,7 +488,7 @@ test("12I. Should submit a valid draft budget proposal", async ({
 }) => {
   test.slow();
   const page = await createNewPageWithWallet(browser, {
-    storageState: ".auth/budgetProposal04.json",
+    storageState: budgetProposal04AuthFile,
     wallet: budgetProposal04Wallet,
   });
 

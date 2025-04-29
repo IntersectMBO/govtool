@@ -14,6 +14,12 @@ import {
   proposal08Wallet,
   proposal09Wallet,
 } from "@constants/staticWallets";
+import {
+  proposal05AuthFile,
+  proposal07AuthFile,
+  proposal08AuthFile,
+  proposal09AuthFile,
+} from "@constants/auth";
 
 interface CreateUserProps {
   page: Page;
@@ -91,22 +97,22 @@ export const getDraftProposalWalletAndState = (proposalType: string) => {
   switch (proposalType) {
     case ProposalType.info:
       return {
-        storageState: ".auth/proposal05.json",
+        storageState: proposal05AuthFile,
         wallet: proposal05Wallet,
       };
     case ProposalType.treasury:
       return {
-        storageState: ".auth/proposal07.json",
+        storageState: proposal07AuthFile,
         wallet: proposal07Wallet,
       };
     case ProposalType.updatesToTheConstitution:
       return {
-        storageState: ".auth/proposal08.json",
+        storageState: proposal08AuthFile,
         wallet: proposal08Wallet,
       };
     case ProposalType.motionOfNoConfedence:
       return {
-        storageState: ".auth/proposal09.json",
+        storageState: proposal09AuthFile,
         wallet: proposal09Wallet,
       };
   }

@@ -1,5 +1,8 @@
 import environments from "@constants/environments";
-import { dRepWallets } from "@constants/staticWallets";
+import {
+  budgetProposalDRepWallets,
+  dRepWallets,
+} from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import { skipIfMainnet } from "@helpers/cardano";
 import { pollTransaction } from "@helpers/transaction";
@@ -26,6 +29,7 @@ cleanup("DRep de-registration", async () => {
     ...dRepWallets,
     ...registerDRep,
     ...registeredDRep,
+    ...budgetProposalDRepWallets,
   ];
   try {
     const { txId, lockInfo } = await kuberService.multipleDRepDeRegistration(

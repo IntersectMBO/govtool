@@ -25,3 +25,9 @@ export function toCamelCase(str: string) {
     )
     .join("");
 }
+
+export function generateParagraph(isValid: boolean, isEmpty: boolean): string {
+  if (isValid) return faker.lorem.paragraph(2);
+  const text = isEmpty ? "" : faker.lorem.paragraph(15001);
+  return text;
+}

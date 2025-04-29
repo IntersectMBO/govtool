@@ -1,4 +1,10 @@
 import {
+  budgetProposal01AuthFile,
+  budgetProposal02AuthFile,
+  budgetProposal03AuthFile,
+  budgetProposal04AuthFile,
+} from "@constants/auth";
+import {
   budgetProposal01Wallet,
   budgetProposal02Wallet,
   budgetProposal03Wallet,
@@ -26,7 +32,7 @@ test.beforeEach(async () => {
 
 test.describe("Budget proposal 01 wallet", () => {
   test.use({
-    storageState: ".auth/budgetProposal01.json",
+    storageState: budgetProposal01AuthFile,
     wallet: budgetProposal01Wallet,
   });
 
@@ -413,7 +419,7 @@ test.describe("Budget proposal 01 wallet", () => {
 
 test("12C. Should save and view draft proposal", async ({ browser }) => {
   const page = await createNewPageWithWallet(browser, {
-    storageState: ".auth/budgetProposal02.json",
+    storageState: budgetProposal02AuthFile,
     wallet: budgetProposal02Wallet,
   });
 
@@ -461,7 +467,7 @@ test("12C. Should save and view draft proposal", async ({ browser }) => {
 
 test("12H. Should submit a valid budget proposal", async ({ browser }) => {
   const page = await createNewPageWithWallet(browser, {
-    storageState: ".auth/budgetProposal03.json",
+    storageState: budgetProposal03AuthFile,
     wallet: budgetProposal03Wallet,
   });
   const budgetSubmissionPage = new BudgetDiscussionSubmissionPage(page);
@@ -482,7 +488,7 @@ test("12I. Should submit a valid draft budget proposal", async ({
 }) => {
   test.slow();
   const page = await createNewPageWithWallet(browser, {
-    storageState: ".auth/budgetProposal04.json",
+    storageState: budgetProposal04AuthFile,
     wallet: budgetProposal04Wallet,
   });
 

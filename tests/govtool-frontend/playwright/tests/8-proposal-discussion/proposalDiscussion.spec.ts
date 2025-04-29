@@ -6,7 +6,7 @@ import {
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
-import { isBootStrapingPhase, skipIfNotHardFork } from "@helpers/cardano";
+import { isBootStrapingPhase } from "@helpers/cardano";
 import { injectLogger } from "@helpers/page";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
@@ -21,7 +21,6 @@ const mockComments = require("../../lib/_mock/proposalComments.json");
 
 test.beforeEach(async () => {
   await setAllureEpic("8. Proposal Discussion Forum");
-  await skipIfNotHardFork();
 });
 
 test("8A. Should access proposed governance actions in disconnected state", async ({

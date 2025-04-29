@@ -5,7 +5,7 @@ import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
-import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
+import { skipIfMainnet } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
@@ -14,16 +14,16 @@ import { expect } from "@playwright/test";
 import walletManager from "lib/walletManager";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { GovernanceActionType } from "@types";
+import { dRep01AuthFile } from "@constants/auth";
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
-  await skipIfNotHardFork();
   await skipIfMainnet();
 });
 
 test.describe("Logged in DReps", () => {
   test.use({
-    storageState: ".auth/dRep01.json",
+    storageState: dRep01AuthFile,
     wallet: dRep01Wallet,
     enableDRepSigning: true,
     enableStakeSigning: false,
@@ -98,6 +98,15 @@ test.describe("Logged in DReps", () => {
       ],
     });
     await page.getByTestId("confirm-modal-button").click();
+  });
+
+  test("3S. Should restrict dRep registration for dRep", async ({ page }) => {
+    await page.goto(`${environments.frontendUrl}/register_drep`);
+
+    await expect(page.getByText("You already are a DRep")).toBeVisible({
+      timeout: 60_000,
+    });
+    await expect(page.getByTestId("name-input")).not.toBeVisible();
   });
 });
 

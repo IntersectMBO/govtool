@@ -4,19 +4,19 @@ import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
-import { skipIfNotHardFork } from "@helpers/cardano";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
 import environments from "@constants/environments";
+import { user01AuthFile } from "@constants/auth";
+import EditDRepPage from "@pages/editDRepPage";
 
 test.use({
-  storageState: ".auth/user01.json",
+  storageState: user01AuthFile,
   wallet: user01Wallet,
 });
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
-  await skipIfNotHardFork();
 });
 
 test("3B. Should access DRep registration page", async ({ page }) => {
@@ -222,4 +222,12 @@ test("3O. Should reject invalid dRep registration metadata", async ({
   await expect(dRepRegistrationPage.metadataErrorModal).toHaveText(
     /your external data does not/i
   );
+});
+
+test("3R. Should restrict edit dRep for non dRep", async ({ page }) => {
+  const editDrepPage = new EditDRepPage(page);
+  await editDrepPage.goto();
+
+  await page.waitForTimeout(2_000);
+  await expect(editDrepPage.nameInput).not.toBeVisible();
 });

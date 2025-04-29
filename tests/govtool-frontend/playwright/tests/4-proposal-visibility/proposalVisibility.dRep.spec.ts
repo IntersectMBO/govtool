@@ -7,6 +7,7 @@ import { setAllureEpic } from "@helpers/allure";
 import {
   isBootStrapingPhase,
   lovelaceToAda,
+  skipIfBalanceIsInsufficient,
   skipIfMainnet,
 } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
@@ -27,6 +28,7 @@ import { dRep01AuthFile } from "@constants/auth";
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
   await skipIfMainnet();
+   await skipIfBalanceIsInsufficient(4000);
 });
 
 test.describe("Logged in DRep", () => {

@@ -4,7 +4,7 @@ import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
-import { skipIfMainnet } from "@helpers/cardano";
+import { skipIfBalanceIsInsufficient, skipIfMainnet } from "@helpers/cardano";
 import EditDRepPage from "@pages/editDRepPage";
 import { expect } from "@playwright/test";
 import environments from "@constants/environments";
@@ -13,6 +13,7 @@ import { dRep02AuthFile } from "@constants/auth";
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
   await skipIfMainnet();
+   await skipIfBalanceIsInsufficient(4000);
 });
 
 test.use({ wallet: dRep02Wallet, storageState: dRep02AuthFile });

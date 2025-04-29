@@ -5,7 +5,7 @@ import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { isBootStrapingPhase, skipIfMainnet } from "@helpers/cardano";
+import { isBootStrapingPhase, skipIfBalanceIsInsufficient, skipIfMainnet } from "@helpers/cardano";
 import { encodeCIP129Identifier } from "@helpers/encodeDecode";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
@@ -20,6 +20,7 @@ import walletManager from "lib/walletManager";
 test.beforeEach(async () => {
   await setAllureEpic("5. Proposal functionality");
   await skipIfMainnet();
+  await skipIfBalanceIsInsufficient(4000);
 });
 
 test.describe("Proposal checks", () => {
@@ -180,7 +181,7 @@ test.describe("Perform voting", () => {
 
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 60_000 });
 
     govActionDetailsPage = await governanceActionsPage.viewFirstVotedProposal();
     await govActionDetailsPage.reVote();

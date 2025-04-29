@@ -1,6 +1,6 @@
 import { adaHolderWallets, dRepWallets } from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
-import { skipIfMainnet } from "@helpers/cardano";
+import { skipIfBalanceIsInsufficient, skipIfMainnet } from "@helpers/cardano";
 import { pollTransaction } from "@helpers/transaction";
 import { expect } from "@playwright/test";
 import { test as setup } from "@fixtures/walletExtension";
@@ -13,6 +13,7 @@ setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Wallet bootstrap");
   await skipIfMainnet();
+  await skipIfBalanceIsInsufficient(200);
 });
 
 setup("Initialize static wallets", async () => {

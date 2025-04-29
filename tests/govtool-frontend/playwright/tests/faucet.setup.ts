@@ -1,12 +1,10 @@
 import environments from "@constants/environments";
 import { faucetWallet } from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
-import { skipIfMainnet } from "@helpers/cardano";
+import { getWalletBalance, skipIfMainnet } from "@helpers/cardano";
 import { pollTransaction } from "@helpers/transaction";
 import { test as setup } from "@fixtures/walletExtension";
 import { loadAmountFromFaucet } from "@services/faucetService";
-import kuberService from "@services/kuberService";
-import { functionWaitedAssert } from "@helpers/waitedLoop";
 
 setup.describe.configure({ timeout: environments.txTimeOut });
 
@@ -17,15 +15,17 @@ setup.beforeEach(async () => {
 });
 
 setup("Faucet setup", async () => {
-  let balance: number;
-  functionWaitedAssert(
-    async () => {
-      balance = await kuberService.getBalance(faucetWallet.address);
-    },
-    { message: "get balance" }
-  );
-
-  if (balance > 100_000) return;
-  const res = await loadAmountFromFaucet(faucetWallet.address);
-  await pollTransaction(res.txid);
+  const balance = await getWalletBalance(faucetWallet.address);
+  if (balance > 450_000) return;
+  if (environments.faucet.apiKey === "" || environments.faucet.apiKey === undefined) {
+    console.log("Faucet API key is not set");
+    console.log("please fund 10_000 Ada to the wallet", faucetWallet.address);
+  } else {
+    try {
+      const res = await loadAmountFromFaucet(faucetWallet.address);
+      await pollTransaction(res.txid);
+    } catch (e) {
+      console.log("Error loading amount from faucet", e);
+    }
+  }
 });

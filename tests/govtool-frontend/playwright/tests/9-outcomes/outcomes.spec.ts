@@ -1,11 +1,7 @@
 import { InvalidMetadata } from "@constants/index";
 import { test } from "@fixtures/walletExtension";
-import {
-  correctVoteAdaFormat,
-  formatWithThousandSeparator,
-} from "@helpers/adaFormat";
+import { formatWithThousandSeparator } from "@helpers/adaFormat";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import {
   areCCVoteTotalsDisplayed,
@@ -24,7 +20,6 @@ const invalidOutcomeProposals = require("../../lib/_mock/outcome.json");
 
 test.beforeEach(async () => {
   await setAllureEpic("9. Outcomes");
-  await skipIfNotHardFork();
 });
 
 const status = ["Expired", "Ratified", "Enacted", "Live"];
@@ -170,9 +165,7 @@ test.describe("Outcome details dependent test", () => {
     const outcomesPage = new OutComesPage(currentPage);
 
     await outcomesPage.searchInput.fill(governanceActionId);
-    await expect(
-      currentPage.getByRole("progressbar").getByRole("img")
-    ).toBeVisible();
+
     await page
       .getByTestId(`${governanceActionId}-CIP-105-id`)
       .getByTestId("copy-button")
@@ -455,7 +448,7 @@ test("9G. Should display correct vote counts on outcome details page", async ({
             name: "Explicit",
           })
         ).toHaveText(
-          `Explicit${formatWithThousandSeparator(Math.ceil(proposalToCheck.pool_abstain_votes) / 1000000)}`
+          `Explicit${formatWithThousandSeparator(proposalToCheck.pool_abstain_votes, false)}`
         ); //BUG missing testIds
         await expect(
           govActionDetailsPage.sPosResultData

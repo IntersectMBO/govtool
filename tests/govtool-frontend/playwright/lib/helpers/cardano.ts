@@ -47,16 +47,6 @@ export async function skipIfNotInfoAndBootstrapping(type: ProposalType) {
   }
 }
 
-export async function skipIfNotHardFork() {
-  const currentProtocolVersion = await getProtocolParamsMajorVersion();
-  if (currentProtocolVersion < 9) {
-    await allure.description(
-      "Govtool Features will be available after hardfork."
-    );
-    test.skip();
-  }
-}
-
 export async function skipIfMainnet() {
   if (environments.networkId === 1) {
     await allure.description(

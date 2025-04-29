@@ -114,7 +114,7 @@ export default class GovernanceActionsPage {
       const proposalCards = await this.getAllProposals();
 
       for (const proposalCard of proposalCards) {
-        if (await proposalCard.isVisible()) {
+        if (await proposalCard.locator('[data-testid$="-type"]').isVisible()) {
           const hasFilter = await this._validateFiltersInProposalCard(
             proposalCard,
             filters

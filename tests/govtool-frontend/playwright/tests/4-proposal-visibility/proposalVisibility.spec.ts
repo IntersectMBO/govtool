@@ -1,6 +1,5 @@
 import { correctVoteAdaFormat } from "@helpers/adaFormat";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
 import {
   areCCVoteTotalsDisplayed,
   areDRepVoteTotalsDisplayed,
@@ -19,7 +18,6 @@ import { InvalidMetadata } from "@constants/index";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
-  await skipIfNotHardFork();
 });
 
 const infoTypeProposal: PaginatedLiveProposal = require("../../lib/_mock/infoTypeProposal.json");

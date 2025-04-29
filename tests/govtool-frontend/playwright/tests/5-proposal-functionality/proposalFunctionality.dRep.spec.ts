@@ -1,14 +1,11 @@
+import { dRep01AuthFile } from "@constants/auth";
 import environments from "@constants/environments";
 import { dRep01Wallet } from "@constants/staticWallets";
 import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import {
-  isBootStrapingPhase,
-  skipIfMainnet,
-  skipIfNotHardFork,
-} from "@helpers/cardano";
+import { isBootStrapingPhase, skipIfMainnet } from "@helpers/cardano";
 import { encodeCIP129Identifier } from "@helpers/encodeDecode";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
@@ -22,12 +19,11 @@ import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
   await setAllureEpic("5. Proposal functionality");
-  await skipIfNotHardFork();
   await skipIfMainnet();
 });
 
 test.describe("Proposal checks", () => {
-  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
+  test.use({ storageState: dRep01AuthFile, wallet: dRep01Wallet });
 
   let govActionDetailsPage: GovernanceActionDetailsPage;
   let currentPage: Page;
@@ -147,7 +143,7 @@ test.describe("Perform voting", () => {
     const dRepPage = await createNewPageWithWallet(browser, {
       storageState: tempDRepAuth,
       wallet,
-      enableStakeSigning: true,
+      enableDRepSigning: true,
     });
 
     const govActionsPage = new GovernanceActionsPage(dRepPage);
@@ -306,7 +302,7 @@ test.describe("Check voting power", () => {
     const dRepPage = await createNewPageWithWallet(browser, {
       storageState: tempDRepAuth,
       wallet,
-      enableStakeSigning: true,
+      enableDRepSigning: true,
     });
 
     await dRepPage.goto("/");

@@ -1,13 +1,11 @@
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { expect } from "@playwright/test";
 const invalidInfinityProposals = require("../../lib/_mock/invalidInfinityProposals.json");
 
 test.beforeEach(async () => {
   await setAllureEpic("5. Proposal functionality");
-  await skipIfNotHardFork();
 });
 test.describe("Bad Proposals", () => {
   let govActionsPage: GovernanceActionsPage;

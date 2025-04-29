@@ -1,6 +1,5 @@
 import environments from "@constants/environments";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
 import { convertDRep, fetchFirstActiveDRepDetails } from "@helpers/dRep";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import DRepDetailsPage from "@pages/dRepDetailsPage";
@@ -11,7 +10,6 @@ import { DRepStatus, IDRep, PaginatedDRepResponse } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
-  await skipIfNotHardFork();
 });
 
 enum SortOption {

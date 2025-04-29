@@ -18,6 +18,7 @@ on:
           - "govtool.cardanoapi.io"
           - "preview.gov.tools"
           - "gov.tools"
+          - "p80-z78acf3c2-zded6a792-gtw.z937eb260.rustrocks.fr"
       network:
         required: true
         type: choice
@@ -129,6 +130,7 @@ jobs:
       CARDANOAPI_METADATA_URL: ${{vars.CARDANOAPI_METADATA_URL}}
       PROPOSAL_FAUCET_PAYMENT_PRIVATE: ${{secrets.PROPOSAL_FAUCET_PAYMENT_PRIVATE}}
       PROPOSAL_FAUCET_STAKE_PRIVATE: ${{secrets.PROPOSAL_FAUCET_STAKE_PRIVATE}}
+      PROPOSAL_FAUCET_DREP_PRIVATE: ${{secrets.PROPOSAL_FAUCET_DREP_PRIVATE}}
 
   publish-report:
     runs-on: ubuntu-latest

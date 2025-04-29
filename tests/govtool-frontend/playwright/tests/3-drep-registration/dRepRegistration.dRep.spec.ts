@@ -5,7 +5,7 @@ import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
-import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
+import { skipIfMainnet } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
@@ -14,15 +14,20 @@ import { expect } from "@playwright/test";
 import walletManager from "lib/walletManager";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { GovernanceActionType } from "@types";
+import { dRep01AuthFile } from "@constants/auth";
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
-  await skipIfNotHardFork();
   await skipIfMainnet();
 });
 
 test.describe("Logged in DReps", () => {
-  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
+  test.use({
+    storageState: dRep01AuthFile,
+    wallet: dRep01Wallet,
+    enableDRepSigning: true,
+    enableStakeSigning: false,
+  });
 
   test("3A. Should show dRepId on dashboard and enable voting on governance actions after connecting registered dRep Wallet", async ({
     page,
@@ -94,6 +99,15 @@ test.describe("Logged in DReps", () => {
     });
     await page.getByTestId("confirm-modal-button").click();
   });
+
+  test("3S. Should restrict dRep registration for dRep", async ({ page }) => {
+    await page.goto(`${environments.frontendUrl}/register_drep`);
+
+    await expect(page.getByText("You already are a DRep")).toBeVisible({
+      timeout: 60_000,
+    });
+    await expect(page.getByTestId("name-input")).not.toBeVisible();
+  });
 });
 
 test.describe("Temporary DReps", () => {
@@ -109,6 +123,7 @@ test.describe("Temporary DReps", () => {
     const dRepPage = await createNewPageWithWallet(browser, {
       storageState: tempDRepAuth,
       wallet,
+      enableDRepSigning: true,
       enableStakeSigning: true,
     });
 
@@ -135,6 +150,7 @@ test.describe("Temporary DReps", () => {
       storageState: tempDRepAuth,
       wallet,
       enableStakeSigning: true,
+      enableDRepSigning: true,
     });
 
     const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);
@@ -169,7 +185,7 @@ test.describe("Temporary DReps", () => {
     const dRepPage = await createNewPageWithWallet(browser, {
       storageState: tempDRepAuth,
       wallet,
-      enableStakeSigning: true,
+      enableDRepSigning: true,
     });
 
     await dRepPage.goto("/");
@@ -194,7 +210,7 @@ test.describe("Temporary DReps", () => {
     const dRepPage = await createNewPageWithWallet(browser, {
       storageState: dRepAuth,
       wallet,
-      enableStakeSigning: true,
+      enableDRepSigning: true,
     });
 
     await dRepPage.goto("/");
@@ -233,6 +249,7 @@ test.describe("Temporary DReps", () => {
       storageState: dRepAuth,
       wallet,
       enableStakeSigning: true,
+      enableDRepSigning: true,
     });
 
     const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);

@@ -13,7 +13,6 @@ import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import { expect, Page } from "@playwright/test";
-import { allure } from "allure-playwright";
 import environments from "lib/constants/environments";
 
 test.beforeEach(async () => {

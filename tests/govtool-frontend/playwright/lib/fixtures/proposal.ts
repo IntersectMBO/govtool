@@ -1,3 +1,4 @@
+import { proposal01AuthFile } from "@constants/auth";
 import { proposal01Wallet } from "@constants/staticWallets";
 import { test as base } from "@fixtures/walletExtension";
 import { createNewPageWithWallet } from "@helpers/page";
@@ -15,7 +16,7 @@ export const test = base.extend<TestOptions>({
   proposalId: async ({ browser, pollEnabled }, use) => {
     // setup
     const proposalPage = await createNewPageWithWallet(browser, {
-      storageState: ".auth/proposal01.json",
+      storageState: proposal01AuthFile,
       wallet: proposal01Wallet,
     });
 

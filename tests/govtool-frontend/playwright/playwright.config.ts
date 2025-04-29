@@ -149,7 +149,7 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.delegation.spec.ts",
       dependencies: environments.ci
-        ? ["adaholder auth setup", "dRep setup", "wallet bootstrap"]
+        ? ["adaholder auth setup","dRep auth setup", "dRep setup", "wallet bootstrap"]
         : [],
       teardown: environments.ci && "cleanup delegation",
     },

@@ -47,18 +47,17 @@ npx playwright install
 
 ---
 
-
 ## 🌐 Environment Setup
 
 ### HOST URL
 
-| Environment | URL |
-| :---------- | :-- |
+| Environment | URL                                                                                                                        |
+| :---------- | :------------------------------------------------------------------------------------------------------------------------- |
 | Development | [https://p80-z78acf3c2-zded6a792-gtw.z937eb260.rustrocks.fr/](https://p80-z78acf3c2-zded6a792-gtw.z937eb260.rustrocks.fr/) |
-| QA          | [https://govtool.cardanoapi.io/](https://govtool.cardanoapi.io/) |
-| Preview     | [https://preview.gov.tools/](https://preview.gov.tools/) |
-| Pre-Prod    | [https://pre-prod.gov.tools/](https://pre-prod.gov.tools/) |
-| Mainnet     | [https://gov.tools/](https://gov.tools/) |
+| QA          | [https://govtool.cardanoapi.io/](https://govtool.cardanoapi.io/)                                                           |
+| Preview     | [https://preview.gov.tools/](https://preview.gov.tools/)                                                                   |
+| Pre-Prod    | [https://pre-prod.gov.tools/](https://pre-prod.gov.tools/)                                                                 |
+| Mainnet     | [https://gov.tools/](https://gov.tools/)                                                                                   |
 
 ---
 
@@ -93,6 +92,7 @@ npm run generate-wallets
 ---
 
 ### 🔁 Run All Tests
+
 - **Requirements**: Faucet API key , valid proposal faucet private keys , valid Blockfrost and Kuber API keys
 
 - **Headless mode** (no UI):
@@ -116,7 +116,8 @@ Each test suite can be run in **UI** or **Headless** mode.
 ---
 
 #### 1. **Delegation Pillars**
-- **Requirements**: Faucet API key, valid proposal faucet private keys and valid Blockfrost and Kuber API keys 
+
+- **Requirements**: Faucet API key, valid proposal faucet private keys and valid Blockfrost and Kuber API keys
 - **UI Mode**:
   ```bash
   npm run test:delegation-pillars
@@ -129,6 +130,7 @@ Each test suite can be run in **UI** or **Headless** mode.
 ---
 
 #### 2. **Voting Pillars**
+
 - **Requirements**: Faucet API key, valid proposal faucet private keys and valid Blockfrost and Kuber API keys
 - **UI Mode**:
   ```bash
@@ -142,6 +144,7 @@ Each test suite can be run in **UI** or **Headless** mode.
 ---
 
 #### 3. **Outcomes**
+
 - **UI Mode**:
   ```bash
   npm run test:outcomes
@@ -153,9 +156,11 @@ Each test suite can be run in **UI** or **Headless** mode.
 
 ---
 
-#### 4. **Proposal Pillars**  
-_Includes both Proposal Discussion and Budget Discussion_  
-- **Requirements**: Valid proposal faucet private keys and valid Blockfrost and Kuber API keys 
+#### 4. **Proposal Pillars**
+
+_Includes both Proposal Discussion and Budget Discussion_
+
+- **Requirements**: Valid proposal faucet private keys and valid Blockfrost and Kuber API keys
 - **UI Mode**:
   ```bash
   npm run test:proposal-pillars
@@ -168,6 +173,7 @@ _Includes both Proposal Discussion and Budget Discussion_
 ---
 
 #### 5. **Proposal Discussion**
+
 - **Requirements**: Valid proposal faucet private keys and valid Blockfrost and Kuber API keys
 - **UI Mode**:
   ```bash
@@ -181,6 +187,7 @@ _Includes both Proposal Discussion and Budget Discussion_
 ---
 
 #### 6. **Proposal Budget**
+
 - **Requirements**: Valid proposal faucet private keys and valid Blockfrost and Kuber API keys
 - **UI Mode**:
   ```bash
@@ -194,6 +201,7 @@ _Includes both Proposal Discussion and Budget Discussion_
 ---
 
 #### 7. **Wallet Connect**
+
 - **UI Mode**:
   ```bash
   npm run test:wallet-connect
@@ -206,6 +214,7 @@ _Includes both Proposal Discussion and Budget Discussion_
 ---
 
 #### 8. **Usersnap Integration**
+
 - **UI Mode**:
   ```bash
   npm run test:usersnap
@@ -218,6 +227,7 @@ _Includes both Proposal Discussion and Budget Discussion_
 ---
 
 #### 9. **Miscellaneous Tests**
+
 - **UI Mode**:
   ```bash
   npm run test:misc

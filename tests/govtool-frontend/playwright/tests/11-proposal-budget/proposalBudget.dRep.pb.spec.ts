@@ -5,14 +5,17 @@ import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
 import { expect } from "@playwright/test";
 import { dRep03Wallet } from "@constants/staticWallets";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
+import { dRep03AuthFile } from "@constants/auth";
+import { skipIfMainnet } from "@helpers/cardano";
 
 test.beforeEach(async () => {
   await setAllureEpic("11. Proposal Budget");
+  await skipIfMainnet();
 });
 
 test.describe("Budget proposal dRep behaviour", () => {
   test.use({
-    storageState: ".auth/dRep03.json",
+    storageState: dRep03AuthFile,
     wallet: dRep03Wallet,
   });
 
@@ -100,6 +103,15 @@ test.describe("Budget proposal dRep behaviour", () => {
     await expect(
       dRepCommentedCard.getByText("DRep", { exact: true })
     ).toBeVisible();
+
+    const isDRepGivenNameVisible = await dRepCommentedCard
+      .getByTestId("given-name")
+      .isVisible();
+
+    expect(
+      isDRepGivenNameVisible,
+      !isDRepGivenNameVisible && "Missing given-name testId"
+    ).toBeTruthy();
 
     await expect(dRepCommentedCard.getByTestId("given-name")).toHaveText(
       dRep03Wallet.givenName

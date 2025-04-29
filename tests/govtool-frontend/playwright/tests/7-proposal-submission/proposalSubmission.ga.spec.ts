@@ -7,7 +7,7 @@ import { waitForTxConfirmation } from "@helpers/transaction";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
-import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
+import { skipIfMainnet } from "@helpers/cardano";
 import { ProposalType } from "@types";
 import { proposalFaucetWallet } from "@constants/proposalFaucetWallet";
 import walletManager from "lib/walletManager";
@@ -15,7 +15,6 @@ import { valid } from "@mock/index";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
-  await skipIfNotHardFork();
   await skipIfMainnet();
 });
 

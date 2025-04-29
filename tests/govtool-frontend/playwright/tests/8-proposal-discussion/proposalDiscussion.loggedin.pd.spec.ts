@@ -9,17 +9,20 @@ import { createNewPageWithWallet } from "@helpers/page";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import { Page, expect } from "@playwright/test";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
+import {
+  proposal01AuthFile,
+  proposal02AuthFile,
+  user01AuthFile,
+} from "@constants/auth";
 
 test.beforeEach(async () => {
   await setAllureEpic("8. Proposal Discussion Forum");
-  await skipIfNotHardFork();
 });
 
 test.describe("Proposal created logged in state", () => {
   test.use({
-    storageState: ".auth/proposal02.json",
+    storageState: proposal02AuthFile,
     wallet: proposal02Wallet,
   });
 
@@ -76,7 +79,7 @@ test.describe("Proposal created logged in state", () => {
 
 test.describe("Proposal created with poll enabled (user auth)", () => {
   test.use({
-    storageState: ".auth/proposal02.json",
+    storageState: proposal02AuthFile,
     wallet: proposal02Wallet,
     pollEnabled: true,
   });
@@ -136,7 +139,7 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
 
 test.describe("Proposal created with poll enabled (proposal auth)", () => {
   test.use({
-    storageState: ".auth/user01.json",
+    storageState: user01AuthFile,
     wallet: user01Wallet,
     pollEnabled: true,
   });
@@ -147,7 +150,7 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
   test.beforeEach(async ({ browser, proposalId }) => {
     test.slow();
     proposalPage = await createNewPageWithWallet(browser, {
-      storageState: ".auth/proposal01.json",
+      storageState: proposal01AuthFile,
       wallet: proposal01Wallet,
     });
     ownerProposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(

@@ -8,7 +8,7 @@ import { functionWaitedAssert } from "@helpers/waitedLoop";
 import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 import { expect } from "@playwright/test";
-import { BudgetDiscussionEnum, CommentResponse } from "@types";
+import { BudgetDiscussionEnum } from "@types";
 
 const mockBudgetProposal = require("../../lib/_mock/budgetProposal.json");
 const mockPoll = require("../../lib/_mock/budgetProposalPoll.json");

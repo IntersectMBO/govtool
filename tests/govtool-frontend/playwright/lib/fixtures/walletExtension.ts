@@ -7,6 +7,7 @@ import { injectLogger } from "@helpers/page";
 type WalletExtensionTestOptions = {
   wallet?: StaticWallet;
   enableStakeSigning: boolean;
+  enableDRepSigning: boolean;
   supportedExtensions: Record<string, number>[];
 };
 
@@ -14,14 +15,26 @@ export const test = base.extend<WalletExtensionTestOptions>({
   wallet: [null, { option: true }],
 
   enableStakeSigning: [true, { option: true }],
+  enableDRepSigning: [false, { option: true }],
 
   supportedExtensions: [[{ cip: 95 }], { option: true }],
 
   page: async (
-    { page, wallet, enableStakeSigning, supportedExtensions },
+    {
+      page,
+      wallet,
+      enableStakeSigning,
+      supportedExtensions,
+      enableDRepSigning,
+    },
     use
   ) => {
-    await loadDemosExtension(page, enableStakeSigning, supportedExtensions);
+    await loadDemosExtension(
+      page,
+      enableStakeSigning,
+      enableDRepSigning,
+      supportedExtensions
+    );
 
     if (wallet) {
       await importWallet(page, wallet);

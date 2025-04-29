@@ -1,7 +1,7 @@
 import environments from "@constants/environments";
 import { proposalFaucetWallet } from "@constants/proposalFaucetWallet";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
-import { skipIfMainnet, skipIfNotHardFork } from "@helpers/cardano";
+import { skipIfMainnet } from "@helpers/cardano";
 import { generateWallets } from "@helpers/shellyWallet";
 import { pollTransaction } from "@helpers/transaction";
 import { test as setup } from "@fixtures/walletExtension";
@@ -26,7 +26,6 @@ setup.beforeAll(async () => {
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Proposal");
-  await skipIfNotHardFork();
   await skipIfMainnet();
 });
 

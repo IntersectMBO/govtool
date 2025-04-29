@@ -136,8 +136,8 @@ export class ShelleyWallet {
   }
 
   dRepIdBech32() {
-    const stakePubKey = Buffer.from(this.stakeKey.public).toString("hex");
-    const dRepKeyBytes = Buffer.from(stakePubKey, "hex");
+    const dRepPubKey = Buffer.from(this.dRepKey.public).toString("hex");
+    const dRepKeyBytes = Buffer.from(dRepPubKey, "hex");
     const dRepId = blake.blake2bHex(dRepKeyBytes, undefined, 28);
     const words = bech32.toWords(Buffer.from(dRepId, "hex"));
     const dRepIdBech32 = bech32.encode("drep", words);
@@ -176,6 +176,11 @@ export class ShelleyWallet {
     if (!stakeKey || typeof stakeKey !== "object") {
       throw new Error(
         "ShelleyWallet.fromJson : Invalid stake key: It must be an object."
+      );
+    }
+    if (!dRepKey || typeof dRepKey !== "object") {
+      throw new Error(
+        "ShelleyWallet.fromJson : Invalid dRep key: It must be an object."
       );
     }
     return new ShelleyWallet(

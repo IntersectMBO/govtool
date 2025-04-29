@@ -44,7 +44,8 @@ export const adaHolderWallets = [
 
 export const userWallets = [user01Wallet];
 
-export const dRepWallets = [dRep01Wallet, dRep02Wallet, dRep03Wallet];
+export const dRepWallets = [dRep01Wallet, dRep02Wallet];
+export const budgetProposalDRepWallets = [dRep03Wallet];
 
 export const proposalWallets = [
   proposal01Wallet,
@@ -65,4 +66,5 @@ export const allStaticWallets = [
   ...proposalWallets,
   faucetWallet,
   proposalFaucetWallet,
+  ...budgetProposalDRepWallets,
 ];

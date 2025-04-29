@@ -1,3 +1,9 @@
+import {
+  proposal01AuthFile,
+  proposal03AuthFile,
+  proposal04AuthFile,
+  proposal06AuthFile,
+} from "@constants/auth";
 import environments from "@constants/environments";
 import {
   proposal01Wallet,
@@ -11,7 +17,6 @@ import { setAllureEpic } from "@helpers/allure";
 import { getDraftProposalWalletAndState } from "@helpers/auth";
 import {
   skipIfNotInfoAndBootstrapping,
-  skipIfNotHardFork,
   isBootStrapingPhase,
 } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
@@ -24,11 +29,10 @@ import { ProposalCreateRequest, ProposalType } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
-  await skipIfNotHardFork();
 });
 
 test.describe("Proposal created logged state", () => {
-  test.use({ storageState: ".auth/proposal01.json", wallet: proposal01Wallet });
+  test.use({ storageState: proposal01AuthFile, wallet: proposal01Wallet });
   test("7B. Should access proposal creation page", async ({ page }) => {
     await page.goto("/");
     await page.getByTestId("proposal-discussion-link").click();
@@ -368,7 +372,7 @@ test.describe("Proposal created logged state", () => {
 test.describe("Proposal Draft", () => {
   test("7C. Should list unfinished Draft ", async ({ browser }) => {
     const page = await createNewPageWithWallet(browser, {
-      storageState: ".auth/proposal03.json",
+      storageState: proposal03AuthFile,
       wallet: proposal03Wallet,
     });
     const proposalSubmissionPage = new ProposalSubmissionPage(page);
@@ -384,7 +388,7 @@ test.describe("Proposal Draft", () => {
 
   test("7L. Should save proposal as a draft", async ({ browser }) => {
     const page = await createNewPageWithWallet(browser, {
-      storageState: ".auth/proposal04.json",
+      storageState: proposal04AuthFile,
       wallet: proposal04Wallet,
     });
 
@@ -534,7 +538,7 @@ test.describe("Proposal Draft", () => {
 
   test("7N. Should submit a draft proposal", async ({ browser }) => {
     const page = await createNewPageWithWallet(browser, {
-      storageState: ".auth/proposal06.json",
+      storageState: proposal06AuthFile,
       wallet: proposal06Wallet,
     });
 

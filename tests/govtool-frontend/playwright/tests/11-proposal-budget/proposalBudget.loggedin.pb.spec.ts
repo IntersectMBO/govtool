@@ -1,3 +1,4 @@
+import { budgetProposal01AuthFile } from "@constants/auth";
 import { budgetProposal01Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
@@ -12,7 +13,7 @@ test.beforeEach(async () => {
 
 test.describe("Budget proposal logged in state", () => {
   test.use({
-    storageState: ".auth/budgetProposal01.json",
+    storageState: budgetProposal01AuthFile,
     wallet: budgetProposal01Wallet,
   });
 

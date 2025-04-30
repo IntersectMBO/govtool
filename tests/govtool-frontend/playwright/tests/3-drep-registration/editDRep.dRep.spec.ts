@@ -98,61 +98,50 @@ test.describe("Validation of edit dRep Form", () => {
     }
   });
 
-  test("3N_1. Should accept valid metadata anchor on edit dRep", async ({
-    page,
-  }) => {
-    const editDRepPage = new EditDRepPage(page);
-    await editDRepPage.goto();
+  test.describe("Metadata anchor Validation", () => {
+    let editDRepPage: EditDRepPage;
+    test.beforeEach(async ({ page }) => {
+      editDRepPage = new EditDRepPage(page);
+      await editDRepPage.goto();
 
-    const dRepName = "Test_DRep";
-    await editDRepPage.nameInput.fill(dRepName);
+      const dRepName = faker.person.firstName();
+      await editDRepPage.nameInput.fill(dRepName);
 
-    await editDRepPage.continueBtn.click();
-    await page.getByRole("checkbox").click();
-    await editDRepPage.registerBtn.click();
-
-    for (let i = 0; i < 100; i++) {
-      await editDRepPage.metadataUrlInput.fill(mockValid.url());
-      await expect(page.getByTestId("invalid-url-error")).toBeHidden();
-    }
-  });
-
-  test("3N_2. Should reject invalid dRep metadata anchor on edit dRep", async ({
-    page,
-  }) => {
-    const editDRepPage = new EditDRepPage(page);
-    await editDRepPage.goto();
-
-    const dRepName = "Test_DRep";
-    await editDRepPage.nameInput.fill(dRepName);
-
-    await editDRepPage.continueBtn.click();
-    await page.getByRole("checkbox").click();
-    await editDRepPage.registerBtn.click();
-
-    for (let i = 0; i < 100; i++) {
-      const invalidUrl = mockInvalid.url(false);
-      await editDRepPage.metadataUrlInput.fill(invalidUrl);
-      if (invalidUrl.length <= 128) {
-        await expect(page.getByTestId("invalid-url-error")).toBeVisible();
-      } else {
-        await expect(
-          page.getByTestId("url-must-be-less-than-128-bytes-error")
-        ).toBeVisible();
+      await editDRepPage.continueBtn.click();
+      await page.getByRole("checkbox").click();
+      await editDRepPage.registerBtn.click();
+    });
+    test("3N_1. Should accept valid metadata anchor on edit dRep", async ({
+      page,
+    }) => {
+      for (let i = 0; i < 100; i++) {
+        await editDRepPage.metadataUrlInput.fill(mockValid.url());
+        await expect(page.getByTestId("invalid-url-error")).toBeHidden();
       }
-    }
+    });
 
-    const sentenceWithoutSpace = faker.lorem
-      .sentence(128)
-      .replace(/[\s.]/g, "");
-    const metadataAnchorGreaterThan128Bytes =
-      faker.internet.url({ appendSlash: true }) + sentenceWithoutSpace;
-
-    await editDRepPage.metadataUrlInput.fill(metadataAnchorGreaterThan128Bytes);
-
-    await expect(
-      page.getByTestId("url-must-be-less-than-128-bytes-error")
-    ).toBeVisible();
+    test("3N_2. Should reject invalid dRep metadata anchor on edit dRep", async ({
+      page,
+    }) => {
+      for (let i = 0; i < 100; i++) {
+        const invalidUrl = mockInvalid.url(false);
+        const sentenceWithoutSpace = faker.lorem
+          .sentence({ min: 128, max: 500 })
+          .replace(/[\s.]/g, "");
+        const metadataAnchorGreaterThan128Bytes =
+          faker.internet.url({ appendSlash: true }) + sentenceWithoutSpace;
+        const checkedUrl =
+          Math.random() > 0.5 ? invalidUrl : metadataAnchorGreaterThan128Bytes;
+        await editDRepPage.metadataUrlInput.fill(checkedUrl);
+        if (checkedUrl.length <= 128) {
+          await expect(page.getByTestId("invalid-url-error")).toBeVisible();
+        } else {
+          await expect(
+            page.getByTestId("url-must-be-less-than-128-bytes-error")
+          ).toBeVisible();
+        }
+      }
+    });
   });
 });
 

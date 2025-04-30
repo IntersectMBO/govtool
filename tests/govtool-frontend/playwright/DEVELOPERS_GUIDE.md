@@ -118,7 +118,7 @@ Sure! Here's a refined and clearer version of your note:
 - Use the terminal to run specific test suites using the commands provided in the **README.md**.
 - Ensure all test files are recognized in the **Test Explorer**.
 
-![Test Runner Screenshot](image.png)
+![Test Runner Screenshot](/docs/image.png)
 
 - Use the **Play** ▶️ icon to run individual tests directly from the UI.
 
@@ -128,12 +128,12 @@ Sure! Here's a refined and clearer version of your note:
 
 - Add **Playwright Test for VSCode** extension
 
-  ![Playwright Test Screenshot](image-1.png)
+  ![Playwright Test Screenshot](/docs/image-1.png)
 
 1. **Remove** the `CI` environment variable.
 2. **Navigate** to the specific directory where your test is located to run it directly.
 
-   ![Directory Navigation Screenshot](image-2.png)
+   ![Directory Navigation Screenshot](/docs/image-2.png)
 
 > **Note:**
 >

@@ -253,4 +253,4 @@ npm run allure:serve
 
 For contribution guidelines and development tips, refer to:
 
-📄 **`DEVELOPERS_GUIDE.md`**
+📄 **[DEVELOPERS_GUIDE.md](/DEVELOPERS_GUIDE.md)**

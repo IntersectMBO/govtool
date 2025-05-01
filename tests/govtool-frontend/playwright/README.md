@@ -93,19 +93,19 @@ npm run generate-wallets
 
 ### 🔁 Run All Tests
 
-- **Requirements**: Faucet API key , valid proposal faucet private keys , valid Blockfrost and Kuber API keys
+- **Pre-requisite**: Ensure the faucet address holds at least **412,000 ADA**.
 
-- **Headless mode** (no UI):
+#### 🖥️ UI Mode
 
-  ```bash
-  npm run test
-  ```
+```bash
+npm run test
+```
 
-- **UI mode**:
+#### 🧪 Headless Mode (No UI)
 
-  ```bash
-  npm run test:headless
-  ```
+```bash
+npm run test:headless
+```
 
 ---
 
@@ -117,42 +117,53 @@ Each test suite can be run in **UI** or **Headless** mode.
 
 #### 1. **Delegation Pillars**
 
-- **Requirements**: Faucet API key, valid proposal faucet private keys and valid Blockfrost and Kuber API keys
-- **UI Mode**:
-  ```bash
-  npm run test:delegation-pillars
-  ```
-- **Headless Mode**:
-  ```bash
-  npm run test:headless:delegation-pillars
-  ```
+- **Pre-requisite**: Ensure the faucet address holds at least **12,000 ADA**.
+
+#### 🖥️ UI Mode
+
+```bash
+npm run test:delegation-pillars
+```
+
+#### 🧪 Headless Mode (No UI)
+
+```bash
+npm run test:headless:delegation-pillars
+```
 
 ---
 
 #### 2. **Voting Pillars**
 
-- **Requirements**: Faucet API key, valid proposal faucet private keys and valid Blockfrost and Kuber API keys
-- **UI Mode**:
-  ```bash
-  npm run test:voting-pillars
-  ```
-- **Headless Mode**:
-  ```bash
-  npm run test:headless:voting-pillars
-  ```
+- **Pre-requisite**: Ensure the faucet address holds at least **12,000 ADA**.
+
+#### 🖥️ UI Mode
+
+```bash
+npm run test:voting-pillars
+```
+
+#### 🧪 Headless Mode (No UI)
+
+```bash
+npm run test:headless:voting-pillars
+```
 
 ---
 
 #### 3. **Outcomes**
 
-- **UI Mode**:
-  ```bash
-  npm run test:outcomes
-  ```
-- **Headless Mode**:
-  ```bash
-  npm run test:headless:outcomes
-  ```
+#### 🖥️ UI Mode
+
+```bash
+npm run test:outcomes
+```
+
+#### 🧪 Headless Mode (No UI)
+
+```bash
+npm run test:headless:outcomes
+```
 
 ---
 
@@ -160,82 +171,103 @@ Each test suite can be run in **UI** or **Headless** mode.
 
 _Includes both Proposal Discussion and Budget Discussion_
 
-- **Requirements**: Valid proposal faucet private keys and valid Blockfrost and Kuber API keys
-- **UI Mode**:
-  ```bash
-  npm run test:proposal-pillars
-  ```
-- **Headless Mode**:
-  ```bash
-  npm run test:headless:proposal-pillars
-  ```
+- **Pre-requisite**: Ensure the faucet address holds at least **403,000 ADA**.
+
+#### 🖥️ UI Mode
+
+```bash
+npm run test:proposal-pillars
+```
+
+#### 🧪 Headless Mode (No UI)
+
+```bash
+npm run test:headless:proposal-pillars
+```
 
 ---
 
 #### 5. **Proposal Discussion**
 
-- **Requirements**: Valid proposal faucet private keys and valid Blockfrost and Kuber API keys
-- **UI Mode**:
-  ```bash
-  npm run test:proposal-discussion
-  ```
-- **Headless Mode**:
-  ```bash
-  npm run test:headless:proposal-discussion
-  ```
+- **Pre-requisite**: Ensure the faucet address holds at least **401,000 ADA**.
+
+#### 🖥️ UI Mode
+
+```bash
+npm run test:proposal-discussion
+```
+
+#### 🧪 Headless Mode (No UI)
+
+```bash
+npm run test:headless:proposal-discussion
+```
 
 ---
 
 #### 6. **Proposal Budget**
 
-- **Requirements**: Valid proposal faucet private keys and valid Blockfrost and Kuber API keys
-- **UI Mode**:
-  ```bash
-  npm run test:proposal-budget
-  ```
-- **Headless Mode**:
-  ```bash
-  npm run test:headless:proposal-budget
-  ```
+- **Pre-requisite**: Ensure the faucet address holds at least **1,000 ADA**.
+
+#### 🖥️ UI Mode
+
+```bash
+npm run test:proposal-budget
+```
+
+#### 🧪 Headless Mode (No UI)
+
+```bash
+npm run test:headless:proposal-budget
+```
 
 ---
 
 #### 7. **Wallet Connect**
 
-- **UI Mode**:
-  ```bash
-  npm run test:wallet-connect
-  ```
-- **Headless Mode**:
-  ```bash
-  npm run test:headless:wallet-connect
-  ```
+#### 🖥️ UI Mode
+
+```bash
+npm run test:wallet-connect
+```
+
+#### 🧪 Headless Mode (No UI)
+
+```bash
+npm run test:headless:wallet-connect
+```
 
 ---
 
 #### 8. **Usersnap Integration**
 
-- **UI Mode**:
-  ```bash
-  npm run test:usersnap
-  ```
-- **Headless Mode**:
-  ```bash
-  npm run test:headless:usersnap
-  ```
+#### 🖥️ UI Mode
+
+```bash
+npm run test:usersnap
+```
+
+#### 🧪 Headless Mode (No UI)
+
+```bash
+npm run test:headless:usersnap
+```
 
 ---
 
 #### 9. **Miscellaneous Tests**
 
-- **UI Mode**:
-  ```bash
-  npm run test:misc
-  ```
-- **Headless Mode**:
-  ```bash
-  npm run test:headless:misc
-  ```
+#### 🖥️ UI Mode
+
+```bash
+npm run test:misc
+```
+
+#### 🧪 Headless Mode (No UI)
+
+```bash
+npm run test:headless:misc
+```
 
 ---
 

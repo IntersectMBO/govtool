@@ -93,16 +93,12 @@ jobs:
 
           # Set API keys based on the network
           if [[ "${{ env.NETWORK }}" == "preprod" ]]; then
-            export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_PREPROD }}"
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_PREPROD }}"
           elif [[ "${{ env.NETWORK }}" == "sanchonet" ]]; then
-            export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_SANCHONET }}"
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_SANCHONET }}"
           elif [[ "${{ env.NETWORK }}" == "preview" ]]; then
-            export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_PREVIEW }}"
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_PREVIEW }}"
           else
-            export FAUCET_API_KEY="${{ secrets.FAUCET_API_KEY_PREVIEW }}"
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_MAINNET }}"
           fi
 
@@ -123,7 +119,6 @@ jobs:
           path: tests/govtool-frontend/playwright/lock_logs.txt
 
     env:
-      API_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io' }}/api
       DOCS_URL: ${{ vars.DOCS_URL }}
       KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}
       NETWORK: ${{ inputs.network || vars.NETWORK }}
@@ -131,9 +126,8 @@ jobs:
       CI: ${{vars.CI}}
       FAUCET_ADDRESS: ${{vars.FAUCET_ADDRESS}}
       CARDANOAPI_METADATA_URL: ${{vars.CARDANOAPI_METADATA_URL}}
-      PROPOSAL_FAUCET_PAYMENT_PRIVATE: ${{secrets.PROPOSAL_FAUCET_PAYMENT_PRIVATE}}
-      PROPOSAL_FAUCET_STAKE_PRIVATE: ${{secrets.PROPOSAL_FAUCET_STAKE_PRIVATE}}
-      PROPOSAL_FAUCET_DREP_PRIVATE: ${{secrets.PROPOSAL_FAUCET_DREP_PRIVATE}}
+      FAUCET_PAYMENT_PRIVATE: ${{secrets.FAUCET_PAYMENT_PRIVATE}}
+      FAUCET_STAKE_PKH: ${{secrets.FAUCET_STAKE_PKH}}
 
   publish-report:
     runs-on: ubuntu-latest

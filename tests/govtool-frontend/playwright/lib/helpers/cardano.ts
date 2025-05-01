@@ -1,12 +1,11 @@
 import environments from "@constants/environments";
 import test from "@playwright/test";
 import kuberService from "@services/kuberService";
-import { ProposalType, ProtocolParams } from "@types";
+import { ProposalType } from "@types";
 import { allure } from "allure-playwright";
 import { bech32 } from "bech32";
 import { functionWaitedAssert } from "./waitedLoop";
 import { createFile, getFile } from "./file";
-import { faucetWallet } from "@constants/staticWallets";
 
 export function lovelaceToAda(lovelace: number) {
   if (lovelace === 0) return 0;
@@ -57,8 +56,18 @@ export async function skipIfMainnet() {
   }
 }
 
+export async function skipIfTemporyWalletIsNotAvailable(fileName: string) {
+  const wallets = (await getFile(fileName)) || [];
+  if (wallets.length === 0) {
+    await allure.description(
+      `Temporary wallet file "${fileName}" is not available or contains insufficient wallet. Please fund the faucet wallet and run the test again.`
+    );
+    test.skip();
+  }
+}
+
 export async function skipIfBalanceIsInsufficient(limit = 10) {
-  const balance = await getWalletBalance(faucetWallet.address);
+  const balance = await getWalletBalance(environments.faucet.address);
   if (balance <= limit) {
     await allure.description("Not enough balance to perform this action.");
     test.skip();
@@ -76,7 +85,7 @@ export async function getWalletBalance(address: string) {
         balance = faucetWalletBalanceDetails["balance"];
       } else {
         faucetWalletBalanceDetails["balance"] = balance;
-        faucetWalletBalanceDetails["address"] = faucetWallet.address;
+        faucetWalletBalanceDetails["address"] = environments.faucet.address;
         await createFile(
           "faucetWalletBalance.json",
           faucetWalletBalanceDetails

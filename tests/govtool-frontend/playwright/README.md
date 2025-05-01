@@ -51,13 +51,13 @@ npx playwright install
 
 ### HOST URL
 
-| Environment | URL                                                                                                                        |
-| :---------- | :------------------------------------------------------------------------------------------------------------------------- |
-| Development | [https://p80-z78acf3c2-zded6a792-gtw.z937eb260.rustrocks.fr/](https://p80-z78acf3c2-zded6a792-gtw.z937eb260.rustrocks.fr/) |
-| QA          | [https://govtool.cardanoapi.io/](https://govtool.cardanoapi.io/)                                                           |
-| Preview     | [https://preview.gov.tools/](https://preview.gov.tools/)                                                                   |
-| Pre-Prod    | [https://pre-prod.gov.tools/](https://pre-prod.gov.tools/)                                                                 |
-| Mainnet     | [https://gov.tools/](https://gov.tools/)                                                                                   |
+| Environment | URL                                                                                                                      |
+| :---------- | :----------------------------------------------------------------------------------------------------------------------- |
+| Development | [https://p80-z78acf3c2-zded6a792-gtw.z937eb260.rustrocks.fr](https://p80-z78acf3c2-zded6a792-gtw.z937eb260.rustrocks.fr) |
+| QA          | [https://govtool.cardanoapi.io](https://govtool.cardanoapi.io)                                                           |
+| Preview     | [https://preview.gov.tools](https://preview.gov.tools)                                                                   |
+| Pre-Prod    | [https://pre-prod.gov.tools](https://pre-prod.gov.tools)                                                                 |
+| Mainnet     | [https://gov.tools](https://gov.tools)                                                                                   |
 
 ---
 

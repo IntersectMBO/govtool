@@ -17,7 +17,7 @@ cleanup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Cleanup");
   await skipIfMainnet();
-  await skipIfBalanceIsInsufficient(100);
+  await skipIfBalanceIsInsufficient(10);
 });
 
 cleanup("DRep de-registration", async () => {

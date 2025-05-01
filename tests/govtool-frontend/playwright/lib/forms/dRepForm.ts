@@ -1,4 +1,5 @@
 import { downloadMetadata } from "@helpers/metadata";
+import { functionWaitedAssert } from "@helpers/waitedLoop";
 import { Download, Page, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
 import { IDRepInfo } from "@types";
@@ -118,8 +119,14 @@ export default class DRepForm {
     await this.form.getByRole("checkbox").click();
     await this.registerBtn.click();
 
-    this.metadataDownloadBtn.click();
-    const dRepMetadata = await this.downloadVoteMetadata();
+    let dRepMetadata: { name: string; data: JSON };
+    await functionWaitedAssert(
+      async () => {
+        this.metadataDownloadBtn.click();
+        dRepMetadata = await this.downloadVoteMetadata();
+      },
+      { name: "download metadata" }
+    );
     const url = await metadataBucketService.uploadMetadata(
       dRepMetadata.name,
       dRepMetadata.data
@@ -130,7 +137,9 @@ export default class DRepForm {
   }
 
   async downloadVoteMetadata() {
-    const download: Download = await this.form.waitForEvent("download");
+    const download: Download = await this.form.waitForEvent("download", {
+      timeout: 20_000,
+    });
     return downloadMetadata(download);
   }
 

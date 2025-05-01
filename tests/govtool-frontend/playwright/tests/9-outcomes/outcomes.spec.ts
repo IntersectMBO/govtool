@@ -93,7 +93,7 @@ test.describe("Outcome details", () => {
 
   test.describe("Invalid Outcome Metadata", () => {
     InvalidMetadata.forEach(({ type, reason, url, hash }, index) => {
-      test(`9H_${index + 1}A: Should display "${type}" message in outcomes when ${reason}`, async ({
+      test(`9H_${index + 1}A: Should display "${type}" message in outcomes when ${reason} in disconnect state`, async ({
         page,
       }) => {
         const outcomeResponse = {

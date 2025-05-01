@@ -75,8 +75,7 @@ setup("Register DRep of static wallets", async () => {
 
 setup("Setup temporary DRep wallets", async () => {
   const totalRequiredBalanceForDRepSetup =
-    (DREP_WALLETS_COUNT + REGISTER_DREP_WALLETS_COUNT) * dRepDeposit +
-    22 * DREP_WALLETS_COUNT;
+    (DREP_WALLETS_COUNT + REGISTER_DREP_WALLETS_COUNT) * (dRepDeposit + 22);
   await skipIfBalanceIsInsufficient(totalRequiredBalanceForDRepSetup);
   setup.setTimeout(3 * environments.txTimeOut);
 

@@ -44,27 +44,18 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "adaholder auth setup",
-      testMatch: "**/adaholder.auth.setup.ts",
+      name: "wallet bootstrap",
+      testMatch: "**/wallet.bootstrap.ts",
+      teardown: environments.ci && "cleanup faucet",
     },
     {
       name: "user auth setup",
       testMatch: "**/user.auth.setup.ts",
     },
     {
-      name: "faucet setup",
-      testMatch: "**/faucet.setup.ts",
-      teardown: environments.ci && "cleanup faucet",
-    },
-    {
-      name: "dRep setup",
-      testMatch: "**/dRep.setup.ts",
-      dependencies: environments.ci ? ["faucet setup", "wallet bootstrap"] : [],
-    },
-    {
-      name: "proposal budget dRep setup",
-      testMatch: "**/proposal-budget.dRep.setup.ts",
-      teardown: environments.ci && "cleanup faucet",
+      name: "adaholder auth setup",
+      testMatch: "**/adaholder.auth.setup.ts",
+      dependencies: environments.ci ? ["wallet bootstrap"] : [],
     },
     {
       name: "dRep auth setup",
@@ -78,6 +69,18 @@ export default defineConfig({
     {
       name: "proposal budget auth setup",
       testMatch: "**/proposal-budget.auth.setup.ts",
+      teardown: environments.ci && "cleanup faucet",
+    },
+    {
+      name: "dRep setup",
+      testMatch: "**/dRep.setup.ts",
+      dependencies: environments.ci ? ["wallet bootstrap"] : [],
+      teardown: environments.ci && "cleanup dRep",
+    },
+    {
+      name: "proposal budget dRep setup",
+      testMatch: "**/proposal-budget.dRep.setup.ts",
+      teardown: environments.ci && "cleanup dRep",
     },
     {
       name: "proposal setup",
@@ -85,15 +88,10 @@ export default defineConfig({
       teardown: environments.ci && "cleanup faucet",
     },
     {
-      name: "wallet bootstrap",
-      testMatch: "**/wallet.bootstrap.ts",
-      dependencies: environments.ci ? ["faucet setup"] : [],
-    },
-    {
       name: "transaction",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.tx.spec.ts",
-      dependencies: environments.ci ? ["adaholder auth setup", "wallet bootstrap"] : [],
+      dependencies: environments.ci ? ["adaholder auth setup"] : [],
     },
     {
       name: "proposal discussion",
@@ -140,7 +138,7 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.dRep.spec.ts",
       dependencies: environments.ci
-        ? ["dRep setup", "dRep auth setup",  "wallet bootstrap"]
+        ? ["dRep auth setup"]
         : [],
       teardown: environments.ci && "cleanup dRep",
     },
@@ -149,7 +147,7 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.delegation.spec.ts",
       dependencies: environments.ci
-        ? ["adaholder auth setup","dRep auth setup", "dRep setup", "wallet bootstrap"]
+        ? ["adaholder auth setup","dRep auth setup"]
         : [],
       teardown: environments.ci && "cleanup delegation",
     },

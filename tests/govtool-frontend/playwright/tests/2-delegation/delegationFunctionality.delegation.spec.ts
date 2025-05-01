@@ -24,7 +24,11 @@ import {
   correctDRepDirectoryFormat,
 } from "@helpers/adaFormat";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfBalanceIsInsufficient, skipIfMainnet } from "@helpers/cardano";
+import {
+  skipIfBalanceIsInsufficient,
+  skipIfMainnet,
+  skipIfTemporyWalletIsNotAvailable,
+} from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
@@ -36,7 +40,7 @@ import walletManager from "lib/walletManager";
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
   await skipIfMainnet();
-  await skipIfBalanceIsInsufficient(200);
+  await skipIfTemporyWalletIsNotAvailable("registerDRepWallets.json");
 });
 
 test.describe("Delegate to others", () => {

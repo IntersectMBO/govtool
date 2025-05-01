@@ -5,7 +5,12 @@ import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { isBootStrapingPhase, skipIfBalanceIsInsufficient, skipIfMainnet } from "@helpers/cardano";
+import {
+  isBootStrapingPhase,
+  skipIfBalanceIsInsufficient,
+  skipIfMainnet,
+  skipIfTemporyWalletIsNotAvailable,
+} from "@helpers/cardano";
 import { encodeCIP129Identifier } from "@helpers/encodeDecode";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
@@ -13,14 +18,13 @@ import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
-import { BootstrapGovernanceActionType, GovernanceActionType } from "@types";
-import { allure } from "allure-playwright";
+import { GovernanceActionType } from "@types";
 import walletManager from "lib/walletManager";
 
 test.beforeEach(async () => {
   await setAllureEpic("5. Proposal functionality");
   await skipIfMainnet();
-  await skipIfBalanceIsInsufficient(4000);
+  await skipIfTemporyWalletIsNotAvailable("registerDRepWallets.json");
 });
 
 test.describe("Proposal checks", () => {

@@ -169,7 +169,9 @@ export default class DRepForm {
     for (const err of formErrors.dRepName) {
       await expect(this.form.getByTestId(err)).toBeHidden();
     }
-    const objectivesInputText = await this.objectivesInput.textContent();
+    const objectivesInputText = await this.objectivesInput.textContent({
+      timeout: 60_000,
+    });
     const motivationsInputText = await this.motivationsInput.textContent();
     const qualificationsInputText =
       await this.qualificationsInput.textContent();
@@ -183,21 +185,21 @@ export default class DRepForm {
       .getByTestId(formErrors.paymentAddress)
       .isVisible();
 
-    expect(await this.objectivesInput.textContent({ timeout: 60_000 }), {
+    expect(objectivesInputText, {
       message:
         objectivesInputText !== dRepInfo.objectives &&
-        `${dRepInfo.objectives} is not equal to ${await this.objectivesInput.textContent()}`,
+        `${dRepInfo.objectives} is not equal to ${objectivesInputText}`,
     }).toEqual(dRepInfo.objectives);
 
-    expect(await this.motivationsInput.textContent(), {
+    expect(motivationsInputText, {
       message:
         motivationsInputText !== dRepInfo.motivations &&
-        `${dRepInfo.motivations} is not equal to ${await this.motivationsInput.textContent()}`,
+        `${dRepInfo.motivations} is not equal to ${motivationsInputText}`,
     }).toEqual(dRepInfo.motivations);
-    expect(await this.qualificationsInput.textContent(), {
+    expect(qualificationsInputText, {
       message:
         qualificationsInputText !== dRepInfo.qualifications &&
-        `${dRepInfo.qualifications} is not equal to ${await this.qualificationsInput.textContent()}`,
+        `${dRepInfo.qualifications} is not equal to ${qualificationsInputText}`,
     }).toEqual(dRepInfo.qualifications);
 
     await expect(this.form.getByTestId(formErrors.links.url), {
@@ -266,20 +268,20 @@ export default class DRepForm {
         `${dRepInfo.paymentAddress} is a valid paymentAddress`,
     }).toBeVisible({ timeout: 60_000 });
 
-    expect(await this.objectivesInput.textContent(), {
+    expect(objectivesInputText, {
       message:
         objectivesInputText === dRepInfo.objectives &&
-        `${dRepInfo.objectives} is equal to ${await this.objectivesInput.textContent()}`,
+        `${dRepInfo.objectives} is equal to ${objectivesInputText}`,
     }).not.toEqual(dRepInfo.objectives);
-    expect(await this.motivationsInput.textContent(), {
+    expect(motivationsInputText, {
       message:
         motivationsInputText === dRepInfo.motivations &&
-        `${dRepInfo.motivations} is equal to ${await this.motivationsInput.textContent()}`,
+        `${dRepInfo.motivations} is equal to ${motivationsInputText}`,
     }).not.toEqual(dRepInfo.qualifications);
-    expect(await this.qualificationsInput.textContent(), {
+    expect(qualificationsInputText, {
       message:
         qualificationsInputText === dRepInfo.qualifications &&
-        `${dRepInfo.qualifications} is equal to ${await this.qualificationsInput.textContent()}`,
+        `${dRepInfo.qualifications} is equal to ${qualificationsInputText}`,
     }).not.toEqual(dRepInfo.qualifications);
 
     await expect(this.form.getByTestId(formErrors.links.url), {

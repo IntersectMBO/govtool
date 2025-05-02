@@ -12,6 +12,7 @@ import EditDRepPage from "@pages/editDRepPage";
 import { expect } from "@playwright/test";
 import environments from "@constants/environments";
 import { dRep02AuthFile } from "@constants/auth";
+import { generateInvalidDRepInfo, generateValidDRepInfo } from "@helpers/dRep";
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
@@ -32,27 +33,8 @@ test.describe("Validation of edit dRep Form", () => {
     await expect(page.getByTestId("alert-success")).not.toBeVisible();
 
     for (let i = 0; i < 100; i++) {
-      await editDRepPage.validateForm({
-        name: mockValid.name(),
-        objectives: faker.lorem.paragraph(2),
-        motivations: faker.lorem.paragraph(2),
-        qualifications: faker.lorem.paragraph(2),
-        paymentAddress: (await ShelleyWallet.generate()).addressBech32(
-          environments.networkId
-        ),
-        linksReferenceLinks: [
-          {
-            url: faker.internet.url(),
-            description: faker.internet.displayName(),
-          },
-        ],
-        identityReferenceLinks: [
-          {
-            url: faker.internet.url(),
-            description: faker.internet.displayName(),
-          },
-        ],
-      });
+      const validDRepInfo = await generateValidDRepInfo();
+      await editDRepPage.validateForm(validDRepInfo);
     }
 
     for (let i = 0; i < 6; i++) {
@@ -80,25 +62,8 @@ test.describe("Validation of edit dRep Form", () => {
     await expect(page.getByTestId("alert-success")).not.toBeVisible();
 
     for (let i = 0; i < 100; i++) {
-      await editDRepPage.inValidateForm({
-        name: mockInvalid.name(),
-        objectives: faker.lorem.paragraph(40),
-        motivations: faker.lorem.paragraph(40),
-        qualifications: faker.lorem.paragraph(40),
-        paymentAddress: faker.string.alphanumeric(45),
-        linksReferenceLinks: [
-          {
-            url: mockInvalid.url(),
-            description: faker.lorem.paragraph(40),
-          },
-        ],
-        identityReferenceLinks: [
-          {
-            url: mockInvalid.url(),
-            description: faker.lorem.paragraph(40),
-          },
-        ],
-      });
+      const invalidDRepInfo = generateInvalidDRepInfo();
+      await editDRepPage.inValidateForm(invalidDRepInfo);
     }
   });
 

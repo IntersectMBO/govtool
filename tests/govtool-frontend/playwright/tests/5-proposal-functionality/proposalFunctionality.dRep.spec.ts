@@ -24,7 +24,7 @@ import walletManager from "lib/walletManager";
 test.beforeEach(async () => {
   await setAllureEpic("5. Proposal functionality");
   await skipIfMainnet();
-  await skipIfTemporyWalletIsNotAvailable("registerDRepWallets.json");
+  await skipIfTemporyWalletIsNotAvailable("registeredDRepCopyWallets.json");
 });
 
 test.describe("Proposal checks", () => {

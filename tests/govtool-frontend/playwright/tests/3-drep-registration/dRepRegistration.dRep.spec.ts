@@ -6,7 +6,6 @@ import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
 import {
-  skipIfBalanceIsInsufficient,
   skipIfMainnet,
   skipIfTemporyWalletIsNotAvailable,
 } from "@helpers/cardano";
@@ -23,7 +22,7 @@ import { dRep01AuthFile } from "@constants/auth";
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
   await skipIfMainnet();
-  await skipIfTemporyWalletIsNotAvailable("registerDRepWallets.json");
+  await skipIfTemporyWalletIsNotAvailable("registerDRepCopyWallets.json");
 });
 
 test.describe("Logged in DReps", () => {

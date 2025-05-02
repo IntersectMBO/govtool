@@ -29,7 +29,7 @@ import { dRep01AuthFile } from "@constants/auth";
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
   await skipIfMainnet();
-  await skipIfTemporyWalletIsNotAvailable("registerDRepWallets.json");
+  await skipIfTemporyWalletIsNotAvailable("registeredDRepCopyWallets.json");
 });
 
 test.describe("Logged in DRep", () => {

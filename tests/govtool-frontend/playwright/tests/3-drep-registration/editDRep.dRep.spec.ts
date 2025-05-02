@@ -16,7 +16,7 @@ import { dRep02AuthFile } from "@constants/auth";
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
   await skipIfMainnet();
-  await skipIfTemporyWalletIsNotAvailable("registerDRepWallets.json");
+  await skipIfTemporyWalletIsNotAvailable("registerDRepCopyWallets.json");
 });
 
 test.use({ wallet: dRep02Wallet, storageState: dRep02AuthFile });

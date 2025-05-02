@@ -40,7 +40,7 @@ import walletManager from "lib/walletManager";
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
   await skipIfMainnet();
-  await skipIfTemporyWalletIsNotAvailable("registerDRepWallets.json");
+  await skipIfTemporyWalletIsNotAvailable("registerDRepCopyWallets.json");
 });
 
 test.describe("Delegate to others", () => {

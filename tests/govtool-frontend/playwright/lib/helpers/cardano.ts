@@ -76,21 +76,9 @@ export async function skipIfBalanceIsInsufficient(limit = 10) {
 
 export async function getWalletBalance(address: string) {
   let balance: number = 0;
-  const faucetWalletBalanceDetails =
-    (await getFile("faucetWalletBalance.json")) || {};
   await functionWaitedAssert(
     async () => {
       balance = await kuberService.getBalance(address);
-      if (faucetWalletBalanceDetails["address"] === address) {
-        balance = faucetWalletBalanceDetails["balance"];
-      } else {
-        faucetWalletBalanceDetails["balance"] = balance;
-        faucetWalletBalanceDetails["address"] = environments.faucet.address;
-        await createFile(
-          "faucetWalletBalance.json",
-          faucetWalletBalanceDetails
-        );
-      }
     },
     { message: "get balance" }
   );

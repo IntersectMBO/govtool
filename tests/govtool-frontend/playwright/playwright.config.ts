@@ -56,6 +56,7 @@ export default defineConfig({
       name: "adaholder auth setup",
       testMatch: "**/adaholder.auth.setup.ts",
       dependencies: environments.ci ? ["wallet bootstrap"] : [],
+      teardown: environments.ci && "cleanup artifacts",
     },
     {
       name: "dRep auth setup",
@@ -94,6 +95,7 @@ export default defineConfig({
       dependencies: environments.ci
         ? ["proposal discussion auth setup"]
         : [],
+        teardown: environments.ci && "cleanup artifacts",
     },
     {
       name: "proposal budget",
@@ -103,6 +105,7 @@ export default defineConfig({
         ? ["proposal budget auth setup"]
         : [],
       testIgnore: ["**/*.dRep.pb.spec.ts"],
+      teardown: environments.ci && "cleanup artifacts",
     },
     {
       name: "proposal submission",
@@ -111,12 +114,14 @@ export default defineConfig({
       dependencies: environments.ci
         ? ["proposal setup"]
         : [],
+        teardown: environments.ci && "cleanup artifacts",
     },
     {
       name: "loggedin (desktop)",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.loggedin.spec.ts",
       dependencies: environments.ci ? ["user auth setup"] : [],
+      teardown: environments.ci && "cleanup artifacts",
     },
     {
       name: "proposal budget dRep",
@@ -125,7 +130,7 @@ export default defineConfig({
       dependencies: environments.ci
         ? ["proposal budget auth setup","proposal budget dRep setup"]
         : [],
-      teardown: environments.ci && "cleanup dRep",
+        teardown: environments.ci && "cleanup artifacts",
     },
     {
       name: "dRep",
@@ -134,7 +139,7 @@ export default defineConfig({
       dependencies: environments.ci
         ? ["dRep auth setup"]
         : [],
-      teardown: environments.ci && "cleanup dRep",
+        teardown: environments.ci && "cleanup artifacts",
     },
     {
       name: "delegation",
@@ -157,6 +162,7 @@ export default defineConfig({
         "**/*.pd.spec.ts",
         "**/*.pb.spec.ts",
       ],
+      teardown: environments.ci && "cleanup artifacts",
     },
     {
       name: "mobile",
@@ -171,6 +177,7 @@ export default defineConfig({
         "**/*.pb.spec.ts",
         "**/walletConnect.spec.ts",
       ],
+      teardown: environments.ci && "cleanup artifacts",
     },
     {
       name: "cleanup delegation",
@@ -183,6 +190,10 @@ export default defineConfig({
     {
       name: "cleanup faucet",
       testMatch: "faucet.teardown.ts",
+    },
+    {
+      name: "cleanup artifacts",
+      testMatch: "generated-artifacts.teardown.ts",
     },
   ],
 });

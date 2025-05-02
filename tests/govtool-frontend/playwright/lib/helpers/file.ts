@@ -55,7 +55,7 @@ export async function deleteFile(fileName: string): Promise<void> {
 
 export async function deleteFolder(folderName: string): Promise<void> {
   await new Promise<void>((resolve, reject) =>
-    rm(`${basePath}/${folderName}`, { recursive: true,force:true }, (err) => {
+    rm(`${basePath}/${folderName}`, { recursive: true, force: true }, (err) => {
       if (err) {
         if (err.code === "ENOENT") {
           resolve();

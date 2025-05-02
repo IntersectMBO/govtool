@@ -68,7 +68,7 @@ export default defineConfig({
       testMatch: "**/proposal-discussion.auth.setup.ts",
     },
     {
-      name: "proposal budget auth setup",
+      name: "budget proposal auth setup",
       testMatch: "**/proposal-budget.auth.setup.ts",
       teardown: environments.ci && "cleanup faucet",
     },
@@ -79,7 +79,7 @@ export default defineConfig({
       teardown: environments.ci && "cleanup dRep",
     },
     {
-      name: "proposal budget dRep setup",
+      name: "budget proposal dRep setup",
       testMatch: "**/proposal-budget.dRep.setup.ts",
       teardown: environments.ci && "cleanup dRep",
     },
@@ -98,11 +98,11 @@ export default defineConfig({
         teardown: environments.ci && "cleanup artifacts",
     },
     {
-      name: "proposal budget",
+      name: "budget proposal",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.pb.spec.ts",
       dependencies: environments.ci
-        ? ["proposal budget auth setup"]
+        ? ["budget proposal auth setup"]
         : [],
       testIgnore: ["**/*.dRep.pb.spec.ts"],
       teardown: environments.ci && "cleanup artifacts",
@@ -124,11 +124,11 @@ export default defineConfig({
       teardown: environments.ci && "cleanup artifacts",
     },
     {
-      name: "proposal budget dRep",
+      name: "budget proposal dRep",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.dRep.pb.spec.ts",
       dependencies: environments.ci
-        ? ["proposal budget auth setup","proposal budget dRep setup"]
+        ? ["budget proposal auth setup","budget proposal dRep setup"]
         : [],
         teardown: environments.ci && "cleanup artifacts",
     },

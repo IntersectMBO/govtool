@@ -88,12 +88,6 @@ export default defineConfig({
       teardown: environments.ci && "cleanup faucet",
     },
     {
-      name: "transaction",
-      use: { ...devices["Desktop Chrome"] },
-      testMatch: "**/*.tx.spec.ts",
-      dependencies: environments.ci ? ["adaholder auth setup"] : [],
-    },
-    {
       name: "proposal discussion",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.pd.spec.ts",

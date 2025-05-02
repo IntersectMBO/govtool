@@ -11,11 +11,12 @@ on:
       deployment:
         required: true
         type: choice
-        default: "govtool.cardanoapi.io"
+        default: "p80-z6b8d2f7a-ze34e4cb2-gtw.z937eb260.rustrocks.fr"
         options:
           - "sanchogov.tools"
           - "staging.govtool.byron.network"
           - "govtool.cardanoapi.io"
+          - "p80-z6b8d2f7a-ze34e4cb2-gtw.z937eb260.rustrocks.fr"
           - "preview.gov.tools"
           - "gov.tools"
           - "p80-z78acf3c2-zded6a792-gtw.z937eb260.rustrocks.fr"

@@ -149,7 +149,7 @@ This section outlines the core behavioral areas of the Govtool application as ca
 
 This set of tests covers all key UI and interaction flows related to delegation functionality.
 
-![Delegation Pillars](/docs/delegation-pillars-1.png)
+![Delegation Pillars](/docs/delegation-pillars.png)
 
 ---
 

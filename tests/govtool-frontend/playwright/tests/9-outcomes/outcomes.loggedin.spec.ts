@@ -64,11 +64,12 @@ test.describe("Outcomes page", () => {
     let currentPage: Page;
     test.beforeEach(async ({ page }) => {
       const outcomePage = new OutComesPage(page);
-      governanceActionId =
-        await outcomePage.fetchOutcomeIdFromNetwork(governanceActionId);
-      governanceActionTitle = await outcomePage.fetchOutcomeTitleFromNetwork(
+      const response = await outcomePage.fetchOutcomeIdAndTitleFromNetwork(
+        governanceActionId,
         governanceActionTitle
       );
+      governanceActionId = response.governanceActionId;
+      governanceActionTitle = response.governanceActionTitle;
       currentPage = page;
     });
 

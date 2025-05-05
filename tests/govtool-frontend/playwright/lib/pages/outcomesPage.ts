@@ -373,8 +373,12 @@ export default class OutComesPage {
     }
   }
 
-  async fetchOutcomeIdFromNetwork(governanceActionId: string) {
+  async fetchOutcomeIdAndTitleFromNetwork(
+    governanceActionId: string,
+    governanceActionTitle: string
+  ) {
     let updatedGovernanceActionId = governanceActionId;
+    let updatedGovernanceActionTitle = governanceActionTitle;
     await this.page.route(
       "**/governance-actions?search=&filters=&sort=**",
       async (route) => {
@@ -397,16 +401,6 @@ export default class OutComesPage {
       }
     );
 
-    const responsePromise = this.page.waitForResponse(
-      "**/governance-actions?search=&filters=&sort=**"
-    );
-    await this.goto();
-    await responsePromise;
-    return updatedGovernanceActionId;
-  }
-
-  async fetchOutcomeTitleFromNetwork(governanceActionTitle: string) {
-    let updatedGovernanceActionTitle = governanceActionTitle;
     await this.page.route(
       "**/governance-actions/metadata?**",
       async (route) => {
@@ -430,12 +424,21 @@ export default class OutComesPage {
         }
       }
     );
-    await this.goto();
+
+    const responsePromise = this.page.waitForResponse(
+      "**/governance-actions?search=&filters=&sort=**"
+    );
     const metadataResponsePromise = this.page.waitForResponse(
       "**/governance-actions/metadata?**"
     );
+
+    await this.goto();
+    await responsePromise;
     await metadataResponsePromise;
-    return updatedGovernanceActionTitle;
+    return {
+      governanceActionId: updatedGovernanceActionId,
+      governanceActionTitle: updatedGovernanceActionTitle,
+    };
   }
 
   async searchOutcomesById(governanceActionId: string) {

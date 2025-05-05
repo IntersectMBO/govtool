@@ -1,7 +1,7 @@
 import environments from "@constants/environments";
 import { allStaticWallets } from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
-import { skipIfMainnet } from "@helpers/cardano";
+import { skipIfBalanceIsInsufficient, skipIfMainnet } from "@helpers/cardano";
 import { pollTransaction } from "@helpers/transaction";
 import { expect } from "@playwright/test";
 import { test as cleanup } from "@fixtures/walletExtension";
@@ -14,6 +14,7 @@ cleanup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Cleanup");
   await skipIfMainnet();
+  await skipIfBalanceIsInsufficient(10);
 });
 
 cleanup("Refund faucet", async () => {

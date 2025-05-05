@@ -1,7 +1,9 @@
 import { proposal01AuthFile } from "@constants/auth";
+import environments from "@constants/environments";
 import { proposal01Wallet } from "@constants/staticWallets";
 import { test as base } from "@fixtures/walletExtension";
 import { createNewPageWithWallet } from "@helpers/page";
+import { rewardAddressBech32 } from "@helpers/shellyWallet";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 
@@ -23,8 +25,13 @@ export const test = base.extend<TestOptions>({
     const proposalCreationPage = new ProposalSubmissionPage(proposalPage);
     await proposalCreationPage.goto();
 
+    const receiverAddress = rewardAddressBech32(
+      environments.networkId,
+      proposal01Wallet.stake.pkh
+    );
+
     const proposalId =
-      await proposalCreationPage.createProposal(proposal01Wallet);
+      await proposalCreationPage.createProposal(receiverAddress);
 
     const proposalDetailsPage = new ProposalDiscussionDetailsPage(proposalPage);
 

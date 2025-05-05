@@ -7,15 +7,20 @@ import { waitForTxConfirmation } from "@helpers/transaction";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
-import { skipIfMainnet } from "@helpers/cardano";
+import {
+  skipIfMainnet,
+  skipIfTemporyWalletIsNotAvailable,
+} from "@helpers/cardano";
 import { ProposalType } from "@types";
-import { proposalFaucetWallet } from "@constants/proposalFaucetWallet";
 import walletManager from "lib/walletManager";
 import { valid } from "@mock/index";
+import { rewardAddressBech32 } from "@helpers/shellyWallet";
+import { getWalletConfigForFaucet } from "@helpers/index";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
   await skipIfMainnet();
+  await skipIfTemporyWalletIsNotAvailable("proposalSubmissionWallets.json");
 });
 
 Object.values(ProposalType).forEach((proposalType, index) => {
@@ -43,10 +48,12 @@ Object.values(ProposalType).forEach((proposalType, index) => {
     await proposalSubmissionPage.proposalCreateBtn.click();
     await proposalDiscussionPage.continueBtn.click();
 
-    await proposalSubmissionPage.createProposal(
-      proposalFaucetWallet,
-      proposalType
+    const rewardAddress = rewardAddressBech32(
+      environments.networkId,
+      getWalletConfigForFaucet().stake.pkh
     );
+
+    await proposalSubmissionPage.createProposal(rewardAddress, proposalType);
 
     await userPage.getByTestId("submit-as-GA-button").click();
 

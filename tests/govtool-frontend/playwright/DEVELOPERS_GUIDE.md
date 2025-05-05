@@ -67,28 +67,31 @@ This directory contains all automated test cases, organized by feature area:
 
 ### Authentication & Setup Scripts
 
-13. **`auth.setup.ts`**  
-    Sets up authentication for users and adaHolder wallets.
+13. **`adaholder.auth.setup.ts`**  
+    Sets up authentication for adaHolder wallets.
 
-14. **`proposal-budget.auth.setup.ts`**  
+14. **`user.auth.setup.ts`**  
+    Sets up authentication for user wallets.
+
+15. **`proposal-budget.auth.setup.ts`**  
     Authentication setup for proposal budget wallets.
 
-15. **`proposal-discussion.auth.setup.ts`**  
+16. **`proposal-discussion.auth.setup.ts`**  
     Authentication setup for proposal discussion wallets.
 
-16. **`dRep.auth.setup.ts`**  
+17. **`dRep.auth.setup.ts`**  
     Authentication setup for dRep wallets.
 
-17. **`dRep.setup.ts`**  
+18. **`dRep.setup.ts`**  
     Setup for temporary and static dRep wallet registration.
 
-18. **`proposal-budget.dRep.setup.ts`**  
+19. **`proposal-budget.dRep.setup.ts`**  
     dRep wallet registration setup for proposal budget tests.
 
-19. **`proposal.setup.ts`**  
+20. **`proposal.setup.ts`**  
     Setup for proposal submission wallets.
 
-20. **`wallet.bootstrap.ts`**  
+21. **`wallet.bootstrap.ts`**  
     Initializes adaHolder and dRep wallets with test funds for spendable ADA functionality.
 
 ---
@@ -98,18 +101,14 @@ This directory contains all automated test cases, organized by feature area:
 21. **`delegation.teardown.ts`**  
     Resets delegation status (abstains delegation from delegated wallets).
 
-22. **`faucet.setup.ts`**  
-    Funds the test faucet wallet.
+22. **`faucet.teardown.ts`**  
+    Refunds all unspendable ADA from test wallets back to the faucet wallet.
 
-23. **`faucet.teardown.ts`**  
-    Refunds all unspendable ADA from test wallets back to the proposal faucet.
-
-24. **`dRep.teardown.ts`**  
+23. **`dRep.teardown.ts`**  
     Handles deregistration of dRep wallets registered during tests or setup.
 
----
-
-Sure! Here's a refined and clearer version of your note:
+24. **`generated-artifacts.teardown.ts`**  
+    Remove all artifacts generated during test execution
 
 ---
 
@@ -141,3 +140,63 @@ Sure! Here's a refined and clearer version of your note:
 > - To run tests _with wallet dependency_ and generate **Allure reports**, **do not** remove the `CI` environment variable.
 
 ---
+
+## Govtool Playwright Configuration – Project Behaviors
+
+This section outlines the core behavioral areas of the Govtool application as captured and tested using Playwright. Visual representations are provided to guide developers in understanding the UI states and interaction flows.
+
+### 1. Delegation Pillars
+
+This set of tests covers all key UI and interaction flows related to delegation functionality.
+
+![Delegation Pillars](/docs/delegation-pillars.png)
+
+---
+
+### 2. Voting Pillars
+
+Covers user voting mechanisms, including interface states and validation of voting logic.
+
+![Voting Pillars](/docs/voting-pillars.png)
+
+---
+
+### 3. Proposal Pillars
+
+Proposal functionality is split into two sub-categories, each with distinct test coverage:
+
+#### i. Proposal Discussion
+
+Tracks creation, display, and participation in proposal discussions.
+
+![Proposal Discussion](/docs/proposal-discussion.png)
+
+#### ii. Budget Proposal
+
+Tracks creation, display, and participation in budget-related proposals.
+
+![Budget Proposal](/docs/budget-proposal.png)
+
+---
+
+### 4. Outcomes Pillars
+
+Tests centered around outcomes from various actions.
+
+![Outcomes Pillars](/docs/outcomes-pillars.png)
+
+---
+
+### 5. Logged-In State
+
+Covers all test cases that require the user to be authenticated, and are not included in the delegation, voting, proposal, or outcomes pillars
+
+![Logged-In State](/docs/loggedin.png)
+
+---
+
+### Overall Architecture
+
+For a comprehensive view of the project's Playwright architecture, refer to the Excalidraw diagram:
+
+[Govtool Project Architecture](/docs/govtool-playwright-project.excalidraw)

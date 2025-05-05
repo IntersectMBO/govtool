@@ -106,7 +106,7 @@ jobs:
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_MAINNET }}"
           fi
 
-          npm test
+          npm run test:headless
 
       - name: Upload report
         uses: actions/upload-artifact@v4

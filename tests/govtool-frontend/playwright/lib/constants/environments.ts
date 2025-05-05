@@ -13,7 +13,6 @@ const environments = {
   blockfrostApiUrl: "https://cardano-" + NETWORK + ".blockfrost.io/api",
   apiUrl: `${SERVER_HOST_URL}/api`,
   docsUrl: process.env.DOCS_URL || "https://docs.gov.tools/cardano-govtool",
-  pdfUrl: process.env.PDF_URL || "https://dev.api.pdf.gov.tools",
   networkId: NETWORK === "mainnet" ? 1 : 0,
   faucet: {
     apiUrl: `https://faucet.${NETWORK}.world.dev.cardano.org`,

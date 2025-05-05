@@ -7,7 +7,6 @@ import { setAllureEpic } from "@helpers/allure";
 import {
   isBootStrapingPhase,
   lovelaceToAda,
-  skipIfBalanceIsInsufficient,
   skipIfMainnet,
   skipIfTemporyWalletIsNotAvailable,
 } from "@helpers/cardano";

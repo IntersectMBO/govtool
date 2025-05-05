@@ -25,7 +25,6 @@ import {
 } from "@helpers/adaFormat";
 import { setAllureEpic } from "@helpers/allure";
 import {
-  skipIfBalanceIsInsufficient,
   skipIfMainnet,
   skipIfTemporyWalletIsNotAvailable,
 } from "@helpers/cardano";

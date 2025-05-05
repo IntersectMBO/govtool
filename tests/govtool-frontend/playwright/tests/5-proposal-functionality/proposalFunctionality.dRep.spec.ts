@@ -7,7 +7,6 @@ import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import {
   isBootStrapingPhase,
-  skipIfBalanceIsInsufficient,
   skipIfMainnet,
   skipIfTemporyWalletIsNotAvailable,
 } from "@helpers/cardano";

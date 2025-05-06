@@ -228,6 +228,9 @@ export default class BudgetDiscussionSubmissionPage {
   readonly contractingContent = this.page.getByTestId(
     "contracting-type-name-content"
   );
+  readonly contractingOtherContent = this.page.getByTestId(
+    "other-contract-description"
+  );
 
   // costing
   readonly adaAmountContent = this.page.getByTestId("ada-amount-content");
@@ -758,6 +761,12 @@ export default class BudgetDiscussionSubmissionPage {
     await expect(this.contractingContent).toHaveText(
       proposalInformations.proposalDetails.contracting
     );
+
+    if (proposalInformations.proposalDetails.contracting === "Other") {
+      await expect(this.contractingOtherContent).toHaveText(
+        proposalInformations.proposalDetails.otherDescription
+      );
+    }
 
     // costing
     await expect(this.adaAmountContent).toHaveText(

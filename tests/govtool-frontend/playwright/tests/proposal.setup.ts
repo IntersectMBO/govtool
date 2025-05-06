@@ -1,13 +1,13 @@
 import environments from "@constants/environments";
-import { proposalFaucetWallet } from "@constants/proposalFaucetWallet";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
-import { skipIfMainnet } from "@helpers/cardano";
+import { skipIfBalanceIsInsufficient, skipIfMainnet } from "@helpers/cardano";
 import { generateWallets } from "@helpers/shellyWallet";
 import { pollTransaction } from "@helpers/transaction";
 import { test as setup } from "@fixtures/walletExtension";
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
+import { getWalletConfigForFaucet } from "@helpers/index";
 
 const PROPOSAL_WALLETS_COUNT = 4;
 
@@ -27,6 +27,10 @@ setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Proposal");
   await skipIfMainnet();
+  const totalRequiredBalanceForWallets =
+    (govActionDeposit / 1000000) * PROPOSAL_WALLETS_COUNT +
+    22 * PROPOSAL_WALLETS_COUNT;
+  await skipIfBalanceIsInsufficient(totalRequiredBalanceForWallets);
 });
 
 setup("Setup temporary proposal wallets", async () => {
@@ -37,8 +41,8 @@ setup("Setup temporary proposal wallets", async () => {
   // initialize wallets
   const initializeRes = await kuberService.initializeWallets(
     [...proposalWallets],
-    proposalFaucetWallet.address,
-    proposalFaucetWallet.payment.private
+    getWalletConfigForFaucet().address,
+    getWalletConfigForFaucet().payment.private
   );
   await pollTransaction(initializeRes.txId, initializeRes.lockInfo);
 
@@ -47,8 +51,8 @@ setup("Setup temporary proposal wallets", async () => {
   });
   const transferRes = await kuberService.multipleTransferADA(
     amountOutputs,
-    proposalFaucetWallet.address,
-    proposalFaucetWallet.payment.private
+    getWalletConfigForFaucet().address,
+    getWalletConfigForFaucet().payment.private
   );
   // save to file
   await walletManager.writeWallets(proposalWallets, "proposalSubmission");

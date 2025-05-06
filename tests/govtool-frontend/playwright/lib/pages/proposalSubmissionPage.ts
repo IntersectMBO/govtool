@@ -544,22 +544,18 @@ export default class ProposalSubmissionPage {
   }
 
   async createProposal(
-    wallet: StaticWallet,
+    receivingAddress: string,
     proposalType: ProposalType = Object.values(ProposalType)[
       Math.floor(Math.random() * Object.values(ProposalType).length)
     ]
   ): Promise<number> {
     await this.addLinkBtn.click();
-    const receivingAddr = ShelleyWallet.fromJson(wallet).rewardAddressBech32(
-      environments.networkId
-    );
-
     const proposalRequest: ProposalCreateRequest =
       await this.generateValidProposalFormFields({
         proposalType: (await isBootStrapingPhase())
           ? ProposalType.info
           : proposalType,
-        receivingAddress: receivingAddr,
+        receivingAddress,
       });
     await this.fillupForm(proposalRequest);
     await this.continueBtn.click();

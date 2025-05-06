@@ -56,7 +56,10 @@ export default class BudgetDiscussionDetailsPage {
   readonly proposalContractingContent = this.page.getByTestId(
     "proposal-contracting"
   );
-  readonly costingAmountContent = this.page.getByTestId("consting-amount"); // BUG typo
+  readonly proposalContractingOtherContent = this.page.getByTestId(
+    "other-contract-description"
+  );
+  readonly costingAmountContent = this.page.getByTestId("costing-amount");
   readonly costingConversionRateContent = this.page.getByTestId(
     "costing-conversion-rate"
   );
@@ -64,7 +67,7 @@ export default class BudgetDiscussionDetailsPage {
     "costing-preferred-currency"
   );
   readonly costingPreferedCurrencyAmountContent = this.page.getByTestId(
-    "costing-prefereed-currency-amount"
+    "costing-preferred-currency-amount"
   );
   readonly costBreakdownContent = this.page.getByTestId("cost-breakdown");
   readonly includeAsAuditorContent =
@@ -191,6 +194,12 @@ export default class BudgetDiscussionDetailsPage {
     await expect(this.proposalContractingContent).toHaveText(
       budgetProposal.proposalDetails.contracting
     );
+
+    if (budgetProposal.proposalDetails.contracting === "Other") {
+      await expect(this.proposalContractingOtherContent).toHaveText(
+        budgetProposal.proposalDetails.otherDescription
+      );
+    }
 
     // costing validation
     await expect(this.costingAmountContent).toHaveText(

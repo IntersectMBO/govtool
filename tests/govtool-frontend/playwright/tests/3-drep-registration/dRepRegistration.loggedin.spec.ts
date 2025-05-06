@@ -2,13 +2,12 @@ import { user01Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { ShelleyWallet } from "@helpers/crypto";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
-import environments from "@constants/environments";
 import { user01AuthFile } from "@constants/auth";
 import EditDRepPage from "@pages/editDRepPage";
+import { generateInvalidDRepInfo, generateValidDRepInfo } from "@helpers/dRep";
 
 test.use({
   storageState: user01AuthFile,
@@ -62,27 +61,8 @@ test.describe("Validation of dRep Registration Form", () => {
     await expect(page.getByTestId("alert-success")).not.toBeVisible();
 
     for (let i = 0; i < 100; i++) {
-      await dRepRegistrationPage.validateForm({
-        name: mockValid.name(),
-        objectives: faker.lorem.paragraph(2),
-        motivations: faker.lorem.paragraph(2),
-        qualifications: faker.lorem.paragraph(2),
-        paymentAddress: (await ShelleyWallet.generate()).addressBech32(
-          environments.networkId
-        ),
-        linksReferenceLinks: [
-          {
-            url: faker.internet.url(),
-            description: faker.internet.displayName(),
-          },
-        ],
-        identityReferenceLinks: [
-          {
-            url: faker.internet.url(),
-            description: faker.internet.displayName(),
-          },
-        ],
-      });
+      const validDRepInfo = await generateValidDRepInfo();
+      await dRepRegistrationPage.validateForm(validDRepInfo);
     }
 
     for (let i = 0; i < 6; i++) {
@@ -107,25 +87,8 @@ test.describe("Validation of dRep Registration Form", () => {
     await expect(page.getByTestId("alert-success")).not.toBeVisible();
 
     for (let i = 0; i < 100; i++) {
-      await dRepRegistrationPage.inValidateForm({
-        name: mockInvalid.name(),
-        objectives: faker.lorem.paragraph(40),
-        motivations: faker.lorem.paragraph(40),
-        qualifications: faker.lorem.paragraph(40),
-        paymentAddress: faker.string.alphanumeric(45),
-        linksReferenceLinks: [
-          {
-            url: mockInvalid.url(),
-            description: faker.lorem.paragraph(20),
-          },
-        ],
-        identityReferenceLinks: [
-          {
-            url: mockInvalid.url(),
-            description: faker.lorem.paragraph(20),
-          },
-        ],
-      });
+      const invalidDRepInfo = generateInvalidDRepInfo();
+      await dRepRegistrationPage.inValidateForm(invalidDRepInfo);
     }
   });
 

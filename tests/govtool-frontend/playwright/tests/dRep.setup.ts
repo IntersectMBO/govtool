@@ -1,7 +1,7 @@
 import environments from "@constants/environments";
 import { dRepWallets } from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
-import { skipIfMainnet } from "@helpers/cardano";
+import { skipIfBalanceIsInsufficient, skipIfMainnet } from "@helpers/cardano";
 import { uploadMetadataAndGetJsonHash } from "@helpers/metadata";
 import { generateWallets } from "@helpers/shellyWallet";
 import { pollTransaction } from "@helpers/transaction";
@@ -35,6 +35,9 @@ setup.beforeEach(async () => {
 });
 
 setup("Register DRep of static wallets", async () => {
+  const totalRequiredBalanceForDRepSetup =
+    dRepWallets.length * (dRepDeposit / 1000000) + 2;
+  await skipIfBalanceIsInsufficient(totalRequiredBalanceForDRepSetup);
   setup.setTimeout(environments.txTimeOut);
 
   try {
@@ -72,6 +75,10 @@ setup("Register DRep of static wallets", async () => {
 });
 
 setup("Setup temporary DRep wallets", async () => {
+  const totalRequiredBalanceForDRepSetup =
+    (DREP_WALLETS_COUNT + REGISTER_DREP_WALLETS_COUNT) *
+    (dRepDeposit / 1000000 + 22);
+  await skipIfBalanceIsInsufficient(totalRequiredBalanceForDRepSetup);
   setup.setTimeout(3 * environments.txTimeOut);
 
   const dRepWallets: StaticWallet[] = await generateWallets(DREP_WALLETS_COUNT);

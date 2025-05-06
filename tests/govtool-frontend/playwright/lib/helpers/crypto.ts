@@ -2,6 +2,7 @@ import environments from "../constants/environments";
 import { ed25519 as ed } from "@noble/curves/ed25519";
 import { bech32 } from "bech32";
 import * as blake from "blakejs";
+import { rewardAddressBech32, rewardAddressRawBytes } from "./shellyWallet";
 
 const KEY_HASH_LENGTH = 28;
 const ADDR_LENGTH = KEY_HASH_LENGTH * 2 + 1;
@@ -117,22 +118,13 @@ export class ShelleyWallet {
     concatenatedArray1.set(this.stakeKey.pkh, KEY_HASH_LENGTH + 1);
     return concatenatedArray1;
   }
+
   rewardAddressRawBytes(network: number) {
-    const rewardAccountPrefix = 0xe0;
-    const header = network | rewardAccountPrefix;
-    const result = new Uint8Array(KEY_HASH_LENGTH + 1);
-    result[0] = header;
-    result.set(this.stakeKey.pkh, 1);
-    return result;
+    return rewardAddressRawBytes(network, this.stakeKey.json().pkh);
   }
 
   rewardAddressBech32(networkId: number): string {
-    const prefix = networkId == 0 ? "stake" : "stake_test";
-    return bech32.encode(
-      prefix,
-      bech32.toWords(Buffer.from(this.rewardAddressRawBytes(networkId))),
-      200
-    );
+    return rewardAddressBech32(networkId, this.stakeKey.json().pkh);
   }
 
   dRepIdBech32() {

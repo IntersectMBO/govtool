@@ -5,7 +5,10 @@ import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
-import { skipIfMainnet } from "@helpers/cardano";
+import {
+  skipIfMainnet,
+  skipIfTemporyWalletIsNotAvailable,
+} from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
@@ -19,6 +22,7 @@ import { dRep01AuthFile } from "@constants/auth";
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
   await skipIfMainnet();
+  await skipIfTemporyWalletIsNotAvailable("registerDRepCopyWallets.json");
 });
 
 test.describe("Logged in DReps", () => {

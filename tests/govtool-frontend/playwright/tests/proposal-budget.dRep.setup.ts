@@ -4,7 +4,7 @@ import {
   dRepWallets,
 } from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
-import { skipIfMainnet } from "@helpers/cardano";
+import { skipIfBalanceIsInsufficient, skipIfMainnet } from "@helpers/cardano";
 import { uploadMetadataAndGetJsonHash } from "@helpers/metadata";
 import { pollTransaction } from "@helpers/transaction";
 import { expect } from "@playwright/test";
@@ -16,6 +16,7 @@ setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Register DRep");
   await skipIfMainnet();
+  await skipIfBalanceIsInsufficient(502 * budgetProposalDRepWallets.length);
 });
 
 setup("Register DRep of proposal budget static wallets", async () => {

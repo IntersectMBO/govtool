@@ -117,7 +117,7 @@ This directory contains all automated test cases, organized by feature area:
 - Use the terminal to run specific test suites using the commands provided in the **README.md**.
 - Ensure all test files are recognized in the **Test Explorer**.
 
-![Test Runner Screenshot](/docs/image.png)
+![Test Runner Screenshot](./docs/image.png)
 
 - Use the **Play** ▶️ icon to run individual tests directly from the UI.
 
@@ -127,12 +127,12 @@ This directory contains all automated test cases, organized by feature area:
 
 - Add **Playwright Test for VSCode** extension
 
-  ![Playwright Test Screenshot](/docs/image-1.png)
+  ![Playwright Test Screenshot](./docs/image-1.png)
 
 1. **Remove** the `CI` environment variable.
 2. **Navigate** to the specific directory where your test is located to run it directly.
 
-   ![Directory Navigation Screenshot](/docs/image-2.png)
+   ![Directory Navigation Screenshot](./docs/image-2.png)
 
 > **Note:**
 >
@@ -149,7 +149,7 @@ This section outlines the core behavioral areas of the Govtool application as ca
 
 This set of tests covers all key UI and interaction flows related to delegation functionality.
 
-![Delegation Pillars](/docs/delegation-pillars.png)
+![Delegation Pillars](./docs/delegation-pillars.png)
 
 ---
 
@@ -157,7 +157,7 @@ This set of tests covers all key UI and interaction flows related to delegation 
 
 Covers user voting mechanisms, including interface states and validation of voting logic.
 
-![Voting Pillars](/docs/voting-pillars.png)
+![Voting Pillars](./docs/voting-pillars.png)
 
 ---
 
@@ -169,13 +169,13 @@ Proposal functionality is split into two sub-categories, each with distinct test
 
 Tracks creation, display, and participation in proposal discussions.
 
-![Proposal Discussion](/docs/proposal-discussion.png)
+![Proposal Discussion](./docs/proposal-discussion.png)
 
 #### ii. Budget Proposal
 
 Tracks creation, display, and participation in budget-related proposals.
 
-![Budget Proposal](/docs/budget-proposal.png)
+![Budget Proposal](./docs/budget-proposal.png)
 
 ---
 
@@ -183,7 +183,7 @@ Tracks creation, display, and participation in budget-related proposals.
 
 Tests centered around outcomes from various actions.
 
-![Outcomes Pillars](/docs/outcomes-pillars.png)
+![Outcomes Pillars](./docs/outcomes-pillars.png)
 
 ---
 
@@ -191,7 +191,7 @@ Tests centered around outcomes from various actions.
 
 Covers all test cases that require the user to be authenticated, and are not included in the delegation, voting, proposal, or outcomes pillars
 
-![Logged-In State](/docs/loggedin.png)
+![Logged-In State](./docs/loggedin.png)
 
 ---
 
@@ -199,4 +199,4 @@ Covers all test cases that require the user to be authenticated, and are not inc
 
 For a comprehensive view of the project's Playwright architecture, refer to the Excalidraw diagram:
 
-[Govtool Project Architecture](/docs/govtool-playwright-project.excalidraw)
+[Govtool Project Architecture](./docs/govtool-playwright-project.excalidraw)

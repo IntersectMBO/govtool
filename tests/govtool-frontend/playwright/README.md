@@ -92,9 +92,11 @@ npm run generate-faucet-wallet
 ```
 
 The script will:
+
 - Display the wallet details (payment private key, stake public key hash, and wallet address) in the terminal.
 
 **Example Output:**
+
 ```
 🎉 Wallet generated successfully!
 -----------------------------------
@@ -136,9 +138,9 @@ https://${network}.cardanoscan.io/address/<your-wallet-address>
 Replace `${network}` with the appropriate Cardano network (e.g.`preprod`, or `preview`) and `<your-wallet-address>` with the generated address.
 
 **Example**:
+
 - For a preview wallet: `https://preview.cardanoscan.io/address/<your-wallet-address>`
 - Monitor the balance to ensure it meets the requirements for individual or all test runs.
-
 
 ---
 
@@ -146,7 +148,7 @@ Replace `${network}` with the appropriate Cardano network (e.g.`preprod`, or `pr
 
 ### 🔑 Generate Test Wallets
 
-Before each test run, generate test wallets which is required for wallet dependent test:
+Before each test run, generate test wallets required for wallet-dependent tests:
 
 ```bash
 npm run generate-wallets
@@ -178,7 +180,7 @@ Each test suite can be run in **UI** or **Headless** mode.
 
 ---
 
-#### 1. **Delegation Pillars**
+#### 1. **Delegation Pillar**
 
 - **Pre-requisite**: Ensure the faucet address holds at least **12,000 ADA**.
 
@@ -196,7 +198,7 @@ npm run test:headless:delegation-pillar
 
 ---
 
-#### 2. **Voting Pillars**
+#### 2. **Voting Pillar**
 
 - **Pre-requisite**: Ensure the faucet address holds at least **12,000 ADA**.
 
@@ -230,7 +232,7 @@ npm run test:headless:outcomes
 
 ---
 
-#### 4. **Proposal Pillars**
+#### 4. **Proposal Pillar**
 
 _Includes both Proposal Discussion and Budget Discussion_
 

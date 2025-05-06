@@ -79,11 +79,74 @@ npx playwright install
 
 ---
 
+## 🔧 Faucet wallet Configuration
+
+This section guides you through generating a Cardano faucet wallet and configuring it for use. Follow the steps below to create and set the config on env
+
+### Step 1: Generate a Faucet Wallet
+
+Run the following command to generate a new faucet wallet:
+
+```bash
+npm run generate-faucet-wallet
+```
+
+The script will:
+- Display the wallet details (payment private key, stake public key hash, and wallet address) in the terminal.
+
+**Example Output:**
+```
+🎉 Wallet generated successfully!
+-----------------------------------
+🔑 Payment Private Key: <your-payment-private-key>
+🔗 Stake Public Key Hash: <your-stake-pkh>
+🏠 Wallet Address: <your-wallet-address>
+-----------------------------------
+
+📋 Please copy the following to your environment variables:
+1. Set FAUCET_PAYMENT_PRIVATE=<your-payment-private-key>
+2. Set FAUCET_STAKE_PKH=<your-stake-pkh>
+3. Set FAUCET_ADDRESS=<your-wallet-address>
+
+🎈 All done! Have fun with your new wallet!
+```
+
+### Step 2: Configure Environment Variables
+
+Securely store the generated wallet details in your environment variables. Add the following to your `.env` file or environment configuration:
+
+```env
+FAUCET_PAYMENT_PRIVATE=<your-payment-private-key>
+FAUCET_STAKE_PKH=<your-stake-pkh>
+FAUCET_ADDRESS=<your-wallet-address>
+```
+
+⚠️ **Security Note**: Store your wallet details in a secure location for future use. The payment private key is sensitive and must be protected to prevent unauthorized access to your funds.
+
+### Step 3: Fund the Wallet
+
+Ensure the wallet address has sufficient funds for your test runs. The required balance depends on the specific tests you plan to execute (refer to the test-specific test run details below).
+
+To check the wallet balance, visit:
+
+```
+https://${network}.cardanoscan.io/address/<your-wallet-address>
+```
+
+Replace `${network}` with the appropriate Cardano network (e.g.`preprod`, or `preview`) and `<your-wallet-address>` with the generated address.
+
+**Example**:
+- For a preview wallet: `https://preview.cardanoscan.io/address/<your-wallet-address>`
+- Monitor the balance to ensure it meets the requirements for individual or all test runs.
+
+
+---
+
 ## 🧪 Running Tests
 
 ### 🔑 Generate Test Wallets
 
-Before each test run, generate fresh test wallets to avoid conflicts:
+Before each test run, generate test wallets which is required for wallet dependent test:
 
 ```bash
 npm run generate-wallets

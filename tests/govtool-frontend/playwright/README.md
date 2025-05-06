@@ -122,13 +122,13 @@ Each test suite can be run in **UI** or **Headless** mode.
 #### 🖥️ UI Mode
 
 ```bash
-npm run test:delegation-pillars
+npm run test:delegation-pillar
 ```
 
 #### 🧪 Headless Mode (No UI)
 
 ```bash
-npm run test:headless:delegation-pillars
+npm run test:headless:delegation-pillar
 ```
 
 ---
@@ -140,13 +140,13 @@ npm run test:headless:delegation-pillars
 #### 🖥️ UI Mode
 
 ```bash
-npm run test:voting-pillars
+npm run test:voting-pillar
 ```
 
 #### 🧪 Headless Mode (No UI)
 
 ```bash
-npm run test:headless:voting-pillars
+npm run test:headless:voting-pillar
 ```
 
 ---
@@ -176,13 +176,13 @@ _Includes both Proposal Discussion and Budget Discussion_
 #### 🖥️ UI Mode
 
 ```bash
-npm run test:proposal-pillars
+npm run test:proposal-pillar
 ```
 
 #### 🧪 Headless Mode (No UI)
 
 ```bash
-npm run test:headless:proposal-pillars
+npm run test:headless:proposal-pillar
 ```
 
 ---
@@ -285,4 +285,4 @@ npm run allure:serve
 
 For contribution guidelines and development tips, refer to:
 
-📄 **[DEVELOPERS_GUIDE.md](/DEVELOPERS_GUIDE.md)**
+📄 **[DEVELOPERS_GUIDE.md](./DEVELOPERS_GUIDE.md)**

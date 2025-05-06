@@ -8,6 +8,7 @@ import {
   isBootStrapingPhase,
   lovelaceToAda,
   skipIfMainnet,
+  skipIfTemporyWalletIsNotAvailable,
 } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
@@ -27,6 +28,7 @@ import { dRep01AuthFile } from "@constants/auth";
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
   await skipIfMainnet();
+  await skipIfTemporyWalletIsNotAvailable("registeredDRepCopyWallets.json");
 });
 
 test.describe("Logged in DRep", () => {

@@ -22,4 +22,5 @@ lib/_mock/registeredDRepCopyWallets.json
 lib/_mock/wallets.json
 lib/_mock/proposals.json
 lib/_mock/protocolParameter.json
-./lock_logs.txt
+lib/_mock/faucetWalletBalance.json
+lock_logs.txt

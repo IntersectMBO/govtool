@@ -1,4 +1,6 @@
+import { user01AuthFile } from "@constants/auth";
 import { InvalidMetadata } from "@constants/index";
+import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import OutcomeDetailsPage from "@pages/outcomeDetailsPage";
@@ -11,25 +13,29 @@ test.beforeEach(async () => {
   await setAllureEpic("9. Outcomes");
 });
 
+test.use({
+  storageState: user01AuthFile,
+  wallet: user01Wallet,
+});
+
 test.describe("Outcomes page", () => {
   let outcomePage: OutComesPage;
   test.beforeEach(async ({ page }) => {
     outcomePage = new OutComesPage(page);
   });
 
-  test("9A_1. Should access Outcomes page in disconnect state", async () => {
+  test("9A_2. Should access Outcomes page in connected state", async () => {
     await outcomePage.shouldAccessPage();
   });
-
   test.describe("outcome sorting and filtering", () => {
-    test("9C_1A. Should filter Governance Action Type on governance actions page in disconnect state", async () => {
+    test("9C_1B. Should filter Governance Action Type on governance actions page", async () => {
       test.slow();
       await outcomePage.goto();
 
       await outcomePage.filterOutcomes();
     });
 
-    test("9C_2A. Should sort Governance Action Type on outcomes page in disconnect state", async () => {
+    test("9C_2B. Should sort Governance Action Type on outcomes page", async () => {
       test.slow();
 
       await outcomePage.goto({ sort: "oldestFirst" });
@@ -37,18 +43,18 @@ test.describe("Outcomes page", () => {
       await outcomePage.sortOutcomes();
     });
 
-    test("9C_3A. Should filter and sort Governance Action Type on outcomes page in disconnect state", async () => {
+    test("9C_3B. Should filter and sort Governance Action Type on outcomes page", async () => {
       await outcomePage.filterAndSortOutcomes();
     });
   });
 
-  test("9E_1. Should verify all of the displayed governance actions have expired in disconnect state", async () => {
+  test("9E_2. Should verify all of the displayed governance actions have expired", async () => {
     await outcomePage.goto();
 
     await outcomePage.verifyAllOutcomesAreExpired();
   });
 
-  test("9F_1. Should load more Outcomes on show more in disconnect state", async () => {
+  test("9F_2. Should load more Outcomes on show more", async () => {
     await outcomePage.VerifyLoadMoreOutcomes();
   });
 
@@ -64,18 +70,17 @@ test.describe("Outcomes page", () => {
       );
       governanceActionId = response.governanceActionId;
       governanceActionTitle = response.governanceActionTitle;
-
       currentPage = page;
     });
 
-    test("9B_1. Should search outcomes proposal by title and id in disconnect state", async () => {
+    test("9B_2. Should search outcomes proposal by title and id", async () => {
       // search by id
       await outcomePage.searchOutcomesById(governanceActionId);
 
       await outcomePage.searchOutcomesByTitle(governanceActionTitle);
     });
 
-    test("9D_1. Should copy governanceActionId in disconnect state", async ({
+    test("9D_2. Should copy governanceActionId in disconnect state", async ({
       context,
     }) => {
       await context.grantPermissions(["clipboard-read", "clipboard-write"]);
@@ -85,17 +90,18 @@ test.describe("Outcomes page", () => {
 });
 
 test.describe("Outcome details", () => {
-  test("9G_1. Should display correct vote counts on outcome details page in disconnect state", async ({
+  test("9G_2. Should display correct vote counts on outcome details page", async ({
     browser,
     page,
   }) => {
     const outcomeDetailPage = new OutcomeDetailsPage(page);
-    await outcomeDetailPage.shouldDisplayCorrectVotingResults(browser);
+
+    await outcomeDetailPage.shouldDisplayCorrectVotingResults(browser, true);
   });
 
   test.describe("Invalid Outcome Metadata", () => {
     InvalidMetadata.forEach(({ type, reason, url, hash }, index) => {
-      test(`9H_${index + 1}A: Should display "${type}" message in outcomes when ${reason} in disconnect state`, async ({
+      test(`9H_${index + 1}B: Should display "${type}" message in outcomes when ${reason}`, async ({
         page,
       }) => {
         const outcomeResponse = {

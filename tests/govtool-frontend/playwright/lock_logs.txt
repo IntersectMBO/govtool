@@ -1,0 +1,525 @@
+[5/5/2025, 11:58:55 AM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 11:58:55 AM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 11:58:56 AM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+ ---------------------> waiting lock for:undefined
+[5/5/2025, 11:59:22 AM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 11:59:22 AM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:01:03 PM] Task completed for:undefined
+[5/5/2025, 12:01:03 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:01:03 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:01:03 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:01:03 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:01:38 PM] Task completed for:undefined
+[5/5/2025, 12:01:38 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:01:38 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:01:54 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:01:54 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:01:55 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+ ---------------------> waiting lock for:undefined
+[5/5/2025, 12:02:46 PM] Task completed for:undefined
+[5/5/2025, 12:02:46 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:02:46 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:02:46 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:02:46 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:02:47 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+ ---------------------> waiting lock for:undefined
+[5/5/2025, 12:02:50 PM] Task completed for:undefined
+[5/5/2025, 12:02:50 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:02:50 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:02:50 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:02:50 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:02:53 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:02:53 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:02:53 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:02:53 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:02:54 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:02:54 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:02:54 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:02:54 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:04:05 PM] Task completed for:undefined
+[5/5/2025, 12:04:05 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:04:05 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:04:05 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:04:05 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:05:01 PM] Task completed for:undefined
+[5/5/2025, 12:05:01 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:05:01 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+ ---------------------> waiting lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:05:18 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:05:40 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:05:40 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:05:40 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:05:40 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:06:17 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:06:17 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:06:17 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:06:17 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:08:13 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:08:13 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:08:39 PM] Task completed for:undefined
+[5/5/2025, 12:08:39 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:08:39 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:08:43 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:08:43 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:08:44 PM] Task failure: 
+{"error":"{\"status\":400}"}
+[5/5/2025, 12:08:44 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:08:44 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:08:47 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:08:47 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:09:01 PM] Task completed for:undefined
+[5/5/2025, 12:09:01 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:09:01 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:19:48 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:19:48 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:19:49 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+ ---------------------> waiting lock for:undefined
+[5/5/2025, 12:20:02 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:20:02 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:20:21 PM] Task completed for:undefined
+[5/5/2025, 12:20:21 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:20:21 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:20:21 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:20:21 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:20:35 PM] Task completed for:undefined
+[5/5/2025, 12:20:35 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:20:35 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:20:50 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:20:50 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:20:51 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+ ---------------------> waiting lock for:undefined
+[5/5/2025, 12:20:55 PM] Task completed for:undefined
+[5/5/2025, 12:20:55 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:20:55 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:20:55 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:20:55 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:20:56 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+ ---------------------> waiting lock for:undefined
+[5/5/2025, 12:21:20 PM] Task completed for:undefined
+[5/5/2025, 12:21:20 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:21:20 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:21:20 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:21:20 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:22:27 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:22:27 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:27:30 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:27:30 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:28:49 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:28:49 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:29:04 PM] Task completed for:undefined
+[5/5/2025, 12:29:04 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:29:04 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:41:47 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:41:47 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:41:47 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+ ---------------------> waiting lock for:undefined
+[5/5/2025, 12:41:50 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:41:50 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:42:11 PM] Task completed for:undefined
+[5/5/2025, 12:42:11 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:42:11 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:42:11 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:42:11 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:42:25 PM] Task completed for:undefined
+[5/5/2025, 12:42:25 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:42:25 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:42:49 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:42:49 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:42:50 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+ ---------------------> waiting lock for:undefined
+[5/5/2025, 12:42:57 PM] Task completed for:undefined
+[5/5/2025, 12:42:57 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:42:57 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:42:57 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:42:57 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:42:58 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+ ---------------------> waiting lock for:undefined
+[5/5/2025, 12:43:11 PM] Task completed for:undefined
+[5/5/2025, 12:43:11 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:43:11 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:43:11 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:43:11 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:44:29 PM] Task completed for:undefined
+[5/5/2025, 12:44:29 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:44:29 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:44:29 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:44:29 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:44:42 PM] Task completed for:undefined
+[5/5/2025, 12:44:42 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:44:42 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:45:12 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:45:12 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:45:12 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:45:12 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:45:12 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:45:12 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:45:12 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:45:12 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:45:18 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:45:18 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:45:18 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:45:18 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:45:19 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:45:19 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:45:19 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:45:19 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:46:43 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:46:43 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:46:43 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:46:43 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:46:43 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:46:43 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:46:43 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:46:43 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:46:43 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:46:43 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:46:43 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:46:43 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:46:43 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:46:44 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:46:44 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:46:44 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:46:44 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:47:07 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:47:07 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:47:07 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:47:07 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:47:41 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:47:41 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:47:41 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:47:41 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:48:38 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:48:38 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:48:38 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:48:38 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:48:42 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:48:42 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:48:42 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:48:42 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:48:59 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:48:59 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:48:59 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:48:59 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:52:05 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:52:05 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:53:02 PM] Task completed for:undefined
+[5/5/2025, 12:53:02 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:53:02 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:53:06 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:53:06 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:53:07 PM] Task failure: 
+{"error":"{\"status\":400}"}
+[5/5/2025, 12:53:07 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:53:07 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 12:53:10 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 12:53:10 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 12:53:23 PM] Task completed for:undefined
+[5/5/2025, 12:53:23 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 12:53:23 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 1:31:04 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 1:31:04 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 1:32:31 PM] Task completed for:undefined
+[5/5/2025, 1:32:31 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 1:32:31 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 1:32:32 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 1:32:32 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 1:33:03 PM] Task completed for:undefined
+[5/5/2025, 1:33:03 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 1:33:03 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 1:33:03 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 1:33:03 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 1:33:11 PM] Task completed for:undefined
+[5/5/2025, 1:33:11 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 1:33:11 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+
+[5/5/2025, 1:33:40 PM] Initiator: tempWallets 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 1:33:40 PM] Initiator: tempWallets 
+---------------------> acquired lock for:undefined
+[5/5/2025, 1:33:40 PM] Initiator: tempWallets 
+---------------------> releasing lock for:undefined
+[5/5/2025, 1:33:40 PM] Initiator: tempWallets 
+---------------------> released lock for:undefined
+
+[5/5/2025, 1:35:20 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquiring lock for:undefined
+[5/5/2025, 1:35:20 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> acquired lock for:undefined
+[5/5/2025, 1:35:58 PM] Task completed for:undefined
+[5/5/2025, 1:35:58 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> releasing lock for:undefined
+[5/5/2025, 1:35:58 PM] Initiator: addr_test1qz3hqauh86zjg2c3wdqueava97mc4llr5pv5fvyfcgjc84jwvs0cxwl8qfkejj8ld2mp0ygjx9n2rjz0tr75w2ntxwjspd08dd 
+---------------------> released lock for:undefined
+

@@ -4,6 +4,10 @@ import { IDRep } from "@types";
 import { bech32 } from "bech32";
 import * as crypto from "crypto";
 import { functionWaitedAssert } from "./waitedLoop";
+import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
+import { faker } from "@faker-js/faker";
+import { ShelleyWallet } from "./crypto";
+import environments from "@constants/environments";
 
 export async function fetchFirstActiveDRepDetails(page: Page) {
   let dRepGivenName: string;
@@ -125,4 +129,50 @@ export function convertDRep(
   );
   cip129DRep = drepIdFromHex("drep", cip129DrepHex);
   return { cip129: cip129DRep, cip105: cip105DRep };
+}
+
+export async function generateValidDRepInfo() {
+  return {
+    name: mockValid.name(),
+    objectives: faker.lorem.paragraph(2),
+    motivations: faker.lorem.paragraph(2),
+    qualifications: faker.lorem.paragraph(2),
+    paymentAddress: (await ShelleyWallet.generate()).addressBech32(
+      environments.networkId
+    ),
+    linksReferenceLinks: [
+      {
+        url: faker.internet.url(),
+        description: faker.internet.displayName(),
+      },
+    ],
+    identityReferenceLinks: [
+      {
+        url: faker.internet.url(),
+        description: faker.internet.displayName(),
+      },
+    ],
+  };
+}
+
+export function generateInvalidDRepInfo() {
+  return {
+    name: mockInvalid.name(),
+    objectives: faker.lorem.paragraph(40),
+    motivations: faker.lorem.paragraph(40),
+    qualifications: faker.lorem.paragraph(40),
+    paymentAddress: faker.string.alphanumeric(45),
+    linksReferenceLinks: [
+      {
+        url: mockInvalid.url(),
+        description: faker.lorem.paragraph(40),
+      },
+    ],
+    identityReferenceLinks: [
+      {
+        url: mockInvalid.url(),
+        description: faker.lorem.paragraph(40),
+      },
+    ],
+  };
 }

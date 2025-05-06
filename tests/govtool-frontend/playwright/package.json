@@ -44,7 +44,8 @@
     "test:headless:usersnap": "npx playwright test userSnap.spec.ts",
     "test:headless:misc": "npx playwright test miscellaneous",
     "format": "prettier . --write",
-    "generate-wallets": "ts-node ./generate_wallets.ts 23"
+    "generate-wallets": "ts-node ./generate_wallets.ts 23",
+    "generate-faucet-wallet": "ts-node ./generate_faucet_wallet.ts"
   },
   "dependencies": {
     "@cardanoapi/cardano-test-wallet": "^3.3.1",

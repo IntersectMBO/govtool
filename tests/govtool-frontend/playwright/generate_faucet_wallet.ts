@@ -23,7 +23,9 @@ import { ShelleyWallet } from "./lib/helpers/crypto";
     console.log(`2. Set FAUCET_STAKE_PKH=${walletJson.stake.pkh}`);
     console.log(`3. Set FAUCET_ADDRESS=${walletJson.address}`);
 
-    console.log("\n🎈 All done! Have fun with your new wallet!");
+    console.log(
+      "\n🎈 All set! Please ensure this wallet is funded with a sufficient balance"
+    );
   } catch (error) {
     console.error("\n❌ An error occurred:", error.message);
   }

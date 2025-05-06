@@ -110,7 +110,7 @@ The script will:
 2. Set FAUCET_STAKE_PKH=<your-stake-pkh>
 3. Set FAUCET_ADDRESS=<your-wallet-address>
 
-🎈 All done! Have fun with your new wallet!
+🎈 All set! Please ensure this wallet is funded with a sufficient balance
 ```
 
 ### Step 2: Configure Environment Variables

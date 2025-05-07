@@ -10,7 +10,7 @@ import { ShelleyWallet } from "./lib/helpers/crypto";
     console.log("\n🎉 Wallet generated successfully!");
     console.log("-----------------------------------");
     console.log("💼 Wallet:", walletJson);
-    console.log(`🔑 Payment Private Key: ${walletJson.payment.private}`);
+    console.log(`\n🔑 Payment Private Key: ${walletJson.payment.private}`);
     console.log(`🔗 Stake Public Key Hash: ${walletJson.stake.pkh}`);
     console.log(`🏠 Wallet Address: ${walletJson.address}`);
     console.log("-----------------------------------");

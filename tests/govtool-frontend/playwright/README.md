@@ -51,13 +51,13 @@ npx playwright install
 
 ### HOST URL
 
-| Environment | URL                                                                                                                      |
-| :---------- | :----------------------------------------------------------------------------------------------------------------------- |
-| Development | [https://p80-z78acf3c2-zded6a792-gtw.z937eb260.rustrocks.fr](https://p80-z78acf3c2-zded6a792-gtw.z937eb260.rustrocks.fr) |
-| QA          | [https://govtool.cardanoapi.io](https://govtool.cardanoapi.io)                                                           |
-| Preview     | [https://preview.gov.tools](https://preview.gov.tools)                                                                   |
-| Pre-Prod    | [https://pre-prod.gov.tools](https://pre-prod.gov.tools)                                                                 |
-| Mainnet     | [https://gov.tools](https://gov.tools)                                                                                   |
+| Environment | URL                                                                                                                      | Network |
+| :---------- | :----------------------------------------------------------------------------------------------------------------------- | :------ |
+| Development | [https://p80-z78acf3c2-zded6a792-gtw.z937eb260.rustrocks.fr](https://p80-z78acf3c2-zded6a792-gtw.z937eb260.rustrocks.fr) | Preview |
+| QA          | [https://govtool.cardanoapi.io](https://govtool.cardanoapi.io)                                                           | Preview |
+| Preview     | [https://preview.gov.tools](https://preview.gov.tools)                                                                   | Preview |
+| Pre-Prod    | [https://pre-prod.gov.tools](https://pre-prod.gov.tools)                                                                 | Preprod |
+| Mainnet     | [https://gov.tools](https://gov.tools)                                                                                   | Mainnet |
 
 ---
 
@@ -66,16 +66,21 @@ npx playwright install
 ### Blockfrost API Key
 
 - To generate a Blockfrost API key (Project ID):
-  1. Follow the instructions in the [Blockfrost documentation](https://blockfrost.dev/overview/getting-started).
+
+  1. Follow the instructions in the [Blockfrost documentation](https://blockfrost.dev/overview/getting-started) 📚.
   2. The **Project ID** you create there serves as your **Blockfrost API Key**.
+  3. Copy the **Project ID** and set it as `BLOCKFROST_API_KEY`.
+
+  🔐 Note: Ensure you select the correct network for the **Project ID** that matches the host URL from the environment listed above.
 
 ### Kuber API Key
 
 - To generate a Kuber API Key:
-  1. Visit [Kuberide](https://kuberide.com/).
+  1. Visit [Kuberide](https://kuberide.com/) 🌐.
   2. Log in using your Google or GitHub account.
-  3. Navigate to **API Keys**.
-  4. Click to **Generate API Key**.
+  3. Navigate to **API Keys** ⚙️.
+  4. Click to **Generate API Key** ✨.
+  5. Copy the API key and set it as `KUBER_API_KEY`
 
 ---
 
@@ -127,15 +132,26 @@ FAUCET_ADDRESS=<your-wallet-address>
 
 ### Step 3: Fund the Wallet
 
-Ensure the wallet address has sufficient funds for your test runs. The required balance depends on the specific tests you plan to execute (refer to the test-specific test run details below).
+Ensure your wallet has enough funds for your test runs. The required balance depends on the specific tests you plan to execute (see test-specific details below).
 
-To check the wallet balance, visit:
+To fund your wallet on the **Preview** or **Preprod** network:
+
+1. Use the Cardano Testnet Faucet:  
+   [https://docs.cardano.org/cardano-testnets/tools/faucet](https://docs.cardano.org/cardano-testnets/tools/faucet) 🌐  
+   **Note**: There is a daily limit of **10,000 ADA** per wallet.
+
+2. If the funded amount is insufficient, transfer additional ADA from another wallet. 💸
+
+To check your wallet balance:
+
+Visit:
 
 ```
 https://${network}.cardanoscan.io/address/<your-wallet-address>
 ```
 
-Replace `${network}` with the appropriate Cardano network (e.g.`preprod`, or `preview`) and `<your-wallet-address>` with the generated address.
+- Replace `${network}` with the appropriate network (e.g., `preprod` or `preview`).
+- Replace `<your-wallet-address>` with your wallet address. 🔍
 
 **Example**:
 

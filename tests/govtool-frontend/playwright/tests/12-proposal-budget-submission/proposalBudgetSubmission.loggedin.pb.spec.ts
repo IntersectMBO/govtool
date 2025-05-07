@@ -305,7 +305,7 @@ test.describe("Budget proposal 01 wallet", () => {
           await budgetProposalSubmissionPage.currentPage
             .getByTestId(`${contractingType}-button`)
             .click();
-          if (contractingType === "Other") {
+          if (contractingType === "other") {
             await budgetProposalSubmissionPage.otherDescriptionInput.fill(
               faker.lorem.paragraph(2)
             );

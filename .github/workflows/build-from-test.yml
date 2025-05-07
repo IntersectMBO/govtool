@@ -196,6 +196,16 @@ jobs:
           docker push ${{ steps.image_lowercase.outputs.lowercase }}-${{ env.CLEAN_NETWORK}}:${{ env.COMMIT_TAG }}
           docker push ${{ steps.image_lowercase.outputs.lowercase }}-${{ env.CLEAN_NETWORK}}:${{ env.STATIC_TAG }}
 
+      - name: Notify Qovery of new image tag
+        run: |
+            curl -X POST https://api.qovery.com/organization/${{ secrets.QOVERY_ORG_ID }}/container/deploy \
+            -H "Authorization: Token ${{ secrets.QOVERY_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+                "image_name": "${{ steps.image_lowercase.outputs.lowercase }}-${{ env.CLEAN_NETWORK }}",
+                "tag": "${{ env.COMMIT_TAG }}"
+              }'
+
       - name: Add tag as a PR comment
         uses: ubie-oss/comment-to-merged-pr-action@v0.3.3
         id: comment-to-merged-pr

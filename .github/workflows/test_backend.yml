@@ -29,7 +29,7 @@ on:
           - "mainnet"
           - "preprod"
   workflow_run:
-    workflows: ["Build and deploy GovTool test stack"]
+    workflows: ["Check and Build QA"]
     types: [completed]
     branches: 
       - test
@@ -47,6 +47,11 @@ jobs:
       start_time: ${{ steps.set-pending-status.outputs.timestamp }}
       status: ${{ steps.run-tests.outcome }}
     steps:
+      - name: Wait for qa deployment to complete
+        if: ${{ github.event_name == 'workflow_run' }}
+        run: |
+          echo "Waiting for the deployment to be ready..."
+          sleep 300
       - name: Checkout code
         uses: actions/checkout@v4
         with:

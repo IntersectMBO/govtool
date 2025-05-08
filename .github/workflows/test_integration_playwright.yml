@@ -31,7 +31,7 @@ on:
           - "preprod"
 
   workflow_run:
-    workflows: ["Build and deploy GovTool test stack"]
+    workflows: ["Check and Build QA"]
     types: [completed]
     branches: 
       - test
@@ -52,6 +52,11 @@ jobs:
       run:
         working-directory: tests/govtool-frontend/playwright
     steps:
+      - name: Wait for qa deployment to complete
+        if: ${{ github.event_name == 'workflow_run' }}
+        run: |
+          echo "Waiting for the deployment to be ready..."
+          sleep 300
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.COMMIT_SHA }}

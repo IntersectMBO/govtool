@@ -18,6 +18,8 @@ changes.
 
 ### Removed
 
+- Remove additional canonicalization of the metadata [Issue 3591](https://github.com/IntersectMBO/govtool/issues/3591)
+
 ## [v2.0.20](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.20) 2025-04-16
 
 ### Added

@@ -13,6 +13,7 @@ const formErrors = {
   ],
   linkDescription: "max-80-characters-error",
   email: "invalid-email-address-error",
+  image: "invalid-image-url-error",
   links: {
     url: "link-reference-description-1-error",
     description: "link-reference-description-1-error",
@@ -59,6 +60,9 @@ export default class DRepForm {
   readonly motivationsInput = this.form.getByTestId("motivations-input");
   readonly qualificationsInput = this.form.getByTestId("qualifications-input");
   readonly paymentAddressInput = this.form.getByTestId("payment-address-input");
+  readonly imageInput = this.form.locator(
+    "div:nth-child(4) > div:nth-child(2) > input"
+  ); // BUG missing test id
   readonly doNotListCheckBox = this.form.getByRole("checkbox");
 
   constructor(private readonly form: Page) {}
@@ -149,6 +153,7 @@ export default class DRepForm {
     await this.motivationsInput.fill(dRepInfo.motivations);
     await this.qualificationsInput.fill(dRepInfo.qualifications);
     await this.paymentAddressInput.fill(dRepInfo.paymentAddress);
+    await this.imageInput.fill(dRepInfo.image);
     await this.linkRefrenceFirstUrlInput.fill(
       dRepInfo.linksReferenceLinks[0].url
     );
@@ -175,6 +180,9 @@ export default class DRepForm {
     const motivationsInputText = await this.motivationsInput.textContent();
     const qualificationsInputText =
       await this.qualificationsInput.textContent();
+    const isImageErrorVisible = await this.form
+      .getByTestId(formErrors.image)
+      .isVisible();
     const isReferenceLinkErrorVisible = await this.form
       .getByTestId(formErrors.links.url)
       .isVisible();
@@ -201,6 +209,10 @@ export default class DRepForm {
         qualificationsInputText !== dRepInfo.qualifications &&
         `${dRepInfo.qualifications} is not equal to ${qualificationsInputText}`,
     }).toEqual(dRepInfo.qualifications);
+
+    await expect(this.form.getByTestId(formErrors.image), {
+      message: isImageErrorVisible && `${dRepInfo.image} is an invalid image`,
+    }).toBeHidden();
 
     await expect(this.form.getByTestId(formErrors.links.url), {
       message:
@@ -246,6 +258,9 @@ export default class DRepForm {
     const motivationsInputText = await this.motivationsInput.textContent();
     const qualificationsInputText =
       await this.qualificationsInput.textContent();
+    const isImageErrorVisible = await this.form
+      .getByTestId(formErrors.image)
+      .isVisible();
     const isReferenceLinkErrorVisible = await this.form
       .getByTestId(formErrors.links.url)
       .isVisible();
@@ -283,6 +298,12 @@ export default class DRepForm {
         qualificationsInputText === dRepInfo.qualifications &&
         `${dRepInfo.qualifications} is equal to ${qualificationsInputText}`,
     }).not.toEqual(dRepInfo.qualifications);
+
+    await expect(this.form.getByTestId(formErrors.image), {
+      message: !isImageErrorVisible && `${dRepInfo.image} is a valid image`,
+    }).toBeVisible({
+      timeout: 60_000,
+    });
 
     await expect(this.form.getByTestId(formErrors.links.url), {
       message:

@@ -25,3 +25,4 @@ export const budgetProposal01AuthFile = ".auth/budgetProposal01.json";
 export const budgetProposal02AuthFile = ".auth/budgetProposal02.json";
 export const budgetProposal03AuthFile = ".auth/budgetProposal03.json";
 export const budgetProposal04AuthFile = ".auth/budgetProposal04.json";
+export const budgetProposal05AuthFile = ".auth/budgetProposal05.json";

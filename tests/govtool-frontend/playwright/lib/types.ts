@@ -66,6 +66,7 @@ export type IDRepInfo = {
   objectives?: string;
   motivations?: string;
   qualifications?: string;
+  image?: string;
   paymentAddress?: string;
   identityReferenceLinks?: LinkType[];
   linksReferenceLinks?: LinkType[];

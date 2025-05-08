@@ -3,18 +3,21 @@ import {
   budgetProposal02AuthFile,
   budgetProposal03AuthFile,
   budgetProposal04AuthFile,
+  budgetProposal05AuthFile,
 } from "@constants/auth";
 import {
   budgetProposal01Wallet,
   budgetProposal02Wallet,
   budgetProposal03Wallet,
   budgetProposal04Wallet,
+  budgetProposal05Wallet,
 } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/budgetProposal";
 import { setAllureEpic } from "@helpers/allure";
 import { createNewPageWithWallet } from "@helpers/page";
 import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
+import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 import BudgetDiscussionSubmissionPage from "@pages/budgetDiscussionSubmissionPage";
 import { expect } from "@playwright/test";
 import {
@@ -305,7 +308,7 @@ test.describe("Budget proposal 01 wallet", () => {
           await budgetProposalSubmissionPage.currentPage
             .getByTestId(`${contractingType}-button`)
             .click();
-          if (contractingType === "Other") {
+          if (contractingType === "other") {
             await budgetProposalSubmissionPage.otherDescriptionInput.fill(
               faker.lorem.paragraph(2)
             );
@@ -507,6 +510,39 @@ test("12I. Should submit a valid draft budget proposal", async ({
 
   const budgetDiscussionDetailsPage = new BudgetDiscussionDetailsPage(page);
   await budgetDiscussionDetailsPage.validateProposalDetails(draftContact);
+
+  await budgetDiscussionDetailsPage.deleteProposal();
+});
+
+test("12J. Should verify created proposal appears in my proposals list", async ({
+  browser,
+}) => {
+  test.slow();
+  const page = await createNewPageWithWallet(browser, {
+    storageState: budgetProposal05AuthFile,
+    wallet: budgetProposal05Wallet,
+  });
+
+  const budgetSubmissionPage = new BudgetDiscussionSubmissionPage(page);
+  await budgetSubmissionPage.goto();
+  const { proposalDetails } = await budgetSubmissionPage.createBudgetProposal();
+  const budgetDiscussionPage = new BudgetDiscussionPage(page);
+  await budgetDiscussionPage.goto();
+
+  await budgetDiscussionPage.filterBtn.click();
+  await budgetDiscussionPage.myProposalBtn.click();
+
+  const proposalList = await budgetDiscussionPage.getAllProposals();
+
+  expect(proposalList.length).toBeGreaterThan(0);
+
+  // Close the filter dropdown to ensure the proposals list is visible
+  await budgetDiscussionPage.sortBtn.click({ force: true });
+  const budgetDiscussionDetailsPage =
+    await budgetDiscussionPage.viewFirstProposal();
+
+  await expect(budgetDiscussionDetailsPage.menuButton).toBeVisible();
+  await budgetDiscussionDetailsPage.validateProposalDetails(proposalDetails);
 
   await budgetDiscussionDetailsPage.deleteProposal();
 });

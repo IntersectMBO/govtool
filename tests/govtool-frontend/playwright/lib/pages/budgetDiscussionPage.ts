@@ -13,6 +13,9 @@ export default class BudgetDiscussionPage {
   readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
   readonly filterBtn = this.page.getByTestId("filter-button");
   readonly sortBtn = this.page.getByTestId("sort-button");
+  readonly myProposalBtn = this.page.getByTestId(
+    "My Proposals-owner-filter-option"
+  );
 
   // input
   readonly searchInput = this.page.getByTestId("search-input");
@@ -49,7 +52,10 @@ export default class BudgetDiscussionPage {
     });
     const proposalCards = await this.page.locator(proposalCardSelector).all();
 
-    expect(true, "No budget proposals found.").toBeTruthy();
+    expect(
+      true,
+      proposalCards.length === 0 && "No budget proposals found."
+    ).toBeTruthy();
 
     return proposalCards;
   }

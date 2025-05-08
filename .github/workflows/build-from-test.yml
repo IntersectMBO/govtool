@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - test
+      - infra/test-chores
   workflow_dispatch:
 
 permissions:

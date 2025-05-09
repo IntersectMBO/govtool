@@ -12,6 +12,17 @@ changes.
 
 ### Added
 
+### Fixed
+
+### Changed
+
+### Removed
+
+## [v2.0.21](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.21) 2025-05-09
+
+
+### Added
+
 - Add support for the tables in markdown [Issue 3581](https://github.com/IntersectMBO/govtool/issues/3581)
 
 ### Fixed

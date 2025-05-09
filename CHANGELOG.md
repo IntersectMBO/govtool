@@ -18,6 +18,24 @@ changes.
 
 ### Removed
 
+## [v2.0.21](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.21) 2025-05-09
+
+
+### Added
+
+- Add support for the tables in markdown [Issue 3581](https://github.com/IntersectMBO/govtool/issues/3581)
+
+### Fixed
+
+- Fix invalid metadata status background on voted on card
+
+### Changed
+
+- Update first CTA on GovTool home page [Issue 3467](https://github.com/IntersectMBO/govtool/issues/3467)
+- Change link to docs in learn more about governance [Issue 3494](https://github.com/IntersectMBO/govtool/issues/3494)
+
+### Removed
+
 - Remove additional canonicalization of the metadata [Issue 3591](https://github.com/IntersectMBO/govtool/issues/3591)
 
 ## [v2.0.20](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.20) 2025-04-16

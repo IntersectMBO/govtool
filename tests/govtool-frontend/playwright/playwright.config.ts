@@ -73,6 +73,12 @@ export default defineConfig({
       teardown: environments.ci && "cleanup faucet",
     },
     {
+      name: "proposal submission ga auth setup",
+      testMatch: "**/proposal-submission.ga.auth.setup.ts",
+      dependencies: environments.ci ? ["proposal setup"] : [],
+      teardown: environments.ci && "cleanup faucet",
+    },
+    {
       name: "dRep setup",
       testMatch: "**/dRep.setup.ts",
       dependencies: environments.ci ? ["wallet bootstrap"] : [],
@@ -112,7 +118,7 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.ga.spec.ts",
       dependencies: environments.ci
-        ? ["proposal setup"]
+        ? ["proposal submission ga auth setup"]
         : [],
         teardown: environments.ci && "cleanup artifacts",
     },

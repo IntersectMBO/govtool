@@ -3,6 +3,7 @@ import loadDemosExtension from "@fixtures/loadExtension";
 import { Browser, ConsoleMessage, Page } from "@playwright/test";
 import { StaticWallet } from "@types";
 import { Logger } from "./logger";
+import kuberService from "@services/kuberService";
 
 interface NewPageConfig {
   storageState?: string;
@@ -47,4 +48,14 @@ export function injectLogger(page: Page) {
     // @ts-ignore
     page.isLoggerInjected = true;
   }
+}
+
+export async function logWalletDetails(address: string) {
+  try {
+    const balance = await kuberService.getBalance(address);
+    console.log("wallet balance", balance);
+  } catch (error) {
+    console.log("failed to get balance", error);
+  }
+  console.log("wallet address", address);
 }

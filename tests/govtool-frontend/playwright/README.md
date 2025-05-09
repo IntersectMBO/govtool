@@ -174,7 +174,7 @@ npm run generate-wallets
 
 ### 🔁 Run All Tests
 
-- **Pre-requisite**: Ensure the faucet address holds at least **412,000 ADA**.
+- **Pre-requisite**: Ensure the faucet address holds at least **512,000 ADA**.
 
 #### 🖥️ UI Mode
 
@@ -270,7 +270,7 @@ npm run test:headless:proposal-pillar
 
 #### 5. **Proposal Discussion**
 
-- **Pre-requisite**: Ensure the faucet address holds at least **401,000 ADA**.
+- **Pre-requisite**: Ensure the faucet address holds at least **501,000 ADA**.
 
 #### 🖥️ UI Mode
 

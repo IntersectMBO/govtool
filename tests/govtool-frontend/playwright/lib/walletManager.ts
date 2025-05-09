@@ -42,6 +42,13 @@ class WalletManager {
     );
     await this.writeWallets(updatedWallets, purpose);
   }
+  async getFirstWalletByPurpose(purpose: Purpose): Promise<StaticWallet> {
+    const wallets = await this.readWallets(purpose);
+    if (wallets.length === 0) {
+      throw new Error(`No wallets found for purpose: ${purpose}`);
+    }
+    return wallets[0];
+  }
 
   async popWallet(purpose: Purpose): Promise<StaticWallet> {
     const popCb = async () => {

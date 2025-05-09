@@ -113,6 +113,14 @@ test.describe("Proposed as a governance action", async () => {
   test.afterEach(async () => {
     // cleanup
     await proposalDiscussionDetailPage.goto(proposalId);
+
+    const isVerifyIdentityBtnVisible =
+      await proposalDiscussionDetailPage.verifyIdentityBtn.isVisible();
+
+    if (isVerifyIdentityBtnVisible) {
+      await proposalDiscussionDetailPage.verifyIdentityBtn.click();
+    }
+
     await proposalDiscussionDetailPage.deleteProposal();
   });
 

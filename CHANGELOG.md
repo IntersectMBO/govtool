@@ -12,6 +12,8 @@ changes.
 
 ### Added
 
+- Add support for the tables in markdown [Issue 3581](https://github.com/IntersectMBO/govtool/issues/3581)
+
 ### Fixed
 
 ### Changed

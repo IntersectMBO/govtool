@@ -14,6 +14,8 @@ changes.
 
 ### Fixed
 
+- Fix invalid metadata status background on voted on card
+
 ### Changed
 
 ### Removed

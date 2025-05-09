@@ -56,6 +56,10 @@ export const GovernanceVotedOnCard = ({
     bech32Prefix: "gov_action",
   });
 
+  // When no status provided into the metadataStatus prop,
+  // we consider it as a valid
+  const isMetadataValid = metadataStatus === undefined;
+
   return (
     <Box
       sx={{
@@ -67,13 +71,13 @@ export const GovernanceVotedOnCard = ({
         justifyContent: "space-between",
         boxShadow: "0px 4px 15px 0px #DDE3F5",
         borderRadius: "20px",
-        backgroundColor: !metadataStatus
+        backgroundColor: !isMetadataValid
           ? "rgba(251, 235, 235, 0.50)"
           : "rgba(255, 255, 255, 0.3)",
         // TODO: To decide if voted on cards can be actually in progress
         border: inProgress
           ? "1px solid #FFCBAD"
-          : !metadataStatus
+          : !isMetadataValid
           ? "1px solid #F6D5D5"
           : "1px solid #C0E4BA",
       }}

@@ -539,7 +539,7 @@
     }
   },
   "hero": {
-    "connectWallet": "Connect your wallet to start",
+    "connectWallet": "Participate now",
     "description": "Cardano Governance lets Ada holders have a say in the network's future.\n\nYou can vote directly, find someone to represent you, or become a representative for others.\n\nYou can also propose changes in the network yourself, put these up for discussion and eventually, a vote.\n\n<0>Learn more about governance</0> in the guide, or have a look around the app and see Cardano Governance in action.",
     "headline": "Cardano \n Governance Tool"
   },

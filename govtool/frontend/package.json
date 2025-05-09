@@ -1,7 +1,7 @@
 {
   "name": "@govtool/frontend",
   "private": true,
-  "version": "2.0.20",
+  "version": "2.0.21",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -58,6 +58,7 @@
     "react-router-dom": "^6.13.0",
     "rehype-katex": "^7.0.1",
     "remark-breaks": "^4.0.0",
+    "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
     "storybook-addon-manual-mocks": "^1.0.3",
     "storybook-addon-module-mock": "^1.3.4",

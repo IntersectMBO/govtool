@@ -3,9 +3,11 @@ import { Box, Skeleton } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Markdown from "react-markdown";
 import remarkMath from "remark-math";
+import remarkGfm from "remark-gfm";
 import rehypeKatex from "rehype-katex";
 import remarkBreaks from "remark-breaks";
 import "katex/dist/katex.min.css";
+import "./tableMarkdown.css";
 
 import { Typography, Tooltip, CopyButton, TooltipProps } from "@atoms";
 import { removeMarkdown } from "@/utils";
@@ -135,7 +137,7 @@ export const GovernanceActionCardElement = ({
   const renderMarkdown = () => (
     <Markdown
       components={markdownComponents}
-      remarkPlugins={[remarkMath, remarkBreaks]}
+      remarkPlugins={[remarkMath, remarkBreaks, remarkGfm]}
       rehypePlugins={[rehypeKatex]}
     >
       {text.toString()}

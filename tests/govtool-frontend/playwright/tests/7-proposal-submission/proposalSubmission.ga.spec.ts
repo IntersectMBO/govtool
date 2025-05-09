@@ -162,4 +162,42 @@ test.describe("Proposed as a governance action", async () => {
       proposalSubmissionPage.currentPage.getByTestId("url-error-modal-title")
     ).toHaveText(/the url you entered cannot be found/i);
   });
+
+  test("7P. Should navigate to the edit proposal page when 'goto data edit screen' is selected if data does not match the anchor URL", async () => {
+    const invalidMetadataAnchorUrl = "https://www.google.com";
+
+    await proposalSubmissionPage.metadataUrlInput.fill(
+      invalidMetadataAnchorUrl
+    );
+    await proposalSubmissionPage.submitBtn.click();
+
+    await expect(
+      proposalSubmissionPage.currentPage.getByTestId("data-not-match-modal")
+    ).toBeVisible();
+    await expect(
+      proposalSubmissionPage.currentPage.getByTestId(
+        "data-not-match-modal-go-to-data-button"
+      )
+    ).toBeVisible();
+
+    await proposalSubmissionPage.currentPage
+      .getByTestId("data-not-match-modal-go-to-data-button")
+      .click();
+
+    await expect(
+      proposalSubmissionPage.currentPage.getByTestId("governance-action-type")
+    ).toBeVisible();
+    await expect(
+      proposalSubmissionPage.currentPage.getByTestId("title-input")
+    ).toBeVisible();
+    await expect(
+      proposalSubmissionPage.currentPage.getByTestId("abstract-input")
+    ).toBeVisible();
+    await expect(
+      proposalSubmissionPage.currentPage.getByTestId("motivation-input")
+    ).toBeVisible();
+    await expect(
+      proposalSubmissionPage.currentPage.getByTestId("rationale-input")
+    ).toBeVisible();
+  });
 });

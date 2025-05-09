@@ -16,6 +16,8 @@ changes.
 
 ### Fixed
 
+- Fix invalid metadata status background on voted on card
+
 ### Changed
 
 - Update first CTA on GovTool home page [Issue 3467](https://github.com/IntersectMBO/govtool/issues/3467)

@@ -126,6 +126,10 @@ export default class ProposalSubmissionPage {
 
   constructor(private readonly page: Page) {}
 
+  get currentPage(): Page {
+    return this.page;
+  }
+
   async goto() {
     await this.page.goto(`${environments.frontendUrl}/proposal_discussion`);
 

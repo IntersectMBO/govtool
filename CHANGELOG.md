@@ -14,6 +14,8 @@ changes.
 
 ### Fixed
 
+- Fix an issue where the submit button remained disabled after removing an invalid value from the IMAGE input field on DRrep form [Issue 3560](https://github.com/IntersectMBO/govtool/issues/3560)
+
 ### Changed
 
 ### Removed

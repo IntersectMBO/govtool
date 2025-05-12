@@ -14,12 +14,13 @@ changes.
 
 ### Fixed
 
+- Fix app crash on unhandled wallet error [Issue 3123](https://github.com/IntersectMBO/govtool/issues/3123)
+
 ### Changed
 
 ### Removed
 
 ## [v2.0.21](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.21) 2025-05-09
-
 
 ### Added
 

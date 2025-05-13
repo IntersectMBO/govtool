@@ -82,7 +82,10 @@ export async function isDRepView(view?: string) {
   return i18n.t("forms.errors.mustBeDRepView");
 }
 
-export async function isValidImageUrl(url: string, options?: Options) {
+export async function isValidImageUrl(url: unknown, options?: Options) {
+  if (typeof url !== "string") {
+    return i18n.t("forms.errors.invalidValueType");
+  }
   if (options?.optional && !url) return true;
   if (!url.length) return false;
 

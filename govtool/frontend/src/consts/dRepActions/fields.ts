@@ -77,6 +77,6 @@ export const Rules = {
       value: IMAGE_REGEX,
       message: i18n.t("registration.fields.validations.image"),
     },
-    validate: (value: string) => isValidImageUrl(value, { optional: true }),
+    validate: (value: unknown) => isValidImageUrl(value, { optional: true }),
   },
 };

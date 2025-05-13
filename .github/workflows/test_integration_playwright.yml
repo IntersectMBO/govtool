@@ -33,7 +33,7 @@ on:
   workflow_run:
     workflows: ["Build and deploy GovTool test stack"]
     types: [completed]
-    branches: 
+    branches:
       - test
       - infra/test-chores
 
@@ -153,12 +153,19 @@ jobs:
           repository: ${{vars.GH_PAGES}}
           ssh-key: ${{ secrets.DEPLOY_KEY }}
 
+      - name: Remove oldest report to save space
+        if: ${{success()}}
+        run: |
+          chmod +x .github/scripts/remove_oldest_report.sh
+           .github/scripts/remove_oldest_report.sh
+
       - name: Register report
         id: register-project
         if: ${{success()}}
         run: |
           chmod +x .github/scripts/register_report.sh
           .github/scripts/register_report.sh
+          
       - if: steps.register-project.outputs.project_exists != 'true'
         uses: JamesIves/github-pages-deploy-action@v4
         with:

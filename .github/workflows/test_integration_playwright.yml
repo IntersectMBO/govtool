@@ -105,6 +105,11 @@ jobs:
           else
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_MAINNET }}"
           fi
+          
+          # Set schedule workflow variable
+          if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
+            export SCHEDULE_WORKFLOW="true"
+          fi
 
           npm run test:headless
 

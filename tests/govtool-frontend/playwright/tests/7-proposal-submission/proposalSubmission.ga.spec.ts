@@ -9,6 +9,7 @@ import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
 import {
   skipIfMainnet,
+  skipIfScheduledWorkflow,
   skipIfTemporyWalletIsNotAvailable,
 } from "@helpers/cardano";
 import { ProposalType } from "@types";
@@ -31,6 +32,7 @@ Object.values(ProposalType).forEach((proposalType, index) => {
     page,
     browser,
   }, testInfo) => {
+    await skipIfScheduledWorkflow();
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     const wallet = await walletManager.popWallet("proposalSubmission");

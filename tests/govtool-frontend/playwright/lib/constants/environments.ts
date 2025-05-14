@@ -28,6 +28,10 @@ const environments = {
   metadataBucketUrl: `${CARDANO_API_METADATA_HOST_URL}/data`,
   lockInterceptorUrl: `${CARDANO_API_METADATA_HOST_URL}/lock`,
   ci: process.env.CI,
+  isScheduled:
+    (process.env.SCHEDULED_WORKFLOW &&
+      process.env.SCHEDULED_WORKFLOW == "true") ||
+    false,
 };
 
 export default environments;

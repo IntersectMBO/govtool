@@ -238,6 +238,6 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 env:
   HOST_URL: https://${{ github.event.schedule && 'preview.gov.tools' || (inputs.deployment || 'govtool.cardanoapi.io')  }}
-  REPORT_NAME: govtool-frontend
+  REPORT_NAME: ${{ github.event.schedule && 'nightly-'}}govtool-frontend
   GH_PAGES: ${{vars.GH_PAGES}}
   COMMIT_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}

@@ -198,6 +198,6 @@ jobs:
 
 env:
   BASE_URL: https://${{github.event.schedule && 'be.preview.gov.tools' || inputs.deployment ||  'govtool.cardanoapi.io/api' }}
-  REPORT_NAME: govtool-backend
+  REPORT_NAME: ${{ github.event.schedule && 'nightly-'}}govtool-backend
   GH_PAGES: ${{vars.GH_PAGES}}
   COMMIT_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}

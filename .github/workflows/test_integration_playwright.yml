@@ -47,7 +47,7 @@ concurrency:
 jobs:
   integration-tests:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' || github.event.schedule }}
     outputs:
       start_time: ${{ steps.set-pending-status.outputs.timestamp }}
       status: ${{ steps.run-test.outcome }}
@@ -105,7 +105,7 @@ jobs:
           else
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_MAINNET }}"
           fi
-          
+
           # Set schedule workflow variable
           if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
             export SCHEDULE_WORKFLOW="true"

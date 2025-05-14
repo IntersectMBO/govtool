@@ -20,7 +20,10 @@ export const useWalletErrorModal = () => {
     buttonText,
     dataTestId,
   }: WalletErrorModalProps) => {
-    const errorMessage = (error && typeof error === 'object' && 'info' in error) ? error.info : error;
+    const errorMessage =
+      error && typeof error === "object" && "info" in error
+        ? error.info
+        : JSON.stringify(error, Object.getOwnPropertyNames(error));
 
     openModal({
       type: "statusModal",

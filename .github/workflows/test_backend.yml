@@ -16,6 +16,7 @@ on:
           - "sanchogov.tools/api"
           - "staging.govtool.byron.network/api"
           - "govtool.cardanoapi.io/api"
+          - "be.preview.gov.tools"
           - "z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr"
           - "z78acf3c2-z5575152b-gtw.z937eb260.rustrocks.fr"
           - "be.gov.tools"
@@ -28,12 +29,16 @@ on:
           - "preview"
           - "mainnet"
           - "preprod"
+
   workflow_run:
     workflows: ["Build and deploy GovTool test stack"]
     types: [completed]
     branches: 
       - test
       - infra/test-chores
+
+  schedule:
+    - cron: "0 0 * * *" # 12AM UTC
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -115,7 +120,7 @@ jobs:
           path: gh-pages
           repository: ${{vars.GH_PAGES}}
           ssh-key: ${{ secrets.DEPLOY_KEY }}
-        
+
       - name: Remove oldest report to save space
         if: ${{success()}}
         run: |
@@ -128,6 +133,7 @@ jobs:
         run: |
           chmod +x .github/scripts/register_report.sh
           .github/scripts/register_report.sh
+
       - if: steps.register-project.outputs.project_exists != 'true'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
@@ -191,7 +197,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 
 env:
-  BASE_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io/api' }}
+  BASE_URL: https://${{github.event.schedule && 'be.preview.gov.tools' || inputs.deployment ||  'govtool.cardanoapi.io/api' }}
   REPORT_NAME: govtool-backend
   GH_PAGES: ${{vars.GH_PAGES}}
   COMMIT_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}

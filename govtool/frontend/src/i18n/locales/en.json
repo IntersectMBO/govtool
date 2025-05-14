@@ -389,7 +389,8 @@
       "tooLongUrl": "Url must be less than 128 bytes",
       "mustBeStakeAddress": "It must be reward address in bech32 format",
       "mustBeReceivingAddress": "Invalid payment address",
-      "couldNotGenerateImageSha": "Could not generate image sha"
+      "couldNotGenerateImageSha": "Could not generate image sha",
+      "invalidValueType": "Invalid value type"
     }
   },
   "proposalDiscussion": {

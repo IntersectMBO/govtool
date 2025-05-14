@@ -147,6 +147,7 @@ export const GovernanceActionCardElement = ({
 
     return (
       <Markdown
+        className="markdown"
         components={markdownComponents}
         remarkPlugins={[remarkMath, remarkGfm]}
         rehypePlugins={[rehypeKatex]}

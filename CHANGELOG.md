@@ -15,6 +15,7 @@ changes.
 ### Fixed
 
 - Fix app crash on unhandled wallet error [Issue 3123](https://github.com/IntersectMBO/govtool/issues/3123)
+- Preserve new lines in markdown text [Issue 2712](https://github.com/IntersectMBO/govtool/issues/2712)
 
 ### Changed
 

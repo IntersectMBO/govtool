@@ -5,7 +5,6 @@ import Markdown from "react-markdown";
 import remarkMath from "remark-math";
 import remarkGfm from "remark-gfm";
 import rehypeKatex from "rehype-katex";
-import remarkBreaks from "remark-breaks";
 import "katex/dist/katex.min.css";
 import "./tableMarkdown.css";
 
@@ -120,7 +119,6 @@ export const GovernanceActionCardElement = ({
         fontWeight: 400,
         lineHeight: "24px",
         maxWidth: "auto",
-        whiteSpace: "pre-wrap",
       }}
     >
       {children}
@@ -128,21 +126,35 @@ export const GovernanceActionCardElement = ({
   );
 
   const markdownComponents = {
-    p: (props: PropsWithChildren) => {
-      const { children } = props;
-      return renderMarkdownText({ children });
-    },
+    p: ({ children }: PropsWithChildren) => renderMarkdownText({ children }),
+    br: () => <br />,
   };
 
-  const renderMarkdown = () => (
-    <Markdown
-      components={markdownComponents}
-      remarkPlugins={[remarkMath, remarkBreaks, remarkGfm]}
-      rehypePlugins={[rehypeKatex]}
-    >
-      {text.toString()}
-    </Markdown>
-  );
+  const renderMarkdown = () => {
+    const formattedText = text
+      .toString()
+      .replace(/\r\n|\r/g, "\n")
+      .replace(
+        /\n\n+/g,
+        (match) =>
+          `\n\n${Array(match.length - 1)
+            .fill("&nbsp;  \n")
+            .join("")}\n`,
+      )
+      .split("\n")
+      .map((line) => `${line}  `)
+      .join("\n");
+
+    return (
+      <Markdown
+        components={markdownComponents}
+        remarkPlugins={[remarkMath, remarkGfm]}
+        rehypePlugins={[rehypeKatex]}
+      >
+        {formattedText}
+      </Markdown>
+    );
+  };
 
   const renderCopyButton = () =>
     isCopyButton && (

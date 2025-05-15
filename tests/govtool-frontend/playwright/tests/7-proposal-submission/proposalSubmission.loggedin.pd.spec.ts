@@ -306,66 +306,25 @@ test.describe("Proposal created logged state", () => {
     });
   });
 
-  test.describe("Proposed as a governance action", () => {
-    let proposalSubmissionPage: ProposalSubmissionPage;
-    test.beforeEach(async ({ page, proposalId }) => {
-      const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
-        page
-      );
-      await proposalDiscussionDetailsPage.goto(proposalId);
+  test("7O. Should display insufficient balance modal when submitting proposal with insufficient funds", async ({
+    page,
+    proposalId,
+  }) => {
+    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
+      page
+    );
+    await proposalDiscussionDetailsPage.goto(proposalId);
 
-      await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
-      await proposalDiscussionDetailsPage.submitAsGABtn.click();
+    await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
+    await proposalDiscussionDetailsPage.submitAsGABtn.click();
 
-      proposalSubmissionPage = new ProposalSubmissionPage(page);
-      await page.getByTestId("agree-checkbox").click();
-      await proposalSubmissionPage.continueBtn.click();
-    });
-
-    test.describe("Metadata anchor validation", () => {
-      test("7J_1. Should accept valid metadata anchor on proposal submission", async ({
-        page,
-      }) => {
-        test.slow(); // Brute-force testing with 100 random data
-        for (let i = 0; i < 50; i++) {
-          await proposalSubmissionPage.metadataUrlInput.fill(mockValid.url());
-          await expect(page.getByTestId("url-input-error-text")).toBeHidden();
-        }
-      });
-
-      test("7J_2. Should reject invalid metadata anchor on proposal submission", async ({
-        page,
-      }) => {
-        test.slow(); // Brute-force testing with 100 random data
-        for (let i = 0; i < 50; i++) {
-          await proposalSubmissionPage.metadataUrlInput.fill(
-            invalid.url(false)
-          );
-          await expect(page.getByTestId("url-input-error-text")).toBeVisible();
-        }
-
-        const sentenceWithoutSpace = faker.lorem
-          .sentence(128)
-          .replace(/[\s.]/g, "");
-        const metadataAnchorGreaterThan128Bytes =
-          faker.internet.url({ appendSlash: true }) + sentenceWithoutSpace;
-
-        await proposalSubmissionPage.metadataUrlInput.fill(
-          metadataAnchorGreaterThan128Bytes
-        );
-
-        await expect(page.getByTestId("url-input-error-text")).toBeVisible(); // BUG better to add different test id compare to invalid url testid
-      });
-    });
-
-    test("7K. Should reject invalid proposal metadata", async ({ page }) => {
-      await proposalSubmissionPage.metadataUrlInput.fill(faker.internet.url());
-      await proposalSubmissionPage.submitBtn.click();
-
-      await expect(page.getByTestId("url-error-modal-title")).toHaveText(
-        /the url you entered cannot be found/i
-      );
-    });
+    const proposalSubmissionPage = new ProposalSubmissionPage(page);
+    await expect(
+      proposalSubmissionPage.currentPage.getByText(
+        "Insufficient wallet balance",
+        { exact: true }
+      )
+    ).toBeVisible(); // BUG missing test id
   });
 });
 

@@ -115,6 +115,12 @@ jobs:
           path: gh-pages
           repository: ${{vars.GH_PAGES}}
           ssh-key: ${{ secrets.DEPLOY_KEY }}
+        
+      - name: Remove oldest report to save space
+        if: ${{success()}}
+        run: |
+          chmod +x .github/scripts/remove_oldest_report.sh
+            .github/scripts/remove_oldest_report.sh
 
       - name: Register report
         id: register-project

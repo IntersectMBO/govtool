@@ -14,6 +14,17 @@ changes.
 
 ### Fixed
 
+### Changed
+
+### Removed
+
+## [v2.0.22](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.22) 2025-05-15
+
+
+### Added
+
+### Fixed
+
 - Fix an issue where the submit button remained disabled after removing an invalid value from the IMAGE input field on DRrep form [Issue 3560](https://github.com/IntersectMBO/govtool/issues/3560)
 - Fix app crash on unhandled wallet error [Issue 3123](https://github.com/IntersectMBO/govtool/issues/3123)
 - Preserve new lines in markdown text [Issue 2712](https://github.com/IntersectMBO/govtool/issues/2712)

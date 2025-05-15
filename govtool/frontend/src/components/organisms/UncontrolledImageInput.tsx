@@ -1,23 +1,31 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRef } from "react";
-import { useController } from "react-hook-form";
+import {
+  Control,
+  FieldPath,
+  FieldValues,
+  RegisterOptions,
+  useController,
+} from "react-hook-form";
 import { FormErrorMessage } from "../atoms";
 
-type UncontrolledImageInputProps = {
-  name: string;
-  control: any;
-  rules?: any;
+type UncontrolledImageInputProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> = {
+  name: TName;
+  control: Control<TFieldValues>;
+  rules?: RegisterOptions<TFieldValues, TName>;
   placeholder?: string;
   dataTestId?: string;
 };
 
-export const UncontrolledImageInput = ({
+export const UncontrolledImageInput = <T extends FieldValues>({
   name,
   control,
   rules,
   placeholder,
   dataTestId,
-}: UncontrolledImageInputProps) => {
+}: UncontrolledImageInputProps<T>) => {
   const {
     field: { onChange },
     fieldState,
@@ -49,8 +57,8 @@ export const UncontrolledImageInput = ({
           borderRadius: "50px",
           height: "50px",
           border: "1px solid",
-          borderColor: fieldState.error?.message ? "red" : "#6F99FF",
-          backgroundColor: fieldState.error?.message ? "#FAEAEB" : "white",
+          borderColor: fieldState.error ? "red" : "#6F99FF",
+          backgroundColor: fieldState.error ? "#FAEAEB" : "white",
           boxSizing: "border-box",
           margin: 0,
           display: "block",

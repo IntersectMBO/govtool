@@ -67,7 +67,7 @@ export const StatusModal = forwardRef<HTMLDivElement>((_, ref) => {
             whiteSpace: "pre-line",
           }}
         >
-          {state?.message}{" "}
+          {typeof state?.message === "string" && state?.message}
           {state?.link && (
             <Link
               onClick={() => openInNewTab(state?.link || "")}

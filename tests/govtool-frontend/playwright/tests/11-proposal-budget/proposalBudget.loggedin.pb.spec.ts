@@ -67,7 +67,7 @@ test.describe("Budget proposal logged in state", () => {
 
     await budgetDiscussionDetailsPage.replyComment(randReply);
     const replyRendered = await budgetDiscussionDetailsPage.currentPage
-      .locator(`[data-testid^="reply-"][data-testid$="-content"]`)
+      .locator(`[data-testid^="subcomment-"][data-testid$="-content"]`)
       .textContent();
     expect(replyRendered).toContain(randReply);
   });

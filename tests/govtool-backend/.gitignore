@@ -36,3 +36,5 @@ Thumbs.db
 # Other
 *.bak
 reports/
+
+allure-results/

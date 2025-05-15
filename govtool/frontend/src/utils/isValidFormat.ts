@@ -7,6 +7,10 @@ import i18n from "@/i18n";
 import { adaHandleService } from "@/services/AdaHandle";
 import { getImageSha } from "./getImageSha";
 
+type Options = {
+  optional: boolean;
+};
+
 export const URL_REGEX =
   /^(?:(?:https?:\/\/)?(?:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})(?:\/[^\s]*)?)|(?:ipfs:\/\/(?:[a-zA-Z0-9]+(?:\/[a-zA-Z0-9._-]+)*))$|^$/;
 export const HASH_REGEX = /^[0-9A-Fa-f]+$/;
@@ -78,8 +82,13 @@ export async function isDRepView(view?: string) {
   return i18n.t("forms.errors.mustBeDRepView");
 }
 
-export async function isValidImageUrl(url: string) {
+export async function isValidImageUrl(url: unknown, options?: Options) {
+  if (typeof url !== "string") {
+    return i18n.t("forms.errors.invalidValueType");
+  }
+  if (options?.optional && !url) return true;
   if (!url.length) return false;
+
   try {
     if (URL_REGEX.test(url)) {
       await getImageSha(url);

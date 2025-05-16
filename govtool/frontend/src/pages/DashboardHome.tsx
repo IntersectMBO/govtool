@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 
 import { DashboardCards } from "@organisms";
-import { UsefulLinks } from "@/components/organisms/UsefulLinks";
+import { UsefulLinks } from "@/components/organisms/Home/UsefulLinks";
 import { useScreenDimension } from "@/hooks";
 
 export const DashboardHome = () => {

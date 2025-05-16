@@ -1,9 +1,10 @@
 import { Box, Link } from "@mui/material";
 
 import { useTranslation } from "@hooks";
-import { Typography } from "../atoms";
 import { ICONS } from "@/consts";
-import { Card } from "../molecules";
+
+import { Typography } from "../../atoms";
+import { Card } from "../../molecules";
 
 const LINKS = {
   ccPortal: {
@@ -23,7 +24,7 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
 
   return (
     <div>
-      <Typography variant="title1" sx={{ mb: 4, textAlign: align }}>
+      <Typography variant="title2" sx={{ mb: 4, textAlign: align }}>
         {t("usefulLinks.title")}
       </Typography>
       <Box

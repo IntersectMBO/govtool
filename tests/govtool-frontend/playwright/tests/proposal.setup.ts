@@ -28,8 +28,7 @@ setup.beforeEach(async () => {
   await setAllureStory("Proposal");
   await skipIfMainnet();
   const totalRequiredBalanceForWallets =
-    (govActionDeposit / 1000000) * PROPOSAL_WALLETS_COUNT +
-    22 * PROPOSAL_WALLETS_COUNT;
+    (govActionDeposit / 1000000 + 22) * PROPOSAL_WALLETS_COUNT;
   await skipIfBalanceIsInsufficient(totalRequiredBalanceForWallets);
 });
 

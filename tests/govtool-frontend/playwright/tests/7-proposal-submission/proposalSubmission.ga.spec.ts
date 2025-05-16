@@ -34,6 +34,8 @@ Object.values(ProposalType).forEach((proposalType, index) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     const wallet = await walletManager.popWallet("proposalSubmission");
+    wallet.stake.pkh = getWalletConfigForFaucet().stake.pkh;
+
     await logWalletDetails(wallet.address);
 
     const tempUserAuth = await createTempUserAuth(page, wallet);

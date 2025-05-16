@@ -108,7 +108,7 @@ jobs:
 
           # Set schedule workflow variable
           if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
-            export SCHEDULE_WORKFLOW="true"
+            export SCHEDULED_WORKFLOW="true"
           fi
 
           npm run test:headless

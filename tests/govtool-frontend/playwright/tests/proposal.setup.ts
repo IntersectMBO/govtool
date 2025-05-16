@@ -9,7 +9,7 @@ import walletManager from "lib/walletManager";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import { getWalletConfigForFaucet } from "@helpers/index";
 
-const PROPOSAL_WALLETS_COUNT = 5;
+const PROPOSAL_WALLETS_COUNT = environments.isScheduled ? 1 : 5;
 
 let govActionDeposit: number;
 

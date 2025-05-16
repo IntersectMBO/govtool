@@ -37,6 +37,9 @@ on:
       - test
       - infra/test-chores
 
+  schedule:
+    - cron: "0 0 * * *" # 12AM UTC
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
@@ -44,7 +47,7 @@ concurrency:
 jobs:
   integration-tests:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' || github.event.schedule }}
     outputs:
       start_time: ${{ steps.set-pending-status.outputs.timestamp }}
       status: ${{ steps.run-test.outcome }}
@@ -101,6 +104,11 @@ jobs:
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_PREVIEW }}"
           else
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_MAINNET }}"
+          fi
+
+          # Set schedule workflow variable
+          if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
+            export SCHEDULED_WORKFLOW="true"
           fi
 
           npm run test:headless
@@ -165,7 +173,7 @@ jobs:
         run: |
           chmod +x .github/scripts/register_report.sh
           .github/scripts/register_report.sh
-          
+
       - if: steps.register-project.outputs.project_exists != 'true'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
@@ -229,7 +237,7 @@ jobs:
           REPORT_NUMBER: ${{ needs.publish-report.outputs.report_number }}
           GITHUB_TOKEN: ${{ github.token }}
 env:
-  HOST_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io' }}
-  REPORT_NAME: govtool-frontend
+  HOST_URL: https://${{ github.event.schedule && 'preview.gov.tools' || (inputs.deployment || 'govtool.cardanoapi.io')  }}
+  REPORT_NAME: ${{ github.event.schedule && 'nightly-'}}govtool-frontend
   GH_PAGES: ${{vars.GH_PAGES}}
   COMMIT_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}

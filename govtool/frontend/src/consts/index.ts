@@ -92,3 +92,15 @@ export const PPU_GOVERNANCE_GROUP_PARAMS_KEYS = [
   "committeeMinSize",
   "committeeMaxTermLength",
 ];
+
+export const SOCIAL_MEDIA_URLS = {
+  discord: "https://discord.gg",
+  x: "https://x.com/intersectmbo",
+  telegram: "https://t.me",
+};
+
+export const GOVTOOL_URLS = {
+  githubRepo: "https://github.com/IntersectMBO/govtool",
+  documentation: "https://docs.gov.tools",
+  telegram: "https://t.me",
+};

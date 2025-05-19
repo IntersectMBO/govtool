@@ -391,10 +391,10 @@ export default class BudgetDiscussionSubmissionPage {
     await this.usaToAdaCnversionRateInput.fill(
       costing.usdToAdaConversionRate.toString()
     );
-    await this.costBreakdownInput.fill(costing.costBreakdown);
     await this.preferredCurrencyInput.fill(
       costing.AmountInPreferredCurrency.toString()
     );
+    await this.costBreakdownInput.fill(costing.costBreakdown);
   }
 
   async fillupCostingForm(costing: BudgetCostingProps) {

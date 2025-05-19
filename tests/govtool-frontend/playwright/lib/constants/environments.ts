@@ -18,7 +18,11 @@ const environments = {
     apiUrl: `https://faucet.${NETWORK}.world.dev.cardano.org`,
     address: process.env.FAUCET_ADDRESS,
     payment: { private: process.env.FAUCET_PAYMENT_PRIVATE },
-    stake: { pkh: process.env.FAUCET_STAKE_PKH },
+    stake: {
+      pkh: process.env.FAUCET_STAKE_PKH,
+      private: process.env.FAUCET_STAKE_PRIVATE,
+      public: process.env.FAUCET_STAKE_PUBLIC,
+    },
   },
   kuber: {
     apiUrl: `https://${NETWORK}.kuber.cardanoapi.io`,

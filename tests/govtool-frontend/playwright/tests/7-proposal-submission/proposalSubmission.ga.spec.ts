@@ -35,6 +35,8 @@ Object.values(ProposalType).forEach((proposalType, index) => {
 
     const wallet = await walletManager.popWallet("proposalSubmission");
     wallet.stake.pkh = getWalletConfigForFaucet().stake.pkh;
+    wallet.stake.private = getWalletConfigForFaucet().stake.private;
+    wallet.stake.public = getWalletConfigForFaucet().stake.public;
 
     await logWalletDetails(wallet.address);
 
@@ -48,7 +50,16 @@ Object.values(ProposalType).forEach((proposalType, index) => {
     const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
     await proposalDiscussionPage.goto();
     await proposalDiscussionPage.verifyIdentityBtn.click();
-    await proposalDiscussionPage.setUsername(mockValid.username());
+
+    try {
+      await expect(userPage.getByTestId("username-input")).toBeVisible({
+        timeout: 10_000,
+      });
+      await proposalDiscussionPage.setUsername(mockValid.username());
+    } catch (error) {
+      // Ignore error if username is already set
+      console.log("Username is already set");
+    }
 
     const proposalSubmissionPage = new ProposalSubmissionPage(userPage);
     await proposalSubmissionPage.proposalCreateBtn.click();

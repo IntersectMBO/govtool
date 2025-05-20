@@ -738,7 +738,13 @@
   "system": {
     "description": "The Cardano GovTool is a tool that allows you to participate in the governance of the Cardano network. You can propose, vote on, and delegate your voting power to other users.",
     "title": "This tool is connected to {{networkName}}",
-    "bootstrappingWarning": "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>"
+    "bootstrappingWarning": "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>",
+    "maintenanceEnding": {
+      "title": "⚠️ GovTool Maintenance Ending Soon",
+      "description1": "GovTool has not been included in the 2025 Cardano budget.",
+      "description2": "Unless alternative support is secured, <0>maintenance will end in June 2025.</0>",
+      "description3": "We remain committed to transparency and will keep you updated."
+    }
   },
   "tooltips": {
     "delegateTodRep": {

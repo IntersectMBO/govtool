@@ -20,6 +20,7 @@ import { getWalletConfigForFaucet } from "@helpers/index";
 import { faker } from "@faker-js/faker";
 import { proposalSubmissionAuthFile } from "@constants/auth";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
+import { createKeyFromPrivateKeyHex } from "@helpers/crypto";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
@@ -36,6 +37,15 @@ Object.values(ProposalType).forEach((proposalType, index) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     const wallet = await walletManager.popWallet("proposalSubmission");
+
+    const stakeKeys = await createKeyFromPrivateKeyHex(
+      environments.faucet.stake.private || ""
+    );
+    const { pkh: stakePkh, public: stakePublic } = stakeKeys.json();
+    wallet.stake.pkh = stakePkh;
+    wallet.stake.private = getWalletConfigForFaucet().stake.private;
+    wallet.stake.public = stakePublic;
+
     await logWalletDetails(wallet.address);
 
     const tempUserAuth = await createTempUserAuth(page, wallet);
@@ -48,16 +58,22 @@ Object.values(ProposalType).forEach((proposalType, index) => {
     const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
     await proposalDiscussionPage.goto();
     await proposalDiscussionPage.verifyIdentityBtn.click();
-    await proposalDiscussionPage.setUsername(mockValid.username());
+
+    try {
+      await expect(userPage.getByTestId("username-input")).toBeVisible({
+        timeout: 10_000,
+      });
+      await proposalDiscussionPage.setUsername(mockValid.username());
+    } catch (error) {
+      // Ignore error if username is already set
+      console.log("Username is already set");
+    }
 
     const proposalSubmissionPage = new ProposalSubmissionPage(userPage);
     await proposalSubmissionPage.proposalCreateBtn.click();
     await proposalDiscussionPage.continueBtn.click();
 
-    const rewardAddress = rewardAddressBech32(
-      environments.networkId,
-      getWalletConfigForFaucet().stake.pkh
-    );
+    const rewardAddress = rewardAddressBech32(environments.networkId, stakePkh);
 
     await proposalSubmissionPage.createProposal(rewardAddress, proposalType);
 
@@ -101,7 +117,7 @@ test.describe("Proposed as a governance action", async () => {
 
     const rewardAddress = rewardAddressBech32(
       environments.networkId,
-      getWalletConfigForFaucet().stake.pkh
+      getWalletConfigForFaucet().address
     );
 
     proposalId = await proposalSubmissionPage.createProposal(rewardAddress);

@@ -85,3 +85,10 @@ export async function getWalletBalance(address: string) {
 
   return balance;
 }
+
+export async function skipIfScheduledWorkflow() {
+  if (environments.isScheduled) {
+    await allure.description("This test is skipped in scheduled workflow.");
+    test.skip();
+  }
+}

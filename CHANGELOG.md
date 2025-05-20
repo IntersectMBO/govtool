@@ -16,6 +16,8 @@ changes.
 
 ### Fixed
 
+- Fix displaying proposals title in details page [Issue 3192](https://github.com/IntersectMBO/govtool/issues/3192)
+
 ### Changed
 
 ### Removed

@@ -7,10 +7,10 @@ export const getProposal = async (
   proposalId: string,
   drepId?: string,
 ): Promise<VotedProposal> => {
-  const isCIP129Identifier = proposalId.includes("gov_action");
+  const isCIP129Identifier = proposalId.startsWith("gov_action");
   if (isCIP129Identifier) {
-    const { txID } = decodeCIP129Identifier(proposalId);
-    proposalId = txID;
+    const { txID, index } = decodeCIP129Identifier(proposalId);
+    proposalId = `${txID}#${parseInt(index, 16)}`;
   }
 
   const encodedHash = encodeURIComponent(proposalId);

@@ -19,6 +19,7 @@ import { getWalletConfigForFaucet } from "@helpers/index";
 import { faker } from "@faker-js/faker";
 import { proposalSubmissionAuthFile } from "@constants/auth";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
+import { createKeyFromPrivateKeyHex } from "@helpers/crypto";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
@@ -34,9 +35,14 @@ Object.values(ProposalType).forEach((proposalType, index) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     const wallet = await walletManager.popWallet("proposalSubmission");
-    wallet.stake.pkh = getWalletConfigForFaucet().stake.pkh;
+
+    const stakeKeys = await createKeyFromPrivateKeyHex(
+      environments.faucet.stake.private || ""
+    );
+    const { pkh: stakePkh, public: stakePublic } = stakeKeys.json();
+    wallet.stake.pkh = stakePkh;
     wallet.stake.private = getWalletConfigForFaucet().stake.private;
-    wallet.stake.public = getWalletConfigForFaucet().stake.public;
+    wallet.stake.public = stakePublic;
 
     await logWalletDetails(wallet.address);
 
@@ -65,10 +71,7 @@ Object.values(ProposalType).forEach((proposalType, index) => {
     await proposalSubmissionPage.proposalCreateBtn.click();
     await proposalDiscussionPage.continueBtn.click();
 
-    const rewardAddress = rewardAddressBech32(
-      environments.networkId,
-      getWalletConfigForFaucet().stake.pkh
-    );
+    const rewardAddress = rewardAddressBech32(environments.networkId, stakePkh);
 
     await proposalSubmissionPage.createProposal(rewardAddress, proposalType);
 
@@ -112,7 +115,7 @@ test.describe("Proposed as a governance action", async () => {
 
     const rewardAddress = rewardAddressBech32(
       environments.networkId,
-      getWalletConfigForFaucet().stake.pkh
+      getWalletConfigForFaucet().address
     );
 
     proposalId = await proposalSubmissionPage.createProposal(rewardAddress);

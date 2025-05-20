@@ -247,3 +247,9 @@ export class ShelleyWalletAddress implements Address {
     return Buffer.from(this.toRawBytes()).toString("hex");
   }
 }
+
+export const createKeyFromPrivateKeyHex = async (
+  privateKeyHex: string
+): Promise<Ed25519Key> => {
+  return await Ed25519Key.fromPrivateKeyHex(privateKeyHex);
+};

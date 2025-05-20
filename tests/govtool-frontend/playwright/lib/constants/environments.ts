@@ -18,7 +18,9 @@ const environments = {
     apiUrl: `https://faucet.${NETWORK}.world.dev.cardano.org`,
     address: process.env.FAUCET_ADDRESS,
     payment: { private: process.env.FAUCET_PAYMENT_PRIVATE },
-    stake: { pkh: process.env.FAUCET_STAKE_PKH },
+    stake: {
+      private: process.env.FAUCET_STAKE_PRIVATE,
+    },
   },
   kuber: {
     apiUrl: `https://${NETWORK}.kuber.cardanoapi.io`,
@@ -28,6 +30,10 @@ const environments = {
   metadataBucketUrl: `${CARDANO_API_METADATA_HOST_URL}/data`,
   lockInterceptorUrl: `${CARDANO_API_METADATA_HOST_URL}/lock`,
   ci: process.env.CI,
+  isScheduled:
+    (process.env.SCHEDULED_WORKFLOW &&
+      process.env.SCHEDULED_WORKFLOW == "true") ||
+    false,
 };
 
 export default environments;

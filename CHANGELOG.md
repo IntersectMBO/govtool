@@ -12,6 +12,8 @@ changes.
 
 ### Added
 
+- Add maintenance ending banner [Issue 3647](https://github.com/IntersectMBO/govtool/issues/3647)
+
 ### Fixed
 
 ### Changed
@@ -19,7 +21,6 @@ changes.
 ### Removed
 
 ## [v2.0.22](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.22) 2025-05-15
-
 
 ### Added
 

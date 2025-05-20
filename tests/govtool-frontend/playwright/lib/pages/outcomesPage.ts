@@ -374,25 +374,30 @@ export default class OutComesPage {
   }
 
   async fetchOutcomeIdAndTitleFromNetwork(
-    governanceActionId: string,
-    governanceActionTitle: string
-  ) {
+    governanceActionId?: string,
+    governanceActionTitle?: string
+  ): Promise<{ governanceActionId: string; governanceActionTitle: string }> {
     let updatedGovernanceActionId = governanceActionId;
     let updatedGovernanceActionTitle = governanceActionTitle;
+
     await this.page.route(
       "**/governance-actions?search=&filters=&sort=**",
       async (route) => {
         const response = await route.fetch();
         const data: outcomeProposal[] = await response.json();
-        if (!governanceActionId) {
-          if (data.length > 0) {
-            const randomIndexForId = Math.floor(Math.random() * data.length);
-            updatedGovernanceActionId =
-              data[randomIndexForId].tx_hash +
-              "#" +
-              data[randomIndexForId].index;
+
+        if (!updatedGovernanceActionId && data.length > 0) {
+          const randomIndex = Math.floor(Math.random() * data.length);
+          updatedGovernanceActionId = `${data[randomIndex].tx_hash}#${data[randomIndex].index}`;
+        }
+
+        if (!updatedGovernanceActionTitle) {
+          const itemWithTitle = data.find((item) => item.title != null);
+          if (itemWithTitle) {
+            updatedGovernanceActionTitle = itemWithTitle.title;
           }
         }
+
         await route.fulfill({
           status: 200,
           contentType: "application/json",
@@ -410,31 +415,40 @@ export default class OutComesPage {
             await route.continue();
             return;
           }
+
           const data: outcomeMetadata = await response.json();
-          if (!governanceActionTitle && data.data.title != null) {
+          if (!updatedGovernanceActionTitle && data.data.title) {
             updatedGovernanceActionTitle = data.data.title;
           }
+
           await route.fulfill({
             status: 200,
             contentType: "application/json",
             body: JSON.stringify(data),
           });
         } catch (error) {
+          // Just return without handling the error
           return;
         }
       }
     );
 
-    const responsePromise = this.page.waitForResponse(
+    const actionsResponsePromise = this.page.waitForResponse(
       "**/governance-actions?search=&filters=&sort=**"
     );
-    const metadataResponsePromise = this.page.waitForResponse(
-      "**/governance-actions/metadata?**"
-    );
+
 
     await this.goto();
-    await responsePromise;
-    await metadataResponsePromise;
+    await actionsResponsePromise;
+
+    const needMetadataForTitle = !updatedGovernanceActionTitle;
+    const metadataResponsePromise = needMetadataForTitle
+      ? this.page.waitForResponse("**/governance-actions/metadata?**")
+      : Promise.resolve(null);
+    if (needMetadataForTitle) {
+      await metadataResponsePromise;
+    }
+
     return {
       governanceActionId: updatedGovernanceActionId,
       governanceActionTitle: updatedGovernanceActionTitle,

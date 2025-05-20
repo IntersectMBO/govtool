@@ -106,18 +106,14 @@ The script will:
 🎉 Wallet generated successfully!
 -----------------------------------
 🔑 Payment Private Key: <your-payment-private-key>
-🔗 Stake Public Key Hash: <your-stake-pkh>
 💰 Stake Private Key: <your-stake-private>
-💳 Stake Public Key: <your-stake-public>
 🏠 Wallet Address: <your-wallet-address>
 -----------------------------------
 
 📋 Please copy the following to your environment variables:
 1. Set FAUCET_PAYMENT_PRIVATE=<your-payment-private-key>
-2. Set FAUCET_STAKE_PKH=<your-stake-pkh>
-3. Set FAUCET_STAKE_PRIVATE=<your-stake-private>
-4. Set FAUCET_STAKE_PUBLIC= <your-stake-public>
-5. Set FAUCET_ADDRESS=<your-wallet-address>
+2. Set FAUCET_STAKE_PRIVATE=<your-stake-private>
+3. Set FAUCET_ADDRESS=<your-wallet-address>
 
 🎈 All set! Please ensure this wallet is funded with a sufficient balance
 ```

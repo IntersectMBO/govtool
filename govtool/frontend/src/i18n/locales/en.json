@@ -109,8 +109,8 @@
         "noDelegationDescription": "Find a DRep to vote on your behalf.",
         "noDelegationActionButton": "View DRep Directory",
         "dRepDelegationTitle": "Your Voting Power of <strong>₳{{ada}}</strong>\nis Delegated to:",
-        "noConfidenceDelegationTitle": "You have delegated your Voting Power <strong>₳{{ada}}</strong>\nto “No Confidence”",
-        "abstainDelegationTitle": "You have delegated your Voting Power <strong>₳{{ada}}</strong>\nto “Abstain”",
+        "noConfidenceDelegationTitle": "You have delegated your Voting Power <strong>₳{{ada}}</strong>\nto \"No Confidence\"",
+        "abstainDelegationTitle": "You have delegated your Voting Power <strong>₳{{ada}}</strong>\nto \"Abstain\"",
         "abstainDescription": "You have selected to apply your Voting Power to Abstain on every vote.",
         "noDescription": "You have selected to apply your Voting Power to No Confidence on every vote.",
         "inProgress": {
@@ -268,8 +268,8 @@
     "abstainCardDefaultTitle": "Abstain from Every Vote",
     "automatedVotingOptions": "Automated Voting Options",
     "editBtn": "Edit DRep data",
-    "delegatedToAbstainTitle": "You have delegated ₳{{ada}} to “Abstain”",
-    "delegatedToNoConfidenceTitle": "You have delegated ₳{{ada}} to “No Confidence”",
+    "delegatedToAbstainTitle": "You have delegated ₳{{ada}} to \"Abstain\"",
+    "delegatedToNoConfidenceTitle": "You have delegated ₳{{ada}} to \"No Confidence\"",
     "delegatedToAbstainDescription": "You have selected to apply your Voting Power to Abstain on every vote.",
     "delegatedToNoConfidenceDescription": "You have selected to apply your Voting Power to No Confidence on every vote.",
     "delegationOptions": "Delegation Options",
@@ -414,7 +414,7 @@
     "chooseHowToVote": "Choose how you want to vote:",
     "contextAboutYourVote": "Context about your vote",
     "dataMissing": "Data Missing",
-    "dataMissingTooltipExplanation": "Please click “View Details” for more information.",
+    "dataMissingTooltipExplanation": "Please click \"View Details\" for more information.",
     "details": "Governance Details:",
     "expiresDateWithEpoch": "Expires: <0>{{date}}</0> <1>(Epoch {{epoch}})</1>",
     "expiryDate": "Expiry date:",
@@ -641,7 +641,7 @@
     },
     "pendingValidation": {
       "title": "GovTool Is Checking Your Data",
-      "message": "GovTool will read the URL that you supplied and make a check to see if it’s identical with the information that you entered on the form."
+      "message": "GovTool will read the URL that you supplied and make a check to see if it's identical with the information that you entered on the form."
     }
   },
   "dRepData": {
@@ -679,7 +679,7 @@
       "description": "Looks like you have already successfully completed your registration and you currently are a DRep.\n\nYou can view your details in the DRep Directory.",
       "viewDetails": "View your DRep details"
     },
-    "becomeADRep": "Become a DRep",
+    "becomeADrep": "Become a DRep",
     "descriptionStepTwo": "By clicking register you create your DRep ID within your wallet and become a DRep.\n\nOnce the registration has completed your DRep ID will be shown on your dashboard. You will be able to share your DRep ID so that other ada holders can delegate their voting power to you.",
     "headingStepTwo": "Confirm DRep registration",
     "register": "Register",
@@ -706,7 +706,7 @@
     }
   },
   "retirement": {
-    "notADRep": {
+    "notADrep": {
       "title": "You are not a DRep",
       "description": "Looks like you cannot retire, because currently you are not a DRep."
     },
@@ -754,7 +754,7 @@
       },
       "noConfidence": {
         "heading": "No confidence",
-        "paragraphOne": "If you don’t have trust in the current constitutional committee you signal ‘No-confidence’. By voting ‘No’ means you don’t want governance actions to be ratified."
+        "paragraphOne": "If you don't have trust in the current constitutional committee you signal 'No-confidence'. By voting 'No' means you don't want governance actions to be ratified."
       },
       "todRep": {
         "heading": "Delegation to DRep",
@@ -767,7 +767,7 @@
     },
     "expiryDate": {
       "heading": "Expiry Date",
-      "paragraphOne": "The date when the governance action will expiry if it doesn’t reach ratification thresholds.",
+      "paragraphOne": "The date when the governance action will expiry if it doesn't reach ratification thresholds.",
       "paragraphTwo": "IMPORTANT: If the governance action is ratified before the expiry date it will be considered ratified and it will not be available to vote on afterwards."
     },
     "submissionDate": {
@@ -781,7 +781,7 @@
     }
   },
   "wallet": {
-    "cantSeeWalletQuestion": "Can’t see your wallet? Check what wallets are currently compatible with GovTool ",
+    "cantSeeWalletQuestion": "Can't see your wallet? Check what wallets are currently compatible with GovTool ",
     "chooseWallet": "Choose the wallet you want to connect with:",
     "connect": "Connect",
     "connectWallet": "Connect Wallet",
@@ -818,7 +818,7 @@
     },
     "intersectWebsite": {
       "title": "Intersect website",
-      "description": "Intersect is a member-based organization for the Cardano ecosystem — putting the community at the center of Cardano’s development",
+      "description": "Intersect is a member-based organization for the Cardano ecosystem — putting the community at the center of Cardano's development",
       "link": "Intersect website"
     }
   },
@@ -840,7 +840,15 @@
   "cip129DrepId": "(CIP-129) DRep ID",
   "cip105DRepId": "Legacy DRep ID (CIP-105)",
   "email": "Email",
-  "feedback": "Feedback",
+  "feedback": {
+    "title": "Feedback",
+    "reportBug": "Report a Bug",
+    "suggestIdea": "Suggest a New Idea",
+    "sentimentFeedback": "Share Your Experience",
+    "sentimentScore": "How would you rate your experience?",
+    "additionalNotes": "Additional Notes",
+    "submit": "Submit Feedback"
+  },
   "filter": "Filter",
   "goBack": "Go back",
   "goToMainnet": "Go to Mainnet",

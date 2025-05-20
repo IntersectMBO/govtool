@@ -8,8 +8,9 @@ import { useCardano, useFeatureFlag, useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 import { DrawerMobile } from "./DrawerMobile";
+import { MaintenanceEndingBanner } from "./MaintenanceEndingBanner";
 
-const POSITION_TO_BLUR = 50;
+const POSITION_TO_BLUR = 80;
 
 export const TopNav = ({ isConnectButton = true }) => {
   const {
@@ -136,51 +137,54 @@ export const TopNav = ({ isConnectButton = true }) => {
   );
 
   return (
-    <AppBar
-      ref={containerRef}
-      color="transparent"
-      sx={{
-        alignItems: "center",
-        backdropFilter: shouldBlur ? "blur(10px)" : "none",
-        backgroundColor: shouldBlur
-          ? "rgba(256, 256, 256, 0.7)"
-          : isMobile
-          ? "white"
-          : "transparent",
-        borderBottom: isMobile ? 1 : 0,
-        borderColor: "lightblue",
-        boxShadow: 0,
-        justifyContent: "center",
-        flexDirection: "row",
-        position: "sticky",
-        top: 0,
-        px: isMobile ? 2 : 5,
-        py: 3,
-        zIndex: 100,
-      }}
-    >
-      <Box
+    <Box sx={{ position: "sticky", top: 0, zIndex: 100, width: "100%" }}>
+      <MaintenanceEndingBanner />
+
+      <AppBar
+        ref={containerRef}
+        position="static"
+        elevation={0}
         sx={{
-          display: "flex",
           alignItems: "center",
-          flex: 1,
-          justifyContent: "space-between",
-          maxWidth: 1290,
+          // TODO: Fix shouldBlur to work with sticky
+          backdropFilter: shouldBlur ? "blur(10px)" : "none",
+          backgroundColor: shouldBlur
+            ? "rgba(256, 256, 256, 0.7)"
+            : isMobile
+            ? "white"
+            : "rgba(256, 256, 256, 0.7)",
+          borderBottom: isMobile ? 1 : 0,
+          borderColor: "lightblue",
+          boxShadow: 0,
+          justifyContent: "center",
+          flexDirection: "row",
+          px: isMobile ? 2 : 5,
+          py: 3,
         }}
       >
-        <NavLink
-          data-testid="logo-button"
-          to={PATHS.home}
-          onClick={() => isConnectButton || disconnectWallet()}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flex: 1,
+            justifyContent: "space-between",
+            maxWidth: 1290,
+          }}
         >
-          <img
-            alt="app-logo"
-            height={isMobile ? 25 : 35}
-            src={IMAGES.appLogo}
-          />
-        </NavLink>
-        {screenWidth >= 1145 ? renderDesktopNav() : renderMobileNav()}
-      </Box>
-    </AppBar>
+          <NavLink
+            data-testid="logo-button"
+            to={PATHS.home}
+            onClick={() => isConnectButton || disconnectWallet()}
+          >
+            <img
+              alt="app-logo"
+              height={isMobile ? 25 : 35}
+              src={IMAGES.appLogo}
+            />
+          </NavLink>
+          {screenWidth >= 1145 ? renderDesktopNav() : renderMobileNav()}
+        </Box>
+      </AppBar>
+    </Box>
   );
 };

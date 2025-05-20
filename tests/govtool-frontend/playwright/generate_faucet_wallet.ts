@@ -11,7 +11,7 @@ import { ShelleyWallet } from "./lib/helpers/crypto";
     console.log("-----------------------------------");
     console.log("💼 Wallet:", walletJson);
     console.log(`\n🔑 Payment Private Key: ${walletJson.payment.private}`);
-    console.log(`🔗 Stake Public Key Hash: ${walletJson.stake.pkh}`);
+    console.log(`💰 Stake Private Key: ${walletJson.stake.private}`);
     console.log(`🏠 Wallet Address: ${walletJson.address}`);
     console.log("-----------------------------------");
 
@@ -20,7 +20,7 @@ import { ShelleyWallet } from "./lib/helpers/crypto";
       "\n📋 Please copy the following to your environment variables:"
     );
     console.log(`1. Set FAUCET_PAYMENT_PRIVATE=${walletJson.payment.private}`);
-    console.log(`2. Set FAUCET_STAKE_PKH=${walletJson.stake.pkh}`);
+    console.log(`2. Set FAUCET_STAKE_PRIVATE=${walletJson.stake.private}`);
     console.log(`3. Set FAUCET_ADDRESS=${walletJson.address}`);
 
     console.log(

@@ -9,7 +9,7 @@ import walletManager from "lib/walletManager";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import { getWalletConfigForFaucet } from "@helpers/index";
 
-const PROPOSAL_WALLETS_COUNT = 5;
+const PROPOSAL_WALLETS_COUNT = environments.isScheduled ? 1 : 5;
 
 let govActionDeposit: number;
 
@@ -28,8 +28,7 @@ setup.beforeEach(async () => {
   await setAllureStory("Proposal");
   await skipIfMainnet();
   const totalRequiredBalanceForWallets =
-    (govActionDeposit / 1000000) * PROPOSAL_WALLETS_COUNT +
-    22 * PROPOSAL_WALLETS_COUNT;
+    (govActionDeposit / 1000000 + 22) * PROPOSAL_WALLETS_COUNT;
   await skipIfBalanceIsInsufficient(totalRequiredBalanceForWallets);
 });
 

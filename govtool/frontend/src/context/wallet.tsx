@@ -130,7 +130,7 @@ type TreasuryProps = {
 
 type ProtocolParameterChangeProps = {
   prevGovernanceActionHash: string;
-  prevGovernanceActionIndex: number;
+  prevGovernanceActionIndex: string;
   protocolParamsUpdate: Partial<ProtocolParamsUpdate>;
 } & VotingAnchor;
 
@@ -166,7 +166,6 @@ export type QuorumThreshold = {
   numerator: string;
   denominator: string;
 };
-
 type ProtocolParamsUpdate = {
   adaPerUtxo: string;
   collateralPercentage: number;
@@ -1343,7 +1342,7 @@ const CardanoProvider = (props: Props) => {
         if (prevGovernanceActionHash && prevGovernanceActionIndex) {
           const prevGovernanceActionId = GovernanceActionId.new(
             TransactionHash.from_hex(prevGovernanceActionHash),
-            prevGovernanceActionIndex,
+            Number(prevGovernanceActionIndex),
           );
           protocolParamChangeAction =
             ParameterChangeAction.new_with_policy_hash_and_action_id(

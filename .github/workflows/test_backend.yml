@@ -134,21 +134,6 @@ jobs:
           chmod +x .github/scripts/remove_oldest_report.sh
             .github/scripts/remove_oldest_report.sh
 
-      - name: Register report
-        id: register-project
-        if: ${{success()}}
-        run: |
-          chmod +x .github/scripts/register_report.sh
-          .github/scripts/register_report.sh
-
-      - if: steps.register-project.outputs.project_exists != 'true'
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
-          repository-name: ${{vars.GH_PAGES}}
-          branch: gh-pages
-          folder: project/${{steps.set-deployment-url.outputs.group_name}}
-
       - name: Generate report details
         id: report-details
         run: |

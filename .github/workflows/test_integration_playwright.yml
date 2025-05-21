@@ -187,7 +187,7 @@ jobs:
           ssh-key: ${{ secrets.DEPLOY_KEY }}
           repository-name: ${{vars.GH_PAGES}}
           branch: gh-pages
-          folder: project
+          folder: project/${{steps.set-deployment-url.outputs.group_name}}
 
       - name: Generate report details
         id: report-details
@@ -201,7 +201,7 @@ jobs:
         id: allure-report
         with:
           allure_results: allure-results
-          gh_pages: gh-pages/${{env.REPORT_NAME}}
+          gh_pages: gh-pages/${{steps.set-deployment-url.outputs.group_name}}/${{env.REPORT_NAME}}
           allure_report: allure-report
           allure_history: allure-history
           keep_reports: 2000
@@ -220,7 +220,7 @@ jobs:
           repository-name: ${{vars.GH_PAGES}}
           branch: gh-pages
           folder: build
-          target-folder: ${{ env.REPORT_NAME }}
+          target-folder: ${{steps.set-deployment-url.outputs.group_name}}/${{ env.REPORT_NAME }}
 
   publish-status:
     runs-on: ubuntu-latest

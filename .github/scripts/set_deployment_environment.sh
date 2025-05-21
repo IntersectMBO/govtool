@@ -29,4 +29,5 @@ fi
 
 # Set environment variable for GitHub Actions
 echo "GROUP_NAME=${GROUP_NAME}" >>$GITHUB_ENV
+echo "group_name=${GROUP_NAME}" >>$GITHUB_OUTPUT
 echo "Setting deployment environment to: ${GROUP_NAME}"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ -d "gh-pages/$REPORT_NAME" ]; then
-    cd gh-pages/$REPORT_NAME
+if [ -d "gh-pages/$GROUP_NAME/$REPORT_NAME" ]; then
+    cd gh-pages/$GROUP_NAME/$REPORT_NAME
     
     # Count the number of numerical directories
     dir_count=$(find . -maxdepth 1 -type d -regex './[0-9]+' | wc -l)

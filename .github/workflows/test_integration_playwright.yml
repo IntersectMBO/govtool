@@ -59,6 +59,7 @@ jobs:
         with:
           ref: ${{ env.COMMIT_SHA }}
       - name: Set pending commit status
+        if: ${{ !github.event.schedule }}
         id: set-pending-status
         run: |
           echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
@@ -161,6 +162,12 @@ jobs:
           repository: ${{vars.GH_PAGES}}
           ssh-key: ${{ secrets.DEPLOY_KEY }}
 
+      - name: Set Deployment Environment
+        id: set-deployment-url
+        run: |
+          chmod +x .github/scripts/set_deployment_environment.sh
+              .github/scripts/set_deployment_environment.sh
+
       - name: Remove oldest report to save space
         if: ${{success()}}
         run: |
@@ -226,8 +233,9 @@ jobs:
         with:
           name: allure-results
           path: allure-results
+          
       - name: Set Commit Status
-        if: always()
+        if: always() && !github.event.schedule
         run: |
           chmod +x .github/scripts/set_commit_status.sh
           .github/scripts/set_commit_status.sh

@@ -137,7 +137,7 @@ jobs:
       FAUCET_ADDRESS: ${{vars.FAUCET_ADDRESS}}
       CARDANOAPI_METADATA_URL: ${{vars.CARDANOAPI_METADATA_URL}}
       FAUCET_PAYMENT_PRIVATE: ${{secrets.FAUCET_PAYMENT_PRIVATE}}
-      FAUCET_STAKE_PKH: ${{secrets.FAUCET_STAKE_PKH}}
+      FAUCET_STAKE_PRIVATE: ${{secrets.FAUCET_STAKE_PRIVATE}}
 
   publish-report:
     runs-on: ubuntu-latest

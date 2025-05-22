@@ -32,6 +32,11 @@ declare module "@intersect.mbo/pdf-ui/cjs" {
     epochParams?: EpochParams;
     username: string;
     setUsername: (username: string) => void;
+    getAdaHolderVotingPower: ({
+      stakeKey,
+    }: {
+      stakeKey?: string;
+    }) => Promise<number>;
   };
 
   type GovernanceActionsOutcomesProps = {

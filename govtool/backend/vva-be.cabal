@@ -36,6 +36,7 @@ extra-source-files:
   sql/get-network-total-stake.sql
   sql/get-dreps-voting-power-list.sql
   sql/get-filtered-dreps-voting-power.sql
+  sql/get-previous-enacted-governance-action-proposal-details.sql
 executable vva-be
     main-is:          Main.hs
 

@@ -78,6 +78,7 @@ type VVAApi =
                     :> QueryParam "search" Text
                     :> Get '[JSON] ListProposalsResponse
     :<|> "proposal" :> "get" :> Capture "proposalId" GovActionId :> QueryParam "drepId" HexText :> Get '[JSON] GetProposalResponse
+    :<|> "proposal" :> "enacted-details" :> QueryParam "type" GovernanceActionType :> Get '[JSON] (Maybe EnactedProposalDetailsResponse)
     :<|> "epoch" :> "params" :> Get '[JSON] GetCurrentEpochParamsResponse
     :<|> "transaction" :> "status" :> Capture "transactionId" HexText :> Get '[JSON] GetTransactionStatusResponse
     :<|> "throw500" :> Get '[JSON] ()
@@ -95,6 +96,7 @@ server = drepList
     :<|> getStakeKeyVotingPower
     :<|> listProposals
     :<|> getProposal
+    :<|> getEnactedProposalDetails
     :<|> getCurrentEpochParams
     :<|> getTransactionStatus
     :<|> throw500
@@ -441,6 +443,33 @@ getProposal g@(GovActionId govActionTxHash govActionIndex) mDrepId' = do
     { getProposalResponseProposal = proposalResponse
     , getProposalResponseVote = voteResponse
     }
+
+getEnactedProposalDetails :: App m => Maybe GovernanceActionType -> m (Maybe EnactedProposalDetailsResponse)
+getEnactedProposalDetails maybeType = do
+  let proposalType = maybe "HardForkInitiation" governanceActionTypeToText maybeType
+  
+  mDetails <- Proposal.getPreviousEnactedProposal proposalType
+  
+  let response = enactedProposalDetailsToResponse <$> mDetails
+  
+  return response
+  where
+    governanceActionTypeToText :: GovernanceActionType -> Text
+    governanceActionTypeToText actionType = 
+      case actionType of
+        HardForkInitiation -> "HardForkInitiation"
+        ParameterChange -> "ParameterChange"
+        _ -> "HardForkInitiation"
+    
+    enactedProposalDetailsToResponse :: Types.EnactedProposalDetails -> EnactedProposalDetailsResponse
+    enactedProposalDetailsToResponse Types.EnactedProposalDetails{..} =
+      EnactedProposalDetailsResponse
+        { enactedProposalDetailsResponseId = enactedProposalDetailsId
+        , enactedProposalDetailsResponseTxId = enactedProposalDetailsTxId
+        , enactedProposalDetailsResponseIndex = enactedProposalDetailsIndex
+        , enactedProposalDetailsResponseDescription = enactedProposalDetailsDescription
+        , enactedProposalDetailsResponseHash = HexText enactedProposalDetailsHash
+        }
 
 getCurrentEpochParams :: App m => m GetCurrentEpochParamsResponse
 getCurrentEpochParams = do

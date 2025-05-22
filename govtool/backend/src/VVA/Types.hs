@@ -211,6 +211,40 @@ instance ToJSON TransactionStatus where
       , "votingProcedure" .= votingProcedure
       ]
 
+data EnactedProposalDetails = EnactedProposalDetails
+  { enactedProposalDetailsId          :: Integer
+  , enactedProposalDetailsTxId        :: Integer
+  , enactedProposalDetailsIndex       :: Integer
+  , enactedProposalDetailsDescription :: Maybe Value
+  , enactedProposalDetailsHash        :: Text
+  }
+  deriving (Show)
+
+instance FromRow EnactedProposalDetails where
+  fromRow =
+    EnactedProposalDetails
+      <$> field
+      <*> field
+      <*> (floor @Scientific <$> field)
+      <*> field
+      <*> field
+
+instance ToJSON EnactedProposalDetails where
+  toJSON EnactedProposalDetails
+    { enactedProposalDetailsId
+    , enactedProposalDetailsTxId
+    , enactedProposalDetailsIndex
+    , enactedProposalDetailsDescription
+    , enactedProposalDetailsHash
+    } =
+      object
+        [ "id" .= enactedProposalDetailsId
+        , "tx_id" .= enactedProposalDetailsTxId
+        , "index" .= enactedProposalDetailsIndex
+        , "description" .= enactedProposalDetailsDescription
+        , "hash" .= enactedProposalDetailsHash
+        ]
+
 data CacheEnv
   = CacheEnv
       { proposalListCache                   :: Cache.Cache () [Proposal]

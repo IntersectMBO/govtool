@@ -455,6 +455,40 @@ instance ToSchema ProposalResponse where
           & example
             ?~ toJSON exampleProposalResponse
 
+data EnactedProposalDetailsResponse
+  = EnactedProposalDetailsResponse
+      { enactedProposalDetailsResponseId          :: Integer
+      , enactedProposalDetailsResponseTxId        :: Integer
+      , enactedProposalDetailsResponseIndex       :: Integer
+      , enactedProposalDetailsResponseDescription :: Maybe Value
+      , enactedProposalDetailsResponseHash        :: HexText
+      }
+  deriving (Generic, Show)
+
+deriveJSON (jsonOptions "enactedProposalDetailsResponse") ''EnactedProposalDetailsResponse
+
+exampleEnactedProposalDetailsResponse :: Text
+exampleEnactedProposalDetailsResponse = "{ \"id\": 123,"
+                  <> "\"txId\": 456,"
+                  <> "\"index\": 0,"
+                  <> "\"description\": {\"key\": \"value\"},"
+                  <> "\"hash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\"}"
+
+instance ToSchema EnactedProposalDetailsResponse where
+  declareNamedSchema proxy = do
+    NamedSchema name_ schema_ <-
+      genericDeclareNamedSchema
+        ( fromAesonOptions $
+            jsonOptions "enactedProposalDetailsResponse"
+        )
+        proxy
+    return $
+      NamedSchema name_ $
+        schema_
+          & description ?~ "Enacted Proposal Details Response"
+          & example
+            ?~ toJSON exampleEnactedProposalDetailsResponse
+
 exampleListProposalsResponse :: Text
 exampleListProposalsResponse =
    "{ \"page\": 0,"

@@ -11,6 +11,7 @@ changes.
 ## [Unreleased]
 
 ### Added
+- Add CIP-129 support for gov_actions hashes in Live Voting (governance actions) [Issue 3619](https://github.com/IntersectMBO/govtool/issues/3619)
 
 - Add maintenance ending banner [Issue 3647](https://github.com/IntersectMBO/govtool/issues/3647)
 

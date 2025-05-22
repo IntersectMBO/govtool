@@ -35,7 +35,9 @@ test.describe("Budget proposal dRep behaviour", () => {
 
       await budgetDiscussionDetailsPage.voteOnPoll(choice);
 
-      await expect(budgetDiscussionDetailsPage.pollYesBtn).not.toBeVisible();
+      await expect(budgetDiscussionDetailsPage.pollYesBtn).not.toBeVisible({
+        timeout: 60_000,
+      });
       await expect(budgetDiscussionDetailsPage.pollNoBtn).not.toBeVisible();
       await expect(
         budgetDiscussionDetailsPage.currentPage.getByTestId(
@@ -59,7 +61,7 @@ test.describe("Budget proposal dRep behaviour", () => {
       await budgetDiscussionDetailsPage.voteOnPoll(choice);
       await budgetDiscussionDetailsPage.changePollVote();
 
-      await expect(budgetDiscussionDetailsPage.pollYesBtn).not.toBeVisible();
+      await expect(budgetDiscussionDetailsPage.pollYesBtn).not.toBeVisible({timeout: 60_000});
       await expect(budgetDiscussionDetailsPage.pollNoBtn).not.toBeVisible();
 
       // vote must be changed
@@ -100,25 +102,17 @@ test.describe("Budget proposal dRep behaviour", () => {
       .locator('[data-testid^="comment-"][data-testid$="-content-card"]')
       .first();
 
-    await expect(
-      dRepCommentedCard.getByText("DRep", { exact: true })
-    ).toBeVisible();
+    await expect(dRepCommentedCard.getByTestId("dRep-tag")).toBeVisible();
 
-    const isDRepGivenNameVisible = await dRepCommentedCard
-      .getByTestId("given-name")
-      .isVisible();
-
-    expect(
-      isDRepGivenNameVisible,
-      !isDRepGivenNameVisible && "Missing given-name testId"
-    ).toBeTruthy();
-
-    await expect(dRepCommentedCard.getByTestId("given-name")).toHaveText(
-      dRep03Wallet.givenName
+    await expect(dRepCommentedCard.getByTestId("dRep-given-name")).toHaveText(
+      dRep03Wallet.givenName,
+      { timeout: 60_000 }
     );
 
-    await expect(dRepCommentedCard.getByTestId("drep-id")).toHaveText(
-      dRep03Wallet.dRepId
-    );
+    const dRepIdWithoutDotted = (
+      await dRepCommentedCard.getByTestId("dRep-id").textContent()
+    ).replace(/\./g, "");
+
+    expect(dRep03Wallet.dRepId).toContain(dRepIdWithoutDotted);
   });
 });

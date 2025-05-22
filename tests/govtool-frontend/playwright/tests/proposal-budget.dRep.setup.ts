@@ -11,6 +11,7 @@ import { expect } from "@playwright/test";
 import { test as setup } from "@fixtures/walletExtension";
 
 import kuberService from "@services/kuberService";
+import walletManager from "lib/walletManager";
 
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
@@ -28,11 +29,12 @@ setup("Register DRep of proposal budget static wallets", async () => {
       async (dRepWallet) => {
         const metadataResponse = await uploadMetadataAndGetJsonHash();
         const givenName = metadataResponse.givenName;
-        const index = dRepWallets.indexOf(dRepWallet);
-        dRepWallets[index] = {
-          ...dRepWallet,
-          givenName,
-        };
+
+        await walletManager.updateWalletGivenName(
+          dRepWallet.address,
+          givenName
+        );
+
         return {
           ...metadataResponse,
           wallet: dRepWallet,

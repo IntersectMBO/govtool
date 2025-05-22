@@ -4,10 +4,12 @@ import { Box } from "@mui/material";
 
 import { Background, ScrollToManage } from "@atoms";
 import {
+  BUDGET_DISCUSSION_PATHS,
   CONNECTED_NAV_ITEMS,
   DRAWER_WIDTH,
   OUTCOMES_PATHS,
   PATHS,
+  PDF_PATHS,
 } from "@consts";
 import { useCardano } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
@@ -34,18 +36,37 @@ export const Dashboard = () => {
       return outcomesNavItem ?? "";
     }
 
+    if (path.startsWith(BUDGET_DISCUSSION_PATHS.budgetDiscussion)) {
+      const budgetNavItem = findNavItem(
+        CONNECTED_NAV_ITEMS,
+        BUDGET_DISCUSSION_PATHS.budgetDiscussion,
+      );
+
+      return budgetNavItem ?? "";
+    }
+
+    if (path.startsWith(PDF_PATHS.proposalDiscussion)) {
+      const proposalDiscussionNavItem = findNavItem(
+        CONNECTED_NAV_ITEMS,
+        PDF_PATHS.proposalDiscussion,
+      );
+
+      return proposalDiscussionNavItem ?? "";
+    }
     return findNavItem(CONNECTED_NAV_ITEMS, path) ?? "";
   };
 
-  const findNavItem = (items: NavItem[], targetPath: string): string | null => (
-    items.reduce<string | null>((result, item) => (
-      result ?? (
-        targetPath === item.navTo
+  const findNavItem = (items: NavItem[], targetPath: string): string | null =>
+    items.reduce<string | null>(
+      (result, item) =>
+        result ??
+        (targetPath === item.navTo
           ? item.label
-          : (item.childNavItems ? findNavItem(item.childNavItems, targetPath) : null)
-      )
-    ), null)
-  );
+          : item.childNavItems
+          ? findNavItem(item.childNavItems, targetPath)
+          : null),
+      null,
+    );
 
   useEffect(() => {
     if (divRef.current && pathname !== PATHS.dashboardGovernanceActions) {

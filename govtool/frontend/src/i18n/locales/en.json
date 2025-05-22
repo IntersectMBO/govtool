@@ -556,36 +556,95 @@
   },
   "hero": {
     "connectWallet": "Participate now",
-    "description": "Cardano Governance lets Ada holders have a say in the network's future.\n\nYou can vote directly, find someone to represent you, or become a representative for others.\n\nYou can also propose changes in the network yourself, put these up for discussion and eventually, a vote.\n\n<0>Learn more about governance</0> in the guide, or have a look around the app and see Cardano Governance in action.",
-    "headline": "Cardano \n Governance Tool"
+    "description": "An Open Source Governance Application for the Cardano Blockchain\n<0>Learn more about Cardano Governance</0>"
   },
   "home": {
-    "cards": {
-      "delegate": {
-        "description": "Find a DRep to vote on your behalf.",
-        "firstButtonLabel": "View DRep Directory",
-        "title": "Delegate your Voting Power"
-      },
-      "governanceActions": {
-        "description": "See all the Governance Actions submitted on chain. ",
-        "firstButtonLabel": "View Governance Actions",
-        "title": "View Governance Actions"
-      },
-      "proposeAGovernanceAction": {
-        "description": "Submit your proposal for a Governance Action.",
-        "secondButtonLabel": "View Proposals",
-        "firstButtonLabel": "Connect to Propose",
-        "title": "Propose a Governance Action"
-      },
-      "registerAsDRep": {
-        "description": "Accept delegated voting power from other Ada holders, and combine it with your own voting power. Vote with the accumulated Power on  Governance Actions.",
-        "firstButtonLabel": "Connect to Register",
-        "title": "Become a DRep"
-      },
-      "registerAsDirectVoter": {
-        "description": "Vote on Governance Actions using your own voting power",
-        "firstButtonLabel": "Connect to Register",
-        "title": "Become a Direct Voter"
+    "openToAny": {
+      "section": { "title": "Open to any and all users:" },
+      "cards": {
+        "drepDirectory": {
+          "description": "DReps are representatives that vote for others.",
+          "title": "Browse the DRep Directory"
+        },
+        "budgetProposal": {
+          "description": "Budget proposal and comments are open to public inspection.",
+          "title": "View Budget Proposals"
+        },
+        "proposalDiscussion": {
+          "description": "Any user can read the proposals and view comments on future Actions.",
+          "title": "See Proposed Governance Actions"
+        },
+        "governanceActions": {
+          "description": "See how the voting is progressing on any Governance Action.",
+          "title": "View Live Voting"
+        },
+        "governanceOutcomes": {
+          "description": "See the outcomes and final votes on any Governance Action.",
+          "title": "View Voting Outcomes"
+        },
+        "guides": {
+          "description": "The roadmap to this tool, to get you started in Cardano Governance.",
+          "title": "Read our Guides"
+        }
+      }
+    },
+    "connectWalletTo": {
+      "section": { "title": "Connect a Cardano Wallet to:" },
+      "cards": {
+        "discussBudgetProposals": {
+          "description": "Read comments and participate in discussions for Budget requests.",
+          "title": "Discuss Budget Proposals"
+        },
+        "createBudgetProposal": {
+          "description": "Create a proposal to fund your project from the Cardano treasury.",
+          "title": "Create a Budget Proposal"
+        },
+        "discussGovernanceActions": {
+          "description": "Read comments and participate in discussions for Governance Actions.",
+          "title": "Discuss Governance Actions"
+        },
+        "proposeGovernanceAction": {
+          "description": "Create a discussion for an Action, and submit it on-chain.",
+          "title": "Propose a Governace Action"
+        },
+        "registerToVote": {
+          "description": "Register yourself to vote on all Governace Actions",
+          "title": "Register to Vote"
+        },
+        "delegateVote": {
+          "description": "Delegate your voting power to a representative (they vote for you).",
+          "title": "Delegate your vote to a DRep"
+        },
+        "becomeDRep": {
+          "description": "DReps are representatives that vote for others.",
+          "title": "Become a DRep"
+        },
+        "voteOnGovernanceActions": {
+          "description": "Cast your vote on Governance Actions as yourself or as a DRep.",
+          "title": "Vote on Governace Actions"
+        }
+      }
+    },
+    "joinDiscussion": {
+      "section": { "title": "Join the discussion on social media" },
+      "cards": {
+        "discord": {
+          "title": "Discord",
+          "description": "Governance Tools working group"
+        }
+      }
+    },
+    "helpBuildGovTool": {
+      "section": { "title": "Help build GovTool" },
+      "cards": {
+        "githubRepo": {
+          "title": "GitHub Repo",
+          "description": "View the GovTool source code and contribute on GitHub."
+        },
+        "documentation": {
+          "title": "Documentation",
+          "description": "GovTool documentation and guides."
+        }
       }
     }
   },
@@ -825,7 +884,7 @@
     "notVoted": "Not voted"
   },
   "usefulLinks": {
-    "title": "Useful links",
+    "title": "Links to other Cardano Governance resources:",
     "ccPortal": {
       "title": "Check the Constitutional Committee Portal",
       "description": "See Interim Cardano Constitution and Constitutional committee votes rationales",
@@ -835,6 +894,71 @@
       "title": "Intersect website",
       "description": "Intersect is a member-based organization for the Cardano ecosystem — putting the community at the center of Cardano’s development",
       "link": "Intersect website"
+    },
+    "tempo": {
+      "title": "Tempo",
+      "description": "Tempo, a tool for DReps Community Engagement",
+      "link": "Tempo"
+    },
+    "1694io": {
+      "title": "1694.io",
+      "description": "CIP-1694 explained plus DRep list, DRep campaign, proposal discussion",
+      "link": "1694.io"
+    },
+    "governanceSpace": {
+      "title": "Governance Space",
+      "description": "Decentralized Governance for Everyone",
+      "link": "Governance Space"
+    },
+    "syncAi": {
+      "title": "SyncAI Governance Hub",
+      "description": "One collaborative space to explore proposals, chat, vote, and track alignment",
+      "link": "SyncAI"
+    },
+    "ekklesia": {
+      "title": "Ekklesia",
+      "description": "Where DReps indicate which proposals they support for funding consideration",
+      "link": "Ekklesia"
+    },
+    "adaStat": {
+      "title": "AdaStat",
+      "description": "AdaStat Cardano Explorer will show you full details about Cardano (ADA) blockchain",
+      "link": "AdaStat"
+    },
+    "cexplorer": {
+      "title": "CExplorer",
+      "description": "Independent tool for your better staking /decision-making",
+      "link": "CExplorer"
+    },
+    "cardanoScan": {
+      "title": "Cardanoscan",
+      "description": "The Cardano (ADA) Explorer, explore blocks, transactions, metadata, certificates, pools, assets and more",
+      "link": "Cardanoscan"
+    },
+    "cardanoBudget": {
+      "title": "Cardano Budget Proposals 2025",
+      "description": "A tool to track the Cardano treasury and its budget proposals",
+      "link": "Cardano Budget"
+    },
+    "budgetCardanoAfrica": {
+      "title": "Budget Cardano Africa",
+      "description": "In-depth analysis of Cardano's budget proposals and insights",
+      "link": "Budget Cardano Africa"
+    },
+    "reachYourPeople": {
+      "title": "Reach Your People",
+      "description": "RYP is a communication and announcement hub for Cardano and other blockchains",
+      "link": "Reach Your People"
+    },
+    "1694Tools": {
+      "title": "1694.Tools",
+      "description": "Cardano proposal explorer",
+      "link": "1694.Tools"
+    },
+    "sanchonetGovernanceExplorer": {
+      "title": "SanchoNet Governance Explorer",
+      "description": "This explorer allows you to view governance activities and other data from the Cardano SanchoNet testnet",
+      "link": "SanchoNet Governance Explorer"
     }
   },
   "about": "About",

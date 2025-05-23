@@ -187,4 +187,27 @@ test.describe("Submit Usersnap", () => {
 
     await expect(page.getByText("Thank you!")).toBeVisible();
   });
+
+  test("10F. Should submit sentiment feedback", async ({ page }) => {
+    // Intercept Usersnap submit API
+    await interceptUsersnap(page);
+    await interceptBucket(page);
+
+    await page
+      .getByRole("button", { name: "Share Your Experience" })
+      .click();
+
+    // Select a rating
+    await page.getByLabel("How would you rate your experience?").click();
+    await page.getByRole("button", { name: "4" }).click();
+
+    // Add additional notes
+    await page
+      .getByPlaceholder("Additional Notes")
+      .fill(faker.lorem.paragraph(2));
+
+    await page.getByRole("button", { name: "Submit Feedback" }).click();
+
+    await expect(page.getByText("Thank you!")).toBeVisible();
+  });
 });

@@ -77,7 +77,39 @@ export const UsersnapProvider = ({
       if (API_KEY) {
         try {
           const api = await loadSpace(API_KEY);
-          api.init(initParams);
+          api.init({
+            ...initParams,
+            customFields: {
+              sentiment_score: {
+                type: 'rating',
+                label: 'How would you rate your experience?',
+                required: true,
+                options: [1, 2, 3, 4, 5]
+              },
+              additional_notes: {
+                type: 'textarea',
+                label: 'Additional Notes',
+                required: false
+              }
+            },
+            feedbackTypes: [
+              {
+                id: 'bug',
+                label: 'Report a Bug',
+                description: 'Something is not working as expected'
+              },
+              {
+                id: 'idea',
+                label: 'Suggest a New Idea',
+                description: 'Share your ideas for improvement'
+              },
+              {
+                id: 'sentiment',
+                label: 'Share Your Experience',
+                description: 'Rate your experience and provide feedback'
+              }
+            ]
+          });
           setUsersnapApi(api);
         } catch (error) {
           console.error(error);

@@ -63,7 +63,7 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
 
   return (
     <div>
-      <Typography variant="title2" sx={{ mb: 4, textAlign: align }}>
+      <Typography variant="title" sx={{ mb: 4, textAlign: align }}>
         {t("usefulLinks.title")}
       </Typography>
       <Box
@@ -73,8 +73,8 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
           sm: "repeat(2, 1fr)",
           lg: "repeat(4, 1fr)",
         }}
-        gap={4}
-        mt={4}
+        gap={3.75}
+        mt={3.75}
       >
         {Object.entries(LINKS).map(([key, { url }]) => (
           <Card
@@ -89,10 +89,10 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
               gap: 1,
             }}
           >
-            <Typography>
+            <Typography component="h3" variant="titleH3">
               {t(`usefulLinks.${key as keyof typeof LINKS}.title`)}
             </Typography>
-            <Typography variant="caption" sx={{ mb: 1 }}>
+            <Typography variant="body" sx={{ mb: 1 }}>
               {t(`usefulLinks.${key as keyof typeof LINKS}.description`)}
             </Typography>
             <Link
@@ -110,7 +110,11 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
                 },
               }}
             >
-              <Typography color="primary" variant="body2">
+              <Typography
+                color="primary"
+                variant="body2"
+                sx={{ fontSize: "21px" }}
+              >
                 {t(`usefulLinks.${key as keyof typeof LINKS}.link`)}
               </Typography>
               <img

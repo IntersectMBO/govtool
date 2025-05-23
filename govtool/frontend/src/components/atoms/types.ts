@@ -32,8 +32,11 @@ export type TypographyProps = Pick<
     | "headline3"
     | "headline4"
     | "headline5"
+    | "title"
+    | "titleH3"
     | "title1"
     | "title2"
+    | "body"
     | "body1"
     | "body2"
     | "caption";

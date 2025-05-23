@@ -47,7 +47,7 @@ export const Home = () => {
             sx={{
               whiteSpace: "pre-line",
             }}
-            variant="body1"
+            variant="title"
           >
             <Trans
               i18nKey="hero.description"
@@ -60,7 +60,7 @@ export const Home = () => {
                   rel="noopener noreferrer"
                   sx={{
                     cursor: "pointer",
-                    fontSize: 16,
+                    fontSize: 22,
                   }}
                 />,
               ]}

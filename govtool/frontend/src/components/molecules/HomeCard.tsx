@@ -19,6 +19,7 @@ export const HomeCard = ({ title, description, onCardClick }: Props) => (
       border: "none",
       cursor: onCardClick ? "pointer" : "default",
       outline: "none",
+      p: 3.75,
       "&:focus": {
         boxShadow: "0 0 0 3px rgba(47, 98, 220, 0.5)",
       },
@@ -29,7 +30,9 @@ export const HomeCard = ({ title, description, onCardClick }: Props) => (
     aria-label={`${title}. ${description}`}
     dataTestId={`home-card-${title.replace(/\s+/g, "-").toLowerCase()}`}
   >
-    <Typography component="h3">{title}</Typography>
-    <Typography variant="caption">{description}</Typography>
+    <Typography component="h3" variant="titleH3">
+      {title}
+    </Typography>
+    <Typography variant="body">{description}</Typography>
   </Card>
 );

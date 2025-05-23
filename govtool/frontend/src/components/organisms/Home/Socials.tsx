@@ -26,7 +26,7 @@ export const Socials = ({ my = 4 }: { my?: number }) => {
 
   return (
     <Box my={my} component="section" data-testid="join-discussion-section">
-      <Typography variant="title2">
+      <Typography variant="title">
         {t("home.joinDiscussion.section.title")}
       </Typography>
       <Box
@@ -36,8 +36,8 @@ export const Socials = ({ my = 4 }: { my?: number }) => {
           sm: "repeat(2, 1fr)",
           lg: "repeat(3, 1fr)",
         }}
-        gap={4}
-        mt={4}
+        gap={3.75}
+        mt={3.75}
       >
         {SOCIAL_CARDS.map(({ title, description, url }) => (
           <HomeCard

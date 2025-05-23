@@ -106,7 +106,7 @@ export const ConnectWalletTo = () => {
   return (
     <Box my={4} component="section" data-testid="connect-wallet-to-section">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="title2">
+        <Typography variant="title">
           {t("home.connectWalletTo.section.title")}
         </Typography>
         <Button
@@ -125,8 +125,8 @@ export const ConnectWalletTo = () => {
           sm: "repeat(2, 1fr)",
           lg: "repeat(3, 1fr)",
         }}
-        gap={4}
-        mt={4}
+        gap={3.75}
+        mt={3.75}
       >
         {CONNECT_WALLET_TO_CARDS.map(({ title, description, path }) => (
           <HomeCard

@@ -605,10 +605,10 @@
         },
         "proposeGovernanceAction": {
           "description": "Create a discussion for an Action, and submit it on-chain.",
-          "title": "Propose a Governace Action"
+          "title": "Propose a Governance Action"
         },
         "registerToVote": {
-          "description": "Register yourself to vote on all Governace Actions",
+          "description": "Register yourself to vote on all Governance Actions",
           "title": "Register to Vote"
         },
         "delegateVote": {
@@ -621,7 +621,7 @@
         },
         "voteOnGovernanceActions": {
           "description": "Cast your vote on Governance Actions as yourself or as a DRep.",
-          "title": "Vote on Governace Actions"
+          "title": "Vote on Governance Actions"
         }
       }
     },

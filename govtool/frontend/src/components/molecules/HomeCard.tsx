@@ -27,6 +27,7 @@ export const HomeCard = ({ title, description, onCardClick }: Props) => (
     component="button"
     role="button"
     aria-label={`${title}. ${description}`}
+    dataTestId={`home-card-${title.replace(/\s+/g, "-").toLowerCase()}`}
   >
     <Typography component="h3">{title}</Typography>
     <Typography variant="caption">{description}</Typography>

@@ -87,7 +87,7 @@ export const OpenToAny = () => {
       component="section"
       data-testid="open-to-any-and-all-users-section"
     >
-      <Typography variant="title">
+      <Typography variant="title" component="h2">
         {t("home.openToAny.section.title")}
       </Typography>
       <Box

@@ -48,6 +48,7 @@ export const Home = () => {
               whiteSpace: "pre-line",
             }}
             variant="title"
+            component="h1"
           >
             <Trans
               i18nKey="hero.description"

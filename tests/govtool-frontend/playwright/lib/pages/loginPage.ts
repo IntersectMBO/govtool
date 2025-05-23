@@ -6,7 +6,9 @@ import { isMobile, openDrawer } from "@helpers/mobile";
 import { Page, expect } from "@playwright/test";
 
 export default class LoginPage {
-  readonly connectWalletBtn = this.page.getByTestId("connect-wallet-button");
+  readonly connectWalletBtn = this.page
+    .getByTestId("connect-wallet-button")
+    .first();
   readonly demosWalletBtn = this.page.getByTestId("demos-wallet-button");
   readonly acceptSanchoNetInfoBtn = this.page
     .getByTestId("confirm-modal-button")

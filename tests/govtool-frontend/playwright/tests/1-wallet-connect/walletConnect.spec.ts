@@ -52,7 +52,7 @@ test("1D. Should reject wallet connection if on different network", async ({
 
   await page.goto("/");
 
-  await page.getByTestId("connect-wallet-button").click();
+  await page.getByTestId("connect-wallet-button").first().click();
   await page.getByTestId("demos-wallet-button").click();
 
   await expect(page.getByTestId("wallet-connection-error-modal")).toHaveText(
@@ -70,7 +70,7 @@ test("1E. Should hide incompatible wallets when connecting", async ({
   });
 
   await newPage.goto("/");
-  await newPage.getByTestId("connect-wallet-button").click();
+  await newPage.getByTestId("connect-wallet-button").first().click();
 
   await expect(newPage.getByTestId("demos-wallet-button")).not.toBeVisible();
 });

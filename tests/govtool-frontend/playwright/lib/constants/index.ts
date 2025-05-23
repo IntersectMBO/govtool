@@ -61,3 +61,13 @@ export const InvalidMetadata: InvalidMetadataType[] = [
     hash: "e71bf6171adda3754a87fff5c2d8d9e404eb3366428a5be13f7e76357a39004f",
   },
 ];
+
+export const connectToCardanoWalletSection = [
+  {
+    label: "Register to Vote. Register",
+    urlPattern: /\/register_direct_voter/,
+  },
+  { label: "Delegate your vote to a DRep", urlPattern: /\/drep_directory/ },
+  { label: "Become a DRep. DReps are", urlPattern: /\/register_drep/ },
+  { label: "Vote on Governace Actions.", urlPattern: /\governance_actions/ }, // Note: typo in original "Governace"
+];

@@ -8,8 +8,11 @@ import {
   REGISTER_DREP_DOC_URL,
   SIGNAL_NO_CONFIDENCE_VOTE_DOC_URL,
 } from "@constants/docsUrl";
+import environments from "@constants/environments";
+import { connectToCardanoWalletSection } from "@constants/index";
 import { user01Wallet } from "@constants/staticWallets";
 import { createTempUserAuth } from "@datafactory/createAuth";
+import createWallet from "@fixtures/createWallet";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { ShelleyWallet } from "@helpers/crypto";
@@ -29,7 +32,7 @@ test.describe("Logged in user", () => {
     wallet: user01Wallet,
   });
 
-  test("6E. Should open Sanchonet docs in a new tab when clicking `Learn More` on dashboards in connected state.", async ({
+  test("6E. Should open docs in a new tab when clicking `Learn More` on dashboards in connected state.", async ({
     page,
     context,
   }) => {
@@ -101,6 +104,28 @@ test.describe("Logged in user", () => {
 
     await expect(page.getByTestId("setup-username-modal")).toBeVisible();
     await expect(page.getByTestId("username-input")).toBeVisible();
+  });
+});
+
+test.describe("Temporary user for landing page connected behaviour", () => {
+  connectToCardanoWalletSection.forEach((section, index) => {
+    test(`6N_${index + 1}. SHould navigate to specific page After connecting wallet of 'connect a cardano wallet to' section on dashboard in disconnect state`, async ({
+      page,
+    }) => {
+      await createWallet(page, {
+        networkId: environments.networkId,
+      });
+      await page.goto("/");
+      await page.getByLabel(section.label).click(); //BUG missing test id
+      await page.getByTestId("demos-wallet-button").click({ force: true });
+
+      await page
+        .getByTestId("confirm-modal-button")
+        .nth(0)
+        .click({ force: true });
+
+      await expect(page).toHaveURL(section.urlPattern);
+    });
   });
 });
 

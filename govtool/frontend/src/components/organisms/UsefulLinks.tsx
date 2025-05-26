@@ -53,10 +53,10 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
               backgroundColor: "white",
             }}
           >
-            <Typography component="h3" variant="titleH3">
+            <Typography>
               {t(`usefulLinks.${key as keyof typeof LINKS}.title`)}
             </Typography>
-            <Typography variant="body" sx={{ mb: 1 }}>
+            <Typography variant="caption" sx={{ mb: 1 }}>
               {t(`usefulLinks.${key as keyof typeof LINKS}.description`)}
             </Typography>
             <Link
@@ -74,11 +74,7 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
                 },
               }}
             >
-              <Typography
-                color="primary"
-                variant="body2"
-                sx={{ fontSize: "21px" }}
-              >
+              <Typography color="primary" variant="body2">
                 {t(`usefulLinks.${key as keyof typeof LINKS}.link`)}
               </Typography>
               <img

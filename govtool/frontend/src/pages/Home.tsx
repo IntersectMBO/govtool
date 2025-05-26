@@ -38,17 +38,18 @@ export const Home = () => {
           maxWidth={1290}
           minHeight="100vh"
           mx="auto"
-          mt={screenWidth < 640 ? 2 : 4}
+          mt={screenWidth < 640 ? 2 : 3.125}
           mb={screenWidth < 640 ? 4.5 : 6}
           px={screenWidth < 640 ? 2 : 5}
         >
           <Typography
-            fontWeight={400}
             sx={{
               whiteSpace: "pre-line",
+              fontSize: "18px",
+              fontWeight: 500,
+              lineHeight: "32px",
             }}
-            variant="title"
-            component="h1"
+            component="h2"
           >
             <Trans
               i18nKey="hero.description"
@@ -61,7 +62,7 @@ export const Home = () => {
                   rel="noopener noreferrer"
                   sx={{
                     cursor: "pointer",
-                    fontSize: 22,
+                    fontSize: "15px",
                   }}
                 />,
               ]}

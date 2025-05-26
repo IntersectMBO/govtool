@@ -87,7 +87,14 @@ export const OpenToAny = () => {
       component="section"
       data-testid="open-to-any-and-all-users-section"
     >
-      <Typography variant="title" component="h2">
+      <Typography
+        component="h2"
+        sx={{
+          fontSize: "20px",
+          fontWeight: 800,
+          lineHeight: "60px",
+        }}
+      >
         {t("home.openToAny.section.title")}
       </Typography>
       <Box
@@ -97,8 +104,8 @@ export const OpenToAny = () => {
           sm: "repeat(2, 1fr)",
           lg: "repeat(3, 1fr)",
         }}
-        gap={3.75}
-        mt={3.75}
+        gap={2.5}
+        mt={0}
       >
         {OPEN_TO_ANY_CARDS.map(({ title, description, path, url }) => (
           <HomeCard

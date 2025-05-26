@@ -106,7 +106,14 @@ export const ConnectWalletTo = () => {
   return (
     <Box my={4} component="section" data-testid="connect-wallet-to-section">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="title">
+        <Typography
+          component="h2"
+          sx={{
+            fontSize: "20px",
+            fontWeight: 800,
+            lineHeight: "60px",
+          }}
+        >
           {t("home.connectWalletTo.section.title")}
         </Typography>
         <Button
@@ -114,6 +121,7 @@ export const ConnectWalletTo = () => {
           onClick={onClickConnectButton}
           size="extraLarge"
           variant="contained"
+          sx={{ mb: 2 }}
         >
           {t("wallet.connectWallet")}
         </Button>
@@ -125,8 +133,8 @@ export const ConnectWalletTo = () => {
           sm: "repeat(2, 1fr)",
           lg: "repeat(3, 1fr)",
         }}
-        gap={3.75}
-        mt={3.75}
+        gap={2.5}
+        mt={0}
       >
         {CONNECT_WALLET_TO_CARDS.map(({ title, description, path }) => (
           <HomeCard

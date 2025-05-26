@@ -33,7 +33,14 @@ export const HelpBuildGovTool = ({ my = 4 }: { my?: number }) => {
 
   return (
     <Box my={my} component="section" data-testid="help-build-govtool-section">
-      <Typography variant="title">
+      <Typography
+        component="h2"
+        sx={{
+          fontSize: "20px",
+          fontWeight: 800,
+          lineHeight: "60px",
+        }}
+      >
         {t("home.helpBuildGovTool.section.title")}
       </Typography>
       <Box
@@ -43,8 +50,8 @@ export const HelpBuildGovTool = ({ my = 4 }: { my?: number }) => {
           sm: "repeat(2, 1fr)",
           lg: "repeat(3, 1fr)",
         }}
-        gap={3.75}
-        mt={3.75}
+        gap={2.5}
+        mt={0}
       >
         {GOVTOOL_CARD_LINKS.map(({ title, description, url }) => (
           <HomeCard

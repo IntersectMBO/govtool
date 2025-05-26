@@ -63,7 +63,16 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
 
   return (
     <div>
-      <Typography variant="title" sx={{ mb: 4, textAlign: align }}>
+      <Typography
+        component="h2"
+        sx={{
+          textAlign: align,
+          fontSize: "20px",
+          fontWeight: 800,
+          lineHeight: "32px",
+          mb: 4,
+        }}
+      >
         {t("usefulLinks.title")}
       </Typography>
       <Box
@@ -88,12 +97,21 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
               flexDirection: "column",
               gap: 1,
               backgroundColor: "white",
+              p: 2.5,
             }}
           >
             <Typography component="h3" variant="titleH3">
               {t(`usefulLinks.${key as keyof typeof LINKS}.title`)}
             </Typography>
-            <Typography variant="body" sx={{ mb: 1 }}>
+            <Typography
+              sx={{
+                mb: 1,
+                textAlign: "left",
+                fontSize: "17px",
+                lineHeight: 1.5,
+                fontWeight: 400,
+              }}
+            >
               {t(`usefulLinks.${key as keyof typeof LINKS}.description`)}
             </Typography>
             <Link
@@ -114,7 +132,7 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
               <Typography
                 color="primary"
                 variant="body2"
-                sx={{ fontSize: "21px" }}
+                sx={{ fontSize: "17px" }}
               >
                 {t(`usefulLinks.${key as keyof typeof LINKS}.link`)}
               </Typography>

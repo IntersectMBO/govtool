@@ -10,6 +10,8 @@ type Props = {
 export const HomeCard = ({ title, description, onCardClick }: Props) => (
   <Card
     sx={{
+      p: 2.5,
+      backgroundColor: "white",
       flexBasis: 0,
       boxShadow: "2px 2px 20px 0px rgba(47, 98, 220, 0.20)",
       boxSizing: "border-box",
@@ -19,7 +21,6 @@ export const HomeCard = ({ title, description, onCardClick }: Props) => (
       border: "none",
       cursor: onCardClick ? "pointer" : "default",
       outline: "none",
-      p: 3.75,
       "&:focus": {
         boxShadow: "0 0 0 3px rgba(47, 98, 220, 0.5)",
       },
@@ -28,7 +29,6 @@ export const HomeCard = ({ title, description, onCardClick }: Props) => (
           ? "0 0 0 3px rgba(47, 98, 220, 0.5)"
           : "2px 2px 20px 0px rgba(47, 98, 220, 0.20)",
       },
-      backgroundColor: "white",
     }}
     onCardClick={onCardClick}
     component="button"
@@ -39,7 +39,14 @@ export const HomeCard = ({ title, description, onCardClick }: Props) => (
     <Typography component="h3" variant="titleH3" sx={{ textAlign: "left" }}>
       {title}
     </Typography>
-    <Typography variant="body" sx={{ textAlign: "left" }}>
+    <Typography
+      sx={{
+        textAlign: "left",
+        fontSize: "17px",
+        lineHeight: 1.5,
+        fontWeight: 400,
+      }}
+    >
       {description}
     </Typography>
   </Card>

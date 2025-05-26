@@ -1,10 +1,9 @@
 import { Box, Link } from "@mui/material";
 
 import { useTranslation } from "@hooks";
+import { Typography } from "../atoms";
 import { ICONS } from "@/consts";
-
-import { Typography } from "../../atoms";
-import { Card } from "../../molecules";
+import { Card } from "../molecules";
 
 const LINKS = {
   ccPortal: {
@@ -12,45 +11,6 @@ const LINKS = {
   },
   intersectWebsite: {
     url: "https://www.intersectmbo.org/",
-  },
-  tempo: {
-    url: "https://tempo.vote/",
-  },
-  "1694io": {
-    url: "https://www.1694.io/",
-  },
-  governanceSpace: {
-    url: "https://governancespace.com/",
-  },
-  syncAi: {
-    url: "https://www.syncgovhub.com/app",
-  },
-  ekklesia: {
-    url: "https://2025budget.intersectmbo.org/",
-  },
-  adaStat: {
-    url: "https://adastat.net/",
-  },
-  cexplorer: {
-    url: "https://cexplorer.io/",
-  },
-  cardanoScan: {
-    url: "https://cardanoscan.io/",
-  },
-  cardanoBudget: {
-    url: "https://cardanobudget.com/",
-  },
-  budgetCardanoAfrica: {
-    url: "https://budget.cardano.africa/",
-  },
-  reachYourPeople: {
-    url: "https://www.ryp.io/",
-  },
-  "1694Tools": {
-    url: "https://1694-tools.vercel.app/",
-  },
-  sanchonetGovernanceExplorer: {
-    url: "https://sancho.cardanoconnect.io/",
   },
 } as const;
 
@@ -63,18 +23,19 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
 
   return (
     <div>
-      <Typography variant="title" sx={{ mb: 4, textAlign: align }}>
+      <Typography variant="title1" sx={{ mb: 4, textAlign: align }}>
         {t("usefulLinks.title")}
       </Typography>
       <Box
-        display="grid"
-        gridTemplateColumns={{
-          xxs: "repeat(1, 1fr)",
-          sm: "repeat(2, 1fr)",
-          lg: "repeat(4, 1fr)",
+        sx={{
+          display: "flex",
+          flexDirection: { xxs: "column", lg: "row" },
+          columnGap: 4.5,
+          rowGap: 2.5,
+          justifyContent: align === "center" ? "center" : "flex-start",
+          alignContent: "center",
+          flexWrap: "wrap",
         }}
-        gap={3.75}
-        mt={3.75}
       >
         {Object.entries(LINKS).map(([key, { url }]) => (
           <Card
@@ -82,6 +43,8 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
             sx={{
               flexBasis: 0,
               boxShadow: "2px 2px 20px 0px rgba(47, 98, 220, 0.20)",
+              maxWidth: 464,
+              minWidth: 264,
               minHeight: 196,
               boxSizing: "border-box",
               display: "flex",

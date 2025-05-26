@@ -1,26 +1,17 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Link } from "@mui/material";
-import { Trans } from "react-i18next";
+import { Box } from "@mui/material";
 
-import { Background, Typography } from "@atoms";
+import { Background } from "@atoms";
 import { PATHS } from "@consts";
 import { useCardano } from "@context";
-import {
-  TopNav,
-  Footer,
-  UsefulLinks,
-  OpenToAny,
-  ConnectWalletTo,
-  Socials,
-  HelpBuildGovTool,
-} from "@organisms";
+import { TopNav, Hero, Footer, HomeCards } from "@organisms";
 import { WALLET_LS_KEY, getItemFromLocalStorage } from "@utils";
+import { UsefulLinks } from "@/components/organisms/UsefulLinks";
 import { useScreenDimension } from "@/hooks";
 
 export const Home = () => {
   const { isEnabled } = useCardano();
-
   const navigate = useNavigate();
   const { screenWidth } = useScreenDimension();
 
@@ -34,44 +25,19 @@ export const Home = () => {
     <Background>
       <TopNav />
       <Box overflow="hidden">
+        <Hero />
         <Box
-          maxWidth={1290}
-          minHeight="100vh"
+          maxWidth={screenWidth < 2560 ? 866 : 1770}
           mx="auto"
-          mt={screenWidth < 640 ? 2 : 4}
+          mt={screenWidth < 640 ? 10 : 14.5}
           mb={screenWidth < 640 ? 4.5 : 6}
           px={screenWidth < 640 ? 2 : 5}
+          display="flex"
+          flexDirection="column"
+          gap={10}
         >
-          <Typography
-            fontWeight={400}
-            sx={{
-              whiteSpace: "pre-line",
-            }}
-            variant="title"
-            component="h1"
-          >
-            <Trans
-              i18nKey="hero.description"
-              components={[
-                <Link
-                  key="link-to-docs"
-                  data-testid="link-to-docs"
-                  href="https://docs.cardano.org/about-cardano/governance-overview"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{
-                    cursor: "pointer",
-                    fontSize: 22,
-                  }}
-                />,
-              ]}
-            />
-          </Typography>
-          <OpenToAny />
-          <ConnectWalletTo />
-          <UsefulLinks align="left" />
-          <Socials />
-          <HelpBuildGovTool />
+          <HomeCards />
+          <UsefulLinks align="center" />
         </Box>
         {/* FIXME: Footer should be on top of the layout.
         Should not be rerendered across the pages */}

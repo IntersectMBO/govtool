@@ -42,7 +42,7 @@ test("4A_2. Should access Governance Actions page without connecting wallet", as
   page,
 }) => {
   await page.goto("/");
-  await page.getByLabel("View Live Voting. See how the").click(); // BUG missing test id
+  await page.getByTestId("home-card-view-live-voting").click();
 
   await expect(page.getByText(/live voting/i)).toHaveCount(2);
 });

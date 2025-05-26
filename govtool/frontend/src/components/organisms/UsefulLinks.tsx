@@ -50,7 +50,6 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
               display: "flex",
               flexDirection: "column",
               gap: 1,
-              backgroundColor: "white",
             }}
           >
             <Typography>

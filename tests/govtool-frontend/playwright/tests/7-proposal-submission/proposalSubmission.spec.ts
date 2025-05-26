@@ -10,6 +10,6 @@ test("7A. Should open wallet connection popup, when propose a governance action 
   page,
 }) => {
   await page.goto("/");
-  await page.getByTestId("propose-a-governance-action-button").click();
+  await page.getByTestId("home-card-propose-a-governance-action").click();
   await expect(page.getByTestId("connect-your-wallet-modal")).toBeVisible();
 });

@@ -9,7 +9,7 @@ import { prepareErrorMessage } from '../utils'
       <!--For displaying the title and description-->
       <div class="mb-4">
         <div class="text-h5">Governance Action Bulk Loader</div>
-        <div class="text-grey mt-1">Submit to load the required number of a given action to sanchonet.</div>
+        <div class="text-grey mt-1">Submit to load the required number of a given action to preview.</div>
       </div>
 
       <!--For selecting the action type and number of proposals-->

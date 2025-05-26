@@ -7,7 +7,7 @@ import config from '../config'
       <!-- Helper title and subtext -->
       <div class="mb-4">
         <div class="text-h5">Specific Governance Action Loader</div>
-        <div class="text-grey mt-1">Fill in the details according to specific action submit to sanchonet.</div>
+        <div class="text-grey mt-1">Fill in the details according to specific action submit to preview.</div>
       </div>
       <!-- Form for action loader -->
       <div class="mt-8">

@@ -53,7 +53,6 @@ test("6C. Navigation within the dApp", async ({ page, context }) => {
     await page.goBack();
   }
 
-
   const [guidesPage2] = await Promise.all([
     context.waitForEvent("page"),
     page.getByLabel("Read our Guides. The roadmap").click(), // BUG missing test id
@@ -106,11 +105,11 @@ test("6D. Should open wallet popup when navigating from 'Connect a Cardano walle
   await page.goto("/");
 
   const sections = connectToCardanoWalletSection.map(
-    (section) => section.label
+    (section) => section.testId
   );
 
-  for (const sectionLabel of sections) {
-    await page.getByLabel(sectionLabel).click(); // BUG missing test id
+  for (const sectionTestId of sections) {
+    await page.getByTestId(sectionTestId).click();
     await expect(page.getByTestId("connect-your-wallet-modal")).toBeVisible();
     await page.getByTestId("close-modal-button").click();
   }

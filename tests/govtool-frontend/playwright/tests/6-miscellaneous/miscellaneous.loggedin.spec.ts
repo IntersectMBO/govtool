@@ -109,14 +109,14 @@ test.describe("Logged in user", () => {
 
 test.describe("Temporary user for landing page connected behaviour", () => {
   connectToCardanoWalletSection.forEach((section, index) => {
-    test(`6N_${index + 1}. SHould navigate to specific page After connecting wallet of 'connect a cardano wallet to' section on dashboard in disconnect state`, async ({
+    test(`6N_${index + 1}. Should navigate to specific page after wallet connection on clicking '${section.label}'`, async ({
       page,
     }) => {
       await createWallet(page, {
         networkId: environments.networkId,
       });
       await page.goto("/");
-      await page.getByLabel(section.label).click(); //BUG missing test id
+      await page.getByTestId(section.testId).click();
       await page.getByTestId("demos-wallet-button").click({ force: true });
 
       await page

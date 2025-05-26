@@ -302,3 +302,11 @@ data Delegation
       , delegationIsDRepScriptBased :: Bool
       , delegationTxHash            :: Text
       }
+
+data AccountInfo
+  = AccountInfo
+      { accountInfoId            :: Integer
+      , accountInfoView          :: Text
+      , accountInfoIsRegistered  :: Bool
+      , accountInfoIsScriptBased :: Bool
+      }

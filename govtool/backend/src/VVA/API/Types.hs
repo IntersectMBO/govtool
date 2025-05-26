@@ -1032,3 +1032,26 @@ instance ToSchema GetNetworkMetricsResponse where
         & description ?~ "GetNetworkMetricsResponse"
         & example
           ?~ toJSON exampleGetNetworkMetricsResponse
+
+data GetAccountInfoResponse
+  = GetAccountInfoResponse
+      { getAccountInfoResponseId            :: Integer
+      , getAccountInfoResponseView          :: Text
+      , getAccountInfoResponseIsRegistered  :: Bool
+      , getAccountInfoResponseIsScriptBased :: Bool
+      }
+  deriving (Generic, Show)
+deriveJSON (jsonOptions "getAccountInfoResponse") ''GetAccountInfoResponse
+exampleGetAccountInfoResponse :: Text
+exampleGetAccountInfoResponse =
+  "{\"stakeKey\": \"stake1u9\","
+  <> " \"id\": \"1\","
+  <> "\"view\": \"stake_test1uzapf83wydusjln97rqr7fen6vgrz5087yqdxm0akqdqkgstjz8g4\","
+  <> "\"isRegistered\": false,"
+  <> "\"isScriptBased\": false}"
+instance ToSchema GetAccountInfoResponse where
+    declareNamedSchema _ = pure $ NamedSchema (Just "GetAccountInfoResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "GetAccountInfoResponse"
+        & example
+          ?~ toJSON exampleGetAccountInfoResponse

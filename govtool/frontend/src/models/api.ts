@@ -261,3 +261,10 @@ type DRepVotingPower = {
 };
 
 export type DRepVotingPowerListResponse = DRepVotingPower[];
+
+export type Account = {
+  id: number,
+  view: string,
+  isRegistered: boolean,
+  isScriptBased: boolean
+}

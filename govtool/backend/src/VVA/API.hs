@@ -40,6 +40,7 @@ import           VVA.Config
 import qualified VVA.DRep                 as DRep
 import qualified VVA.Epoch                as Epoch
 import           VVA.Network              as Network
+import           VVA.Account              as Account
 import qualified VVA.Proposal             as Proposal
 import qualified VVA.Transaction          as Transaction
 import qualified VVA.Types                as Types
@@ -85,6 +86,7 @@ type VVAApi =
     :<|> "network" :> "metrics" :> Get '[JSON] GetNetworkMetricsResponse
     :<|> "network" :> "info" :> Get '[JSON] GetNetworkInfoResponse
     :<|> "network" :> "total-stake" :> Get '[JSON] GetNetworkTotalStakeResponse
+    :<|> "account" :> Capture "stakeKey" HexText :> Get '[JSON] GetAccountInfoResponse
 
 server :: App m => ServerT VVAApi m
 server = drepList
@@ -103,6 +105,7 @@ server = drepList
     :<|> getNetworkMetrics
     :<|> getNetworkInfo
     :<|> getNetworkTotalStake
+    :<|> getAccountInfo
 
 mapDRepType :: Types.DRepType -> DRepType
 mapDRepType Types.DRep      = NormalDRep
@@ -526,4 +529,15 @@ getNetworkMetrics = do
     , getNetworkMetricsResponseNoOfCommitteeMembers = networkMetricsNoOfCommitteeMembers
     , getNetworkMetricsResponseQuorumNumerator = networkMetricsQuorumNumerator
     , getNetworkMetricsResponseQuorumDenominator = networkMetricsQuorumDenominator
+    }
+
+getAccountInfo :: App m => HexText -> m GetAccountInfoResponse
+getAccountInfo (unHexText -> stakeKey) = do
+  -- CacheEnv {accountInfoCache} <- asks vvaCache
+  Types.AccountInfo {..} <- Account.accountInfo stakeKey
+  return $ GetAccountInfoResponse
+    { getAccountInfoResponseId = accountInfoId
+    , getAccountInfoResponseView = accountInfoView
+    , getAccountInfoResponseIsRegistered = accountInfoIsRegistered
+    , getAccountInfoResponseIsScriptBased = accountInfoIsScriptBased
     }

@@ -159,13 +159,13 @@ test("6H. Should navigate between repository and documentation links", async ({
 
   const [repoPage] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByLabel("GitHub Repo. View the GovTool").click(), // BUG missing test id
+    page.getByTestId("home-card-github-repo").click(),
   ]);
   await expect(repoPage).toHaveURL(REPO_URL);
 
   const [docsPage] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByLabel("Documentation. GovTool").click(), // BUG missing test id
+    page.getByTestId("home-card-documentation").click(),
   ]);
   await expect(docsPage).toHaveURL(DOCS_URL);
 

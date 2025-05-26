@@ -39,23 +39,35 @@ test("6C. Navigation within the dApp", async ({ page, context }) => {
   await page.goto("/");
 
   const dashboardCards = [
-    { label: "Browse the DRep Directory.", urlPattern: /\/drep_directory/ },
     {
-      label: "View Live Voting. See how the",
+      testId: "home-card-browse-the-drep-directory",
+      urlPattern: /\/drep_directory/,
+    },
+    {
+      testId: "home-card-view-budget-proposals",
+      urlPattern: /\/budget_discussion/,
+    },
+    {
+      testId: "home-card-see-proposed-governance-actions",
+      urlPattern: /\/proposal_discussion/,
+    },
+    {
+      testId: "home-card-view-live-voting",
       urlPattern: /\/governance_actions/,
     },
-    { label: "View Voting Outcomes. See the", urlPattern: /\/outcomes/ },
+    { testId: "home-card-view-voting-outcomes", urlPattern: /\/outcomes/ },
   ];
 
   for (const card of dashboardCards) {
-    await page.getByLabel(card.label).click(); // BUG missing test id
+    await page.getByTestId(card.testId).click();
     await expect(page).toHaveURL(card.urlPattern);
     await page.goBack();
   }
 
+  // external links in dashboard cards
   const [guidesPage2] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByLabel("Read our Guides. The roadmap").click(), // BUG missing test id
+    page.getByTestId("home-card-read-our-guides").click(),
   ]);
 
   await expect(guidesPage2).toHaveURL(GUIDES_DOC_URL);
@@ -99,7 +111,7 @@ test("6C. Navigation within the dApp", async ({ page, context }) => {
   }
 });
 
-test("6D. Should open wallet popup when navigating from 'Connect a Cardano wallet to' section on dashboard in disconnected state", async ({
+test("6D. Should open wallet popup when navigating from 'Connect a Cardano wallet to' sections on dashboard in disconnected state", async ({
   page,
 }) => {
   await page.goto("/");

@@ -1,19 +1,20 @@
 import { Box, Typography, IconButton } from "@mui/material";
-import { useState } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Trans, useTranslation } from "react-i18next";
+import { useMaintenanceEndingBannerContext } from "./MaintenanceEndingBannerContext";
+
+const EXPANDED_HEIGHT = 135;
+const COLLAPSED_HEIGHT = 50;
 
 export const MaintenanceEndingBanner = () => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const { ref, isExpanded, toggleExpanded } =
+    useMaintenanceEndingBannerContext();
   const { t } = useTranslation();
-
-  const handleToggle = () => {
-    setIsExpanded((prev) => !prev);
-  };
 
   return (
     <Box
+      ref={ref}
       sx={{
         backgroundColor: "#9c2224",
         width: "100%",
@@ -44,7 +45,7 @@ export const MaintenanceEndingBanner = () => {
         </Box>
         <Box sx={{ display: "flex" }}>
           <IconButton
-            onClick={handleToggle}
+            onClick={toggleExpanded}
             size="small"
             data-testid="toggle-maintenance-banner"
             sx={{
@@ -60,7 +61,7 @@ export const MaintenanceEndingBanner = () => {
       {/* Expandable Content */}
       <Box
         sx={{
-          maxHeight: isExpanded ? "500px" : "0px",
+          height: isExpanded ? EXPANDED_HEIGHT - COLLAPSED_HEIGHT : "0px",
           transition: "max-height 0.3s ease-in-out",
           overflow: "hidden",
         }}

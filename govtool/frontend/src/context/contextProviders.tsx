@@ -7,6 +7,7 @@ import { FeatureFlagProvider } from "./featureFlag";
 import { GovernanceActionProvider } from "./governanceAction";
 import { AdaHandleProvider } from "./adaHandle";
 import { ProposalDiscussionProvider } from "./proposalDiscussion";
+import { MaintenanceEndingBannerProvider } from "@/components/organisms/MaintenanceEndingBanner/MaintenanceEndingBannerContext";
 
 interface Props {
   children: React.ReactNode;
@@ -14,21 +15,23 @@ interface Props {
 
 const ContextProviders = ({ children }: Props) => (
   <AppContextProvider>
-    <GovernanceActionProvider>
-      <ProposalDiscussionProvider>
-        <FeatureFlagProvider>
-          <AdaHandleProvider>
-            <ModalProvider>
-              <SnackbarProvider>
-                <DataActionsBarProvider>
-                  <CardanoProvider>{children}</CardanoProvider>
-                </DataActionsBarProvider>
-              </SnackbarProvider>
-            </ModalProvider>
-          </AdaHandleProvider>
-        </FeatureFlagProvider>
-      </ProposalDiscussionProvider>
-    </GovernanceActionProvider>
+    <MaintenanceEndingBannerProvider>
+      <GovernanceActionProvider>
+        <ProposalDiscussionProvider>
+          <FeatureFlagProvider>
+            <AdaHandleProvider>
+              <ModalProvider>
+                <SnackbarProvider>
+                  <DataActionsBarProvider>
+                    <CardanoProvider>{children}</CardanoProvider>
+                  </DataActionsBarProvider>
+                </SnackbarProvider>
+              </ModalProvider>
+            </AdaHandleProvider>
+          </FeatureFlagProvider>
+        </ProposalDiscussionProvider>
+      </GovernanceActionProvider>
+    </MaintenanceEndingBannerProvider>
   </AppContextProvider>
 );
 

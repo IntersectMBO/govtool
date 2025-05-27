@@ -88,7 +88,12 @@ export const Dashboard = () => {
 
   return (
     <Background opacity={0.7}>
-      <Box sx={{ display: "flex", position: "relative" }}>
+      <Box
+        sx={{
+          display: "flex",
+          position: "relative",
+        }}
+      >
         {isMobile ? null : <Drawer />}
         <Box
           sx={{

@@ -7,6 +7,7 @@ import { useFeatureFlag } from "@context";
 import { useGetVoterInfo } from "@hooks";
 import { WalletInfoCard, DRepInfoCard } from "@molecules";
 import { openInNewTab } from "@utils";
+import { useMaintenanceEndingBannerContext } from "./MaintenanceEndingBanner";
 
 export const Drawer = () => {
   const {
@@ -14,6 +15,8 @@ export const Drawer = () => {
     isGovernanceOutcomesPillarEnabled,
   } = useFeatureFlag();
   const { voter } = useGetVoterInfo();
+  const { height: maintenanceEndingBannerHeight } =
+    useMaintenanceEndingBannerContext();
 
   return (
     <Box
@@ -23,7 +26,7 @@ export const Drawer = () => {
         flexDirection: "column",
         height: "100vh",
         position: "sticky",
-        top: 0,
+        top: maintenanceEndingBannerHeight,
         width: `${DRAWER_WIDTH}px`,
 
         overflowY: "auto",

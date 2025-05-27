@@ -7,6 +7,7 @@ import { FeatureFlagProvider } from "./featureFlag";
 import { GovernanceActionProvider } from "./governanceAction";
 import { AdaHandleProvider } from "./adaHandle";
 import { ProposalDiscussionProvider } from "./proposalDiscussion";
+
 import { MaintenanceEndingBannerProvider } from "@/components/organisms/MaintenanceEndingBanner/MaintenanceEndingBannerContext";
 
 interface Props {
@@ -15,23 +16,25 @@ interface Props {
 
 const ContextProviders = ({ children }: Props) => (
   <AppContextProvider>
-    <MaintenanceEndingBannerProvider>
-      <GovernanceActionProvider>
-        <ProposalDiscussionProvider>
-          <FeatureFlagProvider>
-            <AdaHandleProvider>
-              <ModalProvider>
-                <SnackbarProvider>
-                  <DataActionsBarProvider>
-                    <CardanoProvider>{children}</CardanoProvider>
-                  </DataActionsBarProvider>
-                </SnackbarProvider>
-              </ModalProvider>
-            </AdaHandleProvider>
-          </FeatureFlagProvider>
-        </ProposalDiscussionProvider>
-      </GovernanceActionProvider>
-    </MaintenanceEndingBannerProvider>
+    <GovernanceActionProvider>
+      <ProposalDiscussionProvider>
+        <FeatureFlagProvider>
+          <AdaHandleProvider>
+            <ModalProvider>
+              <SnackbarProvider>
+                <DataActionsBarProvider>
+                  <CardanoProvider>
+                    <MaintenanceEndingBannerProvider>
+                      {children}
+                    </MaintenanceEndingBannerProvider>
+                  </CardanoProvider>
+                </DataActionsBarProvider>
+              </SnackbarProvider>
+            </ModalProvider>
+          </AdaHandleProvider>
+        </FeatureFlagProvider>
+      </ProposalDiscussionProvider>
+    </GovernanceActionProvider>
   </AppContextProvider>
 );
 

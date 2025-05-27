@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 
-import { DashboardCards, HelpBuildGovTool, Socials } from "@organisms";
-import { UsefulLinks } from "@/components/organisms/Home/UsefulLinks";
+import { DashboardCards } from "@organisms";
+import { UsefulLinks } from "@/components/organisms/UsefulLinks";
 import { useScreenDimension } from "@/hooks";
 
 export const DashboardHome = () => {
@@ -20,8 +20,6 @@ export const DashboardHome = () => {
     >
       <DashboardCards />
       <UsefulLinks />
-      <Socials my={0} />
-      <HelpBuildGovTool my={0} />
     </Box>
   );
 };

@@ -105,6 +105,7 @@ jobs:
     needs: backend-tests
     outputs:
       report_number: ${{ steps.report-details.outputs.report_number }}
+      group_name: ${{ steps.set-deployment-url.outputs.group_name }}
     steps:
       - uses: actions/checkout@v4
       - name: Download results
@@ -188,6 +189,7 @@ jobs:
           TEST_STATUS: ${{ needs.backend-tests.outputs.status }}
           REPORT_NUMBER: ${{ needs.publish-report.outputs.report_number }}
           GITHUB_TOKEN: ${{ github.token }}
+          GROUP_NAME: ${{ needs.publish-report.outputs.group_name }}
 
 env:
   BASE_URL: https://${{github.event.schedule && 'be.preview.gov.tools' || inputs.deployment ||  'govtool.cardanoapi.io/api' }}

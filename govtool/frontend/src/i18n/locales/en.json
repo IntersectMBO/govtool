@@ -844,10 +844,13 @@
     "title": "Feedback",
     "reportBug": "Report a Bug",
     "suggestIdea": "Suggest a New Idea",
-    "sentimentFeedback": "Share Your Experience",
+    "sentimentFeedback": "Sentiment Feedback",
     "sentimentScore": "How would you rate your experience?",
     "additionalNotes": "Additional Notes",
-    "submit": "Submit Feedback"
+    "submit": "Submit Feedback",
+    "reportBugDescription": "Something is not working as expected",
+    "suggestIdeaDescription": "Share your ideas for improvement",
+    "sentimentFeedbackDescription": "Rate your experience and provide feedback"
   },
   "filter": "Filter",
   "goBack": "Go back",

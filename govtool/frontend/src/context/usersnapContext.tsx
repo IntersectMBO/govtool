@@ -6,6 +6,7 @@ import React, {
   useMemo,
 } from "react";
 import { InitOptions, WidgetApi, loadSpace } from "@usersnap/browser";
+import { useTranslation } from "react-i18next";
 
 type WidgetValues = {
   assignee?: string;
@@ -65,6 +66,7 @@ export const UsersnapProvider = ({
   children,
 }: UsersnapProviderProps) => {
   const [usersnapApi, setUsersnapApi] = useState<UsersnapAPI | null>(null);
+  const { t } = useTranslation();
 
   const openFeedbackWindow = useCallback(() => {
     if (usersnapApi) {
@@ -82,31 +84,31 @@ export const UsersnapProvider = ({
             customFields: {
               sentiment_score: {
                 type: 'rating',
-                label: 'How would you rate your experience?',
+                label: t("feedback.sentimentScore"),
                 required: true,
                 options: [1, 2, 3, 4, 5]
               },
               additional_notes: {
                 type: 'textarea',
-                label: 'Additional Notes',
+                label: t("feedback.additionalNotes"),
                 required: false
               }
             },
             feedbackTypes: [
               {
                 id: 'bug',
-                label: 'Report a Bug',
-                description: 'Something is not working as expected'
+                label: t("feedback.reportBug"),
+                description: t("feedback.reportBugDescription")
               },
               {
                 id: 'idea',
-                label: 'Suggest a New Idea',
-                description: 'Share your ideas for improvement'
+                label: t("feedback.suggestIdea"),
+                description: t("feedback.suggestIdeaDescription")
               },
               {
                 id: 'sentiment',
-                label: 'Share Your Experience',
-                description: 'Rate your experience and provide feedback'
+                label: t("feedback.sentimentFeedback"),
+                description: t("feedback.sentimentFeedbackDescription")
               }
             ]
           });
@@ -117,7 +119,7 @@ export const UsersnapProvider = ({
       }
     };
     initUsersnapSpace();
-  }, [initParams, API_KEY]);
+  }, [initParams, API_KEY, t]);
 
   const value = useMemo(() => ({ openFeedbackWindow }), [openFeedbackWindow]);
 

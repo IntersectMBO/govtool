@@ -150,6 +150,12 @@ export enum DRepListSort {
   Status = "Status",
 }
 
+type Reference = {
+  "@type": "Identity" | "Links";
+  label: string;
+  uri: string;
+};
+
 export type DrepDataDTO = {
   deposit: number;
   drepId: string;
@@ -163,6 +169,8 @@ export type DrepDataDTO = {
   view: string;
   votingPower?: number;
   imageUrl: string | null;
+  identityReferences: Reference[];
+  linkReferences: Reference[];
   // either base64 for IPFS image or URL for regular image
   image: string | null;
 };
@@ -173,7 +181,6 @@ export type DRepData = DrepDataDTO & {
   objectives: string | null;
   motivations: string | null;
   qualifications: string | null;
-  references: Reference[];
   doNotList: boolean;
   imageUrl: string | null;
   // either base64 for IPFS image or URL for regular image

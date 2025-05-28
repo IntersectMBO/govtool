@@ -134,7 +134,9 @@ drepRegistrationToDrep Types.DRepRegistration {..} =
       dRepMotivations = dRepRegistrationMotivations,
       dRepQualifications = dRepRegistrationQualifications,
       dRepImageUrl = dRepRegistrationImageUrl,
-      dRepImageHash = HexText <$> dRepRegistrationImageHash
+      dRepImageHash = HexText <$> dRepRegistrationImageHash,
+      dRepIdentityReferences = DRepReferences <$> dRepRegistrationIdentityReferences,
+      dRepLinkReferences = DRepReferences <$> dRepRegistrationLinkReferences
     }
 
 delegationToResponse :: Types.Delegation -> DelegationResponse

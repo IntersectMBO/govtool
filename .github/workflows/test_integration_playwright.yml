@@ -145,6 +145,7 @@ jobs:
     needs: integration-tests
     outputs:
       report_number: ${{ steps.report-details.outputs.report_number }}
+      group_name: ${{ steps.set-deployment-url.outputs.group_name }}
     steps:
       - uses: actions/checkout@v4
       - name: Download report
@@ -218,7 +219,7 @@ jobs:
         with:
           name: allure-results
           path: allure-results
-          
+
       - name: Set Commit Status
         if: always() && !github.event.schedule
         run: |
@@ -229,6 +230,7 @@ jobs:
           TEST_STATUS: ${{ needs.integration-tests.outputs.status }}
           REPORT_NUMBER: ${{ needs.publish-report.outputs.report_number }}
           GITHUB_TOKEN: ${{ github.token }}
+          GROUP_NAME: ${{ needs.publish-report.outputs.group_name }}
 env:
   HOST_URL: https://${{ github.event.schedule && 'preview.gov.tools' || (inputs.deployment || 'govtool.cardanoapi.io')  }}
   DEPLOYMENT: ${{ github.event.schedule && 'preview.gov.tools' || inputs.deployment ||  'govtool.cardanoapi.io'}}

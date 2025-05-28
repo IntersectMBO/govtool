@@ -61,7 +61,9 @@ test.describe("Budget proposal dRep behaviour", () => {
       await budgetDiscussionDetailsPage.voteOnPoll(choice);
       await budgetDiscussionDetailsPage.changePollVote();
 
-      await expect(budgetDiscussionDetailsPage.pollYesBtn).not.toBeVisible({timeout: 60_000});
+      await expect(budgetDiscussionDetailsPage.pollYesBtn).not.toBeVisible({
+        timeout: 60_000,
+      });
       await expect(budgetDiscussionDetailsPage.pollNoBtn).not.toBeVisible();
 
       // vote must be changed

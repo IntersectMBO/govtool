@@ -126,8 +126,8 @@ export async function registerDRepForWallet(wallet: ShelleyWallet) {
     wallet: wallet.json(),
   };
   const registrationRes = await kuberService.dRepRegistration(
-    convertBufferToHex(wallet.stakeKey.private),
-    convertBufferToHex(wallet.stakeKey.pkh),
+    convertBufferToHex(wallet.dRepKey.private),
+    convertBufferToHex(wallet.dRepKey.pkh),
     metadataAnchorAndWallet
   );
   await pollTransaction(registrationRes.txId, registrationRes.lockInfo);

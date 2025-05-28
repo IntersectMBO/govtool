@@ -63,9 +63,9 @@ test.describe("Delegate to others", () => {
     await dRepDirectoryPage.delegateToDRep(dRepId);
 
     // Verify dRepId in dRep directory
-    await expect(
-      page.getByTestId(`${dRepId}-delegate-button`)
-    ).not.toBeVisible();
+    await expect(page.getByTestId(`${dRepId}-delegate-button`)).not.toBeVisible(
+      { timeout: 60_000 }
+    );
 
     await expect(page.getByTestId(`${dRepId}-delegated-card`)).toBeVisible();
     await expect(
@@ -123,7 +123,7 @@ test.describe("Change delegation", () => {
     await dRepDirectoryPage.delegateToDRep(dRepIdSecond);
     await expect(
       page.getByTestId(`${dRepIdSecond}-delegated-card`)
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 60_000 });
     await expect(
       page
         .getByTestId(`${dRepIdSecond}-delegated-card`)

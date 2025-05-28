@@ -16,6 +16,8 @@ changes.
 
 ### Fixed
 
+- Fix missing off chain references in DRep details [Issue 3490](https://github.com/IntersectMBO/govtool/issues/3490)
+
 ### Changed
 
 ### Removed

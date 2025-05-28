@@ -11,41 +11,74 @@ import           Control.Monad.Reader
 
 import           Crypto.Hash
 
+import           Data.Aeson                         (Value)
 import           Data.ByteString                    (ByteString)
-import qualified Data.ByteString.Base16             as Base16
-import qualified Data.ByteString.Char8              as C
+import qualified  Data.ByteString.Base16             as Base16
+import qualified  Data.ByteString.Char8              as C
 import           Data.FileEmbed                     (embedFile)
 import           Data.Foldable                      (Foldable (sum))
 import           Data.Has                           (Has)
-import qualified Data.Map                           as M
+import qualified  Data.Map                           as M
 import           Data.Maybe                         (fromMaybe, isJust, isNothing)
 import           Data.Scientific
 import           Data.String                        (fromString)
 import           Data.Text                          (Text, pack, unpack, intercalate)
-import qualified Data.Text.Encoding                 as Text
+import qualified  Data.Text.Encoding                 as Text
 import           Data.Time
 
-import qualified Database.PostgreSQL.Simple         as SQL
+import qualified  Database.PostgreSQL.Simple         as SQL
 import           Database.PostgreSQL.Simple.Types   (In(..))
+import           Database.PostgreSQL.Simple.FromRow
 
 import           VVA.Config
 import           VVA.Pool                           (ConnectionPool, withPool)
-import qualified VVA.Proposal                       as Proposal
+import qualified  VVA.Proposal                       as Proposal
 import           VVA.Types                          (AppError, DRepInfo (..), DRepRegistration (..), DRepStatus (..),
                                                      DRepType (..), Proposal (..), Vote (..), DRepVotingPowerList (..))
+
+data DRepQueryResult = DRepQueryResult
+  { queryDrepHash :: Text
+  , queryDrepView :: Text
+  , queryIsScriptBased :: Bool
+  , queryUrl :: Maybe Text
+  , queryDataHash :: Maybe Text
+  , queryDeposit :: Scientific
+  , queryVotingPower :: Maybe Integer
+  , queryIsActive :: Bool
+  , queryTxHash :: Maybe Text
+  , queryDate :: LocalTime
+  , queryLatestDeposit :: Scientific
+  , queryLatestNonDeregisterVotingAnchorWasNotNull :: Bool
+  , queryMetadataError :: Maybe Text
+  , queryPaymentAddress :: Maybe Text
+  , queryGivenName :: Maybe Text
+  , queryObjectives :: Maybe Text
+  , queryMotivations :: Maybe Text
+  , queryQualifications :: Maybe Text
+  , queryImageUrl :: Maybe Text
+  , queryImageHash :: Maybe Text
+  , queryIdentityReferences :: Maybe Value
+  , queryLinkReferences :: Maybe Value
+  } deriving (Show)
+
+instance FromRow DRepQueryResult where
+  fromRow = DRepQueryResult 
+    <$> field <*> field <*> field <*> field <*> field <*> field
+    <*> field <*> field <*> field <*> field <*> field <*> field
+    <*> field <*> field <*> field <*> field <*> field <*> field
+    <*> field <*> field <*> field <*> field
 
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
 
 listDRepsSql :: SQL.Query
 listDRepsSql = sqlFrom $(embedFile "sql/list-dreps.sql")
-
 listDReps ::
   (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m) =>
   Maybe Text -> m [DRepRegistration]
 listDReps mSearchQuery = withPool $ \conn -> do
   let searchParam = fromMaybe "" mSearchQuery
-  results <- liftIO $ SQL.query conn listDRepsSql
+  results <- liftIO (SQL.query conn listDRepsSql
     ( searchParam -- COALESCE(?, '')
     , searchParam -- LENGTH(?)
     , searchParam -- AND ?
@@ -56,44 +89,45 @@ listDReps mSearchQuery = withPool $ \conn -> do
     , "%" <> searchParam <> "%" -- objectives
     , "%" <> searchParam <> "%" -- motivations
     , "%" <> searchParam <> "%" -- qualifications
-    )
+    ) :: IO [DRepQueryResult])
 
   timeZone <- liftIO getCurrentTimeZone
   return
-    [ DRepRegistration drepHash drepView isScriptBased url dataHash (floor @Scientific deposit) votingPower status drepType txHash (localTimeToUTC timeZone date) metadataError paymentAddress givenName objectives motivations qualifications imageUrl imageHash
-    | ( drepHash
-        , drepView
-        , isScriptBased
-        , url
-        , dataHash
-        , deposit
-        , votingPower
-        , isActive
-        , txHash
-        , date
-        , latestDeposit
-        , latestNonDeregisterVotingAnchorWasNotNull
-        , metadataError
-        , paymentAddress
-        , givenName
-        , objectives
-        , motivations
-        , qualifications
-        , imageUrl
-        , imageHash
-      ) <- results
-    , let status = case (isActive, deposit) of
+    [ DRepRegistration 
+      (queryDrepHash result)
+      (queryDrepView result)
+      (queryIsScriptBased result)
+      (queryUrl result)
+      (queryDataHash result)
+      (floor @Scientific $ queryDeposit result)
+      (queryVotingPower result)
+      status
+      drepType
+      (queryTxHash result)
+      (localTimeToUTC timeZone $ queryDate result)
+      (queryMetadataError result)
+      (queryPaymentAddress result)
+      (queryGivenName result)
+      (queryObjectives result)
+      (queryMotivations result)
+      (queryQualifications result)
+      (queryImageUrl result)
+      (queryImageHash result)
+      (queryIdentityReferences result)
+      (queryLinkReferences result)
+    | result <- results
+    , let status = case (queryIsActive result, queryDeposit result) of
                       (_, d)        | d < 0 -> Retired
                       (isActive, d) | d >= 0 && isActive -> Active
                                     | d >= 0 && not isActive -> Inactive
-    , let latestDeposit' = floor @Scientific latestDeposit :: Integer
-    , let drepType | latestDeposit' >= 0 && isNothing url = SoleVoter
-                   | latestDeposit' >= 0 && isJust url = DRep
-                   | latestDeposit' < 0 && not latestNonDeregisterVotingAnchorWasNotNull = SoleVoter
-                   | latestDeposit' < 0 && latestNonDeregisterVotingAnchorWasNotNull = DRep
-                   | Data.Maybe.isJust url = DRep
+    , let latestDeposit' = floor @Scientific (queryLatestDeposit result) :: Integer
+    , let drepType | latestDeposit' >= 0 && isNothing (queryUrl result) = SoleVoter
+                   | latestDeposit' >= 0 && isJust (queryUrl result) = DRep
+                   | latestDeposit' < 0 && not (queryLatestNonDeregisterVotingAnchorWasNotNull result) = SoleVoter
+                   | latestDeposit' < 0 && queryLatestNonDeregisterVotingAnchorWasNotNull result = DRep
+                   | Data.Maybe.isJust (queryUrl result) = DRep
     ]
-
+    
 getVotingPowerSql :: SQL.Query
 getVotingPowerSql = sqlFrom $(embedFile "sql/get-voting-power.sql")
 

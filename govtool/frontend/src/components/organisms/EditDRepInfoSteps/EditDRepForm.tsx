@@ -41,16 +41,7 @@ export const EditDRepForm = ({
   useEffect(() => {
     if (loadUserData) {
       const data: DRepData = state ?? yourselfDRep;
-      const groupedReferences = data?.references?.reduce<
-        Record<string, Reference[]>
-      >((acc, reference) => {
-        const type = reference["@type"];
-        if (!acc[type]) {
-          acc[type] = [];
-        }
-        acc[type].push(reference);
-        return acc;
-      }, {});
+
       reset({
         ...data,
         objectives: data?.objectives ?? "",
@@ -58,8 +49,8 @@ export const EditDRepForm = ({
         qualifications: data?.qualifications ?? "",
         paymentAddress: data?.paymentAddress ?? "",
         image: data?.image ?? "",
-        linkReferences: groupedReferences?.Link ?? [getEmptyReference("Link")],
-        identityReferences: groupedReferences?.Identity ?? [
+        linkReferences: data.linkReferences ?? [getEmptyReference("Link")],
+        identityReferences: data.identityReferences ?? [
           getEmptyReference("Identity"),
         ],
       });

@@ -273,7 +273,7 @@ instance ToParamSchema GovernanceActionSortMode where
 
 
 newtype GovernanceActionDetails
-  = GovernanceActionDetails { getValue :: Value }
+  = GovernanceActionDetails { getGovernanceActionValue :: Value }
   deriving newtype (Show)
 
 instance FromJSON GovernanceActionDetails where
@@ -593,6 +593,7 @@ instance ToSchema VoteResponse where
           & example
             ?~ toJSON exampleVoteResponse
 
+
 data DRepInfoResponse
   = DRepInfoResponse
       { dRepInfoResponseIsScriptBased            :: Bool
@@ -612,7 +613,7 @@ data DRepInfoResponse
       , dRepInfoResponseGivenName                :: Maybe Text
       , dRepInfoResponseObjectives               :: Maybe Text
       , dRepInfoResponseMotivations              :: Maybe Text
-      , dRepInfoResponseQualifications           :: Maybe Text
+      , dRepInfoResponseQualifications            :: Maybe Text
       , dRepInfoResponseImageUrl                 :: Maybe Text
       , dRepInfoResponseImageHash                :: Maybe HexText
       }
@@ -820,6 +821,27 @@ instance ToSchema DRepType where
         & description ?~ "DRep Type"
         & enum_ ?~ map toJSON [NormalDRep, SoleVoter]
 
+newtype DRepReferences
+  = DRepReferences { getDRepReferencesValue :: Value }
+  deriving newtype (Show)
+
+instance FromJSON DRepReferences where
+  parseJSON v = return $ DRepReferences v
+
+instance ToJSON DRepReferences where
+  toJSON (DRepReferences d) = d
+
+instance ToSchema DRepReferences where
+    declareNamedSchema _ = pure $ NamedSchema (Just "DRepReferences") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "A JSON value that can include nested objects and arrays"
+        & example ?~ toJSON
+            (Aeson.object
+              [ "some_key" .= ("some value" :: String)
+              , "nested_key" .= Aeson.object ["inner_key" .= (1 :: Int)]
+              , "array_key" .= [1, 2, 3 :: Int]
+              ])
+
 data DRep
   = DRep
       { dRepIsScriptBased          :: Bool
@@ -838,9 +860,11 @@ data DRep
       , dRepGivenName              :: Maybe Text
       , dRepObjectives             :: Maybe Text
       , dRepMotivations            :: Maybe Text
-      , dRepQualifications         :: Maybe Text
+      , dRepQualifications          :: Maybe Text
       , dRepImageUrl               :: Maybe Text
       , dRepImageHash              :: Maybe HexText
+      , dRepIdentityReferences     :: Maybe DRepReferences
+      , dRepLinkReferences         :: Maybe DRepReferences
       }
   deriving (Generic, Show)
 

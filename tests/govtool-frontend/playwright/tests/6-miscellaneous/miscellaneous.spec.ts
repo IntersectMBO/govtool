@@ -1,18 +1,34 @@
 import {
-  BOOTSTRAP_DOC_URL,
-  DELEGATION_DOC_URL,
-  DIRECT_VOTER_DOC_URL,
+  adaStat,
+  budgetCardanoAfrica,
+  cardanoBudget,
+  cardanoScan,
+  CCPortal,
+  cexplorer,
+  DOCS_URL,
+  ekklesia,
   FAQS_DOC_URL,
+  GOVERNANCE_OVERVIEW_DOC_URL,
+  governanceSpace,
   GUIDES_DOC_URL,
   HELP_DOC_URL,
+  intersectWebsite,
   PRIVACY_POLICY,
-  REGISTER_DREP_DOC_URL,
+  reachYourPeople,
+  REPO_URL,
+  sanchonetGovernanceExplorer,
+  sixteenNinetyFour,
+  sixteenNinetyFourTools,
+  syncAi,
+  tempo,
   TERMS_AND_CONDITIONS,
 } from "@constants/docsUrl";
+import { connectToCardanoWalletSection } from "@constants/index";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import { expect, Page } from "@playwright/test";
+import { connect } from "http2";
 import environments from "lib/constants/environments";
 
 test.beforeEach(async () => {
@@ -22,62 +38,159 @@ test.beforeEach(async () => {
 test("6C. Navigation within the dApp", async ({ page, context }) => {
   await page.goto("/");
 
-  if (isMobile(page)) {
-    await openDrawer(page);
-  }
-  await page.getByTestId("governance-actions-link").click();
-  await expect(page).toHaveURL(/\/governance_actions/);
+  const dashboardCards = [
+    {
+      testId: "home-card-browse-the-drep-directory",
+      urlPattern: /\/drep_directory/,
+    },
+    {
+      testId: "home-card-view-budget-proposals",
+      urlPattern: /\/budget_discussion/,
+    },
+    {
+      testId: "home-card-see-proposed-governance-actions",
+      urlPattern: /\/proposal_discussion/,
+    },
+    {
+      testId: "home-card-view-live-voting",
+      urlPattern: /\/governance_actions/,
+    },
+    { testId: "home-card-view-voting-outcomes", urlPattern: /\/outcomes/ },
+  ];
 
-  if (isMobile(page)) {
-    await openDrawer(page);
+  for (const card of dashboardCards) {
+    await page.getByTestId(card.testId).click();
+    await expect(page).toHaveURL(card.urlPattern);
+    await page.goBack();
   }
-  const [guidesPage] = await Promise.all([
+
+  // external links in dashboard cards
+  const [guidesPage2] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByTestId("guides-link").click(),
+    page.getByTestId("home-card-read-our-guides").click(),
   ]);
 
-  await expect(guidesPage).toHaveURL(GUIDES_DOC_URL);
+  await expect(guidesPage2).toHaveURL(GUIDES_DOC_URL);
 
-  if (isMobile(page)) {
-    await openDrawer(page);
+  // Test navbar links navigation
+  const navbarLinks = [
+    { testId: "dashboard-link", url: `${environments.frontendUrl}/` },
+    { testId: "drep-directory-link", urlPattern: /\/drep_directory/ },
+    { testId: "budget-discussion-link", urlPattern: /\/budget_discussion/ },
+    {
+      testId: "proposed-governance-actions-link",
+      urlPattern: /\/proposal_discussion/,
+    },
+    { testId: "governance-actions-link", urlPattern: /\/governance_actions/ },
+    { testId: "governance-actions-outcomes-link", urlPattern: /\/outcomes/ },
+  ];
+
+  for (const link of navbarLinks) {
+    if (isMobile(page)) {
+      await openDrawer(page);
+    }
+    await page.getByTestId(link.testId).click();
+
+    if (link.url) {
+      expect(page.url()).toEqual(link.url);
+    } else {
+      await expect(page).toHaveURL(link.urlPattern);
+    }
   }
-  const [faqsPage] = await Promise.all([
-    context.waitForEvent("page"),
-    page.getByTestId("faqs-link").click(),
-  ]);
 
-  await expect(faqsPage).toHaveURL(FAQS_DOC_URL);
+  // Test external links in navbar
+  const externalLinks = [
+    { testId: "guides-link", url: GUIDES_DOC_URL },
+    { testId: "faqs-link", url: FAQS_DOC_URL },
+  ];
 
-  if (isMobile(page)) {
-    await openDrawer(page);
+  for (const link of externalLinks) {
+    if (isMobile(page)) {
+      await openDrawer(page);
+    }
+    const [newPage] = await Promise.all([
+      context.waitForEvent("page"),
+      page.getByTestId(link.testId).click(),
+    ]);
+    await expect(newPage).toHaveURL(link.url);
   }
-  await page.getByTestId("dashboard-link").click();
-  expect(page.url()).toEqual(`${environments.frontendUrl}/`);
 });
 
-test("6D. Should open Sanchonet docs in a new tab when clicking `Learn More` on dashboards in disconnected state.", async ({
+test("6D. Should open wallet popup when navigating from 'Connect a Cardano wallet to' sections on dashboard in disconnected state", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const sections = connectToCardanoWalletSection.map(
+    (section) => section.testId
+  );
+
+  for (const sectionTestId of sections) {
+    await page.getByTestId(sectionTestId).click();
+    await expect(page.getByTestId("connect-your-wallet-modal")).toBeVisible();
+    await page.getByTestId("close-modal-button").click();
+  }
+});
+
+test("6G. Should navigate between other cardano governance resources", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const resources = [
+    { testId: "useful-link-ccPortal", url: CCPortal },
+    { testId: "useful-link-intersectWebsite", url: intersectWebsite },
+    { testId: "useful-link-tempo", url: tempo },
+    { testId: "useful-link-1694io", url: sixteenNinetyFour },
+    { testId: "useful-link-governanceSpace", url: governanceSpace },
+    { testId: "useful-link-syncAi", url: syncAi },
+    { testId: "useful-link-ekklesia", url: ekklesia },
+    { testId: "useful-link-adaStat", url: adaStat },
+    { testId: "useful-link-cexplorer", url: cexplorer },
+    { testId: "useful-link-cardanoScan", url: cardanoScan },
+    { testId: "useful-link-cardanoBudget", url: cardanoBudget },
+    { testId: "useful-link-budgetCardanoAfrica", url: budgetCardanoAfrica },
+    { testId: "useful-link-reachYourPeople", url: reachYourPeople },
+    { testId: "useful-link-1694Tools", url: sixteenNinetyFourTools },
+    {
+      testId: "useful-link-sanchonetGovernanceExplorer",
+      url: sanchonetGovernanceExplorer,
+    },
+  ];
+
+  for (let resource of resources) {
+    const [newPage] = await Promise.all([
+      page.context().waitForEvent("page"),
+      page.getByTestId(resource.testId).click(),
+    ]);
+    await expect(newPage).toHaveURL(resource.url);
+    await newPage.close();
+  }
+});
+
+test("6H. Should navigate between repository and documentation links", async ({
   page,
   context,
 }) => {
   await page.goto("/");
 
-  const [delegationLearnMorepage] = await Promise.all([
+  const [repoPage] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByTestId("delegate-learn-more-button").click(),
+    page.getByTestId("home-card-github-repo").click(),
   ]);
-  await expect(delegationLearnMorepage).toHaveURL(DELEGATION_DOC_URL);
+  await expect(repoPage).toHaveURL(REPO_URL);
 
-  const [registerLearnMorepage] = await Promise.all([
+  const [docsPage] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByTestId("d-rep-learn-more-button").click(),
+    page.getByTestId("home-card-documentation").click(),
   ]);
-  await expect(registerLearnMorepage).toHaveURL(REGISTER_DREP_DOC_URL);
+  await expect(docsPage).toHaveURL(DOCS_URL);
 
-  const [directVoterLearnMorepage] = await Promise.all([
+  const [governance_overview] = await Promise.all([
     context.waitForEvent("page"),
-    page.getByTestId("direct-voter-learn-more-button").click(),
+    page.getByTestId("link-to-docs").click(),
   ]);
-  await expect(directVoterLearnMorepage).toHaveURL(DIRECT_VOTER_DOC_URL);
+  await expect(governance_overview).toHaveURL(GOVERNANCE_OVERVIEW_DOC_URL);
 });
 
 test("6M. Should navigate between footer links", async ({ page, context }) => {

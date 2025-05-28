@@ -162,7 +162,9 @@ test.describe("Check vote count", () => {
           return data.elements;
         })
       )
-    ).flat();
+    )
+      .flat()
+      .filter((proposal): proposal is IProposal => proposal !== undefined);
 
     const uniqueProposalTypes = Array.from(
       new Map(proposals.map((proposal) => [proposal.type, proposal])).values()

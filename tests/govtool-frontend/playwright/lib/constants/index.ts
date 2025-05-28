@@ -61,3 +61,46 @@ export const InvalidMetadata: InvalidMetadataType[] = [
     hash: "e71bf6171adda3754a87fff5c2d8d9e404eb3366428a5be13f7e76357a39004f",
   },
 ];
+
+export const connectToCardanoWalletSection = [
+  {
+    testId: "home-card-discuss-budget-proposals",
+    urlPattern: /\/budget_discussion/,
+    label: "Discuss Budget Proposals",
+  },
+  {
+    testId: "home-card-create-a-budget-proposal",
+    urlPattern: /\/budget_discussion/,
+    label: "Create a Budget Proposal",
+  },
+  {
+    testId: "home-card-discuss-governance-actions",
+    urlPattern: /\/proposal_discussion/,
+    label: "Discuss Governance Actions",
+  },
+  {
+    testId: "home-card-propose-a-governance-action",
+    urlPattern: /\/proposal_discussion\/propose/,
+    label: "Propose a Governance Action",
+  },
+  {
+    testId: "home-card-register-to-vote",
+    urlPattern: /\/register_direct_voter/,
+    label: "Register to Vote",
+  },
+  {
+    testId: "home-card-delegate-your-vote-to-a-drep",
+    urlPattern: /\/drep_directory/,
+    label: "Delegate Your Vote to a DRep",
+  },
+  {
+    testId: "home-card-become-a-drep",
+    urlPattern: /\/register_drep/,
+    Label: "Become a DRep",
+  },
+  {
+    testId: "home-card-vote-on-governance-actions",
+    urlPattern: /\governance_actions/,
+    label: "Vote on Governance Actions",
+  },
+];

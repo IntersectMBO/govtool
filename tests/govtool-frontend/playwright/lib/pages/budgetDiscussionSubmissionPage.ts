@@ -83,9 +83,9 @@ export default class BudgetDiscussionSubmissionPage {
   readonly suplimentaryEndorsementInput = this.page.getByTestId(
     "supplementary-endorsement-input"
   );
-  readonly productRoadmapDescriptionInput = this.page.getByLabel(
-    "Please explain how your"
-  ); // BUG missing test Ids
+  readonly productRoadmapDescriptionInput = this.page.getByTestId(
+    "proposal-roadmap-description-input"
+  );
 
   // proposal-details
   readonly proposalNameInput = this.page.getByTestId("proposal-name-input");
@@ -123,12 +123,10 @@ export default class BudgetDiscussionSubmissionPage {
   readonly venderDetailsInput = this.page.getByLabel("Please provide further"); //BUG missing test Ids
 
   // select
-  readonly proposalCommittee = this.page
-    .getByLabel("Is this proposal being")
-    .first(); // BUG incorrect position of testId
-  readonly countryOfIncorporationBtn = this.page
-    .getByLabel("Country of Incorporation *")
-    .first(); // BUG incorrect position of testId
+  readonly proposalCommittee = this.page.getByTestId("proposal-committee");
+  readonly countryOfIncorporationBtn = this.page.getByTestId(
+    "country-of-incorporation"
+  );
   readonly publicChampionSelect = this.page.getByTestId(
     "proposal-public-champion"
   );
@@ -264,8 +262,8 @@ export default class BudgetDiscussionSubmissionPage {
   ) {
     await this.proposalCommittee.click();
     await this.page
-      .getByRole("option", { name: proposalOwnership.companyType })
-      .click(); //BUG missing testId
+      .getByTestId(`${proposalOwnership.companyType.toLowerCase()}-submission`)
+      .click();
 
     await this.contactDetailsInput.fill(proposalOwnership.contactDetails);
 
@@ -787,13 +785,9 @@ export default class BudgetDiscussionSubmissionPage {
 
     // further information
     for (let i = 0; i < proposalInformations.furtherInformation.length; i++) {
-      //BUG missing testId
-      await expect(
-        this.currentPage.getByRole("link", {
-          name: proposalInformations.furtherInformation[i].prop_link_text,
-          exact: true,
-        })
-      ).toBeVisible();
+      await expect(this.currentPage.getByTestId(`link-${i}-label`)).toHaveText(
+        proposalInformations.furtherInformation[i].prop_link_text
+      );
     }
 
     // administration and auditing

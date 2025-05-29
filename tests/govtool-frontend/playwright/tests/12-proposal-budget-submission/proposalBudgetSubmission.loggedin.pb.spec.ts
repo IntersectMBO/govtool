@@ -72,8 +72,8 @@ test.describe("Budget proposal 01 wallet", () => {
         // company type field
         await budgetProposalSubmissionPage.proposalCommittee.click();
         await budgetProposalSubmissionPage.currentPage
-          .getByRole("option", { name: CompanyEnum.Company })
-          .click(); //BUG missing testId
+          .getByTestId("company-submission")
+          .click();
 
         await expect(
           budgetProposalSubmissionPage.companyNameInput
@@ -88,8 +88,8 @@ test.describe("Budget proposal 01 wallet", () => {
         // group type field
         await budgetProposalSubmissionPage.proposalCommittee.click();
         await budgetProposalSubmissionPage.currentPage
-          .getByRole("option", { name: CompanyEnum.Group })
-          .click(); //BUG missing testId
+          .getByTestId("group-submission")
+          .click();
         await expect(budgetProposalSubmissionPage.groupNameInput).toBeVisible();
         await expect(budgetProposalSubmissionPage.groupTypeInput).toBeVisible();
         await expect(

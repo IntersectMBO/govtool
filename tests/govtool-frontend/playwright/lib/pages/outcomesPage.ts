@@ -437,7 +437,6 @@ export default class OutComesPage {
       "**/governance-actions?search=&filters=&sort=**"
     );
 
-
     await this.goto();
     await actionsResponsePromise;
 

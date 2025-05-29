@@ -83,34 +83,34 @@ export const UsersnapProvider = ({
             ...initParams,
             customFields: {
               sentiment_score: {
-                type: 'rating',
+                type: "rating",
                 label: t("feedback.sentimentScore"),
                 required: true,
-                options: [1, 2, 3, 4, 5]
+                options: [1, 2, 3, 4, 5],
               },
               additional_notes: {
-                type: 'textarea',
+                type: "textarea",
                 label: t("feedback.additionalNotes"),
-                required: false
-              }
+                required: false,
+              },
             },
             feedbackTypes: [
               {
-                id: 'bug',
+                id: "bug",
                 label: t("feedback.reportBug"),
-                description: t("feedback.reportBugDescription")
+                description: t("feedback.reportBugDescription"),
               },
               {
-                id: 'idea',
+                id: "idea",
                 label: t("feedback.suggestIdea"),
-                description: t("feedback.suggestIdeaDescription")
+                description: t("feedback.suggestIdeaDescription"),
               },
               {
-                id: 'sentiment',
+                id: "sentiment",
                 label: t("feedback.sentimentFeedback"),
-                description: t("feedback.sentimentFeedbackDescription")
-              }
-            ]
+                description: t("feedback.sentimentFeedbackDescription"),
+              },
+            ],
           });
           setUsersnapApi(api);
         } catch (error) {

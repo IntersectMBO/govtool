@@ -6,6 +6,7 @@ import React, {
   useMemo,
 } from "react";
 import { InitOptions, WidgetApi, loadSpace } from "@usersnap/browser";
+import { useTranslation } from "react-i18next";
 
 type WidgetValues = {
   assignee?: string;
@@ -65,6 +66,7 @@ export const UsersnapProvider = ({
   children,
 }: UsersnapProviderProps) => {
   const [usersnapApi, setUsersnapApi] = useState<UsersnapAPI | null>(null);
+  const { t } = useTranslation();
 
   const openFeedbackWindow = useCallback(() => {
     if (usersnapApi) {
@@ -77,7 +79,39 @@ export const UsersnapProvider = ({
       if (API_KEY) {
         try {
           const api = await loadSpace(API_KEY);
-          api.init(initParams);
+          api.init({
+            ...initParams,
+            customFields: {
+              sentiment_score: {
+                type: 'rating',
+                label: t("feedback.sentimentScore"),
+                required: true,
+                options: [1, 2, 3, 4, 5]
+              },
+              additional_notes: {
+                type: 'textarea',
+                label: t("feedback.additionalNotes"),
+                required: false
+              }
+            },
+            feedbackTypes: [
+              {
+                id: 'bug',
+                label: t("feedback.reportBug"),
+                description: t("feedback.reportBugDescription")
+              },
+              {
+                id: 'idea',
+                label: t("feedback.suggestIdea"),
+                description: t("feedback.suggestIdeaDescription")
+              },
+              {
+                id: 'sentiment',
+                label: t("feedback.sentimentFeedback"),
+                description: t("feedback.sentimentFeedbackDescription")
+              }
+            ]
+          });
           setUsersnapApi(api);
         } catch (error) {
           console.error(error);
@@ -85,7 +119,7 @@ export const UsersnapProvider = ({
       }
     };
     initUsersnapSpace();
-  }, [initParams, API_KEY]);
+  }, [initParams, API_KEY, t]);
 
   const value = useMemo(() => ({ openFeedbackWindow }), [openFeedbackWindow]);
 

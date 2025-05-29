@@ -20,6 +20,9 @@ export const MaintenanceEndingBanner = () => {
         width: "100%",
         overflow: "hidden",
         transition: "all 0.3s ease-in-out",
+        position: "sticky",
+        top: 0,
+        zIndex: 1200,
       }}
     >
       {/* Banner Header */}

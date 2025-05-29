@@ -106,6 +106,10 @@ export default class OutcomeDetailsPage {
           isLoggedIn
         );
 
+        if (!govActionDetailsPage) {
+          return;
+        }
+
         const outcomeResponse = await outcomeResponsePromise;
         const proposalToCheck = (await outcomeResponse.json())[0];
 

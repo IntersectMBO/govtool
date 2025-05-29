@@ -177,8 +177,7 @@ export default class OutComesPage {
     await this.page.getByTestId(this.getSortTestId(sortOption)).click();
 
     const response = await responsePromise;
-    const data = await response.json();
-    let outcomeProposalList: outcomeProposal[] = data.length != 0 ? data : null;
+    const outcomeProposalList: outcomeProposal[] = await response.json();
 
     // API validation
     if (outcomeProposalList.length <= 1) return;
@@ -555,16 +554,25 @@ export default class OutComesPage {
       { timeout: 60_000 }
     );
 
-    const metricsResponsePromise = page.waitForResponse(
-      (response) => response.url().includes(`/misc/network/metrics?epoch`),
-      { timeout: 60_000 }
-    );
-
     const outcomePage = new OutComesPage(page);
     await outcomePage.goto({ filter: filterKey });
 
     const outcomeListResponse = await outcomeListResponsePromise;
     const proposals = await outcomeListResponse.json();
+
+    if (proposals.length === 0) {
+      expect(true, "No proposals found!").toBeTruthy();
+      return {
+        govActionDetailsPage: null,
+        outcomeResponsePromise: null,
+        metricsResponsePromise: null,
+      };
+    }
+
+    const metricsResponsePromise = page.waitForResponse(
+      (response) => response.url().includes(`/misc/network/metrics?epoch`),
+      { timeout: 60_000 }
+    );
 
     expect(
       proposals.length,

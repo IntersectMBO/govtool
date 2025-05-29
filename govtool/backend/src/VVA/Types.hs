@@ -260,6 +260,7 @@ data CacheEnv
       , networkInfoCache                    :: Cache.Cache () NetworkInfo
       , networkTotalStakeCache              :: Cache.Cache () NetworkTotalStake
       , dRepVotingPowerListCache            :: Cache.Cache Text [DRepVotingPowerList]
+      , accountInfoCache                    :: Cache.Cache Text AccountInfo
       }
 
 data NetworkInfo

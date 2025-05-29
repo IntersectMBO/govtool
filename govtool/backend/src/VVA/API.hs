@@ -533,7 +533,7 @@ getNetworkMetrics = do
 
 getAccountInfo :: App m => HexText -> m GetAccountInfoResponse
 getAccountInfo (unHexText -> stakeKey) = do
-  -- CacheEnv {accountInfoCache} <- asks vvaCache
+  CacheEnv {accountInfoCache} <- asks vvaCache
   Types.AccountInfo {..} <- Account.accountInfo stakeKey
   return $ GetAccountInfoResponse
     { getAccountInfoResponseId = accountInfoId

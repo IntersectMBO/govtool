@@ -1046,7 +1046,7 @@ exampleGetAccountInfoResponse :: Text
 exampleGetAccountInfoResponse =
   "{\"stakeKey\": \"stake1u9\","
   <> " \"id\": \"1\","
-  <> "\"view\": \"stake_test1uzapf83wydusjln97rqr7fen6vgrz5087yqdxm0akqdqkgstjz8g4\","
+  <> "\"view\": \"stake_test1uzapf83wydusjln97rqr7fen6vgrz5087yqdxm0akqdqkgstj2345\","
   <> "\"isRegistered\": false,"
   <> "\"isScriptBased\": false}"
 instance ToSchema GetAccountInfoResponse where

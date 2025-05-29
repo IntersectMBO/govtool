@@ -26,11 +26,10 @@ export const Drawer = () => {
         flexDirection: "column",
         height: "100vh",
         position: "sticky",
-        top: maintenanceEndingBannerHeight,
         width: `${DRAWER_WIDTH}px`,
-
+        top: maintenanceEndingBannerHeight || 0,
         overflowY: "auto",
-        maxHeight: "100vh",
+        maxHeight: `calc(100vh - ${maintenanceEndingBannerHeight || 0}px)`,
       }}
     >
       <NavLink

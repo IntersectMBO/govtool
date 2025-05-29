@@ -124,6 +124,7 @@ test.describe("Proposed as a governance action", async () => {
   });
 
   test.afterEach(async () => {
+    await skipIfMainnet();
     // cleanup
     await proposalDiscussionDetailPage.goto(proposalId);
 

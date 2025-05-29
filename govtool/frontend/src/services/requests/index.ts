@@ -22,3 +22,4 @@ export * from "./postDRepRemoveVote";
 export * from "./postDRepRetire";
 export * from "./postDRepVote";
 export * from "./getDRepVotingPowerList";
+export * from "./getAccount";

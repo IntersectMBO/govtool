@@ -5,7 +5,7 @@ enum MetadataValidationStatus {
   INCORRECT_FORMAT = "INCORRECT_FORMAT",
 }
 declare module "@intersect.mbo/pdf-ui/cjs" {
-  import { EpochParams } from "@/models";
+  import { EpochParams, Account } from "@/models";
 
   type ProposalDiscussionProps = {
     pdfApiUrl: string;
@@ -37,6 +37,11 @@ declare module "@intersect.mbo/pdf-ui/cjs" {
     }: {
       stakeKey?: string;
     }) => Promise<number>;
+    getAccount: ({
+      stakeKey,
+    }: {
+      stakeKey?: string;
+    }) => Promise<Account>;
   };
 
   type GovernanceActionsOutcomesProps = {

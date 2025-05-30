@@ -1,4 +1,4 @@
-import { Box, Typography, IconButton } from "@mui/material";
+import { Box, Typography, IconButton, Link } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Trans, useTranslation } from "react-i18next";
@@ -101,7 +101,18 @@ export const MaintenanceEndingBanner = () => {
             />
           </Typography>
           <Typography variant="caption" color="common.white">
-            {t("system.maintenanceEnding.description3")}
+            {t("system.maintenanceEnding.description3")}{" "}
+            <Link
+              variant="caption"
+              fontWeight={600}
+              color="common.white"
+              href="https://docs.gov.tools/overview/important-updates/the-future-of-govtool-why-it-matters-and-what-comes-next"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="govtool-future-link"
+            >
+              {t("system.maintenanceEnding.linkText")}
+            </Link>
           </Typography>
         </Box>
       </Box>

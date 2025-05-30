@@ -329,15 +329,14 @@ test.describe("Proposal created logged state", () => {
     try {
       await proposalDiscussionDetailsPage.submitAsGABtn.click();
       await expect(
-        proposalCreationPage.currentPage.getByText(
-          "Insufficient wallet balance",
-          { exact: true }
+        proposalCreationPage.currentPage.getByTestId(
+          "insufficient-wallet-balance-title"
         )
-      ).toBeVisible(); // BUG missing test id
+      ).toHaveText(/Insufficient wallet balance/);
 
       await proposalCreationPage.currentPage
-        .getByRole("button", { name: "Close" })
-        .click(); // BUG missing test id
+        .getByTestId("insufficient-wallet-balance-dialog-button")
+        .click();
     } finally {
       await proposalDiscussionDetailsPage.deleteProposal();
     }

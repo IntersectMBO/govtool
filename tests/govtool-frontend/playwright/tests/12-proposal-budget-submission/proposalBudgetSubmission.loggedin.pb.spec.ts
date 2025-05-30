@@ -62,7 +62,7 @@ test.describe("Budget proposal 01 wallet", () => {
       test("12D_1. Should verify all field of “proposal ownership” section", async () => {
         // default field
         await expect(
-          budgetProposalSubmissionPage.companyTypeSelect
+          budgetProposalSubmissionPage.proposalCommittee
         ).toBeVisible();
 
         await expect(
@@ -70,10 +70,10 @@ test.describe("Budget proposal 01 wallet", () => {
         ).toBeVisible();
 
         // company type field
-        await budgetProposalSubmissionPage.companyTypeSelect.click();
+        await budgetProposalSubmissionPage.proposalCommittee.click();
         await budgetProposalSubmissionPage.currentPage
-          .getByRole("option", { name: CompanyEnum.Company })
-          .click(); //BUG missing testId
+          .getByTestId("company-submission")
+          .click();
 
         await expect(
           budgetProposalSubmissionPage.companyNameInput
@@ -86,10 +86,10 @@ test.describe("Budget proposal 01 wallet", () => {
         ).toBeVisible();
 
         // group type field
-        await budgetProposalSubmissionPage.companyTypeSelect.click();
+        await budgetProposalSubmissionPage.proposalCommittee.click();
         await budgetProposalSubmissionPage.currentPage
-          .getByRole("option", { name: CompanyEnum.Group })
-          .click(); //BUG missing testId
+          .getByTestId("group-submission")
+          .click();
         await expect(budgetProposalSubmissionPage.groupNameInput).toBeVisible();
         await expect(budgetProposalSubmissionPage.groupTypeInput).toBeVisible();
         await expect(
@@ -436,7 +436,7 @@ test("12C. Should save and view draft proposal", async ({ browser }) => {
 
   await budgetSubmissionPage.viewLastDraft();
 
-  await expect(budgetSubmissionPage.companyTypeSelect).toHaveText(
+  await expect(budgetSubmissionPage.proposalCommittee).toHaveText(
     draftProposalOwnership.companyType
   );
 

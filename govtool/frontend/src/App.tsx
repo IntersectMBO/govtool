@@ -93,9 +93,8 @@ export default () => {
   }, [checkTheWalletIsActive]);
 
   return (
-    <>
+    <TopBanners>
       <ScrollToTop />
-      <TopBanners />
       <Routes>
         <Route path={PATHS.home} element={<Home />} />
         <Route path={PATHS.governanceActions} element={<GovernanceActions />} />
@@ -226,6 +225,6 @@ export default () => {
           {modals[modal.type].component!}
         </Modal>
       )}
-    </>
+    </TopBanners>
   );
 };

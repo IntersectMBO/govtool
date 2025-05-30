@@ -4,7 +4,6 @@ import {
   createContext,
   useContext,
   useCallback,
-  useEffect,
 } from "react";
 import { NodeObject } from "jsonld";
 import { blake2bHex } from "blakejs";
@@ -42,10 +41,6 @@ const GovernanceActionProvider = ({ children }: PropsWithChildren) => {
    * @param {GovActionMetadata} govActionMetadata - The metadata of the governance action.
    * @returns The JSON-LD representation of the governance action.
    */
-
-  useEffect(() => {
-    Sentry.setTag("component_name", "GovernanceActionProvider");
-  }, []);
 
   const createGovernanceActionJsonLD = useCallback(
     async (govActionMetadata: GovActionMetadata) => {

@@ -8,7 +8,10 @@ import {
   useGetVoterInfo,
   useScreenDimension,
 } from "@hooks";
-import { DashboardDrawerMobile } from "@organisms";
+import {
+  DashboardDrawerMobile,
+  useMaintenanceEndingBannerContext,
+} from "@organisms";
 import { useCardano } from "@context";
 
 type DashboardTopNavProps = {
@@ -28,6 +31,8 @@ export const DashboardTopNav = ({
   const { isEnableLoading } = useCardano();
   const { voter } = useGetVoterInfo();
   const { dRepVotingPower } = useGetDRepVotingPowerQuery(voter);
+  const { height: maintenanceEndingBannerHeight } =
+    useMaintenanceEndingBannerContext();
 
   const openDrawer = () => {
     setIsDrawerOpen(true);
@@ -53,7 +58,7 @@ export const DashboardTopNav = ({
           alignItems: "center",
           backdropFilter: "blur(10px)",
           backgroundColor:
-            windowScroll > POSITION_TO_BLUR
+            windowScroll > POSITION_TO_BLUR + maintenanceEndingBannerHeight
               ? "rgba(256, 256, 256, 0.7)"
               : isMobile
               ? "#FBFBFF59"
@@ -65,7 +70,7 @@ export const DashboardTopNav = ({
           minHeight: isMobile ? 36 : 48,
           px: isMobile ? 2 : 5,
           py: 3,
-          top: 0,
+          top: maintenanceEndingBannerHeight || 0,
           width: "fill-available",
           zIndex: 100,
         }}

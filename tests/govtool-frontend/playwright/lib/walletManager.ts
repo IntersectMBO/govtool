@@ -65,5 +65,15 @@ class WalletManager {
 
     return await LockInterceptor.intercept<StaticWallet>("tempWallets", popCb);
   }
+
+  async updateWalletGivenName(address: string, givenName: string) {
+    const wallets: StaticWallet[] = (await getFile("wallets.json")) ?? [];
+    wallets.map((wallet: StaticWallet) => {
+      if (wallet.address === address) {
+        wallet.givenName = givenName;
+      }
+    });
+    await createFile("wallets.json", wallets);
+  }
 }
 export default WalletManager.getInstance();

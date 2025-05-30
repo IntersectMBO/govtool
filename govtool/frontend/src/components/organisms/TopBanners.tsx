@@ -1,13 +1,13 @@
+import { PropsWithChildren } from "react";
 import { Box, Link, Typography } from "@mui/material";
 import { Trans, useTranslation } from "react-i18next";
-import { useAppContext, useCardano } from "@/context";
+import { useAppContext } from "@/context";
 import { LINKS } from "@/consts/links";
 import { MaintenanceEndingBanner } from "./MaintenanceEndingBanner";
 
-export const TopBanners = () => {
+export const TopBanners = ({ children }: PropsWithChildren) => {
   const { isMainnet, networkName, isInBootstrapPhase, isAppInitializing } =
     useAppContext();
-  const { isEnabled } = useCardano();
   const { t } = useTranslation();
 
   if (isAppInitializing) {
@@ -15,7 +15,7 @@ export const TopBanners = () => {
   }
 
   return (
-    <>
+    <Box>
       <Box>
         {/* NETWORK BANNER */}
         {!isMainnet && (
@@ -49,18 +49,7 @@ export const TopBanners = () => {
       </Box>
 
       {/* GOVTOOL MAINTENANCE ENDING SOON BANNER */}
-      {isEnabled && (
-        <Box
-          sx={{
-            position: "sticky",
-            top: 0,
-            width: "100%",
-            zIndex: 1200,
-          }}
-        >
-          <MaintenanceEndingBanner />
-        </Box>
-      )}
+      <MaintenanceEndingBanner />
 
       {/* BOOTSTRAPPING BANNER */}
       <Box>
@@ -92,6 +81,7 @@ export const TopBanners = () => {
           </Box>
         )}
       </Box>
-    </>
+      {children}
+    </Box>
   );
 };

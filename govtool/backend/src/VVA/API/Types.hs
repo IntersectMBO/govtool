@@ -273,7 +273,7 @@ instance ToParamSchema GovernanceActionSortMode where
 
 
 newtype GovernanceActionDetails
-  = GovernanceActionDetails { getValue :: Value }
+  = GovernanceActionDetails { getGovernanceActionValue :: Value }
   deriving newtype (Show)
 
 instance FromJSON GovernanceActionDetails where
@@ -455,6 +455,40 @@ instance ToSchema ProposalResponse where
           & example
             ?~ toJSON exampleProposalResponse
 
+data EnactedProposalDetailsResponse
+  = EnactedProposalDetailsResponse
+      { enactedProposalDetailsResponseId          :: Integer
+      , enactedProposalDetailsResponseTxId        :: Integer
+      , enactedProposalDetailsResponseIndex       :: Integer
+      , enactedProposalDetailsResponseDescription :: Maybe Value
+      , enactedProposalDetailsResponseHash        :: HexText
+      }
+  deriving (Generic, Show)
+
+deriveJSON (jsonOptions "enactedProposalDetailsResponse") ''EnactedProposalDetailsResponse
+
+exampleEnactedProposalDetailsResponse :: Text
+exampleEnactedProposalDetailsResponse = "{ \"id\": 123,"
+                  <> "\"txId\": 456,"
+                  <> "\"index\": 0,"
+                  <> "\"description\": {\"key\": \"value\"},"
+                  <> "\"hash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\"}"
+
+instance ToSchema EnactedProposalDetailsResponse where
+  declareNamedSchema proxy = do
+    NamedSchema name_ schema_ <-
+      genericDeclareNamedSchema
+        ( fromAesonOptions $
+            jsonOptions "enactedProposalDetailsResponse"
+        )
+        proxy
+    return $
+      NamedSchema name_ $
+        schema_
+          & description ?~ "Enacted Proposal Details Response"
+          & example
+            ?~ toJSON exampleEnactedProposalDetailsResponse
+
 exampleListProposalsResponse :: Text
 exampleListProposalsResponse =
    "{ \"page\": 0,"
@@ -559,6 +593,7 @@ instance ToSchema VoteResponse where
           & example
             ?~ toJSON exampleVoteResponse
 
+
 data DRepInfoResponse
   = DRepInfoResponse
       { dRepInfoResponseIsScriptBased            :: Bool
@@ -578,7 +613,7 @@ data DRepInfoResponse
       , dRepInfoResponseGivenName                :: Maybe Text
       , dRepInfoResponseObjectives               :: Maybe Text
       , dRepInfoResponseMotivations              :: Maybe Text
-      , dRepInfoResponseQualifications           :: Maybe Text
+      , dRepInfoResponseQualifications            :: Maybe Text
       , dRepInfoResponseImageUrl                 :: Maybe Text
       , dRepInfoResponseImageHash                :: Maybe HexText
       }
@@ -786,6 +821,27 @@ instance ToSchema DRepType where
         & description ?~ "DRep Type"
         & enum_ ?~ map toJSON [NormalDRep, SoleVoter]
 
+newtype DRepReferences
+  = DRepReferences { getDRepReferencesValue :: Value }
+  deriving newtype (Show)
+
+instance FromJSON DRepReferences where
+  parseJSON v = return $ DRepReferences v
+
+instance ToJSON DRepReferences where
+  toJSON (DRepReferences d) = d
+
+instance ToSchema DRepReferences where
+    declareNamedSchema _ = pure $ NamedSchema (Just "DRepReferences") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "A JSON value that can include nested objects and arrays"
+        & example ?~ toJSON
+            (Aeson.object
+              [ "some_key" .= ("some value" :: String)
+              , "nested_key" .= Aeson.object ["inner_key" .= (1 :: Int)]
+              , "array_key" .= [1, 2, 3 :: Int]
+              ])
+
 data DRep
   = DRep
       { dRepIsScriptBased          :: Bool
@@ -804,9 +860,11 @@ data DRep
       , dRepGivenName              :: Maybe Text
       , dRepObjectives             :: Maybe Text
       , dRepMotivations            :: Maybe Text
-      , dRepQualifications         :: Maybe Text
+      , dRepQualifications          :: Maybe Text
       , dRepImageUrl               :: Maybe Text
       , dRepImageHash              :: Maybe HexText
+      , dRepIdentityReferences     :: Maybe DRepReferences
+      , dRepLinkReferences         :: Maybe DRepReferences
       }
   deriving (Generic, Show)
 
@@ -998,3 +1056,26 @@ instance ToSchema GetNetworkMetricsResponse where
         & description ?~ "GetNetworkMetricsResponse"
         & example
           ?~ toJSON exampleGetNetworkMetricsResponse
+
+data GetAccountInfoResponse
+  = GetAccountInfoResponse
+      { getAccountInfoResponseId            :: Integer
+      , getAccountInfoResponseView          :: Text
+      , getAccountInfoResponseIsRegistered  :: Bool
+      , getAccountInfoResponseIsScriptBased :: Bool
+      }
+  deriving (Generic, Show)
+deriveJSON (jsonOptions "getAccountInfoResponse") ''GetAccountInfoResponse
+exampleGetAccountInfoResponse :: Text
+exampleGetAccountInfoResponse =
+  "{\"stakeKey\": \"stake1u9\","
+  <> " \"id\": \"1\","
+  <> "\"view\": \"stake_test1uzapf83wydusjln97rqr7fen6vgrz5087yqdxm0akqdqkgstj2345\","
+  <> "\"isRegistered\": false,"
+  <> "\"isScriptBased\": false}"
+instance ToSchema GetAccountInfoResponse where
+    declareNamedSchema _ = pure $ NamedSchema (Just "GetAccountInfoResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "GetAccountInfoResponse"
+        & example
+          ?~ toJSON exampleGetAccountInfoResponse

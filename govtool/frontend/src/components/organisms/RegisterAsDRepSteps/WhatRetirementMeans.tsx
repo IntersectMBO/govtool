@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import * as Sentry from "@sentry/react";
 
 import { Typography } from "@atoms";
@@ -34,10 +34,6 @@ export const WhatRetirementMeans = ({
     onClickCancel();
     closeModal();
   };
-
-  useEffect(() => {
-    Sentry.setTag("component_name", "WhatRetirementMeans");
-  }, []);
 
   const retireAsDrep = useCallback(async () => {
     try {

@@ -40,6 +40,7 @@ import           VVA.Config
 import qualified VVA.DRep                 as DRep
 import qualified VVA.Epoch                as Epoch
 import           VVA.Network              as Network
+import           VVA.Account              as Account
 import qualified VVA.Proposal             as Proposal
 import qualified VVA.Transaction          as Transaction
 import qualified VVA.Types                as Types
@@ -78,12 +79,14 @@ type VVAApi =
                     :> QueryParam "search" Text
                     :> Get '[JSON] ListProposalsResponse
     :<|> "proposal" :> "get" :> Capture "proposalId" GovActionId :> QueryParam "drepId" HexText :> Get '[JSON] GetProposalResponse
+    :<|> "proposal" :> "enacted-details" :> QueryParam "type" GovernanceActionType :> Get '[JSON] (Maybe EnactedProposalDetailsResponse)
     :<|> "epoch" :> "params" :> Get '[JSON] GetCurrentEpochParamsResponse
     :<|> "transaction" :> "status" :> Capture "transactionId" HexText :> Get '[JSON] GetTransactionStatusResponse
     :<|> "throw500" :> Get '[JSON] ()
     :<|> "network" :> "metrics" :> Get '[JSON] GetNetworkMetricsResponse
     :<|> "network" :> "info" :> Get '[JSON] GetNetworkInfoResponse
     :<|> "network" :> "total-stake" :> Get '[JSON] GetNetworkTotalStakeResponse
+    :<|> "account" :> Capture "stakeKey" HexText :> Get '[JSON] GetAccountInfoResponse
 
 server :: App m => ServerT VVAApi m
 server = drepList
@@ -95,12 +98,14 @@ server = drepList
     :<|> getStakeKeyVotingPower
     :<|> listProposals
     :<|> getProposal
+    :<|> getEnactedProposalDetails
     :<|> getCurrentEpochParams
     :<|> getTransactionStatus
     :<|> throw500
     :<|> getNetworkMetrics
     :<|> getNetworkInfo
     :<|> getNetworkTotalStake
+    :<|> getAccountInfo
 
 mapDRepType :: Types.DRepType -> DRepType
 mapDRepType Types.DRep      = NormalDRep
@@ -132,7 +137,9 @@ drepRegistrationToDrep Types.DRepRegistration {..} =
       dRepMotivations = dRepRegistrationMotivations,
       dRepQualifications = dRepRegistrationQualifications,
       dRepImageUrl = dRepRegistrationImageUrl,
-      dRepImageHash = HexText <$> dRepRegistrationImageHash
+      dRepImageHash = HexText <$> dRepRegistrationImageHash,
+      dRepIdentityReferences = DRepReferences <$> dRepRegistrationIdentityReferences,
+      dRepLinkReferences = DRepReferences <$> dRepRegistrationLinkReferences
     }
 
 delegationToResponse :: Types.Delegation -> DelegationResponse
@@ -442,6 +449,33 @@ getProposal g@(GovActionId govActionTxHash govActionIndex) mDrepId' = do
     , getProposalResponseVote = voteResponse
     }
 
+getEnactedProposalDetails :: App m => Maybe GovernanceActionType -> m (Maybe EnactedProposalDetailsResponse)
+getEnactedProposalDetails maybeType = do
+  let proposalType = maybe "HardForkInitiation" governanceActionTypeToText maybeType
+  
+  mDetails <- Proposal.getPreviousEnactedProposal proposalType
+  
+  let response = enactedProposalDetailsToResponse <$> mDetails
+  
+  return response
+  where
+    governanceActionTypeToText :: GovernanceActionType -> Text
+    governanceActionTypeToText actionType = 
+      case actionType of
+        HardForkInitiation -> "HardForkInitiation"
+        ParameterChange -> "ParameterChange"
+        _ -> "HardForkInitiation"
+    
+    enactedProposalDetailsToResponse :: Types.EnactedProposalDetails -> EnactedProposalDetailsResponse
+    enactedProposalDetailsToResponse Types.EnactedProposalDetails{..} =
+      EnactedProposalDetailsResponse
+        { enactedProposalDetailsResponseId = enactedProposalDetailsId
+        , enactedProposalDetailsResponseTxId = enactedProposalDetailsTxId
+        , enactedProposalDetailsResponseIndex = enactedProposalDetailsIndex
+        , enactedProposalDetailsResponseDescription = enactedProposalDetailsDescription
+        , enactedProposalDetailsResponseHash = HexText enactedProposalDetailsHash
+        }
+
 getCurrentEpochParams :: App m => m GetCurrentEpochParamsResponse
 getCurrentEpochParams = do
   CacheEnv {currentEpochCache} <- asks vvaCache
@@ -497,4 +531,15 @@ getNetworkMetrics = do
     , getNetworkMetricsResponseNoOfCommitteeMembers = networkMetricsNoOfCommitteeMembers
     , getNetworkMetricsResponseQuorumNumerator = networkMetricsQuorumNumerator
     , getNetworkMetricsResponseQuorumDenominator = networkMetricsQuorumDenominator
+    }
+
+getAccountInfo :: App m => HexText -> m GetAccountInfoResponse
+getAccountInfo (unHexText -> stakeKey) = do
+  CacheEnv {accountInfoCache} <- asks vvaCache
+  Types.AccountInfo {..} <- Account.accountInfo stakeKey
+  return $ GetAccountInfoResponse
+    { getAccountInfoResponseId = accountInfoId
+    , getAccountInfoResponseView = accountInfoView
+    , getAccountInfoResponseIsRegistered = accountInfoIsRegistered
+    , getAccountInfoResponseIsScriptBased = accountInfoIsScriptBased
     }

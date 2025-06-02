@@ -13,7 +13,11 @@ import { functionWaitedAssert } from "@helpers/waitedLoop";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { expect } from "@playwright/test";
-import { ProposalType } from "@types";
+import {
+  ProposalDiscussionFilterTypes,
+  ProposalType,
+  ProposedGovAction,
+} from "@types";
 
 const mockProposal = require("../../lib/_mock/proposal.json");
 const mockPoll = require("../../lib/_mock/proposalPoll.json");
@@ -65,15 +69,41 @@ test.describe("Filter and sort proposals", () => {
   });
 
   test("8B_2. Should sort the list of proposed governance actions.", async () => {
-    await proposalDiscussionPage.sortAndValidate(
-      "asc",
-      (p1, p2) => p1.attributes.createdAt <= p2.attributes.createdAt
-    );
+    const sortOptions = {
+      Oldest: (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.createdAt <= p2.attributes.createdAt,
+      Newest: (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.createdAt >= p2.attributes.createdAt,
+      "Most likes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_likes >= p2.attributes.prop_likes,
+      "Least likes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_likes <= p2.attributes.prop_likes,
+      "Most dislikes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_dislikes >= p2.attributes.prop_dislikes,
+      "Least dislikes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_dislikes <= p2.attributes.prop_dislikes,
+      "Most comments": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_comments_number >=
+        p2.attributes.prop_comments_number,
+      "Least comments": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_comments_number <=
+        p2.attributes.prop_comments_number,
+      "Name A-Z": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.content.attributes.prop_name.localeCompare(
+          p2.attributes.content.attributes.prop_name
+        ) <= 0,
+      "Name Z-A": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.content.attributes.prop_name.localeCompare(
+          p2.attributes.content.attributes.prop_name
+        ) >= 0,
+    };
 
-    await proposalDiscussionPage.sortAndValidate(
-      "desc",
-      (p1, p2) => p1.attributes.createdAt >= p2.attributes.createdAt
-    );
+    for (const [sortOption, sortFunction] of Object.entries(sortOptions)) {
+      await proposalDiscussionPage.sortAndValidate(
+        sortOption as ProposalDiscussionFilterTypes,
+        sortFunction
+      );
+    }
   });
 });
 

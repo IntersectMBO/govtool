@@ -177,6 +177,7 @@ const kuberService = {
     }));
 
     const inputs = wallets.map((wallet) => wallet.address);
+    inputs.push(getWalletConfigForFaucet().address);
     return kuber.signAndSubmitTx({
       inputs,
       selections,

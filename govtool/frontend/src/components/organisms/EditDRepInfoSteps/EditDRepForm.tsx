@@ -49,8 +49,8 @@ export const EditDRepForm = ({
         qualifications: data?.qualifications ?? "",
         paymentAddress: data?.paymentAddress ?? "",
         image: data?.image ?? "",
-        linkReferences: data.linkReferences ?? [getEmptyReference("Link")],
-        identityReferences: data.identityReferences ?? [
+        linkReferences: data?.linkReferences ?? [getEmptyReference("Link")],
+        identityReferences: data?.identityReferences ?? [
           getEmptyReference("Identity"),
         ],
       });

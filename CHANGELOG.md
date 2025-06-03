@@ -17,6 +17,7 @@ changes.
 ### Fixed
 
 - Fix missing off chain references in DRep details [Issue 3490](https://github.com/IntersectMBO/govtool/issues/3490)
+- Fix blank screen and type error on linkReferences when navigating to edit dRep page that has no links [Issue 3714](https://github.com/IntersectMBO/govtool/issues/3714)
 
 ### Changed
 

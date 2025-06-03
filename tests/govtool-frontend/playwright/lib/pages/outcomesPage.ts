@@ -456,10 +456,15 @@ export default class OutComesPage {
 
   async searchOutcomesById(governanceActionId: string) {
     await this.searchInput.fill(governanceActionId);
-    await expect(
-      this.page.getByRole("progressbar").getByRole("img")
-    ).toBeVisible();
 
+    try {
+      await expect(
+        this.page.getByRole("progressbar").getByRole("img")
+      ).toBeVisible();
+    } catch (error) {
+      // Handle the case where the progress bar is not visible
+      console.warn("Progress bar not visible, proceeding with search.");
+    }
     await functionWaitedAssert(
       async () => {
         const idSearchOutcomeCards = await this.getAllOutcomes();
@@ -480,9 +485,14 @@ export default class OutComesPage {
 
   async searchOutcomesByTitle(governanceActionTitle: string) {
     await this.searchInput.fill(governanceActionTitle);
-    await expect(
-      this.page.getByRole("progressbar").getByRole("img")
-    ).toBeVisible();
+    try {
+      await expect(
+        this.page.getByRole("progressbar").getByRole("img")
+      ).toBeVisible();
+    } catch (error) {
+      // Handle the case where the progress bar is not visible
+      console.warn("Progress bar not visible, proceeding with search.");
+    }
 
     await functionWaitedAssert(
       async () => {

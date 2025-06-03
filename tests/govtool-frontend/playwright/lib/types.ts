@@ -201,8 +201,17 @@ export type ProposedGovAction = {
   attributes: {
     gov_action_type_name: string;
     prop_comments_number: number;
+    prop_likes: number;
+    prop_dislikes: number;
     createdAt: string;
     updatedAt: string;
+    content: {
+      id: string;
+      attributes: {
+        proposal_id: string;
+        prop_name: string;
+      };
+    };
     creator: {
       data: {
         id: number;
@@ -547,3 +556,15 @@ export type BudgetProposalFilterTypes =
   | "Name Z-A"
   | "Proposer A-Z"
   | "Proposer Z-A";
+
+export type ProposalDiscussionFilterTypes =
+  | "Newest"
+  | "Oldest"
+  | "Most likes"
+  | "Least likes"
+  | "Most dislikes"
+  | "Least dislikes"
+  | "Most comments"
+  | "Least comments"
+  | "Name A-Z"
+  | "Name Z-A";

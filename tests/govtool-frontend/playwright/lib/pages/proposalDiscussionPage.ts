@@ -1,5 +1,10 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { ProposalCreateRequest, ProposalType, ProposedGovAction } from "@types";
+import {
+  ProposalCreateRequest,
+  ProposalDiscussionFilterTypes,
+  ProposalType,
+  ProposedGovAction,
+} from "@types";
 import environments from "lib/constants/environments";
 import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
 import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
@@ -147,16 +152,30 @@ export default class ProposalDiscussionPage {
   }
 
   async sortAndValidate(
-    option: "asc" | "desc",
+    type: ProposalDiscussionFilterTypes,
     validationFn: (p1: ProposedGovAction, p2: ProposedGovAction) => boolean
   ) {
+    const sortMappings = {
+      "Name A-Z": "&sort[prop_name]=ASC",
+      "Name Z-A": "&sort[prop_name]=DESC",
+      "Most comments": "&sort[proposal][prop_comments_number]=DESC",
+      "Least comments": "&sort[proposal][prop_comments_number]=ASC",
+      "Most likes": "&sort[proposal][prop_likes]=DESC",
+      "Least likes": "&sort[proposal][prop_likes]=ASC",
+      "Most dislikes": "&sort[proposal][prop_dislikes]=DESC",
+      "Least dislikes": "&sort[proposal][prop_dislikes]=ASC",
+      Oldest: "&sort[createdAt]=ASC",
+      Newest: "&sort[createdAt]=DESC",
+    };
+
+    const urlParam = sortMappings[type];
+    const populateParam = "&populate[0]=proposal_links";
     const responsePromise = this.page.waitForResponse((response) =>
-      response
-        .url()
-        .includes(`&sort[createdAt]=${option}&populate[0]=proposal_links`)
+      response.url().includes(`${urlParam}${populateParam}`)
     );
 
     await this.sortBtn.click();
+    await this.page.getByTestId(`${type}-sort-option`).click();
     const response = await responsePromise;
 
     let proposals: ProposedGovAction[] = (await response.json()).data;

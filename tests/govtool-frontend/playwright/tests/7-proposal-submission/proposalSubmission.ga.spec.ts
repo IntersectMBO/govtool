@@ -38,14 +38,6 @@ Object.values(ProposalType).forEach((proposalType, index) => {
 
     const wallet = await walletManager.popWallet("proposalSubmission");
 
-    const stakeKeys = await createKeyFromPrivateKeyHex(
-      environments.faucet.stake.private || ""
-    );
-    const { pkh: stakePkh, public: stakePublic } = stakeKeys.json();
-    wallet.stake.pkh = stakePkh;
-    wallet.stake.private = getWalletConfigForFaucet().stake.private;
-    wallet.stake.public = stakePublic;
-
     await logWalletDetails(wallet.address);
 
     const tempUserAuth = await createTempUserAuth(page, wallet);
@@ -73,7 +65,10 @@ Object.values(ProposalType).forEach((proposalType, index) => {
     await proposalSubmissionPage.proposalCreateBtn.click();
     await proposalDiscussionPage.continueBtn.click();
 
-    const rewardAddress = rewardAddressBech32(environments.networkId, stakePkh);
+    const rewardAddress = rewardAddressBech32(
+      environments.networkId,
+      wallet.stake.pkh
+    );
 
     await proposalSubmissionPage.createProposal(rewardAddress, proposalType);
 

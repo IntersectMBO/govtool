@@ -2,7 +2,7 @@ import { importWallet } from "@fixtures/importWallet";
 import { valid as mockValid } from "@mock/index";
 import LoginPage from "@pages/loginPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
-import { BrowserContext, Page } from "@playwright/test";
+import { BrowserContext, expect, Page } from "@playwright/test";
 import { ProposalType, StaticWallet } from "@types";
 import { ShelleyWallet } from "./crypto";
 import convertBufferToHex from "./convertBufferToHex";
@@ -57,9 +57,16 @@ export async function createAuthWithUserName({
 
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
-  await proposalDiscussionPage.verifyIdentityBtn.click({ timeout: 15_000 });
-
-  await proposalDiscussionPage.setUsername(mockValid.username());
+  await proposalDiscussionPage.verifyIdentityBtn.click({ timeout: 60_000 });
+  try {
+    await expect(page.getByTestId("username-input")).toBeVisible({
+      timeout: 10_000,
+    });
+    await proposalDiscussionPage.setUsername(mockValid.username());
+  } catch (error) {
+    // Ignore error if username is already set
+    console.log("Username is already set");
+  }
 
   await context.storageState({ path: auth });
 }

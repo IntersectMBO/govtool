@@ -4,6 +4,7 @@ import { Box } from "@mui/material";
 
 import { useCardano } from "@context";
 import {
+  defaultEditDRepInfoValues,
   useEditDRepInfoForm,
   useGetDRepDetailsQuery,
   useTranslation,
@@ -44,15 +45,21 @@ export const EditDRepForm = ({
 
       reset({
         ...data,
-        objectives: data?.objectives ?? "",
-        motivations: data?.motivations ?? "",
-        qualifications: data?.qualifications ?? "",
-        paymentAddress: data?.paymentAddress ?? "",
-        image: data?.image ?? "",
-        linkReferences: data.linkReferences ?? [getEmptyReference("Link")],
-        identityReferences: data.identityReferences ?? [
-          getEmptyReference("Identity"),
-        ],
+        objectives: data?.objectives ?? defaultEditDRepInfoValues.objectives,
+        motivations: data?.motivations ?? defaultEditDRepInfoValues.motivations,
+        qualifications:
+          data?.qualifications ?? defaultEditDRepInfoValues.qualifications,
+        paymentAddress:
+          data?.paymentAddress ?? defaultEditDRepInfoValues.paymentAddress,
+        image: data?.image ?? defaultEditDRepInfoValues.image,
+        linkReferences:
+          Array.isArray(data?.linkReferences) && data.linkReferences.length > 0
+            ? data.linkReferences
+            : defaultEditDRepInfoValues.linkReferences,
+        identityReferences:
+          Array.isArray(data?.identityReferences) && data.identityReferences.length > 0
+            ? data.identityReferences
+            : defaultEditDRepInfoValues.identityReferences,
       });
     }
   }, [yourselfDRep, loadUserData]);
@@ -74,9 +81,3 @@ export const EditDRepForm = ({
     </Box>
   );
 };
-
-const getEmptyReference = (type: "Link" | "Identity") => ({
-  "@type": type,
-  uri: "",
-  label: "",
-});

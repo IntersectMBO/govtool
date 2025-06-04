@@ -1,6 +1,10 @@
 import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
 import { expect, Locator, Page } from "@playwright/test";
-import { BudgetDiscussionEnum, ProposedGovAction } from "@types";
+import {
+  BudgetDiscussionEnum,
+  BudgetProposalFilterTypes,
+  ProposedGovAction,
+} from "@types";
 import environments from "lib/constants/environments";
 import BudgetDiscussionDetailsPage from "./budgetDiscussionDetailsPage";
 
@@ -140,16 +144,29 @@ export default class BudgetDiscussionPage {
   }
 
   async sortAndValidate(
-    option: "asc" | "desc",
+    type: BudgetProposalFilterTypes,
     validationFn: (p1: ProposedGovAction, p2: ProposedGovAction) => boolean
   ) {
+    const sortMappings = {
+      "Proposer A-Z": "&sort[creator][govtool_username]=ASC",
+      "Proposer Z-A": "&sort[creator][govtool_username]=DESC",
+      "Name A-Z": "&sort[bd_proposal_detail][proposal_name]=ASC",
+      "Name Z-A": "&sort[bd_proposal_detail][proposal_name]=DESC",
+      "Most comments": "&sort[prop_comments_number]=DESC",
+      "Least comments": "&sort[prop_comments_number]=ASC",
+      Oldest: "&sort[createdAt]=ASC",
+      Newest: "&sort[createdAt]=DESC",
+    };
+
+    const urlParam = sortMappings[type];
+    const populateParam = "&populate[0]=bd_costing";
+
     const responsePromise = this.page.waitForResponse((response) =>
-      response
-        .url()
-        .includes(`&sort[createdAt]=${option}&populate[0]=bd_costing`)
+      response.url().includes(`${urlParam}${populateParam}`)
     );
 
     await this.sortBtn.click();
+    await this.page.getByTestId(`${type}-sort-option`).click();
     const response = await responsePromise;
 
     let proposals: ProposedGovAction[] = (await response.json()).data;

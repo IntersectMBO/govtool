@@ -59,7 +59,7 @@ const commonArgs = {
     metadataHash: "exampleMetadataHash",
     references: [
       {
-        "@type": "Reference",
+        "@type": "Links",
         uri: "https://exampleurl.com",
         label: "Example label",
       },

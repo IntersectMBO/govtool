@@ -15,6 +15,7 @@ import {
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/budgetProposal";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfMainnet } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
@@ -62,7 +63,7 @@ test.describe("Budget proposal 01 wallet", () => {
       test("12D_1. Should verify all field of “proposal ownership” section", async () => {
         // default field
         await expect(
-          budgetProposalSubmissionPage.companyTypeSelect
+          budgetProposalSubmissionPage.proposalCommittee
         ).toBeVisible();
 
         await expect(
@@ -70,10 +71,10 @@ test.describe("Budget proposal 01 wallet", () => {
         ).toBeVisible();
 
         // company type field
-        await budgetProposalSubmissionPage.companyTypeSelect.click();
+        await budgetProposalSubmissionPage.proposalCommittee.click();
         await budgetProposalSubmissionPage.currentPage
-          .getByRole("option", { name: CompanyEnum.Company })
-          .click(); //BUG missing testId
+          .getByTestId("company-submission")
+          .click();
 
         await expect(
           budgetProposalSubmissionPage.companyNameInput
@@ -86,10 +87,10 @@ test.describe("Budget proposal 01 wallet", () => {
         ).toBeVisible();
 
         // group type field
-        await budgetProposalSubmissionPage.companyTypeSelect.click();
+        await budgetProposalSubmissionPage.proposalCommittee.click();
         await budgetProposalSubmissionPage.currentPage
-          .getByRole("option", { name: CompanyEnum.Group })
-          .click(); //BUG missing testId
+          .getByTestId("group-submission")
+          .click();
         await expect(budgetProposalSubmissionPage.groupNameInput).toBeVisible();
         await expect(budgetProposalSubmissionPage.groupTypeInput).toBeVisible();
         await expect(
@@ -421,6 +422,7 @@ test.describe("Budget proposal 01 wallet", () => {
 });
 
 test("12C. Should save and view draft proposal", async ({ browser }) => {
+  await skipIfMainnet();
   const page = await createNewPageWithWallet(browser, {
     storageState: budgetProposal02AuthFile,
     wallet: budgetProposal02Wallet,
@@ -436,7 +438,7 @@ test("12C. Should save and view draft proposal", async ({ browser }) => {
 
   await budgetSubmissionPage.viewLastDraft();
 
-  await expect(budgetSubmissionPage.companyTypeSelect).toHaveText(
+  await expect(budgetSubmissionPage.proposalCommittee).toHaveText(
     draftProposalOwnership.companyType
   );
 
@@ -469,6 +471,8 @@ test("12C. Should save and view draft proposal", async ({ browser }) => {
 });
 
 test("12H. Should submit a valid budget proposal", async ({ browser }) => {
+  await skipIfMainnet();
+
   const page = await createNewPageWithWallet(browser, {
     storageState: budgetProposal03AuthFile,
     wallet: budgetProposal03Wallet,
@@ -489,6 +493,7 @@ test("12H. Should submit a valid budget proposal", async ({ browser }) => {
 test("12I. Should submit a valid draft budget proposal", async ({
   browser,
 }) => {
+  await skipIfMainnet();
   test.slow();
   const page = await createNewPageWithWallet(browser, {
     storageState: budgetProposal04AuthFile,
@@ -517,6 +522,7 @@ test("12I. Should submit a valid draft budget proposal", async ({
 test("12J. Should verify created proposal appears in my proposals list", async ({
   browser,
 }) => {
+  await skipIfMainnet();
   test.slow();
   const page = await createNewPageWithWallet(browser, {
     storageState: budgetProposal05AuthFile,

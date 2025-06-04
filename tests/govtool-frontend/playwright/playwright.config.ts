@@ -61,7 +61,6 @@ export default defineConfig({
     {
       name: "dRep auth setup",
       testMatch: "**/dRep.auth.setup.ts",
-      dependencies: environments.ci ? ["dRep setup"] : [],
     },
     {
       name: "proposal discussion auth setup",
@@ -143,7 +142,7 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.dRep.spec.ts",
       dependencies: environments.ci
-        ? ["dRep auth setup"]
+        ? ["dRep auth setup" , "dRep setup"]
         : [],
         teardown: environments.ci && "cleanup artifacts",
     },

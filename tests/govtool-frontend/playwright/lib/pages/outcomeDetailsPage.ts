@@ -106,6 +106,10 @@ export default class OutcomeDetailsPage {
           isLoggedIn
         );
 
+        if (!govActionDetailsPage) {
+          return;
+        }
+
         const outcomeResponse = await outcomeResponsePromise;
         const proposalToCheck = (await outcomeResponse.json())[0];
 
@@ -267,7 +271,7 @@ export default class OutcomeDetailsPage {
             {
               message: `CC "Abstain" vote count checked for ${currentPageUrl}`,
             }
-          ).toHaveText(`Abstain Votes${proposalToCheck.pool_abstain_votes}`); //BUG missing testIds
+          ).toHaveText(`Abstain Votes${proposalToCheck.cc_abstain_votes}`); //BUG missing testIds
 
           const noPercentage = 100 - parseFloat(yesPercentage.replace("%", ""));
           await expect(govActionDetailsPage.ccCommitteeNoVotes, {

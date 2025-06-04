@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { InvalidMetadataType } from "@types";
+import { BudgetProposalFilterTypes, InvalidMetadataType } from "@types";
 
 export const SECURITY_RELEVANT_PARAMS_MAP: Record<string, string> = {
   maxBlockBodySize: "max_block_size",
@@ -61,3 +61,15 @@ export const InvalidMetadata: InvalidMetadataType[] = [
     hash: "e71bf6171adda3754a87fff5c2d8d9e404eb3366428a5be13f7e76357a39004f",
   },
 ];
+
+export const budgetProposalfilterOptionNames: Array<BudgetProposalFilterTypes> =
+  [
+    "Newest",
+    "Oldest",
+    "Most comments",
+    "Least comments",
+    "Name A-Z",
+    "Name Z-A",
+    "Proposer A-Z",
+    "Proposer Z-A",
+  ];

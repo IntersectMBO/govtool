@@ -99,8 +99,8 @@ export const DashboardGovernanceActionDetails = () => {
 
   useEffect(() => {
     const isProposalNotFound =
-      (error as AxiosError)?.response?.data ===
-      `Proposal with id: ${fullProposalId} not found`;
+      error instanceof AxiosError &&
+      error.response?.data.match(/Proposal with id: .* not found/);
     if (isProposalNotFound && fullProposalId) {
       navigate(
         OUTCOMES_PATHS.governanceActionOutcomes.replace(":id", fullProposalId),

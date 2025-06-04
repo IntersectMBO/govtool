@@ -12,9 +12,30 @@ changes.
 
 ### Added
 
-- Add maintenance ending banner [Issue 3647](https://github.com/IntersectMBO/govtool/issues/3647)
+- Preserve maintenance ending banner state on the wallet connection change [Issue 3681](https://github.com/IntersectMBO/govtool/issues/3681)
 
 ### Fixed
+
+- Fix missing off chain references in DRep details [Issue 3490](https://github.com/IntersectMBO/govtool/issues/3490)
+- Fix blank screen and type error on linkReferences when navigating to edit dRep page that has no links [Issue 3714](https://github.com/IntersectMBO/govtool/issues/3714)
+- Fix adding two link input fields when editing the dRep form when no links are present initially [Issue 3709](https://github.com/IntersectMBO/govtool/issues/3709)
+
+### Changed
+
+### Removed
+
+## [v2.0.23](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.23) 2025-05-22
+
+### Added
+
+- Add CIP-129 support for gov_actions hashes in Live Voting (governance actions) [Issue 3619](https://github.com/IntersectMBO/govtool/issues/3619)
+
+- Add maintenance ending banner [Issue 3647](https://github.com/IntersectMBO/govtool/issues/3647)
+- Add support for the Protocol Parameter Change and Hard Fork Initiation governance actions
+
+### Fixed
+
+- Fix displaying proposals title in details page [Issue 3192](https://github.com/IntersectMBO/govtool/issues/3192)
 
 ### Changed
 

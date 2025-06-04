@@ -6,6 +6,7 @@ import React, {
   useMemo,
 } from "react";
 import { InitOptions, WidgetApi, loadSpace } from "@usersnap/browser";
+import { useTranslation } from "react-i18next";
 
 type WidgetValues = {
   assignee?: string;
@@ -65,6 +66,7 @@ export const UsersnapProvider = ({
   children,
 }: UsersnapProviderProps) => {
   const [usersnapApi, setUsersnapApi] = useState<UsersnapAPI | null>(null);
+  const { t } = useTranslation();
 
   const openFeedbackWindow = useCallback(() => {
     if (usersnapApi) {
@@ -85,7 +87,7 @@ export const UsersnapProvider = ({
       }
     };
     initUsersnapSpace();
-  }, [initParams, API_KEY]);
+  }, [initParams, API_KEY, t]);
 
   const value = useMemo(() => ({ openFeedbackWindow }), [openFeedbackWindow]);
 

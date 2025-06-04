@@ -12,8 +12,8 @@ export enum GovernanceActionType {
 }
 
 export enum GovernanceActionField {
-  Input = "input",
-  TextArea = "textarea",
+  Input = "Input",
+  TextArea = "TextArea",
 }
 
 export type FieldSchema = {
@@ -22,6 +22,7 @@ export type FieldSchema = {
   placeholderI18nKey: NestedKeys<typeof en>;
   tipI18nKey?: NestedKeys<typeof en>;
   rules?: Omit<RegisterOptions, "valueAsNumber" | "valueAsDate" | "setValueAs">;
+  maxLength?: number;
 };
 
 // Following properties are based on [CIP-108](https://github.com/Ryun1/CIPs/blob/governance-metadata-actions/CIP-0108/README.md)
@@ -60,19 +61,27 @@ export type NewConstitutionActionFieldSchema = Partial<{
   constitutionHash: FieldSchema;
   scriptHash: FieldSchema;
 }>;
+export type ProtocolParameterActionFieldSchema = Partial<{
+  prevGovernanceActionHash: FieldSchema;
+  prevGovernanceActionIndex: FieldSchema;
+  protocolParameters: FieldSchema;
+}>;
 
 export type GovernanceActionFieldSchemas =
   | SharedGovernanceActionFieldSchema &
       TreasuryGovernanceActionFieldSchema &
       NewCommitteeActionFieldSchema &
       HardForkInitiationActionFieldSchema &
-      NewConstitutionActionFieldSchema;
+      NewConstitutionActionFieldSchema &
+      ProtocolParameterActionFieldSchema;
 
 export type GovernanceActionFields = Record<
   | GovernanceActionType.InfoAction
   | GovernanceActionType.TreasuryWithdrawals
   | GovernanceActionType.NoConfidence
   | GovernanceActionType.NewCommittee
-  | GovernanceActionType.NewConstitution,
+  | GovernanceActionType.NewConstitution
+  | GovernanceActionType.HardForkInitiation
+  | GovernanceActionType.ParameterChange,
   GovernanceActionFieldSchemas
 >;

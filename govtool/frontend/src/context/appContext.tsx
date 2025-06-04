@@ -39,9 +39,6 @@ const AppContext = createContext<AppContextType | null>(null);
  * @param children - The child components to render.
  */
 const AppContextProvider = ({ children }: PropsWithChildren) => {
-  useEffect(() => {
-    Sentry.setTag("component_name", "AppContextProvider");
-  }, []);
   const { fetchEpochParams, epochParams } = useGetEpochParams();
   const { fetchNetworkInfo, networkInfo } = useGetNetworkInfo();
 

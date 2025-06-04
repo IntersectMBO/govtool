@@ -50,6 +50,8 @@ export const CreateGovernanceActionForm = ({
           | GovernanceActionType.NewCommittee
           | GovernanceActionType.NewConstitution
           | GovernanceActionType.NoConfidence
+          | GovernanceActionType.HardForkInitiation
+          | GovernanceActionType.ParameterChange
       ],
     ).some(
       (field) => !watch(field as unknown as Parameters<typeof watch>[0]),
@@ -73,6 +75,8 @@ export const CreateGovernanceActionForm = ({
           | GovernanceActionType.NewCommittee
           | GovernanceActionType.NewConstitution
           | GovernanceActionType.NoConfidence
+          | GovernanceActionType.HardForkInitiation
+          | GovernanceActionType.ParameterChange
       ],
     ).map(([key, field]) => {
       const fieldProps = {
@@ -85,6 +89,7 @@ export const CreateGovernanceActionForm = ({
           ? t(field.placeholderI18nKey)
           : undefined,
         rules: field.rules,
+        maxLength: field.maxLength,
       };
 
       if (field.component === GovernanceActionField.Input) {

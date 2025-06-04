@@ -51,13 +51,8 @@ export default class BudgetDiscussionSubmissionPage {
   readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
   readonly saveDraftBtn = this.page.getByTestId("draft-button");
   readonly submitBtn = this.page.getByTestId("submit-button");
-  readonly countryOfIncorporationBtn = this.page.getByTestId(
-    "country-of-incorporation"
-  );
 
-  readonly agreeCheckbox = this.page.getByLabel(
-    "I agree to the information in"
-  ); //BUG missing test Ids
+  readonly agreeCheckbox = this.page.getByTestId("agree-checkbox");
   readonly submitCheckbox = this.page.getByTestId("submit-checkbox");
 
   // input
@@ -65,18 +60,18 @@ export default class BudgetDiscussionSubmissionPage {
   readonly linkUrlInput = this.page.getByTestId("link-0-url-input");
 
   // proposal-ownership
-  readonly companyNameInput = this.page.getByLabel("Company Name *"); //BUG missing test Ids
-  readonly companyDomainNameInput = this.page.getByLabel(
-    "Company Domain Name *"
-  ); //BUG missing test Ids
-  readonly groupNameInput = this.page.getByLabel("Group Name *"); //BUG missing test Ids
-  readonly groupTypeInput = this.page.getByLabel("Type of Group *"); //BUG missing test Ids
-  readonly keyInformationOfGroupInput = this.page.getByLabel(
-    "Key Information to Identify"
-  ); //BUG missing test Ids
-  readonly contactDetailsInput = this.page.getByLabel(
-    "Please provide your preferred"
-  ); //BUG missing test Ids
+  readonly companyNameInput = this.page.getByTestId("company-name-input");
+  readonly companyDomainNameInput = this.page.getByTestId(
+    "company-domain-input"
+  );
+  readonly groupNameInput = this.page.getByTestId("group-name-input");
+  readonly groupTypeInput = this.page.getByTestId("group-type-input");
+  readonly keyInformationOfGroupInput = this.page.getByTestId(
+    "group-identity-information-input"
+  );
+  readonly contactDetailsInput = this.page.getByTestId(
+    "provide-preferred-input"
+  );
 
   // problem-statements
   readonly problemStatementInput = this.page.getByTestId(
@@ -88,56 +83,50 @@ export default class BudgetDiscussionSubmissionPage {
   readonly suplimentaryEndorsementInput = this.page.getByTestId(
     "supplementary-endorsement-input"
   );
-  readonly productRoadmapDescriptionInput = this.page.getByLabel(
-    "Please explain how your"
-  ); // BUG missing test Ids
+  readonly productRoadmapDescriptionInput = this.page.getByTestId(
+    "proposal-roadmap-description-input"
+  );
 
   // proposal-details
-  readonly proposalNameInput = this.page.getByLabel(
-    "What is your proposed name to"
-  ); //BUG missing testId
+  readonly proposalNameInput = this.page.getByTestId("proposal-name-input");
   readonly proposalDescriptionInput = this.page.getByTestId(
     "proposal-description-input"
   );
   readonly proposalKeyDependenciesInput = this.page.getByTestId(
     "key-dependencies-input"
   );
-  readonly proposalMaintainAndSupportInput = this.page.getByLabel(
-    "How will this proposal be"
-  ); //BUG missing testId
+  readonly proposalMaintainAndSupportInput = this.page.getByTestId(
+    "proposal-maintain-and-support-input"
+  );
   readonly milestonesInput = this.page.getByTestId(
     "key-proposal-deliverables-input"
   );
   readonly teamSizeAndDurationInput = this.page.getByTestId(
     "resourcing-duration-estimates-input"
   );
-  readonly previousExperienceInput = this.page.getByLabel(
-    "Please provide previous"
-  ); //BUG missing testId
-  readonly otherDescriptionInput = this.page.getByLabel(
-    "Please describe what you have"
+  readonly previousExperienceInput = this.page.getByTestId(
+    "proposal-previous-experience-input"
+  );
+  readonly otherDescriptionInput = this.page.getByTestId(
+    "other-contract-description"
   );
 
   // costing
-  readonly adaAmountInput = this.page.getByLabel("ADA Amount *"); //BUG missing test Ids
-  readonly usaToAdaCnversionRateInput = this.page.getByLabel(
-    "USD to ADA Conversion Rate *"
-  ); //BUG missing test Ids
-  readonly preferredCurrencyInput = this.page.getByLabel(
-    "Amount in preferred currency *"
+  readonly adaAmountInput = this.page.getByTestId("ada-amount-input");
+  readonly usaToAdaCnversionRateInput = this.page.getByTestId(
+    "usd-ada-conversion-input"
+  );
+  readonly preferredCurrencyInput = this.page.getByTestId(
+    "preferred-currency-amount-input"
   );
   readonly costBreakdownInput = this.page.getByTestId("cost-breakdown-input");
   readonly venderDetailsInput = this.page.getByLabel("Please provide further"); //BUG missing test Ids
 
   // select
-  readonly beneficiaryCountrySelect = this.page.getByTestId(
-    "beneficiary-country-of-residence"
+  readonly proposalCommittee = this.page.getByTestId("proposal-committee");
+  readonly countryOfIncorporationBtn = this.page.getByTestId(
+    "country-of-incorporation"
   );
-  readonly beneficiaryNationalitySelect = this.page.getByTestId(
-    "beneficiary-nationality"
-  );
-
-  readonly companyTypeSelect = this.page.getByTestId("beneficiary-type");
   readonly publicChampionSelect = this.page.getByTestId(
     "proposal-public-champion"
   );
@@ -234,9 +223,9 @@ export default class BudgetDiscussionSubmissionPage {
 
   // costing
   readonly adaAmountContent = this.page.getByTestId("ada-amount-content");
-  readonly adaToUsdConversionRateContent = this.page.getByTestId(
+  readonly usdToAdaConversionRateContent = this.page.getByTestId(
     "usd-to-ada-conversion-rate-content"
-  ); // BUG typo
+  );
   readonly preferredCurrencyContent = this.page.getByTestId(
     "preferred-currency-content"
   );
@@ -271,10 +260,10 @@ export default class BudgetDiscussionSubmissionPage {
     proposalOwnership: BudgetProposalOwnershipProps,
     isNaviagted = true
   ) {
-    await this.companyTypeSelect.click();
+    await this.proposalCommittee.click();
     await this.page
-      .getByRole("option", { name: proposalOwnership.companyType })
-      .click(); //BUG missing testId
+      .getByTestId(`${proposalOwnership.companyType.toLowerCase()}-submission`)
+      .click();
 
     await this.contactDetailsInput.fill(proposalOwnership.contactDetails);
 
@@ -391,10 +380,10 @@ export default class BudgetDiscussionSubmissionPage {
     await this.usaToAdaCnversionRateInput.fill(
       costing.usdToAdaConversionRate.toString()
     );
-    await this.costBreakdownInput.fill(costing.costBreakdown);
     await this.preferredCurrencyInput.fill(
       costing.AmountInPreferredCurrency.toString()
     );
+    await this.costBreakdownInput.fill(costing.costBreakdown);
   }
 
   async fillupCostingForm(costing: BudgetCostingProps) {
@@ -772,7 +761,7 @@ export default class BudgetDiscussionSubmissionPage {
     await expect(this.adaAmountContent).toHaveText(
       `₳ ${formatWithThousandSeparator(proposalInformations.costing.adaAmount)}`
     );
-    await expect(this.adaToUsdConversionRateContent).toHaveText(
+    await expect(this.usdToAdaConversionRateContent).toHaveText(
       proposalInformations.costing.usdToAdaConversionRate.toString()
     );
 
@@ -796,13 +785,9 @@ export default class BudgetDiscussionSubmissionPage {
 
     // further information
     for (let i = 0; i < proposalInformations.furtherInformation.length; i++) {
-      //BUG missing testId
-      await expect(
-        this.currentPage.getByRole("link", {
-          name: proposalInformations.furtherInformation[i].prop_link_text,
-          exact: true,
-        })
-      ).toBeVisible();
+      await expect(this.currentPage.getByTestId(`link-${i}-label`)).toHaveText(
+        proposalInformations.furtherInformation[i].prop_link_text
+      );
     }
 
     // administration and auditing
@@ -836,7 +821,7 @@ export default class BudgetDiscussionSubmissionPage {
     proposalOwnership: BudgetProposalOwnershipProps,
     isValid: boolean = true
   ) {
-    const companyTypeSelectContent = await this.companyTypeSelect.textContent();
+    const companyTypeSelectContent = await this.proposalCommittee.textContent();
 
     if (isValid) {
       if (proposalOwnership.companyType === "Company") {

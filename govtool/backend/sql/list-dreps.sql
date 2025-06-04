@@ -126,7 +126,35 @@ DRepData AS (
     off_chain_vote_drep_data.motivations,
     off_chain_vote_drep_data.qualifications,
     off_chain_vote_drep_data.image_url,
-    off_chain_vote_drep_data.image_hash
+    off_chain_vote_drep_data.image_hash,
+    COALESCE(
+      (
+        SELECT jsonb_agg(ref)
+        FROM jsonb_array_elements(
+          CASE 
+            WHEN (ocvd.json::jsonb)->'body'->'references' IS NOT NULL 
+            THEN (ocvd.json::jsonb)->'body'->'references' 
+            ELSE '[]'::jsonb 
+          END
+        ) AS ref
+        WHERE ref->>'@type' = 'Identity'
+      ),
+      '[]'::jsonb
+    ) AS identity_references,
+    COALESCE(
+      (
+        SELECT jsonb_agg(ref)
+        FROM jsonb_array_elements(
+          CASE 
+            WHEN (ocvd.json::jsonb)->'body'->'references' IS NOT NULL 
+            THEN (ocvd.json::jsonb)->'body'->'references' 
+            ELSE '[]'::jsonb 
+          END
+        ) AS ref
+        WHERE ref->>'@type' = 'Link'
+      ),
+      '[]'::jsonb
+    ) AS link_references
   FROM
     drep_hash dh
     JOIN RankedDRepRegistration ON RankedDRepRegistration.drep_hash_id = dh.id
@@ -212,7 +240,29 @@ DRepData AS (
     off_chain_vote_drep_data.motivations,
     off_chain_vote_drep_data.qualifications,
     off_chain_vote_drep_data.image_url,
-    off_chain_vote_drep_data.image_hash
+    off_chain_vote_drep_data.image_hash,
+    (
+      SELECT jsonb_agg(ref)
+      FROM jsonb_array_elements(
+        CASE 
+          WHEN (ocvd.json::jsonb)->'body'->'references' IS NOT NULL 
+          THEN (ocvd.json::jsonb)->'body'->'references' 
+          ELSE '[]'::jsonb 
+        END
+      ) AS ref
+      WHERE ref->>'@type' = 'Identity'
+    ),
+    (
+      SELECT jsonb_agg(ref)
+      FROM jsonb_array_elements(
+        CASE 
+          WHEN (ocvd.json::jsonb)->'body'->'references' IS NOT NULL 
+          THEN (ocvd.json::jsonb)->'body'->'references' 
+          ELSE '[]'::jsonb 
+        END
+      ) AS ref
+      WHERE ref->>'@type' = 'Link'
+    )
 )
 SELECT * FROM DRepData
 WHERE

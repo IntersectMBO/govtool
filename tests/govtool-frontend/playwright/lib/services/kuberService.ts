@@ -177,6 +177,7 @@ const kuberService = {
     }));
 
     const inputs = wallets.map((wallet) => wallet.address);
+    inputs.push(getWalletConfigForFaucet().address);
     return kuber.signAndSubmitTx({
       inputs,
       selections,
@@ -237,8 +238,8 @@ const kuberService = {
   },
 
   dRepRegistration: (
-    stakeSigningKey: string,
-    pkh: string,
+    dRepSigningKey: string,
+    dRepPkh: string,
     metadata: WalletAndAnchorType
   ) => {
     const kuber = new Kuber(
@@ -247,12 +248,12 @@ const kuberService = {
     );
 
     const req = {
-      certificates: [Kuber.generateCert("registerdrep", pkh, metadata)],
+      certificates: [Kuber.generateCert("registerdrep", dRepPkh, metadata)],
       selections: [
         {
           type: "PaymentSigningKeyShelley_ed25519",
           description: "Stake Signing Key",
-          cborHex: `5820${stakeSigningKey}`,
+          cborHex: `5820${dRepSigningKey}`,
         },
       ],
     };
@@ -261,7 +262,7 @@ const kuberService = {
   dRepDeRegistration: (
     addr: string,
     signingKey: string,
-    stakePrivateKey: string,
+    dRepPrivateKey: string,
     pkh: string
   ) => {
     const kuber = new Kuber(addr, signingKey);
@@ -269,7 +270,7 @@ const kuberService = {
       {
         type: "PaymentSigningKeyShelley_ed25519",
         description: "Payment Signing Key",
-        cborHex: "5820" + stakePrivateKey,
+        cborHex: "5820" + dRepPrivateKey,
       },
     ];
     const req = {
@@ -287,13 +288,13 @@ const kuberService = {
     );
     const req = {
       certificates: wallets.map((wallet) =>
-        Kuber.generateCert("deregisterdrep", wallet.stake.pkh)
+        Kuber.generateCert("deregisterdrep", wallet.dRep.pkh)
       ),
       selections: wallets.map((wallet) => {
         return {
           type: "PaymentSigningKeyShelley_ed25519",
           description: "Stake Signing Key",
-          cborHex: `5820${wallet.stake.private}`,
+          cborHex: `5820${wallet.dRep.private}`,
         };
       }),
       inputs: getWalletConfigForFaucet().address,

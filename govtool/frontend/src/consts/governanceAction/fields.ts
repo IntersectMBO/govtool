@@ -262,6 +262,88 @@ export const GOVERNANCE_ACTION_FIELDS: GovernanceActionFields = {
         "createGovernanceAction.fields.declarations.scriptHash.placeholder",
     },
   },
+  [GovernanceActionType.HardForkInitiation]: {
+    ...sharedGovernanceActionFields,
+    prevGovernanceActionHash: {
+      component: GovernanceActionField.Input,
+      labelI18nKey:
+        "createGovernanceAction.fields.declarations.prevGovernanceActionHash.label",
+      placeholderI18nKey:
+        "createGovernanceAction.fields.declarations.prevGovernanceActionHash.placeholder",
+    },
+    prevGovernanceActionIndex: {
+      component: GovernanceActionField.Input,
+      labelI18nKey:
+        "createGovernanceAction.fields.declarations.prevGovernanceActionIndex.label",
+      placeholderI18nKey:
+        "createGovernanceAction.fields.declarations.prevGovernanceActionIndex.placeholder",
+      rules: {
+        validate: numberValidation,
+      },
+    },
+    major: {
+      component: GovernanceActionField.Input,
+      labelI18nKey: "createGovernanceAction.fields.declarations.major.label",
+      placeholderI18nKey:
+        "createGovernanceAction.fields.declarations.major.placeholder",
+      rules: {
+        required: {
+          value: true,
+          message: I18n.t("createGovernanceAction.fields.validations.required"),
+        },
+        validate: numberValidation,
+      },
+    },
+    minor: {
+      component: GovernanceActionField.Input,
+      labelI18nKey: "createGovernanceAction.fields.declarations.minor.label",
+      placeholderI18nKey:
+        "createGovernanceAction.fields.declarations.minor.placeholder",
+      rules: {
+        required: {
+          value: true,
+          message: I18n.t("createGovernanceAction.fields.validations.required"),
+        },
+        validate: numberValidation,
+      },
+    },
+  },
+  [GovernanceActionType.ParameterChange]: {
+    ...sharedGovernanceActionFields,
+    prevGovernanceActionHash: {
+      component: GovernanceActionField.Input,
+      labelI18nKey:
+        "createGovernanceAction.fields.declarations.prevGovernanceActionHash.label",
+      placeholderI18nKey:
+        "createGovernanceAction.fields.declarations.prevGovernanceActionHash.placeholder",
+    },
+    prevGovernanceActionIndex: {
+      component: GovernanceActionField.Input,
+      labelI18nKey:
+        "createGovernanceAction.fields.declarations.prevGovernanceActionIndex.label",
+      placeholderI18nKey:
+        "createGovernanceAction.fields.declarations.prevGovernanceActionIndex.placeholder",
+      rules: {
+        validate: numberValidation,
+      },
+    },
+    protocolParameters: {
+      component: GovernanceActionField.TextArea,
+      maxLength: 5000,
+      labelI18nKey:
+        "createGovernanceAction.fields.declarations.protocolParameters.label",
+      placeholderI18nKey:
+        "createGovernanceAction.fields.declarations.protocolParameters.placeholder",
+      rules: {
+        required: {
+          value: true,
+          message: I18n.t("createGovernanceAction.fields.validations.required"),
+        },
+      },
+      tipI18nKey:
+        "createGovernanceAction.fields.declarations.protocolParameters.tip",
+    },
+  },
 } as const;
 
 export const GOVERNANCE_ACTION_CONTEXT = {

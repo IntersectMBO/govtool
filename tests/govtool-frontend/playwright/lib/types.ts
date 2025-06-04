@@ -196,13 +196,38 @@ export type ProposalCreateRequest = {
   has_guardrails?: boolean;
   is_draft: boolean;
 };
-
 export type ProposedGovAction = {
   id: number;
   attributes: {
     gov_action_type_name: string;
+    prop_comments_number: number;
+    prop_likes: number;
+    prop_dislikes: number;
     createdAt: string;
     updatedAt: string;
+    content: {
+      id: string;
+      attributes: {
+        proposal_id: string;
+        prop_name: string;
+      };
+    };
+    creator: {
+      data: {
+        id: number;
+        attributes: {
+          govtool_username: string;
+        };
+      };
+    };
+    bd_proposal_detail: {
+      data: {
+        id: number;
+        attributes: {
+          proposal_name: string;
+        };
+      };
+    };
   };
 };
 
@@ -521,3 +546,25 @@ export enum BudgetProposalStageEnum {
 }
 
 export type VoterType = "DReps" | "SPOs" | "CC";
+
+export type BudgetProposalFilterTypes =
+  | "Newest"
+  | "Oldest"
+  | "Most comments"
+  | "Least comments"
+  | "Name A-Z"
+  | "Name Z-A"
+  | "Proposer A-Z"
+  | "Proposer Z-A";
+
+export type ProposalDiscussionFilterTypes =
+  | "Newest"
+  | "Oldest"
+  | "Most likes"
+  | "Least likes"
+  | "Most dislikes"
+  | "Least dislikes"
+  | "Most comments"
+  | "Least comments"
+  | "Name A-Z"
+  | "Name Z-A";

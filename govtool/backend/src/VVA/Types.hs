@@ -5,26 +5,28 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NamedFieldPuns        #-}
 {-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
 
 module VVA.Types where
 
 import           Control.Concurrent.QSem
 import           Control.Exception
-import           Control.Monad.Except       (MonadError)
-import           Control.Monad.Fail         (MonadFail)
-import           Control.Monad.IO.Class     (MonadIO)
-import           Control.Monad.Reader       (MonadReader)
+import           Control.Monad.Except                  (MonadError)
+import           Control.Monad.Fail                    (MonadFail)
+import           Control.Monad.IO.Class                (MonadIO)
+import           Control.Monad.Reader                  (MonadReader)
 
-import           Data.Aeson                 (Value, ToJSON (..), object, (.=))
-import qualified Data.Cache                 as Cache
+import           Data.Aeson                            (Value, ToJSON (..), object, (.=))
+import qualified  Data.Cache as Cache
 import           Data.Has
-import           Data.Pool                  (Pool)
-import           Data.Text                  (Text)
-import           Data.Time                  (UTCTime, LocalTime)
+import           Data.Pool                             (Pool)
+import           Data.Text                             (Text)
+import           Data.Time                             (UTCTime, LocalTime)
 import           Data.Scientific
 
-import           Database.PostgreSQL.Simple (Connection)
+import           Database.PostgreSQL.Simple            (Connection)
 import           Database.PostgreSQL.Simple.FromRow
+import           Database.PostgreSQL.Simple.FromField  (FromField(..), returnError, ResultError(ConversionFailed))
 
 import           VVA.Cache
 import           VVA.Config
@@ -107,7 +109,24 @@ data DRepVotingPowerList
 
 data DRepStatus = Active | Inactive | Retired deriving (Show, Eq, Ord)
 
+instance FromField DRepStatus where
+  fromField f mdata = do
+    (value :: Text) <- fromField f mdata
+    case value of
+      "Active" -> return Active
+      "Inactive" -> return Inactive
+      "Retired" -> return Retired
+      _ -> returnError ConversionFailed f "Invalid DRepStatus"
+
 data DRepType = DRep | SoleVoter deriving (Show, Eq)
+
+instance FromField DRepType where
+  fromField f mdata = do
+    (value :: Text) <- fromField f mdata
+    case value of
+      "DRep" -> return DRep
+      "SoleVoter" -> return SoleVoter
+      _ -> returnError ConversionFailed f "Invalid DRepType"
 
 data DRepRegistration
   = DRepRegistration
@@ -127,11 +146,38 @@ data DRepRegistration
       , dRepRegistrationGivenName              :: Maybe Text
       , dRepRegistrationObjectives             :: Maybe Text
       , dRepRegistrationMotivations            :: Maybe Text
-      , dRepRegistrationQualifications         :: Maybe Text
+      , dRepRegistrationQualifications          :: Maybe Text
       , dRepRegistrationImageUrl               :: Maybe Text
       , dRepRegistrationImageHash              :: Maybe Text
+      , dRepRegistrationIdentityReferences     :: Maybe Value
+      , dRepRegistrationLinkReferences         :: Maybe Value
       }
   deriving (Show)
+
+instance FromRow DRepRegistration where
+  fromRow =
+    DRepRegistration
+      <$> field -- dRepRegistrationDRepHash
+      <*> field -- dRepRegistrationView
+      <*> field -- dRepRegistrationIsScriptBased
+      <*> field -- dRepRegistrationUrl
+      <*> field -- dRepRegistrationDataHash
+      <*> (floor @Scientific <$> field) -- dRepRegistrationDeposit
+      <*> field -- dRepRegistrationVotingPower
+      <*> field -- dRepRegistrationStatus
+      <*> field -- dRepRegistrationType
+      <*> field -- dRepRegistrationLatestTxHash
+      <*> field -- dRepRegistrationLatestRegistrationDate
+      <*> field -- dRepRegistrationMetadataError
+      <*> field -- dRepRegistrationPaymentAddress
+      <*> field -- dRepRegistrationGivenName
+      <*> field -- dRepRegistrationObjectives
+      <*> field -- dRepRegistrationMotivations
+      <*> field -- dRepRegistrationQualifications
+      <*> field -- dRepRegistrationImageUrl
+      <*> field -- dRepRegistrationImageHash
+      <*> field -- dRepRegistrationIdentityReferences
+      <*> field -- dRepRegistrationLinkReferences
 
 data Proposal 
   = Proposal
@@ -211,6 +257,40 @@ instance ToJSON TransactionStatus where
       , "votingProcedure" .= votingProcedure
       ]
 
+data EnactedProposalDetails = EnactedProposalDetails
+  { enactedProposalDetailsId          :: Integer
+  , enactedProposalDetailsTxId        :: Integer
+  , enactedProposalDetailsIndex       :: Integer
+  , enactedProposalDetailsDescription :: Maybe Value
+  , enactedProposalDetailsHash        :: Text
+  }
+  deriving (Show)
+
+instance FromRow EnactedProposalDetails where
+  fromRow =
+    EnactedProposalDetails
+      <$> field
+      <*> field
+      <*> (floor @Scientific <$> field)
+      <*> field
+      <*> field
+
+instance ToJSON EnactedProposalDetails where
+  toJSON EnactedProposalDetails
+    { enactedProposalDetailsId
+    , enactedProposalDetailsTxId
+    , enactedProposalDetailsIndex
+    , enactedProposalDetailsDescription
+    , enactedProposalDetailsHash
+    } =
+      object
+        [ "id" .= enactedProposalDetailsId
+        , "tx_id" .= enactedProposalDetailsTxId
+        , "index" .= enactedProposalDetailsIndex
+        , "description" .= enactedProposalDetailsDescription
+        , "hash" .= enactedProposalDetailsHash
+        ]
+
 data CacheEnv
   = CacheEnv
       { proposalListCache                   :: Cache.Cache () [Proposal]
@@ -226,6 +306,7 @@ data CacheEnv
       , networkInfoCache                    :: Cache.Cache () NetworkInfo
       , networkTotalStakeCache              :: Cache.Cache () NetworkTotalStake
       , dRepVotingPowerListCache            :: Cache.Cache Text [DRepVotingPowerList]
+      , accountInfoCache                    :: Cache.Cache Text AccountInfo
       }
 
 data NetworkInfo
@@ -267,4 +348,12 @@ data Delegation
       , delegationDRepView          :: Text
       , delegationIsDRepScriptBased :: Bool
       , delegationTxHash            :: Text
+      }
+
+data AccountInfo
+  = AccountInfo
+      { accountInfoId            :: Integer
+      , accountInfoView          :: Text
+      , accountInfoIsRegistered  :: Bool
+      , accountInfoIsScriptBased :: Bool
       }

@@ -4,6 +4,7 @@ import { Box } from "@mui/material";
 
 import { useCardano } from "@context";
 import {
+  defaultEditDRepInfoValues,
   useEditDRepInfoForm,
   useGetDRepDetailsQuery,
   useTranslation,
@@ -41,27 +42,24 @@ export const EditDRepForm = ({
   useEffect(() => {
     if (loadUserData) {
       const data: DRepData = state ?? yourselfDRep;
-      const groupedReferences = data?.references?.reduce<
-        Record<string, Reference[]>
-      >((acc, reference) => {
-        const type = reference["@type"];
-        if (!acc[type]) {
-          acc[type] = [];
-        }
-        acc[type].push(reference);
-        return acc;
-      }, {});
+
       reset({
         ...data,
-        objectives: data?.objectives ?? "",
-        motivations: data?.motivations ?? "",
-        qualifications: data?.qualifications ?? "",
-        paymentAddress: data?.paymentAddress ?? "",
-        image: data?.image ?? "",
-        linkReferences: groupedReferences?.Link ?? [getEmptyReference("Link")],
-        identityReferences: groupedReferences?.Identity ?? [
-          getEmptyReference("Identity"),
-        ],
+        objectives: data?.objectives ?? defaultEditDRepInfoValues.objectives,
+        motivations: data?.motivations ?? defaultEditDRepInfoValues.motivations,
+        qualifications:
+          data?.qualifications ?? defaultEditDRepInfoValues.qualifications,
+        paymentAddress:
+          data?.paymentAddress ?? defaultEditDRepInfoValues.paymentAddress,
+        image: data?.image ?? defaultEditDRepInfoValues.image,
+        linkReferences:
+          Array.isArray(data?.linkReferences) && data.linkReferences.length > 0
+            ? data.linkReferences
+            : defaultEditDRepInfoValues.linkReferences,
+        identityReferences:
+          Array.isArray(data?.identityReferences) && data.identityReferences.length > 0
+            ? data.identityReferences
+            : defaultEditDRepInfoValues.identityReferences,
       });
     }
   }, [yourselfDRep, loadUserData]);
@@ -83,9 +81,3 @@ export const EditDRepForm = ({
     </Box>
   );
 };
-
-const getEmptyReference = (type: "Link" | "Identity") => ({
-  "@type": type,
-  uri: "",
-  label: "",
-});

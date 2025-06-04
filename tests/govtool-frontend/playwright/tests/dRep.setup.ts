@@ -45,11 +45,9 @@ setup("Register DRep of static wallets", async () => {
     const metadataPromises = dRepWallets.map(async (dRepWallet) => {
       const metadataResponse = await uploadMetadataAndGetJsonHash();
       const givenName = metadataResponse.givenName;
-      const index = dRepWallets.indexOf(dRepWallet);
-      dRepWallets[index] = {
-        ...dRepWallet,
-        givenName,
-      };
+
+      await walletManager.updateWalletGivenName(dRepWallet.address, givenName);
+
       return {
         ...metadataResponse,
         wallet: dRepWallet,

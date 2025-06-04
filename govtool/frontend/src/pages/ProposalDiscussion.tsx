@@ -12,6 +12,7 @@ import { useValidateMutation } from "@/hooks/mutations";
 import { useScreenDimension } from "@/hooks/useScreenDimension";
 import { Footer, TopNav } from "@/components/organisms";
 import { useGetDRepVotingPowerList, useGetVoterInfo } from "@/hooks";
+import { getAdaHolderVotingPower, getAccount } from "@/services";
 
 const ProposalDiscussion = React.lazy(
   () => import("@intersect.mbo/pdf-ui/cjs"),
@@ -79,6 +80,8 @@ export const ProposalDiscussionPillar = () => {
             username={username}
             setUsername={setUsername}
             epochParams={epochParams}
+            getAdaHolderVotingPower={getAdaHolderVotingPower}
+            getAccount={getAccount}
             {...snackbarContext}
           />
         </Suspense>

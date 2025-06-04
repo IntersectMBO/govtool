@@ -1,4 +1,10 @@
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
@@ -60,6 +66,8 @@ export const useCreateGovernanceActionForm = (
     buildNewConstitutionGovernanceAction,
     buildUpdateCommitteeGovernanceAction,
     buildSignSubmitConwayCertTx,
+    buildHardForkGovernanceAction,
+    buildProtocolParameterChangeGovernanceAction,
   } = useCardano();
 
   // App Management
@@ -84,6 +92,12 @@ export const useCreateGovernanceActionForm = (
     reset,
   } = useFormContext<CreateGovernanceActionValues>();
   const govActionType = watch("governance_action_type");
+
+  useEffect(() => {
+    if (govActionType === GovernanceActionType.ParameterChange) {
+      setValue("protocolParameters", JSON.stringify(protocolParams));
+    }
+  }, [govActionType]);
 
   // Navigation
   const backToForm = useCallback(() => {
@@ -211,6 +225,48 @@ export const useCreateGovernanceActionForm = (
           };
 
           return buildTreasuryGovernanceAction(treasuryActionDetails);
+        }
+        case GovernanceActionType.HardForkInitiation: {
+          if (
+            data.major === undefined ||
+            data.minor === undefined ||
+            data.prevGovernanceActionHash === undefined ||
+            data.prevGovernanceActionIndex === undefined
+          ) {
+            throw new Error(
+              t("errors.invalidHardForkInitiationGovernanceActionType"),
+            );
+          }
+          const hardForkActionDetails = {
+            ...commonGovActionDetails,
+            prevGovernanceActionHash: data.prevGovernanceActionHash,
+            prevGovernanceActionIndex: data.prevGovernanceActionIndex,
+            major: data.major,
+            minor: data.minor,
+          };
+          return buildHardForkGovernanceAction(hardForkActionDetails);
+        }
+
+        case GovernanceActionType.ParameterChange: {
+          if (
+            data.protocolParameters === undefined ||
+            data.prevGovernanceActionHash === undefined ||
+            data.prevGovernanceActionIndex === undefined
+          ) {
+            throw new Error(
+              t("errors.invalidParameterChangeGovernanceActionType"),
+            );
+          }
+          const protocolParamsUpdate = JSON.parse(data.protocolParameters);
+          const parameterChangeActionDetails = {
+            ...commonGovActionDetails,
+            protocolParamsUpdate,
+            prevGovernanceActionHash: data.prevGovernanceActionHash,
+            prevGovernanceActionIndex: data.prevGovernanceActionIndex,
+          };
+          return buildProtocolParameterChangeGovernanceAction(
+            parameterChangeActionDetails,
+          );
         }
         default:
           throw new Error(t("errors.invalidGovernanceActionType"));

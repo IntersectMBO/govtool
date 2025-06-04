@@ -147,7 +147,11 @@ test.describe("Check vote count", () => {
       : GovernanceActionType;
     const responsesPromise = Object.keys(voteWhiteListOption).map((filterKey) =>
       page.waitForResponse((response) =>
-        response.url().includes(`&type[]=${voteWhiteListOption[filterKey]}`)
+        response
+          .url()
+          .includes(
+            `proposal/list?page=0&pageSize=7&type[]=${voteWhiteListOption[filterKey]}`
+          )
       )
     );
 

@@ -130,7 +130,7 @@ type TreasuryProps = {
 
 type ProtocolParameterChangeProps = {
   prevGovernanceActionHash: string;
-  prevGovernanceActionIndex: number;
+  prevGovernanceActionIndex: string;
   protocolParamsUpdate: Partial<ProtocolParamsUpdate>;
 } & VotingAnchor;
 
@@ -166,7 +166,6 @@ export type QuorumThreshold = {
   numerator: string;
   denominator: string;
 };
-
 type ProtocolParamsUpdate = {
   adaPerUtxo: string;
   collateralPercentage: number;
@@ -226,6 +225,7 @@ interface CardanoContextType {
   setStakeKey: (key: string) => void;
   stakeKeys: string[];
   walletApi?: CardanoApiWallet;
+  walletName?: string;
   registeredStakeKeysListState: string[];
   buildSignSubmitConwayCertTx: ({
     certBuilder,
@@ -314,6 +314,7 @@ const CardanoProvider = (props: Props) => {
     changeAddress: undefined,
     usedAddress: undefined,
   });
+  const [walletName, setWalletName] = useState<string | undefined>(undefined);
   const { t } = useTranslation();
   const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
@@ -355,25 +356,25 @@ const CardanoProvider = (props: Props) => {
   const isStakeKeyRegistered = () => !!registeredStakeKeysListState.length;
 
   const enable = useCallback(
-    async (walletName: string) => {
-      setIsEnableLoading(walletName);
+    async (name: string) => {
+      setIsEnableLoading(name);
       await checkIsMaintenanceOn();
 
-      // todo: use .getSupportedExtensions() to check if wallet supports CIP-95
-      if (!isEnabled && walletName) {
+      // TODO: use .getSupportedExtensions() to check if wallet supports CIP-95
+      if (!isEnabled && name) {
         try {
           // Check that this wallet supports CIP-95 connection
-          if (!window.cardano[walletName].supportedExtensions) {
+          if (!window.cardano[name].supportedExtensions) {
             throw new Error(t("errors.walletNoCIP30Support"));
           } else if (
-            !window.cardano[walletName].supportedExtensions.some(
+            !window.cardano[name].supportedExtensions.some(
               (item) => item.cip === 95,
             )
           ) {
             throw new Error(t("errors.walletNoCIP30Nor90Support"));
           }
           // Enable wallet connection
-          const enabledApi: CardanoApiWallet = await window.cardano[walletName]
+          const enabledApi: CardanoApiWallet = await window.cardano[name]
             .enable({
               extensions: [{ cip: 95 }],
             })
@@ -382,7 +383,7 @@ const CardanoProvider = (props: Props) => {
                 category: "wallet",
                 message: "Wallet connected",
                 level: "info",
-                data: window.cardano[walletName],
+                data: window.cardano[name],
               });
               return enabledWalletApi;
             })
@@ -394,6 +395,7 @@ const CardanoProvider = (props: Props) => {
 
           setIsEnabled(true);
           setWalletApi(enabledApi);
+          setWalletName(name);
           // Check if wallet has enabled the CIP-95 extension
           const enabledExtensions = await enabledApi.getExtensions();
           if (!enabledExtensions.some((item) => item.cip === 95)) {
@@ -479,7 +481,7 @@ const CardanoProvider = (props: Props) => {
           const dRepIDs = await getPubDRepID(enabledApi);
           setPubDRepKey(dRepIDs?.dRepKey || "");
           setDRepID(dRepIDs?.dRepID || "");
-          setItemToLocalStorage(`${WALLET_LS_KEY}_name`, walletName);
+          setItemToLocalStorage(`${WALLET_LS_KEY}_name`, name);
 
           return { status: t("ok"), stakeKey: stakeKeySet };
         } catch (e) {
@@ -513,6 +515,7 @@ const CardanoProvider = (props: Props) => {
     setAddress(undefined);
     setStakeKey(undefined);
     setIsEnabled(false);
+    setWalletName(undefined);
 
     Sentry.addBreadcrumb({
       category: "wallet",
@@ -758,8 +761,8 @@ const CardanoProvider = (props: Props) => {
         // TODO: type error
         // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
-        const isWalletConnected = await window.cardano[walletName].isEnabled();
+        const name = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
+        const isWalletConnected = await window.cardano[name].isEnabled();
 
         if (!isWalletConnected) {
           disconnectWallet();
@@ -1343,7 +1346,7 @@ const CardanoProvider = (props: Props) => {
         if (prevGovernanceActionHash && prevGovernanceActionIndex) {
           const prevGovernanceActionId = GovernanceActionId.new(
             TransactionHash.from_hex(prevGovernanceActionHash),
-            prevGovernanceActionIndex,
+            Number(prevGovernanceActionIndex),
           );
           protocolParamChangeAction =
             ParameterChangeAction.new_with_policy_hash_and_action_id(
@@ -1490,6 +1493,7 @@ const CardanoProvider = (props: Props) => {
       stakeKey,
       stakeKeys,
       walletApi,
+      walletName,
     }),
     [
       address,
@@ -1524,6 +1528,7 @@ const CardanoProvider = (props: Props) => {
       stakeKey,
       stakeKeys,
       walletApi,
+      walletName,
     ],
   );
 

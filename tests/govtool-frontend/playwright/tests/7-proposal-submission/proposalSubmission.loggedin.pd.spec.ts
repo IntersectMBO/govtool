@@ -18,10 +18,11 @@ import { getDraftProposalWalletAndState } from "@helpers/auth";
 import {
   skipIfNotInfoAndBootstrapping,
   isBootStrapingPhase,
+  skipIfMainnet,
 } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
-import { invalid, valid as mockValid } from "@mock/index";
+import { rewardAddressBech32 } from "@helpers/shellyWallet";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
@@ -132,6 +133,7 @@ test.describe("Proposal created logged state", () => {
         page,
         wallet,
       }) => {
+        await skipIfMainnet();
         await skipIfNotInfoAndBootstrapping(type);
 
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
@@ -308,28 +310,42 @@ test.describe("Proposal created logged state", () => {
 
   test("7O. Should display insufficient balance modal when submitting proposal with insufficient funds", async ({
     page,
-    proposalId,
   }) => {
+    await skipIfMainnet();
+    const proposalCreationPage = new ProposalSubmissionPage(page);
+    await proposalCreationPage.goto();
+
+    const receiverAddress = rewardAddressBech32(
+      environments.networkId,
+      proposal01Wallet.stake.pkh
+    );
+
+    await proposalCreationPage.createProposal(receiverAddress);
+
     const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
       page
     );
-    await proposalDiscussionDetailsPage.goto(proposalId);
 
-    await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
-    await proposalDiscussionDetailsPage.submitAsGABtn.click();
+    try {
+      await proposalDiscussionDetailsPage.submitAsGABtn.click();
+      await expect(
+        proposalCreationPage.currentPage.getByTestId(
+          "insufficient-wallet-balance-title"
+        )
+      ).toHaveText(/Insufficient wallet balance/);
 
-    const proposalSubmissionPage = new ProposalSubmissionPage(page);
-    await expect(
-      proposalSubmissionPage.currentPage.getByText(
-        "Insufficient wallet balance",
-        { exact: true }
-      )
-    ).toBeVisible(); // BUG missing test id
+      await proposalCreationPage.currentPage
+        .getByTestId("insufficient-wallet-balance-dialog-button")
+        .click();
+    } finally {
+      await proposalDiscussionDetailsPage.deleteProposal();
+    }
   });
 });
 
 test.describe("Proposal Draft", () => {
   test("7C. Should list unfinished Draft ", async ({ browser }) => {
+    await skipIfMainnet();
     const page = await createNewPageWithWallet(browser, {
       storageState: proposal03AuthFile,
       wallet: proposal03Wallet,
@@ -346,6 +362,7 @@ test.describe("Proposal Draft", () => {
   });
 
   test("7L. Should save proposal as a draft", async ({ browser }) => {
+    await skipIfMainnet();
     const page = await createNewPageWithWallet(browser, {
       storageState: proposal04AuthFile,
       wallet: proposal04Wallet,
@@ -422,6 +439,7 @@ test.describe("Proposal Draft", () => {
     test(`7M_${index + 1}. Should edit a ${proposalType.toLowerCase()} proposal draft`, async ({
       browser,
     }) => {
+      await skipIfMainnet();
       test.slow();
       const { storageState, wallet } =
         getDraftProposalWalletAndState(proposalType);
@@ -496,6 +514,7 @@ test.describe("Proposal Draft", () => {
   });
 
   test("7N. Should submit a draft proposal", async ({ browser }) => {
+    await skipIfMainnet();
     const page = await createNewPageWithWallet(browser, {
       storageState: proposal06AuthFile,
       wallet: proposal06Wallet,

@@ -205,6 +205,21 @@
           "label": "New Constitution Script Hash",
           "placeholder": "New Constitution Script Hash",
           "tip": "Script hash of the new constitution"
+        },
+        "major": {
+          "label": "Major",
+          "placeholder": "Major version",
+          "tip": "Major version of the new hard fork"
+        },
+        "minor": {
+          "label": "Minor",
+          "placeholder": "Minor version",
+          "tip": "Minor version of the new hard fork"
+        },
+        "protocolParameters": {
+          "label": "Protocol Parameters",
+          "placeholder": "Protocol parameters",
+          "tip": "Protocol parameters to be changed"
         }
       },
       "validations": {

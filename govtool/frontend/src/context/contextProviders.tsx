@@ -8,6 +8,8 @@ import { GovernanceActionProvider } from "./governanceAction";
 import { AdaHandleProvider } from "./adaHandle";
 import { ProposalDiscussionProvider } from "./proposalDiscussion";
 
+import { MaintenanceEndingBannerProvider } from "@/components/organisms/MaintenanceEndingBanner/MaintenanceEndingBannerContext";
+
 interface Props {
   children: React.ReactNode;
 }
@@ -21,7 +23,11 @@ const ContextProviders = ({ children }: Props) => (
             <ModalProvider>
               <SnackbarProvider>
                 <DataActionsBarProvider>
-                  <CardanoProvider>{children}</CardanoProvider>
+                  <CardanoProvider>
+                    <MaintenanceEndingBannerProvider>
+                      {children}
+                    </MaintenanceEndingBannerProvider>
+                  </CardanoProvider>
                 </DataActionsBarProvider>
               </SnackbarProvider>
             </ModalProvider>

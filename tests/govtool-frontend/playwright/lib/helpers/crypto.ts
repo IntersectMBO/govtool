@@ -2,7 +2,12 @@ import environments from "../constants/environments";
 import { ed25519 as ed } from "@noble/curves/ed25519";
 import { bech32 } from "bech32";
 import * as blake from "blakejs";
-import { rewardAddressBech32, rewardAddressRawBytes } from "./shellyWallet";
+import {
+  addressBech32,
+  addressRawBytes,
+  rewardAddressBech32,
+  rewardAddressRawBytes,
+} from "./shellyWallet";
 
 const KEY_HASH_LENGTH = 28;
 const ADDR_LENGTH = KEY_HASH_LENGTH * 2 + 1;
@@ -103,20 +108,15 @@ export class ShelleyWallet {
   }
 
   addressBech32(networkId: number): string {
-    const prefix = networkId == 0 ? "addr_test" : "addr";
-    return bech32.encode(
-      prefix,
-      bech32.toWords(Buffer.from(this.addressRawBytes(networkId))),
-      200
-    );
+    const stakePkh = Buffer.from(this.stakeKey.pkh).toString("hex");
+    const paymentPkh = Buffer.from(this.paymentKey.pkh).toString("hex");
+    return addressBech32(networkId, paymentPkh, stakePkh);
   }
 
   addressRawBytes(networkId) {
-    const concatenatedArray1 = new Uint8Array(ADDR_LENGTH);
-    concatenatedArray1[0] = networkId;
-    concatenatedArray1.set(this.paymentKey.pkh, 1);
-    concatenatedArray1.set(this.stakeKey.pkh, KEY_HASH_LENGTH + 1);
-    return concatenatedArray1;
+    const stakePkh = Buffer.from(this.stakeKey.pkh).toString("hex");
+    const paymentPkh = Buffer.from(this.paymentKey.pkh).toString("hex");
+    return addressRawBytes(networkId, paymentPkh, stakePkh);
   }
 
   rewardAddressRawBytes(network: number) {

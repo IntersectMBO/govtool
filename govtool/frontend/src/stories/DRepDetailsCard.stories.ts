@@ -28,29 +28,31 @@ const meta = {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras semper tortor ullamcorper volutpat vehicula. Duis varius orci a elit luctus, in fringilla nisl fringilla. Fusce pellentesque convallis dapibus. In hac habitasse platea dictumst. Nunc efficitur ipsum at ipsum blandit, ac eleifend purus pulvinar. Pellentesque orci quam, interdum eget massa id, sollicitudin lacinia turpis. Nullam lectus quam, congue commodo sollicitudin in, pretium sit amet metus. Integer pretium, odio eu dictum posuere.",
       qualifications:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc porta iaculis sodales. Praesent non nisi fermentum, porta sem in, porta arcu. In dignissim pulvinar est eu dignissim. Duis vitae vehicula dui. Praesent posuere egestas lacus, at pulvinar elit tempus ut. Etiam vulputate, lorem in accumsan.",
-      references: [
+      linkReferences: [
         {
-          "@type": "Link",
+          "@type": "Links",
           label: "Link Reference",
           uri: "https://example.com/",
         },
         {
-          "@type": "Link",
+          "@type": "Links",
           label: "Another Link Reference",
           uri: "https://example.com/",
         },
+      ],
+      identityReferences: [
         {
           "@type": "Identity",
           label: "Identity Reference",
           uri: "https://example.com/",
         },
         {
-          "@type": "GovernanceMetadata",
+          "@type": "Identity",
           label: "GovernanceMetadata Reference",
           uri: "https://example.com/",
         },
         {
-          "@type": "Other",
+          "@type": "Identity",
           label: "Other Reference",
           uri: "https://example.com/",
         },

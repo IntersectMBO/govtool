@@ -755,10 +755,10 @@
     "title": "This tool is connected to {{networkName}}",
     "bootstrappingWarning": "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>",
     "maintenanceEnding": {
-      "title": "⚠️ Funding for GovTool is at risk",
-      "description1": "GovTool was not included in the current Cardano budget.",
-      "description2": "Without new support, active development and <0>maintenance will end in June 2025.</0>",
-      "description3": "Learn what this means and what’s next:",
+      "title": "⚠️ GovTool needs your support",
+      "description1": "GovTool wasn’t included in the current Cardano budget.",
+      "description2": "A 100k ada maintenance grant will sustain essential infrastructure and bug fixes through 2025 — but future development depends on renewed community backing.",
+      "description3": "Find out what this means and how you can help:",
       "linkText": "The future of GovTool"
     }
   },

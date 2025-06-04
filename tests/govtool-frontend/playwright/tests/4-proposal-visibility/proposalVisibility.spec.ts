@@ -199,15 +199,19 @@ test("4H. Should verify none of the displayed governance actions have expired", 
   const govActionsPage = new GovernanceActionsPage(page);
   await govActionsPage.goto();
 
-  const proposalCards = await govActionsPage.getAllProposals();
-
-  for (const proposalCard of proposalCards) {
-    const expiryDateEl = proposalCard.getByTestId("expiry-date");
-    const expiryDateTxt = await expiryDateEl.innerText();
-    const expiryDate = extractExpiryDateFromText(expiryDateTxt);
-    const today = new Date();
-    expect(today <= expiryDate).toBeTruthy();
-  }
+  await functionWaitedAssert(
+    async () => {
+      const proposalCards = await govActionsPage.getAllProposals();
+      for (const proposalCard of proposalCards) {
+        const expiryDateEl = proposalCard.getByTestId("expiry-date");
+        const expiryDateTxt = await expiryDateEl.innerText();
+        const expiryDate = extractExpiryDateFromText(expiryDateTxt);
+        const today = new Date();
+        expect(today <= expiryDate).toBeTruthy();
+      }
+    },
+    { name: "verify none expired governance actions" }
+  );
 });
 
 test("4K. Should display correct vote counts on governance details page for disconnect state", async ({

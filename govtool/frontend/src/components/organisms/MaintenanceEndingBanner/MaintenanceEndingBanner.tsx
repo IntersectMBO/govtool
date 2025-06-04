@@ -62,7 +62,7 @@ export const MaintenanceEndingBanner = () => {
       <Box
         sx={{
           maxHeight: isExpanded ? '300px' : "0px", // 300px is a safe value for transition effect
-          transition: "max-height 0.7s ease-in-out",
+          transition: "max-height 0.4s ease-in-out",
           overflow: "hidden",
         }}
       >

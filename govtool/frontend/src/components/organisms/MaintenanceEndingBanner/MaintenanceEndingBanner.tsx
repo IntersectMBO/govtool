@@ -4,9 +4,6 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Trans, useTranslation } from "react-i18next";
 import { useMaintenanceEndingBannerContext } from "./MaintenanceEndingBannerContext";
 
-const EXPANDED_HEIGHT = 135;
-const COLLAPSED_HEIGHT = 50;
-
 export const MaintenanceEndingBanner = () => {
   const { ref, isExpanded, toggleExpanded } =
     useMaintenanceEndingBannerContext();
@@ -16,7 +13,7 @@ export const MaintenanceEndingBanner = () => {
     <Box
       ref={ref}
       sx={{
-        backgroundColor: "#9c2224",
+        backgroundColor: isExpanded ? "#212A3D" : "#9c2224",
         width: "100%",
         overflow: "hidden",
         transition: "all 0.3s ease-in-out",
@@ -64,8 +61,8 @@ export const MaintenanceEndingBanner = () => {
       {/* Expandable Content */}
       <Box
         sx={{
-          height: isExpanded ? EXPANDED_HEIGHT - COLLAPSED_HEIGHT : "0px",
-          transition: "max-height 0.3s ease-in-out",
+          maxHeight: isExpanded ? '300px' : "0px", // 300px is a safe value for transition effect
+          transition: "max-height 0.4s ease-in-out",
           overflow: "hidden",
         }}
       >

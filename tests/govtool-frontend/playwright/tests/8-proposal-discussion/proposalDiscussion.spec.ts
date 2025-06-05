@@ -92,13 +92,17 @@ test.describe("Filter and sort proposals", () => {
         p1.attributes.prop_comments_number <=
         p2.attributes.prop_comments_number,
       "Name A-Z": (p1: ProposedGovAction, p2: ProposedGovAction) =>
-        p1.attributes.content.attributes.prop_name.localeCompare(
-          p2.attributes.content.attributes.prop_name
-        ) <= 0,
+        p1.attributes.content.attributes.prop_name
+          .replace(/ /g, "")
+          .localeCompare(
+            p2.attributes.content.attributes.prop_name.replace(/ /g, "")
+          ) <= 0,
       "Name Z-A": (p1: ProposedGovAction, p2: ProposedGovAction) =>
-        p1.attributes.content.attributes.prop_name.localeCompare(
-          p2.attributes.content.attributes.prop_name
-        ) >= 0,
+        p1.attributes.content.attributes.prop_name
+          .replace(/ /g, "")
+          .localeCompare(
+            p2.attributes.content.attributes.prop_name.replace(/ /g, "")
+          ) >= 0,
     };
 
     for (const [sortOption, sortFunction] of Object.entries(sortOptions)) {

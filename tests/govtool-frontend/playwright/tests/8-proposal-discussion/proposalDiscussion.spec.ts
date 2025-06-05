@@ -69,11 +69,14 @@ test.describe("Filter and sort proposals", () => {
   });
 
   test("8B_2. Should sort the list of proposed governance actions.", async () => {
+    test.slow();
     const sortOptions = {
       Oldest: (p1: ProposedGovAction, p2: ProposedGovAction) =>
-        p1.attributes.createdAt <= p2.attributes.createdAt,
+        p1.attributes.content.attributes.createdAt <=
+        p2.attributes.content.attributes.createdAt,
       Newest: (p1: ProposedGovAction, p2: ProposedGovAction) =>
-        p1.attributes.createdAt >= p2.attributes.createdAt,
+        p1.attributes.content.attributes.createdAt >=
+        p2.attributes.content.attributes.createdAt,
       "Most likes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
         p1.attributes.prop_likes >= p2.attributes.prop_likes,
       "Least likes": (p1: ProposedGovAction, p2: ProposedGovAction) =>

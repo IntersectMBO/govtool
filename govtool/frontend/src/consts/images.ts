@@ -12,6 +12,7 @@ export const IMAGES = {
   proposeGovActionImage: "/images/ProposeGovAction.webp",
   directVoterImage: "/images/GovActionsDirectVoter.webp",
   successImage: "/images/Success.webp",
+  syncAiLogo: "/images/SyncAiLogo.svg",
   warningImage: "/images/Warning.webp",
   warningYellowImage: "/images/WarningYellow.webp",
 };

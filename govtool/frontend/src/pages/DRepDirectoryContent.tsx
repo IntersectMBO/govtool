@@ -1,9 +1,13 @@
-import { FC, useEffect, useState } from "react";
+import { FC, PropsWithChildren, useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { Box, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, InputBase } from "@mui/material";
 
 import { Button, Typography } from "@atoms";
-import { DREP_DIRECTORY_FILTERS, DREP_DIRECTORY_SORTING } from "@consts";
+import {
+  DREP_DIRECTORY_FILTERS,
+  DREP_DIRECTORY_SORTING,
+  IMAGES,
+} from "@consts";
 import { useCardano, useDataActionsBar } from "@context";
 import {
   useDelegateTodRep,
@@ -11,8 +15,13 @@ import {
   useGetAdaHolderVotingPowerQuery,
   useGetDRepDetailsQuery,
   useGetDRepListInfiniteQuery,
+  useGetDRepSyncAiListInfiniteQuery,
 } from "@hooks";
-import { DataActionsBar, EmptyStateDrepDirectory } from "@molecules";
+import {
+  DataActionsBar,
+  EmptyStateDrepDirectory,
+  SyncAiSearch,
+} from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
 import {
   isSameDRep,
@@ -192,59 +201,118 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       )}
 
       {/* DRep list */}
-      <>
-        <Typography fontSize={18} fontWeight={500} sx={{ mb: 3 }}>
-          {t("dRepDirectory.listTitle")}
-        </Typography>
-        <DataActionsBar
-          {...dataActionsBarProps}
-          filterOptions={DREP_DIRECTORY_FILTERS}
-          filtersTitle={t("dRepDirectory.filterTitle")}
-          sortOptions={DREP_DIRECTORY_SORTING}
-        />
-        <Box
-          component="ul"
-          display="flex"
-          flexDirection="column"
-          gap={3}
-          mt={4}
-          p={0}
-          sx={{
-            opacity: isPreviousData ? 0.5 : 1,
-            transition: "opacity 0.2s",
-            flex: 1,
-          }}
-        >
-          {filteredDoNotListDReps?.length === 0 && <EmptyStateDrepDirectory />}
-          {filteredDoNotListDReps?.map((dRep) => (
-            <Box key={dRep.view} component="li" sx={{ listStyle: "none" }}>
-              <DRepCard
-                dRep={dRep}
-                isConnected={!!isConnected}
-                isDelegationLoading={
-                  isDelegating === dRep.view || isDelegating === dRep.drepId
-                }
-                isMe={isSameDRep(dRep, myDRepId)}
-                isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
-                onDelegate={() => {
-                  setInProgressDelegationDRepData(dRep);
-                  delegate(dRep.drepId);
-                }}
-              />
-            </Box>
-          ))}
-        </Box>
-      </>
-      {dRepListHasNextPage && dRepList.length >= 10 && (
-        <Box sx={{ justifyContent: "center", display: "flex" }}>
-          <Button
-            data-testid="show-more-button"
-            variant="outlined"
-            onClick={() => dRepListFetchNextPage()}
+      <SyncAiSearchWrapper>
+        <>
+          <Typography fontSize={18} fontWeight={500} sx={{ mb: 3 }}>
+            {t("dRepDirectory.listTitle")}
+          </Typography>
+          <DataActionsBar
+            {...dataActionsBarProps}
+            filterOptions={DREP_DIRECTORY_FILTERS}
+            filtersTitle={t("dRepDirectory.filterTitle")}
+            sortOptions={DREP_DIRECTORY_SORTING}
+          />
+          <Box
+            component="ul"
+            display="flex"
+            flexDirection="column"
+            gap={3}
+            mt={4}
+            p={0}
+            sx={{
+              opacity: isPreviousData ? 0.5 : 1,
+              transition: "opacity 0.2s",
+              flex: 1,
+            }}
           >
-            {t("showMore")}
-          </Button>
-        </Box>
+            {filteredDoNotListDReps?.length === 0 && (
+              <EmptyStateDrepDirectory />
+            )}
+            {filteredDoNotListDReps?.map((dRep) => (
+              <Box key={dRep.view} component="li" sx={{ listStyle: "none" }}>
+                <DRepCard
+                  dRep={dRep}
+                  isConnected={!!isConnected}
+                  isDelegationLoading={
+                    isDelegating === dRep.view || isDelegating === dRep.drepId
+                  }
+                  isMe={isSameDRep(dRep, myDRepId)}
+                  isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
+                  onDelegate={() => {
+                    setInProgressDelegationDRepData(dRep);
+                    delegate(dRep.drepId);
+                  }}
+                />
+              </Box>
+            ))}
+          </Box>
+        </>
+        {dRepListHasNextPage && dRepList.length >= 10 && (
+          <Box sx={{ justifyContent: "center", display: "flex" }}>
+            <Button
+              data-testid="show-more-button"
+              variant="outlined"
+              onClick={() => dRepListFetchNextPage()}
+            >
+              {t("showMore")}
+            </Button>
+          </Box>
+        )}
+      </SyncAiSearchWrapper>
+    </Box>
+  );
+};
+
+const SyncAiSearchWrapper: FC<PropsWithChildren> = ({ children }) => {
+  const { t } = useTranslation();
+  const [searchText, setSearchText] = useState("");
+  const [usingAI, setUsingAI] = useState(true);
+
+  const d = useGetDRepSyncAiListInfiniteQuery(
+    {
+      searchPhrase: searchText,
+    },
+    {
+      keepPreviousData: true,
+    },
+  );
+
+  console.log(d)
+
+  return (
+    <Box>
+      <Button
+        data-testid="use-ai-button"
+        onClick={() => setUsingAI((value) => !value)}
+        size="extraLarge"
+        variant="contained"
+        sx={{
+          mb: 3,
+        }}
+      >
+        {usingAI ? (
+          t("dRepDirectory.disableAiSearch")
+        ) : (
+          <>
+            {t("dRepDirectory.enableAiSearch")}
+            <img
+              alt="sync-ai-logo"
+              height={35}
+              src={IMAGES.syncAiLogo}
+              style={{ objectFit: "contain", marginLeft: 8 }}
+            />
+          </>
+        )}
+      </Button>
+      {usingAI ? (
+        <>
+          <Typography fontSize={18} fontWeight={500} sx={{ mb: 3 }}>
+            {t("dRepDirectory.syncAiTitle")}
+          </Typography>
+          <SyncAiSearch searchText={searchText} setSearchText={setSearchText} />
+        </>
+      ) : (
+        children
       )}
     </Box>
   );

@@ -40,6 +40,7 @@ export * from "./Share";
 export * from "./SliderArrow";
 export * from "./SliderArrows";
 export * from "./Step";
+export * from "./SyncAiSearch";
 export * from "./VoteActionForm";
 export * from "./VotesSubmitted";
 export * from "./WalletInfoCard";

@@ -1,6 +1,7 @@
 export * from "./getAdaHolderCurrentDelegation";
 export * from "./getAdaHolderVotingPower";
 export * from "./getDRepList";
+export * from "./getDRepSyncAiList";
 export * from "./getDRepVotes";
 export * from "./getDRepVotingPower";
 export * from "./getEpochParams";

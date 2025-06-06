@@ -79,6 +79,8 @@ data VVAConfigInternal
       , vVAConfigInternalSentrydsn                               :: String
         -- | Sentry environment
       , vVAConfigInternalSentryEnv                               :: String
+        -- | SyncAI API key
+      , vVAConfigInternalSyncAiKey                               :: String
       }
   deriving (FromConfig, Generic, Show)
 
@@ -90,7 +92,8 @@ instance DefaultConfig VVAConfigInternal where
         vVAConfigInternalHost = "localhost",
         vVaConfigInternalCacheDurationSeconds = 20,
         vVAConfigInternalSentrydsn = "https://username:password@senty.host/id",
-        vVAConfigInternalSentryEnv = "development"
+        vVAConfigInternalSentryEnv = "development",
+        vVAConfigInternalSyncAiKey = "api_key_1234abcd"
       }
 
 -- | DEX configuration.
@@ -108,6 +111,8 @@ data VVAConfig
       , sentryDSN                               :: String
         -- | Sentry environment
       , sentryEnv                               :: String
+        -- | SyncAI API key
+      , syncAiKey                               :: String
       }
   deriving (Generic, Show, ToJSON)
 
@@ -148,7 +153,8 @@ convertConfig VVAConfigInternal {..} =
       serverHost = vVAConfigInternalHost,
       cacheDurationSeconds = vVaConfigInternalCacheDurationSeconds,
       sentryDSN = vVAConfigInternalSentrydsn,
-      sentryEnv = vVAConfigInternalSentryEnv
+      sentryEnv = vVAConfigInternalSentryEnv,
+      syncAiKey = vVAConfigInternalSyncAiKey
     }
 
 -- | Load configuration from a file specified on the command line.  Load from

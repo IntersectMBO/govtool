@@ -10,5 +10,6 @@
   "host" : "localhost",
   "cachedurationseconds": 20,
   "sentrydsn": "https://username:password@senty.host/id",
-  "sentryenv": "dev"
+  "sentryenv": "dev",
+  "syncAiKey": "api_1234abcd"
 }

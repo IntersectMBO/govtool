@@ -6,23 +6,23 @@
 
 module VVA.DRep where
 
-import           Control.Monad.Except               (MonadError)
+import           Control.Monad.Except               (MonadError, throwError)
 import           Control.Monad.Reader
 
 import           Crypto.Hash
 
-import           Data.Aeson                         (Value)
+import           Data.Aeson                         (Value, eitherDecode, encode, object, (.=))
 import           Data.ByteString                    (ByteString)
 import qualified  Data.ByteString.Base16             as Base16
 import qualified  Data.ByteString.Char8              as C
 import           Data.FileEmbed                     (embedFile)
 import           Data.Foldable                      (Foldable (sum))
-import           Data.Has                           (Has)
+import           Data.Has                           (Has, getter)
 import qualified  Data.Map                           as M
 import           Data.Maybe                         (fromMaybe, isJust, isNothing)
 import           Data.Scientific
 import           Data.String                        (fromString)
-import           Data.Text                          (Text, pack, unpack, intercalate)
+import           Data.Text                          (Text, pack, unpack, intercalate, pack)
 import qualified  Data.Text.Encoding                 as Text
 import           Data.Time
 
@@ -33,8 +33,13 @@ import           Database.PostgreSQL.Simple.FromRow
 import           VVA.Config
 import           VVA.Pool                           (ConnectionPool, withPool)
 import qualified  VVA.Proposal                       as Proposal
-import           VVA.Types                          (AppError, DRepInfo (..), DRepRegistration (..), DRepStatus (..),
-                                                     DRepType (..), Proposal (..), Vote (..), DRepVotingPowerList (..))
+import           VVA.Types                          (AppError (CriticalError), DRepInfo (..), DRepRegistration (..),
+                                                     DRepStatus (..), DRepType (..), Proposal (..), Vote (..),
+                                                     DRepVotingPowerList (..))
+
+import Network.HTTP.Client                          (newManager, parseRequest, httpLbs, RequestBody(..), method,
+                                                     requestHeaders, requestBody, responseBody, Manager, Request, Response)
+import Network.HTTP.Client.TLS                      (tlsManagerSettings)
 
 data DRepQueryResult = DRepQueryResult
   { queryDrepHash :: Text
@@ -127,7 +132,37 @@ listDReps mSearchQuery = withPool $ \conn -> do
                    | latestDeposit' < 0 && queryLatestNonDeregisterVotingAnchorWasNotNull result = DRep
                    | Data.Maybe.isJust (queryUrl result) = DRep
     ]
-    
+
+drepAiSearch ::
+  (Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m) =>
+  Maybe Text   -- ^ search query
+  -> Int -- ^ page
+  -> Int -- ^ limit
+  -> m Value
+drepAiSearch query page limit = do
+  vvaConfig <- asks getter
+  result <- liftIO $ do
+    manager <- newManager tlsManagerSettings
+    initialRequest <- parseRequest "https://api.syncgovhub.com/api/drep/ai"
+    let body = encode $ object
+          [ "query" .= query
+          , "page"  .= page
+          , "limit" .= limit
+          ]
+        request = initialRequest
+          { method = "POST"
+          , requestHeaders =
+              [ ("Content-Type", "application/json")
+              , ("x-api-key", Text.encodeUtf8 (pack (syncAiKey vvaConfig)))
+              ]
+          , requestBody = RequestBodyLBS body
+          }
+    response <- httpLbs request manager
+    return $ eitherDecode (responseBody response)
+  case result of
+    Left err    -> throwError $ CriticalError ("Could not parse the dReps: " <> pack err)
+    Right val -> return val
+
 getVotingPowerSql :: SQL.Query
 getVotingPowerSql = sqlFrom $(embedFile "sql/get-voting-power.sql")
 

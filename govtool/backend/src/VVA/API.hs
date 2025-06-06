@@ -57,6 +57,10 @@ type VVAApi =
                 :> QueryParam "page" Natural
                 :> QueryParam "pageSize" Natural
                 :> Get '[JSON] ListDRepsResponse
+    :<|> "drep-ai-search" :> QueryParam "search" Text
+                          :> QueryParam "page" Natural
+                          :> QueryParam "pageSize" Natural
+                          :> Get '[JSON] Value
     :<|> "drep" :> "get-voting-power" :> Capture "drepId" HexText :> Get '[JSON] Integer
     :<|> "drep" :> "getVotes"
                 :> Capture "drepId" HexText
@@ -90,6 +94,7 @@ type VVAApi =
 
 server :: App m => ServerT VVAApi m
 server = drepList
+    :<|> drepAiSearch
     :<|> getVotingPower
     :<|> getVotes
     :<|> drepInfo
@@ -209,6 +214,12 @@ drepList mSearchQuery statuses mSortMode mPage mPageSize = do
     , listDRepsResponseElements = elements
     }
 
+drepAiSearch :: App m => Maybe Text -> Maybe Natural -> Maybe Natural -> m Value
+drepAiSearch searchQuery mPage mPageSize = do
+  let page = fromIntegral $ fromMaybe 0 mPage
+      pageSize = fromIntegral $ fromMaybe 10 mPageSize
+  result <- DRep.drepAiSearch searchQuery page pageSize
+  return result
 
 getVotingPower :: App m => HexText -> m Integer
 getVotingPower (unHexText -> dRepId) = do

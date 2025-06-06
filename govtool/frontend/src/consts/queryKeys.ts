@@ -3,6 +3,7 @@ export const QUERY_KEYS = {
   getAdaHolderVotingPowerKey: "getAdaHolderVotingPowerKey",
   useGetDRepInfoKey: "useGetDRepInfoKey",
   useGetDRepListInfiniteKey: "useGetDRepListInfiniteKey",
+  useGetDRepSyncAiListInfiniteKey: "useGetDRepSyncAiListInfiniteKey",
   useGetDRepVotesKey: "useGetDRepVotesKey",
   useGetDRepVotingPowerKey: "useGetDRepVotingPowerKey",
   useGetEpochParamsKey: "useGetEpochParamsKey",

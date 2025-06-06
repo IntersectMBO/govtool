@@ -266,7 +266,19 @@ DRepData AS (
     off_chain_vote_drep_data.image_url,
     off_chain_vote_drep_data.image_hash,
     (
-      SELECT jsonb_agg(ref)
+      SELECT jsonb_agg(
+        jsonb_build_object(
+            'uri',   COALESCE(
+                      CASE WHEN jsonb_typeof(ref->'uri') = 'string' THEN ref->>'uri' END,
+                      ref->'uri'->>'@value'
+                    ),
+            '@type', ref->>'@type',
+            'label', COALESCE(
+                      CASE WHEN jsonb_typeof(ref->'label') = 'string' THEN ref->>'label' END,
+                      ref->'label'->>'@value'
+                    )
+          )
+      )
       FROM jsonb_array_elements(
         CASE
           WHEN (ocvd.json::jsonb)->'body'->'references' IS NOT NULL
@@ -277,7 +289,19 @@ DRepData AS (
       WHERE ref->>'@type' = 'Identity'
     ),
     (
-      SELECT jsonb_agg(ref)
+      SELECT jsonb_agg(
+        jsonb_build_object(
+            'uri',   COALESCE(
+                      CASE WHEN jsonb_typeof(ref->'uri') = 'string' THEN ref->>'uri' END,
+                      ref->'uri'->>'@value'
+                    ),
+            '@type', ref->>'@type',
+            'label', COALESCE(
+                      CASE WHEN jsonb_typeof(ref->'label') = 'string' THEN ref->>'label' END,
+                      ref->'label'->>'@value'
+                    )
+          )
+      )
       FROM jsonb_array_elements(
         CASE
           WHEN (ocvd.json::jsonb)->'body'->'references' IS NOT NULL

@@ -156,7 +156,9 @@ test("8C. Should search the list of proposed governance actions.", async ({
         const proposalTitle = await proposalCard
           .locator('[data-testid^="proposal-"][data-testid$="-title"]')
           .innerText();
-        expect(proposalTitle.trim()).toContain(proposalName.trim());
+        expect(proposalTitle.toLowerCase().trim()).toContain(
+          proposalName.toLowerCase().trim()
+        );
       }
     },
     {

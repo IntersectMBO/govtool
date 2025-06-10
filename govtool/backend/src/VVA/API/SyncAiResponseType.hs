@@ -8,6 +8,7 @@ module VVA.API.SyncAiResponseType where
 
 import GHC.Generics (Generic)
 import Data.Text (Text)
+import qualified Data.Text (stripPrefix)
 import Data.Aeson
 import qualified Data.Aeson.Types as Aeson
 import Data.Aeson.Types (Parser)
@@ -51,23 +52,36 @@ instance ToJSON SearchAiResponse where
 
 data DRepData = DRepData
   { drepId             :: Text
-  , motivations        :: Text
-  , givenName          :: Text
-  , objectives         :: Text
-  , status             :: Text
+  -- Missing:
+  -- , dRepHash               :: Text
+  -- , view                   :: Text
+  -- , isScriptBased          :: Bool
   , url                :: Maybe Text
-  , votingPower        :: Double
-  , imageUrl           :: Maybe TextOrValue
-  -- , imageHash          :: Maybe TextOrValue
+  -- Missing:
+  -- , dataHash               :: Maybe Text
+  -- , deposit                :: Integer
+  , votingPower        :: Double -- We might need to multiply this by 1e6 to get the actual voting power + Int
+  , status             :: Text
+  -- Missing:
+  -- , type                   :: DRepType
+  -- , latestTxHash           :: Maybe Text
+  -- , latestRegistrationDate :: UTCTime
+  -- , metadataError          :: Maybe Text
   , paymentAddress     :: Maybe TextOrValue
+  , givenName          :: Maybe Text
+  , objectives         :: Maybe Text
+  , motivations        :: Maybe Text
   , qualifications     :: Maybe TextOrValue
+  , imageUrl           :: Maybe TextOrValue
+  , imageHash          :: Maybe TextOrValue
   , linkReferences     :: [Reference]
   , identityReferences :: [Reference]
   } deriving (Show, Generic, ToSchema, ToJSON)
 
 instance FromJSON DRepData where
   parseJSON = withObject "DRepData" $ \v -> do
-    drepId         <- v .:  "drepId"
+    -- dRep data:
+    -- drepId         <- v .:  "drepId"
     motivations    <- v .:  "motivations"
     givenName      <- v .:  "name"
     objectives     <- v .:  "objectives"
@@ -75,47 +89,54 @@ instance FromJSON DRepData where
     url            <- v .:? "url"
     votingPower    <- (v .: "votingPower" <|> (v .: "metrics" >>= (.: "votingPower")))
 
-    imageUrl <- v .:? "image" >>= \img ->
-      case img of
-        Just _  -> pure img
+    --
+    mMeta     <- v .:? "metadata"
+    mJsonMeta <- mMeta .::? "json_metadata"
+    mBody     <- mJsonMeta .::? "body"
+
+    drepId <- v .:? "drepId" >>= \did ->
+      case did of
+        Just _  -> pure did
         Nothing -> do
           m <- v .:? "metadata"
-          m1 <- m .::? "json_metadata"
-          m2 <- m1 .::? "body"
-          m3 <- m2 .::? "image"
-          m4 <- m3 .::? "contentUrl"
-          traverse parseJSON m4
+          m1 <- m .::? "hex"
+          traverse parseJSON m1
 
+    imageUrl <- do
+      m <- v .:? "metadata"
+      m1 <- m .::? "json_metadata"
+      m2 <- m1 .::? "body"
+      m3 <- m2 .::? "image"
+      m4 <- m3 .::? "contentUrl"
+      traverse parseJSON m4
 
-    paymentAddress <- v .:? "paymentAddress" >>= \pa ->
-      case pa of
-        Just _  -> pure pa
-        Nothing -> do
-          m <- v .:? "metadata"
-          m1 <- m .::? "json_metadata"
-          m2 <- m1 .::? "body"
-          m3 <- m2 .::? "paymentAddress"
-          traverse parseJSON m3
+    imageHash <- do
+      m <- v .:? "metadata"
+      m1 <- m .::? "json_metadata"
+      m2 <- m1 .::? "body"
+      m3 <- m2 .::? "imageHash"
+      traverse parseJSON m3
 
-    qualifications <- v .:? "qualifications" >>= \q ->
-      case q of
-        Just _  -> pure q
-        Nothing -> do
-          m <- v .:? "metadata"
-          m1 <- m .::? "json_metadata"
-          m2 <- m1 .::? "body"
-          m3 <- m2 .::? "qualifications"
-          traverse parseJSON m3
+    paymentAddress <- do
+      m <- v .:? "metadata"
+      m1 <- m .::? "json_metadata"
+      m2 <- m1 .::? "body"
+      m3 <- m2 .::? "paymentAddress"
+      traverse parseJSON m3
 
-    references <- v .:? "references" >>= \r ->
-      case r of
-        Just _  -> pure r
-        Nothing -> do
-          m <- v .:? "metadata"
-          m1 <- m .::? "json_metadata"
-          m2 <- m1 .::? "body"
-          m3 <- m2 .::? "references"
-          traverse parseJSON m3
+    qualifications <- do
+      m <- v .:? "metadata"
+      m1 <- m .::? "json_metadata"
+      m2 <- m1 .::? "body"
+      m3 <- m2 .::? "qualifications"
+      traverse parseJSON m3
+
+    references <-  do
+      m <- v .:? "metadata"
+      m1 <- m .::? "json_metadata"
+      m2 <- m1 .::? "body"
+      m3 <- m2 .::? "references"
+      traverse parseJSON m3
 
     -- Split references by @type
     let (linkRefs, identityRefs) = case references of
@@ -127,7 +148,7 @@ instance FromJSON DRepData where
 
     pure $ DRepData
       drepId motivations givenName objectives status url votingPower
-      imageUrl paymentAddress qualifications linkRefs identityRefs
+      imageUrl imageHash paymentAddress qualifications linkRefs identityRefs
 
 data Reference = Reference
   { refType :: Maybe Text -- "@type"

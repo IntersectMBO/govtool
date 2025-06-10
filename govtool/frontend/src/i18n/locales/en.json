@@ -45,7 +45,7 @@
   "dashboard": {
     "headingOne": "Your Participation",
     "headingTwo": "See Active Governance Actions",
-    "title": "Dashboard",
+    "title": "Home",
     "cards": {
       "drepName": "Drep_name",
       "showTransaction": "Show Transaction",

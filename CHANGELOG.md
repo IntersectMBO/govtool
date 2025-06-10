@@ -22,6 +22,7 @@ changes.
 - Fix adding two link input fields when editing the dRep form when no links are present initially [Issue 3709](https://github.com/IntersectMBO/govtool/issues/3709)
 
 ### Changed
+- Adjust top menu (navbar) layout when wallet is not connected [Issue-3682](https://github.com/IntersectMBO/govtool/issues/3682)
 
 ### Removed
 

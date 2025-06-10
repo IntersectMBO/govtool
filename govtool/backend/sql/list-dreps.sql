@@ -95,7 +95,7 @@ HasNonDeregisterVotingAnchor AS (
     EXISTS (
       SELECT 1
       FROM drep_registration dr_sub
-      WHERE 
+      WHERE
         dr_sub.drep_hash_id = dr.drep_hash_id
         AND dr_sub.voting_anchor_id IS NULL
         AND COALESCE(dr_sub.deposit, 0) >= 0
@@ -129,12 +129,24 @@ DRepData AS (
     off_chain_vote_drep_data.image_hash,
     COALESCE(
       (
-        SELECT jsonb_agg(ref)
+        SELECT jsonb_agg(
+          jsonb_build_object(
+            'uri',   COALESCE(
+                      CASE WHEN jsonb_typeof(ref->'uri') = 'string' THEN ref->>'uri' END,
+                      ref->'uri'->>'@value'
+                    ),
+            '@type', ref->>'@type',
+            'label', COALESCE(
+                      CASE WHEN jsonb_typeof(ref->'label') = 'string' THEN ref->>'label' END,
+                      ref->'label'->>'@value'
+                    )
+          )
+        )
         FROM jsonb_array_elements(
-          CASE 
-            WHEN (ocvd.json::jsonb)->'body'->'references' IS NOT NULL 
-            THEN (ocvd.json::jsonb)->'body'->'references' 
-            ELSE '[]'::jsonb 
+          CASE
+            WHEN (ocvd.json::jsonb)->'body'->'references' IS NOT NULL
+            THEN (ocvd.json::jsonb)->'body'->'references'
+            ELSE '[]'::jsonb
           END
         ) AS ref
         WHERE ref->>'@type' = 'Identity'
@@ -143,12 +155,24 @@ DRepData AS (
     ) AS identity_references,
     COALESCE(
       (
-        SELECT jsonb_agg(ref)
+        SELECT jsonb_agg(
+          jsonb_build_object(
+            'uri',   COALESCE(
+                      CASE WHEN jsonb_typeof(ref->'uri') = 'string' THEN ref->>'uri' END,
+                      ref->'uri'->>'@value'
+                    ),
+            '@type', ref->>'@type',
+            'label', COALESCE(
+                      CASE WHEN jsonb_typeof(ref->'label') = 'string' THEN ref->>'label' END,
+                      ref->'label'->>'@value'
+                    )
+          )
+        )
         FROM jsonb_array_elements(
-          CASE 
-            WHEN (ocvd.json::jsonb)->'body'->'references' IS NOT NULL 
-            THEN (ocvd.json::jsonb)->'body'->'references' 
-            ELSE '[]'::jsonb 
+          CASE
+            WHEN (ocvd.json::jsonb)->'body'->'references' IS NOT NULL
+            THEN (ocvd.json::jsonb)->'body'->'references'
+            ELSE '[]'::jsonb
           END
         ) AS ref
         WHERE ref->>'@type' = 'Link'
@@ -185,7 +209,7 @@ DRepData AS (
     LEFT JOIN FetchError fetch_error ON fetch_error.voting_anchor_id = leva.voting_anchor_id
     LEFT JOIN HasNonDeregisterVotingAnchor hndva ON hndva.drep_hash_id = dh.id
     LEFT JOIN off_chain_vote_data ocvd ON ocvd.voting_anchor_id = leva.voting_anchor_id
-    LEFT JOIN off_chain_vote_drep_data ON off_chain_vote_drep_data.off_chain_vote_data_id = ocvd.id 
+    LEFT JOIN off_chain_vote_drep_data ON off_chain_vote_drep_data.off_chain_vote_data_id = ocvd.id
     LEFT JOIN voting_procedure ON voting_procedure.drep_voter = dh.id
     LEFT JOIN tx voting_procedure_transaction ON voting_procedure_transaction.id = voting_procedure.tx_id
     LEFT JOIN block voting_procedure_block ON voting_procedure_block.id = voting_procedure_transaction.block_id
@@ -242,23 +266,47 @@ DRepData AS (
     off_chain_vote_drep_data.image_url,
     off_chain_vote_drep_data.image_hash,
     (
-      SELECT jsonb_agg(ref)
+      SELECT jsonb_agg(
+        jsonb_build_object(
+            'uri',   COALESCE(
+                      CASE WHEN jsonb_typeof(ref->'uri') = 'string' THEN ref->>'uri' END,
+                      ref->'uri'->>'@value'
+                    ),
+            '@type', ref->>'@type',
+            'label', COALESCE(
+                      CASE WHEN jsonb_typeof(ref->'label') = 'string' THEN ref->>'label' END,
+                      ref->'label'->>'@value'
+                    )
+          )
+      )
       FROM jsonb_array_elements(
-        CASE 
-          WHEN (ocvd.json::jsonb)->'body'->'references' IS NOT NULL 
-          THEN (ocvd.json::jsonb)->'body'->'references' 
-          ELSE '[]'::jsonb 
+        CASE
+          WHEN (ocvd.json::jsonb)->'body'->'references' IS NOT NULL
+          THEN (ocvd.json::jsonb)->'body'->'references'
+          ELSE '[]'::jsonb
         END
       ) AS ref
       WHERE ref->>'@type' = 'Identity'
     ),
     (
-      SELECT jsonb_agg(ref)
+      SELECT jsonb_agg(
+        jsonb_build_object(
+            'uri',   COALESCE(
+                      CASE WHEN jsonb_typeof(ref->'uri') = 'string' THEN ref->>'uri' END,
+                      ref->'uri'->>'@value'
+                    ),
+            '@type', ref->>'@type',
+            'label', COALESCE(
+                      CASE WHEN jsonb_typeof(ref->'label') = 'string' THEN ref->>'label' END,
+                      ref->'label'->>'@value'
+                    )
+          )
+      )
       FROM jsonb_array_elements(
-        CASE 
-          WHEN (ocvd.json::jsonb)->'body'->'references' IS NOT NULL 
-          THEN (ocvd.json::jsonb)->'body'->'references' 
-          ELSE '[]'::jsonb 
+        CASE
+          WHEN (ocvd.json::jsonb)->'body'->'references' IS NOT NULL
+          THEN (ocvd.json::jsonb)->'body'->'references'
+          ELSE '[]'::jsonb
         END
       ) AS ref
       WHERE ref->>'@type' = 'Link'

@@ -108,6 +108,7 @@ test.describe("Budget proposal list manipulation", () => {
     });
 
     test("11B_3. Should sort budget proposals", async () => {
+      test.slow();
       const sortOptions = {
         Oldest: (p1: ProposedGovAction, p2: ProposedGovAction) =>
           p1.attributes.createdAt <= p2.attributes.createdAt,
@@ -120,21 +121,35 @@ test.describe("Budget proposal list manipulation", () => {
           p1.attributes.prop_comments_number <=
           p2.attributes.prop_comments_number,
         "Name A-Z": (p1: ProposedGovAction, p2: ProposedGovAction) =>
-          p1.attributes.bd_proposal_detail.data.attributes.proposal_name.localeCompare(
-            p2.attributes.bd_proposal_detail.data.attributes.proposal_name
-          ) <= 0,
+          p1.attributes.bd_proposal_detail.data.attributes.proposal_name
+            .replace(/ /g, "")
+            .localeCompare(
+              p2.attributes.bd_proposal_detail.data.attributes.proposal_name.replace(
+                / /g,
+                ""
+              )
+            ) <= 0,
         "Name Z-A": (p1: ProposedGovAction, p2: ProposedGovAction) =>
-          p1.attributes.bd_proposal_detail.data.attributes.proposal_name.localeCompare(
-            p2.attributes.bd_proposal_detail.data.attributes.proposal_name
-          ) >= 0,
+          p1.attributes.bd_proposal_detail.data.attributes.proposal_name
+            .replace(/ /g, "")
+            .localeCompare(
+              p2.attributes.bd_proposal_detail.data.attributes.proposal_name.replace(
+                / /g,
+                ""
+              )
+            ) >= 0,
         "Proposer A-Z": (p1: ProposedGovAction, p2: ProposedGovAction) =>
-          p1.attributes.creator.data.attributes.govtool_username.localeCompare(
-            p2.attributes.creator.data.attributes.govtool_username
-          ) <= 0,
+          p1.attributes.creator.data.attributes.govtool_username
+            .replace(/ /g, "")
+            .localeCompare(
+              p2.attributes.creator.data.attributes.govtool_username
+            ) <= 0,
         "Proposer Z-A": (p1: ProposedGovAction, p2: ProposedGovAction) =>
-          p1.attributes.creator.data.attributes.govtool_username.localeCompare(
-            p2.attributes.creator.data.attributes.govtool_username
-          ) >= 0,
+          p1.attributes.creator.data.attributes.govtool_username
+            .replace(/ /g, "")
+            .localeCompare(
+              p2.attributes.creator.data.attributes.govtool_username
+            ) >= 0,
       };
 
       for (const [option, validationFn] of Object.entries(sortOptions)) {

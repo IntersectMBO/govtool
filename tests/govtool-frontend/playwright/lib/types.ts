@@ -210,6 +210,7 @@ export type ProposedGovAction = {
       attributes: {
         proposal_id: string;
         prop_name: string;
+        createdAt: string;
       };
     };
     creator: {

@@ -166,6 +166,8 @@ export default class DRepForm {
     await this.identityReferenceFirstDescriptionInput.fill(
       dRepInfo.identityReferenceLinks[0].description
     );
+
+    await this.form.keyboard.press("Tab");
   }
 
   async validateForm(dRepInfo: IDRepInfo) {

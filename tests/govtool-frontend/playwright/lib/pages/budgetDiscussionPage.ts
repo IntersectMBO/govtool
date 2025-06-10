@@ -174,7 +174,11 @@ export default class BudgetDiscussionPage {
     // API validation
     for (let i = 0; i <= proposals.length - 2; i++) {
       const isValid = validationFn(proposals[i], proposals[i + 1]);
-      expect(isValid).toBe(true);
+      expect(isValid, {
+        message:
+          !isValid &&
+          `Failed on sorting ${type} with proposals: ${proposals[i].id} and ${proposals[i + 1].id}`,
+      }).toBe(true);
     }
   }
 

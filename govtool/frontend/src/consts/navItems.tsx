@@ -13,7 +13,18 @@ import {
   // USER_PATHS
 } from "./paths";
 
-export const NAV_ITEMS = [
+export type NavItem = {
+  dataTestId: string;
+  navTo: string;
+  label: string;
+  newTabLink: string | null;
+};
+export type NavMenuItem = {
+  dataTestId: string;
+  label: string;
+  childNavItems?: Array<NavItem>;
+};
+export const NAV_ITEMS: Array<NavItem | NavMenuItem> = [
   {
     dataTestId: "dashboard-link",
     navTo: PATHS.home,
@@ -24,6 +35,7 @@ export const NAV_ITEMS = [
     dataTestId: "drep-directory-link",
     navTo: PATHS.dRepDirectory,
     label: i18n.t("dRepDirectory.title"),
+    newTabLink: null,
   },
   {
     dataTestId: "budget-discussion-link",
@@ -32,22 +44,28 @@ export const NAV_ITEMS = [
     newTabLink: null,
   },
   {
-    dataTestId: "proposed-governance-actions-link",
-    navTo: PDF_PATHS.proposalDiscussion,
-    label: i18n.t("proposalDiscussion.title"),
-    newTabLink: null,
-  },
-  {
-    dataTestId: "governance-actions-link",
-    navTo: PATHS.governanceActions,
-    label: i18n.t("govActions.navTitle"),
-    newTabLink: null,
-  },
-  {
-    dataTestId: "governance-actions-outcomes-link",
-    label: i18n.t("govActions.outcomes.title"),
-    navTo: OUTCOMES_PATHS.governanceActionsOutcomes,
-    newTabLink: null,
+    dataTestId: "governance-actions",
+    label: i18n.t("govActions.title"),
+    childNavItems: [
+      {
+        dataTestId: "proposed-governance-actions-link",
+        navTo: PDF_PATHS.proposalDiscussion,
+        label: i18n.t("proposalDiscussion.title"),
+        newTabLink: null,
+      },
+      {
+        dataTestId: "governance-actions-link",
+        navTo: PATHS.governanceActions,
+        label: i18n.t("govActions.navTitle"),
+        newTabLink: null,
+      },
+      {
+        dataTestId: "governance-actions-outcomes-link",
+        label: i18n.t("govActions.outcomes.title"),
+        navTo: OUTCOMES_PATHS.governanceActionsOutcomes,
+        newTabLink: null,
+      },
+    ],
   },
   {
     dataTestId: "guides-link",

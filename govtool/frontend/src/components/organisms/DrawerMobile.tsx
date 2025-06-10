@@ -1,8 +1,9 @@
+import { FC } from "react";
 import { NavLink } from "react-router-dom";
 import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 
 import { Background, Button, Link, Typography } from "@atoms";
-import { ICONS, IMAGES, NAV_ITEMS, PATHS } from "@consts";
+import { ICONS, IMAGES, NAV_ITEMS, NavMenuItem, NavItem, PATHS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { useFeatureFlag, useModal } from "@context";
 import { openInNewTab } from "@utils";
@@ -13,15 +14,14 @@ import { LINKS } from "@/consts/links";
 const DRAWER_PADDING = 2;
 const CALCULATED_DRAWER_PADDING = DRAWER_PADDING * 8 * 2;
 
+const isNavMenuItem = (item: NavItem | NavMenuItem): item is NavMenuItem =>
+  "childNavItems" in item;
+
 export const DrawerMobile = ({
   isConnectButton,
   isDrawerOpen,
   setIsDrawerOpen,
 }: DrawerMobileProps) => {
-  const {
-    isProposalDiscussionForumEnabled,
-    isGovernanceOutcomesPillarEnabled,
-  } = useFeatureFlag();
   const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { t } = useTranslation();
@@ -85,18 +85,13 @@ export const DrawerMobile = ({
           <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
             <Grid container direction="column" mt={6} rowGap={4}>
               {NAV_ITEMS.map((navItem) => {
-                if (
-                  !isProposalDiscussionForumEnabled &&
-                  navItem.dataTestId === "proposed-governance-actions-link"
-                ) {
-                  return null;
-                }
-
-                if (
-                  !isGovernanceOutcomesPillarEnabled &&
-                  navItem.dataTestId === "governance-actions-outcomes-link"
-                ) {
-                  return null;
+                if (isNavMenuItem(navItem)) {
+                  return (
+                    <MenuNavItem
+                      closeDrawer={() => setIsDrawerOpen(false)}
+                      navItem={navItem}
+                    />
+                  );
                 }
                 return (
                   <Grid item key={navItem.label}>
@@ -127,5 +122,62 @@ export const DrawerMobile = ({
         </Box>
       </Background>
     </SwipeableDrawer>
+  );
+};
+
+const MenuNavItem: FC<{
+  navItem: NavMenuItem;
+  closeDrawer: () => void;
+}> = ({ closeDrawer, navItem }) => {
+  const {
+    isProposalDiscussionForumEnabled,
+    isGovernanceOutcomesPillarEnabled,
+  } = useFeatureFlag();
+
+  const filterChildNavItems = () => {
+    if (navItem.dataTestId === "governance-actions") {
+      return (navItem.childNavItems || []).filter((item) => {
+        if (
+          !isProposalDiscussionForumEnabled &&
+          item.dataTestId === "proposed-governance-actions-link"
+        )
+          return false;
+        if (
+          !isGovernanceOutcomesPillarEnabled &&
+          item.dataTestId === "governance-actions-outcomes-link"
+        )
+          return false;
+        return true;
+      });
+    }
+    return navItem.childNavItems;
+  };
+  return (
+    <>
+      <Grid item key={navItem.label}>
+        <Link
+          navTo=""
+          data-testid={navItem.dataTestId}
+          label={navItem.label}
+          size="big"
+        />
+      </Grid>
+      {filterChildNavItems()?.map((childNavItem) => (
+        <Grid item key={childNavItem.label} ml={3}>
+          <Link
+            {...childNavItem}
+            data-testid={childNavItem.dataTestId}
+            onClick={() => {
+              if (childNavItem.newTabLink) {
+                openInNewTab(childNavItem.newTabLink);
+              }
+              closeDrawer();
+            }}
+            label={childNavItem.label}
+            size="big"
+          />
+        </Grid>
+      ))}
+    </>
   );
 };

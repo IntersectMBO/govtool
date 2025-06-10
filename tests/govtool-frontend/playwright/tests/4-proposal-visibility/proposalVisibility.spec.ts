@@ -203,6 +203,7 @@ test("4H. Should verify none of the displayed governance actions have expired", 
     async () => {
       const proposalCards = await govActionsPage.getAllProposals();
       for (const proposalCard of proposalCards) {
+        await expect(proposalCard).toBeVisible();
         const expiryDateEl = proposalCard.getByTestId("expiry-date");
         const expiryDateTxt = await expiryDateEl.innerText();
         const expiryDate = extractExpiryDateFromText(expiryDateTxt);

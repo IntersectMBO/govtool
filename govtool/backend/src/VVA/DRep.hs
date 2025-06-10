@@ -36,6 +36,7 @@ import qualified  VVA.Proposal                       as Proposal
 import           VVA.Types                          (AppError (CriticalError), DRepInfo (..), DRepRegistration (..),
                                                      DRepStatus (..), DRepType (..), Proposal (..), Vote (..),
                                                      DRepVotingPowerList (..))
+import          VVA.API.SyncAiResponseType          (SearchAiResponse)
 
 import Network.HTTP.Client                          (newManager, parseRequest, httpLbs, RequestBody(..), method,
                                                      requestHeaders, requestBody, responseBody, Manager, Request, Response)
@@ -67,7 +68,7 @@ data DRepQueryResult = DRepQueryResult
   } deriving (Show)
 
 instance FromRow DRepQueryResult where
-  fromRow = DRepQueryResult 
+  fromRow = DRepQueryResult
     <$> field <*> field <*> field <*> field <*> field <*> field
     <*> field <*> field <*> field <*> field <*> field <*> field
     <*> field <*> field <*> field <*> field <*> field <*> field
@@ -98,7 +99,7 @@ listDReps mSearchQuery = withPool $ \conn -> do
 
   timeZone <- liftIO getCurrentTimeZone
   return
-    [ DRepRegistration 
+    [ DRepRegistration
       (queryDrepHash result)
       (queryDrepView result)
       (queryIsScriptBased result)
@@ -138,7 +139,7 @@ drepAiSearch ::
   Maybe Text   -- ^ search query
   -> Int -- ^ page
   -> Int -- ^ limit
-  -> m Value
+  -> m SearchAiResponse
 drepAiSearch query page limit = do
   vvaConfig <- asks getter
   result <- liftIO $ do
@@ -200,7 +201,7 @@ getVotes drepId selectedProposals = withPool $ \conn -> do
 
       timeZone <- liftIO getCurrentTimeZone
 
-      let votes = 
+      let votes =
             [ Vote proposalId' govActionId' drepId' vote' url' docHash' epochNo' (localTimeToUTC timeZone date') voteTxHash'
             | (proposalId', govActionId', drepId', vote', url', docHash', epochNo', date', voteTxHash') <- results
             , govActionId' `elem` proposalsToSelect
@@ -287,9 +288,9 @@ getDRepsVotingPowerList identifiers = withPool $ \conn -> do
     else do
       resultsPerIdentifier <- forM identifiers $ \identifier -> do
         liftIO $ SQL.query conn getFilteredDRepVotingPowerSql (identifier, identifier)
-      
+
       return $ concat resultsPerIdentifier
-  
+
   return
     [ DRepVotingPowerList view hashRaw votingPower givenName
     | (view, hashRaw, votingPower', givenName) <- results

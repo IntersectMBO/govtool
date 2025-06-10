@@ -2,7 +2,11 @@ import { UseInfiniteQueryOptions, useInfiniteQuery } from "react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
-import { GetDRepListArguments, getDRepList, getDRepSyncAiList } from "@services";
+import {
+  GetDRepListArguments,
+  getDRepList,
+  getDRepSyncAiList,
+} from "@services";
 import { DRepData, Infinite } from "@/models";
 
 export const useGetDRepListInfiniteQuery = (
@@ -74,7 +78,7 @@ export const useGetDRepListInfiniteQuery = (
 
 export const useGetDRepSyncAiListInfiniteQuery = (
   { pageSize = 10, searchPhrase }: GetDRepListArguments,
-  options?: UseInfiniteQueryOptions<Infinite<DRepData>>,
+  options?: UseInfiniteQueryOptions<Infinite<any>>,
 ) => {
   const { pendingTransaction } = useCardano();
 
@@ -114,13 +118,15 @@ export const useGetDRepSyncAiListInfiniteQuery = (
       keepPreviousData: options?.keepPreviousData,
     },
   );
+
+  // console.log("useGetDRepSyncAiListInfiniteQuery", data);
   return {
     dRepListFetchNextPage: fetchNextPage,
     dRepListHasNextPage: hasNextPage,
     isDRepListFetching: isFetching,
     isDRepListFetchingNextPage: isFetchingNextPage,
     isDRepListLoading: isLoading,
-    dRepData: data?.pages.flatMap((page) => page.elements),
+    dRepData: data,
     isPreviousData,
   };
 };

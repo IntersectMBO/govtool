@@ -115,6 +115,7 @@ library
                  , VVA.CommandLine
                  , VVA.API
                  , VVA.API.Types
+                 , VVA.API.SyncAiResponseType
                  , VVA.API.Utils
                  , VVA.DRep
                  , VVA.AdaHolder

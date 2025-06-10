@@ -10,6 +10,7 @@ import {
 } from "@consts";
 import { useCardano, useDataActionsBar } from "@context";
 import {
+  useDebounce,
   useDelegateTodRep,
   useGetAdaHolderCurrentDelegationQuery,
   useGetAdaHolderVotingPowerQuery,
@@ -266,18 +267,20 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 const SyncAiSearchWrapper: FC<PropsWithChildren> = ({ children }) => {
   const { t } = useTranslation();
   const [searchText, setSearchText] = useState("");
+  const [debouncedSearchText] = useDebounce(searchText.trim(), 1200);
   const [usingAI, setUsingAI] = useState(true);
 
   const d = useGetDRepSyncAiListInfiniteQuery(
     {
-      searchPhrase: searchText,
+      searchPhrase: debouncedSearchText,
     },
     {
       keepPreviousData: true,
+      enabled: !!debouncedSearchText && debouncedSearchText.length > 0,
     },
   );
 
-  console.log(d)
+  console.log('component', JSON.stringify(d));
 
   return (
     <Box>

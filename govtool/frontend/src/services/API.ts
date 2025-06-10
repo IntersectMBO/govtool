@@ -15,9 +15,9 @@ export const SetupInterceptors = (navigate: NavigateFunction) =>
   API.interceptors.response.use(
     (response) => response,
     (error) => {
-      if (error?.response?.status === 500) {
-        navigate(PATHS.error, { state: { errorCode: 500 } });
-      }
+      // if (error?.response?.status === 500) {
+      //   navigate(PATHS.error, { state: { errorCode: 500 } });
+      // }
 
       return Promise.reject(error);
     },

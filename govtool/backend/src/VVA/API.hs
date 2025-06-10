@@ -47,6 +47,7 @@ import qualified VVA.Types                as Types
 import           VVA.Types                (App, AppEnv (..),
                                            AppError (CriticalError, InternalError, ValidationError),
                                            CacheEnv (..))
+import         VVA.API.SyncAiResponseType (SearchAiResponse)
 import Data.Time (TimeZone, localTimeToUTC)
 
 type VVAApi =
@@ -60,7 +61,7 @@ type VVAApi =
     :<|> "drep-ai-search" :> QueryParam "search" Text
                           :> QueryParam "page" Natural
                           :> QueryParam "pageSize" Natural
-                          :> Get '[JSON] Value
+                          :> Get '[JSON] SearchAiResponse
     :<|> "drep" :> "get-voting-power" :> Capture "drepId" HexText :> Get '[JSON] Integer
     :<|> "drep" :> "getVotes"
                 :> Capture "drepId" HexText
@@ -170,9 +171,9 @@ drepList mSearchQuery statuses mSortMode mPage mPageSize = do
               viewLower = Text.toLower dRepRegistrationView
               hashLower = Text.toLower dRepRegistrationDRepHash
           in case dRepRegistrationType of
-              Types.SoleVoter -> 
+              Types.SoleVoter ->
                 searchLower == viewLower || searchLower == hashLower
-              Types.DRep -> 
+              Types.DRep ->
                 True
 
 
@@ -214,7 +215,7 @@ drepList mSearchQuery statuses mSortMode mPage mPageSize = do
     , listDRepsResponseElements = elements
     }
 
-drepAiSearch :: App m => Maybe Text -> Maybe Natural -> Maybe Natural -> m Value
+drepAiSearch :: App m => Maybe Text -> Maybe Natural -> Maybe Natural -> m SearchAiResponse
 drepAiSearch searchQuery mPage mPageSize = do
   let page = fromIntegral $ fromMaybe 0 mPage
       pageSize = fromIntegral $ fromMaybe 10 mPageSize
@@ -304,13 +305,13 @@ getVotes :: App m => HexText -> [GovernanceActionType] -> Maybe GovernanceAction
 getVotes (unHexText -> dRepId) selectedTypes sortMode mSearch = do
   CacheEnv {dRepGetVotesCache} <- asks vvaCache
   (votes, proposals) <- cacheRequest dRepGetVotesCache dRepId $ DRep.getVotes dRepId []
-  
-  let voteMapByTxHash = Map.fromList $ 
+
+  let voteMapByTxHash = Map.fromList $
         map (\vote -> (pack $ Prelude.takeWhile (/= '#') (unpack $ Types.voteGovActionId vote), vote)) votes
-  
-  processedProposals <- filter (isProposalSearchedFor mSearch) <$> 
+
+  processedProposals <- filter (isProposalSearchedFor mSearch) <$>
                         mapSortAndFilterProposals selectedTypes sortMode proposals
-  
+
   return $
     [ VoteResponse
       { voteResponseVote = voteToResponse vote
@@ -351,15 +352,15 @@ drepInfo (unHexText -> dRepId) = do
 drepVotingPowerList :: App m => [Text] -> m [DRepVotingPowerListResponse]
 drepVotingPowerList identifiers = do
   CacheEnv {dRepVotingPowerListCache} <- asks vvaCache
-  
+
   let cacheKey = Text.intercalate "," (sort identifiers)
-  
-  results <- cacheRequest dRepVotingPowerListCache cacheKey $ 
+
+  results <- cacheRequest dRepVotingPowerListCache cacheKey $
     DRep.getDRepsVotingPowerList identifiers
-  
+
   return $ map toDRepVotingPowerListResponse results
   where
-    toDRepVotingPowerListResponse Types.DRepVotingPowerList{..} = 
+    toDRepVotingPowerListResponse Types.DRepVotingPowerList{..} =
       DRepVotingPowerListResponse
         { drepVotingPowerListResponseView = drepView
         , drepVotingPowerListResponseHashRaw = HexText drepHashRaw
@@ -441,9 +442,9 @@ getProposal g@(GovActionId govActionTxHash govActionIndex) mDrepId' = do
   let mDrepId = unHexText <$> mDrepId'
   CacheEnv {getProposalCache} <- asks vvaCache
   proposal@Types.Proposal {proposalUrl, proposalDocHash} <- cacheRequest getProposalCache (unHexText govActionTxHash, govActionIndex) (Proposal.getProposal (unHexText govActionTxHash) govActionIndex)
-  
+
   timeZone <- liftIO getCurrentTimeZone
-  
+
   let proposalResponse = proposalToResponse timeZone proposal
   voteResponse <- case mDrepId of
     Nothing -> return Nothing
@@ -463,20 +464,20 @@ getProposal g@(GovActionId govActionTxHash govActionIndex) mDrepId' = do
 getEnactedProposalDetails :: App m => Maybe GovernanceActionType -> m (Maybe EnactedProposalDetailsResponse)
 getEnactedProposalDetails maybeType = do
   let proposalType = maybe "HardForkInitiation" governanceActionTypeToText maybeType
-  
+
   mDetails <- Proposal.getPreviousEnactedProposal proposalType
-  
+
   let response = enactedProposalDetailsToResponse <$> mDetails
-  
+
   return response
   where
     governanceActionTypeToText :: GovernanceActionType -> Text
-    governanceActionTypeToText actionType = 
+    governanceActionTypeToText actionType =
       case actionType of
         HardForkInitiation -> "HardForkInitiation"
         ParameterChange -> "ParameterChange"
         _ -> "HardForkInitiation"
-    
+
     enactedProposalDetailsToResponse :: Types.EnactedProposalDetails -> EnactedProposalDetailsResponse
     enactedProposalDetailsToResponse Types.EnactedProposalDetails{..} =
       EnactedProposalDetailsResponse
@@ -498,7 +499,7 @@ getTransactionStatus (unHexText -> transactionId) = do
   return $ GetTransactionStatusResponse $ case status of
     Just value -> Just $ toJSON value
     Nothing    -> Nothing
-    
+
 throw500 :: App m => m ()
 throw500 = throwError $ CriticalError "intentional system break for testing purposes"
 

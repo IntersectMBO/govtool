@@ -146,7 +146,7 @@ data DRepRegistration
       , dRepRegistrationGivenName              :: Maybe Text
       , dRepRegistrationObjectives             :: Maybe Text
       , dRepRegistrationMotivations            :: Maybe Text
-      , dRepRegistrationQualifications          :: Maybe Text
+      , dRepRegistrationQualifications         :: Maybe Text
       , dRepRegistrationImageUrl               :: Maybe Text
       , dRepRegistrationImageHash              :: Maybe Text
       , dRepRegistrationIdentityReferences     :: Maybe Value
@@ -179,7 +179,7 @@ instance FromRow DRepRegistration where
       <*> field -- dRepRegistrationIdentityReferences
       <*> field -- dRepRegistrationLinkReferences
 
-data Proposal 
+data Proposal
   = Proposal
       { proposalId                    :: Integer
       , proposalTxHash                :: Text

@@ -196,7 +196,7 @@ export type ProposalVote = {
   metadataHash: string;
   proposalId: string;
   txHash: string;
-  url: string;
+  // url: string;
   vote: Vote;
 };
 
@@ -225,7 +225,7 @@ export type ProposalData = {
   metadataHash: string;
   txHash: string;
   type: GovernanceActionType;
-  url: string;
+  // url: string;
   prevGovActionIndex: number | null;
   prevGovActionTxHash: string | null;
   abstract?: string;
@@ -238,7 +238,7 @@ export type ProposalData = {
 
 export type NewConstitutionAnchor = {
   dataHash: string;
-  url: string;
+  // url: string;
 };
 
 export type VotedProposal = {

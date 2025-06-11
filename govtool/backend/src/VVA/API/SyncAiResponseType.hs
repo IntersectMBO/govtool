@@ -6,6 +6,7 @@
 
 module VVA.API.SyncAiResponseType where
 
+import Data.Maybe (fromMaybe)
 import GHC.Generics (Generic)
 import Data.Text (Text)
 import qualified Data.Text (stripPrefix)
@@ -60,7 +61,7 @@ data DRepData = DRepData
   -- Missing:
   -- , dataHash               :: Maybe Text
   -- , deposit                :: Integer
-  , votingPower        :: Double -- We might need to multiply this by 1e6 to get the actual voting power + Int
+  -- , votingPower        :: Double -- We might need to multiply this by 1e6 to get the actual voting power + Int
   , status             :: Text
   -- Missing:
   -- , type                   :: DRepType
@@ -81,26 +82,23 @@ data DRepData = DRepData
 instance FromJSON DRepData where
   parseJSON = withObject "DRepData" $ \v -> do
     -- dRep data:
-    -- drepId         <- v .:  "drepId"
     motivations    <- v .:  "motivations"
     givenName      <- v .:  "name"
     objectives     <- v .:  "objectives"
     status         <- v .:  "status"
     url            <- v .:? "url"
-    votingPower    <- (v .: "votingPower" <|> (v .: "metrics" >>= (.: "votingPower")))
+    -- votingPower    <- (v .: "votingPower" <|> (v .: "metrics" >>= (.: "votingPower")))
 
     --
     mMeta     <- v .:? "metadata"
     mJsonMeta <- mMeta .::? "json_metadata"
     mBody     <- mJsonMeta .::? "body"
 
-    drepId <- v .:? "drepId" >>= \did ->
-      case did of
-        Just _  -> pure did
-        Nothing -> do
-          m <- v .:? "metadata"
-          m1 <- m .::? "hex"
-          traverse parseJSON m1
+    drepId <- do
+      m <- v .:? "metadata"
+      m1 <- m .::? "hex"
+      mt <- traverse parseJSON m1
+      pure (fromMaybe "" mt)
 
     imageUrl <- do
       m <- v .:? "metadata"
@@ -147,7 +145,7 @@ instance FromJSON DRepData where
                 )
 
     pure $ DRepData
-      drepId motivations givenName objectives status url votingPower
+      drepId motivations givenName objectives status url -- votingPower
       imageUrl imageHash paymentAddress qualifications linkRefs identityRefs
 
 data Reference = Reference

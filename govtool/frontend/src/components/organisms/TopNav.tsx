@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, FC } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { AppBar, Box, Grid, IconButton } from "@mui/material";
+import { AppBar, Box, Grid, IconButton, Menu, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Button, Link } from "@atoms";
-import { ICONS, IMAGES, PATHS, NAV_ITEMS } from "@consts";
+import { ICONS, IMAGES, PATHS, NAV_ITEMS, NavMenuItem } from "@consts";
 import { useCardano, useFeatureFlag, useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
@@ -12,11 +12,10 @@ import { useMaintenanceEndingBannerContext } from "./MaintenanceEndingBanner";
 
 const POSITION_TO_BLUR = 80;
 
+const isNavMenuItem = (item: NavItem | NavMenuItem): item is NavMenuItem =>
+  "childNavItems" in item;
+
 export const TopNav = ({ isConnectButton = true }) => {
-  const {
-    isProposalDiscussionForumEnabled,
-    isGovernanceOutcomesPillarEnabled,
-  } = useFeatureFlag();
   const containerRef = useRef<HTMLDivElement>(null);
   const [shouldBlur, setShouldBlur] = useState(false);
   const { openModal } = useModal();
@@ -49,20 +48,6 @@ export const TopNav = ({ isConnectButton = true }) => {
     openModal({ type: "chooseWallet" });
   };
 
-  const filteredNavItems = NAV_ITEMS.filter((navItem) => {
-    if (
-      !isProposalDiscussionForumEnabled &&
-      navItem.dataTestId === "proposed-governance-actions-link"
-    )
-      return false;
-    if (
-      !isGovernanceOutcomesPillarEnabled &&
-      navItem.dataTestId === "governance-actions-outcomes-link"
-    )
-      return false;
-    return true;
-  });
-
   const renderDesktopNav = () => (
     <nav
       style={{ display: "flex", alignItems: "center", justifyContent: "end" }}
@@ -73,18 +58,29 @@ export const TopNav = ({ isConnectButton = true }) => {
         columns={5}
         columnSpacing={screenWidth < 1024 ? 2 : 4}
       >
-        {filteredNavItems.map((navItem) => (
-          <Grid item key={navItem.label}>
-            <Link
-              {...navItem}
-              isConnectWallet={isConnectButton}
-              onClick={() => {
-                if (navItem.newTabLink) openInNewTab(navItem.newTabLink);
-                setIsDrawerOpen(false);
-              }}
-            />
-          </Grid>
-        ))}
+        {NAV_ITEMS.map((navItem) => {
+          if (isNavMenuItem(navItem)) {
+            return (
+              <Grid item key={navItem.label}>
+                <MenuNavItem
+                  navItem={navItem}
+                  closeDrawer={() => setIsDrawerOpen(false)}
+                />
+              </Grid>
+            );
+          }
+          return (
+            <Grid item key={navItem.label}>
+              <Link
+                {...navItem}
+                isConnectWallet={isConnectButton}
+                onClick={() => {
+                  setIsDrawerOpen(false);
+                }}
+              />
+            </Grid>
+          );
+        })}
         {isConnectButton && (
           <Grid item>
             <Button
@@ -194,5 +190,125 @@ export const TopNav = ({ isConnectButton = true }) => {
         </Box>
       </AppBar>
     </Box>
+  );
+};
+
+const MenuNavItem: FC<{
+  navItem: NavMenuItem;
+  closeDrawer: () => void;
+}> = ({ closeDrawer, navItem }) => {
+  const [anchorEl, setAnchorEl] = useState<HTMLAnchorElement | null>(null);
+  const {
+    isProposalDiscussionForumEnabled,
+    isGovernanceOutcomesPillarEnabled,
+  } = useFeatureFlag();
+
+  // Create a ref array for child links to manage cliking within MenuItem but outside of Link
+  const linkRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const filterChildNavItems = () => {
+    if (navItem.dataTestId === "governance-actions") {
+      return (navItem.childNavItems || []).filter((item) => {
+        if (
+          !isProposalDiscussionForumEnabled &&
+          item.dataTestId === "proposed-governance-actions-link"
+        )
+          return false;
+        if (
+          !isGovernanceOutcomesPillarEnabled &&
+          item.dataTestId === "governance-actions-outcomes-link"
+        )
+          return false;
+        return true;
+      });
+    }
+    return navItem.childNavItems;
+  };
+  return (
+    <>
+      <Link
+        navTo=""
+        data-testid={navItem.dataTestId}
+        aria-controls={open ? "basic-menu" : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? "true" : undefined}
+        onClick={handleClick}
+        label={
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+            }}
+          >
+            {navItem.label}
+            <img
+              alt="dropdown-icon"
+              src={ICONS.arrowDownIcon}
+              style={{
+                marginLeft: "8px",
+                width: "16px",
+                height: "16px",
+                transform: open ? "rotate(180deg)" : "rotate(0deg)",
+                transition: "transform 0.2s ease-in-out",
+              }}
+            />
+          </span>
+        }
+      />
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        slotProps={{
+          paper: {
+            sx: {
+              mt: 2,
+            },
+          },
+        }}
+      >
+        {filterChildNavItems()?.map((childNavItem, idx) => (
+          <MenuItem
+            key={childNavItem.label}
+            data-testid={childNavItem.dataTestId}
+            sx={{ minWidth: 160 }}
+            onClick={() => {
+              linkRefs.current[idx]?.click();
+            }}
+          >
+            <Link
+              {...childNavItem}
+              ref={(el) => {
+                linkRefs.current[idx] = el;
+              }}
+              onClick={() => {
+                if (childNavItem.newTabLink) {
+                  openInNewTab(childNavItem.newTabLink);
+                }
+                closeDrawer();
+                handleClose();
+              }}
+              label={childNavItem.label}
+            />
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
   );
 };

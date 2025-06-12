@@ -303,7 +303,18 @@ SELECT
     COALESCE(cv.ccNoVotes, 0) cc_no_votes,
     COALESCE(cv.ccAbstainVotes, 0) cc_abstain_votes,
     prev_gov_action.index as prev_gov_action_index,
-    encode(prev_gov_action_tx.hash, 'hex') as prev_gov_action_tx_hash
+    encode(prev_gov_action_tx.hash, 'hex') as prev_gov_action_tx_hash,
+    COALESCE(
+      json_agg(
+        json_build_object(
+          'name', off_chain_vote_author.name,
+          'witness_algorithm', off_chain_vote_author.witness_algorithm,
+          'public_key', off_chain_vote_author.public_key,
+          'signature', off_chain_vote_author.signature
+        )
+      ) FILTER (WHERE off_chain_vote_author.id IS NOT NULL),
+      '[]'
+    ) authors
 FROM
     gov_action_proposal
     JOIN ActiveProposals ON gov_action_proposal.id = ActiveProposals.id
@@ -314,6 +325,7 @@ FROM
     LEFT JOIN block AS creator_block ON creator_block.id = creator_tx.block_id
     LEFT JOIN voting_anchor ON voting_anchor.id = gov_action_proposal.voting_anchor_id
     LEFT JOIN off_chain_vote_data ON off_chain_vote_data.voting_anchor_id = voting_anchor.id
+    lEFT JOIN off_chain_vote_author ON off_chain_vote_author.off_chain_vote_data_id = off_chain_vote_data.id
     LEFT JOIN off_chain_vote_gov_action_data ON off_chain_vote_gov_action_data.off_chain_vote_data_id = off_chain_vote_data.id
     LEFT JOIN param_proposal AS proposal_params ON gov_action_proposal.param_proposal = proposal_params.id
     LEFT JOIN cost_model AS cost_model ON proposal_params.cost_model_id = cost_model.id

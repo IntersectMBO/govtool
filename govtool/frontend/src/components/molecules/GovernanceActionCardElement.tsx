@@ -15,7 +15,7 @@ import { useModal } from "@/context";
 
 type BaseProps = {
   label: string;
-  text?: string | number;
+  text?: React.ReactNode;
   dataTestId?: string;
   isSliderCard?: boolean;
   tooltipProps?: Omit<TooltipProps, "children">;
@@ -108,7 +108,7 @@ export const GovernanceActionCardElement = ({
         ...(isSemiTransparent && { opacity: 0.75 }),
       }}
     >
-      {isMarkdown ? removeMarkdown(text) : text}
+      {typeof text === "string" && isMarkdown ? removeMarkdown(text) : text}
     </Typography>
   );
 

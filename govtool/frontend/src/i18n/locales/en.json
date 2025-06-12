@@ -421,6 +421,13 @@
     "amount": "Amount:",
     "anchorURL": "Metadata anchor link",
     "anchorHash": "Metadata anchor hash",
+    "authors": {
+      "noDataAvailable": "No data available",
+      "title": "Authors",
+      "publicKey": "Public Key",
+      "signature": "Signature",
+      "witnessAlgorithm": "Witness Algorithm"
+    },
     "backToGovActions": "Back to Governance Actions",
     "castVote": "<0>You voted {{vote}} on this proposal</0>\non {{date}} (Epoch {{epoch}})",
     "castVoteDeadline": "You can change your vote up to {{date}} (Epoch {{epoch}})",

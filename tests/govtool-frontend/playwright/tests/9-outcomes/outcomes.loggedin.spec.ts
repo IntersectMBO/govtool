@@ -25,7 +25,7 @@ test.describe("Outcomes page", () => {
   });
 
   test("9A_2. Should access Outcomes page in connected state", async () => {
-    await outcomePage.shouldAccessPage();
+    await outcomePage.shouldAccessPage(true);
   });
   test.describe("outcome sorting and filtering", () => {
     test("9C_1B. Should filter Governance Action Type on governance actions page", async () => {

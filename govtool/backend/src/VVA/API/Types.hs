@@ -401,8 +401,38 @@ data ProposalResponse
       , proposalResponseCcAbstainVotes      :: Integer
       , proposalResponsePrevGovActionIndex  :: Maybe Integer
       , proposalResponsePrevGovActionTxHash :: Maybe HexText
+      , proposalResponseAuthors             :: Maybe ProposalAuthors
       }
   deriving (Generic, Show)
+
+newtype ProposalAuthors = ProposalAuthors { getProposalAuthors :: Value }
+  deriving newtype (Show)
+
+instance FromJSON ProposalAuthors where
+  parseJSON v@(Array _) = pure $ ProposalAuthors v
+  parseJSON _           = fail "ProposalAuthors must be a JSON array"
+
+instance ToJSON ProposalAuthors where
+  toJSON (ProposalAuthors v) = v
+
+instance ToSchema ProposalAuthors where
+  declareNamedSchema _ = pure $ NamedSchema (Just "ProposalAuthors") $ mempty
+    & type_ ?~ OpenApiArray
+    & description ?~ "A JSON array of proposal authors"
+    & example ?~ toJSON
+        [ object
+            [ "name" .= ("Alice" :: Text)
+            , "witness_algorithm" .= ("algo" :: Text)
+            , "public_key" .= ("key" :: Text)
+            , "signature" .= ("sig" :: Text)
+            ]
+        , object
+            [ "name" .= ("Bob" :: Text)
+            , "witness_algorithm" .= ("algo2" :: Text)
+            , "public_key" .= ("key2" :: Text)
+            , "signature" .= ("sig2" :: Text)
+            ]
+        ]
 
 deriveJSON (jsonOptions "proposalResponse") ''ProposalResponse
 

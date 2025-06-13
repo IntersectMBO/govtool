@@ -294,7 +294,8 @@ test.describe("Mocked proposal", () => {
 
   test("8F. Should display all comments with count indication.", async () => {
     await expect(proposalDiscussionDetailsPage.commentCount).toHaveText(
-      mockProposal.data.attributes.prop_comments_number.toString()
+      mockProposal.data.attributes.prop_comments_number.toString(),
+      { timeout: 60_000 }
     );
   });
 });

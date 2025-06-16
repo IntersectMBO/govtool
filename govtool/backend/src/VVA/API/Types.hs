@@ -422,17 +422,30 @@ instance ToSchema ProposalAuthors where
     & example ?~ toJSON
         [ object
             [ "name" .= ("Alice" :: Text)
-            , "witness_algorithm" .= ("algo" :: Text)
-            , "public_key" .= ("key" :: Text)
+            , "witnessAlgorithm" .= ("algo" :: Text)
+            , "publicKey" .= ("key" :: Text)
             , "signature" .= ("sig" :: Text)
             ]
         , object
             [ "name" .= ("Bob" :: Text)
-            , "witness_algorithm" .= ("algo2" :: Text)
-            , "public_key" .= ("key2" :: Text)
+            , "witnessAlgorithm" .= ("algo2" :: Text)
+            , "publicKey" .= ("key2" :: Text)
             , "signature" .= ("sig2" :: Text)
             ]
         ]
+
+exampleProposalAuthors :: Text
+exampleProposalAuthors =
+  "[\
+  \ {\"name\": \"Alice\",\
+  \  \"witnessAlgorithm\": \"Ed25519\",\
+  \  \"publicKey\": \"abcdef123456\",\
+  \  \"signature\": \"deadbeef\"},\
+  \ {\"name\": \"Bob\",\
+  \  \"witnessAlgorithm\": \"Ed25519\",\
+  \  \"publicKey\": \"123456abcdef\",\
+  \  \"signature\": \"beefdead\"}\
+  \]"
 
 deriveJSON (jsonOptions "proposalResponse") ''ProposalResponse
 
@@ -463,7 +476,9 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"cCNoVotes\": 0,"
                   <> "\"cCAbstainVotes\": 0,"
                   <> "\"prevGovActionIndex\": 0,"
-                  <> "\"prevGovActionTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
+                  <> "\"prevGovActionTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
+                  <> "\"authors\": " <> exampleProposalAuthors
+                  <> "}"
 
 instance ToSchema Value where
   declareNamedSchema _ = pure $ NamedSchema (Just "Value") $ mempty

@@ -308,8 +308,8 @@ SELECT
       json_agg(
         json_build_object(
           'name', off_chain_vote_author.name,
-          'witness_algorithm', off_chain_vote_author.witness_algorithm,
-          'public_key', off_chain_vote_author.public_key,
+          'witnessAlgorithm', off_chain_vote_author.witness_algorithm,
+          'publicKey', off_chain_vote_author.public_key,
           'signature', off_chain_vote_author.signature
         )
       ) FILTER (WHERE off_chain_vote_author.id IS NOT NULL),

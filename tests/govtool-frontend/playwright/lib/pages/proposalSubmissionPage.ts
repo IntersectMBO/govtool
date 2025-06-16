@@ -64,7 +64,9 @@ export default class ProposalSubmissionPage {
   readonly editSubmissionButton = this.page.getByTestId(
     "edit-submission-button"
   );
-  readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
+  readonly verifyIdentityBtn = this.page.getByTestId(
+    "user-validation-get-started"
+  );
   readonly governanceActionType = this.page.getByLabel(
     "Governance Action Type *"
   );

@@ -401,6 +401,7 @@ data ProposalResponse
       , proposalResponseCcAbstainVotes      :: Integer
       , proposalResponsePrevGovActionIndex  :: Maybe Integer
       , proposalResponsePrevGovActionTxHash :: Maybe HexText
+      , proposalResponseJson                :: Maybe Value
       , proposalResponseAuthors             :: Maybe ProposalAuthors
       }
   deriving (Generic, Show)

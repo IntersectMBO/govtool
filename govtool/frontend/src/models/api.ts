@@ -234,6 +234,12 @@ export type ProposalData = {
   references?: Reference[];
   title?: string;
   protocolParams: EpochParams | null;
+  authors?: {
+    name?: string;
+    witnessAlgorithm?: string;
+    publicKey?: string;
+    signature?: string;
+  }[];
 } & SubmittedVotesData;
 
 export type NewConstitutionAnchor = {
@@ -270,8 +276,8 @@ type DRepVotingPower = {
 export type DRepVotingPowerListResponse = DRepVotingPower[];
 
 export type Account = {
-  id: number,
-  view: string,
-  isRegistered: boolean,
-  isScriptBased: boolean
-}
+  id: number;
+  view: string;
+  isRegistered: boolean;
+  isScriptBased: boolean;
+};

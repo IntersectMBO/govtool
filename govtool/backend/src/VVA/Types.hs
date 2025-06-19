@@ -208,6 +208,7 @@ data Proposal
       , proposalCcAbstainVotes        :: Integer
       , proposalPrevGovActionIndex    :: Maybe Integer
       , proposalPrevGovActionTxHash   :: Maybe Text
+      , proposalAuthors               :: Maybe Value
       }
   deriving (Show)
 
@@ -241,6 +242,7 @@ instance FromRow Proposal where
       <*> (floor @Scientific <$> field) -- proposalCcAbstainVotes
       <*> field -- prevGovActionIndex
       <*> field -- prevGovActionTxHash
+      <*> field -- proposalAuthors
 
 data TransactionStatus = TransactionStatus
   { transactionConfirmed         :: Bool

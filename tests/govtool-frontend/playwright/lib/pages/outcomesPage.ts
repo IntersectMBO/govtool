@@ -251,13 +251,21 @@ export default class OutComesPage {
     return outcomeStatus.some((status) => filters.includes(status));
   }
 
-  async shouldAccessPage() {
+  async shouldAccessPage(isLoggedIn = false) {
     await this.page.goto("/");
 
     if (isMobile(this.page)) {
       await this.page.getByTestId("open-drawer-button").click();
+    } else {
+      if (!isLoggedIn) {
+        await this.page.getByTestId("governance-actions").click();
+      }
     }
     await this.page.getByTestId("governance-actions-outcomes-link").click();
+
+    if (!isMobile(this.page) && !isLoggedIn) {
+      await this.page.getByTestId("governance-actions").click();
+    }
 
     await expect(this.page.getByText(/outcomes/i)).toHaveCount(2);
   }

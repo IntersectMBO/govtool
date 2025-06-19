@@ -134,7 +134,7 @@ const buildProtocolParameterChangeGovernanceAction: (
   protocolParameterChangeProps: ProtocolParameterChangeProps
 ) => Promise<VotingProposalBuilder | undefined>;
 
-const buildHardForkInitiationGovernanceAction: (
+const buildHardForkGovernanceAction: (
   hardForkInitiationProps: HardForkInitiationProps
 ) => Promise<VotingProposalBuilder | undefined>;
 
@@ -210,7 +210,7 @@ const {
   buildSignSubmitConwayCertTx,
   buildNewInfoGovernanceAction,
   buildProtocolParameterChangeGovernanceAction,
-  buildHardForkInitiationGovernanceAction,
+  buildHardForkGovernanceAction,
   buildTreasuryGovernanceAction,
   buildNewConstitutionGovernanceAction,
   buildUpdateCommitteeGovernanceAction,
@@ -241,7 +241,7 @@ govActionBuilder = await buildProtocolParameterChangeGovernanceAction({
 });
 
 // hash of the previous Governance Action, index of the previous Governance Action, url of the metadata, hash of the metadata, and the major and minor numbers of the hard fork initiation
-govActionBuilder = await buildHardForkInitiationGovernanceAction({
+govActionBuilder = await buildHardForkGovernanceAction({
   prevGovernanceActionHash,
   prevGovernanceActionIndex,
   url,

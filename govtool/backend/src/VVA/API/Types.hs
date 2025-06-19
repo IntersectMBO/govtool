@@ -401,8 +401,51 @@ data ProposalResponse
       , proposalResponseCcAbstainVotes      :: Integer
       , proposalResponsePrevGovActionIndex  :: Maybe Integer
       , proposalResponsePrevGovActionTxHash :: Maybe HexText
+      , proposalResponseAuthors             :: Maybe ProposalAuthors
       }
   deriving (Generic, Show)
+
+newtype ProposalAuthors = ProposalAuthors { getProposalAuthors :: Value }
+  deriving newtype (Show)
+
+instance FromJSON ProposalAuthors where
+  parseJSON v@(Array _) = pure $ ProposalAuthors v
+  parseJSON _           = fail "ProposalAuthors must be a JSON array"
+
+instance ToJSON ProposalAuthors where
+  toJSON (ProposalAuthors v) = v
+
+instance ToSchema ProposalAuthors where
+  declareNamedSchema _ = pure $ NamedSchema (Just "ProposalAuthors") $ mempty
+    & type_ ?~ OpenApiArray
+    & description ?~ "A JSON array of proposal authors"
+    & example ?~ toJSON
+        [ object
+            [ "name" .= ("Alice" :: Text)
+            , "witnessAlgorithm" .= ("algo" :: Text)
+            , "publicKey" .= ("key" :: Text)
+            , "signature" .= ("sig" :: Text)
+            ]
+        , object
+            [ "name" .= ("Bob" :: Text)
+            , "witnessAlgorithm" .= ("algo2" :: Text)
+            , "publicKey" .= ("key2" :: Text)
+            , "signature" .= ("sig2" :: Text)
+            ]
+        ]
+
+exampleProposalAuthors :: Text
+exampleProposalAuthors =
+  "[\
+  \ {\"name\": \"Alice\",\
+  \  \"witnessAlgorithm\": \"Ed25519\",\
+  \  \"publicKey\": \"abcdef123456\",\
+  \  \"signature\": \"deadbeef\"},\
+  \ {\"name\": \"Bob\",\
+  \  \"witnessAlgorithm\": \"Ed25519\",\
+  \  \"publicKey\": \"123456abcdef\",\
+  \  \"signature\": \"beefdead\"}\
+  \]"
 
 deriveJSON (jsonOptions "proposalResponse") ''ProposalResponse
 
@@ -433,7 +476,9 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"cCNoVotes\": 0,"
                   <> "\"cCAbstainVotes\": 0,"
                   <> "\"prevGovActionIndex\": 0,"
-                  <> "\"prevGovActionTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
+                  <> "\"prevGovActionTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
+                  <> "\"authors\": " <> exampleProposalAuthors
+                  <> "}"
 
 instance ToSchema Value where
   declareNamedSchema _ = pure $ NamedSchema (Just "Value") $ mempty

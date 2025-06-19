@@ -3,12 +3,17 @@ import { NavLink } from "react-router-dom";
 import { Typography } from "@mui/material";
 import { useCardano } from "@context";
 
+const FONT_SIZE = {
+  small: 14,
+  big: 22,
+};
+
 type LinkProps = {
   dataTestId?: string;
   isConnectWallet?: boolean;
   label: React.ReactNode;
   navTo: string;
-  onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
+  onClick?: (event: MouseEvent<HTMLElement>) => void;
   size?: "small" | "big";
 };
 
@@ -24,10 +29,7 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
     } = props;
     const { disconnectWallet } = useCardano();
 
-    const fontSize = {
-      small: 14,
-      big: 22,
-    }[size];
+    const fontSize = FONT_SIZE[size];
 
     return (
       <NavLink
@@ -54,6 +56,43 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
           </Typography>
         )}
       </NavLink>
+    );
+  },
+);
+
+// This component is used as a placeholder for links that do not navigate anywhere,
+// but with the same styling as the Link component.
+export const FakeLink = forwardRef<HTMLElement, Omit<LinkProps, "navTo">>(
+  (props, ref) => {
+    const {
+      dataTestId,
+      isConnectWallet,
+      label,
+      size = "small",
+      onClick,
+    } = props;
+    const { disconnectWallet } = useCardano();
+
+    const fontSize = FONT_SIZE[size];
+
+    return (
+      <Typography
+        data-testid={dataTestId}
+        onClick={(e) => {
+          e.preventDefault();
+          if (!isConnectWallet) disconnectWallet();
+          if (onClick) onClick(e);
+        }}
+        ref={ref}
+        sx={{
+          cursor: "pointer",
+          fontSize,
+          fontWeight: 500,
+          color: "textBlack",
+        }}
+      >
+        {label}
+      </Typography>
     );
   },
 );

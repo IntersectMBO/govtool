@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, Fragment } from "react";
 import { Box, Tabs, Tab, styled, Skeleton } from "@mui/material";
 import { useLocation } from "react-router-dom";
 
-import { CopyButton, ExternalModalButton, Typography } from "@atoms";
+import { CopyButton, ExternalModalButton, Tooltip, Typography } from "@atoms";
 import {
   GovernanceActionCardElement,
   GovernanceActionDetailsCardLinks,
@@ -76,6 +76,7 @@ export const GovernanceActionDetailsCardData = ({
   isValidating,
   proposal: {
     abstract,
+    authors,
     createdDate,
     createdEpochNo,
     details,
@@ -365,6 +366,35 @@ export const GovernanceActionDetailsCardData = ({
           />
         </>
       )}
+      <GovernanceActionCardElement
+        label={t("govActions.authors.title")}
+        text={
+          (authors ?? []).length <= 0
+            ? t("govActions.authors.noDataAvailable")
+            : (authors ?? []).map((author, idx, arr) => (
+              <Fragment key={author.publicKey}>
+                <Tooltip
+                  heading={`${t("govActions.authors.witnessAlgorithm")}: ${
+                      author.witnessAlgorithm
+                    }`}
+                  paragraphOne={`${t("govActions.authors.publicKey")}: ${
+                      author.publicKey
+                    }`}
+                  paragraphTwo={`${t("govActions.authors.signature")}: ${
+                      author.signature
+                    }`}
+                  placement="bottom-end"
+                  arrow
+                >
+                  <span>{author.name}</span>
+                </Tooltip>
+                {idx < arr.length - 1 && <span>,&nbsp;</span>}
+              </Fragment>
+              ))
+        }
+        textVariant="longText"
+        dataTestId="authors"
+      />
 
       <GovernanceActionDetailsCardLinks links={references} />
     </Box>

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, FC } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { AppBar, Box, Grid, IconButton, Menu, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Button, Link } from "@atoms";
+import { Button, Link, FakeLink } from "@atoms";
 import { ICONS, IMAGES, PATHS, NAV_ITEMS, NavMenuItem } from "@consts";
 import { useCardano, useFeatureFlag, useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
@@ -48,6 +48,10 @@ export const TopNav = ({ isConnectButton = true }) => {
     openModal({ type: "chooseWallet" });
   };
 
+  const closeDrawer = () => {
+    setIsDrawerOpen(false);
+  };
+
   const renderDesktopNav = () => (
     <nav
       style={{ display: "flex", alignItems: "center", justifyContent: "end" }}
@@ -62,10 +66,7 @@ export const TopNav = ({ isConnectButton = true }) => {
           if (isNavMenuItem(navItem)) {
             return (
               <Grid item key={navItem.label}>
-                <MenuNavItem
-                  navItem={navItem}
-                  closeDrawer={() => setIsDrawerOpen(false)}
-                />
+                <MenuNavItem navItem={navItem} closeDrawer={closeDrawer} />
               </Grid>
             );
           }
@@ -75,7 +76,8 @@ export const TopNav = ({ isConnectButton = true }) => {
                 {...navItem}
                 isConnectWallet={isConnectButton}
                 onClick={() => {
-                  setIsDrawerOpen(false);
+                  if (navItem.newTabLink) openInNewTab(navItem.newTabLink);
+                  closeDrawer();
                 }}
               />
             </Grid>
@@ -197,17 +199,17 @@ const MenuNavItem: FC<{
   navItem: NavMenuItem;
   closeDrawer: () => void;
 }> = ({ closeDrawer, navItem }) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLAnchorElement | null>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const {
     isProposalDiscussionForumEnabled,
     isGovernanceOutcomesPillarEnabled,
   } = useFeatureFlag();
 
   // Create a ref array for child links to manage cliking within MenuItem but outside of Link
-  const linkRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+  const linkRefs = useRef<Array<HTMLElement | null>>([]);
 
   const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
@@ -234,12 +236,8 @@ const MenuNavItem: FC<{
   };
   return (
     <>
-      <Link
-        navTo=""
-        data-testid={navItem.dataTestId}
-        aria-controls={open ? "basic-menu" : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? "true" : undefined}
+      <FakeLink
+        dataTestId={navItem.dataTestId}
         onClick={handleClick}
         label={
           <span
@@ -286,14 +284,14 @@ const MenuNavItem: FC<{
         {filterChildNavItems()?.map((childNavItem, idx) => (
           <MenuItem
             key={childNavItem.label}
-            data-testid={childNavItem.dataTestId}
             sx={{ minWidth: 160 }}
             onClick={() => {
               linkRefs.current[idx]?.click();
             }}
           >
             <Link
-              {...childNavItem}
+              dataTestId={childNavItem.dataTestId}
+              navTo={childNavItem.navTo}
               ref={(el) => {
                 linkRefs.current[idx] = el;
               }}

@@ -200,7 +200,7 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{
                 "image_name": "${{ steps.image_lowercase.outputs.lowercase }}-${{ env.CLEAN_NETWORK}}"
-                "tag": "${{ env.COMMIT_TAG}}"
+                "tag": "${{ env.COMMIT_TAG }}"
                 }'
 
       - name: Add tag as a PR comment

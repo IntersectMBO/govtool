@@ -37,3 +37,4 @@ export * from "./uniqBy";
 export * from "./wait";
 export * from "./getBase64ImageDetails";
 export * from "./parseBoolean";
+export * from "./validateSignature";

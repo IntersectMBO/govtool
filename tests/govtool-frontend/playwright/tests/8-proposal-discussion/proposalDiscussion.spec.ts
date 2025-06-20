@@ -231,7 +231,7 @@ test("8S. Should restrict proposal creation on disconnected state", async ({
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
 
-  await expect(proposalDiscussionPage.proposalCreateBtn).not.toBeVisible();
+  await expect(proposalDiscussionPage.proposalCreateBtn).toBeDisabled();
 });
 
 test("8E. Should share proposed governance action", async ({

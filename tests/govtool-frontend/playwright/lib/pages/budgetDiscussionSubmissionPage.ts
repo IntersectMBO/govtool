@@ -48,7 +48,9 @@ export default class BudgetDiscussionSubmissionPage {
 
   readonly continueBtn = this.page.getByTestId("continue-button");
   readonly addLinkBtn = this.page.getByTestId("add-link-button");
-  readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
+  readonly verifyIdentityBtn = this.page
+    .getByTestId("verify-user-link")
+    .first();
   readonly saveDraftBtn = this.page.getByTestId("draft-button");
   readonly submitBtn = this.page.getByTestId("submit-button");
 

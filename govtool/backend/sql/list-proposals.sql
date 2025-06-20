@@ -304,6 +304,7 @@ SELECT
     COALESCE(cv.ccAbstainVotes, 0) cc_abstain_votes,
     prev_gov_action.index as prev_gov_action_index,
     encode(prev_gov_action_tx.hash, 'hex') as prev_gov_action_tx_hash,
+    off_chain_vote_data.json as json_content,
     COALESCE(
       json_agg(
         json_build_object(
@@ -367,4 +368,5 @@ GROUP BY
     off_chain_vote_gov_action_data.title,
     off_chain_vote_gov_action_data.abstract,
     off_chain_vote_gov_action_data.motivation,
-    off_chain_vote_gov_action_data.rationale;
+    off_chain_vote_gov_action_data.rationale,
+    off_chain_vote_data.json;

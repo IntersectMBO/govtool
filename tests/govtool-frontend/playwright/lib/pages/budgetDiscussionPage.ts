@@ -14,7 +14,8 @@ export default class BudgetDiscussionPage {
   readonly proposalBudgetDiscussionBtn = this.page.getByTestId(
     "propose-a-budget-discussion-button"
   );
-  readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
+  readonly verifyUserLink = this.page.getByTestId("verify-user-link").first();
+  readonly verifyDRepLink = this.page.getByTestId("verify-drep-link").first();
   readonly filterBtn = this.page.getByTestId("filter-button");
   readonly sortBtn = this.page.getByTestId("sort-button");
   readonly myProposalBtn = this.page.getByTestId(

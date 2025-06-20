@@ -195,7 +195,7 @@ jobs:
 
       - name: Notify Qovery of new image tag
         run: |
-            curl -X POST https://api.qovery.com/organisation/${{ secrets.QOVERY_ORG_ID }}/container/deploy \
+            curl -X POST https://api.qovery.com/organization/${{ secrets.QOVERY_ORG_ID }}/container/deploy \
             -H "Authorization: Token ${{ secrets.QOVERY_API_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d '{

@@ -1,6 +1,9 @@
-import { useMemo, useState, Fragment } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Box, Tabs, Tab, styled, Skeleton } from "@mui/material";
 import { useLocation } from "react-router-dom";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 import { CopyButton, ExternalModalButton, Tooltip, Typography } from "@atoms";
 import {
@@ -23,8 +26,10 @@ import {
   getFullGovActionId,
   mapArrayToObjectByKeys,
   encodeCIP129Identifier,
+  validateSignature,
 } from "@utils";
 import { MetadataValidationStatus, ProposalData } from "@models";
+import { errorRed, successGreen } from "@/consts";
 import { GovernanceActionType } from "@/types/governanceAction";
 import { useAppContext } from "@/context";
 
@@ -77,6 +82,7 @@ export const GovernanceActionDetailsCardData = ({
   proposal: {
     abstract,
     authors,
+    json: jsonContent,
     createdDate,
     createdEpochNo,
     details,
@@ -369,28 +375,39 @@ export const GovernanceActionDetailsCardData = ({
       <GovernanceActionCardElement
         label={t("govActions.authors.title")}
         text={
-          (authors ?? []).length <= 0
-            ? t("govActions.authors.noDataAvailable")
-            : (authors ?? []).map((author, idx, arr) => (
-              <Fragment key={author.publicKey}>
-                <Tooltip
-                  heading={`${t("govActions.authors.witnessAlgorithm")}: ${
-                      author.witnessAlgorithm
-                    }`}
-                  paragraphOne={`${t("govActions.authors.publicKey")}: ${
-                      author.publicKey
-                    }`}
-                  paragraphTwo={`${t("govActions.authors.signature")}: ${
-                      author.signature
-                    }`}
-                  placement="bottom-end"
-                  arrow
+          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+            {(authors ?? []).length <= 0
+              ? t("govActions.authors.noDataAvailable")
+              : (authors ?? []).map((author) => (
+                <Box
+                  key={author.publicKey}
+                  sx={{ display: "flex", gap: 0.5, alignItems: "center" }}
                 >
+                  <AuthorSignatureStatus
+                    signature={author.signature}
+                    publicKey={author.publicKey}
+                    algorithm={author.witnessAlgorithm}
+                    jsonContent={jsonContent}
+                  />
                   <span>{author.name}</span>
-                </Tooltip>
-                {idx < arr.length - 1 && <span>,&nbsp;</span>}
-              </Fragment>
-              ))
+                  <Tooltip
+                    heading={`${t("govActions.authors.witnessAlgorithm")}: ${
+                        author.witnessAlgorithm
+                      }`}
+                    paragraphOne={`${t("govActions.authors.publicKey")}: ${
+                        author.publicKey
+                      }`}
+                    paragraphTwo={`${t("govActions.authors.signature")}: ${
+                        author.signature
+                      }`}
+                    placement="bottom-end"
+                    arrow
+                  >
+                    <InfoOutlinedIcon fontSize="small" />
+                  </Tooltip>
+                </Box>
+                ))}
+          </Box>
         }
         textVariant="longText"
         dataTestId="authors"
@@ -496,5 +513,64 @@ const HardforkDetailsTabContent = ({
         )}
       </Box>
     </Box>
+  );
+};
+
+const AuthorSignatureStatus = ({
+  algorithm,
+  publicKey,
+  signature,
+  jsonContent,
+}: {
+  algorithm?: string;
+  publicKey?: string;
+  signature?: string;
+  jsonContent?: Record<string, unknown>;
+}) => {
+  const { t } = useTranslation();
+  const [isSignatureValid, setIsSignatureValid] = useState<boolean | null>(
+    null,
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    async function checkSignature() {
+      const args = {
+        jsonContent,
+        algorithm,
+        publicKey,
+        signature,
+      };
+      const result = await validateSignature(args);
+      if (!cancelled) setIsSignatureValid(result);
+    }
+    checkSignature();
+    return () => {
+      cancelled = true;
+    };
+  }, [algorithm, jsonContent, publicKey, signature]);
+
+  if (isSignatureValid === null) {
+    return <Skeleton variant="text" width={16} />;
+  }
+  return (
+    <Tooltip
+      heading={
+        isSignatureValid
+          ? t("govActions.authors.singatureVerified")
+          : t("govActions.authors.signatureNotVerified")
+      }
+      placement="bottom-end"
+      arrow
+    >
+      {isSignatureValid ? (
+        <CheckCircleOutlineIcon
+          sx={{ color: successGreen.c500 }}
+          fontSize="small"
+        />
+      ) : (
+        <CancelOutlinedIcon sx={{ color: errorRed.c500 }} fontSize="small" />
+      )}
+    </Tooltip>
   );
 };

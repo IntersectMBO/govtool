@@ -240,6 +240,7 @@ export type ProposalData = {
     publicKey?: string;
     signature?: string;
   }[];
+  json?: Record<string, unknown>;
 } & SubmittedVotesData;
 
 export type NewConstitutionAnchor = {

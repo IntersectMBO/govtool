@@ -15,7 +15,7 @@ test("12A. Should restrict from creating a budget proposal in disconnect state",
     await page.getByTestId("open-drawer-button").click();
   }
   await page.getByTestId("budget-discussion-link").click();
-  await expect(page.getByTestId("verify-identity-button")).not.toBeVisible();
+  await expect(page.getByTestId("verify-user-link")).not.toBeVisible();
   await expect(
     page.getByTestId("propose-a-budget-discussion-button")
   ).not.toBeVisible();

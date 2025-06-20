@@ -245,6 +245,7 @@ proposalToResponse timeZone Types.Proposal {..} =
     proposalResponseCcAbstainVotes = proposalCcAbstainVotes,
     proposalResponsePrevGovActionIndex = proposalPrevGovActionIndex,
     proposalResponsePrevGovActionTxHash = HexText <$> proposalPrevGovActionTxHash,
+    proposalResponseJson = proposalJson,
     proposalResponseAuthors = ProposalAuthors <$> proposalAuthors
   }
 

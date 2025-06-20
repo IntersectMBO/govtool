@@ -17,7 +17,8 @@ export default class BudgetDiscussionDetailsPage {
   readonly changeVoteYesBtn = this.page.getByTestId(
     "change-poll-vote-yes-button"
   );
-  readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
+  readonly verifyUserLink = this.page.getByTestId("verify-user-link").first();
+  readonly verifyDRepLink = this.page.getByTestId("verify-drep-link").first();
   readonly readMoreBtn = this.page.getByTestId("read-more-button");
   readonly menuButton = this.page.getByTestId("menu-button");
 

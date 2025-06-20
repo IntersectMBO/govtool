@@ -19,7 +19,9 @@ export default class ProposalDiscussionPage {
   readonly sortBtn = this.page.getByTestId("sort-button");
   readonly searchInput = this.page.getByTestId("search-input");
   readonly showAllBtn = this.page.getByTestId("show-all-button").first(); //this.page.getByTestId("show-all-button");
-  readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
+  readonly verifyIdentityBtn = this.page
+    .getByTestId("verify-user-link")
+    .first();
   readonly addLinkBtn = this.page.getByTestId("add-link-button");
   readonly infoRadio = this.page.getByTestId("info action-radio-wrapper");
   readonly treasuryRadio = this.page.getByTestId(

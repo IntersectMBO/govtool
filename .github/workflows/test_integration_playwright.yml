@@ -11,7 +11,7 @@ on:
       deployment:
         required: true
         type: choice
-        default: "govtool.cardanoapi.io"
+        default: "p80-z6b8d2f7a-ze34e4cb2-gtw.z937eb260.rustrocks.fr"
         options:
           - "sanchogov.tools"
           - "staging.govtool.byron.network"
@@ -31,7 +31,7 @@ on:
           - "preprod"
 
   workflow_run:
-    workflows: ["Build and deploy GovTool test stack"]
+    workflows: ["Check and Build QA"]
     types: [completed]
     branches: 
       - test

@@ -193,9 +193,12 @@ jobs:
           rm -rf '/tmp/image-${{ matrix.name }}-${{ env.ENVIRONMENT }}.tar'
           docker push ${{ steps.image_lowercase.outputs.lowercase }}-${{ env.CLEAN_NETWORK}}:${{ env.COMMIT_TAG }}
 
+      - name: Sleep for 20 Seconds
+        run: sleep 20
+
       - name: Notify Qovery of new image tag
         run: |
-            curl -X POST https://api.qovery.com/organization/${{ secrets.QOVERY_ORG_ID }}/container/deploy \
+            curl -i -X POST https://api.qovery.com/organization/${{ secrets.QOVERY_ORG_ID }}/container/deploy \
             -H "Authorization: Token ${{ secrets.QOVERY_API_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d '{

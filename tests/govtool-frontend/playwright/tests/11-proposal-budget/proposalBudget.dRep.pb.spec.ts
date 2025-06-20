@@ -25,8 +25,8 @@ test.describe("Budget proposal dRep behaviour", () => {
       budgetDiscussionDetailsPage = new BudgetDiscussionDetailsPage(page);
       await budgetDiscussionDetailsPage.goto(proposalId);
 
-      await budgetDiscussionDetailsPage.verifyIdentityBtn.click();
-      await budgetDiscussionDetailsPage.verifyIdentityBtn.click();
+      await budgetDiscussionDetailsPage.verifyUserLink.click();
+      await budgetDiscussionDetailsPage.verifyDRepLink.click();
     });
 
     test("11K. Should allow registered DRep to vote on a proposal", async () => {
@@ -88,10 +88,10 @@ test.describe("Budget proposal dRep behaviour", () => {
     const comment = faker.lorem.words(5);
     const budgetDiscussionPage = new BudgetDiscussionPage(page);
     await budgetDiscussionPage.goto();
-    await budgetDiscussionPage.verifyIdentityBtn.click();
-    await budgetDiscussionPage.verifyIdentityBtn.click();
+    await budgetDiscussionPage.verifyUserLink.click();
     const budgetDiscussionDetailsPage =
       await budgetDiscussionPage.viewFirstProposal();
+    await budgetDiscussionPage.verifyDRepLink.click();
     await budgetDiscussionDetailsPage.addComment(comment);
 
     await expect(

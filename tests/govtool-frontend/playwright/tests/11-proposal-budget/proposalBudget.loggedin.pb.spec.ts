@@ -23,7 +23,7 @@ test.describe("Budget proposal logged in state", () => {
   test.beforeEach(async ({ page }) => {
     const budgetDiscussionPage = new BudgetDiscussionPage(page);
     await budgetDiscussionPage.goto();
-    await budgetDiscussionPage.verifyIdentityBtn.click();
+    await budgetDiscussionPage.verifyUserLink.click();
     budgetDiscussionDetailsPage =
       await budgetDiscussionPage.viewFirstProposal();
   });

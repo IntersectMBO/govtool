@@ -97,8 +97,18 @@ export default defineConfig({
       name: "proposal discussion",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.pd.spec.ts",
+      testIgnore: ["**/*.loggedin.pd.spec.ts"],
       dependencies: environments.ci
         ? ["proposal discussion auth setup"]
+        : [],
+        teardown: environments.ci && "cleanup artifacts",
+    },
+      {
+      name: "proposal discussion (loggedin)",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: "**/*.loggedin.pd.spec.ts",
+      dependencies: environments.ci
+        ? ["proposal discussion auth setup", "user auth setup"]
         : [],
         teardown: environments.ci && "cleanup artifacts",
     },

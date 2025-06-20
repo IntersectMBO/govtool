@@ -97,7 +97,7 @@ test.describe("Logged in user", () => {
   }) => {
     await page.goto("/");
     await page.getByTestId("proposal-discussion-link").click();
-    await page.getByTestId("verify-identity-button").click();
+    await page.getByTestId("verify-user-link").first().click();
 
     await expect(page.getByTestId("setup-username-modal")).toBeVisible();
     await expect(page.getByTestId("username-input")).toBeVisible();

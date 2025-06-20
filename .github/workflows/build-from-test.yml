@@ -195,11 +195,11 @@ jobs:
 
       - name: Notify Qovery of new image tag
         run: |
-            curl -X POST https://api.qovery.com/organisations/${{ secrets.QOVERY_ORG_ID }}/container/deploy \
-            -H "Authorisation: Token ${{ secrets.QOVERY_API_TOKEN }}" \
+            curl -X POST https://api.qovery.com/organisation/${{ secrets.QOVERY_ORG_ID }}/container/deploy \
+            -H "Authorization: Token ${{ secrets.QOVERY_API_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d '{
-                "image-name": "${{ steps.image_lowercase.outputs.lowercase }}-${{ env.CLEAN_NETWORK}}"
+                "image_name": "${{ steps.image_lowercase.outputs.lowercase }}-${{ env.CLEAN_NETWORK}}"
                 "tag": "${{ env.COMMIT_TAG}}"
                 }'
 

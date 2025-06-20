@@ -14,6 +14,7 @@ changes.
 
 - Preserve maintenance ending banner state on the wallet connection change [Issue 3681](https://github.com/IntersectMBO/govtool/issues/3681)
 - Add authors for Live Voting Governance Actions [Issue 3745](https://github.com/IntersectMBO/govtool/issues/3745)
+- Add support for ed25519 author signature validation on gov actions [Issue 3745](https://github.com/IntersectMBO/govtool/issues/3745)
 
 ### Fixed
 

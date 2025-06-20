@@ -423,10 +423,12 @@
     "anchorHash": "Metadata anchor hash",
     "authors": {
       "noDataAvailable": "No data available",
-      "title": "Authors",
+      "title": "Author(s)",
       "publicKey": "Public Key",
       "signature": "Signature",
-      "witnessAlgorithm": "Witness Algorithm"
+      "witnessAlgorithm": "Witness Algorithm",
+      "singatureVerified": "Author signature is verified",
+      "signatureNotVerified": "Author signature is not verified"
     },
     "backToGovActions": "Back to Governance Actions",
     "castVote": "<0>You voted {{vote}} on this proposal</0>\non {{date}} (Epoch {{epoch}})",

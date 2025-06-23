@@ -166,6 +166,8 @@ export default class DRepForm {
     await this.identityReferenceFirstDescriptionInput.fill(
       dRepInfo.identityReferenceLinks[0].description
     );
+
+    await this.form.keyboard.press("Tab");
   }
 
   async validateForm(dRepInfo: IDRepInfo) {
@@ -230,6 +232,8 @@ export default class DRepForm {
         `${dRepInfo.paymentAddress} is an invalid paymentAddress`,
     }).toBeHidden({ timeout: 60_000 });
     await expect(this.continueBtn).toBeEnabled();
+    // Wait for the form to settle after validation
+    await this.form.waitForTimeout(500);
   }
 
   async inValidateForm(dRepInfo: IDRepInfo) {
@@ -327,5 +331,7 @@ export default class DRepForm {
     }).toBeVisible();
 
     await expect(this.continueBtn).toBeDisabled();
+    // Wait for the form to settle after validation
+    await this.form.waitForTimeout(500);
   }
 }

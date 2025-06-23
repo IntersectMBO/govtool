@@ -1,18 +1,14 @@
 import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
 import { Box, Link } from "@mui/material";
+import { ArrowDownward } from "@mui/icons-material";
 
 import { Button, Typography } from "@atoms";
-import { IMAGES, PATHS } from "@consts";
-import { useCardano, useModal } from "@context";
+import { IMAGES } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 
 export const Hero = () => {
-  const { isEnabled } = useCardano();
-  const { openModal } = useModal();
-  const navigate = useNavigate();
   const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
   const IMAGE_SIZE = screenWidth < 640 ? 300 : screenWidth < 860 ? 400 : 600;
@@ -33,7 +29,8 @@ export const Hero = () => {
     return screenWidth / 11;
   }, [screenWidth]);
 
-  const onClickVotingPower = () => openInNewTab("https://docs.gov.tools");
+  const onClickVotingPower = () =>
+    openInNewTab("https://docs.cardano.org/about-cardano/governance-overview");
 
   return (
     <Box
@@ -79,12 +76,15 @@ export const Hero = () => {
         <Button
           data-testid="hero-connect-wallet-button"
           onClick={() => {
-            if (isEnabled) {
-              navigate(PATHS.dashboard);
-            } else {
-              openModal({ type: "chooseWallet" });
-            }
+            const homeCards =
+              window.document.getElementsByClassName("home-cards")[0];
+
+            homeCards.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            });
           }}
+          endIcon={<ArrowDownward />}
           size={isMobile ? "medium" : "extraLarge"}
         >
           {t("hero.connectWallet")}

@@ -3,6 +3,7 @@ import {
   budgetProposal02AuthFile,
   budgetProposal03AuthFile,
   budgetProposal04AuthFile,
+  budgetProposal05AuthFile,
   dRep03AuthFile,
 } from "@constants/auth";
 import {
@@ -10,6 +11,7 @@ import {
   budgetProposal02Wallet,
   budgetProposal03Wallet,
   budgetProposal04Wallet,
+  budgetProposal05Wallet,
   dRep03Wallet,
 } from "@constants/staticWallets";
 import { test as setup } from "@fixtures/walletExtension";
@@ -41,6 +43,11 @@ const walletAuthPairs = [
     wallet: budgetProposal04Wallet,
     auth: budgetProposal04AuthFile,
     name: "Budget Proposal 04",
+  },
+  {
+    wallet: budgetProposal05Wallet,
+    auth: budgetProposal05AuthFile,
+    name: "Budget Proposal 05",
   },
 ];
 

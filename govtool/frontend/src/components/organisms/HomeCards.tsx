@@ -60,6 +60,7 @@ export const HomeCards = () => {
       gridTemplateColumns="repeat(auto-fill, minmax(300px, 866px))"
       justifyContent="center"
       rowGap={4.625}
+      className="home-cards"
     >
       {/* DELEGATE CARD */}
       <ActionCard

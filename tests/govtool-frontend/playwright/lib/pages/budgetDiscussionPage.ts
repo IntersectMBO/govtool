@@ -1,6 +1,10 @@
 import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
 import { expect, Locator, Page } from "@playwright/test";
-import { BudgetDiscussionEnum, ProposedGovAction } from "@types";
+import {
+  BudgetDiscussionEnum,
+  BudgetProposalFilterTypes,
+  ProposedGovAction,
+} from "@types";
 import environments from "lib/constants/environments";
 import BudgetDiscussionDetailsPage from "./budgetDiscussionDetailsPage";
 
@@ -10,9 +14,13 @@ export default class BudgetDiscussionPage {
   readonly proposalBudgetDiscussionBtn = this.page.getByTestId(
     "propose-a-budget-discussion-button"
   );
-  readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
+  readonly verifyUserLink = this.page.getByTestId("verify-user-link").first();
+  readonly verifyDRepLink = this.page.getByTestId("verify-drep-link").first();
   readonly filterBtn = this.page.getByTestId("filter-button");
   readonly sortBtn = this.page.getByTestId("sort-button");
+  readonly myProposalBtn = this.page.getByTestId(
+    "My Proposals-owner-filter-option"
+  );
 
   // input
   readonly searchInput = this.page.getByTestId("search-input");
@@ -49,7 +57,10 @@ export default class BudgetDiscussionPage {
     });
     const proposalCards = await this.page.locator(proposalCardSelector).all();
 
-    expect(true, "No budget proposals found.").toBeTruthy();
+    expect(
+      true,
+      proposalCards.length === 0 && "No budget proposals found."
+    ).toBeTruthy();
 
     return proposalCards;
   }
@@ -134,16 +145,29 @@ export default class BudgetDiscussionPage {
   }
 
   async sortAndValidate(
-    option: "asc" | "desc",
+    type: BudgetProposalFilterTypes,
     validationFn: (p1: ProposedGovAction, p2: ProposedGovAction) => boolean
   ) {
+    const sortMappings = {
+      "Proposer A-Z": "&sort[creator][govtool_username]=ASC",
+      "Proposer Z-A": "&sort[creator][govtool_username]=DESC",
+      "Name A-Z": "&sort[bd_proposal_detail][proposal_name]=ASC",
+      "Name Z-A": "&sort[bd_proposal_detail][proposal_name]=DESC",
+      "Most comments": "&sort[prop_comments_number]=DESC",
+      "Least comments": "&sort[prop_comments_number]=ASC",
+      Oldest: "&sort[createdAt]=ASC",
+      Newest: "&sort[createdAt]=DESC",
+    };
+
+    const urlParam = sortMappings[type];
+    const populateParam = "&populate[0]=bd_costing";
+
     const responsePromise = this.page.waitForResponse((response) =>
-      response
-        .url()
-        .includes(`&sort[createdAt]=${option}&populate[0]=bd_costing`)
+      response.url().includes(`${urlParam}${populateParam}`)
     );
 
     await this.sortBtn.click();
+    await this.page.getByTestId(`${type}-sort-option`).click();
     const response = await responsePromise;
 
     let proposals: ProposedGovAction[] = (await response.json()).data;
@@ -151,7 +175,11 @@ export default class BudgetDiscussionPage {
     // API validation
     for (let i = 0; i <= proposals.length - 2; i++) {
       const isValid = validationFn(proposals[i], proposals[i + 1]);
-      expect(isValid).toBe(true);
+      expect(isValid, {
+        message:
+          !isValid &&
+          `Failed on sorting ${type} with proposals: ${proposals[i].id} and ${proposals[i + 1].id}`,
+      }).toBe(true);
     }
   }
 

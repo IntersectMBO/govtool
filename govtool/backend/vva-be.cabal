@@ -1,6 +1,6 @@
 cabal-version:      3.6
 name:               vva-be
-version:            2.0.20
+version:            2.0.23
 
 -- A short (one-line) description of the package.
 -- synopsis:
@@ -36,6 +36,8 @@ extra-source-files:
   sql/get-network-total-stake.sql
   sql/get-dreps-voting-power-list.sql
   sql/get-filtered-dreps-voting-power.sql
+  sql/get-previous-enacted-governance-action-proposal-details.sql
+  sql/get-account-info.sql
 executable vva-be
     main-is:          Main.hs
 
@@ -123,4 +125,5 @@ library
                  , VVA.Pool
                  , VVA.Types
                  , VVA.Network
+                 , VVA.Account
   ghc-options: -threaded

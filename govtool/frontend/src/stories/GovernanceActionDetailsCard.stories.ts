@@ -59,9 +59,23 @@ const commonArgs = {
     metadataHash: "exampleMetadataHash",
     references: [
       {
-        "@type": "Reference",
+        "@type": "Links",
         uri: "https://exampleurl.com",
         label: "Example label",
+      },
+    ],
+    authors: [
+      {
+        name: "Alice Cardana",
+        witnessAlgorithm: "Ed25519",
+        publicKey: "ed25519_pk1qwertyuiopasdfghjklzxcvbnm1234567890abcdef",
+        signature: "ed25519_sig1abcdef1234567890qwertyuiopasdfghjklzxcvbnm",
+      },
+      {
+        name: "Bob Stakepool",
+        witnessAlgorithm: "Ed25519",
+        publicKey: "ed25519_pk1asdfghjklqwertyuiopzxcvbnm0987654321abcdf",
+        signature: "ed25519_sig1zxcvbnm0987654321asdfghjklqwertyuiop",
       },
     ],
   } satisfies ProposalData,

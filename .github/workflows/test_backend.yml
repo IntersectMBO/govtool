@@ -16,6 +16,7 @@ on:
           - "sanchogov.tools/api"
           - "staging.govtool.byron.network/api"
           - "govtool.cardanoapi.io/api"
+          - "be.preview.gov.tools"
           - "z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr"
           - "z78acf3c2-z5575152b-gtw.z937eb260.rustrocks.fr"
           - "be.gov.tools"
@@ -28,12 +29,16 @@ on:
           - "preview"
           - "mainnet"
           - "preprod"
+
   workflow_run:
     workflows: ["Build and deploy GovTool test stack"]
     types: [completed]
-    branches: 
+    branches:
       - test
       - infra/test-chores
+
+  schedule:
+    - cron: "0 0 * * *" # 12AM UTC
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -42,7 +47,7 @@ concurrency:
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' || github.event.schedule }}
     outputs:
       start_time: ${{ steps.set-pending-status.outputs.timestamp }}
       status: ${{ steps.run-tests.outcome }}
@@ -54,6 +59,7 @@ jobs:
 
       - name: Set pending commit status
         id: set-pending-status
+        if: ${{ !github.event.schedule }}
         run: |
           echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
           curl -X POST -H "Authorization: Bearer ${{ github.token }}" \
@@ -99,6 +105,7 @@ jobs:
     needs: backend-tests
     outputs:
       report_number: ${{ steps.report-details.outputs.report_number }}
+      group_name: ${{ steps.set-deployment-url.outputs.group_name }}
     steps:
       - uses: actions/checkout@v4
       - name: Download results
@@ -116,19 +123,17 @@ jobs:
           repository: ${{vars.GH_PAGES}}
           ssh-key: ${{ secrets.DEPLOY_KEY }}
 
-      - name: Register report
-        id: register-project
+      - name: Set Deployment Environment
+        id: set-deployment-url
+        run: |
+          chmod +x .github/scripts/set_deployment_environment.sh
+              .github/scripts/set_deployment_environment.sh
+
+      - name: Remove oldest report to save space
         if: ${{success()}}
         run: |
-          chmod +x .github/scripts/register_report.sh
-          .github/scripts/register_report.sh
-      - if: steps.register-project.outputs.project_exists != 'true'
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
-          repository-name: ${{vars.GH_PAGES}}
-          branch: gh-pages
-          folder: project
+          chmod +x .github/scripts/remove_oldest_report.sh
+            .github/scripts/remove_oldest_report.sh
 
       - name: Generate report details
         id: report-details
@@ -141,7 +146,7 @@ jobs:
         id: allure-report
         with:
           allure_results: allure-results
-          gh_pages: gh-pages/${{env.REPORT_NAME}}
+          gh_pages: gh-pages/${{steps.set-deployment-url.outputs.group_name}}/${{env.REPORT_NAME}}
           allure_report: allure-report
           allure_history: allure-history
           keep_reports: 2000
@@ -160,7 +165,7 @@ jobs:
           repository-name: ${{vars.GH_PAGES}}
           branch: gh-pages
           folder: build
-          target-folder: ${{ env.REPORT_NAME }}
+          target-folder: ${{steps.set-deployment-url.outputs.group_name}}/${{ env.REPORT_NAME }}
 
   publish-status:
     runs-on: ubuntu-latest
@@ -173,8 +178,9 @@ jobs:
         with:
           name: allure-results
           path: allure-results
+          
       - name: Set Commit Status
-        if: always()
+        if: always() && !github.event.schedule
         run: |
           chmod +x .github/scripts/set_commit_status.sh
           .github/scripts/set_commit_status.sh
@@ -183,9 +189,11 @@ jobs:
           TEST_STATUS: ${{ needs.backend-tests.outputs.status }}
           REPORT_NUMBER: ${{ needs.publish-report.outputs.report_number }}
           GITHUB_TOKEN: ${{ github.token }}
+          GROUP_NAME: ${{ needs.publish-report.outputs.group_name }}
 
 env:
-  BASE_URL: https://${{inputs.deployment ||  'govtool.cardanoapi.io/api' }}
-  REPORT_NAME: govtool-backend
+  BASE_URL: https://${{github.event.schedule && 'be.preview.gov.tools' || inputs.deployment ||  'govtool.cardanoapi.io/api' }}
+  DEPLOYMENT: ${{ github.event.schedule && 'be.preview.gov.tools' || inputs.deployment ||  'govtool.cardanoapi.io/api'}}
+  REPORT_NAME: ${{ github.event.schedule && 'nightly-'}}govtool-backend
   GH_PAGES: ${{vars.GH_PAGES}}
   COMMIT_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}

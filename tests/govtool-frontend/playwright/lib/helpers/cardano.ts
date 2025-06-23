@@ -50,7 +50,7 @@ export async function skipIfNotInfoAndBootstrapping(type: ProposalType) {
 export async function skipIfMainnet() {
   if (environments.networkId === 1) {
     await allure.description(
-      "Ada spendable features are not available on mainnet."
+      "Test skipped on mainnet to prevent affecting the production environment or using real ADA."
     );
     test.skip();
   }
@@ -84,4 +84,11 @@ export async function getWalletBalance(address: string) {
   );
 
   return balance;
+}
+
+export async function skipIfScheduledWorkflow() {
+  if (environments.isScheduled) {
+    await allure.description("This test is skipped in scheduled workflow.");
+    test.skip();
+  }
 }

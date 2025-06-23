@@ -41,7 +41,8 @@ export const DRepDetailsCard = ({
     objectives,
     paymentAddress,
     qualifications,
-    references,
+    identityReferences,
+    linkReferences,
     status,
     url,
     view,
@@ -74,21 +75,6 @@ export const DRepDetailsCard = ({
     };
     validate();
   }, [url]);
-
-  const groupedReferences = references?.reduce<Record<string, Reference[]>>(
-    (acc, reference) => {
-      const type = reference["@type"];
-      if (!acc[type]) {
-        acc[type] = [];
-      }
-      acc[type].push(reference);
-      return acc;
-    },
-    {},
-  );
-
-  const linkReferences = groupedReferences?.Link;
-  const identityReferences = groupedReferences?.Identity;
 
   return (
     <Card

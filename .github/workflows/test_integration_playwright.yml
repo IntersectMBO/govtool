@@ -33,9 +33,12 @@ on:
   workflow_run:
     workflows: ["Check and Build QA"]
     types: [completed]
-    branches: 
+    branches:
       - test
       - infra/test-chores
+
+  schedule:
+    - cron: "0 0 * * *" # 12AM UTC
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -44,7 +47,7 @@ concurrency:
 jobs:
   integration-tests:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' || github.event.schedule }}
     outputs:
       start_time: ${{ steps.set-pending-status.outputs.timestamp }}
       status: ${{ steps.run-test.outcome }}
@@ -56,6 +59,7 @@ jobs:
         with:
           ref: ${{ env.COMMIT_SHA }}
       - name: Set pending commit status
+        if: ${{ !github.event.schedule }}
         id: set-pending-status
         run: |
           echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
@@ -106,6 +110,11 @@ jobs:
             export BLOCKFROST_API_KEY="${{ secrets.BLOCKFROST_API_KEY_MAINNET }}"
           fi
 
+          # Set schedule workflow variable
+          if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
+            export SCHEDULED_WORKFLOW="true"
+          fi
+
           npm run test:headless
 
       - name: Upload report
@@ -131,7 +140,7 @@ jobs:
       FAUCET_ADDRESS: ${{vars.FAUCET_ADDRESS}}
       CARDANOAPI_METADATA_URL: ${{vars.CARDANOAPI_METADATA_URL}}
       FAUCET_PAYMENT_PRIVATE: ${{secrets.FAUCET_PAYMENT_PRIVATE}}
-      FAUCET_STAKE_PKH: ${{secrets.FAUCET_STAKE_PKH}}
+      FAUCET_STAKE_PRIVATE: ${{secrets.FAUCET_STAKE_PRIVATE}}
 
   publish-report:
     runs-on: ubuntu-latest
@@ -139,6 +148,7 @@ jobs:
     needs: integration-tests
     outputs:
       report_number: ${{ steps.report-details.outputs.report_number }}
+      group_name: ${{ steps.set-deployment-url.outputs.group_name }}
     steps:
       - uses: actions/checkout@v4
       - name: Download report
@@ -156,19 +166,17 @@ jobs:
           repository: ${{vars.GH_PAGES}}
           ssh-key: ${{ secrets.DEPLOY_KEY }}
 
-      - name: Register report
-        id: register-project
+      - name: Set Deployment Environment
+        id: set-deployment-url
+        run: |
+          chmod +x .github/scripts/set_deployment_environment.sh
+              .github/scripts/set_deployment_environment.sh
+
+      - name: Remove oldest report to save space
         if: ${{success()}}
         run: |
-          chmod +x .github/scripts/register_report.sh
-          .github/scripts/register_report.sh
-      - if: steps.register-project.outputs.project_exists != 'true'
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
-          repository-name: ${{vars.GH_PAGES}}
-          branch: gh-pages
-          folder: project
+          chmod +x .github/scripts/remove_oldest_report.sh
+           .github/scripts/remove_oldest_report.sh
 
       - name: Generate report details
         id: report-details
@@ -182,7 +190,7 @@ jobs:
         id: allure-report
         with:
           allure_results: allure-results
-          gh_pages: gh-pages/${{env.REPORT_NAME}}
+          gh_pages: gh-pages/${{steps.set-deployment-url.outputs.group_name}}/${{env.REPORT_NAME}}
           allure_report: allure-report
           allure_history: allure-history
           keep_reports: 2000
@@ -201,7 +209,7 @@ jobs:
           repository-name: ${{vars.GH_PAGES}}
           branch: gh-pages
           folder: build
-          target-folder: ${{ env.REPORT_NAME }}
+          target-folder: ${{steps.set-deployment-url.outputs.group_name}}/${{ env.REPORT_NAME }}
 
   publish-status:
     runs-on: ubuntu-latest
@@ -214,8 +222,9 @@ jobs:
         with:
           name: allure-results
           path: allure-results
+
       - name: Set Commit Status
-        if: always()
+        if: always() && !github.event.schedule
         run: |
           chmod +x .github/scripts/set_commit_status.sh
           .github/scripts/set_commit_status.sh
@@ -224,8 +233,10 @@ jobs:
           TEST_STATUS: ${{ needs.integration-tests.outputs.status }}
           REPORT_NUMBER: ${{ needs.publish-report.outputs.report_number }}
           GITHUB_TOKEN: ${{ github.token }}
+          GROUP_NAME: ${{ needs.publish-report.outputs.group_name }}
 env:
-  HOST_URL: https://${{inputs.deployment ||  'p80-z6b8d2f7a-ze34e4cb2-gtw.z937eb260.rustrocks.fr' }}
-  REPORT_NAME: govtool-frontend
+  HOST_URL: https://${{ github.event.schedule && 'preview.gov.tools' || (inputs.deployment || 'p80-z6b8d2f7a-ze34e4cb2-gtw.z937eb260.rustrocks.fr')  }}
+  DEPLOYMENT: ${{ github.event.schedule && 'preview.gov.tools' || inputs.deployment ||  'p80-z6b8d2f7a-ze34e4cb2-gtw.z937eb260.rustrocks.fr'}}
+  REPORT_NAME: ${{ github.event.schedule && 'nightly-'}}govtool-frontend
   GH_PAGES: ${{vars.GH_PAGES}}
   COMMIT_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}

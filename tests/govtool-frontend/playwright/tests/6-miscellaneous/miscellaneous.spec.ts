@@ -22,37 +22,59 @@ test.beforeEach(async () => {
 test("6C. Navigation within the dApp", async ({ page, context }) => {
   await page.goto("/");
 
-  if (isMobile(page)) {
-    await openDrawer(page);
+  const navbarLinks = [
+    { testId: "dashboard-link", url: `${environments.frontendUrl}/` },
+    { testId: "drep-directory-link", urlPattern: /\/drep_directory/ },
+    { testId: "budget-discussion-link", urlPattern: /\/budget_discussion/ },
+    {
+      testId: "proposed-governance-actions-link",
+      urlPattern: /\/proposal_discussion/,
+      isDropdownContent: true,
+    },
+    {
+      testId: "governance-actions-link",
+      urlPattern: /\/governance_actions/,
+      isDropdownContent: true,
+    },
+    {
+      testId: "governance-actions-outcomes-link",
+      urlPattern: /\/outcomes/,
+      isDropdownContent: true,
+    },
+  ];
+
+  for (const link of navbarLinks) {
+    if (isMobile(page)) {
+      await openDrawer(page);
+    }
+
+    if (!isMobile(page) && !!link.isDropdownContent) {
+      await page.getByTestId("governance-actions").click();
+    }
+    await page.getByTestId(link.testId).click();
+
+    if (link.url) {
+      expect(page.url()).toEqual(link.url);
+    } else {
+      await expect(page).toHaveURL(link.urlPattern);
+    }
   }
-  await page.getByTestId("governance-actions-link").click();
-  await expect(page).toHaveURL(/\/governance_actions/);
 
-  if (isMobile(page)) {
-    await openDrawer(page);
+  const externalLinks = [
+    { testId: "guides-link", url: GUIDES_DOC_URL },
+    { testId: "faqs-link", url: FAQS_DOC_URL },
+  ];
+
+  for (const link of externalLinks) {
+    if (isMobile(page)) {
+      await openDrawer(page);
+    }
+    const [newPage] = await Promise.all([
+      context.waitForEvent("page"),
+      page.getByTestId(link.testId).click(),
+    ]);
+    await expect(newPage).toHaveURL(link.url);
   }
-  const [guidesPage] = await Promise.all([
-    context.waitForEvent("page"),
-    page.getByTestId("guides-link").click(),
-  ]);
-
-  await expect(guidesPage).toHaveURL(GUIDES_DOC_URL);
-
-  if (isMobile(page)) {
-    await openDrawer(page);
-  }
-  const [faqsPage] = await Promise.all([
-    context.waitForEvent("page"),
-    page.getByTestId("faqs-link").click(),
-  ]);
-
-  await expect(faqsPage).toHaveURL(FAQS_DOC_URL);
-
-  if (isMobile(page)) {
-    await openDrawer(page);
-  }
-  await page.getByTestId("dashboard-link").click();
-  expect(page.url()).toEqual(`${environments.frontendUrl}/`);
 });
 
 test("6D. Should open Sanchonet docs in a new tab when clicking `Learn More` on dashboards in disconnected state.", async ({

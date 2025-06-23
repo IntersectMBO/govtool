@@ -61,7 +61,6 @@ export default defineConfig({
     {
       name: "dRep auth setup",
       testMatch: "**/dRep.auth.setup.ts",
-      dependencies: environments.ci ? ["dRep setup"] : [],
     },
     {
       name: "proposal discussion auth setup",
@@ -70,6 +69,12 @@ export default defineConfig({
     {
       name: "budget proposal auth setup",
       testMatch: "**/proposal-budget.auth.setup.ts",
+      teardown: environments.ci && "cleanup faucet",
+    },
+    {
+      name: "proposal submission ga auth setup",
+      testMatch: "**/proposal-submission.ga.auth.setup.ts",
+      dependencies: environments.ci ? ["proposal setup"] : [],
       teardown: environments.ci && "cleanup faucet",
     },
     {
@@ -92,8 +97,18 @@ export default defineConfig({
       name: "proposal discussion",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.pd.spec.ts",
+      testIgnore: ["**/*.loggedin.pd.spec.ts"],
       dependencies: environments.ci
         ? ["proposal discussion auth setup"]
+        : [],
+        teardown: environments.ci && "cleanup artifacts",
+    },
+      {
+      name: "proposal discussion (loggedin)",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: "**/*.loggedin.pd.spec.ts",
+      dependencies: environments.ci
+        ? ["proposal discussion auth setup", "user auth setup"]
         : [],
         teardown: environments.ci && "cleanup artifacts",
     },
@@ -112,7 +127,7 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.ga.spec.ts",
       dependencies: environments.ci
-        ? ["proposal setup"]
+        ? ["proposal submission ga auth setup"]
         : [],
         teardown: environments.ci && "cleanup artifacts",
     },
@@ -137,7 +152,7 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.dRep.spec.ts",
       dependencies: environments.ci
-        ? ["dRep auth setup"]
+        ? ["dRep auth setup" , "dRep setup"]
         : [],
         teardown: environments.ci && "cleanup artifacts",
     },

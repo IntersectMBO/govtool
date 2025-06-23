@@ -3,6 +3,7 @@ import { budgetProposal01Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfMainnet } from "@helpers/cardano";
 import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 import { expect } from "@playwright/test";
@@ -22,7 +23,7 @@ test.describe("Budget proposal logged in state", () => {
   test.beforeEach(async ({ page }) => {
     const budgetDiscussionPage = new BudgetDiscussionPage(page);
     await budgetDiscussionPage.goto();
-    await budgetDiscussionPage.verifyIdentityBtn.click();
+    await budgetDiscussionPage.verifyUserLink.click();
     budgetDiscussionDetailsPage =
       await budgetDiscussionPage.viewFirstProposal();
   });
@@ -50,6 +51,8 @@ test.describe("Budget proposal logged in state", () => {
   });
 
   test("11I. Should comments on any proposal", async ({}) => {
+    await skipIfMainnet();
+
     const comment = faker.lorem.words(5);
     await budgetDiscussionDetailsPage.addComment(comment);
     await expect(
@@ -60,6 +63,8 @@ test.describe("Budget proposal logged in state", () => {
   });
 
   test("11J. Should reply to any comments", async ({}) => {
+    await skipIfMainnet();
+
     const randComment = faker.lorem.words(5);
     const randReply = faker.lorem.words(5);
 
@@ -67,7 +72,7 @@ test.describe("Budget proposal logged in state", () => {
 
     await budgetDiscussionDetailsPage.replyComment(randReply);
     const replyRendered = await budgetDiscussionDetailsPage.currentPage
-      .locator(`[data-testid^="reply-"][data-testid$="-content"]`)
+      .locator(`[data-testid^="subcomment-"][data-testid$="-content"]`)
       .textContent();
     expect(replyRendered).toContain(randReply);
   });

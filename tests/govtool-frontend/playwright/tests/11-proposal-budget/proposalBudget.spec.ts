@@ -1,4 +1,5 @@
 import environments from "@constants/environments";
+import { budgetProposalfilterOptionNames } from "@constants/index";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
@@ -8,7 +9,11 @@ import { functionWaitedAssert } from "@helpers/waitedLoop";
 import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 import { expect } from "@playwright/test";
-import { BudgetDiscussionEnum } from "@types";
+import {
+  BudgetDiscussionEnum,
+  BudgetProposalFilterTypes,
+  ProposedGovAction,
+} from "@types";
 
 const mockBudgetProposal = require("../../lib/_mock/budgetProposal.json");
 const mockPoll = require("../../lib/_mock/budgetProposalPoll.json");
@@ -103,15 +108,56 @@ test.describe("Budget proposal list manipulation", () => {
     });
 
     test("11B_3. Should sort budget proposals", async () => {
-      await budgetDiscussionPage.sortAndValidate(
-        "asc",
-        (p1, p2) => p1.attributes.createdAt <= p2.attributes.createdAt
-      );
+      test.slow();
+      const sortOptions = {
+        Oldest: (p1: ProposedGovAction, p2: ProposedGovAction) =>
+          p1.attributes.createdAt <= p2.attributes.createdAt,
+        Newest: (p1: ProposedGovAction, p2: ProposedGovAction) =>
+          p1.attributes.createdAt >= p2.attributes.createdAt,
+        "Most comments": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+          p1.attributes.prop_comments_number >=
+          p2.attributes.prop_comments_number,
+        "Least comments": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+          p1.attributes.prop_comments_number <=
+          p2.attributes.prop_comments_number,
+        "Name A-Z": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+          p1.attributes.bd_proposal_detail.data.attributes.proposal_name
+            .replace(/ /g, "")
+            .localeCompare(
+              p2.attributes.bd_proposal_detail.data.attributes.proposal_name.replace(
+                / /g,
+                ""
+              )
+            ) <= 0,
+        "Name Z-A": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+          p1.attributes.bd_proposal_detail.data.attributes.proposal_name
+            .replace(/ /g, "")
+            .localeCompare(
+              p2.attributes.bd_proposal_detail.data.attributes.proposal_name.replace(
+                / /g,
+                ""
+              )
+            ) >= 0,
+        "Proposer A-Z": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+          p1.attributes.creator.data.attributes.govtool_username
+            .replace(/ /g, "")
+            .localeCompare(
+              p2.attributes.creator.data.attributes.govtool_username
+            ) <= 0,
+        "Proposer Z-A": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+          p1.attributes.creator.data.attributes.govtool_username
+            .replace(/ /g, "")
+            .localeCompare(
+              p2.attributes.creator.data.attributes.govtool_username
+            ) >= 0,
+      };
 
-      await budgetDiscussionPage.sortAndValidate(
-        "desc",
-        (p1, p2) => p1.attributes.createdAt >= p2.attributes.createdAt
-      );
+      for (const [option, validationFn] of Object.entries(sortOptions)) {
+        await budgetDiscussionPage.sortAndValidate(
+          option as BudgetProposalFilterTypes,
+          validationFn
+        );
+      }
     });
   });
 });

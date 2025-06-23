@@ -22,7 +22,7 @@ export const getWalletConfigForFaucet = () => {
       private: environments.faucet.payment.private || "",
     },
     stake: {
-      pkh: environments.faucet.stake.pkh || "",
+      private: environments.faucet.stake.private || "",
     },
     address: environments.faucet.address || "",
   };

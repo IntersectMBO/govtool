@@ -2,7 +2,6 @@ import { dRep02Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { ShelleyWallet } from "@helpers/crypto";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import {
   skipIfMainnet,
@@ -10,7 +9,6 @@ import {
 } from "@helpers/cardano";
 import EditDRepPage from "@pages/editDRepPage";
 import { expect } from "@playwright/test";
-import environments from "@constants/environments";
 import { dRep02AuthFile } from "@constants/auth";
 import { generateInvalidDRepInfo, generateValidDRepInfo } from "@helpers/dRep";
 

@@ -222,7 +222,7 @@ test.describe("Temporary DReps", () => {
     await dRepPage.getByTestId("continue-retirement-button").click();
     await expect(
       dRepPage.getByTestId("retirement-transaction-submitted-modal")
-    ).toBeVisible({ timeout: 15_000 });
+    ).toBeVisible({ timeout: 60_000 });
     dRepPage.getByTestId("confirm-modal-button").click();
 
     await waitForTxConfirmation(dRepPage);

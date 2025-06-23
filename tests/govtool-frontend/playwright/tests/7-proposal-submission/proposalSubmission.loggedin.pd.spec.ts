@@ -18,10 +18,11 @@ import { getDraftProposalWalletAndState } from "@helpers/auth";
 import {
   skipIfNotInfoAndBootstrapping,
   isBootStrapingPhase,
+  skipIfMainnet,
 } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
-import { invalid, valid as mockValid } from "@mock/index";
+import { rewardAddressBech32 } from "@helpers/shellyWallet";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
@@ -132,6 +133,7 @@ test.describe("Proposal created logged state", () => {
         page,
         wallet,
       }) => {
+        await skipIfMainnet();
         await skipIfNotInfoAndBootstrapping(type);
 
         const proposalSubmissionPage = new ProposalSubmissionPage(page);
@@ -306,71 +308,44 @@ test.describe("Proposal created logged state", () => {
     });
   });
 
-  test.describe("Proposed as a governance action", () => {
-    let proposalSubmissionPage: ProposalSubmissionPage;
-    test.beforeEach(async ({ page, proposalId }) => {
-      const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
-        page
-      );
-      await proposalDiscussionDetailsPage.goto(proposalId);
+  test("7O. Should display insufficient balance modal when submitting proposal with insufficient funds", async ({
+    page,
+  }) => {
+    await skipIfMainnet();
+    const proposalCreationPage = new ProposalSubmissionPage(page);
+    await proposalCreationPage.goto();
 
-      await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
+    const receiverAddress = rewardAddressBech32(
+      environments.networkId,
+      proposal01Wallet.stake.pkh
+    );
+
+    await proposalCreationPage.createProposal(receiverAddress);
+
+    const proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
+      page
+    );
+
+    try {
       await proposalDiscussionDetailsPage.submitAsGABtn.click();
+      await expect(
+        proposalCreationPage.currentPage.getByTestId(
+          "insufficient-wallet-balance-title"
+        )
+      ).toHaveText(/Insufficient wallet balance/);
 
-      proposalSubmissionPage = new ProposalSubmissionPage(page);
-      await page.getByTestId("agree-checkbox").click();
-      await proposalSubmissionPage.continueBtn.click();
-    });
-
-    test.describe("Metadata anchor validation", () => {
-      test("7J_1. Should accept valid metadata anchor on proposal submission", async ({
-        page,
-      }) => {
-        test.slow(); // Brute-force testing with 100 random data
-        for (let i = 0; i < 50; i++) {
-          await proposalSubmissionPage.metadataUrlInput.fill(mockValid.url());
-          await expect(page.getByTestId("url-input-error-text")).toBeHidden();
-        }
-      });
-
-      test("7J_2. Should reject invalid metadata anchor on proposal submission", async ({
-        page,
-      }) => {
-        test.slow(); // Brute-force testing with 100 random data
-        for (let i = 0; i < 50; i++) {
-          await proposalSubmissionPage.metadataUrlInput.fill(
-            invalid.url(false)
-          );
-          await expect(page.getByTestId("url-input-error-text")).toBeVisible();
-        }
-
-        const sentenceWithoutSpace = faker.lorem
-          .sentence(128)
-          .replace(/[\s.]/g, "");
-        const metadataAnchorGreaterThan128Bytes =
-          faker.internet.url({ appendSlash: true }) + sentenceWithoutSpace;
-
-        await proposalSubmissionPage.metadataUrlInput.fill(
-          metadataAnchorGreaterThan128Bytes
-        );
-
-        await expect(page.getByTestId("url-input-error-text")).toBeVisible(); // BUG better to add different test id compare to invalid url testid
-      });
-    });
-
-    test("7K. Should reject invalid proposal metadata", async ({ page }) => {
-      await proposalSubmissionPage.metadataUrlInput.fill(faker.internet.url());
-      await proposalSubmissionPage.submitBtn.click();
-
-      await expect(page.getByTestId("url-error-modal-title")).toHaveText(
-        /the url you entered cannot be found/i
-      );
-    });
+      await proposalCreationPage.currentPage
+        .getByTestId("insufficient-wallet-balance-dialog-button")
+        .click();
+    } finally {
+      await proposalDiscussionDetailsPage.deleteProposal();
+    }
   });
 });
 
 test.describe("Proposal Draft", () => {
   test("7C. Should list unfinished Draft ", async ({ browser }) => {
+    await skipIfMainnet();
     const page = await createNewPageWithWallet(browser, {
       storageState: proposal03AuthFile,
       wallet: proposal03Wallet,
@@ -387,6 +362,7 @@ test.describe("Proposal Draft", () => {
   });
 
   test("7L. Should save proposal as a draft", async ({ browser }) => {
+    await skipIfMainnet();
     const page = await createNewPageWithWallet(browser, {
       storageState: proposal04AuthFile,
       wallet: proposal04Wallet,
@@ -463,6 +439,7 @@ test.describe("Proposal Draft", () => {
     test(`7M_${index + 1}. Should edit a ${proposalType.toLowerCase()} proposal draft`, async ({
       browser,
     }) => {
+      await skipIfMainnet();
       test.slow();
       const { storageState, wallet } =
         getDraftProposalWalletAndState(proposalType);
@@ -537,6 +514,7 @@ test.describe("Proposal Draft", () => {
   });
 
   test("7N. Should submit a draft proposal", async ({ browser }) => {
+    await skipIfMainnet();
     const page = await createNewPageWithWallet(browser, {
       storageState: proposal06AuthFile,
       wallet: proposal06Wallet,

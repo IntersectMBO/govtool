@@ -29,3 +29,4 @@ export * from "./ValidatedGovernanceActionCard";
 export * from "./ValidatedGovernanceVotedOnCard";
 export * from "./VoteContext";
 export * from "./WrongRouteInfo";
+export * from "./MaintenanceEndingBanner";

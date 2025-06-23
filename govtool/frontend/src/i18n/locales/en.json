@@ -45,7 +45,7 @@
   "dashboard": {
     "headingOne": "Your Participation",
     "headingTwo": "See Active Governance Actions",
-    "title": "Dashboard",
+    "title": "Home",
     "cards": {
       "drepName": "Drep_name",
       "showTransaction": "Show Transaction",
@@ -205,6 +205,21 @@
           "label": "New Constitution Script Hash",
           "placeholder": "New Constitution Script Hash",
           "tip": "Script hash of the new constitution"
+        },
+        "major": {
+          "label": "Major",
+          "placeholder": "Major version",
+          "tip": "Major version of the new hard fork"
+        },
+        "minor": {
+          "label": "Minor",
+          "placeholder": "Minor version",
+          "tip": "Minor version of the new hard fork"
+        },
+        "protocolParameters": {
+          "label": "Protocol Parameters",
+          "placeholder": "Protocol parameters",
+          "tip": "Protocol parameters to be changed"
         }
       },
       "validations": {
@@ -389,7 +404,8 @@
       "tooLongUrl": "Url must be less than 128 bytes",
       "mustBeStakeAddress": "It must be reward address in bech32 format",
       "mustBeReceivingAddress": "Invalid payment address",
-      "couldNotGenerateImageSha": "Could not generate image sha"
+      "couldNotGenerateImageSha": "Could not generate image sha",
+      "invalidValueType": "Invalid value type"
     }
   },
   "proposalDiscussion": {
@@ -405,6 +421,15 @@
     "amount": "Amount:",
     "anchorURL": "Metadata anchor link",
     "anchorHash": "Metadata anchor hash",
+    "authors": {
+      "noDataAvailable": "No data available",
+      "title": "Author(s)",
+      "publicKey": "Public Key",
+      "signature": "Signature",
+      "witnessAlgorithm": "Witness Algorithm",
+      "singatureVerified": "Author signature is verified",
+      "signatureNotVerified": "Author signature is not verified"
+    },
     "backToGovActions": "Back to Governance Actions",
     "castVote": "<0>You voted {{vote}} on this proposal</0>\non {{date}} (Epoch {{epoch}})",
     "castVoteDeadline": "You can change your vote up to {{date}} (Epoch {{epoch}})",
@@ -539,7 +564,7 @@
     }
   },
   "hero": {
-    "connectWallet": "Connect your wallet to start",
+    "connectWallet": "Participate now",
     "description": "Cardano Governance lets Ada holders have a say in the network's future.\n\nYou can vote directly, find someone to represent you, or become a representative for others.\n\nYou can also propose changes in the network yourself, put these up for discussion and eventually, a vote.\n\n<0>Learn more about governance</0> in the guide, or have a look around the app and see Cardano Governance in action.",
     "headline": "Cardano \n Governance Tool"
   },
@@ -737,7 +762,14 @@
   "system": {
     "description": "The Cardano GovTool is a tool that allows you to participate in the governance of the Cardano network. You can propose, vote on, and delegate your voting power to other users.",
     "title": "This tool is connected to {{networkName}}",
-    "bootstrappingWarning": "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>"
+    "bootstrappingWarning": "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>",
+    "maintenanceEnding": {
+      "title": "⚠️ GovTool needs your support",
+      "description1": "GovTool wasn’t included in the current Cardano budget.",
+      "description2": "A 100k ada maintenance grant will sustain essential infrastructure and bug fixes through 2025 — but future development depends on renewed community backing.",
+      "description3": "Find out what this means and how you can help:",
+      "linkText": "The future of GovTool"
+    }
   },
   "tooltips": {
     "delegateTodRep": {

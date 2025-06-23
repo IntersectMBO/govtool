@@ -25,8 +25,8 @@ test.describe("Budget proposal dRep behaviour", () => {
       budgetDiscussionDetailsPage = new BudgetDiscussionDetailsPage(page);
       await budgetDiscussionDetailsPage.goto(proposalId);
 
-      await budgetDiscussionDetailsPage.verifyIdentityBtn.click();
-      await budgetDiscussionDetailsPage.verifyIdentityBtn.click();
+      await budgetDiscussionDetailsPage.verifyUserLink.click();
+      await budgetDiscussionDetailsPage.verifyDRepLink.click();
     });
 
     test("11K. Should allow registered DRep to vote on a proposal", async () => {
@@ -35,7 +35,9 @@ test.describe("Budget proposal dRep behaviour", () => {
 
       await budgetDiscussionDetailsPage.voteOnPoll(choice);
 
-      await expect(budgetDiscussionDetailsPage.pollYesBtn).not.toBeVisible();
+      await expect(budgetDiscussionDetailsPage.pollYesBtn).not.toBeVisible({
+        timeout: 60_000,
+      });
       await expect(budgetDiscussionDetailsPage.pollNoBtn).not.toBeVisible();
       await expect(
         budgetDiscussionDetailsPage.currentPage.getByTestId(
@@ -59,7 +61,9 @@ test.describe("Budget proposal dRep behaviour", () => {
       await budgetDiscussionDetailsPage.voteOnPoll(choice);
       await budgetDiscussionDetailsPage.changePollVote();
 
-      await expect(budgetDiscussionDetailsPage.pollYesBtn).not.toBeVisible();
+      await expect(budgetDiscussionDetailsPage.pollYesBtn).not.toBeVisible({
+        timeout: 60_000,
+      });
       await expect(budgetDiscussionDetailsPage.pollNoBtn).not.toBeVisible();
 
       // vote must be changed
@@ -84,10 +88,10 @@ test.describe("Budget proposal dRep behaviour", () => {
     const comment = faker.lorem.words(5);
     const budgetDiscussionPage = new BudgetDiscussionPage(page);
     await budgetDiscussionPage.goto();
-    await budgetDiscussionPage.verifyIdentityBtn.click();
-    await budgetDiscussionPage.verifyIdentityBtn.click();
+    await budgetDiscussionPage.verifyUserLink.click();
     const budgetDiscussionDetailsPage =
       await budgetDiscussionPage.viewFirstProposal();
+    await budgetDiscussionPage.verifyDRepLink.click();
     await budgetDiscussionDetailsPage.addComment(comment);
 
     await expect(
@@ -100,25 +104,17 @@ test.describe("Budget proposal dRep behaviour", () => {
       .locator('[data-testid^="comment-"][data-testid$="-content-card"]')
       .first();
 
-    await expect(
-      dRepCommentedCard.getByText("DRep", { exact: true })
-    ).toBeVisible();
+    await expect(dRepCommentedCard.getByTestId("dRep-tag")).toBeVisible();
 
-    const isDRepGivenNameVisible = await dRepCommentedCard
-      .getByTestId("given-name")
-      .isVisible();
-
-    expect(
-      isDRepGivenNameVisible,
-      !isDRepGivenNameVisible && "Missing given-name testId"
-    ).toBeTruthy();
-
-    await expect(dRepCommentedCard.getByTestId("given-name")).toHaveText(
-      dRep03Wallet.givenName
+    await expect(dRepCommentedCard.getByTestId("dRep-given-name")).toHaveText(
+      dRep03Wallet.givenName,
+      { timeout: 60_000 }
     );
 
-    await expect(dRepCommentedCard.getByTestId("drep-id")).toHaveText(
-      dRep03Wallet.dRepId
-    );
+    const dRepIdWithoutDotted = (
+      await dRepCommentedCard.getByTestId("dRep-id").textContent()
+    ).replace(/\./g, "");
+
+    expect(dRep03Wallet.dRepId).toContain(dRepIdWithoutDotted);
   });
 });

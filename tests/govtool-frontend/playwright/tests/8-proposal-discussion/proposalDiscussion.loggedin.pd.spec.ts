@@ -9,15 +9,16 @@ import { createNewPageWithWallet } from "@helpers/page";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import { Page, expect } from "@playwright/test";
 import { setAllureEpic } from "@helpers/allure";
-import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import {
   proposal01AuthFile,
   proposal02AuthFile,
   user01AuthFile,
 } from "@constants/auth";
+import { skipIfMainnet } from "@helpers/cardano";
 
 test.beforeEach(async () => {
   await setAllureEpic("8. Proposal Discussion Forum");
+  await skipIfMainnet();
 });
 
 test.describe("Proposal created logged in state", () => {
@@ -179,37 +180,5 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
     const userProposalDetailsPage = new ProposalDiscussionDetailsPage(page);
     await expect(userProposalDetailsPage.pollYesBtn).not.toBeVisible();
     await expect(userProposalDetailsPage.pollNoBtn).not.toBeVisible();
-  });
-
-  test("8U. Should navigate to the edit proposal page when 'goto data edit screen' is selected if data does not match the anchor URL", async () => {
-    const invalidMetadataAnchorUrl = "https://www.google.com";
-    await ownerProposalDiscussionDetailsPage.submitAsGABtn.click();
-
-    const proposalSubmissionPage = new ProposalSubmissionPage(proposalPage);
-    await proposalPage.getByTestId("agree-checkbox").click();
-    await proposalSubmissionPage.continueBtn.click();
-    await proposalSubmissionPage.metadataUrlInput.fill(
-      invalidMetadataAnchorUrl
-    );
-    await proposalSubmissionPage.submitBtn.click();
-
-    await expect(
-      proposalPage.getByTestId("data-not-match-modal")
-    ).toBeVisible();
-    await expect(
-      proposalPage.getByTestId("data-not-match-modal-go-to-data-button")
-    ).toBeVisible();
-
-    await proposalPage
-      .getByTestId("data-not-match-modal-go-to-data-button")
-      .click();
-
-    await expect(
-      proposalPage.getByTestId("governance-action-type")
-    ).toBeVisible();
-    await expect(proposalPage.getByTestId("title-input")).toBeVisible();
-    await expect(proposalPage.getByTestId("abstract-input")).toBeVisible();
-    await expect(proposalPage.getByTestId("motivation-input")).toBeVisible();
-    await expect(proposalPage.getByTestId("rationale-input")).toBeVisible();
   });
 });

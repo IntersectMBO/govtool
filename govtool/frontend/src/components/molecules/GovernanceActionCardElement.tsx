@@ -3,9 +3,10 @@ import { Box, Skeleton } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Markdown from "react-markdown";
 import remarkMath from "remark-math";
+import remarkGfm from "remark-gfm";
 import rehypeKatex from "rehype-katex";
-import remarkBreaks from "remark-breaks";
 import "katex/dist/katex.min.css";
+import "./tableMarkdown.css";
 
 import { Typography, Tooltip, CopyButton, TooltipProps } from "@atoms";
 import { removeMarkdown } from "@/utils";
@@ -14,7 +15,7 @@ import { useModal } from "@/context";
 
 type BaseProps = {
   label: string;
-  text?: string | number;
+  text?: React.ReactNode;
   dataTestId?: string;
   isSliderCard?: boolean;
   tooltipProps?: Omit<TooltipProps, "children">;
@@ -107,7 +108,7 @@ export const GovernanceActionCardElement = ({
         ...(isSemiTransparent && { opacity: 0.75 }),
       }}
     >
-      {isMarkdown ? removeMarkdown(text) : text}
+      {typeof text === "string" && isMarkdown ? removeMarkdown(text) : text}
     </Typography>
   );
 
@@ -118,7 +119,6 @@ export const GovernanceActionCardElement = ({
         fontWeight: 400,
         lineHeight: "24px",
         maxWidth: "auto",
-        whiteSpace: "pre-wrap",
       }}
     >
       {children}
@@ -126,21 +126,36 @@ export const GovernanceActionCardElement = ({
   );
 
   const markdownComponents = {
-    p: (props: PropsWithChildren) => {
-      const { children } = props;
-      return renderMarkdownText({ children });
-    },
+    p: ({ children }: PropsWithChildren) => renderMarkdownText({ children }),
+    br: () => <br />,
   };
 
-  const renderMarkdown = () => (
-    <Markdown
-      components={markdownComponents}
-      remarkPlugins={[remarkMath, remarkBreaks]}
-      rehypePlugins={[rehypeKatex]}
-    >
-      {text.toString()}
-    </Markdown>
-  );
+  const renderMarkdown = () => {
+    const formattedText = text
+      .toString()
+      .replace(/\r\n|\r/g, "\n")
+      .replace(
+        /\n\n+/g,
+        (match) =>
+          `\n\n${Array(match.length - 1)
+            .fill("&nbsp;  \n")
+            .join("")}\n`,
+      )
+      .split("\n")
+      .map((line) => `${line}  `)
+      .join("\n");
+
+    return (
+      <Markdown
+        className="markdown"
+        components={markdownComponents}
+        remarkPlugins={[remarkMath, remarkGfm]}
+        rehypePlugins={[rehypeKatex]}
+      >
+        {formattedText}
+      </Markdown>
+    );
+  };
 
   const renderCopyButton = () =>
     isCopyButton && (

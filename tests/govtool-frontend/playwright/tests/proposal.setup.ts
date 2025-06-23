@@ -1,15 +1,16 @@
 import environments from "@constants/environments";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
 import { skipIfBalanceIsInsufficient, skipIfMainnet } from "@helpers/cardano";
-import { generateWallets } from "@helpers/shellyWallet";
+import { addressBech32, generateWallets } from "@helpers/shellyWallet";
 import { pollTransaction } from "@helpers/transaction";
 import { test as setup } from "@fixtures/walletExtension";
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import { getWalletConfigForFaucet } from "@helpers/index";
+import { createKeyFromPrivateKeyHex } from "@helpers/crypto";
 
-const PROPOSAL_WALLETS_COUNT = 4;
+const PROPOSAL_WALLETS_COUNT = environments.isScheduled ? 1 : 5;
 
 let govActionDeposit: number;
 
@@ -28,26 +29,43 @@ setup.beforeEach(async () => {
   await setAllureStory("Proposal");
   await skipIfMainnet();
   const totalRequiredBalanceForWallets =
-    (govActionDeposit / 1000000) * PROPOSAL_WALLETS_COUNT +
-    22 * PROPOSAL_WALLETS_COUNT;
+    (govActionDeposit / 1000000 + 22) * PROPOSAL_WALLETS_COUNT;
   await skipIfBalanceIsInsufficient(totalRequiredBalanceForWallets);
 });
 
 setup("Setup temporary proposal wallets", async () => {
-  setup.setTimeout(2 * environments.txTimeOut);
+  setup.setTimeout(environments.txTimeOut);
 
   const proposalWallets = await generateWallets(PROPOSAL_WALLETS_COUNT);
-
-  // initialize wallets
-  const initializeRes = await kuberService.initializeWallets(
-    [...proposalWallets],
-    getWalletConfigForFaucet().address,
-    getWalletConfigForFaucet().payment.private
+  const stakeKeys = await createKeyFromPrivateKeyHex(
+    environments.faucet.stake.private || ""
   );
-  await pollTransaction(initializeRes.txId, initializeRes.lockInfo);
+  const { pkh: stakePkh, public: stakePublic } = stakeKeys.json();
+
+  const enrichedProposalWallets = proposalWallets.map((wallet) => {
+    const stake = {
+      pkh: stakePkh,
+      private: environments.faucet.stake.private,
+      public: stakePublic,
+    };
+
+    const walletAddress = addressBech32(
+      environments.networkId,
+      wallet.payment.pkh,
+      stakePkh
+    );
+
+    return {
+      ...wallet,
+      address: walletAddress,
+      stake,
+    };
+  });
+
+  proposalWallets.splice(0, proposalWallets.length, ...enrichedProposalWallets);
 
   const amountOutputs = proposalWallets.map((wallet) => {
-    return { address: wallet.address, value: govActionDeposit };
+    return { address: wallet.address, value: govActionDeposit + 22000000 };
   });
   const transferRes = await kuberService.multipleTransferADA(
     amountOutputs,

@@ -3,6 +3,8 @@ export const PROTOCOL_PARAMS_KEY = "protocol_params";
 export const NETWORK_METRICS_KEY = "network_metrics";
 export const NETWORK_INFO_KEY = "network_info";
 export const NETWORK_TOTAL_STAKE_KEY = "network_total_stake";
+export const MAINTENANCE_ENDING_BANNER_EXPANDED_KEY =
+  "maintenance_ending_banner_expanded";
 
 export const WALLET_LS_KEY = "wallet_data";
 

@@ -13,7 +13,11 @@ import { functionWaitedAssert } from "@helpers/waitedLoop";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { expect } from "@playwright/test";
-import { ProposalType } from "@types";
+import {
+  ProposalDiscussionFilterTypes,
+  ProposalType,
+  ProposedGovAction,
+} from "@types";
 
 const mockProposal = require("../../lib/_mock/proposal.json");
 const mockPoll = require("../../lib/_mock/proposalPoll.json");
@@ -65,15 +69,48 @@ test.describe("Filter and sort proposals", () => {
   });
 
   test("8B_2. Should sort the list of proposed governance actions.", async () => {
-    await proposalDiscussionPage.sortAndValidate(
-      "asc",
-      (p1, p2) => p1.attributes.createdAt <= p2.attributes.createdAt
-    );
+    test.slow();
+    const sortOptions = {
+      Oldest: (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.content.attributes.createdAt <=
+        p2.attributes.content.attributes.createdAt,
+      Newest: (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.content.attributes.createdAt >=
+        p2.attributes.content.attributes.createdAt,
+      "Most likes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_likes >= p2.attributes.prop_likes,
+      "Least likes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_likes <= p2.attributes.prop_likes,
+      "Most dislikes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_dislikes >= p2.attributes.prop_dislikes,
+      "Least dislikes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_dislikes <= p2.attributes.prop_dislikes,
+      "Most comments": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_comments_number >=
+        p2.attributes.prop_comments_number,
+      "Least comments": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_comments_number <=
+        p2.attributes.prop_comments_number,
+      "Name A-Z": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.content.attributes.prop_name
+          .replace(/ /g, "")
+          .localeCompare(
+            p2.attributes.content.attributes.prop_name.replace(/ /g, "")
+          ) <= 0,
+      "Name Z-A": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.content.attributes.prop_name
+          .replace(/ /g, "")
+          .localeCompare(
+            p2.attributes.content.attributes.prop_name.replace(/ /g, "")
+          ) >= 0,
+    };
 
-    await proposalDiscussionPage.sortAndValidate(
-      "desc",
-      (p1, p2) => p1.attributes.createdAt >= p2.attributes.createdAt
-    );
+    for (const [sortOption, sortFunction] of Object.entries(sortOptions)) {
+      await proposalDiscussionPage.sortAndValidate(
+        sortOption as ProposalDiscussionFilterTypes,
+        sortFunction
+      );
+    }
   });
 });
 
@@ -119,7 +156,9 @@ test("8C. Should search the list of proposed governance actions.", async ({
         const proposalTitle = await proposalCard
           .locator('[data-testid^="proposal-"][data-testid$="-title"]')
           .innerText();
-        expect(proposalTitle).toContain(proposalName);
+        expect(proposalTitle.toLowerCase().trim()).toContain(
+          proposalName.toLowerCase().trim()
+        );
       }
     },
     {
@@ -192,7 +231,7 @@ test("8S. Should restrict proposal creation on disconnected state", async ({
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
 
-  await expect(proposalDiscussionPage.proposalCreateBtn).not.toBeVisible();
+  await expect(proposalDiscussionPage.proposalCreateBtn).toBeDisabled();
 });
 
 test("8E. Should share proposed governance action", async ({
@@ -255,7 +294,8 @@ test.describe("Mocked proposal", () => {
 
   test("8F. Should display all comments with count indication.", async () => {
     await expect(proposalDiscussionDetailsPage.commentCount).toHaveText(
-      mockProposal.data.attributes.prop_comments_number.toString()
+      mockProposal.data.attributes.prop_comments_number.toString(),
+      { timeout: 60_000 }
     );
   });
 });

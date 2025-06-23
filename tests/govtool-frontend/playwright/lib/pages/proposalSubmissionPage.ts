@@ -64,7 +64,9 @@ export default class ProposalSubmissionPage {
   readonly editSubmissionButton = this.page.getByTestId(
     "edit-submission-button"
   );
-  readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
+  readonly verifyIdentityBtn = this.page
+    .getByTestId("verify-user-link")
+    .first();
   readonly governanceActionType = this.page.getByLabel(
     "Governance Action Type *"
   );
@@ -125,6 +127,10 @@ export default class ProposalSubmissionPage {
   readonly linkUrlContent = this.page.getByTestId("link-0-url-content");
 
   constructor(private readonly page: Page) {}
+
+  get currentPage(): Page {
+    return this.page;
+  }
 
   async goto() {
     await this.page.goto(`${environments.frontendUrl}/proposal_discussion`);

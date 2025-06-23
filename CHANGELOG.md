@@ -12,11 +12,72 @@ changes.
 
 ### Added
 
+- Preserve maintenance ending banner state on the wallet connection change [Issue 3681](https://github.com/IntersectMBO/govtool/issues/3681)
+- Add authors for Live Voting Governance Actions [Issue 3745](https://github.com/IntersectMBO/govtool/issues/3745)
+- Add support for ed25519 author signature validation on gov actions [Issue 3745](https://github.com/IntersectMBO/govtool/issues/3745)
+
 ### Fixed
+
+- Fix blank page on dRep details when link or identity references contain objects: { @value: ... } not strings [Issue 3733](https://github.com/IntersectMBO/govtool/issues/3733)
+- Fix missing off chain references in DRep details [Issue 3490](https://github.com/IntersectMBO/govtool/issues/3490)
+- Fix blank screen and type error on linkReferences when navigating to edit dRep page that has no links [Issue 3714](https://github.com/IntersectMBO/govtool/issues/3714)
+- Fix adding two link input fields when editing the dRep form when no links are present initially [Issue 3709](https://github.com/IntersectMBO/govtool/issues/3709)
+
+### Changed
+- Adjust top menu (navbar) layout when wallet is not connected [Issue-3682](https://github.com/IntersectMBO/govtool/issues/3682)
+
+### Removed
+
+## [v2.0.23](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.23) 2025-05-22
+
+### Added
+
+- Add CIP-129 support for gov_actions hashes in Live Voting (governance actions) [Issue 3619](https://github.com/IntersectMBO/govtool/issues/3619)
+
+- Add maintenance ending banner [Issue 3647](https://github.com/IntersectMBO/govtool/issues/3647)
+- Add support for the Protocol Parameter Change and Hard Fork Initiation governance actions
+
+### Fixed
+
+- Fix displaying proposals title in details page [Issue 3192](https://github.com/IntersectMBO/govtool/issues/3192)
 
 ### Changed
 
 ### Removed
+
+## [v2.0.22](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.22) 2025-05-15
+
+### Added
+
+### Fixed
+
+- Fix an issue where the submit button remained disabled after removing an invalid value from the IMAGE input field on DRrep form [Issue 3560](https://github.com/IntersectMBO/govtool/issues/3560)
+- Fix app crash on unhandled wallet error [Issue 3123](https://github.com/IntersectMBO/govtool/issues/3123)
+- Preserve new lines in markdown text [Issue 2712](https://github.com/IntersectMBO/govtool/issues/2712)
+- Add scroll to markdown tables [Issue 3615](https://github.com/IntersectMBO/govtool/issues/3615)
+
+### Changed
+
+### Removed
+
+## [v2.0.21](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.21) 2025-05-09
+
+### Added
+
+- Add support for the tables in markdown [Issue 3581](https://github.com/IntersectMBO/govtool/issues/3581)
+
+### Fixed
+
+- Fix invalid metadata status background on voted on card
+
+### Changed
+
+- Update first CTA on GovTool home page [Issue 3467](https://github.com/IntersectMBO/govtool/issues/3467)
+- Change link to docs in learn more about governance [Issue 3494](https://github.com/IntersectMBO/govtool/issues/3494)
+
+### Removed
+
+- Remove additional canonicalization of the metadata [Issue 3591](https://github.com/IntersectMBO/govtool/issues/3591)
 
 ## [v2.0.20](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.20) 2025-04-16
 

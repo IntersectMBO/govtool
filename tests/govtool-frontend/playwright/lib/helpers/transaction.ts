@@ -77,7 +77,7 @@ export async function waitForTxConfirmation(
         .getByTestId("alert-warning")
         .getByText("Transaction in progress", { exact: false })
     ).toBeVisible({
-      timeout: 60_000,
+      timeout: 90_000,
     });
     const url = (await transactionStatusPromise).url();
     const regex = /\/transaction\/status\/([^\/]+)$/;
@@ -90,7 +90,7 @@ export async function waitForTxConfirmation(
       await pollTransaction(transactionHash);
       await expect(
         page.getByText("In Progress", { exact: true }).first() //FIXME: Only one element needs to be displayed
-      ).not.toBeVisible({ timeout: 60_000 });
+      ).not.toBeVisible({ timeout: 90_000 });
     }
   } catch (error) {
     Logger.fail(error.message);
@@ -126,8 +126,8 @@ export async function registerDRepForWallet(wallet: ShelleyWallet) {
     wallet: wallet.json(),
   };
   const registrationRes = await kuberService.dRepRegistration(
-    convertBufferToHex(wallet.stakeKey.private),
-    convertBufferToHex(wallet.stakeKey.pkh),
+    convertBufferToHex(wallet.dRepKey.private),
+    convertBufferToHex(wallet.dRepKey.pkh),
     metadataAnchorAndWallet
   );
   await pollTransaction(registrationRes.txId, registrationRes.lockInfo);

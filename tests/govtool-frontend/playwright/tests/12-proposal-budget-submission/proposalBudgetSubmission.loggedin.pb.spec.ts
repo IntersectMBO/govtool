@@ -3,18 +3,22 @@ import {
   budgetProposal02AuthFile,
   budgetProposal03AuthFile,
   budgetProposal04AuthFile,
+  budgetProposal05AuthFile,
 } from "@constants/auth";
 import {
   budgetProposal01Wallet,
   budgetProposal02Wallet,
   budgetProposal03Wallet,
   budgetProposal04Wallet,
+  budgetProposal05Wallet,
 } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/budgetProposal";
 import { setAllureEpic } from "@helpers/allure";
+import { skipIfMainnet } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
+import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 import BudgetDiscussionSubmissionPage from "@pages/budgetDiscussionSubmissionPage";
 import { expect } from "@playwright/test";
 import {
@@ -41,7 +45,7 @@ test.describe("Budget proposal 01 wallet", () => {
   }) => {
     await page.goto("/");
     await page.getByTestId("budget-discussion-link").click();
-    await page.getByTestId("verify-identity-button").click();
+    await page.getByTestId("verify-user-link").first().click();
 
     await expect(
       page.getByTestId("propose-a-budget-discussion-button")
@@ -59,7 +63,7 @@ test.describe("Budget proposal 01 wallet", () => {
       test("12D_1. Should verify all field of “proposal ownership” section", async () => {
         // default field
         await expect(
-          budgetProposalSubmissionPage.companyTypeSelect
+          budgetProposalSubmissionPage.proposalCommittee
         ).toBeVisible();
 
         await expect(
@@ -67,10 +71,10 @@ test.describe("Budget proposal 01 wallet", () => {
         ).toBeVisible();
 
         // company type field
-        await budgetProposalSubmissionPage.companyTypeSelect.click();
+        await budgetProposalSubmissionPage.proposalCommittee.click();
         await budgetProposalSubmissionPage.currentPage
-          .getByRole("option", { name: CompanyEnum.Company })
-          .click(); //BUG missing testId
+          .getByTestId("company-submission")
+          .click();
 
         await expect(
           budgetProposalSubmissionPage.companyNameInput
@@ -83,10 +87,10 @@ test.describe("Budget proposal 01 wallet", () => {
         ).toBeVisible();
 
         // group type field
-        await budgetProposalSubmissionPage.companyTypeSelect.click();
+        await budgetProposalSubmissionPage.proposalCommittee.click();
         await budgetProposalSubmissionPage.currentPage
-          .getByRole("option", { name: CompanyEnum.Group })
-          .click(); //BUG missing testId
+          .getByTestId("group-submission")
+          .click();
         await expect(budgetProposalSubmissionPage.groupNameInput).toBeVisible();
         await expect(budgetProposalSubmissionPage.groupTypeInput).toBeVisible();
         await expect(
@@ -305,7 +309,7 @@ test.describe("Budget proposal 01 wallet", () => {
           await budgetProposalSubmissionPage.currentPage
             .getByTestId(`${contractingType}-button`)
             .click();
-          if (contractingType === "Other") {
+          if (contractingType === "other") {
             await budgetProposalSubmissionPage.otherDescriptionInput.fill(
               faker.lorem.paragraph(2)
             );
@@ -418,6 +422,7 @@ test.describe("Budget proposal 01 wallet", () => {
 });
 
 test("12C. Should save and view draft proposal", async ({ browser }) => {
+  await skipIfMainnet();
   const page = await createNewPageWithWallet(browser, {
     storageState: budgetProposal02AuthFile,
     wallet: budgetProposal02Wallet,
@@ -433,7 +438,7 @@ test("12C. Should save and view draft proposal", async ({ browser }) => {
 
   await budgetSubmissionPage.viewLastDraft();
 
-  await expect(budgetSubmissionPage.companyTypeSelect).toHaveText(
+  await expect(budgetSubmissionPage.proposalCommittee).toHaveText(
     draftProposalOwnership.companyType
   );
 
@@ -466,6 +471,8 @@ test("12C. Should save and view draft proposal", async ({ browser }) => {
 });
 
 test("12H. Should submit a valid budget proposal", async ({ browser }) => {
+  await skipIfMainnet();
+
   const page = await createNewPageWithWallet(browser, {
     storageState: budgetProposal03AuthFile,
     wallet: budgetProposal03Wallet,
@@ -486,6 +493,7 @@ test("12H. Should submit a valid budget proposal", async ({ browser }) => {
 test("12I. Should submit a valid draft budget proposal", async ({
   browser,
 }) => {
+  await skipIfMainnet();
   test.slow();
   const page = await createNewPageWithWallet(browser, {
     storageState: budgetProposal04AuthFile,
@@ -507,6 +515,40 @@ test("12I. Should submit a valid draft budget proposal", async ({
 
   const budgetDiscussionDetailsPage = new BudgetDiscussionDetailsPage(page);
   await budgetDiscussionDetailsPage.validateProposalDetails(draftContact);
+
+  await budgetDiscussionDetailsPage.deleteProposal();
+});
+
+test("12J. Should verify created proposal appears in my proposals list", async ({
+  browser,
+}) => {
+  await skipIfMainnet();
+  test.slow();
+  const page = await createNewPageWithWallet(browser, {
+    storageState: budgetProposal05AuthFile,
+    wallet: budgetProposal05Wallet,
+  });
+
+  const budgetSubmissionPage = new BudgetDiscussionSubmissionPage(page);
+  await budgetSubmissionPage.goto();
+  const { proposalDetails } = await budgetSubmissionPage.createBudgetProposal();
+  const budgetDiscussionPage = new BudgetDiscussionPage(page);
+  await budgetDiscussionPage.goto();
+
+  await budgetDiscussionPage.filterBtn.click();
+  await budgetDiscussionPage.myProposalBtn.click();
+
+  const proposalList = await budgetDiscussionPage.getAllProposals();
+
+  expect(proposalList.length).toBeGreaterThan(0);
+
+  // Close the filter dropdown to ensure the proposals list is visible
+  await budgetDiscussionPage.sortBtn.click({ force: true });
+  const budgetDiscussionDetailsPage =
+    await budgetDiscussionPage.viewFirstProposal();
+
+  await expect(budgetDiscussionDetailsPage.menuButton).toBeVisible();
+  await budgetDiscussionDetailsPage.validateProposalDetails(proposalDetails);
 
   await budgetDiscussionDetailsPage.deleteProposal();
 });

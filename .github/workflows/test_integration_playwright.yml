@@ -235,8 +235,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           GROUP_NAME: ${{ needs.publish-report.outputs.group_name }}
 env:
-  HOST_URL: https://${{ github.event.schedule && 'preview.gov.tools' || (inputs.deployment || 'govtool.cardanoapi.io')  }}
-  DEPLOYMENT: ${{ github.event.schedule && 'preview.gov.tools' || inputs.deployment ||  'govtool.cardanoapi.io'}}
+  HOST_URL: https://${{ github.event.schedule && 'preview.gov.tools' || (inputs.deployment || 'p80-z6b8d2f7a-ze34e4cb2-gtw.z937eb260.rustrocks.fr')  }}
+  DEPLOYMENT: ${{ github.event.schedule && 'preview.gov.tools' || inputs.deployment ||  'p80-z6b8d2f7a-ze34e4cb2-gtw.z937eb260.rustrocks.fr'}}
   REPORT_NAME: ${{ github.event.schedule && 'nightly-'}}govtool-frontend
   GH_PAGES: ${{vars.GH_PAGES}}
   COMMIT_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}

@@ -38,3 +38,4 @@ export * from "./wait";
 export * from "./getBase64ImageDetails";
 export * from "./parseBoolean";
 export * from "./validateSignature";
+export * from "./cip8verification";

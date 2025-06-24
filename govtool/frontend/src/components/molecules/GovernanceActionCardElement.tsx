@@ -15,13 +15,14 @@ import { useModal } from "@/context";
 
 type BaseProps = {
   label: string;
-  text?: React.ReactNode;
+  text?: string | number;
   dataTestId?: string;
   isSliderCard?: boolean;
   tooltipProps?: Omit<TooltipProps, "children">;
   marginBottom?: number;
   isSemiTransparent?: boolean;
   isValidating?: boolean;
+  children?: React.ReactNode;
 };
 
 type VariantProps = BaseProps & {
@@ -44,10 +45,11 @@ export const GovernanceActionCardElement = ({
   isMarkdown = false,
   isSemiTransparent = false,
   isValidating = false,
+  children,
 }: VariantProps) => {
   const { openModal } = useModal();
 
-  if (!text) return null;
+  if (text == null && children == null) return null;
 
   const renderTooltip = () =>
     tooltipProps && (
@@ -108,11 +110,13 @@ export const GovernanceActionCardElement = ({
         ...(isSemiTransparent && { opacity: 0.75 }),
       }}
     >
-      {typeof text === "string" && isMarkdown ? removeMarkdown(text) : text}
+      {isMarkdown ? removeMarkdown(text) : text}
     </Typography>
   );
 
-  const renderMarkdownText = ({ children }: PropsWithChildren) => (
+  const renderMarkdownText = ({
+    children: markdownChildren,
+  }: PropsWithChildren) => (
     <Typography
       sx={{
         fontSize: 16,
@@ -121,17 +125,18 @@ export const GovernanceActionCardElement = ({
         maxWidth: "auto",
       }}
     >
-      {children}
+      {markdownChildren}
     </Typography>
   );
 
   const markdownComponents = {
-    p: ({ children }: PropsWithChildren) => renderMarkdownText({ children }),
+    p: ({ children: markdownChildren }: PropsWithChildren) =>
+      renderMarkdownText({ children: markdownChildren }),
     br: () => <br />,
   };
 
-  const renderMarkdown = () => {
-    const formattedText = text
+  const renderMarkdown = (markdownText: string | number) => {
+    const formattedText = markdownText
       .toString()
       .replace(/\r\n|\r/g, "\n")
       .replace(
@@ -157,14 +162,14 @@ export const GovernanceActionCardElement = ({
     );
   };
 
-  const renderCopyButton = () =>
+  const renderCopyButton = (copyText: string | number) =>
     isCopyButton && (
       <Box ml={1}>
-        <CopyButton text={text.toString()} variant="blueThin" />
+        <CopyButton text={copyText.toString()} variant="blueThin" />
       </Box>
     );
 
-  const renderLinkButton = () =>
+  const renderLinkButton = (linkText: string | number) =>
     isLinkButton && (
       <Box ml={1}>
         <img
@@ -175,12 +180,31 @@ export const GovernanceActionCardElement = ({
           onClick={() =>
             openModal({
               type: "externalLink",
-              state: { externalLink: text.toString() },
+              state: { externalLink: linkText.toString() },
             })
           }
         />
       </Box>
     );
+
+  const renderTextOrChildren = () => {
+    if (text != null) {
+      return (
+        <>
+          {textVariant === "pill"
+            ? renderPillText()
+            : isMarkdown && !isSliderCard
+            ? renderMarkdown(text)
+            : renderStandardText()}
+          {renderCopyButton(text)}
+          {renderLinkButton(text)}
+        </>
+      );
+    }
+    if (children != null) {
+      return children;
+    }
+  };
 
   return (
     <Box
@@ -220,13 +244,7 @@ export const GovernanceActionCardElement = ({
           flexDirection={isMarkdown ? "column" : "row"}
           fontFamily="Poppins, Arial"
         >
-          {textVariant === "pill"
-            ? renderPillText()
-            : isMarkdown && !isSliderCard
-            ? renderMarkdown()
-            : renderStandardText()}
-          {renderCopyButton()}
-          {renderLinkButton()}
+          {renderTextOrChildren()}
         </Box>
       )}
     </Box>

@@ -1,6 +1,7 @@
-import { verifyAsync } from "@noble/ed25519";
+import { verifyAsync as verifyEd25519Signature } from "@noble/ed25519";
 import { blake2bHex } from "blakejs";
 import { canonizeJSON } from "./canonizeJSON";
+import { verifyCIP8Signature } from "./cip8verification";
 
 export const validateSignature = async ({
   signature,
@@ -23,11 +24,11 @@ export const validateSignature = async ({
     switch (algorithm) {
       case "ed25519":
       case "Ed25519": {
-        return await verifyAsync(signature, messageHash, publicKey);
+        return verifyEd25519Signature(signature, messageHash, publicKey);
       }
       case "CIP-8":
       case "CIP-0008": {
-        throw new Error("CIP-0008 is not supported yet");
+        return verifyCIP8Signature(signature, messageHash, publicKey);
       }
       default:
         console.error("Unsupported algorithm:", algorithm);

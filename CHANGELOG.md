@@ -25,6 +25,7 @@ changes.
 
 ### Changed
 - Adjust top menu (navbar) layout when wallet is not connected [Issue-3682](https://github.com/IntersectMBO/govtool/issues/3682)
+- Unification of sections 'Receiving Address' and 'Amount' in Treasury Withdrawal Governance Action [Issue-3828](https://github.com/IntersectMBO/govtool/issues/3828)
 
 ### Removed
 

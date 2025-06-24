@@ -304,6 +304,14 @@ test.describe("Proposal created logged state", () => {
             proposalSubmissionPage.guardrailsScriptHashInput
           ).toBeVisible();
         }
+
+        if (type === ProposalType.hardFork){
+          await expect(proposalSubmissionPage.previousGAHashInput).toBeVisible()
+          await expect(proposalSubmissionPage.previousGAIdInput).toBeVisible()
+          await expect(proposalSubmissionPage.majorInput).toBeVisible()
+          await expect(proposalSubmissionPage.minorInput).toBeVisible()
+        }
+
       });
     });
   });

@@ -101,6 +101,10 @@ export default class ProposalSubmissionPage {
   readonly closeDraftSuccessModalBtn = this.page.getByTestId("close-button");
   readonly linkTextInput = this.page.getByTestId("link-0-text-input");
   readonly linkUrlInput = this.page.getByTestId("link-0-url-input");
+  readonly previousGAHashInput = this.page.getByTestId("previous-ga-hash-input");
+  readonly previousGAIdInput = this.page.getByTestId("previous-ga-id-input");
+  readonly majorInput = this.page.getByTestId("major-input")
+  readonly minorInput = this.page.getByTestId("minor-input")
 
   // content
   readonly governanceActionTypeContent = this.page.getByTestId(

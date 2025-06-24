@@ -6,16 +6,17 @@
 
 module VVA.API.SyncAiResponseType where
 
-import Data.Maybe (fromMaybe)
-import GHC.Generics (Generic)
-import Data.Text (Text)
+import           Data.Maybe (fromMaybe)
+import           GHC.Generics (Generic)
+import           Data.Text (Text)
 import qualified Data.Text (stripPrefix)
-import Data.Aeson
+import           Data.Aeson
 import qualified Data.Aeson.Types as Aeson
-import Data.Aeson.Types (Parser)
+import           Data.Aeson.Types (Parser)
 import qualified Data.Aeson.Key as Key
-import Data.OpenApi (ToSchema)
-import Control.Applicative ((<|>))
+import           Data.OpenApi (ToSchema)
+import           Control.Applicative ((<|>))
+import           Data.Scientific
 
 -- Helper: safe lookup for Maybe Value
 (.::?) :: Maybe Value -> Text -> Parser (Maybe Value)
@@ -37,46 +38,48 @@ instance ToJSON TextOrValue where
   toJSON (TextOrValue t) = String t
 
 data SearchAiResponse = SearchAiResponse
-  { data_      :: Maybe [DRepData]
+  { elements      :: Maybe [DRepData]
   , meta       :: Meta
   , pagination :: Pagination
   } deriving (Show, Generic, ToSchema)
 
 instance FromJSON SearchAiResponse where
   parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = fixData }
-    where fixData "data_" = "data"
+    where fixData "elements" = "data"
           fixData other   = other
 instance ToJSON SearchAiResponse where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = fixData }
-    where fixData "data_" = "data"
+    where fixData "elements" = "data"
           fixData other   = other
 
 data DRepData = DRepData
-  { drepId             :: Text
-  -- Missing:
-  -- , dRepHash               :: Text
-  -- , view                   :: Text
-  -- , isScriptBased          :: Bool
-  , url                :: Maybe Text
-  -- Missing:
-  -- , dataHash               :: Maybe Text
-  -- , deposit                :: Integer
-  -- , votingPower        :: Double -- We might need to multiply this by 1e6 to get the actual voting power + Int
-  , status             :: Text
-  -- Missing:
-  -- , type                   :: DRepType
-  -- , latestTxHash           :: Maybe Text
+  { deposit                :: Scientific
+  , drepId                 :: Text
+  , givenName              :: Maybe Text
+  , identityRefs           :: [Reference]
+  , imageHash              :: Maybe TextOrValue
+  , imageUrl               :: Maybe TextOrValue
+  , isScriptBased          :: Bool
   -- , latestRegistrationDate :: UTCTime
-  -- , metadataError          :: Maybe Text
-  , paymentAddress     :: Maybe TextOrValue
-  , givenName          :: Maybe Text
-  , objectives         :: Maybe Text
-  , motivations        :: Maybe Text
-  , qualifications     :: Maybe TextOrValue
-  , imageUrl           :: Maybe TextOrValue
-  , imageHash          :: Maybe TextOrValue
-  , linkReferences     :: [Reference]
-  , identityReferences :: [Reference]
+  , latestRegistrationDate :: Maybe Text
+  , latestTxHash           :: Maybe Text
+  , linkReferences         :: [Reference]
+  , metadataError          :: Maybe Text
+  , metadataHash           :: Maybe Text
+  , motivations            :: Maybe Text
+  , objectives             :: Maybe Text
+  , paymentAddress         :: Maybe TextOrValue
+  , qualifications         :: Maybe TextOrValue
+  -- , status                 :: DRepStatus
+  , status                 :: Maybe Text
+  -- , type                   :: DRepType
+  , type_                  :: Maybe Text
+  , url                    :: Maybe Text
+  , view                   :: Text
+  , votingPower            ::  Maybe Integer -- We might need to multiply this by 1e6 to get the actual voting power + Int
+  -- THOSE ARE WEIRD FIELDS, NOT USED FOR NOW
+  -- , drepHash :: Text
+  -- , dataHash               :: Maybe Text
   } deriving (Show, Generic, ToSchema, ToJSON)
 
 instance FromJSON DRepData where
@@ -87,9 +90,8 @@ instance FromJSON DRepData where
     objectives     <- v .:  "objectives"
     status         <- v .:  "status"
     url            <- v .:? "url"
-    -- votingPower    <- (v .: "votingPower" <|> (v .: "metrics" >>= (.: "votingPower")))
 
-    --
+    -- dRep data manipulation:
     mMeta     <- v .:? "metadata"
     mJsonMeta <- mMeta .::? "json_metadata"
     mBody     <- mJsonMeta .::? "body"
@@ -144,9 +146,21 @@ instance FromJSON DRepData where
                 , filter (\ref -> refType ref == Just "Identity") refs
                 )
 
+    -- Placeholders for fields not yet implemented
+    deposit <- pure 123456789
+    latestRegistrationDate <- pure (Just "2023-10-01T00:00:00Z")
+    latestTxHash <- pure Nothing
+    isScriptBased <- pure False
+    metadataError <- pure Nothing
+    metadataHash <- pure Nothing
+    type_ <- pure (Just "DRep")
+    view <- pure "https://example.com/view"
+    votingPower <- pure (Just 100)
+
     pure $ DRepData
-      drepId motivations givenName objectives status url -- votingPower
-      imageUrl imageHash paymentAddress qualifications linkRefs identityRefs
+      deposit drepId givenName identityRefs imageHash imageUrl isScriptBased latestRegistrationDate
+      latestTxHash linkRefs metadataError metadataHash motivations objectives paymentAddress
+      qualifications status type_ url view votingPower
 
 data Reference = Reference
   { refType :: Maybe Text -- "@type"

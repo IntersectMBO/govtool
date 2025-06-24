@@ -22,7 +22,7 @@ import qualified  Data.Map                           as M
 import           Data.Maybe                         (fromMaybe, isJust, isNothing)
 import           Data.Scientific
 import           Data.String                        (fromString)
-import           Data.Text                          (Text, pack, unpack, intercalate, pack)
+import           Data.Text                          (Text, pack, unpack, intercalate, pack, isPrefixOf, drop)
 import qualified  Data.Text.Encoding                 as Text
 import           Data.Time
 
@@ -36,7 +36,7 @@ import qualified  VVA.Proposal                       as Proposal
 import           VVA.Types                          (AppError (CriticalError), DRepInfo (..), DRepRegistration (..),
                                                      DRepStatus (..), DRepType (..), Proposal (..), Vote (..),
                                                      DRepVotingPowerList (..))
-import          VVA.API.SyncAiResponseType          (SearchAiResponse)
+import          VVA.API.SyncAiResponseType          (SearchAiResponse(..), DRepData(..))
 
 import Network.HTTP.Client                          (newManager, parseRequest, httpLbs, RequestBody(..), method,
                                                      requestHeaders, requestBody, responseBody, Manager, Request, Response)
@@ -133,36 +133,6 @@ listDReps mSearchQuery = withPool $ \conn -> do
                    | latestDeposit' < 0 && queryLatestNonDeregisterVotingAnchorWasNotNull result = DRep
                    | Data.Maybe.isJust (queryUrl result) = DRep
     ]
-
-drepAiSearch ::
-  (Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m) =>
-  Maybe Text   -- ^ search query
-  -> Int -- ^ page
-  -> Int -- ^ limit
-  -> m SearchAiResponse
-drepAiSearch query page limit = do
-  vvaConfig <- asks getter
-  result <- liftIO $ do
-    manager <- newManager tlsManagerSettings
-    initialRequest <- parseRequest "https://api.syncgovhub.com/api/drep/ai"
-    let body = encode $ object
-          [ "query" .= query
-          , "page"  .= page
-          , "limit" .= limit
-          ]
-        request = initialRequest
-          { method = "POST"
-          , requestHeaders =
-              [ ("Content-Type", "application/json")
-              , ("x-api-key", Text.encodeUtf8 (pack (syncAiKey vvaConfig)))
-              ]
-          , requestBody = RequestBodyLBS body
-          }
-    response <- httpLbs request manager
-    return $ eitherDecode (responseBody response)
-  case result of
-    Left err    -> throwError $ CriticalError ("Could not parse the dReps: " <> pack err)
-    Right val -> return val
 
 getVotingPowerSql :: SQL.Query
 getVotingPowerSql = sqlFrom $(embedFile "sql/get-voting-power.sql")
@@ -296,3 +266,58 @@ getDRepsVotingPowerList identifiers = withPool $ \conn -> do
     | (view, hashRaw, votingPower', givenName) <- results
     , let votingPower = floor @Scientific votingPower'
     ]
+
+
+-- 1. Fetch from 3rd party
+fetchDRepAiData ::
+  (Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m) =>
+  Maybe Text   -- ^ search query
+  -> Int -- ^ page
+  -> Int -- ^ limit
+  -> m SearchAiResponse
+fetchDRepAiData query page limit = do
+  vvaConfig <- asks getter
+  result <- liftIO $ do
+    manager <- newManager tlsManagerSettings
+    initialRequest <- parseRequest "https://api.syncgovhub.com/api/drep/ai"
+    let body = encode $ object
+          [ "query" .= query
+          , "page"  .= page
+          , "limit" .= limit
+          ]
+        request = initialRequest
+          { method = "POST"
+          , requestHeaders =
+              [ ("Content-Type", "application/json")
+              , ("x-api-key", Text.encodeUtf8 (pack (syncAiKey vvaConfig)))
+              ]
+          , requestBody = RequestBodyLBS body
+          }
+    response <- httpLbs request manager
+    return $ eitherDecode (responseBody response)
+  case result of
+    Left err    -> throwError $ CriticalError ("Could not parse the dReps: " <> pack err)
+    Right val -> return val
+
+-- 2. Manipulate/transform
+manipulateDRepAiData :: SearchAiResponse -> SearchAiResponse
+manipulateDRepAiData resp = resp { elements = fmap (map cutDrepId) (elements resp) }
+  where
+    cutDrepId d =
+      let dId = drepId d
+      in d { drepId = if Data.Text.isPrefixOf "22" dId then Data.Text.drop 2 dId else dId }
+
+-- 3. Enrich with SQL data
+enrichDRepDataWithDb ::
+  (Monad m) =>
+  SearchAiResponse -> m SearchAiResponse
+enrichDRepDataWithDb = return
+
+-- 4. Compose them in your endpoint/handler
+drepAiSearch ::
+  (Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m) =>
+  Maybe Text -> Int -> Int -> m SearchAiResponse
+drepAiSearch query page limit = do
+  aiData <- fetchDRepAiData query page limit
+  let manipulated = manipulateDRepAiData aiData
+  enrichDRepDataWithDb manipulated

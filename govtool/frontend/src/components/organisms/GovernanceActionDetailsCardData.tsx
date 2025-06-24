@@ -374,44 +374,43 @@ export const GovernanceActionDetailsCardData = ({
       )}
       <GovernanceActionCardElement
         label={t("govActions.authors.title")}
-        text={
-          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-            {(authors ?? []).length <= 0
-              ? t("govActions.authors.noDataAvailable")
-              : (authors ?? []).map((author) => (
-                <Box
-                  key={author.publicKey}
-                  sx={{ display: "flex", gap: 0.5, alignItems: "center" }}
-                >
-                  <AuthorSignatureStatus
-                    signature={author.signature}
-                    publicKey={author.publicKey}
-                    algorithm={author.witnessAlgorithm}
-                    jsonContent={jsonContent}
-                  />
-                  <span>{author.name}</span>
-                  <Tooltip
-                    heading={`${t("govActions.authors.witnessAlgorithm")}: ${
-                        author.witnessAlgorithm
-                      }`}
-                    paragraphOne={`${t("govActions.authors.publicKey")}: ${
-                        author.publicKey
-                      }`}
-                    paragraphTwo={`${t("govActions.authors.signature")}: ${
-                        author.signature
-                      }`}
-                    placement="bottom-end"
-                    arrow
-                  >
-                    <InfoOutlinedIcon fontSize="small" />
-                  </Tooltip>
-                </Box>
-                ))}
-          </Box>
-        }
         textVariant="longText"
         dataTestId="authors"
-      />
+      >
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+          {(authors ?? []).length <= 0
+            ? t("govActions.authors.noDataAvailable")
+            : (authors ?? []).map((author) => (
+              <Box
+                key={author.publicKey}
+                sx={{ display: "flex", gap: 0.5, alignItems: "center" }}
+              >
+                <AuthorSignatureStatus
+                  signature={author.signature}
+                  publicKey={author.publicKey}
+                  algorithm={author.witnessAlgorithm}
+                  jsonContent={jsonContent}
+                />
+                <span>{author.name}</span>
+                <Tooltip
+                  heading={`${t("govActions.authors.witnessAlgorithm")}: ${
+                      author.witnessAlgorithm
+                    }`}
+                  paragraphOne={`${t("govActions.authors.publicKey")}: ${
+                      author.publicKey
+                    }`}
+                  paragraphTwo={`${t("govActions.authors.signature")}: ${
+                      author.signature
+                    }`}
+                  placement="bottom-end"
+                  arrow
+                >
+                  <InfoOutlinedIcon fontSize="small" />
+                </Tooltip>
+              </Box>
+              ))}
+        </Box>
+      </GovernanceActionCardElement>
 
       <GovernanceActionDetailsCardLinks links={references} />
     </Box>

@@ -1,3 +1,6 @@
+-- Keep it in sync with the list-dreps-for-ai-search.sql as those two queries
+-- are used in the same context, but with different parameters.
+
 WITH DRepDistr AS (
   SELECT DISTINCT ON (drep_distr.hash_id) drep_distr.*
   FROM drep_distr

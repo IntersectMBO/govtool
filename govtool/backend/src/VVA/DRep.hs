@@ -23,11 +23,12 @@ import           Data.Maybe                         (fromMaybe, isJust, isNothin
 import           Data.Scientific
 import           Data.String                        (fromString)
 import           Data.Text                          (Text, pack, unpack, intercalate, pack, isPrefixOf, drop)
+import qualified Data.Text                           as T
 import qualified  Data.Text.Encoding                 as Text
 import           Data.Time
 
 import qualified  Database.PostgreSQL.Simple         as SQL
-import           Database.PostgreSQL.Simple.Types   (In(..))
+import           Database.PostgreSQL.Simple.Types   (In(..), PGArray(..))
 import           Database.PostgreSQL.Simple.FromRow
 
 import           VVA.Config
@@ -268,7 +269,6 @@ getDRepsVotingPowerList identifiers = withPool $ \conn -> do
     ]
 
 
--- 1. Fetch from 3rd party
 fetchDRepAiData ::
   (Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m) =>
   Maybe Text   -- ^ search query
@@ -299,7 +299,6 @@ fetchDRepAiData query page limit = do
     Left err    -> throwError $ CriticalError ("Could not parse the dReps: " <> pack err)
     Right val -> return val
 
--- 2. Manipulate/transform
 manipulateDRepAiData :: SearchAiResponse -> SearchAiResponse
 manipulateDRepAiData resp = resp { elements = fmap (map cutDrepId) (elements resp) }
   where
@@ -307,17 +306,70 @@ manipulateDRepAiData resp = resp { elements = fmap (map cutDrepId) (elements res
       let dId = drepId d
       in d { drepId = if Data.Text.isPrefixOf "22" dId then Data.Text.drop 2 dId else dId }
 
--- 3. Enrich with SQL data
-enrichDRepDataWithDb ::
-  (Monad m) =>
-  SearchAiResponse -> m SearchAiResponse
-enrichDRepDataWithDb = return
+listDRepsForAiSearchSql :: SQL.Query
+listDRepsForAiSearchSql = sqlFrom $(embedFile "sql/list-dreps-for-ai-search.sql")
 
--- 4. Compose them in your endpoint/handler
+enrichDRepAiDataWithDb ::
+  (Has ConnectionPool r, MonadReader r m, MonadIO m) =>
+  SearchAiResponse -> m SearchAiResponse
+enrichDRepAiDataWithDb aiResponse = withPool $ \conn -> do
+
+  let drepIds =
+        case elements aiResponse of
+          Just ds -> filter (not . T.null) $ map drepId ds
+          Nothing -> []
+
+  liftIO $ print drepIds
+
+  results <- liftIO $
+    if null drepIds
+      then return []
+      else SQL.query conn listDRepsForAiSearchSql (SQL.Only (PGArray drepIds)) :: IO [DRepQueryResult]
+
+  -- TODO: merge/enrich aiResponse.elements with results as needed
+  return aiResponse
+
+  timeZone <- liftIO getCurrentTimeZone
+  return
+    [ DRepRegistration
+      (queryDrepHash result)
+      (queryDrepView result)
+      (queryIsScriptBased result)
+      (queryUrl result)
+      (queryDataHash result)
+      (floor @Scientific $ queryDeposit result)
+      (queryVotingPower result)
+      status
+      drepType
+      (queryTxHash result)
+      (localTimeToUTC timeZone $ queryDate result)
+      (queryMetadataError result)
+      (queryPaymentAddress result)
+      (queryGivenName result)
+      (queryObjectives result)
+      (queryMotivations result)
+      (queryQualifications result)
+      (queryImageUrl result)
+      (queryImageHash result)
+      (queryIdentityReferences result)
+      (queryLinkReferences result)
+    | result <- results
+    , let status = case (queryIsActive result, queryDeposit result) of
+                      (_, d)        | d < 0 -> Retired
+                      (isActive, d) | d >= 0 && isActive -> Active
+                                    | d >= 0 && not isActive -> Inactive
+    , let latestDeposit' = floor @Scientific (queryLatestDeposit result) :: Integer
+    , let drepType | latestDeposit' >= 0 && isNothing (queryUrl result) = SoleVoter
+                   | latestDeposit' >= 0 && isJust (queryUrl result) = DRep
+                   | latestDeposit' < 0 && not (queryLatestNonDeregisterVotingAnchorWasNotNull result) = SoleVoter
+                   | latestDeposit' < 0 && queryLatestNonDeregisterVotingAnchorWasNotNull result = DRep
+                   | Data.Maybe.isJust (queryUrl result) = DRep
+    ]
+
 drepAiSearch ::
-  (Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m) =>
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m) =>
   Maybe Text -> Int -> Int -> m SearchAiResponse
 drepAiSearch query page limit = do
   aiData <- fetchDRepAiData query page limit
   let manipulated = manipulateDRepAiData aiData
-  enrichDRepDataWithDb manipulated
+  enrichDRepAiDataWithDb manipulated

@@ -2,6 +2,7 @@ import { Infinite, ProposalData } from "@models";
 
 import { API } from "../API";
 import { decodeCIP129Identifier, getFullGovActionId } from "@/utils";
+import { fillProposalMetadata } from "./getProposal";
 
 export type GetProposalsArguments = {
   dRepID?: string;
@@ -42,6 +43,12 @@ export const getProposals = async ({
       ...(dRepID && { drepId: dRepID }),
     },
   });
+
+  if (Array.isArray(response.data.elements)) {
+    response.data.elements = await Promise.all(
+      response.data.elements.map(fillProposalMetadata),
+    );
+  }
 
   return response.data;
 };

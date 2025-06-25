@@ -26,6 +26,7 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@emurgo/cardano-serialization-lib-asmjs": "^14.1.1",
+    "@helia/verified-fetch": "^3.2.0",
     "@hookform/resolvers": "^3.3.1",
     "@intersect.mbo/govtool-outcomes-pillar-ui": "v1.5.1",
     "@intersect.mbo/intersectmbo.org-icons-set": "^1.0.8",

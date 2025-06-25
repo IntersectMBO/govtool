@@ -25,12 +25,13 @@ export const proposal06Wallet: StaticWallet = staticWallets[15];
 export const proposal07Wallet: StaticWallet = staticWallets[16];
 export const proposal08Wallet: StaticWallet = staticWallets[17];
 export const proposal09Wallet: StaticWallet = staticWallets[18];
+export const proposal10Wallet: StaticWallet = staticWallets[19]
 
-export const budgetProposal01Wallet: StaticWallet = staticWallets[19];
-export const budgetProposal02Wallet: StaticWallet = staticWallets[20];
-export const budgetProposal03Wallet: StaticWallet = staticWallets[21];
-export const budgetProposal04Wallet: StaticWallet = staticWallets[22];
-export const budgetProposal05Wallet: StaticWallet = staticWallets[23];
+export const budgetProposal01Wallet: StaticWallet = staticWallets[20];
+export const budgetProposal02Wallet: StaticWallet = staticWallets[21];
+export const budgetProposal03Wallet: StaticWallet = staticWallets[22];
+export const budgetProposal04Wallet: StaticWallet = staticWallets[23];
+export const budgetProposal05Wallet: StaticWallet = staticWallets[24];
 
 export const adaHolderWallets = [
   adaHolder01Wallet,

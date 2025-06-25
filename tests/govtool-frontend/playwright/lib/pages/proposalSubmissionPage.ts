@@ -30,6 +30,8 @@ const formErrors = {
   constitutionalUrl: "prop-constitution-url-text-error",
   guardrailsScriptUrl: "prop-guardrails-script-url-input-error",
   link: "link-0-url-input-error",
+  majorError : "major-error",
+  minorError : "minor-error"
 };
 
 export default class ProposalSubmissionPage {
@@ -61,6 +63,9 @@ export default class ProposalSubmissionPage {
   readonly motionOfNoConfidenceBtn = this.page.getByTestId(
     "motion of no confidence-button"
   );
+  readonly hardForkBtn = this.page.getByTestId(
+    "hard fork-button"
+  )
   readonly editSubmissionButton = this.page.getByTestId(
     "edit-submission-button"
   );
@@ -129,6 +134,8 @@ export default class ProposalSubmissionPage {
   );
   readonly linkTextContent = this.page.getByTestId("link-0-text-content");
   readonly linkUrlContent = this.page.getByTestId("link-0-url-content");
+  readonly majorVersionContent = this.page.getByTestId("major-version-content")
+  readonly minorVersionContent = this.page.getByTestId("minor-version-content")
 
   constructor(private readonly page: Page) {}
 
@@ -176,9 +183,15 @@ export default class ProposalSubmissionPage {
     if (governanceProposal.proposal_links != null) {
       await this.fillProposalLinks(governanceProposal.proposal_links);
     }
+
+    if(governanceProposal.gov_action_type_id == 4){
+      await this.fillHardForkFields(governanceProposal)
+    } 
   }
 
   async fillupForm(governanceProposal: ProposalCreateRequest) {
+
+    console.log(governanceProposal.gov_action_type_id)
     await this.governanceActionType.click();
 
     if (governanceProposal.gov_action_type_id === 0) {
@@ -190,8 +203,10 @@ export default class ProposalSubmissionPage {
       if (governanceProposal.has_guardrails) {
         await this.guardrailsScriptCheckbox.click();
       }
-    } else {
+    } else if (governanceProposal.gov_action_type_id === 3) {
       await this.motionOfNoConfidenceBtn.click();
+    } else {
+      await this.hardForkBtn.click()
     }
 
     await this.fillupFormWithTypeSelected(governanceProposal);
@@ -240,6 +255,11 @@ export default class ProposalSubmissionPage {
         .getByTestId(`link-${i}-text-input`)
         .fill(proposal_links[i].prop_link_text);
     }
+  }
+
+  async fillHardForkFields(hardForkProposal : ProposalCreateRequest){
+    await this.minorInput.fill(hardForkProposal.prop_min_version.toString())
+    await this.majorInput.fill(hardForkProposal.prop_major_version.toString())
   }
 
   async getAllDrafts() {
@@ -346,6 +366,27 @@ export default class ProposalSubmissionPage {
         message:
           isGuardrailsScriptUrlErrorVisible &&
           `${governanceProposal.prop_guardrails_script_url} is an invalid guardrails script url`,
+      }).toBeHidden();
+    }
+
+    if (governanceProposal.gov_action_type_id === 4) {
+      const isMajorErrorVisible = await this.page
+        .getByTestId(formErrors.majorError)
+        .isVisible();
+      const isMinorErrorVisible = await this.page
+        .getByTestId(formErrors.minorError)
+        .isVisible();
+
+      await expect(this.page.getByTestId(formErrors.majorError), {
+        message: isMajorErrorVisible 
+          ? 'Major version error should be hidden'
+          : 'Major version error is correctly hidden'
+      }).toBeHidden();
+
+      await expect(this.page.getByTestId(formErrors.minorError), {
+        message: isMinorErrorVisible 
+          ? 'Minor version error should be hidden'
+          : 'Minor version error is correctly hidden'
       }).toBeHidden();
     }
 
@@ -461,6 +502,11 @@ export default class ProposalSubmissionPage {
       }).toBeVisible();
     }
 
+    if (governanceProposal.gov_action_type_id === 4){
+      await expect(this.page.getByTestId(formErrors.majorError)).toBeVisible()
+      await expect(this.page.getByTestId(formErrors.minorError)).toBeVisible()
+    }
+
     await expect(this.continueBtn).toBeDisabled();
   }
 
@@ -516,6 +562,11 @@ export default class ProposalSubmissionPage {
         }
       }
     }
+    if (proposalType == ProposalType.hardFork){
+      proposal.prop_min_version = faker.number.float({min:0 , max:100}).toString()
+      proposal.prop_major_version = faker.number.float({min:0 , max:100}).toString()
+    }
+
     return proposal;
   }
 
@@ -550,6 +601,13 @@ export default class ProposalSubmissionPage {
       proposal.prop_guardrails_script_url = invalid.url();
       proposal.prop_guardrails_script_hash = faker.string.alphanumeric(64);
     }
+
+    if (proposalType === ProposalType.hardFork){
+      proposal.prop_min_version = invalid.amount()
+      proposal.prop_major_version = invalid.amount()
+    }
+
+
     return proposal;
   }
 

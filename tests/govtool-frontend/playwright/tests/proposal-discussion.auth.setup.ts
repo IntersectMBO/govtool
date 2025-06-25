@@ -11,6 +11,7 @@ import {
   proposal07Wallet,
   proposal08Wallet,
   proposal09Wallet,
+  proposal10Wallet,
 } from "@constants/staticWallets";
 import {
   proposal01AuthFile,
@@ -22,6 +23,7 @@ import {
   proposal07AuthFile,
   proposal08AuthFile,
   proposal09AuthFile,
+  proposal10AuthFile,
 } from "@constants/auth";
 
 setup.beforeEach(async () => {
@@ -39,6 +41,7 @@ const proposalSetups = [
   { name: "Proposal 07", wallet: proposal07Wallet, auth: proposal07AuthFile },
   { name: "Proposal 08", wallet: proposal08Wallet, auth: proposal08AuthFile },
   { name: "Proposal 09", wallet: proposal09Wallet, auth: proposal09AuthFile },
+  { name: "Proposal 10", wallet: proposal10Wallet, auth: proposal10AuthFile }
 ];
 
 for (const { name, wallet, auth } of proposalSetups) {

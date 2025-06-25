@@ -1,4 +1,5 @@
-import { readFile, rm, writeFile } from "fs";
+import { faker } from "@faker-js/faker";
+import { readFile, rename, rm, writeFile } from "fs";
 const path = require("path");
 
 const mockFolderPath = path.resolve(__dirname, "../_mock");
@@ -18,6 +19,27 @@ export async function createFile(fileName: string, data?: any) {
       }
     )
   );
+}
+
+export async function renameFile(currentPath: string, newPath: string) {
+  await new Promise<void>((resolve, reject) =>
+    rename(currentPath, newPath, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    })
+  );
+}
+
+export async function atomicWriteFile(fileName: string, data: any) {
+  const actualFilePath = `${mockFolderPath}/${fileName}`;
+  const tempFileName = `${faker.person.firstName()}-${faker.string.uuid()}.json`;
+  const tmpPath = `${mockFolderPath}/${tempFileName}`;
+
+  await createFile(tempFileName, data);
+  await renameFile(tmpPath, actualFilePath);
 }
 
 export async function getFile(fileName: string): Promise<any> {

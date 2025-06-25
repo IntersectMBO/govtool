@@ -126,8 +126,8 @@ export const getDraftProposalWalletAndState = (proposalType: string) => {
       };
     case ProposalType.hardFork:
       return {
-        storageState : proposal10AuthFile,
-        wallet: proposal10Wallet
-      }
+        storageState: proposal10AuthFile,
+        wallet: proposal10Wallet,
+      };
   }
 };

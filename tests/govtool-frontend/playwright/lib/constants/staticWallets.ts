@@ -25,7 +25,7 @@ export const proposal06Wallet: StaticWallet = staticWallets[15];
 export const proposal07Wallet: StaticWallet = staticWallets[16];
 export const proposal08Wallet: StaticWallet = staticWallets[17];
 export const proposal09Wallet: StaticWallet = staticWallets[18];
-export const proposal10Wallet: StaticWallet = staticWallets[19]
+export const proposal10Wallet: StaticWallet = staticWallets[19];
 
 export const budgetProposal01Wallet: StaticWallet = staticWallets[20];
 export const budgetProposal02Wallet: StaticWallet = staticWallets[21];

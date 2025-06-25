@@ -20,7 +20,7 @@ export const proposal06AuthFile = ".auth/proposal06.json";
 export const proposal07AuthFile = ".auth/proposal07.json";
 export const proposal08AuthFile = ".auth/proposal08.json";
 export const proposal09AuthFile = ".auth/proposal09.json";
-export const proposal10AuthFile = '.auth/proposal10.json';
+export const proposal10AuthFile = ".auth/proposal10.json";
 
 export const proposalSubmissionAuthFile = ".auth/proposalSubmission.json";
 

@@ -41,7 +41,7 @@ const proposalSetups = [
   { name: "Proposal 07", wallet: proposal07Wallet, auth: proposal07AuthFile },
   { name: "Proposal 08", wallet: proposal08Wallet, auth: proposal08AuthFile },
   { name: "Proposal 09", wallet: proposal09Wallet, auth: proposal09AuthFile },
-  { name: "Proposal 10", wallet: proposal10Wallet, auth: proposal10AuthFile }
+  { name: "Proposal 10", wallet: proposal10Wallet, auth: proposal10AuthFile },
 ];
 
 for (const { name, wallet, auth } of proposalSetups) {

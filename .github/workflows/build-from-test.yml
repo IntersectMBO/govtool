@@ -202,7 +202,7 @@ jobs:
             -H "Authorization: Token ${{ secrets.QOVERY_API_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d '{
-                "image_name": "${{ steps.image_lowercase.outputs.lowercase }}-${{ env.CLEAN_NETWORK }}",
+                "image_name": "intersectmbo/${{ matrix.name }}-${{ env.CLEAN_NETWORK }}",
                 "tag": "${{ env.COMMIT_TAG }}"
                 }'
 

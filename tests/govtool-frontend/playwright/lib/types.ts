@@ -83,6 +83,7 @@ export enum ProposalType {
   treasury = "Treasury requests",
   updatesToTheConstitution = "Updates to the Constitution",
   motionOfNoConfedence = "Motion of No Confidence",
+  hardFork = "Hard fork",
 }
 
 export enum BootstrapGovernanceActionType {
@@ -195,6 +196,8 @@ export type ProposalCreateRequest = {
   prop_guardrails_script_hash?: string;
   has_guardrails?: boolean;
   is_draft: boolean;
+  prop_min_version?: string;
+  prop_major_version?: string;
 };
 export type ProposedGovAction = {
   id: number;

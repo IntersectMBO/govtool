@@ -13,12 +13,14 @@ import {
   proposal07Wallet,
   proposal08Wallet,
   proposal09Wallet,
+  proposal10Wallet,
 } from "@constants/staticWallets";
 import {
   proposal05AuthFile,
   proposal07AuthFile,
   proposal08AuthFile,
   proposal09AuthFile,
+  proposal10AuthFile,
 } from "@constants/auth";
 
 interface CreateUserProps {
@@ -121,6 +123,11 @@ export const getDraftProposalWalletAndState = (proposalType: string) => {
       return {
         storageState: proposal09AuthFile,
         wallet: proposal09Wallet,
+      };
+    case ProposalType.hardFork:
+      return {
+        storageState: proposal10AuthFile,
+        wallet: proposal10Wallet,
       };
   }
 };

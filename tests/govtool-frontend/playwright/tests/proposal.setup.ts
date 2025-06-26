@@ -10,7 +10,7 @@ import { functionWaitedAssert } from "@helpers/waitedLoop";
 import { getWalletConfigForFaucet } from "@helpers/index";
 import { createKeyFromPrivateKeyHex } from "@helpers/crypto";
 
-const PROPOSAL_WALLETS_COUNT = environments.isScheduled ? 1 : 5;
+const PROPOSAL_WALLETS_COUNT = environments.isScheduled ? 1 : 6;
 
 let govActionDeposit: number;
 

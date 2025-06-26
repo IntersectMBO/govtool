@@ -188,6 +188,14 @@ test.describe("Proposal created logged state", () => {
           ).toHaveText(proposal.prop_guardrails_script_hash);
         }
 
+        if (type == ProposalType.hardFork) {
+          await expect(proposalSubmissionPage.majorVersionContent).toHaveText(
+            proposal.prop_major_version
+          );
+          await expect(proposalSubmissionPage.minorVersionContent).toHaveText(
+            proposal.prop_min_version
+          );
+        }
         // cleanup
         await proposalDetailsPage.deleteProposal();
       });
@@ -256,6 +264,15 @@ test.describe("Proposal created logged state", () => {
             proposalSubmissionPage.guardrailsScriptHashContent
           ).toHaveText(proposal.prop_guardrails_script_hash);
         }
+
+        if (type === ProposalType.hardFork) {
+          await expect(proposalSubmissionPage.minorVersionContent).toHaveText(
+            proposal.prop_min_version
+          );
+          await expect(proposalSubmissionPage.majorVersionContent).toHaveText(
+            proposal.prop_major_version
+          );
+        }
       });
     });
   });
@@ -303,6 +320,15 @@ test.describe("Proposal created logged state", () => {
           await expect(
             proposalSubmissionPage.guardrailsScriptHashInput
           ).toBeVisible();
+        }
+
+        if (type === ProposalType.hardFork) {
+          await expect(
+            proposalSubmissionPage.previousGAHashInput
+          ).toBeVisible();
+          await expect(proposalSubmissionPage.previousGAIdInput).toBeVisible();
+          await expect(proposalSubmissionPage.majorInput).toBeVisible();
+          await expect(proposalSubmissionPage.minorInput).toBeVisible();
         }
       });
     });
@@ -427,6 +453,15 @@ test.describe("Proposal Draft", () => {
       ).toHaveValue(proposalFormValue.prop_guardrails_script_hash);
     }
 
+    if (createProposalType === ProposalType.hardFork) {
+      await expect(proposalSubmissionPage.majorInput).toHaveValue(
+        proposalFormValue.prop_major_version
+      );
+      await expect(proposalSubmissionPage.minorInput).toHaveValue(
+        proposalFormValue.prop_min_version
+      );
+    }
+
     await expect(proposalSubmissionPage.linkUrlInput).toHaveValue(
       proposalFormValue.proposal_links[0].prop_link
     );
@@ -509,6 +544,15 @@ test.describe("Proposal Draft", () => {
         await expect(
           proposalSubmissionPage.guardrailsScriptHashContent
         ).toHaveText(proposalFormValue.prop_guardrails_script_hash);
+      }
+
+      if (proposalType === ProposalType.hardFork) {
+        await expect(proposalSubmissionPage.majorVersionContent).toHaveText(
+          proposalFormValue.prop_major_version
+        );
+        await expect(proposalSubmissionPage.minorVersionContent).toHaveText(
+          proposalFormValue.prop_min_version
+        );
       }
     });
   });

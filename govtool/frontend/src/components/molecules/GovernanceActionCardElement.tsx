@@ -133,6 +133,21 @@ export const GovernanceActionCardElement = ({
     p: ({ children: markdownChildren }: PropsWithChildren) =>
       renderMarkdownText({ children: markdownChildren }),
     br: () => <br />,
+    img: ({
+      src,
+      alt,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      node, // node is passed by react-markdown but we should not use it
+      ...rest
+    }: React.ImgHTMLAttributes<HTMLImageElement> & { node: unknown }) => (
+      <img
+        {...rest}
+        src={src ?? ""}
+        alt={alt ?? ""}
+        style={{ maxWidth: "100%", height: "auto", display: "block" }}
+        loading="lazy"
+      />
+      ),
   };
 
   const renderMarkdown = (markdownText: string | number) => {

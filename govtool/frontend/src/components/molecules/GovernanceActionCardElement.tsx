@@ -139,7 +139,7 @@ export const GovernanceActionCardElement = ({
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       node, // node is passed by react-markdown but we should not use it
       ...rest
-    }: React.ImgHTMLAttributes<HTMLImageElement> & { node: unknown }) => (
+    }: React.ImgHTMLAttributes<HTMLImageElement> & { node?: unknown }) => (
       <img
         {...rest}
         src={src ?? ""}

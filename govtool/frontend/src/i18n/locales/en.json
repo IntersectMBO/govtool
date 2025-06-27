@@ -764,11 +764,8 @@
     "title": "This tool is connected to {{networkName}}",
     "bootstrappingWarning": "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>",
     "maintenanceEnding": {
-      "title": "⚠️ GovTool needs your support",
-      "description1": "GovTool wasn’t included in the current Cardano budget.",
-      "description2": "A 100k ada maintenance grant will sustain essential infrastructure and bug fixes through 2025 — but future development depends on renewed community backing.",
-      "description3": "Find out what this means and how you can help:",
-      "linkText": "The future of GovTool"
+      "title": "🔥 GovTool needs your support - Info Action is submitted",
+      "description1": "This Info Action outlines the revised GovTool plan and <0>your vote</0> is essential to continue active development and maintenance for the next 12 months, keeping community owned open governance tooling on Cardano."
     }
   },
   "tooltips": {

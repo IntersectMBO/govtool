@@ -1,6 +1,6 @@
 import { StaticWallet } from "@types";
 import { LockInterceptor } from "./lockInterceptor";
-import { createFile, getFile } from "@helpers/file";
+import { atomicWriteFile, createFile, getFile } from "@helpers/file";
 const path = require("path");
 
 const baseFilePath = path.resolve(__dirname, "./_mock");
@@ -73,7 +73,7 @@ class WalletManager {
         wallet.givenName = givenName;
       }
     });
-    await createFile("wallets.json", wallets);
+    await atomicWriteFile("wallets.json", wallets);
   }
 }
 export default WalletManager.getInstance();

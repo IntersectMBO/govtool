@@ -432,7 +432,7 @@
     },
     "backToGovActions": "Back to Governance Actions",
     "castVote": "<0>You voted {{vote}} on this proposal</0>\non {{date}} (Epoch {{epoch}})",
-    "castVoteDeadline": "You can change your vote up to {{date}} (Epoch {{epoch}})",
+    "castVoteDeadline": "You can change your vote up to {{date}} (UTC, Epoch {{epoch}})",
     "changeVote": "Change vote",
     "changeYourVote": "Change your vote",
     "chooseHowToVote": "Choose how you want to vote:",

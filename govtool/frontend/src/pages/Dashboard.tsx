@@ -60,7 +60,7 @@ export const Dashboard = () => {
     items.reduce<string | null>(
       (result, item) =>
         result ??
-        (targetPath === item.navTo
+        (targetPath === item.navTo || targetPath.startsWith(`${item.navTo}/`)
           ? item.label
           : item.childNavItems
           ? findNavItem(item.childNavItems, targetPath)

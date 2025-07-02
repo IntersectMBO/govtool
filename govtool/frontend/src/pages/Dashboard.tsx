@@ -53,6 +53,11 @@ export const Dashboard = () => {
 
       return proposalDiscussionNavItem ?? "";
     }
+
+    if (path.startsWith(PATHS.dashboardGovernanceActions)) {
+      return t("govActions.title");
+    }
+
     return findNavItem(CONNECTED_NAV_ITEMS, path) ?? "";
   };
 

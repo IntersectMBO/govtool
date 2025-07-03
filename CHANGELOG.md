@@ -22,6 +22,8 @@ changes.
 - Fix missing off chain references in DRep details [Issue 3490](https://github.com/IntersectMBO/govtool/issues/3490)
 - Fix blank screen and type error on linkReferences when navigating to edit dRep page that has no links [Issue 3714](https://github.com/IntersectMBO/govtool/issues/3714)
 - Fix adding two link input fields when editing the dRep form when no links are present initially [Issue 3709](https://github.com/IntersectMBO/govtool/issues/3709)
+- Fix images in Governance Action Details are displayed at full width and height without cropping or clipping [Issue 3837](https://github.com/IntersectMBO/govtool/issues/3837)
+- Fix missing page titles on subpages: DRep details and Gov Actions details [Issue 3142](https://github.com/IntersectMBO/govtool/issues/3142)
 
 ### Changed
 - Adjust top menu (navbar) layout when wallet is not connected [Issue-3682](https://github.com/IntersectMBO/govtool/issues/3682)

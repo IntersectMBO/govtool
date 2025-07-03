@@ -45,7 +45,7 @@ export const NAV_ITEMS: Array<NavItem | NavMenuItem> = [
   },
   {
     dataTestId: "governance-actions",
-    label: i18n.t("govActions.title"),
+    label: i18n.t("govActions.categoryTitle"),
     childNavItems: [
       {
         dataTestId: "proposed-governance-actions-link",
@@ -56,7 +56,7 @@ export const NAV_ITEMS: Array<NavItem | NavMenuItem> = [
       {
         dataTestId: "governance-actions-link",
         navTo: PATHS.governanceActions,
-        label: i18n.t("govActions.navTitle"),
+        label: i18n.t("govActions.title"),
         newTabLink: null,
       },
       {
@@ -108,7 +108,7 @@ export const CONNECTED_NAV_ITEMS = [
   },
   {
     dataTestId: "governance-actions-link",
-    label: i18n.t("govActions.title"),
+    label: i18n.t("govActions.categoryTitle"),
     navTo: PATHS.dashboardGovernanceActions,
     activeIcon: ICONS.governanceActionsActiveIcon,
     icon: ICONS.governanceActionsIcon,
@@ -139,7 +139,7 @@ export const CONNECTED_NAV_ITEMS = [
       {
         dataTestId: "governance-actions-live-voting-link",
         label: i18n.t("govActions.liveVoting.title"),
-        navTo: OUTCOMES_PATHS.governanceActionsLiveVoting,
+        navTo: PATHS.dashboardGovernanceActions,
         activeIcon: ICONS.governanceActionsActiveIcon,
         icon: ICONS.governanceActionsIcon,
         newTabLink: null,

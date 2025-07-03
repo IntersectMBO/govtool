@@ -144,7 +144,10 @@ export const VoteActionForm = ({
               sx={{ lineHeight: "18px", alignSelf: "start" }}
             >
               {t("govActions.castVoteDeadline", {
-                date: expiryDate,
+                date: formatDisplayDate(
+                  expiryDate ?? "",
+                  "yyyy-MM-dd HH:mm:ss",
+                ),
                 epoch: expiryEpochNo,
               })}
             </Typography>

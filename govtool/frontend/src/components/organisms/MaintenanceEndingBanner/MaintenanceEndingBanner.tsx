@@ -61,7 +61,7 @@ export const MaintenanceEndingBanner = () => {
       {/* Expandable Content */}
       <Box
         sx={{
-          maxHeight: isExpanded ? '300px' : "0px", // 300px is a safe value for transition effect
+          maxHeight: isExpanded ? "300px" : "0px", // 300px is a safe value for transition effect
           transition: "max-height 0.4s ease-in-out",
           overflow: "hidden",
         }}
@@ -81,35 +81,20 @@ export const MaintenanceEndingBanner = () => {
             color="common.white"
             mb={0.5}
           >
-            {t("system.maintenanceEnding.description1")}
-          </Typography>
-          <Typography variant="caption" color="common.white" mb={0.5}>
             <Trans
-              i18nKey="system.maintenanceEnding.description2"
+              i18nKey="system.maintenanceEnding.description1"
               components={[
-                <Typography
-                  key="1"
+                <Link
                   variant="caption"
                   fontWeight={600}
                   color="common.white"
-                  component="span"
+                  href="https://gov.tools/outcomes/governance_actions/9d213a57684d7ddf6f3350c80d042639ecbed5ccccc4a05bf54959a086593e7b#0"
+                  data-testid="govtool-info-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 />,
               ]}
             />
-          </Typography>
-          <Typography variant="caption" color="common.white">
-            {t("system.maintenanceEnding.description3")}{" "}
-            <Link
-              variant="caption"
-              fontWeight={600}
-              color="common.white"
-              href="https://docs.gov.tools/overview/important-updates/the-future-of-govtool-why-it-matters-and-what-comes-next"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-testid="govtool-future-link"
-            >
-              {t("system.maintenanceEnding.linkText")}
-            </Link>
           </Typography>
         </Box>
       </Box>

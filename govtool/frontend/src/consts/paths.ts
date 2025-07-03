@@ -49,5 +49,4 @@ export const USER_PATHS = {
 export const OUTCOMES_PATHS = {
   governanceActionsOutcomes: "/outcomes",
   governanceActionOutcomes: "/outcomes/governance_actions/:id",
-  governanceActionsLiveVoting: "/connected/governance_actions",
 };

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Box, IconButton } from "@mui/material";
 
 import { VotingPowerChips, Typography } from "@atoms";
-import { ICONS } from "@consts";
+import { ICONS, PATHS } from "@consts";
 import {
   useGetDRepVotingPowerQuery,
   useGetVoterInfo,
@@ -13,6 +13,7 @@ import {
   useMaintenanceEndingBannerContext,
 } from "@organisms";
 import { useCardano } from "@context";
+import { NavLink } from "react-router-dom";
 
 type DashboardTopNavProps = {
   title: string;
@@ -77,12 +78,18 @@ export const DashboardTopNav = ({
       >
         <Box display="flex">
           {isMobile ? (
-            <img
-              alt="app-logo"
-              height={24}
-              src={ICONS.appLogoIcon}
-              width={27}
-            />
+            <NavLink
+              data-testid="logo-button"
+              style={{ display: "flex", justifyContent: "center" }}
+              to={PATHS.dashboard}
+            >
+              <img
+                alt="app-logo"
+                height={24}
+                src={ICONS.appLogoIcon}
+                width={27}
+              />
+            </NavLink>
           ) : null}
           {!isMobile && title ? (
             <Typography variant="headline5">{title}</Typography>

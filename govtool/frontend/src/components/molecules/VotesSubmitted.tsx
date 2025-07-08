@@ -121,6 +121,18 @@ export const VotesSubmitted = ({
       ? (poolNoVotes / networkTotalStake.totalStakeControlledBySPOs) * 100
       : undefined;
 
+  const poolNotVotedVotes =
+    typeof networkTotalStake?.totalStakeControlledBySPOs === "number"
+      ? networkTotalStake.totalStakeControlledBySPOs -
+        poolYesVotes -
+        poolNoVotes -
+        poolAbstainVotes
+      : undefined;
+  const poolNotVotedVotesPercentage =
+    100 -
+    (typeof poolYesVotesPercentage === "number" ? poolYesVotesPercentage : 0) -
+    (typeof poolNoVotesPercentage === "number" ? poolNoVotesPercentage : 0);
+
   const ccYesVotesPercentage = noOfCommitteeMembers
     ? (ccYesVotes / noOfCommitteeMembers) * 100
     : undefined;
@@ -203,6 +215,8 @@ export const VotesSubmitted = ({
             noVotes={poolNoVotes}
             noVotesPercentage={poolNoVotesPercentage}
             abstainVotes={poolAbstainVotes}
+            notVotedVotes={poolNotVotedVotes}
+            notVotedPercentage={poolNotVotedVotesPercentage}
             threshold={
               (() => {
                 const votingThresholdKey = getGovActionVotingThresholdKey({

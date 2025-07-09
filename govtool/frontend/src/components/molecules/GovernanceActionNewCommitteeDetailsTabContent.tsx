@@ -13,6 +13,12 @@ type CCMember = {
   newExpirationEpoch?: number;
 };
 
+function isArrayOfStrings(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) && value.every((item) => typeof item === "string")
+  );
+}
+
 export const GovernanceActionNewCommitteeDetailsTabContent = ({
   details,
 }: Pick<ProposalData, "details">) => {
@@ -37,6 +43,10 @@ export const GovernanceActionNewCommitteeDetailsTabContent = ({
       expirationEpoch: member.expirationEpoch,
       newExpirationEpoch: member.newExpirationEpoch,
     }));
+
+  const membersToBeRemoved = isArrayOfStrings(details?.membersToBeRemoved)
+    ? details.membersToBeRemoved
+    : [];
 
   return (
     <Box>
@@ -78,7 +88,7 @@ export const GovernanceActionNewCommitteeDetailsTabContent = ({
           ))}
         </Box>
       )}
-      {(details?.membersToBeRemoved as string[]).length > 0 && (
+      {membersToBeRemoved.length > 0 && (
         <Box mb="32px">
           <Typography
             sx={{
@@ -93,8 +103,8 @@ export const GovernanceActionNewCommitteeDetailsTabContent = ({
           >
             {t("govActions.membersToBeRemoved")}
           </Typography>
-          {(details?.membersToBeRemoved as string[]).map((hash) => (
-            <Box display="flex" flexDirection="row">
+          {membersToBeRemoved.map((hash) => (
+            <Box display="flex" flexDirection="row" key={hash}>
               <Typography
                 sx={{
                   fontSize: 16,

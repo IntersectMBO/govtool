@@ -109,14 +109,17 @@ export const VotesSubmitted = ({
     100 - (dRepYesVotesPercentage ?? 0) - (dRepNoVotesPercentage ?? 0);
 
   const poolYesVotesPercentage =
-    poolYesVotes + poolNoVotes
-      ? (poolYesVotes / (poolYesVotes + poolNoVotes)) * 100
+    typeof poolYesVotes === "number" &&
+    typeof networkTotalStake?.totalStakeControlledBySPOs === "number" &&
+    networkTotalStake.totalStakeControlledBySPOs > 0
+      ? (poolYesVotes / networkTotalStake.totalStakeControlledBySPOs) * 100
       : undefined;
-  const poolNoVotesPercentage = poolYesVotesPercentage
-    ? 100 - poolYesVotesPercentage
-    : poolNoVotes
-    ? 100
-    : undefined;
+  const poolNoVotesPercentage =
+    typeof poolNoVotes === "number" &&
+    typeof networkTotalStake?.totalStakeControlledBySPOs === "number" &&
+    networkTotalStake.totalStakeControlledBySPOs > 0
+      ? (poolNoVotes / networkTotalStake.totalStakeControlledBySPOs) * 100
+      : undefined;
   const poolNotVotedVotes =
     typeof networkTotalStake?.totalStakeControlledBySPOs === "number"
       ? networkTotalStake.totalStakeControlledBySPOs -

@@ -67,8 +67,16 @@ TotalStakeControlledByActiveDReps AS (
         AND COALESCE(rd.deposit, 0) >= 0
         AND ((DRepActivity.epoch_no - GREATEST(COALESCE(lve.epoch_no, 0), COALESCE(rd.epoch_no, 0))) <= DRepActivity.drep_activity)
 ),
+-- it's a fix for duplication issue https://github.com/IntersectMBO/cardano-db-sync/issues/1986
+LatestPoolStat AS (
+    SELECT DISTINCT ON (pool_hash_id) *
+    FROM
+        pool_stat
+    WHERE
+        epoch_no = (SELECT MAX(no) FROM epoch)
+),
 TotalStakeControlledBySPOs AS (
-    SELECT SUM(ps.stake)::bigint AS total FROM pool_stat ps WHERE ps.epoch_no = (SELECT no FROM CurrentEpoch)
+    SELECT SUM(ps.stake)::bigint AS total FROM LatestPoolStat ps WHERE ps.epoch_no = (SELECT no FROM CurrentEpoch)
 ),
 AlwaysAbstainVotingPower AS (
     SELECT COALESCE((SELECT amount FROM drep_hash

@@ -15,6 +15,7 @@ import removeAllSpaces from "@helpers/removeAllSpaces";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import { InvalidMetadata } from "@constants/index";
+import { isMobile } from "@helpers/mobile";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
@@ -44,7 +45,11 @@ test("4A_2. Should access Governance Actions page without connecting wallet", as
   await page.goto("/");
   await page.getByTestId("move-to-governance-actions-button").click();
 
-  await expect(page.getByText(/Governance actions/i)).toHaveCount(2);
+  if (!isMobile(page)) {
+    await page.getByTestId("governance-actions").click();
+  }
+
+  await expect(page.getByText(/Live Voting/i)).toHaveCount(2);
 });
 
 test("4B_2. Should restrict voting for users who are not registered as DReps (without wallet connected)", async ({

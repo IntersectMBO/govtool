@@ -12,6 +12,17 @@ changes.
 
 ### Added
 
+### Fixed
+
+### Changed
+
+### Removed
+
+## [v2.0.29](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.29) 2025-07-16
+
+
+### Added
+
 - Preserve maintenance ending banner state on the wallet connection change [Issue 3681](https://github.com/IntersectMBO/govtool/issues/3681)
 - Add authors for Live Voting Governance Actions [Issue 3745](https://github.com/IntersectMBO/govtool/issues/3745)
 - Add support for ed25519 author signature validation on gov actions [Issue 3745](https://github.com/IntersectMBO/govtool/issues/3745)

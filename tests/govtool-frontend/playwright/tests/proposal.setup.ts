@@ -7,10 +7,13 @@ import { test as setup } from "@fixtures/walletExtension";
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
-import { getWalletConfigForFaucet } from "@helpers/index";
+import {
+  getProposalWalletCount,
+  getWalletConfigForFaucet,
+} from "@helpers/index";
 import { createKeyFromPrivateKeyHex } from "@helpers/crypto";
 
-const PROPOSAL_WALLETS_COUNT = environments.isScheduled ? 1 : 6;
+const PROPOSAL_WALLETS_COUNT = getProposalWalletCount();
 
 let govActionDeposit: number;
 

@@ -7,6 +7,7 @@ import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
 import { isBootStrapingPhase } from "@helpers/cardano";
+import { getProposalType } from "@helpers/index";
 import { injectLogger } from "@helpers/page";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
@@ -55,9 +56,7 @@ test.describe("Filter and sort proposals", () => {
 
     // proposal type filter
     await proposalDiscussionPage.applyAndValidateFilters(
-      isBootStraping
-        ? BOOTSTRAP_PROPOSAL_TYPE_FILTERS
-        : Object.values(ProposalType),
+      isBootStraping ? BOOTSTRAP_PROPOSAL_TYPE_FILTERS : getProposalType(),
       proposalDiscussionPage._validateTypeFiltersInProposalCard
     );
 
@@ -171,7 +170,7 @@ test("8D. Should show the view-all categorized proposed governance actions.", as
   browser,
 }) => {
   await Promise.all(
-    Object.values(ProposalType).map(async (proposalType: string) => {
+    getProposalType().map(async (proposalType: string) => {
       const context = await browser.newContext();
       const page = await context.newPage();
       injectLogger(page);

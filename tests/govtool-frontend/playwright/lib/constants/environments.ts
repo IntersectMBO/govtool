@@ -34,6 +34,8 @@ const environments = {
     (process.env.SCHEDULED_WORKFLOW &&
       process.env.SCHEDULED_WORKFLOW == "true") ||
     false,
+  isHardforkProposalEnabled:
+    process.env.IS_HARDFORK_PROPOSAL_ENABLED === "true" || false,
 };
 
 export default environments;

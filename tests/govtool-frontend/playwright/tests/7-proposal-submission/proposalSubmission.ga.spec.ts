@@ -16,7 +16,7 @@ import { ProposalType } from "@types";
 import walletManager from "lib/walletManager";
 import { valid as mockValid, invalid as mockInvalid } from "@mock/index";
 import { rewardAddressBech32 } from "@helpers/shellyWallet";
-import { getWalletConfigForFaucet } from "@helpers/index";
+import { getProposalType, getWalletConfigForFaucet } from "@helpers/index";
 import { faker } from "@faker-js/faker";
 import { proposalSubmissionAuthFile } from "@constants/auth";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
@@ -28,7 +28,7 @@ test.beforeEach(async () => {
   await skipIfTemporyWalletIsNotAvailable("proposalSubmissionWallets.json");
 });
 
-Object.values(ProposalType).forEach((proposalType, index) => {
+getProposalType().forEach((proposalType, index) => {
   test(`7H_${index + 1}. Should submit a ${proposalType.toLocaleLowerCase()} proposal as governance action`, async ({
     page,
     browser,

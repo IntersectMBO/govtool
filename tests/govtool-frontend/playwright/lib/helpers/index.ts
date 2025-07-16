@@ -1,4 +1,5 @@
 import environments from "@constants/environments";
+import { ProposalType } from "@types";
 export const parseVotingPowerAndPercentage = (
   combinedString: string
 ): { votingPower: string; percentage: string } => {
@@ -26,4 +27,22 @@ export const getWalletConfigForFaucet = () => {
     },
     address: environments.faucet.address || "",
   };
+};
+
+
+export const getProposalType = () => {
+  return Object.values(ProposalType).filter(
+    (type) =>
+      !(
+        environments.isHardforkProposalEnabled === false &&
+        type === ProposalType.hardFork
+      )
+  );
+};
+
+export const getProposalWalletCount = (): number => {
+  if (environments.isScheduled) {
+    return 1;
+  }
+  return environments.isHardforkProposalEnabled ? 6 : 5;
 };

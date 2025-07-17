@@ -189,6 +189,7 @@ CommitteeThreshold AS (
     where
             ( c.gov_action_proposal_id = (Select id from LatestGovAction))
         OR  ( c.gov_action_proposal_id IS NULL)
+            order by gov_action_proposal_id nulls last
 )
 SELECT
     UniqueDelegators.count AS unique_delegators,

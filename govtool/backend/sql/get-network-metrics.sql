@@ -186,9 +186,9 @@ CommitteeThreshold AS (
     SELECT
         c.*
     FROM committee c
-    LEFT JOIN LatestGovAction lga ON c.gov_action_proposal_id = lga.id
-    WHERE (c.gov_action_proposal_id IS NOT NULL AND lga.id IS NOT NULL)
-        OR (c.gov_action_proposal_id IS NULL)
+    where
+            ( c.gov_action_proposal_id = (Select id from LatestGovAction))
+        OR  ( c.gov_action_proposal_id IS NULL)
 )
 SELECT
     UniqueDelegators.count AS unique_delegators,

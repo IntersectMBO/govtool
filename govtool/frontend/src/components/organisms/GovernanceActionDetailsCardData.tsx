@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { Box, Tabs, Tab, styled, Skeleton } from "@mui/material";
+import { Box, Tabs, Tab, styled, Skeleton, Link } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
@@ -29,9 +29,11 @@ import {
   validateSignature,
 } from "@utils";
 import { MetadataValidationStatus, ProposalData } from "@models";
+import { Trans } from "react-i18next";
 import { errorRed, successGreen } from "@/consts";
 import { GovernanceActionType } from "@/types/governanceAction";
 import { useAppContext } from "@/context";
+import { theme } from "@/theme";
 
 type TabPanelProps = {
   children?: React.ReactNode;
@@ -164,6 +166,11 @@ export const GovernanceActionDetailsCardData = ({
   }${window.location.port ? `:${window.location.port}` : ""}${pathname}${
     hash ?? ""
   }`;
+
+  const isItMLabsWithdrawal =
+    type === GovernanceActionType.TreasuryWithdrawals &&
+    cip129GovernanceActionId ===
+      "gov_action18nefry4qacd80xzs2srjahxm2e4vz3c8wvrr03rrtk8mdqfuknysq66459t";
 
   const tabs = useMemo(
     () =>
@@ -390,6 +397,7 @@ export const GovernanceActionDetailsCardData = ({
                   publicKey={author.publicKey}
                   algorithm={author.witnessAlgorithm}
                   jsonContent={jsonContent}
+                  forceValidStatus={isItMLabsWithdrawal}
                 />
                 <span>{author.name}</span>
                 <Tooltip
@@ -409,6 +417,7 @@ export const GovernanceActionDetailsCardData = ({
                 </Tooltip>
               </Box>
               ))}
+          {isItMLabsWithdrawal && authors && authors.length > 0 && <AuthorsVerificationInfoBox />}
         </Box>
       </GovernanceActionCardElement>
 
@@ -520,13 +529,16 @@ const AuthorSignatureStatus = ({
   publicKey,
   signature,
   jsonContent,
+  forceValidStatus = false,
 }: {
   algorithm?: string;
   publicKey?: string;
   signature?: string;
   jsonContent?: Record<string, unknown>;
+  forceValidStatus: boolean;
 }) => {
   const { t } = useTranslation();
+
   const [isSignatureValid, setIsSignatureValid] = useState<boolean | null>(
     null,
   );
@@ -542,6 +554,9 @@ const AuthorSignatureStatus = ({
       };
       const result = await validateSignature(args);
       if (!cancelled) setIsSignatureValid(result);
+    }
+    if (forceValidStatus) {
+      return setIsSignatureValid(true);
     }
     checkSignature();
     return () => {
@@ -571,5 +586,48 @@ const AuthorSignatureStatus = ({
         <CancelOutlinedIcon sx={{ color: errorRed.c500 }} fontSize="small" />
       )}
     </Tooltip>
+  );
+};
+
+const AuthorsVerificationInfoBox = () => {
+  const { t } = useTranslation();
+  const {
+    palette: { lightBlue, secondaryBlue },
+  } = theme;
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        gap: 1,
+        backgroundColor: lightBlue,
+        p: 2,
+        borderRadius: "5px",
+      }}
+    >
+      <InfoOutlinedIcon fontSize="small" style={{ color: secondaryBlue }} />
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Typography variant="body2">
+          {t("govActions.safeModeInfoBox.title")}
+        </Typography>
+        <Typography variant="body2">
+          {t("govActions.safeModeInfoBox.line1")}
+        </Typography>
+        <Typography variant="body2">
+          <Trans
+            i18nKey="govActions.safeModeInfoBox.line2"
+            components={[<span style={{ fontWeight: 700 }} key="0" />]}
+          />
+        </Typography>
+        <Link
+          href="https://docs.gov.tools/cardano-govtool/faqs/how-was-the-author-of-withdraw-ara45-217-for-mlabs-core...-ga-verified"
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{ fontSize: "14px" }}
+        >
+          {t("govActions.safeModeInfoBox.link")}
+        </Link>
+      </Box>
+    </Box>
   );
 };

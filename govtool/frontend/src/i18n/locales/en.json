@@ -482,6 +482,12 @@
     "additionalInformationAboutYourVote": "Additional information about your vote",
     "provideNewContextAboutYourVote": "Provide new context about your vote",
     "rationale": "Rationale",
+    "safeModeInfoBox": {
+      "title": "How this Author got verified?",
+      "line1": "A metadata formatting issue caused only part of the data to be signed, preventing automatic verification — the signature is valid and can be manually confirmed.",
+      "line2": "<0>Govtool have manually verified the signature confirming this Treasury action is genuinely coming from Intersect</0> and has marked it accordingly to make it explicit to DReps.",
+      "link": "More details"
+    },
     "seeExternalData": "See external data",
     "selectDifferentOption": "Select a different option to change your vote",
     "showVotes": "Show votes",

@@ -84,6 +84,8 @@ export const VotesSubmitted = ({
     dRepAbstainVotes + (networkTotalStake?.alwaysAbstainVotingPower ?? 0);
 
   // TODO: Move this logic to backend
+
+  // DRep votes
   const dRepYesVotesPercentage = totalStakeControlledByDReps
     ? (dRepYesVotes / totalStakeControlledByDReps) * 100
     : undefined;
@@ -108,25 +110,45 @@ export const VotesSubmitted = ({
   const dRepNotVotedVotesPercentage =
     100 - (dRepYesVotesPercentage ?? 0) - (dRepNoVotesPercentage ?? 0);
 
+  // SPO/Pool votes
   const poolYesVotesPercentage =
-    poolYesVotes + poolNoVotes
-      ? (poolYesVotes / (poolYesVotes + poolNoVotes)) * 100
+    typeof poolYesVotes === "number" &&
+    typeof networkTotalStake?.totalStakeControlledBySPOs === "number" &&
+    networkTotalStake.totalStakeControlledBySPOs > 0
+      ? (poolYesVotes / networkTotalStake.totalStakeControlledBySPOs) * 100
       : undefined;
-  const poolNoVotesPercentage = poolYesVotesPercentage
-    ? 100 - poolYesVotesPercentage
-    : poolNoVotes
-    ? 100
-    : undefined;
 
+  const poolNoVotesPercentage =
+    typeof poolNoVotes === "number" &&
+    typeof networkTotalStake?.totalStakeControlledBySPOs === "number" &&
+    networkTotalStake.totalStakeControlledBySPOs > 0
+      ? (poolNoVotes / networkTotalStake.totalStakeControlledBySPOs) * 100
+      : undefined;
+
+  const poolNotVotedVotes =
+    typeof networkTotalStake?.totalStakeControlledBySPOs === "number"
+      ? networkTotalStake.totalStakeControlledBySPOs -
+        (poolYesVotes + poolNoVotes + poolAbstainVotes)
+      : undefined;
+
+  const poolNotVotedVotesPercentage =
+    100 -
+    (typeof poolYesVotesPercentage === "number" ? poolYesVotesPercentage : 0) -
+    (typeof poolNoVotesPercentage === "number" ? poolNoVotesPercentage : 0);
+
+  // Constitutional Commission votes
   const ccYesVotesPercentage = noOfCommitteeMembers
     ? (ccYesVotes / noOfCommitteeMembers) * 100
     : undefined;
-  const ccNoVotesPercentage = noOfCommitteeMembers
+
+    const ccNoVotesPercentage = noOfCommitteeMembers
     ? (ccNoVotes / noOfCommitteeMembers) * 100
     : undefined;
-  const ccNotVotedVotes =
+
+    const ccNotVotedVotes =
     noOfCommitteeMembers - ccYesVotes - ccNoVotes - ccAbstainVotes;
-  const ccNotVotedVotesPercentage =
+
+    const ccNotVotedVotesPercentage =
     100 - (ccYesVotesPercentage ?? 0) - (ccNoVotesPercentage ?? 0);
 
   return (
@@ -200,6 +222,8 @@ export const VotesSubmitted = ({
             noVotes={poolNoVotes}
             noVotesPercentage={poolNoVotesPercentage}
             abstainVotes={poolAbstainVotes}
+            notVotedVotes={poolNotVotedVotes}
+            notVotedPercentage={poolNotVotedVotesPercentage}
             threshold={
               (() => {
                 const votingThresholdKey = getGovActionVotingThresholdKey({

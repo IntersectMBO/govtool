@@ -90,6 +90,7 @@ export const DrawerMobile = ({
                     <MenuNavItem
                       closeDrawer={() => setIsDrawerOpen(false)}
                       navItem={navItem}
+                      key={navItem.label}
                     />
                   );
                 }

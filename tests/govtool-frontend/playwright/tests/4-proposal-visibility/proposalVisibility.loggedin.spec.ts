@@ -20,8 +20,8 @@ test("4A_1. Should access Governance Actions page with connecting wallet", async
     await openDrawer(page);
   }
 
-  await page.getByTestId("governance-actions-link").click();
-  await expect(page.getByText(/Governance Actions/i)).toHaveCount(2);
+  await page.getByTestId("governance-actions-live-voting-link").click();
+  await expect(page.getByText(/Live Voting/i)).toHaveCount(2);
 });
 
 test("4B_1. Should restrict voting for users who are not registered as DReps (with wallet connected)", async ({

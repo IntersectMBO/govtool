@@ -21,6 +21,7 @@ import {
   skipIfMainnet,
 } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
+import { getProposalType } from "@helpers/index";
 import { createNewPageWithWallet } from "@helpers/page";
 import { rewardAddressBech32 } from "@helpers/shellyWallet";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
@@ -42,11 +43,12 @@ test.describe("Proposal created logged state", () => {
   });
 
   test.describe("Accept valid data", () => {
-    Object.values(ProposalType).map((type: ProposalType, index) => {
+    getProposalType().map((type: ProposalType, index) => {
       test(`7E_${index + 1}. Should accept valid data in ${type.toLowerCase()} proposal form`, async ({
         page,
       }) => {
         await skipIfNotInfoAndBootstrapping(type);
+
 
         test.slow(); // Brute-force testing with 50 random data
 
@@ -99,7 +101,7 @@ test.describe("Proposal created logged state", () => {
   });
 
   test.describe("Reject invalid  data", () => {
-    Object.values(ProposalType).map((type: ProposalType, index) => {
+    getProposalType().map((type: ProposalType, index) => {
       test(`7F_${index + 1}. Should reject invalid data in ${type.toLowerCase()} Proposal form`, async ({
         page,
       }) => {
@@ -128,7 +130,7 @@ test.describe("Proposal created logged state", () => {
   });
 
   test.describe("Create a proposal with proper data", () => {
-    Object.values(ProposalType).map((type: ProposalType, index) => {
+    getProposalType().map((type: ProposalType, index) => {
       test(`7G_${index + 1}. Should create a proposal with proper ${type.toLowerCase()} data`, async ({
         page,
         wallet,
@@ -203,7 +205,7 @@ test.describe("Proposal created logged state", () => {
   });
 
   test.describe("Review fillup form", () => {
-    Object.values(ProposalType).map((type: ProposalType, index) => {
+    getProposalType().map((type: ProposalType, index) => {
       test(`7I_${index + 1}. Should valid review submission in ${type.toLowerCase()} Proposal form`, async ({
         page,
       }) => {
@@ -278,7 +280,7 @@ test.describe("Proposal created logged state", () => {
   });
 
   test.describe("Verify Proposal form", () => {
-    Object.values(ProposalType).map((type: ProposalType, index) => {
+    getProposalType().map((type: ProposalType, index) => {
       test(`7D_${index + 1}. Verify ${type.toLocaleLowerCase()} proposal form`, async ({
         page,
       }) => {
@@ -378,9 +380,7 @@ test.describe("Proposal Draft", () => {
     });
     const proposalSubmissionPage = new ProposalSubmissionPage(page);
     const proposalType =
-      Object.values(ProposalType)[
-        Math.floor(Math.random() * Object.values(ProposalType).length)
-      ];
+      getProposalType()[Math.floor(Math.random() * getProposalType().length)];
     await proposalSubmissionPage.createDraft(proposalType);
     const getAllDrafts = await proposalSubmissionPage.getAllDrafts();
 
@@ -395,9 +395,7 @@ test.describe("Proposal Draft", () => {
     });
 
     const proposalType =
-      Object.values(ProposalType)[
-        Math.floor(Math.random() * Object.values(ProposalType).length)
-      ];
+      getProposalType()[Math.floor(Math.random() * getProposalType().length)];
 
     const proposalSubmissionPage = new ProposalSubmissionPage(page);
     const createProposalType = (await isBootStrapingPhase())
@@ -470,7 +468,7 @@ test.describe("Proposal Draft", () => {
     );
   });
 
-  Object.values(ProposalType).map((proposalType, index) => {
+  getProposalType().map((proposalType, index) => {
     test(`7M_${index + 1}. Should edit a ${proposalType.toLowerCase()} proposal draft`, async ({
       browser,
     }) => {
@@ -567,9 +565,7 @@ test.describe("Proposal Draft", () => {
     test.slow();
 
     const proposalType =
-      Object.values(ProposalType)[
-        Math.floor(Math.random() * Object.values(ProposalType).length)
-      ];
+      getProposalType()[Math.floor(Math.random() * getProposalType().length)];
 
     const proposalSubmissionPage = new ProposalSubmissionPage(page);
     const { proposalFormValue } =

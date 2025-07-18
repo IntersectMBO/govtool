@@ -5,6 +5,7 @@ import { faker } from "@faker-js/faker";
 import { isBootStrapingPhase } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { expectWithInfo } from "@helpers/exceptionHandler";
+import { getProposalType } from "@helpers/index";
 import {
   downloadMetadata,
   uploadScriptAndGenerateUrl,
@@ -615,8 +616,8 @@ export default class ProposalSubmissionPage {
 
   async createProposal(
     receivingAddress: string,
-    proposalType: ProposalType = Object.values(ProposalType)[
-      Math.floor(Math.random() * Object.values(ProposalType).length)
+    proposalType: ProposalType = getProposalType()[
+      Math.floor(Math.random() * getProposalType().length)
     ]
   ): Promise<number> {
     await this.addLinkBtn.click();

@@ -293,8 +293,12 @@ test.describe("Mocked proposal", () => {
   });
 
   test("8F. Should display all comments with count indication.", async () => {
+    let commentCount = mockProposal.data.attributes.prop_comments_number;
+    if (commentCount > 99) {
+      commentCount = "99+";
+    }
     await expect(proposalDiscussionDetailsPage.commentCount).toHaveText(
-      mockProposal.data.attributes.prop_comments_number.toString(),
+      commentCount.toString(),
       { timeout: 60_000 }
     );
   });

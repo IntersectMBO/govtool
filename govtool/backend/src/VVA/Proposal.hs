@@ -87,7 +87,7 @@ getProposals mSearchTerms = withPool $ \conn -> do
       , "%" <> searchParam <> "%"
       , "%" <> searchParam <> "%"
       , "%" <> searchParam <> "%"
-      , "%" <> searchParam <> "%"
+      , searchParam
       )
     case result of
       Left (e :: SomeException) -> do

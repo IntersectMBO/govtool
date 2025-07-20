@@ -346,7 +346,7 @@ WHERE
     off_chain_vote_gov_action_data.abstract ILIKE ? OR
     off_chain_vote_gov_action_data.motivation ILIKE ? OR
     off_chain_vote_gov_action_data.rationale ILIKE ? OR
-    concat(encode(creator_tx.hash, 'hex'), '#', gov_action_proposal.index) ILIKE ?)
+    concat(encode(creator_tx.hash, 'hex'), '#', gov_action_proposal.index) = ?)
 GROUP BY
     gov_action_proposal.id,
     creator_tx.hash,

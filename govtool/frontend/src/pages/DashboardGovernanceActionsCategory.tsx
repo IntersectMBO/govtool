@@ -13,13 +13,13 @@ import {
   useFetchNextPageDetector,
   useGetProposalsInfiniteQuery,
   useGetVoterInfo,
-  useSaveScrollPosition,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
 import {
   getFullGovActionId,
   getProposalTypeLabel,
+  openInNewTab,
   removeDuplicatedProposals,
 } from "@utils";
 import { ValidatedGovernanceActionCard } from "@/components/organisms";
@@ -35,7 +35,6 @@ export const DashboardGovernanceActionsCategory = () => {
   const { t } = useTranslation();
 
   const {
-    isProposalsFetching,
     isProposalsFetchingNextPage,
     isProposalsLoading,
     proposals,
@@ -52,11 +51,6 @@ export const DashboardGovernanceActionsCategory = () => {
     proposalsfetchNextPage,
     isProposalsLoading || isProposalsFetchingNextPage,
     proposalsHaveNextPage,
-  );
-
-  const saveScrollPosition = useSaveScrollPosition(
-    isProposalsLoading,
-    isProposalsFetching,
   );
 
   const mappedData = useMemo(
@@ -140,18 +134,14 @@ export const DashboardGovernanceActionsCategory = () => {
                     `${item.txHash ?? ""}${item.index ?? ""}`
                   }
                   onClick={() => {
-                    saveScrollPosition();
-
-                    navigate(
-                      generatePath(PATHS.dashboardGovernanceActionsAction, {
-                        proposalId: getFullGovActionId(item.txHash, item.index),
-                      }),
-                      {
-                        state: {
-                          proposal: item,
-                          openedFromCategoryPage: true,
-                        },
-                      },
+                    openInNewTab(
+                      window.location.origin +
+                        generatePath(PATHS.dashboardGovernanceActionsAction, {
+                          proposalId: getFullGovActionId(
+                            item.txHash,
+                            item.index,
+                          ),
+                        }),
                     );
                   }}
                   txHash={item.txHash}

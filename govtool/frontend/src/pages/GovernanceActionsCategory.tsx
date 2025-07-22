@@ -13,7 +13,6 @@ import { Footer, TopNav, ValidatedGovernanceActionCard } from "@organisms";
 import {
   useGetProposalsInfiniteQuery,
   useFetchNextPageDetector,
-  useSaveScrollPosition,
   useScreenDimension,
   useTranslation,
   useGetVoterInfo,
@@ -23,6 +22,7 @@ import {
   getFullGovActionId,
   getItemFromLocalStorage,
   getProposalTypeLabel,
+  openInNewTab,
   removeDuplicatedProposals,
 } from "@utils";
 
@@ -37,7 +37,6 @@ export const GovernanceActionsCategory = () => {
   const { t } = useTranslation();
 
   const {
-    isProposalsFetching,
     isProposalsFetchingNextPage,
     isProposalsLoading,
     proposals,
@@ -54,11 +53,6 @@ export const GovernanceActionsCategory = () => {
     proposalsfetchNextPage,
     isProposalsLoading || isProposalsFetchingNextPage,
     proposalsHaveNextPage,
-  );
-
-  const saveScrollPosition = useSaveScrollPosition(
-    isProposalsLoading,
-    isProposalsFetching,
   );
 
   const mappedData = useMemo(
@@ -141,19 +135,12 @@ export const GovernanceActionsCategory = () => {
                       <ValidatedGovernanceActionCard
                         {...item}
                         onClick={() => {
-                          saveScrollPosition();
-
-                          navigate(
-                            PATHS.governanceActionsAction.replace(
-                              ":proposalId",
-                              getFullGovActionId(item.txHash, item.index),
-                            ),
-                            {
-                              state: {
-                                proposal: item,
-                                openedFromCategoryPage: true,
-                              },
-                            },
+                          openInNewTab(
+                            window.location.origin +
+                              PATHS.governanceActionsAction.replace(
+                                ":proposalId",
+                                getFullGovActionId(item.txHash, item.index),
+                              ),
                           );
                         }}
                       />

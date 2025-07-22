@@ -22,6 +22,7 @@ import {
   DashboardGovernanceActionsVotedOn,
 } from "@organisms";
 import { Button } from "@atoms";
+import usePrevious from "@/hooks/usePrevious";
 
 type TabPanelProps = {
   children?: React.ReactNode;
@@ -84,11 +85,17 @@ export const DashboardGovernanceActions = () => {
   const queryFilters =
     chosenFilters.length > 0 ? chosenFilters : defaultCategories;
 
+  const prevFilters = usePrevious(queryFilters);
+  const prevSorting = usePrevious(chosenSorting);
+
+  const stableFilters = isAdjusting ? prevFilters ?? queryFilters : queryFilters;
+  const stableSorting = isAdjusting ? prevSorting ?? chosenSorting : chosenSorting;
+
   const { proposals, isProposalsLoading } = useGetProposalsQuery({
-    filters: queryFilters,
-    sorting: chosenSorting,
+    filters: stableFilters,
+    sorting: stableSorting,
     searchPhrase: debouncedSearchText,
-    enabled: !isAdjusting,
+    enabled: true,
   });
   const { data: votes, areDRepVotesLoading } = useGetDRepVotesQuery(
     queryFilters,

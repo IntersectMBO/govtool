@@ -88,8 +88,12 @@ export const DashboardGovernanceActions = () => {
   const prevFilters = usePrevious(queryFilters);
   const prevSorting = usePrevious(chosenSorting);
 
-  const stableFilters = isAdjusting ? prevFilters ?? queryFilters : queryFilters;
-  const stableSorting = isAdjusting ? prevSorting ?? chosenSorting : chosenSorting;
+  const stableFilters = isAdjusting
+    ? prevFilters ?? queryFilters
+    : queryFilters;
+  const stableSorting = isAdjusting
+    ? prevSorting ?? chosenSorting
+    : chosenSorting;
 
   const { proposals, isProposalsLoading } = useGetProposalsQuery({
     filters: stableFilters,
@@ -109,7 +113,9 @@ export const DashboardGovernanceActions = () => {
       const filteredActions = proposalCategory.actions.filter((action) => {
         const hasVote = votes?.some((voteCategory) =>
           voteCategory.actions.some(
-            (voteAction) => voteAction.proposal.txHash === action.txHash,
+            (voteAction) =>
+              voteAction.proposal.txHash === action.txHash &&
+              voteAction.proposal.index === action.index,
           ),
         );
 

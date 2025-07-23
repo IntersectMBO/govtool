@@ -20,7 +20,6 @@ import {
 } from "@hooks";
 import {
   WALLET_LS_KEY,
-  getFullGovActionId,
   getItemFromLocalStorage,
   getProposalTypeLabel,
   removeDuplicatedProposals,
@@ -142,19 +141,6 @@ export const GovernanceActionsCategory = () => {
                         {...item}
                         onClick={() => {
                           saveScrollPosition();
-
-                          navigate(
-                            PATHS.governanceActionsAction.replace(
-                              ":proposalId",
-                              getFullGovActionId(item.txHash, item.index),
-                            ),
-                            {
-                              state: {
-                                proposal: item,
-                                openedFromCategoryPage: true,
-                              },
-                            },
-                          );
                         }}
                       />
                     </Box>

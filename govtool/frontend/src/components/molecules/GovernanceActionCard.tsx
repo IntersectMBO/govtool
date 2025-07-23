@@ -40,6 +40,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
   inProgress = false,
   expiryDate,
   expiryEpochNo,
+  onClick,
   createdDate,
   createdEpochNo,
   txHash,
@@ -58,7 +59,8 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
     bech32Prefix: "gov_action",
   });
 
-  const location = useLocation();
+  const pathname = useLocation().pathname.replace(/governance_actions.*/g, "governance_actions");
+  const isCategoryView = useLocation().pathname.includes("category");
 
   return (
     <Box
@@ -152,8 +154,23 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
           <Skeleton width="100%" height="40px" sx={{ borderRadius: "20px" }} />
         ) : (
           <Button
+            onClick={onClick}
             component={Link}
-            to={`${location.pathname}/${govActionId}`}
+            to={`${pathname}/${govActionId}`}
+            state={{
+              proposal: {
+                  abstract,
+                  type,
+                  expiryDate,
+                  expiryEpochNo,
+                  createdDate,
+                  createdEpochNo,
+                  txHash,
+                  index,
+                  title,
+              },
+              openedFromCategoryPage: isCategoryView
+            }}
             variant={inProgress ? "outlined" : "contained"}
             size="large"
             sx={{

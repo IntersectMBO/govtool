@@ -81,7 +81,10 @@ export default () => {
           enable(walletName);
           return;
         }
-        await new Promise(resolve => setTimeout(resolve, interval));
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve) => {
+          setTimeout(resolve, interval);
+        });
       }
 
       if (!isOnAllowedPage) {

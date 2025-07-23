@@ -407,7 +407,8 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
 
   CacheEnv {proposalListCache} <- asks vvaCache
 
-  proposals <- cacheRequest proposalListCache () (Proposal.listProposals mSearchQuery)
+  let emptyMSearchQuery = Just "" :: Maybe Text -- issue 3918 temporary bypass
+  proposals <- cacheRequest proposalListCache () (Proposal.listProposals emptyMSearchQuery)
 
   mappedSortedAndFilteredProposals <- mapSortAndFilterProposals selectedTypes sortMode proposals
   let filteredProposals = filter

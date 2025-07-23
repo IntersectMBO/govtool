@@ -63,28 +63,47 @@ export default () => {
   }, []);
 
   const checkTheWalletIsActive = useCallback(() => {
-    const hrefCondition =
-      window.location.pathname === PATHS.home ||
-      window.location.pathname === PATHS.governanceActions ||
-      window.location.pathname === PATHS.governanceActionsAction;
+    const isWalletAvailable = () =>
+        window.cardano && walletName && Object.keys(window.cardano).includes(walletName);
 
-    const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
-    if (window.cardano) {
-      const walletExtensions = Object.keys(window.cardano);
-      if (walletName && walletExtensions.includes(walletName)) {
-        enable(walletName);
-        return;
-      }
-    }
-    if (
-      (!window.cardano && walletName) ||
-      (walletName && !Object.keys(window.cardano).includes(walletName))
-    ) {
-      if (!hrefCondition) {
-        navigate(PATHS.home);
-      }
+    const cleanUpWalletData = () => {
       removeItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
       removeItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`);
+    };
+
+    const waitForWalletExtension = async () => {
+      const timeout = 5000;
+      const interval = 100;
+      const startTime = Date.now();
+
+      while (Date.now() - startTime < timeout) {
+        if (isWalletAvailable()) {
+          enable(walletName);
+          return;
+        }
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve) => {
+          setTimeout(resolve, interval);
+        });
+      }
+
+      if (!isOnAllowedPage) {
+        navigate(PATHS.home);
+      }
+      cleanUpWalletData();
+    };
+
+    const isOnAllowedPage = [PATHS.home, PATHS.governanceActions, PATHS.governanceActionsAction]
+        .includes(window.location.pathname);
+
+    const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
+
+    if (!walletName) return;
+
+    if (isWalletAvailable()) {
+      enable(walletName);
+    } else {
+      waitForWalletExtension();
     }
   }, []);
 

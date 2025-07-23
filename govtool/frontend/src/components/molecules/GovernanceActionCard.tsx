@@ -1,5 +1,6 @@
 import { FC } from "react";
 import { Box, Skeleton } from "@mui/material";
+import { Link, useLocation } from "react-router-dom";
 
 import { Button } from "@atoms";
 import {
@@ -57,6 +58,9 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
     index: index.toString(16).padStart(2, "0"),
     bech32Prefix: "gov_action",
   });
+
+  const pathname = useLocation().pathname.replace(/governance_actions.*/g, "governance_actions");
+  const isCategoryView = useLocation().pathname.includes("category");
 
   return (
     <Box
@@ -151,6 +155,22 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
         ) : (
           <Button
             onClick={onClick}
+            component={Link}
+            to={`${pathname}/${govActionId}`}
+            state={{
+              proposal: {
+                  abstract,
+                  type,
+                  expiryDate,
+                  expiryEpochNo,
+                  createdDate,
+                  createdEpochNo,
+                  txHash,
+                  index,
+                  title,
+              },
+              openedFromCategoryPage: isCategoryView
+            }}
             variant={inProgress ? "outlined" : "contained"}
             size="large"
             sx={{

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Box, CircularProgress, Tab, Tabs, styled } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -88,8 +88,12 @@ export const DashboardGovernanceActions = () => {
   const prevFilters = usePrevious(queryFilters);
   const prevSorting = usePrevious(chosenSorting);
 
-  const stableFilters = isAdjusting ? prevFilters ?? queryFilters : queryFilters;
-  const stableSorting = isAdjusting ? prevSorting ?? chosenSorting : chosenSorting;
+  const stableFilters = isAdjusting
+    ? prevFilters ?? queryFilters
+    : queryFilters;
+  const stableSorting = isAdjusting
+    ? prevSorting ?? chosenSorting
+    : chosenSorting;
 
   const { proposals, isProposalsLoading } = useGetProposalsQuery({
     filters: stableFilters,
@@ -103,16 +107,23 @@ export const DashboardGovernanceActions = () => {
     debouncedSearchText,
   );
 
-  // TODO: Black magic - that filtering should be done on the backend
-  const filteredProposals = proposals
-    ?.map((proposalCategory) => {
+  // White Magic :)
+  const shouldFilter =
+  voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter;
+
+const filteredProposals = useMemo(() => {
+  if (!shouldFilter || !proposals || !votes) return proposals;
+
+  return proposals
+    .map((proposalCategory) => {
       const filteredActions = proposalCategory.actions.filter((action) => {
-        const hasVote = votes?.some((voteCategory) =>
+        const hasVote = votes.some((voteCategory) =>
           voteCategory.actions.some(
-            (voteAction) => voteAction.proposal.txHash === action.txHash,
+            (voteAction) =>
+              voteAction.proposal.txHash === action.txHash &&
+              voteAction.proposal.index === action.index,
           ),
         );
-
         return !hasVote;
       });
 
@@ -122,6 +133,7 @@ export const DashboardGovernanceActions = () => {
       };
     })
     .filter((category) => category.actions.length > 0);
+}, [proposals, votes, shouldFilter]);
 
   const { state } = useLocation();
   const [content, setContent] = useState<number>(

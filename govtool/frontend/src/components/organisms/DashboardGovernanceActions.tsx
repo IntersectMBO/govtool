@@ -107,6 +107,8 @@ export const DashboardGovernanceActions = () => {
     debouncedSearchText,
   );
 
+  if (!votes) return proposals;
+  
   // TODO: Black magic - that filtering should be done on the backend
   const filteredProposals = proposals
     ?.map((proposalCategory) => {

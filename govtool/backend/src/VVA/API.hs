@@ -407,6 +407,8 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
 
   CacheEnv {proposalListCache} <- asks vvaCache
 
+  let cacheKey = ()
+
   proposals <- do
     result <- Proposal.listProposals mSearchQuery
     if null result

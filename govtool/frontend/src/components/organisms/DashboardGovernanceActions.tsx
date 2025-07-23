@@ -107,7 +107,7 @@ export const DashboardGovernanceActions = () => {
     debouncedSearchText,
   );
 
-  //White Magic :)
+  // White Magic :)
   const filterOutAlreadyVotedProposals = () => {
   if (!votes) return proposals;
 

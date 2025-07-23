@@ -107,13 +107,14 @@ export const DashboardGovernanceActions = () => {
     debouncedSearchText,
   );
 
+  //White Magic :)
+  const filterOutAlreadyVotedProposals = () => {
   if (!votes) return proposals;
 
-  // TODO: Black magic - that filtering should be done on the backend
-  const filteredProposals = proposals
+  return proposals
     ?.map((proposalCategory) => {
       const filteredActions = proposalCategory.actions.filter((action) => {
-        const hasVote = votes?.some((voteCategory) =>
+        const hasVote = votes.some((voteCategory) =>
           voteCategory.actions.some(
             (voteAction) =>
               voteAction.proposal.txHash === action.txHash &&
@@ -130,6 +131,9 @@ export const DashboardGovernanceActions = () => {
       };
     })
     .filter((category) => category.actions.length > 0);
+};
+
+const filteredProposals = filterOutAlreadyVotedProposals();
 
   const { state } = useLocation();
   const [content, setContent] = useState<number>(

@@ -407,7 +407,13 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
 
   CacheEnv {proposalListCache} <- asks vvaCache
 
-  proposals <- cacheRequest proposalListCache () (Proposal.listProposals mSearchQuery)
+  let cacheKey = ()
+
+  proposals <- do
+    result <- Proposal.listProposals mSearchQuery
+    if null result
+      then return result
+      else cacheRequest proposalListCache cacheKey (pure result)
 
   mappedSortedAndFilteredProposals <- mapSortAndFilterProposals selectedTypes sortMode proposals
   let filteredProposals = filter

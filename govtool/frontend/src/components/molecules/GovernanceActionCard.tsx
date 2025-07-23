@@ -1,6 +1,5 @@
 import { FC } from "react";
 import { Box, Skeleton } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
 
 import { Button } from "@atoms";
 import {
@@ -40,6 +39,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
   inProgress = false,
   expiryDate,
   expiryEpochNo,
+  onClick,
   createdDate,
   createdEpochNo,
   txHash,
@@ -57,8 +57,6 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
     index: index.toString(16).padStart(2, "0"),
     bech32Prefix: "gov_action",
   });
-
-  const location = useLocation();
 
   return (
     <Box
@@ -152,8 +150,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
           <Skeleton width="100%" height="40px" sx={{ borderRadius: "20px" }} />
         ) : (
           <Button
-            component={Link}
-            to={`${location.pathname}/${govActionId}`}
+            onClick={onClick}
             variant={inProgress ? "outlined" : "contained"}
             size="large"
             sx={{

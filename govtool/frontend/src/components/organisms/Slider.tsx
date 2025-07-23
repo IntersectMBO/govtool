@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { generatePath, Link } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { generatePath, useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 import { KeenSliderOptions } from "keen-slider";
 import "keen-slider/keen-slider.min.css";
@@ -39,6 +39,7 @@ export const Slider = ({
   const [isSliderInitialized, setIsSliderInitialized] = useState(false);
 
   const { isMobile, screenWidth } = useScreenDimension();
+  const navigate = useNavigate();
   const { pendingTransaction } = useCardano();
   const { t } = useTranslation();
 
@@ -75,6 +76,19 @@ export const Slider = ({
     instanceRef.current?.track.to(0);
     instanceRef.current?.moveToIdx(0);
   };
+
+  const onClickShowAll = useCallback(() => {
+    navigate(
+      generatePath(
+        onDashboard
+          ? PATHS.dashboardGovernanceActionsCategory
+          : PATHS.governanceActionsCategory,
+        {
+          category: navigateKey,
+        },
+      ),
+    );
+  }, [navigate, onDashboard]);
 
   useEffect(() => {
     if (instanceRef.current) {
@@ -115,15 +129,6 @@ export const Slider = ({
           <Typography variant="title2">{title}</Typography>
           {(notSlicedDataLength > 6 || (isMobile && isShowAll)) && (
             <Button
-              component={Link}
-              to={`${generatePath(
-                  onDashboard
-                      ? PATHS.dashboardGovernanceActionsCategory
-                      : PATHS.governanceActionsCategory,
-                  {
-                    category: navigateKey,
-                  },
-              )}`}
               variant="contained"
               size="medium"
               sx={{
@@ -134,6 +139,7 @@ export const Slider = ({
                 minWidth: 93,
                 "&:hover": { backgroundColor: arcticWhite },
               }}
+              onClick={onClickShowAll}
             >
               {t("slider.showAll")}
             </Button>

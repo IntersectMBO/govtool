@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import { useValidateMutation } from "@/hooks/mutations";
 import { MetadataStandard, ProposalData } from "@/models";
-import { GovernanceActionCard } from "@molecules";
+import { GovernanceActionCard } from "../molecules";
 
 type ActionTypeProps = Omit<
   ProposalData,
@@ -14,6 +14,7 @@ type ActionTypeProps = Omit<
   | "rationale"
   | "motivation"
 > & {
+  onClick?: () => void;
   inProgress?: boolean;
 };
 export const ValidatedGovernanceActionCard = (props: ActionTypeProps) => {

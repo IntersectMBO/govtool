@@ -1,12 +1,10 @@
-import { useNavigate, generatePath } from "react-router-dom";
 import { Box } from "@mui/material";
 
 import { Typography } from "@atoms";
-import { PATHS } from "@consts";
 import { useCardano } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { ProposalData } from "@models";
-import { getProposalTypeTitle, getFullGovActionId } from "@utils";
+import { getProposalTypeTitle } from "@utils";
 import { Slider, ValidatedGovernanceActionCard } from "@organisms";
 
 type GovernanceActionsToVoteProps = {
@@ -25,7 +23,6 @@ export const GovernanceActionsToVote = ({
   sorting,
 }: GovernanceActionsToVoteProps) => {
   const { pendingTransaction } = useCardano();
-  const navigate = useNavigate();
   const { isMobile, pagePadding } = useScreenDimension();
   const { t } = useTranslation();
 
@@ -64,29 +61,6 @@ export const GovernanceActionsToVote = ({
                         pendingTransaction.vote?.resourceId ===
                           `${action.txHash ?? ""}${action.index ?? ""}`
                       }
-                      onClick={() => {
-                        navigate(
-                          onDashboard
-                            ? generatePath(
-                                PATHS.dashboardGovernanceActionsAction,
-                                {
-                                  proposalId: getFullGovActionId(
-                                    action.txHash,
-                                    action.index,
-                                  ),
-                                },
-                              )
-                            : PATHS.governanceActionsAction.replace(
-                                ":proposalId",
-                                getFullGovActionId(action.txHash, action.index),
-                              ),
-                          {
-                            state: {
-                              proposal: action,
-                            },
-                          },
-                        );
-                      }}
                     />
                   </div>
                 ))}

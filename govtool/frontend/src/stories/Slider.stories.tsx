@@ -58,6 +58,6 @@ export const SliderComponentOverflow: Story = {
     await expect(canvas.getByText("Slider title")).toBeInTheDocument();
     await expect(canvas.getAllByTestId("slider")).toHaveLength(6);
 
-    await expect(canvas.getByRole("link")).toBeEnabled();
+    await expect(canvas.getByRole("button")).toBeEnabled();
   },
 };

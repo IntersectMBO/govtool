@@ -1,5 +1,5 @@
 import { useMemo, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { Box, CircularProgress, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
@@ -18,6 +18,7 @@ import {
   useTranslation,
 } from "@hooks";
 import {
+  getFullGovActionId,
   getProposalTypeLabel,
   removeDuplicatedProposals,
 } from "@utils";
@@ -140,6 +141,18 @@ export const DashboardGovernanceActionsCategory = () => {
                   }
                   onClick={() => {
                     saveScrollPosition();
+
+                    navigate(
+                      generatePath(PATHS.dashboardGovernanceActionsAction, {
+                        proposalId: getFullGovActionId(item.txHash, item.index),
+                      }),
+                      {
+                        state: {
+                          proposal: item,
+                          openedFromCategoryPage: true,
+                        },
+                      },
+                    );
                   }}
                   txHash={item.txHash}
                 />

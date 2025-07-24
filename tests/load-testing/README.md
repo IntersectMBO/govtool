@@ -24,9 +24,9 @@ npm run generate-auth
 ## Manual Run
 
 ```bash
-export API_URL=https://govtool.cardanoapi.io/api
-export PDF_API_URL=https://z74f91f2d-zb0719f09-gtw.z937eb260.rustrocks.fr/api
-export METADATA_API_URL=https://govtool.cardanoapi.io/metadata-validation
+export API_URL=https://z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr
+export METADATA_VALIDATION_API_URL=https://z6b8d2f7a-z2f6a992f-gtw.z937eb260.rustrocks.fr
+export PDF_API_URL=https://zdae9891f-zf09d11da-gtw.z937eb260.rustrocks.fr
 export PEAK_USERS=100
 export RAMP_DURATION=40 # in seconds
 export STRESS_DURATION=40 # in seconds
@@ -41,9 +41,9 @@ docker run \
   -e RAMP_DURATION=40 \
   -e PEAK_USERS=100 \
   -e STRESS_DURATION=40 \
-  -e API_URL='https://govtool.cardanoapi.io/api'\
-  -e PDF_API_URL='https://z74f91f2d-zb0719f09-gtw.z937eb260.rustrocks.fr/api'\
-  -e METADATA_API_URL='https://govtool.cardanoapi.io/metadata-validation'\
+  -e API_URL='https://z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr' \
+  -e METADATA_VALIDATION_API_URL='https://z6b8d2f7a-z2f6a992f-gtw.z937eb260.rustrocks.fr' \
+  -e PDF_API_URL='https://zdae9891f-zf09d11da-gtw.z937eb260.rustrocks.fr' \
   govtool/load-testing
 ```
 

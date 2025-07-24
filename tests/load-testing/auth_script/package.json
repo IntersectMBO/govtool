@@ -5,7 +5,8 @@
   "devDependencies": {
     "@types/node": "^22.10.7",
     "@types/node-fetch": "^2.6.11",
-    "libcardano": "^1.4.6",
+    "libcardano": "2.2.3",
+    "libcardano-wallet": "2.2.5",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
@@ -18,5 +19,6 @@
     "@faker-js/faker": "^9.4.0",
     "@noble/curves": "^1.8.1",
     "faker-js": "^1.0.0"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

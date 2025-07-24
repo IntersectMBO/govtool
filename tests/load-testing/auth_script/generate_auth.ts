@@ -1,16 +1,19 @@
 import { writeFile } from "fs";
-import {  ShelleyWallet } from "libcardano";
+import {  Cip30ShelleyWallet, ShelleyWallet } from "libcardano-wallet";
 import { AuthResponse } from "./lib/types";
 import { generateWallets } from "./lib/helpers/generateWallets";
-import { signData } from "./lib/helpers/auth";
+import { authenticate } from "./lib/helpers/auth";
+import { loadCrypto } from "libcardano";
 
 async function saveAuths(wallets: ShelleyWallet[]): Promise<void> {
+  
   const jsonWallets: AuthResponse[] = [];
   for (let i = 0; i < wallets.length; i++) {
-    const payload =
-      "To proceed, please sign this data to verify your identity. This ensures that the action is secure and confirms your identity. ";
-    const stakeAddress = wallets[i].rewardAddressBech32(0);
-    let authResponse = await signData(stakeAddress, payload, wallets[i]);
+    const cip30 = new Cip30ShelleyWallet({} as any,{} as any,wallets[i],0)
+
+    const stakeAddress = wallets[i].stakeAddrechBech32(0);
+    
+    let authResponse = await authenticate(cip30);
     if (authResponse) {
       jsonWallets.push({ ...authResponse, stakeAddress });
     }
@@ -23,7 +26,9 @@ async function saveAuths(wallets: ShelleyWallet[]): Promise<void> {
   });
 }
 
-(async () => {
+setTimeout(async () => {
+  await loadCrypto()
+  console.log("crypto loaded")
   const wallets = await generateWallets();
   await saveAuths(wallets);
-})();
+},3000)

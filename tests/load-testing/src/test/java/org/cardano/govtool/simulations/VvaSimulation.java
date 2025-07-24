@@ -21,43 +21,41 @@ import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.http;
 
 public class VvaSimulation extends Simulation {
-        private static final String API_URL = Optional.ofNullable(System.getenv("API_URL"))
-                        .orElse("https://govtool.cardanoapi.io/api2");
-        private static final String PDF_API_URL = Optional.ofNullable(System.getenv("PDF_API_URL"))
-                        .orElse("https://z74f91f2d-zb0719f09-gtw.z937eb260.rustrocks.fr/api");
-        private static final int PEAK_USERS = Integer
-                        .parseInt(Optional.ofNullable(System.getenv("PEAK_USERS")).orElse("600"));
-        private static final int STRESS_DURATION = Integer
-                        .parseInt(Optional.ofNullable(System.getenv("STRESS_DURATION")).orElse("20"));
-        private static final int RAMP_DURATION = Integer
-                        .parseInt(Optional.ofNullable(System.getenv("RAMP_DURATION")).orElse("20"));
+
         private List<String> knownDreps;
         private List<String> knownProposaList;
 
         @Override
         public void before() {
-                System.out.printf("Base API URL: %s%n", API_URL);
-                System.out.printf("PDF API URL: %s%n", PDF_API_URL);
-                System.out.printf("Peak users count: %d%n", PEAK_USERS);
-                System.out.printf("Ramping users over %d seconds%n", RAMP_DURATION);
-                System.out.printf("Stress interval %d seconds%n", STRESS_DURATION);
+                System.out.printf("Base API URL: %s%n", SimulationConfig.API_URL);
+                System.out.printf("Metadata validation API url: %s%n", SimulationConfig.METADATA_VALIDATION_API_URL);
+                System.out.printf("PDF API URL: %s%n", SimulationConfig.PDF_API_URL);
+                System.out.printf("Peak users count: %d%n", SimulationConfig.PEAK_USERS);
+                System.out.printf("Ramping users over %d seconds%n", SimulationConfig.RAMP_DURATION);
+                System.out.printf("Stress interval %d seconds%n", SimulationConfig.STRESS_DURATION);
 
+        }
+        @Override
+        public void after() {
+                this.before();
         }
 
         private PopulationBuilder makeScenario(String name, ChainBuilder chain, double userPercent,
                         HttpProtocolBuilder protocol) {
-                var rampUserRate = ((double) PEAK_USERS) * userPercent / (double) RAMP_DURATION;
-                return scenario(name)
-                                .exec(AuthenticationAction.connect(knownDreps, knownProposaList).pause(2).exec(chain))
-                                .injectOpen(
-                                                nothingFor(5),
-                                                constantUsersPerSec(rampUserRate).during(RAMP_DURATION),
-                                                stressPeakUsers(PEAK_USERS).during(STRESS_DURATION))
-                                .protocols(protocol);
+                var rampUserRate = ((double) SimulationConfig.PEAK_USERS) * userPercent / (double) SimulationConfig.RAMP_DURATION;
+                var baseScenario = scenario(name)
+                                .exec(AuthenticationAction.connect(knownDreps, knownProposaList).pause(2));
+                var withExec = chain == null? baseScenario: baseScenario.exec(chain);
+
+                return withExec.injectOpen(
+                        nothingFor(5),
+                        constantUsersPerSec(rampUserRate).during(SimulationConfig.RAMP_DURATION),
+                        stressPeakUsers(SimulationConfig.PEAK_USERS).during(SimulationConfig.STRESS_DURATION))
+                .protocols(protocol);
         }
 
         private final HttpProtocolBuilder httpProtocol = http
-                        .baseUrl(API_URL)
+                        .baseUrl(SimulationConfig.API_URL)
                         .inferHtmlResources(AllowList(),
                                         DenyList(".*\\.js", ".*\\.css", ".*\\.gif", ".*\\.jpeg", ".*\\.jpg", ".*\\.ico",
                                                         ".*\\.woff",
@@ -70,7 +68,7 @@ public class VvaSimulation extends Simulation {
                                         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36");
 
         private final HttpProtocolBuilder pdfHttpProtocol = http
-                        .baseUrl(PDF_API_URL)
+                        .baseUrl(SimulationConfig.PDF_API_URL)
                         .inferHtmlResources(AllowList(),
                                         DenyList(".*\\.js", ".*\\.css", ".*\\.gif", ".*\\.jpeg", ".*\\.jpg", ".*\\.ico",
                                                         ".*\\.woff",
@@ -84,12 +82,12 @@ public class VvaSimulation extends Simulation {
 
         // Load Simulation
         {
-                knownDreps = DrepListFetcher.fetchDrepIds(API_URL);
-                knownProposaList = ProposalListFetcher.fetchProposalIds(PDF_API_URL);
+                knownDreps = DrepListFetcher.fetchDrepIds(SimulationConfig.API_URL);
+                knownProposaList = ProposalListFetcher.fetchProposalIds(SimulationConfig.PDF_API_URL);
 
                 var DREP_USER_RATI0 = 0.3;
                 setUp(
-                                makeScenario("User Connects and Leave", exec(), 0.1, httpProtocol),
+                                makeScenario("User Connects and Leave", null, 0.1, httpProtocol),
                                 makeScenario("User Registers as Drep",
                                                 exec(DRepAction.registerAsDRep), 0.1, httpProtocol),
                                 makeScenario("User Views Proposals",
@@ -120,7 +118,8 @@ public class VvaSimulation extends Simulation {
                                 makeScenario("Users Like/Dislike proposal", exec(ProposalAction.voteOnProposal), 0.2,
                                                 pdfHttpProtocol),
                                 makeScenario("Users Create proposal/draft", exec(ProposalAction.createProposal), 0.2,
-                                                pdfHttpProtocol));
+                                                pdfHttpProtocol)
+                );
         }
 
 }

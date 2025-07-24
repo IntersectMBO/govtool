@@ -14,6 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.cardano.govtool.Utils;
+import org.cardano.govtool.simulations.SimulationConfig;
 
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.http;
@@ -41,18 +42,16 @@ public class PageVisits {
     }
 
     public static ChainBuilder visitProposalPage() {
-        final String METADATA_API_URL = Optional.ofNullable(System.getenv("METADATA_API_URL"))
-                .orElse("https://z0656605b-zf21c9655-gtw.z937eb260.rustrocks.fr");
 
         return exec(proposalTypes.stream().map(pType -> exec(requestProposal(pType))
                 .doIf(session -> session.get("metadataList" + pType) != null)
                 .then(foreach("#{metadataList" + pType + "}", "metadata" + pType)
                         .on(exec(
                                 http("validate proposal metadata")
-                                        .post(METADATA_API_URL + "/validate")
+                                        .post(SimulationConfig.metadataUrl("validate"))
                                         .body(StringBody(session1 -> session1.get("metadata" + pType)))
                                         .header("content-type", "application/json")
-                                        .check(status().is(201)))))
+                                        .check(status().in(200,201)))))
 
         ).toList());
     }
@@ -63,7 +62,7 @@ public class PageVisits {
 
     public static HttpRequestActionBuilder requestProposalDiscussion(String type) {
         return http("list proposal Discussion " + type + " type")
-                .get("/proposals")
+                .get("/api/proposals")
                 .header("authorization", "Bearer " + Utils.extractJWT())
                 .queryParam("filters[$and][0][gov_action_type_id]", proposalCreationType.indexOf(type) + 1)
                 .check(status().is(200));

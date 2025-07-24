@@ -24,7 +24,7 @@ public class ProposalListFetcher {
             for (int page = 1; page <= 5; page++) {
 
                 for (int i = 1; i <= 2; i++) {
-                    String requestUrl = baseUrl + "proposals" + "?filters[$and][0][gov_action_type_id]=" + i
+                    String requestUrl = baseUrl + "api/proposals" + "?filters[$and][0][gov_action_type_id]=" + i
                             + "&filters[$and][1][prop_name][$containsi]=&filters[$and][2][prop_submitted]=false&pagination[page]="
                             + page + "&pagination[pageSize]=" + PAGE_SIZE
                             + "&sort[createdAt]=desc&populate[0]=proposal_links&populate[1]=proposal_withdrawals";

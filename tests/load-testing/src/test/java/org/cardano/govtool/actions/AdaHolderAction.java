@@ -5,7 +5,6 @@ import org.cardano.govtool.ApiService;
 import io.gatling.javaapi.core.ChainBuilder;
 import org.cardano.govtool.feeders.RandomDataFeeder;
 
-import java.util.Collections;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static io.gatling.javaapi.core.CoreDsl.*;

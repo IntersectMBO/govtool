@@ -1,6 +1,6 @@
 package org.cardano.govtool.actions;
 
-import org.cardano.govtool.ApiService;
+import org.cardano.govtool.PdfApiService;
 import org.cardano.govtool.feeders.RandomDataFeeder;
 
 import io.gatling.javaapi.core.ChainBuilder;
@@ -11,20 +11,20 @@ public class ProposalAction {
 
         public static ChainBuilder commentOnProposal = group("Comments").on(
                         feed(RandomDataFeeder.commentText).feed(RandomDataFeeder.randomJwt))
-                        .exec(ApiService.postComments).exec(ApiService.getComments);
+                        .exec(PdfApiService.postComments).exec(PdfApiService.getComments);
 
         public static ChainBuilder getPolls = group("Polls").on(
                         feed(RandomDataFeeder.randomJwt))
-                        .exec(ApiService.getActivePolls)
-                        .exec(ApiService.getInActivePolls);
+                        .exec(PdfApiService.getActivePolls)
+                        .exec(PdfApiService.getInActivePolls);
 
         public static ChainBuilder getGovernanceActionType = group("Proposal").on(
                         feed(RandomDataFeeder.randomJwt))
-                        .exec(ApiService.getGovernanceActionType);
+                        .exec(PdfApiService.getGovernanceActionType);
 
         public static ChainBuilder voteOnProposal = group("Like/Dislike").on(
                         feed(RandomDataFeeder.proposalVote).feed(RandomDataFeeder.randomJwt))
-                        .exec(ApiService.proposalVote);
+                        .exec(PdfApiService.proposalVote);
 
         public static ChainBuilder createProposal = group("Create Proposal").on(
                         feed(RandomDataFeeder.title)).feed(RandomDataFeeder.abstractText)
@@ -35,6 +35,6 @@ public class ProposalAction {
                         .feed(RandomDataFeeder.randomBech32StakeAddress)
                         .feed(RandomDataFeeder.proposalAmount)
                         .feed(RandomDataFeeder.randomJwt)
-                        .exec(ApiService.createProposalDraft)
-                        .exec(ApiService.createProposal);
+                        .exec(PdfApiService.createProposalDraft)
+                        .exec(PdfApiService.createProposal);
 }

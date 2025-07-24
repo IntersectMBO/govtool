@@ -1,7 +1,8 @@
-import { ShelleyWallet, bech32 } from "libcardano";
+import {  bech32 } from "libcardano";
 import { valid } from "../_mock/index";
 import { AuthResponse } from "lib/types";
-import { cip008Sign } from "libcardano/cardano/cip8";
+import { Cip30, Cip30Provider, ShelleyWallet } from "libcardano-wallet";
+import { Cip8SignResult } from "libcardano/cardano/cip8";
 
 async function addUsername(jsonResponse: AuthResponse) {
   const username = valid.username();
@@ -17,27 +18,31 @@ async function addUsername(jsonResponse: AuthResponse) {
   });
 }
 
-export async function signData(
-  address: string,
-  payload: string,
-  wallet: ShelleyWallet
+export async function authenticate(
+  wallet: Cip30Provider,
+  max_retries: number=2
 ) {
-  const signedData = await cip008Sign(
-    Buffer.from(address, "hex"),
-    wallet.stakeKey,
-    Buffer.from(payload, "hex")
-  );
+  const stakeAddress=(await wallet.getRewardAddresses())[0]
+  const stakeAddressHex = stakeAddress.toBytes().toString('hex')
+  const challengeResponse=await fetch( process.env.PDF_API_URL +"/api/auth/challenge?identifier="+stakeAddressHex, {
+    "method": "GET",
+    "mode": "cors",
+  });
+  const challengeJson: {message: string} = await challengeResponse.json()
+  console.log("Challenge",stakeAddressHex,challengeJson)
+  const signature = await wallet.signData(stakeAddressHex,Buffer.from(challengeJson.message).toString('hex'))
+  const signatureJson: Cip8SignResult & {expectedSignedMessage: string} = {...signature.toCip8Json(),expectedSignedMessage:challengeJson.message}
 
   const signDataResponse = await fetch(
-    process.env.PDF_API_URL + "/auth/local",
+    process.env.PDF_API_URL + "/api/auth/local",
     {
       method: "POST",
       headers: {
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        identifier: bech32.decode(address).data.toString("hex"),
-        signedData,
+        identifier: stakeAddressHex,
+        signedMessage: signatureJson,
       }),
     }
   );
@@ -60,8 +65,10 @@ export async function signData(
     }
 
     console.log("Retrying now...");
-    return await signData(address, payload, wallet);
+    return await authenticate(wallet,max_retries-1);
+  }else{
+    console.log("Authentication failed. Status:", signDataResponse.status);
+    console.log(signDataResponse.url,signDataResponse.url)
+    console.log("Response body:", await signDataResponse.text());
   }
-  console.log("failed to sign data", await signDataResponse.text());
-  return null;
 }

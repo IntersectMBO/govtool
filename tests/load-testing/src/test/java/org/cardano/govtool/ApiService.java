@@ -6,31 +6,33 @@ import io.gatling.javaapi.http.HttpRequestActionBuilder;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.cardano.govtool.simulations.SimulationConfig;
+
 import static io.gatling.javaapi.core.CoreDsl.*;
 
 import static io.gatling.javaapi.http.HttpDsl.http;
 
 public class ApiService {
-    private static final String METADATA_API_URL = Optional.ofNullable(System.getenv("METADATA_API_URL"))
-                        .orElse("https://z0656605b-zf21c9655-gtw.z937eb260.rustrocks.fr");
-    static String example_metadata_validate = "{\"url\":\"https://metadata-govtool.cardanoapi.io/data/milanfile\",\"hash\":\"dcc25ca74534a1fa3b4c86447c1e28dd86e103e1ead5e5308b64b34338af00a9\"}";
-    public static ChainBuilder validate_sample_metadata = exec(http("validate_metadata").post(METADATA_API_URL + "/validate")
+
+    static String example_metadata_validate = "{\"standard\":\"CIP108\",\"url\":\"https://metadata-govtool.cardanoapi.io/data/conservo\",\"hash\":\"958825f460136ad4d4f44e40e66f2c0ef82cea430c54612707ddc96d7a3df5e9\"}";
+    public static ChainBuilder validate_sample_metadata = exec(http("validate_metadata").post(SimulationConfig.metadataUrl("validate"))
             .body(StringBody(example_metadata_validate)).header("content-type", "application/json"));
     public static ChainBuilder getCurrentDelegation = exec(
-            http("get_current_delegation").get("/ada-holder/get-current-delegation/#{stakeKey}"));
+            http("get_current_delegation")
+            .get(SimulationConfig.apiUrl("/ada-holder/get-current-delegation/#{stakeKey}")));
 
     public static HttpRequestActionBuilder getAdaHolderVotingPower = http("get_AdaHolder_voting_power")
-            .get("/ada-holder/get-voting-power/#{stakeKey}");
+            .get(SimulationConfig.apiUrl("/ada-holder/get-voting-power/#{stakeKey}"));
 
     public static HttpRequestActionBuilder getDRepVotingPower = http("get_dRep_voting_power")
-            .get("/drep/get-voting-power/#{dRepId}");
+            .get(SimulationConfig.apiUrl("/drep/get-voting-power/#{dRepId}"));
 
     public static HttpRequestActionBuilder getDrepInfo = http("get_dRep_info").get("/drep/info/#{stakeKey}");
     public static ChainBuilder getVotes = exec(http("get_votes").get("/drep/getVotes/#{dRepId}"));
 
     public static ChainBuilder getAllDReps = exec(http("get_dReps").get("/drep/list?page=0&size=10"));
 
-    public static ChainBuilder getParams = exec(http("get_epoch_params").get("/epoch/params"));
+    public static ChainBuilder getParams = exec(http("get_epoch_params").get(SimulationConfig.apiUrl("/epoch/params")));
 
     public static ChainBuilder getTxStatus = exec(http("get_tx_status").get("/transaction/status/#{txId}"));
 
@@ -39,38 +41,4 @@ public class ApiService {
     public static ChainBuilder pollTxStatus = repeat(session -> ThreadLocalRandom.current()
             .nextInt(3, 6)).on(
                     exec(http("get_tx_status").get("/transaction/status/#{txId}")).pause(4));
-
-    public static ChainBuilder getComments = exec(
-            http("get_comments").get("/comments").queryParam("filters[$and][0][proposal_id]", "#{proposalDiscussionId}")
-                    .headers(Utils.proposalDefaultHeaders("#{jwt}")));
-
-    public static ChainBuilder postComments = exec(http("add_comments_on_proposal").post("/comments")
-            .body(StringBody(
-                    "{\"data\":{\"proposal_id\":\"#{proposalDiscussionId}\",\"comment_text\":\"#{commentText}\"}}"))
-            .headers(Utils.proposalDefaultHeaders("#{jwt}")));
-
-    public static ChainBuilder getActivePolls = exec(http("get_proposal_active_polls").get("/polls")
-            .queryParam("filters[$and][0][proposal_id]", "#{proposalDiscussionId}")
-            .queryParam("filters[$and][1][is_poll_active]", "true").headers(Utils.proposalDefaultHeaders("#{jwt}")));
-
-    public static ChainBuilder getInActivePolls = exec(http("get_proposal_inactive_polls").get("/polls")
-            .queryParam("filters[$and][0][proposal_id]", "#{proposalDiscussionId}")
-            .queryParam("filters[$and][1][is_poll_active]", "false").headers(Utils.proposalDefaultHeaders("#{jwt}")));
-
-    public static ChainBuilder proposalVote = exec(http("like/dislike_on_proposals").post("/proposal-votes")
-            .body(StringBody(
-                    "{\"data\":{\"proposal_id\":\"#{proposalDiscussionId}\",\"vote_result\":#{proposalVote}}}"))
-            .headers(Utils.proposalDefaultHeaders("#{jwt}")));
-
-    public static ChainBuilder getGovernanceActionType = exec(http("get_gov_action_type")
-            .get("/governance-action-types").headers(Utils.proposalDefaultHeaders("#{jwt}")));
-
-    public static ChainBuilder createProposalDraft = exec(http("create_proposal_draft").post("/proposals")
-            .body(StringBody(
-                    "{\"data\":{\"proposal_links\":[{\"prop_link\":\"#{proposalLink}\",\"prop_link_text\":\"#{proposalLinkText}\"}],\"proposal_withdrawals\":[{\"prop_receiving_address\":\"#{stakeAddress}\",\"prop_amount\":\"#{proposalAmount}\"}],\"gov_action_type_id\":#{governanceActionTypeId},\"prop_name\":\"#{title}\",\"prop_abstract\":\"#{abstract}\",\"prop_motivation\":\"#{motivation}\",\"prop_rationale\":\"#{rationale}\",\"is_draft\":true}}"))
-            .headers(Utils.proposalDefaultHeaders("#{jwt}")));
-
-    public static ChainBuilder createProposal = exec(http("create_proposal").post("/proposals").body(StringBody(
-            "{\"data\":{\"proposal_links\":[{\"prop_link\":\"#{proposalLink}\",\"prop_link_text\":\"#{proposalLinkText}\"}],\"proposal_withdrawals\":[{\"prop_receiving_address\":\"#{stakeAddress}\",\"prop_amount\":\"#{proposalAmount}\"}],\"gov_action_type_id\":#{governanceActionTypeId},\"prop_name\":\"#{title}\",\"prop_abstract\":\"#{abstract}\",\"prop_motivation\":\"#{motivation}\",\"prop_rationale\":\"#{rationale}\",\"is_draft\":false}}"))
-            .headers(Utils.proposalDefaultHeaders("#{jwt}")));
 }

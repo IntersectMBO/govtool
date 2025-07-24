@@ -1,4 +1,5 @@
 import { ChangeEvent } from "react";
+import { LinkProps } from "react-router-dom";
 import {
   ButtonProps as MUIButtonProps,
   CheckboxProps as MUICheckboxProps,
@@ -13,6 +14,10 @@ export type ButtonProps = Omit<MUIButtonProps, "size"> & {
   isLoading?: boolean;
   size?: "small" | "medium" | "large" | "extraLarge";
   dataTestId?: string;
+  to?: LinkProps["to"];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  state?: any;
+  component?: React.ElementType;
 };
 
 export type LoadingButtonProps = ButtonProps & {

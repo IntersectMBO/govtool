@@ -26,20 +26,39 @@ export const DashboardGovernanceActionsVotedOn = ({
   const { t } = useTranslation();
 
   // TODO: Filtering here is some kind of craziness. It should be done on the backend.
+
   const filteredData = useMemo(() => {
-    if (votes.length && searchPhrase) {
-      return votes
-        .map((entry) => ({
+    if (!votes?.length) return [];
+    if (!searchPhrase) return votes;
+    const lowerSearch = searchPhrase.toLowerCase();
+    return votes
+      .map((entry) => {
+        const filteredActions = entry.actions.filter((action) => {
+          const hash = getFullGovActionId(
+            action.proposal.txHash,
+            action.proposal.index,
+          ).toLowerCase();
+
+          const title = action.proposal.title?.toLowerCase() || "";
+          const motivation = action.proposal.motivation?.toLowerCase() || "";
+          const rationale = action.proposal.rationale?.toLowerCase() || "";
+          const abstract = action.proposal.abstract?.toLowerCase() || "";
+
+          return (
+            hash.includes(lowerSearch) ||
+            title.includes(lowerSearch) ||
+            motivation.includes(lowerSearch) ||
+            rationale.includes(lowerSearch) ||
+            abstract.includes(lowerSearch)
+          );
+        });
+
+        return {
           ...entry,
-          actions: entry.actions.filter((action) =>
-            getFullGovActionId(action.proposal.txHash, action.proposal.index)
-              .toLowerCase()
-              .includes(searchPhrase.toLowerCase()),
-          ),
-        }))
-        .filter((entry) => entry.actions?.length > 0);
-    }
-    return votes;
+          actions: filteredActions,
+        };
+      })
+      .filter((entry) => entry.actions.length > 0);
   }, [votes, searchPhrase, pendingTransaction.vote]);
 
   return areDRepVotesLoading ? (

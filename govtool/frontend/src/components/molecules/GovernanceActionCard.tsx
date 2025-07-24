@@ -1,5 +1,6 @@
 import { FC } from "react";
 import { Box, Skeleton } from "@mui/material";
+import { Link, useLocation } from "react-router-dom";
 
 import { Button } from "@atoms";
 import {
@@ -19,13 +20,7 @@ import { ProposalData } from "@models";
 
 type ActionTypeProps = Omit<
   ProposalData,
-  | "yesVotes"
-  | "noVotes"
-  | "abstainVotes"
   | "id"
-  | "details"
-  | "rationale"
-  | "motivation"
 > & {
   onClick?: () => void;
   inProgress?: boolean;
@@ -47,6 +42,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
   title,
   isValidating,
   metadataStatus,
+  ...otherProposalData
 }) => {
   const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
@@ -57,6 +53,9 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
     index: index.toString(16).padStart(2, "0"),
     bech32Prefix: "gov_action",
   });
+
+  const pathname = useLocation().pathname.replace(/governance_actions.*/g, "governance_actions");
+  const isCategoryView = useLocation().pathname.includes("category");
 
   return (
     <Box
@@ -151,6 +150,26 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
         ) : (
           <Button
             onClick={onClick}
+            component={Link}
+            to={`${pathname}/${govActionId}`}
+            state={{
+              proposal: {
+                abstract,
+                type,
+                inProgress,
+                expiryDate,
+                expiryEpochNo,
+                createdDate,
+                createdEpochNo,
+                txHash,
+                index,
+                title,
+                isValidating,
+                metadataStatus,
+                ...otherProposalData,
+              },
+              openedFromCategoryPage: isCategoryView
+            }}
             variant={inProgress ? "outlined" : "contained"}
             size="large"
             sx={{

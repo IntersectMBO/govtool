@@ -111,7 +111,29 @@ export const DashboardGovernanceActions = () => {
   const shouldFilter =
   voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter;
 
-const filteredProposals = proposals;
+const filteredProposals = useMemo(() => {
+  if (!shouldFilter || !proposals || !votes) return proposals;
+
+  return proposals
+    .map((proposalCategory) => {
+      const filteredActions = proposalCategory.actions.filter((action) => {
+        const hasVote = votes.some((voteCategory) =>
+          voteCategory.actions.some(
+            (voteAction) =>
+              voteAction.proposal.txHash === action.txHash &&
+              voteAction.proposal.index === action.index,
+          ),
+        );
+        return !hasVote;
+      });
+
+      return {
+        ...proposalCategory,
+        actions: filteredActions,
+      };
+    })
+    .filter((category) => category.actions.length > 0);
+}, [proposals, votes, shouldFilter]);
 
   const { state } = useLocation();
   const [content, setContent] = useState<number>(

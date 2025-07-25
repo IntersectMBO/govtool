@@ -297,7 +297,7 @@ getVotes (unHexText -> dRepId) selectedTypes sortMode mSearch = do
   (votes, proposals) <- cacheRequest dRepGetVotesCache dRepId $ DRep.getVotes dRepId []
   
   let voteMapById = Map.fromList $
-      map (\vote -> (Types.voteGovActionId vote, vote)) votes
+        map (\vote -> (Types.voteGovActionId vote, vote)) votes
   
   processedProposals <- filter (isProposalSearchedFor mSearch) <$> 
                         mapSortAndFilterProposals selectedTypes sortMode proposals

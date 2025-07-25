@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Box, CircularProgress, Tab, Tabs, styled } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -106,10 +106,6 @@ export const DashboardGovernanceActions = () => {
     chosenSorting,
     debouncedSearchText,
   );
-
-  // White Magic :)
-  const shouldFilter =
-  voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter;
 
 const filteredProposals = proposals;
 

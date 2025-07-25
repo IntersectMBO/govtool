@@ -1,10 +1,12 @@
 import { Dispatch, SetStateAction } from "react";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Link } from "@mui/material";
 
 import { Spacer, Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { VoteContextWrapper } from "@organisms";
 import { NodeObject } from "jsonld";
+import { openInNewTab } from "@utils";
+import { LINKS } from "@/consts/links";
 
 type VoteContextChoiceProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -26,6 +28,8 @@ export const VoteContextChoice = ({
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
 
+  const openLink = () => openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);
+
   const handleStoreItMyself = () => {
     setStoreDataYourself(true);
     setStep(3);
@@ -42,23 +46,57 @@ export const VoteContextChoice = ({
   return (
     <VoteContextWrapper onCancel={onCancel} showContinueButton={false}>
       <Typography sx={{ textAlign: "center" }} variant="headline4">
-        {t("createGovernanceAction.storeDataTitle")}
+        {t("createGovernanceAction.storeAndMaintainDataTitle")}
+      </Typography>
+      <Link
+        onClick={openLink}
+        sx={{
+          cursor: "pointer",
+          fontSize: 16,
+          fontWeight: 500,
+          fontFamily: "Poppins",
+          my: 4,
+          textAlign: "center",
+          textDecoration: "none",
+        }}
+      >
+        {t("createGovernanceAction.learnMoreAboutStoringInformation")}
+      </Link>
+      <Typography fontWeight={400} sx={{ textAlign: "center" }} variant="body1">
+        {t("createGovernanceAction.govToolProvidesOptions")}
+      </Typography>
+      <Box sx={{ my: 4 }}>
+        <ul>
+          <li>
+            <Typography variant="body1">
+              {t("createGovernanceAction.govToolCanPinToIPFS")}
+            </Typography>
+          </li>
+          <li>
+            <Typography variant="body1">
+              {t("createGovernanceAction.storeYourselfInRepo")}
+            </Typography>
+          </li>
+        </ul>
+      </Box>
+      <Typography sx={{ textAlign: "center" }} variant="body1">
+        {t("createGovernanceAction.chooseDataStorageOption")}
       </Typography>
       <Spacer y={isMobile ? 4 : 6} />
-      <Box sx={{ display: "flex", gap: 2 }}>
+      <Box sx={{ display: "flex", gap: 2, width: "100%", justifyContent: "center" }}>
         <Button
           variant="outlined"
-          onClick={handleStoreItMyself}
-          sx={{ width: "100%" }}
+          onClick={handleLetGovToolStore}
+          sx={{ width: "250px", whiteSpace: "nowrap" }}
         >
-          {t("createGovernanceAction.storeDataYourself")}
+          {t("createGovernanceAction.govToolPinsDataToIPFS")}
         </Button>
         <Button
           variant="contained"
-          onClick={handleLetGovToolStore}
-          sx={{ width: "100%" }}
+          onClick={handleStoreItMyself}
+          sx={{ width: "250px", whiteSpace: "nowrap" }}
         >
-          {t("createGovernanceAction.letGovToolStore")}
+          {t("createGovernanceAction.downloadAndStoreYourself")}
         </Button>
       </Box>
       <Spacer y={isMobile ? 4 : 12.5} />

@@ -32,7 +32,7 @@ import qualified Conferer.Source.Env      as Env
 
 import           Control.Monad.Reader
 
-import           Data.Aeson
+import           Data.Aeson               as Aeson
 import qualified Data.Aeson.Encode.Pretty as AP
 import           Data.ByteString          (ByteString, toStrict)
 import           Data.Has                 (Has, getter)
@@ -58,7 +58,7 @@ data DBConfig
         -- | Port
       , dBConfigPort     :: Int
       }
-  deriving (FromConfig, Generic, Show)
+  deriving (FromConfig, FromJSON, Generic, Show)
 
 instance DefaultConfig DBConfig where
   configDef = DBConfig "localhost" "cexplorer" "postgres" "test" 9903
@@ -79,8 +79,11 @@ data VVAConfigInternal
       , vVAConfigInternalSentrydsn                               :: String
         -- | Sentry environment
       , vVAConfigInternalSentryEnv                               :: String
+        -- | Pinata API JWT
+      , vVAConfigInternalPinataApiJwt                            :: Maybe Text
       }
   deriving (FromConfig, Generic, Show)
+
 
 instance DefaultConfig VVAConfigInternal where
   configDef =
@@ -90,7 +93,8 @@ instance DefaultConfig VVAConfigInternal where
         vVAConfigInternalHost = "localhost",
         vVaConfigInternalCacheDurationSeconds = 20,
         vVAConfigInternalSentrydsn = "https://username:password@senty.host/id",
-        vVAConfigInternalSentryEnv = "development"
+        vVAConfigInternalSentryEnv = "development",
+        vVAConfigInternalPinataApiJwt = Nothing
       }
 
 -- | DEX configuration.
@@ -108,6 +112,8 @@ data VVAConfig
       , sentryDSN                               :: String
         -- | Sentry environment
       , sentryEnv                               :: String
+        -- | Pinata API JWT
+      , pinataApiJwt                            :: Maybe Text
       }
   deriving (Generic, Show, ToJSON)
 
@@ -148,7 +154,8 @@ convertConfig VVAConfigInternal {..} =
       serverHost = vVAConfigInternalHost,
       cacheDurationSeconds = vVaConfigInternalCacheDurationSeconds,
       sentryDSN = vVAConfigInternalSentrydsn,
-      sentryEnv = vVAConfigInternalSentryEnv
+      sentryEnv = vVAConfigInternalSentryEnv,
+      pinataApiJwt = vVAConfigInternalPinataApiJwt
     }
 
 -- | Load configuration from a file specified on the command line.  Load from
@@ -163,7 +170,7 @@ loadVVAConfig configFile = do
   where
     buildConfig :: IO Config
     buildConfig =
-      Conferer.mkConfig'
+      mkConfig'
         []
         [ Env.fromConfig "vva",
           JSON.fromFilePath (fromMaybe "example-config.json" configFile)

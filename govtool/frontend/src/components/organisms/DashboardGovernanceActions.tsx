@@ -95,7 +95,7 @@ export const DashboardGovernanceActions = () => {
     ? prevSorting ?? chosenSorting
     : chosenSorting;
 
-  const { proposals, isProposalsLoading } = useGetProposalsQuery({
+  const { proposals, isProposalsLoading, refetch: refetchProposals } = useGetProposalsQuery({
     filters: stableFilters,
     sorting: stableSorting,
     searchPhrase: debouncedSearchText,
@@ -110,6 +110,12 @@ export const DashboardGovernanceActions = () => {
   // White Magic :)
   const shouldFilter =
   voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter;
+
+  useEffect(() => {
+    if (voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter) {
+      refetchProposals();
+    }
+  }, [voter?.isRegisteredAsDRep, voter?.isRegisteredAsSoleVoter]);
 
 const filteredProposals = useMemo(() => {
   if (!shouldFilter || !proposals || !votes) return proposals;

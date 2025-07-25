@@ -48,7 +48,7 @@ export const GovernanceActionsToVote = ({
                 data={item.actions.slice(0, 6).map((action) => (
                   <div
                     className="keen-slider__slide"
-                    key={action.id}
+                    key={`${action.txHash}${action.index}`}
                     style={{
                       overflow: "visible",
                       width: "auto",

@@ -122,25 +122,29 @@ RankedPoolVotes AS (
         vp.tx_id DESC,
         vp.id DESC
 ),
+DistinctPoolStats as (
+    SELECT 
+       DISTINCT ON (pool_hash_id) *
+    FROM 
+       pool_stat
+    WHERE 
+       epoch_no = (SELECT MAX(no) FROM epoch)
+),
 PoolVotes AS (
     SELECT
         rpv.gov_action_proposal_id,
-        ps.epoch_no,
-        COUNT(DISTINCT CASE WHEN vote = 'Yes' THEN rpv.pool_voter ELSE 0 END) AS total_yes_votes,
-        COUNT(DISTINCT CASE WHEN vote = 'No' THEN rpv.pool_voter ELSE 0 END) AS total_no_votes,
-        COUNT(DISTINCT CASE WHEN vote = 'Abstain' THEN rpv.pool_voter ELSE 0 END) AS total_abstain_votes,
-        SUM(CASE WHEN rpv.vote = 'Yes' THEN ps.voting_power ELSE 0 END) AS poolYesVotes,
-        SUM(CASE WHEN rpv.vote = 'No' THEN ps.voting_power ELSE 0 END) AS poolNoVotes,
-        SUM(CASE WHEN rpv.vote = 'Abstain' THEN ps.voting_power ELSE 0 END) AS poolAbstainVotes
-    FROM 
+        COUNT(DISTINCT CASE WHEN vote = 'Yes' THEN rpv.pool_voter ELSE NULL END) AS total_yes_votes,
+        COUNT(DISTINCT CASE WHEN vote = 'No' THEN rpv.pool_voter ELSE NULL END) AS total_no_votes,
+        COUNT(DISTINCT CASE WHEN vote = 'Abstain' THEN rpv.pool_voter ELSE NULL END) AS total_abstain_votes,
+        SUM(CASE WHEN rpv.vote = 'Yes' THEN dps.voting_power ELSE 0 END) AS poolYesVotes,
+        SUM(CASE WHEN rpv.vote = 'No' THEN dps.voting_power ELSE 0 END) AS poolNoVotes,
+        SUM(CASE WHEN rpv.vote = 'Abstain' THEN dps.voting_power ELSE 0 END) AS poolAbstainVotes
+    FROM
         RankedPoolVotes rpv
     JOIN 
-        pool_stat ps
-        ON rpv.pool_voter = ps.pool_hash_id
-    WHERE
-        ps.epoch_no = (SELECT MAX(no) FROM epoch)
+        DistinctPoolStats dps ON rpv.pool_voter = dps.pool_hash_id
     GROUP BY
-        rpv.gov_action_proposal_id, ps.epoch_no
+        rpv.gov_action_proposal_id
 ),
 RankedDRepVotes AS (
     SELECT DISTINCT ON (vp.drep_voter, vp.gov_action_proposal_id)

@@ -99,7 +99,7 @@ export const DashboardGovernanceActions = () => {
     filters: stableFilters,
     sorting: stableSorting,
     searchPhrase: debouncedSearchText,
-    enabled: true,
+    enabled: voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter,
   });
   const { data: votes, areDRepVotesLoading } = useGetDRepVotesQuery(
     queryFilters,

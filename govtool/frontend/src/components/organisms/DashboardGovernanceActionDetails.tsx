@@ -60,7 +60,8 @@ export const DashboardGovernanceActionDetails = () => {
   );
 
   useEffect(() => {
-    if (data?.proposal && typeof isMetadataValid !== "boolean") {
+    const extendedProposalIndex = extendedProposal ? extendedProposal.index : -1;
+    if (data?.proposal && data?.proposal.index !== extendedProposalIndex) {
       setExtendedProposal(data.proposal);
     }
   }, [data?.proposal, isMetadataValid]);

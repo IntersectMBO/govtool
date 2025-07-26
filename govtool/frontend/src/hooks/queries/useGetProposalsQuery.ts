@@ -33,16 +33,23 @@ export const useGetProposalsQuery = ({
     return allProposals.flatMap((proposal) => proposal.elements);
   };
 
-    const { data, isLoading } = useQuery(
-        [QUERY_KEYS.useGetProposalsKey, filters, searchPhrase, sorting, dRepID],
-        fetchProposals,
-        {
-            enabled,
-            refetchOnWindowFocus: true,
-            keepPreviousData: true,
-            staleTime: 2000,
-        },
-    );
+  const { data, isLoading } = useQuery(
+    [
+      QUERY_KEYS.useGetProposalsKey,
+      filters,
+      searchPhrase,
+      sorting,
+      dRepID,
+      voter?.isRegisteredAsDRep,
+      voter?.isRegisteredAsSoleVoter,
+    ],
+    fetchProposals,
+    {
+      enabled,
+      refetchOnWindowFocus: true,
+      keepPreviousData: true,
+    },
+  );
 
   const proposals = Object.values(groupByType(data) ?? []);
 

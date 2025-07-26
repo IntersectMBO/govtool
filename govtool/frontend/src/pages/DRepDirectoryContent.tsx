@@ -50,15 +50,24 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 }) => {
   const { dRepID: myDRepId, pendingTransaction, stakeKey } = useCardano();
   const { t } = useTranslation();
-  const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
+
+  const {
+    searchText,
+    debouncedSearchText,
+    setSearchText,
+    ...dataActionsBarProps
+  } = useDataActionsBar();
+
   const { chosenFilters, chosenSorting, setChosenFilters, setChosenSorting } =
     dataActionsBarProps;
 
   const [inProgressDelegationDRepData, setInProgressDelegationDRepData] =
     useState<DRepData | undefined>(undefined);
 
+  // Set initial filters and sort
   useEffect(() => {
     setChosenFilters([DRepStatus.Active]);
+    setSearchText(""); // <--- Clear the search field on mount
   }, []);
 
   useEffect(() => {
@@ -198,6 +207,8 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
         </Typography>
         <DataActionsBar
           {...dataActionsBarProps}
+          searchText={searchText}
+          setSearchText={setSearchText}
           filterOptions={DREP_DIRECTORY_FILTERS}
           filtersTitle={t("dRepDirectory.filterTitle")}
           sortOptions={DREP_DIRECTORY_SORTING}

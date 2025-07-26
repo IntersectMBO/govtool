@@ -95,11 +95,11 @@ export const DashboardGovernanceActions = () => {
     ? prevSorting ?? chosenSorting
     : chosenSorting;
 
-  const { proposals, isProposalsLoading, refetch: refetchProposals } = useGetProposalsQuery({
+  const { proposals, isProposalsLoading } = useGetProposalsQuery({
     filters: stableFilters,
     sorting: stableSorting,
     searchPhrase: debouncedSearchText,
-    enabled: voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter,
+    enabled: Boolean(voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter),
   });
   const { data: votes, areDRepVotesLoading } = useGetDRepVotesQuery(
     queryFilters,

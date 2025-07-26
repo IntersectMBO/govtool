@@ -95,7 +95,11 @@ export const DashboardGovernanceActions = () => {
     ? prevSorting ?? chosenSorting
     : chosenSorting;
 
-  const { proposals, isProposalsLoading } = useGetProposalsQuery({
+  const {
+    proposals,
+    isProposalsLoading,
+    refetch: refetchProposals,
+  } = useGetProposalsQuery({
     filters: stableFilters,
     sorting: stableSorting,
     searchPhrase: debouncedSearchText,

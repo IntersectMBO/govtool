@@ -22,7 +22,6 @@ import {
   DashboardGovernanceActionsVotedOn,
 } from "@organisms";
 import { Button } from "@atoms";
-import usePrevious from "@/hooks/usePrevious";
 
 type TabPanelProps = {
   children?: React.ReactNode;
@@ -85,21 +84,11 @@ export const DashboardGovernanceActions = () => {
   const queryFilters =
     chosenFilters.length > 0 ? chosenFilters : defaultCategories;
 
-  const prevFilters = usePrevious(queryFilters);
-  const prevSorting = usePrevious(chosenSorting);
-
-  const stableFilters = isAdjusting
-    ? prevFilters ?? queryFilters
-    : queryFilters;
-  const stableSorting = isAdjusting
-    ? prevSorting ?? chosenSorting
-    : chosenSorting;
-
   const { proposals, isProposalsLoading } = useGetProposalsQuery({
-    filters: stableFilters,
-    sorting: stableSorting,
+    filters: queryFilters,
+    sorting: chosenSorting,
     searchPhrase: debouncedSearchText,
-    enabled: true,
+    enabled: !isAdjusting,
   });
   const { data: votes, areDRepVotesLoading } = useGetDRepVotesQuery(
     queryFilters,
@@ -109,31 +98,31 @@ export const DashboardGovernanceActions = () => {
 
   // White Magic :)
   const shouldFilter =
-  voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter;
+    voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter;
 
-const filteredProposals = useMemo(() => {
-  if (!shouldFilter || !proposals || !votes) return proposals;
+  const filteredProposals = useMemo(() => {
+    if (!shouldFilter || !proposals || !votes) return proposals;
 
-  return proposals
-    .map((proposalCategory) => {
-      const filteredActions = proposalCategory.actions.filter((action) => {
-        const hasVote = votes.some((voteCategory) =>
-          voteCategory.actions.some(
-            (voteAction) =>
-              voteAction.proposal.txHash === action.txHash &&
-              voteAction.proposal.index === action.index,
-          ),
-        );
-        return !hasVote;
-      });
+    return proposals
+      .map((proposalCategory) => {
+        const filteredActions = proposalCategory.actions.filter((action) => {
+          const hasVote = votes.some((voteCategory) =>
+            voteCategory.actions.some(
+              (voteAction) =>
+                voteAction.proposal.txHash === action.txHash &&
+                voteAction.proposal.index === action.index,
+            ),
+          );
+          return !hasVote;
+        });
 
-      return {
-        ...proposalCategory,
-        actions: filteredActions,
-      };
-    })
-    .filter((category) => category.actions.length > 0);
-}, [proposals, votes, shouldFilter]);
+        return {
+          ...proposalCategory,
+          actions: filteredActions,
+        };
+      })
+      .filter((category) => category.actions.length > 0);
+  }, [proposals, votes, shouldFilter]);
 
   const { state } = useLocation();
   const [content, setContent] = useState<number>(

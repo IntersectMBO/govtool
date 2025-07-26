@@ -45,8 +45,8 @@ executable vva-be
     -- other-modules:
 
     -- LANGUAGE extensions used by modules in this package.
-    -- other-extensions:
-    build-depends:    base >=4.16 && <4.18
+    -- other-extensions9
+    build-depends:    base >=4.16 && <4.19
                     , vva-be
                     , optparse-applicative
                     , text
@@ -80,7 +80,7 @@ executable vva-be
 
 library
   hs-source-dirs: src
-  build-depends: base  >=4.16 && <4.18
+  build-depends: base  >=4.16 && <4.19
                , servant-server
                , conferer
                , mtl
@@ -107,9 +107,11 @@ library
                , swagger2
                , http-client
                , http-client-tls
+               , http-client-multipart
                , vector
                , async
                , random
+               , http-types
 
   exposed-modules: VVA.Config
                  , VVA.CommandLine
@@ -126,4 +128,5 @@ library
                  , VVA.Types
                  , VVA.Network
                  , VVA.Account
+                 , VVA.Ipfs
   ghc-options: -threaded

@@ -5,14 +5,21 @@ import { useScreenDimension, useTranslation } from "@hooks";
 import { Button } from "@atoms";
 
 type VoteContextWrapperProps = {
-  onContinue: () => void;
+  onContinue?: () => void;
   isContinueDisabled?: boolean;
   onCancel: () => void;
+  showContinueButton?: boolean;
 };
 
 export const VoteContextWrapper: FC<
   PropsWithChildren<VoteContextWrapperProps>
-> = ({ onContinue, isContinueDisabled, onCancel, children }) => {
+> = ({
+  onContinue,
+  isContinueDisabled,
+  onCancel,
+  children,
+  showContinueButton = true,
+}) => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
 
@@ -43,22 +50,24 @@ export const VoteContextWrapper: FC<
             width: isMobile ? "100%" : "154px",
           }}
           variant="outlined"
-        >
-          {t("cancel")}
-        </Button>
-        <Button
-          data-testid="confirm-modal-button"
-          disabled={isContinueDisabled}
-          onClick={onContinue}
-          size="large"
-          sx={{
-            width: isMobile ? "100%" : "154px",
-          }}
-          variant="contained"
-        >
-          {t("continue")}
-        </Button>
-      </Box>
+>
+  {t("cancel")}
+</Button>
+{showContinueButton && (
+  <Button
+    data-testid="confirm-modal-button"
+    disabled={isContinueDisabled}
+    onClick={onContinue}
+    size="large"
+    sx={{
+      width: isMobile ? "100%" : "154px",
+    }}
+    variant="contained"
+  >
+    {t("continue")}
+  </Button>
+)}
+</Box>
     </>
   );
 };

@@ -51,7 +51,7 @@ export const useVoteContextForm = (
     setHash(jsonHash);
     setJson(jsonld);
 
-    return jsonld;
+    return { jsonld, jsonHash };
   }, [getValues]);
 
   const onClickDownloadJson = () => {
@@ -102,5 +102,6 @@ export const useVoteContextForm = (
     setValue,
     watch,
     hash,
+    json,
   };
 };

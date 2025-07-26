@@ -1112,6 +1112,14 @@ data GetAccountInfoResponse
       }
   deriving (Generic, Show)
 deriveJSON (jsonOptions "getAccountInfoResponse") ''GetAccountInfoResponse
+
+data UploadResponse
+  = UploadResponse
+      { uploadResponseIpfsCid :: Text
+      }
+  deriving (Generic, Show)
+deriveJSON (jsonOptions "uploadResponse") ''UploadResponse
+
 exampleGetAccountInfoResponse :: Text
 exampleGetAccountInfoResponse =
   "{\"stakeKey\": \"stake1u9\","
@@ -1125,3 +1133,14 @@ instance ToSchema GetAccountInfoResponse where
         & description ?~ "GetAccountInfoResponse"
         & example
           ?~ toJSON exampleGetAccountInfoResponse
+
+exampleUploadResponse :: Text
+exampleUploadResponse =
+  "{\"ipfsHash\": \"QmZKLGf2D3Z3F2J2K5J2L5J2L5J2L5J2L5J2L5J2L5J2L5\"}"
+
+instance ToSchema UploadResponse where
+    declareNamedSchema _ = pure $ NamedSchema (Just "UploadResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "UploadResponse"
+        & example
+          ?~ toJSON exampleUploadResponse

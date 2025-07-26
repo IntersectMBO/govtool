@@ -28,5 +28,7 @@ export * from "./UncontrolledImageInput";
 export * from "./ValidatedGovernanceActionCard";
 export * from "./ValidatedGovernanceVotedOnCard";
 export * from "./VoteContext";
+export * from "./VoteContext/VoteContextChoice";
+export * from "./VoteContext/VoteContextGovTool";
 export * from "./WrongRouteInfo";
 export * from "./MaintenanceEndingBanner";

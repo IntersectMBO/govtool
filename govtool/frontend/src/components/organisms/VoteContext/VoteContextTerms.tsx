@@ -23,7 +23,7 @@ export const VoteContextTerms = ({ setStep, onCancel }: StoreDataInfoProps) => {
 
   return (
     <VoteContextWrapper
-      onContinue={() => setStep(3)}
+      onContinue={() => setStep(4)}
       isContinueDisabled={isContinueDisabled}
       onCancel={onCancel}
     >

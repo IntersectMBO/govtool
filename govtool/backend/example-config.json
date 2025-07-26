@@ -6,6 +6,7 @@
       "password" : "postgres",
       "port"     : 5432
     },
+  "pinataapijwt": "",
   "port" : 9999,
   "host" : "localhost",
   "cachedurationseconds": 20,

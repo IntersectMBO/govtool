@@ -71,8 +71,7 @@ const StyledTab = styled((props: StyledTabProps) => (
 }));
 
 export const DashboardGovernanceActions = () => {
-  const { debouncedSearchText, isAdjusting, ...dataActionsBarProps } =
-    useDataActionsBar();
+  const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
   const { chosenFilters, chosenSorting } = dataActionsBarProps;
   const { voter } = useGetVoterInfo();
   const { isMobile } = useScreenDimension();

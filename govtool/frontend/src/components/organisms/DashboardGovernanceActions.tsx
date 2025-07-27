@@ -88,7 +88,7 @@ export const DashboardGovernanceActions = () => {
     filters: queryFilters,
     sorting: chosenSorting,
     searchPhrase: debouncedSearchText,
-    enabled: !isAdjusting,
+    enabled: true,
   });
   const { data: votes, areDRepVotesLoading } = useGetDRepVotesQuery(
     queryFilters,

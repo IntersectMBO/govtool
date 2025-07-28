@@ -251,6 +251,7 @@
     "govToolProvidesOptions": "GovTool currently provides two options for storing your rationale:",
     "govToolCanPinToIPFS": "GovTool can pin it to IPFS",
     "storeYourselfInRepo": "Store it yourself in a repository such as GitHub",
+    "storingOptionsForYourVoterRationale" : "Storing options for your voter rationale",
     "chooseDataStorageOption": "Choose a data storage option:",
     "govToolPinsDataToIPFS": "GovTool pins data to IPFS",
     "downloadAndStoreYourself": "Download and store yourself",

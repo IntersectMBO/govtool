@@ -44,63 +44,45 @@ export const VoteContextChoice = ({
   };
 
   return (
-    <VoteContextWrapper onCancel={onCancel} showContinueButton={false}>
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
-        {t("createGovernanceAction.storeAndMaintainDataTitle")}
-      </Typography>
-      <Link
-        onClick={openLink}
-        sx={{
-          cursor: "pointer",
-          fontSize: 16,
-          fontWeight: 500,
-          fontFamily: "Poppins",
-          my: 4,
-          textAlign: "center",
-          textDecoration: "none",
-        }}
-      >
-        {t("createGovernanceAction.learnMoreAboutStoringInformation")}
-      </Link>
-      <Typography fontWeight={400} sx={{ textAlign: "center" }} variant="body1">
-        {t("createGovernanceAction.govToolProvidesOptions")}
-      </Typography>
-      <Box sx={{ my: 4 }}>
-        <ul>
-          <li>
-            <Typography variant="body1">
-              {t("createGovernanceAction.govToolCanPinToIPFS")}
-            </Typography>
-          </li>
-          <li>
-            <Typography variant="body1">
-              {t("createGovernanceAction.storeYourselfInRepo")}
-            </Typography>
-          </li>
-        </ul>
-      </Box>
-      <Typography sx={{ textAlign: "center" }} variant="body1">
-        {t("createGovernanceAction.chooseDataStorageOption")}
-      </Typography>
-      <Spacer y={isMobile ? 4 : 6} />
-      <Box sx={{ display: "flex", gap: 2, width: "100%", justifyContent: "center" }}>
-        <Button
-          variant="outlined"
-          onClick={handleLetGovToolStore}
-          sx={{ width: "250px", whiteSpace: "nowrap" }}
+    <VoteContextWrapper onCancel={onCancel} showContinueButton={false} showAllButtons={false}>
+        <Typography sx={{ textAlign: "center" , fontWeight : 500 , marginTop: isMobile ? 0 : 1 }} variant="headline4">
+          {t("createGovernanceAction.storingOptionsForYourVoterRationale")}
+        </Typography>
+        <Link
+          onClick={openLink}
+          sx={{
+            cursor: "pointer",
+            fontSize: 16,
+            fontWeight: 500,
+            fontFamily: "Poppins",
+            my: 4,
+            textAlign: "center",
+            textDecoration: "none",
+          }}
         >
-          {t("createGovernanceAction.govToolPinsDataToIPFS")}
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleStoreItMyself}
-          sx={{ width: "250px", whiteSpace: "nowrap" }}
-        >
-          {t("createGovernanceAction.downloadAndStoreYourself")}
-        </Button>
-      </Box>
-      <Spacer y={isMobile ? 4 : 12.5} />
-      <Box display="flex" flex={1} />
+          {t("createGovernanceAction.learnMoreAboutStoringInformation")}
+        </Link>
+        <Spacer y={isMobile ? 14 : 16} />
+        <Typography sx={{ textAlign: "center" , fontWeight: 700 }} variant="body1">
+          {t("createGovernanceAction.chooseDataStorageOption")}
+        </Typography>
+        <Spacer y={4}/>
+        <Box sx={{ display: "flex", flexDirection: isMobile ? "column" : "row" ,  width: "100%", justifyContent: isMobile ? "none" : "space-between" , gap: isMobile ? "14px" : "0px" }}>
+          <Button
+            variant="outlined"
+            onClick={handleLetGovToolStore}
+            sx={{ width: isMobile ? "100%" : "259px", whiteSpace: "nowrap" , height:"48px" , fontWeight:"500" }}
+          >
+            {t("createGovernanceAction.govToolPinsDataToIPFS")}
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={handleStoreItMyself}
+            sx={{ width: isMobile ? "100%" :  "287px", whiteSpace: "nowrap" , height:"48px" , fontWeight:"500" }}
+          >
+            {t("createGovernanceAction.downloadAndStoreYourself")}
+          </Button>
+        </Box>
     </VoteContextWrapper>
   );
 };

@@ -7,8 +7,10 @@ import { Button } from "@atoms";
 type VoteContextWrapperProps = {
   onContinue?: () => void;
   isContinueDisabled?: boolean;
+  showCancelButton? : boolean;
   onCancel: () => void;
   showContinueButton?: boolean;
+  showAllButtons? : boolean;
 };
 
 export const VoteContextWrapper: FC<
@@ -17,8 +19,10 @@ export const VoteContextWrapper: FC<
   onContinue,
   isContinueDisabled,
   onCancel,
+  showCancelButton = true,
   children,
   showContinueButton = true,
+  showAllButtons = true
 }) => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -34,40 +38,46 @@ export const VoteContextWrapper: FC<
       >
         {children}
       </Box>
+      {
+        showAllButtons &&
       <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginTop: "40px",
-          ...(isMobile && { flexDirection: "column-reverse", gap: 3 }),
-        }}
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: "40px",
+                ...(isMobile && { flexDirection: "column-reverse", gap: 3 }),
+              }}
+            >
+              {
+                showCancelButton &&
+              <Button
+                data-testid="cancel-modal-button"
+                onClick={onCancel}
+                size="large"
+                sx={{
+                  width: isMobile ? "100%" : "154px",
+                }}
+                variant="outlined"
       >
+        {t("cancel")}
+      </Button>
+              }
+      {showContinueButton && (
         <Button
-          data-testid="cancel-modal-button"
-          onClick={onCancel}
+          data-testid="confirm-modal-button"
+          disabled={isContinueDisabled}
+          onClick={onContinue}
           size="large"
           sx={{
             width: isMobile ? "100%" : "154px",
           }}
-          variant="outlined"
->
-  {t("cancel")}
-</Button>
-{showContinueButton && (
-  <Button
-    data-testid="confirm-modal-button"
-    disabled={isContinueDisabled}
-    onClick={onContinue}
-    size="large"
-    sx={{
-      width: isMobile ? "100%" : "154px",
-    }}
-    variant="contained"
-  >
-    {t("continue")}
-  </Button>
-)}
-</Box>
+          variant="contained"
+        >
+          {t("continue")}
+        </Button>
+      )}
+      </Box>
+      }
     </>
   );
 };

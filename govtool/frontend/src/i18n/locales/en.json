@@ -256,17 +256,18 @@
     "govToolPinsDataToIPFS": "GovTool pins data to IPFS",
     "downloadAndStoreYourself": "Download and store yourself",
     "uploadingToIPFS": "Uploading to IPFS...",
-    "rationalePinnedToIPFS": "Your rationale will be pinned to IPFS",
-    "readFullGuide": "Read full guide",
-    "recommendations": "Recommendations",
-    "downloadAndStoreMetadataFile": "Download and store your metadata file\n(if you needed in the future you can re-pin it on IPFS)",
-    "rePinYourFile": "Re-pin your file",
+    "rationalePinnedToIPFS": "GovTool has pinned your rationale to IPFS",
+    "learnMore" : "Learn more",
+    "optionalDownloadAndStoreMetadataFile": "Optional: Download and store a backup copy of your metadata file",
+    "rePinYourFileToIPFS": "Re-pin your file to IPFS",
     "modals": {
       "submitTransactionSuccess": {
         "message": "Your Governance Action may take a little time to submit to the chain.",
         "title": "Governance Action submitted!"
       }
-    }
+    },
+    "back" : "Back",
+    "continue" : "Continue"
   },
   "delegation": {
     "description": "You can delegate your voting power to a DRep or to a pre-defined voting option.",

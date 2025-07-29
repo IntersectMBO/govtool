@@ -14,9 +14,16 @@ import {
 import { NodeObject } from "jsonld";
 import { VoteContextFormValues, useVoteContextForm } from "@hooks";
 import { UseFormReturn } from "react-hook-form";
+import { Vote } from "@/models";
 
 export type VoteContextModalState = {
   onSubmit: (url: string, hash: string | null, voteContextText: string) => void;
+  vote?: Vote;
+  confirmVote: (
+    vote?: Vote,
+    url?: string,
+    hash?: string | null,
+  ) => void;
 };
 
 export const VoteContextModal = () => {
@@ -35,7 +42,7 @@ export const VoteContextModal = () => {
   const { getValues } = methods;
 
   const submitVoteContext = () => {
-    if (state && savedHash) {
+    if (state) {
       state.onSubmit(
         getValues("storingURL"),
         savedHash,
@@ -74,7 +81,12 @@ export const VoteContextModal = () => {
           />
         )}
         {step === 1 && (
-          <VoteContextText setStep={setStep} onCancel={closeModal} />
+          <VoteContextText
+            setStep={setStep}
+            onCancel={closeModal}
+            confirmVote={state?.confirmVote ?? (() => {})}
+            vote={state?.vote}
+          />
         )}
       </FormProvider>
     </ModalWrapper>

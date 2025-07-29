@@ -7,7 +7,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { PATHS } from "@consts";
 import { useCardano, useSnackbar } from "@context";
 import { useWalletErrorModal } from "@hooks";
-import { ProposalVote } from "@/models";
+import { ProposalVote, Vote } from "@/models";
 
 export interface VoteActionFormValues {
   vote: string;
@@ -72,19 +72,23 @@ export const useVoteActionForm = ({
     !areFormErrors;
 
   const confirmVote = useCallback(
-    async (values: VoteActionFormValues) => {
-      if (!canVote) return;
+    async (
+      vote?: Vote,
+      url?: string,
+      hash?: string | null,
+    ) => {
+      if (!canVote || !vote) return;
 
       setIsLoading(true);
 
-      const urlSubmitValue = voteContextUrl ?? "";
-      const hashSubmitValue = voteContextHash ?? "";
+      const urlSubmitValue = url ?? "";
+      const hashSubmitValue = hash ?? "";
 
       try {
         const isPendingTx = isPendingTransaction();
         if (isPendingTx) return;
         const votingBuilder = await buildVote(
-          values.vote,
+          vote,
           txHash,
           index,
           urlSubmitValue,
@@ -116,7 +120,7 @@ export const useVoteActionForm = ({
   );
 
   return {
-    confirmVote: handleSubmit(confirmVote),
+    confirmVote,
     setValue,
     vote,
     registerInput,

@@ -5,16 +5,25 @@ import { Typography } from "@atoms";
 import { VoteContextWrapper } from "@organisms";
 import { useTranslation, useVoteContextForm } from "@/hooks";
 import { ControlledField } from "..";
+import { Vote } from "@/models";
 
 type VoteContextTextProps = {
   setStep: Dispatch<SetStateAction<number>>;
   onCancel: () => void;
+  confirmVote: (
+    vote?: Vote,
+    url?: string,
+    hash?: string | null,
+  ) => void;
+  vote?: Vote;
 };
 const MAX_LENGTH = 10000;
 
 export const VoteContextText = ({
   setStep,
   onCancel,
+  confirmVote,
+  vote,
 }: VoteContextTextProps) => {
   const { t } = useTranslation();
 
@@ -26,10 +35,6 @@ export const VoteContextText = ({
     name: "voteContextText",
     placeholder: t("govActions.provideContext"),
     rules: {
-      required: {
-        value: true,
-        message: t("createGovernanceAction.fields.validations.required"),
-      },
       maxLength: {
         value: MAX_LENGTH,
         message: t("createGovernanceAction.fields.validations.maxLength", {
@@ -44,6 +49,10 @@ export const VoteContextText = ({
       onContinue={() => setStep(2)}
       isContinueDisabled={isContinueDisabled}
       onCancel={onCancel}
+      onSkip={() => confirmVote(vote)}
+      continueLabel={
+        isContinueDisabled ? t("govActions.skip") : t("govActions.continue")
+      }
     >
       <Typography
         variant="body1"

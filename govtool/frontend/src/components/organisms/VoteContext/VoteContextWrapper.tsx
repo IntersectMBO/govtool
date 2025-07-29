@@ -7,10 +7,12 @@ import { Button } from "@atoms";
 type VoteContextWrapperProps = {
   onContinue?: () => void;
   isContinueDisabled?: boolean;
-  onCancel? : () => void;
-  hideAllBtn? : boolean;
-  useBackLabel? : boolean;
-  useSubmitLabel? : boolean;
+  onCancel?: () => void;
+  hideAllBtn?: boolean;
+  useBackLabel?: boolean;
+  useSubmitLabel?: boolean;
+  onSkip?: () => void;
+  continueLabel?: string;
 };
 
 export const VoteContextWrapper: FC<
@@ -22,7 +24,9 @@ export const VoteContextWrapper: FC<
   children,
   hideAllBtn = false,
   useBackLabel = false,
-  useSubmitLabel = false
+  useSubmitLabel = false,
+  onSkip,
+  continueLabel,
 }) => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -59,13 +63,21 @@ export const VoteContextWrapper: FC<
           </Button>
           <Button
             data-testid="confirm-modal-button"
-            disabled={isContinueDisabled}
-            onClick={onContinue}
+            onClick={isContinueDisabled ? onSkip : onContinue}
             size="large"
-                              sx={{ width: isMobile ? "100%" :  "130px", whiteSpace: "nowrap" , height:"48px" , fontWeight:"500" }}
+            sx={{
+              width: isMobile ? "100%" : "130px",
+              whiteSpace: "nowrap",
+              height: "48px",
+              fontWeight: "500",
+            }}
             variant="contained"
           >
-            {useSubmitLabel ? t('submit') : t("continue")}
+            {continueLabel
+              ? continueLabel
+              : useSubmitLabel
+              ? t("submit")
+              : t("continue")}
           </Button>
         </Box>
       }

@@ -13,7 +13,7 @@ import {
   useGetVoteContextTextFromFile,
 } from "@hooks";
 import { formatDisplayDate } from "@utils";
-import { ProposalData, ProposalVote } from "@/models";
+import { ProposalData, ProposalVote, Vote } from "@/models";
 import { VoteContextModalState, SubmittedVotesModalState } from "../organisms";
 
 type VoteActionFormProps = {
@@ -51,6 +51,21 @@ export const VoteActionForm = ({
     vote,
     canVote,
   } = useVoteActionForm({ previousVote, voteContextHash, voteContextUrl });
+
+  const handleVoteClick = () => {
+    openModal({
+      type: "voteContext",
+      state: {
+        onSubmit: (url, hash) => {
+          setVoteContextUrl(url);
+          setVoteContextHash(hash ?? undefined);
+          confirmVote(vote as Vote, url, hash);
+        },
+        vote: vote as Vote,
+        confirmVote,
+      } satisfies VoteContextModalState,
+    });
+  };
 
   const setVoteContextData = (url: string, hash: string | null) => {
     setVoteContextUrl(url);
@@ -95,7 +110,7 @@ export const VoteActionForm = ({
     () => (
       <Button
       data-testid="change-vote"
-      onClick={confirmVote}
+      onClick={() => confirmVote(vote as Vote, voteContextUrl, voteContextHash)}
       disabled={!canVote}
       isLoading={isVoteLoading}
       variant="contained"
@@ -226,32 +241,6 @@ export const VoteActionForm = ({
             {t("govActions.showVotes")}
           </Button>
         )}
-        {
-          !voteContextText &&
-          <Typography
-            variant="body1"
-            sx={{
-              textTransform: "uppercase",
-              fontSize: "14px",
-              color: orange.c400,
-              mt: 6,
-            }}
-          >
-            {t("optional")}
-          </Typography>
-        }
-        <Typography
-          variant="body2"
-          sx={{
-            textAlign: "center",
-            mt: "5px",
-          }}
-        >
-          {voteContextText
-            ? t("govActions.yourVoteRationale")
-            : t("govActions.youCanProvideContext")
-          }
-        </Typography>
         {voteContextText && (
           <Box
             sx={{
@@ -304,35 +293,6 @@ export const VoteActionForm = ({
             </Button>
           </Box>
         )}
-        <Button
-          variant="outlined"
-          onClick={() => {
-            openModal({
-              type: "voteContext",
-              state: {
-                onSubmit: setVoteContextData,
-              } satisfies VoteContextModalState,
-            });
-          }}
-          sx={{
-            mt: voteContextText ? "40px" : "12px",
-            fontSize:
-              screenWidth < 390
-                ? "12px"
-                : screenWidth < 1036
-                ? "14px"
-                : screenWidth < 1080
-                ? "10.5px"
-                : screenWidth < 1480
-                ? "11.5px"
-                : "14px",
-          }}
-          data-testid="provide-context-button"
-        >
-          {voteContextText
-            ? t("govActions.provideNewContextAboutYourVote")
-            : t("govActions.provideContextAboutYourVote")}
-        </Button>
         <Box>
         </Box>
       </Box>
@@ -369,7 +329,7 @@ export const VoteActionForm = ({
                 !voteContextHash))
           }
           isLoading={isVoteLoading}
-          onClick={confirmVote}
+          onClick={handleVoteClick}
           size="extraLarge"
         >
           {t("govActions.vote")}

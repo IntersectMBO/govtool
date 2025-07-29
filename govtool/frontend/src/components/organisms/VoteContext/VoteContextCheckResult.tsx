@@ -67,7 +67,7 @@ export const VoteContextCheckResult = ({
           }}
           variant="contained"
         >
-          {t("govActions.goToVote")}
+          {t("govActions.submitVote")}
         </Button>
       ) : (
         <Box

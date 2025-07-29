@@ -15,6 +15,7 @@ changes.
 ### Fixed
 
 - Fix disappearing proposals in the governance actions list for the same tx hashes [Issue 3918](https://github.com/IntersectMBO/govtool/issues/3918)
+- Fix incorrect display of new committee parameters in Governance Action details [Issue 3954](https://github.com/IntersectMBO/govtool/issues/3954)
 
 ### Changed
 

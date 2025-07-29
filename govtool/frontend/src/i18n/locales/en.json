@@ -479,7 +479,7 @@
     "membersToBeRemovedFromTheCommittee": "Members to be removed from the Committee",
     "membersToBeAddedToTheCommittee": "Members to be added to the Committee",
     "changeToTermsOfExistingMembers": "Change to terms of existing members",
-    "changeToTermsEpochs": "To {{epochTo}} epoch {{epochFrom}} epoch",
+    "changeToTermsEpochs": "To {{epochTo}} epoch, from {{epochFrom}} epoch",
     "newThresholdValue": "New threshold value",
     "protocolParamsDetails": {
       "existing": "Existing",

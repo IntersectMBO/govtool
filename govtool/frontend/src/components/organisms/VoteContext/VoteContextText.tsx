@@ -53,7 +53,7 @@ export const VoteContextText = ({
       onCancel={onCancel}
       onSkip={() => confirmVote(vote)}
       continueLabel={
-        isContinueDisabled ? t("govActions.skip") : t("govActions.continue")
+        isContinueDisabled ? t("govActions.voting.voteWithoutMetadata") : t("govActions.voting.continue")
       }
     >
       <Typography

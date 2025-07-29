@@ -331,24 +331,9 @@ export const VoteActionForm = ({
           </>
         )}
 
-        <Box>
+        <Box sx={{ mt: 4 }}>
         </Box>
       </Box>
-      {
-        voteContextText && (
-          <Button
-            data-testid="edit-rationale-button"
-            variant="outlined"
-            sx={{
-              height : "48px",
-              marginY : 4
-            }}
-            onClick={handleVoteClick}
-            >
-              {t("govActions.editRationale")}
-          </Button>
-        )
-      }
       {previousVote?.vote && previousVote?.vote !== vote  ? (
         <Box
           display="flex"
@@ -364,17 +349,17 @@ export const VoteActionForm = ({
           data-testid="vote-button"
           variant="contained"
           disabled={
-            !vote ||
-            areFormErrors ||
-            (previousVote?.vote === vote &&
-              (previousVote.metadataHash === voteContextHash ||
-                !voteContextHash))
+            (previousVote?.vote && previousVote?.vote === vote)
+              ? false
+              : !vote || areFormErrors
           }
           isLoading={isVoteLoading}
           onClick={handleVoteClick}
           size="extraLarge"
         >
-          {t("govActions.vote")}
+          {previousVote?.vote && previousVote?.vote === vote
+            ? t("govActions.changeRationale")
+            : t("govActions.vote")}
         </Button>
       )}
     </Box>

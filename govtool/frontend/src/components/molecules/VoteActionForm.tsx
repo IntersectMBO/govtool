@@ -36,7 +36,7 @@ export const VoteActionForm = ({
     useState<boolean>(false);
 
   const { voter } = useGetVoterInfo();
-  const { voteContextText } = useGetVoteContextTextFromFile(voteContextUrl);
+  const { voteContextText } = useGetVoteContextTextFromFile(voteContextUrl , voteContextHash);
 
   const { isMobile, screenWidth } = useScreenDimension();
   const { openModal } = useModal();
@@ -61,6 +61,7 @@ export const VoteActionForm = ({
     if (previousVote?.vote) {
       setValue("vote", previousVote.vote);
       setIsVoteSubmitted(true);
+      
     }
   }, [previousVote?.vote, setValue, setIsVoteSubmitted]);
 
@@ -68,33 +69,36 @@ export const VoteActionForm = ({
     if (previousVote?.url) {
       setVoteContextUrl(previousVote.url);
     }
+     if (previousVote?.metadataHash) {
+      setVoteContextHash(previousVote.metadataHash);
+    }
   }, [previousVote?.url, setVoteContextUrl]);
-
+  
   const renderCancelButton = useMemo(
     () => (
       <Button
-        data-testid="cancel-button"
-        onClick={() => setValue("vote", previousVote?.vote ?? "")}
+      data-testid="cancel-button"
+      onClick={() => setValue("vote", previousVote?.vote ?? "")}
         variant="outlined"
         size="extraLarge"
         sx={{
           width: "100%",
         }}
-      >
+        >
         {t("cancel")}
       </Button>
     ),
     [previousVote?.vote, setValue],
   );
-
+  
   const renderChangeVoteButton = useMemo(
     () => (
       <Button
-        data-testid="change-vote"
-        onClick={confirmVote}
-        disabled={!canVote}
-        isLoading={isVoteLoading}
-        variant="contained"
+      data-testid="change-vote"
+      onClick={confirmVote}
+      disabled={!canVote}
+      isLoading={isVoteLoading}
+      variant="contained"
         sx={{
           borderRadius: 50,
           textTransform: "none",
@@ -107,7 +111,7 @@ export const VoteActionForm = ({
     ),
     [confirmVote, areFormErrors, vote, isVoteLoading],
   );
-
+  
   return (
     <Box
       sx={{
@@ -222,17 +226,20 @@ export const VoteActionForm = ({
             {t("govActions.showVotes")}
           </Button>
         )}
-        <Typography
-          variant="body1"
-          sx={{
-            textTransform: "uppercase",
-            fontSize: "14px",
-            color: orange.c400,
-            mt: 6,
-          }}
-        >
-          {t("optional")}
-        </Typography>
+        {
+          !voteContextText &&
+          <Typography
+            variant="body1"
+            sx={{
+              textTransform: "uppercase",
+              fontSize: "14px",
+              color: orange.c400,
+              mt: 6,
+            }}
+          >
+            {t("optional")}
+          </Typography>
+        }
         <Typography
           variant="body2"
           sx={{
@@ -241,8 +248,9 @@ export const VoteActionForm = ({
           }}
         >
           {voteContextText
-            ? t("govActions.contextAboutYourVote")
-            : t("govActions.youCanProvideContext")}
+            ? t("govActions.yourVoteRationale")
+            : t("govActions.youCanProvideContext")
+          }
         </Typography>
         {voteContextText && (
           <Box
@@ -325,6 +333,8 @@ export const VoteActionForm = ({
             ? t("govActions.provideNewContextAboutYourVote")
             : t("govActions.provideContextAboutYourVote")}
         </Button>
+        <Box>
+        </Box>
       </Box>
       <Typography
         sx={{

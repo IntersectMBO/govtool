@@ -8,7 +8,6 @@ import React, {
   useEffect,
   useMemo,
   FC,
-  useRef,
 } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -42,7 +41,7 @@ interface ProviderProps {
 }
 
 const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
-  const isAdjusting = useRef<boolean>(false);
+  const [isAdjusting, setIsAdjusting] = useState(false);
   const [searchText, setSearchText] = useState<string>("");
   const debouncedSearchText = useDebounce(searchText.trim(), 300);
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
@@ -65,7 +64,6 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     setSearchText("");
     setChosenFilters([]);
     setChosenSorting("");
-    isAdjusting.current = false;
   }, []);
 
   const userMovedToDifferentAppArea =
@@ -79,7 +77,11 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     pathname.includes("governance_actions/category");
 
   useEffect(() => {
-    isAdjusting.current = true;
+    setIsAdjusting(true);
+
+    const timeout = setTimeout(() => {
+      setIsAdjusting(false);
+    }, 150); // Adjust delay if needed
 
     if (
       (!pathname.includes("drep_directory") &&
@@ -89,6 +91,8 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     ) {
       resetState();
     }
+
+    return () => clearTimeout(timeout);
   }, [pathname, resetState]);
 
   useEffect(() => {
@@ -97,7 +101,7 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
 
   const contextValue = useMemo(
     () => ({
-      isAdjusting: isAdjusting.current,
+      isAdjusting,
       chosenFilters,
       chosenFiltersLength: chosenFilters.length,
       chosenSorting,

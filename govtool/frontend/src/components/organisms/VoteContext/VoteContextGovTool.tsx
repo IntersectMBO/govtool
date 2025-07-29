@@ -1,10 +1,7 @@
 import { useEffect, Dispatch, SetStateAction, useState } from "react";
 import { Box, Button, CircularProgress, Link, Typography } from "@mui/material";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useMutation } from "react-query";
 
-import { Spacer } from "@atoms";
-import { useScreenDimension, useTranslation } from "@hooks";
 import { VoteContextWrapper } from "@organisms";
 import { postIpfs } from "@services";
 import { downloadTextFile, openInNewTab } from "@utils";
@@ -13,9 +10,8 @@ import { UseFormSetValue } from "react-hook-form";
 import { VoteContextFormValues } from "@hooks";
 import { LINKS } from "@/consts/links";
 import { ICONS } from "@/consts/icons";
-import { useSnackbar } from "@context";
-import { copyToClipboard } from "@utils";
 import { primaryBlue } from "@/consts";
+import { useTranslation } from "@hooks";
 
 interface PostIpfsResponse {
   ipfsCid: string;
@@ -24,7 +20,6 @@ interface PostIpfsResponse {
 type VoteContextGovToolProps = {
   setStep: Dispatch<SetStateAction<number>>;
   setSavedHash: Dispatch<SetStateAction<string | null>>;
-  onCancel: () => void;
   submitVoteContext: () => void;
   jsonldContent: NodeObject | null;
   metadataHash: string | null;
@@ -34,8 +29,6 @@ type VoteContextGovToolProps = {
 export const VoteContextGovTool = ({
   setStep,
   setSavedHash,
-  onCancel,
-  submitVoteContext,
   jsonldContent,
   metadataHash,
   setValue,
@@ -43,9 +36,7 @@ export const VoteContextGovTool = ({
   const [apiResponse, setApiResponse] = useState<PostIpfsResponse | null>(null);
   const [uploadInitiated, setUploadInitiated] = useState(false); // New state to track upload
   const { t } = useTranslation();
-  const { addSuccessAlert } = useSnackbar();
 
-  const { isMobile } = useScreenDimension();
 
   const openLink = () => openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);
 
@@ -74,10 +65,10 @@ export const VoteContextGovTool = ({
 
   return (
     <VoteContextWrapper
-      onContinue={submitVoteContext}
       isContinueDisabled={!apiResponse}
-      onCancel={onCancel}
-      showAllButtons={false}
+      onCancel={() => {setStep(2)}}
+      onContinue = {() => {setStep(5)}}
+      useBackLabel
     >
       <Typography sx={{ textAlign: "center" , fontSize : "28px" , fontWeight: 500 }} variant="h4">
         {t("createGovernanceAction.rationalePinnedToIPFS")}
@@ -143,22 +134,6 @@ export const VoteContextGovTool = ({
           {t("createGovernanceAction.uploadingToIPFS")}
         </Typography>
       )}
-        <Box sx={{ display: "flex", flexDirection: isMobile ? "column" : "row" ,  width: "100%", justifyContent: isMobile ? "none" : "space-between" , gap: isMobile ? "14px" : "0px" , mt: 3 }}>
-                <Button
-                  variant="outlined"
-                  onClick={()=>{setStep(2)}}
-                  sx={{ width: isMobile ? "100%" : "96px", whiteSpace: "nowrap" , height:"48px" , fontWeight:"500" }}
-                >
-                  {t("createGovernanceAction.back")}
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={submitVoteContext}
-                  sx={{ width: isMobile ? "100%" :  "130px", whiteSpace: "nowrap" , height:"48px" , fontWeight:"500" }}
-                >
-                  {t("createGovernanceAction.continue")}
-                </Button>
-              </Box>
     </VoteContextWrapper>
   );
 };

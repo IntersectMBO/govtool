@@ -79,11 +79,11 @@ export const useVoteContextForm = (
       } catch (error: any) {
         if (Object.values(MetadataValidationStatus).includes(error)) {
           if (setErrorMessage) setErrorMessage(error);
-          if (setStep) setStep(4);
+          if (setStep) setStep(5);
         }
       } finally {
         if (setSavedHash) setSavedHash(hash);
-        if (setStep) setStep(4);
+        if (setStep) setStep(5);
       }
     },
     [hash],

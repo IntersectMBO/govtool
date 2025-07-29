@@ -48,7 +48,10 @@ export const VoteContextCheckResult = ({
         {errorMessage ? "Data validation failed" : "Success"}
       </Typography>
       <Typography variant="body1" sx={{ fontWeight: 400, mb: 2 }}>
-        {errorMessage ?? "Data check has been successful"}
+        {errorMessage ?? "GovTool has processed has your rationale"}
+      </Typography>
+      <Typography>
+        {errorMessage ?? "You can now proceed to vote."}
       </Typography>
       {!errorMessage ? (
         <Button
@@ -78,7 +81,7 @@ export const VoteContextCheckResult = ({
         >
           <Button
             data-testid="go-back-modal-button"
-            onClick={() => setStep(3)}
+            onClick={() => setStep(4)}
             size="large"
             sx={{
               width: isMobile ? "100%" : "154px",

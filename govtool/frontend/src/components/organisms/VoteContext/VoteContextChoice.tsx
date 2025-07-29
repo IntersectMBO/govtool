@@ -44,7 +44,7 @@ export const VoteContextChoice = ({
   };
 
   return (
-    <VoteContextWrapper onCancel={onCancel} showContinueButton={false} showAllButtons={false}>
+    <VoteContextWrapper hideAllBtn={true}>
         <Typography sx={{ textAlign: "center" , fontWeight : 500 , marginTop: isMobile ? 0 : 1 }} variant="headline4">
           {t("createGovernanceAction.storingOptionsForYourVoterRationale")}
         </Typography>

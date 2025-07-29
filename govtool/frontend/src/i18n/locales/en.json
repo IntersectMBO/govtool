@@ -260,6 +260,7 @@
     "learnMore" : "Learn more",
     "optionalDownloadAndStoreMetadataFile": "Optional: Download and store a backup copy of your metadata file",
     "rePinYourFileToIPFS": "Re-pin your file to IPFS",
+    "oneMomentPlease" : "One Moment please",
     "modals": {
       "submitTransactionSuccess": {
         "message": "Your Governance Action may take a little time to submit to the chain.",

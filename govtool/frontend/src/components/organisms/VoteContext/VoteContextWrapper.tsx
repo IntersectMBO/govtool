@@ -7,10 +7,10 @@ import { Button } from "@atoms";
 type VoteContextWrapperProps = {
   onContinue?: () => void;
   isContinueDisabled?: boolean;
-  showCancelButton? : boolean;
-  onCancel: () => void;
-  showContinueButton?: boolean;
-  showAllButtons? : boolean;
+  onCancel? : () => void;
+  hideAllBtn? : boolean;
+  useBackLabel? : boolean;
+  useSubmitLabel? : boolean;
 };
 
 export const VoteContextWrapper: FC<
@@ -19,10 +19,10 @@ export const VoteContextWrapper: FC<
   onContinue,
   isContinueDisabled,
   onCancel,
-  showCancelButton = true,
   children,
-  showContinueButton = true,
-  showAllButtons = true
+  hideAllBtn = false,
+  useBackLabel = false,
+  useSubmitLabel = false
 }) => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -39,44 +39,35 @@ export const VoteContextWrapper: FC<
         {children}
       </Box>
       {
-        showAllButtons &&
-      <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop: "40px",
-                ...(isMobile && { flexDirection: "column-reverse", gap: 3 }),
-              }}
-            >
-              {
-                showCancelButton &&
-              <Button
-                data-testid="cancel-modal-button"
-                onClick={onCancel}
-                size="large"
-                sx={{
-                  width: isMobile ? "100%" : "154px",
-                }}
-                variant="outlined"
-      >
-        {t("cancel")}
-      </Button>
-              }
-      {showContinueButton && (
-        <Button
-          data-testid="confirm-modal-button"
-          disabled={isContinueDisabled}
-          onClick={onContinue}
-          size="large"
-          sx={{
-            width: isMobile ? "100%" : "154px",
-          }}
-          variant="contained"
-        >
-          {t("continue")}
-        </Button>
-      )}
-      </Box>
+        !hideAllBtn &&
+          <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginTop: "40px",
+                    ...(isMobile && { flexDirection: "column-reverse", gap: 3 }),
+                  }}
+                >
+          <Button
+                    data-testid="cancel-modal-button"
+                    onClick={onCancel}
+                    size="large"
+                    sx={{ width: isMobile ? "100%" : "96px", whiteSpace: "nowrap" , height:"48px" , fontWeight:"500" }}
+                    variant="outlined"
+          >
+            {useBackLabel ? t('back') :  t("cancel")}
+          </Button>
+          <Button
+            data-testid="confirm-modal-button"
+            disabled={isContinueDisabled}
+            onClick={onContinue}
+            size="large"
+                              sx={{ width: isMobile ? "100%" :  "130px", whiteSpace: "nowrap" , height:"48px" , fontWeight:"500" }}
+            variant="contained"
+          >
+            {useSubmitLabel ? t('submit') : t("continue")}
+          </Button>
+        </Box>
       }
     </>
   );

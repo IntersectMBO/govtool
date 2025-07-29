@@ -49,6 +49,7 @@ export const VoteContextStoringInformation = ({
       onContinue={validateURL}
       isContinueDisabled={isContinueDisabled}
       onCancel={onCancel}
+      useSubmitLabel
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("createGovernanceAction.storingInformationTitle")}

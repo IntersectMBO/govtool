@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useMemo } from "react";
 
 import { orange } from "@consts";
 import { Typography } from "@atoms";
@@ -30,7 +30,19 @@ export const VoteContextText = ({
   const { t } = useTranslation();
 
   const { control, errors, watch } = useVoteContextForm();
-  const isContinueDisabled = !watch("voteContextText");
+  const currentRationale = watch("voteContextText");
+
+  const isRationaleChanged = useMemo(() => {
+    console.log({"currentRationale":currentRationale,previousRationale:previousRationale})
+    return currentRationale !== previousRationale;
+  }, [currentRationale, previousRationale]);
+
+  const buttonLabel = useMemo(() => {
+    if (currentRationale === "") {
+      return t("govActions.voting.voteWithoutMetadata");
+    }
+    return t("govActions.voting.continue");
+  }, [currentRationale, t]);
 
   const fieldProps = {
     layoutStyles: { mb: 3 },
@@ -45,16 +57,16 @@ export const VoteContextText = ({
       },
     },
   };
-
+  console.log("Previous rationale",previousRationale)
   return (
     <VoteContextWrapper
       onContinue={() => setStep(2)}
-      isContinueDisabled={isContinueDisabled}
+      isVoteWithMetadata={currentRationale !== ""}
       onCancel={onCancel}
       onSkip={() => confirmVote(vote)}
-      continueLabel={
-        isContinueDisabled ? t("govActions.voting.voteWithoutMetadata") : t("govActions.voting.continue")
-      }
+      continueLabel={buttonLabel}
+      isChangeVote={previousRationale !== undefined && previousRationale !== null}
+      isRationaleChanged={isRationaleChanged}
     >
       <Typography
         variant="body1"

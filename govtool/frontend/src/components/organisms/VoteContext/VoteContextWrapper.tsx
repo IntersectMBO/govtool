@@ -6,21 +6,22 @@ import { Button } from "@atoms";
 
 type VoteContextWrapperProps = {
   onContinue?: () => void;
-  isContinueDisabled?: boolean;
+  isVoteWithMetadata?: boolean;
   onCancel?: () => void;
   hideAllBtn?: boolean;
   useBackLabel?: boolean;
   useSubmitLabel?: boolean;
   onSkip?: () => void;
   continueLabel?: string;
-  disableNext?: boolean;
+  isChangeVote?: boolean;
+  isRationaleChanged?:boolean;
 };
 
 export const VoteContextWrapper: FC<
   PropsWithChildren<VoteContextWrapperProps>
 > = ({
   onContinue,
-  isContinueDisabled,
+  isVoteWithMetadata,
   onCancel,
   children,
   hideAllBtn = false,
@@ -28,7 +29,8 @@ export const VoteContextWrapper: FC<
   useSubmitLabel = false,
   onSkip,
   continueLabel,
-  disableNext = false,
+  isChangeVote = false,
+  isRationaleChanged=true,
 }) => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -65,8 +67,8 @@ export const VoteContextWrapper: FC<
           </Button>
           <Button
             data-testid="confirm-modal-button"
-            disabled={disableNext}
-            onClick={isContinueDisabled ? onSkip : onContinue}
+            disabled={isChangeVote && !isRationaleChanged}
+            onClick={isVoteWithMetadata ?   onContinue: onSkip}
             size="large"
             sx={{
               width: isMobile ? "100%" : "130px",

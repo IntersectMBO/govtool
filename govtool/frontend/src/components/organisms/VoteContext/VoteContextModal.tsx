@@ -40,7 +40,12 @@ export const VoteContextModal = () => {
 
   const { state, closeModal } = useModal<VoteContextModalState>();
 
-  const methods = useForm<VoteContextFormValues>({ mode: "onChange" });
+  const methods = useForm<VoteContextFormValues>({
+    mode: "onChange",
+    defaultValues: {
+      voteContextText: state?.previousRationale || "",
+    },
+  });
   const { getValues } = methods;
 
   const submitVoteContext = () => {

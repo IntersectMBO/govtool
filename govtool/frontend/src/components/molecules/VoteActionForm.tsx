@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import { Trans } from "react-i18next";
 
 import { Button, Radio, Typography } from "@atoms";
-import { orange } from "@consts";
+import { fadedPurple } from "@/consts";
 import { useModal } from "@context";
 import {
   useScreenDimension,
@@ -60,9 +60,11 @@ export const VoteActionForm = ({
           setVoteContextUrl(url);
           setVoteContextHash(hash ?? undefined);
           confirmVote(vote as Vote, url, hash);
+          setVoteContextData(url , hash);
         },
         vote: vote as Vote,
         confirmVote,
+        previousRationale : voteContextText
       } satisfies VoteContextModalState,
     });
   };
@@ -126,6 +128,10 @@ export const VoteActionForm = ({
     ),
     [confirmVote, areFormErrors, vote, isVoteLoading],
   );
+
+  useEffect(()=>{
+    console.log(previousVote?.metadataHash , voteContextHash)
+  } , [previousVote?.metadataHash , voteContextHash])
   
   return (
     <Box
@@ -242,11 +248,27 @@ export const VoteActionForm = ({
           </Button>
         )}
         {voteContextText && (
+          <>
+          <Typography sx={{fontSize : "14px" , fontWeight : 500}}>{t("govActions.yourVoteRationale")}</Typography>
           <Box
             sx={{
               display: "flex",
               flexDirection: "column",
+              justifyContent : "space-between",
+              width: "100%",
               mt: 2,
+            }}
+          >
+          {voteContextText && (
+          <Box
+            sx={{
+              position: "relative",
+              width: "100%",
+              mt: 2,
+              border: !showWholeVoteContext ? "1px solid #E1E1E1" : "none",
+              borderRadius: "4px",
+              backgroundColor: !showWholeVoteContext ? fadedPurple.c50 : "transparent",
+              padding: 2,
             }}
           >
             <Typography
@@ -254,6 +276,7 @@ export const VoteActionForm = ({
               sx={{
                 fontWeight: 400,
                 color: "neutralGray",
+                whiteSpace: "pre-wrap",
                 ...(!showWholeVoteContext && {
                   overflow: "hidden",
                   textOverflow: "ellipsis",
@@ -263,51 +286,70 @@ export const VoteActionForm = ({
                 }),
               }}
             >
-              {voteContextText}
-            </Typography>
-            <Button
-              onClick={() => {
-                setShowWholeVoteContext((prev) => !prev);
-              }}
+      {voteContextText}
+    </Typography>
+
+      {!showWholeVoteContext && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            position: "absolute",
+            bottom: 8,
+            right: 16,
+            background: fadedPurple.c50,
+          }}
+        >
+          <Button
+            onClick={() => setShowWholeVoteContext(true)}
+            sx={{
+              p: 0,
+              minWidth: "unset",
+              ":hover": { backgroundColor: "transparent" },
+            }}
+            disableRipple
+            variant="text"
+            data-testid="external-modal-button"
+          >
+            <Typography
+              variant="body2"
               sx={{
-                p: 0,
-                margin: "0 auto",
-                ":hover": {
-                  backgroundColor: "transparent",
-                },
+                fontWeight: 400,
+                color: "primaryBlue",
+                borderBottom: "1px solid",
               }}
-              disableRipple
-              variant="text"
-              data-testid="external-modal-button"
             >
-              <Typography
-                variant="body2"
-                sx={{
-                  fontWeight: 400,
-                  color: "primaryBlue",
-                  borderBottom: "1px solid",
-                }}
-              >
-                {showWholeVoteContext ? t("showLess") : t("showMore")}
-              </Typography>
-            </Button>
+              {t("showMore")}
+            </Typography>
+          </Button>
+        </Box>
+      )}
+    </Box>
+  )}
+
           </Box>
+          </>
         )}
+
         <Box>
         </Box>
       </Box>
-      <Typography
-        sx={{
-          mb: 2,
-          mt: 3,
-          textAlign: "center",
-          visibility: previousVote?.vote ? "visible" : "hidden",
-        }}
-        variant="caption"
-      >
-        {t("govActions.selectDifferentOption")}
-      </Typography>
-      {previousVote?.vote && previousVote?.vote !== vote ? (
+      {
+        voteContextText && (
+          <Button
+            data-testid="edit-rationale-button"
+            variant="outlined"
+            sx={{
+              height : "48px",
+              marginY : 4
+            }}
+            onClick={handleVoteClick}
+            >
+              {t("govActions.editRationale")}
+          </Button>
+        )
+      }
+      {previousVote?.vote && previousVote?.vote !== vote  ? (
         <Box
           display="flex"
           flexDirection={isMobile ? "column" : "row"}

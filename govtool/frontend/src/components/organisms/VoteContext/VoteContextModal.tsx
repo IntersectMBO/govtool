@@ -19,11 +19,13 @@ import { Vote } from "@/models";
 export type VoteContextModalState = {
   onSubmit: (url: string, hash: string | null, voteContextText: string) => void;
   vote?: Vote;
+  previousRationale?: string
   confirmVote: (
     vote?: Vote,
     url?: string,
     hash?: string | null,
   ) => void;
+  // onRationaleChange : ()
 };
 
 export const VoteContextModal = () => {
@@ -86,6 +88,7 @@ export const VoteContextModal = () => {
             onCancel={closeModal}
             confirmVote={state?.confirmVote ?? (() => {})}
             vote={state?.vote}
+            previousRationale={state?.previousRationale}
           />
         )}
       </FormProvider>

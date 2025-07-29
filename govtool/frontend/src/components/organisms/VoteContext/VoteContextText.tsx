@@ -16,6 +16,7 @@ type VoteContextTextProps = {
     hash?: string | null,
   ) => void;
   vote?: Vote;
+  previousRationale? : string
 };
 const MAX_LENGTH = 10000;
 
@@ -24,6 +25,7 @@ export const VoteContextText = ({
   onCancel,
   confirmVote,
   vote,
+  previousRationale
 }: VoteContextTextProps) => {
   const { t } = useTranslation();
 
@@ -82,6 +84,7 @@ export const VoteContextText = ({
         isModifiedLayout
         maxLength={MAX_LENGTH}
         data-testid="provide-context-input"
+        defaultValue={previousRationale}
       />
     </VoteContextWrapper>
   );

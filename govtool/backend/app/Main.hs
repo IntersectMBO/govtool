@@ -16,6 +16,7 @@ import           Control.Monad.Trans.Except
 import           Control.Monad.Trans.Reader
 
 import           Data.Aeson                             hiding (Error)
+import           Data.Aeson                             (encode)
 import qualified Data.ByteString                        as BS
 import           Data.ByteString.Char8                  (unpack)
 import qualified Data.Cache                             as Cache
@@ -35,7 +36,7 @@ import           Data.Text.Encoding                     (encodeUtf8)
 import qualified Data.Text.IO                           as Text
 import qualified Data.Text.Lazy                         as LazyText
 import qualified Data.Text.Lazy.Encoding                as LazyText
-
+import qualified Data.ByteString.Lazy.Char8             as BS8
 import           Database.PostgreSQL.Simple             (close, connectPostgreSQL, Connection)
 
 import           Network.Wai
@@ -62,8 +63,10 @@ import           VVA.API.Types
 import           VVA.CommandLine
 import           VVA.Config
 import           VVA.Types                              (AppEnv (..),
-                                                         AppError (CriticalError, InternalError, NotFoundError, ValidationError),
+                                                         AppError (..),
                                                          CacheEnv (..))
+import           VVA.Ipfs                              (IpfsError(..))
+
 
 -- Function to create a connection pool with optimized settings
 createOptimizedConnectionPool :: BS.ByteString -> IO (Pool Connection)
@@ -288,10 +291,15 @@ liftServer appEnv =
   where
     handleErrors :: Either AppError a -> Handler a
     handleErrors (Right x) = pure x
-    handleErrors (Left (ValidationError msg)) = throwError $ err400 { errBody = BS.fromStrict $ encodeUtf8 msg }
-    handleErrors (Left (NotFoundError msg)) = throwError $ err404 { errBody = BS.fromStrict $ encodeUtf8 msg }
-    handleErrors (Left (CriticalError msg)) = throwError $ err500 { errBody = BS.fromStrict $ encodeUtf8 msg }
-    handleErrors (Left (InternalError msg)) = throwError $ err500 { errBody = BS.fromStrict $ encodeUtf8 msg }
+    handleErrors (Left appError) = do
+      let status = case appError of
+            ValidationError _ -> err400
+            NotFoundError _   -> err404
+            CriticalError _   -> err500
+            InternalError _   -> err500
+            AppIpfsError (OtherIpfsError _)    -> err400
+            AppIpfsError _    -> err503
+      throwError $ status { errBody = encode appError, errHeaders = [("Content-Type", "application/json")] }
 -- * Swagger
 
 type SwaggerAPI = SwaggerSchemaUI "swagger-ui" "swagger.json"

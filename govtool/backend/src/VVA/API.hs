@@ -1,10 +1,10 @@
-{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE NamedFieldPuns    #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TypeOperators     #-}
 {-# LANGUAGE ViewPatterns      #-}
+{-# LANGUAGE DataKinds #-}
 
 module VVA.API where
 
@@ -31,6 +31,7 @@ import           Numeric.Natural          (Natural)
 
 import           Servant.API
 import           Servant.Server
+import           Servant.Exception        (Throws)
 import           System.Random            (randomRIO)
 
 import           Text.Read                (readMaybe)
@@ -47,16 +48,17 @@ import qualified VVA.Proposal             as Proposal
 import qualified VVA.Transaction          as Transaction
 import qualified VVA.Types                as Types
 import           VVA.Types                (App, AppEnv (..),
-                                           AppError (CriticalError, InternalError, ValidationError),
+                                           AppError (CriticalError, InternalError, ValidationError, AppIpfsError),
                                            CacheEnv (..))
 import Data.Time (TimeZone, localTimeToUTC)
 import qualified VVA.Ipfs as Ipfs
 import Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Lazy as BSL
+import Servant.Exception (Throws)
 
 type VVAApi =
          "ipfs"
-                :> "upload"  :> QueryParam "fileName" Text :> ReqBody '[PlainText] Text :> Post '[JSON] UploadResponse
+                :> "upload"  :>  QueryParam "fileName" Text :> ReqBody '[PlainText] Text :> Post '[JSON] UploadResponse
     :<|> "drep" :> "list"
                 :> QueryParam "search" Text
                 :> QueryParams "status" DRepStatus
@@ -125,8 +127,8 @@ upload mFileName fileContentText = do
     throwError $ ValidationError "The uploaded file is larger than 500Kb"
   eIpfsHash <- liftIO $ Ipfs.ipfsUpload vvaPinataJwt fileName fileContent
   case eIpfsHash of
-    Left err  -> throwError $ InternalError $ "IPFS upload failed: " <> pack err
-    Right ipfsHash -> return $ UploadResponse ipfsHash
+    Left err  ->  throwError $ AppIpfsError err
+    Right ipfsHash -> return $  UploadResponse ipfsHash
 
 mapDRepType :: Types.DRepType -> DRepType
 mapDRepType Types.DRep      = NormalDRep

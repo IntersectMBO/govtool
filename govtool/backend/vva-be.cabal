@@ -52,6 +52,7 @@ executable vva-be
                     , text
                     , servant-swagger-ui
                     , servant-server
+                    , servant-exceptions
                     , servant-openapi3
                     , servant
                     , wai
@@ -91,6 +92,7 @@ library
                , bytestring
                , optparse-applicative
                , servant
+               , servant-exceptions
                , openapi3
                , lens
                , postgresql-simple

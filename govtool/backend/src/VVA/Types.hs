@@ -15,7 +15,7 @@ import           Control.Monad.Except                  (MonadError)
 import           Control.Monad.Fail                    (MonadFail)
 import           Control.Monad.IO.Class                (MonadIO)
 import           Control.Monad.Reader                  (MonadReader)
-
+import qualified Data.Aeson                            as A
 import           Data.Aeson                            (Value, ToJSON (..), object, (.=))
 import qualified  Data.Cache as Cache
 import           Data.Has
@@ -30,6 +30,7 @@ import           Database.PostgreSQL.Simple.FromField  (FromField(..), returnErr
 
 import           VVA.Cache
 import           VVA.Config
+import           VVA.Ipfs                              (IpfsError)
 
 type App m = (MonadReader AppEnv m, MonadIO m, MonadFail m, MonadError AppError m)
 
@@ -57,9 +58,17 @@ data AppError
   | NotFoundError Text
   | CriticalError Text
   | InternalError Text
+  | AppIpfsError IpfsError
   deriving (Show)
 
 instance Exception AppError
+
+instance ToJSON AppError where
+  toJSON (ValidationError msg) = object ["errorType" .= A.String "ValidationError", "message" .= msg]
+  toJSON (NotFoundError msg) = object ["errorType" .= A.String "NotFoundError", "message" .= msg]
+  toJSON (CriticalError msg) = object ["errorType" .= A.String "CriticalError", "message" .= msg]
+  toJSON (InternalError msg) = object ["errorType" .= A.String "InternalError", "message" .= msg]
+  toJSON (AppIpfsError err) =  toJSON err
 
 data Vote
   = Vote

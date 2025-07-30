@@ -152,7 +152,6 @@ const VoteContextFlow = ({
         <VoteContextGovTool
           setStep={setStep}
           setSavedHash={setSavedHash}
-          submitVoteContext={submitVoteContext}
           jsonldContent={jsonldContent}
           metadataHash={metadataHash}
           setValue={methods.setValue}

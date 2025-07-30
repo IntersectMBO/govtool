@@ -68,6 +68,7 @@ export const VoteContextGovTool = ({
       onCancel={() => {setStep(2)}}
       onContinue = {() => {setStep(5)}}
       useBackLabel
+      isContinueDisabled={!apiResponse}
     >
       <Typography sx={{ textAlign: "center" , fontSize : "28px" , fontWeight: 500 }} variant="h4">
         {t("createGovernanceAction.rationalePinnedToIPFS")}

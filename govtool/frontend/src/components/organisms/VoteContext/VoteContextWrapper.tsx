@@ -13,9 +13,8 @@ type VoteContextWrapperProps = {
   useSubmitLabel?: boolean;
   onSkip?: () => void;
   continueLabel?: string;
-  isChangeVote?: boolean;
-  isRationaleChanged?:boolean;
   isApiLoading?:boolean;
+  isContinueDisabled?:boolean
 };
 
 export const VoteContextWrapper: FC<
@@ -30,8 +29,7 @@ export const VoteContextWrapper: FC<
   useSubmitLabel = false,
   onSkip,
   continueLabel,
-  isChangeVote = false,
-  isRationaleChanged=true,
+  isContinueDisabled
 }) => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
@@ -67,7 +65,7 @@ export const VoteContextWrapper: FC<
           </Button>
           <Button
             data-testid="confirm-modal-button"
-            disabled={isChangeVote && !isRationaleChanged}
+            disabled={isContinueDisabled}
             onClick={isVoteWithMetadata ?   onContinue: onSkip}
             size="large"
             sx={{

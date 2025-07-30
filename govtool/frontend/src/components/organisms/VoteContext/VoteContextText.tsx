@@ -65,8 +65,7 @@ export const VoteContextText = ({
       onCancel={onCancel}
       onSkip={() => confirmVote(vote)}
       continueLabel={buttonLabel}
-      isChangeVote={previousRationale !== undefined && previousRationale !== null}
-      isRationaleChanged={isRationaleChanged}
+      isContinueDisabled={(previousRationale !== undefined && previousRationale !== null ) && !isRationaleChanged}
     >
       <Typography
         variant="body1"

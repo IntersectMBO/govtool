@@ -26,6 +26,7 @@ export const VoteContextTerms = ({ setStep, onCancel }: StoreDataInfoProps) => {
       onContinue={() => setStep(4)}
       isContinueDisabled={isContinueDisabled}
       onCancel={onCancel}
+      isVoteWithMetadata
     >
       <Typography sx={{ textAlign: "center" , fontWeight: 500 , fontSize : 28 }} variant="headline4">
         {t("createGovernanceAction.storeDataTitle")}

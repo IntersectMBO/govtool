@@ -15,6 +15,7 @@ type VoteContextWrapperProps = {
   continueLabel?: string;
   isChangeVote?: boolean;
   isRationaleChanged?:boolean;
+  isApiLoading?:boolean;
 };
 
 export const VoteContextWrapper: FC<
@@ -34,7 +35,6 @@ export const VoteContextWrapper: FC<
 }) => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
-
   return (
     <>
       <Box

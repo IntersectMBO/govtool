@@ -33,12 +33,14 @@ type Props = {
   previousVote?: ProposalVote | null;
   voteContextHash?: string;
   voteContextUrl?: string;
+  closeModal: () => void;
 };
 
 export const useVoteActionForm = ({
   previousVote,
   voteContextHash,
   voteContextUrl,
+  closeModal,
 }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const { buildSignSubmitConwayCertTx, buildVote, isPendingTransaction } =
@@ -106,6 +108,7 @@ export const useVoteActionForm = ({
               isVotedListOnLoad: !!previousVote?.vote,
             },
           });
+          closeModal();
         }
       } catch (error) {
         openWalletErrorModal({

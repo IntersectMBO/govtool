@@ -39,7 +39,7 @@ export const VoteActionForm = ({
   const { voteContextText } = useGetVoteContextTextFromFile(voteContextUrl , voteContextHash);
 
   const { isMobile, screenWidth } = useScreenDimension();
-  const { openModal } = useModal();
+  const { openModal, closeModal } = useModal();
   const { t } = useTranslation();
 
   const {
@@ -50,9 +50,9 @@ export const VoteActionForm = ({
     setValue,
     vote,
     canVote,
-  } = useVoteActionForm({ previousVote, voteContextHash, voteContextUrl });
+  } = useVoteActionForm({ previousVote, voteContextHash, voteContextUrl, closeModal });
 
-  const handleVoteClick = () => {
+  const handleVoteClick = (isVoteChanged:boolean) => {
     openModal({
       type: "voteContext",
       state: {
@@ -64,7 +64,7 @@ export const VoteActionForm = ({
         },
         vote: vote as Vote,
         confirmVote,
-        previousRationale : voteContextText
+        previousRationale : isVoteChanged?undefined:voteContextText
       } satisfies VoteContextModalState,
     });
   };
@@ -112,7 +112,7 @@ export const VoteActionForm = ({
     () => (
       <Button
       data-testid="change-vote"
-      onClick={() => confirmVote(vote as Vote, voteContextUrl, voteContextHash)}
+      onClick={ ()=>handleVoteClick(true)}
       disabled={!canVote}
       isLoading={isVoteLoading}
       variant="contained"
@@ -345,6 +345,7 @@ export const VoteActionForm = ({
           {isMobile ? renderCancelButton : renderChangeVoteButton}
         </Box>
       ) : (
+        // this button appears on gov action detail page to change vote or rationale.
         <Button
           data-testid="vote-button"
           variant="contained"
@@ -354,7 +355,7 @@ export const VoteActionForm = ({
               : !vote || areFormErrors
           }
           isLoading={isVoteLoading}
-          onClick={handleVoteClick}
+          onClick={()=>handleVoteClick(false)}
           size="extraLarge"
         >
           {previousVote?.vote && previousVote?.vote === vote

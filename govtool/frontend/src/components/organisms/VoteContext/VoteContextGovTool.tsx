@@ -65,7 +65,6 @@ export const VoteContextGovTool = ({
 
   return (
     <VoteContextWrapper
-      isContinueDisabled={!apiResponse}
       onCancel={() => {setStep(2)}}
       onContinue = {() => {setStep(5)}}
       useBackLabel

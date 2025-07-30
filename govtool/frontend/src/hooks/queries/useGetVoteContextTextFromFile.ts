@@ -23,14 +23,25 @@ export const useGetVoteContextTextFromFile = (url: string | undefined,
 
   const voteContextText = (data?.metadata as { comment?: string })?.comment || "";
 
-  if (data?.valid) {
+  if (url === undefined || contextHash === undefined) {
     return {
-      voteContextText,
-      isLoading
+      voteContextText: undefined,
+      isLoading: false,
+      valid: true
     };
   }
-  return {
-      voteContextText: undefined,
-      isLoading
-    };
+  if (data) {
+    if (data?.valid) {
+      return {
+        voteContextText,
+        isLoading,
+        valid: true
+      };
+    }
+    return {
+        voteContextText: undefined,
+        isLoading,
+        valid: false
+      };
+  }
 };

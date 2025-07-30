@@ -12,7 +12,7 @@ import {
   useGetVoteContextTextFromFile,
 } from "@hooks";
 import { formatDisplayDate } from "@utils";
-import { fadedPurple } from "@/consts";
+import { errorRed, fadedPurple } from "@/consts";
 import { ProposalData, ProposalVote, Vote } from "@/models";
 import { VoteContextModalState, SubmittedVotesModalState } from "../organisms";
 
@@ -36,7 +36,8 @@ export const VoteActionForm = ({
     useState<boolean>(false);
 
   const { voter } = useGetVoterInfo();
-  const { voteContextText } = useGetVoteContextTextFromFile(voteContextUrl, voteContextHash) || {};
+  const { voteContextText, valid: voteContextValid = true } =
+    useGetVoteContextTextFromFile(voteContextUrl, voteContextHash) || {};
 
   const finalVoteContextText =
   ((previousVote != null || undefined) && !voteContextUrl && !voteContextHash)
@@ -247,6 +248,12 @@ export const VoteActionForm = ({
             {t("govActions.showVotes")}
           </Button>
         )}
+        {
+          !voteContextValid &&
+            <Typography sx={{ fontSize: "14px", fontWeight: 700, color: errorRed.c500 }}>
+                {t("govActions.invalidVoteContext")}
+            </Typography>
+        }
         {finalVoteContextText && (
           <>
             <Typography sx={{ fontSize: "14px", fontWeight: 500 }}>{t("govActions.yourVoteRationale")}</Typography>

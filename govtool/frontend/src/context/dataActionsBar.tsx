@@ -42,7 +42,7 @@ interface ProviderProps {
 }
 
 const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
-  const [isAdjusting, setIsAdjusting] = useState(false);
+  const isAdjusting = useRef<boolean>(false);
   const [searchText, setSearchText] = useState<string>("");
   const debouncedSearchText = useDebounce(searchText.trim(), 300);
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
@@ -79,11 +79,7 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     pathname.includes("governance_actions/category");
 
   useEffect(() => {
-    setIsAdjusting(true);
-
-    const timeout = setTimeout(() => {
-      setIsAdjusting(false);
-    }, 150); // Adjust delay if needed
+    isAdjusting.current = true;
 
     if (
       (!pathname.includes("drep_directory") &&
@@ -93,8 +89,6 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     ) {
       resetState();
     }
-
-    return () => clearTimeout(timeout);
   }, [pathname, resetState]);
 
   useEffect(() => {
@@ -103,7 +97,7 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
 
   const contextValue = useMemo(
     () => ({
-      isAdjusting,
+      isAdjusting: isAdjusting.current,
       chosenFilters,
       chosenFiltersLength: chosenFilters.length,
       chosenSorting,

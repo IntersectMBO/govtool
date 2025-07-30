@@ -10,18 +10,10 @@ export const useGetProposalsQuery = ({
   filters = [],
   searchPhrase,
   sorting,
-  enabled = true,
+  enabled,
 }: GetProposalsArguments) => {
   const { dRepID } = useCardano();
   const { voter } = useGetVoterInfo();
-
-// Determine if voter is ready to be used in the query
-const voterReady =
-  !!dRepID && (voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter);
-
-// Only run the query if enabled externally and voter info is ready
-const shouldFetch = enabled && voterReady;
-
 
   const fetchProposals = async (): Promise<ProposalData[]> => {
     const allProposals = await Promise.all(
@@ -53,7 +45,7 @@ const shouldFetch = enabled && voterReady;
     ],
     fetchProposals,
     {
-      enabled: shouldFetch,
+      enabled,
       refetchOnWindowFocus: true,
       keepPreviousData: true,
     },

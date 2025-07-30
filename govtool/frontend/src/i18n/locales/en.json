@@ -243,6 +243,7 @@
     "storingInformationStep2Link": "Read full guide",
     "storingInformationStep3Label": "Paste the URL here",
     "storingInformationTitle": "Information Storage Steps",
+    "uploadToIPFSError" : "An Error occured while trying to upload to IPFS",
     "storingInformationURLPlaceholder": "URL",
     "supportingLinks": "Supporting links",
     "title": "Create a Governance Action",

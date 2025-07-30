@@ -40,7 +40,7 @@ export const VoteContextGovTool = ({
 
   const openLink = () => openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);
 
-  const { mutate, isLoading } = useMutation<PostIpfsResponse, Error, { content: string }>({
+  const { mutate, isLoading , isError } = useMutation<PostIpfsResponse, Error, { content: string }>({
     mutationFn: postIpfs,
     onSuccess: (data) => {
       const ipfsUrl = `ipfs://${data.ipfsCid}`;
@@ -69,6 +69,7 @@ export const VoteContextGovTool = ({
       onContinue = {() => {setStep(5)}}
       useBackLabel
       isContinueDisabled={!apiResponse}
+      isVoteWithMetadata
     >
       <Typography sx={{ textAlign: "center" , fontSize : "28px" , fontWeight: 500 }} variant="h4">
         {t("createGovernanceAction.rationalePinnedToIPFS")}
@@ -87,7 +88,11 @@ export const VoteContextGovTool = ({
       >
         {t("createGovernanceAction.learnMore")}
       </Link>
-      {isLoading ? (
+      {isError ? (
+        <Typography sx={{ textAlign: "center", color: "error.main", mt: 2 }} variant="body1">
+          {t("createGovernanceAction.uploadToIPFSError")}
+        </Typography>
+      ) : isLoading ? (
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <CircularProgress size={24} />
         </Box>
@@ -129,7 +134,7 @@ export const VoteContextGovTool = ({
           </Typography>
           </Box>
         </>
-      ) : (
+      ) :  (
         <Typography sx={{ textAlign: "center" }} variant="body1">
           {t("createGovernanceAction.uploadingToIPFS")}
         </Typography>

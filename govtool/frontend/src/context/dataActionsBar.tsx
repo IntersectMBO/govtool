@@ -8,6 +8,7 @@ import React, {
   useEffect,
   useMemo,
   FC,
+  useRef,
 } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -64,6 +65,7 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     setSearchText("");
     setChosenFilters([]);
     setChosenSorting("");
+    isAdjusting.current = false;
   }, []);
 
   const userMovedToDifferentAppArea =

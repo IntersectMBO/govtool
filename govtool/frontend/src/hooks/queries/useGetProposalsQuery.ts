@@ -22,6 +22,7 @@ const voterReady =
 // Only run the query if enabled externally and voter info is ready
 const shouldFetch = enabled && voterReady;
 
+
   const fetchProposals = async (): Promise<ProposalData[]> => {
     const allProposals = await Promise.all(
       filters.map((filter) =>

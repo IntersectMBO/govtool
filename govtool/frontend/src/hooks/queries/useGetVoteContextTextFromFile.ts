@@ -5,14 +5,14 @@ import { QUERY_KEYS } from "@/consts";
 import { useCardano } from "@/context";
 import { useGetVoterInfo } from ".";
 
-export const useGetVoteContextTextFromFile = (url: string | undefined , contextHash : string | undefined) => {
+export const useGetVoteContextTextFromFile = (url: string | undefined,
+                                            contextHash : string | undefined) => {
   const { dRepID } = useCardano();
   const { voter } = useGetVoterInfo();
 
-
   const { data, isLoading } = useQuery(
   [QUERY_KEYS.useGetVoteContextFromFile, url],
-  () => getVoteContextTextFromFile(url , contextHash),
+  () => getVoteContextTextFromFile(url, contextHash),
   {
     enabled:
       !!url &&
@@ -26,12 +26,11 @@ export const useGetVoteContextTextFromFile = (url: string | undefined , contextH
   if (data?.valid) {
     return {
       voteContextText,
-      isLoading 
-    }
+      isLoading
+    };
   }
   return {
-      voteContextText : undefined,
+      voteContextText: undefined,
       isLoading
-    }
-
+    };
 };

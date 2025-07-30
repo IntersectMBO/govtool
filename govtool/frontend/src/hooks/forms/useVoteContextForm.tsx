@@ -35,7 +35,6 @@ export const useVoteContextForm = (
     reset,
   } = useFormContext<VoteContextFormValues>();
 
-
   const generateMetadata = useCallback(async () => {
     const { voteContextText } = getValues();
     const body = await generateMetadataBody({

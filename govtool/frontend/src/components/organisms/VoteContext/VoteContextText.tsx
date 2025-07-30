@@ -32,10 +32,8 @@ export const VoteContextText = ({
   const { control, errors, watch } = useVoteContextForm();
   const currentRationale = watch("voteContextText");
 
-  const isRationaleChanged = useMemo(() => {
-    console.log({"currentRationale":currentRationale,previousRationale:previousRationale})
-    return currentRationale !== previousRationale;
-  }, [currentRationale, previousRationale]);
+  const isRationaleChanged = useMemo(() => currentRationale !== previousRationale,
+                                       [currentRationale, previousRationale]);
 
   const buttonLabel = useMemo(() => {
     if (currentRationale === "") {
@@ -57,7 +55,6 @@ export const VoteContextText = ({
       },
     },
   };
-  console.log("Previous rationale",previousRationale)
   return (
     <VoteContextWrapper
       onContinue={() => setStep(2)}
@@ -65,7 +62,8 @@ export const VoteContextText = ({
       onCancel={onCancel}
       onSkip={() => confirmVote(vote)}
       continueLabel={buttonLabel}
-      isContinueDisabled={(previousRationale !== undefined && previousRationale !== null ) && !isRationaleChanged}
+      isContinueDisabled={(previousRationale !== undefined && previousRationale !== null)
+        && !isRationaleChanged}
     >
       <Typography
         variant="body1"

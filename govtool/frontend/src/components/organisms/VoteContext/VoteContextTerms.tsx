@@ -28,7 +28,7 @@ export const VoteContextTerms = ({ setStep, onCancel }: StoreDataInfoProps) => {
       onCancel={onCancel}
       isVoteWithMetadata
     >
-      <Typography sx={{ textAlign: "center" , fontWeight: 500 , fontSize : 28 }} variant="headline4">
+      <Typography sx={{ textAlign: "center", fontWeight: 500, fontSize: 28 }} variant="headline4">
         {t("createGovernanceAction.storeDataTitle")}
       </Typography>
       <Link

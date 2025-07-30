@@ -7,11 +7,10 @@ import { postIpfs } from "@services";
 import { downloadTextFile, openInNewTab } from "@utils";
 import { NodeObject } from "jsonld";
 import { UseFormSetValue } from "react-hook-form";
-import { VoteContextFormValues } from "@hooks";
+import { VoteContextFormValues, useTranslation } from "@hooks";
 import { LINKS } from "@/consts/links";
 import { ICONS } from "@/consts/icons";
 import { primaryBlue } from "@/consts";
-import { useTranslation } from "@hooks";
 
 interface PostIpfsResponse {
   ipfsCid: string;
@@ -20,7 +19,6 @@ interface PostIpfsResponse {
 type VoteContextGovToolProps = {
   setStep: Dispatch<SetStateAction<number>>;
   setSavedHash: Dispatch<SetStateAction<string | null>>;
-  submitVoteContext: () => void;
   jsonldContent: NodeObject | null;
   metadataHash: string | null;
   setValue: UseFormSetValue<VoteContextFormValues>;
@@ -37,10 +35,9 @@ export const VoteContextGovTool = ({
   const [uploadInitiated, setUploadInitiated] = useState(false); // New state to track upload
   const { t } = useTranslation();
 
-
   const openLink = () => openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);
 
-  const { mutate, isLoading , isError } = useMutation<PostIpfsResponse, Error, { content: string }>({
+  const { mutate, isLoading, isError } = useMutation<PostIpfsResponse, Error, { content: string }>({
     mutationFn: postIpfs,
     onSuccess: (data) => {
       const ipfsUrl = `ipfs://${data.ipfsCid}`;
@@ -65,13 +62,13 @@ export const VoteContextGovTool = ({
 
   return (
     <VoteContextWrapper
-      onCancel={() => {setStep(2)}}
-      onContinue = {() => {setStep(5)}}
+      onCancel={() => { setStep(2); }}
+      onContinue={() => { setStep(5); }}
       useBackLabel
       isContinueDisabled={!apiResponse || isError}
       isVoteWithMetadata
     >
-      <Typography sx={{ textAlign: "center" , fontSize : "28px" , fontWeight: 500 }} variant="h4">
+      <Typography sx={{ textAlign: "center", fontSize: "28px", fontWeight: 500 }} variant="h4">
         {t("createGovernanceAction.rationalePinnedToIPFS")}
       </Typography>
       <Link
@@ -98,7 +95,7 @@ export const VoteContextGovTool = ({
         </Box>
       ) : apiResponse ? (
         <>
-          <Typography fontWeight={400} sx={{ textAlign: "center" , mt: 2 }} variant="body1">
+          <Typography fontWeight={400} sx={{ textAlign: "center", mt: 2 }} variant="body1">
             {t("createGovernanceAction.optionalDownloadAndStoreMetadataFile")}
           </Typography>
           <Button
@@ -106,35 +103,38 @@ export const VoteContextGovTool = ({
             onClick={handleDownload}
             size="large"
             startIcon={<img alt="download" src={ICONS.download} />}
-            sx={{ width: "fit-content", alignSelf: "center" , my:3 , height : "48px", px : 7 , fontWeight : 500 }}
+            sx={{ width: "fit-content", alignSelf: "center", my: 3, height: "48px", px: 7, fontWeight: 500 }}
             variant="outlined"
           >
             {t("govActions.voteContextFileName")}
           </Button>
-          <Typography sx={{ textAlign: "center" , my:1 }} variant="body1">
+          <Typography sx={{ textAlign: "center", my: 1 }} variant="body1">
             {t("createGovernanceAction.rePinYourFileToIPFS")}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1 }}>
-         <Typography sx={{ textAlign: "center" ,
+            <Typography
+              sx={{ textAlign: "center",
             "&:hover": {
                   textDecoration: "underline",
-            }, }} variant="body1">
-            {apiResponse.ipfsCid ? (
-              <a
-                href={`https://ipfs.io/ipfs/${apiResponse.ipfsCid}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: "none", color: primaryBlue.c500, cursor: "pointer" }}
-              >
-                <span style={{fontWeight : 500}}>IPFS URI:</span> {`https://ipfs.io/ipfs/${apiResponse.ipfsCid}`}
-              </a>
+            }, }}
+              variant="body1"
+            >
+              {apiResponse.ipfsCid ? (
+                <a
+                  href={`https://ipfs.io/ipfs/${apiResponse.ipfsCid}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: "none", color: primaryBlue.c500, cursor: "pointer" }}
+                >
+                  <span style={{ fontWeight: 500 }}>IPFS URI:</span> {`https://ipfs.io/ipfs/${apiResponse.ipfsCid}`}
+                </a>
             ) : (
               "[URI]"
             )}
-          </Typography>
+            </Typography>
           </Box>
         </>
-      ) :  (
+      ) : (
         <Typography sx={{ textAlign: "center" }} variant="body1">
           {t("createGovernanceAction.uploadingToIPFS")}
         </Typography>

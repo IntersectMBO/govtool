@@ -14,7 +14,6 @@ type VoteContextChoiceProps = {
   setJsonldContent: Dispatch<SetStateAction<NodeObject | null>>;
   setMetadataHash: Dispatch<SetStateAction<string | null>>;
   generateMetadata: () => Promise<{ jsonld: NodeObject; jsonHash: string }>;
-  onCancel: () => void;
 };
 
 export const VoteContextChoice = ({
@@ -23,7 +22,6 @@ export const VoteContextChoice = ({
   setJsonldContent,
   setMetadataHash,
   generateMetadata,
-  onCancel,
 }: VoteContextChoiceProps) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
@@ -44,13 +42,13 @@ export const VoteContextChoice = ({
   };
 
   return (
-    <VoteContextWrapper hideAllBtn={true}>
-        <Typography sx={{ textAlign: "center" , fontWeight : 500 , marginTop: isMobile ? 0 : 1 }} variant="headline4">
-          {t("createGovernanceAction.storingOptionsForYourVoterRationale")}
-        </Typography>
-        <Link
-          onClick={openLink}
-          sx={{
+    <VoteContextWrapper hideAllBtn>
+      <Typography sx={{ textAlign: "center", fontWeight: 500, marginTop: isMobile ? 0 : 1 }} variant="headline4">
+        {t("createGovernanceAction.storingOptionsForYourVoterRationale")}
+      </Typography>
+      <Link
+        onClick={openLink}
+        sx={{
             cursor: "pointer",
             fontSize: 16,
             fontWeight: 500,
@@ -59,30 +57,30 @@ export const VoteContextChoice = ({
             textAlign: "center",
             textDecoration: "none",
           }}
+      >
+        {t("createGovernanceAction.learnMoreAboutStoringInformation")}
+      </Link>
+      <Spacer y={isMobile ? 14 : 16} />
+      <Typography sx={{ textAlign: "center", fontWeight: 700 }} variant="body1">
+        {t("createGovernanceAction.chooseDataStorageOption")}
+      </Typography>
+      <Spacer y={4} />
+      <Box sx={{ display: "flex", flexDirection: isMobile ? "column" : "row", width: "100%", justifyContent: isMobile ? "none" : "space-between", gap: isMobile ? "14px" : "0px" }}>
+        <Button
+          variant="outlined"
+          onClick={handleLetGovToolStore}
+          sx={{ width: isMobile ? "100%" : "259px", whiteSpace: "nowrap", height: "48px", fontWeight: "500" }}
         >
-          {t("createGovernanceAction.learnMoreAboutStoringInformation")}
-        </Link>
-        <Spacer y={isMobile ? 14 : 16} />
-        <Typography sx={{ textAlign: "center" , fontWeight: 700 }} variant="body1">
-          {t("createGovernanceAction.chooseDataStorageOption")}
-        </Typography>
-        <Spacer y={4}/>
-        <Box sx={{ display: "flex", flexDirection: isMobile ? "column" : "row" ,  width: "100%", justifyContent: isMobile ? "none" : "space-between" , gap: isMobile ? "14px" : "0px" }}>
-          <Button
-            variant="outlined"
-            onClick={handleLetGovToolStore}
-            sx={{ width: isMobile ? "100%" : "259px", whiteSpace: "nowrap" , height:"48px" , fontWeight:"500" }}
-          >
-            {t("createGovernanceAction.govToolPinsDataToIPFS")}
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={handleStoreItMyself}
-            sx={{ width: isMobile ? "100%" :  "287px", whiteSpace: "nowrap" , height:"48px" , fontWeight:"500" }}
-          >
-            {t("createGovernanceAction.downloadAndStoreYourself")}
-          </Button>
-        </Box>
+          {t("createGovernanceAction.govToolPinsDataToIPFS")}
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={handleStoreItMyself}
+          sx={{ width: isMobile ? "100%" : "287px", whiteSpace: "nowrap", height: "48px", fontWeight: "500" }}
+        >
+          {t("createGovernanceAction.downloadAndStoreYourself")}
+        </Button>
+      </Box>
     </VoteContextWrapper>
   );
 };

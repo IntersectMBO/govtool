@@ -38,8 +38,6 @@ type Props = {
 
 export const useVoteActionForm = ({
   previousVote,
-  voteContextHash,
-  voteContextUrl,
   closeModal,
 }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +52,6 @@ export const useVoteActionForm = ({
 
   const {
     control,
-    handleSubmit,
     formState: { errors, isDirty },
     setValue,
     register: registerInput,
@@ -73,52 +70,55 @@ export const useVoteActionForm = ({
     index !== null &&
     !areFormErrors;
 
-  const confirmVote = useCallback(
-    async (
-      vote?: Vote,
-      url?: string,
-      hash?: string | null,
-    ) => {
-      if (!canVote || !vote) return;
+ const confirmVote = useCallback(
+  async (
+    voteValue?: Vote,
+    url?: string,
+    hashValue?: string | null,
+  ) => {
+    if (!canVote || !voteValue) return;
 
-      setIsLoading(true);
+    setIsLoading(true);
 
-      const urlSubmitValue = url ?? "";
-      const hashSubmitValue = hash ?? "";
+    const urlSubmitValue = url ?? "";
+    const hashSubmitValue = hashValue ?? "";
 
-      try {
-        const isPendingTx = isPendingTransaction();
-        if (isPendingTx) return;
-        const votingBuilder = await buildVote(
-          vote,
-          txHash,
-          index,
-          urlSubmitValue,
-          hashSubmitValue,
-        );
-        const result = await buildSignSubmitConwayCertTx({
-          votingBuilder,
-          type: "vote",
-          resourceId: txHash + index,
+    try {
+      const isPendingTx = isPendingTransaction();
+      if (isPendingTx) return;
+
+      const votingBuilder = await buildVote(
+        voteValue,
+        txHash,
+        index,
+        urlSubmitValue,
+        hashSubmitValue,
+      );
+
+      const result = await buildSignSubmitConwayCertTx({
+        votingBuilder,
+        type: "vote",
+        resourceId: txHash + index,
+      });
+
+      if (result) {
+        addSuccessAlert("Vote submitted");
+        navigate(PATHS.dashboardGovernanceActions, {
+          state: {
+            isVotedListOnLoad: !!previousVote?.vote,
+          },
         });
-        if (result) {
-          addSuccessAlert("Vote submitted");
-          navigate(PATHS.dashboardGovernanceActions, {
-            state: {
-              isVotedListOnLoad: !!previousVote?.vote,
-            },
-          });
-          closeModal();
-        }
-      } catch (error) {
-        openWalletErrorModal({
-          error,
-          dataTestId: "vote-transaction-error-modal",
-        });
-      } finally {
-        setIsLoading(false);
+        closeModal();
       }
-    },
+    } catch (error) {
+      openWalletErrorModal({
+        error,
+        dataTestId: "vote-transaction-error-modal",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  },
     [buildVote, buildSignSubmitConwayCertTx, txHash, index, canVote],
   );
 

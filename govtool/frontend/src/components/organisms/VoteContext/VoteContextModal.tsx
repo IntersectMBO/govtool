@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
 
 import { ModalWrapper } from "@atoms";
 import { useModal } from "@context";
@@ -13,7 +13,6 @@ import {
 } from "@organisms";
 import { NodeObject } from "jsonld";
 import { VoteContextFormValues, useVoteContextForm } from "@hooks";
-import { UseFormReturn } from "react-hook-form";
 import { Vote } from "@/models";
 
 export type VoteContextModalState = {
@@ -144,7 +143,6 @@ const VoteContextFlow = ({
           setJsonldContent={setJsonldContent}
           setMetadataHash={setMetadataHash}
           generateMetadata={generateMetadata}
-          onCancel={onCancel}
         />
       )}
       {step === 3 && storeDataYourself && (
@@ -157,7 +155,7 @@ const VoteContextFlow = ({
           submitVoteContext={submitVoteContext}
           jsonldContent={jsonldContent}
           metadataHash={metadataHash}
-          setValue={methods.setValue} 
+          setValue={methods.setValue}
         />
       )}
       {step === 4 && (

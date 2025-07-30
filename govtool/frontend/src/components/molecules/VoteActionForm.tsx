@@ -3,7 +3,6 @@ import { Box } from "@mui/material";
 import { Trans } from "react-i18next";
 
 import { Button, Radio, Typography } from "@atoms";
-import { fadedPurple } from "@/consts";
 import { useModal } from "@context";
 import {
   useScreenDimension,
@@ -13,6 +12,7 @@ import {
   useGetVoteContextTextFromFile,
 } from "@hooks";
 import { formatDisplayDate } from "@utils";
+import { fadedPurple } from "@/consts";
 import { ProposalData, ProposalVote, Vote } from "@/models";
 import { VoteContextModalState, SubmittedVotesModalState } from "../organisms";
 
@@ -36,9 +36,9 @@ export const VoteActionForm = ({
     useState<boolean>(false);
 
   const { voter } = useGetVoterInfo();
-  const { voteContextText } = useGetVoteContextTextFromFile(voteContextUrl , voteContextHash);
+  const { voteContextText } = useGetVoteContextTextFromFile(voteContextUrl, voteContextHash);
 
-  const { isMobile, screenWidth } = useScreenDimension();
+  const { isMobile } = useScreenDimension();
   const { openModal, closeModal } = useModal();
   const { t } = useTranslation();
 
@@ -60,11 +60,11 @@ export const VoteActionForm = ({
           setVoteContextUrl(url);
           setVoteContextHash(hash ?? undefined);
           confirmVote(vote as Vote, url, hash);
-          setVoteContextData(url , hash);
+          setVoteContextData(url, hash);
         },
         vote: vote as Vote,
         confirmVote,
-        previousRationale : isVoteChanged?undefined:voteContextText
+        previousRationale: isVoteChanged ? undefined : voteContextText
       } satisfies VoteContextModalState,
     });
   };
@@ -78,7 +78,6 @@ export const VoteActionForm = ({
     if (previousVote?.vote) {
       setValue("vote", previousVote.vote);
       setIsVoteSubmitted(true);
-      
     }
   }, [previousVote?.vote, setValue, setIsVoteSubmitted]);
 
@@ -90,32 +89,32 @@ export const VoteActionForm = ({
       setVoteContextHash(previousVote.metadataHash);
     }
   }, [previousVote?.url, setVoteContextUrl]);
-  
+
   const renderCancelButton = useMemo(
     () => (
       <Button
-      data-testid="cancel-button"
-      onClick={() => setValue("vote", previousVote?.vote ?? "")}
+        data-testid="cancel-button"
+        onClick={() => setValue("vote", previousVote?.vote ?? "")}
         variant="outlined"
         size="extraLarge"
         sx={{
           width: "100%",
         }}
-        >
+      >
         {t("cancel")}
       </Button>
     ),
     [previousVote?.vote, setValue],
   );
-  
+
   const renderChangeVoteButton = useMemo(
     () => (
       <Button
-      data-testid="change-vote"
-      onClick={ ()=>handleVoteClick(true)}
-      disabled={!canVote}
-      isLoading={isVoteLoading}
-      variant="contained"
+        data-testid="change-vote"
+        onClick={() => handleVoteClick(true)}
+        disabled={!canVote}
+        isLoading={isVoteLoading}
+        variant="contained"
         sx={{
           borderRadius: 50,
           textTransform: "none",
@@ -129,10 +128,6 @@ export const VoteActionForm = ({
     [confirmVote, areFormErrors, vote, isVoteLoading],
   );
 
-  useEffect(()=>{
-    console.log(previousVote?.metadataHash , voteContextHash)
-  } , [previousVote?.metadataHash , voteContextHash])
-  
   return (
     <Box
       sx={{
@@ -249,19 +244,19 @@ export const VoteActionForm = ({
         )}
         {voteContextText && (
           <>
-          <Typography sx={{fontSize : "14px" , fontWeight : 500}}>{t("govActions.yourVoteRationale")}</Typography>
-          <Box
-            sx={{
+            <Typography sx={{ fontSize: "14px", fontWeight: 500 }}>{t("govActions.yourVoteRationale")}</Typography>
+            <Box
+              sx={{
               display: "flex",
               flexDirection: "column",
-              justifyContent : "space-between",
+              justifyContent: "space-between",
               width: "100%",
               mt: 2,
             }}
-          >
-          {voteContextText && (
-          <Box
-            sx={{
+            >
+              {voteContextText && (
+              <Box
+                sx={{
               position: "relative",
               width: "100%",
               mt: 2,
@@ -270,10 +265,10 @@ export const VoteActionForm = ({
               backgroundColor: !showWholeVoteContext ? fadedPurple.c50 : "transparent",
               padding: 2,
             }}
-          >
-            <Typography
-              variant="body2"
-              sx={{
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
                 fontWeight: 400,
                 color: "neutralGray",
                 whiteSpace: "pre-wrap",
@@ -285,13 +280,13 @@ export const VoteActionForm = ({
                   WebkitLineClamp: 2,
                 }),
               }}
-            >
-      {voteContextText}
-    </Typography>
+                >
+                  {voteContextText}
+                </Typography>
 
-      {!showWholeVoteContext && (
-        <Box
-          sx={{
+                {!showWholeVoteContext && (
+                <Box
+                  sx={{
             display: "flex",
             justifyContent: "flex-end",
             position: "absolute",
@@ -299,42 +294,41 @@ export const VoteActionForm = ({
             right: 16,
             background: fadedPurple.c50,
           }}
-        >
-          <Button
-            onClick={() => setShowWholeVoteContext(true)}
-            sx={{
+                >
+                  <Button
+                    onClick={() => setShowWholeVoteContext(true)}
+                    sx={{
               p: 0,
               minWidth: "unset",
               ":hover": { backgroundColor: "transparent" },
             }}
-            disableRipple
-            variant="text"
-            data-testid="external-modal-button"
-          >
-            <Typography
-              variant="body2"
-              sx={{
+                    disableRipple
+                    variant="text"
+                    data-testid="external-modal-button"
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
                 fontWeight: 400,
                 color: "primaryBlue",
                 borderBottom: "1px solid",
               }}
-            >
-              {t("showMore")}
-            </Typography>
-          </Button>
-        </Box>
+                    >
+                      {t("showMore")}
+                    </Typography>
+                  </Button>
+                </Box>
       )}
-    </Box>
+              </Box>
   )}
 
-          </Box>
+            </Box>
           </>
         )}
 
-        <Box sx={{ mt: 4 }}>
-        </Box>
+        <Box sx={{ mt: 4 }} />
       </Box>
-      {previousVote?.vote && previousVote?.vote !== vote  ? (
+      {previousVote?.vote && previousVote?.vote !== vote ? (
         <Box
           display="flex"
           flexDirection={isMobile ? "column" : "row"}
@@ -355,7 +349,7 @@ export const VoteActionForm = ({
               : !vote || areFormErrors
           }
           isLoading={isVoteLoading}
-          onClick={()=>handleVoteClick(false)}
+          onClick={() => handleVoteClick(false)}
           size="extraLarge"
         >
           {previousVote?.vote && previousVote?.vote === vote

@@ -1,10 +1,10 @@
-{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE NamedFieldPuns    #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TypeOperators     #-}
 {-# LANGUAGE ViewPatterns      #-}
+{-# LANGUAGE DataKinds #-}
 
 module VVA.API where
 
@@ -13,7 +13,7 @@ import           Control.Exception        (throw, throwIO)
 import           Control.Monad.Except     (runExceptT, throwError)
 import           Control.Monad.Reader
 
-import           Data.Aeson               (Value(..), Array, decode, encode, ToJSON, toJSON)
+import           Data.Aeson               (Value(..), Array, decode, ToJSON, toJSON)
 import           Data.Bool                (Bool)
 import           Data.List                (sortOn, sort)
 import qualified Data.Map                 as Map
@@ -21,6 +21,8 @@ import           Data.Maybe               (Maybe (Nothing), catMaybes, fromMaybe
 import           Data.Ord                 (Down (..))
 import           Data.Text                hiding (any, drop, elem, filter, length, map, null, take)
 import qualified Data.Text                as Text
+import qualified Data.Text.Lazy           as TL
+import qualified Data.Text.Lazy.Encoding  as TL
 import qualified Data.Vector as V
 import           Data.Time.LocalTime      (TimeZone, getCurrentTimeZone)
 
@@ -29,6 +31,7 @@ import           Numeric.Natural          (Natural)
 
 import           Servant.API
 import           Servant.Server
+import           Servant.Exception        (Throws)
 import           System.Random            (randomRIO)
 
 import           Text.Read                (readMaybe)
@@ -45,12 +48,18 @@ import qualified VVA.Proposal             as Proposal
 import qualified VVA.Transaction          as Transaction
 import qualified VVA.Types                as Types
 import           VVA.Types                (App, AppEnv (..),
-                                           AppError (CriticalError, InternalError, ValidationError),
+                                           AppError (CriticalError, InternalError, ValidationError, AppIpfsError),
                                            CacheEnv (..))
 import Data.Time (TimeZone, localTimeToUTC)
+import qualified VVA.Ipfs as Ipfs
+import Data.ByteString.Lazy (ByteString)
+import qualified Data.ByteString.Lazy as BSL
+import Servant.Exception (Throws)
 
 type VVAApi =
-         "drep" :> "list"
+         "ipfs"
+                :> "upload"  :>  QueryParam "fileName" Text :> ReqBody '[PlainText] Text :> Post '[JSON] UploadResponse
+    :<|> "drep" :> "list"
                 :> QueryParam "search" Text
                 :> QueryParams "status" DRepStatus
                 :> QueryParam "sort" DRepSortMode
@@ -89,7 +98,8 @@ type VVAApi =
     :<|> "account" :> Capture "stakeKey" HexText :> Get '[JSON] GetAccountInfoResponse
 
 server :: App m => ServerT VVAApi m
-server = drepList
+server = upload
+    :<|> drepList
     :<|> getVotingPower
     :<|> getVotes
     :<|> drepInfo
@@ -106,6 +116,19 @@ server = drepList
     :<|> getNetworkInfo
     :<|> getNetworkTotalStake
     :<|> getAccountInfo
+
+upload :: App m => Maybe Text -> Text -> m UploadResponse
+upload mFileName fileContentText = do
+  AppEnv {vvaConfig} <- ask
+  let fileContent = TL.encodeUtf8 $ TL.fromStrict fileContentText
+      vvaPinataJwt = pinataApiJwt vvaConfig
+      fileName = fromMaybe "data.txt" mFileName -- Default to data.txt if no filename is provided
+  when (BSL.length fileContent > 1024 * 512) $
+    throwError $ ValidationError "The uploaded file is larger than 500Kb"
+  eIpfsHash <- liftIO $ Ipfs.ipfsUpload vvaPinataJwt fileName fileContent
+  case eIpfsHash of
+    Left err  ->  throwError $ AppIpfsError err
+    Right ipfsHash -> return $  UploadResponse ipfsHash
 
 mapDRepType :: Types.DRepType -> DRepType
 mapDRepType Types.DRep      = NormalDRep

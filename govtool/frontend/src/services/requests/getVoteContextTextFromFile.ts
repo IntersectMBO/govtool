@@ -1,11 +1,16 @@
-import axios from "axios";
+import { postValidate } from "./metadataValidation";
+import { MetadataStandard } from "@/models";
 
-export const getVoteContextTextFromFile = async (url: string | undefined) => {
-  if (!url) {
-    throw new Error("URL is undefined");
+export const getVoteContextTextFromFile = async (url: string | undefined,
+          contextHash : string | undefined) => {
+  if (!url || !contextHash) {
+    throw new Error("Missing Vote Context values");
   }
+  const response = await postValidate({
+    standard: MetadataStandard.CIP100,
+    url,
+    hash: contextHash
+  });
 
-  const response = await axios.get(url);
-
-  return response.data.body?.body?.comment ?? "";
+  return { valid: response.valid, metadata: response.metadata };
 };

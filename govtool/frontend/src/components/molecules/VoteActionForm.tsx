@@ -36,7 +36,12 @@ export const VoteActionForm = ({
     useState<boolean>(false);
 
   const { voter } = useGetVoterInfo();
-  const { voteContextText } = useGetVoteContextTextFromFile(voteContextUrl, voteContextHash);
+  const { voteContextText } = useGetVoteContextTextFromFile(voteContextUrl, voteContextHash) || {};
+
+  const finalVoteContextText =
+  ((previousVote != null || undefined) && !voteContextUrl && !voteContextHash)
+    ? ""
+    : voteContextText;
 
   const { isMobile } = useScreenDimension();
   const { openModal, closeModal } = useModal();
@@ -64,7 +69,7 @@ export const VoteActionForm = ({
         },
         vote: vote as Vote,
         confirmVote,
-        previousRationale: isVoteChanged ? undefined : voteContextText
+        previousRationale: isVoteChanged ? undefined : finalVoteContextText
       } satisfies VoteContextModalState,
     });
   };
@@ -242,7 +247,7 @@ export const VoteActionForm = ({
             {t("govActions.showVotes")}
           </Button>
         )}
-        {voteContextText && (
+        {finalVoteContextText && (
           <>
             <Typography sx={{ fontSize: "14px", fontWeight: 500 }}>{t("govActions.yourVoteRationale")}</Typography>
             <Box
@@ -254,7 +259,7 @@ export const VoteActionForm = ({
               mt: 2,
             }}
             >
-              {voteContextText && (
+              {finalVoteContextText && (
               <Box
                 sx={{
               position: "relative",
@@ -281,7 +286,7 @@ export const VoteActionForm = ({
                 }),
               }}
                 >
-                  {voteContextText}
+                  {finalVoteContextText}
                 </Typography>
 
                 {!showWholeVoteContext && (

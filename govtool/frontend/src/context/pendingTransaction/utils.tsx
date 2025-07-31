@@ -48,15 +48,26 @@ export const getQueryKey = (
     case "retireAsDirectVoter":
       return [QUERY_KEYS.useGetDRepInfoKey, transaction?.transactionHash];
     case "delegate":
-      return [
-        QUERY_KEYS.getAdaHolderCurrentDelegationKey,
-        transaction?.transactionHash,
-      ];
     case "vote":
       return [
         QUERY_KEYS.getAdaHolderCurrentDelegationKey,
         transaction?.transactionHash,
       ];
+    default:
+      return undefined;
+  }
+};
+
+export const getQueryKeyToInvalidate = (type: TransactionType) => {
+  switch (type) {
+    case "registerAsDrep":
+    case "retireAsDrep":
+    case "registerAsDirectVoter":
+    case "retireAsDirectVoter":
+      return QUERY_KEYS.useGetDRepListInfiniteKey;
+    case "delegate":
+    case "vote":
+      return QUERY_KEYS.useGetProposalsInfiniteKey;
     default:
       return undefined;
   }
@@ -93,4 +104,12 @@ export const refetchData = async (
     return true;
   }
   return undefined;
+};
+
+export const invalidateQuery = async (
+  type: TransactionType,
+  queryClient: QueryClient,
+) => {
+  const queryKey = getQueryKeyToInvalidate(type);
+  if (queryKey) await queryClient.invalidateQueries(queryKey);
 };

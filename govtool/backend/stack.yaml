@@ -4,3 +4,4 @@ packages:
 
 extra-deps:
 - raven-haskell-0.1.4.1@sha256:9187272adc064197528645b5ad9b89163b668f386f34016d97fa646d5c790784
+- http-client-multipart-0.3.0.0@sha256:d675f10cba69c98233467dd533ba46e64f34798fc2ea528efe662ad2ea6c89bf,554

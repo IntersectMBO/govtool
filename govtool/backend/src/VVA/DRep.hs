@@ -13,56 +13,59 @@ import           Crypto.Hash
 
 import           Data.Aeson                         (Value)
 import           Data.ByteString                    (ByteString)
-import qualified  Data.ByteString.Base16             as Base16
-import qualified  Data.ByteString.Char8              as C
+import qualified Data.ByteString.Base16             as Base16
+import qualified Data.ByteString.Char8              as C
 import           Data.FileEmbed                     (embedFile)
 import           Data.Foldable                      (Foldable (sum))
 import           Data.Has                           (Has)
-import qualified  Data.Map                           as M
+import qualified Data.Map                           as M
 import           Data.Maybe                         (fromMaybe, isJust, isNothing)
 import           Data.Scientific
 import           Data.String                        (fromString)
-import           Data.Text                          (Text, pack, unpack, intercalate)
-import qualified  Data.Text.Encoding                 as Text
+import           Data.Text                          (Text, intercalate, pack, unpack)
+import qualified Data.Text.Encoding                 as Text
 import           Data.Time
 
-import qualified  Database.PostgreSQL.Simple         as SQL
-import           Database.PostgreSQL.Simple.Types   (In(..))
+import qualified Database.PostgreSQL.Simple         as SQL
 import           Database.PostgreSQL.Simple.FromRow
+import           Database.PostgreSQL.Simple.Types   (In (..))
 
 import           VVA.Config
 import           VVA.Pool                           (ConnectionPool, withPool)
-import qualified  VVA.Proposal                       as Proposal
-import           VVA.Types                          (AppError, DRepInfo (..), DRepRegistration (..), DRepStatus (..),
-                                                     DRepType (..), Proposal (..), Vote (..), DRepVotingPowerList (..))
+import qualified VVA.Proposal                       as Proposal
+import           VVA.Types                          (AppError, DRepInfo (..), DRepRegistration (..),
+                                                     DRepStatus (..), DRepType (..), DRepVotingPowerList (..),
+                                                     Proposal (..), Vote (..))
 
-data DRepQueryResult = DRepQueryResult
-  { queryDrepHash :: Text
-  , queryDrepView :: Text
-  , queryIsScriptBased :: Bool
-  , queryUrl :: Maybe Text
-  , queryDataHash :: Maybe Text
-  , queryDeposit :: Scientific
-  , queryVotingPower :: Maybe Integer
-  , queryIsActive :: Bool
-  , queryTxHash :: Maybe Text
-  , queryDate :: LocalTime
-  , queryLatestDeposit :: Scientific
-  , queryLatestNonDeregisterVotingAnchorWasNotNull :: Bool
-  , queryMetadataError :: Maybe Text
-  , queryPaymentAddress :: Maybe Text
-  , queryGivenName :: Maybe Text
-  , queryObjectives :: Maybe Text
-  , queryMotivations :: Maybe Text
-  , queryQualifications :: Maybe Text
-  , queryImageUrl :: Maybe Text
-  , queryImageHash :: Maybe Text
-  , queryIdentityReferences :: Maybe Value
-  , queryLinkReferences :: Maybe Value
-  } deriving (Show)
+data DRepQueryResult
+  = DRepQueryResult
+      { queryDrepHash                                  :: Text
+      , queryDrepView                                  :: Text
+      , queryIsScriptBased                             :: Bool
+      , queryUrl                                       :: Maybe Text
+      , queryDataHash                                  :: Maybe Text
+      , queryDeposit                                   :: Scientific
+      , queryVotingPower                               :: Maybe Integer
+      , queryIsActive                                  :: Bool
+      , queryTxHash                                    :: Maybe Text
+      , queryDate                                      :: LocalTime
+      , queryLatestDeposit                             :: Scientific
+      , queryLatestNonDeregisterVotingAnchorWasNotNull :: Bool
+      , queryMetadataError                             :: Maybe Text
+      , queryPaymentAddress                            :: Maybe Text
+      , queryGivenName                                 :: Maybe Text
+      , queryObjectives                                :: Maybe Text
+      , queryMotivations                               :: Maybe Text
+      , queryQualifications                            :: Maybe Text
+      , queryImageUrl                                  :: Maybe Text
+      , queryImageHash                                 :: Maybe Text
+      , queryIdentityReferences                        :: Maybe Value
+      , queryLinkReferences                            :: Maybe Value
+      }
+  deriving (Show)
 
 instance FromRow DRepQueryResult where
-  fromRow = DRepQueryResult 
+  fromRow = DRepQueryResult
     <$> field <*> field <*> field <*> field <*> field <*> field
     <*> field <*> field <*> field <*> field <*> field <*> field
     <*> field <*> field <*> field <*> field <*> field <*> field
@@ -93,7 +96,7 @@ listDReps mSearchQuery = withPool $ \conn -> do
 
   timeZone <- liftIO getCurrentTimeZone
   return
-    [ DRepRegistration 
+    [ DRepRegistration
       (queryDrepHash result)
       (queryDrepView result)
       (queryIsScriptBased result)
@@ -127,7 +130,7 @@ listDReps mSearchQuery = withPool $ \conn -> do
                    | latestDeposit' < 0 && queryLatestNonDeregisterVotingAnchorWasNotNull result = DRep
                    | Data.Maybe.isJust (queryUrl result) = DRep
     ]
-    
+
 getVotingPowerSql :: SQL.Query
 getVotingPowerSql = sqlFrom $(embedFile "sql/get-voting-power.sql")
 
@@ -165,7 +168,7 @@ getVotes drepId selectedProposals = withPool $ \conn -> do
 
       timeZone <- liftIO getCurrentTimeZone
 
-      let votes = 
+      let votes =
             [ Vote proposalId' govActionId' drepId' vote' url' docHash' epochNo' (localTimeToUTC timeZone date') voteTxHash'
             | (proposalId', govActionId', drepId', vote', url', docHash', epochNo', date', voteTxHash') <- results
             , govActionId' `elem` proposalsToSelect
@@ -252,9 +255,9 @@ getDRepsVotingPowerList identifiers = withPool $ \conn -> do
     else do
       resultsPerIdentifier <- forM identifiers $ \identifier -> do
         liftIO $ SQL.query conn getFilteredDRepVotingPowerSql (identifier, identifier)
-      
+
       return $ concat resultsPerIdentifier
-  
+
   return
     [ DRepVotingPowerList view hashRaw votingPower givenName
     | (view, hashRaw, votingPower', givenName) <- results

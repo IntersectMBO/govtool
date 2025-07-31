@@ -12,11 +12,11 @@ import           Data.Aeson                 (Value)
 import           Data.ByteString            (ByteString)
 import           Data.FileEmbed             (embedFile)
 import           Data.Has                   (Has)
+import           Data.Maybe                 (fromMaybe)
 import           Data.String                (fromString)
 import           Data.Text                  (Text, pack, unpack)
 import qualified Data.Text.Encoding         as Text
 import qualified Data.Text.IO               as Text
-import           Data.Maybe                 (fromMaybe)
 
 import qualified Database.PostgreSQL.Simple as SQL
 

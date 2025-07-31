@@ -34,7 +34,7 @@ networkInfo ::
 networkInfo = withPool $ \conn -> do
   result <- liftIO $ SQL.query_ conn networkInfoSql
   current_time <- liftIO getCurrentTime
-  case result of 
+  case result of
     [( network_epoch
      , network_block_no
      , network_name

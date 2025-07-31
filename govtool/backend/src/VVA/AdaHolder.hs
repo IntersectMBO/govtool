@@ -1,12 +1,12 @@
 {-# LANGUAGE FlexibleContexts    #-}
 {-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell     #-}
 {-# LANGUAGE TypeApplications    #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 
 module VVA.AdaHolder where
 
-import           Control.Exception          (try, SomeException)
+import           Control.Exception          (SomeException, try)
 import           Control.Monad.Except
 import           Control.Monad.Reader
 

@@ -1,41 +1,53 @@
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric       #-}
+{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module VVA.Ipfs (ipfsUpload, IpfsError(..)) where
+module VVA.Ipfs
+    ( IpfsError (..)
+    , ipfsUpload
+    ) where
 
-import           Control.Exception              (SomeException, try)
-import           Control.Monad.IO.Class         (liftIO)
-import qualified Data.Aeson                     as A
-import           Data.Aeson                     (FromJSON(parseJSON), withObject, (.:), eitherDecode, ToJSON(..), encode,(.=),object)
-import qualified Data.ByteString.Lazy           as LBS
-import           Data.Text                      (Text)
-import qualified Data.Text.Encoding             as TE
-import           GHC.Generics                   (Generic)
-import           Network.HTTP.Client            (newManager, parseRequest, httpLbs, method, requestHeaders, RequestBody(..), Request, responseBody, responseStatus)
-import           Network.HTTP.Client.TLS        (tlsManagerSettings)
+import           Control.Exception                     (SomeException, try)
+import           Control.Monad.IO.Class                (liftIO)
+
+import           Data.Aeson                            (FromJSON (parseJSON), ToJSON (..), eitherDecode,
+                                                        encode, object, withObject, (.:), (.=))
+import qualified Data.Aeson                            as A
+import qualified Data.ByteString.Lazy                  as LBS
+import qualified Data.ByteString.Lazy.Char8            as LBS8
+import           Data.Text                             (Text)
+import qualified Data.Text                             as T
+import qualified Data.Text.Encoding                    as TE
+import qualified Data.Text.Lazy                        as TL
+import qualified Data.Text.Lazy.Encoding               as TL
+
+import           GHC.Generics                          (Generic)
+
+import           Network.HTTP.Client                   (Request, RequestBody (..), httpLbs, method,
+                                                        newManager, parseRequest, requestHeaders,
+                                                        responseBody, responseStatus)
 import           Network.HTTP.Client.MultipartFormData (formDataBody, partBS, partFileRequestBody)
-import           Network.HTTP.Types.Status      (statusIsSuccessful, Status, status503, status400)
-import qualified Data.ByteString.Lazy.Char8 as LBS8
-import qualified Data.Text.Lazy as TL
-import qualified Data.Text.Lazy.Encoding as TL
-import qualified Data.Text as T
-import           Servant.Server                 (ServerError (errBody))
-import           Servant.Exception              (ToServantErr(..), Exception(..))
+import           Network.HTTP.Client.TLS               (tlsManagerSettings)
+import           Network.HTTP.Types.Status             (Status, status400, status503, statusIsSuccessful)
+
+import           Servant.Exception                     (Exception (..), ToServantErr (..))
+import           Servant.Server                        (ServerError (errBody))
 
 
-data PinataData = PinataData
-  { cid    :: Text
-  , size     :: Int
-  , created_at   :: Text
-  , isDuplicate :: Maybe Bool
-  } deriving (Show, Generic)
+data PinataData
+  = PinataData
+      { cid         :: Text
+      , size        :: Int
+      , created_at  :: Text
+      , isDuplicate :: Maybe Bool
+      }
+  deriving (Generic, Show)
 
 instance FromJSON PinataData
 
-data PinataSuccessResponse = PinataSuccessResponse
-  { pinataData :: PinataData
-  } deriving (Show)
+newtype PinataSuccessResponse
+  = PinataSuccessResponse { pinataData :: PinataData }
+  deriving (Show)
 
 instance FromJSON PinataSuccessResponse where
   parseJSON = withObject "PinataSuccessResponse" $ \v -> PinataSuccessResponse
@@ -45,9 +57,9 @@ data IpfsError
   = PinataConnectionError String
   | PinataAPIError Status LBS.ByteString
   | PinataDecodingError String LBS.ByteString
-  | IpfsUnconfiguredError 
+  | IpfsUnconfiguredError
   | OtherIpfsError String
-  deriving (Show, Generic)
+  deriving (Generic, Show)
 
 instance ToJSON IpfsError where
   toJSON (PinataConnectionError msg) =
@@ -86,19 +98,19 @@ instance Exception IpfsError
 
 instance ToServantErr IpfsError where
   status (OtherIpfsError _) = status400
-  status _ = status503
+  status _                  = status503
 
   message (PinataConnectionError msg) = T.pack ("Pinata service connection error: " <> msg)
   message (PinataAPIError status body) = T.pack ("Pinata API error: " <> show status <> " - " <> LBS8.unpack body)
   message (PinataDecodingError msg body) = T.pack ("Pinata decoding error: " <> msg <> " - " <> LBS8.unpack body)
-  message IpfsUnconfiguredError = T.pack ("Backend is not configured to support ipfs upload")
+  message IpfsUnconfiguredError = T.pack "Backend is not configured to support ipfs upload"
   message (OtherIpfsError msg) = T.pack msg
 
 ipfsUpload :: Maybe Text -> Text -> LBS.ByteString -> IO (Either IpfsError Text)
 ipfsUpload maybeJwt fileName fileContent =
   case maybeJwt of
-    Nothing -> pure $ Left $ IpfsUnconfiguredError
-    Just "" -> pure $ Left $ IpfsUnconfiguredError 
+    Nothing -> pure $ Left IpfsUnconfiguredError
+    Just "" -> pure $ Left IpfsUnconfiguredError
     Just jwt -> do
       manager <- newManager tlsManagerSettings
       initialRequest <- parseRequest "https://uploads.pinata.cloud/v3/files"

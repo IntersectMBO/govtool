@@ -2,42 +2,43 @@
 {-# LANGUAGE LambdaCase          #-}
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell     #-}
 {-# LANGUAGE TypeApplications    #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 
 module VVA.Proposal where
 
-import           Control.Exception          (throw, SomeException, try)
-import           Control.Monad.Except       (MonadError, throwError)
+import           Control.Exception                  (SomeException, throw, try)
+import           Control.Monad.Except               (MonadError, throwError)
 import           Control.Monad.Reader
 
 import           Data.Aeson
-import           Data.Aeson.Types           (Parser, parseMaybe)
-import           Data.ByteString            (ByteString)
-import           Data.FileEmbed             (embedFile)
-import           Data.Foldable              (fold)
-import           Data.Has                   (Has, getter)
-import qualified  Data.Map                   as Map
-import           Data.Maybe                 (fromMaybe, isJust)
-import           Data.Monoid                (Sum (..), getSum)
+import           Data.Aeson.Types                   (Parser, parseMaybe)
+import           Data.ByteString                    (ByteString)
+import           Data.FileEmbed                     (embedFile)
+import           Data.Foldable                      (fold)
+import           Data.Has                           (Has, getter)
+import qualified Data.Map                           as Map
+import           Data.Maybe                         (fromMaybe, isJust)
+import           Data.Monoid                        (Sum (..), getSum)
 import           Data.Scientific
-import           Data.String                (fromString)
-import           Data.Text                  (Text, pack, unpack)
-import qualified  Data.Text.Encoding         as Text
-import qualified  Data.Text.IO               as Text
+import           Data.String                        (fromString)
+import           Data.Text                          (Text, pack, unpack)
+import qualified Data.Text.Encoding                 as Text
+import qualified Data.Text.IO                       as Text
 import           Data.Time
 
-import qualified  Database.PostgreSQL.Simple as SQL
-import qualified  Database.PostgreSQL.Simple.Types as PG
-import           Database.PostgreSQL.Simple.ToField (ToField(..))
-import           Database.PostgreSQL.Simple.ToRow (ToRow(..))
+import qualified Database.PostgreSQL.Simple         as SQL
+import           Database.PostgreSQL.Simple.ToField (ToField (..))
+import           Database.PostgreSQL.Simple.ToRow   (ToRow (..))
+import qualified Database.PostgreSQL.Simple.Types   as PG
 
-import           GHC.IO.Unsafe              (unsafePerformIO) 
+import           GHC.IO.Unsafe                      (unsafePerformIO)
 
 import           VVA.Config
-import           VVA.Pool                   (ConnectionPool, withPool)
-import           VVA.Types                  (AppError (..), Proposal (..), EnactedProposalDetails (..))
+import           VVA.Pool                           (ConnectionPool, withPool)
+import           VVA.Types                          (AppError (..), EnactedProposalDetails (..),
+                                                     Proposal (..))
 
 query1 :: (SQL.ToRow q, SQL.FromRow r) => SQL.Connection -> SQL.Query -> q -> IO (Maybe r)
 query1 conn q params = do
@@ -52,7 +53,8 @@ sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
 listProposalsSql :: SQL.Query
 listProposalsSql = sqlFrom $(embedFile "sql/list-proposals.sql")
 
-newtype TextArray = TextArray [Text]
+newtype TextArray
+  = TextArray [Text]
 
 instance ToRow TextArray where
   toRow (TextArray texts) = map toField texts
@@ -81,7 +83,7 @@ getProposals ::
 getProposals mSearchTerms = withPool $ \conn -> do
   let searchParam = maybe "" head mSearchTerms
   liftIO $ do
-    result <- try $ SQL.query conn listProposalsSql 
+    result <- try $ SQL.query conn listProposalsSql
       ( searchParam
       , "%" <> searchParam <> "%"
       , "%" <> searchParam <> "%"
@@ -96,7 +98,7 @@ getProposals mSearchTerms = withPool $ \conn -> do
       Right rows -> return rows
 
 latestEnactedProposalSql :: SQL.Query
-latestEnactedProposalSql = 
+latestEnactedProposalSql =
   let rawSql = sqlFrom $(embedFile "sql/get-previous-enacted-governance-action-proposal-details.sql")
   in unsafePerformIO $ do
        putStrLn $ "[DEBUG] SQL query content: " ++ show rawSql
@@ -109,13 +111,13 @@ getPreviousEnactedProposal ::
 getPreviousEnactedProposal proposalType = withPool $ \conn -> do
   let query = latestEnactedProposalSql
   let params = [proposalType]
-  
+
   result <- liftIO $ try $ do
     rows <- SQL.query conn query params :: IO [EnactedProposalDetails]
     case rows of
       [x] -> return (Just x)
       _   -> return Nothing
-  
+
   case result of
     Left err -> do
       throwError $ CriticalError $ "Database error: " <> pack (show (err :: SomeException))
@@ -123,6 +125,6 @@ getPreviousEnactedProposal proposalType = withPool $ \conn -> do
       case proposal of
         Just details -> do
           liftIO $ putStrLn $ "[DEBUG] Previous enacted proposal details: " ++ show details
-        Nothing -> 
+        Nothing ->
           liftIO $ putStrLn "[DEBUG] No previous enacted proposal found"
       return proposal

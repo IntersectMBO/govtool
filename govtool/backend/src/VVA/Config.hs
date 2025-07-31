@@ -68,19 +68,19 @@ instance DefaultConfig DBConfig where
 data VVAConfigInternal
   = VVAConfigInternal
       { -- | db-sync database access.
-        vVAConfigInternalDbsyncconfig                            :: DBConfig
+        vVAConfigInternalDbsyncconfig         :: DBConfig
         -- | Server port.
-      , vVAConfigInternalPort                                    :: Int
+      , vVAConfigInternalPort                 :: Int
         -- | Server host.
-      , vVAConfigInternalHost                                    :: Text
+      , vVAConfigInternalHost                 :: Text
         -- | Request cache duration
-      , vVaConfigInternalCacheDurationSeconds                    :: Int
+      , vVaConfigInternalCacheDurationSeconds :: Int
         -- | Sentry DSN
-      , vVAConfigInternalSentrydsn                               :: String
+      , vVAConfigInternalSentrydsn            :: String
         -- | Sentry environment
-      , vVAConfigInternalSentryEnv                               :: String
+      , vVAConfigInternalSentryEnv            :: String
         -- | Pinata API JWT
-      , vVAConfigInternalPinataApiJwt                            :: Maybe Text
+      , vVAConfigInternalPinataApiJwt         :: Maybe Text
       }
   deriving (FromConfig, Generic, Show)
 
@@ -101,19 +101,19 @@ instance DefaultConfig VVAConfigInternal where
 data VVAConfig
   = VVAConfig
       { -- | db-sync database credentials.
-        dbSyncConnectionString                  :: Text
+        dbSyncConnectionString :: Text
         -- | Server port.
-      , serverPort                              :: Int
+      , serverPort             :: Int
         -- | Server host.
-      , serverHost                              :: Text
+      , serverHost             :: Text
         -- | Request cache duration
-      , cacheDurationSeconds                    :: Int
+      , cacheDurationSeconds   :: Int
         -- | Sentry DSN
-      , sentryDSN                               :: String
+      , sentryDSN              :: String
         -- | Sentry environment
-      , sentryEnv                               :: String
+      , sentryEnv              :: String
         -- | Pinata API JWT
-      , pinataApiJwt                            :: Maybe Text
+      , pinataApiJwt           :: Maybe Text
       }
   deriving (Generic, Show, ToJSON)
 

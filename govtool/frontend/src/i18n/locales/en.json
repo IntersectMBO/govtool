@@ -243,15 +243,33 @@
     "storingInformationStep2Link": "Read full guide",
     "storingInformationStep3Label": "Paste the URL here",
     "storingInformationTitle": "Information Storage Steps",
+    "uploadToIPFSError" : "An Error occured while trying to upload to IPFS",
     "storingInformationURLPlaceholder": "URL",
     "supportingLinks": "Supporting links",
     "title": "Create a Governance Action",
+    "storeAndMaintainDataTitle": "Store and Maintain the Data Yourself",
+    "learnMoreAboutStoringInformation": "Learn more about storing information",
+    "govToolProvidesOptions": "GovTool currently provides two options for storing your rationale:",
+    "govToolCanPinToIPFS": "GovTool can pin it to IPFS",
+    "storeYourselfInRepo": "Store it yourself in a repository such as GitHub",
+    "storingOptionsForYourVoterRationale" : "Storing options for your voter rationale",
+    "chooseDataStorageOption": "Choose a data storage option:",
+    "govToolPinsDataToIPFS": "GovTool pins data to IPFS",
+    "downloadAndStoreYourself": "Download and store yourself",
+    "uploadingToIPFS": "Uploading to IPFS...",
+    "rationalePinnedToIPFS": "GovTool has pinned your rationale to IPFS",
+    "learnMore" : "Learn more",
+    "optionalDownloadAndStoreMetadataFile": "Optional: Download and store a backup copy of your metadata file",
+    "rePinYourFileToIPFS": "Re-pin your file to IPFS",
+    "oneMomentPlease" : "One Moment please",
     "modals": {
       "submitTransactionSuccess": {
         "message": "Your Governance Action may take a little time to submit to the chain.",
         "title": "Governance Action submitted!"
       }
-    }
+    },
+    "back" : "Back",
+    "continue" : "Continue"
   },
   "delegation": {
     "description": "You can delegate your voting power to a DRep or to a pre-defined voting option.",
@@ -434,9 +452,11 @@
     "castVote": "<0>You voted {{vote}} on this proposal</0>\non {{date}} (Epoch {{epoch}})",
     "castVoteDeadline": "You can change your vote up to {{date}} UTC (Epoch {{epoch}})",
     "changeVote": "Change vote",
+    "changeRationale": "Change Rationale",
     "changeYourVote": "Change your vote",
     "chooseHowToVote": "Choose how you want to vote:",
-    "contextAboutYourVote": "Context about your vote",
+    "yourVoteRationale": "Your Vote Rationale",
+    "invalidVoteContext": "Invalid Vote Context",
     "dataMissing": "Data Missing",
     "dataMissingTooltipExplanation": "Please click “View Details” for more information.",
     "details": "Governance Details:",
@@ -450,11 +470,16 @@
     "governanceActionId": "Legacy Governance Action ID (CIP-105):",
     "cip129GovernanceActionId": "Governance Action ID:",
     "governanceActionType": "Governance Action Type:",
+    "voting":{
+        "submitVote": "Submit Vote",
+        "continue": "Continue",
+        "voteWithoutMetadata": "Submit Vote"
+    },
     "goToVote": "Go to Vote",
     "membersToBeRemovedFromTheCommittee": "Members to be removed from the Committee",
     "membersToBeAddedToTheCommittee": "Members to be added to the Committee",
     "changeToTermsOfExistingMembers": "Change to terms of existing members",
-    "changeToTermsEpochs": "To {{epochTo}} epoch {{epochFrom}} epoch",
+    "changeToTermsEpochs": "To {{epochTo}} epoch, from {{epochFrom}} epoch",
     "newThresholdValue": "New threshold value",
     "protocolParamsDetails": {
       "existing": "Existing",

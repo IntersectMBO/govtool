@@ -205,7 +205,14 @@ instance ToParamSchema GovernanceActionType where
       & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [GovernanceActionType])
 
 
-data DRepSortMode = Random | VotingPower | RegistrationDate | Status deriving (Bounded, Enum, Eq, Generic, Read, Show)
+data DRepSortMode = Random | VotingPower | RegistrationDate | Status deriving
+    ( Bounded
+    , Enum
+    , Eq
+    , Generic
+    , Read
+    , Show
+    )
 
 instance FromJSON DRepSortMode where
   parseJSON (Aeson.String dRepSortMode) = pure $ fromJust $ readMaybe (Text.unpack dRepSortMode)
@@ -406,7 +413,8 @@ data ProposalResponse
       }
   deriving (Generic, Show)
 
-newtype ProposalAuthors = ProposalAuthors { getProposalAuthors :: Value }
+newtype ProposalAuthors
+  = ProposalAuthors { getProposalAuthors :: Value }
   deriving newtype (Show)
 
 instance FromJSON ProposalAuthors where
@@ -659,7 +667,7 @@ data DRepInfoResponse
       , dRepInfoResponseGivenName                :: Maybe Text
       , dRepInfoResponseObjectives               :: Maybe Text
       , dRepInfoResponseMotivations              :: Maybe Text
-      , dRepInfoResponseQualifications            :: Maybe Text
+      , dRepInfoResponseQualifications           :: Maybe Text
       , dRepInfoResponseImageUrl                 :: Maybe Text
       , dRepInfoResponseImageHash                :: Maybe HexText
       }
@@ -906,7 +914,7 @@ data DRep
       , dRepGivenName              :: Maybe Text
       , dRepObjectives             :: Maybe Text
       , dRepMotivations            :: Maybe Text
-      , dRepQualifications          :: Maybe Text
+      , dRepQualifications         :: Maybe Text
       , dRepImageUrl               :: Maybe Text
       , dRepImageHash              :: Maybe HexText
       , dRepIdentityReferences     :: Maybe DRepReferences
@@ -1011,11 +1019,11 @@ instance ToSchema DelegationResponse where
 
 data GetNetworkInfoResponse
   = GetNetworkInfoResponse
-    { getNetworkInfoResponseCurrentTime                     :: UTCTime
-    , getNetworkInfoResponseEpochNo                         :: Integer
-    , getNetworkInfoResponseBlockNo                         :: Integer
-    , getNetworkInfoResponseNetworkName                     :: Text
-    }
+      { getNetworkInfoResponseCurrentTime :: UTCTime
+      , getNetworkInfoResponseEpochNo     :: Integer
+      , getNetworkInfoResponseBlockNo     :: Integer
+      , getNetworkInfoResponseNetworkName :: Text
+      }
 
 deriveJSON (jsonOptions "getNetworkInfoResponse") ''GetNetworkInfoResponse
 
@@ -1035,11 +1043,11 @@ instance ToSchema GetNetworkInfoResponse where
 
 data GetNetworkTotalStakeResponse
   = GetNetworkTotalStakeResponse
-    { getNetworkTotalStakeResponseTotalStakeControlledByDReps   :: Integer
-    , getNetworkTotalStakeResponseTotalStakeControlledBySPOs    :: Integer
-    , getNetworkTotalStakeResponseAlwaysAbstainVotingPower      :: Integer
-    , getNetworkTotalStakeResponseAlwaysNoConfidenceVotingPower  :: Integer
-    }
+      { getNetworkTotalStakeResponseTotalStakeControlledByDReps   :: Integer
+      , getNetworkTotalStakeResponseTotalStakeControlledBySPOs    :: Integer
+      , getNetworkTotalStakeResponseAlwaysAbstainVotingPower      :: Integer
+      , getNetworkTotalStakeResponseAlwaysNoConfidenceVotingPower :: Integer
+      }
 
 deriveJSON (jsonOptions "getNetworkTotalStakeResponse") ''GetNetworkTotalStakeResponse
 
@@ -1112,6 +1120,12 @@ data GetAccountInfoResponse
       }
   deriving (Generic, Show)
 deriveJSON (jsonOptions "getAccountInfoResponse") ''GetAccountInfoResponse
+
+newtype UploadResponse
+  = UploadResponse { uploadResponseIpfsCid :: Text }
+  deriving (Generic, Show)
+deriveJSON (jsonOptions "uploadResponse") ''UploadResponse
+
 exampleGetAccountInfoResponse :: Text
 exampleGetAccountInfoResponse =
   "{\"stakeKey\": \"stake1u9\","
@@ -1125,3 +1139,14 @@ instance ToSchema GetAccountInfoResponse where
         & description ?~ "GetAccountInfoResponse"
         & example
           ?~ toJSON exampleGetAccountInfoResponse
+
+exampleUploadResponse :: Text
+exampleUploadResponse =
+  "{\"ipfsHash\": \"QmZKLGf2D3Z3F2J2K5J2L5J2L5J2L5J2L5J2L5J2L5J2L5\"}"
+
+instance ToSchema UploadResponse where
+    declareNamedSchema _ = pure $ NamedSchema (Just "UploadResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "UploadResponse"
+        & example
+          ?~ toJSON exampleUploadResponse

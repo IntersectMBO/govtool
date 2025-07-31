@@ -48,6 +48,7 @@ export const useGetProposalsQuery = ({
       enabled,
       refetchOnWindowFocus: true,
       keepPreviousData: true,
+      cacheTime: Infinity,
     },
   );
 

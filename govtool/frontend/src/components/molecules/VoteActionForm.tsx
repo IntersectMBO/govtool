@@ -3,7 +3,6 @@ import { Box } from "@mui/material";
 import { Trans } from "react-i18next";
 
 import { Button, Radio, Typography } from "@atoms";
-import { orange } from "@consts";
 import { useModal } from "@context";
 import {
   useScreenDimension,
@@ -13,7 +12,8 @@ import {
   useGetVoteContextTextFromFile,
 } from "@hooks";
 import { formatDisplayDate } from "@utils";
-import { ProposalData, ProposalVote } from "@/models";
+import { errorRed, fadedPurple } from "@/consts";
+import { ProposalData, ProposalVote, Vote } from "@/models";
 import { VoteContextModalState, SubmittedVotesModalState } from "../organisms";
 
 type VoteActionFormProps = {
@@ -36,10 +36,16 @@ export const VoteActionForm = ({
     useState<boolean>(false);
 
   const { voter } = useGetVoterInfo();
-  const { voteContextText } = useGetVoteContextTextFromFile(voteContextUrl);
+  const { voteContextText, valid: voteContextValid = true } =
+    useGetVoteContextTextFromFile(voteContextUrl, voteContextHash) || {};
 
-  const { isMobile, screenWidth } = useScreenDimension();
-  const { openModal } = useModal();
+  const finalVoteContextText =
+  ((previousVote != null || undefined) && !voteContextUrl && !voteContextHash)
+    ? ""
+    : voteContextText;
+
+  const { isMobile } = useScreenDimension();
+  const { openModal, closeModal } = useModal();
   const { t } = useTranslation();
 
   const {
@@ -50,7 +56,24 @@ export const VoteActionForm = ({
     setValue,
     vote,
     canVote,
-  } = useVoteActionForm({ previousVote, voteContextHash, voteContextUrl });
+  } = useVoteActionForm({ previousVote, voteContextHash, voteContextUrl, closeModal });
+
+  const handleVoteClick = (isVoteChanged:boolean) => {
+    openModal({
+      type: "voteContext",
+      state: {
+        onSubmit: (url, hash) => {
+          setVoteContextUrl(url);
+          setVoteContextHash(hash ?? undefined);
+          confirmVote(vote as Vote, url, hash);
+          setVoteContextData(url, hash);
+        },
+        vote: vote as Vote,
+        confirmVote,
+        previousRationale: isVoteChanged ? undefined : finalVoteContextText
+      } satisfies VoteContextModalState,
+    });
+  };
 
   const setVoteContextData = (url: string, hash: string | null) => {
     setVoteContextUrl(url);
@@ -67,6 +90,9 @@ export const VoteActionForm = ({
   useEffect(() => {
     if (previousVote?.url) {
       setVoteContextUrl(previousVote.url);
+    }
+     if (previousVote?.metadataHash) {
+      setVoteContextHash(previousVote.metadataHash);
     }
   }, [previousVote?.url, setVoteContextUrl]);
 
@@ -91,7 +117,7 @@ export const VoteActionForm = ({
     () => (
       <Button
         data-testid="change-vote"
-        onClick={confirmVote}
+        onClick={() => handleVoteClick(true)}
         disabled={!canVote}
         isLoading={isVoteLoading}
         variant="contained"
@@ -222,41 +248,42 @@ export const VoteActionForm = ({
             {t("govActions.showVotes")}
           </Button>
         )}
-        <Typography
-          variant="body1"
-          sx={{
-            textTransform: "uppercase",
-            fontSize: "14px",
-            color: orange.c400,
-            mt: 6,
-          }}
-        >
-          {t("optional")}
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{
-            textAlign: "center",
-            mt: "5px",
-          }}
-        >
-          {voteContextText
-            ? t("govActions.contextAboutYourVote")
-            : t("govActions.youCanProvideContext")}
-        </Typography>
-        {voteContextText && (
-          <Box
-            sx={{
+        {
+          !voteContextValid &&
+            <Typography sx={{ fontSize: "14px", fontWeight: 700, color: errorRed.c500 }}>
+                {t("govActions.invalidVoteContext")}
+            </Typography>
+        }
+        {finalVoteContextText && (
+          <>
+            <Typography sx={{ fontSize: "14px", fontWeight: 500 }}>{t("govActions.yourVoteRationale")}</Typography>
+            <Box
+              sx={{
               display: "flex",
               flexDirection: "column",
+              justifyContent: "space-between",
+              width: "100%",
               mt: 2,
             }}
-          >
-            <Typography
-              variant="body2"
-              sx={{
+            >
+              {finalVoteContextText && (
+              <Box
+                sx={{
+              position: "relative",
+              width: "100%",
+              mt: 2,
+              border: !showWholeVoteContext ? "1px solid #E1E1E1" : "none",
+              borderRadius: "4px",
+              backgroundColor: !showWholeVoteContext ? fadedPurple.c50 : "transparent",
+              padding: 2,
+            }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
                 fontWeight: 400,
                 color: "neutralGray",
+                whiteSpace: "pre-wrap",
                 ...(!showWholeVoteContext && {
                   overflow: "hidden",
                   textOverflow: "ellipsis",
@@ -265,78 +292,54 @@ export const VoteActionForm = ({
                   WebkitLineClamp: 2,
                 }),
               }}
-            >
-              {voteContextText}
-            </Typography>
-            <Button
-              onClick={() => {
-                setShowWholeVoteContext((prev) => !prev);
+                >
+                  {finalVoteContextText}
+                </Typography>
+
+                {!showWholeVoteContext && (
+                <Box
+                  sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            position: "absolute",
+            bottom: 8,
+            right: 16,
+            background: fadedPurple.c50,
+          }}
+                >
+                  <Button
+                    onClick={() => setShowWholeVoteContext(true)}
+                    sx={{
+              p: 0,
+              minWidth: "unset",
+              ":hover": { backgroundColor: "transparent" },
+            }}
+                    disableRipple
+                    variant="text"
+                    data-testid="external-modal-button"
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                fontWeight: 400,
+                color: "primaryBlue",
+                borderBottom: "1px solid",
               }}
-              sx={{
-                p: 0,
-                margin: "0 auto",
-                ":hover": {
-                  backgroundColor: "transparent",
-                },
-              }}
-              disableRipple
-              variant="text"
-              data-testid="external-modal-button"
-            >
-              <Typography
-                variant="body2"
-                sx={{
-                  fontWeight: 400,
-                  color: "primaryBlue",
-                  borderBottom: "1px solid",
-                }}
-              >
-                {showWholeVoteContext ? t("showLess") : t("showMore")}
-              </Typography>
-            </Button>
-          </Box>
+                    >
+                      {t("showMore")}
+                    </Typography>
+                  </Button>
+                </Box>
+      )}
+              </Box>
+  )}
+
+            </Box>
+          </>
         )}
-        <Button
-          variant="outlined"
-          onClick={() => {
-            openModal({
-              type: "voteContext",
-              state: {
-                onSubmit: setVoteContextData,
-              } satisfies VoteContextModalState,
-            });
-          }}
-          sx={{
-            mt: voteContextText ? "40px" : "12px",
-            fontSize:
-              screenWidth < 390
-                ? "12px"
-                : screenWidth < 1036
-                ? "14px"
-                : screenWidth < 1080
-                ? "10.5px"
-                : screenWidth < 1480
-                ? "11.5px"
-                : "14px",
-          }}
-          data-testid="provide-context-button"
-        >
-          {voteContextText
-            ? t("govActions.provideNewContextAboutYourVote")
-            : t("govActions.provideContextAboutYourVote")}
-        </Button>
+
+        <Box sx={{ mt: 4 }} />
       </Box>
-      <Typography
-        sx={{
-          mb: 2,
-          mt: 3,
-          textAlign: "center",
-          visibility: previousVote?.vote ? "visible" : "hidden",
-        }}
-        variant="caption"
-      >
-        {t("govActions.selectDifferentOption")}
-      </Typography>
       {previousVote?.vote && previousVote?.vote !== vote ? (
         <Box
           display="flex"
@@ -348,21 +351,22 @@ export const VoteActionForm = ({
           {isMobile ? renderCancelButton : renderChangeVoteButton}
         </Box>
       ) : (
+        // this button appears on gov action detail page to change vote or rationale.
         <Button
           data-testid="vote-button"
           variant="contained"
           disabled={
-            !vote ||
-            areFormErrors ||
-            (previousVote?.vote === vote &&
-              (previousVote.metadataHash === voteContextHash ||
-                !voteContextHash))
+            (previousVote?.vote && previousVote?.vote === vote)
+              ? false
+              : !vote || areFormErrors
           }
           isLoading={isVoteLoading}
-          onClick={confirmVote}
+          onClick={() => handleVoteClick(false)}
           size="extraLarge"
         >
-          {t("govActions.vote")}
+          {previousVote?.vote && previousVote?.vote === vote
+            ? t("govActions.changeRationale")
+            : t("govActions.vote")}
         </Button>
       )}
     </Box>

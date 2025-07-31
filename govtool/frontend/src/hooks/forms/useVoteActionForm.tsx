@@ -7,7 +7,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { PATHS } from "@consts";
 import { useCardano, useSnackbar } from "@context";
 import { useWalletErrorModal } from "@hooks";
-import { ProposalVote } from "@/models";
+import { ProposalVote, Vote } from "@/models";
 
 export interface VoteActionFormValues {
   vote: string;
@@ -33,12 +33,12 @@ type Props = {
   previousVote?: ProposalVote | null;
   voteContextHash?: string;
   voteContextUrl?: string;
+  closeModal: () => void;
 };
 
 export const useVoteActionForm = ({
   previousVote,
-  voteContextHash,
-  voteContextUrl,
+  closeModal,
 }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const { buildSignSubmitConwayCertTx, buildVote, isPendingTransaction } =
@@ -52,7 +52,6 @@ export const useVoteActionForm = ({
 
   const {
     control,
-    handleSubmit,
     formState: { errors, isDirty },
     setValue,
     register: registerInput,
@@ -71,52 +70,60 @@ export const useVoteActionForm = ({
     index !== null &&
     !areFormErrors;
 
-  const confirmVote = useCallback(
-    async (values: VoteActionFormValues) => {
-      if (!canVote) return;
+ const confirmVote = useCallback(
+  async (
+    voteValue?: Vote,
+    url?: string,
+    hashValue?: string | null,
+  ) => {
+    if (!canVote || !voteValue) return;
 
-      setIsLoading(true);
+    setIsLoading(true);
 
-      const urlSubmitValue = voteContextUrl ?? "";
-      const hashSubmitValue = voteContextHash ?? "";
+    const urlSubmitValue = url ?? "";
+    const hashSubmitValue = hashValue ?? "";
 
-      try {
-        const isPendingTx = isPendingTransaction();
-        if (isPendingTx) return;
-        const votingBuilder = await buildVote(
-          values.vote,
-          txHash,
-          index,
-          urlSubmitValue,
-          hashSubmitValue,
-        );
-        const result = await buildSignSubmitConwayCertTx({
-          votingBuilder,
-          type: "vote",
-          resourceId: txHash + index,
+    try {
+      const isPendingTx = isPendingTransaction();
+      if (isPendingTx) return;
+
+      const votingBuilder = await buildVote(
+        voteValue,
+        txHash,
+        index,
+        urlSubmitValue,
+        hashSubmitValue,
+      );
+
+      const result = await buildSignSubmitConwayCertTx({
+        votingBuilder,
+        type: "vote",
+        resourceId: txHash + index,
+      });
+
+      if (result) {
+        addSuccessAlert("Vote submitted");
+        navigate(PATHS.dashboardGovernanceActions, {
+          state: {
+            isVotedListOnLoad: !!previousVote?.vote,
+          },
         });
-        if (result) {
-          addSuccessAlert("Vote submitted");
-          navigate(PATHS.dashboardGovernanceActions, {
-            state: {
-              isVotedListOnLoad: !!previousVote?.vote,
-            },
-          });
-        }
-      } catch (error) {
-        openWalletErrorModal({
-          error,
-          dataTestId: "vote-transaction-error-modal",
-        });
-      } finally {
-        setIsLoading(false);
+        closeModal();
       }
-    },
+    } catch (error) {
+      openWalletErrorModal({
+        error,
+        dataTestId: "vote-transaction-error-modal",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  },
     [buildVote, buildSignSubmitConwayCertTx, txHash, index, canVote],
   );
 
   return {
-    confirmVote: handleSubmit(confirmVote),
+    confirmVote,
     setValue,
     vote,
     registerInput,

@@ -13,44 +13,52 @@ import           Control.Exception        (throw, throwIO)
 import           Control.Monad.Except     (runExceptT, throwError)
 import           Control.Monad.Reader
 
-import           Data.Aeson               (Value(..), Array, decode, encode, ToJSON, toJSON)
+import           Data.Aeson               (Array, ToJSON, Value (..), decode, toJSON)
 import           Data.Bool                (Bool)
-import           Data.List                (sortOn, sort)
+import           Data.ByteString.Lazy     (ByteString)
+import qualified Data.ByteString.Lazy     as BSL
+import           Data.List                (sort, sortOn)
 import qualified Data.Map                 as Map
 import           Data.Maybe               (Maybe (Nothing), catMaybes, fromMaybe, mapMaybe)
 import           Data.Ord                 (Down (..))
 import           Data.Text                hiding (any, drop, elem, filter, length, map, null, take)
 import qualified Data.Text                as Text
-import qualified Data.Vector as V
+import qualified Data.Text.Lazy           as TL
+import qualified Data.Text.Lazy.Encoding  as TL
+import           Data.Time                (TimeZone, localTimeToUTC)
 import           Data.Time.LocalTime      (TimeZone, getCurrentTimeZone)
-
+import qualified Data.Vector              as V
 
 import           Numeric.Natural          (Natural)
 
 import           Servant.API
+import           Servant.Exception        (Throws)
 import           Servant.Server
+
 import           System.Random            (randomRIO)
 
 import           Text.Read                (readMaybe)
 
+import           VVA.Account              as Account
 import qualified VVA.AdaHolder            as AdaHolder
 import           VVA.API.Types
 import           VVA.Cache                (cacheRequest)
 import           VVA.Config
 import qualified VVA.DRep                 as DRep
 import qualified VVA.Epoch                as Epoch
+import qualified VVA.Ipfs                 as Ipfs
 import           VVA.Network              as Network
-import           VVA.Account              as Account
 import qualified VVA.Proposal             as Proposal
 import qualified VVA.Transaction          as Transaction
 import qualified VVA.Types                as Types
 import           VVA.Types                (App, AppEnv (..),
-                                           AppError (CriticalError, InternalError, ValidationError),
+                                           AppError (AppIpfsError, CriticalError, InternalError, ValidationError),
                                            CacheEnv (..))
-import Data.Time (TimeZone, localTimeToUTC)
 
 type VVAApi =
-         "drep" :> "list"
+         "ipfs"
+                :> "upload"  :>  QueryParam "fileName" Text :> ReqBody '[PlainText] Text :> Post '[JSON] UploadResponse
+    :<|> "drep" :> "list"
                 :> QueryParam "search" Text
                 :> QueryParams "status" DRepStatus
                 :> QueryParam "sort" DRepSortMode
@@ -89,7 +97,8 @@ type VVAApi =
     :<|> "account" :> Capture "stakeKey" HexText :> Get '[JSON] GetAccountInfoResponse
 
 server :: App m => ServerT VVAApi m
-server = drepList
+server = upload
+    :<|> drepList
     :<|> getVotingPower
     :<|> getVotes
     :<|> drepInfo
@@ -106,6 +115,19 @@ server = drepList
     :<|> getNetworkInfo
     :<|> getNetworkTotalStake
     :<|> getAccountInfo
+
+upload :: App m => Maybe Text -> Text -> m UploadResponse
+upload mFileName fileContentText = do
+  AppEnv {vvaConfig} <- ask
+  let fileContent = TL.encodeUtf8 $ TL.fromStrict fileContentText
+      vvaPinataJwt = pinataApiJwt vvaConfig
+      fileName = fromMaybe "data.txt" mFileName -- Default to data.txt if no filename is provided
+  when (BSL.length fileContent > 1024 * 512) $
+    throwError $ ValidationError "The uploaded file is larger than 500Kb"
+  eIpfsHash <- liftIO $ Ipfs.ipfsUpload vvaPinataJwt fileName fileContent
+  case eIpfsHash of
+    Left err       ->  throwError $ AppIpfsError err
+    Right ipfsHash -> return $  UploadResponse ipfsHash
 
 mapDRepType :: Types.DRepType -> DRepType
 mapDRepType Types.DRep      = NormalDRep
@@ -165,9 +187,9 @@ drepList mSearchQuery statuses mSortMode mPage mPageSize = do
               viewLower = Text.toLower dRepRegistrationView
               hashLower = Text.toLower dRepRegistrationDRepHash
           in case dRepRegistrationType of
-              Types.SoleVoter -> 
+              Types.SoleVoter ->
                 searchLower == viewLower || searchLower == hashLower
-              Types.DRep -> 
+              Types.DRep ->
                 True
 
 
@@ -295,13 +317,13 @@ getVotes :: App m => HexText -> [GovernanceActionType] -> Maybe GovernanceAction
 getVotes (unHexText -> dRepId) selectedTypes sortMode mSearch = do
   CacheEnv {dRepGetVotesCache} <- asks vvaCache
   (votes, proposals) <- cacheRequest dRepGetVotesCache dRepId $ DRep.getVotes dRepId []
-  
+
   let voteMapById = Map.fromList $
         map (\vote -> (Types.voteGovActionId vote, vote)) votes
-  
-  processedProposals <- filter (isProposalSearchedFor mSearch) <$> 
+
+  processedProposals <- filter (isProposalSearchedFor mSearch) <$>
                         mapSortAndFilterProposals selectedTypes sortMode proposals
-  
+
   return
     [ VoteResponse
       { voteResponseVote = voteToResponse vote
@@ -311,7 +333,7 @@ getVotes (unHexText -> dRepId) selectedTypes sortMode mSearch = do
     , let govActionId = unHexText (proposalResponseTxHash proposalResponse) <> "#" <> pack (show $ proposalResponseIndex proposalResponse)
     , Just vote <- [Map.lookup govActionId voteMapById]
     ]
-    
+
 drepInfo :: App m => HexText -> m DRepInfoResponse
 drepInfo (unHexText -> dRepId) = do
   CacheEnv {dRepInfoCache} <- asks vvaCache
@@ -342,15 +364,15 @@ drepInfo (unHexText -> dRepId) = do
 drepVotingPowerList :: App m => [Text] -> m [DRepVotingPowerListResponse]
 drepVotingPowerList identifiers = do
   CacheEnv {dRepVotingPowerListCache} <- asks vvaCache
-  
+
   let cacheKey = Text.intercalate "," (sort identifiers)
-  
-  results <- cacheRequest dRepVotingPowerListCache cacheKey $ 
+
+  results <- cacheRequest dRepVotingPowerListCache cacheKey $
     DRep.getDRepsVotingPowerList identifiers
-  
+
   return $ map toDRepVotingPowerListResponse results
   where
-    toDRepVotingPowerListResponse Types.DRepVotingPowerList{..} = 
+    toDRepVotingPowerListResponse Types.DRepVotingPowerList{..} =
       DRepVotingPowerListResponse
         { drepVotingPowerListResponseView = drepView
         , drepVotingPowerListResponseHashRaw = HexText drepHashRaw
@@ -433,9 +455,9 @@ getProposal g@(GovActionId govActionTxHash govActionIndex) mDrepId' = do
   let mDrepId = unHexText <$> mDrepId'
   CacheEnv {getProposalCache} <- asks vvaCache
   proposal@Types.Proposal {proposalUrl, proposalDocHash} <- cacheRequest getProposalCache (unHexText govActionTxHash, govActionIndex) (Proposal.getProposal (unHexText govActionTxHash) govActionIndex)
-  
+
   timeZone <- liftIO getCurrentTimeZone
-  
+
   let proposalResponse = proposalToResponse timeZone proposal
   voteResponse <- case mDrepId of
     Nothing -> return Nothing
@@ -455,20 +477,20 @@ getProposal g@(GovActionId govActionTxHash govActionIndex) mDrepId' = do
 getEnactedProposalDetails :: App m => Maybe GovernanceActionType -> m (Maybe EnactedProposalDetailsResponse)
 getEnactedProposalDetails maybeType = do
   let proposalType = maybe "HardForkInitiation" governanceActionTypeToText maybeType
-  
+
   mDetails <- Proposal.getPreviousEnactedProposal proposalType
-  
+
   let response = enactedProposalDetailsToResponse <$> mDetails
-  
+
   return response
   where
     governanceActionTypeToText :: GovernanceActionType -> Text
-    governanceActionTypeToText actionType = 
+    governanceActionTypeToText actionType =
       case actionType of
         HardForkInitiation -> "HardForkInitiation"
-        ParameterChange -> "ParameterChange"
-        _ -> "HardForkInitiation"
-    
+        ParameterChange    -> "ParameterChange"
+        _                  -> "HardForkInitiation"
+
     enactedProposalDetailsToResponse :: Types.EnactedProposalDetails -> EnactedProposalDetailsResponse
     enactedProposalDetailsToResponse Types.EnactedProposalDetails{..} =
       EnactedProposalDetailsResponse
@@ -490,7 +512,7 @@ getTransactionStatus (unHexText -> transactionId) = do
   return $ GetTransactionStatusResponse $ case status of
     Just value -> Just $ toJSON value
     Nothing    -> Nothing
-    
+
 throw500 :: App m => m ()
 throw500 = throwError $ CriticalError "intentional system break for testing purposes"
 

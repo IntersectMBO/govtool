@@ -1,21 +1,24 @@
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell  #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module VVA.Account where
 
 import           Control.Monad.Except       (MonadError, throwError)
 import           Control.Monad.Reader       (MonadIO, MonadReader, liftIO)
+
 import           Data.ByteString            (ByteString)
 import           Data.FileEmbed             (embedFile)
+import           Data.Has                   (Has)
 import           Data.String                (fromString)
-import qualified Database.PostgreSQL.Simple as SQL
-import           VVA.Types                  (AppError(..), AccountInfo(..))
 import           Data.Text                  (Text, unpack)
 import qualified Data.Text.Encoding         as Text
 import qualified Data.Text.IO               as Text
-import           Data.Has                   (Has)
+
+import qualified Database.PostgreSQL.Simple as SQL
+
 import           VVA.Pool                   (ConnectionPool, withPool)
+import           VVA.Types                  (AccountInfo (..), AppError (..))
 
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom = fromString . unpack . Text.decodeUtf8

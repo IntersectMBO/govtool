@@ -1,36 +1,38 @@
-{-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE ConstraintKinds       #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NamedFieldPuns        #-}
-{-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeApplications      #-}
 
 module VVA.Types where
 
 import           Control.Concurrent.QSem
 import           Control.Exception
-import           Control.Monad.Except                  (MonadError)
-import           Control.Monad.Fail                    (MonadFail)
-import           Control.Monad.IO.Class                (MonadIO)
-import           Control.Monad.Reader                  (MonadReader)
-import qualified Data.Aeson                            as A
-import           Data.Aeson                            (Value, ToJSON (..), object, (.=))
-import qualified  Data.Cache as Cache
-import           Data.Has
-import           Data.Pool                             (Pool)
-import           Data.Text                             (Text)
-import           Data.Time                             (UTCTime, LocalTime)
-import           Data.Scientific
+import           Control.Monad.Except                 (MonadError)
+import           Control.Monad.Fail                   (MonadFail)
+import           Control.Monad.IO.Class               (MonadIO)
+import           Control.Monad.Reader                 (MonadReader)
 
-import           Database.PostgreSQL.Simple            (Connection)
+import           Data.Aeson                           (ToJSON (..), Value, object, (.=))
+import qualified Data.Aeson                           as A
+import qualified Data.Cache                           as Cache
+import           Data.Has
+import           Data.Pool                            (Pool)
+import           Data.Scientific
+import           Data.Text                            (Text)
+import           Data.Time                            (LocalTime, UTCTime)
+
+import           Database.PostgreSQL.Simple           (Connection)
+import           Database.PostgreSQL.Simple.FromField (FromField (..), ResultError (ConversionFailed),
+                                                       returnError)
 import           Database.PostgreSQL.Simple.FromRow
-import           Database.PostgreSQL.Simple.FromField  (FromField(..), returnError, ResultError(ConversionFailed))
 
 import           VVA.Cache
 import           VVA.Config
-import           VVA.Ipfs                              (IpfsError)
+import           VVA.Ipfs                             (IpfsError)
 
 type App m = (MonadReader AppEnv m, MonadIO m, MonadFail m, MonadError AppError m)
 
@@ -65,10 +67,10 @@ instance Exception AppError
 
 instance ToJSON AppError where
   toJSON (ValidationError msg) = object ["errorType" .= A.String "ValidationError", "message" .= msg]
-  toJSON (NotFoundError msg) = object ["errorType" .= A.String "NotFoundError", "message" .= msg]
-  toJSON (CriticalError msg) = object ["errorType" .= A.String "CriticalError", "message" .= msg]
-  toJSON (InternalError msg) = object ["errorType" .= A.String "InternalError", "message" .= msg]
-  toJSON (AppIpfsError err) =  toJSON err
+  toJSON (NotFoundError msg)   = object ["errorType" .= A.String "NotFoundError", "message" .= msg]
+  toJSON (CriticalError msg)   = object ["errorType" .= A.String "CriticalError", "message" .= msg]
+  toJSON (InternalError msg)   = object ["errorType" .= A.String "InternalError", "message" .= msg]
+  toJSON (AppIpfsError err)    =  toJSON err
 
 data Vote
   = Vote
@@ -114,28 +116,28 @@ data DRepVotingPowerList
       , drepVotingPower :: Integer
       , drepGivenName   :: Maybe Text
       }
-  deriving (Show, Eq)
+  deriving (Eq, Show)
 
-data DRepStatus = Active | Inactive | Retired deriving (Show, Eq, Ord)
+data DRepStatus = Active | Inactive | Retired deriving (Eq, Ord, Show)
 
 instance FromField DRepStatus where
   fromField f mdata = do
     (value :: Text) <- fromField f mdata
     case value of
-      "Active" -> return Active
+      "Active"   -> return Active
       "Inactive" -> return Inactive
-      "Retired" -> return Retired
-      _ -> returnError ConversionFailed f "Invalid DRepStatus"
+      "Retired"  -> return Retired
+      _          -> returnError ConversionFailed f "Invalid DRepStatus"
 
-data DRepType = DRep | SoleVoter deriving (Show, Eq)
+data DRepType = DRep | SoleVoter deriving (Eq, Show)
 
 instance FromField DRepType where
   fromField f mdata = do
     (value :: Text) <- fromField f mdata
     case value of
-      "DRep" -> return DRep
+      "DRep"      -> return DRep
       "SoleVoter" -> return SoleVoter
-      _ -> returnError ConversionFailed f "Invalid DRepType"
+      _           -> returnError ConversionFailed f "Invalid DRepType"
 
 data DRepRegistration
   = DRepRegistration
@@ -155,7 +157,7 @@ data DRepRegistration
       , dRepRegistrationGivenName              :: Maybe Text
       , dRepRegistrationObjectives             :: Maybe Text
       , dRepRegistrationMotivations            :: Maybe Text
-      , dRepRegistrationQualifications          :: Maybe Text
+      , dRepRegistrationQualifications         :: Maybe Text
       , dRepRegistrationImageUrl               :: Maybe Text
       , dRepRegistrationImageHash              :: Maybe Text
       , dRepRegistrationIdentityReferences     :: Maybe Value
@@ -188,37 +190,37 @@ instance FromRow DRepRegistration where
       <*> field -- dRepRegistrationIdentityReferences
       <*> field -- dRepRegistrationLinkReferences
 
-data Proposal 
+data Proposal
   = Proposal
-      { proposalId                    :: Integer
-      , proposalTxHash                :: Text
-      , proposalIndex                 :: Integer
-      , proposalType                  :: Text
-      , proposalDetails               :: Maybe Value
-      , proposalExpiryDate            :: Maybe LocalTime
-      , proposalExpiryEpochNo         :: Maybe Integer
-      , proposalCreatedDate           :: LocalTime
-      , proposalCreatedEpochNo        :: Integer
-      , proposalUrl                   :: Text
-      , proposalDocHash               :: Text
-      , proposalProtocolParams        :: Maybe Value
-      , proposalTitle                 :: Maybe Text
-      , proposalAbstract              :: Maybe Text
-      , proposalMotivation            :: Maybe Text
-      , proposalRationale             :: Maybe Text
-      , proposalDRepYesVotes          :: Integer
-      , proposalDRepNoVotes           :: Integer
-      , proposalDRepAbstainVotes      :: Integer
-      , proposalPoolYesVotes          :: Integer
-      , proposalPoolNoVotes           :: Integer
-      , proposalPoolAbstainVotes      :: Integer
-      , proposalCcYesVotes            :: Integer
-      , proposalCcNoVotes             :: Integer
-      , proposalCcAbstainVotes        :: Integer
-      , proposalPrevGovActionIndex    :: Maybe Integer
-      , proposalPrevGovActionTxHash   :: Maybe Text
-      , proposalJson                  :: Maybe Value
-      , proposalAuthors               :: Maybe Value
+      { proposalId                  :: Integer
+      , proposalTxHash              :: Text
+      , proposalIndex               :: Integer
+      , proposalType                :: Text
+      , proposalDetails             :: Maybe Value
+      , proposalExpiryDate          :: Maybe LocalTime
+      , proposalExpiryEpochNo       :: Maybe Integer
+      , proposalCreatedDate         :: LocalTime
+      , proposalCreatedEpochNo      :: Integer
+      , proposalUrl                 :: Text
+      , proposalDocHash             :: Text
+      , proposalProtocolParams      :: Maybe Value
+      , proposalTitle               :: Maybe Text
+      , proposalAbstract            :: Maybe Text
+      , proposalMotivation          :: Maybe Text
+      , proposalRationale           :: Maybe Text
+      , proposalDRepYesVotes        :: Integer
+      , proposalDRepNoVotes         :: Integer
+      , proposalDRepAbstainVotes    :: Integer
+      , proposalPoolYesVotes        :: Integer
+      , proposalPoolNoVotes         :: Integer
+      , proposalPoolAbstainVotes    :: Integer
+      , proposalCcYesVotes          :: Integer
+      , proposalCcNoVotes           :: Integer
+      , proposalCcAbstainVotes      :: Integer
+      , proposalPrevGovActionIndex  :: Maybe Integer
+      , proposalPrevGovActionTxHash :: Maybe Text
+      , proposalJson                :: Maybe Value
+      , proposalAuthors             :: Maybe Value
       }
   deriving (Show)
 
@@ -255,10 +257,11 @@ instance FromRow Proposal where
       <*> field -- proposalJson
       <*> field -- proposalAuthors
 
-data TransactionStatus = TransactionStatus
-  { transactionConfirmed         :: Bool
-  , votingProcedure :: Maybe Value
-  }
+data TransactionStatus
+  = TransactionStatus
+      { transactionConfirmed :: Bool
+      , votingProcedure      :: Maybe Value
+      }
 
 instance FromRow TransactionStatus where
   fromRow = TransactionStatus <$> field <*> field
@@ -270,13 +273,14 @@ instance ToJSON TransactionStatus where
       , "votingProcedure" .= votingProcedure
       ]
 
-data EnactedProposalDetails = EnactedProposalDetails
-  { enactedProposalDetailsId          :: Integer
-  , enactedProposalDetailsTxId        :: Integer
-  , enactedProposalDetailsIndex       :: Integer
-  , enactedProposalDetailsDescription :: Maybe Value
-  , enactedProposalDetailsHash        :: Text
-  }
+data EnactedProposalDetails
+  = EnactedProposalDetails
+      { enactedProposalDetailsId          :: Integer
+      , enactedProposalDetailsTxId        :: Integer
+      , enactedProposalDetailsIndex       :: Integer
+      , enactedProposalDetailsDescription :: Maybe Value
+      , enactedProposalDetailsHash        :: Text
+      }
   deriving (Show)
 
 instance FromRow EnactedProposalDetails where
@@ -306,20 +310,20 @@ instance ToJSON EnactedProposalDetails where
 
 data CacheEnv
   = CacheEnv
-      { proposalListCache                   :: Cache.Cache () [Proposal]
-      , getProposalCache                    :: Cache.Cache (Text, Integer) Proposal
-      , currentEpochCache                   :: Cache.Cache () (Maybe Value)
-      , adaHolderVotingPowerCache           :: Cache.Cache Text Integer
-      , adaHolderGetCurrentDelegationCache  :: Cache.Cache Text (Maybe Delegation)
-      , dRepGetVotesCache                   :: Cache.Cache Text ([Vote], [Proposal])
-      , dRepInfoCache                       :: Cache.Cache Text DRepInfo
-      , dRepVotingPowerCache                :: Cache.Cache Text Integer
-      , dRepListCache                       :: Cache.Cache Text [DRepRegistration]
-      , networkMetricsCache                 :: Cache.Cache () NetworkMetrics
-      , networkInfoCache                    :: Cache.Cache () NetworkInfo
-      , networkTotalStakeCache              :: Cache.Cache () NetworkTotalStake
-      , dRepVotingPowerListCache            :: Cache.Cache Text [DRepVotingPowerList]
-      , accountInfoCache                    :: Cache.Cache Text AccountInfo
+      { proposalListCache                  :: Cache.Cache () [Proposal]
+      , getProposalCache                   :: Cache.Cache (Text, Integer) Proposal
+      , currentEpochCache                  :: Cache.Cache () (Maybe Value)
+      , adaHolderVotingPowerCache          :: Cache.Cache Text Integer
+      , adaHolderGetCurrentDelegationCache :: Cache.Cache Text (Maybe Delegation)
+      , dRepGetVotesCache                  :: Cache.Cache Text ([Vote], [Proposal])
+      , dRepInfoCache                      :: Cache.Cache Text DRepInfo
+      , dRepVotingPowerCache               :: Cache.Cache Text Integer
+      , dRepListCache                      :: Cache.Cache Text [DRepRegistration]
+      , networkMetricsCache                :: Cache.Cache () NetworkMetrics
+      , networkInfoCache                   :: Cache.Cache () NetworkInfo
+      , networkTotalStakeCache             :: Cache.Cache () NetworkTotalStake
+      , dRepVotingPowerListCache           :: Cache.Cache Text [DRepVotingPowerList]
+      , accountInfoCache                   :: Cache.Cache Text AccountInfo
       }
 
 data NetworkInfo
@@ -335,24 +339,24 @@ data NetworkTotalStake
       { networkTotalStakeControlledByDReps        :: Integer
       , networkTotalStakeControlledBySPOs         :: Integer
       , networkTotalAlwaysAbstainVotingPower      :: Integer
-      , networkTotalAlwaysNoConfidenceVotingPower  :: Integer
+      , networkTotalAlwaysNoConfidenceVotingPower :: Integer
       }
 
 data NetworkMetrics
   = NetworkMetrics
-      { networkMetricsUniqueDelegators                      :: Integer
-      , networkMetricsTotalDelegations                      :: Integer
-      , networkMetricsTotalGovernanceActions                :: Integer
-      , networkMetricsTotalDRepVotes                        :: Integer
-      , networkMetricsTotalRegisteredDReps                  :: Integer
-      , networkMetricsTotalDRepDistr                        :: Integer
-      , networkMetricsTotalActiveDReps                      :: Integer
-      , networkMetricsTotalInactiveDReps                    :: Integer
-      , networkMetricsTotalActiveCIP119CompliantDReps       :: Integer
-      , networkMetricsTotalRegisteredDirectVoters           :: Integer
-      , networkMetricsNoOfCommitteeMembers                  :: Integer
-      , networkMetricsQuorumNumerator                       :: Integer
-      , networkMetricsQuorumDenominator                     :: Integer
+      { networkMetricsUniqueDelegators                :: Integer
+      , networkMetricsTotalDelegations                :: Integer
+      , networkMetricsTotalGovernanceActions          :: Integer
+      , networkMetricsTotalDRepVotes                  :: Integer
+      , networkMetricsTotalRegisteredDReps            :: Integer
+      , networkMetricsTotalDRepDistr                  :: Integer
+      , networkMetricsTotalActiveDReps                :: Integer
+      , networkMetricsTotalInactiveDReps              :: Integer
+      , networkMetricsTotalActiveCIP119CompliantDReps :: Integer
+      , networkMetricsTotalRegisteredDirectVoters     :: Integer
+      , networkMetricsNoOfCommitteeMembers            :: Integer
+      , networkMetricsQuorumNumerator                 :: Integer
+      , networkMetricsQuorumDenominator               :: Integer
       }
 
 data Delegation

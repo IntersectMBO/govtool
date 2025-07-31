@@ -10,6 +10,10 @@ export const useGetVoteContextTextFromFile = (url: string | undefined,
   const { dRepID } = useCardano();
   const { voter } = useGetVoterInfo();
 
+  if (url && url.startsWith("ipfs://")) {
+      url = url.replace("ipfs://", "https://ipfs.io/ipfs/");
+  }
+
   const { data, isLoading } = useQuery(
   [QUERY_KEYS.useGetVoteContextFromFile, url],
   () => getVoteContextTextFromFile(url, contextHash),

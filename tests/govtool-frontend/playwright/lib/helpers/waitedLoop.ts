@@ -9,7 +9,7 @@ export async function waitedLoop(
   const startTime = Date.now();
   while (Date.now() - startTime < timeout) {
     if (await conditionFn()) return true;
-    Logger.info("Retring the function");
+    Logger.info("Retrying the function");
     await new Promise((resolve) => setTimeout(resolve, interval));
   }
   return false;
@@ -36,9 +36,10 @@ export async function functionWaitedAssert(
     } catch (error) {
       if (Date.now() - startTime >= timeout) {
         const errorMessage = options.message || error.message;
+        console.log(errorMessage);
         expect(false, { message: errorMessage }).toBe(true);
       }
-      Logger.info(`Retring the function ${name}`);
+      Logger.info(`Retrying the function ${name}`);
       await new Promise((resolve) => setTimeout(resolve, interval));
     }
   }

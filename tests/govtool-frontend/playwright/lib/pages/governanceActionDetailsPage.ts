@@ -31,6 +31,9 @@ export default class GovernanceActionDetailsPage {
   readonly continueModalBtn = this.page.getByTestId("continue-modal-button");
   readonly confirmModalBtn = this.page.getByTestId("confirm-modal-button");
 
+  readonly downloadAndStoreYourselfOptionBtn = this.page.getByTestId("download-and-store-yourself-option-button")
+  readonly govtoolPinsDatatoIpfsBtn = this.page.getByTestId("govtool-pins-data-to-ipfs-option-button")
+
   readonly voteSuccessModal = this.page.getByTestId("alert-success");
   readonly externalLinkModal = this.page.getByTestId("external-link-modal");
 
@@ -81,10 +84,16 @@ export default class GovernanceActionDetailsPage {
       await this.yesVoteRadio.click();
     }
 
+    await this.voteBtn.click()
+
     if (context) {
-      await this.contextBtn.click();
+      // await this.contextBtn.click();
       await this.contextInput.fill(context);
-      await this.confirmModalBtn.click();
+
+      this.confirmModalBtn.click()
+
+      await this.downloadAndStoreYourselfOptionBtn.click()
+      
       await this.page.getByRole("checkbox").click();
       await this.confirmModalBtn.click();
 
@@ -100,13 +109,8 @@ export default class GovernanceActionDetailsPage {
       await this.page.getByTestId("go-to-vote-modal-button").click();
     }
 
-    const isVoteButtonEnabled = await this.voteBtn.isEnabled();
-
-    await expect(this.voteBtn, {
-      message: !isVoteButtonEnabled && "Vote button is not enabled",
-    }).toBeEnabled({ timeout: 60_000 });
-
-    await this.voteBtn.click();
+    // const isVoteButtonEnabled = await this.voteBtn.isEnabled();
+    // await this.voteBtn.click()
   }
 
   async getDRepNotVoted(

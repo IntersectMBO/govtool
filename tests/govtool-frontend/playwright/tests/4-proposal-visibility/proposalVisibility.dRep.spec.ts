@@ -123,15 +123,25 @@ test.describe("Temporary DReps", async () => {
     await govActionsPage.goto();
 
     const govActionDetailsPage = await govActionsPage.viewFirstProposal();
-    await govActionDetailsPage.vote(faker.lorem.sentence(200));
 
-    await dRepPage.waitForTimeout(5_000);
+    const fakerContext = faker.lorem.sentence(200)
+    await govActionDetailsPage.vote(fakerContext);
+
+    await dRepPage.reload();1
+    await dRepPage.waitForTimeout(5_000);1
 
     await govActionsPage.votedTab.click();
-    await govActionsPage.viewFirstVotedProposal();
+    
+    const votedGovActionDetailsPage =  await govActionsPage.viewFirstVotedProposal();
 
-    //  Vote context is not displayed in UI to validate
-    expect(false, "No vote context displayed").toBe(true);
+    await votedGovActionDetailsPage.currentPage.getByTestId("show-more-button").click()
+
+    await votedGovActionDetailsPage.currentPage.waitForTimeout(2000)
+
+    const voteRationaleContext = await votedGovActionDetailsPage.currentPage.getByTestId("vote-rationale-context")
+    
+    await expect(voteRationaleContext).toContainText(fakerContext);
+
   });
 });
 

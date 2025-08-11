@@ -79,7 +79,7 @@ export default class GovernanceActionDetailsPage {
   }
 
   @withTxConfirmation
-  async vote(context?: string, isAlreadyVoted: boolean = false) {
+  async vote(context?: string, isAlreadyVoted: boolean = false , useIPFSforStorage : boolean = false ){
     if (!isAlreadyVoted) {
       await this.yesVoteRadio.click();
     }
@@ -87,30 +87,33 @@ export default class GovernanceActionDetailsPage {
     await this.voteBtn.click()
 
     if (context) {
-      // await this.contextBtn.click();
       await this.contextInput.fill(context);
 
       this.confirmModalBtn.click()
 
-      await this.downloadAndStoreYourselfOptionBtn.click()
-      
-      await this.page.getByRole("checkbox").click();
-      await this.confirmModalBtn.click();
+      if (useIPFSforStorage) {
+        await this.govtoolPinsDatatoIpfsBtn.click()
+      } else {
 
-      this.metadataDownloadBtn.click();
-      const voteMetadata = await this.downloadVoteMetadata();
-      const url = await metadataBucketService.uploadMetadata(
-        voteMetadata.name,
-        voteMetadata.data
-      );
-
-      await this.metadataUrlInput.fill(url);
+        await this.downloadAndStoreYourselfOptionBtn.click()
+        await this.page.getByRole("checkbox").click();
+        await this.confirmModalBtn.click();
+  
+        this.metadataDownloadBtn.click();
+        const voteMetadata = await this.downloadVoteMetadata();
+        const url = await metadataBucketService.uploadMetadata(
+          voteMetadata.name,
+          voteMetadata.data
+        );  
+        await this.metadataUrlInput.fill(url);
+      }
       await this.confirmModalBtn.click();
       await this.page.getByTestId("go-to-vote-modal-button").click();
-    }
 
-    // const isVoteButtonEnabled = await this.voteBtn.isEnabled();
-    // await this.voteBtn.click()
+    }
+    else {
+      await this.confirmModalBtn.click()
+    }
   }
 
   async getDRepNotVoted(

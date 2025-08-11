@@ -88,13 +88,21 @@ export const MaintenanceEndingBanner = () => {
                   variant="caption"
                   fontWeight={600}
                   color="common.white"
-                  href="https://gov.tools/governance_actions/9d213a57684d7ddf6f3350c80d042639ecbed5ccccc4a05bf54959a086593e7b#0"
+                  href="https://gov.tools/outcomes/governance_actions/9d213a57684d7ddf6f3350c80d042639ecbed5ccccc4a05bf54959a086593e7b#0"
                   data-testid="govtool-info-link"
                   target="_blank"
                   rel="noopener noreferrer"
                 />,
               ]}
             />
+          </Typography>
+          <Typography
+            fontWeight={600}
+            variant="caption"
+            color="common.white"
+            mb={0.5}
+          >
+            {t("system.maintenanceEnding.description2")}
           </Typography>
         </Box>
       </Box>

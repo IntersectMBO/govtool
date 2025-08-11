@@ -12,9 +12,10 @@ import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import { StaticWallet } from "@types";
+import { Logger } from "@helpers/logger";
 
 const REGISTER_DREP_WALLETS_COUNT = 6;
-const DREP_WALLETS_COUNT = 10;
+const DREP_WALLETS_COUNT = 11;
 
 let dRepDeposit: number;
 
@@ -73,6 +74,10 @@ setup("Register DRep of static wallets", async () => {
 });
 
 setup("Setup temporary DRep wallets", async () => {
+
+  Logger.info("KUBER API KEY")
+  Logger.info(process.env.KUBER_API_KEY)
+
   const totalRequiredBalanceForDRepSetup =
     (DREP_WALLETS_COUNT + REGISTER_DREP_WALLETS_COUNT) *
     (dRepDeposit / 1000000 + 22);

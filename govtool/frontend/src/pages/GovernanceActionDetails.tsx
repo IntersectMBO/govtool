@@ -95,7 +95,7 @@ export const GovernanceActionDetails = () => {
   useEffect(() => {
     const isProposalNotFound =
       error instanceof AxiosError &&
-      error.response?.data.match(/Proposal with id: .* not found/);
+      error.response?.data.message.match(/Proposal with id: .* not found/);
     if (isProposalNotFound && fullProposalId) {
       navigate(
         OUTCOMES_PATHS.governanceActionOutcomes.replace(":id", fullProposalId),

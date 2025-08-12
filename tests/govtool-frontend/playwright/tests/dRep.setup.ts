@@ -75,9 +75,6 @@ setup("Register DRep of static wallets", async () => {
 
 setup("Setup temporary DRep wallets", async () => {
 
-  Logger.info("KUBER API KEY")
-  Logger.info(process.env.KUBER_API_KEY)
-
   const totalRequiredBalanceForDRepSetup =
     (DREP_WALLETS_COUNT + REGISTER_DREP_WALLETS_COUNT) *
     (dRepDeposit / 1000000 + 22);

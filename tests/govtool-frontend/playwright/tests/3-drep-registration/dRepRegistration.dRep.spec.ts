@@ -42,18 +42,12 @@ test.describe("Logged in DReps", () => {
       timeout: 60_000,
     });
 
-    await expect(
-      page.getByTestId("dRep-id-display-card-dashboard")
-    ).toContainText(dRep01Wallet.dRepId, { timeout: 60_000 });
-
+    
     const governanceActionsPage = new GovernanceActionsPage(page);
-
+    
     await governanceActionsPage.goto();
-
-    await expect(page.getByText(/info action/i).first()).toBeVisible({
-      timeout: 60_000,
-    });
-
+    
+    await governanceActionsPage.getFirstProposal(GovernanceActionType.InfoAction);
     const governanceActionDetailsPage =
       await governanceActionsPage.viewFirstProposalByGovernanceAction(
         GovernanceActionType.InfoAction

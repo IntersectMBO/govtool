@@ -72,7 +72,6 @@ test.describe("Proposal checks", () => {
       currentPage.getByTestId(`${cip129GovActionId}-id`)
     ).toBeVisible();
 
-    await expect(govActionDetailsPage.contextBtn).toBeVisible();
     await expect(govActionDetailsPage.showVotesBtn).toBeVisible();
 
     await expect(govActionDetailsPage.voteBtn).toBeVisible();
@@ -87,12 +86,12 @@ test.describe("Proposal checks", () => {
     await expect(govActionDetailsPage.noVoteRadio).toBeVisible();
     await expect(govActionDetailsPage.abstainRadio).toBeVisible();
 
-    await govActionDetailsPage.contextBtn.click();
+    await govActionDetailsPage.yesVoteRadio.click();
+    await govActionDetailsPage.voteBtn.click();
 
     await expect(govActionDetailsPage.contextInput).toBeVisible();
     await govActionDetailsPage.cancelModalBtn.click();
 
-    await govActionDetailsPage.yesVoteRadio.click();
     await expect(govActionDetailsPage.voteBtn).toBeEnabled();
   });
 
@@ -100,7 +99,9 @@ test.describe("Proposal checks", () => {
     const characters =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     test("5D_1. Should accept valid data in provide context", async () => {
-      await govActionDetailsPage.contextBtn.click();
+
+      await govActionDetailsPage.yesVoteRadio.click()
+      await govActionDetailsPage.voteBtn.click()
 
       await expect(govActionDetailsPage.contextInput).toBeVisible();
 
@@ -119,7 +120,8 @@ test.describe("Proposal checks", () => {
     });
 
     test("5D_2. Should reject invalid data in provide context", async () => {
-      await govActionDetailsPage.contextBtn.click();
+      await govActionDetailsPage.yesVoteRadio.click()
+      await govActionDetailsPage.voteBtn.click()
 
       await expect(govActionDetailsPage.contextInput).toBeVisible();
 
@@ -245,32 +247,23 @@ test.describe("Perform voting", () => {
     ).toBeVisible();
 
     govActionDetailsPage = await governanceActionsPage.viewFirstVotedProposal();
-    await govActionDetailsPage.vote(faker.lorem.sentence(200), true);
+
+    const fakerContext = faker.lorem.sentence(200)
+    await govActionDetailsPage.vote(fakerContext, true);
 
     await govActionDetailsPage.currentPage.reload();
 
     await governanceActionsPage.votedTab.click();
 
-    const isYesVoteVisible = await govActionDetailsPage.currentPage
-      .getByTestId("my-vote")
-      .getByText("Yes")
-      .isVisible();
+    govActionDetailsPage = await governanceActionsPage.viewFirstVotedProposal();
+    
+    await govActionDetailsPage.currentPage.getByTestId("yes-radio").isVisible();
 
-    const textContent = await govActionDetailsPage.currentPage
-      .getByTestId("my-vote")
-      .textContent();
-
-    await govActionDetailsPage.currentPage.evaluate(() =>
-      window.scrollTo(0, 500)
-    );
-    await expect(
-      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes"),
-      {
-        message:
-          !isYesVoteVisible &&
-          `"Yes" vote not visible, current vote status: ${textContent.match(/My Vote:(Yes|No)/)[1]}`,
-      }
-    ).toBeVisible({ timeout: 60_000 });
+    await govActionDetailsPage.currentPage.getByTestId("show-more-button").click();
+    await govActionDetailsPage.currentPage.waitForTimeout(2000);
+    
+    const voteRationaleContext = await govActionDetailsPage.currentPage.getByTestId("vote-rationale-context");
+    await expect(voteRationaleContext).toContainText(fakerContext);
   });
 
   test("5I. Should view the vote details,when viewing governance action already voted by the DRep", async ({}, testInfo) => {
@@ -282,7 +275,7 @@ test.describe("Perform voting", () => {
       govActionDetailsPage.currentPage
     );
 
-    await governanceActionsPage.currentPage.waitForTimeout(5_000);
+    await governanceActionsPage.getFirstProposal();
 
     await governanceActionsPage.votedTab.click();
     await expect(

@@ -21,7 +21,6 @@ export default class GovernanceActionDetailsPage {
   readonly externalModalBtn = this.page.getByTestId("external-modal-button");
   readonly governanceActionId = this.page.getByText("Governance Action ID:");
 
-  readonly contextBtn = this.page.getByTestId("provide-context-button");
   readonly metadataDownloadBtn = this.page.getByTestId(
     "metadata-download-button"
   );
@@ -172,5 +171,6 @@ export default class GovernanceActionDetailsPage {
   async reVote() {
     await this.noVoteRadio.click();
     await this.changeVoteBtn.click();
+    await this.confirmModalBtn.click();
   }
 }

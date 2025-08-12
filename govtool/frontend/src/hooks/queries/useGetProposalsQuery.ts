@@ -33,7 +33,7 @@ export const useGetProposalsQuery = ({
     return allProposals.flatMap((proposal) => proposal.elements);
   };
 
-  const { data, isLoading } = useQuery(
+  const { data, isLoading, isFetching } = useQuery(
     [
       QUERY_KEYS.useGetProposalsKey,
       filters,
@@ -46,16 +46,18 @@ export const useGetProposalsQuery = ({
     fetchProposals,
     {
       enabled,
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
       keepPreviousData: true,
-      cacheTime: Infinity,
     },
   );
+
+  const isProposalsLoading = isLoading || isFetching;
 
   const proposals = Object.values(groupByType(data) ?? []);
 
   return {
-    isProposalsLoading: isLoading,
+    isProposalsLoading,
     proposals,
   };
 };

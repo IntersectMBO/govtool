@@ -47,7 +47,7 @@ test.describe("Logged in DReps", () => {
     
     await governanceActionsPage.goto();
     
-    await governanceActionsPage.getFirstProposal(GovernanceActionType.InfoAction);
+    await governanceActionsPage.getFirstProposal();
     const governanceActionDetailsPage =
       await governanceActionsPage.viewFirstProposalByGovernanceAction(
         GovernanceActionType.InfoAction

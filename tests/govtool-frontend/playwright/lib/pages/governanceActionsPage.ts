@@ -77,7 +77,6 @@ export default class GovernanceActionsPage {
   }
 
   async getFirstProposal(
-    governanceAction: GovernanceActionType
   ) {
     await functionWaitedAssert(
       async () => {

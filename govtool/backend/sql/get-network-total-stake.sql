@@ -83,7 +83,7 @@ AlwaysNoConfidenceVotingPower AS (
         ORDER BY epoch_no DESC LIMIT 1), 0) AS amount
 )
 SELECT
-  COALESCE(TotalStakeControlledByActiveDReps.total, 0) + COALESCE(AlwaysNoConfidenceVotingPower.amount, 0) AS total_stake_controlled_by_active_dreps,
+  COALESCE(TotalStakeControlledByActiveDReps.total, 0) AS total_stake_controlled_by_active_dreps,
   COALESCE(TotalStakeControlledBySPOs.total, 0) AS total_stake_controlled_by_spos,
   AlwaysAbstainVotingPower.amount AS always_abstain_voting_power,
   AlwaysNoConfidenceVotingPower.amount AS always_no_confidence_voting_power

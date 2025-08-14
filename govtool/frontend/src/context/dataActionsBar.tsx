@@ -68,18 +68,32 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     isAdjusting.current = false;
   }, []);
 
+  const gADetailsPathnameRegexp = /^.*\/governance_actions\/[a-fA-F0-9]{64}$/;
   const userMovedToDifferentAppArea =
     pathname !== lastPath &&
     (!pathname.startsWith(lastPath) || lastPath === "" || lastPath === "/");
+  const userOpenedGADetails = gADetailsPathnameRegexp.test(pathname);
   const userOpenedGADetailsFromCategoryPage =
-    lastPath.includes("governance_actions/category") &&
-    pathname.includes("governance_actions/");
+    userOpenedGADetails &&
+    lastPath.includes("governance_actions/category");
   const userMovedFromGAListToCategoryPage =
     lastPath.endsWith("governance_actions") &&
+    pathname.includes("governance_actions/category");
+  const userMovedFromGADetailsToListOrCategoryPage =
+    (gADetailsPathnameRegexp.test(lastPath) &&
+      pathname.includes("governance_actions")) ||
     pathname.includes("governance_actions/category");
 
   useEffect(() => {
     isAdjusting.current = true;
+    if (userOpenedGADetails) {
+      return;
+    }
+
+    if (userMovedFromGADetailsToListOrCategoryPage && debouncedSearchText.length > 0) {
+      isAdjusting.current = false;
+      return;
+    }
 
     if (
       (!pathname.includes("drep_directory") &&
@@ -93,7 +107,7 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
 
   useEffect(() => {
     setLastPath(pathname);
-  }, [searchText, chosenFilters, chosenSorting]);
+  }, [pathname, searchText, chosenFilters, chosenSorting]);
 
   const contextValue = useMemo(
     () => ({

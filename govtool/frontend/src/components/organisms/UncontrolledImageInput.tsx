@@ -74,7 +74,7 @@ export const UncontrolledImageInput = <T extends FieldValues>({
       />
       {fieldState.error && (
         <FormErrorMessage
-          dataTestId={`${dataTestId}-error`}
+          dataTestId={`invalid-${dataTestId}-error`}
           errorMessage={fieldState.error.message}
         />
       )}

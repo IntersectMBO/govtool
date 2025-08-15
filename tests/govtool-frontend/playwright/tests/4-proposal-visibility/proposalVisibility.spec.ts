@@ -189,7 +189,7 @@ test("4M. Should show view-all categorized governance actions", async ({
   const governanceActionPage = new GovernanceActionsPage(page);
   await governanceActionPage.goto();
 
-  await page.getByRole("button", { name: "Show All" }).click();
+  await page.getByRole("link", { name: "Show All" }).click();
 
   const proposalCards = await governanceActionPage.getAllProposals();
 

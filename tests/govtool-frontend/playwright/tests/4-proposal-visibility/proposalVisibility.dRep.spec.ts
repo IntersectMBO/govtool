@@ -67,7 +67,6 @@ test.describe("Logged in DRep", () => {
           )
         : await govActionsPage.viewFirstProposal();
 
-      await govActionDetailsPage.contextBtn.click();
       await govActionDetailsPage.contextInput.fill(faker.lorem.sentence(200));
       await govActionDetailsPage.confirmModalBtn.click();
       await page.getByRole("checkbox").click();

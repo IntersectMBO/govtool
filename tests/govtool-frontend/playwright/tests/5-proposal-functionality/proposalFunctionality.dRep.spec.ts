@@ -315,3 +315,52 @@ test.describe("Check voting power", () => {
     expect(balance, "Retirement deposit not returned").toBeGreaterThan(500);
   });
 });
+
+test.describe("Temporary DReps Voting", async () => {
+  let dRepPage: Page;
+
+  test.beforeEach(async ({ page, browser }) => {
+    const wallet = await walletManager.popWallet("registeredDRep");
+    const tempDRepAuth = await createTempDRepAuth(page, wallet);
+    dRepPage = await createNewPageWithWallet(browser, {
+      storageState: tempDRepAuth,
+      wallet,
+      enableDRepSigning: true,
+    });
+  });
+
+  const verifyVoteWithMetadata = async (testInfo: any, useGovToolIPFS: boolean = false) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+    
+    const govActionsPage = new GovernanceActionsPage(dRepPage);
+    await govActionsPage.goto();
+    
+    const govActionDetailsPage = await govActionsPage.viewFirstProposal();
+    const fakerContext = faker.lorem.sentence(200);
+    
+    if (useGovToolIPFS) {
+      await govActionDetailsPage.vote(fakerContext, false, true);
+    } else {
+      await govActionDetailsPage.vote(fakerContext);
+    }
+    
+    await dRepPage.reload();
+    await dRepPage.waitForTimeout(5_000);
+    await govActionsPage.votedTab.click();
+    
+    const votedGovActionDetailsPage = await govActionsPage.viewFirstVotedProposal();
+    await votedGovActionDetailsPage.currentPage.getByTestId("show-more-button").click();
+    await votedGovActionDetailsPage.currentPage.waitForTimeout(2000);
+    
+    const voteRationaleContext = await votedGovActionDetailsPage.currentPage.getByTestId("vote-rationale-context");
+    await expect(voteRationaleContext).toContainText(fakerContext);
+  };
+
+  test("5M. Should vote with Context (Download and store yourself)", async ({}, testInfo) => {
+    await verifyVoteWithMetadata(testInfo, false);
+  });
+
+  test("4N. Should vote with Context (GovTool pins data to IPFS)", async ({}, testInfo) => {
+    await verifyVoteWithMetadata(testInfo, true);
+  });
+});

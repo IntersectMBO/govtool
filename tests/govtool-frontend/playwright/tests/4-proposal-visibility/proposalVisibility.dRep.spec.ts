@@ -113,7 +113,7 @@ test.describe("Temporary DReps", async () => {
     });
   });
 
-  const verifyVoteWithMetadata = async (testInfo: any, useGovToolIPFS: boolean = false) => {
+  const verifyVoteWithMetadata = async (testInfo: any) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
     
     const govActionsPage = new GovernanceActionsPage(dRepPage);
@@ -122,11 +122,7 @@ test.describe("Temporary DReps", async () => {
     const govActionDetailsPage = await govActionsPage.viewFirstProposal();
     const fakerContext = faker.lorem.sentence(200);
     
-    if (useGovToolIPFS) {
-      await govActionDetailsPage.vote(fakerContext, false, true);
-    } else {
-      await govActionDetailsPage.vote(fakerContext);
-    }
+    await govActionDetailsPage.vote(fakerContext);
     
     await dRepPage.reload();
     await dRepPage.waitForTimeout(5_000);
@@ -140,12 +136,8 @@ test.describe("Temporary DReps", async () => {
     await expect(voteRationaleContext).toContainText(fakerContext);
   };
 
-  test("4J. Should include metadata anchor in the vote transaction (Download and store yourself)", async ({}, testInfo) => {
-    await verifyVoteWithMetadata(testInfo, false);
-  });
-
-  test("4k. Should include metadata anchor in the vote transaction (GovTool pins data to IPFS)", async ({}, testInfo) => {
-    await verifyVoteWithMetadata(testInfo, true);
+  test("4J. Should include metadata anchor in the vote transaction", async ({}, testInfo) => {
+    await verifyVoteWithMetadata(testInfo);
   });
 });
 

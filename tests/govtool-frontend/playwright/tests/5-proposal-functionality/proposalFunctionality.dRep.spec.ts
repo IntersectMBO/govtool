@@ -356,11 +356,11 @@ test.describe("Temporary DReps Voting", async () => {
     await expect(voteRationaleContext).toContainText(fakerContext);
   };
 
-  test("5M. Should vote with Context (Download and store yourself)", async ({}, testInfo) => {
+  test("5M_1. Should vote with Context (Download and store yourself)", async ({}, testInfo) => {
     await verifyVoteWithMetadata(testInfo, false);
   });
 
-  test("4N. Should vote with Context (GovTool pins data to IPFS)", async ({}, testInfo) => {
+  test("5M_2. Should vote with Context (GovTool pins data to IPFS)", async ({}, testInfo) => {
     await verifyVoteWithMetadata(testInfo, true);
   });
 });

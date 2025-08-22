@@ -111,7 +111,7 @@ export default class OutcomeDetailsPage {
         }
 
         const outcomeResponse = await outcomeResponsePromise;
-        const proposalToCheck = (await outcomeResponse.json())[0];
+        const proposalToCheck = (await outcomeResponse.json());
 
         const metricsResponse = await metricsResponsePromise;
 

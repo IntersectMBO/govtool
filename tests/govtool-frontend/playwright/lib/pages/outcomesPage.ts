@@ -579,7 +579,7 @@ export default class OutComesPage {
 
     const metricsResponsePromise = page.waitForResponse(
       (response) => response.url().includes(`/misc/network/metrics?epoch`),
-      { timeout: 60_000 }
+      { timeout: 120_000 }
     );
 
     expect(
@@ -597,7 +597,7 @@ export default class OutComesPage {
           .includes(
             `governance-actions/${governanceTransactionHash}?index=${governanceActionIndex}`
           ),
-      { timeout: 60_000 }
+      { timeout: 120_000 }
     );
 
     const govActionDetailsPage = await outcomePage.viewFirstOutcomes();

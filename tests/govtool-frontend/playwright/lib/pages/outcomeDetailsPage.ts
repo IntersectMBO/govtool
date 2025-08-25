@@ -188,7 +188,7 @@ export default class OutcomeDetailsPage {
             filterKey === "NoConfidence"
               ? proposalToCheck.pool_no_votes
               : parseInt(sPosNoConfidence.replace(/,/g, "")) * 1000000 +
-                parseInt(proposalToCheck.pool_no_votes);
+              parseInt(proposalToCheck.pool_no_votes);
 
           const totalSposYesVotesForNoConfidence =
             parseInt(sPosNoConfidence.replace(/,/g, "")) * 1000000 +
@@ -295,19 +295,24 @@ export default class OutcomeDetailsPage {
     url: string;
     hash: string;
   }) {
-    await this.page.route("**/governance-actions*", (route) =>
-      route.fulfill({ body: JSON.stringify([outcomeResponse]) })
+    let governanceActionPromise = this.page.route("**/governance-actions/*", async (route) => {
+      if (route.request().url().includes("/governance-actions/metadata")) {
+        await route.continue();
+      } else {
+        await route.fulfill({ body: JSON.stringify(outcomeResponse)});
+      }
+    }
     );
-  
     const outcomePage = new OutComesPage(this.page);
     await outcomePage.goto();
     await outcomePage.viewFirstOutcomes();
+    await governanceActionPromise;
     const outcomeTitle = await outcomePage.title.textContent();
 
     await expect(
       outcomePage.title,
       outcomeTitle.toLowerCase() !== type.toLowerCase() &&
-        `The URL "${url}" and hash "${hash}" do not match the expected properties for type "${type}".`
+      `The URL "${url}" and hash "${hash}" do not match the expected properties for type "${type}".`
     ).toHaveText(type, {
       ignoreCase: true,
       timeout: 60_000,

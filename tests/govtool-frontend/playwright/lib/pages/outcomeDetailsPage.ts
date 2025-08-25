@@ -295,10 +295,10 @@ export default class OutcomeDetailsPage {
     url: string;
     hash: string;
   }) {
-    await this.page.route(/.*\/governance-actions\/[a-f0-9]{64}\?.*/, (route) =>
+    await this.page.route("**/governance-actions*", (route) =>
       route.fulfill({ body: JSON.stringify([outcomeResponse]) })
     );
-
+  
     const outcomePage = new OutComesPage(this.page);
     await outcomePage.goto();
     await outcomePage.viewFirstOutcomes();

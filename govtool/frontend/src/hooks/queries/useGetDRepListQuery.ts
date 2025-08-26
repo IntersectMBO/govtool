@@ -1,47 +1,58 @@
-import { UseInfiniteQueryOptions, useInfiniteQuery } from "react-query";
+import { useMemo, useRef } from "react";
+import { useQuery, UseQueryOptions } from "react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { GetDRepListArguments, getDRepList } from "@services";
 import { DRepData, Infinite } from "@/models";
 
-export const useGetDRepListInfiniteQuery = (
-  {
-    filters = [],
-    pageSize = 10,
-    searchPhrase,
-    sorting,
-    status,
-  }: GetDRepListArguments,
-  options?: UseInfiniteQueryOptions<Infinite<DRepData>>,
-) => {
-  const { pendingTransaction } = useCardano();
+const makeStatusKey = (status?: string[] | undefined) =>
+    (status && status.length ? [...status].sort().join("|") : "__EMPTY__");
 
-  const {
-    data,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    isPreviousData,
-  } = useInfiniteQuery(
-    [
-      QUERY_KEYS.useGetDRepListInfiniteKey,
-      (
-        pendingTransaction.registerAsDirectVoter ||
-        pendingTransaction.registerAsDrep ||
-        pendingTransaction.retireAsDirectVoter ||
-        pendingTransaction.retireAsDrep
-      )?.transactionHash ?? "noPendingTransaction",
-      filters.length ? filters : "",
-      searchPhrase ?? "",
-      sorting ?? "",
-      status?.length ? status : "",
-    ],
-    async ({ pageParam = 0 }) =>
+type PaginatedResult = {
+  dRepData: DRepData[] | undefined;
+  isLoading: boolean;
+  isFetching: boolean;
+  isPreviousData: boolean;
+  total: number | undefined;
+  baselineTotalForStatus: number | undefined;
+};
+
+type Args = GetDRepListArguments & {
+  page: number;
+  pageSize?: number;
+};
+
+export function useGetDRepListPaginatedQuery(
+  { page, pageSize = 10, filters = [], searchPhrase, sorting, status }: Args,
+  options?: UseQueryOptions<Infinite<DRepData>>,
+): PaginatedResult {
+  const { pendingTransaction } = useCardano();
+  const totalsByStatusRef = useRef<Record<string, number>>({});
+  const statusKey = useMemo(() => makeStatusKey(status), [status]);
+
+  const queryKey = [
+    QUERY_KEYS.useGetDRepListInfiniteKey,
+    (
+      pendingTransaction.registerAsDirectVoter ||
+      pendingTransaction.registerAsDrep ||
+      pendingTransaction.retireAsDirectVoter ||
+      pendingTransaction.retireAsDrep
+    )?.transactionHash ?? "noPendingTransaction",
+    "paged",
+    page,
+    pageSize,
+    filters.length ? filters : "",
+    searchPhrase ?? "",
+    sorting ?? "",
+    status?.length ? status : "",
+  ];
+
+  const { data, isLoading, isFetching, isPreviousData } = useQuery(
+    queryKey,
+    async () =>
       getDRepList({
-        page: pageParam,
+        page,
         pageSize,
         filters,
         searchPhrase,
@@ -49,25 +60,49 @@ export const useGetDRepListInfiniteQuery = (
         status,
       }),
     {
-      getNextPageParam: (lastPage) => {
-        if (lastPage.elements.length === 0) {
-          return undefined;
-        }
-
-        return lastPage.page + 1;
-      },
+      keepPreviousData: true,
       enabled: options?.enabled,
-      keepPreviousData: options?.keepPreviousData,
+      onSuccess: (resp) => {
+        if (!searchPhrase && typeof resp?.total === "number") {
+          totalsByStatusRef.current[statusKey] = resp.total;
+        }
+        options?.onSuccess?.(resp);
+      },
+    },
+  );
+
+  useQuery(
+    [QUERY_KEYS.useGetDRepListInfiniteKey, "baseline", statusKey],
+    async () => {
+      const resp = await getDRepList({
+        page: 0,
+        pageSize: 1,
+        filters,
+        searchPhrase: "",
+        sorting,
+        status,
+      });
+      return resp;
+    },
+    {
+      enabled:
+        options?.enabled &&
+        searchPhrase !== "" &&
+        totalsByStatusRef.current[statusKey] === undefined,
+      onSuccess: (resp) => {
+        if (typeof resp.total === "number") {
+          totalsByStatusRef.current[statusKey] = resp.total;
+        }
+      },
     },
   );
 
   return {
-    dRepListFetchNextPage: fetchNextPage,
-    dRepListHasNextPage: hasNextPage,
-    isDRepListFetching: isFetching,
-    isDRepListFetchingNextPage: isFetchingNextPage,
-    isDRepListLoading: isLoading,
-    dRepData: data?.pages.flatMap((page) => page.elements),
+    dRepData: data?.elements,
+    isLoading,
+    isFetching,
     isPreviousData,
+    total: data?.total,
+    baselineTotalForStatus: totalsByStatusRef.current[statusKey],
   };
-};
+}

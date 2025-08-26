@@ -317,10 +317,6 @@ WHERE
   (
     COALESCE(?, '') = '' OR
     (CASE WHEN LENGTH(?) % 2 = 0 AND ? ~ '^[0-9a-fA-F]+$' THEN drep_hash = ? ELSE false END) OR
-    view ILIKE ? OR
-    given_name ILIKE ? OR
-    payment_address ILIKE ? OR
-    objectives ILIKE ? OR
-    motivations ILIKE ? OR
-    qualifications ILIKE ?
+    (CASE WHEN lower(?) ~ '^drep1[qpzry9x8gf2tvdw0s3jn54khce6mua7l]+$' THEN view = lower(?) ELSE FALSE END) OR
+    given_name ILIKE ?
   )

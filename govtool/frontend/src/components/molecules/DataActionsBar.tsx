@@ -1,6 +1,7 @@
 import { Dispatch, FC, SetStateAction } from "react";
-import { Box, InputBase } from "@mui/material";
+import { Box, InputBase, IconButton } from "@mui/material";
 import Search from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
 
 import { DataActionsFilters, DataActionsSorting } from "@molecules";
 import { OrderActionsChip } from "./OrderActionsChip";
@@ -20,6 +21,7 @@ type DataActionsBarProps = {
   filtersTitle?: string;
   isFiltering?: boolean;
   searchText: string;
+  placeholder?: string;
   setChosenFilters?: Dispatch<SetStateAction<string[]>>;
   setChosenSorting: Dispatch<SetStateAction<string>>;
   setFiltersOpen?: Dispatch<SetStateAction<boolean>>;
@@ -51,6 +53,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
     setSortOpen,
     sortOpen,
     sortOptions = [],
+    placeholder = "Search...",
   } = props;
   const {
     palette: { boxShadow2 },
@@ -61,7 +64,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
       <InputBase
         inputProps={{ "data-testid": "search-input" }}
         onChange={(e) => setSearchText(e.target.value)}
-        placeholder="Search..."
+        placeholder={placeholder}
         value={searchText}
         startAdornment={
           <Search
@@ -72,6 +75,17 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({ ...props }) => {
               width: 16,
             }}
           />
+        }
+        endAdornment={
+          searchText && (
+            <IconButton
+              size="small"
+              onClick={() => setSearchText("")}
+              sx={{ ml: 1 }}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          )
         }
         sx={{
           bgcolor: "white",

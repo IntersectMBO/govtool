@@ -1,5 +1,5 @@
-import { useMemo, useRef } from "react";
-import { useQuery, UseQueryOptions } from "react-query";
+import { useMemo } from "react";
+import { useQuery, UseQueryOptions, useQueryClient } from "react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
@@ -28,10 +28,11 @@ export function useGetDRepListPaginatedQuery(
   options?: UseQueryOptions<Infinite<DRepData>>,
 ): PaginatedResult {
   const { pendingTransaction } = useCardano();
-  const totalsByStatusRef = useRef<Record<string, number>>({});
+  const queryClient = useQueryClient();
+
   const statusKey = useMemo(() => makeStatusKey(status), [status]);
 
-  const queryKey = [
+  const listKey = [
     QUERY_KEYS.useGetDRepListInfiniteKey,
     (
       pendingTransaction.registerAsDirectVoter ||
@@ -48,9 +49,14 @@ export function useGetDRepListPaginatedQuery(
     status?.length ? status : "",
   ];
 
+  const baselineKey = useMemo(
+    () => [QUERY_KEYS.useGetDRepListInfiniteKey, "baseline", statusKey],
+    [statusKey],
+  );
+
   const { data, isLoading, isFetching, isPreviousData } = useQuery(
-    queryKey,
-    async () =>
+    listKey,
+    () =>
       getDRepList({
         page,
         pageSize,
@@ -64,36 +70,32 @@ export function useGetDRepListPaginatedQuery(
       enabled: options?.enabled,
       onSuccess: (resp) => {
         if (!searchPhrase && typeof resp?.total === "number") {
-          totalsByStatusRef.current[statusKey] = resp.total;
+          queryClient.setQueryData(baselineKey, resp);
         }
         options?.onSuccess?.(resp);
       },
     },
   );
 
-  useQuery(
-    [QUERY_KEYS.useGetDRepListInfiniteKey, "baseline", statusKey],
-    async () => {
-      const resp = await getDRepList({
+  const { data: baselineResp } = useQuery(
+    baselineKey,
+    async () =>
+      getDRepList({
         page: 0,
         pageSize: 1,
         filters,
         searchPhrase: "",
         sorting,
         status,
-      });
-      return resp;
-    },
+      }),
     {
+      initialData: () =>
+        queryClient.getQueryData<Infinite<DRepData>>(baselineKey),
       enabled:
         options?.enabled &&
-        searchPhrase !== "" &&
-        totalsByStatusRef.current[statusKey] === undefined,
-      onSuccess: (resp) => {
-        if (typeof resp.total === "number") {
-          totalsByStatusRef.current[statusKey] = resp.total;
-        }
-      },
+        !queryClient.getQueryData(baselineKey) &&
+        searchPhrase !== "",
+      staleTime: Infinity,
     },
   );
 
@@ -103,6 +105,6 @@ export function useGetDRepListPaginatedQuery(
     isFetching,
     isPreviousData,
     total: data?.total,
-    baselineTotalForStatus: totalsByStatusRef.current[statusKey],
+    baselineTotalForStatus: baselineResp?.total,
   };
 }

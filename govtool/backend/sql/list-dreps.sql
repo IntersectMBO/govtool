@@ -32,6 +32,16 @@ LatestVoteEpoch AS (
     JOIN tx ON tx.id = lvp.tx_id
     JOIN block ON block.id = tx.block_id
 ),
+VotesLastYear AS (
+  SELECT
+    vp.drep_voter AS drep_id,
+    COUNT(DISTINCT vp.gov_action_proposal_id) AS votes_last_year
+  FROM voting_procedure vp
+    JOIN tx    ON tx.id = vp.tx_id
+    JOIN block ON block.id = tx.block_id
+  WHERE block.time >= now() - INTERVAL '1 year'
+  GROUP BY vp.drep_voter
+),
 RankedDRepRegistration AS (
   SELECT DISTINCT ON (dr.drep_hash_id)
       dr.id,
@@ -127,6 +137,7 @@ DRepData AS (
     off_chain_vote_drep_data.qualifications,
     off_chain_vote_drep_data.image_url,
     off_chain_vote_drep_data.image_hash,
+    COALESCE(vly.votes_last_year, 0) AS votes_last_year,
     COALESCE(
       (
         SELECT jsonb_agg(
@@ -239,6 +250,7 @@ DRepData AS (
     LEFT JOIN tx AS tx_first_register ON tx_first_register.id = dr_first_register.tx_id
     LEFT JOIN block AS block_first_register ON block_first_register.id = tx_first_register.block_id
     LEFT JOIN LatestVoteEpoch lve ON lve.drep_id = dh.id
+    LEFT JOIN VotesLastYear vly ON vly.drep_id = dh.id
     CROSS JOIN DRepActivity
   GROUP BY
     dh.raw,
@@ -265,6 +277,7 @@ DRepData AS (
     off_chain_vote_drep_data.qualifications,
     off_chain_vote_drep_data.image_url,
     off_chain_vote_drep_data.image_hash,
+    vly.votes_last_year,
     (
       SELECT jsonb_agg(
         jsonb_build_object(

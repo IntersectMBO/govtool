@@ -1,10 +1,10 @@
 import React, { FC, useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { Box, CircularProgress, Pagination } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { DREP_DIRECTORY_FILTERS, DREP_DIRECTORY_SORTING } from "@consts";
-import { useCardano, useDataActionsBar } from "@context";
+import { useCardano, useDataActionsBar, usePagination } from "@context";
 import {
   useDelegateTodRep,
   useGetAdaHolderCurrentDelegationQuery,
@@ -26,6 +26,8 @@ import {
   AutomatedVotingOptionDelegationId,
 } from "@/types/automatedVotingOptions";
 import usePrevious from "@/hooks/usePrevious";
+import { PaginationFooter } from "@/components/molecules/PaginationFooter";
+import { useUpdateEffect } from "@/hooks/useUpdateEffect";
 
 interface DRepDirectoryContentProps {
   isConnected?: boolean;
@@ -55,8 +57,11 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     searchText,
     debouncedSearchText,
     setSearchText,
+    lastPath,
     ...dataActionsBarProps
   } = useDataActionsBar();
+
+  const { page, pageSize, setPage, setPageSize } = usePagination();
 
   const { chosenFilters, chosenSorting, setChosenFilters, setChosenSorting } =
     dataActionsBarProps;
@@ -64,22 +69,19 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const [inProgressDelegationDRepData, setInProgressDelegationDRepData] =
     useState<DRepData | undefined>(undefined);
 
-  const [page, setPage] = useState<number>(1);
-  const pageSize = 10;
-
   // Set initial filters and sort
   useEffect(() => {
-    // TODO: it should be done only if last page URL WASN'T like /drep_directory/drep1.*
-    setChosenFilters([DRepStatus.Active]);
-    setSearchText(""); // <--- Clear the search field on mount
+    if (!lastPath.includes("drep_directory")) {
+      setChosenFilters([DRepStatus.Active]);
+      setSearchText("");
+    }
   }, []);
 
   useEffect(() => {
-    if (!chosenSorting) setChosenSorting(DRepListSort.Random);
+    if (!chosenSorting) setChosenSorting(DRepListSort.Activity);
   }, [chosenSorting, setChosenSorting]);
 
-  useEffect(() => {
-    // TODO: it should be done only if last page URL WASN'T like /drep_directory/drep1.*
+  useUpdateEffect(() => {
     setPage(1);
   }, [debouncedSearchText, chosenSorting, JSON.stringify(chosenFilters)]);
 
@@ -141,9 +143,6 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     }),
     "view",
   );
-
-  const totalForPaging = typeof total === "number" ? total : 0;
-  const pageCount = Math.max(1, Math.ceil(totalForPaging / pageSize));
 
   const isAnAutomatedVotingOptionChosen =
     currentDelegation?.dRepView &&
@@ -236,9 +235,10 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           <Typography fontSize={16} fontWeight={500}>
             <Trans
               i18nKey="dRepDirectory.searchSummary"
-              defaults="Found {{found}} DReps out of a total of <total>{{total}}</total>"
+              defaults="Found {{found}} DRep{{multiple}} out of a total of <total>{{total}}</total>"
               values={{
                 found: total ?? "",
+                multiple: total && total > 1 ? "s" : "",
                 total: baselineTotalForStatus ?? "",
               }}
               components={{
@@ -288,19 +288,16 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           ))}
         </Box>
 
-        {pageCount > 1 && (
-          <Box sx={{ justifyContent: "center", display: "flex", mt: 2 }}>
-            <Pagination
-              count={pageCount}
-              page={page}
-              onChange={(_, newPage) => setPage(newPage)}
-              shape="rounded"
-              variant="outlined"
-              siblingCount={1}
-              boundaryCount={1}
-            />
-          </Box>
-        )}
+        <PaginationFooter
+          page={page}
+          total={total || 0}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={(n) => {
+            setPageSize(n);
+            setPage(1);
+          }}
+        />
       </>
     </Box>
   );

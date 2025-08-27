@@ -3,6 +3,7 @@ import { CardanoProvider, useCardano } from "./wallet";
 import { ModalProvider, useModal } from "./modal";
 import { SnackbarProvider, useSnackbar } from "./snackbar";
 import { DataActionsBarProvider } from "./dataActionsBar";
+import { PaginationProvider } from "./pagination";
 import { FeatureFlagProvider } from "./featureFlag";
 import { GovernanceActionProvider } from "./governanceAction";
 import { AdaHandleProvider } from "./adaHandle";
@@ -23,11 +24,13 @@ const ContextProviders = ({ children }: Props) => (
             <ModalProvider>
               <SnackbarProvider>
                 <DataActionsBarProvider>
-                  <CardanoProvider>
-                    <MaintenanceEndingBannerProvider>
-                      {children}
-                    </MaintenanceEndingBannerProvider>
-                  </CardanoProvider>
+                  <PaginationProvider>
+                    <CardanoProvider>
+                      <MaintenanceEndingBannerProvider>
+                        {children}
+                      </MaintenanceEndingBannerProvider>
+                    </CardanoProvider>
+                  </PaginationProvider>
                 </DataActionsBarProvider>
               </SnackbarProvider>
             </ModalProvider>

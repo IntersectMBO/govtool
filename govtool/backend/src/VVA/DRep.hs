@@ -59,6 +59,7 @@ data DRepQueryResult
       , queryQualifications                            :: Maybe Text
       , queryImageUrl                                  :: Maybe Text
       , queryImageHash                                 :: Maybe Text
+      , queryVotesLastYear                             :: Maybe Integer
       , queryIdentityReferences                        :: Maybe Value
       , queryLinkReferences                            :: Maybe Value
       }
@@ -69,7 +70,7 @@ instance FromRow DRepQueryResult where
     <$> field <*> field <*> field <*> field <*> field <*> field
     <*> field <*> field <*> field <*> field <*> field <*> field
     <*> field <*> field <*> field <*> field <*> field <*> field
-    <*> field <*> field <*> field <*> field
+    <*> field <*> field <*> field <*> field <*> field
 
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
@@ -113,6 +114,7 @@ listDReps mSearchQuery = withPool $ \conn -> do
       (queryQualifications result)
       (queryImageUrl result)
       (queryImageHash result)
+      (queryVotesLastYear result)
       (queryIdentityReferences result)
       (queryLinkReferences result)
     | result <- results

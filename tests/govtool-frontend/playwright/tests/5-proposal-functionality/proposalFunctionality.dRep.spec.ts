@@ -138,6 +138,8 @@ test.describe("Proposal checks", () => {
 
 test.describe("Perform voting", () => {
   let govActionDetailsPage: GovernanceActionDetailsPage;
+  let dRepPage: Page;
+  let govActionsPage: GovernanceActionsPage;
 
   test.beforeEach(async ({ page, browser }) => {
     test.slow(); // Due to queue in pop wallets
@@ -146,14 +148,14 @@ test.describe("Perform voting", () => {
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
-    const dRepPage = await createNewPageWithWallet(browser, {
+    dRepPage = await createNewPageWithWallet(browser, {
       storageState: tempDRepAuth,
       wallet,
       enableDRepSigning: true,
     });
 
-    const govActionsPage = new GovernanceActionsPage(dRepPage);
-    await govActionsPage.goto();
+    govActionsPage = new GovernanceActionsPage(dRepPage);
+    govActionsPage.goto();
 
     // assert to wait until the loading button is hidden
     await expect(dRepPage.getByTestId("to-vote-tab")).toBeVisible({
@@ -282,6 +284,36 @@ test.describe("Perform voting", () => {
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")
     ).toBeVisible();
   });
+
+   const verifyVoteWithMetadata = async (testInfo: any, useGovToolIPFS: boolean = false) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+    const fakerContext = faker.lorem.sentence(200);
+    
+    if (useGovToolIPFS) {
+      await govActionDetailsPage.vote(fakerContext, false, true);
+    } else {
+      await govActionDetailsPage.vote(fakerContext);
+    }
+    
+    await dRepPage.reload();
+    await dRepPage.waitForTimeout(5_000);
+    await govActionsPage.votedTab.click();
+    
+    const votedGovActionDetailsPage = await govActionsPage.viewFirstVotedProposal();
+    await votedGovActionDetailsPage.currentPage.getByTestId("show-more-button").click();
+    await votedGovActionDetailsPage.currentPage.waitForTimeout(2000);
+    
+    const voteRationaleContext = await votedGovActionDetailsPage.currentPage.getByTestId("vote-rationale-context");
+    await expect(voteRationaleContext).toContainText(fakerContext);
+  };
+
+  test("5M_1. Should vote with Context (Download and store yourself)", async ({}, testInfo) => {
+    await verifyVoteWithMetadata(testInfo, false);
+  });
+
+  test("5M_2. Should vote with Context (GovTool pins data to IPFS)", async ({}, testInfo) => {
+    await verifyVoteWithMetadata(testInfo, true );
+  });
 });
 
 test.describe("Check voting power", () => {
@@ -313,54 +345,5 @@ test.describe("Check voting power", () => {
 
     const balance = await kuberService.getBalance(wallet.address);
     expect(balance, "Retirement deposit not returned").toBeGreaterThan(500);
-  });
-});
-
-test.describe("Temporary DReps Voting", async () => {
-  let dRepPage: Page;
-
-  test.beforeEach(async ({ page, browser }) => {
-    const wallet = await walletManager.popWallet("registeredDRep");
-    const tempDRepAuth = await createTempDRepAuth(page, wallet);
-    dRepPage = await createNewPageWithWallet(browser, {
-      storageState: tempDRepAuth,
-      wallet,
-      enableDRepSigning: true,
-    });
-  });
-
-  const verifyVoteWithMetadata = async (testInfo: any, useGovToolIPFS: boolean = false) => {
-    test.setTimeout(testInfo.timeout + environments.txTimeOut);
-    
-    const govActionsPage = new GovernanceActionsPage(dRepPage);
-    await govActionsPage.goto();
-    
-    const govActionDetailsPage = await govActionsPage.viewFirstProposal();
-    const fakerContext = faker.lorem.sentence(200);
-    
-    if (useGovToolIPFS) {
-      await govActionDetailsPage.vote(fakerContext, false, true);
-    } else {
-      await govActionDetailsPage.vote(fakerContext);
-    }
-    
-    await dRepPage.reload();
-    await dRepPage.waitForTimeout(5_000);
-    await govActionsPage.votedTab.click();
-    
-    const votedGovActionDetailsPage = await govActionsPage.viewFirstVotedProposal();
-    await votedGovActionDetailsPage.currentPage.getByTestId("show-more-button").click();
-    await votedGovActionDetailsPage.currentPage.waitForTimeout(2000);
-    
-    const voteRationaleContext = await votedGovActionDetailsPage.currentPage.getByTestId("vote-rationale-context");
-    await expect(voteRationaleContext).toContainText(fakerContext);
-  };
-
-  test("5M_1. Should vote with Context (Download and store yourself)", async ({}, testInfo) => {
-    await verifyVoteWithMetadata(testInfo, false);
-  });
-
-  test("5M_2. Should vote with Context (GovTool pins data to IPFS)", async ({}, testInfo) => {
-    await verifyVoteWithMetadata(testInfo, true);
   });
 });

@@ -14,7 +14,7 @@ import { functionWaitedAssert } from "@helpers/waitedLoop";
 import { StaticWallet } from "@types";
 
 const REGISTER_DREP_WALLETS_COUNT = 6;
-const DREP_WALLETS_COUNT = 10;
+const DREP_WALLETS_COUNT = 11;
 
 let dRepDeposit: number;
 

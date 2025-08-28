@@ -8,7 +8,8 @@ import {
 } from "@mui/material";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-import { FC } from "react";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { FC, useState } from "react";
 
 type Props = {
   page: number;
@@ -46,6 +47,19 @@ export const PaginationFooter: FC<Props> = ({
     }
   };
 
+  const [open, setOpen] = useState(false);
+
+  const ArrowIcon: React.FC<React.ComponentProps<typeof ArrowDropDownIcon>> = (props,) => (
+    <ArrowDropDownIcon
+      {...props}
+      onMouseDown={(e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setOpen(true);
+      }}
+    />
+  );
+
   return (
     <Box
       sx={{
@@ -68,15 +82,22 @@ export const PaginationFooter: FC<Props> = ({
           onChange={handlePageSizeChange}
           variant="standard"
           disableUnderline
+          open={open}
+          onOpen={() => setOpen(true)}
+          onClose={() => setOpen(false)}
+          IconComponent={ArrowIcon}
           sx={{
             verticalAlign: "baseline",
             "& .MuiSelect-select": {
               py: 0,
+              pr: "8px !important",
               lineHeight: 1.5,
               display: "inline-flex",
               alignItems: "center",
             },
             "& .MuiSelect-icon": {
+              pointerEvents: "auto",
+              cursor: "pointer",
               top: "calc(50% - 12px)",
             },
           }}

@@ -115,6 +115,7 @@ startApp vvaConfig sentryService = do
           $ setOnException (exceptionHandler vvaConfig sentryService) defaultSettings
   cacheEnv <- do
     let newCache = Cache.newCache (Just $ TimeSpec (fromIntegral (cacheDurationSeconds vvaConfig)) 0)
+    let newDRepListCache = Cache.newCache (Just $ TimeSpec (fromIntegral (dRepListCacheDurationSeconds vvaConfig)) 0)
     proposalListCache <- newCache
     getProposalCache <- newCache
     currentEpochCache <- newCache
@@ -123,7 +124,7 @@ startApp vvaConfig sentryService = do
     dRepGetVotesCache <- newCache
     dRepInfoCache <- newCache
     dRepVotingPowerCache <- newCache
-    dRepListCache <- newCache
+    dRepListCache <- newDRepListCache
     networkMetricsCache <- newCache
     networkInfoCache <- newCache
     networkTotalStakeCache <- newCache

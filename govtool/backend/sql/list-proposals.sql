@@ -174,6 +174,14 @@ RankedPoolVotes AS (
         vp.tx_id DESC,
         vp.id DESC
 ),
+-- it's a fix for duplication issue https://github.com/IntersectMBO/cardano-db-sync/issues/1986
+LatestPoolStat AS (
+    SELECT DISTINCT ON (pool_hash_id) *
+    FROM
+        pool_stat
+    WHERE
+        epoch_no = (SELECT MAX(no) FROM epoch)
+),
 PoolVotes AS (
     SELECT
         rpv.gov_action_proposal_id,
@@ -184,10 +192,10 @@ PoolVotes AS (
         SUM(CASE WHEN rpv.vote = 'Yes' THEN ps.voting_power ELSE 0 END) AS poolYesVotes,
         SUM(CASE WHEN rpv.vote = 'No' THEN ps.voting_power ELSE 0 END) AS poolNoVotes,
         SUM(CASE WHEN rpv.vote = 'Abstain' THEN ps.voting_power ELSE 0 END) AS poolAbstainVotes
-    FROM 
+    FROM
         RankedPoolVotes rpv
-    JOIN 
-        pool_stat ps
+    JOIN
+        LatestPoolStat ps
         ON rpv.pool_voter = ps.pool_hash_id
     WHERE
         ps.epoch_no = (SELECT MAX(no) FROM epoch)

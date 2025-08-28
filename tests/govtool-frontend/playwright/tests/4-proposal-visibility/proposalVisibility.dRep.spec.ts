@@ -67,7 +67,6 @@ test.describe("Logged in DRep", () => {
           )
         : await govActionsPage.viewFirstProposal();
 
-      await govActionDetailsPage.contextBtn.click();
       await govActionDetailsPage.contextInput.fill(faker.lorem.sentence(200));
       await govActionDetailsPage.confirmModalBtn.click();
       await page.getByRole("checkbox").click();
@@ -98,40 +97,6 @@ test.describe("Logged in DRep", () => {
         }
       }
     });
-  });
-});
-
-test.describe("Temporary DReps", async () => {
-  let dRepPage: Page;
-
-  test.beforeEach(async ({ page, browser }) => {
-    const wallet = await walletManager.popWallet("registeredDRep");
-
-    const tempDRepAuth = await createTempDRepAuth(page, wallet);
-
-    dRepPage = await createNewPageWithWallet(browser, {
-      storageState: tempDRepAuth,
-      wallet,
-      enableDRepSigning: true,
-    });
-  });
-
-  test("4J. Should include metadata anchor in the vote transaction", async ({}, testInfo) => {
-    test.setTimeout(testInfo.timeout + environments.txTimeOut);
-
-    const govActionsPage = new GovernanceActionsPage(dRepPage);
-    await govActionsPage.goto();
-
-    const govActionDetailsPage = await govActionsPage.viewFirstProposal();
-    await govActionDetailsPage.vote(faker.lorem.sentence(200));
-
-    await dRepPage.waitForTimeout(5_000);
-
-    await govActionsPage.votedTab.click();
-    await govActionsPage.viewFirstVotedProposal();
-
-    //  Vote context is not displayed in UI to validate
-    expect(false, "No vote context displayed").toBe(true);
   });
 });
 

@@ -275,7 +275,7 @@ export const VoteActionForm = ({
               border: !showWholeVoteContext ? "1px solid #E1E1E1" : "none",
               borderRadius: "4px",
               backgroundColor: !showWholeVoteContext ? fadedPurple.c50 : "transparent",
-              padding: 2,
+              padding: 2
             }}
               >
                 <Typography
@@ -292,6 +292,7 @@ export const VoteActionForm = ({
                   WebkitLineClamp: 2,
                 }),
               }}
+                  data-testid="vote-rationale-context"
                 >
                   {finalVoteContextText}
                 </Typography>
@@ -316,7 +317,7 @@ export const VoteActionForm = ({
             }}
                     disableRipple
                     variant="text"
-                    data-testid="external-modal-button"
+                    data-testid="show-more-button"
                   >
                     <Typography
                       variant="body2"

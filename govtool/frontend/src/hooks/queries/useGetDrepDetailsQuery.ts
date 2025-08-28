@@ -1,7 +1,7 @@
 import { UseInfiniteQueryOptions } from "react-query";
 
 import { Infinite, DRepData } from "@/models";
-import { useGetDRepListInfiniteQuery } from "./useGetDRepListQuery";
+import { useGetDRepListInfiniteQuery } from "./useGetDRepListInfiniteQuery";
 
 export const useGetDRepDetailsQuery = (
   dRepId: string | null | undefined,

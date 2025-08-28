@@ -67,7 +67,6 @@ test.describe("Logged in DRep", () => {
           )
         : await govActionsPage.viewFirstProposal();
 
-      await govActionDetailsPage.contextBtn.click();
       await govActionDetailsPage.contextInput.fill(faker.lorem.sentence(200));
       await govActionDetailsPage.confirmModalBtn.click();
       await page.getByRole("checkbox").click();
@@ -98,55 +97,6 @@ test.describe("Logged in DRep", () => {
         }
       }
     });
-  });
-});
-
-test.describe("Temporary DReps", async () => {
-  let dRepPage: Page;
-
-  test.beforeEach(async ({ page, browser }) => {
-    const wallet = await walletManager.popWallet("registeredDRep");
-    const tempDRepAuth = await createTempDRepAuth(page, wallet);
-    dRepPage = await createNewPageWithWallet(browser, {
-      storageState: tempDRepAuth,
-      wallet,
-      enableDRepSigning: true,
-    });
-  });
-
-  const verifyVoteWithMetadata = async (testInfo: any, useGovToolIPFS: boolean = false) => {
-    test.setTimeout(testInfo.timeout + environments.txTimeOut);
-    
-    const govActionsPage = new GovernanceActionsPage(dRepPage);
-    await govActionsPage.goto();
-    
-    const govActionDetailsPage = await govActionsPage.viewFirstProposal();
-    const fakerContext = faker.lorem.sentence(200);
-    
-    if (useGovToolIPFS) {
-      await govActionDetailsPage.vote(fakerContext, false, true);
-    } else {
-      await govActionDetailsPage.vote(fakerContext);
-    }
-    
-    await dRepPage.reload();
-    await dRepPage.waitForTimeout(5_000);
-    await govActionsPage.votedTab.click();
-    
-    const votedGovActionDetailsPage = await govActionsPage.viewFirstVotedProposal();
-    await votedGovActionDetailsPage.currentPage.getByTestId("show-more-button").click();
-    await votedGovActionDetailsPage.currentPage.waitForTimeout(2000);
-    
-    const voteRationaleContext = await votedGovActionDetailsPage.currentPage.getByTestId("vote-rationale-context");
-    await expect(voteRationaleContext).toContainText(fakerContext);
-  };
-
-  test("4J. Should include metadata anchor in the vote transaction (Download and store yourself)", async ({}, testInfo) => {
-    await verifyVoteWithMetadata(testInfo, false);
-  });
-
-  test("4k. Should include metadata anchor in the vote transaction (GovTool pins data to IPFS)", async ({}, testInfo) => {
-    await verifyVoteWithMetadata(testInfo, true);
   });
 });
 

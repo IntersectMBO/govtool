@@ -12,7 +12,6 @@ import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import { StaticWallet } from "@types";
-import { Logger } from "@helpers/logger";
 
 const REGISTER_DREP_WALLETS_COUNT = 6;
 const DREP_WALLETS_COUNT = 11;

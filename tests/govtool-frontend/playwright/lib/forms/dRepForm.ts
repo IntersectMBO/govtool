@@ -13,7 +13,7 @@ const formErrors = {
   ],
   linkDescription: "max-80-characters-error",
   email: "invalid-email-address-error",
-  image: "invalid-image-url-error",
+  image: "invalid-image-input-error",
   links: {
     url: "link-reference-description-1-error",
     description: "link-reference-description-1-error",
@@ -304,7 +304,7 @@ export default class DRepForm {
     }).not.toEqual(dRepInfo.qualifications);
 
     await expect(this.form.getByTestId(formErrors.image), {
-      message: !isImageErrorVisible && `${dRepInfo.image} is a valid image`,
+      message: !isImageErrorVisible && `Invalid image URL or properly formatted base64-encoded image`,
     }).toBeVisible({
       timeout: 60_000,
     });

@@ -185,7 +185,7 @@ exceptionHandler vvaConfig sentryService mRequest exception = do
   let env = sentryEnv vvaConfig
   case mRequest of
     Nothing -> return ()
-    Just _  -> register
+    Just _  -> when (env /= "qa") $ register
       sentryService
       "vva.be"
       Error

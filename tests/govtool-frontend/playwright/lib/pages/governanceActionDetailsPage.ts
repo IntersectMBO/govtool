@@ -21,7 +21,6 @@ export default class GovernanceActionDetailsPage {
   readonly externalModalBtn = this.page.getByTestId("external-modal-button");
   readonly governanceActionId = this.page.getByText("Governance Action ID:");
 
-  readonly contextBtn = this.page.getByTestId("provide-context-button");
   readonly metadataDownloadBtn = this.page.getByTestId(
     "metadata-download-button"
   );
@@ -30,6 +29,9 @@ export default class GovernanceActionDetailsPage {
   );
   readonly continueModalBtn = this.page.getByTestId("continue-modal-button");
   readonly confirmModalBtn = this.page.getByTestId("confirm-modal-button");
+
+  readonly downloadAndStoreYourselfOptionBtn = this.page.getByTestId("download-and-store-yourself-option-button")
+  readonly govtoolPinsDatatoIpfsBtn = this.page.getByTestId("govtool-pins-data-to-ipfs-option-button")
 
   readonly voteSuccessModal = this.page.getByTestId("alert-success");
   readonly externalLinkModal = this.page.getByTestId("external-link-modal");
@@ -76,37 +78,41 @@ export default class GovernanceActionDetailsPage {
   }
 
   @withTxConfirmation
-  async vote(context?: string, isAlreadyVoted: boolean = false) {
+  async vote(context?: string, isAlreadyVoted: boolean = false , useIPFSforStorage : boolean = false ){
     if (!isAlreadyVoted) {
       await this.yesVoteRadio.click();
     }
 
+    await this.voteBtn.click()
+
     if (context) {
-      await this.contextBtn.click();
       await this.contextInput.fill(context);
-      await this.confirmModalBtn.click();
-      await this.page.getByRole("checkbox").click();
-      await this.confirmModalBtn.click();
 
-      this.metadataDownloadBtn.click();
-      const voteMetadata = await this.downloadVoteMetadata();
-      const url = await metadataBucketService.uploadMetadata(
-        voteMetadata.name,
-        voteMetadata.data
-      );
+      this.confirmModalBtn.click()
 
-      await this.metadataUrlInput.fill(url);
+      if (useIPFSforStorage) {
+        await this.govtoolPinsDatatoIpfsBtn.click()
+      } else {
+
+        await this.downloadAndStoreYourselfOptionBtn.click()
+        await this.page.getByRole("checkbox").click();
+        await this.confirmModalBtn.click();
+  
+        this.metadataDownloadBtn.click();
+        const voteMetadata = await this.downloadVoteMetadata();
+        const url = await metadataBucketService.uploadMetadata(
+          voteMetadata.name,
+          voteMetadata.data
+        );  
+        await this.metadataUrlInput.fill(url);
+      }
       await this.confirmModalBtn.click();
       await this.page.getByTestId("go-to-vote-modal-button").click();
+
     }
-
-    const isVoteButtonEnabled = await this.voteBtn.isEnabled();
-
-    await expect(this.voteBtn, {
-      message: !isVoteButtonEnabled && "Vote button is not enabled",
-    }).toBeEnabled({ timeout: 60_000 });
-
-    await this.voteBtn.click();
+    else {
+      await this.confirmModalBtn.click()
+    }
   }
 
   async getDRepNotVoted(
@@ -165,5 +171,6 @@ export default class GovernanceActionDetailsPage {
   async reVote() {
     await this.noVoteRadio.click();
     await this.changeVoteBtn.click();
+    await this.confirmModalBtn.click();
   }
 }

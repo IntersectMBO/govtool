@@ -55,9 +55,9 @@ export default class GovernanceActionsPage {
   async viewFirstProposalByGovernanceAction(
     governanceAction: GovernanceActionType
   ): Promise<GovernanceActionDetailsPage> {
-    const proposalCard = this.page
-      .getByTestId(`govaction-${governanceAction}-card`)
-      .first();
+     const proposalCard = this.page
+          .locator('[data-testid^="govaction-"][data-testid$="-card"]')
+          .first();
 
     const isVisible = await proposalCard.isVisible();
 
@@ -74,6 +74,20 @@ export default class GovernanceActionsPage {
       );
       return null;
     }
+  }
+
+  async getFirstProposal(
+  ) {
+    await functionWaitedAssert(
+      async () => {
+        const proposalCard = this.page
+          .locator('[data-testid^="govaction-"][data-testid$="-card"]')
+          .first();
+
+        await expect(proposalCard
+          .locator('[data-testid^="govaction-"][data-testid$="-view-detail"]')
+          .first()).toBeVisible()
+      }, { name: "Retrying to get the first proposal" });
   }
 
   async viewVotedProposal(
@@ -122,7 +136,7 @@ export default class GovernanceActionsPage {
           expect(
             hasFilter,
             hasFilter == false &&
-              `A proposal card does not contain any of the ${filters}`
+            `A proposal card does not contain any of the ${filters}`
           ).toBe(true);
         }
       }

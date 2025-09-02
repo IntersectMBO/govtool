@@ -72,7 +72,6 @@ test.describe("Proposal checks", () => {
       currentPage.getByTestId(`${cip129GovActionId}-id`)
     ).toBeVisible();
 
-    await expect(govActionDetailsPage.contextBtn).toBeVisible();
     await expect(govActionDetailsPage.showVotesBtn).toBeVisible();
 
     await expect(govActionDetailsPage.voteBtn).toBeVisible();
@@ -87,12 +86,12 @@ test.describe("Proposal checks", () => {
     await expect(govActionDetailsPage.noVoteRadio).toBeVisible();
     await expect(govActionDetailsPage.abstainRadio).toBeVisible();
 
-    await govActionDetailsPage.contextBtn.click();
+    await govActionDetailsPage.yesVoteRadio.click();
+    await govActionDetailsPage.voteBtn.click();
 
     await expect(govActionDetailsPage.contextInput).toBeVisible();
     await govActionDetailsPage.cancelModalBtn.click();
 
-    await govActionDetailsPage.yesVoteRadio.click();
     await expect(govActionDetailsPage.voteBtn).toBeEnabled();
   });
 
@@ -100,7 +99,9 @@ test.describe("Proposal checks", () => {
     const characters =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     test("5D_1. Should accept valid data in provide context", async () => {
-      await govActionDetailsPage.contextBtn.click();
+
+      await govActionDetailsPage.yesVoteRadio.click()
+      await govActionDetailsPage.voteBtn.click()
 
       await expect(govActionDetailsPage.contextInput).toBeVisible();
 
@@ -119,7 +120,8 @@ test.describe("Proposal checks", () => {
     });
 
     test("5D_2. Should reject invalid data in provide context", async () => {
-      await govActionDetailsPage.contextBtn.click();
+      await govActionDetailsPage.yesVoteRadio.click()
+      await govActionDetailsPage.voteBtn.click()
 
       await expect(govActionDetailsPage.contextInput).toBeVisible();
 
@@ -136,6 +138,8 @@ test.describe("Proposal checks", () => {
 
 test.describe("Perform voting", () => {
   let govActionDetailsPage: GovernanceActionDetailsPage;
+  let dRepPage: Page;
+  let govActionsPage: GovernanceActionsPage;
 
   test.beforeEach(async ({ page, browser }) => {
     test.slow(); // Due to queue in pop wallets
@@ -144,14 +148,14 @@ test.describe("Perform voting", () => {
 
     const tempDRepAuth = await createTempDRepAuth(page, wallet);
 
-    const dRepPage = await createNewPageWithWallet(browser, {
+    dRepPage = await createNewPageWithWallet(browser, {
       storageState: tempDRepAuth,
       wallet,
       enableDRepSigning: true,
     });
 
-    const govActionsPage = new GovernanceActionsPage(dRepPage);
-    await govActionsPage.goto();
+    govActionsPage = new GovernanceActionsPage(dRepPage);
+    govActionsPage.goto();
 
     // assert to wait until the loading button is hidden
     await expect(dRepPage.getByTestId("to-vote-tab")).toBeVisible({
@@ -245,32 +249,23 @@ test.describe("Perform voting", () => {
     ).toBeVisible();
 
     govActionDetailsPage = await governanceActionsPage.viewFirstVotedProposal();
-    await govActionDetailsPage.vote(faker.lorem.sentence(200), true);
+
+    const fakerContext = faker.lorem.sentence(200)
+    await govActionDetailsPage.vote(fakerContext, true);
 
     await govActionDetailsPage.currentPage.reload();
 
     await governanceActionsPage.votedTab.click();
 
-    const isYesVoteVisible = await govActionDetailsPage.currentPage
-      .getByTestId("my-vote")
-      .getByText("Yes")
-      .isVisible();
+    govActionDetailsPage = await governanceActionsPage.viewFirstVotedProposal();
+    
+    await govActionDetailsPage.currentPage.getByTestId("yes-radio").isVisible();
 
-    const textContent = await govActionDetailsPage.currentPage
-      .getByTestId("my-vote")
-      .textContent();
-
-    await govActionDetailsPage.currentPage.evaluate(() =>
-      window.scrollTo(0, 500)
-    );
-    await expect(
-      govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes"),
-      {
-        message:
-          !isYesVoteVisible &&
-          `"Yes" vote not visible, current vote status: ${textContent.match(/My Vote:(Yes|No)/)[1]}`,
-      }
-    ).toBeVisible({ timeout: 60_000 });
+    await govActionDetailsPage.currentPage.getByTestId("show-more-button").click();
+    await govActionDetailsPage.currentPage.waitForTimeout(2000);
+    
+    const voteRationaleContext = await govActionDetailsPage.currentPage.getByTestId("vote-rationale-context");
+    await expect(voteRationaleContext).toContainText(fakerContext);
   });
 
   test("5I. Should view the vote details,when viewing governance action already voted by the DRep", async ({}, testInfo) => {
@@ -282,12 +277,42 @@ test.describe("Perform voting", () => {
       govActionDetailsPage.currentPage
     );
 
-    await governanceActionsPage.currentPage.waitForTimeout(5_000);
+    await governanceActionsPage.getFirstProposal();
 
     await governanceActionsPage.votedTab.click();
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")
     ).toBeVisible();
+  });
+
+   const verifyVoteWithMetadata = async (testInfo: any, useGovToolIPFS: boolean = false) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+    const fakerContext = faker.lorem.sentence(200);
+    
+    if (useGovToolIPFS) {
+      await govActionDetailsPage.vote(fakerContext, false, true);
+    } else {
+      await govActionDetailsPage.vote(fakerContext);
+    }
+    
+    await dRepPage.reload();
+    await dRepPage.waitForTimeout(5_000);
+    await govActionsPage.votedTab.click();
+    
+    const votedGovActionDetailsPage = await govActionsPage.viewFirstVotedProposal();
+    await votedGovActionDetailsPage.currentPage.getByTestId("show-more-button").click();
+    await votedGovActionDetailsPage.currentPage.waitForTimeout(2000);
+    
+    const voteRationaleContext = await votedGovActionDetailsPage.currentPage.getByTestId("vote-rationale-context");
+    await expect(voteRationaleContext).toContainText(fakerContext);
+  };
+
+  test("5M_1. Should vote with Context (Download and store yourself)", async ({}, testInfo) => {
+    await verifyVoteWithMetadata(testInfo, false);
+  });
+
+  test("5M_2. Should vote with Context (GovTool pins data to IPFS)", async ({}, testInfo) => {
+    await verifyVoteWithMetadata(testInfo, true );
   });
 });
 

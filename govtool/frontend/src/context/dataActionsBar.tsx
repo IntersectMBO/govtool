@@ -24,6 +24,7 @@ interface DataActionsBarContextType {
   debouncedSearchText: string;
   filtersOpen: boolean;
   searchText: string;
+  lastPath: string;
   setChosenFilters: Dispatch<SetStateAction<string[]>>;
   setChosenSorting: Dispatch<SetStateAction<string>>;
   setFiltersOpen: Dispatch<SetStateAction<boolean>>;
@@ -120,6 +121,7 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
       debouncedSearchText,
       filtersOpen,
       searchText,
+      lastPath,
       setChosenFilters,
       setChosenSorting,
       setFiltersOpen,

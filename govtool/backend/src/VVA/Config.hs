@@ -68,19 +68,21 @@ instance DefaultConfig DBConfig where
 data VVAConfigInternal
   = VVAConfigInternal
       { -- | db-sync database access.
-        vVAConfigInternalDbsyncconfig         :: DBConfig
+        vVAConfigInternalDbsyncconfig                 :: DBConfig
         -- | Server port.
-      , vVAConfigInternalPort                 :: Int
+      , vVAConfigInternalPort                         :: Int
         -- | Server host.
-      , vVAConfigInternalHost                 :: Text
+      , vVAConfigInternalHost                         :: Text
         -- | Request cache duration
-      , vVaConfigInternalCacheDurationSeconds :: Int
+      , vVaConfigInternalCacheDurationSeconds         :: Int
+        -- | DRep List request cache duration
+      , vVaConfigInternalDRepListCacheDurationSeconds :: Int
         -- | Sentry DSN
-      , vVAConfigInternalSentrydsn            :: String
+      , vVAConfigInternalSentrydsn                    :: String
         -- | Sentry environment
-      , vVAConfigInternalSentryEnv            :: String
+      , vVAConfigInternalSentryEnv                    :: String
         -- | Pinata API JWT
-      , vVAConfigInternalPinataApiJwt         :: Maybe Text
+      , vVAConfigInternalPinataApiJwt                 :: Maybe Text
       }
   deriving (FromConfig, Generic, Show)
 
@@ -92,6 +94,7 @@ instance DefaultConfig VVAConfigInternal where
         vVAConfigInternalPort = 3000,
         vVAConfigInternalHost = "localhost",
         vVaConfigInternalCacheDurationSeconds = 20,
+        vVaConfigInternalDRepListCacheDurationSeconds = 600,
         vVAConfigInternalSentrydsn = "https://username:password@senty.host/id",
         vVAConfigInternalSentryEnv = "development",
         vVAConfigInternalPinataApiJwt = Nothing
@@ -101,19 +104,21 @@ instance DefaultConfig VVAConfigInternal where
 data VVAConfig
   = VVAConfig
       { -- | db-sync database credentials.
-        dbSyncConnectionString :: Text
+        dbSyncConnectionString       :: Text
         -- | Server port.
-      , serverPort             :: Int
+      , serverPort                   :: Int
         -- | Server host.
-      , serverHost             :: Text
+      , serverHost                   :: Text
         -- | Request cache duration
-      , cacheDurationSeconds   :: Int
+      , cacheDurationSeconds         :: Int
+        -- | DRep List request cache duration
+      , dRepListCacheDurationSeconds :: Int
         -- | Sentry DSN
-      , sentryDSN              :: String
+      , sentryDSN                    :: String
         -- | Sentry environment
-      , sentryEnv              :: String
+      , sentryEnv                    :: String
         -- | Pinata API JWT
-      , pinataApiJwt           :: Maybe Text
+      , pinataApiJwt                 :: Maybe Text
       }
   deriving (Generic, Show, ToJSON)
 
@@ -153,6 +158,7 @@ convertConfig VVAConfigInternal {..} =
       serverPort = vVAConfigInternalPort,
       serverHost = vVAConfigInternalHost,
       cacheDurationSeconds = vVaConfigInternalCacheDurationSeconds,
+      dRepListCacheDurationSeconds = vVaConfigInternalDRepListCacheDurationSeconds,
       sentryDSN = vVAConfigInternalSentrydsn,
       sentryEnv = vVAConfigInternalSentryEnv,
       pinataApiJwt = vVAConfigInternalPinataApiJwt

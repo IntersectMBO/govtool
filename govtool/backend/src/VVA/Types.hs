@@ -160,6 +160,7 @@ data DRepRegistration
       , dRepRegistrationQualifications         :: Maybe Text
       , dRepRegistrationImageUrl               :: Maybe Text
       , dRepRegistrationImageHash              :: Maybe Text
+      , dRepRegistrationVotesLastYear          :: Maybe Integer
       , dRepRegistrationIdentityReferences     :: Maybe Value
       , dRepRegistrationLinkReferences         :: Maybe Value
       }
@@ -187,6 +188,7 @@ instance FromRow DRepRegistration where
       <*> field -- dRepRegistrationQualifications
       <*> field -- dRepRegistrationImageUrl
       <*> field -- dRepRegistrationImageHash
+      <*> field -- dRepRegistrationVotesLastYear
       <*> field -- dRepRegistrationIdentityReferences
       <*> field -- dRepRegistrationLinkReferences
 

@@ -107,7 +107,7 @@ export const DRepDataForm = ({ control, errors, register, watch }: Props) => {
             subtitle={t("forms.dRepData.imageHelpfulText")}
           />
           <UncontrolledImageInput
-            data-testid="image-input"
+            dataTestId="image-input"
             control={control}
             name="image"
             rules={Rules.IMAGE_URL}

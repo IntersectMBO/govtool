@@ -160,6 +160,7 @@ drepRegistrationToDrep Types.DRepRegistration {..} =
       dRepQualifications = dRepRegistrationQualifications,
       dRepImageUrl = dRepRegistrationImageUrl,
       dRepImageHash = HexText <$> dRepRegistrationImageHash,
+      dRepVotesLastYear = dRepRegistrationVotesLastYear,
       dRepIdentityReferences = DRepReferences <$> dRepRegistrationIdentityReferences,
       dRepLinkReferences = DRepReferences <$> dRepRegistrationLinkReferences
     }
@@ -205,6 +206,8 @@ drepList mSearchQuery statuses mSortMode mPage mPageSize = do
         Just Random -> fmap snd . sortOn fst . Prelude.zip randomizedOrderList
         Just VotingPower -> sortOn $ \Types.DRepRegistration {..} ->
           Down dRepRegistrationVotingPower
+        Just Activity -> sortOn $ \Types.DRepRegistration {..} ->
+          Down dRepRegistrationVotesLastYear
         Just RegistrationDate -> sortOn $ \Types.DRepRegistration {..} ->
           Down dRepRegistrationLatestRegistrationDate
         Just Status -> sortOn $ \Types.DRepRegistration {..} ->

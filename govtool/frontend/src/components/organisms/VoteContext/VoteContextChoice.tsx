@@ -70,6 +70,7 @@ export const VoteContextChoice = ({
           variant="outlined"
           onClick={handleLetGovToolStore}
           sx={{ width: isMobile ? "100%" : "259px", whiteSpace: "nowrap", height: "48px", fontWeight: "500" }}
+          data-testid="govtool-pins-data-to-ipfs-option-button"
         >
           {t("createGovernanceAction.govToolPinsDataToIPFS")}
         </Button>
@@ -77,6 +78,7 @@ export const VoteContextChoice = ({
           variant="outlined"
           onClick={handleStoreItMyself}
           sx={{ width: isMobile ? "100%" : "287px", whiteSpace: "nowrap", height: "48px", fontWeight: "500" }}
+          data-testid="download-and-store-yourself-option-button"
         >
           {t("createGovernanceAction.downloadAndStoreYourself")}
         </Button>

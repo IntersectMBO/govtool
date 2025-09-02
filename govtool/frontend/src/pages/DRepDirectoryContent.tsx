@@ -1,16 +1,16 @@
-import { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { Box, CircularProgress } from "@mui/material";
 
-import { Button, Typography } from "@atoms";
+import { Typography } from "@atoms";
 import { DREP_DIRECTORY_FILTERS, DREP_DIRECTORY_SORTING } from "@consts";
-import { useCardano, useDataActionsBar } from "@context";
+import { useCardano, useDataActionsBar, usePagination } from "@context";
 import {
   useDelegateTodRep,
   useGetAdaHolderCurrentDelegationQuery,
   useGetAdaHolderVotingPowerQuery,
   useGetDRepDetailsQuery,
-  useGetDRepListInfiniteQuery,
+  useGetDRepListPaginatedQuery,
 } from "@hooks";
 import { DataActionsBar, EmptyStateDrepDirectory } from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
@@ -26,6 +26,8 @@ import {
   AutomatedVotingOptionDelegationId,
 } from "@/types/automatedVotingOptions";
 import usePrevious from "@/hooks/usePrevious";
+import { PaginationFooter } from "@/components/molecules/PaginationFooter";
+import { useUpdateEffect } from "@/hooks/useUpdateEffect";
 
 interface DRepDirectoryContentProps {
   isConnected?: boolean;
@@ -55,8 +57,11 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     searchText,
     debouncedSearchText,
     setSearchText,
+    lastPath,
     ...dataActionsBarProps
   } = useDataActionsBar();
+
+  const { page, pageSize, setPage, setPageSize } = usePagination();
 
   const { chosenFilters, chosenSorting, setChosenFilters, setChosenSorting } =
     dataActionsBarProps;
@@ -66,13 +71,19 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   // Set initial filters and sort
   useEffect(() => {
-    setChosenFilters([DRepStatus.Active]);
-    setSearchText(""); // <--- Clear the search field on mount
+    if (!lastPath.includes("drep_directory")) {
+      setChosenFilters([DRepStatus.Active]);
+      setSearchText("");
+    }
   }, []);
 
   useEffect(() => {
-    if (!chosenSorting) setChosenSorting(DRepListSort.Random);
+    if (!chosenSorting) setChosenSorting(DRepListSort.Activity);
   }, [chosenSorting, setChosenSorting]);
+
+  useUpdateEffect(() => {
+    setPage(1);
+  }, [debouncedSearchText, chosenSorting, JSON.stringify(chosenFilters)]);
 
   const { delegate, isDelegating } = useDelegateTodRep();
 
@@ -87,20 +98,25 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   const {
     dRepData: dRepList,
-    isPreviousData,
-    dRepListHasNextPage,
-    dRepListFetchNextPage,
-  } = useGetDRepListInfiniteQuery(
+    isFetching,
+    isPreviousData: isPrev,
+    total,
+    baselineTotalForStatus,
+  } = useGetDRepListPaginatedQuery(
     {
+      page: page - 1, // convert 1-based UI -> 0-based API
+      pageSize,
       searchPhrase: debouncedSearchText,
       sorting: chosenSorting as DRepListSort,
       status: chosenFilters as DRepStatus[],
     },
-    {
-      enabled: !!chosenSorting,
-      keepPreviousData: true,
-    },
+    { enabled: !!chosenSorting },
   );
+
+  const showSearchSummary =
+    searchText !== "" &&
+    (!isFetching || !isPrev) &&
+    total !== baselineTotalForStatus;
 
   useEffect(() => {
     if (!inProgressDelegation && prevInProgressDelegation) {
@@ -212,16 +228,42 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           filterOptions={DREP_DIRECTORY_FILTERS}
           filtersTitle={t("dRepDirectory.filterTitle")}
           sortOptions={DREP_DIRECTORY_SORTING}
+          placeholder={t("dRepDirectory.searchBarPlaceholder")}
         />
+
+        {showSearchSummary && (
+          <Typography fontSize={16} fontWeight={500}>
+            <Trans
+              i18nKey="dRepDirectory.searchSummary"
+              defaults="Found {{found}} DRep{{multiple}} out of a total of <total>{{total}}</total>"
+              values={{
+                found: total ?? "",
+                multiple: total && total > 1 ? "s" : "",
+                total: baselineTotalForStatus ?? "",
+              }}
+              components={{
+                total:
+                  baselineTotalForStatus === undefined ? (
+                    <CircularProgress
+                      size={16}
+                      sx={{ mx: 0.5, verticalAlign: "middle" }}
+                    />
+                  ) : (
+                    <React.Fragment />
+                  ),
+              }}
+            />
+          </Typography>
+        )}
         <Box
           component="ul"
           display="flex"
           flexDirection="column"
           gap={3}
-          mt={4}
+          mt={showSearchSummary ? 0 : 4}
           p={0}
           sx={{
-            opacity: isPreviousData ? 0.5 : 1,
+            opacity: isPrev ? 0.5 : 1,
             transition: "opacity 0.2s",
             flex: 1,
           }}
@@ -245,18 +287,18 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             </Box>
           ))}
         </Box>
+
+        <PaginationFooter
+          page={page}
+          total={total || 0}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={(n) => {
+            setPageSize(n);
+            setPage(1);
+          }}
+        />
       </>
-      {dRepListHasNextPage && dRepList.length >= 10 && (
-        <Box sx={{ justifyContent: "center", display: "flex" }}>
-          <Button
-            data-testid="show-more-button"
-            variant="outlined"
-            onClick={() => dRepListFetchNextPage()}
-          >
-            {t("showMore")}
-          </Button>
-        </Box>
-      )}
     </Box>
   );
 };

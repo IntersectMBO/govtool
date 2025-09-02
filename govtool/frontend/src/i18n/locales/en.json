@@ -314,6 +314,7 @@
     "myDelegationToYourself": "You have delegated <strong>₳ {{ada}}</strong> to yourself",
     "myDRep": "You have delegated <strong>₳ {{ada}}</strong> to this DRep",
     "listTitle": "Find a DRep",
+    "searchBarPlaceholder": "Search for a DRep name or ID",
     "noConfidenceDefaultDescription": "Select this to signal no confidence in the current constitutional committee by voting NO on every proposal and voting YES to no confidence proposals",
     "noConfidenceDefaultTitle": "Signal No Confidence on Every Vote",
     "noResultsForTheSearchTitle": "No DReps found",

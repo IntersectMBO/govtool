@@ -205,7 +205,7 @@ instance ToParamSchema GovernanceActionType where
       & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [GovernanceActionType])
 
 
-data DRepSortMode = Random | VotingPower | RegistrationDate | Status deriving
+data DRepSortMode = Random | VotingPower | Activity | RegistrationDate | Status deriving
     ( Bounded
     , Enum
     , Eq
@@ -917,6 +917,7 @@ data DRep
       , dRepQualifications         :: Maybe Text
       , dRepImageUrl               :: Maybe Text
       , dRepImageHash              :: Maybe HexText
+      , dRepVotesLastYear          :: Maybe Integer
       , dRepIdentityReferences     :: Maybe DRepReferences
       , dRepLinkReferences         :: Maybe DRepReferences
       }
@@ -944,6 +945,7 @@ exampleDrep =
   <> "\"qualifications\": \"Some Qualifications\","
   <> "\"qualifications\": \"Some Qualifications\","
   <> "\"imageUrl\": \"https://image.url\","
+  <> "\"votesLastYear\": 15,"
   <> "\"imageHash\": \"9198b1b204273ba5c67a13310b5a806034160f6a063768297e161d9b759cad61\"}"
 
 -- ToSchema instance for DRep

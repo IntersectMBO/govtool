@@ -1,6 +1,7 @@
 export * from "./appContext";
 export * from "./contextProviders";
 export * from "./dataActionsBar";
+export * from "./pagination";
 export * from "./modal";
 export * from "./pendingTransaction";
 export * from "./snackbar";

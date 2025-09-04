@@ -259,13 +259,12 @@ test.describe("Perform voting", () => {
 
     govActionDetailsPage = await governanceActionsPage.viewFirstVotedProposal();
     
+        
     await govActionDetailsPage.currentPage.getByTestId("yes-radio").isVisible();
-
-    await govActionDetailsPage.currentPage.getByTestId("show-more-button").click();
-    await govActionDetailsPage.currentPage.waitForTimeout(2000);
     
-    const voteRationaleContext = await govActionDetailsPage.currentPage.getByTestId("vote-rationale-context");
-    await expect(voteRationaleContext).toContainText(fakerContext);
+    const voteRationaleContext = await govActionDetailsPage.currentPage.getByTestId("vote-rationale-context").textContent();
+
+    expect(voteRationaleContext).toEqual(fakerContext);
   });
 
   test("5I. Should view the vote details,when viewing governance action already voted by the DRep", async ({}, testInfo) => {

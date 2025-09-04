@@ -8,11 +8,11 @@ import { VotedProposal } from "@/models";
 export const useGetDRepVotesQuery = (
   type?: string[],
   sort?: string,
-  search?: string,
+  search?: string
 ) => {
   const { dRepID, pendingTransaction } = useCardano();
 
-  const { data, isLoading, refetch, isRefetching } = useQuery({
+  const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: [
       QUERY_KEYS.useGetDRepVotesKey,
       pendingTransaction.vote?.transactionHash,
@@ -62,6 +62,6 @@ export const useGetDRepVotesQuery = (
     }[],
     areDRepVotesLoading: isLoading,
     refetch,
-    isRefetching,
+    isFetching,
   };
 };

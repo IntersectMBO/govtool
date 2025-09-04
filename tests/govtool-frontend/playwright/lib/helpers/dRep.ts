@@ -17,8 +17,9 @@ export async function fetchFirstActiveDRepDetails(page: Page) {
   let dRepGivenName: string;
   let dRepId: string;
   let dRepDirectoryPage: DRepDirectoryPage;
+  let routePath = "**/drep/list?page=0&pageSize=5&sort=Activity&**";
   await page.route(
-    "**/drep/list?page=0&pageSize=10&sort=Random&**",
+    routePath,
     async (route) => {
       const response = await route.fetch();
       const json = await response.json();
@@ -40,7 +41,7 @@ export async function fetchFirstActiveDRepDetails(page: Page) {
   );
 
   const responsePromise = page.waitForResponse(
-    "**/drep/list?page=0&pageSize=10&sort=Random&**"
+    routePath
   );
 
   await functionWaitedAssert(

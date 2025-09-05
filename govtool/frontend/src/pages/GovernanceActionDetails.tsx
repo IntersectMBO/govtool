@@ -44,8 +44,8 @@ export const GovernanceActionDetails = () => {
   const { t } = useTranslation();
   const { proposalId: txHash } = useParams();
 
-  const fullProposalId = txHash && getFullGovActionId(txHash, index);
-  const shortenedGovActionId = txHash && getShortenedGovActionId(txHash, index);
+  const fullProposalId = txHash && getFullGovActionId(txHash, +index);
+  const shortenedGovActionId = txHash && getShortenedGovActionId(txHash, +index);
 
   const { data, isLoading, error } = useGetProposalQuery(
     fullProposalId ?? "",

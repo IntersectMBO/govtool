@@ -74,8 +74,9 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
         alignItems="center"
         display="flex"
         justifyContent="space-between"
-        gap={1.5}
-        flexWrap="wrap"
+        gap={{ xs: 0.75, sm: 1.5 }}
+        flexWrap="nowrap"
+        width="100%"
       >
         <InputBase
           inputProps={{ "data-testid": "search-input" }}
@@ -113,38 +114,47 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
             fontWeight: 500,
             height: 48,
             padding: "16px 24px",
-            maxWidth: 500,
-            flex: "0 0 auto",
+            flex: "1 1 auto",
+            minWidth: 0,
+            maxWidth: "none",
           }}
         />
 
-        <OrderActionsChip
-          chosenFiltersLength={chosenFiltersLength}
-          filtersOpen={effectiveFiltersOpen}
-          isFiltering={isFiltering}
-          setFiltersOpen={setEffectiveFiltersOpen}
-          chosenSorting={chosenSorting}
-          setSortOpen={setEffectiveSortOpen}
-          sortOpen={effectiveSortOpen}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: { xs: 0.5, sm: 1.25 },
+          }}
         >
-          {effectiveFiltersOpen && (
-            <DataActionsFilters
-              chosenFilters={chosenFilters}
-              setChosenFilters={setChosenFilters}
-              closeFilters={closeFilters}
-              options={filterOptions}
-              title={filtersTitle}
-            />
-          )}
-          {effectiveSortOpen && (
-            <DataActionsSorting
-              chosenSorting={chosenSorting}
-              setChosenSorting={setChosenSorting}
-              closeSorts={closeSorts}
-              options={sortOptions}
-            />
-          )}
-        </OrderActionsChip>
+          <OrderActionsChip
+            chosenFiltersLength={chosenFiltersLength}
+            filtersOpen={effectiveFiltersOpen}
+            isFiltering={isFiltering}
+            setFiltersOpen={setEffectiveFiltersOpen}
+            chosenSorting={chosenSorting}
+            setSortOpen={setEffectiveSortOpen}
+            sortOpen={effectiveSortOpen}
+          >
+            {effectiveFiltersOpen && (
+              <DataActionsFilters
+                chosenFilters={chosenFilters}
+                setChosenFilters={setChosenFilters}
+                closeFilters={closeFilters}
+                options={filterOptions}
+                title={filtersTitle}
+              />
+            )}
+            {effectiveSortOpen && (
+              <DataActionsSorting
+                chosenSorting={chosenSorting}
+                setChosenSorting={setChosenSorting}
+                closeSorts={closeSorts}
+                options={sortOptions}
+              />
+            )}
+          </OrderActionsChip>
+        </Box>
       </Box>
 
       {selectedFilterItems.length > 0 && (
@@ -153,10 +163,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
           flexWrap="wrap"
           gap={1}
           alignItems="flex-start"
-          sx={{
-            mt: 2,
-            "& > *": { flex: "0 0 auto", alignSelf: "flex-start" },
-          }}
+          sx={{ mt: 2, "& > *": { flex: "0 0 auto", alignSelf: "flex-start" } }}
         >
           {selectedFilterItems.map(({ key, label }) => (
             <ChipButton

@@ -75,7 +75,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
         display="flex"
         justifyContent="space-between"
         gap={{ xs: 0.75, sm: 1.5 }}
-        flexWrap="nowrap"
+        flexWrap={{ xs: "wrap", sm: "nowrap" }}
         width="100%"
       >
         <InputBase
@@ -94,7 +94,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
             />
           }
           endAdornment={
-            searchText && (
+            searchText ? (
               <IconButton
                 size="small"
                 onClick={() => setSearchText("")}
@@ -102,7 +102,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
               >
                 <CloseIcon fontSize="small" />
               </IconButton>
-            )
+            ) : null
           }
           sx={{
             bgcolor: "white",
@@ -114,9 +114,9 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
             fontWeight: 500,
             height: 48,
             padding: "16px 24px",
-            flex: "1 1 auto",
+            flex: "1 1 0",
             minWidth: 0,
-            maxWidth: "none",
+            maxWidth: "100%",
           }}
         />
 
@@ -125,6 +125,9 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
             display: "flex",
             alignItems: "center",
             gap: { xs: 0.5, sm: 1.25 },
+            flex: "0 0 auto",
+            flexShrink: 0,
+            mt: { xs: 1, sm: 0 },
           }}
         >
           <OrderActionsChip

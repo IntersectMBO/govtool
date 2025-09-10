@@ -66,9 +66,14 @@ test.describe("Logged in DRep", () => {
             GovernanceActionType.InfoAction
           )
         : await govActionsPage.viewFirstProposal();
+      
+      await govActionDetailsPage.yesVoteRadio.click();
+      await govActionDetailsPage.voteBtn.click()
 
+      
       await govActionDetailsPage.contextInput.fill(faker.lorem.sentence(200));
       await govActionDetailsPage.confirmModalBtn.click();
+      await govActionDetailsPage.downloadAndStoreYourselfOptionBtn.click();
       await page.getByRole("checkbox").click();
       await govActionDetailsPage.confirmModalBtn.click();
     });

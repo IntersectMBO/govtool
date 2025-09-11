@@ -75,8 +75,7 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     (!pathname.startsWith(lastPath) || lastPath === "" || lastPath === "/");
   const userOpenedGADetails = gADetailsPathnameRegexp.test(pathname);
   const userOpenedGADetailsFromCategoryPage =
-    userOpenedGADetails &&
-    lastPath.includes("governance_actions/category");
+    userOpenedGADetails && lastPath.includes("governance_actions/category");
   const userMovedFromGAListToCategoryPage =
     lastPath.endsWith("governance_actions") &&
     pathname.includes("governance_actions/category");
@@ -84,6 +83,10 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     (gADetailsPathnameRegexp.test(lastPath) &&
       pathname.includes("governance_actions")) ||
     pathname.includes("governance_actions/category");
+  const isSearchOrFilterSet =
+    debouncedSearchText.length > 0 ||
+    chosenSorting !== "" ||
+    chosenFilters.length > 0;
 
   useEffect(() => {
     isAdjusting.current = true;
@@ -91,7 +94,7 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
       return;
     }
 
-    if (userMovedFromGADetailsToListOrCategoryPage && debouncedSearchText.length > 0) {
+    if (userMovedFromGADetailsToListOrCategoryPage && isSearchOrFilterSet) {
       isAdjusting.current = false;
       return;
     }

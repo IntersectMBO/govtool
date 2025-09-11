@@ -94,7 +94,7 @@ export default class OutcomeDetailsPage {
     isLoggedIn = false
   ) {
     await Promise.all(
-      Object.keys(outcomeType).map(async (filterKey) => {
+      Object.entries(outcomeType).map(async ([filterKey, filterValue]) => {
         const outcomePage = new OutComesPage(this.page);
         const {
           govActionDetailsPage,
@@ -106,6 +106,7 @@ export default class OutcomeDetailsPage {
           isLoggedIn
         );
 
+        
         if (!govActionDetailsPage) {
           return;
         }
@@ -119,6 +120,11 @@ export default class OutcomeDetailsPage {
           await govActionDetailsPage.getSposAndDRepAbstainNoConfidence(
             metricsResponse
           );
+
+        const metricsResponseJson = await metricsResponse.json();
+        const totalStakeControlledByNoConfidence = Number(metricsResponseJson.always_no_confidence_voting_power)
+        const dRepYesVotes = filterValue === outcomeType.NoConfidence ? Number(proposalToCheck.yes_votes) + totalStakeControlledByNoConfidence : Number(proposalToCheck.yes_votes);
+        const dRepNoVotes = filterValue != outcomeType.NoConfidence ? Number(proposalToCheck.no_votes) + totalStakeControlledByNoConfidence : Number(proposalToCheck.no_votes) ;
 
         const currentPageUrl = govActionDetailsPage.currentPage.url();
 
@@ -134,7 +140,7 @@ export default class OutcomeDetailsPage {
               message: `DRep "Yes" voting power checked for ${currentPageUrl}`,
             }
           ).toHaveText(
-            `Yes${formatWithThousandSeparator(proposalToCheck.yes_votes, false)}`,
+            `Yes${formatWithThousandSeparator(dRepYesVotes, false)}`,
             {
               timeout: 60_000,
             }
@@ -177,7 +183,7 @@ export default class OutcomeDetailsPage {
               message: `DRep "No" voting power checked for ${currentPageUrl}`,
             }
           ).toHaveText(
-            `No${formatWithThousandSeparator(proposalToCheck.no_votes, false)}`
+            `No${formatWithThousandSeparator(dRepNoVotes, false)}`
           ); //BUG missing testIds
         }
 

@@ -13,7 +13,7 @@ test.beforeEach(async () => {
 });
 
 enum SortOption {
-  Random = "Random",
+  Activity = "Activity",
   RegistrationDate = "RegistrationDate",
   VotingPower = "VotingPower",
   Status = "Status",
@@ -51,7 +51,8 @@ test("2K_2. Should sort DReps", async ({ page }) => {
   );
 });
 
-test("2K_3. Should sort DReps randomly", async ({ page }) => {
+test("2K_3. Should sort DReps randomly (Deprecated)", async ({ page }) => {
+  test.skip()
   const dRepDirectory = new DRepDirectoryPage(page);
   await dRepDirectory.goto();
 
@@ -60,13 +61,13 @@ test("2K_3. Should sort DReps randomly", async ({ page }) => {
   await page.getByTestId(`${SortOption.RegistrationDate}-radio`).click();
 
   const dRepList1: IDRep[] = await dRepDirectory.getDRepsResponseFromApi(
-    SortOption.Random
+    SortOption.Activity
   );
 
   await page.getByTestId(`${SortOption.RegistrationDate}-radio`).click();
 
   const dRepList2: IDRep[] = await dRepDirectory.getDRepsResponseFromApi(
-    SortOption.Random
+    SortOption.Activity
   );
 
   // Extract dRepIds from both lists
@@ -82,11 +83,12 @@ test("2K_3. Should sort DReps randomly", async ({ page }) => {
   expect(isOrderDifferent).toBe(true);
 });
 
-test("2O. Should load more DReps on show more", async ({ page }) => {
+test("2O. Should load more DReps on show more (Deprecated)", async ({ page }) => {
+  test.skip();
   const responsePromise = page.waitForResponse((response) =>
     response
       .url()
-      .includes(`drep/list?page=1&pageSize=10&sort=${SortOption.Random}`)
+      .includes(`drep/list?page=1&pageSize=10&sort=${SortOption.Activity}`)
   );
   const dRepDirectory = new DRepDirectoryPage(page);
   await dRepDirectory.goto();

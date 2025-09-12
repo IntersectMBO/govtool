@@ -377,7 +377,7 @@
     }
   },
   "footer": {
-    "copyright": "© {{year}} Intersect",
+    "copyright": "© {{year}} GovTool",
     "privacyPolicy": "Privacy policy",
     "termOfService": "Terms of Use"
   },

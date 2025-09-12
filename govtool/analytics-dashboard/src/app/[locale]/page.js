@@ -170,7 +170,7 @@ function Dashboard() {
 				padding={2}
 			>
 				<Typography variant="caption" display="block" gutterBottom>
-					© {new Date().getFullYear()} Intersect
+					© {new Date().getFullYear()} GovTool
 				</Typography>
 				<Link href="https://sanchogov.tools/">
 					<Typography

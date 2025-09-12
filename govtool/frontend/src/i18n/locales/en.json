@@ -377,7 +377,7 @@
     }
   },
   "footer": {
-    "copyright": "© {{year}} Intersect MBO",
+    "copyright": "© {{year}} Intersect",
     "privacyPolicy": "Privacy policy",
     "termOfService": "Terms of Use"
   },

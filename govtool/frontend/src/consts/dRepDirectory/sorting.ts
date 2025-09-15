@@ -1,7 +1,7 @@
 export const DREP_DIRECTORY_SORTING = [
   {
     key: "Activity",
-    label: "Activity Voting",
+    label: "Voting Activity",
   },
   {
     key: "RegistrationDate",

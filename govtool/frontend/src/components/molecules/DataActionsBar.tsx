@@ -65,6 +65,11 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
     [chosenFilters, filterOptions],
   );
 
+  const chosenSortingLabel = useMemo(() => {
+    const opt = (sortOptions ?? []).find((o) => o.key === chosenSorting);
+    return opt?.label ?? chosenSorting;
+  }, [sortOptions, chosenSorting]);
+
   const handleRemoveFilter = (key: string) =>
     setChosenFilters?.((prev) => (prev ?? []).filter((k) => k !== key));
 
@@ -135,7 +140,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
             filtersOpen={effectiveFiltersOpen}
             isFiltering={isFiltering}
             setFiltersOpen={setEffectiveFiltersOpen}
-            chosenSorting={chosenSorting}
+            chosenSorting={chosenSortingLabel}
             setSortOpen={setEffectiveSortOpen}
             sortOpen={effectiveSortOpen}
           >

@@ -77,7 +77,7 @@ export const DashboardGovernanceActionsVotedOn = ({
         <Box
           columnGap="20px"
           display="grid"
-          gridTemplateColumns={`repeat(auto-fit, minmax(${
+          gridTemplateColumns={`repeat(auto-fill, minmax(${
             screenWidth < 420 ? "290px" : isMobile ? "324px" : "350px"
           }, 1fr))`}
         >

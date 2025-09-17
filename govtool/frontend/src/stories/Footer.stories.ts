@@ -21,7 +21,7 @@ export const FooterComponent: Story = {
 
     const nowDate = new Date();
     await expect(
-      canvas.getByText(`© ${nowDate.getFullYear()} Intersect MBO`),
+      canvas.getByText(`© ${nowDate.getFullYear()} GovTool`),
     ).toBeInTheDocument();
     await userEvent.click(canvas.getByTestId("privacy-policy-footer-link"));
     await expect(window.open).toHaveBeenCalledTimes(1);

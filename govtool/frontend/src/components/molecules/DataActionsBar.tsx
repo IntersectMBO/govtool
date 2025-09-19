@@ -74,14 +74,16 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
     setChosenFilters?.((prev) => (prev ?? []).filter((k) => k !== key));
 
   return (
-    <Box display="flex" flexDirection="column" gap={1.5}>
+    <Box display="flex" flexDirection="column" gap={1.5} sx={{ width: "100%" }}>
       <Box
+        display="grid"
+        gridTemplateColumns={{
+          xs: "minmax(0,1fr) max-content",
+          sm: "minmax(0,1fr) max-content",
+        }}
+        columnGap={{ xs: 1, sm: 1.5 }}
         alignItems="center"
-        display="flex"
-        justifyContent="space-between"
-        gap={{ xs: 0.75, sm: 1.5 }}
-        flexWrap={{ xs: "wrap", sm: "nowrap" }}
-        width="100%"
+        sx={{ width: "100%" }}
       >
         <InputBase
           inputProps={{ "data-testid": "search-input" }}
@@ -115,7 +117,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
             borderColor: "#6E87D9",
             borderRadius: 50,
             boxShadow: "2px 2px 20px 0 rgba(0,0,0,0.05)",
-            fontSize: 11,
+            fontSize: { xs: 16, sm: 11 },
             fontWeight: 500,
             height: 48,
             padding: "16px 24px",
@@ -133,6 +135,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
             flex: "0 0 auto",
             flexShrink: 0,
             mt: { xs: 1, sm: 0 },
+            mr: { xs: 2, sm: 0 },
           }}
         >
           <OrderActionsChip

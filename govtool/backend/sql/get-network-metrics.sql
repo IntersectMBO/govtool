@@ -22,13 +22,18 @@ CurrentEpoch AS (
     SELECT MAX(no) AS no FROM epoch
 ),
 CommitteeMembers AS (
-    SELECT DISTINCT ON (cm.committee_hash_id)
-        cm.id,
-        cm.expiration_epoch
+    SELECT
+        DISTINCT cm.committee_hash_id AS committee_members
     FROM committee_member cm
-    CROSS JOIN CurrentEpoch
-    WHERE
-        cm.expiration_epoch >= CurrentEpoch.no
+        JOIN committee c ON c.id = cm.committee_id
+        LEFT JOIN gov_action_proposal gap ON gap.id = c.gov_action_proposal_id
+        CROSS JOIN CurrentEpoch ce
+    WHERE (
+        (c.gov_action_proposal_id IS NULL)
+       OR
+        (gap.enacted_epoch IS NOT NULL AND gap.enacted_epoch <= ce.no)
+        )
+      AND cm.expiration_epoch >= ce.no
 ),
 NoOfCommitteeMembers AS (
 	SELECT COUNT(*) total FROM CommitteeMembers

@@ -150,12 +150,19 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       currentDelegation?.dRepView ===
         AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence);
 
-  const scaleWrapSx = {
-    width: "100%",
-    transform: { xs: "scale(0.90)", sm: "scale(0.90)", md: "none" },
-    transformOrigin: { xs: "top left", sm: "top left", md: "initial" },
-    ml: { xs: 0.25, sm: 0.25, md: 0 },
-  } as const;
+  const scaleWrapSx = isConnected
+    ? ({
+        width: "100%",
+        transform: { xs: "scale(0.9)", sm: "scale(0.9)", md: "none" },
+        transformOrigin: { xs: "top center", sm: "top center", md: "initial" },
+        ml: { xs: 0.25, sm: 0.25, md: 0 },
+      } as const)
+    : ({
+        width: "100%",
+        transform: { xs: "scale(0.9)", sm: "scale(0.9)", md: "none" },
+        transformOrigin: { xs: "top left", sm: "top left", md: "initial" },
+        ml: { xs: 0.25, sm: 0.25, md: 0 },
+      } as const);
 
   return (
     <Box
@@ -313,10 +320,10 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
         <Box
           sx={{
             width: "100%",
-            transform: { xs: "scale(0.90)", sm: "scale(0.90)", md: "none" },
+            transform: { xs: "scale(0.85)", sm: "scale(0.85)", md: "none" },
             transformOrigin: {
-              xs: "top right",
-              sm: "top right",
+              xs: "top rigth",
+              sm: "top rigth",
               md: "initial",
             },
           }}

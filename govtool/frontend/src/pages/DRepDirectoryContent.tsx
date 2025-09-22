@@ -150,13 +150,20 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       currentDelegation?.dRepView ===
         AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence);
 
+  const scaleWrapSx = {
+    width: "100%",
+    transform: { xs: "scale(0.90)", sm: "scale(0.90)", md: "none" },
+    transformOrigin: { xs: "top left", sm: "top left", md: "initial" },
+    ml: { xs: 0.25, sm: 0.25, md: 0 },
+  } as const;
+
   return (
     <Box
       display="flex"
       flex={1}
       flexDirection="column"
       gap={4}
-      sx={{ width: "100%", maxWidth: "100vw", overflowX: "hidden" }}
+      sx={{ width: "100%", maxWidth: "100vw" }}
     >
       {myDrep &&
         !inProgressDelegation &&
@@ -166,26 +173,31 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             <Typography variant="title2" sx={{ mb: 2 }}>
               <Trans i18nKey="dRepDirectory.myDelegation" values={{ ada }} />
             </Typography>
-            <Box sx={{ width: "100%" }}>
-              <DRepCard
-                dRep={myDrep}
-                isConnected={!!isConnected}
-                isInProgress={isSameDRep(myDrep, inProgressDelegation)}
-                isMe={isSameDRep(myDrep, myDRepId)}
-              />
+            <Box>
+              <Box sx={scaleWrapSx}>
+                <DRepCard
+                  dRep={myDrep}
+                  isConnected={!!isConnected}
+                  isInProgress={isSameDRep(myDrep, inProgressDelegation)}
+                  isMe={isSameDRep(myDrep, myDRepId)}
+                />
+              </Box>
             </Box>
           </div>
         )}
+
       {inProgressDelegation &&
         inProgressDelegation !== myDRepId &&
         inProgressDelegationDRepData && (
-          <Box sx={{ width: "100%" }}>
-            <DRepCard
-              dRep={inProgressDelegationDRepData}
-              isConnected={!!isConnected}
-              isMe={isSameDRep(inProgressDelegationDRepData, myDRepId)}
-              isInProgress
-            />
+          <Box>
+            <Box sx={scaleWrapSx}>
+              <DRepCard
+                dRep={inProgressDelegationDRepData}
+                isConnected={!!isConnected}
+                isMe={isSameDRep(inProgressDelegationDRepData, myDRepId)}
+                isInProgress
+              />
+            </Box>
           </Box>
         )}
 
@@ -194,34 +206,32 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           <Typography variant="title2" sx={{ mb: 2 }}>
             {t("dRepDirectory.delegationOptions")}
           </Typography>
-          <Box sx={{ width: "100%" }}>
-            <AutomatedVotingOptions
-              currentDelegation={
-                !pendingTransaction.delegate && isAnAutomatedVotingOptionChosen
-                  ? currentDelegation?.dRepView
-                  : undefined
-              }
-              delegate={delegate}
-              delegationInProgress={
-                inProgressDelegation &&
-                (inProgressDelegation ===
-                  AutomatedVotingOptionDelegationId.abstain ||
-                  inProgressDelegation ===
-                    AutomatedVotingOptionDelegationId.no_confidence)
-                  ? inProgressDelegation
-                  : undefined
-              }
-              isConnected={!!isConnected}
-              isDelegationLoading={isDelegating}
-              votingPower={ada.toString()}
-              pendingTransaction={pendingTransaction}
-              txHash={
-                !pendingTransaction.delegate && isAnAutomatedVotingOptionChosen
-                  ? currentDelegation?.txHash
-                  : undefined
-              }
-            />
-          </Box>
+          <AutomatedVotingOptions
+            currentDelegation={
+              !pendingTransaction.delegate && isAnAutomatedVotingOptionChosen
+                ? currentDelegation?.dRepView
+                : undefined
+            }
+            delegate={delegate}
+            delegationInProgress={
+              inProgressDelegation &&
+              (inProgressDelegation ===
+                AutomatedVotingOptionDelegationId.abstain ||
+                inProgressDelegation ===
+                  AutomatedVotingOptionDelegationId.no_confidence)
+                ? inProgressDelegation
+                : undefined
+            }
+            isConnected={!!isConnected}
+            isDelegationLoading={isDelegating}
+            votingPower={ada.toString()}
+            pendingTransaction={pendingTransaction}
+            txHash={
+              !pendingTransaction.delegate && isAnAutomatedVotingOptionChosen
+                ? currentDelegation?.txHash
+                : undefined
+            }
+          />
         </div>
       )}
 
@@ -271,52 +281,46 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           mt={showSearchSummary ? 0 : 4}
           p={0}
           sx={{
-            opacity: isPrev ? 0.5 : 1,
-            transition: "opacity 0.2s",
             flex: 1,
             width: "100%",
             maxWidth: "100%",
-            overflowX: "hidden",
           }}
         >
           {filteredDoNotListDReps?.length === 0 && <EmptyStateDrepDirectory />}
           {filteredDoNotListDReps?.map((dRep) => (
-            <Box
-              key={dRep.view}
-              component="li"
-              sx={{
-                listStyle: "none",
-                width: "100%",
-                maxWidth: "100%",
-                "& .MuiCard-root, & .MuiPaper-root": {
-                  width: "100% !important",
-                  maxWidth: "100% !important",
-                  marginLeft: "0 !important",
-                  marginRight: "0 !important",
-                },
-                "& .MuiCardContent-root, & .MuiCardActions-root": {
-                  minWidth: 0,
-                },
-              }}
-            >
-              <DRepCard
-                dRep={dRep}
-                isConnected={!!isConnected}
-                isDelegationLoading={
-                  isDelegating === dRep.view || isDelegating === dRep.drepId
-                }
-                isMe={isSameDRep(dRep, myDRepId)}
-                isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
-                onDelegate={() => {
-                  setInProgressDelegationDRepData(dRep);
-                  delegate(dRep.drepId);
-                }}
-              />
+            <Box key={dRep.view} component="li" sx={{ listStyle: "none" }}>
+              <Box>
+                <Box sx={scaleWrapSx}>
+                  <DRepCard
+                    dRep={dRep}
+                    isConnected={!!isConnected}
+                    isDelegationLoading={
+                      isDelegating === dRep.view || isDelegating === dRep.drepId
+                    }
+                    isMe={isSameDRep(dRep, myDRepId)}
+                    isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
+                    onDelegate={() => {
+                      setInProgressDelegationDRepData(dRep);
+                      delegate(dRep.drepId);
+                    }}
+                  />
+                </Box>
+              </Box>
             </Box>
           ))}
         </Box>
 
-        <Box sx={{ width: "100%", maxWidth: "100%", overflowX: "hidden" }}>
+        <Box
+          sx={{
+            width: "100%",
+            transform: { xs: "scale(0.90)", sm: "scale(0.90)", md: "none" },
+            transformOrigin: {
+              xs: "top right",
+              sm: "top right",
+              md: "initial",
+            },
+          }}
+        >
           <PaginationFooter
             page={page}
             total={total || 0}

@@ -796,9 +796,9 @@
     "title": "This tool is connected to {{networkName}}",
     "bootstrappingWarning": "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>",
     "maintenanceEnding": {
-      "title": "\uD83D\uDCA1 Next Step: Treasury Withdrawal based on your feedback is coming soon",
+      "title": "\uD83D\uDCA1 Next Step: Treasury Withdrawal based on your feedback has been submitted",
       "description1": "<0>The Info Action</0> has passed — thank you for your support!",
-      "description2": "We’re now preparing a Treasury Withdrawal proposal that reflects the feedback gathered during the voting phase to ensure continued development and maintenance of GovTool as a community-owned governance interface on Cardano."
+      "description2": "We have now submitted a <0>Treasury Withdrawal</0> that reflects the feedback gathered during the voting phase to ensure continued development and maintenance of GovTool as a community-owned governance interface on Cardano."
     }
   },
   "tooltips": {

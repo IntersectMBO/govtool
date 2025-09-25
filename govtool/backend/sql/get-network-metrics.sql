@@ -22,21 +22,18 @@ CurrentEpoch AS (
     SELECT MAX(no) AS no FROM epoch
 ),
 CommitteeMembers AS (
-    SELECT DISTINCT ON (cm.committee_hash_id)
-        cr.id,
-        block.time,
-        encode(cold_key_hash.raw, 'hex') cold_key,
-        encode(hot_key_hash.raw, 'hex') hot_key
-    FROM committee_registration cr
-    JOIN tx ON tx.id = cr.tx_id
-    JOIN block ON block.id = tx.block_id
-    JOIN committee_hash cold_key_hash ON cr.cold_key_id = cold_key_hash.id
-    JOIN committee_hash hot_key_hash ON cr.hot_key_id = hot_key_hash.id
-    JOIN committee_member cm ON cm.committee_hash_id = cold_key_hash.id OR cm.committee_hash_id = hot_key_hash.id
-    LEFT JOIN committee_de_registration cdr ON cdr.cold_key_id = cold_key_hash.id
-    CROSS JOIN CurrentEpoch
-    WHERE
-        cdr.id IS NULL AND cm.expiration_epoch > CurrentEpoch.no 
+    SELECT
+        DISTINCT cm.committee_hash_id AS committee_members
+    FROM committee_member cm
+        JOIN committee c ON c.id = cm.committee_id
+        LEFT JOIN gov_action_proposal gap ON gap.id = c.gov_action_proposal_id
+        CROSS JOIN CurrentEpoch ce
+    WHERE (
+        (c.gov_action_proposal_id IS NULL)
+       OR
+        (gap.enacted_epoch IS NOT NULL AND gap.enacted_epoch <= ce.no)
+        )
+      AND cm.expiration_epoch >= ce.no
 ),
 NoOfCommitteeMembers AS (
 	SELECT COUNT(*) total FROM CommitteeMembers

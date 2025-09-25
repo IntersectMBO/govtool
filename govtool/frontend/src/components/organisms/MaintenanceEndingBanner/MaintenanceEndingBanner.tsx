@@ -102,7 +102,20 @@ export const MaintenanceEndingBanner = () => {
             color="common.white"
             mb={0.5}
           >
-            {t("system.maintenanceEnding.description2")}
+            <Trans
+              i18nKey="system.maintenanceEnding.description2"
+              components={[
+                <Link
+                  variant="caption"
+                  fontWeight={600}
+                  color="common.white"
+                  href="https://gov.tools/governance_actions/d2db60c5307cb517c735e2d0138d2b6f10fc5b221d610fa187719bdc82af9a03#0"
+                  data-testid="govtool-info-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />,
+              ]}
+            />
           </Typography>
         </Box>
       </Box>

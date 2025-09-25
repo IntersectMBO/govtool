@@ -24,11 +24,11 @@ export const validateSignature = async ({
     switch (algorithm) {
       case "ed25519":
       case "Ed25519": {
-        return verifyEd25519Signature(signature, messageHash, publicKey);
+        return await verifyEd25519Signature(signature, messageHash, publicKey);
       }
       case "CIP-8":
       case "CIP-0008": {
-        return verifyCIP8Signature(signature, messageHash, publicKey);
+        return await verifyCIP8Signature(signature, messageHash, publicKey);
       }
       default:
         console.error("Unsupported algorithm:", algorithm);

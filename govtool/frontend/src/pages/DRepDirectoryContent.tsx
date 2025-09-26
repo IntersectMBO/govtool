@@ -69,7 +69,6 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const [inProgressDelegationDRepData, setInProgressDelegationDRepData] =
     useState<DRepData | undefined>(undefined);
 
-  // Set initial filters and sort
   useEffect(() => {
     if (!lastPath.includes("drep_directory")) {
       setChosenFilters([DRepStatus.Active]);
@@ -104,7 +103,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     baselineTotalForStatus,
   } = useGetDRepListPaginatedQuery(
     {
-      page: page - 1, // convert 1-based UI -> 0-based API
+      page: page - 1,
       pageSize,
       searchPhrase: debouncedSearchText,
       sorting: chosenSorting as DRepListSort,
@@ -151,9 +150,28 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       currentDelegation?.dRepView ===
         AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence);
 
+  const scaleWrapSx = isConnected
+    ? ({
+        width: "100%",
+        transform: { xs: "scale(0.9)", sm: "scale(0.9)", md: "none" },
+        transformOrigin: { xs: "top center", sm: "top center", md: "initial" },
+        ml: { xs: 0.25, sm: 0.25, md: 0 },
+      } as const)
+    : ({
+        width: "100%",
+        transform: { xs: "scale(0.9)", sm: "scale(0.9)", md: "none" },
+        transformOrigin: { xs: "top left", sm: "top left", md: "initial" },
+        ml: { xs: 0.25, sm: 0.25, md: 0 },
+      } as const);
+
   return (
-    <Box display="flex" flex={1} flexDirection="column" gap={4}>
-      {/* My delegation */}
+    <Box
+      display="flex"
+      flex={1}
+      flexDirection="column"
+      gap={4}
+      sx={{ width: "100%", maxWidth: "100vw" }}
+    >
       {myDrep &&
         !inProgressDelegation &&
         currentDelegation &&
@@ -162,26 +180,34 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             <Typography variant="title2" sx={{ mb: 2 }}>
               <Trans i18nKey="dRepDirectory.myDelegation" values={{ ada }} />
             </Typography>
-            <DRepCard
-              dRep={myDrep}
-              isConnected={!!isConnected}
-              isInProgress={isSameDRep(myDrep, inProgressDelegation)}
-              isMe={isSameDRep(myDrep, myDRepId)}
-            />
+            <Box>
+              <Box sx={scaleWrapSx}>
+                <DRepCard
+                  dRep={myDrep}
+                  isConnected={!!isConnected}
+                  isInProgress={isSameDRep(myDrep, inProgressDelegation)}
+                  isMe={isSameDRep(myDrep, myDRepId)}
+                />
+              </Box>
+            </Box>
           </div>
         )}
+
       {inProgressDelegation &&
         inProgressDelegation !== myDRepId &&
         inProgressDelegationDRepData && (
-          <DRepCard
-            dRep={inProgressDelegationDRepData}
-            isConnected={!!isConnected}
-            isMe={isSameDRep(inProgressDelegationDRepData, myDRepId)}
-            isInProgress
-          />
+          <Box>
+            <Box sx={scaleWrapSx}>
+              <DRepCard
+                dRep={inProgressDelegationDRepData}
+                isConnected={!!isConnected}
+                isMe={isSameDRep(inProgressDelegationDRepData, myDRepId)}
+                isInProgress
+              />
+            </Box>
+          </Box>
         )}
 
-      {/* Automated voting options */}
       {isConnected && (
         <div>
           <Typography variant="title2" sx={{ mb: 2 }}>
@@ -216,7 +242,6 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
         </div>
       )}
 
-      {/* DRep list */}
       <>
         <Typography fontSize={18} fontWeight={500} sx={{ mb: 3 }}>
           {t("dRepDirectory.listTitle")}
@@ -263,41 +288,57 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           mt={showSearchSummary ? 0 : 4}
           p={0}
           sx={{
-            opacity: isPrev ? 0.5 : 1,
-            transition: "opacity 0.2s",
             flex: 1,
+            width: "100%",
+            maxWidth: "100%",
           }}
         >
           {filteredDoNotListDReps?.length === 0 && <EmptyStateDrepDirectory />}
           {filteredDoNotListDReps?.map((dRep) => (
             <Box key={dRep.view} component="li" sx={{ listStyle: "none" }}>
-              <DRepCard
-                dRep={dRep}
-                isConnected={!!isConnected}
-                isDelegationLoading={
-                  isDelegating === dRep.view || isDelegating === dRep.drepId
-                }
-                isMe={isSameDRep(dRep, myDRepId)}
-                isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
-                onDelegate={() => {
-                  setInProgressDelegationDRepData(dRep);
-                  delegate(dRep.drepId);
-                }}
-              />
+              <Box>
+                <Box sx={scaleWrapSx}>
+                  <DRepCard
+                    dRep={dRep}
+                    isConnected={!!isConnected}
+                    isDelegationLoading={
+                      isDelegating === dRep.view || isDelegating === dRep.drepId
+                    }
+                    isMe={isSameDRep(dRep, myDRepId)}
+                    isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
+                    onDelegate={() => {
+                      setInProgressDelegationDRepData(dRep);
+                      delegate(dRep.drepId);
+                    }}
+                  />
+                </Box>
+              </Box>
             </Box>
           ))}
         </Box>
 
-        <PaginationFooter
-          page={page}
-          total={total || 0}
-          pageSize={pageSize}
-          onPageChange={setPage}
-          onPageSizeChange={(n) => {
-            setPageSize(n);
-            setPage(1);
+        <Box
+          sx={{
+            width: "100%",
+            transform: { xs: "scale(0.85)", sm: "scale(0.85)", md: "none" },
+            transformOrigin: {
+              xs: "top rigth",
+              sm: "top rigth",
+              md: "initial",
+            },
           }}
-        />
+        >
+          <PaginationFooter
+            page={page}
+            total={total || 0}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={(n) => {
+              setPageSize(n);
+              setPage(1);
+            }}
+          />
+        </Box>
       </>
     </Box>
   );

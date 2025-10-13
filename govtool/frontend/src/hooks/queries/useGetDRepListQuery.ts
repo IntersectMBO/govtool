@@ -24,7 +24,7 @@ type Args = GetDRepListArguments & {
 };
 
 export function useGetDRepListPaginatedQuery(
-  { page, pageSize = 10, filters = [], searchPhrase, sorting, status }: Args,
+  { page, pageSize = 10, filters = [], searchPhrase, sorting, status, sortingSeed }: Args,
   options?: UseQueryOptions<Infinite<DRepData>>,
 ): PaginatedResult {
   const { pendingTransaction } = useCardano();
@@ -47,6 +47,7 @@ export function useGetDRepListPaginatedQuery(
     searchPhrase ?? "",
     sorting ?? "",
     status?.length ? status : "",
+    sortingSeed ?? ""
   ];
 
   const baselineKey = useMemo(
@@ -64,6 +65,7 @@ export function useGetDRepListPaginatedQuery(
         searchPhrase,
         sorting,
         status,
+        sortingSeed,
       }),
     {
       keepPreviousData: true,
@@ -87,6 +89,7 @@ export function useGetDRepListPaginatedQuery(
         searchPhrase: "",
         sorting,
         status,
+        sortingSeed
       }),
     {
       initialData: () =>

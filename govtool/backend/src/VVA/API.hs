@@ -210,7 +210,7 @@ drepList mSearchQuery statuses mSortMode mPage mPageSize mSeed = do
 
   let sortDReps = case mSortMode of
         Nothing -> id
-        Just Random     -> sortOn randomKey
+        Just Random -> sortOn randomKey
         Just VotingPower -> sortOn $ \Types.DRepRegistration {..} ->
           Down dRepRegistrationVotingPower
         Just Activity -> sortOn $ \Types.DRepRegistration {..} ->

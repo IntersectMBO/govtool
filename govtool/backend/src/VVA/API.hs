@@ -28,6 +28,7 @@ import qualified Data.Text.Lazy.Encoding  as TL
 import           Data.Time                (TimeZone, localTimeToUTC)
 import           Data.Time.LocalTime      (TimeZone, getCurrentTimeZone)
 import qualified Data.Vector              as V
+import           Data.Hashable            (hash, hashWithSalt)
 
 import           Numeric.Natural          (Natural)
 
@@ -64,6 +65,7 @@ type VVAApi =
                 :> QueryParam "sort" DRepSortMode
                 :> QueryParam "page" Natural
                 :> QueryParam "pageSize" Natural
+                :> QueryParam "seed" Text
                 :> Get '[JSON] ListDRepsResponse
     :<|> "drep" :> "get-voting-power" :> Capture "drepId" HexText :> Get '[JSON] Integer
     :<|> "drep" :> "getVotes"
@@ -175,8 +177,8 @@ delegationToResponse Types.Delegation {..} =
     }
 
 
-drepList :: App m => Maybe Text -> [DRepStatus] -> Maybe DRepSortMode -> Maybe Natural -> Maybe Natural -> m ListDRepsResponse
-drepList mSearchQuery statuses mSortMode mPage mPageSize = do
+drepList :: App m => Maybe Text -> [DRepStatus] -> Maybe DRepSortMode -> Maybe Natural -> Maybe Natural -> Maybe Text -> m ListDRepsResponse
+drepList mSearchQuery statuses mSortMode mPage mPageSize mSeed = do
   CacheEnv {dRepListCache} <- asks vvaCache
   dreps <- cacheRequest dRepListCache (fromMaybe "" mSearchQuery) (DRep.listDReps mSearchQuery)
 
@@ -193,17 +195,22 @@ drepList mSearchQuery statuses mSortMode mPage mPageSize = do
               Types.DRep ->
                 True
 
-
   let filterDRepsByStatus = case statuses of
         [] -> id
         _  -> filter $ \Types.DRepRegistration {..} ->
           mapDRepStatus dRepRegistrationStatus `elem` statuses
 
-  randomizedOrderList <- mapM (\_ -> randomRIO (0, 1 :: Double)) dreps
+  let seedInt :: Int
+      seedInt =
+        maybe 0 (hash . Text.toCaseFold) mSeed
+
+      randomKey :: Types.DRepRegistration -> Int
+      randomKey Types.DRepRegistration{..} =
+        hashWithSalt seedInt dRepRegistrationDRepHash
 
   let sortDReps = case mSortMode of
         Nothing -> id
-        Just Random -> fmap snd . sortOn fst . Prelude.zip randomizedOrderList
+        Just Random     -> sortOn randomKey
         Just VotingPower -> sortOn $ \Types.DRepRegistration {..} ->
           Down dRepRegistrationVotingPower
         Just Activity -> sortOn $ \Types.DRepRegistration {..} ->

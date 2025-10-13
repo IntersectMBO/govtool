@@ -14,6 +14,7 @@ export type GetDRepListArguments = {
   sorting?: DRepListSort;
   status?: DRepStatus[];
   searchPhrase?: string;
+  sortingSeed?: string;
 };
 
 export const getDRepList = async ({
@@ -23,6 +24,7 @@ export const getDRepList = async ({
   pageSize = 10,
   searchPhrase: rawSearchPhrase = "",
   status = [],
+  sortingSeed = ""
 }: GetDRepListArguments): Promise<Infinite<DRepData>> => {
   const searchPhrase = await dRepSearchPhraseProcessor(rawSearchPhrase);
 
@@ -34,6 +36,7 @@ export const getDRepList = async ({
       ...(filters.length && { type: filters }),
       ...(sorting && { sort: sorting }),
       ...(status.length && { status }),
+      ...(sortingSeed && { seed: sortingSeed }),
     },
   });
 

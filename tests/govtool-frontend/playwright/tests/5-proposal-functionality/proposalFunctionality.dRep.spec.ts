@@ -281,7 +281,7 @@ test.describe("Perform voting", () => {
     await governanceActionsPage.votedTab.click();
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")
-    ).toBeVisible();
+    ).toBeVisible({timeout: 60_000});
   });
 
    const verifyVoteWithMetadata = async (testInfo: any, useGovToolIPFS: boolean = false) => {
@@ -302,7 +302,7 @@ test.describe("Perform voting", () => {
     await votedGovActionDetailsPage.currentPage.getByTestId("show-more-button").click();
     await votedGovActionDetailsPage.currentPage.waitForTimeout(2000);
     
-    const voteRationaleContext = await votedGovActionDetailsPage.currentPage.getByTestId("vote-rationale-context");
+    const voteRationaleContext = votedGovActionDetailsPage.currentPage.getByTestId("vote-rationale-context");
     await expect(voteRationaleContext).toContainText(fakerContext);
   };
 

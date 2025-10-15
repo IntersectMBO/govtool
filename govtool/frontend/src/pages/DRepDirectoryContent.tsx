@@ -61,6 +61,27 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     ...dataActionsBarProps
   } = useDataActionsBar();
 
+  const SEED_STORAGE_KEY = "drep_directory_sorting_seed";
+
+  const makeSeed = () =>
+      (globalThis.crypto?.randomUUID?.() as string | undefined) ??
+      Math.random().toString(36).slice(2);
+
+  const getStoredSeed = () => {
+    if (typeof window === "undefined") return "";
+    return sessionStorage.getItem(SEED_STORAGE_KEY) || "";
+  };
+
+  const [sortingSeed, setSortingSeed] = useState<string>(() => getStoredSeed());
+
+  useEffect(() => {
+    if (lastPath && !lastPath.includes("drep_directory")) {
+      const newSeed = makeSeed();
+      setSortingSeed(newSeed);
+      sessionStorage.setItem(SEED_STORAGE_KEY, newSeed);
+    }
+  }, [sortingSeed]);
+
   const { page, pageSize, setPage, setPageSize } = usePagination();
 
   const { chosenFilters, chosenSorting, setChosenFilters, setChosenSorting } =
@@ -108,6 +129,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       searchPhrase: debouncedSearchText,
       sorting: chosenSorting as DRepListSort,
       status: chosenFilters as DRepStatus[],
+      sortingSeed
     },
     { enabled: !!chosenSorting },
   );

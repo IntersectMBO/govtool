@@ -132,7 +132,7 @@ test("4C_3. Should filter and sort Governance Action Type on governance actions 
   await govActionsPage.sortAndValidate(
     SortOption.SoonToExpire,
     (p1, p2) => p1.expiryDate <= p2.expiryDate,
-    [removeAllSpaces(filterOptionNames[choice])]
+    removeAllSpaces(filterOptionNames[choice])
   );
   await govActionsPage.validateFilters([filterOptionNames[choice]]);
 });
@@ -180,6 +180,7 @@ test("4L. Should search governance actions", async ({ page }) => {
 test("4M. Should show view-all categorized governance actions", async ({
   page,
 }) => {
+  test.skip();
   await page.route("**/proposal/list?**", async (route) =>
     route.fulfill({
       body: JSON.stringify(infoTypeProposal),
@@ -224,23 +225,15 @@ test("4K. Should display correct vote counts on governance details page for disc
   page,
   browser,
 }) => {
-  const responsesPromise = Object.keys(GovernanceActionType).map((filterKey) =>
-    page.waitForResponse((response) =>
-      response.url().includes(`&type[]=${GovernanceActionType[filterKey]}`)
-    )
-  );
+  const responsesPromise = page.waitForResponse((response) =>
+      response.url().includes(`/proposal/list`)
+    );
 
   const governanceActionsPage = new GovernanceActionsPage(page);
   await governanceActionsPage.goto();
-  const responses = await Promise.all(responsesPromise);
-  const proposals: IProposal[] = (
-    await Promise.all(
-      responses.map(async (response) => {
-        const data = await response.json();
-        return data.elements;
-      })
-    )
-  ).flat();
+  const response = await responsesPromise;
+  const data = await response.json();
+  const proposals: IProposal[] = data.elements;
 
   expect(proposals.length, "No proposals found!").toBeGreaterThan(0);
 

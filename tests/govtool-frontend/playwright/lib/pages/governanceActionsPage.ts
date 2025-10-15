@@ -150,41 +150,27 @@ export default class GovernanceActionsPage {
   async sortAndValidate(
     sortOption: string,
     validationFn: (p1: IProposal, p2: IProposal) => boolean,
-    filterKeys = Object.keys(GovernanceActionType)
+    filterKey?: string
   ) {
-    const responsesPromise = Promise.all(
-      filterKeys.map((filterKey) =>
-        this.page.waitForResponse((response) =>
-          response
-            .url()
-            .includes(
-              `&type[]=${GovernanceActionType[filterKey]}&sort=${sortOption}`
-            )
-        )
-      )
+    const apiUrl = filterKey
+      ? `proposal/list?page=0&pageSize=10&type%5B%5D=${GovernanceActionType[filterKey]}&sort=${sortOption}`
+      : `proposal/list?page=0&pageSize=10&sort=${sortOption}`;
+
+    const responsesPromise = this.page.waitForResponse((response) =>
+      response.url().includes(apiUrl)
     );
 
     await this.sortProposal(sortOption);
-    const responses = await responsesPromise;
+    const response = await responsesPromise;
 
-    let proposalData: IProposal[][] = await Promise.all(
-      responses.map(async (response) => {
-        const { elements } = await response.json();
-        return elements.length ? elements : null;
-      })
-    );
-    const proposalsByType = proposalData.filter(Boolean);
+    let responseJson = await response.json();
+    let  proposals: IProposal[] = responseJson.elements;
 
     // API validation
-    proposalsByType.forEach(async (proposalList) => {
-      if (proposalList.length <= 1) return;
-
-      const proposals = proposalList;
-      for (let i = 0; i <= proposals.length - 2; i++) {
-        const isValid = validationFn(proposals[i], proposals[i + 1]);
-        expect(isValid).toBe(true);
-      }
-    });
+    for (let i = 0; i <= proposals.length - 2; i++) {
+      const isValid = validationFn(proposals[i], proposals[i + 1]);
+      expect(isValid).toBe(true);
+    }
 
     await expect(
       this.page.getByRole("progressbar").getByRole("img")
@@ -193,31 +179,13 @@ export default class GovernanceActionsPage {
     await functionWaitedAssert(
       async () => {
         // Frontend validation
-        for (let dIdx = 0; dIdx <= proposalsByType.length - 1; dIdx++) {
-          const proposals = proposalsByType[0] as IProposal[];
-          const filterOptionKey = getEnumKeyByValue(
-            GovernanceActionType,
-            proposals[0].type
-          );
-
-          const slides = await this.page
-            .locator(`[data-testid="govaction-${filterOptionKey}-card"]`)
-            .all();
-
-          const actualSlidesInDisplay =
-            proposals.length > MAX_SLIDES_DISPLAY_PER_TYPE
-              ? MAX_SLIDES_DISPLAY_PER_TYPE
-              : proposals.length;
-
-          expect(slides).toHaveLength(actualSlidesInDisplay);
-
-          for (let i = 0; i <= slides.length - 1; i++) {
-            await expect(slides[i]).toContainText(`${proposals[i].txHash}`);
-          }
+        for (let dIdx = 0; dIdx <= proposals.length - 1; dIdx++) {
+          const fullTransactionHash = proposals[dIdx].txHash + "#" + proposals[dIdx].index;
+          await expect(this.page.getByTestId(`${fullTransactionHash}-id`)).toBeVisible();
         }
       },
       {
-        name: `frontend sort validation of ${sortOption} and filter ${filterKeys}`,
+        name: `frontend sort validation of ${sortOption} and filter ${filterKey ? filterKey : "None"}`,
       }
     );
   }

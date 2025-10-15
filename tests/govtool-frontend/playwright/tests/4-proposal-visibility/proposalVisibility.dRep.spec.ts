@@ -112,31 +112,19 @@ test.describe("Check vote count", () => {
     page,
     browser,
   }) => {
-    const voteWhiteListOption = (await isBootStrapingPhase())
-      ? { InfoAction: "InfoAction" }
-      : GovernanceActionType;
-    const responsesPromise = Object.keys(voteWhiteListOption).map((filterKey) =>
-      page.waitForResponse((response) =>
+    const responsesPromise =  page.waitForResponse((response) =>
         response
           .url()
           .includes(
-            `proposal/list?page=0&pageSize=7&type[]=${voteWhiteListOption[filterKey]}`
+            `proposal/list?page=0&pageSize=10&drepId=${dRep01Wallet.dRep.pkh}`
           )
-      )
-    );
+      );
 
     const governanceActionsPage = new GovernanceActionsPage(page);
     await governanceActionsPage.goto();
 
-    const responses = await Promise.all(responsesPromise);
-    const proposals: IProposal[] = (
-      await Promise.all(
-        responses.map(async (response) => {
-          const data = await response.json();
-          return data.elements;
-        })
-      )
-    ).flat();
+    const response = await responsesPromise;
+    const proposals: IProposal[] = await response.json().then((data) => data.elements);
 
     const uniqueProposalTypes = Array.from(
       new Map(proposals.map((proposal) => [proposal.type, proposal])).values()

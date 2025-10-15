@@ -148,6 +148,7 @@ export enum DRepListSort {
   VotingPower = "VotingPower",
   RegistrationDate = "RegistrationDate",
   Status = "Status",
+  Random = "Random",
 }
 
 type Reference = {

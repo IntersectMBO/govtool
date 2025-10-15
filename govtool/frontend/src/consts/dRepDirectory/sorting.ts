@@ -15,4 +15,8 @@ export const DREP_DIRECTORY_SORTING = [
     key: "Status",
     label: "Status",
   },
+  {
+    key: "Random",
+    label: "Random",
+  },
 ];

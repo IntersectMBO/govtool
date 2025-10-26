@@ -32,6 +32,7 @@ export const useGetDRepVotesQuery = (
     enabled: !!dRepID,
     refetchOnWindowFocus: true,
     keepPreviousData: true,
+    refetchInterval: 20000,
   });
 
   const groupedByType = data?.reduce((groups, item) => {

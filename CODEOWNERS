@@ -1,22 +1,22 @@
 # GovTool Project Codeowners
 
 # These owners will be the default owners for everything in the repository.
-* @Ryun1 @MSzalowski
+* @Ryun1 @aaboyle878
 
 # Frontend assets templates
-govtool/frontend/*                                                          @MSzalowski
-*.tsx                                                                       @MSzalowski
-*.ts                                                                        @MSzalowski
-*.css                                                                       @MSzalowski
+govtool/frontend/*                                                          
+*.tsx                                                                       
+*.ts                                                                        
+*.css                                                                       
 
 # Backend
-govtool/backend/*                                                           @MSzalowski @jankun4
+govtool/backend/*                                                           
 
 # DevOps
-.github/workflows/*                                                         @placek @adgud
-config/govtool/*                                                            @placek @adgud
-infra/terraform/*                                                           @placek @adgud
+.github/workflows/*                                                         
+config/govtool/*                                                            
+infra/terraform/*                                                           
 
 # Testing
-tests/*                                                                     @spannercode @mesudip @kneerose
-gov-action-loader/*                                                         @spannercode @mesudip @kneerose
+tests/*                                                                     
+gov-action-loader/*                                                         

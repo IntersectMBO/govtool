@@ -434,8 +434,7 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
   proposalsToRemove <- case mDrepRaw of
     Nothing -> return []
     Just drepId ->
-      map (\VoteResponse { voteResponseProposal = ProposalResponse { proposalResponseTxHash, proposalResponseIndex } } ->
-          (proposalResponseTxHash, proposalResponseIndex))
+      map (voteParamsProposalId . voteResponseVote)
         <$> getVotes drepId [] Nothing Nothing
 
   CacheEnv {proposalListCache} <- asks vvaCache
@@ -445,8 +444,8 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
 
   mappedSortedAndFilteredProposals <- mapSortAndFilterProposals selectedTypes sortMode proposals
   let filteredProposals = filter
-        (\p@ProposalResponse { proposalResponseTxHash, proposalResponseIndex } ->
-            (proposalResponseTxHash, proposalResponseIndex) `notElem` proposalsToRemove
+        ( \p@ProposalResponse {proposalResponseId} ->
+            proposalResponseId `notElem` proposalsToRemove
             && isProposalSearchedFor mSearchQuery p
         ) mappedSortedAndFilteredProposals
 

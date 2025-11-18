@@ -8,6 +8,7 @@ import {
   useTranslation,
 } from "@hooks";
 import { ValidatedGovernanceVotedOnCard } from "@organisms";
+import { getFullGovActionId } from "@utils";
 
 type DashboardGovernanceActionsVotedOnProps = {
   searchPhrase?: string;
@@ -24,14 +25,41 @@ export const DashboardGovernanceActionsVotedOn = ({
 
   const {
     data: votes,
-    areDRepVotesLoading
+    areDRepVotesLoading,
+    isFetching,
   } = useGetDRepVotesQuery(chosenFilters, chosenSorting, searchPhrase);
 
-  const proposals = useMemo(() =>
-          votes.flatMap((entry) => entry.actions),
-      [votes, searchPhrase, pendingTransaction.vote]);
+  // TODO: Filtering here is some kind of craziness. It should be done on the backend.
+  const filteredData = useMemo(() => {
+    if (!votes?.length) return [];
+    if (!searchPhrase) return votes.flatMap((entry) => entry.actions);
 
-  return areDRepVotesLoading ? (
+    const lowerSearch = searchPhrase.toLowerCase();
+
+    return votes.flatMap((entry) =>
+      entry.actions.filter((action) => {
+        const hash = getFullGovActionId(
+          action.proposal.txHash,
+          action.proposal.index,
+        ).toLowerCase();
+
+        const title = action.proposal.title?.toLowerCase() || "";
+        const motivation = action.proposal.motivation?.toLowerCase() || "";
+        const rationale = action.proposal.rationale?.toLowerCase() || "";
+        const abstract = action.proposal.abstract?.toLowerCase() || "";
+
+        return (
+          hash.includes(lowerSearch) ||
+          title.includes(lowerSearch) ||
+          motivation.includes(lowerSearch) ||
+          rationale.includes(lowerSearch) ||
+          abstract.includes(lowerSearch)
+        );
+      }),
+    );
+  }, [votes, searchPhrase, pendingTransaction.vote]);
+
+  return areDRepVotesLoading || isFetching ? (
     <Box py={4} display="flex" justifyContent="center">
       <CircularProgress />
     </Box>
@@ -41,7 +69,7 @@ export const DashboardGovernanceActionsVotedOn = ({
         <Typography py={4} fontWeight="300">
           {t("govActions.youHaventVotedYet")}
         </Typography>
-      ) : !proposals?.length ? (
+      ) : !filteredData?.length ? (
         <Typography py={4} fontWeight="300">
           {t("govActions.noResultsForTheSearch")}
         </Typography>
@@ -53,7 +81,7 @@ export const DashboardGovernanceActionsVotedOn = ({
             screenWidth < 420 ? "290px" : isMobile ? "324px" : "350px"
           }, 1fr))`}
         >
-          {proposals.map((item) => (
+          {filteredData.map((item) => (
             <Box pb={4.25} key={item.proposal.txHash + item.proposal.index}>
               <ValidatedGovernanceVotedOnCard
                 votedProposal={item}

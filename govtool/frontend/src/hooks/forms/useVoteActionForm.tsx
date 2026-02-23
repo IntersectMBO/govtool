@@ -13,6 +13,18 @@ export interface VoteActionFormValues {
   vote: string;
 }
 
+export type SurveyResponsePayload = {
+  specVersion: string;
+  surveyTxId: string;
+  surveyHash: string;
+  answers: {
+    questionId: string;
+    selection?: number[];
+    numericValue?: number;
+    customValue?: unknown;
+  }[];
+};
+
 export const useVoteActionFormController = () => {
   const validationSchema = useMemo(
     () =>
@@ -41,7 +53,12 @@ export const useVoteActionForm = ({
   closeModal,
 }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { buildSignSubmitConwayCertTx, buildVote, isPendingTransaction } =
+  const {
+    buildSignSubmitConwayCertTx,
+    buildVote,
+    buildMetadataAuxiliaryData,
+    isPendingTransaction,
+  } =
     useCardano();
   const { addSuccessAlert } = useSnackbar();
   const navigate = useNavigate();
@@ -70,56 +87,77 @@ export const useVoteActionForm = ({
     index !== null &&
     !areFormErrors;
 
- const confirmVote = useCallback(
-  async (
-    voteValue?: Vote,
-    url?: string,
-    hashValue?: string | null,
-  ) => {
-    if (!canVote || !voteValue) return;
+  const confirmVote = useCallback(
+    async (
+      voteValue?: Vote,
+      url?: string,
+      hashValue?: string | null,
+      surveyResponse?: SurveyResponsePayload | null,
+    ) => {
+      if (!canVote || !voteValue) return;
 
-    setIsLoading(true);
+      setIsLoading(true);
 
-    const urlSubmitValue = url ?? "";
-    const hashSubmitValue = hashValue ?? "";
+      const urlSubmitValue = url ?? "";
+      const hashSubmitValue = hashValue ?? "";
 
-    try {
-      const isPendingTx = isPendingTransaction();
-      if (isPendingTx) return;
+      try {
+        const isPendingTx = isPendingTransaction();
+        if (isPendingTx) return;
 
-      const votingBuilder = await buildVote(
-        voteValue,
-        txHash,
-        index,
-        urlSubmitValue,
-        hashSubmitValue,
-      );
+        const votingBuilder = await buildVote(
+          voteValue,
+          txHash,
+          index,
+          urlSubmitValue,
+          hashSubmitValue,
+        );
 
-      const result = await buildSignSubmitConwayCertTx({
-        votingBuilder,
-        type: "vote",
-        resourceId: txHash + index,
-      });
+        const auxiliaryData = surveyResponse
+          ? buildMetadataAuxiliaryData(17, {
+              surveyResponse,
+            })
+          : undefined;
 
-      if (result) {
-        addSuccessAlert("Vote submitted");
-        navigate(PATHS.dashboardGovernanceActions, {
-          state: {
-            isVotedListOnLoad: !!previousVote?.vote,
-          },
+        const result = await buildSignSubmitConwayCertTx({
+          votingBuilder,
+          type: "vote",
+          resourceId: txHash + index,
+          auxiliaryData,
         });
-        closeModal();
+
+        if (result) {
+          addSuccessAlert("Vote submitted");
+          navigate(PATHS.dashboardGovernanceActions, {
+            state: {
+              isVotedListOnLoad: !!previousVote?.vote,
+            },
+          });
+          closeModal();
+        }
+      } catch (error) {
+        openWalletErrorModal({
+          error,
+          dataTestId: "vote-transaction-error-modal",
+        });
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      openWalletErrorModal({
-        error,
-        dataTestId: "vote-transaction-error-modal",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  },
-    [buildVote, buildSignSubmitConwayCertTx, txHash, index, canVote],
+    },
+    [
+      addSuccessAlert,
+      buildMetadataAuxiliaryData,
+      buildVote,
+      buildSignSubmitConwayCertTx,
+      canVote,
+      closeModal,
+      index,
+      isPendingTransaction,
+      navigate,
+      openWalletErrorModal,
+      previousVote?.vote,
+      txHash,
+    ],
   );
 
   return {

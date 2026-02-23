@@ -23,6 +23,7 @@ import {
   generateJsonld,
   generateMetadataBody,
   getItemFromLocalStorage,
+  getSurveyHash,
   PROTOCOL_PARAMS_KEY,
 } from "@utils";
 import { useWalletErrorModal } from "@hooks";
@@ -39,6 +40,8 @@ export type CreateGovernanceActionValues = {
   storeData?: boolean;
   storingURL: string;
   governance_action_type?: GovernanceActionType;
+  attachSurvey?: boolean;
+  surveyDetailsJson?: string;
 } & Partial<Record<keyof GovernanceActionFieldSchemas, string>>;
 
 export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues =
@@ -46,17 +49,26 @@ export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues =
     references: [{ uri: "" }],
     storeData: false,
     storingURL: "",
+    attachSurvey: false,
+    surveyDetailsJson: "",
   };
 
 const protocolParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
+
+type SurveyRef = {
+  surveyTxId: string;
+  surveyHash: string;
+};
 
 export const useCreateGovernanceActionForm = (
   setStep?: Dispatch<SetStateAction<number>>,
 ) => {
   // Local state
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [hash, setHash] = useState<string | null>(null);
   const [json, setJson] = useState<NodeObject | null>(null);
+  const [createdSurveyRef, setCreatedSurveyRef] = useState<SurveyRef | null>(
+    null,
+  );
 
   // DApp Connector
   const {
@@ -66,6 +78,7 @@ export const useCreateGovernanceActionForm = (
     buildNewConstitutionGovernanceAction,
     buildUpdateCommitteeGovernanceAction,
     buildSignSubmitConwayCertTx,
+    buildMetadataAuxiliaryData,
     buildHardForkGovernanceAction,
     buildProtocolParameterChangeGovernanceAction,
   } = useCardano();
@@ -92,12 +105,19 @@ export const useCreateGovernanceActionForm = (
     reset,
   } = useFormContext<CreateGovernanceActionValues>();
   const govActionType = watch("governance_action_type");
+  const attachSurvey = watch("attachSurvey");
 
   useEffect(() => {
     if (govActionType === GovernanceActionType.ParameterChange) {
       setValue("protocolParameters", JSON.stringify(protocolParams));
     }
   }, [govActionType]);
+
+  useEffect(() => {
+    if (!attachSurvey || govActionType !== GovernanceActionType.InfoAction) {
+      setCreatedSurveyRef(null);
+    }
+  }, [attachSurvey, govActionType]);
 
   // Navigation
   const backToForm = useCallback(() => {
@@ -111,26 +131,85 @@ export const useCreateGovernanceActionForm = (
   }, []);
 
   // Business Logic
-  const generateMetadata = useCallback(async () => {
-    if (!govActionType) {
-      throw new Error("Governance action type is not defined");
+  const generateMetadata = useCallback(
+    async (surveyRef?: SurveyRef | null) => {
+      if (!govActionType) {
+        throw new Error("Governance action type is not defined");
+      }
+
+      const body = await generateMetadataBody({
+        data: getValues(),
+        acceptedKeys: ["title", "motivation", "abstract", "rationale"],
+      });
+
+      const jsonld = await generateJsonld(body, GOVERNANCE_ACTION_CONTEXT);
+      const currentSurveyRef = surveyRef ?? createdSurveyRef;
+      const shouldAttachSurveyRef =
+        govActionType === GovernanceActionType.InfoAction && currentSurveyRef;
+
+      const payload = shouldAttachSurveyRef
+        ? {
+            ...jsonld,
+            specVersion: "1.0.0",
+            kind: "cardano-governance-survey-link",
+            surveyRef: {
+              surveyTxId: currentSurveyRef.surveyTxId,
+              surveyHash: currentSurveyRef.surveyHash,
+            },
+          }
+        : jsonld;
+
+      const jsonHash = blake2bHex(
+        JSON.stringify(payload, null, 2),
+        undefined,
+        32,
+      );
+
+      setJson(payload);
+
+      return {
+        payload,
+        hash: jsonHash,
+      };
+    },
+    [getValues, govActionType, createdSurveyRef],
+  );
+
+  const parseSurveyDetails = useCallback((rawJson: string | undefined) => {
+    if (!rawJson?.trim()) {
+      throw new Error("Survey details JSON is required.");
     }
 
-    const body = await generateMetadataBody({
-      data: getValues(),
-      acceptedKeys: ["title", "motivation", "abstract", "rationale"],
-    });
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(rawJson);
+    } catch (_error) {
+      throw new Error("Survey details JSON must be valid JSON.");
+    }
 
-    const jsonld = await generateJsonld(body, GOVERNANCE_ACTION_CONTEXT);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("Survey details JSON must be an object.");
+    }
 
-    const jsonHash = blake2bHex(JSON.stringify(jsonld, null, 2), undefined, 32);
+    const details = parsed as Record<string, unknown>;
+    if (details.specVersion !== "1.0.0") {
+      throw new Error("surveyDetails.specVersion must be 1.0.0.");
+    }
+    if (!details.title || typeof details.title !== "string") {
+      throw new Error("surveyDetails.title is required.");
+    }
+    if (!details.description || typeof details.description !== "string") {
+      throw new Error("surveyDetails.description is required.");
+    }
+    if (
+      !Array.isArray(details.questions) ||
+      (details.questions as unknown[]).length === 0
+    ) {
+      throw new Error("surveyDetails.questions must be a non-empty array.");
+    }
 
-    // That allows to validate metadata hash
-    setHash(jsonHash);
-    setJson(jsonld);
-
-    return jsonld;
-  }, [getValues]);
+    return details;
+  }, []);
 
   const onClickDownloadJson = useCallback(() => {
     if (!json) return;
@@ -138,11 +217,9 @@ export const useCreateGovernanceActionForm = (
   }, [govActionType, json]);
 
   const buildTransaction = useCallback(
-    async (data: CreateGovernanceActionValues) => {
-      if (!hash) return;
-
+    async (data: CreateGovernanceActionValues, metadataHash: string) => {
       const commonGovActionDetails = {
-        hash,
+        hash: metadataHash,
         url: data.storingURL,
       };
       switch (govActionType) {
@@ -272,7 +349,17 @@ export const useCreateGovernanceActionForm = (
           throw new Error(t("errors.invalidGovernanceActionType"));
       }
     },
-    [hash],
+    [
+      buildHardForkGovernanceAction,
+      buildNewConstitutionGovernanceAction,
+      buildNewInfoGovernanceAction,
+      buildNoConfidenceGovernanceAction,
+      buildProtocolParameterChangeGovernanceAction,
+      buildTreasuryGovernanceAction,
+      buildUpdateCommitteeGovernanceAction,
+      govActionType,
+      t,
+    ],
   );
 
   const showSuccessModal = useCallback((link: string) => {
@@ -310,23 +397,77 @@ export const useCreateGovernanceActionForm = (
       try {
         setIsLoading(true);
         showLoadingModal();
-        if (!hash) throw MetadataValidationStatus.INVALID_HASH;
+        const shouldAttachSurvey =
+          data.attachSurvey && govActionType === GovernanceActionType.InfoAction;
+
+        let surveyRefToUse = createdSurveyRef;
+        if (shouldAttachSurvey) {
+          const surveyDetails = parseSurveyDetails(data.surveyDetailsJson);
+          const currentSurveyHash = getSurveyHash(surveyDetails).toLowerCase();
+          const mustCreateSurveyTx =
+            !surveyRefToUse || surveyRefToUse.surveyHash !== currentSurveyHash;
+
+          if (mustCreateSurveyTx) {
+            const auxiliaryData = buildMetadataAuxiliaryData(17, {
+              surveyDetails,
+            });
+            const surveyTxId = await buildSignSubmitConwayCertTx({
+              type: "createGovAction",
+              auxiliaryData,
+              skipStakeKeyRegistration: true,
+              trackPending: false,
+            });
+
+            if (!surveyTxId) {
+              throw new Error("Survey transaction was not submitted.");
+            }
+
+            surveyRefToUse = {
+              surveyTxId,
+              surveyHash: currentSurveyHash,
+            };
+            setCreatedSurveyRef(surveyRefToUse);
+            setValue("storingURL", "");
+            await generateMetadata(surveyRefToUse);
+
+            openModal({
+              type: "statusModal",
+              state: {
+                status: "info",
+                title: "Survey transaction submitted",
+                message:
+                  "Your survey has been created. Download the updated metadata file, upload it, paste its URL, then submit again to create the Info Action.",
+                buttonText: "Continue",
+                dataTestId: "survey-created-info-modal",
+              },
+            });
+
+            return;
+          }
+        }
+
+        const metadata = await generateMetadata(surveyRefToUse);
+        if (!metadata.hash) throw MetadataValidationStatus.INVALID_HASH;
+
         const { status } = await validateMetadata({
           url: data.storingURL,
-          hash,
+          hash: metadata.hash,
         });
 
         if (status) {
           throw status;
         }
 
-        const govActionBuilder = await buildTransaction(data);
+        const govActionBuilder = await buildTransaction(data, metadata.hash);
         const result = await buildSignSubmitConwayCertTx({
           govActionBuilder,
           type: "createGovAction",
         });
 
-        if (result) showSuccessModal(result);
+        if (result) {
+          setCreatedSurveyRef(null);
+          showSuccessModal(result);
+        }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         const isInsufficientBalance = error
@@ -365,7 +506,21 @@ export const useCreateGovernanceActionForm = (
         setIsLoading(false);
       }
     },
-    [hash, buildTransaction, buildSignSubmitConwayCertTx],
+    [
+      buildMetadataAuxiliaryData,
+      buildSignSubmitConwayCertTx,
+      buildTransaction,
+      createdSurveyRef,
+      generateMetadata,
+      govActionType,
+      openModal,
+      parseSurveyDetails,
+      setValue,
+      showLoadingModal,
+      showSuccessModal,
+      t,
+      validateMetadata,
+    ],
   );
 
   return {

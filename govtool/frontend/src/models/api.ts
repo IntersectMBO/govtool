@@ -268,6 +268,74 @@ export type Infinite<T> = {
   total: number;
 };
 
+export type SurveyRef = {
+  surveyTxId: string;
+  surveyHash: string;
+};
+
+export type SurveyQuestion = {
+  questionId: string;
+  question: string;
+  methodType: string;
+  options?: string[];
+  maxSelections?: number;
+  numericConstraints?: {
+    minValue: number;
+    maxValue: number;
+    step?: number;
+  };
+  methodSchemaUri?: string;
+  hashAlgorithm?: string;
+  methodSchemaHash?: string;
+};
+
+export type SurveyDetails = {
+  specVersion: string;
+  title: string;
+  description: string;
+  questions: SurveyQuestion[];
+  eligibility?: string[];
+  voteWeighting?: "StakeBased" | "CredentialBased";
+  lifecycle?: {
+    startSlot: number;
+    endSlot: number;
+  };
+};
+
+export type ProposalSurveyResponse = {
+  linked: boolean;
+  actionLifecycle: {
+    startSlot: number;
+    endSlot: number;
+  };
+  surveyRef: SurveyRef | null;
+  computedSurveyHash: string | null;
+  linkValidation: {
+    valid: boolean;
+    errors: string[];
+  };
+  surveyDetails: SurveyDetails | null;
+  surveyDetailsValidation: {
+    valid: boolean;
+    errors: string[];
+  };
+};
+
+export type ProposalSurveyTallyResponse = {
+  surveyTxId: string | null;
+  surveyHash: string | null;
+  weightingMode: "CredentialBased" | "StakeBased";
+  totals: {
+    totalSeen: number;
+    valid: number;
+    invalid: number;
+    deduped: number;
+    uniqueResponders: number;
+  };
+  methodResults: Record<string, unknown>[];
+  errors: string[];
+};
+
 type DRepVotingPower = {
   view: string;
   hashRaw: string;

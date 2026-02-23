@@ -40,3 +40,4 @@ export * from "./parseBoolean";
 export * from "./validateSignature";
 export * from "./cip8verification";
 export * from "./clipboard";
+export * from "./survey";

@@ -30,6 +30,42 @@ export const CreateGovernanceActionForm = ({
   const isError = Object.keys(errors).length > 0;
 
   const type = getValues("governance_action_type");
+  const attachSurvey = watch("attachSurvey");
+  const surveyDetailsText = watch("surveyDetailsJson") ?? "";
+
+  const validateSurveyDetailsJson = useCallback(
+    (value?: string) => {
+      if (!attachSurvey || type !== GovernanceActionType.InfoAction) {
+        return true;
+      }
+
+      if (!value?.trim()) {
+        return t("createGovernanceAction.fields.validations.required");
+      }
+
+      try {
+        const parsed = JSON.parse(value) as Record<string, unknown>;
+        const questions = parsed.questions;
+        if (
+          parsed.specVersion !== "1.0.0" ||
+          typeof parsed.title !== "string" ||
+          typeof parsed.description !== "string" ||
+          !Array.isArray(questions) ||
+          !questions.length
+        ) {
+          return "Survey JSON must include specVersion, title, description, and questions.";
+        }
+      } catch (_error) {
+        return "Survey JSON is invalid.";
+      }
+
+      return true;
+    },
+    [attachSurvey, t, type],
+  );
+
+  const isSurveySectionEnabled =
+    type === GovernanceActionType.InfoAction && !!attachSurvey;
   const {
     append,
     fields: references,
@@ -55,7 +91,9 @@ export const CreateGovernanceActionForm = ({
       ],
     ).some(
       (field) => !watch(field as unknown as Parameters<typeof watch>[0]),
-    ) || isError;
+    ) ||
+    (isSurveySectionEnabled && !surveyDetailsText.trim()) ||
+    isError;
 
   const onClickContinue = () => {
     setStep(4);
@@ -159,6 +197,43 @@ export const CreateGovernanceActionForm = ({
       />
       <Spacer y={3} />
       {renderGovernanceActionField()}
+      {type === GovernanceActionType.InfoAction && (
+        <>
+          <Spacer y={1} />
+          <InfoText
+            label={t("optional")}
+            sx={{ mb: 0.75, textAlign: "center" }}
+          />
+          <Typography sx={{ textAlign: "center" }} variant="headline4">
+            Survey Link (Info Action)
+          </Typography>
+          <Spacer y={2.5} />
+          <ControlledField.Checkbox
+            {...{ control, errors }}
+            data-testid="attach-survey-checkbox"
+            label="Create and attach an on-chain survey"
+            name="attachSurvey"
+          />
+          {attachSurvey && (
+            <>
+              <Spacer y={2} />
+              <ControlledField.TextArea
+                {...{ control, errors }}
+                data-testid="survey-details-json-input"
+                helpfulText="Paste label 17 surveyDetails JSON only (no wrapper envelope)."
+                label="Survey details JSON"
+                layoutStyles={{ mb: 3 }}
+                maxLength={20000}
+                name="surveyDetailsJson"
+                placeholder='{"specVersion":"1.0.0","title":"...","description":"...","questions":[...]}'
+                rules={{
+                  validate: validateSurveyDetailsJson,
+                }}
+              />
+            </>
+          )}
+        </>
+      )}
       <InfoText label={t("optional")} sx={{ mb: 0.75, textAlign: "center" }} />
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("createGovernanceAction.references")}

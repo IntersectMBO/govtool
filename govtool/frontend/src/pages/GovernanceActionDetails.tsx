@@ -13,6 +13,8 @@ import { ICONS, OUTCOMES_PATHS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
   useGetProposalQuery,
+  useGetProposalSurveyQuery,
+  useGetProposalSurveyTallyQuery,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
@@ -24,8 +26,13 @@ import {
   getShortenedGovActionId,
 } from "@utils";
 import { Breadcrumbs } from "@molecules";
-import { MetadataStandard, ProposalData } from "@/models";
+import {
+  MetadataStandard,
+  MetadataValidationStatus,
+  ProposalData,
+} from "@/models";
 import { useValidateMutation } from "@/hooks/mutations";
+import { GovernanceActionType } from "@/types/governanceAction";
 
 type GovernanceActionDetailsState = {
   proposal?: ProposalData;
@@ -35,6 +42,9 @@ type GovernanceActionDetailsState = {
 // TODO: Refactor: GovernanceActionDetals and DashboardGovernanceActionDetails are almost identical
 // and should be unified
 export const GovernanceActionDetails = () => {
+  const [weighting, setWeighting] = useState<"CredentialBased" | "StakeBased">(
+    "CredentialBased",
+  );
   const { state: untypedState, hash } = useLocation();
   const state = untypedState as GovernanceActionDetailsState | null;
   const index = hash.slice(1);
@@ -108,6 +118,23 @@ export const GovernanceActionDetails = () => {
       navigate(`/connected${pathname}`);
     }
   }, [isEnabled, error]);
+
+  const shouldFetchSurvey =
+    !!fullProposalId &&
+    extendedProposal?.type === GovernanceActionType.InfoAction;
+  const { data: surveyData, isLoading: isSurveyLoading } =
+    useGetProposalSurveyQuery(fullProposalId ?? "", shouldFetchSurvey);
+  const shouldFetchSurveyTally =
+    !!shouldFetchSurvey &&
+    !!surveyData?.linked &&
+    !!surveyData?.linkValidation?.valid &&
+    !!surveyData?.surveyDetailsValidation?.valid;
+  const { data: surveyTallyData, isLoading: isSurveyTallyLoading } =
+    useGetProposalSurveyTallyQuery(
+      fullProposalId ?? "",
+      weighting,
+      shouldFetchSurveyTally,
+    );
 
   return (
     <Background opacity={0.7}>
@@ -187,6 +214,248 @@ export const GovernanceActionDetails = () => {
                   isDataMissing={metadataStatus}
                   proposal={extendedProposal}
                 />
+                {extendedProposal.type === GovernanceActionType.InfoAction && (
+                  <Box
+                    sx={{
+                      mt: 3,
+                      p: 3,
+                      borderRadius: "20px",
+                      background: "rgba(255,255,255,0.45)",
+                      boxShadow: "2px 2px 20px 0px rgba(47, 98, 220, 0.12)",
+                    }}
+                  >
+                    <Typography variant="headline4">Linked Survey</Typography>
+                    {isSurveyLoading ? (
+                      <Box mt={2}>
+                        <CircularProgress size={22} />
+                      </Box>
+                    ) : !surveyData?.linked ? (
+                      <Typography variant="body2" sx={{ mt: 2 }}>
+                        No survey linked to this Info Action.
+                      </Typography>
+                    ) : (
+                      <>
+                        <Typography variant="body2" sx={{ mt: 2 }}>
+                          {surveyData.surveyDetails?.title ?? "Untitled survey"}
+                        </Typography>
+                        {surveyData.surveyDetails?.description && (
+                          <Typography
+                            variant="body2"
+                            sx={{ mt: 1, color: "neutralGray" }}
+                          >
+                            {surveyData.surveyDetails.description}
+                          </Typography>
+                        )}
+
+                        {(!surveyData.linkValidation.valid ||
+                          !surveyData.surveyDetailsValidation.valid) && (
+                          <Box mt={2}>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              Survey validation errors
+                            </Typography>
+                            {[
+                              ...(surveyData.linkValidation.errors ?? []),
+                              ...(surveyData.surveyDetailsValidation.errors ?? []),
+                            ].map((validationError) => (
+                              <Typography
+                                key={validationError}
+                                variant="caption"
+                                sx={{ display: "block", mt: 0.5 }}
+                              >
+                                • {validationError}
+                              </Typography>
+                            ))}
+                          </Box>
+                        )}
+
+                        {surveyData.linkValidation.valid &&
+                          surveyData.surveyDetailsValidation.valid && (
+                            <>
+                              <Box
+                                sx={{
+                                  mt: 2,
+                                  display: "flex",
+                                  gap: 1,
+                                  flexWrap: "wrap",
+                                }}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => setWeighting("CredentialBased")}
+                                  style={{
+                                    borderRadius: 20,
+                                    border: "1px solid #2F62DC",
+                                    padding: "6px 12px",
+                                    cursor: "pointer",
+                                    background:
+                                      weighting === "CredentialBased"
+                                        ? "#2F62DC"
+                                        : "transparent",
+                                    color:
+                                      weighting === "CredentialBased"
+                                        ? "#fff"
+                                        : "#2F62DC",
+                                  }}
+                                >
+                                  CredentialBased
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setWeighting("StakeBased")}
+                                  style={{
+                                    borderRadius: 20,
+                                    border: "1px solid #2F62DC",
+                                    padding: "6px 12px",
+                                    cursor: "pointer",
+                                    background:
+                                      weighting === "StakeBased"
+                                        ? "#2F62DC"
+                                        : "transparent",
+                                    color:
+                                      weighting === "StakeBased"
+                                        ? "#fff"
+                                        : "#2F62DC",
+                                  }}
+                                >
+                                  StakeBased
+                                </button>
+                              </Box>
+
+                              {isSurveyTallyLoading ? (
+                                <Box mt={2}>
+                                  <CircularProgress size={22} />
+                                </Box>
+                              ) : surveyTallyData ? (
+                                <Box mt={2}>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{ display: "block" }}
+                                  >
+                                    Total responses seen:{" "}
+                                    {surveyTallyData.totals.totalSeen}
+                                  </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{ display: "block" }}
+                                  >
+                                    Valid latest responses:{" "}
+                                    {surveyTallyData.totals.valid}
+                                  </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{ display: "block" }}
+                                  >
+                                    Invalid responses:{" "}
+                                    {surveyTallyData.totals.invalid}
+                                  </Typography>
+
+                                  <Box mt={2}>
+                                    {surveyTallyData.methodResults.map((result) => {
+                                      const resultRecord =
+                                        result as Record<string, unknown>;
+                                      const questionId = String(
+                                        resultRecord.questionId ?? "question",
+                                      );
+                                      const question = String(
+                                        resultRecord.question ?? "",
+                                      );
+                                      const options = Array.isArray(
+                                        resultRecord.options,
+                                      )
+                                        ? (resultRecord.options as string[])
+                                        : [];
+                                      const optionTotals = Array.isArray(
+                                        resultRecord.optionTotals,
+                                      )
+                                        ? (resultRecord.optionTotals as number[])
+                                        : [];
+                                      const customValueTotals =
+                                        (resultRecord.customValueTotals as
+                                          | Record<string, number>
+                                          | undefined) ?? {};
+
+                                      return (
+                                        <Box
+                                          key={questionId}
+                                          sx={{
+                                            mt: 2,
+                                            p: 2,
+                                            borderRadius: "12px",
+                                            border:
+                                              "1px solid rgba(47,98,220,0.2)",
+                                          }}
+                                        >
+                                          <Typography
+                                            variant="body2"
+                                            sx={{ fontWeight: 600 }}
+                                          >
+                                            {question}
+                                          </Typography>
+                                          {options.length > 0 &&
+                                            options.map((option, optionIndex) => (
+                                              <Typography
+                                                key={`${questionId}-${option}`}
+                                                variant="caption"
+                                                sx={{ display: "block", mt: 0.5 }}
+                                              >
+                                                {option}:{" "}
+                                                {optionTotals[optionIndex] ?? 0}
+                                              </Typography>
+                                            ))}
+                                          {resultRecord.mean !== undefined && (
+                                            <>
+                                              <Typography
+                                                variant="caption"
+                                                sx={{ display: "block", mt: 0.5 }}
+                                              >
+                                                Count:{" "}
+                                                {String(resultRecord.count ?? 0)}
+                                              </Typography>
+                                              <Typography
+                                                variant="caption"
+                                                sx={{ display: "block", mt: 0.5 }}
+                                              >
+                                                Min: {String(resultRecord.min ?? "-")}
+                                              </Typography>
+                                              <Typography
+                                                variant="caption"
+                                                sx={{ display: "block", mt: 0.5 }}
+                                              >
+                                                Max: {String(resultRecord.max ?? "-")}
+                                              </Typography>
+                                              <Typography
+                                                variant="caption"
+                                                sx={{ display: "block", mt: 0.5 }}
+                                              >
+                                                Mean:{" "}
+                                                {String(resultRecord.mean ?? "-")}
+                                              </Typography>
+                                            </>
+                                          )}
+                                          {Object.keys(customValueTotals).length > 0 &&
+                                            Object.entries(customValueTotals).map(
+                                              ([valueKey, valueTotal]) => (
+                                                <Typography
+                                                  key={`${questionId}-${valueKey}`}
+                                                  variant="caption"
+                                                  sx={{ display: "block", mt: 0.5 }}
+                                                >
+                                                  {valueKey}: {valueTotal}
+                                                </Typography>
+                                              ),
+                                            )}
+                                        </Box>
+                                      );
+                                    })}
+                                  </Box>
+                                </Box>
+                              ) : null}
+                            </>
+                          )}
+                      </>
+                    )}
+                  </Box>
+                )}
               </Box>
             ) : (
               <Box display="flex" flexWrap="wrap" mt={4}>

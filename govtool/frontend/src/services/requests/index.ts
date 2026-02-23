@@ -8,6 +8,8 @@ export * from "./getNetworkInfo";
 export * from "./getNetworkMetrics";
 export * from "./getNetworkTotalStake";
 export * from "./getProposal";
+export * from "./getProposalSurvey";
+export * from "./getProposalSurveyTally";
 export * from "./getProposals";
 export * from "./getTransactionStatus";
 export * from "./getVoteContextTextFromFile";

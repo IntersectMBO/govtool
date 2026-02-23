@@ -10,6 +10,8 @@ export const QUERY_KEYS = {
   useGetNetworkTotalStakeKey: "useGetNetworkTotalStakeKey",
   useGetNetworkInfoKey: "useGetNetworkInfoKey",
   useGetProposalKey: "useGetProposalKey",
+  useGetProposalSurveyKey: "useGetProposalSurveyKey",
+  useGetProposalSurveyTallyKey: "useGetProposalSurveyTallyKey",
   useGetProposalsInfiniteKey: "useGetProposalsInfiniteKey",
   useGetProposalsKey: "useGetProposalsKey",
   useGetVoteContextFromFile: "useGetVoteContextFromFile",

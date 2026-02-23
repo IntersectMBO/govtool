@@ -70,6 +70,10 @@ import {
   UpdateCommitteeAction,
   Committee,
   Credentials,
+  AuxiliaryData,
+  GeneralTransactionMetadata,
+  MetadataJsonSchema,
+  encode_json_str_to_metadatum,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 import { Buffer } from "buffer";
 import { useNavigate } from "react-router-dom";
@@ -204,6 +208,10 @@ type BuildSignSubmitConwayCertTxArgs = {
   govActionBuilder?: VotingProposalBuilder;
   votingBuilder?: VotingBuilder;
   voter?: VoterInfo;
+  auxiliaryData?: AuxiliaryData;
+  skipPendingCheck?: boolean;
+  skipStakeKeyRegistration?: boolean;
+  trackPending?: boolean;
 } & (
   | Pick<TransactionStateWithoutResource, "type" | "resourceId">
   | Pick<TransactionStateWithResource, "type" | "resourceId">
@@ -234,7 +242,15 @@ interface CardanoContextType {
     type,
     votingBuilder,
     voter,
+    auxiliaryData,
+    skipPendingCheck,
+    skipStakeKeyRegistration,
+    trackPending,
   }: BuildSignSubmitConwayCertTxArgs) => Promise<string>;
+  buildMetadataAuxiliaryData: (
+    label: number,
+    payload: Record<string, unknown>,
+  ) => AuxiliaryData;
   buildStakeKeyRegCert: () => Promise<Certificate>;
   buildDRepRegCert: (url?: string, hash?: string) => Promise<Certificate>;
   buildVoteDelegationCert: (vote: string) => Promise<Certificate>;
@@ -571,6 +587,21 @@ const CardanoProvider = (props: Props) => {
     return txOutputs;
   };
 
+  const buildMetadataAuxiliaryData = useCallback(
+    (label: number, payload: Record<string, unknown>) => {
+      const metadata = GeneralTransactionMetadata.new();
+      const metadatum = encode_json_str_to_metadatum(
+        JSON.stringify(payload),
+        MetadataJsonSchema.NoConversions,
+      );
+      metadata.insert(BigNum.from_str(String(label)), metadatum);
+      const auxiliaryData = AuxiliaryData.new();
+      auxiliaryData.set_metadata(metadata);
+      return auxiliaryData;
+    },
+    [],
+  );
+
   // Build, sign and submit transaction
   const buildSignSubmitConwayCertTx = useCallback(
     async ({
@@ -579,10 +610,16 @@ const CardanoProvider = (props: Props) => {
       resourceId,
       type,
       votingBuilder,
+      auxiliaryData,
+      skipPendingCheck,
+      skipStakeKeyRegistration,
+      trackPending,
     }: BuildSignSubmitConwayCertTxArgs) => {
       await checkIsMaintenanceOn();
-      const isPendingTx = isPendingTransaction();
-      if (isPendingTx) return;
+      if (!skipPendingCheck) {
+        const isPendingTx = isPendingTransaction();
+        if (isPendingTx) return;
+      }
 
       try {
         const txBuilder = await initTransactionBuilder();
@@ -603,7 +640,11 @@ const CardanoProvider = (props: Props) => {
         }
 
         // register stake key if it is not registered
-        if (!certBuilder && !registeredStakeKeysListState.length) {
+        if (
+          !skipStakeKeyRegistration &&
+          !certBuilder &&
+          !registeredStakeKeysListState.length
+        ) {
           const stakeKeyRegCertBuilder = CertificatesBuilder.new();
           const stakeKeyRegCert = await buildStakeKeyRegCert();
           stakeKeyRegCertBuilder.add(stakeKeyRegCert);
@@ -616,6 +657,10 @@ const CardanoProvider = (props: Props) => {
 
         if (govActionBuilder) {
           txBuilder.set_voting_proposal_builder(govActionBuilder);
+        }
+
+        if (auxiliaryData) {
+          txBuilder.set_auxiliary_data(auxiliaryData);
         }
 
         if (isGuardrailScriptUsed.current) {
@@ -727,7 +772,7 @@ const CardanoProvider = (props: Props) => {
         const txBody = txBuilder.build();
 
         // Make a full transaction, passing in empty witness set
-        const tx = Transaction.new(txBody, transactionWitnessSet);
+        const tx = Transaction.new(txBody, transactionWitnessSet, auxiliaryData);
         // Ask wallet to to provide signature (witnesses) for the transaction
 
         // Create witness set object using the witnesses provided by the wallet
@@ -740,18 +785,24 @@ const CardanoProvider = (props: Props) => {
 
         transactionWitnessSet.set_vkeys(vkeys);
         // Build transaction with witnesses
-        const signedTx = Transaction.new(tx.body(), transactionWitnessSet);
+        const signedTx = Transaction.new(
+          tx.body(),
+          transactionWitnessSet,
+          auxiliaryData,
+        );
 
         // Submit built signed transaction to chain, via wallet's submit transaction endpoint
         const result = await walletApi.submitTx(signedTx.to_hex());
         // Set results so they can be rendered
         const resultHash = result;
 
-        updateTransaction({
-          transactionHash: resultHash,
-          type,
-          resourceId,
-        });
+        if (trackPending !== false) {
+          updateTransaction({
+            transactionHash: resultHash,
+            type,
+            resourceId,
+          });
+        }
 
         isGuardrailScriptUsed.current = false;
 
@@ -1466,6 +1517,7 @@ const CardanoProvider = (props: Props) => {
       buildDRepRetirementCert,
       buildDRepUpdateCert,
       buildHardForkGovernanceAction,
+      buildMetadataAuxiliaryData,
       buildNewInfoGovernanceAction,
       buildProtocolParameterChangeGovernanceAction,
       buildNoConfidenceGovernanceAction,
@@ -1501,6 +1553,7 @@ const CardanoProvider = (props: Props) => {
       buildDRepRetirementCert,
       buildDRepUpdateCert,
       buildHardForkGovernanceAction,
+      buildMetadataAuxiliaryData,
       buildNewInfoGovernanceAction,
       buildProtocolParameterChangeGovernanceAction,
       buildNoConfidenceGovernanceAction,

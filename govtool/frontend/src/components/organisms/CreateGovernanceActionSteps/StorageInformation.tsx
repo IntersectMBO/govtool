@@ -48,7 +48,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
 
   useEffect(() => {
     generateMetadata();
-  }, []);
+  }, [generateMetadata]);
 
   return (
     <>

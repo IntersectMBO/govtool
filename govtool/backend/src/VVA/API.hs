@@ -26,7 +26,7 @@ import qualified Data.Text                as Text
 import qualified Data.Text.Lazy           as TL
 import qualified Data.Text.Lazy.Encoding  as TL
 import           Data.Time                (TimeZone, localTimeToUTC)
-import           Data.Time.LocalTime      (TimeZone, getCurrentTimeZone)
+import           Data.Time.LocalTime      (getCurrentTimeZone)
 import qualified Data.Vector              as V
 import           Data.Hashable            (hash, hashWithSalt)
 
@@ -50,6 +50,7 @@ import qualified VVA.Epoch                as Epoch
 import qualified VVA.Ipfs                 as Ipfs
 import           VVA.Network              as Network
 import qualified VVA.Proposal             as Proposal
+import qualified VVA.Survey               as Survey
 import qualified VVA.Transaction          as Transaction
 import qualified VVA.Types                as Types
 import           VVA.Types                (App, AppEnv (..),
@@ -89,6 +90,8 @@ type VVAApi =
                     :> QueryParam "search" Text
                     :> Get '[JSON] ListProposalsResponse
     :<|> "proposal" :> "get" :> Capture "proposalId" GovActionId :> QueryParam "drepId" HexText :> Get '[JSON] GetProposalResponse
+    :<|> "proposal" :> "survey" :> Capture "proposalId" GovActionId :> Get '[JSON] AnyValue
+    :<|> "proposal" :> "survey" :> Capture "proposalId" GovActionId :> "tally" :> QueryParam "weighting" Text :> Get '[JSON] AnyValue
     :<|> "proposal" :> "enacted-details" :> QueryParam "type" GovernanceActionType :> Get '[JSON] (Maybe EnactedProposalDetailsResponse)
     :<|> "epoch" :> "params" :> Get '[JSON] GetCurrentEpochParamsResponse
     :<|> "transaction" :> "status" :> Capture "transactionId" HexText :> Get '[JSON] GetTransactionStatusResponse
@@ -109,6 +112,8 @@ server = upload
     :<|> getStakeKeyVotingPower
     :<|> listProposals
     :<|> getProposal
+    :<|> getProposalSurvey
+    :<|> getProposalSurveyTally
     :<|> getEnactedProposalDetails
     :<|> getCurrentEpochParams
     :<|> getTransactionStatus
@@ -484,6 +489,20 @@ getProposal g@(GovActionId govActionTxHash govActionIndex) mDrepId' = do
     { getProposalResponseProposal = proposalResponse
     , getProposalResponseVote = voteResponse
     }
+
+getProposalSurvey :: App m => GovActionId -> m AnyValue
+getProposalSurvey (GovActionId govActionTxHash govActionIndex) = do
+  payload <- Survey.getProposalSurvey (unHexText govActionTxHash) govActionIndex
+  pure $ AnyValue (Just payload)
+
+getProposalSurveyTally :: App m => GovActionId -> Maybe Text -> m AnyValue
+getProposalSurveyTally (GovActionId govActionTxHash govActionIndex) mWeighting = do
+  let weighting = fromMaybe "CredentialBased" mWeighting
+  payload <- Survey.getProposalSurveyTally
+    (unHexText govActionTxHash)
+    govActionIndex
+    weighting
+  pure $ AnyValue (Just payload)
 
 getEnactedProposalDetails :: App m => Maybe GovernanceActionType -> m (Maybe EnactedProposalDetailsResponse)
 getEnactedProposalDetails maybeType = do

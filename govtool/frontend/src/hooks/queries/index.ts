@@ -9,6 +9,8 @@ export * from "./useGetNetworkInfo";
 export * from "./useGetNetworkMetrics";
 export * from "./useGetNetworkTotalStake";
 export * from "./useGetProposalQuery";
+export * from "./useGetProposalSurveyQuery";
+export * from "./useGetProposalSurveyTallyQuery";
 export * from "./useGetProposalsInfiniteQuery";
 export * from "./useGetProposalsQuery";
 export * from "./useGetVoteContextTextFromFile";

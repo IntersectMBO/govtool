@@ -14,9 +14,11 @@ jobs:
     steps:
       - name: Check if issue is a "🐛 Bug report"
         id: check_is_bug_report
+        env:
+          issue_title: "${{ github.event.issue.title }}"
         run: |
           echo "## Checking if issue is a 'Feature idea'..."
-          if [[ "${{ github.event.issue.title }}" == "🐛 "* ]]; then
+          if [[ "$issue_title" == "🐛 "* ]]; then
             echo "is_bug_report=true" >> $GITHUB_ENV
           else
             echo "is_bug_report=false" >> $GITHUB_ENV
@@ -50,5 +52,14 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 labels: [labelToAdd],
+              });
+            }
+            else {
+              // Apply "Needs Triage" if area not found
+              await github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: ["Needs Triage"],
               });
             }

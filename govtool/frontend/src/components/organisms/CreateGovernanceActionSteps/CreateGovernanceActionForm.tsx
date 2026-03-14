@@ -31,11 +31,11 @@ export const CreateGovernanceActionForm = ({
 
   const type = getValues("governance_action_type");
   const attachSurvey = watch("attachSurvey");
-  const surveyDetailsText = watch("surveyDetailsJson") ?? "";
+  const surveyTxId = watch("surveyTxId") ?? "";
 
-  const validateSurveyDetailsJson = useCallback(
+  const validateSurveyTxId = useCallback(
     (value?: string) => {
-      if (!attachSurvey || type !== GovernanceActionType.InfoAction) {
+      if (!attachSurvey) {
         return true;
       }
 
@@ -43,29 +43,16 @@ export const CreateGovernanceActionForm = ({
         return t("createGovernanceAction.fields.validations.required");
       }
 
-      try {
-        const parsed = JSON.parse(value) as Record<string, unknown>;
-        const questions = parsed.questions;
-        if (
-          parsed.specVersion !== "1.0.0" ||
-          typeof parsed.title !== "string" ||
-          typeof parsed.description !== "string" ||
-          !Array.isArray(questions) ||
-          !questions.length
-        ) {
-          return "Survey JSON must include specVersion, title, description, and questions.";
-        }
-      } catch (_error) {
-        return "Survey JSON is invalid.";
+      if (!/^[0-9a-fA-F]{64}$/.test(value.trim())) {
+        return "Survey transaction id must be a 64-character hex string.";
       }
 
       return true;
     },
-    [attachSurvey, t, type],
+    [attachSurvey, t],
   );
 
-  const isSurveySectionEnabled =
-    type === GovernanceActionType.InfoAction && !!attachSurvey;
+  const isSurveySectionEnabled = !!attachSurvey;
   const {
     append,
     fields: references,
@@ -92,7 +79,7 @@ export const CreateGovernanceActionForm = ({
     ).some(
       (field) => !watch(field as unknown as Parameters<typeof watch>[0]),
     ) ||
-    (isSurveySectionEnabled && !surveyDetailsText.trim()) ||
+    (isSurveySectionEnabled && !surveyTxId.trim()) ||
     isError;
 
   const onClickContinue = () => {
@@ -197,41 +184,33 @@ export const CreateGovernanceActionForm = ({
       />
       <Spacer y={3} />
       {renderGovernanceActionField()}
-      {type === GovernanceActionType.InfoAction && (
+      <Spacer y={1} />
+      <InfoText label={t("optional")} sx={{ mb: 0.75, textAlign: "center" }} />
+      <Typography sx={{ textAlign: "center" }} variant="headline4">
+        Survey Link
+      </Typography>
+      <Spacer y={2.5} />
+      <ControlledField.Checkbox
+        {...{ control, errors }}
+        data-testid="attach-survey-checkbox"
+        label="Link an existing on-chain survey"
+        name="attachSurvey"
+      />
+      {attachSurvey && (
         <>
-          <Spacer y={1} />
-          <InfoText
-            label={t("optional")}
-            sx={{ mb: 0.75, textAlign: "center" }}
-          />
-          <Typography sx={{ textAlign: "center" }} variant="headline4">
-            Survey Link (Info Action)
-          </Typography>
-          <Spacer y={2.5} />
-          <ControlledField.Checkbox
+          <Spacer y={2} />
+          <ControlledField.Input
             {...{ control, errors }}
-            data-testid="attach-survey-checkbox"
-            label="Create and attach an on-chain survey"
-            name="attachSurvey"
+            data-testid="survey-tx-id-input"
+            helpfulText="Paste the existing survey transaction id from metadata label 17."
+            label="Survey transaction id"
+            layoutStyles={{ mb: 3 }}
+            name="surveyTxId"
+            placeholder="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            rules={{
+              validate: validateSurveyTxId,
+            }}
           />
-          {attachSurvey && (
-            <>
-              <Spacer y={2} />
-              <ControlledField.TextArea
-                {...{ control, errors }}
-                data-testid="survey-details-json-input"
-                helpfulText="Paste label 17 surveyDetails JSON only (no wrapper envelope)."
-                label="Survey details JSON"
-                layoutStyles={{ mb: 3 }}
-                maxLength={20000}
-                name="surveyDetailsJson"
-                placeholder='{"specVersion":"1.0.0","title":"...","description":"...","questions":[...]}'
-                rules={{
-                  validate: validateSurveyDetailsJson,
-                }}
-              />
-            </>
-          )}
         </>
       )}
       <InfoText label={t("optional")} sx={{ mb: 0.75, textAlign: "center" }} />

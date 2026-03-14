@@ -31,9 +31,7 @@ emptySurveyPayload :: Value
 emptySurveyPayload =
   object
     [ "linked" .= False
-    , "actionLifecycle" .= object ["startSlot" .= (0 :: Integer), "endSlot" .= (0 :: Integer)]
-    , "surveyRef" .= (Nothing :: Maybe Value)
-    , "computedSurveyHash" .= (Nothing :: Maybe Text)
+    , "surveyTxId" .= (Nothing :: Maybe Text)
     , "linkValidation" .= object ["valid" .= False, "errors" .= ["No survey link found for this proposal."]]
     , "surveyDetails" .= (Nothing :: Maybe Value)
     , "surveyDetailsValidation" .= object ["valid" .= False, "errors" .= ([] :: [Text])]
@@ -43,8 +41,6 @@ emptySurveyTallyPayload :: Text -> Value
 emptySurveyTallyPayload weighting =
   object
     [ "surveyTxId" .= (Nothing :: Maybe Text)
-    , "surveyHash" .= (Nothing :: Maybe Text)
-    , "weightingMode" .= weighting
     , "totals" .= object
         [ "totalSeen" .= (0 :: Integer)
         , "valid" .= (0 :: Integer)
@@ -52,7 +48,20 @@ emptySurveyTallyPayload weighting =
         , "deduped" .= (0 :: Integer)
         , "uniqueResponders" .= (0 :: Integer)
         ]
-    , "methodResults" .= ([] :: [Value])
+    , "roleResults" .=
+        [ object
+            [ "responderRole" .= ("DRep" :: Text)
+            , "weightingMode" .= weighting
+            , "totals" .= object
+                [ "totalSeen" .= (0 :: Integer)
+                , "valid" .= (0 :: Integer)
+                , "invalid" .= (0 :: Integer)
+                , "deduped" .= (0 :: Integer)
+                , "uniqueResponders" .= (0 :: Integer)
+                ]
+            , "methodResults" .= ([] :: [Value])
+            ]
+        ]
     , "errors" .= ["No survey tally available for this proposal."]
     ]
 

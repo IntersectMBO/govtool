@@ -52,7 +52,7 @@ export const VoteActionForm = ({
   const fullProposalId = getFullGovActionId(proposal.txHash, proposal.index);
   const { data: proposalSurvey } = useGetProposalSurveyQuery(
     fullProposalId,
-    proposal.type === "InfoAction",
+    !!proposal.type,
   );
   const { voteContextText, valid: voteContextValid = true } =
     useGetVoteContextTextFromFile(voteContextUrl, voteContextHash) || {};
@@ -82,59 +82,67 @@ export const VoteActionForm = ({
   });
 
   const handleVoteClick = (isVoteChanged: boolean) => {
-    const shouldAttachSurveyResponse =
+    let surveyResponsePayload: SurveyResponsePayload | undefined;
+    const linkedSurvey =
       proposalSurvey?.linked &&
       proposalSurvey?.linkValidation?.valid &&
       proposalSurvey?.surveyDetailsValidation?.valid &&
-      proposalSurvey?.surveyRef &&
-      proposalSurvey?.surveyDetails;
+      proposalSurvey?.surveyTxId &&
+      proposalSurvey?.surveyDetails
+        ? proposalSurvey
+        : null;
 
-    let surveyResponsePayload: SurveyResponsePayload | undefined;
-    if (shouldAttachSurveyResponse) {
+    const linkedSurveyDetails = linkedSurvey?.surveyDetails;
+    const linkedSurveyTxId = linkedSurvey?.surveyTxId;
+
+    if (linkedSurveyDetails && linkedSurveyTxId) {
+      const surveyDetails = linkedSurveyDetails;
+      const surveyTxId = linkedSurveyTxId;
       let hasInvalidSurveyAnswer = false;
-      const answers = proposalSurvey.surveyDetails.questions.flatMap((question) => {
+      const answers: SurveyResponsePayload["answers"] = [];
+
+      for (const question of surveyDetails.questions) {
         const answer = surveyAnswers[question.questionId];
-        if (!answer) return [];
+        if (!answer) {
+          continue;
+        }
 
         if (Array.isArray(answer.selection)) {
-          return [
-            {
-              questionId: question.questionId,
-              selection: answer.selection,
-            },
-          ];
+          answers.push({
+            questionId: question.questionId,
+            selection: answer.selection,
+          });
+          continue;
         }
 
         if (
           typeof answer.numericValue === "number" &&
           Number.isFinite(answer.numericValue)
         ) {
-          return [
-            {
-              questionId: question.questionId,
-              numericValue: answer.numericValue,
-            },
-          ];
+          answers.push({
+            questionId: question.questionId,
+            numericValue: answer.numericValue,
+          });
+          continue;
         }
 
-        if (typeof answer.customValue === "string" && answer.customValue.trim()) {
+        if (
+          typeof answer.customValue === "string" &&
+          answer.customValue.trim()
+        ) {
           try {
             const customValue = JSON.parse(answer.customValue);
-            return [
-              {
-                questionId: question.questionId,
-                customValue,
-              },
-            ];
+            answers.push({
+              questionId: question.questionId,
+              customValue,
+            });
           } catch (_error) {
             setSurveyError("Invalid custom survey answer JSON.");
             hasInvalidSurveyAnswer = true;
-            return [];
+            break;
           }
         }
-
-        return [];
-      });
+      }
 
       if (hasInvalidSurveyAnswer) {
         return;
@@ -143,8 +151,8 @@ export const VoteActionForm = ({
       if (answers.length) {
         surveyResponsePayload = {
           specVersion: "1.0.0",
-          surveyTxId: proposalSurvey.surveyRef.surveyTxId,
-          surveyHash: proposalSurvey.surveyRef.surveyHash,
+          surveyTxId,
+          responderRole: "DRep",
           answers,
         };
       }

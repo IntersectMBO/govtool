@@ -1,15 +1,14 @@
 WITH context AS (
     SELECT
         gov_action_proposal.id AS proposal_db_id,
-        off_chain_vote_data.json->'surveyRef'->>'surveyTxId' AS survey_tx_id,
-        off_chain_vote_data.json->'surveyRef'->>'surveyHash' AS survey_hash,
+        off_chain_vote_data.json->>'surveyTxId' AS survey_tx_id,
         survey_meta.json->'surveyDetails' AS survey_details
     FROM gov_action_proposal
     JOIN tx AS creator_tx ON creator_tx.id = gov_action_proposal.tx_id
     LEFT JOIN voting_anchor ON voting_anchor.id = gov_action_proposal.voting_anchor_id
     LEFT JOIN off_chain_vote_data ON off_chain_vote_data.voting_anchor_id = voting_anchor.id
     LEFT JOIN tx survey_tx
-      ON encode(survey_tx.hash, 'hex') = LOWER(off_chain_vote_data.json->'surveyRef'->>'surveyTxId')
+      ON encode(survey_tx.hash, 'hex') = LOWER(off_chain_vote_data.json->>'surveyTxId')
     LEFT JOIN tx_metadata survey_meta
       ON survey_meta.tx_id = survey_tx.id
      AND survey_meta.key = 17
@@ -37,7 +36,6 @@ responses AS (
       ON tx_metadata.key = 17
      AND tx_metadata.json ? 'surveyResponse'
      AND LOWER(tx_metadata.json->'surveyResponse'->>'surveyTxId') = LOWER(context.survey_tx_id)
-     AND LOWER(tx_metadata.json->'surveyResponse'->>'surveyHash') = LOWER(context.survey_hash)
     JOIN tx ON tx.id = tx_metadata.tx_id
     JOIN block ON block.id = tx.block_id
     JOIN voting_procedure
@@ -100,8 +98,6 @@ method_results AS (
 SELECT
     jsonb_build_object(
         'surveyTxId', context.survey_tx_id,
-        'surveyHash', context.survey_hash,
-        'weightingMode', ?,
         'totals', jsonb_build_object(
             'totalSeen', COALESCE((SELECT COUNT(*) FROM responses), 0),
             'valid', COALESCE((SELECT COUNT(*) FROM latest), 0),
@@ -110,10 +106,35 @@ SELECT
                 - COALESCE((SELECT COUNT(*) FROM latest), 0),
                 0
             ),
-            'deduped', COALESCE((SELECT COUNT(*) FROM latest), 0),
+            'deduped', GREATEST(
+                COALESCE((SELECT COUNT(*) FROM responses), 0)
+                - COALESCE((SELECT COUNT(*) FROM latest), 0),
+                0
+            ),
             'uniqueResponders', COALESCE((SELECT COUNT(*) FROM latest), 0)
         ),
-        'methodResults', COALESCE(method_results.results, '[]'::jsonb),
+        'roleResults', jsonb_build_array(
+            jsonb_build_object(
+                'responderRole', 'DRep',
+                'weightingMode', ?,
+                'totals', jsonb_build_object(
+                    'totalSeen', COALESCE((SELECT COUNT(*) FROM responses), 0),
+                    'valid', COALESCE((SELECT COUNT(*) FROM latest), 0),
+                    'invalid', GREATEST(
+                        COALESCE((SELECT COUNT(*) FROM responses), 0)
+                        - COALESCE((SELECT COUNT(*) FROM latest), 0),
+                        0
+                    ),
+                    'deduped', GREATEST(
+                        COALESCE((SELECT COUNT(*) FROM responses), 0)
+                        - COALESCE((SELECT COUNT(*) FROM latest), 0),
+                        0
+                    ),
+                    'uniqueResponders', COALESCE((SELECT COUNT(*) FROM latest), 0)
+                ),
+                'methodResults', COALESCE(method_results.results, '[]'::jsonb)
+            )
+        ),
         'errors', '[]'::jsonb
     ) AS survey_tally
 FROM context

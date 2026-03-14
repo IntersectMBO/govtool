@@ -1,53 +1,38 @@
 WITH proposal_data AS (
     SELECT
-        gov_action_proposal.id AS proposal_db_id,
         gov_action_proposal.type::text AS proposal_type,
-        gov_action_proposal.voting_anchor_id AS voting_anchor_id,
-        creator_block.slot_no AS creator_slot,
-        meta.network_name::text AS network_name,
-        COALESCE(latest_epoch_param.gov_action_lifetime, 0) AS gov_action_lifetime
+        encode(creator_tx.hash, 'hex') AS proposal_tx_id,
+        gov_action_proposal.index AS proposal_index,
+        gov_action_proposal.expiration AS expiration_epoch,
+        off_chain_vote_data.json AS anchor_json,
+        off_chain_vote_data.json->>'kind' AS kind,
+        off_chain_vote_data.json->>'surveyTxId' AS survey_tx_id
     FROM gov_action_proposal
     JOIN tx AS creator_tx ON creator_tx.id = gov_action_proposal.tx_id
-    JOIN block AS creator_block ON creator_block.id = creator_tx.block_id
-    CROSS JOIN meta
-    LEFT JOIN LATERAL (
-        SELECT ep.gov_action_lifetime
-        FROM epoch_param ep
-        ORDER BY ep.epoch_no DESC
-        LIMIT 1
-    ) latest_epoch_param ON true
+    LEFT JOIN voting_anchor ON voting_anchor.id = gov_action_proposal.voting_anchor_id
+    LEFT JOIN off_chain_vote_data ON off_chain_vote_data.voting_anchor_id = voting_anchor.id
     WHERE encode(creator_tx.hash, 'hex') = ?
       AND gov_action_proposal.index = ?
     LIMIT 1
 ),
-survey_link AS (
-    SELECT
-        proposal_data.*,
-        off_chain_vote_data.json AS anchor_json,
-        off_chain_vote_data.json->>'kind' AS kind,
-        off_chain_vote_data.json->'surveyRef'->>'surveyTxId' AS survey_tx_id,
-        off_chain_vote_data.json->'surveyRef'->>'surveyHash' AS survey_hash
-    FROM proposal_data
-    LEFT JOIN voting_anchor ON voting_anchor.id = proposal_data.voting_anchor_id
-    LEFT JOIN off_chain_vote_data ON off_chain_vote_data.voting_anchor_id = voting_anchor.id
-),
 survey_payload AS (
     SELECT
-        survey_link.*,
+        proposal_data.*,
         survey_meta.json->'surveyDetails' AS survey_details,
         CASE
-            WHEN (survey_meta.json->'surveyDetails'->'lifecycle'->>'startSlot') ~ '^[0-9]+$'
-            THEN (survey_meta.json->'surveyDetails'->'lifecycle'->>'startSlot')::bigint
+            WHEN (survey_meta.json->'surveyDetails'->>'endEpoch') ~ '^[0-9]+$'
+            THEN (survey_meta.json->'surveyDetails'->>'endEpoch')::bigint
             ELSE NULL
-        END AS lifecycle_start_slot,
+        END AS survey_end_epoch,
+        survey_meta.json->'surveyDetails'->'roleWeighting' AS role_weighting,
         CASE
-            WHEN (survey_meta.json->'surveyDetails'->'lifecycle'->>'endSlot') ~ '^[0-9]+$'
-            THEN (survey_meta.json->'surveyDetails'->'lifecycle'->>'endSlot')::bigint
-            ELSE NULL
-        END AS lifecycle_end_slot
-    FROM survey_link
+            WHEN proposal_type IN ('TreasuryWithdrawals', 'NewConstitution')
+            THEN '["DRep","CC"]'::jsonb
+            ELSE '["DRep","SPO","CC"]'::jsonb
+        END AS action_eligibility
+    FROM proposal_data
     LEFT JOIN tx survey_tx
-      ON encode(survey_tx.hash, 'hex') = LOWER(survey_link.survey_tx_id)
+      ON encode(survey_tx.hash, 'hex') = LOWER(proposal_data.survey_tx_id)
     LEFT JOIN tx_metadata survey_meta
       ON survey_meta.tx_id = survey_tx.id
      AND survey_meta.key = 17
@@ -55,75 +40,82 @@ survey_payload AS (
 )
 SELECT
     jsonb_build_object(
-        'linked', (survey_tx_id IS NOT NULL AND survey_hash IS NOT NULL),
-        'actionLifecycle', jsonb_build_object(
-            'startSlot', creator_slot,
-            'endSlot', creator_slot + (
-                gov_action_lifetime
-                * CASE WHEN network_name IN ('mainnet', 'preprod') THEN 432000 ELSE 86400 END
-            )
-        ),
-        'surveyRef', CASE
-            WHEN survey_tx_id IS NOT NULL AND survey_hash IS NOT NULL
-            THEN jsonb_build_object(
-                'surveyTxId', survey_tx_id,
-                'surveyHash', survey_hash
-            )
-            ELSE NULL
-        END,
-        'computedSurveyHash', survey_hash,
+        'linked', survey_tx_id IS NOT NULL,
+        'surveyTxId', survey_tx_id,
         'linkValidation', jsonb_build_object(
             'valid',
             (
-                proposal_type = 'InfoAction'
-                AND kind = 'cardano-governance-survey-link'
+                kind = 'cardano-governance-survey-link'
                 AND survey_tx_id IS NOT NULL
-                AND survey_hash IS NOT NULL
                 AND survey_details IS NOT NULL
+            )
+            AND (
+                role_weighting IS NOT NULL
+                AND (
+                    SELECT COUNT(*)
+                    FROM jsonb_object_keys(role_weighting) AS role_key
+                    WHERE action_eligibility ? role_key
+                ) > 0
             ),
             'errors',
             to_jsonb(array_remove(ARRAY[
-                CASE WHEN proposal_type <> 'InfoAction'
-                    THEN 'Survey linkage is only valid for InfoAction proposals.' END,
                 CASE WHEN kind IS DISTINCT FROM 'cardano-governance-survey-link'
                     THEN 'Anchor metadata kind is not cardano-governance-survey-link.' END,
-                CASE WHEN survey_tx_id IS NULL OR survey_hash IS NULL
-                    THEN 'Missing surveyRef.surveyTxId or surveyRef.surveyHash in anchor metadata.' END,
+                CASE WHEN survey_tx_id IS NULL
+                    THEN 'Missing surveyTxId in anchor metadata.' END,
                 CASE WHEN survey_tx_id IS NOT NULL AND survey_details IS NULL
-                    THEN 'Referenced surveyTxId has no label 17 surveyDetails payload.' END
-            ], NULL))
+                    THEN 'Referenced surveyTxId has no label 17 surveyDetails payload.' END,
+                CASE WHEN role_weighting IS NOT NULL
+                    AND (
+                        SELECT COUNT(*)
+                        FROM jsonb_object_keys(role_weighting) AS role_key
+                        WHERE action_eligibility ? role_key
+                    ) = 0
+                    THEN 'Linked survey has no eligible roles after governance action filtering.' END
+            ], NULL)),
+            'actionEligibility', action_eligibility,
+            'linkedRoleWeighting',
+            COALESCE(
+                (
+                    SELECT jsonb_object_agg(role_key, role_weighting->role_key)
+                    FROM jsonb_object_keys(role_weighting) AS role_key
+                    WHERE action_eligibility ? role_key
+                ),
+                'null'::jsonb
+            ),
+            'linkedActionId', jsonb_build_object(
+                'txId', proposal_tx_id,
+                'govActionIx', proposal_index
+            )
         ),
         'surveyDetails', survey_details,
         'surveyDetailsValidation', jsonb_build_object(
             'valid',
             (
                 survey_details IS NOT NULL
-                AND lifecycle_start_slot IS NOT NULL
-                AND lifecycle_end_slot IS NOT NULL
-                AND lifecycle_start_slot = creator_slot
-                AND lifecycle_end_slot = creator_slot + (
-                    gov_action_lifetime
-                    * CASE WHEN network_name IN ('mainnet', 'preprod') THEN 432000 ELSE 86400 END
-                )
+                AND role_weighting IS NOT NULL
+                AND jsonb_typeof(role_weighting) = 'object'
+                AND jsonb_object_length(role_weighting) > 0
+                AND survey_end_epoch IS NOT NULL
+                AND survey_end_epoch = expiration_epoch
             ),
             'errors',
             to_jsonb(array_remove(ARRAY[
                 CASE WHEN survey_details IS NULL
                     THEN 'Missing surveyDetails payload.' END,
                 CASE WHEN survey_details IS NOT NULL
-                    AND (lifecycle_start_slot IS NULL OR lifecycle_end_slot IS NULL)
-                    THEN 'surveyDetails.lifecycle.startSlot/endSlot are required for linked InfoAction surveys.' END,
-                CASE WHEN survey_details IS NOT NULL
-                    AND lifecycle_start_slot IS NOT NULL
-                    AND lifecycle_end_slot IS NOT NULL
                     AND (
-                        lifecycle_start_slot <> creator_slot
-                        OR lifecycle_end_slot <> creator_slot + (
-                            gov_action_lifetime
-                            * CASE WHEN network_name IN ('mainnet', 'preprod') THEN 432000 ELSE 86400 END
-                        )
+                        role_weighting IS NULL
+                        OR jsonb_typeof(role_weighting) <> 'object'
+                        OR jsonb_object_length(role_weighting) = 0
                     )
-                    THEN 'surveyDetails.lifecycle must match InfoAction lifecycle (start/end slot mismatch).' END
+                    THEN 'surveyDetails.roleWeighting must be a non-empty object.' END,
+                CASE WHEN survey_details IS NOT NULL
+                    AND survey_end_epoch IS NULL
+                    THEN 'surveyDetails.endEpoch is required.' END,
+                CASE WHEN survey_end_epoch IS NOT NULL
+                    AND survey_end_epoch <> expiration_epoch
+                    THEN 'surveyDetails.endEpoch must exactly match the governance action expiration epoch.' END
             ], NULL))
         )
     ) AS survey_payload

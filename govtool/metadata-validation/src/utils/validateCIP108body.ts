@@ -17,7 +17,7 @@ export const validateCIP108body = (body: Record<string, unknown>) => {
   if (!title || !abstract || !motivation || !rationale) {
     throw MetadataValidationStatus.INCORRECT_FORMAT;
   }
-  if (String(title).length > 80 || String(abstract).length > 2500) {
+  if (String(title).length > 80 || String(abstract).length > 3000) {
     throw MetadataValidationStatus.INCORRECT_FORMAT;
   }
 

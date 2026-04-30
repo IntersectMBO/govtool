@@ -1,3 +1,4 @@
+import { ProposalResponse } from 'src/proposal/proposal.type';
 export type DRepVotingPower = {
     amount: number | string;
 };
@@ -126,4 +127,30 @@ export type DRepListResponse = {
   elements: DRepListItem[];
 };
 
+export type DRepVoteRow = {
+  proposal_id: number | string;
+  gov_action_id: string;
+  drep_id: string;
+  vote: string;
+  url: string | null;
+  doc_hash: string | null;
+  epoch_no: number | string;
+  date: Date | string;
+  vote_tx_hash: string;
+};
 
+export type VoteParams = {
+  proposalId: string;
+  drepId: string;
+  vote: string;
+  url: string | null;
+  metadataHash: string | null;
+  epochNo: number;
+  date: string;
+  txHash: string;
+};
+
+export type VoteResponse = {
+  vote: VoteParams;
+  proposal: ProposalResponse;
+};

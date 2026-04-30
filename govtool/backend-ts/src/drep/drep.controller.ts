@@ -1,8 +1,13 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 
 import { DRepService } from './drep.service';
-import { DRepInfoResponse, DRepVotingPowerListResponse , DRepListResponse, DRepStatus,} from './drep.type';
+import { DRepInfoResponse, DRepVotingPowerListResponse , DRepListResponse, DRepStatus,VoteResponse} from './drep.type';
 import type { DRepListSort} from './drep.type';
+import {
+  GovernanceActionType,
+} from 'src/proposal/proposal.type';
+import type {  GovernanceActionSortMode} from 'src/proposal/proposal.type';
+
 
 @Controller('drep')
 export class DRepController {
@@ -24,6 +29,23 @@ export class DRepController {
   getInfo(@Param('drepId') drepId: string): Promise<DRepInfoResponse> {
     return this.drepService.getInfo(drepId);
   }
+
+  @Get('getVotes/:drepId')
+    getVotes(
+    @Param('drepId') drepId: string,
+    @Query('type') type?: string | string[],
+    @Query('sort') sort?: GovernanceActionSortMode,
+    @Query('search') search?: string,
+    ): Promise<VoteResponse[]> {
+    return this.drepService.getVotes(
+        drepId,
+        this.normalizeQueryArray(type) as GovernanceActionType[],
+        sort,
+        search,
+    );
+}
+
+
   @Get('list')
   getList(
   @Query('search') search?: string,

@@ -18,14 +18,14 @@ import { AccountController } from './account/account.controller';
 import { AccountService } from './account/account.service';
 import { DRepController } from './drep/drep.controller';
 import { DRepService } from './drep/drep.service';
-
-
+import { ProposalController } from './proposal/proposal.controller';
+import { ProposalService } from './proposal/proposal.service';
 
 
 @Module({
   imports: [],
-  controllers: [AppController, HealthController, NetworkController, EpochController, TransactionController, AdaHolderController, AccountController,DRepController],
-  providers: [AppService, ConfigService, DbService, NetworkService, SqlService, EpochService, TransactionService, AdaHolderService, AccountService, DRepService],
+  controllers: [AppController, HealthController, NetworkController, EpochController, TransactionController, AdaHolderController, AccountController,DRepController,ProposalController],
+  providers: [AppService, ConfigService, DbService, NetworkService, SqlService, EpochService, TransactionService, AdaHolderService, AccountService, DRepService,ProposalService],
   exports: [ConfigService, DbService]
 })
 export class AppModule {}

@@ -4,13 +4,21 @@ import { assertHexText } from "src/common/hex";
 import { DbService } from "src/db/db.service";
 import { SqlService } from "src/sql/sq.service";
 
-import { DRepInfo, DRepInfoResponse, DRepVotingPower, DRepVotingPowerList,DRepVotingPowerListResponse , DRepListItem, DRepListResponse, DRepList, DRepListSort,DRepStatus,DRepType} from "./drep.type";
+import { DRepInfo, DRepInfoResponse, DRepVotingPower, DRepVotingPowerList,DRepVotingPowerListResponse , DRepListItem, DRepListResponse, DRepList, DRepListSort,DRepStatus,DRepType,DRepVoteRow,VoteParams,VoteResponse,
+} from "./drep.type";
+import { ProposalService } from 'src/proposal/proposal.service';
+import {
+  GovernanceActionSortMode,
+  GovernanceActionType,
+  ProposalResponse,
+} from 'src/proposal/proposal.type';
 
 @Injectable()
 export class DRepService {
     constructor(
         private readonly dbService: DbService,
         private readonly sqlService: SqlService,
+        private readonly proposalService: ProposalService,
     ){}
 
     async getVotingPower(drepId: string): Promise<number> {
@@ -148,6 +156,66 @@ export class DRepService {
             elements
         };
     }
+    async getVotes(
+        drepId: string,
+        selectedTypes: GovernanceActionType[] = [],
+        sort?: GovernanceActionSortMode,
+        search?: string,
+        ): Promise<VoteResponse[]> {
+        assertHexText(drepId);
+
+        const sql = this.sqlService.load('get-votes.sql');
+        const result = await this.dbService.query<DRepVoteRow>(sql, [drepId]);
+
+        if (result.rows.length === 0) {
+            return [];
+        }
+
+        const voteRows = result.rows;
+        const proposals: ProposalResponse[] = [];
+
+        for (const voteRow of voteRows) {
+            const matched = await this.proposalService.getProposals(voteRow.gov_action_id);
+            proposals.push(...matched);
+        }
+
+        let processedProposals = this.proposalService.filterByType(
+            proposals,
+            selectedTypes,
+        );
+        processedProposals = this.proposalService.filterBySearch(
+            processedProposals,
+            search,
+        );
+        processedProposals = this.proposalService.sortProposals(
+            processedProposals,
+            sort,
+        );
+
+        const voteByGovActionId = new Map<string, DRepVoteRow>();
+
+        for (const voteRow of voteRows) {
+            voteByGovActionId.set(voteRow.gov_action_id, voteRow);
+        }
+
+        return processedProposals.flatMap((proposal) => {
+            const govActionId = `${proposal.txHash}#${proposal.index}`;
+            const voteRow = voteByGovActionId.get(govActionId);
+
+            if (!voteRow) {
+            return [];
+            }
+
+            return [
+            {
+                vote: this.toVoteParams(voteRow),
+                proposal,
+            },
+            ];
+        });
+     }
+
+
 
     private emptyDRepInfo(): DRepInfoResponse {
         return {
@@ -312,5 +380,19 @@ export class DRepService {
         }
         return this.toInteger(value);
     }
+    
+    private toVoteParams(row: DRepVoteRow): VoteParams {
+        return {
+            proposalId: String(row.proposal_id),
+            drepId: row.drep_id,
+            vote: row.vote,
+            url: row.url,
+            metadataHash: row.doc_hash,
+            epochNo: this.toInteger(row.epoch_no),
+            date: this.toIsoString(row.date),
+            txHash: row.vote_tx_hash,
+        };
+}
+
     
 }

@@ -14,7 +14,6 @@ async function bootstrap() {
   });
   const configService = app.get(ConfigService);
   const config = configService.get()
-  console.log("COMMAND LINE ARGS:", process.argv);
   await app.listen(config.port, config.host);
   console.log(`listening on ${config.host}:${config.port}`);
 }

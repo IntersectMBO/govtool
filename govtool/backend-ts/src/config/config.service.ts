@@ -66,7 +66,6 @@ export class ConfigService {
 
      private readJsonConfig(configPath: string): BackendConfigFile {
         const file = fs.readFileSync(configPath, 'utf8');
-         console.log(`file is ${file}`)
         return JSON.parse(file) as BackendConfigFile;
      }
 }

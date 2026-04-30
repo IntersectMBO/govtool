@@ -1,26 +1,29 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 
 import { DbService } from "src/db/db.service";
-import { GetNetworkInfoResponse, NetworkInfo } from "./network.type";
-
-const GET_NETWORK_INFO_SQL = `
-SELECT
-  (SELECT MAX(no) FROM epoch) AS current_epoch,
-  (SELECT MAX(block_no) FROM block) AS current_block,
-  network_name
-FROM
-  meta;
-`;
+import { SqlService } from "src/sql/sq.service";
+import { 
+    GetNetworkInfoResponse,
+    GetNetworkMetricsResponse,
+    GetNetworkTotalStakeResponse, 
+    NetworkInfo,
+    NetworkMetrics,
+  NetworkTotalStake,
+ } from "./network.type";
 
 @Injectable()
 export class NetworkService {
-    constructor( private readonly dbService: DbService) {}
+    constructor( 
+        private readonly dbService: DbService ,
+        private readonly sqlService: SqlService,
+    ) {}
 
     async getNetworkInfo() : Promise<GetNetworkInfoResponse> {
-        const result = await this.dbService.query<NetworkInfo>(GET_NETWORK_INFO_SQL);
+        const sql = this.sqlService.load('get-network-info.sql')
+        const result = await this.dbService.query<NetworkInfo>(sql);
 
         if (result.rows.length != 1){
-            throw this.networkInfoError();
+            throw this.criticalError('Could not query the network info. This should never happen.');
         }
         const row = result.rows[0];
         if (
@@ -28,7 +31,7 @@ export class NetworkService {
             row.current_block === null ||
             row.network_name ===null
         ) {
-            throw this.networkInfoError();
+            throw this.criticalError('Could not query the network info. This should never happen.');
         }
         return {
              currentTime: new Date().toISOString(),
@@ -38,20 +41,65 @@ export class NetworkService {
         };
     }
 
+     async getNetworkTotalStake(): Promise<GetNetworkTotalStakeResponse> {
+    const sql = this.sqlService.load('get-network-total-stake.sql');
+    const result = await this.dbService.query<NetworkTotalStake>(sql);
 
-private toInteger(value: number | string ) : number {
-    const parsed = Number(value);
-
-    if (!Number.isInteger(parsed)) {
-        throw this.networkInfoError();
+    if (result.rows.length !== 1) {
+      throw this.criticalError('Could not query the network total stake. This should never happen.');
     }
-    return parsed;
-}    
 
-private networkInfoError(): InternalServerErrorException {
-    return new InternalServerErrorException ({
+    const row = result.rows[0];
+    return {
+      totalStakeControlledByDReps: this.toInteger(row.total_stake_controlled_by_active_dreps),
+      totalStakeControlledBySPOs: this.toInteger(row.total_stake_controlled_by_spos),
+      alwaysAbstainVotingPower: this.toInteger(row.always_abstain_voting_power),
+      alwaysNoConfidenceVotingPower: this.toInteger(row.always_no_confidence_voting_power),
+    };
+  }
+
+  async getNetworkMetrics(): Promise<GetNetworkMetricsResponse> {
+    const sql = this.sqlService.load('get-network-metrics.sql');
+    const result = await this.dbService.query<NetworkMetrics>(sql);
+
+    if (result.rows.length !== 1) {
+      throw this.criticalError('Could not query the network metrics. This should never happen.');
+    }
+
+    const row = result.rows[0];
+
+    return {
+      uniqueDelegators: this.toInteger(row.unique_delegators),
+      totalDelegations: this.toInteger(row.total_delegations),
+      totalGovernanceActions: this.toInteger(row.total_gov_action_proposals),
+      totalDRepVotes: this.toInteger(row.total_drep_votes),
+      totalRegisteredDReps: this.toInteger(row.total_registered_dreps),
+      totalDRepDistr: this.toInteger(row.total_drep_distr),
+      totalActiveDReps: this.toInteger(row.total_active_dreps),
+      totalInactiveDReps: this.toInteger(row.total_inactive_dreps),
+      totalActiveCIP119CompliantDReps: this.toInteger(
+        row.total_active_cip119_compliant_dreps,
+      ),
+      totalRegisteredDirectVoters: this.toInteger(row.total_registered_direct_voters),
+      noOfCommitteeMembers: this.toInteger(row.no_of_committee_members),
+      quorumNumerator: this.toInteger(row.quorum_numerator),
+      quorumDenominator: this.toInteger(row.quorum_denominator),
+    };
+  }
+
+    private toInteger(value: number | string ) : number {
+        const parsed = Number(value);
+
+        if (!Number.isInteger(parsed)) {
+            throw this.criticalError('Unexpected non-integer value returned from database.');
+        }
+        return parsed;
+    }    
+
+    private criticalError(message: string): InternalServerErrorException {
+        return new InternalServerErrorException({
         errorType: 'CriticalError',
-        message: "Could not query the network info"
-    });
-}
+        message,
+        });
+    }
 }

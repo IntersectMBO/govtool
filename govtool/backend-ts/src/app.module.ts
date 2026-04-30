@@ -16,13 +16,16 @@ import { AdaHolderController } from './ada-holder/ada-holder.controller';
 import { AdaHolderService } from './ada-holder/ada-holder.service';
 import { AccountController } from './account/account.controller';
 import { AccountService } from './account/account.service';
+import { DRepController } from './drep/drep.controller';
+import { DRepService } from './drep/drep.service';
+
 
 
 
 @Module({
   imports: [],
-  controllers: [AppController, HealthController, NetworkController, EpochController, TransactionController, AdaHolderController, AccountController],
-  providers: [AppService, ConfigService, DbService, NetworkService, SqlService, EpochService, TransactionService, AdaHolderService, AccountService],
+  controllers: [AppController, HealthController, NetworkController, EpochController, TransactionController, AdaHolderController, AccountController,DRepController],
+  providers: [AppService, ConfigService, DbService, NetworkService, SqlService, EpochService, TransactionService, AdaHolderService, AccountService, DRepService],
   exports: [ConfigService, DbService]
 })
 export class AppModule {}

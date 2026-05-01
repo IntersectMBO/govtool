@@ -2,6 +2,8 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from './config/config.service';
+import * as express from 'express';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -14,6 +16,7 @@ async function bootstrap() {
   });
   const configService = app.get(ConfigService);
   const config = configService.get()
+  app.use(express.text({ type: 'text/plain', limit: '600kb'}));
   await app.listen(config.port, config.host);
   console.log(`listening on ${config.host}:${config.port}`);
 }

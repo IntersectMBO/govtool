@@ -20,12 +20,15 @@ import { DRepController } from './drep/drep.controller';
 import { DRepService } from './drep/drep.service';
 import { ProposalController } from './proposal/proposal.controller';
 import { ProposalService } from './proposal/proposal.service';
+import { IpfsController } from './ipfs/ipfs.controller';
+import { IpfsService } from './ipfs/ipfs.service';
+import { SystemController } from './system/system.controller';
 
 
 @Module({
   imports: [],
-  controllers: [AppController, HealthController, NetworkController, EpochController, TransactionController, AdaHolderController, AccountController,DRepController,ProposalController],
-  providers: [AppService, ConfigService, DbService, NetworkService, SqlService, EpochService, TransactionService, AdaHolderService, AccountService, DRepService,ProposalService],
+  controllers: [AppController, HealthController, NetworkController, EpochController, TransactionController, AdaHolderController, AccountController,DRepController,ProposalController,IpfsController,SystemController],
+  providers: [AppService, ConfigService, DbService, NetworkService, SqlService, EpochService, TransactionService, AdaHolderService, AccountService, DRepService,ProposalService,IpfsService],
   exports: [ConfigService, DbService]
 })
 export class AppModule {}

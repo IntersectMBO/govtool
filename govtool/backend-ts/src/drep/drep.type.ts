@@ -154,3 +154,12 @@ export type VoteResponse = {
   vote: VoteParams;
   proposal: ProposalResponse;
 };
+
+export type DRepListParams = {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status: DRepStatus[];
+  sort?: DRepListSort;
+  seed?: string;
+};

@@ -10,16 +10,19 @@ import {
     NetworkMetrics,
   NetworkTotalStake,
  } from "./network.type";
+import { CacheService } from "src/cache/cache.service";
 
 @Injectable()
 export class NetworkService {
     constructor( 
         private readonly dbService: DbService ,
         private readonly sqlService: SqlService,
+        private readonly cacheService: CacheService,
     ) {}
 
     async getNetworkInfo() : Promise<GetNetworkInfoResponse> {
-        const sql = this.sqlService.load('get-network-info.sql')
+       return this.cacheService.getOrSet('networkInfo','default',async ()=> {
+         const sql = this.sqlService.load('get-network-info.sql')
         const result = await this.dbService.query<NetworkInfo>(sql);
 
         if (result.rows.length != 1){
@@ -39,10 +42,12 @@ export class NetworkService {
              blockNo: this.toInteger(row.current_block),
              networkName: row.network_name,
         };
+       });
     }
 
-     async getNetworkTotalStake(): Promise<GetNetworkTotalStakeResponse> {
-    const sql = this.sqlService.load('get-network-total-stake.sql');
+    async getNetworkTotalStake(): Promise<GetNetworkTotalStakeResponse> {
+      return this.cacheService.getOrSet('networkTotalStake','default',async () => {
+         const sql = this.sqlService.load('get-network-total-stake.sql');
     const result = await this.dbService.query<NetworkTotalStake>(sql);
 
     if (result.rows.length !== 1) {
@@ -56,10 +61,12 @@ export class NetworkService {
       alwaysAbstainVotingPower: this.toInteger(row.always_abstain_voting_power),
       alwaysNoConfidenceVotingPower: this.toInteger(row.always_no_confidence_voting_power),
     };
+      });
   }
 
   async getNetworkMetrics(): Promise<GetNetworkMetricsResponse> {
-    const sql = this.sqlService.load('get-network-metrics.sql');
+    return this.cacheService.getOrSet('networkMetrics', 'default', async()=>{
+      const sql = this.sqlService.load('get-network-metrics.sql');
     const result = await this.dbService.query<NetworkMetrics>(sql);
 
     if (result.rows.length !== 1) {
@@ -85,6 +92,7 @@ export class NetworkService {
       quorumNumerator: this.toInteger(row.quorum_numerator),
       quorumDenominator: this.toInteger(row.quorum_denominator),
     };
+    });
   }
 
     private toInteger(value: number | string ) : number {

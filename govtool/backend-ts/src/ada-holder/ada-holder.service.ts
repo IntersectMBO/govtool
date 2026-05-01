@@ -8,16 +8,18 @@ import {
   DelegationResponse,
   VotingPowerRow,
 } from './ada-holder.type';
-
+import { CacheService } from 'src/cache/cache.service';
 @Injectable()
 export class AdaHolderService {
   constructor(
     private readonly dbService: DbService,
     private readonly sqlService: SqlService,
+    private readonly cacheService: CacheService,
   ) {}
 
   async getCurrentDelegation(stakeKey: string): Promise<DelegationResponse | null> {
-    assertHexText(stakeKey);
+    return this.cacheService.getOrSet('adaHolderCurrentDelegation', stakeKey, async()=> {
+       assertHexText(stakeKey);
 
     const sql = this.sqlService.load('get-current-delegation.sql');
     const result = await this.dbService.query<CurrentDelegationRow>(sql, [stakeKey]);
@@ -40,10 +42,12 @@ export class AdaHolderService {
       isDRepScriptBased: row.has_script,
       txHash: row.encode,
     };
+    });
   }
 
   async getVotingPower(stakeKey: string): Promise<number> {
-    assertHexText(stakeKey);
+   return this.cacheService.getOrSet('adaHolderVotingPower',stakeKey,async()=> {
+     assertHexText(stakeKey);
 
     const sql = this.sqlService.load('get-stake-key-voting-power.sql');
 
@@ -58,6 +62,7 @@ export class AdaHolderService {
     } catch {
       return 0;
     }
+   });
   }
 
   private toInteger(value: number | string): number {

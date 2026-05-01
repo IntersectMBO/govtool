@@ -17,12 +17,14 @@ import {
   ProposalResponse,
   Proposal,
 } from './proposal.type';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class ProposalService {
   constructor(
     private readonly dbService: DbService,
     private readonly sqlService: SqlService,
+    private readonly cacheService: CacheService,
   ) {}
 
   async list(params: {
@@ -33,11 +35,17 @@ export class ProposalService {
     drepId?: string;
     search?: string;
   }): Promise<ListProposalsResponse> {
-    if (params.drepId) {
+   return this.cacheService.getOrSet('proposalList',{
+    type: params.type,
+    sort: params.sort,
+    page: params.page,
+    pageSize: params.pageSize,
+    drepId: params.drepId,
+    search: params.search
+   }, async()=> {
+     if (params.drepId) {
       assertHexText(params.drepId);
     }
-
-    // Haskell currently bypasses SQL search with empty search and filters after mapping.
     const proposals = await this.getProposals('');
 
     let filtered = this.filterByType(proposals, params.type);
@@ -53,6 +61,7 @@ export class ProposalService {
       total,
       elements: filtered.slice(start, start + params.pageSize),
     };
+   });
   }
 
   async get(proposalId: string, drepId?: string): Promise<GetProposalResponse> {
@@ -116,18 +125,11 @@ export class ProposalService {
   }
 
   async getProposals(search: string): Promise<ProposalResponse[]> {
-    const sql = this.sqlService.load('list-proposals.sql');
-
-    const result = await this.dbService.query<Proposal>(sql, [
-      search,
-      `%${search}%`,
-      `%${search}%`,
-      `%${search}%`,
-      `%${search}%`,
-      search,
-    ]);
-
-    return result.rows.map((row) => this.toProposalResponse(row));
+  return this.cacheService.getOrSetStaleWhileRevalidate(
+    this.proposalListSnapshotNamespace,
+    search,
+    () => this.fetchProposals(search),
+  );
   }
 
   private toProposalResponse(row: Proposal): ProposalResponse {
@@ -291,4 +293,29 @@ export class ProposalService {
   private toNullableIsoString(value: Date | string | null): string | null {
     return value === null ? null : this.toIsoString(value);
   }
+  private readonly proposalListSnapshotNamespace = 'proposalListSnapshot';
+
+async warmActiveProposalSnapshot(): Promise<void> {
+  await this.cacheService.refresh(
+    this.proposalListSnapshotNamespace,
+    '',
+    () => this.fetchProposals(''),
+  );
+}
+
+
+
+private async fetchProposals(search: string): Promise<ProposalResponse[]> {
+  const sql = this.sqlService.load('list-proposals.sql');
+
+  const result = await this.dbService.query<Proposal>(sql, [
+     search,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      search,
+  ]);
+  return result.rows.map((row) => this.toProposalResponse(row));
+}
 }

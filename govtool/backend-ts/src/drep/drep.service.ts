@@ -4,7 +4,7 @@ import { assertHexText } from "src/common/hex";
 import { DbService } from "src/db/db.service";
 import { SqlService } from "src/sql/sq.service";
 
-import { DRepInfo, DRepInfoResponse, DRepVotingPower, DRepVotingPowerList,DRepVotingPowerListResponse , DRepListItem, DRepListResponse, DRepList, DRepListSort,DRepStatus,DRepType,DRepVoteRow,VoteParams,VoteResponse,
+import { DRepInfo, DRepInfoResponse, DRepVotingPower, DRepVotingPowerList,DRepVotingPowerListResponse , DRepListItem, DRepListResponse, DRepList, DRepListSort,DRepStatus,DRepType,DRepVoteRow,VoteParams,VoteResponse,DRepListParams
 } from "./drep.type";
 import { ProposalService } from 'src/proposal/proposal.service';
 import {
@@ -12,6 +12,7 @@ import {
   GovernanceActionType,
   ProposalResponse,
 } from 'src/proposal/proposal.type';
+import { CacheService } from "src/cache/cache.service";
 
 @Injectable()
 export class DRepService {
@@ -19,10 +20,12 @@ export class DRepService {
         private readonly dbService: DbService,
         private readonly sqlService: SqlService,
         private readonly proposalService: ProposalService,
+        private readonly cacheService: CacheService,
     ){}
 
     async getVotingPower(drepId: string): Promise<number> {
-        assertHexText(drepId);
+       return this.cacheService.getOrSet('drepVotingPower',drepId,async()=> {
+         assertHexText(drepId);
 
         const sql = this.sqlService.load('get-voting-power.sql');
         const result = await this.dbService.query<DRepVotingPower>(sql, [drepId]);
@@ -32,12 +35,14 @@ export class DRepService {
         }
 
         return this.toInteger(result.rows[0].amount);
+       });
     }
 
     async getVotingPowerList (
         identifiers: string[],
     ): Promise<DRepVotingPowerListResponse[]> {
-        const rows: DRepVotingPowerList[]=[];
+       return this.cacheService.getOrSet('drepVotingPowerList',identifiers,async()=>{
+         const rows: DRepVotingPowerList[]=[];
 
         if (identifiers.length === 0) {
             const sql = this.sqlService.load('get-dreps-voting-power-list.sql');
@@ -60,10 +65,12 @@ export class DRepService {
             votingPower: this.toInteger(row.voting_power),
             givenName: row.given_name,
         }));
+       });
     }
 
     async getInfo(drepId: string): Promise<DRepInfoResponse> {
-        assertHexText(drepId);
+       return this.cacheService.getOrSet('drepInfo',drepId,async()=>{
+         assertHexText(drepId);
         
         const sql = this.sqlService.load('get-drep-info.sql');
         const result = await this.dbService.query<DRepInfo>(sql, [drepId]);
@@ -100,69 +107,48 @@ export class DRepService {
             imageUrl: row.image_url,
             imageHash: row.image_hash,
         };
+       });
     }
 
-    async list(params: {
-        search?: string;
-        status: DRepStatus[];
-        sort?: DRepListSort;
-        page: number;
-        pageSize:number;
-        seed?: string;
-    }): Promise<DRepListResponse> {
-        const search = params.search ?? '';
-        const sql = this.sqlService.load('list-dreps.sql');
+   async list(params: DRepListParams): Promise<DRepListResponse> {
+      const page = Number(params.page ?? 0);
+      const pageSize = Number(params.pageSize ?? 10);
+      const search = params.search ?? '';
+      const status = params.status;
+      const sort = params.sort ?? 'Random';
+      const seed = params.seed ?? '';
 
-        const result = await this.dbService.query<DRepList>(sql, [
-            search,
-            search,
-            search,
-            search,
-            search,
-            search,
-            `%${search}%`,
-        ]);
-
-        let dreps = result.rows.map((row)=> this.toDRepListItem(row));
-
-        if(!params.search) {
-            dreps = dreps.filter((drep)=> drep.type !== 'SoleVoter');
-        } else {
-            const searchLower = params.search.toLowerCase();
-            dreps = dreps.filter((drep) => {
-                if(drep.type === 'DRep'){
-                    return true;
-                }
-
-                return (
-                    drep.view.toLowerCase() === searchLower ||
-                    drep.drepId.toLowerCase() === searchLower
-                );
-            });
-        }
-        if (params.status.length > 0) {
-            dreps = dreps.filter((drep) => params.status.includes(drep.status));
-        }
-        dreps = this.sortDReps(dreps, params.sort, params.seed);
-
-        const total = dreps.length;
-        const start = params.page * params.pageSize;
-        const elements = dreps.slice(start,start+params.pageSize);
-
-        return {
-            page: params.page,
-            pageSize: params.pageSize,
-            total,
-            elements
-        };
+      let dreps = [...(await this.getDRepListSnapShot(search))];
+      if (params.status.length > 0) {
+      dreps = dreps.filter((drep) => params.status.includes(drep.status));
     }
+      dreps = this.sortDReps(dreps,sort,seed);
+      const total = dreps.length;
+      const offset = page* pageSize;
+      const elements = dreps.slice(offset, offset+pageSize);
+
+      return {
+        page,
+        pageSize,
+        total,
+        elements,
+      };
+  }
+
+
     async getVotes(
         drepId: string,
         selectedTypes: GovernanceActionType[] = [],
         sort?: GovernanceActionSortMode,
         search?: string,
         ): Promise<VoteResponse[]> {
-        assertHexText(drepId);
+            return this.cacheService.getOrSet('drepVotes',{
+                drepId:drepId,
+                selectedTypes:selectedTypes,
+                sort:sort,
+                search:search
+            }, async()=> {
+                  assertHexText(drepId);
 
         const sql = this.sqlService.load('get-votes.sql');
         const result = await this.dbService.query<DRepVoteRow>(sql, [drepId]);
@@ -213,6 +199,7 @@ export class DRepService {
             },
             ];
         });
+            });
      }
 
 
@@ -392,7 +379,42 @@ export class DRepService {
             date: this.toIsoString(row.date),
             txHash: row.vote_tx_hash,
         };
-}
+    }
+    private readonly drepListSnapshotNamespace = 'drepListSnapshot';
+
+    async warmDefaultListSnapshot(): Promise<void> {
+    await this.cacheService.refresh(
+        this.drepListSnapshotNamespace,
+        '',
+        () => this.fetchDRepListSnapshot(''),
+        this.cacheService.drepListTtlSeconds(),
+    );
+    }
+    private getDRepListSnapShot(search: string): Promise<DRepListItem[]> {
+    return this.cacheService.getOrSetStaleWhileRevalidate(
+      this.drepListSnapshotNamespace,
+      search,
+      ()=> this.fetchDRepListSnapshot(search),
+      this.cacheService.drepListTtlSeconds(),
+    );
+  }
+
+  private async fetchDRepListSnapshot(search:string): Promise<DRepListItem[]>{
+    const sql = this.sqlService.load('list-dreps.sql');
+    const result = await this.dbService.query<DRepList>(sql, [
+            search,
+            search,
+            search,
+            search,
+            search,
+            search,
+            `%${search}%`,
+        ]);
+
+    return result.rows.map((row)=> this.toDRepListItem(row));
+  }
+
+
 
     
 }

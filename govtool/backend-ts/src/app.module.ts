@@ -23,12 +23,13 @@ import { ProposalService } from './proposal/proposal.service';
 import { IpfsController } from './ipfs/ipfs.controller';
 import { IpfsService } from './ipfs/ipfs.service';
 import { SystemController } from './system/system.controller';
-
+import { CacheService } from './cache/cache.service';
+import { CacheWarmerService } from './cache/cache-warmer.service';
 
 @Module({
   imports: [],
   controllers: [AppController, HealthController, NetworkController, EpochController, TransactionController, AdaHolderController, AccountController,DRepController,ProposalController,IpfsController,SystemController],
-  providers: [AppService, ConfigService, DbService, NetworkService, SqlService, EpochService, TransactionService, AdaHolderService, AccountService, DRepService,ProposalService,IpfsService],
+  providers: [AppService, ConfigService, DbService, NetworkService, SqlService, EpochService, TransactionService, AdaHolderService, AccountService, DRepService,ProposalService,IpfsService,CacheService,CacheWarmerService],
   exports: [ConfigService, DbService]
 })
 export class AppModule {}

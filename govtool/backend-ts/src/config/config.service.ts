@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import 'dotenv/config'
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -32,25 +33,27 @@ export class ConfigService {
 
         return {
             dbSync: {
-                host: process.env.VVA_DBSYNCCONFIG_HOST ?? rawConfig.dbsyncconfig.host,
-                dbname: process.env.VVA_DBSYNCCONFIG_DBNAME ?? rawConfig.dbsyncconfig.dbname,
-                user: process.env.VVA_DBSYNCCONFIG_USER ?? rawConfig.dbsyncconfig.user,
-                password: process.env.VVA_DBSYNCCONFIG_PASSWORD ?? rawConfig.dbsyncconfig.password,
-                port: Number(process.env.VVA_DBSYNCCONFIG_PORT ?? rawConfig.dbsyncconfig.port),
-            },
-            pinataApiJwt: process.env.VVA_PINATAAPIJWT ?? rawConfig.pinataapijwt ?? null,
-            port: Number(process.env.VVA_PORT ?? rawConfig.port),
-            host: String(process.env.VVA_HOST ?? rawConfig.host),
-            cacheDurationSeconds: Number(
-                process.env.VVA_CACHEDURATIONSECONDS ?? rawConfig.cachedurationseconds,
-            ),
-            drepListCacheDurationSeconds: Number(
-                process.env.VVA_DREPLISTCACHEDURATIONSECONDS ??
-                rawConfig.dreplistcachedurationseconds,
-            ),
-            sentryDsn: process.env.VVA_SENTRYDSN ?? rawConfig.sentrydsn,
-            sentryEnv: process.env.VVA_SENTRYENV ?? rawConfig.sentryenv,
-        };
+            host: this.requiredEnvString('VVA_DBSYNCCONFIG_HOST'),
+            dbname: this.requiredEnvString('VVA_DBSYNCCONFIG_DBNAME'),
+            user: this.requiredEnvString('VVA_DBSYNCCONFIG_USER'),
+            password: this.requiredEnvString('VVA_DBSYNCCONFIG_PASSWORD'),
+            port: this.envNumber('VVA_DBSYNCCONFIG_PORT', 5432),
+        },
+        pinataApiJwt:
+            this.envString('VVA_PINATAAPIJWT', rawConfig.pinataapijwt ?? '') || null,
+        port: this.envNumber('VVA_PORT', rawConfig.port),
+        host: this.envString('VVA_HOST', rawConfig.host),
+        cacheDurationSeconds: this.envNumber(
+            'VVA_CACHEDURATIONSECONDS',
+            rawConfig.cachedurationseconds,
+        ),
+        drepListCacheDurationSeconds: this.envNumber(
+            'VVA_DREPLISTCACHEDURATIONSECONDS',
+            rawConfig.dreplistcachedurationseconds,
+        ),
+        sentryDsn: this.envString('VVA_SENTRYDSN', rawConfig.sentrydsn),
+        sentryEnv: this.envString('VVA_SENTRYENV', rawConfig.sentryenv),
+    };
     }
 
     private getConfigPath(): string {
@@ -61,11 +64,46 @@ export class ConfigService {
             return path.resolve(args[confiFlagIndex + 1]);
         }
        
-        return path.resolve('example-config.json');
+        return path.resolve('config.json');
      }
 
      private readJsonConfig(configPath: string): BackendConfigFile {
         const file = fs.readFileSync(configPath, 'utf8');
         return JSON.parse(file) as BackendConfigFile;
      }
+    
+    private envNumber(name: string, fallback: number): number {
+    const value = process.env[name];
+
+    if (value === undefined || value.trim() === '') {
+      return fallback;
+    }
+
+    const parsed = Number(value);
+
+    if (Number.isNaN(parsed)) {
+      throw new Error(`${name} must be a valid number`);
+    }
+
+    return parsed;
+    }
+
+    private requiredEnvString(name: string): string {
+    const value = process.env[name];
+
+    if (value === undefined || value.trim() === '') {
+        throw new Error(`${name} is required`);
+    }
+     return value;
+    }
+
+     private envString(name: string, fallback: string): string {
+    const value = process.env[name];
+
+    if (value === undefined || value.trim() === '') {
+      return fallback;
+    }
+
+    return value;
+  }
 }

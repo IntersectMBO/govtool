@@ -1,0 +1,33 @@
+services:
+  backend-ts:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${VVA_PORT:-9999}:9999"
+    environment:
+      NODE_ENV: production
+      VVA_HOST: 0.0.0.0
+      VVA_PORT: 9999
+      VVA_DBSYNCCONFIG_HOST: ${VVA_DBSYNCCONFIG_HOST:-host.docker.internal}
+      VVA_DBSYNCCONFIG_PORT: ${VVA_DBSYNCCONFIG_PORT:-5432}
+      VVA_DBSYNCCONFIG_DBNAME: ${VVA_DBSYNCCONFIG_DBNAME:-cexplorer}
+      VVA_DBSYNCCONFIG_USER: ${VVA_DBSYNCCONFIG_USER:-postgres}
+      VVA_DBSYNCCONFIG_PASSWORD: ${VVA_DBSYNCCONFIG_PASSWORD:-postgres}
+      VVA_CACHEDURATIONSECONDS: ${VVA_CACHEDURATIONSECONDS:-20}
+      VVA_DREPLISTCACHEDURATIONSECONDS: ${VVA_DREPLISTCACHEDURATIONSECONDS:-600}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const port = process.env.VVA_PORT || 9999; fetch('http://127.0.0.1:' + port + '/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1));",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped

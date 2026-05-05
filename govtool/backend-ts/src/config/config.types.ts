@@ -7,7 +7,6 @@ export type DbSyncConfig = {
 };
 
 export type BackendConfigFile = {
-    dbsyncconfig: DbSyncConfig;
     pinataapijwt?: string | null;
     port: number;
     host: string;

@@ -122,7 +122,8 @@ export class DRepService {
       if (params.status.length > 0) {
       dreps = dreps.filter((drep) => params.status.includes(drep.status));
     }
-      dreps = this.sortDReps(dreps,sort,seed);
+     dreps = this.filterDRepsBySearchRule(dreps, search);
+     dreps = this.sortDReps(dreps, sort, seed);
       const total = dreps.length;
       const offset = page* pageSize;
       const elements = dreps.slice(offset, offset+pageSize);
@@ -355,8 +356,6 @@ export class DRepService {
         return new Date(value).toISOString();
     }
 
-
-
     private toInteger(value: number | string): number {
         return Math.floor(Number(value));
     }
@@ -413,6 +412,29 @@ export class DRepService {
 
     return result.rows.map((row)=> this.toDRepListItem(row));
   }
+
+  private filterDRepsBySearchRule(
+    dreps: DRepListItem[],
+    search: string,
+    ): DRepListItem[] {
+    const searchLower = search.toLowerCase();
+
+    if (searchLower === '') {
+        return dreps.filter((drep) => drep.type !== 'SoleVoter');
+    }
+
+    return dreps.filter((drep) => {
+        if (drep.type !== 'SoleVoter') {
+        return true;
+        }
+
+        return (
+        drep.view.toLowerCase() === searchLower ||
+        drep.drepId.toLowerCase() === searchLower
+        );
+    });
+    }
+
 
 
 

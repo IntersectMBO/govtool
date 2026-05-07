@@ -50,6 +50,7 @@ export class DRepController {
   getList(
   @Query('search') search?: string,
   @Query('status') status?: string | string[],
+  @Query('status[]') statusArray?: string | string[],
   @Query('sort') sort?: DRepListSort,
   @Query('page') page?: string,
   @Query('pageSize') pageSize?: string,
@@ -57,7 +58,10 @@ export class DRepController {
     ): Promise<DRepListResponse> {
   return this.drepService.list({
     search,
-    status: this.normalizeQueryArray(status) as DRepStatus[],
+    status: [
+      ...this.normalizeQueryArray(status),
+      ...this.normalizeQueryArray(statusArray),
+    ] as DRepStatus[],
     sort,
     page: page === undefined ? 0 : Number(page),
     pageSize: pageSize === undefined ? 10 : Number(pageSize),

@@ -298,6 +298,7 @@ liftServer appEnv =
             NotFoundError _   -> err404
             CriticalError _   -> err500
             InternalError _   -> err500
+            UnauthorizedError _ -> err401
             AppIpfsError (OtherIpfsError _)    -> err400
             AppIpfsError _    -> err503
       throwError $ status { errBody = encode appError, errHeaders = [("Content-Type", "application/json")] }

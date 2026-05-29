@@ -61,6 +61,7 @@ data AppError
   | CriticalError Text
   | InternalError Text
   | AppIpfsError IpfsError
+  | UnauthorizedError Text
   deriving (Show)
 
 instance Exception AppError
@@ -71,6 +72,7 @@ instance ToJSON AppError where
   toJSON (CriticalError msg)   = object ["errorType" .= A.String "CriticalError", "message" .= msg]
   toJSON (InternalError msg)   = object ["errorType" .= A.String "InternalError", "message" .= msg]
   toJSON (AppIpfsError err)    =  toJSON err
+  toJSON (UnauthorizedError msg) = object ["errorType" .= A.String "UnauthorizedError", "message" .= msg]
 
 data Vote
   = Vote

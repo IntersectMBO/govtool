@@ -2,15 +2,19 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { of, throwError } from 'rxjs';
 import * as blake from 'blakejs';
+import { lookup } from 'node:dns/promises';
 
 import { AppService } from './app.service';
 import { ValidateMetadataDTO } from '@dto';
 import { MetadataValidationStatus } from '@enums';
 import { MetadataStandard } from '@types';
-import { validateMetadataStandard, parseMetadata } from '@utils';
+import { validateMetadataStandard, parseMetadata, getStandard } from '@utils';
 import { AxiosResponse, AxiosRequestHeaders } from 'axios';
 
 jest.mock('@utils');
+jest.mock('node:dns/promises', () => ({
+  lookup: jest.fn(),
+}));
 
 describe('AppService', () => {
   let service: AppService;
@@ -31,19 +35,20 @@ describe('AppService', () => {
 
     service = module.get<AppService>(AppService);
     httpService = module.get<HttpService>(HttpService);
+    (lookup as jest.Mock).mockResolvedValue([{ address: '93.184.216.34' }]);
   });
 
   it('should validate metadata correctly', async () => {
     const url = 'http://example.com';
     const hash = 'correctHash';
     const validateMetadataDTO: ValidateMetadataDTO = { hash, url };
-    const data = {
+    const body = {
       body: 'testBody',
       headers: {},
     };
     const parsedMetadata = { parsed: 'metadata' };
     const response: AxiosResponse = {
-      data,
+      data: JSON.stringify(body),
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -53,6 +58,7 @@ describe('AppService', () => {
       },
     };
     jest.spyOn(httpService, 'get').mockReturnValueOnce(of(response));
+    (getStandard as jest.Mock).mockReturnValueOnce(MetadataStandard.CIP108);
     (validateMetadataStandard as jest.Mock).mockResolvedValueOnce(undefined);
     (parseMetadata as jest.Mock).mockReturnValueOnce(parsedMetadata);
     jest.spyOn(blake, 'blake2bHex').mockReturnValueOnce(hash);
@@ -65,12 +71,16 @@ describe('AppService', () => {
       metadata: parsedMetadata,
     });
     expect(validateMetadataStandard).toHaveBeenCalledWith(
-      data,
+      body.body,
       MetadataStandard.CIP108,
     );
-    expect(parseMetadata).toHaveBeenCalledWith(
-      data.body,
-      MetadataStandard.CIP108,
+    expect(parseMetadata).toHaveBeenCalledWith(body.body);
+    expect(httpService.get).toHaveBeenCalledWith(
+      url,
+      expect.objectContaining({
+        httpAgent: expect.any(Object),
+        httpsAgent: expect.any(Object),
+      }),
     );
   });
 
@@ -98,13 +108,13 @@ describe('AppService', () => {
     const url = 'http://example.com';
     const hash = 'incorrectHash';
     const validateMetadataDTO: ValidateMetadataDTO = { hash, url };
-    const data = {
+    const body = {
       body: 'testBody',
     };
     const parsedMetadata = { parsed: 'metadata' };
 
     const response: AxiosResponse = {
-      data,
+      data: JSON.stringify(body),
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -114,6 +124,7 @@ describe('AppService', () => {
       },
     };
     jest.spyOn(httpService, 'get').mockReturnValueOnce(of(response));
+    (getStandard as jest.Mock).mockReturnValueOnce(MetadataStandard.CIP108);
     (validateMetadataStandard as jest.Mock).mockResolvedValueOnce(undefined);
     (parseMetadata as jest.Mock).mockReturnValueOnce(parsedMetadata);
     jest.spyOn(blake, 'blake2bHex').mockReturnValueOnce('differentHash');
@@ -125,5 +136,83 @@ describe('AppService', () => {
       valid: false,
       metadata: parsedMetadata,
     });
+  });
+
+  it('should block loopback metadata URLs before fetching', async () => {
+    const validateMetadataDTO: ValidateMetadataDTO = {
+      hash: 'hash',
+      url: 'http://127.0.0.1:3000/api',
+    };
+
+    const result = await service.validateMetadata(validateMetadataDTO);
+
+    expect(result).toEqual({
+      status: MetadataValidationStatus.URL_BLOCKED,
+      valid: false,
+      metadata: undefined,
+    });
+    expect(httpService.get).not.toHaveBeenCalled();
+  });
+
+  it('should block hostnames that resolve to private addresses', async () => {
+    (lookup as jest.Mock).mockResolvedValueOnce([{ address: '10.0.0.5' }]);
+
+    const validateMetadataDTO: ValidateMetadataDTO = {
+      hash: 'hash',
+      url: 'https://metadata.internal.example/metadata.json',
+    };
+
+    const result = await service.validateMetadata(validateMetadataDTO);
+
+    expect(result).toEqual({
+      status: MetadataValidationStatus.URL_BLOCKED,
+      valid: false,
+      metadata: undefined,
+    });
+    expect(httpService.get).not.toHaveBeenCalled();
+  });
+
+  it('should block private addresses during the HTTP agent lookup', async () => {
+    const url = 'http://example.com';
+    const hash = 'correctHash';
+    const body = {
+      body: 'testBody',
+    };
+    const response: AxiosResponse = {
+      data: JSON.stringify(body),
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {
+        headers: {} as AxiosRequestHeaders,
+        url,
+      },
+    };
+    jest.spyOn(httpService, 'get').mockReturnValueOnce(of(response));
+    (getStandard as jest.Mock).mockReturnValueOnce(MetadataStandard.CIP108);
+    (validateMetadataStandard as jest.Mock).mockResolvedValueOnce(undefined);
+    jest.spyOn(blake, 'blake2bHex').mockReturnValueOnce(hash);
+
+    await service.validateMetadata({ hash, url });
+
+    const requestConfig = (httpService.get as jest.Mock).mock.calls[0][1];
+    const agentLookup = requestConfig.httpAgent.options.lookup;
+    (lookup as jest.Mock).mockResolvedValueOnce({
+      address: '127.0.0.1',
+      family: 4,
+    });
+
+    await expect(
+      new Promise((resolve, reject) => {
+        agentLookup('example.com', {}, (error: Error | null) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+
+          resolve(undefined);
+        });
+      }),
+    ).rejects.toThrow(MetadataValidationStatus.URL_BLOCKED);
   });
 });

@@ -18,7 +18,7 @@ jobs:
 
       - name: Cache dependencies
         uses: actions/cache@v4
-        with:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           path: govtool/frontend/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
 
@@ -40,6 +40,6 @@ jobs:
         if: always()
         with:
           projectBaseDir: govtool/frontend
-        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io

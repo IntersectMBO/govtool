@@ -1,16 +1,9 @@
-import { Infinite, ProposalData } from "@models";
-
+import axiosInstance from "@/lib/axiosInstance";
+import type { ProposalData } from "@/models/api";
 import { API } from "../API";
-import { decodeCIP129Identifier, getFullGovActionId } from "@/utils";
-
-export type GetProposalsArguments = {
-  dRepID?: string;
-  filters?: string[];
-  page?: number;
-  pageSize?: number;
-  sorting?: string;
-  searchPhrase?: string;
-  enabled?: boolean;
+export const getProposals = async (): Promise<ProposalData[]> => {
+  const { data } = await axiosInstance.get<ProposalData[]>(`/api/proposals`);
+  return data;
 };
 
 export const getProposals = async ({

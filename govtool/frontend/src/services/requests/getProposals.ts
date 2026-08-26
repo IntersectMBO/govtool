@@ -1,4 +1,4 @@
-import { Infinite, ProposalData } from "@models";
+const MOCKAROO_KEY = import.meta.env.VITE_MOCKAROO_API_KEY ?? '';
 
 import { API } from "../API";
 import { decodeCIP129Identifier, getFullGovActionId } from "@/utils";

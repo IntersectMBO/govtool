@@ -21,12 +21,11 @@ jobs:
         with:
           path: govtool/frontend/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
-
+          SONAR_HOST_URL: https://sonarcloud.io
       - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "govtool/frontend/.nvmrc"
-          registry-url: "https://registry.npmjs.org/"
+          args: >
+            -Dsonar.organization=intersectmbo
+            -Dsonar.projectKey=intersectmbo_govtool
           scope: "@intersect.mbo"
       - name: 🧪 Test
         working-directory: govtool/frontend
@@ -41,5 +40,5 @@ jobs:
         with:
           projectBaseDir: govtool/frontend
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          curl -sSf -u "${{ secrets.SONAR_TOKEN }}:" \
           SONAR_HOST_URL: https://sonarcloud.io

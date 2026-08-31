@@ -23,13 +23,13 @@ historically fails on openapi3, hence nix plus direnv. stylish-haskell reads
 everywhere, so match the surrounding formatting: a reformat-everything diff will fail
 review.
 
-CONFIG.json above is a file you create by copying example-config.json. Config can
-also come from env vars using the same keys, since Conferer reads both. Swagger UI is at /swagger-ui, generated
+CONFIG.json above is a file you create by copying example-config.json. Conferer also accepts
+environment variable overrides prefixed with VVA_. Swagger UI is at /swagger-ui, generated
 from the VVAApi type, declaring /api and / as server bases.
 
 ## Rules that will bite you
 
-1. Every .sql file must be listed in vva-be.cabal under extra-source-files. The
+1. Every .sql file used with embedFile must be listed in vva-be.cabal under extra-source-files. The
    sqlFrom embedFile call is a compile-time splice, so an unlisted file breaks the
    build and the release tarball even when a local build works.
 2. A new module must be added to exposed-modules in the cabal file.
@@ -40,8 +40,8 @@ from the VVAApi type, declaring /api and / as server bases.
    compiles and fails at runtime.
 5. A cache key must include every parameter that affects the result, or one user's
    response is served to another.
-6. A new cache is two edits: a CacheEnv field in Types.hs, and its initialisation in
-   app/Main.hs.
+6. A new cache is two edits: a CacheEnv field in Types.hs,initialisation in
+   app/Main.hs and use at the relevant handler call site.
 7. Throw the right AppError. The HTTP status is derived from the constructor.
 8. CORS allows only GET, HEAD, POST and OPTIONS, set in vvaCorsResourcePolicy in
    app/Main.hs. A PUT or DELETE route needs that widened too.

@@ -29,14 +29,29 @@ useGetProposalQuery, keyed on [key, dRepID, proposalId]. Return a named object l
    Dashboard element route gets connected chrome, wrapped in PublicRoute redirects
    when a wallet is connected.
 
-Keep the page thin. It wires hooks to organisms; markup belongs in organisms.
+Route placement controls layout and connected variants, but does not by itself define
+all access requirements:
+
+- Public browsing routes are registered at the top level.
+- Routes nested under Dashboard receive the connected dashboard layout.
+- PublicRoute currently redirects public DRep-directory routes to their
+  /connected equivalents when a wallet is connected.
+- Wallet-dependent transaction pages, including registration and governance-action
+  creation, are currently top-level routes and enforce their requirements through
+  their page and wallet logic.
+Keep the page thin. It should wire hooks and state to feature components; follow the
+surrounding page and organism structure.
 
 ## Frontend: add a component
 
-The only real decision is the layer. atoms for anything with no GovTool dependencies,
-molecules for compositions of atoms that do not fetch, organisms for feature blocks
-that may use contexts and query hooks. Add a .stories.tsx if it is reusable, since
-Storybook builds in CI.
+Choose the existing component layer whose responsibilities most closely match the new
+component. The atoms, molecules and organisms directories express increasing feature
+composition, but the boundaries are not strict: existing atoms and molecules may use
+shared hooks or contexts. Match nearby components before introducing a new layering
+rule.
+For a reusable component, add or update a Storybook story under src/stories, using
+.stories.ts or .stories.tsx depending on whether the story contains JSX.
+Storybook build and interaction tests run in CI.
 
 ## Frontend: add user-facing copy
 
@@ -46,13 +61,20 @@ t("key", { name }). No hardcoded strings in JSX.
 
 ## Frontend: add an environment variable
 
-Real only once it is in all four:
+A new React-visible `VITE_` runtime variable is complete only after updating all four
+applicable configuration points:
 
 1. .env.example
 2. src/config/env.ts, as MY_VAR: getEnv("VITE_MY_VAR")
-3. docker-entrypoint.sh, into the window.__ENV__ block. This is the forgotten one:
-   skip it and the var is undefined in every container while working locally.
+3. docker-entrypoint.sh, into the window.__ENV__ block. 
 4. docker/docker-compose.yaml, passed into the govtool-frontend service
+
+The entrypoint is easy to miss: without runtime injection, a variable may work through
+import.meta.env during local development but be undefined in a deployed container.
+
+Container-only variables such as Umami and Nginx proxy configuration do not belong in
+src/config/env.ts or window.__ENV__; document and wire those through
+docker-entrypoint.sh and Compose instead.
 
 ## Frontend: add a feature flag
 
@@ -65,20 +87,34 @@ predicate; exemplar areDRepVoteTotalsDisplayed.
 
 ## Frontend: build a new transaction or certificate
 
-All of it lives in src/context/wallet.tsx. Add a buildXCert or
-buildXGovernanceAction beside its siblings, hand the certificates to
-buildSignSubmitConwayCertTx which owns builder, UTxO selection, change address,
-signing and submit, expose it on the context value, and register the result with
-pendingTransaction so the UI can poll /transaction/status/:txId.
+Shared Cardano serialization, wallet interaction and transaction submission live in
+src/context/wallet.tsx. Form-specific validation and selection of the appropriate
+builder remain in the calling form hook or page.
+
+Add the appropriate builder beside its siblings:
+- buildXCert for certificates
+- buildXGovernanceAction for governance-action proposal builders
+- A voting builder for votes
+
+Expose the builder through CardanoContextType and the provider value. Pass the
+result to buildSignSubmitConwayCertTx through the matching argument:
+certBuilder, govActionBuilder or votingBuilder.
+
+buildSignSubmitConwayCertTx owns maintenance checks, UTxO selection, change,
+signing, submission and pending-transaction registration. Supply the correct
+transaction type and, when applicable, resourceId; it records the submitted hash
+so usePendingTransaction can poll /transaction/status/:txId.
 
 Extend an existing builder rather than adding a parallel path, and verify on a
 testnet. This code moves real ada and has no unit tests.
 
 ## Frontend: write a unit test
 
-Utils go in src/utils/tests/util.test.ts importing from the barrel, as from "..".
-Everything else is co-located, e.g. context/featureFlag.test.tsx. Iterate with
-npx vitest run and a path. Coverage comes from components, consts, context, hooks,
+Utils go in src/utils/tests/<utility>.test.ts and normally import the
+utility from the parent barrel with from "..". Other tests are generally colocated
+with the code under test, for example context/featureFlag.test.tsx.
+
+Run a focused test with npx vitest run <path>.Coverage comes from components, consts, context, hooks,
 services and utils; pages and models are excluded, so do not chase coverage there.
 
 ## Backend: add a REST endpoint
@@ -101,17 +137,17 @@ tests/govtool-backend/test_cases.
 
 ## Backend: add caching to an endpoint
 
-Two edits plus the call site: a field on CacheEnv in src/VVA/Types.hs, its
-initialisation in the cacheEnv block in app/Main.hs using newCache for the standard
-TTL or newDRepListCache for the long one, then in the handler:
+Add a field to CacheEnv in src/VVA/Types.hs, initialize it in the cacheEnv
+block in `app/Main.hs`, and use it at the handler call site.
+
+Use newCache for the standard configured TTL. Use the DRep-list TTL only when the
+endpoint is deliberately intended to share that longer cache duration; rename or add
+a dedicated constructor binding when introducing another cache category.
 
 ```haskell
 CacheEnv {myThingCache} <- asks vvaCache
 cacheRequest myThingCache cacheKey $ do ...
 ```
-
-The key must include every parameter affecting the result. cacheRequest needs
-Hashable; compound keys use hash or hashWithSalt.
 
 ## Backend: change a db-sync query
 
@@ -124,26 +160,45 @@ db-sync instance, and say so if you could not.
 ## Add a new governance action type
 
 docs/operations/HANDLE_NEW_GOVERNANCE_ACTION_TYPE.md covers this but its paths and
-line numbers are stale. Current locations:
+line numbers are stale.A genuinely new governance-action type can affect both frontend and backend.
 
-1. src/types/governanceAction.ts: the GovernanceActionType member, any new field type,
-   a schema extending SharedGovernanceActionFieldSchema, and that schema added to the
-   GovernanceActionFieldSchemas union
-2. src/consts/governanceAction/fields.ts: the field declaration, meaning component,
-   labelI18nKey, placeholderI18nKey, tipI18nKey and rules. The doc says
-   src/constants/governanceActionFields.ts, which does not exist.
-3. src/i18n/locales/en.json: every key the schema references
-4. Custom validation, if any: a helper in src/utils such as numberValidation.ts or
-   isValidFormat.ts, used as validate in rules. The doc's
-   src/utils/govActionValidations does not exist.
-5. src/context/featureFlag.tsx: how the type behaves in bootstrap versus full
-   governance. Skipping this is how a new type ships silently unvotable.
-6. src/context/wallet.tsx: a buildXGovernanceAction if it needs a new certificate
+Frontend locations:
 
-Verify at /create_governance_action, then fix the ops doc, which asks you to. The
-schema drives both rendering in CreateGovernanceActionForm.tsx and hashing and
-validation in useCreateGovernanceActionForm.ts, so getting it right is most of the
-work. Actions must comply with CIP-100 and CIP-108.
+1. src/types/governanceAction.ts: add the GovernanceActionType member, field
+   types, schema extending SharedGovernanceActionFieldSchema, and the schema union
+   member.
+2. src/consts/governanceAction/fields.ts: define the fields, meaning components,
+   i18n keys and validation rules.
+3. src/consts/governanceAction/filters.ts: add the type when it should appear in
+   governance-action filters.
+4. src/i18n/locales/en.json: add every label, placeholder, tip, error and display
+   key used by the new type.
+5. src/utils: add any custom validation and update exhaustive mappings such as
+   getGovActionVotingThresholdKey.ts.
+6. src/context/featureFlag.tsx: define voting and vote-total behavior for bootstrap
+   and full-governance phases.
+7. src/context/wallet.tsx: add the Cardano serialization builder and expose it
+   through the wallet context.
+8. src/hooks/forms/useCreateGovernanceActionForm.ts: add the new type to the
+   buildTransaction switch and construct the builder arguments.
+9. Update details rendering, tests and Storybook fixtures wherever behavior differs
+   by governance-action type.
+
+Backend locations:
+
+1. src/VVA/API/Types.hs: add the type to GovernanceActionType. This affects JSON,
+   query-parameter parsing and the OpenAPI enum.
+2. Review src/VVA/API.hs filtering, response conversion and enacted-details logic
+   for type-specific mappings.
+3. Update backend API tests and response examples that enumerate or assume the
+   existing action types.
+
+Verify creation at /create_governance_action, backend filtering and response
+decoding, voting behavior, details rendering and protocol phase visibility.Add
+frontend unit tests and backend/E2E coverage where applicable.
+Actions must comply with CIP-100 and CIP-108.
+Afterward, update the stale operations document rather than preserving conflicting
+paths.
 
 ## Change metadata validation rules
 

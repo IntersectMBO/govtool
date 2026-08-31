@@ -59,8 +59,9 @@ import/prefer-default-export. Still errors, and easy to trip:
   cannot be fixed from this repo.
 - src/utils/canonizeJSON.ts is duplicated at
   govtool/metadata-validation/src/utils/canonizeJSON.ts and must behave identically,
-  or metadata hash checks diverge. Change one, change both.
+  or metadata hash checks diverge. Change one, change both.The metadata-validation copy is currently unused. The frontend copy is used for signature verification.
 - Stale local node_modules is common. If npm run tsc cannot find a module that is in
   package.json, run npm ci before debugging further.
-- Adding a VITE_ var touches four files, including docker-entrypoint.sh. Miss it and
-  it works locally but is undefined in every container.
+- Adding a VITE_ variable touches .env.example, src/config/env.ts,
+  docker-entrypoint.sh, and docker/docker-compose.yaml. Missing the runtime
+  wiring can make it work locally but remain undefined in containers.

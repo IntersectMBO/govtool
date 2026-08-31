@@ -20,8 +20,7 @@ builds with cardano-serialization-lib and the wallet signs.
 
 Vite aliases: @ for src, plus @pages @consts @context @hooks @models @services @utils
 @mock, and @atoms @molecules @organisms for src/components/*. There is no @types or
-@config alias, so use @/types/... and @/config/env. Every folder has an index.ts
-barrel and new files must be added to it.
+@config alias, so use @/types/... and @/config/env. Many feature directories expose files through index.ts barrels. When a directory already uses a barrel, add new public exports to it; otherwise follow the surrounding direct-import pattern.
 
 - App.tsx: the route table. Every route registers here.
 - config/env.ts: the only env accessor. Reads window.__ENV__, then import.meta.env.
@@ -30,8 +29,10 @@ barrel and new files must be added to it.
 - consts/queryKeys.ts: QUERY_KEYS and MUTATION_KEYS. Every new key registers here.
 - consts/governanceAction/fields.ts: GA form schemas, driving both rendering and
   hashing
-- services/API.ts: the single axios instance, with the 500-to-error-page interceptor
-- i18n/locales/en.json: all user-facing copy, about 925 lines, the only locale
+- services/API.ts:is the shared Axios instance for the GovTool backend and redirects backend HTTP 500 responses to the error
+  page.Metadata validation uses a separate Axios client because it has a separate base URL.
+- i18n/locales/en.json: is the only locale and should be the source of new user-facing copy. Some existing hardcoded strings
+  remain.
 - components: atomic design. atoms have no GovTool dependencies, molecules compose
   atoms without fetching, organisms are feature blocks that may use contexts and hooks.
 
@@ -46,9 +47,8 @@ Contexts in src/context:
   vote totals show for which GA type
 - pendingTransaction: in-flight txs, so the UI can poll /transaction/status/:txId
 - governanceAction.tsx: GA list and detail state
-- contextProviders.tsx composes all of them. modal, snackbar, pagination and
-  dataActionsBar are UI plumbing; adaHandle, usersnap and proposalDiscussion are
-  integrations.
+- contextProviders.tsx: composes the main application providers. ChatwootProvider is mounted separately in main.tsx, and 
+  pending-transaction state is integrated through the wallet context.
 
 ## govtool/backend
 
@@ -91,34 +91,105 @@ into SQL and cache the result rather than holding a connection.
 
 ## govtool/metadata-validation
 
-NestJS. One job: fetch metadata at a URL, canonize the JSON-LD, hash it, validate the
-body against a CIP standard. POST /validate is in app.controller.ts, orchestration in
-app.service.ts, rules in utils/getStandard.ts, utils/validateCIP108body.ts and
-utils/validateMetadataStandard.ts. enums/ValidationError.ts holds the error codes the
-frontend switches on, so grep the frontend before renaming one.
+A NestJS service that validates off-chain metadata. It fetches metadata from a URL,
+parses the JSON, accepts a supplied CIP standard or attempts to identify CIP-108 or
+CIP-119, validates the required fields for a recognized standard, and compares a
+Blake2b-256 hash of the exact fetched content with the submitted hash.
 
-utils/canonizeJSON.ts is duplicated at govtool/frontend/src/utils/canonizeJSON.ts and
-must behave identically: the frontend hashes metadata before submission and this
-service re-hashes it. Change one, change both.
+POST /validate is defined in app.controller.ts, orchestration is handled by
+app.service.ts, and validation logic lives in utils/getStandard.ts,
+utils/validateCIP108body.ts, and utils/validateMetadataStandard.ts.
+enums/ValidationError.ts defines the validation statuses consumed by the frontend,
+so check frontend usage before renaming or removing one.
+
+Both metadata validation and the frontend contain utils/canonizeJSON.ts. The
+metadata-validation copy is currently unused by the production validation flow. The
+frontend uses canonicalization for signature verification, not for the metadata hash submitted to POST /validate.
 
 ## Environment variables
 
-Frontend. .env.example, src/config/env.ts and docker-entrypoint.sh must all agree.
+### Frontend application configuration
 
-- VITE_BASE_URL: backend REST base URL
-- VITE_METADATA_API_URL: metadata-validation service
-- VITE_PDF_API_URL, VITE_OUTCOMES_API_URL: pillar APIs
-- VITE_IPFS_GATEWAY, VITE_IPFS_PROJECT_ID: IPFS reads
-- VITE_NETWORK_FLAG: Cardano network id, 0 is testnet
-- VITE_APP_ENV, VITE_IS_DEV: environment banners and dev affordances
-- VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED,
-  VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: pillar flags
-- VITE_SENTRY_DSN, VITE_GTM_ID, VITE_USERSNAP_SPACE_API_KEY
+The frontend reads configuration from window.__ENV__ when running in a container,
+falling back to Vite's import.meta.env values for local development and build-time
+configuration.
 
-Backend. example-config.json, or the same keys as env vars via Conferer:
-dbsyncconfig with host, dbname, user, password and port; port 9999; host;
-cachedurationseconds; dreplistcachedurationseconds; pinataapijwt; sentrydsn;
-sentryenv.
+When adding a frontend runtime variable, update all applicable configuration points:
+
+1. govtool/frontend/.env.example
+2. govtool/frontend/src/config/env.ts
+3. govtool/frontend/docker-entrypoint.sh
+4. The govtool-frontend service in docker/docker-compose.yaml
+
+Active frontend variables:
+
+- VITE_BASE_URL: GovTool backend REST API base URL.
+- VITE_METADATA_API_URL: metadata-validation service base URL.
+- VITE_PDF_API_URL: Proposal Discussion and Budget Discussion API base URL.
+- VITE_OUTCOMES_API_URL: Governance Outcomes API base URL.
+- VITE_IPFS_GATEWAY: gateway used to resolve ipfs:// resources.
+- VITE_IPFS_PROJECT_ID: optional project identifier sent when accessing the
+  configured IPFS gateway.
+- VITE_NETWORK_FLAG: Cardano network ID; 0 selects a test network and 1
+  selects mainnet.
+- VITE_APP_ENV: deployment environment name supplied to services such as Sentry.
+- VITE_IS_DEV: enables development behavior, including React Query devtools and
+  bypassing production maintenance checks.
+- VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: enables the Proposal Discussion
+  pillar.
+- VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: enables the Governance Outcomes
+  pillar.
+- VITE_SENTRY_DSN: optional Sentry data source name.
+- VITE_CHATWOOT_URL: base URL from which the Chatwoot SDK is loaded.
+- VITE_CHATWOOT_WEBSITE_TOKEN: Chatwoot website token used to initialize the
+  feedback widget.
+
+### Frontend container and analytics configuration
+The frontend container also accepts variables that are handled by
+docker-entrypoint.sh and Nginx rather than exposed to React through window.__ENV__:
+
+- UMAMI_URL: base URL of the Umami analytics service.
+- UMAMI_WEBSITE_ID: Umami website identifier.
+- UMAMI_SSL_VERIFY: controls TLS certificate verification for the Umami proxy;
+  defaults to true.
+- TRUSTED_PROXY_CIDRS: trusted proxy address ranges used when resolving the
+  original client IP. Set it to none to disable real-IP resolution.
+- REAL_IP_HEADER: header used to obtain the original client IP; defaults to
+  X-Forwarded-For.
+
+Umami is enabled only when both UMAMI_URL and UMAMI_WEBSITE_ID are configured.
+
+### Metadata-validation service
+
+The metadata-validation service reads these variables directly from process.env:
+
+- PORT: HTTP port used by the NestJS service.
+- IPFS_GATEWAY: gateway used to resolve ipfs:// metadata URLs.
+- IPFS_PROJECT_ID: optional project identifier sent to the configured IPFS
+  gateway.
+
+The local template is govtool/metadata-validation/.env.example.
+
+### Backend configuration
+
+The Haskell backend loads configuration from example-config.json, or from the file
+supplied with --config / -c. Conferer also supports environment-variable overrides
+prefixed with VVA_.
+
+Backend configuration keys:
+
+- dbsyncconfig.host: cardano-db-sync PostgreSQL host.
+- dbsyncconfig.dbname: database name.
+- dbsyncconfig.user: database user.
+- dbsyncconfig.password: database password.
+- dbsyncconfig.port: PostgreSQL port.
+- port: backend HTTP port; example-config.json uses 9999.
+- host: backend bind address.
+- cachedurationseconds: default endpoint-cache lifetime in seconds.
+- dreplistcachedurationseconds: DRep-list cache lifetime in seconds.
+- pinataapijwt: optional Pinata API JWT used by the IPFS upload endpoint.
+- sentrydsn: backend Sentry data source name.
+- sentryenv: backend Sentry environment name.
 
 ## CI gates, in .github/workflows
 

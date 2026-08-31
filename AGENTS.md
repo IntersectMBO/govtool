@@ -18,7 +18,7 @@ tests/AGENTS.md: E2E, API and load suites
   wallet connection and transaction building. Main surface.
 - govtool/backend: Haskell + Servant, read-only REST over cardano-db-sync. All
   endpoints, db-sync queries, response shapes.
-- govtool/metadata-validation: NestJS. Rules for what makes CIP-100/108/119 off-chain
+- govtool/metadata-validation: NestJS. Rules for what makes CIP-108/119 off-chain
   metadata valid.
 - govtool/analytics-dashboard: Next.js internal usage dashboard. Not part of the
   gov.tools user flow; touch only when asked about analytics.

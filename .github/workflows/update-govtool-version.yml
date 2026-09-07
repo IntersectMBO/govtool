@@ -10,6 +10,8 @@ on:
 jobs:
   update-version:
     runs-on: ubuntu-latest
+    env:
+      VERSION: "${{ github.event.inputs.version }}"
 
     steps:
       - name: Checkout Repository
@@ -23,9 +25,6 @@ jobs:
           registry-url: "https://registry.npmjs.org/"
           node-version-file: "./govtool/frontend/.nvmrc"
           scope: "@intersect.mbo"
-
-      - name: Set Version Variable
-        run: echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
 
       - name: Update package.json files and install dependencies
         run: |
@@ -55,7 +54,7 @@ jobs:
       - name: Update CHANGELOG.md
         run: |
           #!/bin/bash
-          VERSION="${{ github.event.inputs.version }}"
+          VERSION="$VERSION"
           TODAY=$(date +%Y-%m-%d)
           RELEASE_TAG="v$VERSION"
           RELEASE_LINK="[v$VERSION](https://github.com/IntersectMBO/govtool/releases/tag/$RELEASE_TAG)"

@@ -2,11 +2,75 @@ import { Injectable, Logger } from '@nestjs/common';
 import { catchError, finalize, firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import * as blake from 'blakejs';
+import * as dns from 'dns';
+import * as net from 'net';
 
 import { ValidateMetadataDTO } from '@dto';
 import { LoggerMessage, MetadataValidationStatus } from '@enums';
 import { validateMetadataStandard, parseMetadata, getStandard } from '@utils';
 import { /* MetadataStandard, */ ValidateMetadataResult } from '@types';
+
+function isPrivateIP(ip: string): boolean {
+  // Check for loopback
+  if (ip === '127.0.0.1' || ip === '::1' || ip === 'localhost') return true;
+  
+  // Check for private ranges (RFC 1918)
+  const parts = ip.split('.').map(Number);
+  if (parts.length !== 4) return false;
+  
+  const [a, b, c, d] = parts;
+  // 10.0.0.0/8
+  if (a === 10) return true;
+  // 172.16.0.0/12
+  if (a === 172 && b >= 16 && b <= 31) return true;
+  // 192.168.0.0/16
+  if (a === 192 && b === 168) return true;
+  // 169.254.0.0/16 (link-local)
+  if (a === 169 && b === 254) return true;
+  // 127.0.0.0/8 (loopback)
+  if (a === 127) return true;
+  // 0.0.0.0
+  if (a === 0 && b === 0 && c === 0 && d === 0) return true;
+  // Cloud metadata endpoint
+  if (ip === '169.254.169.254') return true;
+  
+  return false;
+}
+
+function isBlockedHostname(hostname: string): boolean {
+  const lower = hostname.toLowerCase();
+  if (lower === 'localhost' || lower === '127.0.0.1' || lower === '::1') return true;
+  if (lower.startsWith('metadata.') || lower === 'instance-data' || lower === 'instance-data.') return true;
+  return false;
+}
+
+function validateUrl(url: string): void {
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    throw new Error('Invalid URL format');
+  }
+
+  // Only allow http, https, and ipfs protocols
+  if (!['http:', 'https:', 'ipfs:'].includes(parsedUrl.protocol)) {
+    throw new Error('Unsupported protocol: ' + parsedUrl.protocol);
+  }
+
+  const hostname = parsedUrl.hostname.toLowerCase();
+  
+  // Block loopback and internal hostnames
+  if (isBlockedHostname(hostname)) {
+    throw new Error('Blocked hostname: ' + hostname);
+  }
+
+  // Check if hostname is an IP address and block private ranges
+  if (net.isIPv4(hostname) || net.isIPv6(hostname)) {
+    if (isPrivateIP(hostname)) {
+      throw new Error('Blocked private/internal IP: ' + hostname);
+    }
+  }
+}
 
 @Injectable()
 export class AppService {
@@ -21,9 +85,27 @@ export class AppService {
     let metadata: Record<string, unknown>;
     let standard = paramStandard;
 
+    // SSRF protection: validate URL before fetching
+    try {
+      validateUrl(url);
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      Logger.warn(`Blocked SSRF attempt: ${msg}`);
+      return { status: MetadataValidationStatus.URL_NOT_FOUND, valid: false, metadata: undefined };
+    }
+
     const isIPFS = url.startsWith('ipfs://');
     if (isIPFS) {
       url = `${process.env.IPFS_GATEWAY}/${url.slice(7)}`;
+    }
+
+    // Validate URL after IPFS gateway rewrite
+    try {
+      validateUrl(url);
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      Logger.warn(`Blocked SSRF attempt after IPFS rewrite: ${msg}`);
+      return { status: MetadataValidationStatus.URL_NOT_FOUND, valid: false, metadata: undefined };
     }
 
     try {

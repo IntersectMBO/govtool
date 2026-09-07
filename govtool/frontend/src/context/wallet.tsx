@@ -753,7 +753,9 @@ const CardanoProvider = (props: Props) => {
         const signedTx = Transaction.new(
           tx.body(),
           transactionWitnessSet,
-          auxiliaryData,
+          // Transaction.new consumes auxiliaryData; retrieve it from the
+          // unsigned transaction to preserve its committed metadata hash.
+          tx.auxiliary_data(),
         );
 
         // Submit built signed transaction to chain, via wallet's submit transaction endpoint

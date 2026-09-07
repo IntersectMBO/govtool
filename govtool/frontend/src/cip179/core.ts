@@ -93,7 +93,13 @@ export const decodeDefinition = (
   const decoded = metadatumCodec.cborToMetadatum(
     hexToBytes(envelope.payloadCborHex),
   );
-  const payload = decodePayload(decoded);
+  // db-sync stores each tx_metadata.bytes row as a singleton metadata map.
+  // Keep accepting an inner payload for hosts that already extract the label.
+  const labelPayload = decoded instanceof Map ? decoded.get(17n) : decoded;
+  if (labelPayload === undefined) {
+    throw new Error("Survey metadata does not contain label 17");
+  }
+  const payload = decodePayload(labelPayload);
   if (payload.type !== "definitions") {
     throw new Error("Label 17 payload is not a survey definition");
   }

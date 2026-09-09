@@ -56,9 +56,8 @@ export const hexToBytes = (hex: string): Uint8Array => {
   if (hex.length % 2 !== 0 || !/^[0-9a-fA-F]*$/.test(hex)) {
     throw new Error("Invalid hex value");
   }
-  return Uint8Array.from(
-    { length: hex.length / 2 },
-    (_, index) => parseInt(hex.slice(index * 2, index * 2 + 2), 16),
+  return Uint8Array.from({ length: hex.length / 2 }, (_, index) =>
+    parseInt(hex.slice(index * 2, index * 2 + 2), 16),
   );
 };
 
@@ -75,7 +74,7 @@ export const parseSurveyLink = (metadata: unknown): SurveyLink | null => {
     return null;
   }
   const { surveyRef } = parseCip179Link(metadata);
-  return surveyRef;
+  return surveyRef && surveyRef.index <= 65535 ? surveyRef : null;
 };
 
 export const decodeDefinition = (
@@ -88,7 +87,9 @@ export const decodeDefinition = (
     envelope.surveyIndex !== expected.index ||
     envelope.metadataLabel !== 17
   ) {
-    throw new Error("Survey definition response does not match the requested reference");
+    throw new Error(
+      "Survey definition response does not match the requested reference",
+    );
   }
   const decoded = metadatumCodec.cborToMetadatum(
     hexToBytes(envelope.payloadCborHex),
@@ -107,7 +108,14 @@ export const decodeDefinition = (
   if (!definition) throw new Error("Survey index does not exist");
   const problems = validateDefinition(definition);
   if (problems.length) throw new Error(problems.join("; "));
-  if (expiryEpoch !== undefined && definition.endEpoch !== expiryEpoch - 1) {
+  if (
+    expiryEpoch === undefined ||
+    !Number.isSafeInteger(expiryEpoch) ||
+    expiryEpoch <= 0
+  ) {
+    throw new Error("Governance action expiry epoch is unavailable");
+  }
+  if (definition.endEpoch !== expiryEpoch - 1) {
     throw new Error("Survey end epoch does not match the governance action");
   }
   return definition;
@@ -135,6 +143,22 @@ type PresentationQuestion = {
   ratingLabels?: string[];
 };
 
+const validatePresentationQuestion = (
+  value: unknown,
+): value is PresentationQuestion => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const question = value as Record<string, unknown>;
+  return (
+    (question.prompt === undefined || typeof question.prompt === "string") &&
+    [question.options, question.ratingLabels].every(
+      (labels) =>
+        labels === undefined ||
+        (Array.isArray(labels) &&
+          labels.every((label) => typeof label === "string")),
+    )
+  );
+};
+
 const fetchContentAnchor = async (anchor: ContentAnchor): Promise<unknown> => {
   const uri = anchor.uri.startsWith("ipfs://")
     ? `https://ipfs.io/ipfs/${anchor.uri.slice(7)}`
@@ -142,18 +166,42 @@ const fetchContentAnchor = async (anchor: ContentAnchor): Promise<unknown> => {
   if (!uri.startsWith("https://")) throw new Error("Unsupported anchor URI");
   const controller = new AbortController();
   const timeout = globalThis.setTimeout(() => controller.abort(), 10_000);
-  const response = await fetch(uri, { signal: controller.signal }).finally(() =>
-    globalThis.clearTimeout(timeout),
-  );
-  if (!response.ok) throw new Error("External survey content is unavailable");
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  if (
-    blake2bHex(bytes, undefined, 32) !==
-    Array.from(anchor.hash, (byte) => byte.toString(16).padStart(2, "0")).join("")
-  ) {
-    throw new Error("External survey content hash does not match");
+  try {
+    const response = await fetch(uri, { signal: controller.signal });
+    if (!response.ok || !response.body) {
+      throw new Error("External survey content is unavailable");
+    }
+    // ponytail: cap presentation downloads at 1 MiB; larger documents use on-chain labels.
+    const reader = response.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let size = 0;
+    for (;;) {
+      // Read sequentially so the size limit also applies to chunked responses.
+      // eslint-disable-next-line no-await-in-loop
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.length;
+      if (size > 1024 * 1024)
+        throw new Error("External survey content is too large");
+      chunks.push(value);
+    }
+    const bytes = new Uint8Array(size);
+    let offset = 0;
+    chunks.forEach((chunk) => {
+      bytes.set(chunk, offset);
+      offset += chunk.length;
+    });
+    const expectedHash = Array.from(anchor.hash, (byte) =>
+      byte.toString(16).padStart(2, "0"),
+    ).join("");
+    if (blake2bHex(bytes, undefined, 32) !== expectedHash) {
+      throw new Error("External survey content hash does not match");
+    }
+    return JSON.parse(new TextDecoder().decode(bytes));
+  } finally {
+    controller.abort();
+    globalThis.clearTimeout(timeout);
   }
-  return JSON.parse(new TextDecoder().decode(bytes));
 };
 
 const applyQuestion = (
@@ -185,13 +233,24 @@ export const enrichDefinition = async (
   let enriched = definition;
   if (definition.contentAnchor) {
     const raw = await fetchContentAnchor(definition.contentAnchor);
-    if (!raw || typeof raw !== "object") throw new Error("Invalid presentation");
+    if (!raw || typeof raw !== "object")
+      throw new Error("Invalid presentation");
     const presentation = raw as Record<string, unknown>;
     if (
       presentation.specVersion !== 5 ||
       presentation.kind !== "cardano-survey-presentation"
     ) {
       throw new Error("Invalid presentation kind");
+    }
+    if (
+      [presentation.title, presentation.description].some(
+        (value) => value !== undefined && typeof value !== "string",
+      ) ||
+      (presentation.questions !== undefined &&
+        (!Array.isArray(presentation.questions) ||
+          !presentation.questions.every(validatePresentationQuestion)))
+    ) {
+      throw new Error("Invalid presentation fields");
     }
     const questions = Array.isArray(presentation.questions)
       ? (presentation.questions as PresentationQuestion[])

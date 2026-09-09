@@ -310,7 +310,16 @@ export const Cip179Survey = ({
             const labels = "options" in question ? optionLabels(question.options) : [];
             const markTouched = (value: unknown) => {
               setValues((current) => ({ ...current, [index]: value }));
-              setTouched((current) => new Set(current).add(index));
+              setTouched((current) => {
+                const next = new Set(current);
+                const empty =
+                  (question.type === "numericRange" && value === "") ||
+                  (question.type === "ranking" && Array.isArray(value) && value.length === 0) ||
+                  (question.type === "rating" && Array.isArray(value) && value.every((rating) => rating === null));
+                if (empty) next.delete(index);
+                else next.add(index);
+                return next;
+              });
             };
             return (
               <Box

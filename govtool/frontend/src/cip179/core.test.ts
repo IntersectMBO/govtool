@@ -1,7 +1,9 @@
+import { blake2bHex } from "blakejs";
 import { encodePayload, Role, type SurveyDefinition } from "cip-179";
 
 import {
   decodeDefinition,
+  enrichDefinition,
   getRenderabilityProblem,
   MAX_RENDERED_SURVEY_ITEMS,
   parseSurveyLink,
@@ -90,27 +92,42 @@ describe("CIP-179 integration helpers", () => {
     ).toEqual({ txId, index: 0 });
     expect(
       parseSurveyLink({
-        body: { cip179: { kind: "survey-link", surveyTxId: txId, surveyIndex: 0 } },
+        body: {
+          cip179: { kind: "survey-link", surveyTxId: txId, surveyIndex: 0 },
+        },
       }),
     ).toBeNull();
   });
 
   it("decodes exact label payload CBOR and checks action expiry", () => {
-    const payload = encodePayload({ type: "definitions", definitions: [definition] });
+    const payload = encodePayload({
+      type: "definitions",
+      definitions: [definition],
+    });
     const payloadCborHex = Buffer.from(
       metadatumCodec.metadatumToCbor(payload),
     ).toString("hex");
     const link = { txId: "ab".repeat(32), index: 0 };
     expect(
       decodeDefinition(
-        { txId: "ab".repeat(32), surveyIndex: 0, metadataLabel: 17, payloadCborHex },
+        {
+          txId: "ab".repeat(32),
+          surveyIndex: 0,
+          metadataLabel: 17,
+          payloadCborHex,
+        },
         link,
         501,
       ),
     ).toEqual(definition);
     expect(() =>
       decodeDefinition(
-        { txId: "ab".repeat(32), surveyIndex: 0, metadataLabel: 17, payloadCborHex },
+        {
+          txId: "ab".repeat(32),
+          surveyIndex: 0,
+          metadataLabel: 17,
+          payloadCborHex,
+        },
         link,
         502,
       ),
@@ -125,7 +142,12 @@ describe("CIP-179 integration helpers", () => {
     ).toString("hex");
     expect(() =>
       decodeDefinition(
-        { txId: "cd".repeat(32), surveyIndex: 0, metadataLabel: 17, payloadCborHex },
+        {
+          txId: "cd".repeat(32),
+          surveyIndex: 0,
+          metadataLabel: 17,
+          payloadCborHex,
+        },
         { txId: "ab".repeat(32), index: 0 },
         501,
       ),
@@ -225,5 +247,155 @@ describe("CIP-179 integration helpers", () => {
         true,
       ),
     ).toBeNull();
+  });
+});
+
+describe("CIP-179 untrusted inputs", () => {
+  const envelope = {
+    txId: dbSyncFixture.txId,
+    surveyIndex: 0,
+    metadataLabel: 17 as const,
+    payloadCborHex: dbSyncFixture.dbSyncRowCborHex,
+  };
+  const ref = { txId: dbSyncFixture.txId, index: 0 };
+  const read = (expiry: number | undefined) =>
+    decodeDefinition(envelope, ref, expiry);
+  const survey = read(501);
+  const document = {
+    specVersion: 5,
+    kind: "cardano-survey-presentation",
+    questions: [{ prompt: "Question", options: ["Yes", "No"] }],
+  };
+  const originalFetch = globalThis.fetch;
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    vi.useRealTimers();
+  });
+  const load = (doc: unknown) => {
+    const bytes = Uint8Array.from(new TextEncoder().encode(JSON.stringify(doc)));
+    globalThis.fetch = vi
+      .fn<typeof fetch>()
+      .mockImplementation(async () => new Response(bytes));
+    return {
+      ...survey,
+      title: "",
+      description: "",
+      questions: [
+        {
+          ...survey.questions[0],
+          prompt: "",
+          options: { type: "count" as const, count: 2 },
+        },
+      ],
+      contentAnchor: {
+        uri: "https://example.invalid/survey.json",
+        hash: Uint8Array.from(
+          Buffer.from(blake2bHex(bytes, undefined, 32), "hex"),
+        ),
+      },
+    };
+  };
+  it.each([undefined, null, NaN, Infinity, -1, 0, 501.5])(
+    "rejects unavailable or invalid expiry %s",
+    (expiry) => {
+      expect(() => read(expiry as number | undefined)).toThrow(/epoch/);
+    },
+  );
+  it.each([65535, 65536])("enforces uint16 link index %s", (index) => {
+    const link = parseSurveyLink({
+      body: {
+        cip179: {
+          specVersion: 5,
+          kind: "survey-link",
+          surveyTxId: ref.txId,
+          surveyIndex: index,
+        },
+      },
+    });
+    expect(link).toEqual(index === 65535 ? { ...ref, index } : null);
+  });
+  it("uses verified strings while preserving on-chain fields", async () => {
+    const result = await enrichDefinition(
+      load({
+        ...document,
+        endEpoch: 999,
+        questions: [{ ...document.questions[0], required: false }],
+      }),
+    );
+    expect(result.endEpoch).toBe(500);
+    expect(result.questions[0]).toMatchObject({
+      prompt: "Question",
+      required: true,
+      options: { type: "options", labels: ["Yes", "No"] },
+    });
+    const anchored = load(document);
+    await expect(
+      enrichDefinition({
+        ...anchored,
+        title: "On-chain",
+        questions: survey.questions,
+      }),
+    ).resolves.toMatchObject({
+      title: "On-chain",
+      questions: survey.questions,
+    });
+  });
+  it.each([
+    { title: {} },
+    { description: [] },
+    { questions: {} },
+    { questions: [null] },
+    { questions: [{ prompt: {} }] },
+    { questions: [{ options: [{ bad: true }, "No"] }] },
+    { questions: [{ ratingLabels: ["Low", 2] }] },
+  ])("rejects hash-valid malformed presentation %j", async (fields) => {
+    await expect(
+      enrichDefinition(load({ ...document, ...fields })),
+    ).rejects.toThrow(/presentation/);
+  });
+  it("rejects a raw-byte hash mismatch", async () => {
+    const anchored = load(document);
+    anchored.contentAnchor.hash = new Uint8Array(32);
+    await expect(enrichDefinition(anchored)).rejects.toThrow(/hash/);
+  });
+  it("bounds streamed content even without Content-Length", async () => {
+    const anchored = load(document);
+    let signal: AbortSignal | null | undefined;
+    globalThis.fetch = vi
+      .fn<typeof fetch>()
+      .mockImplementation(async (_url, init) => {
+        signal = init?.signal;
+        return new Response(
+          new ReadableStream({
+            start(controller) {
+              controller.enqueue(new Uint8Array(1024 * 1024));
+              controller.enqueue(new Uint8Array(1));
+              controller.close();
+            },
+          }),
+        );
+      });
+    await expect(enrichDefinition(anchored)).rejects.toThrow(/too large/);
+    expect(signal?.aborted).toBe(true);
+  });
+  it("keeps the deadline active after response headers", async () => {
+    vi.useFakeTimers();
+    const anchored = load(document);
+    globalThis.fetch = vi.fn<typeof fetch>().mockImplementation(
+      async (_url, init) =>
+        new Response(
+          new ReadableStream({
+            start(controller) {
+              init?.signal?.addEventListener("abort", () =>
+                controller.error(new Error("Aborted")),
+              );
+            },
+          }),
+        ),
+    );
+    await Promise.all([
+      expect(enrichDefinition(anchored)).rejects.toThrow(/Aborted/),
+      vi.advanceTimersByTimeAsync(10_000),
+    ]);
   });
 });

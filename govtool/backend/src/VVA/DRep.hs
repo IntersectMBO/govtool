@@ -8,6 +8,7 @@ module VVA.DRep where
 
 import           Control.Monad.Except               (MonadError)
 import           Control.Monad.Reader
+import           Control.Monad.Trans.Control        (MonadBaseControl)
 
 import           Crypto.Hash
 
@@ -78,7 +79,7 @@ sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
 listDRepsSql :: SQL.Query
 listDRepsSql = sqlFrom $(embedFile "sql/list-dreps.sql")
 listDReps ::
-  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m) =>
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadBaseControl IO m) =>
   Maybe Text -> m [DRepRegistration]
 listDReps mSearchQuery = withPool $ \conn -> do
   let searchParam = fromMaybe "" mSearchQuery
@@ -134,7 +135,7 @@ getVotingPowerSql :: SQL.Query
 getVotingPowerSql = sqlFrom $(embedFile "sql/get-voting-power.sql")
 
 getVotingPower ::
-  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m) =>
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadBaseControl IO m, MonadFail m) =>
   Text ->
   m Integer
 getVotingPower drepId = withPool $ \conn -> do
@@ -147,7 +148,7 @@ getVotesSql :: SQL.Query
 getVotesSql = sqlFrom $(embedFile "sql/get-votes.sql")
 
 getVotes ::
-  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadBaseControl IO m, MonadFail m, MonadError AppError m) =>
   Text ->
   [Text] ->
   m ([Vote], [Proposal])
@@ -183,6 +184,7 @@ getDRepInfo
      , Has VVAConfig r
      , MonadReader r m
      , MonadIO m
+     , MonadBaseControl IO m
      , MonadFail m
      , MonadError AppError m
      )
@@ -244,7 +246,7 @@ getFilteredDRepVotingPowerSql :: SQL.Query
 getFilteredDRepVotingPowerSql = sqlFrom $(embedFile "sql/get-filtered-dreps-voting-power.sql")
 
 getDRepsVotingPowerList ::
-  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m) =>
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadBaseControl IO m) =>
   [Text] ->
   m [DRepVotingPowerList]
 getDRepsVotingPowerList identifiers = withPool $ \conn -> do

@@ -17,6 +17,7 @@ import           Data.Aeson               (Array, ToJSON, Value (..), decode, ob
 import           Data.Bool                (Bool)
 import           Data.ByteString.Lazy     (ByteString)
 import qualified Data.ByteString.Lazy     as BSL
+import           Data.Hashable            (hash, hashWithSalt)
 import           Data.List                (sort, sortOn)
 import qualified Data.Map                 as Map
 import           Data.Maybe               (Maybe (Nothing), catMaybes, fromMaybe, mapMaybe)
@@ -28,7 +29,6 @@ import qualified Data.Text.Lazy.Encoding  as TL
 import           Data.Time                (TimeZone, localTimeToUTC)
 import           Data.Time.LocalTime      (TimeZone, getCurrentTimeZone)
 import qualified Data.Vector              as V
-import           Data.Hashable            (hash, hashWithSalt)
 
 import           Numeric.Natural          (Natural)
 
@@ -125,6 +125,8 @@ getSurveyDefinition :: App m => HexText -> Natural -> m (Headers '[Header "Cache
 getSurveyDefinition (unHexText -> txId) surveyIndex = do
   when (Text.length txId /= 64) $
     throwError $ ValidationError "txId must be a 64-character hex string"
+  when (surveyIndex > 65535) $
+    throwError $ ValidationError "surveyIndex must be between 0 and 65535"
   payloadCborHex <- Survey.getSurveyDefinition txId
   pure $ addHeader "public, max-age=31536000, immutable" $ AnyValue $ Just $
     object

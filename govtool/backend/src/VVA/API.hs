@@ -53,12 +53,12 @@ import qualified VVA.Proposal             as Proposal
 import qualified VVA.Transaction          as Transaction
 import qualified VVA.Types                as Types
 import           VVA.Types                (App, AppEnv (..),
-                                           AppError (AppIpfsError, CriticalError, InternalError, ValidationError),
+                                           AppError (AppIpfsError, CriticalError, InternalError, UnauthorizedError, ValidationError),
                                            CacheEnv (..))
 
 type VVAApi =
          "ipfs"
-                :> "upload"  :>  QueryParam "fileName" Text :> ReqBody '[PlainText] Text :> Post '[JSON] UploadResponse
+                :> "upload"  :>  Header "Authorization" Text :> QueryParam "fileName" Text :> ReqBody '[PlainText] Text :> Post '[JSON] UploadResponse
     :<|> "drep" :> "list"
                 :> QueryParam "search" Text
                 :> QueryParams "status" DRepStatus
@@ -118,9 +118,21 @@ server = upload
     :<|> getNetworkTotalStake
     :<|> getAccountInfo
 
-upload :: App m => Maybe Text -> Text -> m UploadResponse
-upload mFileName fileContentText = do
+upload :: App m => Maybe Text -> Maybe Text -> Text -> m UploadResponse
+upload mAuthHeader mFileName fileContentText = do
   AppEnv {vvaConfig} <- ask
+  let configuredApiKey = ipfsUploadApiKey vvaConfig
+  case configuredApiKey of
+    Nothing -> throwError $ UnauthorizedError "IPFS upload is not configured on this server"
+    Just expectedKey -> do
+      case mAuthHeader of
+        Nothing -> throwError $ UnauthorizedError "Missing Authorization header. Please provide a valid API key."
+        Just authHeader -> do
+          let strippedKey = if "Bearer " `isPrefixOf` authHeader
+                            then Text.drop (Text.length "Bearer ") authHeader
+                            else authHeader
+          when (strippedKey /= expectedKey) $
+            throwError $ UnauthorizedError "Invalid API key"
   let fileContent = TL.encodeUtf8 $ TL.fromStrict fileContentText
       vvaPinataJwt = pinataApiJwt vvaConfig
       fileName = fromMaybe "data.txt" mFileName -- Default to data.txt if no filename is provided

@@ -83,6 +83,8 @@ data VVAConfigInternal
       , vVAConfigInternalSentryEnv                    :: String
         -- | Pinata API JWT
       , vVAConfigInternalPinataApiJwt                 :: Maybe Text
+        -- | API key required to authorize IPFS uploads
+      , vVAConfigInternalIpfsUploadApiKey             :: Maybe Text
       }
   deriving (FromConfig, Generic, Show)
 
@@ -97,7 +99,8 @@ instance DefaultConfig VVAConfigInternal where
         vVaConfigInternalDRepListCacheDurationSeconds = 600,
         vVAConfigInternalSentrydsn = "https://username:password@senty.host/id",
         vVAConfigInternalSentryEnv = "development",
-        vVAConfigInternalPinataApiJwt = Nothing
+        vVAConfigInternalPinataApiJwt = Nothing,
+        vVAConfigInternalIpfsUploadApiKey = Nothing
       }
 
 -- | DEX configuration.
@@ -119,6 +122,8 @@ data VVAConfig
       , sentryEnv                    :: String
         -- | Pinata API JWT
       , pinataApiJwt                 :: Maybe Text
+        -- | API key required to authorize IPFS uploads
+      , ipfsUploadApiKey             :: Maybe Text
       }
   deriving (Generic, Show, ToJSON)
 
@@ -161,7 +166,8 @@ convertConfig VVAConfigInternal {..} =
       dRepListCacheDurationSeconds = vVaConfigInternalDRepListCacheDurationSeconds,
       sentryDSN = vVAConfigInternalSentrydsn,
       sentryEnv = vVAConfigInternalSentryEnv,
-      pinataApiJwt = vVAConfigInternalPinataApiJwt
+      pinataApiJwt = vVAConfigInternalPinataApiJwt,
+      ipfsUploadApiKey = vVAConfigInternalIpfsUploadApiKey
     }
 
 -- | Load configuration from a file specified on the command line.  Load from

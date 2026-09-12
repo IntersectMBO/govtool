@@ -1,5 +1,5 @@
 import { ChangeEvent } from "react";
-import { LinkProps } from "react-router-dom";
+import { LinkProps } from "react-router";
 import {
   ButtonProps as MUIButtonProps,
   CheckboxProps as MUICheckboxProps,

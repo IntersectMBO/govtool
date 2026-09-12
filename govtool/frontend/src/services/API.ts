@@ -1,5 +1,5 @@
 import axios from "axios";
-import { NavigateFunction } from "react-router-dom";
+import { NavigateFunction } from "react-router";
 
 import { PATHS } from "@consts";
 import { env } from "@/config/env";

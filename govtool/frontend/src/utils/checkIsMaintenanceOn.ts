@@ -12,7 +12,7 @@ export const checkIsMaintenanceOn = async () => {
     if (response.data) {
       window.location.reload();
     }
-  } catch (error) {
+  } catch {
     throw new Error("Action canceled due to maintenance mode.");
   }
 };

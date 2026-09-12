@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import { Box } from "@mui/material";
 
 import { useCardano } from "@context";

@@ -1,9 +1,8 @@
-import { UseInfiniteQueryOptions, useInfiniteQuery } from "react-query";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { GetDRepListArguments, getDRepList } from "@services";
-import { DRepData, Infinite } from "@/models";
 
 export const useGetDRepListInfiniteQuery = (
   {
@@ -13,7 +12,7 @@ export const useGetDRepListInfiniteQuery = (
     sorting,
     status,
   }: GetDRepListArguments,
-  options?: UseInfiniteQueryOptions<Infinite<DRepData>>,
+  options?: { enabled?: boolean; keepPreviousData?: boolean },
 ) => {
   const { pendingTransaction } = useCardano();
 
@@ -24,9 +23,9 @@ export const useGetDRepListInfiniteQuery = (
     hasNextPage,
     isFetching,
     isFetchingNextPage,
-    isPreviousData,
-  } = useInfiniteQuery(
-    [
+    isPlaceholderData,
+  } = useInfiniteQuery({
+    queryKey: [
       QUERY_KEYS.useGetDRepListInfiniteKey,
       (
         pendingTransaction.registerAsDirectVoter ||
@@ -39,7 +38,7 @@ export const useGetDRepListInfiniteQuery = (
       sorting ?? "",
       status?.length ? status : "",
     ],
-    async ({ pageParam = 0 }) =>
+    queryFn: async ({ pageParam }) =>
       getDRepList({
         page: pageParam,
         pageSize,
@@ -48,15 +47,14 @@ export const useGetDRepListInfiniteQuery = (
         sorting,
         status,
       }),
-    {
-      getNextPageParam: (lastPage) => {
-        if (lastPage.elements.length === 0) return undefined;
-        return lastPage.page + 1;
-      },
-      enabled: options?.enabled,
-      keepPreviousData: options?.keepPreviousData,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.elements.length === 0) return undefined;
+      return lastPage.page + 1;
     },
-  );
+    enabled: options?.enabled,
+    placeholderData: options?.keepPreviousData ? keepPreviousData : undefined,
+  });
 
   return {
     dRepListFetchNextPage: fetchNextPage,
@@ -65,6 +63,6 @@ export const useGetDRepListInfiniteQuery = (
     isDRepListFetchingNextPage: isFetchingNextPage,
     isDRepListLoading: isLoading,
     dRepData: data?.pages.flatMap((page) => page.elements),
-    isPreviousData,
+    isPreviousData: isPlaceholderData,
   };
 };

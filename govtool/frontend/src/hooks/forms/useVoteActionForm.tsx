@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 import { PATHS } from "@consts";
 import { useCardano, useSnackbar } from "@context";

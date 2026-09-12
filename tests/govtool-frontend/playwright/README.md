@@ -320,18 +320,18 @@ npm run test:headless:wallet-connect
 
 ---
 
-#### 8. **Usersnap Integration**
+#### 8. **Chatwoot Feedback Integration**
 
 #### 🖥️ UI Mode
 
 ```bash
-npm run test:usersnap
+npm run test:chatwoot
 ```
 
 #### 🧪 Headless Mode (No UI)
 
 ```bash
-npm run test:headless:usersnap
+npm run test:headless:chatwoot
 ```
 
 ---

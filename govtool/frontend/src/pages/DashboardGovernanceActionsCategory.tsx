@@ -1,5 +1,5 @@
 import { useMemo, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import { Box, CircularProgress, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";

@@ -1,6 +1,6 @@
 import { useEffect, Dispatch, SetStateAction, useState } from "react";
 import { Box, Button, CircularProgress, Link, Typography } from "@mui/material";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 
 import { VoteContextWrapper } from "@organisms";
 import { postIpfs } from "@services";
@@ -37,7 +37,7 @@ export const VoteContextGovTool = ({
 
   const openLink = () => openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);
 
-  const { mutate, isLoading, isError } = useMutation<PostIpfsResponse, Error, { content: string }>({
+  const { mutate, isPending, isError } = useMutation<PostIpfsResponse, Error, { content: string }>({
     mutationFn: postIpfs,
     onSuccess: (data) => {
       const ipfsUrl = `ipfs://${data.ipfsCid}`;
@@ -89,7 +89,7 @@ export const VoteContextGovTool = ({
         <Typography sx={{ textAlign: "center", color: "error.main", mt: 2 }} variant="body1">
           {t("createGovernanceAction.uploadToIPFSError")}
         </Typography>
-      ) : isLoading ? (
+      ) : isPending ? (
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <CircularProgress size={24} />
         </Box>

@@ -4,7 +4,7 @@ import {
   useLocation,
   useParams,
   generatePath,
-} from "react-router-dom";
+} from "react-router";
 import { Box, CircularProgress, Link, Typography } from "@mui/material";
 import { AxiosError } from "axios";
 

@@ -1,14 +1,14 @@
 import { Box, Typography } from "@mui/material";
-import { FC } from "react";
-import { NavLink } from "react-router-dom";
+import { FC, ReactElement } from "react";
+import { NavLink } from "react-router";
 
 import { theme } from "@/theme";
 
 type LinkProps = {
   label: string;
   navTo: string;
-  icon?: string | JSX.Element;
-  activeIcon?: string | JSX.Element;
+  icon?: string | ReactElement;
+  activeIcon?: string | ReactElement;
   dataTestId?: string;
   onClick?: () => void;
 };

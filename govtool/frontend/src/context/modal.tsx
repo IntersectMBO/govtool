@@ -78,8 +78,9 @@ ModalContext.displayName = "ModalContext";
 
 // eslint-disable-next-line react/function-component-definition
 function ModalProvider<T>({ children, ...props }: ProviderProps) {
-  const [modal, openModal] = useReducer<BasicReducer<ModalState<T>>>(
-    basicReducer,
+  const reducer: BasicReducer<ModalState<T>> = basicReducer;
+  const [modal, openModal] = useReducer(
+    reducer,
     {
       state: null,
       type: "none",

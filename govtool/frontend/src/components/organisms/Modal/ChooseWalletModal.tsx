@@ -7,7 +7,7 @@ import type { WalletOption } from "@molecules";
 import { WalletOptionButton } from "@molecules";
 import { openInNewTab } from "@utils";
 import { useTranslation } from "@hooks";
-import { To } from "react-router-dom";
+import { To } from "react-router";
 import { LINKS } from "@/consts/links";
 
 type ChooseWalletModalState = {

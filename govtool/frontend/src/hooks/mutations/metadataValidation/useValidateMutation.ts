@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { postValidate } from "@services";
 import { MUTATION_KEYS } from "@consts";
@@ -8,7 +8,7 @@ import { useMemo } from "react";
 export const useValidateMutation = <MetadataType>() => {
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useMutation({
+  const { data, isPending } = useMutation({
     mutationFn: (body: MetadataValidationDTO) =>
       postValidate<MetadataType>(body),
     mutationKey: [MUTATION_KEYS.postValidateKey],
@@ -24,9 +24,9 @@ export const useValidateMutation = <MetadataType>() => {
     () => ({
       validateMetadata,
       validationStatus: data,
-      isValidating: isLoading,
+      isValidating: isPending,
     }),
-    [data, isLoading],
+    [data, isPending],
   );
 
   return contextValue;

@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { Box, Tabs, Tab, styled, Skeleton, Link } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";

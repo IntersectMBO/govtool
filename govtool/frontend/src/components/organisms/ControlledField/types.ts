@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   CheckboxFieldProps,
   InputFieldProps,
@@ -13,30 +12,53 @@ import {
   RegisterOptions,
 } from "react-hook-form";
 
-export type ControlledInputProps = InputFieldProps & {
-  control?: Control<any>;
-  errors?: FieldErrors<any>;
-  name: Path<any>;
-  rules?: Omit<RegisterOptions, "valueAsNumber" | "valueAsDate" | "setValueAs">;
+export type ControlledInputProps<
+  TFieldValues extends FieldValues,
+  TName extends Path<TFieldValues> = Path<TFieldValues>,
+> =
+  InputFieldProps & {
+  control?: Control<TFieldValues>;
+  errors?: FieldErrors<TFieldValues>;
+  name: TName;
+  rules?: Omit<
+    RegisterOptions<TFieldValues, TName>,
+    "valueAsNumber" | "valueAsDate" | "setValueAs"
+  >;
 };
 
-export type ControlledCheckboxProps = Omit<
+export type ControlledCheckboxProps<
+  TFieldValues extends FieldValues,
+  TName extends Path<TFieldValues> = Path<TFieldValues>,
+> = Omit<
   CheckboxFieldProps,
   "onChange" | "value"
 > & {
-  control: Control<any>;
-  errors: FieldErrors<any>;
-  name: Path<any>;
-  rules?: Omit<RegisterOptions, "valueAsNumber" | "valueAsDate" | "setValueAs">;
+  control: Control<TFieldValues>;
+  errors: FieldErrors<TFieldValues>;
+  name: TName;
+  rules?: Omit<
+    RegisterOptions<TFieldValues, TName>,
+    "valueAsNumber" | "valueAsDate" | "setValueAs"
+  >;
 };
 
-export type RenderInputProps = {
-  field: ControllerRenderProps<FieldValues, string>;
+export type RenderInputProps<
+  TFieldValues extends FieldValues,
+  TName extends Path<TFieldValues>,
+> = {
+  field: ControllerRenderProps<TFieldValues, TName>;
 };
 
-export type ControlledTextAreaProps = TextAreaFieldProps & {
-  control: Control<any>;
-  errors: FieldErrors<any>;
-  name: Path<any>;
-  rules?: Omit<RegisterOptions, "valueAsNumber" | "valueAsDate" | "setValueAs">;
+export type ControlledTextAreaProps<
+  TFieldValues extends FieldValues,
+  TName extends Path<TFieldValues> = Path<TFieldValues>,
+> =
+  TextAreaFieldProps & {
+  control: Control<TFieldValues>;
+  errors: FieldErrors<TFieldValues>;
+  name: TName;
+  rules?: Omit<
+    RegisterOptions<TFieldValues, TName>,
+    "valueAsNumber" | "valueAsDate" | "setValueAs"
+  >;
 };

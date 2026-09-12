@@ -6,15 +6,24 @@ on:
       - main
       - develop
       - test
+    tags:
+      - "v*.*.*"
   workflow_dispatch:
 
 permissions:
   contents: read
   packages: write
 
+concurrency:
+  group: docker-images-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
-    if: contains(fromJson('["main", "develop", "test"]'), github.ref_name)
+    if: >-
+      github.ref_type == 'tag' ||
+      contains(fromJson('["main", "develop", "test"]'), github.ref_name)
+
     runs-on: ubuntu-latest
 
     strategy:
@@ -45,14 +54,39 @@ jobs:
         run: |
           IMAGE=$(echo "${{ matrix.image }}" | tr '[:upper:]' '[:lower:]')
           BRANCH=$(echo "${{ github.ref_name }}" | tr '/' '-')
-          TAG="${{ github.sha}}"
+          TAG="${{ github.sha }}"
 
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
           echo "IMAGE=$IMAGE"
+          echo "BRANCH=$BRANCH"
           echo "TAG=$TAG"
           echo "FULL_IMAGE=$IMAGE:$TAG"
+          
+      - name: Generate Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.vars.outputs.image }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=${{ github.sha }}
+
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=dev,enable=${{ github.ref == 'refs/heads/develop' }}
+            type=raw,value=test,enable=${{ github.ref == 'refs/heads/test' }}
+
+            type=semver,pattern={{raw}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern=v{{major}}
+
+      - name: Print generated Docker tags
+        run: |
+          echo "Generated Docker tags:"
+          echo "${{ steps.meta.outputs.tags }}"
 
       - name: Lint Dockerfile
         id: hadolint
@@ -78,7 +112,7 @@ jobs:
           else
             echo "No lint.sh found, skipping app lint"
           fi
-          
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -104,7 +138,8 @@ jobs:
           file: ${{ matrix.dockerfile }}
           load: true
           push: false
-          tags: ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.tag }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
@@ -127,6 +162,6 @@ jobs:
 
           cat ${{ matrix.workdir }}/dockle_scan_output.json
 
-      - name: Push Docker image to GHCR
+      - name: Push Docker images to GHCR
         run: |
-          docker push ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.tag }}
+          docker image push --all-tags "${{ steps.vars.outputs.image }}"

@@ -1,5 +1,5 @@
 import { FC, useCallback } from "react";
-import { To, useNavigate, useLocation } from "react-router-dom";
+import { To, useNavigate, useLocation } from "react-router";
 import { Box, CircularProgress, Typography } from "@mui/material";
 
 import {

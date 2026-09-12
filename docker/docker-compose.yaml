@@ -1,0 +1,73 @@
+services:
+    govtool-backend:
+        image: ghcr.io/intersectmbo/govtool-backend:dev
+        build:
+            context: ../govtool/backend
+        volumes:
+         - ../govtool/backend/example-config.json:/config.json:ro
+        entrypoint:
+        - sh
+        - -c
+        - vva-be -c /config.json start-app
+        ports:
+         - "9999:9999"
+        
+    metadata-validation:
+        image: ghcr.io/intersectmbo/govtool-metadata-validation:dev
+        build: 
+            context: ../govtool/metadata-validation
+            dockerfile: Dockerfile
+        environment:
+            - PORT=3000
+        env_file:
+            - ../govtool/metadata-validation/.env
+        
+        ports:
+            - "3000:3000"
+
+    outcomes:
+        image: ghcr.io/intersectmbo/govtool-outcomes-pillar-backend:acf1032dae36691f8bc6af2b8e90a9b7917a557e-91
+        env_file:
+            - ./.env
+        environment:
+            DATABASE_HOST: ${DBSYNC_POSTGRES_HOST}
+            DATABASE_PORT: ${DBSYNC_POSTGRES_PORT:-5432}
+            DATABASE_NAME: ${DBSYNC_DATABASE}
+            DATABASE_USER: ${DBSYNC_POSTGRES_USER}
+            DATABASE_PASSWORD: ${DBSYNC_POSTGRES_PASSWORD}
+            IPFS_GATEWAY: ${IPFS_GATEWAY}
+            PDF_API_URL: ${PDF_API_URL}    
+        ports:
+            - "3001:3000"     
+
+    govtool-frontend:
+        image: ghcr.io/intersectmbo/govtool-frontend:dev
+        build: 
+            context: ../govtool/frontend
+            dockerfile: Dockerfile
+        env_file:
+            - ./.envs
+        environment:
+            VITE_BASE_URL: ${BASE_URL}
+            VITE_SENTRY_DSN: ${SENTRY_DSN_FRONTEND:-}
+            VITE_APP_ENV: ${APP_ENV:-test}
+            VITE_NETWORK_FLAG: ${VITE_NETWORK_FLAG:-0}
+            VITE_CHATWOOT_URL: ${CHATWOOT_URL:-}
+            VITE_CHATWOOT_WEBSITE_TOKEN: ${CHATWOOT_WEBSITE_TOKEN:-}
+            VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: 'true'
+            VITE_METADATA_API_URL: ${METADATA_API_URL}
+            UMAMI_URL: ${UMAMI_URL:-}
+            UMAMI_WEBSITE_ID: ${UMAMI_WEBSITE_ID:-}
+            UMAMI_SSL_VERIFY: ${UMAMI_SSL_VERIFY:-true}
+            TRUSTED_PROXY_CIDRS: ${TRUSTED_PROXY_CIDRS:-}
+            REAL_IP_HEADER: ${REAL_IP_HEADER:-X-Forwarded-For}
+            VITE_PDF_API_URL: ${PDF_API_URL:-}
+            VITE_OUTCOMES_API_URL: ${OUTCOMES_API_URL:-}
+            VITE_IPFS_GATEWAY: ${IPFS_GATEWAY:-https://ipfs.io/ipfs}
+            VITE_IPFS_PROJECT_ID: ${IPFS_PROJECT_ID:-}
+            VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: 'true'
+        ports:
+            - "80:80"
+        depends_on:
+            - govtool-backend
+            - metadata-validation

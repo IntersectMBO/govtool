@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Box, Divider } from "@mui/material";
 
 import { Background, ScrollToManage, Typography } from "@atoms";

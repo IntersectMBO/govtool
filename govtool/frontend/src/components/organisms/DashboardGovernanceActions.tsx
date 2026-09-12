@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Box, CircularProgress, Tab, Tabs, styled } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
 
 import {
   GOVERNANCE_ACTIONS_FILTERS,

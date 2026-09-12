@@ -2,7 +2,7 @@ import { Box, Link } from "@mui/material";
 
 import { Button, Typography } from "@atoms";
 import { ICONS } from "@consts";
-import { useUsersnapApi } from "@context";
+import { useChatwoot } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab, testIdFromLabel } from "@utils";
 import { LINKS } from "@/consts/links";
@@ -33,7 +33,7 @@ const FooterLink = ({ label, onClick }: FooterLinkProps) => (
 export const Footer = () => {
   const { screenWidth } = useScreenDimension();
   const { t } = useTranslation();
-  const { openFeedbackWindow } = useUsersnapApi();
+  const { openFeedbackWindow } = useChatwoot();
 
   const onClickHelp = () => openInNewTab(LINKS.SUPPORT);
 

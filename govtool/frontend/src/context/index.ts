@@ -5,7 +5,7 @@ export * from "./pagination";
 export * from "./modal";
 export * from "./pendingTransaction";
 export * from "./snackbar";
-export * from "./usersnapContext";
+export * from "./chatwootContext";
 export * from "./wallet";
 export * from "./featureFlag";
 export * from "./governanceAction";

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useLocation, Outlet, useNavigate } from "react-router-dom";
+import { useLocation, Outlet, useNavigate } from "react-router";
 import { Box } from "@mui/material";
 
 import { Background, ScrollToManage } from "@atoms";

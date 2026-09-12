@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 
 import { Background, Button, Link, Typography } from "@atoms";

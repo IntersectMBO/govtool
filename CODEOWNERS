@@ -1,7 +1,8 @@
 # GovTool Project Codeowners
 
 # These owners will be the default owners for everything in the repository.
-* @Ryun1 @aaboyle878
+
+* @mesudip @sireto-sandip @kusssal
 
 # Frontend assets templates
 govtool/frontend/*                                                          
@@ -13,7 +14,7 @@ govtool/frontend/*
 govtool/backend/*                                                           
 
 # DevOps
-.github/workflows/*                                                         
+.github/workflows/*
 config/govtool/*                                                            
 infra/terraform/*                                                           
 

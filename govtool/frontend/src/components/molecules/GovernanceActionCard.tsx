@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Box, Skeleton } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router";
 
 import { Button } from "@atoms";
 import {

@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
 import { useTranslation } from "react-i18next";

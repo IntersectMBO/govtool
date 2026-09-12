@@ -54,8 +54,8 @@ This directory contains all automated test cases, organized by feature area:
 9. **`9-outcomes/`**  
    Tests related to proposal outcome visibility and validations.
 
-10. **`10-user-snap/`**  
-    Usersnap-related test cases.
+10. **`10-feedback/`**  
+    Chatwoot feedback widget test cases.
 
 11. **`11-proposal-budget/`**  
     Tests for proposal budget functionality and associated forms.

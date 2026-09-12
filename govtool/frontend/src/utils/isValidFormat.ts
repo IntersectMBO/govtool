@@ -43,7 +43,7 @@ export async function isRewardAddress(address: string) {
   try {
     const stake = RewardAddress.from_address(Address.from_bech32(address));
     return stake ? true : i18n.t("forms.errors.mustBeStakeAddress");
-  } catch (e) {
+  } catch {
     return i18n.t("forms.errors.mustBeStakeAddress");
   }
 }
@@ -67,7 +67,7 @@ export async function isReceivingAddress(address?: string) {
       return true;
     }
     return i18n.t("forms.errors.mustBeReceivingAddress");
-  } catch (e) {
+  } catch {
     return i18n.t("forms.errors.mustBeReceivingAddress");
   }
 }
@@ -94,7 +94,7 @@ export async function isValidImageUrl(url: unknown, options?: Options) {
       await getImageSha(url);
     }
     return true;
-  } catch (error) {
+  } catch {
     return i18n.t("forms.errors.couldNotGenerateImageSha");
   }
 }

@@ -1,11 +1,11 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { getNetworkMetrics } from "@services";
 import { QUERY_KEYS } from "@consts";
 
 export const useGetNetworkMetrics = () => {
   const { data: networkMetrics, refetch: fetchNetworkMetrics } = useQuery({
-    queryKey: QUERY_KEYS.useGetNetworkMetricsKey,
+    queryKey: [QUERY_KEYS.useGetNetworkMetricsKey],
     queryFn: () => getNetworkMetrics(),
     enabled: false,
   });

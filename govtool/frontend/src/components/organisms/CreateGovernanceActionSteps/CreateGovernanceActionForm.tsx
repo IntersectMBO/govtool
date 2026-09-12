@@ -1,10 +1,14 @@
 import { Dispatch, SetStateAction, useCallback } from "react";
-import { useFieldArray } from "react-hook-form";
+import { Path, RegisterOptions, useFieldArray } from "react-hook-form";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 import { Button, InfoText, Spacer, Typography } from "@atoms";
 import { GOVERNANCE_ACTION_FIELDS, Placeholders } from "@consts";
-import { useCreateGovernanceActionForm, useTranslation } from "@hooks";
+import {
+  CreateGovernanceActionValues,
+  useCreateGovernanceActionForm,
+  useTranslation,
+} from "@hooks";
 import { useFeatureFlag } from "@context";
 import { CenteredBoxBottomButtons, Field } from "@molecules";
 import { URL_REGEX, testIdFromLabel } from "@/utils";
@@ -86,11 +90,17 @@ export const CreateGovernanceActionForm = ({
         key,
         label: t(field.labelI18nKey),
         layoutStyles: { mb: 3 },
-        name: key,
+        name: key as Path<CreateGovernanceActionValues>,
         placeholder: field.placeholderI18nKey
           ? t(field.placeholderI18nKey)
           : undefined,
-        rules: field.rules,
+        rules: field.rules as unknown as Omit<
+          RegisterOptions<
+            CreateGovernanceActionValues,
+            Path<CreateGovernanceActionValues>
+          >,
+          "valueAsNumber" | "valueAsDate" | "setValueAs"
+        >,
         maxLength: field.maxLength,
       };
 

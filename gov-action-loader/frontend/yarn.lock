@@ -651,10 +651,10 @@ muggle-string@^0.4.1:
   resolved "https://registry.yarnpkg.com/muggle-string/-/muggle-string-0.4.1.tgz#3b366bd43b32f809dc20659534dd30e7c8a0d328"
   integrity sha512-VNTrAak/KhO2i8dqqnqnAHOa3cYBwXEZe9h+D5h/1ZqFSTEFHdM65lR7RoIqq3tBBYavsOXV84NoHXZ0AkPyqQ==
 
-nanoid@^3.3.12:
-  version "3.3.15"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.15.tgz#36c490fad8c6e86c824c940dfdde999b69ed4316"
-  integrity sha512-y7Wygv/7mEOvxTuEQDB8StXdMRBWf1kR/tlhAzBRUFkB2jfcLOAxO/SHmOO2zgz1pVgK29/kyupn059/bCHdjA==
+nanoid@^3.3.17:
+  version "3.3.18"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.18.tgz#f66a2de1199ffde0fcf21c8a5f13106b1c081913"
+  integrity sha512-DTg4MJbGMWkfi6VZFdNt2/caMbQy4Ou+Op/hJQvGEWcnVfoA1QA+xzRKAzw9jD6+GVOOeYr/mIcuDSdug6F6+w==
 
 node-gyp-build-optional-packages@5.1.1:
   version "5.1.1"
@@ -678,12 +678,12 @@ picomatch@^4.0.4:
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-4.0.5.tgz#51ea57a17d86f605f81039595fbc40ed06a55fab"
   integrity sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==
 
-postcss@^8.5.10, postcss@^8.5.15, postcss@^8.5.16:
-  version "8.5.16"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.5.16.tgz#1230ce0b5df354c24c0ea45f99ce5f6a88279d28"
-  integrity sha512-vuwillviilfKZsg0VGj5R/YwwcHx4SLsIOI/7K6mQkWx+l5cUHTjj5g0AasTBcyXsbfTgrwsUNmVUb5xVwyPwg==
+postcss@^8.5.15, postcss@^8.5.16, postcss@^8.5.23:
+  version "8.5.26"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.5.26.tgz#6e75135780c7e10df3433bf2266c552d35c8c620"
+  integrity sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ==
   dependencies:
-    nanoid "^3.3.12"
+    nanoid "^3.3.17"
     picocolors "^1.1.1"
     source-map-js "^1.2.1"
 

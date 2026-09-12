@@ -1,4 +1,4 @@
-FROM node:20.18.1-alpine as builder
+FROM node:22.22.0-alpine as builder
 
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 

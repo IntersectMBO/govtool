@@ -34,7 +34,7 @@ export const dRepSearchPhraseProcessor = async (phrase: string) => {
     }
 
     return drepIDPhrase;
-  } catch (e) {
+  } catch {
     return phrase;
   }
 };

@@ -3,7 +3,7 @@ import { Button, Link, Typography } from "@mui/material";
 
 import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import { ICONS, IMAGES } from "@consts";
-import { useModal, useUsersnapApi } from "@context";
+import { useModal, useChatwoot } from "@context";
 import { openInNewTab } from "@utils";
 import { useScreenDimension, useTranslation } from "@hooks";
 
@@ -27,7 +27,7 @@ export const StatusModal = forwardRef<HTMLDivElement>((_, ref) => {
   const { state, closeModal } = useModal<StatusModalState>();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
-  const { openFeedbackWindow } = useUsersnapApi();
+  const { openFeedbackWindow } = useChatwoot();
 
   const onClickFeedback = () => {
     openFeedbackWindow();

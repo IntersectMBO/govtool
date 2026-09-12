@@ -37,6 +37,7 @@
   },
   "overrides": {
     "@tootallnate/once": "^3.0.1",
-    "postcss": "^8.5.10"
+    "postcss": "^8.5.10",
+    "sharp": "^0.35.0"
   }
 }

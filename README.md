@@ -55,6 +55,11 @@ The API exposes endpoints making the querying of governance related data from DB
 GovTool frontend web app communicates with the backend over a REST interface, reading and displaying on-chain governance data.
 Frontend is able to connect to Cardano wallets over the [CIP-30](https://github.com/cardano-foundation/CIPs/blob/master/CIP-0030/README.md) and [CIP-95](https://github.com/cardano-foundation/CIPs/blob/master/CIP-0095/README.md) standards.
 
+## 🐳 Running locally with docker
+
+This repository includes a Docker Compose setup for running GovTool services locally.
+For local setup instructions, see the [Docker Compose README](docker/README.md).
+
 ## 🤝 Contributing
 
 Thanks for considering contributing and helping us on creating GovTool! 😎

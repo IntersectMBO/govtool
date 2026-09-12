@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";

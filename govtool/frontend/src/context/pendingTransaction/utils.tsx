@@ -1,4 +1,4 @@
-import { QueryClient, QueryKey } from "react-query";
+import { QueryClient, QueryKey } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/consts";
 import { TransactionType, TransactionState } from "./types";
 import {
@@ -70,7 +70,7 @@ export const refetchData = async (
 ) => {
   if (queryKey === undefined) return;
 
-  await queryClient.invalidateQueries(queryKey);
+  await queryClient.invalidateQueries({ queryKey });
 
   if (type === "delegate") {
     const data = await queryClient.getQueryData<CurrentDelegation>(queryKey);

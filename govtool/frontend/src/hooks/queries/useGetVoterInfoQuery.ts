@@ -1,10 +1,10 @@
-import { UseQueryOptions, useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { getVoterInfo } from "@services";
 
-export const useGetVoterInfo = (options?: UseQueryOptions) => {
+export const useGetVoterInfo = (options?: { enabled?: boolean }) => {
   const { dRepID, pendingTransaction } = useCardano();
   const { data } = useQuery({
     queryKey: [

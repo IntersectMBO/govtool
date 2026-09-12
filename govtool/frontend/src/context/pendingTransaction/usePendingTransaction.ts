@@ -9,7 +9,7 @@ import {
 import { getTransactionStatus } from "@services";
 import { useTranslation } from "@hooks";
 import { StatusModalState } from "@organisms";
-import { useQueryClient } from "react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useModal, useSnackbar } from "..";
 import { TransactionState } from "./types";
 import { getDesiredResult, getQueryKey, refetchData } from "./utils";

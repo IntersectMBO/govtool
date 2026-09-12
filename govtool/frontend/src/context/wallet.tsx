@@ -72,7 +72,7 @@ import {
   Credentials,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 import { Buffer } from "buffer";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Link } from "@mui/material";
 import * as Sentry from "@sentry/react";
 import { Trans } from "react-i18next";

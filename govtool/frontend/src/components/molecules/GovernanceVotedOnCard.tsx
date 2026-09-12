@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Box } from "@mui/material";
 
 import { Button } from "@atoms";

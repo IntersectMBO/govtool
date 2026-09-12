@@ -1,5 +1,5 @@
 import { Box, Grid } from "@mui/material";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 
 import { DrawerLink, Spacer } from "@atoms";
 import { CONNECTED_NAV_ITEMS, IMAGES, PATHS, DRAWER_WIDTH } from "@consts";

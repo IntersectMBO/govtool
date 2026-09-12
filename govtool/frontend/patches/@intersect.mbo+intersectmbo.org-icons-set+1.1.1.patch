@@ -1010,3 +1010,7 @@ diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconZoomOut.
 similarity index 100%
 rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconZoomOut.js
 rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconZoomOut.jsx
+diff --git a/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPercent.js b/node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPercent.jsx
+similarity index 100%
+rename from node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPercent.js
+rename to node_modules/@intersect.mbo/intersectmbo.org-icons-set/IconPercent.jsx

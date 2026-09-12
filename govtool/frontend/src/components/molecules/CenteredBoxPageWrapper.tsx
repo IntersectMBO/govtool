@@ -5,7 +5,7 @@ import { Background } from "@atoms";
 import { PATHS } from "@consts";
 import { DashboardTopNav, Footer } from "@organisms";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { theme } from "@/theme";
 import { LinkWithIcon } from "./LinkWithIcon";
 

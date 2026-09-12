@@ -1,7 +1,8 @@
-import { type ComponentType, useEffect, useMemo, useState } from "react";
+import { type ComponentType, useEffect, useId, useMemo, useState } from "react";
 import {
   Alert,
   Box,
+  Button,
   Checkbox,
   FormControlLabel,
   FormLabel,
@@ -9,8 +10,10 @@ import {
   Radio,
   RadioGroup,
   Select,
+  Slider,
   TextField,
   Typography,
+  type BoxProps,
 } from "@mui/material";
 import {
   Role,
@@ -18,6 +21,7 @@ import {
   validateResponse,
   type AnswerItem,
   type Metadatum,
+  type NumericConstraints,
   type OptionsOrCount,
   type Question,
   type SurveyDefinition,
@@ -72,6 +76,101 @@ const optionLabels = (options: OptionsOrCount): readonly string[] =>
     ? options.labels
     : Array.from({ length: options.count }, (_, index) => `Option ${index + 1}`));
 
+const parseDecimalInteger = (value: unknown): bigint | null =>
+  (typeof value === "string" && /^-?[0-9]+$/.test(value)
+    ? BigInt(value)
+    : null);
+
+const NumericAnswerField = ({
+  constraints: { min, max, step = 1n },
+  value,
+  onChange,
+  label,
+  sx,
+}: {
+  constraints: NumericConstraints;
+  value: string;
+  onChange: (value: string) => void;
+  label: string;
+  sx?: BoxProps["sx"];
+}) => {
+  const descriptionId = useId();
+  const parsed = parseDecimalInteger(value);
+  const lastIndex = (max - min) / step;
+  const index = parsed === null ? 0n : (parsed - min) / step;
+  const selectIndex = (next: bigint) => {
+    const bounded = next < 0n ? 0n : next > lastIndex ? lastIndex : next;
+    onChange(String(min + bounded * step));
+  };
+  // Only slider indices use Number; answer values must retain full integer precision.
+  const selectSliderIndex = (next: number | number[]) => {
+    if (typeof next === "number" && Number.isSafeInteger(next)) selectIndex(BigInt(next));
+  };
+  return (
+    <Box sx={sx}>
+      <Box sx={{ alignItems: "center", display: "flex", justifyContent: "space-between", minHeight: 36, gap: 1 }}>
+        <Typography sx={{ fontWeight: 600, overflowWrap: "anywhere" }}>
+          {parsed === null ? "Not answered" : String(parsed)}
+        </Typography>
+        {parsed !== null && (
+          <Button size="small" aria-label={`Clear answer: ${label}`} onClick={() => onChange("")}>
+            Clear answer
+          </Button>
+        )}
+      </Box>
+      {lastIndex === 0n ? (
+        <Button aria-label={`Select ${min}: ${label}`} onClick={() => selectIndex(0n)}>
+          Select {String(min)}
+        </Button>
+      ) : lastIndex <= BigInt(Number.MAX_SAFE_INTEGER) ? (
+        <Box sx={{ px: 1 }}>
+          <Slider
+            aria-label={label}
+            slotProps={{ input: { "aria-describedby": descriptionId } }}
+            getAriaValueText={() => (parsed === null ? "Not answered" : String(parsed))}
+            min={0}
+            max={Number(lastIndex)}
+            step={1}
+            value={Number(index)}
+            valueLabelDisplay="auto"
+            valueLabelFormat={(position) => String(min + BigInt(position) * step)}
+            onChange={(_, next) => selectSliderIndex(next)}
+            // Selecting the initial thumb position must also record an explicit zero/minimum.
+            onChangeCommitted={(_, next) => selectSliderIndex(next)}
+            onKeyDownCapture={(event) => {
+              const increment = event.shiftKey ? 10n : 1n;
+              const next = {
+                Home: 0n,
+                End: lastIndex,
+                ArrowLeft: index - increment,
+                ArrowDown: index - increment,
+                ArrowRight: index + increment,
+                ArrowUp: index + increment,
+                PageDown: index - 10n,
+                PageUp: index + 10n,
+              }[event.key];
+              if (next === undefined) return;
+              event.preventDefault();
+              event.stopPropagation();
+              selectIndex(next);
+            }}
+          />
+        </Box>
+      ) : (
+        <Box role="group" aria-label={label} aria-describedby={descriptionId} sx={{ display: "flex", flexWrap: "wrap" }}>
+          <Button aria-label={`Minimum: ${label}`} onClick={() => selectIndex(0n)}>Minimum</Button>
+          <Button aria-label={`Decrease: ${label}`} disabled={parsed !== null && index === 0n} onClick={() => selectIndex(index - 1n)}>−</Button>
+          <Button aria-label={`Increase: ${label}`} disabled={index === lastIndex} onClick={() => selectIndex(index + 1n)}>+</Button>
+          <Button aria-label={`Maximum: ${label}`} onClick={() => selectIndex(lastIndex)}>Maximum</Button>
+        </Box>
+      )}
+      <Typography id={descriptionId} variant="caption" color="text.secondary" sx={{ overflowWrap: "anywhere" }}>
+        {`${min} to ${max}, step ${step}`}
+      </Typography>
+    </Box>
+  );
+};
+
 export const buildAnswer = (
   question: Question,
   questionIndex: number,
@@ -92,14 +191,10 @@ export const buildAnswer = (
       return Array.isArray(value) && value.length
         ? { type: "ranking", questionIndex, ranking: value as number[] }
         : null;
-    case "numericRange":
-      try {
-        return value === "" || value === undefined
-          ? null
-          : { type: "numeric", questionIndex, value: BigInt(String(value)) };
-      } catch {
-        return null;
-      }
+    case "numericRange": {
+      const parsed = parseDecimalInteger(value);
+      return parsed === null ? null : { type: "numeric", questionIndex, value: parsed };
+    }
     case "pointsAllocation":
       return Array.isArray(value) &&
         value.every(
@@ -116,22 +211,14 @@ export const buildAnswer = (
             ),
           }
         : null;
-    case "rating":
+    case "rating": {
       if (!Array.isArray(value)) return null;
-      try {
-        const ratings = (value as Array<string | null>).flatMap(
-          (rating, optionIndex) =>
-            (rating === null ? [] : [{ optionIndex, rating: BigInt(rating) }]),
-        );
-        if (!ratings.length) return null;
-        return {
-          type: "rating",
-          questionIndex,
-          ratings,
-        };
-      } catch {
-        return null;
-      }
+      const parsed = value.map(parseDecimalInteger);
+      if (value.some((rating, index) => rating !== null && parsed[index] === null)) return null;
+      const ratings = parsed.flatMap((rating, optionIndex) =>
+        (rating === null ? [] : [{ optionIndex, rating }]));
+      return ratings.length ? { type: "rating", questionIndex, ratings } : null;
+    }
     case "custom":
       return value === undefined
         ? null
@@ -381,14 +468,11 @@ export const Cip179Survey = ({
                     );
                   })}
                 {question.type === "numericRange" && (
-                  <TextField
-                    value={values[index] ?? ""}
-                    onChange={(event) => markTouched(event.target.value)}
-                    inputProps={{
-                      "aria-label": question.prompt || `Question ${index + 1}`,
-                      inputMode: "numeric",
-                    }}
-                    helperText={`${question.constraints.min.toString()} to ${question.constraints.max.toString()}${question.constraints.step ? `, step ${question.constraints.step.toString()}` : ""}`}
+                  <NumericAnswerField
+                    constraints={question.constraints}
+                    value={(values[index] as string | undefined) ?? ""}
+                    onChange={markTouched}
+                    label={question.prompt || `Question ${index + 1}`}
                   />
                 )}
                 {question.type === "pointsAllocation" &&
@@ -419,20 +503,20 @@ export const Cip179Survey = ({
                     return (
                       <Box
                         key={surveyItemKey(index, optionIndex)}
-                        sx={{ alignItems: "center", display: "flex", gap: 2, mt: 1 }}
+                        sx={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: 2, mt: 1 }}
                       >
                         <Typography sx={{ flex: 1 }}>{label}</Typography>
                         {question.scale.type === "numeric" ? (
-                          <TextField
+                          <NumericAnswerField
+                            constraints={question.scale.constraints}
                             value={ratings[optionIndex] ?? ""}
-                            onChange={(event) => {
+                            onChange={(value) => {
                               const next = [...ratings];
-                              next[optionIndex] = event.target.value || null;
+                              next[optionIndex] = value || null;
                               markTouched(next);
                             }}
-                            inputProps={{ "aria-label": label, inputMode: "numeric" }}
-                            helperText={`${question.scale.constraints.min.toString()} to ${question.scale.constraints.max.toString()}`}
-                            sx={{ minWidth: 180 }}
+                            label={label}
+                            sx={{ minWidth: 180, flex: 1 }}
                           />
                         ) : (
                           <Select

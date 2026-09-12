@@ -12,6 +12,8 @@ changes.
 
 ### Added
 
+- Add feature-flagged CIP-179 linked survey authoring, rendering, and vote-response submission for governance actions
+
 ### Fixed
 
 - Fix disappearing proposals in the governance actions list for the same tx hashes [Issue 3918](https://github.com/IntersectMBO/govtool/issues/3918)

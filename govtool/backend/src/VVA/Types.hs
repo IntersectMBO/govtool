@@ -15,6 +15,7 @@ import           Control.Monad.Except                 (MonadError)
 import           Control.Monad.Fail                   (MonadFail)
 import           Control.Monad.IO.Class               (MonadIO)
 import           Control.Monad.Reader                 (MonadReader)
+import           Control.Monad.Trans.Control          (MonadBaseControl)
 
 import           Data.Aeson                           (ToJSON (..), Value, object, (.=))
 import qualified Data.Aeson                           as A
@@ -34,7 +35,7 @@ import           VVA.Cache
 import           VVA.Config
 import           VVA.Ipfs                             (IpfsError)
 
-type App m = (MonadReader AppEnv m, MonadIO m, MonadFail m, MonadError AppError m)
+type App m = (MonadReader AppEnv m, MonadIO m, MonadBaseControl IO m, MonadFail m, MonadError AppError m)
 
 data AppEnv
   = AppEnv
@@ -118,7 +119,8 @@ data DRepVotingPowerList
       }
   deriving (Eq, Show)
 
-data DRepStatus = Active | Inactive | Retired deriving (Eq, Ord, Show)
+data DRepStatus = Active | Inactive | Retired
+  deriving (Eq, Ord, Show)
 
 instance FromField DRepStatus where
   fromField f mdata = do
@@ -129,7 +131,8 @@ instance FromField DRepStatus where
       "Retired"  -> return Retired
       _          -> returnError ConversionFailed f "Invalid DRepStatus"
 
-data DRepType = DRep | SoleVoter deriving (Eq, Show)
+data DRepType = DRep | SoleVoter
+  deriving (Eq, Show)
 
 instance FromField DRepType where
   fromField f mdata = do

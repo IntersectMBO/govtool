@@ -16,6 +16,7 @@ import { useAppContext } from "./appContext";
 type FeatureFlagContextType = {
   isProposalDiscussionForumEnabled: boolean;
   isGovernanceOutcomesPillarEnabled: boolean;
+  isCip179Enabled: boolean;
   isVotingOnGovernanceActionEnabled: (
     governanceActionType: GovernanceActionType,
   ) => boolean;
@@ -35,6 +36,7 @@ type FeatureFlagContextType = {
 const FeatureFlagContext = createContext<FeatureFlagContextType>({
   isProposalDiscussionForumEnabled: false,
   isGovernanceOutcomesPillarEnabled: false,
+  isCip179Enabled: false,
   isVotingOnGovernanceActionEnabled: () => false,
   areDRepVoteTotalsDisplayed: () => false,
   areSPOVoteTotalsDisplayed: () => false,
@@ -134,6 +136,10 @@ const FeatureFlagProvider = ({ children }: PropsWithChildren) => {
       isGovernanceOutcomesPillarEnabled:
         env.VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED === "true" ||
         env.VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED === true ||
+        false,
+      isCip179Enabled:
+        env.VITE_IS_CIP179_ENABLED === "true" ||
+        env.VITE_IS_CIP179_ENABLED === true ||
         false,
       isVotingOnGovernanceActionEnabled,
       areDRepVoteTotalsDisplayed,

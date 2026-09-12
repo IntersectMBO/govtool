@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import { Trans } from "react-i18next";
 
 import { Button, Radio, Typography } from "@atoms";
-import { useModal } from "@context";
+import { useCardano, useFeatureFlag, useModal } from "@context";
 import {
   useScreenDimension,
   useVoteActionForm,
@@ -15,6 +15,10 @@ import { formatDisplayDate } from "@utils";
 import { errorRed, fadedPurple } from "@/consts";
 import { ProposalData, ProposalVote, Vote } from "@/models";
 import { VoteContextModalState, SubmittedVotesModalState } from "../organisms";
+import {
+  Cip179Survey,
+  type Cip179Participation,
+} from "@/cip179/Cip179Survey";
 
 type VoteActionFormProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
@@ -34,6 +38,12 @@ export const VoteActionForm = ({
   const [voteContextUrl, setVoteContextUrl] = useState<string | undefined>();
   const [showWholeVoteContext, setShowWholeVoteContext] =
     useState<boolean>(false);
+  const [cip179, setCip179] = useState<Cip179Participation>({
+    participating: false,
+    valid: true,
+    response: null,
+    definition: null,
+  });
 
   const { voter } = useGetVoterInfo();
   const { voteContextText, valid: voteContextValid = true } =
@@ -46,6 +56,8 @@ export const VoteActionForm = ({
 
   const { isMobile } = useScreenDimension();
   const { openModal, closeModal } = useModal();
+  const { dRepID } = useCardano();
+  const { isCip179Enabled } = useFeatureFlag();
   const { t } = useTranslation();
 
   const {
@@ -56,7 +68,13 @@ export const VoteActionForm = ({
     setValue,
     vote,
     canVote,
-  } = useVoteActionForm({ previousVote, voteContextHash, voteContextUrl, closeModal });
+  } = useVoteActionForm({
+    previousVote,
+    voteContextHash,
+    voteContextUrl,
+    closeModal,
+    cip179,
+  });
 
   const handleVoteClick = (isVoteChanged:boolean) => {
     openModal({
@@ -340,6 +358,13 @@ export const VoteActionForm = ({
         )}
 
         <Box sx={{ mt: 4 }} />
+        {isCip179Enabled && (
+          <Cip179Survey
+            dRepId={dRepID}
+            proposal={proposal}
+            onChange={setCip179}
+          />
+        )}
       </Box>
       {previousVote?.vote && previousVote?.vote !== vote ? (
         <Box

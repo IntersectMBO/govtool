@@ -13,6 +13,7 @@ import { NodeObject } from "jsonld";
 
 import {
   GOVERNANCE_ACTION_CONTEXT,
+  GOVERNANCE_ACTION_CONTEXT_WITH_CIP179,
   PATHS,
   storageInformationErrorModals,
 } from "@consts";
@@ -27,6 +28,12 @@ import {
 } from "@utils";
 import { useWalletErrorModal } from "@hooks";
 import { MetadataValidationStatus } from "@models";
+import { API } from "@services";
+import {
+  decodeDefinition,
+  getRenderabilityProblem,
+  type SurveyDefinitionEnvelope,
+} from "@/cip179/core";
 import {
   GovernanceActionFieldSchemas,
   GovernanceActionType,
@@ -39,6 +46,7 @@ export type CreateGovernanceActionValues = {
   storeData?: boolean;
   storingURL: string;
   governance_action_type?: GovernanceActionType;
+  surveyTxId?: string;
 } & Partial<Record<keyof GovernanceActionFieldSchemas, string>>;
 
 export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues =
@@ -75,7 +83,7 @@ export const useCreateGovernanceActionForm = (
   const navigate = useNavigate();
   const { openModal, closeModal } = useModal();
   const openWalletErrorModal = useWalletErrorModal();
-  const { cExplorerBaseUrl } = useAppContext();
+  const { cExplorerBaseUrl, epochParams } = useAppContext();
 
   // Queries
   const { validateMetadata } = useValidateMutation();
@@ -111,17 +119,62 @@ export const useCreateGovernanceActionForm = (
   }, []);
 
   // Business Logic
+  const validateSurveyLink = useCallback(
+    async (surveyTxId?: string) => {
+      const normalized = surveyTxId?.trim().toLowerCase();
+      if (!normalized) return;
+      if (!/^[0-9a-f]{64}$/.test(normalized)) {
+        throw new Error("Survey transaction hash must be 64 hexadecimal characters");
+      }
+      if (
+        epochParams?.epoch_no === null ||
+        epochParams?.epoch_no === undefined ||
+        epochParams.gov_action_lifetime === null ||
+        epochParams.gov_action_lifetime === undefined
+      ) {
+        throw new Error("Current governance action lifetime is unavailable");
+      }
+      const { data } = await API.get<SurveyDefinitionEnvelope>(
+        `/survey/definition/${normalized}/0`,
+      );
+      const actionExpiration =
+        epochParams.epoch_no + epochParams.gov_action_lifetime + 1;
+      const definition = decodeDefinition(
+        data,
+        { txId: normalized, index: 0 },
+        actionExpiration,
+      );
+      const renderabilityProblem = getRenderabilityProblem(definition);
+      if (renderabilityProblem) throw new Error(renderabilityProblem);
+    },
+    [epochParams?.epoch_no, epochParams?.gov_action_lifetime],
+  );
+
   const generateMetadata = useCallback(async () => {
     if (!govActionType) {
       throw new Error("Governance action type is not defined");
     }
 
+    const values = getValues();
+    await validateSurveyLink(values.surveyTxId);
     const body = await generateMetadataBody({
-      data: getValues(),
+      data: values,
       acceptedKeys: ["title", "motivation", "abstract", "rationale"],
     });
+    if (!body) throw new Error("Could not generate governance metadata");
+    if (values.surveyTxId?.trim()) {
+      body.cip179 = {
+        specVersion: 5,
+        kind: "survey-link",
+        surveyTxId: values.surveyTxId.trim().toLowerCase(),
+        surveyIndex: 0,
+      };
+    }
 
-    const jsonld = await generateJsonld(body, GOVERNANCE_ACTION_CONTEXT);
+    const context = values.surveyTxId?.trim()
+      ? GOVERNANCE_ACTION_CONTEXT_WITH_CIP179
+      : GOVERNANCE_ACTION_CONTEXT;
+    const jsonld = await generateJsonld(body, context);
 
     const jsonHash = blake2bHex(JSON.stringify(jsonld, null, 2), undefined, 32);
 
@@ -130,7 +183,7 @@ export const useCreateGovernanceActionForm = (
     setJson(jsonld);
 
     return jsonld;
-  }, [getValues]);
+  }, [getValues, validateSurveyLink]);
 
   const onClickDownloadJson = useCallback(() => {
     if (!json) return;
@@ -310,6 +363,7 @@ export const useCreateGovernanceActionForm = (
       try {
         setIsLoading(true);
         showLoadingModal();
+        await validateSurveyLink(data.surveyTxId);
         if (!hash) throw MetadataValidationStatus.INVALID_HASH;
         const { status } = await validateMetadata({
           url: data.storingURL,
@@ -365,7 +419,12 @@ export const useCreateGovernanceActionForm = (
         setIsLoading(false);
       }
     },
-    [hash, buildTransaction, buildSignSubmitConwayCertTx],
+    [
+      hash,
+      buildTransaction,
+      buildSignSubmitConwayCertTx,
+      validateSurveyLink,
+    ],
   );
 
   return {

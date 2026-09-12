@@ -7,7 +7,10 @@ import { useLocation, useNavigate, useParams } from "react-router";
 import { PATHS } from "@consts";
 import { useCardano, useSnackbar } from "@context";
 import { useWalletErrorModal } from "@hooks";
+import { encodeMetadata, type SurveyResponse } from "cip-179";
 import { ProposalVote, Vote } from "@/models";
+import type { Cip179Participation } from "@/cip179/Cip179Survey";
+import { metadatumCodec } from "@/cip179/csl";
 
 export interface VoteActionFormValues {
   vote: string;
@@ -34,11 +37,13 @@ type Props = {
   voteContextHash?: string;
   voteContextUrl?: string;
   closeModal: () => void;
+  cip179?: Cip179Participation;
 };
 
 export const useVoteActionForm = ({
   previousVote,
   closeModal,
+  cip179,
 }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const { buildSignSubmitConwayCertTx, buildVote, isPendingTransaction } =
@@ -69,6 +74,7 @@ export const useVoteActionForm = ({
     index !== undefined &&
     index !== null &&
     !areFormErrors;
+  const canSubmitSurvey = !cip179?.participating || cip179.valid;
 
  const confirmVote = useCallback(
   async (
@@ -76,7 +82,7 @@ export const useVoteActionForm = ({
     url?: string,
     hashValue?: string | null,
   ) => {
-    if (!canVote || !voteValue) return;
+    if (!canVote || !canSubmitSurvey || !voteValue) return;
 
     setIsLoading(true);
 
@@ -95,10 +101,39 @@ export const useVoteActionForm = ({
         hashSubmitValue,
       );
 
+      let surveyResponse: SurveyResponse | null = cip179?.response ?? null;
+      if (
+        surveyResponse &&
+        cip179?.definition?.submissionMode.type === "sealed" &&
+        surveyResponse.answers.type === "public"
+      ) {
+        const { isQuicknet, sealAnswers } = await import("cip-179/tlock");
+        const mode = cip179.definition.submissionMode;
+        if (!isQuicknet(mode.chainHash)) {
+          throw new Error("This sealed survey uses an unsupported drand network");
+        }
+        const ciphertext = await sealAnswers(
+          metadatumCodec,
+          surveyResponse.answers.answers,
+          mode.round,
+          mode.paddingSize,
+        );
+        surveyResponse = {
+          ...surveyResponse,
+          answers: { type: "sealed", ciphertext },
+        };
+      }
+      const encodedMetadata = surveyResponse
+        ? encodeMetadata({ type: "responses", responses: [surveyResponse] })
+        : undefined;
+      const transactionMetadata =
+        encodedMetadata instanceof Map ? encodedMetadata : undefined;
+
       const result = await buildSignSubmitConwayCertTx({
         votingBuilder,
         type: "vote",
         resourceId: txHash + index,
+        transactionMetadata,
       });
 
       if (result) {
@@ -119,7 +154,15 @@ export const useVoteActionForm = ({
       setIsLoading(false);
     }
   },
-    [buildVote, buildSignSubmitConwayCertTx, txHash, index, canVote],
+    [
+      buildVote,
+      buildSignSubmitConwayCertTx,
+      txHash,
+      index,
+      canVote,
+      canSubmitSurvey,
+      cip179,
+    ],
   );
 
   return {
@@ -130,6 +173,6 @@ export const useVoteActionForm = ({
     isDirty,
     areFormErrors,
     isVoteLoading: isLoading,
-    canVote,
+    canVote: canVote && canSubmitSurvey,
   };
 };

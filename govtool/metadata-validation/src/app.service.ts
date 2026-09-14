@@ -3,78 +3,68 @@ import { catchError, finalize, firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import * as blake from 'blakejs';
 import { lookup } from 'node:dns/promises';
-import { isIP, LookupFunction } from 'node:net';
+import { LookupFunction } from 'node:net';
 import { Agent as HttpAgent } from 'node:http';
 import { Agent as HttpsAgent } from 'node:https';
+import * as ipaddr from 'ipaddr.js';
 
 import { ValidateMetadataDTO } from '@dto';
 import { LoggerMessage, MetadataValidationStatus } from '@enums';
 import { validateMetadataStandard, parseMetadata, getStandard } from '@utils';
 import { /* MetadataStandard, */ ValidateMetadataResult } from '@types';
 
+class UrlBlockedError extends Error {
+  readonly code = MetadataValidationStatus.URL_BLOCKED;
+
+  constructor() {
+    super(MetadataValidationStatus.URL_BLOCKED);
+    this.name = 'UrlBlockedError';
+  }
+}
+
 @Injectable()
 export class AppService {
   constructor(private readonly httpService: HttpService) {}
 
   private readonly safeHttpAgent = new HttpAgent({
+    keepAlive: true,
     lookup: this.createSafeLookup(),
   });
 
   private readonly safeHttpsAgent = new HttpsAgent({
+    keepAlive: true,
     lookup: this.createSafeLookup(),
   });
 
-  private isBlockedIPv4(address: string): boolean {
-    const parts = address.split('.').map(Number);
-    const [first, second] = parts;
-
-    return (
-      first === 0 ||
-      first === 10 ||
-      first === 127 ||
-      (first === 100 && second >= 64 && second <= 127) ||
-      (first === 169 && second === 254) ||
-      (first === 172 && second >= 16 && second <= 31) ||
-      (first === 192 && second === 0 && parts[2] === 0) ||
-      (first === 192 && second === 168) ||
-      (first === 198 && (second === 18 || second === 19)) ||
-      first >= 224
-    );
-  }
-
-  private isBlockedIPv6(address: string): boolean {
-    const normalized = address.toLowerCase();
-    const ipv4MappedPrefix = '::ffff:';
-
-    if (normalized.startsWith(ipv4MappedPrefix)) {
-      const mappedAddress = normalized.slice(ipv4MappedPrefix.length);
-      if (isIP(mappedAddress) === 4) {
-        return this.isBlockedIPv4(mappedAddress);
-      }
-    }
-
-    return (
-      normalized === '::' ||
-      normalized === '::1' ||
-      normalized.startsWith('fc') ||
-      normalized.startsWith('fd') ||
-      normalized.startsWith('fe80:') ||
-      normalized.startsWith('::ffff:0:')
-    );
+  private stripIPv6Brackets(hostname: string): string {
+    return hostname.startsWith('[') && hostname.endsWith(']')
+      ? hostname.slice(1, -1)
+      : hostname;
   }
 
   private isBlockedAddress(address: string): boolean {
-    const version = isIP(address);
-
-    if (version === 4) {
-      return this.isBlockedIPv4(address);
+    const normalized = this.stripIPv6Brackets(address);
+    if (!ipaddr.isValid(normalized)) {
+      return false;
     }
 
-    if (version === 6) {
-      return this.isBlockedIPv6(address);
+    return ipaddr.process(normalized).range() !== 'unicast';
+  }
+
+  private isUrlBlockedError(error: unknown): boolean {
+    if (!error || typeof error !== 'object') {
+      return false;
     }
 
-    return false;
+    const candidate = error as {
+      code?: unknown;
+      cause?: { code?: unknown };
+    };
+
+    return (
+      candidate.code === MetadataValidationStatus.URL_BLOCKED ||
+      candidate.cause?.code === MetadataValidationStatus.URL_BLOCKED
+    );
   }
 
   private async assertAllowedMetadataUrl(url: string): Promise<void> {
@@ -90,7 +80,7 @@ export class AppService {
       throw MetadataValidationStatus.URL_BLOCKED;
     }
 
-    const hostname = parsedUrl.hostname.toLowerCase();
+    const hostname = this.stripIPv6Brackets(parsedUrl.hostname.toLowerCase());
     if (hostname === 'localhost' || hostname.endsWith('.localhost')) {
       throw MetadataValidationStatus.URL_BLOCKED;
     }
@@ -119,10 +109,8 @@ export class AppService {
         .then((result) => {
           const addresses = Array.isArray(result) ? result : [result];
 
-          if (
-            addresses.some(({ address }) => this.isBlockedAddress(address))
-          ) {
-            callback(new Error(MetadataValidationStatus.URL_BLOCKED), '', 0);
+          if (addresses.some(({ address }) => this.isBlockedAddress(address))) {
+            callback(new UrlBlockedError(), '', 0);
             return;
           }
 
@@ -155,12 +143,13 @@ export class AppService {
 
     try {
       await this.assertAllowedMetadataUrl(url);
-
       const { data: rawData } = await firstValueFrom(
         this.httpService
           .get(url, {
             httpAgent: this.safeHttpAgent,
             httpsAgent: this.safeHttpsAgent,
+            maxRedirects: 0,
+            proxy: false,
             headers: {
               // Required to not being blocked by APIs that require a User-Agent
               'User-Agent': 'GovTool/Metadata-Validation-Tool',
@@ -175,6 +164,10 @@ export class AppService {
             finalize(() => Logger.log(`Fetching ${url} completed`)),
             catchError((error) => {
               Logger.error(error, JSON.stringify(error));
+              if (this.isUrlBlockedError(error)) {
+                throw MetadataValidationStatus.URL_BLOCKED;
+              }
+
               throw MetadataValidationStatus.URL_NOT_FOUND;
             }),
           ),

@@ -12,10 +12,11 @@
     "swagger-ui-express": "^5.0.0",
     "uuid": "^14.0.0"
   },
-   "resolutions": {
-    "qs": "^6.15.2",
+  "resolutions": {
+    "qs": "^6.16.0",
     "js-yaml": "^4.2.0",
     "brace-expansion": "^1.1.16",
-    "body-parser": "^2.3.0"
+    "body-parser": "^2.3.0",
+    "fast-uri": "^3.1.6"
   }
 }

@@ -230,7 +230,7 @@ changes.
 
 ### Changed
 
--
+- Changed copy on maintenance page to remove reference to a network.
 
 ### Removed
 

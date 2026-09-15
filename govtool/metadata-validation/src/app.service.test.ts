@@ -80,6 +80,8 @@ describe('AppService', () => {
       expect.objectContaining({
         httpAgent: expect.any(Object),
         httpsAgent: expect.any(Object),
+        maxRedirects: 0,
+        proxy: false,
       }),
     );
   });
@@ -154,6 +156,40 @@ describe('AppService', () => {
     expect(httpService.get).not.toHaveBeenCalled();
   });
 
+  it.each([
+    'http://[::]/metadata.json',
+    'http://[::1]/metadata.json',
+    'http://[fc00::1]/metadata.json',
+    'http://[fe90::1]/metadata.json',
+    'http://[febf::1]/metadata.json',
+    'http://[ff02::1]/metadata.json',
+    'http://[::ffff:7f00:1]/metadata.json',
+  ])('should block special-use IPv6 URL %s before fetching', async (url) => {
+    const result = await service.validateMetadata({ hash: 'hash', url });
+
+    expect(result).toEqual({
+      status: MetadataValidationStatus.URL_BLOCKED,
+      valid: false,
+      metadata: undefined,
+    });
+    expect(httpService.get).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    'http://192.0.2.1/metadata.json',
+    'http://198.51.100.1/metadata.json',
+    'http://203.0.113.1/metadata.json',
+  ])('should block reserved IPv4 URL %s before fetching', async (url) => {
+    const result = await service.validateMetadata({ hash: 'hash', url });
+
+    expect(result).toEqual({
+      status: MetadataValidationStatus.URL_BLOCKED,
+      valid: false,
+      metadata: undefined,
+    });
+    expect(httpService.get).not.toHaveBeenCalled();
+  });
+
   it('should block hostnames that resolve to private addresses', async () => {
     (lookup as jest.Mock).mockResolvedValueOnce([{ address: '10.0.0.5' }]);
 
@@ -214,5 +250,26 @@ describe('AppService', () => {
         });
       }),
     ).rejects.toThrow(MetadataValidationStatus.URL_BLOCKED);
+  });
+
+  it('should preserve URL_BLOCKED from a connection-time lookup', async () => {
+    const blockedError = Object.assign(
+      new Error(MetadataValidationStatus.URL_BLOCKED),
+      { code: MetadataValidationStatus.URL_BLOCKED },
+    );
+    jest
+      .spyOn(httpService, 'get')
+      .mockReturnValueOnce(throwError(() => blockedError));
+
+    const result = await service.validateMetadata({
+      hash: 'hash',
+      url: 'http://example.com',
+    });
+
+    expect(result).toEqual({
+      status: MetadataValidationStatus.URL_BLOCKED,
+      valid: false,
+      metadata: undefined,
+    });
   });
 });

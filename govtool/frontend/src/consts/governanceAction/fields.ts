@@ -395,3 +395,24 @@ export const GOVERNANCE_ACTION_CONTEXT = {
     },
   },
 };
+
+export const GOVERNANCE_ACTION_CONTEXT_WITH_CIP179 = {
+  ...GOVERNANCE_ACTION_CONTEXT,
+  CIP179:
+    "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0179/README.md#",
+  body: {
+    ...GOVERNANCE_ACTION_CONTEXT.body,
+    "@context": {
+      ...GOVERNANCE_ACTION_CONTEXT.body["@context"],
+      cip179: {
+        "@id": "CIP179:link",
+        "@context": {
+          specVersion: "CIP179:specVersion",
+          kind: "CIP179:kind",
+          surveyTxId: "CIP179:surveyTxId",
+          surveyIndex: "CIP179:surveyIndex",
+        },
+      },
+    },
+  },
+};

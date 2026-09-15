@@ -1,4 +1,5 @@
 node_modules/
+.browsers/
 /test-results/
 /playwright-report/
 /blob-report/

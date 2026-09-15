@@ -20,6 +20,7 @@
     "webpack-cli": "^5.1.4"
   },
   "scripts": {
+    "test:cip179": "playwright test --config playwright.cip179.config.ts",
     "package-wallet": "tsc ./lib/_mock/cardano-test-wallet/types.ts --outDir dist/@types/cardano-test-wallet --declaration && npx webpack",
     "allure:generate": "npx allure generate ./allure-results --clean",
     "allure:open": "npx allure open ./allure-report",

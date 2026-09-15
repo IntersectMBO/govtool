@@ -94,6 +94,8 @@ import {
   setProtocolParameterUpdate,
 } from "@utils";
 import { useTranslation } from "@hooks";
+import type { MetadatumMap } from "cip-179";
+import { buildAuxiliaryData } from "@/cip179/csl";
 import { AutomatedVotingOptionDelegationId } from "@/types/automatedVotingOptions";
 import { env } from "@/config/env";
 import { getUtxos } from "./getUtxos";
@@ -204,6 +206,7 @@ type BuildSignSubmitConwayCertTxArgs = {
   govActionBuilder?: VotingProposalBuilder;
   votingBuilder?: VotingBuilder;
   voter?: VoterInfo;
+  transactionMetadata?: MetadatumMap;
 } & (
   | Pick<TransactionStateWithoutResource, "type" | "resourceId">
   | Pick<TransactionStateWithResource, "type" | "resourceId">
@@ -579,6 +582,7 @@ const CardanoProvider = (props: Props) => {
       resourceId,
       type,
       votingBuilder,
+      transactionMetadata,
     }: BuildSignSubmitConwayCertTxArgs) => {
       await checkIsMaintenanceOn();
       const isPendingTx = isPendingTransaction();
@@ -587,6 +591,7 @@ const CardanoProvider = (props: Props) => {
       try {
         const txBuilder = await initTransactionBuilder();
         const transactionWitnessSet = TransactionWitnessSet.new();
+        let auxiliaryData: ReturnType<typeof buildAuxiliaryData> | undefined;
 
         if (!txBuilder) {
           throw new Error(t("errors.appCannotCreateTransaction"));
@@ -616,6 +621,11 @@ const CardanoProvider = (props: Props) => {
 
         if (govActionBuilder) {
           txBuilder.set_voting_proposal_builder(govActionBuilder);
+        }
+
+        if (transactionMetadata?.size) {
+          auxiliaryData = buildAuxiliaryData(transactionMetadata);
+          txBuilder.set_auxiliary_data(auxiliaryData);
         }
 
         if (isGuardrailScriptUsed.current) {
@@ -727,7 +737,7 @@ const CardanoProvider = (props: Props) => {
         const txBody = txBuilder.build();
 
         // Make a full transaction, passing in empty witness set
-        const tx = Transaction.new(txBody, transactionWitnessSet);
+        const tx = Transaction.new(txBody, transactionWitnessSet, auxiliaryData);
         // Ask wallet to to provide signature (witnesses) for the transaction
 
         // Create witness set object using the witnesses provided by the wallet
@@ -740,7 +750,13 @@ const CardanoProvider = (props: Props) => {
 
         transactionWitnessSet.set_vkeys(vkeys);
         // Build transaction with witnesses
-        const signedTx = Transaction.new(tx.body(), transactionWitnessSet);
+        const signedTx = Transaction.new(
+          tx.body(),
+          transactionWitnessSet,
+          // Transaction.new consumes auxiliaryData; retrieve it from the
+          // unsigned transaction to preserve its committed metadata hash.
+          tx.auxiliary_data(),
+        );
 
         // Submit built signed transaction to chain, via wallet's submit transaction endpoint
         const result = await walletApi.submitTx(signedTx.to_hex());

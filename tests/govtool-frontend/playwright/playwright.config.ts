@@ -12,6 +12,8 @@ import environments from "lib/constants/environments";
  */
 export default defineConfig({
   testDir: "./tests",
+  // Run these deterministic local tests with npm run test:cip179.
+  testIgnore: ["**/cip179/**"],
   /* Run tests in files in parallel */
   fullyParallel: true,
   /**TODO: Remove this timeout *
@@ -169,6 +171,7 @@ export default defineConfig({
       name: "independent (desktop)",
       use: { ...devices["Desktop Chrome"] },
       testIgnore: [
+        "**/cip179/**",
         "**/*.delegation.spec.ts",
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",
@@ -183,6 +186,7 @@ export default defineConfig({
       name: "mobile",
       use: { ...devices["Pixel 5"] },
       testIgnore: [
+        "**/cip179/**",
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",
         "**/*.delegation.spec.ts",

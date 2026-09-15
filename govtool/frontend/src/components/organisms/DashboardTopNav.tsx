@@ -12,7 +12,7 @@ import {
   DashboardDrawerMobile,
 } from "@organisms";
 import { useCardano } from "@context";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 
 type DashboardTopNavProps = {
   title: string;

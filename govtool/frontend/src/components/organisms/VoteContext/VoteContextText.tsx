@@ -1,49 +1,69 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useMemo } from "react";
 
 import { orange } from "@consts";
 import { Typography } from "@atoms";
 import { VoteContextWrapper } from "@organisms";
 import { useTranslation, useVoteContextForm } from "@/hooks";
 import { ControlledField } from "..";
+import { Vote } from "@/models";
 
 type VoteContextTextProps = {
   setStep: Dispatch<SetStateAction<number>>;
   onCancel: () => void;
+  confirmVote: (
+    vote?: Vote,
+    url?: string,
+    hash?: string | null,
+  ) => void;
+  vote?: Vote;
+  previousRationale? : string
 };
+const MAX_LENGTH = 10000;
 
 export const VoteContextText = ({
   setStep,
   onCancel,
+  confirmVote,
+  vote,
+  previousRationale
 }: VoteContextTextProps) => {
   const { t } = useTranslation();
 
   const { control, errors, watch } = useVoteContextForm();
-  const isContinueDisabled = !watch("voteContextText");
+  const currentRationale = watch("voteContextText");
+
+  const isRationaleChanged = useMemo(() => currentRationale !== previousRationale,
+                                       [currentRationale, previousRationale]);
+
+  const buttonLabel = useMemo(() => {
+    if (currentRationale === "") {
+      return t("govActions.voting.voteWithoutMetadata");
+    }
+    return t("govActions.voting.continue");
+  }, [currentRationale, t]);
 
   const fieldProps = {
-    key: "voteContextText",
     layoutStyles: { mb: 3 },
-    name: "voteContextText",
+    name: "voteContextText" as const,
     placeholder: t("govActions.provideContext"),
     rules: {
-      required: {
-        value: true,
-        message: t("createGovernanceAction.fields.validations.required"),
-      },
       maxLength: {
-        value: 500,
+        value: MAX_LENGTH,
         message: t("createGovernanceAction.fields.validations.maxLength", {
-          maxLength: 500,
+          maxLength: MAX_LENGTH,
         }),
       },
     },
   };
-
   return (
     <VoteContextWrapper
       onContinue={() => setStep(2)}
-      isContinueDisabled={isContinueDisabled}
+      isVoteWithMetadata={currentRationale !== ""}
       onCancel={onCancel}
+      onSkip={() => confirmVote(vote)}
+      continueLabel={buttonLabel}
+      isContinueDisabled={(previousRationale !== undefined && previousRationale !== null)
+        && !isRationaleChanged}
     >
       <Typography
         variant="body1"
@@ -64,14 +84,16 @@ export const VoteContextText = ({
         {t("govActions.provideContextAboutYourVote")}
       </Typography>
       <Typography variant="body1" sx={{ fontWeight: 400, mb: 2 }}>
-        {/* TODO: Update text when design is finalised */}
-        Additional information about your vote
+        {t("govActions.additionalInformationAboutYourVote")}
       </Typography>
       <ControlledField.TextArea
         {...{ control, errors }}
         {...fieldProps}
+        key="voteContextText"
         isModifiedLayout
+        maxLength={MAX_LENGTH}
         data-testid="provide-context-input"
+        defaultValue={previousRationale}
       />
     </VoteContextWrapper>
   );

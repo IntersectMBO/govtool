@@ -1,8 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within } from "storybook/test";
 
 import { Slider } from "@organisms";
-import { expect } from "@storybook/jest";
-import { within } from "@storybook/testing-library";
 
 const DATA = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 const BOX_SIZE = 200;
@@ -59,6 +58,6 @@ export const SliderComponentOverflow: Story = {
     await expect(canvas.getByText("Slider title")).toBeInTheDocument();
     await expect(canvas.getAllByTestId("slider")).toHaveLength(6);
 
-    await expect(canvas.getByRole("button")).toBeEnabled();
+    await expect(canvas.getByRole("link")).toBeEnabled();
   },
 };

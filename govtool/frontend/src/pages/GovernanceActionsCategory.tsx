@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import { Box, CircularProgress, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
@@ -8,9 +8,8 @@ import { useCardano, useDataActionsBar } from "@context";
 import {
   DataActionsBar,
   EmptyStateGovernanceActionsCategory,
-  GovernanceActionCard,
 } from "@molecules";
-import { Footer, TopNav } from "@organisms";
+import { Footer, TopNav, ValidatedGovernanceActionCard } from "@organisms";
 import {
   useGetProposalsInfiniteQuery,
   useFetchNextPageDetector,
@@ -21,7 +20,6 @@ import {
 } from "@hooks";
 import {
   WALLET_LS_KEY,
-  getFullGovActionId,
   getItemFromLocalStorage,
   getProposalTypeLabel,
   removeDuplicatedProposals,
@@ -139,23 +137,10 @@ export const GovernanceActionsCategory = () => {
                 >
                   {mappedData.map((item) => (
                     <Box pb={4.25} key={item.txHash + item.index}>
-                      <GovernanceActionCard
+                      <ValidatedGovernanceActionCard
                         {...item}
                         onClick={() => {
                           saveScrollPosition();
-
-                          navigate(
-                            PATHS.governanceActionsAction.replace(
-                              ":proposalId",
-                              getFullGovActionId(item.txHash, item.index),
-                            ),
-                            {
-                              state: {
-                                proposal: item,
-                                openedFromCategoryPage: true,
-                              },
-                            },
-                          );
                         }}
                       />
                     </Box>

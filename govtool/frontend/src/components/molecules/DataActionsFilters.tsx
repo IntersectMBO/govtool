@@ -29,9 +29,6 @@ export const DataActionsFilters = ({
 }: Props) => {
   const handleFilterChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      // TODO: Refine if it is needed to remove this eslint-disable
-      // eslint-disable-next-line no-unused-expressions, no-sequences
-      e.target.name, e.target.checked;
       let filters = [...chosenFilters];
       if (e.target.checked) {
         filters.push(e.target.name);
@@ -43,7 +40,7 @@ export const DataActionsFilters = ({
     [chosenFilters, setChosenFilters],
   );
 
-  const { isMobile, screenWidth } = useScreenDimension();
+  const { isMobile } = useScreenDimension();
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(wrapperRef, closeFilters);
@@ -58,7 +55,10 @@ export const DataActionsFilters = ({
         boxShadow: "1px 2px 11px 0px #00123D5E",
         borderRadius: "10px",
         padding: "12px 0px",
-        width: screenWidth < 850 ? "315px" : "415px",
+        width: {
+          xxs: "250px",
+          md: "415px",
+        },
         zIndex: "1",
         right: isMobile ? "59px" : "115px",
         top: "53px",

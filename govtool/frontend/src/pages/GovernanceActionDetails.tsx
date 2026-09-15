@@ -1,14 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   useNavigate,
   useLocation,
   useParams,
   generatePath,
-} from "react-router-dom";
+} from "react-router";
 import { Box, CircularProgress, Link } from "@mui/material";
+import { AxiosError } from "axios";
 
 import { Background, Typography } from "@atoms";
-import { ICONS, PATHS } from "@consts";
+import { ICONS, OUTCOMES_PATHS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
   useGetProposalQuery,
@@ -23,7 +24,8 @@ import {
   getShortenedGovActionId,
 } from "@utils";
 import { Breadcrumbs } from "@molecules";
-import { ProposalData } from "@/models";
+import { MetadataStandard, ProposalData } from "@/models";
+import { useValidateMutation } from "@/hooks/mutations";
 
 type GovernanceActionDetailsState = {
   proposal?: ProposalData;
@@ -42,21 +44,70 @@ export const GovernanceActionDetails = () => {
   const { t } = useTranslation();
   const { proposalId: txHash } = useParams();
 
-  const fullProposalId = txHash && getFullGovActionId(txHash, index);
-  const shortenedGovActionId = txHash && getShortenedGovActionId(txHash, index);
+  const fullProposalId = txHash && getFullGovActionId(txHash, +index);
+  const shortenedGovActionId = txHash && getShortenedGovActionId(txHash, +index);
 
-  const { data, isLoading } = useGetProposalQuery(
+  const { data, isLoading, error } = useGetProposalQuery(
     fullProposalId ?? "",
     !state?.proposal,
   );
-  const proposal = (data ?? state)?.proposal;
+  // TODO: Refactor this mess with proposals and metadata validation
+  // once authors are existing in all CIP-108 metadata
+  const [extendedProposal, setExtendedProposal] = useState<ProposalData>(
+    (data ?? state)?.proposal as ProposalData,
+  );
 
   useEffect(() => {
-    if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
+    if (data?.proposal) {
+      setExtendedProposal(data.proposal);
+    }
+  }, [data?.proposal]);
+
+  const [metadataStatus, setMetadataStatus] = useState<
+    MetadataValidationStatus | undefined
+  >();
+  const { validateMetadata } = useValidateMutation();
+
+  useEffect(() => {
+    if (!extendedProposal?.url) return;
+
+    const validate = async () => {
+      const { status, metadata } = await validateMetadata({
+        standard: MetadataStandard.CIP108,
+        url: extendedProposal?.url,
+        hash: extendedProposal?.metadataHash ?? "",
+      });
+
+      if (metadata) {
+        setExtendedProposal((prevProposal) => ({
+          ...(prevProposal || {}),
+          ...(metadata as Pick<
+            ProposalData,
+            "title" | "abstract" | "motivation" | "rationale"
+          >),
+        }));
+      }
+      setMetadataStatus(status);
+    };
+    validate();
+  }, [extendedProposal?.url]);
+
+  useEffect(() => {
+    const isProposalNotFound =
+      error instanceof AxiosError &&
+      error.response?.data.message.match(/Proposal with id: .* not found/);
+    if (isProposalNotFound && fullProposalId) {
+      navigate(
+        OUTCOMES_PATHS.governanceActionOutcomes.replace(":id", fullProposalId),
+      );
+    } else if (
+      isEnabled &&
+      getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)
+    ) {
       const { pathname } = window.location;
       navigate(`/connected${pathname}`);
     }
-  }, [isEnabled]);
+  }, [isEnabled, error]);
 
   return (
     <Background opacity={0.7}>
@@ -93,8 +144,8 @@ export const GovernanceActionDetails = () => {
             <Breadcrumbs
               elementOne={t("govActions.title")}
               elementOnePath={PATHS.governanceActions}
-              elementTwo={proposal?.title ?? ""}
-              isDataMissing={proposal?.metadataStatus ?? null}
+              elementTwo={extendedProposal?.title ?? ""}
+              isDataMissing={metadataStatus ?? null}
             />
             <Link
               sx={{
@@ -104,7 +155,7 @@ export const GovernanceActionDetails = () => {
               }}
               onClick={() =>
                 navigate(
-                  state && state.openedFromCategoryPage
+                  state?.openedFromCategoryPage
                     ? generatePath(PATHS.governanceActionsCategory, {
                         category: state?.proposal?.type,
                       })
@@ -130,11 +181,11 @@ export const GovernanceActionDetails = () => {
               >
                 <CircularProgress />
               </Box>
-            ) : proposal ? (
+            ) : extendedProposal ? (
               <Box data-testid="governance-action-details">
                 <GovernanceActionDetailsCard
-                  isDataMissing={proposal.metadataStatus}
-                  proposal={proposal}
+                  isDataMissing={metadataStatus}
+                  proposal={extendedProposal}
                 />
               </Box>
             ) : (

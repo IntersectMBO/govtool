@@ -9,6 +9,7 @@ export enum MetadataValidationStatus {
 export enum MetadataStandard {
   CIP108 = "CIP108",
   CIP119 = "CIP119",
+  CIP100 = "CIP100"
 }
 
 export type ValidateMetadataResult<MetadataType> = {

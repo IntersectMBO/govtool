@@ -2,18 +2,23 @@ import { dRep02Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { ShelleyWallet } from "@helpers/crypto";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
-import { skipIfNotHardFork } from "@helpers/cardano";
+import {
+  skipIfMainnet,
+  skipIfTemporyWalletIsNotAvailable,
+} from "@helpers/cardano";
 import EditDRepPage from "@pages/editDRepPage";
 import { expect } from "@playwright/test";
+import { dRep02AuthFile } from "@constants/auth";
+import { generateInvalidDRepInfo, generateValidDRepInfo } from "@helpers/dRep";
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
-  await skipIfNotHardFork();
+  await skipIfMainnet();
+  await skipIfTemporyWalletIsNotAvailable("registerDRepCopyWallets.json");
 });
 
-test.use({ wallet: dRep02Wallet, storageState: ".auth/dRep02.json" });
+test.use({ wallet: dRep02Wallet, storageState: dRep02AuthFile });
 
 test.describe("Validation of edit dRep Form", () => {
   test("3M_1. Should accept valid data in edit dRep form", async ({ page }) => {
@@ -23,28 +28,11 @@ test.describe("Validation of edit dRep Form", () => {
     await editDRepPage.goto();
 
     // wait until wallet alert close
-    await page.waitForTimeout(5_000);
+    await expect(page.getByTestId("alert-success")).not.toBeVisible();
 
     for (let i = 0; i < 100; i++) {
-      await editDRepPage.validateForm({
-        name: mockValid.name(),
-        objectives: faker.lorem.paragraph(2),
-        motivations: faker.lorem.paragraph(2),
-        qualifications: faker.lorem.paragraph(2),
-        paymentAddress: (await ShelleyWallet.generate()).addressBech32(0),
-        linksReferenceLinks: [
-          {
-            url: faker.internet.url(),
-            description: faker.internet.displayName(),
-          },
-        ],
-        identityReferenceLinks: [
-          {
-            url: faker.internet.url(),
-            description: faker.internet.displayName(),
-          },
-        ],
-      });
+      const validDRepInfo = await generateValidDRepInfo();
+      await editDRepPage.validateForm(validDRepInfo);
     }
 
     for (let i = 0; i < 6; i++) {
@@ -69,86 +57,58 @@ test.describe("Validation of edit dRep Form", () => {
     const editDRepPage = new EditDRepPage(page);
     await editDRepPage.goto();
 
-    await page.waitForTimeout(3_000); // wait until dRep information load properly
+    await expect(page.getByTestId("alert-success")).not.toBeVisible();
 
     for (let i = 0; i < 100; i++) {
-      await editDRepPage.inValidateForm({
-        name: mockInvalid.name(),
-        objectives: faker.lorem.paragraph(40),
-        motivations: faker.lorem.paragraph(40),
-        qualifications: faker.lorem.paragraph(40),
-        paymentAddress: faker.string.alphanumeric(45),
-        linksReferenceLinks: [
-          {
-            url: mockInvalid.url(),
-            description: faker.lorem.paragraph(40),
-          },
-        ],
-        identityReferenceLinks: [
-          {
-            url: mockInvalid.url(),
-            description: faker.lorem.paragraph(40),
-          },
-        ],
-      });
+      const invalidDRepInfo = generateInvalidDRepInfo();
+      await editDRepPage.inValidateForm(invalidDRepInfo);
     }
   });
 
-  test("3N_1. Should accept valid metadata anchor on edit dRep", async ({
-    page,
-  }) => {
-    const editDRepPage = new EditDRepPage(page);
-    await editDRepPage.goto();
+  test.describe("Metadata anchor Validation", () => {
+    let editDRepPage: EditDRepPage;
+    test.beforeEach(async ({ page }) => {
+      editDRepPage = new EditDRepPage(page);
+      await editDRepPage.goto();
 
-    const dRepName = "Test_DRep";
-    await editDRepPage.nameInput.fill(dRepName);
+      const dRepName = faker.person.firstName();
+      await editDRepPage.nameInput.fill(dRepName);
 
-    await editDRepPage.continueBtn.click();
-    await page.getByRole("checkbox").click();
-    await editDRepPage.registerBtn.click();
-
-    for (let i = 0; i < 100; i++) {
-      await editDRepPage.metadataUrlInput.fill(mockValid.url());
-      await expect(page.getByTestId("invalid-url-error")).toBeHidden();
-    }
-  });
-
-  test("3N_2. Should reject invalid dRep metadata anchor on edit dRep", async ({
-    page,
-  }) => {
-    const editDRepPage = new EditDRepPage(page);
-    await editDRepPage.goto();
-
-    const dRepName = "Test_DRep";
-    await editDRepPage.nameInput.fill(dRepName);
-
-    await editDRepPage.continueBtn.click();
-    await page.getByRole("checkbox").click();
-    await editDRepPage.registerBtn.click();
-
-    for (let i = 0; i < 100; i++) {
-      const invalidUrl = mockInvalid.url(false);
-      await editDRepPage.metadataUrlInput.fill(invalidUrl);
-      if (invalidUrl.length <= 128) {
-        await expect(page.getByTestId("invalid-url-error")).toBeVisible();
-      } else {
-        await expect(
-          page.getByTestId("url-must-be-less-than-128-bytes-error")
-        ).toBeVisible();
+      await editDRepPage.continueBtn.click();
+      await page.getByRole("checkbox").click();
+      await editDRepPage.registerBtn.click();
+    });
+    test("3N_1. Should accept valid metadata anchor on edit dRep", async ({
+      page,
+    }) => {
+      for (let i = 0; i < 100; i++) {
+        await editDRepPage.metadataUrlInput.fill(mockValid.url());
+        await expect(page.getByTestId("invalid-url-error")).toBeHidden();
       }
-    }
+    });
 
-    const sentenceWithoutSpace = faker.lorem
-      .sentence(128)
-      .replace(/[\s.]/g, "");
-    const metadataAnchorGreaterThan128Bytes =
-      faker.internet.url({ appendSlash: true }) + sentenceWithoutSpace;
-
-    await editDRepPage.metadataUrlInput.fill(metadataAnchorGreaterThan128Bytes);
-
-    await expect(
-      page.getByTestId("url-must-be-less-than-128-bytes-error")
-    ).toBeVisible();
+    test("3N_2. Should reject invalid dRep metadata anchor on edit dRep", async ({
+      page,
+    }) => {
+      for (let i = 0; i < 100; i++) {
+        const invalidUrl = mockInvalid.url(false);
+        const sentenceWithoutSpace = faker.lorem
+          .sentence({ min: 128, max: 500 })
+          .replace(/[\s.]/g, "");
+        const metadataAnchorGreaterThan128Bytes =
+          faker.internet.url({ appendSlash: true }) + sentenceWithoutSpace;
+        const checkedUrl =
+          Math.random() > 0.5 ? invalidUrl : metadataAnchorGreaterThan128Bytes;
+        await editDRepPage.metadataUrlInput.fill(checkedUrl);
+        if (checkedUrl.length <= 128) {
+          await expect(page.getByTestId("invalid-url-error")).toBeVisible();
+        } else {
+          await expect(
+            page.getByTestId("url-must-be-less-than-128-bytes-error")
+          ).toBeVisible();
+        }
+      }
+    });
   });
 });
 

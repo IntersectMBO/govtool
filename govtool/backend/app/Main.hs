@@ -8,7 +8,7 @@
 
 module Main where
 
-import           Control.Exception                      (Exception, SomeException, fromException, throw)
+import           Control.Exception                      (IOException, Exception, SomeException, fromException, throw)
 import           Control.Lens.Operators                 ((.~))
 import           Control.Monad
 import           Control.Monad.IO.Class
@@ -16,16 +16,18 @@ import           Control.Monad.Trans.Except
 import           Control.Monad.Trans.Reader
 
 import           Data.Aeson                             hiding (Error)
+import           Data.Aeson                             (encode)
 import qualified Data.ByteString                        as BS
 import           Data.ByteString.Char8                  (unpack)
 import qualified Data.Cache                             as Cache
 import           Data.Function                          ((&))
 import           Data.Has                               (getter)
+import           Data.List                              (isInfixOf)
 import           Data.Monoid                            (mempty)
 import           Data.OpenApi                           (OpenApi, Server (Server), _openApiServers,
                                                          _serverDescription, _serverUrl, _serverVariables,
                                                          servers)
-import           Data.Pool                              (createPool)
+import           Data.Pool                              (createPool, Pool)
 import           Data.Proxy
 import           Data.String                            (fromString)
 import           Data.String.Conversions                (cs)
@@ -34,8 +36,8 @@ import           Data.Text.Encoding                     (encodeUtf8)
 import qualified Data.Text.IO                           as Text
 import qualified Data.Text.Lazy                         as LazyText
 import qualified Data.Text.Lazy.Encoding                as LazyText
-
-import           Database.PostgreSQL.Simple             (close, connectPostgreSQL)
+import qualified Data.ByteString.Lazy.Char8             as BS8
+import           Database.PostgreSQL.Simple             (close, connectPostgreSQL, Connection)
 
 import           Network.Wai
 import           Network.Wai.Handler.Warp
@@ -53,7 +55,7 @@ import           System.Clock                           (TimeSpec (TimeSpec))
 import           System.IO                              (stderr)
 import           System.Log.Raven                       (initRaven, register, silentFallback)
 import           System.Log.Raven.Transport.HttpConduit (sendRecord)
-import           System.Log.Raven.Types                 (SentryLevel (Error), SentryRecord (..))
+import           System.Log.Raven.Types                 (SentryLevel (Error), SentryRecord (..), SentryService)
 import           System.TimeManager                     (TimeoutThread (..))
 
 import           VVA.API
@@ -61,8 +63,19 @@ import           VVA.API.Types
 import           VVA.CommandLine
 import           VVA.Config
 import           VVA.Types                              (AppEnv (..),
-                                                         AppError (CriticalError, InternalError, NotFoundError, ValidationError),
+                                                         AppError (..),
                                                          CacheEnv (..))
+import           VVA.Ipfs                              (IpfsError(..))
+
+
+-- Function to create a connection pool with optimized settings
+createOptimizedConnectionPool :: BS.ByteString -> IO (Pool Connection)
+createOptimizedConnectionPool connectionString = createPool
+  (connectPostgreSQL connectionString) -- Connection creation function
+  close                                -- Connection destruction function
+  1                                   -- Idle timeout (seconds)
+  2                                    -- Number of stripes (sub-pools)
+  60                                   -- Maximum number of connections per stripe
 
 proxyAPI :: Proxy (VVAApi :<|> SwaggerAPI)
 proxyAPI = Proxy
@@ -71,18 +84,25 @@ main :: IO ()
 main = do
   commandLineConfig <- execParser cmdParser
   vvaConfig <- loadVVAConfig (clcConfigPath commandLineConfig)
+  sentryService <-
+    initRaven
+      (sentryDSN vvaConfig)
+      id
+      sendRecord
+      silentFallback
   case clcCommand commandLineConfig of
-    StartApp   -> startApp vvaConfig
+    StartApp   -> startApp vvaConfig sentryService
     ShowConfig -> Text.putStrLn $ vvaConfigToText vvaConfig
 
-startApp :: VVAConfig -> IO ()
-startApp vvaConfig = do
+startApp :: VVAConfig -> SentryService -> IO ()
+startApp vvaConfig sentryService = do
   let vvaPort = serverPort vvaConfig
       vvaHost = fromString (Text.unpack (serverHost vvaConfig))
       settings =
         setPort vvaPort
           $ setHost vvaHost
-          $ setTimeout 120 -- 120 seconds timeout
+          $ setTimeout 300-- 300 seconds timeout
+          $ setGracefulShutdownTimeout (Just 60) -- Allow 60 seconds for cleanup
           $ setBeforeMainLoop
             ( Text.hPutStrLn stderr $
                 Text.pack
@@ -92,9 +112,10 @@ startApp vvaConfig = do
                       ++ show vvaPort
                   )
             )
-          $ setOnException (exceptionHandler vvaConfig) defaultSettings
+          $ setOnException (exceptionHandler vvaConfig sentryService) defaultSettings
   cacheEnv <- do
     let newCache = Cache.newCache (Just $ TimeSpec (fromIntegral (cacheDurationSeconds vvaConfig)) 0)
+    let newDRepListCache = Cache.newCache (Just $ TimeSpec (fromIntegral (dRepListCacheDurationSeconds vvaConfig)) 0)
     proposalListCache <- newCache
     getProposalCache <- newCache
     currentEpochCache <- newCache
@@ -103,8 +124,12 @@ startApp vvaConfig = do
     dRepGetVotesCache <- newCache
     dRepInfoCache <- newCache
     dRepVotingPowerCache <- newCache
-    dRepListCache <- newCache
+    dRepListCache <- newDRepListCache
     networkMetricsCache <- newCache
+    networkInfoCache <- newCache
+    networkTotalStakeCache <- newCache
+    dRepVotingPowerListCache <- newCache
+    accountInfoCache <- newCache
     return $ CacheEnv
       { proposalListCache
       , getProposalCache
@@ -116,15 +141,21 @@ startApp vvaConfig = do
       , dRepVotingPowerCache
       , dRepListCache
       , networkMetricsCache
+      , networkInfoCache
+      , networkTotalStakeCache
+      , dRepVotingPowerListCache
+      , accountInfoCache
       }
-  connectionPool <- createPool (connectPostgreSQL (encodeUtf8 (dbSyncConnectionString $ getter vvaConfig))) close 10 10 120
+
+  let connectionString = encodeUtf8 (dbSyncConnectionString $ getter vvaConfig)
+  connectionPool <- createOptimizedConnectionPool connectionString
+
   let appEnv = AppEnv {vvaConfig=vvaConfig, vvaCache=cacheEnv, vvaConnectionPool=connectionPool }
   server' <- mkVVAServer appEnv
   runSettings settings server'
 
-exceptionHandler :: VVAConfig -> Maybe Request -> SomeException -> IO ()
-exceptionHandler vvaConfig mRequest exception = do
-  print mRequest
+exceptionHandler :: VVAConfig -> SentryService -> Maybe Request -> SomeException -> IO ()
+exceptionHandler vvaConfig sentryService mRequest exception = do
   print exception
   let isNotTimeoutThread x = case fromException x of
         Just TimeoutThread -> False
@@ -132,23 +163,34 @@ exceptionHandler vvaConfig mRequest exception = do
       isNotConnectionClosedByPeer x = case fromException x of
         Just ConnectionClosedByPeer -> False
         _                           -> True
-  guard . isNotTimeoutThread $ exception
-  guard . isNotConnectionClosedByPeer $ exception
+      isNotClientClosedConnection x =
+        case fromException x of
+          Just ioe -> not ("Warp: Client closed connection prematurely" `isInfixOf` show (ioe :: IOException))
+          Nothing  -> True
+      isNotThreadKilledByTimeoutManager x =
+          "Thread killed by timeout manager" `notElem` lines (show x)
+      isNotUserErrorMzero x = case fromException x of
+        Just ioe -> not ("user error (mzero)" `isInfixOf` show (ioe :: IOException))
+        _        -> True
+
+      isGuardException =
+        isNotTimeoutThread exception &&
+        isNotConnectionClosedByPeer exception &&
+        isNotClientClosedConnection exception &&
+        isNotThreadKilledByTimeoutManager exception &&
+        isNotUserErrorMzero exception
+
+  guard isGuardException
+
   let env = sentryEnv vvaConfig
-  sentryService <-
-    initRaven
-      (sentryDSN vvaConfig)
-      id
-      sendRecord
-      silentFallback
-  register
-    sentryService
-    "vva.be"
-    Error
-    (formatMessage mRequest exception)
-    (recordUpdate env mRequest exception)
-
-
+  case mRequest of
+    Nothing -> return ()
+    Just _  -> register
+      sentryService
+      "vva.be"
+      Error
+      (formatMessage mRequest exception)
+      (recordUpdate env mRequest exception)
 
 formatMessage :: Maybe Request -> SomeException -> String
 formatMessage Nothing exception = "Exception before request could be parsed: " ++ show exception
@@ -250,10 +292,15 @@ liftServer appEnv =
   where
     handleErrors :: Either AppError a -> Handler a
     handleErrors (Right x) = pure x
-    handleErrors (Left (ValidationError msg)) = throwError $ err400 { errBody = BS.fromStrict $ encodeUtf8 msg }
-    handleErrors (Left (NotFoundError msg)) = throwError $ err404 { errBody = BS.fromStrict $ encodeUtf8 msg }
-    handleErrors (Left (CriticalError msg)) = throwError $ err500 { errBody = BS.fromStrict $ encodeUtf8 msg }
-    handleErrors (Left (InternalError msg)) = throwError $ err500 { errBody = BS.fromStrict $ encodeUtf8 msg }
+    handleErrors (Left appError) = do
+      let status = case appError of
+            ValidationError _ -> err400
+            NotFoundError _   -> err404
+            CriticalError _   -> err500
+            InternalError _   -> err500
+            AppIpfsError (OtherIpfsError _)    -> err400
+            AppIpfsError _    -> err503
+      throwError $ status { errBody = encode appError, errHeaders = [("Content-Type", "application/json")] }
 -- * Swagger
 
 type SwaggerAPI = SwaggerSchemaUI "swagger-ui" "swagger.json"

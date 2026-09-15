@@ -4,13 +4,12 @@ import {
   createContext,
   useContext,
   useCallback,
-  useEffect,
 } from "react";
 import { NodeObject } from "jsonld";
 import { blake2bHex } from "blakejs";
 import * as Sentry from "@sentry/react";
 
-import { CIP_108, GOVERNANCE_ACTION_CONTEXT } from "@/consts";
+import { GOVERNANCE_ACTION_CONTEXT } from "@/consts";
 import { generateJsonld, generateMetadataBody } from "@/utils";
 
 type GovActionMetadata = {
@@ -43,17 +42,12 @@ const GovernanceActionProvider = ({ children }: PropsWithChildren) => {
    * @returns The JSON-LD representation of the governance action.
    */
 
-  useEffect(() => {
-    Sentry.setTag("component_name", "GovernanceActionProvider");
-  }, []);
-
   const createGovernanceActionJsonLD = useCallback(
     async (govActionMetadata: GovActionMetadata) => {
       try {
-        const metadataBody = generateMetadataBody({
+        const metadataBody = await generateMetadataBody({
           data: govActionMetadata,
           acceptedKeys: ["title", "abstract", "motivation", "rationale"],
-          standardReference: CIP_108,
         });
 
         const jsonLD = await generateJsonld(

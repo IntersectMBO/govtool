@@ -8,6 +8,24 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const app = express();
 
 
+
+const dynamicCors = (req, res, next) => {
+    const origin = req.headers.origin
+
+    // Allow requests from any origin but with credentials
+    res.header('Access-Control-Allow-Origin', origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Credentials', 'true');
+
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+        res.sendStatus(200);
+    } else {
+        next();
+    }
+};
+
 const dataDir = process.env.DATA_DIR || path.join(__dirname, 'json_files');
 
 if (!fs.existsSync(dataDir)) {
@@ -30,6 +48,9 @@ const swaggerOptions = {
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
+// cors enable
+app.use(dynamicCors);
 
 // Serve Swagger UI
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

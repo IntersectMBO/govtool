@@ -12,6 +12,234 @@ changes.
 
 ### Added
 
+### Fixed
+
+- Fix disappearing proposals in the governance actions list for the same tx hashes [Issue 3918](https://github.com/IntersectMBO/govtool/issues/3918)
+- Fix incorrect display of new committee parameters in Governance Action details [Issue 3954](https://github.com/IntersectMBO/govtool/issues/3954)
+
+### Changed
+
+### Removed
+
+## [v2.0.29](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.29) 2025-07-16
+
+
+### Added
+
+- Preserve maintenance ending banner state on the wallet connection change [Issue 3681](https://github.com/IntersectMBO/govtool/issues/3681)
+- Add authors for Live Voting Governance Actions [Issue 3745](https://github.com/IntersectMBO/govtool/issues/3745)
+- Add support for ed25519 author signature validation on gov actions [Issue 3745](https://github.com/IntersectMBO/govtool/issues/3745)
+
+### Fixed
+
+- Fix blank page on dRep details when link or identity references contain objects: { @value: ... } not strings [Issue 3733](https://github.com/IntersectMBO/govtool/issues/3733)
+- Fix missing off chain references in DRep details [Issue 3490](https://github.com/IntersectMBO/govtool/issues/3490)
+- Fix blank screen and type error on linkReferences when navigating to edit dRep page that has no links [Issue 3714](https://github.com/IntersectMBO/govtool/issues/3714)
+- Fix adding two link input fields when editing the dRep form when no links are present initially [Issue 3709](https://github.com/IntersectMBO/govtool/issues/3709)
+- Fix images in Governance Action Details are displayed at full width and height without cropping or clipping [Issue 3837](https://github.com/IntersectMBO/govtool/issues/3837)
+- Fix missing page titles on subpages: DRep details and Gov Actions details [Issue 3142](https://github.com/IntersectMBO/govtool/issues/3142)
+
+### Changed
+- Adjust top menu (navbar) layout when wallet is not connected [Issue-3682](https://github.com/IntersectMBO/govtool/issues/3682)
+- Unification of sections 'Receiving Address' and 'Amount' in Treasury Withdrawal Governance Action [Issue-3828](https://github.com/IntersectMBO/govtool/issues/3828)
+
+### Removed
+
+## [v2.0.23](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.23) 2025-05-22
+
+### Added
+
+- Add CIP-129 support for gov_actions hashes in Live Voting (governance actions) [Issue 3619](https://github.com/IntersectMBO/govtool/issues/3619)
+
+- Add maintenance ending banner [Issue 3647](https://github.com/IntersectMBO/govtool/issues/3647)
+- Add support for the Protocol Parameter Change and Hard Fork Initiation governance actions
+
+### Fixed
+
+- Fix displaying proposals title in details page [Issue 3192](https://github.com/IntersectMBO/govtool/issues/3192)
+
+### Changed
+
+### Removed
+
+## [v2.0.22](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.22) 2025-05-15
+
+### Added
+
+### Fixed
+
+- Fix an issue where the submit button remained disabled after removing an invalid value from the IMAGE input field on DRrep form [Issue 3560](https://github.com/IntersectMBO/govtool/issues/3560)
+- Fix app crash on unhandled wallet error [Issue 3123](https://github.com/IntersectMBO/govtool/issues/3123)
+- Preserve new lines in markdown text [Issue 2712](https://github.com/IntersectMBO/govtool/issues/2712)
+- Add scroll to markdown tables [Issue 3615](https://github.com/IntersectMBO/govtool/issues/3615)
+
+### Changed
+
+### Removed
+
+## [v2.0.21](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.21) 2025-05-09
+
+### Added
+
+- Add support for the tables in markdown [Issue 3581](https://github.com/IntersectMBO/govtool/issues/3581)
+
+### Fixed
+
+- Fix invalid metadata status background on voted on card
+
+### Changed
+
+- Update first CTA on GovTool home page [Issue 3467](https://github.com/IntersectMBO/govtool/issues/3467)
+- Change link to docs in learn more about governance [Issue 3494](https://github.com/IntersectMBO/govtool/issues/3494)
+
+### Removed
+
+- Remove additional canonicalization of the metadata [Issue 3591](https://github.com/IntersectMBO/govtool/issues/3591)
+
+## [v2.0.20](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.20) 2025-04-16
+
+### Added
+
+- Add Proposal discussion context that manages username [Issue 3341](https://github.com/IntersectMBO/govtool/issues/3341)
+- Add epochParams and ada holder balance to Proposal Discussion Pillar [Issue 2243](https://github.com/IntersectMBO/govtool/issues/2243)
+- Add skeleton element to the drep and governance action cards on validation [Issue 3247](https://github.com/IntersectMBO/govtool/issues/3247)
+- Add mock for the authors field in governance metadata [Issue 3307](https://github.com/IntersectMBO/govtool/issues/3307)
+- Add uncontrolled image input to improve performance of large base64 encoded image strings
+- Add snackbar to pdf
+
+### Fixed
+
+- Fix scroll on a drawer on smaller resolution
+- Fix incorrect routing on connecting wallet on budget discussion page
+- Fix missing validation on failed image sha generation [Issue 3246](https://github.com/IntersectMBO/govtool/issues/3246)
+- Fix validating drep metadata
+
+### Changed
+
+- Change budget proposal nav item label
+
+### Removed
+
+## [v2.0.19](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.19) 2025-03-31
+
+### Added
+
+- Add budget discussion paths in the wrapper
+
+### Fixed
+
+- Fix missing redirect to outcomes on wallet disconnected state [Issue 3230](https://github.com/IntersectMBO/govtool/issues/3230)
+
+### Changed
+
+### Removed
+
+## [v2.0.18](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.18) 2025-03-26
+
+### Added
+
+- Add redirection to outcomes when proposal is not found [Issue 3230](https://github.com/IntersectMBO/govtool/issues/3230)
+- Add DRep voting power list endpoint [Issue 3263](https://github.com/IntersectMBO/govtool/issues/3263)
+- Add DRep given name to the voting power list endpoint [Issue 3273](https://github.com/IntersectMBO/govtool/issues/3273)
+- Add DRep voting power list query to PDF Pillar [Issue 3277](https://github.com/IntersectMBO/govtool/issues/3277)
+
+### Fixed
+
+- Fix post-vote navigation to governance action list [Issue 3242](https://github.com/IntersectMBO/govtool/issues/3242)
+
+### Changed
+
+## [v2.0.4](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.4) 2025-01-07
+
+### Added
+
+-
+
+### Fixed
+
+- Fix CIP-129 DRep view identifier for script based DReps [Issue 2583](https://github.com/IntersectMBO/govtool/issues/2583)
+- Fix fetching metadata from IPFS gateway
+- Fix bad request on passing the random sorting to GA list request [Issue 2535](https://github.com/IntersectMBO/govtool/issues/2535)
+- Fix wrong drep activity conditions
+
+### Changed
+
+- Reduce CSL version to 12.1.1 [Issue 2600](https://github.com/IntersectMBO/govtool/issues/2600)
+
+### Removed
+
+-
+
+## [v2.0.3](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.3) 2024-12-30
+
+### Added
+
+-
+
+### Fixed
+
+- Fix calculating DRep live voting power [Issue 2460](https://github.com/IntersectMBO/govtool/issues/2460)
+- Fix link and description validation [Issue 2403](https://github.com/IntersectMBO/govtool/issues/2403)
+- Revert to drep_distr for providing active voting power
+- Add rewards amount in the ada holder voting power
+- Fix nested @value in jsonld metadatas [Issue 2509](https://github.com/IntersectMBO/govtool/issues/2509)
+- Fix fetching latest voting anchor after DRep updates
+
+### Changed
+
+- Split New constitution on-chain details into tabs
+
+### Removed
+
+-
+
+## [v2.0.2](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.2) 2024-12-23
+
+### Added
+
+- Add preprod adjustments [Issue 2547](https://github.com/IntersectMBO/govtool/issues/2547)
+
+### Fixed
+
+- Move matomo initalization out of the react code
+- Fix some non-ipfs related errors while fetching the DRep images [Issue 2546](https://github.com/IntersectMBO/govtool/issues/2546)
+- Remaining mobile responsiveness issue [Issue 2493](https://github.com/IntersectMBO/govtool/issues/2493)
+- Fix searching by CIP-129 identifiers [Issue 2571](https://github.com/IntersectMBO/govtool/issues/2571)
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v2.0.1](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.1) 2024-12-16
+
+### Added
+
+- Integrate matomo analytics
+
+### Fixed
+
+- Fix mzero parsing error on fetching the /proposal/list [Issue 2446](https://github.com/IntersectMBO/govtool/issues/2446)
+- Fix scaling gov action votes on lower resolutions
+- Fix storing url missing length validation [Issue 2044](https://github.com/IntersectMBO/govtool/issues/2044)
+- Fix governance action details page crash on missing data [Issue 2511](https://github.com/IntersectMBO/govtool/issues/2511)
+- Fix wrong voting conditions for drep
+
+### Changed
+
+- Changed copy on maintenance page to remove reference to a network.
+
+### Removed
+
+-
+
+## [v2.0.0](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.0) 2024-12-10
+
+### Added
+
 -
 
 ### Fixed
@@ -20,7 +248,79 @@ changes.
 
 ### Changed
 
-- Changed copy on maintenance page to remove reference to a network.
+- Bump @intersect.mbo/pdf-ui to v0.5.5
+- Change limit of active db connections
+
+### Removed
+
+-
+
+## [v1.0.30](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.30) 2024-12-10
+
+### Added
+
+- Add stake key registration certificate to voting and gov action proposal if not registered [Issue 2490](https://github.com/IntersectMBO/govtool/issues/2490)
+
+### Fixed
+
+- Fix vulnerabilities in dependencies [Issue 2192](https://github.com/IntersectMBO/govtool/issues/2192)
+- Optimize resources usage in frontend service build [Issue 2192](https://github.com/IntersectMBO/govtool/issues/2192)
+- Fix sentry reports on multiple reloads of Governance Actions [Issue 2446](https://github.com/IntersectMBO/govtool/issues/2446)
+
+### Changed
+
+-
+
+### Removed
+
+-
+
+## [v1.0.29](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.29) 2024-12-05
+
+### Added
+
+- Add support for displaying CIP-119 DRep images [Issue 1806](https://github.com/IntersectMBO/govtool/issues/1806)
+
+### Fixed
+
+- Fix fetching voting power of newly registerd DRep [Issue 2407](https://github.com/IntersectMBO/govtool/issues/2407)
+- Fix inconsistent voting status [Issue 1713](https://github.com/IntersectMBO/govtool/issues/1713)
+- Fix removing a child (link) when is not registed in DOM [Issue 2398](https://github.com/IntersectMBO/govtool/issues/2398)
+- Fix blank screen on DRep delegation when UTXos are missing [Issue 2408](https://github.com/IntersectMBO/govtool/issues/2408)
+- Fix broken guides links [Issue 2417](https://github.com/IntersectMBO/govtool/issues/2417)
+- Fix double signing of transaction [Issue 2478](https://github.com/IntersectMBO/govtool/issues/2478)
+
+### Changed
+
+- Bump cardano-db-sync to 13.6.0.4 [Issue 2411](https://github.com/IntersectMBO/govtool/issues/2411)
+- Bump @intersect.mbo/pdf-ui to v0.5.3
+- Bump @intersect.mbo/pdf-ui to v0.5.4
+
+### Removed
+
+-
+
+## [v1.0.28](https://github.com/IntersectMBO/govtool/releases/tag/v1.0.28) 2024-11-26
+
+### Added
+
+- Add more useful metrics to the backend GET /network/metrics endpoint [Issue 2010](https://github.com/IntersectMBO/govtool/issues/2010)
+
+### Fixed
+
+- Fix ada holder voting power calculation
+- Fix wrong statuses on past DRep info
+- Fix listing voted-on governance actions [Issue 2379](https://github.com/IntersectMBO/govtool/issues/2379)
+- Fix wronly displayed markdown on slider card [Issue 2263](https://github.com/IntersectMBO/govtool/issues/2316)
+- fix ada quantities format to avoid thousands when the total is 0 [Issue 2372](https://github.com/IntersectMBO/govtool/issues/2382)
+- fix inconsistent display of delegated DRep card during delegation [Issue 2332](https://github.com/IntersectMBO/govtool/issues/2332)
+
+### Changed
+
+- Bump CSL version to 13.1.0 [Issue 2169](https://github.com/IntersectMBO/govtool/issues/2169)
+- Display supporting links below labels than in same row [Issue 2391](https://github.com/IntersectMBO/govtool/issues/2391)
+- change link to support page [Issue 2292](https://github.com/IntersectMBO/govtool/issues/2292)
+- Bump @intersect.mbo/pdf-ui to v0.5.0
 
 ### Removed
 

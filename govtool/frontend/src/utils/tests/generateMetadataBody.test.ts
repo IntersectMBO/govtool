@@ -1,31 +1,26 @@
-import { CIP_108 } from "@consts";
-
 import { generateMetadataBody } from "../generateMetadataBody";
 
 describe("generateMetadataBody", () => {
-  it("generates metadata body with filtered data", () => {
+  it("generates metadata body with filtered data", async () => {
     const data = {
       name: "John Doe",
       age: 30,
       email: "johndoe@example.com",
     };
     const acceptedKeys = ["name", "age"];
-    const standardReference = CIP_108;
 
-    const result = generateMetadataBody({
+    const result = await generateMetadataBody({
       data,
       acceptedKeys,
-      standardReference,
     });
 
     expect(result).toEqual({
-      "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#name":
-        "John Doe",
-      "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#age": 30,
+      name: "John Doe",
+      age: 30,
     });
   });
 
-  it("generates metadata body with filtered data and references", () => {
+  it("generates metadata body with filtered data and references", async () => {
     const data = {
       name: "John Doe",
       age: 30,
@@ -36,47 +31,37 @@ describe("generateMetadataBody", () => {
       ],
     };
     const acceptedKeys = ["name", "age"];
-    const standardReference = CIP_108;
 
-    const result = generateMetadataBody({
+    const result = await generateMetadataBody({
       data,
       acceptedKeys,
-      standardReference,
     });
 
     expect(result).toEqual({
-      "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#name":
-        "John Doe",
-      "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#age": 30,
-      "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#references":
-        [
-          {
-            "@type": "Other",
-            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#reference-label":
-              "Label",
-            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#reference-uri":
-              "https://example.com/link1",
-          },
-          {
-            "@type": "Other",
-            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#reference-label":
-              "Label",
-            "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#reference-uri":
-              "https://example.com/link2",
-          },
-        ],
+      name: "John Doe",
+      age: 30,
+      references: [
+        {
+          "@type": "Other",
+          label: "Label",
+          uri: "https://example.com/link1",
+        },
+        {
+          "@type": "Other",
+          label: "Label",
+          uri: "https://example.com/link2",
+        },
+      ],
     });
   });
 
-  it("generates metadata body with empty data", () => {
+  it("generates metadata body with empty data", async () => {
     const data = {};
     const acceptedKeys = ["name", "age"];
-    const standardReference = CIP_108;
 
-    const result = generateMetadataBody({
+    const result = await generateMetadataBody({
       data,
       acceptedKeys,
-      standardReference,
     });
 
     expect(result).toEqual({});

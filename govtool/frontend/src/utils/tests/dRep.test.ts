@@ -14,9 +14,8 @@ const EXAMPLE_DREP: DRepData = {
   status: DRepStatus.Active,
   type: "DRep" as TDRepType,
   givenName: "name",
-  references: [],
-  metadataStatus: null,
-  metadataValid: true,
+  identityReferences: [],
+  linkReferences: [],
   latestRegistrationDate: "2024-07-10",
   paymentAddress: null,
   objectives: null,
@@ -24,6 +23,8 @@ const EXAMPLE_DREP: DRepData = {
   qualifications: null,
   doNotList: false,
   isScriptBased: false,
+  imageUrl: null,
+  image: null,
 };
 
 describe("isSameDRep function", () => {

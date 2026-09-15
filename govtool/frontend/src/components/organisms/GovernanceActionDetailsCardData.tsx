@@ -1,7 +1,11 @@
-import { useMemo, useState } from "react";
-import { Box, Tabs, Tab, styled } from "@mui/material";
+import { useMemo, useState, useEffect } from "react";
+import { Box, Tabs, Tab, styled, Skeleton, Link } from "@mui/material";
+import { useLocation } from "react-router";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
-import { CopyButton, ExternalModalButton, Typography } from "@atoms";
+import { CopyButton, ExternalModalButton, Tooltip, Typography } from "@atoms";
 import {
   GovernanceActionCardElement,
   GovernanceActionDetailsCardLinks,
@@ -11,6 +15,7 @@ import {
   GovernanceActionDetailsDiffView,
   GovernanceActionNewCommitteeDetailsTabContent,
   GovernanceActionCardTreasuryWithdrawalElement,
+  GovernanceActionNewConstitutionDetailsTabContent,
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
@@ -21,14 +26,14 @@ import {
   getFullGovActionId,
   mapArrayToObjectByKeys,
   encodeCIP129Identifier,
+  validateSignature,
 } from "@utils";
-import {
-  MetadataValidationStatus,
-  NewConstitutionAnchor,
-  ProposalData,
-} from "@models";
+import { MetadataValidationStatus, ProposalData } from "@models";
+import { Trans } from "react-i18next";
+import { errorRed, successGreen } from "@/consts";
 import { GovernanceActionType } from "@/types/governanceAction";
 import { useAppContext } from "@/context";
+import { theme } from "@/theme";
 
 type TabPanelProps = {
   children?: React.ReactNode;
@@ -44,7 +49,8 @@ type StyledTabProps = {
   isMobile: boolean;
 };
 
-const StyledTab = styled((props: StyledTabProps) => (
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const StyledTab = styled(({ isMobile, ...props }: StyledTabProps) => (
   <Tab disableRipple {...props} />
 ))(({ isMobile }) => ({
   textTransform: "none",
@@ -60,10 +66,11 @@ const StyledTab = styled((props: StyledTabProps) => (
 
 type GovernanceActionDetailsCardDataProps = {
   isDashboard?: boolean;
-  isDataMissing: MetadataValidationStatus | null;
+  isDataMissing?: MetadataValidationStatus;
   isInProgress?: boolean;
   isOneColumn: boolean;
   isSubmitted?: boolean;
+  isValidating?: boolean;
   proposal: ProposalData;
 };
 
@@ -73,8 +80,11 @@ export const GovernanceActionDetailsCardData = ({
   isInProgress,
   isOneColumn,
   isSubmitted,
+  isValidating,
   proposal: {
     abstract,
+    authors,
+    json: jsonContent,
     createdDate,
     createdEpochNo,
     details,
@@ -91,12 +101,14 @@ export const GovernanceActionDetailsCardData = ({
     url,
     type,
     protocolParams,
+    metadataHash,
   },
 }: GovernanceActionDetailsCardDataProps) => {
   const { epochParams } = useAppContext();
   const { t } = useTranslation();
   const { screenWidth } = useScreenDimension();
   const { isMobile } = useScreenDimension();
+  const { pathname, hash } = useLocation();
 
   const mappedArraysToObjectsProtocolParams = useMemo(
     () =>
@@ -149,6 +161,17 @@ export const GovernanceActionDetailsCardData = ({
       ? getFullGovActionId(prevGovActionTxHash, prevGovActionIndex)
       : null;
 
+  const govActionLinkToShare = `${window.location.protocol}//${
+    window.location.hostname
+  }${window.location.port ? `:${window.location.port}` : ""}${pathname}${
+    hash ?? ""
+  }`;
+
+  const isItMLabsWithdrawal =
+    type === GovernanceActionType.TreasuryWithdrawals &&
+    cip129GovernanceActionId ===
+      "gov_action18nefry4qacd80xzs2srjahxm2e4vz3c8wvrr03rrtk8mdqfuknysq66459t";
+
   const tabs = useMemo(
     () =>
       [
@@ -200,6 +223,19 @@ export const GovernanceActionDetailsCardData = ({
           ),
           visible: type === GovernanceActionType.NewCommittee && !!details,
         },
+        {
+          label: "Details",
+          dataTestId: "parameters-tab",
+          content: (
+            <GovernanceActionNewConstitutionDetailsTabContent
+              details={details}
+            />
+          ),
+          visible:
+            type === GovernanceActionType.NewConstitution &&
+            !!details &&
+            !!details?.anchor,
+        },
       ].filter((tab) => tab.visible),
     [
       abstract,
@@ -221,9 +257,15 @@ export const GovernanceActionDetailsCardData = ({
         overflow: "hidden",
       }}
     >
-      <DataMissingHeader isDataMissing={isDataMissing} title={title} />
+      <DataMissingHeader
+        isDataMissing={isDataMissing}
+        isValidating={isValidating}
+        title={title}
+        shareLink={govActionLinkToShare}
+      />
       <DataMissingInfoBox
         isDataMissing={isDataMissing}
+        isValidating={isValidating}
         isInProgress={isInProgress}
         isSubmitted={isSubmitted}
       />
@@ -232,35 +274,43 @@ export const GovernanceActionDetailsCardData = ({
         text={label}
         textVariant="pill"
         dataTestId={`${getProposalTypeNoEmptySpaces(label)}-type`}
+        isValidating={isValidating}
       />
       <GovernanceActionsDatesBox
         createdDate={createdDate}
         expiryDate={expiryDate}
         expiryEpochNo={expiryEpochNo}
         createdEpochNo={createdEpochNo}
+        isValidating={isValidating}
       />
-      {isDataMissing && (
-        <ExternalModalButton
-          url={url}
-          label={t("govActions.seeExternalData")}
-        />
-      )}
-      <GovernanceActionCardElement
-        label={t("govActions.governanceActionId")}
-        text={govActionId}
-        isCopyButton
-        dataTestId={`${govActionId}-id`}
-        textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
-      />
+      {isDataMissing &&
+        (isValidating ? (
+          <Skeleton height="24px" width="128px" variant="text" />
+        ) : (
+          <ExternalModalButton
+            url={url}
+            label={t("govActions.seeExternalData")}
+          />
+        ))}
       <GovernanceActionCardElement
         label={t("govActions.cip129GovernanceActionId")}
         text={cip129GovernanceActionId}
         dataTestId={`${cip129GovernanceActionId}-id`}
         isCopyButton
         textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
+        isValidating={isValidating}
+      />
+      <GovernanceActionCardElement
+        label={t("govActions.governanceActionId")}
+        text={govActionId}
+        isCopyButton
+        dataTestId={`${govActionId}-id`}
+        textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
+        isSemiTransparent
+        isValidating={isValidating}
       />
 
-      {tabs.length === 1 ? (
+      {tabs?.length === 1 ? (
         tabs[0].content
       ) : (
         <>
@@ -297,7 +347,8 @@ export const GovernanceActionDetailsCardData = ({
           ))}
         </>
       )}
-      {details &&
+      {!isValidating &&
+        details &&
         type === GovernanceActionType.TreasuryWithdrawals &&
         Array.isArray(details) &&
         details.map((withdrawal) => (
@@ -307,26 +358,69 @@ export const GovernanceActionDetailsCardData = ({
             amount={withdrawal.amount}
           />
         ))}
-      {details?.anchor && type === GovernanceActionType.NewConstitution && (
+      {/* NewConstitution metadata hash and url is visible in details tab */}
+      {!isValidating && type !== GovernanceActionType.NewConstitution && (
         <>
           <GovernanceActionCardElement
-            isCopyButton
-            label="Data Hash"
-            text={
-              (details?.anchor as NewConstitutionAnchor)?.dataHash as string
-            }
-            dataTestId="new-constitution-data-hash"
+            label={t("govActions.anchorURL")}
+            text={url}
             textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
+            dataTestId="anchor-url"
+            isLinkButton
+            isValidating={isValidating}
           />
           <GovernanceActionCardElement
-            isCopyButton
-            label="URL"
-            text={(details?.anchor as NewConstitutionAnchor)?.url as string}
-            dataTestId="new-constitution-url"
+            label={t("govActions.anchorHash")}
+            text={metadataHash}
             textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
+            dataTestId="anchor-hash"
+            isCopyButton
+            isValidating={isValidating}
           />
         </>
       )}
+      <GovernanceActionCardElement
+        label={t("govActions.authors.title")}
+        textVariant="longText"
+        dataTestId="authors"
+      >
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+          {(authors ?? []).length <= 0
+            ? t("govActions.authors.noDataAvailable")
+            : (authors ?? []).map((author) => (
+              <Box
+                key={author.publicKey}
+                sx={{ display: "flex", gap: 0.5, alignItems: "center" }}
+              >
+                <AuthorSignatureStatus
+                  signature={author.signature}
+                  publicKey={author.publicKey}
+                  algorithm={author.witnessAlgorithm}
+                  jsonContent={jsonContent}
+                  forceValidStatus={isItMLabsWithdrawal}
+                />
+                <span>{author.name}</span>
+                <Tooltip
+                  heading={`${t("govActions.authors.witnessAlgorithm")}: ${
+                      author.witnessAlgorithm
+                    }`}
+                  paragraphOne={`${t("govActions.authors.publicKey")}: ${
+                      author.publicKey
+                    }`}
+                  paragraphTwo={`${t("govActions.authors.signature")}: ${
+                      author.signature
+                    }`}
+                  placement="bottom-end"
+                  arrow
+                >
+                  <InfoOutlinedIcon fontSize="small" />
+                </Tooltip>
+              </Box>
+              ))}
+          {isItMLabsWithdrawal && authors && authors.length > 0 && <AuthorsVerificationInfoBox />}
+        </Box>
+      </GovernanceActionCardElement>
+
       <GovernanceActionDetailsCardLinks links={references} />
     </Box>
   );
@@ -336,7 +430,10 @@ const ReasoningTabContent = ({
   abstract,
   motivation,
   rationale,
-}: Pick<ProposalData, "abstract" | "motivation" | "rationale">) => {
+  isValidating,
+}: Pick<ProposalData, "abstract" | "motivation" | "rationale"> & {
+  isValidating?: boolean;
+}) => {
   const { t } = useTranslation();
 
   return (
@@ -347,6 +444,7 @@ const ReasoningTabContent = ({
         textVariant="longText"
         dataTestId="abstract"
         isMarkdown
+        isValidating={isValidating}
       />
       <GovernanceActionCardElement
         label={t("govActions.motivation")}
@@ -354,6 +452,7 @@ const ReasoningTabContent = ({
         textVariant="longText"
         dataTestId="motivation"
         isMarkdown
+        isValidating={isValidating}
       />
       <GovernanceActionCardElement
         label={t("govActions.rationale")}
@@ -361,6 +460,7 @@ const ReasoningTabContent = ({
         textVariant="longText"
         dataTestId="rationale"
         isMarkdown
+        isValidating={isValidating}
       />
     </>
   );
@@ -369,7 +469,9 @@ const ReasoningTabContent = ({
 const HardforkDetailsTabContent = ({
   details,
   prevGovActionId,
-}: Pick<ProposalData, "details"> & { prevGovActionId: string | null }) => {
+}: Pick<ProposalData, "details"> & {
+  prevGovActionId: string | null;
+}) => {
   const { epochParams } = useAppContext();
   const { t } = useTranslation();
 
@@ -417,6 +519,114 @@ const HardforkDetailsTabContent = ({
         ) : (
           <Typography variant="body2">-</Typography>
         )}
+      </Box>
+    </Box>
+  );
+};
+
+const AuthorSignatureStatus = ({
+  algorithm,
+  publicKey,
+  signature,
+  jsonContent,
+  forceValidStatus = false,
+}: {
+  algorithm?: string;
+  publicKey?: string;
+  signature?: string;
+  jsonContent?: Record<string, unknown>;
+  forceValidStatus: boolean;
+}) => {
+  const { t } = useTranslation();
+
+  const [isSignatureValid, setIsSignatureValid] = useState<boolean | null>(
+    null,
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    async function checkSignature() {
+      const args = {
+        jsonContent,
+        algorithm,
+        publicKey,
+        signature,
+      };
+      const result = await validateSignature(args);
+      if (!cancelled) setIsSignatureValid(result);
+    }
+    if (forceValidStatus) {
+      return setIsSignatureValid(true);
+    }
+    checkSignature();
+    return () => {
+      cancelled = true;
+    };
+  }, [algorithm, jsonContent, publicKey, signature]);
+
+  if (isSignatureValid === null) {
+    return <Skeleton variant="text" width={16} />;
+  }
+  return (
+    <Tooltip
+      heading={
+        isSignatureValid
+          ? t("govActions.authors.singatureVerified")
+          : t("govActions.authors.signatureNotVerified")
+      }
+      placement="bottom-end"
+      arrow
+    >
+      {isSignatureValid ? (
+        <CheckCircleOutlineIcon
+          sx={{ color: successGreen.c500 }}
+          fontSize="small"
+        />
+      ) : (
+        <CancelOutlinedIcon sx={{ color: errorRed.c500 }} fontSize="small" />
+      )}
+    </Tooltip>
+  );
+};
+
+const AuthorsVerificationInfoBox = () => {
+  const { t } = useTranslation();
+  const {
+    palette: { lightBlue, secondaryBlue },
+  } = theme;
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        gap: 1,
+        backgroundColor: lightBlue,
+        p: 2,
+        borderRadius: "5px",
+      }}
+    >
+      <InfoOutlinedIcon fontSize="small" style={{ color: secondaryBlue }} />
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Typography variant="body2">
+          {t("govActions.safeModeInfoBox.title")}
+        </Typography>
+        <Typography variant="body2">
+          {t("govActions.safeModeInfoBox.line1")}
+        </Typography>
+        <Typography variant="body2">
+          <Trans
+            i18nKey="govActions.safeModeInfoBox.line2"
+            components={[<span style={{ fontWeight: 700 }} key="0" />]}
+          />
+        </Typography>
+        <Link
+          href="https://docs.gov.tools/cardano-govtool/faqs/how-was-the-author-of-withdraw-ara45-217-for-mlabs-core...-ga-verified"
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{ fontSize: "14px" }}
+        >
+          {t("govActions.safeModeInfoBox.link")}
+        </Link>
       </Box>
     </Box>
   );

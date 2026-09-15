@@ -1,33 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Box, CircularProgress, Tab, Tabs, styled } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
 
 import {
   GOVERNANCE_ACTIONS_FILTERS,
   GOVERNANCE_ACTIONS_SORTING,
+  PATHS,
+  PDF_PATHS,
 } from "@consts";
-import { useCardano, useDataActionsBar } from "@context";
-import {
-  useGetProposalsQuery,
-  useGetVoterInfo,
-  useScreenDimension,
-  useTranslation,
-} from "@hooks";
+import { useCardano, useDataActionsBar, useFeatureFlag } from "@context";
+import { useGetVoterInfo, useScreenDimension, useTranslation } from "@hooks";
 import { DataActionsBar } from "@molecules";
 import {
   GovernanceActionsToVote,
   DashboardGovernanceActionsVotedOn,
 } from "@organisms";
+import { Button } from "@atoms";
 
 type TabPanelProps = {
   children?: React.ReactNode;
   index: number;
   value: number;
 };
-
-const defaultCategories = GOVERNANCE_ACTIONS_FILTERS.map(
-  (category) => category.key,
-);
 
 const CustomTabPanel = (props: TabPanelProps) => {
   const { children, value, index } = props;
@@ -49,6 +43,8 @@ const CustomTabPanel = (props: TabPanelProps) => {
   );
 };
 
+const temporaryProposeButtonRemove: boolean = true;
+
 type StyledTabProps = {
   label: string;
 };
@@ -67,30 +63,31 @@ const StyledTab = styled((props: StyledTabProps) => (
 }));
 
 export const DashboardGovernanceActions = () => {
-  const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
-  const { chosenFilters, chosenSorting } = dataActionsBarProps;
+  const { debouncedSearchText, ...dataActionsBarProps } =
+    useDataActionsBar();
   const { voter } = useGetVoterInfo();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
   const { isEnableLoading } = useCardano();
-
-  const queryFilters =
-    chosenFilters.length > 0 ? chosenFilters : defaultCategories;
-
-  const { proposals, isProposalsLoading } = useGetProposalsQuery({
-    filters: queryFilters,
-    sorting: chosenSorting,
-    searchPhrase: debouncedSearchText,
-  });
-
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
+  const navigate = useNavigate();
   const { state } = useLocation();
+
   const [content, setContent] = useState<number>(
-    state && state.isVotedListOnLoad ? 1 : 0,
+    state?.isVotedListOnLoad ? 1 : 0,
   );
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setContent(newValue);
   };
+
+  const onClickPropose = useCallback(() => {
+    navigate(
+      isProposalDiscussionForumEnabled
+        ? PDF_PATHS.proposalDiscussionPropose
+        : PATHS.createGovernanceAction,
+    );
+  }, [isProposalDiscussionForumEnabled]);
 
   useEffect(() => {
     window.history.replaceState({}, document.title);
@@ -111,7 +108,7 @@ export const DashboardGovernanceActions = () => {
           filtersTitle={t("govActions.filterTitle")}
           sortOptions={GOVERNANCE_ACTIONS_SORTING}
         />
-        {!proposals || !voter || isEnableLoading || isProposalsLoading ? (
+        {!voter || isEnableLoading ? (
           <Box
             alignItems="center"
             display="flex"
@@ -124,51 +121,59 @@ export const DashboardGovernanceActions = () => {
         ) : (
           <>
             {(voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter) && (
-              <Tabs
-                sx={{
-                  marginTop: 3,
-                  display: "flex",
-                  fontSize: 16,
-                  fontWeight: 500,
-                }}
-                value={content}
-                indicatorColor="secondary"
-                onChange={handleChange}
-                aria-label="Governance Actions tabs"
-              >
-                <StyledTab
-                  data-testid="to-vote-tab"
-                  label={t("govActions.toVote")}
+              <Box display="flex" flexDirection="row" alignItems="center">
+                <Tabs
                   sx={{
-                    textTransform: "none",
-                    width: !isMobile ? "auto" : "50%",
+                    marginTop: 3,
+                    display: "flex",
+                    fontSize: 16,
+                    fontWeight: 500,
                   }}
-                />
-                <StyledTab
-                  data-testid="voted-tab"
-                  label={t("govActions.votedOnByMe")}
+                  value={content}
+                  indicatorColor="secondary"
+                  onChange={handleChange}
+                  aria-label="Governance Actions tabs"
+                >
+                  <StyledTab
+                    data-testid="to-vote-tab"
+                    label={t("govActions.toVote")}
+                    sx={{
+                      textTransform: "none",
+                      width: !isMobile ? "auto" : "50%",
+                    }}
+                  />
+                  <StyledTab
+                    data-testid="voted-tab"
+                    label={t("govActions.votedOnByMe")}
+                    sx={{
+                      textTransform: "none",
+                      width: !isMobile ? "auto" : "50%",
+                    }}
+                  />
+                </Tabs>
+                <Button
+                  data-testid="proposal-discussion-link"
+                  onClick={onClickPropose}
                   sx={{
-                    textTransform: "none",
-                    width: !isMobile ? "auto" : "50%",
+                    display:
+                      isMobile || temporaryProposeButtonRemove
+                        ? "none"
+                        : "block",
+                    ml: "auto",
                   }}
-                />
-              </Tabs>
+                >
+                  {t("govActions.propose")}
+                </Button>
+              </Box>
             )}
+
             <Box height={isMobile ? 24 : 60} />
             <CustomTabPanel value={content} index={0}>
-              <GovernanceActionsToVote
-                filters={chosenFilters}
-                onDashboard
-                searchPhrase={debouncedSearchText}
-                sorting={chosenSorting}
-                proposals={proposals}
-              />
+              <GovernanceActionsToVote onDashboard />
             </CustomTabPanel>
             <CustomTabPanel value={content} index={1}>
               <DashboardGovernanceActionsVotedOn
-                filters={chosenFilters}
                 searchPhrase={debouncedSearchText}
-                sorting={chosenSorting}
               />
             </CustomTabPanel>
           </>

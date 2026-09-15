@@ -1,4 +1,3 @@
-import { faucetWallet } from "@constants/staticWallets";
 import {
   KuberValue,
   ProtocolParams,
@@ -6,11 +5,13 @@ import {
   WalletAndAnchorType,
 } from "@types";
 import * as blake from "blakejs";
-import environments from "lib/constants/environments";
+import environments from "@constants/environments";
 import { LockInterceptor, LockInterceptorInfo } from "lib/lockInterceptor";
 import fetch, { BodyInit, RequestInit } from "node-fetch";
-import { cborxDecoder, cborxEncoder } from "../helpers/cborEncodeDecode";
+import { cborxEncoder } from "@helpers/encodeDecode";
 import { Logger } from "@helpers/logger";
+import { blockfrostSubmitTransaction } from "@services/blockfrostService";
+import { getWalletConfigForFaucet } from "@helpers/index";
 
 type CertificateType = "registerstake" | "registerdrep" | "deregisterdrep";
 
@@ -99,20 +100,17 @@ class Kuber {
       `Submitting tx: ${JSON.stringify({ lock_id: lockId, tx: signedTx })}`
     );
 
-    const res = (await callKuber(
-      `/api/${this.version}/tx?submit=true`,
+    const response = (await callKuber(
+      `/api/${this.version}/tx?submit=false`,
       "POST",
       JSON.stringify(signedTx)
     )) as any;
-    let decodedTx = cborxDecoder.decode(Buffer.from(res.cborHex, "hex"));
-    const submittedTxBody = Uint8Array.from(cborxEncoder.encode(decodedTx[0]));
-    const submittedTxHash = Buffer.from(
-      blake.blake2b(submittedTxBody, undefined, 32)
-    ).toString("hex");
+    const cborSignedTx = Buffer.from(response.cborHex, "hex");
 
+    const submittedTxHash = await blockfrostSubmitTransaction(cborSignedTx);
     Logger.success(`Tx submitted: ${submittedTxHash}`);
     return {
-      cbor: res.cborHex,
+      cbor: response.cborHex,
       txId: submittedTxHash,
     };
   }
@@ -138,8 +136,12 @@ const kuberService = {
     });
   },
   // register stake and outputs 20A
-  initializeWallets: (wallets: StaticWallet[]) => {
-    const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
+  initializeWallets: (
+    wallets: StaticWallet[],
+    faucetAddress: string = getWalletConfigForFaucet().address,
+    faucetStakeKey: string = getWalletConfigForFaucet().payment.private
+  ) => {
+    const kuber = new Kuber(faucetAddress, faucetStakeKey);
     const outputs = [];
     const stakes = [];
     const certificates = [];
@@ -163,8 +165,31 @@ const kuberService = {
       certificates,
     });
   },
+  mergeUtXos: (wallets: StaticWallet[]) => {
+    const kuber = new Kuber(
+      getWalletConfigForFaucet().address,
+      getWalletConfigForFaucet().payment.private
+    );
+    const selections = wallets.map((wallet) => ({
+      type: "PaymentSigningKeyShelley_ed25519",
+      description: "Payment Signing Key",
+      cborHex: "5820" + wallet.payment.private,
+    }));
+
+    const inputs = wallets.map((wallet) => wallet.address);
+    inputs.push(getWalletConfigForFaucet().address);
+    return kuber.signAndSubmitTx({
+      inputs,
+      selections,
+      changeAddress: getWalletConfigForFaucet().address,
+    });
+  },
+
   transferADA: (receiverAddressList: string[], ADA = 20) => {
-    const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
+    const kuber = new Kuber(
+      getWalletConfigForFaucet().address,
+      getWalletConfigForFaucet().payment.private
+    );
     const req = {
       outputs: receiverAddressList.map((addr) => {
         return {
@@ -177,9 +202,11 @@ const kuberService = {
   },
 
   multipleTransferADA: (
-    outputs: { address: string; value: string | number }[]
+    outputs: { address: string; value: string | number }[],
+    addr = getWalletConfigForFaucet().address,
+    signingKey = getWalletConfigForFaucet().payment.private
   ) => {
-    const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
+    const kuber = new Kuber(addr, signingKey);
     const req = {
       outputs,
     };
@@ -187,12 +214,15 @@ const kuberService = {
   },
 
   multipleDRepRegistration: (metadataAndWallets: WalletAndAnchorType[]) => {
-    const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
+    const kuber = new Kuber(
+      getWalletConfigForFaucet().address,
+      getWalletConfigForFaucet().payment.private
+    );
     const req = {
       certificates: metadataAndWallets.map((metadataAndWallet) =>
         Kuber.generateCert(
           "registerdrep",
-          metadataAndWallet.wallet.stake.pkh,
+          metadataAndWallet.wallet.dRep.pkh,
           metadataAndWallet
         )
       ),
@@ -200,7 +230,7 @@ const kuberService = {
         return {
           type: "PaymentSigningKeyShelley_ed25519",
           description: "Stake Signing Key",
-          cborHex: `5820${metadata.wallet.stake.private}`,
+          cborHex: `5820${metadata.wallet.dRep.private}`,
         };
       }),
     };
@@ -208,19 +238,22 @@ const kuberService = {
   },
 
   dRepRegistration: (
-    stakeSigningKey: string,
-    pkh: string,
+    dRepSigningKey: string,
+    dRepPkh: string,
     metadata: WalletAndAnchorType
   ) => {
-    const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
+    const kuber = new Kuber(
+      getWalletConfigForFaucet().address,
+      getWalletConfigForFaucet().payment.private
+    );
 
     const req = {
-      certificates: [Kuber.generateCert("registerdrep", pkh, metadata)],
+      certificates: [Kuber.generateCert("registerdrep", dRepPkh, metadata)],
       selections: [
         {
           type: "PaymentSigningKeyShelley_ed25519",
           description: "Stake Signing Key",
-          cborHex: `5820${stakeSigningKey}`,
+          cborHex: `5820${dRepSigningKey}`,
         },
       ],
     };
@@ -229,7 +262,7 @@ const kuberService = {
   dRepDeRegistration: (
     addr: string,
     signingKey: string,
-    stakePrivateKey: string,
+    dRepPrivateKey: string,
     pkh: string
   ) => {
     const kuber = new Kuber(addr, signingKey);
@@ -237,7 +270,7 @@ const kuberService = {
       {
         type: "PaymentSigningKeyShelley_ed25519",
         description: "Payment Signing Key",
-        cborHex: "5820" + stakePrivateKey,
+        cborHex: "5820" + dRepPrivateKey,
       },
     ];
     const req = {
@@ -249,19 +282,22 @@ const kuberService = {
   },
 
   multipleDRepDeRegistration: (wallets: StaticWallet[]) => {
-    const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
+    const kuber = new Kuber(
+      getWalletConfigForFaucet().address,
+      getWalletConfigForFaucet().payment.private
+    );
     const req = {
       certificates: wallets.map((wallet) =>
-        Kuber.generateCert("deregisterdrep", wallet.stake.pkh)
+        Kuber.generateCert("deregisterdrep", wallet.dRep.pkh)
       ),
       selections: wallets.map((wallet) => {
         return {
           type: "PaymentSigningKeyShelley_ed25519",
           description: "Stake Signing Key",
-          cborHex: `5820${wallet.stake.private}`,
+          cborHex: `5820${wallet.dRep.private}`,
         };
       }),
-      inputs: faucetWallet.address,
+      inputs: getWalletConfigForFaucet().address,
     };
     return kuber.signAndSubmitTx(req);
   },
@@ -325,7 +361,10 @@ const kuberService = {
   },
 
   createGovAction(proposalsCount = 2) {
-    const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
+    const kuber = new Kuber(
+      getWalletConfigForFaucet().address,
+      getWalletConfigForFaucet().payment.private
+    );
     const infoProposal = {
       deposit: 1000000000,
       refundAccount: {
@@ -402,7 +441,10 @@ const kuberService = {
     stakePrivKeys: string[],
     stakePkhs: string[]
   ): Promise<TxSubmitResponse> {
-    const kuber = new Kuber(faucetWallet.address, faucetWallet.payment.private);
+    const kuber = new Kuber(
+      getWalletConfigForFaucet().address,
+      getWalletConfigForFaucet().payment.private
+    );
     const selections = stakePrivKeys.map((key) => {
       return {
         type: "PaymentSigningKeyShelley_ed25519",

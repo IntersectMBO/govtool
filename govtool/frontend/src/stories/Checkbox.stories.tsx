@@ -1,9 +1,8 @@
-import { expect } from "@storybook/jest";
-import type { Meta, StoryFn } from "@storybook/react";
+import { ComponentProps } from "react";
+import { expect, within } from "storybook/test";
+import type { Meta, StoryFn } from "@storybook/react-vite";
 
 import { Field } from "@molecules";
-import { within } from "@storybook/testing-library";
-import { ComponentProps } from "react";
 
 const meta = {
   title: "Example/Checkbox",
@@ -36,11 +35,11 @@ WithLabel.play = async ({ canvasElement }) => {
   expect(canvas.getByText("Label")).toBeVisible();
 };
 
-export const Error = Template.bind({});
-Error.args = {
+export const ErrorBase = Template.bind({});
+ErrorBase.args = {
   errorMessage: "Error message",
 };
-Error.play = async ({ canvasElement, args }) => {
+ErrorBase.play = async ({ canvasElement, args }) => {
   const canvas = within(canvasElement);
   const errorId = args.errorMessage!.toLowerCase().split(" ").join("-");
 

@@ -1,16 +1,8 @@
 # Contributing to the `GovTool` project
 
-⚠️ This is a work in progress document, more instruction on how-to contribute to come!
-
-Contributing todo:
-
-- [ ] Align with latest OSC policies
-- [ ] Refactor to reflect reality
-- [ ] Make more friendly to open source contributors
-
 Thanks for considering contributing and helping us on creating GovTool! 😎
 
-The best way to contribute right now is to try things out and provide feedback, but we also accept contributions to the documentation and the obviously to the code itself.
+We welcome bug reports, documentation improvements, and code contributions. Contributors should work from a focused branch based on `develop` and open a pull request targeting `develop`.
 
 This document contains guidelines to help you get started and how to make sure your contribution gets accepted, making you our newest GovTool contributor!
 
@@ -30,7 +22,7 @@ This document contains guidelines to help you get started and how to make sure y
     - [Branch Naming](#branch-naming)
     - [Commit Messages](#commit-messages)
       - [Rationale](#rationale)
-    - [Merge Commit PRs and Rebase Branches on top of Main](#merge-commit-prs-and-rebase-branches-on-top-of-main)
+    - [Merge PRs and Rebase Branches on top of develop](#merge-prs-and-rebase-branches-on-top-of-develop)
       - [Rationale](#rationale-1)
     - [Versioning](#versioning)
     - [Changelog](#changelog)
@@ -107,7 +99,63 @@ Once it's filed:
 
 #### Your First Code Contribution
 
-TODO
+Welcome to contributing to `GovTool`! Whether you're fixing a bug, adding a feature, or improving documentation, we’re excited to have you on board. This section guides you through your first code contribution to make the process smooth and rewarding.
+
+#### Getting Started
+
+1. **Set Up Your Environment**:
+   - Follow the [local development instructions](./README.md#-local-development) to clone the repository, select the required Node.js version, create the environment file, install dependencies, and start the frontend.
+   - For another component, use its setup guide: [frontend](./govtool/frontend/README.md), [backend](./govtool/backend/README.md), or [Docker Compose](./docker/README.md).
+   - Make sure you're using the latest version of the project to avoid potential conflicts.
+
+2. **Find an Issue to Work On**:
+   - Browse open issues on the [GovTool GitHub Issues page](https://github.com/IntersectMBO/govtool/issues).
+   - Look for issues labeled `🐛 Bug` or `💡 Feature idea`.
+   - For existing feature idea tasks, comment on the issue to express interest or share thoughts.
+
+3. **Claim an Issue**:
+   - Comment on the issue to let maintainers know you’re working on it. This helps avoid duplicate efforts.
+   - Move the issue from `todo` to `in progress` on the project board (if you have permissions).
+  
+
+4. **Fork the Repository**:
+    - This step applies only if you lack permission to create branches or perform actions in the `govtool` repository.
+    - Fork the `govtool` repository on GitHub to create a copy under your account.
+
+
+5. **Create a Branch**:
+   - Create a new branch from the `develop` branch with a descriptive name (see [Branch Naming](#branch-naming)).
+   - Example: `feat/123-add-voting-ui` or `fix/456-update-api-endpoint`.
+
+6. **Make Your Changes**:
+   - Write clean, well-documented code following the [Style Guides](#style-guides) for React, Haskell, CSS, or other relevant technologies.
+   - Add or update tests to ensure your changes are robust.
+   - Keep your changes focused and aligned with the issue’s scope.
+
+7. **Commit Your Changes**:
+   - Write clear, concise commit messages following the [Commit Messages](#commit-messages) guidelines.
+
+8. **Submit a Pull Request**:
+
+   `If You Have Push Permissions to the Original Repository`
+    - Push your branch to the repository and create a pull request (PR) to the `develop` branch.
+
+   `If You Don’t Have Push Permissions (Using a Forked Repository)`
+    - Push your branch to the forked repository and create a pull request (PR) in the `govtool` main repository, using the `govtool` `develop` branch as the base and your fork’s branch name as the head repository.
+
+   - Use the PR template provided in the repository and link the related issue (e.g., `issues #123`).
+   - Describe your changes clearly, including why they’re needed and how they were tested.
+   - If your PR isn’t ready for review, mark it as a draft.
+
+9. **Address Feedback**:
+   - Expect reviews from maintainers or other contributors (see [CODEOWNERS](./CODEOWNERS)).
+   - Respond to feedback promptly and make requested changes.
+   - Once approved, your PR will be merged into `develop` by the author after passing tests.
+
+10. **Celebrate Your Contribution!**:
+    - Once merged, your changes will move through the [Development Processes](#development-processes) (QA, staging, etc.).
+    - You’re now a `GovTool` contributor! Share your achievement and consider tackling another issue.
+
 
 ## Working Conventions
 
@@ -168,12 +216,12 @@ There is plenty to say on this topic, but broadly the guidelines in [this post](
 Git commit messages are our only source of why something was changed the way it was changed.
 So we better make the readable, concise and detailed (when required).
 
-### Merge Commit PRs and Rebase Branches on top of Main
+### Merge PRs and Rebase Branches on top of `develop`
 
 When closing branches / PRs use merge commits, so we have a history of PRs also in the git history.
-Do not merge main into side branches, instead rebase them on top of main.
-Try to keep branches up-to-date with main (not strict requirement though).
-Once merged to main, please delete the branch.
+Do not merge `develop` into side branches; instead, rebase them on top of `develop`.
+Try to keep branches up-to-date with `develop` (not a strict requirement).
+Once merged into `develop`, please delete the branch.
 
 **Tip:** Use Github's merge button in PRs to merge with commit.
 This strategy helps us operate on the commits you've delivered: it's easier to [cherry-pick a merge commit](https://git-scm.com/docs/git-cherry-pick#Documentation/git-cherry-pick.txt--mltparent-numbergt) than a series of commits, and it's also easier to [revert changes using a merge commit](https://git-scm.com/docs/git-revert#Documentation/git-revert.txt--mparent-number) instead of a series of reverts.

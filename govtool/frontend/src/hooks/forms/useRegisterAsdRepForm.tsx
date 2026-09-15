@@ -1,18 +1,12 @@
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
-import * as Sentry from "@sentry/react";
 import { NodeObject } from "jsonld";
 import { CertificatesBuilder } from "@emurgo/cardano-serialization-lib-asmjs";
 
-import {
-  CIP_119,
-  DREP_CONTEXT,
-  PATHS,
-  storageInformationErrorModals,
-} from "@consts";
+import { DREP_CONTEXT, PATHS, storageInformationErrorModals } from "@consts";
 import { useCardano, useModal, useAppContext } from "@context";
 import { MetadataValidationStatus } from "@models";
 import {
@@ -33,6 +27,7 @@ export const defaultRegisterAsDRepValues: DRepDataFormValues = {
   motivations: "",
   qualifications: "",
   paymentAddress: "",
+  image: "",
   linkReferences: [{ "@type": "Link", uri: "", label: "" }],
   identityReferences: [{ "@type": "Identity", uri: "", label: "" }],
   storeData: false,
@@ -97,7 +92,7 @@ export const useRegisterAsdRepForm = (
   // Business Logic
   const generateMetadata = useCallback(async () => {
     const { linkReferences, identityReferences, ...rest } = getValues();
-    const body = generateMetadataBody({
+    const body = await generateMetadataBody({
       data: {
         ...rest,
         references: [...(linkReferences ?? []), ...(identityReferences ?? [])],
@@ -108,12 +103,12 @@ export const useRegisterAsdRepForm = (
         "motivations",
         "qualifications",
         "paymentAddress",
-        "references",
         "doNotList",
+        "image",
       ],
-      standardReference: CIP_119,
     });
-    const jsonld = await generateJsonld(body, DREP_CONTEXT, CIP_119);
+
+    const jsonld = await generateJsonld(body, DREP_CONTEXT);
 
     const jsonHash = blake2bHex(JSON.stringify(jsonld, null, 2), undefined, 32);
 
@@ -133,29 +128,23 @@ export const useRegisterAsdRepForm = (
     async (data: DRepDataFormValues) => {
       if (!hash) return;
       const uri = data.storingURL;
-      try {
-        const certBuilder = CertificatesBuilder.new();
+      const certBuilder = CertificatesBuilder.new();
 
-        const registerCert = voter?.isRegisteredAsSoleVoter
-          ? await buildDRepUpdateCert(uri, hash)
-          : await buildDRepRegCert(uri, hash);
+      const registerCert = voter?.isRegisteredAsSoleVoter
+        ? await buildDRepUpdateCert(uri, hash)
+        : await buildDRepRegCert(uri, hash);
 
-        certBuilder.add(registerCert);
+      certBuilder.add(registerCert);
 
-        if (!registeredStakeKeysListState.length) {
-          const stakeKeyRegCert = await buildStakeKeyRegCert();
-          certBuilder.add(stakeKeyRegCert);
-        }
-
-        const voteDelegationCert = await buildVoteDelegationCert(dRepID);
-        certBuilder.add(voteDelegationCert);
-
-        return certBuilder;
-      } catch (error) {
-        Sentry.setTag("hook", "useRegisterAsdRepForm");
-        Sentry.captureException(error);
-        throw error;
+      if (!registeredStakeKeysListState.length) {
+        const stakeKeyRegCert = await buildStakeKeyRegCert();
+        certBuilder.add(stakeKeyRegCert);
       }
+
+      const voteDelegationCert = await buildVoteDelegationCert(dRepID);
+      certBuilder.add(voteDelegationCert);
+
+      return certBuilder;
     },
     [
       buildDRepRegCert,
@@ -228,11 +217,8 @@ export const useRegisterAsdRepForm = (
             },
           });
         } else {
-          Sentry.setTag("hook", "useRegisterAsdRepForm");
-          Sentry.captureException(error);
-
           openWalletErrorModal({
-            error,
+            error: error?.message ? error.message : JSON.stringify(error),
             onSumbit: () => backToDashboard(),
             dataTestId: "registration-transaction-error-modal",
           });

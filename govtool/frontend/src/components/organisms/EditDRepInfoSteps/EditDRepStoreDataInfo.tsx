@@ -11,6 +11,7 @@ import {
 import { openInNewTab } from "@utils";
 
 import { ControlledField } from "..";
+import { LINKS } from "@/consts/links";
 
 export const EditDRepStoreDataInfo = ({
   setStep,
@@ -27,10 +28,7 @@ export const EditDRepStoreDataInfo = ({
 
   const isContinueDisabled = !watch("storeData");
 
-  const openLink = () =>
-    openInNewTab(
-      "https://docs.gov.tools/using-govtool/govtool-functions/storing-information-offline",
-    );
+  const openLink = () => openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);
 
   return (
     <>

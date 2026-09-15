@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { getAdaHolderCurrentDelegation } from "@services";
 import { QUERY_KEYS } from "@consts";

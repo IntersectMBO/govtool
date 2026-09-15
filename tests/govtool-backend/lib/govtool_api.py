@@ -92,6 +92,12 @@ class GovToolApi:
 
     def network_metrics(self) -> Response:
         return self.__get("/network/metrics")
+    
+    def network_total_stake(self) -> Response:
+        return self.__get("/network/total-stake")
+    
+    def network_info(self) -> Response:
+        return self.__get("/network/info")
 
     def get_transaction_status(self, tx_id) -> Response:
         return self.__get("/transaction/status", tx_id)

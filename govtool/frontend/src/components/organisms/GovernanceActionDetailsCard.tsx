@@ -5,18 +5,17 @@ import { useScreenDimension } from "@hooks";
 import {
   GovernanceActionCardStatePill,
   GovernanceActionDetailsCardVotes,
-  Share,
 } from "@molecules";
 import { GovernanceActionDetailsCardData } from "@organisms";
 import { MetadataValidationStatus, ProposalData, ProposalVote } from "@models";
-import { useLocation } from "react-router-dom";
 
 type GovernanceActionDetailsCardProps = {
   isDashboard?: boolean;
-  isDataMissing: null | MetadataValidationStatus;
+  isDataMissing?: MetadataValidationStatus;
   isInProgress?: boolean;
+  isValidating?: boolean;
   isVoter?: boolean;
-  vote?: ProposalVote;
+  vote?: ProposalVote | null;
   proposal: ProposalData;
 };
 
@@ -25,27 +24,21 @@ export const GovernanceActionDetailsCard = ({
   isDataMissing,
   isInProgress,
   isVoter,
+  isValidating,
   vote,
   proposal,
 }: GovernanceActionDetailsCardProps) => {
   const [isVoteSubmitted, setIsVoteSubmitted] = useState<boolean>(false);
   const { screenWidth, isMobile } = useScreenDimension();
 
-  const isOneColumn = (isDashboard && screenWidth < 1645) ?? isMobile;
-  const { pathname, hash } = useLocation();
-
-  const govActionLinkToShare = `${window.location.protocol}//${
-    window.location.hostname
-  }${window.location.port ? `:${window.location.port}` : ""}${pathname}${
-    hash ?? ""
-  }`;
+  const isOneColumn = (isDashboard && screenWidth < 1200) ?? isMobile;
 
   return (
     <Box
       sx={{
         borderRadius: "20px",
         display: "grid",
-        gridTemplateColumns: isOneColumn ? undefined : "0.6fr 0.4fr",
+        gridTemplateColumns: isOneColumn ? undefined : "0.55fr 0.45fr",
         mt: "12px",
         width: "100%",
         position: "relative",
@@ -72,6 +65,7 @@ export const GovernanceActionDetailsCard = ({
         isOneColumn={isOneColumn}
         isSubmitted={isVoteSubmitted}
         proposal={proposal}
+        isValidating={isValidating}
       />
       <GovernanceActionDetailsCardVotes
         setIsVoteSubmitted={setIsVoteSubmitted}
@@ -82,9 +76,6 @@ export const GovernanceActionDetailsCard = ({
         isInProgress={isInProgress}
         proposal={proposal}
       />
-      <Box position="absolute" right={40} top={40}>
-        <Share link={govActionLinkToShare} />
-      </Box>
     </Box>
   );
 };

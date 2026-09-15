@@ -1,4 +1,5 @@
 import { downloadMetadata } from "@helpers/metadata";
+import { functionWaitedAssert } from "@helpers/waitedLoop";
 import { Download, Page, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
 import { IDRepInfo } from "@types";
@@ -12,8 +13,9 @@ const formErrors = {
   ],
   linkDescription: "max-80-characters-error",
   email: "invalid-email-address-error",
+  image: "invalid-image-input-error",
   links: {
-    url:"link-reference-description-1-error",
+    url: "link-reference-description-1-error",
     description: "link-reference-description-1-error",
   },
   identity: {
@@ -58,6 +60,9 @@ export default class DRepForm {
   readonly motivationsInput = this.form.getByTestId("motivations-input");
   readonly qualificationsInput = this.form.getByTestId("qualifications-input");
   readonly paymentAddressInput = this.form.getByTestId("payment-address-input");
+  readonly imageInput = this.form.locator(
+    "div:nth-child(4) > div:nth-child(2) > input"
+  ); // BUG missing test id
   readonly doNotListCheckBox = this.form.getByRole("checkbox");
 
   constructor(private readonly form: Page) {}
@@ -118,8 +123,14 @@ export default class DRepForm {
     await this.form.getByRole("checkbox").click();
     await this.registerBtn.click();
 
-    this.metadataDownloadBtn.click();
-    const dRepMetadata = await this.downloadVoteMetadata();
+    let dRepMetadata: { name: string; data: JSON };
+    await functionWaitedAssert(
+      async () => {
+        this.metadataDownloadBtn.click();
+        dRepMetadata = await this.downloadVoteMetadata();
+      },
+      { name: "download metadata" }
+    );
     const url = await metadataBucketService.uploadMetadata(
       dRepMetadata.name,
       dRepMetadata.data
@@ -130,7 +141,9 @@ export default class DRepForm {
   }
 
   async downloadVoteMetadata() {
-    const download: Download = await this.form.waitForEvent("download");
+    const download: Download = await this.form.waitForEvent("download", {
+      timeout: 20_000,
+    });
     return downloadMetadata(download);
   }
 
@@ -140,6 +153,7 @@ export default class DRepForm {
     await this.motivationsInput.fill(dRepInfo.motivations);
     await this.qualificationsInput.fill(dRepInfo.qualifications);
     await this.paymentAddressInput.fill(dRepInfo.paymentAddress);
+    await this.imageInput.fill(dRepInfo.image);
     await this.linkRefrenceFirstUrlInput.fill(
       dRepInfo.linksReferenceLinks[0].url
     );
@@ -152,6 +166,8 @@ export default class DRepForm {
     await this.identityReferenceFirstDescriptionInput.fill(
       dRepInfo.identityReferenceLinks[0].description
     );
+
+    await this.form.keyboard.press("Tab");
   }
 
   async validateForm(dRepInfo: IDRepInfo) {
@@ -160,22 +176,64 @@ export default class DRepForm {
     for (const err of formErrors.dRepName) {
       await expect(this.form.getByTestId(err)).toBeHidden();
     }
+    const objectivesInputText = await this.objectivesInput.textContent({
+      timeout: 60_000,
+    });
+    const motivationsInputText = await this.motivationsInput.textContent();
+    const qualificationsInputText =
+      await this.qualificationsInput.textContent();
+    const isImageErrorVisible = await this.form
+      .getByTestId(formErrors.image)
+      .isVisible();
+    const isReferenceLinkErrorVisible = await this.form
+      .getByTestId(formErrors.links.url)
+      .isVisible();
+    const isIdentityLinkErrorVisible = await this.form
+      .getByTestId(formErrors.identity.url)
+      .isVisible();
+    const isPaymentAddressErrorVisible = await this.form
+      .getByTestId(formErrors.paymentAddress)
+      .isVisible();
 
-    expect(await this.objectivesInput.textContent()).toEqual(
-      dRepInfo.objectives
-    );
+    expect(objectivesInputText, {
+      message:
+        objectivesInputText !== dRepInfo.objectives &&
+        `${dRepInfo.objectives} is not equal to ${objectivesInputText}`,
+    }).toEqual(dRepInfo.objectives);
 
-    expect(await this.motivationsInput.textContent()).toEqual(
-      dRepInfo.motivations
-    );
-    expect(await this.qualificationsInput.textContent()).toEqual(
-      dRepInfo.qualifications
-    );
+    expect(motivationsInputText, {
+      message:
+        motivationsInputText !== dRepInfo.motivations &&
+        `${dRepInfo.motivations} is not equal to ${motivationsInputText}`,
+    }).toEqual(dRepInfo.motivations);
+    expect(qualificationsInputText, {
+      message:
+        qualificationsInputText !== dRepInfo.qualifications &&
+        `${dRepInfo.qualifications} is not equal to ${qualificationsInputText}`,
+    }).toEqual(dRepInfo.qualifications);
 
-    await expect(this.form.getByTestId(formErrors.links.url)).toBeHidden();
-    await expect(this.form.getByTestId(formErrors.identity.url)).toBeHidden();
-    await expect(this.form.getByTestId(formErrors.paymentAddress)).toBeHidden();
+    await expect(this.form.getByTestId(formErrors.image), {
+      message: isImageErrorVisible && `${dRepInfo.image} is an invalid image`,
+    }).toBeHidden();
+
+    await expect(this.form.getByTestId(formErrors.links.url), {
+      message:
+        isReferenceLinkErrorVisible &&
+        `${dRepInfo.linksReferenceLinks[0].url} is an invalid url`,
+    }).toBeHidden();
+    await expect(this.form.getByTestId(formErrors.identity.url), {
+      message:
+        isIdentityLinkErrorVisible &&
+        `${dRepInfo.identityReferenceLinks[0].url} is an invalid url`,
+    }).toBeHidden();
+    await expect(this.form.getByTestId(formErrors.paymentAddress), {
+      message:
+        isPaymentAddressErrorVisible &&
+        `${dRepInfo.paymentAddress} is an invalid paymentAddress`,
+    }).toBeHidden({ timeout: 60_000 });
     await expect(this.continueBtn).toBeEnabled();
+    // Wait for the form to settle after validation
+    await this.form.waitForTimeout(500);
   }
 
   async inValidateForm(dRepInfo: IDRepInfo) {
@@ -200,29 +258,80 @@ export default class DRepForm {
 
     expect(nameErrors.length).toBeGreaterThanOrEqual(1);
 
-    await expect(
-      this.form.getByTestId(formErrors.paymentAddress)
-    ).toBeVisible();
+    const objectivesInputText = await this.objectivesInput.textContent();
+    const motivationsInputText = await this.motivationsInput.textContent();
+    const qualificationsInputText =
+      await this.qualificationsInput.textContent();
+    const isImageErrorVisible = await this.form
+      .getByTestId(formErrors.image)
+      .isVisible();
+    const isReferenceLinkErrorVisible = await this.form
+      .getByTestId(formErrors.links.url)
+      .isVisible();
+    const isReferenceLinkDescriptionErrorVisible = await this.form
+      .getByTestId(formErrors.links.description)
+      .isVisible();
+    const isIdentityLinkErrorVisible = await this.form
+      .getByTestId(formErrors.identity.url)
+      .isVisible();
+    const isIdentityLinkDescriptionErrorVisible = await this.form
+      .getByTestId(formErrors.identity.description)
+      .isVisible();
+    const isPaymentAddressErrorVisible = await this.form
+      .getByTestId(formErrors.paymentAddress)
+      .isVisible();
 
-    expect(await this.objectivesInput.textContent()).not.toEqual(
-      dRepInfo.objectives
-    );
-    expect(await this.motivationsInput.textContent()).not.toEqual(
-      dRepInfo.qualifications
-    );
-    expect(await this.qualificationsInput.textContent()).not.toEqual(
-      dRepInfo.qualifications
-    );
+    await expect(this.form.getByTestId(formErrors.paymentAddress), {
+      message:
+        !isPaymentAddressErrorVisible &&
+        `${dRepInfo.paymentAddress} is a valid paymentAddress`,
+    }).toBeVisible({ timeout: 60_000 });
 
-    await expect(this.form.getByTestId(formErrors.links.url)).toBeVisible();
-    await expect(
-      this.form.getByTestId(formErrors.links.description)
-    ).toBeVisible();
-    await expect(this.form.getByTestId(formErrors.identity.url)).toBeVisible();
-    await expect(
-      this.form.getByTestId(formErrors.identity.description)
-    ).toBeVisible();
+    expect(objectivesInputText, {
+      message:
+        objectivesInputText === dRepInfo.objectives &&
+        `${dRepInfo.objectives} is equal to ${objectivesInputText}`,
+    }).not.toEqual(dRepInfo.objectives);
+    expect(motivationsInputText, {
+      message:
+        motivationsInputText === dRepInfo.motivations &&
+        `${dRepInfo.motivations} is equal to ${motivationsInputText}`,
+    }).not.toEqual(dRepInfo.qualifications);
+    expect(qualificationsInputText, {
+      message:
+        qualificationsInputText === dRepInfo.qualifications &&
+        `${dRepInfo.qualifications} is equal to ${qualificationsInputText}`,
+    }).not.toEqual(dRepInfo.qualifications);
+
+    await expect(this.form.getByTestId(formErrors.image), {
+      message: !isImageErrorVisible && `Invalid image URL or properly formatted base64-encoded image`,
+    }).toBeVisible({
+      timeout: 60_000,
+    });
+
+    await expect(this.form.getByTestId(formErrors.links.url), {
+      message:
+        !isReferenceLinkErrorVisible &&
+        `${dRepInfo.linksReferenceLinks[0].url} is a valid url`,
+    }).toBeVisible();
+    await expect(this.form.getByTestId(formErrors.links.description), {
+      message:
+        !isReferenceLinkDescriptionErrorVisible &&
+        `${dRepInfo.linksReferenceLinks[0].description} is a valid description`,
+    }).toBeVisible();
+    await expect(this.form.getByTestId(formErrors.identity.url), {
+      message:
+        !isIdentityLinkErrorVisible &&
+        `${dRepInfo.identityReferenceLinks[0].url} is a valid url`,
+    }).toBeVisible();
+    await expect(this.form.getByTestId(formErrors.identity.description), {
+      message:
+        !isIdentityLinkDescriptionErrorVisible &&
+        `${dRepInfo.identityReferenceLinks[0].description} is a valid description`,
+    }).toBeVisible();
 
     await expect(this.continueBtn).toBeDisabled();
+    // Wait for the form to settle after validation
+    await this.form.waitForTimeout(500);
   }
 }

@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import * as Sentry from "@sentry/react";
 
 import { useCardano, useSnackbar } from "@context";
 import { useGetVoterInfo, useTranslation, useWalletErrorModal } from "@hooks";
@@ -51,13 +50,12 @@ export const useDelegateTodRep = () => {
           resourceId: dRepId,
           voter,
         });
-      } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
         openWalletErrorModal({
-          error,
+          error: error?.message ? error.message : JSON.stringify(error),
           dataTestId: "delegate-transaction-error-modal",
         });
-        Sentry.setTag("hook", "useDelegateTodRep");
-        Sentry.captureException(error);
       } finally {
         setIsDelegating(null);
       }

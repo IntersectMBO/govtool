@@ -38,3 +38,18 @@ export METRICS_URL="url" # metrics server Url
 export METRICS_API_SECRET="metrics-api-secret"
 pytest -v
 ```
+
+## Allure Report
+Generate and view test reports using Allure.
+
+### Run Tests with Allure
+Execute tests and save results to the `allure-results` directory:
+```bash
+python -m pytest --alluredir allure-results
+```
+
+### View Allure Dashboard
+Launch the Allure dashboard to view the test report:
+```bash
+allure serve allure-results
+```

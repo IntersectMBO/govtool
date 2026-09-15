@@ -28,6 +28,7 @@ export * from "./GovernanceActionDetailsCardLinks";
 export * from "./GovernanceActionDetailsCardOnChainData";
 export * from "./GovernanceActionDetailsCardVotes";
 export * from "./GovernanceActionDetailsDiffView";
+export * from "./GovernanceActionNewConstitutionDetailsTabContent";
 export * from "./GovernanceActionNewCommitteeDetailsTabContent";
 export * from "./GovernanceActionsDatesBox";
 export * from "./GovernanceVotedOnCard";

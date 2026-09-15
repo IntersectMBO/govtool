@@ -1,20 +1,34 @@
 import React, { ComponentProps, Suspense } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import "@intersect.mbo/pdf-ui/style";
-import { useCardano, useGovernanceActions } from "@/context";
+import {
+  useAppContext,
+  useCardano,
+  useGovernanceActions,
+  useProposalDiscussion,
+  useSnackbar,
+} from "@/context";
 import { useValidateMutation } from "@/hooks/mutations";
 import { useScreenDimension } from "@/hooks/useScreenDimension";
 import { Footer, TopNav } from "@/components/organisms";
+import { useGetDRepVotingPowerList, useGetVoterInfo } from "@/hooks";
+import { getAdaHolderVotingPower, getAccount } from "@/services";
+import { env } from "@/config/env";
 
 const ProposalDiscussion = React.lazy(
   () => import("@intersect.mbo/pdf-ui/cjs"),
 );
 
 export const ProposalDiscussionPillar = () => {
+  const { epochParams } = useAppContext();
   const { pagePadding } = useScreenDimension();
   const { validateMetadata } = useValidateMutation();
   const { walletApi, ...context } = useCardano();
+  const { voter } = useGetVoterInfo();
   const { createGovernanceActionJsonLD, createHash } = useGovernanceActions();
+  const { fetchDRepVotingPowerList } = useGetDRepVotingPowerList();
+  const { username, setUsername } = useProposalDiscussion();
+  const snackbarContext = useSnackbar();
 
   return (
     <Box
@@ -49,12 +63,13 @@ export const ProposalDiscussionPillar = () => {
           }
         >
           <ProposalDiscussion
-            pdfApiUrl={import.meta.env.VITE_PDF_API_URL}
+            pdfApiUrl={env.VITE_PDF_API_URL}
             walletAPI={{
               ...context,
               ...walletApi,
               createGovernanceActionJsonLD,
               createHash,
+              voter,
             }}
             pathname={window.location.pathname}
             validateMetadata={
@@ -62,6 +77,13 @@ export const ProposalDiscussionPillar = () => {
                 typeof ProposalDiscussion
               >["validateMetadata"]
             }
+            fetchDRepVotingPowerList={fetchDRepVotingPowerList}
+            username={username}
+            setUsername={setUsername}
+            epochParams={epochParams}
+            getAdaHolderVotingPower={getAdaHolderVotingPower}
+            getAccount={getAccount}
+            {...snackbarContext}
           />
         </Suspense>
       </Box>

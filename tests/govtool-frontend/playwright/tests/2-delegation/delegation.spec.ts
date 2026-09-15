@@ -1,16 +1,19 @@
+import environments from "@constants/environments";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
+import { convertDRep, fetchFirstActiveDRepDetails } from "@helpers/dRep";
+import { functionWaitedAssert } from "@helpers/waitedLoop";
+import DRepDetailsPage from "@pages/dRepDetailsPage";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
-import { expect, test } from "@playwright/test";
-import { DRepStatus, IDRep } from "@types";
+import { expect, Locator } from "@playwright/test";
+import { test } from "@fixtures/walletExtension";
+import { DRepStatus, IDRep, PaginatedDRepResponse } from "@types";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
-  await skipIfNotHardFork();
 });
 
 enum SortOption {
-  Random = "Random",
+  Activity = "Activity",
   RegistrationDate = "RegistrationDate",
   VotingPower = "VotingPower",
   Status = "Status",
@@ -21,6 +24,8 @@ const statusRank: Record<DRepStatus, number> = {
   Inactive: 2,
   Retired: 3,
 };
+
+const scripDRepId: PaginatedDRepResponse = require("../../lib/_mock/scriptDRep.json");
 
 test("2K_2. Should sort DReps", async ({ page }) => {
   test.slow();
@@ -46,7 +51,8 @@ test("2K_2. Should sort DReps", async ({ page }) => {
   );
 });
 
-test("2K_3. Should sort DReps randomly", async ({ page }) => {
+test("2K_3. Should sort DReps randomly (Deprecated)", async ({ page }) => {
+  test.skip()
   const dRepDirectory = new DRepDirectoryPage(page);
   await dRepDirectory.goto();
 
@@ -55,13 +61,13 @@ test("2K_3. Should sort DReps randomly", async ({ page }) => {
   await page.getByTestId(`${SortOption.RegistrationDate}-radio`).click();
 
   const dRepList1: IDRep[] = await dRepDirectory.getDRepsResponseFromApi(
-    SortOption.Random
+    SortOption.Activity
   );
 
   await page.getByTestId(`${SortOption.RegistrationDate}-radio`).click();
 
   const dRepList2: IDRep[] = await dRepDirectory.getDRepsResponseFromApi(
-    SortOption.Random
+    SortOption.Activity
   );
 
   // Extract dRepIds from both lists
@@ -77,17 +83,40 @@ test("2K_3. Should sort DReps randomly", async ({ page }) => {
   expect(isOrderDifferent).toBe(true);
 });
 
-test("2O. Should load more DReps on show more", async ({ page }) => {
+test("2O. Should load more DReps on show more (Deprecated)", async ({ page }) => {
+  test.skip();
+  const responsePromise = page.waitForResponse((response) =>
+    response
+      .url()
+      .includes(`drep/list?page=1&pageSize=10&sort=${SortOption.Activity}`)
+  );
   const dRepDirectory = new DRepDirectoryPage(page);
   await dRepDirectory.goto();
 
-  const dRepIdsBefore = await dRepDirectory.getAllListedDRepIds();
-  await dRepDirectory.showMoreBtn.click();
+  let dRepIdsBefore: Locator[];
+  let dRepIdsAfter: Locator[];
 
-  const dRepIdsAfter = await dRepDirectory.getAllListedDRepIds();
-  expect(dRepIdsAfter.length).toBeGreaterThanOrEqual(dRepIdsBefore.length);
+  await functionWaitedAssert(
+    async () => {
+      dRepIdsBefore = await dRepDirectory.getAllListedCIP105DRepIds();
+      await dRepDirectory.showMoreBtn.click();
+    },
+    { message: "Show more button not visible" }
+  );
 
-  if (dRepIdsAfter.length > dRepIdsBefore.length) {
+  const response = await responsePromise;
+  const json = await response.json();
+  const dRepListAfter = json.elements;
+
+  await functionWaitedAssert(
+    async () => {
+      dRepIdsAfter = await dRepDirectory.getAllListedCIP105DRepIds();
+      expect(dRepIdsAfter.length).toBeGreaterThanOrEqual(dRepIdsBefore.length);
+    },
+    { message: "DReps not loaded after clicking show more" }
+  );
+
+  if (dRepListAfter.length >= dRepIdsBefore.length) {
     await expect(dRepDirectory.showMoreBtn).toBeVisible();
     expect(true).toBeTruthy();
   } else {
@@ -102,6 +131,7 @@ test("2K_1. Should filter DReps", async ({ page }) => {
   await dRepDirectory.goto();
 
   await dRepDirectory.filterBtn.click();
+  await page.getByTestId(`Active-checkbox`).click();
 
   // Single filter
   for (const option of dRepFilterOptions) {
@@ -121,4 +151,115 @@ test("2K_1. Should filter DReps", async ({ page }) => {
     await dRepDirectory.unFilterDReps(multipleFilterOptionNames);
     multipleFilterOptionNames.pop();
   }
+});
+
+test("2M. Should access dRep directory page on disconnected state", async ({
+  page,
+}) => {
+  const dRepDirectoryPage = new DRepDirectoryPage(page);
+  await dRepDirectoryPage.goto();
+
+  const dRepCards = await dRepDirectoryPage.getAllListedDReps();
+  expect(dRepCards.length).toBeGreaterThan(1);
+});
+
+test.describe("DRep dependent tests", () => {
+  let dRepId: string;
+  let dRepDirectoryPage: DRepDirectoryPage;
+
+  test.beforeEach(async ({ page }) => {
+    ({ dRepDirectoryPage, dRepId } = await fetchFirstActiveDRepDetails(page));
+  });
+
+  test("2P. Should enable sharing of DRep details", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+
+    const dRepDetailsPage = new DRepDetailsPage(page);
+    await dRepDetailsPage.goto(dRepId);
+
+    await dRepDetailsPage.shareLink();
+    await expect(page.getByText("Copied to clipboard")).toBeVisible();
+
+    const copiedText = await page.evaluate(() =>
+      navigator.clipboard.readText()
+    );
+    expect(copiedText).toEqual(
+      `${environments.frontendUrl}/drep_directory/${dRepId}`
+    );
+  });
+
+  test("2Q. Should include DRep status and voting power on the DRep card", async ({
+    page,
+  }) => {
+    await dRepDirectoryPage.searchInput.fill(dRepId);
+    const dRepCard = dRepDirectoryPage.getDRepCard(dRepId);
+
+    await expect(dRepCard.getByTestId(`${dRepId}-voting-power`)).toBeVisible();
+    await expect(
+      dRepCard.locator(`[data-testid^="${dRepId}-"][data-testid$="-pill"]`)
+    ).toBeVisible();
+  });
+
+  test("2C. Should open wallet connection popup on delegate in disconnected state", async ({
+    page,
+  }) => {
+    await page.getByTestId("search-input").fill(dRepId);
+    await page.getByTestId(`${dRepId}-connect-to-delegate-button`).click();
+    await expect(page.getByTestId("connect-your-wallet-modal")).toBeVisible();
+  });
+
+  test("2L. Should copy DRepId", async ({ page, context }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+
+    await dRepDirectoryPage.searchInput.fill(dRepId);
+    await page.getByTestId(`${dRepId}-copy-id-button`).click();
+    await expect(page.getByText("Copied to clipboard")).toBeVisible({
+      timeout: 60_000,
+    });
+    const copiedTextDRepDirectory = await page.evaluate(() =>
+      navigator.clipboard.readText()
+    );
+    expect(copiedTextDRepDirectory).toEqual(dRepId);
+  });
+});
+
+Object.values(["script drep", "drep"]).forEach((type, index) => {
+  test(`2Y_${index + 1}. Should correctly convert CIP-129/CIP-105 ${type}`, async ({
+    page,
+  }) => {
+    const dRepId = scripDRepId.elements[0]["drepId"];
+    const dRepResponse = {
+      ...scripDRepId,
+      elements: [{ ...scripDRepId.elements[0], isScriptBased: false }],
+    };
+    await page.route("**/drep/list?page=0&pageSize=10&**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(type === "drep" ? dRepResponse : scripDRepId),
+      });
+    });
+
+    const responsePromise = page.waitForResponse(
+      "**/drep/list?page=0&pageSize=10&**"
+    );
+
+    const { cip129, cip105 } = convertDRep(
+      dRepId,
+      type === "drep" ? false : true
+    );
+
+    await page.goto(`/drep_directory/${dRepId}`);
+    await responsePromise;
+
+    await expect(
+      page.getByTestId("cip-129-drep-id-info-item-description")
+    ).toHaveText(cip129, { timeout: 60_000 });
+    await expect(
+      page.getByTestId("cip-105-drep-id-info-item-description")
+    ).toHaveText(cip105);
+  });
 });

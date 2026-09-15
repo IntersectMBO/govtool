@@ -45,7 +45,7 @@
   "dashboard": {
     "headingOne": "Your Participation",
     "headingTwo": "See Active Governance Actions",
-    "title": "Dashboard",
+    "title": "Home",
     "cards": {
       "drepName": "Drep_name",
       "showTransaction": "Show Transaction",
@@ -89,8 +89,9 @@
       },
       "directVoter": {
         "isRegisteredDescription": "Your Voting Power of ₳<strong>{{votingPower}}</strong> can be used to vote.",
+        "isRegisteredDescriptionWithoutVotingPower": "You can vote on Governance Actions.",
         "register": "Register",
-        "registerDescription": "Register to Vote on Governance Actions using your own Voting Power of ₳<strong>{{votingPower}}</strong>.",
+        "registerDescription": "Register to Vote on Governance Actions.",
         "registerTitle": "Become a Direct Voter",
         "reRegister": "Re-register",
         "registration": "Direct Voter Registration",
@@ -99,7 +100,7 @@
         "wasDirectVoterTitle": "You Have Retired as a Direct Voter",
         "retirement": "Direct Voter Retirement",
         "retirementInProgress": "The retirement process is ongoing. This may take several minutes.",
-        "wasRegisteredDescription": "You cannot vote on Governance Actions using your own Voting Power of ₳<strong>{{votingPower}}</strong> until you re-register.",
+        "wasRegisteredDescription": "You cannot vote on Governance Actions until you re-register.",
         "youAreDirectVoterTitle": "You are a Direct Voter"
       },
       "delegation": {
@@ -154,6 +155,71 @@
         "title": {
           "label": "Title",
           "placeholder": "A name for this Action"
+        },
+        "denominator": {
+          "label": "Denominator",
+          "placeholder": "Denominator",
+          "tip": "Denominator of the threshold"
+        },
+        "numerator": {
+          "label": "Numerator",
+          "placeholder": "Numerator",
+          "tip": "Numerator of the threshold"
+        },
+        "members": {
+          "label": "New committee member",
+          "placeholder": "Members to be added",
+          "tip": "Bech32 address of the new member"
+        },
+        "expiryEpoch": {
+          "label": "Expiry Epoch",
+          "placeholder": "Expiry Epoch of the new Committee member",
+          "tip": "Epoch when the new committee will expire"
+        },
+        "remove": {
+          "label": "Remove committee member",
+          "placeholder": "Members to be removed",
+          "tip": "Bech32 address of the member to be removed"
+        },
+        "prevGovernanceActionIndex": {
+          "label": "Previous Governance Action ID",
+          "placeholder": "Previous Governance Action ID",
+          "tip": "Previous Governance Action ID"
+        },
+        "prevGovernanceActionHash": {
+          "label": "Previous Governance Action Hash",
+          "placeholder": "Previous Governance Action Hash",
+          "tip": "Previous Governance Action Hash"
+        },
+        "constitutionUrl": {
+          "label": "New Constitution URL",
+          "placeholder": "New Constitution URL",
+          "tip": "URL of the new constitution"
+        },
+        "constitutionHash": {
+          "label": "New Constitution Hash",
+          "placeholder": "New Constitution Hash",
+          "tip": "Hash of the new constitution"
+        },
+        "scriptHash": {
+          "label": "New Constitution Script Hash",
+          "placeholder": "New Constitution Script Hash",
+          "tip": "Script hash of the new constitution"
+        },
+        "major": {
+          "label": "Major",
+          "placeholder": "Major version",
+          "tip": "Major version of the new hard fork"
+        },
+        "minor": {
+          "label": "Minor",
+          "placeholder": "Minor version",
+          "tip": "Minor version of the new hard fork"
+        },
+        "protocolParameters": {
+          "label": "Protocol Parameters",
+          "placeholder": "Protocol parameters",
+          "tip": "Protocol parameters to be changed"
         }
       },
       "validations": {
@@ -177,15 +243,33 @@
     "storingInformationStep2Link": "Read full guide",
     "storingInformationStep3Label": "Paste the URL here",
     "storingInformationTitle": "Information Storage Steps",
+    "uploadToIPFSError" : "An Error occured while trying to upload to IPFS",
     "storingInformationURLPlaceholder": "URL",
     "supportingLinks": "Supporting links",
     "title": "Create a Governance Action",
+    "storeAndMaintainDataTitle": "Store and Maintain the Data Yourself",
+    "learnMoreAboutStoringInformation": "Learn more about storing information",
+    "govToolProvidesOptions": "GovTool currently provides two options for storing your rationale:",
+    "govToolCanPinToIPFS": "GovTool can pin it to IPFS",
+    "storeYourselfInRepo": "Store it yourself in a repository such as GitHub",
+    "storingOptionsForYourVoterRationale" : "Storing options for your voter rationale",
+    "chooseDataStorageOption": "Choose a data storage option:",
+    "govToolPinsDataToIPFS": "GovTool pins data to IPFS",
+    "downloadAndStoreYourself": "Download and store yourself",
+    "uploadingToIPFS": "Uploading to IPFS...",
+    "rationalePinnedToIPFS": "GovTool has pinned your rationale to IPFS",
+    "learnMore" : "Learn more",
+    "optionalDownloadAndStoreMetadataFile": "Optional: Download and store a backup copy of your metadata file",
+    "rePinYourFileToIPFS": "Re-pin your file to IPFS",
+    "oneMomentPlease" : "One Moment please",
     "modals": {
       "submitTransactionSuccess": {
         "message": "Your Governance Action may take a little time to submit to the chain.",
         "title": "Governance Action submitted!"
       }
-    }
+    },
+    "back" : "Back",
+    "continue" : "Continue"
   },
   "delegation": {
     "description": "You can delegate your voting power to a DRep or to a pre-defined voting option.",
@@ -230,6 +314,7 @@
     "myDelegationToYourself": "You have delegated <strong>₳ {{ada}}</strong> to yourself",
     "myDRep": "You have delegated <strong>₳ {{ada}}</strong> to this DRep",
     "listTitle": "Find a DRep",
+    "searchBarPlaceholder": "Search for a DRep name or ID",
     "noConfidenceDefaultDescription": "Select this to signal no confidence in the current constitutional committee by voting NO on every proposal and voting YES to no confidence proposals",
     "noConfidenceDefaultTitle": "Signal No Confidence on Every Vote",
     "noResultsForTheSearchTitle": "No DReps found",
@@ -292,7 +377,7 @@
     }
   },
   "footer": {
-    "copyright": "© 2024 Intersect MBO",
+    "copyright": "© {{year}} GovTool",
     "privacyPolicy": "Privacy policy",
     "termOfService": "Terms of Use"
   },
@@ -311,6 +396,8 @@
       "motivationsHelpfulText": "Why do you want to be a DRep, what personal and professional experiences do you want to share.",
       "qualifications": "Qualifications",
       "qualificationsHelpfulText": "List any qualifications that are relevant to your role as a DRep",
+      "image": "Image",
+      "imageHelpfulText": "A URL to an image or base64-encoded image that represents you. This could be an photo or a logo.",
       "paymentAddress": "Payment Address",
       "paymentAddressHelpfulText": "An address for DReps to receive payments. Only one address can be entered.",
       "doNotList": "Do Not List",
@@ -328,29 +415,49 @@
       "references": "References",
       "referenceDescription": "Description",
       "referenceDescriptionHelpfulText": "Limit: 80 characters",
-      "referenceURL": "URL"
+      "referenceURL": "URL",
+      "metadataUrl": "Metadata URL",
+      "metadataHash": "Metadata Hash"
     },
     "errors": {
       "tooLongUrl": "Url must be less than 128 bytes",
       "mustBeStakeAddress": "It must be reward address in bech32 format",
-      "mustBeReceivingAddress": "Invalid payment address"
+      "mustBeReceivingAddress": "Invalid payment address",
+      "couldNotGenerateImageSha": "Could not generate image sha",
+      "invalidValueType": "Invalid value type"
     }
   },
   "proposalDiscussion": {
     "title": "Proposals",
     "proposeAGovernanceAction": "Propose a Governance Action"
   },
+  "budgetDiscussion": {
+    "title": "Budget Proposals"
+  },
   "govActions": {
     "about": "About",
     "abstract": "Abstract",
     "amount": "Amount:",
+    "anchorURL": "Metadata anchor link",
+    "anchorHash": "Metadata anchor hash",
+    "authors": {
+      "noDataAvailable": "No data available",
+      "title": "Author(s)",
+      "publicKey": "Public Key",
+      "signature": "Signature",
+      "witnessAlgorithm": "Witness Algorithm",
+      "singatureVerified": "Author signature is verified",
+      "signatureNotVerified": "Author signature is not verified"
+    },
     "backToGovActions": "Back to Governance Actions",
     "castVote": "<0>You voted {{vote}} on this proposal</0>\non {{date}} (Epoch {{epoch}})",
-    "castVoteDeadline": "You can change your vote up to {{date}} (Epoch {{epoch}})",
+    "castVoteDeadline": "You can change your vote up to {{date}} UTC (Epoch {{epoch}})",
     "changeVote": "Change vote",
+    "changeRationale": "Change Rationale",
     "changeYourVote": "Change your vote",
     "chooseHowToVote": "Choose how you want to vote:",
-    "contextAboutYourVote": "Context about your vote",
+    "yourVoteRationale": "Your Vote Rationale",
+    "invalidVoteContext": "Invalid Vote Context",
     "dataMissing": "Data Missing",
     "dataMissingTooltipExplanation": "Please click “View Details” for more information.",
     "details": "Governance Details:",
@@ -361,14 +468,19 @@
     "dReps": "DReps",
     "sPos": "SPOs",
     "ccCommittee": "Constitutional Committee",
-    "governanceActionId": "Governance Action ID:",
-    "cip129GovernanceActionId": "(CIP-129) Governance Action ID:",
+    "governanceActionId": "Legacy Governance Action ID (CIP-105):",
+    "cip129GovernanceActionId": "Governance Action ID:",
     "governanceActionType": "Governance Action Type:",
+    "voting":{
+        "submitVote": "Submit Vote",
+        "continue": "Continue",
+        "voteWithoutMetadata": "Submit Vote"
+    },
     "goToVote": "Go to Vote",
     "membersToBeRemovedFromTheCommittee": "Members to be removed from the Committee",
     "membersToBeAddedToTheCommittee": "Members to be added to the Committee",
     "changeToTermsOfExistingMembers": "Change to terms of existing members",
-    "changeToTermsEpochs": "To {{epochTo}} epoch {{epochFrom}} epoch",
+    "changeToTermsEpochs": "To {{epochTo}} epoch, from {{epochFrom}} epoch",
     "newThresholdValue": "New threshold value",
     "protocolParamsDetails": {
       "existing": "Existing",
@@ -380,23 +492,37 @@
       "proposedVersion": "Proposed version",
       "previousGAId": "Previous Governance Action ID"
     },
+    "newConstitution": {
+      "url": "New constitution link",
+      "hash": "New constitution hash",
+      "scriptHash": "New constitution script hash"
+    },
     "motivation": "Motivation",
     "myVote": "My Vote:",
     "noResultsForTheSearch": "No results for the search.",
     "onChainTransactionDetails": "On-chain Transaction Details",
     "optional": "(optional)",
+    "propose": "Propose Governance Action",
     "provideContext": "Provide context",
     "provideContextAboutYourVote": "Provide context about your vote",
+    "additionalInformationAboutYourVote": "Additional information about your vote",
     "provideNewContextAboutYourVote": "Provide new context about your vote",
     "rationale": "Rationale",
+    "safeModeInfoBox": {
+      "title": "How this Author got verified?",
+      "line1": "Due to a metadata formatting issue, only a part of the data was signed, which prevented GovTool's automatic verification. However, the signature is valid and can be confirmed manually.",
+      "line2": "<0>Govtool Builders have manually verified the signature, confirming that this Treasury action genuinely originates from Intersect.</0> It has been marked accordingly to make this clear to DReps.",
+      "link": "More details"
+    },
     "seeExternalData": "See external data",
     "selectDifferentOption": "Select a different option to change your vote",
     "showVotes": "Show votes",
     "submissionDate": "Submission date:",
     "submittedDateWithEpoch": "Submitted: <0>{{date}}</0> <1>(Epoch {{epoch}})</1>",
     "supportingLinks": "Supporting links",
-    "threshold": "THRESHOLD",
-    "title": "Governance Actions",
+    "threshold": "Ratification Threshold",
+    "categoryTitle": "Governance Actions",
+    "title": "Live Voting",
     "toVote": "To vote",
     "viewDetails": "View Details",
     "viewDetailsAndVote": "View Details and Vote",
@@ -455,10 +581,22 @@
         "title": "Info Action",
         "label": "Info Action"
       }
+    },
+    "liveVoting": {
+      "title": "Live Voting",
+      "label": "Live Voting"
+    },
+    "outcomes": {
+      "title": "Outcomes",
+      "label": "Outcomes"
+    },
+    "votedByMe": {
+      "title": "Voted by me",
+      "label": "Voted by me"
     }
   },
   "hero": {
-    "connectWallet": "Connect your wallet to start",
+    "connectWallet": "Participate now",
     "description": "Cardano Governance lets Ada holders have a say in the network's future.\n\nYou can vote directly, find someone to represent you, or become a representative for others.\n\nYou can also propose changes in the network yourself, put these up for discussion and eventually, a vote.\n\n<0>Learn more about governance</0> in the guide, or have a look around the app and see Cardano Governance in action.",
     "headline": "Cardano \n Governance Tool"
   },
@@ -618,7 +756,8 @@
         "maxLength": "Max {{maxLength}} characters",
         "required": "This field is required",
         "url": "Invalid URL",
-        "noSpaces": "No spaces allowed"
+        "noSpaces": "No spaces allowed",
+        "image": "Invalid image URL or properly formatted base64-encoded image"
       }
     }
   },
@@ -717,7 +856,8 @@
     "constitutional": "Constitutional",
     "no": "No",
     "unconstitutional": "Unconstitutional",
-    "yes": "Yes"
+    "yes": "Yes",
+    "notVoted": "Not voted"
   },
   "usefulLinks": {
     "title": "Useful links",
@@ -747,6 +887,8 @@
   "copiedLink": "Copied link",
   "delegate": "Delegate",
   "drepId": "DRep ID",
+  "cip129DrepId": "(CIP-129) DRep ID",
+  "cip105DRepId": "Legacy DRep ID (CIP-105)",
   "email": "Email",
   "feedback": "Feedback",
   "filter": "Filter",

@@ -1,19 +1,11 @@
 export {};
-interface SentryEventDataLayer {
-  event: string;
-  sentryEventId: string;
-  sentryErrorMessage?: JSONValue;
-}
 
 declare global {
-  interface Window {
-    dataLayer: SentryEventDataLayer[];
-  }
-
-  type VoteType = "yes" | "no" | "abstain";
+  type VoteType = "yes" | "no" | "abstain" | "notVoted";
 
   type ActionTypeFromAPI = {
     id: string;
+    txHash: string;
     type: string;
     details: string;
     expiryDate: string;
@@ -36,7 +28,7 @@ declare global {
 
   type ToVoteDataType = {
     title: string;
-    actions: ActionTypeToDsiplay[];
+    actions: ProposalData[];
   }[];
 
   type NestedKeys<T> = T extends Record<string, unknown>
@@ -63,4 +55,14 @@ declare global {
     label: string;
     uri: string;
   };
+
+  interface NavItem {
+    dataTestId: string;
+    label: string;
+    navTo: string;
+    activeIcon: JSX.Element | string;
+    icon: JSX.Element | string;
+    newTabLink: string | null;
+    childNavItems?: NavItem[];
+  }
 }

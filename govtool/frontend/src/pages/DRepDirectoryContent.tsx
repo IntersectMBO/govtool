@@ -1,25 +1,33 @@
-import { FC, useEffect } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { Box, CircularProgress } from "@mui/material";
 
-import { Button, Typography } from "@atoms";
+import { Typography } from "@atoms";
 import { DREP_DIRECTORY_FILTERS, DREP_DIRECTORY_SORTING } from "@consts";
-import { useCardano, useDataActionsBar } from "@context";
+import { useCardano, useDataActionsBar, usePagination } from "@context";
 import {
   useDelegateTodRep,
   useGetAdaHolderCurrentDelegationQuery,
   useGetAdaHolderVotingPowerQuery,
   useGetDRepDetailsQuery,
-  useGetDRepListInfiniteQuery,
+  useGetDRepListPaginatedQuery,
 } from "@hooks";
 import { DataActionsBar, EmptyStateDrepDirectory } from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
-import { correctAdaFormat, isSameDRep } from "@utils";
-import { DRepListSort, DRepStatus } from "@models";
+import {
+  isSameDRep,
+  uniqBy,
+  parseBoolean,
+  correctDRepDirectoryFormat,
+} from "@utils";
+import { DRepData, DRepListSort, DRepStatus } from "@models";
 import {
   AutomatedVotingOptionCurrentDelegation,
   AutomatedVotingOptionDelegationId,
 } from "@/types/automatedVotingOptions";
+import usePrevious from "@/hooks/usePrevious";
+import { PaginationFooter } from "@/components/molecules/PaginationFooter";
+import { useUpdateEffect } from "@/hooks/useUpdateEffect";
 
 interface DRepDirectoryContentProps {
   isConnected?: boolean;
@@ -44,46 +52,98 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 }) => {
   const { dRepID: myDRepId, pendingTransaction, stakeKey } = useCardano();
   const { t } = useTranslation();
-  const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
-  const { chosenFilters, chosenSorting, setChosenSorting } =
-    dataActionsBarProps;
+
+  const {
+    searchText,
+    debouncedSearchText,
+    setSearchText,
+    lastPath,
+    ...dataActionsBarProps
+  } = useDataActionsBar();
+
+  const SEED_STORAGE_KEY = "drep_directory_sorting_seed";
+
+  const makeSeed = () =>
+      (globalThis.crypto?.randomUUID?.() as string | undefined) ??
+      Math.random().toString(36).slice(2);
+
+  const getStoredSeed = () => {
+    if (typeof window === "undefined") return "";
+    return sessionStorage.getItem(SEED_STORAGE_KEY) || "";
+  };
+
+  const [sortingSeed, setSortingSeed] = useState<string>(() => getStoredSeed());
 
   useEffect(() => {
-    if (!chosenSorting) setChosenSorting(DRepListSort.Random);
+    if (lastPath && !lastPath.includes("drep_directory")) {
+      const newSeed = makeSeed();
+      setSortingSeed(newSeed);
+      sessionStorage.setItem(SEED_STORAGE_KEY, newSeed);
+    }
+  }, [sortingSeed]);
+
+  const { page, pageSize, setPage, setPageSize } = usePagination();
+
+  const { chosenFilters, chosenSorting, setChosenFilters, setChosenSorting } =
+    dataActionsBarProps;
+
+  const [inProgressDelegationDRepData, setInProgressDelegationDRepData] =
+    useState<DRepData | undefined>(undefined);
+
+  useEffect(() => {
+    if (!lastPath.includes("drep_directory")) {
+      setChosenFilters([DRepStatus.Active]);
+      setSearchText("");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!chosenSorting) setChosenSorting(DRepListSort.Activity);
   }, [chosenSorting, setChosenSorting]);
+
+  useUpdateEffect(() => {
+    setPage(1);
+  }, [debouncedSearchText, chosenSorting, JSON.stringify(chosenFilters)]);
 
   const { delegate, isDelegating } = useDelegateTodRep();
 
   const { votingPower } = useGetAdaHolderVotingPowerQuery(stakeKey);
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const inProgressDelegation = pendingTransaction.delegate?.resourceId;
+  const prevInProgressDelegation = usePrevious(inProgressDelegation);
 
   const { dRep: myDrep } = useGetDRepDetailsQuery(currentDelegation?.dRepView, {
     enabled: !!inProgressDelegation || !!currentDelegation,
   });
 
-  const { dRep: yourselfDRep } = useGetDRepDetailsQuery(myDRepId, {
-    enabled: !!inProgressDelegation || !!currentDelegation,
-  });
-  const showYourselfDRep =
-    debouncedSearchText === myDRepId || debouncedSearchText === "";
-
   const {
     dRepData: dRepList,
-    isPreviousData,
-    dRepListHasNextPage,
-    dRepListFetchNextPage,
-  } = useGetDRepListInfiniteQuery(
+    isFetching,
+    isPreviousData: isPrev,
+    total,
+    baselineTotalForStatus,
+  } = useGetDRepListPaginatedQuery(
     {
+      page: page - 1,
+      pageSize,
       searchPhrase: debouncedSearchText,
       sorting: chosenSorting as DRepListSort,
       status: chosenFilters as DRepStatus[],
+      sortingSeed
     },
-    {
-      enabled: !!chosenSorting,
-      keepPreviousData: true,
-    },
+    { enabled: !!chosenSorting },
   );
+
+  const showSearchSummary =
+    searchText !== "" &&
+    (!isFetching || !isPrev) &&
+    total !== baselineTotalForStatus;
+
+  useEffect(() => {
+    if (!inProgressDelegation && prevInProgressDelegation) {
+      setInProgressDelegationDRepData(undefined);
+    }
+  }, [prevInProgressDelegation, inProgressDelegation]);
 
   if (
     (stakeKey && votingPower === undefined) ||
@@ -93,20 +153,16 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     return <Loader />;
   }
 
-  const ada = correctAdaFormat(votingPower);
+  const ada = correctDRepDirectoryFormat(votingPower);
 
-  const listedDRepsWithoutYourself = dRepList?.filter(
-    (dRep) => !dRep.doNotList && !isSameDRep(dRep, myDRepId),
-  );
-  const dRepListToDisplay =
-    yourselfDRep && showYourselfDRep
-      ? [yourselfDRep, ...listedDRepsWithoutYourself]
-      : listedDRepsWithoutYourself;
-
-  const inProgressDelegationDRepData = dRepListToDisplay.find(
-    (dRep) =>
-      dRep.drepId === inProgressDelegation ||
-      dRep.view === inProgressDelegation,
+  const filteredDoNotListDReps = uniqBy(
+    dRepList?.filter((dRep) => {
+      if (typeof dRep.doNotList === "string") {
+        return !parseBoolean(dRep.doNotList);
+      }
+      return !dRep.doNotList;
+    }),
+    "view",
   );
 
   const isAnAutomatedVotingOptionChosen =
@@ -116,9 +172,28 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       currentDelegation?.dRepView ===
         AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence);
 
+  const scaleWrapSx = isConnected
+    ? ({
+        width: "100%",
+        transform: { xs: "scale(0.9)", sm: "scale(0.9)", md: "none" },
+        transformOrigin: { xs: "top center", sm: "top center", md: "initial" },
+        ml: { xs: 0.25, sm: 0.25, md: 0 },
+      } as const)
+    : ({
+        width: "100%",
+        transform: { xs: "scale(0.9)", sm: "scale(0.9)", md: "none" },
+        transformOrigin: { xs: "top left", sm: "top left", md: "initial" },
+        ml: { xs: 0.25, sm: 0.25, md: 0 },
+      } as const);
+
   return (
-    <Box display="flex" flex={1} flexDirection="column" gap={4}>
-      {/* My delegation */}
+    <Box
+      display="flex"
+      flex={1}
+      flexDirection="column"
+      gap={4}
+      sx={{ width: "100%", maxWidth: "100vw" }}
+    >
       {myDrep &&
         !inProgressDelegation &&
         currentDelegation &&
@@ -127,26 +202,34 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             <Typography variant="title2" sx={{ mb: 2 }}>
               <Trans i18nKey="dRepDirectory.myDelegation" values={{ ada }} />
             </Typography>
-            <DRepCard
-              dRep={myDrep}
-              isConnected={!!isConnected}
-              isInProgress={isSameDRep(myDrep, inProgressDelegation)}
-              isMe={isSameDRep(myDrep, myDRepId)}
-            />
+            <Box>
+              <Box sx={scaleWrapSx}>
+                <DRepCard
+                  dRep={myDrep}
+                  isConnected={!!isConnected}
+                  isInProgress={isSameDRep(myDrep, inProgressDelegation)}
+                  isMe={isSameDRep(myDrep, myDRepId)}
+                />
+              </Box>
+            </Box>
           </div>
         )}
+
       {inProgressDelegation &&
         inProgressDelegation !== myDRepId &&
         inProgressDelegationDRepData && (
-          <DRepCard
-            dRep={inProgressDelegationDRepData}
-            isConnected={!!isConnected}
-            isMe={isSameDRep(inProgressDelegationDRepData, myDRepId)}
-            isInProgress
-          />
+          <Box>
+            <Box sx={scaleWrapSx}>
+              <DRepCard
+                dRep={inProgressDelegationDRepData}
+                isConnected={!!isConnected}
+                isMe={isSameDRep(inProgressDelegationDRepData, myDRepId)}
+                isInProgress
+              />
+            </Box>
+          </Box>
         )}
 
-      {/* Automated voting options */}
       {isConnected && (
         <div>
           <Typography variant="title2" sx={{ mb: 2 }}>
@@ -181,58 +264,104 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
         </div>
       )}
 
-      {/* DRep list */}
       <>
         <Typography fontSize={18} fontWeight={500} sx={{ mb: 3 }}>
           {t("dRepDirectory.listTitle")}
         </Typography>
         <DataActionsBar
           {...dataActionsBarProps}
+          searchText={searchText}
+          setSearchText={setSearchText}
           filterOptions={DREP_DIRECTORY_FILTERS}
           filtersTitle={t("dRepDirectory.filterTitle")}
           sortOptions={DREP_DIRECTORY_SORTING}
+          placeholder={t("dRepDirectory.searchBarPlaceholder")}
         />
+
+        {showSearchSummary && (
+          <Typography fontSize={16} fontWeight={500}>
+            <Trans
+              i18nKey="dRepDirectory.searchSummary"
+              defaults="Found {{found}} DRep{{multiple}} out of a total of <total>{{total}}</total>"
+              values={{
+                found: total ?? "",
+                multiple: total && total > 1 ? "s" : "",
+                total: baselineTotalForStatus ?? "",
+              }}
+              components={{
+                total:
+                  baselineTotalForStatus === undefined ? (
+                    <CircularProgress
+                      size={16}
+                      sx={{ mx: 0.5, verticalAlign: "middle" }}
+                    />
+                  ) : (
+                    <React.Fragment />
+                  ),
+              }}
+            />
+          </Typography>
+        )}
         <Box
           component="ul"
           display="flex"
           flexDirection="column"
           gap={3}
-          mt={4}
+          mt={showSearchSummary ? 0 : 4}
           p={0}
           sx={{
-            opacity: isPreviousData ? 0.5 : 1,
-            transition: "opacity 0.2s",
             flex: 1,
+            width: "100%",
+            maxWidth: "100%",
           }}
         >
-          {dRepList?.length === 0 && <EmptyStateDrepDirectory />}
-          {dRepListToDisplay?.map((dRep) => (
-            <Box key={dRep.drepId} component="li" sx={{ listStyle: "none" }}>
-              <DRepCard
-                dRep={dRep}
-                isConnected={!!isConnected}
-                isDelegationLoading={
-                  isDelegating === dRep.view || isDelegating === dRep.drepId
-                }
-                isMe={isSameDRep(dRep, myDRepId)}
-                isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
-                onDelegate={() => delegate(dRep.drepId)}
-              />
+          {filteredDoNotListDReps?.length === 0 && <EmptyStateDrepDirectory />}
+          {filteredDoNotListDReps?.map((dRep) => (
+            <Box key={dRep.view} component="li" sx={{ listStyle: "none" }}>
+              <Box>
+                <Box sx={scaleWrapSx}>
+                  <DRepCard
+                    dRep={dRep}
+                    isConnected={!!isConnected}
+                    isDelegationLoading={
+                      isDelegating === dRep.view || isDelegating === dRep.drepId
+                    }
+                    isMe={isSameDRep(dRep, myDRepId)}
+                    isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
+                    onDelegate={() => {
+                      setInProgressDelegationDRepData(dRep);
+                      delegate(dRep.drepId);
+                    }}
+                  />
+                </Box>
+              </Box>
             </Box>
           ))}
         </Box>
-      </>
-      {dRepListHasNextPage && dRepList.length >= 10 && (
-        <Box sx={{ justifyContent: "center", display: "flex" }}>
-          <Button
-            data-testid="show-more-button"
-            variant="outlined"
-            onClick={() => dRepListFetchNextPage()}
-          >
-            {t("showMore")}
-          </Button>
+
+        <Box
+          sx={{
+            width: "100%",
+            transform: { xs: "scale(0.85)", sm: "scale(0.85)", md: "none" },
+            transformOrigin: {
+              xs: "top rigth",
+              sm: "top rigth",
+              md: "initial",
+            },
+          }}
+        >
+          <PaginationFooter
+            page={page}
+            total={total || 0}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={(n) => {
+              setPageSize(n);
+              setPage(1);
+            }}
+          />
         </Box>
-      )}
+      </>
     </Box>
   );
 };

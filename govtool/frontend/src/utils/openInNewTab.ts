@@ -1,4 +1,18 @@
+import { env } from "@/config/env";
+
 export const openInNewTab = (url: string) => {
-  const newWindow = window.open(url, "_blank", "noopener,noreferrer");
+  // Ensure the URL is absolute
+  const fullUrl =
+    url.startsWith("http://") || url.startsWith("https://")
+      ? url
+      : url.startsWith("ipfs")
+      ? `${env.VITE_IPFS_GATEWAY}/${url.slice(7)}`
+      : `https://${url}`;
+
+  // eslint-disable-next-line no-console
+  console.debug("Opening in new tab", fullUrl);
+
+  // Open the URL in a new tab
+  const newWindow = window.open(fullUrl, "_blank", "noopener,noreferrer");
   if (newWindow) newWindow.opener = null;
 };

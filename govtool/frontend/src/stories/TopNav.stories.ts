@@ -1,7 +1,7 @@
+import { expect, userEvent, within, fn } from "storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { TopNav } from "@organisms";
-import { expect, jest } from "@storybook/jest";
-import type { Meta, StoryObj } from "@storybook/react";
-import { userEvent, within } from "@storybook/testing-library";
 
 const meta = {
   title: "Example/TopNav",
@@ -13,14 +13,36 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const performCommonActions = async (canvas: ReturnType<typeof within>) => {
-  window.open = jest.fn();
+  window.open = fn();
 
-  await userEvent.click(canvas.getByTestId("logo-button"));
-  const governanceActionsLink = canvas.getByTestId("governance-actions-link");
-  await userEvent.click(canvas.getByTestId("governance-actions-link"));
+  const logoButton = canvas.getByTestId("logo-button");
+  await userEvent.click(logoButton);
+
+  const governanceActions = canvas.getByTestId("governance-actions");
+  await userEvent.click(governanceActions);
+
+  // governance actions link is injected outside the TopNav component, so we use querySelector
+  const governanceActionsLink = document.querySelector(
+    '[data-testid="governance-actions-link"]',
+  );
+  if (!governanceActionsLink)
+    throw new Error("governance-actions-link not found");
+  await expect(governanceActionsLink).not.toHaveClass("active");
+  await userEvent.click(governanceActionsLink);
+  await expect(governanceActions).not.toHaveClass("active");
   await expect(governanceActionsLink).toHaveClass("active");
-  await userEvent.click(canvas.getByTestId("guides-link"));
-  await userEvent.click(canvas.getByTestId("faqs-link"));
+
+  const drepDirectoryLink = canvas.getByTestId("drep-directory-link");
+  await expect(drepDirectoryLink).not.toHaveClass("active");
+  await userEvent.click(drepDirectoryLink);
+  await expect(drepDirectoryLink).toHaveClass("active");
+
+  const guidesLink = canvas.getByTestId("guides-link");
+  await userEvent.click(guidesLink);
+
+  const faqsLink = canvas.getByTestId("faqs-link");
+  await userEvent.click(faqsLink);
+
   await expect(window.open).toHaveBeenCalledTimes(2);
 };
 

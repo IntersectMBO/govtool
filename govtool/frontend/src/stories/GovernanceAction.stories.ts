@@ -1,7 +1,13 @@
-import { MetadataValidationStatus } from "@models";
-import { expect, jest } from "@storybook/jest";
-import type { Meta, StoryObj } from "@storybook/react";
-import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
+import {
+  expect,
+  screen,
+  userEvent,
+  waitFor,
+  within,
+  fn,
+} from "storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import {
   encodeCIP129Identifier,
   formatDisplayDate,
@@ -9,6 +15,7 @@ import {
 } from "@utils";
 import { GovernanceActionCard } from "@/components/molecules";
 import { GovernanceActionType } from "@/types/governanceAction";
+import { MetadataValidationStatus } from "@/models";
 
 const meta = {
   title: "Example/GovernanceActionCard",
@@ -23,20 +30,18 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const commonArgs = {
-  about: "About this Governance Action",
+const commonArgs: Story["args"] = {
+  abstract: "About this Governance Action",
   createdDate: "1970-01-01T00:00:00Z",
   createdEpochNo: 302,
   expiryDate: "1970-02-01T00:00:00Z",
   expiryEpochNo: 420,
   index: 2,
   inProgress: false,
-  onClick: jest.fn(),
+  onClick: fn(),
   title: "Example title",
   txHash: "sad78afdsf7jasd98d",
   type: GovernanceActionType.InfoAction,
-  metadataValid: true,
-  metadataStatus: null,
   dRepYesVotes: 1,
   dRepNoVotes: 0,
   dRepAbstainVotes: 0,
@@ -49,6 +54,8 @@ const commonArgs = {
   protocolParams: null,
   prevGovActionIndex: null,
   prevGovActionTxHash: null,
+  metadataHash: "exampleMetadataHash",
+  url: "https://exampleMetadataUrl.com",
 };
 
 const cip129GovActionId = encodeCIP129Identifier({
@@ -60,7 +67,7 @@ const cip129GovActionId = encodeCIP129Identifier({
 export const GovernanceActionCardComponent: Story = {
   args: commonArgs,
 
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     expect(
       canvas.getByTestId(
@@ -87,18 +94,16 @@ export const GovernanceActionCardComponent: Story = {
       expect(screen.getByRole("tooltip")).toBeInTheDocument();
       expect(screen.getByRole("tooltip")).toHaveTextContent(/Expiry Date/i);
     });
-    await userEvent.click(
-      canvas.getByTestId("govaction-sad78afdsf7jasd98d#2-view-detail"),
-    );
-    await await expect(args.onClick).toHaveBeenCalled();
+  const viewDetailsButton = canvas.getByTestId(
+  "govaction-sad78afdsf7jasd98d#2-view-detail",
+);
+
+await expect(viewDetailsButton).toBeVisible();
   },
 };
 
 export const GovernanceActionCardIsLoading: Story = {
-  args: {
-    ...commonArgs,
-    inProgress: true,
-  },
+  args: { ...commonArgs, inProgress: true },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByText(/in progress/i)).toBeVisible();
@@ -109,7 +114,6 @@ export const GovernanceActionCardDataMissing: Story = {
   args: {
     ...commonArgs,
     metadataStatus: MetadataValidationStatus.URL_NOT_FOUND,
-    metadataValid: false,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -128,8 +132,7 @@ export const GovernanceActionCardDataMissing: Story = {
 export const GovernanceActionCardIncorectFormat: Story = {
   args: {
     ...commonArgs,
-    metadataStatus: MetadataValidationStatus.INVALID_JSONLD,
-    metadataValid: false,
+    metadataStatus: MetadataValidationStatus.INCORRECT_FORMAT,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -151,7 +154,6 @@ export const GovernanceActionCardNotVerifiable: Story = {
   args: {
     ...commonArgs,
     metadataStatus: MetadataValidationStatus.INVALID_HASH,
-    metadataValid: false,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

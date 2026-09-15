@@ -15,10 +15,11 @@ function saveWallets(wallets: ShelleyWallet[]): void {
   const jsonWallets = [];
   for (let i = 0; i < wallets.length; i++) {
     const dRepId = extractDRepFromWallet(wallets[i]);
+    const networkId = process.env.NETWORK === "mainnet" ? 1 : 0;
 
     jsonWallets.push({
       ...wallets[i].json(),
-      address: wallets[i].addressBech32(0), // testnet
+      address: wallets[i].addressBech32(networkId),
       dRepId,
     });
   }

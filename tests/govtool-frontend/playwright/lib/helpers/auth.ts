@@ -2,12 +2,26 @@ import { importWallet } from "@fixtures/importWallet";
 import { valid as mockValid } from "@mock/index";
 import LoginPage from "@pages/loginPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
-import { BrowserContext, Page } from "@playwright/test";
-import { StaticWallet } from "@types";
+import { BrowserContext, expect, Page } from "@playwright/test";
+import { ProposalType, StaticWallet } from "@types";
 import { ShelleyWallet } from "./crypto";
 import convertBufferToHex from "./convertBufferToHex";
 import { updateWalletConfig } from "@fixtures/createWallet";
-import { adaHolder05Wallet } from "@constants/staticWallets";
+import {
+  adaHolder05Wallet,
+  proposal05Wallet,
+  proposal07Wallet,
+  proposal08Wallet,
+  proposal09Wallet,
+  proposal10Wallet,
+} from "@constants/staticWallets";
+import {
+  proposal05AuthFile,
+  proposal07AuthFile,
+  proposal08AuthFile,
+  proposal09AuthFile,
+  proposal10AuthFile,
+} from "@constants/auth";
 
 interface CreateUserProps {
   page: Page;
@@ -45,9 +59,16 @@ export async function createAuthWithUserName({
 
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
-  await proposalDiscussionPage.verifyIdentityBtn.click();
-
-  await proposalDiscussionPage.setUsername(mockValid.username());
+  await proposalDiscussionPage.verifyIdentityBtn.click({ timeout: 60_000 });
+  try {
+    await expect(page.getByTestId("username-input")).toBeVisible({
+      timeout: 10_000,
+    });
+    await proposalDiscussionPage.setUsername(mockValid.username());
+  } catch (error) {
+    // Ignore error if username is already set
+    console.log("Username is already set");
+  }
 
   await context.storageState({ path: auth });
 }
@@ -80,3 +101,33 @@ export async function createAuthWithMultipleStake({
 
   await context.storageState({ path: auth });
 }
+
+export const getDraftProposalWalletAndState = (proposalType: string) => {
+  switch (proposalType) {
+    case ProposalType.info:
+      return {
+        storageState: proposal05AuthFile,
+        wallet: proposal05Wallet,
+      };
+    case ProposalType.treasury:
+      return {
+        storageState: proposal07AuthFile,
+        wallet: proposal07Wallet,
+      };
+    case ProposalType.updatesToTheConstitution:
+      return {
+        storageState: proposal08AuthFile,
+        wallet: proposal08Wallet,
+      };
+    case ProposalType.motionOfNoConfedence:
+      return {
+        storageState: proposal09AuthFile,
+        wallet: proposal09Wallet,
+      };
+    case ProposalType.hardFork:
+      return {
+        storageState: proposal10AuthFile,
+        wallet: proposal10Wallet,
+      };
+  }
+};

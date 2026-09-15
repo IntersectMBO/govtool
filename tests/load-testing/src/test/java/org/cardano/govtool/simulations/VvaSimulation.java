@@ -53,7 +53,7 @@ public class VvaSimulation extends Simulation {
     // Load Simulation
     {
         knownDreps= DrepListFetcher.fetchDrepIds(API_URL);
-        var DREP_USER_RATI0=0.3
+        var DREP_USER_RATI0=0.3;
         setUp(
                   makeScenario("User Connects and Leave", exec(), 0.1)
                 , makeScenario("User Registers as Drep",

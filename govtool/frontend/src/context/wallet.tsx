@@ -64,14 +64,20 @@ import {
   CostModel,
   Language,
   TxInputsBuilder,
+  NoConfidenceAction,
+  Constitution,
+  NewConstitutionAction,
+  UpdateCommitteeAction,
+  Committee,
+  Credentials,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 import { Buffer } from "buffer";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Link } from "@mui/material";
 import * as Sentry from "@sentry/react";
 import { Trans } from "react-i18next";
 
-import { PATHS, COMPILED_GUARDRAIL_SCRIPTS } from "@consts";
+import { PATHS, COMPILED_GUARDRAIL_SCRIPT } from "@consts";
 import { CardanoApiWallet, VoterInfo } from "@models";
 import type { StatusModalState } from "@organisms";
 import {
@@ -89,7 +95,7 @@ import {
 } from "@utils";
 import { useTranslation } from "@hooks";
 import { AutomatedVotingOptionDelegationId } from "@/types/automatedVotingOptions";
-
+import { env } from "@/config/env";
 import { getUtxos } from "./getUtxos";
 import { useAppContext, useModal, useSnackbar } from ".";
 import {
@@ -109,17 +115,57 @@ interface EnableResponse {
   error?: string;
 }
 
-type InfoProps = {
-  hash: string;
+type VotingAnchor = {
   url: string;
+  hash: string;
 };
+
+type InfoProps = VotingAnchor;
+
+type NoConfidenceProps = VotingAnchor;
 
 type TreasuryProps = {
-  hash: string;
-  url: string;
   withdrawals: { receivingAddress: string; amount: string }[];
+} & VotingAnchor;
+
+type ProtocolParameterChangeProps = {
+  prevGovernanceActionHash: string;
+  prevGovernanceActionIndex: string;
+  protocolParamsUpdate: Partial<ProtocolParamsUpdate>;
+} & VotingAnchor;
+
+type HardForkInitiationProps = {
+  prevGovernanceActionHash: string;
+  prevGovernanceActionIndex: string;
+  major: string;
+  minor: string;
+} & VotingAnchor;
+
+type NewConstitutionProps = {
+  prevGovernanceActionHash?: string;
+  prevGovernanceActionIndex?: string;
+  constitutionUrl: string;
+  constitutionHash: string;
+  scriptHash?: string;
+} & VotingAnchor;
+
+type UpdateCommitteeProps = {
+  prevGovernanceActionHash?: string;
+  prevGovernanceActionIndex?: string;
+  quorumThreshold: QuorumThreshold;
+  newCommittee?: CommitteeToAdd[];
+  removeCommittee?: string[];
+} & VotingAnchor;
+
+export type CommitteeToAdd = {
+  expiryEpoch: string;
+  committee: string;
 };
 
+export type QuorumThreshold = {
+  numerator: string;
+  denominator: string;
+};
 type ProtocolParamsUpdate = {
   adaPerUtxo: string;
   collateralPercentage: number;
@@ -153,23 +199,6 @@ type ProtocolParamsUpdate = {
   treasuryGrowthRate: UnitInterval;
 };
 
-type ProtocolParameterChangeProps = {
-  prevGovernanceActionHash: string;
-  prevGovernanceActionIndex: number;
-  url: string;
-  hash: string;
-  protocolParamsUpdate: Partial<ProtocolParamsUpdate>;
-};
-
-type HardForkInitiationProps = {
-  prevGovernanceActionHash: string;
-  prevGovernanceActionIndex: number;
-  url: string;
-  hash: string;
-  major: number;
-  minor: number;
-};
-
 type BuildSignSubmitConwayCertTxArgs = {
   certBuilder?: CertificatesBuilder | Certificate;
   govActionBuilder?: VotingProposalBuilder;
@@ -196,6 +225,7 @@ interface CardanoContextType {
   setStakeKey: (key: string) => void;
   stakeKeys: string[];
   walletApi?: CardanoApiWallet;
+  walletName?: string;
   registeredStakeKeysListState: string[];
   buildSignSubmitConwayCertTx: ({
     certBuilder,
@@ -219,6 +249,7 @@ interface CardanoContextType {
   ) => Promise<VotingBuilder>;
   pendingTransaction: PendingTransaction;
   isPendingTransaction: () => boolean;
+  isStakeKeyRegistered: () => boolean;
   buildNewInfoGovernanceAction: (
     infoProps: InfoProps,
   ) => Promise<VotingProposalBuilder | undefined>;
@@ -231,6 +262,15 @@ interface CardanoContextType {
   buildHardForkGovernanceAction: (
     hardForkInitiationProps: HardForkInitiationProps,
   ) => Promise<VotingProposalBuilder | undefined>;
+  buildNewConstitutionGovernanceAction: (
+    newConstitutionProps: NewConstitutionProps,
+  ) => Promise<VotingProposalBuilder | undefined>;
+  buildUpdateCommitteeGovernanceAction: (
+    updateCommitteeProps: UpdateCommitteeProps,
+  ) => Promise<VotingProposalBuilder | undefined>;
+  buildNoConfidenceGovernanceAction: (
+    noConfidenceProps: NoConfidenceProps,
+  ) => Promise<VotingProposalBuilder | undefined>;
 }
 
 type Utxos = {
@@ -242,7 +282,7 @@ type Utxos = {
   TransactionUnspentOutput: TransactionUnspentOutput;
 }[];
 
-const NETWORK = +import.meta.env.VITE_NETWORK_FLAG;
+const NETWORK = +env.VITE_NETWORK_FLAG;
 
 const CardanoContext = createContext<CardanoContextType>(
   {} as CardanoContextType,
@@ -250,12 +290,6 @@ const CardanoContext = createContext<CardanoContextType>(
 CardanoContext.displayName = "CardanoContext";
 
 const CardanoProvider = (props: Props) => {
-  const { network: networkKey } = useAppContext();
-  const guardrailScript =
-    COMPILED_GUARDRAIL_SCRIPTS[
-      networkKey as keyof typeof COMPILED_GUARDRAIL_SCRIPTS
-    ];
-
   const [isEnabled, setIsEnabled] = useState(false);
   const isGuardrailScriptUsed = useRef(false);
   const redeemers = useRef<Redeemer[]>([]);
@@ -263,6 +297,7 @@ const CardanoProvider = (props: Props) => {
   const [walletApi, setWalletApi] = useState<CardanoApiWallet | undefined>(
     undefined,
   );
+
   const [address, setAddress] = useState<string | undefined>(undefined);
   const [pubDRepKey, setPubDRepKey] = useState<string>("");
   const [dRepID, setDRepID] = useState<string>("");
@@ -279,6 +314,7 @@ const CardanoProvider = (props: Props) => {
     changeAddress: undefined,
     usedAddress: undefined,
   });
+  const [walletName, setWalletName] = useState<string | undefined>(undefined);
   const { t } = useTranslation();
   const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
@@ -293,7 +329,6 @@ const CardanoProvider = (props: Props) => {
       ).to_bech32();
       setWalletState((prev) => ({ ...prev, changeAddress }));
 
-      // return changeAddress for the usage of the pillars;
       return changeAddress;
     } catch (err) {
       console.error(err);
@@ -314,26 +349,32 @@ const CardanoProvider = (props: Props) => {
     }
   };
 
+  /**
+   * Checks if there are any registered stake keys.
+   * @returns {boolean} True if there are registered stake keys, false otherwise.
+   */
+  const isStakeKeyRegistered = () => !!registeredStakeKeysListState.length;
+
   const enable = useCallback(
-    async (walletName: string) => {
-      setIsEnableLoading(walletName);
+    async (name: string) => {
+      setIsEnableLoading(name);
       await checkIsMaintenanceOn();
 
-      // todo: use .getSupportedExtensions() to check if wallet supports CIP-95
-      if (!isEnabled && walletName) {
+      // TODO: use .getSupportedExtensions() to check if wallet supports CIP-95
+      if (!isEnabled && name) {
         try {
           // Check that this wallet supports CIP-95 connection
-          if (!window.cardano[walletName].supportedExtensions) {
+          if (!window.cardano[name].supportedExtensions) {
             throw new Error(t("errors.walletNoCIP30Support"));
           } else if (
-            !window.cardano[walletName].supportedExtensions.some(
+            !window.cardano[name].supportedExtensions.some(
               (item) => item.cip === 95,
             )
           ) {
             throw new Error(t("errors.walletNoCIP30Nor90Support"));
           }
           // Enable wallet connection
-          const enabledApi: CardanoApiWallet = await window.cardano[walletName]
+          const enabledApi: CardanoApiWallet = await window.cardano[name]
             .enable({
               extensions: [{ cip: 95 }],
             })
@@ -342,7 +383,7 @@ const CardanoProvider = (props: Props) => {
                 category: "wallet",
                 message: "Wallet connected",
                 level: "info",
-                data: window.cardano[walletName],
+                data: window.cardano[name],
               });
               return enabledWalletApi;
             })
@@ -351,8 +392,10 @@ const CardanoProvider = (props: Props) => {
             });
           await getChangeAddress(enabledApi);
           await getUsedAddresses(enabledApi);
+
           setIsEnabled(true);
           setWalletApi(enabledApi);
+          setWalletName(name);
           // Check if wallet has enabled the CIP-95 extension
           const enabledExtensions = await enabledApi.getExtensions();
           if (!enabledExtensions.some((item) => item.cip === 95)) {
@@ -403,7 +446,6 @@ const CardanoProvider = (props: Props) => {
                 .to_hex();
             });
           } else {
-            console.warn(t("warnings.usingUnregisteredStakeKeys"));
             stakeKeysList = unregisteredStakeKeysList.map((key) => {
               const stakeKeyHash = PublicKey.from_hex(key).hash();
               const stakeCredential = Credential.from_keyhash(stakeKeyHash);
@@ -439,10 +481,11 @@ const CardanoProvider = (props: Props) => {
           const dRepIDs = await getPubDRepID(enabledApi);
           setPubDRepKey(dRepIDs?.dRepKey || "");
           setDRepID(dRepIDs?.dRepID || "");
-          setItemToLocalStorage(`${WALLET_LS_KEY}_name`, walletName);
+          setItemToLocalStorage(`${WALLET_LS_KEY}_name`, name);
 
           return { status: t("ok"), stakeKey: stakeKeySet };
         } catch (e) {
+          console.error({ e });
           console.error(e);
           setError(`${e}`);
           setAddress(undefined);
@@ -472,6 +515,7 @@ const CardanoProvider = (props: Props) => {
     setAddress(undefined);
     setStakeKey(undefined);
     setIsEnabled(false);
+    setWalletName(undefined);
 
     Sentry.addBreadcrumb({
       category: "wallet",
@@ -499,6 +543,7 @@ const CardanoProvider = (props: Props) => {
           .max_value_size(epochParams.max_val_size)
           .max_tx_size(epochParams.max_tx_size)
           .prefer_pure_change(true)
+          .do_not_burn_extra_change(true)
           .ex_unit_prices(
             ExUnitPrices.new(
               UnitInterval.new(
@@ -557,6 +602,14 @@ const CardanoProvider = (props: Props) => {
           }
         }
 
+        // register stake key if it is not registered
+        if (!certBuilder && !registeredStakeKeysListState.length) {
+          const stakeKeyRegCertBuilder = CertificatesBuilder.new();
+          const stakeKeyRegCert = await buildStakeKeyRegCert();
+          stakeKeyRegCertBuilder.add(stakeKeyRegCert);
+          txBuilder.set_certs_builder(stakeKeyRegCertBuilder);
+        }
+
         if (votingBuilder) {
           txBuilder.set_voting_builder(votingBuilder);
         }
@@ -569,7 +622,9 @@ const CardanoProvider = (props: Props) => {
           try {
             const scripts = PlutusScripts.new();
             scripts.add(
-              PlutusScript.from_bytes_v3(Buffer.from(guardrailScript, "hex")),
+              PlutusScript.from_bytes_v3(
+                Buffer.from(COMPILED_GUARDRAIL_SCRIPT, "hex"),
+              ),
             );
             transactionWitnessSet.set_plutus_scripts(scripts);
 
@@ -674,12 +729,9 @@ const CardanoProvider = (props: Props) => {
         // Make a full transaction, passing in empty witness set
         const tx = Transaction.new(txBody, transactionWitnessSet);
         // Ask wallet to to provide signature (witnesses) for the transaction
-        let txVkeyWitnesses;
-
-        txVkeyWitnesses = await walletApi.signTx(tx.to_hex(), true);
 
         // Create witness set object using the witnesses provided by the wallet
-        txVkeyWitnesses = TransactionWitnessSet.from_bytes(
+        const txVkeyWitnesses = TransactionWitnessSet.from_bytes(
           Buffer.from(await walletApi.signTx(tx.to_hex(), true), "hex"),
         );
         const vkeys = txVkeyWitnesses.vkeys();
@@ -709,8 +761,8 @@ const CardanoProvider = (props: Props) => {
         // TODO: type error
         // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
-        const isWalletConnected = await window.cardano[walletName].isEnabled();
+        const name = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
+        const isWalletConnected = await window.cardano[name].isEnabled();
 
         if (!isWalletConnected) {
           disconnectWallet();
@@ -728,19 +780,31 @@ const CardanoProvider = (props: Props) => {
       walletApi,
       t,
       updateTransaction,
-      guardrailScript,
       epochParams?.cost_model?.costs,
       disconnectWallet,
+      registeredStakeKeysListState,
+      stakeKey,
     ],
   );
+
+  const buildCredentialFromBech32Key = useCallback(async (key: string) => {
+    try {
+      const keyHash = Ed25519KeyHash.from_hex(key);
+      return Credential.from_keyhash(keyHash);
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }, []);
 
   const buildStakeKeyRegCert = useCallback(async (): Promise<Certificate> => {
     try {
       if (!stakeKey) {
         throw new Error(t("errors.noStakeKeySelected"));
       }
-      const stakeKeyHash = Ed25519KeyHash.from_hex(stakeKey.substring(2));
-      const stakeCred = Credential.from_keyhash(stakeKeyHash);
+      const stakeCred = await buildCredentialFromBech32Key(
+        stakeKey.substring(2),
+      );
       const stakeKeyRegCert = StakeRegistration.new_with_explicit_deposit(
         stakeCred,
         BigNum.from_str(`${epochParams.key_deposit}`),
@@ -760,8 +824,9 @@ const CardanoProvider = (props: Props) => {
           throw new Error(t("errors.noStakeKeySelected"));
         }
         // Remove network tag from stake key hash
-        const stakeKeyHash = Ed25519KeyHash.from_hex(stakeKey.substring(2));
-        const stakeCred = Credential.from_keyhash(stakeKeyHash);
+        const stakeCred = await buildCredentialFromBech32Key(
+          stakeKey.substring(2),
+        );
 
         // Create correct DRep
         let targetDRep;
@@ -796,8 +861,7 @@ const CardanoProvider = (props: Props) => {
     ): Promise<Certificate> => {
       try {
         // Get wallet's DRep key
-        const dRepKeyHash = Ed25519KeyHash.from_hex(dRepID);
-        const dRepCred = Credential.from_keyhash(dRepKeyHash);
+        const dRepCred = await buildCredentialFromBech32Key(dRepID);
 
         let dRepRegCert;
         // If there is an anchor
@@ -832,8 +896,7 @@ const CardanoProvider = (props: Props) => {
     ): Promise<Certificate> => {
       try {
         // Get wallet's DRep key
-        const dRepKeyHash = Ed25519KeyHash.from_hex(dRepID);
-        const dRepCred = Credential.from_keyhash(dRepKeyHash);
+        const dRepCred = await buildCredentialFromBech32Key(dRepID);
 
         let dRepUpdateCert;
         // If there is an anchor
@@ -857,8 +920,7 @@ const CardanoProvider = (props: Props) => {
     async (voterDeposit: string): Promise<Certificate> => {
       try {
         // Get wallet's DRep key
-        const dRepKeyHash = Ed25519KeyHash.from_hex(dRepID);
-        const dRepCred = Credential.from_keyhash(dRepKeyHash);
+        const dRepCred = await buildCredentialFromBech32Key(dRepID);
 
         const dRepRetirementCert = DRepDeregistration.new(
           dRepCred,
@@ -883,12 +945,10 @@ const CardanoProvider = (props: Props) => {
       cip95MetadataHash?: string,
     ): Promise<VotingBuilder> => {
       try {
-        // Get wallet's DRep key
-        const dRepKeyHash = Ed25519KeyHash.from_hex(dRepID);
-        // Vote things
-        const voter = Voter.new_drep_credential(
-          Credential.from_keyhash(dRepKeyHash),
-        );
+        // Get wallet's DRep credential
+        const dRepCredential = await buildCredentialFromBech32Key(dRepID);
+        // Vote credential
+        const voter = Voter.new_drep_credential(dRepCredential);
         const govActionId = GovernanceActionId.new(
           // placeholder
           TransactionHash.from_hex(txHash),
@@ -977,6 +1037,153 @@ const CardanoProvider = (props: Props) => {
     [],
   );
 
+  // new constitution action
+  const buildNewConstitutionGovernanceAction = useCallback(
+    async ({
+      prevGovernanceActionHash,
+      prevGovernanceActionIndex,
+      constitutionUrl,
+      constitutionHash,
+      url,
+      hash,
+      scriptHash,
+    }: NewConstitutionProps) => {
+      const govActionBuilder = VotingProposalBuilder.new();
+      try {
+        const constitutionAnchor = generateAnchor(
+          constitutionUrl,
+          constitutionHash,
+        );
+        const anchor = generateAnchor(url, hash);
+
+        const rewardAddr = await getRewardAddress();
+        if (!rewardAddr) throw new Error("Can not get reward address");
+
+        let constitution;
+        if (scriptHash) {
+          constitution = Constitution.new_with_script_hash(
+            constitutionAnchor,
+            ScriptHash.from_hex(scriptHash),
+          );
+        } else {
+          constitution = Constitution.new(constitutionAnchor);
+        }
+
+        let newConstitution;
+        if (prevGovernanceActionHash && prevGovernanceActionIndex) {
+          const prevGovernanceActionId = GovernanceActionId.new(
+            TransactionHash.from_hex(prevGovernanceActionHash),
+            Number(prevGovernanceActionIndex),
+          );
+          newConstitution = NewConstitutionAction.new_with_action_id(
+            prevGovernanceActionId,
+            constitution,
+          );
+        } else {
+          newConstitution = NewConstitutionAction.new(constitution);
+        }
+
+        const newConstitutionAction =
+          GovernanceAction.new_new_constitution_action(newConstitution);
+
+        // Create voting proposal
+        const votingProposal = VotingProposal.new(
+          newConstitutionAction,
+          anchor,
+          rewardAddr,
+          BigNum.from_str(epochParams?.gov_action_deposit.toString()),
+        );
+
+        govActionBuilder.add(votingProposal);
+
+        return govActionBuilder;
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    [epochParams?.gov_action_deposit, getRewardAddress],
+  );
+
+  // update committee action
+  const buildUpdateCommitteeGovernanceAction = useCallback(
+    async ({
+      prevGovernanceActionHash,
+      prevGovernanceActionIndex,
+      url,
+      hash,
+      newCommittee,
+      removeCommittee,
+      quorumThreshold,
+    }: UpdateCommitteeProps) => {
+      const govActionBuilder = VotingProposalBuilder.new();
+      try {
+        const anchor = generateAnchor(url, hash);
+        const rewardAddr = await getRewardAddress();
+        if (!rewardAddr) throw new Error("Can not get reward address");
+
+        const threshold = UnitInterval.new(
+          BigNum.from_str(quorumThreshold.numerator.toString()),
+          BigNum.from_str(quorumThreshold.denominator.toString()),
+        );
+        const committeeToAdd = Committee.new(threshold);
+        if (newCommittee) {
+          newCommittee.forEach(async (member) => {
+            const credential = await buildCredentialFromBech32Key(
+              member.committee,
+            );
+            committeeToAdd.add_member(credential, Number(member.expiryEpoch));
+          });
+        }
+        const committeeToRemoveCredentials = Credentials.new();
+        if (removeCommittee) {
+          removeCommittee.forEach(async (member) => {
+            const credential = await buildCredentialFromBech32Key(member);
+            committeeToRemoveCredentials.add(credential);
+          });
+        }
+
+        let updateCommitteeAction;
+        if (prevGovernanceActionHash && prevGovernanceActionIndex) {
+          const prevGovernanceActionId = GovernanceActionId.new(
+            TransactionHash.from_hex(prevGovernanceActionHash),
+            Number(prevGovernanceActionIndex),
+          );
+          updateCommitteeAction = UpdateCommitteeAction.new_with_action_id(
+            prevGovernanceActionId,
+            committeeToAdd,
+            committeeToRemoveCredentials,
+          );
+        } else {
+          updateCommitteeAction = UpdateCommitteeAction.new(
+            committeeToAdd,
+            committeeToRemoveCredentials,
+          );
+        }
+
+        const updateCommitteeGovernanceAction =
+          GovernanceAction.new_new_committee_action(updateCommitteeAction);
+
+        const votingProposal = VotingProposal.new(
+          updateCommitteeGovernanceAction,
+          anchor,
+          rewardAddr,
+          BigNum.from_str(epochParams?.gov_action_deposit.toString()),
+        );
+
+        govActionBuilder.add(votingProposal);
+
+        return govActionBuilder;
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    [
+      buildCredentialFromBech32Key,
+      epochParams?.gov_action_deposit,
+      getRewardAddress,
+    ],
+  );
+
   // info action
   const buildNewInfoGovernanceAction = useCallback(
     async ({ hash, url }: InfoProps) => {
@@ -1006,6 +1213,38 @@ const CardanoProvider = (props: Props) => {
       }
     },
     [epochParams, getRewardAddress],
+  );
+
+  // no confidence action
+  const buildNoConfidenceGovernanceAction = useCallback(
+    async ({ hash, url }: NoConfidenceProps) => {
+      const govActionBuilder = VotingProposalBuilder.new();
+      try {
+        // Create new no confidence action
+        const noConfidenceAction = NoConfidenceAction.new();
+        const noConfidenceGovAct =
+          GovernanceAction.new_no_confidence_action(noConfidenceAction);
+        // Create an anchor
+        const anchor = generateAnchor(url, hash);
+
+        const rewardAddr = await getRewardAddress();
+        if (!rewardAddr) throw new Error("Can not get reward address");
+
+        // Create voting proposal
+        const votingProposal = VotingProposal.new(
+          noConfidenceGovAct,
+          anchor,
+          rewardAddr,
+          BigNum.from_str(epochParams?.gov_action_deposit.toString()),
+        );
+        govActionBuilder.add(votingProposal);
+
+        return govActionBuilder;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [epochParams?.gov_action_deposit, getRewardAddress],
   );
 
   // treasury action
@@ -1040,7 +1279,7 @@ const CardanoProvider = (props: Props) => {
           );
         });
         const guardrailPlutusScript = PlutusScript.from_bytes_v3(
-          Buffer.from(guardrailScript, "hex"),
+          Buffer.from(COMPILED_GUARDRAIL_SCRIPT, "hex"),
         );
         const treasuryAction = TreasuryWithdrawalsAction.new_with_policy_hash(
           treasuryWithdrawals,
@@ -1079,7 +1318,6 @@ const CardanoProvider = (props: Props) => {
       addVotingProposalToBuilder,
       epochParams?.gov_action_deposit,
       getRewardAddress,
-      guardrailScript,
     ],
   );
 
@@ -1102,13 +1340,13 @@ const CardanoProvider = (props: Props) => {
         }
 
         const guardrailPlutusScript = PlutusScript.from_bytes_v3(
-          Buffer.from(guardrailScript, "hex"),
+          Buffer.from(COMPILED_GUARDRAIL_SCRIPT, "hex"),
         );
         let protocolParamChangeAction;
         if (prevGovernanceActionHash && prevGovernanceActionIndex) {
           const prevGovernanceActionId = GovernanceActionId.new(
             TransactionHash.from_hex(prevGovernanceActionHash),
-            prevGovernanceActionIndex,
+            Number(prevGovernanceActionIndex),
           );
           protocolParamChangeAction =
             ParameterChangeAction.new_with_policy_hash_and_action_id(
@@ -1157,7 +1395,6 @@ const CardanoProvider = (props: Props) => {
       addVotingProposalToBuilder,
       epochParams?.gov_action_deposit,
       getRewardAddress,
-      guardrailScript,
     ],
   );
 
@@ -1172,13 +1409,16 @@ const CardanoProvider = (props: Props) => {
     }: HardForkInitiationProps) => {
       const govActionBuilder = VotingProposalBuilder.new();
       try {
-        const newProtocolVersion = ProtocolVersion.new(major, minor);
+        const newProtocolVersion = ProtocolVersion.new(
+          Number(major),
+          Number(minor),
+        );
 
         let hardForkInitiationAction;
         if (prevGovernanceActionHash && prevGovernanceActionIndex) {
           const prevGovernanceActionId = GovernanceActionId.new(
             TransactionHash.from_hex(prevGovernanceActionHash),
-            prevGovernanceActionIndex,
+            Number(prevGovernanceActionIndex),
           );
           hardForkInitiationAction =
             HardForkInitiationAction.new_with_action_id(
@@ -1228,6 +1468,9 @@ const CardanoProvider = (props: Props) => {
       buildHardForkGovernanceAction,
       buildNewInfoGovernanceAction,
       buildProtocolParameterChangeGovernanceAction,
+      buildNoConfidenceGovernanceAction,
+      buildNewConstitutionGovernanceAction,
+      buildUpdateCommitteeGovernanceAction,
       buildSignSubmitConwayCertTx,
       buildStakeKeyRegCert,
       buildTreasuryGovernanceAction,
@@ -1242,6 +1485,7 @@ const CardanoProvider = (props: Props) => {
       isEnabled,
       isMainnet,
       isPendingTransaction,
+      isStakeKeyRegistered,
       pendingTransaction,
       pubDRepKey,
       registeredStakeKeysListState,
@@ -1249,6 +1493,7 @@ const CardanoProvider = (props: Props) => {
       stakeKey,
       stakeKeys,
       walletApi,
+      walletName,
     }),
     [
       address,
@@ -1258,6 +1503,9 @@ const CardanoProvider = (props: Props) => {
       buildHardForkGovernanceAction,
       buildNewInfoGovernanceAction,
       buildProtocolParameterChangeGovernanceAction,
+      buildNoConfidenceGovernanceAction,
+      buildNewConstitutionGovernanceAction,
+      buildUpdateCommitteeGovernanceAction,
       buildSignSubmitConwayCertTx,
       buildStakeKeyRegCert,
       buildTreasuryGovernanceAction,
@@ -1272,6 +1520,7 @@ const CardanoProvider = (props: Props) => {
       isEnabled,
       isMainnet,
       isPendingTransaction,
+      isStakeKeyRegistered,
       pendingTransaction,
       pubDRepKey,
       registeredStakeKeysListState,
@@ -1279,6 +1528,7 @@ const CardanoProvider = (props: Props) => {
       stakeKey,
       stakeKeys,
       walletApi,
+      walletName,
     ],
   );
 

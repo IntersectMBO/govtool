@@ -1,9 +1,10 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import { IMAGES, PATHS } from "@consts";
 import { useTranslation } from "@hooks";
 import { DashboardActionCard } from "@molecules";
 import { openInNewTab } from "@utils";
+import { LINKS } from "@/consts/links";
 
 export const ListGovActionsDashboardCards = () => {
   const navigate = useNavigate();
@@ -21,10 +22,7 @@ export const ListGovActionsDashboardCards = () => {
         {
           children: t("learnMore"),
           dataTestId: "list-gov-actions-learn-more-button",
-          onClick: () =>
-            openInNewTab(
-              "https://docs.gov.tools/using-govtool/govtool-functions/governance-actions/view-governance-actions",
-            ),
+          onClick: () => openInNewTab(LINKS.VIEW_GOVERNANCE_ACTIONS),
           variant: "outlined",
         },
       ]}

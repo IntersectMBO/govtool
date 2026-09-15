@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
@@ -10,8 +10,9 @@ export const useGetProposalsQuery = ({
   filters = [],
   searchPhrase,
   sorting,
+  enabled,
 }: GetProposalsArguments) => {
-  const { dRepID, pendingTransaction } = useCardano();
+  const { dRepID } = useCardano();
   const { voter } = useGetVoterInfo();
 
   const fetchProposals = async (): Promise<ProposalData[]> => {
@@ -32,22 +33,29 @@ export const useGetProposalsQuery = ({
     return allProposals.flatMap((proposal) => proposal.elements);
   };
 
-  const { data, isLoading } = useQuery(
-    [
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: [
       QUERY_KEYS.useGetProposalsKey,
       filters,
       searchPhrase,
       sorting,
       dRepID,
-      pendingTransaction.vote?.transactionHash,
+      voter?.isRegisteredAsDRep,
+      voter?.isRegisteredAsSoleVoter,
     ],
-    fetchProposals,
-  );
+    queryFn: fetchProposals,
+    enabled,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    placeholderData: keepPreviousData,
+  });
+
+  const isProposalsLoading = isLoading || isFetching;
 
   const proposals = Object.values(groupByType(data) ?? []);
 
   return {
-    isProposalsLoading: isLoading,
+    isProposalsLoading,
     proposals,
   };
 };

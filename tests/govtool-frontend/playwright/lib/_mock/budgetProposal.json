@@ -1,0 +1,171 @@
+{
+  "data": {
+    "id": 49,
+    "attributes": {
+      "privacy_policy": true,
+      "intersect_named_administrator": true,
+      "prop_comments_number": 2,
+      "is_active": true,
+      "createdAt": "2025-03-31T12:08:38.908Z",
+      "updatedAt": "2025-04-01T08:09:46.924Z",
+      "intersect_admin_further_text": null,
+      "creator": {
+        "data": {
+          "id": 1300,
+          "attributes": {
+            "username": "e0d7ccd5f411be1bb732a3770fd4c79b74bd5fc75ac76bdfe73f2d8893",
+            "email": "e0d7ccd5f411be1bb732a3770fd4c79b74bd5fc75ac76bdfe73f2d8893@example.com",
+            "provider": "local",
+            "confirmed": true,
+            "blocked": false,
+            "govtool_username": "intersectadmin",
+            "createdAt": "2025-03-31T09:43:04.102Z",
+            "updatedAt": "2025-03-31T09:43:17.516Z"
+          }
+        }
+      },
+      "bd_costing": {
+        "data": {
+          "id": 49,
+          "attributes": {
+            "ada_amount": "0",
+            "amount_in_preferred_currency": "300000",
+            "usd_to_ada_conversion_rate": "0",
+            "cost_breakdown": "25% up front, 75% on delivery.\n\nUp front: $75,000\nOn delivery: $225,000",
+            "createdAt": "2025-03-31T12:08:38.879Z",
+            "updatedAt": "2025-03-31T12:08:38.879Z",
+            "preferred_currency": {
+              "data": {
+                "id": 1,
+                "attributes": {
+                  "currency_name": "United States Dollar",
+                  "currency_letter_code": "USD",
+                  "currency_number_code": "840",
+                  "createdAt": "2025-03-31T08:49:25.530Z",
+                  "updatedAt": "2025-03-31T08:49:25.530Z",
+                  "publishedAt": "2025-03-31T08:49:25.529Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "bd_proposal_detail": {
+        "data": {
+          "id": 49,
+          "attributes": {
+            "experience": "Wanchain has already deployed cross-chain value bridges to Cardano. Wanchain has also already deployed XPort on other networks.",
+            "proposal_name": "Deploy XPort, Wanchain's cross-chain data transfer protocol, to Cardano",
+            "key_dependencies": "No dependencies",
+            "maintain_and_support": "Wanchain will provide ongoing maintenance.",
+            "proposal_description": "Blockchain interoperability is essential for the growth and adoption of decentralized technologies. As a leading blockchain network, Cardano has established itself as a secure, scalable, and research-driven ecosystem. However, interoperability with other blockchains remains limited. Wanchain’s XPort protocol offers a decentralized, secure, and efficient cross-chain data transfer solution, making it an ideal candidate to bridge Cardano with external blockchain ecosystems. This proposal is for the deployment of XPort to Cardano, enabling seamless cross-chain data transfers between Cardano and other blockchain networks.\n\nAbout Cross-Chain Data Transfer Protocols\n\nCross-Chain Data Transfer Protocols enable data to be passed from one blockchain to another. Rather than only moving fungible and non-fungible tokens, which are a specific type of data structure, Cross-Chain Data Transfer Protocols can move any type of data. Importantly, Cross-Chain Data Transfer Protocols can feed data into 3rd party smart contracts to seamlessly execute on-chain logic and create novel cross-chain applications.\n\nThe basic flow of all Cross-Chain Data Transfers Protocols is as follows:\n\n- A user or smart contract records arbitrary data on the source chain\n- The off-chain component detects these data\n- The off-chain component records these data on the destination chain\n- A smart contract executes on-chain logic on the destination chain using these data\n\nAbout XPort\n\nTrue to its legacy, XPort is deceptively simple. It essentially just detects data on a source blockchain then exports it to the destination chain in the correct format.\n\nXPort is composed of two basic elements: one robust off-chain relayer and a set of rudimentary on-chain smart contracts called Cross-Chain Gateways.\n\n1. The off-chain relayer is the same Bridge Node Group that secures all cross-chain transactions executed using the Wanchain Bridge. These permissionless Bridge Nodes are rotated and re-elected monthly. They use Multiparty Computation and Shamir’s Secret Sharing cryptography to transfer messages and arbitrary data across chains.\n\n2. A smart contract, called a Cross-Chain Gateway, is deployed on each supported blockchain. These Cross-Chain Gateways have limited functionality — they can essentially only send and receive data. They serve as the point of contact for all 3rd party developers.\n\nImportantly, XPort is designed to be compliant with the Enterprise Ethereum Alliance’s Distributed Ledger Technology Interoperability Specification, co-authored by Wanchain’s VP on Engineering Dr. Weijia Zhang.\n\nMore technical information about XPort: https://docs.wanchain.org/latest-major-updates/xport-wanchains-cross-chain-data-transfer-protocol-development-handbook",
+            "key_proposal_deliverables": "- XPort interface definition adjustment to support Cardano\n\n- XPort deployed on Cardano Pre-Production\n\n- XPort deployed on Cardano Mainnet: developers will be able to build applications that seamlessly span multiple networks using XPort",
+            "resourcing_duration_estimates": "Budget: 400,000 USD\nTeam size: ~30\nDuration: 9 months",
+            "other_contract_type": "",
+            "createdAt": "2025-03-31T12:08:38.864Z",
+            "updatedAt": "2025-03-31T12:08:38.864Z",
+            "contract_type_name": {
+              "data": {
+                "id": 3,
+                "attributes": {
+                  "contract_type_name": "Service Level Agreement",
+                  "createdAt": "2025-03-31T08:49:37.711Z",
+                  "updatedAt": "2025-03-31T08:49:37.711Z",
+                  "publishedAt": "2025-03-31T08:49:37.710Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "bd_further_information": {
+        "data": {
+          "id": 49,
+          "attributes": {
+            "createdAt": "2025-03-31T12:08:38.891Z",
+            "updatedAt": "2025-03-31T12:08:38.891Z",
+            "proposal_links": []
+          }
+        }
+      },
+      "bd_psapb": {
+        "data": {
+          "id": 49,
+          "attributes": {
+            "problem_statement": "Seamless cross-chain communication is a challenge for permissionless blockchains due to their inherent lack of interoperability. This limitation is rooted in their trustless nature, as blockchains need a mechanism to verify the authenticity of data before processing it. When dealing with heterogeneous blockchain networks, each with their own distinct ruleset and security guarantees, cross-chain communication is currently impossible without the intervention of an off-chain component.\n\nIn many ways, this problem is just the oracle problem. The oracle problem, for those who are unfamiliar, refers to a blockchain’s inability to access external data, rendering it isolated. An additional piece of infrastructure — whether you want to call it a bridge, an oracle or a relayer — is needed to connect the blockchain and the off-chain data. With cross-chain communication, the problem is the same. The data that needs to be accessed just happens to be on another blockchain!\n\nCross-Chain Data Transfer Protocols enable data to be passed from one blockchain to another. Rather than only moving fungible and non-fungible tokens, which are a specific type of data structure, Cross-Chain Data Transfer Protocols can move any type of data. Importantly, Cross-Chain Data Transfer Protocols can feed data into 3rd party smart contracts to seamlessly execute on-chain logic and create novel cross-chain applications.\n\nThis proposal is to deploy XPort, Wanchain's cross-chain data transfer protocol, to Cardano.",
+            "proposal_benefit": "Once deployed, XPort will allow arbitrary data to flow between Cardano, any EVM, and select non-EVM networks. This will enable developers to develop applications that span multiple blockchains. It will also empower developers to shift their focus from extracting value out of a blockchain to importing execution logic into one. \n\nOther potential benefits include but are not limited to:\n\n- Improved interoperability between Cardano and the of the industry\n- Expanded access to liquidity and assets on other chains\n- Greater abstraction to improve UX\n- Reduced bridge risk\n- Improved developer experience\n- More modular application design/New types of applications",
+            "supplementary_endorsement": "Wanchain is the longest running cross-chain bridge in the blockchain industry and is the primary cross-chain value bridge currently servicing the Cardano mainnet. It has received good support from the Cardano community (multiple approved Catalyst proposals) and Cardano Dapps (like Liqwid).",
+            "explain_proposal_roadmap": "",
+            "createdAt": "2025-03-31T12:08:38.846Z",
+            "updatedAt": "2025-03-31T12:08:38.846Z",
+            "committee_name": {
+              "data": {
+                "id": 2,
+                "attributes": {
+                  "committee_name": "Product Committee",
+                  "createdAt": "2025-03-31T08:50:27.431Z",
+                  "updatedAt": "2025-03-31T08:50:27.431Z",
+                  "publishedAt": "2025-03-31T08:50:27.429Z"
+                }
+              }
+            },
+            "roadmap_name": {
+              "data": {
+                "id": 2,
+                "attributes": {
+                  "roadmap_name": "Architectural Excellence",
+                  "createdAt": "2025-03-31T08:49:40.879Z",
+                  "updatedAt": "2025-03-31T08:49:40.879Z",
+                  "publishedAt": "2025-03-31T08:49:40.877Z"
+                }
+              }
+            },
+            "type_name": {
+              "data": {
+                "id": 6,
+                "attributes": {
+                  "type_name": "Core",
+                  "createdAt": "2025-03-31T10:40:44.559Z",
+                  "updatedAt": "2025-03-31T10:40:45.976Z",
+                  "publishedAt": "2025-03-31T10:40:45.971Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "bd_proposal_ownership": {
+        "data": {
+          "id": 50,
+          "attributes": {
+            "agreed": true,
+            "group_name": "",
+            "company_name": "Wanchain",
+            "type_of_group": "",
+            "social_handles": "https://x.com/wanchain_org, https://x.com/TemujinLouie",
+            "submited_on_behalf": "Company",
+            "company_domain_name": "wanchain.org",
+            "proposal_public_champion": "Submission lead listed above",
+            "key_info_to_identify_group": "",
+            "createdAt": "2025-03-31T12:08:38.826Z",
+            "updatedAt": "2025-03-31T12:08:38.826Z",
+            "be_country": {
+              "data": {
+                "id": 32,
+                "attributes": {
+                  "country_name": "British Virgin Islands",
+                  "alfa_2_code": "VG",
+                  "alfa_3_code": "VGB",
+                  "createdAt": "2025-03-31T08:49:04.220Z",
+                  "updatedAt": "2025-03-31T08:49:04.220Z",
+                  "publishedAt": "2025-03-31T08:49:04.219Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "meta": {}
+}

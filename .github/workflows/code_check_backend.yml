@@ -13,8 +13,9 @@ jobs:
       - name: Use Haskell
         uses: haskell-actions/setup@v2
         with:
-          ghc-version: '9.2.7'
-          cabal-version: '3.6.0.0'
+          ghc-version: '9.2.8'
+          cabal-version: '3.8.1.0'
+          cabal-update: false
 
       - name: Use Python
         uses: actions/setup-python@v2
@@ -26,6 +27,13 @@ jobs:
 
       - name: Install HLint
         run: |
+          rm -rf ~/.cabal ~/.ghcup
+          mkdir -p ~/.cabal
+          cat <<EOF > ~/.cabal/config
+          repository hackage.haskell.org
+            url: http://hackage.haskell.org/
+            secure: False
+          EOF
           cabal update
           cabal install hlint
 
@@ -41,8 +49,9 @@ jobs:
       - name: Use Haskell
         uses: haskell-actions/setup@v2
         with:
-          ghc-version: '9.2.7'
-          cabal-version: '3.6.0.0'
+          ghc-version: '9.2.8'
+          cabal-version: '3.8.1.0'
+          cabal-update: false
 
       - name: Use Python
         uses: actions/setup-python@v2
@@ -54,6 +63,13 @@ jobs:
 
       - name: Install HLint
         run: |
+          rm -rf ~/.cabal ~/.ghcup
+          mkdir -p ~/.cabal
+          cat <<EOF > ~/.cabal/config
+          repository hackage.haskell.org
+            url: http://hackage.haskell.org/
+            secure: False
+          EOF
           cabal update
           cabal install stylish-haskell
 

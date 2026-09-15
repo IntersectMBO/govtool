@@ -1,12 +1,11 @@
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
-import * as Sentry from "@sentry/react";
 import { NodeObject } from "jsonld";
 
 import { downloadJson, generateJsonld, generateMetadataBody } from "@utils";
 import { MetadataValidationStatus } from "@models";
-import { CIP_100, CIP_100_CONTEXT } from "@/consts";
+import { CIP_100_CONTEXT } from "@/consts";
 
 import { useValidateMutation } from "../mutations";
 
@@ -38,14 +37,13 @@ export const useVoteContextForm = (
 
   const generateMetadata = useCallback(async () => {
     const { voteContextText } = getValues();
-    const body = generateMetadataBody({
+    const body = await generateMetadataBody({
       data: {
         comment: voteContextText,
       },
       acceptedKeys: ["comment"],
-      standardReference: CIP_100,
     });
-    const jsonld = await generateJsonld(body, CIP_100_CONTEXT, CIP_100);
+    const jsonld = await generateJsonld(body, CIP_100_CONTEXT);
 
     const jsonHash = blake2bHex(JSON.stringify(jsonld, null, 2), undefined, 32);
 
@@ -53,7 +51,7 @@ export const useVoteContextForm = (
     setHash(jsonHash);
     setJson(jsonld);
 
-    return jsonld;
+    return { jsonld, jsonHash };
   }, [getValues]);
 
   const onClickDownloadJson = () => {
@@ -61,16 +59,16 @@ export const useVoteContextForm = (
     downloadJson(json, "Vote_Context");
   };
 
-  const validateHash = useCallback(
-    async (url: string, localHash: string | null) => {
+  const onSubmit = useCallback(
+    async (data: VoteContextFormValues) => {
       try {
-        if (!localHash) {
+        if (!hash) {
           throw new Error(MetadataValidationStatus.INVALID_HASH);
         }
 
         const result = await validateMetadata({
-          hash: localHash,
-          url,
+          hash,
+          url: data.storingURL,
         });
 
         if (result.status) {
@@ -81,25 +79,11 @@ export const useVoteContextForm = (
       } catch (error: any) {
         if (Object.values(MetadataValidationStatus).includes(error)) {
           if (setErrorMessage) setErrorMessage(error);
-          if (setStep) setStep(4);
+          if (setStep) setStep(5);
         }
-        throw error;
-      }
-    },
-    [],
-  );
-
-  const onSubmit = useCallback(
-    async (data: VoteContextFormValues) => {
-      try {
-        await validateHash(data.storingURL, hash);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        Sentry.setTag("hook", "useVoteContextForm");
-        Sentry.captureException(error);
       } finally {
         if (setSavedHash) setSavedHash(hash);
-        if (setStep) setStep(4);
+        if (setStep) setStep(5);
       }
     },
     [hash],
@@ -118,5 +102,6 @@ export const useVoteContextForm = (
     setValue,
     watch,
     hash,
+    json,
   };
 };

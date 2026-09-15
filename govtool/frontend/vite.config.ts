@@ -1,29 +1,31 @@
 import path from "path";
 import { defineConfig as defineViteConfig, mergeConfig } from "vite";
 import { defineConfig as defineVitestConfig } from "vitest/config";
-import react from "@vitejs/plugin-react";
-import babel from "vite-plugin-babel";
+import compression from "vite-plugin-compression";
+import react from "@vitejs/plugin-react-swc";
 
-// https://vitejs.dev/config/
 const viteConfig = defineViteConfig({
   plugins: [
     react(),
-    // Transpile @intersect.mbo packages as they provides jsx in js which is not supported in vite.
-    babel({
-      include: [
-        "node_modules/@intersect.mbo/**/*.js",
-        "node_modules/@intersect.mbo/**/*.jsx",
-      ],
-      exclude: /node_modules\/@intersect\.mbo\/.*\/node_modules\/.*/, // Exclude nested node_modules
-      babelConfig: {
-        presets: ["@babel/preset-react"],
-      },
+    compression({
+      algorithm: "brotliCompress",
+      threshold: 1024 * 10,
     }),
   ],
   cacheDir: ".vite",
-  // Required for the @intersect.mbo packages as they uses the .env from process which is not supported in vite.
   define: {
     "process.env": {},
+  },
+  build: {
+    chunkSizeWarningLimit: 512,
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        keep_infinity: true,
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
   },
   resolve: {
     alias: [
@@ -67,6 +69,7 @@ const viteConfig = defineViteConfig({
 const vitestConfig = defineVitestConfig({
   test: {
     setupFiles: "./src/setupTests.ts",
+    testTimeout: 10000,
     globals: true,
     pool: "forks",
     poolOptions: {

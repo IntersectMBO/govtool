@@ -17,6 +17,7 @@ import {
   isValidURLLength,
   openInNewTab,
 } from "@utils";
+import { LINKS } from "@/consts/links";
 
 type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -39,9 +40,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
   const fileName = getValues("governance_action_type") as string;
 
   const openGuideAboutStoringInformation = () =>
-    openInNewTab(
-      "https://docs.gov.tools/using-govtool/govtool-functions/storing-information-offline",
-    );
+    openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);
 
   const isActionButtonDisabled = !watch("storingURL") || !!errors.storingURL;
 

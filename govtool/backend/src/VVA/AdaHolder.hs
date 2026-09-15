@@ -1,10 +1,12 @@
-{-# LANGUAGE FlexibleContexts  #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE TypeApplications  #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TemplateHaskell     #-}
+{-# LANGUAGE TypeApplications    #-}
 
 module VVA.AdaHolder where
 
+import           Control.Exception          (SomeException, try)
 import           Control.Monad.Except
 import           Control.Monad.Reader
 
@@ -51,9 +53,16 @@ getStakeKeyVotingPower ::
   Text ->
   m Integer
 getStakeKeyVotingPower stakeKey = withPool $ \conn -> do
-  result <- liftIO $ SQL.query @_ @(Scientific, Text) conn getVotingPowerSql (SQL.Only stakeKey)
-  case result of
-    [(votingPower,_)] -> return $ floor votingPower
-    _ -> do
-      liftIO $ Text.putStrLn ("couldn't fetch voting power for stake key: " <> stakeKey)
-      return 0
+  liftIO $ do
+    result <- try $ SQL.query @_ @(Scientific, ByteString) conn getVotingPowerSql (SQL.Only stakeKey)
+    case result of
+      Left (e :: SomeException) -> do
+        Text.putStrLn ("couldn't fetch voting power for stake key: " <> stakeKey)
+        return 0
+      Right [(votingPower,_)] -> return $ floor votingPower
+      Right [] -> do
+        Text.putStrLn ("No voting power found for stake key: " <> stakeKey)
+        return 0
+      Right _ -> do
+        Text.putStrLn ("Unexpected result for stake key: " <> stakeKey)
+        return 0

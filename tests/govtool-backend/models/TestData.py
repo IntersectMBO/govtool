@@ -18,13 +18,14 @@ class Proposal(TypedDict):
     txHash: str
     index: int
     type: str
-    details: Optional[dict]
+    details: Optional[dict] | Optional[list]
     expiryDate: str
     expiryEpochNo: int
     createdDate: str
     createdEpochNo: int
     url: str
     metadataHash: str
+    protocolParams: Optional[dict]
     title: Optional[str]
     abstract: Optional[str]
     motivation: Optional[str]
@@ -38,6 +39,8 @@ class Proposal(TypedDict):
     poolYesVotes: int
     poolNoVotes: int
     poolAbstainVotes: int
+    prevGovActionIndex: Optional[int]
+    prevGovActionTxHash: Optional[str]
 
 
 class Drep(TypedDict):
@@ -125,13 +128,28 @@ class TxStatus(TypedDict):
 
 
 class NetworkMetrics(TypedDict):
-    currentTime: str
-    currentEpoch: int
-    currentBlock: int
     uniqueDelegators: int
     totalDelegations: int
     totalGovernanceActions: int
     totalDRepVotes: int
     totalRegisteredDReps: int
+    totalDRepDistr: int
+    totalActiveDReps: int
+    totalInactiveDReps: int
+    totalActiveCIP119CompliantDReps: int
+    totalRegisteredDirectVoters: int
+    noOfCommitteeMembers: int
+    quorumNumerator: int
+    quorumDenominator: int
+
+class NetworkTotalStake(TypedDict):
+    totalStakeControlledByDReps: int
+    totalStakeControlledBySPOs: int
     alwaysAbstainVotingPower: int
     alwaysNoConfidenceVotingPower: int
+
+class NetworkInfo(TypedDict):
+    currentTime: str
+    epochNo: int
+    blockNo: int
+    networkName: str

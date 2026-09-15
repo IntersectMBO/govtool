@@ -8,7 +8,9 @@ import {
   useGetVoterInfo,
   useScreenDimension,
 } from "@hooks";
-import { DashboardDrawerMobile } from "@organisms";
+import {
+  DashboardDrawerMobile,
+} from "@organisms";
 import { useCardano } from "@context";
 
 type DashboardTopNavProps = {

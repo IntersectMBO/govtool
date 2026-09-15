@@ -1,20 +1,24 @@
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+import { useNavigate } from "react-router";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
-import * as Sentry from "@sentry/react";
 import { useTranslation } from "react-i18next";
 import { NodeObject } from "jsonld";
 
 import {
-  CIP_108,
   GOVERNANCE_ACTION_CONTEXT,
   PATHS,
   storageInformationErrorModals,
 } from "@consts";
-import { useCardano, useModal, useAppContext } from "@context";
+import { useCardano, useModal, useAppContext, QuorumThreshold } from "@context";
 import {
-  correctAdaFormat,
+  correctVoteAdaFormat,
   downloadJson,
   generateJsonld,
   generateMetadataBody,
@@ -58,7 +62,12 @@ export const useCreateGovernanceActionForm = (
   const {
     buildNewInfoGovernanceAction,
     buildTreasuryGovernanceAction,
+    buildNoConfidenceGovernanceAction,
+    buildNewConstitutionGovernanceAction,
+    buildUpdateCommitteeGovernanceAction,
     buildSignSubmitConwayCertTx,
+    buildHardForkGovernanceAction,
+    buildProtocolParameterChangeGovernanceAction,
   } = useCardano();
 
   // App Management
@@ -84,6 +93,12 @@ export const useCreateGovernanceActionForm = (
   } = useFormContext<CreateGovernanceActionValues>();
   const govActionType = watch("governance_action_type");
 
+  useEffect(() => {
+    if (govActionType === GovernanceActionType.ParameterChange) {
+      setValue("protocolParameters", JSON.stringify(protocolParams));
+    }
+  }, [govActionType]);
+
   // Navigation
   const backToForm = useCallback(() => {
     setStep?.(3);
@@ -101,10 +116,9 @@ export const useCreateGovernanceActionForm = (
       throw new Error("Governance action type is not defined");
     }
 
-    const body = generateMetadataBody({
+    const body = await generateMetadataBody({
       data: getValues(),
       acceptedKeys: ["title", "motivation", "abstract", "rationale"],
-      standardReference: CIP_108,
     });
 
     const jsonld = await generateJsonld(body, GOVERNANCE_ACTION_CONTEXT);
@@ -131,36 +145,131 @@ export const useCreateGovernanceActionForm = (
         hash,
         url: data.storingURL,
       };
-      try {
-        switch (govActionType) {
-          case GovernanceActionType.InfoAction:
-            return await buildNewInfoGovernanceAction(commonGovActionDetails);
-          case GovernanceActionType.TreasuryWithdrawals: {
-            if (
-              data.amount === undefined ||
-              data.receivingAddress === undefined
-            ) {
-              throw new Error(t("errors.invalidTreasuryGovernanceActionType"));
-            }
-
-            const treasuryActionDetails = {
-              ...commonGovActionDetails,
-              withdrawals: [
-                {
-                  amount: data.amount,
-                  receivingAddress: data.receivingAddress,
-                },
-              ],
-            };
-
-            return await buildTreasuryGovernanceAction(treasuryActionDetails);
+      switch (govActionType) {
+        case GovernanceActionType.InfoAction:
+          return buildNewInfoGovernanceAction(commonGovActionDetails);
+        case GovernanceActionType.NoConfidence:
+          return buildNoConfidenceGovernanceAction(commonGovActionDetails);
+        case GovernanceActionType.NewConstitution: {
+          if (
+            data.constitutionUrl === undefined ||
+            data.constitutionHash === undefined
+          ) {
+            throw new Error(
+              t("errors.invalidNewCommitteeGovernanceActionType"),
+            );
           }
-          default:
-            throw new Error(t("errors.invalidGovernanceActionType"));
+
+          return buildNewConstitutionGovernanceAction({
+            ...commonGovActionDetails,
+            constitutionUrl: data.constitutionUrl,
+            constitutionHash: data.constitutionHash,
+            scriptHash: data.scriptHash,
+            prevGovernanceActionHash: data.prevGovernanceActionHash,
+            prevGovernanceActionIndex: data.prevGovernanceActionIndex,
+          });
         }
-      } catch (error) {
-        Sentry.setTag("hook", "useCreateGovernanceActionForm");
-        Sentry.captureException(error);
+        case GovernanceActionType.NewCommittee: {
+          if (
+            data.newCommitteeHash === undefined ||
+            data.newCommitteeExpiryEpoch === undefined
+          ) {
+            throw new Error(
+              t("errors.invalidUpdateCommitteeGovernanceActionType"),
+            );
+          }
+
+          let quorumThreshold: QuorumThreshold = {
+            numerator: "1",
+            denominator: "2",
+          };
+          if (data.numerator !== undefined && data.denominator !== undefined) {
+            quorumThreshold = {
+              numerator: data.numerator,
+              denominator: data.denominator,
+            };
+          }
+
+          return buildUpdateCommitteeGovernanceAction({
+            ...commonGovActionDetails,
+            newCommittee: [
+              {
+                committee: data.newCommitteeHash,
+                expiryEpoch: data.newCommitteeExpiryEpoch,
+              },
+            ],
+            removeCommittee: data.removeCommitteeHash
+              ? [data.removeCommitteeHash]
+              : [],
+            quorumThreshold,
+            prevGovernanceActionHash: data.prevGovernanceActionHash,
+            prevGovernanceActionIndex: data.prevGovernanceActionIndex,
+          });
+        }
+        case GovernanceActionType.TreasuryWithdrawals: {
+          if (
+            data.amount === undefined ||
+            data.receivingAddress === undefined
+          ) {
+            throw new Error(t("errors.invalidTreasuryGovernanceActionType"));
+          }
+
+          const treasuryActionDetails = {
+            ...commonGovActionDetails,
+            withdrawals: [
+              {
+                amount: data.amount,
+                receivingAddress: data.receivingAddress,
+              },
+            ],
+          };
+
+          return buildTreasuryGovernanceAction(treasuryActionDetails);
+        }
+        case GovernanceActionType.HardForkInitiation: {
+          if (
+            data.major === undefined ||
+            data.minor === undefined ||
+            data.prevGovernanceActionHash === undefined ||
+            data.prevGovernanceActionIndex === undefined
+          ) {
+            throw new Error(
+              t("errors.invalidHardForkInitiationGovernanceActionType"),
+            );
+          }
+          const hardForkActionDetails = {
+            ...commonGovActionDetails,
+            prevGovernanceActionHash: data.prevGovernanceActionHash,
+            prevGovernanceActionIndex: data.prevGovernanceActionIndex,
+            major: data.major,
+            minor: data.minor,
+          };
+          return buildHardForkGovernanceAction(hardForkActionDetails);
+        }
+
+        case GovernanceActionType.ParameterChange: {
+          if (
+            data.protocolParameters === undefined ||
+            data.prevGovernanceActionHash === undefined ||
+            data.prevGovernanceActionIndex === undefined
+          ) {
+            throw new Error(
+              t("errors.invalidParameterChangeGovernanceActionType"),
+            );
+          }
+          const protocolParamsUpdate = JSON.parse(data.protocolParameters);
+          const parameterChangeActionDetails = {
+            ...commonGovActionDetails,
+            protocolParamsUpdate,
+            prevGovernanceActionHash: data.prevGovernanceActionHash,
+            prevGovernanceActionIndex: data.prevGovernanceActionIndex,
+          };
+          return buildProtocolParameterChangeGovernanceAction(
+            parameterChangeActionDetails,
+          );
+        }
+        default:
+          throw new Error(t("errors.invalidGovernanceActionType"));
       }
     },
     [hash],
@@ -243,7 +352,7 @@ export const useCreateGovernanceActionForm = (
           openWalletErrorModal({
             error: isInsufficientBalance
               ? t("errors.insufficientBalanceDescription", {
-                  ada: correctAdaFormat(protocolParams?.gov_action_deposit),
+                  ada: correctVoteAdaFormat(protocolParams?.gov_action_deposit),
                 })
               : error,
             title: isInsufficientBalance
@@ -251,8 +360,6 @@ export const useCreateGovernanceActionForm = (
               : undefined,
             dataTestId: "create-governance-action-error-modal",
           });
-          Sentry.setTag("hook", "useCreateGovernanceActionForm");
-          Sentry.captureException(error);
         }
       } finally {
         setIsLoading(false);

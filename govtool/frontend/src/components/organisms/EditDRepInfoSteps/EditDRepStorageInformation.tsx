@@ -12,6 +12,7 @@ import {
 import { CenteredBoxBottomButtons, Step } from "@molecules";
 import { ControlledField } from "@organisms";
 import { ellipsizeText, openInNewTab } from "@utils";
+import { LINKS } from "@/consts/links";
 
 type StorageInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -35,9 +36,7 @@ export const EditDRepStorageInformation = ({
 
   const fileName = getValues("givenName");
   const openGuideAboutStoringInformation = () =>
-    openInNewTab(
-      "https://docs.gov.tools/using-govtool/govtool-functions/storing-information-offline",
-    );
+    openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);
 
   const isActionButtonDisabled = !watch("storingURL") || !!errors.storingURL;
 

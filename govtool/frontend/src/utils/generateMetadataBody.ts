@@ -1,11 +1,9 @@
-import { CIP_100, CIP_108, CIP_119 } from "@/consts";
-
-type StandardReference = typeof CIP_100 | typeof CIP_108 | typeof CIP_119;
+import { getImageSha } from "./getImageSha";
+import { URL_REGEX } from "./isValidFormat";
 
 type MetadataConfig = {
   data: Record<string, unknown>;
   acceptedKeys: string[];
-  standardReference: StandardReference;
 };
 
 /**
@@ -15,31 +13,55 @@ type MetadataConfig = {
  * the data, accepted keys, and standard reference.
  * @returns {Object} - The generated metadata body.
  */
-export const generateMetadataBody = ({
+export const generateMetadataBody = async ({
   data,
   acceptedKeys,
-  standardReference,
 }: MetadataConfig) => {
-  const filteredData = Object.entries(data)
-    .filter(([key]) => acceptedKeys.includes(key))
-    .map(([key, value]) => [standardReference + key, value]);
+  try {
+    const filteredData = Object.entries(data)
+      .filter(([key, value]) => value && acceptedKeys.includes(key))
+      .map(([key, value]) => [key, value]);
 
-  const references = data?.references
-    ? // uri should not be optional. It is just not yet supported on govtool
-      (data.references as Array<Partial<Reference>>)
-        .filter((link) => link.uri)
-        .map((link) => ({
-          "@type": link["@type"] ?? "Other",
-          [`${CIP_100}reference-label`]: link.label || "Label",
-          [`${CIP_100}reference-uri`]: link.uri,
-        }))
-    : undefined;
+    const references = data?.references
+      ? // uri should not be optional. It is just not yet supported on govtool
+        (data.references as Array<Partial<Reference>>)
+          .filter((link) => link.uri)
+          .map((link) => ({
+            "@type": link["@type"] ?? "Other",
+            label: link.label ?? "Label",
+            uri: link.uri,
+          }))
+      : undefined;
 
-  const body = Object.fromEntries(filteredData);
+    const isUrl = (url?: unknown) => URL_REGEX.test(url as string);
+    let image;
 
-  if (references) {
-    body[`${standardReference}references`] = references;
+    if (isUrl(data?.image)) {
+      image = {
+        "@type": "ImageObject",
+        contentUrl: data.image,
+        sha256: await getImageSha(data.image as string),
+      };
+    } else {
+      image = data?.image
+        ? {
+            "@type": "ImageObject",
+            contentUrl: data.image,
+          }
+        : undefined;
+    }
+
+    const body = Object.fromEntries(filteredData);
+    if (references?.length) {
+      body.references = references;
+    }
+
+    if (image) {
+      body.image = image;
+    }
+
+    return body;
+  } catch (error) {
+    console.error({ error });
   }
-
-  return body;
 };

@@ -1,8 +1,13 @@
 import environments from "@constants/environments";
-import { dRepWallets } from "@constants/staticWallets";
+import {
+  budgetProposalDRepWallets,
+  dRepWallets,
+} from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
+import { skipIfBalanceIsInsufficient, skipIfMainnet } from "@helpers/cardano";
 import { pollTransaction } from "@helpers/transaction";
-import { test as cleanup, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test as cleanup } from "@fixtures/walletExtension";
 import kuberService from "@services/kuberService";
 import { StaticWallet } from "@types";
 import walletManager from "lib/walletManager";
@@ -11,6 +16,8 @@ cleanup.describe.configure({ timeout: environments.txTimeOut });
 cleanup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Cleanup");
+  await skipIfMainnet();
+  await skipIfBalanceIsInsufficient(10);
 });
 
 cleanup("DRep de-registration", async () => {
@@ -23,6 +30,7 @@ cleanup("DRep de-registration", async () => {
     ...dRepWallets,
     ...registerDRep,
     ...registeredDRep,
+    ...budgetProposalDRepWallets,
   ];
   try {
     const { txId, lockInfo } = await kuberService.multipleDRepDeRegistration(

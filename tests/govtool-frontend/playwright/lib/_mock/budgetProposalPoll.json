@@ -1,0 +1,23 @@
+{
+  "data": [
+    {
+      "id": 48,
+      "attributes": {
+        "bd_proposal_id": "49",
+        "poll_yes": 0,
+        "poll_no": 0,
+        "is_poll_active": true,
+        "createdAt": "2025-03-31T12:08:38.928Z",
+        "updatedAt": "2025-03-31T12:08:38.928Z"
+      }
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pageSize": 1,
+      "pageCount": 1,
+      "total": 1
+    }
+  }
+}

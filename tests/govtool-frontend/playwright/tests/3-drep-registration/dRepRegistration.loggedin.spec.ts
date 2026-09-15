@@ -2,20 +2,20 @@ import { user01Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { ShelleyWallet } from "@helpers/crypto";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
-import { skipIfNotHardFork } from "@helpers/cardano";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
+import { user01AuthFile } from "@constants/auth";
+import EditDRepPage from "@pages/editDRepPage";
+import { generateInvalidDRepInfo, generateValidDRepInfo } from "@helpers/dRep";
 
 test.use({
-  storageState: ".auth/user01.json",
+  storageState: user01AuthFile,
   wallet: user01Wallet,
 });
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
-  await skipIfNotHardFork();
 });
 
 test("3B. Should access DRep registration page", async ({ page }) => {
@@ -58,26 +58,11 @@ test.describe("Validation of dRep Registration Form", () => {
     const dRepRegistrationPage = new DRepRegistrationPage(page);
     await dRepRegistrationPage.goto();
 
+    await expect(page.getByTestId("alert-success")).not.toBeVisible();
+
     for (let i = 0; i < 100; i++) {
-      await dRepRegistrationPage.validateForm({
-        name: mockValid.name(),
-        objectives: faker.lorem.paragraph(2),
-        motivations: faker.lorem.paragraph(2),
-        qualifications: faker.lorem.paragraph(2),
-        paymentAddress: (await ShelleyWallet.generate()).addressBech32(0),
-        linksReferenceLinks: [
-          {
-            url: faker.internet.url(),
-            description: faker.internet.displayName(),
-          },
-        ],
-        identityReferenceLinks: [
-          {
-            url: faker.internet.url(),
-            description: faker.internet.displayName(),
-          },
-        ],
-      });
+      const validDRepInfo = await generateValidDRepInfo();
+      await dRepRegistrationPage.validateForm(validDRepInfo);
     }
 
     for (let i = 0; i < 6; i++) {
@@ -99,27 +84,11 @@ test.describe("Validation of dRep Registration Form", () => {
 
     const dRepRegistrationPage = new DRepRegistrationPage(page);
     await dRepRegistrationPage.goto();
+    await expect(page.getByTestId("alert-success")).not.toBeVisible();
 
     for (let i = 0; i < 100; i++) {
-      await dRepRegistrationPage.inValidateForm({
-        name: mockInvalid.name(),
-        objectives: faker.lorem.paragraph(40),
-        motivations: faker.lorem.paragraph(40),
-        qualifications: faker.lorem.paragraph(40),
-        paymentAddress: faker.string.alphanumeric(45),
-        linksReferenceLinks: [
-          {
-            url: mockInvalid.url(),
-            description: faker.lorem.paragraph(20),
-          },
-        ],
-        identityReferenceLinks: [
-          {
-            url: mockInvalid.url(),
-            description: faker.lorem.paragraph(20),
-          },
-        ],
-      });
+      const invalidDRepInfo = generateInvalidDRepInfo();
+      await dRepRegistrationPage.inValidateForm(invalidDRepInfo);
     }
   });
 
@@ -193,7 +162,7 @@ test("3F. Should create proper DRep registration request, when registered with d
   await dRepRegistrationPage.registerWithoutTxConfirmation({ name: "Test" });
   await expect(
     page.getByTestId("registration-transaction-error-modal")
-  ).toBeVisible({ timeout: 10_000 });
+  ).toBeVisible({ timeout: 60_000 });
 });
 
 test("3O. Should reject invalid dRep registration metadata", async ({
@@ -216,4 +185,12 @@ test("3O. Should reject invalid dRep registration metadata", async ({
   await expect(dRepRegistrationPage.metadataErrorModal).toHaveText(
     /your external data does not/i
   );
+});
+
+test("3R. Should restrict edit dRep for non dRep", async ({ page }) => {
+  const editDrepPage = new EditDRepPage(page);
+  await editDrepPage.goto();
+
+  await page.waitForTimeout(2_000);
+  await expect(editDrepPage.nameInput).not.toBeVisible();
 });

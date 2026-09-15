@@ -1,9 +1,10 @@
 import removeAllSpaces from "@helpers/removeAllSpaces";
 import { Locator, Page, expect } from "@playwright/test";
-import { GrovernanceActionType, IProposal } from "@types";
+import { GovernanceActionType, IProposal } from "@types";
 import environments from "lib/constants/environments";
 import GovernanceActionDetailsPage from "./governanceActionDetailsPage";
 import { getEnumKeyByValue } from "@helpers/enum";
+import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
 
 const MAX_SLIDES_DISPLAY_PER_TYPE = 6;
 
@@ -20,6 +21,10 @@ export default class GovernanceActionsPage {
   async goto() {
     await this.page.goto(`${environments.frontendUrl}/governance_actions`);
     await this.page.waitForTimeout(2_000); // Waits to ensure the alert-success popup does not interfere
+  }
+
+  get currentPage(): Page {
+    return this.page;
   }
 
   async viewProposal(
@@ -48,11 +53,11 @@ export default class GovernanceActionsPage {
   }
 
   async viewFirstProposalByGovernanceAction(
-    governanceAction: GrovernanceActionType
+    governanceAction: GovernanceActionType
   ): Promise<GovernanceActionDetailsPage> {
-    const proposalCard = this.page
-      .getByTestId(`govaction-${governanceAction}-card`)
-      .first();
+     const proposalCard = this.page
+          .locator('[data-testid^="govaction-"][data-testid$="-card"]')
+          .first();
 
     const isVisible = await proposalCard.isVisible();
 
@@ -69,6 +74,20 @@ export default class GovernanceActionsPage {
       );
       return null;
     }
+  }
+
+  async getFirstProposal(
+  ) {
+    await functionWaitedAssert(
+      async () => {
+        const proposalCard = this.page
+          .locator('[data-testid^="govaction-"][data-testid$="-card"]')
+          .first();
+
+        await expect(proposalCard
+          .locator('[data-testid^="govaction-"][data-testid$="-view-detail"]')
+          .first()).toBeVisible()
+      }, { name: "Retrying to get the first proposal" });
   }
 
   async viewVotedProposal(
@@ -94,24 +113,34 @@ export default class GovernanceActionsPage {
     }
   }
 
-  async getAllProposals() {
-    await this.page.waitForTimeout(4_000); // waits for proposals to render
+  async getAllProposals(): Promise<Locator[]> {
+    await waitedLoop(async () => {
+      return (
+        (await this.page.locator('[data-testid$="-card"]').count()) > 0 ||
+        (await this.page.getByText("No results for the search.").isVisible())
+      );
+    });
     return this.page.locator('[data-testid$="-card"]').all();
   }
 
   async validateFilters(filters: string[]) {
-    const proposalCards = await this.getAllProposals();
+    await functionWaitedAssert(async () => {
+      const proposalCards = await this.getAllProposals();
 
-    for (const proposalCard of proposalCards) {
-      const hasFilter = await this._validateFiltersInProposalCard(
-        proposalCard,
-        filters
-      );
-      expect(
-        hasFilter,
-        "A proposal card does not contain any of the filters"
-      ).toBe(true);
-    }
+      for (const proposalCard of proposalCards) {
+        if (await proposalCard.locator('[data-testid$="-type"]').isVisible()) {
+          const hasFilter = await this._validateFiltersInProposalCard(
+            proposalCard,
+            filters
+          );
+          expect(
+            hasFilter,
+            hasFilter == false &&
+            `A proposal card does not contain any of the ${filters}`
+          ).toBe(true);
+        }
+      }
+    });
   }
 
   async sortProposal(option: string) {
@@ -121,7 +150,7 @@ export default class GovernanceActionsPage {
   async sortAndValidate(
     sortOption: string,
     validationFn: (p1: IProposal, p2: IProposal) => boolean,
-    filterKeys = Object.keys(GrovernanceActionType)
+    filterKeys = Object.keys(GovernanceActionType)
   ) {
     const responsesPromise = Promise.all(
       filterKeys.map((filterKey) =>
@@ -129,7 +158,7 @@ export default class GovernanceActionsPage {
           response
             .url()
             .includes(
-              `&type[]=${GrovernanceActionType[filterKey]}&sort=${sortOption}`
+              `&type[]=${GovernanceActionType[filterKey]}&sort=${sortOption}`
             )
         )
       )
@@ -159,31 +188,38 @@ export default class GovernanceActionsPage {
 
     await expect(
       this.page.getByRole("progressbar").getByRole("img")
-    ).toBeHidden({ timeout: 10_000 });
+    ).toBeHidden({ timeout: 20_000 });
 
-    // Frontend validation
-    for (let dIdx = 0; dIdx <= proposalsByType.length - 1; dIdx++) {
-      const proposals = proposalsByType[0] as IProposal[];
-      const filterOptionKey = getEnumKeyByValue(
-        GrovernanceActionType,
-        proposals[0].type
-      );
+    await functionWaitedAssert(
+      async () => {
+        // Frontend validation
+        for (let dIdx = 0; dIdx <= proposalsByType.length - 1; dIdx++) {
+          const proposals = proposalsByType[0] as IProposal[];
+          const filterOptionKey = getEnumKeyByValue(
+            GovernanceActionType,
+            proposals[0].type
+          );
 
-      const slides = await this.page
-        .locator(`[data-testid="govaction-${filterOptionKey}-card"]`)
-        .all();
+          const slides = await this.page
+            .locator(`[data-testid="govaction-${filterOptionKey}-card"]`)
+            .all();
 
-      const actualSlidesInDisplay =
-        proposals.length > MAX_SLIDES_DISPLAY_PER_TYPE
-          ? MAX_SLIDES_DISPLAY_PER_TYPE
-          : proposals.length;
+          const actualSlidesInDisplay =
+            proposals.length > MAX_SLIDES_DISPLAY_PER_TYPE
+              ? MAX_SLIDES_DISPLAY_PER_TYPE
+              : proposals.length;
 
-      expect(slides).toHaveLength(actualSlidesInDisplay);
+          expect(slides).toHaveLength(actualSlidesInDisplay);
 
-      for (let i = 0; i <= slides.length - 1; i++) {
-        await expect(slides[i]).toContainText(`${proposals[i].txHash}`);
+          for (let i = 0; i <= slides.length - 1; i++) {
+            await expect(slides[i]).toContainText(`${proposals[i].txHash}`);
+          }
+        }
+      },
+      {
+        name: `frontend sort validation of ${sortOption} and filter ${filterKeys}`,
       }
-    }
+    );
   }
 
   async _validateFiltersInProposalCard(

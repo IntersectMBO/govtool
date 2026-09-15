@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: govtool/frontend/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('govtool/frontend/package-lock.json') }}
@@ -31,7 +31,6 @@ jobs:
       - name: 🧪 Test
         working-directory: govtool/frontend
         env:
-          NODE_OPTIONS: "--max_old_space_size=6144"
           NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
         run: |
           npm ci

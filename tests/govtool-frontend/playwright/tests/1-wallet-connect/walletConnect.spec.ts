@@ -1,3 +1,4 @@
+import environments from "@constants/environments";
 import createWallet from "@fixtures/createWallet";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
@@ -17,12 +18,13 @@ test("1A. Should connect wallet and choose stake-key to use", async ({
   const shellyWallet = await ShelleyWallet.generate();
   const extraPubStakeKey = convertBufferToHex(shellyWallet.stakeKey.public);
   const extraRewardAddress = convertBufferToHex(
-    shellyWallet.rewardAddressRawBytes(0)
+    shellyWallet.rewardAddressRawBytes(environments.networkId)
   );
 
   await createWallet(page, {
     extraRegisteredPubStakeKeys: [extraPubStakeKey],
     extraRewardAddresses: [extraRewardAddress],
+    networkId: environments.networkId,
   });
 
   const loginPage = new LoginPage(page);
@@ -30,7 +32,9 @@ test("1A. Should connect wallet and choose stake-key to use", async ({
 });
 
 test("1C. Should disconnect Wallet When connected", async ({ page }) => {
-  await createWallet(page);
+  await createWallet(page, {
+    networkId: environments.networkId,
+  });
 
   const loginPage = new LoginPage(page);
   await loginPage.login();
@@ -38,8 +42,10 @@ test("1C. Should disconnect Wallet When connected", async ({ page }) => {
   await loginPage.logout();
 });
 
-test("1D. Should reject wallet connection in mainnet", async ({ page }) => {
-  const wrongNetworkId = 1; // mainnet network
+test("1D. Should reject wallet connection if on different network", async ({
+  page,
+}) => {
+  const wrongNetworkId = environments.networkId == 0 ? 1 : 0;
   await createWallet(page, {
     networkId: wrongNetworkId,
   });

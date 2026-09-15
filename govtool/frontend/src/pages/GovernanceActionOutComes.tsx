@@ -1,0 +1,63 @@
+import { Box, CircularProgress } from "@mui/material";
+import React, { Suspense } from "react";
+import { Footer, TopNav } from "@/components/organisms";
+import { useCardano } from "@/context";
+import { useScreenDimension, useTranslation } from "@/hooks";
+import { Background } from "@/components/atoms";
+import { env } from "@/config/env";
+
+const GovernanceActionsOutcomes = React.lazy(
+  () => import("@intersect.mbo/govtool-outcomes-pillar-ui/dist/esm"),
+);
+
+export const GovernanceActionOutComesPillar = () => {
+  const { pagePadding } = useScreenDimension();
+  const { walletApi, ...context } = useCardano();
+  const { i18n } = useTranslation();
+
+  return (
+    <Background>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          minHeight: !context.isEnabled ? "100vh" : "auto",
+        }}
+      >
+        {!context.isEnabled && <TopNav />}
+        <Box
+          sx={{
+            px: context.isEnabled ? { xs: 2, sm: 5 } : pagePadding,
+            py: 3,
+            display: "flex",
+            flex: 1,
+          }}
+        >
+          <Suspense
+            fallback={
+              <Box
+                sx={{
+                  display: "flex",
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <CircularProgress />
+              </Box>
+            }
+          >
+            <GovernanceActionsOutcomes
+              apiUrl={env.VITE_OUTCOMES_API_URL}
+              ipfsGateway={env.VITE_IPFS_GATEWAY}
+              walletAPI={{ ...context, ...walletApi }}
+              i18n={i18n}
+            />
+          </Suspense>
+        </Box>
+        {!context.isEnabled && <Footer />}
+      </Box>
+    </Background>
+  );
+};

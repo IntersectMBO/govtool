@@ -1,8 +1,13 @@
 import { FC, useCallback } from "react";
-import { To, useNavigate, useLocation } from "react-router-dom";
+import { To, useNavigate, useLocation } from "react-router";
 import { Box, CircularProgress, Typography } from "@mui/material";
 
-import { PATHS, PDF_PATHS } from "@consts";
+import {
+  BUDGET_DISCUSSION_PATHS,
+  OUTCOMES_PATHS,
+  PATHS,
+  PDF_PATHS,
+} from "@consts";
 import { useCardano } from "@context";
 import { theme } from "@/theme";
 
@@ -32,14 +37,27 @@ export const WalletOptionButton: FC<WalletOption> = ({
 
   const enableByWalletName = useCallback(async () => {
     if (isEnableLoading) return;
+    const isBudgetDiscussion = window.location.pathname.includes(
+      BUDGET_DISCUSSION_PATHS.budgetDiscussion.replace("/", ""),
+    );
+
     const isProposalDiscussionForum = window.location.pathname.includes(
       PDF_PATHS.proposalDiscussion.replace("/", ""),
+    );
+
+    const isGovernanceOutcomesPillar = window.location.pathname.includes(
+      OUTCOMES_PATHS.governanceActionsOutcomes.replace("/", ""),
     );
 
     const result = await enable(name);
 
     if (result?.stakeKey) {
-      if (isProposalDiscussionForum) return;
+      if (
+        isBudgetDiscussion ||
+        isProposalDiscussionForum ||
+        isGovernanceOutcomesPillar
+      )
+        return;
       navigate(
         // eslint-disable-next-line no-unneeded-ternary
         pathToNavigate

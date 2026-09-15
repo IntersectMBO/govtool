@@ -1,5 +1,6 @@
 import { FC } from "react";
-import { Box } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
+import { Link, useLocation } from "react-router";
 
 import { Button } from "@atoms";
 import {
@@ -8,7 +9,6 @@ import {
   GovernanceActionCardStatePill,
   GovernanceActionsDatesBox,
 } from "@molecules";
-
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
   encodeCIP129Identifier,
@@ -20,36 +20,30 @@ import { ProposalData } from "@models";
 
 type ActionTypeProps = Omit<
   ProposalData,
-  | "yesVotes"
-  | "noVotes"
-  | "abstainVotes"
-  | "metadataHash"
-  | "url"
   | "id"
-  | "details"
-  | "rationale"
-  | "motivation"
 > & {
   onClick?: () => void;
   inProgress?: boolean;
+  isValidating?: boolean;
+  metadataStatus?: MetadataValidationStatus;
 };
 
-export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
-  const {
-    abstract,
-    type,
-    inProgress = false,
-    expiryDate,
-    expiryEpochNo,
-    onClick,
-    createdDate,
-    createdEpochNo,
-    txHash,
-    index,
-    metadataStatus,
-    metadataValid,
-    title,
-  } = props;
+export const GovernanceActionCard: FC<ActionTypeProps> = ({
+  abstract,
+  type,
+  inProgress = false,
+  expiryDate,
+  expiryEpochNo,
+  onClick,
+  createdDate,
+  createdEpochNo,
+  txHash,
+  index,
+  title,
+  isValidating,
+  metadataStatus,
+  ...otherProposalData
+}) => {
   const { isMobile, screenWidth } = useScreenDimension();
   const { t } = useTranslation();
 
@@ -59,6 +53,9 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
     index: index.toString(16).padStart(2, "0"),
     bech32Prefix: "gov_action",
   });
+
+  const pathname = useLocation().pathname.replace(/governance_actions.*/g, "governance_actions");
+  const isCategoryView = useLocation().pathname.includes("category");
 
   return (
     <Box
@@ -71,10 +68,10 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
         justifyContent: "space-between",
         boxShadow: "0px 4px 15px 0px #DDE3F5",
         borderRadius: "20px",
-        backgroundColor: !metadataValid
+        backgroundColor: metadataStatus
           ? "rgba(251, 235, 235, 0.50)"
           : "rgba(255, 255, 255, 0.3)",
-        ...(!metadataValid && {
+        ...(!!metadataStatus && {
           border: "1px solid #F6D5D5",
         }),
         ...(inProgress && {
@@ -92,8 +89,9 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
         <GovernanceActionCardHeader
           title={title}
           isDataMissing={metadataStatus}
+          isValidating={isValidating}
         />
-        {!metadataStatus && (
+        {!!metadataStatus && (
           <GovernanceActionCardElement
             label={t("govActions.abstract")}
             text={abstract}
@@ -101,6 +99,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
             dataTestId="governance-action-abstract"
             isSliderCard
             isMarkdown
+            isValidating={isValidating}
           />
         )}
         <GovernanceActionCardElement
@@ -109,6 +108,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           textVariant="pill"
           dataTestId={`${getProposalTypeNoEmptySpaces(type)}-type`}
           isSliderCard
+          isValidating={isValidating}
         />
         <GovernanceActionsDatesBox
           createdDate={createdDate}
@@ -116,13 +116,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           expiryEpochNo={expiryEpochNo}
           createdEpochNo={createdEpochNo}
           isSliderCard
-        />
-        <GovernanceActionCardElement
-          label={t("govActions.governanceActionId")}
-          text={govActionId}
-          dataTestId={`${govActionId}-id`}
-          isCopyButton
-          isSliderCard
+          isValidating={isValidating}
         />
         <GovernanceActionCardElement
           label={t("govActions.cip129GovernanceActionId")}
@@ -130,6 +124,16 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           dataTestId={`${cip129GovernanceActionId}-id`}
           isCopyButton
           isSliderCard
+          isValidating={isValidating}
+        />
+        <GovernanceActionCardElement
+          label={t("govActions.governanceActionId")}
+          text={govActionId}
+          dataTestId={`${govActionId}-id`}
+          isCopyButton
+          isSliderCard
+          isSemiTransparent
+          isValidating={isValidating}
         />
       </Box>
       <Box
@@ -141,21 +145,45 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({ ...props }) => {
           bgcolor: "white",
         }}
       >
-        <Button
-          onClick={onClick}
-          variant={inProgress ? "outlined" : "contained"}
-          size="large"
-          sx={{
-            width: "100%",
-          }}
-          data-testid={`govaction-${govActionId}-view-detail`}
-        >
-          {t(
-            inProgress
-              ? "govActions.viewDetails"
-              : "govActions.viewDetailsAndVote",
-          )}
-        </Button>
+        {isValidating ? (
+          <Skeleton width="100%" height="40px" sx={{ borderRadius: "20px" }} />
+        ) : (
+          <Button
+            onClick={onClick}
+            component={Link}
+            to={`${pathname}/${govActionId}`}
+            state={{
+              proposal: {
+                abstract,
+                type,
+                inProgress,
+                expiryDate,
+                expiryEpochNo,
+                createdDate,
+                createdEpochNo,
+                txHash,
+                index,
+                title,
+                isValidating,
+                metadataStatus,
+                ...otherProposalData,
+              },
+              openedFromCategoryPage: isCategoryView
+            }}
+            variant={inProgress ? "outlined" : "contained"}
+            size="large"
+            sx={{
+              width: "100%",
+            }}
+            data-testid={`govaction-${govActionId}-view-detail`}
+          >
+            {t(
+              inProgress
+                ? "govActions.viewDetails"
+                : "govActions.viewDetailsAndVote",
+            )}
+          </Button>
+        )}
       </Box>
     </Box>
   );

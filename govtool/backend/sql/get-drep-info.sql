@@ -87,6 +87,7 @@ WasRegisteredAsDRep AS (
                     CROSS JOIN DRepId
                 WHERE
                     drep_hash.raw = DRepId.raw
+                    AND drep_registration.deposit >= 0
                     AND drep_registration.voting_anchor_id IS NOT NULL)) AS value
 ),
 WasRegisteredAsSoleVoter AS (
@@ -100,6 +101,7 @@ WasRegisteredAsSoleVoter AS (
                     CROSS JOIN DRepId
                 WHERE
                     drep_hash.raw = DRepId.raw
+                    AND drep_registration.deposit >= 0
                     AND drep_registration.voting_anchor_id IS NULL)) AS value
 ),
 CurrentMetadata AS (
@@ -213,3 +215,4 @@ FROM
     CROSS JOIN IsScriptHash
     LEFT JOIN off_chain_vote_data ON off_chain_vote_data.voting_anchor_id = LatestRegistrationEntry.voting_anchor_id
     LEFT JOIN off_chain_vote_drep_data ON off_chain_vote_drep_data.off_chain_vote_data_id = off_chain_vote_data.id
+LIMIT 1

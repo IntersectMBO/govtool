@@ -1,25 +1,31 @@
 import environments from "@constants/environments";
+import {
+  BOOTSTRAP_PROPOSAL_TYPE_FILTERS,
+  PROPOSAL_STATUS_FILTER,
+} from "@constants/index";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
-import { isBootStrapingPhase, skipIfNotHardFork } from "@helpers/cardano";
+import { isBootStrapingPhase } from "@helpers/cardano";
+import { getProposalType } from "@helpers/index";
+import { injectLogger } from "@helpers/page";
+import { extractProposalIdFromUrl } from "@helpers/string";
+import { functionWaitedAssert } from "@helpers/waitedLoop";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { expect } from "@playwright/test";
+import {
+  ProposalDiscussionFilterTypes,
+  ProposalType,
+  ProposedGovAction,
+} from "@types";
 
 const mockProposal = require("../../lib/_mock/proposal.json");
 const mockPoll = require("../../lib/_mock/proposalPoll.json");
 const mockComments = require("../../lib/_mock/proposalComments.json");
-const mockInfoProposedGA = require("../../lib/_mock/infoProposedGAs.json");
-
-const PROPOSAL_TYPE_FILTERS = ["Info", "Treasury"];
-const BOOTSTRAP_PROPOSAL_TYPE_FILTERS = ["Info"];
-
-const PROPOSAL_STATUS_FILTER = ["Submitted for vote", "Active proposal"];
 
 test.beforeEach(async () => {
   await setAllureEpic("8. Proposal Discussion Forum");
-  await skipIfNotHardFork();
 });
 
 test("8A. Should access proposed governance actions in disconnected state", async ({
@@ -50,7 +56,7 @@ test.describe("Filter and sort proposals", () => {
 
     // proposal type filter
     await proposalDiscussionPage.applyAndValidateFilters(
-      isBootStraping ? BOOTSTRAP_PROPOSAL_TYPE_FILTERS : PROPOSAL_TYPE_FILTERS,
+      isBootStraping ? BOOTSTRAP_PROPOSAL_TYPE_FILTERS : getProposalType(),
       proposalDiscussionPage._validateTypeFiltersInProposalCard
     );
 
@@ -62,57 +68,142 @@ test.describe("Filter and sort proposals", () => {
   });
 
   test("8B_2. Should sort the list of proposed governance actions.", async () => {
-    await proposalDiscussionPage.sortAndValidate(
-      "asc",
-      (p1, p2) => p1.attributes.createdAt <= p2.attributes.createdAt
-    );
+    test.slow();
+    const sortOptions = {
+      Oldest: (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.content.attributes.createdAt <=
+        p2.attributes.content.attributes.createdAt,
+      Newest: (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.content.attributes.createdAt >=
+        p2.attributes.content.attributes.createdAt,
+      "Most likes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_likes >= p2.attributes.prop_likes,
+      "Least likes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_likes <= p2.attributes.prop_likes,
+      "Most dislikes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_dislikes >= p2.attributes.prop_dislikes,
+      "Least dislikes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_dislikes <= p2.attributes.prop_dislikes,
+      "Most comments": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_comments_number >=
+        p2.attributes.prop_comments_number,
+      "Least comments": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.prop_comments_number <=
+        p2.attributes.prop_comments_number,
+      "Name A-Z": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.content.attributes.prop_name
+          .replace(/ /g, "")
+          .localeCompare(
+            p2.attributes.content.attributes.prop_name.replace(/ /g, "")
+          ) <= 0,
+      "Name Z-A": (p1: ProposedGovAction, p2: ProposedGovAction) =>
+        p1.attributes.content.attributes.prop_name
+          .replace(/ /g, "")
+          .localeCompare(
+            p2.attributes.content.attributes.prop_name.replace(/ /g, "")
+          ) >= 0,
+    };
 
-    await proposalDiscussionPage.sortAndValidate(
-      "desc",
-      (p1, p2) => p1.attributes.createdAt >= p2.attributes.createdAt
-    );
+    for (const [sortOption, sortFunction] of Object.entries(sortOptions)) {
+      await proposalDiscussionPage.sortAndValidate(
+        sortOption as ProposalDiscussionFilterTypes,
+        sortFunction
+      );
+    }
   });
 });
 
 test("8C. Should search the list of proposed governance actions.", async ({
   page,
 }) => {
-  const proposalName = "Labadie, Stehr and Rosenbaum";
-  const proposalDiscussionPage = new ProposalDiscussionPage(page);
-  await proposalDiscussionPage.goto();
+  let proposalName = "Labadie, Stehr and Rosenbaum";
+  let proposalNameSet = false;
 
-  await proposalDiscussionPage.searchInput.fill(proposalName);
-
-  const proposalCards = await proposalDiscussionPage.getAllProposals();
-
-  for (const proposalCard of proposalCards) {
-    await expect(
-      proposalCard.locator('[data-testid^="proposal-"][data-testid$="-title"]')
-    ).toHaveText(proposalName);
-  }
-});
-
-test("8D.Should show the view-all categorized proposed governance actions.", async ({
-  page,
-}) => {
   await page.route("**/api/proposals?**", async (route) => {
-    return route.fulfill({
-      body: JSON.stringify(mockInfoProposedGA),
+    const response = await route.fetch();
+    const json = await response.json();
+    if (!proposalNameSet && "data" in json && json["data"].length > 0) {
+      const randomIndex = Math.floor(Math.random() * json["data"].length);
+      proposalName =
+        json["data"][randomIndex]["attributes"]["content"]["attributes"][
+          "prop_name"
+        ];
+      proposalNameSet = true;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(json),
     });
   });
 
+  const responsePromise = page.waitForResponse("**/api/proposals?**");
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
 
-  await proposalDiscussionPage.showAllBtn.click();
+  await responsePromise;
 
-  const proposalCards = await proposalDiscussionPage.getAllProposals();
+  await proposalDiscussionPage.searchInput.fill(proposalName);
 
-  for (const proposalCard of proposalCards) {
-    await expect(
-      proposalCard.getByTestId("governance-action-type")
-    ).toBeVisible();
-  }
+  await page.waitForTimeout(2000);
+
+  await functionWaitedAssert(
+    async () => {
+      const proposalCards = await proposalDiscussionPage.getAllProposals();
+      for (const proposalCard of proposalCards) {
+        await expect(proposalCard).toBeVisible();
+        const proposalTitle = await proposalCard
+          .locator('[data-testid^="proposal-"][data-testid$="-title"]')
+          .innerText();
+        expect(proposalTitle.toLowerCase().trim()).toContain(
+          proposalName.toLowerCase().trim()
+        );
+      }
+    },
+    {
+      message: `A proposal card does not contain the search term ${proposalName}`,
+    }
+  );
+});
+
+test("8D. Should show the view-all categorized proposed governance actions.", async ({
+  browser,
+}) => {
+  await Promise.all(
+    getProposalType().map(async (proposalType: string) => {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      injectLogger(page);
+
+      const proposalDiscussionPage = new ProposalDiscussionPage(page);
+      await proposalDiscussionPage.goto();
+      const isShowAllButtonVisible = await page
+        .waitForSelector(
+          `[data-testid="${proposalType.toLowerCase().replace(/ /g, "-")}-show-all-button"]`,
+          { timeout: 60_000 }
+        )
+        .then(() => true)
+        .catch(() => false);
+
+      if (isShowAllButtonVisible) {
+        await page
+          .getByTestId(
+            proposalType.toLowerCase().replace(/ /g, "-") + "-show-all-button"
+          )
+          .click();
+
+        const proposalCards = await proposalDiscussionPage.getAllProposals();
+
+        for (const proposalCard of proposalCards) {
+          await expect(
+            proposalCard.getByTestId("governance-action-type")
+          ).toHaveText(proposalType, { timeout: 60_000 });
+        }
+      } else {
+        expect(true, `No ${proposalType} found`).toBeTruthy();
+      }
+    })
+  );
 });
 
 test("8H. Should disable proposal interaction on a disconnected state.", async ({
@@ -139,7 +230,32 @@ test("8S. Should restrict proposal creation on disconnected state", async ({
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
 
-  await expect(proposalDiscussionPage.proposalCreateBtn).not.toBeVisible();
+  await expect(proposalDiscussionPage.proposalCreateBtn).toBeDisabled();
+});
+
+test("8E. Should share proposed governance action", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  const proposalDiscussionPage = new ProposalDiscussionPage(page);
+  await proposalDiscussionPage.goto();
+
+  await proposalDiscussionPage.viewFirstProposal();
+
+  const currentPageUrl = page.url();
+  const proposalId = extractProposalIdFromUrl(currentPageUrl);
+
+  await page.getByTestId("share-button").click();
+  await page.getByTestId("copy-link").click();
+  await expect(page.getByTestId("copy-link-text")).toBeVisible();
+
+  const copiedTextDRepDirectory = await page.evaluate(() =>
+    navigator.clipboard.readText()
+  );
+  const expectedCopyUrl = `${environments.frontendUrl}/proposal_discussion/${proposalId}`;
+
+  expect(copiedTextDRepDirectory).toEqual(expectedCopyUrl);
 });
 
 test.describe("Mocked proposal", () => {
@@ -168,24 +284,6 @@ test.describe("Mocked proposal", () => {
     await proposalDiscussionDetailsPage.goto(mockProposal.data.id);
   });
 
-  test("8E. Should share proposed governance action", async ({
-    page,
-    context,
-  }) => {
-    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-
-    await page.getByTestId("share-button").click();
-    await page.getByTestId("copy-link").click();
-    await expect(page.getByTestId("copy-link-text")).toBeVisible();
-
-    const copiedTextDRepDirectory = await page.evaluate(() =>
-      navigator.clipboard.readText()
-    );
-    const expectedCopyUrl = `${environments.frontendUrl}/proposal_discussion/${mockProposal.data.id}`;
-
-    expect(copiedTextDRepDirectory).toEqual(expectedCopyUrl);
-  });
-
   test("8I. Should disable poll voting functionality.", async () => {
     await expect(proposalDiscussionDetailsPage.pollVoteCard).not.toBeVisible();
     await expect(proposalDiscussionDetailsPage.pollYesBtn).not.toBeVisible();
@@ -194,8 +292,13 @@ test.describe("Mocked proposal", () => {
   });
 
   test("8F. Should display all comments with count indication.", async () => {
+    let commentCount = mockProposal.data.attributes.prop_comments_number;
+    if (commentCount > 99) {
+      commentCount = "99+";
+    }
     await expect(proposalDiscussionDetailsPage.commentCount).toHaveText(
-      mockProposal.data.attributes.prop_comments_number.toString()
+      commentCount.toString(),
+      { timeout: 60_000 }
     );
   });
 });

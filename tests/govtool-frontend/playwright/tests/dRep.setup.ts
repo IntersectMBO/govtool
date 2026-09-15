@@ -1,45 +1,57 @@
 import environments from "@constants/environments";
 import { dRepWallets } from "@constants/staticWallets";
 import { setAllureEpic, setAllureStory } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
-import { ShelleyWallet } from "@helpers/crypto";
+import { skipIfBalanceIsInsufficient, skipIfMainnet } from "@helpers/cardano";
 import { uploadMetadataAndGetJsonHash } from "@helpers/metadata";
+import { generateWallets } from "@helpers/shellyWallet";
 import { pollTransaction } from "@helpers/transaction";
-import { expect, test as setup } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test as setup } from "@fixtures/walletExtension";
+
 import kuberService from "@services/kuberService";
 import walletManager from "lib/walletManager";
+import { functionWaitedAssert } from "@helpers/waitedLoop";
+import { StaticWallet } from "@types";
 
 const REGISTER_DREP_WALLETS_COUNT = 6;
-const DREP_WALLETS_COUNT = 9;
+const DREP_WALLETS_COUNT = 11;
 
 let dRepDeposit: number;
 
 setup.beforeAll(async () => {
-  const res = await kuberService.queryProtocolParams();
-  dRepDeposit = res.dRepDeposit;
+  await functionWaitedAssert(
+    async () => {
+      const res = await kuberService.queryProtocolParams();
+      dRepDeposit = res.dRepDeposit;
+    },
+    { name: "queryProtocolParams" }
+  );
 });
 
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");
   await setAllureStory("Register DRep");
-  await skipIfNotHardFork();
+  await skipIfMainnet();
 });
 
-async function generateWallets(num: number) {
-  return await Promise.all(
-    Array.from({ length: num }, () =>
-      ShelleyWallet.generate().then((wallet) => wallet.json())
-    )
-  );
-}
-
 setup("Register DRep of static wallets", async () => {
+  const totalRequiredBalanceForDRepSetup =
+    dRepWallets.length * (dRepDeposit / 1000000) + 2;
+  await skipIfBalanceIsInsufficient(totalRequiredBalanceForDRepSetup);
   setup.setTimeout(environments.txTimeOut);
 
   try {
     // Submit metadata to obtain a URL and generate hash value.
     const metadataPromises = dRepWallets.map(async (dRepWallet) => {
-      return { ...(await uploadMetadataAndGetJsonHash()), wallet: dRepWallet };
+      const metadataResponse = await uploadMetadataAndGetJsonHash();
+      const givenName = metadataResponse.givenName;
+
+      await walletManager.updateWalletGivenName(dRepWallet.address, givenName);
+
+      return {
+        ...metadataResponse,
+        wallet: dRepWallet,
+      };
     });
 
     const metadataAndDRepWallets = await Promise.all(metadataPromises);
@@ -61,9 +73,14 @@ setup("Register DRep of static wallets", async () => {
 });
 
 setup("Setup temporary DRep wallets", async () => {
+
+  const totalRequiredBalanceForDRepSetup =
+    (DREP_WALLETS_COUNT + REGISTER_DREP_WALLETS_COUNT) *
+    (dRepDeposit / 1000000 + 22);
+  await skipIfBalanceIsInsufficient(totalRequiredBalanceForDRepSetup);
   setup.setTimeout(3 * environments.txTimeOut);
 
-  const dRepWallets = await generateWallets(DREP_WALLETS_COUNT);
+  const dRepWallets: StaticWallet[] = await generateWallets(DREP_WALLETS_COUNT);
   const registerDRepWallets = await generateWallets(
     REGISTER_DREP_WALLETS_COUNT
   );
@@ -77,7 +94,17 @@ setup("Setup temporary DRep wallets", async () => {
 
   // Submit metadata to obtain a URL and generate hash value.
   const metadataPromises = dRepWallets.map(async (dRepWallet) => {
-    return { ...(await uploadMetadataAndGetJsonHash()), wallet: dRepWallet };
+    const metadataResponse = await uploadMetadataAndGetJsonHash();
+    const givenName = metadataResponse.givenName;
+    const index = dRepWallets.indexOf(dRepWallet);
+    dRepWallets[index] = {
+      ...dRepWallet,
+      givenName,
+    };
+    return {
+      ...metadataResponse,
+      wallet: dRepWallet,
+    };
   });
 
   const metadatasAndDRepWallets = await Promise.all(metadataPromises);

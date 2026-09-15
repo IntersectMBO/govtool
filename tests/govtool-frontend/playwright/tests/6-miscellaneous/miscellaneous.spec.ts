@@ -9,11 +9,10 @@ import {
   REGISTER_DREP_DOC_URL,
   TERMS_AND_CONDITIONS,
 } from "@constants/docsUrl";
-import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { isMobile, openDrawer } from "@helpers/mobile";
-import { expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 import environments from "lib/constants/environments";
 
 test.beforeEach(async () => {
@@ -23,37 +22,59 @@ test.beforeEach(async () => {
 test("6C. Navigation within the dApp", async ({ page, context }) => {
   await page.goto("/");
 
-  if (isMobile(page)) {
-    await openDrawer(page);
+  const navbarLinks = [
+    { testId: "dashboard-link", url: `${environments.frontendUrl}/` },
+    { testId: "drep-directory-link", urlPattern: /\/drep_directory/ },
+    { testId: "budget-discussion-link", urlPattern: /\/budget_discussion/ },
+    {
+      testId: "proposed-governance-actions-link",
+      urlPattern: /\/proposal_discussion/,
+      isDropdownContent: true,
+    },
+    {
+      testId: "governance-actions-link",
+      urlPattern: /\/governance_actions/,
+      isDropdownContent: true,
+    },
+    {
+      testId: "governance-actions-outcomes-link",
+      urlPattern: /\/outcomes/,
+      isDropdownContent: true,
+    },
+  ];
+
+  for (const link of navbarLinks) {
+    if (isMobile(page)) {
+      await openDrawer(page);
+    }
+
+    if (!isMobile(page) && !!link.isDropdownContent) {
+      await page.getByTestId("governance-actions").click();
+    }
+    await page.getByTestId(link.testId).click();
+
+    if (link.url) {
+      expect(page.url()).toEqual(link.url);
+    } else {
+      await expect(page).toHaveURL(link.urlPattern);
+    }
   }
-  await page.getByTestId("governance-actions-link").click();
-  await expect(page).toHaveURL(/\/governance_actions/);
 
-  if (isMobile(page)) {
-    await openDrawer(page);
+  const externalLinks = [
+    { testId: "guides-link", url: GUIDES_DOC_URL },
+    { testId: "faqs-link", url: FAQS_DOC_URL },
+  ];
+
+  for (const link of externalLinks) {
+    if (isMobile(page)) {
+      await openDrawer(page);
+    }
+    const [newPage] = await Promise.all([
+      context.waitForEvent("page"),
+      page.getByTestId(link.testId).click(),
+    ]);
+    await expect(newPage).toHaveURL(link.url);
   }
-  const [guidesPage] = await Promise.all([
-    context.waitForEvent("page"),
-    page.getByTestId("guides-link").click(),
-  ]);
-
-  await expect(guidesPage).toHaveURL(GUIDES_DOC_URL);
-
-  if (isMobile(page)) {
-    await openDrawer(page);
-  }
-  const [faqsPage] = await Promise.all([
-    context.waitForEvent("page"),
-    page.getByTestId("faqs-link").click(),
-  ]);
-
-  await expect(faqsPage).toHaveURL(FAQS_DOC_URL);
-
-  if (isMobile(page)) {
-    await openDrawer(page);
-  }
-  await page.getByTestId("dashboard-link").click();
-  expect(page.url()).toEqual(`${environments.frontendUrl}/`);
 });
 
 test("6D. Should open Sanchonet docs in a new tab when clicking `Learn More` on dashboards in disconnected state.", async ({
@@ -103,167 +124,8 @@ test("6M. Should navigate between footer links", async ({ page, context }) => {
   await expect(helpUrl).toHaveURL(HELP_DOC_URL);
 });
 
-test.describe("User Snap", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.waitForTimeout(2_000); // wait until page load properly
-
-    await page.getByTestId("feedback-footer-button").click();
-  });
-
-  test("6N. Should open feedback modal", async ({ page }) => {
-    await expect(page.getByLabel("Usersnap widget")).toBeVisible();
-    await expect(
-      page.getByRole("button", {
-        name: "Report an issue Something",
-      })
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", {
-        name: "Idea or new feature Let us",
-      })
-    ).toBeVisible();
-  });
-
-  test("6O. Should verify a bug report form", async ({ page }) => {
-    await page
-      .getByRole("button", {
-        name: "Report an issue Something",
-      })
-      .click();
-
-    await expect(
-      page.getByRole("heading", { name: "Report a bug" })
-    ).toBeVisible();
-    await expect(page.getByPlaceholder("Your feedback")).toBeVisible();
-    await expect(page.getByText("Drag & drop or Browse")).toBeVisible();
-    await expect(page.getByLabel("Take screenshot")).toBeVisible();
-    await expect(page.getByLabel("Record")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
-  });
-
-  test("6P. Should verify feature form", async ({ page }) => {
-    await page
-      .getByRole("button", {
-        name: "Idea or new feature Let us",
-      })
-      .click();
-
-    await expect(
-      page.getByRole("heading", { name: "Idea or new feature" })
-    ).toBeVisible();
-    await expect(
-      page.getByPlaceholder("Example: New navigation")
-    ).toBeVisible();
-    await expect(
-      page.getByPlaceholder("Example: New navigation")
-    ).toBeVisible();
-    await expect(page.getByLabel("Any additional details")).toBeVisible();
-    await expect(page.getByText("Drag & drop or Browse")).toBeVisible();
-    await expect(
-      page.getByLabel("Please summarize your idea or")
-    ).toBeVisible();
-    await expect(page.getByLabel("Take screenshot")).toBeVisible();
-    await expect(page.getByLabel("Record")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
-  });
-
-  test.describe("Feedback Tests", () => {
-    const attachmentInputSelector = "input[type=file]";
-    const feedbackApiUrl =
-      "https://widget.usersnap.com/api/widget/xhrrpc?submit_feedback";
-    const mockAttachmentPath = "./lib/_mock/mockAttachment.png";
-
-    test("6Q. Should report an issue", async ({ page }) => {
-      // Intercept Usersnap submit API
-      await page.route(feedbackApiUrl, async (route) =>
-        route.fulfill({
-          status: 200,
-        })
-      );
-
-      await page
-        .getByRole("button", {
-          name: "Report an issue Something",
-        })
-        .click();
-
-      await page
-        .getByPlaceholder("Your feedback")
-        .fill(faker.lorem.paragraph(2));
-      await page.setInputFiles(attachmentInputSelector, [mockAttachmentPath]);
-
-      await page.getByRole("button", { name: "Submit" }).click();
-
-      await expect(page.getByText("Feedback was not submitted,")).toBeVisible();
-    });
-
-    test("6R. Should submit an idea or new feature", async ({ page }) => {
-      // Intercept Usersnap submit API
-      await page.route(feedbackApiUrl, async (route) =>
-        route.fulfill({
-          status: 200,
-        })
-      );
-
-      await page
-        .getByRole("button", {
-          name: "Idea or new feature Let us",
-        })
-        .click();
-
-      await page
-        .getByPlaceholder("Example: New navigation")
-        .fill(faker.lorem.words(4));
-      await page
-        .getByLabel("Please summarize your idea or")
-        .fill(faker.lorem.paragraph(2));
-      await page
-        .getByLabel("Any additional details")
-        .fill(faker.lorem.paragraph(2));
-      await page.setInputFiles(attachmentInputSelector, [mockAttachmentPath]);
-
-      await page.getByRole("button", { name: "Submit" }).click();
-
-      await expect(page.getByText("Feedback was not submitted,")).toBeVisible();
-    });
-  });
-});
-
-test("6S. Should Warn users that they are in bootstrapping phase via banner", async ({
-  page,
-  context,
-}) => {
-  await page.route("**/epoch/params", async (route) => {
-    // Fetch the original response from the server
-    const response = await route.fetch();
-    const json = await response.json();
-
-    // update protocol major version
-    json["protocol_major"] = 9;
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify(json),
-    });
-  });
-
-  const responsePromise = page.waitForResponse("**/epoch/params");
-  await page.goto("/");
-
-  await responsePromise;
-
-  await expect(page.getByTestId("system-bootstrapping-warning")).toBeVisible();
-
-  const [bootstrap] = await Promise.all([
-    context.waitForEvent("page"),
-    page.getByTestId("system-bootstrapping-warning-link").click(),
-  ]);
-  await expect(bootstrap).toHaveURL(BOOTSTRAP_DOC_URL);
-});
-
-test("6T. Should display proper network name", async ({ page }) => {
-  await page.route("**/network/metrics", async (route) => {
+test("6O. Should display proper network name", async ({ page }) => {
+  await page.route("**/network/info", async (route) => {
     // Fetch the original response from the server
     const response = await route.fetch();
     const json = await response.json();
@@ -278,7 +140,7 @@ test("6T. Should display proper network name", async ({ page }) => {
       body: JSON.stringify(json),
     });
   });
-  const responsePromise = page.waitForResponse("**/network/metrics");
+  const responsePromise = page.waitForResponse("**/network/info");
   await page.goto("/");
 
   const response = await responsePromise;

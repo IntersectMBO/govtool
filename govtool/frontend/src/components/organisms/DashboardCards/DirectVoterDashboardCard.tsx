@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Trans } from "react-i18next";
 
 import { LoadingButtonProps } from "@atoms";
@@ -7,12 +7,13 @@ import { PendingTransaction } from "@context";
 import { useTranslation } from "@hooks";
 import { VoterInfo } from "@models";
 import { DashboardActionCard, DashboardActionCardProps } from "@molecules";
-import { correctAdaFormat, openInNewTab } from "@utils";
+import { correctVoteAdaFormat, openInNewTab } from "@utils";
+import { LINKS } from "@/consts/links";
 
 type DirectVoterDashboardCardProps = {
   pendingTransaction: PendingTransaction;
   voter: VoterInfo;
-  votingPower: number;
+  votingPower: number | null;
 };
 
 export const DirectVoterDashboardCard = ({
@@ -23,16 +24,13 @@ export const DirectVoterDashboardCard = ({
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const ada = correctAdaFormat(votingPower);
+  const ada = correctVoteAdaFormat(votingPower ?? 0);
 
   // learn more button
   const learnMoreButton: LoadingButtonProps = {
     children: t("learnMore"),
     dataTestId: "direct-voter-learn-more-button",
-    onClick: () =>
-      openInNewTab(
-        "https://docs.gov.tools/using-govtool/govtool-functions/direct-voting",
-      ),
+    onClick: () => openInNewTab(LINKS.DIRECT_VOTING),
   };
 
   const cardProps: Partial<DashboardActionCardProps> = (() => {
@@ -71,11 +69,13 @@ export const DirectVoterDashboardCard = ({
           },
           { ...learnMoreButton, variant: "text" },
         ],
-        description: (
+        description: votingPower ? (
           <Trans
             i18nKey="dashboard.cards.directVoter.isRegisteredDescription"
             values={{ votingPower: ada }}
           />
+        ) : (
+          <Trans i18nKey="dashboard.cards.directVoter.isRegisteredDescriptionWithoutVotingPower" />
         ),
         state: "active",
         transactionId: voter?.soleVoterRegisterTxHash,
@@ -96,17 +96,11 @@ export const DirectVoterDashboardCard = ({
           {
             children: t("learnMore"),
             dataTestId: "learn-more-button",
-            onClick: () =>
-              openInNewTab(
-                "https://docs.gov.tools/using-govtool/govtool-functions/direct-voting",
-              ),
+            onClick: () => openInNewTab(LINKS.DIRECT_VOTING),
           },
         ],
         description: (
-          <Trans
-            i18nKey="dashboard.cards.directVoter.wasRegisteredDescription"
-            values={{ votingPower: ada }}
-          />
+          <Trans i18nKey="dashboard.cards.directVoter.wasRegisteredDescription" />
         ),
         transactionId: voter?.soleVoterRetireTxHash,
         title: t("dashboard.cards.directVoter.wasDirectVoterTitle"),
@@ -125,10 +119,7 @@ export const DirectVoterDashboardCard = ({
         learnMoreButton,
       ],
       description: (
-        <Trans
-          i18nKey="dashboard.cards.directVoter.registerDescription"
-          values={{ votingPower: ada }}
-        />
+        <Trans i18nKey="dashboard.cards.directVoter.registerDescription" />
       ),
       title: t("dashboard.cards.directVoter.registerTitle"),
     };

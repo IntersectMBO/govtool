@@ -1,14 +1,19 @@
-import { PropsWithChildren } from "react";
-import { Box, ButtonBase, Link } from "@mui/material";
+import { PropsWithChildren, useEffect, useState } from "react";
+import { Box, ButtonBase, Link, Skeleton } from "@mui/material";
 
 import { Button, ExternalModalButton, StatusPill, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { useDelegateTodRep, useScreenDimension, useTranslation } from "@hooks";
 import { Card, DataMissingInfoBox } from "@molecules";
-import { correctAdaFormat, testIdFromLabel } from "@utils";
-import { DRepData } from "@/models";
+import {
+  correctDRepDirectoryFormat,
+  encodeCIP129Identifier,
+  testIdFromLabel,
+} from "@utils";
+import { DRepData, MetadataStandard } from "@/models";
 import { DRepDetailsCardHeader } from "./DRepDetailsCardHeader";
+import { useValidateMutation } from "@/hooks/mutations";
 
 type DRepDetailsProps = {
   dRepData: DRepData;
@@ -32,32 +37,44 @@ export const DRepDetailsCard = ({
   const { delegate, isDelegating } = useDelegateTodRep();
 
   const {
-    metadataStatus,
     motivations,
     objectives,
     paymentAddress,
     qualifications,
-    references,
+    identityReferences,
+    linkReferences,
     status,
     url,
     view,
+    drepId,
     votingPower,
+    isScriptBased,
+    metadataHash,
   } = dRepData;
 
-  const groupedReferences = references?.reduce<Record<string, Reference[]>>(
-    (acc, reference) => {
-      const type = reference["@type"];
-      if (!acc[type]) {
-        acc[type] = [];
-      }
-      acc[type].push(reference);
-      return acc;
-    },
-    {},
-  );
+  const [isValidating, setIsValidating] = useState(false);
+  const [metadataStatus, setMetadataStatus] = useState<
+    MetadataValidationStatus | undefined
+  >();
+  const { validateMetadata } = useValidateMutation();
 
-  const linkReferences = groupedReferences?.Link;
-  const identityReferences = groupedReferences?.Identity;
+  useEffect(() => {
+    if (!url) return;
+
+    const validate = async () => {
+      setIsValidating(true);
+
+      const { status: metadataValidationStatus } = await validateMetadata({
+        standard: MetadataStandard.CIP119,
+        url,
+        hash: metadataHash ?? "",
+      });
+
+      setMetadataStatus(metadataValidationStatus);
+      setIsValidating(false);
+    };
+    validate();
+  }, [url]);
 
   return (
     <Card
@@ -89,6 +106,8 @@ export const DRepDetailsCard = ({
           dRepData={dRepData}
           isMe={isMe}
           isMyDrep={isMyDrep}
+          isValidating={isValidating}
+          metadataStatus={metadataStatus}
         />
         {/* ERROR MESSAGES */}
         {metadataStatus && (
@@ -96,6 +115,7 @@ export const DRepDetailsCard = ({
             isDataMissing={metadataStatus}
             isDrep
             sx={{ mb: 0 }}
+            isValidating={isValidating}
           />
         )}
         {metadataStatus && !!url && (
@@ -106,64 +126,97 @@ export const DRepDetailsCard = ({
           />
         )}
         {/* ERROR MESSAGES END */}
-        <DRepDetailsInfoItem label={t("drepId")} dataTestId="drep-id">
-          <CopyableText value={view} dataTestId="copy-drep-id-button" />
+        <DRepDetailsInfoItem
+          label={t("drepId")}
+          dataTestId="cip-129-drep-id"
+          isValidating={isValidating}
+        >
+          <CopyableText
+            value={encodeCIP129Identifier({
+              txID: `${isScriptBased ? "23" : "22"}${drepId}`,
+              bech32Prefix: "drep",
+            })}
+            dataTestId="copy-cip-129-drep-id-button"
+          />
         </DRepDetailsInfoItem>
-        <DRepDetailsInfoItem label={t("status")} dataTestId="drep-status">
+
+        <DRepDetailsInfoItem
+          label={t("cip105DRepId")}
+          dataTestId="cip-105-drep-id"
+          isValidating={isValidating}
+        >
+          <CopyableText
+            isSemiTransparent
+            value={view}
+            dataTestId="copy-drep-id-button"
+          />
+        </DRepDetailsInfoItem>
+
+        <DRepDetailsInfoItem
+          label={t("status")}
+          dataTestId="drep-status"
+          isValidating={isValidating}
+        >
           <StatusPill status={status} />
         </DRepDetailsInfoItem>
         <DRepDetailsInfoItem
           label={t("votingPower")}
           dataTestId="drep-voting-power"
+          isValidating={isValidating}
         >
           <Typography
             data-testid="voting-power"
             sx={{ display: "flex", flexDirection: "row", mt: 0.5 }}
           >
             {"₳ "}
-            {correctAdaFormat(votingPower)}
+            {correctDRepDirectoryFormat(votingPower)}
           </Typography>
         </DRepDetailsInfoItem>
       </Box>
       {/* BASIC INFO END */}
 
       {/* BUTTONS */}
-      {isConnected && status === "Active" && !isMyDrep && (
-        <Button
-          data-testid="delegate-button"
-          disabled={!!pendingTransaction?.delegate}
-          isLoading={
-            isDelegating === dRepData.view || isDelegating === dRepData.drepId
-          }
-          onClick={() => delegate(dRepData.drepId)}
-          size="extraLarge"
-          sx={{ width: "100%", maxWidth: screenWidth < 1024 ? "100%" : 286 }}
-          variant="contained"
-        >
-          {t("delegate")}
-        </Button>
-      )}
-      {!isConnected && status === "Active" && (
-        <Button
-          data-testid="connect-to-delegate-button"
-          onClick={() =>
-            openModal({
-              type: "chooseWallet",
-              state: {
-                pathToNavigate: PATHS.dashboardDRepDirectoryDRep.replace(
-                  ":dRepId",
-                  view,
-                ),
-              },
-            })
-          }
-          size="extraLarge"
-          sx={{ width: "100%", maxWidth: screenWidth < 1024 ? "100%" : 286 }}
-          variant="outlined"
-        >
-          {t("connectToDelegate")}
-        </Button>
-      )}
+      {!isValidating &&
+        isConnected &&
+        ["Active", "Inactive"].includes(status) &&
+        !isMyDrep && (
+          <Button
+            data-testid="delegate-button"
+            disabled={!!pendingTransaction?.delegate}
+            isLoading={
+              isDelegating === dRepData.view || isDelegating === dRepData.drepId
+            }
+            onClick={() => delegate(dRepData.drepId)}
+            size="extraLarge"
+            sx={{ width: "100%", maxWidth: screenWidth < 1024 ? "100%" : 286 }}
+            variant="contained"
+          >
+            {t("delegate")}
+          </Button>
+        )}
+      {!isValidating &&
+        !isConnected &&
+        ["Active", "Inactive"].includes(status) && (
+          <Button
+            data-testid="connect-to-delegate-button"
+            onClick={() =>
+              openModal({
+                type: "chooseWallet",
+                state: {
+                  pathToNavigate: PATHS.dashboardDRepDirectoryDRep.replace(
+                    ":dRepId",
+                    view,
+                  ),
+                },
+              })
+            }
+            size="extraLarge"
+            sx={{ width: "100%", maxWidth: screenWidth < 1024 ? "100%" : 286 }}
+            variant="outlined"
+          >
+            {t("connectToDelegate")}
+          </Button>
+        )}
       {/* BUTTONS END */}
 
       {/* CIP-119 DATA */}
@@ -211,6 +264,53 @@ export const DRepDetailsCard = ({
               />
             )}
           </DRepDetailsInfoItem>
+          {url && (
+            <DRepDetailsInfoItem
+              label={t("forms.dRepData.metadataUrl")}
+              dataTestId="metadata-url"
+            >
+              <Link
+                data-testid="metadata-url-link"
+                href={url}
+                target="_blank"
+                sx={{
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  display: "flex",
+                  gap: 1,
+                  alignItems: "center",
+                }}
+              >
+                <Typography
+                  color="primary"
+                  fontWeight={400}
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {url}
+                </Typography>
+                <img
+                  alt="link"
+                  height={16}
+                  src={ICONS.externalLinkIcon}
+                  width={16}
+                />
+              </Link>
+            </DRepDetailsInfoItem>
+          )}
+          {metadataHash && (
+            <DRepDetailsInfoItem
+              label={t("forms.dRepData.metadataHash")}
+              dataTestId="metadata-hash"
+            >
+              <CopyableText
+                value={metadataHash}
+                dataTestId="copy-metadata-hash"
+              />
+            </DRepDetailsInfoItem>
+          )}
         </>
       )}
       {/* CIP-119 DATA END */}
@@ -228,6 +328,7 @@ type DrepDetailsInfoItemProps = PropsWithChildren & {
   label: string;
   text?: string | null;
   dataTestId: string;
+  isValidating?: boolean;
 };
 
 const DRepDetailsInfoItem = ({
@@ -235,41 +336,78 @@ const DRepDetailsInfoItem = ({
   label,
   text,
   dataTestId,
+  isValidating,
 }: DrepDetailsInfoItemProps) => {
   if (!children && !text) return null;
   const dataTestIdInfoItemCategoryPrefix = "info-item";
   return (
-    <div>
-      <Box sx={{ mb: 0.5 }}>
-        <Typography
-          color="neutralGray"
-          fontWeight={600}
-          variant="body2"
-          data-testid={`${dataTestId}-${dataTestIdInfoItemCategoryPrefix}-title`}
+    <Box
+      sx={{
+        maxWidth: {
+          xxs: "295px",
+          md: "100%",
+        },
+      }}
+    >
+      {isValidating ? (
+        <Skeleton sx={{ mb: 0.5 }} width="128px" height="20px" variant="text" />
+      ) : (
+        <Box
+          sx={{
+            mb: 0.5,
+          }}
         >
-          {label}
-        </Typography>
-      </Box>
+          <Typography
+            color="neutralGray"
+            fontWeight={600}
+            variant="body2"
+            data-testid={`${dataTestId}-${dataTestIdInfoItemCategoryPrefix}-title`}
+            component="h2"
+          >
+            {label}
+          </Typography>
+        </Box>
+      )}
       <div
         data-testid={`${dataTestId}-${dataTestIdInfoItemCategoryPrefix}-description`}
       >
-        {text && (
-          <Typography fontWeight={400} sx={{ maxWidth: 608 }} variant="body1">
-            {text}
-          </Typography>
+        {isValidating ? (
+          <Skeleton
+            variant="text"
+            width="100%"
+            height="20px"
+            sx={{ maxWidth: 608 }}
+          />
+        ) : (
+          <>
+            {text && (
+              <Typography
+                fontWeight={400}
+                sx={{ maxWidth: 608 }}
+                variant="body1"
+              >
+                {text}
+              </Typography>
+            )}
+            {children}
+          </>
         )}
-        {children}
       </div>
-    </div>
+    </Box>
   );
 };
 
 type CopyableTextProps = {
   value: string;
   dataTestId: string;
+  isSemiTransparent?: boolean;
 };
 
-const CopyableText = ({ value, dataTestId }: CopyableTextProps) => (
+const CopyableText = ({
+  value,
+  dataTestId,
+  isSemiTransparent,
+}: CopyableTextProps) => (
   <ButtonBase
     onClick={(e) => {
       navigator.clipboard.writeText(value.toString());
@@ -285,7 +423,11 @@ const CopyableText = ({ value, dataTestId }: CopyableTextProps) => (
       },
     }}
   >
-    <Typography color="primary" fontWeight={500} sx={ellipsisStyles}>
+    <Typography
+      color="primary"
+      fontWeight={500}
+      sx={{ ...ellipsisStyles, opacity: isSemiTransparent ? 0.75 : 1 }}
+    >
       {value}
     </Typography>
     <img alt="" src={ICONS.copyBlueIcon} />
@@ -306,8 +448,20 @@ const ReferencesGroup = ({ references }: { references: ReferenceItem[] }) => (
 );
 
 const ReferencesLink = ({ label, uri }: ReferenceItem) => (
-  <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-    <Typography fontWeight={400}>{label}</Typography>
+  <Box
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      gap: 0.5,
+      maxWidth: {
+        xxs: "295px",
+        md: "100%",
+      },
+    }}
+  >
+    <Typography fontWeight={400} component="h2">
+      {label}
+    </Typography>
     <Link
       data-testid={`${testIdFromLabel(label)}-link`}
       href={uri}

@@ -1,12 +1,14 @@
+import { useEffect, useState } from "react";
 import {
   useNavigate,
   useLocation,
   useParams,
   generatePath,
-} from "react-router-dom";
+} from "react-router";
 import { Box, CircularProgress, Link, Typography } from "@mui/material";
+import { AxiosError } from "axios";
 
-import { ICONS, PATHS } from "@consts";
+import { ICONS, OUTCOMES_PATHS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
   useGetProposalQuery,
@@ -17,7 +19,8 @@ import {
 import { getFullGovActionId, getShortenedGovActionId } from "@utils";
 import { GovernanceActionDetailsCard } from "@organisms";
 import { Breadcrumbs } from "@molecules";
-import { ProposalData, ProposalVote } from "@/models";
+import { MetadataStandard, ProposalData, ProposalVote } from "@/models";
+import { useValidateMutation } from "@/hooks/mutations";
 
 type DashboardGovernanceActionDetailsState = {
   proposal?: ProposalData;
@@ -37,17 +40,74 @@ export const DashboardGovernanceActionDetails = () => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
   const { proposalId: txHash } = useParams();
-
+  const [isValidating, setIsValidating] = useState(true);
+  const [metadataStatus, setMetadataStatus] = useState<
+    MetadataValidationStatus | undefined
+  >();
+  const [isMetadataValid, setIsMetadataValid] = useState<boolean | undefined>();
   const fullProposalId = txHash && getFullGovActionId(txHash, +index);
   const shortenedGovActionId =
     txHash && getShortenedGovActionId(txHash, +index);
 
-  const { data, isLoading } = useGetProposalQuery(
+  const { data, isLoading, error } = useGetProposalQuery(
     fullProposalId ?? "",
     !state?.proposal || !state?.vote,
   );
-  const proposal = (data ?? state)?.proposal;
+  // TODO: Refactor this mess with proposals and metadata validation
+  // once authors are existing in all CIP-108 metadata
+  const [extendedProposal, setExtendedProposal] = useState<ProposalData>(
+    (data ?? state)?.proposal as ProposalData,
+  );
+
+  useEffect(() => {
+    const extendedProposalIndex = extendedProposal ? extendedProposal.index : -1;
+    if (data?.proposal && data?.proposal.index !== extendedProposalIndex) {
+      setExtendedProposal(data.proposal);
+    }
+  }, [data?.proposal, isMetadataValid]);
   const vote = (data ?? state)?.vote;
+
+  const { validateMetadata } = useValidateMutation();
+
+  useEffect(() => {
+    if (!extendedProposal?.url) return;
+
+    const validate = async () => {
+      setIsValidating(true);
+
+      const { status, metadata, valid } = await validateMetadata({
+        standard: MetadataStandard.CIP108,
+        url: extendedProposal?.url,
+        hash: extendedProposal?.metadataHash ?? "",
+      });
+
+      if (metadata) {
+        setExtendedProposal((prevProposal) => ({
+          ...(prevProposal || {}),
+          ...(metadata as Pick<
+            ProposalData,
+            "title" | "abstract" | "motivation" | "rationale"
+          >),
+        }));
+      }
+
+      setMetadataStatus(status);
+      setIsValidating(false);
+      setIsMetadataValid(valid);
+    };
+    validate();
+  }, [extendedProposal?.url, extendedProposal?.metadataHash]);
+
+  useEffect(() => {
+    const isProposalNotFound =
+      error instanceof AxiosError &&
+      error.response?.data.message.match(/Proposal with id: .* not found/);
+    if (isProposalNotFound && fullProposalId) {
+      navigate(
+        OUTCOMES_PATHS.governanceActionOutcomes.replace(":id", fullProposalId),
+      );
+    }
+  }, [error]);
 
   return (
     <Box
@@ -61,8 +121,8 @@ export const DashboardGovernanceActionDetails = () => {
       <Breadcrumbs
         elementOne={t("govActions.title")}
         elementOnePath={PATHS.dashboardGovernanceActions}
-        elementTwo={proposal?.title ?? ""}
-        isDataMissing={proposal?.metadataStatus ?? null}
+        elementTwo={extendedProposal?.title ?? ""}
+        isDataMissing={metadataStatus ?? null}
       />
       <Link
         data-testid="back-to-list-link"
@@ -73,7 +133,7 @@ export const DashboardGovernanceActionDetails = () => {
         }}
         onClick={() =>
           navigate(
-            state && state.openedFromCategoryPage
+            state?.openedFromCategoryPage
               ? generatePath(PATHS.dashboardGovernanceActionsCategory, {
                   category: state?.proposal?.type,
                 })
@@ -107,19 +167,20 @@ export const DashboardGovernanceActionDetails = () => {
           >
             <CircularProgress />
           </Box>
-        ) : proposal ? (
+        ) : extendedProposal ? (
           <GovernanceActionDetailsCard
-            proposal={proposal}
+            proposal={extendedProposal}
             vote={vote}
             isVoter={
               voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
             }
-            isDataMissing={proposal.metadataStatus ?? null}
+            isDataMissing={metadataStatus}
             isInProgress={
               pendingTransaction.vote?.resourceId ===
               fullProposalId?.replace("#", "")
             }
             isDashboard
+            isValidating={isValidating}
           />
         ) : (
           <Box mt={4} display="flex" flexWrap="wrap">

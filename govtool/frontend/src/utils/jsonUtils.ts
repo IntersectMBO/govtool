@@ -24,8 +24,6 @@ export const downloadJson = (json: NodeObject, fileName?: string) => {
   } else {
     link.click();
   }
-
-  document.body.removeChild(link);
   URL.revokeObjectURL(url);
 };
 
@@ -52,6 +50,5 @@ export const downloadTextFile = (text: string, fileName?: string) => {
     link.click();
   }
 
-  document.body.removeChild(link);
   URL.revokeObjectURL(url);
 };

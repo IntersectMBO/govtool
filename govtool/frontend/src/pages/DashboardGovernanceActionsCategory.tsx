@@ -1,5 +1,5 @@
 import { useMemo, useRef } from "react";
-import { generatePath, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import { Box, CircularProgress, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
@@ -8,7 +8,6 @@ import { useCardano, useDataActionsBar } from "@context";
 import {
   DataActionsBar,
   EmptyStateGovernanceActionsCategory,
-  GovernanceActionCard,
 } from "@molecules";
 import {
   useFetchNextPageDetector,
@@ -19,10 +18,10 @@ import {
   useTranslation,
 } from "@hooks";
 import {
-  getFullGovActionId,
   getProposalTypeLabel,
   removeDuplicatedProposals,
 } from "@utils";
+import { ValidatedGovernanceActionCard } from "@/components/organisms";
 
 export const DashboardGovernanceActionsCategory = () => {
   const { category } = useParams();
@@ -133,7 +132,7 @@ export const DashboardGovernanceActionsCategory = () => {
           >
             {mappedData.map((item) => (
               <Box pb={4.25} key={item.txHash + item.index}>
-                <GovernanceActionCard
+                <ValidatedGovernanceActionCard
                   {...item}
                   inProgress={
                     pendingTransaction.vote?.resourceId ===
@@ -141,18 +140,6 @@ export const DashboardGovernanceActionsCategory = () => {
                   }
                   onClick={() => {
                     saveScrollPosition();
-
-                    navigate(
-                      generatePath(PATHS.dashboardGovernanceActionsAction, {
-                        proposalId: getFullGovActionId(item.txHash, item.index),
-                      }),
-                      {
-                        state: {
-                          proposal: item,
-                          openedFromCategoryPage: true,
-                        },
-                      },
-                    );
                   }}
                   txHash={item.txHash}
                 />

@@ -1,14 +1,11 @@
-import { bech32 } from "bech32";
-
 import {
   type Infinite,
   type DRepStatus,
   type DRepListSort,
   DRepData,
-  DrepDataDTO,
 } from "@models";
 import { API } from "../API";
-import { mapDtoToDrep } from "@/utils";
+import { dRepSearchPhraseProcessor, mapDtoToDrep } from "@/utils";
 
 export type GetDRepListArguments = {
   filters?: string[];
@@ -17,6 +14,7 @@ export type GetDRepListArguments = {
   sorting?: DRepListSort;
   status?: DRepStatus[];
   searchPhrase?: string;
+  sortingSeed?: string;
 };
 
 export const getDRepList = async ({
@@ -26,18 +24,11 @@ export const getDRepList = async ({
   pageSize = 10,
   searchPhrase: rawSearchPhrase = "",
   status = [],
+  sortingSeed = ""
 }: GetDRepListArguments): Promise<Infinite<DRepData>> => {
-  // DBSync contains wrong representation of DRep view for script based DReps,
-  // but it's still used by BE
-  const searchPhrase = (() => {
-    if (rawSearchPhrase.startsWith("drep_script")) {
-      const { words } = bech32.decode(rawSearchPhrase);
-      return bech32.encode("drep", words);
-    }
-    return rawSearchPhrase;
-  })();
+  const searchPhrase = await dRepSearchPhraseProcessor(rawSearchPhrase);
 
-  const response = await API.get<Infinite<DrepDataDTO>>("/drep/list", {
+  const response = await API.get<Infinite<DRepData>>("/drep/list", {
     params: {
       page,
       pageSize,
@@ -45,6 +36,7 @@ export const getDRepList = async ({
       ...(filters.length && { type: filters }),
       ...(sorting && { sort: sorting }),
       ...(status.length && { status }),
+      ...(sortingSeed && { seed: sortingSeed }),
     },
   });
 

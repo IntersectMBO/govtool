@@ -1,4 +1,5 @@
 import json
+from config import KUBER_API_KEY,KUBER_API_URL
 import sys
 import time
 from typing import Any, Optional
@@ -69,11 +70,12 @@ class KuberApi:
 
     @staticmethod
     def from_env() -> "KuberApi":
-        api_url = os.environ.get("KUBER_API_URL")
+        api_url = KUBER_API_URL
+        print(f"KUBER_API_URL: {api_url}")
         if api_url is not None:
             api_url = api_url[:-1] if api_url.endswith("/") else api_url
             print(f"KUBER_API_URL: {api_url}")
-            api_key = os.environ.get("KUBER_API_KEY")
+            api_key = KUBER_API_KEY
             return KuberApi(api_url, api_key)
         else:
             print("KUBER_API_URL environment variable is not set.", file=sys.stderr)

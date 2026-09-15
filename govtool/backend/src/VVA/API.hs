@@ -13,48 +13,59 @@ import           Control.Exception        (throw, throwIO)
 import           Control.Monad.Except     (runExceptT, throwError)
 import           Control.Monad.Reader
 
-import           Data.Aeson               (Value(..), Array, decode, encode, FromJSON, ToJSON)
+import           Data.Aeson               (Array, ToJSON, Value (..), decode, toJSON)
 import           Data.Bool                (Bool)
-import           Data.List                (sortOn)
+import           Data.ByteString.Lazy     (ByteString)
+import qualified Data.ByteString.Lazy     as BSL
+import           Data.List                (sort, sortOn)
 import qualified Data.Map                 as Map
 import           Data.Maybe               (Maybe (Nothing), catMaybes, fromMaybe, mapMaybe)
 import           Data.Ord                 (Down (..))
 import           Data.Text                hiding (any, drop, elem, filter, length, map, null, take)
 import qualified Data.Text                as Text
-import qualified Data.Vector as V
+import qualified Data.Text.Lazy           as TL
+import qualified Data.Text.Lazy.Encoding  as TL
+import           Data.Time                (TimeZone, localTimeToUTC)
 import           Data.Time.LocalTime      (TimeZone, getCurrentTimeZone)
-
+import qualified Data.Vector              as V
+import           Data.Hashable            (hash, hashWithSalt)
 
 import           Numeric.Natural          (Natural)
 
 import           Servant.API
+import           Servant.Exception        (Throws)
 import           Servant.Server
+
 import           System.Random            (randomRIO)
 
 import           Text.Read                (readMaybe)
 
+import           VVA.Account              as Account
 import qualified VVA.AdaHolder            as AdaHolder
 import           VVA.API.Types
 import           VVA.Cache                (cacheRequest)
 import           VVA.Config
 import qualified VVA.DRep                 as DRep
 import qualified VVA.Epoch                as Epoch
+import qualified VVA.Ipfs                 as Ipfs
 import           VVA.Network              as Network
 import qualified VVA.Proposal             as Proposal
 import qualified VVA.Transaction          as Transaction
 import qualified VVA.Types                as Types
 import           VVA.Types                (App, AppEnv (..),
-                                           AppError (CriticalError, InternalError, ValidationError),
+                                           AppError (AppIpfsError, CriticalError, InternalError, ValidationError),
                                            CacheEnv (..))
-import Data.Time (TimeZone, localTimeToUTC)
 
 type VVAApi =
-         "drep" :> "list"
+         "ipfs"
+                :> "upload"  :>  QueryParam "fileName" Text :> ReqBody '[PlainText] Text :> Post '[JSON] UploadResponse
+    :<|> "drep" :> "list"
                 :> QueryParam "search" Text
                 :> QueryParams "status" DRepStatus
                 :> QueryParam "sort" DRepSortMode
                 :> QueryParam "page" Natural
                 :> QueryParam "pageSize" Natural
+                :> QueryParam "seed" Text
                 :> Get '[JSON] ListDRepsResponse
     :<|> "drep" :> "get-voting-power" :> Capture "drepId" HexText :> Get '[JSON] Integer
     :<|> "drep" :> "getVotes"
@@ -64,6 +75,9 @@ type VVAApi =
                 :> QueryParam "search" Text
                 :> Get '[JSON] [VoteResponse]
     :<|> "drep" :> "info" :> Capture "drepId" HexText :> Get '[JSON] DRepInfoResponse
+    :<|> "drep" :> "voting-power-list"
+                :> QueryParams "identifiers" Text
+                :> Get '[JSON] [DRepVotingPowerListResponse]
     :<|> "ada-holder" :> "get-current-delegation" :> Capture "stakeKey" HexText :> Get '[JSON] (Maybe DelegationResponse)
     :<|> "ada-holder" :> "get-voting-power" :> Capture "stakeKey" HexText :> Get '[JSON] Integer
     :<|> "proposal" :> "list"
@@ -75,24 +89,47 @@ type VVAApi =
                     :> QueryParam "search" Text
                     :> Get '[JSON] ListProposalsResponse
     :<|> "proposal" :> "get" :> Capture "proposalId" GovActionId :> QueryParam "drepId" HexText :> Get '[JSON] GetProposalResponse
+    :<|> "proposal" :> "enacted-details" :> QueryParam "type" GovernanceActionType :> Get '[JSON] (Maybe EnactedProposalDetailsResponse)
     :<|> "epoch" :> "params" :> Get '[JSON] GetCurrentEpochParamsResponse
     :<|> "transaction" :> "status" :> Capture "transactionId" HexText :> Get '[JSON] GetTransactionStatusResponse
     :<|> "throw500" :> Get '[JSON] ()
     :<|> "network" :> "metrics" :> Get '[JSON] GetNetworkMetricsResponse
+    :<|> "network" :> "info" :> Get '[JSON] GetNetworkInfoResponse
+    :<|> "network" :> "total-stake" :> Get '[JSON] GetNetworkTotalStakeResponse
+    :<|> "account" :> Capture "stakeKey" HexText :> Get '[JSON] GetAccountInfoResponse
+
 server :: App m => ServerT VVAApi m
-server = drepList
+server = upload
+    :<|> drepList
     :<|> getVotingPower
     :<|> getVotes
     :<|> drepInfo
+    :<|> drepVotingPowerList
     :<|> getCurrentDelegation
     :<|> getStakeKeyVotingPower
     :<|> listProposals
     :<|> getProposal
+    :<|> getEnactedProposalDetails
     :<|> getCurrentEpochParams
     :<|> getTransactionStatus
     :<|> throw500
     :<|> getNetworkMetrics
+    :<|> getNetworkInfo
+    :<|> getNetworkTotalStake
+    :<|> getAccountInfo
 
+upload :: App m => Maybe Text -> Text -> m UploadResponse
+upload mFileName fileContentText = do
+  AppEnv {vvaConfig} <- ask
+  let fileContent = TL.encodeUtf8 $ TL.fromStrict fileContentText
+      vvaPinataJwt = pinataApiJwt vvaConfig
+      fileName = fromMaybe "data.txt" mFileName -- Default to data.txt if no filename is provided
+  when (BSL.length fileContent > 1024 * 512) $
+    throwError $ ValidationError "The uploaded file is larger than 500Kb"
+  eIpfsHash <- liftIO $ Ipfs.ipfsUpload vvaPinataJwt fileName fileContent
+  case eIpfsHash of
+    Left err       ->  throwError $ AppIpfsError err
+    Right ipfsHash -> return $  UploadResponse ipfsHash
 
 mapDRepType :: Types.DRepType -> DRepType
 mapDRepType Types.DRep      = NormalDRep
@@ -124,7 +161,10 @@ drepRegistrationToDrep Types.DRepRegistration {..} =
       dRepMotivations = dRepRegistrationMotivations,
       dRepQualifications = dRepRegistrationQualifications,
       dRepImageUrl = dRepRegistrationImageUrl,
-      dRepImageHash = HexText <$> dRepRegistrationImageHash
+      dRepImageHash = HexText <$> dRepRegistrationImageHash,
+      dRepVotesLastYear = dRepRegistrationVotesLastYear,
+      dRepIdentityReferences = DRepReferences <$> dRepRegistrationIdentityReferences,
+      dRepLinkReferences = DRepReferences <$> dRepRegistrationLinkReferences
     }
 
 delegationToResponse :: Types.Delegation -> DelegationResponse
@@ -137,37 +177,44 @@ delegationToResponse Types.Delegation {..} =
     }
 
 
-drepList :: App m => Maybe Text -> [DRepStatus] -> Maybe DRepSortMode -> Maybe Natural -> Maybe Natural -> m ListDRepsResponse
-drepList mSearchQuery statuses mSortMode mPage mPageSize = do
+drepList :: App m => Maybe Text -> [DRepStatus] -> Maybe DRepSortMode -> Maybe Natural -> Maybe Natural -> Maybe Text -> m ListDRepsResponse
+drepList mSearchQuery statuses mSortMode mPage mPageSize mSeed = do
   CacheEnv {dRepListCache} <- asks vvaCache
   dreps <- cacheRequest dRepListCache (fromMaybe "" mSearchQuery) (DRep.listDReps mSearchQuery)
 
   let filterDRepsByQuery = case mSearchQuery of
         Nothing -> filter $ \Types.DRepRegistration {..} ->
-          dRepRegistrationType == Types.DRep
+          dRepRegistrationType /= Types.SoleVoter
         Just query -> filter $ \Types.DRepRegistration {..} ->
           let searchLower = Text.toLower query
               viewLower = Text.toLower dRepRegistrationView
               hashLower = Text.toLower dRepRegistrationDRepHash
-              nameLower = maybe "" Text.toLower dRepRegistrationGivenName
-          in  case dRepRegistrationType of
-                Types.SoleVoter -> searchLower == viewLower || searchLower == hashLower
-                Types.DRep      -> searchLower `isInfixOf` viewLower
-                                  || searchLower `isInfixOf` hashLower
-                                  || searchLower `isInfixOf` nameLower
+          in case dRepRegistrationType of
+              Types.SoleVoter ->
+                searchLower == viewLower || searchLower == hashLower
+              Types.DRep ->
+                True
 
   let filterDRepsByStatus = case statuses of
         [] -> id
         _  -> filter $ \Types.DRepRegistration {..} ->
           mapDRepStatus dRepRegistrationStatus `elem` statuses
 
-  randomizedOrderList <- mapM (\_ -> randomRIO (0, 1 :: Double)) dreps
+  let seedInt :: Int
+      seedInt =
+        maybe 0 (hash . Text.toCaseFold) mSeed
+
+      randomKey :: Types.DRepRegistration -> Int
+      randomKey Types.DRepRegistration{..} =
+        hashWithSalt seedInt dRepRegistrationDRepHash
 
   let sortDReps = case mSortMode of
         Nothing -> id
-        Just Random -> fmap snd . sortOn fst . Prelude.zip randomizedOrderList
+        Just Random -> sortOn randomKey
         Just VotingPower -> sortOn $ \Types.DRepRegistration {..} ->
           Down dRepRegistrationVotingPower
+        Just Activity -> sortOn $ \Types.DRepRegistration {..} ->
+          Down dRepRegistrationVotesLastYear
         Just RegistrationDate -> sortOn $ \Types.DRepRegistration {..} ->
           Down dRepRegistrationLatestRegistrationDate
         Just Status -> sortOn $ \Types.DRepRegistration {..} ->
@@ -187,7 +234,6 @@ drepList mSearchQuery statuses mSortMode mPage mPageSize = do
       total = length allValidDReps :: Int
 
   let elements = take pageSize $ drop (page * pageSize) allValidDReps
-
   return $ ListDRepsResponse
     { listDRepsResponsePage = fromIntegral page
     , listDRepsResponsePageSize = fromIntegral pageSize
@@ -230,7 +276,9 @@ proposalToResponse timeZone Types.Proposal {..} =
     proposalResponseCcNoVotes = proposalCcNoVotes,
     proposalResponseCcAbstainVotes = proposalCcAbstainVotes,
     proposalResponsePrevGovActionIndex = proposalPrevGovActionIndex,
-    proposalResponsePrevGovActionTxHash = HexText <$> proposalPrevGovActionTxHash
+    proposalResponsePrevGovActionTxHash = HexText <$> proposalPrevGovActionTxHash,
+    proposalResponseJson = proposalJson,
+    proposalResponseAuthors = ProposalAuthors <$> proposalAuthors
   }
 
 voteToResponse :: Types.Vote -> VoteParams
@@ -279,14 +327,21 @@ getVotes :: App m => HexText -> [GovernanceActionType] -> Maybe GovernanceAction
 getVotes (unHexText -> dRepId) selectedTypes sortMode mSearch = do
   CacheEnv {dRepGetVotesCache} <- asks vvaCache
   (votes, proposals) <- cacheRequest dRepGetVotesCache dRepId $ DRep.getVotes dRepId []
-  let voteMap = Map.fromList $ map (\vote@Types.Vote {..} -> (voteProposalId, vote)) votes
-  processedProposals <- filter (isProposalSearchedFor mSearch) <$> mapSortAndFilterProposals selectedTypes sortMode proposals
-  return $
+
+  let voteMapById = Map.fromList $
+        map (\vote -> (Types.voteGovActionId vote, vote)) votes
+
+  processedProposals <- filter (isProposalSearchedFor mSearch) <$>
+                        mapSortAndFilterProposals selectedTypes sortMode proposals
+
+  return
     [ VoteResponse
-      { voteResponseVote = voteToResponse (voteMap Map.! read (unpack proposalResponseId))
+      { voteResponseVote = voteToResponse vote
       , voteResponseProposal = proposalResponse
       }
-    | proposalResponse@ProposalResponse{proposalResponseId} <- processedProposals
+    | proposalResponse <- processedProposals
+    , let govActionId = unHexText (proposalResponseTxHash proposalResponse) <> "#" <> pack (show $ proposalResponseIndex proposalResponse)
+    , Just vote <- [Map.lookup govActionId voteMapById]
     ]
 
 drepInfo :: App m => HexText -> m DRepInfoResponse
@@ -315,6 +370,25 @@ drepInfo (unHexText -> dRepId) = do
     , dRepInfoResponseImageUrl = dRepInfoImageUrl
     , dRepInfoResponseImageHash = HexText <$> dRepInfoImageHash
     }
+
+drepVotingPowerList :: App m => [Text] -> m [DRepVotingPowerListResponse]
+drepVotingPowerList identifiers = do
+  CacheEnv {dRepVotingPowerListCache} <- asks vvaCache
+
+  let cacheKey = Text.intercalate "," (sort identifiers)
+
+  results <- cacheRequest dRepVotingPowerListCache cacheKey $
+    DRep.getDRepsVotingPowerList identifiers
+
+  return $ map toDRepVotingPowerListResponse results
+  where
+    toDRepVotingPowerListResponse Types.DRepVotingPowerList{..} =
+      DRepVotingPowerListResponse
+        { drepVotingPowerListResponseView = drepView
+        , drepVotingPowerListResponseHashRaw = HexText drepHashRaw
+        , drepVotingPowerListResponseVotingPower = drepVotingPower
+        , drepVotingPowerListResponseGivenName = drepGivenName
+        }
 
 getCurrentDelegation :: App m => HexText -> m (Maybe DelegationResponse)
 getCurrentDelegation (unHexText -> stakeKey) = do
@@ -360,17 +434,19 @@ listProposals selectedTypes sortMode mPage mPageSize mDrepRaw mSearchQuery = do
   proposalsToRemove <- case mDrepRaw of
     Nothing -> return []
     Just drepId ->
-      map (voteParamsProposalId . voteResponseVote)
+      map (\VoteResponse { voteResponseProposal = ProposalResponse { proposalResponseTxHash, proposalResponseIndex } } ->
+          (proposalResponseTxHash, proposalResponseIndex))
         <$> getVotes drepId [] Nothing Nothing
 
   CacheEnv {proposalListCache} <- asks vvaCache
 
-  proposals <- cacheRequest proposalListCache () (Proposal.listProposals mSearchQuery)
+  let emptyMSearchQuery = Just "" :: Maybe Text -- issue 3918 temporary bypass
+  proposals <- cacheRequest proposalListCache () (Proposal.listProposals emptyMSearchQuery)
 
   mappedSortedAndFilteredProposals <- mapSortAndFilterProposals selectedTypes sortMode proposals
   let filteredProposals = filter
-        ( \p@ProposalResponse {proposalResponseId} ->
-            proposalResponseId `notElem` proposalsToRemove
+        (\p@ProposalResponse { proposalResponseTxHash, proposalResponseIndex } ->
+            (proposalResponseTxHash, proposalResponseIndex) `notElem` proposalsToRemove
             && isProposalSearchedFor mSearchQuery p
         ) mappedSortedAndFilteredProposals
 
@@ -390,9 +466,9 @@ getProposal g@(GovActionId govActionTxHash govActionIndex) mDrepId' = do
   let mDrepId = unHexText <$> mDrepId'
   CacheEnv {getProposalCache} <- asks vvaCache
   proposal@Types.Proposal {proposalUrl, proposalDocHash} <- cacheRequest getProposalCache (unHexText govActionTxHash, govActionIndex) (Proposal.getProposal (unHexText govActionTxHash) govActionIndex)
-  
+
   timeZone <- liftIO getCurrentTimeZone
-  
+
   let proposalResponse = proposalToResponse timeZone proposal
   voteResponse <- case mDrepId of
     Nothing -> return Nothing
@@ -409,6 +485,33 @@ getProposal g@(GovActionId govActionTxHash govActionIndex) mDrepId' = do
     , getProposalResponseVote = voteResponse
     }
 
+getEnactedProposalDetails :: App m => Maybe GovernanceActionType -> m (Maybe EnactedProposalDetailsResponse)
+getEnactedProposalDetails maybeType = do
+  let proposalType = maybe "HardForkInitiation" governanceActionTypeToText maybeType
+
+  mDetails <- Proposal.getPreviousEnactedProposal proposalType
+
+  let response = enactedProposalDetailsToResponse <$> mDetails
+
+  return response
+  where
+    governanceActionTypeToText :: GovernanceActionType -> Text
+    governanceActionTypeToText actionType =
+      case actionType of
+        HardForkInitiation -> "HardForkInitiation"
+        ParameterChange    -> "ParameterChange"
+        _                  -> "HardForkInitiation"
+
+    enactedProposalDetailsToResponse :: Types.EnactedProposalDetails -> EnactedProposalDetailsResponse
+    enactedProposalDetailsToResponse Types.EnactedProposalDetails{..} =
+      EnactedProposalDetailsResponse
+        { enactedProposalDetailsResponseId = enactedProposalDetailsId
+        , enactedProposalDetailsResponseTxId = enactedProposalDetailsTxId
+        , enactedProposalDetailsResponseIndex = enactedProposalDetailsIndex
+        , enactedProposalDetailsResponseDescription = enactedProposalDetailsDescription
+        , enactedProposalDetailsResponseHash = HexText enactedProposalDetailsHash
+        }
+
 getCurrentEpochParams :: App m => m GetCurrentEpochParamsResponse
 getCurrentEpochParams = do
   CacheEnv {currentEpochCache} <- asks vvaCache
@@ -416,28 +519,63 @@ getCurrentEpochParams = do
 
 getTransactionStatus :: App m => HexText -> m GetTransactionStatusResponse
 getTransactionStatus (unHexText -> transactionId) = do
-  x <- Transaction.getTransactionStatus transactionId
-  case x of
-    Types.TransactionConfirmed   -> return $ GetTransactionStatusResponse True
-    Types.TransactionUnconfirmed -> return $ GetTransactionStatusResponse False
+  status <- Transaction.getTransactionStatus transactionId
+  return $ GetTransactionStatusResponse $ case status of
+    Just value -> Just $ toJSON value
+    Nothing    -> Nothing
 
 throw500 :: App m => m ()
 throw500 = throwError $ CriticalError "intentional system break for testing purposes"
+
+getNetworkInfo :: App m => m GetNetworkInfoResponse
+getNetworkInfo = do
+  CacheEnv {networkInfoCache} <- asks vvaCache
+  Types.NetworkInfo {..} <- Network.networkInfo
+  return $ GetNetworkInfoResponse
+    { getNetworkInfoResponseCurrentTime = networkInfoCurrentTime
+    , getNetworkInfoResponseEpochNo = networkInfoEpochNo
+    , getNetworkInfoResponseBlockNo = networkInfoBlockNo
+    , getNetworkInfoResponseNetworkName = networkInfoNetworkName
+    }
+
+getNetworkTotalStake :: App m => m GetNetworkTotalStakeResponse
+getNetworkTotalStake = do
+  CacheEnv {networkTotalStakeCache} <- asks vvaCache
+  Types.NetworkTotalStake {..} <- Network.networkTotalStake
+  return $ GetNetworkTotalStakeResponse
+    { getNetworkTotalStakeResponseTotalStakeControlledByDReps = networkTotalStakeControlledByDReps
+    , getNetworkTotalStakeResponseTotalStakeControlledBySPOs = networkTotalStakeControlledBySPOs
+    , getNetworkTotalStakeResponseAlwaysAbstainVotingPower = networkTotalAlwaysAbstainVotingPower
+    , getNetworkTotalStakeResponseAlwaysNoConfidenceVotingPower = networkTotalAlwaysNoConfidenceVotingPower
+    }
 
 getNetworkMetrics :: App m => m GetNetworkMetricsResponse
 getNetworkMetrics = do
   CacheEnv {networkMetricsCache} <- asks vvaCache
   Types.NetworkMetrics {..} <- Network.networkMetrics
   return $ GetNetworkMetricsResponse
-    { getNetworkMetricsResponseCurrentTime = networkMetricsCurrentTime
-    , getNetworkMetricsResponseCurrentEpoch = networkMetricsCurrentEpoch
-    , getNetworkMetricsResponseCurrentBlock = networkMetricsCurrentBlock
-    , getNetworkMetricsResponseUniqueDelegators = networkMetricsUniqueDelegators
+    { getNetworkMetricsResponseUniqueDelegators = networkMetricsUniqueDelegators
     , getNetworkMetricsResponseTotalDelegations = networkMetricsTotalDelegations
     , getNetworkMetricsResponseTotalGovernanceActions = networkMetricsTotalGovernanceActions
     , getNetworkMetricsResponseTotalDRepVotes = networkMetricsTotalDRepVotes
     , getNetworkMetricsResponseTotalRegisteredDReps = networkMetricsTotalRegisteredDReps
-    , getNetworkMetricsResponseAlwaysAbstainVotingPower = networkMetricsAlwaysAbstainVotingPower
-    , getNetworkMetricsResponseAlwaysNoConfidenceVotingPower = networkMetricsAlwaysNoConfidenceVotingPower
-    , getNetworkMetricsResponseNetworkName = networkMetricsNetworkName
+    , getNetworkMetricsResponseTotalDRepDistr = networkMetricsTotalDRepDistr
+    , getNetworkMetricsResponseTotalActiveDReps = networkMetricsTotalActiveDReps
+    , getNetworkMetricsResponseTotalInactiveDReps = networkMetricsTotalInactiveDReps
+    , getNetworkMetricsResponseTotalActiveCIP119CompliantDReps = networkMetricsTotalActiveCIP119CompliantDReps
+    , getNetworkMetricsResponseTotalRegisteredDirectVoters = networkMetricsTotalRegisteredDirectVoters
+    , getNetworkMetricsResponseNoOfCommitteeMembers = networkMetricsNoOfCommitteeMembers
+    , getNetworkMetricsResponseQuorumNumerator = networkMetricsQuorumNumerator
+    , getNetworkMetricsResponseQuorumDenominator = networkMetricsQuorumDenominator
+    }
+
+getAccountInfo :: App m => HexText -> m GetAccountInfoResponse
+getAccountInfo (unHexText -> stakeKey) = do
+  CacheEnv {accountInfoCache} <- asks vvaCache
+  Types.AccountInfo {..} <- Account.accountInfo stakeKey
+  return $ GetAccountInfoResponse
+    { getAccountInfoResponseId = accountInfoId
+    , getAccountInfoResponseView = accountInfoView
+    , getAccountInfoResponseIsRegistered = accountInfoIsRegistered
+    , getAccountInfoResponseIsScriptBased = accountInfoIsScriptBased
     }

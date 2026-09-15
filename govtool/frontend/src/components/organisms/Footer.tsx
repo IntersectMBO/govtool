@@ -2,9 +2,10 @@ import { Box, Link } from "@mui/material";
 
 import { Button, Typography } from "@atoms";
 import { ICONS } from "@consts";
-import { useUsersnapApi } from "@context";
+import { useChatwoot } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab, testIdFromLabel } from "@utils";
+import { LINKS } from "@/consts/links";
 
 type FooterLinkProps = {
   label: string;
@@ -32,16 +33,19 @@ const FooterLink = ({ label, onClick }: FooterLinkProps) => (
 export const Footer = () => {
   const { screenWidth } = useScreenDimension();
   const { t } = useTranslation();
-  const { openFeedbackWindow } = useUsersnapApi();
+  const { openFeedbackWindow } = useChatwoot();
 
-  const onClickHelp = () =>
-    openInNewTab("https://docs.gov.tools/support");
+  const onClickHelp = () => openInNewTab(LINKS.SUPPORT);
 
   const onClickPrivacyPolicy = () =>
-    openInNewTab("https://docs.intersectmbo.org/legal/policies-and-conditions/privacy-policy");
+    openInNewTab(
+      "https://docs.intersectmbo.org/legal/policies-and-conditions/privacy-policy",
+    );
 
   const onClickTermOfService = () =>
-    openInNewTab("https://docs.intersectmbo.org/legal/policies-and-conditions/terms-of-use");
+    openInNewTab(
+      "https://docs.intersectmbo.org/legal/policies-and-conditions/terms-of-use",
+    );
 
   const onClickFeedback = () => openFeedbackWindow();
 
@@ -59,7 +63,7 @@ export const Footer = () => {
         }}
       >
         <Typography fontWeight={500} variant="caption">
-          {t("footer.copyright")}
+          {t("footer.copyright", { year: new Date().getFullYear() })}
         </Typography>
         <Box
           sx={{

@@ -2,6 +2,12 @@ import environments from "../constants/environments";
 import { ed25519 as ed } from "@noble/curves/ed25519";
 import { bech32 } from "bech32";
 import * as blake from "blakejs";
+import {
+  addressBech32,
+  addressRawBytes,
+  rewardAddressBech32,
+  rewardAddressRawBytes,
+} from "./shellyWallet";
 
 const KEY_HASH_LENGTH = 28;
 const ADDR_LENGTH = KEY_HASH_LENGTH * 2 + 1;
@@ -84,14 +90,17 @@ export class Ed25519Key {
 export class ShelleyWallet {
   paymentKey: Ed25519Key;
   stakeKey: Ed25519Key;
+  dRepKey: Ed25519Key;
 
-  public constructor(payment, stake) {
+  public constructor(payment, stake, dRep) {
     this.paymentKey = payment;
     this.stakeKey = stake;
+    this.dRepKey = dRep;
   }
 
   public static async generate() {
     const wallet = new ShelleyWallet(
+      await Ed25519Key.generate(),
       await Ed25519Key.generate(),
       await Ed25519Key.generate()
     );
@@ -99,42 +108,28 @@ export class ShelleyWallet {
   }
 
   addressBech32(networkId: number): string {
-    const prefix = networkId == 0 ? "addr_test" : "addr";
-    return bech32.encode(
-      prefix,
-      bech32.toWords(Buffer.from(this.addressRawBytes(networkId))),
-      200
-    );
+    const stakePkh = Buffer.from(this.stakeKey.pkh).toString("hex");
+    const paymentPkh = Buffer.from(this.paymentKey.pkh).toString("hex");
+    return addressBech32(networkId, paymentPkh, stakePkh);
   }
 
   addressRawBytes(networkId) {
-    const concatenatedArray1 = new Uint8Array(ADDR_LENGTH);
-    concatenatedArray1[0] = networkId;
-    concatenatedArray1.set(this.paymentKey.pkh, 1);
-    concatenatedArray1.set(this.stakeKey.pkh, KEY_HASH_LENGTH + 1);
-    return concatenatedArray1;
+    const stakePkh = Buffer.from(this.stakeKey.pkh).toString("hex");
+    const paymentPkh = Buffer.from(this.paymentKey.pkh).toString("hex");
+    return addressRawBytes(networkId, paymentPkh, stakePkh);
   }
+
   rewardAddressRawBytes(network: number) {
-    const rewardAccountPrefix = 0xe0;
-    const header = network | rewardAccountPrefix;
-    const result = new Uint8Array(KEY_HASH_LENGTH + 1);
-    result[0] = header;
-    result.set(this.stakeKey.pkh, 1);
-    return result;
+    return rewardAddressRawBytes(network, this.stakeKey.json().pkh);
   }
 
   rewardAddressBech32(networkId: number): string {
-    const prefix = networkId == 0 ? "stake" : "stake_test";
-    return bech32.encode(
-      prefix,
-      bech32.toWords(Buffer.from(this.rewardAddressRawBytes(networkId))),
-      200
-    );
+    return rewardAddressBech32(networkId, this.stakeKey.json().pkh);
   }
 
   dRepIdBech32() {
-    const stakePubKey = Buffer.from(this.stakeKey.public).toString("hex");
-    const dRepKeyBytes = Buffer.from(stakePubKey, "hex");
+    const dRepPubKey = Buffer.from(this.dRepKey.public).toString("hex");
+    const dRepKeyBytes = Buffer.from(dRepPubKey, "hex");
     const dRepId = blake.blake2bHex(dRepKeyBytes, undefined, 28);
     const words = bech32.toWords(Buffer.from(dRepId, "hex"));
     const dRepIdBech32 = bech32.encode("drep", words);
@@ -145,6 +140,7 @@ export class ShelleyWallet {
     return {
       payment: this.paymentKey.json(),
       stake: this.stakeKey.json(),
+      dRep: this.dRepKey.json(),
       dRepId: this.dRepIdBech32(),
       address: this.addressBech32(environments.networkId),
     };
@@ -153,6 +149,7 @@ export class ShelleyWallet {
   public static fromJson(obj: {
     payment: object;
     stake: object;
+    dRep: object;
   }): ShelleyWallet {
     if (!obj || typeof obj !== "object") {
       throw new Error("ShelleyWallet.fromJson: The input must be an object.");
@@ -160,6 +157,7 @@ export class ShelleyWallet {
 
     const paymentKey = obj.payment;
     const stakeKey = obj.stake;
+    const dRepKey = obj.dRep;
 
     if (!paymentKey || typeof paymentKey !== "object") {
       throw new Error(
@@ -172,29 +170,16 @@ export class ShelleyWallet {
         "ShelleyWallet.fromJson : Invalid stake key: It must be an object."
       );
     }
+    if (!dRepKey || typeof dRepKey !== "object") {
+      throw new Error(
+        "ShelleyWallet.fromJson : Invalid dRep key: It must be an object."
+      );
+    }
     return new ShelleyWallet(
       Ed25519Key.fromJson(paymentKey),
-      Ed25519Key.fromJson(stakeKey)
+      Ed25519Key.fromJson(stakeKey),
+      Ed25519Key.fromJson(dRepKey)
     );
-  }
-
-  public static dummy(): ShelleyWallet {
-    return ShelleyWallet.fromJson({
-      payment: {
-        pkh: "595ac9bbf256bae584f56a4b671baa4b14a18c8098b8e571834bc12c",
-        private:
-          "5a1380cd79ecaee48d66c14f7d92ddfc866490a3b59d44520e60f16309c8a17d",
-        public:
-          "8d2f4d49118eb1156048b66dd6372cdb1f82da0f8e208d9f8ea4b388c79c09ad",
-      },
-      stake: {
-        pkh: "6706efab75778c2f08b9a5321ead8bfc982a5c08b51a0b2a713cac52",
-        private:
-          "24e8c012c7bef2f5823baef1c06dac253da860a43f0d1f43fc3c8349a4f719a1",
-        public:
-          "f7a1eaea2691ee80b6c0d6f27482145d7037055829b1b26224a5d8f0c2243f16",
-      },
-    });
   }
 }
 
@@ -262,3 +247,9 @@ export class ShelleyWalletAddress implements Address {
     return Buffer.from(this.toRawBytes()).toString("hex");
   }
 }
+
+export const createKeyFromPrivateKeyHex = async (
+  privateKeyHex: string
+): Promise<Ed25519Key> => {
+  return await Ed25519Key.fromPrivateKeyHex(privateKeyHex);
+};

@@ -28,6 +28,13 @@ describe("getShortenedGovActionId", () => {
     const result = getShortenedGovActionId(txHash, index);
     expect(result).toBe("#1");
   });
+
+  it("should handle a hash starting with 'gov_action' correctly", () => {
+    const txHash = "gov_action_1234567890abcdef";
+    const index = 7;
+    const result = getShortenedGovActionId(txHash, index);
+    expect(result).toBe("gov_...cdef");
+  });
 });
 
 describe("getFullGovActionId", () => {
@@ -36,5 +43,12 @@ describe("getFullGovActionId", () => {
     const index = 10;
     const result = getFullGovActionId(txHash, index);
     expect(result).toBe("1234567890abcdef1234567890abcdef#10");
+  });
+
+  it("should return the full id without index if txHash starts with 'gov_action'", () => {
+    const txHash = "gov_action_1234567890abcdef";
+    const index = 5;
+    const result = getFullGovActionId(txHash, index);
+    expect(result).toBe("gov_action_1234567890abcdef");
   });
 });

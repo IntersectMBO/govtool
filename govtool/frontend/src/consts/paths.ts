@@ -31,3 +31,22 @@ export const PDF_PATHS = {
   proposalDiscussionProposal: "/proposal_discussion/:id",
   proposalDiscussionPropose: "/proposal_discussion/propose",
 };
+
+export const BUDGET_DISCUSSION_PATHS = {
+  budgetDiscussion: "/budget_discussion",
+  budgetDiscussionProposal: "/budget_discussion/:id",
+  budgetDiscussionPropose: "/budget_discussion/propose",
+  budgetDiscussionAction: "/budget_discussion/:proposalId",
+  budgetDiscussionCategory: "/budget_discussion/category/:category",
+  budgetDiscussionCategoryAction:
+    "/budget_discussion/category/:category/:proposalId",
+};
+
+export const USER_PATHS = {
+  governanceActionsVotedByMe: "/my/votes_and_favorites",
+};
+
+export const OUTCOMES_PATHS = {
+  governanceActionsOutcomes: "/outcomes",
+  governanceActionOutcomes: "/outcomes/governance_actions/:id",
+};

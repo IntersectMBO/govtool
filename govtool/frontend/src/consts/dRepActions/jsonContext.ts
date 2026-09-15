@@ -31,7 +31,14 @@ export const DREP_CONTEXT = {
       },
       paymentAddress: "CIP119:paymentAddress",
       givenName: "CIP119:givenName",
-      image: "CIP119:image",
+      image: {
+        "@id": "CIP119:image",
+        "@context": {
+          ImageObject: "https://schema.org/ImageObject",
+          contentUrl: "CIP119:contentUrl",
+          sha256: "CIP119:sha256",
+        },
+      },
       objectives: "CIP119:objectives",
       motivations: "CIP119:motivations",
       qualifications: "CIP119:qualifications",

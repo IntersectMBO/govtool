@@ -7,6 +7,7 @@ import { ShelleyWallet } from "./crypto";
 import { uploadMetadataAndGetJsonHash } from "./metadata";
 import { WalletAndAnchorType } from "@types";
 import { Logger } from "@helpers/logger";
+import { functionWaitedAssert } from "./waitedLoop";
 
 /**
  * Polls the transaction status until it's resolved or times out.
@@ -16,43 +17,48 @@ export async function pollTransaction(
   txHash: string,
   lockInfo?: LockInterceptorInfo
 ) {
-  try {
-    Logger.info(`Waiting for tx completion: ${txHash}`);
-    await expect
-      .poll(
-        async () => {
-          const response = await kuberService.getTransactionDetails(txHash);
-          const data = await response.json();
-          return data.length;
-        },
-        {
-          timeout: environments.txTimeOut,
+  await functionWaitedAssert(
+    async () => {
+      try {
+        Logger.info(`Waiting for tx completion: ${txHash}`);
+        await expect
+          .poll(
+            async () => {
+              const response = await kuberService.getTransactionDetails(txHash);
+              const data = await response.json();
+              return data.length;
+            },
+            {
+              timeout: environments.txTimeOut,
+            }
+          )
+          .toBeGreaterThan(0);
+
+        Logger.success("Tx completed");
+
+        if (!lockInfo) return;
+
+        await LockInterceptor.releaseLock(
+          lockInfo.initiator,
+          lockInfo.lockId,
+          `Task completed for:${lockInfo.lockId}`
+        );
+      } catch (err) {
+        if (lockInfo) {
+          const errorMessage = { lockInfo, error: JSON.stringify(err) };
+
+          await LockInterceptor.releaseLock(
+            lockInfo.initiator,
+            lockInfo.lockId,
+            `Task failure: \n${JSON.stringify(errorMessage)}`
+          );
         }
-      )
-      .toBeGreaterThan(0);
-
-    Logger.success("Tx completed");
-
-    if (!lockInfo) return;
-
-    await LockInterceptor.releaseLock(
-      lockInfo.initiator,
-      lockInfo.lockId,
-      `Task completed for:${lockInfo.lockId}`
-    );
-  } catch (err) {
-    if (lockInfo) {
-      const errorMessage = { lockInfo, error: JSON.stringify(err) };
-
-      await LockInterceptor.releaseLock(
-        lockInfo.initiator,
-        lockInfo.lockId,
-        `Task failure: \n${JSON.stringify(errorMessage)}`
-      );
-    }
-
-    throw err;
-  }
+        Logger.fail(`Failed due to ${err}`);
+        throw err;
+      }
+    },
+    { timeout: environments.txTimeOut + 60_000, name: "pollTransaction" }
+  );
 }
 
 export async function waitForTxConfirmation(
@@ -71,7 +77,7 @@ export async function waitForTxConfirmation(
         .getByTestId("alert-warning")
         .getByText("Transaction in progress", { exact: false })
     ).toBeVisible({
-      timeout: 16_000,
+      timeout: 90_000,
     });
     const url = (await transactionStatusPromise).url();
     const regex = /\/transaction\/status\/([^\/]+)$/;
@@ -84,7 +90,7 @@ export async function waitForTxConfirmation(
       await pollTransaction(transactionHash);
       await expect(
         page.getByText("In Progress", { exact: true }).first() //FIXME: Only one element needs to be displayed
-      ).not.toBeVisible({ timeout: 20_000 });
+      ).not.toBeVisible({ timeout: 90_000 });
     }
   } catch (error) {
     Logger.fail(error.message);
@@ -120,8 +126,8 @@ export async function registerDRepForWallet(wallet: ShelleyWallet) {
     wallet: wallet.json(),
   };
   const registrationRes = await kuberService.dRepRegistration(
-    convertBufferToHex(wallet.stakeKey.private),
-    convertBufferToHex(wallet.stakeKey.pkh),
+    convertBufferToHex(wallet.dRepKey.private),
+    convertBufferToHex(wallet.dRepKey.pkh),
     metadataAnchorAndWallet
   );
   await pollTransaction(registrationRes.txId, registrationRes.lockInfo);

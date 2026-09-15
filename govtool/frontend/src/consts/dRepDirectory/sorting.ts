@@ -1,7 +1,7 @@
 export const DREP_DIRECTORY_SORTING = [
   {
-    key: "Random",
-    label: "Random",
+    key: "Activity",
+    label: "Voting Activity",
   },
   {
     key: "RegistrationDate",
@@ -14,5 +14,9 @@ export const DREP_DIRECTORY_SORTING = [
   {
     key: "Status",
     label: "Status",
+  },
+  {
+    key: "Random",
+    label: "Random",
   },
 ];

@@ -10,8 +10,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
-  packages: write
 
 jobs:
   static-checks:
@@ -21,19 +19,19 @@ jobs:
         include:
           - workdir: ./govtool/backend
             name: govtool-backend
-            dockerfile: ./govtool/backend/Dockerfile.qovery
+            dockerfile: ./govtool/backend/Dockerfile
             image: ghcr.io/${{ github.repository }}-govtool-backend
-            qovery_container_name: govtool-backend
+           
           - workdir: ./govtool/frontend
             name: govtool-frontend
-            dockerfile: ./govtool/frontend/Dockerfile.qovery
+            dockerfile: ./govtool/frontend/Dockerfile
             image: ghcr.io/${{ github.repository }}-govtool-frontend
-            qovery_container_name: govtool-frontend
+           
           - workdir: ./govtool/metadata-validation
             name: govtool-metadata-validation
             dockerfile: ./govtool/metadata-validation/Dockerfile
             image: ghcr.io/${{ github.repository }}-govtool-metadata-validation
-            qovery_container_name: govtool-metadata-validation
+            
 
     runs-on: ubuntu-latest
     steps:
@@ -74,7 +72,6 @@ jobs:
           set -o pipefail
           sudo chmod +x lint.sh && ./lint.sh 2>&1 | tee code_lint_output.txt
 
-
       - name: Unit tests
         id: unit_tests
         run: |
@@ -90,7 +87,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Cache Docker layers
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
@@ -112,88 +109,177 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
           outputs: type=docker,dest=/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar
-          build-args: |
-            VITE_APP_ENV=${{ secrets.VITE_APP_ENV }}
-            VITE_BASE_URL=${{ secrets.VITE_BASE_URL }}
-            VITE_METADATA_API_URL=${{ secrets.VITE_METADATA_API_URL }}
-            VITE_GTM_ID=${{ secrets.VITE_GTM_ID }}
-            VITE_NETWORK_FLAG=${{ secrets.VITE_NETWORK_FLAG }}
-            VITE_SENTRY_DSN=${{ secrets.VITE_SENTRY_DSN }}
-            NPMRC_TOKEN=${{ secrets.NPMRC_TOKEN }}
-            VITE_USERSNAP_SPACE_API_KEY=${{ secrets.VITE_USERSNAP_SPACE_API_KEY }}
-            VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED=${{ secrets.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED }}
-            VITE_PDF_API_URL=${{ secrets.VITE_PDF_API_URL }}
-          
+
       - name: Scan Docker image with Dockle
         id: dockle
         run: |
-            wget -q https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
-            tar zxf dockle_0.4.14_Linux-64bit.tar.gz
-            sudo mv dockle /usr/local/bin
+          wget -q https://github.com/goodwithtech/dockle/releases/download/v0.4.14/dockle_0.4.14_Linux-64bit.tar.gz
+          tar zxf dockle_0.4.14_Linux-64bit.tar.gz
+          sudo mv dockle /usr/local/bin
 
-            dockle --exit-code 1 --exit-level fatal -ak GHC_RELEASE_KEY -ak CABAL_INSTALL_RELEASE_KEY -ak STACK_RELEASE_KEY -ak KEY_SHA512 --format json --input '/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar' --output ${{ matrix.workdir }}/dockle_scan_output.json
-            rm -rf '/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar'
-            cat ${{ matrix.workdir }}/dockle_scan_output.json
+          dockle --exit-code 1 --exit-level fatal -ak GHC_RELEASE_KEY -ak CABAL_INSTALL_RELEASE_KEY -ak STACK_RELEASE_KEY -ak KEY_SHA512 --format json --input '/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar' --output ${{ matrix.workdir }}/dockle_scan_output.json
+          rm -rf '/tmp/image-${{ matrix.name }}-${{ github.sha }}-pr.tar'
+          cat ${{ matrix.workdir }}/dockle_scan_output.json
 
-            echo "outcome=success" >> $GITHUB_OUTPUT
+          echo "outcome=success" >> $GITHUB_OUTPUT
 
-      - name: Create PR comment
-        if: always()
-        uses: actions/github-script@v6
-        env:
-          HADOLINT_RESULT: ${{ steps.hadolint.outcome }}
-          CODE_LINT_RESULT: ${{ steps.code_lint.outcome }}
-          UNIT_TEST_RESULT: ${{ steps.unit_tests.outcome }}
-          DOCKLE_RESULT: ${{ steps.dockle.outcome }}
-        with:
-          script: |
-            const fs = require('fs');
+      - name: Write test summary
+        if: ${{ always() }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import sys
+          import json
+          from pathlib import Path
 
-            const hadolintResult = fs.existsSync('${{ matrix.workdir }}/hadolint_output.json') ? fs.readFileSync('${{ matrix.workdir }}/hadolint_output.json', 'utf8') : 'No output';
-            const codeLintResult = fs.existsSync('${{ matrix.workdir }}/code_lint_output.txt') ? fs.readFileSync('${{ matrix.workdir }}/code_lint_output.txt', 'utf8') : 'No output';
-            const unitTestResult = fs.existsSync('${{ matrix.workdir }}/unit_test_output.txt') ? fs.readFileSync('${{ matrix.workdir }}/unit_test_output.txt', 'utf8') : 'No output';
-            const dockleScanResult = fs.existsSync('${{ matrix.workdir }}/dockle_scan_output.json') ? fs.readFileSync('${{ matrix.workdir }}/dockle_scan_output.json', 'utf8') : 'No output';
+          summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+          if not summary_path:
+              sys.exit(0)
 
-            let commentBody = '';
+          workdir = "${{ matrix.workdir }}"
+          name = "${{ matrix.name }}"
+          
+          def md_escape(value):
+              return str(value).replace("|", "\\|").replace("\n", "<br>")
 
-            if (process.env.HADOLINT_RESULT !== 'success') {
-              commentBody = `
-              :x: Dockerfile Lint (Hadolint) failed
-              \`\`\`json
-              ${hadolintResult}
-              \`\`\`
-                            `;
-                          } else if (process.env.CODE_LINT_RESULT !== 'success') {
-                            commentBody = `
-              :x: Code Lint failed
-              \`\`\`
-              ${codeLintResult}
-              \`\`\`
-                            `;
-                          } else if (process.env.UNIT_TEST_RESULT !== 'success') {
-                            commentBody = `
-              :x: Unit Tests failed
-              \`\`\`
-              ${unitTestResult}
-              \`\`\`
-                            `;
-                          } else if (process.env.DOCKLE_RESULT !== 'success') {
-                            commentBody = `
-              :x: Docker Image Scan (Dockle) failed
-              \`\`\`json
-              ${dockleScanResult}
-              \`\`\`
-                            `;
-                          } else {
-                            commentBody = ':white_check_mark: All checks succeeded';
-                          }
+          def get_level_icon(level):
+              level = str(level).upper()
+              if level == "ERROR":
+                  return "❌"
+              elif level == "WARN":
+                  return "⚠️"
+              elif level == "INFO":
+                  return "ℹ️"
+              else:
+                  return "•"
 
-                          const { owner, repo } = context.repo;
-                          const issue_number = context.issue.number;
+          lines = [f"## {name} - Check Results", ""]
 
-                          await github.rest.issues.createComment({
-                            owner,
-                            repo,
-                            issue_number,
-                            body: commentBody
-                          });
+          # Hadolint Results
+          hadolint_file = Path(f"{workdir}/hadolint_output.json")
+          lines.extend([
+              "### Dockerfile Lint (Hadolint)",
+              f"**Status:** ${{ steps.hadolint.outcome }}",
+              ""
+          ])
+          if hadolint_file.exists():
+              with open(hadolint_file) as f:
+                  hadolint_data = json.load(f)
+              
+              if hadolint_data:
+                  lines.extend([
+                      "| Code | Line | Level | Message |",
+                      "| --- | ---: | --- | --- |",
+                  ])
+                  for issue in hadolint_data:
+                      code = md_escape(issue.get("code", ""))
+                      line = issue.get("line", "")
+                      level = issue.get("level", "")
+                      icon = get_level_icon(level)
+                      message = md_escape(issue.get("message", ""))
+                      lines.append(f"| {code} | {line} | {icon} {level} | {message} |")
+                  lines.append("")
+              else:
+                  lines.extend(["✅ No issues found", ""])
+
+          # Code Lint Results
+          code_lint_file = Path(f"{workdir}/code_lint_output.txt")
+          lines.extend([
+              "### Code Lint",
+              f"**Status:** ${{ steps.code_lint.outcome }}",
+              ""
+          ])
+          if code_lint_file.exists():
+              with open(code_lint_file) as f:
+                  content = f.read().strip()
+              if content and content != "lint skipped":
+                  lines.extend(["```", content, "```", ""])
+              else:
+                  lines.extend(["✅ Lint skipped or passed", ""])
+
+          # Unit Tests Results
+          unit_test_file = Path(f"{workdir}/unit_test_output.txt")
+          lines.extend([
+              "### Unit Tests",
+              f"**Status:** ${{ steps.unit_tests.outcome }}",
+              ""
+          ])
+          if unit_test_file.exists():
+              with open(unit_test_file) as f:
+                  content = f.read().strip()
+              if content and content != "unit tests skipped":
+                  lines.extend(["```", content, "```", ""])
+              else:
+                  lines.extend(["✅ Unit tests skipped or passed", ""])
+
+          # Dockle Scan Results
+          dockle_file = Path(f"{workdir}/dockle_scan_output.json")
+          lines.extend([
+              "###  Docker Image Scan (Dockle)",
+              f"**Status:** ${{ steps.dockle.outcome }}",
+              ""
+          ])
+          if dockle_file.exists():
+              with open(dockle_file) as f:
+                  dockle_data = json.load(f)
+              
+              summary = dockle_data.get("summary", {})
+              fatal = summary.get('fatal', 0)
+              warn = summary.get('warn', 0)
+              info = summary.get('info', 0)
+              passed = summary.get('pass', 0)
+              
+              fatal_icon = "❌" if fatal >= 0 else "✅"
+              warn_icon = "⚠️" if warn > 0 else "✅"
+              info_icon = "ℹ️" if info > 0 else "✅"
+              
+              lines.extend([
+                  "#### Summary",
+                  "",
+                  "| Metric | Count |",
+                  "| --- | ---: |",
+                  f"| {fatal_icon} Fatal | {fatal} |",
+                  f"| {warn_icon} Warn | {warn} |",
+                  f"| {info_icon} Info | {info} |",
+                  f"| ✅ Passed | {passed} |",
+                  "",
+              ])
+              
+              details = dockle_data.get("details", [])
+              if details:
+                  lines.extend([
+                      "#### Details",
+                      "",
+                      "| Code | Title | Level | Alert |",
+                      "| --- | --- | --- | --- |",
+                  ])
+                  for detail in details:
+                      code = md_escape(detail.get("code", ""))
+                      title = md_escape(detail.get("title", ""))
+                      level = detail.get("level", "")
+                      icon = get_level_icon(level)
+                      alerts = detail.get("alerts", [])
+                      alert_text = md_escape(", ".join(alerts[:3]))  # Limit to 3 alerts per row
+                      if len(alerts) > 3:
+                          alert_text += f", +{len(alerts)-3} more"
+                      lines.append(f"| {code} | {title} | {icon} {level} | {alert_text} |")
+                  lines.append("")
+
+          # Metadata
+          lines.extend([
+              "### Metadata",
+              "",
+              "| Key | Value |",
+              "| --- | --- |",
+              f"| Workdir | `{md_escape(workdir)}` |",
+              f"| Event | {md_escape(os.environ.get('GITHUB_EVENT_NAME', 'unknown'))} |",
+              f"| Ref | {md_escape(os.environ.get('GITHUB_REF_NAME', 'unknown'))} |",
+              f"| SHA | `{md_escape(os.environ.get('GITHUB_SHA', 'unknown')[:7])}` |",
+              f"| Actor | {md_escape(os.environ.get('GITHUB_ACTOR', 'unknown'))} |",
+              "",
+          ])
+
+          with open(summary_path, "a", encoding="utf-8") as summary:
+              summary.write("\n".join(lines))
+              summary.write("\n")
+          PY

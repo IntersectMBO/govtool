@@ -1,5 +1,11 @@
 import i18n from "@/i18n";
-import { URL_REGEX, isReceivingAddress, isValidURLLength } from "@/utils";
+import {
+  IMAGE_REGEX,
+  URL_REGEX,
+  isReceivingAddress,
+  isValidImageUrl,
+  isValidURLLength,
+} from "@/utils";
 
 export const Rules = {
   GIVEN_NAME: {
@@ -65,5 +71,12 @@ export const Rules = {
         maxLength: 1000,
       }),
     },
+  },
+  IMAGE_URL: {
+    pattern: {
+      value: IMAGE_REGEX,
+      message: i18n.t("registration.fields.validations.image"),
+    },
+    validate: (value: unknown) => isValidImageUrl(value, { optional: true }),
   },
 };

@@ -11,7 +11,6 @@ import { Card } from "./Card";
 export type DashboardActionCardProps = {
   buttons?: LoadingButtonProps[];
   children?: ReactNode;
-  dataTestidDelegationStatus?: string;
   description?: ReactNode;
   imageURL?: string;
   isLoading?: boolean;
@@ -43,11 +42,100 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
 }) => {
   const { t } = useTranslation();
   const { cExplorerBaseUrl } = useAppContext();
-
   const { screenWidth } = useScreenDimension();
 
-  const onClickShowTransaction = () =>
-    openInNewTab(`${cExplorerBaseUrl}/tx/${transactionId}`);
+  const onClickShowTransaction = () => {
+    if (transactionId) {
+      openInNewTab(`${cExplorerBaseUrl}/tx/${transactionId}`);
+    }
+  };
+
+  const renderImage = () => {
+    if (!imageURL) return null;
+    return isLoading ? (
+      <Skeleton animation="wave" variant="circular" width={50} height={50} />
+    ) : (
+      <img
+        alt="card"
+        src={imageURL}
+        width={64}
+        height={64}
+        style={{ objectFit: "contain" }}
+      />
+    );
+  };
+
+  const renderTitle = () => {
+    if (!title) return null;
+    return (
+      <Typography sx={{ mt: 2 }} variant="title2">
+        {isLoading ? <Skeleton variant="rounded" /> : title}
+        {state === "inProgress" && !isLoading && isInProgressOnCard && (
+          <Typography
+            variant="title2"
+            fontWeight={600}
+            sx={{ display: "inline" }}
+            component="span"
+          >
+            {` ${t("inProgress")}`}
+          </Typography>
+        )}
+      </Typography>
+    );
+  };
+
+  const renderDescription = () => {
+    if (!description) return null;
+    return (
+      <Typography
+        data-testid="voting-power-delegation-status"
+        color="textGray"
+        sx={{ mt: 1 }}
+        variant="body2"
+        fontWeight={400}
+      >
+        {isLoading ? <Skeleton variant="rounded" height={60} /> : description}
+      </Typography>
+    );
+  };
+
+  const renderButtons = () => {
+    if (isLoading) {
+      return (
+        <>
+          <Skeleton
+            animation="wave"
+            variant="rounded"
+            width={100}
+            height={35}
+          />
+          <Skeleton
+            animation="wave"
+            variant="rounded"
+            width={100}
+            height={35}
+          />
+        </>
+      );
+    }
+
+    return buttons?.map(({ dataTestId, ...buttonProps }) => (
+      <Button
+        key={buttonProps.children?.toString()}
+        data-testid={dataTestId}
+        size="large"
+        variant="outlined"
+        sx={{
+          width: {
+            xxs: "100%",
+            md: "auto",
+          },
+          ...buttonProps.sx,
+        }}
+        {...buttonProps}
+      />
+    ));
+  };
 
   return (
     <Card
@@ -66,54 +154,9 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
       }}
     >
       <Box display="flex" flexDirection="column" flex={1}>
-        {imageURL ? (
-          isLoading ? (
-            <Skeleton
-              animation="wave"
-              variant="circular"
-              width={50}
-              height={50}
-            />
-          ) : (
-            <img
-              alt="card"
-              src={imageURL}
-              width={64}
-              height={64}
-              style={{ objectFit: "contain" }}
-            />
-          )
-        ) : null}
-        {title ? (
-          <Typography sx={{ mt: 2 }} variant="title2">
-            {isLoading ? <Skeleton variant="rounded" /> : title}
-            {state === "inProgress" && !isLoading && isInProgressOnCard ? (
-              <Typography
-                variant="title2"
-                fontWeight={600}
-                sx={{ display: "inline" }}
-                component="span"
-              >
-                {` ${t("inProgress")}`}
-              </Typography>
-            ) : null}
-          </Typography>
-        ) : null}
-        {description ? (
-          <Typography
-            data-testid="voting-power-delegation-status"
-            color="textGray"
-            sx={{ mt: 1 }}
-            variant="body2"
-            fontWeight={400}
-          >
-            {isLoading ? (
-              <Skeleton variant="rounded" height={60} />
-            ) : (
-              description
-            )}
-          </Typography>
-        ) : null}
+        {renderImage()}
+        {renderTitle()}
+        {renderDescription()}
         {children}
         {transactionId && (
           <Button
@@ -132,39 +175,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
         mt={3}
         gap={2}
       >
-        {isLoading ? (
-          <>
-            <Skeleton
-              animation="wave"
-              variant="rounded"
-              width={100}
-              height={35}
-            />
-            <Skeleton
-              animation="wave"
-              variant="rounded"
-              width={100}
-              height={35}
-            />
-          </>
-        ) : (
-          buttons?.map(({ dataTestId, ...buttonProps }) => (
-            <Button
-              key={buttonProps.children?.toString()}
-              data-testid={dataTestId}
-              size="large"
-              variant="outlined"
-              sx={{
-                width: {
-                  xxs: "100%",
-                  md: "auto",
-                },
-                ...buttonProps.sx,
-              }}
-              {...buttonProps}
-            />
-          ))
-        )}
+        {renderButtons()}
       </Box>
     </Card>
   );

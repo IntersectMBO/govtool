@@ -1,4 +1,4 @@
-import { QueryClient, QueryKey } from "react-query";
+import { QueryClient, QueryKey } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/consts";
 import { TransactionType, TransactionState } from "./types";
 import {
@@ -28,6 +28,10 @@ export const getDesiredResult = (
     case "retireAsDirectVoter":
       // is registered
       return false;
+
+    case "vote":
+      return true;
+
     default:
       return undefined;
   }
@@ -48,6 +52,11 @@ export const getQueryKey = (
         QUERY_KEYS.getAdaHolderCurrentDelegationKey,
         transaction?.transactionHash,
       ];
+    case "vote":
+      return [
+        QUERY_KEYS.getAdaHolderCurrentDelegationKey,
+        transaction?.transactionHash,
+      ];
     default:
       return undefined;
   }
@@ -61,7 +70,7 @@ export const refetchData = async (
 ) => {
   if (queryKey === undefined) return;
 
-  await queryClient.invalidateQueries(queryKey);
+  await queryClient.invalidateQueries({ queryKey });
 
   if (type === "delegate") {
     const data = await queryClient.getQueryData<CurrentDelegation>(queryKey);
@@ -74,11 +83,14 @@ export const refetchData = async (
     return data?.dRepHash;
   }
 
-  const data = await queryClient.getQueryData<VoterInfo>(queryKey);
+  const data = await queryClient.getQueryData(queryKey);
 
   if (type === "registerAsDrep" || type === "retireAsDrep")
-    return data?.isRegisteredAsDRep;
+    return (data as VoterInfo)?.isRegisteredAsDRep;
   if (type === "registerAsDirectVoter" || type === "retireAsDirectVoter")
-    return data?.isRegisteredAsSoleVoter;
+    return (data as VoterInfo)?.isRegisteredAsSoleVoter;
+  if (type === "vote") {
+    return true;
+  }
   return undefined;
 };

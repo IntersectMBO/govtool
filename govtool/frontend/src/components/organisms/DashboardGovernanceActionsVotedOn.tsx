@@ -1,51 +1,35 @@
 import { useMemo } from "react";
 import { Box, Typography, CircularProgress } from "@mui/material";
 
-import { useCardano } from "@context";
+import { useCardano, useDataActionsBar } from "@context";
 import {
   useGetDRepVotesQuery,
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import { GovernanceVotedOnCard } from "@molecules";
-import { Slider } from "@organisms";
-import { getFullGovActionId, getProposalTypeLabel } from "@utils";
+import { ValidatedGovernanceVotedOnCard } from "@organisms";
 
 type DashboardGovernanceActionsVotedOnProps = {
-  filters: string[];
   searchPhrase?: string;
-  sorting: string;
 };
 
 export const DashboardGovernanceActionsVotedOn = ({
-  filters,
   searchPhrase,
-  sorting,
 }: DashboardGovernanceActionsVotedOnProps) => {
-  const { data, areDRepVotesLoading } = useGetDRepVotesQuery(
-    filters,
-    sorting,
-    searchPhrase,
-  );
-  const { isMobile } = useScreenDimension();
+  const { isMobile, screenWidth } = useScreenDimension();
   const { pendingTransaction } = useCardano();
   const { t } = useTranslation();
+  const { ...dataActionsBarProps } = useDataActionsBar();
+  const { chosenSorting, chosenFilters } = dataActionsBarProps;
 
-  const filteredData = useMemo(() => {
-    if (data.length && searchPhrase) {
-      return data
-        .map((entry) => ({
-          ...entry,
-          actions: entry.actions.filter((action) =>
-            getFullGovActionId(action.proposal.txHash, action.proposal.index)
-              .toLowerCase()
-              .includes(searchPhrase.toLowerCase()),
-          ),
-        }))
-        .filter((entry) => entry.actions.length > 0);
-    }
-    return data;
-  }, [data, searchPhrase, pendingTransaction.vote]);
+  const {
+    data: votes,
+    areDRepVotesLoading
+  } = useGetDRepVotesQuery(chosenFilters, chosenSorting, searchPhrase);
+
+  const proposals = useMemo(() =>
+          votes.flatMap((entry) => entry.actions),
+      [votes, searchPhrase, pendingTransaction.vote]);
 
   return areDRepVotesLoading ? (
     <Box py={4} display="flex" justifyContent="center">
@@ -53,45 +37,34 @@ export const DashboardGovernanceActionsVotedOn = ({
     </Box>
   ) : (
     <>
-      {!data.length ? (
+      {!votes.length ? (
         <Typography py={4} fontWeight="300">
           {t("govActions.youHaventVotedYet")}
         </Typography>
-      ) : !filteredData?.length ? (
+      ) : !proposals?.length ? (
         <Typography py={4} fontWeight="300">
           {t("govActions.noResultsForTheSearch")}
         </Typography>
       ) : (
-        <>
-          {filteredData?.map((item) => (
-            <div key={item.title}>
-              <Slider
-                key={item.title}
-                title={getProposalTypeLabel(item.title)}
-                navigateKey={item.title}
-                searchPhrase={searchPhrase}
-                dataLength={item.actions.slice(0, 6).length}
-                onDashboard
-                data={item.actions.map((action) => (
-                  <div
-                    className="keen-slider__slide"
-                    key={`${action?.proposal.id}${action.vote.vote}`}
-                    style={{ overflow: "visible", width: "auto" }}
-                  >
-                    <GovernanceVotedOnCard
-                      votedProposal={action}
-                      inProgress={
-                        pendingTransaction.vote?.resourceId ===
-                        action.proposal.txHash + action.proposal.index
-                      }
-                    />
-                  </div>
-                ))}
+        <Box
+          columnGap="20px"
+          display="grid"
+          gridTemplateColumns={`repeat(auto-fill, minmax(${
+            screenWidth < 420 ? "290px" : isMobile ? "324px" : "350px"
+          }, 1fr))`}
+        >
+          {proposals.map((item) => (
+            <Box pb={4.25} key={item.proposal.txHash + item.proposal.index}>
+              <ValidatedGovernanceVotedOnCard
+                votedProposal={item}
+                inProgress={
+                  pendingTransaction.vote?.resourceId ===
+                  `${item.proposal.txHash ?? ""}${item.proposal.index ?? ""}`
+                }
               />
-              <Box height={isMobile ? 50 : 72} />
-            </div>
+            </Box>
           ))}
-        </>
+        </Box>
       )}
     </>
   );

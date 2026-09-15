@@ -1,21 +1,21 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, MockedFunction } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { FeatureFlagProvider, useFeatureFlag } from "./featureFlag";
 import { GovernanceActionType } from "@/types/governanceAction";
 import { useAppContext } from "./appContext";
+import { Network } from "@/models";
+import { env } from "@/config/env";
 
 vi.mock("./appContext");
 
-const mockUseAppContext = useAppContext as jest.MockedFunction<
-  typeof useAppContext
->;
+const mockUseAppContext = useAppContext as MockedFunction<typeof useAppContext>;
 
 const mockUseAppContextReturnValue = {
   cExplorerBaseUrl: "http://mock.cexplorer",
   isAppInitializing: false,
   isInBootstrapPhase: false,
   isFullGovernance: true,
-  network: "preview",
+  network: Network.preview,
   networkName: "preview",
   isMainnet: false,
 };
@@ -27,7 +27,7 @@ describe("FeatureFlagProvider", () => {
   });
 
   it("should enable proposal discussion forum based on environment variable", () => {
-    import.meta.env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED = "true";
+    env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED = "true";
 
     const { result } = renderHook(() => useFeatureFlag(), {
       wrapper: FeatureFlagProvider,
@@ -37,7 +37,7 @@ describe("FeatureFlagProvider", () => {
   });
 
   it("should disable proposal discussion forum if environment variable is false", () => {
-    import.meta.env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED = "false";
+    env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED = "false";
 
     const { result } = renderHook(() => useFeatureFlag(), {
       wrapper: FeatureFlagProvider,
@@ -126,7 +126,7 @@ describe("FeatureFlagProvider", () => {
       ).toBe(true);
     });
 
-    it("should hide DRep vote totals for MotionNoConfidence in full governance", () => {
+    it("should show DRep vote totals for MotionNoConfidence in full governance", () => {
       mockUseAppContext.mockReturnValue({
         ...mockUseAppContextReturnValue,
         isAppInitializing: false,
@@ -142,7 +142,7 @@ describe("FeatureFlagProvider", () => {
         result.current.areDRepVoteTotalsDisplayed(
           GovernanceActionType.NoConfidence,
         ),
-      ).toBe(false);
+      ).toBe(true);
     });
   });
 

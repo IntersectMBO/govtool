@@ -6,85 +6,128 @@
 
 module VVA.DRep where
 
-import           Control.Monad.Except       (MonadError)
+import           Control.Monad.Except               (MonadError)
 import           Control.Monad.Reader
 
 import           Crypto.Hash
 
-import           Data.ByteString            (ByteString)
-import qualified Data.ByteString.Base16     as Base16
-import qualified Data.ByteString.Char8      as C
-import           Data.FileEmbed             (embedFile)
-import           Data.Foldable              (Foldable (sum))
-import           Data.Has                   (Has)
-import qualified Data.Map                   as M
-import           Data.Maybe                 (fromMaybe, isJust, isNothing)
+import           Data.Aeson                         (Value)
+import           Data.ByteString                    (ByteString)
+import qualified Data.ByteString.Base16             as Base16
+import qualified Data.ByteString.Char8              as C
+import           Data.FileEmbed                     (embedFile)
+import           Data.Foldable                      (Foldable (sum))
+import           Data.Has                           (Has)
+import qualified Data.Map                           as M
+import           Data.Maybe                         (fromMaybe, isJust, isNothing)
 import           Data.Scientific
-import           Data.String                (fromString)
-import           Data.Text                  (Text, pack, unpack)
-import qualified Data.Text.Encoding         as Text
+import           Data.String                        (fromString)
+import           Data.Text                          (Text, intercalate, pack, unpack)
+import qualified Data.Text.Encoding                 as Text
 import           Data.Time
 
-import qualified Database.PostgreSQL.Simple as SQL
+import qualified Database.PostgreSQL.Simple         as SQL
+import           Database.PostgreSQL.Simple.FromRow
+import           Database.PostgreSQL.Simple.Types   (In (..))
+
 import           VVA.Config
-import           VVA.Pool                   (ConnectionPool, withPool)
-import qualified VVA.Proposal               as Proposal
-import           VVA.Types                  (AppError, DRepInfo (..), DRepRegistration (..), DRepStatus (..),
-                                             DRepType (..), Proposal (..), Vote (..))
+import           VVA.Pool                           (ConnectionPool, withPool)
+import qualified VVA.Proposal                       as Proposal
+import           VVA.Types                          (AppError, DRepInfo (..), DRepRegistration (..),
+                                                     DRepStatus (..), DRepType (..), DRepVotingPowerList (..),
+                                                     Proposal (..), Vote (..))
+
+data DRepQueryResult
+  = DRepQueryResult
+      { queryDrepHash                                  :: Text
+      , queryDrepView                                  :: Text
+      , queryIsScriptBased                             :: Bool
+      , queryUrl                                       :: Maybe Text
+      , queryDataHash                                  :: Maybe Text
+      , queryDeposit                                   :: Scientific
+      , queryVotingPower                               :: Maybe Integer
+      , queryIsActive                                  :: Bool
+      , queryTxHash                                    :: Maybe Text
+      , queryDate                                      :: LocalTime
+      , queryLatestDeposit                             :: Scientific
+      , queryLatestNonDeregisterVotingAnchorWasNotNull :: Bool
+      , queryMetadataError                             :: Maybe Text
+      , queryPaymentAddress                            :: Maybe Text
+      , queryGivenName                                 :: Maybe Text
+      , queryObjectives                                :: Maybe Text
+      , queryMotivations                               :: Maybe Text
+      , queryQualifications                            :: Maybe Text
+      , queryImageUrl                                  :: Maybe Text
+      , queryImageHash                                 :: Maybe Text
+      , queryVotesLastYear                             :: Maybe Integer
+      , queryIdentityReferences                        :: Maybe Value
+      , queryLinkReferences                            :: Maybe Value
+      }
+  deriving (Show)
+
+instance FromRow DRepQueryResult where
+  fromRow = DRepQueryResult
+    <$> field <*> field <*> field <*> field <*> field <*> field
+    <*> field <*> field <*> field <*> field <*> field <*> field
+    <*> field <*> field <*> field <*> field <*> field <*> field
+    <*> field <*> field <*> field <*> field <*> field
 
 sqlFrom :: ByteString -> SQL.Query
 sqlFrom bs = fromString $ unpack $ Text.decodeUtf8 bs
 
 listDRepsSql :: SQL.Query
 listDRepsSql = sqlFrom $(embedFile "sql/list-dreps.sql")
-
 listDReps ::
   (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m) =>
   Maybe Text -> m [DRepRegistration]
 listDReps mSearchQuery = withPool $ \conn -> do
   let searchParam = fromMaybe "" mSearchQuery
-  results <- liftIO $ SQL.query conn listDRepsSql
-    ( searchParam 
-    , searchParam
-    , searchParam
-    , searchParam
-    , "%" <> searchParam <> "%"
-    , "%" <> searchParam <> "%"
-    )
+  results <- liftIO (SQL.query conn listDRepsSql
+    ( searchParam -- COALESCE(?, '')
+    , searchParam -- LENGTH(?)
+    , searchParam -- AND ?
+    , searchParam -- decode(?, 'hex')
+    , searchParam -- lower(?)
+    , searchParam -- lower(?)
+    , "%" <> searchParam <> "%" -- given_name
+    ) :: IO [DRepQueryResult])
+
   timeZone <- liftIO getCurrentTimeZone
   return
-    [ DRepRegistration drepHash drepView isScriptBased url dataHash (floor @Scientific deposit) votingPower status drepType txHash (localTimeToUTC timeZone date) metadataError paymentAddress givenName objectives motivations qualifications imageUrl imageHash
-    | ( drepHash
-        , drepView
-        , isScriptBased
-        , url
-        , dataHash
-        , deposit
-        , votingPower
-        , isActive
-        , txHash
-        , date
-        , latestDeposit
-        , latestNonDeregisterVotingAnchorWasNotNull
-        , metadataError
-        , paymentAddress
-        , givenName
-        , objectives
-        , motivations
-        , qualifications
-        , imageUrl
-        , imageHash
-      ) <- results
-    , let status = case (isActive, deposit) of
+    [ DRepRegistration
+      (queryDrepHash result)
+      (queryDrepView result)
+      (queryIsScriptBased result)
+      (queryUrl result)
+      (queryDataHash result)
+      (floor @Scientific $ queryDeposit result)
+      (queryVotingPower result)
+      status
+      drepType
+      (queryTxHash result)
+      (localTimeToUTC timeZone $ queryDate result)
+      (queryMetadataError result)
+      (queryPaymentAddress result)
+      (queryGivenName result)
+      (queryObjectives result)
+      (queryMotivations result)
+      (queryQualifications result)
+      (queryImageUrl result)
+      (queryImageHash result)
+      (queryVotesLastYear result)
+      (queryIdentityReferences result)
+      (queryLinkReferences result)
+    | result <- results
+    , let status = case (queryIsActive result, queryDeposit result) of
                       (_, d)        | d < 0 -> Retired
                       (isActive, d) | d >= 0 && isActive -> Active
                                     | d >= 0 && not isActive -> Inactive
-    , let latestDeposit' = floor @Scientific latestDeposit :: Integer
-    , let drepType | latestDeposit' >= 0 && isNothing url = SoleVoter
-                   | latestDeposit' >= 0 && isJust url = DRep
-                   | latestDeposit' < 0 && not latestNonDeregisterVotingAnchorWasNotNull = SoleVoter
-                   | latestDeposit' < 0 && latestNonDeregisterVotingAnchorWasNotNull = DRep
-                   | Data.Maybe.isJust url = DRep
+    , let latestDeposit' = floor @Scientific (queryLatestDeposit result) :: Integer
+    , let drepType | latestDeposit' >= 0 && isNothing (queryUrl result) = SoleVoter
+                   | latestDeposit' >= 0 && isJust (queryUrl result) = DRep
+                   | latestDeposit' < 0 && not (queryLatestNonDeregisterVotingAnchorWasNotNull result) = SoleVoter
+                   | latestDeposit' < 0 && queryLatestNonDeregisterVotingAnchorWasNotNull result = DRep
+                   | Data.Maybe.isJust (queryUrl result) = DRep
     ]
 
 getVotingPowerSql :: SQL.Query
@@ -110,22 +153,26 @@ getVotes ::
   m ([Vote], [Proposal])
 getVotes drepId selectedProposals = withPool $ \conn -> do
   results <- liftIO $ SQL.query conn getVotesSql (SQL.Only drepId)
-  
+
   if null results
     then return ([], [])
     else do
       let proposalsToSelect = if null selectedProposals
                               then [ govActionId | (_, govActionId, _, _, _, _, _, _, _) <- results]
                               else selectedProposals
-      proposals <- if null proposalsToSelect
-                      then return []
-                      else Proposal.getProposals (Just proposalsToSelect)
+      allProposals <- mapM (Proposal.getProposals . Just . (:[])) proposalsToSelect
+      let proposals = concat allProposals
+
       let proposalMap = M.fromList $ map (\x -> (proposalId x, x)) proposals
+
       timeZone <- liftIO getCurrentTimeZone
-      let votes = [ Vote proposalId' drepId' vote' url' docHash' epochNo' (localTimeToUTC timeZone date') voteTxHash'
-                    | (proposalId', govActionId', drepId', vote', url', docHash', epochNo', date', voteTxHash') <- results
-                    , govActionId' `elem` proposalsToSelect
-                  ]
+
+      let votes =
+            [ Vote proposalId' govActionId' drepId' vote' url' docHash' epochNo' (localTimeToUTC timeZone date') voteTxHash'
+            | (proposalId', govActionId', drepId', vote', url', docHash', epochNo', date', voteTxHash') <- results
+            , govActionId' `elem` proposalsToSelect
+            ]
+
       return (votes, proposals)
 
 getDRepInfoSql :: SQL.Query
@@ -188,3 +235,30 @@ getDRepInfo drepId = withPool $ \conn -> do
         , dRepInfoImageHash = imageHash
         }
     [] -> return $ DRepInfo False False False False False Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+    _ -> error "Unexpected result from database query in getDRepInfo"
+
+getAllDRepsVotingPowerSql :: SQL.Query
+getAllDRepsVotingPowerSql = sqlFrom $(embedFile "sql/get-dreps-voting-power-list.sql")
+
+getFilteredDRepVotingPowerSql :: SQL.Query
+getFilteredDRepVotingPowerSql = sqlFrom $(embedFile "sql/get-filtered-dreps-voting-power.sql")
+
+getDRepsVotingPowerList ::
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m) =>
+  [Text] ->
+  m [DRepVotingPowerList]
+getDRepsVotingPowerList identifiers = withPool $ \conn -> do
+  results <- if null identifiers
+    then do
+      liftIO $ SQL.query_ conn getAllDRepsVotingPowerSql
+    else do
+      resultsPerIdentifier <- forM identifiers $ \identifier -> do
+        liftIO $ SQL.query conn getFilteredDRepVotingPowerSql (identifier, identifier)
+
+      return $ concat resultsPerIdentifier
+
+  return
+    [ DRepVotingPowerList view hashRaw votingPower givenName
+    | (view, hashRaw, votingPower', givenName) <- results
+    , let votingPower = floor @Scientific votingPower'
+    ]

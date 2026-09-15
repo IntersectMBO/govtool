@@ -70,8 +70,8 @@ export default {
   data() {
     return {
       tab: null,
-      selectedNetwork: 'Sanchonet', // Default selection
-      networkOptions: ['Sanchonet', 'Preview', 'Preprod'],
+      selectedNetwork: 'Preview', // Default selection
+      networkOptions: ['Preview', 'Preprod'],
       walletInfo: {
         address: null,
         balance: null,

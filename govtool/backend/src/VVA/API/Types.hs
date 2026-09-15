@@ -139,11 +139,14 @@ instance ToJSON GovActionId where
 instance FromHttpApiData GovActionId where
   parseUrlPiece t = case Text.splitOn "#" t of
       [hash, rest] -> do
-        index <- case readMaybe $ Text.unpack rest of
-          Just x -> pure x
-          _      -> Left (Text.tail rest <> " is not a number")
-        hexHash <- parseUrlPiece hash
-        Right $ GovActionId hexHash index
+        if Text.null rest
+          then Left "Missing index in hash#index format"
+          else do
+            index <- case readMaybe $ Text.unpack rest of
+              Just x -> pure x
+              _      -> Left (rest <> " is not a number")
+            hexHash <- parseUrlPiece hash
+            Right $ GovActionId hexHash index
       _ -> Left "Not a valid hash#index value"
 
 exampleGovActionId :: Text
@@ -202,7 +205,14 @@ instance ToParamSchema GovernanceActionType where
       & enum_ ?~ map toJSON (enumFromTo minBound maxBound :: [GovernanceActionType])
 
 
-data DRepSortMode = Random | VotingPower | RegistrationDate | Status deriving (Bounded, Enum, Eq, Generic, Read, Show)
+data DRepSortMode = Random | VotingPower | Activity | RegistrationDate | Status deriving
+    ( Bounded
+    , Enum
+    , Eq
+    , Generic
+    , Read
+    , Show
+    )
 
 instance FromJSON DRepSortMode where
   parseJSON (Aeson.String dRepSortMode) = pure $ fromJust $ readMaybe (Text.unpack dRepSortMode)
@@ -270,21 +280,11 @@ instance ToParamSchema GovernanceActionSortMode where
 
 
 newtype GovernanceActionDetails
-  = GovernanceActionDetails { getValue :: Value }
+  = GovernanceActionDetails { getGovernanceActionValue :: Value }
   deriving newtype (Show)
 
 instance FromJSON GovernanceActionDetails where
-  parseJSON v@(Aeson.Object o) = do
-    let kvpList = map snd $ Aeson.toList o
-    forM_ kvpList $ \case
-      (Aeson.Object _) -> fail "GovernanceActionDetails cannot have nested objects"
-      (Aeson.Array a) -> forM_ (toList a) $ \case
-        (Aeson.Object _) -> fail "GovernanceActionDetails cannot have nested objects"
-        (Aeson.Array _)  ->  fail "GovernanceActionDetails cannot have nested arrays"
-        _                -> pure ()
-      _ -> pure ()
-    return $ GovernanceActionDetails v
-  parseJSON _ = fail "GovernanceActionDetails has to be an object"
+  parseJSON v = return $ GovernanceActionDetails v
 
 instance ToJSON GovernanceActionDetails where
   toJSON (GovernanceActionDetails g) = g
@@ -292,11 +292,13 @@ instance ToJSON GovernanceActionDetails where
 instance ToSchema GovernanceActionDetails where
     declareNamedSchema _ = pure $ NamedSchema (Just "GovernanceActionDetails") $ mempty
         & type_ ?~ OpenApiObject
-        & description ?~ "A simple JSON value, with object type values, and no nested arrays"
-        & example
-          ?~ toJSON
-                ("{\"some_key\": \"some value\", \"some_key2\": [1,2,3]}" :: Text)
-
+        & description ?~ "A JSON value that can include nested objects and arrays"
+        & example ?~ toJSON
+            (Aeson.object
+              [ "some_key" .= ("some value" :: String)
+              , "nested_key" .= Aeson.object ["inner_key" .= (1 :: Int)]
+              , "array_key" .= [1, 2, 3 :: Int]
+              ])
 
 newtype GovernanceActionMetadata
   = GovernanceActionMetadata Value
@@ -406,8 +408,53 @@ data ProposalResponse
       , proposalResponseCcAbstainVotes      :: Integer
       , proposalResponsePrevGovActionIndex  :: Maybe Integer
       , proposalResponsePrevGovActionTxHash :: Maybe HexText
+      , proposalResponseJson                :: Maybe Value
+      , proposalResponseAuthors             :: Maybe ProposalAuthors
       }
   deriving (Generic, Show)
+
+newtype ProposalAuthors
+  = ProposalAuthors { getProposalAuthors :: Value }
+  deriving newtype (Show)
+
+instance FromJSON ProposalAuthors where
+  parseJSON v@(Array _) = pure $ ProposalAuthors v
+  parseJSON _           = fail "ProposalAuthors must be a JSON array"
+
+instance ToJSON ProposalAuthors where
+  toJSON (ProposalAuthors v) = v
+
+instance ToSchema ProposalAuthors where
+  declareNamedSchema _ = pure $ NamedSchema (Just "ProposalAuthors") $ mempty
+    & type_ ?~ OpenApiArray
+    & description ?~ "A JSON array of proposal authors"
+    & example ?~ toJSON
+        [ object
+            [ "name" .= ("Alice" :: Text)
+            , "witnessAlgorithm" .= ("algo" :: Text)
+            , "publicKey" .= ("key" :: Text)
+            , "signature" .= ("sig" :: Text)
+            ]
+        , object
+            [ "name" .= ("Bob" :: Text)
+            , "witnessAlgorithm" .= ("algo2" :: Text)
+            , "publicKey" .= ("key2" :: Text)
+            , "signature" .= ("sig2" :: Text)
+            ]
+        ]
+
+exampleProposalAuthors :: Text
+exampleProposalAuthors =
+  "[\
+  \ {\"name\": \"Alice\",\
+  \  \"witnessAlgorithm\": \"Ed25519\",\
+  \  \"publicKey\": \"abcdef123456\",\
+  \  \"signature\": \"deadbeef\"},\
+  \ {\"name\": \"Bob\",\
+  \  \"witnessAlgorithm\": \"Ed25519\",\
+  \  \"publicKey\": \"123456abcdef\",\
+  \  \"signature\": \"beefdead\"}\
+  \]"
 
 deriveJSON (jsonOptions "proposalResponse") ''ProposalResponse
 
@@ -438,7 +485,14 @@ exampleProposalResponse = "{ \"id\": \"proposalId123\","
                   <> "\"cCNoVotes\": 0,"
                   <> "\"cCAbstainVotes\": 0,"
                   <> "\"prevGovActionIndex\": 0,"
-                  <> "\"prevGovActionTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\"}"
+                  <> "\"prevGovActionTxHash\": \"47c14a128cd024f1b990c839d67720825921ad87ed875def42641ddd2169b39c\","
+                  <> "\"authors\": " <> exampleProposalAuthors
+                  <> "}"
+
+instance ToSchema Value where
+  declareNamedSchema _ = pure $ NamedSchema (Just "Value") $ mempty
+    & type_ ?~ OpenApiObject
+    & description ?~ "Arbitrary JSON value"
 
 instance ToSchema ProposalResponse where
   declareNamedSchema proxy = do
@@ -454,6 +508,40 @@ instance ToSchema ProposalResponse where
           & description ?~ "Proposal Response"
           & example
             ?~ toJSON exampleProposalResponse
+
+data EnactedProposalDetailsResponse
+  = EnactedProposalDetailsResponse
+      { enactedProposalDetailsResponseId          :: Integer
+      , enactedProposalDetailsResponseTxId        :: Integer
+      , enactedProposalDetailsResponseIndex       :: Integer
+      , enactedProposalDetailsResponseDescription :: Maybe Value
+      , enactedProposalDetailsResponseHash        :: HexText
+      }
+  deriving (Generic, Show)
+
+deriveJSON (jsonOptions "enactedProposalDetailsResponse") ''EnactedProposalDetailsResponse
+
+exampleEnactedProposalDetailsResponse :: Text
+exampleEnactedProposalDetailsResponse = "{ \"id\": 123,"
+                  <> "\"txId\": 456,"
+                  <> "\"index\": 0,"
+                  <> "\"description\": {\"key\": \"value\"},"
+                  <> "\"hash\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\"}"
+
+instance ToSchema EnactedProposalDetailsResponse where
+  declareNamedSchema proxy = do
+    NamedSchema name_ schema_ <-
+      genericDeclareNamedSchema
+        ( fromAesonOptions $
+            jsonOptions "enactedProposalDetailsResponse"
+        )
+        proxy
+    return $
+      NamedSchema name_ $
+        schema_
+          & description ?~ "Enacted Proposal Details Response"
+          & example
+            ?~ toJSON exampleEnactedProposalDetailsResponse
 
 exampleListProposalsResponse :: Text
 exampleListProposalsResponse =
@@ -559,6 +647,7 @@ instance ToSchema VoteResponse where
           & example
             ?~ toJSON exampleVoteResponse
 
+
 data DRepInfoResponse
   = DRepInfoResponse
       { dRepInfoResponseIsScriptBased            :: Bool
@@ -588,8 +677,9 @@ deriveJSON (jsonOptions "dRepInfoResponse") ''DRepInfoResponse
 
 exampleDRepInfoResponse :: Text
 exampleDRepInfoResponse =
-    "{\"isRegisteredAsDRep\": false,"
-  <> "\"wasRegisteredAsDRep\": true,"
+    "{\"isScriptBased\": false,"
+  <> "\"isRegisteredAsDRep\": true,"
+  <> "\"wasRegisteredAsDRep\": false,"
   <> "\"isRegisteredAsSoleVoter\": true,"
   <> "\"wasRegisteredAsSoleVoter\": true,"
   <> "\"deposit\": 2000000,"
@@ -621,6 +711,37 @@ instance ToSchema DRepInfoResponse where
           & example
             ?~ toJSON exampleDRepInfoResponse
 
+data DRepVotingPowerListResponse
+  = DRepVotingPowerListResponse
+      { drepVotingPowerListResponseView        :: Text
+      , drepVotingPowerListResponseHashRaw     :: HexText
+      , drepVotingPowerListResponseVotingPower :: Integer
+      , drepVotingPowerListResponseGivenName   :: Maybe Text
+      }
+  deriving (Generic, Show)
+
+deriveJSON (jsonOptions "drepVotingPowerListResponse") ''DRepVotingPowerListResponse
+
+exampleDRepVotingPowerListResponse :: Text
+exampleDRepVotingPowerListResponse =
+    "{\"view\": \"drep1qq5n7k0r0ff6lf4qvndw9t7vmdqa9y3q9qtjq879rrk9vcjcdy8a4xf92mqsajf9u3nrsh3r6zrp29kuydmfq45fz88qpzmjkc\","
+  <> "\"hashRaw\": \"9af10e89979e51b8cdc827c963124a1ef4920d1253eef34a1d5cfe76438e3f11\","
+  <> "\"votingPower\": 1000000,"
+  <> "\"givenName\": \"John Doe\"}"
+
+instance ToSchema DRepVotingPowerListResponse where
+  declareNamedSchema proxy = do
+    NamedSchema name_ schema_ <-
+      genericDeclareNamedSchema
+      ( fromAesonOptions $ jsonOptions "drepVotingPowerListResponse" )
+      proxy
+    return $
+      NamedSchema name_ $
+        schema_
+          & description ?~ "DRep Voting Power List Response"
+          & example
+            ?~ toJSON exampleDRepVotingPowerListResponse
+
 data GetProposalResponse
   = GetProposalResponse
       { getProposalResponseVote     :: Maybe VoteParams
@@ -651,29 +772,26 @@ instance ToSchema GetProposalResponse where
             ?~ toJSON exampleGetProposalResponse
 
 newtype GetTransactionStatusResponse
-  = GetTransactionStatusResponse { getTransactionstatusResponseTransactionConfirmed :: Bool }
-  deriving (Generic, Show)
+  = GetTransactionStatusResponse { getTransactionStatusResponse :: Maybe Value }
+  deriving newtype (Show)
 
+instance FromJSON GetTransactionStatusResponse where
+  parseJSON = pure . GetTransactionStatusResponse . Just
 
-deriveJSON (jsonOptions "getTransactionstatusResponse") ''GetTransactionStatusResponse
+instance ToJSON GetTransactionStatusResponse where
+  toJSON (GetTransactionStatusResponse Nothing)       = Null
+  toJSON (GetTransactionStatusResponse (Just status)) = toJSON status
 
 exampleGetTransactionStatusResponse :: Text
-exampleGetTransactionStatusResponse = "{ \"transactionConfirmed\": True }"
+exampleGetTransactionStatusResponse =
+  "{ \"transactionConfirmed\": True, \"votingProcedure\": {\"vote\": \"yes\"}}"
 
 instance ToSchema GetTransactionStatusResponse where
-  declareNamedSchema proxy = do
-    NamedSchema name_ schema_ <-
-      genericDeclareNamedSchema
-        ( fromAesonOptions $
-            jsonOptions "getTransactionstatusResponse"
-        )
-        proxy
-    return $
-      NamedSchema name_ $
-        schema_
-          & description ?~ "GetTransactionStatus Response"
-          & example
-            ?~ toJSON exampleGetTransactionStatusResponse
+    declareNamedSchema _ = pure $ NamedSchema (Just "GetTransactionStatusResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "Transaction status encoded as JSON"
+        & example
+          ?~ toJSON exampleGetTransactionStatusResponse
 
 newtype DRepHash
   = DRepHash Text
@@ -757,6 +875,27 @@ instance ToSchema DRepType where
         & description ?~ "DRep Type"
         & enum_ ?~ map toJSON [NormalDRep, SoleVoter]
 
+newtype DRepReferences
+  = DRepReferences { getDRepReferencesValue :: Value }
+  deriving newtype (Show)
+
+instance FromJSON DRepReferences where
+  parseJSON v = return $ DRepReferences v
+
+instance ToJSON DRepReferences where
+  toJSON (DRepReferences d) = d
+
+instance ToSchema DRepReferences where
+    declareNamedSchema _ = pure $ NamedSchema (Just "DRepReferences") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "A JSON value that can include nested objects and arrays"
+        & example ?~ toJSON
+            (Aeson.object
+              [ "some_key" .= ("some value" :: String)
+              , "nested_key" .= Aeson.object ["inner_key" .= (1 :: Int)]
+              , "array_key" .= [1, 2, 3 :: Int]
+              ])
+
 data DRep
   = DRep
       { dRepIsScriptBased          :: Bool
@@ -778,6 +917,9 @@ data DRep
       , dRepQualifications         :: Maybe Text
       , dRepImageUrl               :: Maybe Text
       , dRepImageHash              :: Maybe HexText
+      , dRepVotesLastYear          :: Maybe Integer
+      , dRepIdentityReferences     :: Maybe DRepReferences
+      , dRepLinkReferences         :: Maybe DRepReferences
       }
   deriving (Generic, Show)
 
@@ -803,6 +945,7 @@ exampleDrep =
   <> "\"qualifications\": \"Some Qualifications\","
   <> "\"qualifications\": \"Some Qualifications\","
   <> "\"imageUrl\": \"https://image.url\","
+  <> "\"votesLastYear\": 15,"
   <> "\"imageHash\": \"9198b1b204273ba5c67a13310b5a806034160f6a063768297e161d9b759cad61\"}"
 
 -- ToSchema instance for DRep
@@ -876,36 +1019,92 @@ instance ToSchema DelegationResponse where
         & example
           ?~ toJSON exampleDelegationResponse
 
+data GetNetworkInfoResponse
+  = GetNetworkInfoResponse
+      { getNetworkInfoResponseCurrentTime :: UTCTime
+      , getNetworkInfoResponseEpochNo     :: Integer
+      , getNetworkInfoResponseBlockNo     :: Integer
+      , getNetworkInfoResponseNetworkName :: Text
+      }
+
+deriveJSON (jsonOptions "getNetworkInfoResponse") ''GetNetworkInfoResponse
+
+exampleGetNetworkInfoResponse :: Text
+exampleGetNetworkInfoResponse =
+  "{\"currentTime\": \"1970-01-01T00:00:00Z\","
+  <> "\"currentEpoch\": 0,"
+  <> "\"currentBlock\": 0,"
+  <> "\"networkName\": \"Mainnet\"}"
+
+instance ToSchema GetNetworkInfoResponse where
+    declareNamedSchema _ = pure $ NamedSchema (Just "GetNetworkInfoResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "GetNetworkInfoResponse"
+        & example
+          ?~ toJSON exampleGetNetworkInfoResponse
+
+data GetNetworkTotalStakeResponse
+  = GetNetworkTotalStakeResponse
+      { getNetworkTotalStakeResponseTotalStakeControlledByDReps   :: Integer
+      , getNetworkTotalStakeResponseTotalStakeControlledBySPOs    :: Integer
+      , getNetworkTotalStakeResponseAlwaysAbstainVotingPower      :: Integer
+      , getNetworkTotalStakeResponseAlwaysNoConfidenceVotingPower :: Integer
+      }
+
+deriveJSON (jsonOptions "getNetworkTotalStakeResponse") ''GetNetworkTotalStakeResponse
+
+exampleGetNetworkTotalStakeResponse :: Text
+exampleGetNetworkTotalStakeResponse =
+  "{\"totalStakeControlledByDReps\": 0,"
+  <> "\"totalStakeControlledBySPOs\": 0,"
+  <> "\"alwaysAbstainVotingPower\": 0,"
+  <> "\"alwaysNoConfidenceVotingPower\": 0}"
+
+instance ToSchema GetNetworkTotalStakeResponse where
+    declareNamedSchema _ = pure $ NamedSchema (Just "GetNetworkTotalStakeResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "GetNetworkTotalStakeResponse"
+        & example
+          ?~ toJSON exampleGetNetworkTotalStakeResponse
+
 data GetNetworkMetricsResponse
   = GetNetworkMetricsResponse
-      { getNetworkMetricsResponseCurrentTime                   :: UTCTime
-      , getNetworkMetricsResponseCurrentEpoch                  :: Integer
-      , getNetworkMetricsResponseCurrentBlock                  :: Integer
-      , getNetworkMetricsResponseUniqueDelegators              :: Integer
-      , getNetworkMetricsResponseTotalDelegations              :: Integer
-      , getNetworkMetricsResponseTotalGovernanceActions        :: Integer
-      , getNetworkMetricsResponseTotalDRepVotes                :: Integer
-      , getNetworkMetricsResponseTotalRegisteredDReps          :: Integer
-      , getNetworkMetricsResponseAlwaysAbstainVotingPower      :: Integer
-      , getNetworkMetricsResponseAlwaysNoConfidenceVotingPower :: Integer
-      , getNetworkMetricsResponseNetworkName                   :: Text
+      { getNetworkMetricsResponseUniqueDelegators                :: Integer
+      , getNetworkMetricsResponseTotalDelegations                :: Integer
+      , getNetworkMetricsResponseTotalGovernanceActions          :: Integer
+      , getNetworkMetricsResponseTotalDRepVotes                  :: Integer
+      , getNetworkMetricsResponseTotalRegisteredDReps            :: Integer
+      , getNetworkMetricsResponseTotalDRepDistr                  :: Integer
+      , getNetworkMetricsResponseTotalActiveDReps                :: Integer
+      , getNetworkMetricsResponseTotalInactiveDReps              :: Integer
+      , getNetworkMetricsResponseTotalActiveCIP119CompliantDReps :: Integer
+      , getNetworkMetricsResponseTotalRegisteredDirectVoters     :: Integer
+      , getNetworkMetricsResponseNoOfCommitteeMembers            :: Integer
+      , getNetworkMetricsResponseQuorumNumerator                 :: Integer
+      , getNetworkMetricsResponseQuorumDenominator               :: Integer
       }
 
 deriveJSON (jsonOptions "getNetworkMetricsResponse") ''GetNetworkMetricsResponse
 
 exampleGetNetworkMetricsResponse :: Text
 exampleGetNetworkMetricsResponse =
-   "{\"currentTime\": \"1970-01-01T00:00:00Z\","
- <> "\"currentEpoch\": 0,"
- <> "\"currentBlock\": 0,"
- <> "\"uniqueDelegators\": 0,"
- <> "\"totalDelegations\": 0,"
- <> "\"totalGovernanceActions\": 0,"
- <> "\"totalDRepVotes\": 0,"
- <> "\"totalRegisteredDReps\": 0,"
- <> "\"alwaysAbstainVotingPower\": 0,"
- <> "\"alwaysNoConfidenceVotingPower\": 0,"
- <> "\"networkName\": \"Mainnet\"}"
+  "{\"currentTime\": \"1970-01-01T00:00:00Z\","
+  <> "\"currentEpoch\": 0,"
+  <> "\"currentBlock\": 0,"
+  <> "\"uniqueDelegators\": 0,"
+  <> "\"totalDelegations\": 0,"
+  <> "\"totalGovernanceActions\": 0,"
+  <> "\"totalDRepVotes\": 0,"
+  <> "\"totalRegisteredDReps\": 0,"
+  <> "\"totalDRepDistr\": 0,"
+  <> "\"totalActiveDReps\": 0,"
+  <> "\"totalInactiveDReps\": 0,"
+  <> "\"totalActiveCIP119CompliantDReps\": 0,"
+  <> "\"totalRegisteredDirectVoters\": 0,"
+  <> "\"networkName\": \"Mainnet\","
+  <> "\"noOfCommitteeMembers\": 7,"
+  <> "\"quorumNumerator\": 2,"
+  <> "\"quorumDenominator\": 3}"
 
 instance ToSchema GetNetworkMetricsResponse where
     declareNamedSchema _ = pure $ NamedSchema (Just "GetNetworkMetricsResponse") $ mempty
@@ -914,3 +1113,42 @@ instance ToSchema GetNetworkMetricsResponse where
         & example
           ?~ toJSON exampleGetNetworkMetricsResponse
 
+data GetAccountInfoResponse
+  = GetAccountInfoResponse
+      { getAccountInfoResponseId            :: Integer
+      , getAccountInfoResponseView          :: Text
+      , getAccountInfoResponseIsRegistered  :: Bool
+      , getAccountInfoResponseIsScriptBased :: Bool
+      }
+  deriving (Generic, Show)
+deriveJSON (jsonOptions "getAccountInfoResponse") ''GetAccountInfoResponse
+
+newtype UploadResponse
+  = UploadResponse { uploadResponseIpfsCid :: Text }
+  deriving (Generic, Show)
+deriveJSON (jsonOptions "uploadResponse") ''UploadResponse
+
+exampleGetAccountInfoResponse :: Text
+exampleGetAccountInfoResponse =
+  "{\"stakeKey\": \"stake1u9\","
+  <> " \"id\": \"1\","
+  <> "\"view\": \"stake_test1uzapf83wydusjln97rqr7fen6vgrz5087yqdxm0akqdqkgstj2345\","
+  <> "\"isRegistered\": false,"
+  <> "\"isScriptBased\": false}"
+instance ToSchema GetAccountInfoResponse where
+    declareNamedSchema _ = pure $ NamedSchema (Just "GetAccountInfoResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "GetAccountInfoResponse"
+        & example
+          ?~ toJSON exampleGetAccountInfoResponse
+
+exampleUploadResponse :: Text
+exampleUploadResponse =
+  "{\"ipfsHash\": \"QmZKLGf2D3Z3F2J2K5J2L5J2L5J2L5J2L5J2L5J2L5J2L5\"}"
+
+instance ToSchema UploadResponse where
+    declareNamedSchema _ = pure $ NamedSchema (Just "UploadResponse") $ mempty
+        & type_ ?~ OpenApiObject
+        & description ?~ "UploadResponse"
+        & example
+          ?~ toJSON exampleUploadResponse

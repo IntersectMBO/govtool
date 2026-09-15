@@ -1,6 +1,5 @@
-import { VotedProposal, VotedProposalDTO } from "@models";
+import { VotedProposal } from "@models";
 import { API } from "../API";
-import { mapDtoToProposal } from "@/utils";
 
 type GetDRepVotesParams = {
   type?: string[];
@@ -17,14 +16,7 @@ export const getDRepVotes = async ({
 }): Promise<VotedProposal[]> => {
   const urlBase = `/drep/getVotes/${dRepID}`;
 
-  const { data } = await API.get<VotedProposalDTO[]>(urlBase, { params });
+  const { data } = await API.get<VotedProposal[]>(urlBase, { params });
 
-  const validatedData = await Promise.all(
-    data.map(async (votedProposal) => ({
-      ...votedProposal,
-      proposal: await mapDtoToProposal(votedProposal.proposal),
-    }))
-  );
-
-  return validatedData;
+  return data;
 };

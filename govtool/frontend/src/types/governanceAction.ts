@@ -12,8 +12,8 @@ export enum GovernanceActionType {
 }
 
 export enum GovernanceActionField {
-  Input = "input",
-  TextArea = "textarea",
+  Input = "Input",
+  TextArea = "TextArea",
 }
 
 export type FieldSchema = {
@@ -21,7 +21,8 @@ export type FieldSchema = {
   labelI18nKey: NestedKeys<typeof en>;
   placeholderI18nKey: NestedKeys<typeof en>;
   tipI18nKey?: NestedKeys<typeof en>;
-  rules: Omit<RegisterOptions, "valueAsNumber" | "valueAsDate" | "setValueAs">;
+  rules?: Omit<RegisterOptions, "valueAsNumber" | "valueAsDate" | "setValueAs">;
+  maxLength?: number;
 };
 
 // Following properties are based on [CIP-108](https://github.com/Ryun1/CIPs/blob/governance-metadata-actions/CIP-0108/README.md)
@@ -34,18 +35,53 @@ export type SharedGovernanceActionFieldSchema = {
   rationale: FieldSchema;
 };
 
-export type InfoGovernanceActionFieldSchema = SharedGovernanceActionFieldSchema;
-export type TreasuryGovernanceActionFieldSchema =
-  SharedGovernanceActionFieldSchema &
-    Partial<{
-      receivingAddress: FieldSchema;
-      amount: FieldSchema;
-    }>;
+export type TreasuryGovernanceActionFieldSchema = Partial<{
+  receivingAddress: FieldSchema;
+  amount: FieldSchema;
+}>;
+export type NewCommitteeActionFieldSchema = Partial<{
+  prevGovernanceActionHash: FieldSchema;
+  prevGovernanceActionIndex: FieldSchema;
+  numerator: FieldSchema;
+  denominator: FieldSchema;
+  newCommitteeHash: FieldSchema;
+  newCommitteeExpiryEpoch: FieldSchema;
+  removeCommitteeHash: FieldSchema;
+}>;
+export type HardForkInitiationActionFieldSchema = Partial<{
+  prevGovernanceActionHash: FieldSchema;
+  prevGovernanceActionIndex: FieldSchema;
+  major: FieldSchema;
+  minor: FieldSchema;
+}>;
+export type NewConstitutionActionFieldSchema = Partial<{
+  prevGovernanceActionHash: FieldSchema;
+  prevGovernanceActionIndex: FieldSchema;
+  constitutionUrl: FieldSchema;
+  constitutionHash: FieldSchema;
+  scriptHash: FieldSchema;
+}>;
+export type ProtocolParameterActionFieldSchema = Partial<{
+  prevGovernanceActionHash: FieldSchema;
+  prevGovernanceActionIndex: FieldSchema;
+  protocolParameters: FieldSchema;
+}>;
 
 export type GovernanceActionFieldSchemas =
-  | InfoGovernanceActionFieldSchema & TreasuryGovernanceActionFieldSchema;
+  | SharedGovernanceActionFieldSchema &
+      TreasuryGovernanceActionFieldSchema &
+      NewCommitteeActionFieldSchema &
+      HardForkInitiationActionFieldSchema &
+      NewConstitutionActionFieldSchema &
+      ProtocolParameterActionFieldSchema;
 
 export type GovernanceActionFields = Record<
-  GovernanceActionType.InfoAction | GovernanceActionType.TreasuryWithdrawals,
+  | GovernanceActionType.InfoAction
+  | GovernanceActionType.TreasuryWithdrawals
+  | GovernanceActionType.NoConfidence
+  | GovernanceActionType.NewCommittee
+  | GovernanceActionType.NewConstitution
+  | GovernanceActionType.HardForkInitiation
+  | GovernanceActionType.ParameterChange,
   GovernanceActionFieldSchemas
 >;

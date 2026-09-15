@@ -1,0 +1,28 @@
+{
+  "page": 0,
+  "pageSize": 10,
+  "total": 1,
+  "elements": [
+    {
+      "isScriptBased": true,
+      "drepId": "429b12461640cefd3a4a192f7c531d8f6c6d33610b727f481eb22d39",
+      "view": "drep1g2d3y3skgr806wj2ryhhc5ca3akx6vmppde87jq7kgknjmv589e",
+      "url": null,
+      "metadataHash": null,
+      "deposit": 500000000,
+      "votingPower": 83414740266257,
+      "status": "Active",
+      "type": "SoleVoter",
+      "latestTxHash": "8de2a5f9074679de947549ea36c3980496503ffc40f0cbce5ce1ee3df66306e9",
+      "latestRegistrationDate": "2024-11-20T01:59:20Z",
+      "metadataError": null,
+      "paymentAddress": null,
+      "givenName": null,
+      "objectives": null,
+      "motivations": null,
+      "qualifications": null,
+      "imageUrl": null,
+      "imageHash": null
+    }
+  ]
+}

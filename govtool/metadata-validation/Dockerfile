@@ -7,10 +7,13 @@ WORKDIR /dist
 
 COPY package*.json ./
 
-RUN yarn
+RUN npm install
 
 COPY . /dist
 
-RUN yarn build
+RUN npm run build
 
-ENTRYPOINT ["/bin/sh", "-c", "yarn start:prod"]
+ENV IPFS_GATEWAY=$IPFS_GATEWAY
+ENV IPFS_PROJECT_ID=$IPFS_PROJECT_ID
+
+ENTRYPOINT ["/bin/sh", "-c", "npm run start:prod"]

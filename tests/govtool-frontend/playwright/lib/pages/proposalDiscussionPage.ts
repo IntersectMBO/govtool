@@ -1,11 +1,13 @@
-import { faker } from "@faker-js/faker";
-import { generateWalletAddress } from "@helpers/cardano";
-import { extractProposalIdFromUrl } from "@helpers/string";
 import { expect, Locator, Page } from "@playwright/test";
-import { ProposalCreateRequest, ProposedGovAction } from "@types";
+import {
+  ProposalCreateRequest,
+  ProposalDiscussionFilterTypes,
+  ProposalType,
+  ProposedGovAction,
+} from "@types";
 import environments from "lib/constants/environments";
 import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
-import { isMobile } from "@helpers/mobile";
+import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
 
 export default class ProposalDiscussionPage {
   // Buttons
@@ -17,10 +19,14 @@ export default class ProposalDiscussionPage {
   readonly sortBtn = this.page.getByTestId("sort-button");
   readonly searchInput = this.page.getByTestId("search-input");
   readonly showAllBtn = this.page.getByTestId("show-all-button").first(); //this.page.getByTestId("show-all-button");
-  readonly verifyIdentityBtn = this.page.getByTestId("verify-identity-button");
+  readonly verifyIdentityBtn = this.page
+    .getByTestId("verify-user-link")
+    .first();
   readonly addLinkBtn = this.page.getByTestId("add-link-button");
-  readonly infoRadio = this.page.getByTestId("Info-radio-wrapper");
-  readonly treasuryRadio = this.page.getByTestId("Treasury-radio-wrapper");
+  readonly infoRadio = this.page.getByTestId("info action-radio-wrapper");
+  readonly treasuryRadio = this.page.getByTestId(
+    "treasury requests-radio-wrapper"
+  );
   readonly activeProposalWrapper = this.page.getByTestId(
     "active-proposal-radio-wrapper"
   );
@@ -29,25 +35,8 @@ export default class ProposalDiscussionPage {
 
   async goto() {
     await this.page.goto(`${environments.frontendUrl}/proposal_discussion`);
-    // Temporary fix for blank proposals issue in proposal view during disconnected state
-    // This code handles the blank proposals error, which is causing failing tests.
-    // It will be removed once the underlying issue is resolved.
-    await this.page.getByTestId("logo-button").click();
-    if (isMobile(this.page)) {
-      await this.page.getByTestId("open-drawer-button").click();
-    }
-    await this.page.getByText("Proposals", { exact: true }).click();
-
+    // wait for the proposal cards to load
     await this.page.waitForTimeout(2_000);
-  }
-
-  async closeUsernamePrompt() {
-    await this.page.waitForTimeout(5_000);
-    await this.page
-      .locator("div")
-      .filter({ hasText: /^Hey, setup your username$/ })
-      .getByRole("button")
-      .click();
   }
 
   async viewFirstProposal(): Promise<ProposalDiscussionDetailsPage> {
@@ -59,7 +48,13 @@ export default class ProposalDiscussionPage {
   }
 
   async getAllProposals() {
-    await this.page.waitForTimeout(4_000); // waits for proposals to render
+    await waitedLoop(async () => {
+      return (
+        (await this.page
+          .locator('[data-testid^="proposal-"][data-testid$="-card"]')
+          .count()) > 0
+      );
+    });
 
     return this.page
       .locator('[data-testid^="proposal-"][data-testid$="-card"]')
@@ -74,39 +69,6 @@ export default class ProposalDiscussionPage {
     await proceedBtn.click();
 
     await this.page.getByTestId("close-button").click();
-  }
-
-  async createProposal(): Promise<number> {
-    const receivingAddr = generateWalletAddress();
-    const proposalRequest: ProposalCreateRequest = {
-      proposal_links: [
-        {
-          prop_link: faker.internet.url(),
-          prop_link_text: faker.internet.displayName(),
-        },
-      ],
-      gov_action_type_id: 1,
-      prop_name: faker.company.name(),
-      prop_abstract: faker.lorem.paragraph(2),
-      prop_motivation: faker.lorem.paragraph(2),
-      prop_rationale: faker.lorem.paragraph(2),
-      prop_receiving_address: receivingAddr,
-      prop_amount: faker.number.int({ min: 100, max: 1000 }).toString(),
-      is_draft: false,
-    };
-    await this.proposalCreateBtn.click();
-    await this.continueBtn.click();
-
-    await this.fillForm(proposalRequest);
-
-    await this.continueBtn.click();
-    await this.page.getByTestId("submit-button").click();
-
-    // Wait for redirection to `proposal-discussion-details` page
-    await this.page.waitForTimeout(2_000);
-
-    const currentPageUrl = this.page.url();
-    return extractProposalIdFromUrl(currentPageUrl);
   }
 
   private async fillForm(data: ProposalCreateRequest) {
@@ -133,10 +95,11 @@ export default class ProposalDiscussionPage {
     filters: string[],
     validateFunction: (proposalCard: any, filters: string[]) => Promise<boolean>
   ) {
+    await this.page.waitForTimeout(4_000); // wait for the proposals to load
     // single filter
     for (const filter of filters) {
       await this.filterProposalByNames([filter]);
-      await this.validateFilters(filters, validateFunction);
+      await this.validateFilters([filter], validateFunction);
       await this.unFilterProposalByNames([filter]);
     }
 
@@ -152,10 +115,10 @@ export default class ProposalDiscussionPage {
 
   async clickRadioButtonsByNames(names: string[]) {
     for (const name of names) {
-      const replaceSpaceWithUnderScore = name.toLowerCase().replace(/ /g, "-");
-      await this.page
-        .getByTestId(`${replaceSpaceWithUnderScore}-radio`)
-        .click();
+      const testId = Object.values(ProposalType).includes(name as ProposalType)
+        ? name.toLowerCase()
+        : name.toLowerCase().replace(/ /g, "-");
+      await this.page.getByTestId(`${testId}-radio`).click();
     }
   }
 
@@ -171,25 +134,50 @@ export default class ProposalDiscussionPage {
     filters: string[],
     validateFunction: (proposalCard: any, filters: string[]) => Promise<boolean>
   ) {
-    const proposalCards = await this.getAllProposals();
+    await functionWaitedAssert(async () => {
+      const proposalCards = await this.getAllProposals();
 
-    for (const proposalCard of proposalCards) {
-      const hasFilter = await validateFunction(proposalCard, filters);
-      expect(hasFilter).toBe(true);
-    }
+      for (const proposalCard of proposalCards) {
+        if (await proposalCard.isVisible()) {
+          const type = await proposalCard
+            .getByTestId("governance-action-type")
+            .textContent();
+          const hasFilter = await validateFunction(proposalCard, filters);
+          if (!hasFilter) {
+            const errorMessage = `A governance action type ${type} does not contain on ${filters}`;
+            throw errorMessage;
+          }
+          expect(hasFilter).toBe(true);
+        }
+      }
+    });
   }
 
   async sortAndValidate(
-    option: "asc" | "desc",
+    type: ProposalDiscussionFilterTypes,
     validationFn: (p1: ProposedGovAction, p2: ProposedGovAction) => boolean
   ) {
+    const sortMappings = {
+      "Name A-Z": "&sort[prop_name]=ASC",
+      "Name Z-A": "&sort[prop_name]=DESC",
+      "Most comments": "&sort[proposal][prop_comments_number]=DESC",
+      "Least comments": "&sort[proposal][prop_comments_number]=ASC",
+      "Most likes": "&sort[proposal][prop_likes]=DESC",
+      "Least likes": "&sort[proposal][prop_likes]=ASC",
+      "Most dislikes": "&sort[proposal][prop_dislikes]=DESC",
+      "Least dislikes": "&sort[proposal][prop_dislikes]=ASC",
+      Oldest: "&sort[createdAt]=ASC",
+      Newest: "&sort[createdAt]=DESC",
+    };
+
+    const urlParam = sortMappings[type];
+    const populateParam = "&populate[0]=proposal_links";
     const responsePromise = this.page.waitForResponse((response) =>
-      response
-        .url()
-        .includes(`&sort[createdAt]=${option}&populate[0]=proposal_links`)
+      response.url().includes(`${urlParam}${populateParam}`)
     );
 
     await this.sortBtn.click();
+    await this.page.getByTestId(`${type}-sort-option`).click();
     const response = await responsePromise;
 
     let proposals: ProposedGovAction[] = (await response.json()).data;
@@ -197,7 +185,11 @@ export default class ProposalDiscussionPage {
     // API validation
     for (let i = 0; i <= proposals.length - 2; i++) {
       const isValid = validationFn(proposals[i], proposals[i + 1]);
-      expect(isValid).toBe(true);
+      expect(isValid, {
+        message:
+          !isValid &&
+          `Failed on sorting ${type} with proposals: ${proposals[i].id} and ${proposals[i + 1].id}`,
+      }).toBe(true);
     }
   }
 

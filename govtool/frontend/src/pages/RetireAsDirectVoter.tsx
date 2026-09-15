@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Trans } from "react-i18next";
 import { CircularProgress, Link } from "@mui/material";
 
@@ -13,7 +13,11 @@ import {
   useWalletErrorModal,
 } from "@hooks";
 import { CenteredBoxBottomButtons, CenteredBoxPageWrapper } from "@molecules";
-import { checkIsWalletConnected, correctAdaFormat, openInNewTab } from "@utils";
+import {
+  checkIsWalletConnected,
+  correctVoteAdaFormat,
+  openInNewTab,
+} from "@utils";
 import { WrongRouteInfo } from "@organisms";
 
 export const RetireAsDirectVoter = () => {
@@ -61,7 +65,7 @@ export const RetireAsDirectVoter = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       openWalletErrorModal({
-        error,
+        error: error?.message ? error.message : JSON.stringify(error),
         buttonText: t("modals.common.goToDashboard"),
         onSumbit: () => navigate(PATHS.dashboard),
         dataTestId: "retirement-transaction-error-modal",
@@ -118,10 +122,14 @@ export const RetireAsDirectVoter = () => {
       >
         <Trans
           i18nKey="directVoter.retirementDescription"
-          values={{ deposit: correctAdaFormat(voter?.deposit) }}
+          values={{ deposit: correctVoteAdaFormat(voter?.deposit) }}
           components={[
             <Link
-              onClick={() => openInNewTab("https://sancho.network/")}
+              onClick={() =>
+                openInNewTab(
+                  "https://docs.gov.tools/cardano-govtool/faqs/direct-voter-vs-drep",
+                )
+              }
               sx={{ cursor: "pointer", textDecoration: "none" }}
               key="0"
             />,

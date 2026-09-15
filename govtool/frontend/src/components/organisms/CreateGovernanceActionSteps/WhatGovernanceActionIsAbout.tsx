@@ -5,7 +5,7 @@ import { Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { CenteredBoxBottomButtons } from "@molecules";
 import {
-  correctAdaFormat,
+  correctVoteAdaFormat,
   getItemFromLocalStorage,
   PROTOCOL_PARAMS_KEY,
 } from "@utils";
@@ -44,7 +44,7 @@ export const WhatGovernanceActionIsAbout = ({
         <Trans
           i18nKey="createGovernanceAction.creatingAGovernanceActionDescription"
           values={{
-            deposit: correctAdaFormat(protocolParams?.gov_action_deposit),
+            deposit: correctVoteAdaFormat(protocolParams?.gov_action_deposit),
           }}
         />
       </Typography>

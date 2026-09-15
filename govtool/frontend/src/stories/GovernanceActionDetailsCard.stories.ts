@@ -1,8 +1,15 @@
 import { MetadataValidationStatus, ProposalData } from "@models";
 import { GovernanceActionDetailsCard } from "@organisms";
-import { expect, jest } from "@storybook/jest";
-import type { Meta, StoryObj } from "@storybook/react";
-import { screen, userEvent, waitFor, within } from "@storybook/testing-library";
+import {
+  expect,
+  screen,
+  userEvent,
+  waitFor,
+  within,
+  fn,
+} from "storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import {
   encodeCIP129Identifier,
   formatDisplayDate,
@@ -35,7 +42,7 @@ const commonArgs = {
     expiryEpochNo: 1000001,
     expiryDate: new Date().toISOString(),
     type: GovernanceActionType.InfoAction,
-    url: "https://exampleurl.com",
+    url: "https://exampleMetadataUrl.com",
     title: "Example title",
     dRepYesVotes: 1000000,
     dRepNoVotes: 302,
@@ -50,13 +57,25 @@ const commonArgs = {
     prevGovActionIndex: null,
     prevGovActionTxHash: null,
     metadataHash: "exampleMetadataHash",
-    metadataStatus: null,
-    metadataValid: true,
     references: [
       {
-        "@type": "Reference",
+        "@type": "Links",
         uri: "https://exampleurl.com",
         label: "Example label",
+      },
+    ],
+    authors: [
+      {
+        name: "Alice Cardana",
+        witnessAlgorithm: "Ed25519",
+        publicKey: "ed25519_pk1qwertyuiopasdfghjklzxcvbnm1234567890abcdef",
+        signature: "ed25519_sig1abcdef1234567890qwertyuiopasdfghjklzxcvbnm",
+      },
+      {
+        name: "Bob Stakepool",
+        witnessAlgorithm: "Ed25519",
+        publicKey: "ed25519_pk1asdfghjklqwertyuiopzxcvbnm0987654321abcdf",
+        signature: "ed25519_sig1zxcvbnm0987654321asdfghjklqwertyuiop",
       },
     ],
   } satisfies ProposalData,
@@ -99,11 +118,19 @@ async function assertGovActionDetails(
   await expect(canvas.getByTestId(`${cip129GovActionId}-id`)).toHaveTextContent(
     cip129GovActionId,
   );
+
+  await expect(canvas.getByTestId("anchor-url")).toHaveTextContent(
+    args.proposal.url,
+  );
+  await expect(canvas.getByTestId("anchor-hash")).toHaveTextContent(
+    args.proposal.metadataHash,
+  );
 }
 
 export const GovernanceActionDetailsCardComponent: Story = {
   args: {
     ...commonArgs,
+    isDataMissing: undefined,
     proposal: {
       ...commonArgs.proposal,
       abstract: "Example about section",
@@ -135,6 +162,8 @@ export const GovernanceActionDetailsCardComponent: Story = {
     await expect(canvas.getAllByText(/yes/i)).toHaveLength(2);
     await expect(canvas.getAllByText(/abstain/i)).toHaveLength(3);
     await expect(canvas.getAllByText(/no/i)).toHaveLength(4);
+    await expect(canvas.getAllByText(/constitutional/i)).toHaveLength(3);
+    await expect(canvas.getAllByText(/not voted/i)).toHaveLength(2);
   },
 };
 
@@ -143,6 +172,7 @@ export const GovernanceActionDetailsDrep: Story = {
     ...commonArgs,
     isDashboard: true,
     isVoter: true,
+    isDataMissing: undefined,
     proposal: {
       ...commonArgs.proposal,
       abstract: "Example about section",
@@ -169,7 +199,7 @@ export const GovernanceActionDetailsDataMissing: Story = {
     isDataMissing: MetadataValidationStatus.URL_NOT_FOUND,
   },
   play: async ({ canvasElement, args }) => {
-    window.open = jest.fn();
+    window.open = fn();
     const canvas = within(canvasElement);
 
     await expect(canvas.getByText("Data Missing")).toBeVisible();
@@ -195,7 +225,7 @@ export const GovernanceActionDetailsIncorrectFormat: Story = {
     isDataMissing: MetadataValidationStatus.INVALID_JSONLD,
   },
   play: async ({ canvasElement, args }) => {
-    window.open = jest.fn();
+    window.open = fn();
     const canvas = within(canvasElement);
 
     await expect(canvas.getByText("Data Formatted Incorrectly")).toBeVisible();
@@ -221,7 +251,7 @@ export const GovernanceActionDetailsNotVerifiable: Story = {
     isDataMissing: MetadataValidationStatus.INVALID_HASH,
   },
   play: async ({ canvasElement, args }) => {
-    window.open = jest.fn();
+    window.open = fn();
     const canvas = within(canvasElement);
 
     await expect(canvas.getByText("Data Not Verifiable")).toBeVisible();

@@ -8,7 +8,7 @@ import {
   useTranslation,
 } from "@hooks";
 import { theme } from "@/theme";
-import { correctAdaFormat } from "@/utils";
+import { correctVoteAdaFormat } from "@/utils";
 
 type StakeRadioProps = {
   isChecked?: boolean;
@@ -57,7 +57,7 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
           >
             {stakeKey}
           </Typography>
-          <IconButton color="primary">
+          <IconButton color="primary" tabIndex={0}>
             <img
               alt="copy"
               onClick={(e) => {
@@ -65,6 +65,12 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
                 e.stopPropagation();
               }}
               src={isChecked ? ICONS.copyWhiteIcon : ICONS.copyIcon}
+              onKeyDown={(e) => {
+                if (e.ctrlKey && e.key === "c") {
+                  navigator.clipboard.writeText(stakeKey);
+                  e.stopPropagation();
+                }
+              }}
             />
           </IconButton>
         </Box>
@@ -82,7 +88,7 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
               fontWeight={600}
               marginLeft="4px"
             >
-              ₳ {correctAdaFormat(votingPower) ?? 0}
+              ₳ {correctVoteAdaFormat(votingPower) ?? 0}
             </Typography>
           )}
         </Box>

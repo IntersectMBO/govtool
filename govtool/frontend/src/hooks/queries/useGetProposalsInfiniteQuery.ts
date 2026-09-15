@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from "react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
@@ -33,8 +33,8 @@ export const useGetProposalsInfiniteQuery = ({
     hasNextPage,
     isFetching,
     isFetchingNextPage,
-  } = useInfiniteQuery(
-    [
+  } = useInfiniteQuery({
+    queryKey: [
       QUERY_KEYS.useGetProposalsInfiniteKey,
       dRepID,
       filters,
@@ -43,17 +43,16 @@ export const useGetProposalsInfiniteQuery = ({
       searchPhrase,
       sorting,
     ],
-    fetchProposals,
-    {
-      getNextPageParam: (lastPage) => {
-        if (lastPage.elements.length === 0) {
-          return undefined;
-        }
-        return lastPage.page + 1;
-      },
-      refetchInterval: 20000,
+    queryFn: fetchProposals,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.elements.length === 0) {
+        return undefined;
+      }
+      return lastPage.page + 1;
     },
-  );
+    refetchInterval: 20000,
+  });
 
   const proposals = data?.pages.flatMap(
     (page) => page.elements,

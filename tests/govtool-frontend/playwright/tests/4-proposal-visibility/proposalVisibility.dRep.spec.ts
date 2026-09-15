@@ -7,27 +7,32 @@ import { setAllureEpic } from "@helpers/allure";
 import {
   isBootStrapingPhase,
   lovelaceToAda,
-  skipIfNotHardFork,
+  skipIfMainnet,
+  skipIfTemporyWalletIsNotAvailable,
 } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
-import {
-  BootstrapGovernanceActionType,
-  GrovernanceActionType,
-  IProposal,
-} from "@types";
+import { GovernanceActionType, IProposal } from "@types";
 import walletManager from "lib/walletManager";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
+import { correctVoteAdaFormat } from "@helpers/adaFormat";
+import {
+  areCCVoteTotalsDisplayed,
+  areDRepVoteTotalsDisplayed,
+  areSPOVoteTotalsDisplayed,
+} from "@helpers/featureFlag";
+import { dRep01AuthFile } from "@constants/auth";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
-  await skipIfNotHardFork();
+  await skipIfMainnet();
+  await skipIfTemporyWalletIsNotAvailable("registeredDRepCopyWallets.json");
 });
 
 test.describe("Logged in DRep", () => {
-  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
+  test.use({ storageState: dRep01AuthFile, wallet: dRep01Wallet });
 
   test("4E. Should display DRep's voting power in governance actions page", async ({
     page,
@@ -40,25 +45,35 @@ test.describe("Logged in DRep", () => {
     const votingPower = await res.json();
 
     await expect(page.getByTestId("voting-power-chips-value")).toHaveText(
-      `₳ ${lovelaceToAda(votingPower)}`
+      `₳ ${lovelaceToAda(votingPower)}`,
+      { timeout: 60_000 }
     );
   });
 
-  test.describe("vote context metadata anchor validation", () => {
+  test.describe("Vote context metadata anchor validation", () => {
     let govActionDetailsPage: GovernanceActionDetailsPage;
     test.beforeEach(async ({ page }) => {
       const govActionsPage = new GovernanceActionsPage(page);
       await govActionsPage.goto();
 
+      // assert to wait until the loading button is hidden
+      await expect(page.getByTestId("to-vote-tab")).toBeVisible({
+        timeout: 60_000,
+      });
+
       govActionDetailsPage = (await isBootStrapingPhase())
         ? await govActionsPage.viewFirstProposalByGovernanceAction(
-            GrovernanceActionType.InfoAction
+            GovernanceActionType.InfoAction
           )
         : await govActionsPage.viewFirstProposal();
+      
+      await govActionDetailsPage.yesVoteRadio.click();
+      await govActionDetailsPage.voteBtn.click()
 
-      await govActionDetailsPage.contextBtn.click();
+      
       await govActionDetailsPage.contextInput.fill(faker.lorem.sentence(200));
       await govActionDetailsPage.confirmModalBtn.click();
+      await govActionDetailsPage.downloadAndStoreYourselfOptionBtn.click();
       await page.getByRole("checkbox").click();
       await govActionDetailsPage.confirmModalBtn.click();
     });
@@ -77,7 +92,7 @@ test.describe("Logged in DRep", () => {
     }) => {
       for (let i = 0; i < 100; i++) {
         const invalidUrl = mockInvalid.url(false);
-        await  govActionDetailsPage.metadataUrlInput.fill(invalidUrl);
+        await govActionDetailsPage.metadataUrlInput.fill(invalidUrl);
         if (invalidUrl.length <= 128) {
           await expect(page.getByTestId("invalid-url-error")).toBeVisible();
         } else {
@@ -90,52 +105,23 @@ test.describe("Logged in DRep", () => {
   });
 });
 
-test.describe("Temporary DReps", async () => {
-  let dRepPage: Page;
-
-  test.beforeEach(async ({ page, browser }) => {
-    const wallet = await walletManager.popWallet("registeredDRep");
-
-    const tempDRepAuth = await createTempDRepAuth(page, wallet);
-
-    dRepPage = await createNewPageWithWallet(browser, {
-      storageState: tempDRepAuth,
-      wallet,
-      enableStakeSigning: true,
-    });
-  });
-
-  test("4J. Should include metadata anchor in the vote transaction", async ({}, testInfo) => {
-    test.skip(); // Skipped: Vote context is not displayed in UI to validate
-
-    test.setTimeout(testInfo.timeout + environments.txTimeOut);
-
-    const govActionsPage = new GovernanceActionsPage(dRepPage);
-    await govActionsPage.goto();
-
-    const govActionDetailsPage = await govActionsPage.viewFirstProposal();
-    await govActionDetailsPage.vote(faker.lorem.sentence(200));
-
-    await dRepPage.waitForTimeout(5_000);
-
-    await govActionsPage.votedTab.click();
-    await govActionsPage.viewFirstVotedProposal();
-    expect(false, "No vote context displayed").toBe(true);
-  });
-});
-
 test.describe("Check vote count", () => {
-  test.use({ storageState: ".auth/dRep01.json", wallet: dRep01Wallet });
+  test.use({ storageState: dRep01AuthFile, wallet: dRep01Wallet });
 
   test("4G. Should display correct vote counts on governance details page for DRep", async ({
     page,
+    browser,
   }) => {
     const voteWhiteListOption = (await isBootStrapingPhase())
-      ? BootstrapGovernanceActionType
-      : GrovernanceActionType;
+      ? { InfoAction: "InfoAction" }
+      : GovernanceActionType;
     const responsesPromise = Object.keys(voteWhiteListOption).map((filterKey) =>
       page.waitForResponse((response) =>
-        response.url().includes(`&type[]=${voteWhiteListOption[filterKey]}`)
+        response
+          .url()
+          .includes(
+            `proposal/list?page=0&pageSize=7&type[]=${voteWhiteListOption[filterKey]}`
+          )
       )
     );
 
@@ -152,44 +138,74 @@ test.describe("Check vote count", () => {
       )
     ).flat();
 
+    const uniqueProposalTypes = Array.from(
+      new Map(proposals.map((proposal) => [proposal.type, proposal])).values()
+    );
+
     expect(proposals.length, "No proposals found!").toBeGreaterThan(0);
 
-    const proposalToCheck = proposals[0];
-    const govActionDetailsPage =
-      await governanceActionsPage.viewProposal(proposalToCheck);
-    await govActionDetailsPage.showVotesBtn.click();
+    await Promise.all(
+      uniqueProposalTypes.map(async (proposalToCheck) => {
+        const dRepPage = await createNewPageWithWallet(browser, {
+          storageState: dRep01AuthFile,
+          wallet: dRep01Wallet,
+        });
 
-    // check dRep votes
-    await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
-      `₳ ${lovelaceToAda(proposalToCheck.dRepYesVotes)}`
-    );
-    await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
-      `₳ ${lovelaceToAda(proposalToCheck.dRepAbstainVotes)}`
-    );
-    await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
-      `₳ ${lovelaceToAda(proposalToCheck.dRepNoVotes)}`
-    );
+        const totalStakeResponsePromise = dRepPage.waitForResponse((response) =>
+          response.url().includes(`network/total-stake`)
+        );
+        const govActionDetailsPage = new GovernanceActionDetailsPage(dRepPage);
+        await govActionDetailsPage.goto(
+          `${proposalToCheck.txHash}#${proposalToCheck.index}`
+        );
 
-    // check sPos votes
-    await expect(govActionDetailsPage.sPosYesVotes).toHaveText(
-      `₳ ${lovelaceToAda(proposalToCheck.poolYesVotes)}`
-    );
-    await expect(govActionDetailsPage.sPosAbstainVotes).toHaveText(
-      `₳ ${lovelaceToAda(proposalToCheck.poolAbstainVotes)}`
-    );
-    await expect(govActionDetailsPage.sPosNoVotes).toHaveText(
-      `₳ ${lovelaceToAda(proposalToCheck.poolNoVotes)}`
-    );
+        await govActionDetailsPage.showVotesBtn.click();
 
-    // check ccCommittee votes
-    await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
-      `${proposalToCheck.ccYesVotes}`
-    );
-    await expect(govActionDetailsPage.ccCommitteeAbstainVotes).toHaveText(
-      `${proposalToCheck.ccAbstainVotes}`
-    );
-    await expect(govActionDetailsPage.ccCommitteeNoVotes).toHaveText(
-      `${proposalToCheck.ccNoVotes}`
+        const dRepTotalAbstainVote =
+          await govActionDetailsPage.getDRepTotalAbstainVoted(
+            proposalToCheck,
+            totalStakeResponsePromise
+          );
+
+        // check dRep votes
+        if (await areDRepVoteTotalsDisplayed(proposalToCheck)) {
+          await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
+            `₳ ${correctVoteAdaFormat(proposalToCheck.dRepYesVotes)}`
+          );
+          await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
+            `₳ ${correctVoteAdaFormat(dRepTotalAbstainVote)}`
+          );
+          await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
+            `₳ ${correctVoteAdaFormat(proposalToCheck.dRepNoVotes)}`
+          );
+        }
+
+        // check sPos votes
+        if (await areSPOVoteTotalsDisplayed(proposalToCheck)) {
+          await expect(govActionDetailsPage.sPosYesVotes).toHaveText(
+            `₳ ${correctVoteAdaFormat(proposalToCheck.poolYesVotes)}`
+          );
+          await expect(govActionDetailsPage.sPosAbstainVotes).toHaveText(
+            `₳ ${correctVoteAdaFormat(proposalToCheck.poolAbstainVotes)}`
+          );
+          await expect(govActionDetailsPage.sPosNoVotes).toHaveText(
+            `₳ ${correctVoteAdaFormat(proposalToCheck.poolNoVotes)}`
+          );
+        }
+
+        // check ccCommittee votes
+        if (areCCVoteTotalsDisplayed(proposalToCheck)) {
+          await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
+            `${proposalToCheck.ccYesVotes}`
+          );
+          await expect(govActionDetailsPage.ccCommitteeAbstainVotes).toHaveText(
+            `${proposalToCheck.ccAbstainVotes}`
+          );
+          await expect(govActionDetailsPage.ccCommitteeNoVotes).toHaveText(
+            `${proposalToCheck.ccNoVotes}`
+          );
+        }
+      })
     );
   });
 });

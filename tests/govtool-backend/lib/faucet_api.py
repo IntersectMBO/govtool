@@ -1,3 +1,4 @@
+from config import FAUCET_API_URL,FACUET_API_KEY
 import os
 from typing import TypedDict
 
@@ -21,10 +22,10 @@ class CardanoFaucet:
 
     @staticmethod
     def from_env():
-        api_key = os.getenv("FAUCET_API_KEY")
-        base_url = os.getenv("FAUCET_API_URL", "https://faucet.sanchonet.world.dev.cardano.org")
+        api_key = FACUET_API_KEY
+        base_url = FAUCET_API_URL
         if not api_key:
-            raise ValueError("FAUCET_API_KEY environment variable not set.")
+            raise ValueError("FAUCET_API_KEY environment variable not set. Please set this variable or fund missing balance to the wallet address: addr_test1qzc97zml9xzhm7xcsmqretkk7ztzyehj3dpd7ph7h0s40wp0ea9f3e353pmmr7yxv7m2dj09rn44m7pvd0m4cylusn8szlm75t")
         return CardanoFaucet(api_key, base_url)
 
     def send_money(self, address: str, tx_type: str = "default") -> Transaction:

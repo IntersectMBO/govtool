@@ -1,38 +1,32 @@
-import { useNavigate } from "react-router-dom";
-import { Trans } from "react-i18next";
-import { Box, Chip } from "@mui/material";
+import { useNavigate } from "react-router";
+import { Box } from "@mui/material";
 
 import { Button } from "@atoms";
 import { ICONS, PATHS } from "@consts";
-import { useCardano } from "@context";
-import {
-  useGetAdaHolderVotingPowerQuery,
-  useScreenDimension,
-  useTranslation,
-} from "@hooks";
-import { DataMissingHeader, Share } from "@molecules";
-import { correctDRepDirectoryFormat } from "@utils";
+import { useScreenDimension, useTranslation } from "@hooks";
+import { DataMissingHeader } from "@molecules";
 import { DRepData } from "@/models";
 
 type DRepDetailsProps = {
   dRepData: DRepData;
   isMe?: boolean;
   isMyDrep?: boolean;
+  isValidating?: boolean;
+  metadataStatus?: MetadataValidationStatus;
 };
 
 export const DRepDetailsCardHeader = ({
   dRepData,
   isMe,
   isMyDrep,
+  isValidating,
+  metadataStatus,
 }: DRepDetailsProps) => {
-  const { stakeKey } = useCardano();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { screenWidth } = useScreenDimension();
-  const { votingPower: myVotingPower } =
-    useGetAdaHolderVotingPowerQuery(stakeKey);
 
-  const { givenName, metadataStatus } = dRepData;
+  const { givenName, image } = dRepData;
 
   const navigateToEditDRep = () => {
     navigate(PATHS.editDrepMetadata, {
@@ -48,7 +42,7 @@ export const DRepDetailsCardHeader = ({
             alignSelf: "stretch",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
             mb: "18px",
             ...(screenWidth <= 1020 && {
               flexDirection: "column",
@@ -56,37 +50,6 @@ export const DRepDetailsCardHeader = ({
             }),
           }}
         >
-          <Chip
-            color="primary"
-            label={
-              <Trans
-                i18nKey={
-                  isMe
-                    ? isMyDrep
-                      ? "dRepDirectory.myDelegationToYourself"
-                      : "dRepDirectory.meAsDRep"
-                    : "dRepDirectory.myDRep"
-                }
-                values={{
-                  ada: correctDRepDirectoryFormat(myVotingPower),
-                }}
-              />
-            }
-            sx={{
-              boxShadow: (theme) => theme.shadows[2],
-              color: (theme) => theme.palette.text.primary,
-              px: 3,
-              py: 0.5,
-              ...(isMyDrep &&
-                !isMe && {
-                  width: "100%",
-                }),
-              ...(screenWidth <= 1020 && {
-                width: "100%",
-              }),
-            }}
-          />
-
           {isMe && (
             <Box
               sx={{
@@ -115,15 +78,17 @@ export const DRepDetailsCardHeader = ({
                   style={{ marginLeft: "4px" }}
                 />
               </Button>
-              {screenWidth >= 1020 && <Share link={window.location.href} />}
             </Box>
           )}
         </Box>
       )}
       <DataMissingHeader
+        isDRep
         title={givenName ?? undefined}
+        image={image}
         isDataMissing={metadataStatus}
         titleStyle={{ wordBreak: "break-word", whiteSpace: "wrap" }}
+        isValidating={isValidating}
       />
     </div>
   );

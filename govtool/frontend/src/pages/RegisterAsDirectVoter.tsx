@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Trans } from "react-i18next";
 import { CircularProgress, Link } from "@mui/material";
 
@@ -13,19 +13,12 @@ import {
   useWalletErrorModal,
 } from "@hooks";
 import { CenteredBoxBottomButtons, CenteredBoxPageWrapper } from "@molecules";
-import {
-  PROTOCOL_PARAMS_KEY,
-  checkIsWalletConnected,
-  correctAdaFormat,
-  getItemFromLocalStorage,
-  openInNewTab,
-} from "@utils";
+import { checkIsWalletConnected, correctAdaFormat, openInNewTab } from "@utils";
 import { WrongRouteInfo } from "@organisms";
 import { CertificatesBuilder } from "@emurgo/cardano-serialization-lib-asmjs";
 
 export const RegisterAsDirectVoter = () => {
-  const { cExplorerBaseUrl } = useAppContext();
-  const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
+  const { cExplorerBaseUrl, epochParams } = useAppContext();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
@@ -86,7 +79,7 @@ export const RegisterAsDirectVoter = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       openWalletErrorModal({
-        error,
+        error: error?.message ? error.message : JSON.stringify(error),
         buttonText: t("modals.common.goToDashboard"),
         onSumbit: () => navigate(PATHS.dashboard),
         dataTestId: "registration-transaction-error-modal",
@@ -144,14 +137,21 @@ export const RegisterAsDirectVoter = () => {
       >
         <Trans
           i18nKey="directVoter.registerDescription"
-          values={{ deposit: correctAdaFormat(epochParams?.drep_deposit) }}
           components={[
             <Link
-              onClick={() => openInNewTab("https://sancho.network/")}
+              onClick={() =>
+                openInNewTab(
+                  "https://docs.gov.tools/cardano-govtool/faqs/direct-voter-vs-drep",
+                )
+              }
               sx={{ cursor: "pointer" }}
               key="0"
             />,
           ]}
+          values={{
+            deposit:
+              correctAdaFormat(epochParams?.drep_deposit ?? undefined) ?? 500,
+          }}
         />
       </Typography>
       <CenteredBoxBottomButtons

@@ -7,7 +7,7 @@ import {
 } from "react";
 
 import { GovernanceActionType } from "@/types/governanceAction";
-
+import { env } from "@/config/env";
 import { useAppContext } from "./appContext";
 
 /**
@@ -15,6 +15,7 @@ import { useAppContext } from "./appContext";
  */
 type FeatureFlagContextType = {
   isProposalDiscussionForumEnabled: boolean;
+  isGovernanceOutcomesPillarEnabled: boolean;
   isVotingOnGovernanceActionEnabled: (
     governanceActionType: GovernanceActionType,
   ) => boolean;
@@ -33,6 +34,7 @@ type FeatureFlagContextType = {
 
 const FeatureFlagContext = createContext<FeatureFlagContextType>({
   isProposalDiscussionForumEnabled: false,
+  isGovernanceOutcomesPillarEnabled: false,
   isVotingOnGovernanceActionEnabled: () => false,
   areDRepVoteTotalsDisplayed: () => false,
   areSPOVoteTotalsDisplayed: () => false,
@@ -77,16 +79,10 @@ const FeatureFlagProvider = ({ children }: PropsWithChildren) => {
             !isSecurityGroup)
         );
       }
-      if (isFullGovernance) {
-        return ![
-          GovernanceActionType.NoConfidence,
-          GovernanceActionType.NewCommittee,
-          GovernanceActionType.NewConstitution,
-        ].includes(governanceActionType);
-      }
+
       return true;
     },
-    [isAppInitializing, isInBootstrapPhase, isFullGovernance],
+    [isAppInitializing, isInBootstrapPhase],
   );
 
   /**
@@ -132,7 +128,12 @@ const FeatureFlagProvider = ({ children }: PropsWithChildren) => {
   const value = useMemo(
     () => ({
       isProposalDiscussionForumEnabled:
-        import.meta.env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === "true" ||
+        env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === "true" ||
+        env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === true ||
+        false,
+      isGovernanceOutcomesPillarEnabled:
+        env.VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED === "true" ||
+        env.VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED === true ||
         false,
       isVotingOnGovernanceActionEnabled,
       areDRepVoteTotalsDisplayed,

@@ -1,4 +1,4 @@
-import { NavLink, To } from "react-router-dom";
+import { NavLink, To } from "react-router";
 import { Box } from "@mui/material";
 import Divider from "@mui/material/Divider";
 

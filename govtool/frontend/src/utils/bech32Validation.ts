@@ -9,12 +9,12 @@ import I18n from "@/i18n";
  */
 export const bech32Validation = async (value: string) => {
   try {
-    const decoded = await bech32.decode(value);
+    const decoded = bech32.decode(value);
     if (decoded.words.length) {
       return true;
     }
     throw new Error();
-  } catch (error) {
+  } catch {
     return I18n.t("createGovernanceAction.fields.validations.bech32");
   }
 };

@@ -7,7 +7,8 @@ import { ICONS } from "@consts";
 import { useTranslation, useScreenDimension, useVoteContextForm } from "@hooks";
 import { Step } from "@molecules";
 import { ControlledField, VoteContextWrapper } from "@organisms";
-import { URL_REGEX, openInNewTab } from "@utils";
+import { URL_REGEX, isValidURLLength, openInNewTab } from "@utils";
+import { LINKS } from "@/consts/links";
 
 type VoteContextStoringInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -35,9 +36,7 @@ export const VoteContextStoringInformation = ({
   } = useVoteContextForm(setSavedHash, setStep, setErrorMessage);
 
   const openGuideAboutStoringInformation = () =>
-    openInNewTab(
-      "https://docs.gov.tools/using-govtool/govtool-functions/storing-information-offline",
-    );
+    openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);
 
   const isContinueDisabled = !watch("storingURL");
 
@@ -50,6 +49,8 @@ export const VoteContextStoringInformation = ({
       onContinue={validateURL}
       isContinueDisabled={isContinueDisabled}
       onCancel={onCancel}
+      isVoteWithMetadata
+      useSubmitLabel
     >
       <Typography sx={{ textAlign: "center" }} variant="headline4">
         {t("createGovernanceAction.storingInformationTitle")}
@@ -145,6 +146,7 @@ export const VoteContextStoringInformation = ({
                   value: URL_REGEX,
                   message: t("createGovernanceAction.fields.validations.url"),
                 },
+                validate: isValidURLLength,
               }}
             />
           }

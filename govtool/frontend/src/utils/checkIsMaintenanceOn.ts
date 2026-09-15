@@ -1,7 +1,8 @@
 import axios from "axios";
+import { env } from "@/config/env";
 
 export const checkIsMaintenanceOn = async () => {
-  if (import.meta.env.VITE_IS_DEV) return;
+  if (env.VITE_IS_DEV) return;
 
   try {
     const response = await axios.get(
@@ -11,7 +12,7 @@ export const checkIsMaintenanceOn = async () => {
     if (response.data) {
       window.location.reload();
     }
-  } catch (error) {
+  } catch {
     throw new Error("Action canceled due to maintenance mode.");
   }
 };

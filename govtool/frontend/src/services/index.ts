@@ -1,3 +1,3 @@
 export * from "./API";
 
-export * from "./requests/index";
+export * from "./requests";

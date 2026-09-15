@@ -9,13 +9,14 @@ import {
 import * as Sentry from "@sentry/react";
 
 import { NETWORK_NAMES, CEXPLORER_BASE_URLS } from "@/consts";
-import { useGetNetworkMetrics, useGetEpochParams } from "@/hooks";
+import { useGetEpochParams, useGetNetworkInfo } from "@/hooks";
 import {
-  NETWORK_METRICS_KEY,
+  NETWORK_INFO_KEY,
   PROTOCOL_PARAMS_KEY,
   setItemToLocalStorage,
 } from "@/utils";
-import { EpochParams, NetworkMetrics } from "@/models";
+import { EpochParams, Network } from "@/models";
+import { adaHandleService } from "@/services/AdaHandle";
 
 const BOOTSTRAPPING_PHASE_MAJOR = 9;
 
@@ -25,10 +26,9 @@ type AppContextType = {
   isInBootstrapPhase: boolean;
   isFullGovernance: boolean;
   networkName: string;
-  network: string;
+  network: Network;
   cExplorerBaseUrl: string;
   epochParams?: EpochParams;
-  networkMetrics?: NetworkMetrics;
 };
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -39,11 +39,8 @@ const AppContext = createContext<AppContextType | null>(null);
  * @param children - The child components to render.
  */
 const AppContextProvider = ({ children }: PropsWithChildren) => {
-  useEffect(() => {
-    Sentry.setTag("component_name", "AppContextProvider");
-  }, []);
   const { fetchEpochParams, epochParams } = useGetEpochParams();
-  const { fetchNetworkMetrics, networkMetrics } = useGetNetworkMetrics();
+  const { fetchNetworkInfo, networkInfo } = useGetNetworkInfo();
 
   const [isAppInitializing, setIsAppInitializing] = useState(true);
 
@@ -55,9 +52,12 @@ const AppContextProvider = ({ children }: PropsWithChildren) => {
           setItemToLocalStorage(PROTOCOL_PARAMS_KEY, epochParamsData);
         }
 
-        const { data: networkMetricsData } = await fetchNetworkMetrics();
-        if (networkMetricsData) {
-          setItemToLocalStorage(NETWORK_METRICS_KEY, networkMetricsData);
+        const { data: networkInfoData } = await fetchNetworkInfo();
+        if (networkInfoData) {
+          setItemToLocalStorage(NETWORK_INFO_KEY, networkInfoData);
+
+          // Initialize ada handle service
+          adaHandleService.initialize(networkInfoData?.networkName);
         }
 
         setIsAppInitializing(false);
@@ -72,23 +72,20 @@ const AppContextProvider = ({ children }: PropsWithChildren) => {
   const value = useMemo(
     () => ({
       isAppInitializing,
-      isMainnet: networkMetrics?.networkName === "mainnet",
+      isMainnet: networkInfo?.networkName === "mainnet",
       isInBootstrapPhase:
         epochParams?.protocol_major === BOOTSTRAPPING_PHASE_MAJOR,
       isFullGovernance: Number(epochParams?.protocol_major) >= 10,
       networkName:
         NETWORK_NAMES[
-          (networkMetrics?.networkName as keyof typeof NETWORK_NAMES) ||
-            "preview"
+          (networkInfo?.networkName as keyof typeof NETWORK_NAMES) || "preview"
         ],
-      network: networkMetrics?.networkName || "preview",
+      network: networkInfo?.networkName ?? Network.preview,
       cExplorerBaseUrl:
         CEXPLORER_BASE_URLS[
-          (networkMetrics?.networkName as keyof typeof NETWORK_NAMES) ||
-            "preview"
+          (networkInfo?.networkName as keyof typeof NETWORK_NAMES) || "preview"
         ],
       epochParams,
-      networkMetrics,
     }),
     [isAppInitializing],
   );

@@ -5,9 +5,10 @@ This is a backend application of GovTool project.
 ## Prerequisites
 
 In order to run `backend` your host machine will need access to the `cardano-db-sync` postgres database. To have this database running locally you'll need:
-* `cardano-node`
-* `cardano-db-sync`
-* PostgreSQL database
+
+- [cardano-node](https://github.com/IntersectMBO/cardano-node)
+- [cardano-db-sync](https://github.com/IntersectMBO/cardano-db-sync)
+- [PostgreSQL database](https://www.postgresql.org/download/) (psql needs to be installed on your machine in order to compile the project)
 
 You will need your `cardano-node` and `cardano-db-sync` to be compatible with Sancho testnet. Until these features will be merged to the master branch the new Sancho compatible versions are available as releases on [github](https://github.com/IntersectMBO/cardano-db-sync/releases). You will also need a correct `cardano-node` version. The release notes for `cardano-db-sync` usualy specify that.
 
@@ -25,35 +26,50 @@ You can utilize the [docker-compose.node+dbsync.yml](../../scripts/govtool/docke
 
 Due to problems with openapi3 package it's hard to build this project with plain `ghc` and `cabal-install`. Until the prolem is solved we reccomend using `nix` - this problem is fixed when you build your project from inside of the nix shell.
 
-1. Get [Nix](https://nixos.org/download).
+1.  Get [Nix](https://nixos.org/download).
 
-2. Get [direnv](https://direnv.net/).
+2.  Get [direnv](https://direnv.net/).
 
-3. Enter `govtool/backend` directory:
-
-    ```sh
-    cd govtool/backend
-    ```
-
-4. Allow direnv to setup your environment:
+3.  Set GHC version to 9.2.8:
 
     ```sh
-    direnv allow
+        ghcup install ghc 9.2.8
+
+        ghcup set ghc 9.2.8
     ```
 
-5. Update cabal & build project
-    ```sh
-    cabal update
-    cabal build all
-    ```
-6. Create a config file. You can use `example-config.json` as a template.
+4.  Install cabal
 
-7. Run project
     ```sh
-    cabal run vva-be -- --config <YOUR CONFIG FILE> start-app
+        ghcup install cabal
+        ghcup set cabal
     ```
-> [!WARNING]
-> In the context of our ongoing project enhancements, it is assumed that the executable previously known as 'vva-be' should be now officially renamed to 'govtool-backend'. This change is necessary for aligning with the updated branding and functional scope of the application and it has to be implemented in the near future as a chore and refactoring ticket. Make sure that the documentation matches the actual name of the executable.
+
+5.  Enter `govtool/backend` directory:
+
+    ```sh
+        cd govtool/backend
+    ```
+
+6.  Allow direnv to setup your environment:
+
+    ```sh
+        direnv allow
+    ```
+
+7.  Update cabal & build project
+    ```sh
+        cabal update
+        cabal build all
+    ```
+8.  Create a config file. You can use `example-config.json` as a template.
+
+9.  Run project
+    ```sh
+        cabal run vva-be -- --config <YOUR CONFIG FILE> start-app
+    ```
+    > [!WARNING]
+    > In the context of our ongoing project enhancements, it is assumed that the executable previously known as 'vva-be' should be now officially renamed to 'govtool-backend'. This change is necessary for aligning with the updated branding and functional scope of the application and it has to be implemented in the near future as a chore and refactoring ticket. Make sure that the documentation matches the actual name of the executable.
 
 ## Development
 

@@ -1,8 +1,11 @@
-import test, { expect } from "@playwright/test";
+import environments from "@constants/environments";
+import test from "@playwright/test";
 import kuberService from "@services/kuberService";
-import { ProposalType, ProtocolParams } from "@types";
+import { ProposalType } from "@types";
 import { allure } from "allure-playwright";
 import { bech32 } from "bech32";
+import { functionWaitedAssert } from "./waitedLoop";
+import { createFile, getFile } from "./file";
 
 export function lovelaceToAda(lovelace: number) {
   if (lovelace === 0) return 0;
@@ -16,8 +19,16 @@ export function generateWalletAddress() {
 }
 
 export async function getProtocolParamsMajorVersion() {
-  const protocolParameter: ProtocolParams =
-    await kuberService.queryProtocolParams();
+  let protocolParameter = await getFile("protocolParameter.json");
+  if (protocolParameter === undefined) {
+    await functionWaitedAssert(
+      async () => {
+        protocolParameter = await kuberService.queryProtocolParams();
+        await createFile("protocolParameter.json", protocolParameter);
+      },
+      { name: "queryProtocolParams" }
+    );
+  }
   return protocolParameter.protocolVersion.major;
 }
 
@@ -26,9 +37,9 @@ export async function isBootStrapingPhase() {
   return protocolParameterMajorVersion === 9;
 }
 
-export async function skipIfTreasuryAndBootstrapping(type: ProposalType) {
+export async function skipIfNotInfoAndBootstrapping(type: ProposalType) {
   const isBootStraping = await isBootStrapingPhase();
-  if (type === ProposalType.treasury && isBootStraping) {
+  if (type !== ProposalType.info && isBootStraping) {
     await allure.description(
       "This Features will be available only after hardfork."
     );
@@ -36,12 +47,48 @@ export async function skipIfTreasuryAndBootstrapping(type: ProposalType) {
   }
 }
 
-export async function skipIfNotHardFork() {
-  const currentProtocolVersion = await getProtocolParamsMajorVersion();
-  if (currentProtocolVersion < 9) {
+export async function skipIfMainnet() {
+  if (environments.networkId === 1) {
     await allure.description(
-      "Govtool Features will be available after hardfork."
+      "Test skipped on mainnet to prevent affecting the production environment or using real ADA."
     );
+    test.skip();
+  }
+}
+
+export async function skipIfTemporyWalletIsNotAvailable(fileName: string) {
+  const wallets = (await getFile(fileName)) || [];
+  if (wallets.length === 0) {
+    await allure.description(
+      `Temporary wallet file "${fileName}" is not available or contains insufficient wallet. Please fund the faucet wallet and run the test again.`
+    );
+    test.skip();
+  }
+}
+
+export async function skipIfBalanceIsInsufficient(limit = 10) {
+  const balance = await getWalletBalance(environments.faucet.address);
+  if (balance <= limit) {
+    await allure.description("Not enough balance to perform this action.");
+    test.skip();
+  }
+}
+
+export async function getWalletBalance(address: string) {
+  let balance: number = 0;
+  await functionWaitedAssert(
+    async () => {
+      balance = await kuberService.getBalance(address);
+    },
+    { message: "get balance" }
+  );
+
+  return balance;
+}
+
+export async function skipIfScheduledWorkflow() {
+  if (environments.isScheduled) {
+    await allure.description("This test is skipped in scheduled workflow.");
     test.skip();
   }
 }

@@ -14,12 +14,12 @@ export const correctVoteAdaFormat = (
 ) => {
   if (lovelace) {
     const ada = lovelace / LOVELACE;
+
     return ada.toLocaleString(locale, {
-      minimumFractionDigits: 3,
       maximumFractionDigits: 3,
     });
   }
-  return "0,000";
+  return "0";
 };
 
 export const correctDRepDirectoryFormat = (lovelace: number | undefined) => {
@@ -28,4 +28,25 @@ export const correctDRepDirectoryFormat = (lovelace: number | undefined) => {
   }
 
   return "0";
+};
+
+export const correctAdaFormatWithSuffix = (
+  lovelace: number | undefined,
+  precision = 2,
+) => {
+  if (!lovelace) return "0";
+  const ada = lovelace / LOVELACE;
+  if (ada < 1000)
+    return ada.toLocaleString("en-us", {
+      maximumFractionDigits: precision,
+    });
+
+  const suffixes = ["k", "M", "B", "T"];
+  const divisors = [1000, 1000000, 1000000000, 1000000000000];
+
+  for (let i = 0; i < suffixes.length; i++) {
+    if (ada < divisors[i] * 1000) {
+      return (ada / divisors[i]).toFixed(precision) + suffixes[i];
+    }
+  }
 };

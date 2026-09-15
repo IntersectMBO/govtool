@@ -1,4 +1,3 @@
-import { MetadataValidationStatus } from "@models";
 import { GovernanceActionType } from "@/types/governanceAction";
 
 export type EpochParams = {
@@ -59,18 +58,61 @@ export type EpochParams = {
   treasury_growth_rate: number | null;
 };
 
-export type NetworkMetrics = {
+export type TransactionStatus = {
+  transactionConfirmed: boolean;
+  votingProcedure:
+    | {
+        committee_voter: number | null;
+        drep_voter: number | null;
+        gov_action_proposal_id: number;
+        id: number;
+        index: number;
+        invalid: boolean | null;
+        pool_voter: number | null;
+        tx_id: number;
+        vote: Vote;
+        voter_role: "DRep" | "Pool" | "Committee";
+        voting_anchor_id: number | null;
+      }[]
+    | [];
+};
+
+export enum Network {
+  samchonet = "sanchonet",
+  preview = "preview",
+  testnet = "testnet",
+  preprod = "preprod",
+  mainnet = "mainnet",
+}
+
+export type NetworkInfo = {
   currentTime: string;
   currentEpoch: number;
   currentBlock: number;
+  networkName: Network;
+};
+
+export type NetworkTotalStake = {
+  totalStakeControlledByDReps: number;
+  totalStakeControlledBySPOs: number;
+  alwaysAbstainVotingPower: number;
+  alwaysNoConfidenceVotingPower: number;
+};
+
+export type NetworkMetrics = {
   uniqueDelegators: number;
   totalDelegations: number;
   totalGovernanceActions: number;
   totalDRepVotes: number;
   totalRegisteredDReps: number;
-  alwaysAbstainVotingPower: number;
-  alwaysNoConfidenceVotingPower: number;
-  networkName: string;
+  totalDRepDistr: number;
+  totalActiveDReps: number;
+  totalInactiveDReps: number;
+  totalActiveCIP119CompliantDReps: number;
+  totalRegisteredDirectVoters: number;
+  noOfCommitteeMembers: number;
+  quorumNumerator: number;
+  quorumDenominator: number;
 };
 
 export type VoterInfo = {
@@ -102,11 +144,18 @@ export enum DRepStatus {
 }
 
 export enum DRepListSort {
-  Random = "Random",
+  Activity = "Activity",
   VotingPower = "VotingPower",
   RegistrationDate = "RegistrationDate",
   Status = "Status",
+  Random = "Random",
 }
+
+type Reference = {
+  "@type": "Identity" | "Links";
+  label: string;
+  uri: string;
+};
 
 export type DrepDataDTO = {
   deposit: number;
@@ -120,6 +169,11 @@ export type DrepDataDTO = {
   url?: string;
   view: string;
   votingPower?: number;
+  imageUrl: string | null;
+  identityReferences: Reference[];
+  linkReferences: Reference[];
+  // either base64 for IPFS image or URL for regular image
+  image: string | null;
 };
 
 export type DRepData = DrepDataDTO & {
@@ -128,10 +182,10 @@ export type DRepData = DrepDataDTO & {
   objectives: string | null;
   motivations: string | null;
   qualifications: string | null;
-  references: Reference[];
   doNotList: boolean;
-  metadataStatus: MetadataValidationStatus | null;
-  metadataValid: boolean;
+  imageUrl: string | null;
+  // either base64 for IPFS image or URL for regular image
+  image: string | null;
 };
 
 export type Vote = "yes" | "no" | "abstain";
@@ -161,7 +215,7 @@ export type SubmittedVotesData = {
   protocolParams: EpochParams | null;
 };
 
-export type ProposalDataDTO = {
+export type ProposalData = {
   createdDate: string;
   createdEpochNo: number;
   details?: ActionDetailsType;
@@ -181,25 +235,22 @@ export type ProposalDataDTO = {
   references?: Reference[];
   title?: string;
   protocolParams: EpochParams | null;
+  authors?: {
+    name?: string;
+    witnessAlgorithm?: string;
+    publicKey?: string;
+    signature?: string;
+  }[];
+  json?: Record<string, unknown>;
 } & SubmittedVotesData;
-
-export type ProposalData = ProposalDataDTO & {
-  metadataStatus: MetadataValidationStatus | null;
-  metadataValid: boolean;
-};
 
 export type NewConstitutionAnchor = {
   dataHash: string;
   url: string;
 };
 
-export type VotedProposalDTO = {
-  vote: ProposalVote;
-  proposal: ProposalDataDTO;
-};
-
 export type VotedProposal = {
-  vote: ProposalVote;
+  vote: ProposalVote | null;
   proposal: ProposalData;
 };
 
@@ -215,4 +266,20 @@ export type Infinite<T> = {
   page: number;
   pageSize: number;
   total: number;
+};
+
+type DRepVotingPower = {
+  view: string;
+  hashRaw: string;
+  votingPower: number;
+  givenName: string | null;
+};
+
+export type DRepVotingPowerListResponse = DRepVotingPower[];
+
+export type Account = {
+  id: number;
+  view: string;
+  isRegistered: boolean;
+  isScriptBased: boolean;
 };

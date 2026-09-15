@@ -1,18 +1,28 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { Box } from "@mui/material";
 
 import { IMAGES, SECURITY_RELEVANT_PARAMS_MAP } from "@consts";
 import { Typography, VotePill } from "@atoms";
-import { useTranslation } from "@hooks";
-import { correctVoteAdaFormat, getGovActionVotingThresholdKey } from "@utils";
+import {
+  useGetNetworkMetrics,
+  useGetNetworkTotalStake,
+  useTranslation,
+} from "@hooks";
+import {
+  getGovActionVotingThresholdKey,
+  correctAdaFormatWithSuffix,
+} from "@utils";
 import { SubmittedVotesData } from "@models";
 import { useFeatureFlag, useAppContext } from "@/context";
+import { GovernanceActionType } from "@/types/governanceAction";
 
 type Props = {
+  type: GovernanceActionType;
   votes: SubmittedVotesData;
 };
 
 export const VotesSubmitted = ({
+  type: govActionType,
   votes: {
     dRepYesVotes,
     dRepAbstainVotes,
@@ -42,52 +52,104 @@ export const VotesSubmitted = ({
     areCCVoteTotalsDisplayed,
   } = useFeatureFlag();
   const { t } = useTranslation();
-  const { networkMetrics, epochParams } = useAppContext();
-  const totalDRepStake =
-    dRepYesVotes +
-    dRepAbstainVotes +
-    dRepNoVotes +
-    (networkMetrics?.alwaysAbstainVotingPower || 0) +
-    (networkMetrics?.alwaysNoConfidenceVotingPower || 0);
-  const totalPoolStake = poolYesVotes + poolAbstainVotes + poolNoVotes;
-  const totalCCStake = ccYesVotes + ccAbstainVotes + ccNoVotes;
+  const { networkTotalStake, fetchNetworkTotalStake } =
+    useGetNetworkTotalStake();
+  const { networkMetrics, fetchNetworkMetrics } = useGetNetworkMetrics();
+  const { epochParams } = useAppContext();
 
-  const dRepNegativeVotesPercentage = totalDRepStake
-    ? ((dRepAbstainVotes +
-        dRepNoVotes +
-        (networkMetrics?.alwaysAbstainVotingPower || 0) +
-        (networkMetrics?.alwaysNoConfidenceVotingPower || 0)) /
-        totalDRepStake) *
-      100
-    : undefined;
-  const dRepNoVotesPercentage = totalDRepStake
-    ? (dRepNoVotes / totalDRepStake) * 100
-    : undefined;
-  const dRepYesVotesPercentage = dRepNegativeVotesPercentage
-    ? 100 - dRepNegativeVotesPercentage
+  useEffect(() => {
+    const init = async () => {
+      await fetchNetworkTotalStake();
+      await fetchNetworkMetrics();
+    };
+    init();
+  }, []);
+
+  const noOfCommitteeMembers = networkMetrics?.noOfCommitteeMembers ?? 0;
+  const ccThreshold = (
+    networkMetrics?.quorumDenominator
+      ? networkMetrics.quorumNumerator / networkMetrics.quorumDenominator
+      : 0
+  ).toPrecision(2);
+
+  // Coming from be
+  // Equal to: total active drep stake + auto no-confidence stake
+  const totalStakeControlledByDReps =
+    (networkTotalStake?.totalStakeControlledByDReps ?? 0) -
+    // As this being voted for the action becomes part of the total active stake
+    dRepAbstainVotes;
+
+  // Governance action abstain votesa + auto abstain votes
+  const totalAbstainVotes =
+    dRepAbstainVotes + (networkTotalStake?.alwaysAbstainVotingPower ?? 0);
+
+  // TODO: Move this logic to backend
+
+  // DRep votes
+  const dRepYesVotesPercentage = totalStakeControlledByDReps
+    ? (dRepYesVotes / totalStakeControlledByDReps) * 100
     : undefined;
 
-  // TODO: add abstain votes to the calculation
-  const poolNegativeVotesPercentage = totalPoolStake
-    ? ((poolAbstainVotes + poolNoVotes) / totalPoolStake) * 100
-    : undefined;
-  const poolNoVotesPercentage = totalPoolStake
-    ? (poolNoVotes / totalPoolStake) * 100
-    : undefined;
-  const poolYesVotesPercentage = poolNegativeVotesPercentage
-    ? 100 - poolNegativeVotesPercentage
+  const dRepNoVotesPercentage = totalStakeControlledByDReps
+    ? (dRepNoVotes / totalStakeControlledByDReps) * 100
     : undefined;
 
-  // TODO: add abstain votes to the calculation
-  const ccNegativeVotesPercentage = totalCCStake
-    ? (ccAbstainVotes + ccNoVotes) / totalCCStake
+  const dRepNotVotedVotes = totalStakeControlledByDReps
+    ? totalStakeControlledByDReps -
+      (dRepYesVotes -
+        // As this is already added on backend
+        (govActionType === GovernanceActionType.NoConfidence
+          ? networkTotalStake?.alwaysNoConfidenceVotingPower ?? 0
+          : 0)) -
+      (dRepNoVotes -
+        // As this is already added on backend
+        (govActionType === GovernanceActionType.NoConfidence
+          ? 0
+          : networkTotalStake?.alwaysNoConfidenceVotingPower ?? 0))
     : undefined;
-  const ccNoVotesPercentage = totalCCStake
-    ? ccNoVotes / totalCCStake
+  const dRepNotVotedVotesPercentage =
+    100 - (dRepYesVotesPercentage ?? 0) - (dRepNoVotesPercentage ?? 0);
+
+  // SPO/Pool votes
+  const poolYesVotesPercentage =
+    typeof poolYesVotes === "number" &&
+    typeof networkTotalStake?.totalStakeControlledBySPOs === "number" &&
+    networkTotalStake.totalStakeControlledBySPOs > 0
+      ? (poolYesVotes / networkTotalStake.totalStakeControlledBySPOs) * 100
+      : undefined;
+
+  const poolNoVotesPercentage =
+    typeof poolNoVotes === "number" &&
+    typeof networkTotalStake?.totalStakeControlledBySPOs === "number" &&
+    networkTotalStake.totalStakeControlledBySPOs > 0
+      ? (poolNoVotes / networkTotalStake.totalStakeControlledBySPOs) * 100
+      : undefined;
+
+  const poolNotVotedVotes =
+    typeof networkTotalStake?.totalStakeControlledBySPOs === "number"
+      ? networkTotalStake.totalStakeControlledBySPOs -
+        (poolYesVotes + poolNoVotes + poolAbstainVotes)
+      : undefined;
+
+  const poolNotVotedVotesPercentage =
+    100 -
+    (typeof poolYesVotesPercentage === "number" ? poolYesVotesPercentage : 0) -
+    (typeof poolNoVotesPercentage === "number" ? poolNoVotesPercentage : 0);
+
+  // Constitutional Commission votes
+  const ccYesVotesPercentage = noOfCommitteeMembers
+    ? (ccYesVotes / noOfCommitteeMembers) * 100
     : undefined;
-  const ccYesVotesPercentage = ccNegativeVotesPercentage
-    ? 100 - ccNegativeVotesPercentage
+
+    const ccNoVotesPercentage = noOfCommitteeMembers
+    ? (ccNoVotes / noOfCommitteeMembers) * 100
     : undefined;
+
+    const ccNotVotedVotes =
+    noOfCommitteeMembers - ccYesVotes - ccNoVotes - ccAbstainVotes;
+
+    const ccNotVotedVotesPercentage =
+    100 - (ccYesVotesPercentage ?? 0) - (ccNoVotesPercentage ?? 0);
 
   return (
     <Box
@@ -137,15 +199,19 @@ export const VotesSubmitted = ({
             yesVotesPercentage={dRepYesVotesPercentage}
             noVotes={dRepNoVotes}
             noVotesPercentage={dRepNoVotesPercentage}
-            abstainVotes={dRepAbstainVotes}
-            threshold={(() => {
-              const votingThresholdKey = getGovActionVotingThresholdKey({
-                govActionType: type,
-                protocolParams,
-                voterType: "dReps",
-              });
-              return votingThresholdKey && epochParams?.[votingThresholdKey];
-            })()}
+            abstainVotes={totalAbstainVotes}
+            notVotedVotes={dRepNotVotedVotes}
+            notVotedPercentage={dRepNotVotedVotesPercentage}
+            threshold={
+              (() => {
+                const votingThresholdKey = getGovActionVotingThresholdKey({
+                  govActionType: type,
+                  protocolParams,
+                  voterType: "dReps",
+                });
+                return votingThresholdKey && epochParams?.[votingThresholdKey];
+              })() as number
+            }
           />
         )}
         {areSPOVoteTotalsDisplayed(type, isSecurityGroup()) && (
@@ -156,14 +222,18 @@ export const VotesSubmitted = ({
             noVotes={poolNoVotes}
             noVotesPercentage={poolNoVotesPercentage}
             abstainVotes={poolAbstainVotes}
-            threshold={(() => {
-              const votingThresholdKey = getGovActionVotingThresholdKey({
-                govActionType: type,
-                protocolParams,
-                voterType: "sPos",
-              });
-              return votingThresholdKey && epochParams?.[votingThresholdKey];
-            })()}
+            notVotedVotes={poolNotVotedVotes}
+            notVotedPercentage={poolNotVotedVotesPercentage}
+            threshold={
+              (() => {
+                const votingThresholdKey = getGovActionVotingThresholdKey({
+                  govActionType: type,
+                  protocolParams,
+                  voterType: "sPos",
+                });
+                return votingThresholdKey && epochParams?.[votingThresholdKey];
+              })() as number
+            }
           />
         )}
         {areCCVoteTotalsDisplayed(type) && (
@@ -174,6 +244,13 @@ export const VotesSubmitted = ({
             abstainVotes={ccAbstainVotes}
             yesVotesPercentage={ccYesVotesPercentage}
             noVotesPercentage={ccNoVotesPercentage}
+            notVotedVotes={ccNotVotedVotes}
+            notVotedPercentage={ccNotVotedVotesPercentage}
+            threshold={
+              type !== GovernanceActionType.InfoAction
+                ? Number(ccThreshold)
+                : null
+            }
           />
         )}
       </Box>
@@ -189,6 +266,8 @@ type VotesGroupProps = {
   yesVotesPercentage?: number;
   noVotes: number;
   noVotesPercentage?: number;
+  notVotedVotes?: number;
+  notVotedPercentage?: number;
   abstainVotes: number;
   threshold?: number | null;
 };
@@ -199,6 +278,8 @@ const VotesGroup = ({
   yesVotesPercentage,
   noVotes,
   noVotesPercentage,
+  notVotedVotes,
+  notVotedPercentage,
   abstainVotes,
   threshold,
 }: VotesGroupProps) => {
@@ -221,6 +302,30 @@ const VotesGroup = ({
       >
         {t(`govActions.${type}`)}
       </Typography>
+      {threshold !== undefined && threshold !== null && (
+        <Box display="flex" flexDirection="row" flex={1} alignItems="center">
+          <Typography
+            sx={{
+              marginRight: 1,
+              fontSize: 12,
+              lineHeight: "16px",
+              fontWeight: "400",
+              color: "rgba(36, 34, 50, 1)",
+            }}
+          >
+            {t("govActions.threshold")}
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: 12,
+              lineHeight: "16px",
+              color: "neutralGray",
+            }}
+          >
+            {threshold * 100}%
+          </Typography>
+        </Box>
+      )}
       <Vote
         type={type}
         vote="yes"
@@ -234,36 +339,13 @@ const VotesGroup = ({
         percentage={noVotesPercentage}
         value={noVotes}
       />
-      {threshold !== undefined && (
-        <Box
-          display="flex"
-          flexDirection="row"
-          flex={1}
-          borderBottom={1}
-          borderColor="neutralGray"
-        >
-          <Typography
-            sx={{
-              marginRight: 3,
-              fontSize: 16,
-              lineHeight: "24px",
-              fontWeight: "500",
-              color: "rgba(36, 34, 50, 1)",
-            }}
-          >
-            {t("govActions.threshold")}
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: 16,
-              lineHeight: "24px",
-              fontWeight: "500",
-              color: "neutralGray",
-            }}
-          >
-            {threshold}
-          </Typography>
-        </Box>
+      {typeof notVotedVotes === "number" && (
+        <Vote
+          type={type}
+          vote="notVoted"
+          percentage={notVotedPercentage}
+          value={notVotedVotes}
+        />
       )}
     </Box>
   );
@@ -300,12 +382,15 @@ const Vote = ({ type, vote, value, percentage }: VoteProps) => (
           fontWeight: "500",
         }}
       >
-        {type !== "ccCommittee" ? `₳ ${correctVoteAdaFormat(value)}` : value}
+        {type !== "ccCommittee"
+          ? `₳ ${correctAdaFormatWithSuffix(value)}`
+          : value}
       </Typography>
       {vote !== "abstain" && typeof percentage === "number" && (
         <Typography
           data-testid={`submitted-votes-${type}-${vote}-percentage`}
           sx={{
+            ml: 1,
             fontSize: 16,
             lineHeight: "24px",
             fontWeight: "500",

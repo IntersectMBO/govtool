@@ -6,11 +6,12 @@ import { Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { CenteredBoxBottomButtons } from "@molecules";
 import {
-  correctAdaFormat,
+  correctVoteAdaFormat,
   getItemFromLocalStorage,
   openInNewTab,
   PROTOCOL_PARAMS_KEY,
 } from "@utils";
+import { LINKS } from "@/consts/links";
 
 export const RolesAndResponsibilities = ({
   setStep,
@@ -24,10 +25,7 @@ export const RolesAndResponsibilities = ({
 
   const onClickContinue = () => setStep(2);
 
-  const openLearnMoreAboutDrep = () =>
-    openInNewTab(
-      "https://docs.gov.tools/using-govtool/govtool-functions/dreps",
-    );
+  const openLearnMoreAboutDrep = () => openInNewTab(LINKS.DREPS);
 
   return (
     <>
@@ -53,7 +51,7 @@ export const RolesAndResponsibilities = ({
             />,
           ]}
           i18nKey="registration.rolesAndResponsibilitiesDescription"
-          values={{ deposit: correctAdaFormat(epochParams?.drep_deposit) }}
+          values={{ deposit: correctVoteAdaFormat(epochParams?.drep_deposit) }}
         />
       </Typography>
       <CenteredBoxBottomButtons

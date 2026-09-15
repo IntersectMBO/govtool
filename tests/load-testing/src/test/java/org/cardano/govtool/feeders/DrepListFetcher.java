@@ -22,7 +22,7 @@ public class DrepListFetcher {
 
             // Fetch about 5 pages
             for (int page = 0; page < 5; page++) {
-                String requestUrl = baseUrl + "/drep/list" + "?page=" + page + "&size=" + PAGE_SIZE;
+                String requestUrl = baseUrl + "drep/list" + "?page=" + page + "&size=" + PAGE_SIZE;
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(new URI(requestUrl))
                         .GET()

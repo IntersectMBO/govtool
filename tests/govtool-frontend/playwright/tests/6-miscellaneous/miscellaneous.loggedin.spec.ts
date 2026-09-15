@@ -1,3 +1,4 @@
+import { user01AuthFile } from "@constants/auth";
 import {
   ABSTAIN_VOTE_DOC_URL,
   DELEGATION_DOC_URL,
@@ -11,23 +12,20 @@ import { user01Wallet } from "@constants/staticWallets";
 import { createTempUserAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { skipIfNotHardFork } from "@helpers/cardano";
 import { ShelleyWallet } from "@helpers/crypto";
 import { createNewPageWithWallet } from "@helpers/page";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
-import EditDRepPage from "@pages/editDRepPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { Page, expect } from "@playwright/test";
 
 test.beforeEach(async () => {
   await setAllureEpic("6. Miscellaneous");
-  await skipIfNotHardFork();
 });
 
 test.describe("Logged in user", () => {
   test.use({
-    storageState: ".auth/user01.json",
+    storageState: user01AuthFile,
     wallet: user01Wallet,
   });
 
@@ -94,20 +92,12 @@ test.describe("Logged in user", () => {
     );
   });
 
-  test("6G. Should restrict edit dRep for non dRep", async ({ page }) => {
-    const editDrepPage = new EditDRepPage(page);
-    await editDrepPage.goto();
-
-    await page.waitForTimeout(2_000);
-    await expect(editDrepPage.nameInput).not.toBeVisible();
-  });
-
   test("6I. Should prompt for a username after clicking on proposal discussion link if username is not set", async ({
     page,
   }) => {
     await page.goto("/");
     await page.getByTestId("proposal-discussion-link").click();
-    await page.getByTestId("verify-identity-button").click();
+    await page.getByTestId("verify-user-link").first().click();
 
     await expect(page.getByTestId("setup-username-modal")).toBeVisible();
     await expect(page.getByTestId("username-input")).toBeVisible();

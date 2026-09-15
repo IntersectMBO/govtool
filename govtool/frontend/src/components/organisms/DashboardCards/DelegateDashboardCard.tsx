@@ -1,18 +1,18 @@
-import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
 import { PendingTransaction } from "@context";
 import { useGetDRepDetailsQuery, useTranslation } from "@hooks";
-import { CurrentDelegation, VoterInfo } from "@models";
+import { CurrentDelegation, MetadataStandard, VoterInfo } from "@models";
 import {
   DashboardActionCard,
   DashboardActionCardProps,
   DelegationAction,
 } from "@molecules";
 import {
-  correctAdaFormat,
+  correctVoteAdaFormat,
   getMetadataDataMissingStatusTranslation,
   openInNewTab,
 } from "@utils";
@@ -20,6 +20,8 @@ import {
   AutomatedVotingOptionCurrentDelegation,
   AutomatedVotingOptionDelegationId,
 } from "@/types/automatedVotingOptions";
+import { LINKS } from "@/consts/links";
+import { useValidateMutation } from "@/hooks/mutations";
 
 type DelegateDashboardCardProps = {
   currentDelegation: CurrentDelegation;
@@ -42,13 +44,30 @@ export const DelegateDashboardCard = ({
     delegateTx?.resourceId ?? currentDelegation?.dRepHash,
   );
 
+  const [metadataStatus, setMetadataStatus] = useState<
+    MetadataValidationStatus | undefined
+  >();
+  const { validateMetadata } = useValidateMutation();
+
+  useEffect(() => {
+    if (!myDRepDelegationData?.url) return;
+
+    const validate = async () => {
+      const { status } = await validateMetadata({
+        standard: MetadataStandard.CIP119,
+        url: myDRepDelegationData.url!,
+        hash: myDRepDelegationData?.metadataHash ?? "",
+      });
+
+      setMetadataStatus(status);
+    };
+    validate();
+  }, [myDRepDelegationData?.url]);
+
   const learnMoreButton = {
     children: t("learnMore"),
     dataTestId: "delegate-learn-more-button",
-    onClick: () =>
-      openInNewTab(
-        "https://docs.gov.tools/how-to-use-the-govtool/using-govtool/delegating",
-      ),
+    onClick: () => openInNewTab(LINKS.DELEGATING),
     sx: { backgroundColor: "arcticWhite" },
   };
 
@@ -61,7 +80,7 @@ export const DelegateDashboardCard = ({
   const onClickDelegateToAnotherDRep = () =>
     navigate(PATHS.dashboardDRepDirectory);
 
-  const ada = correctAdaFormat(votingPower);
+  const ada = correctVoteAdaFormat(votingPower);
 
   const cardProps: Partial<DashboardActionCardProps> = (() => {
     // transaction in progress
@@ -119,7 +138,7 @@ export const DelegateDashboardCard = ({
       navigate(
         PATHS.dashboardDRepDirectoryDRep.replace(
           ":dRepId",
-          displayedDelegationId || "",
+          displayedDelegationId ?? "",
         ),
         { state: { enteredFromWithinApp: true } },
       ),
@@ -155,10 +174,8 @@ export const DelegateDashboardCard = ({
           drepName={
             isLoading
               ? "Loading..."
-              : myDRepDelegationData?.metadataStatus
-              ? getMetadataDataMissingStatusTranslation(
-                  myDRepDelegationData.metadataStatus,
-                )
+              : metadataStatus
+              ? getMetadataDataMissingStatusTranslation(metadataStatus)
               : myDRepDelegationData?.givenName ?? ""
           }
           dRepId={displayedDelegationId}
@@ -170,7 +187,7 @@ export const DelegateDashboardCard = ({
   );
 };
 
-const getDelegationTitle = (currentDelegation: string | null, ada: number) => {
+const getDelegationTitle = (currentDelegation: string | null, ada: string) => {
   const key =
     currentDelegation ===
     AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence
@@ -195,7 +212,7 @@ const getDelegationDescription = (currentDelegation: string | null) => {
   return <Trans i18nKey={key} />;
 };
 
-const getProgressDescription = (delegateTo: string, ada: number) => {
+const getProgressDescription = (delegateTo: string, ada: string) => {
   const key = (() => {
     if (!delegateTo) return undefined;
     switch (delegateTo) {

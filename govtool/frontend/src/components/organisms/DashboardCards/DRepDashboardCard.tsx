@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
@@ -10,7 +10,8 @@ import {
   DashboardActionCard,
   DashboardActionCardProps,
 } from "@molecules";
-import { correctAdaFormat, openInNewTab } from "@utils";
+import { correctVoteAdaFormat, openInNewTab } from "@utils";
+import { LINKS } from "@/consts/links";
 
 type DRepDashboardCardProps = {
   dRepID: string;
@@ -37,10 +38,7 @@ export const DRepDashboardCard = ({
   const learnMoreButton = {
     children: t("learnMore"),
     dataTestId: "d-rep-learn-more-button",
-    onClick: () =>
-      openInNewTab(
-        "https://docs.gov.tools/using-govtool/govtool-functions/dreps/register-as-a-drep",
-      ),
+    onClick: () => openInNewTab(LINKS.REGISTER_AS_A_DREP),
   };
 
   const navigateToDrepDirectory = () => {
@@ -67,14 +65,14 @@ export const DRepDashboardCard = ({
             <Trans
               i18nKey="dashboard.cards.drep.retirementInProgressWithGivenName"
               values={{
-                deposit: correctAdaFormat(voter?.deposit),
-                name: voter?.givenName,
+                deposit: correctVoteAdaFormat(voter?.deposit),
+                givenName: voter?.givenName,
               }}
             />
           ) : (
             <Trans
               i18nKey="dashboard.cards.drep.retirementInProgress"
-              values={{ deposit: correctAdaFormat(voter?.deposit) }}
+              values={{ deposit: correctVoteAdaFormat(voter?.deposit) }}
             />
           ),
           transactionId: pendingTransaction?.retireAsDrep.transactionHash,
@@ -130,10 +128,7 @@ export const DRepDashboardCard = ({
           ? {
               children: t("learnMore"),
               dataTestId: "register-learn-more-button",
-              onClick: () =>
-                openInNewTab(
-                  "https://docs.gov.tools/using-govtool/govtool-functions/dreps/retire-as-a-drep",
-                ),
+              onClick: () => openInNewTab(LINKS.RETIRE_AS_A_DREP),
             }
           : learnMoreButton,
       ];
@@ -143,10 +138,7 @@ export const DRepDashboardCard = ({
       return {
         buttons: wasRegisteredOrNotRegisteredButtons,
         description: voter?.givenName ? (
-          <Trans
-            i18nKey="dashboard.cards.drep.notRegisteredWasRegisteredDescriptionWithGivenName"
-            values={{ name: voter?.givenName }}
-          />
+          <Trans i18nKey="dashboard.cards.drep.notRegisteredWasRegisteredDescriptionWithGivenName" />
         ) : (
           <Trans i18nKey="dashboard.cards.drep.notRegisteredWasRegisteredDescription" />
         ),

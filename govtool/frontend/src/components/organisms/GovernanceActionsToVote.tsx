@@ -1,111 +1,116 @@
-import { useNavigate, generatePath } from "react-router-dom";
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 
 import { Typography } from "@atoms";
-import { PATHS } from "@consts";
-import { useCardano } from "@context";
-import { useScreenDimension, useTranslation } from "@hooks";
-import { ProposalData } from "@models";
-import { GovernanceActionCard } from "@molecules";
-import { getProposalTypeTitle, getFullGovActionId } from "@utils";
-import { Slider } from "@organisms";
+import { useCardano, useDataActionsBar } from "@context";
+import {
+  useFetchNextPageDetector,
+  useGetProposalsInfiniteQuery,
+  useSaveScrollPosition,
+  useScreenDimension,
+  useTranslation,
+} from "@hooks";
+import { removeDuplicatedProposals } from "@utils";
+import { ValidatedGovernanceActionCard } from "@organisms";
+import { useMemo, useRef } from "react";
 
 type GovernanceActionsToVoteProps = {
-  filters: string[];
-  sorting: string;
-  proposals: { title: string; actions: ProposalData[] }[];
   onDashboard?: boolean;
-  searchPhrase?: string;
 };
 
 export const GovernanceActionsToVote = ({
-  filters,
   onDashboard = true,
-  proposals,
-  searchPhrase,
-  sorting,
 }: GovernanceActionsToVoteProps) => {
-  const { pendingTransaction } = useCardano();
-  const navigate = useNavigate();
-  const { isMobile, pagePadding } = useScreenDimension();
+  const { pendingTransaction, isEnableLoading } = useCardano();
+  const { isMobile, screenWidth } = useScreenDimension();
+  const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
+  const { chosenSorting, chosenFilters } = dataActionsBarProps;
   const { t } = useTranslation();
+
+  const {
+    isProposalsFetching,
+    isProposalsFetchingNextPage,
+    isProposalsLoading,
+    proposals,
+    proposalsfetchNextPage,
+    proposalsHaveNextPage,
+  } = useGetProposalsInfiniteQuery({
+    filters: chosenFilters,
+    sorting: chosenSorting,
+    searchPhrase: debouncedSearchText,
+  });
+  const loadNextPageRef = useRef(null);
+
+  useFetchNextPageDetector(
+    proposalsfetchNextPage,
+    isProposalsLoading || isProposalsFetchingNextPage,
+    proposalsHaveNextPage,
+  );
+
+  const saveScrollPosition = useSaveScrollPosition(
+    isProposalsLoading,
+    isProposalsFetching,
+  );
+
+  const mappedProposals = useMemo(
+    () => removeDuplicatedProposals(proposals),
+    [proposals, isProposalsFetchingNextPage],
+  );
 
   return (
     <>
-      {!proposals.length ? (
+      {!mappedProposals ||
+      isEnableLoading ||
+      isProposalsLoading ? (
+        <Box
+          sx={{
+            alignItems: "center",
+            display: "flex",
+            flex: 1,
+            justifyContent: "center",
+            py: 4,
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : !mappedProposals?.length ? (
         <Typography fontWeight={300} sx={{ py: 4 }}>
           {t("govActions.noResultsForTheSearch")}
         </Typography>
       ) : (
-        <>
-          {proposals?.map((item, index) => (
-            <Box
-              key={item.title}
-              sx={{
-                mx: -pagePadding,
-                px: pagePadding,
-                pb: 2.5,
-                overflow: "hidden",
-              }}
-            >
-              <Slider
-                data={item.actions.slice(0, 6).map((action) => (
-                  <div
-                    className="keen-slider__slide"
-                    key={action.id}
-                    style={{
-                      overflow: "visible",
-                      width: "auto",
-                    }}
-                  >
-                    <GovernanceActionCard
-                      {...action}
-                      inProgress={
-                        onDashboard &&
-                        pendingTransaction.vote?.resourceId ===
-                          `${action.txHash ?? ""}${action.index ?? ""}`
-                      }
-                      onClick={() => {
-                        navigate(
-                          onDashboard
-                            ? generatePath(
-                                PATHS.dashboardGovernanceActionsAction,
-                                {
-                                  proposalId: getFullGovActionId(
-                                    action.txHash,
-                                    action.index,
-                                  ),
-                                },
-                              )
-                            : PATHS.governanceActionsAction.replace(
-                                ":proposalId",
-                                getFullGovActionId(action.txHash, action.index),
-                              ),
-                          {
-                            state: {
-                              proposal: action,
-                            },
-                          },
-                        );
-                      }}
-                    />
-                  </div>
-                ))}
-                dataLength={item.actions.slice(0, 6).length}
-                filters={filters}
-                navigateKey={item.title}
-                notSlicedDataLength={item.actions.length}
-                onDashboard={onDashboard}
-                searchPhrase={searchPhrase}
-                sorting={sorting}
-                title={getProposalTypeTitle(item.title)}
+        <Box
+          columnGap="20px"
+          display="grid"
+          gridTemplateColumns={`repeat(auto-fill, minmax(${
+            screenWidth < 420 ? "290px" : isMobile ? "324px" : "350px"
+          }, 1fr))`}
+        >
+          {mappedProposals.map((item) => (
+            <Box pb={4.25} key={item.txHash + item.index}>
+              <ValidatedGovernanceActionCard
+                {...item}
+                inProgress={
+                  onDashboard &&
+                  pendingTransaction.vote?.resourceId ===
+                    `${item.txHash ?? ""}${item.index ?? ""}`
+                }
+                onClick={() => {
+                  saveScrollPosition();
+                }}
+                txHash={item.txHash}
               />
-              {index < proposals.length - 1 && (
-                <Box height={isMobile ? 40 : 52} />
-              )}
             </Box>
           ))}
-        </>
+          {proposalsHaveNextPage && isProposalsFetchingNextPage && (
+            <Box
+              display="flex"
+              justifyContent="center"
+              py={4}
+              ref={loadNextPageRef}
+            >
+              <CircularProgress />
+            </Box>
+          )}
+        </Box>
       )}
     </>
   );

@@ -1,8 +1,14 @@
 import { useCallback, useEffect } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router";
 
 import { Modal, ScrollToTop } from "@atoms";
-import { PATHS, PDF_PATHS } from "@consts";
+import {
+  PATHS,
+  PDF_PATHS,
+  OUTCOMES_PATHS,
+  USER_PATHS,
+  BUDGET_DISCUSSION_PATHS,
+} from "@consts";
 import { useCardano, useFeatureFlag, useModal } from "@context";
 import { useWalletConnectionListener } from "@hooks";
 import {
@@ -39,9 +45,13 @@ import {
 import { PublicRoute } from "./pages/PublicRoute";
 import { TopBanners } from "./components/organisms/TopBanners";
 import { DashboardHome } from "./pages/DashboardHome";
+import { GovernanceActionOutComesPillar } from "./pages/GovernanceActionOutComes";
 
 export default () => {
-  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
+  const {
+    isProposalDiscussionForumEnabled,
+    isGovernanceOutcomesPillarEnabled,
+  } = useFeatureFlag();
   const { enable, isEnabled } = useCardano();
   const navigate = useNavigate();
   const { modal, openModal, modals } = useModal();
@@ -53,28 +63,47 @@ export default () => {
   }, []);
 
   const checkTheWalletIsActive = useCallback(() => {
-    const hrefCondition =
-      window.location.pathname === PATHS.home ||
-      window.location.pathname === PATHS.governanceActions ||
-      window.location.pathname === PATHS.governanceActionsAction;
+    const isWalletAvailable = () =>
+        window.cardano && walletName && Object.keys(window.cardano).includes(walletName);
 
-    const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
-    if (window.cardano) {
-      const walletExtensions = Object.keys(window.cardano);
-      if (walletName && walletExtensions.includes(walletName)) {
-        enable(walletName);
-        return;
-      }
-    }
-    if (
-      (!window.cardano && walletName) ||
-      (walletName && !Object.keys(window.cardano).includes(walletName))
-    ) {
-      if (!hrefCondition) {
-        navigate(PATHS.home);
-      }
+    const cleanUpWalletData = () => {
       removeItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
       removeItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`);
+    };
+
+    const waitForWalletExtension = async () => {
+      const timeout = 5000;
+      const interval = 100;
+      const startTime = Date.now();
+
+      while (Date.now() - startTime < timeout) {
+        if (isWalletAvailable()) {
+          enable(walletName);
+          return;
+        }
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve) => {
+          setTimeout(resolve, interval);
+        });
+      }
+
+      if (!isOnAllowedPage) {
+        navigate(PATHS.home);
+      }
+      cleanUpWalletData();
+    };
+
+    const isOnAllowedPage = [PATHS.home, PATHS.governanceActions, PATHS.governanceActionsAction]
+        .includes(window.location.pathname);
+
+    const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
+
+    if (!walletName) return;
+
+    if (isWalletAvailable()) {
+      enable(walletName);
+    } else {
+      waitForWalletExtension();
     }
   }, []);
 
@@ -83,9 +112,8 @@ export default () => {
   }, [checkTheWalletIsActive]);
 
   return (
-    <>
+    <TopBanners>
       <ScrollToTop />
-      <TopBanners />
       <Routes>
         <Route path={PATHS.home} element={<Home />} />
         <Route path={PATHS.governanceActions} element={<GovernanceActions />} />
@@ -98,18 +126,54 @@ export default () => {
           element={<GovernanceActionDetails />}
         />
         {isProposalDiscussionForumEnabled && !isEnabled && (
-          <Route
-            path={`${PDF_PATHS.proposalDiscussion}/*`}
-            element={<ProposalDiscussionPillar />}
-          />
-        )}
-        <Route element={<Dashboard />}>
-          <Route path={PATHS.dashboard} element={<DashboardHome />} />
-          {isProposalDiscussionForumEnabled && (
+          <>
             <Route
               path={`${PDF_PATHS.proposalDiscussion}/*`}
               element={<ProposalDiscussionPillar />}
             />
+            <Route
+              path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
+              element={<ProposalDiscussionPillar />}
+            />
+          </>
+        )}
+        {isGovernanceOutcomesPillarEnabled && !isEnabled && (
+          <>
+            <Route
+              path={`${OUTCOMES_PATHS.governanceActionsOutcomes}/*`}
+              element={<GovernanceActionOutComesPillar />}
+            />
+            <Route
+              path={USER_PATHS.governanceActionsVotedByMe}
+              element={<GovernanceActionOutComesPillar />}
+            />
+          </>
+        )}
+        <Route element={<Dashboard />}>
+          <Route path={PATHS.dashboard} element={<DashboardHome />} />
+          {isProposalDiscussionForumEnabled && (
+            <>
+              <Route
+                path={`${PDF_PATHS.proposalDiscussion}/*`}
+                element={<ProposalDiscussionPillar />}
+              />
+              <Route
+                path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
+                element={<ProposalDiscussionPillar />}
+              />
+            </>
+          )}
+          {isGovernanceOutcomesPillarEnabled && (
+            <>
+              <Route
+                path={`${OUTCOMES_PATHS.governanceActionsOutcomes}/*`}
+                element={<GovernanceActionOutComesPillar />}
+              />
+              <Route
+                path={USER_PATHS.governanceActionsVotedByMe}
+                element={<GovernanceActionOutComesPillar />}
+              />
+            </>
           )}
           <Route
             path={PATHS.dashboardGovernanceActions}
@@ -180,6 +244,6 @@ export default () => {
           {modals[modal.type].component!}
         </Modal>
       )}
-    </>
+    </TopBanners>
   );
 };

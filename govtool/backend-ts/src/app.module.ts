@@ -26,11 +26,13 @@ import { SystemController } from './system/system.controller';
 import { CacheService } from './cache/cache.service';
 import { CacheWarmerService } from './cache/cache-warmer.service';
 import { MetadataModule } from './metadata/metadata.module';
+import { SurveyController } from './survey/survey.controller';
+import { SurveyService } from './survey/survey.service';
 
 @Module({
   imports: [MetadataModule],
-  controllers: [AppController, HealthController, NetworkController, EpochController, TransactionController, AdaHolderController, AccountController,DRepController,ProposalController,IpfsController,SystemController],
-  providers: [AppService, ConfigService, DbService, NetworkService, SqlService, EpochService, TransactionService, AdaHolderService, AccountService, DRepService,ProposalService,IpfsService,CacheService,CacheWarmerService],
+  controllers: [AppController, HealthController, NetworkController, EpochController, TransactionController, AdaHolderController, AccountController,DRepController,ProposalController,IpfsController,SystemController,SurveyController],
+  providers: [AppService, ConfigService, DbService, NetworkService, SqlService, EpochService, TransactionService, AdaHolderService, AccountService, DRepService,ProposalService,IpfsService,CacheService,CacheWarmerService,SurveyService],
   exports: [ConfigService, DbService]
 })
 export class AppModule {}

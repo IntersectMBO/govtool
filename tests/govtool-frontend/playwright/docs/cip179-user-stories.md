@@ -1,6 +1,6 @@
 # CIP-179 linked surveys
 
-User stories follow the maintainer's [User Story / Acceptance Criteria format](https://docs.google.com/document/d/1gtPb3tzQqPzP064R48Nbz2gRuwtT8XPLJIr5ju9INWQ/edit), requested in [PR #4184](https://github.com/IntersectMBO/govtool/pull/4184#issuecomment-5676184783).
+User stories follow the maintainer's [User Story / Acceptance Criteria format](https://docs.google.com/document/d/1gtPb3tzQqPzP064R48Nbz2gRuwtT8XPLJIr5ju9INWQ/edit).
 
 ## Governance-action authoring (connected wallet)
 

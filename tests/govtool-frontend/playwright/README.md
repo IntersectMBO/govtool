@@ -1,5 +1,7 @@
 # 🚀 GovTool Integration Test Guide
 
+For CIP-179 user stories and deterministic tests without funded wallets or API keys, see [CIP-179 linked surveys](docs/cip179-user-stories.md). Run them with `npm run test:cip179` after installing frontend and test dependencies.
+
 ## ✅ Prerequisites
 
 Ensure the following tools are installed on your machine:

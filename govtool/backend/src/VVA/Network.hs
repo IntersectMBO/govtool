@@ -4,22 +4,23 @@
 
 module VVA.Network where
 
-import           Control.Monad.Except       (MonadError, throwError)
+import           Control.Monad.Except        (MonadError, throwError)
 import           Control.Monad.Reader
+import           Control.Monad.Trans.Control (MonadBaseControl)
 
-import           Data.Aeson                 (Value)
-import           Data.ByteString            (ByteString)
-import           Data.FileEmbed             (embedFile)
-import           Data.Has                   (Has)
-import           Data.String                (fromString)
-import           Data.Text                  (Text, unpack)
-import qualified Data.Text.Encoding         as Text
+import           Data.Aeson                  (Value)
+import           Data.ByteString             (ByteString)
+import           Data.FileEmbed              (embedFile)
+import           Data.Has                    (Has)
+import           Data.String                 (fromString)
+import           Data.Text                   (Text, unpack)
+import qualified Data.Text.Encoding          as Text
 import           Data.Time.Clock
 
-import qualified Database.PostgreSQL.Simple as SQL
+import qualified Database.PostgreSQL.Simple  as SQL
 
 import           VVA.Config
-import           VVA.Pool                   (ConnectionPool, withPool)
+import           VVA.Pool                    (ConnectionPool, withPool)
 import           VVA.Types
 
 sqlFrom :: ByteString -> SQL.Query
@@ -29,7 +30,7 @@ networkInfoSql :: SQL.Query
 networkInfoSql = sqlFrom $(embedFile "sql/get-network-info.sql")
 
 networkInfo ::
-  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m) =>
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadBaseControl IO m, MonadError AppError m) =>
   m NetworkInfo
 networkInfo = withPool $ \conn -> do
   result <- liftIO $ SQL.query_ conn networkInfoSql
@@ -49,7 +50,7 @@ networkTotalStakeSql :: SQL.Query
 networkTotalStakeSql = sqlFrom $(embedFile "sql/get-network-total-stake.sql")
 
 networkTotalStake ::
-  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m) =>
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadBaseControl IO m, MonadError AppError m) =>
   m NetworkTotalStake
 networkTotalStake = withPool $ \conn -> do
   result <- liftIO $ SQL.query_ conn networkTotalStakeSql
@@ -69,7 +70,7 @@ networkMetricsSql :: SQL.Query
 networkMetricsSql = sqlFrom $(embedFile "sql/get-network-metrics.sql")
 
 networkMetrics ::
-  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadError AppError m) =>
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadBaseControl IO m, MonadError AppError m) =>
   m NetworkMetrics
 networkMetrics = withPool $ \conn -> do
   result <- liftIO $ SQL.query_ conn networkMetricsSql

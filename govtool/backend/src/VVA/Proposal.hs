@@ -11,6 +11,7 @@ module VVA.Proposal where
 import           Control.Exception                  (SomeException, throw, try)
 import           Control.Monad.Except               (MonadError, throwError)
 import           Control.Monad.Reader
+import           Control.Monad.Trans.Control        (MonadBaseControl)
 
 import           Data.Aeson
 import           Data.Aeson.Types                   (Parser, parseMaybe)
@@ -60,12 +61,12 @@ instance ToRow TextArray where
   toRow (TextArray texts) = map toField texts
 
 listProposals ::
-  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadBaseControl IO m, MonadFail m, MonadError AppError m) =>
   Maybe Text -> m [Proposal]
 listProposals mSearch = getProposals (fmap (:[]) mSearch)
 
 getProposal ::
-  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadBaseControl IO m, MonadFail m, MonadError AppError m) =>
   Text ->
   Integer ->
   m Proposal
@@ -78,7 +79,7 @@ getProposal txHash index = do
     _ -> throwError $ CriticalError ("Multiple proposals found for id: " <> proposalId <> ". This should never happen")
 
 getProposals ::
-  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadBaseControl IO m, MonadFail m, MonadError AppError m) =>
   Maybe [Text] -> m [Proposal]
 getProposals mSearchTerms = withPool $ \conn -> do
   let searchParam = maybe "" head mSearchTerms
@@ -105,7 +106,7 @@ latestEnactedProposalSql =
        return rawSql
 
 getPreviousEnactedProposal ::
-  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadFail m, MonadError AppError m) =>
+  (Has ConnectionPool r, Has VVAConfig r, MonadReader r m, MonadIO m, MonadBaseControl IO m, MonadFail m, MonadError AppError m) =>
   Text ->
   m (Maybe EnactedProposalDetails)
 getPreviousEnactedProposal proposalType = withPool $ \conn -> do

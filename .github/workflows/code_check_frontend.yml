@@ -5,12 +5,36 @@ on:
     paths:
       - govtool/frontend/**
       - .github/workflows/code_check_frontend.yml
+      - tests/govtool-frontend/playwright/**
 
 defaults:
   run:
     working-directory: govtool/frontend
 
 jobs:
+  cip179:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: "./govtool/frontend/.nvmrc"
+          registry-url: "https://registry.npmjs.org/"
+          scope: "@intersect.mbo"
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
+      - run: npm ci --ignore-scripts
+        working-directory: tests/govtool-frontend/playwright
+      - run: npx playwright install --with-deps chromium
+        working-directory: tests/govtool-frontend/playwright
+      - run: npm run test:cip179
+        working-directory: tests/govtool-frontend/playwright
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cip179-playwright-results
+          path: tests/govtool-frontend/playwright/test-results/cip179
   test:
     runs-on: ubuntu-latest
     steps:

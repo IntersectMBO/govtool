@@ -75,6 +75,8 @@ export const useVoteContextForm = (
           throw result.status;
         }
 
+        if (setErrorMessage) setErrorMessage(undefined);
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         if (Object.values(MetadataValidationStatus).includes(error)) {
@@ -86,7 +88,7 @@ export const useVoteContextForm = (
         if (setStep) setStep(5);
       }
     },
-    [hash],
+    [hash, setErrorMessage, setSavedHash, setStep, validateMetadata],
   );
 
   return {

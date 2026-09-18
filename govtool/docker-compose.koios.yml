@@ -1,0 +1,103 @@
+# Run GovTool locally against Koios, with no database.
+#
+# Trial setup for the data-layer experiment: it builds the contract, the
+# providers and the forked backend from this directory, and serves the
+# frontend against it. Nothing here is a deployment artefact.
+#
+#   docker compose -f docker-compose.koios.yml up -d
+#   frontend  http://localhost:8080
+#   backend   http://localhost:9999
+#
+# That builds the backend and pulls the published frontend. After changing
+# backend code, rebuild it with: up -d --build backend
+#
+# Koios is a public API, so this needs no db-sync, no credentials and no
+# Cardano node. A KOIOS_TOKEN raises the rate limit but is optional.
+#
+# Point it at another network with:
+#
+#   KOIOS_NETWORK=preprod VITE_NETWORK_FLAG=0 docker compose -f ... up -d
+#
+# Both, always: the second is what the frontend compares against the wallet's
+# own network id, and a mismatch is reported as a rejected wallet rather than
+# as a misconfiguration. 1 is mainnet, 0 is every testnet.
+#
+# Known limitation: Koios cannot compute six of the thirteen counters behind
+# /network/metrics, so that one route answers 501. The frontend degrades: the
+# committee threshold bar reads zero, and everything else works. See
+# docs/api/frontend-needs-audit.md.
+
+name: govtool-koios
+
+services:
+  backend:
+    build:
+      # The parent directory: the backend depends on its sibling packages by
+      # relative path, so a narrower context cannot resolve them.
+      context: .
+      dockerfile: govtool-backend/Dockerfile
+    environment:
+      NODE_ENV: production
+      VVA_HOST: 0.0.0.0
+      VVA_PORT: 9999
+
+      # The only setting that decides which implementation is constructed.
+      VVA_CHAINDATAPROVIDER: koios
+      VVA_KOIOSNETWORK: ${KOIOS_NETWORK:-mainnet}
+      # Optional. Without one the free public tier applies.
+      VVA_KOIOSTOKEN: ${KOIOS_TOKEN:-}
+      # Optional. Set to run against a self-hosted Koios instead.
+      VVA_KOIOSBASEURL: ${KOIOS_BASE_URL:-}
+
+      # No VVA_DBSYNCCONFIG_* here on purpose: they are required only when the
+      # provider is dbsync, and their absence is what proves the backend has
+      # no database dependency left.
+
+      VVA_CACHEDURATIONSECONDS: ${CACHE_SECONDS:-20}
+      VVA_DREPLISTCACHEDURATIONSECONDS: ${DREP_CACHE_SECONDS:-600}
+      # Optional: without it /ipfs/upload answers 503 and reads are unaffected.
+      VVA_PINATAAPIJWT: ${PINATA_API_JWT:-}
+    ports:
+      - "${BACKEND_PORT:-9999}:9999"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:9999/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1));",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  frontend:
+    # Both keys, the same way docker/docker-compose.yaml does it: plain
+    # `up` uses the published image, and `--build` builds from ./frontend
+    # instead. Pulling is the default because the frontend build is killed by
+    # the OOM killer at 7.8 GB of Docker memory, and because nothing in this
+    # compose file changes frontend source.
+    image: ghcr.io/intersectmbo/govtool-frontend:${FRONTEND_TAG:-dev}
+    build:
+      # Stock image, unmodified: it is configured at run time by its own
+      # entrypoint, so nothing here needs a build argument.
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      VITE_BASE_URL: ${PUBLIC_BACKEND_URL:-http://localhost:9999}
+      VITE_APP_ENV: development
+      VITE_IS_DEV: "true"
+      # Must agree with VVA_KOIOSNETWORK above: 1 for mainnet, 0 otherwise.
+      VITE_NETWORK_FLAG: ${VITE_NETWORK_FLAG:-1}
+      VITE_METADATA_API_URL: ${METADATA_API_URL:-}
+      VITE_IPFS_GATEWAY: ${IPFS_GATEWAY:-https://ipfs.io/ipfs}
+      VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "false"
+      VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: "false"
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped

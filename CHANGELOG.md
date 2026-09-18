@@ -12,20 +12,194 @@ changes.
 
 ### Added
 
-- Add feature-flagged CIP-179 linked survey authoring, rendering, and vote-response submission for governance actions
-- Add CIP-179 user-story acceptance criteria and deterministic desktop/mobile Playwright coverage
-
 ### Fixed
-
-- Clear stale metadata validation errors after correcting a vote context URL [Issue 4006](https://github.com/IntersectMBO/govtool/issues/4006)
-- Fix disappearing proposals in the governance actions list for the same tx hashes [Issue 3918](https://github.com/IntersectMBO/govtool/issues/3918)
-- Fix incorrect display of new committee parameters in Governance Action details [Issue 3954](https://github.com/IntersectMBO/govtool/issues/3954)
 
 ### Changed
 
-- Enable CIP-179 by default; deployments can opt out with `VITE_IS_CIP179_ENABLED=false`
+### Removed
+
+## [v2.1.0-alpha.1](https://github.com/IntersectMBO/govtool/compare/v2.0.36...v2.1.0-alpha.1) 2026-09-18
+
+Pre-release. The TypeScript backend is alpha: it ships alongside the Haskell
+backend.
+### Added
+
+- **TypeScript Backend (new component)** — a NestJS implementation of the full GovTool API, shipped
+  alongside the Haskell backend ready for testing. A major foundation towards [#4216](https://github.com/IntersectMBO/govtool/issues/4216)
+  - Network information, metrics and total stake
+  - Epoch parameters and transaction status
+  - ADA holder delegation and voting power
+  - DRep list, detail, filtering, votes and voting power
+  - Governance proposal list and detail
+  - IPFS upload
+  - Metadata validation (CIP-108 / CIP-119) with BLAKE2b hash verification and SSRF-hardened fetching
+  - CIP-179 survey definitions
+  - Response caching with block-driven cache warming
+  - Exact-integer JSON handling for values beyond 2^53
+  - Docker image, Swagger UI and OpenAPI document
+- Add feature-flagged CIP-179 v5 linked survey authoring, rendering and vote-response submission for governance actions ([#4184](https://github.com/IntersectMBO/govtool/pull/4184), thanks @Cerkoryn)
+- Add CIP-179 user-story acceptance criteria and deterministic desktop/mobile Playwright coverage ([#4184](https://github.com/IntersectMBO/govtool/pull/4184), thanks @Cerkoryn)
+- Add runtime environment injection for the Vite frontend so one image is configurable at startup ([#4163](https://github.com/IntersectMBO/govtool/pull/4163))
+- Add Umami analytics integration ([#4200](https://github.com/IntersectMBO/govtool/pull/4200))
+- Add Chatwoot for feedback ([#4206](https://github.com/IntersectMBO/govtool/pull/4206))
+- Add a `docker compose` setup and contributing documentation for local development [Issue 2206](https://github.com/IntersectMBO/govtool/issues/2206) ([#4214](https://github.com/IntersectMBO/govtool/pull/4214))
+- Add Docker image tags by branch and semantic version, and manual image builds for pull requests
+
+### Fixed
+
+- Complete SSRF protection in metadata-validation by blocking private, loopback and link-local fetch targets [Issue 4142](https://github.com/IntersectMBO/govtool/issues/4142) ([#4177](https://github.com/IntersectMBO/govtool/pull/4177), thanks @tianpeng-dev)
+- Fix missing link on the top left icon when connected on mobile [Issue 1987](https://github.com/IntersectMBO/govtool/issues/1987) ([#3875](https://github.com/IntersectMBO/govtool/pull/3875), thanks @Ciabas)
+- Release database pool resources on failed requests ([#4184](https://github.com/IntersectMBO/govtool/pull/4184), thanks @Cerkoryn)
+- Fix CIP-179 survey decoding from db-sync, preserve signed vote metadata, reject empty rating answers and validate points allocations ([#4184](https://github.com/IntersectMBO/govtool/pull/4184), thanks @Cerkoryn)
+- Fix workflow interpolation safety ([#4148](https://github.com/IntersectMBO/govtool/pull/4148), thanks @justinleeyang)
+- Resolve the real client IP behind reverse proxies for Umami, scoped to the Umami proxy ([#4205](https://github.com/IntersectMBO/govtool/pull/4205))
+- Fix mobile dashboard logo router import
+- Fix delegation to script-based DReps by supporting CIP-129 identifiers [Issue 4210](https://github.com/IntersectMBO/govtool/issues/4210) ([#4242](https://github.com/IntersectMBO/govtool/pull/4242))
+- Clear the metadata validation error after correcting the URL in the voting flow [Issue 4006](https://github.com/IntersectMBO/govtool/issues/4006) ([#4243](https://github.com/IntersectMBO/govtool/pull/4243))
+- Add unique page titles across all pages [Issue 4073](https://github.com/IntersectMBO/govtool/issues/4073) ([#4244](https://github.com/IntersectMBO/govtool/pull/4244))
+- Fix dependency vulnerabilities across frontend, backend, tests and analytics
+
+### Changed
+
+- Enable CIP-179 by default; deployments can opt out with `VITE_IS_CIP179_ENABLED=false` ([#4184](https://github.com/IntersectMBO/govtool/pull/4184), thanks @Cerkoryn)
+- Upgrade the frontend to React 19, React Router v8, TanStack Query v5 and Storybook v10; Node >= 22.22 is now required ([#4178](https://github.com/IntersectMBO/govtool/pull/4178))
+- Reintroduce "Random" sorting in the DRep Directory with pagination support ([#4113](https://github.com/IntersectMBO/govtool/pull/4113), thanks @Ojly)
+- Refactor filtering of voted-on proposals in Live Voting [Issue 4105](https://github.com/IntersectMBO/govtool/issues/4105) ([#4123](https://github.com/IntersectMBO/govtool/pull/4123), thanks @Ojly)
+- `GET /account/{stakeKey}` returns `isRegistered` and `isScriptBased` correctly in the TypeScript backend; the Haskell backend transposes them, so the two disagree on this endpoint ([#4217](https://github.com/IntersectMBO/govtool/pull/4217))
+- Update SECURITY.md to the current org-standard policy
+- Update @intersect.mbo/govtool-outcomes-pillar-ui to v1.5.10
 
 ### Removed
+
+- Remove the maintenance ending banner and its stale imports
+- Remove the Qovery-specific Dockerfile in favour of the standard one
+
+## [v2.0.36](https://github.com/IntersectMBO/govtool/compare/v2.0.35.3...v2.0.36) 2025-10-01
+
+### Fixed
+
+- Fix SQL counting the number of active CC members on preview ([#4089](https://github.com/IntersectMBO/govtool/pull/4089))
+- Fix invalid signature display on Governance Action details authors ([#4091](https://github.com/IntersectMBO/govtool/pull/4091), thanks @Ojly)
+- Fix filter and sorting icons wrapping to a new line [Issue 4062](https://github.com/IntersectMBO/govtool/issues/4062) (thanks @MiroZiel)
+- Fix DRep card being cut off [Issue 4094](https://github.com/IntersectMBO/govtool/issues/4094) (thanks @MiroZiel)
+
+### Changed
+
+- Update the banner text for Treasury Withdrawal
+- Update @intersect.mbo/pdf-ui to 1.0.15-beta
+
+## [v2.0.35.3](https://github.com/IntersectMBO/govtool/compare/v2.0.34...v2.0.35.3) 2025-09-18
+
+### Added
+
+- Add filter pills showing which filters are applied ([#4047](https://github.com/IntersectMBO/govtool/pull/4047), thanks @MiroZiel)
+
+### Fixed
+
+- Fix Governance Action page failing when the index is missing from the URL and no wallet is connected [Issue 4058](https://github.com/IntersectMBO/govtool/issues/4058) ([#4061](https://github.com/IntersectMBO/govtool/pull/4061), thanks @Ojly)
+- Fix filter and sorting icons wrapping to a new line [Issue 4062](https://github.com/IntersectMBO/govtool/issues/4062) (thanks @MiroZiel)
+- Fix Governance Action spacing ([#4082](https://github.com/IntersectMBO/govtool/pull/4082), thanks @Ojly)
+
+### Changed
+
+- Improve DRep search [Issue 4030](https://github.com/IntersectMBO/govtool/issues/4030) ([#4040](https://github.com/IntersectMBO/govtool/pull/4040), thanks @Ojly)
+- Unify and enhance the search experience in the Live Voting section [Issue 4008](https://github.com/IntersectMBO/govtool/issues/4008) ([#4056](https://github.com/IntersectMBO/govtool/pull/4056), thanks @Ojly)
+- Rename the DRep Directory sorting criterion from "Activity" to "Voting Activity" ([#4079](https://github.com/IntersectMBO/govtool/pull/4079), thanks @MiroZiel)
+- Update the footer [Issue 4075](https://github.com/IntersectMBO/govtool/issues/4075) (thanks @MiroZiel)
+- Update @intersect.mbo/govtool-outcomes-pillar-ui to v1.5.9 and @intersect.mbo/pdf-ui to 1.0.14-beta
+
+
+## [v2.0.34](https://github.com/IntersectMBO/govtool/compare/v2.0.33.3...v2.0.34) 2025-08-19
+
+### Fixed
+
+- Fix search no longer working after opening Governance Action details and returning to Live Voting [Issue 4020](https://github.com/IntersectMBO/govtool/issues/4020) ([#4026](https://github.com/IntersectMBO/govtool/pull/4026), thanks @Ojly)
+- Fix missing loader while typing or pasting into the search bar [Issue 4021](https://github.com/IntersectMBO/govtool/issues/4021) ([#4025](https://github.com/IntersectMBO/govtool/pull/4025), thanks @MiroZiel)
+
+
+## [v2.0.33.3](https://github.com/IntersectMBO/govtool/compare/v2.0.33...v2.0.33.3) 2025-08-13
+
+
+### Fixed
+
+- Fix the Live Voting Governance Action to Outcomes redirect ([#4011](https://github.com/IntersectMBO/govtool/pull/4011), thanks @Ojly)
+
+### Changed
+
+- Update the top banner copy after Info Action approval [Issue 4002](https://github.com/IntersectMBO/govtool/issues/4002) ([#4003](https://github.com/IntersectMBO/govtool/pull/4003), thanks @Ojly)
+- Update @intersect.mbo/govtool-outcomes-pillar-ui to v1.5.6 and @intersect.mbo/pdf-ui to 1.0.13-beta
+
+
+## [v2.0.33](https://github.com/IntersectMBO/govtool/compare/v2.0.32.1...v2.0.33) 2025-08-07
+
+### Added
+
+- Save governance metadata in GovTool ([#3961](https://github.com/IntersectMBO/govtool/pull/3961))
+
+### Fixed
+
+- Fix incorrect display of new committee parameters in Governance Action details [Issue 3954](https://github.com/IntersectMBO/govtool/issues/3954) ([#3981](https://github.com/IntersectMBO/govtool/pull/3981), thanks @Ciabas)
+- Handle IPFS links when validating vote context ([#3988](https://github.com/IntersectMBO/govtool/pull/3988))
+- Fix an empty governance actions list when returning from details after an idle period ([#3983](https://github.com/IntersectMBO/govtool/pull/3983))
+- Fix the disappearing governance actions list five minutes after returning from details ([#3986](https://github.com/IntersectMBO/govtool/pull/3986), thanks @MiroZiel)
+
+### Changed
+
+- Apply Haskell lint and formatting to the backend
+- Update @intersect.mbo/govtool-outcomes-pillar-ui to v1.5.5 and @intersect.mbo/pdf-ui to 1.0.11-beta
+
+
+## [v2.0.32.1](https://github.com/IntersectMBO/govtool/compare/v2.0.31.1...v2.0.32.1) 2025-07-26
+
+### Fixed
+
+- Match votes by transaction hash and index [Issue 3918](https://github.com/IntersectMBO/govtool/issues/3918) ([#3963](https://github.com/IntersectMBO/govtool/pull/3963))
+- Fix the Governance Action index in the URL being treated as an HTML anchor rather than a parameter ([#3962](https://github.com/IntersectMBO/govtool/pull/3962), thanks @Ojly)
+- Clear the search input when opening the DRep Directory ([#3960](https://github.com/IntersectMBO/govtool/pull/3960), thanks @MiroZiel)
+- Remove double filtering of proposals in the governance actions list ([#3959](https://github.com/IntersectMBO/govtool/pull/3959))
+- Refetch the proposal list when the voter changes ([#3967](https://github.com/IntersectMBO/govtool/pull/3967))
+- Fix search for a wallet with no DRep ([#3969](https://github.com/IntersectMBO/govtool/pull/3969), thanks @MiroZiel)
+
+### Changed
+
+- Revamp the GitHub Actions workflows ([#3971](https://github.com/IntersectMBO/govtool/pull/3971))
+
+## [v2.0.31.1](https://github.com/IntersectMBO/govtool/compare/v2.0.31...v2.0.31.1) 2025-07-24
+
+### Fixed
+
+- Fix opening governance actions in a new tab from the Live Voting page ([#3951](https://github.com/IntersectMBO/govtool/pull/3951), thanks @Ojly)
+- Fix the "Voted on by me" search ([#3953](https://github.com/IntersectMBO/govtool/pull/3953), thanks @MiroZiel)
+
+### Removed
+
+- Revert the earlier "View Details and Vote" change ([#3947](https://github.com/IntersectMBO/govtool/pull/3947))
+
+## [v2.0.31](https://github.com/IntersectMBO/govtool/compare/v2.0.30...v2.0.31) 2025-07-23
+
+### Added
+
+- Allow opening governance actions in a new tab from the Live Voting page ([#3937](https://github.com/IntersectMBO/govtool/pull/3937), thanks @Ojly)
+
+### Fixed
+
+- Fix disappearing proposals in the governance actions list for the same tx hashes [Issue 3918](https://github.com/IntersectMBO/govtool/issues/3918) ([#3938](https://github.com/IntersectMBO/govtool/pull/3938))
+- Prevent caching of empty result sets in the backend ([#3942](https://github.com/IntersectMBO/govtool/pull/3942))
+- Fix the comment count ([#3922](https://github.com/IntersectMBO/govtool/pull/3922), thanks @kneerose)
+
+### Changed
+
+- Update @intersect.mbo/govtool-outcomes-pillar-ui to v1.5.3
+
+## [v2.0.30](https://github.com/IntersectMBO/govtool/compare/v2.0.29...v2.0.30) 2025-07-20
+
+### Fixed
+
+- Match the transaction hash exactly when looking up a proposal ([#3912](https://github.com/IntersectMBO/govtool/pull/3912))
+
+### Changed
+
+- Update @intersect.mbo/govtool-outcomes-pillar-ui to v1.5.2
 
 ## [v2.0.29](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.29) 2025-07-16
 
@@ -49,8 +223,6 @@ changes.
 - Adjust top menu (navbar) layout when wallet is not connected [Issue-3682](https://github.com/IntersectMBO/govtool/issues/3682)
 - Unification of sections 'Receiving Address' and 'Amount' in Treasury Withdrawal Governance Action [Issue-3828](https://github.com/IntersectMBO/govtool/issues/3828)
 
-### Removed
-
 ## [v2.0.23](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.23) 2025-05-22
 
 ### Added
@@ -64,13 +236,7 @@ changes.
 
 - Fix displaying proposals title in details page [Issue 3192](https://github.com/IntersectMBO/govtool/issues/3192)
 
-### Changed
-
-### Removed
-
 ## [v2.0.22](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.22) 2025-05-15
-
-### Added
 
 ### Fixed
 
@@ -78,10 +244,6 @@ changes.
 - Fix app crash on unhandled wallet error [Issue 3123](https://github.com/IntersectMBO/govtool/issues/3123)
 - Preserve new lines in markdown text [Issue 2712](https://github.com/IntersectMBO/govtool/issues/2712)
 - Add scroll to markdown tables [Issue 3615](https://github.com/IntersectMBO/govtool/issues/3615)
-
-### Changed
-
-### Removed
 
 ## [v2.0.21](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.21) 2025-05-09
 
@@ -124,8 +286,6 @@ changes.
 
 - Change budget proposal nav item label
 
-### Removed
-
 ## [v2.0.19](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.19) 2025-03-31
 
 ### Added
@@ -135,10 +295,6 @@ changes.
 ### Fixed
 
 - Fix missing redirect to outcomes on wallet disconnected state [Issue 3230](https://github.com/IntersectMBO/govtool/issues/3230)
-
-### Changed
-
-### Removed
 
 ## [v2.0.18](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.18) 2025-03-26
 
@@ -152,8 +308,6 @@ changes.
 ### Fixed
 
 - Fix post-vote navigation to governance action list [Issue 3242](https://github.com/IntersectMBO/govtool/issues/3242)
-
-### Changed
 
 ## [v2.0.4](https://github.com/IntersectMBO/govtool/releases/tag/v2.0.4) 2025-01-07
 

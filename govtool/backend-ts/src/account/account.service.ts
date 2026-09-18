@@ -1,3 +1,4 @@
+import { safeDbInteger } from 'src/common/integer';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 import { assertHexText } from 'src/common/hex';
@@ -30,7 +31,7 @@ export class AccountService {
     const row = result.rows[0];
 
     return {
-      id: Number(row.id),
+      id: safeDbInteger(row.id),
       view: row.view,
       isRegistered: row.is_registered,
       isScriptBased: row.is_script_based,

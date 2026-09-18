@@ -1,4 +1,6 @@
 import { VoteService } from './drep/vote.service';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { IntegerJsonInterceptor } from './common/integer-json.interceptor';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -33,7 +35,7 @@ import { SurveyService } from './survey/survey.service';
 @Module({
   imports: [MetadataModule],
   controllers: [AppController, HealthController, NetworkController, EpochController, TransactionController, AdaHolderController, AccountController,DRepController,ProposalController,IpfsController,SystemController,SurveyController],
-  providers: [VoteService, AppService, ConfigService, DbService, NetworkService, SqlService, EpochService, TransactionService, AdaHolderService, AccountService, DRepService,ProposalService,IpfsService,CacheService,CacheWarmerService,SurveyService],
+  providers: [{ provide: APP_INTERCEPTOR, useClass: IntegerJsonInterceptor }, VoteService, AppService, ConfigService, DbService, NetworkService, SqlService, EpochService, TransactionService, AdaHolderService, AccountService, DRepService,ProposalService,IpfsService,CacheService,CacheWarmerService,SurveyService],
   exports: [ConfigService, DbService]
 })
 export class AppModule {}

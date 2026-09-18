@@ -1,3 +1,4 @@
+import { dbInteger, safeDbInteger, compareIntegers, ApiInteger } from 'src/common/integer';
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 
 import { assertHexText } from "src/common/hex";
@@ -25,7 +26,7 @@ export class DRepService {
         private readonly voteService: VoteService,
     ){}
 
-    async getVotingPower(drepId: string): Promise<number> {
+    async getVotingPower(drepId: string): Promise<ApiInteger> {
        return this.cacheService.getOrSet('drepVotingPower',drepId,async()=> {
          assertHexText(drepId);
 
@@ -36,7 +37,7 @@ export class DRepService {
             return 0;
         }
 
-        return this.toInteger(result.rows[0].amount);
+        return dbInteger(result.rows[0].amount);
        });
     }
 
@@ -64,7 +65,7 @@ export class DRepService {
         return rows.map((row)=> ({
             view: row.view,
             hashRaw: row.hash_raw,
-            votingPower: this.toInteger(row.voting_power),
+            votingPower: dbInteger(row.voting_power),
             givenName: row.given_name,
         }));
        });
@@ -93,10 +94,10 @@ export class DRepService {
             wasRegisteredAsDRep: row.was_registered_as_drep ?? false,
             isRegisteredAsSoleVoter: row.is_registered_as_sole_voter ?? false,
             wasRegisteredAsSoleVoter: row.was_registered_as_sole_voter ?? false,
-            deposit: this.toNullableInteger(row.deposit),
+            deposit: (row.deposit === null ? null : dbInteger(row.deposit)),
             url: row.url,
             dataHash: row.data_hash,
-            votingPower: this.toNullableInteger(row.voting_power),
+            votingPower: (row.voting_power === null ? null : dbInteger(row.voting_power)),
             dRepRegisterTxHash: row.drep_register_tx_hash,
             dRepRetireTxHash: row.drep_retire_tx_hash,
             soleVoterRegisterTxHash: row.sole_voter_register_tx_hash,
@@ -231,8 +232,8 @@ export class DRepService {
     }
 
     private toDRepListItem(row: DRepList): DRepListItem {
-        const deposit = this.toInteger(row.deposit);
-        const latestDeposit = this.toInteger(row.latest_deposit);
+        const deposit = dbInteger(row.deposit);
+        const latestDeposit = dbInteger(row.latest_deposit);
 
         return {
             isScriptBased: row.has_script,
@@ -241,7 +242,7 @@ export class DRepService {
             url: row.url,
             metadataHash: row.metadata_hash,
             deposit,
-            votingPower: this.toNullableInteger(row.amount),
+            votingPower: (row.amount === null ? null : dbInteger(row.amount)),
             status: this.toDRepStatus(row.active, deposit),
             type: this.toDRepType(latestDeposit, row.url, row.has_non_deregister_voting_anchor),
             latestTxHash: row.tx_hash,
@@ -260,7 +261,7 @@ export class DRepService {
         };
     }
 
-    private toDRepStatus(active: boolean, deposit: number): DRepStatus {
+    private toDRepStatus(active: boolean, deposit: ApiInteger): DRepStatus {
         if (deposit < 0) {
             return 'Retired';
         }
@@ -269,7 +270,7 @@ export class DRepService {
     }
 
     private toDRepType(
-        latestDeposit: number,
+        latestDeposit: ApiInteger,
         url: string | null,
         hasNonDeregisterVotingAnchor: boolean | null,
         ): DRepType {
@@ -298,7 +299,7 @@ export class DRepService {
         switch (sort) {
             case 'VotingPower':
             return copied.sort(
-                (a, b) => (b.votingPower ?? -1) - (a.votingPower ?? -1),
+                (a, b) => compareIntegers(b.votingPower ?? -1, a.votingPower ?? -1),
             );
 
             case 'Activity':
@@ -356,9 +357,9 @@ export class DRepService {
         return new Date(value).toISOString();
     }
 
-    private toInteger(value: number | string): number {
-        return Math.floor(Number(value));
-    }
+  private toInteger(value: number | string): number {
+    return safeDbInteger(value);
+  }
 
     private toNullableInteger(value: number | string | null): number | null {
         if (value === null) {

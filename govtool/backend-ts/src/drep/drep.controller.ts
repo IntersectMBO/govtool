@@ -1,12 +1,13 @@
+import { drepStatuses, drepListSorts } from './drep.type';
+import { queryEnum, queryEnums } from 'src/common/query-enum';
+import { governanceActionTypes, governanceActionSortModes } from 'src/proposal/proposal.type';
+import type { ApiInteger } from 'src/common/integer';
 import { parsePageValue } from 'src/common/pagination';
 import { Controller, Get, Param, Query } from '@nestjs/common';
 
 import { DRepService } from './drep.service';
-import { DRepInfoResponse, DRepVotingPowerListResponse , DRepListResponse, DRepStatus,VoteResponse} from './drep.type';
+import { DRepInfoResponse, DRepVotingPowerListResponse , DRepListResponse, VoteResponse} from './drep.type';
 import type { DRepListSort} from './drep.type';
-import {
-  GovernanceActionType,
-} from 'src/proposal/proposal.type';
 import type {  GovernanceActionSortMode} from 'src/proposal/proposal.type';
 
 
@@ -15,7 +16,7 @@ export class DRepController {
   constructor(private readonly drepService: DRepService) {}
 
   @Get('get-voting-power/:drepId')
-  getVotingPower(@Param('drepId') drepId: string): Promise<number> {
+  getVotingPower(@Param('drepId') drepId: string): Promise<ApiInteger> {
     return this.drepService.getVotingPower(drepId);
   }
 
@@ -41,8 +42,8 @@ export class DRepController {
     ): Promise<VoteResponse[]> {
     return this.drepService.getVotes(
         drepId,
-        [...this.normalizeQueryArray(type), ...this.normalizeQueryArray(typeArray)] as GovernanceActionType[],
-        sort,
+        queryEnums(type, typeArray, governanceActionTypes, 'type'),
+        queryEnum(sort, governanceActionSortModes, 'sort'),
         search,
     );
 }
@@ -60,11 +61,8 @@ export class DRepController {
     ): Promise<DRepListResponse> {
   return this.drepService.list({
     search,
-    status: [
-      ...this.normalizeQueryArray(status),
-      ...this.normalizeQueryArray(statusArray),
-    ] as DRepStatus[],
-    sort,
+    status: queryEnums(status, statusArray, drepStatuses, 'status'),
+    sort: queryEnum(sort, drepListSorts, 'sort'),
     page: parsePageValue(page, 0, 'page'),
     pageSize: parsePageValue(pageSize, 10, 'pageSize'),
     seed,

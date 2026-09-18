@@ -1,3 +1,5 @@
+import { queryEnum, queryEnums } from 'src/common/query-enum';
+import { governanceActionTypes, governanceActionSortModes } from 'src/proposal/proposal.type';
 import { parsePageValue } from 'src/common/pagination';
 import { Controller, Get, Param, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
@@ -25,8 +27,8 @@ export class ProposalController {
     @Query('search') search?: string,
   ): Promise<ListProposalsResponse> {
     return this.proposalService.list({
-      type: [...this.normalizeQueryArray(type), ...this.normalizeQueryArray(typeArray)] as GovernanceActionType[],
-      sort,
+      type: queryEnums(type, typeArray, governanceActionTypes, 'type'),
+      sort: queryEnum(sort, governanceActionSortModes, 'sort'),
       page: parsePageValue(page, 0, 'page'),
       pageSize: parsePageValue(pageSize, 10, 'pageSize'),
       drepId,
@@ -47,15 +49,8 @@ export class ProposalController {
     @Query('type') type: GovernanceActionType | undefined,
     @Res() response: Response,
   ): Promise<void> {
-    const details = await this.proposalService.getEnactedDetails(type);
+    const details = await this.proposalService.getEnactedDetails(queryEnum(type, governanceActionTypes, 'type'));
     response.status(200).json(details);
   }
 
-  private normalizeQueryArray(value?: string | string[]): string[] {
-    if (value === undefined) {
-      return [];
-    }
-
-    return Array.isArray(value) ? value : [value];
-  }
 }

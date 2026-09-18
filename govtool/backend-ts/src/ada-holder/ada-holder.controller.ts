@@ -1,3 +1,4 @@
+import type { ApiInteger } from 'src/common/integer';
 import { Controller, Get, Param, Res } from '@nestjs/common';
 import type { Response } from 'express';
 
@@ -17,7 +18,7 @@ export class AdaHolderController {
   }
 
   @Get('get-voting-power/:stakeKey')
-  getVotingPower(@Param('stakeKey') stakeKey: string): Promise<number> {
+  getVotingPower(@Param('stakeKey') stakeKey: string): Promise<ApiInteger> {
     return this.adaHolderService.getVotingPower(stakeKey);
   }
 }

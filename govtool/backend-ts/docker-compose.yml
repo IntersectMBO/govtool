@@ -7,6 +7,7 @@ services:
       - "${VVA_PORT:-9999}:9999"
     environment:
       NODE_ENV: production
+      VVA_PINATAAPIJWT: ${VVA_PINATAAPIJWT:-}
       IPFS_GATEWAY: ${IPFS_GATEWAY:-}
       IPFS_PROJECT_ID: ${IPFS_PROJECT_ID:-}
       VVA_CACHEMAXENTRIES: ${VVA_CACHEMAXENTRIES:-256}

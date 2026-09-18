@@ -1,3 +1,4 @@
+import { dbInteger, safeDbInteger } from 'src/common/integer';
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 
 import { DbService } from "src/db/db.service";
@@ -56,10 +57,10 @@ export class NetworkService {
 
     const row = result.rows[0];
     return {
-      totalStakeControlledByDReps: this.toInteger(row.total_stake_controlled_by_active_dreps),
-      totalStakeControlledBySPOs: this.toInteger(row.total_stake_controlled_by_spos),
-      alwaysAbstainVotingPower: this.toInteger(row.always_abstain_voting_power),
-      alwaysNoConfidenceVotingPower: this.toInteger(row.always_no_confidence_voting_power),
+      totalStakeControlledByDReps: dbInteger(row.total_stake_controlled_by_active_dreps),
+      totalStakeControlledBySPOs: dbInteger(row.total_stake_controlled_by_spos),
+      alwaysAbstainVotingPower: dbInteger(row.always_abstain_voting_power),
+      alwaysNoConfidenceVotingPower: dbInteger(row.always_no_confidence_voting_power),
     };
       });
   }
@@ -81,7 +82,7 @@ export class NetworkService {
       totalGovernanceActions: this.toInteger(row.total_gov_action_proposals),
       totalDRepVotes: this.toInteger(row.total_drep_votes),
       totalRegisteredDReps: this.toInteger(row.total_registered_dreps),
-      totalDRepDistr: this.toInteger(row.total_drep_distr),
+      totalDRepDistr: dbInteger(row.total_drep_distr ?? 0),
       totalActiveDReps: this.toInteger(row.total_active_dreps),
       totalInactiveDReps: this.toInteger(row.total_inactive_dreps),
       totalActiveCIP119CompliantDReps: this.toInteger(
@@ -95,14 +96,9 @@ export class NetworkService {
     });
   }
 
-    private toInteger(value: number | string ) : number {
-        const parsed = Number(value);
-
-        if (!Number.isInteger(parsed)) {
-            throw this.criticalError('Unexpected non-integer value returned from database.');
-        }
-        return parsed;
-    }    
+  private toInteger(value: number | string): number {
+    return safeDbInteger(value);
+  }
 
     private criticalError(message: string): InternalServerErrorException {
         return new InternalServerErrorException({

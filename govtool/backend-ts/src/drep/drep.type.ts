@@ -1,3 +1,4 @@
+import type { ApiInteger } from 'src/common/integer';
 import { ProposalResponse } from 'src/proposal/proposal.type';
 export type DRepVotingPower = {
     amount: number | string;
@@ -13,14 +14,16 @@ export type DRepVotingPowerList = {
 export type DRepVotingPowerListResponse = {
   view: string;
   hashRaw: string;
-  votingPower: number;
+  votingPower: ApiInteger;
   givenName: string | null;
 };
 
-export type DRepStatus = 'Active' | 'Inactive' | 'Retired';
+export const drepStatuses = ['Active', 'Inactive', 'Retired'] as const;
+export type DRepStatus = (typeof drepStatuses)[number];
 export type DRepType = 'DRep' | 'SoleVoter';
 
-export type DRepListSort = 'Random' | 'VotingPower' | 'Activity' | 'RegistrationDate' | 'Status';
+export const drepListSorts = ['Random', 'VotingPower', 'Activity', 'RegistrationDate', 'Status'] as const;
+export type DRepListSort = (typeof drepListSorts)[number];
 
 
 export type DRepInfo = {
@@ -52,10 +55,10 @@ export type DRepInfoResponse = {
   wasRegisteredAsDRep: boolean;
   isRegisteredAsSoleVoter: boolean;
   wasRegisteredAsSoleVoter: boolean;
-  deposit: number | null;
+  deposit: ApiInteger | null;
   url: string | null;
   dataHash: string | null;
-  votingPower: number | null;
+  votingPower: ApiInteger | null;
   dRepRegisterTxHash: string | null;
   dRepRetireTxHash: string | null;
   soleVoterRegisterTxHash: string | null;
@@ -101,8 +104,8 @@ export type DRepListItem = {
   view: string;
   url: string | null;
   metadataHash: string | null;
-  deposit: number;
-  votingPower: number | null;
+  deposit: ApiInteger;
+  votingPower: ApiInteger | null;
   status: DRepStatus;
   type: DRepType;
   latestTxHash: string | null;

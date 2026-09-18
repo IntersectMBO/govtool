@@ -1,3 +1,4 @@
+import { safeDbInteger } from 'src/common/integer';
 import { Injectable } from '@nestjs/common';
 import { assertHexText } from 'src/common/hex';
 import { DbService } from 'src/db/db.service';
@@ -31,7 +32,7 @@ export class VoteService {
       vote: row.vote,
       url: row.url,
       metadataHash: row.doc_hash,
-      epochNo: Number(row.epoch_no),
+      epochNo: safeDbInteger(row.epoch_no),
       date: new Date(row.date).toISOString(),
       txHash: row.vote_tx_hash,
     };

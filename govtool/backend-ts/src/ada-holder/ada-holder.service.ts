@@ -1,3 +1,4 @@
+import { dbInteger, ApiInteger } from 'src/common/integer';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 import { assertHexText } from 'src/common/hex';
@@ -45,33 +46,16 @@ export class AdaHolderService {
     });
   }
 
-  async getVotingPower(stakeKey: string): Promise<number> {
+  async getVotingPower(stakeKey: string): Promise<ApiInteger> {
    return this.cacheService.getOrSet('adaHolderVotingPower',stakeKey,async()=> {
      assertHexText(stakeKey);
 
     const sql = this.sqlService.load('get-stake-key-voting-power.sql');
 
-    try {
-      const result = await this.dbService.query<VotingPowerRow>(sql, [stakeKey]);
-
-      if (result.rows.length !== 1) {
-        return 0;
-      }
-
-      return this.toInteger(result.rows[0].total_balance);
-    } catch {
-      return 0;
-    }
+    const result = await this.dbService.query<VotingPowerRow>(sql, [stakeKey]).catch(() => null);
+    if (!result || result.rows.length !== 1) return 0;
+    return dbInteger(result.rows[0].total_balance);
    });
   }
 
-  private toInteger(value: number | string): number {
-    const parsed = Number(value);
-
-    if (!Number.isFinite(parsed)) {
-      return 0;
-    }
-
-    return Math.floor(parsed);
-  }
 }

@@ -1,3 +1,4 @@
+import { dbInteger, safeDbInteger, compareIntegers } from 'src/common/integer';
 import {
   Injectable,
   InternalServerErrorException,
@@ -105,10 +106,7 @@ export class ProposalService {
   async getEnactedDetails(
     type?: GovernanceActionType,
   ): Promise<EnactedProposalDetailsResponse | null> {
-    const proposalType =
-      type === 'ParameterChange' || type === 'HardForkInitiation'
-        ? type
-        : 'HardForkInitiation';
+    const proposalType = type ?? 'HardForkInitiation';
 
     const sql = this.sqlService.load(
       'get-previous-enacted-governance-action-proposal-details.sql',
@@ -159,15 +157,15 @@ export class ProposalService {
       abstract: row.abstract,
       motivation: row.motivation,
       rationale: row.rationale,
-      dRepYesVotes: this.toInteger(row.yes_votes),
-      dRepNoVotes: this.toInteger(row.no_votes),
-      dRepAbstainVotes: this.toInteger(row.abstain_votes),
-      poolYesVotes: this.toInteger(row.pool_yes_votes),
-      poolNoVotes: this.toInteger(row.pool_no_votes),
-      poolAbstainVotes: this.toInteger(row.pool_abstain_votes),
-      ccYesVotes: this.toInteger(row.cc_yes_votes),
-      ccNoVotes: this.toInteger(row.cc_no_votes),
-      ccAbstainVotes: this.toInteger(row.cc_abstain_votes),
+      dRepYesVotes: dbInteger(row.yes_votes),
+      dRepNoVotes: dbInteger(row.no_votes),
+      dRepAbstainVotes: dbInteger(row.abstain_votes),
+      poolYesVotes: dbInteger(row.pool_yes_votes),
+      poolNoVotes: dbInteger(row.pool_no_votes),
+      poolAbstainVotes: dbInteger(row.pool_abstain_votes),
+      ccYesVotes: dbInteger(row.cc_yes_votes),
+      ccNoVotes: dbInteger(row.cc_no_votes),
+      ccAbstainVotes: dbInteger(row.cc_abstain_votes),
       prevGovActionIndex: this.toNullableInteger(row.prev_gov_action_index),
       prevGovActionTxHash: row.prev_gov_action_tx_hash,
       json: row.json_content,
@@ -231,7 +229,7 @@ export class ProposalService {
 
       case 'MostYesVotes':
         return copied.sort(
-          (a, b) => this.totalYesVotes(b) - this.totalYesVotes(a),
+          (a, b) => compareIntegers(this.totalYesVotes(b), this.totalYesVotes(a)),
         );
 
       default:
@@ -239,8 +237,8 @@ export class ProposalService {
     }
   }
 
-  private totalYesVotes(proposal: ProposalResponse): number {
-    return proposal.dRepYesVotes + proposal.poolYesVotes + proposal.ccYesVotes;
+  private totalYesVotes(proposal: ProposalResponse): bigint {
+    return BigInt(proposal.dRepYesVotes) + BigInt(proposal.poolYesVotes) + BigInt(proposal.ccYesVotes);
   }
 
   private nullableDateSortValue(value: string | null): number {
@@ -288,7 +286,7 @@ export class ProposalService {
   }
 
   private toInteger(value: number | string): number {
-    return Math.floor(Number(value));
+    return safeDbInteger(value);
   }
 
   private toNullableInteger(value: number | string | null): number | null {

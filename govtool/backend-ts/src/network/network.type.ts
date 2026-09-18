@@ -1,3 +1,4 @@
+import type { ApiInteger } from 'src/common/integer';
 export type NetworkInfo = {
     current_epoch: number | string | null;
     current_block: number | string | null;
@@ -21,10 +22,10 @@ export type NetworkTotalStake = {
 };
 
 export type GetNetworkTotalStakeResponse = {
-  totalStakeControlledByDReps: number;
-  totalStakeControlledBySPOs: number;
-  alwaysAbstainVotingPower: number;
-  alwaysNoConfidenceVotingPower: number;
+  totalStakeControlledByDReps: ApiInteger;
+  totalStakeControlledBySPOs: ApiInteger;
+  alwaysAbstainVotingPower: ApiInteger;
+  alwaysNoConfidenceVotingPower: ApiInteger;
 };
 
 export type NetworkMetrics = {
@@ -33,7 +34,7 @@ export type NetworkMetrics = {
   total_gov_action_proposals: number | string;
   total_drep_votes: number | string;
   total_registered_dreps: number | string;
-  total_drep_distr: number | string;
+  total_drep_distr: number | string | null;
   total_active_dreps: number | string;
   total_inactive_dreps: number | string;
   total_active_cip119_compliant_dreps: number | string;
@@ -49,7 +50,7 @@ export type GetNetworkMetricsResponse = {
   totalGovernanceActions: number;
   totalDRepVotes: number;
   totalRegisteredDReps: number;
-  totalDRepDistr: number;
+  totalDRepDistr: ApiInteger;
   totalActiveDReps: number;
   totalInactiveDReps: number;
   totalActiveCIP119CompliantDReps: number;

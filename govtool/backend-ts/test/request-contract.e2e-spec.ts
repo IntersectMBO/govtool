@@ -11,7 +11,10 @@ import { IpfsService } from '../src/ipfs/ipfs.service';
 
 describe('HTTP input contracts', () => {
   let app: INestApplication;
-  const proposals = { list: jest.fn(async (params) => params) };
+  const proposals = {
+    list: jest.fn(async (params) => params),
+    getEnactedDetails: jest.fn(async () => null),
+  };
   const dreps = {
     list: jest.fn(async (params) => params),
     getVotes: jest.fn(async (_id, types) => types),
@@ -77,6 +80,40 @@ describe('HTTP input contracts', () => {
       .get('/drep/getVotes/ab?type[]=InfoAction&type[]=NoConfidence')
       .expect(200)
       .expect(['InfoAction', 'NoConfidence']);
+  });
+  it.each([
+    '/proposal/list?type=invalid',
+    '/proposal/list?type[]=invalid',
+    '/proposal/list?type=InfoAction&type[]=invalid',
+    '/proposal/list?sort=invalid',
+    '/proposal/list?sort=NewestCreated&sort=MostYesVotes',
+    '/proposal/enacted-details?type=invalid',
+    '/proposal/enacted-details?type=',
+    '/drep/getVotes/ab?type=invalid',
+    '/drep/getVotes/ab?type[]=invalid',
+    '/drep/getVotes/ab?sort=invalid',
+    '/drep/list?status=invalid',
+    '/drep/list?status[]=invalid',
+    '/drep/list?sort=invalid',
+    '/drep/list?status=',
+  ])('rejects invalid enum request %s', async (url) => {
+    await request(app.getHttpServer()).get(url).expect(400);
+  });
+  it('accepts valid enum values and omitted optional values', async () => {
+    await request(app.getHttpServer())
+      .get('/proposal/list?type=InfoAction&sort=MostYesVotes')
+      .expect(200);
+    await request(app.getHttpServer())
+      .get('/drep/list?status=Active&status[]=Retired&sort=VotingPower')
+      .expect(200);
+    await request(app.getHttpServer())
+      .get('/proposal/enacted-details?type=InfoAction')
+      .expect(200);
+    expect(proposals.getEnactedDetails).toHaveBeenLastCalledWith('InfoAction');
+    await request(app.getHttpServer())
+      .get('/proposal/enacted-details')
+      .expect(200);
+    expect(proposals.getEnactedDetails).toHaveBeenLastCalledWith(undefined);
   });
   it('returns 415 for unsupported upload types and accepts plain text', async () => {
     await request(app.getHttpServer())

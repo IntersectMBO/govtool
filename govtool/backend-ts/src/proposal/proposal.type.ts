@@ -1,18 +1,10 @@
+import type { ApiInteger } from 'src/common/integer';
 import type { VoteParams } from '../drep/drep.type';
 
-export type GovernanceActionType =
-  | 'ParameterChange'
-  | 'HardForkInitiation'
-  | 'TreasuryWithdrawals'
-  | 'NoConfidence'
-  | 'NewCommittee'
-  | 'NewConstitution'
-  | 'InfoAction';
-
-export type GovernanceActionSortMode =
-  | 'SoonestToExpire'
-  | 'NewestCreated'
-  | 'MostYesVotes';
+export const governanceActionTypes = ['ParameterChange', 'HardForkInitiation', 'TreasuryWithdrawals', 'NoConfidence', 'NewCommittee', 'NewConstitution', 'InfoAction'] as const;
+export type GovernanceActionType = (typeof governanceActionTypes)[number];
+export const governanceActionSortModes = ['SoonestToExpire', 'NewestCreated', 'MostYesVotes'] as const;
+export type GovernanceActionSortMode = (typeof governanceActionSortModes)[number];
 
 export type Proposal = {
   id: number | string;
@@ -63,15 +55,15 @@ export type ProposalResponse = {
   abstract: string | null;
   motivation: string | null;
   rationale: string | null;
-  dRepYesVotes: number;
-  dRepNoVotes: number;
-  dRepAbstainVotes: number;
-  poolYesVotes: number;
-  poolNoVotes: number;
-  poolAbstainVotes: number;
-  ccYesVotes: number;
-  ccNoVotes: number;
-  ccAbstainVotes: number;
+  dRepYesVotes: ApiInteger;
+  dRepNoVotes: ApiInteger;
+  dRepAbstainVotes: ApiInteger;
+  poolYesVotes: ApiInteger;
+  poolNoVotes: ApiInteger;
+  poolAbstainVotes: ApiInteger;
+  ccYesVotes: ApiInteger;
+  ccNoVotes: ApiInteger;
+  ccAbstainVotes: ApiInteger;
   prevGovActionIndex: number | null;
   prevGovActionTxHash: string | null;
   json: unknown | null;

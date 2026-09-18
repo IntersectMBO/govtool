@@ -1,3 +1,4 @@
+import { safeDbInteger } from 'src/common/integer';
 import { Injectable,Logger,OnModuleDestroy,OnModuleInit } from "@nestjs/common";
 import { DbService } from "src/db/db.service";
 import { DRepService } from "src/drep/drep.service";
@@ -75,7 +76,7 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
       return null;
     }
 
-    return Number(blockNo);
+    return safeDbInteger(blockNo);
   }
 
 }

@@ -1,6 +1,6 @@
 import { queryEnum, queryEnums } from 'src/common/query-enum';
 import { governanceActionTypes, governanceActionSortModes } from 'src/proposal/proposal.type';
-import { parsePageValue } from 'src/common/pagination';
+import { MAX_PAGE_SIZE, parsePageValue } from 'src/common/pagination';
 import { Controller, Get, Param, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
 
@@ -30,7 +30,7 @@ export class ProposalController {
       type: queryEnums(type, typeArray, governanceActionTypes, 'type'),
       sort: queryEnum(sort, governanceActionSortModes, 'sort'),
       page: parsePageValue(page, 0, 'page'),
-      pageSize: parsePageValue(pageSize, 10, 'pageSize'),
+      pageSize: parsePageValue(pageSize, 10, 'pageSize', MAX_PAGE_SIZE),
       drepId,
       search,
     });

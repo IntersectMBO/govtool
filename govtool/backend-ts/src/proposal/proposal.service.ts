@@ -79,7 +79,8 @@ export class ProposalService {
       assertHexText(drepId);
     }
 
-    const proposals = await this.getProposals(`${txHash}#${index}`);
+    const govActionId = `${txHash.toLowerCase()}#${index}`;
+    const proposals = await this.findByGovActionIds(new Set([govActionId]));
 
     if (proposals.length === 0) {
       throw new NotFoundException({
@@ -96,7 +97,7 @@ export class ProposalService {
     }
 
     const votes = drepId ? await this.voteService.getVotes(drepId) : [];
-    const vote = votes.find((row) => row.gov_action_id === `${txHash.toLowerCase()}#${index}`);
+    const vote = votes.find((row) => row.gov_action_id === govActionId);
     return {
       proposal: proposals[0],
       vote: vote ? this.voteService.toVoteParams(vote) : null,
@@ -137,6 +138,28 @@ export class ProposalService {
     search,
     () => this.fetchProposals(search),
   );
+  }
+
+  govActionId(proposal: ProposalResponse): string {
+    return `${proposal.txHash}#${proposal.index}`;
+  }
+
+  // The snapshot is gated by the same ActiveProposals join as a per-id query, so it
+  // holds exactly the rows such a query would return. Matching ids against it keeps
+  // one cached read in place of a full proposal query per id, and never matches a
+  // proposal that merely quotes the id in its metadata text.
+  async findByGovActionIds(
+    govActionIds: ReadonlySet<string>,
+  ): Promise<ProposalResponse[]> {
+    if (govActionIds.size === 0) {
+      return [];
+    }
+
+    const proposals = await this.getProposals('');
+
+    return proposals.filter((proposal) =>
+      govActionIds.has(this.govActionId(proposal)),
+    );
   }
 
   private toProposalResponse(row: Proposal): ProposalResponse {
@@ -195,7 +218,7 @@ export class ProposalService {
     const searchLower = search.toLowerCase();
 
     return proposals.filter((proposal) => {
-      const govActionId = `${proposal.txHash}#${proposal.index}`;
+      const govActionId = this.govActionId(proposal);
       const values = [
         govActionId,
         proposal.title,

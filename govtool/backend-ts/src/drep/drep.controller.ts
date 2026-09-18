@@ -2,7 +2,7 @@ import { drepStatuses, drepListSorts } from './drep.type';
 import { queryEnum, queryEnums } from 'src/common/query-enum';
 import { governanceActionTypes, governanceActionSortModes } from 'src/proposal/proposal.type';
 import type { ApiInteger } from 'src/common/integer';
-import { parsePageValue } from 'src/common/pagination';
+import { MAX_PAGE_SIZE, parsePageValue } from 'src/common/pagination';
 import { Controller, Get, Param, Query } from '@nestjs/common';
 
 import { DRepService } from './drep.service';
@@ -64,7 +64,7 @@ export class DRepController {
     status: queryEnums(status, statusArray, drepStatuses, 'status'),
     sort: queryEnum(sort, drepListSorts, 'sort'),
     page: parsePageValue(page, 0, 'page'),
-    pageSize: parsePageValue(pageSize, 10, 'pageSize'),
+    pageSize: parsePageValue(pageSize, 10, 'pageSize', MAX_PAGE_SIZE),
     seed,
   });
 

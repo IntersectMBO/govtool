@@ -113,11 +113,50 @@ describe('DRep vote parity', () => {
   });
   it('returns the matching own vote only when supplied and present', async () => {
     const { proposals } = setup();
-    jest.spyOn(proposals, 'getProposals').mockResolvedValue([proposal]);
+    jest
+      .spyOn(proposals, 'getProposals')
+      .mockResolvedValue([proposal, { ...proposal, index: 1 }]);
     expect((await proposals.get(`${hash}#0`, 'ab')).vote).toMatchObject({
       vote: 'yes',
     });
     expect((await proposals.get(`${hash}#1`, 'ab')).vote).toBeNull();
     expect((await proposals.get(`${hash}#0`)).vote).toBeNull();
+  });
+  it('resolves a proposal by id, not by metadata text that quotes the id', async () => {
+    const { proposals } = setup();
+    const quoting = {
+      ...proposal,
+      index: 7,
+      rationale: `supersedes ${hash}#0`,
+    } as ProposalResponse;
+    jest
+      .spyOn(proposals, 'getProposals')
+      .mockResolvedValue([proposal, quoting]);
+    expect((await proposals.get(`${hash}#0`)).proposal.index).toBe(0);
+    await expect(proposals.get(`${hash}#9`)).rejects.toThrow(/not found/);
+  });
+  it('reads the proposal snapshot once and never duplicates a vote', async () => {
+    const { db, sql, c, votes, proposals } = setup();
+    db.query.mockResolvedValue({
+      rows: [row, { ...row, gov_action_id: `${hash}#1`, proposal_id: '10' }],
+    });
+    const quoting = {
+      ...proposal,
+      index: 7,
+      rationale: `supersedes ${hash}#0 and ${hash}#1`,
+    } as ProposalResponse;
+    const snapshot = jest
+      .spyOn(proposals, 'getProposals')
+      .mockResolvedValue([proposal, { ...proposal, index: 1 }, quoting]);
+    const dreps = new DRepService(
+      db as unknown as DbService,
+      sql as unknown as SqlService,
+      proposals,
+      c,
+      votes,
+    );
+    const result = await dreps.getVotes('ab');
+    expect(snapshot).toHaveBeenCalledTimes(1);
+    expect(result.map((entry) => entry.proposal.index).sort()).toEqual([0, 1]);
   });
 });

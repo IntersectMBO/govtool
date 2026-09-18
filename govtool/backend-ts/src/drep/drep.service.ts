@@ -160,12 +160,17 @@ export class DRepService {
             return [];
         }
 
-        const proposals: ProposalResponse[] = [];
+        const voteByGovActionId = new Map<string, DRepVoteRow>();
 
         for (const voteRow of voteRows) {
-            const matched = await this.proposalService.getProposals(voteRow.gov_action_id);
-            proposals.push(...matched);
+            voteByGovActionId.set(voteRow.gov_action_id, voteRow);
         }
+
+        // One snapshot read for every vote, instead of a full proposal query each.
+        const proposals: ProposalResponse[] =
+            await this.proposalService.findByGovActionIds(
+                new Set(voteByGovActionId.keys()),
+            );
 
         let processedProposals = this.proposalService.filterByType(
             proposals,
@@ -180,15 +185,10 @@ export class DRepService {
             sort,
         );
 
-        const voteByGovActionId = new Map<string, DRepVoteRow>();
-
-        for (const voteRow of voteRows) {
-            voteByGovActionId.set(voteRow.gov_action_id, voteRow);
-        }
-
         return processedProposals.flatMap((proposal) => {
-            const govActionId = `${proposal.txHash}#${proposal.index}`;
-            const voteRow = voteByGovActionId.get(govActionId);
+            const voteRow = voteByGovActionId.get(
+                this.proposalService.govActionId(proposal),
+            );
 
             if (!voteRow) {
             return [];

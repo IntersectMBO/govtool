@@ -4,8 +4,9 @@ import { assertHexText } from "src/common/hex";
 import { DbService } from "src/db/db.service";
 import { SqlService } from "src/sql/sq.service";
 
-import { DRepInfo, DRepInfoResponse, DRepVotingPower, DRepVotingPowerList,DRepVotingPowerListResponse , DRepListItem, DRepListResponse, DRepList, DRepListSort,DRepStatus,DRepType,DRepVoteRow,VoteParams,VoteResponse,DRepListParams
+import { DRepInfo, DRepInfoResponse, DRepVotingPower, DRepVotingPowerList,DRepVotingPowerListResponse , DRepListItem, DRepListResponse, DRepList, DRepListSort,DRepStatus,DRepType,DRepVoteRow,VoteResponse,DRepListParams
 } from "./drep.type";
+import { VoteService } from './vote.service';
 import { ProposalService } from 'src/proposal/proposal.service';
 import {
   GovernanceActionSortMode,
@@ -21,6 +22,7 @@ export class DRepService {
         private readonly sqlService: SqlService,
         private readonly proposalService: ProposalService,
         private readonly cacheService: CacheService,
+        private readonly voteService: VoteService,
     ){}
 
     async getVotingPower(drepId: string): Promise<number> {
@@ -151,14 +153,12 @@ export class DRepService {
             }, async()=> {
                   assertHexText(drepId);
 
-        const sql = this.sqlService.load('get-votes.sql');
-        const result = await this.dbService.query<DRepVoteRow>(sql, [drepId]);
+        const voteRows = await this.voteService.getVotes(drepId);
 
-        if (result.rows.length === 0) {
+        if (voteRows.length === 0) {
             return [];
         }
 
-        const voteRows = result.rows;
         const proposals: ProposalResponse[] = [];
 
         for (const voteRow of voteRows) {
@@ -195,7 +195,7 @@ export class DRepService {
 
             return [
             {
-                vote: this.toVoteParams(voteRow),
+                vote: this.voteService.toVoteParams(voteRow),
                 proposal,
             },
             ];
@@ -367,18 +367,6 @@ export class DRepService {
         return this.toInteger(value);
     }
     
-    private toVoteParams(row: DRepVoteRow): VoteParams {
-        return {
-            proposalId: String(row.proposal_id),
-            drepId: row.drep_id,
-            vote: row.vote,
-            url: row.url,
-            metadataHash: row.doc_hash,
-            epochNo: this.toInteger(row.epoch_no),
-            date: this.toIsoString(row.date),
-            txHash: row.vote_tx_hash,
-        };
-    }
     private readonly drepListSnapshotNamespace = 'drepListSnapshot';
 
     async warmDefaultListSnapshot(): Promise<void> {

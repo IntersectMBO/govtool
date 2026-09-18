@@ -1,3 +1,4 @@
+import { parsePageValue } from 'src/common/pagination';
 import { Controller, Get, Param, Query } from '@nestjs/common';
 
 import { DRepService } from './drep.service';
@@ -34,12 +35,13 @@ export class DRepController {
     getVotes(
     @Param('drepId') drepId: string,
     @Query('type') type?: string | string[],
+    @Query('type[]') typeArray?: string | string[],
     @Query('sort') sort?: GovernanceActionSortMode,
     @Query('search') search?: string,
     ): Promise<VoteResponse[]> {
     return this.drepService.getVotes(
         drepId,
-        this.normalizeQueryArray(type) as GovernanceActionType[],
+        [...this.normalizeQueryArray(type), ...this.normalizeQueryArray(typeArray)] as GovernanceActionType[],
         sort,
         search,
     );
@@ -63,8 +65,8 @@ export class DRepController {
       ...this.normalizeQueryArray(statusArray),
     ] as DRepStatus[],
     sort,
-    page: page === undefined ? 0 : Number(page),
-    pageSize: pageSize === undefined ? 10 : Number(pageSize),
+    page: parsePageValue(page, 0, 'page'),
+    pageSize: parsePageValue(pageSize, 10, 'pageSize'),
     seed,
   });
 

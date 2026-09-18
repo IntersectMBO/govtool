@@ -1,3 +1,4 @@
+import { parsePageValue } from 'src/common/pagination';
 import { Controller, Get, Param, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
 
@@ -16,6 +17,7 @@ export class ProposalController {
   @Get('list')
   list(
     @Query('type') type?: string | string[],
+    @Query('type[]') typeArray?: string | string[],
     @Query('sort') sort?: GovernanceActionSortMode,
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,
@@ -23,10 +25,10 @@ export class ProposalController {
     @Query('search') search?: string,
   ): Promise<ListProposalsResponse> {
     return this.proposalService.list({
-      type: this.normalizeQueryArray(type) as GovernanceActionType[],
+      type: [...this.normalizeQueryArray(type), ...this.normalizeQueryArray(typeArray)] as GovernanceActionType[],
       sort,
-      page: page === undefined ? 0 : Number(page),
-      pageSize: pageSize === undefined ? 10 : Number(pageSize),
+      page: parsePageValue(page, 0, 'page'),
+      pageSize: parsePageValue(pageSize, 10, 'pageSize'),
       drepId,
       search,
     });

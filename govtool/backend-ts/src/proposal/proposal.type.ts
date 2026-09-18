@@ -1,3 +1,5 @@
+import type { VoteParams } from '../drep/drep.type';
+
 export type GovernanceActionType =
   | 'ParameterChange'
   | 'HardForkInitiation'
@@ -84,7 +86,7 @@ export type ListProposalsResponse = {
 };
 
 export type GetProposalResponse = {
-  vote: unknown | null;
+  vote: VoteParams | null;
   proposal: ProposalResponse;
 };
 

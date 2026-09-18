@@ -1,4 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '../config/config.service';
+import { fetchMetadataText, MetadataFetchError } from './safe-metadata-fetch';
 import * as blake from 'blakejs';
 
 import { ValidateMetadataDto } from './dto/validate-metadata.dto';
@@ -10,6 +12,8 @@ import {
 
 @Injectable()
 export class MetadataService {
+  constructor(private readonly config: ConfigService) {}
+
   private readonly logger = new Logger(MetadataService.name);
 
   async validateMetadata({
@@ -23,7 +27,7 @@ export class MetadataService {
 
     try {
       const resolvedUrl = this.resolveMetadataUrl(url);
-      const rawData = await this.fetchMetadata(resolvedUrl);
+      const rawData = await this.fetchMetadata(resolvedUrl, url.startsWith('ipfs://'));
 
       let parsedData: Record<string, unknown>;
 
@@ -60,7 +64,9 @@ export class MetadataService {
     } catch (error) {
       this.logger.error('Metadata validation failed', error);
 
-      if (Object.values(MetadataValidationStatus).includes(
+      if (error instanceof MetadataFetchError) {
+        status = error.code;
+      } else if (Object.values(MetadataValidationStatus).includes(
         error as MetadataValidationStatus,
       )) {
         status = error as MetadataValidationStatus;
@@ -78,7 +84,7 @@ export class MetadataService {
 
   private resolveMetadataUrl(url: string): string {
     if (url.startsWith('ipfs://')) {
-      const gateway = process.env.IPFS_GATEWAY;
+      const gateway = this.config.get().ipfsGateway;
 
       if (!gateway) {
         throw MetadataValidationStatus.URL_NOT_FOUND;
@@ -90,19 +96,13 @@ export class MetadataService {
     return url;
   }
 
-  private async fetchMetadata(url: string): Promise<string> {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'GovTool/Metadata-Validation-Tool',
-        'Content-Type': 'application/json',
-      },
+  private fetchMetadata(url: string, isIpfs: boolean): Promise<string> {
+    const projectId = this.config.get().ipfsProjectId;
+    return fetchMetadataText(url, {
+      'User-Agent': 'GovTool/Metadata-Validation-Tool',
+      'Content-Type': 'application/json',
+      ...(isIpfs && projectId ? { project_id: projectId } : {}),
     });
-
-    if (!response.ok) {
-      throw MetadataValidationStatus.URL_NOT_FOUND;
-    }
-
-    return response.text();
   }
 
   private getStandard(

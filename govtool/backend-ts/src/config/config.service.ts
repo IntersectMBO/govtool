@@ -39,6 +39,9 @@ export class ConfigService {
             password: this.requiredEnvString('VVA_DBSYNCCONFIG_PASSWORD'),
             port: this.envNumber('VVA_DBSYNCCONFIG_PORT', 5432),
         },
+        cacheMaxEntries: this.positiveInteger('VVA_CACHEMAXENTRIES', 256),
+        ipfsGateway: this.envString('IPFS_GATEWAY', ''),
+        ipfsProjectId: this.envString('IPFS_PROJECT_ID', ''),
         pinataApiJwt:
             this.envString('VVA_PINATAAPIJWT', rawConfig.pinataapijwt ?? '') || null,
         port: this.envNumber('VVA_PORT', rawConfig.port),
@@ -54,6 +57,12 @@ export class ConfigService {
         sentryDsn: this.envString('VVA_SENTRYDSN', rawConfig.sentrydsn),
         sentryEnv: this.envString('VVA_SENTRYENV', rawConfig.sentryenv),
     };
+    }
+
+    private positiveInteger(name: string, fallback: number): number {
+        const value = this.envNumber(name, fallback);
+        if (!Number.isSafeInteger(value) || value < 1) throw new Error(`${name} must be a positive safe integer`);
+        return value;
     }
 
     private getConfigPath(): string {

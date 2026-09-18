@@ -1,5 +1,6 @@
-import { Body, Controller, Post, Query } from '@nestjs/common';
+import { Body, Controller, Post, Query, Req, UnsupportedMediaTypeException } from '@nestjs/common';
 
+import type { Request } from 'express';
 import { IpfsService } from './ipfs.service';
 import { UploadResponse } from './ipfs.type';
 
@@ -10,8 +11,12 @@ export class IpfsController {
   @Post('upload')
   upload(
     @Query('fileName') fileName: string | undefined,
-    @Body() fileContent: string,
+    @Body() fileContent: unknown,
+    @Req() request: Request,
   ): Promise<UploadResponse> {
+    if (!request.is('text/plain') || typeof fileContent !== 'string') {
+      throw new UnsupportedMediaTypeException('Expected a text/plain body');
+    }
     return this.ipfsService.upload(fileName ?? 'data.txt', fileContent);
   }
 }

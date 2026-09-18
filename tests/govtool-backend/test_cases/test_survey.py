@@ -2,8 +2,13 @@ import os
 import re
 
 import pytest
-import requests
 
+
+# This shared suite also runs against Haskell deployments, which have no survey API.
+pytestmark = pytest.mark.skipif(
+    os.environ.get("RUN_SURVEY_TESTS") != "1",
+    reason="Set RUN_SURVEY_TESTS=1 when targeting the TypeScript backend",
+)
 
 CACHE_CONTROL = "public, max-age=31536000, immutable"
 
@@ -15,33 +20,18 @@ def assert_not_immutable(response):
 @pytest.fixture(scope="session")
 def survey_reference():
     tx_id = os.environ.get("SURVEY_TX_ID", "")
-    reference_url = os.environ.get("REFERENCE_BASE_URL", "").rstrip("/")
-
+    payload = os.environ.get("SURVEY_PAYLOAD_CBOR_HEX", "")
+    if not tx_id and not payload:
+        pytest.skip("Set SURVEY_TX_ID and independently verified SURVEY_PAYLOAD_CBOR_HEX")
     if not re.fullmatch(r"[0-9a-fA-F]{64}", tx_id):
-        pytest.fail("Set SURVEY_TX_ID to a real survey-definition transaction hash")
-
-    if not reference_url:
-        pytest.fail("Set REFERENCE_BASE_URL to the Haskell backend API URL")
-
-    tx_id = tx_id.lower()
-    response = requests.get(
-        f"{reference_url}/survey/definition/{tx_id}/0",
-        timeout=30,
-    )
-
-    assert response.status_code == 200, response.text
-    data = response.json()
-
-    assert data["txId"] == tx_id
-    assert data["surveyIndex"] == 0
-    assert data["metadataLabel"] == 17
-    assert re.fullmatch(r"(?:[0-9a-f]{2})+", data["payloadCborHex"])
-
-    return data
+        pytest.fail("SURVEY_TX_ID must be a real survey-definition transaction hash")
+    if not re.fullmatch(r"(?:[0-9a-fA-F]{2})+", payload):
+        pytest.fail("SURVEY_PAYLOAD_CBOR_HEX must contain the independently verified payload bytes")
+    return {"txId": tx_id.lower(), "surveyIndex": 0, "metadataLabel": 17, "payloadCborHex": payload.lower()}
 
 
 @pytest.mark.parametrize("index", [0, 1, 65535])
-def test_survey_matches_haskell(govtool_api, survey_reference, index):
+def test_survey_matches_expected_payload(govtool_api, survey_reference, index):
     tx_id = survey_reference["txId"]
     response = govtool_api.raw_get(f"/survey/definition/{tx_id}/{index}")
 

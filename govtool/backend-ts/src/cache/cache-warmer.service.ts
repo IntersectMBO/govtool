@@ -38,16 +38,12 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
       return;
     }
 
-    const latestBlockNo = await this.getLatestBlockNo();
-
-    if (!force && latestBlockNo !== null && latestBlockNo === this.lastBlockNo) {
-      return;
-    }
-
     this.refreshing = true;
     const startedAt = Date.now();
 
     try {
+      const latestBlockNo = await this.getLatestBlockNo();
+      if (!force && latestBlockNo !== null && latestBlockNo === this.lastBlockNo) return;
       await Promise.all([
         this.drepService.warmDefaultListSnapshot(),
         this.proposalService.warmActiveProposalSnapshot(),

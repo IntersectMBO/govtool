@@ -27,15 +27,16 @@ export class CacheService {
         const entry = this.cache.get(cacheKey) as CacheEntry<T> | undefined;
 
         if (entry && entry.expiresAt > now) {
+            this.touch(cacheKey, entry);
             return entry.value;
         }
 
         const value = action().catch((error) => {
-            this.cache.delete(cacheKey);
+            if (this.cache.get(cacheKey)?.value === value) this.cache.delete(cacheKey);
             throw error;
         });
 
-        this.cache.set(cacheKey, {
+        this.store(cacheKey, {
             expiresAt: now + ttlSeconds * 1000,
             value,
             refreshing: false,
@@ -56,8 +57,9 @@ export class CacheService {
         const now =Date.now();
 
         if(!entry){
-            return this.refresh(namespace,key,action,ttlSeconds);
+            return this.getOrSet(namespace,key,action,ttlSeconds);
         }
+        this.touch(cacheKey, entry);
         if(entry.expiresAt > now){
             return entry.value;
         }
@@ -65,7 +67,7 @@ export class CacheService {
             entry.refreshing = true;
             void action()
                 .then((value)=> {
-                    this.set(namespace, key, value, ttlSeconds);
+                    if (this.cache.get(cacheKey) === entry) this.set(namespace, key, value, ttlSeconds);
                 })
                 .catch((error)=>{
                     this.logger.error(
@@ -75,7 +77,7 @@ export class CacheService {
                 })
                 .finally(()=>{
                     const latest = this.cache.get(cacheKey);
-                    if (latest) {
+                    if (latest === entry) {
                         latest.refreshing = false;
                     }
                 });
@@ -102,7 +104,7 @@ export class CacheService {
     ): void {
         const cacheKey = this.toCacheKey(namespace,key);
 
-        this.cache.set(cacheKey, {
+        this.store(cacheKey, {
             expiresAt: Date.now()+ttlSeconds*1000,
             value: Promise.resolve(value),
             refreshing: false,
@@ -123,6 +125,19 @@ export class CacheService {
 
     drepListTtlSeconds(): number {
         return this.configSerivce.get().drepListCacheDurationSeconds;
+    }
+
+    private touch(key: string, entry: CacheEntry<unknown>): void {
+        this.cache.delete(key);
+        this.cache.set(key, entry);
+    }
+
+    private store(key: string, entry: CacheEntry<unknown>): void {
+        this.touch(key, entry);
+        const maxEntries = this.configSerivce.get().cacheMaxEntries;
+        while (this.cache.size > maxEntries) {
+            this.cache.delete(this.cache.keys().next().value!);
+        }
     }
 
     private toCacheKey(namespace: string, key:unknown): string {

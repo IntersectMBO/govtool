@@ -7,6 +7,9 @@ services:
       - "${VVA_PORT:-9999}:9999"
     environment:
       NODE_ENV: production
+      IPFS_GATEWAY: ${IPFS_GATEWAY:-}
+      IPFS_PROJECT_ID: ${IPFS_PROJECT_ID:-}
+      VVA_CACHEMAXENTRIES: ${VVA_CACHEMAXENTRIES:-256}
       VVA_HOST: 0.0.0.0
       VVA_PORT: 9999
       VVA_DBSYNCCONFIG_HOST: ${VVA_DBSYNCCONFIG_HOST:-host.docker.internal}

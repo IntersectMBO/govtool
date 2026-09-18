@@ -18,6 +18,9 @@ export type BackendConfigFile = {
 
 export type BackendConfig = {
   dbSync: DbSyncConfig;
+  cacheMaxEntries: number;
+  ipfsGateway: string;
+  ipfsProjectId: string;
   pinataApiJwt: string | null;
   port: number;
   host: string;

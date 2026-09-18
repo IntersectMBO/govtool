@@ -17,6 +17,7 @@ import {
   ProposalResponse,
   Proposal,
 } from './proposal.type';
+import { VoteService } from 'src/drep/vote.service';
 import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
@@ -25,6 +26,7 @@ export class ProposalService {
     private readonly dbService: DbService,
     private readonly sqlService: SqlService,
     private readonly cacheService: CacheService,
+    private readonly voteService: VoteService,
   ) {}
 
   async list(params: {
@@ -49,6 +51,11 @@ export class ProposalService {
     const proposals = await this.getProposals('');
 
     let filtered = this.filterByType(proposals, params.type);
+    if (params.drepId) {
+      const votes = await this.voteService.getVotes(params.drepId);
+      const votedIds = new Set(votes.map((vote) => vote.gov_action_id));
+      filtered = filtered.filter((proposal) => !votedIds.has(`${proposal.txHash}#${proposal.index}`));
+    }
     filtered = this.filterBySearch(filtered, params.search);
     filtered = this.sortProposals(filtered, params.sort);
 
@@ -87,9 +94,11 @@ export class ProposalService {
       });
     }
 
+    const votes = drepId ? await this.voteService.getVotes(drepId) : [];
+    const vote = votes.find((row) => row.gov_action_id === `${txHash.toLowerCase()}#${index}`);
     return {
       proposal: proposals[0],
-      vote: null,
+      vote: vote ? this.voteService.toVoteParams(vote) : null,
     };
   }
 

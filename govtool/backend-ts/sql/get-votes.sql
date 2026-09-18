@@ -1,12 +1,12 @@
 SELECT DISTINCT ON (voting_procedure.gov_action_proposal_id, voting_procedure.drep_voter)
-  voting_procedure.gov_action_proposal_id, 
-  CONCAT(encode(gov_action_tx.hash,'hex'),'#',gov_action_proposal.index),
-  encode(drep_hash.raw, 'hex'),
-  LOWER(voting_procedure.vote::text),
-  voting_anchor.url,
-  encode(voting_anchor.data_hash, 'hex'),
+  voting_procedure.gov_action_proposal_id AS proposal_id,
+  CONCAT(encode(gov_action_tx.hash,'hex'),'#',gov_action_proposal.index) AS gov_action_id,
+  encode(drep_hash.raw, 'hex') AS drep_id,
+  LOWER(voting_procedure.vote::text) AS vote,
+  voting_anchor.url AS url,
+  encode(voting_anchor.data_hash, 'hex') AS doc_hash,
   block.epoch_no AS epoch_no,
-  block.time AS time,
+  block.time AS date,
   encode(vote_tx.hash, 'hex') AS vote_tx_hash
 FROM voting_procedure
 JOIN gov_action_proposal

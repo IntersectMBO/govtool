@@ -53,3 +53,6 @@ Launch the Allure dashboard to view the test report:
 ```bash
 allure serve allure-results
 ```
+### TypeScript survey integration tests
+
+Set `RUN_SURVEY_TESTS=1` and run `test_cases/test_survey.py` against the TypeScript backend. The module is otherwise skipped so the shared suite still supports Haskell deployments. For successful lookup cases, set `SURVEY_TX_ID` and `SURVEY_PAYLOAD_CBOR_HEX` to a transaction and independently verified CBOR payload from the target network. These cases skip when neither value is configured and fail for incomplete or malformed configuration. Survey validation and missing-metadata cases do not require these values. The Haskell backend has no survey reference endpoint.

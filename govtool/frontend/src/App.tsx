@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { Route, Routes, useNavigate } from "react-router";
+import { Route, Routes, useNavigate, useLocation } from "react-router";
 
 import { Modal, ScrollToTop } from "@atoms";
 import {
@@ -41,6 +41,7 @@ import {
   getItemFromLocalStorage,
   WALLET_LS_KEY,
   removeItemFromLocalStorage,
+  getPageTitle
 } from "@utils";
 import { PublicRoute } from "./pages/PublicRoute";
 import { TopBanners } from "./components/organisms/TopBanners";
@@ -55,12 +56,17 @@ export default () => {
   const { enable, isEnabled } = useCardano();
   const navigate = useNavigate();
   const { modal, openModal, modals } = useModal();
+  const { pathname } = useLocation();
 
   useWalletConnectionListener();
 
   useEffect(() => {
     SetupInterceptors(navigate);
   }, []);
+
+  useEffect(() => {
+    document.title = getPageTitle(pathname);
+  }, [pathname]);
 
   const checkTheWalletIsActive = useCallback(() => {
     const isWalletAvailable = () =>

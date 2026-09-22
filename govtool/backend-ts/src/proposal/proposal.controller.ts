@@ -1,17 +1,19 @@
 import { queryEnum, queryEnums } from 'src/common/query-enum';
-import { governanceActionTypes, governanceActionSortModes } from 'src/proposal/proposal.type';
+import {
+  governanceActionTypes,
+  governanceActionSortModes,
+} from 'src/proposal/proposal.type';
 import { MAX_PAGE_SIZE, parsePageValue } from 'src/common/pagination';
 import { Controller, Get, Param, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
 
 import { ProposalService } from './proposal.service';
 import {
-  EnactedProposalDetailsResponse,
   GetProposalResponse,
   GovernanceActionType,
   ListProposalsResponse,
 } from './proposal.type';
-import type {GovernanceActionSortMode} from './proposal.type'
+import type { GovernanceActionSortMode } from './proposal.type';
 @Controller('proposal')
 export class ProposalController {
   constructor(private readonly proposalService: ProposalService) {}
@@ -49,8 +51,9 @@ export class ProposalController {
     @Query('type') type: GovernanceActionType | undefined,
     @Res() response: Response,
   ): Promise<void> {
-    const details = await this.proposalService.getEnactedDetails(queryEnum(type, governanceActionTypes, 'type'));
+    const details = await this.proposalService.getEnactedDetails(
+      queryEnum(type, governanceActionTypes, 'type'),
+    );
     response.status(200).json(details);
   }
-
 }

@@ -18,44 +18,57 @@ export class AdaHolderService {
     private readonly cacheService: CacheService,
   ) {}
 
-  async getCurrentDelegation(stakeKey: string): Promise<DelegationResponse | null> {
-    return this.cacheService.getOrSet('adaHolderCurrentDelegation', stakeKey, async()=> {
-       assertHexText(stakeKey);
+  async getCurrentDelegation(
+    stakeKey: string,
+  ): Promise<DelegationResponse | null> {
+    return this.cacheService.getOrSet(
+      'adaHolderCurrentDelegation',
+      stakeKey,
+      async () => {
+        assertHexText(stakeKey);
 
-    const sql = this.sqlService.load('get-current-delegation.sql');
-    const result = await this.dbService.query<CurrentDelegationRow>(sql, [stakeKey]);
-    if (result.rows.length === 0) {
-      return null;
-    }
+        const sql = this.sqlService.load('get-current-delegation.sql');
+        const result = await this.dbService.query<CurrentDelegationRow>(sql, [
+          stakeKey,
+        ]);
+        if (result.rows.length === 0) {
+          return null;
+        }
 
-    if (result.rows.length !== 1) {
-      throw new InternalServerErrorException({
-        errorType: 'CriticalError',
-        message: `multiple delegations for stake key: ${stakeKey}`,
-      });
-    }
+        if (result.rows.length !== 1) {
+          throw new InternalServerErrorException({
+            errorType: 'CriticalError',
+            message: `multiple delegations for stake key: ${stakeKey}`,
+          });
+        }
 
-    const row = result.rows[0];
+        const row = result.rows[0];
 
-    return {
-      drepHash: row.drep_raw,
-      drepView: row.drep_view,
-      isDRepScriptBased: row.has_script,
-      txHash: row.encode,
-    };
-    });
+        return {
+          drepHash: row.drep_raw,
+          drepView: row.drep_view,
+          isDRepScriptBased: row.has_script,
+          txHash: row.encode,
+        };
+      },
+    );
   }
 
   async getVotingPower(stakeKey: string): Promise<ApiInteger> {
-   return this.cacheService.getOrSet('adaHolderVotingPower',stakeKey,async()=> {
-     assertHexText(stakeKey);
+    return this.cacheService.getOrSet(
+      'adaHolderVotingPower',
+      stakeKey,
+      async () => {
+        assertHexText(stakeKey);
 
-    const sql = this.sqlService.load('get-stake-key-voting-power.sql');
+        const sql = this.sqlService.load('get-stake-key-voting-power.sql');
 
-    const result = await this.dbService.query<VotingPowerRow>(sql, [stakeKey]).catch(() => null);
-    if (!result || result.rows.length !== 1) return 0;
-    return dbInteger(result.rows[0].total_balance);
-   });
+        const result = await this.dbService
+          .query<VotingPowerRow>(sql, [stakeKey])
+          .catch(() => null);
+        if (!result || result.rows.length !== 1) return 0;
+        return dbInteger(result.rows[0].total_balance);
+      },
+    );
   }
-
 }

@@ -1,12 +1,31 @@
-import { dbInteger, safeDbInteger, compareIntegers, ApiInteger } from 'src/common/integer';
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import {
+  dbInteger,
+  safeDbInteger,
+  compareIntegers,
+  ApiInteger,
+} from 'src/common/integer';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
-import { assertHexText } from "src/common/hex";
-import { DbService } from "src/db/db.service";
-import { SqlService } from "src/sql/sq.service";
+import { assertHexText } from 'src/common/hex';
+import { DbService } from 'src/db/db.service';
+import { SqlService } from 'src/sql/sq.service';
 
-import { DRepInfo, DRepInfoResponse, DRepVotingPower, DRepVotingPowerList,DRepVotingPowerListResponse , DRepListItem, DRepListResponse, DRepList, DRepListSort,DRepStatus,DRepType,DRepVoteRow,VoteResponse,DRepListParams
-} from "./drep.type";
+import {
+  DRepInfo,
+  DRepInfoResponse,
+  DRepVotingPower,
+  DRepVotingPowerList,
+  DRepVotingPowerListResponse,
+  DRepListItem,
+  DRepListResponse,
+  DRepList,
+  DRepListSort,
+  DRepStatus,
+  DRepType,
+  DRepVoteRow,
+  VoteResponse,
+  DRepListParams,
+} from './drep.type';
 import { VoteService } from './vote.service';
 import { ProposalService } from 'src/proposal/proposal.service';
 import {
@@ -14,418 +33,424 @@ import {
   GovernanceActionType,
   ProposalResponse,
 } from 'src/proposal/proposal.type';
-import { CacheService } from "src/cache/cache.service";
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class DRepService {
-    constructor(
-        private readonly dbService: DbService,
-        private readonly sqlService: SqlService,
-        private readonly proposalService: ProposalService,
-        private readonly cacheService: CacheService,
-        private readonly voteService: VoteService,
-    ){}
+  constructor(
+    private readonly dbService: DbService,
+    private readonly sqlService: SqlService,
+    private readonly proposalService: ProposalService,
+    private readonly cacheService: CacheService,
+    private readonly voteService: VoteService,
+  ) {}
 
-    async getVotingPower(drepId: string): Promise<ApiInteger> {
-       return this.cacheService.getOrSet('drepVotingPower',drepId,async()=> {
-         assertHexText(drepId);
+  async getVotingPower(drepId: string): Promise<ApiInteger> {
+    return this.cacheService.getOrSet('drepVotingPower', drepId, async () => {
+      assertHexText(drepId);
 
-        const sql = this.sqlService.load('get-voting-power.sql');
-        const result = await this.dbService.query<DRepVotingPower>(sql, [drepId]);
+      const sql = this.sqlService.load('get-voting-power.sql');
+      const result = await this.dbService.query<DRepVotingPower>(sql, [drepId]);
 
-        if(result.rows.length === 0){
-            return 0;
-        }
+      if (result.rows.length === 0) {
+        return 0;
+      }
 
-        return dbInteger(result.rows[0].amount);
-       });
-    }
-
-    async getVotingPowerList (
-        identifiers: string[],
-    ): Promise<DRepVotingPowerListResponse[]> {
-       return this.cacheService.getOrSet('drepVotingPowerList',identifiers,async()=>{
-         const rows: DRepVotingPowerList[]=[];
-
-        if (identifiers.length === 0) {
-            const sql = this.sqlService.load('get-dreps-voting-power-list.sql');
-            const result = await this.dbService.query<DRepVotingPowerList>(sql);
-            rows.push(...result.rows);
-        } else {
-            const sql = this.sqlService.load('get-filtered-dreps-voting-power.sql');
-
-            for (const identifier of identifiers) {
-                const result = await this.dbService.query<DRepVotingPowerList>(sql, [
-                    identifier,
-                    identifier,
-                ]);
-                rows.push(...result.rows);
-            }
-        }
-        return rows.map((row)=> ({
-            view: row.view,
-            hashRaw: row.hash_raw,
-            votingPower: dbInteger(row.voting_power),
-            givenName: row.given_name,
-        }));
-       });
-    }
-
-    async getInfo(drepId: string): Promise<DRepInfoResponse> {
-       return this.cacheService.getOrSet('drepInfo',drepId,async()=>{
-         assertHexText(drepId);
-        
-        const sql = this.sqlService.load('get-drep-info.sql');
-        const result = await this.dbService.query<DRepInfo>(sql, [drepId]);
-
-        if (result.rows.length === 0) {
-            return this.emptyDRepInfo();
-        }
-        if (result.rows.length != 1) {
-            throw new InternalServerErrorException({
-                errorType: 'CriticalError',
-                message: 'Unexpected result from database query in getDRepInfo',
-            });
-        }
-        const row = result.rows[0];
-        return {
-            isScriptBased: row.is_script_based,
-            isRegisteredAsDRep: row.is_registered_as_drep ?? false,
-            wasRegisteredAsDRep: row.was_registered_as_drep ?? false,
-            isRegisteredAsSoleVoter: row.is_registered_as_sole_voter ?? false,
-            wasRegisteredAsSoleVoter: row.was_registered_as_sole_voter ?? false,
-            deposit: (row.deposit === null ? null : dbInteger(row.deposit)),
-            url: row.url,
-            dataHash: row.data_hash,
-            votingPower: (row.voting_power === null ? null : dbInteger(row.voting_power)),
-            dRepRegisterTxHash: row.drep_register_tx_hash,
-            dRepRetireTxHash: row.drep_retire_tx_hash,
-            soleVoterRegisterTxHash: row.sole_voter_register_tx_hash,
-            soleVoterRetireTxHash: row.sole_voter_retire_tx_hash,
-            paymentAddress: row.payment_address,
-            givenName: row.given_name,
-            objectives: row.objectives,
-            motivations: row.motivations,
-            qualifications: row.qualifications,
-            imageUrl: row.image_url,
-            imageHash: row.image_hash,
-        };
-       });
-    }
-
-   async list(params: DRepListParams): Promise<DRepListResponse> {
-      const page = Number(params.page ?? 0);
-      const pageSize = Number(params.pageSize ?? 10);
-      const search = params.search ?? '';
-      const status = params.status;
-      const sort = params.sort ?? 'Random';
-      const seed = params.seed ?? '';
-
-      let dreps = [...(await this.getDRepListSnapShot(search))];
-      if (params.status.length > 0) {
-      dreps = dreps.filter((drep) => params.status.includes(drep.status));
-    }
-     dreps = this.filterDRepsBySearchRule(dreps, search);
-     dreps = this.sortDReps(dreps, sort, seed);
-      const total = dreps.length;
-      const offset = page* pageSize;
-      const elements = dreps.slice(offset, offset+pageSize);
-
-      return {
-        page,
-        pageSize,
-        total,
-        elements,
-      };
+      return dbInteger(result.rows[0].amount);
+    });
   }
 
+  async getVotingPowerList(
+    identifiers: string[],
+  ): Promise<DRepVotingPowerListResponse[]> {
+    return this.cacheService.getOrSet(
+      'drepVotingPowerList',
+      identifiers,
+      async () => {
+        const rows: DRepVotingPowerList[] = [];
 
-    async getVotes(
-        drepId: string,
-        selectedTypes: GovernanceActionType[] = [],
-        sort?: GovernanceActionSortMode,
-        search?: string,
-        ): Promise<VoteResponse[]> {
-            return this.cacheService.getOrSet('drepVotes',{
-                drepId:drepId,
-                selectedTypes:selectedTypes,
-                sort:sort,
-                search:search
-            }, async()=> {
-                  assertHexText(drepId);
+        if (identifiers.length === 0) {
+          const sql = this.sqlService.load('get-dreps-voting-power-list.sql');
+          const result = await this.dbService.query<DRepVotingPowerList>(sql);
+          rows.push(...result.rows);
+        } else {
+          const sql = this.sqlService.load(
+            'get-filtered-dreps-voting-power.sql',
+          );
+
+          for (const identifier of identifiers) {
+            const result = await this.dbService.query<DRepVotingPowerList>(
+              sql,
+              [identifier, identifier],
+            );
+            rows.push(...result.rows);
+          }
+        }
+        return rows.map((row) => ({
+          view: row.view,
+          hashRaw: row.hash_raw,
+          votingPower: dbInteger(row.voting_power),
+          givenName: row.given_name,
+        }));
+      },
+    );
+  }
+
+  async getInfo(drepId: string): Promise<DRepInfoResponse> {
+    return this.cacheService.getOrSet('drepInfo', drepId, async () => {
+      assertHexText(drepId);
+
+      const sql = this.sqlService.load('get-drep-info.sql');
+      const result = await this.dbService.query<DRepInfo>(sql, [drepId]);
+
+      if (result.rows.length === 0) {
+        return this.emptyDRepInfo();
+      }
+      if (result.rows.length != 1) {
+        throw new InternalServerErrorException({
+          errorType: 'CriticalError',
+          message: 'Unexpected result from database query in getDRepInfo',
+        });
+      }
+      const row = result.rows[0];
+      return {
+        isScriptBased: row.is_script_based,
+        isRegisteredAsDRep: row.is_registered_as_drep ?? false,
+        wasRegisteredAsDRep: row.was_registered_as_drep ?? false,
+        isRegisteredAsSoleVoter: row.is_registered_as_sole_voter ?? false,
+        wasRegisteredAsSoleVoter: row.was_registered_as_sole_voter ?? false,
+        deposit: row.deposit === null ? null : dbInteger(row.deposit),
+        url: row.url,
+        dataHash: row.data_hash,
+        votingPower:
+          row.voting_power === null ? null : dbInteger(row.voting_power),
+        dRepRegisterTxHash: row.drep_register_tx_hash,
+        dRepRetireTxHash: row.drep_retire_tx_hash,
+        soleVoterRegisterTxHash: row.sole_voter_register_tx_hash,
+        soleVoterRetireTxHash: row.sole_voter_retire_tx_hash,
+        paymentAddress: row.payment_address,
+        givenName: row.given_name,
+        objectives: row.objectives,
+        motivations: row.motivations,
+        qualifications: row.qualifications,
+        imageUrl: row.image_url,
+        imageHash: row.image_hash,
+      };
+    });
+  }
+
+  async list(params: DRepListParams): Promise<DRepListResponse> {
+    const page = Number(params.page ?? 0);
+    const pageSize = Number(params.pageSize ?? 10);
+    const search = params.search ?? '';
+    const sort = params.sort ?? 'Random';
+    const seed = params.seed ?? '';
+
+    let dreps = [...(await this.getDRepListSnapShot(search))];
+    if (params.status.length > 0) {
+      dreps = dreps.filter((drep) => params.status.includes(drep.status));
+    }
+    dreps = this.filterDRepsBySearchRule(dreps, search);
+    dreps = this.sortDReps(dreps, sort, seed);
+    const total = dreps.length;
+    const offset = page * pageSize;
+    const elements = dreps.slice(offset, offset + pageSize);
+
+    return {
+      page,
+      pageSize,
+      total,
+      elements,
+    };
+  }
+
+  async getVotes(
+    drepId: string,
+    selectedTypes: GovernanceActionType[] = [],
+    sort?: GovernanceActionSortMode,
+    search?: string,
+  ): Promise<VoteResponse[]> {
+    return this.cacheService.getOrSet(
+      'drepVotes',
+      {
+        drepId: drepId,
+        selectedTypes: selectedTypes,
+        sort: sort,
+        search: search,
+      },
+      async () => {
+        assertHexText(drepId);
 
         const voteRows = await this.voteService.getVotes(drepId);
 
         if (voteRows.length === 0) {
-            return [];
+          return [];
         }
 
         const voteByGovActionId = new Map<string, DRepVoteRow>();
 
         for (const voteRow of voteRows) {
-            voteByGovActionId.set(voteRow.gov_action_id, voteRow);
+          voteByGovActionId.set(voteRow.gov_action_id, voteRow);
         }
 
         // One snapshot read for every vote, instead of a full proposal query each.
         const proposals: ProposalResponse[] =
-            await this.proposalService.findByGovActionIds(
-                new Set(voteByGovActionId.keys()),
-            );
+          await this.proposalService.findByGovActionIds(
+            new Set(voteByGovActionId.keys()),
+          );
 
         let processedProposals = this.proposalService.filterByType(
-            proposals,
-            selectedTypes,
+          proposals,
+          selectedTypes,
         );
         processedProposals = this.proposalService.filterBySearch(
-            processedProposals,
-            search,
+          processedProposals,
+          search,
         );
         processedProposals = this.proposalService.sortProposals(
-            processedProposals,
-            sort,
+          processedProposals,
+          sort,
         );
 
         return processedProposals.flatMap((proposal) => {
-            const voteRow = voteByGovActionId.get(
-                this.proposalService.govActionId(proposal),
-            );
+          const voteRow = voteByGovActionId.get(
+            this.proposalService.govActionId(proposal),
+          );
 
-            if (!voteRow) {
+          if (!voteRow) {
             return [];
-            }
+          }
 
-            return [
+          return [
             {
-                vote: this.voteService.toVoteParams(voteRow),
-                proposal,
+              vote: this.voteService.toVoteParams(voteRow),
+              proposal,
             },
-            ];
+          ];
         });
-            });
-     }
+      },
+    );
+  }
 
+  private emptyDRepInfo(): DRepInfoResponse {
+    return {
+      isScriptBased: false,
+      isRegisteredAsDRep: false,
+      wasRegisteredAsDRep: false,
+      isRegisteredAsSoleVoter: false,
+      wasRegisteredAsSoleVoter: false,
+      deposit: null,
+      url: null,
+      dataHash: null,
+      votingPower: null,
+      dRepRegisterTxHash: null,
+      dRepRetireTxHash: null,
+      soleVoterRegisterTxHash: null,
+      soleVoterRetireTxHash: null,
+      paymentAddress: null,
+      givenName: null,
+      objectives: null,
+      motivations: null,
+      qualifications: null,
+      imageUrl: null,
+      imageHash: null,
+    };
+  }
 
+  private toDRepListItem(row: DRepList): DRepListItem {
+    const deposit = dbInteger(row.deposit);
+    const latestDeposit = dbInteger(row.latest_deposit);
 
-    private emptyDRepInfo(): DRepInfoResponse {
-        return {
-        isScriptBased: false,
-        isRegisteredAsDRep: false,
-        wasRegisteredAsDRep: false,
-        isRegisteredAsSoleVoter: false,
-        wasRegisteredAsSoleVoter: false,
-        deposit: null,
-        url: null,
-        dataHash: null,
-        votingPower: null,
-        dRepRegisterTxHash: null,
-        dRepRetireTxHash: null,
-        soleVoterRegisterTxHash: null,
-        soleVoterRetireTxHash: null,
-        paymentAddress: null,
-        givenName: null,
-        objectives: null,
-        motivations: null,
-        qualifications: null,
-        imageUrl: null,
-        imageHash: null,
-        };
+    return {
+      isScriptBased: row.has_script,
+      drepId: row.drep_hash,
+      view: row.view,
+      url: row.url,
+      metadataHash: row.metadata_hash,
+      deposit,
+      votingPower: row.amount === null ? null : dbInteger(row.amount),
+      status: this.toDRepStatus(row.active, deposit),
+      type: this.toDRepType(
+        latestDeposit,
+        row.url,
+        row.has_non_deregister_voting_anchor,
+      ),
+      latestTxHash: row.tx_hash,
+      latestRegistrationDate: this.toIsoString(row.last_register_time),
+      metadataError: row.fetch_error,
+      paymentAddress: row.payment_address,
+      givenName: row.given_name,
+      objectives: row.objectives,
+      motivations: row.motivations,
+      qualifications: row.qualifications,
+      imageUrl: row.image_url,
+      imageHash: row.image_hash,
+      votesLastYear: this.toNullableInteger(row.votes_last_year),
+      identityReferences: row.identity_references,
+      linkReferences: row.link_references,
+    };
+  }
+
+  private toDRepStatus(active: boolean, deposit: ApiInteger): DRepStatus {
+    if (deposit < 0) {
+      return 'Retired';
     }
 
-    private toDRepListItem(row: DRepList): DRepListItem {
-        const deposit = dbInteger(row.deposit);
-        const latestDeposit = dbInteger(row.latest_deposit);
+    return active ? 'Active' : 'Inactive';
+  }
 
-        return {
-            isScriptBased: row.has_script,
-            drepId: row.drep_hash,
-            view: row.view,
-            url: row.url,
-            metadataHash: row.metadata_hash,
-            deposit,
-            votingPower: (row.amount === null ? null : dbInteger(row.amount)),
-            status: this.toDRepStatus(row.active, deposit),
-            type: this.toDRepType(latestDeposit, row.url, row.has_non_deregister_voting_anchor),
-            latestTxHash: row.tx_hash,
-            latestRegistrationDate: this.toIsoString(row.last_register_time),
-            metadataError: row.fetch_error,
-            paymentAddress: row.payment_address,
-            givenName: row.given_name,
-            objectives: row.objectives,
-            motivations: row.motivations,
-            qualifications: row.qualifications,
-            imageUrl: row.image_url,
-            imageHash: row.image_hash,
-            votesLastYear: this.toNullableInteger(row.votes_last_year),
-            identityReferences: row.identity_references,
-            linkReferences: row.link_references,
-        };
+  private toDRepType(
+    latestDeposit: ApiInteger,
+    url: string | null,
+    hasNonDeregisterVotingAnchor: boolean | null,
+  ): DRepType {
+    if (latestDeposit >= 0 && url === null) {
+      return 'SoleVoter';
     }
 
-    private toDRepStatus(active: boolean, deposit: ApiInteger): DRepStatus {
-        if (deposit < 0) {
-            return 'Retired';
-        }
-
-        return active ? 'Active' : 'Inactive';
+    if (latestDeposit >= 0 && url !== null) {
+      return 'DRep';
     }
 
-    private toDRepType(
-        latestDeposit: ApiInteger,
-        url: string | null,
-        hasNonDeregisterVotingAnchor: boolean | null,
-        ): DRepType {
-        if (latestDeposit >= 0 && url === null) {
-            return 'SoleVoter';
-        }
-
-        if (latestDeposit >= 0 && url !== null) {
-            return 'DRep';
-        }
-
-        if (latestDeposit < 0 && !hasNonDeregisterVotingAnchor) {
-            return 'SoleVoter';
-        }
-
-        return 'DRep';
+    if (latestDeposit < 0 && !hasNonDeregisterVotingAnchor) {
+      return 'SoleVoter';
     }
 
-    private sortDReps(
-        dreps: DRepListItem[],
-        sort?: DRepListSort,
-        seed?: string,
-        ): DRepListItem[] {
-        const copied = [...dreps];
+    return 'DRep';
+  }
 
-        switch (sort) {
-            case 'VotingPower':
-            return copied.sort(
-                (a, b) => compareIntegers(b.votingPower ?? -1, a.votingPower ?? -1),
-            );
+  private sortDReps(
+    dreps: DRepListItem[],
+    sort?: DRepListSort,
+    seed?: string,
+  ): DRepListItem[] {
+    const copied = [...dreps];
 
-            case 'Activity':
-            return copied.sort(
-                (a, b) => (b.votesLastYear ?? -1) - (a.votesLastYear ?? -1),
-            );
+    switch (sort) {
+      case 'VotingPower':
+        return copied.sort((a, b) =>
+          compareIntegers(b.votingPower ?? -1, a.votingPower ?? -1),
+        );
 
-            case 'RegistrationDate':
-            return copied.sort(
-                (a, b) =>
-                Date.parse(b.latestRegistrationDate) -
-                Date.parse(a.latestRegistrationDate),
-            );
+      case 'Activity':
+        return copied.sort(
+          (a, b) => (b.votesLastYear ?? -1) - (a.votesLastYear ?? -1),
+        );
 
-            case 'Status':
-            return copied.sort(
-                (a, b) => this.statusOrder(a.status) - this.statusOrder(b.status),
-            );
+      case 'RegistrationDate':
+        return copied.sort(
+          (a, b) =>
+            Date.parse(b.latestRegistrationDate) -
+            Date.parse(a.latestRegistrationDate),
+        );
 
-            case 'Random':
-            return copied.sort(
-                (a, b) =>
-                this.seededHash(`${seed ?? ''}:${a.drepId}`) -
-                this.seededHash(`${seed ?? ''}:${b.drepId}`),
-            );
+      case 'Status':
+        return copied.sort(
+          (a, b) => this.statusOrder(a.status) - this.statusOrder(b.status),
+        );
 
-            default:
-            return copied;
-        }
+      case 'Random':
+        return copied.sort(
+          (a, b) =>
+            this.seededHash(`${seed ?? ''}:${a.drepId}`) -
+            this.seededHash(`${seed ?? ''}:${b.drepId}`),
+        );
+
+      default:
+        return copied;
+    }
+  }
+
+  private statusOrder(status: DRepStatus): number {
+    return {
+      Active: 0,
+      Inactive: 1,
+      Retired: 2,
+    }[status];
+  }
+
+  private seededHash(value: string): number {
+    let hash = 0;
+
+    for (let index = 0; index < value.length; index += 1) {
+      hash = (hash * 31 + value.charCodeAt(index)) | 0;
     }
 
-    private statusOrder(status: DRepStatus): number {
-        return {
-            Active: 0,
-            Inactive: 1,
-            Retired: 2,
-        }[status];
+    return hash;
+  }
+
+  private toIsoString(value: Date | string): string {
+    if (value instanceof Date) {
+      return value.toISOString();
     }
 
-    private seededHash(value: string): number {
-        let hash = 0;
-
-        for (let index = 0; index < value.length; index += 1) {
-            hash = (hash * 31 + value.charCodeAt(index)) | 0;
-        }
-
-        return hash;
-    }
-
-    private toIsoString(value: Date | string): string {
-        if (value instanceof Date) {
-            return value.toISOString();
-        }
-
-        return new Date(value).toISOString();
-    }
+    return new Date(value).toISOString();
+  }
 
   private toInteger(value: number | string): number {
     return safeDbInteger(value);
   }
 
-    private toNullableInteger(value: number | string | null): number | null {
-        if (value === null) {
-            return null;
-        }
-        return this.toInteger(value);
+  private toNullableInteger(value: number | string | null): number | null {
+    if (value === null) {
+      return null;
     }
-    
-    private readonly drepListSnapshotNamespace = 'drepListSnapshot';
+    return this.toInteger(value);
+  }
 
-    async warmDefaultListSnapshot(): Promise<void> {
+  private readonly drepListSnapshotNamespace = 'drepListSnapshot';
+
+  async warmDefaultListSnapshot(): Promise<void> {
     await this.cacheService.refresh(
-        this.drepListSnapshotNamespace,
-        '',
-        () => this.fetchDRepListSnapshot(''),
-        this.cacheService.drepListTtlSeconds(),
+      this.drepListSnapshotNamespace,
+      '',
+      () => this.fetchDRepListSnapshot(''),
+      this.cacheService.drepListTtlSeconds(),
     );
-    }
-    private getDRepListSnapShot(search: string): Promise<DRepListItem[]> {
+  }
+  private getDRepListSnapShot(search: string): Promise<DRepListItem[]> {
     return this.cacheService.getOrSetStaleWhileRevalidate(
       this.drepListSnapshotNamespace,
       search,
-      ()=> this.fetchDRepListSnapshot(search),
+      () => this.fetchDRepListSnapshot(search),
       this.cacheService.drepListTtlSeconds(),
     );
   }
 
-  private async fetchDRepListSnapshot(search:string): Promise<DRepListItem[]>{
+  private async fetchDRepListSnapshot(search: string): Promise<DRepListItem[]> {
     const sql = this.sqlService.load('list-dreps.sql');
     const result = await this.dbService.query<DRepList>(sql, [
-            search,
-            search,
-            search,
-            search,
-            search,
-            search,
-            `%${search}%`,
-        ]);
+      search,
+      search,
+      search,
+      search,
+      search,
+      search,
+      `%${search}%`,
+    ]);
 
-    return result.rows.map((row)=> this.toDRepListItem(row));
+    return result.rows.map((row) => this.toDRepListItem(row));
   }
 
   private filterDRepsBySearchRule(
     dreps: DRepListItem[],
     search: string,
-    ): DRepListItem[] {
+  ): DRepListItem[] {
     const searchLower = search.toLowerCase();
 
     if (searchLower === '') {
-        return dreps.filter((drep) => drep.type !== 'SoleVoter');
+      return dreps.filter((drep) => drep.type !== 'SoleVoter');
     }
 
     return dreps.filter((drep) => {
-        if (drep.type !== 'SoleVoter') {
+      if (drep.type !== 'SoleVoter') {
         return true;
-        }
+      }
 
-        return (
+      return (
         drep.view.toLowerCase() === searchLower ||
         drep.drepId.toLowerCase() === searchLower
-        );
+      );
     });
-    }
-
-
-
-
-    
+  }
 }

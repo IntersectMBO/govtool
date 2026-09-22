@@ -1,4 +1,11 @@
-import { Body, Controller, Post, Query, Req, UnsupportedMediaTypeException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Query,
+  Req,
+  UnsupportedMediaTypeException,
+} from '@nestjs/common';
 
 import type { Request } from 'express';
 import { IpfsService } from './ipfs.service';

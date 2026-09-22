@@ -1,15 +1,22 @@
 import { drepStatuses, drepListSorts } from './drep.type';
 import { queryEnum, queryEnums } from 'src/common/query-enum';
-import { governanceActionTypes, governanceActionSortModes } from 'src/proposal/proposal.type';
+import {
+  governanceActionTypes,
+  governanceActionSortModes,
+} from 'src/proposal/proposal.type';
 import type { ApiInteger } from 'src/common/integer';
 import { MAX_PAGE_SIZE, parsePageValue } from 'src/common/pagination';
 import { Controller, Get, Param, Query } from '@nestjs/common';
 
 import { DRepService } from './drep.service';
-import { DRepInfoResponse, DRepVotingPowerListResponse , DRepListResponse, VoteResponse} from './drep.type';
-import type { DRepListSort} from './drep.type';
-import type {  GovernanceActionSortMode} from 'src/proposal/proposal.type';
-
+import {
+  DRepInfoResponse,
+  DRepVotingPowerListResponse,
+  DRepListResponse,
+  VoteResponse,
+} from './drep.type';
+import type { DRepListSort } from './drep.type';
+import type { GovernanceActionSortMode } from 'src/proposal/proposal.type';
 
 @Controller('drep')
 export class DRepController {
@@ -24,7 +31,9 @@ export class DRepController {
   getVotingPowerList(
     @Query('identifiers') identifiers?: string | string[],
   ): Promise<DRepVotingPowerListResponse[]> {
-    return this.drepService.getVotingPowerList(this.normalizeQueryArray(identifiers));
+    return this.drepService.getVotingPowerList(
+      this.normalizeQueryArray(identifiers),
+    );
   }
 
   @Get('info/:drepId')
@@ -33,42 +42,40 @@ export class DRepController {
   }
 
   @Get('getVotes/:drepId')
-    getVotes(
+  getVotes(
     @Param('drepId') drepId: string,
     @Query('type') type?: string | string[],
     @Query('type[]') typeArray?: string | string[],
     @Query('sort') sort?: GovernanceActionSortMode,
     @Query('search') search?: string,
-    ): Promise<VoteResponse[]> {
+  ): Promise<VoteResponse[]> {
     return this.drepService.getVotes(
-        drepId,
-        queryEnums(type, typeArray, governanceActionTypes, 'type'),
-        queryEnum(sort, governanceActionSortModes, 'sort'),
-        search,
+      drepId,
+      queryEnums(type, typeArray, governanceActionTypes, 'type'),
+      queryEnum(sort, governanceActionSortModes, 'sort'),
+      search,
     );
-}
-
+  }
 
   @Get('list')
   getList(
-  @Query('search') search?: string,
-  @Query('status') status?: string | string[],
-  @Query('status[]') statusArray?: string | string[],
-  @Query('sort') sort?: DRepListSort,
-  @Query('page') page?: string,
-  @Query('pageSize') pageSize?: string,
-  @Query('seed') seed?: string,
-    ): Promise<DRepListResponse> {
-  return this.drepService.list({
-    search,
-    status: queryEnums(status, statusArray, drepStatuses, 'status'),
-    sort: queryEnum(sort, drepListSorts, 'sort'),
-    page: parsePageValue(page, 0, 'page'),
-    pageSize: parsePageValue(pageSize, 10, 'pageSize', MAX_PAGE_SIZE),
-    seed,
-  });
-
-    }
+    @Query('search') search?: string,
+    @Query('status') status?: string | string[],
+    @Query('status[]') statusArray?: string | string[],
+    @Query('sort') sort?: DRepListSort,
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+    @Query('seed') seed?: string,
+  ): Promise<DRepListResponse> {
+    return this.drepService.list({
+      search,
+      status: queryEnums(status, statusArray, drepStatuses, 'status'),
+      sort: queryEnum(sort, drepListSorts, 'sort'),
+      page: parsePageValue(page, 0, 'page'),
+      pageSize: parsePageValue(pageSize, 10, 'pageSize', MAX_PAGE_SIZE),
+      seed,
+    });
+  }
   private normalizeQueryArray(value?: string | string[]): string[] {
     if (value === undefined) {
       return [];
@@ -77,4 +84,3 @@ export class DRepController {
     return Array.isArray(value) ? value : [value];
   }
 }
-

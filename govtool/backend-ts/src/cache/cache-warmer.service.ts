@@ -1,40 +1,45 @@
 import { safeDbInteger } from 'src/common/integer';
-import { Injectable,Logger,OnModuleDestroy,OnModuleInit } from "@nestjs/common";
-import { DbService } from "src/db/db.service";
-import { DRepService } from "src/drep/drep.service";
-import { ProposalService } from "src/proposal/proposal.service";
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
+import { DbService } from 'src/db/db.service';
+import { DRepService } from 'src/drep/drep.service';
+import { ProposalService } from 'src/proposal/proposal.service';
 
 type LatestBlockRow = {
-    block_no: string | number | null;
-}
+  block_no: string | number | null;
+};
 
 @Injectable()
 export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
-    private readonly logger = new Logger(CacheWarmerService.name);
-    private timer?: NodeJS.Timeout;
-    private refreshing = false;
-    private lastBlockNo: number | null = null
+  private readonly logger = new Logger(CacheWarmerService.name);
+  private timer?: NodeJS.Timeout;
+  private refreshing = false;
+  private lastBlockNo: number | null = null;
 
-    constructor (
-        private readonly dbService : DbService,
-        private readonly drepService: DRepService,
-        private readonly proposalService: ProposalService,
-    ) {}
-   async onModuleInit(): Promise<void> {
-        await this.refreshIfNeeded(true);
+  constructor(
+    private readonly dbService: DbService,
+    private readonly drepService: DRepService,
+    private readonly proposalService: ProposalService,
+  ) {}
+  async onModuleInit(): Promise<void> {
+    await this.refreshIfNeeded(true);
 
-        this.timer = setInterval(() => {
-        void this.refreshIfNeeded(false);
-        }, 20_000);
+    this.timer = setInterval(() => {
+      void this.refreshIfNeeded(false);
+    }, 20_000);
+  }
+
+  onModuleDestroy(): void {
+    if (this.timer) {
+      clearInterval(this.timer);
     }
+  }
 
-    onModuleDestroy(): void {
-        if (this.timer) {
-            clearInterval(this.timer);
-        }
-    }
-
-    private async refreshIfNeeded(force: boolean): Promise<void> {
+  private async refreshIfNeeded(force: boolean): Promise<void> {
     if (this.refreshing) {
       return;
     }
@@ -44,7 +49,12 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
 
     try {
       const latestBlockNo = await this.getLatestBlockNo();
-      if (!force && latestBlockNo !== null && latestBlockNo === this.lastBlockNo) return;
+      if (
+        !force &&
+        latestBlockNo !== null &&
+        latestBlockNo === this.lastBlockNo
+      )
+        return;
       await Promise.all([
         this.drepService.warmDefaultListSnapshot(),
         this.proposalService.warmActiveProposalSnapshot(),
@@ -65,7 +75,7 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
     }
   }
 
-   private async getLatestBlockNo(): Promise<number | null> {
+  private async getLatestBlockNo(): Promise<number | null> {
     const result = await this.dbService.query<LatestBlockRow>(
       'SELECT MAX(block_no) AS block_no FROM block',
     );
@@ -78,5 +88,4 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
 
     return safeDbInteger(blockNo);
   }
-
 }

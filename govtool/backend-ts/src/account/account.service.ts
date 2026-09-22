@@ -16,26 +16,28 @@ export class AccountService {
   ) {}
 
   async getAccountInfo(stakeKey: string): Promise<AccountInfoResponse> {
-    return this.cacheService.getOrSet('accountInfo',stakeKey,async()=> {
+    return this.cacheService.getOrSet('accountInfo', stakeKey, async () => {
       assertHexText(stakeKey);
 
-    const sql = this.sqlService.load('get-account-info.sql');
-    const result = await this.dbService.query<AccountInfoRow>(sql, [stakeKey]);
-    if (result.rows.length !== 1) {
-      throw new InternalServerErrorException({
-        errorType: 'CriticalError',
-        message: 'Could not query the account info.',
-      });
-    }
+      const sql = this.sqlService.load('get-account-info.sql');
+      const result = await this.dbService.query<AccountInfoRow>(sql, [
+        stakeKey,
+      ]);
+      if (result.rows.length !== 1) {
+        throw new InternalServerErrorException({
+          errorType: 'CriticalError',
+          message: 'Could not query the account info.',
+        });
+      }
 
-    const row = result.rows[0];
+      const row = result.rows[0];
 
-    return {
-      id: safeDbInteger(row.id),
-      view: row.view,
-      isRegistered: row.is_registered,
-      isScriptBased: row.is_script_based,
-    };
+      return {
+        id: safeDbInteger(row.id),
+        view: row.view,
+        isRegistered: row.is_registered,
+        isScriptBased: row.is_script_based,
+      };
     });
   }
 }

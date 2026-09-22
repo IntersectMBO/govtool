@@ -1,14 +1,14 @@
 import type { ApiInteger } from 'src/common/integer';
 import { ProposalResponse } from 'src/proposal/proposal.type';
 export type DRepVotingPower = {
-    amount: number | string;
+  amount: number | string;
 };
 
 export type DRepVotingPowerList = {
-    view: string;
-    hash_raw: string;
-    voting_power: number | string;
-    given_name: string | null;
+  view: string;
+  hash_raw: string;
+  voting_power: number | string;
+  given_name: string | null;
 };
 
 export type DRepVotingPowerListResponse = {
@@ -22,9 +22,14 @@ export const drepStatuses = ['Active', 'Inactive', 'Retired'] as const;
 export type DRepStatus = (typeof drepStatuses)[number];
 export type DRepType = 'DRep' | 'SoleVoter';
 
-export const drepListSorts = ['Random', 'VotingPower', 'Activity', 'RegistrationDate', 'Status'] as const;
+export const drepListSorts = [
+  'Random',
+  'VotingPower',
+  'Activity',
+  'RegistrationDate',
+  'Status',
+] as const;
 export type DRepListSort = (typeof drepListSorts)[number];
-
 
 export type DRepInfo = {
   is_script_based: boolean;
@@ -94,8 +99,8 @@ export type DRepList = {
   image_url: string | null;
   image_hash: string | null;
   votes_last_year: number | string | null;
-  identity_references: unknown | null;
-  link_references: unknown | null;
+  identity_references: unknown;
+  link_references: unknown;
 };
 
 export type DRepListItem = {
@@ -119,8 +124,8 @@ export type DRepListItem = {
   imageUrl: string | null;
   imageHash: string | null;
   votesLastYear: number | null;
-  identityReferences: unknown | null;
-  linkReferences: unknown | null;
+  identityReferences: unknown;
+  linkReferences: unknown;
 };
 
 export type DRepListResponse = {

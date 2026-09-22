@@ -6,10 +6,7 @@ import {
 
 import { DbService } from 'src/db/db.service';
 import { SqlService } from 'src/sql/sq.service';
-import {
-  SurveyDefinitionResponse,
-  SurveyDefinitionRow,
-} from './survey.type';
+import { SurveyDefinitionResponse, SurveyDefinitionRow } from './survey.type';
 
 @Injectable()
 export class SurveyService {

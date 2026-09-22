@@ -42,9 +42,7 @@ describe('safe metadata requests', () => {
     );
   });
   it('passes permitted DNS answers to the socket', async () => {
-    jest
-      .mocked(lookup)
-      .mockResolvedValue({ address: '8.8.8.8', family: 4 } as never);
+    jest.mocked(lookup).mockResolvedValue({ address: '8.8.8.8', family: 4 });
     const callback = jest.fn();
     safeLookup('example.org', {}, callback);
     await Promise.resolve();

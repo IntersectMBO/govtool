@@ -1,18 +1,16 @@
 import type { ApiInteger } from 'src/common/integer';
 export type NetworkInfo = {
-    current_epoch: number | string | null;
-    current_block: number | string | null;
-    network_name: string | null;
+  current_epoch: number | string | null;
+  current_block: number | string | null;
+  network_name: string | null;
 };
-
 
 export type GetNetworkInfoResponse = {
-    currentTime : string;
-    epochNo: number;
-    blockNo: number;
-    networkName: string;
+  currentTime: string;
+  epochNo: number;
+  blockNo: number;
+  networkName: string;
 };
-
 
 export type NetworkTotalStake = {
   total_stake_controlled_by_active_dreps: number | string;

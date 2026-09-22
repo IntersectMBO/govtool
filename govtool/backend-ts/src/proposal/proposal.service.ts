@@ -38,38 +38,44 @@ export class ProposalService {
     drepId?: string;
     search?: string;
   }): Promise<ListProposalsResponse> {
-   return this.cacheService.getOrSet('proposalList',{
-    type: params.type,
-    sort: params.sort,
-    page: params.page,
-    pageSize: params.pageSize,
-    drepId: params.drepId,
-    search: params.search
-   }, async()=> {
-     if (params.drepId) {
-      assertHexText(params.drepId);
-    }
-    const proposals = await this.getProposals('');
+    return this.cacheService.getOrSet(
+      'proposalList',
+      {
+        type: params.type,
+        sort: params.sort,
+        page: params.page,
+        pageSize: params.pageSize,
+        drepId: params.drepId,
+        search: params.search,
+      },
+      async () => {
+        if (params.drepId) {
+          assertHexText(params.drepId);
+        }
+        const proposals = await this.getProposals('');
 
-    let filtered = this.filterByType(proposals, params.type);
-    if (params.drepId) {
-      const votes = await this.voteService.getVotes(params.drepId);
-      const votedIds = new Set(votes.map((vote) => vote.gov_action_id));
-      filtered = filtered.filter((proposal) => !votedIds.has(`${proposal.txHash}#${proposal.index}`));
-    }
-    filtered = this.filterBySearch(filtered, params.search);
-    filtered = this.sortProposals(filtered, params.sort);
+        let filtered = this.filterByType(proposals, params.type);
+        if (params.drepId) {
+          const votes = await this.voteService.getVotes(params.drepId);
+          const votedIds = new Set(votes.map((vote) => vote.gov_action_id));
+          filtered = filtered.filter(
+            (proposal) => !votedIds.has(`${proposal.txHash}#${proposal.index}`),
+          );
+        }
+        filtered = this.filterBySearch(filtered, params.search);
+        filtered = this.sortProposals(filtered, params.sort);
 
-    const total = filtered.length;
-    const start = params.page * params.pageSize;
+        const total = filtered.length;
+        const start = params.page * params.pageSize;
 
-    return {
-      page: params.page,
-      pageSize: params.pageSize,
-      total,
-      elements: filtered.slice(start, start + params.pageSize),
-    };
-   });
+        return {
+          page: params.page,
+          pageSize: params.pageSize,
+          total,
+          elements: filtered.slice(start, start + params.pageSize),
+        };
+      },
+    );
   }
 
   async get(proposalId: string, drepId?: string): Promise<GetProposalResponse> {
@@ -133,11 +139,11 @@ export class ProposalService {
   }
 
   async getProposals(search: string): Promise<ProposalResponse[]> {
-  return this.cacheService.getOrSetStaleWhileRevalidate(
-    this.proposalListSnapshotNamespace,
-    search,
-    () => this.fetchProposals(search),
-  );
+    return this.cacheService.getOrSetStaleWhileRevalidate(
+      this.proposalListSnapshotNamespace,
+      search,
+      () => this.fetchProposals(search),
+    );
   }
 
   govActionId(proposal: ProposalResponse): string {
@@ -204,7 +210,9 @@ export class ProposalService {
       return proposals;
     }
 
-    return proposals.filter((proposal) => selectedTypes.includes(proposal.type));
+    return proposals.filter((proposal) =>
+      selectedTypes.includes(proposal.type),
+    );
   }
 
   filterBySearch(
@@ -251,8 +259,8 @@ export class ProposalService {
         );
 
       case 'MostYesVotes':
-        return copied.sort(
-          (a, b) => compareIntegers(this.totalYesVotes(b), this.totalYesVotes(a)),
+        return copied.sort((a, b) =>
+          compareIntegers(this.totalYesVotes(b), this.totalYesVotes(a)),
         );
 
       default:
@@ -261,14 +269,21 @@ export class ProposalService {
   }
 
   private totalYesVotes(proposal: ProposalResponse): bigint {
-    return BigInt(proposal.dRepYesVotes) + BigInt(proposal.poolYesVotes) + BigInt(proposal.ccYesVotes);
+    return (
+      BigInt(proposal.dRepYesVotes) +
+      BigInt(proposal.poolYesVotes) +
+      BigInt(proposal.ccYesVotes)
+    );
   }
 
   private nullableDateSortValue(value: string | null): number {
     return value === null ? Number.MAX_SAFE_INTEGER : Date.parse(value);
   }
 
-  private parseProposalId(proposalId: string): { txHash: string; index: number } {
+  private parseProposalId(proposalId: string): {
+    txHash: string;
+    index: number;
+  } {
     const [txHash, rawIndex] = proposalId.split('#');
 
     if (!txHash || rawIndex === undefined || rawIndex === '') {
@@ -317,7 +332,9 @@ export class ProposalService {
   }
 
   private toIsoString(value: Date | string): string {
-    return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
+    return value instanceof Date
+      ? value.toISOString()
+      : new Date(value).toISOString();
   }
 
   private toNullableIsoString(value: Date | string | null): string | null {
@@ -325,27 +342,25 @@ export class ProposalService {
   }
   private readonly proposalListSnapshotNamespace = 'proposalListSnapshot';
 
-async warmActiveProposalSnapshot(): Promise<void> {
-  await this.cacheService.refresh(
-    this.proposalListSnapshotNamespace,
-    '',
-    () => this.fetchProposals(''),
-  );
-}
+  async warmActiveProposalSnapshot(): Promise<void> {
+    await this.cacheService.refresh(
+      this.proposalListSnapshotNamespace,
+      '',
+      () => this.fetchProposals(''),
+    );
+  }
 
+  private async fetchProposals(search: string): Promise<ProposalResponse[]> {
+    const sql = this.sqlService.load('list-proposals.sql');
 
-
-private async fetchProposals(search: string): Promise<ProposalResponse[]> {
-  const sql = this.sqlService.load('list-proposals.sql');
-
-  const result = await this.dbService.query<Proposal>(sql, [
-     search,
+    const result = await this.dbService.query<Proposal>(sql, [
+      search,
       `%${search}%`,
       `%${search}%`,
       `%${search}%`,
       `%${search}%`,
       search,
-  ]);
-  return result.rows.map((row) => this.toProposalResponse(row));
-}
+    ]);
+    return result.rows.map((row) => this.toProposalResponse(row));
+  }
 }

@@ -37,6 +37,8 @@ export const Footer = () => {
 
   const onClickHelp = () => openInNewTab(LINKS.SUPPORT);
 
+  const onClickSubscribe = () => openInNewTab(LINKS.NEWSLETTER_SIGNUP);
+
   const onClickPrivacyPolicy = () =>
     openInNewTab(
       "https://docs.intersectmbo.org/legal/policies-and-conditions/privacy-policy",
@@ -86,6 +88,7 @@ export const Footer = () => {
           sx={{
             display: "flex",
             flexDirection: "row",
+            flexWrap: "wrap",
             gap: 3,
             justifyContent: screenWidth < 640 ? "space-between" : undefined,
             mt: screenWidth < 640 ? 1.5 : 0,
@@ -100,6 +103,14 @@ export const Footer = () => {
             variant="text"
           >
             {t("menu.help")}
+          </Button>
+          <Button
+            data-testid="newsletter-footer-button"
+            onClick={onClickSubscribe}
+            size="small"
+            variant="outlined"
+          >
+            {t("footer.subscribe")}
           </Button>
           <Button
             data-testid="feedback-footer-button"

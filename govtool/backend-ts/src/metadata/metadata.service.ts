@@ -166,8 +166,8 @@ export class MetadataService {
     const rationale = this.getFieldValue(body, 'rationale');
 
     if (
-      typeof title !== 'string' ||
-      typeof abstract !== 'string' ||
+      !this.isNonBlankString(title) ||
+      !this.isNonBlankString(abstract) ||
       !motivation ||
       !rationale
     ) {
@@ -183,6 +183,12 @@ export class MetadataService {
     }
 
     return true;
+  }
+
+  // CIP-108 requires `title` and `abstract` as strings (max 80 / 2500 chars).
+  // Empty or whitespace-only values carry no content, so they are rejected.
+  private isNonBlankString(value: unknown): value is string {
+    return typeof value === 'string' && value.trim().length > 0;
   }
 
   private parseMetadata(

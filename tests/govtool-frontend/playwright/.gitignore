@@ -25,3 +25,5 @@ lib/_mock/proposals.json
 lib/_mock/protocolParameter.json
 lib/_mock/faucetWalletBalance.json
 lock_logs.txt
+lib/_mock/hdRun.json
+.faucet.lock

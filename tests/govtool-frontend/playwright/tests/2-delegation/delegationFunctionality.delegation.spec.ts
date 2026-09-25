@@ -1,7 +1,6 @@
 import {
   adaHolder01AuthFile,
   adaHolder02AuthFile,
-  adaHolder03AuthFile,
   adaHolder04AuthFile,
   adaHolder05AuthFile,
   adaHolder06AuthFile,
@@ -10,7 +9,6 @@ import environments from "@constants/environments";
 import {
   adaHolder01Wallet,
   adaHolder02Wallet,
-  adaHolder03Wallet,
   adaHolder04Wallet,
   adaHolder05Wallet,
   adaHolder06Wallet,
@@ -252,36 +250,6 @@ test.describe("Multiple delegations", () => {
     await page.getByTestId(`${dRep02Wallet.dRepId}-delegate-button`).click();
 
     await expect(page.getByTestId("transaction-inprogress-modal")).toBeVisible({
-      timeout: 60_000,
-    });
-  });
-});
-
-test.describe("Abstain delegation", () => {
-  test.use({
-    storageState: adaHolder03AuthFile,
-    wallet: adaHolder03Wallet,
-  });
-
-  test("2U. Should show delegated voting power to Abstain", async ({
-    page,
-  }, testInfo) => {
-    test.setTimeout(testInfo.timeout + environments.txTimeOut);
-
-    const dRepDirectoryPage = new DRepDirectoryPage(page);
-    await dRepDirectoryPage.goto();
-
-    await dRepDirectoryPage.automaticDelegationOptionsDropdown.click();
-    await page.getByTestId("abstain-from-every-vote-delegate-button").click();
-    await waitForTxConfirmation(page);
-
-    const balance = await kuberService.getBalance(adaHolder03Wallet.address);
-
-    await expect(
-      page.getByText(
-        `You have delegated ₳${correctDRepDirectoryFormat(balance)}`
-      )
-    ).toBeVisible({
       timeout: 60_000,
     });
   });

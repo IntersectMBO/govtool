@@ -30,8 +30,9 @@ export default class LoginPage {
 
     const { stakeKeys, rewardAddresses } = await this.page.evaluate(
       async () => {
-        const walletInstance: CIP30Instance | Cip95Instance =
-          await window["cardano"]["demos"].enable();
+        const walletInstance = (await (window as any)["cardano"][
+          "demos"
+        ].enable()) as CIP30Instance | Cip95Instance;
 
         let stakeKeys = [];
         let rewardAddresses = [];

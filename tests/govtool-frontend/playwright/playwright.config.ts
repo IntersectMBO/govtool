@@ -12,6 +12,8 @@ import environments from "lib/constants/environments";
  */
 export default defineConfig({
   testDir: "./tests",
+  // Picks this run's HD account base for the test wallets.
+  globalSetup: "./lib/wallet/hdRunSetup.ts",
   // Run these deterministic local tests with npm run test:cip179.
   testIgnore: ["**/cip179/**"],
   /* Run tests in files in parallel */
@@ -168,11 +170,19 @@ export default defineConfig({
       teardown: environments.ci && "cleanup delegation",
     },
     {
+      // Wallets derived from TEST_WALLET_MNEMONIC and funded on demand; no
+      // setup projects or stored login state needed.
+      name: "wallet",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: "**/*.wallet.spec.ts",
+    },
+    {
       name: "independent (desktop)",
       use: { ...devices["Desktop Chrome"] },
       testIgnore: [
         "**/cip179/**",
         "**/*.delegation.spec.ts",
+        "**/*.wallet.spec.ts",
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",
         "**/*.tx.spec.ts",
@@ -190,6 +200,7 @@ export default defineConfig({
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",
         "**/*.delegation.spec.ts",
+        "**/*.wallet.spec.ts",
         "**/*.tx.spec.ts",
         "**/*.ga.spec.ts",
         "**/*.pd.spec.ts",

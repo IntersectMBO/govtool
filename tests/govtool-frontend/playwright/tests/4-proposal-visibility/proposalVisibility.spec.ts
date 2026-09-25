@@ -180,21 +180,38 @@ test("4L. Should search governance actions", async ({ page }) => {
 test("4M. Should show view-all categorized governance actions", async ({
   page,
 }) => {
-  await page.route("**/proposal/list?**", async (route) =>
-    route.fulfill({
+  const requestedTypes: string[][] = [];
+  await page.route("**/proposal/list?**", async (route) => {
+    requestedTypes.push(
+      new URL(route.request().url()).searchParams.getAll("type[]")
+    );
+    await route.fulfill({
       body: JSON.stringify(infoTypeProposal),
-    })
+    });
+  });
+
+  // The categorized view is reached by URL (e.g. the details page "Back" link
+  // when opened from a category); the list page no longer links to it.
+  await page.goto(
+    `/governance_actions/category/${GovernanceActionType.InfoAction}`
   );
 
+  await expect(page.getByTestId("back-to-list-link")).toBeVisible();
+  // Category heading renders above the cards, which repeat the type label
+  await expect(
+    page.getByText("Info Action", { exact: true }).first()
+  ).toBeVisible();
+
   const governanceActionPage = new GovernanceActionsPage(page);
-  await governanceActionPage.goto();
-
-  await page.getByRole("link", { name: "Show All" }).click();
-
   const proposalCards = await governanceActionPage.getAllProposals();
 
+  expect(proposalCards).toHaveLength(infoTypeProposal.elements.length);
   for (const proposalCard of proposalCards) {
     await expect(proposalCard.getByTestId("InfoAction-type")).toBeVisible();
+  }
+  expect(requestedTypes.length).toBeGreaterThan(0);
+  for (const types of requestedTypes) {
+    expect(types).toEqual([GovernanceActionType.InfoAction]);
   }
 });
 
@@ -224,23 +241,12 @@ test("4K. Should display correct vote counts on governance details page for disc
   page,
   browser,
 }) => {
-  const responsesPromise = Object.keys(GovernanceActionType).map((filterKey) =>
-    page.waitForResponse((response) =>
-      response.url().includes(`&type[]=${GovernanceActionType[filterKey]}`)
-    )
-  );
+  const responsePromise = page.waitForResponse("**/proposal/list?**");
 
   const governanceActionsPage = new GovernanceActionsPage(page);
   await governanceActionsPage.goto();
-  const responses = await Promise.all(responsesPromise);
-  const proposals: IProposal[] = (
-    await Promise.all(
-      responses.map(async (response) => {
-        const data = await response.json();
-        return data.elements;
-      })
-    )
-  ).flat();
+  const response = await responsePromise;
+  const proposals: IProposal[] = (await response.json()).elements;
 
   expect(proposals.length, "No proposals found!").toBeGreaterThan(0);
 

@@ -1,6 +1,7 @@
 import environments from "@constants/environments";
 import { downloadMetadata } from "@helpers/metadata";
 import { Download, expect, Page, Response } from "@playwright/test";
+import { randomUUID } from "crypto";
 import metadataBucketService from "@services/metadataBucketService";
 import { IProposal } from "@types";
 import { withTxConfirmation } from "lib/transaction.decorator";
@@ -100,8 +101,10 @@ export default class GovernanceActionDetailsPage {
   
         this.metadataDownloadBtn.click();
         const voteMetadata = await this.downloadVoteMetadata();
+        // Tests run in parallel and the downloaded file always has the same
+        // name, so give each upload its own to keep the hash matching.
         const url = await metadataBucketService.uploadMetadata(
-          voteMetadata.name,
+          `${randomUUID()}-${voteMetadata.name}`,
           voteMetadata.data
         );  
         await this.metadataUrlInput.fill(url);

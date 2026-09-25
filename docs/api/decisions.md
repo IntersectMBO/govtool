@@ -4905,3 +4905,54 @@ protocol params and genesis-params (optionally) in the spec."
   camelCase, while its threshold lookup expects the legacy snake_case keys.
   *Recommended:* the backend maps them back in the legacy route, like
   `/epoch/params`.
+
+## D137 — Local tests may switch off the private-address guard (amends D122)
+
+**Date:** 2026-09-25
+**Said:** "that would make our test local, for metadata service or component i
+want to have that private ipblocking thing off during test. So that I can run
+the test in peace"
+
+- Both guards get an opt-in switch, off unless set to exactly `true`:
+  `METADATA_ALLOW_PRIVATE_ADDRESSES` in govtool-metadata-service
+  (`src/helpers/addressGuard.ts`) and `GOVTOOL_METADATA_ALLOW_PRIVATE_URLS` in
+  govtool-backend (`config.service.ts`, passed to `fetchMetadataText`). With it
+  on, loopback, private and other non-public addresses are connectable.
+  Protocol and URL-credential checks still apply in the backend.
+- Either service logs a warning at startup when the switch is on.
+- **Amends D122**, which kept the only escape hatch in code so that no
+  deployment could set it. That still holds for every deployment: the switch is
+  for local end-to-end runs, where the test metadata bucket
+  (`tests/test-metadata-api`) lives on loopback. Never set it in a deployment.
+- **Why:** the Playwright suite uploads DRep and vote metadata to a bucket and
+  registers the URL. Against the shared bucket the run depended on
+  `metadata-govtool.cardanoapi.io`, which split-horizon DNS on the office
+  network resolves to a private address, so every registration failed with
+  URL_BLOCKED. A local bucket needs loopback, which the guard refuses by design.
+
+## F51 — Five legacy-shape regressions the Playwright suite found, and their fixes
+
+The frontend suite against govtool-backend on db-sync preview (2026-09-25) found
+five places where `govtool-backend` differed from the Haskell backend. Each was
+diffed against preview.gov.tools/api and now matches it:
+
+- `/proposal/list` and `/drep/getVotes` ignored the bracketed `type[]` the
+  frontend sends (axios percent-encodes it); the controllers read it again, as
+  backend-ts did.
+- `/proposal/list` returned every action; it now lists `live` ones only, as the
+  legacy list did. The snapshot still holds every action, because vote history
+  needs the ended ones; the status travels beside each legacy row.
+- `/ada-holder/get-current-delegation` sent `drepHash`/`drepView`; the legacy
+  keys are `dRepHash`/`dRepView` (inherited from backend-ts).
+- `/drep/info` reported every registration as a DRep. The legacy split is back:
+  an anchor makes a DRep, no anchor makes a direct ("sole") voter. The "was"
+  flags read the latest registration certificate, the only one the contract
+  keeps, so a credential's earlier registrations are not seen.
+- `/transaction/status` sends an empty `votingProcedure`, and the frontend waited
+  on it to confirm a vote. **Not reopened in the contract**: D49 keeps votes
+  unaddressable by transaction and D65 dropped `votingProcedures`. The frontend
+  instead treats a confirmed vote transaction as confirmed, which is equivalent
+  (a transaction on chain has cast its votes) and unchanged against Haskell. The
+  same change keeps polling until the expected state appears or the 3-minute
+  expiry fires; before, polling stopped at confirmation and "in progress" could
+  stay up for good.

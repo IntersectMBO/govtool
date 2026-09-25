@@ -10,8 +10,7 @@ import {
   valid as mockValid,
 } from "@mock/index";
 import { faker } from "@faker-js/faker";
-import { ShelleyWallet } from "./crypto";
-import environments from "@constants/environments";
+import { randomAddress } from "lib/wallet/testWallets";
 
 export async function fetchFirstActiveDRepDetails(page: Page) {
   let dRepGivenName: string;
@@ -142,9 +141,7 @@ export async function generateValidDRepInfo(): Promise<IDRepInfo> {
     objectives: faker.lorem.paragraph(2),
     motivations: faker.lorem.paragraph(2),
     qualifications: faker.lorem.paragraph(2),
-    paymentAddress: (await ShelleyWallet.generate()).addressBech32(
-      environments.networkId
-    ),
+    paymentAddress: await randomAddress(),
     image: faker.image.avatarGitHub(),
     linksReferenceLinks: [
       {

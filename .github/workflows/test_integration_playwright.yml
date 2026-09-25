@@ -97,7 +97,6 @@ jobs:
         run: |
           mkdir -p ./lib/_mock
           chmod +w ./lib/_mock
-          npm run generate-wallets
 
           # Set API keys based on the network
           if [[ "${{ env.NETWORK }}" == "preprod" ]]; then
@@ -124,13 +123,6 @@ jobs:
           name: allure-results
           path: tests/govtool-frontend/playwright/allure-results
 
-      - name: Upload lock logs
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: lock-logs
-          path: tests/govtool-frontend/playwright/lock_logs.txt
-
     env:
       DOCS_URL: ${{ vars.DOCS_URL }}
       KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}
@@ -141,6 +133,7 @@ jobs:
       CARDANOAPI_METADATA_URL: ${{vars.CARDANOAPI_METADATA_URL}}
       FAUCET_PAYMENT_PRIVATE: ${{secrets.FAUCET_PAYMENT_PRIVATE}}
       FAUCET_STAKE_PRIVATE: ${{secrets.FAUCET_STAKE_PRIVATE}}
+      TEST_WALLET_MNEMONIC: ${{secrets.TEST_WALLET_MNEMONIC}}
 
   publish-report:
     runs-on: ubuntu-latest

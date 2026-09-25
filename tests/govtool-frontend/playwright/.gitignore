@@ -27,3 +27,5 @@ lib/_mock/faucetWalletBalance.json
 lock_logs.txt
 lib/_mock/hdRun.json
 .faucet.lock
+.sharedDRep*.lock
+lib/_mock/sharedDReps.json

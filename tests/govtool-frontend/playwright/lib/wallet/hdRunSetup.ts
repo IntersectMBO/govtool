@@ -1,18 +1,21 @@
+import { randomBytes } from "crypto";
 import * as fs from "fs";
+import path = require("path");
 import { HD_RUN_FILE } from "./testWallets";
 
 /**
- * Global setup: picks this run's HD account base, so the run's wallets have no
- * chain history. Hardened account indices stop at 2^31; roles use the next
- * few indices above the base. HD_ACCOUNT_BASE pins it, e.g. to reuse a run's
- * wallets.
+ * Global setup: picks this run's id, which with each wallet's name picks its
+ * HD account, so the run's wallets have no chain history. HD_RUN_ID pins it,
+ * for example to reuse or sweep a past run's wallets.
  */
 export default async function hdRunSetup() {
-  const base = process.env.HD_ACCOUNT_BASE
-    ? Number(process.env.HD_ACCOUNT_BASE)
-    : (Math.floor(Math.random() * 2 ** 20) + 1) * 1024;
+  const runId = process.env.HD_RUN_ID ?? randomBytes(8).toString("hex");
   fs.writeFileSync(
     HD_RUN_FILE,
-    JSON.stringify({ base, startedAt: new Date().toISOString() }, null, 2)
+    JSON.stringify({ runId, startedAt: new Date().toISOString() }, null, 2)
   );
+  // Protocol parameters are cached per run (see helpers/cardano.ts).
+  fs.rmSync(path.resolve(__dirname, "../_mock/protocolParameter.json"), {
+    force: true,
+  });
 }

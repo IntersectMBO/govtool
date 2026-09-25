@@ -3,10 +3,10 @@ import { test } from "@fixtures/budgetProposal";
 import { setAllureEpic } from "@helpers/allure";
 import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
 import { expect } from "@playwright/test";
-import { dRep03Wallet } from "@constants/staticWallets";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
-import { dRep03AuthFile } from "@constants/auth";
 import { skipIfMainnet } from "@helpers/cardano";
+import environments from "@constants/environments";
+import { sharedDRep } from "lib/wallet/sharedDReps";
 
 test.beforeEach(async () => {
   await setAllureEpic("11. Proposal Budget");
@@ -14,9 +14,11 @@ test.beforeEach(async () => {
 });
 
 test.describe("Budget proposal dRep behaviour", () => {
-  test.use({
-    storageState: dRep03AuthFile,
-    wallet: dRep03Wallet,
+  test.use({ walletName: "dRep03" });
+
+  test.beforeAll(async () => {
+    test.setTimeout(2 * environments.txTimeOut);
+    await sharedDRep("dRep03");
   });
 
   test.describe("Budget proposal voting", () => {
@@ -85,6 +87,7 @@ test.describe("Budget proposal dRep behaviour", () => {
   test("11M. Should display DRep tag, name and ID when a registered DRep comments on a proposal", async ({
     page,
   }) => {
+    const { wallet, givenName } = await sharedDRep("dRep03");
     const comment = faker.lorem.words(5);
     const budgetDiscussionPage = new BudgetDiscussionPage(page);
     await budgetDiscussionPage.goto();
@@ -107,7 +110,7 @@ test.describe("Budget proposal dRep behaviour", () => {
     await expect(dRepCommentedCard.getByTestId("dRep-tag")).toBeVisible();
 
     await expect(dRepCommentedCard.getByTestId("dRep-given-name")).toHaveText(
-      dRep03Wallet.givenName,
+      givenName,
       { timeout: 60_000 }
     );
 
@@ -115,6 +118,6 @@ test.describe("Budget proposal dRep behaviour", () => {
       await dRepCommentedCard.getByTestId("dRep-id").textContent()
     ).replace(/\./g, "");
 
-    expect(dRep03Wallet.dRepId).toContain(dRepIdWithoutDotted);
+    expect(wallet.dRepId).toContain(dRepIdWithoutDotted);
   });
 });

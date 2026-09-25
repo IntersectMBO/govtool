@@ -1,15 +1,13 @@
-import { user01AuthFile } from "@constants/auth";
-import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { ShelleyWallet } from "@helpers/crypto";
-import { fetchFirstActiveDRepDetails } from "@helpers/dRep";
+import { fetchFirstActiveDRepDetails, fromHex } from "@helpers/dRep";
 import { isMobile } from "@helpers/mobile";
-import extractDRepFromWallet from "@helpers/shellyWallet";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { expect } from "@playwright/test";
+import { randomBytes } from "crypto";
 
-test.use({ storageState: user01AuthFile, wallet: user01Wallet });
+// Unfunded: 2T expects the insufficient-funds warning.
+test.use({ walletName: "user01", walletFundsAda: 0 });
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
@@ -104,8 +102,7 @@ test.describe("DRep dependent tests", () => {
       timeout: 60_000,
     });
 
-    const wallet = await ShelleyWallet.generate();
-    const invalidDRepId = extractDRepFromWallet(wallet);
+    const invalidDRepId = fromHex("drep", randomBytes(28).toString("hex"));
 
     await dRepDirectoryPage.searchInput.fill(invalidDRepId);
 

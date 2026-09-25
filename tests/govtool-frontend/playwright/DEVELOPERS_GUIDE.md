@@ -65,50 +65,12 @@ This directory contains all automated test cases, organized by feature area:
 
 ---
 
-### Authentication & Setup Scripts
+### Wallets & Setup
 
-13. **`adaholder.auth.setup.ts`**  
-    Sets up authentication for adaHolder wallets.
+Test wallets are HD accounts of `TEST_WALLET_MNEMONIC`, picked by name (`lib/wallet/testWallets.ts`) and funded from the faucet on demand. Specs connect one with `test.use({ walletName: "adaHolder01" })`; `lib/wallet/transactions.ts` registers stake keys and DReps.
 
-14. **`user.auth.setup.ts`**  
-    Sets up authentication for user wallets.
-
-15. **`proposal-budget.auth.setup.ts`**  
-    Authentication setup for proposal budget wallets.
-
-16. **`proposal-discussion.auth.setup.ts`**  
-    Authentication setup for proposal discussion wallets.
-
-17. **`dRep.auth.setup.ts`**  
-    Authentication setup for dRep wallets.
-
-18. **`dRep.setup.ts`**  
-    Setup for temporary and static dRep wallet registration.
-
-19. **`proposal-budget.dRep.setup.ts`**  
-    dRep wallet registration setup for proposal budget tests.
-
-20. **`proposal.setup.ts`**  
-    Setup for proposal submission wallets.
-
-21. **`wallet.bootstrap.ts`**  
-    Initializes adaHolder and dRep wallets with test funds for spendable ADA functionality.
-
----
-
-### Teardown Scripts
-
-21. **`delegation.teardown.ts`**  
-    Resets delegation status (abstains delegation from delegated wallets).
-
-22. **`faucet.teardown.ts`**  
-    Refunds all unspendable ADA from test wallets back to the faucet wallet.
-
-23. **`dRep.teardown.ts`**  
-    Handles deregistration of dRep wallets registered during tests or setup.
-
-24. **`generated-artifacts.teardown.ts`**  
-    Remove all artifacts generated during test execution
+13. **`dRep.setup.ts`**  
+    Registers the shared DReps (dRep01, dRep02, dRep03) with metadata; tests also register them on first use (`lib/wallet/sharedDReps.ts`).
 
 ---
 

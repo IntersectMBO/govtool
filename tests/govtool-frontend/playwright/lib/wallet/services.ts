@@ -33,8 +33,10 @@ export async function isStakeAddressRegistered(
   if (!res.ok) {
     throw new Error(`Blockfrost account lookup failed: ${res.status}`);
   }
-  const account = (await res.json()) as { active: boolean };
-  return account.active;
+  // `registered` is the stake registration; `active` only means delegated to
+  // a stake pool.
+  const account = (await res.json()) as { registered: boolean };
+  return account.registered;
 }
 
 /**

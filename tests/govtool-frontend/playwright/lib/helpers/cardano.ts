@@ -56,16 +56,6 @@ export async function skipIfMainnet() {
   }
 }
 
-export async function skipIfTemporyWalletIsNotAvailable(fileName: string) {
-  const wallets = (await getFile(fileName)) || [];
-  if (wallets.length === 0) {
-    await allure.description(
-      `Temporary wallet file "${fileName}" is not available or contains insufficient wallet. Please fund the faucet wallet and run the test again.`
-    );
-    test.skip();
-  }
-}
-
 export async function skipIfBalanceIsInsufficient(limit = 10) {
   const balance = await getWalletBalance(environments.faucet.address);
   if (balance <= limit) {

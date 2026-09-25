@@ -11,8 +11,7 @@
       "@pages/*": ["lib/pages/*"],
       "@services/*": ["lib/services/*"],
       "@types": ["lib/types.ts"],
-      "@constants/*": ["lib/constants/*"],
-      "@datafactory/*": ["lib/datafactory/*"]
+      "@constants/*": ["lib/constants/*"]
     }
   }
 }

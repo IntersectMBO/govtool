@@ -1,40 +1,28 @@
 import environments from "@constants/environments";
-import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import {
-  skipIfMainnet,
-  skipIfTemporyWalletIsNotAvailable,
-} from "@helpers/cardano";
-import { ShelleyWallet } from "@helpers/crypto";
+import { skipIfMainnet } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
 import { LinkType } from "@types";
-import walletManager from "lib/walletManager";
+import { ensureFunded, testWallet } from "lib/wallet/testWallets";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
   await skipIfMainnet();
-  await skipIfTemporyWalletIsNotAvailable("registerDRepCopyWallets.json");
 });
 
 test("2N. Should show DRep information on details page", async ({
-  page,
   browser,
 }, testInfo) => {
-  test.setTimeout(testInfo.timeout + environments.txTimeOut);
+  test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
-  const wallet = await walletManager.popWallet("registerDRep");
+  const wallet = await testWallet("2N:dRep");
+  await ensureFunded(wallet, 600);
 
-  const tempDRepAuth = await createTempDRepAuth(page, wallet);
-  const dRepPage = await createNewPageWithWallet(browser, {
-    storageState: tempDRepAuth,
-    wallet,
-    enableStakeSigning: true,
-    enableDRepSigning: true,
-  });
+  const dRepPage = await createNewPageWithWallet(browser, { wallet });
 
   const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);
   await dRepRegistrationPage.goto();
@@ -43,9 +31,7 @@ test("2N. Should show DRep information on details page", async ({
   const objectives = faker.lorem.paragraph(2);
   const motivations = faker.lorem.paragraph(2);
   const qualifications = faker.lorem.paragraph(2);
-  const paymentAddress = ShelleyWallet.fromJson(wallet).addressBech32(
-    environments.networkId
-  );
+  const paymentAddress = wallet.address;
   const linksReferenceLinks: LinkType[] = [
     {
       url: faker.internet.url(),

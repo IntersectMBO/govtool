@@ -1,40 +1,26 @@
-import {
-  proposal01AuthFile,
-  proposal03AuthFile,
-  proposal04AuthFile,
-  proposal06AuthFile,
-} from "@constants/auth";
-import environments from "@constants/environments";
-import {
-  proposal01Wallet,
-  proposal03Wallet,
-  proposal04Wallet,
-  proposal06Wallet,
-} from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
-import { getDraftProposalWalletAndState } from "@helpers/auth";
+import { getDraftProposalWalletName } from "@helpers/auth";
 import {
   skipIfNotInfoAndBootstrapping,
   isBootStrapingPhase,
   skipIfMainnet,
 } from "@helpers/cardano";
-import { ShelleyWallet } from "@helpers/crypto";
 import { getProposalType } from "@helpers/index";
 import { createNewPageWithWallet } from "@helpers/page";
-import { rewardAddressBech32 } from "@helpers/shellyWallet";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
 import { ProposalCreateRequest, ProposalType } from "@types";
+import { randomStakeAddress, testWallet } from "lib/wallet/testWallets";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
 });
 
 test.describe("Proposal created logged state", () => {
-  test.use({ storageState: proposal01AuthFile, wallet: proposal01Wallet });
+  test.use({ walletName: "proposal01", walletFundsAda: 0 });
   test("7B. Should access proposal creation page", async ({ page }) => {
     await page.goto("/");
     await page.getByTestId("proposal-discussion-link").click();
@@ -65,9 +51,7 @@ test.describe("Proposal created logged state", () => {
         }
 
         for (let i = 0; i < 50; i++) {
-          const rewardAddressBech32 = (
-            await ShelleyWallet.generate()
-          ).rewardAddressBech32(environments.networkId);
+          const rewardAddressBech32 = await randomStakeAddress();
           const formFields: ProposalCreateRequest =
             await proposalSubmissionPage.generateValidProposalFormFields({
               proposalType: type,
@@ -143,9 +127,7 @@ test.describe("Proposal created logged state", () => {
 
         await proposalSubmissionPage.addLinkBtn.click();
 
-        const stakeAddressBech32 = ShelleyWallet.fromJson(
-          wallet
-        ).rewardAddressBech32(environments.networkId);
+        const stakeAddressBech32 = wallet!.stakeAddress;
         const proposal: ProposalCreateRequest =
           await proposalSubmissionPage.generateValidProposalFormFields({
             proposalType: type,
@@ -208,6 +190,7 @@ test.describe("Proposal created logged state", () => {
     getProposalType().map((type: ProposalType, index) => {
       test(`7I_${index + 1}. Should valid review submission in ${type.toLowerCase()} Proposal form`, async ({
         page,
+        wallet,
       }) => {
         await skipIfNotInfoAndBootstrapping(type);
 
@@ -216,9 +199,7 @@ test.describe("Proposal created logged state", () => {
 
         await proposalSubmissionPage.addLinkBtn.click();
 
-        const rewardAddressBech32 = ShelleyWallet.fromJson(
-          proposal01Wallet
-        ).rewardAddressBech32(environments.networkId);
+        const rewardAddressBech32 = wallet!.stakeAddress;
         const proposal: ProposalCreateRequest =
           await proposalSubmissionPage.generateValidProposalFormFields({
             proposalType: type,
@@ -338,15 +319,13 @@ test.describe("Proposal created logged state", () => {
 
   test("7O. Should display insufficient balance modal when submitting proposal with insufficient funds", async ({
     page,
+    wallet,
   }) => {
     await skipIfMainnet();
     const proposalCreationPage = new ProposalSubmissionPage(page);
     await proposalCreationPage.goto();
 
-    const receiverAddress = rewardAddressBech32(
-      environments.networkId,
-      proposal01Wallet.stake.pkh
-    );
+    const receiverAddress = wallet!.stakeAddress;
 
     await proposalCreationPage.createProposal(receiverAddress);
 
@@ -375,8 +354,7 @@ test.describe("Proposal Draft", () => {
   test("7C. Should list unfinished Draft ", async ({ browser }) => {
     await skipIfMainnet();
     const page = await createNewPageWithWallet(browser, {
-      storageState: proposal03AuthFile,
-      wallet: proposal03Wallet,
+      wallet: await testWallet("proposal03"),
     });
     const proposalSubmissionPage = new ProposalSubmissionPage(page);
     const proposalType =
@@ -390,8 +368,7 @@ test.describe("Proposal Draft", () => {
   test("7L. Should save proposal as a draft", async ({ browser }) => {
     await skipIfMainnet();
     const page = await createNewPageWithWallet(browser, {
-      storageState: proposal04AuthFile,
-      wallet: proposal04Wallet,
+      wallet: await testWallet("proposal04"),
     });
 
     const proposalType =
@@ -474,12 +451,8 @@ test.describe("Proposal Draft", () => {
     }) => {
       await skipIfMainnet();
       test.slow();
-      const { storageState, wallet } =
-        getDraftProposalWalletAndState(proposalType);
-
       const page = await createNewPageWithWallet(browser, {
-        storageState: storageState,
-        wallet: wallet,
+        wallet: await testWallet(getDraftProposalWalletName(proposalType)),
       });
 
       const proposalSubmissionPage = new ProposalSubmissionPage(page);
@@ -487,9 +460,7 @@ test.describe("Proposal Draft", () => {
         proposalType as ProposalType
       );
       const newTitle = faker.lorem.sentence(6);
-      const newTreasuryAddress = (
-        await ShelleyWallet.generate()
-      ).rewardAddressBech32(environments.networkId);
+      const newTreasuryAddress = await randomStakeAddress();
       const newConstitutionUrl = faker.internet.url();
 
       await proposalSubmissionPage.viewFirstDraft();
@@ -558,8 +529,7 @@ test.describe("Proposal Draft", () => {
   test("7N. Should submit a draft proposal", async ({ browser }) => {
     await skipIfMainnet();
     const page = await createNewPageWithWallet(browser, {
-      storageState: proposal06AuthFile,
-      wallet: proposal06Wallet,
+      wallet: await testWallet("proposal06"),
     });
 
     test.slow();

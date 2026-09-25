@@ -1,6 +1,4 @@
-import { user01AuthFile } from "@constants/auth";
 import { InvalidMetadata } from "@constants/index";
-import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import OutcomeDetailsPage from "@pages/outcomeDetailsPage";
@@ -13,10 +11,7 @@ test.beforeEach(async () => {
   await setAllureEpic("9. Outcomes");
 });
 
-test.use({
-  storageState: user01AuthFile,
-  wallet: user01Wallet,
-});
+test.use({ walletName: "user01", walletFundsAda: 0 });
 
 test.describe("Outcomes page", () => {
   let outcomePage: OutComesPage;

@@ -1,27 +1,23 @@
-import { ShelleyWallet } from "./lib/helpers/crypto";
+import { Ed25519Key } from "libcardano";
+import { ShelleyWallet } from "libcardano-wallet";
+import environments from "./lib/constants/environments";
 
 (async () => {
   try {
-    console.log("\nGenerating your wallet... 🔐");
-    const wallet = await ShelleyWallet.generate();
-    const walletJson = wallet.json();
+    console.log("\nGenerating your faucet wallet... 🔐");
+    const payment = Ed25519Key.generate();
+    const stake = Ed25519Key.generate();
+    const address = new ShelleyWallet(payment, stake).addressBech32(
+      environments.networkId
+    );
 
-    // Display wallet details
     console.log("\n🎉 Wallet generated successfully!");
-    console.log("-----------------------------------");
-    console.log("💼 Wallet:", walletJson);
-    console.log(`\n🔑 Payment Private Key: ${walletJson.payment.private}`);
-    console.log(`💰 Stake Private Key: ${walletJson.stake.private}`);
-    console.log(`🏠 Wallet Address: ${walletJson.address}`);
-    console.log("-----------------------------------");
-
-    // Instructions for environment variables
     console.log(
       "\n📋 Please copy the following to your environment variables:"
     );
-    console.log(`1. Set FAUCET_PAYMENT_PRIVATE=${walletJson.payment.private}`);
-    console.log(`2. Set FAUCET_STAKE_PRIVATE=${walletJson.stake.private}`);
-    console.log(`3. Set FAUCET_ADDRESS=${walletJson.address}`);
+    console.log(`FAUCET_ADDRESS=${address}`);
+    console.log(`FAUCET_PAYMENT_PRIVATE=${payment.private.toString("hex")}`);
+    console.log(`FAUCET_STAKE_PRIVATE=${stake.private.toString("hex")}`);
 
     console.log(
       "\n🎈 All set! Please ensure this wallet is funded with a sufficient balance"

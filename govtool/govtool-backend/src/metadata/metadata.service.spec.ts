@@ -3,6 +3,7 @@ import * as blake from 'blakejs';
 import { MetadataService } from './metadata.service';
 import { ConfigService } from '../config/config.service';
 import { MetadataValidationStatus } from './metadata-status.enum';
+import { MetadataStandard } from './metadata.type';
 import { fetchMetadataText, MetadataFetchError } from './safe-metadata-fetch';
 jest.mock('./safe-metadata-fetch', () => ({
   ...jest.requireActual<typeof import('./safe-metadata-fetch')>(
@@ -18,6 +19,7 @@ describe('metadata IPFS configuration', () => {
         get: () => ({
           ipfsGateway: 'https://example.org/ipfs/',
           ipfsProjectId: 'test-project',
+          metadataAllowPrivateUrls: false,
         }),
       } as ConfigService,
       null,
@@ -29,11 +31,42 @@ describe('metadata IPFS configuration', () => {
     expect(fetchMetadataText).toHaveBeenLastCalledWith(
       'https://example.org/ipfs/cid',
       expect.objectContaining({ project_id: 'test-project' }),
+      { allowPrivateAddresses: false },
     );
     await service.validateMetadata({ url: 'https://example.net/data', hash });
     expect(jest.mocked(fetchMetadataText).mock.lastCall![1]).not.toHaveProperty(
       'project_id',
     );
+  });
+});
+
+describe('CIP100 vote rationale', () => {
+  it('returns the comment the frontend shows for a vote rationale', async () => {
+    const service = new MetadataService(
+      {
+        get: () => ({
+          ipfsGateway: '',
+          ipfsProjectId: '',
+          metadataAllowPrivateUrls: false,
+        }),
+      } as ConfigService,
+      null,
+    );
+    const raw = JSON.stringify({
+      body: { comment: { '@value': 'Voting yes because...' } },
+    });
+    jest.mocked(fetchMetadataText).mockResolvedValue(raw);
+
+    await expect(
+      service.validateMetadata({
+        url: 'https://example.org/rationale.jsonld',
+        hash: blake.blake2bHex(raw, undefined, 32),
+        standard: MetadataStandard.CIP100,
+      }),
+    ).resolves.toMatchObject({
+      valid: true,
+      metadata: { comment: 'Voting yes because...' },
+    });
   });
 });
 

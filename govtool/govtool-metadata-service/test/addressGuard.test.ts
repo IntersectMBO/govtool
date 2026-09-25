@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { classifyAddress } from '../src/helpers/addressGuard';
 import { PositionIndex } from '../src/helpers/positions';
 import { gatewayUrl, parseIpfsUrl } from '../src/helpers/ipfs';
@@ -100,5 +100,24 @@ describe('parseIpfsUrl', () => {
   it('builds a gateway url, keeping the path', () => {
     expect(gatewayUrl('https://gw.example/', { namespace: 'ipfs', id: v1, rest: '/a.json' }))
       .toBe(`https://gw.example/ipfs/${v1}/a.json`);
+  });
+});
+
+describe('METADATA_ALLOW_PRIVATE_ADDRESSES (local testing only, D137)', () => {
+  afterEach(() => {
+    delete process.env.METADATA_ALLOW_PRIVATE_ADDRESSES;
+  });
+
+  it.each([['127.0.0.1'], ['172.31.0.3'], ['::1'], ['169.254.169.254']])(
+    'allows %s when set to true',
+    (address) => {
+      process.env.METADATA_ALLOW_PRIVATE_ADDRESSES = 'true';
+      expect(classifyAddress(address)).toEqual({ public: true });
+    },
+  );
+
+  it.each([[undefined], ['false'], ['1'], ['']])('keeps blocking when set to %s', (value) => {
+    if (value !== undefined) process.env.METADATA_ALLOW_PRIVATE_ADDRESSES = value;
+    expect(classifyAddress('127.0.0.1')).toEqual({ public: false, range: 'loopback' });
   });
 });

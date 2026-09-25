@@ -47,10 +47,19 @@ export const allowAddressesForTesting = (addresses: string[]) => {
   testAllowed = new Set(addresses);
 };
 
+/**
+ * Local testing only (D137, amending D122): METADATA_ALLOW_PRIVATE_ADDRESSES=true
+ * treats every address as connectable, so a local test bucket on loopback or a
+ * private network can be fetched. Read on each call so a test can toggle it.
+ * Never set this in a deployment.
+ */
+export const privateAddressesAllowed = (): boolean =>
+  process.env.METADATA_ALLOW_PRIVATE_ADDRESSES?.trim().toLowerCase() === "true";
+
 export type AddressVerdict = { public: true } | { public: false; range: string };
 
 export const classifyAddress = (address: string): AddressVerdict => {
-  if (testAllowed.has(address)) return { public: true };
+  if (testAllowed.has(address) || privateAddressesAllowed()) return { public: true };
   let parsed: ipaddr.IPv4 | ipaddr.IPv6;
   try {
     parsed = ipaddr.parse(address);

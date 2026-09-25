@@ -72,10 +72,16 @@ export class ConfigService {
       ipfsGateway: this.envString('IPFS_GATEWAY', ''),
       ipfsProjectId: this.envString('IPFS_PROJECT_ID', ''),
       pinataApiJwt:
-        this.envString('GOVTOOL_PINATA_API_JWT', rawConfig.pinataapijwt ?? '') ||
-        null,
+        this.envString(
+          'GOVTOOL_PINATA_API_JWT',
+          rawConfig.pinataapijwt ?? '',
+        ) || null,
       metadataServiceUrl:
         this.envString('GOVTOOL_METADATA_SERVICE_URL', '').trim() || null,
+      metadataAllowPrivateUrls:
+        this.envString('GOVTOOL_METADATA_ALLOW_PRIVATE_URLS', 'false')
+          .trim()
+          .toLowerCase() === 'true',
       port: this.envNumber('GOVTOOL_PORT', rawConfig.port),
       host: this.envString('GOVTOOL_HOST', rawConfig.host),
       cacheDurationSeconds: this.envNumber(
@@ -100,7 +106,10 @@ export class ConfigService {
   }
 
   private chainDataProviderName(): ChainDataProviderName {
-    const raw = this.envString('GOVTOOL_CHAIN_DATA_PROVIDER', 'dbsync').toLowerCase();
+    const raw = this.envString(
+      'GOVTOOL_CHAIN_DATA_PROVIDER',
+      'dbsync',
+    ).toLowerCase();
     if (!CHAIN_DATA_PROVIDERS.includes(raw as ChainDataProviderName)) {
       throw new Error(
         `GOVTOOL_CHAIN_DATA_PROVIDER must be one of ${CHAIN_DATA_PROVIDERS.join(', ')}; got '${raw}'`,

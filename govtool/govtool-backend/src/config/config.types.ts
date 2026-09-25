@@ -66,6 +66,12 @@ export type BackendConfig = {
    * and `/reports` routes answer 503.
    */
   metadataServiceUrl: string | null;
+  /**
+   * Local testing only: lets the backend's own metadata fetch reach loopback and
+   * private addresses, which it otherwise refuses (D122, amended by D137). Off
+   * unless GOVTOOL_METADATA_ALLOW_PRIVATE_URLS is exactly "true".
+   */
+  metadataAllowPrivateUrls: boolean;
   port: number;
   host: string;
   cacheDurationSeconds: number;

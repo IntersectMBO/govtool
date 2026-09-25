@@ -125,4 +125,35 @@ describe('safe metadata requests', () => {
       expect.objectContaining({ lookup: safeLookup, agent: false }),
     );
   });
+  describe('allowPrivateAddresses (local testing only, D137)', () => {
+    it.each([
+      'http://127.0.0.1:3001/data/x',
+      'http://localhost:3001/x',
+      'http://10.0.0.1/',
+    ])('fetches %s without the address guard', async (url) => {
+      const { req, response } = connection();
+      const result = fetchMetadataText(
+        url,
+        {},
+        { allowPrivateAddresses: true },
+      );
+      req.emit('response', response);
+      response.emit('data', Buffer.from('{}'));
+      response.emit('end');
+      await expect(result).resolves.toBe('{}');
+      expect(request).toHaveBeenCalledWith(
+        expect.any(URL),
+        expect.objectContaining({ lookup: undefined }),
+      );
+    });
+    it.each(['file:///etc/passwd', 'http://user:pass@127.0.0.1/'])(
+      'still blocks %s',
+      async (url) => {
+        await expect(
+          fetchMetadataText(url, {}, { allowPrivateAddresses: true }),
+        ).rejects.toMatchObject({ code: 'URL_BLOCKED' });
+        expect(request).not.toHaveBeenCalled();
+      },
+    );
+  });
 });

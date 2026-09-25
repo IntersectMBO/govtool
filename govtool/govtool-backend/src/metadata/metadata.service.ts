@@ -27,7 +27,13 @@ export class MetadataService {
     private readonly config: ConfigService,
     @Inject(METADATA)
     private readonly metadataService: MetadataServiceV1 | null,
-  ) {}
+  ) {
+    if (this.config.get().metadataAllowPrivateUrls) {
+      this.logger.warn(
+        'GOVTOOL_METADATA_ALLOW_PRIVATE_URLS=true: metadata fetches may reach loopback and private addresses. Local testing only.',
+      );
+    }
+  }
 
   /**
    * The metadata service's failure codes in the legacy statuses the frontend
@@ -182,11 +188,15 @@ export class MetadataService {
 
   private fetchMetadata(url: string, isIpfs: boolean): Promise<string> {
     const projectId = this.config.get().ipfsProjectId;
-    return fetchMetadataText(url, {
-      'User-Agent': 'GovTool/Metadata-Validation-Tool',
-      'Content-Type': 'application/json',
-      ...(isIpfs && projectId ? { project_id: projectId } : {}),
-    });
+    return fetchMetadataText(
+      url,
+      {
+        'User-Agent': 'GovTool/Metadata-Validation-Tool',
+        'Content-Type': 'application/json',
+        ...(isIpfs && projectId ? { project_id: projectId } : {}),
+      },
+      { allowPrivateAddresses: this.config.get().metadataAllowPrivateUrls },
+    );
   }
 
   private getStandard(

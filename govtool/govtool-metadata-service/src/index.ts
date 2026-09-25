@@ -25,6 +25,7 @@ import path from 'path';
 import setupSwaggerUi from './swagger-loader';
 import fs from 'fs'
 import {prisma} from './config/db';
+import { privateAddressesAllowed } from "./helpers/addressGuard";
 
 const app = express();
 
@@ -84,6 +85,9 @@ const server = http.createServer(app);
 if (process.env.NODE_ENV !== 'test') {
     // Start the server
     const port = process.env.PORT || 3000;
+    if (privateAddressesAllowed()) {
+        console.warn("METADATA_ALLOW_PRIVATE_ADDRESSES=true: metadata fetches may reach loopback and private addresses. Local testing only.")
+    }
     console.log("Connecting to database")
     prisma.$connect().then(() => {
         server.listen(port, () => {

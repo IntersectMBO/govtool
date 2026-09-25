@@ -36,9 +36,19 @@ export const safeLookup: LookupFunction = (hostname, options, callback) => {
     .catch((error: Error) => callback(error, '', 0));
 };
 
+export type MetadataFetchOptions = {
+  /**
+   * Local testing only (D137): skip the loopback, private and non-unicast checks
+   * on the hostname and on the resolved addresses. Protocol and credential
+   * checks still apply.
+   */
+  allowPrivateAddresses?: boolean;
+};
+
 export async function fetchMetadataText(
   url: string,
   headers: Record<string, string>,
+  { allowPrivateAddresses = false }: MetadataFetchOptions = {},
 ): Promise<string> {
   let parsed: URL;
   try {
@@ -47,11 +57,13 @@ export async function fetchMetadataText(
     throw new MetadataFetchError(Status.URL_NOT_FOUND);
   }
   const hostname = parsed.hostname.replace(/^\[|\]$/g, '').toLowerCase();
-  if (
-    !['http:', 'https:'].includes(parsed.protocol) ||
+  const privateHost =
     hostname === 'localhost' ||
     hostname.endsWith('.localhost') ||
-    blocked(hostname) ||
+    blocked(hostname);
+  if (
+    !['http:', 'https:'].includes(parsed.protocol) ||
+    (privateHost && !allowPrivateAddresses) ||
     parsed.username ||
     parsed.password
   ) {
@@ -61,7 +73,11 @@ export async function fetchMetadataText(
   return new Promise((resolve, reject) => {
     const request = parsed.protocol === 'https:' ? httpsRequest : httpRequest;
     // Native requests do not follow redirects or read proxy environment variables.
-    const req = request(parsed, { headers, lookup: safeLookup, agent: false });
+    const req = request(parsed, {
+      headers,
+      lookup: allowPrivateAddresses ? undefined : safeLookup,
+      agent: false,
+    });
     const timer = setTimeout(
       () => req.destroy(new Error('Metadata request timed out')),
       TIMEOUT_MS,

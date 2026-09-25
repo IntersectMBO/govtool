@@ -371,6 +371,16 @@ describe('metadata routes without a configured service', () => {
     });
   });
 
+  it('accepts a CIP100 vote rationale on POST /metadata/validate', async () => {
+    await request(app.getHttpServer())
+      .post('/metadata/validate')
+      .send({ hash: HASH, url: 'file:///etc/passwd', standard: 'CIP100' })
+      .expect(201)
+      .expect((res) => {
+        expect(res.body).toEqual({ status: 'URL_BLOCKED', valid: false });
+      });
+  });
+
   it('leaves POST /metadata/validate working', async () => {
     await request(app.getHttpServer())
       .post('/metadata/validate')

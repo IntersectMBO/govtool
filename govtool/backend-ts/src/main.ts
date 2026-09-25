@@ -1,10 +1,11 @@
 import 'reflect-metadata';
+
+import * as Sentry from '@sentry/nestjs';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from './config/config.service';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as express from 'express';
-
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -13,17 +14,39 @@ async function bootstrap() {
       methods: 'GET,HEAD,POST,OPTIONS',
       allowedHeaders: ['Authorization', 'Content-Type'],
     },
-    logger: ['error', 'log', 'warn']
+    logger: ['error', 'log', 'warn'],
   });
+
   const configService = app.get(ConfigService);
-  const config = configService.get()
-  app.use(express.text({ type: 'text/plain', limit: '600kb'}));
+  const config = configService.get();
+
+  if (config.sentryDsn) {
+    Sentry.init({
+      dsn: config.sentryDsn,
+      environment: config.sentryEnv,
+      sendDefaultPii: false,
+
+      // Error reporting only.
+      tracesSampleRate: 0,
+    });
+  }
+
+  // Enables SIGTERM/SIGINT handling
+  app.enableShutdownHooks();
+
+  app.use(
+    express.text({
+      type: 'text/plain',
+      limit: '600kb',
+    }),
+  );
+
   const swaggerConfig = new DocumentBuilder()
-  .setTitle('GovTool Backend TS')
-  .setDescription('GovTool backend API')
-  .setVersion('1.0')
-  .addServer('/')
-  .build();
+    .setTitle('GovTool Backend TS')
+    .setDescription('GovTool backend API')
+    .setVersion('1.0')
+    .addServer('/')
+    .build();
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('swagger-ui', app, swaggerDocument, {
     jsonDocumentUrl: 'swagger.json',
@@ -33,4 +56,11 @@ async function bootstrap() {
   console.log(`listening on ${config.host}:${config.port}`);
 }
 
-bootstrap();
+void bootstrap().catch(async (error: unknown) => {
+  console.error('Backend failed to start', error);
+
+  Sentry.captureException(error);
+  await Sentry.flush(2_000);
+
+  process.exitCode = 1;
+});

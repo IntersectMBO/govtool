@@ -1,16 +1,29 @@
 import type { ApiInteger } from 'src/common/integer';
 import type { VoteParams } from '../drep/drep.type';
 
-export const governanceActionTypes = ['ParameterChange', 'HardForkInitiation', 'TreasuryWithdrawals', 'NoConfidence', 'NewCommittee', 'NewConstitution', 'InfoAction'] as const;
+export const governanceActionTypes = [
+  'ParameterChange',
+  'HardForkInitiation',
+  'TreasuryWithdrawals',
+  'NoConfidence',
+  'NewCommittee',
+  'NewConstitution',
+  'InfoAction',
+] as const;
 export type GovernanceActionType = (typeof governanceActionTypes)[number];
-export const governanceActionSortModes = ['SoonestToExpire', 'NewestCreated', 'MostYesVotes'] as const;
-export type GovernanceActionSortMode = (typeof governanceActionSortModes)[number];
+export const governanceActionSortModes = [
+  'SoonestToExpire',
+  'NewestCreated',
+  'MostYesVotes',
+] as const;
+export type GovernanceActionSortMode =
+  (typeof governanceActionSortModes)[number];
 
 export type Proposal = {
   id: number | string;
   tx_hash: string;
   index: number | string;
-  type: GovernanceActionType | string;
+  type: string;
   description: unknown;
   expiry_date: Date | string | null;
   expiration: number | string | null;
@@ -18,7 +31,7 @@ export type Proposal = {
   epoch_no: number | string;
   url: string;
   data_hash: string;
-  proposal_params: unknown | null;
+  proposal_params: unknown;
   title: string | null;
   abstract: string | null;
   motivation: string | null;
@@ -34,8 +47,8 @@ export type Proposal = {
   cc_abstain_votes: number | string;
   prev_gov_action_index: number | string | null;
   prev_gov_action_tx_hash: string | null;
-  json_content: unknown | null;
-  authors: unknown | null;
+  json_content: unknown;
+  authors: unknown;
 };
 
 export type ProposalResponse = {
@@ -50,7 +63,7 @@ export type ProposalResponse = {
   createdEpochNo: number;
   url: string;
   metadataHash: string;
-  protocolParams: unknown | null;
+  protocolParams: unknown;
   title: string | null;
   abstract: string | null;
   motivation: string | null;
@@ -66,8 +79,8 @@ export type ProposalResponse = {
   ccAbstainVotes: ApiInteger;
   prevGovActionIndex: number | null;
   prevGovActionTxHash: string | null;
-  json: unknown | null;
-  authors: unknown | null;
+  json: unknown;
+  authors: unknown;
 };
 
 export type ListProposalsResponse = {
@@ -86,7 +99,7 @@ export type EnactedProposalDetailsRow = {
   id: number | string;
   tx_id: number | string;
   index: number | string;
-  description: unknown | null;
+  description: unknown;
   hash: string;
 };
 
@@ -94,6 +107,6 @@ export type EnactedProposalDetailsResponse = {
   id: number;
   txId: number;
   index: number;
-  description: unknown | null;
+  description: unknown;
   hash: string;
 };

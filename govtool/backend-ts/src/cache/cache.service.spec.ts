@@ -10,10 +10,10 @@ describe('bounded cache', () => {
   });
   it('evicts the least recently used entry across all insertion paths', async () => {
     cache.set('n', 'a', 1);
-    await cache.getOrSet('n', 'b', async () => 2);
-    await cache.getOrSet('n', 'a', async () => 99);
-    await cache.refresh('n', 'c', async () => 3);
-    const miss = jest.fn(async () => 4);
+    await cache.getOrSet('n', 'b', () => Promise.resolve(2));
+    await cache.getOrSet('n', 'a', () => Promise.resolve(99));
+    await cache.refresh('n', 'c', () => Promise.resolve(3));
+    const miss = jest.fn(() => Promise.resolve(4));
     expect(await cache.getOrSet('n', 'a', miss)).toBe(1);
     expect(await cache.getOrSet('n', 'b', miss)).toBe(4);
     expect(miss).toHaveBeenCalledTimes(1);
@@ -35,10 +35,10 @@ describe('bounded cache', () => {
     complete(9);
     await Promise.resolve();
     await Promise.resolve();
-    expect(await cache.getOrSet('n', 'a', async () => 4)).toBe(4);
+    expect(await cache.getOrSet('n', 'a', () => Promise.resolve(4))).toBe(4);
   });
   it('shares cold snapshot requests and allows retry after rejection', async () => {
-    const action = jest.fn(async () => 3);
+    const action = jest.fn(() => Promise.resolve(3));
     expect(
       await Promise.all([
         cache.getOrSetStaleWhileRevalidate('n', 'a', action),
@@ -47,10 +47,8 @@ describe('bounded cache', () => {
     ).toEqual([3, 3]);
     expect(action).toHaveBeenCalledTimes(1);
     await expect(
-      cache.getOrSet('n', 'bad', async () => {
-        throw new Error('failed');
-      }),
+      cache.getOrSet('n', 'bad', () => Promise.reject(new Error('failed'))),
     ).rejects.toThrow('failed');
-    expect(await cache.getOrSet('n', 'bad', async () => 5)).toBe(5);
+    expect(await cache.getOrSet('n', 'bad', () => Promise.resolve(5))).toBe(5);
   });
 });

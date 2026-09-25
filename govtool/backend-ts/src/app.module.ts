@@ -1,5 +1,5 @@
 import { VoteService } from './drep/vote.service';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { IntegerJsonInterceptor } from './common/integer-json.interceptor';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -31,11 +31,44 @@ import { CacheWarmerService } from './cache/cache-warmer.service';
 import { MetadataModule } from './metadata/metadata.module';
 import { SurveyController } from './survey/survey.controller';
 import { SurveyService } from './survey/survey.service';
+import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 
 @Module({
-  imports: [MetadataModule],
-  controllers: [AppController, HealthController, NetworkController, EpochController, TransactionController, AdaHolderController, AccountController,DRepController,ProposalController,IpfsController,SystemController,SurveyController],
-  providers: [{ provide: APP_INTERCEPTOR, useClass: IntegerJsonInterceptor }, VoteService, AppService, ConfigService, DbService, NetworkService, SqlService, EpochService, TransactionService, AdaHolderService, AccountService, DRepService,ProposalService,IpfsService,CacheService,CacheWarmerService,SurveyService],
-  exports: [ConfigService, DbService]
+  imports: [SentryModule.forRoot(), MetadataModule],
+  controllers: [
+    AppController,
+    HealthController,
+    NetworkController,
+    EpochController,
+    TransactionController,
+    AdaHolderController,
+    AccountController,
+    DRepController,
+    ProposalController,
+    IpfsController,
+    SystemController,
+    SurveyController,
+  ],
+  providers: [
+    { provide: APP_INTERCEPTOR, useClass: IntegerJsonInterceptor },
+    { provide: APP_FILTER, useClass: SentryGlobalFilter },
+    VoteService,
+    AppService,
+    ConfigService,
+    DbService,
+    NetworkService,
+    SqlService,
+    EpochService,
+    TransactionService,
+    AdaHolderService,
+    AccountService,
+    DRepService,
+    ProposalService,
+    IpfsService,
+    CacheService,
+    CacheWarmerService,
+    SurveyService,
+  ],
+  exports: [ConfigService, DbService],
 })
 export class AppModule {}

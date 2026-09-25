@@ -5,6 +5,7 @@ import { AppModule } from '../src/app.module';
 import { DbService } from '../src/db/db.service';
 import { SqlService } from '../src/sql/sq.service';
 import { ConfigService } from '../src/config/config.service';
+import type { Server } from 'node:http';
 
 const large = '9007199254740993';
 const drep = (hash: string, amount: string) => ({
@@ -44,9 +45,11 @@ const proposal = {
 };
 
 describe('exact integers on the wire', () => {
-  let app: INestApplication;
-  const query = jest.fn(async (sql: string) => {
-    if (sql.startsWith('SELECT MAX')) throw new Error('No warmup database');
+  let app: INestApplication<Server>;
+  const query = jest.fn((sql: string) => {
+    if (sql.startsWith('SELECT MAX')) {
+      return Promise.reject(new Error('No warmup database'));
+    }
     const rows: Record<string, unknown[]> = {
       'get-network-metrics.sql': [
         {
@@ -79,7 +82,7 @@ describe('exact integers on the wire', () => {
       'list-proposals.sql': [proposal],
       'get-previous-enacted-governance-action-proposal-details.sql': [],
     };
-    return { rows: rows[sql] ?? [] };
+    return Promise.resolve({ rows: rows[sql] ?? [] });
   });
   beforeAll(async () => {
     const module = await Test.createTestingModule({ imports: [AppModule] })
@@ -96,7 +99,7 @@ describe('exact integers on the wire', () => {
       .overrideProvider(DbService)
       .useValue({ query })
       .compile();
-    app = module.createNestApplication();
+    app = module.createNestApplication<INestApplication<Server>>();
     app.useLogger(false);
     await app.init();
   });
@@ -117,7 +120,8 @@ describe('exact integers on the wire', () => {
     const response = await request(app.getHttpServer())
       .get('/network/metrics')
       .expect(200);
-    expect(response.body.totalDRepDistr).toBe(0);
+    const body = response.body as { totalDRepDistr: number };
+    expect(body.totalDRepDistr).toBe(0);
   });
   it('preserves network totals as unquoted JSON numbers', async () => {
     const response = await request(app.getHttpServer())
@@ -131,9 +135,8 @@ describe('exact integers on the wire', () => {
       const response = await request(app.getHttpServer())
         .get('/drep/list?sort=VotingPower')
         .expect(200);
-      expect(
-        response.body.elements.map((item: { drepId: string }) => item.drepId),
-      ).toEqual(['bb', 'aa']);
+      const body = response.body as { elements: { drepId: string }[] };
+      expect(body.elements.map((item) => item.drepId)).toEqual(['bb', 'aa']);
       expect(response.text).toContain(`"votingPower":${large}`);
       expect(response.text).toContain(`"deposit":${large}`);
       expect(response.text).toContain('"votesLastYear":null');

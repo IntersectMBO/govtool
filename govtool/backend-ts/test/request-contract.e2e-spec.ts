@@ -8,18 +8,28 @@ import { DRepController } from '../src/drep/drep.controller';
 import { DRepService } from '../src/drep/drep.service';
 import { IpfsController } from '../src/ipfs/ipfs.controller';
 import { IpfsService } from '../src/ipfs/ipfs.service';
+import type { GovernanceActionType } from '../src/proposal/proposal.type';
+import type { Server } from 'node:http';
 
 describe('HTTP input contracts', () => {
-  let app: INestApplication;
+  let app: INestApplication<Server>;
   const proposals = {
-    list: jest.fn(async (params) => params),
-    getEnactedDetails: jest.fn(async () => null),
+    list: jest.fn((params: Parameters<ProposalService['list']>[0]) =>
+      Promise.resolve(params),
+    ),
+    getEnactedDetails: jest.fn(() => Promise.resolve(null)),
   };
   const dreps = {
-    list: jest.fn(async (params) => params),
-    getVotes: jest.fn(async (_id, types) => types),
+    list: jest.fn((params: Parameters<DRepService['list']>[0]) =>
+      Promise.resolve(params),
+    ),
+    getVotes: jest.fn((_id: string, types: GovernanceActionType[]) =>
+      Promise.resolve(types),
+    ),
   };
-  const ipfs = { upload: jest.fn(async () => ({ ipfsCid: 'test' })) };
+  const ipfs = {
+    upload: jest.fn(() => Promise.resolve({ ipfsCid: 'test' })),
+  };
   beforeAll(async () => {
     const module = await Test.createTestingModule({
       controllers: [ProposalController, DRepController, IpfsController],
@@ -29,7 +39,7 @@ describe('HTTP input contracts', () => {
         { provide: IpfsService, useValue: ipfs },
       ],
     }).compile();
-    app = module.createNestApplication();
+    app = module.createNestApplication<INestApplication<Server>>();
     app.use(express.text({ type: 'text/plain' }));
     await app.init();
   });
@@ -58,13 +68,15 @@ describe('HTTP input contracts', () => {
       await request(app.getHttpServer())
         .get(`${route}?page=0&pageSize=0`)
         .expect(200)
-        .expect(({ body }) => {
+        .expect((response) => {
+          const body = response.body as { page: number; pageSize: number };
           expect(body).toMatchObject({ page: 0, pageSize: 0 });
         });
       await request(app.getHttpServer())
         .get(route)
         .expect(200)
-        .expect(({ body }) => {
+        .expect((response) => {
+          const body = response.body as { page: number; pageSize: number };
           expect(body).toMatchObject({ page: 0, pageSize: 10 });
         });
     },
@@ -73,7 +85,8 @@ describe('HTTP input contracts', () => {
     await request(app.getHttpServer())
       .get('/proposal/list?type=InfoAction&type[]=NoConfidence')
       .expect(200)
-      .expect(({ body }) => {
+      .expect((response) => {
+        const body = response.body as { type: GovernanceActionType[] };
         expect(body.type).toEqual(['InfoAction', 'NoConfidence']);
       });
     await request(app.getHttpServer())

@@ -5,10 +5,13 @@ import * as blake from 'blakejs';
 
 import { ValidateMetadataDto } from './dto/validate-metadata.dto';
 import { MetadataValidationStatus } from './metadata-status.enum';
-import {
-  MetadataStandard,
-  ValidateMetadataResult,
-} from './metadata.type';
+import { MetadataStandard, ValidateMetadataResult } from './metadata.type';
+
+class MetadataValidationError extends Error {
+  constructor(readonly code: MetadataValidationStatus) {
+    super(code);
+  }
+}
 
 @Injectable()
 export class MetadataService {
@@ -27,18 +30,25 @@ export class MetadataService {
 
     try {
       const resolvedUrl = this.resolveMetadataUrl(url);
-      const rawData = await this.fetchMetadata(resolvedUrl, url.startsWith('ipfs://'));
+      const rawData = await this.fetchMetadata(
+        resolvedUrl,
+        url.startsWith('ipfs://'),
+      );
 
       let parsedData: Record<string, unknown>;
 
       try {
         parsedData = JSON.parse(rawData) as Record<string, unknown>;
       } catch {
-        throw MetadataValidationStatus.INCORRECT_FORMAT;
+        throw new MetadataValidationError(
+          MetadataValidationStatus.INCORRECT_FORMAT,
+        );
       }
 
       if (!parsedData.body || typeof parsedData.body !== 'object') {
-        throw MetadataValidationStatus.INCORRECT_FORMAT;
+        throw new MetadataValidationError(
+          MetadataValidationStatus.INCORRECT_FORMAT,
+        );
       }
 
       if (!standard) {
@@ -59,17 +69,18 @@ export class MetadataService {
       const hashedMetadata = blake.blake2bHex(rawData, undefined, 32);
 
       if (hashedMetadata.toLowerCase() !== hash.toLowerCase()) {
-        throw MetadataValidationStatus.INVALID_HASH;
+        throw new MetadataValidationError(
+          MetadataValidationStatus.INVALID_HASH,
+        );
       }
     } catch (error) {
       this.logger.error('Metadata validation failed', error);
 
-      if (error instanceof MetadataFetchError) {
+      if (
+        error instanceof MetadataFetchError ||
+        error instanceof MetadataValidationError
+      ) {
         status = error.code;
-      } else if (Object.values(MetadataValidationStatus).includes(
-        error as MetadataValidationStatus,
-      )) {
-        status = error as MetadataValidationStatus;
       } else {
         status = MetadataValidationStatus.INTERNAL_ERROR;
       }
@@ -87,7 +98,9 @@ export class MetadataService {
       const gateway = this.config.get().ipfsGateway;
 
       if (!gateway) {
-        throw MetadataValidationStatus.URL_NOT_FOUND;
+        throw new MetadataValidationError(
+          MetadataValidationStatus.URL_NOT_FOUND,
+        );
       }
 
       return `${gateway.replace(/\/$/, '')}/${url.slice(7)}`;
@@ -130,7 +143,9 @@ export class MetadataService {
         const givenName = this.getFieldValue(body, 'givenName');
 
         if (!givenName) {
-          throw MetadataValidationStatus.INCORRECT_FORMAT;
+          throw new MetadataValidationError(
+            MetadataValidationStatus.INCORRECT_FORMAT,
+          );
         }
 
         return true;
@@ -150,18 +165,35 @@ export class MetadataService {
     const motivation = this.getFieldValue(body, 'motivation');
     const rationale = this.getFieldValue(body, 'rationale');
 
-    if (!title || !abstract || !motivation || !rationale) {
-      throw MetadataValidationStatus.INCORRECT_FORMAT;
+    if (
+      !this.isNonBlankString(title) ||
+      !this.isNonBlankString(abstract) ||
+      !motivation ||
+      !rationale
+    ) {
+      throw new MetadataValidationError(
+        MetadataValidationStatus.INCORRECT_FORMAT,
+      );
     }
 
-    if (String(title).length > 80 || String(abstract).length > 2500) {
-      throw MetadataValidationStatus.INCORRECT_FORMAT;
+    if (title.length > 80 || abstract.length > 2500) {
+      throw new MetadataValidationError(
+        MetadataValidationStatus.INCORRECT_FORMAT,
+      );
     }
 
     return true;
   }
 
-  private parseMetadata(body: Record<string, unknown>): Record<string, unknown> {
+  // CIP-108 requires `title` and `abstract` as strings (max 80 / 2500 chars).
+  // Empty or whitespace-only values carry no content, so they are rejected.
+  private isNonBlankString(value: unknown): value is string {
+    return typeof value === 'string' && value.trim().length > 0;
+  }
+
+  private parseMetadata(
+    body: Record<string, unknown>,
+  ): Record<string, unknown> {
     const metadata: Record<string, unknown> = {};
 
     Object.keys(body).forEach((key) => {
@@ -183,12 +215,8 @@ export class MetadataService {
   ): unknown {
     const value = data[fieldName];
 
-    if (
-      value &&
-      typeof value === 'object' &&
-      '@value' in value
-    ) {
-      return (value as { '@value': unknown })['@value'];
+    if (value && typeof value === 'object' && '@value' in value) {
+      return value['@value'];
     }
 
     return value;

@@ -16,10 +16,7 @@ export class SurveyController {
   ): Promise<SurveyDefinitionResponse> {
     const result = await this.surveyService.getDefinition(txId, index);
 
-    response.setHeader(
-      'Cache-Control',
-      'public, max-age=31536000, immutable',
-    );
+    response.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
 
     return result;
   }

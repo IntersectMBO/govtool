@@ -13,7 +13,8 @@ export class AdaHolderController {
     @Param('stakeKey') stakeKey: string,
     @Res() response: Response,
   ): Promise<void> {
-    const delegation = await this.adaHolderService.getCurrentDelegation(stakeKey);
+    const delegation =
+      await this.adaHolderService.getCurrentDelegation(stakeKey);
     response.status(200).json(delegation);
   }
 

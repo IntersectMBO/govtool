@@ -8,7 +8,9 @@ export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
   @Get(':stakeKey')
-  getAccountInfo(@Param('stakeKey') stakeKey: string): Promise<AccountInfoResponse> {
+  getAccountInfo(
+    @Param('stakeKey') stakeKey: string,
+  ): Promise<AccountInfoResponse> {
     return this.accountService.getAccountInfo(stakeKey);
   }
 }

@@ -1,20 +1,20 @@
 export type DbSyncConfig = {
-    host: string;
-    dbname: string;
-    user: string;
-    password: string;
-    port: number;
+  host: string;
+  dbname: string;
+  user: string;
+  password: string;
+  port: number;
 };
 
 export type BackendConfigFile = {
-    pinataapijwt?: string | null;
-    port: number;
-    host: string;
-    cachedurationseconds: number;
-    dreplistcachedurationseconds: number;
-    sentrydsn: string;
-    sentryenv: string;
-}
+  pinataapijwt?: string | null;
+  port: number;
+  host: string;
+  cachedurationseconds: number;
+  dreplistcachedurationseconds: number;
+  sentrydsn: string;
+  sentryenv: string;
+};
 
 export type BackendConfig = {
   dbSync: DbSyncConfig;

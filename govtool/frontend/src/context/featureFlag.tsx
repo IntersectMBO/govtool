@@ -5,15 +5,15 @@ import {
   useContext,
   useCallback,
 } from "react";
-import type { ControlId, FeatureId, FeatureSet } from "@/models/featureSet";
-import { allowedOptions, isAvailable } from "@/models/featureSet";
-
 import {
   DREP_DIRECTORY_SORTING,
   DREP_DIRECTORY_SORT_CAPABILITY_KEYS,
   GOVERNANCE_ACTIONS_SORTING,
   GOVERNANCE_ACTIONS_SORT_CAPABILITY_KEYS,
 } from "@consts";
+import type { ControlId, FeatureId, FeatureSet } from "@/models/featureSet";
+import { allowedOptions, isAvailable } from "@/models/featureSet";
+
 import { GovernanceActionType } from "@/types/governanceAction";
 import { env } from "@/config/env";
 
@@ -72,9 +72,9 @@ const buildGatedControl = (
       return !options.some((option) => option.key === selected);
     },
     fallbackSelection: (preferred) =>
-      options.some((option) => option.key === preferred)
+      (options.some((option) => option.key === preferred)
         ? preferred
-        : (options[0]?.key ?? null),
+        : (options[0]?.key ?? null)),
   };
 };
 

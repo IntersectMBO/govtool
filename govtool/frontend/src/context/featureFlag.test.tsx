@@ -1,11 +1,10 @@
 import { describe, it, expect, vi, beforeEach, MockedFunction } from "vitest";
 import { renderHook } from "@testing-library/react";
-import type { FeatureId, FeatureSet } from "@/models/featureSet";
-
 import {
   DREP_DIRECTORY_SORTING,
   GOVERNANCE_ACTIONS_SORTING,
 } from "@consts";
+import type { FeatureId, FeatureSet } from "@/models/featureSet";
 
 import { FeatureFlagProvider, useFeatureFlag } from "./featureFlag";
 import { GovernanceActionType } from "@/types/governanceAction";

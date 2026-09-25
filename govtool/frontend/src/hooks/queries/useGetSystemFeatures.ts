@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import type { FeatureSet } from "@/models/featureSet";
 
 import { getSystemFeatures } from "@services";
 import { QUERY_KEYS } from "@consts";
+import type { FeatureSet } from "@/models/featureSet";
 
 /**
  * Fetched once during app bootstrap (see `AppContextProvider`), like

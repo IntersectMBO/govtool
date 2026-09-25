@@ -1,12 +1,63 @@
+import fs from "fs";
 import path from "path";
-import { defineConfig as defineViteConfig, mergeConfig } from "vite";
+import {
+  defineConfig as defineViteConfig,
+  mergeConfig,
+  type Plugin,
+} from "vite";
 import { defineConfig as defineVitestConfig } from "vitest/config";
 import compression from "vite-plugin-compression";
 import react from "@vitejs/plugin-react-swc";
 
+/**
+ * `@intersect.mbo/pdf-ui` injects a stylesheet whose Poppins `@font-face` rules
+ * point at `./files/poppins-*`, but the package ships no `files` folder. Those
+ * requests resolve against the page, reach the SPA fallback, and come back as
+ * HTML the browser cannot decode as a font. Serve them from
+ * `@fontsource/poppins`, which has the same files, in dev and in the build.
+ */
+const POPPINS_DIR = path.resolve(
+  __dirname,
+  "node_modules/@fontsource/poppins/files",
+);
+const POPPINS_FILE = /^\/files\/(poppins-[a-z0-9-]+\.woff2?)$/;
+
+const pdfUiFonts = (): Plugin => ({
+  name: "pdf-ui-fonts",
+  configureServer(server) {
+    server.middlewares.use((req, res, next) => {
+      const match = POPPINS_FILE.exec((req.url ?? "").split("?")[0]);
+      const file = match && path.join(POPPINS_DIR, match[1]);
+      if (!file || !fs.existsSync(file)) {
+        next();
+        return;
+      }
+      res.setHeader(
+        "Content-Type",
+        file.endsWith(".woff2") ? "font/woff2" : "font/woff",
+      );
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      fs.createReadStream(file).pipe(res);
+    });
+  },
+  generateBundle() {
+    if (!fs.existsSync(POPPINS_DIR)) return;
+    for (const name of fs.readdirSync(POPPINS_DIR)) {
+      if (!/^poppins-latin-[0-9]+-(normal|italic)\.woff2?$/.test(name))
+        continue;
+      this.emitFile({
+        type: "asset",
+        fileName: `files/${name}`,
+        source: fs.readFileSync(path.join(POPPINS_DIR, name)),
+      });
+    }
+  },
+});
+
 const viteConfig = defineViteConfig({
   plugins: [
     react(),
+    pdfUiFonts(),
     compression({
       algorithm: "brotliCompress",
       threshold: 1024 * 10,

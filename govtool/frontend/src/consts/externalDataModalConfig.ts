@@ -39,4 +39,5 @@ export const storageInformationErrorModals: Record<
   [MetadataValidationStatus.INCORRECT_FORMAT]: externalDataDoesntMatchModal,
   [MetadataValidationStatus.INVALID_JSONLD]: externalDataDoesntMatchModal,
   [MetadataValidationStatus.INVALID_HASH]: externalDataDoesntMatchModal,
+  [MetadataValidationStatus.EXCEEDS_LIMIT]: externalDataDoesntMatchModal,
 };

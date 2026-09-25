@@ -1,0 +1,30 @@
+{
+  "name": "@govtool/provider-dbsync",
+  "version": "0.1.0",
+  "description": "A GovTool chain-data provider over a cardano-db-sync PostgreSQL database, implementing ChainDataApiV1.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "clean": "node --eval \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "prebuild": "npm run clean",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test test/*.test.mjs",
+    "conformance": "node scripts/conformance.mjs",
+    "verify": "npm run typecheck && npm run build && npm test"
+  },
+  "dependencies": {
+    "@govtool/data-providers": "file:../govtool-data-providers",
+    "bech32": "^2.0.0",
+    "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.11.10",
+    "typescript": "^5.7.2"
+  }
+}

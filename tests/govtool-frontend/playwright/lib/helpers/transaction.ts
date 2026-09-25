@@ -1,22 +1,13 @@
 import environments from "@constants/environments";
 import { Page, expect } from "@playwright/test";
 import kuberService from "@services/kuberService";
-import { LockInterceptor, LockInterceptorInfo } from "lib/lockInterceptor";
-import convertBufferToHex from "./convertBufferToHex";
-import { ShelleyWallet } from "./crypto";
-import { uploadMetadataAndGetJsonHash } from "./metadata";
-import { WalletAndAnchorType } from "@types";
 import { Logger } from "@helpers/logger";
 import { functionWaitedAssert } from "./waitedLoop";
 
 /**
  * Polls the transaction status until it's resolved or times out.
- * address is used to release lock of that address
  */
-export async function pollTransaction(
-  txHash: string,
-  lockInfo?: LockInterceptorInfo
-) {
+export async function pollTransaction(txHash: string) {
   await functionWaitedAssert(
     async () => {
       try {
@@ -35,24 +26,7 @@ export async function pollTransaction(
           .toBeGreaterThan(0);
 
         Logger.success("Tx completed");
-
-        if (!lockInfo) return;
-
-        await LockInterceptor.releaseLock(
-          lockInfo.initiator,
-          lockInfo.lockId,
-          `Task completed for:${lockInfo.lockId}`
-        );
       } catch (err) {
-        if (lockInfo) {
-          const errorMessage = { lockInfo, error: JSON.stringify(err) };
-
-          await LockInterceptor.releaseLock(
-            lockInfo.initiator,
-            lockInfo.lockId,
-            `Task failure: \n${JSON.stringify(errorMessage)}`
-          );
-        }
         Logger.fail(`Failed due to ${err}`);
         throw err;
       }
@@ -96,39 +70,4 @@ export async function waitForTxConfirmation(
     Logger.fail(error.message);
     throw new Error(error);
   }
-}
-
-export async function registerStakeForWallet(wallet: ShelleyWallet) {
-  const { txId, lockInfo } = await kuberService.registerStake(
-    convertBufferToHex(wallet.stakeKey.private),
-    convertBufferToHex(wallet.stakeKey.pkh),
-    convertBufferToHex(wallet.paymentKey.private),
-    wallet.addressBech32(environments.networkId)
-  );
-  await pollTransaction(txId, lockInfo);
-}
-
-export async function transferAdaForWallet(
-  wallet: ShelleyWallet,
-  amount?: number
-) {
-  const { txId, lockInfo } = await kuberService.transferADA(
-    [wallet.addressBech32(environments.networkId)],
-    amount
-  );
-  await pollTransaction(txId, lockInfo);
-}
-
-export async function registerDRepForWallet(wallet: ShelleyWallet) {
-  const dataHashAndUrl = await uploadMetadataAndGetJsonHash();
-  const metadataAnchorAndWallet: WalletAndAnchorType = {
-    ...dataHashAndUrl,
-    wallet: wallet.json(),
-  };
-  const registrationRes = await kuberService.dRepRegistration(
-    convertBufferToHex(wallet.dRepKey.private),
-    convertBufferToHex(wallet.dRepKey.pkh),
-    metadataAnchorAndWallet
-  );
-  await pollTransaction(registrationRes.txId, registrationRes.lockInfo);
 }

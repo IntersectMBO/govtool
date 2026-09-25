@@ -1,17 +1,3 @@
-import {
-  budgetProposal01AuthFile,
-  budgetProposal02AuthFile,
-  budgetProposal03AuthFile,
-  budgetProposal04AuthFile,
-  budgetProposal05AuthFile,
-} from "@constants/auth";
-import {
-  budgetProposal01Wallet,
-  budgetProposal02Wallet,
-  budgetProposal03Wallet,
-  budgetProposal04Wallet,
-  budgetProposal05Wallet,
-} from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/budgetProposal";
 import { setAllureEpic } from "@helpers/allure";
@@ -21,6 +7,7 @@ import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
 import BudgetDiscussionPage from "@pages/budgetDiscussionPage";
 import BudgetDiscussionSubmissionPage from "@pages/budgetDiscussionSubmissionPage";
 import { expect } from "@playwright/test";
+import { testWallet } from "lib/wallet/testWallets";
 import {
   BudgetProposalOwnershipProps,
   BudgetProposalProps,
@@ -35,10 +22,7 @@ test.beforeEach(async () => {
 });
 
 test.describe("Budget proposal 01 wallet", () => {
-  test.use({
-    storageState: budgetProposal01AuthFile,
-    wallet: budgetProposal01Wallet,
-  });
+  test.use({ walletName: "budgetProposal01", walletFundsAda: 0 });
 
   test("12B. Should access proposal creation page in connected state", async ({
     page,
@@ -424,8 +408,7 @@ test.describe("Budget proposal 01 wallet", () => {
 test("12C. Should save and view draft proposal", async ({ browser }) => {
   await skipIfMainnet();
   const page = await createNewPageWithWallet(browser, {
-    storageState: budgetProposal02AuthFile,
-    wallet: budgetProposal02Wallet,
+    wallet: await testWallet("budgetProposal02"),
   });
 
   const budgetSubmissionPage = new BudgetDiscussionSubmissionPage(page);
@@ -474,8 +457,7 @@ test("12H. Should submit a valid budget proposal", async ({ browser }) => {
   await skipIfMainnet();
 
   const page = await createNewPageWithWallet(browser, {
-    storageState: budgetProposal03AuthFile,
-    wallet: budgetProposal03Wallet,
+    wallet: await testWallet("budgetProposal03"),
   });
   const budgetSubmissionPage = new BudgetDiscussionSubmissionPage(page);
   await budgetSubmissionPage.goto();
@@ -496,8 +478,7 @@ test("12I. Should submit a valid draft budget proposal", async ({
   await skipIfMainnet();
   test.slow();
   const page = await createNewPageWithWallet(browser, {
-    storageState: budgetProposal04AuthFile,
-    wallet: budgetProposal04Wallet,
+    wallet: await testWallet("budgetProposal04"),
   });
 
   const budgetSubmissionPage = new BudgetDiscussionSubmissionPage(page);
@@ -525,8 +506,7 @@ test("12J. Should verify created proposal appears in my proposals list", async (
   await skipIfMainnet();
   test.slow();
   const page = await createNewPageWithWallet(browser, {
-    storageState: budgetProposal05AuthFile,
-    wallet: budgetProposal05Wallet,
+    wallet: await testWallet("budgetProposal05"),
   });
 
   const budgetSubmissionPage = new BudgetDiscussionSubmissionPage(page);

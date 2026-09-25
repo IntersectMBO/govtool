@@ -67,6 +67,8 @@ export const GovernanceActionDetails = () => {
     MetadataValidationStatus | undefined
   >();
   const { validateMetadata } = useValidateMutation();
+  // Bumped when a retry resolves the metadata, to validate it again.
+  const [validationRevision, setValidationRevision] = useState(0);
 
   useEffect(() => {
     if (!extendedProposal?.url) return;
@@ -90,7 +92,7 @@ export const GovernanceActionDetails = () => {
       setMetadataStatus(status);
     };
     validate();
-  }, [extendedProposal?.url]);
+  }, [extendedProposal?.url, validationRevision]);
 
   useEffect(() => {
     const isProposalNotFound =
@@ -104,8 +106,13 @@ export const GovernanceActionDetails = () => {
       isEnabled &&
       getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)
     ) {
-      const { pathname } = window.location;
-      navigate(`/connected${pathname}`);
+      // The effect can run again before this page unmounts (StrictMode runs
+      // it twice in development), so only redirect once, and keep the hash:
+      // it carries the action index.
+      const { pathname, search, hash: locationHash } = window.location;
+      if (!pathname.startsWith("/connected")) {
+        navigate(`/connected${pathname}${search}${locationHash}`);
+      }
     }
   }, [isEnabled, error]);
 
@@ -185,6 +192,9 @@ export const GovernanceActionDetails = () => {
               <Box data-testid="governance-action-details">
                 <GovernanceActionDetailsCard
                   isDataMissing={metadataStatus}
+                  onMetadataRecovered={() =>
+                    setValidationRevision((value) => value + 1)
+                  }
                   proposal={extendedProposal}
                 />
               </Box>

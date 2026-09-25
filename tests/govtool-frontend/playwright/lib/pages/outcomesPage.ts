@@ -8,9 +8,7 @@ import OutcomeDetailsPage from "./outcomeDetailsPage";
 import { isMobile } from "@helpers/mobile";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import { createNewPageWithWallet, injectLogger } from "@helpers/page";
-import { createTempUserAuth } from "@datafactory/createAuth";
-import { user01Wallet } from "@constants/staticWallets";
-import { user01AuthFile } from "@constants/auth";
+import { testWallet } from "lib/wallet/testWallets";
 
 const status = ["Expired", "Ratified", "Enacted", "Live"];
 
@@ -548,8 +546,7 @@ export default class OutComesPage {
       page = await browser.newPage();
     } else {
       page = await createNewPageWithWallet(browser, {
-        storageState: user01AuthFile,
-        wallet: user01Wallet,
+        wallet: await testWallet("user01"),
       });
     }
     injectLogger(page);

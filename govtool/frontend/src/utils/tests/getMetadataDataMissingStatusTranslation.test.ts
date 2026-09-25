@@ -23,6 +23,13 @@ describe("getMetadataDataMissingStatusTranslation", () => {
     expect(translation).toBe("Data Not Verifiable");
   });
 
+  it("should map EXCEEDS_LIMIT to the incorrect format translation", () => {
+    const translation = getMetadataDataMissingStatusTranslation(
+      MetadataValidationStatus.EXCEEDS_LIMIT,
+    );
+    expect(translation).toBe("Data Formatted Incorrectly");
+  });
+
   it("should return the default translation for unknown status", () => {
     const translation = getMetadataDataMissingStatusTranslation(
       "UNKNOWN_STATUS" as MetadataValidationStatus,

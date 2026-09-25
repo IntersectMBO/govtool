@@ -1,20 +1,11 @@
-import {
-  proposal01Wallet,
-  proposal02Wallet,
-  user01Wallet,
-} from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { createNewPageWithWallet } from "@helpers/page";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import { Page, expect } from "@playwright/test";
 import { setAllureEpic } from "@helpers/allure";
-import {
-  proposal01AuthFile,
-  proposal02AuthFile,
-  user01AuthFile,
-} from "@constants/auth";
 import { skipIfMainnet } from "@helpers/cardano";
+import { testWallet } from "lib/wallet/testWallets";
 
 test.beforeEach(async () => {
   await setAllureEpic("8. Proposal Discussion Forum");
@@ -22,10 +13,7 @@ test.beforeEach(async () => {
 });
 
 test.describe("Proposal created logged in state", () => {
-  test.use({
-    storageState: proposal02AuthFile,
-    wallet: proposal02Wallet,
-  });
+  test.use({ walletName: "proposal02", walletFundsAda: 0 });
 
   let proposalDiscussionDetailsPage: ProposalDiscussionDetailsPage;
 
@@ -80,8 +68,8 @@ test.describe("Proposal created logged in state", () => {
 
 test.describe("Proposal created with poll enabled (user auth)", () => {
   test.use({
-    storageState: proposal02AuthFile,
-    wallet: proposal02Wallet,
+    walletName: "proposal02",
+    walletFundsAda: 0,
     pollEnabled: true,
   });
 
@@ -140,8 +128,8 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
 
 test.describe("Proposal created with poll enabled (proposal auth)", () => {
   test.use({
-    storageState: user01AuthFile,
-    wallet: user01Wallet,
+    walletName: "user01",
+    walletFundsAda: 0,
     pollEnabled: true,
   });
 
@@ -151,8 +139,7 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
   test.beforeEach(async ({ browser, proposalId }) => {
     test.slow();
     proposalPage = await createNewPageWithWallet(browser, {
-      storageState: proposal01AuthFile,
-      wallet: proposal01Wallet,
+      wallet: await testWallet("proposal01"),
     });
     ownerProposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
       proposalPage

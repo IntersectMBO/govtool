@@ -1,9 +1,7 @@
 import environments from "@constants/environments";
 import { guardrailsScript, guardrailsScriptHash } from "@constants/index";
-import { proposal04Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { isBootStrapingPhase } from "@helpers/cardano";
-import { ShelleyWallet } from "@helpers/crypto";
 import { expectWithInfo } from "@helpers/exceptionHandler";
 import { getProposalType } from "@helpers/index";
 import {
@@ -18,8 +16,8 @@ import {
   ProposalCreateRequest,
   ProposalLink,
   ProposalType,
-  StaticWallet,
 } from "@types";
+import { testWallet } from "lib/wallet/testWallets";
 
 const formErrors = {
   proposalTitle: "title-input-error",
@@ -644,9 +642,7 @@ export default class ProposalSubmissionPage {
     const proposalFormValue = await this.generateValidProposalFormFields({
       proposalType: proposalType,
       is_draft: true,
-      receivingAddress: ShelleyWallet.fromJson(
-        proposal04Wallet
-      ).rewardAddressBech32(environments.networkId),
+      receivingAddress: (await testWallet("proposal04")).stakeAddress,
     });
     await this.fillupForm(proposalFormValue);
 

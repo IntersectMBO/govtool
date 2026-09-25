@@ -1,14 +1,10 @@
-import { dRep01AuthFile } from "@constants/auth";
 import environments from "@constants/environments";
-import { dRep01Wallet } from "@constants/staticWallets";
-import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import {
   isBootStrapingPhase,
   skipIfMainnet,
-  skipIfTemporyWalletIsNotAvailable,
 } from "@helpers/cardano";
 import { encodeCIP129Identifier } from "@helpers/encodeDecode";
 import { createNewPageWithWallet } from "@helpers/page";
@@ -16,18 +12,23 @@ import { waitForTxConfirmation } from "@helpers/transaction";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
-import kuberService from "@services/kuberService";
 import { GovernanceActionType } from "@types";
-import walletManager from "lib/walletManager";
+import { sharedDRep } from "lib/wallet/sharedDReps";
+import { adaBalance } from "lib/wallet/testWallets";
+import { registeredDRepWallet } from "lib/wallet/transactions";
 
 test.beforeEach(async () => {
   await setAllureEpic("5. Proposal functionality");
   await skipIfMainnet();
-  await skipIfTemporyWalletIsNotAvailable("registeredDRepCopyWallets.json");
 });
 
 test.describe("Proposal checks", () => {
-  test.use({ storageState: dRep01AuthFile, wallet: dRep01Wallet });
+  test.use({ walletName: "dRep01" });
+
+  test.beforeAll(async () => {
+    test.setTimeout(2 * environments.txTimeOut);
+    await sharedDRep("dRep01");
+  });
 
   let govActionDetailsPage: GovernanceActionDetailsPage;
   let currentPage: Page;
@@ -141,18 +142,14 @@ test.describe("Perform voting", () => {
   let dRepPage: Page;
   let govActionsPage: GovernanceActionsPage;
 
-  test.beforeEach(async ({ page, browser }) => {
-    test.slow(); // Due to queue in pop wallets
+  test.beforeEach(async ({ browser }, testInfo) => {
+    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
-    const wallet = await walletManager.popWallet("registeredDRep");
+    const wallet = await registeredDRepWallet(
+      `${testInfo.title.split(".")[0]}:dRep`
+    );
 
-    const tempDRepAuth = await createTempDRepAuth(page, wallet);
-
-    dRepPage = await createNewPageWithWallet(browser, {
-      storageState: tempDRepAuth,
-      wallet,
-      enableDRepSigning: true,
-    });
+    dRepPage = await createNewPageWithWallet(browser, { wallet });
 
     govActionsPage = new GovernanceActionsPage(dRepPage);
     govActionsPage.goto();
@@ -317,21 +314,13 @@ test.describe("Perform voting", () => {
 
 test.describe("Check voting power", () => {
   test("5K. Should return deposit on DRep retirement", async ({
-    page,
     browser,
   }, testInfo) => {
-    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+    test.setTimeout(testInfo.timeout + 3 * environments.txTimeOut);
 
-    const wallet = await walletManager.popWallet("registeredDRep");
-    await walletManager.removeCopyWallet(wallet, "registeredDRepCopy");
+    const wallet = await registeredDRepWallet("5K:dRep");
 
-    const tempDRepAuth = await createTempDRepAuth(page, wallet);
-
-    const dRepPage = await createNewPageWithWallet(browser, {
-      storageState: tempDRepAuth,
-      wallet,
-      enableDRepSigning: true,
-    });
+    const dRepPage = await createNewPageWithWallet(browser, { wallet });
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("retire-button").click();
@@ -342,7 +331,7 @@ test.describe("Check voting power", () => {
     dRepPage.getByTestId("confirm-modal-button").click();
     await waitForTxConfirmation(dRepPage);
 
-    const balance = await kuberService.getBalance(wallet.address);
+    const balance = await adaBalance(wallet);
     expect(balance, "Retirement deposit not returned").toBeGreaterThan(500);
   });
 });

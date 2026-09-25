@@ -15,6 +15,7 @@ type GovernanceActionDetailsCardProps = {
   isInProgress?: boolean;
   isValidating?: boolean;
   isVoter?: boolean;
+  onMetadataRecovered?: () => void;
   vote?: ProposalVote | null;
   proposal: ProposalData;
 };
@@ -25,6 +26,7 @@ export const GovernanceActionDetailsCard = ({
   isInProgress,
   isVoter,
   isValidating,
+  onMetadataRecovered,
   vote,
   proposal,
 }: GovernanceActionDetailsCardProps) => {
@@ -66,6 +68,7 @@ export const GovernanceActionDetailsCard = ({
         isSubmitted={isVoteSubmitted}
         proposal={proposal}
         isValidating={isValidating}
+        onMetadataRecovered={onMetadataRecovered}
       />
       <GovernanceActionDetailsCardVotes
         setIsVoteSubmitted={setIsVoteSubmitted}

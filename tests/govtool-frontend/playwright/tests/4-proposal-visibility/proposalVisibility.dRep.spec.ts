@@ -1,6 +1,4 @@
 import environments from "@constants/environments";
-import { dRep01Wallet } from "@constants/staticWallets";
-import { createTempDRepAuth } from "@datafactory/createAuth";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
@@ -8,14 +6,12 @@ import {
   isBootStrapingPhase,
   lovelaceToAda,
   skipIfMainnet,
-  skipIfTemporyWalletIsNotAvailable,
 } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
 import { Page, expect } from "@playwright/test";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import { GovernanceActionType, IProposal } from "@types";
-import walletManager from "lib/walletManager";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
 import { correctVoteAdaFormat } from "@helpers/adaFormat";
 import {
@@ -23,16 +19,21 @@ import {
   areDRepVoteTotalsDisplayed,
   areSPOVoteTotalsDisplayed,
 } from "@helpers/featureFlag";
-import { dRep01AuthFile } from "@constants/auth";
+import { sharedDRep } from "lib/wallet/sharedDReps";
+import { registeredDRepWallet } from "lib/wallet/transactions";
 
 test.beforeEach(async () => {
   await setAllureEpic("4. Proposal visibility");
   await skipIfMainnet();
-  await skipIfTemporyWalletIsNotAvailable("registeredDRepCopyWallets.json");
 });
 
 test.describe("Logged in DRep", () => {
-  test.use({ storageState: dRep01AuthFile, wallet: dRep01Wallet });
+  test.use({ walletName: "dRep01" });
+
+  test.beforeAll(async () => {
+    test.setTimeout(2 * environments.txTimeOut);
+    await sharedDRep("dRep01");
+  });
 
   test("4E. Should display DRep's voting power in governance actions page", async ({
     page,
@@ -106,37 +107,31 @@ test.describe("Logged in DRep", () => {
 });
 
 test.describe("Check vote count", () => {
-  test.use({ storageState: dRep01AuthFile, wallet: dRep01Wallet });
+  test.use({ walletName: "dRep01" });
+
+  test.beforeAll(async () => {
+    test.setTimeout(2 * environments.txTimeOut);
+    await sharedDRep("dRep01");
+  });
 
   test("4G. Should display correct vote counts on governance details page for DRep", async ({
     page,
     browser,
+    wallet,
   }) => {
     const voteWhiteListOption = (await isBootStrapingPhase())
       ? { InfoAction: "InfoAction" }
       : GovernanceActionType;
-    const responsesPromise = Object.keys(voteWhiteListOption).map((filterKey) =>
-      page.waitForResponse((response) =>
-        response
-          .url()
-          .includes(
-            `proposal/list?page=0&pageSize=7&type[]=${voteWhiteListOption[filterKey]}`
-          )
-      )
-    );
+    const responsePromise = page.waitForResponse("**/proposal/list?**");
 
     const governanceActionsPage = new GovernanceActionsPage(page);
     await governanceActionsPage.goto();
 
-    const responses = await Promise.all(responsesPromise);
-    const proposals: IProposal[] = (
-      await Promise.all(
-        responses.map(async (response) => {
-          const data = await response.json();
-          return data.elements;
-        })
-      )
-    ).flat();
+    const response = await responsePromise;
+    const allowedTypes = Object.values(voteWhiteListOption);
+    const proposals: IProposal[] = (await response.json()).elements.filter(
+      (proposal: IProposal) => allowedTypes.includes(proposal.type)
+    );
 
     const uniqueProposalTypes = Array.from(
       new Map(proposals.map((proposal) => [proposal.type, proposal])).values()
@@ -147,8 +142,7 @@ test.describe("Check vote count", () => {
     await Promise.all(
       uniqueProposalTypes.map(async (proposalToCheck) => {
         const dRepPage = await createNewPageWithWallet(browser, {
-          storageState: dRep01AuthFile,
-          wallet: dRep01Wallet,
+          wallet: wallet!,
         });
 
         const totalStakeResponsePromise = dRepPage.waitForResponse((response) =>
@@ -211,19 +205,13 @@ test.describe("Check vote count", () => {
 });
 
 test("4F. Should Disable DRep functionality upon wallet disconnection on governance actions page", async ({
-  page,
   browser,
-}) => {
-  test.slow(); // Due to queue in pop wallets
+}, testInfo) => {
+  test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
-  const wallet = await walletManager.popWallet("registeredDRep");
+  const wallet = await registeredDRepWallet("4F:dRep");
 
-  const tempDRepAuth = await createTempDRepAuth(page, wallet);
-
-  const dRepPage = await createNewPageWithWallet(browser, {
-    storageState: tempDRepAuth,
-    wallet,
-  });
+  const dRepPage = await createNewPageWithWallet(browser, { wallet });
 
   const governanceActionsPage = new GovernanceActionsPage(dRepPage);
   await governanceActionsPage.goto();

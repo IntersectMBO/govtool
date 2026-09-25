@@ -1,76 +1,72 @@
 import environments from "@constants/environments";
-import { createTempUserAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
 import { createNewPageWithWallet, logWalletDetails } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
-import { expect } from "@playwright/test";
-import {
-  skipIfMainnet,
-  skipIfScheduledWorkflow,
-  skipIfTemporyWalletIsNotAvailable,
-} from "@helpers/cardano";
-import { ProposalType } from "@types";
-import walletManager from "lib/walletManager";
+import { expect, Page } from "@playwright/test";
+import { skipIfMainnet, skipIfScheduledWorkflow } from "@helpers/cardano";
 import { valid as mockValid, invalid as mockInvalid } from "@mock/index";
-import { rewardAddressBech32 } from "@helpers/shellyWallet";
-import { getProposalType, getWalletConfigForFaucet } from "@helpers/index";
+import { getProposalType } from "@helpers/index";
 import { faker } from "@faker-js/faker";
-import { proposalSubmissionAuthFile } from "@constants/auth";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
-import { createKeyFromPrivateKeyHex } from "@helpers/crypto";
+import kuberService from "@services/kuberService";
+import { ensureFunded, testWallet, TestWallet } from "lib/wallet/testWallets";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
   await skipIfMainnet();
-  await skipIfTemporyWalletIsNotAvailable("proposalSubmissionWallets.json");
 });
+
+/** The named wallet, funded with the governance action deposit and fees. */
+async function proposalSubmissionWallet(name: string): Promise<TestWallet> {
+  const { govActionDeposit } = await kuberService.queryProtocolParams();
+  const wallet = await testWallet(name);
+  await ensureFunded(wallet, govActionDeposit / 1_000_000 + 22);
+  return wallet;
+}
+
+async function setUsernameIfNeeded(page: Page) {
+  const proposalDiscussionPage = new ProposalDiscussionPage(page);
+  await proposalDiscussionPage.goto();
+  await proposalDiscussionPage.verifyIdentityBtn.click();
+
+  try {
+    await expect(page.getByTestId("username-input")).toBeVisible({
+      timeout: 10_000,
+    });
+    await proposalDiscussionPage.setUsername(mockValid.username());
+  } catch (error) {
+    // Ignore error if username is already set
+    console.log("Username is already set");
+  }
+}
 
 getProposalType().forEach((proposalType, index) => {
   test(`7H_${index + 1}. Should submit a ${proposalType.toLocaleLowerCase()} proposal as governance action`, async ({
-    page,
     browser,
   }, testInfo) => {
     await skipIfScheduledWorkflow();
-    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
-    const wallet = await walletManager.popWallet("proposalSubmission");
+    const wallet = await proposalSubmissionWallet(`7H_${index + 1}:proposer`);
 
     await logWalletDetails(wallet.address);
 
-    const tempUserAuth = await createTempUserAuth(page, wallet);
+    const userPage = await createNewPageWithWallet(browser, { wallet });
 
-    const userPage = await createNewPageWithWallet(browser, {
-      storageState: tempUserAuth,
-      wallet: wallet,
-    });
-
+    await setUsernameIfNeeded(userPage);
     const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
-    await proposalDiscussionPage.goto();
-    await proposalDiscussionPage.verifyIdentityBtn.click();
-
-    try {
-      await expect(userPage.getByTestId("username-input")).toBeVisible({
-        timeout: 10_000,
-      });
-      await proposalDiscussionPage.setUsername(mockValid.username());
-    } catch (error) {
-      // Ignore error if username is already set
-      console.log("Username is already set");
-    }
 
     const proposalSubmissionPage = new ProposalSubmissionPage(userPage);
     await proposalSubmissionPage.proposalCreateBtn.click();
     await proposalDiscussionPage.continueBtn.click();
 
-    const rewardAddress = rewardAddressBech32(
-      environments.networkId,
-      wallet.stake.pkh
+    await proposalSubmissionPage.createProposal(
+      wallet.stakeAddress,
+      proposalType
     );
-
-    await proposalSubmissionPage.createProposal(rewardAddress, proposalType);
 
     await userPage.getByTestId("submit-as-GA-button").click();
 
@@ -95,27 +91,23 @@ test.describe("Proposed as a governance action", async () => {
   let proposalDiscussionDetailPage: ProposalDiscussionDetailsPage;
   let proposalId: number;
 
-  test.beforeEach(async ({ browser }) => {
-    const proposalSubmissionWallet =
-      await walletManager.getFirstWalletByPurpose("proposalSubmissionCopy");
-    await logWalletDetails(proposalSubmissionWallet.address);
+  test.beforeEach(async ({ browser }, testInfo) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
-    const page = await createNewPageWithWallet(browser, {
-      storageState: proposalSubmissionAuthFile,
-      wallet: proposalSubmissionWallet,
-    });
+    const wallet = await proposalSubmissionWallet("7:gaProposer");
+    await logWalletDetails(wallet.address);
+
+    const page = await createNewPageWithWallet(browser, { wallet });
+    await setUsernameIfNeeded(page);
 
     proposalSubmissionPage = new ProposalSubmissionPage(page);
     await proposalSubmissionPage.goto();
 
     proposalDiscussionDetailPage = new ProposalDiscussionDetailsPage(page);
 
-    const rewardAddress = rewardAddressBech32(
-      environments.networkId,
-      getWalletConfigForFaucet().address
+    proposalId = await proposalSubmissionPage.createProposal(
+      wallet.stakeAddress
     );
-
-    proposalId = await proposalSubmissionPage.createProposal(rewardAddress);
     await proposalDiscussionDetailPage.submitAsGABtn.click();
     await proposalSubmissionPage.currentPage
       .getByTestId("agree-checkbox")

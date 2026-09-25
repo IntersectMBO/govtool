@@ -212,6 +212,7 @@ export const useRegisterAsdRepForm = (
               ...storageInformationErrorModals[
                 error as MetadataValidationStatus
               ],
+              metadataAnchor: { url: data.storingURL, hash: hash ?? "" },
               onSubmit: backToForm,
               onCancel: backToDashboard,
             },

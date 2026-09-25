@@ -41,3 +41,4 @@ export * from "./validateSignature";
 export * from "./cip8verification";
 export * from "./clipboard";
 export * from "./getPageTitle";
+export * from "./metadataReportHighlight";

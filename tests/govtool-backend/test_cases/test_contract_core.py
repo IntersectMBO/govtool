@@ -182,7 +182,9 @@ def test_account_contract(govtool_api):
     account = response.json()
 
     assert set(account) >= {"id", "view", "isRegistered", "isScriptBased"}
-    assert_int(account["id"])
+    # A db-sync row id: null from a backend on the provider contract, which
+    # carries no source row ids.
+    assert_nullable(account["id"], int)
     assert isinstance(account["view"], str)
     assert isinstance(account["isRegistered"], bool)
     assert isinstance(account["isScriptBased"], bool)
@@ -196,8 +198,10 @@ def test_enacted_details_contract(govtool_api):
         return
 
     assert set(enacted_details) >= {"id", "txId", "index", "description", "hash"}
-    assert_int(enacted_details["id"])
-    assert_int(enacted_details["txId"])
+    # db-sync row ids: null from a backend on the provider contract, which
+    # carries no source row ids.
+    assert_nullable(enacted_details["id"], int)
+    assert_nullable(enacted_details["txId"], int)
     assert_int(enacted_details["index"])
     assert_nullable(enacted_details["description"], dict)
     assert isinstance(enacted_details["hash"], str)

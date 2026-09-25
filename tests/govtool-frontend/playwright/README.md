@@ -86,53 +86,34 @@ npx playwright install
 
 ---
 
-## 🔧 Faucet wallet Configuration
+## 🔧 Wallet Configuration
 
-This section guides you through generating a Cardano faucet wallet and configuring it for use. Follow the steps below to create and set the config on env
+Two secrets drive every wallet the tests use:
 
-### Step 1: Generate a Faucet Wallet
+- `TEST_WALLET_MNEMONIC`: a 24-word mnemonic. Each test wallet is a CIP-1852 account derived from it by name, fresh for every run.
+- `FAUCET_ADDRESS`, `FAUCET_PAYMENT_PRIVATE`, `FAUCET_STAKE_PRIVATE`: the faucet wallet, which funds the test wallets as tests need them.
 
-Run the following command to generate a new faucet wallet:
+No wallet keys are written to disk, and no wallets need to be generated before a run. To reuse a past run's wallets, set `HD_RUN_ID` to the id recorded in `lib/_mock/hdRun.json`.
+
+### Step 1: Generate the Secrets
 
 ```bash
+npm run generate-test-mnemonic
 npm run generate-faucet-wallet
 ```
 
-The script will:
-
-- Display the wallet details (payment private key, stake public key hash, and wallet address) in the terminal.
-
-**Example Output:**
-
-```
-🎉 Wallet generated successfully!
------------------------------------
-🔑 Payment Private Key: <your-payment-private-key>
-💰 Stake Private Key: <your-stake-private>
-🏠 Wallet Address: <your-wallet-address>
------------------------------------
-
-📋 Please copy the following to your environment variables:
-1. Set FAUCET_PAYMENT_PRIVATE=<your-payment-private-key>
-2. Set FAUCET_STAKE_PRIVATE=<your-stake-private>
-3. Set FAUCET_ADDRESS=<your-wallet-address>
-
-🎈 All set! Please ensure this wallet is funded with a sufficient balance
-```
-
-### Step 2: Configure Environment Variables
-
-Securely store the generated wallet details in your environment variables. Add the following to your `.env` file or environment configuration:
+Each script prints the lines to add to your `.env` file:
 
 ```env
-FAUCET_PAYMENT_PRIVATE=<your-payment-private-key>
-FAUCET_STAKE_PKH=<your-stake-pkh>
+TEST_WALLET_MNEMONIC="<24 words>"
 FAUCET_ADDRESS=<your-wallet-address>
+FAUCET_PAYMENT_PRIVATE=<your-payment-private-key>
+FAUCET_STAKE_PRIVATE=<your-stake-private-key>
 ```
 
-⚠️ **Security Note**: Store your wallet details in a secure location for future use. The payment private key is sensitive and must be protected to prevent unauthorized access to your funds.
+⚠️ **Security Note**: Keep these values secret. Anyone holding the mnemonic or the faucet keys can spend the test funds.
 
-### Step 3: Fund the Wallet
+### Step 2: Fund the Faucet Wallet
 
 Ensure your wallet has enough funds for your test runs. The required balance depends on the specific tests you plan to execute (see test-specific details below).
 
@@ -163,16 +144,6 @@ https://${network}.cardanoscan.io/address/<your-wallet-address>
 ---
 
 ## 🧪 Running Tests
-
-### 🔑 Generate Test Wallets
-
-Before each test run, generate test wallets required for wallet-dependent tests:
-
-```bash
-npm run generate-wallets
-```
-
----
 
 ### 🔁 Run All Tests
 

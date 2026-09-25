@@ -12,6 +12,8 @@ import environments from "lib/constants/environments";
  */
 export default defineConfig({
   testDir: "./tests",
+  // Picks this run's HD account base for the test wallets.
+  globalSetup: "./lib/wallet/hdRunSetup.ts",
   // Run these deterministic local tests with npm run test:cip179.
   testIgnore: ["**/cip179/**"],
   /* Run tests in files in parallel */
@@ -46,126 +48,61 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "wallet bootstrap",
-      testMatch: "**/wallet.bootstrap.ts",
-      teardown: environments.ci && "cleanup faucet",
-    },
-    {
-      name: "user auth setup",
-      testMatch: "**/user.auth.setup.ts",
-    },
-    {
-      name: "adaholder auth setup",
-      testMatch: "**/adaholder.auth.setup.ts",
-      dependencies: environments.ci ? ["wallet bootstrap"] : [],
-      teardown: environments.ci && "cleanup artifacts",
-    },
-    {
-      name: "dRep auth setup",
-      testMatch: "**/dRep.auth.setup.ts",
-    },
-    {
-      name: "proposal discussion auth setup",
-      testMatch: "**/proposal-discussion.auth.setup.ts",
-    },
-    {
-      name: "budget proposal auth setup",
-      testMatch: "**/proposal-budget.auth.setup.ts",
-      teardown: environments.ci && "cleanup faucet",
-    },
-    {
-      name: "proposal submission ga auth setup",
-      testMatch: "**/proposal-submission.ga.auth.setup.ts",
-      dependencies: environments.ci ? ["proposal setup"] : [],
-      teardown: environments.ci && "cleanup faucet",
-    },
-    {
+      // Registers the shared DReps (dRep01..03) that other tests delegate to
+      // or look up; tests also register them on first use.
       name: "dRep setup",
       testMatch: "**/dRep.setup.ts",
-      dependencies: environments.ci ? ["wallet bootstrap"] : [],
-      teardown: environments.ci && "cleanup dRep",
-    },
-    {
-      name: "budget proposal dRep setup",
-      testMatch: "**/proposal-budget.dRep.setup.ts",
-      teardown: environments.ci && "cleanup dRep",
-    },
-    {
-      name: "proposal setup",
-      testMatch: "**/proposal.setup.ts",
-      teardown: environments.ci && "cleanup faucet",
     },
     {
       name: "proposal discussion",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.pd.spec.ts",
       testIgnore: ["**/*.loggedin.pd.spec.ts"],
-      dependencies: environments.ci
-        ? ["proposal discussion auth setup"]
-        : [],
-        teardown: environments.ci && "cleanup artifacts",
     },
-      {
+    {
       name: "proposal discussion (loggedin)",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.loggedin.pd.spec.ts",
-      dependencies: environments.ci
-        ? ["proposal discussion auth setup", "user auth setup"]
-        : [],
-        teardown: environments.ci && "cleanup artifacts",
     },
     {
       name: "budget proposal",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.pb.spec.ts",
-      dependencies: environments.ci
-        ? ["budget proposal auth setup"]
-        : [],
       testIgnore: ["**/*.dRep.pb.spec.ts"],
-      teardown: environments.ci && "cleanup artifacts",
     },
     {
       name: "proposal submission",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.ga.spec.ts",
-      dependencies: environments.ci
-        ? ["proposal submission ga auth setup"]
-        : [],
-        teardown: environments.ci && "cleanup artifacts",
     },
     {
       name: "loggedin (desktop)",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.loggedin.spec.ts",
-      dependencies: environments.ci ? ["user auth setup"] : [],
-      teardown: environments.ci && "cleanup artifacts",
     },
     {
       name: "budget proposal dRep",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.dRep.pb.spec.ts",
-      dependencies: environments.ci
-        ? ["budget proposal auth setup","budget proposal dRep setup"]
-        : [],
-        teardown: environments.ci && "cleanup artifacts",
+      dependencies: environments.ci ? ["dRep setup"] : [],
     },
     {
       name: "dRep",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.dRep.spec.ts",
-      dependencies: environments.ci
-        ? ["dRep auth setup" , "dRep setup"]
-        : [],
-        teardown: environments.ci && "cleanup artifacts",
+      dependencies: environments.ci ? ["dRep setup"] : [],
     },
     {
       name: "delegation",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.delegation.spec.ts",
-      dependencies: environments.ci
-        ? ["adaholder auth setup","dRep auth setup"]
-        : [],
-      teardown: environments.ci && "cleanup delegation",
+      dependencies: environments.ci ? ["dRep setup"] : [],
+    },
+    {
+      // Wallets derived from TEST_WALLET_MNEMONIC and funded on demand.
+      name: "wallet",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: "**/*.wallet.spec.ts",
     },
     {
       name: "independent (desktop)",
@@ -173,6 +110,7 @@ export default defineConfig({
       testIgnore: [
         "**/cip179/**",
         "**/*.delegation.spec.ts",
+        "**/*.wallet.spec.ts",
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",
         "**/*.tx.spec.ts",
@@ -180,7 +118,6 @@ export default defineConfig({
         "**/*.pd.spec.ts",
         "**/*.pb.spec.ts",
       ],
-      teardown: environments.ci && "cleanup artifacts",
     },
     {
       name: "mobile",
@@ -190,29 +127,13 @@ export default defineConfig({
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",
         "**/*.delegation.spec.ts",
+        "**/*.wallet.spec.ts",
         "**/*.tx.spec.ts",
         "**/*.ga.spec.ts",
         "**/*.pd.spec.ts",
         "**/*.pb.spec.ts",
         "**/walletConnect.spec.ts",
       ],
-      teardown: environments.ci && "cleanup artifacts",
-    },
-    {
-      name: "cleanup delegation",
-      testMatch: "delegation.teardown.ts",
-    },
-    {
-      name: "cleanup dRep",
-      testMatch: "dRep.teardown.ts",
-    },
-    {
-      name: "cleanup faucet",
-      testMatch: "faucet.teardown.ts",
-    },
-    {
-      name: "cleanup artifacts",
-      testMatch: "generated-artifacts.teardown.ts",
     },
   ],
 });

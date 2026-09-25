@@ -46,16 +46,16 @@ export const invalid = {
       return faker.lorem.words(31).replace(/\s+/g, "");
     } else if (choice === 3) {
       // Starts with a period, which is invalid
-      return "." + faker.internet.userName();
+      return "." + faker.internet.username();
     } else if (choice === 4) {
       // Starts with an underscore, which is invalid
-      return "_" + faker.internet.userName();
+      return "_" + faker.internet.username();
     } else if (choice === 5) {
       // Contains an invalid character, such as a symbol
-      return faker.internet.userName() + "#";
+      return faker.internet.username() + "#";
     } else if (choice === 6) {
       // Contains a hyphen
-      return faker.internet.userName() + "-";
+      return faker.internet.username() + "-";
     }
   },
 
@@ -113,7 +113,7 @@ export const valid = {
   },
   username: () => {
     let timeStamp = Date.now();
-    let username = `${faker.internet.userName().toLowerCase()}_${timeStamp}`;
+    let username = `${faker.internet.username().toLowerCase()}_${timeStamp}`;
 
     // Remove any invalid characters
     username = username.replace(/[^a-z0-9._]/g, "");

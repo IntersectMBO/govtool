@@ -3,6 +3,7 @@ enum MetadataValidationStatus {
   INVALID_JSONLD = "INVALID_JSONLD",
   INVALID_HASH = "INVALID_HASH",
   INCORRECT_FORMAT = "INCORRECT_FORMAT",
+  EXCEEDS_LIMIT = "EXCEEDS_LIMIT",
 }
 declare module "@intersect.mbo/pdf-ui/cjs" {
   import { EpochParams, Account } from "@/models";

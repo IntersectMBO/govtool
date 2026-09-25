@@ -50,7 +50,17 @@ export const VotesSubmitted = ({
     areDRepVoteTotalsDisplayed,
     areSPOVoteTotalsDisplayed,
     areCCVoteTotalsDisplayed,
+    isFeatureAvailable,
   } = useFeatureFlag();
+
+  // Whole-feature gate. Every number in the committee block — the member count,
+  // each percentage denominator and the quorum threshold — comes from the
+  // governance metrics record. A provider that refuses it would make this block
+  // render "0 of 0 members" and a 0% threshold as if they were facts, which is
+  // worse than not rendering it. Fails OPEN while capabilities are unknown.
+  const areCommitteeMetricsAvailable = isFeatureAvailable(
+    "dashboard.committeeThreshold",
+  );
   const { t } = useTranslation();
   const { networkTotalStake, fetchNetworkTotalStake } =
     useGetNetworkTotalStake();
@@ -236,7 +246,7 @@ export const VotesSubmitted = ({
             }
           />
         )}
-        {areCCVoteTotalsDisplayed(type) && (
+        {areCCVoteTotalsDisplayed(type) && areCommitteeMetricsAvailable && (
           <VotesGroup
             type="ccCommittee"
             yesVotes={ccYesVotes}

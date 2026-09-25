@@ -11,6 +11,8 @@ export * from "./useGetNetworkTotalStake";
 export * from "./useGetProposalQuery";
 export * from "./useGetProposalsInfiniteQuery";
 export * from "./useGetProposalsQuery";
+export * from "./useGetSystemFeatures";
 export * from "./useGetVoteContextTextFromFile";
 export * from "./useGetVoterInfoQuery";
 export * from "./useGetDRepVotingPowerList";
+export * from "./useGetMetadataReports";

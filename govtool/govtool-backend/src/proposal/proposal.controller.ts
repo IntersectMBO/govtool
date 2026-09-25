@@ -21,6 +21,7 @@ export class ProposalController {
   @Get('list')
   list(
     @Query('type') type?: string | string[],
+    @Query('type[]') typeArray?: string | string[],
     @Query('sort') sort?: GovernanceActionSortMode,
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,
@@ -28,7 +29,7 @@ export class ProposalController {
     @Query('search') search?: string,
   ): Promise<ListProposalsResponse> {
     return this.proposalService.list({
-      type: queryEnums(type, undefined, governanceActionTypes, 'type'),
+      type: queryEnums(type, typeArray, governanceActionTypes, 'type'),
       sort: queryEnum(sort, governanceActionSortModes, 'sort'),
       page: parsePageValue(page, 0, 'page'),
       pageSize: parsePageValue(pageSize, 10, 'pageSize', MAX_PAGE_SIZE),

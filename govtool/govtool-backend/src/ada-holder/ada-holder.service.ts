@@ -103,16 +103,16 @@ export class AdaHolderService {
         // The legacy renderings: the raw hex hash (compared with the wallet's
         // hex DRep id) and the CIP-105 view (searched in the directory). Both
         // equal the `drepId` / `view` on the matching directory row.
-        drepHash: drepIdToHex(target.drep.id),
-        drepView: drepIdToCip105(target.drep.id),
+        dRepHash: drepIdToHex(target.drep.id),
+        dRepView: drepIdToCip105(target.drep.id),
         isDRepScriptBased: target.drep.isScriptBased ?? false,
         txHash: delegation.txRef?.txHash ?? '',
       };
     }
 
     return {
-      drepHash: null,
-      drepView: PREDEFINED_VIEW[target.target],
+      dRepHash: null,
+      dRepView: PREDEFINED_VIEW[target.target],
       isDRepScriptBased: false,
       txHash: delegation.txRef?.txHash ?? '',
     };

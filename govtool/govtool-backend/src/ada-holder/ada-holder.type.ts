@@ -6,8 +6,8 @@ export type CurrentDelegationRow = {
 };
 
 export type DelegationResponse = {
-  drepHash: string | null;
-  drepView: string;
+  dRepHash: string | null;
+  dRepView: string;
   isDRepScriptBased: boolean;
   txHash: string;
 };

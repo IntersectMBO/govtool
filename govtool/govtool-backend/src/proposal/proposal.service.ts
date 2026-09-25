@@ -8,6 +8,7 @@ import type {
   ChainDataApiV1,
   GovActionLineage,
   GovAction,
+  GovActionStatus,
   VoteAggregate,
 } from '@govtool/data-providers/chain-data';
 
@@ -73,6 +74,15 @@ const LINEAGE_OF: Record<
   HardForkInitiation: 'hardFork',
 };
 
+/**
+ * One snapshot row: the legacy proposal, plus the status the list route filters
+ * on. The legacy shape has no status field, so it travels alongside.
+ */
+type ProposalSnapshotEntry = {
+  proposal: ProposalResponse;
+  status: GovActionStatus;
+};
+
 @Injectable()
 export class ProposalService {
   private readonly proposalListSnapshotNamespace = 'proposalListSnapshot';
@@ -121,7 +131,11 @@ export class ProposalService {
             assertIdentifier(params.drepId);
           }
 
-          const proposals = await this.getProposals('');
+          // Live actions only, as the legacy list returned: an action leaves
+          // the list once it is ratified, enacted, expired or dropped.
+          const proposals = (await this.getProposalSnapshot(''))
+            .filter(({ status }) => status === 'live')
+            .map(({ proposal }) => proposal);
 
           let filtered = this.filterByType(proposals, params.type);
           filtered = this.filterBySearch(filtered, params.search);
@@ -222,7 +236,16 @@ export class ProposalService {
   }
 
   /** Cached, stale-while-revalidate snapshot — unchanged from the legacy service. */
+  /** Every proposal, whatever its status: vote history needs the ended ones. */
   async getProposals(search: string): Promise<ProposalResponse[]> {
+    return (await this.getProposalSnapshot(search)).map(
+      ({ proposal }) => proposal,
+    );
+  }
+
+  private getProposalSnapshot(
+    search: string,
+  ): Promise<ProposalSnapshotEntry[]> {
     return this.cacheService.getOrSetStaleWhileRevalidate(
       this.proposalListSnapshotNamespace,
       search,
@@ -238,7 +261,9 @@ export class ProposalService {
     );
   }
 
-  private async fetchProposals(search: string): Promise<ProposalResponse[]> {
+  private async fetchProposals(
+    search: string,
+  ): Promise<ProposalSnapshotEntry[]> {
     return asHttp(async () => {
       const elements =
         search === ''
@@ -258,7 +283,10 @@ export class ProposalService {
           (expires !== null && expires.time === undefined),
       );
       const schedule = undated ? await this.network.epochSchedule() : null;
-      return elements.map((action) => this.toLegacyProposal(action, schedule));
+      return elements.map((action) => ({
+        proposal: this.toLegacyProposal(action, schedule),
+        status: action.lifecycle.status,
+      }));
     });
   }
 

@@ -46,12 +46,13 @@ export class DRepController {
   getVotes(
     @Param('drepId') drepId: string,
     @Query('type') type?: string | string[],
+    @Query('type[]') typeArray?: string | string[],
     @Query('sort') sort?: GovernanceActionSortMode,
     @Query('search') search?: string,
   ): Promise<VoteResponse[]> {
     return this.drepService.getVotes(
       drepId,
-      queryEnums(type, undefined, governanceActionTypes, 'type'),
+      queryEnums(type, typeArray, governanceActionTypes, 'type'),
       queryEnum(sort, governanceActionSortModes, 'sort'),
       search,
     );

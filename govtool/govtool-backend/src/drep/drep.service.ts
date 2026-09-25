@@ -242,15 +242,22 @@ export class DRepService {
           drep.anchor?.dataHash ?? null,
         );
 
+        // The legacy split, as the Haskell backend drew it: a registration
+        // with an anchor is a DRep, one without is a direct ("sole") voter.
+        // The "is" flags read the current anchor; the "was" flags read the
+        // latest registration certificate, the only one the contract keeps.
+        const registered = drep.status !== 'retired';
+        const hasAnchor = drep.anchor !== null;
+        const latest = drep.registration.latest;
+        const registeredWithAnchor =
+          latest.anchor === undefined ? hasAnchor : latest.anchor !== null;
+
         return {
           isScriptBased: drep.isScriptBased ?? false,
-          // The four booleans distinguished a DRep registration from a direct
-          // voter one. Direct voters are gone from the contract, so a record
-          // that exists is a DRep registration and nothing else.
-          isRegisteredAsDRep: drep.status !== 'retired',
-          wasRegisteredAsDRep: true,
-          isRegisteredAsSoleVoter: false,
-          wasRegisteredAsSoleVoter: false,
+          isRegisteredAsDRep: registered && hasAnchor,
+          wasRegisteredAsDRep: registeredWithAnchor,
+          isRegisteredAsSoleVoter: registered && !hasAnchor,
+          wasRegisteredAsSoleVoter: !registeredWithAnchor,
           deposit: toLegacyNullableInteger(drep.registration.latest.deposit),
           url: drep.anchor?.url ?? null,
           dataHash: drep.anchor?.dataHash ?? null,
@@ -258,11 +265,13 @@ export class DRepService {
             drep.votingPower === null
               ? null
               : dbInteger(drep.votingPower.amount),
-          dRepRegisterTxHash: drep.registration.latest.txRef.txHash,
+          dRepRegisterTxHash: registeredWithAnchor ? latest.txRef.txHash : null,
           // Retirement is dated on the contract but not attributed to a
-          // transaction, and there is no direct-voter registration to report.
+          // transaction.
           dRepRetireTxHash: null,
-          soleVoterRegisterTxHash: null,
+          soleVoterRegisterTxHash: registeredWithAnchor
+            ? null
+            : latest.txRef.txHash,
           soleVoterRetireTxHash: null,
           // The CIP-119 body, resolved through the metadata service; null
           // when it is not configured or the document does not resolve.

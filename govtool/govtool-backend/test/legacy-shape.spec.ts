@@ -180,9 +180,10 @@ describe('GET /ada-holder/get-current-delegation/:stakeKey', () => {
         txRef: { txHash: 'c'.repeat(64) },
       }).getCurrentDelegation(STAKE_KEY),
     ).resolves.toEqual({
-      // The raw hash, and CIP-105 with the script prefix.
-      drepHash: HASH,
-      drepView: drepIdToCip105(drepId('a', true)),
+      // The raw hash, and CIP-105 with the script prefix. The keys are
+      // dRepHash / dRepView, as the Haskell backend sends and the frontend reads.
+      dRepHash: HASH,
+      dRepView: drepIdToCip105(drepId('a', true)),
       isDRepScriptBased: true,
       txHash: 'c'.repeat(64),
     });
@@ -200,8 +201,8 @@ describe('GET /ada-holder/get-current-delegation/:stakeKey', () => {
           txRef: { txHash: 'c'.repeat(64) },
         }).getCurrentDelegation(STAKE_KEY),
       ).resolves.toEqual({
-        drepHash: null,
-        drepView: view,
+        dRepHash: null,
+        dRepView: view,
         isDRepScriptBased: false,
         txHash: 'c'.repeat(64),
       });
@@ -717,7 +718,7 @@ describe('GET /drep/info/:drepId', () => {
       isScriptBased: false,
       isRegisteredAsDRep: true,
       wasRegisteredAsDRep: true,
-      // Direct voters are not a ledger concept and are gone from the contract.
+      // A registration with an anchor is a DRep, not a direct voter.
       isRegisteredAsSoleVoter: false,
       wasRegisteredAsSoleVoter: false,
       deposit: 500000000,
@@ -751,6 +752,67 @@ describe('GET /drep/info/:drepId', () => {
     await expect(service.getInfo(DREP_ID)).resolves.toMatchObject({
       isRegisteredAsDRep: false,
       wasRegisteredAsDRep: true,
+    });
+  });
+
+  it('reports a registration without an anchor as a direct voter, as the Haskell backend did', async () => {
+    const service = drepService({
+      governance: {
+        dreps: {
+          get: () =>
+            Promise.resolve(
+              env(
+                fullDRep({
+                  kind: 'anonymous',
+                  anchor: null,
+                  registration: {
+                    latest: {
+                      txRef: { txHash: 'd'.repeat(64) },
+                      at: { epoch: 500 },
+                      anchor: null,
+                      deposit: '500000000',
+                    },
+                    latestUpdate: null,
+                  },
+                }),
+              ),
+            ),
+        },
+      },
+    });
+
+    await expect(service.getInfo(DREP_ID)).resolves.toMatchObject({
+      isRegisteredAsDRep: false,
+      wasRegisteredAsDRep: false,
+      isRegisteredAsSoleVoter: true,
+      wasRegisteredAsSoleVoter: true,
+      dRepRegisterTxHash: null,
+      soleVoterRegisterTxHash: 'd'.repeat(64),
+    });
+  });
+
+  it('reports a retired direct voter as no longer registered', async () => {
+    const service = drepService({
+      governance: {
+        dreps: {
+          get: () =>
+            Promise.resolve(
+              env(
+                fullDRep({
+                  kind: 'anonymous',
+                  anchor: null,
+                  status: 'retired',
+                }),
+              ),
+            ),
+        },
+      },
+    });
+
+    await expect(service.getInfo(DREP_ID)).resolves.toMatchObject({
+      isRegisteredAsDRep: false,
+      isRegisteredAsSoleVoter: false,
+      wasRegisteredAsSoleVoter: true,
     });
   });
 
@@ -1268,6 +1330,32 @@ function proposalService(chainStub: StubApi): ProposalService {
 }
 
 describe('GET /proposal/list', () => {
+  it('lists live actions only, while vote history still sees every action', async () => {
+    const ended = (status: 'ratified' | 'enacted' | 'expired' | 'dropped') =>
+      govAction({ lifecycle: { ...govAction().lifecycle, status } });
+    const service = proposalService({
+      governance: {
+        proposals: {
+          list: () =>
+            Promise.resolve(
+              page([
+                govAction(),
+                ended('ratified'),
+                ended('enacted'),
+                ended('expired'),
+                ended('dropped'),
+              ]),
+            ),
+        },
+      },
+    });
+
+    const body = await service.list({ type: [], page: 0, pageSize: 10 });
+    expect(body.total).toBe(1);
+    expect(body.elements).toHaveLength(1);
+    await expect(service.getProposals('')).resolves.toHaveLength(5);
+  });
+
   it('returns every legacy key with the legacy value types', async () => {
     const service = proposalService({
       governance: {

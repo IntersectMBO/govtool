@@ -45,6 +45,23 @@ export class ConfigService {
       pinataApiJwt:
         this.envString('VVA_PINATAAPIJWT', rawConfig.pinataapijwt ?? '') ||
         null,
+      ipfsUpload: {
+        perClientLimit: this.positiveInteger(
+          'VVA_IPFSUPLOAD_PERCLIENTLIMIT',
+          10,
+        ),
+        globalLimit: this.positiveInteger('VVA_IPFSUPLOAD_GLOBALLIMIT', 300),
+        windowSeconds: this.positiveInteger(
+          'VVA_IPFSUPLOAD_WINDOWSECONDS',
+          3600,
+        ),
+      },
+      // Express "trust proxy" setting used to resolve the client IP for
+      // rate limiting. Defaults to trusting only private-network proxies.
+      trustProxy: this.envString(
+        'VVA_TRUSTPROXY',
+        'loopback, linklocal, uniquelocal',
+      ),
       port: this.envNumber('VVA_PORT', rawConfig.port),
       host: this.envString('VVA_HOST', rawConfig.host),
       cacheDurationSeconds: this.envNumber(

@@ -36,6 +36,9 @@ export const DataMissingInfoBox = ({
     [MetadataValidationStatus.INCORRECT_FORMAT]: isDrep
       ? t("errors.dRep.message.incorrectFormat")
       : t("errors.gAMetadata.message.incorrectFormat"),
+    [MetadataValidationStatus.EXCEEDS_LIMIT]: isDrep
+      ? t("errors.dRep.message.incorrectFormat")
+      : t("errors.gAMetadata.message.incorrectFormat"),
   }[isDataMissing as MetadataValidationStatus];
 
   const gaMetadataErrorDescription = {
@@ -49,6 +52,9 @@ export const DataMissingInfoBox = ({
       ? t("errors.dRep.description.notVerifiable")
       : t("errors.gAMetadata.description.notVerifiable"),
     [MetadataValidationStatus.INCORRECT_FORMAT]: isDrep
+      ? t("errors.dRep.description.incorrectFormat")
+      : t("errors.gAMetadata.description.incorrectFormat"),
+    [MetadataValidationStatus.EXCEEDS_LIMIT]: isDrep
       ? t("errors.dRep.description.incorrectFormat")
       : t("errors.gAMetadata.description.incorrectFormat"),
   }[isDataMissing as MetadataValidationStatus];

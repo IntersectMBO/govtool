@@ -5,7 +5,11 @@ import { Button, ExternalModalButton, StatusPill, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { useDelegateTodRep, useScreenDimension, useTranslation } from "@hooks";
-import { Card, DataMissingInfoBox } from "@molecules";
+import {
+  Card,
+  DataMissingInfoBox,
+  MetadataFailureDetails,
+} from "@molecules";
 import {
   correctDRepDirectoryFormat,
   encodeCIP129Identifier,
@@ -57,6 +61,8 @@ export const DRepDetailsCard = ({
     MetadataValidationStatus | undefined
   >();
   const { validateMetadata } = useValidateMutation();
+  // Bumped when a retry resolves the document, to validate it again.
+  const [validationRevision, setValidationRevision] = useState(0);
 
   useEffect(() => {
     if (!url) return;
@@ -74,7 +80,7 @@ export const DRepDetailsCard = ({
       setIsValidating(false);
     };
     validate();
-  }, [url]);
+  }, [url, validationRevision]);
 
   return (
     <Card
@@ -116,6 +122,13 @@ export const DRepDetailsCard = ({
             isDrep
             sx={{ mb: 0 }}
             isValidating={isValidating}
+          />
+        )}
+        {metadataStatus && !isValidating && !!url && !!metadataHash && (
+          <MetadataFailureDetails
+            anchor={{ url, hash: metadataHash }}
+            canRetry={isMe}
+            onRecovered={() => setValidationRevision((value) => value + 1)}
           />
         )}
         {metadataStatus && !!url && (

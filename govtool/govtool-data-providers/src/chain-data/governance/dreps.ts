@@ -1,213 +1,155 @@
 /**
  * Chain Data API — `/governance/dreps/*`
- *
- * DRep profiles, registration lifecycle, voting power, delegators and activity.
- * Covers both real DReps and direct ("sole") voters, distinguished by `kind`
- * rather than by a separate entity.
  */
 
 import type {
+  Anchor,
   Bech32,
-  Envelope,
   EpochNo,
   EpochStamp,
+  Envelope,
   Lovelace,
-  PagedEnvelope,
   PageRequest,
-  StakeBalance,
-  StakeBasis,
+  PagedEnvelope,
   TxRef,
   VotingPower,
 } from '../common';
-import type { Anchor } from '../common';
-import type { DRepTarget, VoterRef } from '../refs';
-import type { DRepMetadataBody, MetadataProjection } from '../../metadata';
-import type { VoteListQuery, VotedGovAction } from './votes';
+import type { VoterRef } from '../refs';
+import type { DRepVoteListQuery, DRepVoteRow } from './votes';
 
+/** From the ledger's DRep expiry; see `DRep.status`. */
 export type DRepStatus = 'active' | 'inactive' | 'retired';
 
-/** DRep proper vs. a stake key registered only to vote for itself. */
-export type DRepKind = 'drep' | 'directVoter';
+/**
+ * A DRep that registered with NO ANCHOR is `anonymous`.
+ *
+ * That is the definition — an observable fact, not an inference about intent.
+ * `kind` is derived from the anchor and exists as a filter key, not as
+ * independent information: a provider must never report `drep` for a DRep with
+ * no anchor, or vice versa.
+ */
+export type DRepKind = 'drep' | 'anonymous';
+
+export type DRepSort =
+  'votingPower' | 'registrationDate' | 'activity' | 'random';
+
+/** A registration or update certificate, dated. */
+export interface RegistrationEvent {
+  txRef: TxRef;
+  /** Required: the stated purpose of carrying these is showing a date. */
+  at: EpochStamp;
+  /** The anchor as of this certificate. */
+  anchor?: Anchor | null;
+  deposit?: Lovelace | null;
+}
 
 export interface Registration {
-  /**
-   * Optional because `active` vs `inactive` is an activity computation, not a
-   * registration fact: a provider that answers a single-DRep read from the
-   * registration certificates alone knows whether the credential is
-   * registered, not whether it has been voting.
-   */
-  status?: DRepStatus;
-  /**
-   * The lifecycle fields are optional, not nullable-required: `null` means
-   * "known not to have happened" (an active DRep has no retirement), while
-   * absent means the read did not cover it. db-sync's directory query knows
-   * the latest registration's time and tx but nothing about a retirement;
-   * its single-DRep query knows the certificates but not their times.
-   */
-  registeredAt?: EpochStamp | null;
-  registrationTx?: TxRef | null;
+  /** The latest registration certificate. */
+  latest: RegistrationEvent;
+  /** The latest registration-UPDATE certificate, if the DRep has updated. */
+  latestUpdate: RegistrationEvent | null;
   retiredAt?: EpochStamp | null;
-  retirementTx?: TxRef | null;
-  deposit: Lovelace | null;
 }
 
 /**
- * Registration state for one `DRepKind` on a credential. The same stake key
- * can hold a DRep registration (with an anchor) and a direct-voter
- * registration (without) over its lifetime; `DRep.registration` summarises
- * the latest, this keeps them apart.
+ * Participation since the DRep registered — NOT a rolling window.
+ *
+ * `votable` is the number of actions that were votable during the DRep's
+ * registration, which is the length of the unfiltered vote listing.
  */
-export interface DRepKindRegistration {
-  isRegistered: boolean;
-  wasRegistered: boolean;
-  registrationTx: TxRef | null;
-  retirementTx: TxRef | null;
+export interface DRepActivity {
+  voted: number;
+  votable: number;
 }
 
-export interface DRepActivity {
-  /**
-   * Distinct governance actions voted on within the provider's activity
-   * window — db-sync's is the trailing 365 days. Not a lifetime count.
-   */
-  votesCast: number;
-  /** Votable actions the DRep did not vote on, over the same window. */
-  notVotedCount?: number;
-  /** Optional: a count-only read (db-sync's directory) has no per-vote timestamps. */
-  lastVotedAt?: EpochStamp | null;
-  /** Epoch at which the DRep goes inactive without activity (`drepActivity`). */
-  inactiveFromEpoch?: EpochNo | null;
-  /** votes cast / actions votable during registration, 0..1 */
-  participationRate?: number;
+export interface DRepDelegator {
+  stakeAddress: Bech32;
+  activeVotingPower: Lovelace;
+  delegatedAt?: EpochStamp;
+  liveVotingPower?: Lovelace;
+  /** The DRep this delegator switched away from, where the source records it. */
+  previousDRepId?: Bech32;
+}
+
+/** Counts over the whole directory. All three, or none. */
+export interface DRepCounts {
+  totalRegistered: number;
+  totalActive: number;
+  totalInactive: number;
+  /** DReps with no anchor. */
+  anonymous?: number;
 }
 
 export interface DRep extends VoterRef {
   role: 'drep';
   kind: DRepKind;
+  /**
+   * The CIP-119 anchor. `null` = registered without one, which makes this DRep
+   * `anonymous`. The document is the metadata service's business.
+   */
+  anchor: Anchor | null;
   registration: Registration;
   /**
-   * Per-kind registration state; see `DRepKindRegistration`. Optional: only a
-   * provider that walks the full certificate history can split them.
+   * From the ledger's DRep expiry, which is pushed forward by `drepActivity`
+   * whenever the DRep votes or re-registers; inactive means
+   * `currentEpoch > expiry`. READ THE EXPIRY — do not reconstruct activity
+   * from vote timestamps.
    */
-  registrationByKind?: Record<DRepKind, DRepKindRegistration>;
-  metadata: MetadataProjection<DRepMetadataBody> | null;
-  /** Optional: requires the metadata to have been validated, not just fetched. */
-  isCip119Compliant?: boolean;
-  /** Epoch-snapshot power — the one the ledger counts. */
+  status: DRepStatus;
+  /** The epoch this DRep goes inactive without further activity. */
+  expiryEpoch?: EpochNo;
+  /** The epoch snapshot the ledger counts. Required. */
   votingPower: VotingPower | null;
-  /** Current power, if the provider can compute it. `basis: "live"`. */
+  /** Optional. */
   liveVotingPower?: VotingPower | null;
-  delegators?: { active?: number; live?: number };
+  /** Optional. */
   activity?: DRepActivity;
-  adaHandles?: string[];
+  /** Optional. */
+  delegatorCount?: number;
 }
-
-export interface DRepDelegator {
-  stakeAddress: Bech32;
-  basis: StakeBasis;
-  balance: StakeBalance;
-  since: EpochStamp | null;
-  txRef: TxRef | null;
-}
-
-/** Delegations arriving at / leaving a DRep. */
-export interface DRepDelegationEvent {
-  action: 'joined' | 'left';
-  stakeAddress: Bech32;
-  at: EpochStamp;
-  txRef: TxRef;
-}
-
-/** Registration / update / retirement history (#4226). */
-export interface DRepHistoryEvent {
-  type: 'registered' | 'updated' | 'retired';
-  /** Optional: a certificate listing may name the transaction but not date it. */
-  at?: EpochStamp;
-  txRef: TxRef;
-  /** Optional where the source lists the certificate without its anchor. */
-  anchor?: Anchor | null;
-  /** Field-level diff where the provider can compute one. */
-  changes?: Record<string, { from: unknown; to: unknown }>;
-}
-
-/**
- * One row of the batch voting-power read.
- *
- * `subject` is a `DRepTarget` rather than a `VoterRef` because a source's
- * DRep listing includes the predefined options, which hold real voting power
- * but have no credential — db-sync's `drep_hash` rows for
- * `drep_always_no_confidence` and `drep_always_abstain` have a NULL `raw`.
- */
-export interface DRepVotingPowerEntry {
-  subject: DRepTarget;
-  votingPower: VotingPower | null;
-  /** Carried so a list can be labelled without a second read per DRep. */
-  givenName?: string | null;
-}
-
-/* ------------------------------------------------------------------------- */
-/* Queries                                                                    */
-/* ------------------------------------------------------------------------- */
-
-export type DRepSort =
-  'votingPower' | 'registrationDate' | 'activity' | 'status' | 'random';
-
-export type DRepExpand =
-  'metadata' | 'liveVotingPower' | 'delegators' | 'activity';
 
 export interface DRepListQuery extends PageRequest {
-  expand?: DRepExpand[];
   status?: DRepStatus[];
-  /** Omitted = every kind. A directory UI usually passes `['drep']`. */
   kind?: DRepKind[];
   sort?: DRepSort;
-  /** Required for stable pagination when `sort === "random"`. */
-  seed?: string;
-  /** Name, DRep id, or Ada Handle. */
+  /**
+   * One term. The caller does NOT name a mode; the provider applies whatever it
+   * supports and declares which kinds of input will match.
+   */
   search?: string;
 }
 
 export interface DRepsApi {
-  /** `GET /governance/dreps` */
-  list(q?: DRepListQuery): Promise<PagedEnvelope<DRep>>;
+  /**
+   * The directory. Default ordering is RANDOM, so it does not become a rich
+   * list; a randomly ordered read is not paged — it returns `size` rows and a
+   * provider rejects any `page` beyond the first.
+   */
+  list(q: DRepListQuery): Promise<PagedEnvelope<DRep>>;
 
-  /** `GET /governance/dreps/{id}` — `NOT_FOUND` when the credential was never registered. */
-  get(id: string, q?: { expand?: DRepExpand[] }): Promise<Envelope<DRep>>;
+  get(id: string): Promise<Envelope<DRep>>;
 
-  /** `GET /governance/dreps/{id}/votes` */
-  listVotes(
+  /** Optional. Voted and not-voted actions, filterable. */
+  listVotes?(
     id: string,
-    q?: VoteListQuery,
-  ): Promise<PagedEnvelope<VotedGovAction>>;
+    q: PageRequest & DRepVoteListQuery,
+  ): Promise<PagedEnvelope<DRepVoteRow>>;
 
-  /** `GET /governance/dreps/{id}/delegators` */
-  listDelegators(
+  /** Optional. */
+  listDelegators?(
     id: string,
-    q?: PageRequest & { basis?: StakeBasis; includeBalance?: boolean },
+    q: PageRequest,
   ): Promise<PagedEnvelope<DRepDelegator>>;
 
-  /** `GET /governance/dreps/{id}/delegation-events` */
-  listDelegationEvents(
-    id: string,
-    q?: PageRequest,
-  ): Promise<PagedEnvelope<DRepDelegationEvent>>;
-
-  /** `GET /governance/dreps/{id}/history` */
-  listHistory(
-    id: string,
-    q?: PageRequest,
-  ): Promise<PagedEnvelope<DRepHistoryEvent>>;
-
-  /** `GET /governance/dreps/{id}/voting-power` — history when `from`/`to` given. */
-  getVotingPower(
-    id: string,
-    q?: { basis?: StakeBasis; fromEpoch?: EpochNo; toEpoch?: EpochNo },
-  ): Promise<Envelope<VotingPower[]>>;
-
   /**
-   * `GET /governance/dreps/voting-power?ids=…` — batch, for list hydration.
-   * `ids` omitted or empty = every DRep the provider knows. Each id may be a
-   * CIP-129 id, a CIP-105 id or a raw hash; the entry echoes the DRep's
-   * identity so the caller can match rows back however it asked.
+   * Optional. The DRep's METADATA-CHANGE feed: each row an anchor and a date.
+   * Not a general certificate feed.
    */
-  getVotingPowers(ids?: string[]): Promise<Envelope<DRepVotingPowerEntry[]>>;
+  listUpdateHistory?(
+    id: string,
+    q: PageRequest & { sort?: 'asc' | 'desc' },
+  ): Promise<PagedEnvelope<RegistrationEvent>>;
+
+  /** Optional. All-or-nothing, apart from `anonymous`. */
+  getCounts?(): Promise<Envelope<DRepCounts>>;
 }

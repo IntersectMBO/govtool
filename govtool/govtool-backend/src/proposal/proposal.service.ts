@@ -6,16 +6,35 @@ import {
 } from '@nestjs/common';
 import type {
   ChainDataApiV1,
+  GovActionLineage,
   GovAction,
+  VoteAggregate,
 } from '@govtool/data-providers/chain-data';
-import { toDbSyncType } from '@govtool/provider-dbsync';
 
 import { CacheService } from 'src/cache/cache.service';
 import { asHttp } from 'src/common/errors';
-import { assertHexText } from 'src/common/hex';
-import { compareIntegers, dbInteger } from 'src/common/integer';
+import { assertIdentifier } from 'src/common/hex';
+import { legacyGovActionId } from 'src/common/legacy-ids';
+import {
+  LegacyNetwork,
+  epochStartTime,
+  type EpochSchedule,
+} from 'src/common/legacy-network';
+import {
+  compareIntegers,
+  dbInteger,
+  type ApiInteger,
+} from 'src/common/integer';
 import { toLegacyNullableNumber } from 'src/common/legacy';
-import { CHAIN_DATA } from 'src/providers/providers.module';
+import { CHAIN_DATA, METADATA } from 'src/providers/providers.module';
+import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
+import {
+  ENRICH_CONCURRENCY,
+  mapLimit,
+  proposalFields,
+  resolveBody,
+} from 'src/metadata/enrich';
+import { toLegacyParamProposal } from 'src/epoch/epoch.service';
 import { readAll } from 'src/common/snapshot';
 import {
   EnactedProposalDetailsResponse,
@@ -26,6 +45,34 @@ import {
   ProposalResponse,
 } from './proposal.type';
 
+/**
+ * The contract's action type back to db-sync's spelling. Only one name
+ * differs, and every existing client expects db-sync's — so the rename stops
+ * at the wire.
+ */
+const LEGACY_TYPE: Record<GovAction['type'], GovernanceActionType> = {
+  ParameterChange: 'ParameterChange',
+  HardForkInitiation: 'HardForkInitiation',
+  TreasuryWithdrawals: 'TreasuryWithdrawals',
+  NoConfidence: 'NoConfidence',
+  UpdateCommittee: 'NewCommittee',
+  NewConstitution: 'NewConstitution',
+  InfoAction: 'InfoAction',
+};
+
+/**
+ * The legacy endpoint asks by action TYPE; `getEnacted` is keyed by LINEAGE,
+ * because `UpdateCommittee` and `NoConfidence` share one and a per-type answer
+ * returns a `prevGovActionId` the ledger rejects.
+ */
+const LINEAGE_OF: Record<
+  'ParameterChange' | 'HardForkInitiation',
+  GovActionLineage
+> = {
+  ParameterChange: 'pparamUpdate',
+  HardForkInitiation: 'hardFork',
+};
+
 @Injectable()
 export class ProposalService {
   private readonly proposalListSnapshotNamespace = 'proposalListSnapshot';
@@ -33,7 +80,22 @@ export class ProposalService {
   constructor(
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
     private readonly cacheService: CacheService,
+    @Inject(METADATA) private readonly metadata: MetadataServiceV1 | null,
+    private readonly network: LegacyNetwork = new LegacyNetwork(chain),
   ) {}
+
+  /** A proposal with its CIP-108 text filled from the anchored document. */
+  private async withText(
+    proposal: ProposalResponse,
+  ): Promise<ProposalResponse> {
+    const text = proposalFields(
+      await resolveBody(this.metadata, {
+        url: proposal.url,
+        hash: proposal.metadataHash,
+      }),
+    );
+    return text ? { ...proposal, ...text } : proposal;
+  }
 
   async list(params: {
     type: GovernanceActionType[];
@@ -56,7 +118,7 @@ export class ProposalService {
       () =>
         asHttp(async () => {
           if (params.drepId) {
-            assertHexText(params.drepId);
+            assertIdentifier(params.drepId);
           }
 
           const proposals = await this.getProposals('');
@@ -72,20 +134,29 @@ export class ProposalService {
             page: params.page,
             pageSize: params.pageSize,
             total,
-            elements: filtered.slice(start, start + params.pageSize),
+            elements: await mapLimit(
+              filtered.slice(start, start + params.pageSize),
+              ENRICH_CONCURRENCY,
+              (proposal) => this.withText(proposal),
+            ),
           };
         }),
     );
   }
 
   async get(proposalId: string, drepId?: string): Promise<GetProposalResponse> {
-    const { txHash, index } = this.parseProposalId(proposalId);
+    // The frontend sends `txHash#index` (it converts a CIP-129 id to that
+    // before calling); either form is accepted, and the provider is asked by
+    // the CIP-129 id, the only form it takes.
+    const { txHash, index, id } = legacyGovActionId(proposalId);
 
+    // Only charset-checked: it selects nothing yet (`vote` is always null),
+    // and a disconnected frontend sends the literal text "undefined".
     if (drepId) {
-      assertHexText(drepId);
+      assertIdentifier(drepId);
     }
 
-    const proposals = await this.getProposals(`${txHash}#${index}`);
+    const proposals = await this.getProposals(id);
 
     if (proposals.length === 0) {
       throw new NotFoundException({
@@ -102,7 +173,7 @@ export class ProposalService {
     }
 
     return {
-      proposal: proposals[0],
+      proposal: await this.withText(proposals[0]),
       vote: null,
     };
   }
@@ -122,35 +193,32 @@ export class ProposalService {
         : 'HardForkInitiation';
 
     return asHttp(async () => {
-      const { data } =
-        await this.chain.governance.proposals.getEnacted(proposalType);
+      const { data } = await this.chain.governance.proposals.getEnacted(
+        LINEAGE_OF[proposalType],
+      );
 
       if (data === null) {
         return null;
       }
 
+      // `getEnacted` answers with a reference, which is all a transaction
+      // needs. The legacy body also carried the action's description, so the
+      // action itself is read for it.
+      const { data: action } = await this.chain.governance.proposals.get(
+        data.id,
+      );
+
       return {
-        // Legacy numeric ids, likewise db-sync-only. `Number(undefined)` is
-        // NaN, which serialises to null; that is at least honest about being
-        // absent, but it is made explicit here.
-        id: this.toLegacyRowId(data.action.providerId),
-        txId: this.toLegacyRowId(data.submittedTx?.providerId),
-        index: data.action.index,
-        description: data.rawBody ?? null,
-        hash: data.action.txHash,
+        // Legacy numeric ids: db-sync row ids, which no provider carries now.
+        // The legacy shape has no way to say "absent", so this reports null
+        // rather than NaN.
+        id: null,
+        txId: null,
+        index: data.index,
+        description: action.body,
+        hash: data.txHash,
       };
     });
-  }
-
-  /**
-   * A provider-native row id as the legacy numeric field. Providers other
-   * than db-sync have none, and the legacy shape has no way to say "absent",
-   * so this reports null rather than NaN.
-   */
-  private toLegacyRowId(providerId: string | undefined): number | null {
-    if (providerId === undefined) return null;
-    const parsed = Number(providerId);
-    return Number.isFinite(parsed) ? parsed : null;
   }
 
   /** Cached, stale-while-revalidate snapshot — unchanged from the legacy service. */
@@ -182,7 +250,15 @@ export class ProposalService {
               },
             )
           : (await this.findOne(search)).data.elements;
-      return elements.map((action) => this.toLegacyProposal(action));
+      // Only needed to date an epoch the provider reports without a time, so
+      // the network is not looked up when every stamp carries one.
+      const undated = elements.some(
+        ({ lifecycle: { submitted, expires } }) =>
+          submitted.time === undefined ||
+          (expires !== null && expires.time === undefined),
+      );
+      const schedule = undated ? await this.network.epochSchedule() : null;
+      return elements.map((action) => this.toLegacyProposal(action, schedule));
     });
   }
 
@@ -216,60 +292,115 @@ export class ProposalService {
    *    reported as `NewCommittee` the way every existing client expects;
    *  - vote stake comes back as a JSON number, which is lossy above
    *    `Number.MAX_SAFE_INTEGER` but is what the legacy API emitted.
+   *
+   * `schedule` dates an epoch the provider reports without a time; see
+   * `legacyEpochTime`.
    */
-  toLegacyProposal(action: GovAction): ProposalResponse {
-    const body = action.metadata?.body;
-    const tallies = new Map(
-      (action.tallies ?? []).map((tally) => [tally.role, tally]),
+  toLegacyProposal(
+    action: GovAction,
+    schedule: EpochSchedule | null = null,
+  ): ProposalResponse {
+    const { submitted, expires } = action.lifecycle;
+    const aggregates = new Map(
+      (action.voteAggregates ?? []).map((aggregate) => [
+        aggregate.role,
+        aggregate,
+      ]),
     );
-    const drep = tallies.get('drep');
-    const spo = tallies.get('spo');
-    const cc = tallies.get('cc');
+    const drep = aggregates.get('drep');
+    const spo = aggregates.get('spo');
+    const cc = aggregates.get('cc');
 
     return {
-      // The legacy `id` was db-sync's internal row id, which the contract
-      // keeps opaque on `providerId`. A provider that has no such id (Koios,
-      // Blockfrost) leaves it unset, so the canonical CIP-129 action id is
-      // used instead — stable and unique, where `String(undefined)` produced
-      // the literal text "undefined" in the response.
-      id: String(action.providerId ?? action.id),
+      // The legacy `id` was db-sync's internal row id. No provider carries one
+      // now, so the canonical CIP-129 action id is used — stable and unique,
+      // where `String(undefined)` produced the literal text "undefined".
+      id: action.id,
       txHash: action.txHash,
       index: action.index,
-      type: toDbSyncType(action.type) as GovernanceActionType,
-      details: action.rawBody ?? null,
-      expiryDate: action.lifecycle.expires?.time ?? null,
-      expiryEpochNo: action.lifecycle.expires?.epoch ?? null,
-      // `lifecycle.submitted` is optional on the contract: a provider may know
-      // an action's whole lifecycle except when it was submitted. The legacy
-      // fields are required, so they fall back rather than dropping out of
-      // the response. db-sync always fills the stamp.
-      createdDate: action.lifecycle.submitted?.time ?? '',
-      createdEpochNo: action.lifecycle.submitted?.epoch ?? 0,
-      url: action.metadata?.anchor.url ?? null,
-      metadataHash: action.metadata?.anchor.dataHash ?? null,
+      type: LEGACY_TYPE[action.type],
+      // Was db-sync's raw `description` column. The typed body is what the
+      // action proposes, and there is no untyped fallback any more.
+      details: action.body,
+      expiryDate:
+        expires === null
+          ? null
+          : (expires.time ?? this.legacyEpochTime(schedule, expires.epoch)),
+      expiryEpochNo: expires?.epoch ?? null,
+      // Falls back to '' only when even the epoch cannot be placed: the
+      // legacy field is a required string.
+      createdDate:
+        submitted.time ?? this.legacyEpochTime(schedule, submitted.epoch) ?? '',
+      createdEpochNo: submitted.epoch,
+      url: action.anchor?.url ?? null,
+      metadataHash: action.anchor?.dataHash ?? null,
+      // The legacy `param_proposal` row, in snake_case with every column
+      // present: the frontend diffs it key by key against `/epoch/params`.
       protocolParams:
-        action.body?.type === 'ParameterChange' ? action.body.changes : null,
-      title: body?.title ?? null,
-      abstract: body?.abstract ?? null,
-      motivation: body?.motivation ?? null,
-      rationale: body?.rationale ?? null,
-      dRepYesVotes: dbInteger(drep?.stake?.yes ?? 0),
-      dRepNoVotes: dbInteger(drep?.stake?.no ?? 0),
-      dRepAbstainVotes: dbInteger(drep?.stake?.abstain ?? 0),
-      poolYesVotes: dbInteger(spo?.stake?.yes ?? 0),
-      poolNoVotes: dbInteger(spo?.stake?.no ?? 0),
-      poolAbstainVotes: dbInteger(spo?.stake?.abstain ?? 0),
-      ccYesVotes: cc?.count?.yes ?? 0,
-      ccNoVotes: cc?.count?.no ?? 0,
-      ccAbstainVotes: cc?.count?.abstain ?? 0,
+        action.body.type === 'ParameterChange'
+          ? toLegacyParamProposal(action.body.changes)
+          : null,
+      // The four CIP-108 strings, `json` and `authors` come from the anchored
+      // document. Chain data emits the anchor and never resolves it, and this
+      // backend has no metadata service wired, so they are absent.
+      title: null,
+      abstract: null,
+      motivation: null,
+      rationale: null,
+      dRepYesVotes: this.aggregateValue(drep, 'yes'),
+      dRepNoVotes: this.aggregateValue(drep, 'no'),
+      dRepAbstainVotes: this.aggregateValue(drep, 'abstain'),
+      poolYesVotes: this.aggregateValue(spo, 'yes'),
+      poolNoVotes: this.aggregateValue(spo, 'no'),
+      poolAbstainVotes: this.aggregateValue(spo, 'abstain'),
+      ccYesVotes: this.aggregateValue(cc, 'yes'),
+      ccNoVotes: this.aggregateValue(cc, 'no'),
+      ccAbstainVotes: this.aggregateValue(cc, 'abstain'),
       prevGovActionIndex: toLegacyNullableNumber(
         action.previousAction?.index ?? null,
       ),
       prevGovActionTxHash: action.previousAction?.txHash ?? null,
-      json: action.metadata?.raw ?? null,
-      // The statement COALESCEs to `[]`, so the legacy field is never null.
-      authors: body?.authors ?? [],
+      json: null,
+      authors: [],
     };
+  }
+
+  /**
+   * The start of `epoch`, for a lifecycle stamp the provider dated by epoch
+   * alone (`EpochStamp.time` is optional).
+   *
+   * - Expiry: exactly what the legacy SQL reported —
+   *   `latest_epoch.start_time + (expiration - latest_epoch.no) × epoch
+   *   length`, i.e. the start of the expiry epoch (see `EpochSchedule`).
+   * - Creation: the legacy value was the submitting block's time, which no
+   *   epoch number pins down; the start of the submission epoch is the
+   *   closest the stamp allows, and a provider-supplied time always wins.
+   *
+   * `null` on a network with no known genesis schedule.
+   */
+  private legacyEpochTime(
+    schedule: EpochSchedule | null,
+    epoch: number,
+  ): string | null {
+    return schedule === null ? null : epochStartTime(schedule, epoch);
+  }
+
+  /**
+   * One choice off a vote aggregate, as the legacy integer field.
+   *
+   * The legacy fields are whole numbers — lovelace for the DRep and pool rows,
+   * a head count for the committee — so a `percent` aggregate has nothing to
+   * put in them. Reporting the fraction rounded to 0 would read as "no votes",
+   * so it is refused instead.
+   */
+  private aggregateValue(
+    aggregate: VoteAggregate | undefined,
+    choice: 'yes' | 'no' | 'abstain',
+  ): ApiInteger {
+    if (aggregate === undefined || aggregate.representation === 'percent') {
+      return 0;
+    }
+    return dbInteger(aggregate[choice]);
   }
 
   filterByType(
@@ -298,6 +429,9 @@ export class ProposalService {
       const govActionId = `${proposal.txHash}#${proposal.index}`;
       const values = [
         govActionId,
+        // The CIP-129 action id, which is what `id` carries now and what a
+        // provider's own `exactId` search matches.
+        proposal.id,
         proposal.title,
         proposal.abstract,
         proposal.motivation,
@@ -353,32 +487,5 @@ export class ProposalService {
 
   private nullableDateSortValue(value: string | null): number {
     return value === null ? Number.MAX_SAFE_INTEGER : Date.parse(value);
-  }
-
-  private parseProposalId(proposalId: string): {
-    txHash: string;
-    index: number;
-  } {
-    const [txHash, rawIndex] = proposalId.split('#');
-
-    if (!txHash || rawIndex === undefined || rawIndex === '') {
-      throw new NotFoundException({
-        errorType: 'NotFoundError',
-        message: `Proposal with id: ${proposalId} not found`,
-      });
-    }
-
-    assertHexText(txHash);
-
-    const index = Number(rawIndex);
-
-    if (!Number.isInteger(index)) {
-      throw new NotFoundException({
-        errorType: 'NotFoundError',
-        message: `Proposal with id: ${proposalId} not found`,
-      });
-    }
-
-    return { txHash, index };
   }
 }

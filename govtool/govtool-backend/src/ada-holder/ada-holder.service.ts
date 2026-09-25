@@ -1,12 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import type {
   ChainDataApiV1,
   Delegation,
 } from '@govtool/data-providers/chain-data';
 
 import { CacheService } from 'src/cache/cache.service';
-import { asHttp } from 'src/common/errors';
-import { assertHexText } from 'src/common/hex';
+import { asHttp, withMethod } from 'src/common/errors';
+import { drepIdToCip105, drepIdToHex } from 'src/common/legacy-ids';
+import { LegacyNetwork } from 'src/common/legacy-network';
 import { dbInteger, type ApiInteger } from 'src/common/integer';
 import { CHAIN_DATA } from 'src/providers/providers.module';
 import { DelegationResponse } from './ada-holder.type';
@@ -22,6 +23,7 @@ export class AdaHolderService {
   constructor(
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
     private readonly cacheService: CacheService,
+    private readonly network: LegacyNetwork = new LegacyNetwork(chain),
   ) {}
 
   async getCurrentDelegation(
@@ -32,9 +34,23 @@ export class AdaHolderService {
       stakeKey,
       () =>
         asHttp(async () => {
-          assertHexText(stakeKey);
-          const { data } = await this.chain.accounts.getDelegation(stakeKey);
-          return data === null ? null : this.toLegacyDelegation(data);
+          const stakeAddress = await this.network.stakeAddress(stakeKey);
+          try {
+            const { data } =
+              await this.chain.accounts.getDelegation(stakeAddress);
+            return data === null ? null : this.toLegacyDelegation(data);
+          } catch (error) {
+            // The legacy statement answered a stake address it had never
+            // seen with no row, so null — which is what a fresh wallet gets.
+            if (
+              typeof error === 'object' &&
+              error !== null &&
+              (error as { code?: unknown }).code === 'NOT_FOUND'
+            ) {
+              return null;
+            }
+            throw error;
+          }
         }),
     );
   }
@@ -48,9 +64,25 @@ export class AdaHolderService {
   async getVotingPower(stakeKey: string): Promise<ApiInteger> {
     return this.cacheService.getOrSet('adaHolderVotingPower', stakeKey, () =>
       asHttp(async () => {
-        assertHexText(stakeKey);
+        // A malformed key is still a 400, as it was when the legacy route
+        // parsed it as hex. Failing to learn the served network (needed only
+        // for a bare key hash) is a failure like any other: 0.
+        let stakeAddress: string;
         try {
-          const { data } = await this.chain.accounts.getVotingPower(stakeKey);
+          stakeAddress = await this.network.stakeAddress(stakeKey);
+        } catch (error) {
+          if (error instanceof BadRequestException) {
+            throw error;
+          }
+          return 0;
+        }
+        try {
+          const accounts = withMethod(
+            this.chain.accounts,
+            'getVotingPower',
+            'accounts.getVotingPower',
+          );
+          const { data } = await accounts.getVotingPower(stakeAddress);
           if (data === null) {
             return 0;
           }
@@ -68,18 +100,19 @@ export class AdaHolderService {
 
     if (target.kind === 'drep') {
       return {
-        drepHash: target.drep.hash,
-        // The legacy field is db-sync's pre-CIP-129 `view`, not the CIP-129 id.
-        drepView: target.drep.cip105Id ?? target.drep.id,
-        isDRepScriptBased: target.drep.isScriptBased,
+        // The legacy renderings: the raw hex hash (compared with the wallet's
+        // hex DRep id) and the CIP-105 view (searched in the directory). Both
+        // equal the `drepId` / `view` on the matching directory row.
+        drepHash: drepIdToHex(target.drep.id),
+        drepView: drepIdToCip105(target.drep.id),
+        isDRepScriptBased: target.drep.isScriptBased ?? false,
         txHash: delegation.txRef?.txHash ?? '',
       };
     }
 
     return {
       drepHash: null,
-      drepView:
-        target.kind === 'predefined' ? PREDEFINED_VIEW[target.option] : '',
+      drepView: PREDEFINED_VIEW[target.target],
       isDRepScriptBased: false,
       txHash: delegation.txRef?.txHash ?? '',
     };

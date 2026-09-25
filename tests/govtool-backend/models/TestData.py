@@ -88,12 +88,14 @@ class DrepInfo(TypedDict):
 
 
 class EpochParam(TypedDict):
-    block_id: int
+    # db-sync row ids (id, block_id, cost_model_id): null from a backend on the
+    # provider contract, which carries no source row ids.
+    block_id: Optional[int]
     coins_per_utxo_size: int
     collateral_percent: int
     committee_max_term_length: int
     committee_min_size: int
-    cost_model_id: int
+    cost_model_id: Optional[int]
     decentralisation: int
     drep_activity: int
     drep_deposit: int
@@ -111,7 +113,7 @@ class EpochParam(TypedDict):
     extra_entropy: Optional[int]
     gov_action_deposit: int
     gov_action_lifetime: int
-    id: int
+    id: Optional[int]
     influence: float
     key_deposit: int
     max_bh_size: int

@@ -1,0 +1,27 @@
+{
+  "name": "@govtool/provider-fixture",
+  "version": "0.1.0",
+  "description": "A GovTool governance data provider over frozen mainnet data. No network, no database — for local development and integration tests.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "data"],
+  "scripts": {
+    "clean": "node --eval \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "prebuild": "npm run clean",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "capture": "node scripts/capture.mjs",
+    "test": "node --test test/*.test.mjs",
+    "verify": "npm run typecheck && npm run build && npm test"
+  },
+  "dependencies": {
+    "@govtool/data-providers": "file:../govtool-data-providers"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}

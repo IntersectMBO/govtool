@@ -1,295 +1,477 @@
 /**
- * Conformance checks for the contracts in ../src.
+ * A worked fixture of every entity, type-checked and never executed.
  *
- * This file is never executed and never shipped — it is type-checked by
- * `npm run typecheck`. For an interfaces-only package that is the meaningful
- * test, and it covers the two ways such a package breaks:
+ * For a types-only package this IS the meaningful test: it proves the contract
+ * is inhabitable — that a provider can actually build one of everything — and
+ * it fails the build the moment a shape changes underneath it.
  *
- *   1. A service contract that cannot be implemented (a signature that does not
- *      admit an implementation). `notImplementedChainData` and friends below are
- *      annotated with the service interface, so the compiler checks every method.
- *
- *   2. A domain type that cannot be constructed (a field required in a
- *      combination no provider can produce). The fixtures build each central
- *      entity from literals, which is what a provider's mapping layer does.
- *
- * The stubs double as a skeleton: a new provider can copy one and replace the
- * `unsupported` calls route by route, declaring the gaps at
- * `/system/capabilities` until it is complete.
+ * Add a fixture here when an entity is added.
  */
 
 import type {
+  Account,
   ChainDataApiV1,
+  Committee,
+  Constitution,
   DRep,
-  DRepVotingPowerEntry,
+  DRepCounts,
+  DRepDelegator,
+  DRepVoteRow,
+  Delegation,
+  Envelope,
   GovAction,
-  RoleTally,
+  NetworkInfo,
+  Page,
+  GenesisParams,
+  ProtocolParams,
+  ProviderCapabilities,
+  ProviderIdentity,
+  SpoVoter,
+  StakeDistribution,
+  TransactionState,
+  VoteAggregate,
   VoteRecord,
 } from '../src/chain-data';
-import type {
-  DRepMetadataBody,
-  MetadataProjection,
-  MetadataServiceV1,
-} from '../src/metadata';
-import type { PinningServiceV1, PinRecord } from '../src/pinning';
+import { ChainDataError, ratioEquals } from '../src/chain-data';
+import type { MetadataServiceV1, MetadataResult } from '../src/metadata';
+import type { PinningServiceV1 } from '../src/pinning';
+import type { GovernanceIndexV1 } from '../src/index-provider';
+import type { CommitteeInfoProviderV1 } from '../src/committee-info';
+import type { TransactionMonitorV1 } from '../src/tx-monitor';
 
-/**
- * Every method resolves the same way: a provider that cannot serve a route
- * fails loudly rather than returning an empty success. The zero-argument arrows
- * below are deliberate — a narrower function satisfies a wider signature, so
- * the stub stays readable without naming parameters it ignores.
- */
-const unsupported = (route: string): never => {
-  throw new Error(`CAPABILITY_UNSUPPORTED: ${route}`);
+const HALF = { numerator: 1, denominator: 2 };
+const TWO_THIRDS = { numerator: 2, denominator: 3 };
+const DREP_ID = 'drep1yfaaaaa270yjt6tu5skndugekprf5ykv5jshanl0c6gqx5qpstskf';
+const STAKE = 'stake1uxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+const TX = 'd'.repeat(64);
+
+/* Ratios are compared by cross-multiplication, never structurally. */
+export const ratiosEqual: boolean = ratioEquals(HALF, {
+  numerator: 2,
+  denominator: 4,
+});
+
+/* -- network --------------------------------------------------------------- */
+
+export const networkInfo: NetworkInfo = {
+  network: 'mainnet',
+  era: 'conway',
+  tip: {
+    epoch: 580,
+    slot: 100,
+    block: 11_000_000,
+    time: '2026-09-22T00:00:00Z',
+  },
+  currentEpoch: 580,
 };
 
-/* ------------------------------------------------------------------------- */
-/* 1. The service contracts admit an implementation                           */
-/* ------------------------------------------------------------------------- */
+export const protocolParams: ProtocolParams = {
+  epoch: 580,
+  protocolVersion: { major: 10, minor: 0 },
+  govActionLifetime: 6,
+  govActionDeposit: '100000000000',
+  drepDeposit: '500000000',
+  drepActivity: 20,
+  committeeMinSize: 5,
+  committeeMaxTermLength: 146,
+  drepThresholds: {
+    motionNoConfidence: { numerator: 67, denominator: 100 },
+    committeeNormal: { numerator: 67, denominator: 100 },
+    committeeNoConfidence: { numerator: 60, denominator: 100 },
+    updateToConstitution: { numerator: 75, denominator: 100 },
+    hardForkInitiation: { numerator: 60, denominator: 100 },
+    ppNetworkGroup: { numerator: 67, denominator: 100 },
+    ppEconomicGroup: { numerator: 67, denominator: 100 },
+    ppTechnicalGroup: { numerator: 67, denominator: 100 },
+    ppGovGroup: { numerator: 75, denominator: 100 },
+    treasuryWithdrawal: { numerator: 67, denominator: 100 },
+  },
+  poolThresholds: {
+    motionNoConfidence: HALF,
+    committeeNormal: HALF,
+    committeeNoConfidence: HALF,
+    hardForkInitiation: HALF,
+    ppSecurityGroup: HALF,
+  },
+  keyDeposit: '2000000',
+  poolDeposit: '500000000',
+  coinsPerUtxoByte: '4310',
+  minFeeA: 44,
+  minFeeB: 155_381,
+  maxTxSize: 16_384,
+  maxValSize: 5000,
+  minFeeRefScriptCostPerByte: { numerator: 15, denominator: 1 },
+  maxBlockBodySize: 90_112,
+  maxBlockHeaderSize: 1100,
+  maxTxExecutionUnits: { memory: 14_000_000, steps: 10_000_000_000 },
+  maxBlockExecutionUnits: { memory: 62_000_000, steps: 20_000_000_000 },
+  collateralPercentage: 150,
+  maxCollateralInputs: 3,
+  executionUnitPrices: {
+    memory: { numerator: 577, denominator: 10_000 },
+    steps: { numerator: 721, denominator: 10_000_000 },
+  },
+  costModels: { PlutusV1: [100_788, 420, 1], PlutusV3: [100_788, 420, 1, 1] },
+  poolRetireMaxEpoch: 18,
+  stakePoolTargetNum: 500,
+  poolPledgeInfluence: { numerator: 3, denominator: 10 },
+  monetaryExpansion: { numerator: 3, denominator: 1000 },
+  treasuryCut: { numerator: 1, denominator: 5 },
+  minPoolCost: '170000000',
+};
 
-export const notImplementedChainData: ChainDataApiV1 = {
-  network: {
-    getNetworkInfo: () => unsupported('network.getNetworkInfo'),
-    listEpochs: () => unsupported('network.listEpochs'),
-    getProtocolParams: () => unsupported('network.getProtocolParams'),
-    listBlocks: () => unsupported('network.listBlocks'),
-    getStakeDistribution: () => unsupported('network.getStakeDistribution'),
-    getTreasury: () => unsupported('network.getTreasury'),
-  },
-  accounts: {
-    get: () => unsupported('accounts.get'),
-    listDelegationHistory: () => unsupported('accounts.listDelegationHistory'),
-    listStakeEvents: () => unsupported('accounts.listStakeEvents'),
-    getVotingPower: () => unsupported('accounts.getVotingPower'),
-    getDelegation: () => unsupported('accounts.getDelegation'),
-  },
-  governance: {
-    dreps: {
-      list: () => unsupported('governance.dreps.list'),
-      get: () => unsupported('governance.dreps.get'),
-      listVotes: () => unsupported('governance.dreps.listVotes'),
-      listDelegators: () => unsupported('governance.dreps.listDelegators'),
-      listDelegationEvents: () =>
-        unsupported('governance.dreps.listDelegationEvents'),
-      listHistory: () => unsupported('governance.dreps.listHistory'),
-      getVotingPower: () => unsupported('governance.dreps.getVotingPower'),
-      getVotingPowers: () => unsupported('governance.dreps.getVotingPowers'),
-    },
-    pools: {
-      list: () => unsupported('governance.pools.list'),
-      get: () => unsupported('governance.pools.get'),
-      listVotes: () => unsupported('governance.pools.listVotes'),
-    },
-    proposals: {
-      list: () => unsupported('governance.proposals.list'),
-      get: () => unsupported('governance.proposals.get'),
-      listVotes: () => unsupported('governance.proposals.listVotes'),
-      getTallies: () => unsupported('governance.proposals.getTallies'),
-      listActivity: () => unsupported('governance.proposals.listActivity'),
-      getEnacted: () => unsupported('governance.proposals.getEnacted'),
-      listByTx: () => unsupported('governance.proposals.listByTx'),
-    },
-    votes: {
-      list: () => unsupported('governance.votes.list'),
-      get: () => unsupported('governance.votes.get'),
-    },
-    committee: {
-      getCommittee: () => unsupported('governance.committee.getCommittee'),
-      getMember: () => unsupported('governance.committee.getMember'),
-      getConstitution: () =>
-        unsupported('governance.committee.getConstitution'),
-      listConstitutionHistory: () =>
-        unsupported('governance.committee.listConstitutionHistory'),
-    },
-    metrics: {
-      get: () => unsupported('governance.metrics.get'),
-    },
-    voters: {
-      resolve: () => unsupported('governance.voters.resolve'),
-      list: () => unsupported('governance.voters.list'),
-    },
-  },
-  transactions: {
-    get: () => unsupported('transactions.get'),
-  },
-  // Optional on the contract; a provider with no CIP-179 statement omits it.
-  surveys: {
-    getDefinition: () => unsupported('surveys.getDefinition'),
-  },
-  system: {
-    getCapabilities: () => unsupported('system.getCapabilities'),
-    getHealth: () => unsupported('system.getHealth'),
+export const genesisParams: GenesisParams = {
+  networkMagic: 764_824_073,
+  networkId: 'Mainnet',
+  systemStart: '2017-09-23T21:44:51Z',
+  epochLength: 432_000,
+  slotLength: 1,
+  activeSlotsCoefficient: { numerator: 1, denominator: 20 },
+  securityParam: 2160,
+  slotsPerKesPeriod: 129_600,
+  maxKesEvolutions: 62,
+  updateQuorum: 5,
+  maxLovelaceSupply: '45000000000000000',
+};
+
+export const stakeDistribution: StakeDistribution = {
+  epoch: 580,
+  totalActiveStake: '21357778069987000',
+  totalStakeControlledByDReps: '5000000000000000',
+  alwaysAbstainVotingPower: '1000000000000000',
+};
+
+/* -- account --------------------------------------------------------------- */
+
+export const account: Account = {
+  stakeAddress: STAKE,
+  stakeKeyHash: 'a'.repeat(56),
+  isRegistered: true,
+  balance: {
+    total: '1500000000',
+    utxo: '1400000000',
+    rewards: '90000000',
+    rewardsRest: '10000000',
   },
 };
 
-export const notImplementedMetadata: MetadataServiceV1 = {
-  get: () => unsupported('metadata.get'),
-  getMany: () => unsupported('metadata.getMany'),
-  getRaw: () => unsupported('metadata.getRaw'),
-  refresh: () => unsupported('metadata.refresh'),
-  validate: () => unsupported('metadata.validate'),
-  stats: () => unsupported('metadata.stats'),
+export const delegatedToDRep: Delegation = {
+  target: { kind: 'drep', drep: { role: 'drep', id: DREP_ID } },
+  txRef: { txHash: TX },
+  since: { epoch: 570 },
 };
 
-export const notImplementedPinning: PinningServiceV1 = {
-  pin: () => unsupported('pinning.pin'),
-  prepare: () => unsupported('pinning.prepare'),
-  getPin: () => unsupported('pinning.getPin'),
-  listPins: () => unsupported('pinning.listPins'),
-  repin: () => unsupported('pinning.repin'),
-  unpin: () => unsupported('pinning.unpin'),
-  getPolicy: () => unsupported('pinning.getPolicy'),
-  getHealth: () => unsupported('pinning.getHealth'),
+/** The predefined targets are NOT DReps and carry no credential. */
+export const delegatedToAbstain: Delegation = {
+  target: { kind: 'predefined', target: 'alwaysAbstain' },
+  txRef: null,
 };
 
-/* ------------------------------------------------------------------------- */
-/* 2. The domain entities are constructible                                   */
-/* ------------------------------------------------------------------------- */
+/* -- drep ------------------------------------------------------------------ */
 
-export const drepMetadataFixture: MetadataProjection<DRepMetadataBody> = {
-  id: 'c0ffee',
-  anchor: { url: 'ipfs://bafy', dataHash: 'deadbeef' },
-  standard: 'CIP119',
-  status: 'valid',
-  body: {
-    givenName: 'Example DRep',
-    objectives: 'Vote on everything.',
-    identityReferences: [
-      { '@type': 'Identity', label: 'X', uri: 'https://x.com/example' },
-    ],
-  },
-  fetchedAt: '2026-09-18T00:00:00Z',
-};
-
-/** A fully-hydrated DRep, as `governance.dreps.get` would return one. */
-export const drepFixture: DRep = {
+export const drep: DRep = {
   role: 'drep',
-  id: 'drep1abc',
-  hash: 'ab12',
-  isScriptBased: false,
+  id: DREP_ID,
   kind: 'drep',
+  anchor: {
+    url: 'https://example.invalid/drep.json',
+    dataHash: 'b'.repeat(64),
+  },
   registration: {
-    status: 'active',
-    registeredAt: { epoch: 500, time: '2026-01-01T00:00:00Z' },
-    registrationTx: { txHash: 'ab12', index: 0 },
-    retiredAt: null,
-    retirementTx: null,
-    deposit: '500000000',
+    latest: {
+      txRef: { txHash: TX },
+      at: { epoch: 540, time: '2026-01-01T00:00:00Z' },
+    },
+    latestUpdate: null,
   },
-  metadata: drepMetadataFixture,
-  isCip119Compliant: true,
-  votingPower: { amount: '12500000000', epoch: 500, basis: 'active' },
-  liveVotingPower: { amount: '12600000000', epoch: 500, basis: 'live' },
-  delegators: { active: 12, live: 13 },
-  activity: {
-    votesCast: 8,
-    notVotedCount: 2,
-    lastVotedAt: { epoch: 499, time: '2025-12-20T00:00:00Z' },
-    inactiveFromEpoch: 520,
-    participationRate: 0.8,
-  },
+  status: 'active',
+  expiryEpoch: 600,
+  votingPower: { amount: '27412054204974', basis: 'active', epoch: 580 },
+  activity: { voted: 7, votable: 12 },
 };
 
-/** A direct ("sole") voter — same entity, distinguished only by `kind`. */
-export const directVoterFixture: DRep = {
+/** An anonymous DRep is exactly one that registered with no anchor. */
+export const anonymousDRep: DRep = {
   role: 'drep',
-  id: 'drep1xyz',
-  hash: 'cd34',
-  isScriptBased: false,
-  kind: 'directVoter',
+  id: DREP_ID,
+  kind: 'anonymous',
+  anchor: null,
   registration: {
-    status: 'active',
-    registeredAt: { epoch: 501, time: '2026-02-01T00:00:00Z' },
-    registrationTx: { txHash: 'cd34' },
-    retiredAt: null,
-    retirementTx: null,
-    deposit: '500000000',
+    latest: { txRef: { txHash: TX }, at: { epoch: 545 } },
+    latestUpdate: null,
   },
-  metadata: null,
-  isCip119Compliant: false,
+  status: 'active',
   votingPower: null,
 };
 
-/** A predefined option in a voting-power listing: real power, no credential. */
-export const predefinedVotingPowerFixture: DRepVotingPowerEntry = {
-  subject: {
-    kind: 'predefined',
-    option: 'alwaysNoConfidence',
-    view: 'drep_always_no_confidence',
+export const delegator: DRepDelegator = {
+  stakeAddress: STAKE,
+  activeVotingPower: '1500000000',
+  previousDRepId: DREP_ID,
+};
+
+export const drepCounts: DRepCounts = {
+  totalRegistered: 1684,
+  totalActive: 1200,
+  totalInactive: 484,
+  anonymous: 96,
+};
+
+/** The vote listing is a union: voted rows carry a choice, not-voted rows do not. */
+export const voteRows: DRepVoteRow[] = [
+  {
+    voted: true,
+    action: { id: 'gov_action1aaa', type: 'InfoAction', title: 'A survey' },
+    choice: 'yes',
+    anchor: null,
+    txRef: { txHash: TX },
   },
-  votingPower: { amount: '3707653134137', basis: 'active' },
-  givenName: null,
-};
+  {
+    voted: false,
+    action: { id: 'gov_action1bbb', type: 'TreasuryWithdrawals' },
+  },
+];
 
-export const drepVotingPowerFixture: DRepVotingPowerEntry = {
-  subject: { kind: 'drep', drep: drepFixture },
-  votingPower: { amount: '12500000000', basis: 'active' },
-};
+/* -- proposal -------------------------------------------------------------- */
 
-export const tallyFixture: RoleTally = {
+export const voteAggregate: VoteAggregate = {
   role: 'drep',
-  stake: { yes: '1000', no: '250', abstain: '10' },
-  count: { yes: 4, no: 1, abstain: 1 },
-  notVotedStake: '500',
-  totalEligibleStake: '1760',
+  representation: 'stake',
+  yes: '4000000000000',
+  no: '1000000000000',
+  abstain: '500000000000',
+  notVoted: '2000000000000',
+  totalEligible: '7500000000000',
   threshold: { numerator: 67, denominator: 100 },
   passing: false,
 };
 
-/** A TreasuryWithdrawals action, exercising the discriminated body union. */
-export const govActionFixture: GovAction = {
-  id: 'gov_action1abc',
-  txHash: 'ef56',
+/** A head-count aggregate, as a source without stake weighting reports it. */
+export const countAggregate: VoteAggregate = {
+  role: 'cc',
+  representation: 'count',
+  yes: '4',
+  no: '1',
+  abstain: '0',
+  notVoted: '2',
+  totalEligible: '7',
+  threshold: TWO_THIRDS,
+  passing: true,
+};
+
+export const proposal: GovAction = {
+  id: 'gov_action1w2w64uhelz0cg2np7m37hal905tdd7jpzm3fcyc3g7qvkwgfppgqqfsggt5',
+  txHash: '7'.repeat(64),
   index: 0,
   type: 'TreasuryWithdrawals',
   body: {
     type: 'TreasuryWithdrawals',
-    withdrawals: [{ stakeAddress: 'stake1abc', amount: '1000000000' }],
+    withdrawals: [{ stakeAddress: STAKE, amount: '1000000000' }],
     totalAmount: '1000000000',
-    guardrailsScriptHash: null,
   },
   lifecycle: {
     status: 'live',
-    submitted: { epoch: 500, time: '2026-01-05T00:00:00Z' },
-    submittedTx: { txHash: 'ef56', index: 0 },
-    expires: { epoch: 506, time: '2026-02-05T00:00:00Z' },
+    submitted: { epoch: 578, time: '2026-09-01T00:00:00Z' },
+    submittedTx: { txHash: '7'.repeat(64) },
+    expires: { epoch: 584 },
     ratifiedAt: null,
     enactedAt: null,
     droppedAt: null,
     expiredAt: null,
   },
+  anchor: { url: 'ipfs://abc', dataHash: 'c'.repeat(64) },
   deposit: '100000000000',
-  depositReturnAddress: 'stake1abc',
-  proposedBy: 'stake1abc',
+  depositReturnAddress: STAKE,
   previousAction: null,
-  metadata: null,
-  tallies: [tallyFixture],
+  voteAggregates: [voteAggregate],
 };
 
-/** An InfoAction — the body variant with no payload at all. */
-export const infoActionBodyFixture: GovAction['body'] = { type: 'InfoAction' };
+/** Every body variant is constructible — D7 requires all seven. */
+export const bodies: GovAction['body'][] = [
+  { type: 'InfoAction' },
+  { type: 'NoConfidence' },
+  { type: 'ParameterChange', changes: { minFeeA: 45 } },
+  { type: 'HardForkInitiation', protocolVersion: { major: 11, minor: 0 } },
+  proposal.body,
+  {
+    type: 'UpdateCommittee',
+    added: [{ coldCredential: 'cc_cold1aaa', termExpiryEpoch: 700 }],
+    removed: [{ coldCredential: 'cc_cold1bbb' }],
+    quorum: TWO_THIRDS,
+  },
+  {
+    type: 'NewConstitution',
+    anchor: { url: 'ipfs://const', dataHash: 'd'.repeat(64) },
+  },
+];
 
-export const voteFixture: VoteRecord = {
-  proposal: { id: 'gov_action1abc', txHash: 'ef56', index: 0 },
-  voter: { role: 'drep', id: 'drep1abc', hash: 'ab12', isScriptBased: false },
-  vote: 'yes',
-  txRef: { txHash: '9a88' },
-  at: { epoch: 501, time: '2026-01-10T00:00:00Z' },
-  votingPower: { amount: '12500000000', epoch: 500, basis: 'active' },
-  rationale: null,
-  isCurrent: true,
+/* -- votes, pools, committee ----------------------------------------------- */
+
+/** A committee vote carries the HOT key; cold is the optional resolution. */
+export const committeeVote: VoteRecord = {
+  voter: { role: 'cc', hot: 'cc_hot1aaa', cold: 'cc_cold1aaa' },
+  choice: 'yes',
+  anchor: null,
+  txRef: { txHash: TX },
 };
 
-export const pinFixture: PinRecord = {
-  cid: 'bafybeigdyrzt',
-  url: 'ipfs://bafybeigdyrzt',
-  gatewayUrls: ['https://ipfs.io/ipfs/bafybeigdyrzt'],
-  dataHash: 'deadbeef',
-  byteSize: 512,
-  contentType: 'application/ld+json',
-  status: 'pinned',
-  pinnedAt: '2026-09-18T00:00:00Z',
-  replicas: [
-    { backend: 'pinata', status: 'pinned', pinnedAt: '2026-09-18T00:00:00Z' },
+export const drepVote: VoteRecord = {
+  voter: { role: 'drep', id: DREP_ID },
+  choice: 'no',
+  anchor: { url: 'https://example.invalid/why.json', dataHash: 'e'.repeat(64) },
+  txRef: { txHash: TX },
+};
+
+export const pool: SpoVoter = {
+  role: 'spo',
+  id: 'pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt',
+  poolId: 'pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt',
+  anchor: {
+    url: 'https://example.invalid/pool.json',
+    dataHash: 'f'.repeat(64),
+  },
+  votingPower: { amount: '57382396556341', basis: 'active' },
+};
+
+export const committee: Committee = {
+  members: [
+    {
+      role: 'cc',
+      coldCredential:
+        'cc_cold1zg90nyz8hjgwpkg8x3n4fzse4pggndmxuultspm53g4dxcgjkqykp',
+      hotCredential:
+        'cc_hot1q2ccqmm64956nc65aw65gcn9354c3ldlfqp03qh2v2y5ueqhzw8g4',
+      termStartEpoch: 500,
+      termExpiryEpoch: 799,
+      hasResigned: false,
+    },
   ],
+  quorum: TWO_THIRDS,
+  enactedBy: null,
 };
+
+/** Anchor only — the document is the metadata service's business. */
+export const constitution: Constitution = {
+  anchor: { url: 'ipfs://constitution', dataHash: '1'.repeat(64) },
+  guardrailsScriptHash: null,
+  enactedBy: null,
+  enactedAt: { epoch: 500 },
+};
+
+export const transaction: TransactionState = { txHash: TX, onChain: true };
+
+/* -- declarations ---------------------------------------------------------- */
+
+export const identity: ProviderIdentity = {
+  id: 'fixture',
+  name: 'Fixture Provider',
+};
+
+/**
+ * A provider that orders nothing on DReps but honours both required proposal
+ * sorts, searches by exact id only, and expresses aggregates as stake.
+ */
+export const capabilities: ProviderCapabilities = {
+  sorts: { dreps: [], proposals: ['newest', 'oldest'] },
+  filters: { dreps: ['status'], proposals: ['type'] },
+  search: ['exactId'],
+  voteAggregate: ['stake'],
+  optionalArguments: ['protocolParams.epoch'],
+};
+
+/* -- the whole surface ----------------------------------------------------- */
+
+const envelope = <T>(data: T): Envelope<T> => ({
+  data,
+  meta: { provider: 'fixture', network: 'mainnet' },
+});
+
+const page = <T>(elements: T[]): Envelope<Page<T>> =>
+  envelope({ elements, total: elements.length });
+
+const unsupported = () =>
+  Promise.reject(new ChainDataError('CAPABILITY_UNSUPPORTED', 'fixture'));
+
+/**
+ * A minimal conformant provider: every REQUIRED method present, every optional
+ * one omitted. Omission is how the interface says "not supported" — there is no
+ * declaration for it.
+ */
+export const minimalProvider: ChainDataApiV1 = {
+  network: {
+    getNetworkInfo: () => Promise.resolve(envelope(networkInfo)),
+    getProtocolParams: () => Promise.resolve(envelope(protocolParams)),
+    getStakeDistribution: () => Promise.resolve(envelope(stakeDistribution)),
+  },
+  accounts: {
+    get: () => Promise.resolve(envelope(account)),
+    getDelegation: () => Promise.resolve(envelope(delegatedToDRep)),
+  },
+  governance: {
+    dreps: {
+      list: () => Promise.resolve(page([drep])),
+      get: () => Promise.resolve(envelope(drep)),
+    },
+    proposals: {
+      list: () => Promise.resolve(page([proposal])),
+      get: () => Promise.resolve(envelope(proposal)),
+      getEnacted: () => Promise.resolve(envelope(null)),
+    },
+    pools: {
+      list: () => Promise.resolve(page([pool])),
+      get: () => Promise.resolve(envelope(pool)),
+    },
+    committee: {
+      getCommittee: () => Promise.resolve(envelope(committee)),
+      getMember: () => Promise.resolve(envelope(committee.members[0]!)),
+      getConstitution: () => Promise.resolve(envelope(constitution)),
+    },
+  },
+  transactions: { get: () => Promise.resolve(envelope(transaction)) },
+  system: {
+    getIdentity: () => Promise.resolve(envelope(identity)),
+    getCapabilities: () => Promise.resolve(envelope(capabilities)),
+    getHealth: () => Promise.resolve(envelope({ status: 'healthy' as const })),
+  },
+};
+
+/* -- the optional components ------------------------------------------------ */
+
+const ok: MetadataResult = {
+  ok: true,
+  hash: 'b'.repeat(64),
+  body: { givenName: 'A DRep' },
+  fetchedAt: '2026-09-22T00:00:00Z',
+};
+
+export const metadataService: MetadataServiceV1 = {
+  getMetadata: () => Promise.resolve(ok),
+  getCipMetadata: <TBody>() => Promise.resolve(ok as MetadataResult<TBody>),
+  refresh: () => Promise.resolve({ refetched: false, result: ok }),
+  getReport: () => Promise.resolve(null),
+  listReports: () => Promise.resolve([]),
+};
+
+export const pinningService: PinningServiceV1 = {
+  pinData: () => Promise.resolve('bafy...'),
+  getDataCid: () => Promise.resolve('bafy...'),
+  unpin: () => Promise.resolve(),
+  fetch: () => Promise.resolve(new Uint8Array()),
+  getHealth: () => Promise.resolve({ status: 'healthy' }),
+};
+
+/** An indexer that only does DReps — the other halves are simply absent. */
+export const drepOnlyIndex: GovernanceIndexV1 = {
+  dreps: { searchDReps: () => Promise.resolve(page([drep])) },
+};
+
+export const committeeInfo: CommitteeInfoProviderV1 = {
+  getMemberInfo: () => Promise.resolve(null),
+};
+
+export const txMonitor: TransactionMonitorV1 = {
+  add: (_txHash, callback) =>
+    callback({ txHash: TX, state: 'confirmed', confirmations: 3 }),
+};
+
+void unsupported;

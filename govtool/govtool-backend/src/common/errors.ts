@@ -39,8 +39,6 @@ const PINNING_STATUS: Record<PinningError['reason'], number> = {
   BACKEND_UNAVAILABLE: 503,
   BACKEND_TIMEOUT: 504,
   BACKEND_ERROR: 503,
-  BACKEND_INVALID_RESPONSE: 503,
-  UNSUPPORTED_OPERATION: 501,
 };
 
 /**
@@ -56,18 +54,7 @@ const PINNING_ERROR_TYPE: Record<PinningError['reason'], string> = {
   BACKEND_UNAVAILABLE: 'PinataConenctionError',
   BACKEND_TIMEOUT: 'PinataConenctionError',
   BACKEND_ERROR: 'PinataAPIError',
-  BACKEND_INVALID_RESPONSE: 'PinataDecodingError',
-  UNSUPPORTED_OPERATION: 'NotImplementedError',
 };
-
-/** `details` is `Record<string, unknown>`; only primitives are safe to stringify. */
-function scalarOr(value: unknown, fallback: string): string {
-  if (typeof value === 'string') return value;
-  if (typeof value === 'number' || typeof value === 'boolean') {
-    return String(value);
-  }
-  return fallback;
-}
 
 export function toHttpException(error: unknown): HttpException {
   if (error instanceof HttpException) {
@@ -86,18 +73,16 @@ export function toHttpException(error: unknown): HttpException {
   }
 
   if (PinningError.is(error)) {
-    const body: Record<string, unknown> = {
-      errorType: PINNING_ERROR_TYPE[error.reason],
-      message: error.message,
-    };
-    // The legacy upload endpoint nested Pinata's own status and body here.
-    if (error.details) {
-      body.pinataResponse = {
-        status: scalarOr(error.details.status, 'unknown'),
-        body: scalarOr(error.details.body, ''),
-      };
-    }
-    return new HttpException(body, PINNING_STATUS[error.reason]);
+    // The legacy upload endpoint nested Pinata's own status and body under
+    // `pinataResponse`. A `PinningError` carries only a reason and a message
+    // now, so the reason is all there is to report.
+    return new HttpException(
+      {
+        errorType: PINNING_ERROR_TYPE[error.reason],
+        message: error.message,
+      },
+      PINNING_STATUS[error.reason],
+    );
   }
 
   return new HttpException(
@@ -113,4 +98,39 @@ export async function asHttp<T>(action: () => Promise<T>): Promise<T> {
   } catch (error) {
     throw toHttpException(error);
   }
+}
+
+/**
+ * Narrow an optional contract member, or fail with the error a caller of an
+ * unsupported route should see.
+ *
+ * Optional methods and namespaces on `ChainDataApiV1` are how a provider says
+ * it cannot serve something: the member is absent, so calling it blindly is a
+ * TypeError rather than a rejected promise. Every use of an optional member
+ * goes through here, which is what makes the compiler enforce that a new
+ * provider gap is handled rather than crashing a route.
+ */
+export function required<T>(member: T | undefined, route: string): T {
+  if (member === undefined) {
+    throw new ChainDataError(
+      'CAPABILITY_UNSUPPORTED',
+      `The configured provider does not serve ${route}.`,
+      { retryable: false, details: { route } },
+    );
+  }
+  return member;
+}
+
+/**
+ * The same, for an optional METHOD: returns the owner with that method
+ * narrowed to present, so it is still called as `owner.method(…)` and stays
+ * bound to its object.
+ */
+export function withMethod<T extends object, K extends keyof T>(
+  owner: T,
+  key: K,
+  route: string,
+): T & { [P in K]-?: NonNullable<T[P]> } {
+  required(owner[key], route);
+  return owner as T & { [P in K]-?: NonNullable<T[P]> };
 }

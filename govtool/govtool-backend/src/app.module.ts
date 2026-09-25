@@ -30,6 +30,7 @@ import { MetadataModule } from './metadata/metadata.module';
 import { SurveyController } from './survey/survey.controller';
 import { SurveyService } from './survey/survey.service';
 import { ProvidersModule } from './providers/providers.module';
+import { LegacyNetwork } from './common/legacy-network';
 
 /**
  * There is no `DbService` or `SqlService` here any more: every read goes
@@ -58,6 +59,7 @@ import { ProvidersModule } from './providers/providers.module';
     // value above the safe range reaches the wire exactly.
     { provide: APP_INTERCEPTOR, useClass: IntegerJsonInterceptor },
     AppService,
+    LegacyNetwork,
     NetworkService,
     EpochService,
     TransactionService,

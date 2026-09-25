@@ -67,6 +67,8 @@ export const GovernanceActionDetails = () => {
     MetadataValidationStatus | undefined
   >();
   const { validateMetadata } = useValidateMutation();
+  // Bumped when a retry resolves the metadata, to validate it again.
+  const [validationRevision, setValidationRevision] = useState(0);
 
   useEffect(() => {
     if (!extendedProposal?.url) return;
@@ -90,7 +92,7 @@ export const GovernanceActionDetails = () => {
       setMetadataStatus(status);
     };
     validate();
-  }, [extendedProposal?.url]);
+  }, [extendedProposal?.url, validationRevision]);
 
   useEffect(() => {
     const isProposalNotFound =
@@ -185,6 +187,9 @@ export const GovernanceActionDetails = () => {
               <Box data-testid="governance-action-details">
                 <GovernanceActionDetailsCard
                   isDataMissing={metadataStatus}
+                  onMetadataRecovered={() =>
+                    setValidationRevision((value) => value + 1)
+                  }
                   proposal={extendedProposal}
                 />
               </Box>

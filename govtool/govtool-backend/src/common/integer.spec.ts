@@ -32,7 +32,7 @@ describe('database integer precision', () => {
     expect(compareIntegers(1, 1n)).toBe(0);
   });
   it('sorts proposal totals exactly even when summing safe values exceeds the safe range', () => {
-    const service = new ProposalService(null!, null!);
+    const service = new ProposalService(null!, null!, null);
     const lower = {
       id: 'lower',
       dRepYesVotes: Number.MAX_SAFE_INTEGER,

@@ -3,20 +3,17 @@ import { useNavigate } from "react-router";
 import { Box, Divider } from "@mui/material";
 
 import { Background, ScrollToManage, Typography } from "@atoms";
-import {
-  GOVERNANCE_ACTIONS_FILTERS,
-  GOVERNANCE_ACTIONS_SORTING,
-  PATHS,
-} from "@consts";
-import { useCardano, useDataActionsBar } from "@context";
+import { GOVERNANCE_ACTIONS_FILTERS, PATHS } from "@consts";
+import { useCardano, useDataActionsBar, useFeatureFlag } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { DataActionsBar } from "@molecules";
 import { Footer, TopNav, GovernanceActionsToVote } from "@organisms";
 import { WALLET_LS_KEY, getItemFromLocalStorage } from "@utils";
 
 export const GovernanceActions = () => {
-  const { ...dataActionsBarProps } =
-    useDataActionsBar();
+  const { ...dataActionsBarProps } = useDataActionsBar();
+  const { chosenSorting, setChosenSorting } = dataActionsBarProps;
+  const { governanceActionsSort } = useFeatureFlag();
   const { isMobile, pagePadding } = useScreenDimension();
   const { isEnabled } = useCardano();
   const navigate = useNavigate();
@@ -27,6 +24,17 @@ export const GovernanceActions = () => {
       navigate(PATHS.dashboardGovernanceActions);
     }
   }, [isEnabled]);
+
+  // `MostYesVotes` is the key Koios refuses. A selection carried in from an
+  // earlier page must not survive into a provider that cannot honour it.
+  useEffect(() => {
+    if (!chosenSorting) return;
+    if (governanceActionsSort.isSelectionStale(chosenSorting)) {
+      setChosenSorting(
+        governanceActionsSort.fallbackSelection(chosenSorting) ?? "",
+      );
+    }
+  }, [chosenSorting, setChosenSorting, governanceActionsSort]);
 
   return (
     <Background>
@@ -75,7 +83,8 @@ export const GovernanceActions = () => {
               {...dataActionsBarProps}
               filterOptions={GOVERNANCE_ACTIONS_FILTERS}
               filtersTitle={t("govActions.filterTitle")}
-              sortOptions={GOVERNANCE_ACTIONS_SORTING}
+              sortOptions={governanceActionsSort.options}
+              isSorting={governanceActionsSort.isAvailable}
             />
             <Box height={isMobile ? 60 : 80} />
             <GovernanceActionsToVote onDashboard={false} />

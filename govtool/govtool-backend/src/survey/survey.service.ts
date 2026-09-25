@@ -1,19 +1,11 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import type { ChainDataApiV1 } from '@govtool/data-providers/chain-data';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { ChainDataError } from '@govtool/data-providers/chain-data';
 
 import { asHttp } from 'src/common/errors';
-import { CHAIN_DATA } from 'src/providers/providers.module';
 import { SurveyDefinitionResponse } from './survey.type';
 
 @Injectable()
 export class SurveyService {
-  constructor(@Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1) {}
-
   async getDefinition(
     txId: string,
     rawSurveyIndex: string,
@@ -43,30 +35,18 @@ export class SurveyService {
 
     const normalizedTxId = txId.toLowerCase();
 
-    const definition = await asHttp(async () => {
-      // `surveys` is optional on the contract: a provider with no CIP-179
-      // statement omits the namespace entirely.
-      if (this.chain.surveys === undefined) {
-        return null;
-      }
-      const { data } = await this.chain.surveys.getDefinition(normalizedTxId);
-      return data;
-    });
-
-    if (definition === null) {
-      throw new NotFoundException({
-        errorType: 'NotFoundError',
-        message: `No metadata label 17 found for transaction ${normalizedTxId}`,
-      });
-    }
-
-    return {
-      txId: normalizedTxId,
-      // Not read from chain: the index addresses a question inside the
-      // payload, which the consumer decodes.
-      surveyIndex,
-      metadataLabel: 17,
-      payloadCborHex: definition.payloadCborHex,
-    };
+    // CIP-179 survey definitions are transaction metadata, not governance
+    // state, and no provider serves them any more. The route and its argument
+    // checks stay — a malformed request is still a 400 — but a well-formed one
+    // now says the capability is gone rather than inventing a payload.
+    void surveyIndex;
+    return asHttp(() =>
+      Promise.reject(
+        new ChainDataError(
+          'CAPABILITY_UNSUPPORTED',
+          `No survey definition source is configured, so metadata label 17 for transaction ${normalizedTxId} cannot be read.`,
+        ),
+      ),
+    );
   }
 }

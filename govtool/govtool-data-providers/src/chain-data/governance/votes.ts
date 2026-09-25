@@ -1,84 +1,71 @@
 /**
- * Chain Data API — `/governance/votes/*`
+ * Chain Data API — votes.
  *
- * Votes are their own resource rather than a field of a proposal or a DRep,
- * because every surface reaches them from a different direction: a proposal's
- * "who voted", a DRep's voting record, and a global feed. The two list routes
- * on `proposals` and `dreps` are filtered views of this same record.
+ * Votes are NEVER independently addressable. There is no cross-cutting feed and
+ * no lookup of a vote by its own transaction hash: a vote is reachable only
+ * through its DRep or its governance action (SPEC.md §5.2, §5.3).
  */
 
-import type {
-  Envelope,
-  EpochStamp,
-  PagedEnvelope,
-  PageRequest,
-  TxRef,
-  VotingPower,
-} from '../common';
-import type { GovActionRef, VoteChoice, VoterRef, VoterRole } from '../refs';
-import type { MetadataProjection, VoteRationaleBody } from '../../metadata';
-import type { GovAction, GovActionType } from './proposals';
+import type { Anchor, Bech32, EpochStamp, TxRef, VotingPower } from '../common';
+import type { VoteCastBy, VoteChoice } from '../refs';
+import type { GovActionType } from './proposals';
 
+export type VoteSort = 'newest' | 'oldest';
+
+/** One vote cast on one governance action. */
 export interface VoteRecord {
-  proposal: GovActionRef;
-  voter: VoterRef;
-  vote: VoteChoice;
-  txRef: TxRef;
+  voter: VoteCastBy;
+  choice: VoteChoice;
   /**
-   * When the vote was cast. Optional: a provider that indexes votes per
-   * proposal returns the voter, the choice and the vote's transaction, but
-   * dating it means joining that transaction to its block — one extra read
-   * per vote. `txRef` always identifies it.
+   * The CIP-100 rationale anchor. `null` = the voter attached none, which is
+   * legal and common. The document itself is the metadata service's business.
    */
+  anchor: Anchor | null;
+  txRef: TxRef;
   at?: EpochStamp;
-  /** Voting power applied when the vote was counted (`basis: "active"`). */
-  votingPower: VotingPower | null;
-  rationale: MetadataProjection<VoteRationaleBody> | null;
-  /** False when a later vote by the same voter on the same action replaced it. */
-  isCurrent: boolean;
+  /** The weight this vote carried, where the provider computes it. */
+  votingPower?: VotingPower;
 }
-
-/** Vote plus the full action — what a voter's "votes" tab renders. */
-export interface VotedGovAction {
-  vote: VoteRecord | null;
-  proposal: GovAction;
-}
-
-export type VoteExpand = 'votingPower' | 'rationale' | 'proposal';
 
 /**
- * Ordering for every vote listing — `votes.list`, `dreps.listVotes`,
- * `proposals.listVotes` and `pools.listVotes` all take it.
+ * The action a DRep's vote listing row is about.
  *
- * Named rather than inline since 0.4.0, because a capability cannot be declared
- * for something the contract cannot express: "this provider lists votes
- * chronologically but cannot order them by the voter's power" needs
- * `votingPower` to be a requestable sort before a provider can refuse it.
- *
- * `votingPower` orders by the power applied to each vote when it was counted
- * (`VoteRecord.votingPower`, `basis: "active"`), descending. A provider that
- * does not record per-vote power refuses it — see `EnumSupport<VoteSort>` in
- * `../capabilities`.
+ * `id` and `type` are required; `title` is the ONE documented denormalization
+ * of resolved metadata into chain data, present so a listing renders without a
+ * metadata lookup per row. Nothing else from the document travels.
  */
-export type VoteSort = 'newest' | 'oldest' | 'votingPower';
-
-export interface VoteListQuery extends PageRequest {
-  expand?: VoteExpand[];
-  proposalType?: GovActionType[];
-  vote?: VoteChoice[];
-  role?: VoterRole[];
-  sort?: VoteSort;
-  search?: string;
-  /** Include votes later superseded by a re-vote. Default false. */
-  includeSuperseded?: boolean;
+export interface VotedActionSummary {
+  id: Bech32;
+  type: GovActionType;
+  title?: string;
 }
 
-export interface VotesApi {
-  /** `GET /governance/votes` — cross-cutting feed. */
-  list(
-    q?: VoteListQuery & { voterId?: string; proposalId?: string },
-  ): Promise<PagedEnvelope<VoteRecord>>;
+/**
+ * A row in a DRep's voting activity.
+ *
+ * The listing covers actions the DRep voted on AND actions it did not, with a
+ * filter between them — so the participation stat's denominator is the length
+ * of the unfiltered listing and the two cannot disagree.
+ *
+ * A not-voted row carries no choice and no anchor: those fields are absent
+ * rather than null-filled.
+ */
+export type DRepVoteRow =
+  | {
+      voted: true;
+      action: VotedActionSummary;
+      choice: VoteChoice;
+      anchor: Anchor | null;
+      txRef: TxRef;
+      at?: EpochStamp;
+    }
+  | {
+      voted: false;
+      action: VotedActionSummary;
+    };
 
-  /** `GET /governance/votes/{txHash}` — a single vote by its transaction. */
-  get(txHash: string, q?: { index?: number }): Promise<Envelope<VoteRecord>>;
+export interface DRepVoteListQuery {
+  /** Omitted = both. */
+  voted?: boolean;
+  sort?: VoteSort;
 }

@@ -8,7 +8,7 @@ def test_ada_holder_current_delegation(govtool_api, ada_holder_delegate_to_drep)
     response = govtool_api.ada_holder_get_current_delegation(ada_holder_delegate_to_drep["stakeKey"])
     resp = response.json()
     if resp:
-        assert ada_holder_delegate_to_drep["drepId"] in resp
+        assert resp["drepHash"] == ada_holder_delegate_to_drep["dRepId"]
 
 
 @allure.story("AdaHolder")

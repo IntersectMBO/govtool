@@ -1,9 +1,7 @@
 import { Controller, Get, HttpException } from '@nestjs/common';
-import type {
-  FeatureSet,
-  ProviderCapabilityDocument,
-} from '@govtool/data-providers/chain-data';
+import type { ProviderCapabilities } from '@govtool/data-providers/chain-data';
 
+import type { FeatureSet } from './capabilities';
 import { SystemService } from './system.service';
 
 @Controller()
@@ -22,12 +20,12 @@ export class SystemController {
   }
 
   /**
-   * The composed capability document — for operators and support bundles.
-   * Verbose and provider-shaped on purpose; a component reads `/system/features`
-   * instead.
+   * The configured provider's own declaration, for operators and support
+   * bundles. A component reads `/system/features` instead, which is this
+   * backend's answer rather than the provider's.
    */
   @Get('system/capabilities')
-  getCapabilities(): Promise<ProviderCapabilityDocument> {
+  getCapabilities(): Promise<ProviderCapabilities> {
     return this.systemService.getCapabilities();
   }
 

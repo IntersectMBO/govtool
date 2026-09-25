@@ -1,0 +1,133 @@
+# Run GovTool locally on frozen mainnet data: no db-sync, no Cardano node,
+# no chain-data credentials.
+#
+#   docker compose -f docker-compose.fixture.yml up -d --build
+#   frontend  http://localhost:8080
+#   backend   http://localhost:9999
+#
+# Four services:
+#   backend       govtool-backend with the fixture chain-data provider
+#   metadata      govtool-metadata-service, which resolves anchors; private,
+#                 reached only by the backend, as in a deployment
+#   metadata-db   its Postgres, the permanent content and report store
+#   frontend      the Vite dev server over ./frontend, so it shows local source
+#
+# Metadata is live, not frozen: the fixture's anchors are real mainnet urls,
+# so the metadata service fetches them from the internet, IPFS included.
+#
+# After changing code: up -d --build backend (or metadata). The frontend
+# reloads on its own.
+
+name: govtool-fixture
+
+services:
+  metadata-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: metadata
+      POSTGRES_PASSWORD: metadata
+      POSTGRES_DB: metadata
+    volumes:
+      - metadata-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U metadata -d metadata"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  metadata:
+    build:
+      context: ./govtool-metadata-service
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # The image runs `prisma migrate deploy` before starting.
+      DATABASE_URL: postgresql://metadata:metadata@metadata-db:5432/metadata
+      # Optional: your own IPFS gateway, tried before the public ones.
+      IPFS_PRIMARY_GATEWAY: ${IPFS_PRIMARY_GATEWAY:-}
+    # No published port: only the backend talks to it (D119). For debugging,
+    # add  ports: ["127.0.0.1:3000:3000"]
+    depends_on:
+      metadata-db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1));",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+
+  backend:
+    build:
+      # The parent directory: the backend depends on its sibling packages by
+      # relative path, so a narrower context cannot resolve them.
+      context: .
+      dockerfile: govtool-backend/Dockerfile
+    environment:
+      NODE_ENV: production
+      GOVTOOL_HOST: 0.0.0.0
+      GOVTOOL_PORT: 9999
+      # Frozen mainnet capture from govtool-provider-fixture/data.
+      GOVTOOL_CHAIN_DATA_PROVIDER: fixture
+      GOVTOOL_METADATA_SERVICE_URL: http://metadata:3000
+      # Optional: without it /ipfs/upload answers 503 and reads are unaffected.
+      GOVTOOL_PINATA_API_JWT: ${PINATA_API_JWT:-}
+    ports:
+      - "${BACKEND_PORT:-9999}:9999"
+    depends_on:
+      metadata:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:9999/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1));",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  frontend:
+    # The dev server, not the production image: building the frontend image
+    # is killed by the OOM killer at about 8 GB of Docker memory, and the dev
+    # server shows local source changes as they are saved.
+    image: node:24-alpine
+    working_dir: /app
+    command: sh -c "npm ci --no-audit --no-fund && npx vite --host 0.0.0.0 --port 8080 --strictPort"
+    volumes:
+      - ./frontend:/app
+      # The container's own node_modules, so macOS binaries never mix in.
+      - frontend-node-modules:/app/node_modules
+    environment:
+      # Read by the browser, so these are host addresses, not service names.
+      VITE_BASE_URL: ${PUBLIC_BACKEND_URL:-http://localhost:9999}
+      VITE_METADATA_API_URL: ${PUBLIC_BACKEND_URL:-http://localhost:9999}/metadata
+      VITE_APP_ENV: development
+      VITE_IS_DEV: "true"
+      # The fixture is mainnet data.
+      VITE_NETWORK_FLAG: "1"
+      VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "false"
+      VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: "false"
+      NODE_OPTIONS: --max-old-space-size=4096
+    ports:
+      - "${FRONTEND_PORT:-8080}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  metadata-db:
+  frontend-node-modules:

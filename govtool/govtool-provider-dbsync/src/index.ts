@@ -1,55 +1,54 @@
-export { DbSyncChainDataProvider, createDbSyncProvider } from './provider';
-export type { DbSyncProviderOptions } from './provider';
-
-export { createPgQueryable, DEFAULT_POOL_SETTINGS } from './db/pg-pool';
-export type {
-  ClosableQueryable,
-  Queryable,
-  QueryResultLike,
-} from './db/queryable';
-export { loadSql, sqlDirectory } from './db/sql-loader';
-export type { SqlFileName } from './db/sql-loader';
-
-export {
-  DBSYNC_CAPABILITIES_REVIEWED_AT,
-  DBSYNC_PROVIDER_VERSION,
-  DBSYNC_REFUSALS,
-  dbSyncCapabilities,
-  missingUtxoViewOverride,
-  PROVIDER_ID,
-} from './capabilities';
-
-export { DbSyncAccountsApi } from './api/accounts.api';
-export { DbSyncNetworkApi } from './api/network.api';
-export { DbSyncSurveysApi } from './api/surveys.api';
-export { DbSyncSystemApi } from './api/system.api';
-export type { DbSyncSystemApiOptions } from './api/system.api';
-export { DbSyncTransactionsApi } from './api/transactions.api';
-export {
-  DbSyncCommitteeApi,
-  DbSyncDRepsApi,
-  DbSyncGovernanceApi,
-  DbSyncMetricsApi,
-  DbSyncPoolsApi,
-  DbSyncProposalsApi,
-  DbSyncVotesApi,
-} from './api/governance';
-
 /**
- * The legacy derivations are exported because a consumer reproducing the
- * pre-contract API response needs the same rules — `status` and `kind` are
- * computed, not stored.
+ * `ChainDataApiV1` over a cardano-db-sync PostgreSQL database.
+ *
+ *   const { chainData, close } = createDbSyncProvider({
+ *     network: 'mainnet',
+ *     connection: { host, port, database, user, password },
+ *   });
  */
-export { deriveKind, deriveStatus } from './mappers/drep.mapper';
-export { toContractType, toDbSyncType } from './mappers/proposal.mapper';
-export { computeMetadataId } from './common/metadata-id';
-export {
-  encodeCip129DRepId,
-  encodeCip129GovActionId,
-  formatLegacyGovActionId,
-  normalizeDRepId,
-  normalizeStakeKey,
-  parseGovActionId,
-} from './common/ids';
-export { assertHexText, isHexText } from './common/hex';
-export type * as Rows from './rows';
+import type { ChainDataApiV1, NetworkId } from '@govtool/data-providers/chain-data';
+
+import { createAccountsApi } from './accounts';
+import { createCtx } from './context';
+import { createPgDb, guardDb, type Db, type PgDbOptions } from './db';
+import { createGovernanceApi } from './governance';
+import { createNetworkApi } from './network';
+import { createSystemApi } from './system';
+import { createTransactionsApi } from './transactions';
+
+export interface DbSyncProviderOptions {
+  /** The network the database follows. Decides stake address prefixes. */
+  network: NetworkId;
+  /** Connection settings; the provider opens and owns a pool. */
+  connection?: PgDbOptions;
+  /** Or a database the caller owns, such as a test double. */
+  db?: Db;
+}
+
+export interface DbSyncProvider {
+  chainData: ChainDataApiV1;
+  /** Closes the pool the provider opened. A no-op for a caller-owned `db`. */
+  close(): Promise<void>;
+}
+
+export function createDbSyncProvider(options: DbSyncProviderOptions): DbSyncProvider {
+  if (!options.db && !options.connection) throw new Error('createDbSyncProvider needs a connection or a db');
+  const owned = options.db ? undefined : createPgDb(options.connection!);
+  const db = owned ?? guardDb(options.db!);
+  const ctx = createCtx(db, options.network);
+  return {
+    chainData: {
+      network: createNetworkApi(ctx),
+      accounts: createAccountsApi(ctx),
+      governance: createGovernanceApi(ctx),
+      transactions: createTransactionsApi(ctx),
+      system: createSystemApi(ctx),
+    },
+    close: async () => {
+      await owned?.end();
+    },
+  };
+}
+
+export type { Db, PgDbOptions } from './db';
+export { capabilities } from './system';

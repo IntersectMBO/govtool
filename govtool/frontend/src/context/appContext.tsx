@@ -8,8 +8,14 @@ import {
 } from "react";
 import * as Sentry from "@sentry/react";
 
+import type { FeatureSet } from "@/models/featureSet";
+
 import { NETWORK_NAMES, CEXPLORER_BASE_URLS } from "@/consts";
-import { useGetEpochParams, useGetNetworkInfo } from "@/hooks";
+import {
+  useGetEpochParams,
+  useGetNetworkInfo,
+  useGetSystemFeatures,
+} from "@/hooks";
 import {
   NETWORK_INFO_KEY,
   PROTOCOL_PARAMS_KEY,
@@ -20,8 +26,26 @@ import { adaHandleService } from "@/services/AdaHandle";
 
 const BOOTSTRAPPING_PHASE_MAJOR = 9;
 
+/**
+ * Three distinct states, deliberately not a boolean:
+ *
+ *   loading      the bootstrap fetch has not resolved yet.
+ *   unavailable  the fetch failed, or the backend does not serve
+ *                `/system/features` at all. Gates FAIL OPEN here — the full UI,
+ *                exactly as it behaved before capabilities existed.
+ *   ready        a `FeatureSet` is in hand and gates apply.
+ *
+ * Collapsing `unavailable` into `ready` would turn a transient network error
+ * into a permanently feature-less app; collapsing it into `loading` would hang
+ * every gated control on a spinner forever.
+ */
+export type CapabilitiesStatus = "loading" | "unavailable" | "ready";
+
 type AppContextType = {
   isAppInitializing: boolean;
+  /** Provider capabilities, derived by the backend. `undefined` unless ready. */
+  featureSet?: FeatureSet;
+  capabilitiesStatus: CapabilitiesStatus;
   isMainnet: boolean;
   isInBootstrapPhase: boolean;
   isFullGovernance: boolean;
@@ -41,8 +65,12 @@ const AppContext = createContext<AppContextType | null>(null);
 const AppContextProvider = ({ children }: PropsWithChildren) => {
   const { fetchEpochParams, epochParams } = useGetEpochParams();
   const { fetchNetworkInfo, networkInfo } = useGetNetworkInfo();
+  const { fetchSystemFeatures } = useGetSystemFeatures();
 
   const [isAppInitializing, setIsAppInitializing] = useState(true);
+  const [featureSet, setFeatureSet] = useState<FeatureSet | undefined>();
+  const [capabilitiesStatus, setCapabilitiesStatus] =
+    useState<CapabilitiesStatus>("loading");
 
   useEffect(() => {
     const init = async () => {
@@ -60,6 +88,22 @@ const AppContextProvider = ({ children }: PropsWithChildren) => {
           adaHandleService.initialize(networkInfoData?.networkName);
         }
 
+        // Capabilities are advisory: a backend that does not serve them (or a
+        // transient failure) must leave the app fully usable, so this is its
+        // own try/catch rather than part of the bootstrap's failure path.
+        try {
+          const { data: featureSetData } = await fetchSystemFeatures();
+          if (featureSetData) {
+            setFeatureSet(featureSetData);
+            setCapabilitiesStatus("ready");
+          } else {
+            setCapabilitiesStatus("unavailable");
+          }
+        } catch (capabilitiesError) {
+          Sentry.captureException(capabilitiesError);
+          setCapabilitiesStatus("unavailable");
+        }
+
         setIsAppInitializing(false);
       } catch (error) {
         Sentry.captureException(error);
@@ -72,6 +116,8 @@ const AppContextProvider = ({ children }: PropsWithChildren) => {
   const value = useMemo(
     () => ({
       isAppInitializing,
+      featureSet,
+      capabilitiesStatus,
       isMainnet: networkInfo?.networkName === "mainnet",
       isInBootstrapPhase:
         epochParams?.protocol_major === BOOTSTRAPPING_PHASE_MAJOR,
@@ -87,7 +133,7 @@ const AppContextProvider = ({ children }: PropsWithChildren) => {
         ],
       epochParams,
     }),
-    [isAppInitializing],
+    [isAppInitializing, capabilitiesStatus, featureSet],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

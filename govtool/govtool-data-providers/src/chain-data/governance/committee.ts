@@ -1,37 +1,39 @@
 /**
- * Chain Data API — `/governance/committee` and `/governance/constitution`
+ * Chain Data API — `/governance/committee`
  *
- * Constitutional committee membership and the current constitution. Both are
- * read from ledger gov-state where the provider exposes it, rather than
- * reconstructed by replaying enacted `UpdateCommittee` / `NewConstitution`
- * actions — replay is error-prone and gov-state is authoritative.
+ * Committee membership is genuine LEDGER STATE, not something readable off the
+ * latest action. `UpdateCommittee` actions are add/remove deltas, so current
+ * membership is assembled from the genesis committee, every enacted
+ * `UpdateCommittee`, any enacted `NoConfidence`, the `AuthCommitteeHotCert` and
+ * `ResignCommitteeColdCert` certificates, and term expiry against the current
+ * epoch.
+ *
+ * The constitution, by contrast, IS derivable: each `NewConstitution` action
+ * replaces the previous one outright and its body carries the anchor, so
+ * `getEnacted('constitution')` → `body.anchor` is sufficient.
  */
 
 import type {
   Anchor,
-  Envelope,
+  Bech32,
   EpochNo,
   EpochStamp,
+  Envelope,
   Hex,
-  PagedEnvelope,
-  PageRequest,
   Ratio,
 } from '../common';
-import type { GovActionRef, VoterRef } from '../refs';
-import type { ConstitutionBody, MetadataProjection } from '../../metadata';
+import type { GovActionRef } from '../refs';
 
-export interface Credential {
-  hash: Hex;
-  isScriptBased: boolean;
-}
-
-export interface CommitteeMember extends VoterRef {
+export interface CommitteeMember {
   role: 'cc';
-  coldCredential: Credential;
-  hotCredential: Credential | null;
+  /** The member's identity. Never the hot credential, which rotates. */
+  coldCredential: Bech32;
+  /** Absent until the member authorises one; changes over the seat's life. */
+  hotCredential: Bech32 | null;
   termStartEpoch: EpochNo | null;
   termExpiryEpoch: EpochNo | null;
   hasResigned: boolean;
+  isScriptBased?: boolean;
 }
 
 export interface Committee {
@@ -39,26 +41,20 @@ export interface Committee {
   quorum: Ratio;
   /** The action that last set this membership. */
   enactedBy: GovActionRef | null;
+  /** True after an enacted `NoConfidence`. */
+  isDissolved?: boolean;
 }
 
 export interface Constitution {
+  /** Points at the constitution document; the metadata service resolves it. */
   anchor: Anchor;
   guardrailsScriptHash: Hex | null;
   enactedBy: GovActionRef | null;
   enactedAt: EpochStamp | null;
-  /** Resolved document — same lifecycle rules as any other metadata. */
-  document: MetadataProjection<ConstitutionBody> | null;
 }
 
 export interface CommitteeApi {
-  /** `GET /governance/committee` */
   getCommittee(): Promise<Envelope<Committee>>;
-  /** `GET /governance/committee/members/{id}` */
-  getMember(id: string): Promise<Envelope<CommitteeMember>>;
-  /** `GET /governance/constitution` */
+  getMember(coldCredential: string): Promise<Envelope<CommitteeMember>>;
   getConstitution(): Promise<Envelope<Constitution>>;
-  /** `GET /governance/constitution/history` */
-  listConstitutionHistory(
-    q?: PageRequest,
-  ): Promise<PagedEnvelope<Constitution>>;
 }

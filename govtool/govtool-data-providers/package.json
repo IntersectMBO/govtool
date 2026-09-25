@@ -1,7 +1,7 @@
 {
   "name": "@govtool/data-providers",
   "version": "0.3.0",
-  "description": "Provider-agnostic TypeScript contracts for GovTool chain data, off-chain metadata and pinning. Interfaces only — no implementation, no transport.",
+  "description": "Provider-agnostic TypeScript contracts for GovTool chain data, off-chain metadata and pinning. Interfaces only \u2014 no implementation, no transport.",
   "license": "Apache-2.0",
   "private": true,
   "sideEffects": false,
@@ -16,10 +16,6 @@
       "types": "./dist/chain-data/index.d.ts",
       "default": "./dist/chain-data/index.js"
     },
-    "./chain-data/governance": {
-      "types": "./dist/chain-data/governance/index.d.ts",
-      "default": "./dist/chain-data/governance/index.js"
-    },
     "./metadata": {
       "types": "./dist/metadata/index.d.ts",
       "default": "./dist/metadata/index.js"
@@ -28,21 +24,39 @@
       "types": "./dist/pinning/index.d.ts",
       "default": "./dist/pinning/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./index-provider": {
+      "types": "./dist/index-provider/index.d.ts",
+      "default": "./dist/index-provider/index.js"
+    },
+    "./committee-info": {
+      "types": "./dist/committee-info/index.d.ts",
+      "default": "./dist/committee-info/index.js"
+    },
+    "./tx-monitor": {
+      "types": "./dist/tx-monitor/index.d.ts",
+      "default": "./dist/tx-monitor/index.js"
+    }
   },
   "typesVersions": {
     "*": {
       "chain-data": [
         "./dist/chain-data/index.d.ts"
       ],
-      "chain-data/governance": [
-        "./dist/chain-data/governance/index.d.ts"
-      ],
       "metadata": [
         "./dist/metadata/index.d.ts"
       ],
       "pinning": [
         "./dist/pinning/index.d.ts"
+      ],
+      "index-provider": [
+        "./dist/index-provider/index.d.ts"
+      ],
+      "committee-info": [
+        "./dist/committee-info/index.d.ts"
+      ],
+      "tx-monitor": [
+        "./dist/tx-monitor/index.d.ts"
       ]
     }
   },

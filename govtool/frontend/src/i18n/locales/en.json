@@ -644,6 +644,103 @@
     "info": "Update Information",
     "title": "Update DRep Metadata"
   },
+  "metadataReport": {
+    "showDetails": "Show details",
+    "hideDetails": "Hide details",
+    "loading": "Loading the fetch report…",
+    "loadError": "The fetch report could not be loaded.",
+    "notFound": "No fetch report was found for this failure.",
+    "categories": {
+      "NETWORK": "Network error: nothing usable came back from the URL",
+      "INVALID_CONTENT": "Invalid content: something came back, but it is not the anchored document",
+      "SCHEMA_INVALID": "Schema invalid: the document does not meet the metadata standard"
+    },
+    "summary": {
+      "code": "Code",
+      "message": "Message",
+      "startedAt": "Started",
+      "finishedAt": "Finished",
+      "url": "Requested URL",
+      "effectiveUrl": "Effective URL",
+      "requestedHash": "Requested hash",
+      "servedHash": "Served hash",
+      "hashMismatch": "The document served does not hash to the value anchored on chain."
+    },
+    "history": {
+      "label": "Report",
+      "latest": "latest"
+    },
+    "hop": {
+      "title": "Request {{number}}",
+      "dns": "DNS",
+      "dnsAddresses": "Resolved to",
+      "dnsNoAddresses": "No addresses returned",
+      "dnsError": "DNS error",
+      "attempts": "Connection attempts",
+      "noAttempts": "No connection was attempted.",
+      "httpStatus": "HTTP status",
+      "headers": "Response headers",
+      "noResponse": "No HTTP response was received.",
+      "redirectTo": "Redirected to"
+    },
+    "attempt": {
+      "address": "Address",
+      "family": "Family",
+      "familyValue": "IPv{{family}}",
+      "outcome": "Outcome",
+      "errorCode": "Error code",
+      "message": "Message",
+      "timings": "Timings"
+    },
+    "timings": {
+      "connect": "connect {{ms}} ms",
+      "tls": "TLS {{ms}} ms",
+      "firstByte": "first byte {{ms}} ms",
+      "end": "end {{ms}} ms"
+    },
+    "outcomes": {
+      "connected": "Connected",
+      "blocked": "Blocked: not a public address",
+      "blockedRange": "Blocked: not a public address ({{range}})",
+      "refused": "Connection refused",
+      "reset": "Connection reset",
+      "unreachable": "Unreachable",
+      "timeout": "Timed out",
+      "timeoutStage": "Timed out during {{stage}}",
+      "tls_error": "TLS error",
+      "error": "Error"
+    },
+    "timeoutStages": {
+      "connect": "connect",
+      "tls": "TLS handshake",
+      "first_byte": "wait for first byte",
+      "body": "body download"
+    },
+    "body": {
+      "title": "Content received",
+      "none": "No content was received.",
+      "meta": "{{size}} bytes",
+      "metaWithType": "{{size}} bytes, {{contentType}}",
+      "binary": "Binary content, {{size}} bytes. It is not shown because it is not text.",
+      "truncated": "Reading stopped at the {{limit}} fetch limit, so the document is at least {{size}} bytes. Only the part received is shown.",
+      "showAllLines": "Show all {{count}} lines",
+      "hiddenLines": "{{count}} more lines not shown"
+    },
+    "issues": {
+      "title": "Problems found",
+      "position": "line {{line}}, column {{column}}",
+      "noPosition": "position unknown",
+      "jumpTo": "Show in content"
+    },
+    "retry": {
+      "button": "Retry",
+      "wait_one": "You can retry again in {{count}} second",
+      "wait_other": "You can retry again in {{count}} seconds",
+      "success": "The metadata now loads correctly.",
+      "stillFailing": "Retried: the document still fails. The details show the new attempt.",
+      "error": "The retry could not be sent. Please try again later."
+    }
+  },
   "modals": {
     "common": {
       "goToDashboard": "Go to Dashboard",

@@ -1,20 +1,36 @@
-import { Inject, Injectable } from '@nestjs/common';
-import type {
-  ChainDataApiV1,
-  DRep,
-  VotedGovAction,
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  ChainDataError,
+  type ChainDataApiV1,
+  type DRep,
+  type DRepSort,
+  type DRepVoteRow,
 } from '@govtool/data-providers/chain-data';
 
 import { CacheService } from 'src/cache/cache.service';
-import { asHttp } from 'src/common/errors';
-import { assertHexText } from 'src/common/hex';
+import { asHttp, withMethod } from 'src/common/errors';
+import {
+  decodeCip129DRepId,
+  drepIdToCip105,
+  drepIdToHex,
+  firstFound,
+  legacyDRepCandidates,
+  tryLegacyDRepCandidates,
+} from 'src/common/legacy-ids';
 import {
   compareIntegers,
   dbInteger,
   type ApiInteger,
 } from 'src/common/integer';
 import { toLegacyNullableInteger } from 'src/common/legacy';
-import { CHAIN_DATA } from 'src/providers/providers.module';
+import { CHAIN_DATA, METADATA } from 'src/providers/providers.module';
+import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
+import {
+  drepFields,
+  ENRICH_CONCURRENCY,
+  mapLimit,
+  resolveBody,
+} from 'src/metadata/enrich';
 import { readAll } from 'src/common/snapshot';
 import { ProposalService } from 'src/proposal/proposal.service';
 import {
@@ -42,10 +58,51 @@ const LEGACY_STATUS = {
   retired: 'Retired',
 } as const satisfies Record<string, DRepStatus>;
 
+/**
+ * `SoleVoter` was a direct voter — a registration kind the ledger does not
+ * have and the contract dropped. `anonymous` is the observable fact that
+ * replaced it: a DRep registered with no anchor. The two are not the same set,
+ * but they carry the same directory policy — hidden unless the id is typed in
+ * full — so the legacy name keeps meaning what the UI does with it.
+ */
 const LEGACY_KIND = {
   drep: 'DRep',
-  directVoter: 'SoleVoter',
+  anonymous: 'SoleVoter',
 } as const satisfies Record<string, DRepType>;
+
+/** The predefined delegation targets, under db-sync's `drep_hash.view`. */
+const PREDEFINED_VIEW = {
+  drep_always_abstain: 'alwaysAbstainVotingPower',
+  drep_always_no_confidence: 'alwaysNoConfidenceVotingPower',
+} as const;
+
+/**
+ * The legacy endpoint had no cap; each identifier here costs up to two
+ * provider reads, so an unbounded list is an amplification vector. The one
+ * caller (pdf-ui's poll-voter dialog) asks for at most 1,000.
+ */
+const MAX_VOTING_POWER_IDENTIFIERS = 1_000;
+
+function isPredefinedView(
+  identifier: string,
+): identifier is keyof typeof PREDEFINED_VIEW {
+  return identifier in PREDEFINED_VIEW;
+}
+
+function isNotFound(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    (error as { code?: unknown }).code === 'NOT_FOUND'
+  );
+}
+
+/** Deterministic DRep orderings a snapshot can page through, in preference order. */
+const SNAPSHOT_DREP_SORTS: readonly DRepSort[] = [
+  'registrationDate',
+  'votingPower',
+  'activity',
+];
 
 @Injectable()
 export class DRepService {
@@ -55,45 +112,113 @@ export class DRepService {
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
     private readonly proposalService: ProposalService,
     private readonly cacheService: CacheService,
+    @Inject(METADATA) private readonly metadata: MetadataServiceV1 | null,
   ) {}
 
+  /** A DRep's CIP-119 fields from its anchored document, when it resolves. */
+  private async profileOf(url: string | null, hash: string | null) {
+    return drepFields(await resolveBody(this.metadata, { url, hash }));
+  }
+
+  /**
+   * The legacy endpoint answered 0 for a credential with no distribution row.
+   * Voting power is a field on the DRep now rather than a lookup of its own,
+   * so an unknown credential is a `NOT_FOUND` and becomes the same 0.
+   */
   async getVotingPower(drepId: string): Promise<ApiInteger> {
     return this.cacheService.getOrSet('drepVotingPower', drepId, () =>
       asHttp(async () => {
-        assertHexText(drepId);
-        const { data } =
-          await this.chain.governance.dreps.getVotingPower(drepId);
-        const first = data[0];
-        return first === undefined ? 0 : dbInteger(first.amount);
+        const drep = await this.findDRep(legacyDRepCandidates(drepId));
+        return drep?.votingPower === null || drep?.votingPower === undefined
+          ? 0
+          : dbInteger(drep.votingPower.amount);
       }),
     );
   }
 
+  /**
+   * The batch read, one credential at a time.
+   *
+   * There is no batch method on the contract — voting power travels on the
+   * DRep — and the two predefined targets are not DReps at all, so their
+   * totals come from the network's stake distribution, which is where the
+   * contract puts them.
+   */
   async getVotingPowerList(
     identifiers: string[],
   ): Promise<DRepVotingPowerListResponse[]> {
+    if (identifiers.length > MAX_VOTING_POWER_IDENTIFIERS) {
+      throw new BadRequestException({
+        errorType: 'ValidationError',
+        message: `At most ${MAX_VOTING_POWER_IDENTIFIERS} identifiers per request`,
+      });
+    }
+
     return this.cacheService.getOrSet('drepVotingPowerList', identifiers, () =>
       asHttp(async () => {
-        const { data } =
-          await this.chain.governance.dreps.getVotingPowers(identifiers);
+        const predefined = identifiers.filter(isPredefinedView);
+        const distribution =
+          predefined.length === 0
+            ? undefined
+            : (await this.chain.network.getStakeDistribution()).data;
 
-        return data.map((entry) => ({
-          // The legacy field is db-sync's pre-CIP-129 `view`; for a
-          // predefined option it is the ledger name db-sync stores.
-          view:
-            entry.subject.kind === 'drep'
-              ? (entry.subject.drep.cip105Id ?? entry.subject.drep.id)
-              : (entry.subject.view ?? ''),
-          // NULL for the predefined options, which have no credential —
-          // exactly as the legacy endpoint reported them.
-          hashRaw:
-            entry.subject.kind === 'drep' ? entry.subject.drep.hash : null,
-          votingPower:
-            entry.votingPower === null
-              ? 0
-              : dbInteger(entry.votingPower.amount),
-          givenName: entry.givenName ?? null,
-        }));
+        const entries = await Promise.all(
+          identifiers.map(
+            async (identifier): Promise<DRepVotingPowerListResponse[]> => {
+              if (isPredefinedView(identifier)) {
+                return [
+                  {
+                    view: identifier,
+                    // NULL for the predefined options, which have no credential —
+                    // exactly as the legacy endpoint reported them.
+                    hashRaw: null,
+                    votingPower: dbInteger(
+                      distribution?.[PREDEFINED_VIEW[identifier]] ?? 0,
+                    ),
+                    givenName: null,
+                  },
+                ];
+              }
+
+              // The legacy statement matched each identifier with SQL and
+              // simply returned no row for one that matched nothing — a
+              // malformed id included. pdf-ui passes whatever DRep ids its
+              // comments carry, so one bad id must not fail the whole list: it
+              // is dropped here, without ever reaching the provider.
+              const candidates = tryLegacyDRepCandidates(identifier);
+              const drep =
+                candidates === undefined
+                  ? null
+                  : await this.findDRep(candidates);
+              if (drep === null) {
+                return [];
+              }
+              return [
+                {
+                  // Legacy forms: pdf-ui matches `hashRaw` against the raw hex
+                  // DRep id its comments store, and links `view` into the
+                  // directory, whose search takes CIP-105.
+                  view: drepIdToCip105(drep.id),
+                  hashRaw: drepIdToHex(drep.id),
+                  votingPower:
+                    drep.votingPower == null
+                      ? 0
+                      : dbInteger(drep.votingPower.amount),
+                  // The DRep's CIP-119 name, through the metadata service.
+                  givenName:
+                    (
+                      await this.profileOf(
+                        drep.anchor?.url ?? null,
+                        drep.anchor?.dataHash ?? null,
+                      )
+                    )?.givenName ?? null,
+                },
+              ];
+            },
+          ),
+        );
+
+        return entries.flat();
       }),
     );
   }
@@ -106,52 +231,48 @@ export class DRepService {
   async getInfo(drepId: string): Promise<DRepInfoResponse> {
     return this.cacheService.getOrSet('drepInfo', drepId, () =>
       asHttp(async () => {
-        assertHexText(drepId);
+        const drep = await this.findDRep(legacyDRepCandidates(drepId));
 
-        let drep: DRep;
-        try {
-          const { data } = await this.chain.governance.dreps.get(drepId);
-          drep = data;
-        } catch (error) {
-          if (
-            typeof error === 'object' &&
-            error !== null &&
-            (error as { code?: string }).code === 'NOT_FOUND'
-          ) {
-            return this.emptyDRepInfo();
-          }
-          throw error;
+        if (drep === null) {
+          return this.emptyDRepInfo();
         }
 
-        const byKind = drep.registrationByKind;
-        const body = drep.metadata?.body;
+        const profile = await this.profileOf(
+          drep.anchor?.url ?? null,
+          drep.anchor?.dataHash ?? null,
+        );
 
         return {
-          isScriptBased: drep.isScriptBased,
-          isRegisteredAsDRep: byKind?.drep.isRegistered ?? false,
-          wasRegisteredAsDRep: byKind?.drep.wasRegistered ?? false,
-          isRegisteredAsSoleVoter: byKind?.directVoter.isRegistered ?? false,
-          wasRegisteredAsSoleVoter: byKind?.directVoter.wasRegistered ?? false,
-          deposit: toLegacyNullableInteger(drep.registration.deposit),
-          url: drep.metadata?.anchor.url ?? null,
-          dataHash: drep.metadata?.anchor.dataHash ?? null,
+          isScriptBased: drep.isScriptBased ?? false,
+          // The four booleans distinguished a DRep registration from a direct
+          // voter one. Direct voters are gone from the contract, so a record
+          // that exists is a DRep registration and nothing else.
+          isRegisteredAsDRep: drep.status !== 'retired',
+          wasRegisteredAsDRep: true,
+          isRegisteredAsSoleVoter: false,
+          wasRegisteredAsSoleVoter: false,
+          deposit: toLegacyNullableInteger(drep.registration.latest.deposit),
+          url: drep.anchor?.url ?? null,
+          dataHash: drep.anchor?.dataHash ?? null,
           votingPower:
             drep.votingPower === null
               ? null
               : dbInteger(drep.votingPower.amount),
-          dRepRegisterTxHash: byKind?.drep.registrationTx?.txHash ?? null,
-          dRepRetireTxHash: byKind?.drep.retirementTx?.txHash ?? null,
-          soleVoterRegisterTxHash:
-            byKind?.directVoter.registrationTx?.txHash ?? null,
-          soleVoterRetireTxHash:
-            byKind?.directVoter.retirementTx?.txHash ?? null,
-          paymentAddress: body?.paymentAddress ?? null,
-          givenName: body?.givenName ?? null,
-          objectives: body?.objectives ?? null,
-          motivations: body?.motivations ?? null,
-          qualifications: body?.qualifications ?? null,
-          imageUrl: body?.image?.url ?? null,
-          imageHash: body?.image?.contentHash ?? null,
+          dRepRegisterTxHash: drep.registration.latest.txRef.txHash,
+          // Retirement is dated on the contract but not attributed to a
+          // transaction, and there is no direct-voter registration to report.
+          dRepRetireTxHash: null,
+          soleVoterRegisterTxHash: null,
+          soleVoterRetireTxHash: null,
+          // The CIP-119 body, resolved through the metadata service; null
+          // when it is not configured or the document does not resolve.
+          paymentAddress: profile?.paymentAddress ?? null,
+          givenName: profile?.givenName ?? null,
+          objectives: profile?.objectives ?? null,
+          motivations: profile?.motivations ?? null,
+          qualifications: profile?.qualifications ?? null,
+          imageUrl: profile?.imageUrl ?? null,
+          imageHash: profile?.imageHash ?? null,
         };
       }),
     );
@@ -181,12 +302,19 @@ export class DRepService {
     const total = dreps.length;
     const offset = page * pageSize;
 
-    return {
-      page,
-      pageSize,
-      total,
-      elements: dreps.slice(offset, offset + pageSize),
-    };
+    // Only the page being returned is resolved: the snapshot can hold
+    // thousands of DReps, and the metadata service caches each document by
+    // hash, so a page someone has looked at before costs nothing.
+    const elements = await mapLimit(
+      dreps.slice(offset, offset + pageSize),
+      ENRICH_CONCURRENCY,
+      async (item) => {
+        const profile = await this.profileOf(item.url, item.metadataHash);
+        return profile ? { ...item, ...profile } : item;
+      },
+    );
+
+    return { page, pageSize, total, elements };
   }
 
   async getVotes(
@@ -200,12 +328,56 @@ export class DRepService {
       { drepId, selectedTypes, sort, search },
       () =>
         asHttp(async () => {
-          assertHexText(drepId);
+          const candidates = legacyDRepCandidates(drepId);
 
-          const { data } = await this.chain.governance.dreps.listVotes(drepId);
+          const dreps = withMethod(
+            this.chain.governance.dreps,
+            'listVotes',
+            'governance.dreps.listVotes',
+          );
 
-          const pairs = data.elements.flatMap((element) =>
-            this.toLegacyVotePair(element),
+          // A bare hash names two possible credentials; which one is
+          // registered is settled by reading the DRep, since a vote listing
+          // for an unknown DRep is not an error on every provider.
+          const id =
+            candidates.length === 1
+              ? candidates[0]
+              : ((await this.findDRep(candidates))?.id ?? null);
+
+          // The legacy statement answered an unknown DRep with no rows.
+          if (id === null) {
+            return [];
+          }
+
+          // The listing carries voted AND not-voted rows, and it is paged like
+          // every other collection, so the whole of it is read rather than
+          // whichever prefix the first page happened to hold.
+          let rows: DRepVoteRow[];
+          try {
+            rows = await readAll(
+              (page) => dreps.listVotes(id, { ...page, voted: true }),
+              { label: 'drep vote listing' },
+            );
+          } catch (error) {
+            if (isNotFound(error)) {
+              return [];
+            }
+            throw error;
+          }
+
+          // A row names the action it is about; the legacy response carries
+          // the whole proposal, which the snapshot already holds.
+          const byId = new Map(
+            (await this.proposalService.getProposals('')).map((proposal) => [
+              proposal.id,
+              proposal,
+            ]),
+          );
+
+          // The legacy vote row named its DRep by the raw hex hash.
+          const legacyDRepId = drepIdToHex(id);
+          const pairs = rows.flatMap((row) =>
+            this.toLegacyVotePair(legacyDRepId, row, byId),
           );
 
           // Filter and sort on the proposal side, as the legacy service did.
@@ -243,6 +415,25 @@ export class DRepService {
     );
   }
 
+  /**
+   * The DRep, or `null` where the provider has none of the candidate ids.
+   * Candidates come from `legacyDRepCandidates`: one id, or for a bare hash
+   * the key-hash id and then the script-hash id.
+   */
+  private async findDRep(candidates: string[]): Promise<DRep | null> {
+    try {
+      const { data } = await firstFound(candidates, (id) =>
+        this.chain.governance.dreps.get(id),
+      );
+      return data;
+    } catch (error) {
+      if (isNotFound(error)) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
   private getDRepListSnapShot(search: string): Promise<DRepListItem[]> {
     return this.cacheService.getOrSetStaleWhileRevalidate(
       this.drepListSnapshotNamespace,
@@ -256,76 +447,143 @@ export class DRepService {
    * The whole directory, paged out of the provider when it caps a page.
    * Everything downstream — the status filter, the SoleVoter rule, the sort
    * and the paging — assumes this snapshot is complete; see `readAll`.
+   *
+   * `sort` is explicit because the contract's default ordering is RANDOM, and
+   * a randomly ordered read is not paged: the provider rejects a second page
+   * rather than reshuffling, so asking for the default would cap the snapshot
+   * at one page.
    */
   private async fetchDRepListSnapshot(search: string): Promise<DRepListItem[]> {
     return asHttp(async () => {
-      const dreps = await readAll(
-        (page) => this.chain.governance.dreps.list({ ...page, search }),
-        { label: 'drep list snapshot' },
+      const sort = await this.snapshotSort();
+      const read = (term: string) =>
+        readAll(
+          (page) =>
+            this.chain.governance.dreps.list({
+              ...page,
+              sort,
+              ...(term === '' ? {} : { search: term }),
+            }),
+          { label: 'drep list snapshot' },
+        );
+
+      // The frontend searches by a legacy id: its search box, the directory
+      // detail page and the delegation card all pass the term through
+      // dRepSearchPhraseProcessor, which turns any `drep…` id into the raw
+      // hex hash. A provider's `exactId` search matches CIP-129 only, so a
+      // term that decodes as a DRep id is searched in that form — both forms,
+      // for a bare hash — and anything else goes through as free text.
+      const candidates =
+        search === '' ? undefined : tryLegacyDRepCandidates(search);
+      const dreps =
+        candidates === undefined
+          ? await read(search)
+          : (await Promise.all(candidates.map(read))).flat();
+
+      // Only rows with a CIP-129 id. The fixture lists the two predefined
+      // targets as DReps under the ids `drep_always_abstain` and
+      // `drep_always_no_confidence`; they are not DReps in the contract, had
+      // no directory row in the legacy API, and have no hex hash or CIP-105
+      // form to report, so they are dropped rather than failing the page.
+      const unique = new Map(
+        dreps
+          .filter((drep) => decodeCip129DRepId(drep.id) !== undefined)
+          .map((drep) => [drep.id, drep]),
       );
-      return dreps.map((drep) => this.toLegacyListItem(drep));
+      return [...unique.values()].map((drep) => this.toLegacyListItem(drep));
     });
   }
 
-  private toLegacyListItem(drep: DRep): DRepListItem {
-    const body = drep.metadata?.body;
-    const status = drep.registration.status;
+  /**
+   * The ordering the snapshot is read in. Any deterministic sort will do, since
+   * the snapshot is re-sorted in memory, but it must be one the provider
+   * declares: an undeclared one is refused, and Blockfrost, for one, declares
+   * no `registrationDate` because it costs requests per DRep.
+   */
+  private async snapshotSort(): Promise<DRepSort> {
+    const { data } = await this.chain.system.getCapabilities();
+    const sort = SNAPSHOT_DREP_SORTS.find((s) => data.sorts.dreps.includes(s));
+    if (sort === undefined) {
+      throw new ChainDataError(
+        'CAPABILITY_UNSUPPORTED',
+        'The provider declares no deterministic DRep ordering, so the directory cannot be read in full',
+      );
+    }
+    return sort;
+  }
 
+  private toLegacyListItem(drep: DRep): DRepListItem {
     return {
-      isScriptBased: drep.isScriptBased,
-      // The legacy id is the raw hex credential hash, not a bech32 id.
-      drepId: drep.hash,
-      view: drep.cip105Id ?? drep.id,
-      url: drep.metadata?.anchor.url ?? null,
-      metadataHash: drep.metadata?.anchor.dataHash ?? null,
-      deposit: dbInteger(drep.registration.deposit ?? 0),
+      isScriptBased: drep.isScriptBased ?? false,
+      // The legacy forms, which the frontend depends on: `drepId` is the raw
+      // hex hash (compared with the wallet's hex DRep id, and prefixed with a
+      // CIP-129 header byte by DRepDetailsCard), `view` the CIP-105 bech32
+      // (re-prefixed for script DReps by fixViewForScriptBasedDRep, which
+      // would mangle a CIP-129 id).
+      drepId: drepIdToHex(drep.id),
+      view: drepIdToCip105(drep.id),
+      url: drep.anchor?.url ?? null,
+      metadataHash: drep.anchor?.dataHash ?? null,
+      deposit: dbInteger(drep.registration.latest.deposit ?? 0),
       votingPower:
         drep.votingPower === null ? null : dbInteger(drep.votingPower.amount),
-      status: status === undefined ? 'Inactive' : LEGACY_STATUS[status],
+      // A ledger fact now, read off the DRep's expiry epoch rather than
+      // reconstructed from its registration.
+      status: LEGACY_STATUS[drep.status],
       type: LEGACY_KIND[drep.kind],
-      latestTxHash: drep.registration.registrationTx?.txHash ?? null,
-      latestRegistrationDate: drep.registration.registeredAt?.time ?? '',
-      metadataError: drep.metadata?.failureMessage ?? null,
-      paymentAddress: body?.paymentAddress ?? null,
-      givenName: body?.givenName ?? null,
-      objectives: body?.objectives ?? null,
-      motivations: body?.motivations ?? null,
-      qualifications: body?.qualifications ?? null,
-      imageUrl: body?.image?.url ?? null,
-      imageHash: body?.image?.contentHash ?? null,
-      votesLastYear: drep.activity?.votesCast ?? null,
+      latestTxHash: drep.registration.latest.txRef.txHash,
+      latestRegistrationDate: drep.registration.latest.at.time ?? '',
+      // Whether an anchor resolved is the metadata service's answer, and this
+      // backend has none wired; the same goes for every field below.
+      metadataError: null,
+      paymentAddress: null,
+      givenName: null,
+      objectives: null,
+      motivations: null,
+      qualifications: null,
+      imageUrl: null,
+      imageHash: null,
+      // Participation is "voted out of votable since registration" now, not a
+      // trailing year — the legacy field name outlived the window.
+      votesLastYear: drep.activity?.voted ?? null,
       // `list-dreps.sql` COALESCEs both reference arrays to `[]`, so the
-      // legacy field is an array even for a DRep with no metadata anchor —
-      // where the contract reports no metadata at all. Never `null`.
-      identityReferences: body?.identityReferences ?? [],
-      linkReferences: body?.linkReferences ?? [],
+      // legacy field is an array even for a DRep with no metadata anchor.
+      // Never `null`.
+      identityReferences: [],
+      linkReferences: [],
     };
   }
 
   private toLegacyVotePair(
-    element: VotedGovAction,
+    drepId: string,
+    row: DRepVoteRow,
+    proposals: Map<string, ProposalResponse>,
   ): { vote: VoteParams; proposal: ProposalResponse }[] {
-    if (element.vote === null) {
+    if (!row.voted) {
       return [];
     }
-    const { vote } = element;
+
+    const proposal = proposals.get(row.action.id);
+
+    if (proposal === undefined) {
+      return [];
+    }
 
     return [
       {
         vote: {
-          proposalId: String(vote.proposal.providerId),
-          drepId: vote.voter.hash,
-          vote: vote.vote,
-          url: vote.rationale?.anchor.url ?? null,
-          metadataHash: vote.rationale?.anchor.dataHash ?? null,
+          proposalId: proposal.id,
+          drepId,
+          vote: row.choice,
+          url: row.anchor?.url ?? null,
+          metadataHash: row.anchor?.dataHash ?? null,
           // `at` is optional on the contract: a provider may identify a vote
-          // by its transaction without dating it. db-sync always dates it,
-          // so these fallbacks do not fire on the current wiring.
-          epochNo: vote.at?.epoch ?? 0,
-          date: vote.at?.time ?? '',
-          txHash: vote.txRef.txHash,
+          // by its transaction without dating it.
+          epochNo: row.at?.epoch ?? 0,
+          date: row.at?.time ?? '',
+          txHash: row.txRef.txHash,
         },
-        proposal: this.proposalService.toLegacyProposal(element.proposal),
+        proposal,
       },
     ];
   }
@@ -358,7 +616,8 @@ export class DRepService {
   /**
    * GovTool's directory policy, unchanged: with no search term direct voters
    * are hidden, and with one they appear only on an exact id match. It is a
-   * presentation rule rather than a data rule, so it stays in the backend.
+   * presentation rule rather than a data rule, so it stays in the backend —
+   * and it is the same rule the contract states for anonymous DReps.
    */
   private filterDRepsBySearchRule(
     dreps: DRepListItem[],
@@ -370,11 +629,18 @@ export class DRepService {
       return dreps.filter((drep) => drep.type !== 'SoleVoter');
     }
 
+    // An exact id in any accepted form: compared as the raw hash the list
+    // item carries, so CIP-129, CIP-105 and hex all reveal the same DRep.
+    const searchedHashes = new Set(
+      (tryLegacyDRepCandidates(search) ?? []).map(drepIdToHex),
+    );
+
     return dreps.filter((drep) => {
       if (drep.type !== 'SoleVoter') {
         return true;
       }
       return (
+        searchedHashes.has(drep.drepId) ||
         drep.view.toLowerCase() === searchLower ||
         drep.drepId.toLowerCase() === searchLower
       );

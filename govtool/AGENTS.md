@@ -1,292 +1,261 @@
 # GovTool data layer
 
-This file sits in govtool/ so it loads whenever anything under it is touched,
-which is where every package below lives.
+Loads for anything under govtool/. Early-stage trial: nothing here is deployed,
+and nothing should be described as shipped.
 
-Early-stage planning. Every package described here is a trial implementation,
-none is committed to git, and none is deployed. Treat all of it as a spike that
-exists to answer design questions, not as production code. Nothing here should
-be presented to a reader as shipped.
+## What it is
 
-## What is being tried
+GovTool's backend queries db-sync directly, so a db-sync schema change is a
+GovTool breaking change. The trial puts a provider-agnostic contract between
+the HTTP surface and the data source: one contract package, one package per
+source, one per satellite service, and a backend that depends only on the
+contract.
 
-GovTool's backend talks to db-sync directly. The experiment is to put a
-provider-agnostic contract between the HTTP surface and whatever supplies the
-data, so a deployment can choose db-sync, Koios, Blockfrost or something else
-without the backend or the frontend knowing.
+## Where the truth is
 
-The shape is one contract package plus one package per data source, and a
-backend that depends only on the contract.
+govtool-data-providers/SPEC.md: the decided state. Where src disagrees, src is
+the backlog item.
+govtool-data-providers/src: exact shapes.
+../docs/api/decisions.md: why. Append-only, numbered D1.. and F1..; later entries beat
+earlier ones and name what they amend. New decisions go there as they are made.
+../docs/api/README.md: the /api/v1 path surface, the metadata service spec,
+what the frontend calls, what each provider serves, and the open questions.
+Each package README: what that package serves, omits and costs.
+govtool-backend/src/config/config.service.ts: every environment variable;
+govtool-backend/.env.example mirrors it.
+docker-compose.fixture.yml and docker-compose.koios.yml: local runs, with the
+knobs and the expected behaviour in each file's header.
 
-## Where things are
+## Packages
 
-All paths are relative to the repository root.
+govtool-data-providers: the contract. Interfaces only, zero runtime deps.
+govtool-provider-fixture: all six components over a committed mainnet capture.
+No network, database or credentials; develop and test against this.
+govtool-provider-dbsync, -koios, -blockfrost: chain data only.
+govtool-pinning-pinata: the pinning contract.
+govtool-metadata-http: the metadata contract as a client of
+govtool-metadata-service, which is private to the backend.
+govtool-backend: backend-ts forked onto the contract; same routes and bodies
+plus /system/capabilities, /system/features and four metadata routes.
 
-govtool/govtool-data-providers: the contract. Interfaces and types only.
-govtool/govtool-provider-dbsync: implements the chain-data contract over db-sync SQL.
-govtool/govtool-provider-koios: implements it over the Koios REST API.
-govtool/govtool-provider-blockfrost: implements it over a Blockfrost-compatible API.
-govtool/govtool-pinning-pinata: implements the pinning contract over Pinata.
-govtool/govtool-backend: the HTTP surface, forked from govtool/backend-ts.
+Edges are file: paths: every provider and client depends on the contract; the
+backend depends on the contract, the four chain-data providers, pinning and
+metadata-http; providers never depend on each other.
 
-Dependency edges, all via file: paths:
+The frontend keeps its own copy of the feature-set type in
+frontend/src/models/featureSet.ts because CI builds it from frontend/ alone, so
+it cannot take a file: dependency on a sibling package. Anything else it needs
+from the contract arrives published or vendored.
 
-- every provider depends on govtool-data-providers
-- govtool-backend depends on govtool-data-providers, govtool-provider-dbsync, govtool-pinning-pinata
+## Three backends, one ships
 
-Nothing depends on a provider except the backend, and providers never depend on
-each other.
+govtool/backend is the Haskell service the deployment compose runs; compatibility
+is measured against it. govtool/backend-ts is its TypeScript port, actively
+developed, not deployed. govtool-backend is the fork of backend-ts on the
+contract. So: a backend-ts bug may already be fixed on develop, and the fork
+drifts, so reconcile it against backend-ts before proposing either replaces the
+other.
 
-## Three backends exist, and only one of them ships
+## Build order
 
-This is the single most misread thing in the repository.
+file: deps resolve to built dist, not source, so nothing typechecks until its
+dependencies are built: contract, then providers and clients, then backend.
+Rebuild the contract before touching a provider or the errors make no sense.
+A stale dist also lets a package typecheck against the current contract while
+implementing an earlier one; it compiles and throws at runtime, so compiling is
+not evidence until rebuilt.
 
-govtool/backend is the Haskell service. It is what the deployment compose
-builds and runs, and it is still actively maintained on the develop branch.
-Compatibility is measured against this, not against the TypeScript port.
+Adding a chain-data provider touches four places, and each miss fails
+differently: the case in govtool-backend/src/providers/providers.module.ts, the
+union in src/config/config.types.ts, the validation in
+src/config/config.service.ts, and the file: dependency in package.json. Missing
+the config pair rejects the name at startup with a message that looks like a
+typo.
 
-govtool/backend-ts is a TypeScript port of it, tracked and under active
-development. It is not in the deployment compose.
+## Working on it
 
-govtool/govtool-backend is the untracked fork of backend-ts that this
-experiment rewired onto the contract. It carries the same HTTP routes and the
-same response bodies.
-
-Two consequences. First, a bug found in backend-ts may already be fixed
-upstream, so check the develop branch before fixing it again. Second, the fork
-drifts: reconcile govtool-backend against backend-ts before proposing that
-either replaces the other.
-
-## Build order, and the trap in it
-
-The file: dependencies resolve to each package's built dist, not to its
-source. A package therefore cannot typecheck until everything it depends on has
-been built at least once. After changing the contract, rebuild it before
-touching any provider, or the provider will typecheck against a stale contract
-and the errors will make no sense.
-
-```bash
-cd govtool/govtool-data-providers && npm install && npm run build
-```
-
-Then the same install and build in each provider, then in govtool-backend.
-
-## Verifying
-
-Every package has the same entry point, and it is what to run before claiming
-anything works:
-
-```bash
-npm run verify
-```
-
-It chains format check, lint, typecheck, unit tests and build. It never touches
-the network.
-
-Providers that talk to an HTTP API also carry live scripts, deliberately
-excluded from verify because they need network access and their results move
-with chain state:
-
-- npm run smoke asks whether each route answers at all
-- npm run conformance asks whether the answers are valid instances of the
-  contract, which is the one that finds bugs
-
-Run the live scripts after changing any mapper. Configure them through
-environment variables rather than editing them; read the script for the names it
-accepts.
-
-## Running a local instance
-
-govtool/docker-compose.koios.yml builds and runs the backend and the frontend
-against Koios. Koios is a public API, so this needs no database, no Cardano
-node and no credentials, which makes it the fastest way to exercise the whole
-stack.
+First build, from this folder, in this order:
 
 ```bash
-cd govtool
-docker compose -f docker-compose.koios.yml up -d
+for p in govtool-data-providers govtool-provider-fixture govtool-provider-dbsync \
+         govtool-provider-koios govtool-provider-blockfrost govtool-pinning-pinata \
+         govtool-metadata-http govtool-backend; do
+  (cd $p && npm install && npm run build)
+done
 ```
 
-That builds the backend and pulls the published frontend image. After changing
-backend code, rebuild only that service with: up -d --build backend
+The inner loop in any package is npm test (jest in the backend and pinning,
+node --test in the providers, both fast and offline), then npm run verify
+before claiming it works. A provider's dist is what the backend loads, so
+rebuild it before starting the backend.
 
-Frontend on port 8080, backend on 9999, both overridable with FRONTEND_PORT
-and BACKEND_PORT. Other knobs, all optional: KOIOS_NETWORK (default mainnet),
-KOIOS_TOKEN to raise the rate limit, KOIOS_BASE_URL for a self-hosted Koios,
-PINATA_API_JWT to make the upload route work.
+Seeing a change run, cheapest first:
 
-Changing KOIOS_NETWORK means changing VITE_NETWORK_FLAG with it: 1 for mainnet,
-0 for any testnet. The frontend compares that number against the network id the
-wallet reports, so a mismatch surfaces as a wallet that refuses to connect,
-which reads like a wallet problem rather than a configuration one.
+1. Backend alone, on frozen data, restarting on every save:
+   (cd govtool-backend && GOVTOOL_CHAIN_DATA_PROVIDER=fixture npm run start:dev),
+   then curl localhost:9999/drep/list, /proposal/list, /network/metrics and
+   so on. Nothing else needs to be running.
+2. Frontend against that backend: in frontend/, put
+   VITE_BASE_URL=http://127.0.0.1:9999 and
+   VITE_METADATA_API_URL=http://127.0.0.1:9999/metadata in .env.local, which
+   is gitignored and overrides .env (leave .env alone; it points at preview),
+   then npm run dev. Vite hot-reloads frontend edits.
+3. The whole stack in Docker, including the metadata service and its
+   Postgres: docker compose -f docker-compose.fixture.yml up -d --build, then
+   http://localhost:8080. The frontend there is the Vite dev server over
+   ./frontend, so frontend edits show as saved; backend or metadata edits need
+   up -d --build backend (or metadata).
+4. Live data: the same with GOVTOOL_CHAIN_DATA_PROVIDER=koios in step 1, or
+   docker compose -f docker-compose.koios.yml up -d for the stack.
 
-Bring up only the backend by naming it: up -d backend. That is enough for
-API work.
+Frontend checks, in frontend/: npm run tsc, npm run lint, npm test.
 
-The frontend service declares both an image and a build, the same way
-docker/docker-compose.yaml does, so passing --build builds it from
-govtool/frontend instead of pulling. That needs more memory than Docker Desktop allocates by
-default: at 7.8 GB, with nothing else running, the minifier is killed part way
-through chunk rendering, and the error says only SIGKILL, which reads like a
-crash rather than a memory limit. CI builds it on larger runners. Pulling is the
-default because nothing in this compose file changes frontend source. Pin a
-different published build with FRONTEND_TAG.
+The integration suite in ../tests/govtool-backend is pytest against a running
+backend: BASE_URL=http://localhost:9999 NETWORK=preview pytest -v, from a
+fresh venv made from its requirements.txt. Its test data is registered on
+preview, so it is the check for a db-sync-backed run, not for the fixture.
 
-The provider is chosen at runtime, not build time, so the same image serves any
-of them. Set VVA_CHAINDATAPROVIDER to dbsync, koios or blockfrost. Under dbsync
-the VVA_DBSYNCCONFIG_ group becomes required; under the other two it is not
-read at all, and its absence is what demonstrates the backend has no remaining
-database dependency.
+Changing the contract: edit govtool-data-providers/src and SPEC.md together,
+npm run build there, then npm run verify in every provider and in
+govtool-backend. The compiler is the only thing that finds consumers of a
+loosened field.
 
-Things to expect, none of which are faults in the setup:
+Changing a provider mapper: npm run verify in that package, then its live
+script against a real source (below).
 
-The backend takes roughly thirty seconds to accept connections. The cache
-warmer runs in the module init hook and awaits a full DRep and proposal
-snapshot before the server listens, and on a paging HTTP provider that is many
-requests. The container healthcheck already allows for it.
+Changing the backend: npm run verify there. test/legacy-shape.spec.ts pins
+every response body with toEqual, so an added or dropped key fails it, and
+test/capabilities.spec.ts fails when a declared feature stops matching the
+code behind it.
 
-/network/metrics answers 501 under Koios and Blockfrost. Six of its thirteen
-counters are collection-wide aggregates neither can compute. The frontend
-degrades rather than breaking: the committee threshold bar reads zero. This is
-the single gap between Koios and a fully working GovTool, and the frontend
-reads only three of those thirteen fields, so closing it is a narrowing
-exercise rather than new data. See docs/api/frontend-needs-audit.md.
+Adding a provider: the four places under Build order, then a README in the
+package saying what it serves and omits.
 
-Live data moves. Totals and identifiers in any example will differ from what
-you see.
+Local-run traps: under dbsync, GOVTOOL_DBSYNC_NETWORK must match the database
+or every route answers 500. Two backends run as the identical command line
+node dist/main.js, so stop one by PID from its cwd, not by pkill on the path.
+A stale frontend/node_modules shows as Vite failing to resolve an import;
+npm install there fixes it.
 
-The backend image builds from the govtool directory rather than from
-govtool-backend, because the backend depends on the contract and the providers
-by relative path and a narrower context cannot resolve them. The frontend image
-is the stock one and builds from govtool/frontend, unchanged.
+## Verify
 
-Keep it that way. Three CI workflows build govtool/frontend/Dockerfile with
-govtool/frontend as the context, so the frontend cannot take a file: dependency
-on a sibling package: npm install inside that build has no way to reach it, and
-the failure appears as an unresolved import during the Vite build rather than
-as a missing file. Anything the frontend needs from the contract has to arrive
-as a published package or be vendored.
+npm run verify in any package, before claiming it works. It chains what the
+package has of format check, lint, typecheck, tests and build, and never
+touches the network.
 
-The frontend image is configured at run time by govtool/frontend/docker-entrypoint.sh,
-not at build time, so the VITE_ values are environment variables on the service
-and changing one needs only a restart.
+Koios and Blockfrost carry npm run live, db-sync carries
+scripts/live-*.mjs; both need a real source and are the only thing that finds
+mapping bugs, because a fixture is written by whoever wrote the mapper and
+encodes the same misunderstanding (one test asserted a negative balance as
+expected). Run them after changing any mapper. Unit tests pin the mapping you
+intended; live scripts say whether the source agrees.
 
-## Testing doctrine
+Proof the backend serves data rather than compiling:
+GOVTOOL_CHAIN_DATA_PROVIDER=fixture GOVTOOL_PORT=9123 node dist/main.js, then
+curl localhost:9123/drep/list answers 18 of 30 DReps, the other 12 anonymous
+and hidden by the directory rule.
 
-Fixture-based unit tests do not catch provider mapping bugs. Every real defect
-found in this experiment so far passed a green unit suite, because the fixture
-is written by whoever wrote the mapper and encodes the same misunderstanding. In
-one case a test asserted a negative account balance as the expected value.
+Three method rules from wrong claims: a missing endpoint is not a missing
+capability if the value is derivable from required data (the constitution is
+derivable from getEnacted on all three providers); a capability claim is about
+a deployment, not an API (self-hosted blockfrost-ryo findings reversed on
+hosted mainnet); a static grep undercounts usage, so check dynamic indexing
+before calling a field unused (protocolParams[key] nearly lost the thresholds).
 
-What does find them:
+## Load-bearing rules
 
-1. The live conformance script, which walks real responses and checks the
-   contract's own rules: required fields present, lovelace a decimal string and
-   never negative, identity fields non-empty, page and envelope shapes complete.
-2. A capability cross-check, which exercises every route and compares the
-   outcome against the provider's own declared capability document. This is how
-   a route declared supported while hanging forever gets caught.
+Chain data never resolves a URL; it emits anchors and the metadata service
+fetches. The one exception is an action title denormalized onto a DRep vote
+row, and it does not generalize to names, bios or abstracts.
 
-So: unit tests pin the mapping you intended, live scripts tell you whether the
-source agrees. Neither replaces the other.
+Availability is the interface: an absent optional method means not supported,
+and there is no availability boolean. The provider's declaration carries only
+which option values are honoured. This is why entities use optional members,
+not a capability table.
 
-## Invariants worth not breaking
+Refuse rather than fabricate. A provider that cannot compute a value raises
+CAPABILITY_UNSUPPORTED, never 0 or an empty list. Never serve a capability
+half-filled; required-ness follows the displayed computation.
 
-The contract package has zero runtime dependencies and contains no
-implementation, no transport and no framework. Anything that fetches, queries,
-caches or wires dependency injection belongs in a provider. Adding a dependency
-to it is the signal that something has leaked.
+Contract types are a floor: a provider may add fields, never narrow. Types hide
+extras but JSON.stringify does not, so a consumer forwarding a provider object
+serializes only contract fields.
 
-The db-sync provider's SQL is frozen: it is byte-identical to the SQL the
-existing backend ships, and it is verifiable with diff -r. When a contract
-field cannot be filled from those statements, the contract loosens; the SQL does
-not grow. That is what keeps the provider's results identical to the deployed
-API's.
+One bech32 id per entity: CIP-129 for DRep, action and committee credentials,
+pool1 for pools, stake1 for accounts. The backend translates to and from the
+forms the frontend sends, at its edge, and that is where GovTool's existing
+wire format lives. Providers report ledger names, lovelace as decimal strings
+and propagating errors.
 
-Providers do no caching. The backend owns caching, and it already has a cache
-and a cache warmer.
+Committee members are identified by the cold credential; hot rotates. A vote
+carries only hot, so cold is optional on a vote and unresolved means no voter
+info.
 
-The legacy wire format lives in the backend, not in providers. Providers report
-honestly: lovelace as decimal strings, ledger names, errors that propagate. The
-backend narrows to the legacy JSON shape at the edge. Keep it that way, or every
-provider ends up carrying GovTool's history.
+No aggregate counter for anything a filtered list's total answers. That is why
+there is no metrics resource; the backend's /network/metrics assembles its
+thirteen counters from the committee, DRep counts, proposal total and stake
+distribution, and reports 0 for the five nothing renders.
 
-## Traps that have already cost time
+The contract package has zero dependencies; a new one means something leaked.
+Providers do no caching; the backend owns the cache and warmer. The db-sync
+provider owns its SQL; a changed statement needs a test pinning what the
+backend relies on.
 
-Loosening a contract field is safe for a provider and breaks every consumer that
-reads the field unguarded. After editing the contract, typecheck every provider
-and the backend before moving on. The compiler is the only thing that will find
-those sites.
+## Traps
 
-A list call with no limit does not mean "everything" on an HTTP provider. Koios
-caps a page, Blockfrost caps it much lower, and both report the cap honestly
-through a cursor. A consumer that builds a snapshot must follow the cursor to
-exhaustion, or it silently shows a fraction of the data with no error anywhere.
-The backend has a helper for this; use it rather than calling a list method
-directly when you need the whole set.
+Loosening a contract field breaks every consumer reading it unguarded; after
+editing the contract, typecheck every provider and the backend.
 
-Casting a test stub to the contract type switches off the check that matters
-most. The backend's stub helper is deliberately typed so a stub cannot be an
-invalid page or envelope. Reintroducing a cast there re-opens dozens of silent
-violations at once.
+CIP-105 and CIP-129 DRep ids share the drep1 prefix and differ by a header
+byte; decode and validate, never prefix-match.
 
-SQL columns that are not aliased are read by position, not by name. A SELECT
-list with bare encode(...), CONCAT(...) or LOWER(...) produces duplicate
-and meaningless column names, and a name-based reader silently gets undefined
-for each one. Alias every computed column, or read positionally.
+getEnacted is keyed by lineage: UpdateCommittee and NoConfidence share the
+committee lineage, and a per-type answer gives a prevGovActionId the ledger
+rejects.
 
-Koios rejects any request body over roughly five kilobytes, which is a limit on
-bytes and not on the number of identifiers. Batch by measured size.
+Committee membership is assembled from genesis plus every enacted
+UpdateCommittee delta plus hot-key auth and cold-key resignation certificates
+plus term expiry; it cannot be read off the latest action. The constitution is
+the opposite: getEnacted('constitution') then body.anchor.
 
-Sending an explicit sort to an endpoint that is already sorted can make a
-provider sort an entire table and never return. Check whether the default order
-is already what you want.
+DRep inactivity is the ledger's expiry epoch, pushed by drepActivity on each
+vote or re-registration; do not reconstruct it from vote timestamps.
 
-A public provider fails occasionally for no reason you can reproduce. Running
-against Koios, the cache warmer logs a full error stack every so often and
-recovers on its next pass twenty seconds later, because a refresh only replaces
-the cached snapshot after the provider call resolves, so a failed pass keeps
-serving the previous one. Treat a single stack trace there as weather, not as a
-bug; chase it only if it repeats across several passes or the same call fails
-from the conformance script.
+Paging is 1-based page and size with total optional; no cursors. Walk to total
+or a short page; a provider omitting total must never return a short page
+except the last. govtool-backend/src/common/snapshot.ts does this; use it for
+whole-set reads. Random ordering is unpaged: size only, page beyond 1 refused.
 
-## Design notes and audits
+Promise-returning methods must reject, not throw synchronously; a notFound()
+thrown inside a non-async arrow bypasses .catch().
 
-These live under docs/api and are opt-in reading. The contract drafts there
-predate the packages and their TypeScript files are now duplicated by, and
-behind, the contract package source. Treat the packages as the source of truth
-and the drafts as history.
+Casting a test stub to the contract type disables the check that matters; the
+backend's typed stub helper exists so a stub cannot be an invalid page.
 
-docs/api/README.md orients the three components and the route map.
-docs/api/provider-gap-report.md compares what each provider can serve, and
-records which contract fields had to be loosened and why.
-docs/api/frontend-needs-audit.md measures what the current frontend actually
-calls, against the spec and against each provider.
-docs/api/multi-provider-support.md is the design for the capability layer.
+Unaliased SQL columns (bare encode(), CONCAT(), LOWER()) come back under
+duplicate names and a name-based reader gets undefined; alias every computed
+column.
 
-## Configuration
+Koios rejects request bodies over about 5 KB, a byte limit not an id count;
+batch by measured size. An explicit sort on an already-sorted endpoint can make
+a provider sort a whole table and never return.
 
-The backend reads the same environment variables the existing TypeScript backend
-reads: a VVA_DBSYNCCONFIG_ group for the database connection, VVA_HOST and
-VVA_PORT for the listener, cache duration settings, a Pinata credential and
-Sentry settings. Read src/config/config.service.ts for the current list rather
-than copying one from a document.
+On a public provider the cache warmer logs a full stack now and then and
+recovers next pass, because a failed refresh keeps serving the previous
+snapshot. One trace is weather; chase it only if it repeats or the live script
+fails the same call.
 
-Live provider scripts take their own variables for endpoint, credential and
-sample identifiers. Read the script.
+On an HTTP provider the backend takes a while to listen: the warmer awaits a
+full DRep and proposal snapshot first. The healthcheck allows for it.
 
-Never commit a populated env file. Each package gitignores .env.
+Changing KOIOS_NETWORK without VITE_NETWORK_FLAG (1 mainnet, 0 testnet) shows
+as a wallet refusing to connect, not as a config error.
 
-## Open questions
+Building the frontend image needs more than Docker Desktop's default memory;
+the minifier dies with a bare SIGKILL. The compose files pull the published
+image or run the Vite dev server for that reason.
 
-Whether govtool-backend replaces backend-ts, or whether the provider layer is
-folded into backend-ts as a change on top of it. The second is likely less
-disruptive while backend-ts is under active development.
+The backend image builds from govtool/, not govtool-backend/, because the file:
+paths cannot resolve from a narrower context.
 
-Whether the provider packages should move under this folder. They are siblings
-today, and moving them would break every file: path and the Docker build
-context.
-
-Whether the frozen SQL should be taken from the Haskell backend rather than from
-backend-ts, given that Haskell is what ships. The two sets are reported to be
-the same statements modulo placeholder syntax, which has not been verified here.
+Live data moves; totals and ids in any example will differ.

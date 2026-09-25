@@ -3,6 +3,7 @@ import { request as httpRequest } from 'node:http';
 import { request as httpsRequest } from 'node:https';
 import type { LookupFunction } from 'node:net';
 import * as ipaddr from 'ipaddr.js';
+import { METADATA_FETCH_LIMIT_BYTES } from './config';
 import { MetadataValidationStatus as Status } from './metadata-status.enum';
 
 export class MetadataFetchError extends Error {
@@ -11,7 +12,6 @@ export class MetadataFetchError extends Error {
   }
 }
 
-const MAX_BYTES = 1024 * 1024;
 const TIMEOUT_MS = 10_000;
 
 function blocked(address: string): boolean {
@@ -87,12 +87,20 @@ export async function fetchMetadataText(
         response.destroy();
         return;
       }
+      // A declared length over the limit is refused before reading a byte.
+      const declared = Number(response.headers?.['content-length']);
+      if (Number.isFinite(declared) && declared > METADATA_FETCH_LIMIT_BYTES) {
+        fail(Status.EXCEEDS_LIMIT);
+        response.destroy();
+        req.destroy();
+        return;
+      }
       let size = 0;
       const chunks: Buffer[] = [];
       response.on('data', (chunk: Buffer) => {
         size += chunk.length;
-        if (size > MAX_BYTES) {
-          fail(Status.URL_NOT_FOUND);
+        if (size > METADATA_FETCH_LIMIT_BYTES) {
+          fail(Status.EXCEEDS_LIMIT);
           response.destroy();
           req.destroy();
           return;

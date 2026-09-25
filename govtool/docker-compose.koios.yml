@@ -1,7 +1,7 @@
 # Run GovTool locally against Koios, with no database.
 #
 # Trial setup for the data-layer experiment: it builds the contract, the
-# providers and the forked backend from this directory, and serves the
+# providers and govtool-backend from this directory, and serves the
 # frontend against it. Nothing here is a deployment artefact.
 #
 #   docker compose -f docker-compose.koios.yml up -d
@@ -22,10 +22,9 @@
 # own network id, and a mismatch is reported as a rejected wallet rather than
 # as a misconfiguration. 1 is mainnet, 0 is every testnet.
 #
-# Known limitation: Koios cannot compute six of the thirteen counters behind
-# /network/metrics, so that one route answers 501. The frontend degrades: the
-# committee threshold bar reads zero, and everything else works. See
-# docs/api/frontend-needs-audit.md.
+# Every route the frontend calls is served on Koios. Without a metadata
+# service configured, document-derived fields (DRep names, action titles) are
+# null.
 
 name: govtool-koios
 
@@ -38,25 +37,25 @@ services:
       dockerfile: govtool-backend/Dockerfile
     environment:
       NODE_ENV: production
-      VVA_HOST: 0.0.0.0
-      VVA_PORT: 9999
+      GOVTOOL_HOST: 0.0.0.0
+      GOVTOOL_PORT: 9999
 
       # The only setting that decides which implementation is constructed.
-      VVA_CHAINDATAPROVIDER: koios
-      VVA_KOIOSNETWORK: ${KOIOS_NETWORK:-mainnet}
+      GOVTOOL_CHAIN_DATA_PROVIDER: koios
+      GOVTOOL_KOIOS_NETWORK: ${KOIOS_NETWORK:-mainnet}
       # Optional. Without one the free public tier applies.
-      VVA_KOIOSTOKEN: ${KOIOS_TOKEN:-}
+      GOVTOOL_KOIOS_TOKEN: ${KOIOS_TOKEN:-}
       # Optional. Set to run against a self-hosted Koios instead.
-      VVA_KOIOSBASEURL: ${KOIOS_BASE_URL:-}
+      GOVTOOL_KOIOS_BASE_URL: ${KOIOS_BASE_URL:-}
 
-      # No VVA_DBSYNCCONFIG_* here on purpose: they are required only when the
+      # No GOVTOOL_DBSYNC_* here on purpose: they are required only when the
       # provider is dbsync, and their absence is what proves the backend has
       # no database dependency left.
 
-      VVA_CACHEDURATIONSECONDS: ${CACHE_SECONDS:-20}
-      VVA_DREPLISTCACHEDURATIONSECONDS: ${DREP_CACHE_SECONDS:-600}
+      GOVTOOL_CACHE_DURATION_SECONDS: ${CACHE_SECONDS:-20}
+      GOVTOOL_DREP_LIST_CACHE_DURATION_SECONDS: ${DREP_CACHE_SECONDS:-600}
       # Optional: without it /ipfs/upload answers 503 and reads are unaffected.
-      VVA_PINATAAPIJWT: ${PINATA_API_JWT:-}
+      GOVTOOL_PINATA_API_JWT: ${PINATA_API_JWT:-}
     ports:
       - "${BACKEND_PORT:-9999}:9999"
     healthcheck:
@@ -89,7 +88,7 @@ services:
       VITE_BASE_URL: ${PUBLIC_BACKEND_URL:-http://localhost:9999}
       VITE_APP_ENV: development
       VITE_IS_DEV: "true"
-      # Must agree with VVA_KOIOSNETWORK above: 1 for mainnet, 0 otherwise.
+      # Must agree with GOVTOOL_KOIOS_NETWORK above: 1 for mainnet, 0 otherwise.
       VITE_NETWORK_FLAG: ${VITE_NETWORK_FLAG:-1}
       VITE_METADATA_API_URL: ${METADATA_API_URL:-}
       VITE_IPFS_GATEWAY: ${IPFS_GATEWAY:-https://ipfs.io/ipfs}

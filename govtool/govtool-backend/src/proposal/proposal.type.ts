@@ -1,3 +1,4 @@
+import type { LegacyParamProposal } from 'src/epoch/epoch.type';
 import type { ApiInteger } from 'src/common/integer';
 
 /**
@@ -40,7 +41,7 @@ export type ProposalResponse = {
   // LEFT JOINed on voting_anchor, so both are absent for an action with no anchor.
   url: string | null;
   metadataHash: string | null;
-  protocolParams: unknown;
+  protocolParams: LegacyParamProposal | null;
   title: string | null;
   abstract: string | null;
   motivation: string | null;

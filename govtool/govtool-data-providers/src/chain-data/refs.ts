@@ -1,71 +1,86 @@
 /**
- * Chain Data API — cross-module identity shapes.
+ * Chain Data API — how entities are addressed.
  *
- * These are the only types every module is allowed to reference, which is what
- * keeps `accounts`, `governance/*` and `transactions` from importing each
- * other's full entities. A module that needs to *point at* a DRep or a
- * governance action uses the ref; only the owning module returns the entity.
+ * One bech32 identifier per entity, in the current standard form (SPEC.md §3.1).
+ * No legacy alternates — CIP-105, raw hex, `txHash#index` and shortened display
+ * forms are a consumer's business, not this contract's.
  */
 
 import type { Bech32, Hex } from './common';
 
-export type VoterRole = 'drep' | 'spo' | 'cc' | 'direct';
+export type VoterRole = 'drep' | 'spo' | 'cc';
 
-/** Identity of anything that can cast a governance vote. */
+/**
+ * A reference to something that can cast a governance vote.
+ *
+ * `id` is the entity's STABLE identifier:
+ *   drep  CIP-129 DRep id
+ *   spo   `pool1…`
+ *   cc    CIP-129 **cold** credential — never the hot one, which rotates
+ */
 export interface VoterRef {
   role: VoterRole;
-  /**
-   * CIP-129 bech32 (`drep1…`, `cc_hot1…`, `pool1…`). Canonical id used in URLs.
-   * A provider whose source stores only the raw credential computes it.
-   */
   id: Bech32;
-  hash: Hex;
-  isScriptBased: boolean;
   /**
-   * The pre-CIP-129 bech32 of the same credential — `drep1` + hash with no
-   * credential-type header — as db-sync's `drep_hash.view` and the legacy
-   * GovTool API expose it. Present when the provider has it, so a consumer
-   * that still speaks CIP-105 reads this instead of re-encoding `hash`.
+   * Optional: derivable from the CIP-129 header byte, which encodes key vs
+   * script. A provider that has it cheaply supplies it; one that does not omits
+   * it rather than guessing.
    */
-  cip105Id?: Bech32;
+  isScriptBased?: boolean;
 }
 
+/**
+ * A committee member's hot credential, as it appears on a vote.
+ *
+ * A vote's on-chain voter field for a committee member is the HOT credential;
+ * resolving it to the cold one is a join. So `cold` is optional here — but
+ * PROVIDERS SHOULD SUPPLY IT. There is no lookup to fall back on, and a
+ * consumer that does not receive it shows no voter information for that vote.
+ */
+export interface CommitteeVoterRef {
+  role: 'cc';
+  hot: Bech32;
+  cold?: Bech32;
+  isScriptBased?: boolean;
+}
+
+/** The voter on a vote row: a DRep or pool by stable id, or a committee hot key. */
+export type VoteCastBy = VoterRef | CommitteeVoterRef;
+
 export interface GovActionRef {
-  /** CIP-129 `gov_action1…`; canonical id used in URLs. */
+  /** CIP-129 governance action id. */
   id: Bech32;
+  /** The transaction that submitted it, and the index within it. */
   txHash: Hex;
   index: number;
-  /** Provider-native opaque identifier, for compatibility only; see `TxRef.providerId`. */
-  providerId?: string;
 }
 
 export type VoteChoice = 'yes' | 'no' | 'abstain';
 
 /**
- * The two ledger-defined delegation targets that are not a real DRep.
- *
- * They have no credential: no hash, and so no CIP-129 id. Anything that can
- * name one alongside real DReps — a delegation, a voting-power listing —
- * discriminates on `kind` rather than trying to express them as a `VoterRef`.
+ * Governance action PURPOSES. `prevGovActionId` is per purpose, not per type —
+ * `UpdateCommittee` and `NoConfidence` share the `committee` lineage, so the
+ * enacted head of either is the same action. A per-type implementation returns
+ * the wrong id and the ledger rejects the transaction.
  */
+export type GovActionLineage =
+  'pparamUpdate' | 'hardFork' | 'committee' | 'constitution';
+
+/** The predefined delegation targets. They are NOT DReps. */
 export type PredefinedDelegation = 'alwaysAbstain' | 'alwaysNoConfidence';
 
-/** A DRep credential, or one of the predefined options. */
-export type DRepTarget =
+/**
+ * Where an account's governance stake is delegated.
+ *
+ * `alwaysAbstain` and `alwaysNoConfidence` have no credential, anchor or
+ * registration, so they are a separate variant rather than a DRep with special
+ * values.
+ */
+export type DelegationTarget =
   | { kind: 'drep'; drep: VoterRef }
-  | {
-      kind: 'predefined';
-      option: PredefinedDelegation;
-      /**
-       * The source's own name for it (db-sync's `drep_always_abstain` /
-       * `drep_always_no_confidence`), when it has one.
-       */
-      view?: string;
-    };
+  | { kind: 'predefined'; target: PredefinedDelegation };
 
-/** Stake account identity. */
 export interface AccountRef {
   stakeAddress: Bech32;
   stakeKeyHash: Hex;
-  isScriptBased: boolean;
 }

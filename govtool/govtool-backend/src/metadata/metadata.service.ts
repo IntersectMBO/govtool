@@ -4,10 +4,15 @@
  * behaviour, and the thrown status is what reaches the response body, so it
  * is preserved rather than refactored.
  */
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as blake from 'blakejs';
+import type {
+  MetadataFailureCode,
+  MetadataServiceV1,
+} from '@govtool/data-providers/metadata';
 
 import { ConfigService } from '../config/config.service';
+import { METADATA } from '../providers/providers.module';
 
 import { ValidateMetadataDto } from './dto/validate-metadata.dto';
 import { MetadataValidationStatus } from './metadata-status.enum';
@@ -18,7 +23,66 @@ import { fetchMetadataText, MetadataFetchError } from './safe-metadata-fetch';
 export class MetadataService {
   private readonly logger = new Logger(MetadataService.name);
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(
+    private readonly config: ConfigService,
+    @Inject(METADATA)
+    private readonly metadataService: MetadataServiceV1 | null,
+  ) {}
+
+  /**
+   * The metadata service's failure codes in the legacy statuses the frontend
+   * already renders.
+   */
+  private static readonly LEGACY_STATUS: Record<
+    MetadataFailureCode,
+    MetadataValidationStatus
+  > = {
+    FETCH_ERROR: MetadataValidationStatus.URL_NOT_FOUND,
+    EXCEEDS_LIMIT: MetadataValidationStatus.EXCEEDS_LIMIT,
+    JSON_PARSE_ERROR: MetadataValidationStatus.INCORRECT_FORMAT,
+    HASH_MISMATCH: MetadataValidationStatus.INVALID_HASH,
+    SCHEMA_INVALID: MetadataValidationStatus.INCORRECT_FORMAT,
+  };
+
+  /**
+   * Resolve through the metadata service when one is configured: it caches by
+   * hash, fails over across IPFS gateways and guards against private
+   * addresses, none of which the local fetch does. Returns `undefined` when
+   * there is no service or it cannot be reached, so the caller falls back to
+   * the local fetch rather than reporting a working document as missing.
+   */
+  private async resolveThroughService(
+    hash: string,
+    url: string,
+  ): Promise<
+    | { ok: true; document: Record<string, unknown> }
+    | { ok: false; status: MetadataValidationStatus }
+    | undefined
+  > {
+    if (!this.metadataService) return undefined;
+    try {
+      const result = await this.metadataService.getMetadata(
+        hash.toLowerCase(),
+        url,
+      );
+      if (result.ok) {
+        return {
+          ok: true,
+          document: (result.body ?? {}) as Record<string, unknown>,
+        };
+      }
+      const status =
+        result.code === 'FETCH_ERROR' && result.message.startsWith('Refused')
+          ? MetadataValidationStatus.URL_BLOCKED
+          : MetadataService.LEGACY_STATUS[result.code];
+      return { ok: false, status };
+    } catch (error) {
+      this.logger.warn(
+        `metadata service unavailable, falling back to a local fetch: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      return undefined;
+    }
+  }
 
   async validateMetadata({
     hash,
@@ -30,18 +94,27 @@ export class MetadataService {
     let standard = paramStandard;
 
     try {
-      const resolvedUrl = this.resolveMetadataUrl(url);
-      const rawData = await this.fetchMetadata(
-        resolvedUrl,
-        url.startsWith('ipfs://'),
-      );
+      const viaService = await this.resolveThroughService(hash, url);
+      if (viaService && !viaService.ok) throw viaService.status;
 
+      // The service has already verified the hash over the exact bytes; the
+      // local path verifies it below.
+      let rawData: string | undefined;
       let parsedData: Record<string, unknown>;
 
-      try {
-        parsedData = JSON.parse(rawData) as Record<string, unknown>;
-      } catch {
-        throw MetadataValidationStatus.INCORRECT_FORMAT;
+      if (viaService) {
+        parsedData = viaService.document;
+      } else {
+        const resolvedUrl = this.resolveMetadataUrl(url);
+        rawData = await this.fetchMetadata(
+          resolvedUrl,
+          url.startsWith('ipfs://'),
+        );
+        try {
+          parsedData = JSON.parse(rawData) as Record<string, unknown>;
+        } catch {
+          throw MetadataValidationStatus.INCORRECT_FORMAT;
+        }
       }
 
       if (!parsedData.body || typeof parsedData.body !== 'object') {
@@ -63,10 +136,12 @@ export class MetadataService {
         );
       }
 
-      const hashedMetadata = blake.blake2bHex(rawData, undefined, 32);
+      if (rawData !== undefined) {
+        const hashedMetadata = blake.blake2bHex(rawData, undefined, 32);
 
-      if (hashedMetadata.toLowerCase() !== hash.toLowerCase()) {
-        throw MetadataValidationStatus.INVALID_HASH;
+        if (hashedMetadata.toLowerCase() !== hash.toLowerCase()) {
+          throw MetadataValidationStatus.INVALID_HASH;
+        }
       }
     } catch (error) {
       this.logger.error('Metadata validation failed', error);

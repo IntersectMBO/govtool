@@ -6,7 +6,8 @@ export type AccountInfoRow = {
 };
 
 export type AccountInfoResponse = {
-  id: number;
+  /** Null under every provider: the contract carries no internal row id. */
+  id: number | null;
   view: string;
   isRegistered: boolean;
   isScriptBased: boolean;

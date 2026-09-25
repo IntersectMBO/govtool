@@ -11,6 +11,8 @@ async function bootstrap() {
       origin: '*',
       methods: 'GET,HEAD,POST,OPTIONS',
       allowedHeaders: ['Authorization', 'Content-Type'],
+      // So the frontend can read the retry countdown from POST /metadata/retry.
+      exposedHeaders: ['Retry-After'],
     },
     logger: ['error', 'log', 'warn'],
   });

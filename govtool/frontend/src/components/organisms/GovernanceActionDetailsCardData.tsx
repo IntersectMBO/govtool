@@ -12,6 +12,7 @@ import {
   DataMissingInfoBox,
   DataMissingHeader,
   GovernanceActionsDatesBox,
+  MetadataFailureDetails,
   GovernanceActionDetailsDiffView,
   GovernanceActionNewCommitteeDetailsTabContent,
   GovernanceActionCardTreasuryWithdrawalElement,
@@ -71,6 +72,8 @@ type GovernanceActionDetailsCardDataProps = {
   isOneColumn: boolean;
   isSubmitted?: boolean;
   isValidating?: boolean;
+  /** Called when a retry makes the anchored metadata resolve. */
+  onMetadataRecovered?: () => void;
   proposal: ProposalData;
 };
 
@@ -81,6 +84,7 @@ export const GovernanceActionDetailsCardData = ({
   isOneColumn,
   isSubmitted,
   isValidating,
+  onMetadataRecovered,
   proposal: {
     abstract,
     authors,
@@ -269,6 +273,20 @@ export const GovernanceActionDetailsCardData = ({
         isInProgress={isInProgress}
         isSubmitted={isSubmitted}
       />
+      {isDataMissing &&
+        !isValidating &&
+        !isSubmitted &&
+        !isInProgress &&
+        !!url &&
+        !!metadataHash && (
+          // Anyone may retry a governance action's metadata (D125).
+          <MetadataFailureDetails
+            anchor={{ url, hash: metadataHash }}
+            canRetry
+            onRecovered={onMetadataRecovered}
+            sx={{ mb: 4 }}
+          />
+        )}
       <GovernanceActionCardElement
         label={t("govActions.governanceActionType")}
         text={label}

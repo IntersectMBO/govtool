@@ -14,6 +14,7 @@ const CHAIN_DATA_PROVIDERS: ChainDataProviderName[] = [
   'dbsync',
   'koios',
   'blockfrost',
+  'fixture',
 ];
 
 @Injectable()
@@ -33,7 +34,7 @@ export class ConfigService {
     const dbSync = this.config.dbSync;
     if (dbSync === null) {
       throw new Error(
-        `VVA_CHAINDATAPROVIDER is '${this.config.chainDataProvider}', so no db-sync connection is configured`,
+        `GOVTOOL_CHAIN_DATA_PROVIDER is '${this.config.chainDataProvider}', so no db-sync connection is configured`,
       );
     }
     return {
@@ -57,33 +58,36 @@ export class ConfigService {
       // deployment starts with no database credentials present at all.
       dbSync: chainDataProvider === 'dbsync' ? this.dbSyncConfig() : null,
       koios: {
-        network: this.envString('VVA_KOIOSNETWORK', 'mainnet') as
+        network: this.envString('GOVTOOL_KOIOS_NETWORK', 'mainnet') as
           'mainnet' | 'preprod' | 'preview' | 'guild',
-        token: this.envString('VVA_KOIOSTOKEN', '') || null,
-        baseUrl: this.envString('VVA_KOIOSBASEURL', '') || null,
+        token: this.envString('GOVTOOL_KOIOS_TOKEN', '') || null,
+        baseUrl: this.envString('GOVTOOL_KOIOS_BASE_URL', '') || null,
       },
       blockfrost: {
-        baseUrl: this.envString('VVA_BLOCKFROSTBASEURL', ''),
-        projectId: this.envString('VVA_BLOCKFROSTPROJECTID', '') || null,
+        network: this.dbSyncNetwork('GOVTOOL_BLOCKFROST_NETWORK'),
+        baseUrl: this.envString('GOVTOOL_BLOCKFROST_BASE_URL', ''),
+        projectId: this.envString('GOVTOOL_BLOCKFROST_PROJECT_ID', '') || null,
       },
-      cacheMaxEntries: this.positiveInteger('VVA_CACHEMAXENTRIES', 256),
+      cacheMaxEntries: this.positiveInteger('GOVTOOL_CACHE_MAX_ENTRIES', 256),
       ipfsGateway: this.envString('IPFS_GATEWAY', ''),
       ipfsProjectId: this.envString('IPFS_PROJECT_ID', ''),
       pinataApiJwt:
-        this.envString('VVA_PINATAAPIJWT', rawConfig.pinataapijwt ?? '') ||
+        this.envString('GOVTOOL_PINATA_API_JWT', rawConfig.pinataapijwt ?? '') ||
         null,
-      port: this.envNumber('VVA_PORT', rawConfig.port),
-      host: this.envString('VVA_HOST', rawConfig.host),
+      metadataServiceUrl:
+        this.envString('GOVTOOL_METADATA_SERVICE_URL', '').trim() || null,
+      port: this.envNumber('GOVTOOL_PORT', rawConfig.port),
+      host: this.envString('GOVTOOL_HOST', rawConfig.host),
       cacheDurationSeconds: this.envNumber(
-        'VVA_CACHEDURATIONSECONDS',
+        'GOVTOOL_CACHE_DURATION_SECONDS',
         rawConfig.cachedurationseconds,
       ),
       drepListCacheDurationSeconds: this.envNumber(
-        'VVA_DREPLISTCACHEDURATIONSECONDS',
+        'GOVTOOL_DREP_LIST_CACHE_DURATION_SECONDS',
         rawConfig.dreplistcachedurationseconds,
       ),
-      sentryDsn: this.envString('VVA_SENTRYDSN', rawConfig.sentrydsn),
-      sentryEnv: this.envString('VVA_SENTRYENV', rawConfig.sentryenv),
+      sentryDsn: this.envString('GOVTOOL_SENTRY_DSN', rawConfig.sentrydsn),
+      sentryEnv: this.envString('GOVTOOL_SENTRY_ENV', rawConfig.sentryenv),
     };
   }
 
@@ -96,10 +100,10 @@ export class ConfigService {
   }
 
   private chainDataProviderName(): ChainDataProviderName {
-    const raw = this.envString('VVA_CHAINDATAPROVIDER', 'dbsync').toLowerCase();
+    const raw = this.envString('GOVTOOL_CHAIN_DATA_PROVIDER', 'dbsync').toLowerCase();
     if (!CHAIN_DATA_PROVIDERS.includes(raw as ChainDataProviderName)) {
       throw new Error(
-        `VVA_CHAINDATAPROVIDER must be one of ${CHAIN_DATA_PROVIDERS.join(', ')}; got '${raw}'`,
+        `GOVTOOL_CHAIN_DATA_PROVIDER must be one of ${CHAIN_DATA_PROVIDERS.join(', ')}; got '${raw}'`,
       );
     }
     return raw as ChainDataProviderName;
@@ -107,12 +111,26 @@ export class ConfigService {
 
   private dbSyncConfig(): DbSyncConfig {
     return {
-      host: this.requiredEnvString('VVA_DBSYNCCONFIG_HOST'),
-      dbname: this.requiredEnvString('VVA_DBSYNCCONFIG_DBNAME'),
-      user: this.requiredEnvString('VVA_DBSYNCCONFIG_USER'),
-      password: this.requiredEnvString('VVA_DBSYNCCONFIG_PASSWORD'),
-      port: this.envNumber('VVA_DBSYNCCONFIG_PORT', 5432),
+      host: this.requiredEnvString('GOVTOOL_DBSYNC_HOST'),
+      dbname: this.requiredEnvString('GOVTOOL_DBSYNC_DATABASE'),
+      user: this.requiredEnvString('GOVTOOL_DBSYNC_USER'),
+      password: this.requiredEnvString('GOVTOOL_DBSYNC_PASSWORD'),
+      port: this.envNumber('GOVTOOL_DBSYNC_PORT', 5432),
+      network: this.dbSyncNetwork(),
     };
+  }
+
+  /** A mainnet/preprod/preview setting; also read for Blockfrost's network. */
+  private dbSyncNetwork(
+    name = 'GOVTOOL_DBSYNC_NETWORK',
+  ): DbSyncConfig['network'] {
+    const raw = this.envString(name, 'mainnet').toLowerCase();
+    if (raw !== 'mainnet' && raw !== 'preprod' && raw !== 'preview') {
+      throw new Error(
+        `${name} must be mainnet, preprod or preview; got '${raw}'`,
+      );
+    }
+    return raw;
   }
 
   private getConfigPath(): string {

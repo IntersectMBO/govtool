@@ -1,28 +1,24 @@
 /**
  * Chain Data API — `/governance/proposals/*`
- *
- * Governance actions: identity, typed body, lifecycle, tallies and thresholds.
- * "Proposal" is the GovTool-facing name; the ledger calls these governance
- * actions, and the ids are CIP-129 `gov_action1…`.
  */
 
 import type {
   Anchor,
   Bech32,
-  Envelope,
   EpochNo,
   EpochStamp,
+  Envelope,
   Hex,
   Lovelace,
-  PagedEnvelope,
   PageRequest,
+  PagedEnvelope,
   Ratio,
   TxRef,
 } from '../common';
-import type { GovActionRef, VoteChoice, VoterRef, VoterRole } from '../refs';
+import type { GovActionLineage, GovActionRef, VoterRole } from '../refs';
+import type { VoteAggregateRepresentation } from '../capabilities';
+import type { VoteRecord } from './votes';
 import type { ProtocolParams } from '../network';
-import type { GovActionMetadataBody, MetadataProjection } from '../../metadata';
-import type { VoteListQuery, VoteRecord } from './votes';
 
 export type GovActionType =
   | 'ParameterChange'
@@ -36,19 +32,25 @@ export type GovActionType =
 export type GovActionStatus =
   'live' | 'ratified' | 'enacted' | 'expired' | 'dropped';
 
+export type GovActionSort =
+  | 'newest'
+  | 'oldest'
+  | 'soonestToExpire'
+  | 'mostYesVotes'
+  | 'highestParticipation';
+
 /**
- * Action body, discriminated by `type`.
+ * What the action proposes, typed, discriminated by `type`.
  *
- * `guardrailsScriptHash` is optional on the variants that carry one: it lives
- * in the action's on-chain description, which some sources store pre-digested
- * without it. `null` still means "known to be absent".
+ * REQUIRED for all seven variants. A source that cannot decode an action's
+ * description cannot serve proposals — there is no untyped fallback field.
  */
 export type GovActionBody =
   | { type: 'InfoAction' }
   | { type: 'NoConfidence' }
   | {
       type: 'ParameterChange';
-      changes: Record<string, unknown>;
+      changes: Partial<ProtocolParams>;
       guardrailsScriptHash?: Hex | null;
     }
   | {
@@ -63,12 +65,8 @@ export type GovActionBody =
     }
   | {
       type: 'UpdateCommittee';
-      added: {
-        coldCredential: Hex;
-        isScriptBased: boolean;
-        termExpiryEpoch: EpochNo;
-      }[];
-      removed: { coldCredential: Hex; isScriptBased: boolean }[];
+      added: { coldCredential: Bech32; termExpiryEpoch: EpochNo }[];
+      removed: { coldCredential: Bech32 }[];
       quorum: Ratio;
     }
   | {
@@ -77,36 +75,9 @@ export type GovActionBody =
       guardrailsScriptHash?: Hex | null;
     };
 
-/**
- * Tally for one voter role. Whether a role is counted by stake or by head
- * is a ledger fact — DReps and SPOs by stake, the committee by count — so a
- * provider fills the field that applies and leaves the other `undefined`.
- * A provider with both figures fills both.
- */
-export interface RoleTally {
-  role: VoterRole;
-  stake?: Record<VoteChoice, Lovelace>;
-  count?: Record<VoteChoice, number>;
-  /** Stake eligible but not voted — needed for threshold bars. */
-  notVotedStake?: Lovelace;
-  /** The denominator percentages must be computed against (always `active` basis). */
-  totalEligibleStake?: Lovelace;
-  /** Threshold that applies to THIS action type for THIS role. */
-  threshold?: Ratio;
-  /** Whether this role's threshold is currently met. */
-  passing?: boolean;
-}
-
 export interface GovActionLifecycle {
   status: GovActionStatus;
-  /**
-   * When the action was submitted. Optional because a per-entity HTTP API can
-   * return an action's whole lifecycle *except* its submission point —
-   * Blockfrost's proposal record carries the ratified / enacted / dropped /
-   * expired epochs and the expiry, but nothing about submission. The
-   * submitting transaction is always known, so `submittedTx` stays required.
-   */
-  submitted?: EpochStamp;
+  submitted: EpochStamp;
   submittedTx: TxRef;
   expires: EpochStamp | null;
   ratifiedAt: EpochStamp | null;
@@ -115,115 +86,90 @@ export interface GovActionLifecycle {
   expiredAt: EpochStamp | null;
 }
 
+/**
+ * Per-role vote totals for one action.
+ *
+ * `representation` says how to read the figures and therefore how to render
+ * them — a `count` rendered with an ada prefix is the failure this field
+ * exists to prevent. Values are strings in every representation: lovelace for
+ * `stake`, an integer for `count`, a 0..1 fraction for `percent`.
+ *
+ * Serving an aggregate means serving its denominator and threshold. The
+ * denominator is the total AS IT STOOD FOR THIS ACTION, not the current total,
+ * so a percentage stays reproducible after the fact.
+ */
+export interface VoteAggregate {
+  role: VoterRole;
+  representation: VoteAggregateRepresentation;
+  yes: string;
+  no: string;
+  abstain: string;
+  notVoted: string;
+  totalEligible: string;
+  threshold: Ratio;
+  passing?: boolean;
+}
+
 export interface GovAction extends GovActionRef {
   type: GovActionType;
-  /**
-   * Typed body. Optional: a provider fills it for the variants it can build
-   * without guessing and puts the source's own rendering in `rawBody`. A
-   * consumer that needs the body for a type the provider does not type reads
-   * `rawBody` knowing it is provider-shaped.
-   */
-  body?: GovActionBody;
-  /** The action description as the provider stores it, untyped. */
-  rawBody?: unknown;
+  body: GovActionBody;
   lifecycle: GovActionLifecycle;
-  /** Optional: the deposit is on the proposal certificate, which not every read joins. */
-  deposit?: Lovelace | null;
-  depositReturnAddress?: Bech32 | null;
-  proposedBy?: Bech32 | null;
+  /** The CIP-108 anchor. The document is the metadata service's business. */
+  anchor: Anchor | null;
+  deposit: Lovelace | null;
+  /** The reward account the deposit returns to. There is no separate proposer
+   *  identity on chain — `proposal_procedure` carries only this. */
+  depositReturnAddress: Bech32 | null;
+  /** Previous action in the same LINEAGE, or null at the head of one. */
   previousAction: GovActionRef | null;
-  metadata: MetadataProjection<GovActionMetadataBody> | null;
-  /** Present when `expand` includes `tallies`. */
-  tallies?: RoleTally[];
-  /** Protocol parameters in force when the action was submitted. */
+  /** Required whenever the provider serves aggregates at all. */
+  voteAggregates?: VoteAggregate[];
+  /** Optional; see SPEC.md §5.2. */
   protocolParamsAtSubmission?: ProtocolParams | null;
-  /** Populated once enacted, for before/after diffs. */
   protocolParamsAtEnactment?: ProtocolParams | null;
-  /** Present only when the request carried a `voterId`. */
-  myVote?: VoteRecord | null;
 }
-
-export interface GovActionActivityEvent {
-  type: 'submitted' | 'voted' | 'ratified' | 'enacted' | 'expired' | 'dropped';
-  at: EpochStamp;
-  txRef: TxRef | null;
-  voter?: VoterRef;
-  vote?: VoteChoice;
-}
-
-/** Currently-enacted action of a given type, for comparison views. */
-export interface EnactedActionSummary {
-  type: GovActionType;
-  action: GovActionRef;
-  /** Optional: the enactment epoch is on the proposal row, which a minimal read may not select. */
-  enactedAt?: EpochStamp;
-  /** The transaction that submitted the action, when the provider reports it separately from `action`. */
-  submittedTx?: TxRef;
-  body?: GovActionBody;
-  /** See `GovAction.rawBody`. */
-  rawBody?: unknown;
-}
-
-/* ------------------------------------------------------------------------- */
-/* Queries                                                                    */
-/* ------------------------------------------------------------------------- */
-
-export type GovActionSort =
-  | 'newest'
-  | 'oldest'
-  | 'soonestToExpire'
-  | 'mostYesVotes'
-  | 'highestParticipation';
-
-/** Fields the caller opts into; each adds a join the list read otherwise skips. */
-export type GovActionExpand =
-  'tallies' | 'thresholds' | 'metadata' | 'myVote' | 'protocolParams';
 
 export interface ProposalListQuery extends PageRequest {
-  expand?: GovActionExpand[];
   type?: GovActionType[];
+  /** Optional filter — a provider that does not support it REJECTS it. */
   status?: GovActionStatus[];
   sort?: GovActionSort;
-  /** Free text over title/abstract, or an exact CIP-129 id. */
   search?: string;
-  /** Adds `myVote` to each element. */
+  /**
+   * Annotate rows with this voter's vote. OPTIONAL on a listing — a provider
+   * declares `proposals.voterContextOnList`. Declining it makes a consumer hide
+   * its voted/not-voted filter rather than issue one request per row.
+   */
   voterId?: string;
+  /** With `voterId`: restrict to actions this voter has or has not voted on. */
+  voted?: boolean;
 }
 
 export interface ProposalsApi {
-  /** `GET /governance/proposals` */
-  list(q?: ProposalListQuery): Promise<PagedEnvelope<GovAction>>;
+  list(q: ProposalListQuery): Promise<PagedEnvelope<GovAction>>;
 
-  /**
-   * `GET /governance/proposals/{id}` — CIP-129 id. Providers also accept the
-   * `txHash#index` form, since that is what wallets and older clients hold.
-   * `NOT_FOUND` when no action matches.
-   */
   get(
     id: string,
-    q?: { expand?: GovActionExpand[]; voterId?: string },
-  ): Promise<Envelope<GovAction>>;
+    q?: { voterId?: string },
+  ): Promise<Envelope<GovAction & { myVote?: VoteRecord | null }>>;
 
-  /** `GET /governance/proposals/{id}/votes` */
-  listVotes(id: string, q?: VoteListQuery): Promise<PagedEnvelope<VoteRecord>>;
+  /**
+   * The last ENACTED action in a lineage, for `prevGovActionId` when
+   * constructing a governance transaction. Required — without it GovTool cannot
+   * submit proposals at all.
+   *
+   * Keyed by LINEAGE, not by type: `UpdateCommittee` and `NoConfidence` share
+   * the `committee` lineage. `null` means nothing of this lineage has ever been
+   * enacted, which is the genesis case.
+   */
+  getEnacted(lineage: GovActionLineage): Promise<Envelope<GovActionRef | null>>;
 
-  /** `GET /governance/proposals/{id}/tallies` */
-  getTallies(
+  /** Optional — the individual "who voted" listing. */
+  listVotes?(id: string, q: PageRequest): Promise<PagedEnvelope<VoteRecord>>;
+
+  /** Optional — the lifecycle feed a detail page renders. */
+  listActivity?(
     id: string,
-    q?: { role?: VoterRole },
-  ): Promise<Envelope<RoleTally[]>>;
-
-  /** `GET /governance/proposals/{id}/activity` */
-  listActivity(
-    id: string,
-    q?: PageRequest,
-  ): Promise<PagedEnvelope<GovActionActivityEvent>>;
-
-  /** `GET /governance/proposals/enacted?type=…` */
-  getEnacted(
-    type: GovActionType,
-  ): Promise<Envelope<EnactedActionSummary | null>>;
-
-  /** `GET /governance/proposals?txHash=…` — post-submission confirmation. */
-  listByTx(txHash: string): Promise<Envelope<GovActionRef[]>>;
+    q: PageRequest,
+  ): Promise<PagedEnvelope<{ status: GovActionStatus; at: EpochStamp }>>;
 }

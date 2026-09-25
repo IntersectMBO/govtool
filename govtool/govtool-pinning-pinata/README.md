@@ -4,7 +4,7 @@ Pinata implementation of the GovTool pinning contract
 ([`@govtool/data-providers/pinning`](../govtool-data-providers)).
 
 The author-side write path: pin a user-authored metadata document and return
-the `url` + `dataHash` pair to submit on chain. It is optional — GovTool works
+the `url` + `dataHash` pair to submit on chain. It is optional. GovTool works
 fully with it switched off, and an author who hosts their own document never
 touches it.
 
@@ -13,7 +13,9 @@ touches it.
 ```ts
 import { createPinataPinning } from '@govtool/pinning-pinata';
 
-const pinning = createPinataPinning({ jwt: process.env.VVA_PINATAAPIJWT! });
+const pinning = createPinataPinning({
+  jwt: process.env.GOVTOOL_PINATA_API_JWT!,
+});
 
 const pin = await pinning.pin({
   content: JSON.stringify(document),
@@ -26,16 +28,16 @@ const anchor = { url: pin.url, dataHash: pin.dataHash };
 ```
 
 `toAnchor(pin)` from the contract package does that last step. Never put a
-gateway url on chain — `gatewayUrls` is for display only, and an anchor
+gateway url on chain: `gatewayUrls` is for display only, and an anchor
 pinned to one gateway's availability outlives that gateway.
 
 ## What it does
 
-`pin()` is a faithful port of the legacy backend's `POST /ipfs/upload`: the
-same endpoint (`https://upload.pinata.cloud/v3/files`), the same multipart
-shape (`network` + `file`), the same 512 KiB cap, the same default file name
+`pin()` behaves as GovTool's `POST /ipfs/upload` route does: the same endpoint
+(`https://upload.pinata.cloud/v3/files`), the same multipart shape
+(`network` + `file`), the same 512 KiB cap, the same default file name
 (`data.txt`), and failures in the same four classes. It additionally computes
-`dataHash` — blake2b-256 over the exact bytes — so the author never has to.
+`dataHash`, blake2b-256 over the exact bytes, so the author never has to.
 
 `prepare()` hashes and sizes **without** pinning, which lets an author preview
 the `dataHash` they will commit when hosting the document themselves.
@@ -53,7 +55,7 @@ call to Pinata's file-management API would be worse than an honest gap.
 **CIP validation is not performed.** `PinRequest.standard` is accepted and
 ignored, and `prepare().valid` reflects size and content-type only. Validating
 a document against CIP-108/119 belongs to the metadata service, which re-fetches
-and re-checks from the public url anyway — this service is not a trusted source
+and re-checks from the public url anyway; this service is not a trusted source
 for it.
 
 `PinningPolicy.rateLimit` and `.quota` are omitted rather than invented: a thin
@@ -68,7 +70,7 @@ consumer maps it onto its own transport without knowing the backend:
 | -------------------------- | ------------------------------------------------------ | -------- |
 | `TOO_LARGE`                | over 512 KiB, checked before any request leaves        | yes      |
 | `UNSUPPORTED_CONTENT_TYPE` | content type outside the policy                        | yes      |
-| `BACKEND_UNAVAILABLE`      | `fetch` threw — Pinata unreachable                     | no       |
+| `BACKEND_UNAVAILABLE`      | `fetch` threw: Pinata unreachable                      | no       |
 | `BACKEND_ERROR`            | Pinata answered non-2xx; `details` has status and body | no       |
 | `BACKEND_INVALID_RESPONSE` | 2xx whose body carried no cid                          | yes      |
 | `UNSUPPORTED_OPERATION`    | one of the four file-management calls                  | yes      |

@@ -85,7 +85,7 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
   private async getLatestBlockNo(): Promise<number | null> {
     try {
       const { data } = await this.chain.system.getHealth();
-      return data[0]?.tip?.block ?? null;
+      return data.tip?.block ?? null;
     } catch (error) {
       this.logger.warn(
         `Could not read the chain tip: ${error instanceof Error ? error.message : String(error)}`,

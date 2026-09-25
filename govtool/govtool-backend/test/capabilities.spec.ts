@@ -8,50 +8,58 @@
  *   - a RAISE is tested by driving the service and watching it supply the
  *     capability the provider refused;
  *   - a LOWER is tested by driving the service and watching it destroy one;
- *   - the route list is tested by grepping `src/` rather than by reading it,
- *     because a new `this.chain.…` call is exactly the change that would make
- *     the "not exposed" block silently wrong.
+ *   - the "no route for it" list is tested by grepping `src/` for
+ *     `this.chain.…` call sites, because a new call is exactly the change
+ *     that would make that block silently wrong.
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type {
-  AnyDatasetCapability,
-  Caveat,
   ChainDataApiV1,
   DRep,
-  DatasetId,
+  DRepVoteListQuery,
+  Envelope,
   GovAction,
-  ProviderCapabilityDocument,
-  RouteId,
+  PageRequest,
+  PagedEnvelope,
+  ProviderCapabilities,
 } from '@govtool/data-providers/chain-data';
-import {
-  DATASETS,
-  DATASET_IDS,
-  ChainDataError,
-  composeCapabilities,
-  declarationProblems,
-  readCapability,
-  resolveCapabilities,
-} from '@govtool/data-providers/chain-data';
-import { dbSyncCapabilities } from '@govtool/provider-dbsync';
+import { ChainDataError } from '@govtool/data-providers/chain-data';
 
 import { AdaHolderService } from '../src/ada-holder/ada-holder.service';
 import { CacheService } from '../src/cache/cache.service';
 import { ConfigService } from '../src/config/config.service';
 import { DRepService } from '../src/drep/drep.service';
 import { ProposalService } from '../src/proposal/proposal.service';
+import { drepIdToCip105 } from '../src/common/legacy-ids';
 import {
-  BACKEND_CHAIN_DATA_ROUTES,
+  allowedOptions,
   BACKEND_PROVIDER_ID,
   backendFeatures,
-  composeBackendCapabilities,
-  notExposedByBackend,
+  capabilityDigest,
+  isAvailable,
 } from '../src/system/capabilities';
+import type { FeatureId } from '../src/system/capabilities';
 import { SystemService } from '../src/system/system.service';
+import { actionId, drepId } from './ids';
 
 const HASH = 'a'.repeat(56);
 const TX = 'd'.repeat(64);
+const DREP_ID = drepId('a');
+const ACTION_ID = actionId(TX, 0);
+/** The legacy reward address the frontend sends: header e0 + HASH. */
+const STAKE_KEY = `e0${HASH}`;
+
+const META = { provider: 'stub', network: 'mainnet' } as const;
+
+function env<T>(data: T): Envelope<T> {
+  return { data, meta: { ...META } };
+}
+
+function page<T>(elements: T[]): PagedEnvelope<T> {
+  return env({ elements, total: elements.length });
+}
 
 /**
  * A cache with a zero TTL, so each test sees the stub it set up rather than a
@@ -83,6 +91,7 @@ function passthroughCache(): CacheService {
 }
 
 type StubApi = {
+  network?: Partial<ChainDataApiV1['network']>;
   accounts?: Partial<ChainDataApiV1['accounts']>;
   system?: Partial<ChainDataApiV1['system']>;
   governance?: {
@@ -95,35 +104,56 @@ function chain(overrides: StubApi): ChainDataApiV1 {
   return overrides as ChainDataApiV1;
 }
 
+/**
+ * A provider that honours everything it is allowed to. The interesting cases
+ * below narrow it; a declaration cannot say a feature is unavailable, only
+ * which option values it accepts.
+ */
+function providerCapabilities(
+  overrides: Partial<ProviderCapabilities> = {},
+): ProviderCapabilities {
+  return {
+    sorts: {
+      dreps: ['votingPower', 'registrationDate', 'activity', 'random'],
+      proposals: ['newest', 'oldest'],
+    },
+    filters: { dreps: ['status', 'kind'], proposals: ['type', 'status'] },
+    search: ['exactId'],
+    voteAggregate: ['stake', 'count'],
+    optionalArguments: [],
+    ...overrides,
+  };
+}
+
 function drep(overrides: Partial<DRep> = {}): DRep {
   return {
     role: 'drep',
-    id: 'drep1cip129',
-    hash: HASH,
+    id: DREP_ID,
     isScriptBased: false,
-    cip105Id: 'drep1legacyview',
     kind: 'drep',
+    anchor: null,
     registration: {
-      status: 'active',
-      registeredAt: { time: '2026-01-01T00:00:00.000Z' },
-      registrationTx: { txHash: 'c'.repeat(64) },
-      deposit: '500000000',
+      latest: {
+        txRef: { txHash: 'c'.repeat(64) },
+        at: { epoch: 500, time: '2026-01-01T00:00:00.000Z' },
+        deposit: '500000000',
+      },
+      latestUpdate: null,
     },
-    metadata: null,
+    status: 'active',
     votingPower: { amount: '100', basis: 'active' },
-    activity: { votesCast: 1 },
+    activity: { voted: 1, votable: 1 },
     ...overrides,
   };
 }
 
 function govAction(overrides: Partial<GovAction> = {}): GovAction {
   return {
-    id: 'gov_action1abc',
+    id: ACTION_ID,
     txHash: TX,
     index: 0,
-    providerId: '42',
     type: 'InfoAction',
-    rawBody: { data: {} },
+    body: { type: 'InfoAction' },
     lifecycle: {
       status: 'live',
       submitted: { epoch: 500, time: '2026-01-05T00:00:00.000Z' },
@@ -134,9 +164,11 @@ function govAction(overrides: Partial<GovAction> = {}): GovAction {
       droppedAt: null,
       expiredAt: null,
     },
+    anchor: null,
+    deposit: null,
+    depositReturnAddress: null,
     previousAction: null,
-    metadata: null,
-    tallies: [],
+    voteAggregates: [],
     ...overrides,
   };
 }
@@ -144,17 +176,15 @@ function govAction(overrides: Partial<GovAction> = {}): GovAction {
 function drepService(dreps: DRep[]): DRepService {
   const cache = passthroughCache();
   const api = chain({
-    governance: {
-      dreps: {
-        list: () =>
-          Promise.resolve({
-            meta: {},
-            data: { nextCursor: null, elements: dreps },
-          }),
-      },
-    },
+    governance: { dreps: { list: () => Promise.resolve(page(dreps)) } },
+    system: { getCapabilities: () => Promise.resolve(env(PROVIDER)) },
   });
-  return new DRepService(api, new ProposalService(api, cache), cache);
+  return new DRepService(
+    api,
+    new ProposalService(api, cache, null),
+    cache,
+    null,
+  );
 }
 
 function proposalService(actions: GovAction[]): ProposalService {
@@ -162,36 +192,25 @@ function proposalService(actions: GovAction[]): ProposalService {
     chain({
       governance: {
         proposals: {
-          list: () =>
-            Promise.resolve({
-              meta: {},
-              data: { nextCursor: null, elements: actions },
-            }),
+          list: () => Promise.resolve(page(actions)),
           get: (id) => {
-            const found = actions.find(
-              (action) => `${action.txHash}#${action.index}` === id,
-            );
+            // The contract takes the CIP-129 id; the backend translates the
+            // legacy `txHash#index` before asking.
+            const found = actions.find((action) => action.id === id);
             return found === undefined
               ? Promise.reject(new ChainDataError('NOT_FOUND', id))
-              : Promise.resolve({ meta: {}, data: found });
+              : Promise.resolve(env(found));
           },
         },
       },
     }),
     passthroughCache(),
+    null,
   );
 }
 
-/** The real db-sync declaration, which is what this backend is wired to. */
-const DBSYNC: ProviderCapabilityDocument = dbSyncCapabilities('mainnet');
-const COMPOSED = composeBackendCapabilities(DBSYNC);
-
-function dataset(doc: ProviderCapabilityDocument, id: DatasetId) {
-  return readCapability(resolveCapabilities(doc), id);
-}
-
 /* ------------------------------------------------------------------------- */
-/* The route list the "not exposed" block is derived from                     */
+/* Source-grepping, for the "no route for it" claims                          */
 /* ------------------------------------------------------------------------- */
 
 function sourceFiles(directory: string): string[] {
@@ -204,70 +223,45 @@ function sourceFiles(directory: string): string[] {
   });
 }
 
-describe('BACKEND_CHAIN_DATA_ROUTES', () => {
-  it('names exactly the contract routes src/ calls', () => {
-    const called = new Set<string>();
-    for (const file of sourceFiles(join(__dirname, '..', 'src'))) {
-      const source = readFileSync(file, 'utf8');
-      for (const match of source.matchAll(
-        /this\.chain\.([A-Za-z0-9_.]+?)\(/g,
-      )) {
-        // `system.*` is how a consumer reads this document, not a gated route.
-        if (!match[1].startsWith('system.')) {
-          called.add(match[1]);
-        }
-      }
-    }
-
-    expect([...called].sort()).toEqual([...BACKEND_CHAIN_DATA_ROUTES].sort());
-  });
-
-  it('only lists routes the contract actually has', () => {
-    const contractRoutes = new Set<string>(
-      DATASET_IDS.flatMap((id) => [
-        ...(DATASETS[id].routes as readonly string[]),
-      ]),
-    );
-    for (const route of BACKEND_CHAIN_DATA_ROUTES) {
-      expect(contractRoutes.has(route)).toBe(true);
-    }
-  });
-});
-
-/* ------------------------------------------------------------------------- */
-/* RAISE — the DRep directory                                                 */
-/* ------------------------------------------------------------------------- */
-
 describe('RAISE: sortDReps handles all five DRepSort keys', () => {
   const dreps = [
     drep({
-      hash: 'a'.repeat(56),
+      id: drepId('a'),
+      status: 'retired',
       votingPower: { amount: '10', basis: 'active' },
-      activity: { votesCast: 3 },
+      activity: { voted: 3, votable: 3 },
       registration: {
-        status: 'retired',
-        registeredAt: { time: '2026-01-01T00:00:00.000Z' },
-        deposit: '1',
+        latest: {
+          txRef: { txHash: TX },
+          at: { epoch: 500, time: '2026-01-01T00:00:00.000Z' },
+        },
+        latestUpdate: null,
       },
     }),
     drep({
-      hash: 'b'.repeat(56),
+      id: drepId('b'),
+      status: 'active',
       votingPower: { amount: '30', basis: 'active' },
-      activity: { votesCast: 1 },
+      activity: { voted: 1, votable: 3 },
       registration: {
-        status: 'active',
-        registeredAt: { time: '2026-03-01T00:00:00.000Z' },
-        deposit: '1',
+        latest: {
+          txRef: { txHash: TX },
+          at: { epoch: 502, time: '2026-03-01T00:00:00.000Z' },
+        },
+        latestUpdate: null,
       },
     }),
     drep({
-      hash: 'c'.repeat(56),
+      id: drepId('c'),
+      status: 'inactive',
       votingPower: { amount: '20', basis: 'active' },
-      activity: { votesCast: 2 },
+      activity: { voted: 2, votable: 3 },
       registration: {
-        status: 'inactive',
-        registeredAt: { time: '2026-02-01T00:00:00.000Z' },
-        deposit: '1',
+        latest: {
+          txRef: { txHash: TX },
+          at: { epoch: 501, time: '2026-02-01T00:00:00.000Z' },
+        },
+        latestUpdate: null,
       },
     }),
   ];
@@ -279,14 +273,14 @@ describe('RAISE: sortDReps handles all five DRepSort keys', () => {
       pageSize: 10,
       sort,
     });
-    return body.elements.map((element) => element.drepId[0]);
+    return body.elements.map((element) => element.drepId.slice(-1));
   }
 
   it('orders by voting power, descending', async () => {
     await expect(order('VotingPower')).resolves.toEqual(['b', 'c', 'a']);
   });
 
-  it('orders by activity (votes in the trailing window), descending', async () => {
+  it('orders by activity, descending', async () => {
     await expect(order('Activity')).resolves.toEqual(['a', 'c', 'b']);
   });
 
@@ -318,97 +312,37 @@ describe('RAISE: sortDReps handles all five DRepSort keys', () => {
     );
     expect(first.elements).toHaveLength(3);
   });
+});
 
-  it('is declared honoured for every key, even when the provider refuses them all', () => {
-    // A Koios-shaped base: every DRepSort key rejected, because /drep_list has
-    // nothing to order 1,000 arbitrary rows by. The composed document must
-    // still offer the sort, since the backend supplies it.
-    const sortless: ProviderCapabilityDocument = {
-      ...DBSYNC,
-      datasets: composeCapabilities(DBSYNC.datasets, {
-        'drep.identity.current': {
-          sort: {
-            votingPower: 'rejected',
-            registrationDate: 'rejected',
-            activity: 'rejected',
-            status: 'rejected',
-            random: 'rejected',
-          },
-        },
-      }),
-    };
+describe('LOWER: sortProposals silently ignores the two keys it has no case for', () => {
+  const actions = [govAction({ index: 0 }), govAction({ index: 1 })];
 
-    const composed = composeBackendCapabilities(sortless);
-    expect(dataset(composed, 'drep.identity.current').sort).toEqual({
-      votingPower: 'honoured',
-      registrationDate: 'honoured',
-      activity: 'honoured',
-      status: 'honoured',
-      random: 'honoured',
-    });
-
-    const features = backendFeatures(composed);
-    expect(features.features['drepDirectory.browse'].available).toBe(true);
-    expect(
-      features.features['drepDirectory.browse'].options.sort.allowed,
-    ).toEqual([
-      'votingPower',
-      'registrationDate',
-      'activity',
-      'status',
-      'random',
-    ]);
+  it('returns the list untouched for an unknown sort', async () => {
+    const service = proposalService(actions);
+    const unsorted = await service.list({ type: [], page: 0, pageSize: 10 });
+    // `GovernanceActionSortMode` has no member for either, and the switch
+    // falls through `default: return copied` — no error, no ordering.
+    const asked = service.sortProposals(
+      unsorted.elements,
+      'HighestParticipation' as never,
+    );
+    expect(asked.map((e) => e.index)).toEqual([0, 1]);
   });
+});
 
-  it('declares a sort ignored when the provider never fills the column it orders by', () => {
-    // The backend supplies the ordering; the provider supplies the column. On
-    // a provider that serves `DRep.activity` only under `expand`, the backend
-    // never sees it — no service passes `expand` — so `sort: 'activity'` runs
-    // over an array of nulls and produces an unsorted list presented as
-    // sorted. That is `ignored`, and a UI must not offer it.
-    const expandOnly: ProviderCapabilityDocument = {
-      ...DBSYNC,
-      entities: {
-        ...DBSYNC.entities,
-        DRep: {
-          ...DBSYNC.entities.DRep,
-          fields: {
-            ...DBSYNC.entities.DRep.fields,
-            activity: { serves: 'onExpand' },
-          },
-        },
-      },
-      fieldOverrides: DBSYNC.fieldOverrides.filter(
-        (override) =>
-          !(override.entity === 'DRep' && override.field === 'activity'),
-      ),
-    };
-
-    const sort = dataset(
-      composeBackendCapabilities(expandOnly),
-      'drep.identity.current',
-    ).sort;
-    expect(sort?.activity).toBe('ignored');
-    // The other four are unaffected: one dead column is one lost menu item.
-    expect(sort?.votingPower).toBe('honoured');
-    expect(sort?.status).toBe('honoured');
+describe('LOWER: drepId is accepted on the proposal routes and dropped', () => {
+  it('always answers vote: null, however the caller identifies itself', async () => {
+    const service = proposalService([govAction()]);
+    const body = await service.get(`${TX}#0`, HASH);
+    expect(body.vote).toBeNull();
   });
 });
 
 describe('RAISE: the status filter and the pager run over the whole snapshot', () => {
   const dreps = [
-    drep({
-      hash: 'a'.repeat(56),
-      registration: { status: 'active', deposit: '1' },
-    }),
-    drep({
-      hash: 'b'.repeat(56),
-      registration: { status: 'inactive', deposit: '1' },
-    }),
-    drep({
-      hash: 'c'.repeat(56),
-      registration: { status: 'retired', deposit: '1' },
-    }),
+    drep({ id: drepId('a'), status: 'active' }),
+    drep({ id: drepId('b'), status: 'inactive' }),
+    drep({ id: drepId('c'), status: 'retired' }),
   ];
 
   it('filters by any combination of the three statuses', async () => {
@@ -430,42 +364,16 @@ describe('RAISE: the status filter and the pager run over the whole snapshot', (
     expect(body.total).toBe(3);
     expect(body.elements).toHaveLength(1);
   });
-
-  it('declares all three statuses honoured and an exact total', () => {
-    const cap = dataset(COMPOSED, 'drep.identity.current');
-    expect(cap.filters?.status?.values).toEqual({
-      active: 'honoured',
-      inactive: 'honoured',
-      retired: 'honoured',
-    });
-    expect(cap.paging).toMatchObject({
-      offset: 'honoured',
-      total: 'exact',
-      defaultLimit: 10,
-    });
-  });
 });
 
-/* ------------------------------------------------------------------------- */
-/* RAISE — the governance-action list                                         */
-/* ------------------------------------------------------------------------- */
-
-describe('RAISE: the proposal list is filtered, searched and sorted in memory', () => {
+describe('RAISE: the proposal list is filtered and sorted in memory', () => {
   const actions = [
+    govAction({ index: 0, type: 'InfoAction' }),
     govAction({
-      index: 0,
-      type: 'InfoAction',
-      metadata: {
-        id: 'm0',
-        anchor: { url: 'u', dataHash: 'h' },
-        standard: 'CIP108',
-        status: 'valid',
-        body: { title: 'Treasury plans', authors: [] },
-      },
-    }),
-    govAction({
+      id: actionId(TX, 1),
       index: 1,
       type: 'ParameterChange',
+      body: { type: 'ParameterChange', changes: { drepActivity: 20 } },
       lifecycle: {
         status: 'live',
         submitted: { epoch: 501, time: '2026-02-05T00:00:00.000Z' },
@@ -476,7 +384,18 @@ describe('RAISE: the proposal list is filtered, searched and sorted in memory', 
         droppedAt: null,
         expiredAt: null,
       },
-      tallies: [{ role: 'drep', stake: { yes: '9', no: '0', abstain: '0' } }],
+      voteAggregates: [
+        {
+          role: 'drep',
+          representation: 'stake',
+          yes: '9',
+          no: '0',
+          abstain: '0',
+          notVoted: '0',
+          totalEligible: '9',
+          threshold: { numerator: 67, denominator: 100 },
+        },
+      ],
     }),
   ];
 
@@ -490,15 +409,22 @@ describe('RAISE: the proposal list is filtered, searched and sorted in memory', 
     expect(body.elements[0].index).toBe(1);
   });
 
-  it('searches free text across the metadata body, not just the id', async () => {
+  /**
+   * The provider declares `exactId` search only, and the backend still matches
+   * a substring — of the action id, which is what it has. The four CIP-108
+   * strings the legacy search also matched are metadata, and chain data no
+   * longer resolves any, so free text over a title is gone until a metadata
+   * service is wired in.
+   */
+  it('searches over the whole snapshot, not by exact id alone', async () => {
     const body = await proposalService(actions).list({
       type: [],
       page: 0,
       pageSize: 10,
-      search: 'treasury pl',
+      search: actionId(TX, 1),
     });
     expect(body.total).toBe(1);
-    expect(body.elements[0].title).toBe('Treasury plans');
+    expect(body.elements[0].index).toBe(1);
   });
 
   it('sorts newest-first, soonest-to-expire and most-yes-votes', async () => {
@@ -527,129 +453,9 @@ describe('RAISE: the proposal list is filtered, searched and sorted in memory', 
     });
     expect(yes.elements.map((e) => e.index)).toEqual([1, 0]);
   });
-
-  it('declares the three it applies honoured, and free text honoured', () => {
-    const cap = dataset(COMPOSED, 'proposal.identity.current');
-    expect(cap.sort).toMatchObject({
-      newest: 'honoured',
-      soonestToExpire: 'honoured',
-      mostYesVotes: 'honoured',
-    });
-    expect(cap.search?.modes.freeText).toBe('honoured');
-    expect(cap.filters?.type?.values.UpdateCommittee).toBe('honoured');
-  });
 });
-
-/* ------------------------------------------------------------------------- */
-/* LOWER — sorts and parameters the backend accepts and drops                  */
-/* ------------------------------------------------------------------------- */
-
-describe('LOWER: sortProposals silently ignores the two keys it has no case for', () => {
-  const actions = [govAction({ index: 0 }), govAction({ index: 1 })];
-
-  it('returns the list untouched for an unknown sort', async () => {
-    const service = proposalService(actions);
-    const unsorted = await service.list({ type: [], page: 0, pageSize: 10 });
-    // `GovernanceActionSortMode` has no member for either, and the switch
-    // falls through `default: return copied` — no error, no ordering.
-    const asked = service.sortProposals(
-      unsorted.elements,
-      'HighestParticipation' as never,
-    );
-    expect(asked.map((e) => e.index)).toEqual([0, 1]);
-  });
-
-  it('declares oldest and highestParticipation ignored, not rejected', () => {
-    const cap = dataset(COMPOSED, 'proposal.identity.current');
-    expect(cap.sort?.oldest).toBe('ignored');
-    expect(cap.sort?.highestParticipation).toBe('ignored');
-  });
-
-  it('keeps them out of the UI option set, since ignored is never offerable', () => {
-    const allowed =
-      backendFeatures(COMPOSED).features['govActionList.browse'].options.sort
-        .allowed;
-    expect(allowed).not.toContain('oldest');
-    expect(allowed).not.toContain('highestParticipation');
-    expect(allowed).toContain('newest');
-  });
-});
-
-describe('LOWER: drepId is accepted on the proposal routes and dropped', () => {
-  it('always answers vote: null, however the caller identifies itself', async () => {
-    const service = proposalService([govAction()]);
-    const body = await service.get(`${TX}#0`, HASH);
-    expect(body.vote).toBeNull();
-  });
-
-  it('declares the callerVote join ignored, so the badge is not offered', () => {
-    expect(
-      dataset(COMPOSED, 'proposal.identity.current').joins?.callerVote,
-    ).toBe('ignored');
-    expect(
-      backendFeatures(COMPOSED).features['govAction.myVoteBadge'].available,
-    ).toBe(false);
-  });
-});
-
-describe('LOWER: no service passes expand, so no expand is requestable', () => {
-  it('reads the DRep directory without an expand argument', async () => {
-    const calls: unknown[] = [];
-    const cache = passthroughCache();
-    const api = chain({
-      governance: {
-        dreps: {
-          list: (query) => {
-            calls.push(query);
-            return Promise.resolve({
-              meta: {},
-              data: { nextCursor: null, elements: [drep()] },
-            });
-          },
-        },
-      },
-    });
-    const service = new DRepService(
-      api,
-      new ProposalService(api, cache),
-      cache,
-    );
-    await service.list({ status: [], page: 0, pageSize: 10 });
-
-    expect(calls).toHaveLength(1);
-    expect(calls[0]).not.toHaveProperty('expand');
-  });
-
-  it('declares every expand member ignored on the datasets it reads', () => {
-    expect(dataset(COMPOSED, 'drep.identity.current').expand).toEqual({
-      metadata: 'ignored',
-      liveVotingPower: 'ignored',
-      delegators: 'ignored',
-      activity: 'ignored',
-    });
-    expect(
-      Object.values(
-        dataset(COMPOSED, 'proposal.identity.current').expand ?? {},
-      ),
-    ).toEqual(
-      ['tallies', 'thresholds', 'metadata', 'myVote', 'protocolParams'].map(
-        () => 'ignored',
-      ),
-    );
-  });
-});
-
-/* ------------------------------------------------------------------------- */
-/* LOWER — absence laundered into a plausible value                            */
-/* ------------------------------------------------------------------------- */
 
 describe('LOWER: laundering an absence into a number', () => {
-  function misreport(
-    entity: 'VotingPower' | 'DRepVotingPowerEntry' | 'Registration',
-  ) {
-    return COMPOSED.entities[entity].misreported ?? [];
-  }
-
   it('turns a provider failure into 0 voting power for the connected wallet', async () => {
     const service = new AdaHolderService(
       chain({
@@ -661,329 +467,264 @@ describe('LOWER: laundering an absence into a number', () => {
       passthroughCache(),
     );
     // Not a 503: the number the browser renders as fact.
-    await expect(service.getVotingPower(HASH)).resolves.toBe(0);
+    await expect(service.getVotingPower(STAKE_KEY)).resolves.toBe(0);
   });
 
   it('turns "no rows" into the same 0, so the two are indistinguishable', async () => {
     const service = new AdaHolderService(
-      chain({
-        accounts: {
-          getVotingPower: () => Promise.resolve({ meta: {}, data: null }),
-        },
-      }),
+      chain({ accounts: { getVotingPower: () => Promise.resolve(env(null)) } }),
       passthroughCache(),
     );
-    await expect(service.getVotingPower(HASH)).resolves.toBe(0);
-  });
-
-  it('declares VotingPower.amount misreported as 0', () => {
-    expect(misreport('VotingPower')).toContainEqual(
-      expect.objectContaining({ field: 'amount', sends: '0' }),
-    );
+    await expect(service.getVotingPower(STAKE_KEY)).resolves.toBe(0);
   });
 
   it('turns an unknown DRep voting power into 0 on the batch route', async () => {
     const cache = passthroughCache();
     const api = chain({
       governance: {
-        dreps: {
-          getVotingPowers: () =>
-            Promise.resolve({
-              meta: {},
-              data: [
-                {
-                  subject: {
-                    kind: 'drep' as const,
-                    drep: {
-                      role: 'drep' as const,
-                      id: 'drep1x',
-                      hash: HASH,
-                      isScriptBased: false,
-                    },
-                  },
-                  votingPower: null,
-                },
-              ],
-            }),
-        },
+        dreps: { get: () => Promise.resolve(env(drep({ votingPower: null }))) },
       },
     });
     const service = new DRepService(
       api,
-      new ProposalService(api, cache),
+      new ProposalService(api, cache, null),
       cache,
+      null,
     );
-    await expect(service.getVotingPowerList([HASH])).resolves.toEqual([
-      { view: 'drep1x', hashRaw: HASH, votingPower: 0, givenName: null },
+    await expect(service.getVotingPowerList([DREP_ID])).resolves.toEqual([
+      {
+        view: drepIdToCip105(DREP_ID),
+        hashRaw: HASH,
+        votingPower: 0,
+        givenName: null,
+      },
     ]);
-  });
-
-  it('declares DRepVotingPowerEntry.votingPower misreported as 0', () => {
-    expect(misreport('DRepVotingPowerEntry')).toContainEqual(
-      expect.objectContaining({ field: 'votingPower', sends: '0' }),
-    );
   });
 
   it('turns an unknown deposit into 0 on the directory row', async () => {
     const body = await drepService([
-      drep({ registration: { status: 'active', deposit: null } }),
+      drep({
+        registration: {
+          latest: { txRef: { txHash: TX }, at: { epoch: 500 } },
+          latestUpdate: null,
+        },
+      }),
     ]).list({ status: [], page: 0, pageSize: 10 });
     expect(body.elements[0].deposit).toBe(0);
   });
-
-  it('declares Registration.deposit misreported as 0', () => {
-    expect(misreport('Registration')).toContainEqual(
-      expect.objectContaining({ field: 'deposit', sends: '0' }),
-    );
-  });
 });
 
-describe('LOWER: a DRep vote history is one provider page, unpaged', () => {
-  it('asks listVotes for no page and follows no cursor', async () => {
-    const calls: unknown[] = [];
+describe('RAISE: a DRep vote history is read whole, not one provider page', () => {
+  it('pages the listing to the end and asks for voted rows only', async () => {
+    const calls: (PageRequest & DRepVoteListQuery)[] = [];
     const cache = passthroughCache();
     const api = chain({
       governance: {
         dreps: {
-          listVotes: (...args: unknown[]) => {
-            calls.push(args);
-            return Promise.resolve({
-              meta: {},
-              data: { nextCursor: 'more-after-this', elements: [] },
-            });
+          listVotes: (_id, q) => {
+            calls.push(q);
+            return Promise.resolve(env({ elements: [], total: 0 }));
           },
         },
+        proposals: { list: () => Promise.resolve(page([govAction()])) },
       },
     });
     const service = new DRepService(
       api,
-      new ProposalService(api, cache),
+      new ProposalService(api, cache, null),
       cache,
+      null,
     );
 
-    await service.getVotes(HASH);
+    await service.getVotes(DREP_ID);
 
-    // One call, with the id alone — no PageRequest, and the cursor the
-    // provider returned is never followed.
-    expect(calls).toEqual([[HASH]]);
+    // A paged read, from page 1, restricted to the rows the legacy endpoint
+    // returns — the listing also carries not-voted rows.
+    expect(calls).toHaveLength(1);
+    expect(calls[0].page).toBe(1);
+    expect(calls[0].voted).toBe(true);
   });
 
-  it('declares the truncation as a notExhaustive caveat', () => {
-    const caveats: readonly Caveat[] =
-      dataset(COMPOSED, 'drep.ballot.current').caveats ?? [];
-    expect(caveats.map((caveat) => caveat.kind)).toContain('notExhaustive');
-    // The provider's own caveats survive the merge: db-sync warns that this
-    // route omits votes cast on concluded actions, and that is still true.
-    const providerCaveats: readonly Caveat[] =
-      dataset(DBSYNC, 'drep.ballot.current').caveats ?? [];
-    for (const caveat of providerCaveats) {
-      expect(caveats).toContainEqual(caveat);
-    }
-    expect(providerCaveats.length).toBeGreaterThan(0);
-  });
-});
-
-/* ------------------------------------------------------------------------- */
-/* LOWER — routes this backend does not have                                  */
-/* ------------------------------------------------------------------------- */
-
-describe('LOWER: datasets no controller reads are refused', () => {
-  const notExposed = notExposedByBackend();
-
-  it('covers every dataset none of whose routes the backend calls', () => {
-    const called = new Set<string>(BACKEND_CHAIN_DATA_ROUTES);
-    for (const id of DATASET_IDS) {
-      const reachable = (DATASETS[id].routes as readonly string[]).some(
-        (route) => called.has(route),
-      );
-      if (!reachable) {
-        expect(notExposed[id]).toBeDefined();
-      }
-    }
-  });
-
-  it('refuses a dataset db-sync really does serve', () => {
-    // The one live instance today: db-sync projects a vote's CIP-100
-    // rationale, and this backend calls `governance.votes.get` nowhere, so a
-    // browser told the feature works would call an endpoint that 404s.
-    expect(dataset(DBSYNC, 'vote.metadata.current').reachability).toBe(
-      'served',
+  it('refuses rather than answering an empty list when the provider has no listing', async () => {
+    const cache = passthroughCache();
+    const api = chain({ governance: { dreps: {} } });
+    const service = new DRepService(
+      api,
+      new ProposalService(api, cache, null),
+      cache,
+      null,
     );
-    expect(dataset(COMPOSED, 'vote.metadata.current')).toMatchObject({
-      reachability: 'refused',
-      unavailable: { kind: 'notImplemented', scope: 'source' },
+    await expect(service.getVotes(DREP_ID)).rejects.toMatchObject({
+      status: 501,
     });
   });
-
-  it('refuses every one of them on a provider that serves them all', () => {
-    // db-sync happens to refuse most of these itself, which would leave the
-    // block untested. A provider that serves everything proves the backend's
-    // own limit is what the composed document reports.
-    const everything: Partial<
-      Record<DatasetId, Partial<AnyDatasetCapability>>
-    > = {};
-    for (const id of DATASET_IDS) {
-      if (notExposed[id] !== undefined) {
-        everything[id] = {
-          reachability: 'served',
-          unavailable: undefined,
-          pollable: true,
-        };
-      }
-    }
-    const generous: ProviderCapabilityDocument = {
-      ...DBSYNC,
-      datasets: composeCapabilities(DBSYNC.datasets, everything),
-    };
-
-    const composed = composeBackendCapabilities(generous);
-    for (const id of Object.keys(notExposed) as DatasetId[]) {
-      expect(dataset(composed, id)).toMatchObject({
-        reachability: 'refused',
-        unavailable: { kind: 'notImplemented', scope: 'source' },
-      });
-    }
-    // Spot-check the two the frontend would most obviously be misled by.
-    const features = backendFeatures(composed).features;
-    expect(features['govAction.voterList'].available).toBe(false);
-    expect(features['committee.browse'].available).toBe(false);
-  });
-
-  it('keeps the provider reason when the provider already refuses', () => {
-    // `drep.delegation.events` is a universal gap; "no source records the
-    // transitions" outranks "this backend has no route", and the derived
-    // feature must still come out permanentlyAbsent.
-    expect(
-      dataset(COMPOSED, 'drep.delegation.events').unavailable?.reason,
-    ).toEqual(dataset(DBSYNC, 'drep.delegation.events').unavailable?.reason);
-    expect(
-      backendFeatures(COMPOSED).features['drep.delegationTimeline']
-        .permanentlyAbsent,
-    ).toBe(true);
-  });
-
-  it('leaves the datasets the backend does read alone', () => {
-    for (const id of [
-      'drep.identity.current',
-      'proposal.identity.current',
-      'network.identity.current',
-      'account.delegation.current',
-      'transaction.identity.current',
-    ] satisfies DatasetId[]) {
-      expect(dataset(COMPOSED, id).reachability).toBe('served');
-    }
-  });
 });
 
 /* ------------------------------------------------------------------------- */
-/* The document as a whole                                                    */
+/* The composed feature set                                                   */
 /* ------------------------------------------------------------------------- */
 
-describe('the composed document', () => {
-  it('has no declaration problems', () => {
-    expect(declarationProblems(COMPOSED)).toEqual([]);
-  });
+const PROVIDER = providerCapabilities();
+const COMPOSED = backendFeatures(PROVIDER, 'mainnet');
 
-  it('says who it was composed from, rather than impersonating the provider', () => {
+describe('the composed feature set', () => {
+  it('claims this backend, not the provider', () => {
     expect(COMPOSED.provider).toBe(BACKEND_PROVIDER_ID);
-    expect(COMPOSED.composedFrom).toEqual([
-      { provider: 'dbsync', network: 'mainnet' },
-    ]);
     expect(COMPOSED.network).toBe('mainnet');
   });
 
-  it('is deterministic, so a consumer can compare digests', () => {
-    expect(backendFeatures(COMPOSED).sourceDigest).toBe(
-      backendFeatures(composeBackendCapabilities(DBSYNC)).sourceDigest,
+  it('RAISES the controls it applies to its own snapshot', () => {
+    // The point is that the backend removes the restriction entirely, so a
+    // provider that refuses every key still gets a full menu.
+    const raised = backendFeatures(
+      providerCapabilities({
+        sorts: { dreps: [], proposals: ['newest'] },
+        filters: { dreps: [], proposals: [] },
+        search: ['exactId'],
+      }),
+      'mainnet',
     );
+    const universe = ['votingPower', 'activity', 'status'];
+    expect(allowedOptions(raised, 'drepDirectory.sort', universe)).toEqual(
+      universe,
+    );
+    expect(allowedOptions(raised, 'govActionList.sort', ['newest'])).toEqual([
+      'newest',
+    ]);
+    expect(
+      allowedOptions(raised, 'drepDirectory.search', ['exactId', 'freeText']),
+    ).toEqual(['exactId', 'freeText']);
+    expect(allowedOptions(raised, 'govActionList.status', ['live'])).toEqual([
+      'live',
+    ]);
   });
 
-  it('lets a provider deployment fault still win over a compensation', () => {
-    // A fault is applied by `resolveCapabilities` after composition: the
-    // backend can page and sort rows it could not read in the first place.
-    const faulty: ProviderCapabilityDocument = {
-      ...DBSYNC,
-      overrides: [
-        {
-          dataset: 'drep.identity.current',
-          reachability: 'refused',
-          unavailable: {
-            kind: 'deploymentFault',
-            scope: 'deployment',
-            symptom: 'statement timeout',
-            reason: 'list-dreps.sql times out on this instance.',
-          },
-        },
-      ],
-    };
-    const composed = composeBackendCapabilities(faulty);
-    expect(dataset(composed, 'drep.identity.current').reachability).toBe(
-      'refused',
-    );
-    const browse = backendFeatures(composed).features['drepDirectory.browse'];
-    expect(browse.available).toBe(false);
-    expect(browse.blockedBy?.cause).toBe('deployment');
+  it('LOWERS a feature whose route it does not expose', () => {
+    // The provider can serve these; this backend has no route for them.
+    expect(isAvailable(COMPOSED, 'network.treasury')).toBe(false);
+    expect(isAvailable(COMPOSED, 'committee.browse')).toBe(false);
+    expect(isAvailable(COMPOSED, 'spo.directory')).toBe(false);
+    expect(isAvailable(COMPOSED, 'govAction.voterList')).toBe(false);
   });
 
-  it('breaks no core feature on db-sync', () => {
-    // `brokenCore` is a deployment banner, not a hidden tab. The backend must
-    // not create one: everything it takes away here is `enhanced`.
-    expect(backendFeatures(COMPOSED).brokenCore).toEqual([]);
-    const features = backendFeatures(COMPOSED).features;
-    expect(features['drepDirectory.browse'].available).toBe(true);
-    expect(features['govActionList.browse'].available).toBe(true);
-    expect(features['account.votingPower'].available).toBe(true);
+  it('keeps the features it does expose available', () => {
+    for (const feature of [
+      'drep.directory',
+      'govAction.list',
+      'account.currentDelegation',
+      'dashboard.metrics',
+    ] as FeatureId[]) {
+      expect(isAvailable(COMPOSED, feature)).toBe(true);
+    }
+  });
+
+  it('fails open on a feature set that could not be fetched', () => {
+    // An unreachable /system/features must never hide a working screen.
+    expect(isAvailable(undefined, 'committee.browse')).toBe(true);
+    expect(
+      allowedOptions(undefined, 'drepDirectory.sort', ['votingPower']),
+    ).toEqual(['votingPower']);
+  });
+
+  it('carries the losses it introduces itself', () => {
+    const votingPower = COMPOSED.caveats.filter(
+      (c) => c.feature === 'account.votingPower',
+    );
+    expect(votingPower).toHaveLength(1);
+    expect(votingPower[0].note).toMatch(/returns 0/);
+
+    // The metrics route now assembles its counters, and says which of them no
+    // resource owns any more.
+    const metrics = COMPOSED.caveats.filter(
+      (c) => c.feature === 'dashboard.metrics',
+    );
+    expect(metrics).toHaveLength(1);
+    expect(metrics[0].kind).toBe('derived');
+
+    // Every metadata-derived field on a directory row is null.
+    expect(
+      COMPOSED.caveats.some(
+        (c) => c.feature === 'drep.directory' && /anchor/.test(c.note),
+      ),
+    ).toBe(true);
+  });
+
+  it('never qualifies a feature it also declares unavailable', () => {
+    for (const caveat of COMPOSED.caveats) {
+      expect(COMPOSED.unavailable[caveat.feature]).toBeUndefined();
+    }
+  });
+
+  it('digests to a stable value', () => {
+    expect(capabilityDigest(COMPOSED)).toBe(capabilityDigest(COMPOSED));
+    expect(capabilityDigest(COMPOSED)).toMatch(/^sha256:[0-9a-f]{16}$/);
+  });
+});
+
+describe('the features this backend has no route for', () => {
+  // A new `this.chain.*` call is what would make the NO_ROUTE block wrong, so
+  // the list of called routes is grepped rather than read.
+  const called = new Set<string>();
+  for (const file of sourceFiles(join(__dirname, '..', 'src'))) {
+    for (const match of readFileSync(file, 'utf8').matchAll(
+      /this\.chain\.([A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)*)/g,
+    )) {
+      called.add(match[1]);
+    }
+  }
+
+  it.each([
+    ['network.treasury', 'network.getTreasury'],
+    ['spo.directory', 'governance.pools.list'],
+    ['govAction.voterList', 'governance.proposals.listVotes'],
+    ['govAction.activityTimeline', 'governance.proposals.listActivity'],
+    ['drep.delegatorList', 'governance.dreps.listDelegators'],
+    ['drep.registrationHistory', 'governance.dreps.listUpdateHistory'],
+    ['account.delegationHistory', 'accounts.listDelegationHistory'],
+  ])('%s is declared unavailable and %s is never called', (feature, route) => {
+    expect(isAvailable(COMPOSED, feature as FeatureId)).toBe(false);
+    expect(called.has(route)).toBe(false);
+  });
+
+  /**
+   * The one exception, and the reason the two halves are tested separately:
+   * `GovernanceMetrics` is gone, so the committee's size and quorum come from
+   * the committee itself. The call exists; a route to browse the committee
+   * still does not.
+   */
+  it('reads the committee for the metrics counters without exposing it', () => {
+    expect(called.has('governance.committee.getCommittee')).toBe(true);
+    expect(isAvailable(COMPOSED, 'committee.browse')).toBe(false);
+    expect(called.has('governance.committee.getMember')).toBe(false);
+    expect(called.has('governance.committee.getConstitution')).toBe(false);
+  });
+
+  it('does call the routes behind the features it keeps', () => {
+    for (const route of [
+      'governance.dreps.list',
+      'governance.proposals.list',
+      'accounts.getDelegation',
+    ]) {
+      expect(called.has(route)).toBe(true);
+    }
   });
 });
 
 describe('the /system endpoints', () => {
-  function systemService(): SystemService {
-    return new SystemService(
-      chain({
-        system: {
-          getCapabilities: () => Promise.resolve({ meta: {}, data: DBSYNC }),
-        },
-      }),
-      passthroughCache(),
-    );
-  }
-
-  it('serves the COMPOSED document, not the provider one', async () => {
-    const document = await systemService().getCapabilities();
-    expect(document.provider).toBe(BACKEND_PROVIDER_ID);
-    expect(document.composedFrom).toEqual([
-      { provider: 'dbsync', network: 'mainnet' },
-    ]);
-    // The raise is in the served document, not only in the unit under test.
-    expect(
-      readCapability(document.datasets, 'drep.identity.current').paging,
-    ).toMatchObject({ total: 'exact' });
-  });
-
-  it('derives the feature set from the composed document', async () => {
-    const features = await systemService().getFeatures();
-    expect(features.schemaVersion).toBe(2);
-    expect(features.provider).toBe(BACKEND_PROVIDER_ID);
-    expect(features.sourceDigest).toMatch(/^sha256:[0-9a-f]{64}$/);
-    expect(features.features['drepDirectory.browse'].available).toBe(true);
-  });
-
-  it('turns a provider failure into an HTTP error rather than an empty document', async () => {
-    const service = new SystemService(
-      chain({
-        system: {
-          getCapabilities: () =>
-            Promise.reject(new ChainDataError('PROVIDER_UNAVAILABLE', 'down')),
-        },
-      }),
-      passthroughCache(),
-    );
-    await expect(service.getCapabilities()).rejects.toMatchObject({
-      status: 503,
+  it('serves the provider declaration raw and the feature set composed', async () => {
+    const api = chain({
+      system: { getCapabilities: () => Promise.resolve(env(PROVIDER)) },
     });
+    const system = new SystemService(api, passthroughCache());
+
+    const raw = await system.getCapabilities();
+    expect(raw.search).toEqual(['exactId']);
+    expect(raw.sorts.proposals).toContain('newest');
+
+    const features = await system.getFeatures();
+    expect(features.provider).toBe(BACKEND_PROVIDER_ID);
+    // From the envelope the declaration arrived in.
+    expect(features.network).toBe('mainnet');
+    expect(isAvailable(features, 'committee.browse')).toBe(false);
   });
 });
-
-/** Referenced so the RouteId import is used by the type checker, not erased. */
-const _routeIdIsTyped: RouteId = 'governance.dreps.list';
-void _routeIdIsTyped;

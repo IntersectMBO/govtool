@@ -16,12 +16,20 @@ export type BackendConfigFile = {
   sentryenv: string;
 };
 
+export type IpfsUploadConfig = {
+  perClientLimit: number;
+  globalLimit: number;
+  windowSeconds: number;
+};
+
 export type BackendConfig = {
   dbSync: DbSyncConfig;
   cacheMaxEntries: number;
   ipfsGateway: string;
   ipfsProjectId: string;
   pinataApiJwt: string | null;
+  ipfsUpload: IpfsUploadConfig;
+  trustProxy: string;
   port: number;
   host: string;
   cacheDurationSeconds: number;

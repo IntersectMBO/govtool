@@ -2,13 +2,14 @@ import 'reflect-metadata';
 
 import * as Sentry from '@sentry/nestjs';
 import { NestFactory } from '@nestjs/core';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { ConfigService } from './config/config.service';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as express from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: {
       origin: '*',
       methods: 'GET,HEAD,POST,OPTIONS',
@@ -30,6 +31,10 @@ async function bootstrap() {
       tracesSampleRate: 0,
     });
   }
+
+  // Resolve the real client IP behind the reverse proxy (used by the
+  // /ipfs/upload rate limiter).
+  app.set('trust proxy', config.trustProxy);
 
   // Enables SIGTERM/SIGINT handling
   app.enableShutdownHooks();

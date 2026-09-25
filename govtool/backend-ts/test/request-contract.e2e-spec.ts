@@ -144,6 +144,10 @@ describe('HTTP input contracts', () => {
       .type('text/plain')
       .send('data')
       .expect(201);
-    expect(ipfs.upload).toHaveBeenCalledWith('data.txt', 'data');
+    expect(ipfs.upload).toHaveBeenCalledWith(
+      undefined,
+      'data',
+      expect.any(String),
+    );
   });
 });

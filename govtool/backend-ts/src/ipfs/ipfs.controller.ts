@@ -24,6 +24,10 @@ export class IpfsController {
     if (!request.is('text/plain') || typeof fileContent !== 'string') {
       throw new UnsupportedMediaTypeException('Expected a text/plain body');
     }
-    return this.ipfsService.upload(fileName ?? 'data.txt', fileContent);
+    return this.ipfsService.upload(
+      fileName,
+      fileContent,
+      request.ip ?? request.socket.remoteAddress ?? 'unknown',
+    );
   }
 }

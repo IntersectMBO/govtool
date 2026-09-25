@@ -106,8 +106,13 @@ export const GovernanceActionDetails = () => {
       isEnabled &&
       getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)
     ) {
-      const { pathname } = window.location;
-      navigate(`/connected${pathname}`);
+      // The effect can run again before this page unmounts (StrictMode runs
+      // it twice in development), so only redirect once, and keep the hash:
+      // it carries the action index.
+      const { pathname, search, hash: locationHash } = window.location;
+      if (!pathname.startsWith("/connected")) {
+        navigate(`/connected${pathname}${search}${locationHash}`);
+      }
     }
   }, [isEnabled, error]);
 

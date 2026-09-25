@@ -1,5 +1,9 @@
 import { dbInteger, ApiInteger } from 'src/common/integer';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 
 import { assertHexText } from 'src/common/hex';
 import { DbService } from 'src/db/db.service';
@@ -10,8 +14,12 @@ import {
   VotingPowerRow,
 } from './ada-holder.type';
 import { CacheService } from 'src/cache/cache.service';
+class VotingPowerUnavailableError extends Error {}
+
 @Injectable()
 export class AdaHolderService {
+  private readonly logger = new Logger(AdaHolderService.name);
+
   constructor(
     private readonly dbService: DbService,
     private readonly sqlService: SqlService,
@@ -55,20 +63,48 @@ export class AdaHolderService {
   }
 
   async getVotingPower(stakeKey: string): Promise<ApiInteger> {
-    return this.cacheService.getOrSet(
-      'adaHolderVotingPower',
-      stakeKey,
-      async () => {
-        assertHexText(stakeKey);
+    assertHexText(stakeKey);
 
-        const sql = this.sqlService.load('get-stake-key-voting-power.sql');
+    try {
+      return await this.cacheService.getOrSet(
+        'adaHolderVotingPower',
+        stakeKey,
+        async () => {
+          const sql = this.sqlService.load('get-stake-key-voting-power.sql');
 
-        const result = await this.dbService
-          .query<VotingPowerRow>(sql, [stakeKey])
-          .catch(() => null);
-        if (!result || result.rows.length !== 1) return 0;
-        return dbInteger(result.rows[0].total_balance);
-      },
-    );
+          let result: { rows: VotingPowerRow[] };
+          try {
+            result = await this.dbService.query<VotingPowerRow>(sql, [
+              stakeKey,
+            ]);
+          } catch (error) {
+            this.logger.error(
+              `Couldn't fetch voting power for stake key: ${stakeKey}`,
+              error instanceof Error ? error.stack : String(error),
+            );
+            // Rejecting keeps the fallback 0 out of the cache.
+            throw new VotingPowerUnavailableError();
+          }
+
+          if (result.rows.length === 0) {
+            this.logger.warn(
+              `No voting power found for stake key: ${stakeKey}`,
+            );
+            return 0;
+          }
+          if (result.rows.length !== 1) {
+            this.logger.warn(
+              `Unexpected voting power result for stake key: ${stakeKey}`,
+            );
+            return 0;
+          }
+          return dbInteger(result.rows[0].total_balance);
+        },
+      );
+    } catch (error) {
+      // Same response as the Haskell backend: a failed lookup reports 0.
+      if (error instanceof VotingPowerUnavailableError) return 0;
+      throw error;
+    }
   }
 }

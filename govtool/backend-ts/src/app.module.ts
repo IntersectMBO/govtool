@@ -31,7 +31,8 @@ import { CacheWarmerService } from './cache/cache-warmer.service';
 import { MetadataModule } from './metadata/metadata.module';
 import { SurveyController } from './survey/survey.controller';
 import { SurveyService } from './survey/survey.service';
-import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
+import { SentryModule } from '@sentry/nestjs/setup';
+import { LoggingExceptionFilter } from './common/logging-exception.filter';
 
 @Module({
   imports: [SentryModule.forRoot(), MetadataModule],
@@ -51,7 +52,7 @@ import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: IntegerJsonInterceptor },
-    { provide: APP_FILTER, useClass: SentryGlobalFilter },
+    { provide: APP_FILTER, useClass: LoggingExceptionFilter },
     VoteService,
     AppService,
     ConfigService,

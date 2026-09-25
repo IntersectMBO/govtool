@@ -38,7 +38,11 @@ export const DashboardDrawerMobile = ({
   const openDrawer = () => setIsDrawerOpen(true);
   const closeDrawer = () => setIsDrawerOpen(false);
 
-  const navItems = CONNECTED_NAV_ITEMS as unknown as NavItem[];
+  const navItems = (CONNECTED_NAV_ITEMS as unknown as NavItem[]).filter(
+    (navItem) =>
+      isProposalDiscussionForumEnabled ||
+      navItem.dataTestId !== "budget-discussion-link",
+  );
 
   return (
     <SwipeableDrawer

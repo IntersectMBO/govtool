@@ -36,12 +36,24 @@ describe("FeatureFlagProvider", () => {
 
   it("should enable proposal discussion forum based on environment variable", () => {
     env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED = "true";
+    env.VITE_PDF_API_URL = "http://mock.pdf";
 
     const { result } = renderHook(() => useFeatureFlag(), {
       wrapper: FeatureFlagProvider,
     });
 
     expect(result.current.isProposalDiscussionForumEnabled).toBe(true);
+  });
+
+  it("should disable proposal discussion forum if the PDF API URL is not set", () => {
+    env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED = "true";
+    env.VITE_PDF_API_URL = undefined;
+
+    const { result } = renderHook(() => useFeatureFlag(), {
+      wrapper: FeatureFlagProvider,
+    });
+
+    expect(result.current.isProposalDiscussionForumEnabled).toBe(false);
   });
 
   it("should disable proposal discussion forum if environment variable is false", () => {

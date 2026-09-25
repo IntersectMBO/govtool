@@ -265,10 +265,12 @@ const FeatureFlagProvider = ({ children }: PropsWithChildren) => {
   );
   const value = useMemo(
     () => ({
+      // pdf-ui cannot run without its API, so an unset URL disables the
+      // forum (proposal and budget discussion) rather than mounting it broken.
       isProposalDiscussionForumEnabled:
-        env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === "true" ||
-        env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === true ||
-        false,
+        (env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === "true" ||
+          env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === true) &&
+        !!env.VITE_PDF_API_URL,
       isGovernanceOutcomesPillarEnabled:
         env.VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED === "true" ||
         env.VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED === true ||

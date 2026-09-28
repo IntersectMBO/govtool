@@ -1,0 +1,71 @@
+:root {
+  --ifm-color-primary: #0033ad;
+  --ifm-color-primary-dark: #002e9c;
+  --ifm-color-primary-darker: #002b93;
+  --ifm-color-primary-darkest: #002479;
+  --ifm-color-primary-light: #0038be;
+  --ifm-color-primary-lighter: #003bc7;
+  --ifm-color-primary-lightest: #0042e1;
+  --ifm-code-font-size: 95%;
+}
+
+[data-theme="dark"] {
+  --ifm-color-primary: #6f9bff;
+  --ifm-color-primary-dark: #4f84ff;
+  --ifm-color-primary-darker: #3f79ff;
+  --ifm-color-primary-darkest: #0f57ff;
+  --ifm-color-primary-light: #8fb2ff;
+  --ifm-color-primary-lighter: #9fbdff;
+  --ifm-color-primary-lightest: #cfdeff;
+}
+
+/* GitBook-style group headings in the sidebar */
+.sidebar-section {
+  display: block;
+  margin-top: 1rem;
+  padding: 0 var(--ifm-menu-link-padding-horizontal);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ifm-color-emphasis-600);
+}
+
+/* GitBook <figure> exports */
+.markdown figure {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+.markdown figure img {
+  max-width: 100%;
+}
+.markdown figcaption {
+  font-size: 0.875rem;
+  color: var(--ifm-color-emphasis-700);
+}
+.markdown img.gitbook-cover {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* GitBook {% embed %} blocks */
+.gitbook-embed {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  margin-bottom: 0.5rem;
+}
+.gitbook-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.markdown details {
+  margin-bottom: 1rem;
+}

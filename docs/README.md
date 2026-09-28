@@ -23,12 +23,64 @@ npm run build    # static site in ./build
 npm run serve    # serve the production build
 ```
 
+## Deployment (Docker)
+
+The site is packaged as a static nginx image (`Dockerfile`, `nginx.conf.template`). The container runs as a non-root user and listens on port `8080`, with a health check at `/healthz`.
+
+### Build and publish the image
+
+Build for `linux/amd64` (servers) even when building on an Apple Silicon Mac:
+
+```sh
+cd docs
+docker buildx build --platform linux/amd64 \
+  --build-arg DOCS_URL=https://docs.dev.gov.tools \
+  -t ghcr.io/<owner>/govtool-docs:<tag> \
+  --push .
+```
+
+Build arguments (fixed at build time):
+
+| Argument | Default | Purpose |
+| --- | --- | --- |
+| `DOCS_URL` | `https://docs.gov.tools` | Public URL of the site (canonical links, Open Graph tags, sitemap) |
+| `DOCS_BASE_URL` | `/` | Path the site is served under |
+
+Runtime environment variables:
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `X_ROBOTS_TAG` | `all` | Value of the `X-Robots-Tag` header. Use `noindex, nofollow` on temporary hosts |
+
+CI (`.github/workflows/build-docker-images.yml`) also builds and pushes `ghcr.io/intersectmbo/govtool-docs` on `main`, `develop`, `test` and version tags. It uses the `DOCS_URL` repository variable when set.
+
+### Run on a server
+
+`deploy/` contains a Compose file, an `.env.example` and an example host nginx server block:
+
+```sh
+cd deploy
+cp .env.example .env        # set DOCS_IMAGE, DOCS_PORT, X_ROBOTS_TAG
+docker compose up -d
+curl -fsS http://127.0.0.1:8085/healthz
+```
+
+The container is published on `127.0.0.1` only. The host reverse proxy terminates TLS and forwards to it (see `deploy/nginx-host.conf.example`).
+
+### Moving to docs.gov.tools
+
+1. Rebuild the image with `DOCS_URL=https://docs.gov.tools` (the default).
+2. Set `X_ROBOTS_TAG=all` and redeploy.
+3. Point the `docs.gov.tools` DNS record at the server and add it to the host reverse proxy.
+4. Update the GovTool frontend footer to link to `/legal/privacy-policy` and `/legal/terms-of-use` on docs.gov.tools.
+
 ## Layout
 
 | Path | Purpose |
 | --- | --- |
 | `docs/` | Markdown pages (URL = file path, `README.md` = section index) |
 | `docs/developers/` | Developer documentation (hand-written, not touched by the migration script) |
+| `Dockerfile`, `nginx.conf.template`, `deploy/` | Docker image and server deployment files |
 | `sidebars.js` | Sidebar tree: GitBook sections + developer documentation |
 | `sidebars.gitbook.js` | GitBook part of the sidebar (originally generated from `SUMMARY.md`) |
 | `static/img/gitbook/` | Images referenced by the pages |

@@ -46,6 +46,13 @@ jobs:
             dockerfile: ./govtool/metadata-validation/Dockerfile
             image: ghcr.io/${{ github.repository }}-metadata-validation
 
+          - name: govtool-docs
+            workdir: ./docs
+            dockerfile: ./docs/Dockerfile
+            image: ghcr.io/${{ github.repository }}-docs
+            # Public URL the docs site is built for (repository variable DOCS_URL, e.g. a temporary host).
+            build_args: DOCS_URL=${{ vars.DOCS_URL || 'https://docs.gov.tools' }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -137,6 +144,7 @@ jobs:
         with:
           context: ${{ matrix.context || matrix.workdir }}
           file: ${{ matrix.dockerfile }}
+          build-args: ${{ matrix.build_args }}
           load: true
           push: false
           tags: ${{ steps.meta.outputs.tags }}

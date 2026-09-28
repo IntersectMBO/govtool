@@ -1,13 +1,10 @@
 ---
 description: How GovTool handles personal and technical data when you use gov.tools, its documentation and its APIs.
+# Draft for review by Intersect legal before publication.
+# Based on the Intersect Privacy Policy (https://docs.intersectmbo.org/intersect-knowledge-base/legal/policies-and-conditions/intersect-internal-policies/privacy-policy)
+# and on how the GovTool code handles data (IntersectMBO/govtool, develop @ 6522bd4, and the embedded Proposal and Outcomes pillars).
+# Keep the "Data we process" and "Cookies and browser storage" sections in sync with the code when integrations change.
 ---
-
-<!--
-  Draft for review by Intersect legal before publication.
-  Based on the Intersect Privacy Policy (https://docs.intersectmbo.org/intersect-knowledge-base/legal/policies-and-conditions/intersect-internal-policies/privacy-policy)
-  and on how the GovTool code handles data (IntersectMBO/govtool, develop @ 6522bd4, and the embedded Proposal and Outcomes pillars).
-  Keep the "Data we process" and "Cookies and browser storage" sections in sync with the code when integrations change.
--->
 
 # Privacy Policy
 

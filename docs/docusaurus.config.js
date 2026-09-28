@@ -1,14 +1,20 @@
 // @ts-check
 const { themes: prismThemes } = require("prism-react-renderer");
 
+// Build-time settings. Override them with environment variables (or Docker
+// build args, see Dockerfile) to build the site for another domain, e.g. a
+// temporary host before docs.gov.tools is switched over.
+const siteUrl = process.env.DOCS_URL || "https://docs.gov.tools";
+const baseUrl = process.env.DOCS_BASE_URL || "/";
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "Governance Tools Documentation",
   tagline: "User guides for Cardano GovTool and the Constitutional Committee Portal",
   favicon: "img/favicon.svg",
 
-  url: "https://docs.gov.tools",
-  baseUrl: "/",
+  url: siteUrl,
+  baseUrl,
 
   organizationName: "IntersectMBO",
   projectName: "govtool",

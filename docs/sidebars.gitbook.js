@@ -3,64 +3,76 @@
 module.exports = [
   {
     "type": "html",
-    "value": "2025 Funding (archive)",
+    "value": "Important Updates",
     "className": "sidebar-section",
     "defaultStyle": true
   },
   {
     "type": "category",
-    "label": "⚠️ GovTool Maintenance Ending Soon",
-    "link": {
-      "type": "doc",
-      "id": "README"
-    },
-    "collapsed": true,
+    "label": "GovTool Maintenance",
+    "collapsed": false,
     "items": [
       {
         "type": "doc",
-        "id": "important-updates/govtool-maintenance-ending-soon/the-future-of-govtool-why-it-matters-and-what-comes-next",
-        "label": "The future of GovTool: Why it matters and what comes next"
+        "id": "important-updates/govtool-maintenance-2026",
+        "label": "2026: Actively maintained by Sireto"
       },
       {
         "type": "category",
-        "label": "Updated Budget Proposal",
+        "label": "2025: Maintenance ending soon",
         "link": {
           "type": "doc",
-          "id": "important-updates/govtool-maintenance-ending-soon/updated-budget-proposal/README"
+          "id": "important-updates/govtool-maintenance-ending-soon/README"
         },
         "collapsed": true,
         "items": [
           {
             "type": "doc",
-            "id": "important-updates/govtool-maintenance-ending-soon/updated-budget-proposal/updated-govtool-budget-proposal-short-version",
-            "label": "Updated Govtool Budget Proposal - short version"
+            "id": "important-updates/govtool-maintenance-ending-soon/the-future-of-govtool-why-it-matters-and-what-comes-next",
+            "label": "The future of GovTool: Why it matters and what comes next"
+          },
+          {
+            "type": "category",
+            "label": "Updated Budget Proposal",
+            "link": {
+              "type": "doc",
+              "id": "important-updates/govtool-maintenance-ending-soon/updated-budget-proposal/README"
+            },
+            "collapsed": true,
+            "items": [
+              {
+                "type": "doc",
+                "id": "important-updates/govtool-maintenance-ending-soon/updated-budget-proposal/updated-govtool-budget-proposal-short-version",
+                "label": "Updated Govtool Budget Proposal - short version"
+              },
+              {
+                "type": "doc",
+                "id": "important-updates/govtool-maintenance-ending-soon/updated-budget-proposal/updated-govtool-budget-proposal-long-version",
+                "label": "Updated Govtool Budget Proposal - long version"
+              },
+              {
+                "type": "doc",
+                "id": "important-updates/govtool-maintenance-ending-soon/updated-budget-proposal/budget-proposal-faqs",
+                "label": "Budget Proposal FAQs"
+              },
+              {
+                "type": "doc",
+                "id": "important-updates/govtool-maintenance-ending-soon/updated-budget-proposal/proposed-roadmap",
+                "label": "Proposed roadmap"
+              },
+              {
+                "type": "doc",
+                "id": "important-updates/govtool-maintenance-ending-soon/updated-budget-proposal/govtool-builder-monthly-responsibilities",
+                "label": "Govtool Builder monthly responsibilities"
+              }
+            ]
           },
           {
             "type": "doc",
-            "id": "important-updates/govtool-maintenance-ending-soon/updated-budget-proposal/updated-govtool-budget-proposal-long-version",
-            "label": "Updated Govtool Budget Proposal - long version"
-          },
-          {
-            "type": "doc",
-            "id": "important-updates/govtool-maintenance-ending-soon/updated-budget-proposal/budget-proposal-faqs",
-            "label": "Budget Proposal FAQs"
-          },
-          {
-            "type": "doc",
-            "id": "important-updates/govtool-maintenance-ending-soon/updated-budget-proposal/proposed-roadmap",
-            "label": "Proposed roadmap"
-          },
-          {
-            "type": "doc",
-            "id": "important-updates/govtool-maintenance-ending-soon/updated-budget-proposal/govtool-builder-monthly-responsibilities",
-            "label": "Govtool Builder monthly responsibilities"
+            "id": "important-updates/govtool-maintenance-ending-soon/govtool-a-breakdown-of-the-costs-so-far",
+            "label": "GovTool - a breakdown of the costs so far"
           }
         ]
-      },
-      {
-        "type": "doc",
-        "id": "important-updates/govtool-maintenance-ending-soon/govtool-a-breakdown-of-the-costs-so-far",
-        "label": "GovTool - a breakdown of the costs so far"
       }
     ]
   },

@@ -7,7 +7,7 @@ The Cardano Govtool is a community tool that supports the key steps of Cardano's
 
 Intersect has facilitated the bootstrapping of GovTool and supported the process to fully open source it, allowing community ownership for improvement and maintenance.
 
-The Cardano Govtool, together with the other core tools such as the Constitutional Committee Portal, is currently managed by the Intersect [Governance tools WG](https://intersect.gitbook.io/intersect-committees-groups/groups-overview/working-groups/governance-tools-working-group), the pillars that make up Govtool (Voting & Delegation, Proposal Discussion, Budget Discussion and Outcomes) are developed and maintained by community builder teams. The availability of some pillars (Proposal Discussion, Budget Discussion and Outcomes) depends on the deployment configuration of each GovTool instance.
+The Cardano Govtool, together with the other core tools such as the Constitutional Committee Portal, is currently managed by the Intersect [Governance tools WG](https://intersect.gitbook.io/intersect-committees-groups/groups-overview/working-groups/governance-tools-working-group), the pillars that make up Govtool (Voting & Delegation, Proposal Discussion, Budget Discussion and Outcomes) are developed by community builder teams. Since September 2026, GovTool is maintained by the Sireto team (see [GovTool Maintenance in 2026](../important-updates/govtool-maintenance-2026.md)). The availability of some pillars (Proposal Discussion, Budget Discussion and Outcomes) depends on the deployment configuration of each GovTool instance.
 
 GovTool is an application that enables users to participate in many ways in the governance of the Cardano blockchain.
 

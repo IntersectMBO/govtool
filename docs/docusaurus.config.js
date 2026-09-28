@@ -49,7 +49,10 @@ const config = {
         blog: false,
         pages: false,
         theme: {
-          customCss: require.resolve("./src/css/custom.css"),
+          customCss: [
+            require.resolve("@fontsource-variable/inter/index.css"),
+            require.resolve("./src/css/custom.css"),
+          ],
         },
       }),
     ],
@@ -90,33 +93,6 @@ const config = {
           { href: "https://gov.tools", label: "GovTool", position: "right" },
           { href: "https://github.com/IntersectMBO/govtool", label: "GitHub", position: "right" },
         ],
-      },
-      footer: {
-        style: "dark",
-        links: [
-          {
-            title: "Tools",
-            items: [
-              { label: "Cardano GovTool", href: "https://gov.tools" },
-              { label: "Constitutional Committee Portal", href: "https://constitution.gov.tools" },
-            ],
-          },
-          {
-            title: "Community",
-            items: [
-              { label: "GitHub", href: "https://github.com/IntersectMBO/govtool" },
-              { label: "Intersect", href: "https://www.intersectmbo.org" },
-            ],
-          },
-          {
-            title: "Legal",
-            items: [
-              { label: "Privacy Policy", to: "/legal/privacy-policy" },
-              { label: "Terms of Use", to: "/legal/terms-of-use" },
-            ],
-          },
-        ],
-        copyright: `Copyright © ${new Date().getFullYear()} Intersect MBO`,
       },
       prism: {
         theme: prismThemes.github,

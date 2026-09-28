@@ -3,6 +3,53 @@
 module.exports = [
   {
     "type": "html",
+    "value": "overview",
+    "className": "sidebar-section",
+    "defaultStyle": true
+  },
+  {
+    "type": "doc",
+    "id": "overview/what-is-cardano-govtool",
+    "label": "What is Cardano GovTool?"
+  },
+  {
+    "type": "category",
+    "label": "Core Governance Tools",
+    "link": {
+      "type": "doc",
+      "id": "overview/core-governance-tools/README"
+    },
+    "collapsed": true,
+    "items": [
+      {
+        "type": "doc",
+        "id": "overview/core-governance-tools/access-the-core-governance-tools",
+        "label": "Access the Core Governance Tools"
+      }
+    ]
+  },
+  {
+    "type": "doc",
+    "id": "overview/system-status",
+    "label": "System status"
+  },
+  {
+    "type": "doc",
+    "id": "overview/what-is-the-constitutional-committee-portal",
+    "label": "What is the Constitutional Committee Portal?"
+  },
+  {
+    "type": "doc",
+    "id": "overview/community-governance-tools",
+    "label": "Community Governance Tools"
+  },
+  {
+    "type": "doc",
+    "id": "overview/cardano-govtool-consortium",
+    "label": "Cardano Govtool Consortium"
+  },
+  {
+    "type": "html",
     "value": "Important Updates",
     "className": "sidebar-section",
     "defaultStyle": true
@@ -10,7 +57,7 @@ module.exports = [
   {
     "type": "category",
     "label": "GovTool Maintenance",
-    "collapsed": false,
+    "collapsed": true,
     "items": [
       {
         "type": "doc",
@@ -75,53 +122,6 @@ module.exports = [
         ]
       }
     ]
-  },
-  {
-    "type": "html",
-    "value": "overview",
-    "className": "sidebar-section",
-    "defaultStyle": true
-  },
-  {
-    "type": "category",
-    "label": "Core Governance Tools",
-    "link": {
-      "type": "doc",
-      "id": "overview/core-governance-tools/README"
-    },
-    "collapsed": true,
-    "items": [
-      {
-        "type": "doc",
-        "id": "overview/core-governance-tools/access-the-core-governance-tools",
-        "label": "Access the Core Governance Tools"
-      }
-    ]
-  },
-  {
-    "type": "doc",
-    "id": "overview/system-status",
-    "label": "System status"
-  },
-  {
-    "type": "doc",
-    "id": "overview/what-is-cardano-govtool",
-    "label": "What is Cardano GovTool?"
-  },
-  {
-    "type": "doc",
-    "id": "overview/what-is-the-constitutional-committee-portal",
-    "label": "What is the Constitutional Committee Portal?"
-  },
-  {
-    "type": "doc",
-    "id": "overview/community-governance-tools",
-    "label": "Community Governance Tools"
-  },
-  {
-    "type": "doc",
-    "id": "overview/cardano-govtool-consortium",
-    "label": "Cardano Govtool Consortium"
   },
   {
     "type": "html",

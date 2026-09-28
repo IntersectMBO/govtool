@@ -1,3 +1,8 @@
+---
+slug: /
+description: Cardano GovTool is an open-source, community tool for taking part in Cardano on-chain governance.
+---
+
 
 # What is Cardano GovTool?
 

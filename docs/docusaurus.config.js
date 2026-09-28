@@ -69,6 +69,11 @@ const config = {
             to: "/cardano-govtool/faqs/how-was-the-author-of-withdraw-ara45-217-for-mlabs-core-ga-verified",
           },
           {
+            // "What is Cardano GovTool?" is now the home page.
+            from: "/overview/what-is-cardano-govtool",
+            to: "/",
+          },
+          {
             from: "/about/what-is-the-constitutional-committee-portal",
             to: "/overview/what-is-the-constitutional-committee-portal",
           },
@@ -82,6 +87,12 @@ const config = {
     ({
       colorMode: {
         respectPrefersColorScheme: true,
+      },
+      announcementBar: {
+        id: "maintenance-2026",
+        content:
+          `GovTool is actively maintained by the Sireto team. <a href="${baseUrl}important-updates/govtool-maintenance-2026">Read the 2026 update</a>`,
+        isCloseable: true,
       },
       navbar: {
         title: "Governance Tools",

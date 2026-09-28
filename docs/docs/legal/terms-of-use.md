@@ -1,12 +1,9 @@
 ---
 description: The terms that apply when you use Cardano GovTool, its documentation and its APIs.
+# Draft for review by Intersect legal before publication.
+# Based on the Intersect Terms of Use (https://docs.intersectmbo.org/intersect-knowledge-base/legal/policies-and-conditions/intersect-internal-policies/terms-of-use),
+# adapted to how GovTool works (non-custodial wallet interactions, on-chain governance, Proposals/Budget Proposals, public APIs).
 ---
-
-<!--
-  Draft for review by Intersect legal before publication.
-  Based on the Intersect Terms of Use (https://docs.intersectmbo.org/intersect-knowledge-base/legal/policies-and-conditions/intersect-internal-policies/terms-of-use),
-  adapted to how GovTool works (non-custodial wallet interactions, on-chain governance, Proposals/Budget Proposals, public APIs).
--->
 
 # Terms of Use
 
